@@ -1,5 +1,5 @@
 package Crypt::Argon2;
-$Crypt::Argon2::VERSION = '0.020';
+$Crypt::Argon2::VERSION = '0.021';
 use strict;
 use warnings;
 
@@ -53,7 +53,7 @@ Crypt::Argon2 - Perl interface to the Argon2 key derivation functions
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -148,9 +148,9 @@ This verifies that the C<$password> matches C<$encoded> and the given type. All 
 
 This function processes the C<$password> much like C<argon2_raw> does, but the C<$type> argument is set like the function name.
 
-=head2 argon2_needs_rehash($encoded, $type, $t_cost, $m_cost, $parallelism, $salt_length, $output_length)
+=head2 argon2_needs_rehash($encoded, $type, $t_cost, $m_cost, $parallelism, $output_length, $salt_length)
 
-This function checks if a password-encoded string needs a rehash. It will return true if the C<$type> (valid values are C<argon2i>, C<argon2id> or C<argon2d>), C<$t_cost>, C<$m_cost>, C<$parallelism>, C<$salt_length> or C<$output_length> arguments mismatches or any of the parameters of the password-encoded hash.
+This function checks if a password-encoded string needs a rehash. It will return true if the C<$type> (valid values are C<argon2i>, C<argon2id> or C<argon2d>), C<$t_cost>, C<$m_cost>, C<$parallelism>, C<$output_length> or C<$salt_length> arguments mismatches any of the parameters of the password-encoded hash.
 
 =head2 argon2_types
 

@@ -9,6 +9,7 @@ MANIFEST			This list of files
 README.md
 t/frantic.t
 t/indirect.t
+t/lib/TestNumber.pm
 t/paragraph-bounds.t
 t/paragraph.t
 t/script.t

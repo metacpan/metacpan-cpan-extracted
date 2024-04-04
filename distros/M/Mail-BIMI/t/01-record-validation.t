@@ -10,7 +10,7 @@ use Test::More;
 use Mail::BIMI;
 use Mail::BIMI::Record;
 
-plan tests => 11;
+plan tests => 12;
 
 is_deeply(
   test_record( 'v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg', 'example.com', 'default' ),
@@ -34,6 +34,12 @@ is_deeply(
   test_record( 'v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg; a=;', 'example.com', 'default' ),
   [ 1, [] ],
   'Valid record with a and terminator'
+);
+
+is_deeply(
+  test_record( 'v = bimi1 ; l =  https://fastmaildmarc.com/FM_BIMI.svg  ; a=', 'example.com', 'default' ),
+  [ 1, [] ],
+  'Valid record with a and WSP'
 );
 
 is_deeply(

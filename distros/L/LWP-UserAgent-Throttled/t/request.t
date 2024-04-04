@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 14;
+use Test::Most tests => 15;
 use LWP::Protocol::https;
 use Test::Timer;
 use IO::Socket::INET;
@@ -18,9 +18,9 @@ THROTTLE: {
 			PeerAddr => 'example.com:80',
 			Timeout => 2	# Set low to try to catch slow machines
 		);
-		skip 'Responsive machine and an Internet connection are required for testing', 12 unless($s);
+		skip 'Responsive machine and an Internet connection are required for testing', 13 unless($s);
 
-		skip 'Time::HiRes::usleep required for testing throttling', 12 unless(&Time::HiRes::d_usleep);
+		skip 'Time::HiRes::usleep required for testing throttling', 13 unless(&Time::HiRes::d_usleep);
 
 		diag('This will take some time because of sleeps');
 		diag('Some tests will fail on slower machines and connections');
@@ -30,7 +30,7 @@ THROTTLE: {
 		my $start = Time::HiRes::time();
 		$ua->get('https://www.perl.org/');
 		my $timetaken = Time::HiRes::time() - $start;
-		skip 'Responsive machine is required for testing', 11 if($timetaken >= 3);
+		skip('Responsive machine is required for testing', 12) if($timetaken >= 3);
 
 		$Test::Timer::alarm = 20;
 
@@ -38,6 +38,7 @@ THROTTLE: {
 		$ua->env_proxy(1);
 		$ua->max_redirect(0);
 
+		is($ua->throttle(), undef, 'Giving no argument does something sensible');
 		cmp_ok($ua->throttle('example.com'), '==', 0, 'Thottle value initialises to 0');
 		$ua->throttle({ 'example.com' => 10 });
 		cmp_ok($ua->throttle('example.com'), '==', 10, 'Can set throttle value');

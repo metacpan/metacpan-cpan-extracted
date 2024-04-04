@@ -16,4 +16,22 @@ Content-Type: text/plain
 
 blah blah
 
+------------0xKhTmLbOuNdArY
+Content-Disposition: form-data; name="upload4"; filename="malicious.txt;xeyes;foo.something"
+Content-Type: text/plain
+
+blah blah
+
+------------0xKhTmLbOuNdArY
+Content-Disposition: form-data; name="upload5"; filename="filename.longextlongextlongextlongextlongextlongextlongextlongextlongextlongext.txt"
+Content-Type: text/plain
+
+blah blah
+
+------------0xKhTmLbOuNdArY
+Content-Disposition: form-data; name="upload6"; filename="manyext.a1.b2.c3.d4.e5"
+Content-Type: text/plain
+
+blah blah
+
 ------------0xKhTmLbOuNdArY--

@@ -1,3 +1,10 @@
+0.007		2024-03-31	T. R. Wyant
+    Prefer Astro::Coord::ECI::Utils::gm_strftime to POSIX::strftime
+    because the behavior of POSIX::strftime when formatting GMT changed in
+    Perl 5.39.8, and is no longer compatible with the libc implementation,
+    which does not alter the components given it. This requires
+    Astro::Coord::ECI::Utils 0.131,
+
 0.006		2021-08-07	T. R. Wyant
     Correct generation of 'provides' metadata.  Thanks to Favio Poletti
     for blogging

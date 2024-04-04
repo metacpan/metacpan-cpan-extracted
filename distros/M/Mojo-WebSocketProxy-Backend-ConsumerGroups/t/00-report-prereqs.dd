@@ -53,6 +53,7 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'Future' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::CheckDeps' => '0.010',

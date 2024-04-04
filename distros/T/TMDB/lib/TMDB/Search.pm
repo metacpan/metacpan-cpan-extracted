@@ -241,7 +241,7 @@ sub now_playing {
     my ($self) = @_;
   return $self->_search(
         {
-            method => 'movie/now-playing',
+            method => 'movie/now_playing',
             params => {
                 language => $self->session->lang
                 ? $self->session->lang

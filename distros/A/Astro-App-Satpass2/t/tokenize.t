@@ -3,21 +3,19 @@ package main;
 use strict;
 use warnings;
 
-use Test::More 0.88;
+use Test2::V0;
+use Test2::Tools::Explain;
 
+use Astro::App::Satpass2;
+use Astro::App::Satpass2::Utils qw{ HASH_REF REGEXP_REF my_dist_config };
 use Cwd qw{ cwd };
 
-use lib qw{ inc/mock inc };
-use Astro::App::Satpass2::Utils qw{ HASH_REF REGEXP_REF };
-use My::Module::Test::App;	# for environment clean-up.
+use lib qw{ inc };
 
-use File::HomeDir;	# Mocked
+use My::Module::Test::App;	# for environment clean-up.
 
 sub dump_tokens;
 sub new;
-
-use Astro::App::Satpass2;
-use Astro::App::Satpass2::Utils qw{ my_dist_config };
 
 new;
 
@@ -132,24 +130,29 @@ tokenize( q{x~}, [ [ 'x~' ], {} ] )
     or dump_tokens;
 
 {
-
-
     my $home = '/home/menuhin';
-    local $File::HomeDir::MOCK_FILE_HOMEDIR_MY_HOME = $home;
+    my $mocker = mock 'File::HomeDir' => (
+	override	=> [
+	    my_home	=> sub { return $home },
+	],
+    );
 
     tokenize( q{~}, [ [ $home ], {} ] )
 	or dump_tokens;
 
     tokenize( q{~/foo}, [ [ "$home/foo" ], {} ] )
 	or dump_tokens;
-
 }
 
 {
     my $home = {
 	menuhin	=> '/home/menuhin',
     };
-    local $File::HomeDir::MOCK_FILE_HOMEDIR_USERS_HOME = $home;
+    my $mocker = mock 'File::HomeDir' => (
+	override	=> [
+	    users_home	=> sub { return $home->{ $_[1] } },
+	],
+    );
 
     tokenize( q{~menuhin}, [ [ $home->{menuhin} ], {} ] )
 	or dump_tokens;
@@ -168,21 +171,26 @@ tokenize( q{x~}, [ [ 'x~' ], {} ] )
 }
 
 {
-
     my $cfg = '/home/menuhin/.local/perl/Astro-App-Satpass2';
-    local $File::HomeDir::MOCK_FILE_HOMEDIR_MY_DIST_CONFIG = $cfg;
+    my $mocker = mock 'File::HomeDir' => (
+	override	=> [
+	    my_dist_config	=> sub { return $cfg },
+	],
+    );
 
     tokenize( q{~~}, [ [ $cfg ], {} ] )
 	or dump_tokens;
 
     tokenize( q{~~/foo}, [ [ "$cfg/foo" ], {} ] )
 	or dump_tokens;
-
 }
 
 {
-
-    local $File::HomeDir::MOCK_FILE_HOMEDIR_MY_DIST_CONFIG = undef;
+    my $mocker = mock 'File::HomeDir' => (
+	override	=> [
+	    my_dist_config	=> sub { return undef },
+	],
+    );
 
     tokenize( { fail => 1 }, q{~~},
 	qr{ \A Unable \s to \s find \s ~~ }smx,
@@ -196,8 +204,8 @@ tokenize( q{x~}, [ [ 'x~' ], {} ] )
 local $ENV{foo} = 'bar';
 local $ENV{bar} = 'baz';
 local @ENV{ qw{ fooz yehudi } };
-delete $ENV{fooz};
-delete $ENV{yehudi};
+delete local $ENV{fooz};
+delete local $ENV{yehudi};
 
 tokenize( q{$foo}, [ [ 'bar' ], {} ] )
     or dump_tokens;
@@ -524,7 +532,7 @@ done_testing;
 		    goto &fail;
 		} else {
 		    @_ = ( \@got, $tokens, $name );
-		    goto &is_deeply;
+		    goto &is;
 		}
 	    } else {
 		my $err = $@;

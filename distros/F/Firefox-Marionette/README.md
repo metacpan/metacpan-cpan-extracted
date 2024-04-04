@@ -4,7 +4,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 # VERSION
 
-Version 1.53
+Version 1.54
 
 # SYNOPSIS
 
@@ -276,6 +276,7 @@ In addition, this method will accept a hash of values as parameters as well.  Wh
 
 - os - The desired operating system, known values are "linux", "win32", "darwin", "freebsd", "netbsd", "openbsd" and "dragonfly"
 - version - A specific version of firefox, such as 120.
+- arch - A specific version of the architecture, such as "x86\_64" or "aarch64" or "s390x".
 - increment - A specific offset from the actual version of firefox, such as -5
 
 These parameters can be used to set a user agent string like so;
@@ -288,6 +289,10 @@ These parameters can be used to set a user agent string like so;
 
     # user agent is now equal to
     # Mozilla/5.0 (X11; FreeBSD amd64; rv:109.0) Gecko/20100101 Firefox/118.0
+
+    $firefox->agent(os => 'linux', arch => 's390x', version => 115);
+    # user agent is now equal to
+    # Mozilla/5.0 (X11; Linux s390x; rv:109.0) Gecko/20100101 Firefox/115.0
 
 If the `stealth` parameter has supplied to the [new](#new) method, it will also attempt to change a number of javascript attributes to match the desired browser.  The following websites have been very useful in testing these ideas;
 
@@ -308,6 +313,10 @@ This method returns true or false depending on if the Firefox process is still r
 ## application\_type
 
 returns the application type for the Marionette protocol.  Should be 'gecko'.
+
+## arch
+
+returns the architecture of the machine running firefox.  Should be something like 'x86\_64' or 'arm'.  This is only intended for test suite support.
 
 ## aria\_label
 
@@ -1979,6 +1988,10 @@ accepts a [element](https://metacpan.org/pod/Firefox::Marionette::Element) as th
 ## send\_alert\_text
 
 sends keys to the input field of a currently displayed modal message box
+
+## set\_javascript
+
+accepts a parameter for the the profile preference value of [javascript.enabled](https://support.mozilla.org/en-US/kb/javascript-settings-for-interactive-web-pages#w_for-advanced-users).  This method returns [itself](https://metacpan.org/pod/Firefox::Marionette) to aid in chaining methods.
 
 ## set\_pref
 

@@ -1,5 +1,5 @@
 /* Translated from F77 to C, rjrw 10/04/2000 */
-/* replaced 'bool' by 'boolvar' to get it to compile on my 
+/* replaced 'bool' by 'boolvar' to get it to compile on my
    linux machine, DJB Aug 02 2000 */
 
 /* algorithm 419 collected algorithms from acm.
@@ -8,7 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-/* 
+#include <complex.h>
+/*
    #if !defined(WIN32) && !defined(_WIN32) && !defined(__APPLE__) && !defined(__CYGWIN__)
    #include <values.h>
    #endif
@@ -18,26 +19,22 @@
 #include "cpoly.h"
 
 /* Internal routines */
-static void noshft(int l1);
-static int fxshft(int l2, double *zr, double *zi);
-static int vrshft(int l3, double *zr, double *zi);
-static int calct(void);
-static void nexth(int boolvar);
-static void polyev(int nn, double sr, double si, double pr[], double pi[],
-	    double qr[], double qi[], double *pvr, double *pvi);
-static double errev(int nn, double qr[], double qi[], double ms, double mp);
-static double cauchy(int nn, double pt[], double q[]);
-static double scale(int nn, double pt[]);
-static void cdivid(double ar, double ai, double br, double bi, 
-	    double *cr, double *ci);
-static double cmod(double r, double i);
+static complex double noshft(int l1, int nn, complex double tc, complex double hc[], complex double pc[]);
+static int fxshft(int l2, int nn, complex double shc[], complex double qpc[], complex double hc[], complex double pc[], complex double qhc[], complex double *tc, complex double *sc, complex double *pvc, complex double *zc);
+static int vrshft(int l3, int nn, complex double qpc[], complex double pc[], complex double qhc[], complex double hc[], complex double *tc, complex double *sc, complex double *pvc, complex double *zc);
+static int calct(int nn, complex double sc, complex double pvc, complex double qhc[], complex double hc[], complex double *tc);
+static void nexth(int boolvar, int nn, complex double tc, complex double qhc[], complex double qpc[], complex double hc[]);
+static complex double polyev(int nn, complex double sc, complex double pc[], complex double qc[]);
+static double errev(int nn, double ms, double mp, complex double qc[]);
+static double cauchy(int nn, complex double pc[]);
+static double scale(int nn, complex double pc[]);
+static complex double cdivid(complex double a, complex double b);
+static double cmod(complex double a);
 static void mcon(void);
-static int init(int nncr);
+static void init(int nncr);
 
 /* Internal global variables */
-static double *pr,*pi,*hr,*hi,*qpr,*qpi,*qhr,*qhi,*shr,*shi;
-static double sr,si,tr,ti,pvr,pvi,are,mre,eta,infin,smalno,base;
-static int nn;
+static double are,mre,eta,infin,smalno,base;
 
 #ifdef DEBUGMAIN
 /* driver to test cpoly */
@@ -78,7 +75,7 @@ int main()
   pi[3]=1;
   prtc(4,p,pi);
   fail = cpoly(p,pi,3,zr,zi);
-  if (fail) 
+  if (fail)
     printf("cpoly has failed on this example\n");
   prtz(3,zr,zi);
   printf("Example 3. zeros at 1+i,1/2*(1+i)....1/(2**-9)*(1+i)\n");
@@ -106,8 +103,8 @@ int main()
   pi[10]=9.094947017729282e-13L;
   prtc(11,p,pi);
   fail = cpoly(p,pi,10,zr,zi);
-  if (fail) 
-    printf("cpoly has failed on this example\n");  
+  if (fail)
+    printf("cpoly has failed on this example\n");
   prtz(10,zr,zi);
   printf("Example 4. multiple zeros\n");
   p[0]=1L;
@@ -193,18 +190,18 @@ void prtz(int n,double zr[], double zi[])
 #define COSR (-.069756474L)
 #define SINR (.99756405L)
 
-int cpoly(double opr[], double opi[], int degree,
+char *cpoly(double opr[], double opi[], int degree,
 	   double zeror[], double zeroi[])
 {
   /* Finds the zeros of a complex polynomial.
 
-     opr, opi - double precision vectors of real and imaginary parts 
+     opr, opi - double precision vectors of real and imaginary parts
                 of the coefficients in order of decreasing powers.
      degree   - integer degree of polynomial
-     zeror, zeroi  
-              - output double precision vectors of real and imaginary 
+     zeror, zeroi
+              - output double precision vectors of real and imaginary
 	        parts of the zeros.
-     fail     - output logical parameter, TRUE if leading coefficient 
+     fail     - output logical parameter, TRUE if leading coefficient
                 is zero, if cpoly has found fewer than degree zeros,
                 or if there is another internal error.
 
@@ -212,27 +209,34 @@ int cpoly(double opr[], double opi[], int degree,
      occurring.  If it does occur, there is still a possibility that
      the zerofinder will work provided the overflowed quantity is
      replaced by a large number. */
-  
-  double xx,yy,xxx,zr,zi,bnd;
-  int fail,conv;
+
+  if (degree < 1)
+    return "algorithm only works for degree >= 1.";
+
+  if (opr[0] == 0.0 && opi[0] == 0.0)
+    return "algorithm fails if the leading coefficient is zero.";
+
+  double xx,yy,xxx,bnd;
+  complex double zc,tc,sc,pvc;
+  char *failreason = NULL;
   int cnt1,cnt2,i,idnn2;
 
   /* initialization of constants */
-  nn = degree+1;
-  if (!init(nn)) {
-    fail = TRUE;
-    return fail;
+  int nn = degree+1;
+  init(nn);
+  complex double *pc  = malloc(nn*sizeof(complex double));
+  complex double *hc  = malloc(nn*sizeof(complex double));
+  complex double *qpc = malloc(nn*sizeof(complex double));
+  complex double *qhc = malloc(nn*sizeof(complex double));
+  complex double *shc = malloc(nn*sizeof(complex double));
+
+  if (!(pc && hc && qpc && qhc && shc)) {
+    failreason = "Couldn't allocate space for cpoly";
+    goto returnlab;
   }
 
   xx = .70710678L;
   yy = -xx;
-  fail = FALSE;
-
-  /* algorithm fails if the leading coefficient is zero. */
-  if (opr[0] == 0.0 && opi[0] == 0.0) {
-    fail = TRUE;
-    return fail;
-  }
 
   /* Remove the zeros at the origin if any */
   while (opr[nn-1] == 0.0 && opi[nn-1] == 0.0) {
@@ -244,68 +248,63 @@ int cpoly(double opr[], double opi[], int degree,
 
   /* Make a copy of the coefficients */
   for (i=0;i<nn;i++) {
-    pr[i] = opr[i];
-    pi[i] = opi[i];
-    shr[i] = cmod(pr[i],pi[i]);
+    pc[i] = opr[i] + I*opi[i];
+    shc[i] = cmod(pc[i]);
   }
 
   /* Scale the polynomial */
-  bnd = scale(nn,shr);
+  bnd = scale(nn,shc);
   if (bnd != 1.0) {
     for (i=0;i<nn;i++) {
-      pr[i] *= bnd;
-      pi[i] *= bnd;
+      pc[i] *= bnd;
     }
   }
 
-  while (!fail) {
+  while (!failreason) {
 
     /* Start the algorithm for one zero */
     if (nn < 3) {
       /* Calculate the final zero and return */
-      cdivid(-pr[1],-pi[1],pr[0],pi[0],&(zeror[degree-1]),&(zeroi[degree-1]));
-      return fail;
+      complex double zeroc = cdivid(-pc[1], pc[0]);
+      zeror[degree-1] = creal(zeroc); zeroi[degree-1] = cimag(zeroc);
+      goto returnlab;
     }
 
     /* Calculate bnd, a lower bound on the modulus of the zeros */
     for (i=0;i<nn;i++) {
-      shr[i] = cmod(pr[i],pi[i]);
+      shc[i] = cmod(pc[i]) + I*cimag(shc[i]);
     }
-    bnd = cauchy(nn,shr,shi);
+    bnd = cauchy(nn,shc);
 
     /* Outer loop to control 2 major passes with different sequences
        of shifts */
-    fail = TRUE;
-    for(cnt1=1;fail && (cnt1<=2);cnt1++) {
+    failreason = "found fewer than degree zeros";
+    for(cnt1=1;failreason && (cnt1<=2);cnt1++) {
 
       /* First stage calculation, no shift */
-      noshft(5);
+      tc = noshft(5,nn,tc,hc,pc);
 
       /* Inner loop to select a shift. */
-      for (cnt2=1;fail && (cnt2<10);cnt2++) {
+      for (cnt2=1;failreason && (cnt2<10);cnt2++) {
 	/* Shift is chosen with modulus bnd and amplitude rotated by
 	   94 degrees from the previous shift */
 	xxx = COSR*xx-SINR*yy;
 	yy  = SINR*xx+COSR*yy;
 	xx  = xxx;
-	sr  = bnd*xx;
-	si  = bnd*yy;
+	sc  = bnd*xx + I*bnd*yy;
 
 	/* Second stage calculation, fixed shift */
-	conv = fxshft(10*cnt2,&zr,&zi);
-	if (conv) {
+	if (fxshft(10*cnt2,nn,shc,qpc,hc,pc,qhc,&tc,&sc,&pvc,&zc)) {
 
 	  /* The second stage jumps directly to the third stage iteration
 	     If successful the zero is stored and the polynomial deflated */
 	  idnn2 = degree+1-nn;
-	  zeror[idnn2] = zr;
-	  zeroi[idnn2] = zi;
+	  zeror[idnn2] = creal(zc);
+	  zeroi[idnn2] = cimag(zc);
 	  nn--;
-	  for(i=0;i<nn;i++) {
-	    pr[i] = qpr[i];
-	    pi[i] = qpi[i];
-	  }
-	  fail = FALSE;
+	  for(i=0;i<nn;i++)
+	    pc[i] = qpc[i];
+	  failreason = NULL;
 	}
 	/* If the iteration is unsuccessful another shift is chosen */
       }
@@ -314,113 +313,102 @@ int cpoly(double opr[], double opi[], int degree,
     }
   }
 
+returnlab:
+  if (shc) free(shc);
+  if (qhc) free(qhc);
+  if (qpc) free(qpc);
+  if (hc) free(hc);
+  if (pc) free(pc);
   /* The zerofinder has failed on two major passes
      Return empty handed */
-  return fail;
+  return failreason;
 }
 
-static void noshft(int l1)
+static complex double noshft(int l1, int nn, complex double tc, complex double hc[], complex double pc[])
 {
   /*  Computes the derivative polynomial as the initial h
       polynomial and computes l1 no-shift h polynomials. */
-
-  double  xni,t1,t2;
-  int i,j,jj,n = nn-1,nm1 = n-1,nm2=nm1-1;
+  int i,jj,n = nn-1,nm1 = n-1,nm2=nm1-1;
   for (i=0;i<n;i++) {
-    xni = n-i;
-    hr[i] = xni*pr[i]/((double)(n));
-    hi[i] = xni*pi[i]/((double)(n));
+    double xni = n-i;
+    hc[i] = xni*pc[i]/((double)(n));
   }
   for (jj=0;jj<l1;jj++) {
-    if (cmod(hr[nm2],hi[nm2]) > eta*10.0*cmod(pr[nm2],pi[nm2])) {
-      cdivid(-pr[n],-pi[n],hr[nm1],hi[nm1],&tr,&ti);
+    if (cmod(hc[nm2]) > eta*10.0*cmod(pc[nm2])) {
+      tc = cdivid(-pc[n], hc[nm1]);
       for (i=0;i<nm1;i++) {
-	j = nm1-i;
-	t1 = hr[j-1];
-	t2 = hi[j-1];
-	hr[j] = tr*t1-ti*t2+pr[j];
-	hi[j] = tr*t2+ti*t1+pi[j];
+	int j = nm1-i;
+	hc[j] = pc[j] + tc * hc[j-1];
       }
-      hr[0] = pr[0];
-      hi[0] = pi[0];
+      hc[0] = pc[0];
     } else {
-
       /*  If the constant term is essentially zero, shift h coefficients */
       for (i=0;i<nm1;i++) {
-	j = nm1-i;
-	hr[j] = hr[j-1];
-	hi[j] = hi[j-1];
+	int j = nm1-i;
+	hc[j] = hc[j-1];
       }
-      hr[0] = 0.0;
-      hi[0] = 0.0;
+      hc[0] = 0.0;
     }
   }
+  return tc;
 }
 
-static int fxshft(int l2, double *zr, double *zi)
+static int fxshft(int l2, int nn, complex double shc[], complex double qpc[], complex double hc[], complex double pc[], complex double qhc[], complex double *tc, complex double *sc, complex double *pvc, complex double *zc)
      /* Computes l2 fixed-shift h polynomials and tests for convergence
 
 	Initiates a variable-shift iteration and returns with the
 	approximate zero if successful.
 
 	l2    - Limit of fixed shift steps
-	zr,zi - Approximate zero if conv is .true.
-	conv  - Flag indicating convergence of stage 3 iteration 
+	zc    - Approximate zero if conv is .true.
+	conv  - Flag indicating convergence of stage 3 iteration
      */
 {
-  double otr,oti,svsr,svsi;
-  int conv,test,pasd,boolvar;
+  int test,pasd,boolvar;
   int i,j,n = nn-1;
 
   /* Evaluate p at s */
-  polyev(nn,sr,si,pr,pi,qpr,qpi,&pvr,&pvi);
+  *pvc = polyev(nn,*sc,pc,qpc);
   test = TRUE;
   pasd = FALSE;
 
   /* Calculate first t = -p(s)/h(s) */
-  boolvar = calct();
+  boolvar = calct(nn,*sc,*pvc,qhc,hc,tc);
 
   /* Main loop for one second stage step */
   for (j=0;j<l2;j++) {
-    otr = tr;
-    oti = ti;
+    complex double otc = *tc;
 
     /* Compute next h polynomial and new t */
-    nexth(boolvar);
-    boolvar = calct();
-    *zr = sr+tr;
-    *zi = si+ti;
+    nexth(boolvar,nn, *tc, qhc, qpc, hc);
+    boolvar = calct(nn,*sc,*pvc,qhc,hc,tc);
+    *zc = *sc+*tc;
 
-    /* Test for convergence unless stage 3 has failed once or 
+    /* Test for convergence unless stage 3 has failed once or
        this is the last h polynomial */
     if (!boolvar && test && j != l2) {
-      if (cmod(tr-otr,ti-oti) < .5*cmod(*zr,*zi)) {
+      if (cmod(*tc-otc) < .5*cmod(*zc)) {
 	if (pasd) {
 
 	  /* The weak convergence test has been passed twice, start the
 	     third stage iteration, after saving the current h polynomial
 	     and shift */
 	  for (i=0;i<n;i++) {
-	    shr[i] = hr[i];
-	    shi[i] = hi[i];
+	    shc[i] = hc[i];
 	  }
-	  svsr = sr;
-	  svsi = si;
-	  conv = vrshft(10,zr,zi);
-	  if (conv) 
-	    return conv;
+	  complex double svsc = *sc;
+	  if (vrshft(10,nn,qpc,pc,qhc,hc,tc,sc,pvc,zc))
+	    return TRUE;
 
 	  /* The iteration failed to converge
 	     Turn off testing and restore h,s,pv and t */
 	  test = FALSE;
 	  for (i=0;i<n;i++) {
-	    hr[i] = shr[i];
-	    hi[i] = shi[i];
+	    hc[i] = shc[i];
 	  }
-	  sr = svsr;
-	  si = svsi;
-	  polyev(nn,sr,si,pr,pi,qpr,qpi,&pvr,&pvi);
-	  boolvar = calct();
+	  *sc = svsc;
+	  *pvc = polyev(nn,*sc,pc,qpc);
+	  boolvar = calct(nn,*sc,*pvc,qhc,hc,tc);
 	} else {
 	  pasd = TRUE;
 	}
@@ -431,66 +419,54 @@ static int fxshft(int l2, double *zr, double *zi)
   }
 
   /* Attempt an iteration with final h polynomial from second stage */
-  conv = vrshft(10,zr,zi);
-  return conv;
+  return vrshft(10,nn,qpc,pc,qhc,hc,tc,sc,pvc,zc);
 }
 
-static int vrshft(int l3, double *zr, double *zi)
+static int vrshft(int l3, int nn, complex double qpc[], complex double pc[], complex double qhc[], complex double hc[], complex double *tc, complex double *sc, complex double *pvc, complex double *zc)
      /*  Carries out the third stage iteration
 
 	 l3      - Limit of steps in stage 3
-	 zr,zi   - On entry contains the initial iterate,
+	 zc      - On entry contains the initial iterate,
 	           On exit, it contains the final iterate (if it converges).
-	 conv    - TRUE if iteration converges 
+	 conv    - TRUE if iteration converges
      */
 {
-  double mp,ms,omp,relstp,r1,r2,tp;
-  int i,j,conv,b,boolvar;
-
-  conv = FALSE;
-  b = FALSE;
-  sr = *zr;
-  si = *zi;
+  double mp,ms,omp,relstp;
+  int i,j,boolvar;
+  int b = FALSE;
+  *sc = *zc;
 
   /* Main loop for stage three */
   for (i=0; i<l3;i++) {
 
     /* Evaluate p at s and test for convergence */
-    polyev(nn,sr,si,pr,pi,qpr,qpi,&pvr,&pvi);
-    mp = cmod(pvr,pvi);
-    ms = cmod(sr,si);
-    if (mp <= 20.0L*errev(nn,qpr,qpi,ms,mp)) {
+    *pvc = polyev(nn,*sc,pc,qpc);
+    mp = cmod(*pvc);
+    ms = cmod(*sc);
+    if (mp <= 20.0L*errev(nn,ms,mp,qpc)) {
       /* Polynomial value is smaller in value than a bound on the error
 	 in evaluating p, terminate the iteration */
-      conv = TRUE;
-      *zr = sr;
-      *zi = si;
-      return conv;
+      *zc = *sc;
+      return TRUE;
     } else {
       if (i!=0) {
 	if (!b && mp>=omp && relstp < .05L) {
-	  /* Iteration has stalled, probably a cluster of zeros 
-	     Do 5 fixed shift steps into the cluster to force one zero 
+	  /* Iteration has stalled, probably a cluster of zeros
+	     Do 5 fixed shift steps into the cluster to force one zero
 	     to dominate */
 	  b = TRUE;
-	  if (relstp < eta) 
-	    tp = eta;
-	  else
-	    tp = relstp;
-	  r1 = sqrt(tp);
-	  r2 = sr*(1.0L+r1)-si*r1;
-	  si = sr*r1+si*(1.0L+r1);
-	  sr = r2;
-	  polyev(nn,sr,si,pr,pi,qpr,qpi,&pvr,&pvi);
+	  double tp = (relstp < eta) ? eta : relstp;
+	  *sc *= 1.0L + sqrt(tp)*(1 + I);
+	  *pvc = polyev(nn,*sc,pc,qpc);
 	  for (j=0;j<5;j++) {
-	    boolvar = calct();
-	    nexth(boolvar);
+	    boolvar = calct(nn,*sc,*pvc,qhc,hc,tc);
+	    nexth(boolvar,nn, *tc, qhc, qpc, hc);
 	  }
 	  omp = infin;
 	} else {
 	  /* Exit if polynomial value increases significantly */
-          if (mp*0.1L > omp) 
-	    return conv;
+          if (mp*0.1L > omp)
+	    return FALSE;
 	  omp = mp;
 	}
       } else {
@@ -499,91 +475,64 @@ static int vrshft(int l3, double *zr, double *zi)
     }
 
     /* Calculate next iterate. */
-    boolvar = calct();
-    nexth(boolvar);
-    boolvar = calct();
+    boolvar = calct(nn,*sc,*pvc,qhc,hc,tc);
+    nexth(boolvar,nn, *tc, qhc, qpc, hc);
+    boolvar = calct(nn,*sc,*pvc,qhc,hc,tc);
     if (!boolvar) {
-      relstp = cmod(tr,ti)/cmod(sr,si);
-      sr += tr;
-      si += ti;
+      relstp = cmod(*tc)/cmod(*sc);
+      *sc += *tc;
     }
   }
-  return conv;
+  return FALSE;
 }
 
-static int calct(void)
+static int calct(int nn, complex double sc, complex double pvc, complex double qhc[], complex double hc[], complex double *tc)
      /* Computes  t = -p(s)/h(s)
-	Returns TRUE if h(s) is essentially zero 
+	Returns TRUE if h(s) is essentially zero
      */
 {
-  double  hvr,hvi;
-  int n = nn-1, boolvar;
-
-  /* Evaluate h(s) */
-  polyev(n,sr,si,hr,hi,qhr,qhi,&hvr,&hvi);
-  boolvar = (cmod(hvr,hvi) <= are*10.0*cmod(hr[n-1],hi[n-1]));
-  if (!boolvar) {
-    cdivid(-pvr,-pvi,hvr,hvi,&tr,&ti);
-  } else {
-    tr = 0.0;
-    ti = 0.0;
-  }
+  complex double hvc = polyev(nn-1,sc,hc,qhc); /* Evaluate h(s) */
+  int boolvar = (cmod(hvc) <= are*10.0*cmod(hc[nn-2]));
+  *tc = boolvar ? 0.0 : cdivid(-pvc, hvc);
   return boolvar;
 }
 
-static void nexth(int boolvar) 
+static void nexth(int boolvar, int nn, complex double tc, complex double qhc[], complex double qpc[], complex double hc[])
   /* Calculates the next shifted h polynomial
-     boolvar   -  TRUE if h(s) is essentially zero 
+     boolvar   -  TRUE if h(s) is essentially zero
   */
 {
-  double t1,t2;
   int j,n = nn-1;
 
   if (!boolvar) {
     for (j=1;j<n;j++) {
-      t1 = qhr[j-1];
-      t2 = qhi[j-1];
-      hr[j] = tr*t1-ti*t2+qpr[j];
-      hi[j] = tr*t2+ti*t1+qpi[j];
+      hc[j] = qpc[j] + tc*qhc[j-1];
     }
-    hr[0] = qpr[0];
-    hi[0] = qpi[0];
+    hc[0] = qpc[0];
   } else {
     /* If h(s) is zero, replace h with qh */
     for (j=1;j<n;j++) {
-          hr[j] = qhr[j-1];
-          hi[j] = qhi[j-1];
+          hc[j] = qhc[j-1];
     }
-    hr[0] = 0.0;
-    hi[0] = 0.0;
+    hc[0] = 0.0;
   }
 }
- 
-static void polyev(int nn, double sr, double si, double pr[], double pi[],
-	    double qr[], double qi[], double *tvr, double *tvi)
+
+static complex double polyev(int nn, complex double sc, complex double pc[],
+	    complex double qc[])
      /* Evaluates a polynomial  p  at  s  by the Horner recurrence,
-	placing the partial sums in q and the computed value in pv 
+	placing the partial sums in q, returns the computed value
      */
 {
-  double t, vr, vi;
   int i;
-
-  qr[0] = pr[0];
-  qi[0] = pi[0];
-  vr = qr[0];
-  vi = qi[0];
-  for (i=1;i<nn;i++) {
-    t = vr*sr-vi*si+pr[i];
-    vi = vr*si+vi*sr+pi[i];
-    vr = t;
-    qr[i] = vr;
-    qi[i] = vi;
-  }
-  *tvr = vr;
-  *tvi = vi;
+  complex double vc = pc[0];
+  qc[0] = vc;
+  for (i=1;i<nn;i++)
+    qc[i] = vc = vc*sc + pc[i];
+  return vc;
 }
 
-static double errev(int nn, double qr[], double qi[], double ms, double mp)
+static double errev(int nn, double ms, double mp, complex double qc[])
      /* Bounds the error in evaluating the polynomial by the Horner recurrence
 	
 	qr,qi    - The partial sums
@@ -594,28 +543,28 @@ static double errev(int nn, double qr[], double qi[], double ms, double mp)
   double e;
   int i;
 
-  e = cmod(qr[0],qi[0])*mre/(are+mre);
+  e = cmod(qc[0])*mre/(are+mre);
   for (i=0;i<nn;i++)
-    e = e*ms+cmod(qr[i],qi[i]);
+    e = e*ms+cmod(qc[i]);
   return e*(are+mre)-mp*mre;
 }
 
-static double cauchy(int nn, double pt[], double q[])
+static double cauchy(int nn, complex double pc[])
      /* Cauchy computes a lower bound on the moduli of the zeros of a
-	polynomial - pt is the modulus of the coefficients 
+	polynomial - the real component of pc is the modulus of the coefficients
      */
 {
   double x,xm,f,dx,df;
   int n=nn-1, nm=nn-2, i;
 
-  pt[n] = -pt[n];
+  pc[n] = -creal(pc[n]) + I*cimag(pc[n]);
 
   /* Compute upper estimate of bound */
-  xm = exp( (log(-pt[n]) - log(pt[0]))/((double)n) );
-  if (pt[nm] != 0.0) {
+  xm = exp( (log(-creal(pc[n])) - log(creal(pc[0])))/((double)n) );
+  if (creal(pc[nm]) != 0.0) {
     /* If Newton step at the origin is better, use it */
-    x = -pt[n]/pt[nm];
-    if (x < xm) 
+    x = -creal(pc[n])/creal(pc[nm]);
+    if (x < xm)
       xm = x;
   }
 
@@ -623,34 +572,34 @@ static double cauchy(int nn, double pt[], double q[])
   do {
     x = xm;
     xm *= .1;
-    f = pt[0];
+    f = creal(pc[0]);
     for (i=1;i<nn;i++)
-      f = f*xm+pt[i];
+      f = f*xm+creal(pc[i]);
   } while (f > 0.);
   dx = x;
-  
+
   /* Do Newton iteration until x converges to two decimal places */
   while (fabs(dx/x) > .005L) {
-    q[0] = pt[0];
+    pc[0] = creal(pc[0]) + I*creal(pc[0]);
     for(i=1;i<nn;i++)
-      q[i] = q[i-1]*x+pt[i];
-    f = q[n];
-    df = q[0];
+      pc[i] = creal(pc[i]) + I*(cimag(pc[i-1])*x+creal(pc[i]));
+    f = cimag(pc[n]);
+    df = cimag(pc[0]);
     for (i=1;i<n;i++)
-      df = df*x+q[i];
+      df = df*x+cimag(pc[i]);
     dx = f/df;
     x -= dx;
   }
   return x;
 }
 
-static double scale(int nn, double pt[])
+static double scale(int nn, complex double pc[])
      /* Returns a scale factor to multiply the coefficients of the
 	polynomial.  The scaling is done to avoid overflow and to avoid
 	undetected underflow interfering with the convergence
 	criterion.  The factor is a power of the base.
 	
-	pt - modulus of coefficients of p 
+	pc - the real components are modulus of coefficients of p
      */
 {
   double hi,lo,max,min,x,sc;
@@ -662,57 +611,50 @@ static double scale(int nn, double pt[])
   max = 0.0;
   min = infin;
   for (i=0;i<nn;i++) {
-    x = pt[i];
-    if (x > max) 
+    x = creal(pc[i]);
+    if (x > max)
       max = x;
     if (x != 0.0 && x < min)
       min = x;
   }
 
   /* Scale only if there are very large or very small components */
-  if (min >= lo && max <= hi) 
+  if (min >= lo && max <= hi)
     return 1.0;
   x = lo/min;
   if (x <= 1.0L) {
     sc = 1.0L/(sqrt(max)*sqrt(min));
   } else {
     sc = x;
-    if (infin/sc > max) 
+    if (infin/sc > max)
       sc = 1.0;
   }
   l = log(sc)/log(base) + .500;
   return pow(base,l);
 }
 
-static void cdivid(double ar, double ai, double br, double bi, 
-	    double *cr, double *ci)
+static complex double cdivid(complex double a, complex double b)
      /* Complex division c = a/b, avoiding overflow */
 {
-  double r,d;
-  if (br == 0.0  && bi == 0.0) { 
+  double ar=creal(a),ai=cimag(a),br=creal(b),bi=cimag(b);
+  if (br == 0.0  && bi == 0.0) {
     /* division by zero, c = infinity. */
-    *cr = infin;
-    *ci = infin;
+    return infin*(1 + I);
   } else if (fabs(br) < fabs(bi)) {
-    r = br/bi;
-    d = bi+r*br;
-    *cr = (ar*r+ai)/d;
-    *ci = (ai*r-ar)/d;
+    double r = br/bi;
+    double d = bi+r*br;
+    return (ar*r+ai + I*(ai*r-ar))/d;
   } else {
-    r = bi/br;
-    d = br+r*bi;
-    *cr = (ar+ai*r)/d;
-    *ci = (ai-ar*r)/d;
+    double r = bi/br;
+    double d = br+r*bi;
+    return (ar+ai*r + I*(ai-ar*r))/d;
   }
-  return;
 }
 
-static double cmod(double r, double i)
+static double cmod(complex double a)
      /* Modulus of a complex number avoiding overflow */
 {
-  double ar,ai,f;
-  ar = fabs(r);
-  ai = fabs(i);
+  double ar = fabs(creal(a)), ai = fabs(cimag(a)), f;
   if (ar < ai) {
     f = ar/ai;
     return ai*sqrt(1.0+f*f);
@@ -748,8 +690,8 @@ static void mcon()
 	and smalno is base**n.
      */
 {
-  
-  /* 
+
+  /*
      #if !defined(WIN32) && !defined(_WIN32) && !defined(__APPLE__) && !defined(__CYGWIN__)
      base = 2;
      eta = DBL_EPSILON;
@@ -776,7 +718,7 @@ static void mcon()
 #endif
 }
 
-static int init(int nncr)
+static void init(int nncr)
 {
   static int nmax=0;
 
@@ -788,32 +730,5 @@ static int init(int nncr)
        cf e.g. errev() above */
     are = eta;
     mre = 2.0L*sqrt(2.0L)*eta;
-
-  } else if (nmax >= nncr) {
-    return TRUE;            /* Present arrays are big enough */
-  } else {
-    /* Free old arrays (no need to preserve contents */
-    free(shi); free(shr); free(qhi); free(qhr); 
-    free(qpi); free(qpr); free(hi); free(hr); free(pi); free(pr);
-  }
-
-  nmax = nncr;
-
-  pr  = (double *) malloc(nmax*sizeof(double));
-  pi  = (double *) malloc(nmax*sizeof(double));
-  hr  = (double *) malloc(nmax*sizeof(double));
-  hi  = (double *) malloc(nmax*sizeof(double));
-  qpr = (double *) malloc(nmax*sizeof(double));
-  qpi = (double *) malloc(nmax*sizeof(double));
-  qhr = (double *) malloc(nmax*sizeof(double));
-  qhi = (double *) malloc(nmax*sizeof(double));
-  shr = (double *) malloc(nmax*sizeof(double));
-  shi = (double *) malloc(nmax*sizeof(double));
-
-  if (!(pr && pi && hr && hi && qpr && qpi && qhr && qhi && shr && shi)) {
-    fprintf(stderr,"Couldn't allocate space for cpoly\n");
-    return FALSE;
-  } else {
-    return TRUE;
   }
 }

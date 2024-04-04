@@ -1,0 +1,39 @@
+---
+abstract: 'Very configurable Markdown processor written in pure Perl, supporting the CommonMark spec and many extensions'
+author:
+  - 'Mathias Kende <mathias@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  JSON: '0'
+  Readonly: '0'
+  Test2::V0: '0'
+  Test::CPANfile: '0'
+  Test::More: '0'
+  Text::Diff: '0'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+  perl: v5.26.0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Markdown-Perl
+no_index:
+  directory:
+    - t
+    - inc
+    - local
+    - vendor
+requires:
+  List::MoreUtils: '0'
+  List::Util: '1.45'
+  Readonly: '0'
+  Unicode::CaseFold: '0'
+  perl: '5.026'
+resources:
+  bugtracker: https://github.com/mkende/pmarkdown/issues
+  repository: https://github.com/mkende/pmarkdown
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

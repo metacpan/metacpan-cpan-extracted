@@ -5,17 +5,17 @@ package PDL::Algorithm::Center;
 use strict;
 use warnings;
 
-require 5.010000;
+require v5.10;
 
 use feature 'state';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Carp;
 
 use Try::Tiny;
 use Safe::Isa;
-use Ref::Util  qw< is_arrayref is_ref is_coderef is_hashref >;
+use Ref::Util qw< is_arrayref is_ref is_coderef is_hashref >;
 
 use Hash::Wrap ( { -as => '_wrap_hash' } );
 
@@ -43,24 +43,22 @@ sub _weighted_mean_center {
 
     $total_weight //= $wmask->dsum;
 
-    iteration_empty_failure->throw(
-        "weighted mean center: all elements excluded or sum(weight) == 0" )
+    iteration_empty_failure->throw( 'weighted mean center: all elements excluded or sum(weight) == 0' )
       if $total_weight == 0;
 
-    return ( $coords * $wmask->dummy( 0 ) )->xchg( 0, 1 )->dsumover
-      / $total_weight;
+    return ( $coords * $wmask->dummy( 0 ) )->xchg( 0, 1 )->dsumover / $total_weight;
 }
 
 sub _distance {
 
-    my ( $last, $current ) = @_;
+    my ( $prev, $current ) = @_;
 
-    return sqrt( ( ( $last->center - $current->center )**2 )->dsum );
+    return sqrt( ( ( $prev->center - $current->center )**2 )->dsum );
 }
 
-sub _sigma_clip_initialize {
+sub _sigma_clip_initialize {    ## no critic (Subroutines::ProhibitManyArgs)
 
-    my ( $init_clip, $dtol, $coords, $mask, $weight, $current, $work ) = @_;
+    my ( $init_clip, undef, $coords, $mask, $weight, $current, $work ) = @_;
 
     # initialize the sigma_clip specific fields the docs promise will be there
     $current->{dist} = undef;
@@ -79,8 +77,7 @@ sub _sigma_clip_initialize {
 
     if ( $current->total_weight == 0 ) {
         $current->{sigma} = undef;
-        iteration_empty_failure->throw(
-            "sigma_clip initialize: all elements excluded or sum(weight) == 0"
+        iteration_empty_failure->throw( 'sigma_clip initialize: all elements excluded or sum(weight) == 0',
         );
     }
 
@@ -89,7 +86,7 @@ sub _sigma_clip_initialize {
     return;
 }
 
-sub _sigma_clip_calc_wmask {
+sub _sigma_clip_calc_wmask {    ## no critic (Subroutines::ProhibitManyArgs)
 
     my ( $nsigma, $coords, $mask, $weight, $iter, $work ) = @_;
 
@@ -106,8 +103,7 @@ sub _sigma_clip_calc_wmask {
     my $wmask = $work->{wmask};
     $wmask .= $mask * $weight;
 
-    iteration_empty_failure->throw(
-        "sigma_clip calc_wmask: all elements excluded or sum(weight) == 0" )
+    iteration_empty_failure->throw( 'sigma_clip calc_wmask: all elements excluded or sum(weight) == 0' )
       if $iter->total_weight == 0;
 
     $iter->sigma( sqrt( ( $wmask * $r2 )->dsum / $iter->total_weight ) );
@@ -115,19 +111,19 @@ sub _sigma_clip_calc_wmask {
     return;
 }
 
-sub _sigma_clip_is_converged {
+sub _sigma_clip_is_converged {    ## no critic (Subroutines::ProhibitManyArgs)
 
-    my ( $init_clip, $dtol, $coords, $mask, $weight, $last, $current ) = @_;
+    my ( undef, $dtol, undef, undef, undef, $prev, $current ) = @_;
 
     $current->{dist} = undef;
 
     # stop if standard deviations and centers haven't changed
 
-    if ( $current->sigma == $last->sigma
-        && PDL::all( $current->center == $last->center ) )
+    if ( $current->sigma == $prev->sigma
+        && PDL::all( $current->center == $prev->center ) )
     {
 
-        $current->dist( _distance( $last, $current ) )
+        $current->dist( _distance( $prev, $current ) )
           if defined $dtol;
 
         return 1;
@@ -136,11 +132,11 @@ sub _sigma_clip_is_converged {
     # or, if a tolerance was defined, stop if distance from old
     # to new centers is less than the tolerance.
     if ( defined $dtol ) {
-        $current->dist( _distance( $last, $current ) );
+        $current->dist( _distance( $prev, $current ) );
         return 1 if $current->dist <= $dtol;
     }
 
-    return;
+    return 0;
 }
 
 sub _sigma_clip_log_iteration {
@@ -153,31 +149,22 @@ sub _sigma_clip_log_iteration {
     my $ncoords = $iter->center->nelem;
     if ( $iter->iter == 0 ) {
 
-        my $fmt = "%4s %7s" . ' %10s' x ( 3 + $ncoords ) . "\n";
+        my $fmt = '%4s %7s' . ' %10s' x ( 3 + $ncoords ) . "\n";
 
-        printf $fmt,
-          @$_
-          for [
-            qw{ iter  nelem    weight      clip      sigma   },
-            map { "q$_" } 1 .. $ncoords
-          ],
-          [
-            qw{ ---- ------- ---------- ---------- ----------},
-            ( "----------" ) x $ncoords
-          ];
+        printf $fmt, @$_
+          for [ qw{ iter  nelem    weight      clip      sigma   }, map { 'q$_' } 1 .. $ncoords, ],
+          [ qw{ ---- ------- ---------- ---------- ----------}, ( '----------' ) x $ncoords, ];
     }
 
     my @fmt = ( '%4d', '%7d', ( '%10.6g' ) x ( 3 + $ncoords ) );
     $fmt[3] = '%10s' if !defined $iter->clip;
 
     printf(
-        join( ' ', @fmt ) . "\n",
+        join( q{ }, @fmt ) . "\n",
         $iter->iter,  $iter->nelem, $iter->total_weight, $iter->clip // 'undef',
-        $iter->sigma, $iter->center->list
+        $iter->sigma, $iter->center->list,
     );
 }
-
-## no critic (ProhibitAccessOfPrivateData)
 
 
 
@@ -477,19 +464,15 @@ sub _to_json {
         $hash,
         sub {
             return unless Scalar::Util::blessed( my $object = ${ $_[1] } );
-            if ( defined( my $TO_JSON = $object->can( 'TO_JSON' ) ) ) {
-                ${ $_[1] } = $object->$TO_JSON;
-            }
-            elsif ( $object->isa( 'PDL' ) ) {
-                ${ $_[1] }
-                  = $object->dims == 0 ? $object->unpdl->[0] : $object->unpdl;
-            }
-
-            else {
-                die( "unexpected object: ", Scalar::Util::blessed( $object ) );
-            }
+            ${ $_[1] }
+              = defined( $object->can( 'TO_JSON' ) )
+              ? $object->TO_JSON
+              : $object->isa( 'PDL' ) ? $object->dims == 0
+                  ? $object->unpdl->[0]
+                  : $object->unpdl
+              : "$object";
         },
-        $hash
+        $hash,
     );
     return $hash;
 }
@@ -500,12 +483,13 @@ use Hash::Wrap ( {
         -clone => sub {
             my $hash = shift;
 
+            ## no critic (BuiltinFunctions::ProhibitComplexMappings)
             return {
                 map {
                     my $value = $hash->{$_};
                     $value = $value->copy if $value->$_isa( 'PDL' );
                     ( $_, $value )
-                } keys %$hash
+                } keys %$hash,
             };
         },
         -methods => { TO_JSON => \&_to_json },
@@ -560,16 +544,15 @@ sub sigma_clip {
             my $value = $opt->{$name};
             next unless defined $value;
 
-            parameter_failure->throw(
-                "<$name> must be a 1D piddle if <coords> is specified" )
+            parameter_failure->throw( "<$name> must be a 1D piddle if <coords> is specified" )
               if $value->ndims != 1;
 
             my $nelem_c = $value->getdim( -1 );
             my $nelem_p = $opt->coords->getdim( -1 );
 
             parameter_failure->throw(
-                "number of elements in <$name> ($nelem_p) ) must be the same as in <coords> ($nelem_c)"
-            ) if $nelem_c != $nelem_p;
+                "number of elements in <$name> ($nelem_p) ) must be the same as in <coords> ($nelem_c)", )
+              if $nelem_c != $nelem_p;
         }
 
     }
@@ -590,7 +573,7 @@ sub sigma_clip {
 
     else {
 
-        parameter_failure->throw( "must specify one of <coords> or <weight>" );
+        parameter_failure->throw( 'must specify one of <coords> or <weight>' );
     }
 
     my ( $ndims ) = $opt->coords->dims;
@@ -1204,8 +1187,7 @@ sub iterate {
     my ( $ndims, $nelem ) = $opt->coords->dims;
 
     parameter_failure->throw( "<$_> must have $nelem elements" )
-      for grep { defined $opt->{$_} && $opt->{$_}->nelem != $nelem }
-      qw[ mask weight ];
+      for grep { defined $opt->{$_} && $opt->{$_}->nelem != $nelem } qw[ mask weight ];
 
     $opt->weight(
         defined $opt->weight
@@ -1227,12 +1209,10 @@ sub iterate {
     my $mask   = $opt->mask->copy;
     my $weight = $opt->weight->copy;
 
-    $opt->center(
-        $opt->center->( $opt->coords, $mask, $weight, $total_weight ) )
+    $opt->center( $opt->center->( $opt->coords, $mask, $weight, $total_weight ) )
       if is_coderef( $opt->center );
 
-    parameter_failure->throw(
-        "<center> must be a 1D piddle with $ndims elements" )
+    parameter_failure->throw( "<center> must be a 1D piddle with $ndims elements" )
       unless is_Piddle1D( $opt->center ) && $opt->center->nelem == $ndims;
 
     #############################################################################
@@ -1258,20 +1238,19 @@ sub iterate {
 
     my $iteration = 0;
     my $converged;
+    my $error;
 
     eval {
 
-        $opt->initialize->(
-            $opt->coords, $mask, $weight, $iteration[-1], $work
-        );
+        $opt->initialize->( $opt->coords, $mask, $weight, $iteration[-1], $work, );
 
         $opt->log && $opt->log->( _new_iteration( $iteration[-1] ) );
 
         while ( !$converged && ++$iteration <= $opt->iterlim ) {
 
-            my $last = $iteration[-1];
+            my $prev = $iteration[-1];
 
-            my $current = _new_iteration( $last );
+            my $current = _new_iteration( $prev );
             push @iteration, $current;
 
             ++$current->{iter};
@@ -1289,28 +1268,20 @@ sub iterate {
             $current->nelem( $mask->sum )
               unless defined $current->nelem;
 
-            iteration_empty_failure->throw( "no elements left after clip" )
+            iteration_empty_failure->throw( 'no elements left after clip' )
               if $current->nelem == 0;
 
-            $current->center(
-                $opt->calc_center->(
-                    $opt->coords, $mask, $weight, $current, $work
-                ) );
+            $current->center( $opt->calc_center->( $opt->coords, $mask, $weight, $current, $work, ) );
 
-            $converged = $opt->is_converged->(
-                $opt->coords, $mask, $weight, $last, $current, $work
-            );
+            $converged = $opt->is_converged->( $opt->coords, $mask, $weight, $prev, $current, $work, );
 
             $opt->log && $opt->log->( _new_iteration( $current ) );
         }
-
-    };
-
-    my $error = $@ eq '' ? undef : $@;
+        1;
+    } or $error = $@;
 
     $error
-      = iteration_limit_reached_failure->new(
-        msg => "iteration limit (@{[ $opt->iterlim ]}) reached" )
+      = iteration_limit_reached_failure->new( msg => "iteration limit (@{[ $opt->iterlim ]}) reached" )
       if $iteration > $opt->iterlim;
 
     _return_iterate_results( {
@@ -1319,7 +1290,7 @@ sub iterate {
         ( $opt->save_weight ? ( weight => $weight ) : () ),
         iterations => \@iteration,
         success    => !$error,
-        error      => $error
+        error      => $error,
     } );
 }
 
@@ -1347,7 +1318,7 @@ PDL::Algorithm::Center - Various methods of finding the center of a sample
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 DESCRIPTION
 
@@ -2021,7 +1992,7 @@ It defaults to a piddle of all C<1>'s.
 Callbacks are provided with L<Hash::Wrap> based objects which contain
 the data for the current iteration.  They should add data to the
 objects underlying hash which records particulars about their specific
-operation,
+operation.
 
 =head3 Work Space
 
@@ -2225,7 +2196,7 @@ The objects stringify to a failure message.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-pdl-algorithm-center@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Algorithm-Center
+Please report any bugs or feature requests to bug-pdl-algorithm-center@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Algorithm-Center>
 
 =head2 Source
 

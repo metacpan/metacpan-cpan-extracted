@@ -1,0 +1,16 @@
+Revision history for Perl extension Tk::FileBrowser.
+
+0.02  Mon Apr 1 2024
+	- made column types user configerable.
+	- updated documentation.
+	- Tk::FileBrowser::Header can now be used with any HList like widget.
+
+0.01  Fri Mar 29 2024
+	- first upload to cpan.
+ 
+0.01  Fri Mar 1 10:42:59 2024
+	- original version; created by h2xs 1.23 with options
+		-X Tk::FileBrowser
+
+
+

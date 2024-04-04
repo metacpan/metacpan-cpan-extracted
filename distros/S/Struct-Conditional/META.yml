@@ -22,11 +22,11 @@ no_index:
 provides:
   Struct::Conditional:
     file: lib/Struct/Conditional.pm
-    version: '1.00'
+    version: '1.01'
 requires:
   Clone: '0.45'
   perl: '5.006'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/Struct-Conditional.git
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,185 @@
+#!/usr/bin/perl
+
+use 5.024;
+use strict;
+use warnings;
+use utf8;
+
+use English;
+use Getopt::Long qw(VersionMessage :config no_ignore_case bundling);
+use Markdown::Perl;
+use Markdown::Perl::Options 'validate_options';
+use Pod::Usage;
+
+our $VERSION = $Markdown::Perl::VERSION; ## no critic (ProhibitComplexVersion,RequireConstantVersion)
+
+my $pmark = Markdown::Perl->new();
+
+GetOptions(
+  'help|h' => sub { pod2usage(-verbose => 1, -exitval => 0); },
+  'helpfull|help-full|man' => sub { pod2usage(-verbose => 2, -exitval => 0); },
+  'list-options|help-options|helpoptions' =>
+      sub { pod2usage(-verbose => 2, -exitval => 0, -input => $INC{'Markdown/Perl/Options.pm'}); },
+  'version|v' => sub { VersionMessage(-exitval => 0) },
+  'mode|m=s' => sub { $pmark->set_mode($_[1]) },
+  'option|o=s%' => sub { validate_options($_[1], $_[2]); $pmark->set_options($_[1], $_[2]) },
+) or pod2usage(-verbose => 0, -exitval => 2);
+
+binmode STDIN, ':encoding(UTF-8)';
+my $input;
+{
+  local $INPUT_RECORD_SEPARATOR = undef;
+  $input = <>;
+}
+
+binmode STDOUT, ':encoding(UTF-8)';
+print $pmark->convert($input);
+
+__DATA__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+pmarkdown – Very configurable Markdown processor written in pure Perl,
+supporting the CommonMark spec and many extensions.
+
+=head1 SYNOPSIS
+
+  pmarkdown [-o key=value] ... < in_file.md > out_file.html_fragment
+
+=head1 DESCRIPTION
+
+Currently C<pmarkdown> can only read a single input from its standard input and
+will write its output on the standard output. Both are assumed to be encoded in
+UTF-8.
+
+If needed, See the L<GitHub pmarkdown page|https://github.com/mkende/pmarkdown>
+for installation instructions.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>, B<-h>
+
+Show a short help message about the program.
+
+=item B<--helpfull>
+
+Show the complete man page of the program.
+
+=item B<--list-options>
+
+Show the documentation of all the existing options of the Markdown processor.
+This is the same content that can be found on the L<Markdown::Perl::Options>
+page.
+
+These options can be passed to the program with the C<--options> flag.
+
+=item B<--version>, B<-v>
+
+Show the version of this program.
+
+=item B<--mode> I<mode>, B<-m>
+
+Specify a I<mode> for the Markdown processor. A mode is a set of configuration
+options working together, typically to replicate the semantics of another
+existing Markdown processor. See the L</MODES> section in this page for a list
+of available modes.
+
+When a mode is applied, is set specific values for some options but any value
+for these options set through the C<--option> flag will take precedence.
+
+=item B<--option> I<option=value>, B<-o>
+
+Specify the value for one particular option. The C<--option> flag can be passed
+multiple times. If an option is specified multiple times, the last value takes
+precedence.
+
+The options are described in the L<Markdown::Perl::Options> page. You can see
+it with the C<pmarkdown --list-options> command.
+
+When specifying an option value, boolean options should be passed as either
+C<0>, C<1>, C<false>, or C<true>.
+
+Note that all options are applied I<on top> of the selected mode. Even if the
+options are passed before the B<--mode> flag, the mode will not override options
+set through B<--option>.
+
+=back
+
+=head1 MODES
+
+=over 8
+
+=item B<default>
+
+The default mode if no other mode is specified. This mode uses the default value
+for all the options (as per their documentation).
+
+Note that, in practice, setting the mode to B<default> will I<erase> the mode
+currently set, which means that no warning will be emitted if this mode is
+overridden afterward (as opposed to what happens when any other mode is being
+overridden, including by the default mode).
+
+=item B<cmark>
+
+This mode implements the full
+L<CommonMark spec|https://spec.commonmark.org/0.31.2/>.
+
+=item B<github>
+
+This mode implements the
+L<GitHub Flavored Markdown|https://github.github.com/gfm/> variant of the
+CommonMark spec.
+
+=item B<markdown>
+
+This mode implements the
+L<original Markdown syntax|https://daringfireball.net/projects/markdown/syntax>.
+
+Note that this mode is not 100% similar to the original F<Markdown.pl> script.
+
+=back
+
+=head1 AUTHOR
+
+This program has been written by L<Mathias Kende|mailto:mathias@cpan.org>.
+
+=head1 LICENCE
+
+Copyright 2024 Mathias Kende
+
+This program is distributed under the MIT (X11) License:
+L<http://www.opensource.org/licenses/mit-license.php>
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+=head1 SEE ALSO
+
+L<cmark(1)>,
+L<CommonMark Spec|https://spec.commonmark.org/0.30/#links>
+
+=cut

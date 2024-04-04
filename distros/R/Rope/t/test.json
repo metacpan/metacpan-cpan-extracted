@@ -1,0 +1,26 @@
+{
+        "for": {
+                "key": "countries",
+                "each": "countries",
+                "if": {
+                        "m": "Thailand",
+                        "key": "country",
+                        "then": {
+                                "rank": 1
+                        }
+                },
+                "elsif": {
+                        "m": "Indonesia",
+                        "key": "country",
+                        "then": {
+                                "rank": 2
+                        }
+                },
+                "else": {
+                        "then": {
+                                "rank": null
+                        }
+                },
+                "country": "{country}"
+        }
+}

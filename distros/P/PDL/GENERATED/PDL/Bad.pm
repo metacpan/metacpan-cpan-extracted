@@ -64,6 +64,7 @@ Set to 1 as of PDL 2.035 as always available.
 =cut
 #line 66 "Bad.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -74,7 +75,6 @@ Set to 1 as of PDL 2.035 as always available.
 
 #line 62 "bad.pd"
 
-# really should be constants
 $PDL::Bad::Status = 1;
 $PDL::Bad::UseNaN = 0;
 $PDL::Bad::PerPdl = 1;
@@ -87,7 +87,7 @@ use PDL::Primitive;
 ############################################################
 ############################################################
 
-#line 79 "bad.pd"
+#line 78 "bad.pd"
 ############################################################
 ############################################################
 
@@ -131,7 +131,7 @@ always returns a Perl scalar, so it never returns bad values.
 
 =for ref
 
-returns the value used to indicate a missing (or bad) element
+returns (or sets) the value used to indicate a missing (or bad) element
 for the given ndarray type. You can give it an ndarray,
 a PDL::Type object, or one of C<$PDL_B>, C<$PDL_S>, etc.
 
@@ -144,12 +144,16 @@ a PDL::Type object, or one of C<$PDL_B>, C<$PDL_S>, etc.
 
 This can act as a setter (e.g. C<< $x->badvalue(23) >>),
 including with the value C<NaN> for floating-point types.
-Note that this B<never touches the data in the ndarray>.
+Note that this B<doesn't change the data in the ndarray> for
+floating-point-typed ndarrays.
 That is, if C<$x> already has bad values, they will not
 be changed to use the given number and if any elements of
 C<$x> have that value, they will unceremoniously be marked
 as bad data. See L</setvaltobad>, L</setbadtoval>, and
 L</setbadif> for ways to actually modify the data in ndarrays
+
+It I<does> change data for integer-typed arrays, changing values that
+had the old bad value to have the new one.
 
 It is possible to change the bad value on a per-ndarray basis, so
 
@@ -166,6 +170,27 @@ C<[0 1 2 3 BAD 5 6 7 8 9]>.
 This method does not care if you call it on an input ndarray
 that has bad values. It always returns an ndarray
 with the current or new bad value.
+
+=cut
+
+sub PDL::badvalue {
+    my ( $self, $val ) = @_;
+    my $num;
+    if ( UNIVERSAL::isa($self,"PDL") ) {
+	$num = $self->get_datatype;
+	if ( $num < $PDL_F && defined($val) && $self->badflag ) {
+	    $self->inplace->setbadtoval( $val );
+	    $self->badflag(1);
+	}
+	return PDL::Bad::_badvalue_per_pdl_int($self, $val, $num);
+    } elsif ( UNIVERSAL::isa($self,"PDL::Type") ) {
+	$num = $self->enum;
+    } else {
+        # assume it's a number
+        $num = $self;
+    }
+    PDL::Bad::_badvalue_int( $val, $num );
+}
 
 =head2 orig_badvalue
 
@@ -191,6 +216,23 @@ It also has an I<awful> name.
 This method does not care if you call it on an input ndarray
 that has bad values. It always returns an ndarray
 with the original bad value for the associated type.
+
+=cut
+
+sub PDL::orig_badvalue {
+    no strict 'refs';
+    my $self = shift;
+    my $num;
+    if ( UNIVERSAL::isa($self,"PDL") ) {
+	$num = $self->get_datatype;
+    } elsif ( UNIVERSAL::isa($self,"PDL::Type") ) {
+	$num = $self->enum;
+    } else {
+        # assume it's a number
+        $num = $self;
+    }
+    PDL::Bad::_default_badvalue_int($num);
+}
 
 =head2 check_badflag
 
@@ -221,55 +263,8 @@ sub PDL::check_badflag {
     $pdl->badflag(0) if $pdl->badflag and $pdl->nbad == 0;
     return $pdl->badflag;
 } # sub: check_badflag()
+#line 267 "Bad.pm"
 
-#line 288 "bad.pd"
-# note:
-#  if sent an ndarray, we have to change its bad values
-#  (but only if it contains bad values)
-#  - there's a slight overhead in that the badflag is
-#    cleared and then set (hence propagating to all
-#    children) but we'll ignore that)
-#  - we can ignore this for float/double types
-#    since we can't change the bad value
-#
-sub PDL::badvalue {
-    no strict 'refs';
-    my ( $self, $val ) = @_;
-    my $num;
-    if ( UNIVERSAL::isa($self,"PDL") ) {
-	$num = $self->get_datatype;
-	if ( $num < $PDL_F && defined($val) && $self->badflag ) {
-	    $self->inplace->setbadtoval( $val );
-	    $self->badflag(1);
-	}
-	return PDL::Bad::_badvalue_per_pdl_int($self, $val, $num);
-    } elsif ( UNIVERSAL::isa($self,"PDL::Type") ) {
-	$num = $self->enum;
-    } else {
-        # assume it's a number
-        $num = $self;
-    }
-    PDL::Bad::_badvalue_int( $val, $num );
-}
-
-sub PDL::orig_badvalue {
-    no strict 'refs';
-    my $self = shift;
-    my $num;
-    if ( UNIVERSAL::isa($self,"PDL") ) {
-	$num = $self->get_datatype;
-    } elsif ( UNIVERSAL::isa($self,"PDL::Type") ) {
-	$num = $self->enum;
-    } else {
-        # assume it's a number
-        $num = $self;
-    }
-    PDL::Bad::_default_badvalue_int($num);
-}
-
-############################################################
-############################################################
-#line 273 "Bad.pm"
 
 =head2 isbad
 
@@ -436,24 +431,25 @@ flag set.
 
 
 
-#line 512 "bad.pd"
+#line 511 "bad.pd"
 
 *nbad = \&PDL::nbad;
 sub PDL::nbad {
 	my($x) = @_; my $tmp;
-	$x->clump(-1)->nbadover($tmp=PDL->nullcreate($x) );
+	$x->flat->nbadover($tmp=PDL->nullcreate($x) );
 	return $tmp;
 }
 
-#line 512 "bad.pd"
+#line 511 "bad.pd"
 *ngood = \&PDL::ngood;
 sub PDL::ngood {
 	my($x) = @_; my $tmp;
-	$x->clump(-1)->ngoodover($tmp=PDL->nullcreate($x) );
+	$x->flat->ngoodover($tmp=PDL->nullcreate($x) );
 	return $tmp;
 }
 
-#line 524 "bad.pd"
+#line 523 "bad.pd"
+
 =head2 nbad
 
 =for ref
@@ -528,7 +524,8 @@ sub PDL::setbadat {
     $self->badflag(1);
     return $self;
 }
-#line 532 "Bad.pm"
+#line 528 "Bad.pm"
+
 
 =head2 setbadif
 
@@ -915,7 +912,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1070 "bad.pd"
+#line 1064 "bad.pd"
 
 =head1 AUTHOR
 
@@ -932,7 +929,7 @@ separated from the PDL distribution, the copyright notice should be
 included in the file.
 
 =cut
-#line 936 "Bad.pm"
+#line 933 "Bad.pm"
 
 # Exit with OK status
 

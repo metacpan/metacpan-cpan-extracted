@@ -22,6 +22,13 @@ METHODS
 
             Default value is undef.
 
+    *       "css_background_image"
+
+            CSS parameter for background-image of gradient.
+
+            Default value is 'linear-gradient(to right, red, orange, yellow,
+            green, blue, indigo, violet)'.
+
     *       "css_gradient_class"
 
             CSS class name for gradient.
@@ -33,12 +40,6 @@ METHODS
             Indicator height.
 
             Default value is 30.
-
-    *       "unit"
-
-            Unit for height and width.
-
-            Default value is 'px'.
 
     *       "width"
 
@@ -70,6 +71,21 @@ ERRORS
      new():
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
+             From Mo::utils::CSS::check_css_unit():
+                     Parameter 'height' doesn't contain number.
+                             Value: %s
+                     Parameter 'height' doesn't contain unit.
+                             Value: %s
+                     Parameter 'height' contain bad unit.
+                             Unit: %s
+                             Value: %s
+                     Parameter 'width' doesn't contain number.
+                             Value: %s
+                     Parameter 'width' doesn't contain unit.
+                             Value: %s
+                     Parameter 'width' contain bad unit.
+                             Unit: %s
+                             Value: %s
              Parameter 'css' must be a 'CSS::Struct::Output::*' class.
              Parameter 'tags' must be a 'Tags::Output::*' class.
 
@@ -160,7 +176,7 @@ EXAMPLE2
      # </div>
 
 DEPENDENCIES
-    Class::Utils, Error::Pure.
+    Class::Utils, Error::Pure, Mo::utils::CSS.
 
 SEE ALSO
     Tags::HTML::Stars
@@ -175,10 +191,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2021
+    © Michal Josef Špaček 2021-2024
 
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

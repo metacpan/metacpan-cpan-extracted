@@ -354,14 +354,13 @@ sub PDL::ndcoords {
   unshift(@d,$type) if defined($type);
   my $out = PDL->zeroes(@d);
   for my $d(0..$#dims) {
-    my $w = $out->index($d)->mv($d,0);
+    my $w = $out->index($d);
+    $w = $w->mv($d,0) if $d != 0;
     $w .= xvals($w);
   }
   $out;
 }
-*ndcoords = \&PDL::ndcoords;
-*allaxisvals = \&PDL::ndcoords;
-*PDL::allaxisvals = \&PDL::ndcoords;
+*ndcoords = *allaxisvals = *PDL::allaxisvals = \&PDL::ndcoords;
 
 =head2 hist
 
@@ -406,7 +405,7 @@ sub PDL::hist {
     my($pdl,$min,$max,$step)=@_;
     ($step, $min, my $bins, my $xvals) =
         _hist_bin_calc($pdl, $min, $max, $step, wantarray());
-    PDL::Primitive::histogram($pdl->clump(-1),(my $hist = null),
+    PDL::Primitive::histogram($pdl->flat,(my $hist = null),
 			      $step,$min,$bins);
     return wantarray() ? ($xvals,$hist) : $hist;
 }
@@ -450,7 +449,7 @@ sub PDL::whist {
     ($step, $min, my $bins, my $xvals) =
         _hist_bin_calc($pdl, $min, $max, $step, wantarray());
 
-    PDL::Primitive::whistogram($pdl->clump(-1),$wt->clump(-1),
+    PDL::Primitive::whistogram($pdl->flat,$wt->flat,
 			       (my $hist = null), $step, $min, $bins);
     return wantarray() ? ($xvals,$hist) : $hist;
 }
@@ -506,8 +505,7 @@ sub PDL::sequence {
     my $type_given = grep +(ref($_[$_])||'') eq 'PDL::Type', 0..1;
     $type_given ||= ref($_[0]) && UNIVERSAL::isa($_[0], 'PDL'); # instance method
     my $pdl = &PDL::Core::_construct;
-    my $bar = $pdl->clump(-1)->inplace;
-    axisvals2($bar,0,$type_given);
+    axisvals2($pdl->flat->inplace,0,$type_given);
     return $pdl;
 }
 
@@ -595,7 +593,7 @@ sub PDL::rvals { # Return radial distance from given point and offset
     for ($i=0; $i<$r->getndims; $i++) {
          $offset = (defined $pos[$i] ? $pos[$i] : int($r->getdim($i)/2));
 	 # Note careful coding for speed and min memory footprint
-	 PDL::Primitive::axisvalues($tmp->xchg(0,$i)->inplace);
+	 PDL::Primitive::axisvalues((0==$i?$tmp:$tmp->xchg(0,$i))->inplace);
 	 $tmp -= $offset; $tmp *= $tmp;
          $r += $tmp;
     }
@@ -633,7 +631,7 @@ sub PDL::axisvals {
 		$dummy .= 0;
 		return $dummy;
 	}
-	my $bar = $dummy->xchg(0,$nth);
+	my $bar = 0==$nth ? $dummy : $dummy->xchg(0,$nth);
 	PDL::Primitive::axisvalues($bar->inplace);
 	return $dummy;
 }
@@ -648,7 +646,7 @@ sub axisvals2 {
 		$dummy .= 0;
 		return $dummy;
 	}
-	my $bar = $dummy->xchg(0,$nth);
+	my $bar = 0==$nth ? $dummy : $dummy->xchg(0,$nth);
 	PDL::Primitive::axisvalues($bar->inplace);
 	return $dummy;
 }

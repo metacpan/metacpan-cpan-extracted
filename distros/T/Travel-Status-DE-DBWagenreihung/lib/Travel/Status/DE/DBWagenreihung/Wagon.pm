@@ -8,13 +8,13 @@ use utf8;
 use parent 'Class::Accessor';
 use Carp qw(cluck);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 Travel::Status::DE::DBWagenreihung::Wagon->mk_ro_accessors(
 	qw(attributes class_type group_index has_ac has_accessibility
 	  has_bahn_comfort has_bike_storage has_bistro has_compartments
-	  has_family_area has_phone_area has_quiet_area is_dosto is_interregio
-	  is_locomotive is_powercar number model multipurpose section train_no
-	  train_subtype type uic_id)
+	  has_family_area has_phone_area has_quiet_area is_closed is_dosto
+	  is_interregio is_locomotive is_powercar number model multipurpose section
+	  train_no train_subtype type uic_id)
 );
 
 our %type_attributes = (
@@ -74,6 +74,7 @@ sub new {
 	$ref->{has_bistro}    = 0;
 	$ref->{is_locomotive} = 0;
 	$ref->{is_powercar}   = 0;
+	$ref->{is_closed}     = 0;
 	$ref->{train_no}      = $opt{train_no};
 	$ref->{number}        = $opt{wagenordnungsnummer};
 	$ref->{model}         = $opt{fahrzeugnummer};
@@ -86,6 +87,10 @@ sub new {
 	my $self = bless( $ref, $obj );
 
 	$self->parse_type;
+
+	if ( $opt{status} and $opt{status} eq 'GESCHLOSSEN' ) {
+		$ref->{is_closed} = 1;
+	}
 
 	if ( $opt{kategorie} =~ m{SPEISEWAGEN} ) {
 		$ref->{has_bistro} = 1;

@@ -34,15 +34,6 @@ void ppcp(PDL_Byte *dst, PDL_Byte *src, int len)
   for (i=0;i<len;i++)
      *dst++=*src++;
 }
-
-void tinplace_c2(int n, PDL_Float* data1, PDL_Float* data2)
-{
-  int i;
-  for (i=0;i<n;i++) {
-    data1[i] = 599.0;
-    data2[i] = 699.0;
-  }
-}
 EOF
 
     'tests.pd' => <<'EOF',
@@ -90,43 +81,12 @@ pp_def(
 	 $b() = tmp;'
 );
 
-# test to set named dim with 'OtherPar'
-pp_def('setdim',
-	Pars => '[o] a(n)',
-	OtherPars => 'int ns => n',
-	Code => 'loop(n) %{ $a() = n; %}',
-);
-
 pp_def("gelsd",
         Pars => '[io,phys]A(m,n); [io,phys]B(p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info()',
         RedoDimsCode => '$SIZE(r) = PDLMIN($SIZE(m),$SIZE(n));',
         GenericTypes => ['F'],
         Code => '$CROAK("croaking");'
 );
-
-pp_def('fooseg',
-        Pars => 'a(n);  [o]b(n);',
-        Code => '
-	   loop(n) %{ $b() = $a(); %}
-');
-
-# adapted from PDL::NDBin: if in=null and b is a scalar, was SEGV-ing
-pp_def( '_flatten_into',
-        Pars => "in(m); indx b(m); [o] idx(m)",
-        Code => '
-                loop(m) %{ $idx() = $in(); %}
-        ',
-);
-
-pp_addhdr << 'EOH';
-void tinplace_c2(int n, PDL_Float* data1, PDL_Float* data2);
-EOH
-
-pp_def('fooflow2',
-	Pars => '[io]a(n);[io]b(n)',
-        GenericTypes => ['F'],
-	Code => 'tinplace_c2($SIZE(n),$P(a),$P(b));',
-	);
 
 pp_def( 'broadcastloop_continue',
 	 Pars => 'in(); [o] out()',
@@ -174,12 +134,6 @@ EOXS
 pp_add_boot pp_line_numbers(__LINE__, q{
         /* nothing happening here */
 });
-
-# test fixed value for named dim, wrong Code for simplicity
-pp_def('Cpow',
-	Pars => 'a(m=2); b(m=2); [o]c(m=2)',
-	Code => '$c(m => 0) = $a(m => 0) + $b(m => 0);',
-);
 
 # test XS args with OtherPars
 pp_def('gl_arrows',
@@ -238,11 +192,12 @@ pp_def('incomp_dim',
 
 pp_addhdr('
 typedef NV NV_ADD1;
+typedef HV* NV_HR;
 ');
 pp_add_typemaps(string=><<'EOT');
-TYPEMAP: <<END_OF_TYPEMAP
 TYPEMAP
 NV_ADD1 T_NV_ADD1
+NV_HR T_HVREF
 
 INPUT
 T_NV_ADD1
@@ -251,11 +206,11 @@ T_NV_ADD1
 OUTPUT
 T_NV_ADD1
   sv_setnv($arg, $var - 1);
-END_OF_TYPEMAP
 EOT
+
 pp_def('typem',
   Pars => 'int [o] out()',
-  OtherPars => '[io] NV_ADD1 v1',
+  OtherPars => '[io] NV_ADD1 v1; NV_HR v2;',
   Code => '$out() = $COMP(v1); $COMP(v1) = 8;',
 );
 
@@ -283,12 +238,12 @@ for (i = 0; i < $COMP(ins_count); i++) {
   pdl *in = ins[i];
   PDL_Indx j;
 #define X_CAT_INNER(datatype_in, ctype_in, ppsym_in, ...) \
-  PDL_DECLARE_PARAMETER_BADVAL(ctype_in, 0, in, (in), 1) \
+  PDL_DECLARE_PARAMETER_BADVAL(ctype_in, in, (in), 1, ppsym_in) \
   for(j=0; j<in->nvals; j++) { \
-    if ($PRIV(bvalflag) && PDL_ISBAD(in_physdatap[j], in_badval, ppsym_in)) continue; \
-    $out() += in_physdatap[j]; \
+    if ($PRIV(bvalflag) && PDL_ISBAD2(in_datap[j], in_badval, ppsym_in, in_badval_isnan)) continue; \
+    $out() += in_datap[j]; \
   }
-  PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, in->datatype, X_CAT_INNER, $CROAK("Not a known data type code=%d", in->datatype))
+  PDL_GENERICSWITCH(PDL_TYPELIST_ALL, in->datatype, X_CAT_INNER, $CROAK("Not a known data type code=%d", in->datatype))
 #undef X_CAT_INNER
 }
 EOC
@@ -313,7 +268,7 @@ for (i = 0; i < $COMP(outs_count); i++) {
   if (PDL_err.error) { for (; i >= 0; i--) PDL->destroy(outs[i]); free(outs); return PDL_err; }
   PDL_err = PDL->allocdata(o);
   if (PDL_err.error) { for (; i >= 0; i--) PDL->destroy(outs[i]); free(outs); return PDL_err; }
-  PDL_DECLARE_PARAMETER_BADVAL($GENERIC(in), 0, o, (o), 1)
+  PDL_DECLARE_PARAMETER_BADVAL($GENERIC(in), o, (o), 1, $PPSYM(in))
   loop(n) %{ o_datap[n] = $in(); %}
 }
 EOC
@@ -395,6 +350,21 @@ pp_def('ftr',
        FtrCode => "  sv_setiv(perl_get_sv(\"main::FOOTERVAL\",TRUE), 1);\n",
       );
 
+pp_def('ftrPM',
+       Pars => 'a(); [o]b()',
+       Code => ';',
+       HdrCode => "  sv_setiv(perl_get_sv(\"main::HEADERVAL\",TRUE), 1);\n",
+       FtrCode => "  sv_setiv(perl_get_sv(\"main::FOOTERVAL\",TRUE), 1);\n",
+       PMCode => <<'EOPM',
+sub PDL::ftrPM {
+  my ($a, $b) = @_;
+  $b //= PDL->null;
+  PDL::_ftrPM_int($a, $b);
+  $b;
+}
+EOPM
+      );
+
 pp_done;
 
 # this tests the bug with a trailing comment and *no* newline
@@ -447,7 +417,7 @@ isnt $@, '', '[phys] with multi-used mismatched dim of 1 throws exception';
 eval { foop(pdl([1]),($y=pdl([1]))) };
 is $@, '', '[phys] with multi-used matched dim of 1 no exception';
 
-eval { foop1($x,($y=pdl([1]))) };
+eval { foop1($x,($y=pdl([[1],[1],[1],[1]]))) };
 is $@, '', '[phys] with single-used dim of 1 no exception';
 
 # float qualifier
@@ -464,10 +434,6 @@ for (byte,short,ushort,long,float,double) {
   is( $y->at, 3000 );
 }
 
-setdim(($x=null),10);
-is( join(',',$x->dims), "10" );
-ok( tapprox($x,sequence(10)) );
-
 {
 my @msg;
 local $SIG{__WARN__} = sub { push @msg, @_ };
@@ -475,32 +441,6 @@ eval { nan(2,2)->gelsd(nan(2,2), -3) };
 like $@, qr/croaking/, 'right error message';
 is_deeply \@msg, [], 'no warnings' or diag explain \@msg;
 }
-
-# this used to segv under solaris according to Karl
-{
-  my $ny=7;
-  $x = double xvals zeroes (20,$ny);
-  fooseg $x, $y=null;
-  ok( 1 );  # if we get here at all that is alright
-  ok( tapprox($x,$y) )
-    or diag($x, "\n", $y);
-}
-
-eval { _flatten_into(null, 2) };
-ok 1; #was also segfaulting
-
-# test the bug alluded to in the comments in pdl_changed (pdlapi.c)
-# used to segfault
-my $xx=ones(float,3,4);
-my $sl1 = $xx->slice('(0)');
-my $sl11 = $sl1->slice('');
-my $sl2 = $xx->slice('(1)');
-my $sl22 = $sl2->slice('');
-
-fooflow2($sl11, $sl22);
-
-ok(all $xx->slice('(0)') == 599);
-ok(all $xx->slice('(1)') == 699);
 
 # test that continues in a broadcastloop work
 {
@@ -515,8 +455,6 @@ ok(all $xx->slice('(1)') == 699);
     ok( tapprox( $got, $exp ), "continue works in broadcastloop" )
       or do { diag "got     : $got"; diag "expected: $exp" };
 }
-
-Cpow(sequence(2), 1);
 
 polyfill_pp(zeroes(5,5), ones(2,3), 1);
 eval { polyfill_pp(ones(2,3), 1) };
@@ -546,13 +484,16 @@ is "$o", 4;
 $o = incomp_dim([0..3]);
 is "$o", 4;
 
-$o = typem(my $oth = 3);
+$o = typem(my $oth = 3, {});
 is "$o", 4;
 is "$oth", 7;
 
-typem($o = PDL->null, $oth = 3);
+typem($o = PDL->null, $oth = 3, {});
 is "$o", 4;
 is "$oth", 7;
+
+eval {typem($o = PDL->null, $oth = 3, []);};
+like $@, qr/^typem:.*not a HASH reference/i;
 
 incomp_in($o = PDL->null, [sequence(3), sequence(byte, 4)]);
 is "$o", 9;
@@ -609,6 +550,12 @@ is $@, '';
 
 undef $main::FOOTERVAL;
 ftr(1);
+is $main::FOOTERVAL, 1;
+
+undef $main::HEADERVAL;
+undef $main::FOOTERVAL;
+ftrPM(1);
+is $main::HEADERVAL, 1;
 is $main::FOOTERVAL, 1;
 
 done_testing;

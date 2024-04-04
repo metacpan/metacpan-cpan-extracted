@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -43,6 +43,7 @@
             "LWP::Protocol::https" : "0",
             "Test::Exception" : "0.42",
             "Test::Most" : "0",
+            "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
             "Test::Timer" : "2.01",
             "Test::URI" : "0"
@@ -62,6 +63,6 @@
          "web" : "https://github.com/nigelhorne/LWP-UserAgent::Throttled"
       }
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

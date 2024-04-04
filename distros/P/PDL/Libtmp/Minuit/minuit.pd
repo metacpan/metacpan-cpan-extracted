@@ -14,7 +14,7 @@ pp_addhdr('
 pp_addpm({At=>'Top'},<<'EOD');
 =head1 NAME
 
-PDL::Minuit -- a PDL interface to the Minuit library
+PDL::Minuit - a PDL interface to the Minuit library
 
 =head1 DESCRIPTION
 
@@ -23,13 +23,32 @@ of the CERN Library)
 
 =head1 SYNOPSIS
 
+  use PDL::LiteF;
+  use PDL::Minuit;
+  $x = sequence(10);
+  $y = 3.0 + 4.0*$x;
+  mn_init(\&chi2, {Title => 'test title'});
+  mn_def_pars($pars=pdl(2.5,3.0), $steps=pdl(0.3,0.5), {Names => [qw(intercept slope)]});
+  mn_excm('set pri',pdl(3.0));
+  mn_excm('migrad');
+  mn_excm('minos');
+  print "emat=", mn_emat();
+  print "out=", mn_pout(1), "\n";
+  mn_err(1);
+  mn_stat();
+
+  sub chi2 {
+      my ($npar,$grad,$fval,$xval,$iflag) = @_;
+      $fval = (($y - $xval->slice(0) - $xval->slice(1)*$x)**2)->sumover
+        if $iflag == 4;
+      ($fval,$grad);
+  }
+
 A basic fit with Minuit will call three functions in this package. First, a basic
 initialization is done with mn_init(). Then, the parameters are defined via
 the function mn_def_pars(), which allows setting upper and lower bounds. Then
 the function mn_excm() can be used to issue many Minuit commands, including simplex
 and migrad minimization algorithms (see Minuit manual for more details).
-
-See the test file minuit.t in the test (t/) directory for a basic example.
 
 =cut
 EOD
@@ -67,21 +86,23 @@ sub mn_init{
            
   if (defined (my $logfile = $mn_options->{Log})){ 
     if (-e $logfile) { unlink $logfile; }   
-    PDL::Minuit::mn_abre($mn_options->{Unit},$logfile,\'new\');
+    mn_abre($mn_options->{Unit},$logfile,\'new\');
   }
 
-  PDL::Minuit::mninit(5,$mn_options->{Unit},$mn_options->{Unit});
-  PDL::Minuit::mnseti($mn_options->{Title});
+  mninit(5,$mn_options->{Unit},$mn_options->{Unit});
+  mnseti($mn_options->{Title});
 
   if (defined (my $logfile = $mn_options->{Log})){
-    PDL::Minuit::mn_cierra($mn_options->{Unit});
+    mn_cierra($mn_options->{Unit});
   }
 
 }
 ');
 
 pp_def('mninit',
-        Pars => 'longlong a();longlong b(); longlong c();',
+        Pars => 'a(); b(); c();',
+        GenericTypes => ['LL'],
+        Doc => undef,
         Code => 'MNINIT($P(a),$P(b),$P(c));
       ');
 pp_addxs('','
@@ -94,14 +115,18 @@ mnseti(str)
 ');
 
 pp_def('mn_abre',
-        Pars => 'longlong l();',
+        Pars => 'l();',
+        GenericTypes => ['LL'],
         OtherPars => 'char* nombre; char* mode;',
+        Doc => undef,
         Code => '
-         PDL_Indx l1,l2; l1 = strlen($COMP(nombre)); l2 = strlen($COMP(mode));
+         PDL_Indx l1 = strlen($COMP(nombre)), l2 = strlen($COMP(mode));
          ABRE($P(l),$COMP(nombre),$COMP(mode),l1,l2);
 ');
 pp_def('mn_cierra',
-        Pars => 'longlong l();',
+        Pars => 'l();',
+        GenericTypes => ['LL'],
+        Doc => undef,
         Code => 'CIERRA($P(l));'
 );
 
@@ -134,31 +159,35 @@ sub mn_def_pars{
   my $iflag = 0;
 
   if (defined (my $logfile = $mn_options->{Log})){
-    PDL::Minuit::mn_abre($mn_options->{Unit},$logfile,\'old\');
+    mn_abre($mn_options->{Unit},$logfile,\'old\');
   }
 
-  foreach my $i ( 0..(nelem($pars)-1) ){
-     my $ii = $i + 1;
-     $iflag = PDL::Minuit::mnparm($ii,$pars->slice("($i)"),
-		       $steps->slice("($i)"),
-		       $lo_bounds->slice("($i)"),
-		       $up_bounds->slice("($i)"),
-		       $names[$i]);
-     barf "Problem initializing parameter $i in Minuit, got $iflag" unless ($iflag == 0);
-  }
-  
-  if (defined (my $logfile = $mn_options->{Log})){
-     PDL::Minuit::mn_cierra($mn_options->{Unit});
-  }
+  $iflag = mnparm($pars, $steps, $lo_bounds, $up_bounds, \@names);
+  barf "Problem initializing parameters in Minuit, got $iflag"
+    unless PDL::all($iflag == 0);
+
+  mn_cierra($mn_options->{Unit}) if defined $mn_options->{Log};
 }
 ');
 
 pp_def('mnparm',
-       Pars => 'longlong a(); double b(); double c(); double d(); double e(); longlong [o] ia()',
-       OtherPars => "char* str",
-       Code => ' PDL_Indx largo=strlen($COMP(str));
-                 MNPARM($P(a),$COMP(str),$P(b),$P(c),$P(d),$P(e),$P(ia),largo);
-       ');
+  Pars => 'pars(n); steps(n); lo_bounds(n); up_bounds(n); longlong [o] ia(n)',
+  GenericTypes => ['D'],
+  OtherPars => "char* names[]",
+  RedoDimsCode => <<'EOF',
+if ($COMP(names_count) != $SIZE(n))
+  $CROAK("Number of names=%"IND_FLAG" different from n=%"IND_FLAG, $COMP(names_count), $SIZE(n));
+EOF
+  Doc => undef,
+  Code => <<'EOF',
+loop(n) %{
+  char *name = $COMP(names)[n];
+  PDL_Indx largo=strlen(name);
+  PDL_LongLong a = n + 1;
+  MNPARM(&a,name,$P(pars),$P(steps),$P(lo_bounds),$P(up_bounds),$P(ia),largo);
+%}
+EOF
+);
 
 
 pp_addpm('
@@ -174,17 +203,17 @@ sub mn_excm{
   if ( @_ ) { barf "Usage : mn_excm($command, [$arglis]) \n"; }
 
   if (defined (my $logfile = $mn_options->{Log})){
-    PDL::Minuit::mn_abre($mn_options->{Unit},$logfile,\'old\');
+    mn_abre($mn_options->{Unit},$logfile,\'old\');
   }
 
   my $iflag = pdl(0);
 
 
-  $iflag = PDL::Minuit::mnexcm($arglis, $narg, $command, $fun_ref,$mn_options->{N});
+  $iflag = mnexcm($arglis, $narg, $command, $fun_ref,$mn_options->{N});
   warn "Problem executing command \'$command\' " unless ($iflag == 0);
 
   if (defined (my $logfile = $mn_options->{Log})){
-    PDL::Minuit::mn_cierra($mn_options->{Unit});
+    mn_cierra($mn_options->{Unit});
   }
 
   return $iflag;
@@ -192,12 +221,13 @@ sub mn_excm{
 ');
 
 pp_def('mnexcm',
-	Pars =>'double a(n); longlong ia(); longlong [o] ib();',
+	Pars =>'double a(n); ia(); [o] ib();',
+	GenericTypes => ['LL'],
 	OtherPars => 'char* str; SV* function; IV numelem;',
-	Code => 'double zero;
+	Doc => undef,
+	Code => 'double zero = 0.0;
         PDL_Indx largo=strlen($COMP(str));
         ene = $COMP(numelem);
-	zero = 0.0;
 	mnfunname = $COMP(function);
         MNEXCM(FCN,$COMP(str),$P(a),$P(ia),$P(ib),&zero,largo);
        ');
@@ -210,7 +240,7 @@ pp_addpm('
     if (($par_num < 1) || ($par_num > $n)) { barf "Parameter numbers range from 1 to $n "; }
 
     if (defined (my $logfile = $mn_options->{Log})){
-      PDL::Minuit::mn_abre($mn_options->{Unit},$logfile,\'old\');
+      mn_abre($mn_options->{Unit},$logfile,\'old\');
     }
 
     my $val = pdl(0);
@@ -219,10 +249,10 @@ pp_addpm('
     my $bnd2 = pdl(0);
     my $ivarbl = pdl(0);
     my $par_name = "          ";
-    PDL::Minuit::mnpout($par_num,$val,$err,$bnd1,$bnd2,$ivarbl,\$par_name);
+    mnpout($par_num,$val,$err,$bnd1,$bnd2,$ivarbl,\$par_name);
 
     if (defined (my $logfile = $mn_options->{Log})){
-      PDL::Minuit::mn_cierra($mn_options->{Unit});
+      mn_cierra($mn_options->{Unit});
     }
 
     return ($val,$err,$bnd1,$bnd2,$ivarbl,$par_name);    
@@ -230,8 +260,10 @@ pp_addpm('
 ');
 
 pp_def('mnpout',
-	Pars => 'longlong ia(); double [o] a(); double [o] b(); double [o] c(); double [o] d();longlong [o] ib();',
+	Pars => 'longlong ia(); [o] a(); [o] b(); [o] c(); [o] d();longlong [o] ib();',
+	GenericTypes => ['D'],
 	OtherPars => 'SV* str;',
+	Doc => undef,
 	Code => 'STRLEN largo; SV* tempo; char* uuu;
 	tempo = SvRV($COMP(str));
 	uuu = SvPV(tempo,largo);
@@ -242,21 +274,23 @@ pp_def('mnpout',
 pp_addpm('
   sub mn_stat{
      if (defined (my $logfile = $mn_options->{Log})){
-       PDL::Minuit::mn_abre($mn_options->{Unit},$logfile,\'old\');
+       mn_abre($mn_options->{Unit},$logfile,\'old\');
      }
 
 
-     my ($fmin,$fedm,$errdef,$npari,$nparx,$istat) = PDL::Minuit::mnstat();
+     my ($fmin,$fedm,$errdef,$npari,$nparx,$istat) = mnstat();
 
      if (defined (my $logfile = $mn_options->{Log})){
-       PDL::Minuit::mn_cierra($mn_options->{Unit});
+       mn_cierra($mn_options->{Unit});
      }
 
      return ($fmin,$fedm,$errdef,$npari,$nparx,$istat);
   }
 ');
 pp_def('mnstat',
-        Pars => 'double [o] a(); double [o] b(); double [o] c(); longlong [o] ia(); longlong [o] ib(); longlong [o] ic();',
+        Pars => '[o] a(); [o] b(); [o] c(); longlong [o] ia(); longlong [o] ib(); longlong [o] ic();',
+        GenericTypes => ['D'],
+        Doc => undef,
         Code => 'MNSTAT($P(a),$P(b),$P(c),$P(ia),$P(ib),$P(ic));
        ');
 
@@ -265,17 +299,17 @@ pp_addpm('
   sub mn_emat{
    
     if (defined (my $logfile = $mn_options->{Log})){
-      PDL::Minuit::mn_abre($mn_options->{Unit},$logfile,\'old\');
+      mn_abre($mn_options->{Unit},$logfile,\'old\');
     }
 
-    my ($fmin,$fedm,$errdef,$npari,$nparx,$istat) = PDL::Minuit::mnstat();
+    my ($fmin,$fedm,$errdef,$npari,$nparx,$istat) = mnstat();
     my $n = $npari->sum->at;
     my $mat = zeroes($n,$n);
 
-    PDL::Minuit::mnemat($mat);
+    mnemat($mat);
 
     if (defined (my $logfile = $mn_options->{Log})){
-      PDL::Minuit::mn_cierra($mn_options->{Unit});
+      mn_cierra($mn_options->{Unit});
     }
     
     return $mat;
@@ -283,7 +317,9 @@ pp_addpm('
   }
 ');
 pp_def('mnemat',
-        Pars => 'double [o] mat(n,n);',
+        Pars => '[o] mat(n,n);',
+        GenericTypes => ['D'],
+        Doc => undef,
         Code => 'PDL_LongLong numrows = $SIZE(n);
         MNEMAT($P(mat),&numrows);
        ');
@@ -299,20 +335,22 @@ pp_addpm('
     if (($par_num < 1) || ($par_num > $n)) { barf "Parameter numbers range from 1 to $n "; }
 
     if (defined (my $logfile = $mn_options->{Log})){
-      PDL::Minuit::mn_abre($mn_options->{Unit},$logfile,\'old\');
+      mn_abre($mn_options->{Unit},$logfile,\'old\');
     }
 
-    my ($eplus,$eminus,$eparab,$globcc) = PDL::Minuit::mnerrs($par_num);
+    my ($eplus,$eminus,$eparab,$globcc) = mnerrs($par_num);
 
     if (defined (my $logfile = $mn_options->{Log})){
-      PDL::Minuit::mn_cierra($mn_options->{Unit});
+      mn_cierra($mn_options->{Unit});
     }
 
     return ($eplus,$eminus,$eparab,$globcc);
   }
 ');
 pp_def('mnerrs',
-	Pars => 'longlong ia(); double [o] a(); double [o] b(); double [o] c(); double [o] d();',
+	Pars => 'longlong ia(); [o] a(); [o] b(); [o] c(); [o] d();',
+	GenericTypes => ['D'],
+	Doc => undef,
         Code => 'MNERRS($P(ia),$P(a),$P(b),$P(c),$P(d));
        ');
 
@@ -335,10 +373,10 @@ pp_addpm('
     my $ypt = zeroes($npt);
     my $nfound = pdl->new;
 
-    PDL::Minuit::mncont($par_num_1,$par_num_2,$npt,$xpt,$ypt,$nfound,$fun_ref,$n);
+    mncont($par_num_1,$par_num_2,$npt,$xpt,$ypt,$nfound,$fun_ref,$n);
 
     if (defined (my $logfile = $mn_options->{Log})){
-      PDL::Minuit::mn_cierra($mn_options->{Unit});
+      mn_cierra($mn_options->{Unit});
     }
 
     return ($xpt,$ypt,$nfound);
@@ -346,10 +384,11 @@ pp_addpm('
 ');
 
 pp_def('mncont',
-        Pars => 'longlong ia(); longlong ib(); longlong ic(); double [o] a(n); double [o] b(n); longlong [o] id();',
+        Pars => 'ia(); ib(); ic(); double [o] a(n); double [o] b(n); [o] id();',
+        GenericTypes => ['LL'],
         OtherPars => 'SV* function; IV numelem;',
-        Code => ' double zero;
-	zero = 0.0; 
+        Doc => undef,
+        Code => 'double zero = 0.0;
         mnfunname = $COMP(function);
 	ene = $COMP(numelem);
         MNCONT(FCN,$P(ia),$P(ib),$P(ic),$P(a),$P(b),$P(id),&zero);
@@ -518,7 +557,7 @@ Example:
   $iflag = mn_excm('set strategy',$arglist);
 
   # each command can be specified by a minimal string that uniquely
-  # identifies it (see Chapter 4 of Minuit manual). The comannd above
+  # identifies it (see Chapter 4 of Minuit manual). The command above
   # is equivalent to:
   $iflag = mn_excm('set stra',$arglis);
 

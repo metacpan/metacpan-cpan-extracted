@@ -1,6 +1,40 @@
 Revision history for Runtime-Debugger
 
 ====
+0.18
+====
+
+2024-04-02
+
+Updated pod.
+
+====
+0.17
+====
+
+2024-04-02
+
+Fixed bug with no being able to use help/hist
+with (old) "eval run".
+
+====
+0.16
+====
+
+2024-03-28
+
+No longer expanding escaped variable in quotes.
+
+====
+0.15
+====
+
+2024-03-28
+
+Created new function to avoid lossy vars: repl.
+Cleaned up README/pod.
+
+====
 0.14
 ====
 

@@ -7,6 +7,7 @@ lib/Net/OBS/Client/DTD.pm
 lib/Net/OBS/Client/Roles/BuildStatus.pm
 lib/Net/OBS/Client/Roles/Client.pm
 lib/Net/OBS/SigAuth.pm
+lib/Net/OBS/LWP/UserAgent.pm
 
 Makefile.PL
 MANIFEST			This list of files

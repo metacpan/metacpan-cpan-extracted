@@ -10,7 +10,6 @@ eg/README
 eg/tle_celestia.tt
 eg/tle_json.tt
 eg/tle_stellarium.tt
-inc/mock/File/HomeDir.pm
 inc/My/Module/Build.pm
 inc/My/Module/Meta.pm
 inc/My/Module/Recommend.pm
@@ -18,7 +17,6 @@ inc/My/Module/Recommend/All.pm
 inc/My/Module/Recommend/Any.pm
 inc/My/Module/Test/App.pm
 inc/My/Module/Test/Geocode.pm
-inc/My/Module/Test/Mock_App.pm
 lib/Astro/App/Satpass2.pm
 lib/Astro/App/Satpass2/Copier.pm
 lib/Astro/App/Satpass2/Format.pm

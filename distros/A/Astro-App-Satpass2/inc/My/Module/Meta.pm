@@ -31,7 +31,10 @@ sub author {
 
 sub build_requires {
     return +{
-	'Test::More'	=> 0.88,	# Because of done_testing().
+	'Test2::V0'			=> 0,
+	'Test2::Plugin::BailOnFail'	=> 0,
+	'Test2::Tools::Explain'		=> 0,
+	'Test2::Tools::LoadModule'	=> 0,
     };
 }
 
@@ -90,22 +93,23 @@ sub no_index {
     };
 }
 
+sub optional_modules {
+    require My::Module::Recommend;
+    return My::Module::Recommend->optional_modules();
+}
+
 sub provides {
     my $provides;
     local $@ = undef;
 
     eval {
 	require CPAN::Meta;
-	require ExtUtils::Manifest;
 	require Module::Metadata;
 
-	my $manifest;
-	{
-	    local $SIG{__WARN__} = sub {};
-	    $manifest = ExtUtils::Manifest::maniread();
-	}
-	keys %{ $manifest || {} }
-	    or return;
+	$provides = Module::Metadata->provides(
+	    version	=> 2,
+	    dir		=> 'lib',
+	);
 
 	# Skeleton so we can use should_index_file() and
 	# should_index_package().
@@ -116,21 +120,11 @@ sub provides {
 	    },
 	);
 
-	# The Module::Metadata docs say not to use
-	# package_versions_from_directory() directly, but the 'files =>'
-	# version of provides() is broken, and has been known to be so
-	# since 2014, so it's not getting fixed any time soon. So:
-
-	foreach my $fn ( sort keys %{ $manifest } ) {
-	    $fn =~ m/ [.] pm \z /smx
-		or next;
-	    my $pvd = Module::Metadata->package_versions_from_directory(
-		undef, [ $fn ] );
-	    foreach my $pkg ( keys %{ $pvd } ) {
-		$meta->should_index_package( $pkg )
-		    and $meta->should_index_file( $pvd->{$pkg}{file} )
-		    and $provides->{$pkg} = $pvd->{$pkg};
-	    }
+	# Remove things that are not to be indexed, if any.
+	foreach my $module ( keys %{ $provides } ) {
+	    $meta->should_index_package( $module )
+		and $meta->should_index_file( $provides->{$module}{file} )
+		    or delete $provides->{$module};
 	}
 
 	1;
@@ -142,13 +136,13 @@ sub provides {
 sub requires {
     my ( undef, @extra ) = @_;		# Invocant unused
     return {
-	'Astro::Coord::ECI'		=> 0.077,
-	'Astro::Coord::ECI::Moon'	=> 0.077,
-	'Astro::Coord::ECI::Star'	=> 0.077,
-	'Astro::Coord::ECI::Sun'	=> 0.077,
-	'Astro::Coord::ECI::TLE'	=> 0.077,
-	'Astro::Coord::ECI::TLE::Set'	=> 0.077,
-	'Astro::Coord::ECI::Utils'	=> 0.112,	# for greg_time_gm() ...
+	'Astro::Coord::ECI'		=> 0.131,
+	'Astro::Coord::ECI::Moon'	=> 0.131,
+	'Astro::Coord::ECI::Star'	=> 0.131,
+	'Astro::Coord::ECI::Sun'	=> 0.131,
+	'Astro::Coord::ECI::TLE'	=> 0.131,
+	'Astro::Coord::ECI::TLE::Set'	=> 0.131,
+	'Astro::Coord::ECI::Utils'	=> 0.131,	# for gm_strftime() ...
 	'Attribute::Handlers'	=> 0,
 	'Carp'			=> 0,
 	'Clone'			=> 0,
@@ -307,6 +301,11 @@ on.
 This method returns the names of things which are not to be indexed
 by CPAN.
 
+=head2 optional_modules
+
+This method is just a convenience wrapper for C<optional_modules()> in
+C<My::Module::Recommend>.
+
 =head2 provides
 
  use YAML;
@@ -370,7 +369,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2023 by Thomas R. Wyant, III
+Copyright (C) 2010-2024 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

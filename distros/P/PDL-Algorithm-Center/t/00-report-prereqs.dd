@@ -1,7 +1,8 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'Module::Build::Tiny' => '0.034'
                                       }
                       },
        'develop' => {
@@ -21,6 +22,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::MetaNoIndex' => '0',
                                       'Dist::Zilla::Plugin::MetaProvides::Package' => '0',
                                       'Dist::Zilla::Plugin::MetaResources' => '0',
+                                      'Dist::Zilla::Plugin::ModuleBuildTiny' => '0',
                                       'Dist::Zilla::Plugin::NextRelease' => '0',
                                       'Dist::Zilla::Plugin::PodCoverageTests' => '0',
                                       'Dist::Zilla::Plugin::PodSyntaxTests' => '0',
@@ -43,7 +45,6 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::Test::PodSpelling' => '0',
                                       'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0',
                                       'Dist::Zilla::Plugin::Test::TrailingSpace' => '0',
-                                      'Dist::Zilla::Plugin::Test::UnusedVars' => '0',
                                       'Dist::Zilla::Plugin::Test::Version' => '0',
                                       'Dist::Zilla::PluginBundle::Basic' => '0',
                                       'Dist::Zilla::PluginBundle::Filter' => '0',
@@ -66,7 +67,6 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Spelling' => '0.12',
                                       'Test::TrailingSpace' => '0.0203',
-                                      'Test::Vars' => '0.015',
                                       'Test::Version' => '1'
                                     }
                     },
@@ -75,6 +75,7 @@ do { my $x = {
                                       'Data::Clone' => '0',
                                       'Data::Visitor::Tiny' => '0',
                                       'Hash::Wrap' => '0.10',
+                                      'List::Util' => '1.33',
                                       'PDL' => '0',
                                       'PDL::Image2D' => '0',
                                       'PDL::Lite' => '0',

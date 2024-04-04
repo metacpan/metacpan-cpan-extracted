@@ -45,6 +45,7 @@ GetOptions (\%options,
                coverpage-only-if-toc
                include-path=s@
                purge
+               run-timeout=i
                help/) or die "Bad option passed!\n";
 
 if ($options{help}) {
@@ -194,6 +195,10 @@ started, finding all the .muse files without a newer status file, and
 compiling them accordingly to the options.
 
 No target files can be specified.
+
+=item --run-timeout INTEGER
+
+Set the latex/xindy max time execution in seconds.
 
 =item --dry-run
 

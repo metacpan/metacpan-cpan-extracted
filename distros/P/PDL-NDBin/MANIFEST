@@ -29,7 +29,6 @@ lib/PDL/NDBin/Action/Sum.pm
 lib/PDL/NDBin/Iterator.pm
 pp/Actions/Makefile.PL
 pp/Actions/actions.pd
-pp/Actions/typemap
 pp/Makefile.PL
 pp/Utils/Makefile.PL
 pp/Utils/utils.pd

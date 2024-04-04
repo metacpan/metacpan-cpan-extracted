@@ -1,5 +1,5 @@
 package YA::CLI::Usage;
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 use Moo;
 use namespace::autoclean;
 
@@ -11,7 +11,7 @@ use Pod::Find  qw(pod_where);
 use Pod::Usage qw(pod2usage);
 
 has verbose => (
-  is      => 'ro',
+  is      => 'rw',
   default => 1,
 );
 
@@ -35,10 +35,15 @@ sub run {
 
   my $pod_where = $self->_pod_where;
 
+  if ($self->verbose == 1) {
+      $self->verbose(99);
+  }
+
   $self->_pod2usage(
     $self->has_message ? (-message => $self->message) : (),
     -verbose => $self->verbose,
     -exitval => $self->rc,
+    $self->verbose == 99 ? ( -sections => 'NAME|SYNOPSIS|COMMANDS|OPTIONS' ) : (),
     $pod_where ? ('-input' => $pod_where) : (),
   );
 }
@@ -68,7 +73,7 @@ YA::CLI::Usage - Class that handles usage and man page generation for action han
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

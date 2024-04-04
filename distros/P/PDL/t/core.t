@@ -1,10 +1,14 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Exception;
 use PDL::LiteF;
+use PDL::Math; # for polyroots with [phys] params, for dim compat tests
+use PDL::MatrixOps; # for simq with [phys] params, for dim compat tests
 use Config;
 use PDL::Types;
 use Math::Complex ();
+use Devel::Peek;
 
 sub tapprox ($$) {
     my ( $x, $y ) = @_;
@@ -21,6 +25,36 @@ my $p = sequence(100); # big enough to not fit in "value" field
 my $ref = $p->get_dataref;
 $p->reshape(3); # small enough now
 $p->upd_data;
+}
+
+{
+  my $pa = pdl 2,3,4;
+  $pa->doflow;
+  my $pb = $pa + $pa;
+  is "$pb", '[4 6 8]';
+  $pa->set(0,50);
+  is "$pb", '[100 6 8]';
+  eval {$pa->set_datatype(PDL::float()->enum)};
+  like $@, qr/ndarray has child/, 'set_datatype if has child dies';
+  $pb->set_datatype(PDL::float()->enum);
+  $pa->set(0,60);
+  is "$pb", '[100 6 8]', 'dataflow broken by set_datatype';
+}
+
+eval {PDL->inplace};
+like $@, qr/called object method/, 'error on PDL->obj_method';
+
+{
+my $p = sequence(3);
+my $p2 = sequence(2);
+eval {$p->set(1,$p2)};
+isnt $@, '', 'set(..., $multi_elt) should error';
+}
+
+{
+my $p = sequence(5);
+is Devel::Peek::SvREFCNT($p), 1, 'right refcnt blessed ref';
+is Devel::Peek::SvREFCNT($$p), 1, 'right refcnt pointer SV';
 }
 
 for (@PDL::Core::EXPORT_OK) {
@@ -123,14 +157,143 @@ is($c->hdr->{demo}, "yes", "hdr before reshape");
 $c->reshape(5,5);
 is($c->hdr->{demo}, "yes", "hdr after reshape");
 
+eval {empty->squeeze->dims};
+is $@, '', 'can "squeeze" an empty';
+eval {empty->copy->make_physical};
+is $@, '', 'can physicalise the copy of an empty';
+
+# capture ancient pptest.t test for Solaris segfault
+ok all(tapprox(norm(pdl 3,4), pdl(0.6,0.8))), 'vector quasi-copy works';
+# pptest for null input
+eval {(my $tmp=null) .= null}; like $@, qr/input.*null/;
+# pptest for OtherPars=>named dim
+ok all(tapprox((5*sequence(5))->maximum_n_ind(3), pdl(4,3,2))), 'named dim';
+# pptest for dim with fixed value
+ok all(tapprox(crossp([1..3],[4..6]), pdl(-3,6,-3))), 'named dim=3';
+
+subtest 'dim compatibility' => sub {
+  for (
+    # non-phys params
+    [\&append, [zeroes(1), zeroes(1), zeroes(1)], 2, qr/dim has size 1/, 'output=[1]; required [2]. output too small'],
+    [\&append, [pdl(1), pdl(2), null], 2, [ 1, 2 ], 'output=null; required [2]'],
+    [\&append, [pdl(1), pdl(2), zeroes(2)], 2, [ 1, 2 ], 'output=[2]; required [2]'],
+    [\&append, [zeroes(1), zeroes(1), zeroes(3)], 2, qr/dim has size 3/, 'output=[3]; required [2]. output too large'],
+    [\&append, [zeroes(1), zeroes(0), zeroes()], 2, [0], 'output=scalar; required [1]'],
+    [\&append, [zeroes(1), zeroes(1), zeroes()], 2, qr/can't broadcast/, 'output=scalar; required [2]. output too small'],
+    [\&append, [zeroes(1), zeroes(1), zeroes(1,1)], 2, qr/dim has size 1/, 'output=[1,1]; required [2]. output too small'],
+    [\&append, [pdl(1),    pdl(2),    zeroes(2,1)], 2, [[ 1, 2 ]], 'output=[2,1]; required [2]'],
+    [\&append, [zeroes(1), zeroes(1), zeroes(3,1)], 2, qr/dim has size 3/, 'output=[3,1]; required [2]. output too large'],
+    [\&append, [zeroes(1), zeroes(1), zeroes(1,2)], 2, qr/dim has size 1/, 'output=[1,2]; required [2]. output too small'],
+    [\&append, [zeroes(1), zeroes(1), zeroes(2,2)], 2, [[ 0, 0 ], [ 0, 0 ]], 'output=[2,2]; required [2]. input without that dim broadcasted up'],
+    [\&append, [zeroes(1,2), zeroes(1), zeroes(2,2)], 2, [[ 0, 0 ], [ 0, 0 ]], 'output=[2,2]; required [2]. one input without that dim broadcasted up'],
+    [\&append, [zeroes(1,3), zeroes(1), zeroes(2,2)], 2, qr/Mismatch/, 'input=[1,3] output=[2,2]. input with mismatched broadcast dim'],
+    [\&append, [zeroes(1,2), zeroes(1), zeroes(2,1)], 2, qr/implicit dim/, 'output=[2,1]; required [2,2]. output too small in broadcast dim'],
+    [\&append, [zeroes(1,2), zeroes(1), zeroes(2)], 2, qr/implicit dim/, 'output=[2,1]; required [2,2]. output too small in broadcast implicit dim'],
+    [\&append, [zeroes(1,2), zeroes(1,2), zeroes(2,1)], 2, qr/implicit dim/, 'output=[2,1]; required [2,2]. output too small in broadcast dim'],
+    [\&append, [zeroes(1,2), zeroes(1,2), zeroes(2)->dummy(1,2)], 2, qr/implicit dim/, 'output=[2,*2]; required [2,2]. output into dummy implicit dim'],
+    [\&append, [zeroes(1,2), zeroes(1,2), zeroes(2)->dummy(1,2)->make_physical], 2, qr/implicit dim/, 'output=[2,*2](phys); required [2,2]. output into dummy implicit dim'],
+    [\&append, [zeroes(1,2), zeroes(1,2), zeroes(2)->dummy(0,2)], 2, qr/over dummy dim/, 'output=[*2,2]; required [2,2]. output into dummy active dim'],
+    [\&append, [zeroes(1,2), zeroes(1,2), zeroes(2)->dummy(0,2)->make_physical], 2, qr/over dummy dim/, 'output=[*2,2](phys); required [2,2]. output into dummy active dim'],
+    # phys params
+    [\&polyroots, [ones(2), zeroes(2), zeroes(1), zeroes(1)], 2, [-1], '[phys] output=[1]'],
+    [\&polyroots, [ones(2), zeroes(1), zeroes(), zeroes(1)], 2, qr/dim has size 1/, '[phys] output=[2] mismatch'],
+    [\&polyroots, [ones(2), zeroes(1), zeroes(1), zeroes(1)], 2, qr/dim has size 1/, '[phys] output=[2] mismatch'],
+    [\&polyroots, [ones(2), zeroes(2), zeroes(2), zeroes(2)], 2, qr/dim has size 2/, '[phys] output=[2] mismatch'],
+    [\&polyroots, [ones(2), zeroes(2), zeroes(1,2), zeroes(1)], 2, qr/implicit dim/, '[phys] one outputs=[1,2],[1] no promote output implicit dims'],
+    [\&polyroots, [ones(2), zeroes(2,2), zeroes(1,2), zeroes(1,2)], 2, [[-1],[-1]], '[phys] output=[1,2] ok broadcast over input'],
+    [\&polyroots, [ones(2), zeroes(2,2), zeroes(1), zeroes(1,2)], 2, qr/implicit dim/, '[phys] output=[1,2] not ok broadcast over output implicit dim'],
+    [\&polyroots, [ones(2), zeroes(2,2), zeroes(1,1), zeroes(1,2)], 2, qr/implicit dim/, '[phys] outputs=[1,1],[1,2] not ok broadcast over output explicit dim'],
+    # phys params with (n,n)
+    [\&simq, [identity(3)+1, sequence(3,1), null, null, 0], 2, [[-0.75,0.25,1.25]], '[phys] output=[3,3]'],
+    [\&simq, [[[2,1,1]], sequence(3,1), null, null, 0], 2, qr/dim has size/, '[phys] input=[3,1] output=[3,3] no expand input phys multi-used dim of 1'],
+    [\&simq, [identity(3)+1, sequence(3,2), null, null, 0], 2, qr/implicit dim/, '[phys] inputs:n,n=[3,3],n=[3,2] no broadcast over [io]'],
+  ) {
+    my ($func, $args, $exp_index, $exp, $label) = @$_;
+    if (ref $exp eq 'Regexp') {
+      throws_ok { $func->( @$args ) } $exp, $label;
+    } else {
+      $func->( @$args );
+      my $got = $args->[$exp_index];
+      ok all(tapprox $got, pdl($exp)), $label or diag $got;
+    }
+  }
+};
+
 # test topdl
 
+{ package # hide from PAUSE
+  PDL::Trivial;
+our @ISA = qw(PDL);
+sub new {bless {PDL=>PDL->SUPER::new(@_[1..$#_])}} # like PDL::DateTime
+}
+my $subobj = PDL::Trivial->new(6);
+isa_ok $subobj, 'PDL::Trivial';
+isa_ok +PDL->topdl($subobj), 'PDL::Trivial';
+isa_ok $subobj->inplace, 'PDL::Trivial';
 isa_ok( PDL->topdl(1),       "PDL", "topdl(1) returns an ndarray" );
 isa_ok( PDL->topdl([1,2,3]), "PDL", "topdl([1,2,3]) returns an ndarray" );
 isa_ok( PDL->topdl(1,2,3),   "PDL", "topdl(1,2,3) returns an ndarray" );
 $x=PDL->topdl(1,2,3);
 ok (($x->nelem == 3  and  all($x == pdl(1,2,3))), "topdl(1,2,3) returns a 3-ndarray containing (1,2,3)");
+eval {PDL->topdl({})};
+isnt $@, '', 'topdl({}) no segfault';
 
+# stringification
+{
+my $x = sequence( 3 + 1e7 );
+my $x_indx = which( $x > 1e7 - 4 );
+is $x_indx.'', "[9999997 9999998 9999999 10000000 10000001 10000002]";
+my $x_indx_bad = $x_indx->copy;
+$x_indx_bad->setbadat($_) for 1, 4;
+is $x_indx_bad.'', "[9999997 BAD 9999999 10000000 BAD 10000002]";
+is +($x_indx - 10).'', "[9999987 9999988 9999989 9999990 9999991 9999992]";
+is +($x_indx)->splitdim(0,3).'', "\n[\n [     9999997      9999998      9999999]\n [    10000000     10000001     10000002]\n]\n";
+is +($x_indx - 10)->splitdim(0,3).'', "\n[\n [9999987 9999988 9999989]\n [9999990 9999991 9999992]\n]\n";
+is +($x_indx_bad)->splitdim(0,3).'', "\n[\n [     9999997          BAD      9999999]\n [    10000000          BAD     10000002]\n]\n";
+is +($x_indx_bad - 10)->splitdim(0,3).'', "\n[\n [9999987     BAD 9999989]\n [9999990     BAD 9999992]\n]\n";
+my $x_double = where( $x, $x > 1e7 - 4 );
+is $x_double.'', "[9999997 9999998 9999999 10000000 10000001 10000002]";
+is +($x_double - 10).'', "[9999987 9999988 9999989 9999990 9999991 9999992]";
+is +($x_double)->splitdim(0,3).'', "\n[\n [   9999997    9999998    9999999]\n [  10000000   10000001   10000002]\n]\n";
+is +($x_double - 10)->splitdim(0,3).'', "\n[\n [9999987 9999988 9999989]\n [9999990 9999991 9999992]\n]\n";
+my $x_long = where( long($x), $x > 1e7 - 4 );
+is $x_long.'', "[9999997 9999998 9999999 10000000 10000001 10000002]";
+is +($x_long - 10).'', "[9999987 9999988 9999989 9999990 9999991 9999992]";
+is +($x_long)->splitdim(0,3).'', "\n[\n [ 9999997  9999998  9999999]\n [10000000 10000001 10000002]\n]\n";
+is +($x_long - 10)->splitdim(0,3).'', "\n[\n [9999987 9999988 9999989]\n [9999990 9999991 9999992]\n]\n";
+my $fracs = sequence(9) / 16;
+is $PDL::doubleformat, "%10.8g";
+is $fracs.'', "[0 0.0625 0.125 0.1875 0.25 0.3125 0.375 0.4375 0.5]";
+is $fracs->string($PDL::doubleformat).'', "[         0     0.0625      0.125     0.1875       0.25     0.3125      0.375     0.4375        0.5]";
+{
+local $PDL::doubleformat = '%8.2g';
+is $fracs.'', "[0 0.0625 0.125 0.1875 0.25 0.3125 0.375 0.4375 0.5]";
+is $fracs->string($PDL::doubleformat).'', "[       0    0.062     0.12     0.19     0.25     0.31     0.38     0.44      0.5]";
+}
+
+# from Data::Frame
+{
+  my $_pdl_stringify_temp = PDL::Core::pdl([[0]]);
+  my $_pdl_stringify_temp_single = PDL::Core::pdl(0);
+  sub element_stringify {
+    my ($self, $element) = @_;
+    return $_pdl_stringify_temp_single->set(0, $element)->string if $self->ndims == 0;
+    # otherwise
+    ( $_pdl_stringify_temp->set(0,0, $element)->string =~ /\[(.*)\]/ )[0];
+  }
+}
+sub element_stringify_max_width {
+  my ($self) = @_;
+  my @vals = @{ $self->uniq->unpdl };
+  my @lens = map { length element_stringify($self, $_) } @vals;
+  max( pdl @lens )->sclr;
+}
+for (1.23456789, 1.2345678901, 1.23456789012) {
+  my $ndim = length( pdl([ $_ ])->string ) - 2;
+  is element_stringify_max_width(pdl([ $_ ])), $ndim, "length right for [$_]";
+  is element_stringify_max_width(pdl([[ $_ ]])), $ndim, "length right for [[$_]]";
+}
+}
 
 # test $PDL::undefval support in pdl (bug #886263)
 #
@@ -275,6 +438,8 @@ $x = sequence(byte,5);
 
 $x->inplace;
 ok($x->is_inplace,"original item inplace-d true inplace flag");
+eval { $x->inplace(1) };
+is $@, '', 'passing spurious extra args no error';
 $y = $x->copy;
 ok($x->is_inplace,"original item true inplace flag after copy");
 ok(!$y->is_inplace,"copy has false inplace flag");
@@ -307,6 +472,7 @@ ok($empty->nelem==0,"you can make an empty PDL with zeroes(0)");
 ok("$empty" =~ m/Empty/, "an empty PDL prints 'Empty'");
 
 my $null = null;
+is $null->nbytes, 0, 'a null has 0 nbytes';
 is $null->info, 'PDL->null', "null ndarray's info is 'PDL->null'";
 my $mt_info = $empty->info;
 $mt_info =~m/\[([\d,]+)\]/;
@@ -330,13 +496,15 @@ eval { $y->reshape(4); };
 ok( $@ !~ m/Can\'t/, "reshape doesn't fail on a PDL with a parent" );
 
 {
-my $pb = double ones(2,3);
-my $ind = 1;
+my $pb = sequence(2,3);
 is(($pb->dims)[0], 2);
 is(($pb->dims)[1], 3);
 note $pb;
-is($pb->at(1,1), 1);
-is($pb->at(1,2), 1);
+is $pb->at(1,1), 3;
+is $pb->at(1,2), 5;
+eval {$pb->at(2,1)};
+like $@, qr/Position 2 at dimension 0 out of range/;
+is $pb->at(-1,2), 5;
 }
 
 my $array = [
@@ -465,17 +633,20 @@ note "F ($pb * string(-2.2)) is $pf";
 }
 
 {
-my @types = (
-	{ typefunc => *byte  , size => 1 },
-	{ typefunc => *short , size => 2 },
-	{ typefunc => *ushort, size => 2 },
-	{ typefunc => *long  , size => 4 },
-	{ typefunc => *float , size => 4 },
-	{ typefunc => *double, size => 8 },
-);
-for my $type (@types) {
-	my $pdl = $type->{typefunc}(42); # build a PDL with datatype $type->{type}
-	is( PDL::Core::howbig( $pdl->get_datatype ), $type->{size} );
+for my $type (
+  { typefunc => *byte  , size => 1 },
+  { typefunc => *short , size => 2 },
+  { typefunc => *ushort, size => 2 },
+  { typefunc => *long  , size => 4 },
+  { typefunc => *float , size => 4 },
+  { typefunc => *double, size => 8 },
+) {
+  my $pdl = $type->{typefunc}(42); # build a PDL with datatype $type->{type}
+  is( PDL::Core::howbig( $pdl->get_datatype ), $type->{size} );
+  is $pdl->type, $type->{typefunc}->().'', 'pdl has right type';
+  is $pdl->convert(longlong).'', 42, 'converted to longlong same value';
+  $pdl->inplace->convert(longlong);
+  is $pdl->type, 'longlong', 'pdl has new right type, inplace convert worked';
 }
 }
 
@@ -495,9 +666,13 @@ for (['ones', 1], ['zeroes', 0], ['nan', '.*NaN'], ['inf', '.*Inf'], ['i', 'i', 
   # from PDL::Core docs of zeroes
   my (@dims, $w) = (1..3);
   $w = $name->(byte, @dims); is_deeply [$w->dims], \@dims; is $w->type, $type || 'byte';
+  ok $w->allocated, "$name(type, dims) is allocated";
   $w = $name->(@dims); is_deeply [$w->dims], \@dims; is $w->type, $type || 'double';
+  ok $w->allocated, "$name(dims) is allocated";
   $w = PDL->$name(byte, @dims); is_deeply [$w->dims], \@dims; is $w->type, $type || 'byte';
+  ok $w->allocated, "PDL->$name(type, dims) is allocated";
   $w = PDL->$name(@dims); is_deeply [$w->dims], \@dims; is $w->type, $type || 'double';
+  ok $w->allocated, "PDL->$name(dims) is allocated";
   my $pdl = ones(float, 4, 5);
   $w = $pdl->$name(byte, @dims); is_deeply [$w->dims], \@dims; is $w->type, $type || 'byte';
   # usage type (ii):
@@ -520,9 +695,17 @@ my $slice = $s->slice;
 isnt +(my $tp=$slice->trans_parent), undef, 'trans_parent with trans defined';
 is ${($s->trans_children)[0]}, $$tp, 'correct trans_children';
 my @parents = $tp->parents;
-is ${$parents[0]}, $$s, 'correct parent ndarray';
+is ${$parents[0]}, $s->address, 'correct parent ndarray';
 my @children = $tp->children;
-is ${$children[0]}, $$slice, 'correct child ndarray';
+is ${$children[0]}, $slice->address, 'correct child ndarray';
+my $vtable = $tp->vtable;
+isnt $vtable->name, undef, 'trans vtable has a name';
+isnt PDL::Core::pdump($slice), undef, 'pdump works';
+isnt PDL::Core::pdump_trans($tp), undef, 'pdump_trans works';
+isnt PDL::Core::pdumphash($slice), undef, 'pdumphash works with ndarray';
+isnt PDL::Core::pdumphash($tp), undef, 'pdumphash works with trans';
+my @pn = $vtable->par_names;
+is 0+@pn, 2, 'par_names returned 2 things';
 
 my $notouch = sequence(4);
 $notouch->set_donttouchdata(4 * PDL::Core::howbig($notouch->get_datatype));
@@ -530,5 +713,10 @@ eval { $notouch->setdims([2,2]); $notouch->make_physical; };
 is $@, '', 'setdims to same total size of set_donttouchdata should be fine';
 eval { $notouch->setdims([3,2]); $notouch->make_physical; };
 isnt $@, '', 'setdims/make_physical to different size of set_donttouchdata should fail';
+my $sliced = sequence(4)->slice('');
+eval { $sliced->setdims([3,2]) };
+like $@, qr/but has trans_parent/, 'setdims on pdl with trans_parent is error';
+
+eval { pdl(3)->getbroadcastid($_) }, isnt $@, '', "getbroadcastid($_) out of range gives error" for -2, 5;
 
 done_testing;

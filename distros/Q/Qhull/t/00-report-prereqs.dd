@@ -93,7 +93,6 @@ do { my $x = {
                                       'System::Command' => '0',
                                       'constant' => '0',
                                       'experimental' => '0',
-                                      'if' => '0',
                                       'namespace::clean' => '0',
                                       'parent' => '0',
                                       'perl' => 'v5.26.0',

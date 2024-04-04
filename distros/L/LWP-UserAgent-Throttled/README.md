@@ -1,17 +1,10 @@
-[![Linux Build Status](https://travis-ci.org/nigelhorne/LWP-UserAgent-Throttled.svg?branch=master)](https://travis-ci.org/nigelhorne/LWP-UserAgent-Throttled)
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/1t1yhvagx00c2qi8?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-info)
-[![Dependency Status](https://dependencyci.com/github/nigelhorne/LWP-UserAgent-Throttled/badge)](https://dependencyci.com/github/nigelhorne/LWP-UserAgent-Throttled)
-[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/LWP-UserAgent-Throttled/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/LWP-UserAgent-Throttled?branch=master)
-[![CPAN](https://img.shields.io/cpan/v/LWP-UserAgent-Throttled.svg)](http://search.cpan.org/~nhorne/LWP-UserAgent-Throttled/)
-[![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/2745818166683002/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/2745818166683002/heads/master/)
-
 # NAME
 
 LWP::UserAgent::Throttled - Throttle requests to a site
 
 # VERSION
 
-Version 0.09
+Version 0.10
 
 # SYNOPSIS
 
@@ -94,16 +87,12 @@ You can also look for information at:
 
     [http://matrix.cpantesters.org/?dist=LWP-UserAgent-Throttled](http://matrix.cpantesters.org/?dist=LWP-UserAgent-Throttled)
 
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/LWP-UserAgent-Throttled](http://cpanratings.perl.org/d/LWP-UserAgent-Throttled)
-
 - CPAN Testers Dependencies
 
     [http://deps.cpantesters.org/?module=LWP::UserAgent::Throttled](http://deps.cpantesters.org/?module=LWP::UserAgent::Throttled)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017-2022 Nigel Horne.
+Copyright 2017-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2

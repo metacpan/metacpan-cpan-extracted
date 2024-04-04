@@ -1,5 +1,5 @@
 package Variable::OnDestruct;
-$Variable::OnDestruct::VERSION = '0.08';
+$Variable::OnDestruct::VERSION = '0.09';
 use strict;
 use warnings;
 use Exporter 5.57 'import';
@@ -27,7 +27,7 @@ Variable::OnDestruct - Call a subroutine on destruction of a variable.
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

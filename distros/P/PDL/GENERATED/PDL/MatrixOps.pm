@@ -3,7 +3,7 @@
 #
 package PDL::MatrixOps;
 
-our @EXPORT_OK = qw(identity stretcher inv det determinant eigens_sym eigens svd lu_decomp lu_decomp2 lu_backsub simq squaretotri );
+our @EXPORT_OK = qw(identity stretcher inv det determinant eigens_sym eigens svd lu_decomp lu_decomp2 lu_backsub simq squaretotri tritosquare );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -132,6 +132,7 @@ use Carp;
 use strict;
 #line 134 "MatrixOps.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -172,6 +173,7 @@ sub identity {
 }
 
 #line 157 "matrixops.pd"
+
 =head2 stretcher
 
 =for sig
@@ -192,11 +194,12 @@ sub stretcher {
   my $in = shift;
   my $out = zeroes($in->dim(0),$in->dims);
   my $tmp;  # work around for perl -d "feature"
-  ($tmp = $out->diagonal(0,1)) += $in;	
+  ($tmp = $out->diagonal(0,1)) += $in;
   $out;
 }
 
 #line 188 "matrixops.pd"
+
 =head2 inv
 
 =for sig
@@ -226,7 +229,7 @@ OPTIONS:
 =item * s
 
 Boolean value indicating whether to complain if the matrix is singular.  If
-this is false, singular matrices cause inverse to barf.  If it is true, then 
+this is false, singular matrices cause inverse to barf.  If it is true, then
 singular matrices cause inverse to return undef.
 
 =item * lu (I/O)
@@ -253,7 +256,7 @@ sub inv {
   my $opt = shift;
   $opt = {} unless defined($opt);
 
-  barf "inverse needs a square PDL as a matrix\n" 
+  barf "inverse needs a square PDL as a matrix\n"
     unless(UNIVERSAL::isa($x,'PDL') &&
 	   $x->dims >= 2 &&
 	   $x->dim(0) == $x->dim(1)
@@ -275,7 +278,7 @@ sub inv {
     if exists($opt->{det});
 
   unless($det->nelem > 1 || $det) {
-    return undef 
+    return undef
       if $opt->{s};
     barf("PDL::inv: got a singular matrix or LU decomposition\n");
   }
@@ -290,6 +293,7 @@ sub inv {
 }
 
 #line 288 "matrixops.pd"
+
 =head2 det
 
 =for sig
@@ -318,7 +322,7 @@ OPTIONS:
 
 =item * lu (I/O)
 
-Provides a cache for the LU decomposition of the matrix.  If you 
+Provides a cache for the LU decomposition of the matrix.  If you
 provide the key but leave the value undefined, then the LU decomposition
 goes in here; if you put an LU decomposition here, it will be used and
 the matrix will not be decomposed again.
@@ -343,6 +347,7 @@ sub det {
 }
 
 #line 347 "matrixops.pd"
+
 =head2 determinant
 
 =for sig
@@ -398,13 +403,13 @@ sub determinant {
     my $y7 = $y->index(7);
     my $y8 = $y->index(8);
 
-    return ( 
+    return (
 	 $y->index(0) * ( $y4 * $y8 - $y5 * $y7 )
       +  $y->index(1) * ( $y5 * $y6 - $y3 * $y8 )
       +  $y->index(2) * ( $y3 * $y7 - $y4 * $y6 )
 	     );
   }
-  
+
   my($i);
   my($sum) = zeroes($x->slice('(0),(0)'));
 
@@ -412,7 +417,7 @@ sub determinant {
   for $i(1..$n-2) {
     my $el = $x->slice("($i),(0)");
     next if( ($el==0)->all );  # Optimize away unnecessary recursion
-    $sum += $el * (1-2*($i%2)) * 
+    $sum += $el * (1-2*($i%2)) *
       determinant($x->slice("0:".($i-1).",1:-1")->
 		  append($x->slice(($i+1).":-1,1:-1")));
   }
@@ -420,10 +425,11 @@ sub determinant {
   # Do beginning and end submatrices
   $sum += $x->slice("(0),(0)")  * determinant($x->slice('1:-1,1:-1'));
   $sum -= $x->slice("(-1),(0)") * determinant($x->slice('0:-2,1:-1')) * (1 - 2*($n % 2));
-  
+
   return $sum;
 }
-#line 427 "MatrixOps.pm"
+#line 432 "MatrixOps.pm"
+
 
 =head2 eigens_sym
 
@@ -441,7 +447,7 @@ It's broadcastable, so if C<$a> is 3x3x100, it's treated as 100 separate 3x3
 matrices, and both C<$ev> and C<$e> get extra dimensions accordingly.
 
 If called in scalar context it hands back only the eigenvalues.  Ultimately,
-it should switch to a faster algorithm in this case (as discarding the 
+it should switch to a faster algorithm in this case (as discarding the
 eigenvectors is wasteful).
 
 The algorithm used is due to J. vonNeumann, which was a rediscovery of
@@ -475,9 +481,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
    sub PDL::eigens_sym {
       my ($x) = @_;
       my (@d) = $x->dims;
-      barf "Need real square matrix for eigens_sym" 
+      barf "Need real square matrix for eigens_sym"
             if $#d < 1 or $d[0] != $d[1];
-      my ($n) = $d[0];
       my ($sym) = 0.5*($x + $x->transpose);
       my ($err) = PDL::max(abs($sym));
       barf "Need symmetric component non-zero for eigens_sym"
@@ -486,19 +491,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
       warn "Using symmetrized version of the matrix in eigens_sym"
 	if $err > 1e-5 && $PDL::debug;
 
-      ## Get lower diagonal form 
-      ## Use whichND/indexND because whereND doesn't exist (yet?) and
-      ## the combo is broadcastable (unlike where).  Note that for historical
-      ## reasons whichND needs a scalar() around it to give back a 
-      ## nice 2xn PDL index. 
-      my $lt  = PDL::indexND($sym,
-			     scalar(PDL::whichND(PDL->xvals($n,$n) <=
-						 PDL->yvals($n,$n)))
-			     )->copy;
-      my $ev  = PDL->zeroes($sym->dims);
-      my $e   = PDL->zeroes($sym->index(0)->dims);
-      
-      &PDL::_eigens_sym_int($lt, $ev, $e);
+      &PDL::_eigens_sym_int($sym->squaretotri, my $ev=PDL->null, my $e=PDL->null);
 
       return $ev->transpose, $e
 	if(wantarray);
@@ -518,11 +511,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]a(m); [o,phys]ev(l,n,n); [o,phys]e(l,n))
+  Signature: ([phys]a(m); [o,phys]ev(l=2,n,n); [o,phys]e(l,n))
 
 =for ref
 
-Real eigenvalues and -vectors of a real square matrix.  
+Real eigenvalues and -vectors of a real square matrix.
 
 (See also L<"eigens_sym"|/eigens_sym>, for eigenvalues and -vectors
 of a real, symmetric, square matrix).
@@ -565,7 +558,7 @@ eigenvectors and the 1st dim runs across their components.
 	$vector = $ev->slice($n);   # Select nth eigenvector as a column-vector
 	$vector = $ev->slice("($n)"); # Select nth eigenvector as a row-vector
 
-DEVEL NOTES: 
+DEVEL NOTES:
 
 For now, there is no distinction between a complex eigenvalue and an
 invalid eigenvalue, although the underlying code generates complex
@@ -590,22 +583,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
    sub PDL::eigens {
       my ($x) = @_;
       my (@d) = $x->dims;
-      my $n = $d[0];
-      barf "Need real square matrix for eigens" 
+      barf "Need real square matrix for eigens"
             if $#d < 1 or $d[0] != $d[1];
       my $deviation = PDL::max(abs($x - $x->transpose))/PDL::max(abs($x));
       if ( $deviation <= 1e-5 ) {
-          #taken from eigens_sym code
-
-          my $lt  = PDL::indexND($x,
-			     scalar(PDL::whichND(PDL->xvals($n,$n) <=
-						 PDL->yvals($n,$n)))
-			     )->copy;
-          my $ev  = PDL->zeroes($x->dims);
-          my $e   = PDL->zeroes($x->index(0)->dims);
-      
-          &PDL::_eigens_sym_int($lt, $ev, $e);
-
+          &PDL::_eigens_sym_int($x->squaretotri, my $ev=PDL->null, my $e=PDL->null);
           return $ev->transpose, $e   if wantarray;
           return $e;  #just eigenvalues
       }
@@ -621,11 +603,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 		  "    PDL_EIGENS_HACK prior to calling eigens() with a non-symmetric matrix.\n";
 		  $PDL::eigens_bug_ack = 1;
 	  }
-	  
-          my $ev  = PDL->zeroes(2, $x->dims);
-          my $e   = PDL->zeroes(2, $x->index(0)->dims);
 
-          &PDL::_eigens_int($x->clump(0,1), $ev, $e);
+          &PDL::_eigens_int($x->clump(0,1), my $ev=PDL->null, my $e=PDL->null);
 
           return $ev->index(0)->transpose->sever, $e->index(0)->sever
               if(wantarray);
@@ -712,7 +691,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 801 "matrixops.pd"
+#line 764 "matrixops.pd"
 
 =head2 lu_decomp
 
@@ -795,8 +774,8 @@ sub lu_decomp {
    my $TINY = 1e-30;
 
    barf("lu_decomp requires a square (2D) PDL\n")
-   if(!UNIVERSAL::isa($in,'PDL') || 
-      $in->ndims < 2 || 
+   if(!UNIVERSAL::isa($in,'PDL') ||
+      $in->ndims < 2 ||
       $in->dim(0) != $in->dim(1));
 
    my($n) = $in->dim(0);
@@ -807,8 +786,8 @@ sub lu_decomp {
 
    if(defined $permute) {
       barf('lu_decomp: permutation vector must match the matrix')
-      if(!UNIVERSAL::isa($permute,'PDL') || 
-         $permute->ndims != 1 || 
+      if(!UNIVERSAL::isa($permute,'PDL') ||
+         $permute->ndims != 1 ||
          $permute->dim(0) != $out->dim(0));
       $permute .= PDL->xvals($in->dim(0));
    } else {
@@ -816,7 +795,7 @@ sub lu_decomp {
    }
 
    if(defined $parity) {
-      barf('lu_decomp: parity must be a scalar PDL') 
+      barf('lu_decomp: parity must be a scalar PDL')
       if(!UNIVERSAL::isa($parity,'PDL') ||
          $parity->dim(0) != 1);
       $parity .= 1.0;
@@ -836,8 +815,8 @@ sub lu_decomp {
    my($tmpval) = $tmprow->slice('(0)')->sever;
 
    my($col,$row);
-   for $col(0..$n1) {       
-      for $row(1..$n1) {   
+   for $col(0..$n1) {
+      for $row(1..$n1) {
          my($klim) = $row<$col ? $row : $col;
          if($klim > 0) {
             $klim--;
@@ -887,7 +866,8 @@ sub lu_decomp {
    wantarray ? ($out,$permute,$parity) : $out;
 }
 
-#line 980 "matrixops.pd"
+#line 943 "matrixops.pd"
+
 =head2 lu_decomp2
 
 =for sig
@@ -901,10 +881,10 @@ LU decompose a matrix, with no row permutation
 =for usage
 
   ($lu, $perm, $parity) = lu_decomp2($x);
-  
+
   $lu = lu_decomp2($x,$perm,$parity);   # or
   $lu = lu_decomp2($x);                 # $perm and $parity are optional
-  
+
   lu_decomp($x->inplace,$perm,$parity); # or
   lu_decomp($x->inplace);               # $perm and $parity are optional
 
@@ -917,7 +897,7 @@ for them -- but they are always trivial.
 
 Because C<lu_decomp2> does not pivot, it is numerically B<unstable> --
 that means it is less precise than L</lu_decomp>, particularly for
-large or near-singular matrices.  There are also specific types of 
+large or near-singular matrices.  There are also specific types of
 non-singular matrices that confuse it (e.g. ([0,-1,0],[1,0,0],[0,0,1]),
 which is a 90 degree rotation matrix but which confuses C<lu_decomp2>).
 
@@ -928,7 +908,7 @@ decomposition for some of the input matrices.
 
 The output is a single matrix that contains the LU decomposition of C<$a>;
 you can even do it in-place, thereby destroying C<$a>, if you want.  See
-L</lu_decomp> for more information about LU decomposition. 
+L</lu_decomp> for more information about LU decomposition.
 
 C<lu_decomp2> is ported from I<Numerical Recipes> into PDL.
 
@@ -944,12 +924,12 @@ sub lu_decomp2 {
   my($sing_ok) = shift;
 
   my $TINY = 1e-30;
-  
+
   barf("lu_decomp2 requires a square (2D) PDL\n")
-    if(!UNIVERSAL::isa($in,'PDL') || 
-       $in->ndims < 2 || 
+    if(!UNIVERSAL::isa($in,'PDL') ||
+       $in->ndims < 2 ||
        $in->dim(0) != $in->dim(1));
-  
+
   my($n) = $in->dim(0);
   my($n1) = $n; $n1--;
 
@@ -958,8 +938,8 @@ sub lu_decomp2 {
 
   if(defined $perm) {
     barf('lu_decomp2: permutation vector must match the matrix')
-      if(!UNIVERSAL::isa($perm,'PDL') || 
-	 $perm->ndims != 1 || 
+      if(!UNIVERSAL::isa($perm,'PDL') ||
+	 $perm->ndims != 1 ||
 	 $perm->dim(0) != $out->dim(0));
     $perm .= PDL->xvals($in->dim(0));
   } else {
@@ -967,7 +947,7 @@ sub lu_decomp2 {
   }
 
   if(defined $par) {
-    barf('lu_decomp: parity must be a scalar PDL') 
+    barf('lu_decomp: parity must be a scalar PDL')
       if(!UNIVERSAL::isa($par,'PDL') ||
 	 $par->nelem != 1);
     $par .= 1.0;
@@ -978,8 +958,8 @@ sub lu_decomp2 {
   my $diagonal = $out->diagonal(0,1);
 
   my($col,$row);
-  for $col(0..$n1) {       
-    for $row(1..$n1) {   
+  for $col(0..$n1) {
+    for $row(1..$n1) {
       my($klim) = $row<$col ? $row : $col;
       if($klim > 0) {
 	$klim--;
@@ -990,10 +970,10 @@ sub lu_decomp2 {
       }
 
     }
-    
+
     # Figure a_ij, with no pivoting
     if($col < $n1) {
-      # Divide the rest of the column by the diagonal element 
+      # Divide the rest of the column by the diagonal element
       my $tmp; # work around for perl -d "feature"
       ($tmp = $out->slice("($col),".($col+1).":$n1")) /= $diagonal->index($col)->dummy(0,$n1-$col);
     }
@@ -1003,7 +983,8 @@ sub lu_decomp2 {
   wantarray ? ($out,$perm,$par) : $out;
 }
 
-#line 1102 "matrixops.pd"
+#line 1065 "matrixops.pd"
+
 =head2 lu_backsub
 
 =for sig
@@ -1038,12 +1019,24 @@ Solve A x = B for matrix A, by back substitution into A's LU decomposition.
   ($lu,$perm,$par) = lu_decomp($A);
   $x = lu_backsub($lu,$perm,$par, $B->transpose)->transpose;
 
+  # using simq
+  # remove all active dims
+  @A_dims = $A->dims; @B_dims = $B->transpose->dims;
+  splice @A_dims, 0, 2; splice @B_dims, 0, 1;
+  @broadcast = PDL::Core::dims_filled(\@A_dims, \@B_dims);
+  # simq modifies A, so need 1 copy per broadcast else non-first run has wrong A
+  ($x) = simq($A->dupN(1,1,map +($A_dims[$_]//1)==1?$broadcast[$_]:1, 0..$#broadcast)->copy, $B->transpose, 0);
+  $x = $x->inplace->transpose;
+
   # or with Slatec LINPACK
   use PDL::Slatec;
   gefa($lu=$A->copy, $ipiv=null, $info=null);
   # 1 = do transpose because Fortran's idea of rows vs columns
   gesl($lu, $ipiv, $x=$B->transpose->copy, 1);
   $x = $x->inplace->transpose;
+
+  # or with PDL::LinearAlgebra wrappers of LAPACK
+  $x = msolve($A, $B);
 
   # or with LAPACK
   use PDL::LinearAlgebra::Real;
@@ -1100,12 +1093,12 @@ sub lu_backsub {
       ($lu, $perm, $y) = @_;
    } elsif(@_==4) {
       ($lu, $perm, $par, $y) = @_;
-   } 
+   }
 
    barf("lu_backsub: LU decomposition is undef -- probably from a singular matrix.\n")
    unless defined($lu);
 
-   barf("Usage: \$x = lu_backsub(\$lu,\$perm,\$y); all must be PDLs\n") 
+   barf("Usage: \$x = lu_backsub(\$lu,\$perm,\$y); all must be PDLs\n")
    unless(UNIVERSAL::isa($lu,'PDL') &&
       UNIVERSAL::isa($perm,'PDL') &&
       UNIVERSAL::isa($y,'PDL'));
@@ -1215,20 +1208,32 @@ BROADCAST_OK:
    }
    $out;
 }
-#line 1219 "MatrixOps.pm"
+#line 1212 "MatrixOps.pm"
+
 
 =head2 simq
 
 =for sig
 
-  Signature: ([phys]a(n,n); [phys]b(n); [o,phys]x(n); int [o,phys]ips(n); int flag)
+  Signature: ([io,phys]a(n,n); [phys]b(n); [o,phys]x(n); int [o,phys]ips(n); int flag)
 
 =for ref
 
 Solution of simultaneous linear equations, C<a x = b>.
+B<NB does not broadcast well>.
+
+=for usage
+
+  # remove all active dims
+  @A_dims = $A->dims; @B_dims = $B->transpose->dims;
+  splice @A_dims, 0, 2; splice @B_dims, 0, 1;
+  @broadcast = PDL::Core::dims_filled(\@A_dims, \@B_dims);
+  # simq modifies A, so need 1 copy per broadcast else non-first run has wrong A
+  ($x) = simq($A->dupN(1,1,map +($A_dims[$_]//1)==1?$broadcast[$_]:1, 0..$#broadcast)->copy, $B->transpose, 0);
+  $x = $x->inplace->transpose;
 
 C<$a> is an C<n x n> matrix (i.e., a vector of length C<n*n>), stored row-wise:
-that is, C<a(i,j) = a[ij]>, where C<ij = i*n + j>.  
+that is, C<a(i,j) = a[ij]>, where C<ij = i*n + j>.
 
 While this is the transpose of the normal column-wise storage, this
 corresponds to normal PDL usage.  The contents of matrix a may be
@@ -1236,11 +1241,15 @@ altered (but may be required for subsequent calls with flag = -1).
 
 C<$y>, C<$x>, C<$ips> are vectors of length C<n>.
 
-Set C<flag=0> to solve.  
+Set C<flag=0> to solve.
 Set C<flag=-1> to do a new back substitution for
 different C<$y> vector using the same a matrix previously reduced when
 C<flag=0> (the C<$ips> vector generated in the previous solution is also
 required).
+
+For this function to work well with broadcasting, it will need the LU
+decomposition part split out, so that for solving C<A x = B> only C<x>
+would be written to.
 
 See also L</lu_backsub>, which does the same thing with a slightly
 less opaque interface.
@@ -1290,8 +1299,36 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+=head2 tritosquare
 
-#line 1390 "matrixops.pd"
+=for sig
+
+  Signature: (a(m); [o]b(n,n))
+
+=for ref
+
+Convert a triangular vector to lower-triangular square matrix storage.
+Does not touch upper half of output.
+
+=for bad
+
+tritosquare does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*tritosquare = \&PDL::tritosquare;
+
+
+
+
+
+
+
+#line 1391 "matrixops.pd"
 
 =head1 AUTHOR
 
@@ -1303,7 +1340,7 @@ itself.  If this file is separated from the PDL distribution, then the
 PDL copyright notice should be included in this file.
 
 =cut
-#line 1307 "MatrixOps.pm"
+#line 1344 "MatrixOps.pm"
 
 # Exit with OK status
 

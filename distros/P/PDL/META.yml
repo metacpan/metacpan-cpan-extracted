@@ -37,6 +37,7 @@ recommends:
   Inline::C: '0.62'
   OpenGL: '0.70'
   OpenGL::GLUT: '0.72'
+  PGPLOT: '2.29'
   Term::ReadKey: '2.34'
 requires:
   Data::Dumper: '2.121'
@@ -56,5 +57,5 @@ resources:
   bugtracker: https://github.com/PDLPorters/pdl/issues
   homepage: http://pdl.perl.org/
   repository: git://github.com/PDLPorters/pdl.git
-version: '2.085'
+version: '2.086'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

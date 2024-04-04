@@ -1,6 +1,10 @@
 Version History for TMDB
 Mithun Ayachit
 
+1.2.2
+
+-   Fix #7 Problem with now_playing
+-   Add Pod tests
 
 
 1.2.1

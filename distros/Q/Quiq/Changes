@@ -1,4 +1,48 @@
-1.213 2023-11.19
+1.215 2024-03-28
+================
+
+[Quiq::Confluence::Client]
+* getPage(), updatePage(): neuer REST API Url
+
+[Quiq::Database::Connection]
+* copyData(): Option -initialData hinzugefügt
+
+[Quiq::Hash]
+* asString(): Methode hinzugefügt
+
+[Quiq::Path]
+* absolute(): Tilde-Expansion hinzugefügt
+* numberBasePaths(): Prüfung auf korrekten Aufbau der Dateinamen hinzugefügt
+
+[Quiq::PhotoStorage]
+* add(): convert-Operation gegen ungewöhnliche Dateinamen geschützt
+
+[Quiq::Url]
+* encode(): nun wird auch + geschützt
+
+1.214 2024-01-21
+================
+
+[Quiq::Smb::Client]
+* put(): Methode hinzugefügt
+
+[Quiq::Eog]
+* Doku bearbeitet
+
+[Quiq::Hash]
+* keyVal(): Methode hinzugefügt
+
+[Quiq::Path]
+* moveToDateSubDir(): Methode hinzugefügt
+* numberBasePaths(): Behandlung von Verzeichnissen korrigiert
+
+[Quiq::PhotoStorage]
+* Speicherung von Doubletten ergänzt
+
+[Quiq::SQLite]
+* Doku bearbeitet
+
+1.213 2023-11-19
 ================
 
 [Quiq::Array]

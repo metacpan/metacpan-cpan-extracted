@@ -1,0 +1,19 @@
+{
+  "disputes": [
+    {
+      "amount": 5247,
+      "created": 1540504800,
+      "id": "dspt_lkR6152bNJ6XvPpG5uvkbMfu",
+      "order_id": "885299454",
+      "payment": "paym_PTtxIEIdcsITfOPyd3cIqp0b",
+      "response": "45"
+    }
+  ],
+  "live_mode": true,
+  "range": {
+    "end": 1,
+    "has_more": false,
+    "limit": 2,
+    "start": 0
+  }
+}

@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.061     2024-04-01 05:33:15Z
+          - fixed incompatibility with an internal change in
+            JSON::Schema::Modern 0.583
+
 0.060     2024-03-20 20:56:37Z
           - remove use of JSON::MaybeXS, to avoid potential use of JSON::XS;
             now we use Cpanel::JSON::XS or JSON::PP directly, using the same

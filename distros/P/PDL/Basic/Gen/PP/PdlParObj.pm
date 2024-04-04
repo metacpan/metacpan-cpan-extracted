@@ -145,10 +145,6 @@ sub get_nname{ my($this) = @_;
 	"(\$PRIV(pdls)[$this->{Number}])";
 }
 
-sub get_nnflag { my($this) = @_;
-	"(\$PRIV(vtable)->per_pdl_flags[$this->{Number}])";
-}
-
 sub get_substname {
   my($this,$ind) = @_;
   $this->{IndObjs}[$ind]->name.($this->{IndTotCounts}[$ind] > 1 ? $this->{IndCounts}[$ind] : '');
@@ -200,11 +196,6 @@ sub do_pointeraccess {
 	return $this->{Name}."_datap";
 }
 
-sub do_physpointeraccess {
-	my($this) = @_;
-	return $this->{Name}."_physdatap";
-}
-
 sub do_indterm { my($this,$pdl,$ind,$subst,$context) = @_;
   my $substname = $this->get_substname($ind);
 # See if substitutions
@@ -218,12 +209,11 @@ sub do_indterm { my($this,$pdl,$ind,$subst,$context) = @_;
 }
 
 sub get_xsdatapdecl { 
-    my($this,$ctype,$nulldatacheck) = @_;
+    my($this,$ctype,$nulldatacheck,$ppsym) = @_;
     my $pdl = $this->get_nname;
-    my $flag = $this->get_nnflag;
     my $name = $this->{Name};
     my $macro = "PDL_DECLARE_PARAMETER".($this->{BadFlag} ? "_BADVAL" : "");
-    "$macro($ctype, $flag, $name, $pdl, $nulldatacheck)";
+    "$macro($ctype, $name, $pdl, $nulldatacheck, $ppsym)";
 }
 
 1;

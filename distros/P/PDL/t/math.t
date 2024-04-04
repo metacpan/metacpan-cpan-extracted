@@ -53,12 +53,33 @@ $pa->inplace->erfi;
 ok( all( approx( $pa, pdl(0.00886,0.0) )), "erfi inplace" );
 }
 
-ok( all approx( qsort(
-	(polyroots(
-			pdl( 1,-55,1320,-18150,157773,-902055, 3416930,-8409500,12753576,-10628640,3628800 ),
-			zeroes(11)
-		))[0]
-), 1+sequence(10) ) );
+eval {polyroots(1,0)};
+like $@, qr/only works/, 'polyroots(1,0) throws exception not segfault';
+my $coeffs = pdl(cdouble, 1,-55,1320,-18150,157773,-902055, 3416930,-8409500,12753576,-10628640,3628800);
+my $roots = 1+sequence(10);
+my $got;
+ok all(approx $got=qsort((polyroots $coeffs->re, $coeffs->im)[0]), $roots), 'polyroots' or diag $got;
+polyroots $coeffs->re, $coeffs->im, $got=null; $got->inplace->qsort;
+ok all(approx $got, $roots), 'polyroots with explicit output args' or diag $got;
+ok all(approx $got=qsort(polyroots($coeffs)->re), $roots), 'polyroots native complex no output args' or diag $got;
+polyroots $coeffs, $got=null; $got=$got->re->qsort;
+ok all(approx $got, $roots), 'polyroots native complex explicit output args' or diag $got;
+eval {polyroots(pdl("[1 0 0 0 -1]"),zeroes(5))};
+is $@, '', 'polyroots no crash on 4 complex roots of 1';
+ok all(approx $got=(polyfromroots $roots, $roots->zeroes)[0], $coeffs->re), 'polyfromroots legacy no outargs' or diag $got;
+polyfromroots $roots, $roots->zeroes, $got=null;
+ok all(approx $got, $coeffs->re), 'polyfromroots legacy with explicit output args' or diag $got;
+ok all(approx $got=polyfromroots(cdouble($roots)), $coeffs->re), 'polyfromroots natcom no outargs' or diag $got;
+polyfromroots cdouble($roots), $got=null;
+ok all(approx $got, $coeffs), 'polyfromroots natcom explicit outargs' or diag $got;
+
+my ($coeffs2, $x, $exp_val) = (cdouble(3,2,1), cdouble(5,7,9), cdouble(86,162,262));
+ok all(approx $got=polyval($coeffs2, $x), $exp_val), 'polyval natcom no output' or diag $got;
+polyval($coeffs2, $x, $got=null);
+ok all(approx $got, $exp_val), 'polyval natcom explicit output' or diag $got;
+ok all(approx $got=(polyval($coeffs2->re, zeroes(3), $x->re, zeroes(3)))[0], $exp_val->re), 'polyval legacy no output' or diag $got;
+polyval($coeffs2->re, zeroes(3), $x->re, zeroes(3), $got=null);
+ok all(approx $got, $exp_val->re), 'polyval legacy explicit output' or diag $got;
 
 {
 my $pa = sequence(41) - 20;

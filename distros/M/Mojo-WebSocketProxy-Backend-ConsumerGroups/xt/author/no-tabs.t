@@ -13,6 +13,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/26-rpc-queue-unit.t',
+    't/30_rpc-timeout-extension.t',
     'xt/author/critic.t',
     'xt/author/distmeta.t',
     'xt/author/eol.t',

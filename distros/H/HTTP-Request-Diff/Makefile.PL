@@ -50,18 +50,21 @@ my %module = (
     },
 
     PREREQ_PM => {
+        'experimental'         => '0.031',
+        'stable'               => '0.031',
         'Moo' => '2',
         'Carp' => 0,
         'Algorithm::Diff' => 0,
         'List::Util' => 1.45, # uniq() enters List::Util
         'HTTP::Request' => 0,
+        'URI::QueryParam' => 0, # for old versions of URI that don't load ->query_param()
         'CGI::Tiny::Multipart' => 0,
         'Term::Table' => 0,
     },
     TEST_REQUIRES => {
         'Test2::V0'             => 0,
         'Data::Dumper'          => 0,
-        'YAML'                  => 0,
+        'YAML::PP'              => 0,
         'HTTP::Request::Common' => 0,
     },
 

@@ -492,6 +492,7 @@ sub DESTROY
 } # End of DESTROY()...
 
 #line 752 "VS.pd"
+
 =head1 CURRENT AUTHOR & MAINTAINER
 
 Judd Taylor, Orbital Systems, Ltd.
@@ -507,7 +508,7 @@ contribs of Patrick Leilde patrick.leilde@ifremer.fr
 perl(1), PDL(1), PDL::IO::HDF(1).
 
 =cut
-#line 511 "VS.pm"
+#line 512 "VS.pm"
 
 # Exit with OK status
 

@@ -5,3 +5,6 @@ Revision history for JSON-Conditional
 
 0.05    2020/10/27
         - Update the Makefile meta information.
+
+1.01	2024-03-31
+	- Fix the decode method to handle files correctly

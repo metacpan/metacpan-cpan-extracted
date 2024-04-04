@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use Tags::HTML::CPAN::Changes;
 use Test::MockObject;
-use Test::More 'tests' => 9;
+use Test::More 'tests' => 10;
 use Test::NoWarnings;
 
 # Test.
@@ -82,4 +82,14 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'css_class' is required.\n",
 	"Parameter 'css_class' is required.");
+clean();
+
+# Test.
+eval {
+	Tags::HTML::CPAN::Changes->new(
+		'xxx' => 'value',
+	);
+};
+is($EVAL_ERROR, "Unknown parameter 'xxx'.\n",
+	"Unknown parameter 'xxx'.");
 clean();

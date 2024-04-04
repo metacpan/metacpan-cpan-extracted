@@ -1,736 +1,740 @@
-0.1.23 Mon Dec 25 06:29:32 AM PST 2023
- - Change skip-tag-check to no-git-update
-
-0.1.22 Sat Dec 23 07:28:59 AM PST 2023
- - Don't do any git stuff when skip_tag_check
-
-0.1.21 Sat Dec 23 07:09:37 AM PST 2023
- - Don't tag commit when skip_tag_check set
-
-0.1.20 Sat Dec 23 06:49:18 AM PST 2023
- - Add skip_tag_check
-
-0.1.19 Sat Dec 23 06:11:24 AM PST 2023
- - Fix Makefile bug with NAMEPATH
-
-0.1.18 Sat Jul 22 07:39:03 PM PDT 2023
- - Add Dist::Zilla::Plugin::MakeMaker::Awesome to requires
-
-0.1.17 Tue Jun 27 09:29:55 AM EDT 2023
- - Update Meta and YAML::PP dependency
-
-0.1.16 Fri May 26 09:57:53 PM PDT 2023
- - Make Meta merge be RIGHT_PRECEDENT
-
-0.1.15 Wed Jan 25 09:51:39 PM EST 2023
- - Allow explicit modules name in {doc-head: <name>}
-
-0.1.14 Fri Sep  9 04:07:04 PM EDT 2022
- - Remove XXX usage
-
-0.1.13 Fri Sep  9 03:02:55 PM EDT 2022
- - Generate special functions in markdown (badges)
-
-0.1.12 Sat Sep  3 10:53:33 AM PDT 2022
- - Testing release with PST
-
-0.1.11 Sat Sep  3 10:33:43 AM PDT 2022
- - Simpler way for shared Makefile to find its path
-
-0.1.10 Sat Sep  3 10:28:26 AM PDT 2022
- - Applied https://github.com/ingydotnet/zilla-dist-pm/pull/59 perlpunk++
-
-0.1.9 Sun 24 Jul 2022 07:22:47 AM PDT
- - share/Makefile patches
-
-0.1.8 Wed 13 Jul 2022 09:39:55 AM PDT
- - Use upper case for POD =head1 and =head2
- - Use a space for pandoc's softbreak to POD
- - Add Archive::Tar::Wrapper to requirements
-
-0.1.7 Tue 12 Jul 2022 09:35:54 PM PDT
- - Various small fixes
-
-0.1.6 Tue 12 Jul 2022 04:28:38 PM PDT
- - Support Markdown docs in doc/
-
-0.1.5 Tue Jun  9 07:58:41 PDT 2020
- - Don't mess with perl versions
- - Change perl5 to perl for testml
-
-0.1.4 Thu Jan  9 09:39:27 PST 2020
- - Fix to add versions to CPAN requirements
-
-0.1.3 Sun Jan  5 23:31:00 PST 2020
- - Don't clone depth=1 for testml repo on travis
-
-0.1.2 Sun Jan  5 14:31:23 PST 2020
- - Do coverage on perl 5.30 (latest)
-
-0.1.1 Sun Jan  5 13:58:06 PST 2020
- - Combine 2 include_testml sections
-
-0.1.0 Sun Jan  5 10:46:13 PST 2020
- - Apply https://github.com/ingydotnet/zilla-dist-pm/pull/56/ Make Travis
-   config use travis-perl helpers @mohawk2++
-
-0.0.203 Sun Nov 11 12:09:39 PST 2018
- - TestML Travis fix
-
-0.0.202 Sun Nov 11 11:05:21 PST 2018
- - Set up environment for releaseing modules with TestML tests
-
-0.0.201 Mon Aug 27 08:03:52 PDT 2018
- - Update travis code for new TestML
-
-0.0.200 Mon Aug 27 07:14:08 PDT 2018
- - Support `make clean` removes .testml/ dirs
- - Allow Makefile override for RELEASE_BRANCH
-
-0.0.199 Sat Jul 28 14:14:43 PDT 2018
- - Update required version of Dist::Zilla
-
-0.0.198 Fri Jul 27 11:36:54 PDT 2018
- - Dist::Zilla::Plugin::TestML1Includer
- - Add 5.28 to travis perl versions
- - Update copyright year
-
-0.0.197 Fri Jun 22 21:15:15 MDT 2018
- - Add 5.26 to travis perl versions
-
-0.0.196 Sun Feb 12 13:26:51 PST 2017
- - Release after pause-cleanup screwed up
-
-0.0.195 Wed Jan  4 21:34:29 CET 2017
- - Exclude 5.8 5.10 and 5.12 in travis template
-
-0.0.194 Fri Dec 23 17:49:01 CET 2016
- - Fixed typo in About template
-
-0.0.193 Tue Mar 29 14:18:40 PDT 2016
- - Make version updating mst++ approved
-
-0.0.192 Sat Apr 18 13:50:29 CEST 2015
- - Rewrite `#!/usr/bin/env perl` in `zild cpan`
-
-0.0.191 Thu Apr  2 12:26:25 PDT 2015
- - make clean no longer removes Makefile
-
-0.0.190 Thu Apr  2 12:22:16 PDT 2015
- - Add JSON dependency
-
-0.0.189 Sat Jan  3 15:43:29 PST 2015
- - remove .inline/ for `make clean`
-
-0.0.188 Fri Jan  2 12:17:42 PST 2015
- - Get rid of DZ PluginBundles
- - Use DZ Plugins directly
- - Eliminate unused plugins
-
-0.0.187 Thu Jan  1 19:02:33 PST 2015
- - Update prereq versions
-
-0.0.186 Thu Jan  1 00:00:27 PST 2015
- - Add copyright year check
- - Happy New Year 2015
-
-0.0.185 Wed Dec 31 21:24:14 PST 2014
- - Work with new `swim` commandline args
-
-0.0.184 Wed Dec 31 15:52:34 PST 2014
- - Convert doc to swim-plugin-cpan
-
-0.0.183 Wed Dec 31 15:08:14 PST 2014
- - Fix doc references to `make`, to `zild`.
-
-0.0.182 Wed Dec 31 14:28:35 PST 2014
- - Pass --meta=Meta to swim
- - Clean up Makefile a bit
-
-0.0.181 Mon Dec 29 17:11:39 PST 2014
- - Add AltInstall support
-
-0.0.180 Fri Dec 26 21:47:54 PST 2014
- - Support win32.requires in Meta
-
-0.0.179 Tue Dec 23 12:04:59 PST 2014
- - Prettier zild help output
-
-0.0.178 Tue Dec 23 11:58:48 PST 2014
- - Change `metaval` command to `meta`
-
-0.0.177 Tue Dec 23 11:00:32 PST 2014
- - Add `zild <cmd>` aliases for common `zild make <cmd>` targets
-
-0.0.176 Sun Dec 14 16:25:06 PST 2014
- - Fix .travis.yml file to fail when tests fail. frew++
-
-0.0.175 Sun Dec 14 12:52:10 PST 2014
- - Set an env var in 000compile.t
-
-0.0.174 Mon Nov 24 10:17:15 PST 2014
- - Replace top level repo Contributing with About file
-
-0.0.173 Tue Nov 18 08:52:48 PST 2014
- - Change `zild makefile` to just show location of Zilla::Dist Makefile
- - Add `zild version`
-
-0.0.172 Mon Nov 17 08:17:18 PST 2014
- - Use Makefile directly from sharedir
- - Updated docs to reflect new API better
-
-0.0.171 Sun Nov 16 22:39:46 PST 2014
- - Try removing Makefile again. Something messed up.
-
-0.0.170 Sun Nov 16 22:37:52 PST 2014
- - Remove Makefile from top level
- - Now use `zild make <target>`
-
-0.0.169 Sun Nov 16 22:34:24 PST 2014
- - Update Contributing.swim
-
-0.0.168 Sun Nov 16 22:22:05 PST 2014
- - Change how `zild` command works
-
-0.0.167 Sun Nov 16 08:53:48 PST 2014
- - Add rudimentary Inline::Module support
-
-0.0.166 Sun Nov 16 08:21:14 PST 2014
- - Try changing ZD to not commit Makefiles
- - Set up `zild` to just create Makefile (not Meta)
- - Have `make clean` remove a non-git-tracked Makefile
-
-0.0.165 Sat Nov  8 10:46:10 EST 2014
- - PPW++
- - Version bumper
-
-0.0.164 Sun Oct 26 22:51:19 UTC 2014
- - Remove blib on clean
-
-0.0.163 Fri Oct 10 20:47:33 CEST 2014
- - Fixed a couple version bumping errors.
-
-0.0.162 Mon Sep 22 12:17:21 PDT 2014
- - Testing release.
-
-0.0.161 Fri Sep  5 06:48:19 UTC 2014
- - Add Test::Pod to requirements for release testing
-
-0.0.160 Tue Aug 26 17:15:23 PDT 2014
- - Remove the usage of lib 'lib'
-
-0.0.159 Tue Aug 26 14:21:15 PDT 2014
- - Remove 'use lib "lib"' from `zild`.
- - Was causing issues to release Alt-IO-All
-
-0.0.158 Fri Aug 22 21:01:14 PDT 2014
- - Add cpantest and disttest targets back into Makefile.
-
-0.0.157 Thu Aug 21 11:22:35 PDT 2014
- - Move 'git status' after the auto 'make install'
-
-0.0.156 Thu Aug 21 11:20:15 PDT 2014
- - Fix non-tab error in Makefile
-
-0.0.155 Thu Aug 21 11:17:50 PDT 2014
- - Fix for issue/41
- - Honor PERL_ZILLA_DIST_AUTO_INSTALL=1 and install after release
-
-0.0.154 Mon Aug 18 14:07:01 PDT 2014
- - Travis accounts for no test/ directory
-
-0.0.153 Mon Aug 18 07:54:06 PDT 2014
- - Simplify 000 tests
-
-0.0.152 Sun Aug 17 21:32:45 PDT 2014
- - Apply PR/42 @wollmers++
-
-0.0.151 Sat Aug 16 17:00:06 PDT 2014
- - Superfluous Release!
-
-0.0.150 Sat Aug 16 16:59:10 PDT 2014
- - Change ' / ' to '/' in doc
-
-0.0.149 Sat Aug 16 16:19:47 PDT 2014
- - Fix strict/warnings
-
-0.0.148 Sat Aug 16 13:56:23 PDT 2014
- - Remove need for =travis
- - Rework share/travis.yaml
-
-0.0.147 Sat Aug 16 13:09:11 PDT 2014
- - Meta tweaks
-
-0.0.146 Sat Aug 16 09:51:11 PDT 2014
- - Meta 0.0.2
-
-0.0.145 Sat Aug 16 09:48:36 PDT 2014
- - Change =cpan to =zild
-
-0.0.144 Fri Aug 15 23:39:47 PDT 2014
- - Add RELEASE_TESTING=1 to make test-dist
-
-0.0.143 Fri Aug 15 22:38:49 PDT 2014
- - Fix share/alias.pm
-
-0.0.142 Fri Aug 15 22:36:36 PDT 2014
- - Support no 000
-
-0.0.141 Fri Aug 15 19:57:29 PDT 2014
- - Add share/test/000-require-modules.t for "special" modules
- - Things that can't 'use_ok'
-
-0.0.140 Fri Aug 15 19:17:00 PDT 2014
- - Allow version to be in quotes in Changes
- - For '1.1111111111' in Acme
-
-0.0.139 Fri Aug 15 18:56:56 PDT 2014
- - Change Makefile target cpantest to test-cpan
- - Change Makefile target disttest to test-dist
- - Remove t/use_ok.t
-
-0.0.138 Fri Aug 15 18:38:12 PDT 2014
- - Add 'Inline::' to 000 exception list
-
-0.0.137 Fri Aug 15 18:17:28 PDT 2014
- - Add Devel::Local to 000 exception list
-
-0.0.136 Fri Aug 15 18:04:07 PDT 2014
- - Allow no test dir in repo
- - Generated tests only is OK
-
-0.0.135 Fri Aug 15 17:56:46 PDT 2014
- - Make a test exception for Sex!
-
-0.0.134 Fri Aug 15 17:52:04 PDT 2014
- - 000 test can't *use* 'Alt::' modules
-
-0.0.133 Fri Aug 15 16:42:27 PDT 2014
- - Fixed a bug is 000 test.
- - CPAN Day 2014 - 21 Release Salute!
-
-0.0.132 Fri Aug 15 15:05:38 PDT 2014
- - Retesting release with PERL_ZILLA_DIST_*
-
-0.0.131 Fri Aug 15 15:01:40 PDT 2014
- - Change ZILLA_DIST_ vars to PERL_ZILLA_DIST_
-
-0.0.130 Fri Aug 15 14:54:48 PDT 2014
- - Add t/000-compile-modules.t
-
-0.0.129 Fri Aug 15 13:57:34 PDT 2014
- - Timed Zilla-Dist Massive Attack test II
-
-0.0.128 Fri Aug 15 13:16:33 PDT 2014
- - Add ZILLA_DIST_RELEASE_LOG logging
-
-0.0.127 Fri Aug 15 12:48:30 PDT 2014
- - Add better messaging to ZILLA_DIST_RELEASE_TIME
-
-0.0.126 Fri Aug 15 12:14:19 PDT 2014
- - Timed Zilla-Dist Massive Attack test
-
-0.0.125 Thu Aug 14 23:13:49 PDT 2014
- - Add support for ZILLA_DIST_RELEASE_TIME (wait for release)
-
-0.0.124 Thu Aug 14 17:03:40 PDT 2014
- - Add to dist list
- - Fix Changes typo
-
-0.0.123 Thu Aug 14 17:01:59 PDT 2014
- - Makefile bombed if rebase *wasn't* in progress
-
-0.0.122 Wed Aug 13 21:50:18 PDT 2014
- - Abort any previous rebase
-
-0.0.121 Wed Aug 13 11:25:00 PDT 2014
- - Don't update $VERSION on a split line
-
-0.0.120 Tue Aug 12 12:22:50 PDT 2014
- - Print command on failure
-
-0.0.119 Tue Aug 12 10:58:21 PDT 2014
- - Added test-dev and test-all targets
- - Make `make release` dep on `test-all` now
-
-0.0.118 Thu Aug  7 00:27:13 PDT 2014
- - Fix bad encoding in Pod
-
-0.0.117 Wed Aug  6 09:15:21 PDT 2014
- - Check $VERSION exists in main library.
-
-0.0.116 Tue Aug  5 10:36:29 PDT 2014
- - FIx a couple path nits with '::'
-
-0.0.115 Tue Aug  5 10:06:47 PDT 2014
- - More work on massive-attack script
-
-0.0.114 Tue Aug  5 09:33:45 PDT 2014
- - Add zild-massive-attack
-
-0.0.113 Mon Aug  4 23:12:17 PDT 2014
- - Dep on Swim-0.1.14
-
-0.0.112 Mon Aug  4 14:13:53 PDT 2014
- - Pass Meta file to swim
-
-0.0.111 Sun Aug  3 21:07:15 PDT 2014
- - Update travis template for 5.20
-
-0.0.110 Sat Aug  2 18:57:31 PDT 2014
- - Fix bugs in zild-setup-release process
- - Fix Changes log from last release
-
-0.0.109 Sat Aug  2 18:23:03 PDT 2014
- - Add bin/zild-setup-release
-
-0.0.108 Sat Aug  2 10:12:57 PDT 2014
- - Add `zild years`
-
-0.0.107 Fri Aug  1 15:14:31 PDT 2014
- - Remove (c) from copyright.
-
-0.0.106 Thu Jul 31 12:18:42 PDT 2014
- - Fix a bad `swim` invocation
-
-0.0.105 Thu Jul 31 12:00:30 PDT 2014
- - Need to try `plenv rehash` after install
-
-0.0.104 Thu Jul 31 11:43:30 PDT 2014
- - Make Zilla-Dist install itself before release
- - This was leading to some botched releases
-
-0.0.103 Thu Jul 31 11:36:33 PDT 2014
- - Put last Changes entry into release commit message
-
-0.0.102 Thu Jul 31 10:32:54 PDT 2014
- - Be better about swim doc type detection.
-
-0.0.101 Wed Jul 30 15:07:37 PDT 2014
- - Change commit message to 'CPAN Release x.y.z'
-
-0.0.100 Mon Jul 28 07:26:50 PDT 2014
- - Add metanoindex feature to Meta
-
-0.0.99 Sat Jul 26 22:09:09 PDT 2014
- - Update doc
-
-0.0.98 Sat Jul 26 14:15:53 PDT 2014
- - Provide a way to bail out of zild-update loop
-
-0.0.97 Sat Jul 26 14:07:56 PDT 2014
- - Add zild-update-all to do mass review/release
-
-0.0.96 Sat Jul 26 11:52:19 PDT 2014
- - Fix issue/19
- - Auto edit Meta/Changes for `make release` if not edited.
- - Testing right now :)
-
-0.0.95 Sat Jul 26 11:20:01 PDT 2014
- - Fix issue/32
- - Auto enable irc and travis as appropriate
-
-0.0.94 Fri Jul 25 23:59:50 PDT 2014
- - Fix issue/34 and issue/35
-
-0.0.93 Fri Jul 25 22:11:28 PDT 2014
- - Merge 0.91 and 0.92 changes
-
-0.0.92 Fri Jul 25 21:23:51 PDT 2014
- - Allow for main lib different than package name
-
-0.0.91 Fri Jul 25 18:11:04 PDT 2014
- - Fix issue/33. cp option for OSX.
- - Released from OSX.
- - Allow for main lib different than package name
-
-0.0.90 Thu Jul 24 10:23:28 PDT 2014
- - Check for boilerplate email in Meta
-
-0.0.89 Mon Jul 21 16:22:11 PDT 2014
- - Fix bugs with no_changes_yaml
-
-0.0.88 Sat Jul 19 14:35:34 PDT 2014
- - -e in prove messes up -T, so using $(PERL) -S
-
-0.0.87 Sat Jul 19 14:04:31 PDT 2014
- - Fix issues/29.
- - Add target to install prereqs from CPAN
-
-0.0.86 Sat Jul 19 13:50:35 PDT 2014
- - Fix issues/17. Sort prereqs list in dist.ini
-
-0.0.85 Sat Jul 19 13:28:54 PDT 2014
- - 2nd attempt at issues/20
-
-0.0.84 Sat Jul 19 13:09:52 PDT 2014
- - Fix issues/20
- - Auto update date in Changes on release
-
-0.0.83 Sat Jul 19 12:59:18 PDT 2014
- - Yet another try for issues/23
-
-0.0.82 Sat Jul 19 12:47:21 PDT 2014
- - Another try for issues/23
-
-0.0.81 Sat Jul 19 12:44:20 PDT 2014
- - Fix issues/23
- - make release fails when all files committed already
-
-0.0.80 Sat Jul 19 12:42:13 PDT 2014
- - Fix issues/28
- - Dep on ExtUtils-MakeMaker-6.98 to fix 3 part version warnings
-
-0.0.79 Sat Jul 19 12:33:35 PDT 2014
- - issue/26. Commit changes *after* upload succeeds.
-
-0.0.78 Sat Jul 19 12:30:28 PDT 2014
- - issue/6. Make sure version change is an increase.
-
-0.0.76 Fri Jul 18 11:23:20 PDT 2014
- - issue/10
- - Fully check out Changes file content and structure
-
-0.0.75 Thu Jul 17 15:10:19 PDT 2014
- - Fix issues with using multiple perls. rurban++
-
-0.0.74 Thu Jul 17 11:12:12 PDT 2014
- - Fix for issue/25. rurban++
- - Call perl scripts with current perl
-
-0.0.73 Thu Jul 17 08:05:30 PDT 2014
- - Fix issue/24. rurban++
- - Don't dist-dep on the travis-deps.
- - Fixed swim modules, and dep on new ones
-
-0.0.72 Thu Jul 17 08:05:30 PDT 2014
- - Add mailing list info to contributing
-
-0.0.71 Thu Jul 17 00:11:37 PDT 2014
- - Fix issue/22
- - Die on make commands when Makefile changes
-
-0.0.70 Wed Jul 16 22:57:32 PDT 2014
- - Add new prereqs
- - Dist::Zilla::Plugin::TestBaseIncluder
- - Dist::Zilla::Plugin::TestMLIncluder
-
-0.0.69 Tue Jul 15 11:17:43 PDT 2014
- - Fix issues/21. Check Meta correctness before release.
-
-0.0.67 Mon Jul 14 12:34:24 PDT 2014
- - Fix the share/Meta file.
-
-0.0.66 Sun Jul 13 21:13:16 PDT 2014
- - Change share/Contributing intro.
-
-0.0.65 Sun Jul 13 20:50:57 PDT 2014
- - Add IRC info to share/Contributing file.
-
-0.0.64 Sun Jul 13 20:34:11 PDT 2014
- - Forgot to update ./Contributing
-
-0.0.63 Sun Jul 13 19:49:42 PDT 2014
- - Tweak share/Contributing text.
-
-0.0.62 Sun Jul 13 19:16:57 PDT 2014
- - Add Contributing support.
- - Refactor all template generating code. (bin/zild-render-template)
-
-0.0.61 Sun Jul 13 15:36:24 PDT 2014
- - Add latest modules to list.
-
-0.0.60 Fri Jul 11 15:29:24 PDT 2014
- - Added support for YAML::XS
- - Can't use prove testing (only disttest)
- - Need to add custom content (LibYAML dir)
-
-0.0.59 Fri Jul 11 12:45:35 PDT 2014
- - Allow for pkg/travis.yml override
-
-0.0.58 Fri Jul 11 00:41:43 PDT 2014
- - Make travis not join on notifications
-
-0.0.57 Thu Jul 10 17:03:50 PDT 2014
- - Change CONTRIBUTE to CONTRIBUTING
-
-0.0.56 Thu Jul 10 11:02:45 PDT 2014
- - Initial support for CONTRIBUTE
-
-0.0.55 Thu Jul 10 10:54:37 PDT 2014
- - Dep on Swim::Plugin::badge
-
-0.0.54 Thu Jul 10 08:47:19 PDT 2014
- - Dep on CPAN::Uploader
- - Check for cpan-upload and .pause on 'make release'
-
-0.0.53 Wed Jul  9 17:45:17 PDT 2014
- - Dep on Dist::Zilla::Plugin::GithubMeta, mohawk2++
-
-0.0.52 Wed Jul  9 17:39:06 PDT 2014
- - Dep on Dist::Zilla::PluginBundle::Git, mohawk2++
-
-0.0.51 Wed Jul  9 17:37:26 PDT 2014
- - Dep on Dist::Zilla::Plugin::ReadmeFromPod, mohawk2++
-
-0.0.50 Wed Jul  9 17:32:10 PDT 2014
- - Dep on Dist::Zilla::Plugin::ChangesFromYaml, mohawk2++
-
-0.0.49 Wed Jul  9 17:23:43 PDT 2014
- - Fix typo. @mohawk2++
-
-0.0.48 Wed Jul  9 11:12:13 PDT 2014
- - Support release branch variable in Meta (issues/7)
-
-0.0.47 Fri Jul  4 07:23:55 PDT 2014
- - Don't prompt to commit Changes
- - Commit changes only after tests all pass
-
-0.0.46 Fri Jul  4 07:23:55 PDT 2014
- - Add 2 new modules to list
-
-0.0.45 Wed Jul  2 12:39:33 PDT 2014
- - The Makefile no longer checks for Zilla::Dist to be installed.
- - Regular users can run `make test`, without need zild or dzil.
-
-0.0.44 Wed Jul  2 12:11:10 PDT 2014
- - Make 'setup' be default 'zild' command.
-
-0.0.43 Tue Jul  1 10:31:40 PDT 2014
- - Remove preflight from Makefile
- - Other Makefile refactoring
- - Update the docs
-
-0.0.42 Fri Jun 27 23:07:55 PDT 2014
- - Add `package-pm` to list
-
-0.0.41 Fri Jun 27 21:31:07 PDT 2014
- - Add 2 new modules to the list.
-
-0.0.40 Fri Jun 27 19:27:28 PDT 2014
- - Add a bunch more mdules to shipped list.
-
-0.0.39 Thu Jun 26 13:00:56 PDT 2014
- - Be more lenient on VERSION checking.
- - Allow fully qualified over `our` style.
-
-0.0.38 Thu Jun 26 08:52:45 PDT 2014
- - Update list of modules shipped with Zilla::Dist
-
-0.0.37 Wed Jun 25 21:04:53 PDT 2014
- - Adjust success message
-
-0.0.36 Wed Jun 25 14:38:29 PDT 2014
- - Substitute Kwim with Swim
-
-0.0.35 Mon Jun 23 16:05:03 PDT 2014
- - Fix bug in zild-make-cpan for eg copy.
-
-0.0.34 Sat Jun 21 14:28:51 PDT 2014
- - Small changes to cowsay output.
-
-0.0.33 Sat Jun 21 14:28:51 PDT 2014
- - Botched the 0.0.32 release.
-
-0.0.32 Sat Jun 21 14:11:52 PDT 2014
- - Add cowsay message to 'make release'. Issue 8
- - Check for VERSION statement in module. Issue 6
- - Check branch before release. Issue 7
-
-0.0.31 Thu Jun 19 11:11:46 PDT 2014
- - Allow for $VERSION without 'our'.
-
-0.0.30 Wed Jun 18 11:05:24 PDT 2014
- - Add META.json file to each dist
-
-0.0.29 Tue Jun 17 10:37:04 PDT 2014
- - Don't require retry when Makefile updates
-
-0.0.28 Mon Jun 16 23:02:48 PDT 2014
- - Add travis config to skip tags
-
-0.0.27 Mon Jun 16 16:03:22 PDT 2014
- - Allow for JSONY Changes file
- - Press enter to continue. Easier.
-
-0.0.25 Mon Jun 16 13:43:27 PDT 2014
- - Remove a debugging line.
-
-0.0.24 Mon Jun 16 13:39:33 PDT 2014
- - Added VERSION updating.
-
-0.0.23 Sun Jun 15 13:51:58 PDT 2014
- - Remove failing tests from cpan/t/
-
-0.0.22 Sun Jun 15 11:38:34 PDT 2014
- - Do better version/meta/changes verification
-
-0.0.21 Sat Jun 14 12:47:03 PDT 2014
- - Add 'recommends' support to dist.ini
-
-0.0.20 Sat Jun 14 12:23:44 PDT 2014
- - New badge syntax
-
-0.0.19 Fri Jun 13 22:41:15 PDT 2014
- - Support xt tests (issues/4)
-
-0.0.18 Fri Jun 13 21:26:03 PDT 2014
- - Add TestBase support (for YAML.pm mostly)
-
-0.0.17 Sun Jun  8 18:14:22 PDT 2014
- - Add test.requires and recommends to travis.yml
- - Add irc motify support to travis.yml
-
-0.0.16 Sun Jun  8 13:04:14 PDT 2014
- - Update files before commiting during `make release`
-
-0.0.15 Sun Jun  8 12:26:35 PDT 2014
- - Add travis building support
-
-0.0.14 Sat Jun  7 12:32:30 PDT 2014
- - Add Kwim prereq
-
-0.0.13 Sat Jun  7 11:28:56 PDT 2014
- - Carp in Makefile if Zilla::Dist is not installed.
-
-0.0.12 Sat Jun  7 10:39:27 PDT 2014
- - Run test and disttest before release
- - https://github.com/ingydotnet/zilla-dist-pm/issues/1
-
-0.0.11 Sat Jun  7 09:49:37 PDT 2014
- - Make the share/Makefile be a symlink
- - Prompt to commit changes on release
-
-0.0.10 Sat Jun  7 08:39:48 PDT 2014
- - Added 'abstract' support to dist.ini
-
-0.0.9 Thu May 29 19:02:00 EDT 2014
- - Changed the Abstract
-
-0.0.8 Thu May 29 19:02:00 EDT 2014
- - NYC.pm++
-
-0.0.7 Thu May 29 11:02:39 EDT 2014
- - Add cpanshell and distshell support
-
-0.0.6 Thu May 29 00:41:51 EDT 2014
- - Allow for per dist custom tool/make-cpan
-
-0.0.5 Fri May 23 23:28:41 PDT 2014
- - Move some Makefile shell stuff into Zilla::Dist
- - More same Meta YAML handling
-
-0.0.4 Fri May 23 23:01:07 PDT 2014
- - More helpful doc
+0.0.1 Fri May 23 16:33:23 PDT 2014
+ - First release
+
+0.0.2 Fri May 23 17:14:39 PDT 2014
+ - Fixed sharedir
+ - Fixed doc bug
 
 0.0.3 Fri May 23 18:15:19 PDT 2014
  - Doc corrections
  - Fixed little nits
  - Added example Meta file for `zild setup`
 
-0.0.2 Fri May 23 17:14:39 PDT 2014
- - Fixed sharedir
- - Fixed doc bug
+0.0.4 Fri May 23 23:01:07 PDT 2014
+ - More helpful doc
 
-0.0.1 Fri May 23 16:33:23 PDT 2014
- - First release
+0.0.5 Fri May 23 23:28:41 PDT 2014
+ - Move some Makefile shell stuff into Zilla::Dist
+ - More same Meta YAML handling
+
+0.0.6 Thu May 29 00:41:51 EDT 2014
+ - Allow for per dist custom tool/make-cpan
+
+0.0.7 Thu May 29 11:02:39 EDT 2014
+ - Add cpanshell and distshell support
+
+0.0.8 Thu May 29 19:02:00 EDT 2014
+ - NYC.pm++
+
+0.0.9 Thu May 29 19:02:00 EDT 2014
+ - Changed the Abstract
+
+0.0.10 Sat Jun  7 08:39:48 PDT 2014
+ - Added 'abstract' support to dist.ini
+
+0.0.11 Sat Jun  7 09:49:37 PDT 2014
+ - Make the share/Makefile be a symlink
+ - Prompt to commit changes on release
+
+0.0.12 Sat Jun  7 10:39:27 PDT 2014
+ - Run test and disttest before release
+ - https://github.com/ingydotnet/zilla-dist-pm/issues/1
+
+0.0.13 Sat Jun  7 11:28:56 PDT 2014
+ - Carp in Makefile if Zilla::Dist is not installed.
+
+0.0.14 Sat Jun  7 12:32:30 PDT 2014
+ - Add Kwim prereq
+
+0.0.15 Sun Jun  8 12:26:35 PDT 2014
+ - Add travis building support
+
+0.0.16 Sun Jun  8 13:04:14 PDT 2014
+ - Update files before commiting during `make release`
+
+0.0.17 Sun Jun  8 18:14:22 PDT 2014
+ - Add test.requires and recommends to travis.yml
+ - Add irc motify support to travis.yml
+
+0.0.18 Fri Jun 13 21:26:03 PDT 2014
+ - Add TestBase support (for YAML.pm mostly)
+
+0.0.19 Fri Jun 13 22:41:15 PDT 2014
+ - Support xt tests (issues/4)
+
+0.0.20 Sat Jun 14 12:23:44 PDT 2014
+ - New badge syntax
+
+0.0.21 Sat Jun 14 12:47:03 PDT 2014
+ - Add 'recommends' support to dist.ini
+
+0.0.22 Sun Jun 15 11:38:34 PDT 2014
+ - Do better version/meta/changes verification
+
+0.0.23 Sun Jun 15 13:51:58 PDT 2014
+ - Remove failing tests from cpan/t/
+
+0.0.24 Mon Jun 16 13:39:33 PDT 2014
+ - Added VERSION updating.
+
+0.0.25 Mon Jun 16 13:43:27 PDT 2014
+ - Remove a debugging line.
+
+0.0.27 Mon Jun 16 16:03:22 PDT 2014
+ - Allow for JSONY Changes file
+ - Press enter to continue. Easier.
+
+0.0.28 Mon Jun 16 23:02:48 PDT 2014
+ - Add travis config to skip tags
+
+0.0.29 Tue Jun 17 10:37:04 PDT 2014
+ - Don't require retry when Makefile updates
+
+0.0.30 Wed Jun 18 11:05:24 PDT 2014
+ - Add META.json file to each dist
+
+0.0.31 Thu Jun 19 11:11:46 PDT 2014
+ - Allow for $VERSION without 'our'.
+
+0.0.32 Sat Jun 21 14:11:52 PDT 2014
+ - Add cowsay message to 'make release'. Issue 8
+ - Check for VERSION statement in module. Issue 6
+ - Check branch before release. Issue 7
+
+0.0.33 Sat Jun 21 14:28:51 PDT 2014
+ - Botched the 0.0.32 release.
+
+0.0.34 Sat Jun 21 14:28:51 PDT 2014
+ - Small changes to cowsay output.
+
+0.0.35 Mon Jun 23 16:05:03 PDT 2014
+ - Fix bug in zild-make-cpan for eg copy.
+
+0.0.36 Wed Jun 25 14:38:29 PDT 2014
+ - Substitute Kwim with Swim
+
+0.0.37 Wed Jun 25 21:04:53 PDT 2014
+ - Adjust success message
+
+0.0.38 Thu Jun 26 08:52:45 PDT 2014
+ - Update list of modules shipped with Zilla::Dist
+
+0.0.39 Thu Jun 26 13:00:56 PDT 2014
+ - Be more lenient on VERSION checking.
+ - Allow fully qualified over `our` style.
+
+0.0.40 Fri Jun 27 19:27:28 PDT 2014
+ - Add a bunch more mdules to shipped list.
+
+0.0.41 Fri Jun 27 21:31:07 PDT 2014
+ - Add 2 new modules to the list.
+
+0.0.42 Fri Jun 27 23:07:55 PDT 2014
+ - Add `package-pm` to list
+
+0.0.43 Tue Jul  1 10:31:40 PDT 2014
+ - Remove preflight from Makefile
+ - Other Makefile refactoring
+ - Update the docs
+
+0.0.44 Wed Jul  2 12:11:10 PDT 2014
+ - Make 'setup' be default 'zild' command.
+
+0.0.45 Wed Jul  2 12:39:33 PDT 2014
+ - The Makefile no longer checks for Zilla::Dist to be installed.
+ - Regular users can run `make test`, without need zild or dzil.
+
+0.0.46 Fri Jul  4 07:23:55 PDT 2014
+ - Add 2 new modules to list
+
+0.0.47 Fri Jul  4 07:23:55 PDT 2014
+ - Don't prompt to commit Changes
+ - Commit changes only after tests all pass
+
+0.0.48 Wed Jul  9 11:12:13 PDT 2014
+ - Support release branch variable in Meta (issues/7)
+
+0.0.49 Wed Jul  9 17:23:43 PDT 2014
+ - Fix typo. @mohawk2++
+
+0.0.50 Wed Jul  9 17:32:10 PDT 2014
+ - Dep on Dist::Zilla::Plugin::ChangesFromYaml, mohawk2++
+
+0.0.51 Wed Jul  9 17:37:26 PDT 2014
+ - Dep on Dist::Zilla::Plugin::ReadmeFromPod, mohawk2++
+
+0.0.52 Wed Jul  9 17:39:06 PDT 2014
+ - Dep on Dist::Zilla::PluginBundle::Git, mohawk2++
+
+0.0.53 Wed Jul  9 17:45:17 PDT 2014
+ - Dep on Dist::Zilla::Plugin::GithubMeta, mohawk2++
+
+0.0.54 Thu Jul 10 08:47:19 PDT 2014
+ - Dep on CPAN::Uploader
+ - Check for cpan-upload and .pause on 'make release'
+
+0.0.55 Thu Jul 10 10:54:37 PDT 2014
+ - Dep on Swim::Plugin::badge
+
+0.0.56 Thu Jul 10 11:02:45 PDT 2014
+ - Initial support for CONTRIBUTE
+
+0.0.57 Thu Jul 10 17:03:50 PDT 2014
+ - Change CONTRIBUTE to CONTRIBUTING
+
+0.0.58 Fri Jul 11 00:41:43 PDT 2014
+ - Make travis not join on notifications
+
+0.0.59 Fri Jul 11 12:45:35 PDT 2014
+ - Allow for pkg/travis.yml override
+
+0.0.60 Fri Jul 11 15:29:24 PDT 2014
+ - Added support for YAML::XS
+ - Can't use prove testing (only disttest)
+ - Need to add custom content (LibYAML dir)
+
+0.0.61 Sun Jul 13 15:36:24 PDT 2014
+ - Add latest modules to list.
+
+0.0.62 Sun Jul 13 19:16:57 PDT 2014
+ - Add Contributing support.
+ - Refactor all template generating code. (bin/zild-render-template)
+
+0.0.63 Sun Jul 13 19:49:42 PDT 2014
+ - Tweak share/Contributing text.
+
+0.0.64 Sun Jul 13 20:34:11 PDT 2014
+ - Forgot to update ./Contributing
+
+0.0.65 Sun Jul 13 20:50:57 PDT 2014
+ - Add IRC info to share/Contributing file.
+
+0.0.66 Sun Jul 13 21:13:16 PDT 2014
+ - Change share/Contributing intro.
+
+0.0.67 Mon Jul 14 12:34:24 PDT 2014
+ - Fix the share/Meta file.
+
+0.0.69 Tue Jul 15 11:17:43 PDT 2014
+ - Fix issues/21. Check Meta correctness before release.
+
+0.0.70 Wed Jul 16 22:57:32 PDT 2014
+ - Add new prereqs
+ - Dist::Zilla::Plugin::TestBaseIncluder
+ - Dist::Zilla::Plugin::TestMLIncluder
+
+0.0.71 Thu Jul 17 00:11:37 PDT 2014
+ - Fix issue/22
+ - Die on make commands when Makefile changes
+
+0.0.72 Thu Jul 17 08:05:30 PDT 2014
+ - Add mailing list info to contributing
+
+0.0.73 Thu Jul 17 08:05:30 PDT 2014
+ - Fix issue/24. rurban++
+ - Don't dist-dep on the travis-deps.
+ - Fixed swim modules, and dep on new ones
+
+0.0.74 Thu Jul 17 11:12:12 PDT 2014
+ - Fix for issue/25. rurban++
+ - Call perl scripts with current perl
+
+0.0.75 Thu Jul 17 15:10:19 PDT 2014
+ - Fix issues with using multiple perls. rurban++
+
+0.0.76 Fri Jul 18 11:23:20 PDT 2014
+ - issue/10
+ - Fully check out Changes file content and structure
+
+0.0.78 Sat Jul 19 12:30:28 PDT 2014
+ - issue/6. Make sure version change is an increase.
+
+0.0.79 Sat Jul 19 12:33:35 PDT 2014
+ - issue/26. Commit changes *after* upload succeeds.
+
+0.0.80 Sat Jul 19 12:42:13 PDT 2014
+ - Fix issues/28
+ - Dep on ExtUtils-MakeMaker-6.98 to fix 3 part version warnings
+
+0.0.81 Sat Jul 19 12:44:20 PDT 2014
+ - Fix issues/23
+ - make release fails when all files committed already
+
+0.0.82 Sat Jul 19 12:47:21 PDT 2014
+ - Another try for issues/23
+
+0.0.83 Sat Jul 19 12:59:18 PDT 2014
+ - Yet another try for issues/23
+
+0.0.84 Sat Jul 19 13:09:52 PDT 2014
+ - Fix issues/20
+ - Auto update date in Changes on release
+
+0.0.85 Sat Jul 19 13:28:54 PDT 2014
+ - 2nd attempt at issues/20
+
+0.0.86 Sat Jul 19 13:50:35 PDT 2014
+ - Fix issues/17. Sort prereqs list in dist.ini
+
+0.0.87 Sat Jul 19 14:04:31 PDT 2014
+ - Fix issues/29.
+ - Add target to install prereqs from CPAN
+
+0.0.88 Sat Jul 19 14:35:34 PDT 2014
+ - -e in prove messes up -T, so using $(PERL) -S
+
+0.0.89 Mon Jul 21 16:22:11 PDT 2014
+ - Fix bugs with no_changes_yaml
+
+0.0.90 Thu Jul 24 10:23:28 PDT 2014
+ - Check for boilerplate email in Meta
+
+0.0.91 Fri Jul 25 18:11:04 PDT 2014
+ - Fix issue/33. cp option for OSX.
+ - Released from OSX.
+ - Allow for main lib different than package name
+
+0.0.92 Fri Jul 25 21:23:51 PDT 2014
+ - Allow for main lib different than package name
+
+0.0.93 Fri Jul 25 22:11:28 PDT 2014
+ - Merge 0.91 and 0.92 changes
+
+0.0.94 Fri Jul 25 23:59:50 PDT 2014
+ - Fix issue/34 and issue/35
+
+0.0.95 Sat Jul 26 11:20:01 PDT 2014
+ - Fix issue/32
+ - Auto enable irc and travis as appropriate
+
+0.0.96 Sat Jul 26 11:52:19 PDT 2014
+ - Fix issue/19
+ - Auto edit Meta/Changes for `make release` if not edited.
+ - Testing right now :)
+
+0.0.97 Sat Jul 26 14:07:56 PDT 2014
+ - Add zild-update-all to do mass review/release
+
+0.0.98 Sat Jul 26 14:15:53 PDT 2014
+ - Provide a way to bail out of zild-update loop
+
+0.0.99 Sat Jul 26 22:09:09 PDT 2014
+ - Update doc
+
+0.0.100 Mon Jul 28 07:26:50 PDT 2014
+ - Add metanoindex feature to Meta
+
+0.0.101 Wed Jul 30 15:07:37 PDT 2014
+ - Change commit message to 'CPAN Release x.y.z'
+
+0.0.102 Thu Jul 31 10:32:54 PDT 2014
+ - Be better about swim doc type detection.
+
+0.0.103 Thu Jul 31 11:36:33 PDT 2014
+ - Put last Changes entry into release commit message
+
+0.0.104 Thu Jul 31 11:43:30 PDT 2014
+ - Make Zilla-Dist install itself before release
+ - This was leading to some botched releases
+
+0.0.105 Thu Jul 31 12:00:30 PDT 2014
+ - Need to try `plenv rehash` after install
+
+0.0.106 Thu Jul 31 12:18:42 PDT 2014
+ - Fix a bad `swim` invocation
+
+0.0.107 Fri Aug  1 15:14:31 PDT 2014
+ - Remove (c) from copyright.
+
+0.0.108 Sat Aug  2 10:12:57 PDT 2014
+ - Add `zild years`
+
+0.0.109 Sat Aug  2 18:23:03 PDT 2014
+ - Add bin/zild-setup-release
+
+0.0.110 Sat Aug  2 18:57:31 PDT 2014
+ - Fix bugs in zild-setup-release process
+ - Fix Changes log from last release
+
+0.0.111 Sun Aug  3 21:07:15 PDT 2014
+ - Update travis template for 5.20
+
+0.0.112 Mon Aug  4 14:13:53 PDT 2014
+ - Pass Meta file to swim
+
+0.0.113 Mon Aug  4 23:12:17 PDT 2014
+ - Dep on Swim-0.1.14
+
+0.0.114 Tue Aug  5 09:33:45 PDT 2014
+ - Add zild-massive-attack
+
+0.0.115 Tue Aug  5 10:06:47 PDT 2014
+ - More work on massive-attack script
+
+0.0.116 Tue Aug  5 10:36:29 PDT 2014
+ - FIx a couple path nits with '::'
+
+0.0.117 Wed Aug  6 09:15:21 PDT 2014
+ - Check $VERSION exists in main library.
+
+0.0.118 Thu Aug  7 00:27:13 PDT 2014
+ - Fix bad encoding in Pod
+
+0.0.119 Tue Aug 12 10:58:21 PDT 2014
+ - Added test-dev and test-all targets
+ - Make `make release` dep on `test-all` now
+
+0.0.120 Tue Aug 12 12:22:50 PDT 2014
+ - Print command on failure
+
+0.0.121 Wed Aug 13 11:25:00 PDT 2014
+ - Don't update $VERSION on a split line
+
+0.0.122 Wed Aug 13 21:50:18 PDT 2014
+ - Abort any previous rebase
+
+0.0.123 Thu Aug 14 17:01:59 PDT 2014
+ - Makefile bombed if rebase *wasn't* in progress
+
+0.0.124 Thu Aug 14 17:03:40 PDT 2014
+ - Add to dist list
+ - Fix Changes typo
+
+0.0.125 Thu Aug 14 23:13:49 PDT 2014
+ - Add support for ZILLA_DIST_RELEASE_TIME (wait for release)
+
+0.0.126 Fri Aug 15 12:14:19 PDT 2014
+ - Timed Zilla-Dist Massive Attack test
+
+0.0.127 Fri Aug 15 12:48:30 PDT 2014
+ - Add better messaging to ZILLA_DIST_RELEASE_TIME
+
+0.0.128 Fri Aug 15 13:16:33 PDT 2014
+ - Add ZILLA_DIST_RELEASE_LOG logging
+
+0.0.129 Fri Aug 15 13:57:34 PDT 2014
+ - Timed Zilla-Dist Massive Attack test II
+
+0.0.130 Fri Aug 15 14:54:48 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.0.131 Fri Aug 15 15:01:40 PDT 2014
+ - Change ZILLA_DIST_ vars to PERL_ZILLA_DIST_
+
+0.0.132 Fri Aug 15 15:05:38 PDT 2014
+ - Retesting release with PERL_ZILLA_DIST_*
+
+0.0.133 Fri Aug 15 16:42:27 PDT 2014
+ - Fixed a bug is 000 test.
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.0.134 Fri Aug 15 17:52:04 PDT 2014
+ - 000 test can't *use* 'Alt::' modules
+
+0.0.135 Fri Aug 15 17:56:46 PDT 2014
+ - Make a test exception for Sex!
+
+0.0.136 Fri Aug 15 18:04:07 PDT 2014
+ - Allow no test dir in repo
+ - Generated tests only is OK
+
+0.0.137 Fri Aug 15 18:17:28 PDT 2014
+ - Add Devel::Local to 000 exception list
+
+0.0.138 Fri Aug 15 18:38:12 PDT 2014
+ - Add 'Inline::' to 000 exception list
+
+0.0.139 Fri Aug 15 18:56:56 PDT 2014
+ - Change Makefile target cpantest to test-cpan
+ - Change Makefile target disttest to test-dist
+ - Remove t/use_ok.t
+
+0.0.140 Fri Aug 15 19:17:00 PDT 2014
+ - Allow version to be in quotes in Changes
+ - For '1.1111111111' in Acme
+
+0.0.141 Fri Aug 15 19:57:29 PDT 2014
+ - Add share/test/000-require-modules.t for "special" modules
+ - Things that can't 'use_ok'
+
+0.0.142 Fri Aug 15 22:36:36 PDT 2014
+ - Support no 000
+
+0.0.143 Fri Aug 15 22:38:49 PDT 2014
+ - Fix share/alias.pm
+
+0.0.144 Fri Aug 15 23:39:47 PDT 2014
+ - Add RELEASE_TESTING=1 to make test-dist
+
+0.0.145 Sat Aug 16 09:48:36 PDT 2014
+ - Change =cpan to =zild
+
+0.0.146 Sat Aug 16 09:51:11 PDT 2014
+ - Meta 0.0.2
+
+0.0.147 Sat Aug 16 13:09:11 PDT 2014
+ - Meta tweaks
+
+0.0.148 Sat Aug 16 13:56:23 PDT 2014
+ - Remove need for =travis
+ - Rework share/travis.yaml
+
+0.0.149 Sat Aug 16 16:19:47 PDT 2014
+ - Fix strict/warnings
+
+0.0.150 Sat Aug 16 16:59:10 PDT 2014
+ - Change ' / ' to '/' in doc
+
+0.0.151 Sat Aug 16 17:00:06 PDT 2014
+ - Superfluous Release!
+
+0.0.152 Sun Aug 17 21:32:45 PDT 2014
+ - Apply PR/42 @wollmers++
+
+0.0.153 Mon Aug 18 07:54:06 PDT 2014
+ - Simplify 000 tests
+
+0.0.154 Mon Aug 18 14:07:01 PDT 2014
+ - Travis accounts for no test/ directory
+
+0.0.155 Thu Aug 21 11:17:50 PDT 2014
+ - Fix for issue/41
+ - Honor PERL_ZILLA_DIST_AUTO_INSTALL=1 and install after release
+
+0.0.156 Thu Aug 21 11:20:15 PDT 2014
+ - Fix non-tab error in Makefile
+
+0.0.157 Thu Aug 21 11:22:35 PDT 2014
+ - Move 'git status' after the auto 'make install'
+
+0.0.158 Fri Aug 22 21:01:14 PDT 2014
+ - Add cpantest and disttest targets back into Makefile.
+
+0.0.159 Tue Aug 26 14:21:15 PDT 2014
+ - Remove 'use lib "lib"' from `zild`.
+ - Was causing issues to release Alt-IO-All
+
+0.0.160 Tue Aug 26 17:15:23 PDT 2014
+ - Remove the usage of lib 'lib'
+
+0.0.161 Fri Sep  5 06:48:19 UTC 2014
+ - Add Test::Pod to requirements for release testing
+
+0.0.162 Mon Sep 22 12:17:21 PDT 2014
+ - Testing release.
+
+0.0.163 Fri Oct 10 20:47:33 CEST 2014
+ - Fixed a couple version bumping errors.
+
+0.0.164 Sun Oct 26 22:51:19 UTC 2014
+ - Remove blib on clean
+
+0.0.165 Sat Nov  8 10:46:10 EST 2014
+ - PPW++
+ - Version bumper
+
+0.0.166 Sun Nov 16 08:21:14 PST 2014
+ - Try changing ZD to not commit Makefiles
+ - Set up `zild` to just create Makefile (not Meta)
+ - Have `make clean` remove a non-git-tracked Makefile
+
+0.0.167 Sun Nov 16 08:53:48 PST 2014
+ - Add rudimentary Inline::Module support
+
+0.0.168 Sun Nov 16 22:22:05 PST 2014
+ - Change how `zild` command works
+
+0.0.169 Sun Nov 16 22:34:24 PST 2014
+ - Update Contributing.swim
+
+0.0.170 Sun Nov 16 22:37:52 PST 2014
+ - Remove Makefile from top level
+ - Now use `zild make <target>`
+
+0.0.171 Sun Nov 16 22:39:46 PST 2014
+ - Try removing Makefile again. Something messed up.
+
+0.0.172 Mon Nov 17 08:17:18 PST 2014
+ - Use Makefile directly from sharedir
+ - Updated docs to reflect new API better
+
+0.0.173 Tue Nov 18 08:52:48 PST 2014
+ - Change `zild makefile` to just show location of Zilla::Dist Makefile
+ - Add `zild version`
+
+0.0.174 Mon Nov 24 10:17:15 PST 2014
+ - Replace top level repo Contributing with About file
+
+0.0.175 Sun Dec 14 12:52:10 PST 2014
+ - Set an env var in 000compile.t
+
+0.0.176 Sun Dec 14 16:25:06 PST 2014
+ - Fix .travis.yml file to fail when tests fail. frew++
+
+0.0.177 Tue Dec 23 11:00:32 PST 2014
+ - Add `zild <cmd>` aliases for common `zild make <cmd>` targets
+
+0.0.178 Tue Dec 23 11:58:48 PST 2014
+ - Change `metaval` command to `meta`
+
+0.0.179 Tue Dec 23 12:04:59 PST 2014
+ - Prettier zild help output
+
+0.0.180 Fri Dec 26 21:47:54 PST 2014
+ - Support win32.requires in Meta
+
+0.0.181 Mon Dec 29 17:11:39 PST 2014
+ - Add AltInstall support
+
+0.0.182 Wed Dec 31 14:28:35 PST 2014
+ - Pass --meta=Meta to swim
+ - Clean up Makefile a bit
+
+0.0.183 Wed Dec 31 15:08:14 PST 2014
+ - Fix doc references to `make`, to `zild`.
+
+0.0.184 Wed Dec 31 15:52:34 PST 2014
+ - Convert doc to swim-plugin-cpan
+
+0.0.185 Wed Dec 31 21:24:14 PST 2014
+ - Work with new `swim` commandline args
+
+0.0.186 Thu Jan  1 00:00:27 PST 2015
+ - Add copyright year check
+ - Happy New Year 2015
+
+0.0.187 Thu Jan  1 19:02:33 PST 2015
+ - Update prereq versions
+
+0.0.188 Fri Jan  2 12:17:42 PST 2015
+ - Get rid of DZ PluginBundles
+ - Use DZ Plugins directly
+ - Eliminate unused plugins
+
+0.0.189 Sat Jan  3 15:43:29 PST 2015
+ - remove .inline/ for `make clean`
+
+0.0.190 Thu Apr  2 12:22:16 PDT 2015
+ - Add JSON dependency
+
+0.0.191 Thu Apr  2 12:26:25 PDT 2015
+ - make clean no longer removes Makefile
+
+0.0.192 Sat Apr 18 13:50:29 CEST 2015
+ - Rewrite `#!/usr/bin/env perl` in `zild cpan`
+
+0.0.193 Tue Mar 29 14:18:40 PDT 2016
+ - Make version updating mst++ approved
+
+0.0.194 Fri Dec 23 17:49:01 CET 2016
+ - Fixed typo in About template
+
+0.0.195 Wed Jan  4 21:34:29 CET 2017
+ - Exclude 5.8 5.10 and 5.12 in travis template
+
+0.0.196 Sun Feb 12 13:26:51 PST 2017
+ - Release after pause-cleanup screwed up
+
+0.0.197 Fri Jun 22 21:15:15 MDT 2018
+ - Add 5.26 to travis perl versions
+
+0.0.198 Fri Jul 27 11:36:54 PDT 2018
+ - Dist::Zilla::Plugin::TestML1Includer
+ - Add 5.28 to travis perl versions
+ - Update copyright year
+
+0.0.199 Sat Jul 28 14:14:43 PDT 2018
+ - Update required version of Dist::Zilla
+
+0.0.200 Mon Aug 27 07:14:08 PDT 2018
+ - Support `make clean` removes .testml/ dirs
+ - Allow Makefile override for RELEASE_BRANCH
+
+0.0.201 Mon Aug 27 08:03:52 PDT 2018
+ - Update travis code for new TestML
+
+0.0.202 Sun Nov 11 11:05:21 PST 2018
+ - Set up environment for releaseing modules with TestML tests
+
+0.0.203 Sun Nov 11 12:09:39 PST 2018
+ - TestML Travis fix
+
+0.1.0 Sun Jan  5 10:46:13 PST 2020
+ - Apply https://github.com/ingydotnet/zilla-dist-pm/pull/56/ Make Travis
+   config use travis-perl helpers @mohawk2++
+
+0.1.1 Sun Jan  5 13:58:06 PST 2020
+ - Combine 2 include_testml sections
+
+0.1.2 Sun Jan  5 14:31:23 PST 2020
+ - Do coverage on perl 5.30 (latest)
+
+0.1.3 Sun Jan  5 23:31:00 PST 2020
+ - Don't clone depth=1 for testml repo on travis
+
+0.1.4 Thu Jan  9 09:39:27 PST 2020
+ - Fix to add versions to CPAN requirements
+
+0.1.5 Tue Jun  9 07:58:41 PDT 2020
+ - Don't mess with perl versions
+ - Change perl5 to perl for testml
+
+0.1.6 Tue 12 Jul 2022 04:28:38 PM PDT
+ - Support Markdown docs in doc/
+
+0.1.7 Tue 12 Jul 2022 09:35:54 PM PDT
+ - Various small fixes
+
+0.1.8 Wed 13 Jul 2022 09:39:55 AM PDT
+ - Use upper case for POD =head1 and =head2
+ - Use a space for pandoc's softbreak to POD
+ - Add Archive::Tar::Wrapper to requirements
+
+0.1.9 Sun 24 Jul 2022 07:22:47 AM PDT
+ - share/Makefile patches
+
+0.1.10 Sat Sep  3 10:28:26 AM PDT 2022
+ - Applied https://github.com/ingydotnet/zilla-dist-pm/pull/59 perlpunk++
+
+0.1.11 Sat Sep  3 10:33:43 AM PDT 2022
+ - Simpler way for shared Makefile to find its path
+
+0.1.12 Sat Sep  3 10:53:33 AM PDT 2022
+ - Testing release with PST
+
+0.1.13 Fri Sep  9 03:02:55 PM EDT 2022
+ - Generate special functions in markdown (badges)
+
+0.1.14 Fri Sep  9 04:07:04 PM EDT 2022
+ - Remove XXX usage
+
+0.1.15 Wed Jan 25 09:51:39 PM EST 2023
+ - Allow explicit modules name in {doc-head: <name>}
+
+0.1.16 Fri May 26 09:57:53 PM PDT 2023
+ - Make Meta merge be RIGHT_PRECEDENT
+
+0.1.17 Tue Jun 27 09:29:55 AM EDT 2023
+ - Update Meta and YAML::PP dependency
+
+0.1.18 Sat Jul 22 07:39:03 PM PDT 2023
+ - Add Dist::Zilla::Plugin::MakeMaker::Awesome to requires
+
+0.1.19 Sat Dec 23 06:11:24 AM PST 2023
+ - Fix Makefile bug with NAMEPATH
+
+0.1.20 Sat Dec 23 06:49:18 AM PST 2023
+ - Add skip_tag_check
+
+0.1.21 Sat Dec 23 07:09:37 AM PST 2023
+ - Don't tag commit when skip_tag_check set
+
+0.1.22 Sat Dec 23 07:28:59 AM PST 2023
+ - Don't do any git stuff when skip_tag_check
+
+0.1.23 Mon Dec 25 06:29:32 AM PST 2023
+ - Change skip-tag-check to no-git-update
+
+0.1.24 Sat Mar 30 07:51:11 AM PDT 2024
+ - Update copyright year
+ - Add a zild/no-check setting

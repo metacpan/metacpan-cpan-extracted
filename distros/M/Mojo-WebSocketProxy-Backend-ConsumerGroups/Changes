@@ -1,6 +1,10 @@
 Revision History for ConsumerGroups
 
-0.05      2023-11-07 07:54:26+00:00 UTC
+0.06      2024-03-28 06:16:44+00:00 UTC
+        Allow timeout to be extended vs published deadline
+
+
+0.05    2023-11-07 07:54:26+00:00 UTC
         Pass log context to redis streams message
 
 0.04    2023-08-28 11:13:42+00:00 UTC

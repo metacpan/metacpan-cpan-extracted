@@ -1,0 +1,20 @@
+{
+  "amount": 100,
+  "capture": true,
+  "created": 1538564504,
+  "currency": "eur",
+  "customer": "cust_9Cle7TXKkjhwqcWx4Kl5cQYk",
+  "description": "le test restfull v1",
+  "id": "paym_5IptC9R1Wu2wKBR5cjM2so7k",
+  "live_mode": false,
+  "method": "sepa",
+  "order_id": null,
+  "sepa": {
+    "bic": "ILADFRPP",
+    "id": "sepa_oazGliEo6BuqUlyCzE42hcNp",
+    "last4": "2606",
+    "name": "David Coaster"
+  },
+  "response": "00",
+  "status": "to_capture"
+}

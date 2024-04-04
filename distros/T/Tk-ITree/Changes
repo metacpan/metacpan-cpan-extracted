@@ -1,4 +1,12 @@
 Revision history for Perl extension Tk::ITree.
+0.03  Sun Mar 31 2024
+	Added -leftrightcall callback.
 
-0.01  Mon Jun 5 2023
+0.02  Sat Mar 30 2024
+	Configured Left and Right key to open and close branches.
+	Corrected documentation.
+
+0.01  Thu Jun 29 2023
 	Initial version
+
+

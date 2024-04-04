@@ -40,6 +40,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 =cut
 #line 42 "COULOMB.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -172,7 +173,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 176 "COULOMB.pm"
+#line 177 "COULOMB.pm"
 
 # Exit with OK status
 

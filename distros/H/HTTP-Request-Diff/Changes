@@ -1,3 +1,18 @@
+0.07 2024-03-30
+    * Switch tests from YAML to YAML::PP
+      This is mainly to avoid YAML::Syck being loaded, which can't handle
+      some of our YAML (?!)
+
+0.06 2024-03-29
+    * Use "stable" instead of "experimental"
+
+0.05 2024-03-28
+    * We use the postderef feature also in tests
+    * Use features of URI in a backwards compatible way
+
+0.04 2024-03-27
+    * We use the postderef feature
+
 0.03 2024-03-25
     * We need List::Util 1.45+ for uniq(), spotted by the CPAN testers
 

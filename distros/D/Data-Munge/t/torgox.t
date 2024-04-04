@@ -1,9 +1,5 @@
 #!perl
-use warnings;
-use strict;
-
-use Test::More tests => 8;
-
+use Test2::V0;
 use Data::Munge qw(list2re replace);
 
 my $orig = '[acabbdcacab]';
@@ -35,3 +31,5 @@ is replace($orig, $re4, 'XY', 'g'), $good4;
 $_ = $orig;
 s/$re4/XY/g;
 is $_, $good4;
+
+done_testing;

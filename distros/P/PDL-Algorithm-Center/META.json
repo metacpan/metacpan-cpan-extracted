@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -26,7 +26,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {
@@ -46,6 +47,7 @@
             "Dist::Zilla::Plugin::MetaNoIndex" : "0",
             "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
             "Dist::Zilla::Plugin::MetaResources" : "0",
+            "Dist::Zilla::Plugin::ModuleBuildTiny" : "0",
             "Dist::Zilla::Plugin::NextRelease" : "0",
             "Dist::Zilla::Plugin::PodCoverageTests" : "0",
             "Dist::Zilla::Plugin::PodSyntaxTests" : "0",
@@ -68,7 +70,6 @@
             "Dist::Zilla::Plugin::Test::PodSpelling" : "0",
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
             "Dist::Zilla::Plugin::Test::TrailingSpace" : "0",
-            "Dist::Zilla::Plugin::Test::UnusedVars" : "0",
             "Dist::Zilla::Plugin::Test::Version" : "0",
             "Dist::Zilla::PluginBundle::Basic" : "0",
             "Dist::Zilla::PluginBundle::Filter" : "0",
@@ -91,7 +92,6 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Spelling" : "0.12",
             "Test::TrailingSpace" : "0.0203",
-            "Test::Vars" : "0.015",
             "Test::Version" : "1"
          }
       },
@@ -100,6 +100,7 @@
             "Data::Clone" : "0",
             "Data::Visitor::Tiny" : "0",
             "Hash::Wrap" : "0.10",
+            "List::Util" : "1.33",
             "PDL" : "0",
             "PDL::Image2D" : "0",
             "PDL::Lite" : "0",
@@ -142,15 +143,15 @@
    "provides" : {
       "PDL::Algorithm::Center" : {
          "file" : "lib/PDL/Algorithm/Center.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "PDL::Algorithm::Center::Failure" : {
          "file" : "lib/PDL/Algorithm/Center/Failure.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "PDL::Algorithm::Center::Types" : {
          "file" : "lib/PDL/Algorithm/Center/Types.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -165,8 +166,8 @@
          "web" : "https://gitlab.com/djerius/pdl-algorithm-center"
       }
    },
-   "version" : "0.14",
-   "x_generated_by_perl" : "v5.36.1",
+   "version" : "0.15",
+   "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "GPL-3.0-only"
 }

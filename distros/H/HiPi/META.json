@@ -52,7 +52,7 @@
    "provides" : {
       "HiPi" : {
          "file" : "lib/HiPi.pm",
-         "version" : "0.91"
+         "version" : "0.92"
       },
       "HiPi::Class" : {
          "file" : "lib/HiPi/Class.pm",
@@ -76,7 +76,7 @@
       },
       "HiPi::Device::I2C" : {
          "file" : "lib/HiPi/Device/I2C.pm",
-         "version" : "0.91"
+         "version" : "0.92"
       },
       "HiPi::Device::OneWire" : {
          "file" : "lib/HiPi/Device/OneWire.pm",
@@ -84,7 +84,7 @@
       },
       "HiPi::Device::SPI" : {
          "file" : "lib/HiPi/Device/SPI.pm",
-         "version" : "0.91"
+         "version" : "0.92"
       },
       "HiPi::Device::SerialPort" : {
          "file" : "lib/HiPi/Device/SerialPort.pm",
@@ -108,7 +108,7 @@
       },
       "HiPi::GPIO" : {
          "file" : "lib/HiPi/GPIO.pm",
-         "version" : "0.91"
+         "version" : "0.92"
       },
       "HiPi::GPIO::Pin" : {
          "file" : "lib/HiPi/GPIO/Pin.pm",
@@ -681,7 +681,7 @@
       },
       "HiPi::Utils" : {
          "file" : "lib/HiPi/Utils.pm",
-         "version" : "0.91"
+         "version" : "0.92"
       },
       "HiPi::Utils::BitBuffer" : {
          "file" : "lib/HiPi/Utils/BitBuffer.pm",
@@ -693,7 +693,7 @@
       },
       "HiPi::Utils::Exec" : {
          "file" : "lib/HiPi/Utils/Exec.pm",
-         "version" : "0.91"
+         "version" : "0.92"
       },
       "HiPi::Utils::OLEDFont" : {
          "file" : "lib/HiPi/Utils/OLEDFont.pm",
@@ -707,6 +707,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.91",
+   "version" : "0.92",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -4,10 +4,11 @@ package JSON::Schema::Modern::Annotation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single annotation from a JSON Schema evaluation
 
-our $VERSION = '0.582';
+our $VERSION = '0.583';
 
 use 5.020;
 use Moo;
+with 'JSON::Schema::Modern::ResultNode';
 use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
@@ -15,27 +16,10 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use Safe::Isa;
 use MooX::TypeTiny;
-use Types::Standard qw(Str InstanceOf Bool);
-use Types::Common::Numeric qw(PositiveOrZeroInt);
+use Types::Standard 'Bool';
+use Carp 'croak';
 use namespace::clean;
-
-has [qw(
-  keyword
-  instance_location
-  keyword_location
-)] => (
-  is => 'ro',
-  isa => Str,
-  required => 1,
-);
-
-has absolute_keyword_location => (
-  is => 'ro',
-  isa => InstanceOf['Mojo::URL'],
-  coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
-);
 
 # https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.7.7.1
 has annotation => (
@@ -49,47 +33,13 @@ has unknown => (
   default => 0,
 );
 
-has depth => (
-  is => 'ro',
-  isa => PositiveOrZeroInt,
-  required => 1,
-);
-
 around BUILDARGS => sub ($orig, $class, @args) {
   my $args = $class->$orig(@args);
 
-  if (my $uri = delete $args->{_uri}) {
-    # as if we did canonical_uri(..)->to_abs($state->{effective_base_uri} in A(..)
-    $uri = $uri->[0]->to_abs($uri->[1]);
-    undef $uri if $uri eq '' and $args->{keyword_location} eq ''
-      or ($uri->fragment // '') eq $args->{keyword_location} and $uri->clone->fragment(undef) eq '';
-    $args->{absolute_keyword_location} = $uri if defined $uri;
-  }
-
+  # undef is not okay for annotations
+  croak 'keyword must be defined' if exists $args->{keyword} and not defined $args->{keyword};
   return $args;
 };
-
-sub TO_JSON ($self) {
-  return +{
-    # note that locations are JSON pointers, not uri fragments!
-    instanceLocation => $self->instance_location,
-    keywordLocation => $self->keyword_location,
-    !defined($self->absolute_keyword_location) ? ()
-      : ( absoluteKeywordLocation => $self->absolute_keyword_location->to_string ),
-    annotation => $self->annotation,
-  };
-}
-
-sub dump ($self) {
-  my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new
-    ->utf8(0)
-    ->convert_blessed(1)
-    ->canonical(1)
-    ->indent(1)
-    ->space_after(1);
-  $encoder->indent_length(2) if $encoder->can('indent_length');
-  $encoder->encode($self);
-}
 
 1;
 
@@ -107,7 +57,7 @@ JSON::Schema::Modern::Annotation - Contains a single annotation from a JSON Sche
 
 =head1 VERSION
 
-version 0.582
+version 0.583
 
 =head1 SYNOPSIS
 
@@ -181,13 +131,13 @@ if the distinction is important to you.)
 Returns a JSON string representing the error object, according to
 the L<specification|https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.10>.
 
-=for stopwords OpenAPI
-
 =head1 SUPPORT
 
 Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Modern/issues>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+=for stopwords OpenAPI
 
 You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
 server|https://open-api.slack.com>, which are also great resources for finding help.

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.581-7-g6f026737
+package JSON::Schema::Modern; # git description: v0.582-15-gfa6dcf01
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
-# ABSTRACT: Validate data against a schema
+# ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.582';
+our $VERSION = '0.583';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -469,7 +469,7 @@ my %removed_keywords = (
 our $vocabulary_cache = {};
 
 sub _traverse_subschema ($self, $schema, $state) {
-  delete $state->{keyword};
+  delete $state->@{'keyword', grep /^_/, keys %$state};
 
   return E($state, 'EXCEPTION: maximum traversal depth (%d) exceeded', $self->max_traversal_depth)
     if $state->{depth}++ > $self->max_traversal_depth;
@@ -1143,11 +1143,11 @@ __END__
 
 =head1 NAME
 
-JSON::Schema::Modern - Validate data against a schema
+JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.582
+version 0.583
 
 =head1 SYNOPSIS
 
@@ -1268,6 +1268,7 @@ fixed for the next draft.
 When true, annotations are collected from keywords that produce them, when validation succeeds.
 These annotations are available in the returned result (see L<JSON::Schema::Modern::Result>).
 Not operational when L</specification_version> is C<draft7>.
+
 Defaults to false.
 
 =head2 scalarref_booleans
@@ -1930,6 +1931,8 @@ L<Test::Mojo::Role::OpenAPI::Modern>: test your Mojolicious application's OpenAP
 Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Modern/issues>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+=for stopwords OpenAPI
 
 You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
 server|https://open-api.slack.com>, which are also great resources for finding help.

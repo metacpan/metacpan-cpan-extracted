@@ -1,7 +1,7 @@
 This archive contains the distribution JSON-Schema-Modern,
-version 0.582:
+version 0.583:
 
-  Validate data against a schema
+  Validate data against a schema using a JSON Schema
 
 This software is copyright (c) 2020 by Karen Etheridge.
 

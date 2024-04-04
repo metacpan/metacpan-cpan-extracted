@@ -1,7 +1,7 @@
 package Factory::Sub;
 use 5.006; use strict; use warnings;
 use Import::Into; use Carp qw/croak/; use Coerce::Types::Standard qw//;
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use overload 
 	"&{}" => sub {my $self = shift; sub { $self->call(@_) }},
@@ -17,12 +17,23 @@ sub import {
 
 sub new {
 	my $self = shift;
-	bless { factory => [ @_ ] }, $self;
+	my $fallback;
+	for (my $i = 0; $i < scalar @_; $i++) {
+		if ( scalar @{$_[$i]} == 1 ) {
+			$fallback = splice @_, $i, 1;
+			$i--;
+		}
+	}
+	bless { factory => [ @_ ], ($fallback ? (fallback => $fallback->[0]) : ()) }, $self;
 }
 
 sub add {
 	my ($self, @args) = @_;
-	push @{ $self->{factory} }, \@args;
+	if (scalar @args == 1) {
+		$self->{fallback} = $args[0];
+	} else {
+		push @{ $self->{factory} }, \@args;
+	}
 }
 
 sub call {
@@ -37,12 +48,15 @@ sub call {
 						&& scalar @{$factory->[$i]->{coercion}->{type_coercion_map}} 
 							? $factory->[$i]->coerce($factory_params[$i])
 							: $factory_params[$i]
-				) } or next FACTORY;
+				); 1; } or next FACTORY;
 			}
 			return $factory->[-1]->(@factory_params);
 		}
 	}
-	croak "No matching factory sub for given params " . join " ", @params;
+	if ($self->{fallback}) {
+		return $self->{fallback}->(@params);
+	}
+	croak "No matching factory sub for given params " . join " ", map { ! defined $_ ? 'undef' : $_ } @params;
 }
 
 sub clone {
@@ -64,7 +78,7 @@ Factory::Sub - Generate a factory of subs
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =cut
 
@@ -77,6 +91,8 @@ Perhaps a little code snippet.
 	use Factory::Sub qw/Str HashRef ArrayRef StrToArray StrToHash HashToArray/;
 
 	my $factory = Factory::Sub->new();
+
+	$factory->add(sub { return 'fallback' });
 
 	$factory->add(Str, Str, sub { 
 		return 1;

@@ -62,9 +62,19 @@ SUBROUTINES
   "check_date_order"
      check_date_order($self, $key1, $key2);
 
-    *Since version 0.01. Described functionality since version 0.02.*
+    *Since version 0.01. Described functionality since version 0.04.*
 
     Check if date with $key1 is lesser than date with $key2.
+
+    Possible date formats:
+
+    *   YYYY-MM-DD
+
+    *   -YYYY-MM-DD
+
+    *   YEAR
+
+    *   DateTime object
 
     Put error if check isn't ok.
 
@@ -91,6 +101,11 @@ ERRORS
                      DateTime error: %s
 
      check_date_order():
+             Cannot parse date/time string.
+                     Value: %s
+             Cannot construct DateTime object from date.
+                     Value: %s
+                     DateTime error: %s
              Parameter '%s' has date greater or same as parameter '%s' date.
 
 EXAMPLE1
@@ -188,5 +203,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

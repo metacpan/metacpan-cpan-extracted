@@ -1,0 +1,7 @@
+Revision history for pmarkdown and the Markdown::Perl module.
+
+1.00 - 2024-03-31
+
+ - Initial release with full support for the CommonMark spec, the GitHub
+   Flavored Markdown extentions, and partial support for original Markdown
+   syntax.

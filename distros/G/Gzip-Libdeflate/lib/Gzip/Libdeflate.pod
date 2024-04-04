@@ -25,13 +25,13 @@ produces output
     ABCDEFGABCDEFG
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Libdeflate-0.07/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Libdeflate-0.08/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.07 of Gzip-Libdeflate
-corresponding to L<git commit 4596fb46fdec606730aac1a2d54e9fd977abe29b|https://github.com/benkasminbullock/gzip-libdeflate/commit/4596fb46fdec606730aac1a2d54e9fd977abe29b> released on Mon Mar 25 21:32:18 2024 +0900. This
+This documents version 0.08 of Gzip-Libdeflate
+corresponding to L<git commit 6efe47bdda02829ec3ba584893e5b269e51e6194|https://github.com/benkasminbullock/gzip-libdeflate/commit/6efe47bdda02829ec3ba584893e5b269e51e6194> released on Sat Mar 30 10:16:25 2024 +0900. This
 distribution also includes libdeflate version 1.20. 
 
 =head1 DESCRIPTION
@@ -41,6 +41,12 @@ newly-written compression library which offers the same C<deflate>
 form of compression as zlib, as used in gzip, libpng and many similar
 utilities. This distribution includes libdeflate within itself, so it
 is not necessary to have that on your system.
+
+=head1 INSTALLATION
+
+An ISO C99 compiler is required. For example Gcc (Gnu Compiler
+Collection) version 4.9 or later, or Clang version 3.9 or later, are
+required. This restriction is imposed by libdeflate.
 
 =head1 METHODS
 

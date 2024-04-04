@@ -1,0 +1,32 @@
+Revision history for Stancer.
+
+1.0.3   2024-04-01
+
+- Better CI
+
+
+1.0.2   2024-04-01 (TRIAL RELEASE)
+
+- No real change, this is a test with `dzil release`
+
+
+1.0.1   2024-04-01 (TRIAL RELEASE)
+
+- Add missing `$Dispute::amount`
+- Fix currencies for SEPA
+- More perl critic configuration
+- Remove default timeout
+- Rewrite main package POD
+- Remove default timeout
+- Update dependencies
+- Remove needs to `Business::IBAN`
+- Remove needs to `Business::SWIFT`
+- Remove needs to `List::MoreUtils::one()`
+- Recover CI testing
+- Rewrite main package pod
+- Update dependencies
+
+
+1.0.0   2022-09-26
+
+- Initial release

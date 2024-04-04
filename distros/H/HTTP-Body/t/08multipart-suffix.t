@@ -19,6 +19,8 @@ use File::Temp qw/ tempdir /;
 my $path = catdir( getcwd(), 't', 'data', 'multipart' );
 
 {
+    $HTTP::Body::MultiPart::file_temp_suffix = undef;
+
     my $uploads = uploads_for('001');
 
 	{

@@ -72,7 +72,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.53';
+our $VERSION = '1.54';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -847,6 +847,19 @@ _SCRIPT_
         }
         return $handle;
     }
+}
+
+sub set_javascript {
+    my ( $self, $value ) = @_;
+    my $pref_name = 'javascript.enabled';
+    if ( defined $value ) {
+        $self->set_pref( $pref_name,
+            $self->_translate_to_json_boolean( $value ? 1 : 0 ) );
+    }
+    else {
+        $self->clear_pref($pref_name);
+    }
+    return $self;
 }
 
 sub downloaded {
@@ -1695,6 +1708,17 @@ _JS_
         Firefox::Marionette::Exception->throw('Incorrect Primary Password');
     }
     return $self;
+}
+
+sub arch {
+    my ($self) = @_;
+    my $old    = $self->_context('chrome');
+    my $arch   = $self->script(<<'_JS_');
+return Services.appinfo.XPCOMABI;
+_JS_
+    $arch =~ s/\-.*+$//smx;    # stripping suffixes like x86_64-gcc3
+    $self->_context($old);
+    return $arch;
 }
 
 sub _bookmark_interface_preamble {
@@ -12076,7 +12100,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.53
+Version 1.54
 
 =head1 SYNOPSIS
 
@@ -12405,6 +12429,8 @@ In addition, this method will accept a hash of values as parameters as well.  Wh
 
 =item * version - A specific version of firefox, such as 120.
 
+=item * arch - A specific version of the architecture, such as "x86_64" or "aarch64" or "s390x".
+
 =item * increment - A specific offset from the actual version of firefox, such as -5
 
 =back
@@ -12419,6 +12445,10 @@ These parameters can be used to set a user agent string like so;
 
     # user agent is now equal to
     # Mozilla/5.0 (X11; FreeBSD amd64; rv:109.0) Gecko/20100101 Firefox/118.0
+
+    $firefox->agent(os => 'linux', arch => 's390x', version => 115);
+    # user agent is now equal to
+    # Mozilla/5.0 (X11; Linux s390x; rv:109.0) Gecko/20100101 Firefox/115.0
 
 If the C<stealth> parameter has supplied to the L<new|/new> method, it will also attempt to change a number of javascript attributes to match the desired browser.  The following websites have been very useful in testing these ideas;
 
@@ -12445,6 +12475,10 @@ This method returns true or false depending on if the Firefox process is still r
 =head2 application_type
 
 returns the application type for the Marionette protocol.  Should be 'gecko'.
+
+=head2 arch
+
+returns the architecture of the machine running firefox.  Should be something like 'x86_64' or 'arm'.  This is only intended for test suite support.
 
 =head2 aria_label
 
@@ -14247,6 +14281,10 @@ accepts a L<element|Firefox::Marionette::Element> as the first parameter and L<s
 =head2 send_alert_text
 
 sends keys to the input field of a currently displayed modal message box
+
+=head2 set_javascript
+
+accepts a parameter for the the profile preference value of L<javascript.enabled|https://support.mozilla.org/en-US/kb/javascript-settings-for-interactive-web-pages#w_for-advanced-users>.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 set_pref
 

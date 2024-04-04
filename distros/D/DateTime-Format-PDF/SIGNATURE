@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 47546c2ab51dcac0d6e697de20c9b02c2a77c30c3b3fb186ad533d4cbd9dc068 Changes
+SHA256 e9721661dbfb60dadebf3cd197cbc00239895aa73fb3431e19490cfad301cf99 LICENSE
+SHA256 5233fbb02173f3a0ad6b2663b87995800f8a25f34c9a90749670e4349e7b7b0c MANIFEST
+SHA256 c5f41cb4c3e2974614148ce00e6c9912eda1a0f95888cc3d7360a5daee68e201 META.yml
+SHA256 f7eaa101d864e716ada8530b520fd28b9ffce0663ec4aabe22e7c61650c016b4 Makefile.PL
+SHA256 50e6d258f91e6255eb27cdd7754037f659ae790a6890850dabfcce38fee632d9 PDF.pm
+SHA256 32a29b27135df6a0f29054eacfc4628746e286a8204326ee492e89b62808632e README
+SHA256 1ea9edb9f2f61c54a7ddf42102d711d0fac9fc274a5c44f63a54d76cf25900c9 examples/format_pdf_string.pl
+SHA256 5f9348bc9755c78b57dab40306fbf3632346f6c28947fcf20cd4ee4896845be3 examples/parse_pdf_string.pl
+SHA256 f23f6798cfc3f9c50fe74359f214964cd4cc5dd36e0ae1e12038584cfbc9bc2b examples/read_dates_from_pdf_api2.pl
+SHA256 55eb25489092526b7b7d2cbb9d1ec04644343ab0d896e6736da885c98285347d examples/read_dates_from_pdf_builder.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 5d51ac8472b99732fdf88fd7348d712946df1b48be830f0c0e3bdc296d32b1a8 t/DateTime-Format-PDF/01-use.t
+SHA256 b7d7b1337bf48b7c5aa0c41bef5ac7c5684202bb0eb4a1080c5e42b87249ea97 t/DateTime-Format-PDF/02-version.t
+SHA256 0bfc781dff1ddbcaf42bfe100af5b0660ad0907ae5135c6e549e62d87a881540 t/DateTime-Format-PDF/03-new.t
+SHA256 8fe6839c73ffb8ab142c24d76dede9789e9c905be4f4db21c6ff498d17870800 t/DateTime-Format-PDF/04-format_datetime.t
+SHA256 8230a5b00707b5e67c3a392b1ba40318df7a135673c322d7ed43e1a72f5e922f t/DateTime-Format-PDF/05-parse_datetime.t
+SHA256 57beeba2a21353203c61c4750e6b4e9c616dc9cc3bc5c1d1453b015942f91be0 xt/DateTime-Format-PDF/01-pod_coverage.t
+SHA256 c23f51817c6784c8b7ae83bd91e3eb3035887111c5af106ad3a2d0e2c4660987 xt/DateTime-Format-PDF/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEbhzVZugfHqSVNvE7YSp92FNcjtAFAmYLFEkACgkQYSp92FNc
+jtC2lwwAwdUNBR3jsGrK77cWUj4wLfAPTiE52ehrY3ekqRaoVZoYsW8SEYxk2qo4
+RbVz9QBZfhxCxJie6T2UL9Yp9wqR072Plp8UVy+FWz2zBPuJjDxzje1TxX4TNW0p
+R/yEa35KHtdVOtYlkL3b+7UUpot81Hvxs5/QlF5J/g4CuOR8Yu6GAbi3UOAjQ9hI
+b6nrvY48/M7C5cGDDMT5ddwaPxN5YGs3m1Dmz0Dh922VObI3MG3zZxadSy3nw/CZ
+hcAc1RXhhe6fVcamCmb4morBRebrQgN2sZnx1gTvtME3QyC5tIKSRBh9IpMZk4iv
+0ISKuf1o1ZHqZVBu8zUOuHzGkqUJnOq2lOGyLZIYJVCeLGawMH1uMpyJsjvCiV8A
+TfcMIb+Mzc8nhV0T8KRH3ZnC8vHxvEiJdEbNEtYp96b4se+OYOHvv/hqJ5VF7A0R
+wtGvrrUQFoErwZSjFsfEd4RlkXCkwIejvzGmr7xk8duC/u3N5pQClZIVENCBtnBF
+Swy8FkDs
+=wOkr
+-----END PGP SIGNATURE-----

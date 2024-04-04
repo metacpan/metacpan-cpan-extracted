@@ -5,7 +5,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.14'; # VERSION
+our $VERSION = '1.15'; # VERSION
 
 use DBI 1.40;
 use parent 'DBI';
@@ -14,8 +14,6 @@ use parent 'DBI';
     no warnings 'once';
     *errstr = \*DBI::errstr;
 }
-
-our $_dq_parser_cache = {};
 
 sub _connect {
     my ( $self, $dsn, $user, $pass, $attr, $connect ) = @_;
@@ -95,13 +93,19 @@ sub connect_uncached {
         my $dialect = ( ref $connection eq 'HASH' and ref $connection->{attr} eq 'HASH' )
             ? $connection->{attr}{dq_dialect}
             : undef;
-        $dialect ||= 'ANSI';
 
-        $self->_param(
-            'sql_parser' => SQL::Parser->new(
-                $dialect, { 'RaiseError' => 0, 'PrintError' => 0 }
-            )
+        my $sql_parser = SQL::Parser->new(
+            ( $dialect || 'ANSI' ),
+            { 'RaiseError' => 0, 'PrintError' => 0 },
         );
+
+        unless ($dialect) {
+            $sql_parser->feature( 'reserved_words', $_, 0 )
+                for ( keys %{ $sql_parser->{opts}{reserved_words} } );
+        }
+
+        $self->_param( 'sql_parser'       => $sql_parser );
+        $self->_param( '_dq_parser_cache' => {} );
 
         return;
     }
@@ -240,6 +244,10 @@ sub connect_uncached {
         return $self;
     }
 
+    sub abstract {
+        return $_[0]->_param('sql_abstract');
+    }
+
     sub get_run {
         my $self = shift;
         my $sth = $self->get(@_);
@@ -326,7 +334,7 @@ sub connect_uncached {
     package DBIx::Query::st;
     use strict;
     use warnings;
-    use Carp 'croak';
+    use Carp qw( croak carp );
 
     use vars '@ISA';
     @ISA = qw( DBI::st DBIx::Query::_Common );
@@ -365,22 +373,24 @@ sub connect_uncached {
     sub structure {
         my $self = shift;
 
-        my $structure = $self->_param('structure');
-
-        return $structure if ($structure);
+        my $saved_structure = $self->_param('structure');
+        return $saved_structure if ($saved_structure);
         return if ( $self->_param('no_structure') );
 
-        my $sql = $self->_param('sql');
+        my $sql             = $self->_param('sql');
+        my $dq_parser_cache = $self->_param('dq')->_param('_dq_parser_cache');
 
-        $DBIx::Query::_dq_parser_cache->{$sql} ||= $self->_param('dq')->_param('sql_parser')->structure if (
-            not $DBIx::Query::_dq_parser_cache->{$sql} and
-            $self->_param('dq')->_param('sql_parser')->parse($sql)
-        );
+        unless ( $dq_parser_cache->{$sql} ) {
+            $self->_param('dq')->_param('sql_parser')->parse($sql);
+            my $parsed_structure = $self->_param('dq')->_param('sql_parser')->structure;
+            $dq_parser_cache->{$sql} = $parsed_structure;
+            carp $parsed_structure->{'errstr'} if ( $parsed_structure->{errstr} );
+        }
 
         $self->_param( 'wildcard_column' => 0 );
 
-        if ( $DBIx::Query::_dq_parser_cache->{$sql} ) {
-            my $structure    = $DBIx::Query::_dq_parser_cache->{$sql};
+        if ( $dq_parser_cache->{$sql} ) {
+            my $structure    = $dq_parser_cache->{$sql};
             my $column_index = 0;
             my %aliases;
 
@@ -458,7 +468,6 @@ sub connect_uncached {
             if ( my $row = $self->{'sth'}->$method ) {
                 $value = DBIx::Query::_Dq::Row->new( $row, $self );
             }
-
         } );
 
         return $value if ($value);
@@ -726,7 +735,7 @@ DBIx::Query - Simplified abstracted chained DBI subclass
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =for markdown [![test](https://github.com/gryphonshafer/DBIx-Query/workflows/test/badge.svg)](https://github.com/gryphonshafer/DBIx-Query/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/DBIx-Query/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/DBIx-Query)
@@ -878,7 +887,8 @@ parse.
     );
 
 For more information, see L<SQL::Parser> documentation on dialect. If not
-specified, DBIx::Query defaults to the "ANSI" dialect.
+specified, DBIx::Query defaults to a pseudo "ANSI" dialect, which is: the "ANSI"
+dialect with all reserved words removed.
 
 =head2 connect_uncached
 
@@ -1024,6 +1034,10 @@ for the update.
 If the cache type definition is C<undef>, then DBIx::Query will set it to 3.
 (See L<DBI> for details of what the 1, 2, and 3 level caching means.) If you'd
 prefer no caching, you can set cache type to -1 or use C<sql_uncached>.
+
+=head2 abstract
+
+Return the L<SQL::Abstract::Complete> object used in the database object.
 
 =head1 DATABASE CLASS HELPER METHODS
 

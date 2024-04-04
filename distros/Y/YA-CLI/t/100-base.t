@@ -15,7 +15,8 @@ my @usage_tests = (
         args => [],
         cmp  => {
             '-exitval' => 1,
-            '-verbose' => 1,
+            '-verbose' => 99,
+            '-sections' => 'NAME|SYNOPSIS|COMMANDS|OPTIONS',
         },
         name => 'no args, just help',
     },
@@ -23,7 +24,8 @@ my @usage_tests = (
         args => [qw(--help)],
         cmp  => {
             '-exitval' => 0,
-            '-verbose' => 1,
+            '-verbose' => 99,
+            '-sections' => ignore(),
         },
         name => '--help: so no exitval',
     },
@@ -47,7 +49,8 @@ my @usage_tests = (
         args => [qw(--youcanbereal)],
         cmp  => {
             '-exitval' => 1,
-            '-verbose' => 1,
+            '-verbose' => 99,
+            '-sections' => ignore(),
         },
         warns => ["Unknown option: youcanbereal\n"],
         name => '--youcanbereal: pass though',
@@ -56,7 +59,8 @@ my @usage_tests = (
         args => [qw(xx)],
         cmp  => {
             '-exitval' => 1,
-            '-verbose' => 1,
+            '-verbose' => 99,
+            '-sections' => ignore(),
             '-message' => 'xx command does not exist!'
         },
         name => 'xx command does not exist: usage'
@@ -65,7 +69,8 @@ my @usage_tests = (
         args => [qw(xx --foo)],
         cmp  => {
             '-exitval' => 1,
-            '-verbose' => 1,
+            '-verbose' => 99,
+            '-sections' => ignore(),
             '-message' => 'xx command does not exist!'
         },
         name => 'xx command does not exist: usage'
@@ -74,7 +79,8 @@ my @usage_tests = (
         args => [qw(main --foo)],
         cmp  => {
             '-exitval' => 1,
-            '-verbose' => 1,
+            '-verbose' => 99,
+            '-sections' => ignore(),
         },
         warns => ["Unknown option: foo\n"],
         name => "Invalid CLI options for main command"
@@ -83,7 +89,8 @@ my @usage_tests = (
         args => [qw(something --help)],
         cmp  => {
             '-exitval' => 0,
-            '-verbose' => 1,
+            '-verbose' => 99,
+            '-sections' => ignore(),
             '-input'   => 'pod_where called',
         },
         name => "something --help displays the help of the file",

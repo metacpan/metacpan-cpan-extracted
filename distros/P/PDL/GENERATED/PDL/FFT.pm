@@ -101,6 +101,7 @@ and so may not be installed.
 =cut
 #line 103 "FFT.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -237,7 +238,7 @@ sub PDL::ifft {
 
 
 
-#line 185 "fft.pd"
+#line 184 "fft.pd"
 
 use Carp;
 use PDL::Core qw/:Func/;
@@ -345,8 +346,8 @@ sub PDL::fftnd {
     $i = $i->copy;
     foreach (0..$n) {
       fft($r,$i);
-      $r = $r->mv(0,$n);
-      $i = $i->mv(0,$n);
+      $r = $r->mv(0,$n) if 0 != $n;
+      $i = $i->mv(0,$n) if 0 != $n;
     }
     if (!$_[0]->type->real) {
 	$_[0]= czip($r, $i);
@@ -388,8 +389,8 @@ sub PDL::ifftnd {
     $n--;
     foreach (0..$n) {
       ifft($r,$i);
-      $r = $r->mv(0,$n);
-      $i = $i->mv(0,$n);
+      $r = $r->mv(0,$n) if 0 != $n;
+      $i = $i->mv(0,$n) if 0 != $n;
     }
     if (!$_[0]->type->real) {
 	$_[0]= czip($r, $i);
@@ -440,7 +441,8 @@ sub PDL::fftconvolve {
     @_;
 }
 
-#line 388 "fft.pd"
+#line 387 "fft.pd"
+
 =head1 BUGS
 
 Where the source is marked `FIX', could re-implement using phase-shift
@@ -458,7 +460,7 @@ COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.
 
 =cut
-#line 462 "FFT.pm"
+#line 464 "FFT.pm"
 
 # Exit with OK status
 

@@ -146,13 +146,26 @@ sub __module_version {
 
 my %core = map { $_ => 1 } qw{ Time::HiRes };
 
-sub optionals {
-    # As of Test::Builder 1.302190 (March 2 2022) Time::HiRes is needed
-    # by Test::Builder, which is used by Test::More. It's a core module,
-    # so it OUGHT to be available, though there are known downstream
-    # packagers who strip core modules. Sigh. This is the reason I'm
-    # stripping it here rather than removing it completely.
-    return ( grep { ! $core{$_} } map { $_->modules() } @optionals );
+sub optional_modules {
+    my ( undef, %arg ) = @_;
+    defined $arg{core}
+	or $arg{core} = 1;
+    my %rslt;
+    foreach my $opt ( @optionals ) {
+	foreach my $m ( $opt->__modules() ) {
+	    if ( ! $core{$m->[0]} || $arg{core} ) {
+		$rslt{$m->[0]} = $m->[1] || 0;
+	    }
+	}
+    }
+    return \%rslt;
+}
+
+sub optional_modules_to_hide {
+    my ( $invocant, %arg ) = @_;
+    defined $arg{core}
+	or $arg{core} = 0;
+    return ( sort keys %{ $invocant->optional_modules( %arg ) } );
 }
 
 sub recommend {
@@ -208,6 +221,40 @@ This class supports the following public methods:
 
 This static method simply returns the names of the optional modules.
 
+=head2 optional_modules
+
+ my $hash_ref = My::Module::Recommend->optional_modules();
+
+This static method returns a reference to a hash describing the optional
+modules. The key is the module name, and the value is the required
+version, with C<0> indicating no requirement.
+
+You can specify named arguments in the usual syntax. The following
+arguments are supported:
+
+=over
+
+=item C<core>
+
+If this Boolean argument is true, the return includes optional core
+modules. Otherwise optional core modules are not returned.
+
+The default is C<1> (i.e. true).
+
+=back
+
+=head2 optional_modules_to_hide
+
+ say for My::Module::Recommend->optional_modules_to_hide();
+
+This convenience wrapper for L<optional_modules()|/optional_modules>
+takes the same arguments, and returns the names of the optional modules
+in lexicographic order.
+
+Because the intended use of this method is in hiding installed modules
+for testing purposes, the default value of the C<core> argument is C<0>,
+i.e. false.
+
 =head2 recommend
 
  My::Module::Recommend->recommend();
@@ -230,7 +277,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2023 by Thomas R. Wyant, III
+Copyright (C) 2010-2024 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

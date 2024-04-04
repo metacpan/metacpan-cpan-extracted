@@ -5,3 +5,62 @@ Revision history for Rope
 
 0.08    2024-02-06
 	Set minimum perl version 5.18.
+
+0.11    2024-03-28
+	Ensure any passed index takes precedents over the auto generated index
+
+0.12    2024-03-29
+	Expose the locking functonality via the locked keyword.
+
+0.13    2024-03-29
+	- Fix scoping to achieve this you now have to explicity call ->destroy, especially under a long running process like a daemon or web service
+	- Add triggers that are called on setting and deletiong of a value
+
+0.14    2024-03-29
+	- Adds delete_trigger which allows you to explicitly set a trigger just when deleting, this removes the need for conditional code (is it a set or delete) when using triggers.
+
+0.15    2024-03-29
+	- Adds get_initialised function which can be called on Rope to retrieve an already initialised object by index.
+	- Adds before, around and after keywords which can be chained and work for all properties/functions, not traditional subs currently because they are effectively 'hidden' to Rope.
+
+0.16    2024-03-29
+	- Fix before, around and after to only work on readonly functions (properties that have a value as a code ref), to prevent unexpected behaviour.
+
+0.17    2024-03-29
+	- Adds get_meta to return the objects definition
+	- Adds Rope::Monkey which takes the monkey patch approach to achieve autoloading, each for their own.
+
+0.18    2024-03-30
+	- Extends CONFIGURE PROPERTIES with a private key that allows you to make properties private.
+
+0.19    2024-03-30
+	- get_meta now returns a readonly definition
+	- Fix private to work with roles and inheritance via extends.
+
+0.20    2024-03-30
+	- Adds clear_meta and set_meta on Rope so that you can manipulate an Objects meta definition
+	- Extends CONFIGURE PROPERTIES with predicates and clearers
+
+0.21    2024-03-30
+	- Fix a bug with after hooks that were always getting set as before, also fix the order that they are called
+	- Adds factory properties via Rope::Factory
+	- Adds chained properties via Rope::Chained
+
+0.22    2024-03-30
+	- Update Factory::Sub dependency.
+	- Fix Rope::Factory to have $self as the first param
+	- Ensure Chained Factories and Factory Chaines work example in Rope docs and some tests in t/
+
+0.23    2024-03-30
+	- Update Factory::Sub dependency.
+	- Add support for default factory callbacks
+	- Add tests for chaining into a factory into a chain into a factory... extended some syntax to achieve this.
+
+0.24    2024-03-30
+	- Clean up Rope::Chain
+	- Adds conditional properties via Rope::Conditional
+
+0.25	2024-04-03
+	- Adds from_data which allows you to instantiate a Rope object from a perl hash.
+	- Adds from_nested_data which allows you to instantiate a Rope object from a perl nested hash.
+

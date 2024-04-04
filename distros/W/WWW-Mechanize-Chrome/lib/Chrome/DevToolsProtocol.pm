@@ -18,7 +18,7 @@ use URI;
 
 with 'MooX::Role::EventEmitter';
 
-our $VERSION = '0.72';
+our $VERSION = '0.73';
 our @CARP_NOT;
 
 =head1 NAME
@@ -929,7 +929,7 @@ use Carp 'croak';
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.72';
+our $VERSION = '0.73';
 
 has 'protocol' => (
     is => 'ro',
@@ -994,7 +994,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2023 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2024 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

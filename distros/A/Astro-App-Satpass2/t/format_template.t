@@ -5,19 +5,19 @@ use 5.008;
 use strict;
 use warnings;
 
-use Test::More 0.88;
-
-use lib qw{ inc };
-use My::Module::Test::App;	# For environment clean-up.
-use My::Module::Test::Mock_App;
-
+use Test2::V0;
 use Astro::App::Satpass2::Format::Template;
-
 use Astro::Coord::ECI 0.077;
 use Astro::Coord::ECI::Moon 0.077;
 use Astro::Coord::ECI::Sun 0.077;
 use Astro::Coord::ECI::TLE 0.077 qw{ :constants };
 use Astro::Coord::ECI::Utils 0.112 qw{ deg2rad greg_time_gm };
+use Cwd ();
+use Time::Local;
+
+use lib qw{ inc };
+
+use My::Module::Test::App;	# For environment clean-up.
 
 {
     local $@ = undef;
@@ -29,13 +29,11 @@ use Astro::Coord::ECI::Utils 0.112 qw{ deg2rad greg_time_gm };
     } || 0;
 }
 
-use Cwd ();
-use Time::Local;
-
 use constant APRIL_FOOL_2023	=> greg_time_gm( 0, 0, 0, 1, 3, 2023 );
 use constant FORMAT_VALUE	=> 'Astro::App::Satpass2::FormatValue';
 
-my $app = My::Module::Test::Mock_App->new();
+my $mocker = setup_app_mocker;
+my $app = Astro::App::Satpass2->new();
 
 my $sta = Astro::Coord::ECI->new()->geodetic(
     deg2rad( 38.898748 ),
@@ -68,7 +66,7 @@ my $ft = Astro::App::Satpass2::Format::Template->new(
 # Encapsulation violation. The _uniq() subroutine may be moved or
 # retracted without notice of any kind.
 
-is_deeply
+is
     [ Astro::App::Satpass2::Format::Template::_uniq(
 	    qw{ Able was I ere I saw Elba } ) ],
     [ qw{ Able was I ere saw Elba } ],

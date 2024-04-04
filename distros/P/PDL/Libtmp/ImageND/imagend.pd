@@ -125,18 +125,15 @@ it runs faster and handles a variety of boundary conditions.
 EOD
         Pars => 'a(m); b(n); indx adims(p); indx bdims(q); [o]c(m);',
         PMCode => '
-
-# Custom Perl wrapper
-
-sub PDL::convolve{
+sub PDL::convolve {
     my($x,$y,$c) = @_;
     barf("Usage: convolve(a(*), b(*), [o]c(*)") if $#_<1 || $#_>2;
     $c = PDL->null if $#_<2;
-    &PDL::_convolve_int( $x->clump(-1), $y->clump(-1),
-       long([$x->dims]), long([$y->dims]),
-       ($c->getndims>1? $c->clump(-1) : $c)
-     );
-     $c->setdims([$x->dims]);
+    PDL::_convolve_int( $x->flat, $y->flat,
+       $x->shape, $y->shape,
+       $c->isnull ? $c : $c->flat,
+    );
+    $c->setdims([$x->dims]);
 
     if($x->is_inplace) {
       $x .= $c;
@@ -145,7 +142,6 @@ sub PDL::convolve{
     }
     return $c;
 }
-
 ',
         Code => '
    PDL_Indx *dimsa = $P(adims);
@@ -156,7 +152,7 @@ sub PDL::convolve{
    PDL_Indx bnvals = $SIZE(n);
    double cc;
 
-   PDL_Indx i,i2,j,k,n,offcen,cen,ncen,nrow;
+   PDL_Indx i,i2,j,k,n,offcen=0,ncen=0,nrow;
 
    if (andims != bndims)
       $CROAK("Arguments do not have the same dimensionality");
@@ -171,15 +167,13 @@ sub PDL::convolve{
 
    /* Find middle pixel in b */
    i=0; nrow = dimsb[0];
-   while(i<bnvals) {
+   while (i<bnvals) {
       for (j=0; j<nrow; j++) { /* For each row */
-           pos[0]=j;
-
-           for(k=0;k<bndims;k++) {       /* Is centre? */
-               if (pos[k] != dimsb[k]/2)
-                   goto getout_$GENERIC();
-           }
-           ncen = i;
+         pos[0]=j;
+         for (k=0; k < bndims; k++) {       /* Is centre? */
+            if (pos[k] != dimsb[k]/2) goto getout_$GENERIC();
+         }
+         ncen = i;
 getout_$GENERIC():    i++;
       }
       pos[0]=0;
@@ -298,10 +292,7 @@ instead.  PDL::Transform::map runs slower but is more flexible.
 EOD
         Pars => 'a(m); [o]b(n);',
         OtherPars => 'int ns => n',
-        PMCode => '
-
-# Custom Perl wrapper
-
+        PMCode => pp_line_numbers(__LINE__, <<'EOF'),
 sub PDL::rebin {
     my($x) = shift;
     my($opts) = ref $_[-1] eq "HASH" ? pop : {};
@@ -317,10 +308,10 @@ sub PDL::rebin {
       } elsif ($odims[$i] != $idims[$i]) {       # If something changes
          if (!($odims[$i] % $idims[$i])) {      # Cells map 1 -> n
                my ($r) = $odims[$i]/$idims[$i];
-               $y = $x->mv($i,0)->dupN($r);
+               $y = ($i==0 ? $x : $x->mv($i,0))->dupN($r);
          } elsif (!($idims[$i] % $odims[$i])) { # Cells map n -> 1
                my ($r) = $idims[$i]/$odims[$i];
-               $x = $x->mv($i,0);
+               $x = $x->mv($i,0) if $i != 0;
                # -> copy so won\'t corrupt input PDL
                $y = $x->slice("0:-1:$r")->copy;
                foreach (1..$r-1) {
@@ -328,7 +319,7 @@ sub PDL::rebin {
                }
                $y /= $r;
          } else {                               # Cells map n -> m
-             &PDL::_rebin_int($x->mv($i,0), $y = null, $odims[$i]);
+             &PDL::_rebin_int(($i==0 ? $x : $x->mv($i,0)), $y = null, $odims[$i]);
          }
          $x = $y->mv(0,$i);
       }
@@ -349,7 +340,7 @@ sub PDL::rebin {
       return $x -> copy;
     }
 }
-',
+EOF
         Code => '
         int ms = $SIZE(m);
         int nv = $COMP(ns);
@@ -397,15 +388,16 @@ sub circ_mean_p {
  my ($rad,$sum,$norm);
 
  if (defined $opt) {
-   $rad = long PDL::rvals($x,$opt);
+   $rad = indx PDL::rvals($x,$opt);
  }
  else {
-   $rad = long rvals $x;
+   $rad = indx rvals $x;
  }
- $sum = zeroes($rad->max+1);
- PDL::indadd $x->clump(-1), $rad->clump(-1), $sum; # this does the real work
- $norm = zeroes($rad->max+1);
- PDL::indadd pdl(1), $rad->clump(-1), $norm;       # equivalent to get norm
+ my $max1 = $rad->max->sclr+1;
+ $sum = zeroes($max1);
+ PDL::indadd $x->flat, $rad->flat, $sum; # this does the real work
+ $norm = zeroes($max1);
+ PDL::indadd pdl(1), $rad->flat, $norm;       # equivalent to get norm
  $sum /= $norm;
  return $sum;
 }
@@ -430,18 +422,19 @@ sub circ_mean {
  my ($rad,$sum,$norm,$a1);
 
  if (defined $opt) {
-   $rad = long PDL::rvals($x,$opt);
+   $rad = indx PDL::rvals($x,$opt);
  }
  else {
-   $rad = long rvals $x;
+   $rad = indx rvals $x;
  }
- $sum = zeroes($rad->max+1);
- PDL::indadd $x->clump(-1), $rad->clump(-1), $sum; # this does the real work
- $norm = zeroes($rad->max+1);
- PDL::indadd pdl(1), $rad->clump(-1), $norm;       # equivalent to get norm
+ my $max1 = $rad->max->sclr+1;
+ $sum = zeroes($max1);
+ PDL::indadd $x->flat, $rad->flat, $sum; # this does the real work
+ $norm = zeroes($max1);
+ PDL::indadd pdl(1), $rad->flat, $norm;       # equivalent to get norm
  $sum /= $norm;
- $a1 = $x->clump(-1);
- $a1 .= $sum->index($rad->clump(-1));
+ $a1 = $x->flat;
+ $a1 .= $sum->index($rad->flat);
 
  return $x;
 }
@@ -664,7 +657,7 @@ sub PDL::convolveND {
 
   ###
   # Pad the array to include boundary conditions
-  my $adims = pdl($x->dims);
+  my $adims = $x->shape;
   my $koff = ($kdims/2)->ceil - 1;
 
   my $aa = $x->range( -$koff, $adims + $kdims, $opt->{Boundary} )
@@ -678,10 +671,7 @@ sub PDL::convolveND {
     # FFT works best on doubles; do our work there then cast back
     # at the end.  
     $aa = double($aa);
-    my $aai = $aa->zeroes;
-
-    my $kk = $aa->zeroes;
-    my $kki = $aa->zeroes;
+    $_ = $aa->zeroes for my ($aai, $kk, $kki);
     my $tmp;  # work around new perl -d "feature"
     ($tmp = $kk->range( - ($kdims/2)->floor, $kdims, 'p')) .= $k;
     PDL::fftnd($kk, $kki);
@@ -731,7 +721,7 @@ Code => <<'EOD'
  *
  */
 
-  PDL_Indx i,j;
+  PDL_Indx i;
   pdl *k = $COMP(k), *a = $COMP(a), *aa = $COMP(aa);
   PDL_RETERROR(PDL_err, PDL->make_physical(aa));
   PDL_RETERROR(PDL_err, PDL->make_physical(a));
@@ -749,60 +739,42 @@ Code => <<'EOD'
   /* Fill up the koffs & kvals arrays */
   /* koffs gets relative offsets into aa for each kernel value; */
   /* kvals gets the kernel values in the same order (flattened) */
-  for(i=0;i<ndims;ivec[i++] = 0) ; 
   PDL_Indx *koff = koffs;
   $GENERIC() *kval = kvals;
-  j    = 0;                      /* j gets current aa data offset */
   $GENERIC() *aptr = ($GENERIC() *)k->data + k->nvals - 1;
 
+  for (i=0; i < ndims; i++) ivec[i] = 0;
+  PDL_Indx npdls = 2, incs[npdls*ndims], offs[npdls];
+  for (i=0; i < npdls; i++) offs[i] = 0;
+  for (i=0; i < ndims; i++) {
+    incs[i*npdls + 0] = k->dimincs[i];
+    incs[i*npdls + 1] = aa->dimincs[i];
+  }
   do {
-	PDL_Indx acc; 
-
-	*(kval++) = *aptr;     /* Copy kernel value into kernel list */
-
-	*(koff++) = j;	       /* Copy current aa offset into koffs list */
-
-	/* Advance k-vector */
-	for(i=0; 
-	      (i < ndims) && 
-	      (aptr -=  k->dimincs[i]) &&    /* Funky pre-test part of loop */
-	      (j    += aa->dimincs[i]) &&    /* Funky pre-test part of loop */
-	      (++(ivec[i]) >= k->dims[i]); 
-	    i++) {
-	  ivec[i] = 0;
-	  aptr +=  k->dimincs[i] *  k->dims[i];
-	  j    -= aa->dimincs[i] *  k->dims[i];
-        }
-  } while(i<ndims);
+    *kval++ = aptr[-offs[0]]; /* Copy kernel value into kernel list */
+    *koff++ = offs[1];	  /* Copy current aa offset into koffs list */
+    if (!pdl_broadcast_nd_step(npdls, offs, 0, ndims, incs, k->dims, ivec)) break;
+  } while (1);
 
   /******************************/
   /* Now do the actual convolution: for each vector in a,   */
   /* accumulate the appropriate aa-sum and stick it into a. */
-  for(i=0;i<ndims;ivec[i++] = 0) ;
+  for (i=0; i < ndims; i++) ivec[i] = 0;
   aptr  = a->data;
   $GENERIC() *aaptr = aa->data;
+  for (i=0; i < npdls; i++) offs[i] = 0;
+  for (i=0; i < ndims; i++) incs[i*npdls + 0] = a->dimincs[i]; /* got aa already */
   do {
-	$GENERIC() acc = 0;
-	koff = koffs;
-	kval = kvals;
-	for(i=0;i<k->nvals;i++)
-	  acc += aaptr[*(koff++)] * (*(kval++));
-	*aptr = acc;
-
-	/* Advance a-vector and aa-vector */
-        for(i=0;
-	        (i<ndims) &&
-		(aptr  +=  a->dimincs[i]) && /* Funky pre-test part of loop */
-	        (aaptr += aa->dimincs[i]) && /* Funky pre-test part of loop */
-                (++(ivec[i]) >= a->dims[i]);
-	    i++) {
-	    ivec[i] = 0;
-	    aptr  -=  a->dimincs[i] * ( a->dims[i]);
-	    aaptr -= aa->dimincs[i] * ( a->dims[i]); /* sic */
-	}
-  } while(i<ndims);
+    $GENERIC() acc = 0;
+    koff = koffs;
+    kval = kvals;
+    for (i=0;i<k->nvals;i++)
+      acc += aaptr[offs[1] + *koff++] * (*kval++);
+    aptr[offs[0]] = acc;
+    if (!pdl_broadcast_nd_step(npdls, offs, 0, ndims, incs, a->dims, ivec)) break;
+  } while (1);
 
 EOD
-);	  
+);
 
 pp_done();

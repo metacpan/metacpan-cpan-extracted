@@ -24,6 +24,7 @@ sub new {
        $handlebad, $sig,$generictypes,$extrageneric,$havebroadcasting,$name,
        $dont_add_brcloop, $backcode, $nulldatacheck) = @_;
     my $parnames = $sig->names_sorted;
+    $handlebad = !!$handlebad;
 
     die "Error: missing name argument to PDL::PP::Code->new call!\n"
       unless defined $name;
@@ -101,7 +102,7 @@ sub new {
     }
     amalgamate_sizeprivs(@sizeprivs) if @sizeprivs > 1;
     my $sizeprivs = $sizeprivs[0];
-    my $coderef = @coderefs > 1 ? PDL::PP::BadSwitch->new( @coderefs ) : $coderefs[0];
+    my $coderef = PDL::PP::BadSwitch->new( @coderefs );
     print "SIZEPRIVSX: ",(join ',',%$sizeprivs),"\n" if $::PP_VERBOSE;
 
     my $pobjs = $sig->objs;
@@ -109,6 +110,7 @@ sub new {
     print "SIZEPRIVS: ",(join ',',%$sizeprivs),"\n" if $::PP_VERBOSE;
     $this->{Code} = (join '',sort values %$sizeprivs).
        ($dont_add_brcloop?'':join '', map "$_\n",
+        'if (!$PRIV(broadcast).incs) $CROAK("broadcast.incs NULL");',
         'PDL_COMMENT("broadcastloop declarations")',
         'int __brcloopval;',
         'register PDL_Indx __tind0,__tind1; PDL_COMMENT("counters along dim")',
@@ -154,9 +156,9 @@ sub params_declare {
     my ($this) = @_;
     my ($ord,$pdls) = $this->get_pdls;
     my %istyped = map +($_=>1), grep $pdls->{$_}{FlagTypeOverride}, @$ord;
-    my @decls = map $_->get_xsdatapdecl($istyped{$_->name} ? "PDL_TYPE_PARAM_".$_->name : "PDL_TYPE_OP", $this->{NullDataCheck}),
+    my @decls = map $_->get_xsdatapdecl($istyped{$_->name} ? "PDL_TYPE_PARAM_".$_->name : "PDL_TYPE_OP", $this->{NullDataCheck}, $istyped{$_->name} ? "PDL_PPSYM_PARAM_".$_->name : "PDL_PPSYM_OP"),
       map $pdls->{$_}, @$ord;
-    my @param_names = ("PDL_TYPE_OP", map "PDL_TYPE_PARAM_$_", grep $istyped{$_}, @$ord);
+    my @param_names = ("PDL_TYPE_OP", "PDL_PPSYM_OP", map +("PDL_TYPE_PARAM_$_","PDL_PPSYM_PARAM_$_"), grep $istyped{$_}, @$ord);
     <<EOF;
 #ifndef PDL_DECLARE_PARAMS_$this->{Name}_$this->{NullDataCheck}
 #define PDL_DECLARE_PARAMS_$this->{Name}_$this->{NullDataCheck}(@{[join ',', @param_names]}) \\
@@ -203,13 +205,14 @@ sub sig {$_[0]->{Sig}}
 # This sub determines the index name for this index.
 # For example, a(x,y) and x0 becomes [x,x0]
 sub make_loopind { my($this,$ind) = @_;
+	($ind, my $initval) = split /\s*=\s*/, $ind;
 	my $orig = $ind;
 	while(!$this->{IndObjs}{$ind}) {
 		if(!((chop $ind) =~ /[0-9]/)) {
 			confess("Index not found for $_ ($ind)!\n");
 		}
 		}
-	return [$ind,$orig];
+	return [$ind,$orig,$initval//0];
 }
 
 my %access2class = (
@@ -285,14 +288,14 @@ sub expand {
     if($pdl =~ /^T/) {@add = PDL::PP::MacroAccess->new($pdl,$inds,
 			   $this->{Generictypes},$this->{Name});}
     elsif(my $c = $access2class{$pdl}) {@add = $c->new($pdl,$inds)}
-    elsif($pdl =~ /^(PP|)(ISBAD|ISGOOD|SETBAD)(VAR|)$/) {
+    elsif($pdl =~ /^(P|)(ISBAD|ISGOOD|SETBAD)(VAR|)$/) {
 	my ($opcode, $name) = ($2);
 	my $get = $1 || $3;
 	if (!$get) {
 	    $inds =~ s/^\$?([a-zA-Z_]\w*)\s*//; # $ is optional
 	    $name = $1;
 	    $inds = substr $inds, 1, -1; # chop off brackets
-	} elsif ($get eq 'PP') {
+	} elsif ($get eq 'P') {
 	    ($name, $inds) = PDL::PP::Rule::Substitute::split_cpp($inds);
 	} else {
 	    ($inds, $name) = PDL::PP::Rule::Substitute::split_cpp($inds);
@@ -408,7 +411,12 @@ sub new {
 sub get_str {
     my ($this,$parent,$context) = @_;
     my $good = $this->[0];
-    my $bad  = $this->[1];
+    my $good_str = <<EOF;
+#define PDL_IF_BAD(t,f) f
+@{[ $good->get_str($parent,$context)
+]}#undef PDL_IF_BAD
+EOF
+    return $good_str if !defined(my $bad  = $this->[1]);
     my $str = <<EOF;
 if ( \$PRIV(bvalflag) ) { PDL_COMMENT("** do 'bad' Code **")
   #define PDL_BAD_CODE
@@ -417,10 +425,8 @@ if ( \$PRIV(bvalflag) ) { PDL_COMMENT("** do 'bad' Code **")
 ]}  #undef PDL_BAD_CODE
   #undef PDL_IF_BAD
 } else { PDL_COMMENT("** else do 'good' Code **")
-  #define PDL_IF_BAD(t,f) f
-@{[ PDL::PP::indent 2, $good->get_str($parent,$context)
-]}  #undef PDL_IF_BAD
-}
+@{[ PDL::PP::indent 2, $good_str
+]}}
 EOF
 }
 
@@ -446,7 +452,7 @@ sub myprelude { my($this,$parent,$context) = @_;
 	push @$context, map {
 		my $i = $parent->make_loopind($_);
 # Used to be $PRIV(.._size) but now we have it in a register.
-		$text .= "{PDL_COMMENT(\"Open $_\") register PDL_Indx $_; for($_=0; $_<(__$i->[0]_size); $_++) {";
+		$text .= "{PDL_COMMENT(\"Open $_\") register PDL_Indx $i->[1]; for($i->[1]=$i->[2]; $i->[1]<(__$i->[0]_size); $i->[1]++) {";
 		$i;
 	} @{$this->[0]};
 	$text;
@@ -497,10 +503,13 @@ sub myitemstart {
     @$parent{qw(ftypes_type ftypes_vars)} = ($item, $this->[2]) if defined $this->[1];
     my ($ord,$pdls) = $parent->get_pdls;
     my %istyped = map +($_=>1), grep $pdls->{$_}{FlagTypeOverride}, @$ord;
-    my @param_ctypes = ($item->ctype, map $pdls->{$_}->adjusted_type($item)->ctype, grep $istyped{$_}, @$ord);
+    my @param_ctypes = ($item->ctype, $item->ppsym,
+      map +($pdls->{$_}->adjusted_type($item)->ctype,
+        $pdls->{$_}->adjusted_type($item)->ppsym),
+      grep $istyped{$_}, @$ord);
     my $decls = keys %{$this->[2]} == @$ord
       ? "PDL_DECLARE_PARAMS_$parent->{Name}_$parent->{NullDataCheck}(@{[join ',', @param_ctypes]})\n"
-      : join '', map $_->get_xsdatapdecl($_->adjusted_type($item)->ctype, $parent->{NullDataCheck}),
+      : join '', map $_->get_xsdatapdecl($_->adjusted_type($item)->ctype, $parent->{NullDataCheck}, $_->adjusted_type($item)->ppsym),
           map $parent->{ParObjs}{$_}, sort keys %{$this->[2]};
     my @gentype_decls = !$this->[4] ? () : map "#define PDL_IF_GENTYPE_".uc($_)."(t,f) ".
 	($item->$_ ? 't' : 'f')."\n",
@@ -624,7 +633,7 @@ sub new {
     bless [$opcode, $get, $name, $inds], $type;
 }
 
-sub _isbad { "PDL_ISBAD($_[0],$_[1],$_[2])" }
+sub _isbad { "PDL_ISBAD2($_[0],$_[1],$_[2],$_[3])" }
 our %ops = (
     ISBAD => \&_isbad,
     ISGOOD => sub {'!'.&_isbad},
@@ -632,7 +641,7 @@ our %ops = (
 );
 my %getters = (
     '' => sub {my ($obj, $inds, $context)=@_; $obj->do_access($inds,$context)},
-    PP => sub {my ($obj, $inds)=@_; $obj->do_physpointeraccess.$inds},
+    P => sub {my ($obj, $inds)=@_; $obj->do_pointeraccess.$inds},
     VAR => sub {my ($obj, $inds)=@_; $inds},
 );
 
@@ -652,7 +661,7 @@ sub get_str {
     my $type = exists $parent->{ftypes_vars}{$name}
 	? $parent->{ftypes_type}
 	: $obj->adjusted_type($parent->{Gencurtype}[-1]);
-    $op->($lhs, $rhs, $type->ppsym);
+    $op->($lhs, $rhs, $type->ppsym, $rhs."_isnan");
 }
 
 

@@ -1,0 +1,90 @@
+NAME
+    Mo::utils::TimeZone - Mo timezone utilities.
+
+SYNOPSIS
+     use Mo::utils::TimeZone qw(check_timezone_iana);
+
+     check_timezone_iana($self, $key);
+
+DESCRIPTION
+    Mo timezone utilities for checking of data objects.
+
+SUBROUTINES
+  "check_timezone_iana"
+     check_timezone_iana($self, $key);
+
+    Check parameter defined by $key if it's valid IANA timezone code. Value
+    could be undefined.
+
+    Returns undef.
+
+ERRORS
+     check_timezone_iana():
+             Parameter '%s' doesn't contain valid IANA timezone code.
+                     Value: %s
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Mo::utils::TimeZone qw(check_timezone_iana);
+
+     my $self = {
+             'key' => 'Europe/Prague',
+     };
+     check_timezone_iana($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::TimeZone qw(check_timezone_iana);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'BAD',
+     };
+     check_timezone_iana($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' doesn't contain valid IANA timezone code.
+
+DEPENDENCIES
+    DateTime::TimeZone, Error::Pure, Exporter, Readonly.
+
+SEE ALSO
+    Mo  Micro Objects. Mo is less.
+
+    Mo::utils
+        Mo utilities.
+
+    Wikibase::Datatype::Utils
+        Wikibase datatype utilities.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Mo-utils-TimeZone>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

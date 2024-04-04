@@ -21,6 +21,10 @@ no_index:
     - t
     - inc
 requires:
+  Coerce::Types::Standard: '0.000008'
+  Factory::Sub: '0.06'
+  Struct::Conditional: '1.01'
+  Want: '0'
   perl: '5.018'
-version: '0.08'
+version: '0.25'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,7 +3,7 @@
 #
 package PDL::Slices;
 
-our @EXPORT_OK = qw(index index1d index2d indexND indexNDb rangeb rld rle rlevec rldvec rleseq rldseq rleND rldND _clump_int xchg mv using diagonal lags splitdim rotate broadcastI unbroadcast dice dice_axis slice );
+our @EXPORT_OK = qw(index index1d index2d indexND indexNDb rangeb rld rle rlevec rldvec rleseq rldseq rleND rldND _clump_int xchg mv using lags splitdim rotate broadcastI unbroadcast dice dice_axis slice diagonal );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -87,6 +87,7 @@ use warnings;
 use PDL::Core ':Internal';
 use Scalar::Util 'blessed';
 #line 90 "Slices.pm"
+
 
 =head1 FUNCTIONS
 
@@ -348,7 +349,7 @@ index2d barfs if either of the index values are bad.
 
 
 
-#line 241 "slices.pd"
+#line 231 "slices.pd"
 
 =head2 indexNDb
 
@@ -399,7 +400,7 @@ sub PDL::indexND {
 
 *PDL::indexNDb = \&PDL::indexND;
 
-#line 293 "slices.pd"
+#line 283 "slices.pd"
 sub PDL::range {
   my($source,$ind,$sz,$bound) = @_;
 
@@ -436,7 +437,8 @@ sub PDL::range {
   no warnings; # shut up about passing undef into rangeb
   $source->rangeb($index,$size,$bound);
 }
-#line 440 "Slices.pm"
+#line 441 "Slices.pm"
+
 
 =head2 rangeb
 
@@ -551,6 +553,10 @@ throws an error, and all other dimensions get truncated.
 If you feed in a single string, it is interpreted as a packed boundary
 array if all of its characters are valid boundary specifiers (e.g. 'pet'),
 but as a single word-style specifier if they are not (e.g. 'forbid').
+
+Where the source PDL is empty, all non-barfing boundary conditions
+are changed to truncation, since there is no data to reflect, extend,
+or mirror.
 
 B<OUTPUT>
 
@@ -723,7 +729,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (indx a(n); b(n); [o]c(m))
+  Signature: (indx a(n); b(n); [o]c(m); IV sumover_max => m)
 
 =for ref
 
@@ -747,23 +753,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1045 "slices.pd"
+#line 1041 "slices.pd"
 sub PDL::rld {
   my ($x,$y) = @_;
-  my ($c);
-  if ($#_ == 2) {
-    $c = $_[2];
-  } else {
-# XXX Need to improve emulation of broadcasting in auto-generating c
-    my ($size) = $x->sumover->max->sclr;
-    my (@dims) = $x->dims;
-    shift @dims;
-    $c = $y->zeroes($size,@dims);
-  }
-  &PDL::_rld_int($x,$y,$c);
+  my ($c,$sm) = @_ == 3 ? ($_[2], $_[2]->dim(0)) : (PDL->null, $x->sumover->max->sclr);
+  PDL::_rld_int($x,$y,$c,$sm);
   $c;
 }
-#line 767 "Slices.pm"
+#line 764 "Slices.pm"
 
 *rld = \&PDL::rld;
 
@@ -826,7 +823,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1096 "slices.pd"
+#line 1083 "slices.pd"
 sub PDL::rle {
   my $c = shift;
   my ($x,$y) = @_==2 ? @_ : (null,null);
@@ -835,7 +832,7 @@ sub PDL::rle {
                                 ($x!=0)->clump(1..$x->ndims-1)->sumover->max->sclr-1;
   return ($x->slice("0:$max_ind"),$y->slice("0:$max_ind"));
 }
-#line 839 "Slices.pm"
+#line 836 "Slices.pm"
 
 *rle = \&PDL::rle;
 
@@ -889,13 +886,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (indx a(N); b(M,N); [o]c(M,N))
+  Signature: (indx a(uniqvals); b(M,uniqvals); [o]c(M,decodedvals); IV sumover_max => decodedvals)
 
 =for ref
 
 Run-length decode a set of vectors, akin to a higher-order rld().
 
-Given a vector $a() of the number of occurrences of each row, and a set $c()
+Given a vector $a() of the number of occurrences of each row, and a set $b()
 of row-vectors each of length $M, run-length decode to $c().
 
 Can be used together with clump() to run-length decode "values" of arbitrary dimensions.
@@ -914,20 +911,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1221 "slices.pd"
+#line 1209 "slices.pd"
 sub PDL::rldvec {
   my ($a,$b,$c) = @_;
-  if (!defined($c)) {
-# XXX Need to improve emulation of threading in auto-generating c
-    my ($rowlen) = $b->dim(0);
-    my ($size) = $a->sumover->max;
-    my (undef, @dims) = $a->dims;
-    $c = $b->zeroes($b->type,$rowlen,$size,@dims);
-  }
-  &PDL::_rldvec_int($a,$b,$c);
+  ($c,my $sm) = defined($c) ? ($c,$c->dim(1)) : (PDL->null,$a->sumover->max->sclr);
+  PDL::_rldvec_int($a,$b,$c,$sm);
   return $c;
 }
-#line 931 "Slices.pm"
+#line 922 "Slices.pm"
 
 *rldvec = \&PDL::rldvec;
 
@@ -975,7 +966,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (indx a(N); b(N); [o]c(M))
+  Signature: (indx a(N); b(N); [o]c(M); IV sumover_max => M)
 
 =for ref
 
@@ -1003,18 +994,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1299 "slices.pd"
+#line 1282 "slices.pd"
 sub PDL::rldseq {
   my ($a,$b,$c) = @_;
-  if (!defined($c)) {
-    my $size   = $a->sumover->max;
-    my (undef, @dims) = $a->dims;
-    $c = $b->zeroes($b->type,$size,@dims);
-  }
-  &PDL::_rldseq_int($a,$b,$c);
+  ($c,my $sm) = defined($c) ? ($c,$c->dim(1)) : (PDL->null,$a->sumover->max->sclr);
+  PDL::_rldseq_int($a,$b,$c,$sm);
   return $c;
 }
-#line 1018 "Slices.pm"
+#line 1005 "Slices.pm"
 
 *rldseq = \&PDL::rldseq;
 
@@ -1022,7 +1009,7 @@ sub PDL::rldseq {
 
 
 
-#line 1338 "slices.pd"
+#line 1317 "slices.pd"
 
 =head2 rleND
 
@@ -1051,7 +1038,7 @@ sub rleND {
   my @vdimsN = $data->dims;
 
   ##-- construct output pdls
-  my $counts = $#_ >= 0 ? $_[0] : zeroes(long, $vdimsN[$#vdimsN]);
+  my $counts = $#_ >= 0 ? $_[0] : PDL->null;
   my $elts   = $#_ >= 1 ? $_[1] : zeroes($data->type, @vdimsN);
 
   ##-- guts: call rlevec()
@@ -1101,7 +1088,7 @@ sub rldND {
 
   return $data;
 }
-#line 1105 "Slices.pm"
+#line 1092 "Slices.pm"
 
 *_clump_int = \&PDL::_clump_int;
 
@@ -1149,7 +1136,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1497 "slices.pd"
+#line 1476 "slices.pd"
 
 =head2 reorder
 
@@ -1269,7 +1256,8 @@ sub PDL::reorder {
         # a quicker way to do the reorder
         return $pdl->broadcast(@newDimOrder)->unbroadcast(0);
 }
-#line 1273 "Slices.pm"
+#line 1260 "Slices.pm"
+
 
 =head2 mv
 
@@ -1311,7 +1299,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1674 "slices.pd"
+#line 1649 "slices.pd"
 
 =head2 using
 
@@ -1341,78 +1329,7 @@ sub PDL::using {
   }
   @ind;
 }
-#line 1345 "Slices.pm"
-
-=head2 diagonal
-
-=for sig
-
-  Signature: (P(); C(); PDL_Indx whichdims[])
-
-=for ref
-
-Returns the multidimensional diagonal over the specified dimensions.
-
-The diagonal is placed at the first (by number) dimension that is
-diagonalized.
-The other diagonalized dimensions are removed. So if C<$x> has dimensions
-C<(5,3,5,4,6,5)> then after
-
-=for usage
-
- $d = $x->diagonal(dim1, dim2,...)
-
-=for example
-
- $y = $x->diagonal(0,2,5);
-
-the ndarray C<$y> has dimensions C<(5,3,4,6)> and
-C<$y-E<gt>at(2,1,0,1)> refers
-to C<$x-E<gt>at(2,1,2,0,1,2)>.
-
-NOTE: diagonal doesn't handle broadcastids correctly. XXX FIX
-
- pdl> $x = zeroes(3,3,3);
- pdl> ($y = $x->diagonal(0,1))++;
- pdl> p $x
- [
-  [
-   [1 0 0]
-   [0 1 0]
-   [0 0 1]
-  ]
-  [
-   [1 0 0]
-   [0 1 0]
-   [0 0 1]
-  ]
-  [
-   [1 0 0]
-   [0 1 0]
-   [0 0 1]
-  ]
- ]
-
-=for bad
-
-diagonal does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-
-#line 1768 "slices.pd"
-sub PDL::diagonal { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
-#line 1410 "Slices.pm"
-
-*diagonal = \&PDL::diagonal;
-
-
-
-
+#line 1333 "Slices.pm"
 
 
 =head2 lags
@@ -1599,7 +1516,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2109 "slices.pd"
+#line 1976 "slices.pd"
 
 =head2 dice
 
@@ -1749,7 +1666,8 @@ sub PDL::dice_axis {
   return $self->mv($axis,0)->index1d($ix)->mv(0,$axis);
 }
 *dice_axis = \&PDL::dice_axis;
-#line 1753 "Slices.pm"
+#line 1670 "Slices.pm"
+
 
 =head2 slice
 
@@ -1923,7 +1841,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2428 "slices.pd"
+#line 2295 "slices.pd"
 sub PDL::slice {
     my ($source, @others) = @_;
     for my $i(0..$#others) {
@@ -1959,7 +1877,7 @@ sub PDL::slice {
     PDL::_slice_int($source,my $o=$source->initialize,\@others);
     $o;
 }
-#line 1963 "Slices.pm"
+#line 1881 "Slices.pm"
 
 *slice = \&PDL::slice;
 
@@ -1968,8 +1886,80 @@ sub PDL::slice {
 
 
 
+=head2 diagonal
 
-#line 2595 "slices.pd"
+=for sig
+
+  Signature: (P(); C(); PDL_Indx whichdims[])
+
+=for ref
+
+Returns the multidimensional diagonal over the specified dimensions.
+
+The diagonal is placed at the first (by number) dimension that is
+diagonalized.
+The other diagonalized dimensions are removed. So if C<$x> has dimensions
+C<(5,3,5,4,6,5)> then after
+
+=for usage
+
+ $d = $x->diagonal(dim1, dim2,...)
+
+=for example
+
+ $y = $x->diagonal(0,2,5);
+
+the ndarray C<$y> has dimensions C<(5,3,4,6)> and
+C<$y-E<gt>at(2,1,0,1)> refers
+to C<$x-E<gt>at(2,1,2,0,1,2)>.
+
+NOTE: diagonal doesn't handle broadcastids correctly. XXX FIX
+
+ pdl> $x = zeroes(3,3,3);
+ pdl> ($y = $x->diagonal(0,1))++;
+ pdl> p $x
+ [
+  [
+   [1 0 0]
+   [0 1 0]
+   [0 0 1]
+  ]
+  [
+   [1 0 0]
+   [0 1 0]
+   [0 0 1]
+  ]
+  [
+   [1 0 0]
+   [0 1 0]
+   [0 0 1]
+  ]
+ ]
+
+=for bad
+
+diagonal does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+
+#line 2515 "slices.pd"
+sub PDL::diagonal { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
+#line 1953 "Slices.pm"
+
+*diagonal = \&PDL::diagonal;
+
+
+
+
+
+
+
+#line 2565 "slices.pd"
 
 =head1 BUGS
 
@@ -1994,7 +1984,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 1998 "Slices.pm"
+#line 1988 "Slices.pm"
 
 # Exit with OK status
 

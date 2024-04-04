@@ -13,7 +13,7 @@ use Mozilla::CA;
 use Scalar::Util;
 use XML::LibXML;
 
-our $VERSION = '1.1.3';
+our $VERSION = '1.2.1';
 
 use constant ENDPOINTS => {
     'IMGUR' => 'https://api.imgur.com/3',
@@ -46,7 +46,7 @@ sub new {
 sub _lwp { shift->{'lwp'} }
 
 sub request {
-    my ($self, $uri, $http_method, $data, $hdr) = @_;
+    my ($self, $uri, $http_method, $data, $hdr, $debug) = @_;
 
     $http_method = uc($http_method // 'GET');
 
@@ -76,7 +76,7 @@ sub request {
         $request = HTTP::Request->new($http_method, $endpoint);
     }
 
-    print Dumper $request if $ENV{'DEBUG'};
+    print Dumper $request if $ENV{'DEBUG'} || ($debug // 0);
 
     my $response = $self->_lwp->request($request);
 
@@ -662,11 +662,6 @@ sub gallery_image {
     return $self->request("/gallery/image/$image_id");
 }
 
-sub gallery_item {
-    my ($self, $id) = @_;
-    return $self->request("/gallery/$id");
-}
-
 sub gallery_item_comment {
     my $self = shift;
     my $id = shift or die "missing required album/image id";
@@ -735,24 +730,26 @@ sub gallery_image_remove {
 
 sub gallery_search {
     my $self = shift;
-    my $query = shift;
     my $opts = shift // {};
-    my $advanced = shift // {};
+    my $query = $opts->{'q'} // '';
+    my $adv = $opts->{'adv'} // 0;
     my $sort = $opts->{'sort'} // 'time';
     my $window = $opts->{'window'} // 'all';
     my $page = $opts->{'page'} // 0;
     my $data = {};
 
-    if ($advanced) {
+    if ($adv) {
         my %adv_keys = map { $_ => 1 } ('q_all', 'q_any', 'q_exactly', 'q_not', 'q_type', 'q_size_px');
-        foreach my $key (keys %{$advanced}) {
-            $data->{$key} = $advanced->{$key} unless ! exists($adv_keys{$key});
+        foreach my $key (keys %{$adv}) {
+            $data->{$key} = $adv->{$key} unless ! exists($adv_keys{$key});
         }
     } elsif (!$query) {
-        die "must provide a query or advanced search parameters";
+        die "must provide a query or adv search parameters";
     }
 
-    return $self->request("/gallery/search/$sort/$window/$page" . ($advanced ? '' : "?q=$query"), 'GET', $data);
+    print Dumper $data;
+
+    return $self->request("/gallery/search/$sort/$window/$page" . ($adv ? '' : "?q=$query"), 'GET', $data, undef, 1);
 }
 
 sub gallery_share_image {
@@ -1666,12 +1663,6 @@ Get information about a specific gallery album.
 
 Get additional information about an image in the gallery.
 
-=head5 gallery_item
-
-    $resp = $client->gallery_item($item_id);
-
-Get information about a specific gallery item.
-
 =head5 gallery_item_comment
 
     $resp = $client->gallery_item_comment($item_id, $comment);
@@ -1739,11 +1730,15 @@ Remove an image from the gallery.
 
 =head5 gallery_search
 
-    $resp = $client->gallery_search($query, \%opts, \%advanced);
+    $resp = $client->gallery_search(\%opts);
 
 Search the gallery. Valid C<\%opts> keys are:
 
 =over 4
+
+=item *
+
+C<q> - Query string (ignored if C<advanced> is set).
 
 =item *
 
@@ -1757,9 +1752,9 @@ C<window> - Time window. Options are C<all> (default), C<day>, C<week>, C<month>
 
 C<page> - Page number.
 
-=back
+=item *
 
-Valid C<\%advanced> keys are:
+C<adv> - Advanced search options
 
 =over 4
 
@@ -1786,6 +1781,8 @@ C<q_type> - Show results for any file type, or specific file types. C<jpg>, C<pn
 =item *
 
 C<q_size_px> - Return images that are greater or equal to the width/height you specify. C<300x300>.
+
+=back
 
 =back
 

@@ -26,7 +26,7 @@ use DynaLoader;
 
 =head1 NAME
 
-PDL::Minuit -- a PDL interface to the Minuit library
+PDL::Minuit - a PDL interface to the Minuit library
 
 =head1 DESCRIPTION
 
@@ -35,27 +35,36 @@ of the CERN Library)
 
 =head1 SYNOPSIS
 
+  use PDL::LiteF;
+  use PDL::Minuit;
+  $x = sequence(10);
+  $y = 3.0 + 4.0*$x;
+  mn_init(\&chi2, {Title => 'test title'});
+  mn_def_pars($pars=pdl(2.5,3.0), $steps=pdl(0.3,0.5), {Names => [qw(intercept slope)]});
+  mn_excm('set pri',pdl(3.0));
+  mn_excm('migrad');
+  mn_excm('minos');
+  print "emat=", mn_emat();
+  print "out=", mn_pout(1), "\n";
+  mn_err(1);
+  mn_stat();
+
+  sub chi2 {
+      my ($npar,$grad,$fval,$xval,$iflag) = @_;
+      $fval = (($y - $xval->slice(0) - $xval->slice(1)*$x)**2)->sumover
+        if $iflag == 4;
+      ($fval,$grad);
+  }
+
 A basic fit with Minuit will call three functions in this package. First, a basic
 initialization is done with mn_init(). Then, the parameters are defined via
 the function mn_def_pars(), which allows setting upper and lower bounds. Then
 the function mn_excm() can be used to issue many Minuit commands, including simplex
 and migrad minimization algorithms (see Minuit manual for more details).
 
-See the test file minuit.t in the test (t/) directory for a basic example.
-
-=cut
-#line 48 "Minuit.pm"
-
-=head1 FUNCTIONS
-
 =cut
 
-
-
-
-
-#line 37 "minuit.pd"
-
+#line 56 "minuit.pd"
 use strict;
 use warnings;
 
@@ -88,89 +97,25 @@ sub mn_init{
            
   if (defined (my $logfile = $mn_options->{Log})){ 
     if (-e $logfile) { unlink $logfile; }   
-    PDL::Minuit::mn_abre($mn_options->{Unit},$logfile,'new');
+    mn_abre($mn_options->{Unit},$logfile,'new');
   }
 
-  PDL::Minuit::mninit(5,$mn_options->{Unit},$mn_options->{Unit});
-  PDL::Minuit::mnseti($mn_options->{Title});
+  mninit(5,$mn_options->{Unit},$mn_options->{Unit});
+  mnseti($mn_options->{Title});
 
   if (defined (my $logfile = $mn_options->{Log})){
-    PDL::Minuit::mn_cierra($mn_options->{Unit});
+    mn_cierra($mn_options->{Unit});
   }
 
 }
-#line 103 "Minuit.pm"
-
-=head2 mninit
-
-=for sig
-
-  Signature: (longlong a();longlong b(); longlong c())
-
-=for ref
-
-info not available
-
-=for bad
-
-mninit does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
+#line 112 "Minuit.pm"
 
 *mninit = \&PDL::Minuit::mninit;
 
 
 
 
-
-
-=head2 mn_abre
-
-=for sig
-
-  Signature: (longlong l(); char* nombre; char* mode)
-
-=for ref
-
-info not available
-
-=for bad
-
-mn_abre does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
 *mn_abre = \&PDL::Minuit::mn_abre;
-
-
-
-
-
-
-=head2 mn_cierra
-
-=for sig
-
-  Signature: (longlong l())
-
-=for ref
-
-info not available
-
-=for bad
-
-mn_cierra does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
 
 
 
@@ -181,7 +126,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 108 "minuit.pd"
+#line 133 "minuit.pd"
 
 sub mn_def_pars{
   my $pars  = shift;
@@ -211,44 +156,16 @@ sub mn_def_pars{
   my $iflag = 0;
 
   if (defined (my $logfile = $mn_options->{Log})){
-    PDL::Minuit::mn_abre($mn_options->{Unit},$logfile,'old');
+    mn_abre($mn_options->{Unit},$logfile,'old');
   }
 
-  foreach my $i ( 0..(nelem($pars)-1) ){
-     my $ii = $i + 1;
-     $iflag = PDL::Minuit::mnparm($ii,$pars->slice("($i)"),
-		       $steps->slice("($i)"),
-		       $lo_bounds->slice("($i)"),
-		       $up_bounds->slice("($i)"),
-		       $names[$i]);
-     barf "Problem initializing parameter $i in Minuit, got $iflag" unless ($iflag == 0);
-  }
-  
-  if (defined (my $logfile = $mn_options->{Log})){
-     PDL::Minuit::mn_cierra($mn_options->{Unit});
-  }
+  $iflag = mnparm($pars, $steps, $lo_bounds, $up_bounds, \@names);
+  barf "Problem initializing parameters in Minuit, got $iflag"
+    unless PDL::all($iflag == 0);
+
+  mn_cierra($mn_options->{Unit}) if defined $mn_options->{Log};
 }
-#line 232 "Minuit.pm"
-
-=head2 mnparm
-
-=for sig
-
-  Signature: (longlong a(); double b(); double c(); double d(); double e(); longlong [o] ia(); char* str)
-
-=for ref
-
-info not available
-
-=for bad
-
-mnparm does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
+#line 169 "Minuit.pm"
 
 *mnparm = \&PDL::Minuit::mnparm;
 
@@ -256,7 +173,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 164 "minuit.pd"
+#line 193 "minuit.pd"
 
 sub mn_excm{
   my $command = shift;
@@ -270,41 +187,21 @@ sub mn_excm{
   if ( @_ ) { barf "Usage : mn_excm($command, [$arglis]) \n"; }
 
   if (defined (my $logfile = $mn_options->{Log})){
-    PDL::Minuit::mn_abre($mn_options->{Unit},$logfile,'old');
+    mn_abre($mn_options->{Unit},$logfile,'old');
   }
 
   my $iflag = pdl(0);
 
-  $iflag = PDL::Minuit::mnexcm($arglis, $narg, $command, $fun_ref,$mn_options->{N});
+  $iflag = mnexcm($arglis, $narg, $command, $fun_ref,$mn_options->{N});
   warn "Problem executing command '$command' " unless ($iflag == 0);
 
   if (defined (my $logfile = $mn_options->{Log})){
-    PDL::Minuit::mn_cierra($mn_options->{Unit});
+    mn_cierra($mn_options->{Unit});
   }
 
   return $iflag;
 }
-#line 288 "Minuit.pm"
-
-=head2 mnexcm
-
-=for sig
-
-  Signature: (double a(n); longlong ia(); longlong [o] ib(); char* str; SV* function; IV numelem)
-
-=for ref
-
-info not available
-
-=for bad
-
-mnexcm does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
+#line 205 "Minuit.pm"
 
 *mnexcm = \&PDL::Minuit::mnexcm;
 
@@ -312,7 +209,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 205 "minuit.pd"
+#line 235 "minuit.pd"
 
   sub mn_pout{
     barf "Usage: mn_pout(par_number)" unless ($#_ == 0);
@@ -321,7 +218,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
     if (($par_num < 1) || ($par_num > $n)) { barf "Parameter numbers range from 1 to $n "; }
 
     if (defined (my $logfile = $mn_options->{Log})){
-      PDL::Minuit::mn_abre($mn_options->{Unit},$logfile,'old');
+      mn_abre($mn_options->{Unit},$logfile,'old');
     }
 
     my $val = pdl(0);
@@ -330,35 +227,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
     my $bnd2 = pdl(0);
     my $ivarbl = pdl(0);
     my $par_name = "          ";
-    PDL::Minuit::mnpout($par_num,$val,$err,$bnd1,$bnd2,$ivarbl,\$par_name);
+    mnpout($par_num,$val,$err,$bnd1,$bnd2,$ivarbl,\$par_name);
 
     if (defined (my $logfile = $mn_options->{Log})){
-      PDL::Minuit::mn_cierra($mn_options->{Unit});
+      mn_cierra($mn_options->{Unit});
     }
 
     return ($val,$err,$bnd1,$bnd2,$ivarbl,$par_name);    
   }
-#line 342 "Minuit.pm"
-
-=head2 mnpout
-
-=for sig
-
-  Signature: (longlong ia(); double [o] a(); double [o] b(); double [o] c(); double [o] d();longlong [o] ib(); SV* str)
-
-=for ref
-
-info not available
-
-=for bad
-
-mnpout does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
+#line 239 "Minuit.pm"
 
 *mnpout = \&PDL::Minuit::mnpout;
 
@@ -366,42 +243,22 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 242 "minuit.pd"
+#line 274 "minuit.pd"
 
   sub mn_stat{
      if (defined (my $logfile = $mn_options->{Log})){
-       PDL::Minuit::mn_abre($mn_options->{Unit},$logfile,'old');
+       mn_abre($mn_options->{Unit},$logfile,'old');
      }
 
-     my ($fmin,$fedm,$errdef,$npari,$nparx,$istat) = PDL::Minuit::mnstat();
+     my ($fmin,$fedm,$errdef,$npari,$nparx,$istat) = mnstat();
 
      if (defined (my $logfile = $mn_options->{Log})){
-       PDL::Minuit::mn_cierra($mn_options->{Unit});
+       mn_cierra($mn_options->{Unit});
      }
 
      return ($fmin,$fedm,$errdef,$npari,$nparx,$istat);
   }
-#line 385 "Minuit.pm"
-
-=head2 mnstat
-
-=for sig
-
-  Signature: (double [o] a(); double [o] b(); double [o] c(); longlong [o] ia(); longlong [o] ib(); longlong [o] ic())
-
-=for ref
-
-info not available
-
-=for bad
-
-mnstat does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
+#line 262 "Minuit.pm"
 
 *mnstat = \&PDL::Minuit::mnstat;
 
@@ -409,48 +266,28 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 264 "minuit.pd"
+#line 298 "minuit.pd"
 
   sub mn_emat{
    
     if (defined (my $logfile = $mn_options->{Log})){
-      PDL::Minuit::mn_abre($mn_options->{Unit},$logfile,'old');
+      mn_abre($mn_options->{Unit},$logfile,'old');
     }
 
-    my ($fmin,$fedm,$errdef,$npari,$nparx,$istat) = PDL::Minuit::mnstat();
+    my ($fmin,$fedm,$errdef,$npari,$nparx,$istat) = mnstat();
     my $n = $npari->sum->at;
     my $mat = zeroes($n,$n);
 
-    PDL::Minuit::mnemat($mat);
+    mnemat($mat);
 
     if (defined (my $logfile = $mn_options->{Log})){
-      PDL::Minuit::mn_cierra($mn_options->{Unit});
+      mn_cierra($mn_options->{Unit});
     }
     
     return $mat;
 
   }
-#line 434 "Minuit.pm"
-
-=head2 mnemat
-
-=for sig
-
-  Signature: (double [o] mat(n,n))
-
-=for ref
-
-info not available
-
-=for bad
-
-mnemat does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
+#line 291 "Minuit.pm"
 
 *mnemat = \&PDL::Minuit::mnemat;
 
@@ -458,7 +295,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 292 "minuit.pd"
+#line 328 "minuit.pd"
 
   sub mn_err{
 
@@ -469,38 +306,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
     if (($par_num < 1) || ($par_num > $n)) { barf "Parameter numbers range from 1 to $n "; }
 
     if (defined (my $logfile = $mn_options->{Log})){
-      PDL::Minuit::mn_abre($mn_options->{Unit},$logfile,'old');
+      mn_abre($mn_options->{Unit},$logfile,'old');
     }
 
-    my ($eplus,$eminus,$eparab,$globcc) = PDL::Minuit::mnerrs($par_num);
+    my ($eplus,$eminus,$eparab,$globcc) = mnerrs($par_num);
 
     if (defined (my $logfile = $mn_options->{Log})){
-      PDL::Minuit::mn_cierra($mn_options->{Unit});
+      mn_cierra($mn_options->{Unit});
     }
 
     return ($eplus,$eminus,$eparab,$globcc);
   }
-#line 484 "Minuit.pm"
-
-=head2 mnerrs
-
-=for sig
-
-  Signature: (longlong ia(); double [o] a(); double [o] b(); double [o] c(); double [o] d())
-
-=for ref
-
-info not available
-
-=for bad
-
-mnerrs does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
+#line 321 "Minuit.pm"
 
 *mnerrs = \&PDL::Minuit::mnerrs;
 
@@ -508,7 +325,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 320 "minuit.pd"
+#line 358 "minuit.pd"
 
   sub mn_contour{
     barf "Usage: mn_contour(par_number_1,par_number_2,npt)" unless ($#_ == 2);
@@ -527,35 +344,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
     my $ypt = zeroes($npt);
     my $nfound = pdl->new;
 
-    PDL::Minuit::mncont($par_num_1,$par_num_2,$npt,$xpt,$ypt,$nfound,$fun_ref,$n);
+    mncont($par_num_1,$par_num_2,$npt,$xpt,$ypt,$nfound,$fun_ref,$n);
 
     if (defined (my $logfile = $mn_options->{Log})){
-      PDL::Minuit::mn_cierra($mn_options->{Unit});
+      mn_cierra($mn_options->{Unit});
     }
 
     return ($xpt,$ypt,$nfound);
   }
-#line 539 "Minuit.pm"
-
-=head2 mncont
-
-=for sig
-
-  Signature: (longlong ia(); longlong ib(); longlong ic(); double [o] a(n); double [o] b(n); longlong [o] id(); SV* function; IV numelem)
-
-=for ref
-
-info not available
-
-=for bad
-
-mncont does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
+#line 356 "Minuit.pm"
 
 *mncont = \&PDL::Minuit::mncont;
 
@@ -563,7 +360,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 358 "minuit.pd"
+#line 397 "minuit.pd"
 
 =head2 mn_init()
 
@@ -721,7 +518,7 @@ Example:
   $iflag = mn_excm('set strategy',$arglist);
 
   # each command can be specified by a minimal string that uniquely
-  # identifies it (see Chapter 4 of Minuit manual). The comannd above
+  # identifies it (see Chapter 4 of Minuit manual). The command above
   # is equivalent to:
   $iflag = mn_excm('set stra',$arglis);
 
@@ -828,7 +625,7 @@ COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.
 
 =cut
-#line 832 "Minuit.pm"
+#line 629 "Minuit.pm"
 
 # Exit with OK status
 

@@ -38,6 +38,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 =cut
 #line 40 "LEGENDRE.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -497,7 +498,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 501 "LEGENDRE.pm"
+#line 502 "LEGENDRE.pm"
 
 # Exit with OK status
 

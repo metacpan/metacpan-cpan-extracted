@@ -1,5 +1,5 @@
 package HTTP::Body::XFormsMultipart;
-$HTTP::Body::XFormsMultipart::VERSION = '1.22';
+$HTTP::Body::XFormsMultipart::VERSION = '1.23';
 use strict;
 use base 'HTTP::Body::MultiPart';
 use bytes;
@@ -87,6 +87,10 @@ sub handler {
 }
 
 =back
+
+=head1 SUPPORT
+
+See L<HTTP::Body>
 
 =head1 AUTHOR
 

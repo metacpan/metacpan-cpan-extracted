@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'lexical_subs', 'declared_refs';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 
 use Exporter::Shiny 'qhull';
@@ -27,8 +27,6 @@ use System::Command;
 
 
 use Alien::Qhull;
-
-use if $log->is_debug, 'Data::Dump';
 
 my sub croak {
     require Carp;
@@ -206,7 +204,7 @@ sub qhull ( @coords ) {
     my ( $feed, $feed_source ) = @coords ? build_feed_qhull( @coords ) : ();
 
     $log->is_debug
-      && $log->debug( 'executing qhull: ' . Data::Dump::pp( $qh_opts->qhull_opts ) );
+      && $log->debug( 'executing qhull: ', $qh_opts->qhull_opts );
 
     my @cmd = ( qhull_exe, $qh_opts->qhull_opts->@* );
     my $cmd = System::Command->new( @cmd );
@@ -279,7 +277,7 @@ Qhull::PP - Pure Perl interface to Qhull
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

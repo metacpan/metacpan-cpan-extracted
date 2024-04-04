@@ -2,15 +2,17 @@ package HTTP::Request::Diff;
 use 5.020;
 use Moo 2;
 
-our $VERSION = '0.03';
+our $VERSION = '0.07';
 
-use feature 'signatures';
+use experimental 'signatures'; # actually, they are stable but stable.pm doesn't know
+use stable 'postderef';
 no warnings 'experimental::signatures';
 use Algorithm::Diff;
 use Carp 'croak', 'cluck';
 use List::Util 'pairs', 'uniq', 'max';
 use CGI::Tiny::Multipart 'parse_multipart_form_data';
 use HTTP::Request;
+use URI::QueryParam; # old versions of URI don't load the functionality automatically
 require overload; # for checking whether inputs are overloaded
 
 =encoding utf-8
@@ -21,27 +23,37 @@ HTTP::Request::Diff - create diffs between HTTP requests
 
 =head1 SYNOPSIS
 
+  use HTTP::Request::Common 'GET';
+
   my $diff = HTTP::Request::Diff->new(
-      reference => $req,
+      reference => GET('https://example.com/?foo=bar' ),
       #actual    => $req2,
       skip_headers => \@skip,
       ignore_headers => \@skip2,
       mode => 'exact', # default is 'semantic'
   );
 
-  my @differences = $diff->diff( $actual );
+  my @differences = $diff->diff( GET('https://example.com/' ));
   say Dumper $differences[0];
   # {
   #   'kind' => 'value',
   #   'type' => 'query.foo',
   #   'reference' => [
-  #                    undef
+  #                    'bar'
   #                  ],
   #   'actual' => [
-  #                 'bar'
+  #                 undef
   #               ]
   # }
   #
+
+  say $diff->as_table(@differences);
+  # +-----------+-----------+-----------+
+  # | Type      | Reference | Actual    |
+  # +-----------+-----------+-----------+
+  # | query.foo | bar       | <missing> |
+  # +-----------+-----------+-----------+
+
 
 =head1 METHODS
 

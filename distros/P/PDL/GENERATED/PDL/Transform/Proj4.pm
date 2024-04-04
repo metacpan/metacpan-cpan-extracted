@@ -351,6 +351,7 @@ sub t_proj
 1;
 
 #line 353 "Proj4.pd"
+
 =head1 FUNCTIONS
 
 =head2 t_proj
@@ -3118,7 +3119,7 @@ The full name for this projection is Geocentric grid shift.
 
 sub t_proj_xyzgridshift 
     { 'PDL::Transform::Proj4::xyzgridshift'->new( @_ ); }
-#line 3122 "Proj4.pm"
+#line 3123 "Proj4.pm"
 
 *_proj4_dummy = \&PDL::_proj4_dummy;
 
@@ -10963,13 +10964,14 @@ sub new
 1;
 #line 486 "Proj4.pd"
 
+
 =head1 AUTHOR & MAINTAINER
 
 Judd Taylor, Orbital Systems, Ltd.
 judd dot t at orbitalsystems dot com
 
 =cut
-#line 10973 "Proj4.pm"
+#line 10975 "Proj4.pm"
 
 # Exit with OK status
 

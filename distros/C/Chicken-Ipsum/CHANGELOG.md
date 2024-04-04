@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2024-03-31
+
+### Fixed
+- Fix test under Perl v5.39.8
+
 ## [1.0.1] - 2023-12-07
 
 ### Fixed
@@ -55,7 +60,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.1] - 2023-08-10
 Initial published version
 
-[Unreleased]: https://codeberg.org/h3xx/perl-Chicken-Ipsum/compare/v1.0.1...HEAD
+[Unreleased]: https://codeberg.org/h3xx/perl-Chicken-Ipsum/compare/v1.0.2...HEAD
+[1.0.2]: https://codeberg.org/h3xx/perl-Chicken-Ipsum/compare/v1.0.1...v1.0.2
 [1.0.1]: https://codeberg.org/h3xx/perl-Chicken-Ipsum/compare/v1.0.0...v1.0.1
 [1.0.0]: https://codeberg.org/h3xx/perl-Chicken-Ipsum/compare/v0.03...v1.0.0
 [0.03]: https://codeberg.org/h3xx/perl-Chicken-Ipsum/compare/v0.0.2...v0.03

@@ -38,6 +38,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 =cut
 #line 40 "HYPERG.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -278,7 +279,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 282 "HYPERG.pm"
+#line 283 "HYPERG.pm"
 
 # Exit with OK status
 

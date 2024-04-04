@@ -1344,6 +1344,7 @@ sub DESTROY
 } # End of DESTROY()...
 
 #line 1603 "SD.pd"
+
 =head1 CURRENT AUTHOR & MAINTAINER
 
 Judd Taylor, Orbital Systems, Ltd.
@@ -1359,7 +1360,7 @@ contribs of Olivier Archer olivier.archer@ifremer.fr
 perl(1), PDL(1), PDL::IO::HDF(1).
 
 =cut
-#line 1363 "SD.pm"
+#line 1364 "SD.pm"
 
 # Exit with OK status
 

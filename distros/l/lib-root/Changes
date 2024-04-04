@@ -1,0 +1,18 @@
+Revision history for Perl extension lib::root
+
+0.04 2024-04-01T22:07:19Z
+
+    - add dependencys to cpanfile Cwd, Path::Tiny
+
+0.03 2024-03-31T20:04:42Z
+
+    - update docs, add examples of current features
+
+0.02 2024-03-30T17:41:49Z
+
+    - update doc with default .libroot file and list similar projects
+
+0.01 2024-03-30T17:26:22Z
+
+    - initial version
+

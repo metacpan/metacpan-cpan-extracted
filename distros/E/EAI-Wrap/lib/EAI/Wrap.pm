@@ -1,4 +1,4 @@
-package EAI::Wrap 1.912;
+package EAI::Wrap 1.913;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use Data::Dumper qw(Dumper); use File::Copy qw(copy move); use Cwd qw(chdir); use Archive::Extract ();
@@ -864,7 +864,7 @@ sub processingEnd {
 		$logger->info("process has not ended, refreshing configs, planning next execution");
 		readConfigs($execute{envraw});
 		doExecuteOnInit();
-		Log::Log4perl::init($EAI::Common::logConfig);
+		EAI::Common::setupLogging();
 		# pausing processing/retry
 		$retrySeconds = 60 if !$retrySeconds; # sanity fallback if retrySecondsErr not set
 		my $failcountFinish;
@@ -1160,11 +1160,11 @@ The L<process|/process> category is on the one hand used to pass information wit
 
 The settings in DB, File, FTP and task are "merge" inherited in a cascading manner (i.e. missing parameters are merged, parameters already set below are not overwritten):
 
- %config (defined in site.config and other associated configs loaded at INIT)
+ - %config (defined in site.config and other associated configs. This is being loaded at INIT)
  merged into ->
- %common (common task parameters defined in script)
- merged into each of ->
- $loads[]
+ - %common (common task parameters defined in script. This is being loaded when calling setupEAIWrap())
+ merged into each instance of ->
+ - $loads[] (only if loads are defined, you can also stay with %common if there is only one load in the script)
 
 special config parameters and DB, FTP, File, task parameters from command line options are merged at the respective level (config at the top, the rest at the bottom) and always override any set parameters.
 Only scalar parameters can be given on the command line, no lists and hashes are possible. Commandline options are given in the format:

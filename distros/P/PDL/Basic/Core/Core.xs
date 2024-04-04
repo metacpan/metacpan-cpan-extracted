@@ -53,6 +53,37 @@ int pdl_autopthread_actual = 0;
 PDL_Indx pdl_autopthread_dim = -1;
 int pdl_autopthread_size   = 1;
 
+char *_dims_from_args(AV *av, SV **svs, IV n) {
+  IV i;
+  for (i = 0; i < n; i++) {
+    SV *sv = svs[i];
+    if (!SvROK(sv)) {
+      if (SvTRUE(sv) && SvIV(sv) < 0) return "Dimensions must be non-negative";
+      if (SvTRUE(sv))
+        SvREFCNT_inc(sv); /* stack entries are mortal */
+      else
+        sv = newSViv(0);
+      av_push(av, sv);
+      continue;
+    }
+    if (SvROK(sv) && !sv_derived_from(sv, "PDL")) return "Trying to use non-ndarray as dimensions?";
+    pdl *p = pdl_SvPDLV(sv);
+    if (!p) return "Failed to get PDL from arg";
+    if (p->ndims > 1) return "Trying to use multi-dim ndarray as dimensions?";
+    PDL_Indx nvals = p->nvals, v;
+    if (nvals > 10) warn("creating > 10 dim ndarray (ndarray arg)!");
+    for (v = 0; v < nvals; v++) {
+      PDL_Anyval anyval = pdl_get_offs(p, v);
+      if (anyval.type < 0) return "Error getting value from ndarray";
+      SV *dv = newSV(0);
+      ANYVAL_TO_SV(dv, anyval);
+      if (SvIV(dv) < 0) return "Dimensions must be non-negative";
+      av_push(av, dv);
+    }
+  }
+  return NULL;
+}
+
 MODULE = PDL::Core     PACKAGE = PDL
 
 # Destroy a PDL - note if a hash do nothing, the $$x{PDL} component
@@ -69,6 +100,132 @@ DESTROY(sv)
     PDLDEBUG_f(printf("DESTROYING %p\n",(void*)self);)
     if (self != NULL)
       pdl_barf_if_error(pdl_destroy(self));
+
+SV *
+new_from_specification(invoc, ...)
+  SV *invoc;
+  ALIAS:
+    PDL::zeroes = 1
+  CODE:
+    char ispdl = ix && SvROK(invoc) && sv_derived_from(invoc, "PDL");
+    pdl *pdl_given = NULL;
+    if (ispdl) {
+      if (!(pdl_given = pdl_SvPDLV(invoc))) barf("Failed to get PDL from arg");
+      if (pdl_given->state & PDL_INPLACE) {
+        amagic_call(invoc, sv_2mortal(newSViv(0)), concat_ass_amg, AMGf_assign);
+        ST(0) = invoc;
+        XSRETURN(1);
+      }
+    }
+    IV argstart = 1, type = PDL_D;
+    if (items > 1 && sv_derived_from(ST(1), "PDL::Type")) {
+      argstart++;
+      AV *type_av = (AV *)SvRV(ST(1));
+      if (!type_av) barf("Arg 1 not a reference");
+      if (SvTYPE((SV *)type_av) != SVt_PVAV) barf("Arg 1 not an array-ref");
+      SV **firstval = av_fetch(type_av, 0, TRUE);
+      if (!firstval) barf("Failed to get type elt 0");
+      type = SvIV(*firstval);
+    } else if (ispdl)
+      type = pdl_given->datatype;
+    ENTER; SAVETMPS;
+    SV *dims_ref = NULL;
+    if (!(ispdl && items == 1)) {
+      AV *dims_av = newAV();
+      if (!dims_av) barf("Failed to make AV");
+      dims_ref = sv_2mortal(newRV_noinc((SV *)dims_av));
+      if (!dims_ref) barf("Failed to make ref to AV");
+      char *retstr = _dims_from_args(dims_av, &ST(argstart), items-argstart);
+      if (retstr) barf("%s", retstr);
+    }
+    if (strcmp(SvPV_nolen(invoc), "PDL") == 0) {
+      pdl *p = pdl_pdlnew();
+      if (!p) barf("Failed to create ndarray");
+      p->datatype = type;
+      PDL_Indx ndims, *dims;
+      if (dims_ref) {
+        dims = pdl_packdims(dims_ref, &ndims);
+        if (!dims) barf("Failed to unpack dims");
+      } else {
+        dims = pdl_given->dims;
+        ndims = pdl_given->ndims;
+      }
+      pdl_barf_if_error(pdl_setdims(p, dims, ndims));
+      if (ix) pdl_barf_if_error(pdl_make_physical(p));
+      pdl_SetSV_PDL(RETVAL = newSV(0), p);
+    } else {
+      PUSHMARK(SP);
+      PUSHs(ST(0));
+      PUTBACK;
+      int retvals = perl_call_method("initialize", G_SCALAR);
+      SPAGAIN;
+      if (retvals != 1) barf("initialize returned no values");
+      SvREFCNT_inc(RETVAL = POPs);
+      PUSHMARK(SP);
+      EXTEND(SP, 2); PUSHs(RETVAL); mPUSHi(type);
+      PUTBACK;
+      perl_call_method("set_datatype", G_VOID);
+      SPAGAIN;
+      if (!dims_ref) {
+        AV *dims_av = newAV();
+        if (!dims_av) barf("Failed to make AV");
+        dims_ref = sv_2mortal(newRV_noinc((SV *)dims_av));
+        if (!dims_ref) barf("Failed to make ref to AV");
+        PDL_Indx i, *dims = pdl_given->dims;
+        for (i = 0; i < pdl_given->ndims; i++)
+          av_push(dims_av, newSViv(dims[i]));
+      }
+      PUSHMARK(SP);
+      EXTEND(SP, 2); PUSHs(RETVAL); PUSHs(dims_ref);
+      PUTBACK;
+      perl_call_method("setdims", G_VOID);
+      SPAGAIN;
+    }
+    FREETMPS; LEAVE;
+  OUTPUT:
+    RETVAL
+
+SV *
+inplace(self, ...)
+  SV *self
+  CODE:
+    pdl *p = pdl_SvPDLV(self);
+    if (!p) barf("Failed to get PDL from arg");
+    p->state |= PDL_INPLACE;
+    SvREFCNT_inc(RETVAL = self);
+  OUTPUT:
+    RETVAL
+
+SV *
+topdl(klass, arg1, ...)
+  SV *klass;
+  SV *arg1;
+  CODE:
+    if (items > 2 ||
+      (!SvROK(arg1) && SvTYPE(arg1) < SVt_PVAV) ||
+      (SvROK(arg1) && SvTYPE(SvRV(arg1)) == SVt_PVAV)
+    ) {
+      SP -= items; PUSHMARK(SP); SPAGAIN; /* these pass this set of args on */
+      int retvals = perl_call_method("new", G_SCALAR);
+      SPAGAIN;
+      if (retvals != 1) barf("new returned no values");
+      RETVAL = POPs;
+    } else if (SvROK(arg1) && SvOBJECT(SvRV(arg1))) {
+      RETVAL = arg1;
+    } else {
+      barf("Can not convert a %s to a %s", sv_reftype(arg1, 1), SvPV_nolen(klass));
+    }
+    SvREFCNT_inc(RETVAL);
+  OUTPUT:
+    RETVAL
+
+int
+has_vafftrans(self)
+	pdl *self;
+	CODE:
+	RETVAL = !!self->vafftrans;
+	OUTPUT:
+	RETVAL
 
 # Return the transformation object or an undef otherwise.
 pdl_trans *
@@ -120,6 +277,15 @@ nelem_nophys(x)
 
 # only returns list, not context-aware
 void
+dimincs_nophys(x)
+  pdl *x
+  PPCODE:
+    EXTEND(sp, x->ndims);
+    PDL_Indx i;
+    for(i=0; i<x->ndims; i++) mPUSHi(PDL_REPRINC(x,i));
+
+# only returns list, not context-aware
+void
 dims_nophys(x)
   pdl *x
   PPCODE:
@@ -140,7 +306,7 @@ void
 firstvals_nophys(x)
   pdl *x
   PPCODE:
-    if (!(x->state & PDL_ALLOCATED)) barf("firstvals_nophys called on non-ALLOCATED", x);
+    if (!(x->state & PDL_ALLOCATED)) barf("firstvals_nophys called on non-ALLOCATED %p", x);
     PDL_Indx i, maxvals = PDLMIN(10, x->nvals);
     EXTEND(sp, maxvals);
     for(i=0; i<maxvals; i++) {
@@ -284,17 +450,17 @@ get_autopthread_dim()
 void
 _ci(...)
  PPCODE:
-  PDL_XS_SCALAR(PDL_CD, 0 + 1I)
+  PDL_XS_SCALAR(PDL_CD, C, 0 + 1I)
 
 void
 _nan(...)
  PPCODE:
-  PDL_XS_SCALAR(PDL_D, (PDL_Double)NAN)
+  PDL_XS_SCALAR(PDL_D, D, NAN)
 
 void
 _inf(...)
  PPCODE:
-  PDL_XS_SCALAR(PDL_D, INFINITY)
+  PDL_XS_SCALAR(PDL_D, D, INFINITY)
 
 MODULE = PDL::Core     PACKAGE = PDL::Trans
 
@@ -318,30 +484,23 @@ address(self)
   OUTPUT:
     RETVAL
 
-char *
-name(self)
-  pdl_trans *self;
-  CODE:
-    if (!self->vtable) barf("%p has NULL vtable", self);
-    RETVAL = self->vtable->name;
-  OUTPUT:
-    RETVAL
-
 void
 flags(x)
   pdl_trans *x
   PPCODE:
     PDL_FLAG_DUMP(PDL_LIST_FLAGS_PDLTRANS, x->flags)
 
-void
-flags_vtable(x)
+pdl_transvtable *
+vtable(x)
   pdl_trans *x
-  PPCODE:
+  CODE:
     if (!x->vtable) barf("%p has NULL vtable", x);
-    PDL_FLAG_DUMP(PDL_LIST_FLAGS_PDLVTABLE, x->vtable->flags)
+    RETVAL = x->vtable;
+  OUTPUT:
+    RETVAL
 
 int
-vaffine(x)
+affine(x)
   pdl_trans *x
   CODE:
     RETVAL= !!(x->flags & PDL_ITRANS_ISAFFINE);
@@ -380,6 +539,44 @@ inc_sizes(x)
     PDL_Indx i, max = x->vtable->nind_ids;
     EXTEND(sp, max);
     for(i=0; i<max; i++) mPUSHi(x->inc_sizes[i]);
+
+MODULE = PDL::Core     PACKAGE = PDL::Trans::VTable
+
+char *
+name(x)
+  pdl_transvtable *x;
+  CODE:
+    RETVAL = x->name;
+  OUTPUT:
+    RETVAL
+
+void
+flags(x)
+  pdl_transvtable *x
+  PPCODE:
+    PDL_FLAG_DUMP(PDL_LIST_FLAGS_PDLVTABLE, x->flags)
+
+void
+par_names(x)
+  pdl_transvtable *x
+  PPCODE:
+    EXTEND(sp, 2);
+    PDL_Indx i;
+    for (i=0; i < 2; i++) {
+      AV *av = (AV *)sv_2mortal((SV *)newAV());
+      if (!av) barf("Failed to create AV");
+      mPUSHs(newRV_inc((SV *)av));
+      PDL_Indx start = i==0 ? 0 : x->nparents, j, max = i==0 ? x->nparents : x->npdls;
+      av_extend(av, max-start);
+      for (j = start; j < max; j++) {
+        SV *sv = newSVpv(x->par_names[j], 0);
+        if (!sv) barf("Failed to create SV");
+        if (!av_store( av, j-start, sv )) {
+          SvREFCNT_dec(sv);
+          barf("Failed to store SV");
+        }
+      }
+    }
 
 MODULE = PDL::Core     PACKAGE = PDL::Core
 
@@ -428,7 +625,10 @@ at_bad_c(x,pos)
    CODE:
     pdl_barf_if_error(pdl_make_physvaffine( x ));
     if (pos == NULL || pos_count < x->ndims)
-       barf("Invalid position with pos=%p, count=%"IND_FLAG" for ndarray with %"IND_FLAG" dims", pos, pos_count, x->ndims);
+      barf("Invalid position with pos=%p, count=%"IND_FLAG" for ndarray with %"IND_FLAG" dims", pos, pos_count, x->ndims);
+    for (ipos=0; ipos < x->ndims; ipos++)
+      if (pos[ipos] + ((pos[ipos] < 0) ? x->dims[ipos] : 0) >= x->dims[ipos])
+        barf("Position %"IND_FLAG" at dimension %"IND_FLAG" out of range", pos[ipos], ipos);
     /*  allow additional trailing indices
      *  which must be all zero, i.e. a
      *  [3,1,5] ndarray is treated as an [3,1,5,1,1,1,....]
@@ -436,11 +636,11 @@ at_bad_c(x,pos)
      */
     for (ipos=x->ndims; ipos<pos_count; ipos++)
       if (pos[ipos] != 0)
-         barf("Invalid position %"IND_FLAG" at dimension %"IND_FLAG, pos[ipos], ipos);
+        barf("Invalid position %"IND_FLAG" at dimension %"IND_FLAG, pos[ipos], ipos);
     result=pdl_at(PDL_REPRP(x), x->datatype, pos, x->dims,
         PDL_REPRINCS(x), PDL_REPROFFS(x),
 	x->ndims);
-    if (result.type < 0) barf("Position %"IND_FLAG" out of range", pos);
+    if (result.type < 0) barf("Position out of range");
    badflag = (x->state & PDL_BADVAL) > 0;
    if (badflag) {
      volatile PDL_Anyval badval = pdl_get_pdl_badvalue(x);
@@ -468,13 +668,6 @@ SV *
 listref_c(x)
    pdl *x
   PREINIT:
-   PDL_Indx * incs;
-   PDL_Indx offs;
-   void *data;
-   int ind;
-   int lind;
-   int stop = 0;
-   AV *av;
    SV *sv;
    volatile PDL_Anyval pdl_val = { PDL_INVALID, {0} }; /* same reason as below */
    volatile PDL_Anyval pdl_badval = { PDL_INVALID, {0} };
@@ -485,20 +678,18 @@ listref_c(x)
     #  returns
     */
 
-   int badflag = (x->state & PDL_BADVAL) > 0;
+   int stop = 0, badflag = (x->state & PDL_BADVAL) > 0;
    if (badflag) {
       pdl_badval = pdl_get_pdl_badvalue( x );
       if (pdl_badval.type < 0) barf("Error getting badvalue, type=%d", pdl_badval.type);
    }
 
    pdl_barf_if_error(pdl_make_physvaffine( x ));
-   data = PDL_REPRP(x);
-   incs = PDL_REPRINCS(x);
-   offs = PDL_REPROFFS(x);
-   av = newAV();
+   void *data = PDL_REPRP(x);
+   AV *av = newAV();
    av_extend(av,x->nvals);
-   lind=0;
-   PDL_Indx inds[x->ndims];
+   PDL_Indx ind, lind=0, inds[x->ndims];
+   PDL_Indx *incs = PDL_REPRINCS(x), offs = PDL_REPROFFS(x);
    for(ind=0; ind < x->ndims; ind++) inds[ind] = 0;
    while(!stop) {
       pdl_val = pdl_at( data, x->datatype, inds, x->dims, incs, offs, x->ndims );
@@ -723,8 +914,8 @@ pdl_dump(x)
 void
 pdl_add_threading_magic(it,nthdim,nthreads)
 	pdl *it
-	int nthdim
-	int nthreads
+	PDL_Indx nthdim
+	PDL_Indx nthreads
 	CODE:
 		pdl_barf_if_error(pdl_add_threading_magic(it,nthdim,nthreads));
 
@@ -745,6 +936,7 @@ sclr(it)
          */
         pdl_barf_if_error(pdl_make_physdims(it));
         if (it->nvals > 1) barf("multielement ndarray in 'sclr' call");
+        pdl_barf_if_error(pdl_make_physvaffine( it ));
         RETVAL = pdl_at0(it);
         if (RETVAL.type < 0) croak("Position out of range");
     OUTPUT:
@@ -772,7 +964,7 @@ get_dataref(self)
 	if(self->state & PDL_DONTTOUCHDATA)
 	  croak("Trying to get dataref to magical (mmaped?) pdl");
 	PDLDEBUG_f(printf("get_dataref %p\n", self));
-	pdl_barf_if_error(pdl_make_physical(self)); /* XXX IS THIS MEMLEAK WITHOUT MORTAL? */
+	pdl_barf_if_error(pdl_make_physical(self));
 	if (!self->datasv) {
 	  PDLDEBUG_f(printf("get_dataref no datasv\n"));
 	  self->datasv = newSVpvn("", 0);
@@ -816,7 +1008,7 @@ badflag(x,newval=0)
   OUTPUT:
     RETVAL
 
-int
+PDL_Indx
 getndims(x)
 	pdl *x
 	ALIAS:
@@ -847,7 +1039,7 @@ dims(x)
 PDL_Indx
 getdim(x,y)
 	pdl *x
-	int y
+	PDL_Indx y
 	ALIAS:
 	     PDL::dim = 1
 	CODE:
@@ -859,7 +1051,7 @@ getdim(x,y)
 	OUTPUT:
 		RETVAL
 
-int
+PDL_Indx
 getnbroadcastids(x)
 	pdl *x
 	CODE:
@@ -884,11 +1076,12 @@ broadcastids(x)
 			mXPUSHu(x->nbroadcastids);
 		}
 
-int
+PDL_Indx
 getbroadcastid(x,y)
 	pdl *x
-	int y
+	PDL_Indx y
 	CODE:
+		if (y < 0 || y >= x->nbroadcastids) barf("requested invalid broadcastid %"IND_FLAG", nbroadcastids=%"IND_FLAG, y, x->nbroadcastids);
 		RETVAL = x->broadcastids[y];
 	OUTPUT:
 		RETVAL
@@ -975,22 +1168,19 @@ gethdr(p)
 	 RETVAL
 
 void
-broadcastover_n(...)
-   PREINIT:
-   int npdls;
-   SV *sv;
+broadcastover_n(code, pdl1, ...)
+    SV *code;
+    pdl *pdl1;
    CODE:
-    npdls = items - 1;
-    if(npdls <= 0)
-	croak("Usage: broadcastover_n(pdl[,pdl...],sub)");
-    int i,sd;
+    PDL_Indx npdls = items - 1;
+    PDL_Indx i,sd;
     pdl *pdls[npdls];
     PDL_Indx realdims[npdls];
     pdl_broadcast pdl_brc;
-    SV *code = ST(items-1);
+    pdls[0] = pdl1;
+    for(i=1; i<npdls; i++)
+	pdls[i] = pdl_SvPDLV(ST(i+1));
     for(i=0; i<npdls; i++) {
-	pdls[i] = pdl_SvPDLV(ST(i));
-	/* XXXXXXXX Bad */
 	pdl_barf_if_error(pdl_make_physical(pdls[i]));
 	realdims[i] = 0;
     }
@@ -1008,10 +1198,8 @@ broadcastover_n(...)
 	EXTEND(sp,items);
 	PUSHs(sv_2mortal(newSViv((sd-1))));
 	for(i=0; i<npdls; i++) {
-		PDL_Anyval pdl_val = { PDL_INVALID, {0} };
-		pdl_val = pdl_get_offs(pdls[i],pdl_brc.offs[i]);
-		sv = sv_newmortal();
-		ANYVAL_TO_SV(sv, pdl_val);
+		SV *sv = sv_newmortal();
+		ANYVAL_TO_SV(sv, pdl_get_offs(pdls[i],pdl_brc.offs[i]));
 		PUSHs(sv);
 	}
 	PUTBACK;
@@ -1023,45 +1211,41 @@ broadcastover_n(...)
     pdl_freebroadcaststruct(&pdl_brc);
 
 void
-broadcastover(...)
-   PREINIT:
-    int npdls;
-    int targs;
-    int nothers = -1;
+broadcastover(code, realdims, creating, nothers, pdl1, ...)
+    PDL_Indx realdims_count=0;
+    PDL_Indx creating_count=0;
+    SV *code;
+    PDL_Indx *realdims;
+    PDL_Indx *creating;
+    int nothers;
+    pdl *pdl1;
    CODE:
-    targs = items - 4;
-    if (items > 0) nothers = SvIV(ST(0));
-    if(targs <= 0 || nothers < 0 || nothers >= targs)
-	croak("Usage: broadcastover(nothers,pdl[,pdl...][,otherpars..],realdims,creating,sub)");
-    npdls = targs-nothers;
-    int i,dtype=0;
-    PDL_Indx nc=npdls,nd1,nd2;
-    SV* rdimslist = ST(items-3);
-    SV* cdimslist = ST(items-2);
-    SV *code = ST(items-1);
-    pdl_broadcast pdl_brc;
+    int targs = items - 4;
+    if(nothers < 0 || nothers >= targs)
+	croak("Usage: broadcastover(sub,realdims,creating,nothers,pdl1[,pdl...][,otherpars..])");
+    PDL_Indx npdls = targs-nothers, i,nc=npdls;
     pdl *pdls[npdls], *child[npdls];
     SV *csv[npdls], *others[nothers];
-    PDL_Indx *creating = pdl_packdims(cdimslist,&nd2);
-    if (!creating) croak("Failed to packdims for creating");
-    if (nd2 < npdls) croak("broadcastover: need at least one creating flag per pdl: %d pdls, %"IND_FLAG" flags", npdls, nd2);
-    PDL_Indx *realdims = pdl_packdims(rdimslist,&nd1);
-    if (!realdims) croak("Failed to packdims for realdims");
-    if (nd1 != npdls) croak("broadcastover: need one realdim flag per pdl: %d pdls, %"IND_FLAG" flags", npdls, nd1);
+    if (creating_count < npdls) croak("broadcastover: need at least one creating flag per pdl: %"IND_FLAG" pdls, %"IND_FLAG" flags", npdls, creating_count);
+    if (realdims_count != npdls) croak("broadcastover: need one realdim flag per pdl: %"IND_FLAG" pdls, %"IND_FLAG" flags", npdls, realdims_count);
+    int dtype=0;
+    pdls[0] = pdl1;
+    for(i=1; i<npdls; i++)
+	pdls[i] = pdl_SvPDLV(ST(i+4));
     for(i=0; i<npdls; i++) {
-	pdls[i] = pdl_SvPDLV(ST(i+1));
 	if (creating[i])
 	  nc += realdims[i];
 	else {
-	  pdl_barf_if_error(pdl_make_physical(pdls[i])); /* is this what we want?XXX */
+	  pdl_barf_if_error(pdl_make_physvaffine(pdls[i]));
 	  dtype = PDLMAX(dtype,pdls[i]->datatype);
 	}
     }
-    for (i=npdls+1; i<=targs; i++)
-	others[i-npdls-1] = ST(i);
-    if (nd2 < nc)
+    if (creating_count < nc)
 	croak("Not enough dimension info to create pdls");
-    PDLDEBUG_f(for (i=0;i<npdls;i++) { printf("pdl %d ",i); pdl_dump(pdls[i]); });
+    for (i=npdls; i<=targs; i++)
+	others[i-npdls] = ST(i+4);
+    PDLDEBUG_f(for (i=0;i<npdls;i++) { printf("pdl %"IND_FLAG" ",i); pdl_dump(pdls[i]); });
+    pdl_broadcast pdl_brc;
     PDL_CLRMAGIC(&pdl_brc);
     pdl_brc.gflags = 0; /* avoid uninitialised value use below */
     pdl_barf_if_error(pdl_initbroadcaststruct(0,pdls,realdims,creating,npdls,
@@ -1087,12 +1271,11 @@ broadcastover(...)
 	   pdls[i] = pdls[i]->vafftrans->from;
 	child[i]=pdl_pdlnew();
 	if (!child[i]) pdl_pdl_barf("Error making null pdl");
-	/*  instead of pdls[i] its vaffine parent !!!XXX */
 	pdl_barf_if_error(pdl_affine_new(pdls[i],child[i],pdl_brc.offs[i],
 		thesedims,realdims[i],
 		theseincs,realdims[i]));
-	pdl_barf_if_error(pdl_make_physical(child[i])); /* make sure we can get at
-					the vafftrans          */
+	pdl_barf_if_error(pdl_make_physvaffine(child[i])); /* make sure we can
+					get at the vafftrans */
 	csv[i] = sv_newmortal();
 	pdl_SetSV_PDL(csv[i], child[i]); /* pdl* into SV* */
     }
@@ -1102,7 +1285,7 @@ broadcastover(...)
 	pdl_trans *traff;
 	dSP;
 	PUSHMARK(sp);
-	EXTEND(sp,npdls);
+	EXTEND(sp,npdls+nothers);
 	for(i=0; i<npdls; i++) {
 	   /* just twiddle the offset - quick and dirty */
 	   /* we must twiddle both !! */

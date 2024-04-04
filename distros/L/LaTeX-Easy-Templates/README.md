@@ -4,7 +4,7 @@ LaTeX::Easy::Templates - Easily format content into PDF/PS/DVI with LaTeX templa
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
@@ -268,8 +268,49 @@ specified hash and should contain these items:
     - **logfile** : specify a file to redirect the logger's output to. Default
     is to log messages to the console (STDOUT, STDERR).
     - **logger\_object** : supply a [Mojo::Log](https://metacpan.org/pod/Mojo%3A%3ALog) object to use as the logger.
-    In fact any object implementing `error()`, `warn()` and `info()` like
-    [Mojo::Log](https://metacpan.org/pod/Mojo%3A%3ALog) does will be accepted.
+    In fact any object implementing just these three: `error()`, `warn()` and `info()`, which
+    [Mojo::Log](https://metacpan.org/pod/Mojo%3A%3ALog) does, will be accepted.
+    - **templater-parameters** : a HASH containing parameters to be
+    passed on to the [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate) constructor. 
+
+        These are some common templater paramaters:
+
+        - **syntax** : specify the template syntax to be either [Kolon](https://metacpan.org/pod/Text%3A%3AXslate%3A%3ASyntax%3A%3AKolon) or `TTerse|Text::Xslate::Syntax::TTerse`. Default is `Kolon`.
+        - **suffix** : specify the template files suffix. Default is `.tx` (do not forget the dot).
+        - **verbose** : set the verbosity of [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate).
+        Default is the verbosity level currently set in the
+        [LaTeX::Easy::Templates](https://metacpan.org/pod/LaTeX%3A%3AEasy%3A%3ATemplates) object.
+        - **path** : an array(ref) of paths to be searched for included templates. This is crucial
+        when templates are including other templates in different directories.
+        - **function**, **module** : specify your own perl functions and modules you want to use
+        from within a template. That's very handy in overcoming the limitations of the template syntax.
+
+        See [Text::Xslate#Text::Xslate-%3Enew(%options)](https://metacpan.org/pod/Text%3A%3AXslate%23Text%3A%3AXslate-%253Enew%28%25options%29) for all the supported options.
+
+        - **path** : an array of paths to be searched for on-disk template
+        files which are dependencies, i.e. they are included by other templates (in-memory or on-disk).
+        This is very important if your main template includes other templates which
+        are in different directories.
+        - **syntax** : the template syntax. Default is 'Kolon'.
+        - **function**, **module** : a hash of user-specified or built-in perl functions (coderefs)
+        to be used in the templates. And a list of modules to be included for using these.
+        Quite a powerful feature of [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate).
+        - **cache**, **cache\_dir** : cache level and location.
+        - **line\_start**, **tag\_start**, **line\_end**, **tag\_end** : the token strings denoting
+        the start and end of lines and tags.
+
+        For example:
+
+              'templater-parameters' => {
+                # dependent templates search paths
+                'path' => ['a/b/c', 'x/y/z', ...],
+                # user-specified functions to be called
+                # from a template
+                'function' => {
+                  'xyz' => sub { my (@params) = @_; ...; return ... }
+                },
+                ...
+              },
 
 The constructor returns `undef` on failure.
 
@@ -357,11 +398,9 @@ So if your template data is this:
 in exactly the same format as that of the **processors** parameter
 passed to the constructor (["new()"](#new)).
 
-### RETURN
+On failure, ["untemplate()"](#untemplate) returns `undef`.
 
-On failure, ["untemplate()"](#untemplate) returns back `undef`.
-
-On success, it returns back a hash(ref) with two entries:
+On success, it returns a hash(ref) with two entries:
 
 - **latex** : contains **fileapth**, **filename** and **basedir**
 of the produced LaTeX source file.
@@ -393,11 +432,9 @@ be produced.
 in exactly the same format as that of the **processors** parameter
 passed to the constructor (["new()"](#new)).
 
-### RETURN
+On failure, ["format()"](#format) returns `undef`.
 
-On failure, ["format()"](#format) returns back `undef`.
-
-On success, it returns back a hash(ref) with three entries:
+On success, it returns a hash(ref) with three entries:
 
 - **latex** : contains **fileapth**, **filename** and **basedir**
 of the produced LaTeX source file.
@@ -445,28 +482,6 @@ is supported.
 Reset the templater object which means to forget all the templates
 it knows and had possibly loaded in memory. After a reset all
 "processors" will be forgotten as well.
-
-## `templater_parameters($m, $n)`
-
-It gets or sets (with optional parameter `$m` and possiblt `$n`) the
-parameters to be passed to the templater's
-([Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate)) constructor:
-
-- If no parameter is specified then it returns all the parameters as a hash(ref).
-- If the first parameter is a hash, then its copies all its entries possibly
-overwriting existing values.
-- If the first parameter is a scalar and the second is omitted then it returns
-the value for this parameter if it exists.
-- If the first parameter is a scalar and the second is a scalar then it sets
-the value for this parameter to the second parameter.
-
-These are some common templater paramaters:
-
-- **syntax** : specify the template syntax to be either [Kolon](https://metacpan.org/pod/Text%3A%3AXslate%3A%3ASyntax%3A%3AKolon) or `TTerse|Text::Xslate::Syntax::TTerse`. Default is `Kolon`.
-- **suffix** : specify the template files suffix. Default is `.tx` (do not forget the dot).
-- **verbose** : set the verbosity. Default is current verbosity.
-
-See [Text::Xslate#Text::Xslate-%3Enew(%options)](https://metacpan.org/pod/Text%3A%3AXslate%23Text%3A%3AXslate-%253Enew%28%25options%29) for more.
 
 ## `log($l)`
 
@@ -517,18 +532,14 @@ follow its rules. It understands two template syntaxes:
 
 The default syntax is [Text::Xslate::Syntax::Kolon](https://metacpan.org/pod/Text%3A%3AXslate%3A%3ASyntax%3A%3AKolon). This can be changed
 via the parameters to the constructor of [LaTeX::Easy::Templates](https://metacpan.org/pod/LaTeX%3A%3AEasy%3A%3ATemplates) by
-specifying
+specifying this:
 
     'templater-parameters' => {
         'syntax' => 'Kolon' #or 'TTerse'
     }
 
-or setting it before running ["untemplate()"](#untemplate) with
-
-    $latte->templater_parameters('syntax' => 'Kolon');
-
-The data for the template variables comes bundled into a hashref
-which comes bundled into a hashref of a single key `data`. Therefore
+The **data** for substituting into the template variables comes bundled into a hashref
+which comes bundled into a hashref keyed under the name "`data`". Therefore
 all references must be preceded by key `data.`
 
 So if your template data is this:
@@ -539,14 +550,22 @@ So if your template data is this:
 
 Then your template will access `name`'s value via ` <: $data.name :` >.
 
-[Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate) supports loops and conditional statements etc. etc. Read
-the documentation for [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate)'s syntax:
+[Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate) supports loops and conditional statements.
+It also offers a lot of [builtin functions](https://metacpan.org/pod/Text%3A%3AXslate%3A%3AManual%3A%3ABuiltin).
+Additionally you can call user-specified perl subs (or subs from other modules)
+from within a template.
+
+Read
+the documentation for [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate)'s syntax
 [Text::Xslate::Syntax::Kolon](https://metacpan.org/pod/Text%3A%3AXslate%3A%3ASyntax%3A%3AKolon) or [Text::Xslate::Syntax::TTerse](https://metacpan.org/pod/Text%3A%3AXslate%3A%3ASyntax%3A%3ATTerse).
 
 # TEMPLATES INCLUDING TEMPLATES
 
 Templates which include other templates are supported.
-Both with in-memory template strings or with on-disk template files.
+
+The included and the includee templates can be a
+combination of on-disk files and/or in-memory strings.
+Which means in-memory templates can include on-disk and vice-versa.
 
 ## In-memory templates
 
@@ -564,7 +583,7 @@ main template is:
     : }
     \end{document}
 
-It calls two other templates:
+The above _includes_ two other templates:
 
     :# preamble.tex.tx
     \title{ <: $data.title :> }
@@ -604,10 +623,11 @@ object like this:
       } # end 'processors'
 
 With the above, all in-memory templates required are loaded in memory.
-All you need now is to specify "`main.tex.tx`" as the
+All you need now is to specify "`main.tex.tx`" (which
+is the main entry point) as the
 `processor` name when
 calling ["untemplate()"](#untemplate) or ["format()"](#format). You do not need
-to mention the included template names at all. Like this:
+to mention the included template names at all:
 
     my $ret = $latter->format({
       'template-data' => $template_data,
@@ -619,19 +639,36 @@ to mention the included template names at all. Like this:
 });
 
 The above functionality is demonstrated and tested in
-file `t/350-inmemory-template-usage-calling-other-templates.t`
+file `t/460-inmemory-template-usage-calling-other-templates.t`
 
-## On-disk, file templates
+## On-disk file templates
 
 If both the main template and all templates it includes are in the
 same directory then you only need to specify
-the `main.tex.tx` template. And all dependencies will
-be taken care of. Like this:
+the `main.tex.tx` template under key `processors`
+in the parameters to [LaTeX::Easy::Templates](https://metacpan.org/pod/LaTeX%3A%3AEasy%3A%3ATemplates)'s [constructor](#new).
+In this case all dependencies will
+be taken care of (thank you [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate)).
+
+Additionally, you can specify a list of directories as
+paths to be searched for dependent templates. These _include paths_
+can be passed on as parameters to [LaTeX::Easy::Templates](https://metacpan.org/pod/LaTeX%3A%3AEasy%3A%3ATemplates)'s
+[constructor](#new), under 
+
+     ...
+     'templater-parameters' => {
+       'path' => ['a/b/c', 'x/y/z', ...]
+     },
+     ...
 
      my $latter = LaTeX::Easy::Template->new({
-      'processors' => {
+       'templater-parameters' => {
+         'path' => ['a/b/c', 'x/y/z', ...],
+         ...
+       },
+       'processors' => {
         # the main entry
-        'main.tex.tx' => {
+         'main.tex.tx' => {
            'template' => {
              'filepath' => '/x/y/z/main.tex.tx'
              # works also with specifying
@@ -640,11 +677,12 @@ be taken care of. Like this:
            'output' => {
                 'filename' => 'out.pdf'
            }
-        },
-        # the dependent templates are not needed
-        # to be included if in same dir
-        # include them ONLY if in different dir
-      } # end 'processors'
+         },
+         # the dependent templates are not needed
+         # to be included if in same dir
+         # include them ONLY if in different dir
+       } # end 'processors'
+     }); # end constructor
 
 With the above, the "`main.tex.tx`" template,
 which is the main entry point, is loaded.
@@ -670,7 +708,16 @@ to mention the included template names at all. Like this:
 });
 
 The above functionality is demonstrated and tested in
-file `t/360-ondisk-template-usage-calling-other-templates.t`>
+file `t/360-ondisk-template-usage-calling-other-templates.t`
+
+## Mixed use of in-memory and on-disk templates
+
+One can have a project of mixed, in-memory and on-disk, templates
+one including the other in any combination. This is
+straightforward, just follow the above guidelines.
+
+Mixed templates functionality is demonstrated and tested in
+file `t/500-mix-template-usage-calling-other-mix-templates.t`.
 
 # STARTING WITH LaTeX
 

@@ -14,7 +14,7 @@ use lib 'blib/lib';
 
 #use utf8;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Test::More;
 use Test::More::UTF8;
@@ -51,14 +51,14 @@ my $template_data = {
 	'content' => 'blah blah',
 };
 
-my (%templates, $FH);
+my (%processors, $FH);
 for my $atf ('main.tex.tx', 'preamble.tex.tx', 'content.tex.tx'){
 	my $templatefile = File::Spec->catfile($curdir, 'templates', 'simple02-included-templates', $atf);
 	ok(-f $templatefile, "template exists: $templatefile") or BAIL_OUT;
 	ok(open($FH, '<:encoding(UTF-8)', $templatefile), "template file opened for reading : '$templatefile'.") or BAIL_OUT("failed: $!");
 	my $con;
 	{ local $/ = undef; $con = <$FH> } close $FH;
-	$templates{$atf} = {
+	$processors{$atf} = {
 		'template' => {
 			'content' => $con
 		}

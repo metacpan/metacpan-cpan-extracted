@@ -96,7 +96,6 @@ subtest 'ImgurAPI endpoint methods' => sub {
 
         gallery_album
         gallery_image
-        gallery_item
         gallery_item_comment
         gallery_item_comment_info
         gallery_item_comments

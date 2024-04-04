@@ -12,6 +12,12 @@ my $obj = Number::Stars->new;
 isa_ok($obj, 'Number::Stars');
 
 # Test.
+$obj = Number::Stars->new(
+	'number_of_stars' => 3,
+);
+isa_ok($obj, 'Number::Stars');
+
+# Test.
 eval {
 	Number::Stars->new(
 		'bad_param' => 'foo',
@@ -20,12 +26,6 @@ eval {
 is($EVAL_ERROR, "Unknown parameter 'bad_param'.\n",
 	"Unknown parameter 'bad_param'.");
 clean();
-
-# Test.
-$obj = Number::Stars->new(
-	'number_of_stars' => 3,
-);
-isa_ok($obj, 'Number::Stars');
 
 # Test.
 eval {

@@ -1,5 +1,8 @@
 Revision history for CGI-ACL
 
+0.05	Tue Apr  2 16:26:14 EDT 2024
+	Calling new on an object now returns a clone rather than setting the defaults in the new object
+
 0.04	Fri May 21 14:54:04 EDT 2021
 	Do something sensible if the remote country can't be determined
 	By default, localhost is not allowed access

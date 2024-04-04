@@ -83,7 +83,7 @@ parsing the input file unless you change it,
 and the generated XML header specifies the encoding used.
 This makes sense when printing directly to a disk file (via a non-encoding
 file handle), but will corrupt non-ASCII characters printed to STDOUT
-if STDOUT is set to auto-encode, as is usually the case.
+if STDOUT is set to auto-encode, as is often the case.
 
 Going the other way, XML::Twig's B<parse()> method expects binary octets as
 input and uses the "encoding=..." specification in the XML

@@ -10,12 +10,12 @@ BEGIN {
 }
 
 use Astro::App::Satpass2;
-use Test::More 0.88;	# Because of done_testing();
+use Test2::V0;
 
 my $app = Astro::App::Satpass2->new();
 $app->_get_readline();	# To initialize internals.
 $INC{'Term/ReadLine/Perl.pm'}
-    or plan skip_all => 'Term::ReadLine::Perl not available';
+    or skip_all 'Term::ReadLine::Perl not available';
 
 
 complete( '', get_builtins( 0 ) );
@@ -133,7 +133,7 @@ sub complete {
     my @rslt = $app->__readline_completer( $text, $line, $start );
 
     @_ = ( \@rslt, $want, $name || "Complete '$line'" );
-    goto &is_deeply;
+    goto &is;
 }
 
 {

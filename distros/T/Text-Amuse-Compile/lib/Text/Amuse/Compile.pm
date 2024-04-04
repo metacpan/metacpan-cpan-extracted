@@ -31,11 +31,11 @@ Text::Amuse::Compile - Compiler for Text::Amuse
 
 =head1 VERSION
 
-Version 1.88
+Version 1.89
 
 =cut
 
-our $VERSION = '1.88';
+our $VERSION = '1.89';
 
 =head1 SYNOPSIS
 
@@ -72,6 +72,11 @@ Boolean (default to true) which triggers the epub font embedding.
 =item luatex
 
 Use lualatex instead of xelatex.
+
+=item run_timeout
+
+Max time execution for a single latex run in seconds. Default to 600
+which should be plenty and is going to catch only weird compilations.
 
 =item tex
 
@@ -238,6 +243,9 @@ has include_paths => (is => 'ro',
                               die "include_paths $path must exist" unless -d $path;
                           }
                       });
+
+has run_timeout => (is => 'ro', isa => Int, default => sub { 600 });
+
 
 sub _build_fonts {
     my $self = shift;
@@ -597,6 +605,7 @@ sub _compile_virtual_file {
                                                fonts => $self->fonts,
                                                epub_embed_fonts => $self->epub_embed_fonts,
                                                include_paths => [ @{$self->include_paths} ],
+                                               run_timeout => $self->run_timeout,
                                               );
     $self->_muse_compile($muse);
 }
@@ -627,6 +636,7 @@ sub _compile_file {
                 fileobj => $fileobj,
                 coverpage_only_if_toc => $self->coverpage_only_if_toc,
                 include_paths => [ @{$self->include_paths} ],
+                run_timeout => $self->run_timeout,
                );
 
     my $muse = Text::Amuse::Compile::File->new(%args);

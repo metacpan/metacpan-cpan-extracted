@@ -1,9 +1,8 @@
 package WWW::Mechanize::Chrome;
 use 5.020;
 
-use feature 'signatures';
-no warnings 'experimental::signatures';
-
+use experimental 'signatures';
+use stable 'postderef';
 use feature 'current_sub';
 
 use PerlX::Maybe;
@@ -30,7 +29,7 @@ use Future::Utils 'repeat';
 use Time::HiRes ();
 use Encode 'encode';
 
-our $VERSION = '0.72';
+our $VERSION = '0.73';
 our @CARP_NOT;
 
 # We don't yet inherit from Moo 2, so patch up things manually
@@ -440,6 +439,10 @@ sub build_command_line {
     # Convert the path to an absolute filename, so we can chdir() later
     $program = File::Spec->rel2abs( $program ) || $program;
 
+    my $is_root = ($> == 0);
+    $options->{ no_sandbox } = 1
+        if $is_root;     # We need this when running as root
+
     $options->{ launch_arg } ||= [];
     $options->{ exclude_switches } ||= [];
 
@@ -491,6 +494,13 @@ sub build_command_line {
         push @{ $options->{ launch_arg }}, "--profile-directory=$profile";
     };
 
+    if( $options->{temp_profile}) {
+        if( $options->{profile} ) {
+            croak "Cannot use the 'profile' option together with 'temp_profile'";
+        }
+        push @{ $options->{ launch_arg }}, "--temp-profile";
+    }
+
     if( $options->{enable_automation}) {
         push @{ $options->{ launch_arg }}, "--enable-automation";
     };
@@ -516,9 +526,9 @@ sub build_command_line {
         push @{ $options->{ launch_arg }}, "--no-zygote";
     };
 
-    #if( $no_sandbox) {
-    #    push @{ $options->{ launch_arg }}, "--no-sandbox";
-    #};
+    if( $no_sandbox ) {
+        push @{ $options->{ launch_arg }}, "--no-sandbox";
+    };
 
     if( $options->{hide_scrollbars}) {
         push @{ $options->{ launch_arg }}, "--hide-scrollbars";
@@ -803,6 +813,7 @@ sub spawn_child_posix( $self, $method, @cmd ) {
     };
 
     my ($from_chrome, $to_chrome);
+    local $^F;
     if( $method eq 'pipe' ) {
         # We want handles 0,1,2,3,4 to be inherited by Chrome
         $^F = 4;
@@ -836,6 +847,7 @@ sub read_devtools_url( $self, $fh, $lines = 50 ) {
     # We expect the output within the first 50 lines...
     my $devtools_url;
 
+    my %pids;
     while( $lines-- and ! defined $devtools_url and ! eof($fh)) {
         my $line = <$fh>;
         last unless defined $line;
@@ -845,6 +857,12 @@ sub read_devtools_url( $self, $fh, $lines = 50 ) {
             $devtools_url = $1;
             $self->log('trace', "Found ws endpoint from child output as '$devtools_url'");
             last;
+        } elsif( $line =~ m!^\[(\d+):(\d+):!) {
+            my $pid = $1;
+            if( !$pids{ $pid }++ ) {
+                $self->log('trace', "Found a pid as '$pid', original pid is $self->{pid}->@*");
+                push $self->{pid}->@*, $pid;
+            };
         } elsif( $line =~ m!ERROR:headless_shell.cc! ) {
             die "Chrome launch error: $line";
         }
@@ -1060,7 +1078,7 @@ sub _spawn_new_chrome_instance( $self, $options ) {
         = $self->spawn_child( $options->{ connection_style }, @cmd );
     $options->{ writer_fh } = $to_chrome;
     $options->{ reader_fh } = $from_chrome;
-    $self->{pid} = $pid;
+    push $self->{pid}->@*, $pid;
     $self->{ kill_pid } = 1;
     if( $options->{ connection_style } eq 'pipe') {
         $options->{ writer_fh } = $to_chrome;
@@ -1140,8 +1158,9 @@ sub _connect( $self, %options ) {
     # if Chrome started, but so slow or unresponsive that we cannot connect
     # to it, kill it manually to avoid waiting for it indefinitely
     if ( $err ) {
-        if( $self->{ kill_pid } and my $pid = delete $self->{ pid }) {
-            $self->kill_child( 'SIGKILL', $pid, $self->{wait_file} );
+        if( $self->{ kill_pid } and $self->{ pid }->@*) {
+            my $pids = $self->{ pid };
+            $self->kill_child( 'SIGKILL', $pids, $self->{wait_file} );
         };
         croak $err;
     }
@@ -2001,8 +2020,7 @@ Tear down all connections and shut down Chrome.
 =cut
 
 sub close {
-    my $pid= delete $_[0]->{pid};
-
+    my $pids = delete $_[0]->{pid};
     #if( $_[0]->{autoclose} and $_[0]->tab and my $tab_id = $_[0]->tab->{id} ) {
     #    $_[0]->target->close_tab({ id => $tab_id })->get();
     #};
@@ -2029,17 +2047,17 @@ sub close {
     delete $_[0]->{ driver };
 
     if( $_[0]->{autoclose} and $_[0]->{kill_pid} ) {
-        $_[0]->kill_child( $_[0]->{cleanup_signal}, $pid, $_[0]->{wait_file} );
+        $_[0]->kill_child( $_[0]->{cleanup_signal}, $pids, $_[0]->{wait_file} );
     }
 }
 
-sub kill_child( $self, $signal, $pid, $wait_file ) {
-    if( $pid and kill 0 => $pid) {
+sub kill_child( $self, $signal, $pids, $wait_file ) {
+    if( $pids and kill 0 => $pids->@*) {
         local $SIG{CHLD} = 'IGNORE';
         undef $!;
-        if( ! kill $signal => $pid ) {
+        if( ! kill $signal => $pids->@* ) {
             # The child already has gone away?!
-            warn "Couldn't kill browser child process $pid with $self->{cleanup_signal}: $!";
+            warn "Couldn't kill browser child process $pids->@* with $self->{cleanup_signal}: $!";
             # Gobble up any exit status
             warn waitpid -1, WNOHANG;
         } else {
@@ -2049,9 +2067,9 @@ sub kill_child( $self, $signal, $pid, $wait_file ) {
                 # infinite hangs at least on Travis CI !?
                 my $timeout = time+2;
                 while( time < $timeout ) {
-                    my $res = waitpid $pid, WNOHANG;
-                    if( $res != -1 and $res != $pid ) {
-                        warn "Couldn't wait for child '$pid' ($res)?"
+                    my $res = waitpid $pids->[0], WNOHANG;
+                    if( $res != -1 and $res != $pids->[0] ) {
+                        warn "Couldn't wait for child '$pids->@*' ($res)?"
                             if $res != 0;
                         sleep 0.1;
                     } else {
@@ -2060,11 +2078,11 @@ sub kill_child( $self, $signal, $pid, $wait_file ) {
                 };
             } else {
                 # on Linux and Windows, plain waitpid Just Works
-                waitpid $pid, 0;
+                waitpid $pids->[0], 0;
                 # but still, check again that the child has really gone away:
                 my $timeout = time+2;
                 while( time < $timeout ) {
-                    my $res = kill 0 => $pid;
+                    my $res = kill 0 => $pids->@*;
                     if( $res ) {
                         sleep 0.1;
                     } else {
@@ -6776,7 +6794,7 @@ Joshua Pollack
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2023 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2024 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

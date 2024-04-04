@@ -1,31 +1,27 @@
 ---
-abstract: "[One line description of module's purpose here]"
+abstract: 'GitHub client, with some scraping functions'
 author:
   - 'JJ Merelo <jjmerelo@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::Perl::Critic: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
-license: perl
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: App-GitHub-Repository
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  App::GitHub::Repository:
+    file: lib/App/GitHub/Repository.pm
+    version: v0.0.5
 requires:
   File::Slurper: '0'
   Git: '0'
   JSON: '0'
-  Test::Builder::Module: '0'
   Test::More: '0'
-  Test::Perl::Critic: '0'
   version: '0'
-resources:
-  repository: https://github.com/JJ/p5-app-github-repository.git
-version: 0.0.4
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: v0.0.5
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

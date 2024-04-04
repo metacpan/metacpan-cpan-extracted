@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Content;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Content vocabulary
 
-our $VERSION = '0.582';
+our $VERSION = '0.583';
 
 use 5.020;
 use Moo;
@@ -128,7 +128,7 @@ JSON::Schema::Modern::Vocabulary::Content - Implementation of the JSON Schema Co
 
 =head1 VERSION
 
-version 0.582
+version 0.583
 
 =head1 DESCRIPTION
 
@@ -160,13 +160,13 @@ option.
 New handlers for C<contentEncoding> and C<contentMediaType> can be done through
 L<JSON::Schema::Modern/add_encoding> and L<JSON::Schema::Modern/add_media_type>.
 
-=for stopwords OpenAPI
-
 =head1 SUPPORT
 
 Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Modern/issues>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+=for stopwords OpenAPI
 
 You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
 server|https://open-api.slack.com>, which are also great resources for finding help.

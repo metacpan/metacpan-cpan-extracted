@@ -7,7 +7,7 @@ use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -162,8 +162,8 @@ Tags::HTML - Tags helper abstract class.
 
  my $obj = Tags::HTML->new(%params);
  $obj->cleanup(@params);
- $obj->prepare(@params);
  $obj->init(@params);
+ $obj->prepare(@params);
  $obj->process;
  $obj->process_css;
 
@@ -476,12 +476,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2023 Michal Josef Špaček
+© 2021-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

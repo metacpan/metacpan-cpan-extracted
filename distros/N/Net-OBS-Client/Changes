@@ -1,4 +1,9 @@
 Revision history for Net-OBS-Client
+0.1.2 2024-03-27
+
+  * added Net::OBS::LWP::UserAgent with 'mirror' method
+  * multiple configuration parameters for Net::OBS::SigAuth
+
 
 0.1.1 2023-11-30
 

@@ -1,6 +1,10 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use lib 'inc';
+use CheckCCVersion;
+
+check_cc_version ();
 
 my $pm = 'lib/Gzip/Libdeflate.pm';
 my $pod = 'lib/Gzip/Libdeflate.pod';
@@ -19,6 +23,9 @@ WriteMakefile (
 	'meta-spec' => {
 	    version => 2,
 	},
+        no_index => {
+            directory => ['inc'],
+        },
         resources => {
             repository => {
 		type => 'git',

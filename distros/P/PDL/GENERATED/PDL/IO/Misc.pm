@@ -42,6 +42,7 @@ Some basic I/O functionality: FITS, tables, byte-swapping
 =cut
 #line 44 "Misc.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -60,7 +61,8 @@ use Carp;
 use Symbol qw/ gensym /;
 use List::Util;
 use strict;
-#line 64 "Misc.pm"
+#line 65 "Misc.pm"
+
 
 =head2 bswap2
 
@@ -1192,7 +1194,8 @@ of C<$1>, C<$2> etc.
 sub PDL::isbigendian { return 0; };
 *isbigendian = \&PDL::isbigendian;
 
-#line 1202 "misc.pd"
+#line 1196 "misc.pd"
+
 =head2 rasc
 
 =for ref
@@ -1296,7 +1299,7 @@ sub rcube {
 
       return $cube;
 }
-#line 1300 "Misc.pm"
+#line 1303 "Misc.pm"
 
 *_rasc = \&PDL::_rasc;
 
@@ -1319,7 +1322,7 @@ separated from the PDL distribution, the copyright notice
 should be included in the file.
 
 =cut
-#line 1323 "Misc.pm"
+#line 1326 "Misc.pm"
 
 # Exit with OK status
 

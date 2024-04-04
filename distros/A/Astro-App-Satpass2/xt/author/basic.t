@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More 0.88;
 
-diag 'Things needed for authortest';
+note 'Things needed for authortest';
 
 require_ok 'Astro::SIMBAD::Client';
 require_ok 'Astro::SpaceTrack';
@@ -27,6 +27,11 @@ require_ok 'Time::HiRes';
 
 ok -f 'date_manip_v5/Date/Manip.pm',
     'Have Date::Manip v5 for regression testing';
+
+note 'Other author requirements';
+
+require_ok 'CPAN::Meta';
+require_ok 'Module::Metadata';
 
 done_testing;
 

@@ -1,0 +1,57 @@
+{
+  "amount": 1337,
+  "auth": {
+    "redirect_url": null,
+    "return_url": "https://www.free.fr",
+    "status": "available"
+  },
+  "capture": true,
+  "card": {
+    "brand": "mastercard",
+    "country": "US",
+    "created": 1538564253,
+    "exp_month": 2,
+    "exp_year": 2020,
+    "id": "card_xognFbZs935LMKJYeHyCAYUd",
+    "last4": "4444",
+    "name": null,
+    "zip_code": null
+  },
+  "country": "",
+  "created": 1567094428,
+  "currency": "eur",
+  "customer": {
+    "country": null,
+    "created": 1567094428,
+    "email": "john.doe@example.com",
+    "id": "cust_bZ7e17VDlD252dkgHg7JJgBa",
+    "mobile": null,
+    "name": "John Doe"
+  },
+  "date_bank": null,
+  "date_paym": 1567094428,
+  "description": "Auth test",
+  "device": {
+    "city": null,
+    "country": "FR",
+    "geoname": null,
+    "http_accept": "text/html",
+    "ip": "212.27.48.10",
+    "languages": null,
+    "lat": 48.8582,
+    "lng": 2.3387,
+    "phone": null,
+    "port": 1337,
+    "radius": 500,
+    "user_agent": null,
+    "zip_code": null
+  },
+  "fee": 21,
+  "id": "paym_RMLytyx2xLkdXkATKSxHOlvC",
+  "live_mode": false,
+  "method": "card",
+  "order_id": null,
+  "response": null,
+  "return_url": "https://free.fr",
+  "status": null
+}

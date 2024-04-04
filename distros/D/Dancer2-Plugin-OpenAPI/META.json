@@ -66,11 +66,11 @@
    "provides" : {
       "Dancer2::Plugin::OpenAPI" : {
          "file" : "lib/Dancer2/Plugin/OpenAPI.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "Dancer2::Plugin::OpenAPI::Path" : {
          "file" : "lib/Dancer2/Plugin/OpenAPI/Path.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       }
    },
    "release_status" : "stable",
@@ -85,7 +85,7 @@
          "web" : "https://github.com/yanick/Dancer2-Plugin-OpenAPI"
       }
    },
-   "version" : "1.0.1",
+   "version" : "1.0.2",
    "x_author_pledge" : {
       "version" : 1
    },

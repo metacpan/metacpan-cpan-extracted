@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.46';
+$VERSION = '0.47';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -252,7 +252,7 @@ Default value 100. If is used during save and load operation.
 It specifies after how many lines an update on the progress bar on
 the status bar should occur.
 
-=item Switch: B<-xmldir>
+=item Switch: B<-xmlfolder>
 
 XML folder to use for L<Syntax::Kamelon>
 
@@ -280,13 +280,13 @@ sub Populate {
 		$theme->put(@defaultattributes);
 	}
 
-	my $xmldir = delete $args->{'-xmldir'};
 	my @ko = (
 		formatter => ['Base',
 			foldingdepth => 'all',
 		],
 	);
-	push @ko, 'xmldir', $xmldir if defined $xmldir;
+	my $xmldir = delete $args->{'-xmlfolder'};
+	push @ko, 'xmlfolder', $xmldir if defined $xmldir;
 
 	$self->SUPER::Populate($args);
 
@@ -545,7 +545,7 @@ sub Populate {
  	$self->after(1, sub {
 		$self->{POSTCONFIG} = 1;
 		$self->themeUpdate;
-		$self->lnumberCheck;
+		$self->lnumberCheck(1);
  	});
 }
 
@@ -975,16 +975,23 @@ Returns the line number of $index.
 =cut
 
 sub lnumberCheck {
-	my $self = shift;
+	my ($self, $force) = @_;
+	$force = 0 unless defined $force;
 
 	my $line = $self->visualBegin;
 	my $last = $self->visualEnd;
-	$self->SaveFirstVisible($line);
-	$self->SaveLastVisible($last);
 
+	my $sb = $self->SaveFirstVisible;
+	my $se = $self->SaveLastVisible;
+
+	unless ($force) {
+		return if ($sb eq $line) and ($last eq $se);
+	}
 	return unless $self->{POSTCONFIG};
 	return unless $self->cget('-shownumbers');
 
+	$self->SaveFirstVisible($line);
+	$self->SaveLastVisible($last);
 	my $widget = $self->Subwidget('XText');
 	my $count = 0;
 	my $font = $widget->cget('-font');
@@ -1071,8 +1078,6 @@ sub OnKeyPress {
 	my ($self, $key) = @_;
 	if (length($key) > 1) {
 		$self->contentCheckLight;
-	} else {
-		$self->contentCheck;
 	}
 }
 
@@ -1378,7 +1383,7 @@ sub ViewMenuItems {
 			my ($watch, $value) = @_;
 			$watch->Store($value);
 			$self->configure(-wrap => $v);
-			$self->contentCheckLight;
+			$self->contentCheck;
 		},
 	);
 
@@ -1456,6 +1461,9 @@ If you find any, please contact the author.
 1;
 
 __END__
+
+
+
 
 
 

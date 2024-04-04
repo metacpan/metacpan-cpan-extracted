@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.214';
+our $VERSION = '1.215';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -2516,7 +2516,7 @@ sub tempDir {
 
 =head4 Synopsis
 
-  $absolutePath = $class->absolute($path);
+  $absolutePath = $this->absolute($path);
 
 =head4 Alias
 
@@ -2533,8 +2533,10 @@ unverändert.
 # -----------------------------------------------------------------------------
 
 sub absolute {
-    my $class = shift;
+    my $this = shift;
     my $path = shift // '';
+
+    $path = $this->expandTilde($path);
     return Cwd::realpath($path);
 }
 
@@ -3521,6 +3523,16 @@ sub numberBasePaths {
         # my ($dir,undef,$base,$ext) = $this->split($path);
         my ($dir,undef,undef,undef,$base,$ext) = $this->split($path);
 
+        my $l = length $base;
+        if ($l != $width) {
+            $this->throw(
+                'PATH-00099: Wrong base width',
+                Path => $path,
+                Base => $base,
+                AllowedWidth => $width,
+            );
+        }
+
         if ($dir ne '') {
             $base = "$dir/$base";
         }
@@ -4183,7 +4195,7 @@ sub uid {
 
 =head1 VERSION
 
-1.214
+1.215
 
 =head1 AUTHOR
 

@@ -62,6 +62,7 @@ as C<$pa> and C<$pb>, respectively, and Limits (of domain or
 integration) as C<$la> and C<$lb>.
 #line 64 "INTERP.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -394,7 +395,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL interpolation module was written by Gerard Jungman.
 
 =cut
-#line 398 "INTERP.pm"
+#line 399 "INTERP.pm"
 
 # Exit with OK status
 

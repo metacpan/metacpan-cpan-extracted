@@ -3,16 +3,15 @@ abstract: 'various utility functions'
 author:
   - 'Lukas Mai <l.mai@web.de>'
 build_requires:
-  Test::More: '0'
-  Test::Warnings: '0'
+  Test2::V0: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7.0'
   File::Find: '0'
   File::Spec: '0'
   strict: '0'
   warnings: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,11 +23,9 @@ no_index:
     - inc
     - xt
 requires:
-  Exporter: '0'
-  base: '0'
   strict: '0'
   warnings: '0'
 resources:
   repository: git://github.com/mauke/Data-Munge
-version: '0.097'
+version: '0.101'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

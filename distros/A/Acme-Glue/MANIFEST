@@ -5,6 +5,7 @@ MANIFEST
 README.md
 t/glue.t
 snippets/LEEJO/blead_wc.sh
+snippets/LEEJO/fizz_buzz.pl
 snippets/LEEJO/hopscotch.p6
 snippets/LEEJO/transform.pl
 snippets/LEEJO/vec_pack.pl

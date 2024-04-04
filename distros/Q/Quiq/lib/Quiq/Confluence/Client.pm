@@ -34,7 +34,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.214';
+our $VERSION = '1.215';
 
 use LWP::UserAgent ();
 use Quiq::Option;
@@ -310,7 +310,8 @@ ein Seiten-Objekt vom Typ Quiq::Confluence::Page zurück.
 sub getPage {
     my ($self,$pageId) = @_;
 
-    my $res = $self->send('GET',"rest/api/content/$pageId");
+    # my $res = $self->send('GET',"rest/api/content/$pageId");
+    my $res = $self->send('GET',"wiki/rest/api/content/$pageId");
     my $pag = Quiq::Confluence::Page->new($res->content);
     if ($self->verbose) {
         warn sprintf "---RESULT---\n%s\n",$pag->asString;
@@ -429,7 +430,8 @@ sub updatePage {
     my $pag = $self->getPage($pageId);
 
     $self->send(
-        PUT => "rest/api/content/$pageId",
+        # PUT => "rest/api/content/$pageId",
+        PUT => "wiki/rest/api/content/$pageId",
         'application/json',
         JSON::encode_json({
             type => 'page',
@@ -666,7 +668,7 @@ sub url {
 
 =head1 VERSION
 
-1.214
+1.215
 
 =head1 AUTHOR
 

@@ -5,7 +5,7 @@ use warnings;
 use 5.020;
 use utf8;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Carp qw(cluck confess);
 use JSON;
@@ -648,9 +648,9 @@ sub wagongroup_subtype {
 
 	my @likelihood = reverse sort { $ml{$a} <=> $ml{$b} } keys %ml;
 
-	if ( $ml{ $likelihood[0] } < 2 ) {
-
-		# inconclusive
+	# Less than two wagons are generally inconclusive.
+	# Exception: BR 631 (Link I) only has a single wagon
+	if ( $ml{ $likelihood[0] } < 2 and $likelihood[0] ne '631' ) {
 		return undef;
 	}
 
@@ -770,7 +770,7 @@ Travel::Status::DE::DBWagenreihung - Interface to Deutsche Bahn Wagon Order API.
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 This is beta software. The API may change without notice.
 

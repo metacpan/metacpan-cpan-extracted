@@ -27,7 +27,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.214';
+our $VERSION = '1.215';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -2412,6 +2412,16 @@ sub primaryKey {
 
   $tab|@rows|$cur|$stmt = $db->select(@select,@opt);
 
+=head4 Arguments
+
+=over 4
+
+=item @select
+
+Siehe Quiq::Sql->select()
+
+=back
+
 =head4 Options
 
 =over 4
@@ -2564,7 +2574,7 @@ Eine Selektion über dem Statement
 liefert zwar Datensätze mit den eigens vergebenen Kolumnennamen fun_oid,
 fun_owner usw. Diese Namen können jedoch I<nicht> bei der Formulierung
 der WHERE-Klausel verwendet werden. Stattdessen müssen die Namen der
-zugrundeliegenden Tabellen verwendet werden. Diese Assymetrie, die eine
+zugrundeliegenden Tabellen verwendet werden. Diese Asymetrie, die eine
 wirkliche Kapselung verhindert, lässt sich vermeiden, wenn das Statement
 in eine WITH-Klausel eingebettet und über I<dieser> die Selektion
 formuliert wird. In dem Fall können (und müssen) die Namen des
@@ -3816,6 +3826,17 @@ Der Schlüssel des Hash ist der Name in der Quelltabelle, der Wert des Hash
 der Name in der Zieltabelle. Es müssen nur die Kolumennamen angegeben
 werden, die nicht übereinstimmen.
 
+=item -initialData => \@rows
+
+Ist die Tabelle leer, befülle sie mit den Zeilen @rows. Jede Zeile
+ist ein Array von Werten. Beispiel:
+
+  -initialData => [
+      [qw/1 Emily/],
+      [qw/2 Hanno/],
+      [qw/3 Linus/],
+  ]
+
 =back
 
 =head4 Returns
@@ -3842,21 +3863,23 @@ sub copyData {
     my $chunkSize = 100;
     my $mapH = undef;
     my $srcTable = $destTable;
+    my $initialData = undef;
 
     $self->parameters(0,\@_,
         -chunkSize => \$chunkSize,
         -srcTable => \$srcTable,
         -mapColumns => \$mapH,
+        -initialData => \$initialData,
     );
 
     # Prüfe, ob die Zieltabelle auf der Quelldatenbank existiert.
     # Wenn nein, haben wir hier nichts zu tun.
 
     my $cnt = 0;
+    my @destTitles = $self->titles($destTable);
     if ($srcDb->tableExists($srcTable)) {
         # Erstelle Abbildung der Kolumnen
 
-        my @destTitles = $self->titles($destTable);
         my @srcTitles = $srcDb->titles($srcTable);
         my $srcTitleH = Quiq::Hash->new(\@srcTitles,1)->unlockKeys;
 
@@ -3911,7 +3934,11 @@ sub copyData {
         $cur->close;
     }
 
-    printf "$destTable: %s rows copied\n",$cnt;
+    if (!$cnt && $initialData) {
+        $cnt = $self->insertMulti($destTable,\@destTitles,$initialData)->hits;
+    }
+
+    printf "$destTable: %s rows copied/inserted\n",$cnt;
 
     return $cnt;
 }
@@ -6078,7 +6105,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.214
+1.215
 
 =head1 AUTHOR
 

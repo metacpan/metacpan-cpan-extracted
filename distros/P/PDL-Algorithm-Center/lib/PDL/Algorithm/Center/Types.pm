@@ -2,11 +2,13 @@ package PDL::Algorithm::Center::Types;
 
 # ABSTRACT: Type::Tiny types for PDL::Algorithm::Center
 
+use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
+use List::Util 1.33 'any';
 use Types::Standard -types;
 use Types::PDL -types;
 
@@ -30,8 +32,7 @@ BEGIN { extends 'Types::PDL' }
 
 declare Piddle_ne, as Piddle [ null => 0, empty => 0 ];
 
-Piddle_ne->coercion->add_type_coercions( map @{ $_->type_coercion_map },
-    PiddleFromAny );
+Piddle_ne->coercion->add_type_coercions( map @{ $_->type_coercion_map }, PiddleFromAny );
 
 declare Piddle0D_ne, as Piddle0D [ null => 0 ];
 
@@ -39,26 +40,21 @@ declare Piddle1D_ne, as Piddle1D [ null => 0, empty => 0 ];
 
 declare Piddle2D_ne, as Piddle2D [ null => 0, empty => 0 ];
 
-coerce Piddle0D_ne, from Num, q'PDL::Core::topdl( $_ )';
+coerce Piddle0D_ne, from Num, q{PDL::Core::topdl( $_ )};
 
-coerce Piddle1D_ne, from ArrayRef [Num], q'PDL::Core::topdl( $_ )',
+coerce Piddle1D_ne, from ArrayRef [Num], q{PDL::Core::topdl( $_ )},
 
   from Piddle0D_ne->coercibles, via { to_Piddle0D_ne( $_ )->dummy( 0 ) };
 
-coerce Piddle2D_ne,
-  from Piddle1D_ne->coercibles,
-  via { to_Piddle1D_ne( $_ )->dummy( 0 ) },
+coerce Piddle2D_ne, from Piddle1D_ne->coercibles, via { to_Piddle1D_ne( $_ )->dummy( 0 ) },
 
-  from Tuple [ ArrayRef [Num] ], q'PDL::Core::topdl( $_ )';
+  from Tuple [ ArrayRef [Num] ], q{PDL::Core::topdl( $_ )};
 
 declare Piddle_min1D_ne, as Piddle [ ndims_min => 1, null => 0, empty => 0 ];
 
-coerce Piddle_min1D_ne,
-  from Piddle1D_ne->coercibles,
-  via { to_Piddle1D_ne( $_ ) };
+coerce Piddle_min1D_ne, from Piddle1D_ne->coercibles, via { to_Piddle1D_ne( $_ ) };
 
-Piddle_min1D_ne->coercion->add_type_coercions( map @{ $_->type_coercion_map },
-    PiddleFromAny );
+Piddle_min1D_ne->coercion->add_type_coercions( map @{ $_->type_coercion_map }, PiddleFromAny );
 
 declare_coercion Piddle1DFromPiddle0D,
   to_type Piddle1D_ne,
@@ -78,15 +74,14 @@ declare_coercion Piddle2DFromArrayOfPiddle1D,
     my $nelem = $tmp->[0]->nelem;
 
     return $_
-      if grep { $_->nelem != $nelem } @{$tmp};
+      if any { $_->nelem != $nelem } @{$tmp};
 
     return PDL::glue( 0, map { $_->dummy( 0 ) } @{$tmp} );
   };
 
 
 declare Center, as Piddle1D_ne, coercion => 1;
-Center->coercion->add_type_coercions( map @{ $_->type_coercion_map },
-    Piddle1DFromPiddle0D, );
+Center->coercion->add_type_coercions( map @{ $_->type_coercion_map }, Piddle1DFromPiddle0D, );
 
 
 declare Coords, as Piddle2D_ne, coercion => 1;
@@ -118,13 +113,13 @@ PDL::Algorithm::Center::Types - Type::Tiny types for PDL::Algorithm::Center
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SUPPORT
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-pdl-algorithm-center@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Algorithm-Center
+Please report any bugs or feature requests to bug-pdl-algorithm-center@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Algorithm-Center>
 
 =head2 Source
 

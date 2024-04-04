@@ -5,7 +5,7 @@ use DateTime;
 use English;
 use Error::Pure::Utils qw(clean);
 use Mo::utils::Date qw(check_date_dmy);
-use Test::More 'tests' => 8;
+use Test::More 'tests' => 10;
 use Test::NoWarnings;
 
 # Test.
@@ -32,6 +32,16 @@ is($ret, undef, "Date '11.2.2023' is right.");
 $self = {'date' => '11.02.2023'};
 $ret = check_date_dmy($self, 'date');
 is($ret, undef, "Date '11.02.2023' is right.");
+
+# Test.
+$self = {};
+$ret = check_date_dmy($self, 'date');
+is($ret, undef, "Date key doesn't exist.");
+
+# Test.
+$self = {'date' => undef};
+$ret = check_date_dmy($self, 'date');
+is($ret, undef, "Date key is undefined.");
 
 # Test.
 $self = {'date' => 'foo'};

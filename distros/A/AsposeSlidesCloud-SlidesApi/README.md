@@ -27,6 +27,19 @@ You may want to check out Aspose free [Powerpoint to PDF](https://products.aspos
 **Web:** HTML/HTML5
 **Other:** MPEG4, SWF (export whole presentations)
 
+## Enhancements in Version 24.3
+
+* Added Markdown (**Md**) to the list of allowed export formats.
+* Added **DeletePictureCroppedAreas** method to delete cropped areas of pictures.
+* Added **SlidesLayoutOptions** property to **PdfExportOptions**, **HtmlExportOptions**, **TiffExportOptions** and **ImageExportOptions** classes. You can use it to specify handout or notes/comments layouting options.
+* Added **AnimateTextType** enum property to **Effect** class.
+* Added **NotesCommentsLayouting** property to **Html5ExportOptions** class.
+* Added **BwConversionMode** property to **TiffExportOptions** class.
+* Added **EmbedImages** boolean property to **Html5ExportOptions** class.
+* Added **ShowMediaControls** boolean property to **SlideShowProperties** class.
+* Added **IsDecorative** boolean property to **ShapeBase** class.
+
+
 ## Enhancements in Version 24.2
 
 * Added **GetCommentAuthors** method to get list of comment authors.

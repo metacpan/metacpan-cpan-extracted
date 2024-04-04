@@ -7,7 +7,7 @@ Tk::XText - Extended Text widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.45';
+$VERSION = '0.47';
 use strict;
 use warnings;
 use Carp;
@@ -241,7 +241,6 @@ sub ClassInit {
 	$mw->bind($class,'<<UnIndent>>','unindent');
 	$mw->bind($class, '<<Undo>>','undo');
 	$mw->bind($class,'<<Redo>>','redo');
-	$mw->bind($class, '<Return>', 'doAutoIndent', );
 	return $class->SUPER::ClassInit($mw);
 }
 
@@ -343,20 +342,6 @@ sub delete {
 	$self->RecordUndo('delete', $self->editModified, $begin, $string);
 	$self->SUPER::delete(@_);
 	$self->Callback('-modifycall', $begin);
-}
-
-sub DoAutoIndent {
-	my $self = shift;
-	if ($self->cget('-autoindent')) {
-		my $i = $self->index('insert linestart');
-		if ($self->compare($i, ">", '1.0')) {
-			my $s = $self->get("$i - 1 lines", "$i - 1 lines lineend");
-			$s =~ /^(\s+)/;
-			if ($1) {
-				$self->insert('insert', $1);
-			}
-		}
-	}
 }
 
 sub EditMenuItems {
@@ -547,8 +532,19 @@ sub insert {
 
 sub Insert {
 	my ($self, $string) = @_;
+	if (($string eq "\n") and ($self->cget('-autoindent'))) {
+		my $ins = $self->index('insert');
+		my $i = $self->index('insert linestart');
+		my $s = $self->get($i, "$i lineend");
+		if ($s =~ /^(\s+)/) {
+			my $tabs = $1;
+			my $lt = length($tabs);
+			my ($inxl, $insp) = split /\./, $ins;
+			$tabs = substr($tabs, 0, $insp);
+			$string = "$string$tabs";
+		}
+	}
 	$self->SUPER::Insert($string);
-	$self->DoAutoIndent if $string eq "\n" ;
 }
 
 sub InsertKeypress {
@@ -1050,9 +1046,12 @@ sub uncomment {
 		my $old = $self->get($rb, $re);
 		if (defined($slstart)) {
 			$lstart = length $slstart;
-			$self->SUPER::delete('insert linestart', "insert linestart + $lstart chars");
+			my $linebegin = substr($old, 0, $lstart);
+			$self->SUPER::delete($rb, "$rb + $lstart chars") if $linebegin eq $slstart;
 		} elsif ((defined $mlstart) and(defined $mlend)) {
-			if (($old =~ /^$mlstart/) and ($old =~ /$mlend$/)){
+			my $s = quotemeta($mlstart);
+			my $e = quotemeta($mlend);
+			if (($old =~ /^$s/) and ($old =~ /$e$/)){
 				$self->SUPER::delete('insert linestart', "insert linestart + $lstart chars");
 				$self->SUPER::delete( "insert lineend - $lend chars", 'insert lineend');
 			}
@@ -1206,6 +1205,10 @@ Unknown. If you find any, please contact the author.
 1;
 
 __END__
+
+
+
+
 
 
 

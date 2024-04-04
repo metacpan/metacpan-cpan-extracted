@@ -334,7 +334,20 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
                     },
                 ]
             ),
+            {
+                id       => 'with_invocant',
+                tags     => [qw( with invocant )],
+                invocant => HealthCheck->new(
+                    id    => 'from_invocant',
+                    tags  => [qw( from invocant )],
+                ),
+                check => sub { +{ status => 'OK' } },
+            },
         ] );
+
+    is( [$c->get_registered_tags()],
+        [qw( cheap default easy fast invocant subcheck with )],
+        'got expected registered tags');
 
     is $c->check, {
         'id'      => 'main',
@@ -374,7 +387,13 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
                         'tags'   => [qw(hard)],
                     }
                 ],
-                'tags' => [ 'subcheck', 'easy' ] }
+                'tags' => [ 'subcheck', 'easy' ],
+            },
+            {
+                'id'     => 'with_invocant',
+                'status' => 'OK',
+                'tags'   => [ 'with', 'invocant' ],
+            },
         ],
     }, "Default check runs all checks";
 
@@ -435,6 +454,30 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
             'status'  => 'UNKNOWN',
             'info'    => 'missing status',
         }, "Check with 'hard' tags runs no checks, so no results";
+    }
+
+    is $c->check(tags => ['with']), {
+        'id'      => 'main',
+        'status'  => 'OK',
+        'runbook' => 'https://runbook-main.grantstreet.com',
+        'tags'    => ['default'],
+        'results' => [
+            {
+                'id'     => 'with_invocant',
+                'status' => 'OK',
+                'tags'   => [ 'with', 'invocant' ],
+            },
+        ],
+    }, "Uses outer tag when invocant is present";
+
+    { local $SIG{__WARN__} = sub { };
+        is $c->check(tags => ['from']), {
+            'id'      => 'main',
+            'runbook' => 'https://runbook-main.grantstreet.com',
+            'tags'    => ['default'],
+            'status'  => 'UNKNOWN',
+            'info'    => 'missing status',
+        }, "No checks to run when specifying inner invocant tag";
     }
 }
 
@@ -512,6 +555,10 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
         ],
     );
 
+    is( [$c->get_registered_tags()],
+        [qw( check from invocant main with )],
+        'got expected registered tags' );
+
     is $c->check, {
         'id'      => 'main',
         'label'   => 'Main',
@@ -579,6 +626,8 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
         },
         "Able to report mixed success/failures"
     ;
+
+    is [ $hc->get_registered_tags ], [], 'got expected (lack of) registered tags';
 }
 
 done_testing;

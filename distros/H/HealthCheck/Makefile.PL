@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Hash::Util::FieldHash" => 0,
-    "List::Util" => "1.43",
+    "List::Util" => "1.63",
     "Time::HiRes" => 0,
     "parent" => 0,
     "strict" => 0,
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "v1.8.2",
+  "VERSION" => "v1.9.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +46,7 @@ my %FallbackPrereqs = (
   "Hash::Util::FieldHash" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "List::Util" => "1.43",
+  "List::Util" => "1.63",
   "Test2::V0" => 0,
   "Test::More" => 0,
   "Time::HiRes" => 0,

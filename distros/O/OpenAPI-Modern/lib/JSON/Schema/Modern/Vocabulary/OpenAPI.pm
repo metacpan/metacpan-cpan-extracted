@@ -3,7 +3,7 @@ package JSON::Schema::Modern::Vocabulary::OpenAPI;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema OpenAPI vocabulary
 
-our $VERSION = '0.060';
+our $VERSION = '0.061';
 
 use 5.020;
 use Moo;
@@ -14,7 +14,7 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use JSON::Schema::Modern::Utilities 0.524 qw(assert_keyword_type annotate_self E is_type jsonp);
+use JSON::Schema::Modern::Utilities 0.583 qw(assert_keyword_type annotate_self E is_type jsonp);
 use namespace::clean;
 
 with 'JSON::Schema::Modern::Vocabulary';
@@ -71,12 +71,12 @@ sub _eval_keyword_discriminator ($self, $data, $schema, $state) {
     my $mapping = $schema->{discriminator}{mapping}{$discriminator_value};
 
     return $self->eval_subschema_at_uri($data, $schema,
-      { %$state, _schema_path_suffix => [ 'mapping', $discriminator_value ] },
+      { %$state, keyword => $state->{keyword}.jsonp('', 'mapping', $discriminator_value) },
       Mojo::URL->new($mapping =~ /^#/ ? $mapping : '#/components/schemas/'.$mapping)->to_abs($state->{initial_schema_uri}),
     );
   }
   elsif ($state->{document}->get_entity_at_location('/components/schemas/'.$discriminator_value) eq 'schema') {
-    return $self->eval_subschema_at_uri($data, $schema, { %$state, _schema_path_suffix => 'propertyName' },
+    return $self->eval_subschema_at_uri($data, $schema, { %$state, keyword => $state->{keyword}.'/propertyName' },
       Mojo::URL->new->fragment(jsonp('/components/schemas', $discriminator_value))->to_abs($state->{initial_schema_uri}),
     );
   }
@@ -118,7 +118,7 @@ JSON::Schema::Modern::Vocabulary::OpenAPI - Implementation of the JSON Schema Op
 
 =head1 VERSION
 
-version 0.060
+version 0.061
 
 =head1 DESCRIPTION
 

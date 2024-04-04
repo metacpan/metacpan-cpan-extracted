@@ -6,7 +6,7 @@
               |_|                                                         
 
 
-This is the README for Gzip::Libdeflate version 0.07.
+This is the README for Gzip::Libdeflate version 0.08.
 
 Gzip::Libdeflate is a "module" for the Perl computer programming language,
 a library of computer code to install on a computer.  This document
@@ -62,11 +62,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Gzip::Libdeflate
 
-To install the module from the source file, Gzip-Libdeflate-0.07.tar.gz,
+To install the module from the source file, Gzip-Libdeflate-0.08.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Gzip-Libdeflate-0.07.tar.gz
-    cd Gzip-Libdeflate-0.07
+    tar xfz Gzip-Libdeflate-0.08.tar.gz
+    cd Gzip-Libdeflate-0.08
     perl Makefile.PL
     make
     make install
@@ -91,6 +91,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Mon Mar 25 21:33:28 2024.
+This README was written on Sat Mar 30 10:25:10 2024.
 
 -----------------------------------------------------------------------------

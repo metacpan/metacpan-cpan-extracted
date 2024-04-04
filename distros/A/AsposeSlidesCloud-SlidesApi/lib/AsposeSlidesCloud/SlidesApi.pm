@@ -123,17 +123,17 @@ sub align_shapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling align_shapes");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling align_shapes");
     }
 
     # verify the required parameter 'alignment_type' is set
-    unless (exists $args{'alignment_type'} && $args{'alignment_type'}) {
+    unless (exists $args{'alignment_type'} && defined $args{'alignment_type'} && $args{'alignment_type'}) {
       croak("Missing the required parameter 'alignment_type' when calling align_shapes");
     }
 
@@ -301,17 +301,17 @@ sub align_special_slide_shapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling align_special_slide_shapes");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling align_special_slide_shapes");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling align_special_slide_shapes");
     }
 
@@ -321,7 +321,7 @@ sub align_special_slide_shapes {
     }
 
     # verify the required parameter 'alignment_type' is set
-    unless (exists $args{'alignment_type'} && $args{'alignment_type'}) {
+    unless (exists $args{'alignment_type'} && defined $args{'alignment_type'} && $args{'alignment_type'}) {
       croak("Missing the required parameter 'alignment_type' when calling align_special_slide_shapes");
     }
 
@@ -460,7 +460,7 @@ sub compress_embedded_fonts {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling compress_embedded_fonts");
     }
 
@@ -542,7 +542,7 @@ sub compress_embedded_fonts_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling compress_embedded_fonts_online");
     }
 
@@ -644,17 +644,17 @@ sub convert {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling convert");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling convert");
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -789,22 +789,22 @@ sub convert_and_save {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling convert_and_save");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling convert_and_save");
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'} && $args{'out_path'}) {
+    unless (exists $args{'out_path'} && defined $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling convert_and_save");
     }
 
@@ -922,12 +922,12 @@ sub copy_file {
     my ($self, %args) = @_;
 
     # verify the required parameter 'src_path' is set
-    unless (exists $args{'src_path'} && $args{'src_path'}) {
+    unless (exists $args{'src_path'} && defined $args{'src_path'} && $args{'src_path'}) {
       croak("Missing the required parameter 'src_path' when calling copy_file");
     }
 
     # verify the required parameter 'dest_path' is set
-    unless (exists $args{'dest_path'} && $args{'dest_path'}) {
+    unless (exists $args{'dest_path'} && defined $args{'dest_path'} && $args{'dest_path'}) {
       croak("Missing the required parameter 'dest_path' when calling copy_file");
     }
 
@@ -1026,12 +1026,12 @@ sub copy_folder {
     my ($self, %args) = @_;
 
     # verify the required parameter 'src_path' is set
-    unless (exists $args{'src_path'} && $args{'src_path'}) {
+    unless (exists $args{'src_path'} && defined $args{'src_path'} && $args{'src_path'}) {
       croak("Missing the required parameter 'src_path' when calling copy_folder");
     }
 
     # verify the required parameter 'dest_path' is set
-    unless (exists $args{'dest_path'} && $args{'dest_path'}) {
+    unless (exists $args{'dest_path'} && defined $args{'dest_path'} && $args{'dest_path'}) {
       croak("Missing the required parameter 'dest_path' when calling copy_folder");
     }
 
@@ -1149,17 +1149,17 @@ sub copy_layout_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling copy_layout_slide");
     }
 
     # verify the required parameter 'clone_from' is set
-    unless (exists $args{'clone_from'} && $args{'clone_from'}) {
+    unless (exists $args{'clone_from'} && defined $args{'clone_from'} && $args{'clone_from'}) {
       croak("Missing the required parameter 'clone_from' when calling copy_layout_slide");
     }
 
     # verify the required parameter 'clone_from_position' is set
-    unless (exists $args{'clone_from_position'}) {
+    unless (exists $args{'clone_from_position'} && defined $args{'clone_from_position'}) {
       croak("Missing the required parameter 'clone_from_position' when calling copy_layout_slide");
     }
 
@@ -1307,17 +1307,17 @@ sub copy_master_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling copy_master_slide");
     }
 
     # verify the required parameter 'clone_from' is set
-    unless (exists $args{'clone_from'} && $args{'clone_from'}) {
+    unless (exists $args{'clone_from'} && defined $args{'clone_from'} && $args{'clone_from'}) {
       croak("Missing the required parameter 'clone_from' when calling copy_master_slide");
     }
 
     # verify the required parameter 'clone_from_position' is set
-    unless (exists $args{'clone_from_position'}) {
+    unless (exists $args{'clone_from_position'} && defined $args{'clone_from_position'}) {
       croak("Missing the required parameter 'clone_from_position' when calling copy_master_slide");
     }
 
@@ -1470,12 +1470,12 @@ sub copy_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling copy_slide");
     }
 
     # verify the required parameter 'slide_to_copy' is set
-    unless (exists $args{'slide_to_copy'}) {
+    unless (exists $args{'slide_to_copy'} && defined $args{'slide_to_copy'}) {
       croak("Missing the required parameter 'slide_to_copy' when calling copy_slide");
     }
 
@@ -1610,17 +1610,17 @@ sub create_animation_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_animation_effect");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_animation_effect");
     }
 
     # verify the required parameter 'effect' is set
-    unless (exists $args{'effect'} && $args{'effect'}) {
+    unless (exists $args{'effect'} && defined $args{'effect'} && $args{'effect'}) {
       croak("Missing the required parameter 'effect' when calling create_animation_effect");
     }
 
@@ -1742,17 +1742,17 @@ sub create_animation_interactive_sequence {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_animation_interactive_sequence");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_animation_interactive_sequence");
     }
 
     # verify the required parameter 'sequence' is set
-    unless (exists $args{'sequence'} && $args{'sequence'}) {
+    unless (exists $args{'sequence'} && defined $args{'sequence'} && $args{'sequence'}) {
       croak("Missing the required parameter 'sequence' when calling create_animation_interactive_sequence");
     }
 
@@ -1880,22 +1880,22 @@ sub create_animation_interactive_sequence_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'sequence_index' is set
-    unless (exists $args{'sequence_index'}) {
+    unless (exists $args{'sequence_index'} && defined $args{'sequence_index'}) {
       croak("Missing the required parameter 'sequence_index' when calling create_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'effect' is set
-    unless (exists $args{'effect'} && $args{'effect'}) {
+    unless (exists $args{'effect'} && defined $args{'effect'} && $args{'effect'}) {
       croak("Missing the required parameter 'effect' when calling create_animation_interactive_sequence_effect");
     }
 
@@ -2030,22 +2030,22 @@ sub create_chart_category {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_chart_category");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_chart_category");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling create_chart_category");
     }
 
     # verify the required parameter 'category' is set
-    unless (exists $args{'category'} && $args{'category'}) {
+    unless (exists $args{'category'} && defined $args{'category'} && $args{'category'}) {
       croak("Missing the required parameter 'category' when calling create_chart_category");
     }
 
@@ -2186,27 +2186,27 @@ sub create_chart_data_point {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_chart_data_point");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_chart_data_point");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling create_chart_data_point");
     }
 
     # verify the required parameter 'series_index' is set
-    unless (exists $args{'series_index'}) {
+    unless (exists $args{'series_index'} && defined $args{'series_index'}) {
       croak("Missing the required parameter 'series_index' when calling create_chart_data_point");
     }
 
     # verify the required parameter 'data_point' is set
-    unless (exists $args{'data_point'} && $args{'data_point'}) {
+    unless (exists $args{'data_point'} && defined $args{'data_point'} && $args{'data_point'}) {
       croak("Missing the required parameter 'data_point' when calling create_chart_data_point");
     }
 
@@ -2348,22 +2348,22 @@ sub create_chart_series {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_chart_series");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_chart_series");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling create_chart_series");
     }
 
     # verify the required parameter 'series' is set
-    unless (exists $args{'series'} && $args{'series'}) {
+    unless (exists $args{'series'} && defined $args{'series'} && $args{'series'}) {
       croak("Missing the required parameter 'series' when calling create_chart_series");
     }
 
@@ -2498,17 +2498,17 @@ sub create_comment {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_comment");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_comment");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling create_comment");
     }
 
@@ -2629,17 +2629,17 @@ sub create_comment_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling create_comment_online");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_comment_online");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling create_comment_online");
     }
 
@@ -2728,7 +2728,7 @@ sub create_folder {
     my ($self, %args) = @_;
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'} && $args{'path'}) {
+    unless (exists $args{'path'} && defined $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling create_folder");
     }
 
@@ -2824,7 +2824,7 @@ sub create_image_watermark {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_image_watermark");
     }
 
@@ -2926,7 +2926,7 @@ sub create_image_watermark_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling create_image_watermark_online");
     }
 
@@ -3030,17 +3030,17 @@ sub create_notes_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_notes_slide");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_notes_slide");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling create_notes_slide");
     }
 
@@ -3180,22 +3180,22 @@ sub create_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_paragraph");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_paragraph");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling create_paragraph");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling create_paragraph");
     }
 
@@ -3358,27 +3358,27 @@ sub create_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_portion");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_portion");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling create_portion");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling create_portion");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling create_portion");
     }
 
@@ -3524,7 +3524,7 @@ sub create_presentation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_presentation");
     }
 
@@ -3648,7 +3648,7 @@ sub create_presentation_from_source {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_presentation_from_source");
     }
 
@@ -3791,12 +3791,12 @@ sub create_presentation_from_template {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_presentation_from_template");
     }
 
     # verify the required parameter 'template_path' is set
-    unless (exists $args{'template_path'} && $args{'template_path'}) {
+    unless (exists $args{'template_path'} && defined $args{'template_path'} && $args{'template_path'}) {
       croak("Missing the required parameter 'template_path' when calling create_presentation_from_template");
     }
 
@@ -3931,17 +3931,17 @@ sub create_section {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_section");
     }
 
     # verify the required parameter 'section_name' is set
-    unless (exists $args{'section_name'} && $args{'section_name'}) {
+    unless (exists $args{'section_name'} && defined $args{'section_name'} && $args{'section_name'}) {
       croak("Missing the required parameter 'section_name' when calling create_section");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_section");
     }
 
@@ -4079,12 +4079,12 @@ sub create_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_shape");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_shape");
     }
 
@@ -4221,7 +4221,7 @@ sub create_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_slide");
     }
 
@@ -4359,17 +4359,17 @@ sub create_smart_art_node {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_smart_art_node");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_smart_art_node");
     }
 
     # verify the required parameter 'smart_art_index' is set
-    unless (exists $args{'smart_art_index'}) {
+    unless (exists $args{'smart_art_index'} && defined $args{'smart_art_index'}) {
       croak("Missing the required parameter 'smart_art_index' when calling create_smart_art_node");
     }
 
@@ -4514,17 +4514,17 @@ sub create_special_slide_animation_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_special_slide_animation_effect");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_special_slide_animation_effect");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling create_special_slide_animation_effect");
     }
 
@@ -4534,7 +4534,7 @@ sub create_special_slide_animation_effect {
     }
 
     # verify the required parameter 'effect' is set
-    unless (exists $args{'effect'} && $args{'effect'}) {
+    unless (exists $args{'effect'} && defined $args{'effect'} && $args{'effect'}) {
       croak("Missing the required parameter 'effect' when calling create_special_slide_animation_effect");
     }
 
@@ -4669,17 +4669,17 @@ sub create_special_slide_animation_interactive_sequence {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_special_slide_animation_interactive_sequence");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_special_slide_animation_interactive_sequence");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling create_special_slide_animation_interactive_sequence");
     }
 
@@ -4689,7 +4689,7 @@ sub create_special_slide_animation_interactive_sequence {
     }
 
     # verify the required parameter 'sequence' is set
-    unless (exists $args{'sequence'} && $args{'sequence'}) {
+    unless (exists $args{'sequence'} && defined $args{'sequence'} && $args{'sequence'}) {
       croak("Missing the required parameter 'sequence' when calling create_special_slide_animation_interactive_sequence");
     }
 
@@ -4830,17 +4830,17 @@ sub create_special_slide_animation_interactive_sequence_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_special_slide_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_special_slide_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling create_special_slide_animation_interactive_sequence_effect");
     }
 
@@ -4850,12 +4850,12 @@ sub create_special_slide_animation_interactive_sequence_effect {
     }
 
     # verify the required parameter 'sequence_index' is set
-    unless (exists $args{'sequence_index'}) {
+    unless (exists $args{'sequence_index'} && defined $args{'sequence_index'}) {
       croak("Missing the required parameter 'sequence_index' when calling create_special_slide_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'effect' is set
-    unless (exists $args{'effect'} && $args{'effect'}) {
+    unless (exists $args{'effect'} && defined $args{'effect'} && $args{'effect'}) {
       croak("Missing the required parameter 'effect' when calling create_special_slide_animation_interactive_sequence_effect");
     }
 
@@ -5015,17 +5015,17 @@ sub create_special_slide_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_special_slide_paragraph");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_special_slide_paragraph");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling create_special_slide_paragraph");
     }
 
@@ -5035,12 +5035,12 @@ sub create_special_slide_paragraph {
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling create_special_slide_paragraph");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling create_special_slide_paragraph");
     }
 
@@ -5216,17 +5216,17 @@ sub create_special_slide_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_special_slide_portion");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_special_slide_portion");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling create_special_slide_portion");
     }
 
@@ -5236,17 +5236,17 @@ sub create_special_slide_portion {
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling create_special_slide_portion");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling create_special_slide_portion");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling create_special_slide_portion");
     }
 
@@ -5423,17 +5423,17 @@ sub create_special_slide_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_special_slide_shape");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_special_slide_shape");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling create_special_slide_shape");
     }
 
@@ -5443,7 +5443,7 @@ sub create_special_slide_shape {
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling create_special_slide_shape");
     }
 
@@ -5605,32 +5605,32 @@ sub create_table_cell_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_table_cell_paragraph");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_table_cell_paragraph");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling create_table_cell_paragraph");
     }
 
     # verify the required parameter 'row_index' is set
-    unless (exists $args{'row_index'}) {
+    unless (exists $args{'row_index'} && defined $args{'row_index'}) {
       croak("Missing the required parameter 'row_index' when calling create_table_cell_paragraph");
     }
 
     # verify the required parameter 'cell_index' is set
-    unless (exists $args{'cell_index'}) {
+    unless (exists $args{'cell_index'} && defined $args{'cell_index'}) {
       croak("Missing the required parameter 'cell_index' when calling create_table_cell_paragraph");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling create_table_cell_paragraph");
     }
 
@@ -5797,37 +5797,37 @@ sub create_table_cell_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_table_cell_portion");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_table_cell_portion");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling create_table_cell_portion");
     }
 
     # verify the required parameter 'row_index' is set
-    unless (exists $args{'row_index'}) {
+    unless (exists $args{'row_index'} && defined $args{'row_index'}) {
       croak("Missing the required parameter 'row_index' when calling create_table_cell_portion");
     }
 
     # verify the required parameter 'cell_index' is set
-    unless (exists $args{'cell_index'}) {
+    unless (exists $args{'cell_index'} && defined $args{'cell_index'}) {
       croak("Missing the required parameter 'cell_index' when calling create_table_cell_portion");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling create_table_cell_portion");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling create_table_cell_portion");
     }
 
@@ -5989,22 +5989,22 @@ sub create_table_row {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_table_row");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling create_table_row");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling create_table_row");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling create_table_row");
     }
 
@@ -6132,12 +6132,12 @@ sub create_vba_module {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_vba_module");
     }
 
     # verify the required parameter 'module_dto' is set
-    unless (exists $args{'module_dto'} && $args{'module_dto'}) {
+    unless (exists $args{'module_dto'} && defined $args{'module_dto'} && $args{'module_dto'}) {
       croak("Missing the required parameter 'module_dto' when calling create_vba_module");
     }
 
@@ -6270,7 +6270,7 @@ sub create_watermark {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling create_watermark");
     }
 
@@ -6407,7 +6407,7 @@ sub create_watermark_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling create_watermark_online");
     }
 
@@ -6522,12 +6522,12 @@ sub delete_animation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_animation");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_animation");
     }
 
@@ -6644,17 +6644,17 @@ sub delete_animation_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_animation_effect");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_animation_effect");
     }
 
     # verify the required parameter 'effect_index' is set
-    unless (exists $args{'effect_index'}) {
+    unless (exists $args{'effect_index'} && defined $args{'effect_index'}) {
       croak("Missing the required parameter 'effect_index' when calling delete_animation_effect");
     }
 
@@ -6778,17 +6778,17 @@ sub delete_animation_interactive_sequence {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_animation_interactive_sequence");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_animation_interactive_sequence");
     }
 
     # verify the required parameter 'sequence_index' is set
-    unless (exists $args{'sequence_index'}) {
+    unless (exists $args{'sequence_index'} && defined $args{'sequence_index'}) {
       croak("Missing the required parameter 'sequence_index' when calling delete_animation_interactive_sequence");
     }
 
@@ -6918,22 +6918,22 @@ sub delete_animation_interactive_sequence_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'sequence_index' is set
-    unless (exists $args{'sequence_index'}) {
+    unless (exists $args{'sequence_index'} && defined $args{'sequence_index'}) {
       croak("Missing the required parameter 'sequence_index' when calling delete_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'effect_index' is set
-    unless (exists $args{'effect_index'}) {
+    unless (exists $args{'effect_index'} && defined $args{'effect_index'}) {
       croak("Missing the required parameter 'effect_index' when calling delete_animation_interactive_sequence_effect");
     }
 
@@ -7058,12 +7058,12 @@ sub delete_animation_interactive_sequences {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_animation_interactive_sequences");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_animation_interactive_sequences");
     }
 
@@ -7174,12 +7174,12 @@ sub delete_animation_main_sequence {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_animation_main_sequence");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_animation_main_sequence");
     }
 
@@ -7290,12 +7290,12 @@ sub delete_background {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_background");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_background");
     }
 
@@ -7418,22 +7418,22 @@ sub delete_chart_category {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_chart_category");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_chart_category");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_chart_category");
     }
 
     # verify the required parameter 'category_index' is set
-    unless (exists $args{'category_index'}) {
+    unless (exists $args{'category_index'} && defined $args{'category_index'}) {
       croak("Missing the required parameter 'category_index' when calling delete_chart_category");
     }
 
@@ -7576,27 +7576,27 @@ sub delete_chart_data_point {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_chart_data_point");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_chart_data_point");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_chart_data_point");
     }
 
     # verify the required parameter 'series_index' is set
-    unless (exists $args{'series_index'}) {
+    unless (exists $args{'series_index'} && defined $args{'series_index'}) {
       croak("Missing the required parameter 'series_index' when calling delete_chart_data_point");
     }
 
     # verify the required parameter 'point_index' is set
-    unless (exists $args{'point_index'}) {
+    unless (exists $args{'point_index'} && defined $args{'point_index'}) {
       croak("Missing the required parameter 'point_index' when calling delete_chart_data_point");
     }
 
@@ -7740,22 +7740,22 @@ sub delete_chart_series {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_chart_series");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_chart_series");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_chart_series");
     }
 
     # verify the required parameter 'series_index' is set
-    unless (exists $args{'series_index'}) {
+    unless (exists $args{'series_index'} && defined $args{'series_index'}) {
       croak("Missing the required parameter 'series_index' when calling delete_chart_series");
     }
 
@@ -7880,7 +7880,7 @@ sub delete_comments {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_comments");
     }
 
@@ -7973,7 +7973,7 @@ sub delete_comments_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling delete_comments_online");
     }
 
@@ -8062,7 +8062,7 @@ sub delete_document_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_document_properties");
     }
 
@@ -8166,12 +8166,12 @@ sub delete_document_property {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_document_property");
     }
 
     # verify the required parameter 'property_name' is set
-    unless (exists $args{'property_name'} && $args{'property_name'}) {
+    unless (exists $args{'property_name'} && defined $args{'property_name'} && $args{'property_name'}) {
       croak("Missing the required parameter 'property_name' when calling delete_document_property");
     }
 
@@ -8282,12 +8282,12 @@ sub delete_embedded_font {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_embedded_font");
     }
 
     # verify the required parameter 'font_name' is set
-    unless (exists $args{'font_name'} && $args{'font_name'}) {
+    unless (exists $args{'font_name'} && defined $args{'font_name'} && $args{'font_name'}) {
       croak("Missing the required parameter 'font_name' when calling delete_embedded_font");
     }
 
@@ -8386,12 +8386,12 @@ sub delete_embedded_font_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling delete_embedded_font_online");
     }
 
     # verify the required parameter 'font_name' is set
-    unless (exists $args{'font_name'} && $args{'font_name'}) {
+    unless (exists $args{'font_name'} && defined $args{'font_name'} && $args{'font_name'}) {
       croak("Missing the required parameter 'font_name' when calling delete_embedded_font_online");
     }
 
@@ -8476,7 +8476,7 @@ sub delete_file {
     my ($self, %args) = @_;
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'} && $args{'path'}) {
+    unless (exists $args{'path'} && defined $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling delete_file");
     }
 
@@ -8559,7 +8559,7 @@ sub delete_folder {
     my ($self, %args) = @_;
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'} && $args{'path'}) {
+    unless (exists $args{'path'} && defined $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling delete_folder");
     }
 
@@ -8654,12 +8654,12 @@ sub delete_notes_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_notes_slide");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_notes_slide");
     }
 
@@ -8788,22 +8788,22 @@ sub delete_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_paragraph");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_paragraph");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_paragraph");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling delete_paragraph");
     }
 
@@ -8951,17 +8951,17 @@ sub delete_paragraphs {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_paragraphs");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_paragraphs");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_paragraphs");
     }
 
@@ -9040,6 +9040,146 @@ sub delete_paragraphs {
 }
 
 #
+# delete_picture_cropped_areas
+#
+# Deletes cropped areas of a pictire.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index (must refer to a picture frame). (required)
+# @param string $password Document password. (required)
+# @param string $folder Document folder. (required)
+# @param string $storage Presentation storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index (must refer to a picture frame).',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '1',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_picture_cropped_areas' } = { 
+    	summary => 'Deletes cropped areas of a pictire.',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub delete_picture_cropped_areas {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_picture_cropped_areas");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling delete_picture_cropped_areas");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling delete_picture_cropped_areas");
+    }
+
+    # verify the required parameter 'password' is set
+    unless (exists $args{'password'} && defined $args{'password'} && $args{'password'}) {
+      croak("Missing the required parameter 'password' when calling delete_picture_cropped_areas");
+    }
+
+    # verify the required parameter 'folder' is set
+    unless (exists $args{'folder'} && defined $args{'folder'} && $args{'folder'}) {
+      croak("Missing the required parameter 'folder' when calling delete_picture_cropped_areas");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/pictureCroppedAreas';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    return;
+}
+
+#
 # delete_portion
 #
 # Remove a portion.
@@ -9113,27 +9253,27 @@ sub delete_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_portion");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_portion");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_portion");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling delete_portion");
     }
 
     # verify the required parameter 'portion_index' is set
-    unless (exists $args{'portion_index'}) {
+    unless (exists $args{'portion_index'} && defined $args{'portion_index'}) {
       croak("Missing the required parameter 'portion_index' when calling delete_portion");
     }
 
@@ -9294,22 +9434,22 @@ sub delete_portions {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_portions");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_portions");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_portions");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling delete_portions");
     }
 
@@ -9438,7 +9578,7 @@ sub delete_protection {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_protection");
     }
 
@@ -9524,7 +9664,7 @@ sub delete_protection_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling delete_protection_online");
     }
 
@@ -9620,12 +9760,12 @@ sub delete_section {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_section");
     }
 
     # verify the required parameter 'section_index' is set
-    unless (exists $args{'section_index'}) {
+    unless (exists $args{'section_index'} && defined $args{'section_index'}) {
       croak("Missing the required parameter 'section_index' when calling delete_section");
     }
 
@@ -9747,7 +9887,7 @@ sub delete_sections {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_sections");
     }
 
@@ -9873,17 +10013,17 @@ sub delete_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_shape");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_shape");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_shape");
     }
 
@@ -10018,12 +10158,12 @@ sub delete_shapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_shapes");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_shapes");
     }
 
@@ -10144,12 +10284,12 @@ sub delete_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slide");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_slide");
     }
 
@@ -10266,12 +10406,12 @@ sub delete_slide_comments {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slide_comments");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_slide_comments");
     }
 
@@ -10381,12 +10521,12 @@ sub delete_slide_comments_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling delete_slide_comments_online");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_slide_comments_online");
     }
 
@@ -10488,7 +10628,7 @@ sub delete_slides {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slides");
     }
 
@@ -10615,22 +10755,22 @@ sub delete_smart_art_node {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_smart_art_node");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_smart_art_node");
     }
 
     # verify the required parameter 'smart_art_index' is set
-    unless (exists $args{'smart_art_index'}) {
+    unless (exists $args{'smart_art_index'} && defined $args{'smart_art_index'}) {
       croak("Missing the required parameter 'smart_art_index' when calling delete_smart_art_node");
     }
 
     # verify the required parameter 'node_index' is set
-    unless (exists $args{'node_index'}) {
+    unless (exists $args{'node_index'} && defined $args{'node_index'}) {
       croak("Missing the required parameter 'node_index' when calling delete_smart_art_node");
     }
 
@@ -10766,17 +10906,17 @@ sub delete_special_slide_animation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_special_slide_animation");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_special_slide_animation");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_animation");
     }
 
@@ -10911,17 +11051,17 @@ sub delete_special_slide_animation_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_special_slide_animation_effect");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_special_slide_animation_effect");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_animation_effect");
     }
 
@@ -10931,7 +11071,7 @@ sub delete_special_slide_animation_effect {
     }
 
     # verify the required parameter 'effect_index' is set
-    unless (exists $args{'effect_index'}) {
+    unless (exists $args{'effect_index'} && defined $args{'effect_index'}) {
       croak("Missing the required parameter 'effect_index' when calling delete_special_slide_animation_effect");
     }
 
@@ -11068,17 +11208,17 @@ sub delete_special_slide_animation_interactive_sequence {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_special_slide_animation_interactive_sequence");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_special_slide_animation_interactive_sequence");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_animation_interactive_sequence");
     }
 
@@ -11088,7 +11228,7 @@ sub delete_special_slide_animation_interactive_sequence {
     }
 
     # verify the required parameter 'sequence_index' is set
-    unless (exists $args{'sequence_index'}) {
+    unless (exists $args{'sequence_index'} && defined $args{'sequence_index'}) {
       croak("Missing the required parameter 'sequence_index' when calling delete_special_slide_animation_interactive_sequence");
     }
 
@@ -11231,17 +11371,17 @@ sub delete_special_slide_animation_interactive_sequence_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_special_slide_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_special_slide_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_animation_interactive_sequence_effect");
     }
 
@@ -11251,12 +11391,12 @@ sub delete_special_slide_animation_interactive_sequence_effect {
     }
 
     # verify the required parameter 'sequence_index' is set
-    unless (exists $args{'sequence_index'}) {
+    unless (exists $args{'sequence_index'} && defined $args{'sequence_index'}) {
       croak("Missing the required parameter 'sequence_index' when calling delete_special_slide_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'effect_index' is set
-    unless (exists $args{'effect_index'}) {
+    unless (exists $args{'effect_index'} && defined $args{'effect_index'}) {
       croak("Missing the required parameter 'effect_index' when calling delete_special_slide_animation_interactive_sequence_effect");
     }
 
@@ -11394,17 +11534,17 @@ sub delete_special_slide_animation_interactive_sequences {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_special_slide_animation_interactive_sequences");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_special_slide_animation_interactive_sequences");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_animation_interactive_sequences");
     }
 
@@ -11533,17 +11673,17 @@ sub delete_special_slide_animation_main_sequence {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_special_slide_animation_main_sequence");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_special_slide_animation_main_sequence");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_animation_main_sequence");
     }
 
@@ -11690,17 +11830,17 @@ sub delete_special_slide_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_special_slide_paragraph");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_special_slide_paragraph");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_paragraph");
     }
 
@@ -11710,12 +11850,12 @@ sub delete_special_slide_paragraph {
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_special_slide_paragraph");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling delete_special_slide_paragraph");
     }
 
@@ -11876,17 +12016,17 @@ sub delete_special_slide_paragraphs {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_special_slide_paragraphs");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_special_slide_paragraphs");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_paragraphs");
     }
 
@@ -11896,7 +12036,7 @@ sub delete_special_slide_paragraphs {
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_special_slide_paragraphs");
     }
 
@@ -12061,17 +12201,17 @@ sub delete_special_slide_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_special_slide_portion");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_special_slide_portion");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_portion");
     }
 
@@ -12081,17 +12221,17 @@ sub delete_special_slide_portion {
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_special_slide_portion");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling delete_special_slide_portion");
     }
 
     # verify the required parameter 'portion_index' is set
-    unless (exists $args{'portion_index'}) {
+    unless (exists $args{'portion_index'} && defined $args{'portion_index'}) {
       croak("Missing the required parameter 'portion_index' when calling delete_special_slide_portion");
     }
 
@@ -12265,17 +12405,17 @@ sub delete_special_slide_portions {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_special_slide_portions");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_special_slide_portions");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_portions");
     }
 
@@ -12285,12 +12425,12 @@ sub delete_special_slide_portions {
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_special_slide_portions");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling delete_special_slide_portions");
     }
 
@@ -12450,17 +12590,17 @@ sub delete_special_slide_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_special_slide_shape");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_special_slide_shape");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_shape");
     }
 
@@ -12470,7 +12610,7 @@ sub delete_special_slide_shape {
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_special_slide_shape");
     }
 
@@ -12618,17 +12758,17 @@ sub delete_special_slide_shapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_special_slide_shapes");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_special_slide_shapes");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_shapes");
     }
 
@@ -12785,32 +12925,32 @@ sub delete_table_cell_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_table_cell_paragraph");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_table_cell_paragraph");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_table_cell_paragraph");
     }
 
     # verify the required parameter 'row_index' is set
-    unless (exists $args{'row_index'}) {
+    unless (exists $args{'row_index'} && defined $args{'row_index'}) {
       croak("Missing the required parameter 'row_index' when calling delete_table_cell_paragraph");
     }
 
     # verify the required parameter 'cell_index' is set
-    unless (exists $args{'cell_index'}) {
+    unless (exists $args{'cell_index'} && defined $args{'cell_index'}) {
       croak("Missing the required parameter 'cell_index' when calling delete_table_cell_paragraph");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling delete_table_cell_paragraph");
     }
 
@@ -12979,37 +13119,37 @@ sub delete_table_cell_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_table_cell_portion");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_table_cell_portion");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_table_cell_portion");
     }
 
     # verify the required parameter 'row_index' is set
-    unless (exists $args{'row_index'}) {
+    unless (exists $args{'row_index'} && defined $args{'row_index'}) {
       croak("Missing the required parameter 'row_index' when calling delete_table_cell_portion");
     }
 
     # verify the required parameter 'cell_index' is set
-    unless (exists $args{'cell_index'}) {
+    unless (exists $args{'cell_index'} && defined $args{'cell_index'}) {
       croak("Missing the required parameter 'cell_index' when calling delete_table_cell_portion");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling delete_table_cell_portion");
     }
 
     # verify the required parameter 'portion_index' is set
-    unless (exists $args{'portion_index'}) {
+    unless (exists $args{'portion_index'} && defined $args{'portion_index'}) {
       croak("Missing the required parameter 'portion_index' when calling delete_table_cell_portion");
     }
 
@@ -13173,22 +13313,22 @@ sub delete_table_row {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_table_row");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling delete_table_row");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_table_row");
     }
 
     # verify the required parameter 'row_index' is set
-    unless (exists $args{'row_index'}) {
+    unless (exists $args{'row_index'} && defined $args{'row_index'}) {
       croak("Missing the required parameter 'row_index' when calling delete_table_row");
     }
 
@@ -13312,7 +13452,7 @@ sub delete_unused_layout_slides {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_unused_layout_slides");
     }
 
@@ -13398,7 +13538,7 @@ sub delete_unused_layout_slides_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling delete_unused_layout_slides_online");
     }
 
@@ -13488,7 +13628,7 @@ sub delete_unused_master_slides {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_unused_master_slides");
     }
 
@@ -13585,7 +13725,7 @@ sub delete_unused_master_slides_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling delete_unused_master_slides_online");
     }
 
@@ -13680,12 +13820,12 @@ sub delete_vba_module {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_vba_module");
     }
 
     # verify the required parameter 'module_index' is set
-    unless (exists $args{'module_index'}) {
+    unless (exists $args{'module_index'} && defined $args{'module_index'}) {
       croak("Missing the required parameter 'module_index' when calling delete_vba_module");
     }
 
@@ -13796,7 +13936,7 @@ sub delete_watermark {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_watermark");
     }
 
@@ -13889,7 +14029,7 @@ sub delete_watermark_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling delete_watermark_online");
     }
 
@@ -13972,7 +14112,7 @@ sub download_file {
     my ($self, %args) = @_;
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'} && $args{'path'}) {
+    unless (exists $args{'path'} && defined $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling download_file");
     }
 
@@ -14077,17 +14217,17 @@ sub download_image {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling download_image");
     }
 
     # verify the required parameter 'index' is set
-    unless (exists $args{'index'}) {
+    unless (exists $args{'index'} && defined $args{'index'}) {
       croak("Missing the required parameter 'index' when calling download_image");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_image");
     }
 
@@ -14210,12 +14350,12 @@ sub download_image_default_format {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling download_image_default_format");
     }
 
     # verify the required parameter 'index' is set
-    unless (exists $args{'index'}) {
+    unless (exists $args{'index'} && defined $args{'index'}) {
       croak("Missing the required parameter 'index' when calling download_image_default_format");
     }
 
@@ -14314,12 +14454,12 @@ sub download_image_default_format_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling download_image_default_format_online");
     }
 
     # verify the required parameter 'index' is set
-    unless (exists $args{'index'}) {
+    unless (exists $args{'index'} && defined $args{'index'}) {
       croak("Missing the required parameter 'index' when calling download_image_default_format_online");
     }
 
@@ -14410,17 +14550,17 @@ sub download_image_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling download_image_online");
     }
 
     # verify the required parameter 'index' is set
-    unless (exists $args{'index'}) {
+    unless (exists $args{'index'} && defined $args{'index'}) {
       croak("Missing the required parameter 'index' when calling download_image_online");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_image_online");
     }
 
@@ -14529,12 +14669,12 @@ sub download_images {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling download_images");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_images");
     }
 
@@ -14644,7 +14784,7 @@ sub download_images_default_format {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling download_images_default_format");
     }
 
@@ -14730,7 +14870,7 @@ sub download_images_default_format_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling download_images_default_format_online");
     }
 
@@ -14808,12 +14948,12 @@ sub download_images_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling download_images_online");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_images_online");
     }
 
@@ -14939,17 +15079,17 @@ sub download_notes_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling download_notes_slide");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling download_notes_slide");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_notes_slide");
     }
 
@@ -15099,17 +15239,17 @@ sub download_notes_slide_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling download_notes_slide_online");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling download_notes_slide_online");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_notes_slide_online");
     }
 
@@ -15251,27 +15391,27 @@ sub download_portion_as_math_ml {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling download_portion_as_math_ml");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling download_portion_as_math_ml");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling download_portion_as_math_ml");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling download_portion_as_math_ml");
     }
 
     # verify the required parameter 'portion_index' is set
-    unless (exists $args{'portion_index'}) {
+    unless (exists $args{'portion_index'} && defined $args{'portion_index'}) {
       croak("Missing the required parameter 'portion_index' when calling download_portion_as_math_ml");
     }
 
@@ -15421,17 +15561,17 @@ sub download_presentation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling download_presentation");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_presentation");
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -15605,22 +15745,22 @@ sub download_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling download_shape");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling download_shape");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling download_shape");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_shape");
     }
 
@@ -15767,7 +15907,7 @@ sub download_shape_from_dto {
     my ($self, %args) = @_;
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_shape_from_dto");
     }
 
@@ -15777,7 +15917,7 @@ sub download_shape_from_dto {
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling download_shape_from_dto");
     }
 
@@ -15907,22 +16047,22 @@ sub download_shape_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling download_shape_online");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling download_shape_online");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling download_shape_online");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_shape_online");
     }
 
@@ -16103,22 +16243,22 @@ sub download_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling download_slide");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling download_slide");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_slide");
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -16280,22 +16420,22 @@ sub download_slide_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling download_slide_online");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling download_slide_online");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_slide_online");
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -16478,17 +16618,17 @@ sub download_special_slide_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling download_special_slide_shape");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling download_special_slide_shape");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling download_special_slide_shape");
     }
 
@@ -16498,12 +16638,12 @@ sub download_special_slide_shape {
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling download_special_slide_shape");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_special_slide_shape");
     }
 
@@ -16687,12 +16827,12 @@ sub get_animation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_animation");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_animation");
     }
 
@@ -16929,12 +17069,12 @@ sub get_background {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_background");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_background");
     }
 
@@ -17045,12 +17185,12 @@ sub get_color_scheme {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_color_scheme");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_color_scheme");
     }
 
@@ -17155,7 +17295,7 @@ sub get_comment_authors {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_comment_authors");
     }
 
@@ -17311,7 +17451,7 @@ sub get_document_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_document_properties");
     }
 
@@ -17415,12 +17555,12 @@ sub get_document_property {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_document_property");
     }
 
     # verify the required parameter 'property_name' is set
-    unless (exists $args{'property_name'} && $args{'property_name'}) {
+    unless (exists $args{'property_name'} && defined $args{'property_name'} && $args{'property_name'}) {
       croak("Missing the required parameter 'property_name' when calling get_document_property");
     }
 
@@ -17513,7 +17653,7 @@ sub get_file_versions {
     my ($self, %args) = @_;
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'} && $args{'path'}) {
+    unless (exists $args{'path'} && defined $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling get_file_versions");
     }
 
@@ -17589,7 +17729,7 @@ sub get_files_list {
     my ($self, %args) = @_;
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'} && $args{'path'}) {
+    unless (exists $args{'path'} && defined $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling get_files_list");
     }
 
@@ -17683,12 +17823,12 @@ sub get_font_scheme {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_font_scheme");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_font_scheme");
     }
 
@@ -17793,7 +17933,7 @@ sub get_fonts {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_fonts");
     }
 
@@ -17879,7 +18019,7 @@ sub get_fonts_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling get_fonts_online");
     }
 
@@ -17969,12 +18109,12 @@ sub get_format_scheme {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_format_scheme");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_format_scheme");
     }
 
@@ -18085,12 +18225,12 @@ sub get_layout_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_layout_slide");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_layout_slide");
     }
 
@@ -18195,7 +18335,7 @@ sub get_layout_slides {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_layout_slides");
     }
 
@@ -18299,12 +18439,12 @@ sub get_master_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_master_slide");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_master_slide");
     }
 
@@ -18409,7 +18549,7 @@ sub get_master_slides {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_master_slides");
     }
 
@@ -18513,12 +18653,12 @@ sub get_notes_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_notes_slide");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_notes_slide");
     }
 
@@ -18629,12 +18769,12 @@ sub get_notes_slide_header_footer {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_notes_slide_header_footer");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_notes_slide_header_footer");
     }
 
@@ -18733,12 +18873,12 @@ sub get_notes_slide_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling get_notes_slide_online");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_notes_slide_online");
     }
 
@@ -18853,22 +18993,22 @@ sub get_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_paragraph");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_paragraph");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_paragraph");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling get_paragraph");
     }
 
@@ -19016,22 +19156,22 @@ sub get_paragraph_effective {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_paragraph_effective");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_paragraph_effective");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_paragraph_effective");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling get_paragraph_effective");
     }
 
@@ -19173,22 +19313,22 @@ sub get_paragraph_rectangle {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_paragraph_rectangle");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_paragraph_rectangle");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_paragraph_rectangle");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling get_paragraph_rectangle");
     }
 
@@ -19325,17 +19465,17 @@ sub get_paragraphs {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_paragraphs");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_paragraphs");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_paragraphs");
     }
 
@@ -19464,17 +19604,17 @@ sub get_placeholder {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_placeholder");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_placeholder");
     }
 
     # verify the required parameter 'placeholder_index' is set
-    unless (exists $args{'placeholder_index'}) {
+    unless (exists $args{'placeholder_index'} && defined $args{'placeholder_index'}) {
       croak("Missing the required parameter 'placeholder_index' when calling get_placeholder");
     }
 
@@ -19592,12 +19732,12 @@ sub get_placeholders {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_placeholders");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_placeholders");
     }
 
@@ -19732,27 +19872,27 @@ sub get_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_portion");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_portion");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_portion");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling get_portion");
     }
 
     # verify the required parameter 'portion_index' is set
-    unless (exists $args{'portion_index'}) {
+    unless (exists $args{'portion_index'} && defined $args{'portion_index'}) {
       croak("Missing the required parameter 'portion_index' when calling get_portion");
     }
 
@@ -19913,27 +20053,27 @@ sub get_portion_effective {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_portion_effective");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_portion_effective");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_portion_effective");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling get_portion_effective");
     }
 
     # verify the required parameter 'portion_index' is set
-    unless (exists $args{'portion_index'}) {
+    unless (exists $args{'portion_index'} && defined $args{'portion_index'}) {
       croak("Missing the required parameter 'portion_index' when calling get_portion_effective");
     }
 
@@ -20088,27 +20228,27 @@ sub get_portion_rectangle {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_portion_rectangle");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_portion_rectangle");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_portion_rectangle");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling get_portion_rectangle");
     }
 
     # verify the required parameter 'portion_index' is set
-    unless (exists $args{'portion_index'}) {
+    unless (exists $args{'portion_index'} && defined $args{'portion_index'}) {
       croak("Missing the required parameter 'portion_index' when calling get_portion_rectangle");
     }
 
@@ -20258,22 +20398,22 @@ sub get_portions {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_portions");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_portions");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_portions");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling get_portions");
     }
 
@@ -20397,7 +20537,7 @@ sub get_presentation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_presentation");
     }
 
@@ -20495,7 +20635,7 @@ sub get_presentation_images {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_presentation_images");
     }
 
@@ -20599,7 +20739,7 @@ sub get_presentation_text_items {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_presentation_text_items");
     }
 
@@ -20702,7 +20842,7 @@ sub get_protection_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_protection_properties");
     }
 
@@ -20800,7 +20940,7 @@ sub get_sections {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_sections");
     }
 
@@ -20916,17 +21056,17 @@ sub get_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_shape");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_shape");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_shape");
     }
 
@@ -21055,17 +21195,17 @@ sub get_shape_geometry_path {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_shape_geometry_path");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_shape_geometry_path");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_shape_geometry_path");
     }
 
@@ -21195,12 +21335,12 @@ sub get_shapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_shapes");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_shapes");
     }
 
@@ -21326,12 +21466,12 @@ sub get_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slide");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_slide");
     }
 
@@ -21442,12 +21582,12 @@ sub get_slide_comments {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slide_comments");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_slide_comments");
     }
 
@@ -21558,12 +21698,12 @@ sub get_slide_header_footer {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slide_header_footer");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_slide_header_footer");
     }
 
@@ -21674,12 +21814,12 @@ sub get_slide_images {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slide_images");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_slide_images");
     }
 
@@ -21784,7 +21924,7 @@ sub get_slide_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slide_properties");
     }
 
@@ -21882,7 +22022,7 @@ sub get_slide_show_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slide_show_properties");
     }
 
@@ -21992,12 +22132,12 @@ sub get_slide_text_items {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slide_text_items");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_slide_text_items");
     }
 
@@ -22107,7 +22247,7 @@ sub get_slides {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides");
     }
 
@@ -22229,17 +22369,17 @@ sub get_special_slide_animation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_special_slide_animation");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_special_slide_animation");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_animation");
     }
 
@@ -22396,17 +22536,17 @@ sub get_special_slide_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_special_slide_paragraph");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_special_slide_paragraph");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_paragraph");
     }
 
@@ -22416,12 +22556,12 @@ sub get_special_slide_paragraph {
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_special_slide_paragraph");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling get_special_slide_paragraph");
     }
 
@@ -22576,17 +22716,17 @@ sub get_special_slide_paragraphs {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_special_slide_paragraphs");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_special_slide_paragraphs");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_paragraphs");
     }
 
@@ -22596,7 +22736,7 @@ sub get_special_slide_paragraphs {
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_special_slide_paragraphs");
     }
 
@@ -22756,17 +22896,17 @@ sub get_special_slide_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_special_slide_portion");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_special_slide_portion");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_portion");
     }
 
@@ -22776,17 +22916,17 @@ sub get_special_slide_portion {
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_special_slide_portion");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling get_special_slide_portion");
     }
 
     # verify the required parameter 'portion_index' is set
-    unless (exists $args{'portion_index'}) {
+    unless (exists $args{'portion_index'} && defined $args{'portion_index'}) {
       croak("Missing the required parameter 'portion_index' when calling get_special_slide_portion");
     }
 
@@ -22954,17 +23094,17 @@ sub get_special_slide_portions {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_special_slide_portions");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_special_slide_portions");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_portions");
     }
 
@@ -22974,12 +23114,12 @@ sub get_special_slide_portions {
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_special_slide_portions");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling get_special_slide_portions");
     }
 
@@ -23134,17 +23274,17 @@ sub get_special_slide_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_special_slide_shape");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_special_slide_shape");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_shape");
     }
 
@@ -23154,7 +23294,7 @@ sub get_special_slide_shape {
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_special_slide_shape");
     }
 
@@ -23296,17 +23436,17 @@ sub get_special_slide_shapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_special_slide_shapes");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_special_slide_shapes");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_shapes");
     }
 
@@ -23458,32 +23598,32 @@ sub get_table_cell_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_table_cell_paragraph");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_table_cell_paragraph");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_table_cell_paragraph");
     }
 
     # verify the required parameter 'row_index' is set
-    unless (exists $args{'row_index'}) {
+    unless (exists $args{'row_index'} && defined $args{'row_index'}) {
       croak("Missing the required parameter 'row_index' when calling get_table_cell_paragraph");
     }
 
     # verify the required parameter 'cell_index' is set
-    unless (exists $args{'cell_index'}) {
+    unless (exists $args{'cell_index'} && defined $args{'cell_index'}) {
       croak("Missing the required parameter 'cell_index' when calling get_table_cell_paragraph");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling get_table_cell_paragraph");
     }
 
@@ -23640,27 +23780,27 @@ sub get_table_cell_paragraphs {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_table_cell_paragraphs");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_table_cell_paragraphs");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_table_cell_paragraphs");
     }
 
     # verify the required parameter 'row_index' is set
-    unless (exists $args{'row_index'}) {
+    unless (exists $args{'row_index'} && defined $args{'row_index'}) {
       croak("Missing the required parameter 'row_index' when calling get_table_cell_paragraphs");
     }
 
     # verify the required parameter 'cell_index' is set
-    unless (exists $args{'cell_index'}) {
+    unless (exists $args{'cell_index'} && defined $args{'cell_index'}) {
       croak("Missing the required parameter 'cell_index' when calling get_table_cell_paragraphs");
     }
 
@@ -23822,37 +23962,37 @@ sub get_table_cell_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_table_cell_portion");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_table_cell_portion");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_table_cell_portion");
     }
 
     # verify the required parameter 'row_index' is set
-    unless (exists $args{'row_index'}) {
+    unless (exists $args{'row_index'} && defined $args{'row_index'}) {
       croak("Missing the required parameter 'row_index' when calling get_table_cell_portion");
     }
 
     # verify the required parameter 'cell_index' is set
-    unless (exists $args{'cell_index'}) {
+    unless (exists $args{'cell_index'} && defined $args{'cell_index'}) {
       croak("Missing the required parameter 'cell_index' when calling get_table_cell_portion");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling get_table_cell_portion");
     }
 
     # verify the required parameter 'portion_index' is set
-    unless (exists $args{'portion_index'}) {
+    unless (exists $args{'portion_index'} && defined $args{'portion_index'}) {
       croak("Missing the required parameter 'portion_index' when calling get_table_cell_portion");
     }
 
@@ -24022,32 +24162,32 @@ sub get_table_cell_portions {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_table_cell_portions");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_table_cell_portions");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_table_cell_portions");
     }
 
     # verify the required parameter 'row_index' is set
-    unless (exists $args{'row_index'}) {
+    unless (exists $args{'row_index'} && defined $args{'row_index'}) {
       croak("Missing the required parameter 'row_index' when calling get_table_cell_portions");
     }
 
     # verify the required parameter 'cell_index' is set
-    unless (exists $args{'cell_index'}) {
+    unless (exists $args{'cell_index'} && defined $args{'cell_index'}) {
       croak("Missing the required parameter 'cell_index' when calling get_table_cell_portions");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling get_table_cell_portions");
     }
 
@@ -24186,12 +24326,12 @@ sub get_theme {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_theme");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling get_theme");
     }
 
@@ -24302,12 +24442,12 @@ sub get_vba_module {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_vba_module");
     }
 
     # verify the required parameter 'module_index' is set
-    unless (exists $args{'module_index'}) {
+    unless (exists $args{'module_index'} && defined $args{'module_index'}) {
       croak("Missing the required parameter 'module_index' when calling get_vba_module");
     }
 
@@ -24412,7 +24552,7 @@ sub get_vba_project {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_vba_project");
     }
 
@@ -24510,7 +24650,7 @@ sub get_view_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_view_properties");
     }
 
@@ -24644,27 +24784,27 @@ sub highlight_shape_regex {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling highlight_shape_regex");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling highlight_shape_regex");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling highlight_shape_regex");
     }
 
     # verify the required parameter 'regex' is set
-    unless (exists $args{'regex'} && $args{'regex'}) {
+    unless (exists $args{'regex'} && defined $args{'regex'} && $args{'regex'}) {
       croak("Missing the required parameter 'regex' when calling highlight_shape_regex");
     }
 
     # verify the required parameter 'color' is set
-    unless (exists $args{'color'} && $args{'color'}) {
+    unless (exists $args{'color'} && defined $args{'color'} && $args{'color'}) {
       croak("Missing the required parameter 'color' when calling highlight_shape_regex");
     }
 
@@ -24832,27 +24972,27 @@ sub highlight_shape_text {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling highlight_shape_text");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling highlight_shape_text");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling highlight_shape_text");
     }
 
     # verify the required parameter 'text' is set
-    unless (exists $args{'text'} && $args{'text'}) {
+    unless (exists $args{'text'} && defined $args{'text'} && $args{'text'}) {
       croak("Missing the required parameter 'text' when calling highlight_shape_text");
     }
 
     # verify the required parameter 'color' is set
-    unless (exists $args{'color'} && $args{'color'}) {
+    unless (exists $args{'color'} && defined $args{'color'} && $args{'color'}) {
       croak("Missing the required parameter 'color' when calling highlight_shape_text");
     }
 
@@ -24990,7 +25130,7 @@ sub import_from_html {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling import_from_html");
     }
 
@@ -25099,12 +25239,12 @@ sub import_from_pdf {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling import_from_pdf");
     }
 
     # verify the required parameter 'pdf' is set
-    unless (exists $args{'pdf'} && $args{'pdf'}) {
+    unless (exists $args{'pdf'} && defined $args{'pdf'} && $args{'pdf'}) {
       croak("Missing the required parameter 'pdf' when calling import_from_pdf");
     }
 
@@ -25253,12 +25393,12 @@ sub import_shapes_from_svg {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling import_shapes_from_svg");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling import_shapes_from_svg");
     }
 
@@ -25402,12 +25542,12 @@ sub merge {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling merge");
     }
 
     # verify the required parameter 'request' is set
-    unless (exists $args{'request'} && $args{'request'}) {
+    unless (exists $args{'request'} && defined $args{'request'} && $args{'request'}) {
       croak("Missing the required parameter 'request' when calling merge");
     }
 
@@ -25510,7 +25650,7 @@ sub merge_and_save_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'} && $args{'out_path'}) {
+    unless (exists $args{'out_path'} && defined $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling merge_and_save_online");
     }
 
@@ -25698,22 +25838,22 @@ sub merge_table_cells {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling merge_table_cells");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling merge_table_cells");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling merge_table_cells");
     }
 
     # verify the required parameter 'table_cell_merge_options' is set
-    unless (exists $args{'table_cell_merge_options'} && $args{'table_cell_merge_options'}) {
+    unless (exists $args{'table_cell_merge_options'} && defined $args{'table_cell_merge_options'} && $args{'table_cell_merge_options'}) {
       croak("Missing the required parameter 'table_cell_merge_options' when calling merge_table_cells");
     }
 
@@ -25836,12 +25976,12 @@ sub move_file {
     my ($self, %args) = @_;
 
     # verify the required parameter 'src_path' is set
-    unless (exists $args{'src_path'} && $args{'src_path'}) {
+    unless (exists $args{'src_path'} && defined $args{'src_path'} && $args{'src_path'}) {
       croak("Missing the required parameter 'src_path' when calling move_file");
     }
 
     # verify the required parameter 'dest_path' is set
-    unless (exists $args{'dest_path'} && $args{'dest_path'}) {
+    unless (exists $args{'dest_path'} && defined $args{'dest_path'} && $args{'dest_path'}) {
       croak("Missing the required parameter 'dest_path' when calling move_file");
     }
 
@@ -25940,12 +26080,12 @@ sub move_folder {
     my ($self, %args) = @_;
 
     # verify the required parameter 'src_path' is set
-    unless (exists $args{'src_path'} && $args{'src_path'}) {
+    unless (exists $args{'src_path'} && defined $args{'src_path'} && $args{'src_path'}) {
       croak("Missing the required parameter 'src_path' when calling move_folder");
     }
 
     # verify the required parameter 'dest_path' is set
-    unless (exists $args{'dest_path'} && $args{'dest_path'}) {
+    unless (exists $args{'dest_path'} && defined $args{'dest_path'} && $args{'dest_path'}) {
       croak("Missing the required parameter 'dest_path' when calling move_folder");
     }
 
@@ -26051,17 +26191,17 @@ sub move_section {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling move_section");
     }
 
     # verify the required parameter 'section_index' is set
-    unless (exists $args{'section_index'}) {
+    unless (exists $args{'section_index'} && defined $args{'section_index'}) {
       croak("Missing the required parameter 'section_index' when calling move_section");
     }
 
     # verify the required parameter 'new_position' is set
-    unless (exists $args{'new_position'}) {
+    unless (exists $args{'new_position'} && defined $args{'new_position'}) {
       croak("Missing the required parameter 'new_position' when calling move_section");
     }
 
@@ -26183,17 +26323,17 @@ sub move_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling move_slide");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling move_slide");
     }
 
     # verify the required parameter 'new_position' is set
-    unless (exists $args{'new_position'}) {
+    unless (exists $args{'new_position'} && defined $args{'new_position'}) {
       croak("Missing the required parameter 'new_position' when calling move_slide");
     }
 
@@ -26309,12 +26449,12 @@ sub notes_slide_exists {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling notes_slide_exists");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling notes_slide_exists");
     }
 
@@ -26413,12 +26553,12 @@ sub notes_slide_exists_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling notes_slide_exists_online");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling notes_slide_exists_online");
     }
 
@@ -26503,7 +26643,7 @@ sub object_exists {
     my ($self, %args) = @_;
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'} && $args{'path'}) {
+    unless (exists $args{'path'} && defined $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling object_exists");
     }
 
@@ -26602,12 +26742,12 @@ sub ordered_merge {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling ordered_merge");
     }
 
     # verify the required parameter 'request' is set
-    unless (exists $args{'request'} && $args{'request'}) {
+    unless (exists $args{'request'} && defined $args{'request'} && $args{'request'}) {
       croak("Missing the required parameter 'request' when calling ordered_merge");
     }
 
@@ -26698,7 +26838,7 @@ sub pipeline {
     my ($self, %args) = @_;
 
     # verify the required parameter 'pipeline' is set
-    unless (exists $args{'pipeline'} && $args{'pipeline'}) {
+    unless (exists $args{'pipeline'} && defined $args{'pipeline'} && $args{'pipeline'}) {
       croak("Missing the required parameter 'pipeline' when calling pipeline");
     }
 
@@ -26795,7 +26935,7 @@ sub reorder_slides {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling reorder_slides");
     }
 
@@ -26927,17 +27067,17 @@ sub replace_font {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling replace_font");
     }
 
     # verify the required parameter 'source_font' is set
-    unless (exists $args{'source_font'} && $args{'source_font'}) {
+    unless (exists $args{'source_font'} && defined $args{'source_font'} && $args{'source_font'}) {
       croak("Missing the required parameter 'source_font' when calling replace_font");
     }
 
     # verify the required parameter 'target_font' is set
-    unless (exists $args{'target_font'} && $args{'target_font'}) {
+    unless (exists $args{'target_font'} && defined $args{'target_font'} && $args{'target_font'}) {
       croak("Missing the required parameter 'target_font' when calling replace_font");
     }
 
@@ -27071,17 +27211,17 @@ sub replace_font_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling replace_font_online");
     }
 
     # verify the required parameter 'source_font' is set
-    unless (exists $args{'source_font'} && $args{'source_font'}) {
+    unless (exists $args{'source_font'} && defined $args{'source_font'} && $args{'source_font'}) {
       croak("Missing the required parameter 'source_font' when calling replace_font_online");
     }
 
     # verify the required parameter 'target_font' is set
-    unless (exists $args{'target_font'} && $args{'target_font'}) {
+    unless (exists $args{'target_font'} && defined $args{'target_font'} && $args{'target_font'}) {
       croak("Missing the required parameter 'target_font' when calling replace_font_online");
     }
 
@@ -27201,17 +27341,17 @@ sub replace_image {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling replace_image");
     }
 
     # verify the required parameter 'image_index' is set
-    unless (exists $args{'image_index'}) {
+    unless (exists $args{'image_index'} && defined $args{'image_index'}) {
       croak("Missing the required parameter 'image_index' when calling replace_image");
     }
 
     # verify the required parameter 'image' is set
-    unless (exists $args{'image'} && $args{'image'}) {
+    unless (exists $args{'image'} && defined $args{'image'} && $args{'image'}) {
       croak("Missing the required parameter 'image' when calling replace_image");
     }
 
@@ -27315,17 +27455,17 @@ sub replace_image_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling replace_image_online");
     }
 
     # verify the required parameter 'image_index' is set
-    unless (exists $args{'image_index'}) {
+    unless (exists $args{'image_index'} && defined $args{'image_index'}) {
       croak("Missing the required parameter 'image_index' when calling replace_image_online");
     }
 
     # verify the required parameter 'image' is set
-    unless (exists $args{'image'} && $args{'image'}) {
+    unless (exists $args{'image'} && defined $args{'image'} && $args{'image'}) {
       croak("Missing the required parameter 'image' when calling replace_image_online");
     }
 
@@ -27437,17 +27577,17 @@ sub replace_presentation_text {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling replace_presentation_text");
     }
 
     # verify the required parameter 'old_value' is set
-    unless (exists $args{'old_value'} && $args{'old_value'}) {
+    unless (exists $args{'old_value'} && defined $args{'old_value'} && $args{'old_value'}) {
       croak("Missing the required parameter 'old_value' when calling replace_presentation_text");
     }
 
     # verify the required parameter 'new_value' is set
-    unless (exists $args{'new_value'} && $args{'new_value'}) {
+    unless (exists $args{'new_value'} && defined $args{'new_value'} && $args{'new_value'}) {
       croak("Missing the required parameter 'new_value' when calling replace_presentation_text");
     }
 
@@ -27566,17 +27706,17 @@ sub replace_presentation_text_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling replace_presentation_text_online");
     }
 
     # verify the required parameter 'old_value' is set
-    unless (exists $args{'old_value'} && $args{'old_value'}) {
+    unless (exists $args{'old_value'} && defined $args{'old_value'} && $args{'old_value'}) {
       croak("Missing the required parameter 'old_value' when calling replace_presentation_text_online");
     }
 
     # verify the required parameter 'new_value' is set
-    unless (exists $args{'new_value'} && $args{'new_value'}) {
+    unless (exists $args{'new_value'} && defined $args{'new_value'} && $args{'new_value'}) {
       croak("Missing the required parameter 'new_value' when calling replace_presentation_text_online");
     }
 
@@ -27699,22 +27839,22 @@ sub replace_slide_text {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling replace_slide_text");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling replace_slide_text");
     }
 
     # verify the required parameter 'old_value' is set
-    unless (exists $args{'old_value'} && $args{'old_value'}) {
+    unless (exists $args{'old_value'} && defined $args{'old_value'} && $args{'old_value'}) {
       croak("Missing the required parameter 'old_value' when calling replace_slide_text");
     }
 
     # verify the required parameter 'new_value' is set
-    unless (exists $args{'new_value'} && $args{'new_value'}) {
+    unless (exists $args{'new_value'} && defined $args{'new_value'} && $args{'new_value'}) {
       croak("Missing the required parameter 'new_value' when calling replace_slide_text");
     }
 
@@ -27846,22 +27986,22 @@ sub replace_slide_text_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling replace_slide_text_online");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling replace_slide_text_online");
     }
 
     # verify the required parameter 'old_value' is set
-    unless (exists $args{'old_value'} && $args{'old_value'}) {
+    unless (exists $args{'old_value'} && defined $args{'old_value'} && $args{'old_value'}) {
       croak("Missing the required parameter 'old_value' when calling replace_slide_text_online");
     }
 
     # verify the required parameter 'new_value' is set
-    unless (exists $args{'new_value'} && $args{'new_value'}) {
+    unless (exists $args{'new_value'} && defined $args{'new_value'} && $args{'new_value'}) {
       croak("Missing the required parameter 'new_value' when calling replace_slide_text_online");
     }
 
@@ -27991,17 +28131,17 @@ sub replace_text_formatting {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling replace_text_formatting");
     }
 
     # verify the required parameter 'old_value' is set
-    unless (exists $args{'old_value'} && $args{'old_value'}) {
+    unless (exists $args{'old_value'} && defined $args{'old_value'} && $args{'old_value'}) {
       croak("Missing the required parameter 'old_value' when calling replace_text_formatting");
     }
 
     # verify the required parameter 'new_value' is set
-    unless (exists $args{'new_value'} && $args{'new_value'}) {
+    unless (exists $args{'new_value'} && defined $args{'new_value'} && $args{'new_value'}) {
       croak("Missing the required parameter 'new_value' when calling replace_text_formatting");
     }
 
@@ -28131,17 +28271,17 @@ sub replace_text_formatting_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling replace_text_formatting_online");
     }
 
     # verify the required parameter 'old_value' is set
-    unless (exists $args{'old_value'} && $args{'old_value'}) {
+    unless (exists $args{'old_value'} && defined $args{'old_value'} && $args{'old_value'}) {
       croak("Missing the required parameter 'old_value' when calling replace_text_formatting_online");
     }
 
     # verify the required parameter 'new_value' is set
-    unless (exists $args{'new_value'} && $args{'new_value'}) {
+    unless (exists $args{'new_value'} && defined $args{'new_value'} && $args{'new_value'}) {
       croak("Missing the required parameter 'new_value' when calling replace_text_formatting_online");
     }
 
@@ -28275,32 +28415,32 @@ sub save_portion_as_math_ml {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling save_portion_as_math_ml");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling save_portion_as_math_ml");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling save_portion_as_math_ml");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling save_portion_as_math_ml");
     }
 
     # verify the required parameter 'portion_index' is set
-    unless (exists $args{'portion_index'}) {
+    unless (exists $args{'portion_index'} && defined $args{'portion_index'}) {
       croak("Missing the required parameter 'portion_index' when calling save_portion_as_math_ml");
     }
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'} && $args{'out_path'}) {
+    unless (exists $args{'out_path'} && defined $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling save_portion_as_math_ml");
     }
 
@@ -28457,22 +28597,22 @@ sub save_presentation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling save_presentation");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling save_presentation");
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'} && $args{'out_path'}) {
+    unless (exists $args{'out_path'} && defined $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling save_presentation");
     }
 
@@ -28653,22 +28793,22 @@ sub save_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling save_shape");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling save_shape");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling save_shape");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling save_shape");
     }
 
@@ -28678,7 +28818,7 @@ sub save_shape {
     }
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'} && $args{'out_path'}) {
+    unless (exists $args{'out_path'} && defined $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling save_shape");
     }
 
@@ -28881,22 +29021,22 @@ sub save_shape_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling save_shape_online");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling save_shape_online");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling save_shape_online");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling save_shape_online");
     }
 
@@ -28906,7 +29046,7 @@ sub save_shape_online {
     }
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'} && $args{'out_path'}) {
+    unless (exists $args{'out_path'} && defined $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling save_shape_online");
     }
 
@@ -29089,27 +29229,27 @@ sub save_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling save_slide");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling save_slide");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling save_slide");
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'} && $args{'out_path'}) {
+    unless (exists $args{'out_path'} && defined $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling save_slide");
     }
 
@@ -29278,27 +29418,27 @@ sub save_slide_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling save_slide_online");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling save_slide_online");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling save_slide_online");
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'} && $args{'out_path'}) {
+    unless (exists $args{'out_path'} && defined $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling save_slide_online");
     }
 
@@ -29488,17 +29628,17 @@ sub save_special_slide_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling save_special_slide_shape");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling save_special_slide_shape");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling save_special_slide_shape");
     }
 
@@ -29508,12 +29648,12 @@ sub save_special_slide_shape {
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling save_special_slide_shape");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling save_special_slide_shape");
     }
 
@@ -29523,7 +29663,7 @@ sub save_special_slide_shape {
     }
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'} && $args{'out_path'}) {
+    unless (exists $args{'out_path'} && defined $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling save_special_slide_shape");
     }
 
@@ -29697,17 +29837,17 @@ sub set_animation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_animation");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling set_animation");
     }
 
     # verify the required parameter 'animation' is set
-    unless (exists $args{'animation'} && $args{'animation'}) {
+    unless (exists $args{'animation'} && defined $args{'animation'} && $args{'animation'}) {
       croak("Missing the required parameter 'animation' when calling set_animation");
     }
 
@@ -29829,17 +29969,17 @@ sub set_background {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_background");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling set_background");
     }
 
     # verify the required parameter 'background' is set
-    unless (exists $args{'background'} && $args{'background'}) {
+    unless (exists $args{'background'} && defined $args{'background'} && $args{'background'}) {
       croak("Missing the required parameter 'background' when calling set_background");
     }
 
@@ -29961,17 +30101,17 @@ sub set_background_color {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_background_color");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling set_background_color");
     }
 
     # verify the required parameter 'color' is set
-    unless (exists $args{'color'} && $args{'color'}) {
+    unless (exists $args{'color'} && defined $args{'color'} && $args{'color'}) {
       croak("Missing the required parameter 'color' when calling set_background_color");
     }
 
@@ -30105,22 +30245,22 @@ sub set_chart_axis {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_chart_axis");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling set_chart_axis");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling set_chart_axis");
     }
 
     # verify the required parameter 'axis_type' is set
-    unless (exists $args{'axis_type'} && $args{'axis_type'}) {
+    unless (exists $args{'axis_type'} && defined $args{'axis_type'} && $args{'axis_type'}) {
       croak("Missing the required parameter 'axis_type' when calling set_chart_axis");
     }
 
@@ -30130,7 +30270,7 @@ sub set_chart_axis {
     }
 
     # verify the required parameter 'axis' is set
-    unless (exists $args{'axis'} && $args{'axis'}) {
+    unless (exists $args{'axis'} && defined $args{'axis'} && $args{'axis'}) {
       croak("Missing the required parameter 'axis' when calling set_chart_axis");
     }
 
@@ -30272,22 +30412,22 @@ sub set_chart_legend {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_chart_legend");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling set_chart_legend");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling set_chart_legend");
     }
 
     # verify the required parameter 'legend' is set
-    unless (exists $args{'legend'} && $args{'legend'}) {
+    unless (exists $args{'legend'} && defined $args{'legend'} && $args{'legend'}) {
       croak("Missing the required parameter 'legend' when calling set_chart_legend");
     }
 
@@ -30428,27 +30568,27 @@ sub set_chart_series_group {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_chart_series_group");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling set_chart_series_group");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling set_chart_series_group");
     }
 
     # verify the required parameter 'series_group_index' is set
-    unless (exists $args{'series_group_index'}) {
+    unless (exists $args{'series_group_index'} && defined $args{'series_group_index'}) {
       croak("Missing the required parameter 'series_group_index' when calling set_chart_series_group");
     }
 
     # verify the required parameter 'series_group' is set
-    unless (exists $args{'series_group'} && $args{'series_group'}) {
+    unless (exists $args{'series_group'} && defined $args{'series_group'} && $args{'series_group'}) {
       croak("Missing the required parameter 'series_group' when calling set_chart_series_group");
     }
 
@@ -30596,22 +30736,22 @@ sub set_chart_wall {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_chart_wall");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling set_chart_wall");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling set_chart_wall");
     }
 
     # verify the required parameter 'chart_wall_type' is set
-    unless (exists $args{'chart_wall_type'} && $args{'chart_wall_type'}) {
+    unless (exists $args{'chart_wall_type'} && defined $args{'chart_wall_type'} && $args{'chart_wall_type'}) {
       croak("Missing the required parameter 'chart_wall_type' when calling set_chart_wall");
     }
 
@@ -30621,7 +30761,7 @@ sub set_chart_wall {
     }
 
     # verify the required parameter 'chart_wall' is set
-    unless (exists $args{'chart_wall'} && $args{'chart_wall'}) {
+    unless (exists $args{'chart_wall'} && defined $args{'chart_wall'} && $args{'chart_wall'}) {
       croak("Missing the required parameter 'chart_wall' when calling set_chart_wall");
     }
 
@@ -30751,12 +30891,12 @@ sub set_document_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_document_properties");
     }
 
     # verify the required parameter 'properties' is set
-    unless (exists $args{'properties'} && $args{'properties'}) {
+    unless (exists $args{'properties'} && defined $args{'properties'} && $args{'properties'}) {
       croak("Missing the required parameter 'properties' when calling set_document_properties");
     }
 
@@ -30871,17 +31011,17 @@ sub set_document_property {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_document_property");
     }
 
     # verify the required parameter 'property_name' is set
-    unless (exists $args{'property_name'} && $args{'property_name'}) {
+    unless (exists $args{'property_name'} && defined $args{'property_name'} && $args{'property_name'}) {
       croak("Missing the required parameter 'property_name' when calling set_document_property");
     }
 
     # verify the required parameter 'property' is set
-    unless (exists $args{'property'} && $args{'property'}) {
+    unless (exists $args{'property'} && defined $args{'property'} && $args{'property'}) {
       croak("Missing the required parameter 'property' when calling set_document_property");
     }
 
@@ -31009,12 +31149,12 @@ sub set_embedded_font {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_embedded_font");
     }
 
     # verify the required parameter 'font_name' is set
-    unless (exists $args{'font_name'} && $args{'font_name'}) {
+    unless (exists $args{'font_name'} && defined $args{'font_name'} && $args{'font_name'}) {
       croak("Missing the required parameter 'font_name' when calling set_embedded_font");
     }
 
@@ -31141,12 +31281,12 @@ sub set_embedded_font_from_request {
     my ($self, %args) = @_;
 
     # verify the required parameter 'font' is set
-    unless (exists $args{'font'} && $args{'font'}) {
+    unless (exists $args{'font'} && defined $args{'font'} && $args{'font'}) {
       croak("Missing the required parameter 'font' when calling set_embedded_font_from_request");
     }
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_embedded_font_from_request");
     }
 
@@ -31252,12 +31392,12 @@ sub set_embedded_font_from_request_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling set_embedded_font_from_request_online");
     }
 
     # verify the required parameter 'font' is set
-    unless (exists $args{'font'} && $args{'font'}) {
+    unless (exists $args{'font'} && defined $args{'font'} && $args{'font'}) {
       croak("Missing the required parameter 'font' when calling set_embedded_font_from_request_online");
     }
 
@@ -31355,12 +31495,12 @@ sub set_embedded_font_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling set_embedded_font_online");
     }
 
     # verify the required parameter 'font_name' is set
-    unless (exists $args{'font_name'} && $args{'font_name'}) {
+    unless (exists $args{'font_name'} && defined $args{'font_name'} && $args{'font_name'}) {
       croak("Missing the required parameter 'font_name' when calling set_embedded_font_online");
     }
 
@@ -31473,17 +31613,17 @@ sub set_notes_slide_header_footer {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_notes_slide_header_footer");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling set_notes_slide_header_footer");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling set_notes_slide_header_footer");
     }
 
@@ -31599,12 +31739,12 @@ sub set_presentation_header_footer {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_presentation_header_footer");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling set_presentation_header_footer");
     }
 
@@ -31713,12 +31853,12 @@ sub set_protection {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_protection");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling set_protection");
     }
 
@@ -31815,12 +31955,12 @@ sub set_protection_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling set_protection_online");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling set_protection_online");
     }
 
@@ -31915,12 +32055,12 @@ sub set_sections {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_sections");
     }
 
     # verify the required parameter 'sections' is set
-    unless (exists $args{'sections'} && $args{'sections'}) {
+    unless (exists $args{'sections'} && defined $args{'sections'} && $args{'sections'}) {
       croak("Missing the required parameter 'sections' when calling set_sections");
     }
 
@@ -32041,22 +32181,22 @@ sub set_shape_geometry_path {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_shape_geometry_path");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling set_shape_geometry_path");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling set_shape_geometry_path");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling set_shape_geometry_path");
     }
 
@@ -32185,17 +32325,17 @@ sub set_slide_header_footer {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_slide_header_footer");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling set_slide_header_footer");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling set_slide_header_footer");
     }
 
@@ -32311,12 +32451,12 @@ sub set_slide_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_slide_properties");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling set_slide_properties");
     }
 
@@ -32425,12 +32565,12 @@ sub set_slide_show_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_slide_show_properties");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling set_slide_show_properties");
     }
 
@@ -32551,17 +32691,17 @@ sub set_special_slide_animation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_special_slide_animation");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling set_special_slide_animation");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling set_special_slide_animation");
     }
 
@@ -32571,7 +32711,7 @@ sub set_special_slide_animation {
     }
 
     # verify the required parameter 'animation' is set
-    unless (exists $args{'animation'} && $args{'animation'}) {
+    unless (exists $args{'animation'} && defined $args{'animation'} && $args{'animation'}) {
       croak("Missing the required parameter 'animation' when calling set_special_slide_animation");
     }
 
@@ -32694,12 +32834,12 @@ sub set_view_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling set_view_properties");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling set_view_properties");
     }
 
@@ -32850,12 +32990,12 @@ sub split {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling split");
     }
 
     # verify enum value
-    if (exists $args{'format'} && $args{'format'} && !grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5' ))) {
+    if (exists $args{'format'} && $args{'format'} && !grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -33035,17 +33175,17 @@ sub split_and_save_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling split_and_save_online");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling split_and_save_online");
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -33212,17 +33352,17 @@ sub split_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling split_online");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling split_online");
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -33384,32 +33524,32 @@ sub split_table_cell {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling split_table_cell");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling split_table_cell");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling split_table_cell");
     }
 
     # verify the required parameter 'row_index' is set
-    unless (exists $args{'row_index'}) {
+    unless (exists $args{'row_index'} && defined $args{'row_index'}) {
       croak("Missing the required parameter 'row_index' when calling split_table_cell");
     }
 
     # verify the required parameter 'cell_index' is set
-    unless (exists $args{'cell_index'}) {
+    unless (exists $args{'cell_index'} && defined $args{'cell_index'}) {
       croak("Missing the required parameter 'cell_index' when calling split_table_cell");
     }
 
     # verify the required parameter 'split_type' is set
-    unless (exists $args{'split_type'} && $args{'split_type'}) {
+    unless (exists $args{'split_type'} && defined $args{'split_type'} && $args{'split_type'}) {
       croak("Missing the required parameter 'split_type' when calling split_table_cell");
     }
 
@@ -33419,7 +33559,7 @@ sub split_table_cell {
     }
 
     # verify the required parameter 'value' is set
-    unless (exists $args{'value'} && $args{'value'}) {
+    unless (exists $args{'value'} && defined $args{'value'} && $args{'value'}) {
       croak("Missing the required parameter 'value' when calling split_table_cell");
     }
 
@@ -33541,7 +33681,7 @@ sub storage_exists {
     my ($self, %args) = @_;
 
     # verify the required parameter 'storage_name' is set
-    unless (exists $args{'storage_name'} && $args{'storage_name'}) {
+    unless (exists $args{'storage_name'} && defined $args{'storage_name'} && $args{'storage_name'}) {
       croak("Missing the required parameter 'storage_name' when calling storage_exists");
     }
 
@@ -33642,22 +33782,22 @@ sub update_animation_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_animation_effect");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_animation_effect");
     }
 
     # verify the required parameter 'effect_index' is set
-    unless (exists $args{'effect_index'}) {
+    unless (exists $args{'effect_index'} && defined $args{'effect_index'}) {
       croak("Missing the required parameter 'effect_index' when calling update_animation_effect");
     }
 
     # verify the required parameter 'effect' is set
-    unless (exists $args{'effect'} && $args{'effect'}) {
+    unless (exists $args{'effect'} && defined $args{'effect'} && $args{'effect'}) {
       croak("Missing the required parameter 'effect' when calling update_animation_effect");
     }
 
@@ -33798,27 +33938,27 @@ sub update_animation_interactive_sequence_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'sequence_index' is set
-    unless (exists $args{'sequence_index'}) {
+    unless (exists $args{'sequence_index'} && defined $args{'sequence_index'}) {
       croak("Missing the required parameter 'sequence_index' when calling update_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'effect_index' is set
-    unless (exists $args{'effect_index'}) {
+    unless (exists $args{'effect_index'} && defined $args{'effect_index'}) {
       croak("Missing the required parameter 'effect_index' when calling update_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'effect' is set
-    unless (exists $args{'effect'} && $args{'effect'}) {
+    unless (exists $args{'effect'} && defined $args{'effect'} && $args{'effect'}) {
       croak("Missing the required parameter 'effect' when calling update_animation_interactive_sequence_effect");
     }
 
@@ -33966,27 +34106,27 @@ sub update_chart_category {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_chart_category");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_chart_category");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling update_chart_category");
     }
 
     # verify the required parameter 'category_index' is set
-    unless (exists $args{'category_index'}) {
+    unless (exists $args{'category_index'} && defined $args{'category_index'}) {
       croak("Missing the required parameter 'category_index' when calling update_chart_category");
     }
 
     # verify the required parameter 'category' is set
-    unless (exists $args{'category'} && $args{'category'}) {
+    unless (exists $args{'category'} && defined $args{'category'} && $args{'category'}) {
       croak("Missing the required parameter 'category' when calling update_chart_category");
     }
 
@@ -34140,32 +34280,32 @@ sub update_chart_data_point {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_chart_data_point");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_chart_data_point");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling update_chart_data_point");
     }
 
     # verify the required parameter 'series_index' is set
-    unless (exists $args{'series_index'}) {
+    unless (exists $args{'series_index'} && defined $args{'series_index'}) {
       croak("Missing the required parameter 'series_index' when calling update_chart_data_point");
     }
 
     # verify the required parameter 'point_index' is set
-    unless (exists $args{'point_index'}) {
+    unless (exists $args{'point_index'} && defined $args{'point_index'}) {
       croak("Missing the required parameter 'point_index' when calling update_chart_data_point");
     }
 
     # verify the required parameter 'data_point' is set
-    unless (exists $args{'data_point'} && $args{'data_point'}) {
+    unless (exists $args{'data_point'} && defined $args{'data_point'} && $args{'data_point'}) {
       croak("Missing the required parameter 'data_point' when calling update_chart_data_point");
     }
 
@@ -34320,27 +34460,27 @@ sub update_chart_series {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_chart_series");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_chart_series");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling update_chart_series");
     }
 
     # verify the required parameter 'series_index' is set
-    unless (exists $args{'series_index'}) {
+    unless (exists $args{'series_index'} && defined $args{'series_index'}) {
       croak("Missing the required parameter 'series_index' when calling update_chart_series");
     }
 
     # verify the required parameter 'series' is set
-    unless (exists $args{'series'} && $args{'series'}) {
+    unless (exists $args{'series'} && defined $args{'series'} && $args{'series'}) {
       croak("Missing the required parameter 'series' when calling update_chart_series");
     }
 
@@ -34476,17 +34616,17 @@ sub update_layout_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_layout_slide");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_layout_slide");
     }
 
     # verify the required parameter 'slide_dto' is set
-    unless (exists $args{'slide_dto'} && $args{'slide_dto'}) {
+    unless (exists $args{'slide_dto'} && defined $args{'slide_dto'} && $args{'slide_dto'}) {
       croak("Missing the required parameter 'slide_dto' when calling update_layout_slide");
     }
 
@@ -34608,17 +34748,17 @@ sub update_notes_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_notes_slide");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_notes_slide");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling update_notes_slide");
     }
 
@@ -34758,27 +34898,27 @@ sub update_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_paragraph");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_paragraph");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling update_paragraph");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling update_paragraph");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling update_paragraph");
     }
 
@@ -34943,32 +35083,32 @@ sub update_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_portion");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_portion");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling update_portion");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling update_portion");
     }
 
     # verify the required parameter 'portion_index' is set
-    unless (exists $args{'portion_index'}) {
+    unless (exists $args{'portion_index'} && defined $args{'portion_index'}) {
       croak("Missing the required parameter 'portion_index' when calling update_portion");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling update_portion");
     }
 
@@ -35116,17 +35256,17 @@ sub update_section {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_section");
     }
 
     # verify the required parameter 'section_index' is set
-    unless (exists $args{'section_index'}) {
+    unless (exists $args{'section_index'} && defined $args{'section_index'}) {
       croak("Missing the required parameter 'section_index' when calling update_section");
     }
 
     # verify the required parameter 'section_name' is set
-    unless (exists $args{'section_name'} && $args{'section_name'}) {
+    unless (exists $args{'section_name'} && defined $args{'section_name'} && $args{'section_name'}) {
       croak("Missing the required parameter 'section_name' when calling update_section");
     }
 
@@ -35260,22 +35400,22 @@ sub update_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_shape");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_shape");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling update_shape");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling update_shape");
     }
 
@@ -35409,17 +35549,17 @@ sub update_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_slide");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_slide");
     }
 
     # verify the required parameter 'slide_dto' is set
-    unless (exists $args{'slide_dto'} && $args{'slide_dto'}) {
+    unless (exists $args{'slide_dto'} && defined $args{'slide_dto'} && $args{'slide_dto'}) {
       croak("Missing the required parameter 'slide_dto' when calling update_slide");
     }
 
@@ -35553,17 +35693,17 @@ sub update_special_slide_animation_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_special_slide_animation_effect");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_special_slide_animation_effect");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling update_special_slide_animation_effect");
     }
 
@@ -35573,12 +35713,12 @@ sub update_special_slide_animation_effect {
     }
 
     # verify the required parameter 'effect_index' is set
-    unless (exists $args{'effect_index'}) {
+    unless (exists $args{'effect_index'} && defined $args{'effect_index'}) {
       croak("Missing the required parameter 'effect_index' when calling update_special_slide_animation_effect");
     }
 
     # verify the required parameter 'effect' is set
-    unless (exists $args{'effect'} && $args{'effect'}) {
+    unless (exists $args{'effect'} && defined $args{'effect'} && $args{'effect'}) {
       croak("Missing the required parameter 'effect' when calling update_special_slide_animation_effect");
     }
 
@@ -35732,17 +35872,17 @@ sub update_special_slide_animation_interactive_sequence_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_special_slide_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_special_slide_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling update_special_slide_animation_interactive_sequence_effect");
     }
 
@@ -35752,17 +35892,17 @@ sub update_special_slide_animation_interactive_sequence_effect {
     }
 
     # verify the required parameter 'sequence_index' is set
-    unless (exists $args{'sequence_index'}) {
+    unless (exists $args{'sequence_index'} && defined $args{'sequence_index'}) {
       croak("Missing the required parameter 'sequence_index' when calling update_special_slide_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'effect_index' is set
-    unless (exists $args{'effect_index'}) {
+    unless (exists $args{'effect_index'} && defined $args{'effect_index'}) {
       croak("Missing the required parameter 'effect_index' when calling update_special_slide_animation_interactive_sequence_effect");
     }
 
     # verify the required parameter 'effect' is set
-    unless (exists $args{'effect'} && $args{'effect'}) {
+    unless (exists $args{'effect'} && defined $args{'effect'} && $args{'effect'}) {
       croak("Missing the required parameter 'effect' when calling update_special_slide_animation_interactive_sequence_effect");
     }
 
@@ -35929,17 +36069,17 @@ sub update_special_slide_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_special_slide_paragraph");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_special_slide_paragraph");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling update_special_slide_paragraph");
     }
 
@@ -35949,17 +36089,17 @@ sub update_special_slide_paragraph {
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling update_special_slide_paragraph");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling update_special_slide_paragraph");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling update_special_slide_paragraph");
     }
 
@@ -36137,17 +36277,17 @@ sub update_special_slide_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_special_slide_portion");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_special_slide_portion");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling update_special_slide_portion");
     }
 
@@ -36157,22 +36297,22 @@ sub update_special_slide_portion {
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling update_special_slide_portion");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling update_special_slide_portion");
     }
 
     # verify the required parameter 'portion_index' is set
-    unless (exists $args{'portion_index'}) {
+    unless (exists $args{'portion_index'} && defined $args{'portion_index'}) {
       croak("Missing the required parameter 'portion_index' when calling update_special_slide_portion");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling update_special_slide_portion");
     }
 
@@ -36345,17 +36485,17 @@ sub update_special_slide_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_special_slide_shape");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_special_slide_shape");
     }
 
     # verify the required parameter 'slide_type' is set
-    unless (exists $args{'slide_type'} && $args{'slide_type'}) {
+    unless (exists $args{'slide_type'} && defined $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling update_special_slide_shape");
     }
 
@@ -36365,12 +36505,12 @@ sub update_special_slide_shape {
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling update_special_slide_shape");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling update_special_slide_shape");
     }
 
@@ -36529,32 +36669,32 @@ sub update_table_cell {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_table_cell");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_table_cell");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling update_table_cell");
     }
 
     # verify the required parameter 'row_index' is set
-    unless (exists $args{'row_index'}) {
+    unless (exists $args{'row_index'} && defined $args{'row_index'}) {
       croak("Missing the required parameter 'row_index' when calling update_table_cell");
     }
 
     # verify the required parameter 'cell_index' is set
-    unless (exists $args{'cell_index'}) {
+    unless (exists $args{'cell_index'} && defined $args{'cell_index'}) {
       croak("Missing the required parameter 'cell_index' when calling update_table_cell");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling update_table_cell");
     }
 
@@ -36721,37 +36861,37 @@ sub update_table_cell_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_table_cell_paragraph");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_table_cell_paragraph");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling update_table_cell_paragraph");
     }
 
     # verify the required parameter 'row_index' is set
-    unless (exists $args{'row_index'}) {
+    unless (exists $args{'row_index'} && defined $args{'row_index'}) {
       croak("Missing the required parameter 'row_index' when calling update_table_cell_paragraph");
     }
 
     # verify the required parameter 'cell_index' is set
-    unless (exists $args{'cell_index'}) {
+    unless (exists $args{'cell_index'} && defined $args{'cell_index'}) {
       croak("Missing the required parameter 'cell_index' when calling update_table_cell_paragraph");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling update_table_cell_paragraph");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling update_table_cell_paragraph");
     }
 
@@ -36931,42 +37071,42 @@ sub update_table_cell_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_table_cell_portion");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_table_cell_portion");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling update_table_cell_portion");
     }
 
     # verify the required parameter 'row_index' is set
-    unless (exists $args{'row_index'}) {
+    unless (exists $args{'row_index'} && defined $args{'row_index'}) {
       croak("Missing the required parameter 'row_index' when calling update_table_cell_portion");
     }
 
     # verify the required parameter 'cell_index' is set
-    unless (exists $args{'cell_index'}) {
+    unless (exists $args{'cell_index'} && defined $args{'cell_index'}) {
       croak("Missing the required parameter 'cell_index' when calling update_table_cell_portion");
     }
 
     # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'}) {
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling update_table_cell_portion");
     }
 
     # verify the required parameter 'portion_index' is set
-    unless (exists $args{'portion_index'}) {
+    unless (exists $args{'portion_index'} && defined $args{'portion_index'}) {
       croak("Missing the required parameter 'portion_index' when calling update_table_cell_portion");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling update_table_cell_portion");
     }
 
@@ -37135,27 +37275,27 @@ sub update_table_row {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_table_row");
     }
 
     # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling update_table_row");
     }
 
     # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling update_table_row");
     }
 
     # verify the required parameter 'row_index' is set
-    unless (exists $args{'row_index'}) {
+    unless (exists $args{'row_index'} && defined $args{'row_index'}) {
       croak("Missing the required parameter 'row_index' when calling update_table_row");
     }
 
     # verify the required parameter 'dto' is set
-    unless (exists $args{'dto'} && $args{'dto'}) {
+    unless (exists $args{'dto'} && defined $args{'dto'} && $args{'dto'}) {
       croak("Missing the required parameter 'dto' when calling update_table_row");
     }
 
@@ -37291,17 +37431,17 @@ sub update_vba_module {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling update_vba_module");
     }
 
     # verify the required parameter 'module_index' is set
-    unless (exists $args{'module_index'}) {
+    unless (exists $args{'module_index'} && defined $args{'module_index'}) {
       croak("Missing the required parameter 'module_index' when calling update_vba_module");
     }
 
     # verify the required parameter 'module_dto' is set
-    unless (exists $args{'module_dto'} && $args{'module_dto'}) {
+    unless (exists $args{'module_dto'} && defined $args{'module_dto'} && $args{'module_dto'}) {
       croak("Missing the required parameter 'module_dto' when calling update_vba_module");
     }
 
@@ -37405,12 +37545,12 @@ sub upload_file {
     my ($self, %args) = @_;
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'} && $args{'path'}) {
+    unless (exists $args{'path'} && defined $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling upload_file");
     }
 
     # verify the required parameter 'file' is set
-    unless (exists $args{'file'} && $args{'file'}) {
+    unless (exists $args{'file'} && defined $args{'file'} && $args{'file'}) {
       croak("Missing the required parameter 'file' when calling upload_file");
     }
 

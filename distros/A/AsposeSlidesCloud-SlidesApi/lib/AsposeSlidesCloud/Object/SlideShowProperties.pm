@@ -148,6 +148,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'show_media_controls' => {
+    	datatype => 'boolean',
+    	base_name => 'ShowMediaControls',
+    	description => 'Show media controls.',
+    	format => '',
+    	read_only => '',
+    		},
     'use_timings' => {
     	datatype => 'boolean',
     	base_name => 'UseTimings',
@@ -180,6 +187,7 @@ __PACKAGE__->swagger_types( {
     'pen_color' => 'string',
     'show_animation' => 'boolean',
     'show_narration' => 'boolean',
+    'show_media_controls' => 'boolean',
     'use_timings' => 'boolean',
     'slide_show_type' => 'string',
     'show_scrollbar' => 'boolean'
@@ -194,6 +202,7 @@ __PACKAGE__->attribute_map( {
     'pen_color' => 'PenColor',
     'show_animation' => 'ShowAnimation',
     'show_narration' => 'ShowNarration',
+    'show_media_controls' => 'ShowMediaControls',
     'use_timings' => 'UseTimings',
     'slide_show_type' => 'SlideShowType',
     'show_scrollbar' => 'ShowScrollbar'

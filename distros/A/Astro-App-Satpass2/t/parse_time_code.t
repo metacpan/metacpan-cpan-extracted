@@ -3,7 +3,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More 0.88;
+use Test2::V0;
 
 use Astro::Coord::ECI::Utils 0.112 qw{ greg_time_gm greg_time_local };
 use Astro::App::Satpass2::ParseTime;

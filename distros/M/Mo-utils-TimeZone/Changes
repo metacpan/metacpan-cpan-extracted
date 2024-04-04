@@ -1,0 +1,7 @@
+0.02 2024-04-04T09:53:49+02:00
+ - Generate examples.
+ - Rewrite to use of is_valid_name() method. Added support for timezones
+   like 'Europe/Bratislava' which are link.
+
+0.01 2024-04-03T18:33:24+02:00
+ - First version.

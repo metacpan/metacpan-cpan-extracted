@@ -13,3 +13,12 @@ Revision history for LaTeX-Easy-Templates
         Moved test file "t/400-format.t" into xt/ to be run only by 'author tests' because it was failing in many tester machines which lack LaTeX font and style files. In order for this test to succeed, all these missing LaTeX fonts and style files must be installed and that's not an option. Author tests can be run with "make authortest".
         Added two more unit tests "t/350-inmemory-template-usage-calling-other-templates.t" and "t/360-ondisk-template-usage-calling-other-templates.t".
 	Enhanced documentation.
+
+0.05    2024-04-02/23:00
+        Enhanced the ability to pass parameters to the Text::Xslate template engine and created a test file
+        to test setting the search paths for included templates.
+        Method 'templater_parameters()' has been removed. Now, parameters to Text::Xslate template engine
+        can only be passed during construction of LaTeX::Easy::Templates.
+        Test files under "xt/" are now included in the distribution, they were omitted in previous releases.
+        Test files above 300 have been restructured and renamed.
+        Enhanced documentation.

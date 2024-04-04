@@ -282,18 +282,19 @@ Checkout the examples directory.
   - `vote` - up, down, or veto
 - `gallery_item_votes($id)`
 - `gallery_item_tags($id)`
-- `gallery_search($query, \%optional, \%advanced)`
-  - optional:
+- `gallery_search(\%params)`
+  - params:
+    - `q` - query string. ignored if adv query params are specified
     - `sort` - viral, top, time (default), rising
     - `page` - page number (default: 0)
     - `window` - day, week, month, year, all (default)
-  - advanced (note: if advanced search parameters are set, query string is ignored):
-    - `q_all` - search for all of these words (and)
-    - `q_any` - search for any of these words (or)
-    - `q_exactly` - search for exactly this word or phrase
-    - `q_not` - exclude results matching this
-    - `q_type` - show results for file type (jpg, png, gif, anigif, album)
-    - `q_size_pix` - size ranges, small (500 pixels square or less) | med (500 to 2,000 pixels square) | big (2,000 to 5,000 pixels square) | lrg (5,000 to 10,000 pixels square) | huge (10,000 square pixels and above)
+    - `adv`
+      - `q_all` - search for all of these words (and)
+      - `q_any` - search for any of these words (or)
+      - `q_exactly` - search for exactly this word or phrase
+      - `q_not` - exclude results matching this
+      - `q_type` - show results for file type (jpg, png, gif, anigif, album)
+      - `q_size_pix` - size ranges, small (500 pixels square or less) | med (500 to 2,000 pixels square) | big (2,000 to 5,000 pixels square) | lrg (5,000 to 10,000 pixels square) | huge (10,000 square pixels and above)
 - `gallery_share_image($id, $title, \%optional)`
   - optional:
     - `topic` - topic name

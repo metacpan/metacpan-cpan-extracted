@@ -14,13 +14,13 @@ METHODS
 
     Constructor.
 
-    Returns instance of Number::Stars.
-
     *       "number_of_stars"
 
             Number of stars.
 
             Default value is 10.
+
+    Returns instance of object.
 
   "percent_stars"
      my $stars_hr = $obj->percent_stars($percent);
@@ -36,6 +36,9 @@ ERRORS
      new():
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
+             From Mo::utils::check_number():
+                     Parameter 'number_of_stars' must be a number.
+                             Value: %s
 
 EXAMPLE1
      use strict;
@@ -186,11 +189,11 @@ EXAMPLE3
      # Output: ★⭒☆
 
 DEPENDENCIES
-    Class::Utils, Error::Pure.
+    Class::Utils, Error::Pure, Mo::utils.
 
 SEE ALSO
     Tags::HTML::Stars
-        Tags helper for stars evaluation
+        Tags helper for stars evaluation.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Number-Stars>
@@ -206,5 +209,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

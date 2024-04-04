@@ -1,10 +1,20 @@
 CHANGES
 -------
 
+  2.208 31 March 2024
+
+      * Update zipdetails to version 4.002
+        Sun Mar 31 11:52:11 2024 +0100
+        f6610e32bfd5459483a193ef80cebd7cdc6092dd
+
+      * #56 cz-14gzopen.t fails on AFS filesystem
+        Wed Mar 6 11:59:54 2024 +0000
+        68dcf0aceeaec5491a61c8102968b3f004435ee8
+
   2.207 18 February 2024
 
       * Add bin/zipdetails 4.000
-      
+
       * Merge pull request #51 from rwp0/rwp0/fix-indirect-syntax
         Thu Nov 23 12:17:30 2023 +0000
         f1c70d0ef8ed7a91daae6a3ea6b10dc486db4463

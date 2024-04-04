@@ -1,0 +1,20 @@
+0.004   2024-02-13  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Sah-Schema{s,Bundle}-Array following rename of
+          Sah-Schema{s,Bundle} (for visual clarity and consistency with
+          naming of other bundles).
+
+
+0.003   2023-02-03  Released-By: PERLANCAR; Urgency: medium
+
+        - Fix order of check.
+
+
+0.002   2023-02-03  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: array::int::contiguous.
+
+
+0.001   2023-02-03  Released-By: PERLANCAR
+
+        - First release.

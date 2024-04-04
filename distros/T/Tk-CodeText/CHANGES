@@ -1,7 +1,16 @@
 Tk::CodeText module changes log
+
+01 apr 2024
+	Update to version 0.47
+	Revised TagsEditor
+	Fixed auto indent.
+	Fixed bug with uncommenting.
+	Fixed bug with -xmlfolder. -xmldir no longer exists.
+	made lnumberCheck a bit quieter.
+
 28 Feb 2024
 	Update to version 0.46
-	Focus now goes to the find ebtry search and replace frame appears
+	Focus now goes to the find entry when the search and replace frame appears
 	Removed <FocusIn> and <FocusOut> bindings. I thought they made sense, they don't.
 
 
@@ -94,6 +103,8 @@ Tk::CodeText module changes log
 
 02 February 2003
 	First alpha version 0.1
+
+
 
 
 

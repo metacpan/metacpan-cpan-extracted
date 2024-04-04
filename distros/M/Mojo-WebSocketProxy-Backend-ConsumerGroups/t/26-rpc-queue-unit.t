@@ -8,11 +8,11 @@ use Test::MockModule;
 use Test::Fatal;
 
 subtest 'Subscribe for new messaging' => sub {
-    my $redis           = Test::MockObject->new();
-    my $was_subscribed  = 0;
-    my $callback_setted = 0;
+    my $redis          = Test::MockObject->new();
+    my $was_subscribed = 0;
+    my $callback_set   = 0;
     $redis->mock(subscribe => sub { $was_subscribed++; pop->(); return shift; });
-    $redis->mock(on => sub { $callback_setted++; pop->($redis, '{"message_id": "msg_id_123"}') });
+    $redis->mock(on => sub { $callback_set++; pop->($redis, '{"message_id": "msg_id_123"}') });
 
     my $cg_backend = Mojo::WebSocketProxy::Backend::ConsumerGroups->new(redis => $redis);
 
@@ -22,7 +22,7 @@ subtest 'Subscribe for new messaging' => sub {
     $cg_backend->wait_for_messages();
     is $was_subscribed, 1, 'Subscribe for new messages exactly once';
 
-    is $callback_setted, 1, 'Callback for new messages is setted';
+    is $callback_set, 1, 'Callback for new messages is set';
 };
 
 subtest 'Response handling' => sub {
@@ -274,7 +274,7 @@ subtest 'RPC Category separation enable/disable' => sub {
     $cg_mock->unmock_all();
 };
 
-subtest 'RPC Category separtion timeouts' => sub {
+subtest 'RPC Category separation timeouts' => sub {
     my $req_id = '1';
     my $redis  = Test::MockObject->new();
     $redis->mock(_execute  => sub { pop->() });

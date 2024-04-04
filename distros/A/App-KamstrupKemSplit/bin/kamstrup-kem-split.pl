@@ -1,7 +1,7 @@
 #! /usr/bin/env perl
 # PODNAME: kamstrup-kem-split.pl
 # ABSTRACT: Split encrypted KEM file input from the Kamstrup backend into separate XML files with device information
-our $VERSION = '0.006'; # VERSION	
+our $VERSION = '0.007'; # VERSION	
 
 use Modern::Perl '2022';
 use App::KamstrupKemSplit;
@@ -9,10 +9,11 @@ use Log::Log4perl qw(:easy);
 use XML::Simple;
 use Getopt::Long;
 use Pod::Usage;
-my ( $key, $verbose, $help, $man, $config );
+my ( $key, $verbose, $help, $man, $config, $kemformat, $show_version );
 
 # Default values
 $verbose = 0;
+$kemformat = 2; # Default to KEM file format type 2
 
 # Get the command line options
 GetOptions(
@@ -20,10 +21,12 @@ GetOptions(
 	'man'       => \$man,
 	'v|verbose' => \$verbose,
 	'key=s'     => \$key,
-	'config=s'  => \$config
+	'config=s'  => \$config,
+	'kem=s'     => \$kemformat,
+	'version'   => \$show_version
 ) or pod2usage(2);
 
-pod2usage(1) if (defined $help || !defined $ARGV[0]);
+pod2usage(1) if (defined $help);
 
 if ($verbose) {
 	Log::Log4perl->easy_init($DEBUG);
@@ -32,6 +35,13 @@ if ($verbose) {
 	Log::Log4perl->easy_init($INFO);
 }
 
+if (defined $show_version) {
+	my $version = $main::VERSION // 'dev';
+	INFO "This is kamstrup-kem-split version " . $version;
+	exit(0);
+}
+
+pod2usage(1) if (!defined $ARGV[0]);
 
 # Open the config file
 my $orders;
@@ -41,10 +51,18 @@ $orders = read_config($config) if (defined $config);
 my $kem_file = unzip_kem( $ARGV[0] );
 
 # Decode the kem file from the archive
-my $xml = decode_kem( $kem_file, $key );
+my $xml = decode_kem( $kem_file, $key, $kemformat);
+
 
 # Remove the unzipped file
 unlink $kem_file;
+
+# If we are parsing KEM2 file we dump the XML and stop here
+INFO "KEMformat is '$kemformat'";
+if ($kemformat == 2) {
+	write_kem2_xml_output($xml);
+	exit(0);
+}
 
 my $meters = parse_xml_string_to_data($xml);
 
@@ -96,7 +114,7 @@ kamstrup-kem-split - Splits an encrypted delivery file from Kamstrup into separa
 
 =head1 SYNOPSIS
 
-    ./kamstrup-kem-split.pl --key=<key> [--config=<configfile>] inputfile_from_backend
+    ./kamstrup-kem-split.pl --key=<key> [--config=<configfile> --kem=1] inputfile_from_backend
 
 =head1 DESCRIPTION
 
@@ -111,6 +129,10 @@ A configuration file consists of a CSV file with `;` as delimeter and the follow
 C<kamstrup_ordernr;kamstrup_serial_number_start;kamstrup_serial_number_end;number_of_devices;internal_batch_number>
 
 The output file name will be [kamstrup_ordernr]_[internal_batch_number].
+
+Please note that order splitting si only supported for KEM files and not for the default KEM2 files.
+
+Note that this script support the KEM2 file format by default. If you want to process an older KEM file, please configure the script as such via the commandline.
 
 =head1 AUTHOR
 

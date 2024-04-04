@@ -1,0 +1,29 @@
+{
+  "amount": 3406,
+  "auth": null,
+  "capture": true,
+  "card": {
+    "brand": "visa",
+    "country": "US",
+    "created": 1538492150,
+    "exp_month": 3,
+    "exp_year": 2021,
+    "id": "card_jSmaDq5t5lMnz6H8tCZ0AbRG",
+    "last4": "4242",
+    "name": null,
+    "zip_code": null
+  },
+  "country": "FR",
+  "created": 1538492150.0,
+  "currency": "eur",
+  "customer": null,
+  "description": "Fake payment",
+  "id": "paym_SKMLflt8NBATuiUzgvTYqsw5",
+  "live_mode": false,
+  "refunds" : [],
+  "method": "card",
+  "order_id": "815730837",
+  "response": "00",
+  "return_url": null,
+  "status": "to_capture"
+}

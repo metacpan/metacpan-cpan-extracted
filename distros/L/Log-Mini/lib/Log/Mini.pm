@@ -6,7 +6,7 @@ use Module::Load qw/load/;
 
 require Carp;
 
-our $VERSION = "0.3.0";
+our $VERSION = "0.4.1";
 
 sub new
 {
@@ -54,6 +54,9 @@ Log::Mini - It's a very simple logger which can log your messages to a file or S
 
     my $debug_logger = Log::Mini->new('stderr', level => 'debug'); #STDERR logger used by default
     $debug_logger->error('Error message');
+
+    my $debug_logger = Log::Mini->new('stdout', level => 'debug'); #STDOUT logger, error messages too
+    $debug_logger->info('Info message');
 
     my $file_logger = Log::Mini->new(file => 'log_file.log');
     $file_logger->info('message to log file');

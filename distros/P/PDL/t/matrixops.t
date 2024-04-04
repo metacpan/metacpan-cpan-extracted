@@ -148,6 +148,14 @@ ok(tapprox($got,$bb->transpose,$tol), "A x actually == B") or diag "got: $got";
 }
 
 {
+my $A = identity(4) + ones(4, 4); $A->slice('2,0') .= 0;
+my $B = sequence(1, 4);
+my ($x) = simq($A->copy, $B->transpose, 0);
+$x = $x->inplace->transpose;
+ok tapprox($A x $x, $B), 'simq right result';
+}
+
+{
 ### Check attempted inversion of a singular matrix
 my $pb = pdl([1,2,3],[4,5,6],[7,8,9]);
 my $b2;
@@ -332,6 +340,13 @@ eval {squaretotri($x, zeroes(7))};
 like $@, qr/dim has size 7/;
 $y = squaretotri($x);
 is $y.'', "[0 3 4 6 7 8]", 'squaretotri with no output arg given';
+is tritosquare($y).'', '
+[
+ [0 0 0]
+ [3 4 0]
+ [6 7 8]
+]
+', 'tritosquare';
 $y = squaretotri(sequence(3,3,2));
 is $y.'', "
 [

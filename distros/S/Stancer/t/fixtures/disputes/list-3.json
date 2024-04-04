@@ -1,0 +1,43 @@
+{
+  "disputes": [
+    {
+      "amount": 5247,
+      "created": 1540504800,
+      "id": "dspt_ZSnN0wV6Dk0qXe0Q2IXBcxAU",
+      "order_id": "825030405",
+      "payment": "paym_ByH36oqCNRwcWEncrTTCEb4G",
+      "response": "45"
+    },
+    {
+      "amount": 2999,
+      "created": 1541372400,
+      "id": "dspt_AkHxiO2T7BSRXeuir4cyolL6",
+      "order_id": "825198976",
+      "payment": "paym_mQ2Xt2aeVwHMHbhbFkL0WOY1",
+      "response": "45"
+    },
+    {
+      "amount": 4598,
+      "created": 1541372400,
+      "id": "dspt_cXDMoCAjR2UoGkaPjAZRXMRU",
+      "order_id": "3683691977",
+      "payment": "paym_IiEBTLD0LxKBuVeWf9YXMjMh",
+      "response": "45"
+    },
+    {
+      "amount": 1337,
+      "created": 1605308400,
+      "id": "dspt_8KVR2iUAyq7dLvlLa4enJH2l",
+      "order_id": "2635256134",
+      "payment": "paym_QRlQRtNEue1fC7nGwG8SW1D5",
+      "response": "45"
+    }
+  ],
+  "live_mode": true,
+  "range": {
+    "end": 1,
+    "has_more": true,
+    "limit": 4,
+    "start": 0
+  }
+}

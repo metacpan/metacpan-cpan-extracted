@@ -6,7 +6,7 @@ use Rope no_import => 1;
 
 sub import {
 	my ($pkg, $caller) = (shift, scalar(caller));
-	Rope->import(caller => $caller, import => [qw/function property properties prototyped requires/]);
+	Rope->import(caller => $caller, import => [qw/function property properties prototyped before around after requires/]);
 }
 
 1;
@@ -17,7 +17,7 @@ Rope::Autoload - Rope Roles!
 
 =head1 VERSION
 
-Version 0.08
+Version 0.25
 
 =cut
 

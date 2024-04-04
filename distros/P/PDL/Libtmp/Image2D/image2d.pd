@@ -50,23 +50,20 @@ EOD
 #     BEGIN INTERNAL FUNCTION DECLARATIONS      #
 #################################################
 
-pp_addhdr('
-void polyfill(PDL_Long *image, int wx, int wy, float *ps, int n,
-	PDL_Long col, int *ierr);
-');
-
 pp_def('polyfill_pp',
     HandleBad => 0, # a marker
-	Pars => 'int [io] im(m,n); float ps(two=2,np); int col()',
-	Code => 'int ierr = 0, nerr;
-	         broadcastloop %{
-		   polyfill($P(im), $SIZE(m), $SIZE(n), $P(ps), $SIZE(np), $col(), &nerr);
-		   ierr = PDLMAX(ierr, nerr);
-		 %}
-		 if (ierr) warn("errors during polygonfilling");
-		 ',
-	Doc => undef,
-	PMFunc => ''
+    Pars => '[io] im(m,n); float ps(two=2,np); int col()',
+    GenericTypes => ['L'],
+    CHeader => qq{void polyfill(PDL_Long *image, int wx, int wy, float *ps, int n, PDL_Long col, int *ierr);\n},
+    Code => 'int ierr = 0, nerr;
+             broadcastloop %{
+               polyfill($P(im), $SIZE(m), $SIZE(n), $P(ps), $SIZE(np), $col(), &nerr);
+               ierr = PDLMAX(ierr, nerr);
+             %}
+             if (ierr) warn("errors during polygonfilling");
+             ',
+    Doc => undef,
+    PMFunc => ''
 );
 
 my %pnpolyFields = (
@@ -790,10 +787,6 @@ EOD
 '
 );
 
-pp_addhdr('
-void AddEquiv ( PDL_Long* equiv, PDL_Long i, PDL_Long j);
-');
-
 pp_add_exported('', 'crop');
 pp_addpm(<<'EOPM');
 =head2 crop
@@ -897,6 +890,7 @@ where the second parameter specifies the connectivity (4 or 8) of the labeling.
        HandleBad => 0, # a marker
         Pars => 'a(m,n); int+ [o]b(m,n);',
         OtherPars => 'int con',
+        CHeader => qq{void AddEquiv(PDL_Long* equiv, PDL_Long i, PDL_Long j);\n},
         Code => '
 
       PDL_Long i,j,k;
@@ -1181,8 +1175,7 @@ sub PDL::polyfillv :lvalue {
 		return $im->where(PDL::pnpoly_pp($im, $ps)) if $parsed->current->{'Method'} eq 'pnpoly';
 	}
 
-	my $msk = zeroes(long,$im->dims);
-	PDL::polyfill_pp($msk, $ps, 1);
+	PDL::polyfill_pp(my $msk = zeroes(long,$im->dims), $ps, 1);
 	return $im->where($msk);
 }
 *polyfillv = \&PDL::polyfillv;
@@ -1711,28 +1704,18 @@ sub _svd ($$) {
 # and so on for the next control point.
 
 sub _mkbasis ($$$$) {
-    my $fit    = shift;
-    my $npts   = shift;
-    my $u      = shift;
-    my $v      = shift;
-
-    my $n      = $fit->getdim(0) - 1;
+    my $fit    = shift; # dims n n
+    my $npts   = shift; # scalar
+    my $u      = shift; # dims npts
+    my $v      = shift; # dims npts
     my $ncoeff = sum( $fit );
-
-    my $basis = zeroes( $u->type, $ncoeff, $npts );
-    my $k = 0;
-    foreach my $j ( 0 .. $n ) {
-	my $tmp_v = $v**$j;
-	foreach my $i ( 0 .. $n ) {
-	    if ( $fit->at($i,$j) ) {
-		my $tmp = $basis->slice("($k),:");
-		$tmp .= $tmp_v * $u**$i;
-		$k++;
-	    }
-	}
-    }
-    return $basis;
-
+    my $fit_coords = $fit->whichND; # dims uv ncoeff
+    cat($u,$v)            # npts uv
+      ->transpose         # uv npts
+      ->dummy(1,$ncoeff)  # uv ncoeff npts
+      ->ipow($fit_coords) # same
+      ->prodover          # ncoeff npts
+      ;
 } # sub: _mkbasis()
 
 sub PDL::fitwarp2d {
@@ -1855,8 +1838,8 @@ sub PDL::applywarp2d {
     #
     my $mat = _mkbasis( ones(byte,$nf,$nf), $npts, $u, $v );
 
-    my $x = reshape( $mat x $px->clump(-1)->transpose(), $npts );
-    my $y = reshape( $mat x $py->clump(-1)->transpose(), $npts );
+    my $x = reshape( $mat x $px->flat->transpose(), $npts );
+    my $y = reshape( $mat x $py->flat->transpose(), $npts );
     return ( $x, $y );
 
 } # sub: applywarp2d

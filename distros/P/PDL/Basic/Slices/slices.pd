@@ -72,14 +72,6 @@ EOD
 
 # $::PP_VERBOSE=1;
 
-pp_addhdr(<<'EOH');
-
-#ifdef _MSC_VER
-#define strtoll _strtoi64
-#endif
-
-EOH
-
 my $doc = <<'EOD';
 =for ref
 
@@ -177,34 +169,32 @@ pp_def(
        TwoWay => 1,
        Pars => 'a(n); indx ind(m); [oca] c(m);',
        Code => pp_line_numbers(__LINE__, <<'EOF'),
-         PDL_Indx i;
-         for(i=0;i<$SIZE(m);i++) {
-                 PDL_Indx this_ind = $ind(m=>i);
+         loop(m) %{
+                 PDL_Indx this_ind = $ind();
                  PDL_IF_BAD(if( $ISBADVAR(this_ind, ind) ) {
-                     $SETBAD(c(m=>i));
+                     $SETBAD(c(m=>m));
                  } else,) {
                    if( this_ind<0 || this_ind >= $SIZE(n) ) {
                      $CROAK("invalid index %"IND_FLAG" at pos %"IND_FLAG" (valid range 0..%"IND_FLAG")",
-                      this_ind, i, $SIZE(n)-1);
+                      this_ind, m, $SIZE(n)-1);
                    }
-                   $c(m=>i) = $a(n=>this_ind);
+                   $c() = $a(n=>this_ind);
                  }
-         }
+         %}
 EOF
        BackCode => pp_line_numbers(__LINE__, <<'EOF'),
-         PDL_Indx i;
-         for(i=0;i<$SIZE(m);i++) {
-                 PDL_Indx this_ind = $ind(m=>i);
+         loop(m) %{
+                 PDL_Indx this_ind = $ind();
                  PDL_IF_BAD(if( $ISBADVAR(this_ind, ind) ) {
                    /* do nothing */
                  } else,) {
                    if( this_ind<0 || this_ind >= $SIZE(n) ) {
                      $CROAK("invalid index %"IND_FLAG" at pos %"IND_FLAG" (valid range 0..%"IND_FLAG")",
-                      this_ind, i, $SIZE(n)-1);
+                      this_ind, m, $SIZE(n)-1);
                    }
-                   $a(n=>this_ind) = $c(m=>i);
+                   $a(n=>this_ind) = $c();
                  }
-         }
+         %}
 EOF
        Doc => $doc,
        BadDoc =>
@@ -441,6 +431,10 @@ If you feed in a single string, it is interpreted as a packed boundary
 array if all of its characters are valid boundary specifiers (e.g. 'pet'),
 but as a single word-style specifier if they are not (e.g. 'forbid').
 
+Where the source PDL is empty, all non-barfing boundary conditions
+are changed to truncation, since there is no data to reflect, extend,
+or mirror.
+
 B<OUTPUT>
 
 The output broadcasts over both C<$index> and C<$source>.  Because implicit
@@ -624,7 +618,7 @@ EOD
                  char ind_pdl_destroy;
                  ',
         MakeComp => pp_line_numbers(__LINE__, <<'EOD-MakeComp'),
-pdl *size_pdl;
+pdl *size_pdl = NULL;
 PDL_RETERROR(PDL_err, PDL->make_physdims(ind_pdl));
 $COMP(size_pdl_destroy) = $COMP(ind_pdl_destroy) = 0;
 
@@ -642,6 +636,7 @@ switch(ind_pdl->datatype) {
    if (!ind_pdl) $CROAK("Error in hard_copy");
    $COMP(ind_pdl_destroy) = 1;
  case PDL_SB: case PDL_B: case PDL_S: case PDL_US: case PDL_L: case PDL_UL: case PDL_LL: case PDL_ULL:
+   PDL_RETERROR(PDL_err, PDL->make_physical(ind_pdl));
    PDL_RETERROR(PDL_err, PDL->converttype(ind_pdl,PDL_IND)); /* convert in place. */
    break;
  case PDL_IND:
@@ -749,6 +744,7 @@ switch(ind_pdl->datatype) {
         if (!size_pdl) $CROAK("Error in hard_copy");
         $COMP(size_pdl_destroy) = 1;
       case PDL_SB: case PDL_B: case PDL_S: case PDL_US: case PDL_L: case PDL_UL: case PDL_LL: case PDL_ULL:
+        PDL_RETERROR(PDL_err, PDL->make_physical(size_pdl));
         PDL_RETERROR(PDL_err, PDL->converttype(size_pdl,PDL_IND)); /* convert in place. */
         break;
       case PDL_IND:
@@ -845,7 +841,6 @@ PDL_Indx i,rdvalid;
     stdim = 0;
 
   /* Set dimensionality of child */
-  $PDL(CHILD)->ndims = $COMP(itdim) + $COMP(ntsize) + stdim;
   $SETNDIMS($COMP(itdim)+$COMP(ntsize)+stdim);
 
   inc = 1;
@@ -1041,20 +1036,12 @@ pp_def(
         'rld',
         GenericTypes => [ppdefs_all],
         Pars=>'indx a(n); b(n); [o]c(m);',
+        OtherPars=>'IV sumover_max => m',
         PMCode =>pp_line_numbers(__LINE__, <<'EOD'),
 sub PDL::rld {
   my ($x,$y) = @_;
-  my ($c);
-  if ($#_ == 2) {
-    $c = $_[2];
-  } else {
-# XXX Need to improve emulation of broadcasting in auto-generating c
-    my ($size) = $x->sumover->max->sclr;
-    my (@dims) = $x->dims;
-    shift @dims;
-    $c = $y->zeroes($size,@dims);
-  }
-  &PDL::_rld_int($x,$y,$c);
+  my ($c,$sm) = @_ == 3 ? ($_[2], $_[2]->dim(0)) : (PDL->null, $x->sumover->max->sclr);
+  PDL::_rld_int($x,$y,$c,$sm);
   $c;
 }
 EOD
@@ -1216,37 +1203,32 @@ EOD
 );
 
 pp_def('rldvec',
-       Pars => 'indx a(N); b(M,N); [o]c(M,N)',
-       PMCode =>pp_line_numbers(__LINE__, <<'EOC'),
+  Pars => 'indx a(uniqvals); b(M,uniqvals); [o]c(M,decodedvals)',
+  OtherPars=>'IV sumover_max => decodedvals',
+  PMCode =>pp_line_numbers(__LINE__, <<'EOC'),
 sub PDL::rldvec {
   my ($a,$b,$c) = @_;
-  if (!defined($c)) {
-# XXX Need to improve emulation of threading in auto-generating c
-    my ($rowlen) = $b->dim(0);
-    my ($size) = $a->sumover->max;
-    my (undef, @dims) = $a->dims;
-    $c = $b->zeroes($b->type,$rowlen,$size,@dims);
-  }
-  &PDL::_rldvec_int($a,$b,$c);
+  ($c,my $sm) = defined($c) ? ($c,$c->dim(1)) : (PDL->null,$a->sumover->max->sclr);
+  PDL::_rldvec_int($a,$b,$c,$sm);
   return $c;
 }
 EOC
        Code =>pp_line_numbers(__LINE__, <<'EOC'),
   PDL_Indx cn=0;
-  loop (N) %{
+  loop (uniqvals) %{
     PDL_Indx i, nrows = $a();
     for (i=0; i<nrows; i++) {
-      loop (M) %{ $c(N=>cn) = $b(); %}
+      loop (M) %{ $c(decodedvals=>cn) = $b(); %}
       cn++;
     }
    %}
 EOC
-       Doc =><<'EOD'
+  Doc =><<'EOD'
 =for ref
 
 Run-length decode a set of vectors, akin to a higher-order rld().
 
-Given a vector $a() of the number of occurrences of each row, and a set $c()
+Given a vector $a() of the number of occurrences of each row, and a set $b()
 of row-vectors each of length $M, run-length decode to $c().
 
 Can be used together with clump() to run-length decode "values" of arbitrary dimensions.
@@ -1294,29 +1276,26 @@ EOD
 );
 
 pp_def('rldseq',
-       Pars => 'indx a(N); b(N); [o]c(M)',
-       PMCode =>pp_line_numbers(__LINE__, <<'EOC'),
+  Pars => 'indx a(N); b(N); [o]c(M)',
+  OtherPars=>'IV sumover_max => M',
+  PMCode =>pp_line_numbers(__LINE__, <<'EOC'),
 sub PDL::rldseq {
   my ($a,$b,$c) = @_;
-  if (!defined($c)) {
-    my $size   = $a->sumover->max;
-    my (undef, @dims) = $a->dims;
-    $c = $b->zeroes($b->type,$size,@dims);
-  }
-  &PDL::_rldseq_int($a,$b,$c);
+  ($c,my $sm) = defined($c) ? ($c,$c->dim(1)) : (PDL->null,$a->sumover->max->sclr);
+  PDL::_rldseq_int($a,$b,$c,$sm);
   return $c;
 }
 EOC
        Code =>pp_line_numbers(__LINE__, <<'EOC'),
-  size_t mi=0;
+  PDL_Indx mi=0;
   loop (N) %{
-    size_t     len = $a(), li;
+    PDL_Indx     len = $a(), li;
     for (li=0; li < len; ++li, ++mi) {
       $c(M=>mi) = $b() + li;
     }
   %}
 EOC
-       Doc =><<'EOD'
+  Doc =><<'EOD'
 =for ref
 
 Run-length decode a subsequence vector.
@@ -1363,7 +1342,7 @@ sub rleND {
   my @vdimsN = $data->dims;
 
   ##-- construct output pdls
-  my $counts = $#_ >= 0 ? $_[0] : zeroes(long, $vdimsN[$#vdimsN]);
+  my $counts = $#_ >= 0 ? $_[0] : PDL->null;
   my $elts   = $#_ >= 1 ? $_[1] : zeroes($data->type, @vdimsN);
 
   ##-- guts: call rlevec()
@@ -1617,17 +1596,17 @@ sub PDL::reorder {
 
 EOD
 
-pp_addhdr(<<'EOF');
-#define EQUIVDIM(dima,dimb,cdim,inc) \
-  ((cdim < PDLMIN(dima,dimb) || cdim > PDLMAX(dima,dimb)) ? \
-    cdim : ((cdim == dimb) ? dima : cdim + inc))
-EOF
 pp_def(
         'mv',
         OtherPars => 'PDL_Indx n1; PDL_Indx n2;',
         TwoWay => 1,
         P2Child => 1,
         AffinePriv => 1,
+        CHeader => <<'EOF',
+#define EQUIVDIM(dima,dimb,cdim,inc) \
+  ((cdim < PDLMIN(dima,dimb) || cdim > PDLMAX(dima,dimb)) ? \
+    cdim : ((cdim == dimb) ? dima : cdim + inc))
+EOF
         EquivDimCheck =>pp_line_numbers(__LINE__, <<'EOF'),
           if ($COMP(n1) <0)
               $COMP(n1) += $PDL(PARENT)->broadcastids[0];
@@ -1667,10 +1646,6 @@ Negative dimension indices count from the end.
 EOD
 );
 
-pp_addhdr <<'EOH';
-#define sign(x) ( (x) < 0 ? -1 : 1)
-EOH
-
 pp_addpm(<<'EOD'
 
 =head2 using
@@ -1706,114 +1681,6 @@ EOD
 );
 
 pp_add_exported('', 'using');
-
-pp_addhdr(<<END
-static int cmp_pdll(const void *a_,const void *b_) {
-        PDL_Indx *a = (PDL_Indx *)a_; PDL_Indx *b=(PDL_Indx *)b_;
-        if(*a>*b) return 1;
-        else if(*a==*b) return 0;
-        else return -1;
-}
-END
-);
-
-pp_def(
-        'diagonal',
-        P2Child => 1,
-        TwoWay => 1,
-        AffinePriv => 1,
-        OtherPars => 'PDL_Indx whichdims[]',
-        MakeComp => pp_line_numbers(__LINE__-1, '
-                if ($COMP(whichdims_count) < 1)
-                  $CROAK("must have at least 1 dimension");
-                qsort($COMP(whichdims), $COMP(whichdims_count), sizeof(PDL_Indx),
-                        cmp_pdll);
-        '),
-        RedoDims => pp_line_numbers(__LINE__-1, '
-                PDL_Indx nthp,nthc,nthd, cd = $COMP(whichdims)[0];
-                $SETNDIMS($PDL(PARENT)->ndims-$COMP(whichdims_count)+1);
-                $DOPRIVALLOC();
-                $PRIV(offs) = 0;
-                if ($COMP(whichdims)[$COMP(whichdims_count)-1] >= $PDL(PARENT)->ndims ||
-                        $COMP(whichdims)[0] < 0)
-                        $CROAK("dim out of range");
-                nthd=0; nthc=0;
-                for(nthp=0; nthp<$PDL(PARENT)->ndims; nthp++)
-                        if (nthd < $COMP(whichdims_count) &&
-                            nthp == $COMP(whichdims)[nthd]) {
-                                if (!nthd) {
-                                        $PDL(CHILD)->dims[cd] = $PDL(PARENT)->dims[cd];
-                                        nthc++;
-                                        $PRIV(incs)[cd] = 0;
-                                }
-                                if (nthd && $COMP(whichdims)[nthd] ==
-                                    $COMP(whichdims)[nthd-1])
-                                       $CROAK("dims must be unique");
-                                nthd++; /* advance pointer into whichdims */
-                                if($PDL(CHILD)->dims[cd] !=
-                                    $PDL(PARENT)->dims[nthp]) {
-                                        $CROAK("Different dims %"IND_FLAG" and %"IND_FLAG"",
-                                                $PDL(CHILD)->dims[cd],
-                                                $PDL(PARENT)->dims[nthp]);
-                                }
-                                $PRIV(incs)[cd] += $PDL(PARENT)->dimincs[nthp];
-                        } else {
-                                $PRIV(incs)[nthc] = $PDL(PARENT)->dimincs[nthp];
-                                $PDL(CHILD)->dims[nthc] = $PDL(PARENT)->dims[nthp];
-                                nthc++;
-                        }
-                $SETDIMS();
-        '),
-        PMCode =>pp_line_numbers(__LINE__, <<'EOD'),
-sub PDL::diagonal { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
-EOD
-        Doc => <<'EOD',
-=for ref
-
-Returns the multidimensional diagonal over the specified dimensions.
-
-The diagonal is placed at the first (by number) dimension that is
-diagonalized.
-The other diagonalized dimensions are removed. So if C<$x> has dimensions
-C<(5,3,5,4,6,5)> then after
-
-=for usage
-
- $d = $x->diagonal(dim1, dim2,...)
-
-=for example
-
- $y = $x->diagonal(0,2,5);
-
-the ndarray C<$y> has dimensions C<(5,3,4,6)> and
-C<$y-E<gt>at(2,1,0,1)> refers
-to C<$x-E<gt>at(2,1,2,0,1,2)>.
-
-NOTE: diagonal doesn't handle broadcastids correctly. XXX FIX
-
- pdl> $x = zeroes(3,3,3);
- pdl> ($y = $x->diagonal(0,1))++;
- pdl> p $x
- [
-  [
-   [1 0 0]
-   [0 1 0]
-   [0 0 1]
-  ]
-  [
-   [1 0 0]
-   [0 1 0]
-   [0 0 1]
-  ]
-  [
-   [1 0 0]
-   [0 1 0]
-   [0 0 1]
-  ]
- ]
-=cut
-EOD
-);
 
 pp_def(
         'lags',
@@ -2491,7 +2358,7 @@ EOD-slice
                 while (argsptr) nargs++, argsptr = argsptr->next;
                 $COMP(nargs) = nargs;
                 $DOCOMPALLOC();
-                PDL_Indx i, idim, odim, imax;
+                PDL_Indx i, idim, odim;
                 argsptr = arglist;
                 for(odim=idim=i=0; i<nargs; i++) {
                   /* Copy parsed values into the limits */
@@ -2508,7 +2375,6 @@ EOD-slice
 SLICE-MC
            RedoDims => pp_line_numbers(__LINE__, <<'EOF'),
                   PDL_Indx i;
-		  PDL_Indx PDIMS;
                   PDL_Indx o_ndims_extra = PDLMAX(0, $PDL(PARENT)->ndims - $COMP(idim_top));
 
                   /* slurped dims from the arg parsing, plus any extra broadcast dims */
@@ -2537,7 +2403,7 @@ SLICE-MC
 			PDL_Indx end = $COMP(end)[i];
 			if(
 			  /** Trap special case: full slices of an empty dim are empty **/
-                          (pdsize==0 && start==0 && end==-1 && $COMP(inc)[i] == 0)
+                          (pdsize==0 && start==0 && end==-1 && ($COMP(inc)[i] == 0 || $COMP(inc)[i] == 1))
                           ||
                           /* the values given when PDL::slice gets empty ndarray for index */
                           (start==1 && end==0 && $COMP(inc)[i] == 1)
@@ -2553,7 +2419,7 @@ SLICE-MC
 			    if(i >= $PDL(PARENT)->ndims) {
 			      $CROAK("slice has too many dims (indexes dim %"IND_FLAG"; highest is %"IND_FLAG")",i,$PDL(PARENT)->ndims-1);
 			    } else {
-			  $CROAK("slice starts out of bounds in pos %"IND_FLAG" (start is %"IND_FLAG"; source dim %"IND_FLAG" runs 0 to %"IND_FLAG")",i,start,$COMP(idim)[i],pdsize-1);
+			      $CROAK("slice starts out of bounds in pos %"IND_FLAG" (start is %"IND_FLAG"; end is %"IND_FLAG"; inc is %"IND_FLAG"; source dim %"IND_FLAG" runs 0 to %"IND_FLAG")",i,start,end,$COMP(inc)[i],$COMP(idim)[i],pdsize-1);
 			    }
 			  }
 			  if( $COMP(odim)[i] < 0) {
@@ -2591,6 +2457,110 @@ SLICE-MC
 EOF
 );
 
+pp_def('diagonal',
+        P2Child => 1,
+        TwoWay => 1,
+        AffinePriv => 1,
+        OtherPars => 'PDL_Indx whichdims[]',
+        MakeComp => pp_line_numbers(__LINE__-1, '
+                if ($COMP(whichdims_count) < 1)
+                  $CROAK("must have at least 1 dimension");
+                qsort($COMP(whichdims), $COMP(whichdims_count), sizeof(PDL_Indx),
+                        cmp_pdll);
+        '),
+        CHeader => <<'END',
+static int cmp_pdll(const void *a_,const void *b_) {
+        PDL_Indx *a = (PDL_Indx *)a_; PDL_Indx *b=(PDL_Indx *)b_;
+        if(*a>*b) return 1;
+        else if(*a==*b) return 0;
+        else return -1;
+}
+END
+        RedoDims => pp_line_numbers(__LINE__-1, '
+                PDL_Indx nthp,nthc,nthd, cd = $COMP(whichdims)[0];
+                $SETNDIMS($PDL(PARENT)->ndims-$COMP(whichdims_count)+1);
+                $DOPRIVALLOC();
+                $PRIV(offs) = 0;
+                if ($COMP(whichdims)[$COMP(whichdims_count)-1] >= $PDL(PARENT)->ndims ||
+                        $COMP(whichdims)[0] < 0)
+                        $CROAK("dim out of range");
+                nthd=0; nthc=0;
+                for(nthp=0; nthp<$PDL(PARENT)->ndims; nthp++)
+                        if (nthd < $COMP(whichdims_count) &&
+                            nthp == $COMP(whichdims)[nthd]) {
+                                if (!nthd) {
+                                        $PDL(CHILD)->dims[cd] = $PDL(PARENT)->dims[cd];
+                                        nthc++;
+                                        $PRIV(incs)[cd] = 0;
+                                }
+                                if (nthd && $COMP(whichdims)[nthd] ==
+                                    $COMP(whichdims)[nthd-1])
+                                       $CROAK("dims must be unique");
+                                nthd++; /* advance pointer into whichdims */
+                                if($PDL(CHILD)->dims[cd] !=
+                                    $PDL(PARENT)->dims[nthp]) {
+                                        $CROAK("Different dims %"IND_FLAG" and %"IND_FLAG"",
+                                                $PDL(CHILD)->dims[cd],
+                                                $PDL(PARENT)->dims[nthp]);
+                                }
+                                $PRIV(incs)[cd] += $PDL(PARENT)->dimincs[nthp];
+                        } else {
+                                $PRIV(incs)[nthc] = $PDL(PARENT)->dimincs[nthp];
+                                $PDL(CHILD)->dims[nthc] = $PDL(PARENT)->dims[nthp];
+                                nthc++;
+                        }
+                $SETDIMS();
+        '),
+        PMCode =>pp_line_numbers(__LINE__, <<'EOD'),
+sub PDL::diagonal { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
+EOD
+        Doc => <<'EOD',
+=for ref
+
+Returns the multidimensional diagonal over the specified dimensions.
+
+The diagonal is placed at the first (by number) dimension that is
+diagonalized.
+The other diagonalized dimensions are removed. So if C<$x> has dimensions
+C<(5,3,5,4,6,5)> then after
+
+=for usage
+
+ $d = $x->diagonal(dim1, dim2,...)
+
+=for example
+
+ $y = $x->diagonal(0,2,5);
+
+the ndarray C<$y> has dimensions C<(5,3,4,6)> and
+C<$y-E<gt>at(2,1,0,1)> refers
+to C<$x-E<gt>at(2,1,2,0,1,2)>.
+
+NOTE: diagonal doesn't handle broadcastids correctly. XXX FIX
+
+ pdl> $x = zeroes(3,3,3);
+ pdl> ($y = $x->diagonal(0,1))++;
+ pdl> p $x
+ [
+  [
+   [1 0 0]
+   [0 1 0]
+   [0 0 1]
+  ]
+  [
+   [1 0 0]
+   [0 1 0]
+   [0 0 1]
+  ]
+  [
+   [1 0 0]
+   [0 1 0]
+   [0 0 1]
+  ]
+ ]
+=cut
+EOD
+);
 
 pp_addpm({At => 'Bot'},<<'EOD');
 

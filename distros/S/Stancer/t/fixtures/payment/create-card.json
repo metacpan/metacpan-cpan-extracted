@@ -1,0 +1,27 @@
+{
+  "amount": 100,
+  "auth": null,
+  "capture": true,
+  "card": {
+    "brand": "mastercard",
+    "country": "US",
+    "created": 1538564253,
+    "exp_month": 2,
+    "exp_year": 2020,
+    "id": "card_xognFbZs935LMKJYeHyCAYUd",
+    "last4": "4444",
+    "name": null,
+    "zip_code": null
+  },
+  "created": 1538564253,
+  "currency": "eur",
+  "customer": "cust_9Cle7TXKkjhwqcWx4Kl5cQYk",
+  "description": "le test restfull v1",
+  "id": "paym_KIVaaHi7G8QAYMQpQOYBrUQE",
+  "live_mode": false,
+  "method": "card",
+  "order_id": null,
+  "response": "00",
+  "return_url": null,
+  "status": "to_capture"
+}

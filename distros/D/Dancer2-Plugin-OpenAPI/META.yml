@@ -26,10 +26,10 @@ name: Dancer2-Plugin-OpenAPI
 provides:
   Dancer2::Plugin::OpenAPI:
     file: lib/Dancer2/Plugin/OpenAPI.pm
-    version: v1.0.1
+    version: v1.0.2
   Dancer2::Plugin::OpenAPI::Path:
     file: lib/Dancer2/Plugin/OpenAPI/Path.pm
-    version: v1.0.1
+    version: v1.0.2
 requires:
   Carp: '0'
   Class::Load: '0'
@@ -50,7 +50,7 @@ resources:
   bugtracker: https://github.com/yanick/Dancer2-Plugin-OpenAPI/issues
   homepage: https://github.com/yanick/Dancer2-Plugin-OpenAPI
   repository: https://github.com/yanick/Dancer2-Plugin-OpenAPI.git
-version: 1.0.1
+version: 1.0.2
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK

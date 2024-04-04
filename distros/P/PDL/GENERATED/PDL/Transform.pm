@@ -262,6 +262,7 @@ use strict;
 use warnings;
 #line 264 "Transform.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -299,27 +300,18 @@ use Carp;
 
 *PDL::apply = \&apply;
 sub apply {
-  my($me) = shift;
-  my($from) = shift;
-
-  if(UNIVERSAL::isa($me,'PDL')){
-      my($x) = $from;
-      $from = $me;
-      $me = $x;
-  }
-
-  if(UNIVERSAL::isa($me,'PDL::Transform') && UNIVERSAL::isa($from,'PDL')){
-      croak "Applying a PDL::Transform with no func! Oops.\n" unless(defined($me->{func}) and ref($me->{func}) eq 'CODE');
-      my $result = &{$me->{func}}($from,$me->{params});
-      $result->is_inplace(0); # clear inplace flag, just in case.
-      return $result;
-  } else {
-      croak "apply requires both a PDL and a PDL::Transform.\n";
-  }
-
+  my ($me, $from) = UNIVERSAL::isa($_[0],'PDL') ? @_[1,0] : @_;
+  croak "apply requires both a PDL and a PDL::Transform.\n"
+    unless UNIVERSAL::isa($me,'PDL::Transform') && UNIVERSAL::isa($from,'PDL');
+  croak "Applying a PDL::Transform with no func! Oops.\n"
+    unless(defined($me->{func}) and ref($me->{func}) eq 'CODE');
+  my $result = $me->{func}->($from,$me->{params});
+  $result->is_inplace(0); # clear inplace flag, just in case.
+  return $result;
 }
 
-#line 366 "transform.pd"
+#line 356 "transform.pd"
+
 =head2 invert
 
 =for sig
@@ -345,25 +337,17 @@ For convenience this is both a PDL method and a PDL::Transform method.
 
 *PDL::invert = \&invert;
 sub invert {
-  my($me) = shift;
-  my($data) = shift;
-
-  if(UNIVERSAL::isa($me,'PDL')){
-      my($x) = $data;
-      $data = $me;
-      $me = $x;
-  }
-
-  if(UNIVERSAL::isa($me,'PDL::Transform') && UNIVERSAL::isa($data,'PDL')){
-      croak "Inverting a PDL::Transform with no inverse! Oops.\n" unless(defined($me->{inv}) and ref($me->{inv}) eq 'CODE');
-      my $result = &{$me->{inv}}($data, $me->{params});
-      $result->is_inplace(0);  # make sure inplace flag is clear.
-      return $result;
-  } else {
-      croak("invert requires a PDL and a PDL::Transform (did you want 'inverse' instead?)\n");
-  }
+  my ($me, $from) = UNIVERSAL::isa($_[0],'PDL') ? @_[1,0] : @_;
+  croak "invert requires a PDL and a PDL::Transform (did you want 'inverse' instead?)\n"
+    unless UNIVERSAL::isa($me,'PDL::Transform') && UNIVERSAL::isa($from,'PDL');
+  croak "Inverting a PDL::Transform with no inverse! Oops.\n"
+    unless(defined($me->{inv}) and ref($me->{inv}) eq 'CODE');
+  my $result = $me->{inv}->($from, $me->{params});
+  $result->is_inplace(0);  # make sure inplace flag is clear.
+  return $result;
 }
-#line 367 "Transform.pm"
+#line 350 "Transform.pm"
+
 
 =head2 map
 
@@ -643,7 +627,7 @@ the largest non-broadcast input dimension.  (i.e. the default won't let
 you reduce the original image to less than 5 pixels across).  This places
 a limit on how long the processing can take for pathological transformations.
 Smaller numbers keep the code from hanging for a long time; larger numbers
-provide for photometric accuracy in more pathological cases.  Numbers larer
+provide for photometric accuracy in more pathological cases.  Numbers larger
 than 1.0 are silly, because they allow the entire input array to be compressed
 into a region smaller than a single pixel.
 
@@ -711,13 +695,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1573 "transform.pd"
+#line 1530 "transform.pd"
 
 sub PDL::match {
   # Set default for rectification to 0 for simple matching...
   push @_, {} if ref($_[-1]) ne 'HASH';
   my @k = grep(m/^r(e(c(t)?)?)?/,sort keys %{$_[-1]});
-#line 1578 "transform.pd"
+#line 1535 "transform.pd"
   unless(@k) {
       $_[-1]->{rectify} = 0;
   }
@@ -747,7 +731,7 @@ sub map {
     my($x);
     if(defined ($x = $tmp->gethdr)) {
       my(%b) = %{$x};
-#line 1608 "transform.pd"
+#line 1565 "transform.pd"
       $ohdr = \%b;
     }
   } elsif(ref $tmp eq 'HASH') {
@@ -757,7 +741,7 @@ sub map {
     }
     # deep-copy fits header into output
     my %foo = %{$tmp};
-#line 1617 "transform.pd"
+#line 1574 "transform.pd"
     $ohdr = \%foo;
   } elsif(ref $tmp eq 'ARRAY') {
     @odims = @$tmp;
@@ -952,7 +936,7 @@ sub map {
           ### These are the CROTA<n>, PCi_j, and CDi_j.
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(CD|PC)\d+_\d+[A-Z]?$)/, keys %{$out->hdr}
-#line 1814 "transform.pd"
+#line 1771 "transform.pd"
           };
       } else {
           # Non-rectified output -- generate a CDi_j matrix instead of the simple formalism.
@@ -968,8 +952,7 @@ sub map {
               croak("Whups -- got a nonlinear t_fits transformation.  Can't deal with it.");
           }
 
-          my $inv_sc_mat = zeroes($nd,$nd);
-          $inv_sc_mat->diagonal(0,1) .= $scale;
+          my $inv_sc_mat = PDL::MatrixOps::stretcher($scale);
           my $mat = $f_in->{params}->{matrix} x $inv_sc_mat;
           print "scale is $scale; mat is $mat\n" if($PDL::Transform::debug);
 
@@ -997,7 +980,7 @@ sub map {
           ## Eliminate competing header pointing tags if they exist
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(PC)\d+_\d+[A-Z]?$)|(CDELT\d*$)/, keys %{$out->hdr}
-#line 1858 "transform.pd"
+#line 1814 "transform.pd"
           };
       }
     }
@@ -1108,7 +1091,7 @@ sub map {
   }
   return $out;
 }
-#line 1112 "Transform.pm"
+#line 1095 "Transform.pm"
 
 *map = \&PDL::map;
 
@@ -1116,7 +1099,7 @@ sub map {
 
 
 
-#line 1975 "transform.pd"
+#line 1931 "transform.pd"
 
 ######################################################################
 
@@ -1156,7 +1139,8 @@ sub unmap {
   return $me->inverse->map($data,@params);
 }
 
-#line 2018 "transform.pd"
+#line 1974 "transform.pd"
+
 =head2 t_inverse
 
 =for usage
@@ -1199,7 +1183,8 @@ sub inverse {
   }, ref $me;
 }
 
-#line 2065 "transform.pd"
+#line 2021 "transform.pd"
+
 =head2 t_compose
 
 =for usage
@@ -1294,7 +1279,8 @@ sub compose {
   return bless($me,'PDL::Transform::Composition');
 }
 
-#line 2164 "transform.pd"
+#line 2120 "transform.pd"
+
 =head2 t_wrap
 
 =for usage
@@ -1343,7 +1329,7 @@ sub _compose_op {
 sub _pow_op {
     my($x,$y,$c) = @_;
 
-    barf("%s", "Can't raise anything to the power of a transform")
+    barf("Can't raise anything to the power of a transform")
         if($c || UNIVERSAL::isa($y,'PDL::Transform')) ;
 
     $x = $x->inverse
@@ -1360,7 +1346,8 @@ sub _pow_op {
     t_compose(@l);
 }
 
-#line 2237 "transform.pd"
+#line 2193 "transform.pd"
+
 =head2 t_identity
 
 =for usage
@@ -1393,7 +1380,8 @@ sub new {
   return bless $me,$class;
 }
 
-#line 2275 "transform.pd"
+#line 2231 "transform.pd"
+
 =head2 t_lookup
 
 =for usage
@@ -1574,7 +1562,7 @@ sub t_lookup {
         my $maxvals = $p->{table}->clump($me->{idim})->maximum;
 
         # Scale so that the range runs from 0 through the top pixel in the table
-        my $scale = (  pdl(  $itable->dims  )->slice("0:-2")-1  ) /
+        my $scale = (  $itable->shape->slice("0:-2")-1  ) /
                     (($maxvals - $minvals)+ (($maxvals-$minvals) == 0));
         my $offset = - ($minvals * $scale);
 
@@ -1645,7 +1633,8 @@ sub t_lookup {
   return $me;
 }
 
-#line 2535 "transform.pd"
+#line 2491 "transform.pd"
+
 =head2 t_linear
 
 =for usage
@@ -1955,7 +1944,8 @@ sub stringify {
 }
 }
 
-#line 2849 "transform.pd"
+#line 2805 "transform.pd"
+
 =head2 t_scale
 
 =for usage
@@ -1975,12 +1965,13 @@ sub t_scale {
     my($scale) = shift;
     my($y) = shift;
     return t_linear(scale=>$scale,%{$y})
-#line 2870 "transform.pd"
+#line 2826 "transform.pd"
         if(ref $y eq 'HASH');
     t_linear(Scale=>$scale,$y,@_);
 }
 
-#line 2877 "transform.pd"
+#line 2833 "transform.pd"
+
 =head2 t_offset
 
 =for usage
@@ -2000,13 +1991,14 @@ sub t_offset {
     my($pre) = shift;
     my($y) = shift;
     return t_linear(pre=>$pre,%{$y})
-#line 2898 "transform.pd"
+#line 2854 "transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(pre=>$pre,$y,@_);
 }
 
-#line 2906 "transform.pd"
+#line 2862 "transform.pd"
+
 =head2 t_rot
 
 =for usage
@@ -2027,13 +2019,14 @@ sub t_rotate    {
     my $rot = shift;
     my($y) = shift;
     return t_linear(rot=>$rot,%{$y})
-#line 2928 "transform.pd"
+#line 2884 "transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(rot=>$rot,$y,@_);
 }
 
-#line 2938 "transform.pd"
+#line 2894 "transform.pd"
+
 =head2 t_fits
 
 =for usage
@@ -2196,7 +2189,8 @@ sub t_fits {
   return $me;
 }
 
-#line 3110 "transform.pd"
+#line 3066 "transform.pd"
+
 =head2 t_code
 
 =for usage
@@ -2288,7 +2282,8 @@ sub t_code {
   $me;
 }
 
-#line 3209 "transform.pd"
+#line 3165 "transform.pd"
+
 =head2 t_cylindrical
 
 C<t_cylindrical> is an alias for C<t_radial>
@@ -2459,7 +2454,8 @@ sub t_radial {
   $me;
 }
 
-#line 3387 "transform.pd"
+#line 3343 "transform.pd"
+
 =head2 t_quadratic
 
 =for usage
@@ -2573,7 +2569,8 @@ sub t_quadratic {
     $me;
 }
 
-#line 3506 "transform.pd"
+#line 3462 "transform.pd"
+
 =head2 t_cubic
 
 =for usage
@@ -2712,7 +2709,8 @@ sub t_cubic {
     $me;
 }
 
-#line 3652 "transform.pd"
+#line 3608 "transform.pd"
+
 =head2 t_quartic
 
 =for usage
@@ -2830,7 +2828,8 @@ sub t_quartic {
     $me;
 }
 
-#line 3775 "transform.pd"
+#line 3731 "transform.pd"
+
 =head2 t_spherical
 
 =for usage
@@ -2900,8 +2899,7 @@ sub t_spherical {
     $me->{odim}=3;
 
     $me->{params}->{origin} = _opt($o,['o','origin','Origin']);
-    $me->{params}->{origin} = PDL->zeroes(3)
-        unless defined($me->{params}->{origin});
+    $me->{params}->{origin} //= PDL->zeroes(3);
     $me->{params}->{origin} = PDL->pdl($me->{params}->{origin});
 
     $me->{params}->{deg} = _opt($o,['d','degrees','Degrees']);
@@ -2963,7 +2961,8 @@ sub t_spherical {
     $me;
   }
 
-#line 3913 "transform.pd"
+#line 3868 "transform.pd"
+
 =head2 t_projective
 
 =for usage
@@ -3116,6 +3115,7 @@ sub t_projective {
 }
 
 #line 244 "transform.pd"
+
 =head1 AUTHOR
 
 Copyright 2002, 2003 Craig DeForest.  There is no warranty.  You are allowed

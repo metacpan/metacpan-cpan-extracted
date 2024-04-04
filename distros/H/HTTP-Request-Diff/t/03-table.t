@@ -1,11 +1,11 @@
 #!perl
 use 5.020;
-no warnings;
-use Test2::V0;
+use stable 'postderef';
+use Test2::V0 '-no_srand';
 use Data::Dumper;
 
 use HTTP::Request;
-use YAML 'Load';
+use YAML::PP 'Load';
 
 use HTTP::Request::Diff;
 
@@ -96,3 +96,16 @@ Umloud
 +-----------------+-----------+--------+
 | request.content | Ümloud    | Umloud |
 +-----------------+-----------+--------+
+===
+--- name
+Synopsis
+--- reference
+GET /?foo=bar;session=123 HTTP/1.1
+--- actual
+GET /?session=123 HTTP/1.1
+--- diff
++-----------+-----------+-----------+
+| Type      | Reference | Actual    |
++-----------+-----------+-----------+
+| query.foo | bar       | <missing> |
++-----------+-----------+-----------+

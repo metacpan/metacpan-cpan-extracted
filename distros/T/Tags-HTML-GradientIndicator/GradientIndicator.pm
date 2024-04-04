@@ -5,8 +5,9 @@ use warnings;
 
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
+use Mo::utils::CSS qw(check_css_unit);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -25,13 +26,10 @@ sub new {
 	$self->{'css_gradient_class'} = 'gradient';
 
 	# Height.
-	$self->{'height'} = 30;
-
-	# Unit.
-	$self->{'unit'} = 'px';
+	$self->{'height'} = '30px';
 
 	# Width.
-	$self->{'width'} = 500;
+	$self->{'width'} = '500px';
 
 	# 'Tags::Output' object.
 	$self->{'tags'} = undef;
@@ -49,6 +47,12 @@ sub new {
 		err "Parameter 'tags' must be a 'Tags::Output::*' class.";
 	}
 
+	# Check height;
+	check_css_unit($self, 'height');
+
+	# Check width.
+	check_css_unit($self, 'width');
+
 	# Object.
 	return $self;
 }
@@ -58,12 +62,13 @@ sub process {
 	my ($self, $percent_value) = @_;
 
 	# Value.
-	my $value = $percent_value * ($self->{'width'} / 100);
+	my ($width_value, $unit) = $self->{'width'} =~ m/^(\d+)(.*?)$/ms;
+	my $value = $percent_value * ($width_value / 100);
 
 	# Main stars.
 	$self->{'tags'}->put(
 		['b', 'div'],
-		['a', 'style', 'width: '.$value.$self->{'unit'}.';overflow: hidden;'],
+		['a', 'style', 'width: '.$value.$unit.';overflow: hidden;'],
 
 		['b', 'div'],
 		['a', 'class', $self->{'css_gradient_class'}],
@@ -81,8 +86,8 @@ sub process_css {
 
 	$self->{'css'}->put(
 		['s', '.'.$self->{'css_gradient_class'}],
-		['d', 'height', $self->{'height'}.$self->{'unit'}],
-		['d', 'width', $self->{'width'}.$self->{'unit'}],
+		['d', 'height', $self->{'height'}],
+		['d', 'width', $self->{'width'}],
 		['d', 'background-color', 'red'],
 		['d', 'background-image', $self->{'css_background_image'}],
 		['e'],
@@ -147,12 +152,6 @@ Indicator height.
 
 Default value is 30.
 
-=item * C<unit>
-
-Unit for height and width.
-
-Default value is 'px'.
-
 =item * C<width>
 
 Indicator width.
@@ -188,10 +187,27 @@ Returns undef.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+         From Mo::utils::CSS::check_css_unit():
+                 Parameter 'height' doesn't contain number.
+                         Value: %s
+                 Parameter 'height' doesn't contain unit.
+                         Value: %s
+                 Parameter 'height' contain bad unit.
+                         Unit: %s
+                         Value: %s
+                 Parameter 'width' doesn't contain number.
+                         Value: %s
+                 Parameter 'width' doesn't contain unit.
+                         Value: %s
+                 Parameter 'width' contain bad unit.
+                         Unit: %s
+                         Value: %s
          Parameter 'css' must be a 'CSS::Struct::Output::*' class.
          Parameter 'tags' must be a 'Tags::Output::*' class.
 
 =head1 EXAMPLE1
+
+=for comment filename=gradient_50_percent.pl
 
  use strict;
  use warnings;
@@ -233,6 +249,8 @@ Returns undef.
  # </div>
 
 =head1 EXAMPLE2
+
+=for comment filename=gradient_arg_percent.pl
 
  use strict;
  use warnings;
@@ -282,7 +300,8 @@ Returns undef.
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
-L<Error::Pure>.
+L<Error::Pure>,
+L<Mo::utils::CSS>.
 
 =head1 SEE ALSO
 
@@ -306,12 +325,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2021
+© Michal Josef Špaček 2021-2024
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

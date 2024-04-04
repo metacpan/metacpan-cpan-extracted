@@ -1,33 +1,22 @@
 {
-   "abstract" : "[One line description of module's purpose here]",
+   "abstract" : "GitHub client, with some scraping functions",
    "author" : [
       "JJ Merelo <jjmerelo@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-GitHub-Repository",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
@@ -35,21 +24,23 @@
             "File::Slurper" : "0",
             "Git" : "0",
             "JSON" : "0",
-            "Test::Builder::Module" : "0",
             "Test::More" : "0",
-            "Test::Perl::Critic" : "0",
             "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Perl::Critic" : "0"
          }
       }
    },
-   "release_status" : "stable",
-   "resources" : {
-      "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/JJ/p5-app-github-repository.git",
-         "web" : "https://github.com/JJ/p5-app-github-repository"
+   "provides" : {
+      "App::GitHub::Repository" : {
+         "file" : "lib/App/GitHub/Repository.pm",
+         "version" : "v0.0.5"
       }
    },
-   "version" : "0.0.4",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "release_status" : "stable",
+   "version" : "v0.0.5",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

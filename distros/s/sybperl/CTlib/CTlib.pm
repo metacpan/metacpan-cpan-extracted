@@ -773,6 +773,7 @@ use vars qw($DB_ERROR $nsql_strip_whitespace $nsql_deadlock_retrycount
   CS_SEC_APPDEFINED
   CS_SEC_CHALLENGE
   CS_SEC_ENCRYPTION
+  CS_SEC_EXTENDED_ENCRYPTION
   CS_SEC_NEGOTIATE
   CS_SEND
   CS_SEND_BULK_CMD

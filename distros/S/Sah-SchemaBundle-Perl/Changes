@@ -1,0 +1,309 @@
+0.050   2024-02-16  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Sah-Schema{s,Bundle}-Perl following rename of
+          Sah-Schema{s,Bundle} (for visual clarity and consistency with naming
+          of other bundles).
+
+        - [ux] Allow Foo//Bar (in addition to Foo/Bar) to be normalized as
+          Foo::Bar.
+
+
+0.049   2023-10-26  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc][ux] Give some warning when using a schema with default
+          value for destructive actions.
+
+
+0.048   2023-01-19  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] For completion convenience, allow ',' in addition to '=' for
+          starting optional args, but normalize it to '='.
+
+
+0.047   2023-01-14  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: perl::module::release::version{,s}.
+
+
+0.046   2022-12-16  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas:
+          perl::identifier::{qualified,unqualified}_{ascii,unicode}.
+
+
+0.045   2022-09-11  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix off-by-one bug in wildcard expansion coerce rules.
+
+        - [doc] Add description to perl::distname schema.
+
+        - [dist] Add devnotes.org.
+
+
+0.044   2022-07-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: perl::modname_pm.
+
+
+0.043   2022-07-23  Released-By: PERLANCAR; Urgency: medium
+
+        - Tweak coerce rules expand_perl_modname_wildcard to skip module
+          name that contains optional args e.g. Foo::Bar=file,/foo.
+
+        - Remove unused args in Data::Sah::Value::* modules (copy-paste
+          mistake).
+
+
+0.042   2021-12-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add default value rules: Perl::these_{dists,mods}.
+
+
+0.041   2021-12-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schemas: perl::modname::default_this_mod,
+	  perl::distname::default_this_dist.
+
+
+0.040   2021-10-05  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix coerce/filter
+	  normalize_perl_{modname,modprefix,modname_or_prefix} that
+	  overeagerly replaced / or - with :: even in the args part, e.g.
+	  Foo-Bar=a,b/c to become Foo::Bar=a,b::c.
+
+
+0.039   2021-09-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux][schema perl::modname_with_optional_args] Allow array form to
+	  make specifying arguments much more convenient, e.g. using JSON.
+
+
+0.038   2021-07-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Remove warning with latest Test::Sah::Schema (0.010).
+
+	- [schema perl::modname][doc] Mention a demo of this schema in CLI using
+          'pmless'.
+
+
+0.037   2021-07-19  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Build with fixed Pod::Weaver plugin [-Sah::Schemas] (0.064) to
+          properly list schemas in the distribution in lib/Sah/Schemas/Perl.pm.
+
+
+0.036   2021-07-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schemas: perl::modname::installed, perl::modname::not_installed.
+
+
+0.035   2021-01-20  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Forgot to anchor patterns.
+
+
+0.034   2020-06-19  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Forgot to load Regexp::Pattern::Perl::Module in
+	  perl::modname_with_optional_args schema.
+
+
+0.033   2020-06-16  Released-By: PERLANCAR; Urgency: medium
+
+	- Move some regexes to Regexp-Pattern-Perl distro to be more
+	  reusable (in progress).
+
+
+0.032   2020-05-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Coerce rules
+	  Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl
+	  _mod{name,prefix}_wildcard: accept argument 'ns_prefix'.
+
+
+0.031   2020-05-08  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild with newest Pod::Weaver::Plugin::Sah::Schemas that
+          shows how to use the schemas with Params::Sah as well as Data::Sah and
+          Perinci::CmdLine.
+
+
+0.030   2020-05-08  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild with updated Pod::Weaver::Plugin::Sah::Schemas to fix
+          rendered examples.
+
+
+0.029   2020-05-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Tweak abstracts of schema modules (add example to make it
+          clearer).
+
+        - [testing][doc] Add some examples to schema modules.
+
+        - Rename schema perl::modargs -> perl::modname_with_optional_args (old
+          name preserved).
+
+
+0.028   2020-05-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schemas: perl::{mod,dist}name_with_{,optional_}var.
+
+
+0.027   2020-02-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schema: perl::release::version.
+
+
+0.026   2019-12-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schemas: perl::funcname, perl::qualified_funcname,
+	  perl::unqualified_funcname.
+
+
+0.025   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Upgrade dependency on Data::Sah::Coerce 0.034+ to TestRequires
+	  (previously TestRecommends) [RT#131108].
+
+
+0.024   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule modules (Data::Sah::Coerce 0.037+).
+
+
+0.023   2019-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schema: perl::modprefixes.
+
+
+0.022   2019-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq version Data::Sah::Coerce to 0.032 [CT].
+
+
+0.021   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schema: perl::modnames.
+
+
+0.020   2019-07-05  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow empty string '' as a valid perl::modprefix.
+
+
+0.019   2019-06-03  Released-By: PERLANCAR
+
+	- Add schema: perl::podname.
+
+
+0.018   2019-02-24  Released-By: PERLANCAR
+
+	- Add schemas: perl::modprefix, perl::modname_or_prefix.
+
+
+0.017   2018-12-09  Released-By: PERLANCAR
+
+	- Argh, previous commit still didn't delete all tests for
+	  strict.pm.
+
+
+0.016   2018-12-07  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Previous commit didn't delete all tests for strict.pm.
+
+
+0.015   2018-12-03  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Delete test for strict.pm because Debian splits strict.pm's POD
+	  to strict.POD [RT#127839].
+
+
+0.014   2018-09-11  Released-By: PERLANCAR
+
+        - No functional changes.
+
+        - [doc] Fix notes about prioritization of .pm vs .pod.
+
+
+0.013   2018-09-11  Released-By: PERLANCAR
+
+	- Supply module core/pp information for compiling Sah schemas.
+
+
+0.012   2018-06-04  Released-By: PERLANCAR
+
+	- Update to Data::Sah::Coerce 0.025 (coerce rule module metadata
+	  version 3).
+
+
+0.011   2018-04-03  Released-By: PERLANCAR
+
+	- Add schema: perl::modargs.
+
+
+0.010   2018-01-14  Released-By: PERLANCAR
+
+        - [build] Rebuild with updated DZP:Sah::Schemas to add prereqs to
+          Perinci::Sub::XCompletion::* modules.
+
+
+0.009   2017-02-08  Released-By: PERLANCAR
+
+	- Fix tests for perl < 5.12 where invalid version only results in
+	  warning [CT].
+
+
+0.008   2017-02-06  Released-By: PERLANCAR
+
+        - [Removed] Remove schema: perl_modname_or_filename.
+
+        - Add schemas: perl::filename, perl::pm_filename, perl::pod_filename,
+          perl::pod_or_pm_filename.
+
+
+0.007   2017-01-31  Released-By: PERLANCAR
+
+	- Add schema: perl_modname_or_filename.
+
+
+0.006   2016-08-03  Released-By: PERLANCAR
+
+	- [Bugfix] perl::modname: Missed normalizing Foo-Bar -> Foo::Bar.
+
+	- Add tests.
+
+
+0.005   2016-08-03  Released-By: PERLANCAR
+
+	- [Bugfix] Normalize Foo/Bar.pm into Foo::Bar (or Foo-Bar for dist)
+	  instead of Foo::Bar::pm (or Foo-Bar-pm).
+
+
+0.004   2016-07-25  Released-By: PERLANCAR
+
+	- Add schema: perl::version.
+
+
+0.003   2016-07-22  Released-By: PERLANCAR
+
+	- [build] Rebuild to generate Sah::SchemaR::* modules.
+
+
+0.002   2016-07-20  Released-By: PERLANCAR
+
+	- Fix coerce rule names.
+
+
+0.001   2016-07-16  Released-By: PERLANCAR
+
+        - First release.

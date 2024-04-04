@@ -1,6 +1,6 @@
 package Mail::BIMI::Result;
 # ABSTRACT: Class to model a BIMI result
-our $VERSION = '3.20240319'; # VERSION
+our $VERSION = '3.20240402'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -87,7 +87,7 @@ Mail::BIMI::Result - Class to model a BIMI result
 
 =head1 VERSION
 
-version 3.20240319
+version 3.20240402
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,39 @@
+{
+  "amount": 3999,
+  "auth": null,
+  "capture": true,
+  "card": {
+    "brand": "visa",
+    "country": "FR",
+    "created": 1575038378,
+    "exp_month": 12,
+    "exp_year": 2019,
+    "id": "card_cOVrEPMV1srACdm6ThGUtTtJ",
+    "last4": "0002",
+    "live_mode": false,
+    "name": null,
+    "zip_code": null
+  },
+  "created": 1575038378,
+  "currency": "eur",
+  "customer": {
+    "country": null,
+    "created": 1575038378,
+    "email": null,
+    "id": "cust_eaWZHa48G8sxKTPJJ26PwE4o",
+    "live_mode": false,
+    "mobile": null,
+    "name": null
+  },
+  "description": null,
+  "id": "paym_rmPhY0YraP5NqyPj6lbzGE3W",
+  "id_trans": null,
+  "live_mode": false,
+  "method": "card",
+  "order_id": "A123",
+  "response": "05",
+  "response_author": null,
+  "return_url": null,
+  "status": "refused",
+  "unique_id": null
+}

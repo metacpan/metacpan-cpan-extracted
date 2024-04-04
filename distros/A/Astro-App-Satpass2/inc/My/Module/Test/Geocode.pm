@@ -9,9 +9,9 @@ use Exporter ();
 our @ISA = qw{ Exporter };
 
 use Astro::App::Satpass2::Utils qw{ load_package };
-use Test::More 0.88;
+use Test2::V0;
 
-our $VERSION = '0.053';
+our $VERSION = '0.054';
 
 our @EXPORT_OK = qw{ setup geocode };
 our @EXPORT = @EXPORT_OK;
@@ -23,21 +23,21 @@ sub setup {
     ( $wrapper_class ) = @_;
 
     load_package( $wrapper_class )
-	or plan skip_all => "Unable to load $wrapper_class: $@";
+	or skip_all "Unable to load $wrapper_class: $@";
 
     my $geocoder_class = $wrapper_class->GEOCODER_CLASS();
 
     load_package( $geocoder_class )
-	or plan skip_all => "$geocoder_class not available";
+	or skip_all "$geocoder_class not available";
 
     load_package( 'LWP::UserAgent' )
-	or plan skip_all => 'LWP::UserAgent not available';
+	or skip_all 'LWP::UserAgent not available';
 
     my $url = $wrapper_class->GEOCODER_SITE();
     my $rslt = LWP::UserAgent->new()->get( $url )
-	or plan skip_all => "No access to $url: " . $@ || 'Unknown error';
+	or skip_all "No access to $url: " . $@ || 'Unknown error';
     $rslt->is_success
-	or plan skip_all => "No access to $url: " . $rslt->status_line();
+	or skip_all "No access to $url: " . $rslt -> status_line ();
 
     eval {
 	$wrapper_object = $wrapper_class->new();
@@ -164,7 +164,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2023 by Thomas R. Wyant, III
+Copyright (C) 2012-2024 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

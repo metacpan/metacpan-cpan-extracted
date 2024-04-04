@@ -40,6 +40,7 @@ use DateTime;
 use AsposeSlidesCloud::Object::ExportOptions;
 use AsposeSlidesCloud::Object::FontFallbackRule;
 use AsposeSlidesCloud::Object::FontSubstRule;
+use AsposeSlidesCloud::Object::SlidesLayoutOptions;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -171,38 +172,10 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
-    'notes_position' => {
-    	datatype => 'string',
-    	base_name => 'NotesPosition',
-    	description => 'Gets or sets the position of the notes on the page.',
-    	format => '',
-    	read_only => '',
-    		},
-    'comments_position' => {
-    	datatype => 'string',
-    	base_name => 'CommentsPosition',
-    	description => 'Gets or sets the position of the comments on the page.',
-    	format => '',
-    	read_only => '',
-    		},
-    'comments_area_width' => {
-    	datatype => 'int',
-    	base_name => 'CommentsAreaWidth',
-    	description => 'Gets or sets the width of the comment output area in pixels (Applies only if comments are displayed on the right).',
-    	format => '',
-    	read_only => '',
-    		},
-    'comments_area_color' => {
-    	datatype => 'string',
-    	base_name => 'CommentsAreaColor',
-    	description => 'Gets or sets the color of comments area (Applies only if comments are displayed on the right).',
-    	format => '',
-    	read_only => '',
-    		},
-    'show_comments_by_no_author' => {
-    	datatype => 'boolean',
-    	base_name => 'ShowCommentsByNoAuthor',
-    	description => 'True if comments that have no author are displayed. (Applies only if comments are displayed).',
+    'slides_layout_options' => {
+    	datatype => 'SlidesLayoutOptions',
+    	base_name => 'SlidesLayoutOptions',
+    	description => 'Slides layouting options',
     	format => '',
     	read_only => '',
     		},
@@ -220,11 +193,7 @@ __PACKAGE__->swagger_types( {
     'jpeg_quality' => 'int',
     'pictures_compression' => 'string',
     'delete_pictures_cropped_areas' => 'boolean',
-    'notes_position' => 'string',
-    'comments_position' => 'string',
-    'comments_area_width' => 'int',
-    'comments_area_color' => 'string',
-    'show_comments_by_no_author' => 'boolean'
+    'slides_layout_options' => 'SlidesLayoutOptions'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -239,11 +208,7 @@ __PACKAGE__->attribute_map( {
     'jpeg_quality' => 'JpegQuality',
     'pictures_compression' => 'PicturesCompression',
     'delete_pictures_cropped_areas' => 'DeletePicturesCroppedAreas',
-    'notes_position' => 'NotesPosition',
-    'comments_position' => 'CommentsPosition',
-    'comments_area_width' => 'CommentsAreaWidth',
-    'comments_area_color' => 'CommentsAreaColor',
-    'show_comments_by_no_author' => 'ShowCommentsByNoAuthor'
+    'slides_layout_options' => 'SlidesLayoutOptions'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

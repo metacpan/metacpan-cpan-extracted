@@ -1,3 +1,7 @@
+0.03 2024-03-27T16:29:45+01:00
+ - Add test of constructor.
+ - Fix minimal dependency to Tags::HTML.
+
 0.02 2024-03-14T16:39:57+01:00
  - Add test for minimal version of CPAN::Changes module.
  - Rewrite examples in doc to use of methods.

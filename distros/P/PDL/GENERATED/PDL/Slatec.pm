@@ -97,6 +97,7 @@ data using L</chcm>.
 =cut
 #line 99 "Slatec.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -226,7 +227,7 @@ compute the determinant of an invertible matrix
 
 =for example
 
-  $mat = zeroes(5,5); $mat->diagonal(0,1) .= 1; # unity matrix
+  $mat = identity(5); # unity matrix
   $det = detslatec $mat;
 
 Usage:
@@ -369,38 +370,24 @@ sub PDL::polyfit {
   barf 'Usage: polyfit($x, $y, $w, $maxdeg, [$eps]);'
     unless (@_ == 5 || @_==4 );
 
-  my ($x_in, $y_in, $w_in, $maxdeg_in, $eps_in) = @_;
+  my ($x_in, $y_in, $w_in, $maxdeg_in, $eps_io) = map PDL->topdl($_), @_;
 
+  my $template_ind = maximum_n_ind([(map $_->ndims-1, $x_in, $y_in, $w_in), $maxdeg_in->ndims, defined $eps_io ? $eps_io->ndims : -1], 1)->sclr;
+  my $template = $_[$template_ind];
   # if $w_in does not match the data vectors ($x_in, $y_in), then we can resize
   # it to match the size of $y_in :
-  $w_in = $w_in + $y_in->zeros;
-
-  # Create the output arrays
-  my $r = PDL->null;
-
-  # A array needs some work space
-  my $sz = ((3 * $x_in->getdim(0)) + (3*$maxdeg_in) + 3); # Buffer size called for by Slatec
-  my @otherdims = $_[0]->dims; shift @otherdims;          # Thread dims
-  my $a1 =      PDL->new_from_specification($x_in->type,$sz,@otherdims);
-  my $coeffs = PDL->new_from_specification($x_in->type, $maxdeg_in + 1, @otherdims);
-
-  my $ierr = PDL->null;
-  my $ndeg = PDL->null;
+  $w_in = $w_in + $template->zeroes;
+  $eps_io = $eps_io + $template->slice('(0)')->zeroes; # also needs to match but with one less dim
+  my $max_maxdeg = $maxdeg_in->max->sclr;
 
   # Now call polfit
-  my $rms = pdl($eps_in);                                       
-  polfit($x_in, $y_in, $w_in, $maxdeg_in, $ndeg, $rms, $r, $ierr, $a1, $coeffs);
+  my $rms = pdl($eps_io);
+  my ($ndeg, $r, $ierr, $a1, $coeffs) = polfit($x_in, $y_in, $w_in, $maxdeg_in, $rms, $max_maxdeg+1);
   # Preserve historic compatibility by flowing rms error back into the argument
-  if( UNIVERSAL::isa($eps_in,'PDL') ){
-      $eps_in .= $rms;
-  }
+  $eps_io .= $rms if UNIVERSAL::isa($_[4],'PDL');
 
   # Return the arrays
-  if(wantarray) {
-    return ($ndeg, $r, $ierr, $a1, $coeffs, $rms );
-  } else {
-      return $coeffs;
-  }
+  wantarray ? ($ndeg, $r, $ierr, $a1, $coeffs, $rms) : $coeffs;
 }
 
 *polycoef = \&PDL::polycoef;
@@ -447,7 +434,8 @@ sub PDL::polyvalue {
 
 }
                                                                               
-#line 451 "Slatec.pm"
+#line 438 "Slatec.pm"
+
 
 =head2 svdc
 
@@ -1559,7 +1547,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); y(n); w(n); longlong maxdeg(); longlong [o]ndeg(); [o]eps(); [o]r(n); longlong [o]ierr(); [o]a(foo); [o]coeffs(bar);[t]xtmp(n);[t]ytmp(n);[t]wtmp(n);[t]rtmp(n))
+  Signature: (x(n); y(n); w(n); longlong maxdeg(); longlong [o]ndeg(); [io]eps(); [o]r(n); longlong [o]ierr(); [o]a(foo); [o]coeffs(bar);[t]xtmp(n);[t]ytmp(n);[t]wtmp(n);[t]rtmp(n); IV max_maxdeg_plus1 => bar)
 
 Fit discrete data in a least squares sense by polynomials
           in one variable. C<x()>, C<y()> and C<w()> must be of the same type.
@@ -1581,7 +1569,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1580 "slatec.pd"
+#line 1568 "slatec.pd"
 
 =head1 AUTHOR
 
@@ -1594,7 +1582,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 1598 "Slatec.pm"
+#line 1586 "Slatec.pm"
 
 # Exit with OK status
 

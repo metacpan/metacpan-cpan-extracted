@@ -24,7 +24,7 @@ Der Name der Foto-Datei bleibt als Bestandteil erhalten
 
 =item *
 
-Jedes Foto erhält eine eindeutige Zahl als Präfix
+Jedes Foto erhält eine fortlaufende, eindeutige Zahl als Präfix
 
 =item *
 
@@ -52,7 +52,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.214';
+our $VERSION = '1.215';
 
 use Quiq::Path;
 use Quiq::LockedCounter;
@@ -148,7 +148,7 @@ sub add {
         # Bilddatei nach JPEG wandeln
         
         my $sh = Quiq::Shell->new;
-        $sh->exec("convert '$file' '$file.jpg'");
+        $sh->exec(qq/convert "$file" "$file.jpg"/);
         $p->delete($file);
         $file = "$file.jpg";
     }
@@ -206,7 +206,7 @@ sub addAllByTime {
 
 =head1 VERSION
 
-1.214
+1.215
 
 =head1 AUTHOR
 

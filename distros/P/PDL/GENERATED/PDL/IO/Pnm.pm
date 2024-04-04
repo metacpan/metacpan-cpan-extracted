@@ -60,6 +60,7 @@ sub dmax {
 }
 #line 62 "Pnm.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -387,7 +388,7 @@ the copyright notice should be included in the file.
 =cut
 
 ############################## END PM CODE ################################
-#line 391 "Pnm.pm"
+#line 392 "Pnm.pm"
 
 # Exit with OK status
 

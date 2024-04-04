@@ -16,6 +16,7 @@ t/cv.t
 t/dist.t
 t/eof.t
 t/eol.t
+t/fixme.t
 t/gv.t
 t/links.t
 t/manifest.t
@@ -24,11 +25,12 @@ t/no404s.t
 t/noopentickets.t
 t/noplan.t
 t/pod-cm.t
+t/pod-snippets.t
 t/pod-spelling.t
+t/pod-synopsis.t
 t/pod.t
 t/port.t
 t/request.t
-t/snippets.t
 t/strict.t
 t/ua.t
 t/used.t

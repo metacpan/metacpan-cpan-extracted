@@ -1,0 +1,87 @@
+{
+   "abstract" : "Easily send emails from Mojolicious applications",
+   "author" : [
+      "Mark Tyrrell <mark@tyrrminal.dev>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-SendEmail",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::SASL" : "2.16",
+            "Email::Sender::Transport::SMTP" : "2.601",
+            "Email::Stuffer" : "0.020",
+            "Mojolicious" : "9.00",
+            "Params::Util" : "1.05",
+            "perl" : "5.026000"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "List::MoreUtils" : "0.430",
+            "Test2::Suite" : "0.000155",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::SendEmail" : {
+         "file" : "lib/Mojolicious/Plugin/SendEmail.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tyrrminal/mojolicious-plugin-sendemail/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tyrrminal/mojolicious-plugin-sendemail.git",
+         "web" : "https://github.com/tyrrminal/mojolicious-plugin-sendemail.git"
+      }
+   },
+   "version" : "0.02",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "MIT"
+}
+

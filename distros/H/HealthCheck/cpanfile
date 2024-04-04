@@ -4,7 +4,7 @@ requires 'parent';
 requires 'Carp';
 
 requires 'Hash::Util::FieldHash';
-requires 'List::Util', '>= 1.43';
+requires 'List::Util', '>= 1.63';
 requires 'Time::HiRes';
 
 on test => sub {

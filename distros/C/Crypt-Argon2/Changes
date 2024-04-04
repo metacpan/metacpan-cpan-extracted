@@ -1,5 +1,8 @@
 Revision history for Crypt-Argon2
 
+0.021     2024-04-03 23:39:28+02:00 Europe/Brussels
+          - Fix documentation of argon2_needs_rehash argument order
+
 0.020     2023-10-29 18:28:53+01:00 Europe/Brussels
           - Only enable optimization when building in CPAN client
 

@@ -1,0 +1,2 @@
+:# content.tex.tx
+<: $data.content :>

@@ -1,5 +1,5 @@
 package App::Sky::Config::Validate;
-$App::Sky::Config::Validate::VERSION = '0.4.2';
+$App::Sky::Config::Validate::VERSION = '0.4.3';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ use Carp ();
 use Moo;
 use MooX 'late';
 
-use Scalar::Util qw(reftype);
+use Scalar::Util    qw(reftype);
 use List::MoreUtils qw(notall);
 
 has 'config' => ( isa => 'HashRef', is => 'ro', required => 1, );
@@ -127,7 +127,7 @@ App::Sky::Config::Validate - validate the configuration.
 
 =head1 VERSION
 
-version 0.4.2
+version 0.4.3
 
 =head1 METHODS
 

@@ -9,14 +9,7 @@ use File::Slurper qw(read_text);
 use JSON;
 use parent 'Test::Builder::Module'; # Included in Test::Simple
 
-use version; our $VERSION = qv('0.0.4');
-
-# Other recommended modules (uncomment to use):
-#  use IO::Prompt;
-#  use Perl6::Export;
-#  use Perl6::Slurp;
-#  use Perl6::Say;
-
+use version; our $VERSION = qv('0.0.5');
 
 # Module implementation here
 
@@ -31,8 +24,8 @@ sub new {
 	      _user => $user,
 	      _name => $name };
   my $repo_dir =  "$tmp_dir/$user-$name";
-  `rm -rf $repo_dir` if -d $repo_dir;
-  `git clone $repo $repo_dir`;
+  croak "$repo_dir already exists" if -d $repo_dir;
+  Git::command_oneline( ['clone', $repo, $repo_dir] );
   croak "Couldn't download repo" if !(-d $repo_dir);
   my $student_repo =  Git->repository ( Directory => $repo_dir );
   my @repo_files = $student_repo->command("ls-files");
@@ -65,7 +58,7 @@ sub has_milestones {
   my $tb = $self->{'_tb'};
   my $user = $self->{'_user'};
   my $repo = $self->{'_name'};
-  my $page = get_github( "https://github.com/$user/$repo/milestones" );
+  my $page = $self->get_github( "https://github.com/$user/$repo/milestones" );
   my ($milestones ) = ( $page =~ /(\d+)\s+Open/);
   $tb->cmp_ok( $milestones, ">=", $how_many, $message);
 }
@@ -77,17 +70,18 @@ sub issues_well_closed {
   my $user = $self->{'_user'};
   my $repo = $self->{'_name'};
 
-  my $page = get_github( "https://github.com/$user/$repo".'/issues?q=is%3Aissue+is%3Aclosed' );
+  my $page = $self->get_github( "https://github.com/$user/$repo".'/issues?q=is%3Aissue+is%3Aclosed' );
   my (@closed_issues ) = ( $page =~ m{<a\s+(id=\"issue_\d+_link\")}gs );
   for my $i (@closed_issues) {
     my ($issue_id) = ($i =~ /issue_(\d+)_link/);
 
-    $tb->ok(closes_from_commit($user,$repo,$issue_id),"El issue $issue_id se ha cerrado desde commit")
+    $tb->ok($self->closes_from_commit($issue_id),"El issue $issue_id se ha cerrado desde commit")
   }
 
 }
 
 sub get_github {
+  my $self = shift;
   my $url = shift;
   my $page = `curl -ss $url`;
   croak "No pude descargar la página" if !$page;
@@ -95,8 +89,8 @@ sub get_github {
 }
 
 sub closes_from_commit {
-  my ($user,$repo,$issue) = @_;
-  my $page = get_github( "https://github.com/$user/$repo/issues/$issue" );
+  my ($self,$issue) = @_;
+  my $page = $self->get_github( "https://github.com/" . $self->{'_user'} ."/" .$self->{'_repo'}."/issues/$issue" );
   return $page =~ /closed\s+this\s+in/gs ;
 }
 
@@ -165,7 +159,9 @@ App::GitHub::Repository requires no configuration files or environment variables
 
 =head1 DEPENDENCIES
 
-C<git> and C<curl> need to be installed in the system before using this.
+The system needs to have `curl` installed and available.
+
+Use C<./Build installdeps> to install all dependencies>
 
 
 =head1 INCOMPATIBILITIES

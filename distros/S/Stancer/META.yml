@@ -1,0 +1,53 @@
+---
+abstract: 'Stancer Perl library'
+author:
+  - 'Joel Da Silva <jdasilva@cpan.org>'
+build_requires:
+  Cwd: '0'
+  DateTime::Span: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Class: '0.50'
+  Test::MockObject: '0'
+  Test::MockObject::Extends: '0'
+  Test::More: '0'
+  Test::Most: '0.35'
+  perl: '5.033006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.033006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Stancer
+requires:
+  Carp: '0'
+  DateTime: '1.57'
+  JSON: '4.00'
+  LWP::Protocol::https: '6.04'
+  LWP::UserAgent: '6.05'
+  List::MoreUtils: '0.418'
+  Log::Any: '1.704'
+  Moo: '2.005005'
+  MooX::Types::MooseLike::Base: '0.26'
+  Scalar::Util: '0'
+  Storable: '0'
+  Throwable: '0.200012'
+  Try::Tiny: '0.22'
+  namespace::clean: '0.25'
+  perl: '5.033006'
+resources:
+  bugtracker: https://gitlab.com/wearestancer/library/lib-perl/-/issues
+  repository: https://gitlab.com/wearestancer/library/lib-perl
+version: 1.0.3
+x_contributors:
+  - 'Joël DA SILVA <jdasilva@corp.free.fr>'
+  - 'Nicolas VINOT <nvinot@stancer.com>'
+x_generated_by_perl: v5.34.3
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: Artistic-2.0

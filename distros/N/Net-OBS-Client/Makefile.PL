@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-WriteMakefile(
+%::d =  (
     NAME             => 'Net::OBS::Client',
     AUTHOR           => q{Frank Schreiner <frank@samaxi.de>},
     VERSION_FROM     => 'lib/Net/OBS/Client.pm',
@@ -30,7 +30,21 @@ WriteMakefile(
         'HTTP::Cookies'       =>  0,
         'URI::URL'            =>  0,
         'Path::Class'         =>  0,
+        'Const::Fast'         =>  0,
+    },
+    META_MERGE    => {
+        'meta-spec' => { version => 2 },
+         resources => {
+             repository => {
+                 type => 'git',
+                 url  => 'https://github.com/M0ses/Net-OBS-Client.git',
+                 web  => 'https://github.com/M0ses/Net-OBS-Client',
+             },
+             bugtracker => {web => 'https://github.com/M0ses/Net-OBS-Client/issues'},
+         },
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Net-OBS-Client-*' },
 );
+WriteMakefile(%::d) if $0 =~ m#^(?:.*/)?Makefile.PL$#;
+1;

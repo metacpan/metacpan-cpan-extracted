@@ -1,6 +1,6 @@
 #!perl
 use 5.020;
-use Test2::V0;
+use Test2::V0 '-no_srand';
 use Data::Dumper;
 
 use HTTP::Request;

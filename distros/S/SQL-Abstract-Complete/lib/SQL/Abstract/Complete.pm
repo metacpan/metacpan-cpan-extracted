@@ -11,7 +11,7 @@ use Storable 'dclone';
 use vars '@ISA';
 @ISA = 'SQL::Abstract';
 
-our $VERSION = '1.08'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 sub new {
     my $self = shift;
@@ -35,7 +35,11 @@ sub _sqlcase {
 
 sub select {
     my ( $self, $tables, $columns, $where, $meta ) = @_;
+
+    $columns //= '*';
+    $columns = [$columns] unless ( ref $columns );
     $columns = ['*'] unless ( $columns and @{$columns} > 0 );
+
     $tables  = dclone($tables) if ( ref $tables );
 
     my $columns_sql = $self->_sqlcase('select') . ' ' . _wipe_space(
@@ -160,7 +164,7 @@ SQL::Abstract::Complete - Generate complete SQL from Perl data structures
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =for markdown [![test](https://github.com/gryphonshafer/SQL-Abstract-Complete/workflows/test/badge.svg)](https://github.com/gryphonshafer/SQL-Abstract-Complete/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/SQL-Abstract-Complete/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/SQL-Abstract-Complete)
@@ -300,6 +304,9 @@ There are several ways to specify fields and their respective aliases:
             { 'three' => 'col_three' },
         ],
     );
+
+If this input is undefined, it will be interpretted as C<[*]>; and if this
+input is a scalar string, it will be interpretted as that string in an arrayref.
 
 =item \%where
 

@@ -1,3 +1,10 @@
+0.03 2024-03-29T16:01:21+01:00
+ - Add missing dot in doc.
+ - Improve doc for constructor.
+ - Move bugtracker to Github.
+ - Move valid tests to top.
+ - Rewrite check of error to Mo::utils.
+
 0.02 2024-03-16T00:58:37+01:00
  - Rename example file names to better names.
  - Rewrite second example in doc to better version.

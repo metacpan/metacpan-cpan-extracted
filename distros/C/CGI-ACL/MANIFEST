@@ -16,6 +16,7 @@ t/coverage.t
 t/critic.t
 t/cv.t
 t/dist.t
+t/eof.t
 t/eol.t
 t/gv.t
 t/ip.t
@@ -28,6 +29,7 @@ t/noop.t
 t/noopentickets.t
 t/noplan.t
 t/pod-cm.t
+t/pod-synopsis.t
 t/pod.t
 t/pod_spelling.t
 t/port.t

@@ -1,0 +1,50 @@
+{
+  "amount": 7810,
+  "auth": null,
+  "card": {
+    "brand": "visa",
+    "country": "US",
+    "created": 1563811990,
+    "exp_month": 1,
+    "exp_year": 2032,
+    "id": "card_nsA0eap90E6HRod6j54pnVWg",
+    "last4": "4242",
+    "live_mode": false,
+    "name": null,
+    "zip_code": null
+  },
+  "country": "",
+  "created": 1563811990,
+  "currency": "usd",
+  "customer": {
+    "country": null,
+    "created": 1563811990,
+    "email": "jckenobi@example.com",
+    "id": "cust_6FbQaYtxjADzerqdO5gs79as",
+    "mobile": null,
+    "name": "Jean Charles Kenobi"
+  },
+  "description": "Automatic test, 78.10 USD",
+  "id": "paym_FQgpGVJpyGPVJVIuQtO3zy6i",
+  "live_mode": false,
+  "method": "card",
+  "order_id": null,
+  "refunds": [
+    {
+      "amount": 4810,
+      "created": 1563983739,
+      "currency": "usd",
+      "id": "refd_4DjKQJefwKnWFjbttj1Sy0iP",
+      "status": "to_refund"
+    },
+    {
+      "amount": 3000,
+      "created": 1563983740,
+      "currency": "usd",
+      "id": "refd_THvpT5pWZMnDFD47GsanGan9",
+      "status": "refunded"
+    }
+  ],
+  "response": "00",
+  "status": "to_capture"
+}

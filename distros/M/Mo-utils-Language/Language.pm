@@ -11,7 +11,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(check_language check_language_639_1 check_language_639_2);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub check_language {
 	my ($self, $key) = @_;
@@ -87,7 +87,7 @@ Mo::utils::Language - Mo language utilities.
 
 =head1 SYNOPSIS
 
- use Mo::utils::Language qw(check_language);
+ use Mo::utils::Language qw(check_language check_language_639_1 check_language_639_2);
 
  check_language($self, $key);
  check_language_639_1($self, $key);
@@ -154,7 +154,7 @@ Returns undef.
  my $self = {
          'key' => 'en',
  };
- check_language($self, 'en');
+ check_language($self, 'key');
 
  # Print out.
  print "ok\n";
@@ -197,7 +197,7 @@ Returns undef.
  my $self = {
          'key' => 'en',
  };
- check_language_639_1($self, 'en');
+ check_language_639_1($self, 'key');
 
  # Print out.
  print "ok\n";
@@ -240,7 +240,7 @@ Returns undef.
  my $self = {
          'key' => 'eng',
  };
- check_language_639_2($self, 'eng');
+ check_language_639_2($self, 'key');
 
  # Print out.
  print "ok\n";
@@ -315,6 +315,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

@@ -1,5 +1,17 @@
 Revision history for Perl extension CPAN-Audit
 
+20240401.002 2024-04-01T12:27:17Z
+	* Fix some incorrect data in CPANSA-HTTP-Body-2013-4407 (CVE report
+	is wrong). From Stig in briandfoy/cpan-security-advisory#150 .
+
+20240401.001 2024-04-01T11:50:11Z
+	* data update for 2024-04-01
+	* fix data issue for Mojolicious report (briandfoy/cpan-security-advisory#149)
+	(Timothy Legge)
+
+20240329.002 2024-03-29T12:08:01Z
+	* Data update for 2024-03-29
+
 20240318.001 2024-03-19T01:54:37Z
 	* Data update for 2024-03-18
 	* CVE-2013-4184 for Data::UUID is resolved by 1.227

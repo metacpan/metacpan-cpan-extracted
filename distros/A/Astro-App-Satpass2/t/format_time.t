@@ -5,7 +5,7 @@ use warnings;
 
 use lib qw{ inc };
 
-use Test::More 0.88;
+use Test2::V0;
 use My::Module::Test::App;
 
 use Astro::App::Satpass2::FormatTime;

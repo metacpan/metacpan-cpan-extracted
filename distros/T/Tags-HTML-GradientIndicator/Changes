@@ -1,3 +1,11 @@
+0.03 2024-03-27T17:18:08+01:00
+ - API Change: Change 'height' and 'width' parameters to CSS unit.
+ - Remove obsolete module use in test.
+ - Remove usage of Tags::Output::Raw.
+ - Rename example files to better names.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.02 2021-06-16T14:33:51+02:00
  - Add 'css_background_image' constructor parameter.
  - Add basic tests (constructor and process).

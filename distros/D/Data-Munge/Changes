@@ -1,5 +1,15 @@
 Revision history for Data-Munge
 
+0.101   2024-04-04
+        * Work around a warning in the development version of perl (thanks,
+          Shlomi Fish). [RT#152677]
+
+0.10    2023-03-21
+        * Drop dependency on 'base' and 'Test::More'; switch to 'Test2::V0'
+          instead.
+        * Update links in documentation.
+        * Autogenerate README from POD.
+
 0.097   2017-03-17
         * Don't require '.' in @INC during install.
 

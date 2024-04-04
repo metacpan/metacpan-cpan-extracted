@@ -1,5 +1,5 @@
 package YA::CLI::ActionRole;
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 use Moo::Role;
 use namespace::autoclean;
 
@@ -87,7 +87,7 @@ YA::CLI::ActionRole - Action handler role
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

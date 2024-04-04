@@ -2,6 +2,12 @@ Revision history for YA-CLI
 
 TODO: Port to Object::Pad / Corrina
 
+0.007     2024-04-03 01:30:12Z
+
+    * Allow skipping none plugin modules
+    * Fix bug where --help or --man where supplied on the main binary without a
+      default action. This now runs the correct option (with propper exit code)
+
 0.006     2024-03-23 00:01:38Z
 
     * Allow actions which have both subcommands and not, eg

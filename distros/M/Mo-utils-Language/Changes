@@ -1,3 +1,7 @@
+0.06 2024-04-03T17:32:05+02:00
+ - Fix EXAMPLES in doc.
+ - Fix SYNOPSIS section in doc.
+
 0.05 2024-03-23T18:45:21+01:00
  - Add check_language_639_1() and check_language_639_2() checks.
  - Fix output of example in doc.

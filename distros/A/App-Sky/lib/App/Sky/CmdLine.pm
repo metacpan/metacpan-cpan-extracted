@@ -1,5 +1,5 @@
 package App::Sky::CmdLine;
-$App::Sky::CmdLine::VERSION = '0.4.2';
+$App::Sky::CmdLine::VERSION = '0.4.3';
 use strict;
 use warnings;
 
@@ -208,7 +208,7 @@ App::Sky::CmdLine - command line program
 
 =head1 VERSION
 
-version 0.4.2
+version 0.4.3
 
 =head1 METHODS
 

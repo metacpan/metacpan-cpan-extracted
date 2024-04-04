@@ -49,9 +49,9 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0,
     "Test::NoWarnings" => 0,
-    "Test::PDL" => "0.10"
+    "Test::PDL" => "0.20"
   },
-  "VERSION" => "0.027",
+  "VERSION" => "0.028",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -83,7 +83,7 @@ my %FallbackPrereqs = (
   "Test::Exception" => 0,
   "Test::More" => 0,
   "Test::NoWarnings" => 0,
-  "Test::PDL" => "0.10",
+  "Test::PDL" => "0.20",
   "UUID::Tiny" => 0,
   "XSLoader" => 0,
   "integer" => 0,

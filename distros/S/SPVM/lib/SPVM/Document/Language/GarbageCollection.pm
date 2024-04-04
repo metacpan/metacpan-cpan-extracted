@@ -1,6 +1,6 @@
 =head1 Name
 
-SPVM::Document::Language::GarbageCollection - Garbage Collection in The SPVM Language
+SPVM::Document::Language::GarbageCollection - Garbage Collection in the SPVM Language
 
 =head1 Description
 
@@ -32,6 +32,16 @@ Reference counts incremented by assignments to local variables are decremented a
     
     # The reference count of $object is decremented by 1 at the end of this scope
   }
+
+=head2 Assignment
+
+An assignment operator changes the reference count of the left operand and the right operand.
+
+  LEFT_OPERAND = RIGHT_OPERAND
+
+If the type of the value owned by I<RIGHT_OPERAND> is an object type and defined, the reference count of the object is incremented by 1.
+
+And if the type of the value owned by I<LEFT_OPERAND> is an object type and defined, the reference count of the object is decremented by 1.
 
 =head2 Scope
 

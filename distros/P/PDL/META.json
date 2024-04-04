@@ -33,8 +33,7 @@
       },
       "configure" : {
          "recommends" : {
-            "ExtUtils::F77" : "1.10",
-            "PGPLOT" : "0"
+            "ExtUtils::F77" : "1.10"
          },
          "requires" : {
             "Carp" : "1.2",
@@ -52,6 +51,7 @@
             "Inline::C" : "0.62",
             "OpenGL" : "0.70",
             "OpenGL::GLUT" : "0.72",
+            "PGPLOT" : "2.29",
             "Term::ReadKey" : "2.34"
          },
          "requires" : {
@@ -95,6 +95,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.085",
+   "version" : "2.086",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

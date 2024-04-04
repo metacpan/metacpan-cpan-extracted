@@ -10,7 +10,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Exporter qw(import);
 our @EXPORT = qw(
@@ -74,13 +74,11 @@ sub new {
 				# if any of auxfiles' or basedir's  total (recursively calculated) file size
 				# exceeds this limit, file copy will be aborted and untemplate() will fail
 				'max-size-for-filecopy' => 3*1024*1024, # bytes
-				# parameters to be passed to the constructor of the templater (e.g. Text::Xslate)
-				'templater-parameters' => {
-					# Text::Xslate syntax to use, it is one of Kolon or TTerse
-					'syntax' => 'Kolon',
-					# the suffix of template files
-					'suffix' => '.tx',
-				},
+				# Saved parameters to be passed
+				# to the constructor of the templater (e.g. Text::Xslate)
+				# there are defaults below
+				# they can be overwritten by param: 'templater-parameters'
+				'templater-parameters' => {},
 			},
 			'log' => {
 				'logger_object' => undef,
@@ -103,6 +101,8 @@ sub new {
 	# Now we have a logger
 	my $log = $self->log();
 
+	my $options = $self->options();
+
 	# check for some required fields in params:
 	if( ! defined($self->options($params)) ){ $log->error(perl2dump($params)."${whoami} (via $parent), line ".__LINE__." : error, failed to parse input parameters, see above."); return undef }
 
@@ -112,6 +112,30 @@ sub new {
 
 	# this will instantiate objects we store etc. (if any)
 	if( $self->init() ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, call to init() has failed."); return undef }
+
+	# user can set Text::Xslate constructor parameters via 'templater-parameters'
+	# these are our defaults
+	$options->{'templater-parameters'}->{'warn_handler'} = sub { $log->warn($_[0]) };
+	$options->{'templater-parameters'}->{'die_handler'} = sub { $log->error($_[0]); die $_[0] };
+	$options->{'templater-parameters'}->{'verbose'} = $verbosity;
+	# Text::Xslate syntax to use, it is one of Kolon or TTerse
+	# Kolon is used in all our tests!
+	$options->{'templater-parameters'}->{'syntax'} = 'Kolon';
+	# the suffix of template files
+	$options->{'templater-parameters'}->{'suffix'} = '.tx';
+	# stop silly-escaping for html or xml,
+	# this makes the use of mark_raw redundant ouph!
+	$options->{'templater-parameters'}->{'type'} = 'text';
+	# note: you can specify functions to be called in the template
+	#'function' => {
+	#	'templatedir' => sub { # it takes an input param as input $args }
+	#}
+	# and make shallow copies of whatever params the user specified:
+	if( exists($params->{'templater-parameters'}) && defined($params->{'templater-parameters'}) ){
+		if( ref($params->{'templater-parameters'}) ne 'HASH' ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, input parameter 'templater-parameters' must be a HASHref."); return undef }
+		# warning: shallow copy!
+		for my $k (keys %{ $params->{'templater-parameters'} }){ $options->{'templater-parameters'}->{$k} = $params->{'templater-parameters'}->{$k} }
+	}
 
 	# required input parameter 'processors' must be a hash
 	#   keys: id of the processor, just a name.
@@ -629,11 +653,11 @@ sub init {
 
 ####################################################################################
 # It creates the templater object if not exists
-# and adds these templates to it.
-# Templates can be specified by means of the
+# and adds any specified templates to it.
+# Templates can be specified by means of the parameters key:
 #   'processors'
-# input parameter which is a HASH whose *KEYS* are:
-#   1. the key is an name/nickname/alias for each template/latex/pdf item it contains.
+# whose value is a HASH whose *KEYS* are:
+#   1. the key is a name/nickname/alias for each template/latex/pdf item it contains.
 # ... and its *VALUES* are: a HASH with these 3 items:
 #   1. 'latex' : info about the latex src file TO BE PRODUCED (from template).
 #                it can contain 'filename', 'basedir' and 'latex-driver-parameters'
@@ -650,6 +674,14 @@ sub init {
 #                 'filename' and 'basedir' (defaults will be used if none specified).
 #                 NOTE: 'filename' is not a path it is just a filename
 #                 (relative to whatever outdir specified)
+#
+# Parameters to the constructor of Text::Xslate are held
+# in $self->options()->{'templater-parameters'}
+# and should have been specified via our constructor's
+# parameters with a hash keyed on 'templater-parameters'.
+# See Text::Xslate constructor documentation at
+#   https://metacpan.org/pod/Text::Xslate#Text::Xslate-%3Enew(%25options)
+# for the list of options.
 #
 # It returns undef on failure, the templater object on success
 # (on success it saves the templater obj to self, on failure it does not change the previous)
@@ -686,6 +718,7 @@ sub _init_processors_data {
 
 	my $log = $self->log();
 	my $verbosity = $self->verbosity();
+	my $options = $self->options();
 
 	my (@filenames, $ak, $av, $m, %xslate_vpaths);
 	if( ! exists($params->{'processors'}) || ! defined($params->{'processors'})
@@ -750,24 +783,24 @@ sub _init_processors_data {
 			# if you want it at ./xx then set it via filepath
 			if( File::Spec->splitdir($af) > 1 ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, item '$group'->'filename' ($af) must be a filename (and not a filePATH, it should not contain any directory components)."); return undef }
 			$latex_info{'filename'} = $af;
-			$latex_info{'basedir'}  = $self->options()->{'tempdir'};
+			$latex_info{'basedir'}  = $options->{'tempdir'};
 			$latex_info{'filepath'} = File::Spec->catfile(
 				$latex_info{'basedir'},
 				$latex_info{'filename'}
 			);
 		} else {
 			# nothing was specifed we use tempdir and a default latex filename
-			$latex_info{'basedir'}  = $self->options()->{'tempdir'};
-			$latex_info{'filename'} = $self->options()->{$group}->{'filename'};
+			$latex_info{'basedir'}  = $options->{'tempdir'};
+			$latex_info{'filename'} = $options->{$group}->{'filename'};
 			$latex_info{'filepath'} = File::Spec->catfile(
 				$latex_info{'basedir'},
 				$latex_info{'filename'}
 			);
 		}
 		# also in this group we have the latex driver parameters
-		$latex_info{'latex-driver-parameters'} = Storable::dclone($self->options()->{$group}->{'latex-driver-parameters'});
+		$latex_info{'latex-driver-parameters'} = Storable::dclone($options->{$group}->{'latex-driver-parameters'});
 		if( exists($al->{'latex-driver-parameters'}) && defined($af=$al->{'latex-driver-parameters'}) ){
-			for(keys %{ $self->options()->{$group}->{'latex-driver-parameters'} }){
+			for(keys %{ $options->{$group}->{'latex-driver-parameters'} }){
 				if( exists($af->{$_}) && defined($af->{$_}) ){ $latex_info{'latex-driver-parameters'}->{$_} = $af->{$_} }
 			}
 		}
@@ -880,21 +913,13 @@ sub _init_processors_data {
 		# and save to self under '_private'->'processors'->'loaded-info' ...
 		$LI->{$ak} = \%loaded_info;
 	}
-	my %parms = (
-		# stop silly-escaping for html or xml, this makes the use of mark_raw redundant
-		'type' => 'text',
-		# set the syntax
-		'syntax' => $self->templater_parameters('syntax'),
-		'verbose' => $verbosity,
-		'suffix' => $self->templater_parameters('suffix'),
-		'warn_handler' => sub { $log->warn($_[0]) },
-		'die_handler' => sub { $log->error($_[0]); die $_[0] },
-
-		# note: you can specify functions to be called in the template
-		#'function' => {
-		#	'templatedir' => sub { # it takes an input param as input $args }
-		#}
-	);
+	# these are default params to the Text::Xslate constructor,
+	# next we will add all those set via construction parameters (keyed under 'templater-parameters')
+	if( ! exists($options->{'templater-parameters'}) || ! defined($options->{'templater-parameters'}) ){ $log->info("${whoami} (via $parent), line ".__LINE__." : error, there is no option 'templater-parameters'! Something is seriously wrong."); return undef }
+	my %parms = ( %{ $options->{'templater-parameters'} } );
+	# WARNING: we don't want to make any permanent changes to the $options->{'templater-parameters'}
+	# so make sure you don't modify anything permanently, e.g. $options->{'templater-parameters'}->{'path'}!
+	# as it is now, 'path' is not modified permanently:
 	if( (scalar(keys %xslate_vpaths) > 0) || (scalar(keys %template_inc_paths) > 0) ){
 		# using 'path' we achieve caching for both diskfiles and inmemory
 		# otherwise inmemory need render_string() which does not cache like render() does.
@@ -905,8 +930,15 @@ sub _init_processors_data {
 		for (sort keys %xslate_vpaths){
 			push @tmp, {$_ => $xslate_vpaths{$_} }
 		}
-		$parms{'path'} = \@tmp;
+		if( exists($parms{'path'}) && defined($parms{'path'}) ){
+			# just a sanity check
+			if( ref($parms{'path'}) ne 'ARRAY' ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, parameter to Text::Xslate 'path' must be an ARRAYref of paths."); return undef }
+			# yes we have already a set of paths, add to it
+			push @{$parms{'path'}} , @tmp;
+		} else { $parms{'path'} = \@tmp }
 	}
+
+	if( $verbosity > 1 ){ $log->info(perl2dump(\%parms)."\n--end parameters.\n${whoami} (via $parent), line ".__LINE__." : creating the Text::Xslate object with above parameters ...") }
 
 	my $tobj = Text::Xslate->new(\%parms);
 	if( ! defined $tobj ){ log->error(perl2dump(\%parms)."\n--end parameters.\n${whoami} (via $parent), line ".__LINE__." : error, call to ".'Text::Xslate->new()'." has failed for above parameters."); return undef }
@@ -934,7 +966,7 @@ sub options {
 	my $whoami = ( caller(0) )[3];
 
 	my ($x, $y);
-	my $dst = $self->{'_private'}->{'options'};
+	my $dst = $self->options();
 
 	if( exists($src->{'latex'}) && defined($x=$src->{'latex'}) ){
 		if( ref($x) ne 'HASH' ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, key 'latex' must be a HASH."); return undef }
@@ -965,7 +997,14 @@ sub options {
 
 	# check templater parameters
 	if( exists($src->{'templater-parameters'}) && defined($x=$src->{'templater-parameters'}) ){
-		if( ! defined $self->templater_parameters($x) ){ $log->error(perl2dump($x)."${whoami} (via $parent), line ".__LINE__." : error, failed to set templater parameters to above data."); return undef }
+		my $tem = $dst->{'templater-parameters'};
+		for my $k (keys %$x){
+			my $r = ref($x->{$k});
+			# we deep clone only ARRAY and HASH,
+			# we can have scalars and coderefs. dclone() can not clone coderefs, so:
+			if( $r =~ /^HASH|ARRAY$/ ){ $tem->{$k} = Storable::dclone($x->{$k}) }
+			else { $tem->{$k} = $x->{$k} }
+		}
 	}
 	return $dst
 }
@@ -1070,29 +1109,6 @@ sub max_size_for_filecopy {
 	return $self->options()->{'max-size-for-filecopy'}
 }
 
-# Sets or gets ALL or by-name templater parameters e.g. 'syntax'
-# $m can be a hash : then all parameters are set to this hash
-# $m can be a scalar and $n is omitted : then the value for '$m' parameter is returned
-# $m and $n are both scalars : it sets parameter '$m' to value '$n'
-sub templater_parameters {
-	my ($self, $m, $n) = @_;
-	my $log = $self->log();
-	my $parent = ( caller(1) )[3] || "N/A";
-	my $whoami = ( caller(0) )[3];
-	if( defined $m ){
-		my $o = $self->options();
-		# perhaps copy only known keys?
-		if( ref($m) eq 'HASH' ){
-			for (keys %$m){ $o->{'templater-parameters'}->{$_} = $m->{$_} }
-			return $m;
-		} elsif( ref($m) eq '' ){
-			if( defined($n) ){ $o->{'templater-parameters'}->{$m} = $n }
-			else { return $o->{'templater-parameters'}->{$m} }
-		} else { $log->error("${whoami} (via $parent), line ".__LINE__." : error, the first parameter must be a HASHref or the first parameter can be a SCALAR with or without the second parameter."); return undef }
-	}
-	return $self->options()->{'templater-parameters'}
-}
-
 # returns the current verbosity level optionally setting its value
 # Value must be an integer >= 0
 # setting a verbosity level will also spawn a chain of other debug subs,
@@ -1123,7 +1139,7 @@ LaTeX::Easy::Templates - Easily format content into PDF/PS/DVI with LaTeX templa
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 
@@ -1447,8 +1463,66 @@ given by the OS.
 is to log messages to the console (STDOUT, STDERR).
 
 =item * B<logger_object> : supply a L<Mojo::Log> object to use as the logger.
-In fact any object implementing C<error()>, C<warn()> and C<info()> like
-L<Mojo::Log> does will be accepted.
+In fact any object implementing just these three: C<error()>, C<warn()> and C<info()>, which
+L<Mojo::Log> does, will be accepted.
+
+=item * B<templater-parameters> : a HASH containing parameters to be
+passed on to the L<Text::Xslate> constructor. 
+
+These are some common templater paramaters:
+
+=over 2
+
+=item * B<syntax> : specify the template syntax to be either L<Kolon|Text::Xslate::Syntax::Kolon> or C<TTerse|Text::Xslate::Syntax::TTerse>. Default is C<Kolon>.
+
+=item * B<suffix> : specify the template files suffix. Default is C<.tx> (do not forget the dot).
+
+=item * B<verbose> : set the verbosity of L<Text::Xslate>.
+Default is the verbosity level currently set in the
+L<LaTeX::Easy::Templates> object.
+
+=item * B<path> : an array(ref) of paths to be searched for included templates. This is crucial
+when templates are including other templates in different directories.
+
+=item * B<function>, B<module> : specify your own perl functions and modules you want to use
+from within a template. That's very handy in overcoming the limitations of the template syntax.
+
+=back
+
+See L<Text::Xslate#Text::Xslate-%3Enew(%options)> for all the supported options.
+
+=over 2
+
+=item * B<path> : an array of paths to be searched for on-disk template
+files which are dependencies, i.e. they are included by other templates (in-memory or on-disk).
+This is very important if your main template includes other templates which
+are in different directories.
+
+=item * B<syntax> : the template syntax. Default is 'Kolon'.
+
+=item * B<function>, B<module> : a hash of user-specified or built-in perl functions (coderefs)
+to be used in the templates. And a list of modules to be included for using these.
+Quite a powerful feature of L<Text::Xslate>.
+
+=item * B<cache>, B<cache_dir> : cache level and location.
+
+=item * B<line_start>, B<tag_start>, B<line_end>, B<tag_end> : the token strings denoting
+the start and end of lines and tags.
+
+=back
+
+For example:
+
+      'templater-parameters' => {
+        # dependent templates search paths
+        'path' => ['a/b/c', 'x/y/z', ...],
+        # user-specified functions to be called
+        # from a template
+        'function' => {
+          'xyz' => sub { my (@params) = @_; ...; return ... }
+        },
+        ...
+      },
 
 =back
 
@@ -1545,11 +1619,9 @@ passed to the constructor (L</new()>).
 
 =back
 
-=head3 RETURN
+On failure, L</untemplate()> returns C<undef>.
 
-On failure, L</untemplate()> returns back C<undef>.
-
-On success, it returns back a hash(ref) with two entries:
+On success, it returns a hash(ref) with two entries:
 
 =over 2
 
@@ -1592,11 +1664,9 @@ passed to the constructor (L</new()>).
 
 =back
 
-=head3 RETURN
+On failure, L</format()> returns C<undef>.
 
-On failure, L</format()> returns back C<undef>.
-
-On success, it returns back a hash(ref) with three entries:
+On success, it returns a hash(ref) with three entries:
 
 =over 2
 
@@ -1650,41 +1720,6 @@ is supported.
 Reset the templater object which means to forget all the templates
 it knows and had possibly loaded in memory. After a reset all
 "processors" will be forgotten as well.
-
-=head2 C<templater_parameters($m, $n)>
-
-It gets or sets (with optional parameter C<$m> and possiblt C<$n>) the
-parameters to be passed to the templater's
-(L<Text::Xslate>) constructor:
-
-=over 2
-
-=item * If no parameter is specified then it returns all the parameters as a hash(ref).
-
-=item * If the first parameter is a hash, then its copies all its entries possibly
-overwriting existing values.
-
-=item * If the first parameter is a scalar and the second is omitted then it returns
-the value for this parameter if it exists.
-
-=item * If the first parameter is a scalar and the second is a scalar then it sets
-the value for this parameter to the second parameter.
-
-=back
-
-These are some common templater paramaters:
-
-=over 2
-
-=item * B<syntax> : specify the template syntax to be either L<Kolon|Text::Xslate::Syntax::Kolon> or C<TTerse|Text::Xslate::Syntax::TTerse>. Default is C<Kolon>.
-
-=item * B<suffix> : specify the template files suffix. Default is C<.tx> (do not forget the dot).
-
-=item * B<verbose> : set the verbosity. Default is current verbosity.
-
-=back
-
-See L<Text::Xslate#Text::Xslate-%3Enew(%options)> for more.
 
 =head2 C<log($l)>
 
@@ -1740,18 +1775,14 @@ follow its rules. It understands two template syntaxes:
 
 The default syntax is L<Text::Xslate::Syntax::Kolon>. This can be changed
 via the parameters to the constructor of L<LaTeX::Easy::Templates> by
-specifying
+specifying this:
 
   'templater-parameters' => {
       'syntax' => 'Kolon' #or 'TTerse'
   }
 
-or setting it before running L</untemplate()> with
-
-   $latte->templater_parameters('syntax' => 'Kolon');
-
-The data for the template variables comes bundled into a hashref
-which comes bundled into a hashref of a single key C<data>. Therefore
+The B<data> for substituting into the template variables comes bundled into a hashref
+which comes bundled into a hashref keyed under the name "C<data>". Therefore
 all references must be preceded by key C<data.>
 
 So if your template data is this:
@@ -1762,14 +1793,22 @@ So if your template data is this:
 
 Then your template will access C<name>'s value via C< <: $data.name :> >.
 
-L<Text::Xslate> supports loops and conditional statements etc. etc. Read
-the documentation for L<Text::Xslate>'s syntax:
+L<Text::Xslate> supports loops and conditional statements.
+It also offers a lot of L<builtin functions|Text::Xslate::Manual::Builtin>.
+Additionally you can call user-specified perl subs (or subs from other modules)
+from within a template.
+
+Read
+the documentation for L<Text::Xslate>'s syntax
 L<Text::Xslate::Syntax::Kolon> or L<Text::Xslate::Syntax::TTerse>.
 
 =head1 TEMPLATES INCLUDING TEMPLATES
 
 Templates which include other templates are supported.
-Both with in-memory template strings or with on-disk template files.
+
+The included and the includee templates can be a
+combination of on-disk files and/or in-memory strings.
+Which means in-memory templates can include on-disk and vice-versa.
 
 =head2 In-memory templates
 
@@ -1787,7 +1826,7 @@ main template is:
    : }
    \end{document}
 
-It calls two other templates:
+The above I<includes> two other templates:
 
     :# preamble.tex.tx
     \title{ <: $data.title :> }
@@ -1827,10 +1866,11 @@ object like this:
       } # end 'processors'
 
 With the above, all in-memory templates required are loaded in memory.
-All you need now is to specify "C<main.tex.tx>" as the
+All you need now is to specify "C<main.tex.tx>" (which
+is the main entry point) as the
 C<processor> name when
 calling L</untemplate()> or L</format()>. You do not need
-to mention the included template names at all. Like this:
+to mention the included template names at all:
 
     my $ret = $latter->format({
       'template-data' => $template_data,
@@ -1843,19 +1883,36 @@ to mention the included template names at all. Like this:
 
 
 The above functionality is demonstrated and tested in
-file C<t/350-inmemory-template-usage-calling-other-templates.t>
+file C<t/460-inmemory-template-usage-calling-other-templates.t>
 
-=head2 On-disk, file templates
+=head2 On-disk file templates
 
 If both the main template and all templates it includes are in the
 same directory then you only need to specify
-the C<main.tex.tx> template. And all dependencies will
-be taken care of. Like this:
+the C<main.tex.tx> template under key C<processors>
+in the parameters to L<LaTeX::Easy::Templates>'s L<constructor|/new()>.
+In this case all dependencies will
+be taken care of (thank you L<Text::Xslate>).
+
+Additionally, you can specify a list of directories as
+paths to be searched for dependent templates. These I<include paths>
+can be passed on as parameters to L<LaTeX::Easy::Templates>'s
+L<constructor|/new()>, under 
+
+     ...
+     'templater-parameters' => {
+       'path' => ['a/b/c', 'x/y/z', ...]
+     },
+     ...
 
      my $latter = LaTeX::Easy::Template->new({
-      'processors' => {
+       'templater-parameters' => {
+         'path' => ['a/b/c', 'x/y/z', ...],
+         ...
+       },
+       'processors' => {
         # the main entry
-        'main.tex.tx' => {
+         'main.tex.tx' => {
            'template' => {
              'filepath' => '/x/y/z/main.tex.tx'
              # works also with specifying
@@ -1864,12 +1921,12 @@ be taken care of. Like this:
            'output' => {
         	'filename' => 'out.pdf'
            }
-        },
-        # the dependent templates are not needed
-        # to be included if in same dir
-        # include them ONLY if in different dir
-      } # end 'processors'
-
+         },
+         # the dependent templates are not needed
+         # to be included if in same dir
+         # include them ONLY if in different dir
+       } # end 'processors'
+     }); # end constructor
 
 With the above, the "C<main.tex.tx>" template,
 which is the main entry point, is loaded.
@@ -1896,7 +1953,16 @@ to mention the included template names at all. Like this:
 
 
 The above functionality is demonstrated and tested in
-file C<t/360-ondisk-template-usage-calling-other-templates.t>>
+file C<t/360-ondisk-template-usage-calling-other-templates.t>
+
+=head2 Mixed use of in-memory and on-disk templates
+
+One can have a project of mixed, in-memory and on-disk, templates
+one including the other in any combination. This is
+straightforward, just follow the above guidelines.
+
+Mixed templates functionality is demonstrated and tested in
+file C<t/500-mix-template-usage-calling-other-mix-templates.t>.
 
 
 =head1 STARTING WITH LaTeX

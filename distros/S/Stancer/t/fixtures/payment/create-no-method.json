@@ -1,0 +1,25 @@
+{
+  "amount": 10000,
+  "auth": "requested",
+  "country": "",
+  "created": 1562085759,
+  "currency": "eur",
+  "customer": {
+    "country": null,
+    "created": 1562085759,
+    "email": "john.doe@example.com",
+    "id": "cust_IYsHodYTugeBndSIOdm6rnBA",
+    "mobile": null,
+    "name": "John Doe"
+  },
+  "description": "Test payment without any card or sepa account",
+  "device": null,
+  "id": "paym_pia9ossoqujuFFbX0HdS3FLi",
+  "live_mode": false,
+  "method": null,
+  "order_id": null,
+  "redirect_url": null,
+  "response": null,
+  "return_url": null,
+  "status": null
+}

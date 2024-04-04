@@ -19,7 +19,7 @@ my %judge = (
     },
 );
 
-swagger_definition 'Judge' => {
+openapi_definition 'Judge' => {
     type => 'object',
     required => [ 'fullname' ],
     properties => {
@@ -28,7 +28,7 @@ swagger_definition 'Judge' => {
     }
 };
 
-swagger_path {
+openapi_path {
     description => 'Returns information about a judge',
     parameters => [
         {
@@ -59,10 +59,10 @@ swagger_path {
 },
 get '/judge/:judge_name' => sub {
     $judge{ param('judge_name') }
-        ? swagger_template $judge{ param('judge_name') }
-        : swagger_template 404, param('judge_name');
+        ? openapi_template $judge{ param('judge_name') }
+        : openapi_template 404, param('judge_name');
 };
 
-#swagger_auto_discover();
+#openapi_auto_discover();
 
 1;

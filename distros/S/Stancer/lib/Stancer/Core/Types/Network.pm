@@ -1,0 +1,145 @@
+package Stancer::Core::Types::Network;
+
+use 5.020;
+use strict;
+use warnings;
+
+# ABSTRACT: Internal network types
+our $VERSION = '1.0.3'; # VERSION
+
+our @EXPORT_OK = ();
+our %EXPORT_TAGS = ('all' => \@EXPORT_OK);
+
+use Stancer::Core::Types::Helper qw(error_message);
+use Stancer::Exceptions::InvalidIpAddress;
+use Stancer::Exceptions::InvalidPort;
+use Stancer::Exceptions::InvalidUrl;
+use MooX::Types::MooseLike::Base qw();
+use Socket qw(AF_INET AF_INET6 inet_pton);
+
+use namespace::clean;
+
+use Exporter qw(import);
+
+my @defs = ();
+
+push @defs, {
+    name => 'IpAddress',
+    test => sub {
+        my $value = shift;
+
+        return 0 if not defined $value;
+        return 1 if defined inet_pton(AF_INET, $value);
+        return 1 if defined inet_pton(AF_INET6, $value);
+        return 0;
+    },
+    message => error_message('%s is not a valid IP address.'),
+    exception => 'Stancer::Exceptions::InvalidIpAddress',
+};
+
+push @defs, {
+    name => 'Port',
+    subtype_of => 'Int',
+    from => 'MooX::Types::MooseLike::Base',
+    test => sub { $_[0] > 0 && $_[0] <= 65_535 },
+    message => error_message('Must be at less than 65535, %s given.'),
+    exception => 'Stancer::Exceptions::InvalidPort',
+};
+
+push @defs, {
+    name => 'Url',
+    test => sub {
+        my $value = shift;
+
+        return 0 if not defined $value;
+        return $value =~ /^https:\/\//smx;
+    },
+    message => error_message('%s is not a valid HTTPS url.'),
+    exception => 'Stancer::Exceptions::InvalidUrl',
+};
+
+Stancer::Core::Types::Helper::register_types(\@defs, __PACKAGE__);
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Stancer::Core::Types::Network - Internal network types
+
+=head1 VERSION
+
+version 1.0.3
+
+=head1 USAGE
+
+=head2 Logging
+
+
+
+We use the L<Log::Any> framework for logging events.
+You may tell where it should log using any available L<Log::Any::Adapter> module.
+
+For example, to log everything to a file you just have to add a line to your script, like this:
+    #! /usr/bin/env perl
+    use Log::Any::Adapter (File => '/var/log/payment.log');
+    use Stancer::Core::Types::Network;
+
+You must import C<Log::Any::Adapter> before our libraries, to initialize the logger instance before use.
+
+You can choose your log level on import directly:
+    use Log::Any::Adapter (File => '/var/log/payment.log', log_level => 'info');
+
+Read the L<Log::Any> documentation to know what other options you have.
+
+=cut
+
+=head1 SECURITY
+
+=over
+
+=item *
+
+Never, never, NEVER register a card or a bank account number in your database.
+
+=item *
+
+Always uses HTTPS in card/SEPA in communication.
+
+=item *
+
+Our API will never give you a complete card/SEPA number, only the last four digits.
+If you need to keep track, use these last four digit.
+
+=back
+
+=cut
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://gitlab.com/wearestancer/library/lib-perl/-/issues> or by email to
+L<bug-stancer@rt.cpan.org|mailto:bug-stancer@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+Joel Da Silva <jdasilva@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018-2024 by Stancer / Iliad78.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

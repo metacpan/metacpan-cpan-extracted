@@ -11,7 +11,7 @@ CGI::ACL - Decide whether to allow a client to run this script
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
@@ -124,16 +124,12 @@ You can also look for information at:
 
     [http://matrix.cpantesters.org/?dist=CGI-ACL](http://matrix.cpantesters.org/?dist=CGI-ACL)
 
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/CGI-ACL](http://cpanratings.perl.org/d/CGI-ACL)
-
 - CPAN Testers Dependencies
 
     [http://deps.cpantesters.org/?module=CGI::ACL](http://deps.cpantesters.org/?module=CGI::ACL)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017-2021 Nigel Horne.
+Copyright 2017-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2

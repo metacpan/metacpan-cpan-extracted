@@ -1,5 +1,5 @@
 package HTTP::Body;
-$HTTP::Body::VERSION = '1.22';
+$HTTP::Body::VERSION = '1.23';
 use strict;
 
 use Carp       qw[ ];
@@ -62,14 +62,46 @@ and multipart/form-data.
 
 Chunked bodies are supported by not passing a length value to new().
 
-It is currently used by L<Catalyst> to parse POST bodies.
+It is currently used by L<Catalyst>, L<Dancer>, L<Maypole>, L<Web::Simple> and
+L<Jedi>.
 
 =head1 NOTES
 
 When parsing multipart bodies, temporary files are created to store any
 uploaded files.  You must delete these temporary files yourself after
-processing them, or set $body->cleanup(1) to automatically delete them
-at DESTROY-time.
+processing them, or set $body->cleanup(1) to automatically delete them at
+DESTROY-time.
+
+With version 1.23, we have changed the basic behavior of how temporary files
+are prepared for uploads.  The extension of the file is no longer transferred
+to the temporary file, the extension will always be C<.upload>.  We have also
+introduced variables that make it possible to set the behavior as required.
+
+=over 4
+
+=item $HTTP::Body::MultiPart::file_temp_suffix
+
+This is the extension that is given to all multipart files. The default
+setting here is C<.upload>.  If you want the old behavior from before version
+1.23, simply undefine the value here.
+
+=item $HTTP::Body::MultiPart::basename_regexp
+
+This is the regexp used to determine out the file extension.  This is of
+course no longer necessary, unless you undefine
+C<HTTP::Body::MultiPart::file_temp_suffix>.
+
+=item $HTTP::Body::MultiPart::file_temp_template
+
+This gets passed through to the L<File::Temp> TEMPLATE parameter.  There is no
+special default in our module.
+
+=item %HTTP::Body::MultiPart::file_temp_parameters
+
+In this hash you can add up custom settings for the L<File::Temp> invokation.
+Those override every other setting.
+
+=back
 
 =head1 METHODS
 
@@ -451,7 +483,17 @@ sub param_order {
 =head1 SUPPORT
 
 Since its original creation this module has been taken over by the Catalyst
-development team. If you want to contribute patches, these will be your
+development team. If you need general support using this module:
+
+IRC:
+
+    Join #catalyst on irc.perl.org.
+
+Mailing Lists:
+
+    http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst
+
+If you want to contribute patches, these will be your
 primary contact points:
 
 IRC:
@@ -474,11 +516,11 @@ Andy Grundman, C<andy@hybridized.org>
 
 Simon Elliott C<cpan@papercreatures.com>
 
-Kent Fredric <kentnl@cpan.org>
+Kent Fredric C<kentnl@cpan.org>
 
-Christian Walde
+Christian Walde C<walde.christian@gmail.com>
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus C<torsten@raudssus.de>
 
 =head1 LICENSE
 

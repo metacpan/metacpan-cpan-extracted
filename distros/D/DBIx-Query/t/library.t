@@ -12,6 +12,9 @@ test_get_uncached( $dq, $data );
 test_add( $dq, $data );
 test_rm( $dq, $data );
 test_update( $dq, $data );
+
+isa_ok( $dq->abstract, 'SQL::Abstract::Complete' );
+
 test_get_run( $dq, $data );
 test_db_helper_methods( $dq, $data );
 test_statement_handle_methods( $dq, $data );

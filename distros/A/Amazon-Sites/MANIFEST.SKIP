@@ -1,7 +1,9 @@
-Makefile
+Makefile$
 .git/*
 blib/*
 .vscode/*
 Amazon-Sites-*.tar.gz
 Amazon-Sites-*/*
 .bak
+MYMETA.*
+\.code-workspace

@@ -1,0 +1,12 @@
+Changes
+lib/Tk/FileBrowser.pm
+lib/Tk/FileBrowser/Header.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+t/Tk-FileBrowser-Header.t
+t/Tk-FileBrowser.t
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

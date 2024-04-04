@@ -2,13 +2,13 @@ package Net::OBS::Client::Roles::Client;
 
 use Moose::Role;
 
-use LWP::UserAgent;
 use XML::Structured;
 use Config::Tiny;
 use HTTP::Request;
 use HTTP::Cookies;
 use Carp qw/croak/;
 use File::Path qw/make_path/;
+use Net::OBS::LWP::UserAgent;
 
 use Net::OBS::SigAuth;
 
@@ -55,7 +55,7 @@ has user_agent => (
   isa     =>    'Object',
   lazy    =>    1,
   default => sub {
-    my $ua = LWP::UserAgent->new(
+    my $ua = Net::OBS::LWP::UserAgent->new(
       cookie_jar => $_[0]->cookie_jar
     );
     if ($ENV{NET_OBS_CLIENT_DEBUG}) {
@@ -68,7 +68,7 @@ has user_agent => (
     }
     $ua->timeout(10);
     $ua->env_proxy;
-
+    $ua->sigauth_credentials($_[0]->sigauth_credentials) if %{$_[0]->sigauth_credentials};
     return $ua
   },
 );
@@ -119,6 +119,13 @@ has cookie_jar => (
   },
 );
 
+has sigauth_credentials => (
+  is      =>    'rw',
+  isa     =>    'HashRef',
+  lazy    =>    1,
+  default =>    sub { {} },
+);
+
 has cookie_jar_file => (
   is      =>    'rw',
   isa     =>    'Str',
@@ -149,6 +156,7 @@ sub request {
   $self->api_path($api_path) if $api_path;
 
   my $ua = $self->user_agent();
+  $ua->sigauth_credentials($self->sigauth_credentials) if $self->sigauth_credentials;
   my $url = $self->apiurl . $self->api_path;
 
   debug(" $method: $url");

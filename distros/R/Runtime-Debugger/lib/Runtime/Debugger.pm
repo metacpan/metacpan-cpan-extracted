@@ -2,39 +2,39 @@ package Runtime::Debugger;
 
 =head1 LOGO
 
- ____              _   _
-|  _ \ _   _ _ __ | |_(_)_ __ ___   ___
-| |_) | | | | '_ \| __| | '_ ` _ \ / _ \
-|  _ <| |_| | | | | |_| | | | | | |  __/
-|_| \_\\__,_|_| |_|\__|_|_| |_| |_|\___|
+  ____              _   _
+ |  _ \ _   _ _ __ | |_(_)_ __ ___   ___
+ | |_) | | | | '_ \| __| | '_ ` _ \ / _ \
+ |  _ <| |_| | | | | |_| | | | | | |  __/
+ |_| \_\\__,_|_| |_|\__|_|_| |_| |_|\___|
 
- ____       _
-|  _ \  ___| |__  _   _  __ _  __ _  ___ _ __
-| | | |/ _ \ '_ \| | | |/ _` |/ _` |/ _ \ '__|
-| |_| |  __/ |_) | |_| | (_| | (_| |  __/ |
-|____/ \___|_.__/ \__,_|\__, |\__, |\___|_|
-                        |___/ |___/
+  ____       _
+ |  _ \  ___| |__  _   _  __ _  __ _  ___ _ __
+ | | | |/ _ \ '_ \| | | |/ _` |/ _` |/ _ \ '__|
+ | |_| |  __/ |_) | |_| | (_| | (_| |  __/ |
+ |____/ \___|_.__/ \__,_|\__, |\__, |\___|_|
+                         |___/ |___/
 
 =cut
 
-use 5.012;
+use 5.018;
 use strict;
-use warnings;
+use warnings FATAL => 'all';
 use Data::Dumper;
-use Data::Printer;
-use Filter::Simple;
+use Data::Printer use_prototypes => 0;
 use Term::ReadLine;
 use Term::ANSIColor qw( colored );
-use PadWalker       qw( peek_my  peek_our );
+use PadWalker       qw( peek_our  peek_my );
 use Scalar::Util    qw( blessed reftype );
 use Class::Tiny     qw( term attr debug );
-use feature         qw( say state );
+use re              qw( eval );                # For debug.
+use feature         qw( say );
 use parent          qw( Exporter );
-use subs            qw( d uniq );
+use subs            qw( uniq );
 
-our $VERSION = '0.14';
-our @EXPORT  = qw( run np p d );
-our $FILTER  = 1;
+our $VERSION = '0.18';
+our @EXPORT  = qw( run repl d np p );
+our %PEEKS;
 
 =head1 NAME
 
@@ -42,21 +42,38 @@ Runtime::Debugger - Easy to use REPL with existing lexical support and DWIM tab 
 
 (emphasis on "existing" since I have not yet found this support in other modules).
 
+=cut
+
 =head1 SYNOPSIS
 
-Start the debugger:
+In a script:
 
-    perl -MRuntime::Debugger -E 'eval run'
+    use Runtime::Debugger;
+    repl;
+
+On the commandline:
+
+    perl -MRuntime::Debugger -E 'repl'
 
 Same, but with some variables to play with:
 
-    perl -MRuntime::Debugger -E 'my $str1 = "Func"; our $str2 = "Func2"; my @arr1 = "arr-1"; our @arr2 = "arr-2"; my %hash1 = qw(hash 1); our %hash2 = qw(hash 2); my $coderef = sub { "code-ref: @_" }; {package My; sub Func{"My-Func"} sub Func2{"My-Func2"}} my $obj = bless {}, "My"; eval run; say $@'
+    perl -MRuntime::Debugger -E 'my $str1 = "Func"; our $str2 = "Func2"; my @arr1 = "arr-1"; our @arr2 = "arr-2"; my %hash1 = qw(hash 1); our %hash2 = qw(hash 2); my $coderef = sub { "code-ref: @_" }; {package My; sub Func{"My-Func"} sub Func2{"My-Func2"}} my $obj = bless {}, "My"; repl; say $@'
+
+Test command:
+
+    RUNTIME_DEBUGGER_DEBUG=2 perl -Ilib/ -MRuntime::Debugger -E 'my @a = 1..2; my %h = qw( a 11 b 22 ); my $v = 222; my $o = bless {a => 11}, "A"; my $ar = \@a; my $hr = \%h; use warnings FATAL => "all"; eval{ say qr<$hr-\>{b}> }; say "222"'
+
+=cut
 
 =head1 DESCRIPTION
 
 "What? Another debugger? What about ... ?"
 
-=head2 perl5db.pl
+=cut
+
+=head2 Other Modules
+
+=head3 perl5db.pl
 
 The standard perl debugger (C<perl5db.pl>) is a powerful tool.
 
@@ -71,7 +88,7 @@ Using C<per5db.pl>, one would normally be able to do this:
 If that works for you, then dont' bother with this module!
 (joke. still try it.)
 
-=head2 Devel::REPL
+=head3 Devel::REPL
 
 This is a great and extendable module!
 
@@ -102,11 +119,11 @@ Sample Output:
 
  $ print $my_var
  Compile error: Global symbol "$my_var" requires explicit package name ...
- 
+
  $ print $our_var
  Compile error: Global symbol "$our_var" requires explicit package name ...
 
-=head2 Reply
+=head3 Reply
 
 This module also looked nice, but same issue.
 
@@ -126,139 +143,280 @@ Sample Output:
  > print $var2
  1
 
-=head2 Dilemma
+=cut
 
-I have this scenario:
+=head2 This Module
 
- - A perl script gets executed.
- - The script calls a support module.
- - The module reads a test file.
- - The module string evals the string contents of the test file.
- - The test takes possibly minutes to run (Selenium).
- - The test is failing.
- - Not sure what is failing.
+While debugging some long-running, perl,
+Selenium test files, I basically got bored
+during the long waits, and created a simple
+Read Evaluate Print Loop (REPL) to avoid
+the annoyong waits between test tries.
 
-Normal workflow would be:
+Originally I would have a hot key
+command to drop in a snippet of code like
+this into my test code to essentially insert
+a breakpoint/pause.
 
- - Step 1: Apply a fix.
- - Step 2: Run the test.
- - Step 3: Wait ... wait ... wait.
- - Step 4: Go to step 1 if test still fails.
+One can then examine what's going on in that
+area of code.
+
+Originally the repl code snippet was something
+as simple as this:
+
+ while(1){
+   my $in = <STDIN>;
+   chomp $in;
+   last if $in eq 'q';
+   eval $in;
+ }
+
+With that small snippet I could pause in a long
+running test (which I didn't write) and try out
+commands to help me to understand what needs to
+be updated in the test (like a ->click into a
+field before text could be entered).
+
+And I was quite satisfied.
+
+From there, this module increased in features
+such as using C<Term::ReadLine> for readline
+support,tab completion, and history (up arrow).
+
+=cut
+
+=head3 Attempts
+
+This module has changed in its approach quite a
+few times since it turns out to be quite tricky
+to perform C<eval_in_scope>.
+
+=head4 Source Filter
+
+To make usage of this module as simple as
+possible, I tried my hand at source filters.
+
+My idea was that by simply adding this line
+of code:
+
+ use Runtime::Debugger;
+
+That would use a source filter to add in the REPL code.
+
+This solution was great, but source filters can only
+be applied at COMPILE TIME (That was new to me as well).
+
+Unfortunately, the tests I am dealing with are
+read as a string then evaled.
+
+So, source filters, despite how clean they would
+make my solution, would not work for my use cases.
+
+Next idea.
+
+=head4 Back To Eval
+
+Then I decided to go back to using a command like:
+
+ use Runtime::Debugger;
+ eval run;
+
+Where run would basically generates the REPL
+code and eval would use the current scope to
+apply the code.
+
+Side note: other Debuggers I had tried before this
+one, do not update lexical variables in the
+current scope. So this, I think, is unique in this debugger.
+
+=head4 Next pitfall
+
+I learned later that C<eval run> would under
+certain circumstances not work:
+
+First call would print 111, while the exact
+same eval line would print undef afterwards.
+
+ sub {
+     my $v = 111;
+     eval q(
+         # my $v = $v; # Kind of a fix.
+         eval 'say $v'; # 111
+         eval 'say $v'; # undef
+     );
+ }->();
+
+=head4 Still can eval run
+
+Using C<eval run> is still possible (for now).
+
+Just be aware that it does not evaluate correctly
+under certain circumstances.
+
+=cut
 
 =head2 Solution
 
-This module basically inserts a read, evaluate, print loop (REPL)
-wherever you need it.
+Simply add these lines:
 
     use Runtime::Debugger;
-    eval run;
+    repl;
 
-=head2 Tab Completion
+This will basically insert a read, evaluate,
+print loop (REPL).
 
-This module has rich, DWIM tab completion support:
+This should work for more cases (just try not
+to use nasty perl magic).
 
- - Press TAB with no input to view commands and available variables in the current scope.
- - Press TAB after an arrow ("->") to auto append either a "{" or "[" or "(".
-    This depends on the type of variable before it.
- - Press TAB after a hash (or hash object) to list available keys. 
- - Press TAB anywhere else to list variables.
+=head3 Goal
 
-=head2 History
+To reach the current solution, it was essential
+to go back to the main goal.
 
-All commands run in the debugger are saved locally and loaded next time the module is loaded.
+And the goal/idea is simple, be able to evaluate
+an expression in a specific scope/context.
 
-=head2 Data::Dumper
+Basically looking for something like:
 
-You can use "p" as a print command which can show a simple or complex data structure.
+ peek_my(SCOPE)
 
-=head2 Ideas
+But instead for eval:
 
-Not sure how to avoid using eval here while keeping access to the top level lexical scope.
+ eval_in_scope(SCOPE)
 
-(Maybe through abuse of PadWalker and modifying input dynamically.)
+Given C<eval_in_scope(1)>, that would evaluate an expression,
+but in a scope/context one level higher.
 
-Any ideas ? :)
+=head3 Implementation
 
-=head2 New Variables
+=head4 Scope
 
-Currently it is not possible to create new lexicals (my) variables.
+In order to eval a string of perl code correctly,
+we need to figure out at which level the variable
+is located.
 
-I have not yet found a way to run "eval" with a higher scope of lexicals.
-(perhaps there is another way?)
+Thats not hard to do: just look through increasing
+C<caller()> levels until finding the first whose
+package name is not thia module's.
 
-You can make global variables though if:
+=head4 Peek
 
- - By default ($var=123)
- - Using our (our $var=123)
- - Given the full path ($My::var = 123)
+Given the scope level, peek_my/our is utilized
+to grab all the variables in that scope.
 
-=head1 SUBROUTINES/METHODS
+Having these variables:
+
+ my  $var = 111;
+ our $var = 222;
+
+There can only be a single variable (glob) of
+a name. When multiple, the lexical one would
+be used.
+
+=head4 Preprocess
+
+Then we need to preprocess the piece of perl code
+that would be evaled.
+
+At this stage variables would be replaced which
+their equivalent representation at found in
+peek_my/our.
+
+This code:
+
+ say $var
+
+Might be replaced with something like this:
+
+ say ${$PEEKS{'$var'}}
+
+This transformation would normally be down
+seamlessly and hidden from the user.
+
+=head4 Eval
+
+Finally, eval the string.
+
+And we pretend to have done C<eval_in_scope>.
+
+=head3 Future Ideas
+
+One idea would be to create an XS function
+which can perform an eval in a specific scope,
+but without the translation magic that is
+currently being done.
+
+This might appear like peek_my, but for eval.
+So something like this:
+
+ eval_in_scope("STRING_TO_EVAL", SCOPE_LEVEL);
 
 =cut
 
-# Initialize
-
-=head2 import
-
-Updates the import list to disable source filtering if needed.
-
-It appears that a source filter cannot process a one-liner :(
+=head1 FUNCTIONS
 
 =cut
 
-sub import {
-    my ( $class, @args_raw ) = @_;
-    my @args;
-
-    # Source filters do not seem to work with one-liners.
-    # Should manually invoke "eval run".
-    if ( $0 eq "-e" ) {
-        $FILTER = 0;
-    }
-
-    for my $arg ( @args_raw ) {
-        if ( $arg eq "-nofilter" ) {
-            $FILTER = 0;
-            next;
-        }
-        push @args, $arg;
-    }
-
-    $class->export_to_level( 1, $class, @args );
-}
-
-FILTER {
-    if ( $FILTER ) {
-        $_ = run() . $_;
-    }
-};
+# API
 
 =head2 run
 
-Runs the REPL (dont forget eval!)
+DEPRECATED! (Use C<repl> instead)
+
+Runs the REPL.
 
  eval run
 
-Sets C<$@> to the exit reason like 'INT' (Control-C) or 'q' (Normal exit/quit).
+Sets C<$@> to the exit reason like
+'INT' (Control-C) or 'q' (Normal exit/quit).
+
+Note: This method is more stable than repl(), but at the same
+time has limits. L<See also|/Lossy undef Variable>
 
 =cut
 
 sub run {
     <<'CODE';
-    use strict;
-    use warnings;
-    use feature qw(say);
-    my $repl = Runtime::Debugger->_init;
-    local $@;
-    eval {
-        while ( 1 ) {
-            eval $repl->_step;
-            $repl->_show_error($@) if $@;
-        }
-    };
-    $repl->_show_error($@) if $@;
+
+######################################
+#            REPL CODE
+######################################
+use strict;
+use warnings;
+use feature qw(say);
+my $repl = Runtime::Debugger->_init;
+local $@;
+eval {          # Catch loop exit.
+    while ( 1 ) {
+        eval $repl->_step;
+        $repl->_show_error($@) if $@;
+    }
+};
+$repl->_show_error($@) if $@;
+######################################
 CODE
 }
+
+=head2 repl
+
+Works like eval, but without L<the lossy bug|/Lossy undef Variable>
+
+=cut
+
+sub repl {
+    my $repl = __PACKAGE__->_init;
+
+    local $@;
+    eval {    # Catch loop exit.
+        while ( 1 ) {
+            $repl->_repl_step;
+            $repl->_show_error( $@ ) if $@;
+        }
+    };
+    $repl->_show_error( $@ ) if $@;
+}
+
+# Initialize
 
 sub _init {
     my ( $class ) = @_;
@@ -289,304 +447,14 @@ sub _init {
 
     $self->_restore_history;
 
+    $self->_setup_vars;
+
     # Setup some signal handling.
     for my $signal ( qw( INT TERM HUP ) ) {
         $SIG{$signal} = sub { $self->_exit( $signal ) };
     }
 
     $self;
-}
-
-sub _step {
-    my ( $self ) = @_;
-    my $is_data_dumper_command = qr{ ^ d \b }x;
-
-    if ( not $self->{vars_all} ) {
-        $self->_setup_vars;
-        $self->help;    # Show help when first loading the debugger.
-    }
-
-    my $input = $self->term->readline( "perl>" ) // '';
-    say "input_after_readline=[$input]" if $self->debug;
-
-    # Change '#1' to '--maxdepth=1'
-    if ( $input =~ /$is_data_dumper_command/ ) {
-        $input =~ s/
-            \s*
-            \#(\d)     #2 to --maxdepth=2
-            \s*
-        $ /, '--maxdepth=$1'/x;
-    }
-
-    # Change "COMMAND ARG" to "$repl->COMMAND(ARG)".
-    $input =~ s/ ^
-        (
-              help
-            | hist
-        ) \b
-        (.*)
-    $ /\$repl->$1($2)/x;
-
-    $self->_exit( $input ) if $input eq 'q';
-
-    say "input_after_step=[$input]" if $self->debug;
-    $input;
-}
-
-# Completion
-
-sub _complete {
-    my $self = shift;
-    my ( $text, $line, $start, $end ) = @_;
-    say ""                  if $self->debug;
-    $self->_dump_args( @_ ) if $self->debug;
-
-    # Note: return list is what will be shown as possiblities.
-
-    # Empty - show commands and variables.
-    return $self->_complete_empty( @_ ) if $line =~ / ^ \s* $ /x;
-
-    # Help or History command - complete the word.
-    return $self->_complete_h( @_ ) if $line =~ / ^ \s* h \w* $ /x;
-
-    # Dump/Print command - space afterwards.
-    return $self->_complete_d( @_ ) if $line =~ / ^ \s* d $ /x;
-    return $self->_complete_p( @_ ) if $line =~ / ^ \s* p $ /x;
-
-    # Method call or coderef - append "(".
-    return $self->_complete_arrow( "$1", "$2", @_ )
-      if $text =~ / ^ ( \$ \S+ ) -> (\S*) $ /x;
-
-    # Hash or hashref - Show possible keys and string variables.
-    return $self->_complete_hash( "$1", @_ )
-      if substr( $line, 0, $end ) =~ $self->_is_hash_match();
-
-    # Otherwise assume its a variable.
-    return $self->_complete_vars( @_ );
-}
-
-sub _complete_empty {
-    my $self = shift;
-    my ( $text, $line, $start, $end ) = @_;
-    $self->_dump_args( @_ ) if $self->debug;
-
-    $self->_match(
-        words   => $self->{commands_and_vars_all},
-        partial => $text,
-    );
-}
-
-sub _complete_h {
-    my $self = shift;
-    my ( $text, $line, $start, $end ) = @_;
-    $self->_dump_args( @_ ) if $self->debug;
-
-    $self->_match(
-        partial => $text,
-        words   => [ "help", "hist" ],
-        nospace => 1,
-    );
-}
-
-sub _complete_d {
-    my $self = shift;
-    my ( $text, $line, $start, $end ) = @_;
-    $self->_dump_args( @_ ) if $self->debug;
-
-    $self->_match( words => ["d"] );
-}
-
-sub _complete_p {
-    my $self = shift;
-    my ( $text, $line, $start, $end ) = @_;
-    $self->_dump_args( @_ ) if $self->debug;
-
-    $self->_match( words => ["p"] );
-}
-
-sub _complete_arrow {
-    my $self = shift;
-    my ( $var, $partial_method, $text, $line, $start, $end ) = @_;
-    my $ref = $self->{peek_all}->{$var} // "";
-    $partial_method //= '';
-    $self->_dump_args( @_ ) if $self->debug;
-    say "ref: $ref"         if $self->debug;
-
-    return if ref( $ref ) ne "REF";    # Coderef or object.
-
-    # Object call or coderef.
-    my $obj_or_coderef = $$ref;
-
-    # Object.
-    if ( blessed( $obj_or_coderef ) ) {
-        say "IS_OBJECT: $obj_or_coderef" if $self->debug;
-
-        my $methods = $self->{methods}{$obj_or_coderef};
-        if ( not $methods ) {
-            $methods = $self->_get_object_functions( $obj_or_coderef );
-            $self->{methods}{$obj_or_coderef} = $methods;
-
-            # push @$methods, "(";    # Access as method or hash refs.
-            push @$methods, "{" if reftype( $obj_or_coderef ) eq "HASH";
-            push @$methods, @{ $self->{vars_string} };
-            @$methods = uniq sort @$methods;
-        }
-        say "methods: @$methods" if $self->debug;
-
-        return $self->_match(
-            words   => $methods,
-            partial => $partial_method,
-            prepend => "$var->",
-            nospace => 1,
-        );
-    }
-
-    # Coderef.
-    if ( ref( $obj_or_coderef ) eq "CODE" ) {
-        say "IS_CODE: $obj_or_coderef" if $self->debug;
-        return $self->_match(
-            words   => ["("],
-            prepend => "$text",
-            nospace => 1,
-        );
-    }
-
-    # Hashref.
-    if ( ref( $obj_or_coderef ) eq "HASH" ) {
-        say "IS_HASH $obj_or_coderef" if $self->debug;
-        return $self->_match(
-            words   => ["{"],
-            prepend => "$text",
-            nospace => 1,
-        );
-    }
-
-    # Arrayref.
-    if ( ref( $obj_or_coderef ) eq "ARRAY" ) {
-        say "IS_ARRAY: $obj_or_coderef" if $self->debug;
-        return $self->_match(
-            words   => ["["],
-            prepend => "$text",
-            nospace => 1,
-        );
-    }
-
-    say "NOT OBJECT or CODEREF: $obj_or_coderef" if $self->debug;
-    return;
-}
-
-sub _get_object_functions {
-    my ( $self, $obj ) = @_;
-    my $class = ref $obj;
-    no strict 'refs';
-
-    my @functions = grep {
-        !/ ^
-        (?:
-            import
-        )
-        $ /x
-      }
-      grep { not / ^ [A-Z_]+ $ /x }    # Skip special functions.
-      sort
-      keys %{"${class}::"};
-
-    \@functions;
-}
-
-sub _is_hash_match {
-    my ( $self ) = @_;
-
-    qr{
-        (
-            [\$\}@%]                 # Variable sigil.
-            (?: (?!->|\s). )+       # Next if not a -> or space.
-        )
-        (?:->)?                     # Maybe a ->.
-        \{                          # Opening brace.
-        [^\}]*                       # Any non braces.
-        $                           # EOL.
-    }x;
-}
-
-sub _complete_hash {
-    my $self = shift;
-    my ( $var, $text, $line, $start, $end ) = @_;
-    $self->_dump_args( @_ ) if $self->debug;
-
-    my @hash_keys = @{ $self->{vars_string} };
-    my $ref       = $self->{peek_all}{$var} // '';
-    $ref = $$ref if reftype( $ref ) eq "REF";
-    push @hash_keys, keys %$ref if reftype( $ref ) eq "HASH";
-
-    $self->_match(
-        words   => [ sort @hash_keys ],
-        partial => $text,
-        nospace => 1,
-    );
-}
-
-sub _complete_vars {
-    my $self = shift;
-    my ( $text, $line, $start, $end ) = @_;
-    $self->_dump_args( @_ ) if $self->debug;
-
-    $self->_match(
-        words   => $self->{vars_all},
-        partial => $text,
-        nospace => 1,
-    );
-}
-
-=head2 _match
-
-Returns the possible matches:
-
-Input:
-
- words   => ARRAYREF, # What to look for.
- partial => STRING,   # Default: ""  - What you typed so far.
- prepend => "STRING", # Default: ""  - prepend to each possiblity.
- nospace => 0,        # Default: "0" - will not append a space after a completion.
-
-=cut
-
-sub _match {
-    my $self  = shift;
-    my %parms = @_;
-    $self->_dump_args( @_ ) if $self->debug;
-
-    # completion_word does not automationally get reset per call.
-    # completion_suppress_append gets reset perl call.
-    # attempted_completion_over gets reset perl call.
-    $parms{partial} //= "";
-    $parms{prepend} //= "";
-    $self->attr->{completion_word}            = $parms{words};
-    $self->attr->{completion_suppress_append} = 1 if $parms{nospace};
-    $self->attr->{attempted_completion_over} =
-      1;    # Will not use filename completion at all.
-
-    map { "$parms{prepend}$_" }
-      $self->term->completion_matches( $parms{partial},
-        $self->attr->{list_completion_function} );
-}
-
-sub _dump_args {
-    my $self = shift;
-    my $sub  = ( caller( 1 ) )[3];
-    $sub =~ s/ ^ .* :: //x;    # Short sub name.
-    my $args = join ",", map { defined( $_ ) ? "'$_'" : "undef" } @_;
-    printf "%-20s %s\n", $sub, "($args)";
-}
-
-sub _define_commands {
-    (
-        "help",    # Changed in _step to $repl->help().
-        "hist",    # Changed in _step to $repl->hist().
-        "p",       # From Data::Printer and exporting it.
-        "d",       # Exporting it.
-        "q",       # Used in _step to stop the repl.
-    );
 }
 
 sub _setup_vars {
@@ -612,20 +480,43 @@ sub _set_peeks {
     # CAUTION: avoid having the same name for a lexical and global
     # variable since the last variable declared would "win".
 
-    my $levels       = 3;    # How many levels until at "$repl=" or main.
-    my $peek_my      = peek_my( $levels );
-    my $peek_our     = peek_our( $levels );
-    my %peek_all     = ( %$peek_our, %$peek_my );
+    my $levels =
+      $self->_calc_scope;    # How many levels until at "$repl=" or main.
+    my $peek_our = peek_our( $levels );
+    my $peek_my  = peek_my( $levels );
+
+    # Add a reference to the repl.
+    $peek_my->{'$repl'} = \$self;
+
+    # Link for cleaner access later.
+    %PEEKS = ( %$peek_our, %$peek_my );
+
+    # Get just the variable names.
     my @vars_lexical = keys %$peek_my;
     my @vars_global  = keys %$peek_our;
     my @vars_all     = uniq @vars_lexical, @vars_global;
 
     $self->{peek_my}      = $peek_my;
     $self->{peek_our}     = $peek_our;
-    $self->{peek_all}     = \%peek_all;
+    $self->{peek_all}     = \%PEEKS;
     $self->{vars_lexical} = \@vars_lexical;
     $self->{vars_global}  = \@vars_global;
     $self->{vars_all}     = \@vars_all;
+}
+
+sub _calc_scope {
+    my ( $self ) = @_;
+
+    my $scope = 0;
+    my $pkg   = __PACKAGE__;
+    my $caller;
+
+    # Find the first scope level outside
+    # this package.
+    1 while ( ( $caller = caller( ++$scope ) ), $caller and $caller eq $pkg );
+    say "scope: $scope" if $self->debug;
+
+    $scope;
 }
 
 sub _split_vars_by_types {
@@ -640,7 +531,7 @@ sub _split_vars_by_types {
 
         # Show duplcate variables with same name (probably different sigil).
         if ( $already_stored{$_} ) {
-            if ( $self->debug or not $added_duplicates{$_} ) {
+            if ( $self->debug >= 2 or not $added_duplicates{$_} ) {
                 $self->_show_error(
                         "Skipping variable with same name: '$_' "
                       . "(maybe same name, but different sigil?)" );
@@ -691,7 +582,7 @@ sub _split_vars_by_types {
               $self->{peek_all}{$_};
             $added_duplicates{$var_scalar}++;
 
-            say "Added $_: $var_scalar" if $self->debug;
+            say "Added $_: $var_scalar" if $self->debug >= 2;
         }
         elsif ( / ^ % /x ) {
             push @{ $self->{vars_hash} }, $_;
@@ -706,7 +597,7 @@ sub _split_vars_by_types {
             $added_duplicates{$var_scalar}++;
             $added_duplicates{$var_array}++;
 
-            say "Added $_: $var_scalar, $var_array" if $self->debug;
+            say "Added $_: $var_scalar, $var_array" if $self->debug >= 2;
         }
         else {
             push @{ $self->{vars_else} }, $_;
@@ -749,6 +640,578 @@ sub _normalize_var_defaults {
 
 }
 
+=head2 _apply_peeks
+
+Transform variables in a code string
+into references to the same variable
+as found with peek_my/our.
+
+Try to insert the peek_my/our references
+(peeks) only when needed (should appear
+natural to the user).
+
+Ok to transform:
+
+ say "@a"
+
+NOT ok to transform:
+
+ say "%h"
+
+=cut
+
+sub _apply_peeks {
+    my ( $self, $code ) = @_;
+    my $r = $self->_define_regex;
+
+    $code =~ s{
+        ($r->{text})
+    }{
+        local $_ = "$1";
+        p \%+ if $self->debug >= 2;
+
+        if($+{unquoted}){
+            s/$r->{var_unquoted}/$self->_to_peek(%+)/ge;
+        }
+        elsif($+{quoted}){
+            s/$r->{var_quoted}/$self->_to_peek(%+)/ge;
+        }
+
+        $_;
+    }xge;
+
+    $code;
+}
+
+sub _define_regex {
+    my ( $self ) = @_;
+
+    # Some are mainly defined here just to
+    # keep my editor code folding functional.
+    my $var_name = qr{ [_A-Za-z]\w* }x;
+    my $any_3    = qr{ .{0,3} }x;
+    my $qq       = '"';
+    my $q        = "'";
+
+    {
+
+        var_unquoted => qr{
+            (?<var>
+                (?<sigil> [\$\@%] )
+                (?<name> $var_name )
+            )
+            (?= (?<next> $any_3 ) )
+        }x,
+
+        var_quoted => qr{
+            (?<! \\ )  # Should not be escaped.
+            (?<var>
+                (?<sigil> [\$\@] )
+                (?<name> $var_name )
+            )
+            (?= (?<next> $any_3 ) )
+        }x,
+
+        text => qr{
+
+            # Not any (common) form of quotes.
+            (?<unquoted>
+                (?:
+                    (?!
+                          $qq
+                        | $q
+                        | \b q[qrw]? \b
+                    ) .
+                )++ # Should not be empty.
+            )
+            (?{ say "unquoted: |$`:$&:$'|" if $self->debug >= 2 })
+
+            |
+
+            # Otherwise, some form of quotes.
+            # Figure out which to decide whether
+            # to keep %h as %h or expand.
+
+            # Double quotes.
+            $qq
+                (?<quoted>
+                    (?>               # Do not backtrack.
+                        [^$qq\\]*     # None quote or escape.
+                        (?:           # maybe followed by
+                            \\.       # an escape
+                            [^$qq\\]* # and more none quotes or escapes.
+                        )*
+                    )
+                )
+            $qq
+            (?{ say "$qq:      |$`:$&:$'|" if $self->debug >= 2 })
+
+            |
+
+            # Single quotes.
+            # (no capture to skip it).
+            $q
+                (?>
+                    [^$q\\]*
+                    (?:
+                        \\.
+                        [^$q\\]*
+                    )*
+                )
+            $q
+            (?{ say "$q:       |$`:$&:$'|" if $self->debug >= 2 })
+
+            |
+
+            # qq and qr operators.
+            \b q[qr] \b \s* (?<quoted>
+                  (?&PARENS)
+                | (?&CURLY)
+                | (?&SQUARE)
+                | (?&ANGLE)
+            )
+            (?{ say "q[qr]:    |$`:$&:$'|" if $self->debug >= 2 })
+
+            |
+
+            # q and qw operators.
+            # (no capture to skip it).
+            \b qw? \b \s* (?:
+                  (?&PARENS)
+                | (?&CURLY)
+                | (?&SQUARE)
+                | (?&ANGLE)
+            )
+            (?{ say "qw?:      |$`:$&:$'|" if $self->debug >= 2 })
+
+            # Sub pattern definitions.
+            (?(DEFINE)
+                (?<PARENS>
+                    \(                      (?{ say "  parenS  |$`:$&:$'|" if $self->debug >= 2 })
+                        (?:                 (?{ say "  parenA  |$`:$&:$'|" if $self->debug >= 2 })
+                              [^()\\]++     (?{ say "  parenB  |$`:$&:$'|" if $self->debug >= 2 })
+                            | \\.           (?{ say "  parenC  |$`:$&:$'|" if $self->debug >= 2 })
+                            | (?&PARENS)    (?{ say "  parenD  |$`:$&:$'|" if $self->debug >= 2 })
+                        )*+                 (?{ say "  parenE  |$`:$&:$'|" if $self->debug >= 2 })
+                    \)
+                )
+                (?<CURLY>
+                    \{
+                        (?:
+                              [^{}\\]++
+                            | \\.
+                            | (?&CURLY)
+                        )*+
+                    \}
+                )
+                (?<SQUARE>
+                    \[
+                        (?:
+                              [^\[\]\\]++
+                            | \\.
+                            | (?&SQUARE)
+                        )*+
+                    \]
+                )
+                (?<ANGLE>
+                    <
+                        (?:
+                              [^<>\\]++
+                            | \\.
+                            | (?&ANGLE)
+                        )*+
+                    >
+                )
+            )
+        }x,
+
+    };
+}
+
+sub _to_peek {
+    my ( $repl, %match ) = @_;
+    my $var   = $match{var};
+    my $sigil = $match{sigil};
+    my $name  = $match{name};
+    my $next  = $match{next} // "";
+
+    my $is_curly = '{';    # To make my editor happy.
+
+    # Find the true variable with sigil.
+    if ( $next =~ / ^ \[ /x ) {    # Array ref.
+        $var = "\@$name";
+    }
+    elsif ( $next =~ / ^ $is_curly /x ) {    # Hash ref.
+        $var = "\%$name";
+    }
+
+    my $ref = ref $PEEKS{$var};
+    my $val = sprintf( '$%s::PEEKS{qq(%s)}', __PACKAGE__, quotemeta( $var ), );
+
+    if ( $repl->debug ) {
+        say "var:   $var";
+        say "sigil: $sigil";
+        say "next:  $next";
+        say "ref:   $ref";
+    }
+
+    if ( $ref eq 'REF' ) {
+        $val = "\${$val}";
+    }
+    elsif ( $ref eq 'SCALAR' ) {
+        $val = "\${$val}";
+    }
+    elsif ( $ref eq 'ARRAY' ) {
+        $val = "${sigil}{$val}";
+    }
+    elsif ( $ref eq 'HASH' ) {
+        $val = "${sigil}{$val}";
+    }
+    else {
+        return $var;
+    }
+
+    $val;
+}
+
+sub _step {
+    my ( $repl ) = @_;
+
+    # Show help when first loading the debugger.
+    if ( not $repl->{step_counter}++ ) {
+        $repl->help;
+    }
+
+    my $input = $repl->term->readline( "perl>" ) // '';
+    say "input_after_readline=[$input]" if $repl->debug;
+
+    # Change "COMMAND ARG" to "$repl->COMMAND(ARG)".
+    $input =~ s/ ^
+        (
+              help
+            | hist
+        ) \b
+        (.*)
+    $ /\$repl->$1($2)/x;
+
+    $repl->_exit( $input ) if $input eq 'q';
+
+    say "input_after_step=[$input]" if $repl->debug;
+    $input;
+}
+
+sub _repl_step {
+    my ( $repl ) = @_;
+
+    my $input = $repl->_build_step;
+
+    eval $input;
+}
+
+sub _build_step {
+    my ( $repl ) = @_;
+
+    # Show help when first loading the debugger.
+    $repl->help if not $repl->{step_counter}++;
+
+    my $input = $repl->term->readline( "perl>" ) // '';
+    say "input_after_readline=[$input]" if $repl->debug;
+
+    # Change "COMMAND ARG" to "$repl->COMMAND(ARG)".
+    $input =~ s/ ^
+        (
+              help
+            | hist
+        ) \b
+        (.*)
+    $ /\$repl->$1($2)/x;
+
+    $repl->_exit( $input ) if $input eq 'q';
+
+    $input = $repl->_apply_peeks( $input );
+
+    say "input_after_step=[$input]" if $repl->debug;
+
+    $input;
+}
+
+# Tab Completion
+
+=head2 Tab Completion
+
+This module has rich, DWIM tab completion support:
+
+ Press TAB when:
+
+ - No input - view commands and variables.
+
+ - After arrow ("->") - to auto append either a "{" or "[" or "(".
+   (Depends on variable type)
+
+ - After a hash) - show keys.
+
+ - Otherwise - show variables.
+
+=cut
+
+sub _complete {
+    my $self = shift;
+    my ( $text, $line, $start, $end ) = @_;
+    say ""                  if $self->debug >= 2;
+    $self->_dump_args( @_ ) if $self->debug >= 2;
+
+    # Note: return list is what will be shown as possiblities.
+
+    # Empty - show commands and variables.
+    return $self->_complete_empty( @_ ) if $line =~ / ^ \s* $ /x;
+
+    # Help or History command - complete the word.
+    return $self->_complete_h( @_ ) if $line =~ / ^ \s* h \w* $ /x;
+
+    # Dump/Print command - space afterwards.
+    return $self->_complete_d( @_ ) if $line =~ / ^ \s* d $ /x;
+    return $self->_complete_p( @_ ) if $line =~ / ^ \s* p $ /x;
+
+    # Method call or coderef - append "(".
+    return $self->_complete_arrow( "$1", "$2", @_ )
+      if $text =~ / ^ ( \$ \S+ ) -> (\S*) $ /x;
+
+    # Hash or hashref - Show possible keys and string variables.
+    return $self->_complete_hash( "$1", @_ )
+      if substr( $line, 0, $end ) =~ $self->_is_hash_match();
+
+    # Otherwise assume its a variable.
+    return $self->_complete_vars( @_ );
+}
+
+sub _complete_empty {
+    my $self = shift;
+    my ( $text, $line, $start, $end ) = @_;
+    $self->_dump_args( @_ ) if $self->debug >= 2;
+
+    $self->_match(
+        words   => $self->{commands_and_vars_all},
+        partial => $text,
+    );
+}
+
+sub _complete_h {
+    my $self = shift;
+    my ( $text, $line, $start, $end ) = @_;
+    $self->_dump_args( @_ ) if $self->debug >= 2;
+
+    $self->_match(
+        partial => $text,
+        words   => [ "help", "hist" ],
+        nospace => 1,
+    );
+}
+
+sub _complete_d {
+    my $self = shift;
+    my ( $text, $line, $start, $end ) = @_;
+    $self->_dump_args( @_ ) if $self->debug >= 2;
+
+    $self->_match( words => ["d"] );
+}
+
+sub _complete_p {
+    my $self = shift;
+    my ( $text, $line, $start, $end ) = @_;
+    $self->_dump_args( @_ ) if $self->debug >= 2;
+
+    $self->_match( words => ["p"] );
+}
+
+sub _complete_arrow {
+    my $self = shift;
+    my ( $var, $partial_method, $text, $line, $start, $end ) = @_;
+    my $ref = $self->{peek_all}->{$var} // "";
+    $partial_method //= '';
+    $self->_dump_args( @_ ) if $self->debug >= 2;
+    say "ref: $ref"         if $self->debug >= 2;
+
+    return if ref( $ref ) ne "REF";    # Coderef or object.
+
+    # Object call or coderef.
+    my $obj_or_coderef = $$ref;
+
+    # Object.
+    if ( blessed( $obj_or_coderef ) ) {
+        say "IS_OBJECT: $obj_or_coderef" if $self->debug >= 2;
+
+        my $methods = $self->{methods}{$obj_or_coderef};
+        if ( not $methods ) {
+            $methods = $self->_get_object_functions( $obj_or_coderef );
+            $self->{methods}{$obj_or_coderef} = $methods;
+
+            # push @$methods, "(";    # Access as method or hash refs.
+            push @$methods, "{" if reftype( $obj_or_coderef ) eq "HASH";
+            push @$methods, @{ $self->{vars_string} };
+            @$methods = uniq sort @$methods;
+        }
+        say "methods: @$methods" if $self->debug >= 2;
+
+        return $self->_match(
+            words   => $methods,
+            partial => $partial_method,
+            prepend => "$var->",
+            nospace => 1,
+        );
+    }
+
+    # Coderef.
+    if ( ref( $obj_or_coderef ) eq "CODE" ) {
+        say "IS_CODE: $obj_or_coderef" if $self->debug >= 2;
+        return $self->_match(
+            words   => ["("],
+            prepend => "$text",
+            nospace => 1,
+        );
+    }
+
+    # Hashref.
+    if ( ref( $obj_or_coderef ) eq "HASH" ) {
+        say "IS_HASH $obj_or_coderef" if $self->debug >= 2;
+        return $self->_match(
+            words   => ["{"],
+            prepend => "$text",
+            nospace => 1,
+        );
+    }
+
+    # Arrayref.
+    if ( ref( $obj_or_coderef ) eq "ARRAY" ) {
+        say "IS_ARRAY: $obj_or_coderef" if $self->debug >= 2;
+        return $self->_match(
+            words   => ["["],
+            prepend => "$text",
+            nospace => 1,
+        );
+    }
+
+    say "NOT OBJECT or CODEREF: $obj_or_coderef" if $self->debug >= 2;
+    return;
+}
+
+sub _get_object_functions {
+    my ( $self, $obj ) = @_;
+    my $class = ref $obj;
+    no strict 'refs';
+
+    my @functions = grep {
+        !/ ^
+        (?:
+            import
+        )
+        $ /x
+      }
+      grep { not / ^ [A-Z_]+ $ /x }    # Skip special functions.
+      sort
+      keys %{"${class}::"};
+
+    \@functions;
+}
+
+sub _is_hash_match {
+    my ( $self ) = @_;
+    my $is_curly = '}';                # To make my editor happy.
+
+    qr{
+        (
+            [\$${is_curly}@%]       # Variable sigil.
+            (?: (?!->|\s). )+       # Next if not a -> or space.
+        )
+        (?:->)?                     # Maybe a ->.
+        \{                          # Opening brace.
+        [^\}]*                      # Any non braces.
+        $                           # EOL.
+    }x;
+}
+
+sub _complete_hash {
+    my $self = shift;
+    my ( $var, $text, $line, $start, $end ) = @_;
+    $self->_dump_args( @_ ) if $self->debug >= 2;
+
+    my @hash_keys = @{ $self->{vars_string} };
+    my $ref       = $self->{peek_all}{$var} // '';
+    $ref = $$ref if reftype( $ref ) eq "REF";
+    push @hash_keys, keys %$ref if reftype( $ref ) eq "HASH";
+
+    $self->_match(
+        words   => [ sort @hash_keys ],
+        partial => $text,
+        nospace => 1,
+    );
+}
+
+sub _complete_vars {
+    my $self = shift;
+    my ( $text, $line, $start, $end ) = @_;
+    $self->_dump_args( @_ ) if $self->debug >= 2;
+
+    $self->_match(
+        words   => $self->{vars_all},
+        partial => $text,
+        nospace => 1,
+    );
+}
+
+=head2 _match
+
+Wrapper to simplify completion function.
+
+Input:
+
+ words   => ARRAYREF, # What to look for.
+ partial => STRING,   # Default: ""  - What you typed so far.
+ prepend => "STRING", # Default: ""  - prepend to each possiblity.
+ nospace => 0,        # Default: "0" - will not append a space after a completion.
+
+Returns the possible matches:
+
+=cut
+
+sub _match {
+    my $self  = shift;
+    my %parms = @_;
+    $self->_dump_args( @_ ) if $self->debug >= 2;
+
+    # completion_word does NOT automationally get reset per call.
+    # completion_suppress_append gets reset per call.
+    # attempted_completion_over gets reset per call.
+    $self->attr->{completion_word}            = $parms{words};
+    $self->attr->{completion_suppress_append} = 1 if $parms{nospace};
+    $self->attr->{attempted_completion_over}  = 1;  # Avoid filename completion.
+
+    $parms{partial} //= "";
+    $parms{prepend} //= "";
+
+    # Return possible matches.
+    map { "$parms{prepend}$_" }
+      $self->term->completion_matches( $parms{partial},
+        $self->attr->{list_completion_function} );
+}
+
+sub _dump_args {
+    my $self = shift;
+    my $sub  = ( caller( 1 ) )[3];
+    $sub =~ s/ ^ .* :: //x;    # Short sub name.
+    my $args = join ",", map { defined( $_ ) ? "'$_'" : "undef" } @_;
+    printf "%-20s %s\n", $sub, "($args)";
+}
+
+sub _define_commands {
+    (
+        "help",    # Changed in _step to $repl->help().
+        "hist",    # Changed in _step to $repl->hist().
+        "p",       # From Data::Printer and exporting it.
+        "d",       # Exporting it.
+        "q",       # Used in _step to stop the repl.
+    );
+}
+
 # Help
 
 =head2 help
@@ -774,12 +1237,12 @@ sub _define_help {
 
  $class $version
 
- <TAB>       - Show options.
- help        - Show this help section.
- hist [N=20] - Show last N commands.
- p VAR       - Data printer.
- d DATA [#N] - Data dumper (with optional depth).
- q           - Quit debugger.
+ <TAB>      - Show options.
+ help       - Show this help section.
+ hist [N=5] - Show last N commands.
+ d DATA     - Data dumper.
+ p DATA     - Data printer (colored).
+ q          - Quit debugger.
 HELP
 }
 
@@ -824,9 +1287,15 @@ sub _color_help {
 
 # History
 
+=head2 History
+
+All commands run in the debugger are saved locally and loaded next time the module is loaded.
+
+=cut
+
 =head2 hist
 
-Show history of commands.
+Can use hist to show a history of commands.
 
 By default will show 20 commands:
 
@@ -912,47 +1381,55 @@ sub _save_history {
 
 Data::Dumper::Dump anything.
 
+You can use "d" as a print command which
+can show a simple or complex data structure.
+
  d 123
  d [1, 2, 3]
-
-Can adjust the maxdepth (default is 1) to see with: "#Number".
-
- d { a => [1, 2, 3] } #1
-
-Output:
-
- {
-   'a' => 'ARRAY(0x55fd914a3d80)'
- }
-
-Set maxdepth to '0' to show all nested structures.
 
 =cut
 
 sub d {
-
-    # Use same function to change maxdepth of whats shown.
-    my $maxdepth =
-      1;    # Good default to often having to change it during display.
-    if ( @_ > 1 and $_[-1] =~ / ^ --maxdepth=(\d+) $ /x )
-    {       # Like with "tree" command.
-        $maxdepth = $1;
-        pop @_;
-    }
-
     my $d = Data::Dumper
       ->new( \@_ )
       ->Indent( 1 )
       ->Sortkeys( 1 )
       ->Terse( 1 )
-      ->Useqq( 1 )
-      ->Maxdepth( $maxdepth );
+      ->Useqq( 1 );
 
     return $d->Dump if wantarray;
     print $d->Dump;
 }
 
-# List Utils.
+=head2 p
+
+Data::Printer::p
+
+You can use "p" as a print command which
+can show a simple or complex data structure
+with colors.
+
+Some example uses:
+
+ p 123
+ p [1, 2, 3]
+ p $scalar
+ p \@array
+ p \%hash
+ p $object
+
+=cut
+
+# Misc
+
+=head2 uniq
+
+Returns a unique list of elements.
+
+List::Util in lower than v5.26 does not
+provide a unique function.
+
+=cut
 
 sub uniq (@) {
     my %h;
@@ -995,17 +1472,21 @@ sub _show_error {
 
 # Pod
 
-=head2 attr
+=head2 Internal Properties
+
+=head3 attr
 
 Internal use.
 
-=head2 debug
+=head3 debug
 
 Internal use.
 
-=head2 term
+=head3 term
 
 Internal use.
+
+=cut
 
 =head1 ENVIRONMENT
 
@@ -1013,9 +1494,12 @@ Install required library:
 
  sudo apt install libreadline-dev
 
-Enable this environmental variable to show debugging information:
+Enable this environmental variable to
+show debugging information:
 
  RUNTIME_DEBUGGER_DEBUG=1
+
+=cut
 
 =head1 SEE ALSO
 
@@ -1031,19 +1515,21 @@ L<Why not Devel::REPL?|/Devel::REPL>
 
 L<Why not Reply?|/Reply>
 
+=cut
+
 =head1 AUTHOR
 
 Tim Potapov, C<< <tim.potapov[AT]gmail.com> >> E<0x1f42a>E<0x1f977>
 
+=cut
+
 =head1 BUGS
-
-- L<no new lexicals|/New Variables>
-
-Please report any (other) bugs or feature requests to L<https://github.com/poti1/runtime-debugger/issues>.
 
 =head2 Control-C
 
-Doing a Control-C may occassionally break the output in your terminal.
+Doing a Control-C may occassionally break
+the output in your terminal (exit with 'q'
+when possible).
 
 Simply run any one of these:
 
@@ -1051,30 +1537,70 @@ Simply run any one of these:
  tset
  stty echo
 
-=head2 undef Variable
+=head2 New Variables
 
-inside a long running (and perhaps complicated) script, a variable
-may become undef.
+Currently it is not possible to create new
+lexicals (my) variables.
 
-It may be that the padwalker perhaps is confused (not sure).
-Try running this:
+You can create new global variables by:
 
- perl>delete $repl->{vars_all}
+ - Default
+   $var=123
 
-Otherwise, restart the script.
+ - Using our
+   $our $var=123
+
+ - Given the full path
+   $My::var = 123
+
+=head2 Lossy undef Variable
+
+inside a long running (and perhaps complicated)
+script, a variable may become undef.
+
+This piece of code demonstrates the problem
+with using c<eval run>.
+
+ sub Func {
+     my ($code) = @_;
+     $code->();
+ }
+
+ Func( sub{
+     my $v2 = 222;
+
+     # This causes issues.
+     use Runtime::Debugger;
+     eval run;
+
+     # Whereas, this one works.
+     use Runtime::Debugger;
+     repl;
+ });
+
+This issue is described here L<https://www.perlmonks.org/?node_id=11158351>
+
+=head2 Other
+
+Please report any (other) bugs or feature
+requests to L<https://github.com/poti1/runtime-debugger/issues>.
+
+=cut
 
 =head1 SUPPORT
 
-You can find documentation for this module with the perldoc command.
+You can find documentation for this module
+with the perldoc command.
 
     perldoc Runtime::Debugger
-
 
 You can also look for information at:
 
 L<https://metacpan.org/pod/Runtime::Debugger>
+
 L<https://github.com/poti1/runtime-debugger>
 
+=cut
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -1083,7 +1609,6 @@ This software is Copyright (c) 2022 by Tim Potapov.
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
-
 
 =cut
 

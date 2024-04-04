@@ -10,7 +10,7 @@ use Cwd;
 use File::Path;
 our @ISA = qw( Module::Build );
 
-our $VERSION ='0.91';
+our $VERSION ='0.92';
 
 sub process_xs_files {
 	my $self = shift;

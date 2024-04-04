@@ -5,8 +5,9 @@ use warnings;
 
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
+use Mo::utils 0.09 qw(check_number);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -21,9 +22,8 @@ sub new {
 	# Process parameters.
 	set_params($self, @params);
 
-	if ($self->{'number_of_stars'} !~ m/^\d+$/) {
-		err "Parameter 'number_of_stars' must be a number.";
-	}
+	# Check number_of_stars.
+	check_number($self, 'number_of_stars');
 
 	return $self;
 }
@@ -72,8 +72,6 @@ Number::Stars - Class for conversion between percent number to star visualizatio
 
 Constructor.
 
-Returns instance of Number::Stars.
-
 =over 8
 
 =item * C<number_of_stars>
@@ -83,6 +81,8 @@ Number of stars.
 Default value is 10.
 
 =back
+
+Returns instance of object.
 
 =head2 C<percent_stars>
 
@@ -100,6 +100,9 @@ Returns reference to hash.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+         From Mo::utils::check_number():
+                 Parameter 'number_of_stars' must be a number.
+                         Value: %s
 
 =head1 EXAMPLE1
 
@@ -261,7 +264,8 @@ Returns reference to hash.
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
-L<Error::Pure>.
+L<Error::Pure>,
+L<Mo::utils>.
 
 =head1 SEE ALSO
 
@@ -269,7 +273,7 @@ L<Error::Pure>.
 
 =item L<Tags::HTML::Stars>
 
-Tags helper for stars evaluation
+Tags helper for stars evaluation.
 
 =back
 
@@ -291,6 +295,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

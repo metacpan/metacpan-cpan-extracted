@@ -94,6 +94,7 @@ lib/AsposeSlidesCloud/Object/GraphicalObject.pm
 lib/AsposeSlidesCloud/Object/GrayScaleEffect.pm
 lib/AsposeSlidesCloud/Object/GroupingCharacterElement.pm
 lib/AsposeSlidesCloud/Object/GroupShape.pm
+lib/AsposeSlidesCloud/Object/HandoutLayoutingOptions.pm
 lib/AsposeSlidesCloud/Object/HeaderFooter.pm
 lib/AsposeSlidesCloud/Object/HslEffect.pm
 lib/AsposeSlidesCloud/Object/Html5ExportOptions.pm
@@ -131,6 +132,7 @@ lib/AsposeSlidesCloud/Object/MoveToPathSegment.pm
 lib/AsposeSlidesCloud/Object/NaryOperatorElement.pm
 lib/AsposeSlidesCloud/Object/NoFill.pm
 lib/AsposeSlidesCloud/Object/NormalViewRestoredProperties.pm
+lib/AsposeSlidesCloud/Object/NotesCommentsLayoutingOptions.pm
 lib/AsposeSlidesCloud/Object/NotesSlide.pm
 lib/AsposeSlidesCloud/Object/NotesSlideExportFormat.pm
 lib/AsposeSlidesCloud/Object/NotesSlideHeaderFooter.pm
@@ -210,6 +212,7 @@ lib/AsposeSlidesCloud/Object/SlideReplaceResult.pm
 lib/AsposeSlidesCloud/Object/Slides.pm
 lib/AsposeSlidesCloud/Object/SlideShowProperties.pm
 lib/AsposeSlidesCloud/Object/SlideShowTransition.pm
+lib/AsposeSlidesCloud/Object/SlidesLayoutOptions.pm
 lib/AsposeSlidesCloud/Object/SmartArt.pm
 lib/AsposeSlidesCloud/Object/SmartArtNode.pm
 lib/AsposeSlidesCloud/Object/SmartArtShape.pm

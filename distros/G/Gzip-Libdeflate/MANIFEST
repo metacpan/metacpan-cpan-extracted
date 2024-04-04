@@ -1,6 +1,7 @@
 Changes
 examples/synopsis.pl
 gzip-libdeflate-perl.c
+inc/CheckCCVersion.pm
 lib/Gzip/Libdeflate.pm
 lib/Gzip/Libdeflate.pod
 libdeflate-one.c

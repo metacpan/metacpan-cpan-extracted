@@ -116,35 +116,28 @@ EOD
 my %over = 
     (
      sumover  => { name => 'sum',     op => '+=', init => 0, },
-     prodover => { name => 'product', op => '*=', init => 1, },
+     prodover => { name => 'product', op => '*=', init => 1, leftzero => 'tmp == 0' },
      );
 
 foreach my $func ( sort keys %over ) {
-
-    # creates $func and cumu$func functions
-    # and d$func and dcumu$func functions, which
-    # perform the calculations in double precision
-    
-    my $name = $over{$func}{name};
-    my $op   = $over{$func}{op};
-    my $init = $over{$func}{init};
-
+    my ($name, $op, $init, $leftzero) = @{$over{$func}}{qw(name op init leftzero)};
     pp_def(
 	   $_->[0].$func,
 	   HandleBad => 1,
 	   Pars => "a(n); $_->[1] [o]b();",
 	   $_->[2] ? (GenericTypes=>$_->[2]) : (),
-           Code => qq{
+           Code => <<EOF,
             \$GENERIC(b) tmp = $init;
-            int flag = 0;
+            PDL_IF_BAD(int flag = 0;,)
             loop(n) %{
-            PDL_IF_BAD(if ( \$ISGOOD(a()) ) { flag = 1;,)
+            PDL_IF_BAD(if ( \$ISGOOD(a()) ) { flag = 1;,{)
               tmp $op \$a();
-            PDL_IF_BAD(},)
+            }
+            @{[$leftzero ? "if ($leftzero) break;" : '']}
             %}
             PDL_IF_BAD(if ( !flag ) \$SETBAD(b()); else,)
             \$b() = tmp;
-           },
+EOF
 	   Doc => projectdocs( $name, $_->[0].$func, $_->[3] ),
 	   ) for (
       ['', 'int+', $A, ''],
@@ -166,15 +159,19 @@ precision."
            Code => qq{
             \$GENERIC(b) tmp = $init;
             loop(n) %{
-              PDL_IF_BAD(if ( \$ISBAD(a()) ) { \$SETBAD(b()); } else {,)
+              PDL_IF_BAD(if ( \$ISBAD(a()) ) { \$SETBAD(b()); } else,) {
                 tmp $op \$a();
                 \$b() = tmp;
-              PDL_IF_BAD(},)
+              }
             %}
            },
 	   Doc => cumuprojectdocs( $name, $_->[0].$cfunc, $_->[3] ),
 	   ) for (
       ['', 'int+', $A, ''],
+      ['c', 'cdouble', $C,
+"Unlike L</$cfunc>, the calculations are performed in complex double
+precision."
+      ],
       ['d', 'double', undef,
 "Unlike L</$cfunc>, the calculations are performed in double precision."
       ],
@@ -536,9 +533,7 @@ for my $op ( ['avg','average','average'],
 	     ['median', 'medover', 'median'],
 	     ['mode', 'modeover', 'mode'],
 	     ['oddmedian','oddmedover','oddmedian']) {
-    my $name = $op->[0];
-    my $func = $op->[1];
-    my $text = $op->[2];
+   my ($name, $func, $text) = @$op;
    pp_add_exported('', $name);
    pp_addpm(<<"EOD");
 =head2 $name
@@ -561,8 +556,8 @@ This routine handles bad values.
 
 *$name = \\&PDL::$name;
 sub PDL::$name {
-	my(\$x) = \@_; my \$tmp;
-	\$x->clump(-1)->${func}( \$tmp=PDL->nullcreate(\$x) );
+	my (\$x) = \@_;
+	\$x->flat->${func}( my \$tmp=PDL->nullcreate(\$x) );
 	\$tmp;
 }
 EOD
@@ -642,11 +637,7 @@ and therefore ignore whether the values are bad.
 =cut
 
 *minmax = \&PDL::minmax;
-sub PDL::minmax {
-  my ($x)=@_; my $tmp;
-  my @arr = $x->clump(-1)->minmaximum;
-  map $_->sclr, @arr[0,1]; # as scalars !
-}
+sub PDL::minmax { map $_->sclr, ($_[0]->flat->minmaximum)[0,1] }
 
 EOPM
 
@@ -949,7 +940,7 @@ specified percentile falls between data points, the $_->[1].
 *$_->[0]pct = \\&PDL::$_->[0]pct;
 sub PDL::$_->[0]pct {
 	my(\$x, \$p) = \@_;
-	\$x->clump(-1)->$_->[0]pctover(\$p, my \$tmp=PDL->nullcreate(\$x));
+	\$x->flat->$_->[0]pctover(\$p, my \$tmp=PDL->nullcreate(\$x));
 	\$tmp;
 }
 EOD
@@ -971,7 +962,8 @@ pp_def(
     Inplace => 1,
     Pars => 'a(n); [o]b(n);',
     Code =>
-    'register PDL_Indx nn = 0, nb = $SIZE(n) - 1;
+    'register PDL_Indx nn = 0;
+     PDL_IF_BAD(register PDL_Indx nb = $SIZE(n) - 1;,)
      '.qsort_croak('b',0,0).'
      loop(n) %{ 
         PDL_IF_BAD(if (!$ISGOOD(a())) { $SETBAD(b(n=>nb)); nb--; }

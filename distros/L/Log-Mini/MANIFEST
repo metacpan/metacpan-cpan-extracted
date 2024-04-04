@@ -9,6 +9,7 @@ lib/Log/Mini/Logger/Base.pm
 lib/Log/Mini/Logger/FILE.pm
 lib/Log/Mini/Logger/NULL.pm
 lib/Log/Mini/Logger/STDERR.pm
+lib/Log/Mini/Logger/STDOUT.pm
 minil.toml
 t/00_compile.t
 t/01_logger_builder.t
@@ -16,5 +17,6 @@ t/02_Logger.t
 t/03_LoggerFILE.t
 t/04_LoggerSTDERR.t
 t/05_Integration.t
+t/06_LoggerSTDOUT.t
 META.yml
 MANIFEST

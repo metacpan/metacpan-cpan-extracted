@@ -9,10 +9,7 @@ requires 'List::MoreUtils';
 requires 'List::Util';
 requires 'LWP::UserAgent';
 requires 'LWP::Protocol::https';
-requires 'Travel::Status::DE::HAFAS';
-requires 'Travel::Status::DE::HAFAS::Journey',  '5.01';
-requires 'Travel::Status::DE::HAFAS::Location', '5.00';
-requires 'Travel::Status::DE::HAFAS::Message',  '4.19';
+requires 'Travel::Status::DE::HAFAS', '5.06';
 
 on test => sub {
 	requires 'Test::Compile';

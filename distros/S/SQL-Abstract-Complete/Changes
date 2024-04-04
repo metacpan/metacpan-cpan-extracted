@@ -1,5 +1,8 @@
 Revision history for SQL::Abstract::Complete
 
+1.09      2024-03-28 12:22:27-07:00 America/Los_Angeles
+        - Slightly better handling of columns in get()
+
 1.08      2022-03-19 17:52:32-07:00 America/Los_Angeles
         - Minor documentation update
 

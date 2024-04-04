@@ -13,7 +13,7 @@ Tk::ITree - Shamelessly copied Tk::Tree widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.03';
 
 use Tk ();
 use Tk::Derived;
@@ -54,7 +54,7 @@ needed to change is a hidden one.
 
 All cudos go to the original authors.
 
-You can use all config options and methods of the Tree widget.
+You can use all config variables and methods of the Tree widget.
 
 =cut
 
@@ -64,13 +64,18 @@ You can use all config options and methods of the Tree widget.
 
 =item Switch: B<-indicatorminusimg>
 
-Set or get the I<plus> indicator image. By default it is set
-to a Bitmap of I<indicatorminus.xbm> included in this distribution.
+Set or get the I<minus> indicator image. By default it is set
+to an internal bitmap in this package.
 
-=item Switch: B<-indicatorminusimg>
+=item Switch: B<-indicatorplusimg>
 
 Set or get the I<plus> indicator image. By default it is set
-to a Bitmap of I<indicatorminus.xbm> included in this distribution.
+to an internal bitmap in this package.
+
+=item Switch: B<-leftrightcall>
+
+This callback is executed when the user presses the right or left arrow key.
+The call gets 'left' or 'right' and the name of the selected entry as parameter.
 
 =back
 
@@ -86,6 +91,7 @@ sub Populate
  my $fg = $l->cget('-foreground');
  $l->destroy;
  $w->ConfigSpecs(
+	-closecmd     => ['CALLBACK', 'closeCmd',     'CloseCmd', 'CloseCmd'],
 	-indicatorminusimg => ['PASSIVE', undef, undef, $w->Bitmap(
 		-data => $minusimg,
 		-foreground => $fg,
@@ -94,16 +100,15 @@ sub Populate
 		-data => $plusimg,
 		-foreground => $fg,
 	)],
-        -ignoreinvoke => ['PASSIVE',  'ignoreInvoke', 'IgnoreInvoke', 0],
-        -opencmd      => ['CALLBACK', 'openCmd',      'OpenCmd', 'OpenCmd' ],
-        -indicatorcmd => ['CALLBACK', 'indicatorCmd', 'IndicatorCmd', 'IndicatorCmd'],
-        -closecmd     => ['CALLBACK', 'closeCmd',     'CloseCmd', 'CloseCmd'],
-        -indicator    => ['SELF', 'indicator', 'Indicator', 1],
-        -indent       => ['SELF', 'indent', 'Indent', 20],
-        -width        => ['SELF', 'width', 'Width', 20],
-        -itemtype     => ['SELF', 'itemtype', 'Itemtype', 'imagetext'],
-	-foreground   => ['SELF'],
-       );
+	-indent       => ['SELF', 'indent', 'Indent', 20],
+	-indicator    => ['SELF', 'indicator', 'Indicator', 1],
+	-indicatorcmd => ['CALLBACK', 'indicatorCmd', 'IndicatorCmd', 'IndicatorCmd'],
+	-ignoreinvoke => ['PASSIVE',  'ignoreInvoke', 'IgnoreInvoke', 0],
+	-itemtype     => ['SELF', 'itemtype', 'Itemtype', 'imagetext'],
+	-leftrightcall => ['CALLBACK', undef, undef, sub {}],
+	-opencmd      => ['CALLBACK', 'openCmd',      'OpenCmd', 'OpenCmd' ],
+	-width        => ['SELF', 'width', 'Width', 20],
+ );
 }
 
 sub autosetmode
@@ -373,6 +378,20 @@ sub _indicator_image
  return $data->{$ent};
 }
 
+sub LeftRight {
+	my ($self, $spec) = @_;
+	my ($sel) = $self->infoSelection;
+	if ((defined $sel) and $self->infoChildren($sel)) {
+		if ($spec eq 'left') {
+			$self->Activate($sel, 'close'); 
+		} elsif ($spec eq 'right') {
+			$self->Activate($sel, 'open'); 
+		}
+		$self->Callback('-leftrightcall', $spec, $sel);
+	}
+	$self->SUPER::LeftRight($spec)
+}
+
 =head1 AUTHOR
 
 Hans Jeuken (hanje at cpan dot org)
@@ -400,4 +419,8 @@ __END__
 #               (c) 1994-1995 Sun Microsystems, Inc.
 #  The license terms of the Tcl/Tk distrobution are in the file
 #  license.tcl.
+
+
+
+
 

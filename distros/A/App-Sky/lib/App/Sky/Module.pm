@@ -1,5 +1,5 @@
 package App::Sky::Module;
-$App::Sky::Module::VERSION = '0.4.2';
+$App::Sky::Module::VERSION = '0.4.3';
 use strict;
 use warnings;
 
@@ -83,7 +83,7 @@ App::Sky::Module - class that does the heavy lifting.
 
 =head1 VERSION
 
-version 0.4.2
+version 0.4.3
 
 =head1 METHODS
 

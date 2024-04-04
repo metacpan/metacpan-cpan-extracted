@@ -57,18 +57,10 @@ GNU Scientific Library.
      my ($x) = @_;
      return $x**2;
    }
-#line 61 "DIFF.pm"
-
-=head1 FUNCTIONS
 
 =cut
 
-
-
-
-
-#line 119 "gsl_diff.pd"
-
+#line 121 "gsl_diff.pd"
 sub gsldiff{
   my $opt;
   if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
@@ -91,78 +83,14 @@ sub gsldiff{
   }
   return ($res,$abserr);
 }
-#line 95 "DIFF.pm"
-
-=head2 diff_central
-
-=for sig
-
-  Signature: (double x(); double [o] res(); double [o] abserr(); SV* function)
-
-=for ref
-
-info not available
-
-=for bad
-
-diff_central does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
+#line 87 "DIFF.pm"
 
 *diff_central = \&PDL::diff_central;
 
 
 
 
-
-
-=head2 diff_backward
-
-=for sig
-
-  Signature: (double x(); double [o] res(); double [o] abserr(); SV* function)
-
-=for ref
-
-info not available
-
-=for bad
-
-diff_backward does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
 *diff_backward = \&PDL::diff_backward;
-
-
-
-
-
-
-=head2 diff_forward
-
-=for sig
-
-  Signature: (double x(); double [o] res(); double [o] abserr(); SV* function)
-
-=for ref
-
-info not available
-
-=for bad
-
-diff_forward does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
 
 
 
@@ -175,7 +103,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 41 "gsl_diff.pd"
+#line 43 "gsl_diff.pd"
 
 =head2 gsldiff
 
@@ -241,7 +169,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL differentiation routines were written by David Morrison.
 
 =cut
-#line 245 "DIFF.pm"
+#line 173 "DIFF.pm"
 
 # Exit with OK status
 

@@ -3,11 +3,13 @@ package main;
 use strict;
 use warnings;
 
-use Test::More 0.88;
+use Test2::V0;
+use Test2::Plugin::BailOnFail;
+use Test2::Tools::LoadModule ':more';
 
 use lib 'inc';
 
-use My::Module::Test::Mock_App;
+use My::Module::Test::App qw{ dependencies_table setup_app_mocker };
 
 delete $ENV{TZ};
 
@@ -29,104 +31,85 @@ my @parse_time_methods = ( @copier_methods,
     qw{ new base config delegate decode parse parse_time_absolute reset
     tz use_perltime } );
 
-my $app = My::Module::Test::Mock_App->new();
+diag $_ for dependencies_table();
 
 defined $ENV{TZ}
     and diag "\$ENV{TZ} is '$ENV{TZ}'";
 
-require_ok 'Astro::App::Satpass2::Utils'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::Utils';
 
 {
-    can_ok 'Astro::App::Satpass2::Utils', qw{ __parse_class_and_args }
-	or BAIL_OUT;
+    can_ok 'Astro::App::Satpass2::Utils', qw{ __parse_class_and_args };
 
     my $code = Astro::App::Satpass2::Utils->can(
 	'__parse_class_and_args' );
 
-    is_deeply [ $code->( undef, 'Fubar' ) ], [ 'Fubar' ],
+    is [ $code->( undef, 'Fubar' ) ], [ 'Fubar' ],
 	q<__parse_class_and_args( 'Fubar' )>;
 
-    is_deeply [ $code->( undef, 'Fu::Bar,baz=burfle' ) ],
+    is [ $code->( undef, 'Fu::Bar,baz=burfle' ) ],
 	[ qw{ Fu::Bar baz burfle } ],
 	q<__parse_class_and_args( 'Fu::Bar,baz=burfle' )>;
 
-    is_deeply [ $code->( undef, 'Fu::Bar,baz=burfle=buzz' ) ],
+    is [ $code->( undef, 'Fu::Bar,baz=burfle=buzz' ) ],
 	[ qw{ Fu::Bar baz burfle=buzz } ],
 	q<__parse_class_and_args( 'Fu::Bar,baz=burfle=buzz' )>;
 
     {
 	no warnings qw{ qw };
 
-	is_deeply [ $code->( undef, 'Fu::Bar,baz=bur\\,fle' ) ],
+	is [ $code->( undef, 'Fu::Bar,baz=bur\\,fle' ) ],
 	    [ qw{ Fu::Bar baz bur,fle } ],
 	    q<__parse_class_and_args( 'Fu::Bar,baz=bur\\,fle' )>;
 
-	is_deeply [ $code->( undef, 'Fu::Bar,baz="bur,fle"' ) ],
+	is [ $code->( undef, 'Fu::Bar,baz="bur,fle"' ) ],
 	    [ qw{ Fu::Bar baz bur,fle } ],
 	    q<__parse_class_and_args( 'Fu::Bar,baz="bur,fle"' )>;
     }
 
 }
 
-require_ok 'Astro::App::Satpass2::Locale'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::Locale';
 
-require_ok 'Astro::App::Satpass2::Locale::C'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::Locale::C';
 
-require_ok 'Astro::App::Satpass2::Warner'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::Warner';
 
 can_ok 'Astro::App::Satpass2::Warner',
-    qw{ new wail warning weep whinge }
-    or BAIL_OUT;
+    qw{ new wail warning weep whinge };
 
-require_ok 'Astro::App::Satpass2::Copier'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::Copier';
 
-can_ok 'Astro::App::Satpass2::Copier', @copier_methods
-    or BAIL_OUT;
+can_ok 'Astro::App::Satpass2::Copier', @copier_methods;
 
-require_ok 'Astro::App::Satpass2::Macro'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::Macro';
 
-require_ok 'Astro::App::Satpass2::Macro::Command'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::Macro::Command';
 
 isa_ok 'Astro::App::Satpass2::Macro::Command',
     'Astro::App::Satpass2::Macro';
 
-require_ok 'Astro::App::Satpass2::Macro::Code'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::Macro::Code';
 
 isa_ok 'Astro::App::Satpass2::Macro::Code',
-    'Astro::App::Satpass2::Macro'
-    or BAIL_OUT;
+    'Astro::App::Satpass2::Macro';
 
-require_ok 'Astro::App::Satpass2::FormatTime'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::FormatTime';
 
-isa_ok 'Astro::App::Satpass2::FormatTime', 'Astro::App::Satpass2::Copier'
-    or BAIL_OUT;
+isa_ok 'Astro::App::Satpass2::FormatTime', 'Astro::App::Satpass2::Copier';
 
-can_ok 'Astro::App::Satpass2::FormatTime', @format_time_methods
-    or BAIL_OUT;
+can_ok 'Astro::App::Satpass2::FormatTime', @format_time_methods;
 
-require_ok 'Astro::App::Satpass2::FormatTime::POSIX::Strftime'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::FormatTime::POSIX::Strftime';
 
 
 isa_ok 'Astro::App::Satpass2::FormatTime::POSIX::Strftime',
-    'Astro::App::Satpass2::FormatTime'
-    or BAIL_OUT;
+    'Astro::App::Satpass2::FormatTime';
 
 can_ok 'Astro::App::Satpass2::FormatTime::POSIX::Strftime',
-    @format_time_methods
-    or BAIL_OUT;
+    @format_time_methods;
 
-instantiate( 'Astro::App::Satpass2::FormatTime::POSIX::Strftime' )
-    or BAIL_OUT;
+instantiate( 'Astro::App::Satpass2::FormatTime::POSIX::Strftime' );
 
 SKIP: {
 
@@ -138,52 +121,39 @@ SKIP: {
 	1;
     } or skip 'DateTime and/or DateTime::TimeZone not available', $tests;
 
-    require_ok 'Astro::App::Satpass2::FormatTime::DateTime'
-	or BAIL_OUT;
+    require_ok 'Astro::App::Satpass2::FormatTime::DateTime';
 
     isa_ok 'Astro::App::Satpass2::FormatTime::DateTime',
-	'Astro::App::Satpass2::FormatTime'
-	or BAIL_OUT;
+	'Astro::App::Satpass2::FormatTime';
 
     can_ok 'Astro::App::Satpass2::FormatTime::DateTime',
-	@format_time_methods
-	or BAIL_OUT;
+	@format_time_methods;
 
-    require_ok 'Astro::App::Satpass2::FormatTime::DateTime::Strftime'
-	or BAIL_OUT;
+    require_ok 'Astro::App::Satpass2::FormatTime::DateTime::Strftime';
 
     isa_ok 'Astro::App::Satpass2::FormatTime::DateTime::Strftime',
-	'Astro::App::Satpass2::FormatTime::DateTime'
-	or BAIL_OUT;
+	'Astro::App::Satpass2::FormatTime::DateTime';
 
     can_ok 'Astro::App::Satpass2::FormatTime::DateTime::Strftime',
-	@format_time_methods
-	or BAIL_OUT;
+	@format_time_methods;
 
-    instantiate( 'Astro::App::Satpass2::FormatTime::DateTime::Strftime' )
-	or BAIL_OUT;
+    instantiate( 'Astro::App::Satpass2::FormatTime::DateTime::Strftime' );
 
-    require_ok 'Astro::App::Satpass2::FormatTime::DateTime::Cldr'
-	or BAIL_OUT;
+    require_ok 'Astro::App::Satpass2::FormatTime::DateTime::Cldr';
 
     isa_ok 'Astro::App::Satpass2::FormatTime::DateTime::Cldr',
-	'Astro::App::Satpass2::FormatTime::DateTime'
-	or BAIL_OUT;
+	'Astro::App::Satpass2::FormatTime::DateTime';
 
     can_ok 'Astro::App::Satpass2::FormatTime::DateTime::Cldr',
-	@format_time_methods
-	or BAIL_OUT;
+	@format_time_methods;
 
-    instantiate( 'Astro::App::Satpass2::FormatTime::DateTime::Cldr' )
-	or BAIL_OUT;
+    instantiate( 'Astro::App::Satpass2::FormatTime::DateTime::Cldr' );
 
 }
 
-instantiate( 'Astro::App::Satpass2::FormatTime' )
-    or BAIL_OUT;
+instantiate( 'Astro::App::Satpass2::FormatTime' );
 
-require_ok 'Astro::App::Satpass2::FormatValue'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::FormatValue';
 
 can_ok 'Astro::App::Satpass2::FormatValue', qw{
     almanac altitude angle apoapsis apogee appulse argument_of_perigee
@@ -198,92 +168,31 @@ can_ok 'Astro::App::Satpass2::FormatValue', qw{
     period phase rad2deg range reflections reftype reset_title_lines
     revolutions_at_epoch right_ascension second_derivative semimajor
     semiminor station status time title_gravity tle type
-}
-    or BAIL_OUT;
+};
 
-instantiate( 'Astro::App::Satpass2::FormatValue' )
-    or BAIL_OUT;
+instantiate( 'Astro::App::Satpass2::FormatValue' );
 
-require_ok 'Astro::App::Satpass2::Format'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::ParseTime';
 
-isa_ok 'Astro::App::Satpass2::Format', 'Astro::App::Satpass2::Copier'
-    or BAIL_OUT;
+isa_ok 'Astro::App::Satpass2::ParseTime', 'Astro::App::Satpass2::Copier';
 
-can_ok 'Astro::App::Satpass2::Format', @format_methods
-    or BAIL_OUT;
+can_ok 'Astro::App::Satpass2::ParseTime', @parse_time_methods;
 
-require_ok 'Astro::App::Satpass2::Format::Dump'
-    or BAIL_OUT;
-
-isa_ok 'Astro::App::Satpass2::Format::Dump', 'Astro::App::Satpass2::Format'
-    or BAIL_OUT;
-
-instantiate(
-    'Astro::App::Satpass2::Format::Dump',
-    parent	=> $app,
-    'Astro::App::Satpass2::Format',
-)
-    or BAIL_OUT;
-
-can_ok 'Astro::App::Satpass2::Format::Dump', @format_methods
-    or BAIL_OUT;
-
-require_ok 'Astro::App::Satpass2::Wrap::Array'
-    or BAIL_OUT;
-
-can_ok 'Astro::App::Satpass2::Wrap::Array', qw{ new dereference };
-
-instantiate( 'Astro::App::Satpass2::Wrap::Array', [],
-    'Astro::App::Satpass2::Wrap::Array' )
-    or BAIL_OUT;
-
-require_ok 'Astro::App::Satpass2::Format::Template'
-    or BAIL_OUT;
-
-isa_ok 'Astro::App::Satpass2::Format::Template',
-    'Astro::App::Satpass2::Format'
-    or BAIL_OUT;
-
-can_ok 'Astro::App::Satpass2::Format', @format_methods
-    or BAIL_OUT;
-
-instantiate(
-    'Astro::App::Satpass2::Format::Template',
-    parent	=> $app,
-    'Astro::App::Satpass2::Format',
-)
-    or BAIL_OUT;
-
-require_ok 'Astro::App::Satpass2::ParseTime'
-    or BAIL_OUT;
-
-isa_ok 'Astro::App::Satpass2::ParseTime', 'Astro::App::Satpass2::Copier'
-    or BAIL_OUT;
-
-can_ok 'Astro::App::Satpass2::ParseTime', @parse_time_methods
-    or BAIL_OUT;
-
-require_ok 'Astro::App::Satpass2::ParseTime::Code'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::ParseTime::Code';
 
 isa_ok 'Astro::App::Satpass2::ParseTime::Code',
-    'Astro::App::Satpass2::ParseTime'
-    or BAIL_OUT;
+    'Astro::App::Satpass2::ParseTime';
 
 can_ok 'Astro::App::Satpass2::ParseTime::Code',
-    @parse_time_methods
-    or BAIL_OUT;
+    @parse_time_methods;
 
 is eval { Astro::App::Satpass2::ParseTime::Code->delegate() },	## no critic (RequireCheckingReturnValueOfEval)
     'Astro::App::Satpass2::ParseTime::Code',
     'Code delegate is Astro::App::Satpass2::ParseTime::Code';
 
-require_ok 'Astro::App::Satpass2::ParseTime::Date::Manip'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::ParseTime::Date::Manip';
 
-can_ok 'Astro::App::Satpass2::ParseTime::Date::Manip', @parse_time_methods
-    or BAIL_OUT;
+can_ok 'Astro::App::Satpass2::ParseTime::Date::Manip', @parse_time_methods;
 
 my $date_manip_delegate = Astro::App::Satpass2::Utils::__date_manip_backend();
 defined $date_manip_delegate
@@ -296,38 +205,29 @@ is eval { Astro::App::Satpass2::ParseTime::Date::Manip->delegate() },	## no crit
 	defined $date_manip_delegate ? $date_manip_delegate : 'undef' )
 ;
 
-require_ok 'Astro::App::Satpass2::ParseTime::Date::Manip::v5'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::ParseTime::Date::Manip::v5';
 
 isa_ok 'Astro::App::Satpass2::ParseTime::Date::Manip::v5',
-    'Astro::App::Satpass2::ParseTime'
-    or BAIL_OUT;
+    'Astro::App::Satpass2::ParseTime';
 
 can_ok 'Astro::App::Satpass2::ParseTime::Date::Manip::v5',
-    @parse_time_methods
-    or BAIL_OUT;
+    @parse_time_methods;
 
-require_ok 'Astro::App::Satpass2::ParseTime::Date::Manip::v6'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::ParseTime::Date::Manip::v6';
 
 isa_ok 'Astro::App::Satpass2::ParseTime::Date::Manip::v6',
-    'Astro::App::Satpass2::ParseTime'
-    or BAIL_OUT;
+    'Astro::App::Satpass2::ParseTime';
 
 can_ok 'Astro::App::Satpass2::ParseTime::Date::Manip::v6',
-    @parse_time_methods
-    or BAIL_OUT;
+    @parse_time_methods;
 
-require_ok 'Astro::App::Satpass2::ParseTime::ISO8601'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::ParseTime::ISO8601';
 
 isa_ok 'Astro::App::Satpass2::ParseTime::ISO8601',
-    'Astro::App::Satpass2::ParseTime'
-    or BAIL_OUT;
+    'Astro::App::Satpass2::ParseTime';
 
 can_ok 'Astro::App::Satpass2::ParseTime::ISO8601',
-    @parse_time_methods
-    or BAIL_OUT;
+    @parse_time_methods;
 
 is eval { Astro::App::Satpass2::ParseTime::ISO8601->delegate() },	## no critic (RequireCheckingReturnValueOfEval)
     'Astro::App::Satpass2::ParseTime::ISO8601',
@@ -342,46 +242,38 @@ SKIP: {
 
     instantiate( 'Astro::App::Satpass2::ParseTime',
 	class => 'Astro::App::Satpass2::ParseTime::Date::Manip',
-	$date_manip_delegate )
-	or BAIL_OUT;
+	$date_manip_delegate );
 }
 
 instantiate( 'Astro::App::Satpass2::ParseTime',
     class => 'Astro::App::Satpass2::ParseTime::ISO8601',
-    'Astro::App::Satpass2::ParseTime::ISO8601' )
-    or BAIL_OUT;
+    'Astro::App::Satpass2::ParseTime::ISO8601' );
 
 {
 
     my $want_class = $date_manip_delegate ||
 	'Astro::App::Satpass2::ParseTime::ISO8601';
 
-    instantiate( 'Astro::App::Satpass2::ParseTime', $want_class )
-	or BAIL_OUT;
+    instantiate( 'Astro::App::Satpass2::ParseTime', $want_class );
 
     instantiate( 'Astro::App::Satpass2::ParseTime',
 	class => 'Astro::App::Satpass2::ParseTime::Date::Manip,
 	    Astro::App::Satpass2::ParseTime::ISO8601',
-	$want_class )
-	or BAIL_OUT;
+	$want_class );
 
     instantiate( 'Astro::App::Satpass2::ParseTime',
 	class => 'Date::Manip,ISO8601',
-	$want_class )
-	or BAIL_OUT;
+	$want_class );
 
     instantiate( 'Astro::App::Satpass2::ParseTime',
         class => 'ISO8601,Date::Manip',
-	'Astro::App::Satpass2::ParseTime::ISO8601' )
-	or BAIL_OUT;
+	'Astro::App::Satpass2::ParseTime::ISO8601' );
 
 }
 
-require_ok 'Astro::App::Satpass2::Geocode'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2::Geocode';
 
-can_ok 'Astro::App::Satpass2::Geocode', @geocode_methods
-    or BAIL_OUT;
+can_ok 'Astro::App::Satpass2::Geocode', @geocode_methods;
 
 SKIP: {
     my $tests = 3;
@@ -391,18 +283,14 @@ SKIP: {
 	1;
     } or skip 'Unable to load Geo::Coder::OSM', $tests;
 
-    require_ok 'Astro::App::Satpass2::Geocode::OSM'
-	or BAIL_OUT;
+    require_ok 'Astro::App::Satpass2::Geocode::OSM';
 
-    can_ok 'Astro::App::Satpass2::Geocode::OSM', @geocode_methods
-	or BAIL_OUT;
+    can_ok 'Astro::App::Satpass2::Geocode::OSM', @geocode_methods;
 
-    instantiate( 'Astro::App::Satpass2::Geocode::OSM' )
-	or BAIL_OUT;
+    instantiate( 'Astro::App::Satpass2::Geocode::OSM' );
 }
 
-require_ok 'Astro::App::Satpass2'
-    or BAIL_OUT;
+require_ok 'Astro::App::Satpass2';
 
 can_ok 'Astro::App::Satpass2', qw{
     new alias almanac begin cd choose clear dispatch drop dump echo end
@@ -410,11 +298,56 @@ can_ok 'Astro::App::Satpass2', qw{
     init initfile list load localize location macro pass phase position
     pwd quarters run save set show sky source spacetrack st status
     system time time_parser tle unexport validate version
-}
-    or BAIL_OUT;
+};
 
-instantiate( 'Astro::App::Satpass2' )
-    or BAIL_OUT;
+instantiate( 'Astro::App::Satpass2' );
+
+{
+    my $mocker = setup_app_mocker;
+    my $app;
+    my $exception = dies {
+	$app = Astro::App::Satpass2->new();
+    };
+    is $exception, undef, 'Can instantiate Astro::App::Satpass2';
+
+    require_ok 'Astro::App::Satpass2::Format';
+
+    isa_ok 'Astro::App::Satpass2::Format', 'Astro::App::Satpass2::Copier';
+
+    can_ok 'Astro::App::Satpass2::Format', @format_methods;
+
+    require_ok 'Astro::App::Satpass2::Format::Dump';
+
+    isa_ok 'Astro::App::Satpass2::Format::Dump', 'Astro::App::Satpass2::Format';
+
+    instantiate(
+	'Astro::App::Satpass2::Format::Dump',
+	parent	=> $app,
+	'Astro::App::Satpass2::Format',
+    );
+
+    can_ok 'Astro::App::Satpass2::Format::Dump', @format_methods;
+
+    require_ok 'Astro::App::Satpass2::Wrap::Array';
+
+    can_ok 'Astro::App::Satpass2::Wrap::Array', qw{ new dereference };
+
+    instantiate( 'Astro::App::Satpass2::Wrap::Array', [],
+	'Astro::App::Satpass2::Wrap::Array' );
+
+    require_ok 'Astro::App::Satpass2::Format::Template';
+
+    isa_ok 'Astro::App::Satpass2::Format::Template',
+	'Astro::App::Satpass2::Format';
+
+    can_ok 'Astro::App::Satpass2::Format', @format_methods;
+
+    instantiate(
+	'Astro::App::Satpass2::Format::Template',
+	parent	=> $app,
+	'Astro::App::Satpass2::Format',
+    );
+}
 
 done_testing;
 

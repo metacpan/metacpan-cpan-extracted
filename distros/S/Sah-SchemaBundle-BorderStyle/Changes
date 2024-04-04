@@ -1,0 +1,16 @@
+0.003   2024-02-25  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Sah-Schema{s,Bundle}-BorderStyle following
+          rename of Sah-Schema{s,Bundle} (for visual clarity and
+          consistency with naming of other bundles).
+
+
+0.002   2021-02-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Use complete_recurse=1 schema parameter to show all
+	  available border syles during completion.
+
+
+0.001   2021-01-26  Released-By: PERLANCAR
+
+        - First release.

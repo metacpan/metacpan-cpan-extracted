@@ -2,10 +2,11 @@ package PDL::Algorithm::Center::Failure;
 
 # ABSTRACT: Exception classes for PDL::Algorithm::Center
 
+use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use custom::failures::x::alias -suffix => '_failure', qw[
   parameter
@@ -37,7 +38,7 @@ PDL::Algorithm::Center::Failure - Exception classes for PDL::Algorithm::Center
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =for Pod::Coverage iteration_empty_failure
 iteration_limit_reached_failure
@@ -47,7 +48,7 @@ parameter_failure
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-pdl-algorithm-center@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Algorithm-Center
+Please report any bugs or feature requests to bug-pdl-algorithm-center@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Algorithm-Center>
 
 =head2 Source
 

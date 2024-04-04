@@ -12,6 +12,7 @@ createapp;
 my $text;
 if (defined $app) {
 	$text = $app->CodeText(
+		-autoindent => 1,
 		-tabs => '7m',
 		-font => 'Monospace 12',
 		-syntax => 'XML',
@@ -86,3 +87,4 @@ push @tests, (
 
 
 starttesting;
+

@@ -1,0 +1,31 @@
+{
+  "amount": 1337,
+  "auth": {
+    "redirect_url": null,
+    "return_url": null,
+    "status": "requested"
+  },
+  "capture": true,
+  "country": "",
+  "created": 1567094428,
+  "currency": "eur",
+  "customer": {
+    "country": null,
+    "created": 1567094428,
+    "email": "john.doe@example.com",
+    "id": "cust_bZ7e17VDlD252dkgHg7JJgBa",
+    "mobile": null,
+    "name": "John Doe"
+  },
+  "date_bank": null,
+  "date_paym": 1567094428,
+  "description": "Auth test",
+  "fee": 21,
+  "id": "paym_RMLytyx2xLkdXkATKSxHOlvC",
+  "live_mode": false,
+  "method": null,
+  "order_id": null,
+  "response": null,
+  "return_url": "https://free.fr",
+  "status": null
+}

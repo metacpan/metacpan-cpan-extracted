@@ -9,6 +9,9 @@ use PDL::PP qw(foo::bar foo::bar foobar);
 # Prevent file generation (does not prevent calling of functions)
 $PDL::PP::done = 1;
 
+eval {pp_addpm({At=>'Mid'}, "blah")};
+like $@, qr/Middle/, 'pp_addpm says valid options';
+
 # Check the loop malformed call:
 eval {
 	pp_def(test1 =>
@@ -20,10 +23,7 @@ eval {
 		}
 	);
 };
-my $err_msg = $@;
-isnt($@, undef, 'loop without dim name should throw an error');
-like($@, qr/Expected.*loop.*%\{/, 'loop without dim name should explain the error')
-	or diag("Got this error: $@");
+like $@, qr/Expected.*loop.*%\{/, 'loop without dim name should explain error';
 
 eval {
   pp_def(test1 =>
@@ -161,5 +161,14 @@ is_deeply $got = [PDL::PP::reorder_args($sig = PDL::PP::Signature->new(
 is_deeply $got = [PDL::PP::reorder_args($sig, {y=>'""'})], [qw(a z y b x)],
   'right reorder, output other, with default'
   or diag explain $got;
+
+eval {
+pp_def("rice_expand",
+  Pars=>'in(n); [o]out(m);',
+  OtherPars=>'IV dim0 => m; int blocksize',
+  OtherParsDefaults=>{ blocksize=>32 },
+);
+};
+is $@, '';
 
 done_testing;

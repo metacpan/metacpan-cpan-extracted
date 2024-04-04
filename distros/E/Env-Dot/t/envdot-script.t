@@ -3,9 +3,11 @@
 
 use strict;
 use warnings;
+use Test2::V0;
+
 use Cwd;
 use File::Spec;
-use Test2::V0;
+
 use Test::Script;
 
 subtest 'Script compiles' => sub {
@@ -110,107 +112,5 @@ EOF
 
     done_testing;
 };
-
-# First thing change dir!
-# my ($path_first, $path_second, $path_third);
-# my ($path_interpolation, $path_static);
-# BEGIN {
-#         my $this = dirname( File::Spec->rel2abs( __FILE__ ) );
-#         ($this) = $this =~ /(.+)/msx; # Make it non-tainted
-#         chdir $this;
-#     ($path_first, $path_second, $path_third) = (
-#         File::Spec->catdir($this, '.env-first'),
-#         File::Spec->catdir($this, '.env-second'),
-#         File::Spec->catdir($this, '.env-third'),
-#         );
-#     ($path_interpolation, $path_static) = (
-#         File::Spec->catdir($this, '.env-interpolation'),
-#         File::Spec->catdir($this, '.env-static'),
-#         );
-# }
-
-# subtest 'Three dotenv files: natural order' => sub {
-#     # Do not use __FILE__ because its value is not absolute and not updated
-#     # when chdir is done.
-#     my $this = getcwd;
-#     ($this) = $this =~ /(.+)/msx; # Make it non-tainted
-#     my %new_env = (
-#         'ENVDOT_FILEPATHS' => "$path_first:$path_second:$path_third",
-#     );
-#
-#     # We need to replace the current %ENV, not change individual values.
-#     ## no critic [Variables::RequireLocalizedPunctuationVars]
-#     %ENV = %new_env;
-#
-#     my $r = eval <<"END_OF_TEXT"; ## no critic [BuiltinFunctions::ProhibitStringyEval]
-# use Env::Dot;
-# END_OF_TEXT
-#
-#     is( $ENV{'FOURTH'}, 'FOURTH: first file', 'Interface works' );
-#     is( $ENV{'THIRD'}, 'THIRD: first file', 'Interface works' );
-#     is( $ENV{'SECOND'}, 'SECOND: first file', 'Interface works' );
-#     is( $ENV{'FIRST'}, 'FIRST: first file', 'Interface works' );
-#     is( $ENV{'FROM_FIRST'}, 'FIRST: from first', 'Interface works' );
-#     is( $ENV{'FROM_SECOND'}, 'SECOND: from second', 'Interface works' );
-#     is( $ENV{'FROM_THIRD'}, 'THIRD: from third', 'Interface works' );
-#
-#     done_testing;
-# };
-#
-# subtest 'Three dotenv files: reversed order' => sub {
-#     # Do not use __FILE__ because its value is not absolute and not updated
-#     # when chdir is done.
-#     my $this = getcwd;
-#     ($this) = $this =~ /(.+)/msx; # Make it non-tainted
-#     my %new_env = (
-#         'ENVDOT_FILEPATHS' => "$path_third:$path_second:$path_first",
-#     );
-#
-#     # We need to replace the current %ENV, not change individual values.
-#     ## no critic [Variables::RequireLocalizedPunctuationVars]
-#     %ENV = %new_env;
-#
-#     my $r = eval <<"END_OF_TEXT"; ## no critic [BuiltinFunctions::ProhibitStringyEval]
-# use Env::Dot;
-# END_OF_TEXT
-#
-#     is( $ENV{'FOURTH'}, 'FOURTH: third file', 'Interface works' );
-#     is( $ENV{'THIRD'}, 'THIRD: third file', 'Interface works' );
-#     is( $ENV{'SECOND'}, 'SECOND: third file', 'Interface works' );
-#     is( $ENV{'FIRST'}, 'FIRST: third file', 'Interface works' );
-#     is( $ENV{'FROM_FIRST'}, 'FIRST: from first', 'Interface works' );
-#     is( $ENV{'FROM_SECOND'}, 'SECOND: from second', 'Interface works' );
-#     is( $ENV{'FROM_THIRD'}, 'THIRD: from third', 'Interface works' );
-#
-#     done_testing;
-# };
-#
-# subtest 'Three dotenv files: mixed order' => sub {
-#     # Do not use __FILE__ because its value is not absolute and not updated
-#     # when chdir is done.
-#     my $this = getcwd;
-#     ($this) = $this =~ /(.+)/msx; # Make it non-tainted
-#     my %new_env = (
-#         'ENVDOT_FILEPATHS' => "$path_second:$path_third:$path_first",
-#     );
-#
-#     # We need to replace the current %ENV, not change individual values.
-#     ## no critic [Variables::RequireLocalizedPunctuationVars]
-#     %ENV = %new_env;
-#
-#     my $r = eval <<"END_OF_TEXT"; ## no critic [BuiltinFunctions::ProhibitStringyEval]
-# use Env::Dot;
-# END_OF_TEXT
-#
-#     is( $ENV{'FOURTH'}, 'FOURTH: second file', 'Interface works' );
-#     is( $ENV{'THIRD'}, 'THIRD: second file', 'Interface works' );
-#     is( $ENV{'SECOND'}, 'SECOND: second file', 'Interface works' );
-#     is( $ENV{'FIRST'}, 'FIRST: second file', 'Interface works' );
-#     is( $ENV{'FROM_FIRST'}, 'FIRST: from first', 'Interface works' );
-#     is( $ENV{'FROM_SECOND'}, 'SECOND: from second', 'Interface works' );
-#     is( $ENV{'FROM_THIRD'}, 'THIRD: from third', 'Interface works' );
-#
-#     done_testing;
-# };
 
 done_testing;

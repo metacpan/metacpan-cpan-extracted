@@ -15,7 +15,7 @@ eval {
 
 my $tpm = Test::Prereq::Meta->new(
     accept	=> [
-	My::Module::Recommend->optionals(),
+	My::Module::Recommend->optional_modules_to_hide(),
 	qw{ Date::Manip::DM5 Test::MockTime },
     ],
     uses	=> [ qw{

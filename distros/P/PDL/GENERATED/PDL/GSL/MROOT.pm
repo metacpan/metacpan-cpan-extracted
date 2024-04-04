@@ -66,6 +66,7 @@ to the algorithms in the GSL library that do not use derivatives.
   }
 #line 68 "MROOT.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -83,7 +84,27 @@ to the algorithms in the GSL library that do not use derivatives.
 
 =for ref
 
-info not available
+Multidimensional root finder without using derivatives
+
+This function provides an interface to the multidimensional root finding algorithms
+in the GSL library. It takes a minimum of two arguments: an ndarray $init with an
+initial guess for the roots of the system and a reference to a function. The latter
+function must return an ndarray whose i-th element is the i-th equation evaluated at
+the vector x (an ndarray which is the sole input to this function). See the example in
+the Synopsis above for an illustration. The function returns an ndarray with the roots
+for the system of equations.
+
+Two optional arguments can be specified as shown below. One is B<Method>, which can
+take the values 0,1,2,3. They correspond to the 'hybrids', 'hybrid', 'dnewton' and
+'broyden' algorithms respectively (see GSL documentation for details). The other
+optional argument is B<Epsabs>, which sets the absolute accuracy to which the roots
+of the system of equations are required. The default value for Method is 0 ('hybrids'
+algorithm) and the default for Epsabs is 1e-3.
+
+=for usage
+
+   $res = gslmroot_fsolver($init, $function_ref,
+                           [{Method => $method, Epsabs => $epsabs}]);
 
 =for bad
 
@@ -136,7 +157,7 @@ COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.
 
 =cut
-#line 140 "MROOT.pm"
+#line 161 "MROOT.pm"
 
 # Exit with OK status
 

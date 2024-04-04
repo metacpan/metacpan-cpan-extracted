@@ -256,6 +256,7 @@ sub i { $i->copy + (@_ ? $_[0] : 0) };
 *atanh = \&Catanh;
 #line 258 "Complex.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -366,7 +367,8 @@ sub real($) {
    return $_[0] unless UNIVERSAL::isa($_[0],'PDL::Complex'); # NOOP unless complex
    bless $_[0]->slice(''), 'PDL';
 }
-#line 370 "Complex.pm"
+#line 371 "Complex.pm"
+
 
 =head2 r2C
 
@@ -830,7 +832,7 @@ BEGIN {*Ccos = \&PDL::Complex::Ccos;
 
 
 
-#line 685 "complex.pd"
+#line 683 "complex.pd"
 
 =head2 Ctan
 
@@ -845,7 +847,8 @@ Does not work inplace.
 =cut
 
 sub Ctan($) { Csin($_[0]) / Ccos($_[0]) }
-#line 849 "Complex.pm"
+#line 851 "Complex.pm"
+
 
 =head2 Cexp
 
@@ -1008,7 +1011,7 @@ BEGIN {*Cacos = \&PDL::Complex::Cacos;
 
 
 
-#line 832 "complex.pd"
+#line 830 "complex.pd"
 
 =head2 Catan
 
@@ -1024,7 +1027,8 @@ sub Catan($) {
    my $z = shift;
    Cmul Clog(Cdiv (PDL::Complex::i()+$z, PDL::Complex::i()-$z)), PDL->pdl(0, 0.5);
 }
-#line 1028 "Complex.pm"
+#line 1031 "Complex.pm"
+
 
 =head2 Csinh
 
@@ -1249,7 +1253,7 @@ BEGIN {*Croots = \&PDL::Complex::Croots;
 
 
 
-#line 1000 "complex.pd"
+#line 998 "complex.pd"
 
 =head2 re, im
 
@@ -1273,7 +1277,8 @@ sub slice :lvalue {
   $ret;
 }
 }
-#line 1277 "Complex.pm"
+#line 1281 "Complex.pm"
+
 
 =head2 rCpolynomial
 
@@ -1314,7 +1319,7 @@ BEGIN {*rCpolynomial = \&PDL::Complex::rCpolynomial;
 
 
 
-#line 1065 "complex.pd"
+#line 1063 "complex.pd"
 
 # undocumented compatibility functions (thanks to Luis Mochan!)
 sub Catan2 { Clog( $_[1] + i()*$_[0])/i }
@@ -1410,7 +1415,7 @@ in the file COPYING in the PDL distribution.
 perl(1), L<PDL>.
 
 =cut
-#line 1414 "Complex.pm"
+#line 1419 "Complex.pm"
 
 # Exit with OK status
 

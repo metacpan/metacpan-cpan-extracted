@@ -6,7 +6,6 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown",
       "apache_2_0"
    ],
    "meta-spec" : {
@@ -48,7 +47,7 @@
             "IO::String" : "0",
             "IP::Country::DB_File" : "0",
             "IP::Country::Fast" : "0",
-            "LWP::UserAgent" : "0",
+            "LWP::Protocol::https" : "0",
             "MIME::Base64" : "0",
             "Mail::DKIM" : "0.37",
             "Mail::DMARC" : "0",
@@ -67,10 +66,11 @@
             "Errno" : "0",
             "File::Copy" : "2.02",
             "File::Spec" : "0.8",
+            "File::Temp" : "0",
             "HTML::Parser" : "3.43",
             "IO::Zlib" : "1.04",
             "Mail::DKIM" : "0.31",
-            "Net::DNS" : "0.69",
+            "Net::DNS" : "1.1",
             "NetAddr::IP" : "4.01",
             "Pod::Usage" : "1.1",
             "Sys::Hostname" : "0",
@@ -81,14 +81,14 @@
       },
       "test" : {
          "recommends" : {
-            "Net::DNS::Nameserver" : "0"
+            "Devel::Cycle" : "0",
+            "Net::DNS::Nameserver" : "0",
+            "Text::Diff" : "0"
          },
          "requires" : {
-            "Devel::Cycle" : "0",
             "Perl::Critic::Policy::Perlsecret" : "0",
             "Perl::Critic::Policy::TestingAndDebugging::ProhibitNoStrict" : "0",
-            "Test::More" : "0",
-            "Text::Diff" : "0"
+            "Test::Simple" : "1.302067"
          }
       }
    },
@@ -104,6 +104,6 @@
       },
       "x_MailingList" : "http://wiki.apache.org/spamassassin/MailingLists"
    },
-   "version" : "4.000000",
+   "version" : "4.000001",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

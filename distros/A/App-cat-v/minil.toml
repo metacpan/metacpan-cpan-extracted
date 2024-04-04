@@ -1,0 +1,16 @@
+name           = "App-cat-v"
+readme_from    = "script/cat-v"
+authors_from   = "script/cat-v"
+script_files   = [ "script/cat-v" ]
+badges         = [ 'github-actions/test', 'metacpan' ]
+authority      = "cpan:UTASHIRO"
+
+module_maker   = "ModuleBuildTiny"
+static_install = "auto"
+
+[release]
+branch = "main"
+hooks = [
+    "make -C docs",
+]
+do_not_upload_to_cpan = 0

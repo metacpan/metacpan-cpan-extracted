@@ -1,7 +1,7 @@
 package CGI::ACL;
 
 # Author Nigel Horne: njh@bandsman.co.uk
-# Copyright (C) 2018, Nigel Horne
+# Copyright (C) 2017-2024, Nigel Horne
 
 # Usage is subject to licence terms.
 # The licence terms of this software are as follows:
@@ -25,11 +25,11 @@ CGI::ACL - Decide whether to allow a client to run this script
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -50,12 +50,24 @@ Creates a CGI::ACL object.
 
 =cut
 
-sub new {
-	my $proto = shift;
-	my $class = ref($proto) || $proto;
+sub new
+{
+	my $class = $_[0];
 
-	return unless(defined($class));
+	shift;
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
+	if(!defined($class)) {
+		# Using CGI::ACL->new(), not CGI::ACL::new()
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
+	}
 	return bless { }, $class;
 }
 
@@ -299,10 +311,6 @@ L<http://cpants.cpanauthors.org/dist/CGI-ACL>
 
 L<http://matrix.cpantesters.org/?dist=CGI-ACL>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/CGI-ACL>
-
 =item * CPAN Testers Dependencies
 
 L<http://deps.cpantesters.org/?module=CGI::ACL>
@@ -311,7 +319,7 @@ L<http://deps.cpantesters.org/?module=CGI::ACL>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2021 Nigel Horne.
+Copyright 2017-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

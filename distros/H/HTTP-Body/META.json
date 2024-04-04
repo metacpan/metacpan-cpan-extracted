@@ -1,0 +1,59 @@
+{
+   "abstract" : "HTTP Body Parser",
+   "author" : [
+      "Christian Hansen, C<chansen@cpan.org>",
+      "Sebastian Riedel, C<sri@cpan.org>",
+      "Andy Grundman, C<andy@hybridized.org>",
+      "Torsten Raudssus, C<getty@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTTP-Body",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Digest::MD5" : "0",
+            "File::Temp" : "0.14",
+            "HTTP::Headers" : "0",
+            "IO::File" : "1.14"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Encode" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0.14",
+            "HTTP::Request::Common" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0.86"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.shadowcat.co.uk/catagits/HTTP-Body.git",
+         "web" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=catagits/HTTP-Body.git"
+      },
+      "x_mailing_list" : "http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst-dev"
+   },
+   "version" : "1.23",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

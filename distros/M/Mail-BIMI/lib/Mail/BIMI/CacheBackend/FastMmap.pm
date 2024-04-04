@@ -1,6 +1,6 @@
 package Mail::BIMI::CacheBackend::FastMmap;
 # ABSTRACT: Cache handling
-our $VERSION = '3.20240319'; # VERSION
+our $VERSION = '3.20240402'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -46,7 +46,7 @@ Mail::BIMI::CacheBackend::FastMmap - Cache handling
 
 =head1 VERSION
 
-version 3.20240319
+version 3.20240402
 
 =head1 DESCRIPTION
 

@@ -105,37 +105,51 @@ sub generate_authorization {
 }
 
 sub get_key_data {
-  my ($uri) = @_;
-  my $keyid = $::ENV{SSH_PUB_KEY_ID};
-  my $keyfile = _get_tmp_keyfile_from_agent($keyid);
-  if (!defined($keyid)) {
-    # check if the host includes a user name
-    my $authority = $uri->authority;
-    if ($authority =~ s/^([^\@]*)\@//) {
-      $keyid = $1;
-      $keyid =~ s/:.*//;	# ignore password
-    }
+  my ($uri, $creds)    = @_;
+  my $keyid    = $::ENV{SSH_PUB_KEY_ID} || $creds->{keyid};
+  my $auth_type = $creds->{auth_type} || 'agent';
+  my $keyfile;
+  if ($auth_type eq 'agent' ) {
+    $keyfile = _get_tmp_keyfile_from_agent($keyid);
+    die 'No key (keyid: '.($keyid||'NONE').') found in ssh-agent and nofallback expicitly configured!' if !$keyfile and $creds->{nofallback};
   }
+  my $username = $creds->{user} || $keyid;
+  my $authority = $uri->authority;
+  if ($authority =~ s/^([^\@]*)\@//) {
+    $username = $1;
+    $username =~ s/:.*//;	# ignore password
+  }
+  if (!defined($keyfile) && $creds->{keyfile}) {
+      $keyfile = $creds->{keyfile};
+      die "Key file '$keyfile' doesn't exit and nofallback expicitly configured!" if !(-e $keyfile) && $creds->{nofallback};
+  };
   if (!defined($keyfile)) {
-    my $home = $ENV{'HOME'};
-    if ($home && -d "$home/.ssh") {
-      for my $idfile (qw{id_ed25519 id_rsa}) {
-	next unless -s "$home/.ssh/$idfile";
-	$keyfile = "$home/.ssh/$idfile";
-	last;
+    my @_dirs = ("$ENV{'HOME'}/.ssh");
+    unshift @_dirs, $creds->{keydir} if ($creds->{keydir});
+    for my $_dir (@_dirs) {
+      $_dir =~ s#/$##;
+      if (-d "$_dir") {
+	for my $idfile (qw{id_ed25519 id_rsa}) {
+	  next unless -s "$_dir/$idfile";
+	  $keyfile = "$_dir/$idfile";
+	  last;
+	}
+      } else {
+	die "Key dir '$_dir' does not exists and nofallback expicitly configured!" if $creds->{nofallback};
       }
     }
   }
-  return ($keyid, $keyfile);
+  die "No keyfile found!" unless $keyfile;
+  return ($username, $keyid, $keyfile);
 }
 
 sub authenticate {
   my ($class, $ua, $proxy, $auth_param, $response, $request, $arg, $size) = @_;
   my $uri = $request->uri->canonical;
   return $response unless $uri && !$proxy;
-  my ($keyid, $keyfile) = get_key_data($uri);
+  my ($username, $keyid, $keyfile) = get_key_data($uri, $ua->sigauth_credentials);
   my $host_port = $uri->host_port;
-  my $auth = generate_authorization($auth_param, $keyid, $keyfile);
+  my $auth = generate_authorization($auth_param, $username, $keyfile);
   my $h = $ua->get_my_handler('request_prepare', 'm_host_port' => $host_port, sub {
     $_[0]{callback} = sub { $_[0]->header('Authorization' => $auth) };
   });

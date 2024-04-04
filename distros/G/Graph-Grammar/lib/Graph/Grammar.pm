@@ -1,7 +1,11 @@
 package Graph::Grammar;
 
 # ABSTRACT: Grammar for graphs
-our $VERSION = '0.1.0'; # VERSION
+our $VERSION = '0.1.1'; # VERSION
+
+=head1 NAME
+
+Graph::Grammar - Graph grammar, i.e. rewriting method
 
 =head1 SYNOPSIS
 

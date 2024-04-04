@@ -86,19 +86,23 @@ $y = $x->copy;
 $y->badvalue('nan');
 $y->setbadat(2);
 is $y."", "[1 2 BAD 4 5]", "y correct bad before set_datatype with badval=nan";
+my $z = $y->convert(ushort);
+is( PDL::Core::string($z), "[1 2 BAD 4 5]", "non-inplace converting NaN-badvalued pdl preserves badvals" );
 $y->set_datatype(ushort->enum);
 is $y."", "[1 2 BAD 4 5]", "y correct bad after set_datatype with badval=nan";
 
 # now check that badvalue() changes the ndarray
 # (only for integer types)
 $x = convert($x,ushort);
+is( PDL::Core::string($x), "[1 2 BAD 4 5]", "before change badvalue" );
 my $badval = $x->badvalue;
 $x->badvalue(44);
 is( PDL::Core::string($x), "[1 2 BAD 4 5]", "changed badvalue" );
 $x->badflag(0);
 is( PDL::Core::string($x), "[1 2 44 4 5]", "can remove the badflag setting" );
 # restore the bad value
-$x->badvalue($badval);
+$x->badflag(1);
+is( PDL::Core::string($x), "[1 2 BAD 4 5]", "still 'bad' w/changed badvalue" );
 
 $x = byte(1,2,3);
 $y = byte(1,byte->badvalue,3);
@@ -412,6 +416,9 @@ $x->badflag(1);
 $y = $x->slice('2:3');
 is( $y->badvalue, 3, "can propagate per-ndarray bad value");
 is( $y->sum, 2, "and the propagated value is recognised as bad");
+$x->badvalue(2);
+is "$x", '[0 1 BAD 3]', 'change badvalue, badness right in orig';
+is( $y->badvalue, 2, "per-ndarray bad value propagated after change");
 $x = sequence(4);
 is ($x->badvalue, double->orig_badvalue, "no long-term effects of per-ndarray changes [1]");
 

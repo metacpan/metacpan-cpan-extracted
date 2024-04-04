@@ -1,5 +1,5 @@
 {
-   "abstract" : "Validate data against a schema",
+   "abstract" : "Validate data against a schema using a JSON Schema",
    "author" : [
       "Karen Etheridge <ether@cpan.org>"
    ],
@@ -24,6 +24,7 @@
    "name" : "JSON-Schema-Modern",
    "no_index" : {
       "directory" : [
+         "inc",
          "share",
          "t",
          "xt"
@@ -52,6 +53,7 @@
             "Net::IDN::Encode" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Wordlist" : "0",
+            "Sereal" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta" : "0",
             "Test::CleanNamespaces" : "0.15",
@@ -117,6 +119,7 @@
             "Email::Address::XS" : "1.04",
             "Net::IDN::Encode" : "0",
             "Ref::Util::XS" : "0",
+            "Sereal" : "0",
             "Time::Moment" : "0",
             "Type::Tiny::XS" : "0"
          }
@@ -234,63 +237,67 @@
    "provides" : {
       "JSON::Schema::Modern" : {
          "file" : "lib/JSON/Schema/Modern.pm",
-         "version" : "0.582"
+         "version" : "0.583"
       },
       "JSON::Schema::Modern::Annotation" : {
          "file" : "lib/JSON/Schema/Modern/Annotation.pm",
-         "version" : "0.582"
+         "version" : "0.583"
       },
       "JSON::Schema::Modern::Document" : {
          "file" : "lib/JSON/Schema/Modern/Document.pm",
-         "version" : "0.582"
+         "version" : "0.583"
       },
       "JSON::Schema::Modern::Error" : {
          "file" : "lib/JSON/Schema/Modern/Error.pm",
-         "version" : "0.582"
+         "version" : "0.583"
       },
       "JSON::Schema::Modern::Result" : {
          "file" : "lib/JSON/Schema/Modern/Result.pm",
-         "version" : "0.582"
+         "version" : "0.583"
+      },
+      "JSON::Schema::Modern::ResultNode" : {
+         "file" : "lib/JSON/Schema/Modern/ResultNode.pm",
+         "version" : "0.583"
       },
       "JSON::Schema::Modern::Utilities" : {
          "file" : "lib/JSON/Schema/Modern/Utilities.pm",
-         "version" : "0.582"
+         "version" : "0.583"
       },
       "JSON::Schema::Modern::Vocabulary" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary.pm",
-         "version" : "0.582"
+         "version" : "0.583"
       },
       "JSON::Schema::Modern::Vocabulary::Applicator" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Applicator.pm",
-         "version" : "0.582"
+         "version" : "0.583"
       },
       "JSON::Schema::Modern::Vocabulary::Content" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Content.pm",
-         "version" : "0.582"
+         "version" : "0.583"
       },
       "JSON::Schema::Modern::Vocabulary::Core" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Core.pm",
-         "version" : "0.582"
+         "version" : "0.583"
       },
       "JSON::Schema::Modern::Vocabulary::FormatAnnotation" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/FormatAnnotation.pm",
-         "version" : "0.582"
+         "version" : "0.583"
       },
       "JSON::Schema::Modern::Vocabulary::FormatAssertion" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/FormatAssertion.pm",
-         "version" : "0.582"
+         "version" : "0.583"
       },
       "JSON::Schema::Modern::Vocabulary::MetaData" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/MetaData.pm",
-         "version" : "0.582"
+         "version" : "0.583"
       },
       "JSON::Schema::Modern::Vocabulary::Unevaluated" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Unevaluated.pm",
-         "version" : "0.582"
+         "version" : "0.583"
       },
       "JSON::Schema::Modern::Vocabulary::Validation" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Validation.pm",
-         "version" : "0.582"
+         "version" : "0.583"
       }
    },
    "release_status" : "stable",
@@ -305,10 +312,10 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Modern"
       }
    },
-   "version" : "0.582",
+   "version" : "0.583",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.039006"
+         "version" : "5.039009"
       },
       "plugins" : [
          {
@@ -352,7 +359,7 @@
                }
             },
             "name" : "@Author::ETHER/stale modules, build",
-            "version" : "0.058"
+            "version" : "0.060"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
@@ -622,104 +629,109 @@
                   ],
                   "plugins" : [
                      {
+                        "class" : "Pod::Weaver::Section::GenerateSection",
+                        "name" : "SUPPORT",
+                        "version" : "4.020"
+                     },
+                     {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@Author::ETHER/EnsurePod5",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@Author::ETHER/H1Nester",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::SingleEncoding",
                         "name" : "@Author::ETHER/SingleEncoding",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Transformer",
                         "name" : "@Author::ETHER/List",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Transformer",
                         "name" : "@Author::ETHER/Verbatim",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@Author::ETHER/header",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Name",
                         "name" : "@Author::ETHER/Name",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Version",
                         "name" : "@Author::ETHER/Version",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@Author::ETHER/prelude",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "SYNOPSIS",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "DESCRIPTION",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "OVERVIEW",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "ATTRIBUTES",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "METHODS",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "FUNCTIONS",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "TYPES",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
                         "name" : "@Author::ETHER/Leftovers",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@Author::ETHER/postlude",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::GenerateSection",
                         "name" : "@Author::ETHER/generate SUPPORT",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Authors",
                         "name" : "@Author::ETHER/Authors",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::AllowOverride",
@@ -734,17 +746,17 @@
                      {
                         "class" : "Pod::Weaver::Section::Legal",
                         "name" : "@Author::ETHER/Legal",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@Author::ETHER/footer",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
-                        "class" : "Pod::Weaver::Section::AllowOverride",
-                        "name" : "append to SUPPORT",
-                        "version" : "0.05"
+                        "class" : "inc::AppendSupport",
+                        "name" : "=inc::AppendSupport",
+                        "version" : null
                      }
                   ]
                }
@@ -864,7 +876,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.43.0",
+                  "git_version" : "2.43.2",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "commits",
@@ -872,7 +884,7 @@
                }
             },
             "name" : "@Author::ETHER/Git::Contributors",
-            "version" : "0.036"
+            "version" : "0.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::StaticInstall",
@@ -955,7 +967,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20231230"
+                  "Module::CoreList" : "5.20240320"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -974,7 +986,7 @@
                }
             },
             "name" : "@Author::ETHER/stale modules, release",
-            "version" : "0.058"
+            "version" : "0.060"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Check",
@@ -988,7 +1000,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.43.0",
+                  "git_version" : "2.43.2",
                   "repo_root" : "."
                }
             },
@@ -999,7 +1011,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.43.0",
+                  "git_version" : "2.43.2",
                   "repo_root" : "."
                }
             },
@@ -1010,7 +1022,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.43.0",
+                  "git_version" : "2.43.2",
                   "repo_root" : "."
                }
             },
@@ -1044,7 +1056,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.43.0",
+                  "git_version" : "2.43.2",
                   "repo_root" : "."
                }
             },
@@ -1156,7 +1168,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.43.0",
+                  "git_version" : "2.43.2",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1173,12 +1185,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.582",
+                  "tag" : "v0.583",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.43.0",
+                  "git_version" : "2.43.2",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1228,7 +1240,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.43.0",
+                  "git_version" : "2.43.2",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1259,7 +1271,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.43.0",
+                  "git_version" : "2.43.2",
                   "repo_root" : "."
                }
             },
@@ -1361,7 +1373,8 @@
                      "DateTime::Format::RFC3339",
                      "Data::Validate::Domain",
                      "Email::Address::XS",
-                     "Net::IDN::Encode"
+                     "Net::IDN::Encode",
+                     "Sereal"
                   ],
                   "modules_from_features" : null,
                   "to_relationship" : "suggests"
@@ -1459,7 +1472,7 @@
       "JSON::Schema::Modern::Document::OpenAPI" : "< 0.055",
       "JSON::Schema::Modern::Vocabulary::OpenAPI" : "< 0.017"
    },
-   "x_generated_by_perl" : "v5.39.6",
+   "x_generated_by_perl" : "v5.39.9",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1,

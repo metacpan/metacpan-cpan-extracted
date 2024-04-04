@@ -72,6 +72,7 @@ if (defined $app) {
 		-text => 'Get',
 		-command => sub { print Dumper $tags->get },
 	)->pack(-side => 'left');
+	$app->geometry('500x600+200+200');
 }
 
 push @tests, (
@@ -79,3 +80,4 @@ push @tests, (
 );
 
 starttesting;
+

@@ -148,15 +148,27 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method main : void () { undef == 1; } }';
-    compile_not_ok($source, qr'The right operand of the == operator must be an object type');
+    compile_not_ok($source, q|If the type of the left operand of the == operator is the undef type, the type of the right operand must be an object type or the undef type.|);
   }
+  
   {
     my $source = 'class MyClass { static method main : void () { 1 == undef; } }';
-    compile_not_ok($source, qr'The type of the left operand of the == operator must be an object type');
+    compile_not_ok($source, q|If the type of the left operand of the == operator is a numeric type, the type of the right operand must be a numeric type.|);
   }
+  
   {
     my $source = 'class MyClass { static method main : void () { 1 == Int->new(1); } }';
-    compile_not_ok($source, qr'The left and right operands of the == operator must be numeric types or object types or reference types');
+    compile_not_ok($source, q|If the type of the left operand of the == operator is a numeric type, the type of the right operand must be a numeric type.|);
+  }
+  
+  {
+    my $source = 'class MyClass { static method main : void () { my $left = 1; my $right = 2; \$left == \$right; } }';
+    compile_ok($source);
+  }
+  
+  {
+    my $source = 'class MyClass { static method main : void () { my $left = 1; my $right = 2; \$left == $right; } }';
+    compile_not_ok($source, q|If the type of the left operand of the == operator is a reference type, the type of the right operand must be a reference type.|);
   }
 }
 
@@ -164,15 +176,27 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method main : void () { undef != 1; } }';
-    compile_not_ok($source, qr'The right operand of the != operator must be an object type');
+    compile_not_ok($source, q|If the type of the left operand of the != operator is the undef type, the type of the right operand must be an object type or the undef type.|);
   }
+  
   {
     my $source = 'class MyClass { static method main : void () { 1 != undef; } }';
-    compile_not_ok($source, qr'The type of the left operand of the != operator must be an object type');
+    compile_not_ok($source, q|If the type of the left operand of the != operator is a numeric type, the type of the right operand must be a numeric type.|);
   }
+  
   {
     my $source = 'class MyClass { static method main : void () { 1 != Int->new(1); } }';
-    compile_not_ok($source, qr'The left and right operands of the != operator must be numeric types or object types or reference types');
+    compile_not_ok($source, q|If the type of the left operand of the != operator is a numeric type, the type of the right operand must be a numeric type.|);
+  }
+  
+  {
+    my $source = 'class MyClass { static method main : void () { my $left = 1; my $right = 2; \$left != \$right; } }';
+    compile_ok($source);
+  }
+  
+  {
+    my $source = 'class MyClass { static method main : void () { my $left = 1; my $right = 2; \$left != $right; } }';
+    compile_not_ok($source, q|If the type of the left operand of the != operator is a reference type, the type of the right operand must be a reference type.|);
   }
 }
 
@@ -359,7 +383,7 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method main : void () { 1 isa Int; } }';
-    compile_not_ok($source, 'The type of the left operand of the isa operator must be an object type');
+    compile_not_ok($source, 'The type of the operand of the isa operator must be an object type');
   }
 }
 
@@ -382,17 +406,17 @@ use Test::More;
   
   {
     my $source = 'class MyClass { static method main : void () { 1L isa_error Error; } }';
-    compile_not_ok($source, 'The type of the left operand of the isa_error operator must be an integer type within int.');
+    compile_not_ok($source, 'The type of the operand of the isa_error operator must be an integer type within int.');
   }
   
   {
     my $source = 'class MyClass { static method main : void () { 1 isa_error Error[]; } }';
-    compile_not_ok($source, 'The right operand of the isa_error operator must be a class type.');
+    compile_not_ok($source, 'The type given to the isa_error operator must be a class type.');
   }
   
   {
     my $source = 'class MyClass { static method main : void () { 1 isa_error byte; } }';
-    compile_not_ok($source, 'The right operand of the isa_error operator must be a class type.');
+    compile_not_ok($source, 'The type given to the isa_error operator must be a class type.');
   }
 }
 
@@ -400,7 +424,7 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method main : void () { 1 is_type Int; } }';
-    compile_not_ok($source, 'The type of the left operand of the is_type operator must be an object type');
+    compile_not_ok($source, 'The type of the operand of the is_type operator must be an object type');
   }
 }
 
@@ -423,17 +447,17 @@ use Test::More;
   
   {
     my $source = 'class MyClass { static method main : void () { 1L is_error Error; } }';
-    compile_not_ok($source, 'The type of the left operand of the is_error operator must be an integer type within int.');
+    compile_not_ok($source, 'The type of the operand of the is_error operator must be an integer type within int.');
   }
   
   {
     my $source = 'class MyClass { static method main : void () { 1 is_error Error[]; } }';
-    compile_not_ok($source, 'The right operand of the is_error operator must be a class type.');
+    compile_not_ok($source, 'The type given to the is_error operator must be a class type.');
   }
   
   {
     my $source = 'class MyClass { static method main : void () { 1 is_error byte; } }';
-    compile_not_ok($source, 'The right operand of the is_error operator must be a class type.');
+    compile_not_ok($source, 'The type given to the is_error operator must be a class type.');
   }
 }
 
@@ -521,8 +545,28 @@ use Test::More;
 # copy
 {
   {
+    my $source = 'class MyClass { static method main : void () { copy "abc"; } }';
+    compile_ok($source);
+  }
+  
+  {
+    my $source = 'class MyClass { static method main : void () { copy new byte[3]; } }';
+    compile_ok($source);
+  }
+  
+  {
+    my $source = 'class MyClass { use Complex_2d; static method main : void () { copy new Complex_2d[3]; } }';
+    compile_ok($source);
+  }
+  
+  {
     my $source = 'class MyClass { static method main : void () { copy 1; } }';
-    compile_not_ok($source, q|The type of the operand of the copy operator must be an object type|);
+    compile_not_ok($source, q|The type of the operand of the copy operator must be the string type, a numeric type, or a multi-numeric type.|);
+  }
+  
+  {
+    my $source = 'class MyClass { use Point;static method main : void () { copy Point->new; } }';
+    compile_not_ok($source, q|The type of the operand of the copy operator must be the string type, a numeric type, or a multi-numeric type.|);
   }
 }
 
@@ -745,11 +789,11 @@ use Test::More;
   
   {
     my $source = 'class MyClass { static method main : void () { my $num = 1; my $num_ref = \$num; warn $num_ref; } }';
-    compile_not_ok($source, q|The type of the operand of the warn operator must be an object type or the undef type.|);
+    compile_not_ok($source, q|The type of the operand of the warn operator must be an object type.|);
   }
   {
     my $source = 'class MyClass { static method main : void () { warn undef; } }';
-    compile_ok($source);
+    compile_not_ok($source, q|The type of the operand of the warn operator must be an object type.|);
   }
 }
 
@@ -879,19 +923,19 @@ use Test::More;
   }
 }
 
-# Array Access
+# Element Access
 {
   {
     my $source = 'class MyClass { static method main : void () { my $var = 1; $var->[0]; } }';
-    compile_not_ok($source, q|The invocant of the array access must be an array type or the string type|);
+    compile_not_ok($source, q|The invocant of the element access must be an array type or the string type|);
   }
   {
     my $source = 'class MyClass { static method main : void () { my $var = new int[1]; $var->[1L]; } }';
-    compile_not_ok($source, q|The index of the array access must be the int type|);
+    compile_not_ok($source, q|The index of the element access must be the int type|);
   }
   {
     my $source = 'class MyClass { static method main : void () { my $var = new int[1]; $var->["foo"]; } }';
-    compile_not_ok($source, q|The index of the array access must be the int type|);
+    compile_not_ok($source, q|The index of the element access must be the int type|);
   }
 }
 

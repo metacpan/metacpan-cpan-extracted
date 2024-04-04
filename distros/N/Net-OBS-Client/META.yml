@@ -22,6 +22,7 @@ no_index:
 requires:
   Config::INI::Reader: '0'
   Config::Tiny: '0'
+  Const::Fast: '0'
   HTTP::Cookies: '0'
   HTTP::Request: '0'
   LWP::UserAgent: '0'
@@ -31,5 +32,8 @@ requires:
   URI::URL: '0'
   XML::Structured: '0'
   perl: '5.006'
-version: v0.1.1
+resources:
+  bugtracker: https://github.com/M0ses/Net-OBS-Client/issues
+  repository: https://github.com/M0ses/Net-OBS-Client.git
+version: v0.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

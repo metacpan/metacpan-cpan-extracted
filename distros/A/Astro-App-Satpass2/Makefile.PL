@@ -77,7 +77,7 @@ sub MY::postamble {
 	s/ \s+ \z //smx;
 	s/ \A \s+ //smx;
     }
-    my $optionals = join ',', My::Module::Recommend->optionals();
+    my $optionals = join ',', My::Module::Recommend->optional_modules_to_hide();
 
     return <<"EOD";
 

@@ -17,7 +17,7 @@ use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 use EBook::EPUB::Lite;
 use File::Copy;
 use File::Spec;
-use IPC::Run qw(run);
+use IPC::Run qw(run timeout);
 use File::Basename ();
 use Path::Tiny ();
 
@@ -33,7 +33,7 @@ use Text::Amuse::Compile::Templates;
 use Text::Amuse::Compile::TemplateOptions;
 use Text::Amuse::Compile::MuseHeader;
 use Text::Amuse::Compile::Indexer;
-use Types::Standard qw/Str Bool Object Maybe CodeRef HashRef InstanceOf ArrayRef/;
+use Types::Standard qw/Int Str Bool Object Maybe CodeRef HashRef InstanceOf ArrayRef/;
 use Moo;
 
 =encoding utf8
@@ -82,6 +82,11 @@ An hashref with the options to pass to the templates.
 =item include_paths
 
 Include paths arrayref.
+
+=item run_timeout
+
+Run timeout for latex/xindy run in seconds, default to 600 (which
+should be plenty).
 
 =back
 
@@ -175,6 +180,7 @@ has epub_embed_fonts => (is => 'ro', isa => Bool, default => sub { 1 });
 has indexes => (is => 'rwp', isa => Maybe[ArrayRef]);
 has include_paths => (is => 'ro', isa => ArrayRef, default => sub { [] });
 has volumes => (is => 'lazy', isa => ArrayRef);
+has run_timeout => (is => 'ro', isa => Int, default => sub { 600 });
 
 sub _build_file_header {
     my $self = shift;
@@ -840,14 +846,18 @@ sub _compile_pdf {
         if ($i > 2 and @run_xindy) {
             foreach my $exec (@run_xindy) {
                 $self->log_info("Executing " . join(" ", @$exec) . "\n");
-                system(@$exec) == 0 or $self->log_fatal("Errors running " . join(" ", @$exec) ."\n");
+                my ($xin, $xout, $xerr);
+                my $xindy_ok = run $exec, \$xin, \$xout, \$xerr, timeout($self->run_timeout);
+                unless ($xindy_ok) {
+                    $self->log_fatal("Errors running " . join(" ", @$exec) ."\n");
+                }
             }
         }
         my $latexname = $self->luatex ? 'LuaLaTeX' : 'XeLaTeX';
         my $latex = $self->luatex ? 'lualatex' : 'xelatex';
         my @run = ($latex, '-interaction=nonstopmode', $source);
         my ($in, $out, $err);
-        my $ok = run \@run, \$in, \$out, \$err;
+        my $ok = run \@run, \$in, \$out, \$err, timeout($self->run_timeout);
         my $shitout;
         foreach my $line (split(/\n/, $out)) {
             if ($line =~ m/^[!#]/) {

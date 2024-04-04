@@ -132,7 +132,7 @@ use warnings;
 
 
 
-#line 191 "gaussian.pd"
+#line 189 "gaussian.pd"
 
 =head1 BUGS
 

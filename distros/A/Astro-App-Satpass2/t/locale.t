@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Astro::App::Satpass2::Locale qw{ __localize __preferred };
-use Test::More 0.88;	# Because of done_testing();
+use Test2::V0;
 
 {
     local $ENV{ASTRO_APP_SATPASS2_CONFIG_DIR} = 't';
@@ -39,14 +39,14 @@ use Test::More 0.88;	# Because of done_testing();
 	default	=> 'Robin'
     ), 'Batman', q{altitude => 'title' from user-specific locale file};
 
-    is_deeply [ __localize(
+    is [ __localize(
 	    text	=> [ altitude => 'title' ],
 	    default	=> 'Robin',
 	) ],
 	[ 'Batman', 'Altitude', 'Robin' ],
 	q{altitude => 'title' in list context};
 
-    is_deeply scalar __localize(
+    is scalar __localize(
 	text	=> [ bearing => 'table' ],
 	default	=> [],
     ),
@@ -62,7 +62,7 @@ use Test::More 0.88;	# Because of done_testing();
 	text	=> [ event => 'title' ],
     ), 'Event', q{event => 'title' returns C value};
 
-    is_deeply scalar __localize(
+    is scalar __localize(
 	text	=> [ event => 'table' ],
 	default	=> [],
     ), [
@@ -75,7 +75,7 @@ use Test::More 0.88;	# Because of done_testing();
     ), 'Shemp',
 	q{event => table => 2 returns correct array element};
 
-    is_deeply scalar __localize(
+    is scalar __localize(
 	text	=> [ phase => 'table' ],
 	default	=> [],
     ),

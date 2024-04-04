@@ -52,6 +52,7 @@ none
 =cut
 #line 54 "Ops.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -60,13 +61,13 @@ none
 
 
 
-#line 130 "ops.pd"
+#line 125 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'+'} = $overload_sub = sub(;@) {
-      goto &PDL::plus unless ref $_[1]
+      return PDL::plus(@_) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '+'))
               && $foo != $overload_sub; # recursion guard
@@ -74,12 +75,13 @@ none
   }; }
 }
 
-#line 193 "ops.pd"
+#line 191 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'+='} = sub { PDL::plus($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 83 "Ops.pm"
+#line 84 "Ops.pm"
+
 
 =head2 plus
 
@@ -93,10 +95,14 @@ add two ndarrays
 
 =for example
 
-   $c = $x + $y;        # overloaded call
-   $c = plus $x, $y;     # explicit call with default swap of 0
-   $c = plus $x, $y, 1;  # explicit call with trailing 1 to swap args
-   $x->inplace->plus($y); # modify $x inplace
+   $c = $x + $y;               # overloaded call
+   $c = PDL::plus($x, $y);     # explicit call with default swap of 0
+   $c = PDL::plus($x, $y, 0);  # explicit call with explicit swap of 0
+   $c = PDL::plus($x, $y, 1);  # explicit call with trailing 1 to swap args
+   PDL::plus($x, $y, $c, 1);   # all params given
+   $x->plus($y, $c, 0);        # method call, all params given
+   $c = $x->plus($y);          # method call
+   $x->inplace->plus($y);      # modify $x inplace
 
 It can be made to work inplace with the C<< $x->inplace >> syntax.
 This function is used to overload the binary C<+> operator.
@@ -119,13 +125,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 130 "ops.pd"
+#line 125 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'*'} = $overload_sub = sub(;@) {
-      goto &PDL::mult unless ref $_[1]
+      return PDL::mult(@_) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '*'))
               && $foo != $overload_sub; # recursion guard
@@ -133,12 +139,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 193 "ops.pd"
+#line 191 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'*='} = sub { PDL::mult($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 142 "Ops.pm"
+#line 148 "Ops.pm"
+
 
 =head2 mult
 
@@ -152,10 +159,14 @@ multiply two ndarrays
 
 =for example
 
-   $c = $x * $y;        # overloaded call
-   $c = mult $x, $y;     # explicit call with default swap of 0
-   $c = mult $x, $y, 1;  # explicit call with trailing 1 to swap args
-   $x->inplace->mult($y); # modify $x inplace
+   $c = $x * $y;               # overloaded call
+   $c = PDL::mult($x, $y);     # explicit call with default swap of 0
+   $c = PDL::mult($x, $y, 0);  # explicit call with explicit swap of 0
+   $c = PDL::mult($x, $y, 1);  # explicit call with trailing 1 to swap args
+   PDL::mult($x, $y, $c, 1);   # all params given
+   $x->mult($y, $c, 0);        # method call, all params given
+   $c = $x->mult($y);          # method call
+   $x->inplace->mult($y);      # modify $x inplace
 
 It can be made to work inplace with the C<< $x->inplace >> syntax.
 This function is used to overload the binary C<*> operator.
@@ -178,13 +189,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 130 "ops.pd"
+#line 125 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'-'} = $overload_sub = sub(;@) {
-      goto &PDL::minus unless ref $_[1]
+      return PDL::minus(@_) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '-'))
               && $foo != $overload_sub; # recursion guard
@@ -192,12 +203,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 193 "ops.pd"
+#line 191 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'-='} = sub { PDL::minus($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 201 "Ops.pm"
+#line 212 "Ops.pm"
+
 
 =head2 minus
 
@@ -211,10 +223,14 @@ subtract two ndarrays
 
 =for example
 
-   $c = $x - $y;        # overloaded call
-   $c = minus $x, $y;     # explicit call with default swap of 0
-   $c = minus $x, $y, 1;  # explicit call with trailing 1 to swap args
-   $x->inplace->minus($y); # modify $x inplace
+   $c = $x - $y;               # overloaded call
+   $c = PDL::minus($x, $y);     # explicit call with default swap of 0
+   $c = PDL::minus($x, $y, 0);  # explicit call with explicit swap of 0
+   $c = PDL::minus($x, $y, 1);  # explicit call with trailing 1 to swap args
+   PDL::minus($x, $y, $c, 1);   # all params given
+   $x->minus($y, $c, 0);        # method call, all params given
+   $c = $x->minus($y);          # method call
+   $x->inplace->minus($y);      # modify $x inplace
 
 It can be made to work inplace with the C<< $x->inplace >> syntax.
 This function is used to overload the binary C<-> operator.
@@ -237,13 +253,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 130 "ops.pd"
+#line 125 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'/'} = $overload_sub = sub(;@) {
-      goto &PDL::divide unless ref $_[1]
+      return PDL::divide(@_) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '/'))
               && $foo != $overload_sub; # recursion guard
@@ -251,12 +267,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 193 "ops.pd"
+#line 191 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'/='} = sub { PDL::divide($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 260 "Ops.pm"
+#line 276 "Ops.pm"
+
 
 =head2 divide
 
@@ -270,10 +287,14 @@ divide two ndarrays
 
 =for example
 
-   $c = $x / $y;        # overloaded call
-   $c = divide $x, $y;     # explicit call with default swap of 0
-   $c = divide $x, $y, 1;  # explicit call with trailing 1 to swap args
-   $x->inplace->divide($y); # modify $x inplace
+   $c = $x / $y;               # overloaded call
+   $c = PDL::divide($x, $y);     # explicit call with default swap of 0
+   $c = PDL::divide($x, $y, 0);  # explicit call with explicit swap of 0
+   $c = PDL::divide($x, $y, 1);  # explicit call with trailing 1 to swap args
+   PDL::divide($x, $y, $c, 1);   # all params given
+   $x->divide($y, $c, 0);        # method call, all params given
+   $c = $x->divide($y);          # method call
+   $x->inplace->divide($y);      # modify $x inplace
 
 It can be made to work inplace with the C<< $x->inplace >> syntax.
 This function is used to overload the binary C</> operator.
@@ -296,20 +317,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 130 "ops.pd"
+#line 125 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'>'} = $overload_sub = sub(;@) {
-      goto &PDL::gt unless ref $_[1]
+      return PDL::gt(@_) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '>'))
               && $foo != $overload_sub; # recursion guard
       goto &$foo;
   }; }
 }
-#line 313 "Ops.pm"
+#line 334 "Ops.pm"
+
 
 =head2 gt
 
@@ -323,10 +345,14 @@ the binary E<gt> (greater than) operation
 
 =for example
 
-   $c = $x > $y;        # overloaded call
-   $c = gt $x, $y;     # explicit call with default swap of 0
-   $c = gt $x, $y, 1;  # explicit call with trailing 1 to swap args
-   $x->inplace->gt($y); # modify $x inplace
+   $c = $x > $y;               # overloaded call
+   $c = PDL::gt($x, $y);     # explicit call with default swap of 0
+   $c = PDL::gt($x, $y, 0);  # explicit call with explicit swap of 0
+   $c = PDL::gt($x, $y, 1);  # explicit call with trailing 1 to swap args
+   PDL::gt($x, $y, $c, 1);   # all params given
+   $x->gt($y, $c, 0);        # method call, all params given
+   $c = $x->gt($y);          # method call
+   $x->inplace->gt($y);      # modify $x inplace
 
 It can be made to work inplace with the C<< $x->inplace >> syntax.
 This function is used to overload the binary C<E<gt>> operator.
@@ -349,20 +375,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 130 "ops.pd"
+#line 125 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'<'} = $overload_sub = sub(;@) {
-      goto &PDL::lt unless ref $_[1]
+      return PDL::lt(@_) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '<'))
               && $foo != $overload_sub; # recursion guard
       goto &$foo;
   }; }
 }
-#line 366 "Ops.pm"
+#line 392 "Ops.pm"
+
 
 =head2 lt
 
@@ -376,10 +403,14 @@ the binary E<lt> (less than) operation
 
 =for example
 
-   $c = $x < $y;        # overloaded call
-   $c = lt $x, $y;     # explicit call with default swap of 0
-   $c = lt $x, $y, 1;  # explicit call with trailing 1 to swap args
-   $x->inplace->lt($y); # modify $x inplace
+   $c = $x < $y;               # overloaded call
+   $c = PDL::lt($x, $y);     # explicit call with default swap of 0
+   $c = PDL::lt($x, $y, 0);  # explicit call with explicit swap of 0
+   $c = PDL::lt($x, $y, 1);  # explicit call with trailing 1 to swap args
+   PDL::lt($x, $y, $c, 1);   # all params given
+   $x->lt($y, $c, 0);        # method call, all params given
+   $c = $x->lt($y);          # method call
+   $x->inplace->lt($y);      # modify $x inplace
 
 It can be made to work inplace with the C<< $x->inplace >> syntax.
 This function is used to overload the binary C<E<lt>> operator.
@@ -402,20 +433,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 130 "ops.pd"
+#line 125 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'<='} = $overload_sub = sub(;@) {
-      goto &PDL::le unless ref $_[1]
+      return PDL::le(@_) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '<='))
               && $foo != $overload_sub; # recursion guard
       goto &$foo;
   }; }
 }
-#line 419 "Ops.pm"
+#line 450 "Ops.pm"
+
 
 =head2 le
 
@@ -429,10 +461,14 @@ the binary E<lt>= (less equal) operation
 
 =for example
 
-   $c = $x <= $y;        # overloaded call
-   $c = le $x, $y;     # explicit call with default swap of 0
-   $c = le $x, $y, 1;  # explicit call with trailing 1 to swap args
-   $x->inplace->le($y); # modify $x inplace
+   $c = $x <= $y;               # overloaded call
+   $c = PDL::le($x, $y);     # explicit call with default swap of 0
+   $c = PDL::le($x, $y, 0);  # explicit call with explicit swap of 0
+   $c = PDL::le($x, $y, 1);  # explicit call with trailing 1 to swap args
+   PDL::le($x, $y, $c, 1);   # all params given
+   $x->le($y, $c, 0);        # method call, all params given
+   $c = $x->le($y);          # method call
+   $x->inplace->le($y);      # modify $x inplace
 
 It can be made to work inplace with the C<< $x->inplace >> syntax.
 This function is used to overload the binary C<E<lt>=> operator.
@@ -455,20 +491,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 130 "ops.pd"
+#line 125 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'>='} = $overload_sub = sub(;@) {
-      goto &PDL::ge unless ref $_[1]
+      return PDL::ge(@_) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '>='))
               && $foo != $overload_sub; # recursion guard
       goto &$foo;
   }; }
 }
-#line 472 "Ops.pm"
+#line 508 "Ops.pm"
+
 
 =head2 ge
 
@@ -482,10 +519,14 @@ the binary E<gt>= (greater equal) operation
 
 =for example
 
-   $c = $x >= $y;        # overloaded call
-   $c = ge $x, $y;     # explicit call with default swap of 0
-   $c = ge $x, $y, 1;  # explicit call with trailing 1 to swap args
-   $x->inplace->ge($y); # modify $x inplace
+   $c = $x >= $y;               # overloaded call
+   $c = PDL::ge($x, $y);     # explicit call with default swap of 0
+   $c = PDL::ge($x, $y, 0);  # explicit call with explicit swap of 0
+   $c = PDL::ge($x, $y, 1);  # explicit call with trailing 1 to swap args
+   PDL::ge($x, $y, $c, 1);   # all params given
+   $x->ge($y, $c, 0);        # method call, all params given
+   $c = $x->ge($y);          # method call
+   $x->inplace->ge($y);      # modify $x inplace
 
 It can be made to work inplace with the C<< $x->inplace >> syntax.
 This function is used to overload the binary C<E<gt>=> operator.
@@ -508,20 +549,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 130 "ops.pd"
+#line 125 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'=='} = $overload_sub = sub(;@) {
-      goto &PDL::eq unless ref $_[1]
+      return PDL::eq(@_) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '=='))
               && $foo != $overload_sub; # recursion guard
       goto &$foo;
   }; }
 }
-#line 525 "Ops.pm"
+#line 566 "Ops.pm"
+
 
 =head2 eq
 
@@ -535,10 +577,14 @@ binary I<equal to> operation (C<==>)
 
 =for example
 
-   $c = $x == $y;        # overloaded call
-   $c = eq $x, $y;     # explicit call with default swap of 0
-   $c = eq $x, $y, 1;  # explicit call with trailing 1 to swap args
-   $x->inplace->eq($y); # modify $x inplace
+   $c = $x == $y;               # overloaded call
+   $c = PDL::eq($x, $y);     # explicit call with default swap of 0
+   $c = PDL::eq($x, $y, 0);  # explicit call with explicit swap of 0
+   $c = PDL::eq($x, $y, 1);  # explicit call with trailing 1 to swap args
+   PDL::eq($x, $y, $c, 1);   # all params given
+   $x->eq($y, $c, 0);        # method call, all params given
+   $c = $x->eq($y);          # method call
+   $x->inplace->eq($y);      # modify $x inplace
 
 It can be made to work inplace with the C<< $x->inplace >> syntax.
 This function is used to overload the binary C<==> operator.
@@ -561,20 +607,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 130 "ops.pd"
+#line 125 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'!='} = $overload_sub = sub(;@) {
-      goto &PDL::ne unless ref $_[1]
+      return PDL::ne(@_) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '!='))
               && $foo != $overload_sub; # recursion guard
       goto &$foo;
   }; }
 }
-#line 578 "Ops.pm"
+#line 624 "Ops.pm"
+
 
 =head2 ne
 
@@ -588,10 +635,14 @@ binary I<not equal to> operation (C<!=>)
 
 =for example
 
-   $c = $x != $y;        # overloaded call
-   $c = ne $x, $y;     # explicit call with default swap of 0
-   $c = ne $x, $y, 1;  # explicit call with trailing 1 to swap args
-   $x->inplace->ne($y); # modify $x inplace
+   $c = $x != $y;               # overloaded call
+   $c = PDL::ne($x, $y);     # explicit call with default swap of 0
+   $c = PDL::ne($x, $y, 0);  # explicit call with explicit swap of 0
+   $c = PDL::ne($x, $y, 1);  # explicit call with trailing 1 to swap args
+   PDL::ne($x, $y, $c, 1);   # all params given
+   $x->ne($y, $c, 0);        # method call, all params given
+   $c = $x->ne($y);          # method call
+   $x->inplace->ne($y);      # modify $x inplace
 
 It can be made to work inplace with the C<< $x->inplace >> syntax.
 This function is used to overload the binary C<!=> operator.
@@ -614,13 +665,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 130 "ops.pd"
+#line 125 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'<<'} = $overload_sub = sub(;@) {
-      goto &PDL::shiftleft unless ref $_[1]
+      return PDL::shiftleft(@_) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '<<'))
               && $foo != $overload_sub; # recursion guard
@@ -628,12 +679,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 193 "ops.pd"
+#line 191 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'<<='} = sub { PDL::shiftleft($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 637 "Ops.pm"
+#line 688 "Ops.pm"
+
 
 =head2 shiftleft
 
@@ -647,10 +699,14 @@ leftshift C<$a> by C<$b>
 
 =for example
 
-   $c = $x << $y;        # overloaded call
-   $c = shiftleft $x, $y;     # explicit call with default swap of 0
-   $c = shiftleft $x, $y, 1;  # explicit call with trailing 1 to swap args
-   $x->inplace->shiftleft($y); # modify $x inplace
+   $c = $x << $y;               # overloaded call
+   $c = PDL::shiftleft($x, $y);     # explicit call with default swap of 0
+   $c = PDL::shiftleft($x, $y, 0);  # explicit call with explicit swap of 0
+   $c = PDL::shiftleft($x, $y, 1);  # explicit call with trailing 1 to swap args
+   PDL::shiftleft($x, $y, $c, 1);   # all params given
+   $x->shiftleft($y, $c, 0);        # method call, all params given
+   $c = $x->shiftleft($y);          # method call
+   $x->inplace->shiftleft($y);      # modify $x inplace
 
 It can be made to work inplace with the C<< $x->inplace >> syntax.
 This function is used to overload the binary C<E<lt>E<lt>> operator.
@@ -673,13 +729,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 130 "ops.pd"
+#line 125 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'>>'} = $overload_sub = sub(;@) {
-      goto &PDL::shiftright unless ref $_[1]
+      return PDL::shiftright(@_) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '>>'))
               && $foo != $overload_sub; # recursion guard
@@ -687,12 +743,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 193 "ops.pd"
+#line 191 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'>>='} = sub { PDL::shiftright($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 696 "Ops.pm"
+#line 752 "Ops.pm"
+
 
 =head2 shiftright
 
@@ -706,10 +763,14 @@ rightshift C<$a> by C<$b>
 
 =for example
 
-   $c = $x >> $y;        # overloaded call
-   $c = shiftright $x, $y;     # explicit call with default swap of 0
-   $c = shiftright $x, $y, 1;  # explicit call with trailing 1 to swap args
-   $x->inplace->shiftright($y); # modify $x inplace
+   $c = $x >> $y;               # overloaded call
+   $c = PDL::shiftright($x, $y);     # explicit call with default swap of 0
+   $c = PDL::shiftright($x, $y, 0);  # explicit call with explicit swap of 0
+   $c = PDL::shiftright($x, $y, 1);  # explicit call with trailing 1 to swap args
+   PDL::shiftright($x, $y, $c, 1);   # all params given
+   $x->shiftright($y, $c, 0);        # method call, all params given
+   $c = $x->shiftright($y);          # method call
+   $x->inplace->shiftright($y);      # modify $x inplace
 
 It can be made to work inplace with the C<< $x->inplace >> syntax.
 This function is used to overload the binary C<E<gt>E<gt>> operator.
@@ -732,13 +793,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 130 "ops.pd"
+#line 125 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'|'} = $overload_sub = sub(;@) {
-      goto &PDL::or2 unless ref $_[1]
+      return PDL::or2($_[2]?@_[1,0]:@_[0,1]) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '|'))
               && $foo != $overload_sub; # recursion guard
@@ -746,18 +807,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 193 "ops.pd"
+#line 191 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'|='} = sub { PDL::or2($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 755 "Ops.pm"
+#line 816 "Ops.pm"
+
 
 =head2 or2
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int $swap; SV *$ign; int $ign2)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -765,10 +827,14 @@ binary I<or> of two ndarrays
 
 =for example
 
-   $c = $x | $y;        # overloaded call
-   $c = or2 $x, $y;     # explicit call with default swap of 0
-   $c = or2 $x, $y, 1;  # explicit call with trailing 1 to swap args
-   $x->inplace->or2($y); # modify $x inplace
+   $c = $x | $y;               # overloaded call
+   $c = PDL::or2($x, $y);     # explicit call with default swap of 0
+   $c = PDL::or2($x, $y, 0);  # explicit call with explicit swap of 0
+   $c = PDL::or2($x, $y, 1);  # explicit call with trailing 1 to swap args
+   PDL::or2($x, $y, $c, 1);   # all params given
+   $x->or2($y, $c, 0);        # method call, all params given
+   $c = $x->or2($y);          # method call
+   $x->inplace->or2($y);      # modify $x inplace
 
 It can be made to work inplace with the C<< $x->inplace >> syntax.
 This function is used to overload the binary C<|> operator.
@@ -791,13 +857,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 130 "ops.pd"
+#line 125 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'&'} = $overload_sub = sub(;@) {
-      goto &PDL::and2 unless ref $_[1]
+      return PDL::and2($_[2]?@_[1,0]:@_[0,1]) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '&'))
               && $foo != $overload_sub; # recursion guard
@@ -805,18 +871,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 193 "ops.pd"
+#line 191 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'&='} = sub { PDL::and2($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 814 "Ops.pm"
+#line 880 "Ops.pm"
+
 
 =head2 and2
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int $swap; SV *$ign; int $ign2)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -824,10 +891,14 @@ binary I<and> of two ndarrays
 
 =for example
 
-   $c = $x & $y;        # overloaded call
-   $c = and2 $x, $y;     # explicit call with default swap of 0
-   $c = and2 $x, $y, 1;  # explicit call with trailing 1 to swap args
-   $x->inplace->and2($y); # modify $x inplace
+   $c = $x & $y;               # overloaded call
+   $c = PDL::and2($x, $y);     # explicit call with default swap of 0
+   $c = PDL::and2($x, $y, 0);  # explicit call with explicit swap of 0
+   $c = PDL::and2($x, $y, 1);  # explicit call with trailing 1 to swap args
+   PDL::and2($x, $y, $c, 1);   # all params given
+   $x->and2($y, $c, 0);        # method call, all params given
+   $c = $x->and2($y);          # method call
+   $x->inplace->and2($y);      # modify $x inplace
 
 It can be made to work inplace with the C<< $x->inplace >> syntax.
 This function is used to overload the binary C<&> operator.
@@ -850,13 +921,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 130 "ops.pd"
+#line 125 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'^'} = $overload_sub = sub(;@) {
-      goto &PDL::xor unless ref $_[1]
+      return PDL::xor($_[2]?@_[1,0]:@_[0,1]) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '^'))
               && $foo != $overload_sub; # recursion guard
@@ -864,18 +935,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 193 "ops.pd"
+#line 191 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'^='} = sub { PDL::xor($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 873 "Ops.pm"
+#line 944 "Ops.pm"
+
 
 =head2 xor
 
 =for sig
 
-  Signature: (a(); b(); [o]c(); int $swap; SV *$ign; int $ign2)
+  Signature: (a(); b(); [o]c(); int $swap)
 
 =for ref
 
@@ -883,10 +955,14 @@ binary I<exclusive or> of two ndarrays
 
 =for example
 
-   $c = $x ^ $y;        # overloaded call
-   $c = xor $x, $y;     # explicit call with default swap of 0
-   $c = xor $x, $y, 1;  # explicit call with trailing 1 to swap args
-   $x->inplace->xor($y); # modify $x inplace
+   $c = $x ^ $y;               # overloaded call
+   $c = PDL::xor($x, $y);     # explicit call with default swap of 0
+   $c = PDL::xor($x, $y, 0);  # explicit call with explicit swap of 0
+   $c = PDL::xor($x, $y, 1);  # explicit call with trailing 1 to swap args
+   PDL::xor($x, $y, $c, 1);   # all params given
+   $x->xor($y, $c, 0);        # method call, all params given
+   $c = $x->xor($y);          # method call
+   $x->inplace->xor($y);      # modify $x inplace
 
 It can be made to work inplace with the C<< $x->inplace >> syntax.
 This function is used to overload the binary C<^> operator.
@@ -909,11 +985,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 307 "ops.pd"
+#line 302 "ops.pd"
 
-#line 176 "ops.pd"
+#line 174 "ops.pd"
 BEGIN { $OVERLOADS{'~'} = sub { PDL::bitnot($_[0]) } }
-#line 917 "Ops.pm"
+#line 993 "Ops.pm"
+
 
 =head2 bitnot
 
@@ -949,13 +1026,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 239 "ops.pd"
+#line 235 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'**'} = $overload_sub = sub(;@) {
-      goto &PDL::power unless ref $_[1]
+      return PDL::power(@_) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '**'))
               && $foo != $overload_sub; # recursion guard
@@ -963,12 +1040,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 193 "ops.pd"
+#line 191 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'**='} = sub { PDL::power($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 972 "Ops.pm"
+#line 1049 "Ops.pm"
+
 
 =head2 power
 
@@ -1008,20 +1086,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 239 "ops.pd"
+#line 235 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'atan2'} = $overload_sub = sub(;@) {
-      goto &PDL::atan2 unless ref $_[1]
+      return PDL::atan2(@_) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], 'atan2'))
               && $foo != $overload_sub; # recursion guard
       goto &$foo;
   }; }
 }
-#line 1025 "Ops.pm"
+#line 1103 "Ops.pm"
+
 
 =head2 atan2
 
@@ -1061,13 +1140,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 239 "ops.pd"
+#line 235 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'%'} = $overload_sub = sub(;@) {
-      goto &PDL::modulo unless ref $_[1]
+      return PDL::modulo(@_) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '%'))
               && $foo != $overload_sub; # recursion guard
@@ -1075,12 +1154,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 193 "ops.pd"
+#line 191 "ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'%='} = sub { PDL::modulo($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 1084 "Ops.pm"
+#line 1163 "Ops.pm"
+
 
 =head2 modulo
 
@@ -1120,20 +1200,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 239 "ops.pd"
+#line 235 "ops.pd"
 
-#line 180 "ops.pd"
+#line 178 "ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'<=>'} = $overload_sub = sub(;@) {
-      goto &PDL::spaceship unless ref $_[1]
+      return PDL::spaceship(@_) unless ref $_[1]
               && (ref $_[1] ne 'PDL')
               && defined($foo = overload::Method($_[1], '<=>'))
               && $foo != $overload_sub; # recursion guard
       goto &$foo;
   }; }
 }
-#line 1137 "Ops.pm"
+#line 1217 "Ops.pm"
+
 
 =head2 spaceship
 
@@ -1173,11 +1254,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 307 "ops.pd"
+#line 302 "ops.pd"
 
-#line 176 "ops.pd"
+#line 174 "ops.pd"
 BEGIN { $OVERLOADS{'sqrt'} = sub { PDL::sqrt($_[0]) } }
-#line 1181 "Ops.pm"
+#line 1262 "Ops.pm"
+
 
 =head2 sqrt
 
@@ -1213,11 +1295,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 307 "ops.pd"
+#line 302 "ops.pd"
 
-#line 176 "ops.pd"
+#line 174 "ops.pd"
 BEGIN { $OVERLOADS{'sin'} = sub { PDL::sin($_[0]) } }
-#line 1221 "Ops.pm"
+#line 1303 "Ops.pm"
+
 
 =head2 sin
 
@@ -1253,11 +1336,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 307 "ops.pd"
+#line 302 "ops.pd"
 
-#line 176 "ops.pd"
+#line 174 "ops.pd"
 BEGIN { $OVERLOADS{'cos'} = sub { PDL::cos($_[0]) } }
-#line 1261 "Ops.pm"
+#line 1344 "Ops.pm"
+
 
 =head2 cos
 
@@ -1293,11 +1377,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 307 "ops.pd"
+#line 302 "ops.pd"
 
-#line 176 "ops.pd"
+#line 174 "ops.pd"
 BEGIN { $OVERLOADS{'!'} = sub { PDL::not($_[0]) } }
-#line 1301 "Ops.pm"
+#line 1385 "Ops.pm"
+
 
 =head2 not
 
@@ -1333,11 +1418,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 307 "ops.pd"
+#line 302 "ops.pd"
 
-#line 176 "ops.pd"
+#line 174 "ops.pd"
 BEGIN { $OVERLOADS{'exp'} = sub { PDL::exp($_[0]) } }
-#line 1341 "Ops.pm"
+#line 1426 "Ops.pm"
+
 
 =head2 exp
 
@@ -1373,11 +1459,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 307 "ops.pd"
+#line 302 "ops.pd"
 
-#line 176 "ops.pd"
+#line 174 "ops.pd"
 BEGIN { $OVERLOADS{'log'} = sub { PDL::log($_[0]) } }
-#line 1381 "Ops.pm"
+#line 1467 "Ops.pm"
+
 
 =head2 log
 
@@ -1697,7 +1784,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 567 "ops.pd"
+#line 562 "ops.pd"
 
 =head2 abs
 
@@ -1709,9 +1796,10 @@ Returns the absolute value of a number.
 
 sub PDL::abs { $_[0]->type->real ? goto &PDL::_rabs : goto &PDL::_cabs }
 
-#line 176 "ops.pd"
+#line 174 "ops.pd"
 BEGIN { $OVERLOADS{'abs'} = sub { PDL::abs($_[0]) } }
-#line 581 "ops.pd"
+#line 576 "ops.pd"
+
 
 =head2 abs2
 
@@ -1722,7 +1810,8 @@ Returns the square of the absolute value of a number.
 =cut
 
 sub PDL::abs2 ($) { my $r = &PDL::abs; $r * $r }
-#line 1726 "Ops.pm"
+#line 1814 "Ops.pm"
+
 
 =head2 r2C
 
@@ -1795,7 +1884,7 @@ sub PDL::i2C ($) {
 
 
 
-#line 624 "ops.pd"
+#line 619 "ops.pd"
 
 # This is to used warn if an operand is non-numeric or non-PDL.
 sub warn_non_numeric_op_wrapper {
@@ -1818,12 +1907,13 @@ sub warn_non_numeric_op_wrapper {
       PDL::Ops::assgn(@args);
       return $args[1];
     },
-    '++' => sub { $_[0] += 1 },
-    '--' => sub { $_[0] -= 1 },
+    '++' => sub { $_[0] += ($PDL::Core::pdl_ones[$_[0]->get_datatype]//barf "Couldn't find 'one' for type ", $_[0]->get_datatype) },
+    '--' => sub { $_[0] -= ($PDL::Core::pdl_ones[$_[0]->get_datatype]//barf "Couldn't find 'one' for type ", $_[0]->get_datatype) },
     ;
 }
 
 #line 49 "ops.pd"
+
 =head1 AUTHOR
 
 Tuomas J. Lukka (lukka@fas.harvard.edu),
@@ -1834,7 +1924,7 @@ Doug Burke (burke@ifa.hawaii.edu),
 and Craig DeForest (deforest@boulder.swri.edu).
 
 =cut
-#line 1838 "Ops.pm"
+#line 1928 "Ops.pm"
 
 # Exit with OK status
 

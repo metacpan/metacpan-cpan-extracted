@@ -51,6 +51,7 @@ use strict;
 use warnings;
 #line 53 "ImageND.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -62,7 +63,8 @@ use warnings;
 #line 95 "imagend.pd"
 
 use Carp;
-#line 66 "ImageND.pm"
+#line 67 "ImageND.pm"
+
 
 =head2 convolve
 
@@ -98,18 +100,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-
-# Custom Perl wrapper
-
-sub PDL::convolve{
+sub PDL::convolve {
     my($x,$y,$c) = @_;
     barf("Usage: convolve(a(*), b(*), [o]c(*)") if $#_<1 || $#_>2;
     $c = PDL->null if $#_<2;
-    &PDL::_convolve_int( $x->clump(-1), $y->clump(-1),
-       long([$x->dims]), long([$y->dims]),
-       ($c->getndims>1? $c->clump(-1) : $c)
-     );
-     $c->setdims([$x->dims]);
+    PDL::_convolve_int( $x->flat, $y->flat,
+       $x->shape, $y->shape,
+       $c->isnull ? $c : $c->flat,
+    );
+    $c->setdims([$x->dims]);
 
     if($x->is_inplace) {
       $x .= $c;
@@ -121,14 +120,13 @@ sub PDL::convolve{
 
 
 
-
 *convolve = \&PDL::convolve;
 
 
 
 
 
-#line 225 "imagend.pd"
+#line 219 "imagend.pd"
 
 =head2 ninterpol()
 
@@ -169,7 +167,8 @@ sub PDL::ninterpol {
     for (list ($p-$ip)) { $y = interpol($_,$y->xvals,$y); }
     $y;
 }
-#line 173 "ImageND.pm"
+#line 171 "ImageND.pm"
+
 
 =head2 rebin
 
@@ -212,9 +211,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-
-# Custom Perl wrapper
-
+#line 296 "imagend.pd"
 sub PDL::rebin {
     my($x) = shift;
     my($opts) = ref $_[-1] eq "HASH" ? pop : {};
@@ -230,18 +227,18 @@ sub PDL::rebin {
       } elsif ($odims[$i] != $idims[$i]) {       # If something changes
          if (!($odims[$i] % $idims[$i])) {      # Cells map 1 -> n
                my ($r) = $odims[$i]/$idims[$i];
-               $y = $x->mv($i,0)->dupN($r);
+               $y = ($i==0 ? $x : $x->mv($i,0))->dupN($r);
          } elsif (!($idims[$i] % $odims[$i])) { # Cells map n -> 1
                my ($r) = $idims[$i]/$odims[$i];
-               $x = $x->mv($i,0);
-               # -> copy so won't corrupt input PDL
+               $x = $x->mv($i,0) if $i != 0;
+               # -> copy so won\'t corrupt input PDL
                $y = $x->slice("0:-1:$r")->copy;
                foreach (1..$r-1) {
                   $y += $x->slice("$_:-1:$r");
                }
                $y /= $r;
          } else {                               # Cells map n -> m
-             &PDL::_rebin_int($x->mv($i,0), $y = null, $odims[$i]);
+             &PDL::_rebin_int(($i==0 ? $x : $x->mv($i,0)), $y = null, $odims[$i]);
          }
          $x = $y->mv(0,$i);
       }
@@ -257,13 +254,12 @@ sub PDL::rebin {
       }
       return $x * $norm;
     } else {
-      # Explicit copy so i) can't corrupt input PDL through this link
-      #                 ii) don't waste space on invisible elements
+      # Explicit copy so i) can\'t corrupt input PDL through this link
+      #                 ii) don\'t waste space on invisible elements
       return $x -> copy;
     }
 }
-
-
+#line 263 "ImageND.pm"
 
 *rebin = \&PDL::rebin;
 
@@ -271,7 +267,7 @@ sub PDL::rebin {
 
 
 
-#line 378 "imagend.pd"
+#line 369 "imagend.pd"
 
 =head2 circ_mean_p
 
@@ -292,15 +288,16 @@ sub circ_mean_p {
  my ($rad,$sum,$norm);
 
  if (defined $opt) {
-   $rad = long PDL::rvals($x,$opt);
+   $rad = indx PDL::rvals($x,$opt);
  }
  else {
-   $rad = long rvals $x;
+   $rad = indx rvals $x;
  }
- $sum = zeroes($rad->max+1);
- PDL::indadd $x->clump(-1), $rad->clump(-1), $sum; # this does the real work
- $norm = zeroes($rad->max+1);
- PDL::indadd pdl(1), $rad->clump(-1), $norm;       # equivalent to get norm
+ my $max1 = $rad->max->sclr+1;
+ $sum = zeroes($max1);
+ PDL::indadd $x->flat, $rad->flat, $sum; # this does the real work
+ $norm = zeroes($max1);
+ PDL::indadd pdl(1), $rad->flat, $norm;       # equivalent to get norm
  $sum /= $norm;
  return $sum;
 }
@@ -324,23 +321,25 @@ sub circ_mean {
  my ($rad,$sum,$norm,$a1);
 
  if (defined $opt) {
-   $rad = long PDL::rvals($x,$opt);
+   $rad = indx PDL::rvals($x,$opt);
  }
  else {
-   $rad = long rvals $x;
+   $rad = indx rvals $x;
  }
- $sum = zeroes($rad->max+1);
- PDL::indadd $x->clump(-1), $rad->clump(-1), $sum; # this does the real work
- $norm = zeroes($rad->max+1);
- PDL::indadd pdl(1), $rad->clump(-1), $norm;       # equivalent to get norm
+ my $max1 = $rad->max->sclr+1;
+ $sum = zeroes($max1);
+ PDL::indadd $x->flat, $rad->flat, $sum; # this does the real work
+ $norm = zeroes($max1);
+ PDL::indadd pdl(1), $rad->flat, $norm;       # equivalent to get norm
  $sum /= $norm;
- $a1 = $x->clump(-1);
- $a1 .= $sum->index($rad->clump(-1));
+ $a1 = $x->flat;
+ $a1 .= $sum->index($rad->flat);
 
  return $x;
 }
 
-#line 454 "imagend.pd"
+#line 447 "imagend.pd"
+
 =head2 kernctr
 
 =for ref
@@ -395,7 +394,8 @@ sub PDL::kernctr {
     }
     $newk;
 }
-#line 399 "ImageND.pm"
+#line 398 "ImageND.pm"
+
 
 =head2 convolveND
 
@@ -556,7 +556,7 @@ sub PDL::convolveND {
 
   ###
   # Pad the array to include boundary conditions
-  my $adims = pdl($x->dims);
+  my $adims = $x->shape;
   my $koff = ($kdims/2)->ceil - 1;
 
   my $aa = $x->range( -$koff, $adims + $kdims, $opt->{Boundary} )
@@ -570,10 +570,7 @@ sub PDL::convolveND {
     # FFT works best on doubles; do our work there then cast back
     # at the end.  
     $aa = double($aa);
-    my $aai = $aa->zeroes;
-
-    my $kk = $aa->zeroes;
-    my $kki = $aa->zeroes;
+    $_ = $aa->zeroes for my ($aai, $kk, $kki);
     my $tmp;  # work around new perl -d "feature"
     ($tmp = $kk->range( - ($kdims/2)->floor, $kdims, 'p')) .= $k;
     PDL::fftnd($kk, $kki);
@@ -622,7 +619,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 626 "ImageND.pm"
+#line 623 "ImageND.pm"
 
 # Exit with OK status
 

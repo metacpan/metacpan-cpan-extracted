@@ -11,12 +11,12 @@ use My::Module::Test::App;	# For environment clean-up
 use Astro::App::Satpass2;
 use Astro::App::Satpass2::Utils ();
 use Astro::App::Satpass2::Macro::Code;
-use Test::More 0.88;	# Because of done_testing();
+use Test2::V0;
 
 use constant LIB_DIR => 'eg';
 
 -d LIB_DIR
-    or plan skip_all => "Can not find @{[ LIB_DIR ]}/ directory";
+    or skip_all "Can not find @{[ LIB_DIR ]}/ directory";
 
 my ( $mac, $sp );
 
@@ -29,7 +29,7 @@ eval {
 	height		=> 16.68,
     );
     1;
-} or plan skip_all => "Can not instantiate Satpass2: $@";
+} or skip_all "Can not instantiate Satpass2: $@";
 
 eval {
    $mac = Astro::App::Satpass2::Macro::Code->new(
@@ -41,7 +41,7 @@ eval {
 	warner	=> $sp->{_warner},	# TODO Encapsulation violation
     );
     1;
-} or plan skip_all => "Can not instantiate macro: $@";
+} or skip_all "Can not instantiate macro: $@";
 
 cmp_ok scalar $mac->implements(), '==', 5, 'Module implements 5 macros';
 

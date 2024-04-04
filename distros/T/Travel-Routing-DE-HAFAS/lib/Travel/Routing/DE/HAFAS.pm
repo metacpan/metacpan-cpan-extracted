@@ -18,7 +18,7 @@ use Travel::Routing::DE::HAFAS::Connection;
 use Travel::Status::DE::HAFAS::Location;
 use Travel::Status::DE::HAFAS::Message;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # {{{ Endpoint Definition
 
@@ -243,7 +243,7 @@ sub new {
 					arrLocL => [ $self->stop_to_hafas( $self->{to_stop} ) ],
 					numF    => 6,
 					maxChg  => $conf{max_change},
-					minChgTime => undef,
+					minChgTime => $conf{min_change_time},
 					outFrwd    => $outFrwd,
 					viaLocL    => @via_locs
 					? [ map { { loc => $_ } } @via_locs ]
@@ -536,8 +536,17 @@ sub check_mgate {
 sub parse_trips {
 	my ($self) = @_;
 
+	my $common = $self->{raw_json}{svcResL}[0]{res}{common};
+
 	my @locL = map { Travel::Status::DE::HAFAS::Location->new( loc => $_ ) }
-	  @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
+	  @{ $common->{locL} // [] };
+
+	my @prodL = map {
+		Travel::Status::DE::HAFAS::Product->new(
+			common  => $common,
+			product => $_
+		)
+	} @{ $common->{prodL} // [] };
 
 	my @conL = @{ $self->{raw_json}{svcResL}[0]{res}{outConL} // [] };
 	for my $con (@conL) {
@@ -546,6 +555,7 @@ sub parse_trips {
 			Travel::Routing::DE::HAFAS::Connection->new(
 				common     => $self->{raw_json}{svcResL}[0]{res}{common},
 				locL       => \@locL,
+				prodL      => \@prodL,
 				connection => $con,
 				hafas      => $self,
 			)
@@ -680,7 +690,7 @@ Travel::Routing::DE::HAFAS - Interface to HAFAS itinerary services
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 
@@ -759,6 +769,12 @@ pass an empty hashref to call the LWP::UserAgent constructor without arguments.
 =item B<max_change> => I<count>
 
 Request connections with no more than I<count> changeovers.
+
+=item B<min_change_time> => I<minutes>
+
+Request connections with scheduled changeover durations of at least I<minutes>.
+Note that this does not account for real-time data: the backend may return
+delayed connections that violate the specified changeover duration.
 
 =item B<service> => I<service>
 

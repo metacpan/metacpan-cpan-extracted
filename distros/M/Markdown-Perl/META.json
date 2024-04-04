@@ -1,0 +1,85 @@
+{
+   "abstract" : "Very configurable Markdown processor written in pure Perl, supporting the CommonMark spec and many extensions",
+   "author" : [
+      "Mathias Kende <mathias@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Markdown-Perl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "local",
+         "vendor"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "perl" : "v5.26.0"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Devel::Cover" : "0",
+            "Devel::NYTProf" : "0"
+         },
+         "suggests" : {
+            "PAR::Packer" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::MoreUtils" : "0",
+            "List::Util" : "1.45",
+            "Readonly" : "0",
+            "Unicode::CaseFold" : "0",
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::Pod" : "1.22"
+         },
+         "requires" : {
+            "JSON" : "0",
+            "Readonly" : "0",
+            "Test2::V0" : "0",
+            "Test::CPANfile" : "0",
+            "Test::More" : "0",
+            "Text::Diff" : "0"
+         },
+         "suggests" : {
+            "IPC::Run3" : "0",
+            "Perl::Tidy" : "20220613",
+            "Test2::Tools::PerlCritic" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mkende/pmarkdown/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mkende/pmarkdown"
+      }
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

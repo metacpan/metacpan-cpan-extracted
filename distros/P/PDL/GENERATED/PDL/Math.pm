@@ -3,7 +3,7 @@
 #
 package PDL::Math;
 
-our @EXPORT_OK = qw(acos asin atan cosh sinh tan tanh ceil floor rint pow acosh asinh atanh erf erfc bessj0 bessj1 bessy0 bessy1 bessjn bessyn lgamma isfinite erfi ndtri polyroots );
+our @EXPORT_OK = qw(acos asin atan cosh sinh tan tanh ceil floor rint pow acosh asinh atanh erf erfc bessj0 bessj1 bessy0 bessy1 bessjn bessyn lgamma isfinite erfi ndtri polyroots polyfromroots polyval );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -56,6 +56,7 @@ entirely in PDL.
 ### This should be deleted at some point later than 21-Nov-2003.
 BEGIN {use PDL::MatrixOps;}
 #line 59 "Math.pm"
+
 
 =head1 FUNCTIONS
 
@@ -792,10 +793,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for ref
 
 Complex roots of a complex polynomial, given coefficients in order
-of decreasing powers.
+of decreasing powers. Only works for degree >= 1.
+As of 2.086, works with native-complex data.
 
 =for usage
 
+ $roots = polyroots($coeffs); # native complex
  ($rr, $ri) = polyroots($cr, $ci);
 
 =for bad
@@ -808,6 +811,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+
+#line 349 "math.pd"
+sub PDL::polyroots {
+  my @args = map PDL->topdl($_), @_;
+  my $natcplx = !$args[0]->type->real;
+  barf "need array context" if !$natcplx and !(wantarray//1);
+  splice @args, 0, 1, map $args[0]->$_, qw(re im) if $natcplx;
+  $_ //= PDL->null for @args[2,3];
+  PDL::_polyroots_int(@args);
+  $natcplx ? $args[2]->czip($args[3]) : @args[2,3];
+}
+#line 826 "Math.pm"
+
 *polyroots = \&PDL::polyroots;
 
 
@@ -815,8 +831,129 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+=head2 polyfromroots
 
-#line 364 "math.pd"
+=for sig
+
+  Signature: (r(m); [o]c(n))
+
+=for ref
+
+Calculates the complex coefficients of a polynomial from its complex
+roots, in order of decreasing powers. Added in 2.086, works with
+native-complex data. Currently C<O(n^2)>.
+
+=for usage
+
+ $coeffs = polyfromroots($roots); # native complex
+ ($cr, $ci) = polyfromroots($rr, $ri);
+
+=for bad
+
+polyfromroots does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+
+#line 390 "math.pd"
+sub PDL::polyfromroots {
+  my @args = map PDL->topdl($_), @_;
+  my $natcplx = !$args[0]->type->real;
+  barf "need array context" if !$natcplx and !(wantarray//1);
+  if (!$natcplx) {
+    splice @args, 0, 2, $args[0]->czip($args[1]); # r
+  }
+  my @ins = splice @args, 0, 1;
+  my $explicit_out = my @outs = @args;
+  if ($natcplx) {
+    $_ //= PDL->null for $outs[0];
+  } else {
+    $_ //= PDL->null for @outs[0,1];
+  }
+  my @args_out = $natcplx ? @outs : PDL->null;
+  PDL::_polyfromroots_int(@ins, @args_out);
+  if (!$natcplx) {
+    $outs[0] .= $args_out[0]->re;
+    $outs[1] .= $args_out[0]->im;
+  }
+  $natcplx ? $outs[0] : @outs;
+}
+#line 886 "Math.pm"
+
+*polyfromroots = \&PDL::polyfromroots;
+
+
+
+
+
+
+=head2 polyval
+
+=for sig
+
+  Signature: (c(n); x(); [o]y())
+
+=for ref
+
+Complex value of a complex polynomial at given point, given coefficients
+in order of decreasing powers. Uses Horner recurrence. Added in 2.086,
+works with native-complex data.
+
+=for usage
+
+ $y = polyval($coeffs, $x); # native complex
+ ($yr, $yi) = polyval($cr, $ci, $xr, $xi);
+
+=for bad
+
+polyval does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+
+#line 435 "math.pd"
+sub PDL::polyval {
+  my @args = map PDL->topdl($_), @_;
+  my $natcplx = !$args[0]->type->real;
+  barf "need array context" if !$natcplx and !(wantarray//1);
+  if (!$natcplx) {
+    splice @args, 0, 2, $args[0]->czip($args[1]); # c
+    splice @args, 1, 2, $args[1]->czip($args[2]); # x
+  }
+  my @ins = splice @args, 0, 2;
+  my $explicit_out = my @outs = @args;
+  if ($natcplx) {
+    $_ //= PDL->null for $outs[0];
+  } else {
+    $_ //= PDL->null for @outs[0,1];
+  }
+  my @args_out = $natcplx ? @outs : PDL->null;
+  PDL::_polyval_int(@ins, @args_out);
+  if (!$natcplx) {
+    $outs[0] .= $args_out[0]->re;
+    $outs[1] .= $args_out[0]->im;
+  }
+  $natcplx ? $outs[0] : @outs;
+}
+#line 947 "Math.pm"
+
+*polyval = \&PDL::polyval;
+
+
+
+
+
+
+
+#line 472 "math.pd"
 
 =head1 BUGS
 
@@ -836,7 +973,7 @@ distribution. If this file is separated from the PDL distribution,
 the PDL copyright notice should be included in the file.
 
 =cut
-#line 840 "Math.pm"
+#line 977 "Math.pm"
 
 # Exit with OK status
 

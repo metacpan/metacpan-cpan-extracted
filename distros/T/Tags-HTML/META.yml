@@ -7,7 +7,9 @@ build_requires:
   English: 0
   Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
+  File::Object: 0
   Tags::Output::Raw: 0
+  Tags::Output::Structure: 0
   Test::MockObject: 0
   Test::More: 0
   Test::NoWarnings: 0
@@ -37,4 +39,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML
-version: '0.08'
+version: '0.09'

@@ -279,8 +279,7 @@ sub STORABLE_thaw {
 #  return if $cloning;
   my $class = ref $pdl;
   if (defined $hashref) {
-    croak "serial data with hashref!" unless !defined $serial ||
-      $serial eq "";
+    croak "serial data with hashref!" unless ($serial//'') eq "";
     @$pdl{keys %$hashref} = values %$hashref;
   } else {
     # all the magic is happening in pdlunpack
@@ -331,7 +330,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 335 "Storable.pm"
+#line 334 "Storable.pm"
 
 # Exit with OK status
 

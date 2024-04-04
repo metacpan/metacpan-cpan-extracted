@@ -1,4 +1,4 @@
-package Chicken::Ipsum 1.000001;
+package Chicken::Ipsum 1.000002;
 use 5.012;
 use warnings;
 

@@ -2,9 +2,30 @@ use Test2::V0;
 use Clone 'clone';
 use DBIx::Query;
 
-my $dq = DBIx::Query->connect('dbi:SQLite:dbname=:memory:');
+my $dq      = DBIx::Query->connect('dbi:SQLite:dbname=:memory:');
+my $dq_ansi = DBIx::Query->connect( 'dbi:SQLite:dbname=:memory:', undef, undef, { dq_dialect => 'ANSI' } );
+
+$_->do('CREATE TABLE user ( name TEXT )') for ( $dq, $dq_ansi );
+
+my $structure;
+
+like(
+    warning { $structure = $dq_ansi->sql('SELECT * FROM user')->structure },
+    qr/SQL reserved word/,
+    'SQL reserved word warning under pure ANSI',
+);
+
+like( $structure->{errstr}, qr/SQL reserved word/, '"errstr" has SQL reserved word error' );
+
+ok(
+    no_warnings { $structure = $dq->sql('SELECT * FROM user')->structure },
+    'No warnings under pseudo ANSI',
+);
+
+is( $structure->{errstr}, undef, 'TEST' );
 
 $dq->do('CREATE TABLE movie ( open TEXT, final TEXT, west TEXT, east TEXT )');
+
 my $insert = $dq->prepare('INSERT INTO movie ( open, final, west, east ) VALUES ( ?, ?, ?, ? )');
 
 while ( <DATA> ) {
@@ -12,14 +33,14 @@ while ( <DATA> ) {
     $insert->execute( split(/\|/) );
 }
 
-test_query($dq);
-test_crud($dq);
-test_where($dq);
-test_db_helper_methods($dq);
-test_run($dq);
-test_row_set_methods($dq);
-test_row_methods($dq);
-test_cell_methods($dq);
+# test_query($dq);
+# test_crud($dq);
+# test_where($dq);
+# test_db_helper_methods($dq);
+# test_run($dq);
+# test_row_set_methods($dq);
+# test_row_methods($dq);
+# test_cell_methods($dq);
 
 done_testing;
 

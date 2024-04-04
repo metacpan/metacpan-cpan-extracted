@@ -1,3 +1,4 @@
+6.011 - Fix test incompatibility on older Perls (<5.26.0)
 6.009 - Fix typo (caught only with older Perls)
 6.008 - Add hyperlink suport
 6.007 - Provide FRAME_FILTER & SPAN_FILTER (not exported by default)

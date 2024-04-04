@@ -7,7 +7,7 @@ use warnings;
 
 use lib qw{ inc };
 
-use Test::More 0.88;
+use Test2::V0;
 use My::Module::Test::App;
 
 use Astro::App::Satpass2;
@@ -29,9 +29,9 @@ call_m( source => { level1 => 1 }, [ 'almanac' ], undef,
 
 is      scalar @commands, 2, q{Expect two commands from 'almanac'};
 
-is_deeply $commands[0], [ 'location' ], q{First command is 'location'};
+is $commands[0], [ 'location' ], q{First command is 'location'};
 
-is_deeply $commands[1], [ 'almanac' ], q{Second command is 'almanac'};
+is $commands[1], [ 'almanac' ], q{Second command is 'almanac'};
 
 @commands = ();
 
@@ -40,7 +40,7 @@ call_m( source => { level1 => 1 }, [ 'flare -am "today noon" \\', '+1' ],
 
 is      scalar @commands, 1, q{Expect one command from 'flare ...'};
 
-is_deeply $commands[0], [ 'flare', '-noam', 'today noon', '+1' ],
+is $commands[0], [ 'flare', '-noam', 'today noon', '+1' ],
     q{Command is 'flare -noam ...'};
 
 @commands = ();
@@ -50,9 +50,9 @@ q{Rewrite 'pass "today noon" +1'} );
 
 is      scalar @commands, 2, q{Expect two commands from 'pass ...'};
 
-is_deeply $commands[0], [ 'location' ], q{First command is 'location'};
+is $commands[0], [ 'location' ], q{First command is 'location'};
 
-is_deeply $commands[1], [ 'pass', 'today noon', '+2' ],
+is $commands[1], [ 'pass', 'today noon', '+2' ],
     q{Second command is 'pass ...'};
 
 call_m( set => execute_filter => sub { return 1 }, undef,

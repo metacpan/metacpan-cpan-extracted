@@ -14,7 +14,8 @@ use Cwd qw{ abs_path };
 use Getopt::Long 2.39 ();
 use POSIX qw{ strftime };
 use Scalar::Util 1.26 qw{ blessed };
-use Test::More 0.52;
+use Test2::V0;
+use Test2::Util::Table qw{ table };
 
 use constant CODE_REF	=> ref sub {};
 use constant REGEXP_REF	=> ref qr{};
@@ -26,6 +27,7 @@ our @EXPORT = qw{
     call_m_result
     check_access
     check_datetime_timezone_local
+    dependencies_table
     dt_greg_time_gm
     dt_greg_time_local
     dump_date_manip
@@ -38,6 +40,7 @@ our @EXPORT = qw{
     load_or_skip
     normalize_path
     same_path
+    setup_app_mocker
     FALSE
     INSTANTIATE
     TRUE
@@ -352,7 +355,7 @@ sub execute {	## no critic (RequireArgUnpacking)
 	$display .= ' not available';
 	$skip
 	    and $skip =~ m/ \A all \z /smxi
-	    and plan skip_all => $display;
+	    and skip_all $display;
 	skip $display, $skip;
     }
 }
@@ -374,8 +377,7 @@ sub execute {	## no critic (RequireArgUnpacking)
 		defined and not ref and chomp;
 	    }
 	    @_ = ( $got, $want, $title );
-	    REGEXP_REF eq ref $want ? goto &like :
-		ref $want ? goto &is_deeply : goto &is;
+	    REGEXP_REF eq ref $want ? goto &like : goto &is;
 	} else {
 	    $got = $@;
 	    chomp $got;
@@ -389,6 +391,69 @@ sub execute {	## no critic (RequireArgUnpacking)
 
     sub call_m_result {
 	return $got;
+    }
+}
+
+{
+    my $kind_hdr = {
+	configure_requires	=> 'CONFIGURE REQUIRES',
+	build_requires		=> 'BUILD REQUIRES',
+	test_requires		=> 'TEST REQUIRES',
+	requires		=> 'RUNTIME REQUIRES',
+	optional_modules	=> 'OPTIONAL MODULES',
+    };
+
+    sub dependencies_table {
+	require My::Module::Meta;
+	my @tables = ( '' );
+
+	{
+	    my @perls = ( My::Module::Meta->requires_perl(), $] );
+	    foreach ( @perls ) {
+		$_ = sprintf '%.6f', $_;
+		$_ =~ s/ (?= ... \z ) /./smx;
+		$_ =~ s/ (?<= \. ) 00? //smxg;
+	    }
+	    push @tables, table(
+		header	=> [ qw{ PERL REQUIRED INSTALLED } ],
+		rows	=> [ [ perl => @perls ] ],
+	    );
+	}
+
+	foreach my $kind ( qw{ configure_requires build_requires test_requires requires optional_modules }
+	) {
+	    my $code = My::Module::Meta->can( $kind )
+		or next;
+	    my $req = $code->();
+	    my @rows;
+	    foreach my $module ( sort keys %{ $req } ) {
+		( my $file = "$module.pm" ) =~ s| :: |/|smxg;
+		# NOTE that an alternative implementation here is to use
+		# Module::Load::Conditional (core since 5.10.0) to find the
+		# installed modules, and then MM->parse_version() (from
+		# ExtUtils::MakeMaker) to find the version without actually
+		# loading the module.
+		my $installed;
+		eval {
+		    require $file;
+		    $installed = $module->VERSION();
+		    defined $installed
+			or $installed = 'undef';
+		    1;
+		} or $installed = 'not installed';
+		push @rows, [ $module, $req->{$module}, $installed ];
+	    }
+
+	    my $hdr = $kind_hdr->{$kind};
+	    defined $hdr
+		or $hdr = uc $kind;
+	    push @tables, table(
+		header	=> [ $hdr, 'REQUIRED', 'INSTALLED' ],
+		rows	=> \@rows,
+	    );
+	}
+
+	return @tables;
     }
 }
 
@@ -436,6 +501,26 @@ sub execute {	## no critic (RequireArgUnpacking)
 	@_ = ( $got_inode, '==', $want_inode, $name );
 	goto &cmp_ok;
     }
+}
+
+sub setup_app_mocker {
+    return mock 'Astro::App::Satpass2' => (
+    override	=> [
+	new	=> sub {
+	    my ( $class, %self ) = @_;
+	    return bless \%self, $class;
+	},
+	get	=> sub { return $_[0]{$_[1]}; },
+	set	=> sub {
+	    my ( $self, @args ) = @_;
+	    while ( @args ) {
+		my ( $name, $value ) = splice @args, 0, 2;
+		$self->{$name} = $value;
+	    }
+	    return $self;
+	},
+    ],
+);
 }
 
 sub Astro::App::Satpass2::__TEST__frame_stack_depth {
@@ -539,6 +624,20 @@ Cygwin. C<DateTime::TimeZone> assumes Cygwin is a Unix system, but I am
 seeing test failures thre, where presumably the Windows machinery would
 come up with a time zone. We assume the user who really wants to use
 this machinery will sort things out.
+
+=head2 dependencies_table
+
+ diag $_ for dependencies_table;
+
+This subroutine builds and returns depencency tables. The heavy lifting
+is done by C<table()> in L<Test2::Util::Table|Test2::Util::Table>. The
+return is pretty much raw output from the C<table()> subroutine -- that
+is, lines of text without terminating C<"\n"> characters.
+
+B<Note> that this subroutine does not initialize C<Test2>. This is
+important because it may load C<Test::Builder|Test::Builder> at some
+point. If it does this after C<Test2> has been initialized, C<Test2>
+will complain.
 
 =head2 klass
 
@@ -670,6 +769,26 @@ C<Cwd::cwd()>, then it performs OS-specific normalization on them.
 Typically this consists of changing slash direction (MSWin32 and
 friends) and lopping off trailing slashes (DragonFly BSD).
 
+=head2 setup_app_mocker
+
+ my $mocker = setup_app_mocker();
+
+This subroutine sets up to mock
+L<Astro::App::Satpass2|Astro::App::Satpass2> using the tools provided by
+L<Test2::Tools::Mock|Test2::Tools::Mock>. The C<new()>, C<get()>, and
+C<set()> methods are mocked, but behind them is a hash that just stores
+and returns values.
+
+The return is not a mock L<Astro::App::Satpass2|Astro::App::Satpass2>
+object, but an object that manages the mocking. This object needs to be
+retained because it is also a sentinel that tears down the mock when it
+is destroyed. See L<Test2::Tools::Mock|Test2::Tools::Mock> for details.
+
+You actually get a new application object in the normal way:
+
+  my $app = Astro::App::Satpass2->new();
+
+
 =head2 same_path
 
  same_path $got, $want, 'Got the same path';
@@ -728,7 +847,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2023 by Thomas R. Wyant, III
+Copyright (C) 2011-2024 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

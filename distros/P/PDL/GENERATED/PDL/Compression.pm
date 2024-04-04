@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 5 "compression.pd"
+#line 1 "compression.pd"
 
 =head1 NAME
 
@@ -51,6 +51,7 @@ use strict;
 use warnings;
 #line 53 "Compression.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -59,12 +60,13 @@ use warnings;
 
 
 
-#line 74 "compression.pd"
+#line 70 "compression.pd"
 
 =head1 METHODS
 
 =cut
-#line 68 "Compression.pm"
+#line 69 "Compression.pm"
+
 
 =head2 rice_compress
 
@@ -140,12 +142,8 @@ sub PDL::rice_compress {
 	) {
 	die("rice_compress: input needs to have type byte, short, ushort, or long, not ".($in->type)."\n");
     }
-    # output buffer starts the same size; truncate at the end.
-    my ($out) = zeroes($in);
-    # lengths go here
-    my ($len) = zeroes(long, $in->slice("(0)")->dims);
-    PDL::_rice_compress_int( $in, $out, $len, $blocksize  );
-    my $l = $len->max;
+    PDL::_rice_compress_int( $in, my $out=PDL->null, my $len=PDL->null, $blocksize );
+    my $l = $len->max->sclr;
     $out = $out->slice("0:".($l-1))->sever;
     return wantarray ? ($out, $in->dim(0), $blocksize, $len) : $out;
 }
@@ -163,7 +161,7 @@ sub PDL::rice_compress {
 
 =for sig
 
-  Signature: (in(n); [o]out(m); int blocksize)
+  Signature: (in(n); [o]out(m); IV dim0 => m; int blocksize)
 
 =for ref
 
@@ -184,18 +182,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-sub PDL::rice_expand {
-    my $squished = shift;
-    my $dim0 =shift;
-    my $blocksize = shift || 32;
-    # Allocate output array
-    my $out = zeroes( $squished->slice("(0),*$dim0") );
-    PDL::_rice_expand_int( $squished, $out, $blocksize );
-    return $out;
-}
-
-
-
 *rice_expand = \&PDL::rice_expand;
 
 
@@ -204,7 +190,7 @@ sub PDL::rice_expand {
 
 
 
-#line 35 "compression.pd"
+#line 31 "compression.pd"
 
 =head1 AUTHORS
 
@@ -240,7 +226,7 @@ terms than PDL itself; that notice is present in the file "ricecomp.c".
 =back
 
 =cut
-#line 244 "Compression.pm"
+#line 230 "Compression.pm"
 
 # Exit with OK status
 

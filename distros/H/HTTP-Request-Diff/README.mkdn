@@ -9,27 +9,36 @@ HTTP::Request::Diff - create diffs between HTTP requests
 
 # SYNOPSIS
 
+    use HTTP::Request::Common 'GET';
+
     my $diff = HTTP::Request::Diff->new(
-        reference => $req,
+        reference => GET('https://example.com/?foo=bar' ),
         #actual    => $req2,
         skip_headers => \@skip,
         ignore_headers => \@skip2,
         mode => 'exact', # default is 'semantic'
     );
 
-    my @differences = $diff->diff( $actual );
+    my @differences = $diff->diff( GET('https://example.com/' ));
     say Dumper $differences[0];
     # {
     #   'kind' => 'value',
     #   'type' => 'query.foo',
     #   'reference' => [
-    #                    undef
+    #                    'bar'
     #                  ],
     #   'actual' => [
-    #                 'bar'
+    #                 undef
     #               ]
     # }
     #
+
+    say $diff->as_table(@differences);
+    # +-----------+-----------+-----------+
+    # | Type      | Reference | Actual    |
+    # +-----------+-----------+-----------+
+    # | query.foo | bar       | <missing> |
+    # +-----------+-----------+-----------+
 
 # METHODS
 

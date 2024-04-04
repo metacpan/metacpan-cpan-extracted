@@ -1,0 +1,38 @@
+---
+abstract: 'find perl root and push lib modules path to @INC'
+author:
+  - 'Hernan Lopes <hernan@smallcompany.net>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: lib-root
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  lib::root:
+    file: lib/lib/root.pm
+    version: '0.04'
+requires:
+  Cwd: '0'
+  Path::Tiny: '0'
+  perl: '5.008001'
+resources:
+  repository: git://git.smallcompany.net/smallcompany/lib-root.git
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

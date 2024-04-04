@@ -1,3 +1,41 @@
+2.086 2024-03-31
+- fix 64-bit problem in Minuit revealed by LTO (#468) - thanks @eli-schwartz for report
+- add pdl.ntrans_children to speed up destroying ndarrays (#421,#451)
+
+2.085_02 2024-03-25
+- PP add loop(n=value) idiom to start not at 0
+- add whichover, inspired by https://stackoverflow.com/questions/77551179/perl-pdl-indexing-and-which
+- random/randsym only produce real data
+- fix dataflow when vaffine ndarray is between modified and downstream (#461) - thanks @vadim-160102 for continued reporting
+- revert the use of ArgOrder for PDL::Ops so op($a,$b,$c,$swap) works again as pre 2.082_01
+- error on inflating output ndarrays over dims sized 1 or implicit (promoted) or dummy, as is undefined behaviour
+- make HdrCode and FtrCode run when PMCode supplied (#463) - thanks @jo-37 for suggestion
+- PP add CHeader key
+- OtherPars can now be incomplete arrays of char*
+- make typemaps able to use more Perl ones like T_HVREF - thanks @jo-37
+- removed threadover_n alias since not used elsewhere and broadcastover{,_n} interface adjusted to move mandatory to start
+- add ccumu{prod,sum}over in complex double precision
+- setdims on ndarray with trans_parent (i.e. flowing) now an error
+- set(..., $multi_elt) now an error (#466) - thank @djerius for report
+- convert can work inplace (by using set_datatype)
+- flowing convert of ndarrays preserves badvalues that are NaN
+- PDL_ISBAD2 macro
+- lvalue {un,}broadcast
+- set_datatype now errors if has trans_children, as trans-es have a datatype
+- add ANYVAL_TO_ANYVAL_NEWTYPE
+- per-ndarray badvalues (which are PDL_Anyval) now constrained to be same type as ndarray
+
+2.085_01 2024-02-10
+- test, document PDL::string, make more consistent (#459) - thanks @vadim-160102 for report
+- fix pre-2002 rangeb bug (#457) - thanks @jo-37 for report
+- add datachgd method
+- add MatrixOps::tritosquare
+- add gv command to shells
+- add PDL::Trans::VTable
+- Math::polyroots now handles native-complex
+- add Math::poly{val,fromroots}
+- fix DATACHANGED propagation (#461) - thanks Karl Glazebrook and @vadim-160102 for report
+
 2.085 2024-01-30
 - switch FFT code to use heap, not VLA (#436) - thanks @HaraldJoerg for report
 - add methods PDL::Trans::{address,name,flags,flags_vtable,vaffine,offs,incs,ind_sizes,inc_sizes}
@@ -1934,7 +1972,7 @@ General Notes:
 Highlights:
 
  * This release should be a working PDL::IO::Storable that
-   is compatable with the new 64bit index support.
+   is compatible with the new 64bit index support.
  
  * PDL::IO::Storable now requires perl 5.10.x or greater
    although the overall distribution requirements are not
@@ -2847,7 +2885,7 @@ Highlights:
 
    Supports Term::ReadLine::Perl and Term::ReadLine::Gnu.
 
-   Upward compatable with the original PDL shell, perldl.
+   Upward compatible with the original PDL shell, perldl.
 
    Adds completion and command line editing support
    across all PDL platforms.

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Astro::App::Satpass2::ParseTime;
-use Test::More 0.88;
+use Test2::V0;
 
 use lib qw{ inc };
 
@@ -25,10 +25,10 @@ BEGIN {
 	require Date::Manip;
 
 	1;
-    } or plan skip_all => 'Date::Manip 5 not available';
+    } or skip_all 'Date::Manip 5 not available';
 
     $^O eq 'MSWin32'
-	and plan skip_all => 'Date::Manip 5 tests fail under Windows';
+	and skip_all 'Date::Manip 5 tests fail under Windows';
 
     require Astro::Coord::ECI::Utils;
     Astro::Coord::ECI::Utils->VERSION( '0.112' );

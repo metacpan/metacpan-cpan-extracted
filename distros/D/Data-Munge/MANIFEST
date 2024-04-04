@@ -1,14 +1,13 @@
 Changes
+lib/Data/Munge.pm
+Makefile.PL
+Makefile_PL_settings.plx
 MANIFEST
 MANIFEST.SKIP
-Makefile.PL
-Makefile_PL_settings
-README
-lib/Data/Munge.pm
-t/00-load.t
 t/01-compile.t
 t/eval.t
 t/torgox.t
 xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   generated from Data::Munge POD (added by maint/eumm-fixup.pl)

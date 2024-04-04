@@ -429,6 +429,8 @@ sub os_supported { return ( $^O =~ /^linux/i ) ? 1 : 0; }
 
 sub is_raspberry { return $israspberry; }
 
+sub is_raspberry_1 { return $israspberry1; }
+
 sub is_raspberry_2 { return $israspberry2; }
 
 sub is_raspberry_3 { return $israspberry3; }
@@ -583,7 +585,22 @@ sub _configure {
             $binfo->{revision} = $rev;
             $binfo->{revisionnumber} = $s_revision;
             $binfo->{processor_info} = $_revinfostash{processor_info}->{$binfo->{processor}};
-                        
+            
+            my $unknown_raspberry_type =
+                            ( $s_raspberry_type == 5  ||
+                              $s_raspberry_type == 7  ||
+                              $s_raspberry_type == 11 ||
+                              $s_raspberry_type == 15 ||
+                              $s_raspberry_type == 22  ) ? 1 : 0;
+            
+            $israspberry1 = ( $s_raspberry_type == 0 ||
+                              $s_raspberry_type == 1 ||
+                              $s_raspberry_type == 2 ||
+                              $s_raspberry_type == 3 ||
+                              $s_raspberry_type == 6 ||
+                              $s_raspberry_type == 9 ||
+                              $s_raspberry_type == 12 ) ? 1 : 0;
+            
             $israspberry2 = ( $s_raspberry_type == 4 ) ? 1 : 0;
             
             $israspberry3 = ( $s_raspberry_type == 8  ||
@@ -601,7 +618,7 @@ sub _configure {
             $israspberry5 = ( $s_raspberry_type == 23 ) ? 1 : 0;
             
             $israspberry = (
-                $israspberry2 || $israspberry3 || $israspberry4 || $israspberry5
+                $israspberry1 || $israspberry2 || $israspberry3 || $israspberry4 || $israspberry5
             ) ? 1 : 0;
             
             $_config = { %$binfo };
@@ -683,6 +700,7 @@ sub dump_board_info {
     
     $dump .= qq(Device Tree      : $devtree\n);
     $dump .= q(Is Raspberry     : ) . (($israspberry) ? 'Yes' : 'No' ) . qq(\n);
+    $dump .= q(Is Raspberry 1   : ) . (($israspberry1) ? 'Yes' : 'No' ) . qq(\n);
     $dump .= q(Is Raspberry 2   : ) . (($israspberry2) ? 'Yes' : 'No' ) . qq(\n);
     $dump .= q(Is Raspberry 3   : ) . (($israspberry3) ? 'Yes' : 'No' ) . qq(\n);
     $dump .= q(Is Raspberry 4   : ) . (($israspberry4) ? 'Yes' : 'No' ) . qq(\n);

@@ -12,6 +12,7 @@ my @files = (
     'lib/JSON/Schema/Modern/Document.pm',
     'lib/JSON/Schema/Modern/Error.pm',
     'lib/JSON/Schema/Modern/Result.pm',
+    'lib/JSON/Schema/Modern/ResultNode.pm',
     'lib/JSON/Schema/Modern/Utilities.pm',
     'lib/JSON/Schema/Modern/Vocabulary.pm',
     'lib/JSON/Schema/Modern/Vocabulary/Applicator.pm',

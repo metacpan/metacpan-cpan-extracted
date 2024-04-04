@@ -26,7 +26,8 @@ my @files = (
     't/file-read-order/dummy.env-static',
     't/file-read-order/dummy.env-third',
     't/lib/Test2/Require/OS/Linux.pm',
-    't/lib/Test2/Require/OS/Windows.pm'
+    't/lib/Test2/Require/OS/Windows.pm',
+    't/recursive-read.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

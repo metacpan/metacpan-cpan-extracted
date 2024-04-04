@@ -3,3 +3,9 @@ Revision history for Factory-Sub
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.05    2024-03-31
+	Fix to allow any defined value
+
+0.06    2024-03-31
+	Add support for using 'undef'
+	Add a way to set and update a fallback sub

@@ -4,7 +4,7 @@ Dancer2::Plugin::OpenAPI - create OpenAPI documentation of your application
 
 # VERSION
 
-version 1.0.1
+version 1.0.2
 
 # SYNOPSIS
 
@@ -365,7 +365,7 @@ Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/en
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Yanick Champoux.
+This software is copyright (c) 2024 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

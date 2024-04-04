@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v1.8.2
+    version v1.9.1
 
 SYNOPSIS
 
@@ -306,6 +306,13 @@ METHODS
     to avoid running summarize multiple times. See "check" in
     HealthCheck::Diagnostic.
 
+ get_registered_tags
+
+    Read-only accessor that returns the list of 'top-level' tags registered
+    with this object. Sub-check tags are not included - only those which
+    will result in checks being run when passed to "check" on the given
+    object.
+
 INTERNALS
 
     These methods may be useful for subclassing, but are not intended for
@@ -354,7 +361,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2017 - 2023 by Grant Street Group.
+    This software is Copyright (c) 2017 - 2024 by Grant Street Group.
 
     This is free software, licensed under:
 

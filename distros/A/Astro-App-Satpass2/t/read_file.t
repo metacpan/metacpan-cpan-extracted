@@ -5,7 +5,7 @@ use 5.008;
 use strict;
 use warnings;
 
-use Test::More 0.88;	# Because of done_testing();
+use Test2::V0;
 
 use lib qw{ inc };
 use My::Module::Test::App;	# For environment clean-up.

@@ -3,7 +3,7 @@ use parent 'HealthCheck::Diagnostic';
 
 # ABSTRACT: A health check for your code
 use version;
-our $VERSION = 'v1.8.2'; # VERSION
+our $VERSION = 'v1.9.1'; # VERSION
 
 use 5.010;
 use strict;
@@ -12,7 +12,7 @@ use warnings;
 use Carp;
 
 use Hash::Util::FieldHash;
-use List::Util qw(any);
+use List::Util qw(any uniq);
 
 # Create a place outside of $self to store the checks
 # as everything in the self hashref will be copied into
@@ -429,6 +429,28 @@ sub check {
     $self->SUPER::check(@params);
 }
 
+#pod =head2 get_registered_tags
+#pod
+#pod Read-only accessor that returns the list of 'top-level' tags registered with
+#pod this object. Sub-check tags are not included - only those which will result in
+#pod checks being run when passed to L</check> on the given object.
+#pod
+#pod =cut
+
+sub get_registered_tags {
+    my ($self) = @_;
+
+    my @checks = @{ $registered_checks{$self} || [] };
+    my @tags;
+    for my $check (@checks) {
+        $self->_set_check_response_defaults($check);
+        push @tags, @{ $check->{_respond}{tags} || [] };
+    }
+    push @tags, @{ $self->{tags} // [] };
+
+    return uniq sort @tags;
+}
+
 sub run {
     my ($self, %params) = @_;
 
@@ -611,7 +633,7 @@ HealthCheck - A health check for your code
 
 =head1 VERSION
 
-version v1.8.2
+version v1.9.1
 
 =head1 SYNOPSIS
 
@@ -937,6 +959,12 @@ Passes C<< summarize_result => 0 >> to each registered check
 unless overridden to avoid running C<summarize> multiple times.
 See L<HealthCheck::Diagnostic/check>.
 
+=head2 get_registered_tags
+
+Read-only accessor that returns the list of 'top-level' tags registered with
+this object. Sub-check tags are not included - only those which will result in
+checks being run when passed to L</check> on the given object.
+
 =head1 INTERNALS
 
 These methods may be useful for subclassing,
@@ -991,7 +1019,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 - 2023 by Grant Street Group.
+This software is Copyright (c) 2017 - 2024 by Grant Street Group.
 
 This is free software, licensed under:
 

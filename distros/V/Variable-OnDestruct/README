@@ -1,5 +1,5 @@
 This archive contains the distribution Variable-OnDestruct,
-version 0.08:
+version 0.09:
 
   Call a subroutine on destruction of a variable.
 

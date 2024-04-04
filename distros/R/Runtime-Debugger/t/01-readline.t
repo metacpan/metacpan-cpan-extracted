@@ -12,7 +12,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 73;
-use Runtime::Debugger -nofilter;
+use Runtime::Debugger;
 use Term::ANSIColor qw( colorstrip );
 use feature         qw( say );
 
@@ -38,15 +38,18 @@ our $our_hashref  = {qw(key11 aa key22 bb)};
 our $our_coderef  = sub { "coderef-our: @_" };
 our $our_obj      = bless { type => "our" }, "MyObj";
 
-#eval run; exit;
+my $repl = Runtime::Debugger->_init;    # Scope recorded during first "_step".
 
-my $INSTR;                # Simulated input string.
-my $COMPLETION_RETURN;    # Possible completions.
-my $repl = MyTest->_setup_testmode_debugger();
+# my $repl; repl; exit;
+
+my $INSTR;                              # Simulated input string.
+my $COMPLETION_RETURN;                  # Possible completions.
+
+MyTest->_setup_testmode_debugger( $repl );
 
 sub _setup_testmode_debugger {
+    my ( $self, $_repl ) = @_;
 
-    my $_repl = Runtime::Debugger->_init; # Scope recorded during first "_step".
     $Runtime::Debugger::VERSION = "0.01";  # To make testing the version easier.
 
     # Use a separate history file.
@@ -85,95 +88,52 @@ sub _define_expected_vars {
     {
         commands              => [ 'd', 'help', 'hist', 'p', 'q' ],
         commands_and_vars_all => [
-            '$COMPLETION_RETURN', '$EOL',
-            '$INSTR',             '$_repl',
-            '$case',              '$eval_return',
-            '$my_array',          '$my_arrayref',
-            '$my_coderef',        '$my_hash',
-            '$my_hashref',        '$my_obj',
-            '$my_str',            '$our_array',
-            '$our_arrayref',      '$our_coderef',
-            '$our_hash',          '$our_hashref',
-            '$our_obj',           '$our_str',
-            '$repl',              '$stdin',
-            '$stdout',            '$step_return',
-            '%my_hash',           '%our_hash',
-            '@my_array',          '@my_hash',
-            '@our_array',         '@our_hash',
-            'd',                  'help',
-            'hist',               'p',
-            'q',
+            '$my_array',     '$my_arrayref', '$my_coderef', '$my_hash',
+            '$my_hashref',   '$my_obj',      '$my_str',     '$our_array',
+            '$our_arrayref', '$our_coderef', '$our_hash',   '$our_hashref',
+            '$our_obj',      '$our_str',     '$repl',       '%my_hash',
+            '%our_hash',     '@my_array',    '@my_hash',    '@our_array',
+            '@our_hash',     'd',            'help',        'hist',
+            'p',             'q',
         ],
         debug        => 0,
         history_file => "$ENV{HOME}/.runtime_debugger_testmode.info",
         vars_all     => [
-            '$COMPLETION_RETURN', '$EOL',
-            '$INSTR',             '$_repl',
-            '$case',              '$eval_return',
-            '$my_array',          '$my_arrayref',
-            '$my_coderef',        '$my_hash',
-            '$my_hashref',        '$my_obj',
-            '$my_str',            '$our_array',
-            '$our_arrayref',      '$our_coderef',
-            '$our_hash',          '$our_hashref',
-            '$our_obj',           '$our_str',
-            '$repl',              '$stdin',
-            '$stdout',            '$step_return',
-            '%my_hash',           '%our_hash',
-            '@my_array',          '@my_hash',
-            '@our_array',         '@our_hash'
+            '$my_array',     '$my_arrayref', '$my_coderef', '$my_hash',
+            '$my_hashref',   '$my_obj',      '$my_str',     '$our_array',
+            '$our_arrayref', '$our_coderef', '$our_hash',   '$our_hashref',
+            '$our_obj',      '$our_str',     '$repl',       '%my_hash',
+            '%our_hash',     '@my_array',    '@my_hash',    '@our_array',
+            '@our_hash'
         ],
         vars_array    => [ '@my_array', '@my_hash', '@our_array', '@our_hash' ],
-        vars_arrayref =>
-          [ '$COMPLETION_RETURN', '$my_arrayref', '$our_arrayref' ],
-        vars_code   => [ '$my_coderef', '$our_coderef' ],
-        vars_global => [
+        vars_arrayref => [ '$my_arrayref', '$our_arrayref' ],
+        vars_code     => [ '$my_coderef',  '$our_coderef' ],
+        vars_global   => [
             '$our_arrayref', '$our_coderef', '$our_hashref', '$our_obj',
             '$our_str',      '%our_hash',    '@our_array'
         ],
-        vars_hash    => [ '%my_hash', '%our_hash' ],
-        vars_hashref => [ '$case',    '$my_hashref', '$our_hashref' ],
+        vars_hash    => [ '%my_hash',    '%our_hash' ],
+        vars_hashref => [ '$my_hashref', '$our_hashref' ],
         vars_lexical => [
-            '$COMPLETION_RETURN', '$EOL',
-            '$INSTR',             '$_repl',
-            '$case',              '$eval_return',
-            '$my_arrayref',       '$my_coderef',
-            '$my_hashref',        '$my_obj',
-            '$my_str',            '$repl',
-            '$stdin',             '$stdout',
-            '$step_return',       '%my_hash',
-            '@my_array'
+            '$my_arrayref', '$my_coderef', '$my_hashref', '$my_obj',
+            '$my_str',      '$repl',       '%my_hash',    '@my_array'
         ],
 
-
-        vars_obj => [ '$_repl', '$my_obj', '$our_obj', '$repl' ],
+        vars_obj => [ '$my_obj', '$our_obj', '$repl' ],
         vars_ref => [
-            '$COMPLETION_RETURN', '$_repl',
-            '$case',              '$my_arrayref',
-            '$my_coderef',        '$my_hashref',
-            '$my_obj',            '$our_arrayref',
-            '$our_coderef',       '$our_hashref',
-            '$our_obj',           '$repl'
+            '$my_arrayref',  '$my_coderef',  '$my_hashref',  '$my_obj',
+            '$our_arrayref', '$our_coderef', '$our_hashref', '$our_obj',
+            '$repl'
         ],
         vars_ref_else => [],
         vars_scalar   => [
-            '$COMPLETION_RETURN', '$EOL',
-            '$INSTR',             '$_repl',
-            '$case',              '$eval_return',
-            '$my_array',          '$my_arrayref',
-            '$my_coderef',        '$my_hash',
-            '$my_hashref',        '$my_obj',
-            '$my_str',            '$our_array',
-            '$our_arrayref',      '$our_coderef',
-            '$our_hash',          '$our_hashref',
-            '$our_obj',           '$our_str',
-            '$repl',              '$stdin',
-            '$stdout',            '$step_return'
+            '$my_array',     '$my_arrayref', '$my_coderef', '$my_hash',
+            '$my_hashref',   '$my_obj',      '$my_str',     '$our_array',
+            '$our_arrayref', '$our_coderef', '$our_hash',   '$our_hashref',
+            '$our_obj',      '$our_str',     '$repl',
         ],
-        vars_string => [
-            '$EOL',     '$INSTR', '$eval_return', '$my_str',
-            '$our_str', '$stdin', '$stdout',      '$step_return'
-        ],
+        vars_string => [ '$my_str', '$our_str', ],
     };
 }
 
@@ -182,12 +142,12 @@ sub _define_help_stdout {
         '',
         ' Runtime::Debugger 0.01',
         '',
-        ' <TAB>       - Show options.',
-        ' help        - Show this help section.',
-        ' hist [N=20] - Show last N commands.',
-        ' p VAR       - Data printer.',
-        ' d DATA [#N] - Data dumper (with optional depth).',
-        ' q           - Quit debugger.',
+        ' <TAB>      - Show options.',
+        ' help       - Show this help section.',
+        ' hist [N=5] - Show last N commands.',
+        ' d DATA     - Data dumper.',
+        ' p DATA     - Data printer (colored).',
+        ' q          - Quit debugger.',
         ''
     ]
 }
@@ -269,7 +229,7 @@ sub _define_test_cases {
             nocolor          => ["stdout"],
             expected_results => {
                 comp   => [],
-                line   => '$repl->hist()',
+                line   => '${$Runtime::Debugger::PEEKS{qq(\\$repl)}}->hist()',
                 stdout =>
                   [ '1 q', '2 abc', '3 abc2', '4 hist 3', '5 h', '6 hist' ],
             },
@@ -299,7 +259,8 @@ sub _define_test_cases {
             input            => 'help',
             nocolor          => ["stdout"],
             expected_results => {
-                line   => '$repl->help()',         # "help" changes to this.
+                line => '${$Runtime::Debugger::PEEKS{qq(\$repl)}}->help()'
+                ,                                  # "help" changes to this.
                 eval   => '1',                     # Return value.
                 stdout => _define_help_stdout(),
             },
@@ -386,8 +347,8 @@ sub _define_test_cases {
             name             => 'Dump TAB complete: "d $my_<TAB> . $our_str"',
             input            => 'd $my_' . $TAB . ' . $our_str',
             expected_results => {
-                comp   => [ grep { / ^ \$my_ /x } @{ $_repl->{vars_all} } ],
-                line   => 'd $my_ . $our_str',
+                comp => [ grep { / ^ \$my_ /x } @{ $_repl->{vars_all} } ],
+                line => 'd $my_ . ${$Runtime::Debugger::PEEKS{qq(\$our_str)}}',
                 stdout => [],
             },
         },
@@ -395,7 +356,8 @@ sub _define_test_cases {
             name             => 'Dump TAB complete: "d $my_s<TAB> . $our_str"',
             input            => 'd $my_s' . $TAB . ' . $our_str',
             expected_results => {
-                line   => 'd $my_str . $our_str',
+                line =>
+'d ${$Runtime::Debugger::PEEKS{qq(\$my_str)}} . ${$Runtime::Debugger::PEEKS{qq(\$our_str)}}',
                 stdout => [ '"' . $my_str . $our_str . '"' ],
             },
         },
@@ -424,7 +386,7 @@ sub _define_test_cases {
             name             => 'TAB after coderef arrow "$my_coderef->"',
             input            => '$my_coderef->' . $TAB,
             expected_results => {
-                line   => '$my_coderef->(',
+                line   => '${$Runtime::Debugger::PEEKS{qq(\$my_coderef)}}->(',
                 stdout => [],
             },
         },
@@ -432,7 +394,7 @@ sub _define_test_cases {
             name             => 'TAB after coderef arrow "$our_coderef->"',
             input            => '$our_coderef->' . $TAB,
             expected_results => {
-                line   => '$our_coderef->(',
+                line   => '${$Runtime::Debugger::PEEKS{qq(\$our_coderef)}}->(',
                 stdout => [],
             },
         },
@@ -441,7 +403,7 @@ sub _define_test_cases {
               'TAB after coderef arrow - "$my_coderef->" before closing ")"',
             input            => '$my_coderef->' . $TAB . ')',
             expected_results => {
-                line   => '$my_coderef->()',
+                line   => '${$Runtime::Debugger::PEEKS{qq(\$my_coderef)}}->()',
                 stdout => [],
             },
         },
@@ -450,7 +412,7 @@ sub _define_test_cases {
               'TAB after coderef arrow - "$our_coderef->" before closing ")"',
             input            => '$our_coderef->' . $TAB . ')',
             expected_results => {
-                line   => '$our_coderef->()',
+                line   => '${$Runtime::Debugger::PEEKS{qq(\$our_coderef)}}->()',
                 stdout => [],
             },
         },
@@ -469,7 +431,7 @@ sub _define_test_cases {
                     sort map { '$my_obj->' . $_ } @{ $_repl->{vars_string} },
                     qw( Func1 Func2 { )
                 ],
-                line   => '$my_obj->',
+                line   => '${$Runtime::Debugger::PEEKS{qq(\$my_obj)}}->',
                 stdout => [],
             },
         },
@@ -481,7 +443,7 @@ sub _define_test_cases {
                     sort map { '$our_obj->' . $_ } @{ $_repl->{vars_string} },
                     qw( Func1 Func2 { )
                 ],
-                line   => '$our_obj->',
+                line   => '${$Runtime::Debugger::PEEKS{qq(\$our_obj)}}->',
                 stdout => [],
             },
         },
@@ -494,7 +456,7 @@ sub _define_test_cases {
                     sort map { '$my_obj->' . $_ } @{ $_repl->{vars_string} },
                     qw( Func1 Func2 { )
                 ],
-                line   => '$my_obj->)',
+                line   => '${$Runtime::Debugger::PEEKS{qq(\$my_obj)}}->)',
                 stdout => [],
             },
         },
@@ -507,7 +469,7 @@ sub _define_test_cases {
                     sort map { '$our_obj->' . $_ } @{ $_repl->{vars_string} },
                     qw( Func1 Func2 { )
                 ],
-                line   => '$our_obj->)',
+                line   => '${$Runtime::Debugger::PEEKS{qq(\$our_obj)}}->)',
                 stdout => [],
             },
         },
@@ -545,14 +507,14 @@ sub _define_test_cases {
             name             => 'Complete array - "@my_arr"',
             input            => '@my_arr' . $TAB,
             expected_results => {
-                line => '@my_array',
+                line => '@{$Runtime::Debugger::PEEKS{qq(\\@my_array)}}',
             },
         },
         {
             name             => 'Complete array - "@our_arr"',
             input            => '@our_arr' . $TAB,
             expected_results => {
-                line => '@our_array',
+                line => '@{$Runtime::Debugger::PEEKS{qq(\\@our_array)}}',
             },
         },
 
@@ -561,7 +523,7 @@ sub _define_test_cases {
             name             => 'TAB after arrayref arrow "$my_arrayref->"',
             input            => '$my_arrayref->' . $TAB,
             expected_results => {
-                line   => '$my_arrayref->[',
+                line   => '${$Runtime::Debugger::PEEKS{qq(\\$my_arrayref)}}->[',
                 stdout => [],
             },
         },
@@ -569,7 +531,7 @@ sub _define_test_cases {
             name             => 'TAB after arrayref arrow "$our_arrayref->"',
             input            => '$our_arrayref->' . $TAB,
             expected_results => {
-                line   => '$our_arrayref->[',
+                line => '${$Runtime::Debugger::PEEKS{qq(\\$our_arrayref)}}->[',
                 stdout => [],
             },
         },
@@ -580,7 +542,7 @@ sub _define_test_cases {
             input => '$my_arrayref->[' . $TAB,
             expected_results => {
                 comp   => $_repl->{vars_all},
-                line   => '$my_arrayref->[',
+                line   => '${$Runtime::Debugger::PEEKS{qq(\\$my_arrayref)}}->[',
                 stdout => [],
             },
         },
@@ -588,8 +550,8 @@ sub _define_test_cases {
             name => 'TAB after arrayref arrow and bracket - "$our_arrayref->["',
             input            => '$our_arrayref->[' . $TAB,
             expected_results => {
-                comp   => $_repl->{vars_all},
-                line   => '$our_arrayref->[',
+                comp => $_repl->{vars_all},
+                line => '${$Runtime::Debugger::PEEKS{qq(\\$our_arrayref)}}->[',
                 stdout => [],
             },
         },
@@ -643,28 +605,28 @@ sub _define_test_cases {
             name             => 'Complete hash - "@my_ha"',
             input            => '@my_ha' . $TAB,
             expected_results => {
-                line => '@my_hash',
+                line => '@{$Runtime::Debugger::PEEKS{qq(\\@my_hash)}}',
             },
         },
         {
             name             => 'Complete hash - "@our_ha"',
             input            => '@our_ha' . $TAB,
             expected_results => {
-                line => '@our_hash',
+                line => '@{$Runtime::Debugger::PEEKS{qq(\\@our_hash)}}',
             },
         },
         {
             name             => 'Complete hash - "%my_ha"',
             input            => '%my_ha' . $TAB,
             expected_results => {
-                line => '%my_hash',
+                line => '%{$Runtime::Debugger::PEEKS{qq(\\%my_hash)}}',
             },
         },
         {
             name             => 'Complete hash - "%our_ha"',
             input            => '%our_ha' . $TAB,
             expected_results => {
-                line => '%our_hash',
+                line => '%{$Runtime::Debugger::PEEKS{qq(\\%our_hash)}}',
             },
         },
 
@@ -673,14 +635,14 @@ sub _define_test_cases {
             name             => 'TAB after after hashref arrow - "$my->"',
             input            => '$my_hashref->' . $TAB,
             expected_results => {
-                line => '$my_hashref->{',
+                line => '${$Runtime::Debugger::PEEKS{qq(\\$my_hashref)}}->{',
             },
         },
         {
             name             => 'TAB after after hashref arrow - "$our->"',
             input            => '$our_hashref->' . $TAB,
             expected_results => {
-                line => '$our_hashref->{',
+                line => '${$Runtime::Debugger::PEEKS{qq(\\$our_hashref)}}->{',
             },
         },
 
@@ -699,7 +661,7 @@ sub _define_test_cases {
             input            => '$my_hashref->{' . $TAB,
             expected_results => {
                 comp => [ sort keys %$my_hashref, @{ $_repl->{vars_string} } ],
-                line => '$my_hashref->{',
+                line => '${$Runtime::Debugger::PEEKS{qq(\\$my_hashref)}}->{',
                 stdout => [],
             },
         },
@@ -708,7 +670,7 @@ sub _define_test_cases {
             input            => '$our_hashref->{' . $TAB,
             expected_results => {
                 comp => [ sort keys %$our_hashref, @{ $_repl->{vars_string} } ],
-                line => '$our_hashref->{',
+                line => '${$Runtime::Debugger::PEEKS{qq(\\$our_hashref)}}->{',
                 stdout => [],
             },
         },
@@ -719,7 +681,7 @@ sub _define_test_cases {
             input            => '$my_hash{' . $TAB,
             expected_results => {
                 comp => [ sort keys %my_hash, @{ $_repl->{vars_string} } ],
-                line => '$my_hash{',
+                line => '${$Runtime::Debugger::PEEKS{qq(\\%my_hash)}}{',
             },
         },
         {
@@ -727,7 +689,7 @@ sub _define_test_cases {
             input            => '$our_hash{' . $TAB,
             expected_results => {
                 comp   => [ sort keys %our_hash, @{ $_repl->{vars_string} } ],
-                line   => '$our_hash{',
+                line   => '${$Runtime::Debugger::PEEKS{qq(\\%our_hash)}}{',
                 stdout => [],
             },
         },
@@ -802,7 +764,7 @@ sub _run_case {
     $INSTR             = $stdin . $EOL;
     $COMPLETION_RETURN = [];
 
-    $_repl->debug( 1 ) if $case->{debug};
+    $_repl->debug( 2 ) if $case->{debug};
 
     # Run while capturing terminal output.
     eval {
@@ -811,7 +773,7 @@ sub _run_case {
         open STDOUT, ">",  \$stdout or die $!;
         open STDERR, ">>", \$stdout or die $!;
 
-        $step_return = $repl->_step;
+        $step_return = $repl->_build_step;
         $eval_return = eval $step_return // "";
         chomp $stdout;
     };
@@ -895,13 +857,10 @@ sub _test_repl_vars {
 _run_case( $repl, init_case() );
 
 for my $case ( _define_test_cases( $repl ) ) {
-    last if _run_case( $repl, $case );
+    next if _run_case( $repl, $case );
 }
 
 _test_repl_vars( $repl );
 
 __END__
-
-
-
 

@@ -1,5 +1,8 @@
 Revision history for LWP-UserAgent-Throttled
 
+0.10
+	Fix http://www.cpantesters.org/cpan/report/55bb4f64-8d7e-11ec-adcf-8cefa471f67a
+
 0.09	Fri Jan 28 11:15:53 EST 2022
 	Fix http://www.cpantesters.org/cpan/report/91a6ac80-6bf9-1014-b7eb-bb2be30b7e63
 	Fix http://www.cpantesters.org/cpan/report/132e75e2-7fa3-11ec-bc66-57723b537541

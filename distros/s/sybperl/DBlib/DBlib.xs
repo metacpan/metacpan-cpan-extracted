@@ -470,7 +470,7 @@ newdbh(info, package, attr_ref)
     }
     else
     {
-	warn("Couldn't find %Att hash");
+	warn("Couldn't find %%Att hash");
 	info->attr.UseDateTime = 0;
 	info->attr.UseMoney = 0;
 	info->attr.MaxRows = 0;
@@ -5775,8 +5775,7 @@ dbrpcparam(dbp, parname, status, type, maxlen, datalen, value)
 	ptr->value = ptr->u.c;
 	break;
       default:
-	sprintf(buff, "Invalid type value (%d) for dbrpcparam()", type);
-	croak(buff);
+	croak("Invalid type value (%d) for dbrpcparam()", type);
     }
     ptr->next = head;
     head = ptr;
@@ -5916,8 +5915,7 @@ dbregparam(dbp, parname, type, datalen, value)
         ptr->value = ptr->u.c;
         break;
       default:
-        sprintf(buff, "Invalid type value (%d) for dbregparam()", type);
-        croak(buff);
+        croak("Invalid type value (%d) for dbregparam()", type);
     }
     ptr->next = head;
     head = ptr;

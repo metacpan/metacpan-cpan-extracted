@@ -65,6 +65,13 @@ DESCRIPTION
 
       Takes as input the xml skeleton structure
 
+    write_kem2_xml_output
+
+      Write the raw KEM2 file output to a file with name based on the
+      ordercodes in the file.
+
+      Takes as input the raw xml string
+
 AUTHOR
 
     Lieven Hollevoet <lieven@quicksand.be>

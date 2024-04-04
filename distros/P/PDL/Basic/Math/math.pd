@@ -135,6 +135,7 @@ EOD
 pp_addhdr('
 #include <tgmath.h>
 #include "protos.h"
+#include "cpoly.h"
 extern double ndtri(double);
 ');
 
@@ -166,9 +167,8 @@ my (@besbifuncs) = qw(jn yn); # "
 
 sub code_ufunc {
 <<EOF
-PDL_IF_BAD(if ( \$ISBAD(a()) ) { \$SETBAD(b()); } else {,)
+PDL_IF_BAD(if ( \$ISBAD(a()) ) { \$SETBAD(b()); } else,)
   \$b() = $_[0](\$a());
-PDL_IF_BAD(},)
 EOF
 }
 
@@ -176,9 +176,8 @@ sub code_bifunc {
     my $name = $_[0];
     my $x = $_[1] || 'a'; my $y = $_[2] || 'b'; my $c = $_[3] || 'c';
 <<EOF
-PDL_IF_BAD(if ( \$ISBAD($x()) || \$ISBAD($y()) ) { \$SETBAD($c()); } else {,)
+PDL_IF_BAD(if ( \$ISBAD($x()) || \$ISBAD($y()) ) { \$SETBAD($c()); } else,)
   \$$c() = $name(\$$x(),\$$y());
-PDL_IF_BAD(},)
 EOF
 }
 
@@ -270,10 +269,10 @@ if ($^O !~ /win32/i) {
 	   Doc => $doco{"lgamma"},
 	   Code => '
 	    extern int signgam;
-	    PDL_IF_BAD(if ( $ISBAD(a()) ) { $SETBAD(b()); $SETBAD(s()); } else {,)
+	    PDL_IF_BAD(if ( $ISBAD(a()) ) { $SETBAD(b()); $SETBAD(s()); } else,) {
 	      $b() = lgamma($a());
 	      $s() = signgam;
-	    PDL_IF_BAD(},)
+	    }
 	   ',     # what happens to signgam if $a() is bad?
 	   );
 } # if: os !~ win32
@@ -284,10 +283,10 @@ elsif ($Config{cc} =~ /\bgcc/i) {
 	   Pars => 'a(); [o]b(); int[o]s()',
 	   Doc => $doco{"lgamma"},
 	   Code => '
-	    PDL_IF_BAD(if ( $ISBAD(a()) ) { $SETBAD(b()); $SETBAD(s()); } else {,)
+	    PDL_IF_BAD(if ( $ISBAD(a()) ) { $SETBAD(b()); $SETBAD(s()); } else,) {
 	    $b() = lgamma($a());
 	    $s() = tgamma($a()) < 0 ? -1 : 1;
-	    PDL_IF_BAD(},)
+	    }
 	    ',     # what happens to signgam if $a() is bad?
 	   );
 } # elsif: cc =~ /\bgcc/i
@@ -341,24 +340,133 @@ pp_def("polyroots",
       Pars => 'cr(n); ci(n); [o]rr(m); [o]ri(m);',
       RedoDimsCode => '$SIZE(m) = $SIZE(n)-1;',
       GenericTypes => ['D'],
-      Code => '
-              extern int cpoly( double *cr, double *ci, int deg,
-                    double *rr, double *ri );
-              int deg = (int)$SIZE(n)-1;
-              if (cpoly($P(cr), $P(ci), deg, $P(rr), $P(ri)))
-                 $CROAK("PDL::Math::polyroots failed");
-',
-      , Doc => '
-
+      Code => <<'EOF',
+  char *fail = cpoly($P(cr), $P(ci), $SIZE(m), $P(rr), $P(ri));
+  if (fail)
+     $CROAK("cpoly: %s", fail);
+EOF
+      PMCode => pp_line_numbers(__LINE__, <<'EOF'),
+sub PDL::polyroots {
+  my @args = map PDL->topdl($_), @_;
+  my $natcplx = !$args[0]->type->real;
+  barf "need array context" if !$natcplx and !(wantarray//1);
+  splice @args, 0, 1, map $args[0]->$_, qw(re im) if $natcplx;
+  $_ //= PDL->null for @args[2,3];
+  PDL::_polyroots_int(@args);
+  $natcplx ? $args[2]->czip($args[3]) : @args[2,3];
+}
+EOF
+      Doc => '
 =for ref
 
 Complex roots of a complex polynomial, given coefficients in order
-of decreasing powers.
+of decreasing powers. Only works for degree >= 1.
+As of 2.086, works with native-complex data.
 
 =for usage
 
+ $roots = polyroots($coeffs); # native complex
  ($rr, $ri) = polyroots($cr, $ci);
+',);
 
+pp_def("polyfromroots",
+      Pars => 'r(m); [o]c(n);',
+      GenericTypes => ['CD'],
+      RedoDimsCode => '$SIZE(n) = $SIZE(m)+1;',
+      Code => <<'EOF',
+/*
+algorithm from octave poly.m, O(n^2)
+per https://cs.stackexchange.com/questions/116643/what-is-the-most-efficient-algorithm-to-compute-polynomial-coefficients-from-its, FFT allows O(n*log(n)^2)
+*/
+$c(n=>0) = 1.0;
+loop(m) %{ $c(n=>m+1) = 0.0; %}
+PDL_Indx k;
+loop(m) %{
+  for (k = m; k >= 0; k--) /* count down to use data before we mutate */
+    $c(n=>k+1) -= $r() * $c(n=>k);
+%}
+EOF
+      PMCode => pp_line_numbers(__LINE__, <<'EOF'),
+sub PDL::polyfromroots {
+  my @args = map PDL->topdl($_), @_;
+  my $natcplx = !$args[0]->type->real;
+  barf "need array context" if !$natcplx and !(wantarray//1);
+  if (!$natcplx) {
+    splice @args, 0, 2, $args[0]->czip($args[1]); # r
+  }
+  my @ins = splice @args, 0, 1;
+  my $explicit_out = my @outs = @args;
+  if ($natcplx) {
+    $_ //= PDL->null for $outs[0];
+  } else {
+    $_ //= PDL->null for @outs[0,1];
+  }
+  my @args_out = $natcplx ? @outs : PDL->null;
+  PDL::_polyfromroots_int(@ins, @args_out);
+  if (!$natcplx) {
+    $outs[0] .= $args_out[0]->re;
+    $outs[1] .= $args_out[0]->im;
+  }
+  $natcplx ? $outs[0] : @outs;
+}
+EOF
+      Doc => '
+=for ref
+
+Calculates the complex coefficients of a polynomial from its complex
+roots, in order of decreasing powers. Added in 2.086, works with
+native-complex data. Currently C<O(n^2)>.
+
+=for usage
+
+ $coeffs = polyfromroots($roots); # native complex
+ ($cr, $ci) = polyfromroots($rr, $ri);
+',);
+
+pp_def("polyval",
+      Pars => 'c(n); x(); [o]y();',
+      GenericTypes => ['CD'],
+      Code => <<'EOF',
+$GENERIC(y) vc = $c(n=>0), sc = $x();
+loop(n=1) %{ vc = vc*sc + $c(); %}
+$y() = vc;
+EOF
+      PMCode => pp_line_numbers(__LINE__, <<'EOF'),
+sub PDL::polyval {
+  my @args = map PDL->topdl($_), @_;
+  my $natcplx = !$args[0]->type->real;
+  barf "need array context" if !$natcplx and !(wantarray//1);
+  if (!$natcplx) {
+    splice @args, 0, 2, $args[0]->czip($args[1]); # c
+    splice @args, 1, 2, $args[1]->czip($args[2]); # x
+  }
+  my @ins = splice @args, 0, 2;
+  my $explicit_out = my @outs = @args;
+  if ($natcplx) {
+    $_ //= PDL->null for $outs[0];
+  } else {
+    $_ //= PDL->null for @outs[0,1];
+  }
+  my @args_out = $natcplx ? @outs : PDL->null;
+  PDL::_polyval_int(@ins, @args_out);
+  if (!$natcplx) {
+    $outs[0] .= $args_out[0]->re;
+    $outs[1] .= $args_out[0]->im;
+  }
+  $natcplx ? $outs[0] : @outs;
+}
+EOF
+      Doc => '
+=for ref
+
+Complex value of a complex polynomial at given point, given coefficients
+in order of decreasing powers. Uses Horner recurrence. Added in 2.086,
+works with native-complex data.
+
+=for usage
+
+ $y = polyval($coeffs, $x); # native complex
+ ($yr, $yi) = polyval($cr, $ci, $xr, $xi);
 ',);
 
 pp_addpm({At=>'Bot'},<<'EOD');

@@ -42,6 +42,7 @@ use strict;
 use warnings;
 #line 44 "Browser.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -100,7 +101,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 104 "Browser.pm"
+#line 105 "Browser.pm"
 
 # Exit with OK status
 

@@ -75,7 +75,7 @@ sub get_operation_result {
     my ($self, %args) = @_;
 
     # verify the required parameter 'id' is set
-    unless (exists $args{'id'} && $args{'id'}) {
+    unless (exists $args{'id'} && defined $args{'id'} && $args{'id'}) {
       croak("Missing the required parameter 'id' when calling get_operation_result");
     }
 
@@ -140,7 +140,7 @@ sub get_operation_status {
     my ($self, %args) = @_;
 
     # verify the required parameter 'id' is set
-    unless (exists $args{'id'} && $args{'id'}) {
+    unless (exists $args{'id'} && defined $args{'id'} && $args{'id'}) {
       croak("Missing the required parameter 'id' when calling get_operation_status");
     }
 
@@ -241,17 +241,17 @@ sub start_convert {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling start_convert");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling start_convert");
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -386,22 +386,22 @@ sub start_convert_and_save {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
-    unless (exists $args{'document'} && $args{'document'}) {
+    unless (exists $args{'document'} && defined $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling start_convert_and_save");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling start_convert_and_save");
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'} && $args{'out_path'}) {
+    unless (exists $args{'out_path'} && defined $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling start_convert_and_save");
     }
 
@@ -541,17 +541,17 @@ sub start_download_presentation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling start_download_presentation");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling start_download_presentation");
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -750,7 +750,7 @@ sub start_merge_and_save {
     my ($self, %args) = @_;
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'} && $args{'out_path'}) {
+    unless (exists $args{'out_path'} && defined $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling start_merge_and_save");
     }
 
@@ -875,22 +875,22 @@ sub start_save_presentation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling start_save_presentation");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'} && $args{'format'}) {
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling start_save_presentation");
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'} && $args{'out_path'}) {
+    unless (exists $args{'out_path'} && defined $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling start_save_presentation");
     }
 

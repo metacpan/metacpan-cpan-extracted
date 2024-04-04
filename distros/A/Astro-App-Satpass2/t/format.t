@@ -3,15 +3,15 @@ package main;
 use strict;
 use warnings;
 
-use lib qw{ inc };
-
-use Test::More 0.88;
-use My::Module::Test::App;
-use My::Module::Test::Mock_App;
-
+use Test2::V0;
 use Astro::App::Satpass2::Format;
 
-my $app = My::Module::Test::Mock_App->new();
+use lib qw{ inc };
+
+use My::Module::Test::App;
+
+my $mocker = setup_app_mocker;
+my $app = Astro::App::Satpass2->new();
 
 klass( 'Astro::App::Satpass2::Format' );
 

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Synthesizer settings librarian
 
-our $VERSION = '0.0040';
+our $VERSION = '0.0042';
 
 use Moo;
 use strictures 2;
@@ -54,6 +54,15 @@ sub BUILD {
         id integer primary key autoincrement,
         settings json not null,
         name text not null
+      )'
+  );
+  # create the model specs table unless it's already there
+  $self->_sqlite->query(
+    'create table if not exists specs'
+    . ' (
+        id integer primary key autoincrement,
+        model text not null,
+        spec json not null
       )'
   );
 }
@@ -207,6 +216,62 @@ sub remove_model {
   );
 }
 
+
+sub make_spec {
+  my ($self, %args) = @_;
+  my $id = delete $args{id};
+  croak 'No columns given' unless keys %args;
+  if ($id) {
+    my $result = $self->_sqlite->select(
+      'specs',
+      ['spec'],
+      { id => $id },
+    )->expand(json => 'spec')->hash->{spec};
+    for my $arg (keys %args) {
+      $args{$arg} = '' unless defined $args{$arg};
+    }
+    my $params = { %$result, %args };
+    $self->_sqlite->update(
+      'specs',
+      { spec => to_json($params) },
+      { id => $id },
+    );
+  }
+  else {
+    $id = $self->_sqlite->insert(
+      'specs',
+      {
+        model => $self->model,
+        spec  => to_json(\%args),
+      },
+    )->last_insert_id;
+  }
+  return $id;
+}
+
+
+sub recall_spec {
+  my ($self, %args) = @_;
+  my $id = delete $args{id};
+  croak 'No id given' unless $id;
+  my $result = $self->_sqlite->select(
+    'specs',
+    ['spec'],
+    { id => $id },
+  )->expand(json => 'spec')->hash;
+  my $specs = $result->{spec};
+  return $specs;
+}
+
+
+sub remove_spec {
+  my ($self) = @_;
+  $self->_sqlite->delete(
+    'specs',
+    { model => $self->model }
+  );
+}
+
 1;
 
 __END__
@@ -221,7 +286,7 @@ Synth::Config - Synthesizer settings librarian
 
 =head1 VERSION
 
-version 0.0040
+version 0.0042
 
 =head1 SYNOPSIS
 
@@ -231,28 +296,45 @@ version 0.0040
 
   my $synth = Synth::Config->new(model => $model);
 
-  my $name = 'Foo!';
+  my $name = 'My favorite setting';
 
-  my $id1 = $synth->make_setting(name => $name, group => 'foo');
-  my $id2 = $synth->make_setting(name => $name, group => 'bar');
+  my %spec = ( # default initial model specification
+    order      => [qw(group parameter control group_to param_to bottom top value unit is_default)],
+    group      => [],
+    parameter  => {},
+    control    => [qw(knob switch slider patch)],
+    group_to   => [],
+    param_to   => [],
+    bottom     => [qw(off 0 1 7AM 20)],
+    top        => [qw(on 3 4 6 7 5PM 20_000 100%)],
+    value      => [],
+    unit       => [qw(Hz o'clock)],
+    is_default => [0, 1],
+  );
+  my $spec_id = $synth->make_spec(%spec);
+  my $specs = $synth->recall_spec(id => $spec_id);
+  $synth->remove_spec;
+
+  my $id1 = $synth->make_setting(name => $name, group => 'filter', etc => '...');
+  my $id2 = $synth->make_setting(name => $name, group => 'sequencer', etc => '...');
 
   my $setting = $synth->recall_setting(id => $id1);
-  # { group => 'foo' }
+  # { group => 'filter' }
 
-  # update the group key only
-  $synth->make_setting(id => $id1, group => 'baz');
+  # update the group key
+  $synth->make_setting(id => $id1, group => 'envelope');
 
   my $settings = $synth->search_settings(name => $name);
-  # [ 1 => { group => 'baz' }, 2 => { group => 'bar' } ]
+  # [ 1 => { group => 'envelope', etc => '...' }, 2 => { group => 'sequencer', etc => '...' } ]
 
-  my $settings = $synth->search_settings(group => 'bar');
-  # [ 2 => { group => 'bar' } ]
+  $settings = $synth->search_settings(group => 'sequencer');
+  # [ 2 => { group => 'sequencer', etc => '...' } ]
 
   my $models = $synth->recall_models;
   # [ 'moog_matriarch' ]
 
   my $names = $synth->recall_names;
-  # [ 'Foo!' ]
+  # [ 'My favorite setting' ]
 
   $synth->remove_setting(id => $id1);
 
@@ -383,6 +465,31 @@ Remove all settings for a given B<name>.
   $synth->remove_model;
 
 Remove the database table for the current object model.
+
+=head2 make_spec
+
+  my $id = $synth->make_spec(%args);
+
+Save a model specification and return the record id.
+
+If an B<id> is given, an update is performed.
+
+The spec is a single JSON field that can contain any key/value
+pairs that define the configuration - groups, parameters, values, etc.
+of a model.
+
+=head2 recall_spec
+
+  my $specs = $synth->recall_spec(id => $id);
+
+Return the model configuration specification for the given B<id>.
+
+=head2 remove_spec
+
+  $synth->remove_spec;
+
+Remove the database table for the current object model configuration
+specification.
 
 =head1 SEE ALSO
 

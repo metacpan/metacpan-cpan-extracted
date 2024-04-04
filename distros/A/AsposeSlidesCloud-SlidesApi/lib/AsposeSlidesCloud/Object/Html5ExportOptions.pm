@@ -40,6 +40,7 @@ use DateTime;
 use AsposeSlidesCloud::Object::ExportOptions;
 use AsposeSlidesCloud::Object::FontFallbackRule;
 use AsposeSlidesCloud::Object::FontSubstRule;
+use AsposeSlidesCloud::Object::NotesCommentsLayoutingOptions;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -136,6 +137,20 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'embed_images' => {
+    	datatype => 'boolean',
+    	base_name => 'EmbedImages',
+    	description => 'Gets or sets embed images option.',
+    	format => '',
+    	read_only => '',
+    		},
+    'notes_comments_layouting' => {
+    	datatype => 'NotesCommentsLayoutingOptions',
+    	base_name => 'NotesCommentsLayouting',
+    	description => 'Slides layouting options',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -144,7 +159,9 @@ __PACKAGE__->swagger_types( {
     'font_subst_rules' => 'ARRAY[FontSubstRule]',
     'format' => 'string',
     'animate_transitions' => 'boolean',
-    'animate_shapes' => 'boolean'
+    'animate_shapes' => 'boolean',
+    'embed_images' => 'boolean',
+    'notes_comments_layouting' => 'NotesCommentsLayoutingOptions'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -153,7 +170,9 @@ __PACKAGE__->attribute_map( {
     'font_subst_rules' => 'FontSubstRules',
     'format' => 'Format',
     'animate_transitions' => 'AnimateTransitions',
-    'animate_shapes' => 'AnimateShapes'
+    'animate_shapes' => 'AnimateShapes',
+    'embed_images' => 'EmbedImages',
+    'notes_comments_layouting' => 'NotesCommentsLayouting'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

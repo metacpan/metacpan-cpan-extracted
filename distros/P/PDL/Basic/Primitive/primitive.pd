@@ -49,14 +49,13 @@ EOD
 #  available via operator overloading)
 ################################################################
 
-pp_def(
-       'inner',
+pp_def('inner',
        HandleBad => 1,
        Pars => 'a(n); b(n); [o]c();',
        GenericTypes => [ppdefs_all],
        Code =>
-       'double tmp = 0;
-        int badflag = 0;
+       'complex long double tmp = 0;
+        PDL_IF_BAD(int badflag = 0;,)
         loop(n) %{
            PDL_IF_BAD(if (!($ISGOOD(a()) && $ISGOOD(b()))) { badflag = 1; break; }
            else,)                                          { tmp += $a() * $b(); }
@@ -79,8 +78,7 @@ as it will not contain any bad values.
 ',
        ); # pp_def( inner )
 
-pp_def(
-       'outer',
+pp_def('outer',
        HandleBad => 1,
        Pars => 'a(n); b(m); [o]c(n,m);',
        GenericTypes => [ppdefs_all],
@@ -280,19 +278,17 @@ For usage, see L</x>, a description of the overloaded 'x' operator
 EOD
 	);
 
-pp_def(
-       'innerwt',
+pp_def('innerwt',
        HandleBad => 1,
        Pars => 'a(n); b(n); c(n); [o]d();',
        GenericTypes => [ppdefs_all],
        Code =>
-       'long double tmp = 0;
-        int flag = 0;
+       'complex long double tmp = 0;
+        PDL_IF_BAD(int flag = 0;,)
 	loop(n) %{
-           PDL_IF_BAD(if ( $ISGOOD(a()) && $ISGOOD(b()) && $ISGOOD(c()) ),) {
-              tmp += $a() * $b() * $c();
-              flag = 1;
-           }
+           PDL_IF_BAD(if (!( $ISGOOD(a()) && $ISGOOD(b()) && $ISGOOD(c()) )) continue;,)
+           tmp += $a() * $b() * $c();
+           PDL_IF_BAD(flag = 1;,)
         %}
         PDL_IF_BAD(if (!flag) { $SETBAD(d()); }
         else,)                { $d() = tmp; }',
@@ -309,19 +305,17 @@ Weighted (i.e. triple) inner product
 '
        );
 
-pp_def(
-       'inner2',
+pp_def('inner2',
        HandleBad => 1,
        Pars => 'a(n); b(n,m); c(m); [o]d();',
        GenericTypes => [ppdefs_all],
        Code =>
-       'long double tmp = 0;
-        int flag = 0;
+       'complex long double tmp = 0;
+        PDL_IF_BAD(int flag = 0;,)
 	loop(n,m) %{
-           PDL_IF_BAD(if ( $ISGOOD(a()) && $ISGOOD(b()) && $ISGOOD(c()) ),) {
-              tmp += $a() * $b() * $c();
-              flag = 1;
-           }
+           PDL_IF_BAD(if (!( $ISGOOD(a()) && $ISGOOD(b()) && $ISGOOD(c()) )) continue;,)
+           tmp += $a() * $b() * $c();
+           PDL_IF_BAD(flag = 1;,)
         %}
         PDL_IF_BAD(if (!flag) { $SETBAD(d()); }
         else,)                { $d() = tmp; }',
@@ -337,19 +331,17 @@ very wasteful. Instead, you should use a temporary for C<b*c>.
 '
        );
 
-pp_def(
-       'inner2d',
+pp_def('inner2d',
        HandleBad => 1,
        Pars => 'a(n,m); b(n,m); [o]c();',
        GenericTypes => [ppdefs_all],
        Code =>
-       'long double tmp = 0;
-        int flag = 0;
+       'complex long double tmp = 0;
+        PDL_IF_BAD(int flag = 0;,)
 	loop(n,m) %{
-           PDL_IF_BAD(if ( $ISGOOD(a()) && $ISGOOD(b()) ),) {
-              tmp += $a() * $b();
-              flag = 1;
-           }
+           PDL_IF_BAD(if (!( $ISGOOD(a()) && $ISGOOD(b()) )) continue;,)
+           tmp += $a() * $b();
+           PDL_IF_BAD(flag = 1;,)
         %}
         PDL_IF_BAD(if (!flag) { $SETBAD(c()); }
         else,)                { $c() = tmp; }',
@@ -368,32 +360,29 @@ Equivalent to
 '
        );
 
-pp_def(
-       'inner2t',
+pp_def('inner2t',
        HandleBad => 1,
        Pars => 'a(j,n); b(n,m); c(m,k); [t]tmp(n,k); [o]d(j,k));',
        GenericTypes => [ppdefs_all],
        Code =>
        'loop(n,k) %{
-           long double tmp0 = 0;
-           int flag = 0;
+           complex long double tmp0 = 0;
+           PDL_IF_BAD(int flag = 0;,)
 	   loop(m) %{
-              PDL_IF_BAD(if ( $ISGOOD(b()) && $ISGOOD(c()) ),) {
-                 tmp0 += $b() * $c();
-                 flag = 1;
-              }
+              PDL_IF_BAD(if (!( $ISGOOD(b()) && $ISGOOD(c()) )) continue;,)
+              tmp0 += $b() * $c();
+              PDL_IF_BAD(flag = 1;,)
            %}
            PDL_IF_BAD(if (!flag) { $SETBAD(tmp()); }
            else,)                { $tmp() = tmp0; }
 	%}
 	loop(j,k) %{
-           long double tmp1 = 0;
-           int flag = 0;
+           complex long double tmp1 = 0;
+           PDL_IF_BAD(int flag = 0;,)
 	   loop(n) %{
-              if ( $ISGOOD(a()) && $ISGOOD(tmp()) ) {
-                 tmp1 += $a() * $tmp();
-                 flag = 1;
-              }
+              PDL_IF_BAD(if (!( $ISGOOD(a()) && $ISGOOD(tmp()) )) continue;,)
+              tmp1 += $a() * $tmp();
+              PDL_IF_BAD(flag = 1;,)
            %}
            PDL_IF_BAD(if (!flag) { $SETBAD(d()); }
            else,)                { $d() = tmp1; }
@@ -459,36 +448,34 @@ pp_def('norm',
        Doc => 'Normalises a vector to unit Euclidean length',
        Code =>
        'long double sum=0;
-        int flag = 0;
-	loop(n) %{
-           PDL_IF_BAD(if ( $ISGOOD(vec()) ),) {
-              sum +=
-                PDL_IF_GENTYPE_REAL(
-                  $vec()*$vec(),
-                  creall($vec())*creall($vec()) + cimagl($vec())*cimagl($vec())
-                );
-           PDL_IF_BAD(flag = 1;,) }
+        PDL_IF_BAD(int flag = 0;,)
+        loop(n) %{
+           PDL_IF_BAD(if (!( $ISGOOD(vec()) )) continue;,)
+           sum +=
+             PDL_IF_GENTYPE_REAL(
+               $vec()*$vec(),
+               creall($vec())*creall($vec()) + cimagl($vec())*cimagl($vec())
+             );
+           PDL_IF_BAD(flag = 1;,)
         %}
-        PDL_IF_BAD(if ( flag ),) {
-	   if (sum > 0) {
-	      sum = sqrt(sum);
-	      loop(n) %{
-                 PDL_IF_BAD(if ( $ISBAD(vec()) ) { $SETBAD(norm()); }
-                            else              ,) {
-                    $norm() = $vec()/sum;
-                 }
-              %}
-	   } else {
-	      loop(n) %{
-                 if ( $ISBAD(vec()) ) { $SETBAD(norm()); }
-                 else                 { $norm() = $vec(); }
-              %}
-           }
-        } PDL_IF_BAD(else {
-	   loop(n) %{
-              $SETBAD(norm());
+        PDL_IF_BAD(if ( !flag ) {
+           loop(n) %{ $SETBAD(norm()); %}
+           continue;
+        },)
+        if (sum > 0) {
+           sum = sqrt(sum);
+           loop(n) %{
+              PDL_IF_BAD(if ( $ISBAD(vec()) ) { $SETBAD(norm()); }
+                         else              ,) {
+                 $norm() = $vec()/sum;
+              }
            %}
-	},)
+        } else {
+           loop(n) %{
+              PDL_IF_BAD(if ( $ISBAD(vec()) ) { $SETBAD(norm()); }
+                         else              ,) { $norm() = $vec(); }
+           %}
+        }
 	',
 );
 
@@ -508,7 +495,7 @@ pp_def(
     'loop(n) %{
         register PDL_Indx this_ind = $ind();
         if ( PDL_IF_BAD($ISBADVAR(this_ind,ind) ||,) this_ind<0 || this_ind>=$SIZE(m) )
-           $CROAK("invalid index");
+           $CROAK("invalid index %"IND_FLAG"; range 0..%"IND_FLAG, this_ind, $SIZE(m));
         PDL_IF_BAD(
         if ( $ISBAD(input()) ) { $SETBAD(sum(m => this_ind)); }
         else,)                 { $sum(m => this_ind) += $input(); }
@@ -554,10 +541,6 @@ Broadcasting example:
 
 # 1D convolution
 # useful for broadcasted 1D filters
-pp_addhdr('
-/* Fast Modulus with proper negative behaviour */
-#define REALMOD(a,b) while ((a)>=(b)) (a) -= (b); while ((a)<0) (a) += (b);
-');
 pp_def('conv1d',
        Doc => << 'EOD',
 
@@ -602,8 +585,7 @@ another dimension use the slicing routines, e.g.
 This function is useful for broadcasted filtering of 1D signals.
 
 Compare also L<conv2d|PDL::Image2D/conv2d>, L<convolve|PDL::ImageND/convolve>,
-L<fftconvolve|PDL::FFT/fftconvolve()>, L<fftwconv|PDL::FFTW/fftwconv>,
-L<rfftwconv|PDL::FFTW/rfftwconv>
+L<fftconvolve|PDL::FFT/fftconvolve()>
 
 =for bad
 
@@ -632,29 +614,27 @@ sub PDL::conv1d {
    return $c;
 }
 EOPM
+        CHeader => '
+/* Fast Modulus with proper negative behaviour */
+#define REALMOD(a,b) while ((a)>=(b)) (a) -= (b); while ((a)<0) (a) += (b);
+',
         Code => '
-           int i,i1,i2,poff,pflip;
-           double tmp;
-           int reflect = $COMP(reflect);
-           int m_size = $SIZE(m);
-           int p_size = $SIZE(p);
-
-           poff = (p_size-1)/2;
-           for(i=0; i<m_size; i++) {
-              tmp = 0;
-                  for(i1=0; i1<p_size; i1++) {
-                     pflip = p_size - 1 - i1;
-                     i2 = i+i1 - poff;
-                     if (reflect && i2<0)
-                     	i2 = -i2;
-                     if (reflect && i2>=m_size)
-                     	i2 = m_size-(i2-m_size+1);
-
-                     REALMOD(i2,m_size);
-                     tmp += $a(m=>i2) * $kern(p=>pflip);
-                  }
-              $b(m=>i) = tmp;
-           }
+int reflect = $COMP(reflect);
+PDL_Indx m_size = $SIZE(m), p_size = $SIZE(p);
+PDL_Indx poff = (p_size-1)/2;
+loop(m) %{
+  complex long double tmp = 0;
+  loop(p) %{
+    PDL_Indx pflip = p_size - 1 - p, i2 = m+p - poff;
+    if (reflect && i2<0)
+      i2 = -i2;
+    if (reflect && i2>=m_size)
+      i2 = m_size-(i2-m_size+1);
+    REALMOD(i2,m_size);
+    tmp += $a(m=>i2) * $kern(p=>pflip);
+  %}
+  $b() = tmp;
+%}
 ');
 
 
@@ -1002,27 +982,24 @@ EOPM
 # elementary statistics and histograms
 ############################################################
 
-pp_def(
-       'wtstat',
+pp_def('wtstat',
        HandleBad => 1,
        Pars => 'a(n); wt(n); avg(); [o]b();',
        GenericTypes => [ppdefs_all],
        OtherPars => 'int deg',
        Code =>
-       'double wtsum = 0;
-	double statsum = 0;
-        int flag = 0;
+       'complex long double wtsum = 0;
+        complex long double statsum = 0;
+        PDL_IF_BAD(int flag = 0;,)
         loop(n) %{
-           PDL_IF_BAD(if ($ISGOOD(wt()) && $ISGOOD(a()) && $ISGOOD(avg())),) {
-              long double tmp;
-              PDL_Indx i;
-              wtsum += $wt();
-              tmp=1;
-              for(i=0; i<$COMP(deg); i++)
-                 tmp *= $a();
-              statsum += $wt() * (tmp - $avg());
-              flag = 1;
-           }
+          PDL_IF_BAD(if (!($ISGOOD(wt()) && $ISGOOD(a()) && $ISGOOD(avg()))) continue;,)
+          PDL_Indx i;
+          wtsum += $wt();
+          complex long double tmp=1;
+          for(i=0; i<$COMP(deg); i++)
+            tmp *= $a();
+          statsum += $wt() * (tmp - $avg());
+          PDL_IF_BAD(flag = 1;,)
         %}
         PDL_IF_BAD(if (!flag) { $SETBAD(b()); $PDLSTATESETBAD(b); }
         else,)                { $b() = statsum / wtsum; }',
@@ -1056,15 +1033,14 @@ pp_def('statsover',
          int flag = 0;
          loop(n) %{             /* Accumulate sum and summed weight. */
             /* perhaps should check w() for bad values too ? */
-            PDL_IF_BAD(if ( $ISGOOD(a()) ),) {
-              tmp += $a()*$w();
-              norm += ($GENERIC(avg)) $w();
-              if (!flag) { curmin = $a(); curmax = $a(); flag=1; }
-              if ($a() < curmin) {
-                curmin = $a();
-              } else if ($a() > curmax) {
-                curmax = $a();
-              }
+            PDL_IF_BAD(if (!( $ISGOOD(a()) )) continue;,)
+            tmp += $a()*$w();
+            norm += ($GENERIC(avg)) $w();
+            if (!flag) { curmin = $a(); curmax = $a(); flag=1; }
+            if ($a() < curmin) {
+              curmin = $a();
+            } else if ($a() > curmax) {
+              curmax = $a();
             }
          %}
          /* have at least one valid point if flag true */
@@ -1082,11 +1058,10 @@ pp_def('statsover',
            /* Calculate the RMS and standard deviation. */
            tmp = 0;
            loop(n) %{
-              if ($ISGOOD(a())) {
-                 diff = $a()-$avg();
-                 tmp += diff * diff * $w();
-                 tmp1 += fabsl(diff) * $w();
-              }
+              PDL_IF_BAD(if (!$ISGOOD(a())) continue;,)
+              diff = $a()-$avg();
+              tmp += diff * diff * $w();
+              tmp1 += fabsl(diff) * $w();
            %}
            $rms() = sqrt( tmp/norm );
            if(norm>1)
@@ -1314,12 +1289,11 @@ for(
 	%}
 	broadcastloop %{
 	   loop(n) %{
-	     PDL_IF_BAD(if ( $ISGOOD(in()) ),) {
-	      j = (int) (($in()-min)/step);
-	      if (j<0) j=0;
-	      if (j > maxj) j = maxj;
-	      ($hist(m => j))'.$_->{HistOp}.';
-             }
+	     PDL_IF_BAD(if ( !$ISGOOD(in()) ) continue;,)
+	     j = (int) (($in()-min)/step);
+	     if (j<0) j=0;
+	     if (j > maxj) j = maxj;
+	     ($hist(m => j))'.$_->{HistOp}.';
 	   %}
 	%}';
 pp_def($_->{Name},
@@ -1430,15 +1404,14 @@ for(
 	%}
 	broadcastloop %{
 	   loop(n) %{
-	     PDL_IF_BAD(if ( $ISGOOD(ina()) && $ISGOOD(inb()) ),) {
-	      ja = (int) (($ina()-mina)/stepa);
-	      jb = (int) (($inb()-minb)/stepb);
-	      if (ja<0) ja=0;
-	      if (ja > maxja) ja = maxja;
-	      if (jb<0) jb=0;
-	      if (jb > maxjb) jb = maxjb;
-	      ($hist(ma => ja,mb => jb))'.$_->{HistOp}.';
-	     }
+	     PDL_IF_BAD(if (!( $ISGOOD(ina()) && $ISGOOD(inb()) )) continue;,)
+	     ja = (int) (($ina()-mina)/stepa);
+	     jb = (int) (($inb()-minb)/stepb);
+	     if (ja<0) ja=0;
+	     if (ja > maxja) ja = maxja;
+	     if (jb<0) jb=0;
+	     if (jb > maxjb) jb = maxjb;
+	     ($hist(ma => ja,mb => jb))'.$_->{HistOp}.';
 	   %}
 	%}';
 pp_def($_->{Name},
@@ -1469,7 +1442,7 @@ sub fibonacci { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->fibonacci : PDL
 sub PDL::fibonacci{
    my $x = &PDL::Core::_construct;
    my $is_inplace = $x->is_inplace;
-   my ($in, $out) = $x->clump(-1);
+   my ($in, $out) = $x->flat;
    $out = $is_inplace ? $in->inplace : PDL->null;
    PDL::_fibonacci_int($in, $out);
    $out;
@@ -1494,33 +1467,25 @@ pp_def('append',
         PMCode => pp_line_numbers(__LINE__-1, '
 sub PDL::append {
   my ($i1, $i2, $o) = map PDL->topdl($_), @_;
+  $_ = empty() for grep $_->isnull, $i1, $i2;
   my $nempty = grep $_->isempty, $i1, $i2;
   if ($nempty == 2) {
     my @dims = $i1->dims;
     $dims[0] += $i2->dim(0);
     return PDL->zeroes($i1->type, @dims);
   }
-  if ($nempty == 1) {
-    if (!defined $o) {
-      return $i2->isnull ? PDL->zeroes(0) : $i2->copy if $i1->isempty;
-      return $i1->isnull ? PDL->zeroes(0) : $i1->copy;
-    } else {
-      $o .= $i2->isnull ? PDL->zeroes(0) : $i2, return $o if $i1->isempty;
-      $o .= $i1->isnull ? PDL->zeroes(0) : $i1, return $o;
-    }
-  }
   $o //= PDL->null;
+  $o .= $i1->isempty ? $i2 : $i1, return $o if $nempty == 1;
   PDL::_append_int($i1, $i2->convert($i1->type), $o);
   $o;
 }
         '),
-	RedoDimsCode => '$SIZE(mn) = $SIZE(m)+$SIZE(n);',
-	Code => 'register PDL_Indx mnp;
-		 PDL_Indx ns = $SIZE(n);
+        RedoDimsCode => '$SIZE(mn) = $SIZE(n)+$SIZE(m);',
+        Code => 'PDL_Indx ns = $SIZE(n);
                  broadcastloop %{
                        loop(n) %{ $c(mn => n) = $a(); %}
-		       loop(m) %{ mnp = m+ns; $c(mn => mnp) = $b(); %}
-		 %}',
+                       loop(mn=ns) %{ $c() = $b(m=>mn-ns); %}
+                 %}',
 	Doc => '
 =for ref
 
@@ -1603,7 +1568,7 @@ sub PDL::glue{
     while($dim >= $x->ndims) {
 	$x = $x->dummy(-1,1);
     }
-    $x = $x->xchg(0,$dim);
+    $x = $x->xchg(0,$dim) if 0 != $dim;
 
     while(scalar(@_)){
 	my $y = shift;
@@ -1612,10 +1577,10 @@ sub PDL::glue{
 	while($dim >= $y->ndims) {
 		$y = $y->dummy(-1,1);
         }
-	$y = $y->xchg(0,$dim);
+	$y = $y->xchg(0,$dim) if 0 != $dim;
 	$x = $x->append($y);
     }
-    $x->xchg(0,$dim);
+    0 == $dim ? $x : $x->xchg(0,$dim);
 }
 
 EOD
@@ -1646,9 +1611,12 @@ pp_def(
     HandleBad => 1,
     Pars => 'a(n); b(n); sbyte [o]c();',
     Code => '
-     char anybad = 0;
-     broadcastloop %{ $CMPVEC($a(), $b(), n, $c(), anybad); %}
-     PDL_IF_BAD(if (anybad) { $SETBAD(c()); $PDLSTATESETBAD(c); },)
+PDL_IF_BAD(char anybad = 0;,)
+broadcastloop %{
+  $CMPVEC($a(), $b(), n, $c(), anybad);
+  PDL_IF_BAD(if (anybad) $SETBAD(c());,)
+%}
+PDL_IF_BAD(if (anybad) $PDLSTATESETBAD(c);,)
     ',
     Doc => '
 =for ref
@@ -1668,7 +1636,7 @@ pp_def(
     HandleBad => 1,
     Pars => 'a(n); b(n); sbyte [o]c();',
     Code => '
-     char anybad = 0;
+     PDL_IF_BAD(char anybad = 0;,)
      broadcastloop %{
        $c() = 1;
        loop(n) %{
@@ -1688,17 +1656,16 @@ Compare two vectors, returning 1 if equal, 0 if not equal.
 
 pp_def('enumvec',
        Pars => 'v(M,N); indx [o]k(N)',
-       Code =><<'EOC',
-  PDL_Indx vn, kn, sn=$SIZE(N), matches;
+       Code => pp_line_numbers(__LINE__, <<'EOC'),
+  PDL_Indx vn, kn=0, sn=$SIZE(N), matches;
   for (vn=0; vn<sn; vn=kn) {
      for (kn=vn, matches=1; matches && kn<sn; ) {
        $k(N=>kn) = kn-vn;
        ++kn;
        loop (M) %{
-         if ($v(N=>vn) != $v(N=>kn)) {
-           matches=0;
-           break;
-         }
+         if ($v(N=>vn) == $v(N=>kn)) continue;
+         matches=0;
+         break;
        %}
      }
    }
@@ -1725,19 +1692,17 @@ EOD
 pp_def('enumvecg',
        Pars => 'v(M,N); indx [o]k(N)',
        Code =><<'EOC',
-  PDL_Indx vn, vnprev, sn=$SIZE(N), ki;
-  if (sn > 0) {
-    $k(N=>0) = ki = 0;
-    for (vnprev=0, vn=1; vn<sn; vnprev=vn++) {
-       loop (M) %{
-         if ($v(N=>vnprev) != $v(N=>vn)) {
-           ++ki;
-           break;
-         }
-       %}
-       $k(N=>vn) = ki;
-     }
-   }
+if (!$SIZE(N)) continue;
+PDL_Indx Nprev = 0, ki = $k(N=>0) = 0;
+loop(N=1) %{
+  loop (M) %{
+    if ($v(N=>Nprev) == $v()) continue;
+    ++ki;
+    break;
+  %}
+  $k() = ki;
+  Nprev = N;
+%}
 EOC
        Doc =><<'EOD',
 =for ref
@@ -1761,8 +1726,7 @@ pp_def('vsearchvec',
    Code => q(
  int carp=0;
 broadcastloop %{
- PDL_Indx sizeM=$SIZE(M), sizeN=$SIZE(N), n1=sizeN-1;
- PDL_Indx nlo=-1, nhi=n1, nn;
+ PDL_Indx n1=$SIZE(N)-1, nlo=-1, nhi=n1, nn;
  int cmpval, is_asc_sorted;
  //
  //-- get sort direction
@@ -1773,7 +1737,7 @@ broadcastloop %{
  while (nhi-nlo > 1) {
    nn = (nhi+nlo) >> 1;
    $CMPVEC($find(),$which(N=>nn),M,cmpval);
-   if (cmpval > 0 == is_asc_sorted)
+   if ((cmpval > 0) == is_asc_sorted)
      nlo=nn;
    else
      nhi=nn;
@@ -1856,10 +1820,8 @@ EOD
    }
  }
  $nc() = nci;
- for ( ; nci < sizeNC; nci++) {
-  //-- zero unpopulated outputs
-  loop(M) %{ $c(NC=>nci) = 0; %}
- }
+ //-- zero unpopulated outputs
+ loop(NC=nci,M) %{ $c() = 0; %}
 ),
    Doc=><<'EOD'
 =for ref
@@ -1915,10 +1877,8 @@ EOD
    }
  }
  $nc() = nci;
- for ( ; nci < sizeNC; nci++) {
-  //-- zero unpopulated outputs
-  loop(M) %{ $c(NC=>nci) = 0; %}
- }
+ //-- zero unpopulated outputs
+ loop(NC=nci,M) %{ $c() = 0; %}
 ),
    Doc=><<'EOD'
 =for ref
@@ -1976,10 +1936,8 @@ EOD
    loop (M) %{ $c(NC=>nci) = $a(NA=>nai); %}
  }
  $nc() = nci;
- for ( ; nci < sizeNC; nci++) {
-  //-- zero unpopulated outputs
-  loop (M) %{ $c(NC=>nci) = 0; %}
- }
+ //-- zero unpopulated outputs
+ loop (NC=nci,M) %{ $c() = 0; %}
 ),
    Doc=><<'EOD'
 =for ref
@@ -2232,7 +2190,6 @@ EOD
 pp_def(
 	'random',
 	Pars=>'[o] a();',
-        GenericTypes => [ppdefs_all],
 	PMFunc => '',
 	Code => <<'EOF',
 PDL_MAYBE_SRAND
@@ -2245,7 +2202,7 @@ EOF
 	Doc=> <<'EOF',
 =for ref
 
-Constructor which returns ndarray of random numbers
+Constructor which returns ndarray of random numbers, real data-types only.
 
 =for usage
 
@@ -2265,9 +2222,8 @@ EOF
 	PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
 sub random { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->random : PDL->random(@_) }
 sub PDL::random {
-   my $class = shift;
-   unshift @_, double() if !ref($class) and !@_;
-   my $x = scalar(@_)? $class->new_from_specification(@_) : $class->new_or_inplace;
+   splice @_, 1, 0, double() if !ref($_[0]) and @_<=1;
+   my $x = &PDL::Core::_construct;
    PDL::_random_int($x);
    return $x;
 }
@@ -2277,14 +2233,13 @@ EOD
 pp_def(
 	'randsym',
 	Pars=>'[o] a();',
-        GenericTypes => [ppdefs_all],
 	PMFunc => '',
 	Code => <<'EOF',
 PDL_MAYBE_SRAND
 int rand_offset = -1;
 broadcastloop %{
   PDL_RAND_SET_OFFSET(rand_offset, $PRIV(broadcast), $PDL(a));
-  double tmp;
+  long double tmp;
   do tmp = pdl_drand(pdl_rand_state + 4*rand_offset); while (tmp == 0.0); /* 0 < tmp < 1 */
   $a() = tmp;
 %}
@@ -2292,7 +2247,7 @@ EOF
 	Doc=> <<'EOF',
 =for ref
 
-Constructor which returns ndarray of random numbers
+Constructor which returns ndarray of random numbers, real data-types only.
 
 =for usage
 
@@ -2311,9 +2266,8 @@ EOF
 	PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
 sub randsym { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->randsym : PDL->randsym(@_) }
 sub PDL::randsym {
-   my $class = shift;
-   unshift @_, double() if !ref($class) and !@_;
-   my $x = scalar(@_)? $class->new_from_specification(@_) : $class->new_or_inplace;
+   splice @_, 1, 0, double() if !ref($_[0]) and @_<=1;
+   my $x = &PDL::Core::_construct;
    PDL::_randsym_int($x);
    return $x;
 }
@@ -2346,8 +2300,7 @@ If it has not been called yet, it will be with the current time.
 
 sub grandom { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->grandom : PDL->grandom(@_) }
 sub PDL::grandom {
-   my $class = shift;
-   my $x = scalar(@_)? $class->new_from_specification(@_) : $class->new_or_inplace;
+   my $x = &PDL::Core::_construct;
    use PDL::Math 'ndtri';
    $x .= ndtri(randsym($x));
    return $x;
@@ -2913,38 +2866,24 @@ for my $func ( [
 
 
     my $code = undent q[
-                 if ( $SIZE(n) == 0 ){
-                    broadcastloop %{
-                      loop(n) %{
-                        $SETBAD(idx());
-                      %}
-                    %}
-                 }
-                 else {
-                   broadcastloop %{
+                 loop(n) %{
+                    if ( $ISGOOD(vals()) ) {
+                      PDL_Indx n1 = $SIZE(n)-1;
+                      PDL_Indx low = %LOW%;
+                      PDL_Indx high = %HIGH%;
+                      PDL_Indx mid;
 
-                     loop(n) %{
+                      $GENERIC() value = $vals();
 
-                        if ( $ISGOOD(vals()) ) {
-                          PDL_Indx n1 = $SIZE(n)-1;
-                          PDL_Indx low = %LOW%;
-                          PDL_Indx high = %HIGH%;
-                          PDL_Indx mid;
+                      /* determine sort order of data */
+                      int up = %UP%;
+                      %CODE%
+                    }
 
-                          $GENERIC() value = $vals();
-
-                          /* determine sort order of data */
-                          int up = %UP%;
-                          %CODE%
-                        }
-
-                        else {
-                          $SETBAD(idx());
-                        }
-                     %}
-
-                   %}
-                 }
+                    else {
+                      $SETBAD(idx());
+                    }
+                 %}
                  ----
                ];
 
@@ -3096,7 +3035,7 @@ an error message is printed.
 
 =cut
 
-# kept in for backwards compatability
+# kept in for backwards compatibility
 sub interpol ($$$;$) {
     my $xi = shift;
     my $x  = shift;
@@ -3489,7 +3428,7 @@ EOD
 	  Pars => 'mask(n); indx [o] inds(n); indx [o]lastout()',
 	  Variables => 'PDL_Indx dm=0;',
 	  Elseclause => "",
-	  Outclause => '$lastout() = dm; while (dm < $SIZE(n)) $inds(n=>dm++) = -1;',
+	  Outclause => '$lastout() = dm; loop(n=dm) %{ $inds() = -1; %}',
 	  Doc => $doc_which,
 	  PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
    sub which { my ($this,$out) = @_;
@@ -3506,7 +3445,7 @@ EOD
 	  Pars => 'mask(n); indx [o] inds(n); indx [o]notinds(n); indx [o]lastout(); indx [o]lastoutn()',
 	  Variables => 'PDL_Indx dm=0; int dm2=0;',
 	  Elseclause => "else { \n          \$notinds(n => dm2)=n; \n           dm2++;\n     }",
-	  Outclause => '$lastout() = dm; $lastoutn() = dm2; while (dm < $SIZE(n)) $inds(n=>dm++) = -1; while (dm2 < $SIZE(n)) $notinds(n=>dm2++) = -1;',
+	  Outclause => '$lastout() = dm; $lastoutn() = dm2; loop(n=dm) %{ $inds() = -1; %} loop(n=dm2) %{ $notinds() = -1; %}',
 	  Doc => $doc_which_both,
 	  PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
    sub which_both { my ($this,$outi,$outni) = @_;
@@ -3540,6 +3479,49 @@ EOD
 		 %}'.$_->{Outclause},
     );
 }
+
+pp_def('whichover',
+  HandleBad => 1,
+  Inplace => 1,
+  Pars => 'a(n); [o]o(n)',
+  GenericTypes => [ppdefs_all],
+  Code => <<'EOF',
+PDL_Indx last = 0;
+loop(n) %{
+  if ($a() PDL_IF_BAD(&& $ISGOOD($a()),)) $o(n=>last++) = n;
+%}
+loop(n=last) %{ $o() = -1; %}
+EOF
+  Doc => <<'EOF',
+=for ref
+
+Collects the coordinates of non-zero, non-bad values in each 1D mask in
+ndarray at the start of the output, and fills the rest with -1. Works
+inplace.
+
+By using L<PDL::Slices/xchg> etc. it is possible to use I<any> dimension.
+
+=for usage
+
+  my $a = pdl q[3 4 2 3 2 3 1];
+  my $b = $a->uniq;
+  my $c = +($a->dummy(0) == $b)->transpose;
+  print $c, $c->whichover;
+  # [
+  #  [0 0 0 0 0 0 1]
+  #  [0 0 1 0 1 0 0]
+  #  [1 0 0 1 0 1 0]
+  #  [0 1 0 0 0 0 0]
+  # ]
+  # [
+  #  [ 6 -1 -1 -1 -1 -1 -1]
+  #  [ 2  4 -1 -1 -1 -1 -1]
+  #  [ 0  3  5 -1 -1 -1 -1]
+  #  [ 1 -1 -1 -1 -1 -1 -1]
+  # ]
+
+EOF
+);
 
 pp_add_exported("", 'where');
 pp_addpm(<<'EOD');
@@ -3589,21 +3571,9 @@ broadcast over a smaller mask, for example.
 =cut
 
 sub PDL::where {
-    barf "Usage: where( \$pdl1, ..., \$pdlN, \$mask )\n" if @_ == 1;
-    if(@_ == 2) {
-	my($data,$mask) = @_;
-	$data = $_[0]->clump(-1) if $_[0]->getndims>1;
-	$mask = $_[1]->clump(-1) if $_[0]->getndims>1;
-	return $data->index($mask->which());
-    } else {
-	if($_[-1]->getndims > 1) {
-	    my $mask = $_[-1]->clump(-1)->which;
-	    return map {$_->clump(-1)->index($mask)} @_[0..$#_-1];
-	} else {
-	    my $mask = $_[-1]->which;
-	    return map {$_->index($mask)} @_[0..$#_-1];
-	}
-    }
+  barf "Usage: where( \$pdl1, ..., \$pdlN, \$mask )\n" if @_ == 1;
+  my $mask = pop->flat->which;
+  @_ == 1 ? $_[0]->flat->index($mask) : map $_->flat->index($mask), @_;
 }
 *where = \&PDL::where;
 
@@ -3641,7 +3611,7 @@ rather than index-sets are returned.
 sub PDL::where_both {
   barf "Usage: where_both(\$pdl, \$mask)\n" if @_ != 2;
   my ($arr, $mask) = @_;  # $mask has 0==false, 1==true
-  my $arr_flat = $arr->clump(-1);
+  my $arr_flat = $arr->flat;
   map $arr_flat->index1d($_), PDL::which_both($mask);
 }
 *where_both = \&PDL::where_both;
@@ -3804,8 +3774,7 @@ sub PDL::whichND {
 	  printf STDERR "whichND: WARNING - list context deprecated. Set \$PDL::whichND. Details in pod.";
       } elsif($PDL::whichND =~ m/l/i) {
 	  # old list context enabled by setting $PDL::whichND to 'l'
-	  my $ind=($mask->clump(-1))->which;
-	  return $mask->one2nd($ind);
+	  return $mask->one2nd($mask->flat->which);
       }
       # if $PDL::whichND does not contain 'l' or 'L', fall through to scalar context
   }

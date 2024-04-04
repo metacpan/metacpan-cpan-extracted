@@ -5,7 +5,7 @@ use 5.008;
 use strict;
 use warnings;
 
-use Test::More 0.88;
+use Test2::V0;
 
 use lib qw{ inc };
 use My::Module::Test::App qw{ load_or_skip };

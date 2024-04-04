@@ -1,5 +1,14 @@
 Revision history for Synth-Config
 
+0.0042 2024-03-31 20:12:33
+    - Fix eg/visualize.pl and Module.yaml.
+
+0.0041 2024-03-31 13:16:21
+    - Improve documentation.
+    - Improve eg/synth-config-mojo.pl.
+    - Add the eg/visualize.pl program.
+    - WIP: Add spec things to the databasse.
+
 0.0040 2023-07-04 21:23:24
     - Add the missing Top=100% value.
     - Require a name field for setting insert.

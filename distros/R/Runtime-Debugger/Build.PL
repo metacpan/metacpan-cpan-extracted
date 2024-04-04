@@ -21,6 +21,11 @@ my $class = Module::Build->subclass(
             }
             $s->SUPER::ACTION_installdeps;
         }
+        sub ACTION_readme {
+            my ($s) = @_;
+            print "Building README\n";
+            system "pod2markdown lib/Runtime/Debugger.pm > README.md";
+        }
     },
 );
 
@@ -37,7 +42,7 @@ my $builder = $class->new(
         'Test::More' => '0',
     },
     requires => {
-        'perl'                => '5.014',
+        'perl'                => '5.018',
         'Term::ReadLine::Gnu' => '1.44',
         'PadWalker'           => '2.5',
         'Class::Tiny'         => '1.008',

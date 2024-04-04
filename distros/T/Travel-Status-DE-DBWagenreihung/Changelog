@@ -1,3 +1,7 @@
+Travel::Status::DE::DBWagenreihung 0.12 - Fri Mar 29 2024
+
+    * Wagon: Add is_closed accessor
+
 Travel::Status::DE::DBWagenreihung 0.11 - Thu Mar 07 2024
 
     * Add another regional train model

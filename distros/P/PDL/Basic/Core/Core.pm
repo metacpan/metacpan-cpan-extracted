@@ -60,8 +60,8 @@ $PDL::toolongtoprint = 10000;  # maximum pdl size to stringify for printing
 
 *at_c = *at_bad_c; # back-compat alias
 *thread_define = *broadcast_define;
-*PDL::threadover_n = *PDL::broadcastover_n;
 
+our @pdl_ones; # optimisation to provide a "one" of the right type to avoid converttype
 for my $t (PDL::Types::types()) {
   my $conv = $t->convertfunc;
   no strict 'refs';
@@ -69,6 +69,7 @@ for my $t (PDL::Types::types()) {
     return $t unless @_;
     alltopdl('PDL', (@_>1 ? [@_] : shift), $t);
   };
+  $pdl_ones[$t->enum] = pdl($t, 1);
 }
 
 BEGIN {
@@ -662,7 +663,7 @@ below for usage).
 
 Sets the ndarray's data type to the given value (the integer identifier
 for the type, see L<PDL::Types/enum>). See L</get_datatype>. Internal
-function.
+function. Errors if ndarray has child transforms. Severs if has a parent.
 
 =head2 get_datatype
 
@@ -757,7 +758,7 @@ sub topdl {PDL->topdl(@_)}
         unless $_[0]->nelem == 1;
       confess("bad value ndarray in conditional expression")
         if $_[0]->badflag and $_[0].'' eq 'BAD';
-      $_[0]->clump(-1)->at(0);
+      $_[0]->flat->at(0);
     },
     ;
 }
@@ -1469,19 +1470,11 @@ C<[o]>, C<[oca]>, C<[io]>, or C<[t]> in C<Pars>).
 
 The memory address of the struct.
 
-=item name
-
-The function name from the vtable.
-
 =item flags
 
 List of strings of flags set for this trans.
 
-=item flags_vtable
-
-List of strings of flags set for this trans's vtable.
-
-=item vaffine
+=item affine
 
 Whether the trans is affine.
 
@@ -1500,6 +1493,23 @@ The size of each named dim.
 =item inc_sizes
 
 The size of the inc for each use of a named dim.
+
+=item vtable
+
+This trans's vtable.
+
+=item C<< $vtable->name >>
+
+The function name from this vtable.
+
+=item C<< $vtable->flags >>
+
+List of strings of flags set for this vtable.
+
+=item C<< $vtable->par_names >>
+
+List of 2 array-refs of strings of names of input pars, then output pars,
+for this vtable.
 
 =back
 
@@ -1752,7 +1762,9 @@ the usual cases. The following example demonstrates typical usage:
   $x = sequence 2,3,3,3,5; # 5D ndarray
   $c = $x->clump(1..3);    # clump all the dims 1 to 3 into one
   print $c->info;          # resulting 3D ndarray has clumped dim at pos 1
- PDL: Double D [2,27,5]
+  PDL: Double D [2,27,5]
+
+Data flows back and forth as usual with slicing routines.
 
 =cut
 
@@ -1869,7 +1881,7 @@ sub PDL::broadcast_define ($$) {
   *{"$package\::$name"} = sub {
     @_[0..$args] = map PDL::Core::topdl($_), @_[0..$args];
     $sig->checkdims(@_);
-    PDL::broadcastover($others,@_,$sig->realdims,$sig->creating,$sub);
+    PDL::broadcastover($sub,$sig->realdims,$sig->creating,$others,@_);
   };
 }
 
@@ -1887,8 +1899,18 @@ Use explicit broadcasting over specified dimensions (see also L<PDL::Indexing>)
 
  $x = zeroes 3,4,5;
  $y = $x->broadcast(2,0);
+ print $y->info; # PDL: Double D [4] T1 [5,3]
+ $pb = zeroes(3,3);
+ print $pb->broadcast(0,1)->info; # PDL: Double D [] T1 [3,3]
+ print $pb->broadcast(0)->info; #  'PDL: Double D [3] T1 [3]
+ print zeroes(4,7,2,8)->broadcast(2)->info; # PDL: Double D [4,7,8] T1 [2]
+ print zeroes(4,7,2,8)->broadcast(2,1)->info; # PDL: Double D [4,8] T1 [2,7]
+ print zeroes(4,7,2,8,5,6)->broadcast(2,4)->info; # PDL: Double D [4,7,8,6] T1 [2,5]
+ print zeroes(4,7,2,8,5,6)->broadcast1(2)->broadcast2(3)->info; # PDL: Double D [4,7,8,6] T1 [2] T2 [5]
 
 Same as L</broadcast1>, i.e. uses broadcast id 1.
+To use broadcast id 2, use L</broadcast2>, or L<PDL::Slices/broadcastI>
+directly.
 
 =cut
 
@@ -2028,11 +2050,11 @@ sub dimstr {
 
   my @dims = $this->dims;
   my @ids  = $this->broadcastids;
-  my ($nids,$i) = ($#ids - 1,0);
+  my ($nids,$i) = ($#ids,0);
   my $dstr = 'D ['. join(',',@dims[0..($ids[0]-1)]) .']';
   if ($nids > 0) {
     for $i (1..$nids) {
-      $dstr .= " T$i [". join(',',@dims[$ids[$i]..$ids[$i+1]-1]) .']';
+      $dstr .= " T$i [". join(',',@dims[$ids[$i-1]..$ids[$i]-1]) .']';
     }
   }
   return $dstr;
@@ -2183,7 +2205,7 @@ sub pdump {
     "Dims: (@dims)",
     "BroadcastIds: (@{[$pdl->broadcastids_nophys]})",
   );
-  push @lines, sprintf "Vaffine: 0x%x (parent)", $pdl->vaffine_from if $pdl->vaffine;
+  push @lines, sprintf "Vaffine: 0x%x (parent)", $pdl->vaffine_from if $pdl->has_vafftrans;
   push @lines, !$pdl->allocated ? '(not allocated)' : join "\n  ",
     sprintf("data: 0x%x, nbytes: %d, nvals: %d", $pdl->address_data, $pdl->nbytes, $pdl->nelem_nophys),
     "First values: (@{[$pdl->firstvals_nophys]})",
@@ -2215,9 +2237,10 @@ Not exported, and not inserted into the C<PDL> namespace.
 
 sub pdump_trans {
   my ($trans) = @_;
+  my $vtable = $trans->vtable;
   my @lines = (
     "State: ${\join '|', $trans->flags}",
-    "vtable flags: ${\join '|', $trans->flags_vtable}",
+    "vtable flags: ${\join '|', $vtable->flags}",
   );
   my @ins = $trans->parents;
   my @outs = $trans->children;
@@ -2225,13 +2248,13 @@ sub pdump_trans {
     "AFFINE, " . ($outs[0]->dimschgd
       ? "BUT DIMSCHANGED"
       : "o:".$trans->offs."  i:(@{[$trans->incs]}) d:(@{[$outs[0]->dims_nophys]})")
-    if $trans->vaffine;
+    if $trans->affine;
   push @lines,
     "ind_sizes: (@{[$trans->ind_sizes]})",
     "inc_sizes: (@{[$trans->inc_sizes]})",
     "INPUTS: (@{[map sprintf('0x%x', $_->address), @ins]})  OUTPUTS: (@{[map sprintf('0x%x', $_->address), @outs]})",
     ;
-  join '', "PDUMPTRANS 0x${\sprintf '%x', $trans->address} (${\$trans->name})\n", map "  $_\n", @lines;
+  join '', "PDUMPTRANS 0x${\sprintf '%x', $trans->address} (${\$vtable->name})\n", map "  $_\n", @lines;
 }
 
 =head2 pdumphash
@@ -2260,14 +2283,16 @@ sub pdumphash {
   my $addr = sprintf '0x%x', $obj->address; # both ndarray and trans
   return $sofar if $sofar->{$addr};
   if ($obj->isa('PDL::Trans')) {
+    my $vtable = $obj->vtable;
     my @ins = $obj->parents;
     my @outs = $obj->children;
     $sofar->{$addr} = {
       kind => 'trans',
-      name => $obj->name,
+      name => $vtable->name,
       flags => [$obj->flags],
-      vtable_flags => [$obj->flags_vtable],
-      !($obj->vaffine && !$outs[0]->dimschgd) ? () : (
+      vtable_flags => [$vtable->flags],
+      par_names => [$vtable->par_names],
+      !($obj->affine && !$outs[0]->dimschgd) ? () : (
         affine => "o:".$obj->offs." i:(@{[$obj->incs]}) d:(@{[$outs[0]->dims_nophys]})"
       ),
       ins => [map sprintf('0x%x', $_->address), @ins],
@@ -2281,7 +2306,7 @@ sub pdumphash {
       kind => 'ndarray',
       datatype => $obj->get_datatype,
       flags => [$obj->flags],
-      !$obj->vaffine ? () : (
+      !$obj->has_vafftrans ? () : (
         vaffine_from => sprintf("0x%x", $obj->vaffine_from),
       ),
       !$obj->allocated ? () : (
@@ -2319,8 +2344,11 @@ sub pdumpgraph {
   my $g = Graph->new(multiedged=>1);
   for my $addr (keys %$hash) {
     $g->set_vertex_attributes($addr, my $props = $hash->{$addr});
-    $g->add_edge_by_id($_, $addr, 'normal') for @{ $props->{ins} };
-    $g->add_edge_by_id($addr, $_, 'normal') for @{ $props->{outs} };
+    if ($props->{kind} eq 'trans') {
+      my ($ins, $outs) = @$props{qw(ins outs)};
+      $g->add_edge_by_id($ins->[$_], $addr, $_) for 0..$#$ins;
+      $g->add_edge_by_id($addr, $outs->[$_], $_) for 0..$#$outs;
+    }
     if (my $from = $props->{vaffine_from}) {
       $g->add_edge_by_id($addr, $from, 'vaffine_from');
     }
@@ -2363,25 +2391,36 @@ Not exported, and not inserted into the C<PDL> namespace.
 sub pdumpgraphvizify {
   my ($g) = @_;
   for my $v ($g->vertices) {
-    my $kind = $g->get_vertex_attribute($v, 'kind');
-    if (my $from = $g->get_vertex_attribute($v, 'vaffine_from')) {
+    my $attrs = $g->get_vertex_attributes($v);
+    my $kind = $attrs->{kind};
+    if (my $from = $attrs->{vaffine_from}) {
       $g->set_edge_attribute_by_id(
         $v, $from, 'vaffine_from',
         graphviz => { style => 'dashed', constraint => 'false' },
       );
     }
-    my @blocks;
-    push @blocks, $g->get_vertex_attribute($v, 'name') if $kind eq 'trans';
-    push @blocks, join '', map "$_\\l", @{$g->get_vertex_attribute($v, 'flags')};
+    my @blocks = join '', map "$_\\l", @{$attrs->{flags}};
     if ($kind eq 'trans') {
-      my @vflags = @{$g->get_vertex_attribute($v, 'vtable_flags')};
+      my ($in_names, $out_names) = @{$attrs->{par_names}}[0,1];
+      my ($ins, $outs) = @$attrs{qw(ins outs)};
+      unshift @blocks, [map +{text=>$in_names->[$_],port=>"i$_"}, 0..$#$ins], $attrs->{name};
+      $g->set_edge_attribute_by_id(
+        $ins->[$_], $v, $_,
+        graphviz => { headport => ["i$_","n"] },
+      ) for 0..$#$ins;
+      my @vflags = @{$attrs->{vtable_flags}};
       push @blocks, join '', map "$_\\l", @vflags ? @vflags : '(no vtable flags)';
-      my $affine = $g->get_vertex_attribute($v, 'affine');
+      my $affine = $attrs->{affine};
       push @blocks, $affine if $affine;
+      push @blocks, [map +{text=>$out_names->[$_],port=>"o$_"}, 0..$#$outs];
+      $g->set_edge_attribute_by_id(
+        $v, $outs->[$_], $_,
+        graphviz => { tailport => ["o$_","s"] },
+      ) for 0..$#$outs;
     } else {
-      my $firstvals = $g->get_vertex_attribute($v, 'firstvals');
+      my $firstvals = $attrs->{firstvals};
       $firstvals = ", (".($firstvals ? "@$firstvals" : 'not allocated').")";
-      push @blocks, 'datatype: '.$g->get_vertex_attribute($v, 'datatype'). $firstvals;
+      push @blocks, "datatype: $attrs->{datatype}$firstvals";
     }
     $g->set_vertex_attribute($v, graphviz => {
       shape => 'record',
@@ -2393,7 +2432,6 @@ sub pdumpgraphvizify {
     global => {directed => 1, combine_node_and_port => 0},
     graph => {concentrate => 'true', rankdir => 'TB'},
   });
-
   $g;
 }
 
@@ -2452,10 +2490,10 @@ Alias to L<PDL::Slices/slice>.
 =for ref
 
 If C<$self> is a PDL, then calls C<slice> with all but the last
-argument, otherwise $self->($_[-1]) is called where $_[-1} is the
+argument, otherwise C<< $self->($_[-1]) >> is called where C<$_[-1]> is the
 original argument string found during PDL::NiceSlice filtering.
 
-DEVELOPER'S NOTE: this routine is found in Core.pm.PL but would be
+DEVELOPER'S NOTE: this routine is found in Core.pm but would be
 better placed in Slices/slices.pd.  It is likely to be moved there
 and/or changed to "slice_if_pdl" for PDL 3.0.
 
@@ -2481,18 +2519,7 @@ sub PDL::nslice_if_pdl {
    goto &PDL::slice;
 }
 
-# Convert numbers to PDL if not already
-
-sub PDL::topdl {
-    return $_[0]->new(@_[1..$#_]) if($#_ > 1); # PDLify an ARRAY
-    return $_[1] if blessed($_[1]); # Fall through
-    return $_[0]->new($_[1]) if ref(\$_[1]) eq  'SCALAR' or
-           ref($_[1]) eq 'ARRAY';
-    barf("Can not convert a ".ref($_[1])." to a ".$_[0]);
-0;}
-
 # Convert everything to PDL if not blessed
-
 sub alltopdl {
     if (ref $_[2] eq 'PDL::Type') {
       return convert($_[1], $_[2]) if blessed($_[1]);
@@ -2500,7 +2527,7 @@ sub alltopdl {
     }
     return $_[1] if blessed($_[1]); # Fall through
     return $_[0]->new($_[1]);
-0;}
+}
 
 =head2 tracedebug
 
@@ -2570,16 +2597,6 @@ operate array element by array element like C<log10>).
  pdl> log10(inplace $x)
  pdl> p $x
  [-inf 0    0.30103 0.47712125 0.60205999    0.69897 0.77815125 0.84509804 0.90308999 0.95424251]
-
-=cut
-
-# Flag pdl for in-place operations
-
-sub PDL::inplace {
-    my $pdl = PDL->topdl(shift); $pdl->set_inplace(1); return $pdl;
-}
-
-# Copy if not inplace
 
 =head2 is_inplace
 
@@ -2706,30 +2723,6 @@ as if you had said
 This is unfortunate and confusing but no good solution seems
 obvious that would not break existing scripts.
 
-=cut
-
-sub PDL::new_from_specification{
-    my $class = shift;
-    my $type = ref($_[0]) eq 'PDL::Type' ? ${shift @_}[0]  : $PDL_D;
-    my @dims = &_dims_from_args;
-    my $pdl = $class->initialize();
-    $pdl->set_datatype($type);
-    $pdl->setdims(\@dims);
-    print "Dims: ",(join ',',@dims)," DLen: ",length(${$pdl->get_dataref}),"\n" if $PDL::debug;
-    return $pdl;
-}
-
-sub _dims_from_args {
-    barf "Dimensions must be non-negative" if grep !ref && ($_||0)<0, @_;
-    barf "Trying to use non-ndarray as dimensions?"
-       if grep ref && !$_->isa('PDL'), @_;
-    barf "Trying to use multi-dim ndarray as dimensions?"
-       if grep ref && $_->getndims > 1, @_;
-    warn "creating > 10 dim ndarray (ndarray arg)!"
-       if grep ref && $_->nelem > 10, @_;
-    map ref($_) ? $_->list : $_ || 0, @_;
-}
-
 =head2 isnull
 
 =for ref
@@ -2823,24 +2816,6 @@ for details on using ndarrays in the dimensions list.
 =cut
 
 sub zeroes { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? PDL::zeroes($_[0]) : PDL->zeroes(@_) }
-sub PDL::zeroes {
-    my $class = shift;
-    my $ispdl = ref $class && UNIVERSAL::isa($class, 'PDL');
-    if ($ispdl and $class->is_inplace) {
-        $class .= 0; # resets the "inplace"
-        return $class;
-    }
-    my $type =
-      ref($_[0]) eq 'PDL::Type' ? ${shift @_}[0] :
-      $ispdl ? $class->get_datatype :
-      $PDL_D;
-    my @dims = _dims_from_args($ispdl && !@_ ? $class->dims : @_);
-    my $pdl = $class->initialize();
-    $pdl->set_datatype($type);
-    $pdl->setdims(\@dims);
-    $pdl->make_physical;
-    return $pdl;
-}
 
 # Create convenience aliases for zeroes
 
@@ -2882,7 +2857,7 @@ sub _construct {
 sub ones { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? PDL::ones($_[0]) : PDL->ones(@_) }
 sub PDL::ones {
     my $pdl = &_construct;
-    $pdl.=1;
+    $pdl .= ($pdl_ones[$pdl->get_datatype]//barf "Couldn't find 'one' for type ", $pdl->get_datatype);
     return $pdl;
 }
 
@@ -3048,7 +3023,7 @@ then the connection is first severed.
 =cut
 
 *reshape = \&PDL::reshape;
-sub PDL::reshape{
+sub PDL::reshape {
     my $pdl = topdl($_[0]);
     if (@_ == 2 && $_[1] == -1) {  # a slicing reshape that drops 1-dims
 	return $pdl->slice( map $_==1 ? [0,0,0] : [], $pdl->dims);
@@ -3061,7 +3036,7 @@ sub PDL::reshape{
     $pdl->setdims(\@dims);
     $pdl->make_physical;
     if ($pdl->nelem > $nelem) {
-	my $tmp=$pdl->clump(-1)->slice("$nelem:-1");
+	my $tmp = $pdl->flat->slice("$nelem:-1");
 	$tmp .= 0;
     }
     $_[0] = $pdl;
@@ -3103,7 +3078,7 @@ flatten an ndarray (alias for C<< $pdl->clump(-1) >>)
 Useful method to make a 1D ndarray from an
 arbitrarily sized input ndarray. Data flows
 back and forth as usual with slicing routines.
-Falls through if argument already E<lt>= 1D.
+Falls through if argument already != 1D.
 
 =cut
 
@@ -3121,28 +3096,33 @@ Generic datatype conversion function
 =for usage
 
  $y = convert($x, $newtype);
+ $y = $x->convert($newtype);
+ $x->inplace->convert($newtype);
 
 C<$newtype> is a type number or L<PDL::Type> object, for convenience they are
 returned by C<long()> etc when called without arguments.
+Can work in-place, though will C<sever> if so.
 
 =for example
 
  $y = convert $x, long;
- $y = convert $x, ushort;
+ $y = $x->convert(ushort);
+ $x->inplace->convert(double);
 
 =cut
 
+my $CONVERT_ERR = "Usage: \$y = convert(\$x, \$newtype)\n";
 sub PDL::convert {
-  # we don't allow inplace conversion at the moment
-  # (not sure what needs to be changed)
-  barf 'Usage: $y = convert($x, $newtype)'."\n" if @_ != 2;
+  barf $CONVERT_ERR if @_ != 2;
   my ($pdl,$type)= @_;
   $pdl = topdl($pdl); # Allow normal numbers
   barf "Tried to convert(null)" if $pdl->isnull;
   $type = $type->enum if ref($type) eq 'PDL::Type';
-  barf 'Usage: $y = convert($x, $newtype)'."\n" unless Scalar::Util::looks_like_number($type);
+  barf $CONVERT_ERR unless Scalar::Util::looks_like_number($type);
   return $pdl if $pdl->get_datatype == $type;
-  $pdl->_convert_int($type)->sever;
+  return $pdl->_convert_int($type)->sever if !$pdl->is_inplace;
+  $pdl->set_datatype($type);
+  $pdl;
 }
 
 =head2 Datatype_conversions
@@ -3267,46 +3247,50 @@ sub PDL::type { return PDL::Type->new($_[0]->get_datatype); }
 
 ##################### Printing ####################
 
-# New string routine
+=head2 string
+
+=for ref
+
+Convert ndarray to string, optionally using a C<sprintf> format. If such
+a format is provided, it is used. If not, then the formatting variables
+in L</VARIABLES> provide a default, though heuristics are attempted to
+make a nice-looking output.
+
+=for usage
+
+ print $x; # overloaded
+ print $x->string; # explicit method call
+ print $x->string("%5d"); # providing sprintf format
+
+=cut
 
 $PDL::_STRINGIZING = 0;
 
 sub PDL::string {
-    my($self,$format)=@_;
-    my $to_return = eval {
-		if($PDL::_STRINGIZING) {
-			return "ALREADY_STRINGIZING_NO_LOOPS";
-		}
-		local $PDL::_STRINGIZING = 1;
-		my $ndims = $self->getndims;
-		if($self->nelem > $PDL::toolongtoprint) {
-			return "TOO LONG TO PRINT";
-		}
-		if ($ndims==0) {
-		if ( $self->badflag() and $self->isbad() ) {
-			return "BAD";
-		} else {
-			my @x = $self->at();
-			return ($format ? sprintf($format, $x[0]) : "$x[0]");
-		}
-		}
-		return "Null" if $self->isnull;
-		return "Empty[".join("x",$self->dims)."]" if $self->isempty; # Empty ndarray
-		local $sep  = $PDL::use_commas ? "," : " ";
-		local $sep2 = $PDL::use_commas ? "," : "";
-		if ($ndims==1) {
-		   return str1D($self,$format);
-		}
-		else{
-		   return strND($self,$format,0);
-		}
-	};
-	if ($@) {
-		# Remove reference to this line:
-		$@ =~ s/\s*at .* line \d+\s*\.\n*/./;
-		PDL::Core::barf("Stringizing problem: $@");
-	}
-	return $to_return;
+  my ($self,$format) = @_;
+  my $to_return = eval {
+    return "ALREADY_STRINGIZING_NO_LOOPS" if $PDL::_STRINGIZING;
+    local $PDL::_STRINGIZING = 1;
+    return "Null" if $self->isnull;
+    return "Empty[".join("x",$self->dims)."]" if $self->isempty;
+    return "TOO LONG TO PRINT" if $self->nelem > $PDL::toolongtoprint;
+    my $ndims = $self->getndims;
+    if ($ndims==0) {
+      return "BAD" if $self->badflag and $self->isbad;
+      my $x = $self->sclr;
+      return $format ? sprintf($format, $x) : "$x";
+    }
+    local $sep  = $PDL::use_commas ? "," : " ";
+    local $sep2 = $PDL::use_commas ? "," : "";
+    return str1D($self,$format) if $ndims==1;
+    return strND($self,$format,0);
+  };
+  if ($@) {
+    # Remove reference to this line:
+    $@ =~ s/\s*at .* line \d+\s*\.\n*/./;
+    PDL::Core::barf("Stringizing problem: $@");
+  }
+  return $to_return;
 }
 
 ############## Section/subsection functions ###################
@@ -3573,115 +3557,93 @@ to 10x) than cat.
 
 =cut
 
+# takes a list of array-refs with dims, returns list of maximalised
+# broadcast-compatible dim lengths
+sub dims_filled {
+  my @resdims = @{shift()};
+  while (@_) {
+    my @d = @{shift()};
+    for my $j (0..$#d) {
+      $resdims[$j] = $d[$j] if( !defined($resdims[$j]) or $resdims[$j]==1 );
+      die "mismatched dims\n" if $d[$j] != 1 and $resdims[$j] != $d[$j];
+    }
+  }
+  @resdims;
+}
+
 sub PDL::cat {
-	my $res;
-	my $old_err = $@;
-	$@ = '';
-	eval {
-		$res = $_[0]->initialize;
-		$res->set_datatype(max(map $_->get_datatype, @_));
+  barf("Called PDL::cat without any arguments") unless @_;
+  my (@yes_ndarray, @not_a_ndarray);
+  push @{UNIVERSAL::isa($_[$_], 'PDL')?\@yes_ndarray:\@not_a_ndarray}, $_ for 0..$#_;
+  barf("Called PDL::cat without any ndarray arguments") if !@yes_ndarray;
+  my $old_err = $@;
+  $@ = '';
+  my @resdims = eval { dims_filled(map [$_->dims], @_[@yes_ndarray]) };
+  if (!$@ and $yes_ndarray[0] == 0) {
+    my $res;
+    eval {
+      $res = $_[0]->initialize;
+      $res->set_datatype(max(map $_->get_datatype, @_));
 
-		my @resdims = $_[0]->dims;
-		for my $i(0..$#_){
-		    my @d = $_[$i]->dims;
-		    for my $j(0..$#d) {
-			$resdims[$j] = $d[$j] if( !defined($resdims[$j]) or $resdims[$j]==1 );
-			die "mismatched dims\n" if($d[$j] != 1 and $resdims[$j] != $d[$j]);
-		    }
-		}
-		$res->setdims( [@resdims,scalar(@_) ]);
-		my ($i,$t); my $s = ":,"x@resdims;
-		for (@_) { $t = $res->slice($s."(".$i++.")"); $t .= $_}
+      $res->setdims([@resdims,scalar(@_)]);
+      my @dog = $res->dog;
+      $dog[$_] .= $_[$_] for 0..$#_;
 
-		# propagate any bad flags
-		for (@_) { if ( $_->badflag() ) { $res->badflag(1); last; } }
-	};
-	$@ = $old_err, return $res if !$@; # Restore the old error and return
+      # propagate any bad flags
+      for (@_) { if ( $_->badflag() ) { $res->badflag(1); last; } }
+    };
+    $@ = $old_err, return $res if !$@; # Restore the old error and return
+  }
 
-	# If we've gotten here, then there's been an error, so check things
-	# and barf out a meaningful message.
+  # If we've gotten here, then there's been an error, so check things
+  # and barf out a meaningful message.
 
-	if  ($@ =~ /PDL::Ops::assgn|mismatched/
-	  or $@ =~ /"badflag"/
-	  or $@ =~ /"initialize"/) {
-		my (@mismatched_dims, @not_a_ndarray);
-		my $i = 0;
+  my ($first_ndarray_argument, @mismatched_dims) = $yes_ndarray[0];
+  if ($@ and $@ =~ /mismatched/) {
+    # Get the dimensions of the first actual ndarray in the argument list:
+    my @dims = $_[$first_ndarray_argument]->dims;
+    # Figure out all the ways that the caller screwed up:
+    for my $i (@yes_ndarray) {
+      my $arg = $_[$i];
+      if (@dims != $arg->ndims) { # Check if different number of dimensions
+        push @mismatched_dims, $i;
+      } else { # Check if size of dimensions agree
+        DIMENSION: for (my $j = 0; $j < @dims; $j++) {
+          next if $dims[$j] == $arg->dim($j);
+          push @mismatched_dims, $i;
+          last DIMENSION;
+        }
+      }
+      $i++;
+    }
+  }
+  # Handle the edge case that something else happened:
+  barf "cat: unknown error from the internals:\n$@"
+    if ($@ and $@ !~ /PDL::Ops::assgn|mismatched/) or
+    (!@not_a_ndarray and !@mismatched_dims);
 
-		# non-ndarrays and/or dimension mismatch.  The first argument is
-		# ok unless we have the "initialize" error:
-		if ($@ =~ /"initialize"/) {
-			# Handle the special case that there are *no* args passed:
-			barf("Called PDL::cat without any arguments") unless @_;
-
-			while ($i < @_ and not eval{ $_[$i]->isa('PDL')}) {
-				push (@not_a_ndarray, $i);
-				$i++;
-			}
-		}
-
-		# Get the dimensions of the first actual ndarray in the argument
-		# list:
-		my $first_ndarray_argument = $i;
-		my @dims = $_[$i]->dims if ref($_[$i]) =~ /PDL/;
-
-		# Figure out all the ways that the caller screwed up:
-		while ($i < @_) {
-			my $arg = $_[$i];
-			# Check if not an ndarray
-			if (not eval{$arg->isa('PDL')}) {
-				push @not_a_ndarray, $i;
-			}
-			# Check if different number of dimensions
-			elsif (@dims != $arg->ndims) {
-				push @mismatched_dims, $i;
-			}
-			# Check if size of dimensions agree
-			else {
-				DIMENSION: for (my $j = 0; $j < @dims; $j++) {
-					if ($dims[$j] != $arg->dim($j)) {
-						push @mismatched_dims, $i;
-						last DIMENSION;
-					}
-				}
-			}
-			$i++;
-		}
-
-		# Construct a message detailing the results
-		my $message = "bad arguments passed to function PDL::cat\n";
-		if (@mismatched_dims > 1) {
-			# Many dimension mismatches
-			$message .= "The dimensions of arguments "
-						. join(', ', @mismatched_dims[0 .. $#mismatched_dims-1])
-						. " and $mismatched_dims[-1] do not match the\n"
-						. "   dimensions of the first ndarray argument (argument $first_ndarray_argument).\n";
-		}
-		elsif (@mismatched_dims) {
-			# One dimension mismatch
-			$message .= "The dimensions of argument $mismatched_dims[0] do not match the\n"
-						. "   dimensions of the first ndarray argument (argument $first_ndarray_argument).\n";
-		}
-		if (@not_a_ndarray > 1) {
-			# many non-ndarrays
-			$message .= "Arguments " . join(', ', @not_a_ndarray[0 .. $#not_a_ndarray-1])
-						. " and $not_a_ndarray[-1] are not ndarrays.\n";
-		}
-		elsif (@not_a_ndarray) {
-			# one non-ndarray
-			$message .= "Argument $not_a_ndarray[0] is not an ndarray.\n";
-		}
-
-		# Handle the edge case that something else happened:
-		if (@not_a_ndarray == 0 and @mismatched_dims == 0) {
-			barf("cat: unknown error from the internals:\n$@");
-		}
-
-		$message .= "(Argument counting starts from zero.)";
-		croak($message);
-	}
-	else {
-		croak("cat: unknown error from the internals:\n$@");
-	}
+  # Construct a message detailing the results
+  my $message = "bad arguments passed to function PDL::cat\n";
+  if (@mismatched_dims > 1) {
+    # Many dimension mismatches
+    $message .= "The dimensions of arguments "
+      . join(', ', @mismatched_dims[0 .. $#mismatched_dims-1])
+      . " and $mismatched_dims[-1] do not match the\n"
+      . "   dimensions of the first ndarray argument (argument $first_ndarray_argument).\n";
+  } elsif (@mismatched_dims) {
+    # One dimension mismatch
+    $message .= "The dimensions of argument $mismatched_dims[0] do not match the\n"
+      . "   dimensions of the first ndarray argument (argument $first_ndarray_argument).\n";
+  }
+  if (@not_a_ndarray > 1) {
+    # many non-ndarrays
+    $message .= "Arguments " . join(', ', @not_a_ndarray[0 .. $#not_a_ndarray-1])
+      . " and $not_a_ndarray[-1] are not ndarrays.\n";
+  } elsif (@not_a_ndarray) {
+    # one non-ndarray
+    $message .= "Argument $not_a_ndarray[0] is not an ndarray.\n";
+  }
+  croak($message . "(Argument counting starts from zero.)");
 }
 
 =head2 dog
@@ -3769,128 +3731,62 @@ sub strND {
 # String 1D array in nice format
 
 sub str1D {
-    my($self,$format)=@_;
-    barf "Not 1D" if $self->getndims()!=1;
-    my $x = listref_c($self);
-    my ($ret,$dformat,$t);
-    $ret = "[";
-    my $dtype = $self->get_datatype();
-    $dformat = $PDL::floatformat  if $dtype == $PDL_F;
-    $dformat = $PDL::doubleformat if $dtype == $PDL_D;
-    $dformat = $PDL::indxformat if $dtype == $PDL_IND;
+  my($self,$format)=@_;
+  barf "Not 1D" if $self->getndims != 1;
+  my $x = listref_c($self);
+  my $badflag = $self->badflag;
+  return "[".join($sep, map
+    $badflag && $_ eq "BAD" ? $_ :
+    $format ? sprintf $format,$_ : $_,
+  @$x)."]";
+}
 
-    my $badflag = $self->badflag();
-    for $t (@$x) {
-	if ( $badflag and $t eq "BAD" ) {
-	    # do nothing
-        } elsif ($format) {
-	  $t = sprintf $format,$t;
-	} else{ # Default
-	    if ($dformat && length($t)>7) { # Try smaller
-		$t = sprintf $dformat,$t;
-	    }
-	}
-       $ret .= $t.$sep;
+sub str_list {
+  my ($x, $row_len, $format, $dtype, $badflag) = @_;
+  my ($len, $findmax) = (0, 1);
+  if (!defined $format || $format eq "") {
+    # Format not given? - find max length of default
+    $len = max map length($_), @$x;
+    $format = "%".$len."s";
+    if ($len>7) { # Too long? - perhaps try smaller format
+      if ($dtype == $PDL_F) {
+        $format = $PDL::floatformat;
+      } elsif ($dtype == $PDL_D) {
+        $format = $PDL::doubleformat;
+      } elsif ($dtype == $PDL_IND) {
+        $format = $PDL::indxformat;
+      } else {
+        # Stick with default
+        $findmax = 0;
+      }
+    } else {
+      # Default ok
+      $findmax = 0;
     }
-
-    chop $ret; $ret.="]";
-    return $ret;
+  }
+  $len = $badflag ?
+    max $len, map $_ eq "BAD" ? 3 : length(sprintf $format,$_), @$x :
+    max $len, map length(sprintf $format,$_), @$x
+    if $findmax; # Find max length of strings in final format
+  my @ret;
+  for (my $i=0; $i<=$#$x; $i+=$row_len) {
+    push @ret, "[".join($sep, map sprintf("%${len}s", $badflag && $_ eq "BAD" ? "BAD" : sprintf $format,$_), @$x[$i..$i+$row_len-1])."]";
+  }
+  return @ret;
 }
 
 # String 2D array in nice uniform format
 
 sub str2D{
-    my($self,$format,$level)=@_;
-    my @dims = $self->dims();
-    barf "Not 2D" if scalar(@dims)!=2;
-    my $x = listref_c($self);
-    my ($i, $f, $t, $len, $ret);
-
-    my $dtype = $self->get_datatype();
-    my $badflag = $self->badflag();
-
-    my $findmax = 1;
-    if (!defined $format || $format eq "") {
-	# Format not given? - find max length of default
-	$len=0;
-
-	if ( $badflag ) {
-	    for (@$x) {
-		if ( $_ eq "BAD" ) { $i = 3; }
-		else               { $i = length($_); }
-		$len = $i>$len ? $i : $len;
-	    }
-	} else {
-	    for (@$x) {$i = length($_); $len = $i>$len ? $i : $len };
-	}
-
-	$format = "%".$len."s";
-
-	if ($len>7) { # Too long? - perhaps try smaller format
-	    if ($dtype == $PDL_F) {
-		$format = $PDL::floatformat;
-	    } elsif ($dtype == $PDL_D) {
-		$format = $PDL::doubleformat;
-	    } elsif ($dtype == $PDL_IND) {
-		$format = $PDL::indxformat;
-	    } else {
-		# Stick with default
-		$findmax = 0;
-	    }
-	}
-	else {
-	    # Default ok
-	    $findmax = 0;
-	}
-    }
-
-    if($findmax) {
-	# Find max length of strings in final format
-	$len=0;
-
-	if ( $badflag ) {
-	    for (@$x) {
-		if ( $_ eq "BAD" ) { $i = 3; }
-		else               { $i = length(sprintf $format,$_); }
-		$len = $i>$len ? $i : $len;
-	    }
-	} else {
-	    for (@$x) {
-		$i = length(sprintf $format,$_); $len = $i>$len ? $i : $len;
-	    }
-	}
-    } # if: $findmax
-
-    $ret = "\n" . " "x$level . "[\n";
-    {
-	my $level = $level+1;
-	$ret .= " "x$level ."[";
-	for ($i=0; $i<=$#$x; $i++) {
-
-	    if ( $badflag and $$x[$i] eq "BAD" ) {
-		$f = "BAD";
-	    } else {
-		$f = sprintf $format,$$x[$i];
-	    }
-
-	    $t = $len-length($f); $f = " "x$t .$f if $t>0;
-	    $ret .= $f;
-	    if (($i+1)%$dims[0]) {
-		$ret.=$sep;
-	    }
-	    else{ # End of output line
-		$ret.="]";
-		if ($i==$#$x) { # very last number
-		    $ret.="\n";
-		}
-		else{
-		    $ret.= $sep2."\n" . " "x$level ."[";
-		}
-	    }
-	}
-    }
-    $ret .= " "x$level."]\n";
-    return $ret;
+  my($self,$format,$level)=@_;
+  my @dims = $self->dims();
+  barf "Not 2D" if scalar(@dims)!=2;
+  my $x = listref_c($self);
+  my @lines = str_list($x, $dims[0], $format, $self->get_datatype, $self->badflag);
+  my $ret = "\n" . " "x$level . "[\n";
+  $ret .= join $sep2."\n", map " "x($level+1).$_, @lines;
+  $ret .= "\n".(" "x$level)."]\n";
+  return $ret;
 }
 
 ########## Docs for functions in Core.xs ##################

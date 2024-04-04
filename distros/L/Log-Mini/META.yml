@@ -28,7 +28,7 @@ no_index:
 provides:
   Log::Mini:
     file: lib/Log/Mini.pm
-    version: v0.3.0
+    version: v0.4.1
   Log::Mini::Logger::Base:
     file: lib/Log/Mini/Logger/Base.pm
   Log::Mini::Logger::FILE:
@@ -37,15 +37,18 @@ provides:
     file: lib/Log/Mini/Logger/NULL.pm
   Log::Mini::Logger::STDERR:
     file: lib/Log/Mini/Logger/STDERR.pm
+  Log::Mini::Logger::STDOUT:
+    file: lib/Log/Mini/Logger/STDOUT.pm
 requires:
   Carp: '0'
-  List::Util: '0'
-  Time::Moment: '0'
   perl: '5.008001'
 resources:
-  repository: ssh://git@git.whataco.de:2221/medvedych/Log-Mini.git
-version: 0.3.0
+  bugtracker: https://github.com/alpha6/Log-Mini/issues
+  homepage: https://github.com/alpha6/Log-Mini
+  repository: https://github.com/alpha6/Log-Mini.git
+version: 0.4.1
 x_contributors:
   - 'Denis Fedoseev <denis@fedoseev.work>'
+  - 'medvedych <medvedych@whataco.de>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

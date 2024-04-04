@@ -8,7 +8,7 @@ use Mo::utils::Language qw(check_language);
 my $self = {
         'key' => 'en',
 };
-check_language($self, 'en');
+check_language($self, 'key');
 
 # Print out.
 print "ok\n";

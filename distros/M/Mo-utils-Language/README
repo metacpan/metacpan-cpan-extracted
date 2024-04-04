@@ -2,7 +2,7 @@ NAME
     Mo::utils::Language - Mo language utilities.
 
 SYNOPSIS
-     use Mo::utils::Language qw(check_language);
+     use Mo::utils::Language qw(check_language check_language_639_1 check_language_639_2);
 
      check_language($self, $key);
      check_language_639_1($self, $key);
@@ -60,7 +60,7 @@ EXAMPLE1
      my $self = {
              'key' => 'en',
      };
-     check_language($self, 'en');
+     check_language($self, 'key');
 
      # Print out.
      print "ok\n";
@@ -97,7 +97,7 @@ EXAMPLE3
      my $self = {
              'key' => 'en',
      };
-     check_language_639_1($self, 'en');
+     check_language_639_1($self, 'key');
 
      # Print out.
      print "ok\n";
@@ -134,7 +134,7 @@ EXAMPLE5
      my $self = {
              'key' => 'eng',
      };
-     check_language_639_2($self, 'eng');
+     check_language_639_2($self, 'key');
 
      # Print out.
      print "ok\n";
@@ -188,5 +188,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

@@ -2,7 +2,7 @@ package HTTP::Cookies::ChromeDevTools;
 use strict;
 use Carp qw[croak];
 
-our $VERSION = '0.72';
+our $VERSION = '0.73';
 our @CARP_NOT;
 
 use Moo 2;
@@ -210,7 +210,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2009-2023 by Max Maischein C<corion@cpan.org>.
+Copyright 2009-2024 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

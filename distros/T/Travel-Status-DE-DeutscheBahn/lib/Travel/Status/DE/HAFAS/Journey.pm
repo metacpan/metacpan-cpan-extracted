@@ -8,15 +8,16 @@ use 5.014;
 
 use parent 'Class::Accessor';
 use DateTime::Format::Strptime;
-use List::Util qw(any);
+use List::Util qw(any uniq);
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '5.05';
+our $VERSION = '6.01';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
-	qw(datetime sched_datetime rt_datetime
+	qw(datetime sched_datetime rt_datetime tz_offset
 	  is_additional is_cancelled is_partially_cancelled
 	  station station_eva platform sched_platform rt_platform operator
+	  product
 	  id name type type_long class number line line_no load delay
 	  route_end route_start origin destination direction)
 );
@@ -26,13 +27,12 @@ Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 sub new {
 	my ( $obj, %opt ) = @_;
 
-	my @prodL = @{ $opt{common}{prodL} // [] };
-	my @opL   = @{ $opt{common}{opL}   // [] };
 	my @icoL  = @{ $opt{common}{icoL}  // [] };
 	my @tcocL = @{ $opt{common}{tcocL} // [] };
 	my @remL  = @{ $opt{common}{remL}  // [] };
 	my @himL  = @{ $opt{common}{himL}  // [] };
 
+	my $prodL   = $opt{prodL};
 	my $locL    = $opt{locL};
 	my $hafas   = $opt{hafas};
 	my $journey = $opt{journey};
@@ -45,34 +45,7 @@ sub new {
 	my $is_cancelled        = $journey->{isCncl};
 	my $partially_cancelled = $journey->{isPartCncl};
 
-	my $product  = $prodL[ $journey->{prodX} ];
-	my $name     = $product->{addName} // $product->{name};
-	my $line_no  = $product->{prodCtx}{line};
-	my $train_no = $product->{prodCtx}{num};
-	my $cat      = $product->{prodCtx}{catOut};
-	my $catlong  = $product->{prodCtx}{catOutL};
-	if ( $name and $cat and $name eq $cat and $product->{nameS} ) {
-		$name .= ' ' . $product->{nameS};
-	}
-	if ( defined $train_no and not $train_no ) {
-		$train_no = undef;
-	}
-	if (
-		    not defined $line_no
-		and defined $product->{prodCtx}{matchId}
-		and
-		( not defined $train_no or $product->{prodCtx}{matchId} ne $train_no )
-	  )
-	{
-		$line_no = $product->{prodCtx}{matchId};
-	}
-
-	my $operator;
-	if ( defined $product->{oprX} ) {
-		if ( my $opref = $opL[ $product->{oprX} ] ) {
-			$operator = $opref->{name};
-		}
-	}
+	my $product = $prodL->[ $journey->{prodX} ];
 
 	my @messages;
 	for my $msg ( @{ $journey->{msgL} // [] } ) {
@@ -89,35 +62,42 @@ sub new {
 
 	my $datetime_ref;
 
-	if ( @{ $journey->{stopL} // [] } or $journey->{stbStop}) {
-		my ($date_ref, $parse_fmt);
-		if ($jid =~ /#/) {
+	if ( @{ $journey->{stopL} // [] } or $journey->{stbStop} ) {
+		my ( $date_ref, $parse_fmt );
+		if ( $jid =~ /#/ ) {
+
 			# ÖBB Journey ID - technically we ought to use Europe/Vienna tz
 			#  but let's not get into that...
-			$date_ref = ( split( /#/, $jid ) )[12];
+			$date_ref  = ( split( /#/, $jid ) )[12];
 			$parse_fmt = '%d%m%y';
 			if ( length($date_ref) < 5 ) {
-				warn("HAFAS, not even once -- midnight crossing may be bogus -- date_ref $date_ref");
-			} elsif ( length($date_ref) == 5 ) {
+				warn(
+"HAFAS, not even once -- midnight crossing may be bogus -- date_ref $date_ref"
+				);
+			}
+			elsif ( length($date_ref) == 5 ) {
 				$date_ref = "0${date_ref}";
 			}
-		} else {
+		}
+		else {
 			# DB Journey ID
-			$date_ref = ( split( qr{[|]}, $jid ) )[4];
+			$date_ref  = ( split( qr{[|]}, $jid ) )[4];
 			$parse_fmt = '%d%m%Y';
 			if ( length($date_ref) < 7 ) {
-				warn("HAFAS, not even once -- midnight crossing may be bogus -- date_ref $date_ref");
-			} elsif ( length($date_ref) == 7 ) {
+				warn(
+"HAFAS, not even once -- midnight crossing may be bogus -- date_ref $date_ref"
+				);
+			}
+			elsif ( length($date_ref) == 7 ) {
 				$date_ref = "0${date_ref}";
 			}
 		}
 		$datetime_ref = DateTime::Format::Strptime->new(
 			pattern   => $parse_fmt,
-			time_zone => 'Europe/Berlin'
+			time_zone => $hafas->get_active_service->{time_zone}
+			  // 'Europe/Berlin'
 		)->parse_datetime($date_ref);
 	}
-
-	my $class = $product->{cls};
 
 	my @stops;
 	my $route_end;
@@ -128,6 +108,7 @@ sub new {
 			loc          => $loc,
 			stop         => $stop,
 			common       => $opt{common},
+			prodL        => $prodL,
 			hafas        => $hafas,
 			date         => $date,
 			datetime_ref => $datetime_ref,
@@ -150,14 +131,15 @@ sub new {
 
 	my $ref = {
 		id                     => $jid,
-		name                   => $name,
-		number                 => $train_no,
-		line                   => $name,
-		line_no                => $line_no,
-		type                   => $cat,
-		type_long              => $catlong,
-		class                  => $class,
-		operator               => $operator,
+		product                => $product,
+		name                   => $product->name,
+		number                 => $product->number,
+		line                   => $product->name,
+		line_no                => $product->line_no,
+		type                   => $product->type,
+		type_long              => $product->type_long,
+		class                  => $product->class,
+		operator               => $product->operator,
 		direction              => $direction,
 		is_cancelled           => $is_cancelled,
 		is_partially_cancelled => $partially_cancelled,
@@ -186,31 +168,39 @@ sub new {
 	if ( $journey->{stbStop} ) {
 		$ref->{station}        = $locL->[ $journey->{stbStop}{locX} ]->name;
 		$ref->{station_eva}    = 0 + $locL->[ $journey->{stbStop}{locX} ]->eva;
-		$ref->{sched_platform} = $journey->{stbStop}{dPlatfS};
-		$ref->{rt_platform}    = $journey->{stbStop}{dPlatfR};
-		$ref->{platform}       = $ref->{rt_platform} // $ref->{sched_platform};
+		$ref->{sched_platform} = $journey->{stbStop}{dPlatfS}
+		  // $journey->{stbStop}{dPltfS}{txt};
+		$ref->{rt_platform} = $journey->{stbStop}{dPlatfR}
+		  // $journey->{stbStop}{dPltfR}{txt};
+		$ref->{platform} = $ref->{rt_platform} // $ref->{sched_platform};
 
-		my $time_s
-		  = $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeS' : 'dTimeS' };
-		my $time_r
-		  = $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeR' : 'dTimeR' };
+		my $datetime_s = Travel::Status::DE::HAFAS::Stop::handle_day_change(
+			$ref,
+			input =>
+			  $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeS' : 'dTimeS' },
+			offset => $journey->{stbStop}{
+				$hafas->{arrivals}
+				? 'aTZOffset'
+				: 'dTZOffset'
+			},
+			date     => $date,
+			strp_obj => $hafas->{strptime_obj},
+			ref      => $datetime_ref,
+		);
 
-		for my $timestr ( $time_s, $time_r ) {
-			if ( not defined $timestr ) {
-				next;
-			}
-
-			$timestr = Travel::Status::DE::HAFAS::Stop::handle_day_change(
-				input    => $timestr,
-				date     => $date,
-				strp_obj => $hafas->{strptime_obj},
-				ref      => $datetime_ref,
-			);
-
-		}
-
-		my $datetime_s = $time_s;
-		my $datetime_r = $time_r;
+		my $datetime_r = Travel::Status::DE::HAFAS::Stop::handle_day_change(
+			$ref,
+			input =>
+			  $journey->{stbStop}{ $hafas->{arrivals} ? 'aTimeR' : 'dTimeR' },
+			offset => $journey->{stbStop}{
+				$hafas->{arrivals}
+				? 'aTZOffset'
+				: 'dTZOffset'
+			},
+			date     => $date,
+			strp_obj => $hafas->{strptime_obj},
+			ref      => $datetime_ref,
+		);
 
 		my $delay
 		  = $datetime_r
@@ -278,6 +268,23 @@ sub messages {
 		return @{ $self->{messages} };
 	}
 	return;
+}
+
+sub operators {
+	my ($self) = @_;
+
+	if ( $self->{operators} ) {
+		return @{ $self->{operators} };
+	}
+
+	$self->{operators} = [
+		uniq map { ( $_->prod_arr // $_->prod_dep )->operator } grep {
+			      ( $_->prod_arr or $_->prod_dep )
+			  and ( $_->prod_arr // $_->prod_dep )->operator
+		} $self->route
+	];
+
+	return @{ $self->{operators} };
 }
 
 sub polyline {
@@ -412,7 +419,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 5.05
+version 6.01
 
 =head1 DESCRIPTION
 
@@ -421,7 +428,9 @@ a station-specific arrival/departure obtained by a stationboard query, or a
 train journey that does not belong to a specific station.
 
 stationboard-specific accessors are annotated with "(station only)" and return
-undef for non-station journeys.
+undef for non-station journeys. All date and time entries refer to the
+backend time zone (Europe/Berlin in most cases) and do not take local time
+into account; see B<tz_offset> for the latter.
 
 =head1 METHODS
 
@@ -489,6 +498,13 @@ DateTime object indicating the arrival/departure date and time.
 Real-time data if available, schedule data otherwise.
 undef if neither is available.
 
+=item $journey->tz_offset
+
+Offset between backend time zone (default: Europe/Berlin) and this journey's
+time zone in minutes, if any. For instance, if the backend uses UTC+2 (CEST)
+and the journey uses UTC+1 (IST), tz_offset is -60. Returns undef if both use
+the same time zone (or rather, the same UTC offset).
+
 =item $journey->delay (station only)
 
 Delay in minutes, or undef if it is unknown.
@@ -506,6 +522,13 @@ True if the journey was cancelled, false otherwise.
 =item $journey->is_partially_cancelled
 
 True if part of the journey was cancelled, false otherwise.
+
+=item $journey->product
+
+Travel::Status::DE::HAFAS::Product(3pm) instance describing the product (mode
+of transport, line number / ID, operator, ...) associated with this journey.
+Note that journeys may be associated with multiple products -- see also
+C<< $journey->route >> and C<< $stop->product >>.
 
 =item $journey->rt_platform (station only)
 
@@ -543,7 +566,13 @@ detailed delay reasons (e.g. "switch damage between X and Y, expect delays").
 =item $journey->operator
 
 The operator responsible for this journey. Returns undef
-if the backend does not provide an operator.
+if the backend does not provide an operator. Note that the operator may
+change along the journey -- in this case, the returned operator depends on
+the backend and appears to be the first one in most cases.
+
+=item $journey->operators
+
+List of all operators observed along the journey.
 
 =item $journey->station (station only)
 

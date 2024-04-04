@@ -14,11 +14,11 @@ LWP::UserAgent::Throttled - Throttle requests to a site
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -49,13 +49,11 @@ sub send_request {
 	my $request = $_[0];
 	my $host = $request->uri()->host();
 
-	if((defined($self->{'throttle'})) && $self->{'throttle'}{$host}) {
-		if($self->{'lastcallended'}{$host}) {
-			my $waittime = $self->{'throttle'}{$host} - (Time::HiRes::time() - $self->{'lastcallended'}{$host});
+	if((defined($self->{'throttle'})) && $self->{'throttle'}{$host} && $self->{'lastcallended'}{$host}) {
+		my $waittime = $self->{'throttle'}{$host} - (Time::HiRes::time() - $self->{'lastcallended'}{$host});
 
-			if($waittime > 0) {
-				Time::HiRes::usleep($waittime * 1e6);
-			}
+		if($waittime > 0) {
+			Time::HiRes::usleep($waittime * 1e6);
 		}
 	}
 	my $rc;
@@ -165,10 +163,6 @@ L<http://cpants.cpanauthors.org/dist/LWP-UserAgent-Throttled>
 
 L<http://matrix.cpantesters.org/?dist=LWP-UserAgent-Throttled>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/LWP-UserAgent-Throttled>
-
 =item * CPAN Testers Dependencies
 
 L<http://deps.cpantesters.org/?module=LWP::UserAgent::Throttled>
@@ -177,7 +171,7 @@ L<http://deps.cpantesters.org/?module=LWP::UserAgent::Throttled>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2022 Nigel Horne.
+Copyright 2017-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

@@ -159,4 +159,12 @@ is( $sql,
 );
 is( @bind, 1, 'Bind param returned' );
 
+is(
+    $sac->select(
+        'table',
+        'one',
+    ), 'SELECT one FROM table',
+    'Scalar string as fields',
+);
+
 done_testing;

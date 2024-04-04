@@ -1,3 +1,8 @@
+Travel::Routing::DE::HAFAS 0.06 - Thu Mar 28 2024
+
+    * hafas: Add -C / --change-time option
+    * HAFAS: Add min_change_time option
+
 Travel::Routing::DE::HAFAS 0.05 - Sun Mar 24 2024
 
     * hafas: Add -c / --max-change option

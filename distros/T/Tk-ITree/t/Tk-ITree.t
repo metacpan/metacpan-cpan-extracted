@@ -11,15 +11,16 @@ createapp(
 my $it;
 if (defined $app) {
 	$it = $app->Scrolled('ITree',
-		-scrollbars => 'osoe',
+		-exportselection => 0,
 		-itemtype => 'imagetext',
 		-separator => '/',
-		-selectmode => 'single',
-		-exportselection => 0,
+		-leftrightcall => sub { my ($dir, $path) = @_; print "direction $dir, path $path\n"; },
+#		-selectmode => 'extended',
+		-scrollbars => 'osoe',
 	)->pack(-expand => 1, -fill => 'both');
 
 	my @entries =(
-				'colors',
+		'colors',
 		'colors/Red',
 		'colors/Green',
 		'colors/Blue',
@@ -31,7 +32,7 @@ if (defined $app) {
 
 	my $img = $app->Pixmap(-file => Tk->findINC('file.xpm'));
 	for (@entries) {
-		$it->add($_, -image => $img, -text => $_, -itemtype => 'imagetext');
+		$it->add($_, -image => $img, -text => $_,);
 		$it->autosetmode;
 	}
 }
@@ -41,5 +42,7 @@ if (defined $app) {
 );
 
 starttesting;
+
+
 
 

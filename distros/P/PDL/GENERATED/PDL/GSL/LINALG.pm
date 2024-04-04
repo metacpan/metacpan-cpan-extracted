@@ -58,6 +58,7 @@ complex double precision.
 Currently only LU decomposition interfaces here. Pull requests welcome!
 #line 60 "LINALG.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -188,7 +189,7 @@ The GSL documentation for linear algebra is online at
 L<https://www.gnu.org/software/gsl/doc/html/linalg.html>
 
 =cut
-#line 192 "LINALG.pm"
+#line 193 "LINALG.pm"
 
 # Exit with OK status
 

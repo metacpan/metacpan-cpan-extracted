@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 1.53
+    Version 1.54
 
 SYNOPSIS
 
@@ -423,6 +423,9 @@ SUBROUTINES/METHODS
 
       * version - A specific version of firefox, such as 120.
 
+      * arch - A specific version of the architecture, such as "x86_64" or
+      "aarch64" or "s390x".
+
       * increment - A specific offset from the actual version of firefox,
       such as -5
 
@@ -436,6 +439,10 @@ SUBROUTINES/METHODS
     
         # user agent is now equal to
         # Mozilla/5.0 (X11; FreeBSD amd64; rv:109.0) Gecko/20100101 Firefox/118.0
+    
+        $firefox->agent(os => 'linux', arch => 's390x', version => 115);
+        # user agent is now equal to
+        # Mozilla/5.0 (X11; Linux s390x; rv:109.0) Gecko/20100101 Firefox/115.0
 
     If the stealth parameter has supplied to the new method, it will also
     attempt to change a number of javascript attributes to match the
@@ -466,6 +473,12 @@ SUBROUTINES/METHODS
 
     returns the application type for the Marionette protocol. Should be
     'gecko'.
+
+ arch
+
+    returns the architecture of the machine running firefox. Should be
+    something like 'x86_64' or 'arm'. This is only intended for test suite
+    support.
 
  aria_label
 
@@ -2793,6 +2806,13 @@ SUBROUTINES/METHODS
 
     sends keys to the input field of a currently displayed modal message
     box
+
+ set_javascript
+
+    accepts a parameter for the the profile preference value of
+    javascript.enabled
+    <https://support.mozilla.org/en-US/kb/javascript-settings-for-interactive-web-pages#w_for-advanced-users>.
+    This method returns itself to aid in chaining methods.
 
  set_pref
 

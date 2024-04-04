@@ -53,11 +53,9 @@ sub check_search_chars($) {
   my $octet_mode = shift;
   # search() for a wide char results in a "wide character" error from decode()
   # inside ODF::lpOD unless implicit encoding is disabled
+  #
   my $m = eval{ $body->search($smiley_char) };
   if ($octet_mode) { # implicit encoding enabled
-    # Sometimes inexplicably does not fail in cpantesters land...
-    # I've tested this with LANG=C so there should be no default
-    # STD* encoding going on.  Hmm...
     ok(!defined($m) && $@ =~ /wide char/i,
        "bytes mode: search(wide char) blows up (string)",
        dvis '$ODF::lpOD::Common::INPUT_CHARSET\n',
@@ -73,55 +71,64 @@ sub check_search_chars($) {
        dvis '$m\n$@\n');
   }
 
-  $m = eval{ $body->search(qr/$smiley_char/) };
-  if ($octet_mode) { # implicit encoding enabled
-    isnt($ODF::lpOD::Common::INPUT_CHARSET, undef,
-        dvis '$ODF::lpOD::Common::INPUT_CHARSET $ODF::lpOD::VERSION');
-    # An exception is thrown when ODF::lpOD calles decode() on it's input
-    # argument if it contains abstract "wide" characters
-    if (defined $m) {
-      # 9/17/23: EXCEPT... on one cpan tester platform the match "succeeds"
-      #   because, for some reason, the match expression becomes "" and
-      #   so the match succeeds at the first character in $body.
-      #   That implies $smiley_char came back as "" with no 'wide char'
-      #   error from decode() in ODF::lpOD::Common::input_conversion
-      #   HOW IS THIS POSSIBLE?
-      diag dvis 'UNEXPECTED: $m';
-      my ($out,$err,$stat) = Capture::Tiny::capture {
-         no warnings FATAL => 'all'; no warnings; use warnings;  # undo FATAL
-         my $bytes_regex = qr/$smiley_char/;
-         btw dvis '$ODF::lpOD::Common::INPUT_CHARSET $ODF::lpOD::Common::INPUT_ENCODER';
-         my $bytes_regex_copy = $bytes_regex;
-
-         my $xdecoded_regex;
-         eval{ $xdecoded_regex = $ODF::lpOD::Common::INPUT_ENCODER->decode($bytes_regex_copy) };
-         btw dvis '$xdecoded_regex $@';
-
-         my $decoded_regex = eval{ $ODF::lpOD::Common::INPUT_ENCODER->decode($bytes_regex_copy) };
-         btw dvis '$decoded_regex $@';
-
-         my $ydecoded_regex;
-         $ydecoded_regex = $ODF::lpOD::Common::INPUT_ENCODER->decode($bytes_regex_copy);
-         btw dvis '$ydecoded_regex';
-
-         my $m2 = eval{ $body->search($bytes_regex) };
-         btw dvis '$bytes_regex $m2 $@';
-         my $m3 = eval{ $body->search(qr/${smiley_char}Unicode/) };
-         btw dvis '$smiley_char $m3 $@';
-         btw dvis 'body:', fmt_tree($body);
-      };
-      fail("bytes mode problem",
-           dvis('$m\n')."OUT:$out<END stdout>\nERR:$err<END stderr>\n");
+  # 3/27/24: It seems that older Perls (5.2x.y) can not decode(qr/.../) ;
+  # '' is returned with warn "Use of uninitialized value in subroutine entry"
+  # This effectively means search(qr/.../) can not be used with older perls
+  # if ODF::lpOD is in it's default mode where all arguments are decoded
+  # before they are used, such as with "use ODF::lpOD_Helper ':bytes';".
+  #
+  # AND it means our test will not cause an exception!
+  # So do _not_ pass a compiled regex in :bytes mode when using older perls!
+  #
+  SKIP: {
+    skip "Perl version ($]) too old to test search(qr/.../) in :bytes mode"
+      if $octet_mode && (!defined($^V) or $^V  lt v5.26.0);
+    $m = eval{ $body->search(qr/$smiley_char/) };
+    my $ex = $@;
+    if ($octet_mode) { # implicit encoding enabled
+      isnt($ODF::lpOD::Common::INPUT_CHARSET, undef,
+          dvis '$ODF::lpOD::Common::INPUT_CHARSET $ODF::lpOD::VERSION $ex');
+      if (defined $m) {
+        die dvis 'UNEXPECTEDLY DEFINED $m\n$ex\n';
+##        diag dvis 'UNEXPECTEDLY DEFINED $m\n$ex';
+##        my ($out,$err,$stat) = Capture::Tiny::capture {
+##           no warnings FATAL => 'all'; no warnings; use warnings;  # undo FATAL
+##           my $bytes_regex = qr/$smiley_char/;
+##           btw dvis '$ODF::lpOD::Common::INPUT_CHARSET $ODF::lpOD::Common::INPUT_ENCODER';
+##           my $bytes_regex_copy = $bytes_regex;
+##
+##           my $xdecoded_regex;
+##           # Some smokers die in the following evals
+##           # with "uninitialized value in subroutine entry". WHY??
+##           eval{ $xdecoded_regex = $ODF::lpOD::Common::INPUT_ENCODER->decode($bytes_regex_copy) };
+##           btw dvis '$xdecoded_regex $@';
+##
+##           my $decoded_regex = eval{ $ODF::lpOD::Common::INPUT_ENCODER->decode($bytes_regex_copy) };
+##           btw dvis '$decoded_regex $@';
+##
+##           my $ydecoded_regex;
+##           $ydecoded_regex = $ODF::lpOD::Common::INPUT_ENCODER->decode($bytes_regex_copy);
+##           btw dvis '$ydecoded_regex';
+##
+##           my $m2 = eval{ $body->search($bytes_regex) };
+##           btw dvis '$bytes_regex $m2 $@';
+##           my $m3 = eval{ $body->search(qr/${smiley_char}Unicode/) };
+##           btw dvis '$smiley_char $m3 $@';
+##           btw dvis 'body:', fmt_tree($body);
+##        };
+##        fail("bytes mode problem",
+##             dvis('$m\n')."OUT:$out<END stdout>\nERR:$err<END stderr>\n");
+      }
+      ok(!defined($m) && $@ =~ /wide char/i,
+         "bytes mode: search(wide char) blows up (regex)",
+         dvis '$m\n$@\nbody:'.fmt_tree($body));
+    } else {
+      is($ODF::lpOD::Common::INPUT_CHARSET, undef,
+          dvis '$ODF::lpOD::Common::INPUT_CHARSET $ODF::lpOD::VERSION');
+      ok($m->{segment}, "chars mode: search(wide char) works (regex)",
+         dvis '$m\n$@\n');
     }
-    ok(!defined($m) && $@ =~ /wide char/i,
-       "bytes mode: search(wide char) blows up (regex)",
-       dvis '$m\n$@\nbody:'.fmt_tree($body));
-  } else {
-    is($ODF::lpOD::Common::INPUT_CHARSET, undef,
-        dvis '$ODF::lpOD::Common::INPUT_CHARSET $ODF::lpOD::VERSION');
-    ok($m->{segment}, "chars mode: search(wide char) works (regex)",
-       dvis '$m\n$@\n');
-  }
+  }#SKIP:
 
   # But Hsearch does not throw because it does not try to decode() it's args
   # and will not try to encode the result.  However it will not match

@@ -49,6 +49,7 @@ use Carp;
 my %boundary2value = (Reflect=>1, Truncate=>2, Replicate=>3);
 #line 51 "Image2D.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -433,7 +434,7 @@ something with negatives in...) then the output values are set bad.
 
 
 
-#line 798 "image2d.pd"
+#line 791 "image2d.pd"
 
 =head2 crop
 
@@ -462,7 +463,8 @@ sub PDL::crop {
   $x1->cat($x2, $y1, $y2)->mv(-1,0);
 }
 
-#line 828 "image2d.pd"
+#line 821 "image2d.pd"
+
 =head2 cc8compt
 
 =for ref
@@ -504,7 +506,8 @@ sub PDL::cc4compt{
 return ccNcompt(shift,4);
 }
 *cc4compt = \&PDL::cc4compt;
-#line 508 "Image2D.pm"
+#line 510 "Image2D.pm"
+
 
 =head2 ccNcompt
 
@@ -546,7 +549,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 997 "image2d.pd"
+#line 991 "image2d.pd"
 
 =head2 polyfill
 
@@ -601,7 +604,8 @@ sub PDL::polyfill {
 
 *polyfill = \&PDL::polyfill;
 
-#line 1054 "image2d.pd"
+#line 1048 "image2d.pd"
+
 =head2 pnpoly
 
 =for ref
@@ -680,7 +684,8 @@ sub PDL::pnpoly {
 
 *pnpoly = \&PDL::pnpoly;
 
-#line 1137 "image2d.pd"
+#line 1131 "image2d.pd"
+
 =head2 polyfillv
 
 =for ref
@@ -726,12 +731,12 @@ sub PDL::polyfillv :lvalue {
 		return $im->where(PDL::pnpoly_pp($im, $ps)) if $parsed->current->{'Method'} eq 'pnpoly';
 	}
 
-	my $msk = zeroes(long,$im->dims);
-	PDL::polyfill_pp($msk, $ps, 1);
+	PDL::polyfill_pp(my $msk = zeroes(long,$im->dims), $ps, 1);
 	return $im->where($msk);
 }
 *polyfillv = \&PDL::polyfillv;
-#line 735 "Image2D.pm"
+#line 739 "Image2D.pm"
+
 
 =head2 rot2d
 
@@ -844,7 +849,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1442 "image2d.pd"
+#line 1435 "image2d.pd"
 
 =head2 fitwarp2d
 
@@ -1116,28 +1121,18 @@ sub _svd ($$) {
 # and so on for the next control point.
 
 sub _mkbasis ($$$$) {
-    my $fit    = shift;
-    my $npts   = shift;
-    my $u      = shift;
-    my $v      = shift;
-
-    my $n      = $fit->getdim(0) - 1;
+    my $fit    = shift; # dims n n
+    my $npts   = shift; # scalar
+    my $u      = shift; # dims npts
+    my $v      = shift; # dims npts
     my $ncoeff = sum( $fit );
-
-    my $basis = zeroes( $u->type, $ncoeff, $npts );
-    my $k = 0;
-    foreach my $j ( 0 .. $n ) {
-	my $tmp_v = $v**$j;
-	foreach my $i ( 0 .. $n ) {
-	    if ( $fit->at($i,$j) ) {
-		my $tmp = $basis->slice("($k),:");
-		$tmp .= $tmp_v * $u**$i;
-		$k++;
-	    }
-	}
-    }
-    return $basis;
-
+    my $fit_coords = $fit->whichND; # dims uv ncoeff
+    cat($u,$v)            # npts uv
+      ->transpose         # uv npts
+      ->dummy(1,$ncoeff)  # uv ncoeff npts
+      ->ipow($fit_coords) # same
+      ->prodover          # ncoeff npts
+      ;
 } # sub: _mkbasis()
 
 sub PDL::fitwarp2d {
@@ -1260,14 +1255,15 @@ sub PDL::applywarp2d {
     #
     my $mat = _mkbasis( ones(byte,$nf,$nf), $npts, $u, $v );
 
-    my $x = reshape( $mat x $px->clump(-1)->transpose(), $npts );
-    my $y = reshape( $mat x $py->clump(-1)->transpose(), $npts );
+    my $x = reshape( $mat x $px->flat->transpose(), $npts );
+    my $y = reshape( $mat x $py->flat->transpose(), $npts );
     return ( $x, $y );
 
 } # sub: applywarp2d
 
 *applywarp2d = \&PDL::applywarp2d;
-#line 1271 "Image2D.pm"
+#line 1266 "Image2D.pm"
+
 
 =head2 warp2d
 
@@ -1495,7 +1491,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 1499 "Image2D.pm"
+#line 1495 "Image2D.pm"
 
 # Exit with OK status
 

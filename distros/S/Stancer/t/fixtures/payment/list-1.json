@@ -1,0 +1,63 @@
+{
+  "live_mode": true,
+  "payments": [
+    {
+      "amount": 3021,
+      "card": {
+        "brand": "mastercard",
+        "country": "FR",
+        "created": 1541586412,
+        "exp_month": 9,
+        "exp_year": 2019,
+        "id": "card_acn1TKrqViXWVyK88GjnIUxd",
+        "last4": "7354",
+        "name": null,
+        "zip_code": null
+      },
+      "country": "FR",
+      "currency": "eur",
+      "date_bank": null,
+      "date_paym": 1541586411,
+      "description": null,
+      "fee": 5,
+      "id_customer": null,
+      "method": "card",
+      "order_id": "822386023",
+      "id": "paym_JnU7xyTGJvxRWZuxvj78qz7e",
+      "response": "75",
+      "status": null
+    },
+    {
+      "amount": 3021,
+      "card": {
+        "brand": "visa",
+        "country": "FR",
+        "created": 1541586569,
+        "exp_month": 11,
+        "exp_year": 2020,
+        "id": "card_690TS4zmux1I7fnLAB1Jt3yE",
+        "last4": "1435",
+        "name": null,
+        "zip_code": null
+      },
+      "country": "FR",
+      "currency": "eur",
+      "date_bank": 1541631600,
+      "date_paym": 1541586568,
+      "description": null,
+      "fee": 5,
+      "id_customer": null,
+      "method": "card",
+      "order_id": "822386023",
+      "id": "paym_p5tjCrXHy93xtVtVqvEJoC1c",
+      "response": "00",
+      "status": 2
+    }
+  ],
+  "range": {
+    "end": 1,
+    "has_more": true,
+    "limit": 2,
+    "start": 0
+  }
+}

@@ -43,6 +43,7 @@ PDL::GIS::Proj - PDL interface to the PROJ projection library.
 For more information on the PROJ library, see: L<http://www.proj.org/>
 #line 45 "Proj.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -69,7 +70,8 @@ sub get_proj_info
     pop(@a);
     return join("\n", @a);
 } # End of get_proj_info()...
-#line 73 "Proj.pm"
+#line 74 "Proj.pm"
+
 
 =head2 fwd_transform
 
@@ -202,6 +204,7 @@ sub load_projection_information
 } # End of load_projection_information()...
 
 #line 39 "Proj.pd"
+
 =head1 AUTHOR
 
 Judd Taylor, Orbital Systems, Ltd.
@@ -218,7 +221,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =cut
-#line 222 "Proj.pm"
+#line 225 "Proj.pm"
 
 # Exit with OK status
 

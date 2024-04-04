@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Unevaluated;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Unevaluated vocabulary
 
-our $VERSION = '0.582';
+our $VERSION = '0.583';
 
 use 5.020;
 use Moo;
@@ -156,7 +156,7 @@ JSON::Schema::Modern::Vocabulary::Unevaluated - Implementation of the JSON Schem
 
 =head1 VERSION
 
-version 0.582
+version 0.583
 
 =head1 DESCRIPTION
 
@@ -173,13 +173,13 @@ JSON Schema Draft 2019-09 "Applicator" vocabulary, indicated in metaschemas
 with the URI C<https://json-schema.org/draft/2019-09/vocab/applicator> and formally specified in
 L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-02#section-9>.
 
-=for stopwords OpenAPI
-
 =head1 SUPPORT
 
 Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Modern/issues>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+=for stopwords OpenAPI
 
 You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
 server|https://open-api.slack.com>, which are also great resources for finding help.

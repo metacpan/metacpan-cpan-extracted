@@ -1,6 +1,26 @@
 Changelog for HealthCheck
 
-v1.8.2 2023-12-14T18:01:42
+v1.9.1 2024-04-03T19:45:46
+ - Update README (Andrew Hewus Fresh)
+ - Pull request #13: Patch SM-4775 fixed typo bug and added test (Austin
+   Hill)
+ - SM-4775 use default sort comparison (Austin Hill)
+ - SM-4775 fixed typo bug and added test (Austin Hill)
+
+v1.9.0 2024-04-02T19:53:49
+ - Update README and LICENSE (Andrew Hewus Fresh)
+ - Pull request #12: SM-3501 - add accessor methods for registered tags
+   (Austin Hill)
+ - SM-3501 use _respond cache to get tags (Austin Hill)
+ - remove unnecessary '// []' (Austin Hill)
+ - SM-3501 tweak nested invocant tag behavior (Austin Hill)
+ - SM-3501 add inner/outer invocant tag test (Austin Hill)
+ - SM-3501 remove checks accessor and clarify docs (Austin Hill)
+ - SM-3501 don't assume invocant has tags method (Austin Hill)
+ - SM-3501 update List::Util version (Austin Hill)
+ - SM-3501 add accessor methods for registered checks (Austin Hill)
+
+v1.8.2 2023-12-14T18:01:22
  - Update README (Andrew Hewus Fresh)
  - Pull request #11: Patch SM-4514 - Make strict.t an author test (Andrew
    Hewus Fresh)
@@ -38,9 +58,6 @@ v1.5.7 2020-07-02T17:45:23
  - No changes found
 
 v1.5.6 2020-07-02T17:45:23
- - No changes found
-
-v1.5.5 2020-07-02T17:45:23
  - Update README (Maria Cioffi)
  - Add more tests for runtime (Brandon Messineo)
  - Revert back to b8f12974c15 (Andrew Hewus Fresh)

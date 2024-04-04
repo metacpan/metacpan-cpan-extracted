@@ -10,7 +10,7 @@ use Carp qw(croak carp);
 #######################
 # VERSION
 #######################
-our $VERSION = '1.2.1';
+our $VERSION = '1.2.2';
 
 #######################
 # LOAD CPAN MODULES
@@ -175,7 +175,9 @@ this module provides, along with updated dependencies for this
 distribution. If you like to continue to use v2.1 API, you can continue
 to use L<TMDB-0.03x|https://metacpan.org/release/MITHUN/TMDB-0.03/>.
 
-=head1 INITIALIZATION
+=head1 METHODS
+
+=head2 new
 
       # Initialize
       my $tmdb = TMDB->new(
@@ -218,7 +220,7 @@ The API endpoint to use. Defaults to L<https://api.themoviedb.org/3>
 
 =back
 
-=head1 CONFIGURATION
+=head2 config
 
       # Get Config
       my $config = $tmdb->config;
@@ -240,7 +242,7 @@ The API endpoint to use. Defaults to L<https://api.themoviedb.org/3>
 This provides the configuration for the C</3> API. See
 L<http://docs.themoviedb.apiary.io/#configuration> for more details.
 
-=head1 SEARCH
+=head2 search
 
       # Configuration
       my $search = $tmdb->search(
@@ -284,7 +286,7 @@ L<http://docs.themoviedb.apiary.io/#configuration> for more details.
       my @top_rated      = $lists->top_rated();       # Get the top rated list
 
 
-=head1 MOVIE
+=head2 movie
 
       # Get the movie object
       my $movie = $tmdb->movie( id => '49521' );
@@ -333,7 +335,7 @@ L<http://docs.themoviedb.apiary.io/#configuration> for more details.
       print $movie->version;
 
 
-=head1 PEOPLE
+=head2 person
 
       # Get the person object
       my $person = $tmdb->person( id => '1331' );
@@ -359,7 +361,7 @@ L<http://docs.themoviedb.apiary.io/#configuration> for more details.
       print $person->version;
 
 
-=head1 COLLECTION
+=head2 collection
 
       # Get the collection object
       my $collection = $tmdb->collection(id => '2344');
@@ -376,7 +378,7 @@ L<http://docs.themoviedb.apiary.io/#configuration> for more details.
       print $collection->version;
 
 
-=head1 COMPANY
+=head2 company
 
       # Get the company object
       my $company = $tmdb->company(id => '1');
@@ -393,7 +395,7 @@ L<http://docs.themoviedb.apiary.io/#configuration> for more details.
       # Get TMDB's version to check if anything changed
       print $company->version;
 
-=head1 GENRE
+=head2 genre
 
       # Get a list
       my @genres = $tmdb->genre->list();
@@ -401,7 +403,7 @@ L<http://docs.themoviedb.apiary.io/#configuration> for more details.
       # Get a list of movies
       my @movies = $tmdb->genre(id => '35')->movies;
 
-=head1 TV SHOW
+=head2 tv
 
       # Get the TV show object
       my $show = $tmdb->tv( id => '1418' );
@@ -426,6 +428,10 @@ L<http://docs.themoviedb.apiary.io/#configuration> for more details.
       # Get TMDB's version to check if anything changed
       print $show->version;
 
+=head2 session
+
+      # Return the current TMDB API session.
+      my $session = $tmdb->session;
 
 =head1 DEPENDENCIES
 

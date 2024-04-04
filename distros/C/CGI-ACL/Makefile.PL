@@ -18,7 +18,10 @@ WriteMakefile(
 		'Data::Dumper' => 0,
 		'English' => 0,
 		'Test::Carp' => 0,
+		'Test::EOF' => 0,
+		'Test::EOL' => 0,
 		'Test::Most' => 0,
+		'Test::Needs' => 0,
 		'File::Spec' => 0,
 		'Test::NoWarnings' => 0,
 		'Test::CleanNamespaces' => 0,
@@ -26,6 +29,8 @@ WriteMakefile(
 		'Test::Kwalitee' => 0,
 		# 'Test::Perl::Metrics::Simple' => 0,
 		'autodie' => 0,
+		'strict' => 0,
+		'warnings' => 0,
 		'IPC::System::Simple' => 0,
 		'WWW::RT::CPAN' => 0
 	}, PREREQ_PM => {

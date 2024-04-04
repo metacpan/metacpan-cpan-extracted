@@ -42,12 +42,12 @@ Tk:CodeText::TagsEditor - Edit highlighting tags for L<Tk::CodeText>
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.44';
+$VERSION = '0.47';
 
 use base qw(Tk::Derived Tk::Frame);
 
 require Tk::ColorEntry;
-require Tk::Pane;
+require Tk::HList;
 require Tk::Balloon;
 use Tk::CodeText::Theme;
 
@@ -143,44 +143,49 @@ sub Populate {
 
 	$self->{THEME} = $theme;
 
-	my $frame = $self->Scrolled('Pane',
-		-height => 200,
-		-scrollbars => 'oe',
-		-sticky => 'ns',
+	my @columns = ('Tag', 'Foreground', 'Background', 'Bold', 'Italic');
+	my $list;
+	$list = $self->Scrolled('HList',
+		-browsecmd => sub { $list->selectionClear; $list->anchorClear },
+		-columns => 5,
+		-header => 1,
+		-scrollbars => 'osoe',
 	)->pack(-expand => 1, -fill => 'both');
-
-	my $row = 0;
+	my $count = 0;
+	for (@columns) {
+		my $header = $list->Label(-text => $_);
+		$list->headerCreate($count, -itemtype => 'window', -widget => $header);
+#		$list->headerCreate($count, -text => $_);
+		$count ++;
+	}
 
 	for ($self->Theme->tagList) {
 		my $tag = $_;
 
-		my $label = $frame->Label(
+		$list->add($tag);
+		my $label = $list->Label(
 			-background => $defaultbackground,
 			-font => $defaultfont,
 			-anchor => 'e',
 			-text => $tag,
-		)->grid(-sticky => 'ew', -padx => 2, -row => $row, -column => 0);
-		$self->Advertise($tag, $label);
+		);
+		$list->itemCreate($tag, 0, -itemtype => 'window', -widget => $label);
 
-		$frame->Label(-text => 'Fg')->grid(-padx => 2, -row => $row, -column => 1);
-
-		my $fg = $frame->MyColorEntry(
+		my $fg = $list->MyColorEntry(
 			-balloon => $balloon,
 			-width => 8,
 			-historyfile => $historyfile,
 			-command => ['updateForeground', $self, $tag],
-		)->grid(-row => $row, -column => 2);
-		$self->Advertise($tag . "F", $fg);
+		);
+		$list->itemCreate($tag, 1, -itemtype => 'window', -widget => $fg);
 
-		$frame->Label(-text => 'Bg')->grid(-padx => 2, -row => $row, -column => 3);
-
-		my $bg = $frame->MyColorEntry(
+		my $bg = $list->MyColorEntry(
 			-balloon => $balloon,
 			-width => 8,
 			-historyfile => $historyfile,
 			-command => ['updateBackground', $self, $tag],
-		)->grid(-row => $row, -column => 4);
-		$self->Advertise($tag . "B", $bg);
+		);
+		$list->itemCreate($tag, 2, -itemtype => 'window', -widget => $bg);
 
 		my $b = '';
 		Tie::Watch->new(
@@ -192,12 +197,12 @@ sub Populate {
 			},
 		);
 		$self->Advertise($tag . "W", \$b);
-		my $bold = $frame->Checkbutton(
+		my $bold = $list->Checkbutton(
 			-offvalue => '',
 			-onvalue => 'bold',
-			-text => 'Bold',
 			-variable => \$b,
-		)->grid(-row => $row, -column => 5);
+		);
+		$list->itemCreate($tag, 3, -itemtype => 'window', -widget => $bold);
 
 		my $i = '';
 		Tie::Watch->new(
@@ -209,19 +214,22 @@ sub Populate {
 			},
 		);
 		$self->Advertise($tag . "S", \$i);
-		my $italic = $frame->Checkbutton(
+		my $italic = $list->Checkbutton(
 			-offvalue => '',
 			-onvalue => 'italic',
-			-text => 'Italic',
 			-variable => \$i,
-		)->grid(-row => $row, -column => 6);
-		$row ++
+		);
+		$list->itemCreate($tag, 4, -itemtype => 'window', -widget => $italic);
 	}
 	$self->ConfigSpecs(
+		-background => ['SELF', 'DESCENDANTS'],
 		-defaultbackground => ['PASSIVE', undef, undef, $defaultbackground],
 		-defaultforeground => ['PASSIVE', undef, undef, $defaultforeground],
 		-defaultfont => ['PASSIVE', undef, undef, $defaultfont],
-		DEFAULT => [ $self ],
+		DEFAULT => [ $list ],
+	);
+	$self->Delegates(
+		DEFAULT => $list
 	);
 }
 
@@ -278,8 +286,10 @@ sub put {
 	$theme->put(@_);
 	for ($theme->tagList) {
 		my $tag = $_;
-		$self->Subwidget($tag . "B")->put($theme->getItem($tag, '-background'));
-		$self->Subwidget($tag . "F")->put($theme->getItem($tag, '-foreground'));
+		my $b = $self->itemCget($tag, 1, '-widget');
+		$b->put($theme->getItem($tag, '-foreground'));
+		my $f = $self->itemCget($tag, 2, '-widget');
+		$f->put($theme->getItem($tag, '-background'));
 		my $slant = $self->Subwidget($tag . 'S');
 		$$slant = $theme->getItem($tag, '-slant');
 		my $weight = $self->Subwidget($tag . 'W');
@@ -320,14 +330,14 @@ sub updateBackground {
 	my ($self, $tag, $color) = @_;
 	my $bg = $color;
 	$bg = $self->cget('-defaultbackground') if $color eq '';
-	$self->Subwidget($tag)->configure(-background => $bg);
+	my $w = $self->itemCget($tag, 0, '-widget');
+	$w->configure(-background => $bg);
 	$self->Theme->setItem($tag, '-background', $color);
 }
 
 sub updateFont {
 	my ($self, $tag, %values) = @_;
 
-	my $label = $self->Subwidget($tag);
 	my $font = $self->cget('-defaultfont');
 	my $weight = $self->fontActual($font, '-weight');
 	my $slant = $self->fontActual($font, '-slant');
@@ -340,14 +350,16 @@ sub updateFont {
 		$self->Theme->setItem($tag, $_, $values{$_});
 	}
 	$font = $self->fontCompose($font, %options);
-	$label->configure(-font => $font);
+	my $w = $self->itemCget($tag, 0, '-widget');
+	$w->configure(-font => $font);
 }
 
 sub updateForeground {
 	my ($self, $tag, $color) = @_;
 	my $fg = $color;
 	$fg = $self->cget('-defaultforeground') if $color eq '';
-	$self->Subwidget($tag)->configure(-foreground =>$fg);
+	my $w = $self->itemCget($tag, 0, '-widget');
+	$w->configure(-foreground =>$fg);
 	$self->Theme->setItem($tag, '-foreground',$color);
 }
 
@@ -380,5 +392,6 @@ Unknown. If you find any, please contact the author.
 1;
 
 __END__
+
 
 

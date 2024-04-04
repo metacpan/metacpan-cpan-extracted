@@ -261,7 +261,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.214';
+our $VERSION = '1.215';
 
 use Quiq::Array;
 use Quiq::Math;
@@ -612,7 +612,7 @@ sub yMax {
 
 =head1 VERSION
 
-1.214
+1.215
 
 =head1 AUTHOR
 

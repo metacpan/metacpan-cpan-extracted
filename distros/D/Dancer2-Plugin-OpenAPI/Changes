@@ -1,5 +1,9 @@
 Revision history for Dancer2-Plugin-OpenAPI
 
+1.0.2 2024-03-27
+ [BUG FIXES]
+ - The Swagger-UI wasn't made accessible.
+
 1.0.1 2023-11-18
  [BUG FIXES]
  - Default for the main_api_module isn't properly resolved for Perl <

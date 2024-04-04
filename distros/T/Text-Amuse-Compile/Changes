@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.89 2024-04-01
+
+ - Add a timeout to latex/xindy run
+
 1.88 2023-07-11
 
  - Improve bidi support (use the better switches for babel)

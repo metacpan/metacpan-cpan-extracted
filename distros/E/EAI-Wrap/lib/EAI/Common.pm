@@ -1,4 +1,4 @@
-package EAI::Common 1.912;
+package EAI::Common 1.913;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import); use EAI::DateUtil; use Data::Dumper qw(Dumper); use Getopt::Long qw(:config no_ignore_case); use Log::Log4perl qw(get_logger); use MIME::Lite (); use Scalar::Util qw(looks_like_number);
@@ -396,7 +396,6 @@ sub extractConfigs ($$$;@) {
 			push(@ret, \%{$arg->{$req}}); # return the required subhash into the list of hashes
 			checkHash($ret[$#ret],$req) or $logger->error($@); # check last added hash after adding it...
 		}
-		checkHash(\%execute,"execute") or $logger->error($@); # also check always the execute hash ...
 	} else {
 		my $errStr = "no ref to hash passed when calling ".(caller(0))[3].", line ".(caller(0))[2]." in ".(caller(0))[1];
 		$errStr = "no ref to hash passed when calling ".(caller(1))[3].", line ".(caller(1))[2]." in ".(caller(1))[1] if caller(1);

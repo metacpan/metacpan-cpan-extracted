@@ -375,7 +375,7 @@ sub dosubst_private {
       PDLSTATESETGOOD => sub { ($sig->objs->{$_[0]}->do_pdlaccess//confess "Can't get PDLSTATESETGOOD for unknown ndarray '$_[0]'")."->state &= ~PDL_BADVAL" },
       PDLSTATEISBAD => sub {badflag_isset(($sig->objs->{$_[0]}//confess "Can't get PDLSTATEISBAD for unknown ndarray '$_[0]'")->do_pdlaccess)},
       PDLSTATEISGOOD => sub {"!".badflag_isset(($sig->objs->{$_[0]}//confess "Can't get PDLSTATEISGOOD for unknown ndarray '$_[0]'")->do_pdlaccess)},
-      PP => sub { ($sig->objs->{$_[0]}//confess "Can't get PP for unknown ndarray '$_[0]'")->do_physpointeraccess },
+      PP => sub { (my $o = ($sig->objs->{$_[0]}//confess "Can't get PP for unknown ndarray '$_[0]'"))->{FlagPhys} = 1; $o->do_pointeraccess; },
       P => sub { (my $o = ($sig->objs->{$_[0]}//confess "Can't get P for unknown ndarray '$_[0]'"))->{FlagPhys} = 1; $o->do_pointeraccess; },
       PDL => sub { ($sig->objs->{$_[0]}//confess "Can't get PDL for unknown ndarray '$_[0]'")->do_pdlaccess },
       SIZE => sub { ($sig->ind_obj($_[0])//confess "Can't get SIZE of unknown dim '$_[0]'")->get_size },
@@ -666,7 +666,7 @@ sub _pp_addpm_nolineno {
 	if (ref $pm) {
 	  my $opt = $pm;
 	  $pm = shift;
-	  croak "unknown option" unless defined $opt->{At} &&
+	  confess "unknown option '$opt->{At}' (only Top|Bot|Middle)" unless defined $opt->{At} &&
 	    $opt->{At} =~ /^(Top|Bot|Middle)$/;
 	  $pos = $opt->{At};
 	} else {
@@ -784,7 +784,7 @@ sub _pp_linenumber_fill {
     my ($seen_empty, $empty_first, $last_ci, @last_dir) = (0, undef, $ci); # list=(line, file)
     LINE: while (1) {
       last REALLINE if !@lines;
-      if (!length $lines[0]) {
+      if (!length $lines[0] && $lines[1] !~ /^=/) {
         $seen_empty = 1;
         shift @lines;
         next LINE;
@@ -923,16 +923,14 @@ sub pp_def {
 	croak("ERROR: No FreeFunc for pp_def=$name!\n")
 	  unless exists $obj{FreeFunc};
 
-	my $ctext = join("\n\n",grep $_, @obj{'StructDecl','RedoDimsFunc',
-		'ReadDataFunc','WriteBackDataFunc',
-		'FreeFunc',
-		'VTableDef','RunFunc',
-		}
-		);
+	my $ctext = join("\n\n",grep $_, @obj{qw(
+		CHeader StructDecl RedoDimsFunc
+		ReadDataFunc WriteBackDataFunc
+		FreeFunc
+		VTableDef RunFunc
+	)});
 	if ($::PDLMULTI_C) {
-	  PDL::PP->printxsc(undef, <<EOF);
-$obj{RunFuncHdr};
-EOF
+	  PDL::PP->printxsc(undef, "$obj{RunFuncHdr};\n");
 	  PDL::PP->printxsc("pp-$obj{Name}.c", $ctext);
 	} else {
 	  PDL::PP->printxsc(undef, $ctext);
@@ -1032,8 +1030,9 @@ sub typemap {
 }
 sub typemap_eval { # lifted from ExtUtils::ParseXS::Eval, ignoring eg $ALIAS
   my ($code, $varhash) = @_;
-  my ($var, $type, $num, $init, $printed_name, $arg, $ntype, $argoff, $subtype)
-    = @$varhash{qw(var type num init printed_name arg ntype argoff subtype)};
+  my ($var, $type, $num, $init, $pname, $arg, $ntype, $argoff, $subtype)
+    = @$varhash{qw(var type num init pname arg ntype argoff subtype)};
+  my $ALIAS;
   my $rv = eval qq("$code");
   die $@ if $@;
   $rv;
@@ -1080,9 +1079,10 @@ sub callPerlInit {
 }
 
 sub callTypemap {
-  my ($x, $ptype) = @_;
+  my ($x, $ptype, $pname) = @_;
   my ($setter, $type) = typemap($ptype, 'get_inputmap');
-  my $ret = typemap_eval($setter, {var=>$x, type=>$type, arg=>("${x}_SV")});
+  my $ret = typemap_eval($setter, {var=>$x, type=>$type, arg=>("${x}_SV"),
+      pname=>$pname});
   $ret =~ s/^\s*(.*?)\s*$/$1/g;
   $ret =~ s/\s*\n\s*/ /g;
   $ret;
@@ -1151,14 +1151,6 @@ $PDL::PP::deftbl =
           $SETDELTABROADCASTIDS(0);
           $PRIV(dims_redone) = 1;
         '),
-        # NOTE: we use the same bit of code for all-good and bad data -
-        #  see the Code rule
-        # we can NOT assume that PARENT and CHILD have the same type,
-        # hence the version for bad code
-        #
-        # NOTE: we use the same code for 'good' and 'bad' cases - it's
-        # just that when we use it for 'bad' data, we have to change the
-        # definition of the EQUIVCPOFFS macro - see the Code rule
         PDL::PP::pp_line_numbers(__LINE__,
             'PDL_Indx i;
              for(i=0; i<$PDL(CHILD)->nvals; i++)  {
@@ -1367,7 +1359,7 @@ EOD
       sub {
         my (undef,$name,$sname) = @_;
         ("PARENT(); [oca]CHILD();",0,0,[PDL::Types::ppdefs_all()],1,
-          "pdl *__it = $sname->pdls[1];\n",
+          "pdl *__it = $sname->pdls[1]; (void) __it;\n",
           "PDL->hdr_childcopy($sname); $sname->dims_redone = 1;\n",
         );
       }),
@@ -1399,7 +1391,7 @@ EOD
       sub {
         my($pdimexpr,$dimcheck) = @_;
         $pdimexpr =~ s/\$CDIM\b/i/g;
-        ' int i,cor;
+        ' PDL_Indx i,cor;
           '.$dimcheck.'
           $SETNDIMS($PDL(PARENT)->ndims);
           $DOPRIVALLOC();
@@ -1415,46 +1407,21 @@ EOD
         ';
       }),
 
-   PDL::PP::Rule->new("Code", ["EquivCPOffsCode","BadFlag"],
+   PDL::PP::Rule->new("Code", "EquivCPOffsCode",
       "create Code from EquivCPOffsCode",
-      # NOTE: EQUIVCPOFFS and EQUIVCPTRUNC both suffer from the macro-block
-      # wart of C preprocessing.  They look like statements but sometimes
-      # process into blocks, so if/then/else constructs can get broken.
-      # Either (1) use blocks for if/then/else, or (2) get excited and
-      # use the "do {BLOCK} while(0)" block-to-statement conversion construct
-      # in the substitution.  I'm too Lazy. --CED 27-Jan-2003
       sub {
-        my $good  = shift;
-        my $bflag = shift;
-        my $bad = $good;
-        # parse 'good' code
-        $good =~ s/\$EQUIVCPOFFS\(([^()]+),([^()]+)\)/\$PP(CHILD)[$1] = \$PP(PARENT)[$2]/g;
-        $good =~ s/\$EQUIVCPTRUNC\(([^()]+),([^()]+),([^()]+)\)/\$PP(CHILD)[$1] = ($3) ? 0 : \$PP(PARENT)[$2]/g;
-        return $good if !$bflag;
-        # parse 'bad' code
-        $bad  =~ s/\$EQUIVCPOFFS\(([^()]+),([^()]+)\)/if( \$PPISBAD(PARENT,[$2]) ) { \$PPSETBAD(CHILD,[$1]); } else { \$PP(CHILD)[$1] = \$PP(PARENT)[$2]; }/g;
-        $bad =~ s/\$EQUIVCPTRUNC\(([^()]+),([^()]+),([^()]+)\)/ if( ($3) || \$PPISBAD(PARENT,[$2]) ) { \$PPSETBAD(CHILD,[$1]); } else {\$PP(CHILD)[$1] = \$PP(PARENT)[$2]; }/g;
-        'if ( $PRIV(bvalflag) ) { ' . $bad . ' } else { ' . $good . '}';
+        my ($good) = @_;
+        $good =~ s/
+          \$EQUIVCPOFFS\(([^()]+),([^()]+)\)
+        /do { PDL_IF_BAD(if (\$PISBAD(PARENT,[$2]) ) { \$PSETBAD(CHILD,[$1]); } else,) { \$P(CHILD)[$1] = \$P(PARENT)[$2]; } } while (0)/gx;
+        $good =~ s/
+          \$EQUIVCPTRUNC\(([^()]+),([^()]+),([^()]+)\)
+        /do { if (($3) PDL_IF_BAD(|| \$PISBAD(PARENT,[$2]),) ) { PDL_IF_BAD(\$PSETBAD(CHILD,[$1]),\$P(CHILD)[$1] = 0); } else {\$P(CHILD)[$1] = \$P(PARENT)[$2]; } } while (0)/gx;
+        $good;
       }),
 
-   PDL::PP::Rule->new("BackCode", ["EquivCPOffsCode","BadFlag"],
+   PDL::PP::Rule->new("BackCode", "EquivCPOffsCode",
       "create BackCode from EquivCPOffsCode",
-      # If there is an EquivCPOffsCode and:
-      #    no bad-value support ==> use that
-      #    bad value support ==> write a bit of code that does
-      #      if ( $PRIV(bvalflag) ) { bad-EquivCPOffsCode }
-      #      else                   { good-EquivCPOffsCode }
-      #
-      #  Note: since EquivCPOffsCode doesn't (or I haven't seen any that
-      #  do) use 'loop %{' or 'broadcastloop %{', we can't rely on
-      #  PDLCode to automatically write code like above, hence the
-      #  explicit definition here.
-      #
-      #  Note: I *assume* that bad-Equiv..Code == good-Equiv..Code *EXCEPT*
-      #        that we re-define the meaning of the $EQUIVCPOFFS macro to
-      #        check for bad values when copying things over.
-      #        This means having to write less code.
-      #
       # Since PARENT & CHILD need NOT be the same type we cannot just copy
       # values from one to the other - we have to check for the presence
       # of bad values, hence the expansion for the $bad code
@@ -1466,24 +1433,17 @@ EOD
       # forward code puts BAD/0 into the child, and reverse code refrains
       # from copying.
       #                    --CED 27-Jan-2003
-      #
-      # this just reverses PARENT & CHILD in the expansion of
-      # the $EQUIVCPOFFS macro (ie compared to Code from EquivCPOffsCode)
       sub {
-        my ($good, $bflag) = @_;
-        my $bad  = $good;
+        my ($good) = @_;
         # parse 'good' code
-        $good =~ s/\$EQUIVCPOFFS\(([^()]+),([^()]+)\)/\$PP(PARENT)[$2] = \$PP(CHILD)[$1]/g;
-        $good =~ s/\$EQUIVCPTRUNC\(([^()]+),([^()]+),([^()]+)\)/if(!($3)) \$PP(PARENT)[$2] = \$PP(CHILD)[$1] /g;
-        return $good if !$bflag;
-        # parse 'bad' code
-        $bad  =~ s/\$EQUIVCPOFFS\(([^()]+),([^()]+)\)/if( \$PPISBAD(CHILD,[$1]) ) { \$PPSETBAD(PARENT,[$2]); } else { \$PP(PARENT)[$2] = \$PP(CHILD)[$1]; }/g;
-        $bad =~ s/\$EQUIVCPTRUNC\(([^()]+),([^()]+),([^()]+)\)/if(!($3)) { if( \$PPISBAD(CHILD,[$1]) ) { \$PPSETBAD(PARENT,[$2]); } else { \$PP(PARENT)[$2] = \$PP(CHILD)[$1]; } } /g;
-        'if ( $PRIV(bvalflag) ) { ' . $bad . ' } else { ' . $good . '}';
+        $good =~ s/
+          \$EQUIVCPOFFS\(([^()]+),([^()]+)\)
+        /do { PDL_IF_BAD(if( \$PISBAD(CHILD,[$1]) ) { \$PSETBAD(PARENT,[$2]); } else,) { \$P(PARENT)[$2] = \$P(CHILD)[$1]; } } while (0)/gx;
+        $good =~ s/
+          \$EQUIVCPTRUNC\(([^()]+),([^()]+),([^()]+)\)
+        /do { if (!($3)) { PDL_IF_BAD(if (\$PISBAD(CHILD,[$1]) ) { \$PSETBAD(PARENT,[$2]); } else,) { \$P(PARENT)[$2] = \$P(CHILD)[$1]; } } } while (0)/gx;
+        $good;
       }),
-
-   PDL::PP::Rule::Returns::Zero->new("Affine_Ok", "EquivCPOffsCode"),
-   PDL::PP::Rule::Returns::One->new("Affine_Ok"),
 
    PDL::PP::Rule::Returns::NULL->new("ReadDataFuncName", "AffinePriv"),
    PDL::PP::Rule::Returns::NULL->new("WriteBackDataFuncName", "AffinePriv"),
@@ -1623,6 +1583,7 @@ EOD
           confess "$name got default-less arg '$_' after default-ful arg '$default_seen'"
             if $default_seen and !exists $otherdefaults->{$_};
         }
+        ();
       }),
    PDL::PP::Rule->new("VarArgsXSHdr",
       [qw(Name SignatureObj
@@ -1678,7 +1639,7 @@ EOD
           $name2cnts{$x} = [$cnt, undef];
           $name2cnts{$x}[1] = ++$shortcnt if !($out{$x} || $other_out{$x});
           push @xsargs, "$x=$x";
-          push @inputdecls, "$ptypes{$x}$x".($other{$x} && !exists $otherdefaults->{$x} ? "; { ".callTypemap($x, $ptypes{$x})."; }" : "=NO_INIT");
+          push @inputdecls, "$ptypes{$x}$x".($other{$x} && !exists $otherdefaults->{$x} ? "; { ".callTypemap($x, $ptypes{$x}, $name)."; }" : "=NO_INIT");
         }
         push @inputdecls, map "$ptypes{$_}$_=".callPerlInit($_."_SV", $callcopy).";", grep $outca{$_}, @args;
         my $defaults_rawcond = $ndefault ? "items == $nin_minus_default" : '';
@@ -1698,10 +1659,10 @@ EOD
           indent(2, join '',
             (map
               "if (!${_}_SV) { $_ = ($otherdefaults->{$_}); } else ".
-              "{ ".callTypemap($_, $ptypes{$_})."; }\n",
+              "{ ".callTypemap($_, $ptypes{$_}, $name)."; }\n",
               grep !$argorder && exists $otherdefaults->{$_}, @{$sig->othernames(1, 1)}),
-            (map callTypemap($_, $ptypes{$_}).";\n", grep !$already_read{$_}, $sig->names_in),
-            (map +("if (${_}_SV) { ".($argorder ? '' : callTypemap($_, $ptypes{$_}))."; } else ")."$_ = ".callPerlInit($_."_SV", $callcopy).";\n", grep $out{$_} && !$already_read{$_} && !($inplace && $_ eq $inplace->[1]), @args)
+            (map callTypemap($_, $ptypes{$_}, $name).";\n", grep !$already_read{$_}, $sig->names_in),
+            (map +("if (${_}_SV) { ".($argorder ? '' : callTypemap($_, $ptypes{$_}, $name))."; } else ")."$_ = ".callPerlInit($_."_SV", $callcopy).";\n", grep $out{$_} && !$already_read{$_} && !($inplace && $_ eq $inplace->[1]), @args)
           );
         push @preinit, qq[PDL_XS_PREAMBLE($nretval);] if $nallout;
         push @preinit, qq{if (!(@{[join ' || ', map "(items == $_)", sort keys %valid_itemcounts]}))
@@ -1749,7 +1710,8 @@ $preamble@{[join "\n  ", "", @inputdecls]}
         my %ptypes = map +($_=>$$optypes{$_}->get_decl('', {VarArrays2Ptrs=>1})), @other_output;
         for my $x (@other_output) {
           my ($setter, $type) = typemap($ptypes{$x}, 'get_outputmap');
-          $setter = typemap_eval($setter, {var=>$x, type=>$type, arg=>"tsv"});
+          $setter = typemap_eval($setter, {var=>$x, type=>$type, arg=>"tsv",
+              pname=>$name});
           $clause1 .= <<EOF;
 if (!${x}_SV)
   PDL->pdl_barf("Internal error in $name: tried to output to NULL ${x}_SV");
@@ -1841,7 +1803,7 @@ sub wrap_vfn {
   join "", PDL::PP::pp_line_numbers(__LINE__,
 qq[pdl_error $rout(pdl_trans *$sname$extra_args) {
   pdl_error PDL_err = {0, NULL, 0};]),
-    ($ptype ? "  $ptype *$pname = $sname->params;\n" : ''),
+    ($ptype ? "  $ptype *$pname = $sname->params; (void)$pname;\n" : ''),
     indent(2, join '', grep $_, $all_func_header, $func_header, $code),
     "  return PDL_err;\n}";
 }
@@ -1890,7 +1852,7 @@ sub make_vfn_args {
 
    PDL::PP::Rule->new("DefaultRedoDims",
       ["StructName"],
-      sub { "PDL_RETERROR(PDL_err, PDL->redodims_default($_[0]));" }),
+      sub { "PDL_RETERROR(PDL_err, PDL->redodims_default($_[0]));\n" }),
    PDL::PP::Rule->new("DimsSetters",
       ["SignatureObj"],
       sub { join "\n", sort map $_->get_initdim, $_[0]->dims_values }),
@@ -1940,7 +1902,7 @@ sub make_vfn_args {
       "Rule to find the bad value status of the input ndarrays",
       sub {
         my $str = "PDL_RETERROR(PDL_err, PDL->trans_check_pdls($_[0]));\n";
-        $str .= "char \$BADFLAGCACHE() = PDL->trans_badflag_from_inputs($_[0]);\n" if $_[1]->names_out;
+        $str .= "char \$BADFLAGCACHE() = PDL->trans_badflag_from_inputs($_[0]); (void)\$BADFLAGCACHE();\n" if $_[1]->names_out;
         indent(2, $str);
       }),
 
@@ -2013,7 +1975,7 @@ EOF
       sub {(undef,(make_xs_code(' CODE:','',@_))[1..2])}),
    # if PMCode supplied, no var-args stuff
    PDL::PP::Rule->new(["NewXSCode","BootSetNewXS","NewXSInPrelude"],
-      [qw(PMCode NewXSHdr NewXSCHdrs? FixArgsXSOtherOutDeclSV RunFuncCall XSOtherOutSet)],
+      [qw(PMCode NewXSHdr NewXSCHdrs? FixArgsXSOtherOutDeclSV HdrCode RunFuncCall FtrCode XSOtherOutSet)],
       "Non-varargs XS code when PMCode given",
       sub {make_xs_code(' CODE:','',@_[1..$#_])}),
    PDL::PP::Rule->new(["NewXSCode","BootSetNewXS","NewXSInPrelude"],
@@ -2025,19 +1987,16 @@ EOF
    PDL::PP::Rule->new("VTableDef",
       ["VTableName","ParamStructType","RedoDimsFuncName","ReadDataFuncName",
        "WriteBackDataFuncName","FreeFuncName",
-       "SignatureObj","Affine_Ok","HaveBroadcasting","NoPthread","Name",
+       "SignatureObj","HaveBroadcasting","NoPthread","Name",
        "GenericTypes","IsAffineFlag","TwoWayFlag","DefaultFlowFlag",
        "BadFlag"],
       sub {
         my($vname,$ptype,$rdname,$rfname,$wfname,$ffname,
-           $sig,$affine_ok,$havebroadcasting, $noPthreadFlag, $name, $gentypes,
+           $sig,$havebroadcasting, $noPthreadFlag, $name, $gentypes,
            $affflag, $revflag, $flowflag, $badflag) = @_;
         my ($pnames, $pobjs) = ($sig->names_sorted, $sig->objs);
         my $nparents = 0 + grep !$pobjs->{$_}->{FlagW}, @$pnames;
-        my $aff = ($affine_ok ? "PDL_TPDL_VAFFINE_OK" : 0);
         my $npdls = scalar @$pnames;
-        my $join_flags = join(", ",map {$pobjs->{$pnames->[$_]}->{FlagPhys} ?
-                                          0 : $aff} 0..$npdls-1) || '0';
         my @op_flags;
         push @op_flags, 'PDL_TRANS_DO_BROADCAST' if $havebroadcasting;
         push @op_flags, 'PDL_TRANS_BADPROCESS' if $badflag;
@@ -2061,9 +2020,6 @@ EOF
         my $sizeof = $ptype ? "sizeof($ptype)" : '0';
         <<EOF;
 static pdl_datatypes ${vname}_gentypes[] = { $gentypes_txt };
-static char ${vname}_flags[] = {
-  $join_flags
-};
 static PDL_Indx ${vname}_realdims[] = { $realdims };
 static char *${vname}_parnames[] = { $parnames };
 static short ${vname}_parflags[] = {
@@ -2074,7 +2030,7 @@ static PDL_Indx ${vname}_realdims_starts[] = { $realdim_ind_start };
 static PDL_Indx ${vname}_realdims_ind_ids[] = { $realdim_inds };
 static char *${vname}_indnames[] = { $indnames };
 pdl_transvtable $vname = {
-  $op_flags, $iflags, ${vname}_gentypes, $nparents, $npdls, ${vname}_flags,
+  $op_flags, $iflags, ${vname}_gentypes, $nparents, $npdls, NULL /*CORE21*/,
   ${vname}_realdims, ${vname}_parnames,
   ${vname}_parflags, ${vname}_partypes,
   ${vname}_realdims_starts, ${vname}_realdims_ind_ids, @{[scalar @rd_inds]},

@@ -17,7 +17,7 @@ use constant TEST_MOCKTIME	=> do {
 };
 
 use Astro::App::Satpass2::ParseTime;
-use Test::More 0.88;
+use Test2::V0;
 
 use lib qw{ inc };
 
@@ -28,7 +28,7 @@ use My::Module::Test::App;
 # Note that we rely on check_datetime_timezone_local() returning a true
 # value if we're using POSIX rather than DateTime.
 check_datetime_timezone_local()
-    or plan skip_all => 'Cannot determine local time zone';
+    or skip_all 'Cannot determine local time zone';
 
 dump_zones_init();
 

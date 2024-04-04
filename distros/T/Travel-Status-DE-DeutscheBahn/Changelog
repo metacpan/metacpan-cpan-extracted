@@ -1,3 +1,38 @@
+Travel::Status::DE::DeutscheBahn 6.01 - Thu Apr 04 2024
+
+    * Journey: Add operators accessor
+    * Add CMTA (Capital Metropolitan Transportation Authority) and BLS (BLS AG)
+      services
+
+Travel::Status::DE::DeutscheBahn 6.00 - Tue Apr 02 2024
+
+    * Add AVV (Aachener Verkehrsverbund), BART (Bay Area Rapid Transit), and IE
+      (Iarnród Éireann / Irish Rail) backends
+    * Support backend-specific time zones; add time_zone to service description
+    * Handle cross-timezone journeys and stops whose time zone differs from
+      the backend's default time zone. As of this release, all input and output
+      datetimes refer to the backend's default time zone rather than local
+      time (Stop and Journey accessors) / whatever (hafas-m and HAFAS
+      arguments). Use the new tz_offset accessor to determine local time.
+      This is a breaking change.
+    * Journey, Stop: Add tz_offset accessor
+
+Travel::Status::DE::DeutscheBahn 5.06 - Thu Mar 28 2024
+
+    * Add Travel::Status::DE::HAFAS::Product module to handle line numbers,
+      operators, and similar. This enables proper support for journeys with
+      multiple operators and possibly multiple train/line numbers along the
+      route. It also exposes the line ID.
+    * Journey: Add product accessor
+    * Stop: Add prod_arr, prod_dep accessors
+    * hafas-m: Improve stop list display in journey mode
+    * Fix polyline and platform number support in ÖBB backend (and possibly
+      other non-DB backends)
+    * ÖBB backend: correctly handle polylines and platform numbers
+    * ÖBB backend: Remove redundant train numbers from $journey->name /
+      $journey->line / $product->name
+    * ÖBB backend: update productbits (thanks to Cassidy Dingenskirchen)
+
 Travel::Status::DE::DeutscheBahn 5.05 - Wed Feb 21 2024
 
     * ÖBB backend: handle midnight crossing and fix associated warnings

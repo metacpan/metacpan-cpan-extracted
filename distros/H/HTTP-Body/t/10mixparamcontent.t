@@ -28,15 +28,23 @@ SKIP: {
           arg1 => [
             undef, '',
             'Content-Type' =>'text/plain; charset=UTF-8',
-            'Content' => $string_in_utf8, ],
+            'Content' => $string_in_utf8,
+          ],
           arg2 => [
             undef, '',
             'Content-Type' =>'text/plain; charset=SHIFT_JIS',
-            'Content' => $string_in_shiftjis, ],
+            'Content' => $string_in_shiftjis,
+          ],
           arg2 => [
             undef, '',
             'Content-Type' =>'text/plain; charset=SHIFT_JIS',
-            'Content' => $string_in_shiftjis, ],
+            'Content' => $string_in_shiftjis,
+          ],
+          arg3 => [
+            "$path", Encode::encode_utf8('♥ttachment.txt'),
+            'Content-Type' => 'text/plain; charset=UTF-8',
+            'Content' => $string_in_utf8,
+          ],
           file => [
             "$path", Encode::encode_utf8('♥ttachment.txt'), 'Content-Type' =>'text/html; charset=UTF-8'
           ],
@@ -104,6 +112,10 @@ SKIP: {
         ],
         'arg2 part data correct',
     );
+
+    my $filename = $body->upload->{'arg3'} ? ($body->upload->{'arg3'}->{tempname}||"") : "";
+
+    ok($filename =~ qr/\Q$HTTP::Body::MultiPart::file_temp_suffix\E$/, 'arg3 temp file extension correct');
 
 };
 

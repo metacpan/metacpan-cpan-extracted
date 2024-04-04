@@ -57,14 +57,12 @@ subtest "coords" => sub {
 
     my $e;
 
-    isa_ok( $e = dies { sigma_clip( %req, coords => PDL->null ) },
-        [ eclass( 'parameter' ) ], 'null' );
+    isa_ok( $e = dies { sigma_clip( %req, coords => PDL->null ) }, [ eclass( 'parameter' ) ], 'null' );
 
     isa_ok( $e = dies { sigma_clip( %req, coords => PDL->zeroes( 0 ) ) },
         [ eclass( 'parameter' ) ], 'empty' );
 
-    isa_ok( $e = dies { sigma_clip( %req, coords => 'scalar' ) },
-        [ eclass( 'parameter' ) ], 'scalar' );
+    isa_ok( $e = dies { sigma_clip( %req, coords => 'scalar' ) }, [ eclass( 'parameter' ) ], 'scalar' );
 
     isa_ok(
         $e = dies { sigma_clip( %req, coords => ['scalar'] ) },
@@ -91,10 +89,7 @@ subtest "coords" => sub {
     ok( lives { sigma_clip( %req, coords => pdl( 1, 2 ) ) }, "pdl(1, 2)", )
       or note( $@ );
 
-    ok(
-        lives { sigma_clip( %req, coords => [ pdl( 1, 2 ) ] ) },
-        "[ pdl(1, 2) ]",
-    ) or note( $@ );
+    ok( lives { sigma_clip( %req, coords => [ pdl( 1, 2 ) ] ) }, "[ pdl(1, 2) ]", ) or note( $@ );
 
     ok( lives { sigma_clip( %req, coords => pdl( 1 ) ) }, "pdl(1)", )
       or note( $@ );
@@ -191,11 +186,7 @@ foreach my $field ( 'weight', 'mask' ) {
 
 subtest "!( coords || weight)" => sub {
 
-    isa_ok(
-        dies { sigma_clip( %req, ) },
-        [ eclass( 'parameter' ) ],
-        'neither coords nor weight'
-    );
+    isa_ok( dies { sigma_clip( %req, ) }, [ eclass( 'parameter' ) ], 'neither coords nor weight' );
 
 };
 
@@ -277,8 +268,7 @@ sub _generate_sample {
             # so tests are reproducible
             my $rng = PDL::GSL::RNG->new( 'taus' );
             $rng->set_seed( 1 );
-            $coords_cache
-              = $rng->ran_bivariate_gaussian( 10, 8, 0.5, $attr{nelem} );
+            $coords_cache = $rng->ran_bivariate_gaussian( 10, 8, 0.5, $attr{nelem} );
             $coords_cache->wfits( $data );
             $coords_cache;
         }
@@ -297,8 +287,7 @@ sub _generate_sample {
       = $attr{coords}->xchg( 0, 1 )->whereND( $attr{mask} )->xchg( 0, 1 );
 
     $attr{ninside} = $attr{inside}->dim( 1 );
-    $attr{sigma}   = sqrt(
-        dsum( ( $attr{inside} - $attr{initial_center} )**2 ) / $attr{ninside} );
+    $attr{sigma}   = sqrt( dsum( ( $attr{inside} - $attr{initial_center} )**2 ) / $attr{ninside} );
 
     $attr{center} = [ 0.0126755884280886, 0.0337090322699186, ];
 
@@ -318,7 +307,7 @@ subtest 'coords, no clip, no initial center' => sub {
         iterlim => 100,
         nsigma  => 1.5,
 
-# log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
+        # log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
     );
 
     ok( $results->success, "successful centering" ) or note $results->error;
@@ -380,7 +369,7 @@ subtest 'coords, no clip, initial center = [X,Y]' => sub {
         iterlim => 100,
         nsigma  => 1.5,
 
-# log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
+        # log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
     );
 
     ok( $results->success, "successful centering" ) or note $results->error;
@@ -441,7 +430,7 @@ subtest 'coords, no clip, initial center = [ X, undef]' => sub {
         iterlim => 100,
         nsigma  => 1.5,
 
-# log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
+        # log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
     );
 
     ok( $results->success, "successful centering" ) or note $results->error;
@@ -502,7 +491,7 @@ subtest 'coords, no clip, initial center => [undef,Y]' => sub {
         iterlim => 100,
         nsigma  => 1.5,
 
-# log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
+        # log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
     );
 
     ok( $results->success, "successful centering" ) or note $results->error;
@@ -563,7 +552,7 @@ subtest 'coords, no clip, initial center => [undef, undef]' => sub {
         iterlim => 100,
         nsigma  => 1.5,
 
-# log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
+        # log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
     );
 
     ok( $results->success, "successful centering" ) or note $results->error;
@@ -626,7 +615,7 @@ subtest 'coords + clip results' => sub {
         iterlim => 100,
         nsigma  => 1.5,
 
-# log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
+        # log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
     );
 
     ok( $results->success, "successful centering" ) or note $results->error;
@@ -682,7 +671,7 @@ subtest 'coords + mask results' => sub {
         dtol    => 0.00001,
         nsigma  => 1.5,
 
-# log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
+        # log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
     );
 
     ok( $results->success, "successful centering" ) or note $results->error;
@@ -734,10 +723,8 @@ subtest 'coords + clip + weight results' => sub {
 
     $sample->sigma(
         sqrt(
-            dsum(
-                $inside_weight
-                  * dsumover( ( $sample->inside - $sample->initial_center )**2 )
-            ) / $inside_weight_sum
+            dsum( $inside_weight * dsumover( ( $sample->inside - $sample->initial_center )**2 ) )
+              / $inside_weight_sum
         ) );
 
     my $results = sigma_clip(
@@ -836,8 +823,7 @@ subtest serialize => sub {
         'default result is an object with objects in it',
     );
 
-    isnt( $result->TO_JSON, object {},
-        q{jsonified top level object isn't an object} );
+    isnt( $result->TO_JSON, object {}, q{jsonified top level object isn't an object} );
     isnt(
         $result->TO_JSON->{iterations},
         bag { item object {}; item object {}; },

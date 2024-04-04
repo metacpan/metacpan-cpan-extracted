@@ -1773,13 +1773,13 @@ If the string  I<string> is not C<NULL> and it is read-only, returns 1, otherwis
 
 C<void (*print)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Environment">, L<SPVM_VALUE* stack|SPVM::Document::NativeClass/"Runtime Stack">, void* string);>
 
-Prints the string I<string> to SPVM's L<stdout|SPVM::Document::Language::System/"Standard IO">.
+Prints the string I<string> to L<SPVM's standard output|SPVM::Document::Language::System/"Standard Streams">.
 
 =head2 print_stderr
 
 C<void (*print_stderr)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Environment">, L<SPVM_VALUE* stack|SPVM::Document::NativeClass/"Runtime Stack">, void* string);>
 
-Prints the string I<string> to SPVM's L<stderr|SPVM::Document::Language::System/"Standard IO">.
+Prints the string I<string> to SPVM's L<SPVM's standard error|SPVM::Document::Language::System/"Standard Streams">.
 
 =head2 dump_no_mortal
 
@@ -1941,7 +1941,7 @@ If the object I<object> is not C<NULL> and its type is a multi-numeric array typ
 
 C<int32_t (*isa)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Environment">, L<SPVM_VALUE* stack|SPVM::Document::NativeClass/"Runtime Stack">, void* object, void* basic_type, int32_t type_dimension);>
 
-If the object I<object> satisfies the L<runtime assignment requirement|SPVM::Document::Language::Types/"Runtime Assignment Requirement"> to the type given by the basic type C<basic_type> and the type dimension C<type_dimension>, returns 1, otherwise returns 0.
+If the object I<object> satisfies the L<assignment requirement|SPVM::Document::Language::Types/"Assignment Requirement"> without implicite conversion to the type given by the basic type C<basic_type> and the type dimension C<type_dimension>, returns 1, otherwise returns 0.
 
 =head2 isa_by_name
 
@@ -1949,7 +1949,7 @@ C<int32_t (*isa_by_name)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime En
 
 If the basic type given by the basic type name I<basic_type_name> is not found, returns 0.
 
-If the object I<object> satisfies the L<runtime assignment requirement|SPVM::Document::Language::Types/"Runtime Assignment Requirement"> to the type given by the basic type name C<basic_type_name> and the type dimension C<type_dimension>, returns 1, otherwise returns 0.
+If the object I<object> satisfies the L<assignment requirement|SPVM::Document::Language::Types/"Assignment Requirement"> without implicite conversion to the type given by the basic type name C<basic_type_name> and the type dimension C<type_dimension>, returns 1, otherwise returns 0.
 
 =head2 is_type
 
@@ -1971,7 +1971,7 @@ If the object I<object> is not C<NULL> and its type of the object I<object> is e
 
 C<int32_t (*elem_isa)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Environment">, L<SPVM_VALUE* stack|SPVM::Document::NativeClass/"Runtime Stack">, void* array, void* element);>
 
-If the element I<element> satisfies the L<runtime assignment requirement|SPVM::Document::Language::Types/"Runtime Assignment Requirement"> to the element type of the array I<array>, returns 1, otherwise returns 0.
+If the element I<element> satisfies the L<assignment requirement|SPVM::Document::Language::Types/"Assignment Requirement"> without implicite conversion to the element type of the array I<array>, returns 1, otherwise returns 0.
 
 =head2 get_elem_size
 
@@ -2225,7 +2225,7 @@ Returns the count of the memory blocks managed by this runtime.
 
 C<void (*say)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Environment">, L<SPVM_VALUE* stack|SPVM::Document::NativeClass/"Runtime Stack">, void* string);>
 
-Prints the string I<string> and C<\n> to SPVM's L<stdout|SPVM::Document::Language::System/"Standard IO">.
+Prints the string I<string> and C<\n> to L<SPVM's standard output|SPVM::Document::Language::System/"Standard Streams">.
 
 =head2 warn
 
@@ -2236,19 +2236,19 @@ Performs the L<warn|SPVM::Document::Language::Operators/"warn"> operation given 
 
 C<FILE* (*spvm_stdin)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Environment">, L<SPVM_VALUE* stack|SPVM::Document::NativeClass/"Runtime Stack">);>
 
-Returns SPVM's L<stdin|SPVM::Document::Language::System/"Standard IO">.
+Returns L<SPVM's standard input|SPVM::Document::Language::System/"Standard Streams">.
 
 =head2 spvm_stdout
 
 C<FILE* (*spvm_stdout)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Environment">, L<SPVM_VALUE* stack|SPVM::Document::NativeClass/"Runtime Stack">);>
 
-Returns SPVM's L<stdout|SPVM::Document::Language::System/"Standard IO">.
+Returns L<SPVM's standard output|SPVM::Document::Language::System/"Standard Streams">.
 
 =head2 spvm_stderr
 
 C<FILE* (*spvm_stderr)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Environment">, L<SPVM_VALUE* stack|SPVM::Document::NativeClass/"Runtime Stack">);>
 
-Returns SPVM's L<stderr|SPVM::Document::Language::System/"Standard IO">.
+Returns L<SPVM's standard error|SPVM::Document::Language::System/"Standard Streams">.
 
 =head2 check_bootstrap_method
 

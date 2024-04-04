@@ -9,7 +9,7 @@
 package Dancer2::Plugin::OpenAPI;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: create OpenAPI documentation of your application
-$Dancer2::Plugin::OpenAPI::VERSION = '1.0.1';
+$Dancer2::Plugin::OpenAPI::VERSION = '1.0.2';
 use strict;
 use warnings;
 
@@ -149,7 +149,7 @@ sub BUILD {
 
                 $self->app->send_error( "file not found", 404 ) unless -f $file;
 
-                return $file->slurp;
+                return $self->app->send_as( html => $file->slurp );
             }
         );
 
@@ -314,7 +314,7 @@ Dancer2::Plugin::OpenAPI - create OpenAPI documentation of your application
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 SYNOPSIS
 
@@ -660,7 +660,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Yanick Champoux.
+This software is copyright (c) 2024 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

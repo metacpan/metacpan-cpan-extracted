@@ -72,6 +72,7 @@ while C<P(1) = p(1)>, C<Q(1) = 1 - p(1)>.
 =cut
 #line 74 "CDF.pm"
 
+
 =head1 FUNCTIONS
 
 =cut
@@ -87,7 +88,8 @@ while C<P(1) = p(1)>, C<Q(1) = 1 - p(1)>.
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the beta distribution with parameters I<a> and I<b>.
 
 =cut
-#line 91 "CDF.pm"
+#line 92 "CDF.pm"
+
 
 =head2 gsl_cdf_beta_P
 
@@ -195,7 +197,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(k), Q(k) for the binomial distribution with parameters I<p> and I<n>.
 
 =cut
-#line 199 "CDF.pm"
+#line 201 "CDF.pm"
+
 
 =head2 gsl_cdf_binomial_P
 
@@ -253,7 +256,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Cauchy distribution with scale parameter I<a>.
 
 =cut
-#line 257 "CDF.pm"
+#line 260 "CDF.pm"
+
 
 =head2 gsl_cdf_cauchy_P
 
@@ -361,7 +365,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the chi-squared distribution with I<nu> degrees of freedom.
 
 =cut
-#line 365 "CDF.pm"
+#line 369 "CDF.pm"
+
 
 =head2 gsl_cdf_chisq_P
 
@@ -469,7 +474,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the exponential distribution with mean I<mu>.
 
 =cut
-#line 473 "CDF.pm"
+#line 478 "CDF.pm"
+
 
 =head2 gsl_cdf_exponential_P
 
@@ -577,7 +583,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) for the exponential power distribution with parameters I<a> and I<b>.
 
 =cut
-#line 581 "CDF.pm"
+#line 587 "CDF.pm"
+
 
 =head2 gsl_cdf_exppow_P
 
@@ -635,7 +642,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the F-distribution with I<nu1> and I<nu2> degrees of freedom.
 
 =cut
-#line 639 "CDF.pm"
+#line 646 "CDF.pm"
+
 
 =head2 gsl_cdf_fdist_P
 
@@ -743,7 +751,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for a uniform distribution from I<a> to I<b>.
 
 =cut
-#line 747 "CDF.pm"
+#line 755 "CDF.pm"
+
 
 =head2 gsl_cdf_flat_P
 
@@ -851,7 +860,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the gamma distribution with parameters I<a> and I<b>.
 
 =cut
-#line 855 "CDF.pm"
+#line 864 "CDF.pm"
+
 
 =head2 gsl_cdf_gamma_P
 
@@ -959,7 +969,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Gaussian distribution with standard deviation I<sigma>.
 
 =cut
-#line 963 "CDF.pm"
+#line 973 "CDF.pm"
+
 
 =head2 gsl_cdf_gaussian_P
 
@@ -1067,7 +1078,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(k), Q(k) for the geometric distribution with parameter I<p>.
 
 =cut
-#line 1071 "CDF.pm"
+#line 1082 "CDF.pm"
+
 
 =head2 gsl_cdf_geometric_P
 
@@ -1125,7 +1137,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Type-1 Gumbel distribution with parameters I<a> and I<b>.
 
 =cut
-#line 1129 "CDF.pm"
+#line 1141 "CDF.pm"
+
 
 =head2 gsl_cdf_gumbel1_P
 
@@ -1233,7 +1246,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Type-2 Gumbel distribution with parameters I<a> and I<b>.
 
 =cut
-#line 1237 "CDF.pm"
+#line 1250 "CDF.pm"
+
 
 =head2 gsl_cdf_gumbel2_P
 
@@ -1341,7 +1355,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(k), Q(k) for the hypergeometric distribution with parameters I<n1>, I<n2> and I<t>.
 
 =cut
-#line 1345 "CDF.pm"
+#line 1359 "CDF.pm"
+
 
 =head2 gsl_cdf_hypergeometric_P
 
@@ -1399,7 +1414,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Laplace distribution with width I<a>.
 
 =cut
-#line 1403 "CDF.pm"
+#line 1418 "CDF.pm"
+
 
 =head2 gsl_cdf_laplace_P
 
@@ -1507,7 +1523,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the logistic distribution with scale parameter I<a>.
 
 =cut
-#line 1511 "CDF.pm"
+#line 1527 "CDF.pm"
+
 
 =head2 gsl_cdf_logistic_P
 
@@ -1615,7 +1632,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the lognormal distribution with parameters I<zeta> and I<sigma>.
 
 =cut
-#line 1619 "CDF.pm"
+#line 1636 "CDF.pm"
+
 
 =head2 gsl_cdf_lognormal_P
 
@@ -1773,7 +1791,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Pareto distribution with exponent I<a> and scale I<b>.
 
 =cut
-#line 1777 "CDF.pm"
+#line 1795 "CDF.pm"
+
 
 =head2 gsl_cdf_pareto_P
 
@@ -1881,7 +1900,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(k), Q(k) for the Pascal distribution with parameters I<p> and I<n>.
 
 =cut
-#line 1885 "CDF.pm"
+#line 1904 "CDF.pm"
+
 
 =head2 gsl_cdf_pascal_P
 
@@ -1939,7 +1959,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(k), Q(k) for the Poisson distribution with parameter I<mu>.
 
 =cut
-#line 1943 "CDF.pm"
+#line 1963 "CDF.pm"
+
 
 =head2 gsl_cdf_poisson_P
 
@@ -1997,7 +2018,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Rayleigh distribution with scale parameter I<sigma>.
 
 =cut
-#line 2001 "CDF.pm"
+#line 2022 "CDF.pm"
+
 
 =head2 gsl_cdf_rayleigh_P
 
@@ -2105,7 +2127,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the t-distribution with I<nu> degrees of freedom.
 
 =cut
-#line 2109 "CDF.pm"
+#line 2131 "CDF.pm"
+
 
 =head2 gsl_cdf_tdist_P
 
@@ -2213,7 +2236,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the unit Gaussian distribution.
 
 =cut
-#line 2217 "CDF.pm"
+#line 2240 "CDF.pm"
+
 
 =head2 gsl_cdf_ugaussian_P
 
@@ -2321,7 +2345,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Weibull distribution with scale I<a> and exponent I<b>.
 
 =cut
-#line 2325 "CDF.pm"
+#line 2349 "CDF.pm"
+
 
 =head2 gsl_cdf_weibull_P
 
@@ -2435,7 +2460,7 @@ The GSL CDF module was written by J. Stover.
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 2439 "CDF.pm"
+#line 2464 "CDF.pm"
 
 # Exit with OK status
 

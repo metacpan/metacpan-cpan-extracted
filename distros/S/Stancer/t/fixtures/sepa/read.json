@@ -1,0 +1,11 @@
+{
+  "bic": "TESTSEPP",
+  "created": 1601045777,
+  "date_birth": "1977-05-25",
+  "date_mandate": 1601045728,
+  "id": "sepa_bIvCZePYqfMlU11TANT8IqL1",
+  "last4": "0003",
+  "live_mode": false,
+  "mandate": "mandate-identifier",
+  "name": "John Doe"
+}

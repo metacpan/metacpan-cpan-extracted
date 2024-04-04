@@ -6,6 +6,7 @@ set -o nounset
 lib_dir="$PWD/lib"
 
 # Move to a temp dir
+# mktemp is not a POSIX function, but GNU, I think...
 dir="$(mktemp -d)"
 cd "${dir}" || exit
 unset VAR

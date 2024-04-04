@@ -1,12 +1,11 @@
 package Data::Munge;
-
 use strict;
 use warnings;
-use base qw(Exporter);
+use Exporter 5.57 qw(import);
 
 sub _eval { eval $_[0] }  # empty lexical scope
 
-our $VERSION = '0.097';
+our $VERSION = '0.101';
 our @EXPORT = qw(
     byval
     elem
@@ -69,12 +68,11 @@ sub mapval (&@) {
     map { $f->($_); $_ } @xs
 }
 
-if ($] >= 5.016) {
+if ($^V ge v5.16.0) {
     eval_string <<'EOT';
-use v5.16;
 sub rec (&) {
     my ($f) = @_;
-    sub { $f->(__SUB__, @_) }
+    sub { $f->(CORE::__SUB__, @_) }
 }
 EOT
 } elsif (eval { require Scalar::Util } && defined &Scalar::Util::weaken) {
@@ -136,49 +134,58 @@ sub trim {
 
 __END__
 
+=encoding utf8
+
+=for github-markdown [![Coverage Status](https://coveralls.io/repos/github/mauke/Data-Munge/badge.svg?branch=main)](https://coveralls.io/github/mauke/Data-Munge?branch=main)
+
 =head1 NAME
 
 Data::Munge - various utility functions
 
 =head1 SYNOPSIS
 
- use Data::Munge;
- 
- my $re = list2re qw/f ba foo bar baz/;
- # $re = qr/bar|baz|foo|ba|f/;
- 
- print byval { s/foo/bar/ } $text;
- # print do { my $tmp = $text; $tmp =~ s/foo/bar/; $tmp };
- 
- foo(mapval { chomp } @lines);
- # foo(map { my $tmp = $_; chomp $tmp; $tmp } @lines);
- 
- print replace('Apples are round, and apples are juicy.', qr/apples/i, 'oranges', 'g');
- # "oranges are round, and oranges are juicy."
- print replace('John Smith', qr/(\w+)\s+(\w+)/, '$2, $1');
- # "Smith, John"
- 
- my $trimmed = trim "  a b c "; # "a b c"
- 
- my $x = 'bar';
- if (elem $x, [qw(foo bar baz)]) { ... }
- 
- my $contents = slurp $fh;  # or: slurp *STDIN
- 
- eval_string('print "hello world\\n"');  # says hello
- eval_string('die');  # dies
- eval_string('{');    # throws a syntax error
- 
- my $fac = rec {
-   my ($rec, $n) = @_;
-   $n < 2 ? 1 : $n * $rec->($n - 1)
- };
- print $fac->(5);  # 120
- 
- if ("hello, world!" =~ /(\w+), (\w+)/) {
-   my @captured = submatches;
-   # @captured = ("hello", "world")
- }
+=for highlighter language=perl
+
+    use Data::Munge;
+
+    my $re = list2re qw/f ba foo bar baz/;
+    # $re = qr/bar|baz|foo|ba|f/;
+
+    print byval { s/foo/bar/ } $text;
+    # print do { my $tmp = $text; $tmp =~ s/foo/bar/; $tmp };
+
+    foo(mapval { chomp } @lines);
+    # foo(map { my $tmp = $_; chomp $tmp; $tmp } @lines);
+
+    print replace('Apples are round, and apples are juicy.', qr/apples/i, 'oranges', 'g');
+    # "oranges are round, and oranges are juicy."
+    print replace('John Smith', qr/(\w+)\s+(\w+)/, '$2, $1');
+    # "Smith, John"
+
+    my $trimmed = trim "  a b c ";
+    # "a b c"
+
+    my $x = 'bar';
+    if (elem $x, [qw(foo bar baz)]) { ... }
+    # executes: $x is an element of the arrayref
+
+    my $contents = slurp $fh;  # or: slurp *STDIN
+    # reads all data from a filehandle into a scalar
+
+    eval_string('print "hello world\\n"');  # says hello
+    eval_string('die');  # dies
+    eval_string('{');    # throws a syntax error
+
+    my $fac = rec {
+      my ($rec, $n) = @_;
+      $n < 2 ? 1 : $n * $rec->($n - 1)
+    };
+    print $fac->(5);  # 120
+
+    if ("hello, world!" =~ /(\w+), (\w+)/) {
+      my @captured = submatches;
+      # @captured = ("hello", "world")
+    }
 
 =head1 DESCRIPTION
 
@@ -194,8 +201,8 @@ redefining or working around them, so I wrote this module.
 Converts a list of strings to a regex that matches any of the strings.
 Especially useful in combination with C<keys>. Example:
 
- my $re = list2re keys %hash;
- $str =~ s/($re)/$hash{$1}/g;
+    my $re = list2re keys %hash;
+    $str =~ s/($re)/$hash{$1}/g;
 
 This function takes special care to get several edge cases right:
 
@@ -227,13 +234,13 @@ and returns the final value of C<$_>. The global value of C<$_> is not
 affected. C<$_> isn't aliased to the input value either, so modifying C<$_>
 in the block will not affect the passed in value. Example:
 
- foo(byval { s/!/?/g } $str);
- # Calls foo() with the value of $str, but all '!' have been replaced by '?'.
- # $str itself is not modified.
+    foo(byval { s/!/?/g } $str);
+    # Calls foo() with the value of $str, but all '!' have been replaced by '?'.
+    # $str itself is not modified.
 
 Since perl 5.14 you can also use the C</r> flag:
 
- foo($str =~ s/!/?/gr);
+    foo($str =~ s/!/?/gr);
 
 But C<byval> works on all versions of perl and is not limited to C<s///>.
 
@@ -244,10 +251,10 @@ C<map>, but C<$_> is a copy, not aliased to the current element, and the return
 value is taken from C<$_> again (it ignores the value returned by the
 block). Example:
 
- my @foo = mapval { chomp } @bar;
- # @foo contains a copy of @bar where all elements have been chomp'd.
- # This could also be written as chomp(my @foo = @bar); but that's not
- # always possible.
+    my @foo = mapval { chomp } @bar;
+    # @foo contains a copy of @bar where all elements have been chomp'd.
+    # This could also be written as chomp(my @foo = @bar); but that's not
+    # always possible.
 
 =item submatches
 
@@ -327,9 +334,9 @@ at elements C<1 .. 9999>).
 Evals I<STRING> just like C<eval> but doesn't catch exceptions. Caveat: Unlike
 with C<eval> the code runs in an empty lexical scope:
 
- my $foo = "Hello, world!\n";
- eval_string 'print $foo';
- # Dies: Global symbol "$foo" requires explicit package name
+    my $foo = "Hello, world!\n";
+    eval_string 'print $foo';
+    # Dies: Global symbol "$foo" requires explicit package name
 
 That is, the eval'd code can't see variables from the scope of the
 C<eval_string> call.
@@ -347,12 +354,12 @@ C<slurp $handle> is equivalent to C<do { local $/; scalar readline $handle }>.
 Creates an anonymous sub as C<sub BLOCK> would, but supplies the called sub
 with an extra argument that can be used to recurse:
 
- my $code = rec {
-   my ($rec, $n) = @_;
-   $rec->($n - 1) if $n > 0;
-   print $n, "\n";
- };
- $code->(4);
+    my $code = rec {
+      my ($rec, $n) = @_;
+      $rec->($n - 1) if $n > 0;
+      print $n, "\n";
+    };
+    $code->(4);
 
 That is, when the sub is called, an implicit first argument is passed in
 C<$_[0]> (all normal arguments are moved one up). This first argument is a
@@ -379,12 +386,12 @@ Lukas Mai, C<< <l.mai at web.de> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009-2011, 2013-2015 Lukas Mai.
+Copyright 2009-2011, 2013-2015, 2023 Lukas Mai.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
+See L<https://dev.perl.org/licenses/> for more information.
 
 =cut

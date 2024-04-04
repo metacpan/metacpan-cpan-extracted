@@ -118,7 +118,6 @@
             "System::Command" : "0",
             "constant" : "0",
             "experimental" : "0",
-            "if" : "0",
             "namespace::clean" : "0",
             "parent" : "0",
             "perl" : "v5.26.0",
@@ -147,23 +146,23 @@
    "provides" : {
       "Qhull" : {
          "file" : "lib/Qhull.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Qhull::Options" : {
          "file" : "lib/Qhull/Options.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Qhull::PP" : {
          "file" : "lib/Qhull/PP.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Qhull::Util" : {
          "file" : "lib/Qhull/Util.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Qhull::Util::Options" : {
          "file" : "lib/Qhull/Util/Options.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -178,7 +177,7 @@
          "web" : "https://gitlab.com/djerius/p5-qhull"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "GPL-3.0-only"

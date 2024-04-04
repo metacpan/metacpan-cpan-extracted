@@ -37,7 +37,7 @@ my %options = (
 	-showstatus => 1,
 	-tabs => '8m',
 	-wrap => 'none',
-	-xmldir => undef,
+	-xmlfolder => undef,
 );
 
 my @usersettings = ('-autoindent', '-indentstyle', '-match', '-showfolds', '-shownumbers', '-showstatus', '-tabs', '-wrap');
@@ -59,7 +59,7 @@ Options:
 -v -themefile:    Load a theme file with color and font definitions 
                   for syntax highlighting 
 -w -wrap:         By default 'none'. Can also be 'word' or 'char'. 
--x -xmldir:       Specifies the XML directory for syntax highlighting.
+-x -xmlfolder:    Specifies the XML directory for syntax highlighting.
 __EOF
 
 my %short_args = (
@@ -124,7 +124,7 @@ my %short_args = (
 	'-x' => sub { 
 		my $value = shift @ARGV;
 		die "please specify xml folder\n$help_main" unless defined $value;
-		$options{'-xmldir'} = $value
+		$options{'-xmlfolder'} = $value
 	},
 );
 
@@ -140,7 +140,7 @@ my %main_args = (%short_args,
 	'-tabs' => $short_args{'-t'},
 	'-themefile' => $short_args{'-v'},
 	'-wrap' => $short_args{'-w'},
-	'-xmldir' => $short_args{'-x'},
+	'-xmlfolder' => $short_args{'-x'},
 );
 
 while (@ARGV) {
@@ -343,3 +343,4 @@ sub quit {
 }
 
 __END__
+

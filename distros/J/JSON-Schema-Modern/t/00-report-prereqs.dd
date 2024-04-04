@@ -21,6 +21,7 @@ do { my $x = {
                                       'Net::IDN::Encode' => '0',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Pod::Wordlist' => '0',
+                                      'Sereal' => '0',
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::CPAN::Meta' => '0',
                                       'Test::CleanNamespaces' => '0.15',
@@ -86,6 +87,7 @@ do { my $x = {
                                       'Email::Address::XS' => '1.04',
                                       'Net::IDN::Encode' => '0',
                                       'Ref::Util::XS' => '0',
+                                      'Sereal' => '0',
                                       'Time::Moment' => '0',
                                       'Type::Tiny::XS' => '0'
                                     }

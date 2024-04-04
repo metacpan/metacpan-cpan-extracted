@@ -1,4 +1,4 @@
-CGI-ACL Version 0.04
+CGI-ACL Version 0.05
 
 INSTALLATION
 
@@ -21,15 +21,11 @@ You can also look for information at:
     RT, CPAN's request tracker
         http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-ACL
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/CGI-ACL
-
     Search CPAN
         http://search.cpan.org/dist/CGI-ACL/
 
-
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017-2021 Nigel Horne
+Copyright (C) 2017-2024 Nigel Horne
 
 This program is released under the following licence: GPL2

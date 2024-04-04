@@ -26,12 +26,12 @@ get '/' => sub ($c) {
   $fields = trim($fields) if $fields;
   my $synth = Synth::Config->new(model => $model, verbose => 1);
   if ($model) {
+    # TODO save the specs config file IN THE DATABASE please
     # get a specs config file for the synth model
     my $set_file = SETTINGS . $synth->model . '.dat';
     my $specs = -e $set_file ? retrieve($set_file) : undef;
     # get the known groups if there are specs
     $groups = $specs ? $specs->{group} : undef;
-    $groups = [ sort @$groups ] if $groups;
     # fetch the things!
     if ($group || $name || $fields) {
       my %parameters;
@@ -156,6 +156,7 @@ get '/remove' => sub ($c) {
   $v->optional('id');
   $v->optional('name');
   $v->optional('model');
+  $v->optional('group');
   if ($v->failed->@*) {
     $c->flash(error => 'Remove failed');
     return $c->redirect_to('index');
@@ -164,7 +165,7 @@ get '/remove' => sub ($c) {
   if ($v->param('id')) {
     $synth->remove_setting(id => $v->param('id'));
     $c->flash(message => 'Remove setting successful');
-    return $c->redirect_to($c->url_for('index')->query(model => $v->param('model'), name => $v->param('name')));
+    return $c->redirect_to($c->url_for('index')->query(model => $v->param('model'), name => $v->param('name'), group => $v->param('group')));
   }
   elsif ($v->param('name') && !($v->param('id'))) {
     $synth->remove_settings(name => $v->param('name'));
@@ -184,6 +185,7 @@ get '/edit_setting' => sub ($c) {
   my $id         = $c->param('id');
   my $name       = $c->param('name');
   my $model      = $c->param('model');
+# TODO gather these keys from the init.set file
   my $group      = $c->param('group');
   my $parameter  = $c->param('parameter');
   my $control    = $c->param('control');
@@ -231,10 +233,11 @@ get '/edit_setting' => sub ($c) {
   );
 } => 'edit_setting';
 
-post '/update' => sub ($c) {
+post '/update_setting' => sub ($c) {
   my $v = $c->validation;
   $v->required('name');
   $v->required('model');
+# TODO gather these keys from the *.set file
   $v->required('group');
   $v->required('parameter');
   $v->required('control');
@@ -247,7 +250,7 @@ post '/update' => sub ($c) {
   $v->optional('is_default');
   $v->optional('id');
   if ($v->failed->@*) {
-    $c->flash(error => 'Could not update');
+    $c->flash(error => 'Could not update setting');
     return $c->redirect_to('edit_setting');
   }
   my $model = trim $v->param('model') if $v->param('model');
@@ -287,7 +290,7 @@ post '/update' => sub ($c) {
     unit       => $v->param('unit'),
     is_default => $v->param('is_default'),
   ));
-} => 'update';
+} => 'update_setting';
 
 helper to_json => sub ($c, $data) {
   return to_json $data;
@@ -298,6 +301,7 @@ helper build_edit_url => sub ($c, $model, $id, $set) {
     $id ? (id => $id) : (),
     model      => $model,
     name       => $set->{name},
+# TODO gather these keys from the *.set file
     group      => $set->{group},
     parameter  => $set->{parameter},
     control    => $set->{control},
@@ -467,9 +471,9 @@ __DATA__
 <div class="row">
   <div class="col">
     <label for="model">Model:</label>
+    <input type="hidden" name="groups" value="<%= $groups %>">
 % if ($clone) {
     <input type="hidden" name="model" value="<%= $model %>">
-    <input type="hidden" name="groups" value="<%= $groups %>">
     <input type="text" name="clone" id="clone" class="form-control" required>
 % } else {
     <input type="text" name="model" id="model" value="<%= $model %>" class="form-control" disabled readonly>
@@ -477,15 +481,10 @@ __DATA__
   </div>
 </div>
 <p></p>
-<div class="row">
-  <div class="col">
-    <label for="groups">Groups:</label>
-    <input type="text" id="groups" value="<%= $groups %>" class="form-control" disabled readonly>
-  </div>
-</div>
-<p></p>
+<b>Groups</b>:
+<hr>
 % for my $g (@$group_list) {
-  <label for="<%= $g %>"><%= $g %>:</label>
+  <label for="<%= $g %>"><b><%= ucfirst $g %></b>:</label>
   <input type="text" name="group" id="<%= $g %>" value="<%= join ',', $specs->{$g}->@* %>" class="form-control" placeholder="<%= $g %> parameter1, param2, etc.">
   <p></p>
 % }
@@ -507,7 +506,7 @@ __DATA__
 @@ edit_setting.html.ep
 % layout 'default';
 <p></p>
-<form action="<%= url_for('update') %>" method="post">
+<form action="<%= url_for('update_setting') %>" method="post">
   <input type="hidden" name="id" value="<%= $id %>">
 <div class="row">
   <div class="col">
@@ -570,7 +569,7 @@ __DATA__
   <p></p>
 % if ($id) {
   <button type="submit" class="btn btn-primary"><i class="fa-solid fa-arrow-rotate-right"></i> Update</button>
-  <a href="<%= url_for('remove')->query(id => $id, model => $model, name => $name) %>" id="remove" class="btn btn-danger" onclick="if(!confirm('Remove setting <%= $id %>?')) return false;"><i class="fa-solid fa-trash-can"></i> Remove</a>
+  <a href="<%= url_for('remove')->query(id => $id, model => $model, name => $name, group => $selected->{group}) %>" id="remove" class="btn btn-danger" onclick="if(!confirm('Remove setting <%= $id %>?')) return false;"><i class="fa-solid fa-trash-can"></i> Remove</a>
 % my $edit_url = build_edit_url($model, '', { name => $name, %$selected });
   <a href="<%= $edit_url %>" id="clone_setting" class="btn btn-success"><i class="fa-solid fa-copy"></i> Clone</a>
   <a href="<%= url_for('edit_setting')->query(model => $model, name => $name, group => $selected->{group}) %>" id="new_setting" class="btn btn-success"><i class="fa-solid fa-plus"></i> New</a>

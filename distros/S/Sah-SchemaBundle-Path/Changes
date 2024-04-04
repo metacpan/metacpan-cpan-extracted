@@ -1,0 +1,207 @@
+0.031   2024-02-16  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Sah-Schema{s,Bundle}-Path following rename of
+          Sah-Schema{s,Bundle} (for visual clarity and consistency with
+          naming of other bundles).
+
+
+0.030   2024-01-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] [build] Fix links to completion rule module
+          (Pod::Weaver::Plugin::Sah::Schemas 0.077).
+
+
+0.029   2024-01-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] [build] Tweak definition of Sah::Schema modules
+          (Pod::Weaver::Plugin::Sah::Schemas 0.076).
+
+
+0.028   2024-01-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] Show definitions of Sah::Schema modules.
+
+
+0.027   2023-11-23  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Typos.
+
+
+0.026   2023-11-23  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: dirname::default_only_subdir_not_file_in_curdir.
+
+
+0.025   2023-11-23  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: filename::default_only_file_not_dir_in_curdir.
+
+
+0.024   2023-11-18  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: filename::{,exists::}default_only_file_in_curdir,
+          dirname::{,exists::}default_only_subdir_in_curdir.
+
+
+0.023   2023-11-18  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: {dir,file,path}name::unix::dirname.
+
+
+0.022   2023-10-29  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: dirname::default_curdir_abs.
+
+
+0.021   2023-10-29  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: dirname::default_curdir.
+
+
+0.020   2023-08-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: {file,dir}name::{,unix::}not_exists.
+
+        - [doc] Add description (guideline) in the main module.
+
+        - [doc] Add description to all schemas which previously did not have
+          description.
+
+
+0.019   2023-08-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: {path,dir,file}name::unix::exists,
+          pathname::unix::not_exists.
+
+
+0.018   2023-08-14  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: pathname::not_exists.
+
+
+0.017   2023-08-11  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: {file,dir,path}name::exists, filenames,
+          filenames::exist, dirnames, dirnames::exist, pathnames::exist.
+
+
+0.016   2021-07-17  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Give rationale for the schemas.
+
+
+0.015   2020-08-26  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.014 and 0.014.1.
+
+
+0.014.1 2020-08-08  Released-By: PERLANCAR; Urgency: medium; Status: Cancelled
+
+	- Add schema: pathnames.
+
+        - UPDATE 2020-08-26: rename release from 0.014 to 0.014.1, cancel
+          release (duplicate).
+
+
+0.014   2020-05-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Forbid empty filename/dirname/pathname.
+
+	- Add examples (tests).
+
+
+0.013   2020-02-11  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] D'oh, fix filter rule name again.
+
+
+0.012   2020-02-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Tweak/fix filter rule names.
+
+        - Tweak completion.
+
+
+0.011   2020-02-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Use prefilters instead of coerce rules.
+
+        - [ux] Expand tilde (e.g. "~/foo" becomes "/home/budi/foo").
+
+
+0.010   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule modules again, revert to using lower_case
+	  notation for the description part, because CamelCase is really,
+	  REALLY ugly when we have many words.
+
+
+0.009   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule module from
+	  Data-Sah-Coerce-perl-str-str_strip_slashes to
+	  Data-Sah-Coerce-perl-To_str-From_str-StripSlashes.
+
+
+0.008   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Update metadata version of coerce rule module(s) 3->4.
+
+
+0.007   2019-07-12  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Base {file,dir,path}name::unix on str instead of on
+	  {file,dir,path}name because otherwise we have to provide
+	  {file,dir,path}name::str_strip_slashes coercion rule names.
+
+
+0.006   2019-07-12  Released-By: PERLANCAR; Urgency: high
+
+        - UPDATE: this release is broken due to non-existing coercion rules. See
+          0.007.
+
+	- Coerce rule: rename str_strip_trailing_slash to
+	  str_strip_slashes, also strip extra slashes like foo//bar ->
+	  foo/bar. And (bugfix) do not strip '/' to ''.
+
+	- Add schemas: {file,dir,path}name::unix, move strip_slashes coercion
+	  rule to these schemas.
+
+	- Add some tests.
+
+
+0.005   2018-06-04  Released-By: PERLANCAR
+
+	- Update to Data::Sah::Coerce 0.025 (coerce rule module metadata
+	  version 3).
+
+
+0.004   2018-01-14  Released-By: PERLANCAR
+
+        - [build] Rebuild with updated DZP:Sah::Schemas to add prereqs to
+          Perinci::Sub::XCompletion::* modules.
+
+
+0.003   2016-07-22  Released-By: PERLANCAR
+
+	- Add x.completion attribute.
+
+
+0.002   2016-07-22  Released-By: PERLANCAR
+
+	- [build] Rebuild to generate Sah::SchemaR::* modules.
+
+
+0.001   2016-07-20  Released-By: PERLANCAR
+
+	- First release.

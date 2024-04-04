@@ -1,6 +1,6 @@
 package Mail::BIMI::Record;
 # ABSTRACT: Class to model a BIMI record
-our $VERSION = '3.20240319'; # VERSION
+our $VERSION = '3.20240402'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -153,7 +153,7 @@ sub _build_record_hashref($self) {
     return {};
   };
 
-  @records = grep { $_ =~ /^v=bimi1;/i } @records;
+  @records = grep { $_ =~ /^v\s*=\s*bimi1;/i } @records;
 
   if ( !@records ) {
     if ( $domain eq $fallback_domain && $selector eq $fallback_selector ) {
@@ -174,7 +174,7 @@ sub _build_record_hashref($self) {
       return {};
     };
 
-    @records = grep { $_ =~ /^v=bimi1;/i } @records;
+    @records = grep { $_ =~ /^v\s*=\s*bimi1;/i } @records;
 
     if ( !@records ) {
       $self->add_error('NO_BIMI_RECORD');
@@ -243,7 +243,7 @@ sub _parse_record($self,$record) {
   foreach my $part ( @parts ) {
     $part =~ s/^ +//;
     $part =~ s/ +$//;
-    my ( $key, $value ) = split '=', $part, 2;
+    my ( $key, $value ) = split '\s*=\s*', $part, 2;
     $key = lc $key;
     if ( exists $data->{ $key } ) {
       $self->add_error('DUPLICATE_KEY');
@@ -309,7 +309,7 @@ Mail::BIMI::Record - Class to model a BIMI record
 
 =head1 VERSION
 
-version 3.20240319
+version 3.20240402
 
 =head1 DESCRIPTION
 

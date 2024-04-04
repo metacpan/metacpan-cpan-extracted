@@ -1,5 +1,5 @@
 package YA::CLI;
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 use Moo;
 
 # ABSTRACT: Yet another CLI framework
@@ -43,6 +43,11 @@ sub _init {
     }
 
     $action //= $class->default_handler;
+    if (!defined $action) {
+        return $class->as_manpage()  if $cli_args{man};
+        return $class->as_help()     if $cli_args{help};
+        return $class->as_help(1);
+    }
     return $class->as_help() if !defined $action;
 
     my $handler = $class->_get_action_handler($action, $subaction);
@@ -108,10 +113,13 @@ sub _get_action_handler {
     my $finder = Module::Pluggable::Object->new(
         search_path => $class->default_search_path,
         require     => 1,
+        $class->can('exclude_search_path') ? (
+            except => $class->exclude_search_path,
+        ) : (),
     );
 
     @PLUGINS = $finder->plugins if !@PLUGINS;
-    my @found =  grep { $_->has_action($action, $subaction) } @PLUGINS;
+    my @found = grep { $_->has_action($action, $subaction) } @PLUGINS;
     return unless @found;
 
     return $found[0] if @found == 1;
@@ -133,7 +141,7 @@ YA::CLI - Yet another CLI framework
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -182,6 +190,10 @@ Runs the application
 =head2 default_search_path
 
 Override the default search path, defaults to your Your::App namespace.
+
+=head2 exclude_search_path
+
+Excludes the search paths, can be a string, array ref or regexp
 
 =head2 default_handler
 

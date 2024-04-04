@@ -36,6 +36,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "Future" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::CheckDeps" => "0.010",
@@ -45,7 +46,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::NoTabs" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,6 +57,7 @@ my %FallbackPrereqs = (
   "Data::UUID" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "Future" => 0,
   "IO::Async::Loop::Mojo" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

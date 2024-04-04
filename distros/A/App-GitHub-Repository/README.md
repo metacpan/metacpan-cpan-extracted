@@ -1,34 +1,50 @@
-# App-GitHub-Repository version 0.0.1
+# App::GitHub::Repository [![Test distro](https://github.com/JJ/p5-app-github-repository/actions/workflows/test.yml/badge.svg)](https://github.com/JJ/p5-app-github-repository/actions/workflows/test.yml)
 
 
-Checks things from repositories which are hosted in GitHub. Uses scraping for extracting information, so you don't have to use an API.
+Checks things from repositories hosted in GitHub. Uses scraping for extracting
+information, so you don't have to use an API. Bear in mind that you can do so
+only locally, it is probably blocked from workflows, even in GitHub itself.
 
 
 ## INSTALLATION
 
-To install this module, run the following commands:
-
-	perl Makefile.PL
-	make
-	make test
-	make install
-
-Alternatively, to install with Module::Build, you can use the following commands:
+It uses Module::Build for installation, so it goes like this
 
 	perl Build.PL
 	./Build
 	./Build test
 	./Build install
 
+Run
+
+```shell
+./Build installdeps
+```
+
+If you're developing and installing dependencies locally.
 
 ## DEPENDENCIES
 
-None.
+It uses:
 
+- `Test::More`
+- `version`
+- `File::Slurper`
+- `JSON`
+- `Git`
+- `Test::Perl::Critic`
+
+As a binary dependency, `curl` needs to be installed on the system and available
+in the path
+
+## Version history
+
+- v0.0.5 fixes some bugs, and reduces binary dependency. Theoretically, it could
+  run in Windows too.
 
 ## COPYRIGHT AND LICENCE
 
-Copyright (C) 2018, JJ Merelo
+Copyright (C) 2018, 2024 JJ Merelo
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,9 +1,4 @@
-use strict;
-use warnings;
-
-use Test::More tests => 5;
-use Test::Warnings;
-
+use Test2::V0;
 use Data::Munge qw(eval_string);
 
 {
@@ -22,3 +17,5 @@ use Data::Munge qw(eval_string);
     is $@, "fiddlesticks\n";
     is $main::E, 'xyzzy 2';
 }
+
+done_testing;

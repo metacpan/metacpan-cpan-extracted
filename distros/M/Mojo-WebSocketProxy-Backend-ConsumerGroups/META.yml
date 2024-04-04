@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  Future: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::CheckDeps: '0.010'
@@ -33,7 +34,7 @@ no_index:
 provides:
   Mojo::WebSocketProxy::Backend::ConsumerGroups:
     file: lib/Mojo/WebSocketProxy/Backend/ConsumerGroups.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Data::UUID: '0'
   IO::Async::Loop::Mojo: '0'
@@ -51,16 +52,15 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/binary-com/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups/issues
-  homepage: https://github.com/binary-com/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups
-  repository: https://github.com/binary-com/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups.git
-version: '0.05'
+  bugtracker: https://github.com/katew-deriv/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups/issues
+  homepage: https://github.com/katew-deriv/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups
+  repository: https://github.com/katew-deriv/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups.git
+version: '0.06'
 x_authority: cpan:DERIV
 x_contributors:
-  - 'aisha-deriv <aisha@deriv.com>'
-  - 'aisha-deriv <aisha@regentmarkets.com>'
-  - 'kathleen-deriv <122329285+lim-deriv@users.noreply.github.com>'
+  - 'Kate Wilkins <kate.wilkins@deriv.com>'
   - 'aisha-deriv <116639606+aisha-deriv@users.noreply.github.com>'
+  - 'kathleen-deriv <122329285+lim-deriv@users.noreply.github.com>'
   - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
   - 'Kalaiselvan <kalaiselvan@deriv.com>'
   - 'Mario <115534871+mariovw-deriv@users.noreply.github.com>'

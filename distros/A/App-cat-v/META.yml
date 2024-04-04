@@ -1,0 +1,49 @@
+---
+abstract: 'cat-v command implementation'
+author:
+  - 'Kazumasa Utashiro'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-cat-v
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::cat::v:
+    file: lib/App/cat/v.pm
+    version: '0.9902'
+requires:
+  Getopt::EX: '0'
+  Getopt::EX::Hashed: '0'
+  Getopt::Long: '0'
+  Hash::Util: '0'
+  List::Util: '1.29'
+  Pod::Usage: '0'
+  Text::ANSI::Fold: '2.22'
+  Text::ANSI::Tabs: '1.0501'
+  perl: '5.024'
+resources:
+  bugtracker: https://github.com/tecolicom/App-cat-v/issues
+  homepage: https://github.com/tecolicom/App-cat-v
+  repository: https://github.com/tecolicom/App-cat-v.git
+version: '0.9902'
+x_authority: cpan:UTASHIRO
+x_contributors:
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

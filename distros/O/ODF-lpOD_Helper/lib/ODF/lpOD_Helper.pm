@@ -96,8 +96,8 @@ and fonts registered.
 package ODF::lpOD_Helper;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '6.010'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-03-25'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '6.011'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-03-27'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Data::Dumper::Interp 6.004 qw/visnew

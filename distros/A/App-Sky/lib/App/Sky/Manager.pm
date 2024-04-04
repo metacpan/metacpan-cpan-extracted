@@ -1,5 +1,5 @@
 package App::Sky::Manager;
-$App::Sky::Manager::VERSION = '0.4.2';
+$App::Sky::Manager::VERSION = '0.4.3';
 use strict;
 use warnings;
 
@@ -52,8 +52,7 @@ sub _calc_sect_name
                 {
                     my $re = $sections->{$_}->{basename_re};
                     $bn =~ /$re/;
-                }
-                ( keys(%$sections) )
+                } ( keys(%$sections) )
             );
         }
     }
@@ -167,7 +166,7 @@ App::Sky::Manager - manager for the configuration.
 
 =head1 VERSION
 
-version 0.4.2
+version 0.4.3
 
 =head1 METHODS
 

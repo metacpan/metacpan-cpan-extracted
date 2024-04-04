@@ -1,5 +1,11 @@
 Revision history for PDL-Algorithm-Center
 
+0.15      2024-04-02 09:56:35-04:00 America/New_York
+
+  [BUG FIX]
+
+    * serializer for results couldn't serialize our own error object.
+
 0.14      2023-11-25 20:39:04-05:00 America/New_York
 
   [BUG FIX]

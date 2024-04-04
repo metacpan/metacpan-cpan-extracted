@@ -94,3 +94,7 @@
 /.github/workflows/
 
 \bMy.pm$
+
+# For debug/POC.
+\blib/Filter/
+\bt/bug_lossy_var/

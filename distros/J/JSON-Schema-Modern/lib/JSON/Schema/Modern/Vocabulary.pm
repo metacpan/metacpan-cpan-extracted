@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Base role for JSON Schema vocabulary classes
 
-our $VERSION = '0.582';
+our $VERSION = '0.583';
 
 use 5.020;
 use Moo::Role;
@@ -81,10 +81,7 @@ sub eval_subschema_at_uri ($class, $data, $schema, $state, $uri) {
     +{
       $schema_info->{configs}->%*,
       %$state,
-      traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}
-        .jsonp('', $state->{keyword}, exists $state->{_schema_path_suffix}
-          ? (is_plain_arrayref($state->{_schema_path_suffix}) ? $state->{_schema_path_suffix}->@* : $state->{_schema_path_suffix})
-          : ()),
+      traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/'.$state->{keyword},
       initial_schema_uri => $schema_info->{canonical_uri},
       document => $schema_info->{document},
       document_path => $schema_info->{document_path},
@@ -108,7 +105,7 @@ JSON::Schema::Modern::Vocabulary - Base role for JSON Schema vocabulary classes
 
 =head1 VERSION
 
-version 0.582
+version 0.583
 
 =head1 SYNOPSIS
 
@@ -173,13 +170,13 @@ Evaluates a subschema. Callers are expected to establish a new C<$state> scope.
 
 Resolves a URI to a subschema, then evaluates that subschema (essentially the C<$ref> keyword).
 
-=for stopwords OpenAPI
-
 =head1 SUPPORT
 
 Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Modern/issues>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+=for stopwords OpenAPI
 
 You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
 server|https://open-api.slack.com>, which are also great resources for finding help.

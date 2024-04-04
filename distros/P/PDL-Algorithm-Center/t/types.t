@@ -30,9 +30,8 @@ sub coerce_lives {
     my $got;
 
     my $ok
-      = $ctx->ok( lives { $got = $c->assert_coerce( $input ) },
-        "$label: coerce" )->pass
-      ? $ctx->ok( _cmp_pdl( $got, $exp ), "$label: value" )->pass
+      = $ctx->ok( lives { $got = $c->assert_coerce( $input ) }, "$label: coerce" )->pass
+      ? $ctx->ok( _cmp_pdl( $got, $exp ),                       "$label: value" )->pass
           ? 1
           : do { note $got; 0 }
       : do { note $@; 0 };

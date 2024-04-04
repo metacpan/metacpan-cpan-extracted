@@ -1,0 +1,28 @@
+0.005   2024-02-16  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Sah-Schema{s,Bundle}-ArrayData following rename of
+          Sah-Schema{s,Bundle} (for visual clarity and consistency with naming
+          of other bundles).
+
+
+0.004   2022-09-25  Released-By: PERLANCAR; Urgency: low
+
+        - Remove extras part.
+
+
+0.003   2022-09-25  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [ux] Tweak Abstracts (give example).
+
+
+0.002   2021-09-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Use Sah::PSchema::perl::modname_with_optional_args to allow array
+	  form.
+
+
+0.001   2021-06-07  Released-By: PERLANCAR
+
+        - First release.

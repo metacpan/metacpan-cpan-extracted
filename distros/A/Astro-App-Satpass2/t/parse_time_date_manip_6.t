@@ -5,7 +5,7 @@ use warnings;
 
 use Astro::App::Satpass2::ParseTime;
 use Astro::App::Satpass2::Utils qw{ HAVE_DATETIME };
-use Test::More 0.88;
+use Test2::V0;
 
 use lib qw{ inc };
 
@@ -26,18 +26,16 @@ BEGIN {
 	local $Date::Manip::Backend = 'DM6';
 	require Date::Manip;
 	1;
-    } or plan skip_all => 'Date::Manip not available';
+    } or skip_all 'Date::Manip not available';
 
     my $ver = Date::Manip->VERSION();
     Date::Manip->import();
     ( my $test = $ver ) =~ s/ _ //smxg;
     $test >= 6
-	or plan skip_all =>
-	    "Date::Manip $ver installed; this test is for 6.00 or greater";
+	or skip_all "Date::Manip $ver installed; this test is for 6.00 or greater";
 
     $] >= 5.010
-	or plan skip_all =>
-	    "Date::Manip version 6 backend not available under Perl $]";
+	or skip_all "Date::Manip version 6 backend not available under Perl $]";
 
     if ( HAVE_DATETIME ) {
 
@@ -50,8 +48,7 @@ BEGIN {
 	    $dt_zone = DateTime::TimeZone->new( name => 'local')->name();
 	    1;
 	} and lc $dm_zone ne lc $dt_zone
-	    and plan skip_all =>
-	    "Date::Manip zone is '$dm_zone' but DateTime zone is '$dt_zone'";
+	    and skip_all "Date::Manip zone is '$dm_zone' but DateTime zone is '$dt_zone'";
     }
 
 }

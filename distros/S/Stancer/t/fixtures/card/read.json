@@ -1,0 +1,15 @@
+{
+  "brand": "mastercard",
+  "country": "US",
+  "created": 1579010740,
+  "exp_month": 2,
+  "exp_year": 2020,
+  "funding": "credit",
+  "id": "card_ub99idEIFcbK517ZrKBIrt4y",
+  "last4": "4444",
+  "live_mode": false,
+  "name": "John Doe",
+  "nature": "personnal",
+  "network": "mastercard",
+  "zip_code": null
+}

@@ -6,7 +6,7 @@ use warnings;
 use lib qw{ inc };
 use My::Module::Test::App;
 
-use Test::More 0.88;
+use Test2::V0;
 use Astro::Coord::ECI::TLE;
 use Astro::Coord::ECI::Utils qw{ deg2rad };
 use Cwd qw{ cwd };
@@ -1183,7 +1183,7 @@ EOD
 execute( 'pwd', cwd() . "\n", 'Print working directory' );
 
 TODO: {
-    local $TODO = 'Change in equinox algorithm in Astro::Coord::ECI::Sun';
+    my $TODO = todo 'Change in equinox algorithm in Astro::Coord::ECI::Sun';
     execute( q{quarters '20090301T000000Z'}, <<'EOD',
 2009/03/04 07:45:18 First quarter Moon
 2009/03/11 02:37:41 Full Moon

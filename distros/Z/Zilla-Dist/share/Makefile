@@ -49,6 +49,11 @@ ifeq (,$(shell zild meta =zild/no-readme))
   endif
 endif
 
+NOCHECK :=
+ifneq (,$(shell zild meta =zild/no-check))
+  NOCHECK := 1
+endif
+
 export TESTML_RUN := perl
 
 default: help
@@ -252,12 +257,14 @@ force:
 # Non-pulic-facing targets:
 #------------------------------------------------------------------------------
 check-release:
+ifndef NOCHECK
 	@echo '***** Checking readiness to release $(DIST)'
 	RELEASE_BRANCH=$(RELEASE_BRANCH) zild-check-release
 	git stash
 	rm -fr .git/rebase-apply
 	git pull --rebase origin $(RELEASE_BRANCH)
 	git stash pop
+endif
 
 date:
 	$(ZILD) changes date "`date`"

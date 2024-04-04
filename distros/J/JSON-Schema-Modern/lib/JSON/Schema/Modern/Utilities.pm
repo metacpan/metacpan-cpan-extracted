@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.582';
+our $VERSION = '0.583';
 
 use 5.020;
 use strictures 2;
@@ -20,8 +20,6 @@ use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref);
 use Scalar::Util qw(blessed looks_like_number);
 use Storable 'dclone';
 use Feature::Compat::Try;
-use JSON::Schema::Modern::Error;
-use JSON::Schema::Modern::Annotation;
 use namespace::clean;
 
 use Exporter 'import';
@@ -192,7 +190,7 @@ sub is_elements_unique ($array, $equal_indices = undef, $state = {}) {
 # the first argument is a json pointer; remaining arguments are path segments to be encoded and
 # appended
 sub jsonp {
-  return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, map +(is_plain_arrayref($_) ? @$_ : $_), grep defined, @_);
+  return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, grep defined, @_);
 }
 
 # splits a json pointer apart into its path segments
@@ -207,10 +205,9 @@ sub local_annotations ($state) {
 }
 
 # shorthand for finding the canonical uri of the present schema location
-# last argument can be an arrayref, usually coming from $state->{_schema_path_suffix}
+# ensure that this code is kept consistent with the absolute_keyword_location builder in ResultNode
 sub canonical_uri ($state, @extra_path) {
   return $state->{initial_schema_uri} if not @extra_path and not length($state->{schema_path});
-  splice(@extra_path, -1, 1, $extra_path[-1]->@*) if @extra_path and is_plain_arrayref($extra_path[-1]);
   my $uri = $state->{initial_schema_uri}->clone;
   my $fragment = ($uri->fragment//'').(@extra_path ? jsonp($state->{schema_path}, @extra_path) : $state->{schema_path});
   undef $fragment if not length($fragment);
@@ -234,21 +231,24 @@ sub E ($state, $error_string, @args) {
   croak 'E called in void context' if not defined wantarray;
 
   # sometimes the keyword shouldn't be at the very end of the schema path
-  my $uri = canonical_uri($state, $state->{keyword}, $state->{_schema_path_suffix})
-    ->to_abs($state->{effective_base_uri});
+  my $sps = delete $state->{_schema_path_suffix};
+  my @schema_path_suffix = defined $sps && is_plain_arrayref($sps) ? $sps->@* : $sps//();
+
+  # we store the absolute uri in unresolved form until needed,
+  # and perform the rest of the calculations later.
+  my $uri = [ $state->{initial_schema_uri}, $state->{schema_path}, $state->{keyword}, @schema_path_suffix, $state->{effective_base_uri} ];
 
   my $keyword_location = $state->{traversed_schema_path}
-    .jsonp($state->{schema_path}, $state->{keyword}, delete $state->{_schema_path_suffix});
+    .jsonp($state->{schema_path}, $state->{keyword}, @schema_path_suffix);
 
-  undef $uri if $uri eq '' and $keyword_location eq ''
-    or ($uri->fragment // '') eq $keyword_location and $uri->clone->fragment(undef) eq '';
-
+  require JSON::Schema::Modern::Error;
   push $state->{errors}->@*, JSON::Schema::Modern::Error->new(
     depth => $state->{depth} // 0,
     keyword => $state->{keyword},
     instance_location => $state->{data_path},
     keyword_location => $keyword_location,
-    defined $uri ? ( absolute_keyword_location => $uri ) : (),
+    # we calculate absolute_keyword_location when instantiating the Error object for Result
+    _uri => $uri,
     error => @args ? sprintf($error_string, @args) : $error_string,
     $state->{exception} ? ( exception => $state->{exception} ) : (),
     $state->{recommended_response} ? ( recommended_response => $state->{recommended_response} ) : (),
@@ -275,12 +275,10 @@ sub A ($state, $annotation) {
 
   # we store the absolute uri in unresolved form until needed,
   # and perform the rest of the calculations later.
-
-  my $uri = [ canonical_uri($state, $state->{keyword}, $state->{_schema_path_suffix}),
-    $state->{effective_base_uri} ];
+  my $uri = [ $state->{initial_schema_uri}, $state->{schema_path}, $state->{keyword}, $state->{effective_base_uri} ];
 
   my $keyword_location = $state->{traversed_schema_path}
-    .jsonp($state->{schema_path}, $state->{keyword}, delete $state->{_schema_path_suffix});
+    .jsonp($state->{schema_path}, $state->{keyword});
 
   push $state->{annotations}->@*, {
     depth => $state->{depth} // 0,
@@ -392,7 +390,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.582
+version 0.583
 
 =head1 SYNOPSIS
 
@@ -406,13 +404,13 @@ This class contains internal utilities to be used by L<JSON::Schema::Modern>.
 canonical_uri E A abort assert_keyword_exists assert_keyword_type assert_pattern assert_uri_reference assert_uri
 annotate_self sprintf_num
 
-=for stopwords OpenAPI
-
 =head1 SUPPORT
 
 Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Modern/issues>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+=for stopwords OpenAPI
 
 You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
 server|https://open-api.slack.com>, which are also great resources for finding help.

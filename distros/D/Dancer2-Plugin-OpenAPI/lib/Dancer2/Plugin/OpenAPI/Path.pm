@@ -1,7 +1,7 @@
 package Dancer2::Plugin::OpenAPI::Path;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Internal representation of a OpenAPI path
-$Dancer2::Plugin::OpenAPI::Path::VERSION = '1.0.1';
+$Dancer2::Plugin::OpenAPI::Path::VERSION = '1.0.2';
 
 use strict;
 use warnings;
@@ -147,7 +147,7 @@ Dancer2::Plugin::OpenAPI::Path - Internal representation of a OpenAPI path
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 DESCRIPTION
 
@@ -160,7 +160,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Yanick Champoux.
+This software is copyright (c) 2024 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

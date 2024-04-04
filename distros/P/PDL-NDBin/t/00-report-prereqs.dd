@@ -53,7 +53,7 @@ do { my $x = {
                                    'Test::Exception' => '0',
                                    'Test::More' => '0',
                                    'Test::NoWarnings' => '0',
-                                   'Test::PDL' => '0.10',
+                                   'Test::PDL' => '0.20',
                                    'perl' => '5.006'
                                  }
                  }

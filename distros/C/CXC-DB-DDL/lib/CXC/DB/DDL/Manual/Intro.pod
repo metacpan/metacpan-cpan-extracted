@@ -1,0 +1,174 @@
+# PODNAME: CXC::DB::DDL::Manual::Intro
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory xTYPE
+
+=head1 NAME
+
+CXC::DB::DDL::Manual::Intro
+
+=head1 VERSION
+
+version 0.13
+
+=head1 SYNOPSIS
+
+  use CXC::DB::DDL;
+  use CXC::DB::DDL::Util 'INTEGER', 'VARCHAR', 'REAL', 'DATETIME', 'xFIELDS', 'xTYPE';
+  use CXC::DB::DDL::Constants qw( UNIQUE
+    SQL_VARCHAR
+    SQL_LONGVARCHAR
+    SQL_TIMESTAMP
+    CASCADE
+  );
+
+  # define some table names
+  use constant DB_TABLE_OBS      => 'observations';
+  use constant DB_TABLE_TAGS     => 'tags';
+  use constant DB_TABLE_PRODUCTS => 'products';
+
+  # add some DSL keywords of our own
+  sub TAG_ID ( $name = 'tag_id' ) {
+      $name => INTEGER(
+          foreign_key => {
+              table     => DB_TABLE_TAGS,
+              field     => 'id',
+              on_delete => CASCADE,
+          } );
+  }
+
+  sub AUTO_ID ( $name = 'id' ) {
+      $name => INTEGER( is_primary_key => 1, is_auto_increment => 1 );
+  }
+
+=head1 DESCRIPTION
+
+The heart of using L<CXC::DB::DDL> is the DSL routines provided by L<CXC::DB::DDL::Util>,
+which make it easier to construct the data structures that L<CXC::DB::DDL/new> accepts.
+
+  my %table_obs = (
+      name => DB_TABLE_OBS,
+      xFIELDS(
+          obsid       => INTEGER( is_primary_key => 1 ),
+          cohort      => INTEGER,
+          date        => xTYPE( [ SQL_TIMESTAMP, ] ),
+          dec         => TEXT,
+          event_count => INTEGER,
+          exposure    => REAL,
+          instrument  => TEXT,
+          obs_cycle   => INTEGER,
+          prop_cycle  => INTEGER,
+          ra          => TEXT,
+      ),
+  );
+
+The upper-cased type functions (e.g. B<INTEGER>) are factories for the
+L<CXC::DB::DDL::Field> class; and accept its attributes.  The B<xTYPE>
+factory works on any type; here it is used to pass an arrayref of
+types rather than a single type; this is used to limit the return
+values of L<DBI/type_info>.
+
+Here we're using our own DSL keyword (B<AUTO_ID>,  defined in the L</SYNOPSIS>)
+and have added a constraint (with an automatically generated name)
+that requires the tuple of B<tag> and B<system> be unique in the
+table.
+
+  my %table_tags = (
+      name => DB_TABLE_TAGS,
+      xFIELDS(
+          AUTO_ID,
+          tag    => TEXT,
+          system => TEXT,
+          pars   => TEXT,
+      ),
+      constraints => [ {
+              fields => [ 'tag', 'system' ],
+              type   => UNIQUE,
+          },
+      ],
+  );
+
+Introducing foreign keys and default values is straightforward (also using another
+custom DSL field; see L</SYNOPSIS> ):
+
+  my %table_products = (
+      name => DB_TABLE_PRODUCTS,
+      xFIELDS(
+          AUTO_ID,
+          obsid  => INTEGER( foreign_key   => DB_TABLE_OBS ),
+          sim_id => INTEGER( default_value => 0 ),
+          TAG_ID,
+          table   => TEXT,
+          dep_ids => TEXT( is_nullable => !!1),
+      ),
+      constraints => [ {
+              fields => [ 'tag_id', 'obsid', 'sim_id' ],
+              type   => UNIQUE,
+          },
+      ],
+  );
+
+And finally, creating the L<CXC::DB::DDL> object:
+
+  $ddl = CXC::DB::DDL->new( [ \%table_obs, \%table_tags, \%table_products ] );
+
+At this point, given a handle to a DBI object, B<$dbh>, we can create the tables:
+
+  $ddl->create( $dbh );
+
+Drop them:
+
+  $ddl->drop( $dbh );
+
+Etc.  Note that L<CXC::DB::DDL> does not work out inter-table foreign
+key dependencies.  It drops tables in reverse order passed to the
+constructor, so make sure those are in the proper order.
+
+Another benefit of using this approach is that we can query a
+L<CXC::DB::DSL> object for the table names and field names, and so
+automate some of the drudgery of interactions with databases.
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-cxc-db-ddl@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-DB-DDL>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/cxc-db-ddl
+
+and may be cloned from
+
+  https://gitlab.com/djerius/cxc-db-ddl.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<CXC::DB::DDL|CXC::DB::DDL>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

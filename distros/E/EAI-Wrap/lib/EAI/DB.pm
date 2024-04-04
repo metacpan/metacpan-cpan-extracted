@@ -1,4 +1,4 @@
-package EAI::DB 1.912;
+package EAI::DB 1.913;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use DBI qw(:sql_types); use DBD::ODBC (); use Data::Dumper qw(Dumper); use Log::Log4perl qw(get_logger);
@@ -214,10 +214,10 @@ sub storeInDB ($$;$) {
 		$logger->trace("type info:\n".Dumper($dbh->type_info("SQL_ALL_TYPES"))) if $logger->is_trace; # all available data type informations of DBD:ODBC driver
 		for (keys %{$coldefs}) {
 			if ($coldefs->{$_}{"COLUMN_DEF"} =~ /identity/ or $coldefs->{$_}{"TYPE_NAME"} =~ /identity/) { # for identity (auto incrementing) fields no filling needed
-				$logger->trace("TYPE_NAME for identity field ".$_.':'.$coldefs->{$_}{"TYPE_NAME"}) if $logger->is_trace;
+				$logger->debug("TYPE_NAME for identity field ".$_.':'.$coldefs->{$_}{"TYPE_NAME"}) if $logger->is_debug;
 			} else {
 				$columns[$i]= $_;
-				$logger->trace("TYPE_NAME for normal field ".$columns[$i].':'.$coldefs->{$columns[$i]}{"TYPE_NAME"}) if $logger->is_trace;
+				$logger->debug("TYPE_NAME for normal field ".$columns[$i].':'.$coldefs->{$columns[$i]}{"TYPE_NAME"}) if $logger->is_debug;
 				$i++;
 			}
 		}
@@ -228,7 +228,6 @@ sub storeInDB ($$;$) {
 		$dbh->{PrintError} = 0; $dbh->{RaiseError} = 0;
 		my $lines = scalar(@{$data});
 		if ($lines > 0) {
-			$logger->trace("passed data:\n".Dumper($data)) if $logger->is_trace;
 			my %beforeInsert; # hash flag for update before insert (first row where data appears)
 			my $keyValueForDeleteBeforeInsert;
 			# row-wise processing data ($i)
@@ -243,6 +242,7 @@ sub storeInDB ($$;$) {
 
 				# iterate table fields, check data by type and format accordingly
 				for (my $dbCol=0; $dbCol < scalar(@{columns}); $dbCol++) {
+					$logger->trace("passed data:\n".Dumper($data->[$i])) if $logger->is_trace;
 					$dataArray[$tgtCol] = $data->[$i]{$columns[$dbCol]}; # first fill with raw data
 					$dataArray[$tgtCol] = $addID->{$columns[$dbCol]} if $IDName{$columns[$dbCol]}; # if given: add constant ID-field value to all data rows for ID
 					my $datatype = $coldefs->{$columns[$dbCol]}{"TYPE_NAME"}; # type from DB dictionary
@@ -321,6 +321,7 @@ sub storeInDB ($$;$) {
 					# build insert/update statement
 					my $colName = $columns[$dbCol]; 
 					my $colVal = $dataArray[$tgtCol];
+					$logger->trace("$colName: $colVal") if $logger->is_trace;
 					# skip field building for incrementalStore and no content was found
 					unless ($incrementalStore && !defined($data->[$i]{$columns[$dbCol]})) {
 						# explicit NULL for empty values

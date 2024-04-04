@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '5.05';
+our $VERSION = '6.01';
 
 use utf8;
 use DateTime;
@@ -51,12 +51,17 @@ GetOptions(
 ) or show_help(1);
 
 if ($list_services) {
-	printf( "%-40s %-14s %s\n\n", 'operator', 'abbr. (-s)', 'languages (-l)' );
+	printf(
+		"%-40s %-14s %-15s %s\n\n",
+		'operator', 'abbr. (-s)', 'languages (-l)',
+		'time zone'
+	);
 	for my $service ( Travel::Status::DE::HAFAS::get_services() ) {
 		printf(
-			"%-40s %-14s %s\n",
+			"%-40s %-14s %-15s %s\n",
 			@{$service}{qw(name shortname)},
-			join( q{ }, @{ $service->{languages} // [] } )
+			join( q{ }, @{ $service->{languages} // [] } ),
+			$service->{time_zone} // q{},
 		);
 	}
 	exit 0;
@@ -95,7 +100,9 @@ elsif ( $opt{station} =~ m{ ^ [!] (?<query> .*) $ }x ) {
 }
 
 if ( $date or $time ) {
-	my $dt = DateTime->now( time_zone => 'Europe/Berlin' );
+	my $desc = Travel::Status::DE::HAFAS::get_service($service) // {};
+	my $dt
+	  = DateTime->now( time_zone => $desc->{time_zone} // 'Europe/Berlin' );
 	if ($date) {
 		if ( $date
 			=~ m{ ^ (?<day> \d{1,2} ) [.] (?<month> \d{1,2} ) [.] (?<year> \d{4})? $ }x
@@ -148,8 +155,12 @@ sub show_version {
 	exit 0;
 }
 
-sub parse_mot_options {
+sub spacer {
+	my ($len) = @_;
+	return ( $len % 2 ? q { } : q{} ) . ( q{ ·} x ( $len / 2 ) );
+}
 
+sub parse_mot_options {
 	my $default_yes = 1;
 
 	for my $type ( split( qr{,}, $types ) ) {
@@ -157,11 +168,16 @@ sub parse_mot_options {
 			$service //= 'DB';
 			my $desc = Travel::Status::DE::HAFAS::get_service($service);
 			if ($desc) {
-				my @mots = @{ $desc->{productbits} };
-				@mots = grep { $_ ne 'x' } @mots;
-				@mots = uniq @mots;
-				@mots = sort @mots;
-				say join( "\n", @mots );
+				for my $mot ( @{ $desc->{productbits} } ) {
+					if ( ref($mot) eq 'ARRAY' ) {
+						if ( $mot->[0] ne '_' ) {
+							printf( "%-10s %s\n", @{$mot} );
+						}
+					}
+					elsif ( $mot ne '_' ) {
+						say $mot;
+					}
+				}
 				exit 0;
 			}
 			else {
@@ -346,7 +362,7 @@ if ( $opt{journeyMatch} ) {
 			say $result->id;
 			print $result->name;
 			if ( $result->number ) {
-				printf( "  |  Zug  %s", $result->number );
+				printf( "  |  Nr  %s", $result->number );
 			}
 			if ( $result->line_no ) {
 				printf( "  |  Linie %s", $result->line_no );
@@ -381,20 +397,24 @@ elsif ( $opt{locationSearch} ) {
 }
 elsif ( $opt{journey} ) {
 	my $result = $status->result;
+	my @prods;
+	my @directions;
+	my $prev_prod = 0;
 
 	printf( "%s → %s", $result->name, $result->route_end );
 	if ( $result->number ) {
-		printf( " / Zug %s", $result->number );
+		printf( " / Nr %s", $result->number );
 	}
 	if ( $result->line_no ) {
 		printf( " / Linie %s", $result->line_no );
 	}
-	printf( "\nFahrt %s am %s\n\n",
+	printf( "\nFahrt %s am %s\n",
 		$result->id, ( $result->route )[0]->sched_dep->strftime('%d.%m.%Y') );
 
 	my $delay_len     = 0;
 	my $delay_fmt     = 0;
 	my $occupancy_len = 0;
+	my $stop_len      = 0;
 	for my $stop ( $result->route ) {
 		if ( $stop->delay ) {
 			$delay_len = max( $delay_len, length( $stop->delay ) + 1 );
@@ -403,12 +423,31 @@ elsif ( $opt{journey} ) {
 		{
 			$occupancy_len = 2;
 		}
+		if ( length( $stop->loc->name ) > $stop_len ) {
+			$stop_len = length( $stop->loc->name );
+		}
+		my $prod = $stop->prod_dep // $stop->prod_arr;
+		if ( $prod and $prod != $prev_prod ) {
+			push( @prods, $prod );
+			$prev_prod = $prod;
+		}
+		if ( $stop->direction ) {
+			push( @directions, $stop->direction );
+		}
 	}
 	if ($delay_len) {
 		$delay_fmt = $delay_len + 3;
 	}
 
-	my $now       = DateTime->now( time_zone => 'Europe/Berlin' );
+	if ( $result->operators ) {
+		printf( "Betrieb: %s\n", join( q{, }, $result->operators ) );
+	}
+
+	$prev_prod = 0;
+
+	my $desc = Travel::Status::DE::HAFAS::get_service($service) // {};
+	my $now
+	  = DateTime->now( time_zone => $desc->{time_zone} // 'Europe/Berlin' );
 	my $mark_stop = 0;
 	for my $i ( reverse 1 .. scalar $result->route ) {
 		my $stop = ( $result->route )[ $i - 1 ];
@@ -423,6 +462,7 @@ elsif ( $opt{journey} ) {
 
 	my $message_id = 1;
 
+	print "\n";
 	for my $stop ( $result->route ) {
 		my $msg_line = q{};
 		for my $message ( $stop->messages ) {
@@ -437,8 +477,44 @@ elsif ( $opt{journey} ) {
 				$msg_line .= sprintf( ' (%d)', $message->{id} );
 			}
 		}
+
+		my $prod_line = q{};
+		if ( @prods > 1 ) {
+			my $prod = $stop->prod_dep // $stop->prod_arr;
+			if ( $prod and $prod != $prev_prod ) {
+				$prod_line
+				  = sprintf( " %s (%s)", $prod->name, $prod->operator );
+				$prev_prod = $prod;
+			}
+		}
+
+		my $dir_line = q{};
+		if ( @directions > 1 and $stop->direction ) {
+			$dir_line = ' → ' . $stop->direction;
+		}
+
+		my $tz_line = q{};
+		if ( $stop->tz_offset and ( $stop->arr or $stop->dep ) ) {
+			$tz_line = ( $prod_line or $dir_line ) ? q{ · } : q{ };
+			$tz_line .= 'local ';
+			if ( $stop->arr ) {
+				$tz_line
+				  .= $stop->arr->clone->add( minutes => $stop->tz_offset )
+				  ->strftime('%H:%M');
+			}
+			if ( $stop->arr and $stop->dep ) {
+				$tz_line .= ' → ';
+			}
+			if ( $stop->dep ) {
+				$tz_line
+				  .= $stop->dep->clone->add( minutes => $stop->tz_offset )
+				  ->strftime('%H:%M');
+			}
+			$tz_line .= q{  };
+		}
+
 		printf(
-"%s%5s %s %5s %-${delay_fmt}s%${occupancy_len}s%-${occupancy_len}s %s%s%s%s\n",
+"%s%5s %s %5s %-${delay_fmt}s%${occupancy_len}s%-${occupancy_len}s %s%s%s%s%s%s%s\n",
 			$stop == $mark_stop  ? $output_bold : q{},
 			$stop->arr_cancelled ? '--:--'
 			: ( $stop->arr ? $stop->arr->strftime('%H:%M') : q{} ),
@@ -451,8 +527,13 @@ elsif ( $opt{journey} ) {
 			$stop->load->{SECOND} ? display_occupancy( $stop->load->{SECOND} )
 			: q{},
 			$stop->loc->name,
-			$stop == $mark_stop ? $output_reset                        : q{},
-			$stop->direction    ? sprintf( ' → %s', $stop->direction ) : q{},
+			$stop == $mark_stop ? $output_reset : q{},
+			( $tz_line or $prod_line or $dir_line or $msg_line )
+			? spacer( $stop_len + 1 - length( $stop->loc->name ) )
+			: q{},
+			$prod_line,
+			$dir_line,
+			$tz_line,
 			$msg_line,
 		);
 	}
@@ -492,12 +573,16 @@ if ($via) {
 
 my $delay_len     = 0;
 my $occupancy_len = 0;
+my $offset_len    = 0;
 for my $d (@results) {
 	if ( $d->delay ) {
 		$delay_len = max( $delay_len, length( $d->delay ) + 1 );
 	}
 	if ( $d->load and ( $d->load->{FIRST} or $d->load->{SECOND} ) ) {
 		$occupancy_len = 2;
+	}
+	if ( $d->tz_offset ) {
+		$offset_len = 1;
 	}
 }
 
@@ -527,7 +612,8 @@ for my $d (@results) {
 	}
 
 	my $entry = [
-		$d->is_cancelled ? '--:--' : $d->datetime->strftime('%H:%M'),
+		  ( $d->is_cancelled ? '--:--' : $d->datetime->strftime('%H:%M') )
+		. ( $d->tz_offset    ? q{*}    : ( q{ } x $offset_len ) ),
 		$d->is_cancelled
 		? q{}
 		: format_delay( $d->delay, $delay_len ),
@@ -555,6 +641,11 @@ for my $d (@results) {
 }
 
 display_result(@output);
+
+if ($offset_len) {
+	printf( "\n* reported for %s; local time differs\n",
+		$status->get_active_service->{time_zone} // 'Europe/Berlin' );
+}
 
 for my $m ( $status->messages ) {
 	if ( $m->ref_count > 0 and $m->{show} ) {
@@ -584,7 +675,7 @@ B<hafas-m> [B<-s> I<service>] [B<-l> I<language>] B<!>I<query>|I<journeyID>
 
 =head1 VERSION
 
-version 5.05
+version 6.01
 
 =head1 DESCRIPTION
 
@@ -595,28 +686,27 @@ It has four operating modes that depend on the contents of its argument.
 
 =head2 Arrival/Departure Monitor (I<station>)
 
-Show departures (or arrivals) at I<station>, optionally filtered by date, time
-and mode of transport. I<station> may be given as a station name or EVA ID.
-EVA IDs tend to be similar to, but not always identical with, UIC station
-codes. Output format:
+Show departures (or arrivals) at I<station>, optionally filtered by mode of
+transport. I<station> may be given as a station name or HAFAS station ID.
 
 =over
 
-=item * scheduled departure (or arrival) time
+=item * estimated departure (or arrival) time
 
 =item * delay, if known
 
-=item * trip number or line
+=item * trip name, number, or line
 
 =item * direction / destination
 
-=item * platform (B<!> indicates a platform change)
+=item * platform, if known (B<!> indicates a platform change)
 
 =item * expected occupancy of first and second class, if known
 
 =back
 
-Occupancy indicators are, from least occupied to fully booked: B<.> B<o>
+Departure/arrival times are marked with a C<< * >> if they differ from local
+time.  Occupancy indicators are, from least occupied to fully booked: B<.> B<o>
 B<*> B<!>.
 
 =head2 Location Search (B<?>I<query>|I<lat>B<:>I<lon>)
@@ -633,7 +723,11 @@ Otherwise, list all journey IDs that match I<query>.
 =head2 Trip Details (I<journeyID>)
 
 List intermediate stops of I<journeyID> with arrival/departure time, delay (if
-available), occupancy (if available), and stop name.
+available), occupancy (if available), and stop name. Also includes
+line/journey, operator, and heading information.
+
+Times are reported in the selected HAFAS service's default time zone (typically
+Europe/Berlin). If a stop's local time differs, it is also provided.
 
 =head1 OPTIONS
 
@@ -663,8 +757,8 @@ Note that requesting an invalid/unsupported language may lead to garbage output.
 
 =item B<--list>
 
-List known HAFAS installations and exit. Use B<-s>|B<--service> to select an
-operator from this list for a HAFAS request.
+List known HAFAS instances and exit. Use B<-s>|B<--service> to select a
+service from this list for a HAFAS request.
 
 =item B<-m>, B<--mot> I<motlist>
 
@@ -690,7 +784,8 @@ to DB (Deutsche Bahn). See B<--list> for a list of known services.
 
 =item B<-t>, B<--time> I<hh>:I<mm>
 
-Time to list departures for.  Default: now.
+Time to list departures for. Must be specified in the selected HAFAS
+service's default time zone, see B<--list>. Default: now.
 
 =item B<-v>, B<--via> I<stopname>|I<eva1>,I<eva2>,...
 

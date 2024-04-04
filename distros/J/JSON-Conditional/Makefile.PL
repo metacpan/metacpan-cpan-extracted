@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
 	'JSON' => '0',
-	'Struct::Conditional' => '1.00' 
+	'Struct::Conditional' => '1.01' 
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'JSON-Conditional-*' },

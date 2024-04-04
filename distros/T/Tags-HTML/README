@@ -6,8 +6,8 @@ SYNOPSIS
 
      my $obj = Tags::HTML->new(%params);
      $obj->cleanup(@params);
-     $obj->prepare(@params);
      $obj->init(@params);
+     $obj->prepare(@params);
      $obj->process;
      $obj->process_css;
 
@@ -289,10 +289,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2021-2023 Michal Josef Špaček
+    © 2021-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

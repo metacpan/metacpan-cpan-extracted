@@ -11,6 +11,7 @@ lib/Travel/Status/DE/HAFAS/Journey.pm
 lib/Travel/Status/DE/HAFAS/Location.pm
 lib/Travel/Status/DE/HAFAS/Message.pm
 lib/Travel/Status/DE/HAFAS/Polyline.pm
+lib/Travel/Status/DE/HAFAS/Product.pm
 lib/Travel/Status/DE/HAFAS/Stop.pm
 lib/Travel/Status/DE/HAFAS/StopFinder.pm
 MANIFEST			This list of files
@@ -25,6 +26,7 @@ t/22-db-journey.t
 t/30-db-journey-platformchange.t
 t/31-db-journey-daychange.t
 't/in/DB.Berlin Jannowitzbrücke.json'
+t/in/DB.Chop.wat.json
 t/in/DB.EC392.journey.json
 t/in/DB.EC392.journey.txt
 t/in/DB.EC392.json

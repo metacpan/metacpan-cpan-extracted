@@ -1,6 +1,6 @@
 package Mail::BIMI::App::Command::checksvg;
 # ABSTRACT: Check an SVG for validation
-our $VERSION = '3.20240319'; # VERSION
+our $VERSION = '3.20240402'; # VERSION
 use 5.20.0;
 BEGIN { $ENV{MAIL_BIMI_CACHE_DEFAULT_BACKEND} = 'Null' };
 use Mail::BIMI::Prelude;
@@ -69,7 +69,7 @@ Mail::BIMI::App::Command::checksvg - Check an SVG for validation
 
 =head1 VERSION
 
-version 3.20240319
+version 3.20240402
 
 =head1 DESCRIPTION
 

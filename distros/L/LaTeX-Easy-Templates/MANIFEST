@@ -16,10 +16,14 @@ t/130-create_latex_source_from_template-tterse.t
 t/150-create_latex_source_from_template-simple-with-zero-max-filesize.t
 t/200-create_latex_source_from_template-complex.t
 t/250-format-check-latex-driver-parameters-accepted.t
-t/300-inmemory-template-usage-simple.t
-t/350-inmemory-template-usage-calling-other-templates.t
+t/300-ondisk-template-usage-simple.t
+t/350-ondisk-template-testing-include-paths.t
 t/360-ondisk-template-usage-calling-other-templates.t
-t/400-format-simple.t
+t/400-inmemory-template-usage-simple.t
+t/450-inmemory-template-testing-include-paths.t
+t/460-inmemory-template-usage-calling-other-templates.t
+t/500-mix-template-usage-calling-other-mix-templates.t
+t/800-format-simple.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
@@ -53,6 +57,12 @@ t/templates/simple02-included-templates/main.tex.tx
 t/templates/simple02-included-templates/preamble.tex.tx
 t/templates/simple05/main.tex.expected_output
 t/templates/simple05/main.tex.tx
+t/templates/simple10/main.tex.expected_output
+t/templates/simple10/preamble.tex.tx
+t/templates/simple11/main.tex.expected_output
+t/templates/simple11/main.tex.tx
+t/templates/simple11/preamble.tex.tx
+t/templates/simple12/content.tex.tx
 t/templates/simple20/main.tex.expected_output
 t/templates/simple20/main.tex.tx
 t/templates/Xslate/simple/hello.txt.tx
@@ -61,5 +71,7 @@ t/templates/Xslate/with-include/hello.txt.tx
 t/templates/Xslate/with-include/hellos-in-subdir.txt.tx
 t/templates/Xslate/with-include/hellos.txt.tx
 t/templates/Xslate/with-include/subdir/hello-in-subdir.txt.tx
+xt/810-format-complex.t
+xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

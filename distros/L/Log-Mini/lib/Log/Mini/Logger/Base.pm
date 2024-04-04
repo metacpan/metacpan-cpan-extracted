@@ -3,9 +3,8 @@ package Log::Mini::Logger::Base;
 use strict;
 use warnings;
 
-use Carp       qw(croak);
-use List::Util qw(first);
-use Time::Moment;
+use Carp qw(croak);
+use Time::HiRes;
 
 
 my $LEVELS = {
@@ -49,7 +48,7 @@ sub level
     return $self->{level} || 'error';
 }
 
-sub log   { return shift->_log(shift,   @_) }
+sub log   { return shift->_log(@_) }
 sub info  { return shift->_log('info',  @_) }
 sub error { return shift->_log('error', @_) }
 sub warn  { return shift->_log('warn',  @_) }
@@ -63,10 +62,8 @@ sub _log
     my $message = shift;
 
     return if $LEVELS->{$level} > $LEVELS->{$self->{'level'}};
-
-    my $time = $self->_getCurrentTime();
-
-    my $text = sprintf("%s [%s] %s\n", $time, $level, $message);
+    
+    my $text = sprintf("%s [%s] %s\n", $self->_getCurrentTime(), $level, $message);
     $text = sprintf($text, @_) if (@_);
 
     $self->_print($text);
@@ -78,7 +75,11 @@ sub _print { croak 'Not implemented!' }
 
 sub _getCurrentTime
 {
-    return Time::Moment->now->strftime('%Y-%m-%d %T%3f');
+    my ($seconds, $miliseconds) = Time::HiRes::gettimeofday();
+
+    my ($sec,$min,$hour,$mday,$mon,$year) = localtime($seconds);
+
+    return sprintf('%i-%02i-%02i %02i:%02i:%02i.%03i', 1900+$year, $mon, $mday, $hour, $min, $sec, substr($miliseconds, 0, 3));
 }
 
 1;

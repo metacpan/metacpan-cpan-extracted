@@ -34,6 +34,7 @@ Module::Build->new(
 		'Travel::Status::DE::HAFAS::Journey'  => '5.01',
 		'Travel::Status::DE::HAFAS::Location' => '5.00',
 		'Travel::Status::DE::HAFAS::Message'  => '4.19',
+		'Travel::Status::DE::HAFAS::Product'  => '5.05',
 	},
 	script_files  => 'bin/',
 	sign          => 1,

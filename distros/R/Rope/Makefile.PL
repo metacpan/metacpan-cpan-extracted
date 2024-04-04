@@ -13,14 +13,16 @@ my %WriteMakefileArgs = (
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
 	'Type::Tiny' => '0',
-	'Want' => '0'
+	'Want' => '0',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+        'Want' => 0,
+        'Factory::Sub' => 0.06,
+        'Struct::Conditional' => 1.01,
+        'Coerce::Types::Standard' => 0.000008
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Rope-*' },

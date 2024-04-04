@@ -15,7 +15,8 @@ my @usage_tests = (
         args => [qw(something else --help)],
         cmp  => {
             '-exitval' => 0,
-            '-verbose' => 1,
+            '-verbose' => 99,
+            '-sections' => ignore(),
             '-input'   => 'pod_where called',
         },
         name => "something else --help displays the help of the file",

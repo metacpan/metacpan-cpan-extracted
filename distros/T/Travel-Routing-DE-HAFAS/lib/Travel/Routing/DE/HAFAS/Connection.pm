@@ -11,7 +11,7 @@ use DateTime::Duration;
 use Travel::Routing::DE::HAFAS::Utils;
 use Travel::Routing::DE::HAFAS::Connection::Section;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 Travel::Routing::DE::HAFAS::Connection->mk_ro_accessors(
 	qw(changes duration sched_dep rt_dep sched_arr rt_arr dep arr dep_platform arr_platform dep_loc arr_loc dep_cancelled arr_cancelled is_cancelled load)
@@ -24,7 +24,8 @@ sub new {
 
 	my $hafas      = $opt{hafas};
 	my $connection = $opt{connection};
-	my $locs       = $opt{locL};
+	my $locL       = $opt{locL};
+	my $prodL      = $opt{prodL};
 
 	# himL may only be present in departure monitor mode
 	my @remL = @{ $opt{common}{remL} // [] };
@@ -83,7 +84,8 @@ sub new {
 			Travel::Routing::DE::HAFAS::Connection::Section->new(
 				common => $opt{common},
 				date   => $date,
-				locL   => $locs,
+				locL   => $locL,
+				prodL  => $prodL,
 				sec    => $sec,
 				hafas  => $hafas,
 			)
@@ -126,8 +128,8 @@ sub new {
 		  // $connection->{dep}{dPlatfS},
 		arr_platform => $connection->{arr}{aPlatfR}
 		  // $connection->{arr}{aPlatfS},
-		dep_loc  => $locs->[ $connection->{dep}{locX} ],
-		arr_loc  => $locs->[ $connection->{arr}{locX} ],
+		dep_loc  => $locL->[ $connection->{dep}{locX} ],
+		arr_loc  => $locL->[ $connection->{arr}{locX} ],
 		load     => $tco,
 		messages => \@messages,
 		sections => \@sections,
@@ -198,7 +200,7 @@ Travel::Routing::DE::HAFAS::Connection - A single connection between two stops
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 

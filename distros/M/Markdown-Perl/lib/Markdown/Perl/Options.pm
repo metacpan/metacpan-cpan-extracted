@@ -1,0 +1,653 @@
+package Markdown::Perl::Options;
+
+use strict;
+use warnings;
+use utf8;
+use feature ':5.24';
+
+use Carp;
+use English;
+use Exporter 'import';
+use List::Util 'any', 'pairs';
+
+our $VERSION = '0.01';
+
+our @EXPORT_OK = qw(validate_options);
+our %EXPORT_TAGS = (all => \@EXPORT_OK);
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Configuration options for pmarkdown and Markdown::Perl
+
+=head1 SYNOPSIS
+
+This document describes the existing configuration options for the
+L<Markdown::Perl> library and the L<pmarkdown> program. Please refer to their
+documentation to know how to set and use these options.
+
+=head1 MODES
+
+In addition to setting individual options, you can set bundle of options
+together using I<modes>. See the L<pmarkdown/MODES> documentation for a list
+of available modes. And see the documentation for L<Markdown::Perl> or
+L<pmarkdown> to learn how to set a mode.
+
+Note that all options are applied I<on top> of the selected mode. Even if the
+options are passed before the mode, the mode will not override the options.
+
+=head1 OPTIONS
+
+=cut
+
+sub new {
+  my ($class, %options) = @_;
+
+  my $this = bless \%options, $class;
+  $this->{memoized} = {};  # TODO: use this.
+  return $this;
+}
+
+my %options_modes;
+my %validation;
+
+# Undocumented for now, used in tests.
+our @valid_modes = (qw(default cmark github markdown));
+my %valid_modes = map { $_ => 1 } @valid_modes;
+
+sub set_options {
+  my ($this, $dest, @options) = @_;
+  # We don’t put the options into a hash, to preserve the order in which they
+  # are passed.
+  for my $p (pairs @options) {
+    my ($k, $v) = @{$p};
+    if ($k eq 'mode') {
+      $this->set_mode($v);
+    } else {
+      carp "Unknown option ignored: ${k}" unless exists $validation{$k};
+      my $validated_value = $validation{$k}($v);
+      croak "Invalid value for option '${k}': ${ERRNO}" unless defined $validated_value;
+      $this->{$dest}{$k} = $validated_value;
+    }
+  }
+  return;
+}
+
+# returns nothing but dies if the options are not valid. Useful to call before
+# set_options to get error messages without stack-traces in context where this
+# is not needed (while set_options will use carp/croak).
+sub validate_options {
+  my (%options) = @_;
+  while (my ($k, $v) = each %options) {
+    if ($k eq 'mode') {
+      die "Unknown mode '${v}'\n" unless exists $options_modes{$v};
+    } else {
+      die "Unknown option: ${k}\n" unless exists $validation{$k};
+      my $validated = $validation{$k}($v);
+      die "Invalid value for option '${k}': ${ERRNO}\n" unless defined $validated;
+    }
+  }
+  return;
+}
+
+sub set_mode {
+  my ($this, $mode) = @_;
+  carp "Setting mode '${mode}' overriding already set mode '$this->{mode}'"
+      if defined $this->{mode};
+  if ($mode eq 'default' || $mode eq 'pmarkdown') {
+    undef $this->{mode};
+    return;
+  }
+  croak "Unknown mode '${mode}'" unless exists $valid_modes{$mode};
+  $this->{mode} = $mode;
+  return;
+}
+
+# This method is called below to "create" each option. In particular, it
+# populate an accessor method in this package to reach the option value.
+sub _make_option {
+  my ($opt, $default, $validation, %mode) = @_;
+  while (my ($k, $v) = each %mode) {
+    confess "Unknown mode '${k}' when creating option '${opt}'" unless exists $valid_modes{$k};
+    $options_modes{$k}{$opt} = $v;
+  }
+  $validation{$opt} = $validation;
+
+  {
+    no strict 'refs';
+    *{"get_${opt}"} = sub {
+      my ($this) = @_;
+      return $this->{local_options}{$opt} if exists $this->{local_options}{$opt};
+      return $this->{options}{$opt} if exists $this->{options}{$opt};
+      if (defined $this->{mode}) {
+        return $options_modes{$this->{mode}}{$opt}
+            if exists $options_modes{$this->{mode}}{$opt};
+      }
+      return $default;
+    };
+  }
+
+  return;
+}
+
+sub _boolean {
+  return sub {
+    return 0 if $_[0] eq 'false' || $_[0] eq '0';
+    return 1 if $_[0] eq 'true' || $_[0] eq '1';
+    $ERRNO = 'must be a boolean value (0 or 1)';
+    return;
+  };
+}
+
+sub _enum {
+  my @valid = @_;
+  return sub {
+    return $_[0] if any { $_ eq $_[0] } @valid;
+    $ERRNO = "must be one of '".join("', '", @valid)."'";
+    return;
+  };
+}
+
+sub _regex {
+  return sub {
+    my $re = eval { qr/$_[0]/ };
+    return $re if defined $re;
+    $ERRNO = 'cannot be parsed as a Perl regex ($@)';
+    return;
+  };
+}
+
+sub _word_list {
+  return sub {
+    my @a = ref $_[0] eq 'ARRAY' ? @{$_[0]} : split(/,/, $_[0]);
+    # TODO: validate the values of a.
+    return \@a;
+  };
+}
+
+=pod
+
+=head2 B<warn_for_unused_input> I<(boolean, default: true)>
+
+In general, all user input is present in the output (possibly as uninterpreted
+text if it was not understood). But some valid Markdown construct results in
+parts of the input being ignored. By default C<pmarkdown> will emit a warning
+when such a construct is found. This option can disable these warnings.
+
+=cut
+
+_make_option(
+  warn_for_unused_input => 1,
+  _boolean);
+
+=pod
+
+=head2 B<use_fenced_code_blocks> I<(boolean, default: true)>
+
+This options controls whether fenced code blocks are recognised in the document
+structure.
+
+=cut
+
+_make_option(use_fenced_code_blocks => 1, _boolean, (markdown => 0));
+
+=pod
+
+=head2 B<use_table_blocks> I<(boolean, default: true)>
+
+This options controls whether table blocks can be used.
+
+=cut
+
+_make_option(use_table_blocks => 1, _boolean, (cmark => 0, markdown => 0));
+
+=pod
+
+=head2 B<fenced_code_blocks_must_be_closed> I<(boolean, default: true)>
+
+By default, a fenced code block with no closing fence will run until the end of
+the document. With this setting, the opening fence will be treated as normal
+text, rather than the start of a code block, if there is no matching closing
+fence.
+
+=cut
+
+_make_option(fenced_code_blocks_must_be_closed => 1, _boolean, (cmark => 0, github => 0));
+
+=pod
+
+=head2 B<code_blocks_info> I<(enum, default: language)>
+
+Fenced code blocks can have info strings on their opening lines (any text after
+the C<```> or C<~~~> fence). This option controls what is done with that text.
+
+The possible values are:
+
+=over 4
+
+=item B<ignored>
+
+The info text is ignored.
+
+=item B<language> I<(default)>
+
+=back
+
+=cut
+
+_make_option(code_blocks_info => 'language', _enum(qw(ignored language)));
+
+=pod
+
+=head2 B<multi_lines_setext_headings> I<(enum, default: multi_line)>
+
+The default behavior of setext headings in the CommonMark spec is that they can
+have multiple lines of text preceding them (forming the heading itself).
+
+This option allows to change this behavior. And is illustrated with this example
+of Markdown:
+
+    Foo
+    bar
+    ---
+    baz
+
+The possible values are:
+
+=over 4
+
+=item B<single_line>
+
+Only the last line of text is kept as part of the heading. The preceding lines
+are a paragraph of themselves. The result on the example would be:
+paragraph C<Foo>, heading C<bar>, paragraph C<baz>
+
+=item B<break>
+
+If the heading underline can be interpreted as a thematic break, then it is
+interpreted as such (normally the heading interpretation takes precedence). The
+result on the example would be: paragraph C<Foo bar>, thematic break,
+paragraph C<baz>.
+
+If the heading underline cannot be interpreted as a thematic break, then the
+heading will use the default B<multi_line> behavior.
+
+=item B<multi_line> I<(default)>
+
+This is the default CommonMark behavior where all the preceding lines are part
+of the heading. The result on the example would be:
+heading C<Foo bar>, paragraph C<baz>
+
+=item B<ignore>
+
+The heading is ignored, and form just one large paragraph. The result on the
+example would be: paragraph C<Foo bar --- baz>.
+
+Note that this actually has an impact on the interpretation of the thematic
+breaks too.
+
+=back
+
+=cut
+
+_make_option(
+  multi_lines_setext_headings => 'multi_line',
+  _enum(qw(single_line break multi_line ignore)));
+
+=pod
+
+=head2 B<autolinks_regex> I<(regex string)>
+
+The regex that an autolink must match. This is for CommonMark autolinks, that
+are recognized only if they appear between brackets C<\<I<link>\>>.
+
+The default value is meant to match the
+L<spec|https://spec.commonmark.org/0.30/#autolinks>. Basically it requires a
+scheme (e.g. C<https:>) followed by mostly anything else except that spaces and
+the bracket symbols (C<\<> and C<\>>) must be escaped.
+
+=cut
+
+_make_option(autolinks_regex => '(?i)[a-z][-+.a-z0-9]{1,31}:[^ <>[:cntrl:]]*', _regex);
+
+=pod
+
+=head2 B<autolinks_email_regex> I<(regex string)>
+
+The regex that an autolink must match to be recognised as an email address. This
+allows to omit the C<mailto:> scheme that would be needed to be recognised as
+an autolink otherwise.
+
+The default value is exactly the regex specified by the
+L<spec|https://spec.commonmark.org/0.30/#autolinks>.
+
+=cut
+
+_make_option(
+  autolinks_email_regex =>
+      q{[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*},
+  _regex);
+
+=pod
+
+=head2 B<inline_delimiters> I<(map)>
+
+TODO: document
+TODO: provide a way to add entries to this option without redefining it entirely
+(when used on the command line).
+
+=cut
+
+sub _delimiters_map {
+  return sub {
+    my %m = ref $_[0] eq 'HASH' ? %{$_[0]} : map { split(/=/, $_, 2) } split(/,/, $_[0]);
+    # TODO: validate the keys and values of m.
+    return \%m if %m;
+    return {"\N{NULL}" => 'p'}  # this can’t trigger but the code fails with an empty map otherwise.
+  };
+}
+
+_make_option(
+  inline_delimiters => {
+    '*' => 'em',
+    '**' => 'strong',
+    '_' => 'em',
+    '__' => 'strong',
+    '~' => 's',
+    '~~' => 'del',
+  },
+  _delimiters_map,
+  cmark => {
+    '*' => 'em',
+    '**' => 'strong',
+    '_' => 'em',
+    '__' => 'strong',
+  },
+  github => {
+    '*' => 'em',
+    '**' => 'strong',
+    '_' => 'em',
+    '__' => 'strong',
+    '~' => 'del',
+    '~~' => 'del',
+  });
+
+=pod
+
+=head2 B<inline_delimiters_max_run_length> I<(map)>
+
+TODO: document
+
+=cut
+
+sub _delimiters_max_run_length_map {
+  return sub {
+    my %m = ref $_[0] eq 'HASH' ? %{$_[0]} : map { split(/=/, $_, 2) } split(/,/, $_[0]);
+    # TODO: validate the keys and values of m.
+    return \%m;
+  };
+}
+
+_make_option(
+  inline_delimiters_max_run_length => {},
+  _delimiters_max_run_length_map,
+  github => {
+    '~' => 2,
+  });
+
+=pod
+
+=head2 B<html_escaped_characters> I<(character_class)>
+
+This option specifies the list of characters that will be escaped in the HTML
+output. This should be a string containing the characters to escapes. Only the
+following characters are supported and can be passed in the string: C<">, C<'>,
+C<&>, C<E<lt>>, and C<E<gt>>.
+
+=cut
+
+sub _escaped_characters {
+  return sub {
+    return $_[0] if $_[0] =~ m/^["'&<>]*$/;
+    $ERRNO = "must only contains the following characters: \", ', &, <, and >";
+    return;
+  };
+}
+
+_make_option(html_escaped_characters => '"&<>', _escaped_characters, markdown => '&<');
+
+=pod
+
+=head2 B<html_escaped_code_characters> I<(character_class)>
+
+This option is similar to the C<html_escaped_characters> but is used in the
+context of C<E<lt>codeE<gt>> blocks.
+
+=cut
+
+_make_option(html_escaped_code_characters => '"&<>', _escaped_characters, markdown => '&<>');
+
+=pod
+
+=head2 B<allow_spaces_in_links> I<(enum, default: none)>
+
+This option controls whether spaces are allowed between the link text and the
+link destination (between the closing bracket of the text and the opening
+parenthesis or bracket of the destination).
+
+=over 4
+
+=item B<none> I<(default)>
+
+No space is allowed between the link text and the link target.
+
+=item B<reference>
+
+This allows at most one space between the two sets of brackets in a
+reference link.
+
+=back
+
+=cut
+
+_make_option(
+  allow_spaces_in_links => 'none',
+  _enum(qw(none reference)),
+  (markdown => 'reference'));
+
+=pod
+
+=head2 B<force_final_new_line> I<(boolean, default: false)>
+
+This option forces the processing of the input markdown to behave as if a final
+new line was always present. Note that, even without this option, a final new
+line will almost always be present in the output (and will always be present
+with it).
+
+=cut
+
+_make_option(force_final_new_line => 0, _boolean, (markdown => 1));
+
+=pod
+
+=head2 B<preserve_tabs> I<(boolean, default: true)>
+
+When removing prefix spaces in front of some constructs (typically indented code
+blocks), pmarkdown will try to preserve tabs when they are used instead of
+space. If this option is set to false, prefix tabs will be turned into spaces.
+
+=cut
+
+_make_option(preserve_tabs => 1, _boolean, (markdown => 0));
+
+=pod
+
+=head2 B<preserve_white_lines> I<(boolean, default: true)>
+
+By default, pmarkdown will try to preserve lines that contains only whitespace
+when possible. If this option is set to false, such lines are treated as if they
+contained just the new line character.
+
+=cut
+
+_make_option(preserve_white_lines => 1, _boolean, (markdown => 0));
+
+=pod
+
+=head2 B<disallowed_html_tags> I<(world list)>
+
+This option specifies a comma separated list (or, in Perl, an array reference)
+of name of HTML tags that will be disallowed in the output. If these tags appear
+they will be deactivated in the output.
+
+=cut
+
+_make_option(
+  disallowed_html_tags => [],
+  _word_list,
+  github => [qw(title textarea style xmp iframe noembed noframes script plaintext)]);
+
+=pod
+
+=head2 B<use_extended_autolinks> I<(boolean, default: true)>
+
+Allow some links to be recognised when they appear in plain text. These links
+must start by C<http://>, C<https://>, or C<www.>.
+
+=cut
+
+_make_option(
+  use_extended_autolinks => 1,
+  _boolean, (
+    markdown => 0,
+    cmark => 0
+  ));
+
+=pod
+
+=head2 B<default_extended_autolinks_scheme> I<(enum, default: https)>
+
+Specify which scheme is added to the beginning of extended autolinks when none
+was present initially.
+
+=cut
+
+_make_option(
+  default_extended_autolinks_scheme => 'https',
+  _enum(qw(http https)),
+  github => 'http');
+
+=pod
+
+=head2 B<allow_task_list_markers> I<(enum, default: list)>
+
+Specify whether task list markers (rendered as check boxes) are recognised in
+the input. The possible values are as follow:
+
+=over 4
+
+=item B<never>
+
+Task list marker are never recognised
+
+=item B<list> I<(default)>
+
+Task list markers are recognised only as the first element at the beginning of
+a list item.
+
+=item B<always>
+
+Task list markers are recognised at the beginning of any paragraphs, inside any
+type of block.
+
+=back
+
+=cut
+
+_make_option(
+  allow_task_list_markers => 'list',
+  _enum(qw(never list always)), (
+    markdown => 'never',
+    cmark => 'never',
+  ));
+
+=pod
+
+=head2 B<table_blocks_can_interrupt_paragraph> I<(boolean, default: false)>
+
+Allow a table top level block to interrupt a paragraph.
+
+=cut
+
+_make_option(
+  table_blocks_can_interrupt_paragraph => 0,
+  _boolean, (
+    github => 1,
+  ));
+
+=pod
+
+=head2 B<table_blocks_have_cells_for_missing_data> I<(boolean, default: false)>
+
+Whether a table will have a cell in HTML for a missing cell in the markdown
+input.
+
+=cut
+
+_make_option(
+  table_blocks_have_cells_for_missing_data => 0,
+  _boolean, (
+    github => 1,
+  ));
+
+=pod
+
+=head2 B<table_blocks_pipes_requirements> I<(enum, default: strict)>
+
+Defines how strict is the parsing of table top level blocks when the leading or
+trailing pipes of a given line are missing.
+
+=over 4
+
+=item B<strict> I<(default)>
+
+Leading and trailing pipes are always required for all the lines of the table.
+
+=item B<loose>
+
+Leading and trailing pipes can be omitted when the table is not interrupting a
+paragraph, if it has at least two columns, and if the delimiter row uses
+delimiters with more than one character.
+
+=item B<lenient>
+
+Leading and trailing pipes can be omitted when the table has at least two
+columns, and if the delimiter row uses delimiters with more than one character.
+
+=item B<lax>
+
+Leading and trailing pipes can always be omitted, except on the header line of
+a table, if it has a single column.
+
+=back
+
+=cut
+
+_make_option(
+  table_blocks_pipes_requirements => 'strict',
+  _enum(qw(strict loose lenient lax)), (
+    github => 'loose',
+  ));
+
+=pod
+
+=head1 SEE ALSO
+
+L<Markdown::Perl>, L<pmarkdown>
+
+=cut
+
+1;

@@ -1,3 +1,6 @@
+3.20240402 2024-04-02 UTC
+  - Record: Fix bug in parser where spaces around a '=' would cause validation to fail
+
 3.20240319 2024-03-19 UTC
   - VMC: Fix valid usage check for newer OpenSSL builds
 

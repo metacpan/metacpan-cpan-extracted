@@ -44,6 +44,10 @@ Runs the application
 
 Override the default search path, defaults to your Your::App namespace.
 
+## exclude\_search\_path
+
+Excludes the search paths, can be a string, array ref or regexp
+
 ## default\_handler
 
 Defaults to `main` for your default handler. If this handler cannot be found

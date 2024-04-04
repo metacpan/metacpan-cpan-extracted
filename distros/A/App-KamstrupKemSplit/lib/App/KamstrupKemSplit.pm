@@ -1,6 +1,6 @@
 package App::KamstrupKemSplit;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 # ABSTRACT: Helper functions for the Kamstrup KEM file splitter application
 
 use Modern::Perl;
@@ -11,7 +11,7 @@ use XML::Simple;
 use Crypt::Rijndael;
 use MIME::Base64;
 use Exporter qw(import);
-our @EXPORT = qw(split_order read_config unzip_kem decode_kem parse_xml_string_to_data write_xml_output);
+our @EXPORT = qw(split_order read_config unzip_kem decode_kem parse_xml_string_to_data write_xml_output write_kem2_xml_output);
 
 =head1 DESCRIPTION
 
@@ -69,6 +69,7 @@ Returns the decrypted XML contents of the KEM file as string.
 sub decode_kem {
 	my $input_file = shift();
 	my $key        = shift();
+	my $kemformat  = shift() // 2;
 	
 	my $kem_xml    = XMLin($input_file);
 	DEBUG "Decoding encrypted section from XML with key '$key'";
@@ -77,8 +78,10 @@ sub decode_kem {
 	my $cipher  = Crypt::Rijndael->new( $fullkey, Crypt::Rijndael::MODE_CBC() );
 	my $plain_xml = $cipher->decrypt($data);
 
-	# Fix the XML
-	substr( $plain_xml, 0, 14 ) = "<MetersInOrder";
+	my $fix_head = $kemformat == 2 ? "<Devices schem" : "<MetersInOrder";
+
+	# Fix the XML                 
+	substr( $plain_xml, 0, 14 ) = $fix_head;
 	chomp($plain_xml);
 
 	# Remove trailing characters after last closing bracket in the XML
@@ -241,6 +244,51 @@ sub write_xml_output {
 	}
 	
 }
+
+=item write_kem2_xml_output
+
+Write the raw KEM2 file output to a file with name based on the ordercodes in the file.
+
+Takes as input the raw xml string
+
+=cut
+sub write_kem2_xml_output {
+	my $xml = shift();
+	
+	# Order code fetch an sanity check
+	my @ordercodes = $xml =~ /<OrderNumber>(\d+)<\/OrderNumber>/g;
+	my $ordercode = $ordercodes[0];
+	
+	my %codes = map { $_, 1 } @ordercodes;
+	if (keys %codes == 1) {
+ 		# all equal -> continue
+ 		INFO "All devices in the KEM file have the same ordercode '$ordercode'";
+	} else {
+		WARN "WARNING: the XML file contains multiple ordercodes in a single file -- check if this is supported by HydroSense first!";
+		$ordercode = '';
+		foreach (keys %codes) {
+			WARN " * $_";
+			$ordercode .= "$_" . "-";
+		}
+		
+		# Cut last '-' from filename
+		$ordercode =~ s/-$//;
+		
+	}
+	
+	
+	# Write the XML to file and stop
+	my $fname = $ordercode . ".xml";
+	open( my $fh, '>', $fname ) or die "Could not open output file: $!";
+	print $fh $xml;
+	close $fh;
+	
+	INFO "Wrote decoded KEM2 file output to $fname";
+	
+	return;
+}
+
+
 1;
 
 =back

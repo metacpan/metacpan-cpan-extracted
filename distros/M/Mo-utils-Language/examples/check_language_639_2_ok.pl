@@ -8,7 +8,7 @@ use Mo::utils::Language qw(check_language_639_2);
 my $self = {
         'key' => 'eng',
 };
-check_language_639_2($self, 'eng');
+check_language_639_2($self, 'key');
 
 # Print out.
 print "ok\n";

@@ -1,5 +1,5 @@
 package HTTP::Body::MultiPart;
-$HTTP::Body::MultiPart::VERSION = '1.22';
+$HTTP::Body::MultiPart::VERSION = '1.23';
 use strict;
 use base 'HTTP::Body';
 use bytes;
@@ -14,7 +14,7 @@ HTTP::Body::MultiPart - HTTP Body Multipart Parser
 
 =head1 SYNOPSIS
 
-    use HTTP::Body::Multipart;
+    use HTTP::Body::MultiPart;
 
 =head1 DESCRIPTION
 
@@ -256,7 +256,9 @@ sub parse_body {
 =cut
 
 our $basename_regexp = qr/[^.]+(\.[^\\\/]+)$/;
-#our $basename_regexp = qr/(\.\w+(?:\.\w+)*)$/;
+our $file_temp_suffix = '.upload';
+our $file_temp_template;
+our %file_temp_parameters;
 
 sub handler {
     my ( $self, $part ) = @_;
@@ -277,7 +279,11 @@ sub handler {
                 my $basename = (File::Spec->splitpath($filename))[2];
                 my $suffix = $basename =~ $basename_regexp ? $1 : q{};
 
-                my $fh = File::Temp->new( UNLINK => 0, DIR => $self->tmpdir, SUFFIX => $suffix );
+                my $fh = File::Temp->new(
+                    UNLINK => 0, DIR => $self->tmpdir, SUFFIX => ($file_temp_suffix||$suffix),
+                    ( $file_temp_template ? ( TEMPLATE => $file_temp_template ) : () ),
+                    %file_temp_parameters,
+                );
 
                 $part->{fh}       = $fh;
                 $part->{tempname} = $fh->filename;
@@ -310,6 +316,10 @@ sub handler {
 }
 
 =back
+
+=head1 SUPPORT
+
+See L<HTTP::Body>
 
 =head1 AUTHOR
 

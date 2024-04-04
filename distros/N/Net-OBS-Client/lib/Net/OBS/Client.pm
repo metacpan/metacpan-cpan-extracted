@@ -8,7 +8,7 @@ use Net::OBS::Client::BuildResults;
 
 with 'Net::OBS::Client::Roles::Client';
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.2';
 
 sub project {
   my ($self, @args) = @_;
@@ -19,6 +19,7 @@ sub project {
     pass       => $self->pass,
     repository => $self->repository,
     arch       => $self->arch,
+    sigauth_credentials => $self->sigauth_credentials,
     @args,
   );
 }
@@ -30,6 +31,7 @@ sub package {
     use_oscrc  => $self->use_oscrc,
     user       => $self->user,
     pass       => $self->pass,
+    sigauth_credentials => $self->sigauth_credentials,
     @args,
   );
 }
@@ -41,6 +43,7 @@ sub buildresults {
     use_oscrc  => $self->use_oscrc,
     user       => $self->user,
     pass       => $self->pass,
+    sigauth_credentials => $self->sigauth_credentials,
     @args,
   );
 }

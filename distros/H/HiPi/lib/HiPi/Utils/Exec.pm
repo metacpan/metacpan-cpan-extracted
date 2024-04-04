@@ -23,7 +23,7 @@ use HiPi;
 
 __PACKAGE__->create_accessors( qw( workingdir sourceperl outputexec ) );
 
-our $VERSION ='0.91';
+our $VERSION ='0.92';
 
 XSLoader::load('HiPi::Utils::Exec', $VERSION) if HiPi::is_raspberry_pi();
 

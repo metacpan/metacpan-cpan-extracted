@@ -4,11 +4,11 @@ lib/Amazon/Sites.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
-MYMETA.json
-MYMETA.yml
 README.md
 t/00-load.t
 t/01-basic.t
+t/02-include-exclude.t
+t/03-associates.t
 t/pod.t
 t/pod_coverage.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

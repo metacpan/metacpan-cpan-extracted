@@ -1,5 +1,5 @@
 package HTTP::Body::UrlEncoded;
-$HTTP::Body::UrlEncoded::VERSION = '1.22';
+$HTTP::Body::UrlEncoded::VERSION = '1.23';
 use strict;
 use base 'HTTP::Body';
 use bytes;
@@ -63,6 +63,10 @@ sub spin {
 }
 
 =back
+
+=head1 SUPPORT
+
+See L<HTTP::Body>
 
 =head1 AUTHORS
 

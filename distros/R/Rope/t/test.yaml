@@ -1,0 +1,17 @@
+for:
+  country: '{country}'
+  each: countries
+  else:
+    then:
+      rank: ~
+  elsif:
+    key: country
+    m: Indonesia
+    then:
+      rank: 2
+  if:
+    key: country
+    m: Thailand
+    then:
+      rank: 1
+  key: countries

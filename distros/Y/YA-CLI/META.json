@@ -84,23 +84,23 @@
    "provides" : {
       "YA::CLI" : {
          "file" : "lib/YA/CLI.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "YA::CLI::ActionRole" : {
          "file" : "lib/YA/CLI/ActionRole.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "YA::CLI::ErrorHandler" : {
          "file" : "lib/YA/CLI/ErrorHandler.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "YA::CLI::PodRole" : {
          "file" : "lib/YA/CLI/PodRole.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "YA::CLI::Usage" : {
          "file" : "lib/YA/CLI/Usage.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -111,7 +111,7 @@
          "web" : "https://gitlab.com/waterkip/yet-another-cli-module"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_contributors" : [
       "Wesley Schwengle <waterkip@cpan.org>"
    ],

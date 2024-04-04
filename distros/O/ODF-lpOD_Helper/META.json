@@ -83,7 +83,7 @@
    "provides" : {
       "ODF::lpOD_Helper" : {
          "file" : "lib/ODF/lpOD_Helper.pm",
-         "version" : "6.010"
+         "version" : "6.011"
       }
    },
    "release_status" : "stable",
@@ -98,7 +98,7 @@
          "web" : "https://github.com/jimav/ODF-lpOD_Helper"
       }
    },
-   "version" : "6.010",
+   "version" : "6.011",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "CC0-1.0"

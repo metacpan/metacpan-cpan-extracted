@@ -1,5 +1,16 @@
 Revision history for Env-Dot
 
+0.013     2024-03-31 10:17:59+03:00 Europe/Helsinki
+            * Fix test code to use Cwd::abs_path().
+            * Remove tests, remove needless diag.
+
+0.012     2024-03-29 18:05:10+02:00 Europe/Helsinki
+            * Fix lib and test code to use Cwd::abs_path with File::Spec->catdir|catfile.
+
+0.011     2024-03-27 22:13:20+02:00 Europe/Helsinki
+            * Allow reading files recursively.
+            * Perltidyfy lib.
+
 0.010     2024-03-23 16:25:32+01:00 Europe/Stockholm
             * Rework Prereqs in dist.ini. Add Test::Script.
             * Fix test to work in Win32.

@@ -11,7 +11,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(check_date check_date_dmy check_date_ddmmyy check_date_order);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub check_date {
 	my ($self, $key) = @_;
@@ -27,7 +27,7 @@ sub check_date {
 	# Check year format.
 	if ($self->{$key} !~ m/^\-?(\d{1,4})\-?\d{0,2}\-?\d{0,2}$/ms) {
 		err "Parameter '$key' is in bad format.",
-			'Value', $self->{$key},
+			'Value' => $self->{$key},
 		;
 	}
 	my $year = $1;
@@ -53,7 +53,7 @@ sub check_date_dmy {
 
 	if ($self->{$key} !~ m/^(\d{1,2}).(\d{1,2}).(\d{4})$/ms) {
 		err "Parameter '$key' is in bad format.",
-			'Value', $self->{$key},
+			'Value' => $self->{$key},
 		;
 	}
 	my ($day, $month, $year) = ($1, $2, $3);
@@ -67,7 +67,7 @@ sub check_date_dmy {
 	if ($EVAL_ERROR) {
 		err "Parameter '$key' is bad date.",
 			'Value' => $self->{$key},
-			'DateTime error', $EVAL_ERROR,
+			'DateTime error' => $EVAL_ERROR,
 		;
 	}
 
@@ -101,7 +101,7 @@ sub check_date_ddmmyy {
 	if ($EVAL_ERROR) {
 		err "Parameter '$key' is bad date.",
 			'Value' => $self->{$key},
-			'DateTime error', $EVAL_ERROR,
+			'DateTime error' => $EVAL_ERROR,
 		;
 	}
 
@@ -119,8 +119,17 @@ sub check_date_order {
 		return;
 	}
 
-	my $dt1 = _construct_dt($self->{$key1});
-	my $dt2 = _construct_dt($self->{$key2});
+	my ($dt1, $dt2);
+	if (ref $self->{$key1} eq 'DateTime') {
+		$dt1 = $self->{$key1};
+	} else {
+		$dt1 = _construct_dt($self->{$key1});
+	}
+	if (ref $self->{$key2} eq 'DateTime') {
+		$dt2 = $self->{$key2};
+	} else {
+		$dt2 = _construct_dt($self->{$key2});
+	}
 
 	my $cmp = DateTime->compare($dt1, $dt2);
 
@@ -135,12 +144,27 @@ sub check_date_order {
 sub _construct_dt {
 	my $date = shift;
 
-	my ($year, $month, $day) = $date =~ m/^(\-?\d{1,4})\-?(\d{0,2})\-?(\d{0,2})$/ms;
-	my $dt = DateTime->new(
-		'year' => $year,
-		$month ? ('month' => $month) : (),
-		$day ? ('day' => $day) : (),
-	);
+	my ($year, $month, $day);
+	if ($date =~ m/^(\-?\d{1,4})\-?(\d{0,2})\-?(\d{0,2})$/ms) {
+		($year, $month, $day) = ($1, $2, $3);
+	} else {
+		err 'Cannot parse date/time string.',
+			'Value' => $date,
+		;
+	}
+	my $dt = eval {
+		DateTime->new(
+			'year' => $year,
+			$month ? ('month' => $month) : (),
+			$day ? ('day' => $day) : (),
+		);
+	};
+	if ($EVAL_ERROR) {
+		err "Cannot construct DateTime object from date.",
+			'Value' => $date,
+			'DateTime error' => $EVAL_ERROR,
+		;
+	}
 
 	return $dt;
 }
@@ -233,9 +257,23 @@ Returns undef.
 
  check_date_order($self, $key1, $key2);
 
-I<Since version 0.01. Described functionality since version 0.02.>
+I<Since version 0.01. Described functionality since version 0.04.>
 
 Check if date with C<$key1> is lesser than date with C<$key2>.
+
+Possible date formats:
+
+=over
+
+=item * YYYY-MM-DD
+
+=item * -YYYY-MM-DD
+
+=item * YEAR
+
+=item * L<DateTime> object
+
+=back
 
 Put error if check isn't ok.
 
@@ -263,6 +301,11 @@ Returns undef.
                  DateTime error: %s
 
  check_date_order():
+         Cannot parse date/time string.
+                 Value: %s
+         Cannot construct DateTime object from date.
+                 Value: %s
+                 DateTime error: %s
          Parameter '%s' has date greater or same as parameter '%s' date.
 
 =head1 EXAMPLE1
@@ -387,6 +430,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

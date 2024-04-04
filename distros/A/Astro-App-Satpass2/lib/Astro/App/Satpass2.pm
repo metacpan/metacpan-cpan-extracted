@@ -91,7 +91,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.053';
+our $VERSION = '0.054';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -3649,7 +3649,7 @@ sub version : Verb() {
 
 @{[__PACKAGE__]} $VERSION - Satellite pass predictor
 based on Astro::Coord::ECI @{[Astro::Coord::ECI->VERSION]}
-Copyright (C) 2009-2023 by Thomas R. Wyant, III
+Copyright (C) 2009-2024 by Thomas R. Wyant, III
 
 EOD
 }
@@ -6304,8 +6304,8 @@ install them later. The optional modules are:
 =item L<Astro::SIMBAD::Client|Astro::SIMBAD::Client>
 
 This module looks up the positions of astronomical bodies in the SIMBAD
-database at L<http://simbad.u-strasbg.fr/simbad/>. This is only used by the
-C<lookup> subcommand of the L<sky()|/sky> method.
+database at L<https://simbad.cds.unistra.fr/simbad/>. This is only used
+by the C<lookup> subcommand of the L<sky()|/sky> method.
 
 =item L<Astro::SpaceTrack|Astro::SpaceTrack>
 
@@ -9676,9 +9676,9 @@ without an incentive.
 =item simbad_version
 
 This attribute was used to select the version of the SIMBAD protocol to
-use to access L<http://simbad.u-strasbg.fr/simbad/>. Since only version 4 is
-currently supported, and this has been the default in F<satpass> for
-some time, this attribute is eliminated.
+use to access L<https://simbad.cds.unistra.fr/simbad/>. Since only
+version 4 is currently supported, and this has been the default in
+F<satpass> for some time, this attribute is eliminated.
 
 =back
 
@@ -9780,7 +9780,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2023 by Thomas R. Wyant, III
+Copyright (C) 2009-2024 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

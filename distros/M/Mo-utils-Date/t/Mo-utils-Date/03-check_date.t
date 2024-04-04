@@ -5,7 +5,7 @@ use DateTime;
 use English;
 use Error::Pure::Utils qw(clean);
 use Mo::utils::Date qw(check_date);
-use Test::More 'tests' => 19;
+use Test::More 'tests' => 21;
 use Test::NoWarnings;
 
 # Test.
@@ -87,6 +87,16 @@ is($ret, undef, "Date '-2000-01-1' is right.");
 $self = {'date' => '-2000-1-1'};
 $ret = check_date($self, 'date');
 is($ret, undef, "Date '-2000-1-1' is right.");
+
+# Test.
+$self = {};
+$ret = check_date($self, 'date');
+is($ret, undef, "Date key doesn't exist.");
+
+# Test.
+$self = {'date' => undef};
+$ret = check_date($self, 'date');
+is($ret, undef, "Date key is undefined.");
 
 # Test.
 $self = {'date' => 'foo'};

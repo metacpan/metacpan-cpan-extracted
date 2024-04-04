@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -48,11 +48,16 @@
             "Test::Carp" : "0",
             "Test::CleanNamespaces" : "0",
             "Test::Distribution" : "0",
+            "Test::EOF" : "0",
+            "Test::EOL" : "0",
             "Test::Kwalitee" : "0",
             "Test::Most" : "0",
+            "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
             "WWW::RT::CPAN" : "0",
-            "autodie" : "0"
+            "autodie" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
@@ -70,6 +75,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-ACL"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

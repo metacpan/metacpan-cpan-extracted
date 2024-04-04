@@ -1,5 +1,5 @@
 package YAML::Conditional;
-use 5.006; use strict; use warnings; our $VERSION = '1.00';
+use 5.006; use strict; use warnings; our $VERSION = '1.01';
 use YAML::XS qw/Dump DumpFile Load LoadFile/; use base 'Struct::Conditional';
 
 sub encode {
@@ -12,7 +12,7 @@ sub encode_file {
 
 sub decode {
 	if ($_[1] !~ m/\n/ && -f $_[1]) {
-		$_[0]->decode_file($_[1]);
+		return $_[0]->decode_file($_[1]);
 	}
         Load($_[1]);
 }
@@ -43,7 +43,7 @@ YAML::Conditional - A conditional language within a YAML struct
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
