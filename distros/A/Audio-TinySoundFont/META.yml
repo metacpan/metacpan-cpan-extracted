@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.21, Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,10 +31,10 @@ resources:
   bugtracker: https://github.com/atrodo/Audio-TinySoundFont/issues
   homepage: https://github.com/atrodo/Audio-TinySoundFont
   repository: https://github.com/atrodo/Audio-TinySoundFont.git
-version: '0.11'
+version: '0.12'
 x_contributors:
   - 'Jon Gentle <atrodo@atrodo.org>'
-x_generated_by_perl: v5.18.2
+x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0
 x_static_install: 0

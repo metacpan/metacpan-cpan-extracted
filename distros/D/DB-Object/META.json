@@ -41,7 +41,7 @@
             "Fcntl" : "0",
             "JSON" : "4.10",
             "JSON::XS" : "4.03",
-            "Module::Generic" : "v0.35.1",
+            "Module::Generic" : "v0.35.2",
             "Net::IP" : "1.26",
             "POSIX" : "1.53_01",
             "Promise::Me" : "v0.4.7",
@@ -74,6 +74,6 @@
          "web" : "https://gitlab.com/jackdeguest/DB-Object"
       }
    },
-   "version" : "v1.2.1",
+   "version" : "v1.2.2",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

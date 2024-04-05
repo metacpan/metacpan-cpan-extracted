@@ -1,0 +1,38 @@
+---
+abstract: 'Client for AI::Ollama'
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Future: '0'
+  Future::Queue: '0'
+  Future::Utils: '0'
+  Mojo::JSON: '0'
+  Mojolicious: '9'
+  Moo: '2'
+  Test2::V0: '0'
+  experimental: '0.031'
+  stable: '0.031'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AI-Ollama-Client
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '5'
+  perl: '5.020'
+resources:
+  bugtracker: https://github.com/Corion/AI-Ollama-Client/issues
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/Corion/AI-Ollama-Client.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

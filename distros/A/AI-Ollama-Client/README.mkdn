@@ -1,0 +1,125 @@
+
+[![Windows](https://github.com/Corion/AI-Ollama-Client/workflows/windows/badge.svg)](https://github.com/Corion/AI-Ollama-Client/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/AI-Ollama-Client/workflows/macos/badge.svg)](https://github.com/Corion/AI-Ollama-Client/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/AI-Ollama-Client/workflows/linux/badge.svg)](https://github.com/Corion/AI-Ollama-Client/actions?query=workflow%3Alinux)
+
+# NAME
+
+AI::Ollama::Client - Client for AI::Ollama
+
+# SYNOPSIS
+
+    use 5.020;
+    use AI::Ollama::Client;
+
+    my $client = AI::Ollama::Client->new(
+        server => 'https://example.com/',
+    );
+    my $res = $client->someMethod()->get;
+    say $res;
+
+# METHODS
+
+## `checkBlob`
+
+    my $res = $client->checkBlob()->get;
+
+Check to see if a blob exists on the Ollama server which is useful when creating models.
+
+## `createBlob`
+
+    my $res = $client->createBlob()->get;
+
+Create a blob from a file. Returns the server file path.
+
+## `generateChatCompletion`
+
+    my $res = $client->generateChatCompletion()->get;
+
+Generate the next message in a chat with a provided model.
+
+Returns a [AI::Ollama::GenerateChatCompletionResponse](https://metacpan.org/pod/AI%3A%3AOllama%3A%3AGenerateChatCompletionResponse).
+
+## `copyModel`
+
+    my $res = $client->copyModel()->get;
+
+Creates a model with another name from an existing model.
+
+## `createModel`
+
+    my $res = $client->createModel()->get;
+
+Create a model from a Modelfile.
+
+Returns a [AI::Ollama::CreateModelResponse](https://metacpan.org/pod/AI%3A%3AOllama%3A%3ACreateModelResponse).
+
+## `deleteModel`
+
+    my $res = $client->deleteModel()->get;
+
+Delete a model and its data.
+
+## `generateEmbedding`
+
+    my $res = $client->generateEmbedding()->get;
+
+Generate embeddings from a model.
+
+Returns a [AI::Ollama::GenerateEmbeddingResponse](https://metacpan.org/pod/AI%3A%3AOllama%3A%3AGenerateEmbeddingResponse).
+
+## `generateCompletion`
+
+    use Future::Utils 'repeat';
+    my $responses = $client->generateCompletion();
+    repeat {
+        my ($res) = $responses->shift;
+        if( $res ) {
+            my $str = $res->get;
+            say $str;
+        }
+
+        Future::Mojo->done( defined $res );
+    } until => sub($done) { $done->get };
+
+Generate a response for a given prompt with a provided model.
+
+Returns a [AI::Ollama::GenerateCompletionResponse](https://metacpan.org/pod/AI%3A%3AOllama%3A%3AGenerateCompletionResponse).
+
+## `pullModel`
+
+    my $res = $client->pullModel(
+        name => 'llama',
+    )->get;
+
+Download a model from the ollama library.
+
+Returns a [AI::Ollama::PullModelResponse](https://metacpan.org/pod/AI%3A%3AOllama%3A%3APullModelResponse).
+
+## `pushModel`
+
+    my $res = $client->pushModel()->get;
+
+Upload a model to a model library.
+
+Returns a [AI::Ollama::PushModelResponse](https://metacpan.org/pod/AI%3A%3AOllama%3A%3APushModelResponse).
+
+## `showModelInfo`
+
+    my $info = $client->showModelInfo()->get;
+    say $info->modelfile;
+
+Show details about a model including modelfile, template, parameters, license, and system prompt.
+
+Returns a [AI::Ollama::ModelInfo](https://metacpan.org/pod/AI%3A%3AOllama%3A%3AModelInfo).
+
+## `listModels`
+
+    my $info = $client->listModels()->get;
+    for my $model ($info->models->@*) {
+        say $model->model; # llama2:latest
+    }
+
+List models that are available locally.
+
+Returns a [AI::Ollama::ModelsResponse](https://metacpan.org/pod/AI%3A%3AOllama%3A%3AModelsResponse).

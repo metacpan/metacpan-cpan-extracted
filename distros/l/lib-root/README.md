@@ -5,7 +5,7 @@ lib::root - find perl root and push lib modules path to @INC
 
 # VERSION
 
-version 0.04
+version 0.06
 
 # SYNOPSIS
 
@@ -125,6 +125,18 @@ If necessary, lib::root also accepts a callback as an option. The callback is ex
 
     use lib::root callback => sub { ... };
 
+### EXAMPLE 5 - GET ROOT DIR
+
+IT is also possible to get the root dir calling the root sub:
+
+    my $rootdir = lib::root->root;
+
+### EXAMPLE 5 - GET ROOT DIR
+
+IT is also possible to get the root dir calling the root sub:
+
+    my $rootdir = lib::root->root;
+
 ## SEE ALSO
 
 Similar ideas have been implemented before in the modules below and possibly others
@@ -146,4 +158,4 @@ it under the same terms as Perl itself.
 
 # AUTHOR
 
-Hernan Lopes <hernan@smallcompany.net>
+Hernan Lopes

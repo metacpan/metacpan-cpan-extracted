@@ -2,7 +2,7 @@ package Audio::TinySoundFont::XS;
 
 use v5.14;
 use warnings;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 require XSLoader;
 XSLoader::load( 'Audio::TinySoundFont', $VERSION );

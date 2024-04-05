@@ -1,0 +1,14 @@
+Makefile
+Makefile.old
+*.tar.gz
+*.bak
+*.swp
+pm_to_blib
+blib/
+AI-Ollama-Client-*
+AI-Ollama-Client-*/
+.releaserc
+cover_db
+MYMETA.*
+.prove
+.patch

@@ -4,7 +4,8 @@ use warnings;
 use Path::Tiny;
 use Cwd;
 
-our $VERSION = "0.04";
+our $VERSION = "0.06";
+my $root;
 
 sub import
 {
@@ -42,6 +43,7 @@ sub import
 
   if ( $found )
   {
+    $root = $found->parent;
     push @INC, glob $lib_paths;
     $callback->( $lib_paths, $found )
       if $callback;
@@ -51,6 +53,11 @@ sub import
     warn
       "lib::root error: Could not find rootfile [ $rootfile ]. lib::root loaded from [ $caller_file ].";
   }
+}
+
+sub root
+{
+  return $root;
 }
 
 1;
@@ -67,7 +74,7 @@ lib::root - find perl root and push lib modules path to @INC
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -187,6 +194,18 @@ If necessary, lib::root also accepts a callback as an option. The callback is ex
 
   use lib::root callback => sub { ... };
 
+=head3 EXAMPLE 5 - GET ROOT DIR
+
+IT is also possible to get the root dir calling the root sub:
+
+  my $rootdir = lib::root->root;
+
+=head3 EXAMPLE 5 - GET ROOT DIR
+
+IT is also possible to get the root dir calling the root sub:
+
+  my $rootdir = lib::root->root;
+
 =head2 SEE ALSO
 
 Similar ideas have been implemented before in the modules below and possibly others
@@ -212,7 +231,7 @@ it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Hernan Lopes E<lt>hernan@smallcompany.netE<gt>
+Hernan Lopes
 
 =cut
 

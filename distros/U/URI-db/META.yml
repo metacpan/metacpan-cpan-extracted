@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.30'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,139 +17,139 @@ name: URI-db
 provides:
   URI::cassandra:
     file: lib/URI/cassandra.pm
-    version: '0.21'
+    version: '0.22'
   URI::cockroach:
     file: lib/URI/cockroach.pm
-    version: '0.21'
+    version: '0.22'
   URI::cockroachdb:
     file: lib/URI/cockroachdb.pm
-    version: '0.21'
+    version: '0.22'
   URI::couch:
     file: lib/URI/couch.pm
-    version: '0.21'
+    version: '0.22'
   URI::couchdb:
     file: lib/URI/couchdb.pm
-    version: '0.21'
+    version: '0.22'
   URI::cubrid:
     file: lib/URI/cubrid.pm
-    version: '0.21'
+    version: '0.22'
   URI::db:
     file: lib/URI/db.pm
-    version: '0.21'
+    version: '0.22'
   URI::db2:
     file: lib/URI/db2.pm
-    version: '0.21'
+    version: '0.22'
   URI::derby:
     file: lib/URI/derby.pm
-    version: '0.21'
+    version: '0.22'
   URI::exasol:
     file: lib/URI/exasol.pm
-    version: '0.21'
+    version: '0.22'
   URI::firebird:
     file: lib/URI/firebird.pm
-    version: '0.21'
+    version: '0.22'
   URI::hive:
     file: lib/URI/hive.pm
-    version: '0.21'
+    version: '0.22'
   URI::impala:
     file: lib/URI/impala.pm
-    version: '0.21'
+    version: '0.22'
   URI::informix:
     file: lib/URI/informix.pm
-    version: '0.21'
+    version: '0.22'
   URI::ingres:
     file: lib/URI/ingres.pm
-    version: '0.21'
+    version: '0.22'
   URI::interbase:
     file: lib/URI/interbase.pm
-    version: '0.21'
+    version: '0.22'
   URI::ldapdb:
     file: lib/URI/ldapdb.pm
-    version: '0.21'
+    version: '0.22'
   URI::maria:
     file: lib/URI/maria.pm
-    version: '0.21'
+    version: '0.22'
   URI::mariadb:
     file: lib/URI/mariadb.pm
-    version: '0.21'
+    version: '0.22'
   URI::max:
     file: lib/URI/max.pm
-    version: '0.21'
+    version: '0.22'
   URI::maxdb:
     file: lib/URI/maxdb.pm
-    version: '0.21'
+    version: '0.22'
   URI::monet:
     file: lib/URI/monet.pm
-    version: '0.21'
+    version: '0.22'
   URI::monetdb:
     file: lib/URI/monetdb.pm
-    version: '0.21'
+    version: '0.22'
   URI::mongo:
     file: lib/URI/mongo.pm
-    version: '0.21'
+    version: '0.22'
   URI::mongodb:
     file: lib/URI/mongodb.pm
-    version: '0.21'
+    version: '0.22'
   URI::mssql:
     file: lib/URI/mssql.pm
-    version: '0.21'
+    version: '0.22'
   URI::mysql:
     file: lib/URI/mysql.pm
-    version: '0.21'
+    version: '0.22'
   URI::oracle:
     file: lib/URI/oracle.pm
-    version: '0.21'
+    version: '0.22'
   URI::pg:
     file: lib/URI/pg.pm
-    version: '0.21'
+    version: '0.22'
   URI::pgsql:
     file: lib/URI/pgsql.pm
-    version: '0.21'
+    version: '0.22'
   URI::pgxc:
     file: lib/URI/pgxc.pm
-    version: '0.21'
+    version: '0.22'
   URI::postgres:
     file: lib/URI/postgres.pm
-    version: '0.21'
+    version: '0.22'
   URI::postgresql:
     file: lib/URI/postgresql.pm
-    version: '0.21'
+    version: '0.22'
   URI::postgresxc:
     file: lib/URI/postgresxc.pm
-    version: '0.21'
+    version: '0.22'
   URI::redshift:
     file: lib/URI/redshift.pm
-    version: '0.21'
+    version: '0.22'
   URI::snowflake:
     file: lib/URI/snowflake.pm
-    version: '0.21'
+    version: '0.22'
   URI::sqlite:
     file: lib/URI/sqlite.pm
-    version: '0.21'
+    version: '0.22'
   URI::sqlite3:
     file: lib/URI/sqlite3.pm
-    version: '0.21'
+    version: '0.22'
   URI::sqlserver:
     file: lib/URI/sqlserver.pm
-    version: '0.21'
+    version: '0.22'
   URI::sybase:
     file: lib/URI/sybase.pm
-    version: '0.21'
+    version: '0.22'
   URI::teradata:
     file: lib/URI/teradata.pm
-    version: '0.21'
+    version: '0.22'
   URI::unify:
     file: lib/URI/unify.pm
-    version: '0.21'
+    version: '0.22'
   URI::vertica:
     file: lib/URI/vertica.pm
-    version: '0.21'
+    version: '0.22'
   URI::yugabyte:
     file: lib/URI/yugabyte.pm
-    version: '0.21'
+    version: '0.22'
   URI::yugabytedb:
     file: lib/URI/yugabytedb.pm
-    version: '0.21'
+    version: '0.22'
 requires:
   URI: '1.40'
   URI::Nested: '0.10'
@@ -159,5 +159,5 @@ resources:
   homepage: https://search.cpan.org/dist/URI-db/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/theory/uri-db/
-version: '0.21'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

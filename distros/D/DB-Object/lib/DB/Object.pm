@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v1.2.1
+## Version v1.2.2
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/03/22
+## Modified 2024/04/05
 ## All rights reserved
 ## 
 ## 
@@ -35,7 +35,7 @@ BEGIN
     use POSIX ();
     use Want;
     our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
-    our $VERSION = 'v1.2.1';
+    our $VERSION = 'v1.2.2';
     use Devel::Confess;
 };
 
@@ -2724,7 +2724,7 @@ Because the L<fields objects|DB::Object::Fields::Field> are overloaded, instead 
 
 =head1 VERSION
 
-    v1.2.1
+    v1.2.2
 
 =head1 DESCRIPTION
 

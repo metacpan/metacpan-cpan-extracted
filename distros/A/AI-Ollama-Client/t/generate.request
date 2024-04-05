@@ -1,0 +1,69 @@
+Accept: application/x-ndjson
+Accept-Encoding: gzip, deflate, br
+Accept-Language: de,en-US;q=0.7,en;q=0.3
+Cache-Control: no-cache
+Connection: keep-alive
+Content-Length: 942
+Content-Type: application/json
+DNT: 1
+Host: localhost:11434
+Origin: https://dhcode.github.io
+Pragma: no-cache
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: cross-site
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0
+
+{
+  "model": "",
+  "prompt": "",
+  "images": [
+    ""
+  ],
+  "system": "",
+  "template": "",
+  "context": [
+    0
+  ],
+  "options": {
+    "num_keep": 0,
+    "seed": 0,
+    "num_predict": 0,
+    "top_k": 0,
+    "top_p": 0,
+    "tfs_z": 0,
+    "typical_p": 0,
+    "repeat_last_n": 0,
+    "temperature": 0,
+    "repeat_penalty": 0,
+    "presence_penalty": 0,
+    "frequency_penalty": 0,
+    "mirostat": 0,
+    "mirostat_tau": 0,
+    "mirostat_eta": 0,
+    "penalize_newline": true,
+    "stop": [
+      ""
+    ],
+    "numa": true,
+    "num_ctx": 0,
+    "num_batch": 0,
+    "num_gqa": 0,
+    "num_gpu": 0,
+    "main_gpu": 0,
+    "low_vram": true,
+    "f16_kv": true,
+    "logits_all": true,
+    "vocab_only": true,
+    "use_mmap": true,
+    "use_mlock": true,
+    "embedding_only": true,
+    "rope_frequency_base": 0,
+    "rope_frequency_scale": 0,
+    "num_thread": 0
+  },
+  "format": "json",
+  "raw": true,
+  "stream": false,
+  "keep_alive": 0
+}

@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite.pm
-## Version v1.1.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v1.1.1
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/03/16
+## Modified 2024/04/05
 ## All rights reserved
 ## 
 ## 
@@ -67,16 +67,21 @@ BEGIN
             re => qr/^(INT|INTEGER|TINYINT|SMALLINT|MEDIUMINT|BIGINT|UNSIGNED\s+BIG\s+INT|INT2|INT8)/,
             type => 'integer',
         },
-        text => {
+        # Data type text is only available from version 1.71 onward
+    };
+    if( $DBD::SQLite::VERSION >= 1.071 )
+    {
+        $DATATYPES_DICT->{text} =
+        {
             alias => [qw( character clob nchar nvarchar varchar ), 'native character', 'varying character' ],
             constant => '',
             name => 'SQLITE_TEXT',
             re => qr/^(CHARACTER\(\d+\)|VARCHAR\(\d+\)|VARYING\s+CHARACTER\(\d+\)|NCHAR\(\d+\)|NATIVE\s+CHARACTER\(\d+\)|NVARCHAR\(\d+\)|TEXT|CLOB)/,
             type => 'text'
-        },
-    };
+        };
+    }
     our $PLACEHOLDER_REGEXP = qr/\?(?<index>\d+)/;
-    our $VERSION = 'v1.1.0';
+    our $VERSION = 'v1.1.1';
     use Devel::Confess;
 };
 
@@ -1414,7 +1419,7 @@ DB::Object::SQLite - DB Object SQLite Driver
     
 =head1 VERSION
 
-    v1.1.0
+    v1.1.1
 
 =head1 DESCRIPTION
 
