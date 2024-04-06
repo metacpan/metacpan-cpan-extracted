@@ -25,18 +25,20 @@ my $gen = OpenAPI::PerlGenerator->new(
     tidy => 0,
 );
 
-my %prefix = (
-    'ollama' => 'AI::Ollama',
-    'petstore' => 'OpenAPI::PetStore',
-    'more-testcases' => 'More::TestCases',
-    'whisper.cpp' => 'Speech::Recognition::Whisper',
+my %test_configs = (
+    'jira'           => { prefix => 'JIRA::API', compare_todo => 'Mojibake in output', compile_todo => 'Definition wrong/incomplete', },
+    'ollama'         => { prefix => 'AI::Ollama', },
+    'petstore'       => { prefix => 'OpenAPI::PetStore', },
+    'more-testcases' => { prefix => 'More::TestCases', },
+    'whisper.cpp'    => { prefix => 'Speech::Recognition::Whisper', },
 );
 
 my @testcases = grep { -d } curfile()->dirname->list({ dir => 1 })->@*;
 for my $known (@testcases) {
     (my $api_file_yaml) = grep { /\.yaml$/ } $known->list->@*;
     (my $api_file_json) = grep { /\.json$/ } $known->list->@*;
-    my $prefix = $prefix{ $known->basename };
+    my $options = $test_configs{ $known->basename };
+    my $prefix = $options->{prefix};
     note "$prefix";
     my $schema = $api_file_yaml ? YAML::PP->new( boolean => 'JSON::PP' )->load_file( $api_file_yaml )
                : $api_file_json ? JSON::PP->new()->decode( $api_file_json->slurp())
@@ -46,27 +48,40 @@ for my $known (@testcases) {
         prefix => "$prefix",
     );
 
-    # Compile things a second time ...
-    my $res = $gen->load_schema(
-        packages => \@files,
-    );
+    {
+        my $todo;
+        if( $options->{compile_todo} ) {
+            $todo = todo( $options->{compile_todo} );
+        };
 
-    is 0+$res->{errors}->@*, 0, "No errors when compiling the package";
-    if( $res->{errors}->@* ) {
+        # Compile things a second time ...
+        my $res = $gen->load_schema(
+            packages => \@files,
+        );
 
-        for my $err ($res->{errors}->@*) {
-            diag $err->{name};
-            diag $err->{filename};
-            diag $err->{message};
+        is 0+$res->{errors}->@*, 0, "No errors when compiling the package";
+        if( $res->{errors}->@* ) {
+
+            for my $err ($res->{errors}->@*) {
+                diag $err->{name};
+                diag $err->{filename};
+                diag $err->{message};
+            }
         }
     }
-
 
     for my $f (@files) {
         # Check that all files exist and have the same content
         my $file = Mojo::File->new($known, $f->{filename});
         if( ok -f $file, "$file exists" ) {
-        my $known_content = $file->slurp(':raw:UTF-8');
+            my $known_content = $file->slurp(':raw:UTF-8');
+            # Known and $f->{source} have different encodings?!
+            #use Encode;
+            #Encode::_utf8_on( $f->{source});
+            my $todo;
+            if( $options->{compare_todo} ) {
+                $todo = todo( $options->{compare_todo} );
+            };
             is $f->{source}, $known_content, "The content has not changed";
         } else {
             SKIP: {
@@ -75,6 +90,7 @@ for my $known (@testcases) {
         }
         if( $update ) {
             make_path( $file->dirname );
+            #$file->spew( Encode::encode('UTF-8', $f->{ source }));
             $file->spew( $f->{ source });
         }
     }

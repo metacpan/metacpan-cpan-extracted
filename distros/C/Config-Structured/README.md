@@ -11,19 +11,23 @@ Basic usage:
     my $conf = Config::Structured->new(
       structure => { 
         db => {
-          host     => {
+          dsn     => {
             isa         => 'Str',
-            default     => 'localhost',
-            description => 'the database server hostname',
+            default     => '',
+            description => 'Data Source Name for connecting to the database',
+            url         => "https://en.wikipedia.org/wiki/Data_source_name",
+            examples    => ["dbi:SQLite:dbname=:memory:", "dbi:mysql:host=localhost;port=3306;database=prod_myapp"]
           },
           username => {
             isa         => 'Str',
             default     => 'dbuser',
-            description => 'the database user's username',
+            description => "the database user's username",
           },
           password => {
             isa         => 'Str',
-            description => 'the database user's password',
+            description => "the database user's password",
+            sensitive   => 1,
+            notes       => "Often ref'd via file or ENV for security"
           },
         }
       },
@@ -46,17 +50,19 @@ Basic usage:
     # assuming that the hostname value has been set in the DB_HOSTNAME env var
     say $conf->db->host; # prod_db_1.mydomain.com
     # assuming that the password value has been stored in /run/secrets/db_password
-    say $conf->db->password(); # *mD9ua&ZSVzEeWkm93bmQzG
+    say $conf->db->password(1); # *mD9ua&ZSVzEeWkm93bmQzG
 
 Hooks example showing how to ensure config directories exist prior to first 
 use:
+
+    use File::Path qw(make_path);
 
     my $conf = Config::Structured->new(
       ...
       hooks => {
         '/paths/*' => {
           on_load => sub($node,$value) {
-            Mojo::File->new($value)->make_path
+            make_path($value)
           }
         }
       }
@@ -64,72 +70,201 @@ use:
 
 # DESCRIPTION
 
-[Config::Structured](https://metacpan.org/pod/Config%3A%3AStructured) provides a structured method of accessing configuration values
+[Config::Structured](https://metacpan.org/pod/Config%3A%3AStructured) is a configuration value manager and accessor. Its design
+is based on the premise of predefining a structure (which is essentially a schema
+plus some metadata) to which the configuration must adhere. This has the effect
+of ensuring that when the application accesses its configuration, it has confidence
+that the values are of appopriate types, defaults are declared in a consistent
+manner, and new configuration nodes cannot be added ad hoc (i.e., without being
+declared within the structure).
 
-This is predicated on the use of a configuration `structure` (required), This structure
-provides a hierarchical structure of configuration branches and leaves. Each branch becomes
-a [Config::Structured](https://metacpan.org/pod/Config%3A%3AStructured) method which returns a new [Config::Structured](https://metacpan.org/pod/Config%3A%3AStructured) instance rooted at
-that node, while each leaf becomes a method which returns the configuration value.
+A configuration  structure is a hierarchical system of nodes. Nodes may be 
+branches (containing only other nodes) or leaves (identified by their `isa` 
+key). Any keys are allowed within a leaf node, for custom tracking of arbitrary
+metadata, but the following are handled specially by `Config::Structured`:
 
-The configuration value is normally provided in the `config` hash. However, a `config` node
-for a non-Hash value can be a hash containing the "source" and "ref" keys. This permits sourcing
-the config value from a file (when source="file") whose filesystem location is given in the "ref"
-value, or an environment variable (when source="env") whose name is given in the "ref" value.
+- `isa`
 
-_Structure Leaf Nodes_ are required to include an "isa" key, whose value is a type 
-(see [Moose::Util::TypeConstraints](https://metacpan.org/pod/Moose%3A%3AUtil%3A%3ATypeConstraints)). If typechecking is not required, use isa => 'Any'.
-There are a few other keys that [Config::Structured](https://metacpan.org/pod/Config%3A%3AStructured) respects in a leaf node:
+    Required
+
+    Type constraint against which the configured value for the given key will be
+    checked. See [Moose::Util::TypeConstraints](https://metacpan.org/pod/Moose%3A%3AUtil%3A%3ATypeConstraints). Can be set to `Any` to opt out of
+    type checking. If a typecheck fails, the [on\_typecheck\_error](https://metacpan.org/pod/on_typecheck_error) handler is 
+    invoked.
 
 - `default`
 
-    This key's value is the default configuration value if a data source or value is not provided by
-    the configuation.
+    Optional
+
+    This key's value is the default configuration value if a data source or value is 
+    not provided by the configuation.
+
+- `sensitive`
+
+    Optional
+
+    Set to true to mark this key's value as sensitive (e.g., password data). 
+    Sensitive values will be returned as a string of asterisks unless a truth-y 
+    value is passed to the accessor
+
+        use builtin qw(true);
+
+        conf->db->pass        # ************
+        conf->db->pass(true)  # uAjH9PmjH9^knCy4$z3TM4
+
+    This behavior is mimicked in ["to\_hash"](#to_hash) and ["get\_node"](#get_node).
 
 - `description`
+
+    Optional
+
+    A human-readable description of the configuration option.
+
 - `notes`
 
-    A human-readable description and implementation notes, respectively, of the configuration node. 
-    [Config::Structured](https://metacpan.org/pod/Config%3A%3AStructured) does not do anything with these values at present, but they provides inline 
-    documentation of configuration directivess within the structure (particularly useful in the common 
-    case where the structure is read from a file)
+    Optional
 
-Besides `structure` and `config`, [Config::Structured](https://metacpan.org/pod/Config%3A%3AStructured) also accepts a `hooks` argument at 
-initialization time. This argument must be a HashRef whose keys are patterns matching config
-node paths, and whose values are HashRefs containing `on_load` and/or `on_access` keys. These
-in turn point to CodeRefs which are run when the config value is initially loaded, or every time
-it is accessed, respectively.
+    Human-readable implementation notes of the configuration node. 
+
+- `examples`
+
+    Optional
+
+    One or more example values for the given configuration node.
+
+- `url`
+
+    Optional
+
+    A web URL to additional information about the configuration node or resource
 
 # CONSTRUCTORS
 
-## Config::Structured->new( config => {...}, structure => {...} )
+## Config::Structured->new( %params )
 
-Returns a new `Config::Structured` instance. `config` and `structure` are
-required parameters and must either be HashRefs or strings containing a data
-structure in `JSON`, `YAML`, or `perl` (i.e., [Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper)) formats. The
-format of the structure will be autodetected. The content of these data 
-structures is detailed above in the `DESCRIPTION` section.
+Returns a `Config::Structured` node (a dynamically-generated subclass of 
+`Config::Structured::Node`). Nodes implement all methods in the [METHODS](https://metacpan.org/pod/METHODS) 
+section, plus those corresponding to the configuration keys defined in their 
+structure definition. 
+
+Parameters:
+
+#### structure
+
+Required
+
+Either a string or a HashRef. If a string is passed, it is handed off to 
+[Data::Structure::Deserialize::Auto](https://metacpan.org/pod/Data%3A%3AStructure%3A%3ADeserialize%3A%3AAuto), which attempts to parse a 
+YAML, JSON, TOML, or perl string value or filename of an existing, readable file
+containing data in one of those formats, into its corresponding perl data 
+structure. The format of such a structure is detailed in the ["DESCRIPTION"](#description) 
+section.
+
+#### config
+
+Required
+
+Either a string or a HashRef. If a string is passed, it is handed off to 
+[Data::Structure::Deserialize::Auto](https://metacpan.org/pod/Data%3A%3AStructure%3A%3ADeserialize%3A%3AAuto), which attempts to parse a 
+YAML, JSON, TOML, or perl string value or filename of an existing, readable file
+containing data in one of those formats, into its corresponding perl data 
+structure. Its format should mirror that of its `structure` except that its 
+leaf nodes should contain the configured value for that key.
+
+Referenced ValueIn some cases, however, it is inconvenient or insecure to store the configuation
+value here (such as with passwords). In that case, the actual configuration 
+value may be stored in a separate file or an environment variable, and a 
+reference may be used in `config` to point to it. To invoke this behavior,
+the node's ["isa"](#isa) must be a string type (such as `Str` or `Str|Undef`). Then,
+set the config value to a HashRef containing two keys:
+
+- source - `"file"` or `"env"`
+- ref - the filesystem path (relative or absolute) or the name of the environment variable holding the value
+
+If the value is pulled from a file, it will be [chomp](https://perldoc.perl.org/functions/chomp)ed.
+
+#### hooks
+
+Optional
+
+A HashRef whose keys are config paths. A config path is a slash-separated string
+of config node keys, beginning with a root slash. Asterisks are valid placeholders
+for full or partial path components. E.g.:
+
+    /db/user
+    /db/*
+    /email/recipients/admin_*
+    /*/password
+
+The values corresponding to these keys are HashRefs whose keys are supported 
+hook types. Two types of hooks are supported:
+
+- on\_load - these hooks are run once, when the applicable config node is constructed
+- on\_access - these hooks are run each time the applicable config node is invoked
+
+The values corresponding to those keys are CodeRefs (or ArrayRefs of CodeRefs) to
+run when the appropriate events occur on the specified config paths.
+
+The hook function is passed two arguments: the configuration node path, and the
+configuration value (which is not obscured, even for sensitive data nodes)
+
+#### on\_typecheck\_error
+
+Optional.
+
+Controls the behavior occurring when a value type constraint check fails. 
+
+- fail - die with an error message about the constraint failure
+- warn (default) - emit a warning and set the value to undef
+- undef (or any other value) - do nothing and set the value to undef
 
 # METHODS
 
-## get( \[$name\] )
+## to\_hash( $reveal\_sensitive = 0 )
 
-Class method.
+Returns the entire configuration tree as hashref. Sensitive values are obscured
+unless `$reveal_sensitive` is true.
 
-Returns a registered [Config::Structured](https://metacpan.org/pod/Config%3A%3AStructured) instance.  If `$name` is not provided, returns the default instance.
-Instances can be registered with `__register_default` or `__register_as`. This mechanism is used to provide
-global access to a configuration, even from code contexts that otherwise cannot share data.
+## get\_node( $child = undef, $reveal\_sensitive = 0 )
 
-## \_\_register\_default()
+Get all data and metadata for a given node. If given, `$child` is the name
+of a direct child node to get the data for, otherwise data for the called 
+object is returned. For leaf nodes, sensitive values are obscured unless
+`$reveal_sensitive` is true.
 
-Call on a [Config::Structured](https://metacpan.org/pod/Config%3A%3AStructured) instance to set the instance as the default.
+Returns a HashRef which always contains the following keys:
 
-## \_\_register\_as( $name )
+- `path` - the full configuration path of the node
+- `depth` - how many levels deep this node is in the config (1-based)
+- `branches` - ArrayRef of the names of all branch children of this node
+- `leaves` - ArrayRef of the names of all leaf children of this node
 
-Call on a [Config::Structured](https://metacpan.org/pod/Config%3A%3AStructured) instance to register the instance as the provided name.
+Additionally, for leaf nodes:
 
-## \_\_get\_child\_node\_names()
+- `value` - the value of the configuration node (possibly obscured)
+- `overridden` - boolean value that reflects whether the configuration value for this node is the default (0) or from `config` (1)
+- `reference` - present only if the node uses a ["Referenced Value"](#referenced-value), in which case it is a HashRef containing the `source` and `ref` keys and values
+- {structure keys} - all keys and values from the node's structure are present as well (e.g., ["isa"](#isa), ["description"](#description), etc., as well as any custom data)
 
-Returns a list of names (strings) of all immediate child nodes of the current config node
+# CAVEATS
+
+Some tokens are unavailable to be used as configuration node keys. The following 
+keys, as well as any key that is not a 
+[valid perl identifier](https://perldoc.pl/perldata#Identifier-parsing), are
+disallowed - if used in a structure file, a warning will be emitted and the 
+applicable node will be discarded.
+
+- `clone`
+- `clonePackage`
+- `destroy`
+- `DESTROY`
+- `import`
+- `new`
+- `newCore`
+- `newPackage`
+- `reflect`
+- `to_hash`
+- `get_node`
 
 # AUTHOR
 

@@ -24,7 +24,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,22 +36,22 @@ no_index:
 provides:
   DateTime::Locale:
     file: lib/DateTime/Locale.pm
-    version: '1.40'
+    version: '1.41'
   DateTime::Locale::Base:
     file: lib/DateTime/Locale/Base.pm
-    version: '1.40'
+    version: '1.41'
   DateTime::Locale::Catalog:
     file: lib/DateTime/Locale/Catalog.pm
-    version: '1.40'
+    version: '1.41'
   DateTime::Locale::Data:
     file: lib/DateTime/Locale/Data.pm
-    version: '1.40'
+    version: '1.41'
   DateTime::Locale::FromData:
     file: lib/DateTime/Locale/FromData.pm
-    version: '1.40'
+    version: '1.41'
   DateTime::Locale::Util:
     file: lib/DateTime/Locale/Util.pm
-    version: '1.40'
+    version: '1.41'
 requires:
   Carp: '0'
   Dist::CheckConflicts: '0.02'
@@ -72,10 +72,10 @@ resources:
   bugtracker: https://github.com/houseabsolute/DateTime-Locale/issues
   homepage: https://metacpan.org/release/DateTime-Locale
   repository: git://github.com/houseabsolute/DateTime-Locale.git
-version: '1.40'
+version: '1.41'
 x_Dist_Zilla:
   perl:
-    version: '5.032001'
+    version: '5.038002'
   plugins:
     -
       class: Dist::Zilla::Plugin::DROLSKY::BundleAuthordep
@@ -94,7 +94,6 @@ x_Dist_Zilla:
             - cpanfile
           exclude_match:
             - (?^u:^source-data)
-          follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''
           prune_directory: []
@@ -102,27 +101,27 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@DROLSKY/Git::GatherDir'
-      version: '2.048'
+      version: '2.049'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@DROLSKY/ManifestSkip'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::License
       name: '@DROLSKY/License'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@DROLSKY/ExecDir'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@DROLSKY/ShareDir'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@DROLSKY/Manifest'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::CheckVersionIncrement
       name: '@DROLSKY/CheckVersionIncrement'
@@ -130,15 +129,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@DROLSKY/TestRelease'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@DROLSKY/ConfirmRelease'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@DROLSKY/UploadToCPAN'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::VersionFromMainModule
       config:
@@ -154,7 +153,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@DROLSKY/AutoPrereqs'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: '@DROLSKY/CopyFilesFromBuild'
@@ -173,7 +172,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@DROLSKY/MetaResources'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -182,13 +181,13 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.030'
+              version: '6.031'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
-          inherit_missing: '1'
-          inherit_version: '1'
-          meta_noindex: '1'
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000037'
           version: '0.006'
@@ -201,19 +200,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@DROLSKY/MetaConfig'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@DROLSKY/MetaJSON'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@DROLSKY/MetaYAML'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@DROLSKY/NextRelease'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -221,7 +220,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: '@DROLSKY/Test::More with Test2'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -229,7 +228,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: '@DROLSKY/Tools for use with precious'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -237,7 +236,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: '@DROLSKY/Test::Version which fixes https://github.com/plicease/Test-Version/issues/7'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -685,12 +684,15 @@ x_Dist_Zilla:
             - 1el
             - 1em
             - 1er
+            - 1ja
+            - 1ka
             - 1kv
             - 1me
             - 1r
             - 1ro
             - 1st
             - 1ste
+            - 1sṭ
             - 1u
             - 1ª
             - 1º
@@ -854,6 +856,7 @@ x_Dist_Zilla:
             - 2e
             - 2em
             - 2il
+            - 2ja
             - 2kv
             - 2l
             - 2n
@@ -861,6 +864,7 @@ x_Dist_Zilla:
             - 2nd
             - 2nde
             - 2ni
+            - 2nḍ
             - 2u
             - 2yem
             - 2ª
@@ -948,6 +952,7 @@ x_Dist_Zilla:
             - 37-ھەپتە
             - 37.ª
             - 37em
+            - 37ja
             - 37ª
             - 37º
             - 37م
@@ -966,9 +971,11 @@ x_Dist_Zilla:
             - 3em
             - 3er
             - 3et
+            - 3ja
             - 3kv
             - 3r
             - 3rd
+            - 3rḍ
             - 3s
             - 3tie
             - 3u
@@ -1208,6 +1215,7 @@ x_Dist_Zilla:
             - 4em
             - '4h44:23 AM'
             - '4h44 AM'
+            - 4ja
             - 4kv
             - 4m
             - 4mh
@@ -1232,6 +1240,7 @@ x_Dist_Zilla:
             - 4ನೇ
             - 4ኛው
             - 4ይ
+            - '4 1ka'
             - '4 A.M'
             - '4 AM'
             - '4 FM'
@@ -1316,6 +1325,7 @@ x_Dist_Zilla:
             - 51-ھەپتە
             - 51.ª
             - 51em
+            - 51ja
             - 51ª
             - 51º
             - 51م
@@ -1528,6 +1538,7 @@ x_Dist_Zilla:
             - 6f
             - '6h30:30 PM'
             - '6h30 PM'
+            - 6ja
             - 6ª
             - 6º
             - 6ê
@@ -1535,6 +1546,7 @@ x_Dist_Zilla:
             - 6ی
             - 6তম
             - 6వ
+            - '6 2ja'
             - '6 CH'
             - '6 EA'
             - '6 FI'
@@ -1778,6 +1790,7 @@ x_Dist_Zilla:
             - 9m
             - 9ê
             - 9ی
+            - '9 1ka'
             - '9 A.M'
             - '9 AM'
             - '9 FM'
@@ -1831,6 +1844,7 @@ x_Dist_Zilla:
             - 9月第2週
             - 9시
             - 9월
+            - '>B'
             - A
             - A-K
             - A.K
@@ -1853,6 +1867,10 @@ x_Dist_Zilla:
             - AM04.44.23
             - AM09.05.02
             - AM፡UTC
+            - 'AM 4:44'
+            - 'AM 4:44:23'
+            - 'AM 9:05'
+            - 'AM 9:05:02'
             - AN
             - ART
             - AY
@@ -1872,6 +1890,7 @@ x_Dist_Zilla:
             - Abrille
             - Abrëll
             - Aburil
+            - Abʊŋʊma
             - Achiel
             - Adduha
             - Adek
@@ -1971,8 +1990,10 @@ x_Dist_Zilla:
             - Angola
             - Anguilla
             - Ang’wen
+            - Anii
             - Ann
             - Anna
+            - Annabi
             - Anno
             - Ansa
             - Antes
@@ -2112,6 +2133,7 @@ x_Dist_Zilla:
             - Aŋpétuzaptaŋ
             - Aŭg
             - Aŭgusto
+            - AƖAK
             - B
             - B.E
             - B.e
@@ -2174,6 +2196,7 @@ x_Dist_Zilla:
             - Benada
             - Benin
             - Bermuda
+            - Betawi
             - Bh
             - Bh:mm
             - Bh:mm:ss
@@ -2381,6 +2404,7 @@ x_Dist_Zilla:
             - Costa
             - Cpr
             - Cr
+            - Cree
             - Crist
             - Cristo
             - Cristu
@@ -2529,6 +2553,8 @@ x_Dist_Zilla:
             - DateTime::Locale::be_tarask
             - DateTime::Locale::bem
             - DateTime::Locale::bem_ZM
+            - DateTime::Locale::bew
+            - DateTime::Locale::bew_ID
             - DateTime::Locale::bez
             - DateTime::Locale::bez_TZ
             - DateTime::Locale::bg
@@ -2543,6 +2569,8 @@ x_Dist_Zilla:
             - DateTime::Locale::bgn_PK
             - DateTime::Locale::bho
             - DateTime::Locale::bho_IN
+            - DateTime::Locale::blo
+            - DateTime::Locale::blo_BJ
             - DateTime::Locale::blt
             - DateTime::Locale::blt_VN
             - DateTime::Locale::bm
@@ -2600,6 +2628,8 @@ x_Dist_Zilla:
             - DateTime::Locale::co_FR
             - DateTime::Locale::cs
             - DateTime::Locale::cs_CZ
+            - DateTime::Locale::csw
+            - DateTime::Locale::csw_CA
             - DateTime::Locale::cu
             - DateTime::Locale::cu_RU
             - DateTime::Locale::cv
@@ -2685,6 +2715,7 @@ x_Dist_Zilla:
             - DateTime::Locale::en_GU
             - DateTime::Locale::en_GY
             - DateTime::Locale::en_HK
+            - DateTime::Locale::en_ID
             - DateTime::Locale::en_IE
             - DateTime::Locale::en_IL
             - DateTime::Locale::en_IM
@@ -2935,6 +2966,8 @@ x_Dist_Zilla:
             - DateTime::Locale::ia_001
             - DateTime::Locale::id
             - DateTime::Locale::id_ID
+            - DateTime::Locale::ie
+            - DateTime::Locale::ie_EE
             - DateTime::Locale::ig
             - DateTime::Locale::ig_NG
             - DateTime::Locale::ii
@@ -2997,6 +3030,7 @@ x_Dist_Zilla:
             - DateTime::Locale::kn
             - DateTime::Locale::kn_IN
             - DateTime::Locale::ko
+            - DateTime::Locale::ko_CN
             - DateTime::Locale::ko_KP
             - DateTime::Locale::ko_KR
             - DateTime::Locale::kok
@@ -3019,6 +3053,15 @@ x_Dist_Zilla:
             - DateTime::Locale::ku_TR
             - DateTime::Locale::kw
             - DateTime::Locale::kw_GB
+            - DateTime::Locale::kxv
+            - DateTime::Locale::kxv_Deva
+            - DateTime::Locale::kxv_Deva_IN
+            - DateTime::Locale::kxv_Latn
+            - DateTime::Locale::kxv_Latn_IN
+            - DateTime::Locale::kxv_Orya
+            - DateTime::Locale::kxv_Orya_IN
+            - DateTime::Locale::kxv_Telu
+            - DateTime::Locale::kxv_Telu_IN
             - DateTime::Locale::ky
             - DateTime::Locale::ky_KG
             - DateTime::Locale::la
@@ -3074,6 +3117,8 @@ x_Dist_Zilla:
             - DateTime::Locale::mgo_CM
             - DateTime::Locale::mi
             - DateTime::Locale::mi_NZ
+            - DateTime::Locale::mic
+            - DateTime::Locale::mic_CA
             - DateTime::Locale::mk
             - DateTime::Locale::mk_MK
             - DateTime::Locale::ml
@@ -3182,7 +3227,7 @@ x_Dist_Zilla:
             - DateTime::Locale::pl
             - DateTime::Locale::pl_PL
             - DateTime::Locale::prg
-            - DateTime::Locale::prg_001
+            - DateTime::Locale::prg_PL
             - DateTime::Locale::ps
             - DateTime::Locale::ps_AF
             - DateTime::Locale::ps_PK
@@ -3282,6 +3327,8 @@ x_Dist_Zilla:
             - DateTime::Locale::sid_ET
             - DateTime::Locale::sk
             - DateTime::Locale::sk_SK
+            - DateTime::Locale::skr
+            - DateTime::Locale::skr_PK
             - DateTime::Locale::sl
             - DateTime::Locale::sl_SI
             - DateTime::Locale::sma
@@ -3384,6 +3431,8 @@ x_Dist_Zilla:
             - DateTime::Locale::tt_RU
             - DateTime::Locale::twq
             - DateTime::Locale::twq_NE
+            - DateTime::Locale::tyv
+            - DateTime::Locale::tyv_RU
             - DateTime::Locale::tzm
             - DateTime::Locale::tzm_MA
             - DateTime::Locale::ug
@@ -3412,6 +3461,8 @@ x_Dist_Zilla:
             - DateTime::Locale::vec_IT
             - DateTime::Locale::vi
             - DateTime::Locale::vi_VN
+            - DateTime::Locale::vmw
+            - DateTime::Locale::vmw_MZ
             - DateTime::Locale::vo
             - DateTime::Locale::vo_001
             - DateTime::Locale::vun
@@ -3428,12 +3479,14 @@ x_Dist_Zilla:
             - DateTime::Locale::wo_SN
             - DateTime::Locale::xh
             - DateTime::Locale::xh_ZA
+            - DateTime::Locale::xnr
+            - DateTime::Locale::xnr_IN
             - DateTime::Locale::xog
             - DateTime::Locale::xog_UG
             - DateTime::Locale::yav
             - DateTime::Locale::yav_CM
             - DateTime::Locale::yi
-            - DateTime::Locale::yi_001
+            - DateTime::Locale::yi_UA
             - DateTime::Locale::yo
             - DateTime::Locale::yo_BJ
             - DateTime::Locale::yo_NG
@@ -3446,6 +3499,8 @@ x_Dist_Zilla:
             - DateTime::Locale::yue_Hans_CN
             - DateTime::Locale::yue_Hant
             - DateTime::Locale::yue_Hant_HK
+            - DateTime::Locale::za
+            - DateTime::Locale::za_CN
             - DateTime::Locale::zgh
             - DateTime::Locale::zgh_MA
             - DateTime::Locale::zh
@@ -4117,6 +4172,7 @@ x_Dist_Zilla:
             - Inikuˀ
             - Inikuˀtiˀtiˀ
             - Interlingua
+            - Interlingue
             - Inuktitut
             - Inya
             - Inyambala
@@ -4406,6 +4462,7 @@ x_Dist_Zilla:
             - Kamis
             - Kan
             - Kanama
+            - Kangri
             - Kannada
             - Kanne
             - Kapok
@@ -4422,6 +4479,7 @@ x_Dist_Zilla:
             - Kazakh
             - Kazakhstan
             - Kaĩrĩ
+            - Kaŋkǝm
             - Ke
             - Ke-2
             - Ke-3
@@ -4564,6 +4622,7 @@ x_Dist_Zilla:
             - Kusa
             - Kuta
             - Kuuza
+            - Kuvi
             - Kuvita
             - Kuwa
             - Kuwait
@@ -4920,6 +4979,7 @@ x_Dist_Zilla:
             - Maiu
             - Maj
             - Majo
+            - Makhuwa
             - Makhuwa-Meetto
             - Makonde
             - Mal
@@ -5064,6 +5124,7 @@ x_Dist_Zilla:
             - Mhr
             - Mhàrt
             - Mi
+            - "Mi'kmaw"
             - Micronesia
             - Middeweken
             - Mie
@@ -5602,6 +5663,8 @@ x_Dist_Zilla:
             - PM
             - PM06.30.30
             - PM፡UTC
+            - 'PM 6:30'
+            - 'PM 6:30:30'
             - PN
             - PTG
             - PZ
@@ -6047,6 +6110,7 @@ x_Dist_Zilla:
             - Svētd
             - Svētdiena
             - Swahili
+            - Swampy
             - Swati
             - Sweden
             - Swedish
@@ -6253,6 +6317,7 @@ x_Dist_Zilla:
             - Turkmenistan
             - Turks
             - Tuvalu
+            - Tuvinian
             - Tuʻa
             - Tuʻapulelulu
             - Tyap
@@ -6347,6 +6412,7 @@ x_Dist_Zilla:
             - Vɨɨrɨ
             - W
             - "W'em"
+            - "W'ja"
             - "W'ª"
             - "W'º"
             - "W-'hafta"
@@ -6476,6 +6542,7 @@ x_Dist_Zilla:
             - Yaou
             - Yaw
             - Yawda
+            - Ye
             - Yeb
             - Yebrayer
             - Yebrir
@@ -6538,6 +6605,7 @@ x_Dist_Zilla:
             - Zen
             - Zenâr
             - Zezi-Krist
+            - Zhuang
             - Zi
             - Zib
             - Zibandlela
@@ -6571,6 +6639,8 @@ x_Dist_Zilla:
             - aa-DJ
             - aa-ER
             - aa-ET
+            - aadi
+            - aasaḍi
             - aaɓ
             - aaɓnde
             - ab
@@ -6580,12 +6650,17 @@ x_Dist_Zilla:
             - abe.ren
             - abendua
             - abenduaren
+            - abofʊmka
             - abr
             - abril
             - abrile
             - abu
             - abuztua
+            - abɔkɔɩ
+            - acafʊnɖuka
+            - acapomka
             - achiel
+            - ad
             - adamsan
             - adar
             - ade
@@ -6630,8 +6705,15 @@ x_Dist_Zilla:
             - akṛaḍyur
             - al
             - ala
+            - alaamɩshɩ
+            - alaarba
             - alaba
+            - alah
+            - alahaɖɩ
+            - alam
             - alamisa
+            - alar
+            - alàlaka
             - am
             - am-ET
             - am04:44:23
@@ -6653,6 +6735,8 @@ x_Dist_Zilla:
             - antradienis
             - any
             - anyɔnyɔ
+            - anɔɔbʊnka
+            - anɔɔɖuka
             - août
             - ap
             - apc-SY
@@ -6712,6 +6796,9 @@ x_Dist_Zilla:
             - ariyo
             - arn
             - arn-CL
+            - arɛ́cika
+            - arɩs
+            - arɩsǝma
             - as
             - as-IN
             - asa
@@ -6719,6 +6806,8 @@ x_Dist_Zilla:
             - asamas
             - asati
             - asi
+            - asib
+            - asiibi
             - asim
             - asimwas
             - asinas
@@ -6734,6 +6823,8 @@ x_Dist_Zilla:
             - ata
             - ataasinngorneq
             - ataiborwa
+            - atal
+            - atalaata
             - atm
             - aug
             - august
@@ -6788,10 +6879,13 @@ x_Dist_Zilla:
             - azaroa
             - azilawo
             - aɖabaƒoƒo
+            - aɖɩt
+            - aɖɩtɛnɛɛ
             - b
             - b.Y.K
             - ba
             - ba-RU
+            - bado
             - bal
             - bal-Arab
             - bal-Arab-PK
@@ -6802,12 +6896,12 @@ x_Dist_Zilla:
             - bas
             - bas-CM
             - bazar
+            - bc
             - be
             - be-BY
             - be-tarask
             - bear
             - bearjadat
-            - before
             - beke
             - bem
             - bem-ZM
@@ -6815,6 +6909,9 @@ x_Dist_Zilla:
             - berfanbara
             - berfanbarê
             - berî
+            - bese
+            - bew
+            - bew-ID
             - bez
             - bez-TZ
             - bg
@@ -6842,6 +6939,8 @@ x_Dist_Zilla:
             - biɓaà
             - bla
             - blaɖa
+            - blo
+            - blo-BJ
             - blt
             - blt-VN
             - bm
@@ -6884,6 +6983,7 @@ x_Dist_Zilla:
             - bɔ́k
             - bɛ́ɛ
             - bɛ̌
+            - bʊn
             - bṛa
             - bṛayṛ
             - c
@@ -6926,9 +7026,11 @@ x_Dist_Zilla:
             - chr
             - chr-US
             - chwarter
+            - ci
             - cic
             - cic-US
             - cikin
+            - cim
             - ckb
             - ckb-IQ
             - ckb-IR
@@ -6944,6 +7046,8 @@ x_Dist_Zilla:
             - cristu
             - cs
             - cs-CZ
+            - csw
+            - csw-CA
             - csütörtök
             - cu
             - cu-RU
@@ -7009,6 +7113,7 @@ x_Dist_Zilla:
             - dam
             - dama
             - dap
+            - dasara
             - daspò
             - dat
             - data
@@ -7081,6 +7186,7 @@ x_Dist_Zilla:
             - dexembre
             - dez
             - dezembro
+            - dezembru
             - dffir
             - dfɛ
             - dg
@@ -7118,6 +7224,7 @@ x_Dist_Zilla:
             - dissabte
             - diumenge
             - divendres
+            - divi
             - diŋ
             - diŋgindi
             - diɓ
@@ -7315,6 +7422,7 @@ x_Dist_Zilla:
             - en-GU
             - en-GY
             - en-HK
+            - en-ID
             - en-IE
             - en-IL
             - en-IM
@@ -7432,6 +7540,7 @@ x_Dist_Zilla:
             - es-UY
             - es-VE
             - esa
+            - esaabadu
             - esaɓasú
             - esmaspäev
             - esun
@@ -7440,6 +7549,7 @@ x_Dist_Zilla:
             - et
             - et-EE
             - etter
+            - ettiminku
             - etɔ̃lia
             - eu
             - eu-ES
@@ -7491,6 +7601,7 @@ x_Dist_Zilla:
             - feléte
             - fev
             - fevereiro
+            - fevereiru
             - fevral
             - fevrer
             - fevriye
@@ -7620,6 +7731,7 @@ x_Dist_Zilla:
             - fɔe
             - fɔlɔ
             - fɛ
+            - fʊm
             - fọ
             - g
             - ga
@@ -7767,6 +7879,7 @@ x_Dist_Zilla:
             - hihanu
             - hik
             - hil
+            - hire
             - hiruhilekoa
             - hitayi
             - hivili
@@ -7836,6 +7949,7 @@ x_Dist_Zilla:
             - idɛ́n
             - id́ɛ́n
             - ie
+            - ie-EE
             - ig
             - ig-NG
             - igandea
@@ -7916,6 +8030,7 @@ x_Dist_Zilla:
             - jan
             - janar
             - janeiro
+            - janeiru
             - januaari
             - januaarip
             - januar
@@ -7929,6 +8044,7 @@ x_Dist_Zilla:
             - janvāris
             - janúar
             - java
+            - jaṭṭa
             - jbo
             - jbo-001
             - jen
@@ -7957,6 +8073,7 @@ x_Dist_Zilla:
             - joulukuutata
             - jov
             - jovedi
+            - jovedí
             - jue
             - jueves
             - jug
@@ -7976,6 +8093,8 @@ x_Dist_Zilla:
             - julija
             - julio
             - juliol
+            - julyu
+            - julí
             - jum
             - juma
             - jumwa
@@ -7987,6 +8106,7 @@ x_Dist_Zilla:
             - junija
             - junio
             - juny
+            - junyu
             - juov
             - juovlamánnu
             - juovlamánnu:a
@@ -8033,6 +8153,7 @@ x_Dist_Zilla:
             - kab
             - kab-DZ
             - kabiri
+            - kabɔkɔɩ
             - kadadu
             - kaiboirwe
             - kaili
@@ -8058,8 +8179,10 @@ x_Dist_Zilla:
             - kathatũ
             - katikupíen
             - katërt
+            - kaw
             - kawi
             - kaĩri
+            - kaŋɔrɔ
             - ka̱n
             - kcg
             - kcg-NG
@@ -8129,6 +8252,7 @@ x_Dist_Zilla:
             - kn-IN
             - kny
             - ko
+            - ko-CN
             - ko-KP
             - ko-KR
             - kok
@@ -8154,6 +8278,8 @@ x_Dist_Zilla:
             - kpe-LR
             - kris
             - krisiti
+            - krisṭ
+            - krisṭabd
             - krizmed
             - krn
             - krísimin
@@ -8177,6 +8303,7 @@ x_Dist_Zilla:
             - kuarta-fera
             - kuartal
             - kuartal-ka
+            - kuarṭr
             - kuata
             - kud
             - kugú
@@ -8217,6 +8344,15 @@ x_Dist_Zilla:
             - kwiecień
             - kwietnia
             - kwédi
+            - kxv
+            - kxv-Deva
+            - kxv-Deva-IN
+            - kxv-Latn
+            - kxv-Latn-IN
+            - kxv-Orya
+            - kxv-Orya-IN
+            - kxv-Telu
+            - kxv-Telu-IN
             - ky
             - ky-KG
             - kyiukonyi
@@ -8239,6 +8375,7 @@ x_Dist_Zilla:
             - kǝbɛ́ɛ
             - kǝnin
             - kǝráá
+            - kǝu
             - kɔn
             - kɔs
             - kɔsiɖa
@@ -8255,6 +8392,7 @@ x_Dist_Zilla:
             - lag
             - lag-TZ
             - lahadi
+            - laki
             - language
             - lapkr
             - lapkritis
@@ -8274,6 +8412,7 @@ x_Dist_Zilla:
             - led
             - leden
             - ledna
+            - lenju
             - lepyè
             - leta
             - letopočtem
@@ -8282,6 +8421,7 @@ x_Dist_Zilla:
             - leygardagur
             - lg
             - lg-UG
+            - lh
             - li
             - lia
             - libwa
@@ -8311,6 +8451,7 @@ x_Dist_Zilla:
             - lkt-US
             - llu
             - llunes
+            - lm
             - lmo
             - lmo-IT
             - ln
@@ -8347,6 +8488,7 @@ x_Dist_Zilla:
             - lundì
             - lunedi
             - lunedì
+            - lunedí
             - lunes
             - lunesdì
             - luni
@@ -8421,12 +8563,14 @@ x_Dist_Zilla:
             - mafú
             - mag
             - maggio
+            - maha
             - mai
             - mai-IN
             - maiatza
             - maig
             - maijs
             - maio
+            - maiu
             - maj
             - maja
             - majebaargâ
@@ -8437,12 +8581,15 @@ x_Dist_Zilla:
             - makeo
             - man
             - mandag
+            - manga
+            - mangaḍa
             - maná
             - mar
             - marca
             - mardi
             - mardo
             - mardì
+            - mardí
             - marec
             - marisi
             - marlunngorneq
@@ -8454,8 +8601,10 @@ x_Dist_Zilla:
             - marsi
             - marsip
             - marso
+            - marsu
             - mart
             - martars
+            - marte
             - martedi
             - martedì
             - martes
@@ -8541,6 +8690,7 @@ x_Dist_Zilla:
             - mercoldì
             - mercoledì
             - mercredi
+            - mercurdí
             - mercuridi
             - merkredi
             - merkredo
@@ -8558,6 +8708,8 @@ x_Dist_Zilla:
             - mgo-CM
             - mi
             - mi-NZ
+            - mic
+            - mic-CA
             - mie
             - miercuri
             - miercus
@@ -8739,12 +8891,17 @@ x_Dist_Zilla:
             - nC
             - na
             - naa
+            - naaBYŊAƖ
             - naaninan
             - naasaande
             - nad
             - nadale
             - nadīli
             - nam
+            - namaanli
+            - namararu
+            - namathanu
+            - namaxexe
             - nane
             - naq
             - naq-NA
@@ -8770,6 +8927,19 @@ x_Dist_Zilla:
             - ndu2
             - ndu3
             - ndu4
+            - ndwen
+            - ndwenbet
+            - ndwencaet
+            - ndwencib
+            - ndwencibngeih
+            - ndwencib’it
+            - ndwengouj
+            - ndwenit
+            - ndwenloeg
+            - ndwenngeih
+            - ndwenngux
+            - ndwensam
+            - ndwenseiq
             - ndzɔ̀ŋèfwòo
             - ndzɔ̀ŋèsèe
             - ndzɔ̀ŋɔ̀chwaʔàkaa
@@ -8821,6 +8991,8 @@ x_Dist_Zilla:
             - ngm
             - ngn
             - ngo
+            - ngoenz
+            - ngoenzsinghgiz
             - ngs
             - ngt
             - nguwo
@@ -8838,6 +9010,7 @@ x_Dist_Zilla:
             - nia
             - niedz
             - niedziela
+            - nihiku
             - nin
             - nish
             - niydziela
@@ -8856,6 +9029,8 @@ x_Dist_Zilla:
             - njuk
             - njukčamánnu
             - njÿoláʼ
+            - njɩbɔ
+            - nki
             - nl
             - nl-AW
             - nl-BE
@@ -8880,6 +9055,7 @@ x_Dist_Zilla:
             - noh
             - noiembrie
             - nomëttes
+            - noolempwa
             - nov
             - novam
             - nove
@@ -8891,6 +9067,7 @@ x_Dist_Zilla:
             - novembre
             - novembris
             - novembro
+            - novembru
             - novenbre
             - noviembre
             - now
@@ -8954,6 +9131,7 @@ x_Dist_Zilla:
             - năm
             - nɔy
             - nɔ̂y
+            - nɖʊka
             - n‘ime
             - 'n tmeddit'
             - 'n tufat'
@@ -9037,6 +9215,7 @@ x_Dist_Zilla:
             - otâ
             - out
             - outubro
+            - outubru
             - ovdal
             - oyk
             - oóli
@@ -9060,10 +9239,12 @@ x_Dist_Zilla:
             - pa-Arab-PK
             - pa-Guru
             - pa-Guru-IN
+            - pagu
             - pamba
             - pamilau
             - pamunyi
             - panadīli
+            - pande
             - pap
             - pap-AW
             - pap-CW
@@ -9125,6 +9306,7 @@ x_Dist_Zilla:
             - pn
             - po
             - pod
+            - pom
             - pon
             - pondelok
             - pondělí
@@ -9144,7 +9326,7 @@ x_Dist_Zilla:
             - pred
             - premte
             - prg
-            - prg-001
+            - prg-PL
             - pri
             - prieš
             - prije
@@ -9174,8 +9356,12 @@ x_Dist_Zilla:
             - pt-TL
             - ptm
             - pu
+            - puda
+            - pudara
+            - purb
             - pussisawaiti
             - pustis
+            - pusu
             - putúk,oóli
             - puɔs
             - py
@@ -9254,6 +9440,7 @@ x_Dist_Zilla:
             - roku
             - roovvâd
             - roovvâdmáánu
+            - rs
             - ru
             - ru-BY
             - ru-KG
@@ -9304,6 +9491,7 @@ x_Dist_Zilla:
             - samdí
             - samedi
             - saməna
+            - sani
             - santandria
             - santugaine
             - sap
@@ -9319,6 +9507,7 @@ x_Dist_Zilla:
             - sat-Olck-IN
             - sati
             - satin
+            - saturdí
             - sau
             - saurú
             - saus
@@ -9327,6 +9516,7 @@ x_Dist_Zilla:
             - sav
             - savnu
             - saŋ
+            - sb
             - sbp
             - sbp-TZ
             - sbt
@@ -9396,6 +9586,7 @@ x_Dist_Zilla:
             - setember
             - setembre
             - setembro
+            - setembru
             - setenbre
             - setiembre
             - setmana
@@ -9455,6 +9646,12 @@ x_Dist_Zilla:
             - sillins
             - simana
             - simỹnỹ
+            - singhgizhaj
+            - singhgizit
+            - singhgizngeih
+            - singhgizroek
+            - singhgizsam
+            - singhgizseiq
             - sis
             - sisamanngorneq
             - sita
@@ -9469,6 +9666,8 @@ x_Dist_Zilla:
             - sk-SK
             - skammâ
             - skammâmáánu
+            - skr
+            - skr-PK
             - skáb
             - skábmamánnu
             - sl
@@ -9479,6 +9678,8 @@ x_Dist_Zilla:
             - sma-NO
             - sma-SE
             - smb
+            - smba
+            - smbara
             - smj
             - smj-NO
             - smj-SE
@@ -9499,6 +9700,7 @@ x_Dist_Zilla:
             - so-SO
             - sob
             - sobota
+            - soledí
             - somok
             - sonda
             - sotn
@@ -9526,6 +9728,8 @@ x_Dist_Zilla:
             - sr-Latn-ME
             - sr-Latn-RS
             - sr-Latn-XK
+            - sra
+            - srabĩ
             - sre
             - sreda
             - sri
@@ -9568,6 +9772,7 @@ x_Dist_Zilla:
             - subaka
             - subota
             - suenter
+            - sukru
             - sukul
             - sun
             - sungula
@@ -9728,6 +9933,7 @@ x_Dist_Zilla:
             - tjedan
             - tk
             - tk-TM
+            - tl
             - tn
             - tn-BW
             - tn-ZA
@@ -9809,6 +10015,8 @@ x_Dist_Zilla:
             - tydźeń
             - tys
             - tysdag
+            - tyv
+            - tyv-RU
             - tyźeń
             - tyɛ̀b
             - tzm
@@ -9900,6 +10108,7 @@ x_Dist_Zilla:
             - van
             - vandredi
             - vanti
+            - vara
             - vas
             - vasario
             - vasaris
@@ -9924,6 +10133,7 @@ x_Dist_Zilla:
             - vendredo
             - venerdi
             - venerdì
+            - venerdí
             - venres
             - vi
             - vi-VN
@@ -9937,6 +10147,8 @@ x_Dist_Zilla:
             - vinars
             - vineri
             - viz
+            - vmw
+            - vmw-MZ
             - vo
             - vo-001
             - voalohany
@@ -9968,6 +10180,7 @@ x_Dist_Zilla:
             - vẽnhkãgra-kurã-há
             - w
             - "w'em"
+            - "w'ja"
             - "w'ª"
             - "w'º"
             - "w-'hafta"
@@ -10038,6 +10251,8 @@ x_Dist_Zilla:
             - xh-ZA
             - xin
             - xineru
+            - xnr
+            - xnr-IN
             - xnt
             - xog
             - xog-UG
@@ -10127,7 +10342,7 @@ x_Dist_Zilla:
             - yesi-4
             - yesu
             - yi
-            - yi-001
+            - yi-UA
             - yie̱tni
             - ym
             - yo
@@ -10176,6 +10391,7 @@ x_Dist_Zilla:
             - y년
             - z
             - za
+            - za-CN
             - zah
             - zallaws
             - zamanoo
@@ -10460,6 +10676,7 @@ x_Dist_Zilla:
             - ńɔ́
             - Ŋ
             - Ŋuaan
+            - Ŋʊm
             - ŋ
             - ŋ1
             - ŋ10
@@ -10558,6 +10775,7 @@ x_Dist_Zilla:
             - Ɣ
             - Ɣuc
             - Ɣuct
+            - Ɩsa
             - ǀHooǂgaeb
             - ǀKhuuǁkhâb
             - ǁgoagas
@@ -10579,6 +10797,10 @@ x_Dist_Zilla:
             - ɔnsúmbɔl
             - ɔsɔn
             - ɔtb
+            - ɖt
+            - ɖu5
+            - ɖu6
+            - ɖʊ
             - ɗ
             - ɗaya
             - ɗón
@@ -10590,6 +10812,19 @@ x_Dist_Zilla:
             - ɣetrɔ
             - ɣuc
             - ɣuct
+            - ɩ1
+            - ɩ2
+            - ɩ3
+            - ɩ4
+            - ɩjicimka
+            - ɩjikawǝrka
+            - ɩjikpaka
+            - ɩjikǝuka
+            - ɩnantaja
+            - ɩnyɩʊtaja
+            - ɩriutaja
+            - ɩsǝbaka
+            - ɩŋɔrɩriu
             - ɲɛ
             - "ʻ'o"
             - ʻA
@@ -12115,10 +12350,12 @@ x_Dist_Zilla:
             - आगष्ट
             - आठवडा
             - आथवार
+            - आदि
             - आन्न’
             - आयतार
             - आर्त
             - आर्तवार
+            - आसाड़ी
             - इ
             - ई
             - ई.पू
@@ -12127,6 +12364,7 @@ x_Dist_Zilla:
             - ईसवीसनपूर्व
             - ईसा
             - ईसा-पूर्व
+            - ईसा-पैले
             - ईस्वी
             - ए
             - ए.दि
@@ -12168,6 +12406,7 @@ x_Dist_Zilla:
             - चारिम
             - चोथीं
             - चौथी
+            - चौथे
             - चौथो
             - छं
             - छंछ
@@ -12179,6 +12418,7 @@ x_Dist_Zilla:
             - जनवरीमासः
             - जन॰
             - जा
+            - जाटा
             - जान
             - जानुवारी
             - जाने
@@ -12201,6 +12441,7 @@ x_Dist_Zilla:
             - जून
             - 'जून:'
             - जूनमासः
+            - जो
             - टिमाही
             - टीं
             - ड
@@ -12211,19 +12452,23 @@ x_Dist_Zilla:
             - डिसें
             - डिसेंबर
             - डिसेम्बर
+            - त
             - ति1
             - ति2
             - ति3
             - ति4
+            - तिन
             - तिमाही
             - ति१
             - ति२
             - ति३
             - ति४
+            - तीजे
             - तीसरी
             - तृतीय
             - तेसर
             - तेस्रो
+            - तोआर
             - त्र.1
             - त्र.2
             - त्र.3
@@ -12238,18 +12483,22 @@ x_Dist_Zilla:
             - त्रैमासीक
             - थामथि
             - द
+            - दपेहरा/संजा
             - दसमबर
+            - दसारा
             - दसूमबर
             - दा
             - दामिनि
             - दि
             - दिन
+            - दिवी
             - दिस
             - दिसंबर
             - 'दिसंबर:'
             - दिसंबरमासः
             - दिस॰
             - दूई
+            - दूजे
             - दूसरी
             - दोसर
             - दोस्रो
@@ -12278,9 +12527,14 @@ x_Dist_Zilla:
             - पहिरीं
             - पहिल
             - पहिलो
+            - पागुणी
+            - पान्डे
+            - पुद्दारा
+            - पुसु
             - पू
             - पूर्व
             - पूर्वाह्न
+            - पैले
             - पैहली
             - प्रथम
             - फ
@@ -12329,13 +12583,16 @@ x_Dist_Zilla:
             - बृहस्पति
             - बृहस्पतिबार
             - बेलासे
+            - बेसे
             - बोदवार
+            - बोदो
             - बोमवार
             - ब्रेसवार
             - ब्रै
             - ब्रैथि
             - ब्रोंठ
             - भोर
+            - भ्यागा
             - म
             - मं
             - मंग
@@ -12347,6 +12604,7 @@ x_Dist_Zilla:
             - मंगळ
             - मंगळवार
             - मंगळार
+            - मंगाड़ा
             - मई
             - मईमासः
             - मङ्गल
@@ -12357,6 +12615,8 @@ x_Dist_Zilla:
             - मार्चमासः
             - मार्चु
             - माह
+            - माहाका
+            - मीन्ने
             - मे
             - मेई
             - र
@@ -12367,16 +12627,25 @@ x_Dist_Zilla:
             - रविवार
             - रविवासरः
             - रा
+            - लाक्कि
+            - लेञ्जु
             - वा
+            - वारा
             - वि
             - विस
             - विस्पत
+            - वी
+            - वीर
+            - वीरवार
             - श
             - शनि
+            - शनिच्चरवार
             - शनिबार
             - शनिवार
             - शनिवासरः
             - शु
+            - शुक्कर
+            - शुक्करवार
             - शुक्र
             - शुक्रबार
             - शुक्रवार
@@ -12401,6 +12670,8 @@ x_Dist_Zilla:
             - सवेर
             - सह
             - सांझ
+            - सान्नि
+            - साॅम्वारा
             - सि
             - सिगां
             - सित
@@ -12410,6 +12681,7 @@ x_Dist_Zilla:
             - सितम्बर
             - सित॰
             - सु
+            - सुकुरु
             - सुखुर
             - सुखुरबार
             - सुुखुरबार
@@ -12420,14 +12692,17 @@ x_Dist_Zilla:
             - सेप्टेम्बर
             - सेप्थेम्बर
             - सो
+            - सोआर
             - सोम
             - सोमबार
             - सोमवार
             - सोमवासरः
             - सोमार
+            - स्राबाँ
             - स’ञ
             - हप्ता
             - हफ्ता
+            - हिरे
             - অ
             - অক্টো
             - অক্টোঃ
@@ -12726,12 +13001,15 @@ x_Dist_Zilla:
             - ଅକ୍ଟୋବର
             - ଅଗଷ୍ଟ
             - ଅପ୍ରେଲ
+            - ଆଦି
+            - ଆସାଡ଼ି
             - ଖ୍ରୀଷ୍ଟପୂର୍ବ
             - ଖ୍ରୀଷ୍ଟାବ୍ଦ
             - ଗୁ
             - ଗୁରୁ
             - ଗୁରୁବାର
             - ଜା
+            - ଜାଟା
             - ଜାନୁଆରୀ
             - ଜୁ
             - ଜୁନ
@@ -12739,22 +13017,34 @@ x_Dist_Zilla:
             - ଡି
             - ଡିସେମ୍ବର
             - ତ୍ରୟମାସ
+            - ଦାସାରା
+            - ଦିୱିଡ଼ି
             - ନ
             - ନଭେମ୍ବର
+            - ପାଗୁଣି
+            - ପାଣ୍ଡେ
+            - ପୁଦାରା
+            - ପୁସୁ
             - ଫେ
             - ଫେବୃଆରୀ
+            - ବଦ
             - ବୁ
             - ବୁଧ
             - ବୁଧବାର
+            - ବେସେ
             - ମ
             - ମଇ
             - ମଙ୍ଗଳ
             - ମଙ୍ଗଳବାର
             - ମା
+            - ମାଙ୍ଗାଡ଼ା
             - ମାର୍ଚ୍ଚ
+            - ମାହାକା
             - ର
             - ରବି
             - ରବିବାର
+            - ଲାକି
+            - ଲେଞ୍ଜୁ
             - ଶ
             - ଶନି
             - ଶନିବାର
@@ -12762,11 +13052,17 @@ x_Dist_Zilla:
             - ଶୁକ୍ର
             - ଶୁକ୍ରବାର
             - ସପ୍ତାହ
+            - ସମ୍ବାରା
+            - ସାନି
+            - ସୁକ୍ରୁ
             - ସେ
             - ସେପ୍ଟେମ୍ବର
             - ସୋ
             - ସୋମ
             - ସୋମବାର
+            - ସ୍ରାବାଁ
+            - ହିରେ
+            - ୱାରା
             - அ
             - அக்
             - அக்டோபர்
@@ -12839,6 +13135,7 @@ x_Dist_Zilla:
             - అ
             - అక్టో
             - అక్టోబర్
+            - అస్ర
             - ఆ
             - ఆగ
             - ఆగస్టు
@@ -12851,6 +13148,7 @@ x_Dist_Zilla:
             - క్రీశ
             - క్రీస్తు
             - గు
+            - గుండు
             - గురు
             - గురువారం
             - జ
@@ -12869,24 +13167,40 @@ x_Dist_Zilla:
             - త్రై3
             - త్రై4
             - త్రైమాసికం
+            - దివెడి
             - న
+            - నమారా
             - నవం
             - నవంబర్
+            - నుక్
+            - పాండు
+            - పుసు
             - పూర్వం
             - ఫి
             - ఫిబ్ర
             - ఫిబ్రవరి
             - ఫిబ్రవరిలో
+            - బాన్దపాణా
+            - బార్సి
             - బు
             - బుధ
             - బుధవారం
+            - బెసెకి
             - మ
             - మంగళ
             - మంగళవారం
             - మా
+            - మాంగాడా
+            - మాగ
             - మార్చి
             - మే
+            - రాత
+            - లండి
+            - లాకివరా
+            - వరా
             - వారం
+            - వారమి
+            - వుదారా
             - శ
             - శకం
             - శని
@@ -12894,6 +13208,7 @@ x_Dist_Zilla:
             - శు
             - శుక్ర
             - శుక్రవారం
+            - సానివరా
             - సె
             - సెప్టెం
             - సెప్టెంబర్
@@ -12901,6 +13216,7 @@ x_Dist_Zilla:
             - సో
             - సోమ
             - సోమవారం
+            - హిరెఇ
             - ಅ
             - ಅಕ್ಟೋ
             - ಅಕ್ಟೋಬರ್
@@ -13700,6 +14016,26 @@ x_Dist_Zilla:
             - ᏧᎾᎩ
             - ᏧᎾᎩᎶᏍᏗ
             - ᏧᏓᎷᎸ
+            - ᐅᐸᐦᐅᐏᐱᓯᒼ
+            - ᐊᐱᐦᑕᐘᐣ
+            - ᐊᑿᑎᓄᐏᐱᓯᒼ
+            - ᐊᓂᑭᐱᓯᒼ
+            - ᐊᔭᒥᐦᐁᐃ
+            - ᐯᔭᐠᑭᓯᑲᐤ
+            - ᐱᒪᐦᐊᒧᐏᐱᓯᒼ
+            - ᐸᐘᐢᒐᑲᓂᓹᐱᓯᒼ
+            - ᐸᐢᑯᐏᐱᓯᒼ
+            - ᐸᐢᑲᐍᐦᐅᐱᓯᒼ
+            - ᑕᐦᑿᑭᐱᓯᒼ
+            - ᑭᓯᑲᐤ
+            - ᑭᓴᐱᓯᒼ
+            - ᒥᑭᓯᐏᐱᓯᒼ
+            - ᒪᑎᓄᐏᑭᓯᑲᐤ
+            - ᓀᐓᑭᓯᑲᐤ
+            - ᓂᐢᑭᐱᓯᒼ
+            - ᓂᓱᑭᓯᑲᐤ
+            - ᓂᔭᓇᓄᑭᓯᑲᐤ
+            - ᓴᑭᐸᑲᐏᐱᓯᒼ
             - ក
             - កក្កដា
             - កញ្ញា
@@ -14487,7 +14823,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@DROLSKY/PodSyntaxTests'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -14549,7 +14885,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: '0'
+          bail_out_on_fail: 0
           fail_on_warning: author
           fake_home: 0
           filename: xt/author/00-compile.t
@@ -14583,7 +14919,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.42.0
+          git_version: 2.43.2
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -14598,84 +14934,84 @@ x_Dist_Zilla:
             - '@DROLSKY'
           finder:
             - ':InstallModules'
-            - ':ExecFiles'
+            - ':PerlExecFiles'
           plugins:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@DROLSKY/SingleEncoding'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@DROLSKY/List'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@DROLSKY/Verbatim'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Region
               name: '@DROLSKY/header'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Name
               name: '@DROLSKY/Name'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Version
               name: '@DROLSKY/Version'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Region
               name: '@DROLSKY/prelude'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: TYPES
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@DROLSKY/Leftovers'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Region
               name: '@DROLSKY/postlude'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@DROLSKY/generate SUPPORT'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::AllowOverride
               name: '@DROLSKY/allow override SUPPORT'
@@ -14683,15 +15019,15 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@DROLSKY/generate SOURCE'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@DROLSKY/generate DONATIONS'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Authors
               name: '@DROLSKY/Authors'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Contributors
               name: '@DROLSKY/Contributors'
@@ -14699,7 +15035,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Legal
               name: '@DROLSKY/Legal'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::AllowOverride
               name: '@DROLSKY/allow override Legal'
@@ -14707,7 +15043,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Region
               name: '@DROLSKY/footer'
-              version: '4.018'
+              version: '4.019'
       name: '@DROLSKY/SurgicalPodWeaver'
       version: '0.0023'
     -
@@ -14728,7 +15064,7 @@ x_Dist_Zilla:
           destination_filename: CONTRIBUTING.md
           dist: Dist-Zilla-PluginBundle-DROLSKY
           encoding: UTF-8
-          has_xs: '0'
+          has_xs: 0
           location: build
           source_filename: CONTRIBUTING.md
         Dist::Zilla::Role::RepoFileInjector:
@@ -14744,7 +15080,7 @@ x_Dist_Zilla:
           destination_filename: CODE_OF_CONDUCT.md
           dist: Dist-Zilla-PluginBundle-DROLSKY
           encoding: UTF-8
-          has_xs: '0'
+          has_xs: 0
           location: build
           source_filename: CODE_OF_CONDUCT.md
         Dist::Zilla::Role::RepoFileInjector:
@@ -14764,7 +15100,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CPANFile
       name: '@DROLSKY/CPANFile'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::DROLSKY::License
       name: '@DROLSKY/DROLSKY::License'
@@ -14792,7 +15128,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.42.0
+          git_version: 2.43.2
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
       version: '1.22'
@@ -14804,7 +15140,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.42.0
+          git_version: 2.43.2
           repo_root: .
       name: '@DROLSKY/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -14838,10 +15174,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.42.0
+          git_version: 2.43.2
           repo_root: .
       name: '@DROLSKY/Git::Check'
-      version: '2.048'
+      version: '2.049'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -14862,12 +15198,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.42.0
+          git_version: 2.43.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit generated files'
-      version: '2.048'
+      version: '2.049'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -14875,16 +15211,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.40
+          tag: v1.41
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.42.0
+          git_version: 2.43.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Git::Tag'
-      version: '2.048'
+      version: '2.049'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -14893,10 +15229,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.42.0
+          git_version: 2.43.2
           repo_root: .
       name: '@DROLSKY/Git::Push'
-      version: '2.048'
+      version: '2.049'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -14923,12 +15259,12 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.42.0
+          git_version: 2.43.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit version bump'
-      version: '2.048'
+      version: '2.049'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -14937,31 +15273,31 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.42.0
+          git_version: 2.43.2
           repo_root: .
       name: '@DROLSKY/Push version bump'
-      version: '2.048'
+      version: '2.049'
     -
       class: Dist::Zilla::Plugin::DROLSKY::MakeMaker
       config:
         Dist::Zilla::Plugin::MakeMaker:
           make_path: make
-          version: '6.030'
+          version: '6.031'
         Dist::Zilla::Plugin::MakeMaker::Awesome:
           version: '0.49'
         Dist::Zilla::Role::TestRunner:
           default_jobs: '12'
-          version: '6.030'
+          version: '6.031'
       name: '@DROLSKY/DROLSKY::MakeMaker'
       version: '1.22'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: MetaNoIndex
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Conflicts
       name: Conflicts
@@ -14985,56 +15321,56 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: DevelopRequires
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.030'
+      version: '6.031'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: '0'
-    version: '6.030'
+      is_trial: 0
+    version: '6.031'
 x_authority: cpan:DROLSKY
 x_breaks:
   DateTime::Format::Strptime: '<= 1.1000'
@@ -15046,6 +15382,6 @@ x_contributors:
   - 'Ryley Breiddal <rbreiddal@presinet.com>'
   - 'Sergey Leschenko <Sergey.Leschenko@portaone.com>'
   - 'yasu47b <nakayamayasuhiro1986@gmail.com>'
-x_generated_by_perl: v5.32.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

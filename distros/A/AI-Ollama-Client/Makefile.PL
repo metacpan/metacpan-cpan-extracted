@@ -55,6 +55,7 @@ my %module = (
         'Moo'                 => 2,
         'Mojolicious'         => 9,
         'Mojo::JSON'          => 0,
+        'PerlX::Maybe'        => 0,
     },
 
     PREREQ_PM => {

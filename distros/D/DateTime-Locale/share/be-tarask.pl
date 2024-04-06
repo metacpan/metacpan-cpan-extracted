@@ -274,5 +274,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => "Taraskievica orthography",
-  version => 44,
+  version => "44.1",
 }

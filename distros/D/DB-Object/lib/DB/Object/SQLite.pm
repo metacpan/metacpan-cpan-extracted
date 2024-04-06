@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite.pm
-## Version v1.1.1
+## Version v1.1.2
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/04/05
+## Modified 2024/04/06
 ## All rights reserved
 ## 
 ## 
@@ -81,7 +81,7 @@ BEGIN
         };
     }
     our $PLACEHOLDER_REGEXP = qr/\?(?<index>\d+)/;
-    our $VERSION = 'v1.1.1';
+    our $VERSION = 'v1.1.2';
     use Devel::Confess;
 };
 
@@ -171,8 +171,19 @@ foreach my $type ( keys( %$DATATYPES_DICT ) )
 {
     my $c = $DATATYPES_DICT->{ $type }->{name};
     my $code = \&{"DBD::SQLite::Constants::${c}"};
-    my $val = $code->();
-    $DATATYPES_DICT->{ $type }->{constant} = $val;
+    my $val = eval
+    {
+        $code->();
+    };
+    if( $@ )
+    {
+        warn( "Datatype \"DBD::SQLite::Constants::${c}\" is not defined in DBD::SQLite version $DBD::SQLite::VERSION: $@" );
+        delete( $DATATYPES_DICT->{ $type } );
+    }
+    else
+    {
+        $DATATYPES_DICT->{ $type }->{constant} = $val;
+    }
 }
 
 sub init
@@ -1419,7 +1430,7 @@ DB::Object::SQLite - DB Object SQLite Driver
     
 =head1 VERSION
 
-    v1.1.1
+    v1.1.2
 
 =head1 DESCRIPTION
 

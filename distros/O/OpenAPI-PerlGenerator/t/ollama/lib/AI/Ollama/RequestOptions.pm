@@ -6,6 +6,17 @@ use experimental 'signatures';
 use Types::Standard qw(Str Bool Num Int Object ArrayRef);
 use MooX::TypeTiny;
 
+=head1 NAME
+
+AI::Ollama::RequestOptions -
+
+=head1 SYNOPSIS
+
+  my $obj = AI::Ollama::RequestOptions->new();
+  ...
+
+=cut
+
 sub as_hash( $self ) {
     return { $self->%* }
 }

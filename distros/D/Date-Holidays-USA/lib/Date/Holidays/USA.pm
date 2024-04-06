@@ -13,7 +13,7 @@ use Exporter qw(import);
 
 our @EXPORT = qw(is_holiday holidays);
 
-our $VERSION = '0.0201';
+our $VERSION = '0.0202';
 
 
 sub new {
@@ -39,6 +39,7 @@ sub us_holidays {
     }
     my %dom = (
         memorial     => _nth_day_of_month(-1, 1, $year, 5),
+        mothers      => _nth_day_of_month(2, 1, $year, 5),
         fathers      => _nth_day_of_month(3, 7, $year, 6),
         labor        => _nth_day_of_month(1, 1, $year, 9),
         columbus     => _nth_day_of_month(2, 1, $year, 10),
@@ -147,7 +148,7 @@ Date::Holidays::USA - Provides United States of America holidays
 
 =head1 VERSION
 
-version 0.0201
+version 0.0202
 
 =head1 SYNOPSIS
 

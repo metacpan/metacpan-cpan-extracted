@@ -269,5 +269,5 @@
   time_format_medium => "a h.mm.ss",
   time_format_short => "a h.mm",
   variant => undef,
-  version => 44,
+  version => "44.1",
 }

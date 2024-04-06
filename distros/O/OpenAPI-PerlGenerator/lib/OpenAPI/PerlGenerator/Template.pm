@@ -1,14 +1,56 @@
-package OpenAPI::PerlGenerator::Template 0.01;
+package OpenAPI::PerlGenerator::Template 0.02;
 use 5.020;
 use experimental 'signatures';
 
 our $info;
 
-# Reflection package for template methods
+=head1 NAME
+
+OpenAPI::PerlGenerator::Template - Reflection package for template methods
+
+=head1 DESCRIPTION
+
+This package reflects functions called as subroutines onto a global
+variable C<$info> for convenient calling from within (Mojolicious) templates.
+
+=head1 REFLECTED METHODS
+
+=head2 C<< markdown_to_pod >>
+
+=cut
+
+sub markdown_to_pod {
+    $info->markdown_to_pod( @_ );
+}
+
+=head2 C<< map_type >>
+
+=cut
 
 sub map_type {
     $info->map_type( @_ );
 }
+
+=head2 C<< property_name >>
+
+=cut
+
+sub property_name {
+    $info->property_name( @_ );
+}
+
+=head2 C<< single_line >>
+
+=cut
+
+sub single_line {
+    $info->single_line( @_ );
+}
+
+
+=head2 C<< openapi_submodules >>
+
+=cut
 
 sub openapi_submodules {
     $info->openapi_submodules( @_ );

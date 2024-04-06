@@ -1,7 +1,7 @@
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Distributed Workload Automation Software
-#    Copyright © 2000-2023  Brian M. Kelly
+#    Copyright © 2000-2024  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or
 #    modify it under the terms of the GNU Affero General Public License
@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000642';
+our $VERSION='1.0000643';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -269,7 +269,7 @@ my $fa_banner=<<END;
 
 
 
-   Copyright $c 2000-2023  Brian M. Kelly  Brian.Kelly\@FullAuto.com
+   Copyright $c 2000-2024  Brian M. Kelly  Brian.Kelly\@FullAuto.com
 
 
 END
@@ -554,7 +554,7 @@ $SIG{__DIE__} = sub{ eval { require Term::ReadKey };
                    print $tee "FATAL ERROR!: $_[0]\n" if $tee
                      && $_[0]!~/close_everything/;
                    print "FATAL ERROR!: $_[0]\n"
-                     && $_[0]!~/close_everything/;
+                     if $_[0]!~/close_everything/;
                    $tee->close() if $tee;
                    $log->close() if $log;
                    <STDIN> if exists $ENV{PAR_TEMP};
@@ -1892,6 +1892,7 @@ if ($^O ne 'MSWin32' && $^O ne 'MSWin64') {
    #&fa_install_module('Test::Needs','install','Makefile');
    &fa_install_module('Test::RequiresInternet','install','Makefile');
    &fa_install_module('LWP','install','Makefile');
+   &fa_install_module('Regexp::IPv6','install','Makefile');
    &fa_install_module('CPAN::Mini','install','Makefile');
    eval {
       local $SIG{__DIE__}; # No sigdie handler
@@ -6153,7 +6154,7 @@ END
 
    *THANK YOU* For Trying FullAuto!   Net::FullAuto INSTALLATION PROGRAM
 
-   Copyright (C) 2000-2023   Brian M. Kelly   Brian.Kelly\@FullAuto.com
+   Copyright (C) 2000-2024   Brian M. Kelly   Brian.Kelly\@FullAuto.com
 
    This program comes with ABSOLUTELY NO WARRANTY; for details select 2.
    This is free software, and you are welcome to redistribute it under certain

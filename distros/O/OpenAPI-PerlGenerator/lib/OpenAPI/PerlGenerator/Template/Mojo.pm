@@ -1,4 +1,4 @@
-package OpenAPI::PerlGenerator::Template::Mojo 0.01;
+package OpenAPI::PerlGenerator::Template::Mojo 0.02;
 use 5.020;
 
 =head1 NAME
@@ -45,8 +45,12 @@ __PATH_PARAMETERS__
 
 $template{generate_request_body} = <<'__REQUEST_BODY__';
 %     for my $ct (sort keys $content->%*) {
-%         if( $content->{$ct}->{schema}) {
+%         if( exists $content->{$ct}->{schema}) {
+%             if( $content->{$ct}->{schema}->{type} eq 'string' ) {
+    my $body = delete $options{ body } // '';
+%             } else {
     my $request = <%= $prefix %>::<%= $content->{$ct}->{schema}->{name} %>->new( \%options );
+%             }
 %         } elsif( $ct eq 'multipart/form-data' ) {
 %             # nothing to do
 %         } else {
@@ -79,7 +83,7 @@ $template{streaming_response} = <<'__STREAMING_RESPONSE__';
 %# XXX if streaming, we need to handle a non-streaming error response!
         <%= elsif_chain($name) %>( $resp->code <%= openapi_http_code_match( $code ) %> ) {
 %     if( $info->{description} =~ /\S/ ) {
-            # <%= $info->{description} %>
+            # <%= single_line( $info->{description} ) %>
 %     }
 %       # Check the content type
 %       # Will we always have a content type?!
@@ -126,10 +130,6 @@ $template{streaming_response} = <<'__STREAMING_RESPONSE__';
         $r1->resolve( $tx );
         undef $_tx;
         undef $r1;
-    })->catch(sub($err) {
-        $r1->fail( $err => $tx );
-        undef $_tx;
-        undef $r1;
     });
     $_tx = $self->ua->start_p($tx);
 __STREAMING_RESPONSE__
@@ -144,7 +144,7 @@ $template{synchronous_response} = <<'__SYNCHRONOUS_RESPONSE__';
 %     my $info = $elt->{responses}->{ $code };
         <%= elsif_chain($name) %>( $resp->code <%= openapi_http_code_match( $code ) %> ) {
 %     if( $info->{description} =~ /\S/ ) {
-            # <%= $info->{description} %>
+            # <%= single_line( $info->{description} ) %>
 %     }
 %       # Check the content type
 %       # Will we always have a content type?!
@@ -212,6 +212,17 @@ use experimental 'signatures';
 use Types::Standard qw(Str Bool Num Int Object ArrayRef);
 use MooX::TypeTiny;
 
+=head1 NAME
+
+<%= $prefix %>::<%= $name %> -
+
+=head1 SYNOPSIS
+
+  my $obj = <%= $prefix %>::<%= $name %>->new();
+  ...
+
+=cut
+
 sub as_hash( $self ) {
     return { $self->%* }
 }
@@ -227,7 +238,7 @@ extends '<%= $prefix %>::<%= $item->{name} %>';
 % for my $t (@included_types) {
 %     for my $prop (sort keys $t->{properties}->%*) {
 %         my $p = $t->{properties}->{$prop};
-=head2 C<< <%= $prop %> >>
+=head2 C<< <%= property_name( $prop ) %> >>
 
 % if( $p->{description} and $p->{description} =~ /\S/ ) {
 <%= $p->{description} =~ s/\s*$//r %>
@@ -235,7 +246,7 @@ extends '<%= $prefix %>::<%= $item->{name} %>';
 % }
 =cut
 
-has '<%= $prop %>' => (
+has '<%= property_name( $prop ) %>' => (
     is       => 'ro',
 % my $type = map_type( $p );
 % if( $type ) {
@@ -327,7 +338,8 @@ sub _build_<%= $method->{name} %>_request( $self, %options ) {
 %
 % my $is_json;
 % my $content_type;
-% if( $elt->{requestBody} ) {
+% my $has_body = exists $elt->{requestBody};
+% if( $has_body ) {
 %#    We assume we will only ever have one content type for the request we send:
 %     ($content_type) = sort keys $elt->{requestBody}->{content}->%*;
 %     $is_json = $ct && $ct eq 'application/json';
@@ -365,10 +377,14 @@ sub _build_<%= $method->{name} %>_request( $self, %options ) {
 %     }
 % };                                                                           # header parameters
         }
-% if( $is_json ) {
+% if( ! $has_body ) {
+%# nothing to do
+% } elsif( $is_json ) {
         => json => $request->as_hash,
 % } elsif( $content_type and $content_type eq 'multipart/form-data' ) {
         => form => $request->as_hash,
+% } elsif( $content_type and $content_type eq 'application/octet-stream' ) {
+        => $body,
 % } else {
         # XXX Need to fill the body
         # => $body,
@@ -478,7 +494,7 @@ has 'server' => (
 % }
 
 % if( $elt->{summary}  and $elt->{summary} =~ /\S/ ) {
-<%= $elt->{summary} =~ s/\s*$//r; %>
+<%= markdown_to_pod( $elt->{summary} =~ s/\s*$//r ) %>
 
 %}
 %# List/add the invocation parameters
@@ -492,7 +508,7 @@ has 'server' => (
 =item B<< <%= $p->{name} %> >>
 
 %     if( $p->{description} =~ /\S/ ) {
-<%= $p->{description} =~ s/\s*$//r %>
+<%= markdown_to_pod( $p->{description} =~ s/\s*$//r ) %>
 
 %     }
 %     if( $p->{default}) {
@@ -505,7 +521,7 @@ Defaults to C<< <%= $p->{default} =%> >>
 % } # parameters
 %#
 %# Add the body/schema parameters:
-% (my $ct) = keys $elt->{requestBody}->{content}->%*;
+% (my $ct) = exists $elt->{requestBody} ? keys $elt->{requestBody}->{content}->%* : ();
 % my $type;
 % if( $ct ) {
 %     $type = $ct && $elt->{requestBody}->{content}->{$ct}->{schema};
@@ -520,10 +536,10 @@ Defaults to C<< <%= $p->{default} =%> >>
 
 %         for my $prop (@properties) {
 %             my $p = $type->{properties}->{$prop};
-=item C<< <%= $prop %> >>
+=item C<< <%= property_name( $prop ) %> >>
 
 % if( $p->{description} ) {
-<%= $p->{description} =~ s/\s*$//r %>
+<%= markdown_to_pod( $p->{description} =~ s/\s*$//r ) %>
 
 % }
 %         }

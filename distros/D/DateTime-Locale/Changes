@@ -1,3 +1,8 @@
+1.41     2024-04-06
+
+- Rebuilt all locale data with the data from CLDR 44.1.0.
+
+
 1.40     2023-11-04
 
 - Rebuilt all locale data with the data from CLDR 44.0.1.

@@ -1,3 +1,11 @@
+2.087 2024-04-05
+- Slatec PCHIP routines now have idiomatic [io] `skip` Pars, with doc fixed to match SLATEC code (#468)
+- Slatec ezfft* routines take IFAC to avoid treating part of float array as integer (#468)
+- add has_badvalue method for whether ndarray has per-pdl badvalue (#469)
+- fix Slatec breaking PDL::Stats (https://github.com/PDLPorters/PDL-Stats/issues/31) - thanks @sebastic for report
+- fix long-standing mistyping of large negative IVs on 32-bit (#469) - thanks @sebastic for report
+- can now set badvalues that are Math::Complex objects (#469)
+
 2.086 2024-03-31
 - fix 64-bit problem in Minuit revealed by LTO (#468) - thanks @eli-schwartz for report
 - add pdl.ntrans_children to speed up destroying ndarrays (#421,#451)
@@ -1436,7 +1444,7 @@ Highlights:
  * Fix for sf.net bug #390: scalar PDL with badvalue
    always compares BAD with perl scalars.  Now a warning
    is given if the badvalue could conflict with the
-   results of a logical or comparision operation.
+   results of a logical or comparison operation.
  
  * Fixed a makefile construct which was ambiguous and
    caused build failures on Solaris using their make.

@@ -17,7 +17,7 @@ use Scalar::Util 'blessed';
 
 use parent 'Markdown::Perl::Options';
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';  # Remember to also set the App::pmarkdown version.
 
 our @EXPORT_OK = qw(convert set_options);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -43,7 +43,7 @@ sub set_options {
 
 sub set_mode {
   my ($this, $mode) = &_get_this_and_args;  ## no critic (ProhibitAmpersandSigils)
-  $this->SUPER::set_mode($mode);
+  $this->SUPER::set_mode(options => $mode);
   return;
 }
 
@@ -52,16 +52,14 @@ sub set_mode {
 my $default_this = Markdown::Perl->new();
 
 sub _get_this_and_args {  ## no critic (RequireArgUnpacking)
-  my $this = shift @_;
+  return unless @_;
   # We could use `$this isa Markdown::Perl` that does not require to test
   # blessedness first. However this requires 5.31.6 which is not in Debian
   # stable as of writing this.
-  if (!blessed($this) || !$this->isa(__PACKAGE__)) {
-    unshift @_, $this;
-    $this = $default_this;
+  if (!blessed($_[0]) || !$_[0]->isa(__PACKAGE__)) {
+    unshift @_, $default_this;
   }
-  return ($this, @_) if wantarray;
-  unshift @_, $this;
+  return @_ if defined wantarray;
   return;
 }
 
@@ -224,6 +222,10 @@ and they will operate on an implicit default instance of the class.
 See the L<pmarkdown/MODES> page for the documentation of existing modes.
 
 See the L<Markdown::Perl::Options> documentation for all the existing options.
+
+For the reference on the default syntax supported by the library, see the GitHub
+repository of the project:
+L<https://github.com/mkende/pmarkdown/blob/main/README.md>
 
 =head2 set_options
 

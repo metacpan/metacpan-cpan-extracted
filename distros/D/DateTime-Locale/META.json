@@ -4,7 +4,7 @@
       "Dave Rolsky <autarch@urth.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,6 +36,11 @@
             "FindBin" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "JSON::MaybeXS" : "0",
+            "List::AllUtils" : "0",
+            "Locale::Codes::Language" : "0",
+            "Moose" : "0",
+            "MooseX::Getopt::Dashes" : "0",
             "Parse::PMFile" : "0",
             "Path::Tiny" : "0",
             "Path::Tiny::Rule" : "0",
@@ -60,6 +65,7 @@
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
             "Test::Version" : "2.05",
+            "Text::Template" : "0",
             "utf8" : "0"
          }
       },
@@ -108,27 +114,27 @@
    "provides" : {
       "DateTime::Locale" : {
          "file" : "lib/DateTime/Locale.pm",
-         "version" : "1.40"
+         "version" : "1.41"
       },
       "DateTime::Locale::Base" : {
          "file" : "lib/DateTime/Locale/Base.pm",
-         "version" : "1.40"
+         "version" : "1.41"
       },
       "DateTime::Locale::Catalog" : {
          "file" : "lib/DateTime/Locale/Catalog.pm",
-         "version" : "1.40"
+         "version" : "1.41"
       },
       "DateTime::Locale::Data" : {
          "file" : "lib/DateTime/Locale/Data.pm",
-         "version" : "1.40"
+         "version" : "1.41"
       },
       "DateTime::Locale::FromData" : {
          "file" : "lib/DateTime/Locale/FromData.pm",
-         "version" : "1.40"
+         "version" : "1.41"
       },
       "DateTime::Locale::Util" : {
          "file" : "lib/DateTime/Locale/Util.pm",
-         "version" : "1.40"
+         "version" : "1.41"
       }
    },
    "release_status" : "stable",
@@ -144,10 +150,10 @@
       },
       "x_MailingList" : "datetime@perl.org"
    },
-   "version" : "1.40",
+   "version" : "1.41",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.032001"
+         "version" : "5.038002"
       },
       "plugins" : [
          {
@@ -170,7 +176,6 @@
                   "exclude_match" : [
                      "(?^u:^source-data)"
                   ],
-                  "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
                   "prefix" : "",
                   "prune_directory" : [],
@@ -181,32 +186,32 @@
                }
             },
             "name" : "@DROLSKY/Git::GatherDir",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@DROLSKY/ManifestSkip",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@DROLSKY/License",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@DROLSKY/ExecDir",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@DROLSKY/ShareDir",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@DROLSKY/Manifest",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckVersionIncrement",
@@ -216,17 +221,17 @@
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@DROLSKY/TestRelease",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@DROLSKY/ConfirmRelease",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@DROLSKY/UploadToCPAN",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::VersionFromMainModule",
@@ -247,7 +252,7 @@
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "@DROLSKY/AutoPrereqs",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
@@ -272,7 +277,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "@DROLSKY/MetaResources",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -282,7 +287,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.030"
+                        "version" : "6.031"
                      }
                   ],
                   "include_underscores" : 0
@@ -309,22 +314,22 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@DROLSKY/MetaConfig",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@DROLSKY/MetaJSON",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@DROLSKY/MetaYAML",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "@DROLSKY/NextRelease",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -335,7 +340,7 @@
                }
             },
             "name" : "@DROLSKY/Test::More with Test2",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -346,7 +351,7 @@
                }
             },
             "name" : "@DROLSKY/Tools for use with precious",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -357,7 +362,7 @@
                }
             },
             "name" : "@DROLSKY/Test::Version which fixes https://github.com/plicease/Test-Version/issues/7",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::PromptIfStale",
@@ -815,12 +820,15 @@
                      "1el",
                      "1em",
                      "1er",
+                     "1ja",
+                     "1ka",
                      "1kv",
                      "1me",
                      "1r",
                      "1ro",
                      "1st",
                      "1ste",
+                     "1s\u1e6d",
                      "1u",
                      "1\u00aa",
                      "1\u00ba",
@@ -984,6 +992,7 @@
                      "2e",
                      "2em",
                      "2il",
+                     "2ja",
                      "2kv",
                      "2l",
                      "2n",
@@ -991,6 +1000,7 @@
                      "2nd",
                      "2nde",
                      "2ni",
+                     "2n\u1e0d",
                      "2u",
                      "2yem",
                      "2\u00aa",
@@ -1078,6 +1088,7 @@
                      "37-\u06be\u06d5\u067e\u062a\u06d5",
                      "37.\u00aa",
                      "37em",
+                     "37ja",
                      "37\u00aa",
                      "37\u00ba",
                      "37\u0645",
@@ -1096,9 +1107,11 @@
                      "3em",
                      "3er",
                      "3et",
+                     "3ja",
                      "3kv",
                      "3r",
                      "3rd",
+                     "3r\u1e0d",
                      "3s",
                      "3tie",
                      "3u",
@@ -1338,6 +1351,7 @@
                      "4em",
                      "4h44:23\u202fAM",
                      "4h44\u202fAM",
+                     "4ja",
                      "4kv",
                      "4m",
                      "4mh",
@@ -1362,6 +1376,7 @@
                      "4\u0ca8\u0cc7",
                      "4\u129b\u12cd",
                      "4\u12ed",
+                     "4\u202f1ka",
                      "4\u202fA.M",
                      "4\u202fAM",
                      "4\u202fFM",
@@ -1446,6 +1461,7 @@
                      "51-\u06be\u06d5\u067e\u062a\u06d5",
                      "51.\u00aa",
                      "51em",
+                     "51ja",
                      "51\u00aa",
                      "51\u00ba",
                      "51\u0645",
@@ -1658,6 +1674,7 @@
                      "6f",
                      "6h30:30\u202fPM",
                      "6h30\u202fPM",
+                     "6ja",
                      "6\u00aa",
                      "6\u00ba",
                      "6\u00ea",
@@ -1665,6 +1682,7 @@
                      "6\u06cc",
                      "6\u09a4\u09ae",
                      "6\u0c35",
+                     "6\u202f2ja",
                      "6\u202fCH",
                      "6\u202fEA",
                      "6\u202fFI",
@@ -1908,6 +1926,7 @@
                      "9m",
                      "9\u00ea",
                      "9\u06cc",
+                     "9\u202f1ka",
                      "9\u202fA.M",
                      "9\u202fAM",
                      "9\u202fFM",
@@ -1961,6 +1980,7 @@
                      "9\u6708\u7b2c2\u9031",
                      "9\uc2dc",
                      "9\uc6d4",
+                     ">B",
                      "A",
                      "A-K",
                      "A.K",
@@ -1983,6 +2003,10 @@
                      "AM04.44.23",
                      "AM09.05.02",
                      "AM\u1361UTC",
+                     "AM\u202f4:44",
+                     "AM\u202f4:44:23",
+                     "AM\u202f9:05",
+                     "AM\u202f9:05:02",
                      "AN",
                      "ART",
                      "AY",
@@ -2002,6 +2026,7 @@
                      "Abrille",
                      "Abr\u00ebll",
                      "Aburil",
+                     "Ab\u028a\u014b\u028ama",
                      "Achiel",
                      "Adduha",
                      "Adek",
@@ -2101,8 +2126,10 @@
                      "Angola",
                      "Anguilla",
                      "Ang\u2019wen",
+                     "Anii",
                      "Ann",
                      "Anna",
+                     "Annabi",
                      "Anno",
                      "Ansa",
                      "Antes",
@@ -2242,6 +2269,7 @@
                      "A\u014bp\u00e9tuzapta\u014b",
                      "A\u016dg",
                      "A\u016dgusto",
+                     "A\u0196AK",
                      "B",
                      "B.E",
                      "B.e",
@@ -2304,6 +2332,7 @@
                      "Benada",
                      "Benin",
                      "Bermuda",
+                     "Betawi",
                      "Bh",
                      "Bh:mm",
                      "Bh:mm:ss",
@@ -2511,6 +2540,7 @@
                      "Costa",
                      "Cpr",
                      "Cr",
+                     "Cree",
                      "Crist",
                      "Cristo",
                      "Cristu",
@@ -2659,6 +2689,8 @@
                      "DateTime::Locale::be_tarask",
                      "DateTime::Locale::bem",
                      "DateTime::Locale::bem_ZM",
+                     "DateTime::Locale::bew",
+                     "DateTime::Locale::bew_ID",
                      "DateTime::Locale::bez",
                      "DateTime::Locale::bez_TZ",
                      "DateTime::Locale::bg",
@@ -2673,6 +2705,8 @@
                      "DateTime::Locale::bgn_PK",
                      "DateTime::Locale::bho",
                      "DateTime::Locale::bho_IN",
+                     "DateTime::Locale::blo",
+                     "DateTime::Locale::blo_BJ",
                      "DateTime::Locale::blt",
                      "DateTime::Locale::blt_VN",
                      "DateTime::Locale::bm",
@@ -2730,6 +2764,8 @@
                      "DateTime::Locale::co_FR",
                      "DateTime::Locale::cs",
                      "DateTime::Locale::cs_CZ",
+                     "DateTime::Locale::csw",
+                     "DateTime::Locale::csw_CA",
                      "DateTime::Locale::cu",
                      "DateTime::Locale::cu_RU",
                      "DateTime::Locale::cv",
@@ -2815,6 +2851,7 @@
                      "DateTime::Locale::en_GU",
                      "DateTime::Locale::en_GY",
                      "DateTime::Locale::en_HK",
+                     "DateTime::Locale::en_ID",
                      "DateTime::Locale::en_IE",
                      "DateTime::Locale::en_IL",
                      "DateTime::Locale::en_IM",
@@ -3065,6 +3102,8 @@
                      "DateTime::Locale::ia_001",
                      "DateTime::Locale::id",
                      "DateTime::Locale::id_ID",
+                     "DateTime::Locale::ie",
+                     "DateTime::Locale::ie_EE",
                      "DateTime::Locale::ig",
                      "DateTime::Locale::ig_NG",
                      "DateTime::Locale::ii",
@@ -3127,6 +3166,7 @@
                      "DateTime::Locale::kn",
                      "DateTime::Locale::kn_IN",
                      "DateTime::Locale::ko",
+                     "DateTime::Locale::ko_CN",
                      "DateTime::Locale::ko_KP",
                      "DateTime::Locale::ko_KR",
                      "DateTime::Locale::kok",
@@ -3149,6 +3189,15 @@
                      "DateTime::Locale::ku_TR",
                      "DateTime::Locale::kw",
                      "DateTime::Locale::kw_GB",
+                     "DateTime::Locale::kxv",
+                     "DateTime::Locale::kxv_Deva",
+                     "DateTime::Locale::kxv_Deva_IN",
+                     "DateTime::Locale::kxv_Latn",
+                     "DateTime::Locale::kxv_Latn_IN",
+                     "DateTime::Locale::kxv_Orya",
+                     "DateTime::Locale::kxv_Orya_IN",
+                     "DateTime::Locale::kxv_Telu",
+                     "DateTime::Locale::kxv_Telu_IN",
                      "DateTime::Locale::ky",
                      "DateTime::Locale::ky_KG",
                      "DateTime::Locale::la",
@@ -3204,6 +3253,8 @@
                      "DateTime::Locale::mgo_CM",
                      "DateTime::Locale::mi",
                      "DateTime::Locale::mi_NZ",
+                     "DateTime::Locale::mic",
+                     "DateTime::Locale::mic_CA",
                      "DateTime::Locale::mk",
                      "DateTime::Locale::mk_MK",
                      "DateTime::Locale::ml",
@@ -3312,7 +3363,7 @@
                      "DateTime::Locale::pl",
                      "DateTime::Locale::pl_PL",
                      "DateTime::Locale::prg",
-                     "DateTime::Locale::prg_001",
+                     "DateTime::Locale::prg_PL",
                      "DateTime::Locale::ps",
                      "DateTime::Locale::ps_AF",
                      "DateTime::Locale::ps_PK",
@@ -3412,6 +3463,8 @@
                      "DateTime::Locale::sid_ET",
                      "DateTime::Locale::sk",
                      "DateTime::Locale::sk_SK",
+                     "DateTime::Locale::skr",
+                     "DateTime::Locale::skr_PK",
                      "DateTime::Locale::sl",
                      "DateTime::Locale::sl_SI",
                      "DateTime::Locale::sma",
@@ -3514,6 +3567,8 @@
                      "DateTime::Locale::tt_RU",
                      "DateTime::Locale::twq",
                      "DateTime::Locale::twq_NE",
+                     "DateTime::Locale::tyv",
+                     "DateTime::Locale::tyv_RU",
                      "DateTime::Locale::tzm",
                      "DateTime::Locale::tzm_MA",
                      "DateTime::Locale::ug",
@@ -3542,6 +3597,8 @@
                      "DateTime::Locale::vec_IT",
                      "DateTime::Locale::vi",
                      "DateTime::Locale::vi_VN",
+                     "DateTime::Locale::vmw",
+                     "DateTime::Locale::vmw_MZ",
                      "DateTime::Locale::vo",
                      "DateTime::Locale::vo_001",
                      "DateTime::Locale::vun",
@@ -3558,12 +3615,14 @@
                      "DateTime::Locale::wo_SN",
                      "DateTime::Locale::xh",
                      "DateTime::Locale::xh_ZA",
+                     "DateTime::Locale::xnr",
+                     "DateTime::Locale::xnr_IN",
                      "DateTime::Locale::xog",
                      "DateTime::Locale::xog_UG",
                      "DateTime::Locale::yav",
                      "DateTime::Locale::yav_CM",
                      "DateTime::Locale::yi",
-                     "DateTime::Locale::yi_001",
+                     "DateTime::Locale::yi_UA",
                      "DateTime::Locale::yo",
                      "DateTime::Locale::yo_BJ",
                      "DateTime::Locale::yo_NG",
@@ -3576,6 +3635,8 @@
                      "DateTime::Locale::yue_Hans_CN",
                      "DateTime::Locale::yue_Hant",
                      "DateTime::Locale::yue_Hant_HK",
+                     "DateTime::Locale::za",
+                     "DateTime::Locale::za_CN",
                      "DateTime::Locale::zgh",
                      "DateTime::Locale::zgh_MA",
                      "DateTime::Locale::zh",
@@ -4247,6 +4308,7 @@
                      "Iniku\u02c0",
                      "Iniku\u02c0ti\u02c0ti\u02c0",
                      "Interlingua",
+                     "Interlingue",
                      "Inuktitut",
                      "Inya",
                      "Inyambala",
@@ -4536,6 +4598,7 @@
                      "Kamis",
                      "Kan",
                      "Kanama",
+                     "Kangri",
                      "Kannada",
                      "Kanne",
                      "Kapok",
@@ -4552,6 +4615,7 @@
                      "Kazakh",
                      "Kazakhstan",
                      "Ka\u0129r\u0129",
+                     "Ka\u014bk\u01ddm",
                      "Ke",
                      "Ke-2",
                      "Ke-3",
@@ -4694,6 +4758,7 @@
                      "Kusa",
                      "Kuta",
                      "Kuuza",
+                     "Kuvi",
                      "Kuvita",
                      "Kuwa",
                      "Kuwait",
@@ -5050,6 +5115,7 @@
                      "Maiu",
                      "Maj",
                      "Majo",
+                     "Makhuwa",
                      "Makhuwa-Meetto",
                      "Makonde",
                      "Mal",
@@ -5194,6 +5260,7 @@
                      "Mhr",
                      "Mh\u00e0rt",
                      "Mi",
+                     "Mi'kmaw",
                      "Micronesia",
                      "Middeweken",
                      "Mie",
@@ -5732,6 +5799,8 @@
                      "PM",
                      "PM06.30.30",
                      "PM\u1361UTC",
+                     "PM\u202f6:30",
+                     "PM\u202f6:30:30",
                      "PN",
                      "PTG",
                      "PZ",
@@ -6177,6 +6246,7 @@
                      "Sv\u0113td",
                      "Sv\u0113tdiena",
                      "Swahili",
+                     "Swampy",
                      "Swati",
                      "Sweden",
                      "Swedish",
@@ -6383,6 +6453,7 @@
                      "Turkmenistan",
                      "Turks",
                      "Tuvalu",
+                     "Tuvinian",
                      "Tu\u02bba",
                      "Tu\u02bbapulelulu",
                      "Tyap",
@@ -6477,6 +6548,7 @@
                      "V\u0268\u0268r\u0268",
                      "W",
                      "W'em",
+                     "W'ja",
                      "W'\u00aa",
                      "W'\u00ba",
                      "W-'hafta",
@@ -6606,6 +6678,7 @@
                      "Yaou",
                      "Yaw",
                      "Yawda",
+                     "Ye",
                      "Yeb",
                      "Yebrayer",
                      "Yebrir",
@@ -6668,6 +6741,7 @@
                      "Zen",
                      "Zen\u00e2r",
                      "Zezi-Krist",
+                     "Zhuang",
                      "Zi",
                      "Zib",
                      "Zibandlela",
@@ -6701,6 +6775,8 @@
                      "aa-DJ",
                      "aa-ER",
                      "aa-ET",
+                     "aadi",
+                     "aasa\u1e0di",
                      "aa\u0253",
                      "aa\u0253nde",
                      "ab",
@@ -6710,12 +6786,17 @@
                      "abe.ren",
                      "abendua",
                      "abenduaren",
+                     "abof\u028amka",
                      "abr",
                      "abril",
                      "abrile",
                      "abu",
                      "abuztua",
+                     "ab\u0254k\u0254\u0269",
+                     "acaf\u028an\u0256uka",
+                     "acapomka",
                      "achiel",
+                     "ad",
                      "adamsan",
                      "adar",
                      "ade",
@@ -6760,8 +6841,15 @@
                      "ak\u1e5ba\u1e0dyur",
                      "al",
                      "ala",
+                     "alaam\u0269sh\u0269",
+                     "alaarba",
                      "alaba",
+                     "alah",
+                     "alaha\u0256\u0269",
+                     "alam",
                      "alamisa",
+                     "alar",
+                     "al\u00e0laka",
                      "am",
                      "am-ET",
                      "am04:44:23",
@@ -6783,6 +6871,8 @@
                      "antradienis",
                      "any",
                      "any\u0254ny\u0254",
+                     "an\u0254\u0254b\u028anka",
+                     "an\u0254\u0254\u0256uka",
                      "ao\u00fbt",
                      "ap",
                      "apc-SY",
@@ -6842,6 +6932,9 @@
                      "ariyo",
                      "arn",
                      "arn-CL",
+                     "ar\u025b\u0301cika",
+                     "ar\u0269s",
+                     "ar\u0269s\u01ddma",
                      "as",
                      "as-IN",
                      "asa",
@@ -6849,6 +6942,8 @@
                      "asamas",
                      "asati",
                      "asi",
+                     "asib",
+                     "asiibi",
                      "asim",
                      "asimwas",
                      "asinas",
@@ -6864,6 +6959,8 @@
                      "ata",
                      "ataasinngorneq",
                      "ataiborwa",
+                     "atal",
+                     "atalaata",
                      "atm",
                      "aug",
                      "august",
@@ -6918,10 +7015,13 @@
                      "azaroa",
                      "azilawo",
                      "a\u0256aba\u0192o\u0192o",
+                     "a\u0256\u0269t",
+                     "a\u0256\u0269t\u025bn\u025b\u025b",
                      "b",
                      "b.Y.K",
                      "ba",
                      "ba-RU",
+                     "bado",
                      "bal",
                      "bal-Arab",
                      "bal-Arab-PK",
@@ -6932,12 +7032,12 @@
                      "bas",
                      "bas-CM",
                      "bazar",
+                     "bc",
                      "be",
                      "be-BY",
                      "be-tarask",
                      "bear",
                      "bearjadat",
-                     "before",
                      "beke",
                      "bem",
                      "bem-ZM",
@@ -6945,6 +7045,9 @@
                      "berfanbara",
                      "berfanbar\u00ea",
                      "ber\u00ee",
+                     "bese",
+                     "bew",
+                     "bew-ID",
                      "bez",
                      "bez-TZ",
                      "bg",
@@ -6972,6 +7075,8 @@
                      "bi\u0253a\u00e0",
                      "bla",
                      "bla\u0256a",
+                     "blo",
+                     "blo-BJ",
                      "blt",
                      "blt-VN",
                      "bm",
@@ -7014,6 +7119,7 @@
                      "b\u0254\u0301k",
                      "b\u025b\u0301\u025b",
                      "b\u025b\u030c",
+                     "b\u028an",
                      "b\u1e5ba",
                      "b\u1e5bay\u1e5b",
                      "c",
@@ -7056,9 +7162,11 @@
                      "chr",
                      "chr-US",
                      "chwarter",
+                     "ci",
                      "cic",
                      "cic-US",
                      "cikin",
+                     "cim",
                      "ckb",
                      "ckb-IQ",
                      "ckb-IR",
@@ -7074,6 +7182,8 @@
                      "cristu",
                      "cs",
                      "cs-CZ",
+                     "csw",
+                     "csw-CA",
                      "cs\u00fct\u00f6rt\u00f6k",
                      "cu",
                      "cu-RU",
@@ -7139,6 +7249,7 @@
                      "dam",
                      "dama",
                      "dap",
+                     "dasara",
                      "dasp\u00f2",
                      "dat",
                      "data",
@@ -7211,6 +7322,7 @@
                      "dexembre",
                      "dez",
                      "dezembro",
+                     "dezembru",
                      "dffir",
                      "df\u025b",
                      "dg",
@@ -7248,6 +7360,7 @@
                      "dissabte",
                      "diumenge",
                      "divendres",
+                     "divi",
                      "di\u014b",
                      "di\u014bgindi",
                      "di\u0253",
@@ -7445,6 +7558,7 @@
                      "en-GU",
                      "en-GY",
                      "en-HK",
+                     "en-ID",
                      "en-IE",
                      "en-IL",
                      "en-IM",
@@ -7562,6 +7676,7 @@
                      "es-UY",
                      "es-VE",
                      "esa",
+                     "esaabadu",
                      "esa\u0253as\u00fa",
                      "esmasp\u00e4ev",
                      "esun",
@@ -7570,6 +7685,7 @@
                      "et",
                      "et-EE",
                      "etter",
+                     "ettiminku",
                      "et\u0254\u0303lia",
                      "eu",
                      "eu-ES",
@@ -7621,6 +7737,7 @@
                      "fel\u00e9te",
                      "fev",
                      "fevereiro",
+                     "fevereiru",
                      "fevral",
                      "fevrer",
                      "fevriye",
@@ -7750,6 +7867,7 @@
                      "f\u0254e",
                      "f\u0254l\u0254",
                      "f\u025b",
+                     "f\u028am",
                      "f\u1ecd",
                      "g",
                      "ga",
@@ -7897,6 +8015,7 @@
                      "hihanu",
                      "hik",
                      "hil",
+                     "hire",
                      "hiruhilekoa",
                      "hitayi",
                      "hivili",
@@ -7966,6 +8085,7 @@
                      "id\u025b\u0301n",
                      "id\u0301\u025b\u0301n",
                      "ie",
+                     "ie-EE",
                      "ig",
                      "ig-NG",
                      "igandea",
@@ -8046,6 +8166,7 @@
                      "jan",
                      "janar",
                      "janeiro",
+                     "janeiru",
                      "januaari",
                      "januaarip",
                      "januar",
@@ -8059,6 +8180,7 @@
                      "janv\u0101ris",
                      "jan\u00faar",
                      "java",
+                     "ja\u1e6d\u1e6da",
                      "jbo",
                      "jbo-001",
                      "jen",
@@ -8087,6 +8209,7 @@
                      "joulukuutata",
                      "jov",
                      "jovedi",
+                     "joved\u00ed",
                      "jue",
                      "jueves",
                      "jug",
@@ -8106,6 +8229,8 @@
                      "julija",
                      "julio",
                      "juliol",
+                     "julyu",
+                     "jul\u00ed",
                      "jum",
                      "juma",
                      "jumwa",
@@ -8117,6 +8242,7 @@
                      "junija",
                      "junio",
                      "juny",
+                     "junyu",
                      "juov",
                      "juovlam\u00e1nnu",
                      "juovlam\u00e1nnu:a",
@@ -8163,6 +8289,7 @@
                      "kab",
                      "kab-DZ",
                      "kabiri",
+                     "kab\u0254k\u0254\u0269",
                      "kadadu",
                      "kaiboirwe",
                      "kaili",
@@ -8188,8 +8315,10 @@
                      "kathat\u0169",
                      "katikup\u00eden",
                      "kat\u00ebrt",
+                     "kaw",
                      "kawi",
                      "ka\u0129ri",
+                     "ka\u014b\u0254r\u0254",
                      "ka\u0331n",
                      "kcg",
                      "kcg-NG",
@@ -8259,6 +8388,7 @@
                      "kn-IN",
                      "kny",
                      "ko",
+                     "ko-CN",
                      "ko-KP",
                      "ko-KR",
                      "kok",
@@ -8284,6 +8414,8 @@
                      "kpe-LR",
                      "kris",
                      "krisiti",
+                     "kris\u1e6d",
+                     "kris\u1e6dabd",
                      "krizmed",
                      "krn",
                      "kr\u00edsimin",
@@ -8307,6 +8439,7 @@
                      "kuarta-fera",
                      "kuartal",
                      "kuartal-ka",
+                     "kuar\u1e6dr",
                      "kuata",
                      "kud",
                      "kug\u00fa",
@@ -8347,6 +8480,15 @@
                      "kwiecie\u0144",
                      "kwietnia",
                      "kw\u00e9di",
+                     "kxv",
+                     "kxv-Deva",
+                     "kxv-Deva-IN",
+                     "kxv-Latn",
+                     "kxv-Latn-IN",
+                     "kxv-Orya",
+                     "kxv-Orya-IN",
+                     "kxv-Telu",
+                     "kxv-Telu-IN",
                      "ky",
                      "ky-KG",
                      "kyiukonyi",
@@ -8369,6 +8511,7 @@
                      "k\u01ddb\u025b\u0301\u025b",
                      "k\u01ddnin",
                      "k\u01ddr\u00e1\u00e1",
+                     "k\u01ddu",
                      "k\u0254n",
                      "k\u0254s",
                      "k\u0254si\u0256a",
@@ -8385,6 +8528,7 @@
                      "lag",
                      "lag-TZ",
                      "lahadi",
+                     "laki",
                      "language",
                      "lapkr",
                      "lapkritis",
@@ -8404,6 +8548,7 @@
                      "led",
                      "leden",
                      "ledna",
+                     "lenju",
                      "lepy\u00e8",
                      "leta",
                      "letopo\u010dtem",
@@ -8412,6 +8557,7 @@
                      "leygardagur",
                      "lg",
                      "lg-UG",
+                     "lh",
                      "li",
                      "lia",
                      "libwa",
@@ -8441,6 +8587,7 @@
                      "lkt-US",
                      "llu",
                      "llunes",
+                     "lm",
                      "lmo",
                      "lmo-IT",
                      "ln",
@@ -8477,6 +8624,7 @@
                      "lund\u00ec",
                      "lunedi",
                      "luned\u00ec",
+                     "luned\u00ed",
                      "lunes",
                      "lunesd\u00ec",
                      "luni",
@@ -8551,12 +8699,14 @@
                      "maf\u00fa",
                      "mag",
                      "maggio",
+                     "maha",
                      "mai",
                      "mai-IN",
                      "maiatza",
                      "maig",
                      "maijs",
                      "maio",
+                     "maiu",
                      "maj",
                      "maja",
                      "majebaarg\u00e2",
@@ -8567,12 +8717,15 @@
                      "makeo",
                      "man",
                      "mandag",
+                     "manga",
+                     "manga\u1e0da",
                      "man\u00e1",
                      "mar",
                      "marca",
                      "mardi",
                      "mardo",
                      "mard\u00ec",
+                     "mard\u00ed",
                      "marec",
                      "marisi",
                      "marlunngorneq",
@@ -8584,8 +8737,10 @@
                      "marsi",
                      "marsip",
                      "marso",
+                     "marsu",
                      "mart",
                      "martars",
+                     "marte",
                      "martedi",
                      "marted\u00ec",
                      "martes",
@@ -8671,6 +8826,7 @@
                      "mercold\u00ec",
                      "mercoled\u00ec",
                      "mercredi",
+                     "mercurd\u00ed",
                      "mercuridi",
                      "merkredi",
                      "merkredo",
@@ -8688,6 +8844,8 @@
                      "mgo-CM",
                      "mi",
                      "mi-NZ",
+                     "mic",
+                     "mic-CA",
                      "mie",
                      "miercuri",
                      "miercus",
@@ -8869,12 +9027,17 @@
                      "nC",
                      "na",
                      "naa",
+                     "naaBY\u014aA\u0196",
                      "naaninan",
                      "naasaande",
                      "nad",
                      "nadale",
                      "nad\u012bli",
                      "nam",
+                     "namaanli",
+                     "namararu",
+                     "namathanu",
+                     "namaxexe",
                      "nane",
                      "naq",
                      "naq-NA",
@@ -8900,6 +9063,19 @@
                      "ndu2",
                      "ndu3",
                      "ndu4",
+                     "ndwen",
+                     "ndwenbet",
+                     "ndwencaet",
+                     "ndwencib",
+                     "ndwencibngeih",
+                     "ndwencib\u2019it",
+                     "ndwengouj",
+                     "ndwenit",
+                     "ndwenloeg",
+                     "ndwenngeih",
+                     "ndwenngux",
+                     "ndwensam",
+                     "ndwenseiq",
                      "ndz\u0254\u0300\u014b\u00e8fw\u00f2o",
                      "ndz\u0254\u0300\u014b\u00e8s\u00e8e",
                      "ndz\u0254\u0300\u014b\u0254\u0300chwa\u0294\u00e0kaa",
@@ -8951,6 +9127,8 @@
                      "ngm",
                      "ngn",
                      "ngo",
+                     "ngoenz",
+                     "ngoenzsinghgiz",
                      "ngs",
                      "ngt",
                      "nguwo",
@@ -8968,6 +9146,7 @@
                      "nia",
                      "niedz",
                      "niedziela",
+                     "nihiku",
                      "nin",
                      "nish",
                      "niydziela",
@@ -8986,6 +9165,8 @@
                      "njuk",
                      "njuk\u010dam\u00e1nnu",
                      "nj\u00ffol\u00e1\u02bc",
+                     "nj\u0269b\u0254",
+                     "nki",
                      "nl",
                      "nl-AW",
                      "nl-BE",
@@ -9010,6 +9191,7 @@
                      "noh",
                      "noiembrie",
                      "nom\u00ebttes",
+                     "noolempwa",
                      "nov",
                      "novam",
                      "nove",
@@ -9021,6 +9203,7 @@
                      "novembre",
                      "novembris",
                      "novembro",
+                     "novembru",
                      "novenbre",
                      "noviembre",
                      "now",
@@ -9084,6 +9267,7 @@
                      "n\u0103m",
                      "n\u0254y",
                      "n\u0254\u0302y",
+                     "n\u0256\u028aka",
                      "n\u2018ime",
                      "n\u202ftmeddit",
                      "n\u202ftufat",
@@ -9167,6 +9351,7 @@
                      "ot\u00e2",
                      "out",
                      "outubro",
+                     "outubru",
                      "ovdal",
                      "oyk",
                      "o\u00f3li",
@@ -9190,10 +9375,12 @@
                      "pa-Arab-PK",
                      "pa-Guru",
                      "pa-Guru-IN",
+                     "pagu",
                      "pamba",
                      "pamilau",
                      "pamunyi",
                      "panad\u012bli",
+                     "pande",
                      "pap",
                      "pap-AW",
                      "pap-CW",
@@ -9255,6 +9442,7 @@
                      "pn",
                      "po",
                      "pod",
+                     "pom",
                      "pon",
                      "pondelok",
                      "pond\u011bl\u00ed",
@@ -9274,7 +9462,7 @@
                      "pred",
                      "premte",
                      "prg",
-                     "prg-001",
+                     "prg-PL",
                      "pri",
                      "prie\u0161",
                      "prije",
@@ -9304,8 +9492,12 @@
                      "pt-TL",
                      "ptm",
                      "pu",
+                     "puda",
+                     "pudara",
+                     "purb",
                      "pussisawaiti",
                      "pustis",
+                     "pusu",
                      "put\u00fak,o\u00f3li",
                      "pu\u0254s",
                      "py",
@@ -9384,6 +9576,7 @@
                      "roku",
                      "roovv\u00e2d",
                      "roovv\u00e2dm\u00e1\u00e1nu",
+                     "rs",
                      "ru",
                      "ru-BY",
                      "ru-KG",
@@ -9434,6 +9627,7 @@
                      "samd\u00ed",
                      "samedi",
                      "sam\u0259na",
+                     "sani",
                      "santandria",
                      "santugaine",
                      "sap",
@@ -9449,6 +9643,7 @@
                      "sat-Olck-IN",
                      "sati",
                      "satin",
+                     "saturd\u00ed",
                      "sau",
                      "saur\u00fa",
                      "saus",
@@ -9457,6 +9652,7 @@
                      "sav",
                      "savnu",
                      "sa\u014b",
+                     "sb",
                      "sbp",
                      "sbp-TZ",
                      "sbt",
@@ -9526,6 +9722,7 @@
                      "setember",
                      "setembre",
                      "setembro",
+                     "setembru",
                      "setenbre",
                      "setiembre",
                      "setmana",
@@ -9585,6 +9782,12 @@
                      "sillins",
                      "simana",
                      "sim\u1ef9n\u1ef9",
+                     "singhgizhaj",
+                     "singhgizit",
+                     "singhgizngeih",
+                     "singhgizroek",
+                     "singhgizsam",
+                     "singhgizseiq",
                      "sis",
                      "sisamanngorneq",
                      "sita",
@@ -9599,6 +9802,8 @@
                      "sk-SK",
                      "skamm\u00e2",
                      "skamm\u00e2m\u00e1\u00e1nu",
+                     "skr",
+                     "skr-PK",
                      "sk\u00e1b",
                      "sk\u00e1bmam\u00e1nnu",
                      "sl",
@@ -9609,6 +9814,8 @@
                      "sma-NO",
                      "sma-SE",
                      "smb",
+                     "smba",
+                     "smbara",
                      "smj",
                      "smj-NO",
                      "smj-SE",
@@ -9629,6 +9836,7 @@
                      "so-SO",
                      "sob",
                      "sobota",
+                     "soled\u00ed",
                      "somok",
                      "sonda",
                      "sotn",
@@ -9656,6 +9864,8 @@
                      "sr-Latn-ME",
                      "sr-Latn-RS",
                      "sr-Latn-XK",
+                     "sra",
+                     "srab\u0129",
                      "sre",
                      "sreda",
                      "sri",
@@ -9698,6 +9908,7 @@
                      "subaka",
                      "subota",
                      "suenter",
+                     "sukru",
                      "sukul",
                      "sun",
                      "sungula",
@@ -9858,6 +10069,7 @@
                      "tjedan",
                      "tk",
                      "tk-TM",
+                     "tl",
                      "tn",
                      "tn-BW",
                      "tn-ZA",
@@ -9939,6 +10151,8 @@
                      "tyd\u017ae\u0144",
                      "tys",
                      "tysdag",
+                     "tyv",
+                     "tyv-RU",
                      "ty\u017ae\u0144",
                      "ty\u025b\u0300b",
                      "tzm",
@@ -10030,6 +10244,7 @@
                      "van",
                      "vandredi",
                      "vanti",
+                     "vara",
                      "vas",
                      "vasario",
                      "vasaris",
@@ -10054,6 +10269,7 @@
                      "vendredo",
                      "venerdi",
                      "venerd\u00ec",
+                     "venerd\u00ed",
                      "venres",
                      "vi",
                      "vi-VN",
@@ -10067,6 +10283,8 @@
                      "vinars",
                      "vineri",
                      "viz",
+                     "vmw",
+                     "vmw-MZ",
                      "vo",
                      "vo-001",
                      "voalohany",
@@ -10098,6 +10316,7 @@
                      "v\u1ebdnhk\u00e3gra-kur\u00e3-h\u00e1",
                      "w",
                      "w'em",
+                     "w'ja",
                      "w'\u00aa",
                      "w'\u00ba",
                      "w-'hafta",
@@ -10168,6 +10387,8 @@
                      "xh-ZA",
                      "xin",
                      "xineru",
+                     "xnr",
+                     "xnr-IN",
                      "xnt",
                      "xog",
                      "xog-UG",
@@ -10257,7 +10478,7 @@
                      "yesi-4",
                      "yesu",
                      "yi",
-                     "yi-001",
+                     "yi-UA",
                      "yie\u0331tni",
                      "ym",
                      "yo",
@@ -10306,6 +10527,7 @@
                      "y\ub144",
                      "z",
                      "za",
+                     "za-CN",
                      "zah",
                      "zallaws",
                      "zamanoo",
@@ -10590,6 +10812,7 @@
                      "\u0144\u0254\u0301",
                      "\u014a",
                      "\u014auaan",
+                     "\u014a\u028am",
                      "\u014b",
                      "\u014b1",
                      "\u014b10",
@@ -10688,6 +10911,7 @@
                      "\u0194",
                      "\u0194uc",
                      "\u0194uct",
+                     "\u0196sa",
                      "\u01c0Hoo\u01c2gaeb",
                      "\u01c0Khuu\u01c1kh\u00e2b",
                      "\u01c1goagas",
@@ -10709,6 +10933,10 @@
                      "\u0254ns\u00famb\u0254l",
                      "\u0254s\u0254n",
                      "\u0254tb",
+                     "\u0256t",
+                     "\u0256u5",
+                     "\u0256u6",
+                     "\u0256\u028a",
                      "\u0257",
                      "\u0257aya",
                      "\u0257\u00f3n",
@@ -10720,6 +10948,19 @@
                      "\u0263etr\u0254",
                      "\u0263uc",
                      "\u0263uct",
+                     "\u02691",
+                     "\u02692",
+                     "\u02693",
+                     "\u02694",
+                     "\u0269jicimka",
+                     "\u0269jikaw\u01ddrka",
+                     "\u0269jikpaka",
+                     "\u0269jik\u01dduka",
+                     "\u0269nantaja",
+                     "\u0269ny\u0269\u028ataja",
+                     "\u0269riutaja",
+                     "\u0269s\u01ddbaka",
+                     "\u0269\u014b\u0254r\u0269riu",
                      "\u0272\u025b",
                      "\u02bb'o",
                      "\u02bbA",
@@ -12245,10 +12486,12 @@
                      "\u0906\u0917\u0937\u094d\u091f",
                      "\u0906\u0920\u0935\u0921\u093e",
                      "\u0906\u0925\u0935\u093e\u0930",
+                     "\u0906\u0926\u093f",
                      "\u0906\u0928\u094d\u0928\u2019",
                      "\u0906\u092f\u0924\u093e\u0930",
                      "\u0906\u0930\u094d\u0924",
                      "\u0906\u0930\u094d\u0924\u0935\u093e\u0930",
+                     "\u0906\u0938\u093e\u0921\u093c\u0940",
                      "\u0907",
                      "\u0908",
                      "\u0908.\u092a\u0942",
@@ -12257,6 +12500,7 @@
                      "\u0908\u0938\u0935\u0940\u0938\u0928\u092a\u0942\u0930\u094d\u0935",
                      "\u0908\u0938\u093e",
                      "\u0908\u0938\u093e-\u092a\u0942\u0930\u094d\u0935",
+                     "\u0908\u0938\u093e-\u092a\u0948\u0932\u0947",
                      "\u0908\u0938\u094d\u0935\u0940",
                      "\u090f",
                      "\u090f.\u0926\u093f",
@@ -12298,6 +12542,7 @@
                      "\u091a\u093e\u0930\u093f\u092e",
                      "\u091a\u094b\u0925\u0940\u0902",
                      "\u091a\u094c\u0925\u0940",
+                     "\u091a\u094c\u0925\u0947",
                      "\u091a\u094c\u0925\u094b",
                      "\u091b\u0902",
                      "\u091b\u0902\u091b",
@@ -12309,6 +12554,7 @@
                      "\u091c\u0928\u0935\u0930\u0940\u092e\u093e\u0938\u0903",
                      "\u091c\u0928\u0970",
                      "\u091c\u093e",
+                     "\u091c\u093e\u091f\u093e",
                      "\u091c\u093e\u0928",
                      "\u091c\u093e\u0928\u0941\u0935\u093e\u0930\u0940",
                      "\u091c\u093e\u0928\u0947",
@@ -12331,6 +12577,7 @@
                      "\u091c\u0942\u0928",
                      "\u091c\u0942\u0928:",
                      "\u091c\u0942\u0928\u092e\u093e\u0938\u0903",
+                     "\u091c\u094b",
                      "\u091f\u093f\u092e\u093e\u0939\u0940",
                      "\u091f\u0940\u0902",
                      "\u0921",
@@ -12341,19 +12588,23 @@
                      "\u0921\u093f\u0938\u0947\u0902",
                      "\u0921\u093f\u0938\u0947\u0902\u092c\u0930",
                      "\u0921\u093f\u0938\u0947\u092e\u094d\u092c\u0930",
+                     "\u0924",
                      "\u0924\u093f1",
                      "\u0924\u093f2",
                      "\u0924\u093f3",
                      "\u0924\u093f4",
+                     "\u0924\u093f\u0928",
                      "\u0924\u093f\u092e\u093e\u0939\u0940",
                      "\u0924\u093f\u0967",
                      "\u0924\u093f\u0968",
                      "\u0924\u093f\u0969",
                      "\u0924\u093f\u096a",
+                     "\u0924\u0940\u091c\u0947",
                      "\u0924\u0940\u0938\u0930\u0940",
                      "\u0924\u0943\u0924\u0940\u092f",
                      "\u0924\u0947\u0938\u0930",
                      "\u0924\u0947\u0938\u094d\u0930\u094b",
+                     "\u0924\u094b\u0906\u0930",
                      "\u0924\u094d\u0930.1",
                      "\u0924\u094d\u0930.2",
                      "\u0924\u094d\u0930.3",
@@ -12368,18 +12619,22 @@
                      "\u0924\u094d\u0930\u0948\u092e\u093e\u0938\u0940\u0915",
                      "\u0925\u093e\u092e\u0925\u093f",
                      "\u0926",
+                     "\u0926\u092a\u0947\u0939\u0930\u093e/\u0938\u0902\u091c\u093e",
                      "\u0926\u0938\u092e\u092c\u0930",
+                     "\u0926\u0938\u093e\u0930\u093e",
                      "\u0926\u0938\u0942\u092e\u092c\u0930",
                      "\u0926\u093e",
                      "\u0926\u093e\u092e\u093f\u0928\u093f",
                      "\u0926\u093f",
                      "\u0926\u093f\u0928",
+                     "\u0926\u093f\u0935\u0940",
                      "\u0926\u093f\u0938",
                      "\u0926\u093f\u0938\u0902\u092c\u0930",
                      "\u0926\u093f\u0938\u0902\u092c\u0930:",
                      "\u0926\u093f\u0938\u0902\u092c\u0930\u092e\u093e\u0938\u0903",
                      "\u0926\u093f\u0938\u0970",
                      "\u0926\u0942\u0908",
+                     "\u0926\u0942\u091c\u0947",
                      "\u0926\u0942\u0938\u0930\u0940",
                      "\u0926\u094b\u0938\u0930",
                      "\u0926\u094b\u0938\u094d\u0930\u094b",
@@ -12408,9 +12663,14 @@
                      "\u092a\u0939\u093f\u0930\u0940\u0902",
                      "\u092a\u0939\u093f\u0932",
                      "\u092a\u0939\u093f\u0932\u094b",
+                     "\u092a\u093e\u0917\u0941\u0923\u0940",
+                     "\u092a\u093e\u0928\u094d\u0921\u0947",
+                     "\u092a\u0941\u0926\u094d\u0926\u093e\u0930\u093e",
+                     "\u092a\u0941\u0938\u0941",
                      "\u092a\u0942",
                      "\u092a\u0942\u0930\u094d\u0935",
                      "\u092a\u0942\u0930\u094d\u0935\u093e\u0939\u094d\u0928",
+                     "\u092a\u0948\u0932\u0947",
                      "\u092a\u0948\u0939\u0932\u0940",
                      "\u092a\u094d\u0930\u0925\u092e",
                      "\u092b",
@@ -12459,13 +12719,16 @@
                      "\u092c\u0943\u0939\u0938\u094d\u092a\u0924\u093f",
                      "\u092c\u0943\u0939\u0938\u094d\u092a\u0924\u093f\u092c\u093e\u0930",
                      "\u092c\u0947\u0932\u093e\u0938\u0947",
+                     "\u092c\u0947\u0938\u0947",
                      "\u092c\u094b\u0926\u0935\u093e\u0930",
+                     "\u092c\u094b\u0926\u094b",
                      "\u092c\u094b\u092e\u0935\u093e\u0930",
                      "\u092c\u094d\u0930\u0947\u0938\u0935\u093e\u0930",
                      "\u092c\u094d\u0930\u0948",
                      "\u092c\u094d\u0930\u0948\u0925\u093f",
                      "\u092c\u094d\u0930\u094b\u0902\u0920",
                      "\u092d\u094b\u0930",
+                     "\u092d\u094d\u092f\u093e\u0917\u093e",
                      "\u092e",
                      "\u092e\u0902",
                      "\u092e\u0902\u0917",
@@ -12477,6 +12740,7 @@
                      "\u092e\u0902\u0917\u0933",
                      "\u092e\u0902\u0917\u0933\u0935\u093e\u0930",
                      "\u092e\u0902\u0917\u0933\u093e\u0930",
+                     "\u092e\u0902\u0917\u093e\u0921\u093c\u093e",
                      "\u092e\u0908",
                      "\u092e\u0908\u092e\u093e\u0938\u0903",
                      "\u092e\u0919\u094d\u0917\u0932",
@@ -12487,6 +12751,8 @@
                      "\u092e\u093e\u0930\u094d\u091a\u092e\u093e\u0938\u0903",
                      "\u092e\u093e\u0930\u094d\u091a\u0941",
                      "\u092e\u093e\u0939",
+                     "\u092e\u093e\u0939\u093e\u0915\u093e",
+                     "\u092e\u0940\u0928\u094d\u0928\u0947",
                      "\u092e\u0947",
                      "\u092e\u0947\u0908",
                      "\u0930",
@@ -12497,16 +12763,25 @@
                      "\u0930\u0935\u093f\u0935\u093e\u0930",
                      "\u0930\u0935\u093f\u0935\u093e\u0938\u0930\u0903",
                      "\u0930\u093e",
+                     "\u0932\u093e\u0915\u094d\u0915\u093f",
+                     "\u0932\u0947\u091e\u094d\u091c\u0941",
                      "\u0935\u093e",
+                     "\u0935\u093e\u0930\u093e",
                      "\u0935\u093f",
                      "\u0935\u093f\u0938",
                      "\u0935\u093f\u0938\u094d\u092a\u0924",
+                     "\u0935\u0940",
+                     "\u0935\u0940\u0930",
+                     "\u0935\u0940\u0930\u0935\u093e\u0930",
                      "\u0936",
                      "\u0936\u0928\u093f",
+                     "\u0936\u0928\u093f\u091a\u094d\u091a\u0930\u0935\u093e\u0930",
                      "\u0936\u0928\u093f\u092c\u093e\u0930",
                      "\u0936\u0928\u093f\u0935\u093e\u0930",
                      "\u0936\u0928\u093f\u0935\u093e\u0938\u0930\u0903",
                      "\u0936\u0941",
+                     "\u0936\u0941\u0915\u094d\u0915\u0930",
+                     "\u0936\u0941\u0915\u094d\u0915\u0930\u0935\u093e\u0930",
                      "\u0936\u0941\u0915\u094d\u0930",
                      "\u0936\u0941\u0915\u094d\u0930\u092c\u093e\u0930",
                      "\u0936\u0941\u0915\u094d\u0930\u0935\u093e\u0930",
@@ -12531,6 +12806,8 @@
                      "\u0938\u0935\u0947\u0930",
                      "\u0938\u0939",
                      "\u0938\u093e\u0902\u091d",
+                     "\u0938\u093e\u0928\u094d\u0928\u093f",
+                     "\u0938\u093e\u0945\u092e\u094d\u0935\u093e\u0930\u093e",
                      "\u0938\u093f",
                      "\u0938\u093f\u0917\u093e\u0902",
                      "\u0938\u093f\u0924",
@@ -12540,6 +12817,7 @@
                      "\u0938\u093f\u0924\u092e\u094d\u092c\u0930",
                      "\u0938\u093f\u0924\u0970",
                      "\u0938\u0941",
+                     "\u0938\u0941\u0915\u0941\u0930\u0941",
                      "\u0938\u0941\u0916\u0941\u0930",
                      "\u0938\u0941\u0916\u0941\u0930\u092c\u093e\u0930",
                      "\u0938\u0941\u0941\u0916\u0941\u0930\u092c\u093e\u0930",
@@ -12550,14 +12828,17 @@
                      "\u0938\u0947\u092a\u094d\u091f\u0947\u092e\u094d\u092c\u0930",
                      "\u0938\u0947\u092a\u094d\u0925\u0947\u092e\u094d\u092c\u0930",
                      "\u0938\u094b",
+                     "\u0938\u094b\u0906\u0930",
                      "\u0938\u094b\u092e",
                      "\u0938\u094b\u092e\u092c\u093e\u0930",
                      "\u0938\u094b\u092e\u0935\u093e\u0930",
                      "\u0938\u094b\u092e\u0935\u093e\u0938\u0930\u0903",
                      "\u0938\u094b\u092e\u093e\u0930",
+                     "\u0938\u094d\u0930\u093e\u092c\u093e\u0901",
                      "\u0938\u2019\u091e",
                      "\u0939\u092a\u094d\u0924\u093e",
                      "\u0939\u092b\u094d\u0924\u093e",
+                     "\u0939\u093f\u0930\u0947",
                      "\u0985",
                      "\u0985\u0995\u09cd\u099f\u09cb",
                      "\u0985\u0995\u09cd\u099f\u09cb\u0983",
@@ -12856,12 +13137,15 @@
                      "\u0b05\u0b15\u0b4d\u0b1f\u0b4b\u0b2c\u0b30",
                      "\u0b05\u0b17\u0b37\u0b4d\u0b1f",
                      "\u0b05\u0b2a\u0b4d\u0b30\u0b47\u0b32",
+                     "\u0b06\u0b26\u0b3f",
+                     "\u0b06\u0b38\u0b3e\u0b21\u0b3c\u0b3f",
                      "\u0b16\u0b4d\u0b30\u0b40\u0b37\u0b4d\u0b1f\u0b2a\u0b42\u0b30\u0b4d\u0b2c",
                      "\u0b16\u0b4d\u0b30\u0b40\u0b37\u0b4d\u0b1f\u0b3e\u0b2c\u0b4d\u0b26",
                      "\u0b17\u0b41",
                      "\u0b17\u0b41\u0b30\u0b41",
                      "\u0b17\u0b41\u0b30\u0b41\u0b2c\u0b3e\u0b30",
                      "\u0b1c\u0b3e",
+                     "\u0b1c\u0b3e\u0b1f\u0b3e",
                      "\u0b1c\u0b3e\u0b28\u0b41\u0b06\u0b30\u0b40",
                      "\u0b1c\u0b41",
                      "\u0b1c\u0b41\u0b28",
@@ -12869,22 +13153,34 @@
                      "\u0b21\u0b3f",
                      "\u0b21\u0b3f\u0b38\u0b47\u0b2e\u0b4d\u0b2c\u0b30",
                      "\u0b24\u0b4d\u0b30\u0b5f\u0b2e\u0b3e\u0b38",
+                     "\u0b26\u0b3e\u0b38\u0b3e\u0b30\u0b3e",
+                     "\u0b26\u0b3f\u0b71\u0b3f\u0b21\u0b3c\u0b3f",
                      "\u0b28",
                      "\u0b28\u0b2d\u0b47\u0b2e\u0b4d\u0b2c\u0b30",
+                     "\u0b2a\u0b3e\u0b17\u0b41\u0b23\u0b3f",
+                     "\u0b2a\u0b3e\u0b23\u0b4d\u0b21\u0b47",
+                     "\u0b2a\u0b41\u0b26\u0b3e\u0b30\u0b3e",
+                     "\u0b2a\u0b41\u0b38\u0b41",
                      "\u0b2b\u0b47",
                      "\u0b2b\u0b47\u0b2c\u0b43\u0b06\u0b30\u0b40",
+                     "\u0b2c\u0b26",
                      "\u0b2c\u0b41",
                      "\u0b2c\u0b41\u0b27",
                      "\u0b2c\u0b41\u0b27\u0b2c\u0b3e\u0b30",
+                     "\u0b2c\u0b47\u0b38\u0b47",
                      "\u0b2e",
                      "\u0b2e\u0b07",
                      "\u0b2e\u0b19\u0b4d\u0b17\u0b33",
                      "\u0b2e\u0b19\u0b4d\u0b17\u0b33\u0b2c\u0b3e\u0b30",
                      "\u0b2e\u0b3e",
+                     "\u0b2e\u0b3e\u0b19\u0b4d\u0b17\u0b3e\u0b21\u0b3c\u0b3e",
                      "\u0b2e\u0b3e\u0b30\u0b4d\u0b1a\u0b4d\u0b1a",
+                     "\u0b2e\u0b3e\u0b39\u0b3e\u0b15\u0b3e",
                      "\u0b30",
                      "\u0b30\u0b2c\u0b3f",
                      "\u0b30\u0b2c\u0b3f\u0b2c\u0b3e\u0b30",
+                     "\u0b32\u0b3e\u0b15\u0b3f",
+                     "\u0b32\u0b47\u0b1e\u0b4d\u0b1c\u0b41",
                      "\u0b36",
                      "\u0b36\u0b28\u0b3f",
                      "\u0b36\u0b28\u0b3f\u0b2c\u0b3e\u0b30",
@@ -12892,11 +13188,17 @@
                      "\u0b36\u0b41\u0b15\u0b4d\u0b30",
                      "\u0b36\u0b41\u0b15\u0b4d\u0b30\u0b2c\u0b3e\u0b30",
                      "\u0b38\u0b2a\u0b4d\u0b24\u0b3e\u0b39",
+                     "\u0b38\u0b2e\u0b4d\u0b2c\u0b3e\u0b30\u0b3e",
+                     "\u0b38\u0b3e\u0b28\u0b3f",
+                     "\u0b38\u0b41\u0b15\u0b4d\u0b30\u0b41",
                      "\u0b38\u0b47",
                      "\u0b38\u0b47\u0b2a\u0b4d\u0b1f\u0b47\u0b2e\u0b4d\u0b2c\u0b30",
                      "\u0b38\u0b4b",
                      "\u0b38\u0b4b\u0b2e",
                      "\u0b38\u0b4b\u0b2e\u0b2c\u0b3e\u0b30",
+                     "\u0b38\u0b4d\u0b30\u0b3e\u0b2c\u0b3e\u0b01",
+                     "\u0b39\u0b3f\u0b30\u0b47",
+                     "\u0b71\u0b3e\u0b30\u0b3e",
                      "\u0b85",
                      "\u0b85\u0b95\u0bcd",
                      "\u0b85\u0b95\u0bcd\u0b9f\u0bcb\u0baa\u0bb0\u0bcd",
@@ -12969,6 +13271,7 @@
                      "\u0c05",
                      "\u0c05\u0c15\u0c4d\u0c1f\u0c4b",
                      "\u0c05\u0c15\u0c4d\u0c1f\u0c4b\u0c2c\u0c30\u0c4d",
+                     "\u0c05\u0c38\u0c4d\u0c30",
                      "\u0c06",
                      "\u0c06\u0c17",
                      "\u0c06\u0c17\u0c38\u0c4d\u0c1f\u0c41",
@@ -12981,6 +13284,7 @@
                      "\u0c15\u0c4d\u0c30\u0c40\u0c36",
                      "\u0c15\u0c4d\u0c30\u0c40\u0c38\u0c4d\u0c24\u0c41",
                      "\u0c17\u0c41",
+                     "\u0c17\u0c41\u0c02\u0c21\u0c41",
                      "\u0c17\u0c41\u0c30\u0c41",
                      "\u0c17\u0c41\u0c30\u0c41\u0c35\u0c3e\u0c30\u0c02",
                      "\u0c1c",
@@ -12999,24 +13303,40 @@
                      "\u0c24\u0c4d\u0c30\u0c483",
                      "\u0c24\u0c4d\u0c30\u0c484",
                      "\u0c24\u0c4d\u0c30\u0c48\u0c2e\u0c3e\u0c38\u0c3f\u0c15\u0c02",
+                     "\u0c26\u0c3f\u0c35\u0c46\u0c21\u0c3f",
                      "\u0c28",
+                     "\u0c28\u0c2e\u0c3e\u0c30\u0c3e",
                      "\u0c28\u0c35\u0c02",
                      "\u0c28\u0c35\u0c02\u0c2c\u0c30\u0c4d",
+                     "\u0c28\u0c41\u0c15\u0c4d",
+                     "\u0c2a\u0c3e\u0c02\u0c21\u0c41",
+                     "\u0c2a\u0c41\u0c38\u0c41",
                      "\u0c2a\u0c42\u0c30\u0c4d\u0c35\u0c02",
                      "\u0c2b\u0c3f",
                      "\u0c2b\u0c3f\u0c2c\u0c4d\u0c30",
                      "\u0c2b\u0c3f\u0c2c\u0c4d\u0c30\u0c35\u0c30\u0c3f",
                      "\u0c2b\u0c3f\u0c2c\u0c4d\u0c30\u0c35\u0c30\u0c3f\u0c32\u0c4b",
+                     "\u0c2c\u0c3e\u0c28\u0c4d\u0c26\u0c2a\u0c3e\u0c23\u0c3e",
+                     "\u0c2c\u0c3e\u0c30\u0c4d\u0c38\u0c3f",
                      "\u0c2c\u0c41",
                      "\u0c2c\u0c41\u0c27",
                      "\u0c2c\u0c41\u0c27\u0c35\u0c3e\u0c30\u0c02",
+                     "\u0c2c\u0c46\u0c38\u0c46\u0c15\u0c3f",
                      "\u0c2e",
                      "\u0c2e\u0c02\u0c17\u0c33",
                      "\u0c2e\u0c02\u0c17\u0c33\u0c35\u0c3e\u0c30\u0c02",
                      "\u0c2e\u0c3e",
+                     "\u0c2e\u0c3e\u0c02\u0c17\u0c3e\u0c21\u0c3e",
+                     "\u0c2e\u0c3e\u0c17",
                      "\u0c2e\u0c3e\u0c30\u0c4d\u0c1a\u0c3f",
                      "\u0c2e\u0c47",
+                     "\u0c30\u0c3e\u0c24",
+                     "\u0c32\u0c02\u0c21\u0c3f",
+                     "\u0c32\u0c3e\u0c15\u0c3f\u0c35\u0c30\u0c3e",
+                     "\u0c35\u0c30\u0c3e",
                      "\u0c35\u0c3e\u0c30\u0c02",
+                     "\u0c35\u0c3e\u0c30\u0c2e\u0c3f",
+                     "\u0c35\u0c41\u0c26\u0c3e\u0c30\u0c3e",
                      "\u0c36",
                      "\u0c36\u0c15\u0c02",
                      "\u0c36\u0c28\u0c3f",
@@ -13024,6 +13344,7 @@
                      "\u0c36\u0c41",
                      "\u0c36\u0c41\u0c15\u0c4d\u0c30",
                      "\u0c36\u0c41\u0c15\u0c4d\u0c30\u0c35\u0c3e\u0c30\u0c02",
+                     "\u0c38\u0c3e\u0c28\u0c3f\u0c35\u0c30\u0c3e",
                      "\u0c38\u0c46",
                      "\u0c38\u0c46\u0c2a\u0c4d\u0c1f\u0c46\u0c02",
                      "\u0c38\u0c46\u0c2a\u0c4d\u0c1f\u0c46\u0c02\u0c2c\u0c30\u0c4d",
@@ -13031,6 +13352,7 @@
                      "\u0c38\u0c4b",
                      "\u0c38\u0c4b\u0c2e",
                      "\u0c38\u0c4b\u0c2e\u0c35\u0c3e\u0c30\u0c02",
+                     "\u0c39\u0c3f\u0c30\u0c46\u0c07",
                      "\u0c85",
                      "\u0c85\u0c95\u0ccd\u0c9f\u0ccb",
                      "\u0c85\u0c95\u0ccd\u0c9f\u0ccb\u0cac\u0cb0\u0ccd",
@@ -13830,6 +14152,26 @@
                      "\u13e7\u13be\u13a9",
                      "\u13e7\u13be\u13a9\u13b6\u13cd\u13d7",
                      "\u13e7\u13d3\u13b7\u13b8",
+                     "\u1405\u1438\u1426\u1405\u140f\u1431\u14ef\u14bc",
+                     "\u140a\u1431\u1426\u1455\u1418\u1423",
+                     "\u140a\u147f\u144e\u14c4\u140f\u1431\u14ef\u14bc",
+                     "\u140a\u14c2\u146d\u1431\u14ef\u14bc",
+                     "\u140a\u152d\u14a5\u1426\u1401\u1403",
+                     "\u142f\u152d\u1420\u146d\u14ef\u1472\u1424",
+                     "\u1431\u14aa\u1426\u140a\u14a7\u140f\u1431\u14ef\u14bc",
+                     "\u1438\u1418\u1422\u1490\u1472\u14c2\u14f9\u1431\u14ef\u14bc",
+                     "\u1438\u1422\u146f\u140f\u1431\u14ef\u14bc",
+                     "\u1438\u1422\u1472\u140d\u1426\u1405\u1431\u14ef\u14bc",
+                     "\u1455\u1426\u147f\u146d\u1431\u14ef\u14bc",
+                     "\u146d\u14ef\u1472\u1424",
+                     "\u146d\u14f4\u1431\u14ef\u14bc",
+                     "\u14a5\u146d\u14ef\u140f\u1431\u14ef\u14bc",
+                     "\u14aa\u144e\u14c4\u140f\u146d\u14ef\u1472\u1424",
+                     "\u14c0\u1413\u146d\u14ef\u1472\u1424",
+                     "\u14c2\u1422\u146d\u1431\u14ef\u14bc",
+                     "\u14c2\u14f1\u146d\u14ef\u1472\u1424",
+                     "\u14c2\u152d\u14c7\u14c4\u146d\u14ef\u1472\u1424",
+                     "\u14f4\u146d\u1438\u1472\u140f\u1431\u14ef\u14bc",
                      "\u1780",
                      "\u1780\u1780\u17d2\u1780\u178a\u17b6",
                      "\u1780\u1789\u17d2\u1789\u17b6",
@@ -14621,7 +14963,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@DROLSKY/PodSyntaxTests",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::RunExtraTests",
@@ -14749,7 +15091,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.42.0",
+                  "git_version" : "2.43.2",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -14768,103 +15110,103 @@
                   ],
                   "finder" : [
                      ":InstallModules",
-                     ":ExecFiles"
+                     ":PerlExecFiles"
                   ],
                   "plugins" : [
                      {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@CorePrep/EnsurePod5",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::SingleEncoding",
                         "name" : "@DROLSKY/SingleEncoding",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Transformer",
                         "name" : "@DROLSKY/List",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Transformer",
                         "name" : "@DROLSKY/Verbatim",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@DROLSKY/header",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Name",
                         "name" : "@DROLSKY/Name",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Version",
                         "name" : "@DROLSKY/Version",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@DROLSKY/prelude",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "SYNOPSIS",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "DESCRIPTION",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "OVERVIEW",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "ATTRIBUTES",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "METHODS",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "FUNCTIONS",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "TYPES",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
                         "name" : "@DROLSKY/Leftovers",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@DROLSKY/postlude",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::GenerateSection",
                         "name" : "@DROLSKY/generate SUPPORT",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::AllowOverride",
@@ -14874,17 +15216,17 @@
                      {
                         "class" : "Pod::Weaver::Section::GenerateSection",
                         "name" : "@DROLSKY/generate SOURCE",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::GenerateSection",
                         "name" : "@DROLSKY/generate DONATIONS",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Authors",
                         "name" : "@DROLSKY/Authors",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Contributors",
@@ -14894,7 +15236,7 @@
                      {
                         "class" : "Pod::Weaver::Section::Legal",
                         "name" : "@DROLSKY/Legal",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::AllowOverride",
@@ -14904,7 +15246,7 @@
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@DROLSKY/footer",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      }
                   ]
                }
@@ -14981,7 +15323,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CPANFile",
             "name" : "@DROLSKY/CPANFile",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::License",
@@ -15018,7 +15360,7 @@
             "class" : "Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.42.0",
+                  "git_version" : "2.43.2",
                   "repo_root" : "."
                }
             },
@@ -15034,7 +15376,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.42.0",
+                  "git_version" : "2.43.2",
                   "repo_root" : "."
                }
             },
@@ -15077,12 +15419,12 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.42.0",
+                  "git_version" : "2.43.2",
                   "repo_root" : "."
                }
             },
             "name" : "@DROLSKY/Git::Check",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -15107,7 +15449,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.42.0",
+                  "git_version" : "2.43.2",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -15115,7 +15457,7 @@
                }
             },
             "name" : "@DROLSKY/Commit generated files",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -15124,12 +15466,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.40",
+                  "tag" : "v1.41",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.42.0",
+                  "git_version" : "2.43.2",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -15137,7 +15479,7 @@
                }
             },
             "name" : "@DROLSKY/Git::Tag",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -15149,12 +15491,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.42.0",
+                  "git_version" : "2.43.2",
                   "repo_root" : "."
                }
             },
             "name" : "@DROLSKY/Git::Push",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
@@ -15190,7 +15532,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.42.0",
+                  "git_version" : "2.43.2",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -15198,7 +15540,7 @@
                }
             },
             "name" : "@DROLSKY/Commit version bump",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -15210,26 +15552,26 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.42.0",
+                  "git_version" : "2.43.2",
                   "repo_root" : "."
                }
             },
             "name" : "@DROLSKY/Push version bump",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::MakeMaker",
             "config" : {
                "Dist::Zilla::Plugin::MakeMaker" : {
                   "make_path" : "make",
-                  "version" : "6.030"
+                  "version" : "6.031"
                },
                "Dist::Zilla::Plugin::MakeMaker::Awesome" : {
                   "version" : "0.49"
                },
                "Dist::Zilla::Role::TestRunner" : {
                   "default_jobs" : "12",
-                  "version" : "6.030"
+                  "version" : "6.031"
                }
             },
             "name" : "@DROLSKY/DROLSKY::MakeMaker",
@@ -15238,12 +15580,12 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "MetaResources",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaNoIndex",
             "name" : "MetaNoIndex",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Conflicts",
@@ -15276,62 +15618,62 @@
                }
             },
             "name" : "DevelopRequires",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.030"
+            "version" : "6.031"
          }
       ],
       "zilla" : {
@@ -15339,7 +15681,7 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.030"
+         "version" : "6.031"
       }
    },
    "x_authority" : "cpan:DROLSKY",
@@ -15355,8 +15697,8 @@
       "Sergey Leschenko <Sergey.Leschenko@portaone.com>",
       "yasu47b <nakayamayasuhiro1986@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.32.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -95,8 +95,6 @@ sub _build_findPets_request( $self, %options ) {
         {
             'Accept' => 'application/json',
         }
-        # XXX Need to fill the body
-        # => $body,
     );
 
     return $tx
@@ -288,8 +286,6 @@ sub _build_deletePet_request( $self, %options ) {
         {
             'Accept' => 'application/json',
         }
-        # XXX Need to fill the body
-        # => $body,
     );
 
     return $tx
@@ -379,8 +375,6 @@ sub _build_find_pet_by_id_request( $self, %options ) {
         {
             'Accept' => 'application/json',
         }
-        # XXX Need to fill the body
-        # => $body,
     );
 
     return $tx

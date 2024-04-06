@@ -1,2 +1,7 @@
+0.02 2024-04-05
+    * List PerlX::Maybe as prerequisite
+    * Handle a request body of application/octet-stream and request bodies
+      of type 'string' in general
+
 0.01 2024-03-24
     * Released on an unsuspecting world

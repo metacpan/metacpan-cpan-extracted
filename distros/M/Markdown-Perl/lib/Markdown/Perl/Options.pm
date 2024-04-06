@@ -65,7 +65,7 @@ sub set_options {
   for my $p (pairs @options) {
     my ($k, $v) = @{$p};
     if ($k eq 'mode') {
-      $this->set_mode($v);
+      $this->Markdown::Perl::Options::set_mode($dest, $v);
     } else {
       carp "Unknown option ignored: ${k}" unless exists $validation{$k};
       my $validated_value = $validation{$k}($v);
@@ -94,15 +94,11 @@ sub validate_options {
 }
 
 sub set_mode {
-  my ($this, $mode) = @_;
-  carp "Setting mode '${mode}' overriding already set mode '$this->{mode}'"
-      if defined $this->{mode};
-  if ($mode eq 'default' || $mode eq 'pmarkdown') {
-    undef $this->{mode};
-    return;
-  }
+  my ($this, $dest, $mode) = @_;
+  carp "Setting mode '${mode}' overriding already set mode '$this->{$dest}{mode}'"
+      if defined $this->{$dest}{mode};
   croak "Unknown mode '${mode}'" unless exists $valid_modes{$mode};
-  $this->{mode} = $mode;
+  $this->{$dest}{mode} = $mode;
   return;
 }
 
@@ -122,9 +118,14 @@ sub _make_option {
       my ($this) = @_;
       return $this->{local_options}{$opt} if exists $this->{local_options}{$opt};
       return $this->{options}{$opt} if exists $this->{options}{$opt};
-      if (defined $this->{mode}) {
-        return $options_modes{$this->{mode}}{$opt}
-            if exists $options_modes{$this->{mode}}{$opt};
+      if (defined $this->{local_options}{mode}) {
+        # We still enter here if the mode is 'default', to not enter the global
+        # mode (a local mode entirely shadows a global mode).
+        return $options_modes{$this->{local_options}{mode}}{$opt}
+            if exists $options_modes{$this->{local_options}{mode}}{$opt};
+      } elsif (defined $this->{options}{mode}) {
+        return $options_modes{$this->{options}{mode}}{$opt}
+            if exists $options_modes{$this->{options}{mode}}{$opt};
       }
       return $default;
     };
@@ -170,22 +171,9 @@ sub _word_list {
 
 =pod
 
-=head2 B<warn_for_unused_input> I<(boolean, default: true)>
+=head2 Options controlling which top-level blocks are used
 
-In general, all user input is present in the output (possibly as uninterpreted
-text if it was not understood). But some valid Markdown construct results in
-parts of the input being ignored. By default C<pmarkdown> will emit a warning
-when such a construct is found. This option can disable these warnings.
-
-=cut
-
-_make_option(
-  warn_for_unused_input => 1,
-  _boolean);
-
-=pod
-
-=head2 B<use_fenced_code_blocks> I<(boolean, default: true)>
+=head3 B<use_fenced_code_blocks> I<(boolean, default: true)>
 
 This options controls whether fenced code blocks are recognised in the document
 structure.
@@ -196,7 +184,7 @@ _make_option(use_fenced_code_blocks => 1, _boolean, (markdown => 0));
 
 =pod
 
-=head2 B<use_table_blocks> I<(boolean, default: true)>
+=head3 B<use_table_blocks> I<(boolean, default: true)>
 
 This options controls whether table blocks can be used.
 
@@ -206,7 +194,19 @@ _make_option(use_table_blocks => 1, _boolean, (cmark => 0, markdown => 0));
 
 =pod
 
-=head2 B<fenced_code_blocks_must_be_closed> I<(boolean, default: true)>
+=head3 B<use_setext_headings> I<(boolean, default: false)>
+
+This options controls whether table blocks can be used.
+
+=cut
+
+_make_option(use_setext_headings => 0, _boolean, (cmark => 1, markdown => 1, github => 1));
+
+=pod
+
+=head2 Options controlling the parsing of top-level blocks
+
+=head3 B<fenced_code_blocks_must_be_closed> I<(boolean, default: true)>
 
 By default, a fenced code block with no closing fence will run until the end of
 the document. With this setting, the opening fence will be treated as normal
@@ -219,30 +219,7 @@ _make_option(fenced_code_blocks_must_be_closed => 1, _boolean, (cmark => 0, gith
 
 =pod
 
-=head2 B<code_blocks_info> I<(enum, default: language)>
-
-Fenced code blocks can have info strings on their opening lines (any text after
-the C<```> or C<~~~> fence). This option controls what is done with that text.
-
-The possible values are:
-
-=over 4
-
-=item B<ignored>
-
-The info text is ignored.
-
-=item B<language> I<(default)>
-
-=back
-
-=cut
-
-_make_option(code_blocks_info => 'language', _enum(qw(ignored language)));
-
-=pod
-
-=head2 B<multi_lines_setext_headings> I<(enum, default: multi_line)>
+=head3 B<multi_lines_setext_headings> I<(enum, default: multi_line)>
 
 The default behavior of setext headings in the CommonMark spec is that they can
 have multiple lines of text preceding them (forming the heading itself).
@@ -299,7 +276,154 @@ _make_option(
 
 =pod
 
-=head2 B<autolinks_regex> I<(regex string)>
+=head3 B<allow_task_list_markers> I<(enum, default: list)>
+
+Specify whether task list markers (rendered as check boxes) are recognised in
+the input. The possible values are as follow:
+
+=over 4
+
+=item B<never>
+
+Task list marker are never recognised
+
+=item B<list> I<(default)>
+
+Task list markers are recognised only as the first element at the beginning of
+a list item.
+
+=item B<always>
+
+Task list markers are recognised at the beginning of any paragraphs, inside any
+type of block.
+
+=back
+
+=cut
+
+_make_option(
+  allow_task_list_markers => 'list',
+  _enum(qw(never list always)), (
+    markdown => 'never',
+    cmark => 'never',
+  ));
+
+=pod
+
+=head3 B<table_blocks_can_interrupt_paragraph> I<(boolean, default: false)>
+
+Allow a table top level block to interrupt a paragraph.
+
+=cut
+
+_make_option(
+  table_blocks_can_interrupt_paragraph => 0,
+  _boolean, (
+    github => 1,
+  ));
+
+=pod
+
+=head3 B<table_blocks_pipes_requirements> I<(enum, default: strict)>
+
+Defines how strict is the parsing of table top level blocks when the leading or
+trailing pipes of a given line are missing.
+
+=over 4
+
+=item B<strict> I<(default)>
+
+Leading and trailing pipes are always required for all the lines of the table.
+
+=item B<loose>
+
+Leading and trailing pipes can be omitted when the table is not interrupting a
+paragraph, if it has at least two columns, and if the delimiter row uses
+delimiters with more than one character.
+
+=item B<lenient>
+
+Leading and trailing pipes can be omitted when the table has at least two
+columns, and if the delimiter row uses delimiters with more than one character.
+
+=item B<lax>
+
+Leading and trailing pipes can always be omitted, except on the header line of
+a table, if it has a single column.
+
+=back
+
+=cut
+
+_make_option(
+  table_blocks_pipes_requirements => 'strict',
+  _enum(qw(strict loose lenient lax)), (
+    github => 'loose',
+  ));
+
+=pod
+
+=head2 Options controlling the rendering of top-level blocks
+
+=head3 B<code_blocks_info> I<(enum, default: language)>
+
+Fenced code blocks can have info strings on their opening lines (any text after
+the C<```> or C<~~~> fence). This option controls what is done with that text.
+
+The possible values are:
+
+=over 4
+
+=item B<ignored>
+
+The info text is ignored.
+
+=item B<language> I<(default)>
+
+=back
+
+=cut
+
+_make_option(code_blocks_info => 'language', _enum(qw(ignored language)));
+
+=pod
+
+=head3 B<table_blocks_have_cells_for_missing_data> I<(boolean, default: false)>
+
+Whether a table will have a cell in HTML for a missing cell in the markdown
+input.
+
+=cut
+
+_make_option(
+  table_blocks_have_cells_for_missing_data => 0,
+  _boolean, (
+    github => 1,
+  ));
+
+=pod
+
+=head2 Options controlling which inline elements are used
+
+=head3 B<use_extended_autolinks> I<(boolean, default: true)>
+
+Allow some links to be recognised when they appear in plain text. These links
+must start by C<http://>, C<https://>, or C<www.>.
+
+=cut
+
+_make_option(
+  use_extended_autolinks => 1,
+  _boolean, (
+    markdown => 0,
+    cmark => 0
+  ));
+
+=pod
+
+=head2 Options controlling the parsing of inline elements
+
+=head3 B<autolinks_regex> I<(regex string)>
 
 The regex that an autolink must match. This is for CommonMark autolinks, that
 are recognized only if they appear between brackets C<\<I<link>\>>.
@@ -315,7 +439,7 @@ _make_option(autolinks_regex => '(?i)[a-z][-+.a-z0-9]{1,31}:[^ <>[:cntrl:]]*', _
 
 =pod
 
-=head2 B<autolinks_email_regex> I<(regex string)>
+=head3 B<autolinks_email_regex> I<(regex string)>
 
 The regex that an autolink must match to be recognised as an email address. This
 allows to omit the C<mailto:> scheme that would be needed to be recognised as
@@ -333,7 +457,7 @@ _make_option(
 
 =pod
 
-=head2 B<inline_delimiters> I<(map)>
+=head3 B<inline_delimiters> I<(map)>
 
 TODO: document
 TODO: provide a way to add entries to this option without redefining it entirely
@@ -377,7 +501,7 @@ _make_option(
 
 =pod
 
-=head2 B<inline_delimiters_max_run_length> I<(map)>
+=head3 B<inline_delimiters_max_run_length> I<(map)>
 
 TODO: document
 
@@ -400,39 +524,7 @@ _make_option(
 
 =pod
 
-=head2 B<html_escaped_characters> I<(character_class)>
-
-This option specifies the list of characters that will be escaped in the HTML
-output. This should be a string containing the characters to escapes. Only the
-following characters are supported and can be passed in the string: C<">, C<'>,
-C<&>, C<E<lt>>, and C<E<gt>>.
-
-=cut
-
-sub _escaped_characters {
-  return sub {
-    return $_[0] if $_[0] =~ m/^["'&<>]*$/;
-    $ERRNO = "must only contains the following characters: \", ', &, <, and >";
-    return;
-  };
-}
-
-_make_option(html_escaped_characters => '"&<>', _escaped_characters, markdown => '&<');
-
-=pod
-
-=head2 B<html_escaped_code_characters> I<(character_class)>
-
-This option is similar to the C<html_escaped_characters> but is used in the
-context of C<E<lt>codeE<gt>> blocks.
-
-=cut
-
-_make_option(html_escaped_code_characters => '"&<>', _escaped_characters, markdown => '&<>');
-
-=pod
-
-=head2 B<allow_spaces_in_links> I<(enum, default: none)>
+=head3 B<allow_spaces_in_links> I<(enum, default: none)>
 
 This option controls whether spaces are allowed between the link text and the
 link destination (between the closing bracket of the text and the opening
@@ -460,7 +552,41 @@ _make_option(
 
 =pod
 
-=head2 B<force_final_new_line> I<(boolean, default: false)>
+=head2 Options controlling the rendering of inline elements
+
+=head3 B<html_escaped_characters> I<(character_class)>
+
+This option specifies the list of characters that will be escaped in the HTML
+output. This should be a string containing the characters to escapes. Only the
+following characters are supported and can be passed in the string: C<">, C<'>,
+C<&>, C<E<lt>>, and C<E<gt>>.
+
+=cut
+
+sub _escaped_characters {
+  return sub {
+    return $_[0] if $_[0] =~ m/^["'&<>]*$/;
+    $ERRNO = "must only contains the following characters: \", ', &, <, and >";
+    return;
+  };
+}
+
+_make_option(html_escaped_characters => '"&<>', _escaped_characters, markdown => '&<');
+
+=pod
+
+=head3 B<html_escaped_code_characters> I<(character_class)>
+
+This option is similar to the C<html_escaped_characters> but is used in the
+context of C<E<lt>codeE<gt>> blocks.
+
+=cut
+
+_make_option(html_escaped_code_characters => '"&<>', _escaped_characters, markdown => '&<>');
+
+=pod
+
+=head3 B<force_final_new_line> I<(boolean, default: false)>
 
 This option forces the processing of the input markdown to behave as if a final
 new line was always present. Note that, even without this option, a final new
@@ -473,7 +599,7 @@ _make_option(force_final_new_line => 0, _boolean, (markdown => 1));
 
 =pod
 
-=head2 B<preserve_tabs> I<(boolean, default: true)>
+=head3 B<preserve_tabs> I<(boolean, default: true)>
 
 When removing prefix spaces in front of some constructs (typically indented code
 blocks), pmarkdown will try to preserve tabs when they are used instead of
@@ -485,7 +611,7 @@ _make_option(preserve_tabs => 1, _boolean, (markdown => 0));
 
 =pod
 
-=head2 B<preserve_white_lines> I<(boolean, default: true)>
+=head3 B<preserve_white_lines> I<(boolean, default: true)>
 
 By default, pmarkdown will try to preserve lines that contains only whitespace
 when possible. If this option is set to false, such lines are treated as if they
@@ -497,7 +623,7 @@ _make_option(preserve_white_lines => 1, _boolean, (markdown => 0));
 
 =pod
 
-=head2 B<disallowed_html_tags> I<(world list)>
+=head3 B<disallowed_html_tags> I<(world list)>
 
 This option specifies a comma separated list (or, in Perl, an array reference)
 of name of HTML tags that will be disallowed in the output. If these tags appear
@@ -512,23 +638,7 @@ _make_option(
 
 =pod
 
-=head2 B<use_extended_autolinks> I<(boolean, default: true)>
-
-Allow some links to be recognised when they appear in plain text. These links
-must start by C<http://>, C<https://>, or C<www.>.
-
-=cut
-
-_make_option(
-  use_extended_autolinks => 1,
-  _boolean, (
-    markdown => 0,
-    cmark => 0
-  ));
-
-=pod
-
-=head2 B<default_extended_autolinks_scheme> I<(enum, default: https)>
+=head3 B<default_extended_autolinks_scheme> I<(enum, default: https)>
 
 Specify which scheme is added to the beginning of extended autolinks when none
 was present initially.
@@ -542,105 +652,20 @@ _make_option(
 
 =pod
 
-=head2 B<allow_task_list_markers> I<(enum, default: list)>
+=head2 Other options
 
-Specify whether task list markers (rendered as check boxes) are recognised in
-the input. The possible values are as follow:
+=head3 B<warn_for_unused_input> I<(boolean, default: true)>
 
-=over 4
-
-=item B<never>
-
-Task list marker are never recognised
-
-=item B<list> I<(default)>
-
-Task list markers are recognised only as the first element at the beginning of
-a list item.
-
-=item B<always>
-
-Task list markers are recognised at the beginning of any paragraphs, inside any
-type of block.
-
-=back
+In general, all user input is present in the output (possibly as uninterpreted
+text if it was not understood). But some valid Markdown construct results in
+parts of the input being ignored. By default C<pmarkdown> will emit a warning
+when such a construct is found. This option can disable these warnings.
 
 =cut
 
 _make_option(
-  allow_task_list_markers => 'list',
-  _enum(qw(never list always)), (
-    markdown => 'never',
-    cmark => 'never',
-  ));
-
-=pod
-
-=head2 B<table_blocks_can_interrupt_paragraph> I<(boolean, default: false)>
-
-Allow a table top level block to interrupt a paragraph.
-
-=cut
-
-_make_option(
-  table_blocks_can_interrupt_paragraph => 0,
-  _boolean, (
-    github => 1,
-  ));
-
-=pod
-
-=head2 B<table_blocks_have_cells_for_missing_data> I<(boolean, default: false)>
-
-Whether a table will have a cell in HTML for a missing cell in the markdown
-input.
-
-=cut
-
-_make_option(
-  table_blocks_have_cells_for_missing_data => 0,
-  _boolean, (
-    github => 1,
-  ));
-
-=pod
-
-=head2 B<table_blocks_pipes_requirements> I<(enum, default: strict)>
-
-Defines how strict is the parsing of table top level blocks when the leading or
-trailing pipes of a given line are missing.
-
-=over 4
-
-=item B<strict> I<(default)>
-
-Leading and trailing pipes are always required for all the lines of the table.
-
-=item B<loose>
-
-Leading and trailing pipes can be omitted when the table is not interrupting a
-paragraph, if it has at least two columns, and if the delimiter row uses
-delimiters with more than one character.
-
-=item B<lenient>
-
-Leading and trailing pipes can be omitted when the table has at least two
-columns, and if the delimiter row uses delimiters with more than one character.
-
-=item B<lax>
-
-Leading and trailing pipes can always be omitted, except on the header line of
-a table, if it has a single column.
-
-=back
-
-=cut
-
-_make_option(
-  table_blocks_pipes_requirements => 'strict',
-  _enum(qw(strict loose lenient lax)), (
-    github => 'loose',
-  ));
+  warn_for_unused_input => 1,
+  _boolean);
 
 =pod
 

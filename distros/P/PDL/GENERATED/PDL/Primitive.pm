@@ -2049,6 +2049,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 Seed random-number generator with a 64-bit int. Will generate seed data
 for a number of threads equal to the return-value of
 L<PDL::Core/online_cpus>.
+As of 2.062, the generator changed from Perl's generator to xoshiro256++
+(see L<https://prng.di.unimi.it/>).
 
 =for usage
 
@@ -2066,10 +2068,10 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2185 "primitive.pd"
+#line 2187 "primitive.pd"
 *srand = \&PDL::srand;
 sub PDL::srand { PDL::_srand_int($_[0] // PDL::Core::seed()) }
-#line 2073 "Primitive.pm"
+#line 2075 "Primitive.pm"
 
 *srand = \&PDL::srand;
 
@@ -2102,6 +2104,8 @@ a template.
 
 You can use the PDL function L</srand> to seed the random generator.
 If it has not been called yet, it will be with the current time.
+As of 2.062, the generator changed from Perl's generator to xoshiro256++
+(see L<https://prng.di.unimi.it/>).
 
 =for bad
 
@@ -2114,7 +2118,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2223 "primitive.pd"
+#line 2227 "primitive.pd"
 sub random { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->random : PDL->random(@_) }
 sub PDL::random {
    splice @_, 1, 0, double() if !ref($_[0]) and @_<=1;
@@ -2122,7 +2126,7 @@ sub PDL::random {
    PDL::_random_int($x);
    return $x;
 }
-#line 2126 "Primitive.pm"
+#line 2130 "Primitive.pm"
 
 
 =head2 randsym
@@ -2160,7 +2164,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2267 "primitive.pd"
+#line 2271 "primitive.pd"
 sub randsym { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->randsym : PDL->randsym(@_) }
 sub PDL::randsym {
    splice @_, 1, 0, double() if !ref($_[0]) and @_<=1;
@@ -2169,7 +2173,7 @@ sub PDL::randsym {
    return $x;
 }
 
-#line 2278 "primitive.pd"
+#line 2282 "primitive.pd"
 
 =head2 grandom
 
@@ -2201,7 +2205,7 @@ sub PDL::grandom {
    return $x;
 }
 
-#line 2317 "primitive.pd"
+#line 2321 "primitive.pd"
 
 =head2 vsearch
 
@@ -2347,7 +2351,7 @@ sub vsearch {
 }
 
 *PDL::vsearch = \&vsearch;
-#line 2351 "Primitive.pm"
+#line 2355 "Primitive.pm"
 
 
 =head2 vsearch_sample
@@ -2808,7 +2812,7 @@ needs major (?) work to handles bad values
 
 
 
-#line 2936 "primitive.pd"
+#line 2940 "primitive.pd"
 		sub PDL::interpolate {
 			my ($xi, $x, $y, $yi, $err) = @_;
 			croak "x must be real" if (ref($x) && ! $x->type->real);
@@ -2818,7 +2822,7 @@ needs major (?) work to handles bad values
 			PDL::_interpolate_int($xi, $x, $y, $yi, $err);
 			($yi, $err);
 		}
-#line 2822 "Primitive.pm"
+#line 2826 "Primitive.pm"
 
 *interpolate = \&PDL::interpolate;
 
@@ -2826,7 +2830,7 @@ needs major (?) work to handles bad values
 
 
 
-#line 3016 "primitive.pd"
+#line 3020 "primitive.pd"
 
 =head2 interpol
 
@@ -2862,7 +2866,7 @@ sub interpol ($$$;$) {
 } # sub: interpol()
 *PDL::interpol = \&interpol;
 
-#line 3054 "primitive.pd"
+#line 3058 "primitive.pd"
 
 =head2 interpND
 
@@ -3105,7 +3109,7 @@ sub PDL::interpND {
  }
 }
 
-#line 3303 "primitive.pd"
+#line 3307 "primitive.pd"
 
 =head2 one2nd
 
@@ -3153,7 +3157,7 @@ sub PDL::one2nd {
   }
   return @index;
 }
-#line 3157 "Primitive.pm"
+#line 3161 "Primitive.pm"
 
 
 =head2 which
@@ -3215,7 +3219,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 3434 "primitive.pd"
+#line 3438 "primitive.pd"
    sub which { my ($this,$out) = @_;
 		$this = $this->flat;
 		$out //= $this->nullcreate;
@@ -3224,7 +3228,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 		$lastoutmax ? $out->slice('0:'.($lastoutmax-1))->sever : empty(indx);
    }
    *PDL::which = \&which;
-#line 3228 "Primitive.pm"
+#line 3232 "Primitive.pm"
 
 *which = \&PDL::which;
 
@@ -3269,7 +3273,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 3451 "primitive.pd"
+#line 3455 "primitive.pd"
    sub which_both { my ($this,$outi,$outni) = @_;
 		$this = $this->flat;
 		$outi //= $this->nullcreate;
@@ -3282,7 +3286,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 		($outi, $lastoutnmax ? $outni->slice('0:'.($lastoutnmax-1))->sever : empty(indx));
    }
    *PDL::which_both = \&which_both;
-#line 3286 "Primitive.pm"
+#line 3290 "Primitive.pm"
 
 *which_both = \&PDL::which_both;
 
@@ -3340,7 +3344,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 3527 "primitive.pd"
+#line 3531 "primitive.pd"
 
 =head2 where
 
@@ -3394,7 +3398,7 @@ sub PDL::where {
 }
 *where = \&PDL::where;
 
-#line 3583 "primitive.pd"
+#line 3587 "primitive.pd"
 
 =head2 where_both
 
@@ -3431,7 +3435,7 @@ sub PDL::where_both {
 }
 *where_both = \&PDL::where_both;
 
-#line 3621 "primitive.pd"
+#line 3625 "primitive.pd"
 
 =head2 whereND
 
@@ -3514,7 +3518,7 @@ sub PDL::whereND :lvalue {
 }
 *whereND = \&PDL::whereND;
 
-#line 3706 "primitive.pd"
+#line 3710 "primitive.pd"
 
 =head2 whichND
 
@@ -3617,7 +3621,7 @@ sub PDL::whichND {
   return $ind;
 }
 
-#line 3814 "primitive.pd"
+#line 3818 "primitive.pd"
 
 =head2 setops
 
@@ -3798,7 +3802,7 @@ sub PDL::setops {
 
 }
 
-#line 3997 "primitive.pd"
+#line 4001 "primitive.pd"
 
 =head2 intersect
 
@@ -3834,7 +3838,7 @@ sub PDL::intersect {
 
 }
 
-#line 4033 "primitive.pd"
+#line 4037 "primitive.pd"
 
 =head1 AUTHOR
 
@@ -3851,7 +3855,7 @@ the copyright notice should be included in the file.
 Updated for CPAN viewing compatibility by David Mertens.
 
 =cut
-#line 3855 "Primitive.pm"
+#line 3859 "Primitive.pm"
 
 # Exit with OK status
 

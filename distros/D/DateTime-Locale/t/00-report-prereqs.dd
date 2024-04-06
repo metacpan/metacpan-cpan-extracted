@@ -16,6 +16,11 @@ do { my $x = {
                                       'FindBin' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
+                                      'JSON::MaybeXS' => '0',
+                                      'List::AllUtils' => '0',
+                                      'Locale::Codes::Language' => '0',
+                                      'Moose' => '0',
+                                      'MooseX::Getopt::Dashes' => '0',
                                       'Parse::PMFile' => '0',
                                       'Path::Tiny' => '0',
                                       'Path::Tiny::Rule' => '0',
@@ -40,6 +45,7 @@ do { my $x = {
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.12',
                                       'Test::Version' => '2.05',
+                                      'Text::Template' => '0',
                                       'utf8' => '0'
                                     }
                     },

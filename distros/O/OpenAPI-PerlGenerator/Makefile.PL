@@ -51,6 +51,8 @@ my %module = (
 
     PREREQ_PM => {
         'Carp'                => 0,
+        'Encode'              => 0,
+        'experimental'        => '0.031',
         'Exporter'            => 5, # for 'import'
         'File::Basename'      => 0,
         'File::Path'          => 0,
@@ -63,15 +65,16 @@ my %module = (
         'Moo'                 => 2,
         'OpenAPI::Modern'     => 0,
         'Perl::Tidy'          => 0,
-        'YAML::PP'            => 0,
-        'experimental'        => 0,
+        'PerlX::Maybe'        => 0,
+        'Markdown::Pod'       => 0,
         'warnings'            => 0,
+        'YAML::PP'            => 0,
     },
     TEST_REQUIRES => {
         'Test2::V0'    => 0,
         'HTTP::Request::Diff' => 0,
         'Future::Queue' => 0,
-        'Future::Mojo' => '1.03',
+        'Future::Mojo' => '1.003',
         'Mojolicious' => '1.03',
     },
 

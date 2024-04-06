@@ -29,6 +29,7 @@
             "Mojo::JSON" : "0",
             "Mojolicious" : "9",
             "Moo" : "2",
+            "PerlX::Maybe" : "0",
             "experimental" : "0.031",
             "stable" : "0.031"
          }
@@ -64,7 +65,7 @@
          "web" : "https://github.com/Corion/AI-Ollama-Client"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

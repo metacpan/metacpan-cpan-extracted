@@ -13,10 +13,11 @@ perlcriticrc
 perltidyrc
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
-t/01_deserialize.t
-t/02_reserved.t
+t/01_load.t
+t/02_deserialize.t
 t/03_module_args.t
 t/04_children.t
+t/05_reserved.t
 t/10_from_default.t
 t/11_from_env.t
 t/12_from_file.t
@@ -24,6 +25,7 @@ t/20_typechecking.t
 t/30_on_access_hooks.t
 t/31_on_load_hooks.t
 t/32_wildcard_hooks.t
+t/40_to_hash.t
 t/conf/json/config.json
 t/conf/json/definition.json
 t/conf/perl/config.conf

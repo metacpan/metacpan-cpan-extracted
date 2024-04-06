@@ -65,20 +65,48 @@ print OUT <<'EOF';
             break; \
         } \
     } \
-    if (sv_derived_from(sv2, "PDL")) { \
-        pdl *it = PDL_CORE_(SvPDLV)(sv2); \
-        outany = PDL_CORE_(at0)(it); \
-        if (outany.type < 0) croak("Position out of range"); \
+    if (SvROK(sv2)) { \
+        if (sv_derived_from(sv2, "PDL")) { \
+            pdl *it = PDL_CORE_(SvPDLV)(sv2); \
+            outany = PDL_CORE_(at0)(it); \
+            if (outany.type < 0) PDL_CORE_(pdl_barf)("Position out of range"); \
+            break; \
+        } \
+        if (sv_derived_from(sv2, "Math::Complex")) { \
+            ANYVAL_FROM_MCOMPLEX(outany, sv2); \
+            break; \
+        } \
+        PDL_CORE_(pdl_barf)("Can't convert ref '%s' to Anyval", sv_reftype(SvRV(sv2), 1)); \
     } else if (!SvIOK(sv2)) { /* Perl Double (e.g. 2.0) */ \
         NV tmp_NV = SvNV(sv2); \
         int datatype = forced_type >=0 ? forced_type : _pdl_whichdatatype_double(tmp_NV); \
         ANYVAL_FROM_CTYPE(outany, datatype, tmp_NV); \
     } else { /* Perl Int (e.g. 2) */ \
         IV tmp_IV = SvIV(sv2); \
-        int datatype = forced_type >=0 ? forced_type : _pdl_whichdatatype(tmp_IV); \
+        int datatype = forced_type >=0 ? forced_type : _pdl_whichdatatype_int(tmp_IV); \
         ANYVAL_FROM_CTYPE(outany, datatype, tmp_IV); \
     } \
 } while (0)
+
+/* only to CD, same as whichdatatype_double only D. only if know is M:C */
+#define ANYVAL_FROM_MCOMPLEX(outany,insv) do { \
+    dSP; \
+    int i; \
+    double vals[2]; \
+    char *meths[] = { "Re", "Im" }; \
+    ENTER; SAVETMPS; \
+    for (i = 0; i < 2; i++) { \
+      PUSHMARK(sp); XPUSHs(insv); PUTBACK; \
+      int count = perl_call_method(meths[i], G_SCALAR); \
+      SPAGAIN; \
+      if (count != 1) PDL_CORE_(pdl_barf)("Failed Math::Complex method '%s'", meths[i]); \
+      vals[i] = (double)POPn; \
+      PUTBACK; \
+    } \
+    FREETMPS; LEAVE; \
+    outany.type = PDL_CD; \
+    outany.value.C = (PDL_CDouble)(vals[0] + I * vals[1]); \
+  } while (0)
 
 #define ANYVAL_TO_SV(outsv,inany) do { switch (inany.type) { \
 EOF
@@ -103,20 +131,19 @@ print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
 print OUT <<'EOF';
 /* Check minimum datatype required to represent number */
 #define PDL_TESTTYPE(sym, ctype, v) {ctype foo = v; if (v == foo) return sym;}
-static inline int _pdl_whichdatatype (IV iv) {
-#define X(sym, ctype, ...) \
-  PDL_TESTTYPE(sym, ctype, iv)
-   PDL_TYPELIST_ALL(X)
+static inline int _pdl_whichdatatype_int(IV iv) {
+#define X(sym, ctype, ...) PDL_TESTTYPE(sym, ctype, iv)
+  PDL_TYPELIST_SIGNED(X) /* try all signed first */
+  PDL_TYPELIST_UNSIGNED(X) /* only gets here if positive and too big */
 #undef X
-        croak("Something's gone wrong: %lld cannot be converted by whichdatatype", (long long)iv);
+  croak("Something's gone wrong: %lld cannot be converted by whichdatatype", (long long)iv);
 }
 /* Check minimum, at least double, datatype required to represent number */
-static inline int _pdl_whichdatatype_double (NV nv) {
-        PDL_TESTTYPE(PDL_D,PDL_Double, nv)
-        PDL_TESTTYPE(PDL_D,PDL_LDouble, nv)
+static inline int _pdl_whichdatatype_double(NV nv) {
+  PDL_TESTTYPE(PDL_D,PDL_Double, nv)
+  PDL_TESTTYPE(PDL_D,PDL_LDouble, nv)
 #undef PDL_TESTTYPE
-        /* Default return type PDL_Double */
-        return PDL_D;
+  return PDL_D; /* handles NaN */
 }
 
 /* __PDLPERL_H */

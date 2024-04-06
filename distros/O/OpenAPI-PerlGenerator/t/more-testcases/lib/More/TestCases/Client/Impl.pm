@@ -85,8 +85,6 @@ sub _build_withCookie_request( $self, %options ) {
         $method => $url,
         {
         }
-        # XXX Need to fill the body
-        # => $body,
     );
 
     return $tx
@@ -163,8 +161,6 @@ sub _build_withHeader_request( $self, %options ) {
         {
                    'X-token' => delete $options{'X-token'}
         }
-        # XXX Need to fill the body
-        # => $body,
     );
 
     return $tx

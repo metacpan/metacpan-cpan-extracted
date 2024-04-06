@@ -118,7 +118,9 @@ set through B<--option>.
 =item B<default>
 
 The default mode if no other mode is specified. This mode uses the default value
-for all the options (as per their documentation).
+for all the options (as per their documentation). The default syntax is
+documented in the GitHub repository of the project:
+L<https://github.com/mkende/pmarkdown/blob/main/README.md>
 
 Note that, in practice, setting the mode to B<default> will I<erase> the mode
 currently set, which means that no warning will be emitted if this mode is

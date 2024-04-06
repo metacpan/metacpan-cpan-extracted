@@ -66,10 +66,10 @@ another application.
 These routines are cryptically named (blame FORTRAN), 
 beginning with 'ch', and accept either float or double ndarrays. 
 
-Most of the routines require an integer parameter called C<check>;
-if set to 0, then no checks on the validity of the input data are
+Most of the routines require an integer parameter called C<skip>;
+if set to 1, then no checks on the validity of the input data are
 made, otherwise these checks are made.
-The value of C<check> can be set to 0 if a routine
+The value of C<skip> can be set to 1 if a routine
 such as L</chim> has already been successfully called.
 
 =over 4
@@ -281,7 +281,7 @@ L</PDL::Slatec::fft>.
 
 =cut
 
-#line 423 "slatec.pd"
+#line 429 "slatec.pd"
 use PDL::Core;
 use PDL::Basic;
 use PDL::Primitive;
@@ -318,11 +318,11 @@ sub PDL::matinv {
 		unless( @dims >= 2 && $dims[0] == $dims[1] );
   
 	$m = $m->copy(); # Make sure we don't overwrite :(
-	gefa($m,(my $ipvt=null),(my $info=null));
+	my ($ipvt,$info) = gefa($m);
 	if(sum($info) > 0) {
 		barf("Uninvertible matrix given to inv: $m\n");
 	}
-	gedi($m,$ipvt,pdl(0,0),null,1);
+	gedi($m,$ipvt,1);
 	$m;
 }
 
@@ -334,32 +334,24 @@ sub PDL::detslatec {
 	if(sum($info) > 0) {
 		barf("Uninvertible matrix given to inv: $m\n");
 	}
-	gedi($m,$ipvt,my $det=null,null,10);
+	my ($det) = gedi($m,$ipvt,10);
 	return $det->slice('(0)')*10**$det->slice('(1)');
 }
 
 sub prepfft {
 	my($n) = @_;
-	my $tmp = PDL->zeroes(float(),$n*3+15);
-	$n = pdl $n;
-	ezffti($n,$tmp);
-	return $tmp;
+	my $ifac = ezffti($n,my $wsave = PDL->zeroes(float(),$n*3));
+	return ($wsave, $ifac);
 }
 
 sub fft (;@) {
-	my($v) = @_;
-	my $ws = prepfft($v->getdim(0));
-	ezfftf($v,(my $az = PDL->null), (my $x = PDL->null),
-		  (my $y = PDL->null), $ws);
-	return ($az,$x,$y);
+	my ($v) = @_;
+	ezfftf($v, prepfft($v->getdim(0)));
 }
 
 sub rfft {
-	my($az,$x,$y) = @_;
-	my $ws = prepfft($x->getdim(0));
-	my $v = $x->copy();
-	ezfftb($v,$az,$x,$y,$ws);
-	return $v;
+	my ($az,$x,$y) = @_;
+	ezfftb($az,$x,$y,prepfft($x->getdim(0)));
 }
 
 # polynomial fitting routines
@@ -434,14 +426,14 @@ sub PDL::polyvalue {
 
 }
                                                                               
-#line 438 "Slatec.pm"
+#line 430 "Slatec.pm"
 
 
 =head2 svdc
 
 =for sig
 
-  Signature: (x(n,p);[o]s(p);[o]e(p);[o]u(n,p);[o]v(p,p);[o]work(n);longlong job();longlong [o]info())
+  Signature: (x(n,p);[o]s(p);[o]e(p);[o]u(n,p);[o]v(p,p);[t]work(n);longlong job();longlong [o]info())
 
 =for ref
 
@@ -468,7 +460,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,n);rcond();[o]z(n);longlong [o]info())
+  Signature: ([io]a(n,n);[o]rcond();[o]z(n);longlong [o]info())
 
 Factor a real symmetric positive definite matrix
 and estimate the condition number of the matrix.
@@ -520,7 +512,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,n);longlong [o]ipvt(n);longlong [o]info())
+  Signature: ([io]a(n,n);longlong [o]ipvt(n);longlong [o]info())
 
 =for ref
 
@@ -547,7 +539,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,n);[o]det(two=2);longlong job())
+  Signature: ([io]a(n,n);[o]det(two=2);longlong job())
 
 Compute the determinant and inverse of a certain real
 symmetric positive definite matrix using the factors
@@ -574,7 +566,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,n);longlong [o]ipvt(n);[o]det(two=2);[o]work(n);longlong job())
+  Signature: ([io]a(n,n);longlong ipvt(n);[o]det(two=2);[t]work(n);longlong job())
 
 Compute the determinant and inverse of a matrix using the
 factors computed by L</geco> or L</gefa>.
@@ -600,7 +592,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(lda,n);longlong ipvt(n);b(n);longlong job())
+  Signature: (a(lda,n);longlong ipvt(n);[io]b(n);longlong job())
 
 Solve the real system C<A*X=B> or C<TRANS(A)*X=B> using the
 factors computed by L</geco> or L</gefa>.
@@ -654,11 +646,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (longlong n();[o]wsave(foo))
+  Signature: (longlong n();[io]wsave(foo);longlong [o]ifac(ni=15))
 
-Subroutine ezffti initializes the work array C<wsave()>
-which is used in both L</ezfftf> and 
-L</ezfftb>.  
+Subroutine ezffti initializes the work array C<wsave(3n or more)>
+and C<ifac()>
+which is used in both L</ezfftf> and L</ezfftb>.
 The prime factorization
 of C<n> together with a tabulation of the trigonometric functions
 are computed and stored in C<wsave()>.
@@ -684,7 +676,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (r(n);[o]azero();[o]a(n);[o]b(n);wsave(foo))
+  Signature: (r(n);[o]azero();[o]a(n);[o]b(n);wsave(foo);longlong ifac(ni=15))
 
 =for ref
 
@@ -709,7 +701,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([o]r(n);azero();a(n);b(n);wsave(foo))
+  Signature: ([o]r(n);azero();a(n);b(n);wsave(foo);longlong ifac(ni=15))
 
 =for ref
 
@@ -1103,7 +1095,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n);f(n);d(n);longlong check();xe(ne);[o]fe(ne);[o]de(ne);longlong [o]ierr())
+  Signature: (x(n);f(n);d(n);int [io]skip();xe(ne);[o]fe(ne);[o]de(ne);longlong [o]ierr())
 
 =for ref
 
@@ -1113,7 +1105,7 @@ Given a piecewise cubic Hermite function - such as from
 L</chim> - evaluate the function (C<$fe>) and 
 derivative (C<$de>) at a set of points (C<$xe>).
 If function values alone are required, use L</chfe>.
-Set C<check> to 0 to skip checks on the input data.
+Set C<skip> to 0 to skip checks on the input data.
 
 Error status returned by C<$ierr>:
 
@@ -1168,7 +1160,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n);f(n);d(n);longlong check();xe(ne);[o]fe(ne);longlong [o]ierr())
+  Signature: (x(n);f(n);d(n);int [io]skip();xe(ne);[o]fe(ne);longlong [o]ierr())
 
 =for ref
 
@@ -1178,7 +1170,7 @@ Given a piecewise cubic Hermite function - such as from
 L</chim> - evaluate the function (C<$fe>) at
 a set of points (C<$xe>).
 If derivative values are also required, use L</chfd>.
-Set C<check> to 0 to skip checks on the input data.
+Set C<skip> to 0 to skip checks on the input data.
 
 Error status returned by C<$ierr>:
 
@@ -1228,7 +1220,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n);f(n);d(n);longlong check();la();lb();[o]ans();longlong [o]ierr())
+  Signature: (x(n);f(n);d(n);int [io]skip();la();lb();[o]ans();longlong [o]ierr())
 
 =for ref
 
@@ -1239,7 +1231,7 @@ cubic Hermite function over an arbitrary interval,
 given by C<[$la,$lb]>. C<$d> should contain the derivative values, computed by L</chim>.
 See L</chid> if the integration limits are
 data points.
-Set C<check> to 0 to skip checks on the input data.
+Set C<skip> to 0 to skip checks on the input data.
 
 The values of C<$la> and C<$lb> do not have
 to lie within C<$x>, although the resulting integral
@@ -1301,7 +1293,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n);f(n);d(n);longlong check();longlong ia();longlong ib();[o]ans();longlong [o]ierr())
+  Signature: (x(n);f(n);d(n);int [io]skip();longlong ia();longlong ib();[o]ans();longlong [o]ierr())
 
 =for ref
 
@@ -1317,7 +1309,7 @@ limits.
 Although using a fortran routine, the values of
 C<$ia> and C<$ib> are zero offset.
 C<$d> should contain the derivative values, computed by L</chim>.
-Set C<check> to 0 to skip checks on the input data.
+Set C<skip> to 0 to skip checks on the input data.
 
 Error status returned by C<$ierr>:
 
@@ -1362,7 +1354,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n);f(n);d(n);longlong check();longlong [o]ismon(n);longlong [o]ierr())
+  Signature: (x(n);f(n);d(n);int [io]skip();longlong [o]ismon(n);longlong [o]ierr())
 
 =for ref
 
@@ -1370,7 +1362,7 @@ Check the given piecewise cubic Hermite function for monotonicity.
 
 The outout ndarray C<$ismon> indicates over
 which intervals the function is monotonic.
-Set C<check> to 0 to skip checks on the input data.
+Set C<skip> to 0 to skip checks on the input data.
 
 For the data interval C<[x(i),x(i+1)]>, the
 values of C<ismon(i)> can be:
@@ -1582,7 +1574,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 1586 "Slatec.pm"
+#line 1578 "Slatec.pm"
 
 # Exit with OK status
 

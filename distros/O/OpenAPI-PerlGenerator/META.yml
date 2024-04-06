@@ -4,7 +4,7 @@ author:
   - 'Max Maischein <corion@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Future::Mojo: '1.03'
+  Future::Mojo: '1.003'
   Future::Queue: '0'
   HTTP::Request::Diff: '0'
   Mojolicious: '1.03'
@@ -24,26 +24,29 @@ no_index:
     - inc
 requires:
   Carp: '0'
+  Encode: '0'
   Exporter: '5'
   File::Basename: '0'
   File::Path: '0'
   Getopt::Long: '0'
   HTTP::Request::Diff: '0'
   JSON::Pointer: '0'
+  Markdown::Pod: '0'
   Mojo::File: '0'
   Mojo::Template: '0'
   Mojolicious: '0'
   Moo: '2'
   OpenAPI::Modern: '0'
   Perl::Tidy: '0'
+  PerlX::Maybe: '0'
   YAML::PP: '0'
-  experimental: '0'
+  experimental: '0.031'
   perl: '5.020'
   warnings: '0'
 resources:
   bugtracker: https://github.com/Corion/OpenAPI-PerlGenerator/issues
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/OpenAPI-PerlGenerator.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

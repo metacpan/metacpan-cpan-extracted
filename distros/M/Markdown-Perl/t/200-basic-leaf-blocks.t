@@ -19,11 +19,11 @@ is(run('## '), "<h2></h2>\n", 'atx_heading3');
 is(run('#### ###'), "<h4></h4>\n", 'atx_heading4');
 is(run('## other   '), "<h2>other</h2>\n", 'atx_heading5');
 
-is(run("abc\n===\n"), "<h1>abc</h1>\n", 'setext_heading1');
-is(run("abc\ndef\n===\n"), "<h1>abc\ndef</h1>\n", 'setext_heading2');
-is(run("abc\n---\n"), "<h2>abc</h2>\n", 'setext_heading3');
-is(run("   abc\n===\n"), "<h1>abc</h1>\n", 'setext_heading4');
-is(run("abc\n   =\n"), "<h1>abc</h1>\n", 'setext_heading5');
+is(run("abc\n===\n", use_setext_headings => 1), "<h1>abc</h1>\n", 'setext_heading1');
+is(run("abc\ndef\n===\n", use_setext_headings => 1), "<h1>abc\ndef</h1>\n", 'setext_heading2');
+is(run("abc\n---\n", use_setext_headings => 1), "<h2>abc</h2>\n", 'setext_heading3');
+is(run("   abc\n===\n", use_setext_headings => 1), "<h1>abc</h1>\n", 'setext_heading4');
+is(run("abc\n   =\n", use_setext_headings => 1), "<h1>abc</h1>\n", 'setext_heading5');
 
 is(run('    test'), "<pre><code>test</code></pre>\n", 'indented_code1');
 is(run("    test\n      next\n"), "<pre><code>test\n  next\n</code></pre>\n", 'indented_code2');

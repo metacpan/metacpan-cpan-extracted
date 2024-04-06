@@ -1,5 +1,15 @@
 Revision history for perl distribution Config::Structured
 
+3.01       2024-04-05T12:32:18-05:00
+  - declare correct min perl version
+  - provide more/better exaples in SYNOPSIS docs
+
+3.00       2024-04-05T09:42:33-05:00
+  - complete rewrite using Class::Prototyped to eliminate Mojolicious dependency
+  - add get_node and to_hash methods for config introspection
+  - remove __get_child_node_names method (redundant with get_node)
+  - remove static instance registration methods (curbing scope creep)
+
 2.006      2024-02-23T09:52:29-04:00
   - restore package version declaration
 
@@ -21,7 +31,7 @@ Revision history for perl distribution Config::Structured
 2.001      2020-03-25T14:15:00-05:00
   - Minor improvements
 
-2.000      2020-13-06T10:57:00-04:00
+2.000      2020-06-13T10:57:00-04:00
   - Added typechecking
   - Added tests
   - Simplified prereqs

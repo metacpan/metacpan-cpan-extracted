@@ -51,12 +51,18 @@ sub makelister {
 }
 my @generics = makeg(sub {1});
 my @generics_real = makeg(sub {$_[0]->real});
+my @generics_floatreal = makeg(sub {$_[0]->real && !$_[0]->integer});
 my @generics_complex = makeg(sub {!$_[0]->real});
+my @generics_signed = makeg(sub {$_[0]->integer && !$_[0]->unsigned});
+my @generics_unsigned = makeg(sub {$_[0]->unsigned});
 print OUT makelister('ALL', 0, @generics);
 # extra as macro gets expanded twice, gets painted blue
 print OUT makelister('ALL', 1, @generics);
 print OUT makelister('REAL', 0, @generics_real);
+print OUT makelister('FLOATREAL', 0, @generics_floatreal);
 print OUT makelister('COMPLEX', 0, @generics_complex);
+print OUT makelister('SIGNED', 0, @generics_signed);
+print OUT makelister('UNSIGNED', 0, @generics_unsigned);
 
 print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
 print OUT <<'EOF';
@@ -528,7 +534,7 @@ struct pdl {
    void *datasv;        /* Pointer to SV containing data. We own one inc of refcnt */
    void *data;            /* Pointer to actual data (in SV), or NULL if we have no data      */
    PDL_Anyval badvalue; /* BAD value is stored as a PDL_Anyval for portability */
-   int has_badvalue;     /* whether this pdl has non-default badval */
+   int has_badvalue;     /* whether this pdl has non-default badval CORE21 make into state flag */
    PDL_Indx nvals; /* Real number of elements (not quite nelem in case of dummy) */
    PDL_Indx nbytes; /* number of bytes allocated in data */
    pdl_datatypes datatype; /* One of the usual suspects (PDL_L, PDL_D, etc.) */

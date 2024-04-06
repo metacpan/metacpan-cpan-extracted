@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Test::mysqld:
     file: lib/Test/mysqld.pm
-    version: '1.0013'
+    version: '1.0020'
 requires:
   Class::Accessor::Lite: '0'
   DBD::mysql: '0'
@@ -38,8 +38,8 @@ requires:
 resources:
   bugtracker: https://github.com/kazuho/p5-test-mysqld/issues
   homepage: https://github.com/kazuho/p5-test-mysqld
-  repository: git://github.com/kazuho/p5-test-mysqld.git
-version: '1.0013'
+  repository: https://github.com/kazuho/p5-test-mysqld.git
+version: '1.0020'
 x_authority: cpan:KAZUHO
 x_contributors:
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
@@ -52,7 +52,11 @@ x_contributors:
   - 'Kazuho Oku <kazuho@li1.kazuhooku.com>'
   - 'Kazuho Oku <kazuhooku@gmail.com>'
   - 'Masayuki Matsuki <y.songmu@gmail.com>'
+  - 'Matthew Horsfall <wolfsage@gmail.com>'
   - 'NAKAGAWA Masaki <masaki.nakagawa@gmail.com>'
+  - 'Naoto Nakamura <naoto.nakamura@showroom.co.jp>'
+  - 'Petr Písař <ppisar@redhat.com>'
+  - 'Yoshikazu Sawa <883514+yoshikazusawa@users.noreply.github.com>'
   - 'Yusuke Watase <ywatase@gmail.com>'
   - 'Zhenjun Wang <zjwang0414@gmail.com>'
   - 'hiratara <hiratara@cpan.org>'

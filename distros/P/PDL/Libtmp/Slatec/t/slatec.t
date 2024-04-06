@@ -30,8 +30,11 @@ $mat = pdl [2,3],[4,5];
 
 my $inv = matinv($mat);
 
-inner($mat->dummy(2), $inv->transpose->dummy(1), my $uni=null);
-ok(tapprox($uni,pdl[1,0],[0,1]));
+my $uni=scalar $mat x $inv;
+ok(tapprox($uni,identity(2)));
+
+eval {matinv(identity(2)->dummy(-1,2))};
+is $@, '', 'matinv can broadcast';
 
 my $det = $mat->det;
 my $deti = $inv->det;
@@ -210,14 +213,14 @@ $f = $x * $x;
 ( $d, $err ) = chim($x, $f);
 
 $ans = pdl( 9.0**3, (8.0**3-1.0**3) ) / 3.0;
-( my $int, $err ) = chia($x, $f, $d, 1, pdl(0.0,1.0), pdl(9.0,8.0));
+( my $int, $err ) = chia($x, $f, $d, my $skip=zeroes(2), pdl(0.0,1.0), pdl(9.0,8.0));
 ok(all($err == 0));
 ok(all( abs($int-$ans) < 0.04 ) );
 
 my $hi = pdl( $x->at(9), $x->at(7) );
 my $lo = pdl( $x->at(0), $x->at(1) );
 $ans = ($hi**3 - $lo**3) / 3;
-( $int, $err ) = chid( $x, $f, $d, 1, pdl(0,1), pdl(9,7) );
+( $int, $err ) = chid( $x, $f, $d, $skip=zeroes(2), pdl(0,1), pdl(9,7) );
 ok(all($err == 0));
 ok(all( abs($int-$ans) < 0.06 ) );
 ## print STDERR "int=$int; ans=$ans; int-ans=".($int-$ans)."\n";
@@ -246,5 +249,20 @@ gesl($lu, $ipiv, $x=$B->transpose->copy, 1); # 1 = do transpose because Fortran
 $x = $x->inplace->transpose;
 my $got = $A x $x;
 ok tapprox $got, $B or diag "got: $got";
+
+{
+my $pa = pdl(float,1,-1,1,-1); # even number
+my ($az, $x, $y) = PDL::Slatec::fft($pa);
+ok all approx $az, 0;
+ok all approx $x, pdl "[0 1 0 0]";
+ok all approx $y, pdl "[0 0 0 0]";
+ok all approx PDL::Slatec::rfft($az, $x, $y), $pa;
+$pa = pdl(float,1,-1,1,-1,1); # odd number
+($az, $x, $y) = PDL::Slatec::fft($pa);
+ok all approx $az, 0.2;
+ok all approx $x, pdl "[0.4 0.4 0 0 0]";
+ok all approx $y, pdl "[-0.2906170 -1.231073 0 0 0]";
+ok all approx PDL::Slatec::rfft($az, $x, $y), $pa;
+}
 
 done_testing;

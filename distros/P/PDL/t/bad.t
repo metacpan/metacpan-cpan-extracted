@@ -501,7 +501,7 @@ subtest "Issue example code" => sub {
 	ok scalar(@warnings), 'bad gave warnings';
 };
 
-subtest "Badvalue set on 0-dim PDL + comparision operators" => sub {
+subtest "Badvalue set on 0-dim PDL + comparison operators" => sub {
 	my $val = 2;
 	my $badval_sclr = 5;
 	my $p_val = pdl($val);
@@ -700,6 +700,16 @@ subtest "locf" => sub {
   my $withbad = pdl '[BAD 1 BAD 3 BAD 5]';
   my $locf = $withbad->locf;
   is $locf."", '[0 1 1 3 3 5]', 'locf worked';
+};
+
+subtest "badvalues for native complex" => sub {
+  my $pdl = pdl '1+i';
+  $pdl->badflag(1);
+  $pdl->badvalue($pdl);
+  is "$pdl", "BAD", 'set badvalue with complex ndarray';
+  $pdl->badvalue($pdl->sclr);
+  is "$pdl", "BAD", 'set badvalue with complex Perl scalar'
+    or diag "badvalue:", $pdl->badvalue->info, "=", $pdl->badvalue;
 };
 
 done_testing;

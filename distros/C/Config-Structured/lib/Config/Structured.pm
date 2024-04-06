@@ -1,5 +1,5 @@
-package Config::Structured 2.006;
-use v5.22;
+package Config::Structured 3.01;
+use v5.26;
 use warnings;
 
 # ABSTRACT: Provides generalized and structured configuration value access
@@ -19,19 +19,23 @@ Basic usage:
   my $conf = Config::Structured->new(
     structure => { 
       db => {
-        host     => {
+        dsn     => {
           isa         => 'Str',
-          default     => 'localhost',
-          description => 'the database server hostname',
+          default     => '',
+          description => 'Data Source Name for connecting to the database',
+          url         => "https://en.wikipedia.org/wiki/Data_source_name",
+          examples    => ["dbi:SQLite:dbname=:memory:", "dbi:mysql:host=localhost;port=3306;database=prod_myapp"]
         },
         username => {
           isa         => 'Str',
           default     => 'dbuser',
-          description => 'the database user's username',
+          description => "the database user's username",
         },
         password => {
           isa         => 'Str',
-          description => 'the database user's password',
+          description => "the database user's password",
+          sensitive   => 1,
+          notes       => "Often ref'd via file or ENV for security"
         },
       }
     },
@@ -54,17 +58,19 @@ Basic usage:
   # assuming that the hostname value has been set in the DB_HOSTNAME env var
   say $conf->db->host; # prod_db_1.mydomain.com
   # assuming that the password value has been stored in /run/secrets/db_password
-  say $conf->db->password(); # *mD9ua&ZSVzEeWkm93bmQzG
+  say $conf->db->password(1); # *mD9ua&ZSVzEeWkm93bmQzG
 
 Hooks example showing how to ensure config directories exist prior to first 
 use:
+
+  use File::Path qw(make_path);
 
   my $conf = Config::Structured->new(
     ...
     hooks => {
       '/paths/*' => {
         on_load => sub($node,$value) {
-          Mojo::File->new($value)->make_path
+          make_path($value)
         }
       }
     }
@@ -72,391 +78,444 @@ use:
 
 =head1 DESCRIPTION
 
-L<Config::Structured> provides a structured method of accessing configuration values
+L<Config::Structured> is a configuration value manager and accessor. Its design
+is based on the premise of predefining a structure (which is essentially a schema
+plus some metadata) to which the configuration must adhere. This has the effect
+of ensuring that when the application accesses its configuration, it has confidence
+that the values are of appopriate types, defaults are declared in a consistent
+manner, and new configuration nodes cannot be added ad hoc (i.e., without being
+declared within the structure).
 
-This is predicated on the use of a configuration C<structure> (required), This structure
-provides a hierarchical structure of configuration branches and leaves. Each branch becomes
-a L<Config::Structured> method which returns a new L<Config::Structured> instance rooted at
-that node, while each leaf becomes a method which returns the configuration value.
-
-The configuration value is normally provided in the C<config> hash. However, a C<config> node
-for a non-Hash value can be a hash containing the "source" and "ref" keys. This permits sourcing
-the config value from a file (when source="file") whose filesystem location is given in the "ref"
-value, or an environment variable (when source="env") whose name is given in the "ref" value.
-
-I<Structure Leaf Nodes> are required to include an "isa" key, whose value is a type 
-(see L<Moose::Util::TypeConstraints>). If typechecking is not required, use isa => 'Any'.
-There are a few other keys that L<Config::Structured> respects in a leaf node:
+A configuration  structure is a hierarchical system of nodes. Nodes may be 
+branches (containing only other nodes) or leaves (identified by their C<isa> 
+key). Any keys are allowed within a leaf node, for custom tracking of arbitrary
+metadata, but the following are handled specially by C<Config::Structured>:
 
 =over
 
+=item C<isa>
+
+Required
+
+Type constraint against which the configured value for the given key will be
+checked. See L<Moose::Util::TypeConstraints>. Can be set to C<Any> to opt out of
+type checking. If a typecheck fails, the L<on_typecheck_error> handler is 
+invoked.
+
 =item C<default>
 
-This key's value is the default configuration value if a data source or value is not provided by
-the configuation.
+Optional
+
+This key's value is the default configuration value if a data source or value is 
+not provided by the configuation.
+
+=item C<sensitive>
+
+Optional
+
+Set to true to mark this key's value as sensitive (e.g., password data). 
+Sensitive values will be returned as a string of asterisks unless a truth-y 
+value is passed to the accessor
+
+    use builtin qw(true);
+
+    conf->db->pass        # ************
+    conf->db->pass(true)  # uAjH9PmjH9^knCy4$z3TM4
+
+This behavior is mimicked in L</to_hash> and L</get_node>.
 
 =item C<description>
 
+Optional
+
+A human-readable description of the configuration option.
+
 =item C<notes>
 
-A human-readable description and implementation notes, respectively, of the configuration node. 
-L<Config::Structured> does not do anything with these values at present, but they provides inline 
-documentation of configuration directivess within the structure (particularly useful in the common 
-case where the structure is read from a file)
+Optional
+
+Human-readable implementation notes of the configuration node. 
+
+=item C<examples>
+
+Optional
+
+One or more example values for the given configuration node.
+
+=item C<url>
+
+Optional
+
+A web URL to additional information about the configuration node or resource
 
 =back
 
-Besides C<structure> and C<config>, L<Config::Structured> also accepts a C<hooks> argument at 
-initialization time. This argument must be a HashRef whose keys are patterns matching config
-node paths, and whose values are HashRefs containing C<on_load> and/or C<on_access> keys. These
-in turn point to CodeRefs which are run when the config value is initially loaded, or every time
-it is accessed, respectively.
-
-=cut
-
-=pod
-
 =head1 CONSTRUCTORS
 
-=head2 Config::Structured->new( config => {...}, structure => {...} )
+=head2 Config::Structured->new( %params )
 
-Returns a new C<Config::Structured> instance. C<config> and C<structure> are
-required parameters and must either be HashRefs or strings containing a data
-structure in C<JSON>, C<YAML>, or C<perl> (i.e., L<Data::Dumper>) formats. The
-format of the structure will be autodetected. The content of these data 
-structures is detailed above in the C<DESCRIPTION> section.
+Returns a C<Config::Structured> node (a dynamically-generated subclass of 
+C<Config::Structured::Node>). Nodes implement all methods in the L<METHODS> 
+section, plus those corresponding to the configuration keys defined in their 
+structure definition. 
+
+Parameters:
+
+=head4 structure
+
+Required
+
+Either a string or a HashRef. If a string is passed, it is handed off to 
+L<Data::Structure::Deserialize::Auto>, which attempts to parse a 
+YAML, JSON, TOML, or perl string value or filename of an existing, readable file
+containing data in one of those formats, into its corresponding perl data 
+structure. The format of such a structure is detailed in the L</DESCRIPTION> 
+section.
+
+=head4 config
+
+Required
+
+Either a string or a HashRef. If a string is passed, it is handed off to 
+L<Data::Structure::Deserialize::Auto>, which attempts to parse a 
+YAML, JSON, TOML, or perl string value or filename of an existing, readable file
+containing data in one of those formats, into its corresponding perl data 
+structure. Its format should mirror that of its C<structure> except that its 
+leaf nodes should contain the configured value for that key.
+
+=head5 Referenced Value
+
+In some cases, however, it is inconvenient or insecure to store the configuation
+value here (such as with passwords). In that case, the actual configuration 
+value may be stored in a separate file or an environment variable, and a 
+reference may be used in C<config> to point to it. To invoke this behavior,
+the node's L</isa> must be a string type (such as C<Str> or C<Str|Undef>). Then,
+set the config value to a HashRef containing two keys:
+
+=over
+
+=item * source - C<"file"> or C<"env">
+
+=item * ref - the filesystem path (relative or absolute) or the name of the environment variable holding the value
+
+=back
+
+If the value is pulled from a file, it will be L<chomp|https://perldoc.perl.org/functions/chomp>ed.
+
+=head4 hooks
+
+Optional
+
+A HashRef whose keys are config paths. A config path is a slash-separated string
+of config node keys, beginning with a root slash. Asterisks are valid placeholders
+for full or partial path components. E.g.:
+
+    /db/user
+    /db/*
+    /email/recipients/admin_*
+    /*/password
+
+The values corresponding to these keys are HashRefs whose keys are supported 
+hook types. Two types of hooks are supported:
+
+=over
+
+=item * on_load - these hooks are run once, when the applicable config node is constructed
+
+=item * on_access - these hooks are run each time the applicable config node is invoked
+
+=back
+
+The values corresponding to those keys are CodeRefs (or ArrayRefs of CodeRefs) to
+run when the appropriate events occur on the specified config paths.
+
+The hook function is passed two arguments: the configuration node path, and the
+configuration value (which is not obscured, even for sensitive data nodes)
+
+=head4 on_typecheck_error
+
+Optional.
+
+Controls the behavior occurring when a value type constraint check fails. 
+
+=over
+
+=item * fail - die with an error message about the constraint failure
+
+=item * warn (default) - emit a warning and set the value to undef
+
+=item * undef (or any other value) - do nothing and set the value to undef
+
+=back
 
 =head1 METHODS
 
-=head2 get( [$name] )
+=pod
 
-Class method.
+=head2 to_hash( $reveal_sensitive = 0 )
 
-Returns a registered L<Config::Structured> instance.  If C<$name> is not provided, returns the default instance.
-Instances can be registered with C<__register_default> or C<__register_as>. This mechanism is used to provide
-global access to a configuration, even from code contexts that otherwise cannot share data.
+Returns the entire configuration tree as hashref. Sensitive values are obscured
+unless C<$reveal_sensitive> is true.
 
-=head2 __register_default()
+=head2 get_node( $child = undef, $reveal_sensitive = 0 )
 
-Call on a L<Config::Structured> instance to set the instance as the default.
+Get all data and metadata for a given node. If given, C<$child> is the name
+of a direct child node to get the data for, otherwise data for the called 
+object is returned. For leaf nodes, sensitive values are obscured unless
+C<$reveal_sensitive> is true.
 
-=head2 __register_as( $name )
+Returns a HashRef which always contains the following keys:
 
-Call on a L<Config::Structured> instance to register the instance as the provided name.
+=over
 
-=head2 __get_child_node_names()
+=item * C<path> - the full configuration path of the node
 
-Returns a list of names (strings) of all immediate child nodes of the current config node
+=item * C<depth> - how many levels deep this node is in the config (1-based)
+
+=item * C<branches> - ArrayRef of the names of all branch children of this node
+
+=item * C<leaves> - ArrayRef of the names of all leaf children of this node
+
+=back
+
+Additionally, for leaf nodes:
+
+=over
+
+=item * C<value> - the value of the configuration node (possibly obscured)
+
+=item * C<overridden> - boolean value that reflects whether the configuration value for this node is the default (0) or from C<config> (1)
+
+=item * C<reference> - present only if the node uses a L</Referenced Value>, in which case it is a HashRef containing the C<source> and C<ref> keys and values
+
+=item * {structure keys} - all keys and values from the node's structure are present as well (e.g., L</isa>, L</description>, etc., as well as any custom data)
+
+=back
 
 =cut
 
-use Moose;
-
-use Carp;
-use Data::DPath qw(dpath);
-use Data::Printer;    # not debug, used for Carp message in $make_leaf_generator
-use Data::Structure::Deserialize::Auto;
+use Class::Prototyped;
+use Data::Structure::Deserialize::Auto qw(deserialize);
 use IO::All;
-use List::Util qw(reduce);
-use Mojo::DynamicMethods -dispatch;
 use Moose::Util::TypeConstraints;
-use Perl6::Junction qw(any);
+use Scalar::Util qw(looks_like_number);
+use Syntax::Keyword::Try;
 use Readonly;
-use Text::Glob qw(match_glob);
 
-use experimental qw(signatures lexical_subs);
+use experimental qw(signatures);
 
-# Symbol constants
-Readonly::Scalar my $EMPTY => q{};
-Readonly::Scalar my $SLASH => q{/};
+Readonly::Array my @RESERVED => qw(clone clonePackage destroy DESTROY import new newCore newPackage reflect to_hash get_node);
 
-# Token key constants
-Readonly::Scalar my $DEF_ISA     => q{isa};
-Readonly::Scalar my $DEF_DEFAULT => q{default};
-Readonly::Scalar my $CFG_SOURCE  => q{source};
-Readonly::Scalar my $CFG_REF     => q{ref};
+Readonly::Scalar my $PERL_IDENTIFIER => qr/^ (?[ ( \p{Word} & \p{XID_Start} ) + [_] ])
+  (?[ ( \p{Word} & \p{XID_Continue} ) ]) *    $/x;
 
-# Token value constants
-Readonly::Scalar my $CONF_FROM_FILE => q(file);
-Readonly::Scalar my $CONF_FROM_ENV  => q(env);
-
-# Method names that are needed by Config::Structured and cannot be overridden by config node names
-Readonly::Array my @RESERVED =>
-  qw(get meta BUILDCARGS BUILD BUILD_DYNAMIC _config _structure _hooks _base _add_helper __register_default __register_as __get_child_node_names);
-
-#
-# The configuration structure (e.g., $app.conf.def contents)
-#
-has '_structure_v' => (
-  is       => 'ro',
-  isa      => 'Str|HashRef',
-  init_arg => 'structure',
-  required => 1,
+Readonly::Hash my %TCF_HANDLERS => (
+  warn => sub($msg) {warn($msg)},
+  fail => sub($msg) {die($msg)}
 );
 
-has '_structure' => (
-  is       => 'ro',
-  isa      => 'HashRef',
-  init_arg => undef,
-  lazy     => 1,
-  default  => sub($self) {Data::Structure::Deserialize::Auto::deserialize($self->_structure_v)}
+Readonly::Hash my %REF_HANDLERS => (
+  env  => sub($ref) {$ENV{$ref}},
+  file => sub($ref) {
+    try {join($/, io($ref)->chomp->slurp)} catch ($e) {
+      die("Can't read referenced file at '$ref': $e")
+    }
+  },
 );
 
-has '_hooks' => (
-  is       => 'ro',
-  isa      => 'HashRef[HashRef[CodeRef]]',
-  init_arg => 'hooks',
-  required => 0,
-  default  => sub {{}},
-);
+my $base_class = Class::Prototyped->newPackage(__PACKAGE__ . '::Node');
 
-#
-# The file-based configuration (e.g., $app.conf contents)
-#
-has '_config_v' => (
-  is       => 'ro',
-  isa      => 'Str|HashRef',
-  init_arg => 'config',
-  required => 1,
-);
-
-has '_config' => (
-  is       => 'ro',
-  isa      => 'HashRef',
-  init_arg => undef,
-  lazy     => 1,
-  default  => sub($self) {Data::Structure::Deserialize::Auto::deserialize($self->_config_v)}
-);
-
-#
-# This instance's base path (e.g., /db)
-#   Recursively constucted through re-instantiation of non-leaf config nodes
-#
-has '_base' => (
-  is      => 'ro',
-  isa     => 'Str',
-  default => $SLASH,
-);
-
-#
-# Convenience method for adding dynamic methods to an object
-#
-sub _add_helper (@args) {
-  Mojo::DynamicMethods::register __PACKAGE__, @args;
+###
+#  PRIVATE FUNCTIONS
+###
+my sub join_path(@path_components) {
+  join(q{/}, q{}, @path_components)    #insert an empty string so that the result starts with a slash
 }
 
-around BUILDARGS => sub ($orig, $class, @args) {
-  my %args = ref($args[0]) eq 'HASH' ? %{$args[0]} : @args;
-  delete($args{hooks}) unless (defined($args{hooks}));
-  return $class->$orig(%args);
-};
-
-#
-# Dynamically create methods at instantiation time, corresponding to configuration structure's dpaths
-# Use lexical subs and closures to avoid polluting namespace unnecessarily (preserving it for config nodes)
-#
-sub BUILD ($self, $args) {
-  # lexical subroutines
-
-  state sub pkg_prefix ($msg) {
-    '[' . __PACKAGE__ . "] $msg";
-  }
-
-  state sub is_hashref ($node) {
-    return ref($node) eq 'HASH';
-  }
-
-  state sub is_leaf_node ($node) {
-    exists($node->{isa});
-  }
-
-  state sub is_ref_node ($def, $node) {
-    return 0 if ($def->{isa} =~ /hash/i);
-    return 0 unless (ref($node) eq 'HASH');
-    return (exists($node->{$CFG_SOURCE}) && exists($node->{$CFG_REF}));
-  }
-
-  state sub ref_content_value ($node) {
-    my $source = $node->{$CFG_SOURCE};
-    my $ref    = $node->{$CFG_REF};
-    if ($source eq $CONF_FROM_FILE) {
-      if (-f -r $ref) {
-        chomp(my $contents = io->file($ref)->slurp);
-        return $contents;
-      }
-    } elsif ($source eq $CONF_FROM_ENV) {
-      return $ENV{$ref} if (exists($ENV{$ref}));
-    }
-    return;
-  }
-
-  state sub node_value ($el, $node) {
-    if (defined($node)) {
-      my $v = is_ref_node($el, $node) ? ref_content_value($node) : $node;
-      return $v if (defined($v));
-    }
-    return $el->{$DEF_DEFAULT};
-  }
-
-  state sub concat_path($base, $p) {
-    reduce {local $/ = $SLASH; chomp($a); join(($b =~ m|^$SLASH|) ? $EMPTY : $SLASH, $a, $b)} ($base, $p);
-  }
-
-  state sub typecheck ($isa, $value) {
-    my $tc = Moose::Util::TypeConstraints::find_or_parse_type_constraint($isa);
-    if (defined($tc)) {
-      return $tc->check($value);
-    } else {
-      carp(pkg_prefix "Invalid typeconstraint '$isa'. Skipping typecheck");
-      return 1;
-    }
-  }
-
-  # Closures
-  my $get_node_value = sub ($el, $path) {
-    return node_value($el, dpath($path)->matchr($self->_config)->[0]);
-  };
-
-  my $get_hooks = sub ($path) {
-    return map {$self->_hooks->{$_}} grep {match_glob($_, $path) ? $_ : ()} keys(%{$self->_hooks});
-  };
-
-  my $make_leaf_generator = sub ($el, $path) {
-    my $isa = $el->{isa};
-    my $v   = $get_node_value->($el, $path);
-
-    if (defined($v)) {
-      if (typecheck($isa, $v)) {
-        my @hooks = grep {defined} map {$_->{on_access}} $get_hooks->($path);
-        return sub {
-          # access hook
-          foreach (@hooks) {$_->($path, $v)}
-          return $v;
-        }
-      } else {
-        carp(pkg_prefix "Value '" . np($v) . "' does not conform to type '$isa' for node $path");
-      }
-    }
-    return sub {
-      return;
-    }
-  };
-
-  my $make_branch_generator = sub ($path) {
-    return sub {
-      return __PACKAGE__->new(
-        structure => $self->_structure,
-        config    => $self->_config,
-        hooks     => $self->_hooks,
-        _base     => $path
-      );
-    }
-  };
-
-  foreach my $el (dpath($self->_base)->match($self->_structure)) {
-    if (is_hashref($el)) {
-      foreach my $def (keys(%{$el})) {
-        carp(pkg_prefix "Reserved word '$def' used as config node name: ignored") and next if ($def eq any(@RESERVED));
-        $self->meta->remove_method($def)
-          ;    # if the config node refers to a method already defined on our instance, remove that method
-        my $path = concat_path($self->_base, $def);    # construct the new directive path by concatenating with our base
-
-        # Detect whether the resulting node is a branch or leaf node (leaf nodes are required to have an "isa" attribute)
-        # if it's a branch node, return a new Config instance with a new base location, for method chaining (e.g., config->db->pass)
-        $self->_add_helper(
-          $def => (is_leaf_node($el->{$def}) ? $make_leaf_generator->($el->{$def}, $path) : $make_branch_generator->($path)));
-      }
-    }
-  }
-
-  # Run on_load hooks immediately from root node only since we can't assume that non-root nodes will be created immediately
-  if ($self->_base eq $SLASH) {
-    sub ($path, $node) {
-      foreach (keys(%{$node})) {
-        my $p = join($path eq $SLASH ? $EMPTY : $SLASH, $path, $_);    #don't duplicate initial slash in path
-        my $n = $node->{$_};
-        if (is_leaf_node($n)) {
-          my @hooks = grep {defined} map {$_->{on_load}} $get_hooks->($p);
-          if (@hooks) {
-            my $v = $get_node_value->($n, $p);    #put off resolving the node value until we know we need it
-            foreach (@hooks) {$_->($p, $v)}
-          }
-        } else {
-          __SUB__->($p, $n);                      #recurse on the new branch node
-        }
-      }
-      }
-      ->($self->_base, $self->_structure);    #initially call on root of structure
-  }
+my sub is_branch($node) {
+  try {$node->isa('Class::Prototyped')}
+  catch ($e) {0}                       # throws if $node is not blessed
 }
 
-#
-# Handle dynamic method dispatch
-#
-sub BUILD_DYNAMIC($class, $method, $dyn_methods) {
-  return sub($self, @args) {
-    my $dynamic = $dyn_methods->{$self}{$method};
-    return $self->$dynamic(@args) if ($dynamic);
-    my $package = ref $self;
-    croak qq{Can't locate object method "$method" via package "$package"};
-  }
+my sub check_value_type ($isa, $value) {
+  my $tc = Moose::Util::TypeConstraints::find_or_parse_type_constraint($isa);
+  die("invalid typeconstraint '$isa'") unless (defined($tc));
+  return $tc->check($value);
 }
 
-#
-# Saved Named/Default Config instances
-#
-our $saved_instances = {
-  default => undef,
-  named   => {}
-};
-
-#
-# Instance method
-# Saves the current instance as the default instance
-#
-sub __register_default ($self) {
-  $saved_instances->{default} = $self;
-  return $self;
+my sub is_ref_value($def, $cfg) {
+  return 0 if ($def->{isa} !~ /^str/i);
+  return 0 if (ref($cfg) ne 'HASH');
+  return exists($cfg->{ref}) && exists($cfg->{source});
 }
 
-#
-# Instance method
-# Saves the current instance by the specified name
-# Parameters:
-#  Name (Str), required
-#
-sub __register_as ($self, $name) {
-  croak 'Registration name is required' unless (defined $name);
-
-  $saved_instances->{named}->{$name} = $self;
-  return $self;
+my sub resolve_ref_value($def, $cfg) {
+  my ($ref, $src) = @{$cfg}{qw(ref source)};
+  my $h = $REF_HANDLERS{$src};
+  die("invalid reference source type: '$src'") unless (defined($h));
+  return $h->($ref);
 }
 
-#
-# Class method
-# Return a previously saved instance. Returns undef if no instances have been saved. Returns the default instance if no name is provided
-# Parameters:
-#  Name (Str), optional
-#
-sub get ($class, $name = undef) {
-  if (defined $name) {
-    return $saved_instances->{named}->{$name};
+my sub stringify_value($v) {
+  return 'undef' unless (defined($v));
+  return encode_json($v) if (ref($v));
+  return qq{"$v"}        if (!looks_like_number($v));
+  return $v;
+}
+
+my sub resolve_value($k, $def, $cfg) {
+  my $v;
+  if (!exists($cfg->{$k})) {
+    $v = $def->{default};
+  } elsif (is_ref_value($def, $cfg->{$k})) {    # indirect value
+    $v = resolve_ref_value($def, $cfg->{$k});
   } else {
-    return $saved_instances->{default};
+    $v = $cfg->{$k};
   }
+  return $v if (check_value_type($def->{isa}, $v));
+  die("value " . stringify_value($v) . " does not conform to type '" . $def->{isa} . "'");
+  return ();
 }
 
-#
-# Instance method
-# Get all the node names that are children of the current node in config structure
-# Returns:
-#   List of strings
-sub __get_child_node_names ($self) {
-  my ($node) = dpath($self->_base)->match($self->_structure);
-  return (keys($node->%*));
+my sub get_hooks($hooks, $path, $type) {
+  my @h;
+  foreach my $p (keys($hooks->%*)) {
+    my $pat = $p =~ s|[*]|[^/]*|gr;    # path wildcard to regex
+    if ($path =~ /$p/) {
+      my $t = $hooks->{$p}->{$type};
+      push(@h, grep {ref($_) eq 'CODE'} (ref($t) eq 'ARRAY' ? $t->@* : ($t)));
+    }
+  }
+  return @h;
+}
+
+my sub valid_children(@list) {
+  my @v;
+  foreach my $i (@list) {
+    next if ($i =~ /[*]$/);                 # skip parent slots (ending in *)
+    next if (grep {$_ eq $i} @RESERVED);    # skip reserved words
+    push(@v, $i);
+  }
+  return @v;
+}
+
+###
+#  CONSTRUCTOR
+###
+sub new($class, %args) {
+  die("structure is a required parameter") unless (defined($args{structure}));
+  die("config is a required parameter")    unless (defined($args{config}));
+
+  # process %args
+  my $config    = ref($args{config})    ? $args{config}    : deserialize($args{config});
+  my $structure = ref($args{structure}) ? $args{structure} : deserialize($args{structure});
+  my $hooks     = $args{hooks} // {};
+  my $path      = $args{path}  // [];
+  my $tc_fail   = $TCF_HANDLERS{exists($args{on_typecheck_error}) ? $args{on_typecheck_error} : 'warn'};
+
+  my $obj = Class::Prototyped->new(
+    '*'     => $base_class,
+    to_hash => sub($self, $reveal = 0) {
+      return {
+        (map {$_ => $self->$_($reveal)} $self->get_node->{leaves}->@*),
+        (map {$_ => $self->$_->to_hash($reveal)} $self->get_node->{branches}->@*),
+      };
+    },
+    get_node => sub($self, $name = undef, $reveal = 0) {
+      my @children = valid_children($self->reflect->slotNames);
+      my $node     = defined($name) ? $self->$name($reveal) : $self;
+      my $details  = {};
+      unless (is_branch($node)) {
+        $details               = {$structure->{$name}->%*};
+        $details->{overridden} = (exists($config->{$name}) ? 1 : 0), $details->{value} = $node;
+        $details->{reference}  = $config->{$name} if (is_ref_value($structure->{$name}, $config->{$name}));
+      }
+      $details->{branches} = [grep {is_branch($self->$_)} @children];
+      $details->{leaves}   = [grep {!is_branch($self->$_)} @children];
+      $details->{path}     = join_path(grep {defined} ($path->@*, $name));
+      $details->{depth}    = defined($name) ? scalar($path->@*) + 1 : scalar($path->@*);
+      return $details;
+    },
+  );
+
+  foreach my $k (keys($structure->%*)) {
+    # Ensure key does not conflict with a method
+    warn("Reserved token '$k' found in structure definition. Skipping...") and next
+      if ($k !~ $PERL_IDENTIFIER || grep {$_ eq $k} @RESERVED);
+    my $npath = join_path($path->@*, $k);
+    if (exists($structure->{$k}->{isa})) {    # leaf node
+      my $v;
+      try {
+ # actually finding the value is complicated: it can come from default, config, env, or a file, so abstract it away in resolve_value
+        $v = resolve_value($k, $structure->{$k}, $config);
+      } catch ($e) {
+        # Catch any errors in value resolutuion and call preferred handler
+        $e =~ /(.*) (at .* line .*)$/;
+        $tc_fail->(__PACKAGE__ . " $1 for cfg path $npath\n") if (defined($tc_fail));
+      }
+      # ON_LOAD HANDLER
+      $_->($npath, $v) foreach (get_hooks($hooks, $npath, 'on_load'));
+      # sub that's run on access to leaf node
+      $obj->reflect->addSlot(
+        $k => sub($self, $reveal_sensitive = 0) {
+          # ON_ACCESS HANDLER
+          $_->($npath, $v) foreach (get_hooks($hooks, $npath, 'on_access'));
+          # Return the value, unless it's sensitive in which case obscure it
+          return ($structure->{$k}->{sensitive} && !$reveal_sensitive && defined($v)) ? '*' x 12 : $v;
+        }
+      );
+    } else {    # branch node - recursively call constructor for the next-level down node
+                # important! recursively create node outside of sub so that we frontend all node value resolution
+                # otherwise, on_load handlers wouldnt't get called until the parent node was accessed
+      my $branch = __PACKAGE__->new(
+        config    => $config->{$k} // {},
+        structure => $structure->{$k},
+        path      => [$path->@*, $k],
+        hooks     => $hooks,
+      );
+      # sub that's run on access to branch node (use same signature to be consistent with leaves)
+      $obj->reflect->addSlot($k => sub($self, $reveal_sensitive = 0) {$branch});
+    }
+  }
+
+  return $obj;
 }
 
 =pod
+
+=head1 CAVEATS
+
+Some tokens are unavailable to be used as configuration node keys. The following 
+keys, as well as any key that is not a 
+L<valid perl identifier|https://perldoc.pl/perldata#Identifier-parsing>, are
+disallowed - if used in a structure file, a warning will be emitted and the 
+applicable node will be discarded.
+
+=over
+
+=item * C<clone>
+
+=item * C<clonePackage>
+
+=item * C<destroy>
+
+=item * C<DESTROY>
+
+=item * C<import>
+
+=item * C<new>
+
+=item * C<newCore>
+
+=item * C<newPackage>
+
+=item * C<reflect>
+
+=item * C<to_hash>
+
+=item * C<get_node>
+
+=back
 
 =head1 AUTHOR
 

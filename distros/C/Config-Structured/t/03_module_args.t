@@ -1,6 +1,5 @@
-use strict;
-use warnings qw(all);
-use 5.022;
+use v5.26;
+use warnings;
 
 use Test2::V0;
 
@@ -10,7 +9,7 @@ like(
   dies {
     my $conf = Config::Structured->new(config => {});
   },
-  qr/Attribute \(_structure_v\), passed as \(structure\), is required/,
+  qr/structure is a required parameter/,
   "Unspecified structure"
 );
 
@@ -18,7 +17,7 @@ like(
   dies {
     my $conf = Config::Structured->new(structure => {});
   },
-  qr/Attribute \(_config_v\), passed as \(config\), is required/,
+  qr/config is a required parameter/,
   "Unspecified config"
 );
 

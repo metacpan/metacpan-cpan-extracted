@@ -1,14 +1,15 @@
-package OpenAPI::PerlGenerator 0.01;
+package OpenAPI::PerlGenerator 0.02;
 use 5.020;
-use experimental 'signatures';
+use Moo 2;
+use Carp 'croak';
+use experimental 'signatures'; # actually, they are stable but stable.pm doesn't know
+use stable 'postderef';
+
+use Mojo::Template;
 use OpenAPI::PerlGenerator::Utils; # for tidy(), but we don't import that
 use OpenAPI::PerlGenerator::Template;
-use Carp 'croak';
-
-use Moo 2;
-use Mojo::Template;
-no warnings 'experimental::signatures';
 use JSON::Pointer;
+use Markdown::Pod;
 
 =head1 NAME
 
@@ -139,6 +140,11 @@ sub filename( $self, $name, $prefix=$self->prefix ) {
     return ((("lib::" . $self->full_package($name, $prefix)) =~ s!::!/!gr). '.pm');
 }
 
+sub markdown_to_pod( $self, $str ) {
+    state $converter = Markdown::Pod->new();
+    return $converter->markdown_to_pod( markdown => $str ) =~ s/\s+\z//r;
+}
+
 sub map_type( $self, $elt ) {
 
     if( exists $elt->{anyOf}) {
@@ -160,6 +166,18 @@ sub map_type( $self, $elt ) {
     } else {
         return
     }
+}
+
+sub property_name( $self, $name ) {
+    if( $name !~ /\A[A-Za-z_]/ ) {
+        $name = "_" . $name;
+    }
+    $name =~ s!\W+!_!g;
+    return $name
+}
+
+sub single_line( $self, $str ) {
+    $str =~ s/\s+/ /gr
 }
 
 =head1 METHODS

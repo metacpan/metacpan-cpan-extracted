@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.022000;
+use 5.026000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,18 +14,14 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Config-Structured",
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.022000",
+  "MIN_PERL_VERSION" => "5.026000",
   "NAME" => "Config::Structured",
   "PREREQ_PM" => {
-    "Data::DPath" => 0,
-    "Data::Printer" => 0,
+    "Class::Prototyped" => "1.13",
     "Data::Structure::Deserialize::Auto" => "1.01",
-    "IO::All" => 0,
-    "Mojolicious" => 0,
-    "Moose" => 0,
-    "Perl6::Junction" => 0,
-    "Readonly" => 0,
-    "Text::Glob" => 0
+    "IO::All" => "0.87",
+    "Moose::Util::TypeConstraints" => "2.2207",
+    "Syntax::Keyword::Try" => "0.29"
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -33,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test2::Suite" => "0.000155",
     "Test::More" => 0
   },
-  "VERSION" => "2.006",
+  "VERSION" => "3.01",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,19 +37,15 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::DPath" => 0,
-  "Data::Printer" => 0,
+  "Class::Prototyped" => "1.13",
   "Data::Structure::Deserialize::Auto" => "1.01",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "IO::All" => 0,
-  "Mojolicious" => 0,
-  "Moose" => 0,
-  "Perl6::Junction" => 0,
-  "Readonly" => 0,
+  "IO::All" => "0.87",
+  "Moose::Util::TypeConstraints" => "2.2207",
+  "Syntax::Keyword::Try" => "0.29",
   "Test2::Suite" => "0.000155",
-  "Test::More" => 0,
-  "Text::Glob" => 0
+  "Test::More" => 0
 );
 
 

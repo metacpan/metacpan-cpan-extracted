@@ -10,6 +10,7 @@ build_requires:
   Mojo::JSON: '0'
   Mojolicious: '9'
   Moo: '2'
+  PerlX::Maybe: '0'
   Test2::V0: '0'
   experimental: '0.031'
   stable: '0.031'
@@ -33,6 +34,6 @@ resources:
   bugtracker: https://github.com/Corion/AI-Ollama-Client/issues
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/AI-Ollama-Client.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

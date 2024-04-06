@@ -7,6 +7,8 @@ use Test2::V0;
 
 my $md = "Foo\nbar\n---\nbaz\n";
 
+Markdown::Perl::set_options(use_setext_headings => 1);
+
 is(convert($md, multi_lines_setext_headings => 'single_line'), "<p>Foo</p>\n<h2>bar</h2>\n<p>baz</p>\n", 'single_line');
 is(convert($md, multi_lines_setext_headings => 'break'), "<p>Foo\nbar</p>\n<hr />\n<p>baz</p>\n", 'break');
 is(convert($md, multi_lines_setext_headings => 'multi_line'), "<h2>Foo\nbar</h2>\n<p>baz</p>\n", 'multi_line');

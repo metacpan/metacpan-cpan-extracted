@@ -1,3 +1,7 @@
+0.02 2024-04-07
+    * Regenerated documentation
+    * Fixed code for uploading a model
+
 0.01 2024-04-05
     * Released on an unsuspecting world
     * Generated with OpenAPI::PerlGenerator

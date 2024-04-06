@@ -45,10 +45,10 @@ another application.
 These routines are cryptically named (blame FORTRAN), 
 beginning with 'ch', and accept either float or double ndarrays. 
 
-Most of the routines require an integer parameter called C<check>;
-if set to 0, then no checks on the validity of the input data are
+Most of the routines require an integer parameter called C<skip>;
+if set to 1, then no checks on the validity of the input data are
 made, otherwise these checks are made.
-The value of C<check> can be set to 0 if a routine
+The value of C<skip> can be set to 1 if a routine
 such as L</chim> has already been successfully called.
 
 =over 4
@@ -295,11 +295,8 @@ sub intcopy {
 #       (this allows the PCHIP routines to use 2D data, but as it's
 #        done in FORTRAN array order, and PDL has a much richer way
 #        of accessing parts of an array we force the data to be 1D).
-#   IntCopy
-#     - the PCHIP routines may change the value from 0 to 1 if an
-#       error occurs but the checks were successful. As this complicates
-#       things we copy the user value to a temporary variable,
-#       so that the sent in value is not changed.
+#   Logical
+#     - A Fortran Boolean, defined as same size as REAL/INTEGER so 'long'
 #   FortranIndex
 #     - pchid()/dpchid() require FORTRAN array indices, so 
 #       this type flags that we should add 1 onto the input values
@@ -319,7 +316,7 @@ my %KIND2I = (
     # convert from C to F77 index so add 1
   FortranIndex => ['longlong ', intcopy(sub {$_[0][2]}, sub {"\$$_[0][2]() + 1"})],
   Integer => ['longlong ', sub{"\$P($_[0][2])"}, sub {"PDL_LongLong *"}],
-  IntCopy => ['longlong ', intcopy(sub {$_[0][2]}, sub {"\$$_[0][2]()"})],
+  Logical => ['int ', sub{"\$P($_[0][2])"}, sub {"PDL_Long *"}],
   Dim => [undef, intcopy(sub {"dim_$_[0][2]"}, sub {"\$SIZE($_[0][2])"})],
   MDim => [undef, intcopy(sub {$_[0][2]}, sub {$_[1]{$_[0][2]}})],
   Incfd => [undef, intcopy(sub {$_[0][2]}, sub {1})],
@@ -364,10 +361,17 @@ sub defslatec {
     my $funcargs = join ',', map $KIND2I{$_->[0]}[1]->($_, \%lds), @args2;
 
     my @protos = map $KIND2I{$_->[0]}[2], @args2;
+    my @cheaders;
     foreach my $t ( @talts ) {
-	pp_addhdr((defined $fpar ? "$prototype{$t->[0]} " : "PDL_LongLong ")
-	  . "PDL_FORTRAN($t->[1])(" .
-	  join(',', map $_->($t->[0]), @protos) . ");\n");
+        my @decl_args;
+        for my $ind (0..$#protos) {
+          my $arg = $protos[$ind];
+          next unless my @ret = $arg->($t->[0]);
+          push @decl_args, "$ret[0]$args2[$ind][2]";
+        }
+        push @cheaders, (defined $fpar ? $prototype{$t->[0]} : "void")
+          . " PDL_FORTRAN($t->[1])(" .
+          join(',', @decl_args) . ");";
     }
 
     # add on the function reference, if supplied, to the start of
@@ -387,6 +391,7 @@ sub defslatec {
 pp_def('$pname',
   Pars => '$pars',
   Code => '$code',
+  CHeader => '@cheaders',
   GenericTypes => [@{[join ", ", map $_->[0], @talts]}],
   Doc => '$docstring',
 );
@@ -394,6 +399,7 @@ ENDDBG
     pp_def($pname,
       Pars => $pars,
       Code => $code,
+      CHeader => join("\n", @cheaders),
       GenericTypes => [map $_->[0], @talts],
       Doc => $docstring,
     );
@@ -458,11 +464,11 @@ sub PDL::matinv {
 		unless( @dims >= 2 && $dims[0] == $dims[1] );
   
 	$m = $m->copy(); # Make sure we don't overwrite :(
-	gefa($m,(my $ipvt=null),(my $info=null));
+	my ($ipvt,$info) = gefa($m);
 	if(sum($info) > 0) {
 		barf("Uninvertible matrix given to inv: $m\n");
 	}
-	gedi($m,$ipvt,pdl(0,0),null,1);
+	gedi($m,$ipvt,1);
 	$m;
 }
 
@@ -474,33 +480,24 @@ sub PDL::detslatec {
 	if(sum($info) > 0) {
 		barf("Uninvertible matrix given to inv: $m\n");
 	}
-	gedi($m,$ipvt,my $det=null,null,10);
+	my ($det) = gedi($m,$ipvt,10);
 	return $det->slice('(0)')*10**$det->slice('(1)');
 }
 
-
 sub prepfft {
 	my($n) = @_;
-	my $tmp = PDL->zeroes(float(),$n*3+15);
-	$n = pdl $n;
-	ezffti($n,$tmp);
-	return $tmp;
+	my $ifac = ezffti($n,my $wsave = PDL->zeroes(float(),$n*3));
+	return ($wsave, $ifac);
 }
 
 sub fft (;@) {
-	my($v) = @_;
-	my $ws = prepfft($v->getdim(0));
-	ezfftf($v,(my $az = PDL->null), (my $x = PDL->null),
-		  (my $y = PDL->null), $ws);
-	return ($az,$x,$y);
+	my ($v) = @_;
+	ezfftf($v, prepfft($v->getdim(0)));
 }
 
 sub rfft {
-	my($az,$x,$y) = @_;
-	my $ws = prepfft($x->getdim(0));
-	my $v = $x->copy();
-	ezfftb($v,$az,$x,$y,$ws);
-	return $v;
+	my ($az,$x,$y) = @_;
+	ezfftb($az,$x,$y,prepfft($x->getdim(0)));
 }
 
 # polynomial fitting routines
@@ -590,7 +587,7 @@ defslatec(
 	 MDim 		ldu;
 	 Mat 	[o] 	v	(p,p);
 	 MDim 		ldv;
-	 Mat 	[o] 	work	(n);
+	 Mat 	[t] 	work	(n);
 	 Integer   	job	();
 	 Integer [o]	info	();
 	',
@@ -599,11 +596,11 @@ defslatec(
 
 defslatec(
 	'poco',{S => 'spoco', D => 'dpoco'},
-	'Mat		a	(n,n);
+	'Mat [io]	a	(n,n);
 	 MDim		lda;
 	 Dim		n;
-	 Mat 		rcond	();
-	 Mat	[o]	z	(n);
+	 Mat [o]	rcond	();
+	 Mat [o]	z	(n);
 	 Integer [o]	info	();
 	',
 'Factor a real symmetric positive definite matrix
@@ -625,7 +622,7 @@ the condition number of the matrix.'
 
 defslatec(
 	'gefa',{S => 'sgefa', D => 'dgefa'},
-	'Mat		a	(n,n);
+	'Mat [io]	a	(n,n);
 	 MDim		lda;
 	 Dim		n;
 	 Integer [o]	ipvt	(n);
@@ -634,13 +631,11 @@ defslatec(
 'Factor a matrix using Gaussian elimination.'
 );
 
-# XXX Ensure two == 2!!
-#
 # pofa and sqrdc aren't (yet?) implemented
 #
 defslatec(
 	'podi',{S => 'spodi', D => 'dpodi'},
-	'Mat		a	(n,n);
+	'Mat [io]	a	(n,n);
 	 MDim		lda;
 	 Dim		n;
 	 Mat	[o]	det	(two=2);
@@ -653,18 +648,17 @@ computed by L</poco>.'
 
 defslatec(
 	'gedi',{S => 'sgedi', D => 'dgedi'},
-	'Mat		a	(n,n);
+	'Mat [io]	a	(n,n);
 	 MDim		lda;
 	 Dim		n;
-	 Integer [o]	ipvt	(n);
+	 Integer	ipvt	(n);
 	 Mat	 [o]	det	(two=2);
-	 Mat	 [o]	work	(n);
+	 Mat	 [t]	work	(n);
 	 Integer	job	();
 	',
 'Compute the determinant and inverse of a matrix using the
 factors computed by L</geco> or L</gefa>.'
 );
-	
 
 defslatec(
 	'gesl',{S => 'sgesl', D => 'dgesl'},
@@ -672,7 +666,7 @@ defslatec(
 	 MDim		lda;
 	 Dim		n;
 	 Integer	ipvt	(n);
-	 Mat		b	(n);
+	 Mat [io]	b	(n);
 	 Integer	job	();
 	',
 'Solve the real system C<A*X=B> or C<TRANS(A)*X=B> using the
@@ -698,19 +692,19 @@ of a REAL SYMMETRIC matrix.'
 
 );
 
-# XXX wsave : at least 3n+15
+# XXX wsave : at least 3n
 defslatec(
 	'ezffti', {S => 'ezffti'},
 	'Integer	n	();
-	 Mat [o]	wsave(foo);
+	 Mat [io]	wsave(foo);
+	 Integer [o]	ifac(ni=15);
 	',
-'Subroutine ezffti initializes the work array C<wsave()>
-which is used in both L</ezfftf> and 
-L</ezfftb>.  
+'Subroutine ezffti initializes the work array C<wsave(3n or more)>
+and C<ifac()>
+which is used in both L</ezfftf> and L</ezfftb>.
 The prime factorization
 of C<n> together with a tabulation of the trigonometric functions
 are computed and stored in C<wsave()>.'
-
 );
 
 # XXX Correct for azero, a and b
@@ -722,6 +716,7 @@ defslatec(
 	 Mat [o]	a(n);
 	 Mat [o]	b(n);
 	 Mat 		wsave(foo);
+	 Integer    	ifac(ni=15);
 	'
 );
 
@@ -733,6 +728,7 @@ defslatec(
 	 Mat		a(n);
 	 Mat 		b(n);
 	 Mat 		wsave(foo);
+	 Integer    	ifac(ni=15);
 	'
 );
 
@@ -1076,7 +1072,7 @@ defslatec(
            Mat          f       (n);
            Mat          d       (n);
            Incfd        incfd;
-           IntCopy      check   ();
+           Logical [io] skip    ();
            Dim          ne;
            Mat          xe      (ne);
            Mat     [o]  fe      (ne);
@@ -1087,7 +1083,7 @@ defslatec(
 L</chim> - evaluate the function (C<$fe>) and 
 derivative (C<$de>) at a set of points (C<$xe>).
 If function values alone are required, use L</chfe>.
-Set C<check> to 0 to skip checks on the input data.
+Set C<skip> to 0 to skip checks on the input data.
 
 Error status returned by C<$ierr>:
 
@@ -1134,7 +1130,7 @@ defslatec(
            Mat          f       (n);
            Mat          d       (n);
            Incfd        incfd;
-           IntCopy      check    ();
+           Logical [io] skip    ();
            Dim          ne;
            Mat          xe      (ne);
            Mat     [o]  fe      (ne);
@@ -1144,7 +1140,7 @@ defslatec(
 L</chim> - evaluate the function (C<$fe>) at
 a set of points (C<$xe>).
 If derivative values are also required, use L</chfd>.
-Set C<check> to 0 to skip checks on the input data.
+Set C<skip> to 0 to skip checks on the input data.
 
 Error status returned by C<$ierr>:
 
@@ -1186,7 +1182,7 @@ defslatec(
            Mat          f       (n);
            Mat          d       (n);
            Incfd        incfd;
-           IntCopy      check    ();
+           Logical [io] skip    ();
            Mat          la    ();
            Mat          lb    ();
            FuncRet [o]  ans     ();
@@ -1197,7 +1193,7 @@ cubic Hermite function over an arbitrary interval,
 given by C<[$la,$lb]>. C<$d> should contain the derivative values, computed by L</chim>.
 See L</chid> if the integration limits are
 data points.
-Set C<check> to 0 to skip checks on the input data.
+Set C<skip> to 0 to skip checks on the input data.
 
 The values of C<$la> and C<$lb> do not have
 to lie within C<$x>, although the resulting integral
@@ -1251,7 +1247,7 @@ defslatec(
            Mat          f       (n);
            Mat          d       (n);
            Incfd        incfd;
-           IntCopy      check    ();
+           Logical [io] skip    ();
            FortranIndex ia      ();
            FortranIndex ib      ();
            FuncRet [o]  ans     ();
@@ -1267,7 +1263,7 @@ limits.
 Although using a fortran routine, the values of
 C<$ia> and C<$ib> are zero offset.
 C<$d> should contain the derivative values, computed by L</chim>.
-Set C<check> to 0 to skip checks on the input data.
+Set C<skip> to 0 to skip checks on the input data.
 
 Error status returned by C<$ierr>:
 
@@ -1304,13 +1300,13 @@ defslatec(
            Mat          f       (n);
            Mat          d       (n);
            Incfd        incfd;
-           IntCopy      check    ();
+           Logical [io] skip    ();
            Integer [o]  ismon   (n);
            Integer [o]  ierr    ();
           ',
 'The outout ndarray C<$ismon> indicates over
 which intervals the function is monotonic.
-Set C<check> to 0 to skip checks on the input data.
+Set C<skip> to 0 to skip checks on the input data.
 
 For the data interval C<[x(i),x(i+1)]>, the
 values of C<ismon(i)> can be:
@@ -1496,6 +1492,10 @@ pp_def('polfit',
   GenericTypes => ['F','D'],
   HandleBad => 1,
   NoBadifNaN => 1,
+  CHeader => <<'EOF',
+void PDL_FORTRAN(dpcoef)(PDL_LongLong *l,PDL_Double *c,PDL_Double *tc,PDL_Double *a);
+void PDL_FORTRAN(pcoef)(PDL_LongLong *l,PDL_Float *c,PDL_Float *tc,PDL_Float *a);
+EOF
   Code => 'PDL_LongLong howmany = PDL_IF_BAD(0,$SIZE(n)), i;
               if($SIZE(n)<$maxdeg())
                 $CROAK("Must have at least <n> points to fit <n> coefficients");

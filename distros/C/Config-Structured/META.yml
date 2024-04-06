@@ -27,22 +27,18 @@ no_index:
 provides:
   Config::Structured:
     file: lib/Config/Structured.pm
-    version: '2.006'
+    version: '3.01'
 requires:
-  Data::DPath: '0'
-  Data::Printer: '0'
+  Class::Prototyped: '1.13'
   Data::Structure::Deserialize::Auto: '1.01'
-  IO::All: '0'
-  Mojolicious: '0'
-  Moose: '0'
-  Perl6::Junction: '0'
-  Readonly: '0'
-  Text::Glob: '0'
-  perl: '5.022000'
+  IO::All: '0.87'
+  Moose::Util::TypeConstraints: '2.2207'
+  Syntax::Keyword::Try: '0.29'
+  perl: '5.026000'
 resources:
   bugtracker: https://github.com/tyrrminal/config-structured/issues
   repository: https://github.com/tyrrminal/config-structured.git
-version: '2.006'
+version: '3.01'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: MIT

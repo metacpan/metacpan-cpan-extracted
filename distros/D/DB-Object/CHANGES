@@ -1,5 +1,8 @@
 Revision history for Perl module DB::Object
 
+v1.2.3 2024-04-06T15:21:07+0900
+    - Correction of the DBD::SQLite constant bug unresolved previously.
+
 v1.2.2 2024-04-05T15:33:06+0900
     - Corrected a bug when version of DBD::SQLite < 1.71 is used and thus doe snot have the constant DBD::SQLite::Constants::SQLITE_TEXT
 

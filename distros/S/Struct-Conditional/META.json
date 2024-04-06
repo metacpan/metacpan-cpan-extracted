@@ -46,7 +46,7 @@
    "provides" : {
       "Struct::Conditional" : {
          "file" : "lib/Struct/Conditional.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
@@ -57,6 +57,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Struct-Conditional"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

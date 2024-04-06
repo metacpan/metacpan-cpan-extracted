@@ -21,6 +21,7 @@ t/102-html.t
 t/200-basic-leaf-blocks.t
 t/201-basic-container-blocks.t
 t/202-basic-inline-rendering.t
+t/203-options.t
 t/300-containers.t
 t/301-inlines.t
 t/302-reference-links.t

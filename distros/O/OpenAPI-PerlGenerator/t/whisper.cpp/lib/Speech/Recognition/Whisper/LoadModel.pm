@@ -6,6 +6,17 @@ use experimental 'signatures';
 use Types::Standard qw(Str Bool Num Int Object ArrayRef);
 use MooX::TypeTiny;
 
+=head1 NAME
+
+Speech::Recognition::Whisper::LoadModel -
+
+=head1 SYNOPSIS
+
+  my $obj = Speech::Recognition::Whisper::LoadModel->new();
+  ...
+
+=cut
+
 sub as_hash( $self ) {
     return { $self->%* }
 }

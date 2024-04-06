@@ -1,5 +1,5 @@
 package Struct::Conditional;
-use 5.006; use strict; use warnings; our $VERSION = '1.01';
+use 5.006; use strict; use warnings; our $VERSION = '1.02';
 use Clone qw/clone/;
 
 sub new {
@@ -12,6 +12,10 @@ sub compile {
 	die "failed to compile conditional json"
 		if (defined $struct && ! ref $struct && $struct eq 'compiled_null');
 	return $struct;
+}
+
+sub instantiate_hash {
+	return ();
 }
 
 sub itterate {
@@ -65,7 +69,7 @@ sub loops {
 			$json->{$map} = \@each if scalar @each;
 		}
 		if ($loops{for}{keys}) {
-			my %keys = ();
+			my %keys = $self->instantiate_hash();;
 			my $map = delete $loops{for}{keys};
 			die "param $key muse be an hashref"
 				unless (ref($params->{$key}) || "") eq 'HASH';
@@ -213,7 +217,7 @@ Struct::Conditional - A Conditional language within a perl struct.
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 

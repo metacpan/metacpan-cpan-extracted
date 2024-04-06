@@ -8,6 +8,7 @@ use YAML::PP;
 
 use OpenAPI::PerlGenerator;
 use OpenAPI::PerlGenerator::Utils 'update_file';
+use OpenAPI::PerlGenerator::Template::Mojo;
 
 =head1 NAME
 
