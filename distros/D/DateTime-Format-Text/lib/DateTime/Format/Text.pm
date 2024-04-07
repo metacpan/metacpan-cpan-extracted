@@ -11,11 +11,11 @@ DateTime::Format::Text - Find a Date in Text
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 our @month_names = (
 	'january',
@@ -154,18 +154,27 @@ sub parse {
 		return(__PACKAGE__->new()->parse($self));
 	} elsif(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
-	# } elsif(ref($_[0]) && (ref($_[0] !~ /::/))) {
+	} elsif(ref($_[0]) eq 'SCALAR') {
+		$params{'string'} = $$_[0];
+		shift;
+	} elsif(ref($_[0]) eq 'ARRAY') {
+		# TODO: Return an array of DTs, one for each item in the input array
+		Carp::croak('Usage: ', $self, '::parse(string => $string)');
+	} elsif(ref($_[0]) && $_[0]->can('as_string')) {
+		$params{'string'} = shift;
 	} elsif(ref($_[0])) {
 		Carp::croak('Usage: ', __PACKAGE__, '::parse(string => $string)');
 	} elsif(scalar(@_) && (scalar(@_) % 2 == 0)) {
 		%params = @_;
-	} else {
+	} elsif(defined($_[0])) {
 		$params{'string'} = shift;
+	} else {
+		Carp::croak('Usage: ', __PACKAGE__, '::parse(string => $string)');
 	}
 
 	if(my $string = $params{'string'}) {
 		# Allow the text to be an object
-		if(ref($string)) {
+		if(ref($string) && $string->can('as_string')) {
 			$string = $string->as_string();
 		}
 
@@ -315,7 +324,7 @@ L<http://search.cpan.org/dist/DateTime-Format-Text/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019-2023 Nigel Horne.
+Copyright 2019-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

@@ -4,7 +4,7 @@ DateTime::Format::Text - Find a Date in Text
 
 # VERSION
 
-Version 0.07
+Version 0.08
 
 # SYNOPSIS
 
@@ -81,6 +81,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2019-2023 Nigel Horne.
+Copyright 2019-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2

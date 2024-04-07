@@ -10,9 +10,10 @@ csv2pheno-ranker -i &lt;input.csv> \[-options\]
        -i|input                       CSV file
 
      Options:
-       -primary-key                   Name of the field that you want to use as identifier (MUST BE NON-ARRAY)
+
+       -generate-primary-key          Generates a primary key if absent. Use --primary-key-name to set its name.
+       -primary-key-name              Sets the name for the primary key. Must be a single, non-array field.
        -sep|separator                 Delimiter character for CSV files [;] e.g., --sep $'\t'
-       -set-primary-key               To force inserting a primary key (in case your CSV does not have one). The name will be set with --primary-key
 
      Generic Options;
        -debug                         Print debugging (from 1 to 5, being 5 max)
@@ -59,7 +60,7 @@ The software needs a csv as input file and assumes defaults. If you want to chan
 
     $ ./csv2pheno-ranker -i example.csv
     
-    $ ./csv2pheno-ranker -i example.csv --set-primary-key --primary-key ID
+    $ ./csv2pheno-ranker -i example.csv --generate-primary-key --primary-key-name ID
 
 ## COMMON ERRORS AND SOLUTIONS
 

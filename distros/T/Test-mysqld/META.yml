@@ -27,10 +27,12 @@ no_index:
 provides:
   Test::mysqld:
     file: lib/Test/mysqld.pm
-    version: '1.0020'
+    version: '1.0030'
+recommends:
+  DBD::MariaDB: '0'
+  DBD::mysql: '0'
 requires:
   Class::Accessor::Lite: '0'
-  DBD::mysql: '0'
   DBI: '0'
   File::Copy::Recursive: '0'
   File::Temp: '0'
@@ -39,7 +41,7 @@ resources:
   bugtracker: https://github.com/kazuho/p5-test-mysqld/issues
   homepage: https://github.com/kazuho/p5-test-mysqld
   repository: https://github.com/kazuho/p5-test-mysqld.git
-version: '1.0020'
+version: '1.0030'
 x_authority: cpan:KAZUHO
 x_contributors:
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'

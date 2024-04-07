@@ -4,7 +4,8 @@ use warnings;
 use Path::Tiny;
 use Cwd;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
+
 my $root;
 
 sub import
@@ -13,8 +14,14 @@ sub import
   my $rootfile    = $args{ rootfile } || '.libroot';
   my $callback    = $args{ callback };
   my $perldir     = $args{ perldir };
-  my $caller_file = $args{ caller_file } || Cwd::realpath( ( caller )[ 1 ] );
-  my $path        = path( $caller_file )->parent;
+  my $caller_file = Cwd::realpath( ( caller )[ 1 ] );
+
+  if ( $ENV{ LIBROOT_TEST_MODE } )
+  {
+    $caller_file = $args{ caller_file };
+  }
+
+  my $path = path( $caller_file )->parent;
 
   $path = $path->realpath->absolute;
   my $found;
@@ -60,6 +67,11 @@ sub root
   return $root;
 }
 
+sub rootdir
+{
+  return root();
+}
+
 1;
 
 __END__
@@ -74,7 +86,7 @@ lib::root - find perl root and push lib modules path to @INC
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -205,6 +217,70 @@ IT is also possible to get the root dir calling the root sub:
 IT is also possible to get the root dir calling the root sub:
 
   my $rootdir = lib::root->root;
+
+=head2 ACCEPTED PARAMETERS
+
+All the parameters are optional. The default libroot file is C<.libroot>
+
+=head3 rootfile parameter
+
+The C<rootfile> parameter defines the which file lib::root must look for in parent directories.
+
+That file (.libroot or other) must exist inside a perl $directory because lib::root will use that $dir to push to @INC.
+
+Once lib::root finds the .libroot file inside $dir, it will push $dir/*/lib to @INC.
+
+The default libroot file is C<.libroot>, however you may override it with a different name, or maybe use one that already exists, for example the very used C<cpanfile> or C<.perl-version>
+
+  use lib::root rootfile => '.perl-version';
+  use lib::root rootfile => 'cpanfile';
+  use lib::root; #defaults to .libroot
+
+The file must exists or lib::root will throw a warning and will not be able to push to @INC.
+
+Example of such warning:
+
+  lib::root error: Could not find rootfile [ .libroot ]. lib::root loaded from [ /home/user/myapp/perl/MyApp/lib/MyApp.pm ].
+
+=head3 perldir parameter
+
+As mentioned in "rootfile parameter" section, lib::root will find the $dir that contains .libroot. Then push $dir/*/lib to @INC. However, your app might have a different structure and needs some extra directories ie. C<$dir/some/extra/dir/perl/*/lib> to @INC.
+
+You can add that extra dir with the perldir parameter:
+
+  use lib::root perldir => 'some/extra/dir/perl'; #push $librootdir/some/extra/dir/perl/*/lib to @INC
+  use lib::root rootfile => 'cpanfile', perldir => 'local/myapp'; #push $dir/local/myapp/*/lib
+
+=head3 callback parameter
+
+lib::root accepts a callback that will be executed after paths are pushed to @INC. However the callback will only execute if libroot found the rootfile and pushed to @INC.
+
+  use lib::root callback => sub { warn "lib::root pushed to @INC" };
+
+=head3 rootdir function
+
+After using C<lib::root> it is possible to retrieve the directory that contains the rootfile.
+
+Use the C<root> function to get the rootdir. returns a Path::Tiny object. ie:
+
+  use lib::root;
+  print lib::root->rootdir; # /home/user/myapp/perl/ (Path::Tiny object)
+
+C<rootdir> function is an alias for the C<root> function. If you prefer to use root:
+
+  use lib::root;
+  print lib::root->root; # /home/user/myapp/perl/ (Path::Tiny object)
+
+
+=head2 INSTALLATION
+
+To install this module via cpanm:
+
+  cpanm lib::root
+
+Or via cpan shell:
+
+  cpan> install lib::root
 
 =head2 SEE ALSO
 

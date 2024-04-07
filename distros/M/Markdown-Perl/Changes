@@ -1,5 +1,14 @@
 Revision history for pmarkdown and the Markdown::Perl module.
 
+1.02 - 2024-04-06
+
+ - Improvement to the support of the original markdown syntax. This is probably
+   the best that we will do as this is now quite faithful and some of the
+   remaining differences are bugs in the original implementation.
+ - Bugfixes:
+   - Do not make a list loose when it is followed by blank lines.
+   - Tab stops after list markers are properly computed.
+
 1.01 - 2024-04-05
 
  - Deactivate the support for setext headings in pmarkdown default syntax.

@@ -1,5 +1,5 @@
 # Set the primary key for the objects
 primary_key: brand
 
-# Set the allowed terms / properties
+# Set the allowed terms or properties for use with include|exclude-terms
 allowed_terms: [brand,make_display,make_is_common,make_country]

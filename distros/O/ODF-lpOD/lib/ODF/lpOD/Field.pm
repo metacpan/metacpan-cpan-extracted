@@ -80,23 +80,20 @@ sub     set_type
         {
         my $self        = shift;
         my $type        = shift;
-        given ($type)
+        if (!defined $type)
                 {
-                when (undef)
-                        {
-                        $self->del_attribute('office:value-type');
-                        $self->del_attribute('office:currency');
-                        }
-                when ([@ODF::lpOD::Common::DATA_TYPES])
-                        {
-                        $self->set_att('office:value-type', $type);
-                        $self->del_attribute('office:currency')
-                                        unless $type eq 'currency';
-                        }
-                default
-                        {
-                        alert "Wrong data type"; $type = FALSE;
-                        }
+                $self->del_attribute('office:value-type');
+                $self->del_attribute('office:currency');
+                }
+        elsif (grep $type eq $_, @ODF::lpOD::Common::DATA_TYPES)
+                {
+                $self->set_att('office:value-type', $type);
+                $self->del_attribute('office:currency')
+                                unless $type eq 'currency';
+                }
+        else
+                {
+                alert "Wrong data type"; $type = FALSE;
                 }
         return $type;
         }
@@ -120,26 +117,23 @@ sub     get_value
         my $self        = shift;
         my $type        = $self->get_type();
         my $value;
-        given ($type)
+        if ($type eq 'string')
                 {
-                when ('string')
-                        {
-                        $value = $self->get_attribute('office:string-value');
-                        }
-                when (['date', 'time'])
-                        {
-                        my $attr = 'office:' . $type . '-value';
-                        $value = $self->att($attr);
-                        }
-                when (['float', 'currency', 'percentage'])
-                        {
-                        $value = $self->att('office:value');
-                        }
-                when ('boolean')
-                        {
-                        my $v = $self->att('office:boolean-value');
-                        $value = defined $v ? is_true($v) : undef;
-                        }
+                $value = $self->get_attribute('office:string-value');
+                }
+        elsif ($type eq 'date' || $type eq 'time')
+                {
+                my $attr = 'office:' . $type . '-value';
+                $value = $self->att($attr);
+                }
+        elsif ($type eq 'float' || $type eq 'currency' || $type eq 'percentage')
+                {
+                $value = $self->att('office:value');
+                }
+        elsif ($type eq 'boolean')
+                {
+                my $v = $self->att('office:boolean-value');
+                $value = defined $v ? is_true($v) : undef;
                 }
         return wantarray ? ($value, $type) : $value;
         }
@@ -152,32 +146,29 @@ sub     set_value
         my $type        = $self->get_type();
 
         my $v = check_odf_value($value, $type);
-        given ($type)
+        if ($type eq 'string')
                 {
-                when ('string')
+                $self->set_attribute('office:string-value' => $v);
+                }
+        elsif ($type eq 'date')
+                {
+                if (is_numeric($v))
                         {
-                        $self->set_attribute('office:string-value' => $v);
+                        $v = iso_date($v);
                         }
-                when ('date')
-                        {
-                        if (is_numeric($v))
-                                {
-                                $v = iso_date($v);
-                                }
-                        $self->set_att('office:date-value', $v);
-                        }
-                when ('time')
-                        {
-                        $self->set_att('office:time-value', $v);
-                        }
-                when (['float', 'currency', 'percentage'])
-                        {
-                        $self->set_att('office:value', $v);
-                        }
-                when ('boolean')
-                        {
-                        $self->set_att('office:boolean-value', $v);
-                        }
+                $self->set_att('office:date-value', $v);
+                }
+        elsif ($type eq 'time')
+                {
+                $self->set_att('office:time-value', $v);
+                }
+        elsif ($type eq 'float' || $type eq 'currency' || $type eq 'percentage')
+                {
+                $self->set_att('office:value', $v);
+                }
+        elsif ($type eq 'boolean')
+                {
+                $self->set_att('office:boolean-value', $v);
                 }
         return $self->get_value;
         }
@@ -285,7 +276,7 @@ our @TYPES =
 sub     check_type
         {
         my $type        = shift;
-        return ($type ~~ [@TYPES]) ? $type : FALSE;
+        return (grep $type eq $_, @TYPES) ? $type : FALSE;
         }
 
 sub     types           { @TYPES }
@@ -305,7 +296,7 @@ sub     classify
                 }
         return undef unless $tag =~ /^text:/;
         $tag =~ s/^.*://; $tag =~ s/-/ /g;
-        if ($tag ~~ [@TYPES])
+        if (grep $tag eq $_, @TYPES)
                 {
                 $class = __PACKAGE__;
                 return $elt ? bless $elt, $class : $class;

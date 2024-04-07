@@ -1,11 +1,11 @@
 package Clipboard;
-$Clipboard::VERSION = '0.28';
+$Clipboard::VERSION = '0.29';
 use strict;
 use warnings;
 
 our $driver;
 
-sub copy { my $self = shift; $driver->copy(@_); }
+sub copy { my $self = shift; return $driver->copy(@_); }
 sub copy_to_all_selections {
     my $self = shift;
     my $meth = $driver->can('copy_to_all_selections');
@@ -13,9 +13,9 @@ sub copy_to_all_selections {
 }
 
 sub cut { goto &copy }
-sub paste { my $self = shift; $driver->paste(@_); }
+sub paste { my $self = shift; return $driver->paste(@_); }
 
-sub bind_os { my $driver = shift; map { $_ => $driver } @_; }
+sub bind_os { my $driver = shift; return map { $_ => $driver } @_; }
 sub find_driver {
     my $self = shift;
     my $os = shift;
@@ -23,6 +23,9 @@ sub find_driver {
         # list stolen from Module::Build, with some modifications (for
         # example, cygwin doesn't count as Unix here, because it will
         # use the Win32 clipboard.)
+        bind_os(Xsel => qw(linux bsd$ aix bsdos dec_osf dgux
+            dynixptx gnu hpux irix dragonfly machten next os2 sco_sv solaris
+            sunos svr4 svr5 unicos unicosmk)),
         bind_os(Xclip => qw(linux bsd$ aix bsdos dec_osf dgux
             dynixptx gnu hpux irix dragonfly machten next os2 sco_sv solaris
             sunos svr4 svr5 unicos unicosmk)),
@@ -34,18 +37,29 @@ sub find_driver {
         # available, use it.
         if (exists $ENV{SSH_CONNECTION}) {
             local $SIG{__WARN__} = sub {};
+            require Clipboard::Xsel;
+            return 'Xsel' if Clipboard::Xsel::xsel_available();
             require Clipboard::Xclip;
-
             return 'Xclip' if Clipboard::Xclip::xclip_available();
         }
 
         return 'Win32';
     }
-
-    $os =~ /$_/i && return $drivers{$_} for keys %drivers;
-
-    # use xclip on unknown OSes that seem to have a DISPLAY
-    return 'Xclip' if exists $ENV{DISPLAY};
+    foreach my $d (sort keys %drivers)
+    {
+        if ($os =~ /$d/i)
+        {
+            return $drivers{$d};
+        }
+    }
+    # use xsel/xclip on unknown OSes that seem to have a DISPLAY
+    if (exists($ENV{DISPLAY}))
+    {
+        require Clipboard::Xsel;
+        return 'Xsel' if Clipboard::Xsel::xsel_available();
+        require Clipboard::Xclip;
+        return 'Xclip' if Clipboard::Xclip::xclip_available();
+    }
 
     die "The $os system is not yet supported by Clipboard.pm.  Please email rking\@panoptic.com and tell him about this.\n";
 }
@@ -55,6 +69,7 @@ sub import {
     my $drv = Clipboard->find_driver($^O);
     require "Clipboard/$drv.pm";
     $driver = "Clipboard::$drv";
+    return;
 }
 
 1;
@@ -72,7 +87,7 @@ Clipboard - Copy and paste with any OS
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 SYNOPSIS
 
@@ -211,7 +226,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ryan King <rking@panoptic.com>.
+This software is copyright (c) 2024 by Ryan King <rking@panoptic.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

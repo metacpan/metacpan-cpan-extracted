@@ -516,10 +516,6 @@ sub process_styles {
   my $delim = delim_characters($that);
   my %max_delim_run_length = %{$that->get_inline_delimiters_max_run_length};
   while (my @match = $tree->find_in_text(qr/([${delim}])\1*/, $current_child, 0)) {
-    # TODO: add an option to prevent some delimiters to be part of long run
-    # (e.g. max_delimiter_run_length), typically for ~ which can only be in run
-    # of lengths 2 according to GitHub spec (to not collide with code block
-    # probably).
     # We extract the delimiter run into a new node, that will be at $index.
     my ($delim_tree, $index) = $tree->extract($match[0], $match[1], $match[0], $match[2]);
     # We use the type literal so that if we do nothing with the delimiter it

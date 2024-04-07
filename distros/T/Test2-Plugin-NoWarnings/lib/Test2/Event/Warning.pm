@@ -3,21 +3,24 @@ package Test2::Event::Warning;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use parent 'Test2::Event';
 
-use Test2::Util::HashBase qw( causes_fail warning );
+use Test2::Util::HashBase qw( warning );
 
 sub init {
-    $_[0]->{ +CAUSES_FAIL } = 1       unless exists $_[0]->{ +CAUSES_FAIL };
-    $_[0]->{ +WARNING }     = 'undef' unless defined $_[0]->{ +WARNING };
+    $_[0]->{ +WARNING } = 'undef' unless defined $_[0]->{ +WARNING };
 }
 
-sub summary { $_[0]->{ +WARNING } }
-
-sub increments_count {1}
-sub diagnostics      {1}
+sub facet_data {
+    return {
+        assert => {
+            pass    => 0,
+            details => $_[0]->{ +WARNING },
+        },
+    };
+}
 
 1;
 
@@ -35,7 +38,7 @@ Test2::Event::Warning - A Test2 event for warnings
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 DESCRIPTION
 
@@ -57,8 +60,6 @@ Returns the warning that this event captured.
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Test2-Plugin-NoWarnings/issues>.
 
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
-
 =head1 SOURCE
 
 The source code repository for Test2-Plugin-NoWarnings can be found at L<https://github.com/houseabsolute/Test2-Plugin-NoWarnings>.
@@ -69,7 +70,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Dave Rolsky.
+This software is Copyright (c) 2024 by Dave Rolsky.
 
 This is free software, licensed under:
 

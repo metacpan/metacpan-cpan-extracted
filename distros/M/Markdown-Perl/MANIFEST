@@ -25,12 +25,14 @@ t/203-options.t
 t/300-containers.t
 t/301-inlines.t
 t/302-reference-links.t
+t/303-lists.t
 t/400-opt-allow_spaces_in_links.t
 t/400-opt-allow_task_list_markers.t
 t/400-opt-disallowed_html_tags.t
 t/400-opt-fenced_code_blocks_must_be_closed.t
 t/400-opt-inline_delimiters.t
 t/400-opt-inline_delimiters_max_run_length.t
+t/400-opt-lists_can_interrupt_paragraph.t
 t/400-opt-multi_lines_setext_headings.t
 t/400-opt-use_fenced_code_blocks.t
 t/800-bugs.t

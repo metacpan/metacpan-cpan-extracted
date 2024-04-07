@@ -11,6 +11,7 @@ my @files = (
     'lib/Clipboard/MacPasteboard.pm',
     'lib/Clipboard/Win32.pm',
     'lib/Clipboard/Xclip.pm',
+    'lib/Clipboard/Xsel.pm',
     'scripts/clipaccumulate',
     'scripts/clipbrowse',
     'scripts/clipedit',

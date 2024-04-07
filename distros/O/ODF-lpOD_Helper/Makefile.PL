@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "File::Basename" => 0,
     "Getopt::Long" => 0,
     "List::Util" => 0,
-    "ODF::lpOD" => 0,
+    "ODF::lpOD" => "1.200",
     "Scalar::Util" => 0,
     "constant" => 0,
     "feature" => 0,
@@ -67,7 +67,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "multidimensional" => 0
   },
-  "VERSION" => "6.011",
+  "VERSION" => "6.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -97,7 +97,7 @@ my %FallbackPrereqs = (
   "Import::Into" => 0,
   "JSON" => 0,
   "List::Util" => 0,
-  "ODF::lpOD" => 0,
+  "ODF::lpOD" => "1.200",
   "POSIX" => 0,
   "Path::Tiny" => 0,
   "Scalar::Util" => 0,

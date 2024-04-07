@@ -68,9 +68,9 @@ if ($build)
                         );
                 }
 
-        File::Copy::copy("lpOD.pm", "lpOD.bak");
-        open    LPOD, 	"<", "lpOD.pm";
-        open	TMP,	">", "lpod.tmp";
+        File::Copy::copy("lib/ODF/lpOD.pm", "lib/ODF/lpOD.bak");
+        open    LPOD, 	"<", "lib/ODF/lpOD.pm";
+        open	TMP,	">", "lib/ODF/lpod.tmp";
         my @lpod = ();
         while (my $line = <LPOD>)
                 {
@@ -85,7 +85,7 @@ if ($build)
                 }
         close   LPOD;
         close	TMP;
-        unlink("lpOD.pm"); rename("lpod.tmp", "lpOD.pm");
+        unlink("lib/ODF/lpOD.pm"); rename("lib/ODF/lpod.tmp", "lib/ODF/lpOD.pm");
         }
 
 #-----------------------------------------------------------------------------
@@ -94,7 +94,7 @@ WriteMakefile
         (
         'NAME'              => 'ODF::lpOD',
         'VERSION'           => $version,
-        'ABSTRACT_FROM'     => 'lpOD.pod',
+        'ABSTRACT_FROM'     => 'lib/ODF/lpOD.pod',
     	'AUTHOR'            => $author,
 		'LICENSE'   => 'GPL',
         'MIN_PERL_VERSION'  => '5.010001',

@@ -3,7 +3,7 @@ package Test2::Plugin::NoWarnings;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 # This is the version that added test2_is_testing_done.
 use Test2 1.302167;
@@ -77,7 +77,7 @@ Test2::Plugin::NoWarnings - Fail if tests warn
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -107,8 +107,6 @@ you can ask for this with the C<echo> import argument:
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Test2-Plugin-NoWarnings/issues>.
 
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
-
 =head1 SOURCE
 
 The source code repository for Test2-Plugin-NoWarnings can be found at L<https://github.com/houseabsolute/Test2-Plugin-NoWarnings>.
@@ -128,7 +126,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<https://www.urth.org/fs-donation.html>.
+button at L<https://houseabsolute.com/foss-donations/>.
 
 =head1 AUTHOR
 
@@ -142,7 +140,7 @@ Michael Alan Dorman <mdorman@ironicdesign.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Dave Rolsky.
+This software is Copyright (c) 2024 by Dave Rolsky.
 
 This is free software, licensed under:
 

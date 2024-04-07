@@ -32,7 +32,19 @@ $opts{d} ? decompress(\*STDIN, \*STDOUT) : compress(\*STDIN, \*STDOUT);
 
 # DESCRIPTION
 
-**Compression::Util** is a function-based module, implementing various techniques used in data compression, such as the Burrows-Wheeler transform, Move-to-front transform, Huffman Coding, Arithmetic Coding (in fixed bits), Run-length encoding, Fibonacci coding, Delta coding, LZ77/LZSS compression and LZW compression.
+**Compression::Util** is a function-based module, implementing various techniques used in data compression, such as:
+
+    * Burrows-Wheeler transform
+    * Move-to-front transform
+    * Huffman Coding
+    * Arithmetic Coding (in fixed bits)
+    * Run-length encoding
+    * Fibonacci coding
+    * Elias gamma/omega coding
+    * Delta coding
+    * Bzip2-like compression
+    * LZ77/LZSS compression
+    * LZW compression
 
 The provided techniques can be easily combined in various ways to create powerful compressors, such as the Bzip2 compressor, which is a pipeline of the following methods:
 
@@ -53,15 +65,12 @@ my $data = do { open my $fh, '<:raw', $^X; local $/; <$fh> };
 my $rle4 = rle4_encode([unpack('C*', $data)]);
 my ($bwt, $idx) = bwt_encode(pack('C*', @$rle4));
 
-my @bytes    = unpack('C*', $bwt);
-my @alphabet = sort { $a <=> $b } uniq(@bytes);
-
-my $mtf = mtf_encode(\@bytes, \@alphabet);
+my ($mtf, $alphabet) = mtf_encode([unpack("C*", $bwt)]);
 my $rle = zrle_encode($mtf);
 
 open my $out_fh, '>:raw', \my $enc;
 print $out_fh pack('N', $idx);
-print $out_fh encode_alphabet(\@alphabet);
+print $out_fh encode_alphabet($alphabet);
 create_huffman_entry($rle, $out_fh);
 
 say "Original size  : ", length($data);
@@ -102,14 +111,14 @@ The encoding of input and output file-handles must be set to `:raw`.
 # HIGH-LEVEL FUNCTIONS
 
 ```perl
-      create_huffman_entry(\@symbols, $fh) # Create a Huffman Coding block
+      create_huffman_entry(\@symbols)      # Create a Huffman Coding block
       decode_huffman_entry($fh)            # Decode a Huffman Coding block
 
-      create_ac_entry(\@symbols, $fh)      # Create an Arithmetic Coding block
+      create_ac_entry(\@symbols)           # Create an Arithmetic Coding block
       decode_ac_entry($fh)                 # Decode an Arithmetic Coding block
 
-      create_adaptive_ac_entry(\@symbols, $fh)  # Create an Adaptive Arithmetic Coding block
-      decode_adaptive_ac_entry($fh)             # Decode an Adaptive Arithmetic Coding block
+      create_adaptive_ac_entry(\@symbols)  # Create an Adaptive Arithmetic Coding block
+      decode_adaptive_ac_entry($fh)        # Decode an Adaptive Arithmetic Coding block
 
       bz2_compress($string)                # Bzip2-like compression (RLE4+BWT+MTF+ZRLE+Huffman coding)
       bz2_decompress($fh)                  # Inverse of the above method
@@ -133,8 +142,11 @@ The encoding of input and output file-handles must be set to `:raw`.
 # MEDIUM-LEVEL FUNCTIONS
 
 ```perl
-      delta_encode(\@ints, $double=0)      # Delta encoding of an array of ints
-      delta_decode($fh, $double=0)         # Inverse of the above method
+      deltas(\@ints)                       # Computes the differences between integers
+      accumulate(\@deltas)                 # Inverse of the above method
+
+      delta_encode(\@ints)                 # Delta+RLE encoding of an array of ints
+      delta_decode($fh)                    # Inverse of the above method
 
       fibonacci_encode(\@symbols)          # Fibonacci coding of an array of symbols
       fibonacci_decode($fh)                # Inverse of the above method
@@ -157,12 +169,13 @@ The encoding of input and output file-handles must be set to `:raw`.
       bwt_encode_symbolic(\@symbols)       # Burrows-Wheeler transform over an array of symbols
       bwt_decode_symbolic(\@bwt, $idx)     # Inverse of symbolic Burrows-Wheeler transform
 
-      mtf_encode(\@symbols, \@alphabet)    # Move-to-front transform
+      mtf_encode(\@symbols)                # Move-to-front transform
       mtf_decode(\@mtf, \@alphabet)        # Inverse of the above method
 
       encode_alphabet(\@alphabet)          # Encode an alphabet of symbols into a binary string
       decode_alphabet($fh)                 # Inverse of the above method
 
+      frequencies(\@symbols)               # Returns a dictionary with symbol frequencies
       run_length(\@symbols, $max=undef)    # Run-length encoding, returning a 2D array
 
       rle4_encode(\@symbols, $max=255)     # Run-length encoding with 4 or more consecutive characters
@@ -195,7 +208,10 @@ The encoding of input and output file-handles must be set to `:raw`.
 
       huffman_encode(\@symbols, \%dict)    # Huffman encoding
       huffman_decode($bitstring, \%dict)   # Huffman decoding, given a string of bits
-      huffman_tree_from_freq(\%freq)       # Create Huffman dictionaries, given an hash of frequencies
+
+      huffman_from_freq(\%freq)            # Create Huffman dictionaries, given an hash of frequencies
+      huffman_from_symbols(\@symbols)      # Create Huffman dictionaries, given an array of symbols
+      huffman_from_code_lengths(\@lens)    # Create canonical Huffman codes, given an array of code lengths
 
       make_deflate_tables($size)           # Returns the DEFLATE tables for distance and length symbols
       find_deflate_index($value, \@table)  # Returns the index in a DEFLATE table, given a numerical value
@@ -485,16 +501,39 @@ Inverse of `bz2_compress_symbolic()`.
 
 # INTERFACE FOR MEDIUM-LEVEL FUNCTIONS
 
+## frequencies
+
+```perl
+    my $freq = frequencies(\@symbols);
+```
+
+Returns an hash ref dictionary with frequencies, given an array of symbols.
+
+## deltas
+
+```perl
+    my $deltas = deltas(\@integers);
+```
+
+Computes the differences between consecutive integers, returning an array.
+
+## accumulate
+
+```perl
+    my $integers = accumulate(\@deltas);
+```
+
+Inverse of `deltas()`.
+
 ## delta\_encode
 
 ```perl
     my $string = delta_encode(\@integers);
-    my $string = delta_encode(\@integers, 1);    # double
 ```
 
-Encodes a sequence of integers using Delta + Elias omega coding, returning a binary string.
+Encodes a sequence of integers (including negative integers) using Delta + Run-length + Elias omega coding, returning a binary string.
 
-Delta encoding calculates the difference between consecutive integers in the sequence and encodes these differences using Elias omega coding.
+Delta encoding calculates the difference between consecutive integers in the sequence and encodes these differences using Elias omega coding. When it's beneficial, runs of identitical symbols are collapsed with RLE.
 
 It takes two parameters: `\@integers`, representing the sequence of arbitrary integers to be encoded, and an optional parameter which defaults to `0`. If the second parameter is set to a true value, double Elias omega coding is performed, which results in better compression for very large integers.
 
@@ -503,11 +542,9 @@ It takes two parameters: `\@integers`, representing the sequence of arbitrary in
 ```perl
     # Given a file-handle
     my $integers = delta_decode($fh);
-    my $integers = delta_decode($fh, 1);       # double
 
     # Given a string
     my $integers = delta_decode($string);
-    my $integers = delta_decode($string, 1);   # double
 ```
 
 Inverse of `delta_encode()`.
@@ -675,11 +712,16 @@ The function returns the original sequence of symbolic elements.
 
 ```perl
     my $mtf = mtf_encode(\@symbols, \@alphabet);
+    my ($mtf, $alphabet) = mtf_encode(\@symbols);
 ```
 
-Performs Move-To-Front (MTF) encoding on a sequence of symbols using a given alphabet.
+Performs Move-To-Front (MTF) encoding on a sequence of symbols.
 
-It takes two parameters: `\@symbols`, representing the sequence of symbols to be encoded, and `\@alphabet`, representing the ordered alphabet used for encoding. The function returns the encoded MTF sequence.
+It takes one parameter: `\@symbols`, representing the sequence of symbols to be encoded.
+
+The function returns the encoded MTF sequence and the sorted list of unique symbols in the input data, representing the alphabet.
+
+Optionally, the alphabet can be provided as a second argument. When two arguments are provided, only the MTF sequence is returned.
 
 ## mtf\_decode
 
@@ -901,15 +943,39 @@ It takes a single parameter `\@symbols`, which represents the input sequence of 
 
 There is probably no need to call this function explicitly. Use `bwt_encode_symbolic()` instead!
 
-## huffman\_tree\_from\_freq
+## huffman\_from\_freq
 
 ```perl
-    my ($dict, $rev_dict) = huffman_tree_from_freq(\%freq);
+    my ($dict, $rev_dict) = huffman_from_freq(\%freq);
 ```
 
-Low-level function that constructs a Huffman tree based on the frequency of symbols provided in a hash table.
+Low-level function that constructs Huffman prefix codes, based on the frequency of symbols provided in a hash table.
 
 It takes a single parameter, `\%freq`, representing the hash table where keys are symbols, and values are their corresponding frequencies.
+
+The function returns two values: `$dict`, which represents the constructed Huffman dictionary, and `$rev_dict`, which holds the reverse mapping of Huffman codes to symbols.
+
+## huffman\_from\_symbols
+
+```perl
+    my ($dict, $rev_dict) = huffman_from_symbols(\@symbols);
+```
+
+Low-level function that constructs Huffman prefix codes, given an array of symbols.
+
+It takes a single parameter, `\@symbols`. Interanlly, it computes the frequency of each symbols and generates the Huffman prefix codes.
+
+The function returns two values: `$dict`, which represents the constructed Huffman dictionary, and `$rev_dict`, which holds the reverse mapping of Huffman codes to symbols.
+
+## huffman\_from\_code\_lengths
+
+```perl
+    my ($dict, $rev_dict) = huffman_from_code_lengths(\@code_lengths);
+```
+
+Low-level function that constructs a dictionary of canonical prefix codes, given an array of code lengths, as defined in RFC 1951 (Section 3.2.2).
+
+It takes a single parameter, `\@code_lengths`, where entry `$i` in the array corresponds to the code length for symbol `$i`.
 
 The function returns two values: `$dict`, which represents the constructed Huffman dictionary, and `$rev_dict`, which holds the reverse mapping of Huffman codes to symbols.
 
@@ -919,7 +985,7 @@ The function returns two values: `$dict`, which represents the constructed Huffm
     my $bits = huffman_encode(\@symbols, $dict);
 ```
 
-Low-level function that performs Huffman encoding on a sequence of symbols using a provided dictionary, returned by `huffman_tree_from_freq()`.
+Low-level function that performs Huffman encoding on a sequence of symbols using a provided dictionary, returned by `huffman_from_freq()`.
 
 It takes two parameters: `\@symbols`, representing the sequence of symbols to be encoded, and `$dict`, representing the Huffman dictionary mapping symbols to their corresponding Huffman codes.
 
@@ -983,18 +1049,14 @@ The function returns the decompressed data as a string.
 ## deflate\_encode
 
 ```perl
-    # Writes to file-handle
-    deflate_encode(\@literals, \@distances, \@lengths, $out_fh);
-    deflate_encode(\@literals, \@distances, \@lengths, $out_fh, \&create_ac_entry);
-
     # Returns a binary string
     my $string = deflate_encode(\@literals, \@distances, \@lengths);
-    my $string = deflate_encode(\@literals, \@distances, \@lengths, undef, \&create_ac_entry);
+    my $string = deflate_encode(\@literals, \@distances, \@lengths, \&create_ac_entry);
 ```
 
 Low-level function that encodes the results returned by `lz77_encode()` and `lzss_encode()`, using a DEFLATE-like approach, combined with Huffman coding.
 
-A sixth optional argument can be provided as `\&create_ac_entry` to use Arithmetic Coding instead of Huffman coding. The default value is `\&create_huffman_entry`.
+An optional argument can be provided as `\&create_ac_entry` to use Arithmetic Coding instead of Huffman coding. The default value is `\&create_huffman_entry`.
 
 ## deflate\_decode
 

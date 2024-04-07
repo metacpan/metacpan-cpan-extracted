@@ -26,7 +26,7 @@ $SIG{__DIE__}  = sub { die BOLD RED "Error: ", @_ };
 
 # Global variables:
 $Data::Dumper::Sortkeys = 1;
-our $VERSION   = '0.05';
+our $VERSION   = '0.06';
 our $share_dir = dist_dir('Pheno-Ranker');
 
 # Set developoent mode
@@ -321,8 +321,12 @@ sub run {
         );
 
         # Check for existence of primary_key otherwise die
+        # Expected cases:
+        #  - A) BFF/PXF (default  config) exists primary_key('id') 
+        #  - B) JSON    (default  config) exists primary_key('id') - i.e., OpenEHR
+        #  - C) JSON    (external config) exists primary_key 
         my $msg =
-"Sorry, <$cohort_file> does not contain primary_key <$primary_key>. Are you using the right config file?\n";
+"Sorry, <$cohort_file> does not contain primary_key <$primary_key>. Are you using the right configuration file?\n";
         if ( ref $json_data eq ref [] ) {    # array - 1st element only
             die $msg unless exists $json_data->[0]->{$primary_key};
         }
@@ -375,7 +379,7 @@ sub run {
       unless check_existence_of_include_terms( $coverage_stats,
         $self->{include_terms} );
 
-    # We have to check if we have BFF|PXF or others unless defined at config
+    # We have to check if we have BFF|PXF or others (unless defined at config)
     add_attribute( $self, 'format', check_format($ref_data) )
       unless defined $self->{format};    # setter via sub
 

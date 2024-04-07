@@ -10,9 +10,9 @@ use Exporter 'import';
 use POSIX 'setlocale', 'LC_ALL';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-02-26'; # DATE
+our $DATE = '2024-04-06'; # DATE
 our $DIST = 'App-BPOMUtils-RPO-Ingredients'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_rpo_ingredients_group_for_label
@@ -32,6 +32,22 @@ sub _fmtfloat_max_precision {
     $res;
 }
 
+sub _fmt_inner_content {
+    my ($lang, $inner, $weight, $inner_content, $max_precision) = @_;
+
+    my @res;
+    push @res, $lang eq 'eng' ? 'containing ' : 'mengandung ';
+    push @res, $inner;
+    if ($inner_content) {
+        if ($inner_content =~ /^(.+)-(.+)$/) {
+            push @res, ' ', _fmtfloat_max_precision($max_precision, $weight/100 * $1), '-', _fmtfloat_max_precision($max_precision, $weight/100 * $2), '%';
+        } else {
+            push @res, ' ', _fmtfloat_max_precision($max_precision, $weight/100 * $inner_content), '%';
+        }
+    }
+    join "", @res;
+}
+
 $SPEC{bpom_rpo_ingredients_group_for_label} = {
     v => 1.1,
     summary => 'Group ingredients suitable for food label',
@@ -39,15 +55,15 @@ $SPEC{bpom_rpo_ingredients_group_for_label} = {
 
 This utility accepts a CSV data from stdin. The CSV must be formatted like this:
 
-    Ingredient,%weight,"Ingredient name for label (Indonesian)","Ingredient name for label (English)","QUID?","Note (Indonesian)","Note (English)","Ingredient group for label (Indonesian)","Ingredient group for label (English)"
-    Air,78.48,Air,Water,,
-    Gula,16.00,Gula,Sugar,,"mengandung pengawet sulfit","contains sulfite preservative",
-    "Nata de coco",5.00,"Nata de coco","Nata de coco",1,"mengandung pengawet sulfit","contains sulfit preservative",
-    "Asam sitrat",0.25,"Asam sitrat","Citric acid",,,,"Pengatur keasaman","Acidity regulator"
-    "Asam malat",0.10,"Asam malat","Malic acid",,,,"Pengatur keasaman","Acidity regulator"
-    "Grape flavor",0.10,Anggur,Grape,,,,"Perisa sintetik","Synthetic flavoring"
-    "Tea flavor",0.05,Teh,Tea,,,,"Perisa sintetik","Synthetic flavoring"
-    "Natrium benzoat",0.02,"Natrium benzoat","Sodium benzoate",,,,Pengawet,Preservative
+    Ingredient,%weight,"Ingredient name for label (Indonesian)","Ingredient name for label (English)","QUID?","Note (Indonesian)","Note (English)","Ingredient group for label (Indonesian)","Ingredient group for label (English)","Inner ingredient (Indonesian)","Inner ingredient (English)","Inner ingredient content (%)"
+    Air,78.48,Air,Water,,,,,
+    Gula,16.00,Gula,Sugar,,"mengandung pengawet sulfit","contains sulfite preservative",,,,
+    "Nata de coco",5.00,"Nata de coco","Nata de coco",1,"mengandung pengawet sulfit","contains sulfit preservative",,,,
+    "Asam sitrat",0.25,"Asam sitrat","Citric acid",,,,"Pengatur keasaman","Acidity regulator",,,
+    "Asam malat",0.10,"Asam malat","Malic acid",,,,"Pengatur keasaman","Acidity regulator",,,
+    "Grape extract",0.10,Anggur,Grape,,,,"Ekstrak buah","Fruit extract","buah anggur","grape fruit","60-70"
+    "Tea flavor",0.05,Teh,Tea,,,,"Perisa sintetik","Synthetic flavoring",,,
+    "Natrium benzoat",0.02,"Natrium benzoat","Sodium benzoate",,,,Pengawet,Preservative,,,
 
 It can then group the ingredients based on the ingredient group and generate
 this (for Indonesian, `--lang ind`):
@@ -57,7 +73,8 @@ this (for Indonesian, `--lang ind`):
     Gula (mengandung pengawet sulfit),16.00
     "Nata de coco 5% (mengandung pengawet sulfit)",5.00
     "Pengatur keasaman (Asam sitrat, Asam malat)",0.35
-    "Perisa sintetik (Anggur, Teh)",0.15
+    "Ekstrak buah (Anggur 0,1% (mengandung buah anggur 0,06-0,07%))",0.1
+    "Perisa sintetik (Teh)",0.05
     "Pengawet Natrium benzoat",0.02
 
 And for English, `--lang eng`:
@@ -67,7 +84,8 @@ And for English, `--lang eng`:
     Sugar (contains sulfite preservative),16.00
     "Nata de coco 5% (contains sulfite preservative)",5.00
     "Acidity regulator (Citric acid, Malic acid)",0.35
-    "Synthetic flavoring (Grape, Tea)",0.15
+    "Fruit extract (Grape 0.1% (containing grape fruit 0.06-0.07%))",0.1
+    "Synthetic flavoring (Tea)",0.05
     "Preservative Sodium benzoate",0.02
 
 _
@@ -104,13 +122,16 @@ sub bpom_rpo_ingredients_group_for_label {
     my %ingredients; # key = name, value = { weight=>, items=> }
     for my $n (1 .. $#rows) {
         my $row = $rows[$n];
-        my ($ingredient0, $weight, $ind_ingredient, $eng_ingredient, $quid, $ind_note, $eng_note, $ind_group, $eng_group) = @$row;
-        my ($label_ingredient0, $note, $group) = $args{lang} eq 'eng' ? ($eng_ingredient, $eng_note, $eng_group) : ($ind_ingredient, $ind_note, $ind_group);
+        my ($ingredient0, $weight, $ind_ingredient, $eng_ingredient, $quid, $ind_note, $eng_note, $ind_group, $eng_group, $ind_inner, $eng_inner, $inner_content) = @$row;
+        my ($label_ingredient0, $note, $group, $inner) = $args{lang} eq 'eng' ?
+            ($eng_ingredient, $eng_note, $eng_group, $eng_inner) :
+            ($ind_ingredient, $ind_note, $ind_group, $ind_inner);
 
         my $label_ingredient = join(
             " ",
             $label_ingredient0,
             ($quid ? (_fmtfloat_max_precision($args{quid_precision}, $weight) . '%') : ()),
+            ($inner ? ('('. _fmt_inner_content($args{lang}, $inner, $weight, $inner_content, $args{quid_precision}) . ')') : ()),
             ($note ? ("($note)") : ()),
         );
 
@@ -162,7 +183,7 @@ App::BPOMUtils::RPO::Ingredients - Group ingredients suitable for food label
 
 =head1 VERSION
 
-This document describes version 0.006 of App::BPOMUtils::RPO::Ingredients (from Perl distribution App-BPOMUtils-RPO-Ingredients), released on 2024-02-26.
+This document describes version 0.007 of App::BPOMUtils::RPO::Ingredients (from Perl distribution App-BPOMUtils-RPO-Ingredients), released on 2024-04-06.
 
 =head1 SYNOPSIS
 
@@ -191,15 +212,15 @@ Group ingredients suitable for food label.
 
 This utility accepts a CSV data from stdin. The CSV must be formatted like this:
 
- Ingredient,%weight,"Ingredient name for label (Indonesian)","Ingredient name for label (English)","QUID?","Note (Indonesian)","Note (English)","Ingredient group for label (Indonesian)","Ingredient group for label (English)"
- Air,78.48,Air,Water,,
- Gula,16.00,Gula,Sugar,,"mengandung pengawet sulfit","contains sulfite preservative",
- "Nata de coco",5.00,"Nata de coco","Nata de coco",1,"mengandung pengawet sulfit","contains sulfit preservative",
- "Asam sitrat",0.25,"Asam sitrat","Citric acid",,,,"Pengatur keasaman","Acidity regulator"
- "Asam malat",0.10,"Asam malat","Malic acid",,,,"Pengatur keasaman","Acidity regulator"
- "Grape flavor",0.10,Anggur,Grape,,,,"Perisa sintetik","Synthetic flavoring"
- "Tea flavor",0.05,Teh,Tea,,,,"Perisa sintetik","Synthetic flavoring"
- "Natrium benzoat",0.02,"Natrium benzoat","Sodium benzoate",,,,Pengawet,Preservative
+ Ingredient,%weight,"Ingredient name for label (Indonesian)","Ingredient name for label (English)","QUID?","Note (Indonesian)","Note (English)","Ingredient group for label (Indonesian)","Ingredient group for label (English)","Inner ingredient (Indonesian)","Inner ingredient (English)","Inner ingredient content (%)"
+ Air,78.48,Air,Water,,,,,
+ Gula,16.00,Gula,Sugar,,"mengandung pengawet sulfit","contains sulfite preservative",,,,
+ "Nata de coco",5.00,"Nata de coco","Nata de coco",1,"mengandung pengawet sulfit","contains sulfit preservative",,,,
+ "Asam sitrat",0.25,"Asam sitrat","Citric acid",,,,"Pengatur keasaman","Acidity regulator",,,
+ "Asam malat",0.10,"Asam malat","Malic acid",,,,"Pengatur keasaman","Acidity regulator",,,
+ "Grape extract",0.10,Anggur,Grape,,,,"Ekstrak buah","Fruit extract","buah anggur","grape fruit","60-70"
+ "Tea flavor",0.05,Teh,Tea,,,,"Perisa sintetik","Synthetic flavoring",,,
+ "Natrium benzoat",0.02,"Natrium benzoat","Sodium benzoate",,,,Pengawet,Preservative,,,
 
 It can then group the ingredients based on the ingredient group and generate
 this (for Indonesian, C<--lang ind>):
@@ -209,7 +230,8 @@ this (for Indonesian, C<--lang ind>):
  Gula (mengandung pengawet sulfit),16.00
  "Nata de coco 5% (mengandung pengawet sulfit)",5.00
  "Pengatur keasaman (Asam sitrat, Asam malat)",0.35
- "Perisa sintetik (Anggur, Teh)",0.15
+ "Ekstrak buah (Anggur 0,1% (mengandung buah anggur 0,06-0,07%))",0.1
+ "Perisa sintetik (Teh)",0.05
  "Pengawet Natrium benzoat",0.02
 
 And for English, C<--lang eng>:
@@ -219,7 +241,8 @@ And for English, C<--lang eng>:
  Sugar (contains sulfite preservative),16.00
  "Nata de coco 5% (contains sulfite preservative)",5.00
  "Acidity regulator (Citric acid, Malic acid)",0.35
- "Synthetic flavoring (Grape, Tea)",0.15
+ "Fruit extract (Grape 0.1% (containing grape fruit 0.06-0.07%))",0.1
+ "Synthetic flavoring (Tea)",0.05
  "Preservative Sodium benzoate",0.02
 
 This function is not exported by default, but exportable.

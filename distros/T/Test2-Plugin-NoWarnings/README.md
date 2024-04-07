@@ -4,7 +4,7 @@ Test2::Plugin::NoWarnings - Fail if tests warn
 
 # VERSION
 
-version 0.09
+version 0.10
 
 # SYNOPSIS
 
@@ -34,8 +34,6 @@ you can ask for this with the `echo` import argument:
 
 Bugs may be submitted at [https://github.com/houseabsolute/Test2-Plugin-NoWarnings/issues](https://github.com/houseabsolute/Test2-Plugin-NoWarnings/issues).
 
-I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
-
 # SOURCE
 
 The source code repository for Test2-Plugin-NoWarnings can be found at [https://github.com/houseabsolute/Test2-Plugin-NoWarnings](https://github.com/houseabsolute/Test2-Plugin-NoWarnings).
@@ -55,7 +53,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
+button at [https://houseabsolute.com/foss-donations/](https://houseabsolute.com/foss-donations/).
 
 # AUTHOR
 
@@ -67,7 +65,7 @@ Michael Alan Dorman <mdorman@ironicdesign.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Dave Rolsky.
+This software is Copyright (c) 2024 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -45,6 +45,6 @@
          "web" : "https://github.com/pmqs/Compress-Raw-Bzip2"
       }
    },
-   "version" : "2.210",
+   "version" : "2.211",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

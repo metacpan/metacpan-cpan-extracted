@@ -5,7 +5,7 @@
 #   1 - Input file (JSON array of objects)
 #   2 - Configuration file (needed for Pheno-Ranker)
 #
-#   Last Modified: Dec/15/2023
+#   Last Modified: Mar/21/2024
 #
 #   $VERSION taken from Pheno::Ranker
 #
@@ -27,19 +27,19 @@ exit;
 
 sub process_csv {
 
-    my $VERSION = '0.04';
+    my $VERSION = '0.06';
 
     # Reading arguments
     GetOptions(
-        'input|i=s'       => \my $input,                                    # string
-        'primary-key=s'   => \my $primary_key,                              # string
-        'set-primary-key' => \my $set_primary_key,                          # flag
-        'separator|sep=s' => \my $sep,                                      # str
-        'help|?'          => \my $help,                                     # flag
-        'man'             => \my $man,                                      # flag
-        'debug=i'         => \my $debug,                                    # integer
-        'verbose|'        => \my $verbose,                                  # flag
-        'version|V'       => sub { print "$0 Version $VERSION\n"; exit; }
+        'input|i=s'            => \my $input,                                  # string
+        'primary-key-name=s'   => \my $primary_key_name,                       # string
+        'generate-primary-key' => \my $generate_primary_key,                   # flag
+        'separator|sep=s'      => \my $sep,                                    # str
+        'help|?'               => \my $help,                                   # flag
+        'man'                  => \my $man,                                    # flag
+        'debug=i'              => \my $debug,                                  # integer
+        'verbose|'             => \my $verbose,                                # flag
+        'version|V'            => sub { print "$0 Version $VERSION\n"; exit; }
     ) or pod2usage(2);
     pod2usage(1)                              if $help;
     pod2usage( -verbose => 2, -exitval => 0 ) if $man;
@@ -47,21 +47,21 @@ sub process_csv {
         -message =>
           "Please specify a valid CSV|TSV input with --i <file.csv>\n",
         -exitval => 1
-    ) unless ( $input && $input =~ m/\.csv|\.tsv/ && -f $input );
+    ) unless ( $input && $input =~ m/\.(csv|tsv)$/ && -f $input );
     pod2usage(
-        -message => "Please specify a --primary-key <my_string>\n",
+        -message => "Please specify a --primary-key-name <my_string>\n",
         -exitval => 1
-    ) if ( $set_primary_key && !$primary_key );
+    ) if ( $generate_primary_key && !$primary_key_name );
 
     # Create object
     my $csv = CSV2PhenoRanker->new(
         {
-            input           => $input,
-            primary_key     => $primary_key,
-            set_primary_key => $set_primary_key,
-            sep             => $sep,
-            debug           => $debug,
-            verbose         => $verbose
+            input                => $input,
+            primary_key_name     => $primary_key_name,
+            generate_primary_key => $generate_primary_key,
+            sep                  => $sep,
+            debug                => $debug,
+            verbose              => $verbose
         }
     );
 
@@ -136,16 +136,20 @@ sub write_yaml {
 
 sub read_csv {
 
-    my $self            = shift;
-    my $input           = $self->{input};
-    my $primary_key     = $self->{primary_key};       # has to be non-array
-    my $set_primary_key = $self->{set_primary_key};
-    my $sep             = $self->{sep};
+    my $self                 = shift;
+    my $input                = $self->{input};
+    my $primary_key_name     = $self->{primary_key_name};       # has to be non-array
+    my $generate_primary_key = $self->{generate_primary_key};
+    my $sep                  = $self->{sep};
 
     # Create a Text::CSV object with semicolon as the separator
-    my $csv =
-      Text::CSV_XS->new(
-        { binary => 1, sep_char => define_separator($input, $sep), auto_diag => 1 } );
+    my $csv = Text::CSV_XS->new(
+        {
+            binary    => 1,
+            sep_char  => define_separator( $input, $sep ),
+            auto_diag => 1
+        }
+    );
 
     # Open filehandle
     open my $fh, '<', $input;
@@ -156,8 +160,17 @@ sub read_csv {
     # Get rid of problematic characters on headers
     $_ =~ tr/()//d for @$headers;
 
-    # Add $primary_key to headers if $set_primary_key
-    push @$headers, $primary_key if $set_primary_key;
+    # Add $primary_key_name to headers if $generate_primary_key
+    if ($generate_primary_key) {
+
+        # Check that primary_key_name does not exist
+        die
+"Primary key <$primary_key_name> already exists. Are you sure you need the <--generate-primary-key> flag?\n"
+          if ( grep { $_ eq $primary_key_name } @$headers );
+
+        # Make it last element of the array
+        push @$headers, $primary_key_name if $generate_primary_key;
+    }
 
     #####################
     # START READING CSV #
@@ -172,8 +185,8 @@ sub read_csv {
         say "Reading row $count..."
           if ( $self->{verbose} && $count % 1_000 == 0 );
 
-        # Add id if $set_primary_key
-        push @$row, 'PR_' . sprintf( "%08d", $count ) if $set_primary_key;
+        # Add id if $generate_primary_key
+        push @$row, 'PR_' . sprintf( "%08d", $count ) if $generate_primary_key;
 
         # Load data
         my %data;
@@ -223,26 +236,26 @@ sub read_csv {
 sub create_config {
 
     my ( $array, $non_array, $self ) = @_;
-    my $primary_key = $self->{primary_key};
+    my $primary_key_name = $self->{primary_key_name};
 
     my @arrays     = sort keys %$array;
     my @non_arrays = sort keys %$non_array;
 
-    # Set primary key.
-    if ( defined $primary_key ) {
-        die "<$primary_key> not found\n"
-          unless ( exists $array->{$primary_key}
-            || exists $non_array->{$primary_key} );
+    # Set primary key
+    if ( defined $primary_key_name ) {
+        die "<$primary_key_name> not found\n"
+          unless ( exists $array->{$primary_key_name}
+            || exists $non_array->{$primary_key_name} );
     }
 
     else {
-        $primary_key = exists $non_array->{id} ? 'id' : $non_arrays[0];
+        $primary_key_name = exists $non_array->{id} ? 'id' : $non_arrays[0];
     }
 
     # Default for non-arrays
     my $config = {
         format        => 'CSV',
-        primary_key   => $primary_key,
+        primary_key   => $primary_key_name,
         allowed_terms => [@non_arrays]
     };
 
@@ -301,9 +314,10 @@ csv2pheno-ranker -i <input.csv> [-options]
        -i|input                       CSV file
 
      Options:
-       -primary-key                   Name of the field that you want to use as identifier (MUST BE NON-ARRAY)
+
+       -generate-primary-key          Generates a primary key if absent. Use --primary-key-name to set its name.
+       -primary-key-name              Sets the name for the primary key. Must be a single, non-array field.
        -sep|separator                 Delimiter character for CSV files [;] e.g., --sep $'\t'
-       -set-primary-key               To force inserting a primary key (in case your CSV does not have one). The name will be set with --primary-key
 
      Generic Options;
        -debug                         Print debugging (from 1 to 5, being 5 max)
@@ -351,7 +365,7 @@ B<Examples:>
 
  $ ./csv2pheno-ranker -i example.csv
  
- $ ./csv2pheno-ranker -i example.csv --set-primary-key --primary-key ID
+ $ ./csv2pheno-ranker -i example.csv --generate-primary-key --primary-key-name ID
 
 =head2 COMMON ERRORS AND SOLUTIONS
 

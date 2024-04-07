@@ -9,23 +9,27 @@ with qw/Dist::Zilla::Role::TextTemplate Dist::Zilla::Role::PrereqSource/;
 use namespace::autoclean;
 
 has filename_regex => (
-    is      => 'ro',
-    isa     => 'Str',
-    default =>
-        q/(?:\.(?:t|pm|pl|xs|c|h|txt|pod|PL)|README|Changes|TODO|LICENSE)\z/,
+    is => 'ro',
+    isa => 'Str',
+    default => q/(?:\.(?:t|pm|pl|xs|c|h|txt|pod|PL)|README|Changes|TODO|LICENSE)\z/,
+);
+
+has abs_path_prune_re => (
+    is => 'ro',
+    isa => 'Str',
 );
 
 around add_file => sub {
-    my ( $orig, $self, $file ) = @_;
+    my ($orig, $self, $file) = @_;
 
     return $self->$orig(
         Dist::Zilla::File::InMemory->new(
-            name    => $file->name,
-            content => $self->fill_in_string(
-                $file->content,
+            name => $file->name,
+            content => $self->fill_in_string($file->content,
                 {
-                    dist           => \( $self->zilla ),
+                    dist => \($self->zilla),
                     filename_regex => $self->filename_regex,
+                    abs_path_prune_re => $self->abs_path_prune_re,
                 }
             )
         )
@@ -34,8 +38,7 @@ around add_file => sub {
 
 # Register the release test prereq as a "develop requires"
 # so it will be listed in "dzil listdeps --author"
-sub register_prereqs
-{
+sub register_prereqs {
     my ($self) = @_;
 
     $self->zilla->register_prereqs(
@@ -43,7 +46,7 @@ sub register_prereqs
             type  => 'requires',
             phase => 'develop',
         },
-        'Test::TrailingSpace' => '0.0203',
+        'Test::TrailingSpace'     => '0.0203',
     );
 
     return;
@@ -64,7 +67,7 @@ in files.
 
 =head1 VERSION
 
-version 0.2.1
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -90,6 +93,11 @@ Here is an example of how to override it:
 
     [Test::TrailingSpace]
     filename_regex = \.(?:pm|pod)\z
+
+=head2 abs_path_prune_re
+
+The regular expression for input to Test::TrailingSpace for specifying paths
+to ignore.
 
 =head1 SUBROUTINES/METHODS
 
@@ -189,9 +197,9 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<http://bitbucket.org/shlomif/perl-Dist-Zilla-Plugin-Test-TrailingSpace>
+L<https://github.com/shlomif/Dist-Zilla-Plugin-Test-TrailingSpace>
 
-  hg clone ssh://hg@bitbucket.org/shlomif/perl-Dist-Zilla-Plugin-Test-TrailingSpace
+  git clone https://github.com/shlomif/Dist-Zilla-Plugin-Test-TrailingSpace.git
 
 =head1 AUTHOR
 
@@ -243,6 +251,9 @@ my $finder = Test::TrailingSpace->new(
    {
        root => '.',
        filename_regex => qr#{{ $filename_regex }}#,
+       abs_path_prune_re => {{ defined $abs_path_prune_re
+                                 ?  qq{qr#$abs_path_prune_re#}
+                                 : 'undef' }},
    },
 );
 

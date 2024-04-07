@@ -1,11 +1,11 @@
-
+[![Actions Status](https://github.com/hernan604/lib-root/actions/workflows/test.yml/badge.svg)](https://github.com/hernan604/lib-root/actions)
 # NAME
 
 lib::root - find perl root and push lib modules path to @INC
 
 # VERSION
 
-version 0.06
+version 0.07
 
 # SYNOPSIS
 
@@ -136,6 +136,69 @@ IT is also possible to get the root dir calling the root sub:
 IT is also possible to get the root dir calling the root sub:
 
     my $rootdir = lib::root->root;
+
+## ACCEPTED PARAMETERS
+
+All the parameters are optional. The default libroot file is `.libroot`
+
+### rootfile parameter
+
+The `rootfile` parameter defines the which file lib::root must look for in parent directories.
+
+That file (.libroot or other) must exist inside a perl $directory because lib::root will use that $dir to push to @INC.
+
+Once lib::root finds the .libroot file inside $dir, it will push $dir/\*/lib to @INC.
+
+The default libroot file is `.libroot`, however you may override it with a different name, or maybe use one that already exists, for example the very used `cpanfile` or `.perl-version`
+
+    use lib::root rootfile => '.perl-version';
+    use lib::root rootfile => 'cpanfile';
+    use lib::root; #defaults to .libroot
+
+The file must exists or lib::root will throw a warning and will not be able to push to @INC.
+
+Example of such warning:
+
+    lib::root error: Could not find rootfile [ .libroot ]. lib::root loaded from [ /home/user/myapp/perl/MyApp/lib/MyApp.pm ].
+
+### perldir parameter
+
+As mentioned in "rootfile parameter" section, lib::root will find the $dir that contains .libroot. Then push $dir/\*/lib to @INC. However, your app might have a different structure and needs some extra directories ie. `$dir/some/extra/dir/perl/*/lib` to @INC.
+
+You can add that extra dir with the perldir parameter:
+
+    use lib::root perldir => 'some/extra/dir/perl'; #push $librootdir/some/extra/dir/perl/*/lib to @INC
+    use lib::root rootfile => 'cpanfile', perldir => 'local/myapp'; #push $dir/local/myapp/*/lib
+
+### callback parameter
+
+lib::root accepts a callback that will be executed after paths are pushed to @INC. However the callback will only execute if libroot found the rootfile and pushed to @INC.
+
+    use lib::root callback => sub { warn "lib::root pushed to @INC" };
+
+### rootdir function
+
+After using `lib::root` it is possible to retrieve the directory that contains the rootfile.
+
+Use the `root` function to get the rootdir. returns a Path::Tiny object. ie:
+
+    use lib::root;
+    print lib::root->rootdir; # /home/user/myapp/perl/ (Path::Tiny object)
+
+`rootdir` function is an alias for the `root` function. If you prefer to use root:
+
+    use lib::root;
+    print lib::root->root; # /home/user/myapp/perl/ (Path::Tiny object)
+
+## INSTALLATION
+
+To install this module via cpanm:
+
+    cpanm lib::root
+
+Or via cpan shell:
+
+    cpan> install lib::root
 
 ## SEE ALSO
 

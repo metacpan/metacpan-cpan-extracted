@@ -1,5 +1,5 @@
 package Clipboard::Xclip;
-$Clipboard::Xclip::VERSION = '0.28';
+$Clipboard::Xclip::VERSION = '0.29';
 use strict;
 use warnings;
 
@@ -44,7 +44,7 @@ sub paste_from_selection {
     my ($selection) = @_;
     my $cmd = "xclip -o -selection $selection|";
     open my $exe, $cmd or die "Couldn't run `$cmd`: $!\n";
-    my $result = join '', <$exe>;
+    my $result = do { local $/; <$exe> };
     close $exe or die "Error closing `$cmd`: $!";
     return $result;
 }
@@ -71,7 +71,7 @@ sub xclip_available {
 {
   xclip_available() or warn <<'EPIGRAPH';
 
-Can't find the 'xclip' script.  Clipboard.pm's X support depends on it.
+Can't find the 'xclip' program.  Clipboard.pm's X support depends on it.
 
 Here's the project homepage: http://sourceforge.net/projects/xclip/
 
@@ -88,7 +88,7 @@ __END__
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -182,7 +182,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ryan King <rking@panoptic.com>.
+This software is copyright (c) 2024 by Ryan King <rking@panoptic.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

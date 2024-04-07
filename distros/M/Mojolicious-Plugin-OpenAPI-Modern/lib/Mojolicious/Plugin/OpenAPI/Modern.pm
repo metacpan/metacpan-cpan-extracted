@@ -1,10 +1,10 @@
 use strictures 2;
-package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.007-3-g7653d5e
+package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.008-4-gd1d32cc
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mojolicious plugin providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use 5.020;
 use if "$]" >= 5.022, experimental => 're_strict';
@@ -100,7 +100,7 @@ Mojolicious::Plugin::OpenAPI::Modern - Mojolicious plugin providing access to an
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

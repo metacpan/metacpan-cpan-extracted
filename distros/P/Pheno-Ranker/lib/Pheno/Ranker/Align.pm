@@ -631,6 +631,7 @@ sub remap_hash {
         # Discarding lines with val (Time profiled with :NYTProf: ms time)
         next
           if ( $val eq 'NA'
+            || $val eq 'NaN'
             || $val eq 'Fake'
             || $val eq 'None:No matching concept'
             || $val =~ m/1900-01-01|NA0000|P999Y|P9999Y|ARRAY|phenopacket_id/ );

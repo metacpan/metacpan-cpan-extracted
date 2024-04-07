@@ -1,0 +1,15 @@
+Revision history for Perl extension Sqids
+
+0.03 2024-04-06T22:09:57Z
+
+    - Fix typo in POD
+
+0.02 2024-04-06T21:57:16Z
+
+    - Update to upstream repository details
+    - Fix POD formatting
+
+0.01 2024-04-06T10:42:51Z
+
+    - initial version, working from reference spec
+

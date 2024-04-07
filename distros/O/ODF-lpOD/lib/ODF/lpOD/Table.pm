@@ -45,7 +45,7 @@ sub     set_group
                 {
                 alert "Grouping not allowed"; return FALSE;
                 }
-        my $tag = ($type ~~ ['column', 'row']) ?
+        my $tag = ($type eq 'column' || $type eq 'row') ?
                         'table:table-' . $type . '-group'       :
                         'table:table-' . $type;
         my $group = ODF::lpOD::Element->create($tag);
@@ -1263,30 +1263,27 @@ sub     _get_cell_values
                 else
                         {
                         $min //= $v; $max //= $v;
-                        given ($type)
-                                {
-                                when (['string', 'all'])
+                        if ($type eq 'string' || $type eq 'all')
                                         {
                                         $min = $v if &$cf($min, $v) > 0;
                                         $max = $v if &$cf($max, $v) < 0;
                                         }
-                                when (['date', 'time'])
+                        elsif ($type eq 'date' || $type eq 'time')
                                         {
                                         $min = $v if $min gt $v;
                                         $max = $v if $max lt $v;
                                         }
-                                when (['float', 'currency', 'percentage'])
+                        elsif ($type eq 'float' || $type eq 'currency' || $type eq 'percentage') 
                                         {
                                         $min = $v if $min > $v;
                                         $max = $v if $max < $v;
                                         $sum += ($v * $rep);
                                         }
-                                when ('boolean')
+                        elsif ($type eq 'boolean')
                                         {
                                         if (is_true($v))        { $min++ }
                                         else                    { $max++ }
                                         }
-                                }
                         }
                 }
         return wantarray ? @values : [ $count, $min, $max, $sum ];

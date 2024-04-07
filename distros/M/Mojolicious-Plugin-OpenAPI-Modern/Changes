@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-OpenAPI-Modern
 
+0.009     2024-04-06 23:09:07Z
+          - adjust tests for changes in OpenAPI::Modern 0.062
+
 0.008     2024-01-15 03:21:04Z
           - fix prerequisite declaration to allow tests to pass
 

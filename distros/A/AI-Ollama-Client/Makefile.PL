@@ -46,20 +46,26 @@ my %module = (
 
     PL_FILES            => {},
     BUILD_REQUIRES => {
+        'strict'              => 0,
+        'ExtUtils::MakeMaker' => 0,
+    },
+
+    PREREQ_PM => {
         'stable'              => '0.031',
         'experimental'        => '0.031',
-        'ExtUtils::MakeMaker' => 0,
+        'Carp'                => 0,
         'Future'              => 0,
+        'Future::Mojo'        => 0,
         'Future::Utils'       => 0,
         'Future::Queue'       => 0,
         'Moo'                 => 2,
         'Mojolicious'         => 9,
         'Mojo::JSON'          => 0,
+        'Mojo::URL'           => 0,
+        'Mojo::UserAgent'     => 0,
+        'OpenAPI::Modern'     => 0,
         'PerlX::Maybe'        => 0,
-    },
-
-    PREREQ_PM => {
-        'Exporter'           => 5, # for 'import'
+        'YAML::PP'            => 0,
     },
     TEST_REQUIRES => {
         'Test2::V0'    => 0,

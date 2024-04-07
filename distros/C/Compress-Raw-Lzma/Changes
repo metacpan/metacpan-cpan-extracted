@@ -1,6 +1,32 @@
 CHANGES
 -------
 
+  2.211 6 April 2024
+
+    * version 2.211
+      Sat Apr 6 14:29:03 2024 +0100
+      9db8924a5979246370193cd5997e5386d5ce4e63
+
+    * Add xz 5.6.1 to workflow
+      Sat Mar 9 14:56:51 2024 +0000
+      953082ddbe0b71d87a55a6952b2984a706fbed56
+
+    * fixes for 5.7.0 alpha
+      Sat Feb 24 15:05:34 2024 +0000
+      f4e0c65dc7ad21d1a9b3defa727bc9606229907a
+
+    * fix for gettext install
+      Sat Feb 24 15:01:17 2024 +0000
+      3f2488759f7244e4db69003305522a9c230d0993
+
+    * Install gettext for cmake
+      Sat Feb 24 14:57:06 2024 +0000
+      6a71424f221779702fc7517f33c9c373cf3e49e0
+
+    * Add xz 5.6.0 to workflow
+      Sat Feb 24 10:37:19 2024 +0000
+      bb252c8d1290cbbbd669a4ccd31e4429a3cf7e8a
+      
   2.209 19 February 2024
 
     * Merge pull request #11 from pkg-perl-tools/pkg-perl-1708373862

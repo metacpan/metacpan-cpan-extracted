@@ -340,22 +340,19 @@ sub     set_text_mark
                 }
 
         my $tag;
-        given ($opt{role})
+        if (!defined $opt{role})
                 {
-                when (undef)
-                        {
-                        $tag = $opt{tag};
-                        }
-                when (/^(start|end)$/)
-                        {
-                        $tag = $opt{tag} . '-' . $_;
-                        delete $opt{role};
-                        }
-                default
-                        {
-                        alert("Wrong role = $_ option");
-                        return undef;
-                        }
+                $tag = $opt{tag};
+                }
+        elsif ($opt{role} =~ /^(start|end)$/)
+                {
+                $tag = $opt{tag} . '-' . $_;
+                delete $opt{role};
+                }
+        else
+                {
+                alert("Wrong role = $_ option");
+                return undef;
                 }
 
         delete $opt{tag};
@@ -426,30 +423,27 @@ sub     get_text
                     }
                 else
                     {
-                    given ($node->get_tag)
-                        {
-                        when ('text:tab')
-                                {
-                                $text .= $ODF::lpOD::Common::TAB_STOP;
-                                }
-                        when ('text:line-break')
-                                {
-                                $text .= $ODF::lpOD::Common::LINE_BREAK;
-                                }
-                        when ('text:s')
-                                {
-                                my $c = $node->get_attribute('c') // 1;
-                                $text .= " " while $c-- > 0;
-                                }
-                        default
-                                {
-                                if (is_true($opt{recursive}))
-                                        {
-                                        my $t = $node->SUPER::get_text(%opt);
-                                        $text .= $t if defined $t;
-                                        }
-                                }
-                        }
+                    if ($node->get_tag eq 'text:tab')
+                            {
+                            $text .= $ODF::lpOD::Common::TAB_STOP;
+                            }
+                    elsif ($node->get_tag eq 'text:line-break')
+                            {
+                            $text .= $ODF::lpOD::Common::LINE_BREAK;
+                            }
+                    elsif ($node->get_tag eq 'text:s')
+                            {
+                            my $c = $node->get_attribute('c') // 1;
+                            $text .= " " while $c-- > 0;
+                            }
+                    else
+                            {
+                            if (is_true($opt{recursive}))
+                                    {
+                                    my $t = $node->SUPER::get_text(%opt);
+                                    $text .= $t if defined $t;
+                                    }
+                            }
                     }
                 }
 
@@ -598,32 +592,29 @@ sub     set_index_mark
                 }
         my $tag;
         my %attr = $opt{attributes} ? %{$opt{attributes}} : ();
-        given ($opt{type})
+        if ($opt{type} eq "lexical" || $opt{type} eq "alphabetical")
                 {
-                when (["lexical", "alphabetical"])
+                $tag = 'alphabetical index mark';
+                }
+        elsif ($opt{type} eq 'toc')
+                {
+                $tag = 'toc mark';
+                $attr{'outline level'} = $opt{level} // 1;
+                }
+        elsif ($opt{type} eq 'user')
+                {
+                unless ($opt{index_name})
                         {
-                        $tag = 'alphabetical index mark';
+                        alert "Missing index name";
+                        return FALSE;
                         }
-                when ('toc')
-                        {
-                        $tag = 'toc mark';
-                        $attr{'outline level'} = $opt{level} // 1;
-                        }
-                when ('user')
-                        {
-                        unless ($opt{index_name})
-                                {
-                                alert "Missing index name";
-                                return FALSE;
-                                }
-                        $tag = 'user index mark';
-                        $attr{'outline level'} = $opt{level} // 1;
-                        }
-                default
-                        {
-                        alert "Wrong index mark type ($opt{type})";
-                        return FALSE
-                        }
+                $tag = 'user index mark';
+                $attr{'outline level'} = $opt{level} // 1;
+                }
+        else
+                {
+                alert "Wrong index mark type ($opt{type})";
+                return FALSE
                 }
 
         if (defined $opt{content} || ref $opt{offset} || $opt{role})
@@ -648,17 +639,14 @@ sub     set_bibliography_mark
         my $type_ok;
         foreach my $k (keys %opt)
                 {
-                if (ref $opt{$k} || ($k ~~ ['content', 'role']))
+                if (ref $opt{$k} || $k eq 'content' || $k eq 'role')
                         {
                         alert "Not allowed option";
                         delete $opt{$k};
                         next;
                         }
                 unless  (
-                        $k ~~   [
-                                'before', 'after', 'offset',
-                                'start_mark', 'end_mark'
-                                ]
+                            $k =~ /^(before|after|offset|start_mark|end_mark)$/
                         )
                         {
                         if ($k eq 'type')
@@ -768,28 +756,22 @@ sub     set_field
                         next;
                         }
                 unless  (
-                        $k ~~   [
-                                'before', 'after', 'offset', 'length',
-                                'start_mark', 'end_mark', 'search'
-                                ]
+                            $k =~ /^(before|after|offset|length|start_mark|end_mark|search)$/
                         )
                         {
-                        given ($k)
+                        if ($k eq 'fixed')
                                 {
-                                when ('fixed')
-                                        {
-                                        $opt{attributes}{$k} =
-                                                odf_boolean($opt{$k});
-                                        }
-                                when ('style')
-                                        {
-                                        my $a = 'style:data-style-name';
-                                        $opt{attributes}{$a} = $opt{$k};
-                                        }
-                                default
-                                        {
-                                        $opt{attributes}{$k} = $opt{$k};
-                                        }
+                                $opt{attributes}{$k} =
+                                        odf_boolean($opt{$k});
+                                }
+                        elsif ($k eq 'style')
+                                {
+                                my $a = 'style:data-style-name';
+                                $opt{attributes}{$a} = $opt{$k};
+                                }
+                        else
+                                {
+                                $opt{attributes}{$k} = $opt{$k};
                                 }
                         delete $opt{$k};
                         }

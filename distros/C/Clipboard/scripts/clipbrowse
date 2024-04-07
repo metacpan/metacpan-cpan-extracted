@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Clipboard;
 my $browser = $ENV{BROWSER} || 'chromium-browser "%s"';
-$browser .= ' %s' unless $browser =~ /%s/;
+$browser .= ' "%s"' unless $browser =~ /%s/;
 my $query = Clipboard->paste;
 $query =~ s/['"]/\\$&/;
 system(sprintf $browser, $query);
@@ -22,7 +22,7 @@ clipbrowse - Load a URL from the clipboard into your browser.
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 USAGE
 
@@ -157,7 +157,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ryan King <rking@panoptic.com>.
+This software is copyright (c) 2024 by Ryan King <rking@panoptic.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

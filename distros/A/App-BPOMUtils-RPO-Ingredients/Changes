@@ -1,3 +1,9 @@
+0.007   2024-04-06  Released-By: PERLANCAR; Urgency: medium
+
+        - Support inner ingredient, e.g. 'ekstrak anggur 0.1% (mengandung
+          buah anggur 0.06-0.07%).
+
+
 0.006   2024-02-26  Released-By: PERLANCAR; Urgency: medium
 
         - Add option --quid-precision, default to 4.

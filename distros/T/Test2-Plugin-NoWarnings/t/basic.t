@@ -1,6 +1,14 @@
 use strict;
 use warnings;
 
+# We load this here _before_ Test2::Plugin::NoWarnings because if we run tests
+# with 5.18, we get a warning from the version of Module::Pluggable shipped in
+# the 5.18 core. The warning says that Module::Pluggable will be removed from
+# the core. That warning causes our tests to fail.
+#
+# Module::Pluggable is used by the Test2::API::InterceptResult::Event package.
+use Module::Pluggable;
+
 use Test2::API qw( intercept );
 use Test2::V0;
 use Test2::Plugin::NoWarnings;
@@ -19,8 +27,13 @@ use Test2::Plugin::NoWarnings;
                 call pass => T();
             };
             event Warning => sub {
-                call causes_fail      => T();
-                call increments_count => T();
+                call facets => hash {
+                    field assert => object {
+                        call pass => F();
+                        call details => match
+                            qr/^Unexpected warning: Oh noes!/,;
+                    }
+                };
                 call warning => match qr/^Unexpected warning: Oh noes!/;
             };
             event Ok => sub {
@@ -50,10 +63,13 @@ use Test2::Plugin::NoWarnings;
                 call pass      => F();
                 call subevents => array {
                     event Warning => sub {
-                        call causes_fail      => T();
-                        call increments_count => T();
-                        call warning          => match
-                            qr/^Unexpected warning: Oh noes!/;
+                        call facets => hash {
+                            field assert => object {
+                                call pass => F();
+                                call details => match
+                                    qr/^Unexpected warning: Oh noes!/,;
+                            }
+                        }
                     };
                     event Ok => sub {
                         call pass => T();

@@ -1,0 +1,45 @@
+---
+abstract: 'generate short unique identifiers from numbers'
+author:
+  - 'Matthew Somerville <matthew@mysociety.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sqids
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Sqids:
+    file: lib/Sqids.pm
+    version: '0.03'
+  Sqids::Constants:
+    file: lib/Sqids/Constants.pm
+requires:
+  Carp: '0'
+  Class::Tiny: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/sqids/sqids-perl/issues
+  homepage: https://github.com/sqids/sqids-perl
+  repository: https://github.com/sqids/sqids-perl.git
+version: '0.03'
+x_contributors:
+  - 'Ivan Akimov <sqids@fossfox.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

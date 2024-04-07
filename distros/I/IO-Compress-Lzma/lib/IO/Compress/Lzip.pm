@@ -5,14 +5,14 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.207 ;
+use IO::Compress::Base 2.211 ;
 
-use IO::Compress::Base::Common  2.207 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzip 2.207 ;
+use IO::Compress::Base::Common  2.211 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzip 2.211 ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzipError);
 
-$VERSION = '2.207';
+$VERSION = '2.211';
 $LzipError = '';
 
 @ISA    = qw(IO::Compress::Base Exporter);

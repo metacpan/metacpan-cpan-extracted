@@ -529,12 +529,19 @@ sub     set_properties
                         if ($k eq 'display')
                                 {
                                 my $v;
-                                given ($opt{$k})
-                                        {
-                                        when (TRUE)     { $v = 'true'; }
-                                        when (FALSE)    { $v = 'none'; }
-                                        default         { $v = $opt{$k}; }
-                                        }
+# Originally this code used the being-discontinued given/when construct 
+#   given ($opt{$k}) {
+#     when(TRUE)   { $v = 'true' }    # TRUE is 1
+#     when(FALSE)  { $v = 'none' }    # FALSE is 0
+#     else         { $v = $opt{$k} }
+# However that mapped the strings 'true' and 'condition' to 'none' because
+# `when(FALSE)` did a numeric == compare, and all non-numeric strings==0.
+# I'm fairly sure that was not intended because lpOD/Style.pod documents the
+# Text style property "display" to take values 'true', 'none' or 'condition'.
+# For this reason the translation uses 'eq' not '=='.  -Jim Avera 9/25/23
+                                if    ($opt{$k} eq TRUE)  { $v = 'true'; }
+                                elsif ($opt{$k} eq FALSE) { $v = 'none'; }
+                                else                      { $v = $opt{$k}; }
                                 $pr->set_attribute('text:display' => $v);
                                 }
                         else
@@ -705,9 +712,7 @@ sub     set_level_style
                 }
         my $type = $opt{type} || 'number';
         $e = ODF::lpOD::ListLevelStyle->create($type) or return FALSE;
-        given ($type)
-                {
-                when (['number', 'outline'])
+        if ($type eq 'number' || $type eq 'outline')
                         {
                         $e->set_attributes
                                 (
@@ -718,20 +723,19 @@ sub     set_level_style
                                 'display levels'        => $opt{display_levels}
                                 );
                         }
-                when ('bullet')
+        elsif ($type eq 'bullet')
                         {
                         $e->set_attribute('bullet char' => $opt{character});
                         }
-                when ('image')
+        elsif ($type eq 'image')
                         {
                         $e->set_url($opt{url} // $opt{uri});
                         }
-                default
+        else
                         {
                         $e->delete; undef $e;
                         alert "Unknown item mark type"; return FALSE;
                         }
-                }
         $e->set_attribute(level => $level);
         $e->set_style($opt{style});
         my $old = $self->get_level_style($level); $old && $old->delete;
@@ -768,25 +772,22 @@ sub     create
         my $caller      = shift;
         my $type        = shift;
         my $tag;
-        given ($type)
-                {
-                when (undef)
+        if (! defined $type)
                         {
                         alert "Missing list level type";
                         }
-                when (['bullet', 'number', 'image'])
+        elsif ($type eq 'bullet' || $type eq 'number' || $type eq 'image')
                         {
                         $tag = 'text:list-level-style-' . $type;
                         }
-                when ('outline')
+        elsif ($type eq 'outline')
                         {
                         $tag = 'text:outline-level-style';
                         }
-                default
+        else
                         {
                         alert "Wrong list level type";
                         }
-                }
         return $tag ? ODF::lpOD::Element->create($tag) : undef;
         }
 
@@ -962,27 +963,24 @@ sub     fill
         my $mode        = shift or return undef;
         my $value       = shift;
         my $attr = undef;
-        given ($mode)
-                {
-                when (['color', 'solid'])
+        if ($mode eq 'color' || $mode eq 'solid')
                         {
                         $mode = 'solid';
                         $attr = 'draw:fill-color';
                         }
-                when (['bitmap', 'hatch'])
+        elsif ($mode eq 'bitmap' || $mode eq 'hatch')
                         {
                         $attr = 'draw:fill-' . $mode . '-name';
                         }
-                when (['none', 'empty'])
+        elsif ($mode eq 'none' || $mode eq 'empty')
                         {
                         $mode = 'none';
                         }
-                default
+        else
                         {
                         alert "Unknown shape fill mode";
                         return undef;
                         }
-                }
         $self->set_properties
                 (
                 area            => 'graphic',
@@ -1086,25 +1084,22 @@ sub	set_properties
                                         ('may break between rows' => $v);
                                 next OPT;
                                 }
-                        given ($k)
-                                {
-                                when (/:/)
+                        if ($k =~ /:/)
                                         {
                                         $a = $k;
                                         }
-                                when (/(color|margin|break|keep)/)
+                        elsif ($k =~ /(color|margin|break|keep)/)
                                         {
                                         $a = 'fo:' . $k;
                                         }
-                                when (['align', 'display'])
+                        elsif ($k eq 'align' || $k eq 'display')
                                         {
                                         $a = 'table:' . $k;
                                         }
-                                default
+                        else
                                         {
                                         $a = $k;
                                         }
-                                }
                         $pr->set_attribute($a => $opt{$k});
                         }
                 }
@@ -1246,25 +1241,22 @@ sub     set_properties
         my %opt         = process_options(@_);
         my $area        = $opt{area} // $self->get_family;
         delete $opt{area};
-        given ($area)
-                {
-                when ('table cell')
+        if ($area eq 'table cell')
                         {
                         return $self->set_cell_properties(%opt);
                         }
-                when ('text')
+        elsif ($area eq 'text')
                         {
                         return $self->set_text_properties(%opt);
                         }
-                when ('paragraph')
+        elsif ($area eq 'paragraph')
                         {
                         return $self->set_paragraph_properties(%opt);
                         }
-                when ('graphic')
+        elsif ($area eq 'graphic')
                         {
                         return $self->set_graphic_properties(%opt);
                         }
-                }
         return undef;
         }
 
@@ -1586,25 +1578,22 @@ sub     set_properties
         foreach my $k (keys %opt)
                 {
                 my $a;
-                given ($k)
-                        {
-                        when (/:/)
+                if ($k =~ /:/)
                                 {
                                 $a = $k;
                                 }
-                        when ('height')
+                elsif ($k eq 'height')
                                 {
                                 $a = 'fo:min-height';
                                 }
-                        when (/(margin|border|padding|background)/)
+                elsif ($k =~ /(margin|border|padding|background)/)
                                 {
                                 $a = 'fo:' . $k;
                                 }
-                        default
+                else
                                 {
                                 $a = $k;
                                 }
-                        }
                 $pr->set_attribute($a => $opt{$k});
                 }
         return $pr->get_attributes;
@@ -1638,18 +1627,16 @@ sub     set_properties
                 {
                 my $a;
                 my $v = $opt{$k};
-                given ($k)
-                        {
-                        when ('size')
+                if ($k eq 'size')
                                 {
                                 $self->set_size($v);
                                 next;
                                 }
-                        when (['height', 'width'])
+                elsif ($k eq 'height' || $k eq 'width')
                                 {
                                 $a = 'fo:page-' . $k;
                                 }
-                        when (['margin', 'margins'])
+                elsif ($k eq 'margin' || $k eq 'margins')
                                 {
                                 $pr->set_attributes
                                         (
@@ -1660,7 +1647,7 @@ sub     set_properties
                                         );
                                 next;
                                 }
-                        when (['border', 'borders'])
+                elsif ($k eq 'border' || $k eq 'borders')
                                 {
                                 $pr->set_attributes
                                         (
@@ -1671,31 +1658,30 @@ sub     set_properties
                                         );
                                 next;
                                 }
-                        when (/(margin|border|padding|background)/)
+                elsif ($k =~ /(margin|border|padding|background)/)
                                 {
                                 $a = 'fo:' . $k;
                                 }
-                        when (/number/)
+                elsif ($k =~ /number/)
                                 {
                                 $a = $k; $a =~ s/ber//;
                                 }
-                        when ('footnote height')
+                elsif ($k eq 'footnote height')
                                 {
                                 $a = 'footnote max height';
                                 }
-                        when ('orientation')
+                elsif ($k eq 'orientation')
                                 {
                                 $a = 'print orientation';
                                 }
-                        when ('paper tray')
+                elsif ($k eq 'paper tray')
                                 {
                                 $a = 'paper tray name';
                                 }
-                        default
+                else
                                 {
                                 $a = $k;
                                 }
-                        }
                 $pr->set_attribute($a => $v);
                 }
         return $pr->get_attributes;
@@ -1859,15 +1845,12 @@ sub     attribute_name
         my $self        = shift;
         my $p           = shift // return undef;
         my $prefix;
-        given ($p)
-                {
-                when (/:/)
+        if ($p =~ /:/)
                         { return $p                }
-                when (/display|visible|transition/)
+        elsif ($p =~ /display|visible|transition/)
                         { $prefix = 'presentation' }
-                default
+        else
                         { $prefix = 'draw'         }
-                }
         return $prefix . ':' . $p;
         }
 
@@ -1908,14 +1891,12 @@ sub     initialize
                 }
         foreach my $k (keys %opt)
                 {
-                given ($k)
-                        {
-                        when (/^background.*color/)
+                if ($k =~ /^background.*color/)
                                 {
                                 $self->set_background(color => $opt{$k});
                                 delete $opt{$k};
                                 }
-                        when (['border', 'borders', 'stroke'])
+                elsif ($k eq 'border' || $k eq 'borders' || $k eq 'stroke')
                                 {
                                 my ($w, $t, $c) = split / +/, $opt{$k};
                                 $self->set_borders
@@ -1926,7 +1907,6 @@ sub     initialize
                                         );
                                 delete $opt{$k};
                                 }
-                        }
                 }
         $opt{area} = 'graphic';
         $self->set_properties(%opt);
@@ -1940,23 +1920,20 @@ sub     attribute_name
         my $self        = shift;
         my $p           = shift;
         my $prefix;
-        given ($p)
-                {
-                when (undef)
+        if (! defined $p)
                         { return $p                     }
-                when (/:/)
+        elsif ($p =~ /:/)
                         { return $p                     }
-                when (/^(fill|shadow)/)
+        elsif ($p =~ /^(fill|shadow)/)
                         { $prefix = 'draw'              }
-                when (/(pos$|rel$|wrap$|run|shadow)/)
+        elsif ($p =~ /(pos$|rel$|wrap$|run|shadow)/)
                         { $prefix = 'style'             }
-                when (/^stroke[ -_]/)
+        elsif ($p =~ /^stroke[ -_]/)
                         { $prefix = 'svg'               }
-                when (/border|color|height|width|padding|margin|clip/)
+        elsif ($p =~ /border|color|height|width|padding|margin|clip/)
                         { $prefix = 'fo'                }
-                default
+        else
                         { $prefix = 'draw'              }
-                }
         return $prefix . ':' . $p;
         }
 
@@ -2032,17 +2009,14 @@ sub     attribute_name
         {
         my $self	= shift;
         my $p           = shift;
-        given ($p)
-                {
-                when (undef)
+        if (! defined $p)
                         { return $p                     }
-                when (/:/)
+        elsif ($p =~ /:/)
                         { return $p                     }
-                when ('style')
+        elsif ($p eq 'style')
                         { return 'draw:style'           }
-                default
+        else
                         { return $p                     }
-                }
         }
 
 sub     initialize

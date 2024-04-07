@@ -523,51 +523,45 @@ sub     get_style
         $family =~ s/ /-/g;
         unless ($name)
                 {
-                given ($family)
+                    if ($family eq 'outline')
                         {
-                        when ('outline')
-                                {
-                                return $self->get_outline_style;
-                                }
-                        default
-                                {
-                                return $self->get_default_style($family);
-                                }
+                        return $self->get_outline_style;
+                        }
+                    else
+                        {
+                        return $self->get_default_style($family);
                         }
                 }
         my $style; my $xp;
         my $f = $family; $f =~ s/[ _]/-/g;
-        given ($family)
+        if ($family eq 'list')
                 {
-                when ('list')
-                        {
-                        $xp =   '//text:list-style[@style:name="'       .
-                                $name . '"]';
-                        }
-                when (/(master|page-layout)/)
-                        {
-                        $xp =   '//style:' . $f . '[@style:name="'      .
-                                $name . '"]';
-                        }
-                when ('data')
-                        {
-                        my $n = shift;
-                        $xp =   '//number:' . $name . '-style'        .
-                                '[@style:name="' . $n . '"]';
-                        }
-                when ('gradient')
-                        {
-                        $xp =   '//draw:gradient[@draw:name="'  .
-                                $name . '"]';
-                        }
-                default
-                        {
-                        $xp =   '//style:style[@style:name="'   .
-                                $name                           .
-                                '"][@style:family="'            .
-                                $f                              .
-                                '"]';
-                        }
+                $xp =   '//text:list-style[@style:name="'       .
+                        $name . '"]';
+                }
+        elsif ($family =~ /(master|page-layout)/)
+                {
+                $xp =   '//style:' . $f . '[@style:name="'      .
+                        $name . '"]';
+                }
+        elsif ($family eq 'data')
+                {
+                my $n = shift;
+                $xp =   '//number:' . $name . '-style'        .
+                        '[@style:name="' . $n . '"]';
+                }
+        elsif ($family eq 'gradient')
+                {
+                $xp =   '//draw:gradient[@draw:name="'  .
+                        $name . '"]';
+                }
+        else
+                {
+                $xp =   '//style:style[@style:name="'   .
+                        $name                           .
+                        '"][@style:family="'            .
+                        $f                              .
+                        '"]';
                 }
         return
                 $self->get_element(STYLES, $xp)
@@ -589,24 +583,21 @@ sub     get_styles
                 }
         my $xp;
         my $f = $family; $f =~ s/[ _]/-/g;
-        given ($family)
+        if ($family eq 'list')
                 {
-                when('list')
-                        {
-                        $xp =   '//text:list-style';
-                        }
-                when (/(master|page layout)/)
-                        {
-                        $xp = '//style:' . $f;
-                        }
-                when ('gradient')
-                        {
-                        $xp = '//draw:gradient';
-                        }
-                default
-                        {
-                        $xp = '//style:style[@style:family="' . $f . '"]';
-                        }
+                $xp =   '//text:list-style';
+                }
+        elsif ($family eq 'master' || $family eq 'page layout')
+                {
+                $xp = '//style:' . $f;
+                }
+        elsif ($family eq 'gradient')
+                {
+                $xp = '//draw:gradient';
+                }
+        else
+                {
+                $xp = '//style:style[@style:family="' . $f . '"]';
                 }
 
         return  (
@@ -686,26 +677,23 @@ sub     select_style_context
                         }
                 else
                         {
-                        given ($part_name)
-                                {
-                                when (undef)
-                                        {
-                                        $part_name = STYLES;
-                                        $xp = is_true($opt{automatic}) ?
-                                                '//office:automatic-styles' :
-                                                '//office:styles';
-                                        }
-                                when (STYLES)
-                                        {
-                                        $xp = is_true($opt{automatic}) ?
-                                                '//office:automatic-styles' :
-                                                '//office:styles';
-                                        }
-                                when (CONTENT)
-                                        {
-                                        $xp = '//office:automatic-styles';
-                                        }
-                                }
+                            if (!defined $part_name)
+                                    {
+                                    $part_name = STYLES;
+                                    $xp = is_true($opt{automatic}) ?
+                                            '//office:automatic-styles' :
+                                            '//office:styles';
+                                    }
+                            elsif ($part_name eq STYLES)
+                                    {
+                                    $xp = is_true($opt{automatic}) ?
+                                            '//office:automatic-styles' :
+                                            '//office:styles';
+                                    }
+                            elsif ($part_name eq CONTENT)
+                                    {
+                                    $xp = '//office:automatic-styles';
+                                    }
                         }
                 }
         $context = $self->get_element($part_name, $xp);
@@ -805,33 +793,27 @@ sub     insert_style
                 {
                 return $self->insert_default_style($style, $family);
                 }
-        given ($family)
+        if ($family =~ /^(text|paragraph|graphic|gradient|drawing page|number|currency|date)$/)
                 {
-                when    ([
-                        'text', 'paragraph', 'graphic', 'gradient',
-                        'drawing page', 'number', 'currency', 'date'
-                        ])
-                        {
-                        return $self->insert_regular_style($style, %opt);
-                        }
-                when (/(list|master|page layout)/)
-                        {
-                        return $self->insert_special_style($style, %opt);
-                        }
-                when ('outline')
-                        {
-                        return $self->insert_outline_style($style);
-                        }
-                when (/^table/)
-                        {
-                        $opt{automatic} = TRUE unless exists $opt{automatic};
-                        $opt{part} = CONTENT unless $opt{part};
-                        return $self->insert_special_style($style, %opt);
-                        }
-                default
-                        {
-                        alert "Not supported"; return undef;
-                        }
+                return $self->insert_regular_style($style, %opt);
+                }
+        elsif ($family =~ /(list|master|page layout)/)
+                {
+                return $self->insert_special_style($style, %opt);
+                }
+        elsif ($family eq 'outline')
+                {
+                return $self->insert_outline_style($style);
+                }
+        elsif ($family =~ /^table/)
+                {
+                $opt{automatic} = TRUE unless exists $opt{automatic};
+                $opt{part} = CONTENT unless $opt{part};
+                return $self->insert_special_style($style, %opt);
+                }
+        else
+                {
+                alert "Not supported"; return undef;
                 }
         }
 
@@ -895,29 +877,26 @@ sub	get_variables
         {
         my $self	= shift;
         my %opt         = @_;
-        given ($opt{class})
-                {
-                when (undef)
-                        {
-                        return  (
-                                $self->get_user_variables(@_),
-                                $self->get_simple_variables(@_)
-                                );
-                        }
-                when ('user')
-                        {
-                        return $self->get_user_variables;
-                        }
-                when ('simple')
-                        {
-                        return $self->get_simple_variables;
-                        }
-                default
-                        {
-                        alert "Unknown variable class $opt{class}";
-                        return undef;
-                        }
-                }
+            if (!defined $opt{class})
+                    {
+                    return  (
+                            $self->get_user_variables(@_),
+                            $self->get_simple_variables(@_)
+                            );
+                    }
+            elsif ($opt{class} eq 'user')
+                    {
+                    return $self->get_user_variables;
+                    }
+            elsif ($opt{class} eq 'simple')
+                    {
+                    return $self->get_simple_variables;
+                    }
+            else
+                    {
+                    alert "Unknown variable class $opt{class}";
+                    return undef;
+                    }
         }
 
 sub     get_variable
@@ -927,26 +906,23 @@ sub     get_variable
         my %opt         = ( class => 'user', @_ );
         my $context     = $opt{context} // $self->get_body;
         my $tag;
-        given ($opt{class})
+        if (!defined $opt{class})
                 {
-                when (undef)
-                        {
-                        return  $self->get_variable($name, class => 'user')
-                                                ||
-                                $self->get_variable($name, class => 'simple');
-                        }
-                when ('user')
-                        {
-                        $tag = 'text:user-field-decl';
-                        }
-                when ('simple')
-                        {
-                        $tag = 'text:variable-decl';
-                        }
-                default
-                        {
-                        alert "Wrong variable class"; return undef;
-                        }
+                return  $self->get_variable($name, class => 'user')
+                                        ||
+                        $self->get_variable($name, class => 'simple');
+                }
+        elsif ($opt{class} eq 'user')
+                {
+                $tag = 'text:user-field-decl';
+                }
+        elsif ($opt{class} eq 'simple')
+                {
+                $tag = 'text:variable-decl';
+                }
+        else
+                {
+                alert "Wrong variable class"; return undef;
                 }
 
         return $context->get_element
@@ -977,20 +953,17 @@ sub     set_variable
         my $context = $opt{context};
         delete @opt{qw(class context)};
         my $var;
-        given ($class)
+        if ($class eq 'user')
                 {
-                when ('user')
-                        {
-                        $var = ODF::lpOD::UserVariable->create(%opt);
-                        }
-                when ('simple')
-                        {
-                        $var = ODF::lpOD::SimpleVariable->create(%opt);
-                        }
-                default
-                        {
-                        alert "Unsupported variable class";
-                        }
+                $var = ODF::lpOD::UserVariable->create(%opt);
+                }
+        elsif ($class eq 'simple')
+                {
+                $var = ODF::lpOD::SimpleVariable->create(%opt);
+                }
+        else
+                {
+                alert "Unsupported variable class";
                 }
         if ($var)
                 {
@@ -1457,15 +1430,12 @@ sub     class_of
         {
         my $part        = shift;
         return ref $part if ref $part;
-        given($part)
-                {
-                when (CONTENT)          { return 'ODF::lpOD::Content'   }
-                when (STYLES)           { return 'ODF::lpOD::Styles'    }
-                when (META)             { return 'ODF::lpOD::Meta'      }
-                when (SETTINGS)         { return 'ODF::lpOD::Settings'  }
-                when (MANIFEST)         { return 'ODF::lpOD::Manifest'  }
-                default                 { return undef                  }
-                }
+        if    ($part eq CONTENT)          { return 'ODF::lpOD::Content'   }
+        elsif ($part eq STYLES)           { return 'ODF::lpOD::Styles'    }
+        elsif ($part eq META)             { return 'ODF::lpOD::Meta'      }
+        elsif ($part eq SETTINGS)         { return 'ODF::lpOD::Settings'  }
+        elsif ($part eq MANIFEST)         { return 'ODF::lpOD::Manifest'  }
+        else  { return undef }
         }
 
 our %CLASS      =
@@ -1590,12 +1560,9 @@ sub	    needs_update
         {
         my $self	= shift;
         my $arg         = shift;
-            given ($arg)
-                    {
-                    when (undef)    {}
-                    when (TRUE)     { $self->{update} = TRUE  }
-                    when (FALSE)    { $self->{update} = FALSE }
-                    }
+            if (!defined $arg)    {}
+            elsif ($arg == TRUE)  { $self->{update} = TRUE  }
+            elsif ($arg == FALSE) { $self->{update} = FALSE }
             return $self->{update};
         }
     
@@ -2230,57 +2197,54 @@ sub     AUTOLOAD
                 }
 
         my $e = $self->get_element($object);
-        given ($action)
+        if (!defined $action)
                 {
-                when (undef)
+                alert "Unsupported action";
+                }
+        elsif ($action eq 'get')
+                {
+                return $e ? $e->get_text() : undef;
+                }
+        elsif ($action eq 'set')
+                {
+                unless ($e)
                         {
-                        alert "Unsupported action";
+                        my $body = $self->get_body;
+                        $e = $body->append_element($object);
                         }
-                when ('get')
+                my $v = shift;
+                if ($object =~ /date$/)
                         {
-                        return $e ? $e->get_text() : undef;
+                        unless ($v)
+                                {
+                                $v = iso_date;
+                                }
+                        else
+                                {
+                                $v = check_odf_value($v, 'date');
+                                }
                         }
-                when ('set')
+                elsif ($object =~ /creator$/)
                         {
-                        unless ($e)
-                                {
-                                my $body = $self->get_body;
-                                $e = $body->append_element($object);
-                                }
-                        my $v = shift;
-                        if ($object =~ /date$/)
-                                {
-                                unless ($v)
-                                        {
-                                        $v = iso_date;
-                                        }
-                                else
-                                        {
-                                        $v = check_odf_value($v, 'date');
-                                        }
-                                }
-                        elsif ($object =~ /creator$/)
-                                {
-                                $v      =
-                                        $v =    (scalar getlogin())     ||
-                                                (scalar getpwuid($<))   ||
-                                                $<
-                                        unless $v;
-                                }
-                        elsif ($object =~ /generator$/)
-                                {
-                                $v = $0 || $$   unless $v;
-                                }
-                        elsif ($object =~ /cycles$/)
-                                {
-                                unless ($v)
-                                        {
-                                        $v = $e->get_text() || 0;
-                                        $v++;
-                                        }
-                                }
-                        return $e->set_text($v);
+                        $v      =
+                                $v =    (scalar getlogin())     ||
+                                        (scalar getpwuid($<))   ||
+                                        $<
+                                unless $v;
                         }
+                elsif ($object =~ /generator$/)
+                        {
+                        $v = $0 || $$   unless $v;
+                        }
+                elsif ($object =~ /cycles$/)
+                        {
+                        unless ($v)
+                                {
+                                $v = $e->get_text() || 0;
+                                $v++;
+                                }
+                        }
+                return $e->set_text($v);
                 }
         return undef;
         }

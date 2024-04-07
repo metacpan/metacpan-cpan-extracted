@@ -4,16 +4,16 @@ format: MXF
 # Set the primary key for the objects
 primary_key: title
 
-# Set the allowed terms / properties
+# Set the allowed terms or properties for use with include|exclude-terms
 allowed_terms: [country,genre,year]
 
 # Set the terms which are arrays
 array_terms: [genre]
 
-# Set the regex to perform the substitution in array elements
+# Set the regex to identify array indexes, guiding their substitution within array elements
 array_regex: '^(\w+):(\d+)'
 
-# Set the path for array properties
+# Set the path to select values for substituting array indexes
 id_correspondence:
   MXF:
     genre: genre

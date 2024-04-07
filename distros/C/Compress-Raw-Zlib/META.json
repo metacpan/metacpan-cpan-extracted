@@ -45,6 +45,6 @@
          "web" : "https://github.com/pmqs/Compress-Raw-Zlib"
       }
    },
-   "version" : "2.209",
+   "version" : "2.211",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

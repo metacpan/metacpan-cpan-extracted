@@ -19,7 +19,7 @@ name: App-BPOMUtils-RPO-Ingredients
 provides:
   App::BPOMUtils::RPO::Ingredients:
     file: lib/App/BPOMUtils/RPO/Ingredients.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   Data::Sah::Compiler::perl::TH::int: '0.914'
   Data::Sah::Compiler::perl::TH::str: '0.914'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils-RPO-Ingredients
   homepage: https://metacpan.org/release/App-BPOMUtils-RPO-Ingredients
   repository: git://github.com/perlancar/perl-App-BPOMUtils-RPO-Ingredients.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

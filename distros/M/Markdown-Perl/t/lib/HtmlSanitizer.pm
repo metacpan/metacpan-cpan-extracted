@@ -30,7 +30,7 @@ my $html_close_tag_re = qr/ \/ ${html_tag_name_re} ${opt_html_space_re} /x;
 # In addition, this light-weight normalization did uncover a couple of bugs that
 # were hidden by the normalization done by the cmark tool.
 sub  sanitize_html {
-  my ($html) = @_;
+  my ($html, $dense) = @_;
   while ($html =~ m/<code>|(?<new_line>(?<=>)\s*\n+\s*(?=.)|\s*\n+\s*(?=<))/g) {
     if ($+{new_line}) {
       my $p = pos($html);
@@ -40,7 +40,11 @@ sub  sanitize_html {
       $html =~ m/<\/code>|$/g;
     }
   }
-  $html =~ s/( < (?: \/[a-z]+ | input ) >)/$1\n/gx;
-  $html =~ s/\n\n+$/\n/;
+  if ($dense) {
+    $html =~ s/\n+$//;
+  } else {
+    $html =~ s/( < (?: \/[a-z]+ | input ) >)/$1\n/gx;
+    $html =~ s/\n\n+$/\n/;
+  }
   return $html;
 }

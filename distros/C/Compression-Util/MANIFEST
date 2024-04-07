@@ -8,6 +8,7 @@ examples/bzip2-like_adaptive_ac_string_symbolic.pl
 examples/bzip2-like_string.pl
 examples/bzip2-like_string_symbolic.pl
 examples/bzip2-like_symbolic.pl
+examples/gzip_block_type_1.pl
 examples/lz77.pl
 examples/lz77_ac_string.pl
 examples/lz77_string.pl

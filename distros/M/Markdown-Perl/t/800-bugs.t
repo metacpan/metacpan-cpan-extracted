@@ -9,10 +9,6 @@ sub run {
   &Markdown::Perl::convert;
 }
 
-todo 'New lines after lists should not make it be loose' => sub {
-  is(run("* a\n* b\n* c\n\n\nfoo"), "<ul>\n<li>a</li>\n<li>b</li>\n<li>c</li>\n</ul>\n<p>foo</p>\n", 'list is tight');
-};
-
 todo 'New lines are forbidden in link dest' => sub {
   # This fails because the inner brackets are parsed as HTML and the code does
   # not check for new-line inside non-text nodes, inside the span delimited by

@@ -85,8 +85,8 @@ sub read_json {
 
     my $file = shift;
 
-# NB: hp.json is non-UTF8
-# malformed UTF-8 character in JSON string, at character offset 680 (before "\x{fffd}r"\n      },...")
+    # NB: hp.json is non-UTF8
+    # malformed UTF-8 character in JSON string, at character offset 680 (before "\x{fffd}r"\n      },...")
     my $str =
       $file =~ /hp\.json/ ? path($file)->slurp : path($file)->slurp_utf8;
     return decode_json($str);    # Decode to Perl data structure
@@ -220,15 +220,33 @@ sub say_errors {
 
 sub coverage_stats {
 
-    #use Data::Dumper;
     my $data     = shift;
     my $coverage = {};
+
     for my $item (@$data) {
         for my $key ( keys %$item ) {
-            $coverage->{$key}++;
+
+            # Initialize key in coverage with 0 if not already present
+            $coverage->{$key} //= 0;
+
+            # Increment count only if value is not undef, not an empty hash, not an empty array,
+            # and not equal to 'NA' or 'NaN'
+            unless (
+                   !defined $item->{$key}
+                || ( ref $item->{$key} eq 'HASH'  && !%{ $item->{$key} } )
+                || ( ref $item->{$key} eq 'ARRAY' && !@{ $item->{$key} } )
+                || $item->{$key} eq 'NA'    # Check for 'NA'
+                || $item->{$key} eq 'NaN'
+              )                             # Check for 'NaN'
+            {
+                $coverage->{$key}++;
+            }
         }
     }
-    return { cohort_size => scalar @$data, coverage_terms => $coverage };
+    return {
+        cohort_size    => scalar @$data,
+        coverage_terms => $coverage
+    };
 }
 
 sub check_existence_of_include_terms {

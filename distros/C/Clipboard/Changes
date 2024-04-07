@@ -1,3 +1,13 @@
+0.29    2024-04-07
+
+    - Add Xsel.pm / xsel support.
+    - Improve clipbrowse's reliability / security:
+        - https://github.com/shlomif/Clipboard/issues/11
+        - https://github.com/shlomif/Clipboard/pull/12
+        - Thanks to @fschlich .
+    - Made the code more elegant and reliable.
+        - E.g.: explicit returns
+
 0.28    2021-02-23
 
     - Hopefully fix prereqs on cygwin.
@@ -9,6 +19,7 @@
     - README.md instead of README and INSTALL
         - https://github.com/shlomif/Clipboard/issues/5
         - Thanks to https://github.com/mitchblank .
+
 0.26    2020-05-16
 
     - Try to fix 'Wide character in print' warning with Xclip

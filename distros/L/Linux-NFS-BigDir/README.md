@@ -1,3 +1,5 @@
+[![Perl application](https://github.com/glasswalk3r/Linux-NFS-BigDir/actions/workflows/unit-test.yml/badge.svg)](https://github.com/glasswalk3r/Linux-NFS-BigDir/actions/workflows/unit-test.yml)
+
 # Linux-NFS-BigDir
 
 This module was created to solve a very specific problem: you have a directory over NFS, mounted by
@@ -31,5 +33,7 @@ This module is a Perl implementation of that.
 
 ## Install
 
-This distribution will only work in Linux OS with perl version 5.14.4 or higher. Check the dist.ini file for details on that.
+This distribution will only work in Linux OS with perl version 5.14.4 or higher.
+
+You will need [Dist::Zilla](https://dzil.org/) installed first. Check the `dist.ini` file for details on that.
 

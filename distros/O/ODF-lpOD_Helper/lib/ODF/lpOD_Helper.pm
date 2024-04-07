@@ -96,8 +96,8 @@ and fonts registered.
 package ODF::lpOD_Helper;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '6.011'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-03-27'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '6.012'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-04-06'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Data::Dumper::Interp 6.004 qw/visnew
@@ -634,14 +634,14 @@ by C<odf_create_style>, as well as these single-item abbreviations:
   "small-caps"  means  variant => "small-caps"
   "normal-caps" means  variant => "normal", #??
 
-  <NUM>         means  size => "<NUM>pt,   # bare number means point size
-  "<NUM>pt"     means  size => "<NUM>pt,
+  <NUM>         means  size => "<NUM>pt",   # bare number means point size
+  "<NUM>pt"     means  size => "<NUM>pt",
 
 Internally, an ODF "automatic" Style is created for
 each unique combination of properties, re-using styles when possible.
 Fonts are automatically registered.
 
-To use an existing (or to-be-created) ODF Style, use
+To use an existing (or to-be-explicitly-created) ODF Style, use
 
   [style_name => "name of style"]
 

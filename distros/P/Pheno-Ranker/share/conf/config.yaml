@@ -1,35 +1,35 @@
 ---
-# Set the limit for the number of comparisons between patient-cohort to be printed to STDOUT
+# Set the maximum number of patient-cohort comparisons to be printed to STDOUT
 max_out: 50
 
-# Set the key for sorting results in patient mode
+# Set the key to sort results in patient mode (hamming|jaccard)
 sort_by: hamming
 
-# Set the similarity metric for cohort mode
+# Set the similarity metric to use in cohort mode (hamming|jaccard)
 similarity_metric_cohort: hamming
 
 # Set the primary key for the objects
 primary_key: id
 
-# Set the allowed terms / properties
+# Set the allowed terms or properties for use with include|exclude-terms
 allowed_terms: [biosamples,diseases,ethnicity,exposures,files,geographicOrigin,id,info,interpretations,interventionsOrProcedures,karyotypicSex,measurements,measures,medicalActions,metaData,pedigrees,phenotypicFeatures,sex,subject,treatments]
 
-# Set the limit for the maximum number of variables to be utilized; if the actual number exceeds this limit, variables will be selected randomly
+# Set the limit on the maximum number of variables to be used; if exceeded, selection of variables will be random
 max_number_var: 10000
 
-# Set the seed number to initialize a pseudorandom number generator for max_number_var:
+# Set the seed number to initialize a pseudorandom number generator for max_number_var
 seed: 123456789 
 
-# Set the regex to discard variables that contain a given pattern
+# Set the regex to exclude variables matching a specific pattern
 exclude_properties_regex: 'info|notes|label|value|\.high|\.low|metaData|familyHistory|excluded|_visit|dateOfProcedure|files|reference\.id|reference\.description|timeObserved|dateOfBirth|timestamp|treatmentTarget|treatmentIntent|adverseEvents|treatmentTerminationReason'
 
 # Set the terms which are arrays
 array_terms: [biosamples,diseases,exposures,interpretations,interventionsOrProcedures,measures,measurements,medicalActions,phenotypicFeatures,treatments]
 
-# Set the regex to perform the substitution in array elements
+# Set the regex to identify array indexes, guiding their substitution within array elements
 array_regex: '^(\w+):(\d+)\.(\S+)'
 
-# Set the path for array properties
+# Set the path to select values for substituting array indexes
 id_correspondence:
   BFF:
     diseases: 'diseaseCode.id'
@@ -45,4 +45,4 @@ id_correspondence:
     interpretations: 'id'
     diseases: 'term.id'
     exposures: 'type.id'
-    medicalActions: ['procedure.code.id','treatment.agent.id','radiationTherapy.modality.id','therapeuticRegimen.ontologyClass.id'] 
+    medicalActions: ['procedure.code.id','treatment.agent.id','radiationTherapy.modality.id','therapeuticRegimen.ontologyClass.id']

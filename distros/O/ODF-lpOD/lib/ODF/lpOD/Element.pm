@@ -1078,30 +1078,27 @@ sub     get_position_mark
         my $attr = $tag =~ /bookmark|reference-mark/ ?
                 'text:name' : 'text:id';
         my %opt = (attribute => $attr, value => $name);
-        given ($role)
+        if (!defined $role)
                 {
-                when (undef)
+                my $single = $self->get_element($tag, %opt);
+                unless ($single)
                         {
-                        my $single = $self->get_element($tag, %opt);
-                        unless ($single)
-                                {
-                                my $start = $self->get_element
-                                        ($tag . '-start', %opt);
-                                my $end   = $self->get_element
-                                        ($tag . '-end', %opt);
-                                return wantarray ? ($start, $end) : $start;
-                                }
-                        return $single;
+                        my $start = $self->get_element
+                                ($tag . '-start', %opt);
+                        my $end   = $self->get_element
+                                ($tag . '-end', %opt);
+                        return wantarray ? ($start, $end) : $start;
                         }
-                when (/^(start|end)$/)
-                        {
-                        return $self->get_element($tag . '-' . $_, %opt);
-                        }
-                default
-                        {
-                        alert "Wrong role $role";
-                        return FALSE;
-                        }
+                return $single;
+                }
+        elsif ($role =~ /^(start|end)$/)
+                {
+                return $self->get_element($tag . '-' . $_, %opt);
+                }
+        else
+                {
+                alert "Wrong role $role";
+                return FALSE;
                 }
         }
 
@@ -1178,28 +1175,25 @@ sub     get_index_marks
         my $type        = shift;
 
         my $filter;
-        given ($type)
+        if (!defined $type)
                 {
-                when (undef)
-                        {
-                        alert "Missing index mark type";
-                        }
-                when (["lexical", "alphabetical"])
-                        {
-                        $filter = 'alphabetical-index-mark';
-                        }
-                when ("toc")
-                        {
-                        $filter = 'toc-mark';
-                        }
-                when ("user")
-                        {
-                        $filter = 'user-index-mark';
-                        }
-                default
-                        {
-                        alert "Wrong index mark type";
-                        }
+                alert "Missing index mark type";
+                }
+        elsif ($type eq "lexical" || $type eq "alphabetical")
+                {
+                $filter = 'alphabetical-index-mark';
+                }
+        elsif ($type eq "toc")
+                {
+                $filter = 'toc-mark';
+                }
+        elsif ($type eq "user")
+                {
+                $filter = 'user-index-mark';
+                }
+        else
+                {
+                alert "Wrong index mark type";
                 }
         return FALSE unless $filter;
         $filter = $filter . '$|' . $filter . '-start$';
@@ -1623,25 +1617,22 @@ sub     get_boolean_attribute
         {
         my $self        = shift;
         my $value       = $self->get_attribute(shift);
-        given ($value)
+        if (!defined $value)
                 {
-                when (undef)
-                        {
-                        return undef;
-                        }
-                when ('true')
-                        {
-                        return TRUE;
-                        }
-                when ('false')
-                        {
-                        return FALSE;
-                        }
-                default
-                        {
-                        alert("Improper ODF boolean");
-                        return undef;
-                        }
+                return undef;
+                }
+        elsif ($value eq 'true')
+                {
+                return TRUE;
+                }
+        elsif ($value eq 'false')
+                {
+                return FALSE;
+                }
+        else
+                {
+                alert("Improper ODF boolean");
+                return undef;
                 }
         }
 
@@ -1909,48 +1900,45 @@ sub     insert_element
                 $new_elt->paste_before($opt{before}); return $new_elt;
                 }
 
-        given($position)
+        if ($position =~ /^(FIRST_CHILD|LAST_CHILD)$/)
                 {
-                when (/^(FIRST_CHILD|LAST_CHILD)$/)
-                        {
-                        $new_elt->paste((lc $position) => $self);
-                        }
-                when ('NEXT_SIBLING')
-                        {
-                        $new_elt->paste_after($self);
-                        }
-                when ('PREV_SIBLING')
+                $new_elt->paste((lc $position) => $self);
+                }
+        elsif ($position eq 'NEXT_SIBLING')
+                {
+                $new_elt->paste_after($self);
+                }
+        elsif ($position eq 'PREV_SIBLING')
+                {
+                $new_elt->paste_before($self);
+                }
+        elsif ($position eq 'WITHIN')
+                {
+                if ($opt{offset})
+                    {
+                    $new_elt->paste_within($self, $opt{offset});
+                    }
+                else
+                    {
+                    $new_elt->paste_first_child($self);
+                    }
+                }
+        elsif ($position eq 'PARENT')
+                {
+                if ($self->parent)
                         {
                         $new_elt->paste_before($self);
+                        $self->move(last_child => $new_elt);
                         }
-                when ('WITHIN')
+                else
                         {
-                        if ($opt{offset})
-                            {
-                            $new_elt->paste_within($self, $opt{offset});
-                            }
-                        else
-                            {
-                            $new_elt->paste_first_child($self);
-                            }
+                        $self->paste_last_child($new_elt);
                         }
-                when ('PARENT')
-                        {
-                        if ($self->parent)
-                                {
-                                $new_elt->paste_before($self);
-                                $self->move(last_child => $new_elt);
-                                }
-                        else
-                                {
-                                $self->paste_last_child($new_elt);
-                                }
-                        }
-                default
-                        {
-                        alert("Wrong insertion option");
-                        return FALSE;
-                        }
+                }
+        else
+                {
+                alert("Wrong insertion option");
+                return FALSE;
                 }
         return $new_elt;
         }
@@ -2291,29 +2279,26 @@ sub     AUTOLOAD
         my $type = $target->{type};
 
         my $value = undef;
-        given ($action)
+        if ($action eq 'get')
                 {
-                when ('get')
+                $value = $element->get_attribute($name, @_);
+                return ($type and ($type eq 'boolean')) ?
+                                        is_true($value) : $value;
+                }
+        elsif ($action eq 'set')
+                {
+                $value = input_conversion(shift);
+                if ($type)
                         {
-                        $value = $element->get_attribute($name, @_);
-                        return ($type and ($type eq 'boolean')) ?
-                                                is_true($value) : $value;
+                        $value = check_odf_value($value, $type);
                         }
-                when ('set')
-                        {
-                        $value = input_conversion(shift);
-                        if ($type)
-                                {
-                                $value = check_odf_value($value, $type);
-                                }
-                        return defined $value ?
-                                $element->set_att($name => $value) :
-                                $element->del_attribute($name);
-                        }
-                default
-                        {
-                        alert "Unknown method $method @_";
-                        }
+                return defined $value ?
+                        $element->set_att($name => $value) :
+                        $element->del_attribute($name);
+                }
+        else
+                {
+                alert "Unknown method $method @_";
                 }
 
         return undef;
@@ -2327,6 +2312,10 @@ sub     not_allowed
         alert "Not allowed for this $tag ($class) element";
         return undef;
         }
+
+# Avoid "Unknown method DESTROY" warnings from AUTOLOAD, which gets called
+# when objects are being deleted.
+sub DESTROY {}  # https://rt.cpan.org/Public/Bug/Display.html?id=97977
 
 #=============================================================================
 package ODF::lpOD::TextNode;
@@ -2760,7 +2749,7 @@ sub     set_attribute
         {
         my $self        = shift;
         my $name        = $self->normalize_name(shift);
-        unless ($name ~~ [ @ALLOWED_ATTRIBUTES ])
+        unless (grep $_ eq $name, @ALLOWED_ATTRIBUTES)
                 {
                 alert "Attribute $name is not allowed";
                 return FALSE;

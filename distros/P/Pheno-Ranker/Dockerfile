@@ -1,4 +1,5 @@
-FROM perl:5.36-bullseye
+#FROM perl:5.36-bullseye
+FROM perl:stable-bullseye
 
 # File Author / Maintainer
 LABEL maintainer Manuel Rueda <manuel.rueda@cnag.eu>

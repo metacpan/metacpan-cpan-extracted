@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Sqids.pm
+lib/Sqids/Constants.pm
+minil.toml
+t/alphabet.t
+t/blocklist.t
+t/encoding.t
+t/minlength.t
+META.yml
+MANIFEST

@@ -56,17 +56,22 @@
    "provides" : {
       "lib::root" : {
          "file" : "lib/lib/root.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hernan604/lib-root/issues"
+      },
+      "homepage" : "https://github.com/hernan604/lib-root",
       "repository" : {
          "type" : "git",
-         "url" : "git://git.smallcompany.net/smallcompany/lib-root.git"
+         "url" : "https://github.com/hernan604/lib-root.git",
+         "web" : "https://github.com/hernan604/lib-root"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_contributors" : [
       "Hernan Lopes <hernan@smallcompany.net>"
    ],

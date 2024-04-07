@@ -1,0 +1,84 @@
+{
+   "abstract" : "generate short unique identifiers from numbers",
+   "author" : [
+      "Matthew Somerville <matthew@mysociety.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.23",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sqids",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Tiny" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Sqids" : {
+         "file" : "lib/Sqids.pm",
+         "version" : "0.03"
+      },
+      "Sqids::Constants" : {
+         "file" : "lib/Sqids/Constants.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sqids/sqids-perl/issues"
+      },
+      "homepage" : "https://github.com/sqids/sqids-perl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sqids/sqids-perl.git",
+         "web" : "https://github.com/sqids/sqids-perl"
+      }
+   },
+   "version" : "0.03",
+   "x_contributors" : [
+      "Ivan Akimov <sqids@fossfox.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

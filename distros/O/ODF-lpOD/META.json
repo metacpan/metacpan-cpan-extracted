@@ -4,7 +4,7 @@
       "Andy Beverley <andy@andybev.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -49,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.127",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.200",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

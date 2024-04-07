@@ -41,7 +41,8 @@ sub new {
     last_pos => 0,
     line_ending => '',
     continuation_re => qr//,
-    linkrefs => {}
+    linkrefs => {},
+    matched_prefix_size => 0,
   }, $class;
   lock_keys_plus(%{$this}, qw(forced_line));
 
@@ -148,8 +149,21 @@ sub process {
   return delete $this->{linkrefs}, delete $this->{blocks};
 }
 
+# The $force_loose_test parameter is used when we are actually starting a new
+# block. In that case, or if we are actually after a paragraph, then we possibly
+# convert the enclosing list to a loose list.
+# TODO: the logic to decide if a list is loose is extremely complex and split in
+# many different place. It would be great to rewrite it in a simpler way.
 sub _finalize_paragraph {
-  my ($this) = @_;
+  my ($this, $force_loose_test) = @_;
+  if (@{$this->{paragraph}} || $force_loose_test) {
+    if ($this->{last_line_was_blank}) {
+      if (@{$this->{blocks_stack}}
+        && $this->{blocks_stack}[-1]{block}{type} eq 'list_item') {
+        $this->{blocks_stack}[-1]{block}{loose} = 1;
+      }
+    }
+  }
   return unless @{$this->{paragraph}};
   push @{$this->{blocks}}, {type => 'paragraph', content => $this->{paragraph}};
   $this->{paragraph} = [];
@@ -170,8 +184,8 @@ sub _list_match {
 
 sub _add_block {
   my ($this, $block) = @_;
-  $this->_finalize_paragraph();
   if ($block->{type} eq 'list_item') {
+    $this->_finalize_paragraph(0);
     # https://spec.commonmark.org/0.30/#lists
     if ($this->_list_match($block)) {
       push @{$this->{blocks}[-1]{items}}, $block;
@@ -188,6 +202,7 @@ sub _add_block {
       push @{$this->{blocks}}, $list;
     }
   } else {
+    $this->_finalize_paragraph(1);
     push @{$this->{blocks}}, $block;
   }
   return;
@@ -199,7 +214,7 @@ sub _add_block {
 # are parsed through a single regex.
 sub _enter_child_block {
   my ($this, $new_block, $cond, $prefix_re, $forced_next_line) = @_;
-  $this->_finalize_paragraph();
+  $this->_finalize_paragraph(1);
   if (defined $forced_next_line) {
     $this->{forced_line} = $forced_next_line;
   }
@@ -253,9 +268,12 @@ sub _test_lazy_continuation {
 
 sub _count_matching_blocks {
   my ($this, $lr) = @_;  # $lr is a scalar *reference* to the current line text.
+  $this->{matched_prefix_size} = 0;
   for my $i (0 .. $#{$this->{blocks_stack}}) {
     local *::_ = $lr;
-    return $i unless $this->{blocks_stack}[$i]{cond}();
+    my $r = $this->{blocks_stack}[$i]{cond}();
+    $this->{matched_prefix_size} += $r if $r;
+    return $i unless $r;
   }
   return @{$this->{blocks_stack}};
 }
@@ -319,7 +337,7 @@ sub _parse_blocks {  ## no critic (RequireArgUnpacking)
   if ($this->{last_line_is_blank}) {
     if (@{$this->{blocks_stack}}
       && $this->{blocks_stack}[-1]{block}{type} eq 'list_item') {
-      $this->{blocks_stack}[-1]{block}{loose} = 1;
+      # $this->{blocks_stack}[-1]{block}{loose} = 1;
     }
   }
   $this->{last_line_was_blank} = $this->{last_line_is_blank};
@@ -412,7 +430,9 @@ sub _do_indented_code_block {
   if (@{$this->{paragraph}} || $l !~ m/${indented_code_re}/) {
     return;
   }
-  my @code_lines = remove_prefix_spaces(4, $l.$this->line_ending(), $this->get_preserve_tabs);
+  my $convert_tabs = $this->get_code_blocks_convert_tabs_to_spaces;
+  tabs_to_space($l, $this->{matched_prefix_size}) if $convert_tabs;
+  my @code_lines = scalar(remove_prefix_spaces(4, $l.$this->line_ending()));
   my $count = 1;  # The number of lines we have read
   my $valid_count = 1;  # The number of lines we know are in the code block.
   my $valid_pos = $this->get_pos();
@@ -422,11 +442,10 @@ sub _do_indented_code_block {
       if ($nl =~ m/${indented_code_re}/) {
         $valid_pos = $this->get_pos();
         $valid_count = $count;
-        push @code_lines,
-            remove_prefix_spaces(4, $nl.$this->line_ending(), $this->get_preserve_tabs);
+        tabs_to_space($nl, $this->{matched_prefix_size}) if $convert_tabs;
+        push @code_lines, scalar(remove_prefix_spaces(4, $nl.$this->line_ending()));
       } elsif ($nl eq '') {
-        push @code_lines,
-            remove_prefix_spaces(4, $nl.$this->line_ending(), $this->get_preserve_tabs);
+        push @code_lines, scalar(remove_prefix_spaces(4, $nl.$this->line_ending(), !$convert_tabs));
       } else {
         last;
       }
@@ -468,7 +487,7 @@ sub _do_fenced_code_block {
         last;
       } else {
         # We’re adding one line to the fenced code block
-        push @code_lines, remove_prefix_spaces($indent, $nl.$this->line_ending());
+        push @code_lines, scalar(remove_prefix_spaces($indent, $nl.$this->line_ending()));
       }
     } else {
       # We’re out of our enclosing block and we haven’t seen the end of the
@@ -530,11 +549,7 @@ sub _do_html_block {
     while (defined (my $nl = $this->next_line())) {
       if ($this->_all_blocks_match(\$nl)) {
         if ($nl !~ m/${html_end_condition}/) {
-          if ($this->get_preserve_tabs) {
-            push @html_lines, $nl.$this->line_ending();
-          } else {
-            push @html_lines, remove_prefix_spaces(0, $nl.$this->line_ending(), 0);
-          }
+          push @html_lines, $nl.$this->line_ending();
         } elsif ($nl eq '') {
           # This can only happen for rules 6 and 7 where the end condition
           # line is not part of the HTML block.
@@ -568,14 +583,16 @@ sub _do_block_quotes {
       # the case of a line like '>\t\tfoo' where we need to retain the 6
       # spaces of indentation, to produce a code block starting with two
       # spaces.
-      $_ = remove_prefix_spaces(length($1) + 1, $_);
-      return 1;
+      my $m;
+      ($_, $m) = remove_prefix_spaces(length($1) + 1, $_);
+      # Returns the matched horizontal size.
+      return $m;
     }
     return $this->_test_lazy_continuation($_);
   };
   {
     local *::_ = \$l;
-    $cond->();
+    $this->{matched_prefix_size} += $cond->();
   }
   $this->{skip_next_block_matching} = 1;
   $this->_enter_child_block({type => 'quotes'}, $cond, qr/ {0,3}(?:> ?)?/, $l);
@@ -589,12 +606,24 @@ sub _do_list_item {
   # There is a note in the spec on thematic breaks that are not list items,
   # it’s not exactly clear what is intended, and there are no examples.
   my ($indent_outside, $marker, $text, $digits, $symbol) = @+{qw(indent marker text digits symbol)};
+  my $indent_marker = length($indent_outside) + length($marker);
   my $type = $marker =~ m/[-+*]/ ? 'ul' : 'ol';
-  my $text_indent = indent_size($text);
+  # The $indent_marker is passed in case the text starts with tabs, to properly
+  # compute the tab stops. This is better than nothing but won’t work inside
+  # other container blocks. In all cases, using tabs instead of space should not
+  # be encouraged.
+  my $text_indent = indent_size($text, $indent_marker + $this->{matched_prefix_size});
   # When interrupting a paragraph, the rules are stricter.
-  if (@{$this->{paragraph}}
-    && ($text eq '' || ($type eq 'ol' && $digits != 1))) {
-    return;
+  my $mode = $this->get_lists_can_interrupt_paragraph;
+  if (@{$this->{paragraph}}) {
+    return if $mode eq 'never';
+    if ($mode eq 'within_list'
+      && !(@{$this->{blocks_stack}} && $this->{blocks_stack}[-1]{block}{type} eq 'list_item')) {
+      return;
+    }
+    if ($mode eq 'strict' && ($text eq '' || ($type eq 'ol' && $digits != 1))) {
+      return;
+    }
   }
   return if $text ne '' && $text_indent == 0;
   # in the current implementation, $text_indent is enough to know if $text
@@ -602,7 +631,6 @@ sub _do_list_item {
   my $first_line_blank = $text =~ m/^[ \t]*$/;
   my $discard_text_indent = $first_line_blank || indented(4 + 1, $text);  # 4 + 1 is an indented code block, plus the required space after marker.
   my $indent_inside = $discard_text_indent ? 1 : $text_indent;
-  my $indent_marker = length($indent_outside) + length($marker);
   my $indent = $indent_inside + $indent_marker;
   my $cond = sub {
     if ($first_line_blank && m/^[ \t]*$/) {
@@ -613,7 +641,8 @@ sub _do_list_item {
     }
     if (indent_size($_) >= $indent) {
       $_ = remove_prefix_spaces($indent, $_);
-      return 1;
+      # Returns the matched horizontal size.
+      return $indent;
     }
     # TODO: we probably don’t need to test the list_item_re case here, just
     # the lazy continuation and the emptiness is enough.
@@ -626,6 +655,7 @@ sub _do_list_item {
     # processing the condition and to correctly handle the case where the
     # list marker was followed by tabs.
     $forced_next_line = remove_prefix_spaces($indent, (' ' x $indent_marker).$text);
+    $this->{matched_prefix_size} = $indent;
     $this->{skip_next_block_matching} = 1;
   }
   # Note that we are handling the creation of the lists themselves in the
@@ -706,6 +736,7 @@ sub _do_link_reference_definition {
     my ($ref, $target, $title) = @LAST_PAREN_MATCH{qw(LABEL TARGET TITLE)};
     $ref = normalize_label($ref);
     if ($ref ne '') {
+      $this->_finalize_paragraph(1);
       # TODO: option to keep the last appearance instead of the first one.
       if (exists $this->{linkrefs}{$ref}) {
         # We keep the first appearance of a label.

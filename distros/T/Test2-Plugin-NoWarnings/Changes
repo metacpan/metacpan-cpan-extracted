@@ -1,3 +1,11 @@
+0.10     2024-04-07
+
+- Previous, when tests were run via prove without the verbose flag and there
+  was a warning that caused a test failure, there was no output indicating
+  that a warning caused the failure. This has now been corrected and you'll
+  see output that includes "Unexpected warning". Reported by @janlimpens.
+
+
 0.09     2020-06-29
 
 - Don't emit a failing test if there is a warning _after_ done_testing() is

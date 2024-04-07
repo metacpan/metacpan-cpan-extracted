@@ -81,7 +81,7 @@ sub     set_display
         {
         my $self        = shift;
         my $value       = shift // 'true';
-        unless ($value ~~ ['true', 'none', 'condition'])
+        unless ($value eq 'true' || $value eq 'none' || $value eq 'condition')
                 {
                 if ($value == TRUE)
                         {
@@ -103,13 +103,10 @@ sub     get_display
         {
         my $self        = shift;
         my $value = $self->get_attribute('display');
-        given ($value)
-                {
-                when (undef)        { return TRUE   }
-                when ('true')       { return TRUE   }
-                when ('none')       { return FALSE  }
-                default             { return $value }
-                }
+        if (!defined $value)     { return TRUE   }
+        elsif ($value eq 'true') { return TRUE   }
+        elsif ($value eq 'none') { return FALSE  }
+        else                     { return $value }
         }
 
 sub     set_source
@@ -705,7 +702,7 @@ sub     set_type
         {
         my $self        = shift;
         my $type        = shift         or return undef;
-        unless ($type ~~ [ 'standard', 'lines', 'line', 'curve' ])
+        unless ($type =~ /^(standard|lines|line|curve)$/)
                 {
                 alert "Not allowed connector type $type";
                 return FALSE;

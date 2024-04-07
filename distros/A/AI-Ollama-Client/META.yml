@@ -4,16 +4,8 @@ author:
   - 'Max Maischein <corion@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Future: '0'
-  Future::Queue: '0'
-  Future::Utils: '0'
-  Mojo::JSON: '0'
-  Mojolicious: '9'
-  Moo: '2'
-  PerlX::Maybe: '0'
   Test2::V0: '0'
-  experimental: '0.031'
-  stable: '0.031'
+  strict: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -28,12 +20,26 @@ no_index:
     - t
     - inc
 requires:
-  Exporter: '5'
+  Carp: '0'
+  Future: '0'
+  Future::Mojo: '0'
+  Future::Queue: '0'
+  Future::Utils: '0'
+  Mojo::JSON: '0'
+  Mojo::URL: '0'
+  Mojo::UserAgent: '0'
+  Mojolicious: '9'
+  Moo: '2'
+  OpenAPI::Modern: '0'
+  PerlX::Maybe: '0'
+  YAML::PP: '0'
+  experimental: '0.031'
   perl: '5.020'
+  stable: '0.031'
 resources:
   bugtracker: https://github.com/Corion/AI-Ollama-Client/issues
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/AI-Ollama-Client.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

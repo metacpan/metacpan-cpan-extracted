@@ -1,8 +1,8 @@
 #=============================================================================
 #
 #       Copyright (c) 2010 Ars Aperta, Itaapy, Pierlis, Talend.
-#       Copyright (c) 2011 Jean-Marie Gouarné.
-#       Author: Jean-Marie Gouarné <jean.marie.gouarne@online.fr>
+#       Copyright (c) 2011 Jean-Marie GouarnÃ©.
+#       Author: Jean-Marie GouarnÃ© <jean.marie.gouarne@online.fr>
 #
 #=============================================================================
 use     5.010_000;

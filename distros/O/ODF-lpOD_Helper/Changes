@@ -1,3 +1,4 @@
+6.012 - Require ODF::lpOD 1.200 (which removes deprecated given/when constructs)
 6.011 - Fix test incompatibility on older Perls (<5.26.0)
 6.009 - Fix typo (caught only with older Perls)
 6.008 - Add hyperlink suport

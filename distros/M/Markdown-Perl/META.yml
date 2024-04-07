@@ -35,5 +35,5 @@ requires:
 resources:
   bugtracker: https://github.com/mkende/pmarkdown/issues
   repository: https://github.com/mkende/pmarkdown
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

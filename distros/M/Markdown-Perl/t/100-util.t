@@ -69,4 +69,15 @@ is(indented(5, "\t\tfoo"), T(), 'indented8');
 is(indented(5, "     foo"), T(), 'indented9');
 is(indented(5, "    foo"), F(), 'indented10');
 
+is(tabs_to_space("ab\tcd"), 'ab  cd', 'tabs_to_space1');
+is(tabs_to_space("ab\tcd", 2), 'ab    cd', 'tabs_to_space2');
+is(tabs_to_space("ab\t\tcd"), 'ab      cd', 'tabs_to_space3');
+is(tabs_to_space("\t\tab"), '        ab', 'tabs_to_space4');
+{
+  my $s = "ab\tcd";
+  tabs_to_space($s);
+  is($s, 'ab  cd', 'tabs_to_space5');
+}
+
+
 done_testing;

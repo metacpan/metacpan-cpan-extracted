@@ -87,14 +87,16 @@ nav:
       - Implementation: implementation.md
       - Algorithm: algorithm.md
   - Help:
-      - 'Tutorial: JSON format': tutorial-json-format.md
       - Google colab: https://colab.research.google.com/drive/1n3Etu4fnwuDWNveSMb1SzuN50O2a05Rg#scrollTo=8tbJ0f5-hJAB
       - Usage: usage.md
       - FAQs: faq.md
-  - Addendum: 
+  - Formats Beyond BFF/PXF: 
+      - Generic JSON: generic-json.md
+      - CSV: csv-import.md
       - openEHR: open-ehr.md
       - OMOP-CDM: omop-cdm.md 
       - VCF: vcf.md
+  - Addendum:
       - Federated version proposal: federated-version-proposal.md
   - About:
       - About: about.md

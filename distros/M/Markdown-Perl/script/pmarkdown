@@ -143,7 +143,8 @@ CommonMark spec.
 This mode implements the
 L<original Markdown syntax|https://daringfireball.net/projects/markdown/syntax>.
 
-Note that this mode is not 100% similar to the original F<Markdown.pl> script.
+Note that this mode is not 100% similar to the original F<Markdown.pl> script
+as that script has some buggy behavior that we are not reproducing.
 
 =back
 

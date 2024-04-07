@@ -1,7 +1,7 @@
 qrcode[pil]
 Pillow
 pyzbar
-pandas
-reportlab
-matplotlib
+pandas==2.2.1
+reportlab==4.1.0
+matplotlib==3.8.4
 PyYAML

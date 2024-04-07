@@ -2,7 +2,7 @@
 use strictures 2;
 use 5.020;
 use Test::More 0.88;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
+use Test::Warnings 0.033 qw(:no_end_test had_no_warnings allow_patterns);
 use stable 0.031 'postderef';
 use experimental 'signatures';
 use if "$]" >= 5.022, experimental => 're_strict';
@@ -18,15 +18,8 @@ use Test::Memory::Cycle;
 use constant { true => JSON::PP::true, false => JSON::PP::false };
 use JSON::Schema::Modern::Utilities 'jsonp';
 
-# TODO: instead, Test::Warnings::allow_warnings(qr/^Unhandled type: REGEXP at /);
-BEGIN {
-  my $old_handler = $SIG{__WARN__}; # the Test::Warnings hook, and maybe also Devel::Confess
-  $SIG{__WARN__} = sub {
-    return if $_[0] =~ /^Unhandled type: REGEXP at /;  # a regex in our route definition
-    warn @_;
-    $old_handler->(@_) if $old_handler;
-  };
-}
+# this comes from Test::Memory::Cycle, when looking at Mojo::Routes
+allow_patterns(qr{^Unhandled type: REGEXP at .*/Devel/Cycle.pm});
 
 use lib 't/lib';
 
@@ -128,10 +121,10 @@ YAML
 
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_REQUEST_STASH,
-    my $expected_stash = {
+    my $expected_stash = superhashof({
       method => 'post',
       request => isa('Mojo::Message::Request'),
-    },
+    }),
     'stash is set in validate_request',
   );
 
@@ -168,12 +161,12 @@ YAML
 
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_REQUEST_STASH,
-    $expected_stash = {
+    $expected_stash = superhashof({
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 'hi' },
       method => 'get',
       request => isa('Mojo::Message::Request'),
-    },
+    }),
     'stash is set in validate_request',
   );
 
@@ -210,14 +203,13 @@ YAML
 
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_REQUEST_STASH,
-    $expected_stash = {
+    $expected_stash = superhashof({
       method => 'post',
       operation_id => 'operation_foo',
-      operation_path => '/paths/~1foo~1{foo_id}/post',
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => '123' },
       request => isa('Mojo::Message::Request'),
-    },
+    }),
     'stash is set in validate_request',
   );
 
@@ -254,14 +246,13 @@ YAML
 
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_REQUEST_STASH,
-    {
+    superhashof({
       method => 'post',
       operation_id => 'operation_foo',
-      operation_path => '/paths/~1foo~1{foo_id}/post',
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 'hi' },
       request => isa('Mojo::Message::Request'),
-    },
+    }),
     'stash is set in validate_request',
   );
 
@@ -275,14 +266,13 @@ YAML
 
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_REQUEST_STASH,
-    $expected_stash = {
+    $expected_stash = superhashof({
       method => 'post',
       operation_id => 'operation_foo',
-      operation_path => '/paths/~1foo~1{foo_id}/post',
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 'hi' },
       request => isa('Mojo::Message::Request'),
-    },
+    }),
     'stash is set in validate_request',
   );
 
@@ -323,13 +313,12 @@ YAML
 
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_RESPONSE_STASH,
-    {
+    superhashof({
       method => 'get',
       operation_id => 'operation_skip_validate_request',
-      operation_path => '/paths/~1skip_validate_request/get',
       path_template => '/skip_validate_request',
       path_captures => {},
-    },
+    }),
     'stash is set in validate_response, even though validate_request never ran',
   );
 
@@ -350,4 +339,5 @@ YAML
   );
 };
 
+had_no_warnings() if $ENV{AUTHOR_TESTING};
 done_testing;
