@@ -57,16 +57,15 @@ use strict;
 use warnings;
 use Getopt::Long qw(:config pass_through);
 use File::Slurp;
-use TOML::Tiny qw(from_toml);
-use JSON       qw(decode_json);
-use YAML::XS   qw(Load);
+use JSON     qw(decode_json);
+use YAML::XS qw(Load);
 use Ixchel;
 use utf8;
 use Pod::Usage;
 use Pod::Find qw(pod_where);
 
 sub version {
-	print 'ixchel v. '.$Ixchel::VERSION."\n";
+	print 'ixchel v. ' . $Ixchel::VERSION . "\n";
 }
 
 # disable color if asked
@@ -119,7 +118,7 @@ For a list of actions use the action list_actions
 
 	print "Action specific help... \n\n";
 	pod2usage(
-		-input    => pod_where( { -inc => 1 }, 'Ixchel::Actions::' . $action, ),
+		-input   => pod_where( { -inc => 1 }, 'Ixchel::Actions::' . $action, ),
 		-verbose => 99,
 		-output  => \*STDOUT
 	);
@@ -162,7 +161,8 @@ if ( defined($config_file) && -e $config_file ) {
 	} elsif ( $config_file =~ /[Tt][Oo][Mm][Ll]$/ ) {
 		eval {
 			my $err;
-			( $parsed_config, $err ) = from_toml($raw_config);
+			my $to_eval = 'use TOML::Tiny qw(from_toml); ( $parsed_config, $err ) = from_toml($raw_config);';
+			eval($to_eval);
 			unless ($parsed_config) {
 				die($err);
 			}

@@ -3,7 +3,7 @@ package Crypt::Passphrase::Bcrypt::AES;
 use 5.014;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use parent 'Crypt::Passphrase::Bcrypt::Encrypted';
 use Crypt::Passphrase 0.019 -encoder;
@@ -15,6 +15,8 @@ my %mode = (
 	'aes-cfb' => Crypt::Rijndael::MODE_CFB,
 	'aes-ofb' => Crypt::Rijndael::MODE_OFB,
 	'aes-ctr' => Crypt::Rijndael::MODE_CTR,
+	'aes-ecb-pad' => Crypt::Rijndael::MODE_ECB,
+	'aes-cbc-pad' => Crypt::Rijndael::MODE_CBC,
 );
 
 sub new {
@@ -35,6 +37,10 @@ sub new {
 
 sub encrypt_hash {
 	my ($self, $cipher, $id, $iv, $raw) = @_;
+	if ($cipher =~ /-pad$/) {
+		my $pad_length = 16 - length($raw) % 16;
+		$raw .= chr($pad_length) x $pad_length;
+	}
 	my $mode = $mode{$cipher} or croak "No such cipher $cipher";
 	my $secret = $self->{peppers}{$id} or croak "No such pepper $id";
 	return Crypt::Rijndael->new($secret, $mode)->encrypt($raw, $iv);
@@ -44,7 +50,12 @@ sub decrypt_hash {
 	my ($self, $cipher, $id, $iv, $raw) = @_;
 	my $mode = $mode{$cipher} or croak "No such cipher $cipher";
 	my $secret = $self->{peppers}{$id} or croak "No such pepper $id";
-	return Crypt::Rijndael->new($secret, $mode)->decrypt($raw, $iv);
+	my $plaintext = Crypt::Rijndael->new($secret, $mode)->decrypt($raw, $iv);
+	if ($cipher =~ /-pad$/) {
+		my $pad_length = ord substr $plaintext, -1;
+		substr($plaintext, -$pad_length, $pad_length, '') eq chr($pad_length) x $pad_length or croak 'Incorrectly padded';
+	}
+	return $plaintext;
 }
 
 sub supported_ciphers {
@@ -87,7 +98,7 @@ This module takes all arguments also taken by L<Crypt::Passphrase::Bcrypt|Crypt:
 
 =item * peppers
 
-This is a map of identifier to pepper value. The identifiers should be (probably small) numbers, the values should be random binary strings that must be either 16, 24 or 32 bytes long.
+This is a map of identifier to pepper value. The identifiers should be (probably small) numbers, the values should be random binary strings that must be either 16, 24 or 32 bytes long. This argument is mandatory.
 
 =item * active
 
@@ -95,13 +106,15 @@ This is the identifier of the active pepper. By default it will be the identifie
 
 =item * mode
 
-This is the mode that will be used with C<AES>. Values values are C<'cfb'>, C<'ofb'> and C<'ctr'> (the default).
+This is the mode that will be used with C<AES>. Valid values are C<'ctr'> (the default), C<'cfb'>, C<'ofb'>, C<'cbc-pad'> or C<'ecb-pad'>.
 
 =back
 
+The C<hash> parameter will default to C<'sha384'>.
+
 =head2 Supported crypt types
 
-This supports any sequence of <bcrypt->, C<(sha256 | sha385 | sha512)>, -encrypted-aes-, C<(ctr | cfb | ofb)>. E.g. C<bcrypt-sha384-encrypted-aes-ctr>
+This supports any sequence of C<bcrypt->, C<(sha256 | sha384 | sha512)>, C<-encrypted-aes->, C<(ctr | cfb | ofb | cbc-pad | ecb-pad)>. E.g. C<bcrypt-sha384-encrypted-aes-ctr>
 
 =head1 AUTHOR
 

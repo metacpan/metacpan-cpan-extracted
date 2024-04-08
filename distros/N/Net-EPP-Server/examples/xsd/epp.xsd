@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema">
+  <!--
+    EPP core schemas, source: https://www.iana.org/assignments/xml-registry/xml-registry.xhtml#schema
+  -->
+
+  <import namespace="urn:ietf:params:xml:ns:eppcom-1.0" schemaLocation="eppcom-1.0.xsd" />
+  <import namespace="urn:ietf:params:xml:ns:epp-1.0" schemaLocation="epp-1.0.xsd" />
+
+  <!--
+    EPP object schemas, source: https://www.iana.org/assignments/xml-registry/xml-registry.xhtml#schema
+  -->
+  <import namespace="urn:ietf:params:xml:ns:domain-1.0" schemaLocation="domain-1.0.xsd" />
+  <import namespace="urn:ietf:params:xml:ns:host-1.0" schemaLocation="host-1.0.xsd" />
+  <import namespace="urn:ietf:params:xml:ns:contact-1.0" schemaLocation="contact-1.0.xsd" />
+
+  <!--
+    EPP extension schemas, source: https://www.iana.org/assignments/xml-registry/xml-registry.xhtml#schema
+  -->
+  <import namespace="urn:ietf:params:xml:ns:epp:allocationToken-1.0" schemaLocation="allocationToken-1.0.xsd" />
+  <import namespace="urn:ietf:params:xml:ns:epp:loginSec-1.0" schemaLocation="loginSec-1.0.xsd" />
+  <import namespace="urn:ietf:params:xml:ns:epp:ttl-1.0" schemaLocation="ttl-1.0.xsd" />
+  <import namespace="urn:ietf:params:xml:ns:launch-1.0" schemaLocation="launch-1.0.xsd" />
+  <import namespace="urn:ietf:params:xml:ns:rgp-1.0" schemaLocation="rgp-1.0.xsd" />
+  <import namespace="urn:ietf:params:xml:ns:secDNS-1.1" schemaLocation="secDNS-1.1.xsd" />
+
+  <!--
+    TMCH schemas, source: https://www.iana.org/assignments/xml-registry/xml-registry.xhtml#schema
+  -->
+  <import namespace="urn:ietf:params:xml:ns:signedMark-1.0" schemaLocation="signedMark-1.0.xsd" />
+  <import namespace="urn:ietf:params:xml:ns:mark-1.0" schemaLocation="mark-1.0.xsd" />
+
+  <!--
+    XML Signature schema, source: https://www.w3.org/TR/xmldsig-core/#sec-xsdSchema
+  -->
+  <import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd" />
+</schema>

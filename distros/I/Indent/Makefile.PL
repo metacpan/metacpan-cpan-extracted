@@ -30,8 +30,9 @@ test_requires 'Term::ANSIColor' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Text::ANSI::Util' => 0;
+test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.08';
+version '0.09';
 
 # Run.
 WriteAll();

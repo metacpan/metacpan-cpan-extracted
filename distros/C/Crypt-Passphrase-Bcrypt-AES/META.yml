@@ -17,7 +17,7 @@ name: Crypt-Passphrase-Bcrypt-AES
 provides:
   Crypt::Passphrase::Bcrypt::AES:
     file: lib/Crypt/Passphrase/Bcrypt/AES.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Carp: '0'
   Crypt::Passphrase: '0.019'
@@ -29,6 +29,6 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/crypt-passphrase-bcrypt-aes/issues
   repository: git://github.com/Leont/crypt-passphrase-bcrypt-aes.git
-version: '0.001'
+version: '0.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

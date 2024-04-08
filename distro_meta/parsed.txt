@@ -91352,3 +91352,16 @@ M/MY/MYSOCIETY/Sqids-0.03.tar.gz
 D/DR/DROLSKY/Test2-Plugin-NoWarnings-0.10.tar.gz
 S/SO/SONGMU/Test-mysqld-1.0030.tar.gz
 I/IN/INGY/YAMLScript-0.1.53.tar.gz
+L/LE/LEONT/Crypt-Passphrase-Argon2-AES-0.008.tar.gz
+L/LE/LEONT/Crypt-Passphrase-Bcrypt-AES-0.002.tar.gz
+P/PR/PRBRENAN/Data-Table-Text-20240408.tar.gz
+M/MJ/MJEMMESON/Date-Holidays-GB-0.024.tar.gz
+M/MA/MATHIAS/Dist-Setup/Dist-Setup-0.11.tar.gz
+P/PR/PRBRENAN/GitHub-Crud-20240408.tar.gz
+S/SK/SKIM/Indent-0.09.tar.gz
+V/VV/VVELOX/Ixchel-0.11.0.tar.gz
+F/FR/FREDERICD/marc-moose-1.0.49.tar.gz
+I/IS/ISHIGAKI/Mojolicious-Plugin-WithCSRFProtection-1.01.tar.gz
+G/GB/GBROWN/Net-EPP-Server-0.001.tar.gz
+P/PE/PERLANCAR/SortKey-Num-similarity-0.001.tar.gz
+K/KI/KIMOTO/SPVM-0.989099.tar.gz

@@ -6,51 +6,98 @@ SPVM::Document::Language::Types - Types in the SPVM Language
 
 This document describes types in the SPVM language.
 
-=head1 Data
+=head1 Value
 
-This section describes some typical data.
+This section describes values.
 
-=head2 Numeric Value
+=head2 Number
+
+The value of L<numeric types|/"Numeric Types"> is called number.
+
+Normally, numbers are created by L<numeric literals|SPVM::Document::Language::Tokenization/"Numeric Literal">.
+
+  # byte - 8bit signed integer
+  my $number = (byte)1;
+  
+  # short - 16bit signed integer
+  my $number = (short)1;
+  
+  # int - 32bit signed integer
+  my $number = 1;
+  
+  # long - 64bit signed integer
+  my $number = 1L;
+  
+  # float - 32bit floating point
+  my $number = 1.5f;
+  
+  # double - 64bit floating point
+  my $number = 1.0;
+
+A character created by the L<character literal|SPVM::Document::Language::Tokenization/"Character Literal"> is a number of the byte type.
+  
+  # A number of the byte type created by a character literal
+  my $char = 'a';
+
+See the following section operations for numbers.
+
+=over
+
+=item * L<Numeric Operators|SPVM::Document::Language::Operators/"Numeric Operators">
+
+=item * L<Numeric Comparison Operators|SPVM::Document::Language::Operators/"Numeric Comparison Operators">
+
+=back
+
+=head3 Internal Representation of Negative Integers
+
+Negative integers are represented by L<two's complement|https://en.wikipedia.org/wiki/Two%27s_complement>.
 
 =head2 String
 
-SPVM has the L<string type|/"string Type">. A string is created by L</"String Literal"> L</"String Creating Operator"> or L</"Type Convertion"> to the string type.
+The value of the L<string type|/"string Type"> is called string.
+
+A string consists of characters of the C<byte> type.
+
+A string has its length.
+
+A string is an L<object|/"Object">.
+
+Normally, a string is created by a L<string literal|SPVM::Document::Language::Tokenization/"String Literal"> or the L<new_string_len operator|SPVM::Document::Language::Operators/"new_string_len Operator">.
   
-  # Create a string using a string literal
+  # A string created by a string literal
   my $string = "Hello";
+  my $char = $string->[0];
   
-  # Create a string using a string creation operator
+  # A mutable string created by the new_string_len operator
   my $string = new_string_len 3;
-  
-  # Create a string using the type cast to the string type
-  my $bytes = [(byte)93, 94, 95];
-  my $string = (string)$bytes;
+  $string->[0] = 'a';
 
-The each charcter can be get using C<-E<gt>[]>.
+See the following sections about operations for strings.
 
-  # String
-  my $string = "Hello";
-  my $char0 = $string->[0];
-  my $char1 = $string->[1];
-  my $char2 = $string->[2];
+=over 2
 
-By default, each character cannnot be set.
-  
-  # a compilation error.
-  $string_const->[0] = 'd';
+=item * L<length Operator|SPVM::Document::Language::Operators/"length Operator">
 
-If you use C<mutable type qualifier|/"mutable Type Qualifier">, each character can be set.
+=item * L<String Concatenation Operator|SPVM::Document::Language::Operators/"String Concatenation Operator">
 
-  my $string_mut = (mutable string)$string;
-  $string_mut->[0] = 'd';
+=item * L<Getting a Character|SPVM::Document::Language::Operators/"Getting a Character">
 
-The created string is one more last byte that value is C<\0> on the internal memory. Although this has no meaning from SPVM language, this has meaning from L<Native APIs|SPVM:Document::NativeAPI>.
+=item * L<Setting a Character|SPVM::Document::Language::Operators/"Setting a Character">
 
-The length of the string can be got using a L<string length operator|/"String Length Operator">
-  
-  # Getting the length of the string
-  my $message = "Hello"+
-  my $length = length $message;
+=item * L<new_string_len Operator|SPVM::Document::Language::Operators/"new_string_len Operator">
+
+=item * L<make_read_only Operator|SPVM::Document::Language::Operators/"make_read_only Operator">
+
+=item * L<is_read_only Operator|SPVM::Document::Language::Operators/"is_read_only Operator">
+
+=item * L<String Comparison Operators|SPVM::Document::Language::Operators/"String Comparison Operators">
+
+=item * L<copy Operator|SPVM::Document::Language::Operators/"copy Operator">
+
+=back
+
+=head3 Sting Native Level Representation
 
 At the L<native level|SPVM::Document::NativeClass>, the character just after the last character of the string is set to C<\0>, so the characters in the string can be used as a C language string.
 
@@ -60,92 +107,123 @@ At the L<native level|SPVM::Document::NativeClass>, the character just after the
   if (strcmp(chars, "Hello") == 0) {
     
   }
-  
+
 =head2 Array
 
-The array is the data structure for multiple values.
+The value of an L<array type|/"Array Types"> is called array.
 
-There are the following types of array.
+An array consists of a set of L<numbers|/"Number">, a set of L<objects|/"Object">, or a set of L<multi-numeric numbers|/"Multi-Numeric Number">.
 
-=begin html
+An array has its length.
 
-<ul>
-  <li>
-    Numeric Array
- </li>
-  <li>
-    Object Array
- </li>
-  <li>
-    Multi-Numeric Array
- </li>
-</ul>
+The elements of an array are arranged by index and the index starts from 0.
 
-=end html
+An array is an L<object|/"Object">.
 
-The numeric array is the array that the type of the element is the L<numeric type|/"Numeric Types">.
-
-The object array is the array that the type of the element is the L<object type|/"Object Types">.
-
-The multi-numeric array is the array that the type of the element is the L<multi-numeric type|/"Multi-Numeric Types">.
-
-See L</"Creating Array"> to create Array.
-
-=head3 Element Access
-
-Element Access is an L<operator|/"Operators"> to access the element of Array to get or set the value.
-
-  ARRAY->[INDEX]
-
-See L</"Getting Array Element"> to get the element value of Array.
-
-See L</"Setting Array Element"> to set the element value of Array.
-
-=head3 Multi-Numeric Value
-
-A multi-numeric value is a value that represents continuous multiple numeric values in memory.
-
-=head2 Multi-Numeric Array
-
-The L<multi-numeric values|/"Multi-Numeric Value"> can be the elements of the L<array|/"Array">.
-
-  my $zs = new Complex_2d[3];
-
-The elements of the multi-numeric array is continuous multi-numeric values.
+Normally, an array is created by the L<new Operator|SPVM::Document::Language::Operators/"Creating an Array"> and an L<array initialization|SPVM::Document::Language::Operators/"Array Initialization">.
   
-  | Complex_2d  | Complex_2d  | Complex_2d  |
-  |  re  |  im  |  re  |  im  |  re  |  im  |
+  # An array created by the new operator
+  my $numbers = new int[3];
+  $numbergers->[0] = 1;
+  
+  my $strings = new string[3];
+  
+  my $objects = new Point[3];
+  
+  my $mulnum_numbers = new Complex_2d[3];
+  
+  # An array created by an array initialization
+  my $numbers = [1, 2, 3];
 
-=head3 Multi-Numeric Element Access
+All elements of an array can be got by the L<for statement|SPVM::Document::Language::Statements/"for Statement">.
 
-The multi-numeric element access is a syntax to access the element of the multi-numeric array.
+  # for statement
+  for (my $i = 0; $i < @$numbers; $i++) {
+    my $number = $numbers->[$i];
+  }
+  
+  # for-each statement
+  for my $number (@$numbers) {
+    
+  }
 
-  ARRAY->[INDEX]
+See the following sections about operations for arrays.
 
-See L</"Getting Array Element"> to get the element of the array.
+=over 2
 
-See L</"Setting Array Element"> to set the element of the array.
+=item * L<Creating Array in new Operator|SPVM::Document::Language::Operators/"Creating an Array">
+
+=item * L<Array Initialization|SPVM::Document::Language::Operators/"Array Initialization">
+
+=item * L<Array Length Operator|SPVM::Document::Language::Operators/"Array Length Operator">
+
+=item * L<Getting an Array Element|SPVM::Document::Language::Operators/"Getting an Array Element">
+
+=item * L<Setting an Array Element|SPVM::Document::Language::Operators/"Setting an Array Element">
+
+=back
 
 =head2 Object
 
-A object is created by the L<new|SPVM::Document::Language::Operators/"new"> operator.
+The value of an L<object type|/"Object Types"> is called object.
+
+A L<string|/"String"> is an object.
+
+An L<array|/"Array"> is an object.
+
+An objcet of the L<class type|/"class Type"> has its fields. A field is a L<number|/"Number"> or an L<object|/"Object">.
+
+Normally, an object is created by the L<new|SPVM::Document::Language::Operators/"new"> operator.
+
+  # An object created by the new operator
+  my $point = new Point;
+
+When an object is created, memory for the object is allocated in heap memory.
+
+Created objects are destroyed by L<garbage collection|SPVM::Document::Language::GarbageCollection>.
+
+See the following sections about operations for objects.
+
+=over 2
+
+=item * L<new Operator|SPVM::Document::Language::Operators/"new Operator">
+
+=item * L<dump Operator|SPVM::Document::Language::Operators/"dump Operator">
+
+=item * L<Getting a Field|SPVM::Document::Language::Operators/"Getting a Field">
+
+=item * L<Setting a Field|SPVM::Document::Language::Operators/"Setting a Field">
+
+=item * L<isa Operator|SPVM::Document::Language::Operators/"isa Operator">
+
+=item * L<is_type Operator|SPVM::Document::Language::Operators/"is_type Operator">
+
+=item * L<type_name Operator|SPVM::Document::Language::Operators/"type_name Operator">
+
+=back
+
+=head3 Object Native Level Representation
+
+At L<native level|SPVM::Document::NativeClass>, an object is a memory address.
+
+  void* obj_point = stack[0].oval;
 
 =head2 Undefined Value
+
+The value of the L<undef type|/"undef Type"> is called undefined value.
+
+An undefined value means the value is undefined.
 
 An undefined value is created by the L<undef|SPVM::Document::Language::Operators/"undef Operator"> operator.
 
   undef
 
-The type of an undefined value is the L<undef type|/"undef Type">.
-
 An undefined value is able to be assigned to an L<object type|/"Object Types">.
 
-In L<native classes|SPVM::Document::NativeClass>, an undefined value is equal to 0, normally a null pointer C<NULL> defined in C<stddef.h>.
-  
-  NULL
+  my $point : Point = undef;
 
 Examples:
-  
+
   # Examples of undefined values
   my $string : string = undef;
   
@@ -158,238 +236,142 @@ Examples:
     
   }
 
+=head3 Undefined Value Native Level Representation
+
+At L<native level|SPVM::Document::NativeClass>, an undefined value is equal to 0, normally a null pointer C<NULL> defined in C<stddef.h>.
+  
+  NULL
+
+=head2 Multi-Numeric Number
+
+The value of a L<multi-numeric type|/"Multi-Numeric Types"> is called multi-numeric number.
+
+A multi-numeric number is a set of L<numbers|/"Number"> of the same type.
+
+  my $z : Complex_2d;
+  $z->{re} = 1;
+  $z->{im} = 2;
+
+See the following sections about operations for multi-numeric numbers.
+
+=over 2
+
+=item * L<Getting a Multi-Numeric Field|SPVM::Document::Language::Operators/"Getting a Multi-Numeric Field">
+
+=item * L<Setting a Multi-Numeric Field|SPVM::Document::Language::Operators/"Setting a Multi-Numeric Field">
+
+=back
+
 =head2 Reference
 
-The reference is the address of a L<local variable|/"Local Variable"> on the memory.
+The value of a L<reference type|/"Reference Types"> is called reference.
 
-=head3 Creating Reference
+A reference has a referencing value.
 
-The L<reference operator|/"Reference Operator"> creates the reference of a L<local variable|/"Local Variable">.
+A referencing value must be a L<number|/"Number"> or a L<multi-numeric number|/"Multi-Numeric Number">
 
-A reference is assigned to the L<reference type/"Reference Type">.
+The L<reference operator|SPVM::Document::Language::Operators/"Reference Operator"> C<\> creates a reference.
 
-The operand of a reference operator must be the variable of a L<numeric type|/"Numeric Types"> or a L<multi-numeric type|/"Multi-Numeric Types">.
+  my $number : int;
+  my $number_ref = \$number;
 
-  # The reference of numeric type
-  my $num : int;
-  my $num_ref : int* = \$num;
-  
-  # The reference of multi-numeric type
-  my $z : Complex_2d;
-  my $z_ref : Complex_2d* = \$z;
+See the following sections about operations for multi-numeric numbers.
 
-The L<reference type|/"Reference Type"> can be used as the types of the arguments of a method.
+=over 2
 
-  # Method Definition
-  static method sum : void ($result_ref : int*, $num1 : int, $num2 : int) {
-    $$result_ref = $num1 + $num2;
-  }
-  
-  # Method Call
-  my $num1 = 1;
-  my $num2 = 2;
-  my $result_ref = \$result;
-  sum($result_ref, $num1, $num2);
+=item * L<Getting a Referenced Value|SPVM::Document::Language::Operators/"Getting a Referenced Value">
 
-=head3 Dereference
+=item * L<Setting a Referenced Value|SPVM::Document::Language::Operators/"Setting a Referenced Value">
 
-The dereference is the operation to get the value from a reference.
+=item * L<Reference Operator|SPVM::Document::Language::Operators/"Reference Operator">
 
-A L<dereference operator|/"Dereference Operator"> perform a dereference.
+=item * L<Dereference Operator|SPVM::Document::Language::Operators/"Dereference Operator">
 
-  # Get the value using a dereference
-  my $num2 = $$num_ref;
-  
-  # Set the value using a dereference
-  $$num_ref = 3;
-  
-  # Get the value of a multi-numeric type using a dereference
-  my $z2 = $$z_ref;
-  
-  # Set the value of a multi-numeric type using a dereference
-  $$z_ref = $z2;
+=item * L<Getting a Referenced Multi-Numeric Field|SPVM::Document::Language::Operators/"Getting a Referenced Multi-Numeric Field">
 
-In the referencec of L<multi-numeric types|/"Multi-Numeric Types">, the deference can be performed using the arrow operator C<-E<gt>>.
+=item * L<Setting a Referenced Multi-Numeric Field|SPVM::Document::Language::Operators/"Setting a Referenced Multi-Numeric Field">
 
-  # Get a field of a multi-numeric type using a dereference
-  my $x = $z_ref->{re};
-  
-  # Set a field of a multi-numeric type using a dereference
-  $z_ref->{re} = 1;
+=back
+
+=head3 Reference Native Level Representation
+
+At L<native level|SPVM::Document::NativeClass>, a reference is a memory address.
+
+  int32_t* num_ref = stack[0].iref;
 
 =head1 Types
 
-The SPVM language is a programming language with static types.
+This section describes types.
 
 =head2 Numeric Types
 
-The numeric type are an L<integer type|/"Integer Types"> and L</"Floating Point Types">.
+This section lists numeric types.
+
+=head3 Integer Types
+
+This section lists integer types.
+
+=head4 byte Type
+
+The C<byte> type is the type for a signed 8-bit integer.
+
+  byte
+
+=head4 short Type
+
+The C<short> type is the type for a signed 16-bit integer.
+
+  short
+
+=head4 int Type
+
+The C<int> type is the type for a signed 32-bit integer.
+
+  int
+
+=head4 long Type
+
+The C<long> type is the type for a signed 64-bit integer.
+
+  long
+
+=head3 Floating Point Types
+
+This section lists floating point types.
+
+=head4 float Type
+
+The C<float> type is the type for 32bit floating point.
+
+  float
+
+=head4 double Type
+
+The C<double> type is the type for 64bit floating point.
+
+  double
 
 =head3 Numeric Types Order
 
-a L<numeric type|/"Numeric Types"> has the type order. The order is "byte", "short", "int", "long", "float", "double" from the smallest.
+L<numeric types|/"Numeric Types"> have its order.
 
-=head2 Integer Types
-
-Integral types are the following four types.
-
-=begin html
-
-<table>
-  <tr>
-    <th>
-      <b>Type</b>
-   </th>
-    <th>
-      Description
-   </th>
-    <th>
-      Size
-   </th>
-  </tr>
-  <tr>
-    <td>
-      <b>byte</b>
-    </td>
-    <td>
-      signed 8-bit integer type
-    </td>
-    <td>
-      1 byte
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>short</b>
-    </td>
-    <td>
-      signed 16-bit integer type
-    </td>
-    <td>
-      2 bytes
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>int</b>
-    </td>
-    <td>
-      signed 32-bit integer type
-    </td>
-    <td>
-      4 bytes
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>long</b>
-    </td>
-    <td>
-      signed 64-bit integer type
-    </td>
-    <td>
-      8 bytes
-    </td>
-  </tr>
-</table>
-
-=end html
-
-Note that SPVM has only B<singed> integer types, and doesn't have B<unsigned> integer types.
-
-=head3 byte Type
-
-C<byte> type is an L<integer type|/"Integer Types"> that represents a signed 8-bit integer. This is the same type as C<int8_t> type of the C language.
-
-=head3 short Type
-
-C<short> type  is an L<integer type|/"Integer Types"> that represents a signed 16-bit integer. This is the same type as C<int16_t> type of the C language.
-
-=head3 int Type
-
-C<int> type is  is an L<integer type|/"Integer Types"> that represents signed 32-bit integer. This is the same as C<int32_t> type of the C language.
-
-=head3 long Type
-
-C<long> type is an L<integer type|/"Integer Types"> that represents a signed 64-bit integer. This is the same type as C<int64_t> type of the C language.
-
-=head3 Integer Types within int
-
-The integer type within C<int> is an L<integer type|/"Integer Types"> within the int type.
-
-In other words, the integer types within C<int> are the L<byte type|/"byte Type">, the L<short type|/"short Type">, and the int type.
-
-=head2 Floating Point Types
-
-B<Floating Point Types> are the following two.
-
-=begin html
-
-<table>
-  <tr>
-    <th>
-      <b>Type</b>
-    </ th>
-    <th>
-      Description
-    </ th>
-    <th>
-      Size
-    </ th>
-  </tr>
-  <tr>
-    <td>
-      <b>float</b>
-    </td>
-    <td>
-      Single precision (32bit) floating point type
-    </td>
-    <td>
-      4 bytes
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>double</b>
-    </td>
-    <td>
-      Double precision (64bit) floating point type
-    </td>
-    <td>
-      8 bytes
-    </td>
-  </tr>
-</table>
-
-=end html
-
-=head3 float Type
-
-The C<float> type is a L<floating point type|/"Floating Point Types"> that represents a single precision(32bit) floating point. This is the same type as C<float> type of the C language.
-
-=head3 double Type
-
-The C<double> type is a L<floating point type|/"Floating Point Types"> that represents a double precision(64bit) floating point. This is the same type as C<double> type of the C language.
+The order is C<byte>, C<short>, C<int>, C<long>, C<float>, C<double> from smallest to largest.
 
 =head2 Object Types
 
-Object types are L<class types|/"Class Type">, L<interface types|/"Interface Type">, the L<string type|/"string Type">, the L<any object type|/"Any Object Type"> and L<array types|/"Array Types">.
+This section lists object types.
 
 =head3 string Type
 
-The C<string> type is a L<type|/"Types"> for the L</"String">.
+The C<string> type is the type for L<strings/"String">.
 
   string
 
-C<string> type can be qualified by L</"mutable Type Qualifier">.
+The C<string> type is an object type.
+
+C<string> type can be qualified by the L<mutable type qualifier/"mutable Type Qualifier">.
 
   mutable string
-
-Examples:
-  
-  # string type
-  my $message : string = "Hello";
-  my $message : mutable string = new_string_len 256;
 
 =head3 Class Type
 
@@ -614,7 +596,7 @@ The multi-dimensional array type is the L<array type|/"Array Types"> that the ty
 Examples:
 
   # Multi-dimensional array types
-  my $nums_2dim : Int[][];
+  my $numbers_2dim : Int[][];
 
 =head3 Multi-Numeric Array Type
 
@@ -662,7 +644,7 @@ You can get the array length using the L<array length operator|/"The array Lengt
 You can get and set the element using the L<get array element|/"Getting Array Element"> syntax and the L<set array element|/"Setting Array Element">.
  
   # Getting the element of any object array
-  my $num = (Int)$array->[0];
+  my $number = (Int)$array->[0];
   
   # Setting the element of any object array
   $array->[0] = Int->new(5);
@@ -675,7 +657,7 @@ If a invalid type is assigned, a compilation error occurs.
 
 =head2 Multi-Numeric Types
 
-The multi-numeric type is the type to represent a L<multi-numeric value|/"Multi-Numeric Value">.
+The multi-numeric type is the type to represent a L<multi-numeric number|/"Multi-Numeric Number">.
 
 The multi-numeric type can be used as the L<type|/"Types"> of the L<local variable declaration|/"Local Variable Declaration">.
 
@@ -769,51 +751,51 @@ The list of the multi-numeric type suffix.
 
 =head3 Multi-Numeric Types Field Access
 
-The multi-numeric type field access is an syntax to access the field of the multi-numeric value.
+The multi-numeric type field access is an syntax to access the field of the multi-numeric number.
 
   MULTI_NUMERIC_VALUE->{FIELD_NAME}
 
-See L</"Getting Multi-Numeric Field"> to get the field of the multi-numeric value.
+See L</"Getting Multi-Numeric Field"> to get the field of the multi-numeric number.
 
-See L</"Setting Multi-Numeric Field"> to set the field of the multi-numeric value.
+See L</"Setting Multi-Numeric Field"> to set the field of the multi-numeric number.
 
-=head2 Reference Type
+=head2 Reference Types
 
-Reference type is a type that can store the address of a variable. Add C<*> after a L<numeric type|/"Numeric Types"> or the L<multi-numeric type|/"Multi-Numeric Types"> You can define it.
+Reference Types is a type that can store the address of a variable. Add C<*> after a L<numeric type|/"Numeric Types"> or the L<multi-numeric type|/"Multi-Numeric Types"> You can define it.
 
-  my $num : int;
-  my $num_ref : int* = \$num;
+  my $number : int;
+  my $number_ref : int* = \$number;
   
   my $z : Complex_2d;
   my $z_ref : Complex_2d* = \$z;
 
-Only the address of the Local Variable acquired by L</"Reference Operator"> can be assigned to the value of Reference Type.
+Only the address of the Local Variable acquired by L</"Reference Operator"> can be assigned to the value of Reference Types.
 
-Reference type can be used as type of argument in the L<method definition|/"Method Definition">.
+Reference Types can be used as type of argument in the L<method definition|/"Method Definition">.
 
-Reference type cannot be used as return value type in the L<method definition|/"Method Definition">.
+Reference Types cannot be used as return value type in the L<method definition|/"Method Definition">.
 
-Reference type cannot be used as the field type in the L<class definition|/"Class Definition">.
+Reference Types cannot be used as the field type in the L<class definition|/"Class Definition">.
 
-Reference type cannot be used as the type of Class Variable in the L<class definition|/"Class Definition">.
+Reference Types cannot be used as the type of Class Variable in the L<class definition|/"Class Definition">.
 
 See L</"Reference"> for a detailed explanation of Reference.
 
 Compilation Errors:
 
-If only Local Variable Declaration of Reference type is performed, a compilation error occurs
+If only Local Variable Declaration of Reference Types is performed, a compilation error occurs
 
-Reference type can be used as type of the L<local variable declaration|/"Local Variable Declaration">. The address of the Local Variable must be stored by the Reference Operator. In case of only Local Variable Declaration, a compilation error occurs
+Reference Types can be used as type of the L<local variable declaration|/"Local Variable Declaration">. The address of the Local Variable must be stored by the Reference Operator. In case of only Local Variable Declaration, a compilation error occurs
 
-If the Reference type is used at an Invalid location, a compilation error occurs
+If the Reference Types is used at an Invalid location, a compilation error occurs
 
-=head3 Numeric Reference Type
+=head3 Numeric Reference Types
 
-Numeric Reference type means a L<numeric type|/"Numeric Types"> for a L<reference type|/"Reference Type">. Says.
+Numeric Reference Types means a L<numeric type|/"Numeric Types"> for a L<Reference Types|/"Reference Types">. Says.
 
-=head3 Multi-Numeric Reference Type
+=head3 Multi-Numeric Reference Types
 
-Multi-Numeric Reference type means a L<reference type|/"Reference Type"> for the L<multi-numeric type|/"Multi-Numeric Types"> variables. > Means.
+Multi-Numeric Reference Types means a L<Reference Types|/"Reference Types"> for the L<multi-numeric type|/"Multi-Numeric Types"> variables. > Means.
 
 =head2 Type Qualifiers
 
@@ -1152,7 +1134,7 @@ The String-to-byte conversion is a L<type conversion|/"Type Conversion"> from th
 
   # The String-to-byte conversion
   my $string : string = "Hello";
-  my $num : byte = (byte)$string;
+  my $number : byte = (byte)$string;
 
 If the string is not defined, returns 0.
 
@@ -1170,7 +1152,7 @@ The String-to-short conversion is a L<type conversion|/"Type Conversion"> from t
 
   # The String-to-short conversion
   my $string : string = "Hello";
-  my $num : short = (short)$string;
+  my $number : short = (short)$string;
 
 If the string is not defined, returns 0.
 
@@ -1188,7 +1170,7 @@ The String-to-int conversion is a L<type conversion|/"Type Conversion"> from the
 
   # The String-to-int conversion
   my $string : string = "Hello";
-  my $num : int = (int)$string;
+  my $number : int = (int)$string;
 
 If the string is not defined, returns 0.
 
@@ -1206,7 +1188,7 @@ The String-to-long conversion is a L<type conversion|/"Type Conversion"> from th
 
   # The String-to-long conversion
   my $string : string = "Hello";
-  my $num : long = (long)$string;
+  my $number : long = (long)$string;
 
 If the string is not defined, returns 0.
 
@@ -1234,7 +1216,7 @@ The String-to-double conversion is a L<type conversion|/"Type Conversion"> from 
 
   # The String-to-double conversion
   my $string : string = "Hello";
-  my $num : double = (double)$string;
+  my $number : double = (double)$string;
 
 If the string is not defined, returns 0.
 
@@ -1333,7 +1315,7 @@ And the following operation in the C language is performed on I<OPERAND> .
 
 Compilation Errors:
 
-The type of I<OPERAND> of the boolean conversion must be a L<numeric type|/"Numeric Types">, an L<object type|/"Object Types"> or an L<reference type|/"Reference Type"> or the L<undef type|/"undef Type">. Otherwise a compilation error occurs.
+The type of I<OPERAND> of the boolean conversion must be a L<numeric type|/"Numeric Types">, an L<object type|/"Object Types"> or an L<Reference Types|/"Reference Types"> or the L<undef type|/"undef Type">. Otherwise a compilation error occurs.
 
 Examples:
 
@@ -1400,13 +1382,13 @@ See L<"Assignment Requirement"> if you know when implicite type conversion is pe
 Examples:
   
   # The implicite type conversion from int to double 
-  my $num : double = 5;
+  my $number : double = 5;
   
   # The implicite type conversion from double to Double
-  my $num_object : Double = 5.1;
+  my $number_object : Double = 5.1;
   
   # The implicite type conversion from Double to double
-  my $num : double = Double->new(5.1);
+  my $number : double = Double->new(5.1);
   
   # The implicite type conversion from int to string
   my $string : string = 4;
@@ -1461,16 +1443,16 @@ If the L<nemric type order|/"Numeric Types Order"> of I<LEFT_OPERAND> is greater
 Examples:
   
   # int to int
-  my $num : int = 3;
+  my $number : int = 3;
   
   # byte to int
-  my $num : int = (byte)5;
+  my $number : int = (byte)5;
   
   # double to double
-  my $num : double = 4.5;
+  my $number : double = 4.5;
   
   # float to double
-  my $num : double = 4.5f;
+  my $number : double = 4.5f;
 
 If the L<nemric type order|/"Numeric Types Order"> of I<LEFT_OPERAND> is less than the L<nemric type order|/"Numeric Types Order"> of I<RIGHT_OPERAND>, the assignment requirement is conditional true.
 
@@ -1504,7 +1486,7 @@ If the condition is ture, the L<numeric narrowing conversion|/"Numeric Narrowing
 Examples:
   
   # int to byte
-  my $num : byte = 127;
+  my $number : byte = 127;
 
 =head3 Assignment Requirement from NumericObject to Numeric
 
@@ -1578,7 +1560,7 @@ Examples:
 
 =head2 Assignment Requirement to Referenece
 
-If the type of I<LEFT_OPERAND> is a L<reference type|/"Reference Type"> and the type of I<RIGHT_OPERAND> is the same type of I<LEFT_OPERAND>, the assignment requirement is true.
+If the type of I<LEFT_OPERAND> is a L<Reference Types|/"Reference Types"> and the type of I<RIGHT_OPERAND> is the same type of I<LEFT_OPERAND>, the assignment requirement is true.
 
 Otherwise, the assignment requirement is false.
 
@@ -1594,8 +1576,8 @@ Otherwise, the assignment requirement is false.
 
 Examples:
 
-  my $num : int = 5;
-  my $num_ref : int* = \num;
+  my $number : int = 5;
+  my $number_ref : int* = \num;
 
 =head2 Assignment Requirement to String
 
@@ -1628,7 +1610,7 @@ If the type of I<RIGHT_OPERAND> is a L<numeric type|/"Numeric Types">, the L<num
 Examples:
 
   my $string : string = "abc";
-  my $num_string : string = 3;
+  my $number_string : string = 3;
   my $string : string = undef;
 
 =head2 Assignment Requirement to NumericObject
@@ -1653,9 +1635,9 @@ If the type of I<RIGHT_OPERAND> is a L<numeric type|/"Numeric Types">, the L<box
 
 Examples:
 
-  my $num_object : Int = Int->new(3);
-  my $num_object : Int = 3;
-  my $num_object : Int = undef;
+  my $number_object : Int = Int->new(3);
+  my $number_object : Int = 3;
+  my $number_object : Int = undef;
 
 =head2 Assignment Requirement to Class
 
@@ -1731,7 +1713,7 @@ If the type of I<RIGHT_OPERAND> is a L<numeric type|/"Numeric Types">, the L<box
 Examples:
 
   my $object : object = Point->new;
-  my $num_object : object = 3;
+  my $number_object : object = 3;
   my $object : object = undef;
 
 =head2 Assignment Requirement to Undefined
@@ -1776,8 +1758,8 @@ Otherwise, the assignment requirement is false.
 
 Examples:
 
-  my $nums : int[] = new int[3];
-  my $nums : int[] = undef;
+  my $numbers : int[] = new int[3];
+  my $numbers : int[] = undef;
 
 =head2 Assignment Requirement to Multi-Numeric Array
 
@@ -1798,8 +1780,8 @@ Otherwise, the assignment requirement is false.
 
 Examples:
 
-  my $nums : Complex_2d[] = new Complex_2d[3];
-  my $nums : Complex_2d[] = undef;
+  my $numbers : Complex_2d[] = new Complex_2d[3];
+  my $numbers : Complex_2d[] = undef;
 
 =head2 Assignment Requirement to String Array
 
@@ -2024,23 +2006,23 @@ If the L<nemric type order|/"Numeric Types Order"> of I<LEFT_OPERAND> is equal t
 Examples:
   
   # int to int
-  my $num = (int)3;
+  my $number = (int)3;
   
   # byte to int
-  my $num_byte : byte = 5;
-  my $num = (int)5;
+  my $number_byte : byte = 5;
+  my $number = (int)5;
   
   # double to double
-  my $num = (double)4.5;
+  my $number = (double)4.5;
   
   # float to double
-  my $num = (double)4.5f;
+  my $number = (double)4.5f;
   
   # int to byte
-  my $num = (byte)127;
+  my $number = (byte)127;
 
   # double to int
-  my $num = (int)2.5;
+  my $number = (int)2.5;
 
 =head3 Cast Requirement from NumericObject to Numeric
 
@@ -2116,7 +2098,7 @@ Examples:
 
 =head2 Cast Requirement to Referenece
 
-If the type of I<LEFT_OPERAND> is a L<reference type|/"Reference Type"> and the type of I<RIGHT_OPERAND> is the same type of I<LEFT_OPERAND>, the cast requirement is true.
+If the type of I<LEFT_OPERAND> is a L<Reference Types|/"Reference Types"> and the type of I<RIGHT_OPERAND> is the same type of I<LEFT_OPERAND>, the cast requirement is true.
 
 Otherwise, the cast requirement is false.
 
@@ -2132,8 +2114,8 @@ Otherwise, the cast requirement is false.
 
 Examples:
 
-  my $num : int = 5;
-  my $num_ref = (int*)\num;
+  my $number : int = 5;
+  my $number_ref = (int*)\num;
 
 =head2 Cast Requirement to String
 
@@ -2169,7 +2151,7 @@ If the type of I<LEFT_OPERAND> is the L<string type|/"string Type"> and the type
 Examples:
 
   my $string = (string)"abc";
-  my $num_string = (string)3;
+  my $number_string = (string)3;
   my $string : string = undef;
 
 =head2 Cast Requirement to NumericObject
@@ -2199,12 +2181,12 @@ If the type of I<LEFT_OPERAND> is the type of I<RIGHT_OPERAND> is the L<any obje
 
 Examples:
 
-  my $num_object = (Int)Int->new(3);
-  my $num_object = (Int)3;
-  my $num_object = (Int)undef;
+  my $number_object = (Int)Int->new(3);
+  my $number_object = (Int)3;
+  my $number_object = (Int)undef;
   
   my $object : object = Int->new(3);
-  my $num_object = (Int)$object;
+  my $number_object = (Int)$object;
 
 =head2 Cast Requirement to Class
 
@@ -2313,7 +2295,7 @@ If the type of I<RIGHT_OPERAND> is a L<numeric type|/"Numeric Types">, the L<box
 Examples:
 
   my $object : object = Point->new;
-  my $num_object : object = 3;
+  my $number_object : object = 3;
   my $object : object = undef;
 
 =head2 Cast Requirement to Numeric Array
@@ -2347,12 +2329,12 @@ Examples:
   
   my $bytes = (byte[])"abc";
   
-  my $nums = (int[])new int[3];
+  my $numbers = (int[])new int[3];
   
   my $object : object = new int[3];
-  my $nums = (int[])$object;
+  my $numbers = (int[])$object;
   
-  my $nums = (int[])undef;
+  my $numbers = (int[])undef;
 
 =head2 Cast Requirement to Multi-Numeric Array
 
@@ -2378,12 +2360,12 @@ If the type of I<RIGHT_OPERAND> is the L<any object type|/"Any Object Type"> C<o
 
 Examples:
 
-  my $nums = (Complex_2d[])new Complex_2d[3];
+  my $numbers = (Complex_2d[])new Complex_2d[3];
 
   my $object : object = new Complex_2d[3];
-  my $nums = (Complex_2d[])$object;
+  my $numbers = (Complex_2d[])$object;
 
-  my $nums = (Complex_2d[])undef;
+  my $numbers = (Complex_2d[])undef;
 
 =head2 Cast Requirement to String Array
 

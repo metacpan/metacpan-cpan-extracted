@@ -1,5 +1,14 @@
 Revision history for perl distribution Dist-Setup
 
+0.11 - 2024-04-07
+
+ - Clean the cover_db with the `make clean` command.
+ - Add support to set a homepage in Makefile.PL
+ - Allow to not install the dependencies of all the features in the GitHub CI
+   tests.
+ - Don’t write the Makefile postamble under solaris which does not have GNU
+   make by default.
+
 0.10 - 2024-03-01
 
  - Don’t create backup of the source files when running aspell.

@@ -45,7 +45,7 @@
    "provides" : {
       "Crypt::Passphrase::Bcrypt::AES" : {
          "file" : "lib/Crypt/Passphrase/Bcrypt/AES.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -59,7 +59,7 @@
          "web" : "https://github.com/Leont/crypt-passphrase-bcrypt-aes"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

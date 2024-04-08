@@ -13,7 +13,7 @@ use Readonly;
 Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LINE_SIZE => 79;
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -146,17 +146,19 @@ sub _parse_to_indent_length {
 		# First part.
 		my ($first_wo_ansi) = $string_wo_ansi
 			=~ m/^(.{0,$self->{'line_size'}})\s+(.*)$/msx;
-		push @ret, Text::ANSI::Util::ta_trunc($string, length $first_wo_ansi);
+		if (defined $first_wo_ansi) {
+			push @ret, Text::ANSI::Util::ta_trunc($string, length $first_wo_ansi);
 
-		# Second part. (Remove first part + whitespace from string.)
-		my $other_string_wo_ansi = Text::ANSI::Util::ta_strip(
-			Text::ANSI::Util::ta_substr($string, length $first_wo_ansi,
-				Text::ANSI::Util::ta_length($string))
-		);
-		$other_string_wo_ansi =~ m/^(\s*)/ms;
-		my $count_of_spaces = length $1;
-		push @ret, Text::ANSI::Util::ta_substr($string, 0, (length $first_wo_ansi)
-			+ $count_of_spaces, '');
+			# Second part. (Remove first part + whitespace from string.)
+			my $other_string_wo_ansi = Text::ANSI::Util::ta_strip(
+				Text::ANSI::Util::ta_substr($string, length $first_wo_ansi,
+					Text::ANSI::Util::ta_length($string))
+			);
+			$other_string_wo_ansi =~ m/^(\s*)/ms;
+			my $count_of_spaces = length $1;
+			push @ret, Text::ANSI::Util::ta_substr($string, 0, (length $first_wo_ansi)
+				+ $count_of_spaces, '');
+		}
 	} else {
 		@ret = $string =~ m/^(.{0,$self->{'line_size'}})\s+(.*)$/msx;
 	}
@@ -343,12 +345,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2021 Michal Josef Špaček
+© 2005-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

@@ -1,5 +1,5 @@
 package MARC::Moose::Formater::UnimarcToMarc21;
-$MARC::Moose::Formater::UnimarcToMarc21::VERSION = '1.0.48';
+$MARC::Moose::Formater::UnimarcToMarc21::VERSION = '1.0.49';
 # ABSTRACT: Convert biblio record from UNIMARC to MARC21
 use Moose;
 
@@ -169,6 +169,7 @@ push @unchanged, [317, 561],
                  [332, 524],
                  [333, 521],
                  [337, 538],
+                 [371, 506],
                  [686, '084'];
 
 # Tags with non-filing indicator (pos 1 or 2)
@@ -1276,7 +1277,7 @@ MARC::Moose::Formater::UnimarcToMarc21 - Convert biblio record from UNIMARC to M
 
 =head1 VERSION
 
-version 1.0.48
+version 1.0.49
 
 =head1 SYNOPSYS
 

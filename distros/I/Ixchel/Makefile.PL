@@ -37,7 +37,6 @@ my %WriteMakefileArgs = (
 		'Pod::Parser'          => 0,
 		'Rex'                  => '1.14.3',
 		'String::ShellQuote'   => 0,
-		'TOML::Tiny'           => 0,
 		'Template'             => '3.101',
 		'YAML::XS'             => 0,
 		'YAML::yq::Helper'     => '0.2.0',

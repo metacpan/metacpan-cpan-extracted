@@ -1,6 +1,6 @@
 package MARC::Moose::Parser::Marcedit;
 # ABSTRACT: Parser for Marcedit records
-$MARC::Moose::Parser::Marcedit::VERSION = '1.0.48';
+$MARC::Moose::Parser::Marcedit::VERSION = '1.0.49';
 use Moose;
 extends 'MARC::Moose::Parser';
 use JSON;
@@ -64,7 +64,7 @@ MARC::Moose::Parser::Marcedit - Parser for Marcedit records
 
 =head1 VERSION
 
-version 1.0.48
+version 1.0.49
 
 =head1 SEE ALSO
 =for :list

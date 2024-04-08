@@ -1,6 +1,6 @@
 # NAME
 
-Date::Holidays::GB - Determine British holidays - Current UK public and bank holiday dates up to 2023
+Date::Holidays::GB - Determine British holidays - Current UK public and bank holiday dates up to 2026
 
 # SYNOPSIS
 
@@ -168,7 +168,7 @@ Michael Jemmeson <mjemmeson@cpan.org>
 
 # COPYRIGHT
 
-This software is copyright (c) 2013-2022 by Michael Jemmeson.
+This software is copyright (c) 2013-2024 by Michael Jemmeson.
 
 # LICENSE
 

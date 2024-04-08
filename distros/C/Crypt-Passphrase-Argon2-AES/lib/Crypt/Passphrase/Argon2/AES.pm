@@ -3,7 +3,7 @@ package Crypt::Passphrase::Argon2::AES;
 use strict;
 use warnings;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use parent 'Crypt::Passphrase::Argon2::Encrypted';
 use Crypt::Passphrase 0.019 -encoder;
@@ -17,6 +17,9 @@ my %mode = (
 	'aes-cfb' => Crypt::Rijndael::MODE_CFB,
 	'aes-ofb' => Crypt::Rijndael::MODE_OFB,
 	'aes-ctr' => Crypt::Rijndael::MODE_CTR,
+
+	'aes-cbc-pad' => Crypt::Rijndael::MODE_CBC,
+	'aes-ecb-pad' => Crypt::Rijndael::MODE_ECB,
 );
 
 sub new {
@@ -38,6 +41,10 @@ sub new {
 
 sub encrypt_hash {
 	my ($self, $cipher, $id, $iv, $raw) = @_;
+	if ($cipher =~ /-pad$/) {
+		my $pad_length = 16 - length($raw) % 16;
+		$raw .= chr($pad_length) x $pad_length;
+	}
 	my $mode = $mode{$cipher} or croak "No such cipher $cipher";
 	my $secret = $self->{peppers}{$id} or croak "No such pepper $id";
 	return Crypt::Rijndael->new($secret, $mode)->encrypt($raw, $iv);
@@ -47,7 +54,12 @@ sub decrypt_hash {
 	my ($self, $cipher, $id, $iv, $raw) = @_;
 	my $mode = $mode{$cipher} or croak "No such cipher $cipher";
 	my $secret = $self->{peppers}{$id} or croak "No such pepper $id";
-	return Crypt::Rijndael->new($secret, $mode)->decrypt($raw, $iv);
+	my $plaintext = Crypt::Rijndael->new($secret, $mode)->decrypt($raw, $iv);
+	if ($cipher =~ /-pad$/) {
+		my $pad_length = ord substr $plaintext, -1;
+		substr($plaintext, -$pad_length, $pad_length, '') eq chr($pad_length) x $pad_length or croak 'Incorrectly padded';
+	}
+	return $plaintext;
 }
 
 sub supported_ciphers {
@@ -100,7 +112,7 @@ This is the identifier of the active pepper. By default it will be the identifie
 
 =item * mode
 
-This is the mode that will be used with C<AES>. Values values are C<'ecb'>, C<'cbc'> (the default), C<'cfb'>, C<'ofb'> and C<'ctr'>.
+This is the mode that will be used with C<AES>. Values values are C<'cbc'> (the default), C<'ecb'>, C<'cfb'>, C<'ofb'>, C<'ctr'>, C<'cbc-pad'> and C<ecb-pad>.
 
 =back
 

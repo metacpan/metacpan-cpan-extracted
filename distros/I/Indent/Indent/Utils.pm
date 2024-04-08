@@ -11,7 +11,7 @@ use Readonly;
 Readonly::Scalar my $DEFAULT_TAB_LENGTH => 8;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Length of tab.
 our $TAB_LENGTH = $DEFAULT_TAB_LENGTH;
@@ -268,12 +268,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2021 Michal Josef Špaček
+© 2005-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

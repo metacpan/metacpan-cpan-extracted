@@ -1,6 +1,6 @@
 package MARC::Moose::Field;
 # ABSTRACT: Marc field base object
-$MARC::Moose::Field::VERSION = '1.0.48';
+$MARC::Moose::Field::VERSION = '1.0.49';
 use Moose;
 use Moose::Util::TypeConstraints;
 
@@ -42,7 +42,7 @@ MARC::Moose::Field - Marc field base object
 
 =head1 VERSION
 
-version 1.0.48
+version 1.0.49
 
 =head1 ATTRIBUTES
 

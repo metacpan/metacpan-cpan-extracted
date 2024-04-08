@@ -3,12 +3,14 @@ use warnings;
 
 use Indent::Word;
 use Term::ANSIColor;
-use Test::More 'tests' => 11;
+use Test::More 'tests' => 14;
 use Test::NoWarnings;
 use Text::ANSI::Util qw(ta_strip);
+use Unicode::UTF8 qw(decode_utf8);
 
 # Test.
 my $obj = Indent::Word->new(
+	'ansi' => 0,
 	'next_indent' => '  ',
 	'line_size' => '20',
 );
@@ -42,6 +44,7 @@ is($ret, '---abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdef'.
 
 # Test.
 $obj = Indent::Word->new(
+	'ansi' => 0,
 	'next_indent' => '',
 	'line_size' => '5',
 );
@@ -54,6 +57,7 @@ is(
 
 # Test.
 $obj = Indent::Word->new(
+	'ansi' => 0,
 	'next_indent' => ' ',
 	'line_size' => '5',
 );
@@ -68,8 +72,26 @@ is_deeply(
 );
 
 # Test.
+$obj = Indent::Word->new(
+	'ansi' => 1,
+	'line_size' => '5',
+	'next_indent' => ' ',
+);
+my $input_text = decode_utf8('švec švec');
+@ret = $obj->indent($input_text, '<->');
+is_deeply(
+	\@ret,
+	[
+		decode_utf8('<->švec'),
+		decode_utf8('<-> švec'),
+	],
+	'Test for short string #3.',
+);
+
+# Test.
 my $next_indent = '  ';
 $obj = Indent::Word->new(
+	'ansi' => 0,
 	'next_indent' => $next_indent,
 	'line_size' => 0,
 );
@@ -82,6 +104,7 @@ is(
 
 # Test.
 $obj = Indent::Word->new(
+	'ansi' => 0,
 	'next_indent' => '',
 	'line_size' => 2,
 );
@@ -96,6 +119,7 @@ is_deeply(
 
 # Test
 $obj = Indent::Word->new(
+	'ansi' => 0,
 	'next_indent' => '',
 	'line_size' => 1,
 );
@@ -146,4 +170,37 @@ is_deeply(
 		'---  z',
 	],
 	'Test for indenting per 20 char on line.',
+);
+
+# Test.
+$obj = Indent::Word->new(
+	'ansi' => 1,
+	'line_size' => '5',
+	'next_indent' => ' ',
+);
+@ret = $obj->indent('text text', '<->');
+is_deeply(
+	\@ret,
+	[
+		'<->text',
+		'<-> text',
+	],
+	'Test for short string #2 (ansi).',
+);
+
+# Test.
+$obj = Indent::Word->new(
+	'ansi' => 1,
+	'line_size' => '5',
+	'next_indent' => ' ',
+);
+$input_text = decode_utf8('švec švec');
+@ret = $obj->indent($input_text, '<->');
+is_deeply(
+	\@ret,
+	[
+		decode_utf8('<->švec'),
+		decode_utf8('<-> švec'),
+	],
+	'Test for short string #3 (ansi).',
 );

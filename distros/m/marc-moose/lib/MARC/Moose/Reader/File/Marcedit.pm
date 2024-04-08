@@ -1,6 +1,6 @@
 package MARC::Moose::Reader::File::Marcedit;
 # ABSTRACT: File reader for MARC::Moose record from Marcedit file (.mrk)
-$MARC::Moose::Reader::File::Marcedit::VERSION = '1.0.48';
+$MARC::Moose::Reader::File::Marcedit::VERSION = '1.0.49';
 use Moose;
 use Modern::Perl;
 use MARC::Moose::Record;
@@ -68,7 +68,7 @@ MARC::Moose::Reader::File::Marcedit - File reader for MARC::Moose record from Ma
 
 =head1 VERSION
 
-version 1.0.48
+version 1.0.49
 
 =head1 AUTHOR
 

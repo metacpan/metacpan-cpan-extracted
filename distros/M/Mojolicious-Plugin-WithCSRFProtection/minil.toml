@@ -1,0 +1,4 @@
+#module_maker="ExtUtilsMakeMaker"
+abstract_from="lib/Mojolicious/Plugin/WithCSRFProtection.pm"
+authors_from="lib/Mojolicious/Plugin/WithCSRFProtection.pm"
+license="perl_5"

@@ -1,5 +1,9 @@
 Revision history for Perl module MARC::Moose
 
+1.0.49
+
+  - Unimarc -> Marc21
+
 1.0.48
 
   - Marcedit format parser/reader

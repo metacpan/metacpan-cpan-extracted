@@ -16,7 +16,7 @@ name: Crypt-Passphrase-Argon2-AES
 provides:
   Crypt::Passphrase::Argon2::AES:
     file: lib/Crypt/Passphrase/Argon2/AES.pm
-    version: '0.007'
+    version: '0.008'
 requires:
   Carp: '0'
   Crypt::Passphrase: '0.019'
@@ -28,6 +28,6 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/crypt-passphrase-argon2-aes/issues
   repository: git://github.com/Leont/crypt-passphrase-argon2-aes.git
-version: '0.007'
+version: '0.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

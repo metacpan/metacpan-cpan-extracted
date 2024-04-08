@@ -1,6 +1,6 @@
 package MARC::Moose::Record;
 # ABSTRACT: MARC::Moose bibliographic record
-$MARC::Moose::Record::VERSION = '1.0.48';
+$MARC::Moose::Record::VERSION = '1.0.49';
 use Moose;
 
 use Modern::Perl;
@@ -208,7 +208,7 @@ MARC::Moose::Record - MARC::Moose bibliographic record
 
 =head1 VERSION
 
-version 1.0.48
+version 1.0.49
 
 =head1 DESCRIPTION
 

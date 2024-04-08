@@ -1,5 +1,8 @@
 Revision history for Crypt-Passphrase-Argon2-AES
 
+0.008     2024-04-07 13:41:40+0200
+          - Add support for aes-cbc-pad and aes-ecb-pad
+
 0.007     2024-02-09 00:36:33+0100
           - Test recode_hash behavior
           - Double check more arguments

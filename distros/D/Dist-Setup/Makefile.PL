@@ -55,7 +55,8 @@ sub MY::postamble {
   my @postamble;
   push @postamble, ::postamble() if *::postamble{CODE};
 
-  push @postamble, <<"MAKE_FRAGMENT";
+  # Solaris has a weird (?) make that does not support our `export` statements.
+  push @postamble, <<"MAKE_FRAGMENT" unless $^O eq  'solaris';
 distupload: distcheck disttest
 \t\$(MAKE) tardist
 \tcpan-upload --directory Dist-Setup \$(DISTVNAME).tar\$(SUFFIX)
@@ -79,6 +80,11 @@ spelling:
 
 alltest: export EXTENDED_TESTING = 1
 alltest: test
+
+clean:: clean_coverdb
+
+clean_coverdb:
+\trm -fr cover_db
 MAKE_FRAGMENT
 
   push @postamble, File::ShareDir::Install::postamble($self);

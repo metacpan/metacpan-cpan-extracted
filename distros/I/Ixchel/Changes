@@ -1,5 +1,8 @@
 Revision history for Ixchel
 
+0.11.0 2024-04-7/22:00
+		 - TOML::Tiny is no longer a hard requirement to make the flaming mess that is badly maintained out of date that is CentOS happy
+
 0.10.0 2024-03-13/16:00
 		 - enable auto_sensor_name for suricata_diff if needed
 

@@ -7,17 +7,17 @@ use ExtUtils::MakeMaker::CPANfile;
 [% IF data_dir %]use File::ShareDir::Install;
 
 $File::ShareDir::Install::INCLUDE_DOTFILES = 1;
-install_share '[% data_dir %]';[% END %]
-
+install_share '[% data_dir %]';
+[% END %]
 WriteMakefile(
     NAME             => '[% name %]',
     DISTNAME         => '[% dist_name %]',
     AUTHOR           => q{[% author.name %] <[% author.email %]>},
     VERSION_FROM     => '[% base_package %]',
-    [% IF abstract %]ABSTRACT         => q{[% abstract %]},[% END %]
-    LICENSE          => 'mit',
-    [% IF exe_files %]EXE_FILES        => [[% FOREACH f IN exe_files %]'[% f %]',[% END %]],[% END %]
-    MIN_PERL_VERSION => '[% min_perl_version %]',
+[% IF abstract %]    ABSTRACT         => q{[% abstract %]},
+[% END %]    LICENSE          => 'mit',
+[% IF exe_files %]    EXE_FILES        => [[% FOREACH f IN exe_files %]'[% f %]',[% END %]],
+[% END %]    MIN_PERL_VERSION => '[% min_perl_version %]',
     MAN3PODS         => {},
     # Directories in which we look for Makefile.PL. In general could be omitted but is needed in case there
     # is a file named Makefile.PL in a sub-directory. Should be customized if such a file needs to be
@@ -31,8 +31,9 @@ WriteMakefile(
       no_index => {
         directory => [ 'local', 'vendor' ],
       },
-      [% IF github %]resources => {
-        repository => {
+      resources => {
+[% IF homepage %]        homepage => q{[% homepage %]},
+[% END %][% IF github %]        repository => {
           type => 'git',
           url => 'git@github.com:[% github.username %]/[% github.repository_name %].git',
           web => 'https://github.com/[% github.username %]/[% github.repository_name %]',
@@ -40,7 +41,7 @@ WriteMakefile(
         bugtracker => {
           web => 'https://github.com/[% github.username %]/[% github.repository_name %]/issues',
         },
-      },[% END %]
+[% END %]      },
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => '.gz', },
     clean => { FILES => '[% dist_name %]-*' },
@@ -52,7 +53,8 @@ sub MY::postamble {
   my @postamble;
   push @postamble, ::postamble() if *::postamble{CODE};
 
-  push @postamble, <<"MAKE_FRAGMENT";
+  # Solaris has a weird (?) make that does not support our `export` statements.
+  push @postamble, <<"MAKE_FRAGMENT" unless $^O eq 'solaris';
 distupload: distcheck disttest
 \t\$(MAKE) tardist
 \tcpan-upload --directory Dist-Setup \$(DISTVNAME).tar\$(SUFFIX)
@@ -76,6 +78,11 @@ spelling:
 
 alltest: export EXTENDED_TESTING = 1
 alltest: test
+
+clean:: clean_coverdb
+
+clean_coverdb:
+\trm -fr cover_db
 MAKE_FRAGMENT
 
 [% IF data_dir %]  push @postamble, File::ShareDir::Install::postamble($self);

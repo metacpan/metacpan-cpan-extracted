@@ -18,7 +18,7 @@ post '/example_with_condition' => ( with_csrf_protection => 1 );
 # application, but makes sense in a full application, so we need to test it
 # as well
 app->routes->post('/example_with_shortcut')
-    ->with_csrf_protection->to('example_with_shortcut');
+    ->with_csrf_protection->to('#example_with_shortcut');
 
 # And this gets us the CSRF token, which we'll need to be able to test that
 # this works okay.

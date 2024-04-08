@@ -44,7 +44,7 @@
    "provides" : {
       "Crypt::Passphrase::Argon2::AES" : {
          "file" : "lib/Crypt/Passphrase/Argon2/AES.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -58,7 +58,7 @@
          "web" : "https://github.com/Leont/crypt-passphrase-argon2-aes"
       }
    },
-   "version" : "0.007",
+   "version" : "0.008",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

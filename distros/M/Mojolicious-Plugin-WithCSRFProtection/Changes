@@ -1,3 +1,6 @@
-1.00     2016-06-21
+1.01 2024-04-07T13:58:46Z
 
+  - Apply fixes for Mojolicious 9+
+
+1.00     2016-06-21
   - Initial CPAN release

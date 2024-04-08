@@ -4,9 +4,8 @@ use 5.006;
 use strict;
 use warnings;
 use Ixchel::functions::sys_info;
-use TOML::Tiny qw(to_toml);
-use JSON       qw(to_json);
-use YAML::XS   qw(Dump);
+use JSON     qw(to_json);
+use YAML::XS qw(Dump);
 use Data::Dumper;
 use JSON::Path;
 use base 'Ixchel::Actions::base';
@@ -17,11 +16,11 @@ Ixchel::Actions::dump_config - Prints out the config.
 
 =head1 VERSION
 
-Version 0.2.0
+Version 0.3.0
 
 =cut
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 =head1 CLI SYNOPSIS
 
@@ -102,7 +101,8 @@ sub action_extra {
 
 	my $string;
 	if ( $self->{opts}->{o} eq 'toml' ) {
-		$string = to_toml($config) . "\n";
+		my $to_eval = 'use TOML::Tiny qw(to_toml); $string = to_toml($config) . "\n";';
+		eval($to_eval);
 		if ( !$self->{opts}{np} ) {
 			print $string;
 		}
@@ -122,7 +122,7 @@ sub action_extra {
 	}
 
 	return undef;
-} ## end sub action
+} ## end sub action_extra
 
 sub short {
 	return 'Dumps the config to to JSON, YAML, or TOML(default)';

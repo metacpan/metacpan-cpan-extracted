@@ -30,7 +30,8 @@ DESCRIPTION
 
       This is a map of identifier to pepper value. The identifiers should
       be (probably small) numbers, the values should be random binary
-      strings that must be either 16, 24 or 32 bytes long.
+      strings that must be either 16, 24 or 32 bytes long. This argument is
+      mandatory.
 
       * active
 
@@ -39,13 +40,15 @@ DESCRIPTION
 
       * mode
 
-      This is the mode that will be used with AES. Values values are 'cfb',
-      'ofb' and 'ctr' (the default).
+      This is the mode that will be used with AES. Valid values are 'ctr'
+      (the default), 'cfb', 'ofb', 'cbc-pad' or 'ecb-pad'.
+
+    The hash parameter will default to 'sha384'.
 
  Supported crypt types
 
-    This supports any sequence of <bcrypt->, (sha256 | sha385 | sha512),
-    -encrypted-aes-, (ctr | cfb | ofb). E.g.
+    This supports any sequence of bcrypt-, (sha256 | sha384 | sha512),
+    -encrypted-aes-, (ctr | cfb | ofb | cbc-pad | ecb-pad). E.g.
     bcrypt-sha384-encrypted-aes-ctr
 
 AUTHOR

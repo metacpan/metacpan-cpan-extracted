@@ -1,3 +1,14 @@
+0.09 2024-04-08T10:58:07+02:00
+ [Common]
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
+ [Indent::Word]
+ - Add explicit 'ansi' parameter to tests. To reproducible tests.
+ - Add tests with UTF8 input.
+ - Fix warning in 'ansi' mode in situation when the length of the
+   non-breaking string is greater than indent length. Add test.
+
 0.08 2021-06-28T14:44:11+02:00
  [Common]
  - Update copyright years.

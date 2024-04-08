@@ -41,8 +41,8 @@ METHODS
 
       * mode
 
-      This is the mode that will be used with AES. Values values are 'ecb',
-      'cbc' (the default), 'cfb', 'ofb' and 'ctr'.
+      This is the mode that will be used with AES. Values values are 'cbc'
+      (the default), 'ecb', 'cfb', 'ofb', 'ctr', 'cbc-pad' and ecb-pad.
 
     The salt_size is hard-coded to 16 bytes, and if mode equals cbc or ecb,
     the output_size must be a multiple of 16 bytes.

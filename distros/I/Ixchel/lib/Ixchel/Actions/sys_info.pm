@@ -4,9 +4,8 @@ use 5.006;
 use strict;
 use warnings;
 use Ixchel::functions::sys_info;
-use TOML::Tiny qw(to_toml);
-use JSON       qw(to_json);
-use YAML::XS   qw(Dump);
+use JSON     qw(to_json);
+use YAML::XS qw(Dump);
 use Data::Dumper;
 use base 'Ixchel::Actions::base';
 
@@ -16,11 +15,11 @@ Ixchel::Actions::sys_info - Fetches system info via Rex::Hardware and prints it 
 
 =head1 VERSION
 
-Version 0.2.0
+Version 0.3.0
 
 =cut
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 =head1 CLI SYNOPSIS
 
@@ -78,7 +77,8 @@ sub action_extra {
 	my $string;
 	eval {
 		if ( $self->{opts}->{o} eq 'toml' ) {
-			$string = to_toml($sys_info) . "\n";
+			my $to_eval = 'use TOML::Tiny qw(to_toml); $string = to_toml($sys_info) . "\n";';
+			eval($to_eval);
 			print $string;
 		} elsif ( $self->{opts}->{o} eq 'json' ) {
 			my $json = JSON->new;

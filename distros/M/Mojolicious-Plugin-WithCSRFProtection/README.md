@@ -1,11 +1,3 @@
-# NAME
-
-Mojolicious::Plugin::WithCSRFProtection - Mojolicious plugin providing CSRF protection at the routing level
-
-# VERSION
-
-version 1.00
-
 # SYNOPSIS
 
     # in a lite application

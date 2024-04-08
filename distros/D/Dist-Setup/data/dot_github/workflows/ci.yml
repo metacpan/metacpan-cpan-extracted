@@ -51,7 +51,7 @@ jobs:
     - name: Install Modules
       run: |
         cpanm -V
-        cpanm -v --installdeps --notest --with-configure --with-recommends --with-suggests --with-all-features .
+        cpanm -v --installdeps --notest --with-configure --with-recommends --with-suggests --with-all-features [% FOREACH f IN github.use_ci.excluded_features %]--without-feature [% f %] [% END %].
 
     - name: Install aspell
       if:  ${{ matrix.os == 'ubuntu' }}

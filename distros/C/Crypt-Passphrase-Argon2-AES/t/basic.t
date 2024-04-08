@@ -26,7 +26,7 @@ my $hash1 = $passphrase->hash_password($password);
 ok($passphrase->verify_password($password, $hash1), 'Self-generated password validates');
 ok(!$passphrase->needs_rehash($hash1), 'Self-generated password doesn\'t need to be regenerated');
 
-ok($hash1 =~ / \A \$ argon2id-encrypted-aes-cbc \$ /x, 'Hash header looks like what we expect');
+like($hash1, qr/ \A \$ argon2id-encrypted-aes-cbc \$ /x, 'Hash header looks like what we expect');
 
 my $hash2 = '$argon2id$v=19$m=16384,t=2,p=1$AAAAAAAAAAAAAAAAAAAAAA$AcpOEUs9E88hQnLWQYw/ow';
 ok($passphrase->verify_password($password, $hash2), 'Unencrypted hash validates');

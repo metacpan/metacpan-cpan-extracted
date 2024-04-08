@@ -4,38 +4,7 @@ package Mojolicious::Plugin::WithCSRFProtection;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '1.00';
-
-#pod =head1 SYNOPSIS
-#pod
-#pod    # in a lite application
-#pod    post '/some-url' => ( with_csrf_protection => 1 ) => sub { ... };
-#pod
-#pod    # in a full application
-#pod    $app->routes->post('/some-url')
-#pod                ->with_csrf_protection
-#pod                ->to(...);
-#pod
-#pod =head1 DESCRIPTION
-#pod
-#pod This Mojolicious plugin provides a routing condition (called
-#pod C<with_csrf_protection>) and routing shortcut to add that condition (also called
-#pod C<with_csrf_protection>) that can be used to protect against cross site request
-#pod forgery.
-#pod
-#pod Adding the condition to the route checks a valid CSRF token was passed, either
-#pod in the C<X-CSRF-Token> HTTP header or in the C<crsf_token> parameter.
-#pod
-#pod Failing the CSRF check causes a 403 error and the C<bad_csrf> template to be
-#pod rendered, or if no such template is found a simple error string to be
-#pod output. This behavior is unlike most conditions that can be applied to
-#pod Mojolicious routes that normally just cause the route matching to fail and
-#pod alternative subsequent routes to be evaluated, but immediately returning an
-#pod error response makes sense for a failed CSRF check.  The actual error rendering
-#pod is performed by the C<reply.bad_csrf> helper that this plugin installs, and if
-#pod you want different error output you should override that helper.
-#pod
-#pod =cut
+our $VERSION = '1.01';
 
 sub register {
     my ( $self, $app ) = @_;
@@ -71,7 +40,11 @@ sub register {
     $routes->add_shortcut(
         with_csrf_protection => sub {
             my ($route) = @_;
-            return $route->over( with_csrf_protection => 1 );
+            if ($Mojolicious::VERSION >= 9) {
+                return $route->requires( with_csrf_protection => 1 );
+            } else {
+                return $route->over( with_csrf_protection => 1 );
+            }
         }
     );
 
@@ -81,16 +54,6 @@ sub register {
 1;
 
 __END__
-
-=pod
-
-=head1 NAME
-
-Mojolicious::Plugin::WithCSRFProtection - Mojolicious plugin providing CSRF protection at the routing level
-
-=head1 VERSION
-
-version 1.00
 
 =head1 SYNOPSIS
 
