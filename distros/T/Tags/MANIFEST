@@ -1,10 +1,10 @@
 Changes
-examples/ex1.pl
-examples/ex2.pl
-examples/ex3.pl
-examples/ex4.pl
-examples/ex5.pl
-examples/ex6.pl
+examples/encode_attr_entities.pl
+examples/encode_newline.pl
+examples/preserve_test.pl
+examples/tags_output_example.pl
+examples/tags_output_raw_data_callback.pl
+examples/tags_output_raw_element.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -47,7 +47,8 @@ t/Tags-Output-Raw/22-put-end_of_element.t
 t/Tags-Output/01-use.t
 t/Tags-Output/02-version.t
 t/Tags-Output/03-new.t
-t/Tags-Output/04-put.t
+t/Tags-Output/04-finalize.t
+t/Tags-Output/05-put.t
 t/Tags-Utils-Preserve/01-use.t
 t/Tags-Utils-Preserve/02-version.t
 t/Tags-Utils-Preserve/03-new.t

@@ -1,6 +1,34 @@
-2019-03-22  SVN: new release
+2023-07-11  SVN: new release
 
-	* Release: 0.2.7
+	* Release: 0.3.0
+
+2023-07-11 08:57  squinney@INF.ED.AC.UK
+
+	* bin/lcfg-pkgcfg.in, lcfg.yml, lib/LCFG/Build/PkgSpec.pm.in:
+	  Improved support for adding to the platforms list
+
+2019-08-16 14:53  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-PkgSpec release:
+	  0.2.8
+
+2019-08-16 14:52  squinney@INF.ED.AC.UK
+
+	* debian/docs: no need for changelog to be in docs file
+
+2019-08-16 14:52  squinney@INF.ED.AC.UK
+
+	* debian/rules: tabs not spaces
+
+2019-08-16 14:26  squinney@INF.ED.AC.UK
+
+	* debian/rules: Ensure all files are packaged. Install upstream
+	  changelog with correct name
+
+2019-03-22 15:28  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-PkgSpec release:
+	  0.2.7
 
 2019-03-22 15:28  squinney@INF.ED.AC.UK
 

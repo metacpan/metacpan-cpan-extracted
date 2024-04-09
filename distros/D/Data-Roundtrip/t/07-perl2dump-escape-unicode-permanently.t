@@ -6,7 +6,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION='0.27';
+our $VERSION='0.28';
 
 use Test::More;
 use Test2::Plugin::UTF8;
@@ -16,7 +16,7 @@ my $num_tests = 0;
 
 # always escape unicode (default Dump and Dumper behaviour)
 # this is as efficient as no-unicode-escape-permanently
-use Data::Roundtrip qw/:all unicode-escape-permanently/;
+use Data::Roundtrip qw/:all dump2perl unicode-escape-permanently/;
 
 my $abc = "abc-αβγ";
 my $xyz = "χψζ-xyz";

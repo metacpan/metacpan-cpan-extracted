@@ -4,7 +4,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 # VERSION
 
-Version 0.27
+Version 0.28
 
 # SYNOPSIS
 
@@ -127,14 +127,17 @@ By default no symbols are exported. However, the following export tags are avail
 - `:dump` :
 `perl2dump()`,
 `perl2dump_filtered()`,
-`perl2dump_homebrew()`,
-`dump2perl()`,
-`dump2json()`,
-`dump2yaml()`
+`perl2dump_homebrew()`
 - `:io` :
 `read_from_file()`, `write_to_file()`,
 `read_from_filehandle()`, `write_to_filehandle()`,
-- `:all` : everything above
+- `:all` : everything above.
+- Additionally, these four subs: `dump2perl()`, `dump2json()`, `dump2yaml()`, `dump2dump()`
+do not belong to any export tag. However they can be imported explicitly by the caller
+in the usual way (e.g. `use Data::Roundtrip qw/dump2perl perl2json .../`).
+Section CAVEATS, under ["dump2perl"](#dump2perl), describes how these
+subs `eval()` a string possibly coming from user,
+possibly being unchecked.
 - `no-unicode-escape-permanently` : this is not an
 export keyword/parameter but a parameter which affects
 all the `*2dump*` subs by setting unicode escaping
@@ -224,7 +227,7 @@ and/or prettify the returned result with `'pretty' => 1`.
 The output can be fed back to ["json2perl"](#json2perl)
 for getting the Perl variable back.
 
-Returns the JSON string on success or `undef` on failure.
+It returns the JSON string on success or `undef` on failure.
 
 ## `json2perl`
 
@@ -240,7 +243,7 @@ Given an input `$jsonstring` as a string, it will return
 the equivalent Perl data structure using
 `JSON::decode_json(Encode::encode_utf8($jsonstring))`.
 
-Returns the Perl data structure on success or `undef` on failure.
+It returns the Perl data structure on success or `undef` on failure.
 
 ## `perl2yaml`
 
@@ -263,7 +266,7 @@ one can specify whether to escape unicode with
 The output can be fed to ["yaml2perl"](#yaml2perl)
 for getting the Perl variable back.
 
-Returns the YAML string on success or `undef` on failure.
+It returns the YAML string on success or `undef` on failure.
 
 ## `yaml2perl`
 
@@ -281,7 +284,7 @@ Given an input `$yamlstring` as a string, it will return
 the equivalent Perl data structure using
 `YAML::PP::Load($yamlstring)`
 
-Returns the Perl data structure on success or `undef` on failure.
+It returns the Perl data structure on success or `undef` on failure.
 
 ## `yamlfile2perl`
 
@@ -298,7 +301,7 @@ Return value:
 Given an input `$filename` which points to a file containing YAML content,
 it will return the equivalent Perl data structure.
 
-Returns the Perl data structure on success or `undef` on failure.
+It returns the Perl data structure on success or `undef` on failure.
 
 ## `perl2dump`
 
@@ -494,7 +497,7 @@ Given an input `$jsonstring` as a string, it will return
 the equivalent Perl data structure using
 `JSON::decode_json(Encode::encode_utf8($jsonstring))`.
 
-Returns the Perl data structure on success or `undef` on failure.
+It returns the Perl data structure on success or `undef` on failure.
 
 ## `jsonfile2perl`
 
@@ -511,7 +514,7 @@ Return value:
 Given an input `$filename` which points to a file containing JSON content,
 it will return the equivalent Perl data structure.
 
-Returns the Perl data structure on success or `undef` on failure.
+It returns the Perl data structure on success or `undef` on failure.
 
 ## `json2yaml`
 
@@ -533,7 +536,7 @@ converting that variable to YAML using ["perl2yaml"](#perl2yaml).
 All the parameters supported by ["perl2yaml"](#perl2yaml)
 are accepted.
 
-Returns the YAML string on success or `undef` on failure.
+It returns the YAML string on success or `undef` on failure.
 
 ## `yaml2json`
 
@@ -555,7 +558,7 @@ converting that variable to JSON using ["perl2json"](#perl2json).
 All the parameters supported by ["perl2json"](#perl2json)
 are accepted.
 
-Returns the JSON string on success or `undef` on failure.
+It returns the JSON string on success or `undef` on failure.
 
 ## `json2json` `yaml2yaml`
 
@@ -565,7 +568,38 @@ like above will be accepted.
 
 ## `json2dump` `dump2json` `yaml2dump` `dump2yaml`
 
-similar functionality as their counterparts described above.
+These subs offer similar functionality as their counterparts
+described above.
+
+Section CAVEATS, under ["dump2perl"](#dump2perl), describes how
+`dump2*()` subs `eval()` a string possibly coming from user,
+possibly being unchecked.
+
+## `dump2dump`
+
+    my $ret = dump2dump($dumpstring, $optional_paramshashref)
+
+Arguments:
+
+- `$dumpstring`
+- `$optional_paramshashref`
+
+Return value:
+
+- `$ret`
+
+For example:
+
+    my $dumpstr = '...';
+    my $newdumpstr = dump2dump(
+      $dumpstr,
+      {
+        'dont-bloody-escape-unicode' => 1,
+        'terse' => 0,
+      }
+    );
+
+It returns the a dump string similar to 
 
 ## `read_from_file`
 
@@ -584,7 +618,7 @@ contents and closes it. It's a convenience sub which could have also
 been private. If you want to retain the filehandle, use
 ["read\_from\_filehandle"](#read_from_filehandle).
 
-Returns the file contents on success or `undef` on failure.
+It returns the file contents on success or `undef` on failure.
 
 ## `read_from_filehandle`
 
@@ -600,7 +634,7 @@ Return value:
 
 It slurps all content from the specified input file handle. Upon return
 the file handle is still open.
-Returns the file contents on success or `undef` on failure.
+It returns the file contents on success or `undef` on failure.
 
 ## `write_to_file`
 
@@ -621,7 +655,7 @@ It's a convenience sub which could have also
 been private. If you want to retain the filehandle, use
 ["write\_to\_filehandle"](#write_to_filehandle).
 
-Returns 1 on success or 0 on failure.
+It returns 1 on success or 0 on failure.
 
 ## `write_to_filehandle`
 
@@ -638,7 +672,7 @@ Return value:
 It writes content to the specified file handle. Upon return
 the file handle is still open.
 
-Returns 1 on success or 0 on failure.
+It returns 1 on success or 0 on failure.
 
 # SCRIPTS
 
@@ -695,6 +729,21 @@ on `YAML*` too.
 For now, the plan is to still use [YAML::PP](https://metacpan.org/pod/YAML%3A%3APP) and avoid explicitly requiring
 [YAML::XS](https://metacpan.org/pod/YAML%3A%3AXS) until [YAML::Any](https://metacpan.org/pod/YAML%3A%3AAny) is ready.
 
+Be warned that sub `dump2perl()` `eval()`'s
+its input. If this comes from the user and
+it is not checked then it is considered a security
+problem. Subs `dump2json()`, `dump2yaml()`, `dump2dump()`
+use `dump2perl()`. The four subs will issue a warning whenever
+you call them. Additionally, as from version 0.28, they need
+to be explicitly imported like:
+
+    use Data::Roundtrip qw/... dump2perl .../
+
+They are no longer part of export tag `:dump` nor `:all`.
+If their input comes from the user please check the input
+not to contain malicious code which when `eval()`'ed
+can create security concerns.
+
 # AUTHOR
 
 Andreas Hadjiprocopis, `<bliako at cpan.org> / <andreashad2 at gmail.com>`
@@ -726,9 +775,9 @@ You can also look for information at:
 
     [http://annocpan.org/dist/Data-Roundtrip](http://annocpan.org/dist/Data-Roundtrip)
 
-- CPAN Ratings
+- Review this module at PerlMonks
 
-    [https://cpanratings.perl.org/d/Data-Roundtrip](https://cpanratings.perl.org/d/Data-Roundtrip)
+    [https://www.perlmonks.org/?node\_id=21144](https://www.perlmonks.org/?node_id=21144)
 
 - Search CPAN
 
@@ -769,3 +818,11 @@ is Copyright (c) 2020 by Andreas Hadjiprocopis.
 This is free software, licensed under:
 
     The Artistic License 2.0 (GPL Compatible)
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 1386:
+
+    &#x3d;back doesn't take any parameters, but you said =back  Given an input string C&lt;$dumpstring>, which can have been produced by e.g. C&lt;perl2dump()> and is identical to L<Data::Dumper>'s C<Dumper()> output, it will roundtrip back to the same string, possibly with altered format via the parameters in C&lt;$optional\_paramshashref>.

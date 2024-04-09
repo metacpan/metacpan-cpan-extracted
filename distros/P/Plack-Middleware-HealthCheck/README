@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version v0.1.0
+    version v0.2.0
 
 SYNOPSIS
 
@@ -108,17 +108,32 @@ METHODS
     Returns the result of passing the health check $result to
     "health_check_response".
 
+ serve_tags_list
+
+    Called with the Plack $env hash as an argument if
+    "should_serve_health_check" returns true.
+
+    Calls get_registered_tags on the health_check and returns the result of
+    passing the list of tags to "health_check_response".
+
  should_serve_health_check
 
     Receives the Plack $env as an argument and returns a truthy value if
     $env->{PATH_INFO} matches any of the "health_check_paths".
 
+ should_serve_tags_list
+
+    Receives the Plack $env as an argument and returns a truthy value if
+    $env->{PATH_INFO} matches any of the "health_check_paths" followed by
+    /tags.
+
  health_check_response
 
     Takes a health check $result and returns a Plack response arrayref.
 
-    Returns a 200 response if the $result->{status} is "OK", otherwise
-    returns a 503.
+    Returns a 200 response if the $result->{status} is "OK" or if the
+    result is an array ref (for "serve_tags_list"), otherwise returns a
+    503.
 
     The body of the response is the $result JSON encoded.
 

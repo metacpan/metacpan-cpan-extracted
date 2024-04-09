@@ -8,11 +8,13 @@ use Test::NoWarnings;
 # Test.
 my $string = 'a<a"a&a';
 my $ret = encode_attr_entities($string);
-is($ret, 'a&lt;a&quot;a&amp;a');
+is($ret, 'a&lt;a&quot;a&amp;a',
+	'Encode attribute entities (&lt;, &quot; and &amp;).');
 
 # Test.
 encode_attr_entities(\$string);
-is($string, 'a&lt;a&quot;a&amp;a');
+is($string, 'a&lt;a&quot;a&amp;a',
+	'Encode attribute entities defined by reference (&lt;, &quot; and &amp;).');
 
 # Test.
 my @array = ('a<a', 'a"a', 'a&a', 'a&lt;a', 'a&quot;a', 'a&amp;a');
@@ -27,4 +29,5 @@ is_deeply(
 		'a&quot;a',
 		'a&amp;a',
 	],
+	'Encode attribute entities defined by array (&lt;, &quot; and &amp;).',
 );

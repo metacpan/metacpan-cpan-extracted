@@ -9,6 +9,7 @@ README
 README.md
 dist.ini
 eg/Modular.yaml
+eg/patch-visualizer.pl
 eg/public/css/fontawesome.css
 eg/public/css/solid.css
 eg/public/settings/initial.set
@@ -18,7 +19,6 @@ eg/public/webfonts/fa-solid-900.woff2
 eg/synth-config-cli.pl
 eg/synth-config-mojo.pl
 eg/t/routes.t
-eg/visualize.pl
 lib/Synth/Config.pm
 t/00-compile.t
 t/01-methods.t

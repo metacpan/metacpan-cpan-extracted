@@ -1,5 +1,8 @@
 Revision history for Config-INI-RefVars
 
+0.16    2024/04/10
+        Improved ans corrected POD.
+
 0.15    2024/01/06
         Added assignment operator '??='.
 

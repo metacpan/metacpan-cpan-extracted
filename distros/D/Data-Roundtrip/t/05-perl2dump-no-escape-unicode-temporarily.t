@@ -6,7 +6,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION='0.27';
+our $VERSION='0.28';
 
 use Test::More;
 use Test2::Plugin::UTF8;
@@ -16,7 +16,7 @@ my $num_tests = 0;
 
 # the default is to permanently overwrite dumper's qquote()
 # and permanently add a filter to Dump.
-use Data::Roundtrip qw/:all/;
+use Data::Roundtrip qw/:all dump2perl/;
 
 my $abc = "abc-αβγ";
 my $xyz = "χψζ-xyz";

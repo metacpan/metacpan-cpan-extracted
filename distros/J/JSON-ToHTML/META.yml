@@ -1,0 +1,30 @@
+---
+abstract: 'render JSON-based Perl datastructures as HTML tables'
+author:
+  - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
+build_requires:
+  Test::More: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-ToHTML
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Scalar::Util: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=JSON-ToHTML
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ap/JSON-ToHTML.git
+version: '0.001'
+x_copyright:
+  holder: 'Aristotle Pagaltzis'
+  year: 2024
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

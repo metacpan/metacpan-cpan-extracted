@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Config-INI-RefVars
-version:            0.15
+version:            0.16
 abstract:           INI file reader that supports make-style variable references and multiple assignment operators.
 author:
     - Abdul al Hazred <451@gmx.eu>

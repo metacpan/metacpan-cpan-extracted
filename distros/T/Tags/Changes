@@ -1,3 +1,17 @@
+0.15 2024-04-08T22:56:02+02:00
+ [Common]
+ - Add explicit version for usage of List::Util.
+ - Rename example files to better names.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
+ [Tags::Output]
+ - Add tests for finalize() method.
+ - Fix work with 'printed_tags' structure.
+
+ [Tags::Utils]
+ - Add test messages.
+
 0.14 2023-01-09T11:16:55+01:00
  [Common]
  - Fix dependencies and rewrite from List::MoreUtils to List::Util.

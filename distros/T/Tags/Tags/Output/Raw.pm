@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Error::Pure qw(err);
-use List::Util qw(none);
+use List::Util 1.33 qw(none);
 use Readonly;
 use Tags::Utils::Preserve;
 use Tags::Utils qw(encode_attr_entities encode_char_entities);
@@ -15,7 +15,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LAST_INDEX => -1;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 # Finalize Tags output.
 sub finalize {
@@ -632,6 +632,8 @@ __END__
 
 =head1 EXAMPLE1
 
+=for comment filename=tags_output_raw_element.pl
+
  use strict;
  use warnings;
 
@@ -654,6 +656,8 @@ __END__
  # <text>data</text>
 
 =head1 EXAMPLE2
+
+=for comment filename=tags_output_raw_data_callback.pl
 
  use strict;
  use warnings;
@@ -717,12 +721,12 @@ L<http://skim.cz/>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2023 Michal Josef Špaček
+© 2005-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

@@ -33,6 +33,8 @@
       "runtime" : {
          "requires" : {
             "File::Basename" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Link" : "0.073",
             "Test::Tk" : "3.02",
             "Tk" : "800.024",
             "Tk::ITree" : "0.03",
@@ -48,6 +50,6 @@
          "web" : "https://github.com/haje61/Tk-FileBrowser"
       }
    },
-   "version" : 0.02,
+   "version" : 0.03,
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

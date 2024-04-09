@@ -7,7 +7,7 @@ use Test::More;
 plan tests => 1;
 
 BEGIN {
-    use_ok( 'YAML::Conditional' ) || print "Bail out!\n";
+    use_ok( 'YAML::Ordered::Conditional' ) || print "Bail out!\n";
 }
 
-diag( "Testing YAML::Conditional $YAML::Conditional::VERSION, Perl $], $^X" );
+diag( "Testing YAML::Ordered::Conditional $YAML::Ordered::Conditional::VERSION, Perl $], $^X" );

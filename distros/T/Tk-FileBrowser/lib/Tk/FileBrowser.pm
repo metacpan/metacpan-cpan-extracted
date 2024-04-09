@@ -9,18 +9,25 @@ Tk::FileBrowser - Multi column file system explorer
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = 0.02;
+$VERSION = 0.03;
 
 use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'FileBrowser';
 
 use POSIX qw( strftime );
+
 use Config;
+my $mswin = $Config{'osname'} eq 'MSWin32';
+
 use Cwd;
 use File::Basename;
+use File::Spec;
+use File::Spec::Link;
+use Tie::Watch;
 use Tk;
-require Tk::ITree;
 require Tk::FileBrowser::Header;
+use Tk::FileBrowser::Item;
+require Tk::ITree;
 require Tk::ListEntry;
 
 my $file_icon = Tk->findINC('file.xpm');
@@ -34,6 +41,27 @@ my %timedata = (
 	Modified => 'mtime',
 );
 
+my $link_pixmap = '/* XPM */
+static char * link_xpm[] = {
+"12 12 4 1",
+" 	c None",
+".	c #000000",
+"+	c #FFFFFF",
+"@	c #1C94D1",
+" ........   ",
+" .++++++.   ",
+" .+++@++... ",
+" .+++@@+++. ",
+" .+++@@@++. ",
+" .+++@@@@+. ",
+" .+++@@@@@. ",
+" .+++@@@@+. ",
+" .+++@@@++. ",
+" .+++@@+++. ",
+" .+++@++++. ",
+" .......... "};
+';
+
 =head1 SYNOPSIS
 
  require Tk::FileBrowser;
@@ -44,6 +72,12 @@ my %timedata = (
 
 A multicolumn file browser widget. Columns are configurable, sortable
 and resizable.
+
+if you left-click the header bar, you will get a popup menu to configure
+case dependant sort, directories first and show hidden.
+
+if you left-click the tree widget, you will get a popup menu to open the
+current selected entry.
 
 =head1 CONFIG VARIABLES
 
@@ -58,7 +92,7 @@ If you change the value you have to call B<refresh> to see your changes.
 =item Switch: B<-columns>
 
 Specify a list of column names to display. Only available at create
-time. Allowed values are 'Accessed', 'Created', 'Modified', 'Size' and any you
+time. Allowed values are 'Accessed', 'Created', 'Link', 'Modified', 'Size' and any you
 have defined through the B<-columntypes> option.
 
 Default value ['Size', 'Modified'].
@@ -76,8 +110,7 @@ which marks every entry that is geater than 2048 with an 'X', and sorts on size.
        Big => {
           display => sub {
              my ($data) = @_;
-             my $s = $fb->getSize($data);
-             return 'X' if $s > 2048;
+              return 'X' if $data->size > 2048;
              return '';
           },
           test => sub {
@@ -113,15 +146,69 @@ Callback for obtaining the file icon. By default it is set
 to a call that returns the default file.xpm in the Perl/Tk
 distribution.
 
+=item Switch: B<-filtercase>
+
+Default value 0. Specifies if filtering is case dependant.
+
+The value of this filter will change when you use the filter bar.
+
+If you change the value you have to call B<refresh> to see your changes.
+
+=item Switch: B<-filterfolders>
+
+Default value 1. Specifies if folders are filtered.
+
+=item Switch: B<-headermenu>
+
+Specifies a list of menuitems for the context menu of the header. By default
+it is set to a list with checkbuttons entries for -sortcase, -directoriesfirst and -showhidden.
+
 =item Switch: B<-invokefile>
 
 This callback is executed when a user double clicks a file.
+
+=item Switch: B<-linkiconcall>
+
+Callback for obtaining the link icon. By default it is set
+to a call that returns an xpm inside this module.
+
+=item Switch: B<-listmenu>
+
+Specifies a list of menuitems for the context menu of the file list. By default
+it returns a list with a an Open command.
+
+=item Switch: B<-loadfilter>
+
+Filter applied during load. Default value ''.
+
+=item Switch: B<-loadfilterfolders>
+
+Specifies if filters are applied to folders during load. Default value 0.
+
+If you change the value you have to call B<reload> to see your changes.
+
+=item Switch: B<-refreshfilter>
+
+Filter applied during refresh. Default value ''.
+The value of this filter will change when you use the filter bar.
+
+If you change the value you have to call B<refresh> to see your changes.
+
+=item Switch: B<-refreshfilterfolders>
+
+Specifies if filters are applied to folders during refresh. Default value 0.
+
+If you change the value you have to call B<refresh> to see your changes.
+
+=item Switch: B<-reloadimage>
+
+Image for the reload button.
 
 =item Switch: B<-showhidden>
 
 Default value 0;
 
-If you change the value you have to call B<load> again to see your changes.
+If you change the value you have to call B<reload> to see your changes.
 
 =item Switch: B<-sorton>
 
@@ -149,6 +236,24 @@ Class Tk::ListEntry.
 
 Class Tk::ITree.
 
+=item B<FilterFrame>
+
+Class Tk::Frame.
+
+=item B<FilterEntry>
+
+Class Tk::Entry.
+
+=back
+
+=head1 KEYBINDINGS
+
+=over 4
+
+=item B<CTRL+F>
+
+Shows the filter bar.
+
 =back
 
 =head1 METHODS
@@ -160,8 +265,9 @@ Class Tk::ITree.
 sub Populate {
 	my ($self,$args) = @_;
 
-	my $columns = delete $args->{'-columns'};
-	$columns = ['Size', 'Modified'] unless defined $columns;
+	my $col = delete $args->{'-columns'};
+	$col = ['Size', 'Modified'] unless defined $col;
+	my @columns = @$col;
 	my $sorton = delete $args->{'-sorton'};
 	$sorton = 'Name' unless defined $sorton;
 	my $sortorder = delete $args->{'-sortorder'};
@@ -170,26 +276,32 @@ sub Populate {
 
 	$self->SUPER::Populate($args);
 	
+	###################################################################
+	#define column types
 	my %column_types = (
 		Name => {
-			display => sub { return $self->getNameString(@_) },
+			display => sub { return $self->nameString(@_) },
 			test => sub { return $self->testName(@_) },
 		},
 		Size => {
-			display => sub { return $self->getSizeString(@_) },
+			display => sub { return $self->sizeString(@_) },
 			test => sub { return $self->testSize(@_) },
 		},
 		Accessed => {
-			display => sub { return $self->getDateString('atime', @_) },
-			test => sub { return $self->testDate('atime', @_) },
+			display => sub { return $self->dateString('Accessed', @_) },
+			test => sub { return $self->testDate('Accessed', @_) },
 		},
 		Created => {
-			display => sub { return $self->getDateString('ctime', @_) },
-			test => sub { return $self->testDate('ctime', @_) },
+			display => sub { return $self->dateString('Created', @_) },
+			test => sub { return $self->testDate('Created', @_) },
+		},
+		Link => {
+			display => sub { return $self->linkString(@_) },
+			test => sub { return $self->testLink(@_) },
 		},
 		Modified => {
-			display => sub { return $self->getDateString('mtime', @_) },
-			test => sub { return $self->testDate('mtime', @_) },
+			display => sub { return $self->dateString('Modified', @_) },
+			test => sub { return $self->testDate('Modified', @_) },
 		},
 	);
 	if (defined $columntypes) {
@@ -201,7 +313,8 @@ sub Populate {
 	}
 	
 	my $basetxt = '';
-	my $statustxt = '';
+	my $sep = '/';
+	$sep = '\\' if $osname eq 'MSWin32';
 	$self->{BASE} = undef;
 	$self->{BASETXT} = \$basetxt;
 	$self->{COLNAMES} = {};
@@ -209,32 +322,224 @@ sub Populate {
 	$self->{COLTYPES} = \%column_types;
 	$self->{JOBSTACK} = [];
 	$self->{POOL} = {};
+	$self->{NOREFRESH} = 0;
+	$self->{SEPARATOR} = $sep;
 	$self->{SORTON} = $sorton;
 	$self->{SORTORDER} = $sortorder;
-	$self->{STATUSTXT} = \$statustxt,
 
-	my $entry = $self->ListEntry(
+	my @padding = (-padx => 2, -pady => 2);
+	my @pack = (-side => 'left', @padding);
+
+	#setting up load bar
+	my $lframe = $self->Frame->pack(-fill => 'x');
+
+	my $entry = $lframe->ListEntry(
 		-command => ['EditSelect', $self],
 		-textvariable => \$basetxt,
-	)->pack(-fill => 'x');
+	)->pack(@pack, -expand => 1, -fill => 'both');
 	$self->Advertise('Entry', $entry);
 
-	my $tree = $self->CreateTreeWidget(@$columns);
+	my $reload = $lframe->Button(
+		-text => 'Reload',
+		-command => ['reload', $self],
+	)->pack(@pack);
+
+	###################################################################
+	#setting up the tree widget
+
+	unshift @columns, 'Name';
+	my $col_names = {};
+	my $col_nums = {};
+	my $num_col = @columns;
+
+	my $tree = $self->Scrolled('ITree', 
+		-columns => $num_col,
+		-command => ['Invoke', $self],
+		-header => 1,
+		-indicatorcmd => ['IndicatorPressed', $self],
+		-leftrightcall => ['LeftRight', $self],
+		-separator => $sep,
+		-scrollbars => 'osoe',
+	)->pack(@padding,
+		-expand => 1, 
+		-fill => 'both',
+	);
+
+	$self->Advertise('Tree' => $tree);
+	$tree->bind('<Control-f>', [$self, 'filterShow']);
+	$tree->bind('<Escape>', [$self, 'filterHide']);
+	$tree->bind('<Button-3>' => [$self, 'lmPost', Ev('X'), Ev('Y')]);
+
+	###################################################################
+	#setting op tree headers
+	my $column = 0;
+	for (@columns) {
+		my $n = $column;
+		my $item = $_;
+		my @so = ();
+		my $sort = $self->sorton;
+		@so = (-sortorder => $self->sortorder) if $item eq $sort;
+		$col_names->{$item} = $n;
+		$col_nums->{$n} = $item;
+		my $header = $tree->Header(@so,
+			-contextcall => ['hmPost', $self],
+			-column => $column,
+			-sortcall => ['SortMode', $self],
+			-text => $_
+		);
+		$tree->headerCreate($column, -itemtype => 'window', -widget => $header);
+		$column ++;
+	}
+	$self->{COLNAMES} = $col_names;
+	$self->{COLNUMS} = $col_nums;
+	
+	###################################################################
+	#setting up the filter
+	my $fframe = $self->Frame;
+	$self->Advertise('FilterFrame', $fframe);
+
+	$fframe->Label(-text => 'Filter')->pack(@pack);
+
+	my $filter = '';
+	$self->Advertise('Filter', \$filter);
+	new Tie::Watch(
+		-variable => \$filter,
+		-store => sub {
+			my ($watch, $value) = @_;
+			$watch->Store($value);
+			$self->filterActivate;
+		},
+	);
+
+	my $fentry = $fframe->Entry(
+		-textvariable => \$filter,
+	)->pack(@pack, -expand => 1, -fill => 'x');
+	$self->Advertise('FilterEntry', $fentry);
+	$fentry->bind('<Escape>', [$self, 'filterHide']);
+
+	my $case = 0;
+	$self->Advertise('Case', \$case);
+	new Tie::Watch(
+		-variable => \$case,
+		-store => sub {
+			my ($watch, $value) = @_;
+			$watch->Store($value);
+			unless ($self->noRefresh) {
+				$self->configure('-filtercase', $value);
+				$self->refresh ;
+			}
+		},
+	);
+	$fframe->Checkbutton(
+		-onvalue => 1,
+		-offvalue => 0,
+		-variable => \$case,
+		-text => 'Case',
+	)->pack(@pack);
+
+	my $folders = 0;
+	$self->Advertise('Folders', \$folders);
+	new Tie::Watch(
+		-variable => \$folders,
+		-store => sub {
+			my ($watch, $value) = @_;
+			$watch->Store($value);
+			unless ($self->noRefresh) {
+				$self->configure('-refreshfilterfolders', $value);
+				$self->refresh ;
+			}
+		},
+	);
+	$fframe->Checkbutton(
+		-onvalue => 1,
+		-offvalue => 0,
+		-text => 'Folders',
+		-variable => \$folders,
+	)->pack(@pack);
+	
+	###################################################################
+	#setting up header context menu
+	my $hmcase;
+	$self->Advertise('HMCase', \$hmcase);
+	new Tie::Watch(
+		-variable => \$hmcase,
+		-store => sub {
+			my ($watch, $value) = @_;
+			$watch->Store($value);
+			unless ($self->noRefresh) {
+				$self->configure('-casedependantsort', $value);
+				$self->after(1, ['refresh', $self]);;
+			}
+		},
+	);
+	my $hmfolders;
+	$self->Advertise('HMFolders', \$hmfolders);
+	new Tie::Watch(
+		-variable => \$hmfolders,
+		-store => sub {
+			my ($watch, $value) = @_;
+			$watch->Store($value);
+			unless ($self->noRefresh) {
+				$self->configure('-directoriesfirst', $value);
+				$self->after(1, ['refresh', $self]);;
+			}
+		},
+	);
+	my $hmhidden;
+	$self->Advertise('HMHidden', \$hmhidden);
+	new Tie::Watch(
+		-variable => \$hmhidden,
+		-store => sub {
+			my ($watch, $value) = @_;
+			$watch->Store($value);
+			unless ($self->noRefresh) {
+				$self->configure('-showhidden', $value);
+				$self->after(1, ['reload', $self]);;
+			}
+		},
+	);
+	my @headermenu = (
+		[checkbutton => 'Sort case dependant', -variable => \$hmcase],
+		[checkbutton => 'Directories first', -variable => \$hmfolders],
+		[checkbutton => 'Show hidden', -variable => \$hmhidden],
+	);
+	
+	###################################################################
+	#setting up the list context menu
+	my (@listmenu) = (
+		['command' => 'Open', -command => sub {
+			my ($s) = $tree->infoSelection;
+			$self->Invoke($s) if defined $s;
+		}],
+	);
+
+
+	###################################################################
+	#setting up ConfigSpect
 
 	$self->ConfigSpecs(
 		-background => ['SELF', 'DESCENDANTS'],
 		-bginterval => ['PASSIVE', undef, undef, 10],
 		-casedependantsort => ['PASSIVE', undef, undef, 0],
-		-columns => ['PASSIVE', undef, undef, $columns],
+		-columns => ['PASSIVE', undef, undef, \@columns],
 		-dateformat => ['PASSIVE', undef, undef, "%Y-%m-%d %H:%M"],
 		-directoriesfirst => ['PASSIVE', undef, undef, 1],
 		-diriconcall => ['CALLBACK', undef, undef, ['DefaultDirIcon', $self]],
 		-fileiconcall => ['CALLBACK', undef, undef, ['DefaultFileIcon', $self]],
+		-filtercase => ['PASSIVE', undef, undef, 0],
+		-headermenu => ['PASSIVE', undef, undef, \@headermenu],
 		-invokefile => ['CALLBACK', undef, undef, sub {}],
+		-linkiconcall => ['CALLBACK', undef, undef, ['DefaultLinkIcon', $self]],
+		-listmenu => ['PASSIVE', undef, undef, \@listmenu],
+		-loadfilter => ['PASSIVE', undef, undef, ''],
+		-loadfilterfolders => ['PASSIVE', undef, undef, 0],
+		-refreshfilter => ['PASSIVE', undef, undef, ''],
+		-refreshfilterfolders => ['PASSIVE', undef, undef, 0],
+		-reloadimage => [{-image => $reload}],
+		-separator => ['METHOD'],
 		-showhidden => ['PASSIVE', undef, undef, 0],
 		-sorton => ['METHOD', undef, undef, $sorton],
 		-sortorder => ['METHOD', undef, undef, $sortorder],
-		-showhidden => ['PASSIVE', undef, undef, 0],
 		DEFAULT => [ $tree ],
 	);
 	$self->Delegates(
@@ -250,11 +555,13 @@ sub Add {
 	my $sep = $self->cget('-separator');
 	$item = "$path$sep$name" unless $path eq '';
 	my @op = (-itemtype => 'imagetext',);
-	if ($self->IsDir($item)) {
+	if ($data->isDir) {
 		push @op, -image => $self->GetDirIcon($item);
+	} elsif ($data->isLink) {
+		push @op, -image => $self->GetLinkIcon($item);
 	} else {
 		push @op, -image => $self->GetFileIcon($item);
-	}
+	} 
 	my @entrypos = $self->Position($item, $data);
 	$self->add($item, -data => $data, @entrypos);
 	my $c = $self->cget('-columns');
@@ -327,25 +634,34 @@ sub bgCycle {
 			} else {
 				$fullname = "$folder$sep$item";`																																	`																																																																																																																	
 			}
+			if (-d $fullname) {
+				if ($self->cget('-loadfilterfolders')) {
+					next unless $self->filter($self->cget('-loadfilter'), $item);
+				}
+			} else {
+				next unless $self->filter($self->cget('-loadfilter'), $item);
+			}
 			my $fullpath = $item;
 			$fullpath = "$path$sep$item" unless $path eq '';
 
-			my $cdat = $self->getStat($fullname);
-			$data->{'children'}->{$item} = $cdat;
+			my $cdat = new Tk::FileBrowser::Item( $fullname );
+			$data->child($item, $cdat);
 			if ($path eq '') {
 				$self->Add($path, $item, $cdat);
-				$self->bgAddJob($fullpath, $cdat) if $self->IsDir($fullpath);
+				$self->bgAddJob($fullpath, $cdat) if $cdat->isDir;
 			}
 		} else {
 			closedir $handle;
-			$data->{'loaded'} = 1;
+			$data->loaded(1);
 
 			my $col = $self->ColNum('Size');
 			if ((defined $col) and ($path ne '')) {
-				my $size = $self->getSize($data);
-				my $text = $self->getSizeString($data);
-				$self->itemConfigure($path, $col, -text => $text);
-				$self->PHAdd($path) unless $self->PHExists($path) or ($size eq 0);
+				my $size = $data->size;
+				if (defined $size) {
+					my $text = $self->sizeString($data);
+					$self->itemConfigure($path, $col, -text => $text);
+					$self->PHAdd($path) unless $self->PHExists($path);
+				}
 			}
 			my @pos = $self->Position($path, $data);
 			if ((@pos) and ($path ne '') and ($self->{SORTON} eq 'Size')) {
@@ -353,8 +669,8 @@ sub bgCycle {
 				$parent = '' unless defined $parent;
 				$self->deleteEntry($path);
 				$self->Add($parent, basename($path), $data);
-				my $c = $data->{'children'};
-				$self->PHAdd($path) if %$c;
+				my @c = $data->children;
+				$self->PHAdd($path) if @c;
 			}
 			unless (($path eq '') or ($data->{'open'})) {
 				$self->close($path);
@@ -364,12 +680,12 @@ sub bgCycle {
 			$parent = $self->infoParent($path) if $path ne '';
 			if (defined $parent) {
 				my $pdat = $self->infoData($parent);
-				if ($pdat->{'open'}) {
+				if ($pdat->isOpen) {
 					$self->open($parent);
 				}
 			}
 
-			while ((@$stack) and $data->{'loaded'}) {
+			while ((@$stack) and $data->loaded) {
 				shift @$stack;
 				($path, $data, $handle) = $self->bgCurJob;
 			}
@@ -422,28 +738,26 @@ sub branchClose {
 
 sub branchOpen {
 	my ($self, $entry) = @_;
-#	return if exists $self->{'bg_id'};
 	my $data = $self->infoData($entry);
-	unless ($data->{'open'}) {
-		$self->open($entry);
-		my $sep = $self->cget('-separator');
-		my @children = $self->infoChildren($entry);
-		if ($self->PHExists($entry) and (@children eq 1)) {
-			$self->PHDelete($entry);
-			my $data = $self->infoData($entry);
-			my $children = $data->{'children'};
-			for (sort keys %$children) {
-				$self->Add($entry, $_, $children->{$_});
-				my $child = "$entry$sep$_";
-				my $data = $children->{$_};
-				if (exists $data->{'children'}) {
-					$self->bgAddJob($child, $data);
-					$self->bgStartConditional;
-				}
+	$self->open($entry);
+	my $sep = $self->cget('-separator');
+	my @children = $self->infoChildren($entry);
+	if ($self->PHExists($entry) and (@children eq 1)) {
+		$self->PHDelete($entry);
+		my $data = $self->infoData($entry);
+		my @children = $data->children;
+		for (sort @children) {
+			my $child = basename($_);
+			my $childobj = $data->child($_);
+			$self->Add($entry, $child, $childobj);
+			my $childpath = "$entry$sep$_";
+			if ($childobj->isDir) {
+				$self->bgAddJob($childpath, $childobj);
+				$self->bgStartConditional;
 			}
 		}
-		$data->{'open'} = 1;
-	} 
+	}
+	$data->isOpen(1);
 }
 
 sub ColName {
@@ -456,60 +770,16 @@ sub ColNum {
 	return $self->{COLNAMES}->{$name}
 }
 
-sub CreateTreeWidget {
-	my ($self, @columns) = @_;
-	unshift @columns, 'Name';
-	my $col_names = {};
-	my $col_nums = {};
-	my $num_col = @columns;
-	my $sep = '/';
-	$sep = '\\' if $osname eq 'MSWin32';
-
-	my $tree = $self->Scrolled('ITree', 
-		-columns => $num_col,
-		-command => ['Invoke', $self],
-		-header => 1,
-		-indicatorcmd => ['IndicatorPressed', $self],
-		-leftrightcall => ['LeftRight', $self],
-		-separator => $sep,
-		-scrollbars => 'osoe',
-	)->pack(
-		-after => $self->Subwidget('Entry'),
-		-padx => 2, 
-		-pady => 2,
-		-expand => 1, 
-		-fill => 'both',
-	);
-
-	$self->Advertise(Tree => $tree);
-	my $column = 0;
-	for (@columns) {
-		my $n = $column;
-		my $item = $_;
-		my @so = ();
-		my $sort = $self->sorton;
-		@so = (-sortorder => $self->sortorder) if $item eq $sort;
-		$col_names->{$item} = $n;
-		$col_nums->{$n} = $item;
-		my $header = $tree->Header(@so,
-			-column => $column,
-			-sortcall => ['SortMode', $self],
-			-text => $_
-		);
-		$tree->headerCreate($column, -itemtype => 'window', -widget => $header);
-		$column ++;
-	}
-	$self->{COLNAMES} = $col_names;
-	$self->{COLNUMS} = $col_nums;
-	return $tree
-}
-
 sub DefaultDirIcon {
 	return $_[0]->Pixmap(-file => $dir_icon)
 }
 
 sub DefaultFileIcon {
 	return $_[0]->Pixmap(-file => $file_icon)
+}
+
+sub DefaultLinkIcon {
+	return $_[0]->Pixmap(-data => $link_pixmap)
 }
 
 sub EditSelect {
@@ -520,18 +790,76 @@ sub EditSelect {
 	$self->load($folder) if (-e $folder) and (-d $folder);
 }
 
-=item B<getDateString>I<($type, $data)>
+sub filter {
+	my ($self, $filter, $value) = @_;
+	$filter = quotemeta($filter);
+	return 1 if $value eq '';
+	my $case = $self->cget('-filtercase');
+	if ($case) {
+		return $value =~ /$filter/;
+	} else {
+		return $value =~ /$filter/i;
+	}
+}
 
-Returns the formatted date string of one of the date items in I<$data>;
-I<$type> can be 'atime', 'ctime' or 'mtime'
+sub filterActivate {
+	my $self = shift;
+	my $filter_id = $self->{'filter_id'};
+	if (defined $filter_id) {
+		$self->afterCancel($filter_id);
+	}
+	$filter_id = $self->after(500, ['filterRefresh', $self]);
+	$self->{'filter_id'} = $filter_id;
+}
+
+=item B<filterHide>
+
+Removes the filter bar.
 
 =cut
 
-sub getDateString {
-	my ($self, $key, $data) = @_;
-	my $raw = $data->{$key};
-	return '' unless defined $raw;
-	return strftime($self->cget('-dateformat'), localtime($raw))
+sub filterHide {
+	my $self = shift;
+	$self->Subwidget('FilterFrame')->packForget;
+	$self->Subwidget('FilterEntry')->delete(0, 'end');
+	$self->Subwidget('Tree')->focus;
+}
+
+sub filterRefresh {
+	my $self = shift;
+	my $filter = $self->Subwidget('FilterEntry')->get;
+	$self->configure('-refreshfilter', $filter);
+	delete $self->{'filter_id'};
+	$self->refresh;
+}
+
+=item B<filterShow>
+
+Shows the filter bar.
+
+=cut
+
+sub filterShow {
+	my $self = shift;
+	$self->noRefresh(1);
+	my $case = $self->Subwidget('Case');
+	$$case = $self->cget('-filtercase');
+	my $folders = $self->Subwidget('Folders');
+	$$folders = $self->cget('-refreshfilterfolders');
+	$self->noRefresh(0);
+	$self->Subwidget('FilterFrame')->pack(-fill => 'x');
+	$self->Subwidget('FilterEntry')->focus;
+}
+
+=item B<folder>
+
+Returns the name of the folder loaded. Returns undef if
+nothing is loaded.
+
+=cut
+
+sub folder {
+	return $_[0]->{BASE}
 }
 
 sub GetDirHandle {
@@ -556,12 +884,21 @@ sub GetFileIcon {
 }
 
 sub GetFullName {
+	my ($self, $item) = @_;
+	if (ref $item eq 'Tk::FileBrowser::Item') {
+		return $item->name;
+	} else {
+		my $base = $self->{BASE};
+		return $base if $item eq '';
+		my $sep =  $self->cget('-separator');
+		return $sep . $item if $base eq $sep;
+		return $self->{BASE} . $self->cget('-separator') . $item
+	}
+}
+
+sub GetLinkIcon {
 	my ($self, $name) = @_;
-	my $base = $self->{BASE};
-	return $base if $name eq '';
-	my $sep =  $self->cget('-separator');
-	return $sep . $name if $base eq $sep;
-	return $self->{BASE} . $self->cget('-separator') . $name
+	return $self->Callback('-linkiconcall', $name);
 }
 
 sub GetParent {
@@ -573,21 +910,10 @@ sub GetParent {
 	return $dir
 }
 
-=item B<getNameString>I<($data)>
-
-Returns the name to be displayed for I<$data>.
-
-=cut
-
-sub getNameString {
-	my ($self, $data) = @_;
-	return basename($data->{'name'});
-}
-
 sub GetRootFolder {
 	my $self = shift;
 	my $root = '/';
-	$root = substr($self->{BASE}, 0, 3) if $osname eq 'MSWin32';
+	$root = substr($self->{BASE}, 0, 3) if $mswin;
 	return $root
 }
 
@@ -597,97 +923,37 @@ sub GetPeers {
 	return $self->infoChildren($self->GetParent($name));
 }
 
-=item B<getSize>I<($data)>
-
-Returns the size of the item represented in I<$data>.
-If I<$data> contains a folder, it returns the number of items. If not if
-returns the size in bytes.
-
-=cut
-
-sub getSize {
-	my ($self, $data) = @_;
-	my $size;
-	if (exists $data->{'children'}) {
-		my $c = $data->{'children'};
-		$size = keys %$c;
-	} else {
-		$size = $data->{'size'};
+sub hmPost {
+	my $self = shift;
+	$self->noRefresh(1);
+	my $hmcase = $self->Subwidget('HMCase');
+	$$hmcase = $self->cget('-casedependantsort');
+	my $hmfolders = $self->Subwidget('HMFolders');
+	$$hmfolders = $self->cget('-directoriesfirst');
+	my $hmhidden = $self->Subwidget('HMHidden');
+	$$hmhidden = $self->cget('-showhidden');
+	$self->noRefresh(0);
+	my ($x, $y) = $self->pointerxy;
+	my $items = $self->cget('-headermenu');
+	if (@$items) {
+		my $menu = $self->Menu(
+			-menuitems => $items,
+			-tearoff => 0,
+		);
+		$menu->bind('<Leave>', [$self, 'hmUnpost']);
+		$self->{'h_menu'} = $menu;
+		$menu->post($x, $y);
 	}
-	return 0 unless defined $size;
-	return $size
 }
 
-=item B<getSizeString>I<($data)>
-
-Returns the formatted size string to be displayed for I<$data>.
-
-=cut
-
-sub getSizeString {
-	my ($self, $data) = @_;
-	my $size = $self->getSize($data);
-	if (exists $data->{'children'}) {
-		$size = "$size items" if $size ne 1;
-		$size = "$size item" if $size eq 1;
-	} else {
-		my @magnifiers = ('', 'K', 'M', 'G', 'T', 'P');
-		my $count = 0;
-		while ($size >= 1024) {
-			$size = $size / 1024;
-			$count ++;
-		}
-		my $mag = $magnifiers[$count];
-		if ($count eq 0) {
-			$size = int($size);
-		} elsif ($size < 100) {
-			$size = sprintf("%.1f", $size)
-		} else {
-			$size = int($size);
-		}
-		$size = $size . " $mag" . 'B';
+sub hmUnpost {
+	my $self = shift;
+	my $menu = $self->{'h_menu'};
+	if (defined $menu) {
+		delete $self->{'h_menu'};
+		$menu->unpost;
+		$menu->destroy;
 	}
-	return $size
-}
-
-=item B<getStat>I<($item)>
-
-Returns a reference to an info hash for $item. I<$item> if the full name of an existing file or folder. 
-This data structure is used throughout this package. 
-Whenever you seee I<$data> in this document it refers to one of these.
-If looks like this:
-
- $stat = {
-    name => $item,
-    size => $some_size,
-    atime => $some_time_stamp_1,
-    ctime => $some_time_stamp_2,
-    mtime => $some_time_stamp_3,
- 
-    #the ones below only if $item is folder.
-    children => {}, #default
-    loaded => 0, #default
-    open => 0, #default
- }
-
-=cut
-
-sub getStat {
-	my ($self, $item) = @_;
-	my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = stat($item);
-	my %itemdata = (
-		name => $item,
-		size => $size,
-		atime => $atime,
-		mtime => $mtime,
-		ctime => $ctime,
-	);
-	if (-d $item) {
-		$itemdata{'loaded'} = 0;
-		$itemdata{'children'} = {};
-		$itemdata{'open'} = 0;
-	}
-	return \%itemdata;
 }
 
 sub IndicatorPressed {
@@ -704,33 +970,13 @@ sub IndicatorPressed {
 
 sub Invoke {
 	my ($self, $entry) = @_;
-	my $full = $self->GetFullName($entry);
-	if ($self->IsDir($entry)) {
-		$self->load($full)
-	} else {
-		$self->Callback('-invokefile', $full)
-	}
-}
-
-sub IsDir {
-	my ($self, $entry) = @_;
-	my $full = $self->GetFullName($entry);
-	return -d $full
-}
-
-sub IsFile {
-	my ($self, $entry) = @_;
-	my $full = $self->GetFullName($entry);
-	return not -d $full
-}
-
-sub IsLoaded {
-	my ($self, $entry, $flag) = @_;
 	my $data = $self->infoData($entry);
-	if (defined $flag) {
-		$data->{'loaded'} = $flag
+	my $name = $data->name;
+	if ($data->isDir) {
+		$self->load($name)
+	} else {
+		$self->Callback('-invokefile', $name)
 	}
-	return $data->{'loaded'}
 }
 
 sub LeftRight {
@@ -742,6 +988,31 @@ sub LeftRight {
 	}
 }
 
+sub lmPost {
+	my $self = shift;
+	my ($x, $y) = $self->pointerxy;
+	my $items = $self->cget('-listmenu');
+	if (@$items) {
+		my $menu = $self->Menu(
+			-menuitems => $items,
+			-tearoff => 0,
+		);
+		$menu->bind('<Leave>', [$self, 'lmUnpost']);
+		$self->{'l_menu'} = $menu;
+		$menu->post($x, $y);
+	}
+}
+
+sub lmUnpost {
+	my $self = shift;
+	my $menu = $self->{'l_menu'};
+	if (defined $menu) {
+		delete $self->{'l_menu'};
+		$menu->unpost;
+		$menu->destroy;
+	}
+}
+
 =item B<load>I<($folder)>
 
 loads $folder into memory and refreshes the display
@@ -750,8 +1021,13 @@ if succesfull.
 =cut
 
 sub load {
-	my ($self, $folder) = @_;
+	my ($self, $folder, $focus) = @_;
+
+	###################################################################
+	#validate options
+	$focus = 1 unless defined $focus;
 	$folder = getcwd unless defined $folder;
+	return if $folder eq '';
 	unless (-e $folder) {
 		warn "'$folder' does not exist";
 		return
@@ -760,6 +1036,10 @@ sub load {
 		warn "'$folder' is not a directory";
 		return
 	}
+	$folder = File::Spec->rel2abs($folder);
+
+	###################################################################
+	#configure the list entry
 	my $basetxt = $self->{BASETXT};
 	$$basetxt = $folder;
 	my @folders = ();
@@ -773,13 +1053,25 @@ sub load {
 	}
 	my $entry = $self->Subwidget('Entry');
 	$entry->configure(-values => \@folders);
-	my $data = $self->getStat($folder);
-	$self->bgStop;
+
+	###################################################################
+	#start loading
+	my $data = new Tk::FileBrowser::Item( $folder );
+	$self->bgReset;
 	$self->deleteAll;
 	$self->{POOL} = $data;
-	$self->{JOBSTACK} = [];
 	$self->bgAddJob('', $data);
 	$self->bgStart;
+
+	###################################################################
+	#transfer focus to tree widget
+	$self->Subwidget('Tree')->focus if $focus;
+}
+
+sub noRefresh {
+	my ($self, $flag) = @_;
+	$self->{NOREFRESH} = $flag if defined $flag;
+	return $self->{NOREFRESH};
 }
 
 sub NumberOfColumns {
@@ -825,11 +1117,11 @@ sub Position {
 	return () unless @peers;
 	my $directoriesfirst = $self->cget('-directoriesfirst');
 	my @op = ();
-	if ($self->IsDir($item) and $self->cget('-directoriesfirst')) {
+	if ($itemdata->isDir and $self->cget('-directoriesfirst')) {
 		for (@peers) {
 			my $peer = $_;
 			my $pdat = $self->infoData($peer);
-			if ($self->IsFile($peer)) { #we arrived at the end of the directory section
+			if (not $pdat->isDir) { #we arrived at the end of the directory section
 				push @op, -before => $peer;
 				last;
 			} elsif ($self->OrderTest($itemdata, $pdat)) {
@@ -841,8 +1133,8 @@ sub Position {
 		for (@peers) {
 			my $peer = $_;
 			my $pdat = $self->infoData($peer);
-			if ($self->IsDir($peer)) { 
-				#we are still in directory section, ignoring
+			if (($pdat->isDir) and $self->cget('-directoriesfirst')) { 
+			#we are still in directory section, ignoring
 			} elsif ($self->OrderTest($itemdata, $pdat)) {
 				push @op, -before => $peer;
 				last;
@@ -850,12 +1142,6 @@ sub Position {
 		}
 	}
 	return @op;
-}
-
-sub PostConfig {
-	my $self = shift;
-	my $col = $self->cget('-columns');
-	$self->CreateTreeWidget(@$col)
 }
 
 =item B<refresh>
@@ -870,31 +1156,58 @@ sub refresh {
 	$self->bgStop if $bg;
 	$self->deleteAll;
 	$self->update;
-	my $root = $self->{POOL}->{'children'};
-	for (sort keys %$root) {
-		$self->refreshRecursive('', $_, $root->{$_});
-		my $open = $root->{$_}->{'open'};
-		$self->close($_) if (defined $open) and $open;
+	my $root = $self->{POOL};
+	my @children = $root->children;
+	for (sort @children) {
+		$self->refreshRecursive('', $_, $root->child($_));
 	}
-	$self->bgStart if $bg;
+	$self->bgStart if $bg; 
 }
 
 sub refreshRecursive {
 	my ($self, $path, $name, $data) = @_;
+	if ($data->isDir) {
+		if ($self->cget('-refreshfilterfolders')) {
+			return unless $self->filter($self->cget('-refreshfilter'), $name);
+		}
+	} else {
+		return unless $self->filter($self->cget('-refreshfilter'), $name);
+	}
 	my $item = $self->Add($path, $name, $data);
-	if ($self->IsDir($item) and ($data->{'loaded'})) {
-		my $open = $data->{'open'};
-		my $c = $data->{'children'};
+	my $idat = $self->infoData($item);
+	if ($idat->isDir) {
+		my $open = $data->isOpen;
+		my @c = $data->children;
 		if ($open) {
-			for (sort keys %$c) {
-				$self->refreshRecursive($item, $_, $c->{$_});
+			for (@c) {
+				$self->refreshRecursive($item, basename($_), $data->child($_));
 			}
-		} elsif (%$c) {
+		} elsif (@c) {
 			$self->PHAdd($item)
 		}
-		$self->close($item) unless $open;
+		unless ($open) {
+			$self->close($item)
+		}
 	}
 	$self->update;
+}
+
+=item B<reload>
+
+Reloads the current folder, if one is loaded.
+
+=cut
+
+sub reload {
+	my $self = shift;
+	my $folder = $self->folder;
+	$self->load($folder) if defined $folder;
+}
+
+sub separator {
+	my $self = shift;
+	warn "ingoring attempt to configure separator" if @_;
+	return $self->{SEPARATOR}
 }
 
 sub SortMode {
@@ -928,9 +1241,114 @@ sub sortorder {
 	return $self->{SORTORDER}
 }
 
+
+=back
+
+=head1 COLUMN DEFINITIONS
+
+The B<-columntypes> options allows you to define your own column types. The structure is like this:
+
+ my $fb = $app->FileBrowser(
+    -columns => [qw[Size Modified MyColumn]],
+    -columntypes => [
+       MyColumn => {
+          display => sub { ... },
+          test => sub { ... },
+       },
+    ],
+ );
+
+I<MyColumn> is followed by a reference to a hash with the keys I<display> and I<test>.
+Both keys hold a reference to an anonymous sub.
+
+The I<display> sub receives one argument, a B<Tk::FirleBrowser::Item> object. It should
+return the string to be displayed in the column.
+
+The I<test> sub receives two arguments, Both a B<Tk::FirleBrowser::Item> object. It should
+test both objects against each other, taking B<-sortorder> into account. It should return
+the boolean result of the test.
+
+The methods below can help you writing your own column definitions. Whenever you see I<$data> here, 
+it refers to a B<Tk::FirleBrowser::Item> object.
+
+=over 4
+
+=item B<dateString>I<($type, $data)>
+
+Returns the formatted date string of one of the date items in I<$data>;
+I<$type> can be 'Accessed', 'Created' or 'Modified'.
+
+=cut
+
+sub dateString {
+	my ($self, $key, $data) = @_;
+	$key = lc $key;
+	my $raw = $data->$key;
+	return '' unless defined $raw;
+	return strftime($self->cget('-dateformat'), localtime($raw))
+}
+
+=item B<linkString>I<($data)>
+
+Returns the formatted size string to be displayed for I<$data>.
+
+=cut
+
+sub linkString {
+	my ($self, $data) = @_;
+	my $name = $data->name;
+	return '' unless -l $name;
+	return File::Spec::Link->resolve($name);
+}
+
+=item B<nameString>I<($data)>
+
+Returns the name to be displayed for I<$data>.
+
+=cut
+
+sub nameString {
+	my ($self, $data) = @_;
+	return basename($data->name);
+}
+
+=item B<sizeString>I<($data)>
+
+Returns the formatted size string to be displayed for I<$data>.
+
+=cut
+
+sub sizeString {
+	my ($self, $data) = @_;
+	my $size = $data->size;
+	return '' unless defined $size;
+	if ($data->isDir) {
+		$size = "$size items" if $size ne 1;
+		$size = "$size item" if $size eq 1;
+	} else {
+		my @magnifiers = ('', 'K', 'M', 'G', 'T', 'P');
+		my $count = 0;
+		while ($size >= 1024) {
+			$size = $size / 1024;
+			$count ++;
+		}
+		my $mag = $magnifiers[$count];
+		if ($count eq 0) {
+			$size = int($size);
+		} elsif ($size < 100) {
+			$size = sprintf("%.1f", $size)
+		} else {
+			$size = int($size);
+		}
+		$size = $size . " $mag" . 'B';
+	}
+	return $size
+}
+
+
 =item B<testDate>I<($type, $data1, $data2)>
 
-$type can be 'atime', 'ctime' or 'mtime'.
+I<$type> can be 'Accessed', 'Created' or 'Modified'.
 
 Compares the date stamps in $data1 and $data2 and returns true if $data1 wins.
 
@@ -938,15 +1356,38 @@ Compares the date stamps in $data1 and $data2 and returns true if $data1 wins.
 
 sub testDate {
 	my ($self, $key, $data1, $data2) = @_;
+	$key = lc($key);
 	my $sort = $self->sortorder;
-	my $idat = $data1->{$key};
-	my $pdat = $data2->{$key};
+	my $idat = $data1->$key;
+	my $pdat = $data2->$key;
 	return 1 unless defined $idat;
 	return 1 unless defined $pdat;
 	if ($sort eq 'ascending') { 
 		return $idat <= $pdat
 	} else {
 		return $idat >= $pdat
+	}
+}
+
+=item B<testLink>I<($data1, $data2)>
+
+Checks if both $data1 and $data2 represent symbolic links and returns true if $data1 target wins.
+
+=cut
+
+sub testLink {
+	my ($self, $data1, $data2) = @_;
+	my $sort = $self->sortorder;
+	my $itarget = $self->linkString($data1);
+	my $ptarget = $self->linkString($data2);
+	if ($sort eq 'ascending') { 
+		return 1 if $itarget eq '';
+		return 0 if $ptarget eq '';
+		return $itarget le $ptarget
+	} else {
+		return 0 if $itarget eq '';
+		return 1 if $ptarget eq '';
+		return $itarget ge $ptarget
 	}
 }
 
@@ -959,8 +1400,8 @@ Compares the names of $data1 and $data2 and returns true if $data1 wins.
 sub testName {
 	my ($self, $data1, $data2) = @_;
 	my $sort = $self->sortorder;
-	my $name = basename($data1->{'name'});
-	my $peer = basename($data2->{'name'});
+	my $name = basename($data1->name);
+	my $peer = basename($data2->name);
 	unless ($self->cget('-casedependantsort')) {
 		$name = lc($name);
 		$peer = lc($peer);
@@ -981,8 +1422,8 @@ Compares the sizes of $data1 and $data2 and returns true if $data1 wins.
 sub testSize {
 	my ($self, $data1, $data2) = @_;
 	my $sort = $self->sortorder;
-	my $isize = $self->getSize($data1);
-	my $psize = $self->getSize($data2);
+	my $isize = $data1->size;
+	my $psize = $data2->size;
 	return 1 unless defined $isize;
 	return 1 unless defined $psize;
 	if ($sort eq 'ascending') { 
@@ -1008,8 +1449,6 @@ Hans Jeuken (hanje at cpan dot org)
 
 =item Allow columns to be configured on the fly.
 
-=item Recognize links.
-
 =back
 
 =head1 BUGS AND CAVEATS
@@ -1031,6 +1470,13 @@ If you find any bugs, please contact the author.
 =cut
 
 1;
+
+
+
+
+
+
+
 
 
 

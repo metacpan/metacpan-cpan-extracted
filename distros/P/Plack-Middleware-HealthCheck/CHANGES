@@ -1,6 +1,15 @@
 Changelog for Plack-Middleware-HealthCheck
 
-v0.1.0 2024-01-24T23:32:01
+v0.2.0 2024-04-08T15:25:55
+ - Update README and LICENSE (Andrew Hewus Fresh)
+ - Correct POD (Andrew Hewus Fresh)
+ - Pull request #6: SM-4772 add support for list_tags query parameter
+   (Austin Hill)
+ - SM-4772 use a separate endpoint under healthz (Austin Hill)
+ - SM-4772 simplify response code logic (Austin Hill)
+ - SM-4772 add support for list_tags query parameter (Austin Hill)
+
+v0.1.0 2024-01-09T17:07:55
  - Pull request #5: SM-4578 (Alan Lee)
  - Update cpanfile and test file to comply with verify-cpanfile (Alan Lee)
  - Update cpanfile to use compatible version of Hash::MultiValue (Alan Lee)

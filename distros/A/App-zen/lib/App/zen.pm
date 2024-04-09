@@ -1,6 +1,6 @@
 package App::zen;
 
-our $VERSION = 0.05;
+our $VERSION = 0.07;
 
 =head1 NAME
 

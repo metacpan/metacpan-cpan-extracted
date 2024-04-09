@@ -10,6 +10,7 @@ use File::stat;
 use JSON;
 use strict;
 use open ":std", ":encoding(UTF-8)";
+use File::Temp qw(tempfile);
 
 my $output;
 my $output_source_map;
@@ -24,10 +25,10 @@ my $opt_html;
 my $opt_latex;
 my $opt_loc;
 my $opt_draft;
-my $opt_daemon; # 1 -- run server; 2: run server in background
+my $opt_daemon;
 my $opt_live; # true -- live rendering in server mode
 my $opt_toc;
-my $opt_port = 8080;
+my $opt_port;
 my $opt_source_map;
 my $opt_json_dump;
 my $opt_help;
@@ -38,10 +39,36 @@ my $opt_top_heading;
 my %global_labels = ();
 my $global_label_id = 1;
 my $re_ln_label = qr/\{#(\w+)}\s*$/;
-my $global_vars = {};
+my $global_vars = {
+  built_at => strftime('%FT%TZ', gmtime(time()))
+};
 my @env_chain = ();
 my $re_defvar = qr/^[@-]\s*\{([A-Za-z0-9_ -]+)}=\s+`(.*?)`/;
 my $re_command = qr/@(mark|table|c|\+)\s*\b(.*)/;
+my $re_defvar_inline = qr/^\{\{\s*(\w+):\s+'(.*?)'\s*}}/;
+
+my @linePatterns = (
+  {
+    type => 'heading',
+    re => qr/^(#+)\s+(.*?)\s*$/,
+    groups => [qw(prefix text)]
+  },
+  {
+    type => 'field',
+    re => qr/^:(\w+):\s+(.*?)\s*$/,
+    groups => [qw(name value)]
+  },
+  {
+    type => 'code-start',
+    re => qr/^(```+)(\w+)?\s+[@](.*?)\s*$/,
+    groups => [qw(prefix lang text)]
+  },
+  {
+    type => 'var',
+    re => qr/^\{\{\s*\w+:\s+(.*?)\s*}}/,
+    groups => [qw(name expr)]
+  }
+);
 my @sections = ();
 my $re_inline_var = qr/`?\{([#=][A-Za-z].*?)}/;
 my %re_relaxed_inline_var = (
@@ -154,12 +181,13 @@ my %options = (
   "--document-class CLASS"  => [\$opt_document_class, 'Set latex document class'],
   "--verbose"           => [\$opt_verbose, 'More logging'],
   "--output FILENAME"          => [\$opt_output_file, 'Set output file'],
-  "--port PORT:i"            => [\$opt_port, 'Live HTTP Server port'],
-  "--daemon MODE:i"          => [\$opt_daemon, "Run server in: \n1 => foreground, 2 => background"],
+  "--port PORT:i"            => [\$opt_port, 'Start HTTP Server at port'],
+  "--daemon"          => [\$opt_daemon, "Run server in background"],
   "--json-dump"         => [\$opt_json_dump, 'Dump the document'],
   "-x SECTION"               => [\$opt_exec, 'short for --exec'],
   "-o OUTPUTFILE"               => [\$opt_output_file, 'short for --output'],
   "-t SECTION"               => [\$opt_target, 'short for --target'],
+  "-s SECTION"               => [\$opt_target, 'short for --section'],
   "-h"                 => [\$opt_help, 'Shows help information'],
 );
 
@@ -198,6 +226,7 @@ sub usage {
     print STDERR sprintf("  %-24s %s\n", $_, shift @desc);
     print STDERR sprintf("  %-24s $_\n", '') foreach (@desc);
   }
+  print STDERR "Zen Version: 0.07\n";
   exit(1);
 };
 sub add_label
@@ -536,19 +565,32 @@ sub load_zen_file
         push @{$curr_block->{rows}}, [parse_table_row($l->{text})];
       }
       push @{$curr_block->{lines}}, $l;
-    } elsif ($s =~ m/$re_defvar/) {
+    } elsif ($s =~ m/$re_defvar_inline/) {
       my $name = $1;
       my $val = $2;
-  	  foreach (@{$curr_section->{defs}}) {
+      foreach (@{$curr_section->{defs}}) {
         die "$filename:$ln: redefining $name" if $_->{name} eq $name;
-	    }
+      }
       push @{$curr_section->{defs}}, {
         name => $name,
         file => $filename,
         ln => $ln,
         text => $val
       };
-      #print STDERR "def $name $val\n";
+      #print STDERR "def $name '$val'\n";
+    } elsif ($s =~ m/$re_defvar/) {
+      my $name = $1;
+      my $val = $2;
+      foreach (@{$curr_section->{defs}}) {
+        die "$filename:$ln: redefining $name" if $_->{name} eq $name;
+      }
+      push @{$curr_section->{defs}}, {
+        name => $name,
+        file => $filename,
+        ln => $ln,
+        text => $val
+      };
+      #print STDERR "def $name '$val'\n";
     } elsif ($s =~ m/^\.(label)\b\s*(.*)/) {
       my $cmd = $1;
       my $params = trim($2);
@@ -1345,6 +1387,8 @@ sub gen_html_section {
       print "{<b>$1</b>} &equiv; <code>",html_escape_code($2),"</code><br>\n";
     } elsif ($t =~ m/$re_defvar/) {
       print "<div>{<b>$1</b>} &equiv; <code>",html_escape_code($2),"</code></div>\n";
+    } elsif ($t =~ m/$re_defvar_inline/) {
+      print "<div>{<b>$1</b>} &equiv; <code>",html_escape_code($2),"</code></div>\n";
     } elsif ($t =~ m/^\.(\w+)\s+(.*)/) {
       print "<code><b>.$1</b></code> <code>",html_escape_code($2),"</code>\n";
     } elsif ($t =~ m/^\$\$/) {
@@ -1599,11 +1643,11 @@ sub docgen_latex {
                my ($name, $params) = split /:/,trim($_);
                my $section = find_section($name);
                my $id = $section->{id};
-         	  if ($section->{pattern} && !$params && @{$section->{params}} > 0) {
+               if ($section->{pattern} && !$params && @{$section->{params}} > 0) {
                  my $pat = $section->{pattern};
                  my @vals = ($name =~ /^$pat$/g);
-         	    $params = join(',', @vals);
-         	  }
+                 $params = join(',', @vals);
+               }
                if ($params) {
                  $params = "{(" . latex_escape($params) . ")}";
                }
@@ -1709,6 +1753,9 @@ sub docgen_latex {
        print "\\noindent", '$\\langle$', "\\verb|$1|", '$\\rangle$',
          "\$\\equiv\$ \\verb|$2|\\newline\n";
      } elsif ($t =~ m/$re_defvar/) {
+       print "\\noindent", '$\\{$', "\\verb|$1|", '$\\}$',
+         "\$\\equiv\$ \\verb|$2|\\newline\n";
+     } elsif ($t =~ m/$re_defvar_inline/) {
        print "\\noindent", '$\\{$', "\\verb|$1|", '$\\}$',
          "\$\\equiv\$ \\verb|$2|\\newline\n";
      } elsif ($t =~ m/^\.(\w+)\s+(.*)/) {
@@ -2078,7 +2125,7 @@ sub err
 }
 
 
-if ($opt_daemon) {
+if ($opt_port) {
 use warnings;
 use strict;
 
@@ -2088,14 +2135,24 @@ package App::zen::WebServer;
 use HTTP::Server::Simple::CGI;
 use base qw(HTTP::Server::Simple::CGI);
 use File::Slurp;
-use File::Type;
 use File::stat;
 use JSON;
 use Fcntl qw(:flock);
 use POSIX qw( strftime );
 use Data::Dumper;
 
-my $ft = File::Type->new();
+my %mimeTypes = (
+  html => 'text/html',
+  css => 'text/css',
+  js => 'text/javascript',
+  json => 'application/json',
+  svg => 'image/svg+xml',
+  png => 'image/png',
+  jpeg => 'image/jpeg',
+  jpg => 'image/jpeg',
+  gif => 'image/gif',
+  txt => 'text/plain',
+);
 
 sub handle_request {
     my ($self, $cgi) = @_;
@@ -2261,7 +2318,8 @@ sub on_get_file {
     }
     close $fh;
   } else {
-    my $mime_type = $ft->mime_type($path);
+    my ($ext) = $path =~ /\.([^.]+)$/;
+    my $mime_type = $mimeTypes{lc($ext)} || 'application/octet-stream';
     open my $fh, '<:raw', $path or die "Cannot open file: $!";
     my $mtime = stat($path)->mtime;
     my $filesize = -s $path;
@@ -2354,7 +2412,7 @@ sub on_hello {
 }
 
 my $server = App::zen::WebServer->new($opt_port);
-if ($opt_daemon == 2) {
+if ($opt_daemon) {
   $server->background();
 } else {
   $server->run();
@@ -2400,8 +2458,11 @@ if ($opt_exec) {
   } elsif ($lang eq 'ts') {
     $lang = 'ts-node';
   }
-  open $output, "|$lang";
-  emit($output, $opt_output_file, expand($opt_exec));
+  my ($fh, $filename) = tempfile();
+  emit($fh, $opt_output_file, expand($opt_exec));
+  close $fh;
+  system("$lang $filename");
+  #TODO remove temp file
 } elsif (!$opt_html && !$opt_latex) {
   if ($opt_source_map) {
     open $output_source_map, ">$opt_source_map"

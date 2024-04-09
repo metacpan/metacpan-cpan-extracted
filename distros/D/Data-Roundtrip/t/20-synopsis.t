@@ -5,14 +5,14 @@ use warnings;
 
 use utf8;
 
-our $VERSION='0.27';
+our $VERSION='0.28';
 
 use Test::More;
 use Test2::Plugin::UTF8;
 
 my $num_tests = 0;
 
-use Data::Roundtrip;
+use Data::Roundtrip qw/dump2json/;
 
 # we are printing to stdout utf8
 binmode STDOUT, ':encoding(UTF-8)';

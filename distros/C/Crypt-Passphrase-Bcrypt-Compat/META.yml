@@ -1,0 +1,39 @@
+---
+abstract: 'A bcrypt validator for Crypt::Passphrase'
+author:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+build_requires:
+  Crypt::Passphrase::Bcrypt: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-Passphrase-Bcrypt-Compat
+provides:
+  Crypt::Passphrase::Bcrypt::Compat:
+    file: lib/Crypt/Passphrase/Bcrypt/Compat.pm
+    version: '0.002'
+requires:
+  Crypt::Eksblowfish::Bcrypt: '0'
+  Crypt::Passphrase::Validator: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Leont/crypt-passphrase-bcrypt-compat/issues
+  repository: git://github.com/Leont/crypt-passphrase-bcrypt-compat.git
+version: '0.002'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

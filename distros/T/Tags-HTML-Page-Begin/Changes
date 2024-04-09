@@ -1,3 +1,8 @@
+0.17 2024-04-08T12:54:25+02:00
+ - Rewrite from List::MoreUtils to List::Util.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.16 2023-02-10T22:13:53+01:00
  - Add processing of CSS by Tags::HTML::_process_css().
  - Change of API in case of 'tags' parameter, could be undef (not much

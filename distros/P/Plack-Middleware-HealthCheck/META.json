@@ -44,7 +44,7 @@
             "File::Spec" : "0",
             "HTTP::Request::Common" : "0",
             "Hash::MultiValue" : "0.1",
-            "HealthCheck" : "0",
+            "HealthCheck" : "v1.9.1",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Plack::Test" : "0",
@@ -57,7 +57,7 @@
    "provides" : {
       "Plack::Middleware::HealthCheck" : {
          "file" : "lib/Plack/Middleware/HealthCheck.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://github.com/GrantStreetGroup/p5-Plack-Middleware-HealthCheck"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.2.0",
    "x_generated_by_perl" : "v5.38.0",
    "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "Artistic-2.0",

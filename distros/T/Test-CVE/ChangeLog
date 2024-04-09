@@ -1,3 +1,14 @@
+0.04	- 2024-01-20, H.Merijn Brand
+    * Strip WARNING if it prefixes the JSON data
+    * Opt to install cpan-cve.pl (issue #1)
+    * Pass verbosity from script to parser
+    * Fix version chain compare with multiple versions
+    * Suppress perl-core CVE's by default in cpan-cve.pl
+    * Cowardly give up if no NAME or DISTNAME found
+    * Allow multiple folders collected in JSON output
+    * It is 2024
+    * Update dependencies
+
 0.03	- 2023-11-27, H.Merijn Brand
     * Add ->want & ->set_meta
     * Support test on a single script in cpan-cve.pl

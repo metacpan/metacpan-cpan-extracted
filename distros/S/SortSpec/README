@@ -1,0 +1,116 @@
+NAME
+    SortSpec - Specification of sort specification
+
+SPECIFICATION VERSION
+    0.1
+
+VERSION
+    This document describes version 0.1.0 of SortSpec (from Perl
+    distribution SortSpec), released on 2024-01-27.
+
+SYNOPSIS
+    Basic use with Sort::BySpec:
+
+     use Sort::BySpec qw(sort_by_spec);
+     use SortSpec::Perl::CPAN::ChangesGroup::PERLANCAR; # sort specification of changes group, a la PERLANCAR
+
+     my $sorter = sort_by_spec(spec => SortSpec::Perl::CPAN::ChangesGroup::PERLANCAR::get_spec());
+     my @sorted = $sorter->(...);
+
+    Specifying arguments:
+
+     use Sort::BySpec qw(sort_by_spec);
+     use SortExample::Foo;
+     my $sorter = sort_by_spec(spec => SortSpec::Foo::get_spec(arg1=>..., ));
+     my @sorted = sorter->(...);
+
+    Specifying spec on the command-line (for other CLI's):
+
+     % sort-by-spec -m Perl::CPAN::ChangesGroup::PERLANCAR ...
+     % sort-by-spec -m Foo=arg1,val,arg2,val ...
+
+DESCRIPTION
+    EXPERIMENTAL.
+
+    "SortSpec" is a namespace for modules that declare sort specifications.
+    Sort specifications are used with Sort::BySpec.
+
+  Writing a SortSpec module
+     package SortSpec::Foo;
+
+     # required. must return a hash (DefHash)
+     sub meta {
+         return +{
+             v => 1,
+             summary => 'Sort specification related to Foo',
+             args => {
+                 arg1 => {
+                     schema => 'str*', # Sah schema
+                     req => 1,
+                 },
+             },
+         };
+     }
+
+     sub get_spec {
+         my %args = @_;
+         ...
+         return [...];
+     }
+
+     1;
+
+  Namespace organization
+    TODO.
+
+  SEE ALSO
+  Base specifications
+    DefHash
+
+    Sah
+
+  Related specifications
+    SortExample
+
+  Related modules
+    Sort::BySpec
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/SortSpec>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-SortSpec>.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=SortSpec>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

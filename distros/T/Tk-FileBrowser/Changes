@@ -1,5 +1,11 @@
 Revision history for Perl extension Tk::FileBrowser.
 
+0.03  Mon Apr 8, 2024
+	- added Tk::FileBrowser::Item
+	- added context menus for header and tree.
+	- added a filter bar.
+	- updated documentation.
+
 0.02  Mon Apr 1 2024
 	- made column types user configerable.
 	- updated documentation.
@@ -11,6 +17,7 @@ Revision history for Perl extension Tk::FileBrowser.
 0.01  Fri Mar 1 10:42:59 2024
 	- original version; created by h2xs 1.23 with options
 		-X Tk::FileBrowser
+
 
 
 

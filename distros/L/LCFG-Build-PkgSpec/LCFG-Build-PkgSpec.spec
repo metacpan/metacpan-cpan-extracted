@@ -1,10 +1,10 @@
 Name:           perl-LCFG-Build-PkgSpec
-Version:        0.2.7
+Version:        0.3.0
 Release:        1
 Summary:        Object-oriented interface to LCFG build metadata
 License:        GPLv2
 Group:          Development/Libraries
-Source0:        LCFG-Build-PkgSpec-0.2.7.tar.gz
+Source0:        LCFG-Build-PkgSpec-0.3.0.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires:  perl >= 1:5.6.1
@@ -66,8 +66,28 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/*
 
 %changelog
-* Fri Mar 22 2019 SVN: new release
-- Release: 0.2.7
+* Tue Jul 11 2023 SVN: new release
+- Release: 0.3.0
+
+* Tue Jul 11 2023 08:57  squinney@INF.ED.AC.UK
+- bin/lcfg-pkgcfg.in, lcfg.yml, lib/LCFG/Build/PkgSpec.pm.in: Improved
+  support for adding to the platforms list
+
+* Fri Aug 16 2019 14:53  squinney@INF.ED.AC.UK
+- Changes, debian/changelog, lcfg.yml: LCFG-Build-PkgSpec release: 0.2.8
+
+* Fri Aug 16 2019 14:52  squinney@INF.ED.AC.UK
+- debian/docs: no need for changelog to be in docs file
+
+* Fri Aug 16 2019 14:52  squinney@INF.ED.AC.UK
+- debian/rules: tabs not spaces
+
+* Fri Aug 16 2019 14:26  squinney@INF.ED.AC.UK
+- debian/rules: Ensure all files are packaged. Install upstream changelog
+  with correct name
+
+* Fri Mar 22 2019 15:28  squinney@INF.ED.AC.UK
+- Changes, debian/changelog, lcfg.yml: LCFG-Build-PkgSpec release: 0.2.7
 
 * Fri Mar 22 2019 15:28  squinney@INF.ED.AC.UK
 - debian/control: Need to build-depend on libmodule-build-perl

@@ -9,7 +9,7 @@ Tk::FileBrowser::Header - Resizeable header for any HList like widget
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = 0.01;
+$VERSION = 0.03;
 
 use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'Header';
@@ -108,11 +108,13 @@ sub Populate {
 	$self->{ACTIVE} = 0;
 	$self->{COLUMN} = $column;
 	
-	my $label = $self->Label->pack(-side => 'left');
+	my $label = $self->Label(
+	)->pack(-side => 'left');
 	$self->Advertise(Label => $label);
 
 	my $sizer = $self->Label(
-		-justify => 'left',
+#		-anchor => 'w',
+#		-justify => 'left',
 		-borderwidth => 2,
 	)->pack(-side => 'right', -fill => 'y');
 	$self->Advertise(Sizer => $sizer);
@@ -127,6 +129,7 @@ sub Populate {
 	$self->Advertise(Sort => $sort);
 	
 	for ($self, $label, $sort) {
+		$_->bind('<Button-3>', [$self, 'Callback', '-contextcall', Ev('x'), Ev('y')]);
 		$_->bind('<Button-1>', [$self, 'SortClick']);
 	}
 
@@ -148,6 +151,7 @@ sub Populate {
 	$self->{SORT} = undef;
 	
 	$self->ConfigSpecs(
+		-contextcall => ['CALLBACK', undef, undef, sub {}],
 		-sortcall => ['CALLBACK', undef, undef, sub {}],
 		-sortorder => ['METHOD', undef, undef, 'none'],
 		-text => [$label],
@@ -236,8 +240,6 @@ sub sortorder {
 	return $self->{SORT}	
 }
 
-=back
-
 =head1 LICENSE
 
 Same as Perl.
@@ -264,7 +266,11 @@ If you find any bugs, please contact the author.
 
 1;
 
-1;
+
+
+
+
+
 
 
 

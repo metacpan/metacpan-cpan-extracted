@@ -14,6 +14,7 @@ t/00-load.t
 t/01-basic.t
 t/02-random-data-structure.t
 t/03-random-data-structure-UTF8.t
+t/04-dump2-use-is-explicit.t
 t/05-perl2dump-no-escape-unicode-temporarily.t
 t/06-perl2dump-no-escape-unicode-permanently.t
 t/07-perl2dump-escape-unicode-permanently.t
@@ -32,5 +33,12 @@ t/t-data/failing/test.yaml
 t/t-data/succeeding/test.json
 t/t-data/succeeding/test.pl
 t/t-data/succeeding/test.yaml
+xt/benchmarks/01-default-unicode-escaping.b
+xt/benchmarks/02-permanent-no-unicode-escaping.b
+xt/benchmarks/03-permanent-unicode-escaping.b
+xt/boilerplate.t
+xt/deficiencies/01-yaml-quotes-problem.t
+xt/deficiencies/02-yaml-pp-remedy.t
+xt/deficiencies/03-yaml-xs-remedy.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

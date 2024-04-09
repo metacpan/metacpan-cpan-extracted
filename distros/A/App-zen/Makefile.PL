@@ -8,7 +8,6 @@ WriteMakefile
                    'File::Basename' => 0,
                    'File::Path' => 0,
                    'File::Slurp' => 0,
-                   'File::Type' => 0,
                    'HTTP::Server::Simple' => 0,
                    'HTTP::Server::Simple::CGI' => 0,
                    'JSON' => 0,

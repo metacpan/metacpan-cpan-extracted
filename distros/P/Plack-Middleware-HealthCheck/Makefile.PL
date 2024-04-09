@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "HTTP::Request::Common" => 0,
     "Hash::MultiValue" => "0.1",
-    "HealthCheck" => 0,
+    "HealthCheck" => "1.9.1",
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Plack::Test" => 0,
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "v0.1.0",
+  "VERSION" => "v0.2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +46,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "HTTP::Request::Common" => 0,
   "Hash::MultiValue" => "0.1",
-  "HealthCheck" => 0,
+  "HealthCheck" => "1.9.1",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON" => 0,

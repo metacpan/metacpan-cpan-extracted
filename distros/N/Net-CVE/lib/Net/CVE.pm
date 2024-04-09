@@ -5,7 +5,7 @@ package Net::CVE;
 use 5.014002;
 use warnings;
 
-our $VERSION = "0.007"; # 20230606
+our $VERSION = "0.008"; # 20231023
 
 use Carp;
 use HTTP::Tiny;
@@ -157,7 +157,7 @@ sub summary {
     $lang       = first { m/\b $self->{lang} /ix } @lang;
     $lang     //= first { m/\b  en           /ix } @lang;
     $lang     //= $lang[0];
-    my $problem = join "\n" => @{$problem{$lang}};
+    my $problem = defined $lang ? join "\n" => @{$problem{$lang}} : "";
 
     {	id          => $j->{cveMetadata}{cveId},
 	date        => $j->{cveMetadata}{datePublished},
@@ -524,7 +524,7 @@ H.Merijn Brand <hmbrand@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2023-2023 H.Merijn Brand
+Copyright (C) 2023-2024 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. See L<perlartistic>.

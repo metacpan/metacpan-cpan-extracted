@@ -15,7 +15,7 @@ Readonly::Scalar my $ATTR_CHARS => q{<&"};
 Readonly::Scalar my $CHAR_CHARS => q{<&\240};
 Readonly::Scalar my $EMPTY_STR => q{};
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 # Encode newline in data to '\n' in output.
 sub encode_newline {
@@ -124,6 +124,8 @@ __END__
 
 =head1 EXAMPLE1
 
+=for comment filename=encode_newline.pl
+
  use strict;
  use warnings;
 
@@ -145,6 +147,8 @@ __END__
  # foo\nbar\n
 
 =head1 EXAMPLE2
+
+=for comment filename=encode_attr_entities.pl
 
  use strict;
  use warnings;
@@ -196,12 +200,12 @@ L<http://skim.cz/>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2023 Michal Josef Špaček
+© 2005-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

@@ -4,6 +4,18 @@ use warnings;
 
 use Test::More;
 
+END {
+    my $db_file = 'test.db';
+    ok -e $db_file, 'db exists';
+    if (-e $db_file) {
+        unlink $db_file;
+        unlink $db_file . '-shm';
+        unlink $db_file . '-wal';
+        ok !-e $db_file, "$db_file removed";
+    }
+    done_testing();
+}
+
 use_ok 'Synth::Config';
 
 my $model = 'Moog Matriarch';
@@ -11,12 +23,12 @@ my $model = 'Moog Matriarch';
 my $obj = new_ok 'Synth::Config' => [
   model   => $model,
   dbname  => 'test.db',
-  verbose => 1,
+#  verbose => 1,
 ];
 
 subtest defaults => sub {
   is $obj->model, 'moog_matriarch', 'model';
-  is $obj->verbose, 1, 'verbose';
+  is $obj->verbose, 0, 'verbose';
 };
 
 subtest settings => sub {
@@ -37,6 +49,7 @@ subtest settings => sub {
   ok $id, "make_setting (id: $id)";
   # recall that setting
   my $setting = $obj->recall_setting(id => $id);
+  $expect->{id} = $id;
   is_deeply $setting, $expect, 'recall_setting';
   # update a single field in the setting
   my $got = $obj->make_setting(id => $id, is_default => 1);
@@ -46,9 +59,16 @@ subtest settings => sub {
   is keys(%$setting), keys(%$expect), 'recall_setting';
   # check the updated field
   ok $setting->{is_default}, 'is_default';
+  # undef a single field in the setting
+  $got = $obj->make_setting(id => $id, is_default => undef);
+  is $got, $id, 'make_setting undef update';
+  # recall that same setting
+  $setting = $obj->recall_setting(id => $id);
+  # check the updated field
+  ok !$setting->{is_default}, 'is_default';
   # search the settings for a particular key
   my $settings = $obj->search_settings(group => $expect->{group});
-  is_deeply $settings, [ { $id => $setting } ], 'search_settings';
+  is_deeply $settings, [ $setting ], 'search_settings';
   # another!
   $expect = {
     name       => $name,
@@ -64,28 +84,26 @@ subtest settings => sub {
   is $id2, $id + 1, "make_setting (id: $id2)";
   # recall that setting
   my $setting2 = $obj->recall_setting(id => $id2);
+  $expect->{id} = $id2;
   is_deeply $setting2, $expect, 'recall_setting';
   # recall named settings
   $settings = $obj->search_settings(name => $name);
   is_deeply $settings,
-    [ { $id => $setting }, { $id2 => $setting2 } ],
+    [ $setting, $setting2 ],
     'search_settings';
   # search the settings for two keys
   $settings = $obj->search_settings(group => $expect->{group}, name => $name);
-  is_deeply $settings, [ { $id2 => $setting2 } ], 'search_settings';
+  is_deeply $settings, [ $setting2 ], 'search_settings';
   # recall names
   my $names = $obj->recall_names;
   is_deeply $names, [ $name ], 'recall_names';
   # recall all for model
   $settings = $obj->recall_all;
-  is_deeply $settings, [
-    { $id => $setting },
-    { $id2 => $setting2 }
-  ], 'recall_all';
+  is_deeply $settings, [ $setting, $setting2 ], 'recall_all';
   # remove a setting
   $obj->remove_setting(id => $id);
   $settings = $obj->search_settings(name => $name);
-  is_deeply $settings, [ { $id2 => $setting2 } ], 'remove_setting';
+  is_deeply $settings, [ $setting2 ], 'remove_setting';
   $obj->remove_settings(name => $name);
   $settings = $obj->search_settings(name => $name);
   is_deeply $settings, [], 'remove_settings';
@@ -96,12 +114,4 @@ subtest cleanup => sub {
   $obj->remove_model(model => $model);
   my $settings = eval { $obj->recall_all };
   is $settings, undef, 'remove_model';
-  # remove the database
-#  ok -e 'test.db', 'db exists';
-#  unlink 'test.db';
-#  unlink 'test.db-shm';
-#  unlink 'test.db-wal';
-#  ok !-e 'test.db', 'db unlinked';
 };
-
-done_testing();

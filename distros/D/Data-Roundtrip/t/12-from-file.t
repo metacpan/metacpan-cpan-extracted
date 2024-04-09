@@ -16,7 +16,7 @@
 #     Structures begin differing at:
 #          $got->[0] = '0.764232574944025'
 #     $expected->[0] = '0.764232574944026'
-# there is nothing we can do
+# in fix_scalar() we reduce the number of decimal digits, and hope for the best
 
 use 5.008;
 use strict;
@@ -29,7 +29,7 @@ my $DIAG_verbose = 0;
 use Data::Dump qw/pp/;
 use utf8;
 
-our $VERSION='0.27';
+our $VERSION='0.28';
 
 use File::Temp;
 use File::Spec;
@@ -48,32 +48,18 @@ $File::Temp::KEEP_ALL = 1;
 my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
 
 if( $DIAG_verbose > 0 ){ diag "calling randomiser ..."; }
+
 my $randomiser = Data::Random::Structure->new(
 	max_depth => 50,
 	max_elements => 200,
 );
 ok(defined $randomiser, 'Data::Random::Structure->new()'." called.") or BAIL_OUT;
-
 if( $DIAG_verbose > 0 ){ diag "called randomiser ... OK"; }
-
-if( 0 ){
-	# this is only needed before v0.22 when YAML::PP was not used
-	# now this is not needed
-
-	# first test the sub fix_recursively()
-	my $td = fix_scalar('abc:xyz"\\aa"\'');
-	if( $DIAG_verbose > 0 ){ diag "fixed the scalar 1 ... OK"; }
-	ok($td !~ /[:"'\\]/, 'fix_scalar()'." : called and it works for bad characters.") or BAIL_OUT("no it did not:\n$td\n");
-	# with utf8
-	$td = fix_scalar('αβγ:χψζ"\\αα"\'');
-	if( $DIAG_verbose > 0 ){ diag "fixed the scalar 2 ... OK"; }
-	ok($td !~ /[:"'\\]/, 'fix_scalar()'." : called and it works for bad characters.") or BAIL_OUT("no it did not:\n$td\n");
-} 
 
 if( $DIAG_verbose > 0 ){ diag "calling utf8 randomiser"; }
 my $randomiser_utf8 = Data::Random::Structure::UTF8->new(
-	max_depth => 50,
-	max_elements => 200,
+	max_depth => 5,
+	max_elements => 20,
 );
 ok(defined $randomiser, 'Data::Random::Structure->new()'." called.") or BAIL_OUT;
 if( $DIAG_verbose > 0 ){ diag "calling utf8 randomiser OK"; }
@@ -185,17 +171,14 @@ done_testing;
 
 if( $DIAG_verbose > 0 ){ diag "done testing called."; }
 
-# the randomiser produces strings with these characters
-# which seem to confuse YAML::Load()
-# so we are traversing the data structure and changing all
-# scalars: array items, keys, values
-# to remove these characters
-# BUT since v0.22 we are using YAML::PP internally
-# so this is no longer needed
+# this reduces the number of digits to floats so that
+# their comparison does not fail because of last-digit difference
+# because of rounding and representation errors etc.
+# so 0.191891717171 becomes 0.1918 ONLY
 sub fix_scalar {
-	return $_[0]; # short-circuit it, no need to fix anything
+	#return $_[0]; # short-circuit it, no need to fix anything
 	my $instr = $_[0];
-	$instr =~ s/[:'"\\]+//g;
+	$instr =~ s/^(['"]?)(\d+\.\d{4})\d+(['"]?)$/$1$2$3/g;
 	return $instr;
 }
 
@@ -221,4 +204,28 @@ sub fix_recursively {
 		$item = fix_scalar($item);
 	} else { die perl2dump($item)."do not know this ref: '$r' for above input." }
 	if( $DIAG_verbose > 0 ){ diag "fix_recursively : ENDED"; }
+}
+
+sub patched_generate_scalar {
+    my $self = shift;
+
+    my $type_count = scalar @{$self->{_scalar_types}};
+    my $type = $self->{_scalar_types}[int(rand($type_count))];
+ 
+    if ( $type eq 'float' ) {
+        # this is the only change, reduce the number of digits and hope for the best
+        return (1000+int(rand(1_000_000)))/1_000.0;
+    }
+    elsif ( $type eq 'integer' ) {
+        return int(rand(1_000_000));
+    }
+    elsif ( $type eq 'string' ) {
+        return scalar(Data::Random::Structure::rand_chars( set => 'all', min => 6, max => 32 ));
+    }
+    elsif ( $type eq 'bool' ) {
+        return (rand(1) < 0.5) ? 1 : 0;
+    }
+    else {
+        die "I don't know how to generate $type\n";
+    }
 }

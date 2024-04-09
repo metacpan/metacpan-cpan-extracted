@@ -1,5 +1,20 @@
 Revision history for Synth-Config
 
+0.0046 2024-04-08 16:11:31
+    - Fix the _whoops search call in eg/patch-visualizer.pl.
+    - Improve documentation slightly.
+
+0.0045 2024-04-08 15:50:57
+    - Improve documentation.
+
+0.0044 2024-04-08 10:41:01
+    - Improve documentation.
+
+0.0043 2024-04-08 10:06:44
+    - Refactor search and recall methods to return simpler results.
+    - Fix-up the visualization example program and config file.
+    - Update tests!
+
 0.0042 2024-03-31 20:12:33
     - Fix eg/visualize.pl and Module.yaml.
 

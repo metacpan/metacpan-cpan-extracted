@@ -2,27 +2,29 @@
 use strict;
 use warnings;
 
-# $Id: lcfg-pkgcfg.in 35341 2019-01-15 16:19:12Z squinney@INF.ED.AC.UK $
+# $Id: lcfg-pkgcfg.in 44706 2023-07-11 08:57:44Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-PkgSpec/bin/lcfg-pkgcfg.in,v $
-# $Revision: 35341 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-PkgSpec/LCFG_Build_PkgSpec_0_2_7/bin/lcfg-pkgcfg.in $
-# $Date: 2019-01-15 16:19:12 +0000 (Tue, 15 Jan 2019) $
+# $Revision: 44706 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-PkgSpec/LCFG_Build_PkgSpec_0_3_0/bin/lcfg-pkgcfg.in $
+# $Date: 2023-07-11 09:57:44 +0100 (Tue, 11 Jul 2023) $
 
 use LCFG::Build::PkgSpec;
 use File::Spec ();
 use Getopt::Long ();
 use Pod::Usage ();
 
-our $VERSION = '0.2.7';
+our $VERSION = '0.3.0';
 
 use v5.10;
 
 my ( $get, %set, $in, $out, $skeleton, $help );
+my @add_platform;
 Getopt::Long::GetOptions('get=s'    => \$get,
                          'set=s'    => \%set,
                          'in=s'     => \$in,
                          'out=s'    => \$out,
                          'skeleton' => \$skeleton,
+                         'add_platform=s@' => \@add_platform,
                          'help'     => \$help)
     or Pod::Usage::pod2usage( -verbose    => 1,
                               -exitstatus => 2 );
@@ -75,7 +77,17 @@ if ( scalar keys %set > 0 ) {
     $updates = 1;
 }
 
+if ( scalar @add_platform > 0 ) {
+    for my $platform (@add_platform) {
+        if ( !$spec->has_platform( sub { m/^\Q$platform\E$/i } ) ) {
+            $spec->add_platform($platform);
+            $updates = 1;
+        }
+    }
+}
+
 if ( $updates || $infile ne $outfile ) {
+    say STDERR "Updating $outfile";
     $spec->save_metafile($outfile);
 }
 
@@ -120,7 +132,7 @@ lcfg-pkgcfg - A tool for querying LCFG build metadata files
 
 =head1 VERSION
 
-This documentation refers to lcfg-reltool version 0.2.7
+This documentation refers to lcfg-reltool version 0.3.0
 
 =head1 USAGE
 
@@ -195,6 +207,10 @@ see L<LCFG::Build::PkgSpec> for the full list of attributes. It is
 possible to set any number of key-value pairs at the same time. Each
 pair should be separated by just an '=' sign and preceded by the
 I<--set> option.
+
+=item I<--add_platform>
+
+Can be used to add a new name to the list of platforms (e.g. C<UbuntuJammy>)
 
 =item I<--skeleton>
 

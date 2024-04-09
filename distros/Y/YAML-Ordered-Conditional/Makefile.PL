@@ -18,9 +18,9 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
 	'Struct::Conditional' => 1.02,
-	'Tie::IxHash' => 0.02,
 	'YAML::As::Parsed' => 0.06,
-        #'ABC'              => '1.6',
+        'Tie::IxHash' => 0.02,
+	#'ABC'              => '1.6',
         #'Foo::Bar::Module' => '5.0401',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

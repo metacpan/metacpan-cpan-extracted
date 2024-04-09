@@ -9,6 +9,7 @@ use AnyEvent::Socket;
 use AnyEvent;
 use Encode;
 use Scalar::Util qw(tainted);
+use Carp;
 
 =head1 NAME
 
@@ -16,11 +17,11 @@ AnyEvent::I3 - communicate with the i3 window manager
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.19';
 
 =head1 VERSION
 
-Version 0.17
+Version 0.19
 
 =head1 SYNOPSIS
 
@@ -87,6 +88,7 @@ use base 'Exporter';
 
 our @EXPORT = qw(i3);
 
+use constant TYPE_RUN_COMMAND => 0;
 use constant TYPE_COMMAND => 0;
 use constant TYPE_GET_WORKSPACES => 1;
 use constant TYPE_SUBSCRIBE => 2;
@@ -95,10 +97,17 @@ use constant TYPE_GET_TREE => 4;
 use constant TYPE_GET_MARKS => 5;
 use constant TYPE_GET_BAR_CONFIG => 6;
 use constant TYPE_GET_VERSION => 7;
+use constant TYPE_GET_BINDING_MODES => 8;
+use constant TYPE_GET_CONFIG => 9;
+use constant TYPE_SEND_TICK => 10;
+use constant TYPE_SYNC => 11;
+use constant TYPE_GET_BINDING_STATE => 12;
 
 our %EXPORT_TAGS = ( 'all' => [
-    qw(i3 TYPE_COMMAND TYPE_GET_WORKSPACES TYPE_SUBSCRIBE TYPE_GET_OUTPUTS
-       TYPE_GET_TREE TYPE_GET_MARKS TYPE_GET_BAR_CONFIG TYPE_GET_VERSION)
+    qw(i3 TYPE_RUN_COMMAND TYPE_COMMAND TYPE_GET_WORKSPACES TYPE_SUBSCRIBE TYPE_GET_OUTPUTS
+       TYPE_GET_TREE TYPE_GET_MARKS TYPE_GET_BAR_CONFIG TYPE_GET_VERSION
+       TYPE_GET_BINDING_MODES TYPE_GET_CONFIG TYPE_SEND_TICK TYPE_SYNC
+       TYPE_GET_BINDING_STATE)
 ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{all} } );
@@ -115,6 +124,7 @@ my %events = (
     barconfig_update => ($event_mask | 4),
     binding => ($event_mask | 5),
     shutdown => ($event_mask | 6),
+    tick => ($event_mask | 7),
     _error => 0xFFFFFFFF,
 );
 
@@ -183,7 +193,7 @@ sub new {
         # We use getpwuid() instead of $ENV{HOME} because the latter is tainted
         # and thus produces warnings when running tests with perl -T
         my $home = (getpwuid($<))[7];
-        die "Could not get home directory" unless $home and -d $home;
+        confess "Could not get home directory" unless $home and -d $home;
         $path =~ s/~/$home/g;
     }
 
@@ -305,6 +315,11 @@ sub subscribe {
 
     # Register callbacks for each message type
     for my $key (keys %{$callbacks}) {
+        if (!exists $events{$key}) {
+            warn "Could not subscribe to event type '$key'." .
+            " Supported events are " . join(" ", sort keys %events), $/;
+            next;
+        }
         my $type = $events{$key};
         $self->{callbacks}->{$type} = $callbacks->{$key};
     }
@@ -318,7 +333,7 @@ Sends a message of the specified C<type> to i3, possibly containing the data
 structure C<content> (or C<content>, encoded as utf8, if C<content> is a
 scalar), if specified.
 
-    my $reply = $i3->message(TYPE_COMMAND, "reload")->recv;
+    my $reply = $i3->message(TYPE_RUN_COMMAND, "reload")->recv;
     if ($reply->{success}) {
         say "Configuration successfully reloaded";
     }
@@ -327,9 +342,9 @@ scalar), if specified.
 sub message {
     my ($self, $type, $content) = @_;
 
-    die "No message type specified" unless defined($type);
+    confess "No message type specified" unless defined($type);
 
-    die "No connection to i3" unless defined($self->{ipchdl});
+    confess "No connection to i3" unless defined($self->{ipchdl});
 
     my $payload = "";
     if ($content) {
@@ -370,7 +385,7 @@ sub _ensure_connection {
 
     return if defined($self->{ipchdl});
 
-    $self->connect->recv or die "Unable to connect to i3 (socket path " . $self->{path} . ")";
+    $self->connect->recv or confess "Unable to connect to i3 (socket path " . $self->{path} . ")";
 }
 
 =head2 get_workspaces
@@ -501,6 +516,45 @@ sub get_version {
     return $cv;
 }
 
+=head2 get_config
+
+Gets the raw last read config from i3. Requires i3 >= 4.14
+
+=cut
+sub get_config {
+    my ($self) = @_;
+
+    $self->_ensure_connection;
+
+    $self->message(TYPE_GET_CONFIG);
+}
+
+=head2 send_tick
+
+Sends a tick event. Requires i3 >= 4.15
+
+=cut
+sub send_tick {
+    my ($self, $payload) = @_;
+
+    $self->_ensure_connection;
+
+    $self->message(TYPE_SEND_TICK, $payload);
+}
+
+=head2 sync
+
+Sends an i3 sync event. Requires i3 >= 4.16
+
+=cut
+sub sync {
+    my ($self, $payload) = @_;
+
+    $self->_ensure_connection;
+
+    $self->message(TYPE_SYNC, $payload);
+}
+
 =head2 command($content)
 
 Makes i3 execute the given command
@@ -514,7 +568,7 @@ sub command {
 
     $self->_ensure_connection;
 
-    $self->message(TYPE_COMMAND, $content)
+    $self->message(TYPE_RUN_COMMAND, $content)
 }
 
 =head1 AUTHOR
@@ -525,7 +579,7 @@ Michael Stapelberg, C<< <michael at i3wm.org> >>
 
 Please report any bugs or feature requests to C<bug-anyevent-i3 at
 rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=AnyEvent-I3>.  I will be
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=AnyEvent-I3>.  I will be
 notified, and then you'll automatically be notified of progress on your bug as
 I make changes.
 
@@ -541,11 +595,11 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=AnyEvent-I3>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=AnyEvent-I3>
 
 =item * The i3 window manager website
 
-L<http://i3wm.org>
+L<https://i3wm.org>
 
 =back
 
@@ -561,7 +615,7 @@ This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
+See https://dev.perl.org/licenses/ for more information.
 
 
 =cut

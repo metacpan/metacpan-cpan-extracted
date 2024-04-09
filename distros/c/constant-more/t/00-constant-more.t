@@ -50,6 +50,11 @@ ok FEATURE_B_CONFIG eq "disabled" , "Normal ok";
 
 # Enumeration testing
 
+use constant::more qw<CONA=0 CONB CONC>;
+ok CONA == 0;
+ok CONB == 1;
+ok CONC == 2;
+
 # Prefix with globbing
 use constant::more <PREFIX_{1=0,2,3=10,4}>;
 

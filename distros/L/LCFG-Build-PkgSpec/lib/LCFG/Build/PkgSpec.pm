@@ -2,13 +2,13 @@ package LCFG::Build::PkgSpec; # -*-perl-*-
 use strict;
 use warnings;
 
-# $Id: PkgSpec.pm.in 35434 2019-01-18 10:43:38Z squinney@INF.ED.AC.UK $
+# $Id: PkgSpec.pm.in 44706 2023-07-11 08:57:44Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-PkgSpec/lib/LCFG/Build/PkgSpec.pm.in,v $
-# $Revision: 35434 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-PkgSpec/LCFG_Build_PkgSpec_0_2_7/lib/LCFG/Build/PkgSpec.pm.in $
-# $Date: 2019-01-18 10:43:38 +0000 (Fri, 18 Jan 2019) $
+# $Revision: 44706 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-PkgSpec/LCFG_Build_PkgSpec_0_3_0/lib/LCFG/Build/PkgSpec.pm.in $
+# $Date: 2023-07-11 09:57:44 +0100 (Tue, 11 Jul 2023) $
 
-our $VERSION = '0.2.7';
+our $VERSION = '0.3.0';
 
 use v5.10;
 
@@ -102,19 +102,29 @@ has 'metafile' => (
 # doesn't seem to be available at present.
 
 has 'author' => (
+    traits     => ['Array'],
     is         => 'rw',
     isa        => 'EmailAddressList',
     coerce     => 1,
     auto_deref => 1,
     default    => sub { [] },
+    handles    => {
+        has_author => 'grep',
+        add_author => 'push',
+    },
 );
 
 has 'platforms' => (
+    traits     => ['Array'],
     is         => 'rw',
     isa        => 'ArrayRefOrString',
     coerce     => 1,
     auto_deref => 1,
     default    => sub { [] },
+    handles    => {
+        has_platform => 'grep',
+        add_platform => 'push',
+    },
 );
 
 has 'build' => (
@@ -555,7 +565,7 @@ LCFG::Build::PkgSpec - Object-oriented interface to LCFG build metadata
 
 =head1 VERSION
 
-This documentation refers to LCFG::Build::PkgSpec version 0.2.7
+This documentation refers to LCFG::Build::PkgSpec version 0.3.0
 
 =head1 SYNOPSIS
 
@@ -822,11 +832,23 @@ string along with the value of the release field. The release field is
 also incremented. For example, the first dev version for C<1.2.3>
 would be C<1.2.3.dev1> and the second would be C<1.2.3.dev2>.
 
+=item has_platform
+
+A method for checking if an author is already in the list of
+authors. Takes a subroutine, e.g. C<sub { m/foo/ }>, with the C<$_>
+variable set to the item value.
+
 =item add_author
 
 A convenience method for adding new authors to the list of project
 authors. Note that this does not prevent an author being added
 multiple times.
+
+=item has_platform
+
+A method for checking if a platform is already in the list of
+supported platforms. Takes a subroutine, e.g. C<sub { m/foo/ }>, with
+the C<$_> variable set to the item value.
 
 =item add_platform
 

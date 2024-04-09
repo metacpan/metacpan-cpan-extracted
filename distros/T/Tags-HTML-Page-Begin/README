@@ -223,6 +223,7 @@ EXAMPLE1
      );
 
      # Process page
+     $begin->process_css;
      $css->put(
             ['s', 'div'],
             ['d', 'color', 'red'],
@@ -246,20 +247,20 @@ EXAMPLE1
      #   <head>
      #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
      #     <meta name="generator" content=
-     #       "Perl module: Tags::HTML::Page::Begin, Version: 0.15" />
+     #       "Perl module: Tags::HTML::Page::Begin, Version: 0.16" />
      #     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
      #     <title>
      #       Page title
      #     </title>
      #     <style type="text/css">
-     # div {
-     #      color: red;
-     #      background-color: black;
-     # }
      # * {
-     #      box-sizing: border-box;
-     #      margin: 0;
-     #      padding: 0;
+     #         box-sizing: border-box;
+     #         margin: 0;
+     #         padding: 0;
+     # }
+     # div {
+     #         color: red;
+     #         background-color: black;
      # }
      # </style>
      #   </head>
@@ -271,7 +272,7 @@ EXAMPLE1
      # </html>
 
 DEPENDENCIES
-    Class::Utils, Error::Pure, List::MoreUtils, Readonly, Tags::HTML.
+    Class::Utils, Error::Pure, List::Util, Readonly, Tags::HTML.
 
 SEE ALSO
     Tags::HTML::Page::End
@@ -286,10 +287,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2020-2023
+    © Michal Josef Špaček 2020-2024
 
     BSD 2-Clause License
 
 VERSION
-    0.16
+    0.17
 

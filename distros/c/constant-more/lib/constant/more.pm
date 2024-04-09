@@ -2,7 +2,7 @@ package constant::more;
 use strict;
 use warnings;
 
-our $VERSION="v0.3.0";
+our $VERSION="v0.3.1";
 
 no warnings "experimental";
 
@@ -42,7 +42,8 @@ sub import {
     }
 	}
 	
-	my $caller=caller;
+  my $level=$Exporter::ExportLevel//0;
+	my $caller=(caller($level))[0];
 	no strict "refs";
 	my %table;
 

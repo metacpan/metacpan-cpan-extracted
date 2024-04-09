@@ -8,4 +8,4 @@ use Test::NoWarnings;
 # Test.
 my $string = "text\ntext";
 my $ret = encode_newline($string);
-is($ret, 'text\\ntext');
+is($ret, 'text\\ntext', 'Encode string with newline (text\ntext).');

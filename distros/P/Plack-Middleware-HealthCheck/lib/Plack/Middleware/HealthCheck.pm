@@ -2,7 +2,7 @@ package Plack::Middleware::HealthCheck;
 
 # ABSTRACT: A health check endpoint for your Plack app
 use version;
-our $VERSION = 'v0.1.0'; # VERSION
+our $VERSION = 'v0.2.0'; # VERSION
 
 use 5.010;
 use strict;
@@ -69,6 +69,9 @@ sub call {
     return $self->serve_health_check($env)
         if $self->should_serve_health_check($env);
 
+    return $self->serve_tags_list($env)
+        if $self->should_serve_tags_list($env);
+
     return $self->app->($env);
 }
 
@@ -78,6 +81,17 @@ sub should_serve_health_check {
     my $path = $env->{'PATH_INFO'};
     foreach ( @{ $self->health_check_paths || [] } ) {
         return 1 if $path eq $_;
+    }
+
+    return 0;
+}
+
+sub should_serve_tags_list {
+    my ( $self, $env ) = @_;
+
+    my $path = $env->{'PATH_INFO'};
+    foreach ( @{ $self->health_check_paths || [] } ) {
+        return 1 if $path eq "$_/tags";
     }
 
     return 0;
@@ -113,13 +127,24 @@ sub serve_health_check {
         $self->health_check->check(%check_params), $req );
 }
 
+sub serve_tags_list {
+    my ( $self, $env ) = @_;
+
+    my $req          = Plack::Request->new($env);
+    my $query_params = $req->query_parameters;         # a Hash::MultiValue
+
+    return $self->health_check_response(
+        [ $self->health_check->get_registered_tags ], $req );
+}
+
 sub health_check_response {
     my ( $self, $result, $req ) = @_;
     my $json = JSON->new->allow_blessed->convert_blessed->utf8;
     $json->canonical->pretty
         if $req and exists $req->query_parameters->{pretty};
     return [
-        ( $result->{status} || '' ) eq 'OK' ? 200 : 503,
+        ref $result eq 'ARRAY' || ( $result->{status} || '' ) eq 'OK'
+            ? 200 : 503,
         [ 'Content-Type' => 'application/json; charset=utf-8' ],
         [ $json->encode($result) ] ];
 }
@@ -138,7 +163,7 @@ Plack::Middleware::HealthCheck - A health check endpoint for your Plack app
 
 =head1 VERSION
 
-version v0.1.0
+version v0.2.0
 
 =head1 SYNOPSIS
 
@@ -243,17 +268,32 @@ C<$env> under the "env" key.
 Returns the result of passing the health check C<$result>
 to L</health_check_response>.
 
+=head2 serve_tags_list
+
+Called with the Plack C<$env> hash as an argument
+if L</should_serve_health_check> returns true.
+
+Calls L<get_registered_tags|HealthCheck/get_registered_tags> on the
+L<health_check> and returns the result of passing the list of tags to
+L</health_check_response>.
+
 =head2 should_serve_health_check
 
 Receives the Plack C<$env> as an argument and returns a truthy value
 if C<< $env->{PATH_INFO} >> matches any of the L</health_check_paths>.
 
+=head2 should_serve_tags_list
+
+Receives the Plack C<$env> as an argument and returns a truthy value if C<<
+$env->{PATH_INFO} >> matches any of the L</health_check_paths> followed by
+C</tags>.
+
 =head2 health_check_response
 
 Takes a health check C<$result> and returns a Plack response arrayref.
 
-Returns a 200 response if the C<< $result->{status} >> is "OK",
-otherwise returns a 503.
+Returns a 200 response if the C<< $result->{status} >> is "OK" or if the result
+is an array ref (for L</serve_tags_list>), otherwise returns a 503.
 
 The body of the response is the C<$result> JSON encoded.
 

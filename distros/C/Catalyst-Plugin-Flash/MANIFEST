@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+inc/WriteMakefile.pl
+inc/boilerplate.pl
+lib/Catalyst/Plugin/Flash.pm
+lib/Catalyst/Plugin/Flash/JSON.pm
+t/00-load.t
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+LICENSE
+README

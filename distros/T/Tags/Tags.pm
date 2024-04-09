@@ -3,7 +3,7 @@ package Tags;
 use strict;
 use warnings;
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 1;
 
@@ -66,12 +66,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2023 Michal Josef Špaček
+© 2005-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

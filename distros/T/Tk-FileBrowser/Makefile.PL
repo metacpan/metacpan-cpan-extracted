@@ -9,6 +9,8 @@ WriteMakefile(
 	NAME => "Tk::$pm",
 	PREREQ_PM => {
 		'File::Basename' => 0,
+		'File::Spec' => 0,
+		'File::Spec::Link' => '0.073',
 		'Test::Tk' => '3.02',
 		'Tk' => '800.024',
 		'Tk::ITree' => '0.03',
@@ -29,6 +31,8 @@ WriteMakefile(
 		}}) : ()
 	),
 );
+
+
 
 
 

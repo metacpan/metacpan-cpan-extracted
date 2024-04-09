@@ -7,7 +7,7 @@ Description:
     It enables checking the current release only or include its prereqs too.
 
 Copying:
-    Copyright (c) 2023-2023 H.Merijn Brand.  All rights reserved.
+    Copyright (c) 2023-2024 H.Merijn Brand.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the same terms as Perl itself.

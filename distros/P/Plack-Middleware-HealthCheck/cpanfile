@@ -5,7 +5,7 @@ requires 'Plack::Util::Accessor';
 
 on test => sub {
     requires 'HTTP::Request::Common';
-    requires 'HealthCheck';
+    requires 'HealthCheck', '>= v1.9.1';
     requires 'Plack::Test';
     requires 'Test::Exception';
     requires 'Test2::Tools::Mock';

@@ -3,7 +3,7 @@
 use 5.014002;
 use warnings;
 
-our $VERSION = "0.02 - 20231014";
+our $VERSION = "0.04 - 20240408";
 our $CMD = $0 =~ s{.*/}{}r;
 
 sub usage {
@@ -20,6 +20,7 @@ sub usage {
 
 use Net::CVE;
 use Data::Peek;
+use Data::Dumper;
 use JSON::MaybeXS;
 use List::Util   qw( first          );
 use Getopt::Long qw(:config bundling);
@@ -45,7 +46,13 @@ first { $_ !~ m/^(?:cve-)?[0-9]{4}-[0-9]+$/i } @ARGV and
 $cve{$_} = $opt_f ? $cr->data ($_) : $cr->summary ($_) for @ARGV;
 
 if ($opt_d) {
-    DDumper \%cve;
+    eval "local \$_; require Data::Peek;";
+    if ($@) {
+	print STDERR Data::Dumper->Dump (\%cve);
+	}
+    else {
+	print STDERR Data::Peek::DDumper (\%cve);
+	}
     exit 0;
     }
 
@@ -68,21 +75,23 @@ foreach my $cve (@cve) {
 	say " State           : ", $r->{cveMetadata}{state};
 	say " Published       : ", $r->{cveMetadata}{datePublished};
 	my $cc = $r->{containers}{cna} or next;
-	say " Title           : ", $cc->{title};
-	say " Public          : ", $cc->{datePublic};
+	say " Title           : ", $cc->{title}      // "-none-";
+	say " Public          : ", $cc->{datePublic} // "-unknown-";
 	if (my $md = $cc->{providerMetadata}) {
 	    printf " Provider        : %s:%s\n", $md->{shortName}, $md->{orgId};
 	    }
+	my $lead = " " x 19;
 	foreach my $rd (@{$cc->{descriptions} || []}) {
-	    printf "%16s : %s\n", $rd->{lang}, $rd->{value};
+	    printf "%16s : %s\n", $rd->{lang}, $rd->{value} =~ s/\n\K/$lead/gr;
 	    }
 	foreach my $rr (@{$cc->{references} || []}) {
-	    say " References      : ", $rr->{name};
-	    if (my $tags = $rr->{tags}) {
-		say "                   ", join ", " => @$tags;
-		}
-	    if (my $url = $rr->{url}) {
-		say "                   ", $url;
+	    my $trim = "References";
+	    for (grep { length }
+		 $rr->{name},
+		 (join ", " => @{$rr->{tags} || []}),
+		 $rr->{url}) {
+		printf " %-15s : %s\n", $trim, $_;
+		$trim = "";
 		}
 	    }
 	foreach my $pt (@{$cc->{problemTypes} || []}) {
@@ -92,12 +101,16 @@ foreach my $cve (@cve) {
 		}
 	    }
 	foreach my $af (@{$cc->{affected} || []}) {
+	    ($af->{vendor}  || "n/a") eq "n/a" &&
+	    ($af->{product} || "n/a") eq "n/a" and next;
 	    say " Affected        : ", $af->{vendor}, " : ", $af->{product};
 	    if (my $p = $af->{platforms}) {
 		say "       Platforms : ", join ", " => @$p;
 		}
 	    foreach my $v (@{$af->{versions} || []}) {
 		my ($vs, $vv, $vvt) = delete @{$v}{qw( status version versionType )};
+		$vv && $vv eq "n/a" and $vvt ||= "n/a";
+		$vs && $vs eq "affected" && $vvt eq "n/a" and next;
 		printf "       Versions  : %-12s %s (%s)\n", $vs, $vv, $vvt;
 		foreach my $vc (sort keys %$v) {
 		    printf "%16s : %12s %s\n", "", $vc, $v->{$vc};

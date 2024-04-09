@@ -4,13 +4,13 @@ use strict;
 use warnings;
 
 use Class::Utils qw(set_params);
-use List::Util qw(any);
+use List::Util 1.33 qw(any);
 use Readonly;
 
 # Constants.
 Readonly::Scalar my $LAST_INDEX => -1;
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 # Constructor.
 sub new {
@@ -181,6 +181,8 @@ __END__
 
 =head1 EXAMPLE
 
+=for comment filename=preserve_test.pl
+
  use strict;
  use warnings;
 
@@ -252,12 +254,12 @@ L<http://skim.cz/>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2023 Michal Josef Špaček
+© 2005-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

@@ -386,9 +386,8 @@ __DATA__
   </tr>
 </thead>
 <tbody>
-%   for my $s (@$settings) {
-%     my $id = (keys(%$s))[0];
-%     my $setting = (values(%$s))[0];
+%   for my $setting (@$settings) {
+%     my $id = $setting->{id};
 %     my $edit_url = build_edit_url($model, $id, $setting);
 <tr>
   <td><a href="<%= $edit_url %>" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pencil"></i></a></td>

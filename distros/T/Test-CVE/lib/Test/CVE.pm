@@ -13,8 +13,9 @@ package Test::CVE;
  my $cve = Test::CVE->new (
     verbose  => 0,
     deps     => 1,
+    perl     => 1,
     minimum  => 0,
-    cpansa   => "https://perl-toolchain-gang.github.io/cpansa-feed/cpansa.json",
+    cpansa   => "https://cpan-security.github.io/cpansa-feed/cpansa.json",
     make_pl  => "Makefile.PL",
     cpanfile => "cpanfile",
     want     => [],
@@ -29,10 +30,10 @@ package Test::CVE;
 
 =cut
 
-use 5.012000;
+use 5.014000;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use version;
 use Carp;
@@ -51,6 +52,7 @@ sub new {
     my %self  = @_;
     $self{cpansa}   ||= "https://perl-toolchain-gang.github.io/cpansa-feed/cpansa.json";
     $self{deps}     //= 1;
+    $self{perl}     //= 1;
     $self{minimum}  //= 0;
     $self{verbose}  //= 0;
     $self{width}    //= $ENV{COLUMNS} // 80;
@@ -94,7 +96,16 @@ sub _read_cpansa {
 	$r->{success} or die "$src: $@\n";
 
 	$self->{verbose} > 1 and warn "Got it. Decoding\n";
-	$self->{j}{db} = decode_json ($r->{content});
+	if (my $c = $r->{content}) {
+	    # Skip warning part
+	    # CPANSA-perl-2023-47038 has more than 1 range bundled together in '>=5.30.0,<5.34.3,>=5.36.0,<5.36.3,>=5.38.0,<5.38.2'
+	    # {"Alien-PCRE2":[{"affected_versions":["<0.016000"],"cpansa_id":"CPANSA-Alien-PCRE2-2019-20454","cves":["CVE-2019-20454"],"description":"An out-
+	    $c =~ s/^\s*([^{]+?)[\s\r\n]*\{/{/s and warn "$1\n";
+	    $self->{j}{db} = decode_json ($c);
+	    }
+	else {
+	    $self->{j}{db} = undef;
+	    }
 	}
     $self->{j}{mod} = [ sort keys %{$self->{j}{db} // {}} ];
     $self;
@@ -112,13 +123,23 @@ sub _read_MakefilePL {
     $mfc or return $self;
 
     my ($release, $nm, $v, $vf);
-    {	my $w = qr{[\s\r\n]*};
-	my $q = qr{(?:["']|\b)}; # '"
-	my $a = qr{$q $w => $w $q}x;
-	$mfc =~ m/$q VERSION      $a (\S+?) $q/ix and $v       //= $1;
-	$mfc =~ m/$q VERSION_FROM $a (\S+ ) $q/ix and $vf      //= $1;
-	$mfc =~ m/$q     NAME     $a (\S+ ) $q/ix and $nm      //= $1;
-	$mfc =~ m/$q DISTNAME     $a (\S+ ) $q/ix and $release //= $1;
+    foreach my $mfx (grep { m/=>/ }
+		     map  { split m/\s*[;(){}]\s*/ }
+		     map  { split m/\s*,(?!\s*=>)/ }
+			    split m/[,;]\s*\r*\n/ => $mfc) {
+	$mfx =~ s/[\s\r\n]+/ /g;
+	$mfx =~ s/^\s+//;
+	$mfx =~ s/^(['"])(.*?)\1/$2/;	# Unquote key
+	my $a = qr{\s* (?:,\s*)? => \s* (?|"([^""]*)"|'([^'']*)'|([-\w.]+))}x;
+	$mfx =~ m/^ VERSION      $a /ix and $v       //= $1;
+	$mfx =~ m/^ VERSION_FROM $a /ix and $vf      //= $1;
+	$mfx =~ m/^     NAME     $a /ix and $nm      //= $1;
+	$mfx =~ m/^ DISTNAME     $a /ix and $release //= $1;
+	}
+
+    unless ($release || $nm) {
+	carp "Cannot get either NAME or DISTNAME, so cowardly giving up\n";
+	return $self;
 	}
 
     $release //= $nm =~ s{-}{::}gr;
@@ -246,6 +267,8 @@ sub test {
     my @w = @{$self->{want}} or return $self; # Nothing to report
 
     foreach my $m (@w) {
+	$m eq "perl" && !$self->{perl} and next;
+
 	my @mv = sort map { $_ || 0 } keys %{$self->{prereq}{$m}{v} || {}};
 	$self->{verbose} and warn "$m: ", join (" / " => grep { $_ } @mv), "\n";
 	my $cv = ($self->{minimum} ? $mv[0] : $mv[-1]) || 0; # Minimum or recommended
@@ -271,16 +294,18 @@ sub test {
 		"#$m#" =~ m/$p/ and next;
 		}
 	    if (@vsn) {
-		$self->{verbose} > 2 and warn "CMP: $m-$cv\n";
+		$self->{verbose} > 2 and warn "CMP<: $m-$cv\n";
+		$self->{verbose} > 4 and warn "VSN : (@vsn)\n";
+		# >=5.30.0,<5.34.3,>=5.36.0,<5.36.3,>=5.38.0,<5.38.2
 		my $cmp = join " or " =>
-		    map { s/^=(?=[^=<>])/== /r	# = => ==
-		       =~ s/\s*([=<>]+)\s*/$1 version->parse ("/gr
+		    map { s/\s*,\s*/") && XV /gr
 		       =~ s/^/XV /r
-		       =~ s/\s*,\s*/") && XV /r
+		       =~ s/^=(?=[^=<>])/== /r	# = => ==
+		       =~ s/\s*([=<>]+)\s*/$1 version->parse ("/gr
 		       =~ s/$/")/r
 		       =~ s/\bXV\b/version->parse ("$cv")/gr
 		       } @vsn;
-		$self->{verbose} > 2 and warn "CMP: $cmp\n";
+		$self->{verbose} > 2 and warn "CMP>: $cmp\n";
 		eval "$cmp ? 0 : 1" and next;
 		$self->{verbose} > 3 and warn "TAKE!\n";
 		}
@@ -396,6 +421,10 @@ modules are taken into account. Higher verbose will show more. Default = C<0>.
 
 Select if CVE's are also checked for direct dependencies. Default is true. If
 false, just check the module or release itself.
+
+=head4 perl
+
+Select if CVE's on perl itself are included in the report. Default is true.
 
 =head4 minimum
 
@@ -520,7 +549,7 @@ L<Net::CVE>, L<Net::NVD>, L<Net::OSV>
 
 =head1 COPYRIGHT AND LICENSE
 
- Copyright (C) 2023-2023 H.Merijn Brand.  All rights reserved.
+ Copyright (C) 2023-2024 H.Merijn Brand.  All rights reserved.
 
 This library is free software;  you can redistribute and/or modify it under
 the same terms as Perl itself.

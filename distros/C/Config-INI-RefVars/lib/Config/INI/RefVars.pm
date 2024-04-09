@@ -9,7 +9,7 @@ use feature ":5.10";
 use Config;
 use File::Spec::Functions qw(catdir rel2abs splitpath);
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use constant DFLT_TOCOPY_SECTION  => "__TOCOPY__";
 
@@ -521,7 +521,7 @@ Config::INI::RefVars - INI file reader that supports make-style variable referen
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =head1 SYNOPSIS
 
@@ -568,11 +568,11 @@ then C<< $ini_reader->variables >> returns:
 
 =head2 INTRODUCTION
 
-Minimum version of perl required to use this module: C<v5.10.1>.
-
 This module provides an INI file reader that allows INI variables and
 environment variables to be referenced within the INI file. It also supports
 some additional assignment operators.
+
+Minimum version of perl required to use this module: C<v5.10.1>.
 
 
 =head2 OVERVIEW
@@ -1006,13 +1006,13 @@ value C<$(var)> and you write this in your INI file:
 
 This results in C<x> having the value C<$(var)>, while C<y> has the value C<hello!>.
 
-You can access configuration variables of Perl's L<Config> module with this C<$(=:CONFIG...)> notation. Example:
+You can access configuration variables of Perl's L<Config> module with this C<$(=CONFIG:...)> notation. Example:
 
   the archlib=$(=CONFIG:archlib)
 
 This gives the variable C<the archlib> the value of C<$Config{archlib}>.
 
-Note: In contrast to C<=ENV:...>, there is no lower-case counterpart to
+Note: In contrast to C<$(=ENV:...)>, there is no lower-case counterpart to
 C<$(=CONFIG:...)>, as this would not make sense.
 
 

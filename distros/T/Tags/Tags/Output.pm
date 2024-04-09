@@ -7,7 +7,7 @@ use Class::Utils qw(set_params);
 use Encode;
 use Error::Pure qw(err);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 # Constructor.
 sub new {
@@ -280,6 +280,8 @@ sub _put_begin_of_tag {
 
 	push @{$self->{'flush_code'}}, 'Begin of tag';
 
+	unshift @{$self->{'printed_tags'}}, $tag;
+
 	return;
 }
 
@@ -315,6 +317,8 @@ sub _put_end_of_tag {
 	my ($self, $tag) = @_;
 
 	push @{$self->{'flush_code'}}, 'End of tag';
+
+	shift @{$self->{'printed_tags'}};
 
 	return;
 }
@@ -566,6 +570,8 @@ Constructor.
 
 =head1 EXAMPLE
 
+=for comment filename=tags_output_example.pl
+
  use strict;
  use warnings;
 
@@ -627,12 +633,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2023 Michal Josef Špaček
+© 2005-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

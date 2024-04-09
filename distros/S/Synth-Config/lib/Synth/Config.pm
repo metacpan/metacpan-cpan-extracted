@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Synthesizer settings librarian
 
-our $VERSION = '0.0042';
+our $VERSION = '0.0046';
 
 use Moo;
 use strictures 2;
@@ -112,6 +112,7 @@ sub recall_setting {
     { id => $id },
   )->expand(json => 'settings')->hash;
   my $setting = $result->{settings};
+  $setting->{id} = $id;
   $setting->{name} = $result->{name};
   return $setting;
 }
@@ -136,9 +137,10 @@ sub search_settings {
   my $results = $self->_sqlite->query($sql);
   my @settings;
   while (my $next = $results->hash) {
-    push @settings, { $next->{id} => from_json($next->{settings}) };
-    # add the setting name to the settings data so we can use it in the templates
-    $settings[-1]->{ $next->{id} }{name} = $next->{name};
+    my $set = from_json($next->{settings});
+    $set->{id} = $next->{id};
+    $set->{name} = $next->{name};
+    push @settings, $set;
   }
   return \@settings;
 }
@@ -152,9 +154,10 @@ sub recall_all {
   my $results = $self->_sqlite->query($sql);
   my @settings;
   while (my $next = $results->hash) {
-    push @settings, { $next->{id} => from_json($next->{settings}) };
-    # add the setting name to the settings data
-    $settings[-1]->{ $next->{id} }{name} = $next->{name};
+    my $set = from_json($next->{settings});
+    $set->{id} = $next->{id};
+    $set->{name} = $next->{name};
+    push @settings, $set;
   }
   return \@settings;
 }
@@ -286,7 +289,7 @@ Synth::Config - Synthesizer settings librarian
 
 =head1 VERSION
 
-version 0.0042
+version 0.0046
 
 =head1 SYNOPSIS
 
@@ -298,6 +301,28 @@ version 0.0042
 
   my $name = 'My favorite setting';
 
+  my $id1 = $synth->make_setting(name => $name, group => 'filter', etc => '...');
+  my $id2 = $synth->make_setting(name => $name, group => 'sequencer', etc => '...');
+
+  my $setting = $synth->recall_setting(id => $id1);
+  # { id => 1, group => 'filter' }
+
+  # update the group key
+  $synth->make_setting(id => $id1, group => 'envelope');
+
+  my $settings = $synth->search_settings(name => $name);
+  # [ { id => 1, group => 'envelope', etc => '...' }, { id => 2, group => 'sequencer', etc => '...' } ]
+
+  $settings = $synth->search_settings(group => 'sequencer');
+  # [ { id => 2, group => 'sequencer', etc => '...' } ]
+
+  my $models = $synth->recall_models;
+  # [ 'moog_matriarch' ]
+
+  my $names = $synth->recall_names;
+  # [ 'My favorite setting' ]
+
+  # declare the possible settings
   my %spec = ( # default initial model specification
     order      => [qw(group parameter control group_to param_to bottom top value unit is_default)],
     group      => [],
@@ -313,34 +338,12 @@ version 0.0042
   );
   my $spec_id = $synth->make_spec(%spec);
   my $specs = $synth->recall_spec(id => $spec_id);
+
+  # remove stuff!
   $synth->remove_spec;
-
-  my $id1 = $synth->make_setting(name => $name, group => 'filter', etc => '...');
-  my $id2 = $synth->make_setting(name => $name, group => 'sequencer', etc => '...');
-
-  my $setting = $synth->recall_setting(id => $id1);
-  # { group => 'filter' }
-
-  # update the group key
-  $synth->make_setting(id => $id1, group => 'envelope');
-
-  my $settings = $synth->search_settings(name => $name);
-  # [ 1 => { group => 'envelope', etc => '...' }, 2 => { group => 'sequencer', etc => '...' } ]
-
-  $settings = $synth->search_settings(group => 'sequencer');
-  # [ 2 => { group => 'sequencer', etc => '...' } ]
-
-  my $models = $synth->recall_models;
-  # [ 'moog_matriarch' ]
-
-  my $names = $synth->recall_names;
-  # [ 'My favorite setting' ]
-
-  $synth->remove_setting(id => $id1);
-
-  $synth->remove_settings(name => $name);
-
-  $synth->remove_model(model => $model);
+  $synth->remove_setting(id => $id1);     # remove a particular setting
+  $synth->remove_settings(name => $name); # remove all setting sharing the same name
+  $synth->remove_model(model => $model);  # remove the entire model
 
 =head1 DESCRIPTION
 
@@ -407,12 +410,12 @@ Example:
   name: 'My Best Setting!'
   settings:
     group   parameter control bottom top   value unit is_default
-    filters cutoff    knob    20     20000 200   Hz   true
+    filters cutoff    knob    20     20000 200   Hz   1
 
   name: 'My Other Best Setting!'
   settings:
     group parameter control group_to param_to is_default
-    mixer output    patch   filters  vcf-1-in true
+    mixer output    patch   filters  vcf-1-in 0
 
 =head2 recall_setting
 
@@ -493,10 +496,7 @@ specification.
 
 =head1 SEE ALSO
 
-The L<Mojolicious::Lite> user interface that automates synthesizer
-configuration saving and retrieval is F<eg/synth-config-mojo.pl>.
-
-The F<t/01-methods.t> and F<eg/synth-config-cli.pl> files in this distribution
+The F<t/01-methods.t> and the F<eg/*.pl> files in this distribution
 
 L<Moo>
 
@@ -504,19 +504,13 @@ L<Mojo::JSON>
 
 L<Mojo::SQLite>
 
-Knob: L<https://codepen.io/jhnsnc/pen/KXYayG>
-
-Switch: L<https://codepen.io/magnus16/pen/grzqMz>
-
-Slider: L<?>
-
 =head1 AUTHOR
 
 Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Gene Boggs.
+This software is Copyright (c) 2023-2024 by Gene Boggs.
 
 This is free software, licensed under:
 

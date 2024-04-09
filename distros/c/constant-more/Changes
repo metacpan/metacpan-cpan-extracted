@@ -1,5 +1,9 @@
 Revision history for Perl extension constant::more
 
+v0.3.1 2024-04-009
+  [Improvements]
+  - Internal change to use current $Exporter::ExportLevel instead of assuming direct caller target
+
 v0.3.0 2023-09-13
   [Features]
   - Direct support for enumerations

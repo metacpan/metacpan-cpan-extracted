@@ -1,4 +1,10 @@
-0.007 - 2023-10-17, H.Merijn Brand
+0.008 - 2024-04-08, H.Merijn Brand
+    * Prevent warning if report is incomplete
+    * It is 2024
+    * Skip version lines in reports from cve.pl with only n/a
+    * Prefer Data::Peek over Data::Dumper on cve.pl -d (no hard dependency)
+
+0.007 - 2023-10-14, H.Merijn Brand
     * Transfered authority to CPAN-Security
     * Update docs for groff-1.24
     * Better SKIP in xt (pr#10, Haelwenn)

@@ -1,17 +1,26 @@
 #!/usr/bin/perl
 
-# Copyright Toolchain Gang / CPAN Security group (c) 2023-2023 H.Merijn Brand
+# Copyright Toolchain Gang / CPAN Security group (c) 2023-2024 H.Merijn Brand
 
 require 5.014000;
 
 use ExtUtils::MakeMaker;
 
+my @exe;
+unless (exists $ENV{AUTOMATED_TESTING} and $ENV{AUTOMATED_TESTING} == 1) {
+    for ( [ "cpan-cve.pl", "to check dist folder or file against known CVE's" ],
+	  ) {
+	prompt ("Do you want to install '$_->[0]'\n   $_->[1] ?", "y") =~ m/[Yy]/ and
+	    push @exe, "scripts/$_->[0]";
+	}
+    }
 my %wm = (
     NAME		=> "Test::CVE",
     DISTNAME		=> "Test-CVE",
     ABSTRACT		=> "Test current release against CVE's",
     AUTHOR		=> "H.Merijn Brand <hmbrand\@cpan.org>",
     VERSION_FROM	=> "lib/Test/CVE.pm",
+    EXE_FILES		=> \@exe,
     LICENSE		=> "perl",
     PREREQ_PM		=> { "version"		=> 0,
 			     "HTTP::Tiny"	=> 0,

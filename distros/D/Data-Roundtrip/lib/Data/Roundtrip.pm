@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 # import params is just one 'no-unicode-escape-permanently'
 # if set, then unicode escaping will not happen at
@@ -72,10 +72,14 @@ BEGIN {
 	my @io = (@file, @fh);
 	my @json = qw{perl2json json2perl json2dump json2yaml json2json jsonfile2perl};
 	my @yaml = qw{perl2yaml yaml2perl yaml2json yaml2dump yaml2yaml yamlfile2perl};
-	my @dump = qw{perl2dump perl2dump_filtered perl2dump_homebrew
-		      dump2perl dump2json dump2yaml dump2dump};
+	my @dump = qw{perl2dump perl2dump_filtered perl2dump_homebrew};
+	# these have now (v0.28) been removed from @dump: dump2perl dump2json dump2yaml dump2dump
+	# they need to be explicitly imported *individually*
+	# because of the danger that the eval() in dump2perl()
+	# poses. They can not imported with any EXPORT_TAG
+	my @explicit = qw{dump2perl dump2json dump2yaml dump2dump};
 	my @all = (@io, @json, @yaml, @dump);
-	@EXPORT_OK = @all;
+	@EXPORT_OK = (@all, @explicit);
 	%EXPORT_TAGS = (
 	    file => [@file],
 	    fh   => [@fh],
@@ -360,6 +364,9 @@ sub	dump2perl {
 	# output from Data::Dump. Are you sure you trust
 	# the input string ($dump_string) for an eval() ?
 	# WARNING-2: I am considering removing this sub in future releases because of the eval()
+
+	# VERSION 0.28: this now needs to be imported explicitly
+
 	my $dump_string = $_[0];
 	#my $params = defined($_[1]) ? $_[1] : {};
 
@@ -648,7 +655,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =head1 SYNOPSIS
 
@@ -775,16 +782,20 @@ C<yamlfile2perl()>
 =item * C<:dump> :
 C<perl2dump()>,
 C<perl2dump_filtered()>,
-C<perl2dump_homebrew()>,
-C<dump2perl()>,
-C<dump2json()>,
-C<dump2yaml()>
+C<perl2dump_homebrew()>
 
 =item * C<:io> :
 C<read_from_file()>, C<write_to_file()>,
 C<read_from_filehandle()>, C<write_to_filehandle()>,
 
-=item * C<:all> : everything above
+=item * C<:all> : everything above.
+
+=item * Additionally, these four subs: C<dump2perl()>, C<dump2json()>, C<dump2yaml()>, C<dump2dump()>
+do not belong to any export tag. However they can be imported explicitly by the caller
+in the usual way (e.g. C<use Data::Roundtrip qw/dump2perl perl2json .../>).
+Section CAVEATS, under L</dump2perl>, describes how these
+subs C<eval()> a string possibly coming from user,
+possibly being unchecked.
 
 =item * C<no-unicode-escape-permanently> : this is not an
 export keyword/parameter but a parameter which affects
@@ -887,7 +898,7 @@ and/or prettify the returned result with C<< 'pretty' => 1 >>.
 The output can be fed back to L</json2perl>
 for getting the Perl variable back.
 
-Returns the JSON string on success or C<undef> on failure.
+It returns the JSON string on success or C<undef> on failure.
 
 =head2 C<json2perl>
 
@@ -911,7 +922,7 @@ Given an input C<$jsonstring> as a string, it will return
 the equivalent Perl data structure using
 C<JSON::decode_json(Encode::encode_utf8($jsonstring))>.
 
-Returns the Perl data structure on success or C<undef> on failure.
+It returns the Perl data structure on success or C<undef> on failure.
 
 =head2 C<perl2yaml>
 
@@ -943,7 +954,7 @@ C<< 'escape-unicode' => 1 >>. Prettify is not supported yet.
 The output can be fed to L</yaml2perl>
 for getting the Perl variable back.
 
-Returns the YAML string on success or C<undef> on failure.
+It returns the YAML string on success or C<undef> on failure.
 
 =head2 C<yaml2perl>
 
@@ -969,7 +980,7 @@ Given an input C<$yamlstring> as a string, it will return
 the equivalent Perl data structure using
 C<YAML::PP::Load($yamlstring)>
 
-Returns the Perl data structure on success or C<undef> on failure.
+It returns the Perl data structure on success or C<undef> on failure.
 
 =head2 C<yamlfile2perl>
 
@@ -994,7 +1005,7 @@ Return value:
 Given an input C<$filename> which points to a file containing YAML content,
 it will return the equivalent Perl data structure.
 
-Returns the Perl data structure on success or C<undef> on failure.
+It returns the Perl data structure on success or C<undef> on failure.
 
 =head2 C<perl2dump>
 
@@ -1131,6 +1142,7 @@ Deep not long! But it probably is as efficient as
 it can be but definetely lacks in aesthetics
 and functionality compared to Dump and Dumper.
 
+
 =head2 C<dump_perl_var_recursively>
 
     my $ret = dump_perl_var_recursively($perl_var)
@@ -1247,7 +1259,7 @@ Given an input C<$jsonstring> as a string, it will return
 the equivalent Perl data structure using
 C<JSON::decode_json(Encode::encode_utf8($jsonstring))>.
 
-Returns the Perl data structure on success or C<undef> on failure.
+It returns the Perl data structure on success or C<undef> on failure.
 
 =head2 C<jsonfile2perl>
 
@@ -1272,7 +1284,7 @@ Return value:
 Given an input C<$filename> which points to a file containing JSON content,
 it will return the equivalent Perl data structure.
 
-Returns the Perl data structure on success or C<undef> on failure.
+It returns the Perl data structure on success or C<undef> on failure.
 
 =head2 C<json2yaml>
 
@@ -1303,7 +1315,7 @@ converting that variable to YAML using L</perl2yaml>.
 All the parameters supported by L</perl2yaml>
 are accepted.
 
-Returns the YAML string on success or C<undef> on failure.
+It returns the YAML string on success or C<undef> on failure.
 
 =head2 C<yaml2json>
 
@@ -1334,7 +1346,7 @@ converting that variable to JSON using L</perl2json>.
 All the parameters supported by L</perl2json>
 are accepted.
 
-Returns the JSON string on success or C<undef> on failure.
+It returns the JSON string on success or C<undef> on failure.
 
 =head2 C<json2json> C<yaml2yaml>
 
@@ -1344,7 +1356,54 @@ like above will be accepted.
 
 =head2 C<json2dump> C<dump2json> C<yaml2dump> C<dump2yaml>
 
-similar functionality as their counterparts described above.
+These subs offer similar functionality as their counterparts
+described above.
+
+Section CAVEATS, under L</dump2perl>, describes how
+C<dump2*()> subs C<eval()> a string possibly coming from user,
+possibly being unchecked.
+
+=head2 C<dump2dump>
+
+  my $ret = dump2dump($dumpstring, $optional_paramshashref)
+
+Arguments:
+
+=over 4
+
+=item * C<$dumpstring>
+
+=item * C<$optional_paramshashref>
+
+=back
+
+Return value:
+
+=over 4
+
+=item * C<$ret>
+
+=back
+Given an input string C<$dumpstring>, which can
+have been produced by e.g. C<perl2dump()>
+and is identical to L<Data::Dumper>'s C<Dumper()> output,
+it will roundtrip back to the same string,
+possibly with altered format via the parameters in C<$optional_paramshashref>.
+
+For example:
+
+  my $dumpstr = '...';
+  my $newdumpstr = dump2dump(
+    $dumpstr,
+    {
+      'dont-bloody-escape-unicode' => 1,
+      'terse' => 0,
+    }
+  );
+
+
+It returns the a dump string similar to 
+
 
 =head2 C<read_from_file>
 
@@ -1371,7 +1430,7 @@ contents and closes it. It's a convenience sub which could have also
 been private. If you want to retain the filehandle, use
 L</read_from_filehandle>.
 
-Returns the file contents on success or C<undef> on failure.
+It returns the file contents on success or C<undef> on failure.
 
 =head2 C<read_from_filehandle>
 
@@ -1395,7 +1454,7 @@ Return value:
 
 It slurps all content from the specified input file handle. Upon return
 the file handle is still open.
-Returns the file contents on success or C<undef> on failure.
+It returns the file contents on success or C<undef> on failure.
 
 =head2 C<write_to_file>
 
@@ -1425,7 +1484,7 @@ It's a convenience sub which could have also
 been private. If you want to retain the filehandle, use
 L</write_to_filehandle>.
 
-Returns 1 on success or 0 on failure.
+It returns 1 on success or 0 on failure.
 
 =head2 C<write_to_filehandle>
 
@@ -1450,7 +1509,7 @@ Return value:
 It writes content to the specified file handle. Upon return
 the file handle is still open.
 
-Returns 1 on success or 0 on failure.
+It returns 1 on success or 0 on failure.
 
 =head1 SCRIPTS
 
@@ -1507,6 +1566,22 @@ on C<YAML*> too.
 For now, the plan is to still use L<YAML::PP> and avoid explicitly requiring
 L<YAML::XS> until L<YAML::Any> is ready.
 
+Be warned that sub C<dump2perl()> C<eval()>'s
+its input. If this comes from the user and
+it is not checked then it is considered a security
+problem. Subs C<dump2json()>, C<dump2yaml()>, C<dump2dump()>
+use C<dump2perl()>. The four subs will issue a warning whenever
+you call them. Additionally, as from version 0.28, they need
+to be explicitly imported like:
+
+    use Data::Roundtrip qw/... dump2perl .../
+
+They are no longer part of export tag C<:dump> nor C<:all>.
+If their input comes from the user please check the input
+not to contain malicious code which when C<eval()>'ed
+can create security concerns.
+
+
 =head1 AUTHOR
 
 Andreas Hadjiprocopis, C<< <bliako at cpan.org> / <andreashad2 at gmail.com> >>
@@ -1546,9 +1621,9 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Roundtrip>
 
 L<http://annocpan.org/dist/Data-Roundtrip>
 
-=item * CPAN Ratings
+=item * Review this module at PerlMonks
 
-L<https://cpanratings.perl.org/d/Data-Roundtrip>
+L<https://www.perlmonks.org/?node_id=21144>
 
 =item * Search CPAN
 
