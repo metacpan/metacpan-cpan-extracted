@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,12 +26,12 @@ requires:
   URI::Escape::XS: '0'
   URI::QueryParam: '0'
   XML::Simple: '0'
-  experimental: '0'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/nupfel/Web-API/issues
   homepage: https://github.com/nupfel/Web-API/wiki
   repository: git://github.com/nupfel/Web-API.git
-version: '2.7'
-x_generated_by_perl: v5.27.0
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '2.8'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: BSD-3-Clause

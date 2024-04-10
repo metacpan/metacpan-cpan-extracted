@@ -263,7 +263,7 @@ subtest 'http managed, concurrent enabled' => sub {
 	lives_ok { $s->execute_write(sub {
 		shift->run('foo');
 		$r1 = $s->run('');
-		$r2 = $s->execute_write(sub { shift->run('bar') });
+		$s->execute_write(sub { $r2 = shift->run('bar'); 1 });
 	})} 'concurrent in execute lives';
 	isa_ok $r1, Neo4j::Driver::Result::, 'run auto result';
 	isa_ok $r2, Neo4j::Driver::Result::, 'execute result';
@@ -279,7 +279,7 @@ subtest 'http managed, concurrent disabled' => sub {
 	lives_ok { $s->execute_write(sub {
 		shift->run('foo');
 		$w1 = warning { $r1 = $s->run(''); };
-		$w2 = warning { $r2 = $s->execute_write(sub { shift->run('bar') }); };
+		$w2 = warning { $s->execute_write(sub { $r2 = shift->run('bar'); 1 }); };
 	})} 'concurrent in execute lives';
 	like $w1, qr/\bConcurrent transactions\b/i, 'auto in execute warns'
 		or diag 'got warning(s): ', explain $w1;

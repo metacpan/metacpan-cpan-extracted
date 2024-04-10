@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 171;
+use Test::Most tests => 173;
 use Test::NoWarnings;
 use File::Spec;
 use lib 't/lib';
@@ -434,6 +434,11 @@ EOF
 	ok($p{fred} eq 'wilma');
 	ok($i->as_string() eq 'foo=bar;fred=wilma');
 	ok(!$i->is_mobile());
+
+	@ARGV= ('file=/../../../../etc/passwd%00');
+	$i = new_ok('CGI::Info');
+	%p = %{$i->params()};
+	like($p{'file'}, qr/passwd$/, 'strip null byte poison');
 
 	@ARGV = ('--mobile', 'foo=bar', 'fred=wilma' );
 	$i = new_ok('CGI::Info');

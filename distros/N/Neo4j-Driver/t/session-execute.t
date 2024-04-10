@@ -5,7 +5,7 @@ use lib qw(./lib t/lib);
 
 use Test::More 0.94;
 use Test::Exception;
-use Test::Warnings 0.010 qw(:no_end_test);
+use Test::Warnings 0.010 qw(warning :no_end_test);
 my $no_warnings;
 use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
@@ -22,7 +22,7 @@ use Neo4j_Test;
 use Neo4j_Test::EchoHTTP;
 use Neo4j_Test::MockQuery;
 
-plan tests => 8 + $no_warnings;
+plan tests => 9 + $no_warnings;
 
 
 my ($d, $s, $r, @r);
@@ -109,8 +109,8 @@ subtest 'server error with retry' => sub {
 	# Temporary error, retry eventually succeeds
 	$try = 0;
 	lives_ok {
-		$r = 0; $r = $s->execute_read(sub {
-			++$try < 2 ? shift->run('error') : shift->run('foo')
+		$s->execute_read(sub {
+			$r = ++$try < 2 ? shift->run('error') : shift->run('foo')
 		});
 	} 'retry lives';
 	is $try, 2, 'succeeds on 2nd try';
@@ -186,6 +186,22 @@ subtest 'usage errors' => sub {
 	throws_ok {
 		$s->execute_read(sub { shift->rollback });
 	} qr/\brollback\b.*\bmanaged transaction\b/i, 'explicit rollback';
+};
+
+
+subtest 'warn when returning the result' => sub {
+	plan tests => 3;
+	$s = Neo4j::Driver->new->plugin($echo)->session;
+	my ($w, $rr);
+	lives_and {
+		$w = warning { $rr = scalar $s->execute_read(sub { $r = $s->run }) };
+		is $rr, $r;
+	} 'returning result allowed';
+	like $w, qr/\bResult object\b.*valid\b/i, 'returning result: warning in scalar context'
+		or diag 'got warning(s): ', explain $w;
+	$w = warning { $s->execute_read(sub { $s->run }) };
+	ok ref $w eq 'ARRAY' && ! @$w, 'returning result: no warning in void context'
+		or diag 'got warning(s): ', explain $w;
 };
 
 

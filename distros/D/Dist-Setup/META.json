@@ -52,6 +52,7 @@
             "Test::Pod" : "1.22"
          },
          "requires" : {
+            "CPAN::Common::Index::Mux::Ordered" : "0",
             "Readonly" : "0",
             "Test2::V0" : "0",
             "Test::CPANfile" : "0",
@@ -74,6 +75,6 @@
          "web" : "https://github.com/mkende/perl_dist_setup"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -44,7 +44,7 @@ if($ENV{'HTTP_COOKIE'}) {
 		"Cookies:\n";
 
 	foreach my $cookie(split (/; /, $ENV{'HTTP_COOKIE'})) {
-	        my ($key, $value) = split(/=/, $cookie);
+		my ($key, $value) = split(/=/, $cookie);
 
 		print "Cookie $key:\n";
 		my $c = $info->get_cookie(cookie_name => $key);

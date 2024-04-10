@@ -4,8 +4,14 @@ on 'configure' => sub {
   requires 'perl', '[% dotted_min_perl_version %]';
   requires 'ExtUtils::MakeMaker::CPANfile', '0.0.9';
 };
-
+[% IF data_dir %]
+requires 'File::ShareDir';
+on 'configure' => sub {
+  requires 'File::ShareDir::Install';
+};
+[% END %]
 on 'test' => sub {
+  requires 'CPAN::Common::Index::Mux::Ordered';
   requires 'Test::CPANfile';
   requires 'Test::More';
   requires 'Test2::V0';

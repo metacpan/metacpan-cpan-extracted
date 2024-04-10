@@ -373,8 +373,8 @@ subtest 'structural types paths v2' => sub {
 
 subtest 'type errors' => sub {
 	plan tests => 2 + 12;
-	throws_ok { $s->run('bool error') } qr/\bAssertion failed: unexpected bool value\b/i, 'bool';
-	throws_ok { $s->run('sigil error') } qr/\bAssertion failed: unexpected sigil\b/i, 'sigil';
+	throws_ok { $s->run('bool error')->has_next } qr/\bAssertion failed: unexpected bool value\b/i, 'bool';
+	throws_ok { $s->run('sigil error')->has_next } qr/\bAssertion failed: unexpected sigil\b/i, 'sigil';
 	# legacy numeric ids can only be derived from element id format version 1
 	lives_and { ok $r = $s->run('element id format version error') } 'run';
 	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get nDLV';

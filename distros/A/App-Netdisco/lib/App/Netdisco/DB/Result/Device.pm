@@ -322,9 +322,12 @@ sub renumber {
   my $old_ip = $device->ip;
   my $new_ip = $new_addr->addr;
 
-  return
-    if $new_ip eq '0.0.0.0'
-    or $new_ip eq '127.0.0.1';
+  return if $new_ip eq '0.0.0.0';
+
+  # the special record in device_ip which is always there
+  $schema->resultset('DeviceIp')
+    ->search({ip => $old_ip, alias => $old_ip})
+    ->update({ip => $new_ip, alias => $new_ip});
 
   # Community is not included as SNMP::test_connection will take care of it
   foreach my $set (qw/
@@ -360,6 +363,28 @@ sub renumber {
   $schema->resultset('Node')
     ->search({switch => $old_ip})
     ->update({switch => $new_ip});
+
+  # this whole shenanigans exists because I cannot work out how to
+  # pass an escaped SQL placeholder into DBIx::Class/SQL::Abstract
+  # see https://www.mail-archive.com/dbix-class@lists.scsys.co.uk/msg07079.html
+  $schema->storage->dbh_do(sub {
+    my ($storage, $dbh, @extra) = @_;
+    local $dbh->{TraceLevel} = ($ENV{DBIC_TRACE} ? '1|SQL' : $dbh->{TraceLevel});
+
+    my $router_first_sql = q{
+      UPDATE node_ip
+        SET seen_on_router_first = seen_on_router_first - ?::text || jsonb_build_object(?::text, seen_on_router_first -> ?::text)
+        WHERE seen_on_router_first \? ?::text
+    };
+    $dbh->do($router_first_sql, undef, $old_ip, $new_ip, $old_ip, $old_ip);
+
+    my $router_last_sql = q{
+      UPDATE node_ip
+        SET seen_on_router_last = seen_on_router_last - ?::text || jsonb_build_object(?::text, seen_on_router_last -> ?::text)
+        WHERE seen_on_router_last \? ?::text
+    };
+    $dbh->do($router_last_sql, undef, $old_ip, $new_ip, $old_ip, $old_ip);
+  });
 
   $schema->resultset('Topology')
     ->search({dev1 => $old_ip})

@@ -41,7 +41,7 @@ sub mock_jolt {
 
 
 # Trigger Jolt.pm to load DateTime.pm (with require instead of use to allow for 1.00)
-$s->run(mock_jolt { 'T' => '00:00:00' });
+$s->run(mock_jolt { 'T' => '00:00:00' })->fetch;
 
 SKIP: { skip '(Time-Piece#47: strftime broken on Win32)', 1 if $^O =~ /Win32/;
 neo4j_datetime_ok 'Neo4j::Driver::Type::DateTime', sub {
@@ -181,7 +181,7 @@ subtest 'ZonedDateTime non-standard offsets' => sub {
 
 
 # Trigger Jolt.pm to load DateTime.pm (with require instead of use to allow for 1.00)
-$s->run(mock_jolt { 'T' => 'PT0S' });
+$s->run(mock_jolt { 'T' => 'PT0S' })->fetch;
 
 neo4j_duration_ok 'Neo4j::Driver::Type::Duration', sub {
 	my ($class, $params) = @_;

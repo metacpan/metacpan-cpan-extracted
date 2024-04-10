@@ -6,7 +6,9 @@ META.json
 META.yml
 Makefile.PL
 README
+TODO+.pod
 cpanfile
+jolt.pl
 lib/Neo4j/Driver.pm
 lib/Neo4j/Driver/Config.pod
 lib/Neo4j/Driver/Deprecations.pod
@@ -40,6 +42,8 @@ lib/Neo4j/Driver/Type/Relationship.pm
 lib/Neo4j/Driver/Type/Temporal.pm
 lib/Neo4j/Driver/Types.pod
 lib/URI/neo4j.pm
+run.pl
+stream.pl
 t/bolt.t
 t/config.t
 t/deprecated.t

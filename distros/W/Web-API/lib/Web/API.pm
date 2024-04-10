@@ -2,11 +2,10 @@ package Web::API;
 
 use 5.010001;
 use Mouse::Role;
-use experimental 'smartmatch';
 
 # ABSTRACT: A Simple base module to implement almost every RESTful API with just a few lines of configuration
 
-our $VERSION = '2.7'; # VERSION
+our $VERSION = '2.8'; # VERSION
 
 use LWP::UserAgent;
 use HTTP::Cookies 6.04;
@@ -373,18 +372,18 @@ sub decode {
             $data = $self->decoder->($content, $content_type);
         }
         else {
-            given ($content_type) {
-                when (/urlencoded/) {
+            for ($content_type) {
+                if (/urlencoded/) {
                     foreach (split(/&/, $content)) {
                         my ($key, $value) = split(/=/, $_);
                         $data->{ uri_unescape($key) } = uri_unescape($value);
                     }
                 }
-                when (/json/) { $data = $self->json->decode($content); }
-                when (/(xml|html)/) {
+                elsif (/json/) { $data = $self->json->decode($content); }
+                elsif (/(xml|html)/) {
                     $data = $self->xml->XMLin($content, NoAttr => 0);
                 }
-                default {
+                else {
                     $data = { text => $content };
                 }
             }
@@ -414,16 +413,16 @@ sub encode {
             $payload = $self->encoder->($options, $content_type);
         }
         else {
-            given ($content_type) {
-                when (/urlencoded/) {
+            for ($content_type) {
+                if (/urlencoded/) {
                     $payload .=
                         uri_escape($_) . '=' . uri_escape($options->{$_}) . '&'
                         foreach (keys %$options);
                     chop($payload);
                 }
-                when (/json/) { $payload = $self->json->encode($options); }
-                when (/xml/)  { $payload = $self->xml->XMLout($options); }
-                default {
+                elsif (/json/) { $payload = $self->json->encode($options); }
+                elsif (/xml/)  { $payload = $self->xml->XMLout($options); }
+                else {
                     if (exists $options->{payload}
                         and defined $options->{payload})
                     {
@@ -447,13 +446,13 @@ sub talk {
     my $oauth_req;
 
     # handle different auth_types
-    given (lc $self->auth_type) {
-        when ('basic') { $uri->userinfo($self->user . ':' . $self->api_key); }
-        when ('header') {
+    for (lc $self->auth_type) {
+        if ('basic') { $uri->userinfo($self->user . ':' . $self->api_key); }
+        elsif ('header') {
             $self->header->{ $self->auth_header } =
                 sprintf($self->auth_header_token_format, $self->api_key);
         }
-        when ('hash_key') {
+        elsif ('hash_key') {
             my $api_key_field = $self->api_key_field;
             if ($self->mapping and not $command->{no_mapping}) {
                 $self->log("mapping api_key_field: " . $self->api_key_field)
@@ -463,13 +462,13 @@ sub talk {
             }
             $options->{$api_key_field} = $self->api_key;
         }
-        when ('get_params') {
+        elsif ('get_params') {
             $uri->query_form(
                 $self->mapping->{user}    || 'user'    => $self->user,
                 $self->mapping->{api_key} || 'api_key' => $self->api_key,
             );
         }
-        when (/^oauth/) {
+        elsif (/^oauth/) {
             my %opts = (
                 consumer_key     => $self->api_key,
                 consumer_secret  => $self->consumer_secret,
@@ -493,7 +492,7 @@ sub talk {
             $oauth_req = Net::OAuth->request("protected resource")->new(%opts);
             $oauth_req->sign;
         }
-        default {
+        else {
             $self->log(
                 "WARNING: auth_type " . $self->auth_type . " not supported yet")
                 unless (lc($self->auth_type) eq 'none');
@@ -719,7 +718,11 @@ sub needs_retry {
     $self->log("response code was: " . $response->code)
         if $self->debug;
 
-    return 1 if $response->code ~~ $self->retry_http_codes;
+    if ($self->retry_http_codes) {
+        for my $retry_http_code (@{$self->retry_http_codes}) {
+            return 1 if $response->code == $retry_http_code;
+        }
+    }
 
     if (    $self->retry_errors
         and scalar(@{ $self->retry_errors })
@@ -915,8 +918,10 @@ sub AUTOLOAD {
         # in the next step
         my $query_keys;
         foreach my $key (keys %$options) {
-            $query_keys->{$key} = delete $options->{$key}
-                if $key ~~ $self->commands->{$command}->{query_keys};
+            my $command_query_keys = $self->commands->{$command}->{query_keys} || [];
+            for my $command_query_key (@$command_query_keys) {
+                $query_keys->{$key} = delete $options->{$key} if $key eq $command_query_key;
+            }
         }
 
         # finally wrap all options in wrapper key(s) if requested
@@ -953,7 +958,7 @@ Web::API - A Simple base module to implement almost every RESTful API with just 
 
 =head1 VERSION
 
-version 2.7
+version 2.8
 
 =head1 SYNOPSIS
 

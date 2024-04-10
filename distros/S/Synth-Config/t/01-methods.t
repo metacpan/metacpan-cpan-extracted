@@ -109,6 +109,30 @@ subtest settings => sub {
   is_deeply $settings, [], 'remove_settings';
 };
 
+subtest specs => sub {
+  my $expect = {
+    order      => [qw(group parameter control group_to param_to bottom top value unit is_default)],
+    group      => [],
+    parameter  => {},
+    control    => [qw(knob switch slider patch)],
+    group_to   => [],
+    param_to   => [],
+    bottom     => [qw(off 0 1 7AM 20)],
+    top        => [qw(on 3 4 6 7 5PM 20_000 100%)],
+    value      => [],
+    unit       => [qw(Hz o'clock)],
+    is_default => [0, 1],
+  };
+  my $id = $obj->make_spec(%$expect);
+  ok $id, 'make_spec';
+  my $got = $obj->recall_spec(id => $id);
+  $expect->{id} = $id;
+  is_deeply $got, $expect, 'recall_spec';
+  $got = $obj->recall_specs;
+  $expect->{model} = $obj->model;
+  is_deeply $got, $expect, 'recall_specs';
+};
+
 subtest cleanup => sub {
   # remove the model
   $obj->remove_model(model => $model);

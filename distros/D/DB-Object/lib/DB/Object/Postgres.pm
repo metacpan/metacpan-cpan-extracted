@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres.pm
-## Version v1.1.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v1.2.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/03/16
+## Modified 2024/04/09
 ## All rights reserved
 ## 
 ## 
@@ -464,7 +464,7 @@ BEGIN
         },
     };
     our $PLACEHOLDER_REGEXP = qr/(?:\?|\$(?<index>\d+))/;
-    our $VERSION = 'v1.1.0';
+    our $VERSION = 'v1.2.0';
     use Devel::Confess;
 };
 
@@ -667,7 +667,7 @@ sub attribute($;$@)
     # Using an a non existing attribute produce an exception, so we better avoid
     if( $name )
     {
-        return( $self->{ 'dbh' }->{ $name } ) if( exists( $attr{ $name } ) );
+        return( $self->{dbh}->{ $name } ) if( exists( $attr{ $name } ) );
     }
     else
     {
@@ -680,7 +680,7 @@ sub attribute($;$@)
                 defined( $value ) && 
                 $attr{ $name } )
             {
-                $self->{ 'dbh' }->{ $name } = $value;
+                $self->{dbh}->{ $name } = $value;
             }
         }
     }
@@ -1210,9 +1210,41 @@ SQL
 # See DB::Object
 # sub param
 
+sub pg_notifies
+{
+    my $self = shift( @_ );
+    my $dbh;
+    if( $self->{dbh} )
+    {
+        $dbh = $self->{dbh};
+    }
+    elsif( $self->can( 'database_object' ) )
+    {
+        $dbh = $self->database_object ||
+            return( $self->error( "No database object is set on this table object." ) );
+        $dbh = $dbh->{dbh} || return( $self->error( "No database handler is set on our database object." ) );
+    }
+    else
+    {
+        return( $self->error( "The object of class ", ( ref( $self ) || $self ), " has no property 'dbh'." ) );
+    }
+
+    # try-catch
+    local $@;
+    my $ref = eval
+    {
+        $dbh->pg_notifies;
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error calling PostgreSQL function pg_notifies: $@" ) );
+    }
+    return( $ref );
+}
+
 sub pg_ping(@)
 {
-    return( shift->{ 'dbh' }->pg_ping );
+    return( shift->{dbh}->pg_ping );
 }
 
 # See DB::Object
@@ -1900,7 +1932,7 @@ DB::Object::Postgres - SQL API
     
 =head1 VERSION
 
-    v1.1.0
+    v1.2.0
 
 =head1 DESCRIPTION
 

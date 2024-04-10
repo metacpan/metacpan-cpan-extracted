@@ -8,7 +8,6 @@ use Data::Dumper::Compact qw(ddc);
 use Mojo::JSON qw(to_json);
 use Mojo::File ();
 use Mojo::Util qw(trim);
-use Storable qw(store retrieve);
 
 use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Synth-Config); # local author library
 use Synth::Config ();
@@ -26,12 +25,10 @@ get '/' => sub ($c) {
   $fields = trim($fields) if $fields;
   my $synth = Synth::Config->new(model => $model, verbose => 1);
   if ($model) {
-    # TODO save the specs config file IN THE DATABASE please
-    # get a specs config file for the synth model
-    my $set_file = SETTINGS . $synth->model . '.dat';
-    my $specs = -e $set_file ? retrieve($set_file) : undef;
+    # get a specs config for the synth model
+    my $specs = $synth->recall_specs;
     # get the known groups if there are specs
-    $groups = $specs ? $specs->{group} : undef;
+    $groups = $specs && @$specs ? $specs->{group} : undef;
     # fetch the things!
     if ($group || $name || $fields) {
       my %parameters;
@@ -93,9 +90,8 @@ post '/model' => sub ($c) {
   my $synth = Synth::Config->new(model => $v->param('model'));
   my $group_params = $c->every_param('group');
   if (@$group_params) {
-    my $model_file = SETTINGS . $synth->model . '.dat';
     my @groups = split /\s*,\s*/, $v->param('groups');
-    my $specs = -e $model_file ? retrieve($model_file) : undef;
+    my $specs = $synth->recall_specs;
     my $i = 0;
     for my $g (@groups) {
       $specs->{parameter}{$g} = [ split /\s*,\s*/, $group_params->[$i] ];
@@ -103,13 +99,12 @@ post '/model' => sub ($c) {
     }
     if ($v->param('clone')) {
       $synth = Synth::Config->new(model => $v->param('clone'));
-      $model_file = SETTINGS . $synth->model . '.dat';
-      store($specs, $model_file);
+      my $spec_id = $synth->make_spec(%$specs);
       $c->flash(message => 'Clone model successful');
       return $c->redirect_to($c->url_for('index')->query(model => $v->param('clone')));
     }
     else {
-      store($specs, $model_file);
+      my $spec_id = $synth->make_spec(%$specs);
       $c->flash(message => 'Update parameters successful');
       return $c->redirect_to($c->url_for('index')->query(model => $v->param('model')));
     }
@@ -123,8 +118,7 @@ post '/model' => sub ($c) {
     }
     $specs->{group} = [ split /\s*,\s*/, $v->param('groups') ];
     $specs->{parameter}{$_} = [] for $specs->{group}->@*;
-    my $model_file = SETTINGS . $synth->model . '.dat';
-    store($specs, $model_file);
+    my $spec_id = $synth->make_spec(%$specs);
     $c->flash(message => 'Add model successful');
     return $c->redirect_to($c->url_for('model')->query(model => $v->param('model'), groups => $v->param('groups')));
   }
@@ -138,8 +132,7 @@ get '/edit_model' => sub ($c) {
     return $c->redirect_to($c->url_for('index')->query(model => $v->param('model')));
   }
   my $synth = Synth::Config->new(model => $v->param('model'));
-  my $model_file = SETTINGS . $synth->model . '.dat';
-  my $specs = -e $model_file ? retrieve($model_file) : undef;
+  my $specs = $synth->recall_specs;
   my $groups = exists $specs->{group} ? join ',', $specs->{group}->@* : undef;
   $c->render(
     template   => 'edit_model',
@@ -174,8 +167,6 @@ get '/remove' => sub ($c) {
   }
   elsif ($synth->model && !$v->param('name')) {
     $synth->remove_model;
-    my $model_file = Mojo::File->new(SETTINGS . $synth->model . '.dat');
-    $model_file->remove;
     $c->flash(message => 'Remove model successful');
     return $c->redirect_to('index');
   }
@@ -199,9 +190,7 @@ get '/edit_setting' => sub ($c) {
   $model = trim($model) if $model;
   $name  = trim($name)  if $name;
   my $synth = Synth::Config->new(model => $model);
-  # get a specs config file for the synth model
-  my $set_file = SETTINGS . $synth->model . '.dat';
-  my $specs = -e $set_file ? retrieve($set_file) : undef;
+  my $specs = $synth->recall_specs;
   unless ($specs) {
     $c->flash(error => 'No known model');
     return $c->redirect_to('index');
@@ -257,9 +246,7 @@ post '/update_setting' => sub ($c) {
   my $name  = trim $v->param('name')  if $v->param('name');
   my $value = trim $v->param('value') if defined $v->param('value');
   my $synth = Synth::Config->new(model => $model);
-  # get a specs config file for the synth model
-  my $set_file = SETTINGS . $synth->model . '.dat';
-  my $specs = -e $set_file ? retrieve($set_file) : undef;
+  my $specs = $synth->recall_specs;
   my $id = $synth->make_setting(
     id         => $v->param('id'),
     name       => $name,

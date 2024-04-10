@@ -91,13 +91,13 @@ my $mock_plugin = Neo4j_Test::MockHTTP->new;
 {
 no warnings 'qw';
 $mock_plugin->response_for(undef, 'zero notes' => { jolt => [qw(
-	{"header":{}} {"summary":{"stats":{}}} {"info":{}}
+	{"header":{"fields":[]}} {"summary":{"stats":{}}} {"info":{}}
 )]});
 $mock_plugin->response_for(undef, 'one note' => { jolt => [qw(
-	{"header":{}} {"summary":{"stats":{}}} {"info":{"notifications":["foobaz"]}}
+	{"header":{"fields":[]}} {"summary":{"stats":{}}} {"info":{"notifications":["foobaz"]}}
 )]});
 $mock_plugin->response_for(undef, 'two notes' => { jolt => [qw(
-	{"header":{}} {"summary":{"stats":{}}} {"info":{"notifications":["foo","bar"]}}
+	{"header":{"fields":[]}} {"summary":{"stats":{}}} {"info":{"notifications":["foo","bar"]}}
 )]});
 }
 subtest 'summary notifications() wantarray' => sub {

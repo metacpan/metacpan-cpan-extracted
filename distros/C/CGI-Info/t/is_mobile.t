@@ -10,7 +10,7 @@ BEGIN {
 }
 
 MOBILE: {
-        delete $ENV{'HTTP_X_WAP_PROFILE'};
+	delete $ENV{'HTTP_X_WAP_PROFILE'};
 	delete $ENV{'HTTP_USER_AGENT'};
 
 	my $i = new_ok('CGI::Info');
@@ -22,7 +22,7 @@ MOBILE: {
 	ok($i->is_mobile() == 1);
 	ok($i->browser_type eq 'mobile');
 
-        delete $ENV{'HTTP_X_WAP_PROFILE'};
+	delete $ENV{'HTTP_X_WAP_PROFILE'};
 	$ENV{'HTTP_SEC_CH_UA_MOBILE'} = '?0';
 	$i = new_ok('CGI::Info');
 	cmp_ok($i->is_mobile(), '==', 0, 'CH_UA_MOBILE = 0 => !mobile');

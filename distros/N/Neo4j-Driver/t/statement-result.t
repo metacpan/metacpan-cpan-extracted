@@ -60,7 +60,7 @@ my $mock_plugin = Neo4j_Test::MockHTTP->new;
 {
 no warnings 'qw';
 $mock_plugin->response_for(undef, 'no keys' => { jolt => [qw(
-	{"header":{}} {"summary":{}} {"info":{}}
+	{"header":{"fields":[]}} {"summary":{}} {"info":{}}
 )]});
 $mock_plugin->response_for(undef, 'one key' => { jolt => [qw(
 	{"header":{"fields":["A"]}} {"summary":{}} {"info":{}}

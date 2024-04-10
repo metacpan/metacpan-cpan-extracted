@@ -15,15 +15,18 @@ use YAML qw(LoadFile);
 my %opt = ( # defaults:
     model  => undef, # e.g. 'Modular'
     config => undef, # n.b. set below if not given
+    patch  => undef, # e.g. 'Simple 001'
 );
 GetOptions(\%opt,
     'model=s',
     'config=s',
+    'patch=s',
 );
 
 my $model_name = $opt{model};
 
-die "Usage: perl $0 --model='My modular'\n" unless $model_name;
+die "Usage: perl $0 --model='Modular' [--patch='Simple 001']\n"
+    unless $model_name;
 
 $opt{config} ||= "eg/$model_name.yaml";
 die "Invalid model config\n" unless -e $opt{config};
@@ -34,9 +37,11 @@ my $synth = Synth::Config->new(model => $model_name);
 for my $patch ($config->{patches}->@*) {
     my $patch_name = $patch->{patch};
 
+    next if $opt{patch} && $patch_name ne $opt{patch};
+
     my $settings = $synth->search_settings(name => $patch_name);
 
-    if ($settings) {
+    if ($settings && @$settings) {
         print "Removing $patch_name setting from $model_name\n";
         $synth->remove_settings(name => $patch_name);
     }

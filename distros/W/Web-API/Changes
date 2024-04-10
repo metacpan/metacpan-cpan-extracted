@@ -1,131 +1,27 @@
 ==================================================
-Changes from 2019-05-03 00:00:00 +0000 to present.
+Changes from 2023-04-10 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 2.7 at 2020-05-02 07:57:14 +0000
+version 2.8 at 2024-04-09 16:01:27 +0000
 ----------------------------------------
 
-  Change: 713df94906cf2b05bb1f35d0e85508153c337652
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2020-05-02 19:56:15 +0000
-
-    fixes #30 
-
-  Change: a860c10cb1eb29299af4c6334618c88d423a8e42
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2019-12-13 18:46:54 +0000
-
-    default to plain text decoding 
-
-----------------------------------------
-version 2.6 at 2019-11-26 04:59:19 +0000
-----------------------------------------
-
-  Change: 7da3392c4a45d33734f9e88ecf36ccb6432ed271
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2019-11-26 17:59:19 +0000
-
-    auth header format as an attribute 
-
-  Change: 5c8c9874b4ce8fb98a04d4b678c7397c61dd34bd
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2019-11-18 15:46:57 +0000
-
-    cleanup after dzil 
-
-----------------------------------------
-version 2.5 at 2019-11-18 02:35:12 +0000
-----------------------------------------
-
-  Change: 73517c3caf077a4de1a9d2ac90e168c828aedc87
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2019-11-18 15:35:12 +0000
-
-    simple test system support 
-
-  Change: c8c0c4519966072b8c8e2b054655475937965b16
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2019-01-15 17:01:21 +0000
-
-    v2.4.1 
-
-  Change: f7531fae482f31b3e64fe60e3c10a1dd2ddfcdeb
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2019-01-15 17:00:51 +0000
-
-    updated pod from merges 
-
-  Change: 34174e3c23bebb8d5df30c38db88097ee9b24504
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2019-01-15 16:58:31 +0000
-
-    Merge branch 'master' of github.com:nupfel/Web-API 
-
-  Change: 039f7473ca7ea46c1045e5c60f7f8622ba7450cb
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2019-01-15 16:55:50 +0000
-
-    ignore cpanfile 
-
-  Change: 8a0810d23f89ce59301bc475ae3b8599bfd4f4f2
+  Change: 83a1a2c4ca5a3ef6e388483c992621f1efead921
   Author: Tobias Kirschstein <nupfel@users.noreply.github.com>
-  Date : 2019-01-09 15:37:12 +0000
+  Date : 2023-08-11 09:55:35 +0000
 
-    Merge pull request #28 from pkg-perl-tools/pkg-perl-1517091610
+    Merge pull request #32 from CourtAPI/remove-smartmatch
 
-    Grammar correction 
+    Remove smartmatch usage 
 
-  Change: 47afb9f1458baa1e3f67c80a17e6573626bb1612
-  Author: Tobias Kirschstein <nupfel@users.noreply.github.com>
-  Date : 2019-01-09 15:36:30 +0000
+  Change: 81d1da85d621ba6f88942bb2a047adb8c01bd9db
+  Author: Michael Schout <schoutm@gmail.com>
+  Date : 2023-08-05 15:32:01 +0000
 
-    Merge pull request #29 from manwar/tidy-up-abstract
+    Remove smartmatch usage
 
-    Tidied up ABSTRACT in pod. 
-
-  Change: abcb468333ce206ec81d05daad2f54c821649641
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2019-01-08 01:33:00 +0000
-
-    generate and distribute cpanfile 
-
-  Change: bf15211921c1ac419de1870f9c091a136d990af9
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2019-01-08 01:25:28 +0000
-
-    upload release to github 
-
-  Change: a1d7942c1715ecde48bdced3800ef69ac71ad57c
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2019-01-08 01:25:13 +0000
-
-    separate out query_keys from options 
-
-  Change: 0bacbdf8888f2b1f2aa67e1fbdabc8da0ec75d72
-  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
-  Date : 2018-12-25 11:18:22 +0000
-
-    Tidied up ABSTRACT in pod. 
-
-  Change: 98be5b3606ddc7d7b1741cc2be18fc6fb357ee12
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2018-12-25 23:56:47 +0000
-
-    minor version bump 
-
-  Change: b640a74053ba751c941bd97e1523deca73c24053
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2018-12-25 23:56:28 +0000
-
-    ignore decoding whitespace or empty responses 
-
-  Change: b58cfa36e991f5af15d50638f59f72f77c20802b
-  Author: Christopher Hoskin <mans0954@debian.org>
-  Date : 2018-01-27 22:21:27 +0000
-
-    Grammar correction 
+    fixes #19 
 
 =================================================
-Plus 23 releases after 2019-05-03 00:00:00 +0000.
+Plus 26 releases after 2023-04-10 00:00:00 +0000.
 =================================================

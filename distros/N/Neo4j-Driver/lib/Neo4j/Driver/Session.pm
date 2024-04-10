@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Session;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.46';
+$Neo4j::Driver::Session::VERSION = '0.47';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
@@ -109,6 +109,11 @@ sub _execute {
 			}
 		};
 	} until ($success);
+	
+	$r = $r[0] if $wantarray;
+	if (defined $wantarray && blessed $r && $r->isa('Neo4j::Driver::Result')) {
+		warnings::warnif closure => "Result object may not be valid outside the transaction function";
+	}
 	return $wantarray ? @r : $r;
 }
 
@@ -202,7 +207,7 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 SYNOPSIS
 
@@ -319,10 +324,9 @@ Because of this, the given subroutine needs to be B<idempotent>
 it is executed).
 
 Note that L<Neo4j::Driver::Result> objects may not be valid
-outside of the given subroutine. While the driver currently
-doesn't prevent you from returning such an object from the
-subroutine, the effect of doing so with results retrieved over
-a Bolt connection is unspecified. A simple solution might be
+outside of the given subroutine. If the driver detects that
+you return such an object, it will issue a warning in the
+category C<closure>. A better approach would be
 to return the list of records from the subroutine instead,
 which is always safe to do.
 
@@ -348,31 +352,6 @@ commit the transaction.
 
 Obtain the L<ServerInfo|Neo4j::Driver::ServerInfo>, consisting of
 the host, port, protocol and Neo4j version.
-
-=head1 EXPERIMENTAL FEATURES
-
-L<Neo4j::Driver::Session> implements the following experimental
-features. These are subject to unannounced modification or removal
-in future versions. Expect your code to break if you depend upon
-these features.
-
-=head2 Concurrent transactions
-
- %config = ( uri => 'http://...', concurrent_tx => 1 );
- $session = Neo4j::Driver->new(\%config)->session;
- $tx1 = $session->begin_transaction;
- $tx2 = $session->begin_transaction;
- $tx3 = $session->run(...);
-
-Since HTTP is a stateless protocol, the Neo4j HTTP API effectively
-allows multiple concurrently open transactions without special
-client-side considerations. This driver exposes this feature to the
-client and will continue to do so, but the interface is not yet
-finalised. See L<Neo4j::Driver/"Concurrent transactions in HTTP sessions">
-for further details.
-
-The Bolt protocol does not support concurrent transactions (sometimes
-known as "nested transactions") within the same session.
 
 =head1 SECURITY CONSIDERATIONS
 

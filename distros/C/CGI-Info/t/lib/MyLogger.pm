@@ -20,9 +20,8 @@ sub new {
 
 sub warn {
 	my $self = shift;
-	my $message = shift;
 
-	::diag($message);
+	::diag(@_);
 }
 
 # sub info {
@@ -34,10 +33,9 @@ sub warn {
 
 sub trace {
 	my $self = shift;
-	my $message = shift;
 
 	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
+		::diag(@_);
 	}
 }
 
@@ -53,7 +51,7 @@ sub AUTOLOAD {
 	our $AUTOLOAD;
 	my $param = $AUTOLOAD;
 
-	unless($param eq 'MyLogger::DESTROY') {
+	if($param ne 'MyLogger::DESTROY') {
 		::diag("Need to define $param");
 	}
 }

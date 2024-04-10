@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API.pm
-## Version v0.2.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.3.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2024/02/16
+## Modified 2024/04/10
 ## All rights reserved
 ## 
 ## 
@@ -39,7 +39,7 @@ BEGIN
     use JSON ();
     use Scalar::Util ();
     $DEBUG   = 0;
-    $VERSION = 'v0.2.0';
+    $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -103,9 +103,37 @@ sub bailout
 {
     my $self = shift( @_ );
     my $msg;
-    if( ref( $_[0] ) eq 'HASH' )
+    if( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' )
     {
         $msg = shift( @_ );
+    }
+    elsif( scalar( @_ ) == 1 && $self->_is_a( $_[0] => 'Module::Generic::Exception' ) )
+    {
+        my $ex = shift( @_ );
+        $msg = {};
+        if( my $code = $ex->code )
+        {
+            $msg->{code} = $code;
+        }
+        else
+        {
+            $msg->{code} = Apache2::Const::HTTP_INTERNAL_SERVER_ERROR;
+        }
+        $msg->{message} = $ex->message;
+        my $lang;
+        if( $ex->can( 'type' ) && ( my $type = $ex->type ) )
+        {
+            $msg->{type} = $type;
+        }
+        if( !$msg->{lang} && $ex->can( 'lang' ) && ( $lang = $ex->lang ) )
+        {
+            $msg->{lang} = $lang;
+        }
+        elsif( !$msg->{lang} && $ex->can( 'locale' ) && ( $lang = $ex->locale ) )
+        {
+            $msg->{lang} = $lang;
+        }
+        warn( $msg->{message} ) if( $msg->{message} );
     }
     else
     {
@@ -118,12 +146,21 @@ sub bailout
     CORE::delete( $msg->{skip_frames} );
     # So it gets logged or displayed on terminal
     my( $pack, $file, $line ) = caller;
-    my $sub_str = ( caller( 1 ) )[3];
+    my $sub_str = ( caller(1) )[3];
     my $sub = CORE::index( $sub_str, '::' ) != -1 ? substr( $sub_str, rindex( $sub_str, '::' ) + 2 ) : $sub_str;
     # Now we tweak the hash to send it to the client
     $msg->{message} = CORE::delete( $msg->{public_message} ) || 'An unexpected server error has occurred';
     # Give it a chance to be localised
     $msg->{message} = $self->gettext( $msg->{message} );
+    # For example, if the message is a Text::PO::Gettext::String object
+    if( !$msg->{lang} && $self->_can( $msg->{message} => 'lang' ) )
+    {
+        $msg->{lang} = $msg->{message}->lang;
+    }
+    elsif( !$msg->{lang} && $self->_can( $msg->{message} => 'locale' ) )
+    {
+        $msg->{lang} = $msg->{message}->locale;
+    }
     my $ctype = $self->response->content_type;
     if( $ctype eq 'application/json' )
     {
@@ -860,7 +897,7 @@ Apache2::API - Apache2 API Framework
 
 =head1 VERSION
 
-    v0.2.0
+    v0.3.0
 
 =head1 DESCRIPTION
 

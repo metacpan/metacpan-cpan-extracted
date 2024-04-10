@@ -154,7 +154,7 @@ get '/ajax/content/search/node' => require_login sub {
             { time_last_stamp =>  \"to_char(time_last, 'YYYY-MM-DD HH24:MI')" },
           ],
           join => 'manufacturer'
-      });
+      })->with_router;
 
     my $netbios = schema(vars->{'tenant'})->resultset('NodeNbt')
       ->search({-and => [@where_mac, @active, @times]}, {
@@ -219,7 +219,7 @@ get '/ajax/content/search/node' => require_login sub {
             and my $ip = NetAddr::IP::Lite->new($node)) {
 
             # search_by_ip() will extract cidr notation if necessary
-            $set = schema(vars->{'tenant'})->resultset('NodeIp')
+            $set = schema(vars->{'tenant'})->resultset('NodeIp')->with_router
               ->search_by_ip({ip => $ip, @active, @times});
             ++$have_rows if $set->has_rows;
         }

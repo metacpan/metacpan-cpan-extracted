@@ -1,0 +1,21 @@
+Test2::Tools::MIDI - test MIDI files
+
+This module can be installed using cpanm:
+
+  cpanm Test2::Tools::MIDI
+
+
+Run perldoc(1) on Test2::Tools::MIDI for documentation.
+
+
+To author a new release:
+
+  perl Build.PL
+  ./Build testcover
+  RELEASE_TESTING=1 ./Build test
+  ./Build disttest
+  ./Build dist
+  git tag v...
+  cpan-upload ...
+  git push ...
+  ./Build realclean

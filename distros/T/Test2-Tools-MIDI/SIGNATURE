@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 2f7d182acb64a7ad2798f0bca807ac988ea782f5ec03b56398f63b26602016b1 Build.PL
+SHA256 abbbd8dd9d9669e4937093ffc1e9ea947c59fad4141c183cd84a99062d764593 Changes
+SHA256 db739608563af2d9f1763883315451cc38032cb67bdd42a443bfcc7eef1a49b2 LICENSE
+SHA256 3e3a0e572e0f7aadd2f30d74fd86817977ebd546f92a0163b65b627581bd35f7 MANIFEST
+SHA256 a0cf9ef51e9dad411b38d11b788181b7affba54e65902ddc97c6e4d70e8f0ab0 META.json
+SHA256 2f9e1f5572239c66586bca2c201a4fc06974325cb9130cfde890783db126bff2 META.yml
+SHA256 21553e581705d731044c9acd00a1b328c1bb8e3fcd6e1e22ef9cd1eea09e116c README
+SHA256 59a2f74f71a8d66088555ee1c1f80bea9f9dce0306e4f11a2d0e7d3525453d1b lib/Test2/Tools/MIDI.pm
+SHA256 d2cb44171f431e3811a39051af5738a1126236caf8d36dfa2ec290b295c0b008 t/00-load.t
+SHA256 1cc1fec97e4815a2570a4f375dfef2070edf33fedee402aace2d9c4be582df1e t/cowbell.midi
+SHA256 7f5424d1dac20d489827ebf054d5b033fa9c370231c11180d3cba3e6711f1ab4 t/header.midi
+SHA256 e95832e1f4863981cc7f89ff9e610500189ce492816d94fabc11c8946a81272c t/midi.t
+SHA256 17b8090364879f20210812b166baeae6e4ad86ad0689cfeba4b76de263458ab6 t/pod-coverage.t
+SHA256 f6e24a93f4662ef0b8ab4d2c8033221f4be6fbe7a789c3cbbda0d2a83766eee1 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEElPO2YAAs9b/plKLEs1lvXE/ryKcFAmYV0gsACgkQs1lvXE/r
+yKcchAv/VguPL5hFu7Ax333zX1coNFvGdMLEzwbjxEjAP9rXg9lJErjqMNBwTxAP
+5tB3zomw9JLiUBBFRA9TCAL90QUStIEARucVpjyo7HfKjq9ad3KzP5n8IGmbnEIe
+pN+anJeOI6QTSZUR7d5sESZ2JQsoIYvQfU0mhPy1ui8gOy9Ue228Hi3E0V+JYZDW
+BbK0dBlxVD/OMD8QC3YYAuprTSdwzsLITBlR435P/bp/PAQX4EMFyxKMLX2g1mdx
+aLN8baskB1yR9kS182X0fd68aQ9amw/yR/I1jjzGSa29fDv27rIRLd3kGZnnPrRH
+MtCta9GS0Y9qc1F2URBy8OCWFTHvAsN8Kdh2Q4UtDN/jZnrbPPVaGPPEDMCR3Uim
+z3p6YPuxGov65vtFGVftfOSw0adYmpt3m0iHkxoozZoDcy2pvpDeUaa0qPDM4jVl
+TiJVZHfIyvy/CpMDicyhqJqpWQCGCDYw0c+j9gA9RIs1iUQsfcPUcedGv3IW2fFZ
+sp66tr9f
+=ObyA
+-----END PGP SIGNATURE-----

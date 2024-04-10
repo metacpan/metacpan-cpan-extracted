@@ -69,7 +69,7 @@ The C<if> statement is converted to simple C<if> - C<else> statements, so see a 
     
   }
 
-The L<boolean conversion|SPVM::Document::Language::Types/"Boolean Conversion"> is performed on the condition I<CONDITION>.
+The L<condition evaluation|SPVM::Document::Language::Operators/"Condition Evaluation"> is performed on the condition I<CONDITION>.
 
 If the evaluated value is not 0, the program jumps to the beginning of the C<if> block.
 
@@ -180,7 +180,7 @@ The C<switch> statement is a conditional statement with the following syntax.
 
 The L<integer promotional conversion|SPVM::Document::Language::Types/"Integer Promotional Conversion"> is performed on the condition I<CONDITION>.
 
-The operand of the case statement I<CASEn> must be a L<character literal|SPVM::Document::Language::Tokenization/"Character Literal">, an L<integer literal|SPVM::Document::Language::Tokenization/"Integer Literal"> and an L<enumeration value|SPVM::Document::Language::Class/"Getting Enumeration Value">.
+The operand of the case statement I<CASEn> must be a L<character literal|SPVM::Document::Language::Tokenization/"Character Literal">, an L<integer literal|SPVM::Document::Language::Tokenization/"Integer Literals"> and an L<enumeration value|SPVM::Document::Language::Class/"Getting Enumeration Value">.
 
 If I<CASEn> is a L<character literal|SPVM::Document::Language::Tokenization/"Character Literal">, the value is converted to the int type at compile-time.
 
@@ -333,7 +333,7 @@ The C<while> statement is a loop statement with the following syntax.
   
   }
 
-The L<boolean conversion|SPVM::Document::Language::Types/"Boolean Conversion"> is performed on the condition I<CONDITION>.
+The L<condition evaluation|SPVM::Document::Language::Operators/"Condition Evaluation"> is performed on the condition I<CONDITION>.
 
 If the evaluated value is 0, the program jumps to the end of the C<while> block, otherwise the program jumps to the beginning of the C<while> block.
 

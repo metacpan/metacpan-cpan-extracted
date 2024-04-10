@@ -1,5 +1,10 @@
 Revision history for Synth-Config
 
+0.0047 2024-04-09 11:28:00
+    - Improve the specs logic.
+    - Improve eg/patch-visualizer.pl.
+    - Fix eg/synth-config-mojo.pl to use database specs.
+
 0.0046 2024-04-08 16:11:31
     - Fix the _whoops search call in eg/patch-visualizer.pl.
     - Improve documentation slightly.

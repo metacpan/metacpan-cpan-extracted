@@ -13,9 +13,9 @@ BEGIN {
 }
 
 PATHS: {
-        delete $ENV{'SCRIPT_NAME'};
+	delete $ENV{'SCRIPT_NAME'};
 	delete $ENV{'DOCUMENT_ROOT'};
-        delete $ENV{'SCRIPT_FILENAME'};
+	delete $ENV{'SCRIPT_FILENAME'};
 
 	my $i = new_ok('CGI::Info');
 	ok(File::Spec->file_name_is_absolute($i->script_path()));
@@ -74,7 +74,7 @@ PATHS: {
 
 	$ENV{'DOCUMENT_ROOT'} = '/path/to';
 	$ENV{'SCRIPT_NAME'} = '/cgi-bin/bar.pl';
-        delete $ENV{'SCRIPT_FILENAME'};
+	delete $ENV{'SCRIPT_FILENAME'};
 
 	$i = new_ok('CGI::Info');
 	ok($i->script_name() eq 'bar.pl');
@@ -87,9 +87,9 @@ PATHS: {
 		ok($i->script_path() eq '/path/to/cgi-bin/bar.pl');
 	}
 
-        delete $ENV{'DOCUMENT_ROOT'};
+	delete $ENV{'DOCUMENT_ROOT'};
 	$ENV{'SCRIPT_NAME'} = '/cgi-bin/bar.pl';
-        delete $ENV{'SCRIPT_FILENAME'};
+	delete $ENV{'SCRIPT_FILENAME'};
 
 	$i = new_ok('CGI::Info');
 	ok($i->script_name() eq 'bar.pl');

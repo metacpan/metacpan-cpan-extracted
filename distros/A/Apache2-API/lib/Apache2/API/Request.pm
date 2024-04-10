@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API/Request.pm
-## Version v0.1.3
+## Version v0.2.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2023/10/21
+## Modified 2024/04/10
 ## All rights reserved
 ## 
 ## 
@@ -56,7 +56,7 @@ BEGIN
     use URI;
     use URI::Escape;
     use Want;
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.2.0';
     our( $SERVER_VERSION, $ERROR );
 };
 
@@ -600,6 +600,23 @@ sub if_modified_since
 sub if_none_match { return( shift->headers( 'If-None-Match', @_ ) ); }
 
 sub input_filters { return( shift->_try( 'request', 'input_filters' ) ); }
+
+# <https://perl.apache.org/docs/1.0/guide/debug.html#toc_Detecting_Aborted_Connections>
+sub is_aborted
+{
+    my $self = shift( @_ );
+    my $r = $self->request ||
+        return( $self->error( "No Apache2::RequestRec object set anymore!" ) );
+    # try-catch
+    local $@;
+    eval
+    {        
+        $r->print( "\0" );
+        $r->rflush;
+    };
+    return(1) if( $@ && $@ =~ /Broken pipe/i );
+    return( $r->connection->aborted );
+}
 
 sub is_auth_required { return( shift->_try( 'request', 'some_auth_required' ) ); }
 
@@ -1499,6 +1516,8 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
     
     my $filters = $req->input_filters;
     
+    my $bool = $req->is_aborted;
+
     my $enabled = $req->is_perl_option_enabled;
     # running under https?
     my $secure = $req->is_secure;
@@ -1627,7 +1646,7 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
 
 =head1 VERSION
 
-    v0.1.3
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -2549,6 +2568,16 @@ For example instead of using C<< $req->read() >> to read the C<POST> data, one c
      }
 
 As you can see C<< $req->input_filters >> gives us a pointer to the last of the top of the incoming filters stack.
+
+=head2 is_aborted
+
+This is a more subtle implementation of Apache L<aborted method|Apache2::Connection/aborted> and is described in L<its documentation|https://perl.apache.org/docs/1.0/guide/debug.html#toc_Detecting_Aborted_Connections>.
+
+It attempts to print a null-byte to the connection, L<flush|Apache2::RequestIO/rflush> the Apache buffer and then checks if the connection was L<aborted|Apache2::Connection>.
+
+The reason L<as explained in Apache documentation|https://perl.apache.org/docs/1.0/guide/debug.html#toc_Detecting_Aborted_Connections> is that Apache does not detect if the user dropped the connection until it attempts to read from or write back to it. Thus, as suggested in the documentation, an attempt to write back a null-byte character remedies that. Only calling L<aborted|/aborted> will not suffice.
+
+It returns true if the connection was aborted, and false otherwise.
 
 =head2 is_auth_required
 

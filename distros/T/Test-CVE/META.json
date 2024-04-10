@@ -48,6 +48,6 @@
          "web" : "https://github.com/CPAN-Security/Test-CVE"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

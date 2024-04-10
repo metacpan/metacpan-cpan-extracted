@@ -22,110 +22,214 @@
 use strict;
 use warnings;
 
-use testutil;
-
-use Test::More tests => 6;
+use Test::More tests => 12;
 use English qw(-no_match_vars);
 
+use Stow::Util qw(adjust_dotfile unadjust_dotfile);
 use testutil;
 
 init_test_dirs();
 cd("$TEST_DIR/target");
 
+subtest('adjust_dotfile()', sub {
+    plan tests => 4;
+    my @TESTS = (
+        ['file'],
+        ['dot-'],
+        ['dot-.'],
+        ['dot-file', '.file'],
+    );
+    for my $test (@TESTS) {
+        my ($input, $expected) = @$test;
+        $expected ||= $input;
+        is(adjust_dotfile($input), $expected);
+    }
+});
+
+subtest('unadjust_dotfile()', sub {
+    plan tests => 4;
+    my @TESTS = (
+        ['file'],
+        ['.'],
+        ['..'],
+        ['.file', 'dot-file'],
+    );
+    for my $test (@TESTS) {
+        my ($input, $expected) = @$test;
+        $expected ||= $input;
+        is(unadjust_dotfile($input), $expected);
+    }
+});
+
 my $stow;
 
-#
-# process a dotfile marked with 'dot' prefix
-#
+subtest("stow dot-foo as .foo", sub {
+    plan tests => 1;
+    $stow = new_Stow(dir => '../stow', dotfiles => 1);
+    make_path('../stow/dotfiles');
+    make_file('../stow/dotfiles/dot-foo');
 
-$stow = new_Stow(dir => '../stow', dotfiles => 1);
+    $stow->plan_stow('dotfiles');
+    $stow->process_tasks();
+    is(
+        readlink('.foo'),
+        '../stow/dotfiles/dot-foo',
+        => 'processed dotfile'
+    );
+});
 
-make_path('../stow/dotfiles');
-make_file('../stow/dotfiles/dot-foo');
+subtest("stow dot-foo as dot-foo without --dotfile enabled", sub {
+    plan tests => 1;
+    $stow = new_Stow(dir => '../stow', dotfiles => 0);
+    make_path('../stow/dotfiles');
+    make_file('../stow/dotfiles/dot-foo');
 
-$stow->plan_stow('dotfiles');
-$stow->process_tasks();
-is(
-    readlink('.foo'),
-    '../stow/dotfiles/dot-foo',
-    => 'processed dotfile'
-);
+    $stow->plan_stow('dotfiles');
+    $stow->process_tasks();
+    is(
+        readlink('dot-foo'),
+        '../stow/dotfiles/dot-foo',
+        => 'unprocessed dotfile'
+    );
+});
 
-#
-# ensure that turning off dotfile processing links files as usual
-#
+subtest("stow dot-emacs dir as .emacs", sub {
+    plan tests => 1;
+    $stow = new_Stow(dir => '../stow', dotfiles => 1);
 
-$stow = new_Stow(dir => '../stow', dotfiles => 0);
+    make_path('../stow/dotfiles/dot-emacs');
+    make_file('../stow/dotfiles/dot-emacs/init.el');
 
-make_path('../stow/dotfiles');
-make_file('../stow/dotfiles/dot-foo');
+    $stow->plan_stow('dotfiles');
+    $stow->process_tasks();
+    is(
+        readlink('.emacs'),
+        '../stow/dotfiles/dot-emacs',
+        => 'processed dotfile dir'
+    );
+});
 
-$stow->plan_stow('dotfiles');
-$stow->process_tasks();
-is(
-    readlink('dot-foo'),
-    '../stow/dotfiles/dot-foo',
-    => 'unprocessed dotfile'
-);
+subtest("stow dir marked with 'dot' prefix when directory exists in target", sub {
+    plan tests => 1;
+    $stow = new_Stow(dir => '../stow', dotfiles => 1);
 
+    make_path('../stow/dotfiles/dot-emacs.d');
+    make_file('../stow/dotfiles/dot-emacs.d/init.el');
+    make_path('.emacs.d');
 
-#
-# process folder marked with 'dot' prefix
-#
+    $stow->plan_stow('dotfiles');
+    $stow->process_tasks();
+    is(
+        readlink('.emacs.d/init.el'),
+        '../../stow/dotfiles/dot-emacs.d/init.el',
+        => 'processed dotfile dir when dir exists (1 level)'
+    );
+});
 
-$stow = new_Stow(dir => '../stow', dotfiles => 1);
+subtest("stow dir marked with 'dot' prefix when directory exists in target (2 levels)", sub {
+    plan tests => 1;
+    $stow = new_Stow(dir => '../stow', dotfiles => 1);
 
-make_path('../stow/dotfiles/dot-emacs');
-make_file('../stow/dotfiles/dot-emacs/init.el');
+    make_path('../stow/dotfiles/dot-emacs.d/dot-emacs.d');
+    make_file('../stow/dotfiles/dot-emacs.d/dot-emacs.d/init.el');
+    make_path('.emacs.d');
 
-$stow->plan_stow('dotfiles');
-$stow->process_tasks();
-is(
-    readlink('.emacs'),
-    '../stow/dotfiles/dot-emacs',
-    => 'processed dotfile folder'
-);
+    $stow->plan_stow('dotfiles');
+    $stow->process_tasks();
+    is(
+        readlink('.emacs.d/.emacs.d'),
+        '../../stow/dotfiles/dot-emacs.d/dot-emacs.d',
+        => 'processed dotfile dir exists (2 levels)'
+    );
+});
 
-#
-# corner case: paths that have a part in them that's just "$DOT_PREFIX" or
-# "$DOT_PREFIX." should not have that part expanded.
-#
+subtest("stow dir marked with 'dot' prefix when directory exists in target", sub {
+    plan tests => 1;
+    $stow = new_Stow(dir => '../stow', dotfiles => 1);
 
-$stow = new_Stow(dir => '../stow', dotfiles => 1);
+    make_path('../stow/dotfiles/dot-one/dot-two');
+    make_file('../stow/dotfiles/dot-one/dot-two/three');
+    make_path('.one/.two');
 
-make_path('../stow/dotfiles');
-make_file('../stow/dotfiles/dot-');
+    $stow->plan_stow('dotfiles');
+    $stow->process_tasks();
+    is(
+        readlink('./.one/.two/three'),
+        '../../../stow/dotfiles/dot-one/dot-two/three',
+        => 'processed dotfile 2 dir exists (2 levels)'
+    );
 
-make_path('../stow/dotfiles/dot-.');
-make_file('../stow/dotfiles/dot-./foo');
+});
 
-$stow->plan_stow('dotfiles');
-$stow->process_tasks();
-is(
-    readlink('dot-'),
-    '../stow/dotfiles/dot-',
-    => 'processed dotfile'
-);
-is(
-    readlink('dot-.'),
-    '../stow/dotfiles/dot-.',
-    => 'unprocessed dotfile'
-);
+subtest("dot-. should not have that part expanded.", sub {
+    plan tests => 2;
+    $stow = new_Stow(dir => '../stow', dotfiles => 1);
 
-#
-# simple unstow scenario
-#
+    make_path('../stow/dotfiles');
+    make_file('../stow/dotfiles/dot-');
 
-$stow = new_Stow(dir => '../stow', dotfiles => 1);
+    make_path('../stow/dotfiles/dot-.');
+    make_file('../stow/dotfiles/dot-./foo');
 
-make_path('../stow/dotfiles');
-make_file('../stow/dotfiles/dot-bar');
-make_link('.bar', '../stow/dotfiles/dot-bar');
+    $stow->plan_stow('dotfiles');
+    $stow->process_tasks();
+    is(
+        readlink('dot-'),
+        '../stow/dotfiles/dot-',
+        => 'processed dotfile'
+    );
+    is(
+        readlink('dot-.'),
+        '../stow/dotfiles/dot-.',
+        => 'unprocessed dotfile'
+    );
+});
 
-$stow->plan_unstow('dotfiles');
-$stow->process_tasks();
-ok(
-    $stow->get_conflict_count == 0 &&
-    -f '../stow/dotfiles/dot-bar' && ! -e '.bar'
-    => 'unstow a simple dotfile'
-);
+subtest("unstow .bar from dot-bar", sub {
+    plan tests => 3;
+    $stow = new_Stow(dir => '../stow', dotfiles => 1);
+
+    make_path('../stow/dotfiles');
+    make_file('../stow/dotfiles/dot-bar');
+    make_link('.bar', '../stow/dotfiles/dot-bar');
+
+    $stow->plan_unstow('dotfiles');
+    $stow->process_tasks();
+    is($stow->get_conflict_count, 0);
+    ok(-f '../stow/dotfiles/dot-bar', 'package file untouched');
+    ok(! -e '.bar' => '.bar was unstowed');
+});
+
+subtest("unstow dot-emacs.d/init.el when .emacs.d/init.el in target", sub {
+    plan tests => 4;
+    $stow = new_Stow(dir => '../stow', dotfiles => 1);
+
+    make_path('../stow/dotfiles/dot-emacs.d');
+    make_file('../stow/dotfiles/dot-emacs.d/init.el');
+    make_path('.emacs.d');
+    make_link('.emacs.d/init.el', '../../stow/dotfiles/dot-emacs.d/init.el');
+
+    $stow->plan_unstow('dotfiles');
+    $stow->process_tasks();
+    is($stow->get_conflict_count, 0);
+    ok(-f '../stow/dotfiles/dot-emacs.d/init.el');
+    ok(! -e '.emacs.d/init.el', '.emacs.d/init.el unstowed');
+    ok(-d '.emacs.d/' => '.emacs.d left behind');
+});
+
+subtest("unstow dot-emacs.d/init.el in --compat mode", sub {
+    plan tests => 4;
+    $stow = new_compat_Stow(dir => '../stow', dotfiles => 1);
+
+    make_path('../stow/dotfiles/dot-emacs.d');
+    make_file('../stow/dotfiles/dot-emacs.d/init.el');
+    make_path('.emacs.d');
+    make_link('.emacs.d/init.el', '../../stow/dotfiles/dot-emacs.d/init.el');
+
+    $stow->plan_unstow('dotfiles');
+    $stow->process_tasks();
+    is($stow->get_conflict_count, 0);
+    ok(-f '../stow/dotfiles/dot-emacs.d/init.el');
+    ok(! -e '.emacs.d/init.el', '.emacs.d/init.el unstowed');
+    ok(-d '.emacs.d/' => '.emacs.d left behind');
+});

@@ -1,5 +1,9 @@
 Revision history for Perl module Apache2::API
 
+v0.3.0 2024-04-10T06:34:12+0900
+    - Improved method bailout.
+    - Added method is_aborted in Apache2::API::Request
+
 v0.2.0 2024-02-22T19:04:51+0900
     - Improved method reply()
 

@@ -60,6 +60,7 @@
             "Test::CleanNamespaces" : "0",
             "Test::Compile" : "0",
             "Test::Most" : "0",
+            "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
             "Test::Script" : "1.12",
             "Test::Warn" : "0",
@@ -84,6 +85,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Info"
       }
    },
-   "version" : "0.80",
+   "version" : "0.81",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

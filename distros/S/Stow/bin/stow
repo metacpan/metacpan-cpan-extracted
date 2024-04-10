@@ -31,7 +31,7 @@ stow [ options ] package ...
 
 =head1 DESCRIPTION
 
-This manual page describes GNU Stow 2.3.1.  This is not the
+This manual page describes GNU Stow 2.4.0.  This is not the
 definitive documentation for Stow; for that, see the accompanying info
 manual, e.g. by typing C<info stow>.
 
@@ -134,6 +134,8 @@ C<-D>).
 =item -n
 
 =item --no
+
+=item --simulate
 
 Do not perform any operations that modify the filesystem; merely show
 what would happen.
@@ -472,7 +474,6 @@ sub main {
     my ($options, $pkgs_to_unstow, $pkgs_to_stow) = process_options();
 
     my $stow = new Stow(%$options);
-    # current dir is now the target directory
 
     $stow->plan_unstow(@$pkgs_to_unstow);
     $stow->plan_stow  (@$pkgs_to_stow);
@@ -821,6 +822,8 @@ OPTIONS:
                           if the file is already stowed to another package
     --adopt               (Use with care!)  Import existing files into stow package
                           from target.  Please read docs before using.
+    --dotfiles            Enables special handling for dotfiles that are
+                          Stow packages that start with "dot-" and not "."
     -p, --compat          Use legacy algorithm for unstowing
 
     -n, --no, --simulate  Do not actually make any filesystem changes
@@ -845,6 +848,5 @@ sub version {
 
 # Local variables:
 # mode: perl
-# cperl-indent-level: 4
 # end:
 # vim: ft=perl

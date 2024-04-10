@@ -28,7 +28,7 @@ my %empty_json = ( json => {
 	errors => [],
 });
 my %empty_jolt = ( jolt => [
-	{ header => {} },
+	{ header => { fields => [] } },
 	{ summary => {} },
 	{ info => {} },
 ]);

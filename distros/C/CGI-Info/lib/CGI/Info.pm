@@ -25,11 +25,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.80
+Version 0.81
 
 =cut
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 =head1 SYNOPSIS
 
@@ -75,9 +75,7 @@ our $stdin_data;	# Class variable storing STDIN in case the class
 			# is instantiated more than once
 
 sub new {
-	my $class = $_[0];
-
-	shift;
+	my $class = shift;
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if($args{expect} && (ref($args{expect}) ne 'ARRAY')) {
@@ -155,8 +153,7 @@ sub _find_paths {
 		}
 		$self->{script_path} = File::Spec->catfile($ENV{'DOCUMENT_ROOT' }, $script_name);
 	} elsif($ENV{'SCRIPT_NAME'} && !$ENV{'DOCUMENT_ROOT'}) {
-		if(File::Spec->file_name_is_absolute($ENV{'SCRIPT_NAME'}) &&
-		   (-r $ENV{'SCRIPT_NAME'})) {
+		if(File::Spec->file_name_is_absolute($ENV{'SCRIPT_NAME'}) && (-r $ENV{'SCRIPT_NAME'})) {
 			# Called from a command line with a full path
 			$self->{script_path} = $ENV{'SCRIPT_NAME'};
 		} else {
@@ -714,9 +711,11 @@ sub params {
 
 		next unless($key);
 
+		$key =~ s/%00//g;	# Strip NUL byte poison
 		$key =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
 		$key =~ tr/+/ /;
 		if(defined($value)) {
+			$value =~ s/%00//g;	# Strip NUL byte poison
 			$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
 			$value =~ tr/+/ /;
 		} else {
@@ -760,6 +759,7 @@ sub params {
 			   ($value =~ /((\%27)|(\'))union/ix) ||
 			   ($value =~ /select[[a-z]\s\*]from/ix) ||
 			   ($value =~ /\sAND\s1=1/ix) ||
+			   ($value =~ /\/\*\*\/ORDER\/\*\*\/BY\/\*\*/ix) ||
 			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
 				if($self->{logger}) {
 					if($ENV{'REMOTE_ADDR'}) {
@@ -1370,7 +1370,7 @@ Is the visitor a real person or a robot?
 
 	my $info = CGI::Info->new();
 	unless($info->is_robot()) {
-	 # update site visitor statistics
+		# update site visitor statistics
 	}
 
 =cut
@@ -1390,7 +1390,7 @@ sub is_robot {
 		return 0;
 	}
 
-	if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /) || ($agent =~ / OR NOT /) || ($agent =~ / AND \d+=\d+/) || ($agent =~ /THEN.+ELSE.+END/) || ($agent =~ /.+AND.+SELECT.+/)) {
+	if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /) || ($agent =~ / OR NOT /) || ($agent =~ / AND \d+=\d+/) || ($agent =~ /THEN.+ELSE.+END/) || ($agent =~ /.+AND.+SELECT.+/) || ($agent =~ /\sAND\s.+\sAND\s/)) {
 		$self->status(403);
 		$self->{is_robot} = 1;
 		if($self->{logger}) {
@@ -1402,7 +1402,7 @@ sub is_robot {
 		}
 		return 1;
 	}
-	if($agent =~ /.+bot|bytespider|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru/i) {
+	if($agent =~ /.+bot|axios\/1\.6\.7|bytespider|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|ias_crawler|ZoominfoBot/i) {
 		$self->{is_robot} = 1;
 		return 1;
 	}
@@ -1556,6 +1556,7 @@ sub is_search_engine {
 	# Don't use HTTP_USER_AGENT to detect more than we really have to since
 	# that is easily spoofed
 	if($agent =~ /www\.majestic12\.co\.uk|facebookexternal/) {
+		# Mark Facebook as a search engine, not a robot
 		if($self->{cache}) {
 			$self->{cache}->set($key, 'search', '1 day');
 		}
@@ -1689,7 +1690,8 @@ sub get_cookie {
 
 Returns a cookie's value, or undef if no name is given, or the requested
 cookie isn't in the jar.
-API is the same as "param", it will replace the "get_cookie" method in the future.
+API is the same as "param",
+it will replace the "get_cookie" method in the future.
 
     use CGI::Info;
 
@@ -1726,7 +1728,9 @@ sub cookie {
 
 =head2 status
 
-Sets or returns the status of the object, 200 for OK, otherwise an HTTP error code
+Sets or returns the status of the object,
+200 for OK,
+otherwise an HTTP error code
 
 =cut
 
@@ -1776,7 +1780,8 @@ sub set_logger {
 =head2 reset
 
 Class method to reset the class.
-You should do this in an FCGI environment before instantiating, but nowhere else.
+You should do this in an FCGI environment before instantiating,
+but nowhere else.
 
 =cut
 
@@ -1828,7 +1833,8 @@ things to happen.
 
 =head1 SEE ALSO
 
-L<HTTP::BrowserDetect>
+L<HTTP::BrowserDetect>,
+L<https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker>
 
 =head1 SUPPORT
 

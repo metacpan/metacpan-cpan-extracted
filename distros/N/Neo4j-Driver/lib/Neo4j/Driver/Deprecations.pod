@@ -13,7 +13,7 @@ Neo4j::Driver::Deprecations - Explains features that have been deprecated, but n
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 OVERVIEW
 
@@ -444,7 +444,7 @@ Get a boolean value from this record. Behaves exactly like
 L<C<get()>|Neo4j::Driver::Record/"get">, except that non-truthy
 boolean values are returned as C<undef>.
 
-In Perl, which doesn't have a native boolean type, JSON booleans are
+In Perl, which used to not have a native boolean type, JSON booleans are
 represented as a blessed scalar that uses L<overload> to evaluate
 truthy or non-truthy as appropriate in Perl expressions. This almost
 always works perfectly fine. However, some conditions may not expect
@@ -610,7 +610,7 @@ Originally added in 0.01 as an experimental feature.>
 
  @records = $session->run('...');
 
-See L<Neo4j::Driver::Transaction|/"Call-run()-in-list-context1">
+See L</"Call-run()-in-list-context1">
 below for details.
 
 =head2 close()
@@ -680,11 +680,11 @@ use C<list()> in list context:
 I<Deprecated in version 0.25 and to be removed in 1.00.
 Originally added in 0.01 as an experimental feature.>
 
- $statements = [
+ @statements = (
    [ 'RETURN 42' ],
    [ 'RETURN {value}', value => 'forty-two' ],
- ];
- $results = $transaction->run($statements);
+ );
+ $results = $transaction->run( [@statements] );
  foreach $result ( @$results ) {
    say $result->single->get;
  }
@@ -699,8 +699,15 @@ Unfortunately, the resulting API is confusing to use and implement
 and is therefore bug-prone.
 
 If you need this feature, you should consider using the
-private C<_run_multiple()> method instead; see
-L<Neo4j::Driver::Transaction/"Execute multiple statements at once">.
+private C<_run_multiple()> method instead. This feature might
+eventually be used to implement lazy statement execution for
+this driver. The C<_run_multiple()> method is expected to remain
+available at least until that time.
+
+ @results = $transaction->_run_multiple( @statements );
+ foreach $result ( @results ) {
+   say $result->single->get;
+ }
 
 =head2 Disable obtaining query statistics
 

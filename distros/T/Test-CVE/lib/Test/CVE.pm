@@ -33,7 +33,7 @@ package Test::CVE;
 use 5.014000;
 use warnings;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use version;
 use Carp;

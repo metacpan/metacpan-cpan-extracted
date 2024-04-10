@@ -10,7 +10,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.80
+Version 0.81
 
 # SYNOPSIS
 
@@ -322,7 +322,7 @@ Is the visitor a real person or a robot?
 
         my $info = CGI::Info->new();
         unless($info->is_robot()) {
-         # update site visitor statistics
+                # update site visitor statistics
         }
 
 ## is\_search\_engine
@@ -378,7 +378,8 @@ Deprecated - use cookie() instead.
 
 Returns a cookie's value, or undef if no name is given, or the requested
 cookie isn't in the jar.
-API is the same as "param", it will replace the "get\_cookie" method in the future.
+API is the same as "param",
+it will replace the "get\_cookie" method in the future.
 
     use CGI::Info;
 
@@ -387,7 +388,9 @@ API is the same as "param", it will replace the "get\_cookie" method in the futu
 
 ## status
 
-Sets or returns the status of the object, 200 for OK, otherwise an HTTP error code
+Sets or returns the status of the object,
+200 for OK,
+otherwise an HTTP error code
 
 ## set\_logger
 
@@ -397,7 +400,8 @@ This function fixes the catch22 situation.
 ## reset
 
 Class method to reset the class.
-You should do this in an FCGI environment before instantiating, but nowhere else.
+You should do this in an FCGI environment before instantiating,
+but nowhere else.
 
 # AUTHOR
 
@@ -421,7 +425,8 @@ things to happen.
 
 # SEE ALSO
 
-[HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
+[HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect),
+[https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker](https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker)
 
 # SUPPORT
 

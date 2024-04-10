@@ -1,0 +1,487 @@
+# PODNAME: Neo4j::Driver::TODO
+# ABSTRACT: Information on planned improvements to Neo4j::Driver
+
+=encoding utf8
+
+=head1 TODO
+
+=head2 NEW, not yet prioritised, possibly urgent
+
+=over
+
+=item * nothing
+
+=back
+
+=head2 Definitely before last 0.xx release
+
+=over
+
+=item * Various urgent docs updates NOT directly related to upcoming 1.00 release
+
+=over
+
+=item * Bytes.pm: remove from PodWeaver
+
+=item * In Deprecations (C<get_bool>): Perl now has native bools
+
+=item * Move C<_run_multiple> docs from Transaction to Deprecations
+
+=item * Clarify somewhere that currently only HTTP 1.1 has first-party support
+(because most of the Perl HTTP clients don't support newer HTTP versions).
+Adding this to Net would work, but for future-proofing it, it should perhaps be
+mentioned in the bundled HTTP adapter as well. Since the adapter is a properly
+declared and documented dependency, this clarification is not very urgent.
+See also:
+L<https://neo4j.com/docs/operations-manual/5/configuration/configuration-settings/#config_server.http_enabled_transports>
+
+=back
+
+=item * I feel like I should allow C<'v2'> (and possibly even just C<'2'>) for
+C<cypher_params>. It's such a simple change and makes the feature that much
+more stable. It's also listed for the config rework below, but this change
+might really be worth making already now.
+(On the other hand, the same argument could be made for the new summary time
+methods and prolly a few other things. Maybe best to not delay 1.00 for
+anything. But perhaps selected changes are so simple and so useful that they
+could happen quickly.)
+
+
+
+
+-------------------
+
+
+
+=item * Various docs updates related to upcoming 1.00 release
+
+=over
+
+=item * Replace C<summary()> with C<consume()>, C<version()> with C<agent()> in
+synopsis for: L<Neo4j::Driver::ResultSummary>, L<Neo4j::Driver::SummaryCounters>
+
+=item * check SEE ALSO sections
+
+=item * maybe try to finally figure out the podweaver thing (see Plugin pod);
+what if I simply avoid "DESCRIPTION" as a header, does that solve anything?
+(I have a provisional workaround in a git stash, prolly good enough)
+
+=item * remove
+the installed TODO file, remove BUGS/ENV sections in Driver.pm,
+remove POD from StatementResult/Temporal
+
+=item * check/rewrite all synopsis on all classes
+
+=item * remove references to "my CPAN email address" (eg in Plugin)
+
+=item * replace references to libneo4j-client with libneo4j-omni (eg in Net),
+but ONLY if Neo4j::Client is updated before the release
+
+=item * L<Neo4j::Driver::Transaction/"run">: replace C<\1> with \C<builtin::true>
+
+=back
+
+=back
+
+=head2 Not sure
+
+Doesn't really matter when:
+
+=over
+
+=item * Check Neo4p for deprecated / internal stuff, offer PR if necessary or
+maybe fix directly.
+
+=back
+
+=head2 Must be in the 1.00 release
+
+=over
+
+=item * Make concurrent transactions warning fatal
+
+=item * Remove ResultColumns, deprecated modules, deprecated features
+
+=back
+
+=head2 Shortly after the 1.00 release
+
+may happen in 1.00 already:
+
+=over
+
+=item * Remove docs for C<_run_multiple()>
+
+=item * Deprecate discouraged features (including C<summary()> in Record)
+
+=item * Bump prereq versions (Bolt, Types, maybe even perl)
+
+=item * Remove Type::Bytes and use the generic type instead (requires Types v2);
+also, the Types generic constructor should prolly accept the JSON int array, so
+that users at least have a simple way to manually get a unified API.
+
+=item * General refactoring, S<e. g.> change user-visible strings to be
+single-line sprintf (ability to grep for them), remove check for
+C<$ENV{NO_NEO4J_CORE_BOOLS}>
+etc.
+
+=item * General docs update, S<e. g.> add "special thanks", remove "official
+equivalent", abc in L<Neo4j::Driver::Types/"Constructed values">, have the
+run() mapping example use core bools or remove it entirely, check that Net.pod
+features section is still true and update it or remove the file entirely,
+L<rephrase buffering|https://neo4j.com/docs/java-manual/current/session-api/#java-driver-simple-result-retain>,
+adjust L<Neo4j::Driver::Session/"execute_write"> to say that returning Result
+objects is I<always> undefined behaviour (not just for Bolt), adjust docs for
+prereqs based on version changes (S<e. g.> "protocol_version" won't need the
+0.20 note anymore)
+etc.
+
+=back
+
+should NOT happen in 1.00 itself:
+
+=over
+
+=item * Drop Bolt deep_bless. This requires perlbolt Types v2 support though.
+(I I<really> want this, but a lot of other changes are even more important,
+which is why this item is not at the top of the list.)
+
+=item * Refactor Node etc. to match the Jolt data structures instead of JSON;
+refactor Record to be implemented as just a single array representing the row,
+with the (C<get("2")>-fixed) column lookup hash appended at the array's end
+
+=item * Neo4j::Driver::Net::HTTP::Tiny
+
+=item * Discourage C<list()> (in Result) in scalar context,
+maybe formally discourage C<concurrent_tx>
+
+=item * Possibly prevent C<size()> (in Result) from exhausting the result
+stream. It would be enough to detach the stream. The reason we even have
+C<size()> is only because C<list()> in scalar context gives an array ref,
+so there is no real reason for it to exhaust the result stream. Preventing
+this might I<perhaps> be useful in some scenarios.
+
+=item * Config rework
+
+=over
+
+=item * The big plan is to have a config object that can be used anywhere
+(driver/session/tx), with any settings not required in a context simply ignored.
+A config object would be created on the fly if a hash ref is provided.
+Each context will merge the given config with whatever has been supplied
+to the higher-level context, providing a mechanism for custom default values.
+
+=item * Problem is, doing it right is a fair amount of work and I might not
+want to delay 1.00 for it.
+
+=item * => don't make {config} a real object until after 1.00 unless absolutely
+necessary (at most, turn it into a .pm file that has a hidden config() method so
+it can proxy for what is now the $driver in many cases, but completely hide the
+fact that it's an object in the docs, otherwise it's just a new API wormhole)
+
+=item * Use C<none {} LIST> in unsupported option check
+
+=item * Add transaction configuration
+
+=item * Probably add bookmark support
+
+=item * Fix memory leak in Neo4j::Driver::Net::HTTP
+
+=item * allow C<"v2"> as value for cypher_params
+
+=item * part of the config rework is also plugin access to the configuration
+(likely through the first_session and parse_uri events, but possibly also a
+more generic config event)
+
+=item * Jolt results: if C<concurrent_tx>, then enforce C<gather_results>
+
+=back
+
+=item * Possible docs improvement: add "since version 0.xx" to all methods,
+referring to the point when the method itself was added
+
+=back
+
+=head2 Address open issues on GitHub
+
+See L<https://github.com/johannessen/neo4j-driver-perl/issues>.
+
+=head2 Functionality and API
+
+=over
+
+=back
+
+=head2 Tests, code quality, documentation
+
+=over
+
+=item * Improve test coverage:
+
+=over
+
+=item * Many yet uncovered code paths are obviously fine, but difficult or
+impossible to cover. In some of these cases, it may be possible to refactor the
+code, such as by banking on autovivification (i.e. don't defend against undefined
+C<$a> in expressions like C<< $a->{b} >>; see L<perlref/"Using References">).
+
+=item * The C<deep_bless> subs contain a lot of assertions and other checks
+that are not normally necessary. Since this logic seems to work fine, it should
+be simplified. (This may also make it easier to unroll the recursion later.)
+
+=item * Documenting each attribute in L<Neo4j::Driver::SummaryCounters> as individual
+methods might be a quick way to bring up the B<pod> coverage stats a bit.
+
+=back
+
+=item * Write new unit tests for all modules.
+Tests should probably live in files with names that are a good match for module
+names, so that it's easy to find test for a specific module (Simulator and live
+tests should perhaps be in separate files and directories.) The article
+L<Perl Testing in 2023|https://toby.ink/blog/2023/01/24/perl-testing-in-2023/>
+has some insight into how L<Test2> can simplify unit tests.
+
+=item * Optimise the simulator for C<$hash = 0>.
+Use of C<<< << >>> causes statements to end with C<\n>, which the simulator
+could filter out. 
+The internals test "transaction: REST 404 error handling" should run a distinct
+statement.
+
+=item * Consider migrating the LWP tests away from L<Mock::Quick> to reduce
+the dependency chain (L<Mock::MonkeyPatch> and L<Mock::Sub> look extremely
+light-weight, alternatives might I<perhaps> be L<Test::MockObject::Extends>
+or L<Test::LWP::UserAgent>; there is also L<Sub::Override>).
+
+=item * Verify that L<Neo4j::Driver::Type::Node/"get"> and
+L<Neo4j::Driver::Type::Relationship/"get"> really do return undef
+(as documented), even when called in list context.
+
+=item * We need complete working code examples, such as that Neo4j movies app.
+Some of the deprecated functionality could also be implemented as plug-ins
+in a dist named S<e. g.> Neo4j::Driver::Net::HTTP::Extra. Such a plug-in might
+be directly useful to some users, but most importantly, it would serve to
+demonstrate some of the plug-in API's functionality and how that can be used.
+
+=back
+
+=head1 Other ideas for specific modules
+
+=head2 L<Neo4j::Driver>
+
+=over
+
+=item * C<neo4j> URI scheme support: Ideally, the driver's C<config> method
+would continue to return C<'neo4j'> even after the session is created.
+
+=item * Convert the "unsupported option" check from C<grep> to
+L<List::Util/"none"> (in C<config()> and C<_parse_options()>;
+slightly improves both performance and clarity).
+
+=item * A reliable C<connection_timeout> config option might be good.
+Not exactly sure how to achieve that across Bolt, LWP etc. Googling yields
+L<IO::Socket::Timeout> and C<SocketConnectTimeout>, but I haven't really
+researched further.
+
+=back
+
+=head2 Neo4j::Driver::Events
+
+=over
+
+=item * The default implementation of the "error" event currently tries to
+more or less recreate the old error message strings. Looking forward, having
+L<Neo4j::Error> overload stringification and just throwing an object exception
+might be an interesting option. However, we likely would have to roll C<croak>
+ourselves (see L<Carp/"BUGS">). See L<https://perldoc.perl.org/functions/die>
+for the special meaning of C<\n>.
+
+=back
+
+=head2 L<Neo4j::Driver::Session>
+
+=over
+
+=item * For the transaction functions, there is technically no guarantee
+that C<$_> will contain the exception we need it to contain; see
+L<Try::Tiny/"CAVEATS">. This should I<perhaps> be changed to something
+like L<Feature::Compat::Try> eventually (which is, however, effectively
+an XS module on older Perls without C<feature 'try'>).
+
+=item * Add transaction configuration; see:
+L<https://neo4j.com/docs/http-api/4.4/actions/transaction-configuration/>
+
+=back
+
+=head2 L<Neo4j::Driver::Transaction>
+
+=over
+
+=item * Run statements lazily: Just like with the official drivers, statements
+passed to C<run> should be gathered until their results are actually accessed.
+Then, and only then, all statements gathered so far should be sent to the
+server using a single request. Challenges of this approach include that
+notifications are not associated with a single statement, so there must be an
+option to disable this behaviour; indeed, disabled should probably be the
+default when stats are requested. Additionally, there are some bugs with
+multiple statements (see tests C<non-arrayref individual statement> and
+C<include empty statement>). Since stats are now requested by default,
+this item might mean investing time in developing an optimisation
+feature that is almost never used. Since the server is often run on localhost
+anyway where latency is very close to zero, this item should not have high
+priority.
+
+=item * Support for bookmarks was added to HTTP in Neo4j 5.6.
+
+=back
+
+=head2 L<Neo4j::Driver::Record>
+
+=over
+
+=item * Consider whether to implement methods to query the list of fields for
+this record (C<keys>, C<has>, C<size>) and/or a mapping function for all fields
+(C<map>/C<forEach>). Given that this data should easily be available through
+the Result object, these seem slightly superfluous though.
+
+=item * Implement C<graph>; see
+L<https://github.com/neo4j/neo4j/blob/3.5/community/server/src/main/java/org/neo4j/server/rest/transactional/GraphExtractionWriter.java>,
+L<https://github.com/neo4j/neo4j-python-driver/wiki/1.6-changelog#160a1>.
+L<https://github.com/neo4j/neo4j-javascript-driver/issues/140#issuecomment-247203874>.
+
+=item * Maybe add C<field()> as alias for C<get()>. But do we actually need it?
+In practice, field name collisions are incredibly rare, so this would I<only>
+be used to avoid the possibly confusing C<< $record->get->get('key') >>
+pattern, which is better done using C<< $record->get->properties->{key} >>
+anyway. The official drivers only offer C<get()>, and C<field()> might be too
+similar to C<fields()> in the official Java driver, so it isn't even clear
+if the name is acceptable.
+
+=back
+
+=head2 L<Neo4j::Driver::Result>
+
+=over
+
+=item * Improve documentation, esp. wrt. side-effects of e. g. C<has_next()>
+
+=item * Perhaps C<fetch()> should always buffer two records instead of just
+one. With the current implementation, the bolt connection might remain
+attached longer than desirable in cases where the client knows in advance
+how many records there will be and calls C<fetch()> exactly that number of
+times. (In theory, such a change might even slightly improve performance
+if the driver uses Perl threads to fill the buffer in the background.)
+
+=item * C<size()> doesn't need to exhaust the result stream. It only needs to
+detach it. The official drivers don't have C<size()>, so we're free to redefine
+it in order to make it more useful to Perl users.
+
+=item * Jolt: maybe check if for DELETE requests, accepting only Jolt yields an
+octet-stream response that contains JSON; if so, perhaps add to #12644 report
+
+=back
+
+=head2 L<Neo4j::Driver::ResultSummary>
+
+=over
+
+=item * Add timers to L<Neo4j::Driver::ResultSummary> (see C<Neo4j::Bolt>).
+Method names should be C<result_available_after> and C<result_consumed_after>,
+both returning milliseconds with a default of C<-1> when unavailable (HTTP).
+
+=item * Recent Neo4j versions have added C<database>.
+
+=back
+
+=head2 L<Neo4j::Driver::SummaryCounters>
+
+=over
+
+=item * C<use Class::Accessor::Fast 0.34;>
+
+=item * It seems Neo4j 4 added new counters for system updates.
+These are C<contains_system_updates> and C<system_updates>, the latter
+returning the number of system updates. Neither is available in
+L<Neo4j::Bolt> 0.4201 according to the docs; need to check source.
+
+=back
+
+=head2 L<Neo4j::Driver::Net>
+
+=over
+
+=item * As a micro-optimisation for the HTTP net adapter API, it could be
+guaranteed for the C<http_header()> method that the returned hashref will not
+be used by the driver/controller after the next call to C<request()>, so that
+the underlying hash may be reused by the net adapter.
+
+=back
+
+=head2 L<Neo4j::Driver::Net::Bolt>
+
+=over
+
+=item * C<new()> shouldn't swallow the exception if loading
+L<Neo4j::Bolt> fails; see
+L<https://www.nntp.perl.org/group/perl.perl5.porters/2021/07/msg260971.html>
+
+=item * The next major version should require a suitably new version
+of L<Neo4j::Bolt> (using C<< ->VERSION(...) >>; see
+L<https://github.com/libwww-perl/libwww-perl/pull/253#issuecomment-295838118>)
+
+=item * In the case of L<perlbolt#51|https://github.com/majensen/perlbolt/issues/51>,
+it might be possible to try and reconnect (once) if the connection is in fact
+closed by the lib. But that shouldn't happen any more now, so I'm not sure if
+this idea is worth the effort.
+
+=back
+
+=head2 L<Neo4j::Driver::Net::HTTP>
+
+=over
+
+=item * A small memory leak exists in C<new()>. Probably no big deal.
+The config rework will eventually address this.
+
+=item * Perl HTTP libraries like L<LWP> don't report OS L<errno|Errno> codes.
+(BSD: C<man 2 intro>) C<$!> is unreliable. It might be possible to recreate
+errno codes by parsing error string messages.
+L<mentalisttraceur/errnoname|https://github.com/mentalisttraceur/errnoname>
+might be of some use there. But this idea is very likely not worth the effort.
+
+=back
+
+=head2 L<Neo4j::Driver::Net::HTTP::LWP>
+
+=over
+
+=item * Consider externalsing this as a distribution of its own now rather than
+later. Eventually we might get rid of this new dependency by including an all-new
+adapter for L<HTTP::Tiny>. Even before then, this new structure will make more
+clear that the driver in principle supports other backends besides just L<LWP>.
+
+=back
+
+=head2 Neo4j::Driver::Type::*
+
+=over
+
+=item * The C<eq> and C<ne> operators should be overloaded to allow
+for ID comparison on nodes and relationships.
+
+=item * Consider whether to use C<use overload '%{}'> to allow direct
+access to e. g. properties using the pre-0.13 hashref syntax. See
+L<https://metacpan.org/pod/overload#Two-face-References> for an example.
+L<perltie> might perhaps also work.
+Note that L<overload> might be a memory hog; see L<Types::Serialiser/"BUGS">.
+
+=item * Add C<property()> as alias for C<get()> in L<Neo4j::Driver::Type::Node>
+and L<Neo4j::Driver::Type::Relationship>, enabling clients to avoid the
+possibly confusing C<< $record->get->get >> pattern.
+Another way to avoid this pattern would be C<< $record->get->properties->{} >>.
+Aside from being longer, this is also S<50 %> slower because of the defensive
+copy that needs to be created. We should probably cache that one at least.
+In the long run, the internal representation of these types will change;
+the C<properties()> hash ref will then actually be the fastest way to get a
+single property (about 8% faster than C<get()>).
+
+=back

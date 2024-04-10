@@ -1,3 +1,1488 @@
+Sun Apr 7 18:55:18 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Merge pull request #108 from aspiers/release-v2.4.0
+
+Sun Apr 7 18:54:44 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Merge pull request #97 from ilyagr/patch-1
+
+Sun Apr 7 18:38:12 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Rebuild META.*
+
+      M META.json
+      M META.yml
+
+Sun Apr 7 18:34:35 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * HOWTO-RELEASE: THANKS is no longer being updated
+
+      M doc/HOWTO-RELEASE
+
+Sun Apr 7 18:32:51 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Update NEWS for v2.4.0
+
+      M NEWS
+
+Sun Apr 7 18:24:49 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Bump version to 2.4.0
+
+      M META.json
+      M META.yml
+      M NEWS
+      M configure.ac
+
+Sun Apr 7 18:22:56 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Add details on how to view coverage locally Unfortunately for now,
+    Coveralls reports don't include source due to #84, but this is a
+    good workaround.
+
+
+      M CONTRIBUTING.md
+      M Makefile.am
+
+Sun Apr 7 18:00:03 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * stow: remove misleading comment about current dir The current
+    directory is changed by within_target_do() which is called by
+    `plan_stow()`, `plan_unstow()`, and `process_tasks()`.  It is not 
+    changed when constructing a new `Stow` object, so remove this
+    outdated and misleading comment.
+
+    Fixes #102.
+
+
+      M bin/stow.in
+
+Sun Apr 7 17:56:54 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Merge pull request #107 from aspiers/improve-dotfiles-fix
+
+Sun Apr 7 17:44:44 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * t/unstow.t: move final set of tests into a subtest
+
+      M t/unstow.t
+
+Sun Apr 7 17:24:13 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * t/unstow.t: remove superfluous spaces
+
+      M t/unstow.t
+
+Sun Apr 7 17:19:37 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Fix unstowing with `--compat --dotfiles` Unstowing with `--dotfiles`
+    didn't work with `--compat`, because when traversing the target
+    tree rather than the package tree, there was no mechanism for
+    mapping a `.foo` file or directory back to its original
+    `dot-foo` and determine whether it should be unstowed.
+
+    So add a reverse `unadjust_dotfile()` mapping mechanism to support 
+    this.
+
+
+      M lib/Stow.pm.in
+      M lib/Stow/Util.pm.in
+      M t/dotfiles.t
+
+Sun Apr 7 15:57:03 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * t/dotfiles.t: improve language in test names and assertion messages We
+    use the term "directory" (or "dir" for short) rather than
+    "folder". Also explicitly say whether a test is stowing or
+    unstowing, and fix the odd typo.
+
+
+      M t/dotfiles.t
+
+Tue Apr 2 00:06:38 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * stow_contents: fix bugs and corner cases with type mismatch conflicts 
+    If the target directory as a file named X and a package has a 
+    directory named X, or vice-versa, then it is impossible for Stow 
+    to stow that entry X from the package, even if --adopt is
+    supplied.
+
+    However we were previously only handling the former case, and not
+    the latter, and the test for the former was actually broken.  So
+    fix stow_contents() to handle both cases correctly, fix the broken
+    test, and add a new test for the latter case.
+
+
+      M lib/Stow.pm.in
+      M t/stow.t
+
+Sun Apr 7 15:42:06 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * t/unstow.t: create a bunch of unowned files to make tests more robust 
+    This should make it harder for Stow to do the right thing.
+
+
+      M t/unstow.t
+
+Mon Apr 1 22:50:58 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * dotfiles: switch {un,}stow_{contents,node}() recursion parameters Stow
+    walks the package and target tree hierarchies by using mutually 
+    recursive pairs of functions:
+
+    - `stow_contents()` and `stow_node()`
+    - `unstow_contents()` and `unstow_node()`
+
+    As Stow runs its planning from the target directory (`plan_*()`
+    both call `within_target_do()`), previously the parameters for
+    these included:
+
+    - `$target_subpath` (or `$target_subdir` in the `*_node()`
+    functions):
+     the relative path from the target top-level directory to the
+    target
+     subdirectory (initially `.` at the beginning of recursion).  For
+     example, this could be `dir1/subdir1/file1`.
+
+    - `$source`: the relative path from the target _subdirectory_
+    (N.B. _not_
+     top-level directory) to the package subdirectory.  For example,
+    if
+     the relative path to the Stow directory is `../stow`, this could
+    be
+     `../../../stow/pkg1/dir1/subdir1/file1`.  This is used when
+    stowing
+     to construct a new link, or when unstowing to detect whether the
+     link can be unstowed.
+
+    Each time it descends into a further subdirectory of the target
+    and package, it appends the new path segment onto both of these,
+    and also prefixes `$source` with another `..`.  When the
+    `--dotfiles` parameter is enabled, it adjusts `$target_subdir`,
+    performing the `dot-foo` =>
+    `.foo` adjustment on all segments of the path in one go.  In this 
+    case, `$target_subpath` could be something like
+    `.dir1/subdir1/file1`, and the corresponding `$source` could be
+    something like
+    `../../../stow/pkg1/dot-dir1/subdir1/file1`.
+
+    However this doesn't leave an easy way to obtain the relative path 
+    from the target _top-level_ directory to the package subdirectory
+    (i.e. `../stow/pkg1/dot-dir1/subdir1/file1`), which is needed for 
+    checking its existence and if necessary iterating over its
+    contents.
+
+    The current implementation solves this by including an extra
+    `$level` parameter which tracks the recursion depth, and uses that
+    to strip the right number of leading path segments off the front
+    of `$source`.
+    (In the above example, it would remove `../..`.)
+
+    This implementation isn't the most elegant because:
+
+    - It involves adding things to `$source` and then removing them
+    again.
+
+    - It performs the `dot-` => `.` adjustment on every path segment
+     at each level, which is overkill, since when recursing down a
+    level,
+     only adjustment on the final subdirectory is required since the
+    higher
+     segments have already had any required adjustment.
+
+      This in turn requires `adjust_dotfile` to be more complex than
+    it
+     needs to be.
+
+      It also prevents a potential future where we might want Stow to
+     optionally start iterating from within a subdirectory of the
+    whole
+     package install image / target tree, avoiding adjustment at
+    higher
+     levels and only doing it at the levels below the starting point.
+
+    - It requires passing an extra `$level` parameter which can be
+     automatically calculated simply by counting the number of slashes
+     in `$target_subpath`.
+
+    So change the `$source` recursion parameter to instead track the 
+    relative path from the top-level package directory to the package 
+    subdirectory or file being considered for (un)stowing, and rename
+    it to avoid the ambiguity caused by the word "source".
+
+    Also automatically calculate the depth simply by counting the
+    number of slashes, and reconstruct `$source` when needed by
+    combining the relative path to the Stow directory with the package
+    name and
+    `$target_subpath`.
+
+    Closes #33.
+
+
+      M lib/Stow.pm.in
+      M lib/Stow/Util.pm.in
+      M t/dotfiles.t
+
+Sun Apr 7 13:08:56 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * unstow_link_node(): don't register conflicts when unstowing unowned
+    links
+
+      M lib/Stow.pm.in
+      M t/unstow.t
+
+Tue Apr 2 00:36:51 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * merge unstow_orig.t into unstow.t and fix unstowing logic There was a
+    ton of duplication which is not maintainable, so refactor 
+    everything into a single test which still covers the differences.
+
+    This in turn revealed some issues in the unstowing logic:
+
+    - We shouldn't conflict if we find a file which isn't a link or a
+     directory; we can just skip over it.
+
+    - Unstowing with `--dotfiles` was using the wrong variable to
+    obtain
+     the package path, and as a result having to perform an
+    unnecessary
+     call to `adjust_dotfile()`.
+
+    So fix those at the same time.
+
+
+      M .gitignore
+      M MANIFEST
+      M MANIFEST.SKIP
+      M Makefile.am
+      M lib/Stow.pm.in
+      M t/dotfiles.t
+      M t/testutil.pm
+      M t/unstow.t
+      D t/unstow_orig.t
+
+Sun Apr 7 14:09:15 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * allow playground/ directory for testing stuff
+
+      M .gitignore
+      M CONTRIBUTING.md
+      M MANIFEST.SKIP
+
+Sun Apr 7 14:08:59 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * tidy up MANIFEST.SKIP
+
+      M MANIFEST.SKIP
+
+Sun Apr 7 13:08:27 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * read_a_link(): clarify debug message when it's a real link
+
+      M lib/Stow.pm.in
+
+Sun Apr 7 12:51:21 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Fix Dockerfile by updating from jessie to bookworm
+
+      M docker/Dockerfile
+
+Sat Apr 6 15:37:36 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Merge pull request #106 from aspiers/dev
+
+Sat Apr 6 15:09:53 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Update manifest files to keep ./Build distcheck happy
+
+      M MANIFEST
+      M MANIFEST.SKIP
+
+Sat Apr 6 14:59:52 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Revert "testutil: Add sanity check for cwd" This reverts commit
+    5d4e68291e24558a51376cf218cca9a1142dfff1.
+
+    It turns out that this broke `make distcheck`.
+
+
+      M t/testutil.pm
+
+Sat Apr 6 14:51:53 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Revert "Remove unnecessary AM_MAKEINFOFLAGS tweak" This reverts commit
+    1a20a3f7eec823820b5cd01d566244e4fa968b73.
+
+    It turns out that `texi2dvi` _does_ require `-I $(srcdir)` for
+    `@verbatiminclude default-ignore-list` to work after all.  It's
+    needed not for a normal docs build, but when `make distcheck` is
+    run, presumably because `distcheck` runs from a different
+    directory.
+
+
+      M Makefile.am
+      M configure.ac
+
+Sat Apr 6 14:39:16 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Makefile.am: include DEFAULT_IGNORE_LIST in doc_deps
+
+      M Makefile.am
+
+Sat Apr 6 13:33:53 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * iterate over directories in sorted order This makes behaviour more
+    deterministic, and makes debugging easier.
+
+
+      M lib/Stow.pm.in
+
+Sat Apr 6 11:59:23 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * t/unstow.t: convert to use subtests
+
+      M t/unstow.t
+
+Sat Apr 6 11:58:56 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * t/unstow_orig.t: use like() for regexp matching tests This is better
+    because it outputs the mismatching value when the matching check
+    fails.
+
+
+      M t/unstow_orig.t
+
+Sat Apr 6 11:44:36 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * t/unstow_orig.t: use is() for equality tests This is better because it
+    outputs the mismatching values when the equality check fails.
+
+
+      M t/unstow_orig.t
+
+Sat Apr 6 11:12:15 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * tests: use stderr_like() instead of home-grown STDERR capturing The
+    STDERR capturing in testutil just reinvents Test::Output which we
+    already use in chkstow.t, so it's pointless to reinvent that
+    wheel.
+
+
+      M t/stow.t
+      M t/testutil.pm
+      M t/unstow.t
+      M t/unstow_orig.t
+
+Thu Apr 4 00:36:37 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * testutil: rename parameter names to be less confusing
+    $target was the source of the link, and $source was the target
+    (destination) of the link.  Obviously this was hopelessly 
+    confusing, so rename to avoid this.
+
+
+      M t/testutil.pm
+
+Fri Apr 5 22:24:00 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * manual: clarify the pros and cons and history of --compat
+
+      M doc/stow.texi
+
+Fri Apr 5 01:57:29 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Merge pull request #105 from aspiers/github-workflow
+
+Fri Apr 5 00:51:27 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Port Travis CI workflow to a GitHub CI workflow Travis is no longer
+    free, so move to GitHub.  (In the future ideally we should reduce
+    dependencies on proprietary platforms.)
+
+
+      A .coveralls.yml
+      A .github/workflows/test.yml
+      M MANIFEST.SKIP
+
+Mon Apr 1 23:25:46 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * t/stow.t: fix typos, whitespace, and ordering of lines
+
+      M t/stow.t
+
+Mon Apr 1 23:31:36 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * testutil: use croak() instead of die() for more useful errors
+
+      M t/testutil.pm
+
+Mon Apr 1 22:56:32 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * t/stow: use like() instead of ok(... =~ /.../)
+
+      M t/stow.t
+
+Mon Apr 1 23:37:06 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * rename $path => $target_path in node helpers is_a_node(), is_a_dir(),
+    is_a_link() all operate on paths within the target directory, so
+    make this explicit by avoiding the vague variable name "$path".
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 22:32:24 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * fold_tree: rename $target parameter to $target_subdir
+    $target is vague and could refer to the top-level target
+    directory, so rename to clarify.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 22:30:55 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * fold_tree: rename $source parameter to $pkg_subpath
+    $source is vague and confusing as per the manual.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 22:29:03 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * unstow_node / unstow_existing_node: rename foldable return value
+    $parent is a bit vague so rename to $parent_in_pkg.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 21:54:15 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * unstow_valid_link: rename $existing_path Unqualified references to
+    "path" are horribly vague, so rename to
+    $existing_pkg_path_from_cwd for clarity.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 21:57:36 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * stow_node: rename $existing_path Unqualified references to "path" are
+    horribly vague, so rename to
+    $existing_pkg_path_from_cwd for clarity.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 21:51:24 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * link_owned_by_package: rename $source => $link_dest The use of the
+    word "source" to describe a link's destination is confusing in the
+    context of Stow for reasons explained in the manual.
+
+    So rename the $source variable to avoid this.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 21:48:33 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * remove or rename XXX Remove old XXX FIXMEs which tell us nothing
+    useful and may not be relevant any more.
+
+    Also rename another XXX to an industry-standard FIXME.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 21:36:58 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * unstow_node: remove redundant return
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 21:32:30 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Change debug indentation in some helpers These helpers can be called
+    at more deeply nested levels, so they should be indented more than
+    they were.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 21:55:51 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * unstow_link_node: rename $existing_path Unqualified references to
+    "path" are horribly vague, so rename to
+    $existing_pkg_path_from_cwd for clarity.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 21:26:21 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * unstow_link_node: rename $existing_source => $link_dest The use of the
+    word "source" to describe a link's destination is confusing in the
+    context of Stow for reasons explained in the manual.
+
+    So rename the $existing_source variable to $link_dest avoid this.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 21:23:35 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * unstow_contents: remove reference to "source" The use of the word
+    "source" is confusing in the context of Stow for reasons explained
+    in the manual.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 21:24:35 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * stow_node: remove comments about implementation details from POD These
+    don't add much value, and the reference to $source was out of date
+    anyway.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 21:21:06 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * stow_node: rename $second_source => $link_dest The use of the word
+    "source" to describe a link's destination is confusing in the
+    context of Stow for reasons explained in the manual.
+
+    So rename the $second_source variable to avoid this.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 21:33:55 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * foldable: make more understandable Improve variable names, POD, and
+    add helpful comments.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 19:57:54 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * foldable: rename $path to $target_node_path
+    $path is horribly vague, so rename it to be more informative.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 18:49:01 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * foldable: add debug for different cases when not foldable
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 19:53:56 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * read_a_link: improve variable names
+    $path is horribly vague, so rename to $link to be more
+    informative.
+
+    Also the use of "$target" to describe a link's destination is very 
+    confusing in the context of Stow for reasons explained in the
+    manual. So rename to $link_dest.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 17:59:25 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * parent_link_scheduled_for_removal: tweak debug
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 17:00:13 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * t/unstow_orig: split into subtests
+
+      M t/unstow_orig.t
+
+Mon Apr 1 16:34:01 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * foldable: rename $target => $target_subdir The $target variable was
+    ambiguous, as it could have referred to the path to the target
+    directory, or the path to a sub-directory in the target, as well
+    as its intended meaning of a subpath relative to the target
+    directory.  So rename it to try to find the balance between 
+    clarity and verbosity.
+
+
+      M NEWS
+      M lib/Stow.pm.in
+
+Mon Apr 1 16:18:52 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * find_stowed_path: rename $path / $dest to $pkg_path_from_cwd
+    $path is horribly vague, so rename to be more informative.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 16:16:52 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * unstow_node: rename $path to $pkg_path_from_cwd
+    $path is horribly vague, so rename to be more informative.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 16:08:56 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * link_dest_within_stow_dir: rename $path to $pkg_subpath
+    $path is horribly vague, so rename to be more informative.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 16:07:09 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * find_containing_marked_stow_dir: rename $path to $pkg_path_from_cwd
+    $path is horribly vague, so rename to be more informative.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 16:06:12 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * unstow_* helpers: rename $path to $pkg_path_from_cwd
+    $path is horribly vague, so rename to be more informative.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 15:58:09 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * marked_stow_dir: rename $path to $dir It's always a directory, so make
+    this explicit.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 15:49:19 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * find_stowed_path: reintroduce missing comment lines These lines were
+    accidentally removed by 84367681.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 15:15:58 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * stow_contents / unstow_node: rename $target => $target_sub{dir,path} 
+    This is very similar to a previous commit which did the same
+    rename in stow_node().
+
+    The $target variable was ambiguous, as it could have referred to
+    the path to the target directory, or the path to a sub-directory
+    in the target, as well as its intended meaning of a subpath
+    relative to the target directory.  So rename it to try to find the
+    balance between clarity and verbosity.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 15:12:46 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * manual: use American punctuation of "vs." GNU and Stow are both
+    originally from the USA, so it makes sense to stay consistent with
+    American English.
+
+
+      M doc/stow.texi
+
+Mon Apr 1 13:00:51 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Remove unstow_*_orig() functions Refactor the compat mode code to
+    reuse the existing unstow_contents() and unstow_node().  This
+    allows us to remove the parallel versions in 
+    unstow_contents_orig() and unstow_node(), which contained a lot of 
+    duplicated code and were a significant maintenance burden.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 12:13:21 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * emacs: tweak more cperl indentation config to match existing style
+
+      M .dir-locals.el
+
+Mon Apr 1 12:12:27 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * unstow_node_orig: replace a bunch of duplicated code with
+    unstow_link_node()
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 11:49:07 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * unstow_node: extract new unstow_existing_node() sub
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 11:46:10 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * unstow_node: extract new unstow_link_node() sub
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 11:40:26 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * unstow_node: extract new unstow_valid_link() sub
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 11:17:59 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * stow_node: rename $target => $target_subpath The $target variable was
+    ambiguous, as it could have referred to the path to the target
+    directory, or the path to a sub-directory in the target, as well
+    as its intended meaning of a subpath relative to the target
+    directory.  So rename it to try to find the balance between 
+    clarity and verbosity.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 02:30:47 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * t/dotfiles.t: switch to subtests
+
+      M t/dotfiles.t
+
+Mon Apr 1 01:55:31 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * t/stow: convert to subtests()
+
+      M t/stow.t
+
+Mon Apr 1 00:39:18 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * rename $existing_source => $existing_link_dest Source can be
+    ambiguous, as mentioned in the manual.
+
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 00:35:35 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * stow_node(): fix odd whitespace
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 00:34:39 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * should_skip_target(): add docs explaining its purpose
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 00:34:19 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * do_link(): improve variable names
+
+      M lib/Stow.pm.in
+
+Mon Apr 1 00:07:06 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Add emacs config to prevent insertion of hard tabs
+
+      M .dir-locals.el
+
+Mon Apr 1 00:06:24 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Remove hard tabs
+
+      M lib/Stow.pm.in
+
+Sun Mar 31 23:51:14 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * add unit tests for adjust_dotfiles()
+
+      M t/dotfiles.t
+
+Sun Mar 31 23:41:02 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Merge commit 'pullreqs/70' into dev
+
+Sun Mar 31 19:02:23 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * manual: disambiguate meaning of "source"
+
+      M doc/stow.texi
+
+Sun Mar 31 18:59:19 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * manual: clarify that installation image is pre-installation
+
+      M doc/stow.texi
+
+Sun Mar 31 16:10:08 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Stow.pm: reformat old comment style as pod As previously noted, the
+    old comment style was difficult to edit. It's also not idiomatic
+    Perl style, so reformat as pod.  This exposes more of the inner
+    workings of Stow as documentation, but that shouldn't be a
+    problem.
+
+    As part of this change, remove outdated and sometimes misleading 
+    information about if/when each function throws an exception.
+
+
+      M NEWS
+      M lib/Stow.pm.in
+
+Sun Mar 31 15:38:38 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Stow.pm: rename $ldest to $link_dest for clarity
+
+      M lib/Stow.pm.in
+      M lib/Stow/Util.pm.in
+
+Sun Mar 31 15:33:14 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Stow.pm: reformat comments Some methods had comments with a prefix
+    which made the paragraph inconveniently narrow, and made refilling
+    it really awkward.  So switch to a more natural comment style.
+
+
+      M lib/Stow.pm.in
+
+Sun Mar 31 15:25:35 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * manual: avoid double spaces after "i.e."
+
+      M doc/stow.texi
+
+Sun Mar 31 15:14:28 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * manual: Expand the definition of symlinks and disambiguate "target" 
+    Target can have two opposing meanings:
+
+    1. the target directory where symlinks are managed by Stow, and 2.
+    the destinations of those symlinks
+
+    So try to move away from this by using the word "destination" for 
+    symlinks.
+
+
+      M doc/stow.texi
+
+Sun Mar 31 14:11:36 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * NEWS: more updates in preparation for next release
+
+      M NEWS
+
+Wed Nov 11 19:43:25 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Eliminate erroneous warning when unstowing (#65) When unstowing a
+    package, cleanup_invalid_links() is invoked to remove any invalid
+    links owned by Stow.  It was invoking link_owned_by_package() to
+    check whether each existing link is owned by Stow.  This in turn 
+    called find_stowed_path() which since 40a080718505 was not
+    allowing for the possibility that it could be passed a symlink
+    *not* owned by Stow with an absolute target and consequently
+    emitting an erroneous warning.
+
+    So remove this erroneous warning, and refactor find_stowed_path() 
+    to use two new helper functions for detecting stow directories: 
+    link_dest_within_stow_dir() and find_containing_marked_stow_dir(). 
+    Also refactor the logic within each to be simpler and more
+    accurate, and add more test cases to the corresponding parts of
+    the test suite.
+
+    Fixes #65. Closes #103.
+
+    https://github.com/aspiers/stow/issues/65
+
+
+      M NEWS
+      M lib/Stow.pm.in
+      M t/find_stowed_path.t
+      A t/link_dest_within_stow_dir.t
+
+Sun Mar 31 11:53:54 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * cleanup_invalid_links: add test for non-cleanup of an unowned link
+
+      M t/cleanup_invalid_links.t
+
+Sun Mar 31 11:58:39 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * cleanup_invalid_links: improve docs
+
+      M lib/Stow.pm.in
+
+Sun Mar 31 11:52:45 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * t/cleanup_invalid_links: divide into subtests This makes the code and
+    test output both more legible.
+
+
+      M t/cleanup_invalid_links.t
+
+Sat Mar 30 14:03:56 2024 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Separate treatment of .stow and .nonstow marked dirs Placing a .stow
+    file in a directory tells Stow that this directory should be
+    considered a Stow directory.  This is already well-documented.
+
+    There was an undocumented and slightly broken feature where
+    placing a
+    .nonstow file in a directory was treated in exactly the same way. 
+    The intention was for .nonstow to cause Stow to skip stowing into
+    and unstowing from that directory and any of its descendants. 
+    However, it also caused Stow to consider symlinks into any of
+    those directories as owned by Stow, even though that was clearly
+    not the intention.  So separate treatment of .stow and .nonstow
+    markers, so that while both provide protection against Stow
+    stowing and unstowing, only .stow affects the symlink ownership
+    logic in find_stowed_path() and marked_stow_dir().
+
+    Probably no one uses the undocumented .nonstow feature, so it may
+    make sense to remove this in future.
+
+
+      M lib/Stow.pm.in
+      M t/unstow.t
+      M t/unstow_orig.t
+
+Sun Mar 31 11:59:52 2024 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * join_paths: improve docs to clarify purpose / differences join_paths()
+    is used in specific ways and has specific behaviour required which
+    is nuanced and not obvious at first sight.  So make this explicit
+    for future reference.
+
+
+      M lib/Stow/Util.pm.in
+
+Fri Mar 29 22:52:12 2024 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Make join_paths correctly handle absolute paths Previously
+    join_paths() was incorrectly handling absolute paths, for example
+    join_paths('a/b', '/c/d') would return 'a/b/c/d' rather than
+    '/c/d'.  This was a problem when following a symlink in 
+    find_stowed_path(), because if the symlink was not owned by Stow
+    and pointed to an absolute path, find_stowed_path() might
+    accidentally deem the link owned by Stow, if c/d was a valid path
+    relative to the current directory.
+
+
+      M lib/Stow/Util.pm.in
+      M t/join_paths.t
+
+Sat Mar 30 19:27:12 2024 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Disable emacs auto-fill-mode This completely messes up the current
+    function documentation.
+
+
+      M .dir-locals.el
+
+Sat Mar 30 12:57:55 2024 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Move setting of cperl-indent-level to .dir-locals.el This removes
+    duplication.
+
+
+      M .dir-locals.el
+      M bin/chkstow.in
+      M bin/stow.in
+      M lib/Stow.pm.in
+      M lib/Stow/Util.pm.in
+      M t/testutil.pm
+
+Sat Mar 30 12:55:56 2024 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Highlight an issue with prove overriding TEST_VERBOSE
+
+      M CONTRIBUTING.md
+
+Sat Mar 9 18:11:29 2024 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * t/find_stowed_path.t: Add a couple of missing spaces
+
+      M t/find_stowed_path.t
+
+Sat Mar 9 18:11:00 2024 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Add some helpful comments Explain a few things in preparation for a
+    bugfix.
+
+
+      M lib/Stow.pm.in
+      M t/find_stowed_path.t
+
+Sat Mar 9 17:52:17 2024 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * manual: fix duplicated "of" typo
+
+      M doc/stow.texi
+
+Sat Mar 9 17:49:49 2024 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Remove $stow_path parameter from unstow_{contents,node}{,_orig}() 
+    Unlike with the stow_{contents,node}{,_orig}() counterpart
+    functions, when unstowing, it's not necessary to pass the
+    $stow_path parameter because it can never differ from
+    $self->{stow_path}.
+
+    The stow_*() functions need this for the corner case of unfolding
+    a tree which is stowed from a different stow directory to the one
+    being used for the current stowing operation (see the "Multiple
+    Stow Directories" section of the manual).
+
+
+      M lib/Stow.pm.in
+
+Sat Mar 9 17:38:20 2024 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Tweak text of error and debug messages
+
+      M lib/Stow.pm.in
+
+Sat Mar 9 17:36:19 2024 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Add a missing period to the stow_contents() comments.
+
+      M lib/Stow.pm.in
+
+Sat Mar 9 17:35:35 2024 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Add a comment explaining that $node_target can be adjusted for dot-
+    prefix
+
+      M lib/Stow.pm.in
+
+Sat Mar 9 17:34:46 2024 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Add a comment explaining path in stow_contents()
+
+      M lib/Stow.pm.in
+
+Sat Mar 9 17:33:25 2024 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Add a comment explaining $stow_path parameter of stow_contents() At
+    first sight this parameter looks redundant since we have
+    $self->{stow_path}, but in one case the value can differ from
+    that, so mention that explicitly.
+
+
+      M lib/Stow.pm.in
+
+Mon Mar 4 00:53:51 2024 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * plan_*: rename $path to $pkg_path for clarity
+    $path is a vague variable name.
+
+
+      M lib/Stow.pm.in
+
+Sun Mar 3 18:30:21 2024 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * dotfiles.t: improve comment descriptions
+
+      M t/dotfiles.t
+
+Sun Mar 3 18:29:53 2024 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * aclocal.m4: update to 1.16.5
+
+      M NEWS
+      M aclocal.m4
+
+Mon Apr 5 15:36:36 2021 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * testutil: Add sanity check for cwd
+
+      M t/testutil.pm
+
+Mon Apr 5 15:35:13 2021 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * manual: update the Reporting Bugs / Known Bugs sections
+
+      M doc/stow.texi
+
+Mon Apr 5 15:33:44 2021 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * manual: use @email{} for email addresses
+
+      M doc/stow.texi
+
+Sun Apr 4 23:37:24 2021 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Remove trailing whitespace
+
+      M lib/Stow/Util.pm.in
+      M t/unstow_orig.t
+
+Sun Apr 4 23:31:35 2021 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * testutil: clarify reason for default paths in new_Stow()
+
+      M t/testutil.pm
+
+Sun Apr 4 22:52:22 2021 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * manual: improve explanation of target directory definition Bring this
+    more up to date by mentioning the dotfiles use case.
+
+
+      M NEWS
+      M doc/stow.texi
+
+Sun Apr 4 19:08:15 2021 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Add `watch` target to Makefile for easier hacking
+
+      M CONTRIBUTING.md
+      M Makefile.am
+      M NEWS
+
+Sun Apr 4 18:10:17 2021 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * CONTRIBUTING: document how to test using prove(1)
+
+      M CONTRIBUTING.md
+
+Fri Aug 12 20:43:56 2022 -0700  Ilya Grigoriev <ilyagr@users.noreply.github.com>
+
+    * Add .gitmodules to the default ignore list
+
+      M default-ignore-list
+
+Sun Apr 4 17:34:46 2021 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Upgrade aclocal to 1.16.3
+
+      M NEWS
+      M aclocal.m4
+
+Wed Nov 11 19:42:28 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * cleanup_invalid_links: it's a bug if called with a non-directory
+
+      M lib/Stow.pm.in
+
+Wed Nov 11 19:41:38 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * CONTRIBUTING: Add a section on how to run the tests
+
+      M CONTRIBUTING.md
+
+Wed Nov 11 19:36:38 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Beef up README.md and add CONTRIBUTING.md
+
+      A CONTRIBUTING.md
+      M NEWS
+      M README.md
+      M doc/stow.texi
+
+Wed Nov 11 19:24:59 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * manual: request --verbose=5 for bug reports
+
+      M doc/stow.texi
+
+Wed Nov 11 19:24:09 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * AUTHORS: mention THANKS file
+
+      M AUTHORS
+
+Wed Nov 11 18:51:22 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * NEWS: update for 2.3.2
+
+      M NEWS
+
+Wed Nov 11 18:42:21 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * NEWS: set org-blank-before-new-entry
+
+      M NEWS
+
+Wed Nov 11 18:19:43 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Skip unnecessary planning
+
+      M lib/Stow.pm.in
+
+Wed Nov 11 17:13:57 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * cleanup_invalid_links: improve handling of scheduled actions
+
+      M lib/Stow.pm.in
+
+Wed Nov 11 17:13:47 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Further improve debug output
+
+      M lib/Stow.pm.in
+
+Mon Nov 2 00:52:41 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Rename path_owned_by_package() to link_owned_by_package()
+
+      M lib/Stow.pm.in
+
+Mon Nov 2 00:54:15 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Make cleanup_invalid_links() more explicit And add some debug.
+
+
+      M lib/Stow.pm.in
+
+Mon Nov 2 00:53:19 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Improve debug indent levels
+
+      M lib/Stow.pm.in
+
+Mon Nov 2 00:19:21 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Add support for emacs dumb-jump Allow easy navigation to function
+    definitions in emacs.
+
+    The rg (ripgrep) search is needed because as the dumb-jump README
+    says:
+
+       [...] the default searcher (git-grep) won't be able to search
+      outside of the project root. This edge case will be fixed in a
+      future release.
+
+    See: https://github.com/jacktasia/dumb-jump
+
+
+      A .dir-locals.el
+      A .dumbjump
+
+Sun Nov 1 21:04:22 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Move to explicit debug indentation levels
+
+      M lib/Stow.pm.in
+      M lib/Stow/Util.pm.in
+
+Sun Nov 1 17:46:01 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * foldable(): fix debug indentation
+
+      M lib/Stow.pm.in
+
+Sun Nov 1 17:43:17 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * should_skip_target_which_is_stow_dir(): fix debug indentation
+
+      M lib/Stow.pm.in
+
+Sun Nov 1 17:19:18 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * HOWTO-RELEASE: maintainer-clean is better than distclean
+
+      M doc/HOWTO-RELEASE
+
+Sun Nov 1 16:52:50 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Correct comment about overriding the check rule We actually override
+    check-TESTS.
+
+
+      M configure.ac
+
+Sun Nov 1 16:34:46 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Remove unnecessary AM_MAKEINFOFLAGS tweak We no longer need to ensure
+    that texi2any (a.k.a. makeinfo) is called with -I $(srcdir) in
+    order to make the
+
+        @verbatiminclude default-ignore-list
+
+    in the manual work, because texi2any includes the current working 
+    directory by default anyway.  Presumably this behaviour was
+    introduced after this AM_MAKEINFOFLAGS was previously added,
+    because it was needed at some point in the past.
+
+
+      M Makefile.am
+      M configure.ac
+
+Sun Nov 1 16:06:36 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Replace broken gmane links with links to lists.gnu.org gmane has been
+    dead for quite a while:
+
+       
+    https://lars.ingebrigtsen.no/2020/01/06/whatever-happened-to-news-gmane-org/
+
+
+      M Makefile.am
+      M NEWS
+      M TODO
+
+Sun Nov 1 15:05:31 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * aclocal.m4: update to 1.16.2 This only updates copyright notices to
+    2020, and URLs to https.
+
+
+      M aclocal.m4
+
+Sun Nov 1 15:04:56 2020 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Ditch texinfo.tex from distribution
+
+      M MANIFEST
+      M Makefile.am
+      M automake/.gitignore
+      D doc/texinfo.tex
+
+Thu Apr 15 12:18:10 2021 +0100  Adam Spiers <github@adamspiers.org>
+
+    * Merge pull request #86 from gutierri/patch-manpage add option
+    --simulate on manpage
+
+Wed Apr 14 22:08:38 2021 -0300  Gutierri Barboza <me@gutierri.me>
+
+    * add option --simulate on manpage
+
+      M bin/stow.in
+
+Wed Apr 14 11:03:00 2021 +0100  Adam Spiers <github@adamspiers.org>
+
+    * Merge pull request #85 from gutierri/patch-usage-dotfiles add
+    --dotfiles sub usage
+
+Tue Apr 13 22:09:38 2021 -0300  Gutierri Barboza <me@gutierri.me>
+
+    * add --dotfiles sub usage
+
+      M bin/stow.in
+
+Sun Nov 1 12:24:52 2020 +0000  Adam Spiers <github@adamspiers.org>
+
+    * Merge pull request #71 from egli/master Mention the dotfiles option in
+    the manual
+
+Wed May 27 17:51:37 2020 +0200  Christian Egli <christian.egli@sbs.ch>
+
+    * Mention the dotfiles option in the manual This should have been part
+    of 182acbbb64425bf95008cb6d42d266f6185032c9 when the option was
+    first added.
+
+    This commit basically just copies the help text from stow.in into
+    the texinfo manual.
+
+
+      M doc/stow.texi
+
+Mon May 25 22:26:31 2020 +0200  ATuinDev <1757663+AitorATuin@users.noreply.github.com>
+
+    * Fix missing variable
+
+      M lib/Stow.pm.in
+
+Mon May 25 22:23:23 2020 +0200  ATuinDev <1757663+AitorATuin@users.noreply.github.com>
+
+    * Add more tests for testing directories in dotfiles.t
+
+      M t/dotfiles.t
+
+Mon May 25 22:21:31 2020 +0200  ATuinDev <1757663+AitorATuin@users.noreply.github.com>
+
+    * Add $level variable in stow_contents and stow_node This variables is
+    used to keep track of the current level in the source.
+
+
+      M lib/Stow.pm.in
+
+Sun May 24 18:12:49 2020 +0200  ATuinDev <1757663+AitorATuin@users.noreply.github.com>
+
+    * Fixes Bug #56727 Problem was that when running
+    stow_contents/unstow_contents recursively from 
+    stow_node/unstow_node the information for the source path (without
+    the dot- to
+    . transformation) was lost.
+
+    In the case of stow_contents the solution is just to remove the
+    leading dots (..) from the $source path (since the $source path is
+    passed as an argument to the function)
+
+    In the case of unstow_contents the solution is the same as for
+    stow_contents but the arguments was now passed so I added it to
+    the function.
+
+
+      M lib/Stow.pm.in
+
+Sun Jul 28 14:54:36 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * HOWTO-RELEASE: explicitly push to master This avoids errors like
+
+        fatal: You are pushing to remote 'savannah', which is not the
+    upstream of
+       your current branch 'master', without telling me what to push
+       to update which remote branch.
+
+
+      M doc/HOWTO-RELEASE
+
+Sun Jul 28 14:52:53 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Bump version to 2.3.2 for development of next release
+
+      M META.json
+      M META.yml
+      M configure.ac
+
+Sun Jul 28 14:52:16 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * HOWTO-RELEASE: fix final step of bumping to next release version
+
+      M doc/HOWTO-RELEASE
+
+Sun Jul 28 14:29:06 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * NEWS: disable org-export-with-toc 2.3.0 was a big release with lots of
+    stuff, but most releases will be smaller, so default to not having
+    a ToC.
+
+
+      M NEWS
+
+Sun Jul 28 14:28:41 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * NEWS: don't export with author name Avoid extra noise when exporting
+    to text for a release announcement.
+
+
+      M NEWS
+
+Sun Jul 28 13:58:00 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * HOWTO-RELEASE: explain how to confirm PAUSE acceptance of upload
+
+      M doc/HOWTO-RELEASE
+
+Sun Jul 28 13:28:46 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * HOWTO-RELEASE: do ./Build dist earlier docker builds break ./Build
+    dist, so do it earlier.
+
+
+      M doc/HOWTO-RELEASE
+
 Sun Jul 28 13:15:11 2019 +0100  Adam Spiers <stow@adamspiers.org>
 
     * Make sure release process starts from a clean slate
@@ -1476,8 +2961,7 @@ Mon Nov 16 22:12:02 2015 +0000  Adam Spiers <stow@adamspiers.org>
 
     * convert README to Markdown
 
-      D README
-      A README.md
+R076	README	README.md
 
 Mon Nov 16 21:56:45 2015 +0000  Adam Spiers <stow@adamspiers.org>
 
@@ -1632,8 +3116,7 @@ Mon Nov 9 11:36:11 2015 +0000  Adam Spiers <stow@adamspiers.org>
       M META.yml
       M Makefile.am
       M NEWS
-      D lib/Stow/Util.pm
-      A lib/Stow/Util.pm.in
+R099	lib/Stow/Util.pm	lib/Stow/Util.pm.in
 
 Mon Nov 9 11:05:00 2015 +0000  Adam Spiers <stow@adamspiers.org>
 
@@ -2135,20 +3618,16 @@ Mon Jan 9 21:32:31 2012 +0000  Adam Spiers <stow@adamspiers.org>
     * Rename test files to reflect their purpose.
 
       M MANIFEST
-      A t/stow.t
-      D t/stow_contents.t
-      A t/unstow.t
-      D t/unstow_contents.t
-      D t/unstow_contents_orig.t
-      A t/unstow_orig.t
+R099	t/stow_contents.t	t/stow.t
+R099	t/unstow_contents.t	t/unstow.t
+R099	t/unstow_contents_orig.t	t/unstow_orig.t
 
 Mon Jan 9 21:31:46 2012 +0000  Adam Spiers <stow@adamspiers.org>
 
     * Rename stow.t to be more consistent with its purpose.
 
       M MANIFEST
-      A t/cli_options.t
-      D t/stow.t
+R098	t/stow.t	t/cli_options.t
 
 Mon Jan 9 22:10:19 2012 +0000  Adam Spiers <stow@adamspiers.org>
 
@@ -2677,9 +4156,8 @@ Thu Nov 24 17:00:33 2011 +0000  Adam Spiers <stow@adamspiers.org>
     * Auto-generate ChangeLog from git
 
       M .gitignore
-      D ChangeLog
       M Makefile.am
-      A doc/ChangeLog.OLD
+R099	ChangeLog	doc/ChangeLog.OLD
 
 Thu Nov 24 16:59:45 2011 +0000  Adam Spiers <stow@adamspiers.org>
 
@@ -2893,23 +4371,15 @@ Mon Nov 21 13:59:36 2011 +0000  Adam Spiers <stow@adamspiers.org>
       A META.json
       A META.yml
       M Makefile.am
-      A automake/install-sh
-      A automake/mdate-sh
-      A automake/missing
-      A bin/chkstow.in
-      A bin/stow.in
-      D chkstow.in
+R100	install-sh	automake/install-sh
+R100	mdate-sh	automake/mdate-sh
+R100	missing	automake/missing
+R091	chkstow.in	bin/chkstow.in
+R096	stow.in	bin/stow.in
       M configure.ac
-      A doc/stow.8
-      A doc/stow.texi
-      A doc/texinfo.tex
-      D install-sh
-      D mdate-sh
-      D missing
-      D stow.8
-      D stow.in
-      D stow.texi
-      D texinfo.tex
+R099	stow.8	doc/stow.8
+R099	stow.texi	doc/stow.texi
+R099	texinfo.tex	doc/texinfo.tex
 
 Mon Nov 21 14:07:39 2011 +0000  Adam Spiers <stow@adamspiers.org>
 
@@ -2940,10 +4410,9 @@ Thu Nov 24 16:28:09 2011 +0000  Adam Spiers <stow@adamspiers.org>
       M t/parent.t
       M t/stow.t
       M t/stow_contents.t
-      A t/testutil.pm
+R083	t/util.pm	t/testutil.pm
       M t/unstow_contents.t
       M t/unstow_contents_orig.t
-      D t/util.pm
 
 Fri Nov 18 15:09:39 2011 +0000  Adam Spiers <stow@adamspiers.org>
 

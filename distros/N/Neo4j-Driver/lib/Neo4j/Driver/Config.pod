@@ -13,7 +13,7 @@ Neo4j::Driver::Config - Driver configuration options
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 SYNOPSIS
 
@@ -102,6 +102,9 @@ option on a Bolt connection is a fatal error.
 The driver will currently give warnings when using concurrent
 transactions on HTTP I<without> enabling this option, but these
 warnings will become fatal errors in driver S<version 1.xx>.
+
+Using concurrent transactions will make your code less portable.
+This feature exists primarily to support legacy applications.
 
 =head2 cypher_params
 

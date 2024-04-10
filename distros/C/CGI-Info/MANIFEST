@@ -22,6 +22,7 @@ t/comment-spelling.t
 t/cookies.t
 t/critic.t
 t/cv.t
+t/dependent-modules.t
 t/dist.t
 t/eof.t
 t/eol.t
@@ -35,7 +36,6 @@ t/is_tablet.t
 t/json.t
 t/kwalitee.t
 t/lib/MyLogger.pm
-t/links.t
 t/logdir.t
 t/manifest.t
 t/metrics.t
@@ -48,6 +48,7 @@ t/param.t
 t/params.t
 t/pod-cm.t
 t/pod-coverage.t
+t/pod-links.t
 t/pod-snippets.t
 t/pod-spelling.t
 t/pod-synopsis.t
@@ -60,12 +61,14 @@ t/script.t
 t/site.t
 t/status.t
 t/strict.t
+t/tabs.t
 t/taint.t
 t/tmpdir.t
 t/untaint.t
 t/unused.t
 t/used.t
 t/vars.t
+t/version.t
 t/xml.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

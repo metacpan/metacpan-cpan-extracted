@@ -48,7 +48,7 @@ END
 		$r = $s->run($q, a => $a, b => $b, c => );
 	} qr/Odd number of elements .* parameter hash/i, 'param list uneven';
 	throws_ok {
-		$r = $s->run($q, a => $a);
+		$r = $s->run($q, a => $a)->has_next;
 	} qr/\bParameterMissing.* b\b|\bold parameter syntax\b|\bInvalid input '\{'/si, 'missing param';
 	throws_ok {
 		$r = $s->run($q, [a => $a, b => $b]);
@@ -65,12 +65,12 @@ END
 
 subtest 'query error handling' => sub {
 	plan tests => 3;
-	throws_ok { $s->run(' iced manifolds.'); } qr/syntax/i, 'cypher syntax error';
+	throws_ok { $s->run(' iced manifolds.')->has_next } qr/syntax/i, 'cypher syntax error';
 	my $q = 'RETURN 42';
 	throws_ok { $s->run(\$q) } qr/\bunblessed reference\b/, 'bogus reference query';
 	SKIP: {
 		skip 'for sim', 1 if $Neo4j_Test::sim;
-		throws_ok { $s->run( bless \$q, 'Neo4j::Test' ); } qr/syntax/i, 'bogus blessed query';
+		throws_ok { $s->run( bless \$q, 'Neo4j::Test' )->has_next } qr/syntax/i, 'bogus blessed query';
 	}
 };
 
@@ -90,7 +90,7 @@ subtest 'transaction status on error (HTTP)' => sub {
 	ok $t->{unused}, 'network error keeps unused';
 	$session->{net}->{http_agent}->{uri_base} = $good_uri unless $Neo4j_Test::sim;
 	$session->{net}->{http_agent}->{auth} = 1 if $Neo4j_Test::sim;
-	throws_ok { $t->run(' iced manifolds.') } qr/syntax/i, 'Neo4j server error';
+	throws_ok { $t->run(' iced manifolds.')->has_next } qr/syntax/i, 'Neo4j server error';
 	ok ! $t->is_open, 'server error closes';
 };
 

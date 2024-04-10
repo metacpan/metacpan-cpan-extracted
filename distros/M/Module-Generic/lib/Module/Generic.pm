@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.35.2
+## Version v0.35.3
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2024/03/22
+## Modified 2024/04/10
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.35.2';
+    our $VERSION     = 'v0.35.3';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -7811,7 +7811,7 @@ sub _parse_timestamp
         }
         # $fmt->{pattern} .= '%z';
         # push( @buff_fmt, '%z' );
-        $str = join( '-', @$re{qw( year month day )} ) . ' ' . join( ':', @$re{qw( hour minute )}, ( length( $re->{second} ) ? $re->{second} : '00' ) ) . $re->{tz};
+        $str = join( '-', @$re{qw( year month day )} ) . ' ' . join( ':', @$re{qw( hour minute )}, ( length( $re->{second} ) ? $re->{second} : '00' ) ) . ( $re->{tz} // '' );
         
         if( CORE::defined( $re->{tz1} ) || CORE::defined( $re->{tz2} ) )
         {
@@ -7934,7 +7934,7 @@ sub _parse_timestamp
             # push( @buff, ( $re->{wd} || $re->{wd_long} ) );
             push( @buff, ( defined( $re->{wd} ) ? '%a' : '%A' ) );
             push( @buff, ',' ) if( $re->{wd_comma} );
-            push( @buff, $re->{blank0} );
+            push( @buff, $re->{blank0} ) if( defined( $re->{blank0} ) );
         }
         push( @buff, length( $re->{day} ) > 1 ? '%d' : '%e' );
         push( @buff, $re->{sep1} );
@@ -9141,7 +9141,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.35.2
+    v0.35.3
 
 =head1 DESCRIPTION
 

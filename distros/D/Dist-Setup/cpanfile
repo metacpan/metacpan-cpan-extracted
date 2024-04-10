@@ -9,6 +9,7 @@ on 'configure' => sub {
 };
 
 on 'test' => sub {
+  requires 'CPAN::Common::Index::Mux::Ordered';
   requires 'Test::CPANfile';
   requires 'Test::More';
   requires 'Test2::V0';

@@ -7,7 +7,7 @@ use Test::More;
 use Test::CVE;
 
 my $test = Test::CVE->new (
-    verbose  => 9,
+    verbose  => 0,
     deps     => 1,
     minimum  => 0,
     cpanfile => "files/cpanfile-SR",

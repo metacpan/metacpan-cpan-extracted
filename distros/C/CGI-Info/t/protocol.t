@@ -32,7 +32,7 @@ PROTOCOL: {
 	ok($i->protocol() eq 'https');
 
 	$ENV{'SERVER_PORT'} = 443;
-        delete $ENV{'SCRIPT_URI'};
+	delete $ENV{'SCRIPT_URI'};
 	$i = new_ok('CGI::Info');
 	ok($i->protocol() eq 'https');
 	ok(CGI::Info->protocol() eq 'https');

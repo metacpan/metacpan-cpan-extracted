@@ -13,8 +13,8 @@ BEGIN {
 }
 
 HOSTNAMES: {
-        delete $ENV{'HTTP_HOST'};
-        delete $ENV{'SERVER_NAME'};
+	delete $ENV{'HTTP_HOST'};
+	delete $ENV{'SERVER_NAME'};
 	$ENV{'SERVER_PORT'} = 80;
 
 	my $i = new_ok('CGI::Info' => [ logger => MyLogger->new() ]);
@@ -53,7 +53,7 @@ HOSTNAMES: {
 	# Check rereading returns the same value
 	ok($i->domain_name() eq 'example.com');
 
-        delete $ENV{'HTTP_HOST'};
+	delete $ENV{'HTTP_HOST'};
 	delete $ENV{'SCRIPT_URI'};
 	$ENV{'SERVER_NAME'} = 'www.bandsman.co.uk';
 

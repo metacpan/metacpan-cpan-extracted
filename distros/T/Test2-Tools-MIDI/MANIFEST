@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+lib/Test2/Tools/MIDI.pm
+t/00-load.t
+t/cowbell.midi
+t/header.midi
+t/midi.t
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transaction;
 # ABSTRACT: Logical container for an atomic unit of work
-$Neo4j::Driver::Transaction::VERSION = '0.46';
+$Neo4j::Driver::Transaction::VERSION = '0.47';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
@@ -296,7 +296,7 @@ Neo4j::Driver::Transaction - Logical container for an atomic unit of work
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 SYNOPSIS
 
@@ -456,34 +456,6 @@ a defined state, you can roll back a failed transaction manually:
    $tx->rollback if $tx->is_open;
  }
  # at this point, $session is safe to use
-
-=head1 EXPERIMENTAL FEATURES
-
-L<Neo4j::Driver::Transaction> implements the following experimental
-features. These are subject to unannounced modification or removal
-in future versions. Expect your code to break if you depend upon
-these features.
-
-=head2 Execute multiple statements at once
-
- @statements = (
-   [ 'RETURN 42' ],
-   [ 'RETURN {value}', value => 'forty-two' ],
- );
- @results = $transaction->_run_multiple(@statements);
- foreach $result ( @results ) {
-   say $result->single->get;
- }
-
-The Neo4j HTTP API supports executing multiple statements within a
-single HTTP request. This driver exposes this feature to the client.
-It is only available on HTTP connections.
-
-This feature might eventually be used to implement lazy statement
-execution for this driver. The private C<_run_multiple()> method
-which makes using this feature explicit is expected to remain
-available at least until that time. See also
-L<Neo4j::Driver::Plugin/"USE OF INTERNAL APIS">.
 
 =head1 SEE ALSO
 

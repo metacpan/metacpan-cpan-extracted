@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Generic
 
+v0.35.3 2024-04-10T06:42:08+0900
+    - Minor correction of unused variable warning in method _parse_timestamp() in Module::Generic
+
 v0.35.2 2024-03-22T14:13:24+0900
     - Minor corrections to unit tests
 

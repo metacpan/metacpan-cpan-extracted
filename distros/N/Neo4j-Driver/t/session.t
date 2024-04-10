@@ -66,7 +66,7 @@ subtest 'database selection (HTTP)' => sub {
 	lives_ok { $s = 0; $s = $driver->session( database => $db ); } 'nonexistent lives';
 	if ($version >= 4) {
 		throws_ok {
-			 $s->run('');
+			 $s->run('')->has_next;
 		} qr/\bHTTP error: 404 Not Found\b/i, 'nonexistent dies';
 	}
 	else {
@@ -76,7 +76,7 @@ subtest 'database selection (HTTP)' => sub {
 	lives_ok { $s = 0; $s = $driver->session( database => [] ); } 'arrayref lives';
 	if ($version >= 4) {
 		throws_ok {
-			 $s->run('');
+			 $s->run('')->has_next;
 		} qr/\bHTTP error: 404 Not Found\b/i, 'arrayref dies';
 	}
 	else {

@@ -3,19 +3,14 @@
 use strict;
 use warnings;
 use Test::Most;
+use Test::Needs 'Test::Pod::Snippets';
 
-if($ENV{AUTHOR_TESTING}) {
-	eval 'use Test::Pod::Snippets';
+if($ENV{'AUTHOR_TESTING'}) {
+	my @modules = qw/ CGI::Info /;
+	Test::Pod::Snippets->import();
+	Test::Pod::Snippets->new()->runtest(module => $_, testgroup => 1) for @modules;
 
-	if($@) {
-		plan(skip_all => 'Test::Pod::Snippets required for testing POD code snippets');
-	} else {
-		my @modules = qw/ CGI::Info /;
-
-		Test::Pod::Snippets->new()->runtest(module => $_, testgroup => 1) for @modules;
-
-		done_testing();
-	}
+	done_testing();
 } else {
 	plan(skip_all => 'Author tests not required for installation');
 }

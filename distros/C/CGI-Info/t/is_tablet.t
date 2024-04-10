@@ -10,7 +10,7 @@ BEGIN {
 }
 
 PATHS: {
-        delete $ENV{'HTTP_X_WAP_PROFILE'};
+	delete $ENV{'HTTP_X_WAP_PROFILE'};
 	delete $ENV{'HTTP_USER_AGENT'};
 
 	my $i = new_ok('CGI::Info');
@@ -20,7 +20,7 @@ PATHS: {
 	$i = new_ok('CGI::Info');
 	ok($i->is_tablet() == 0);
 
-        delete $ENV{'HTTP_X_WAP_PROFILE'};
+	delete $ENV{'HTTP_X_WAP_PROFILE'};
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (iPhone; U)';
 	$i = new_ok('CGI::Info');
 	ok($i->is_tablet() == 0);

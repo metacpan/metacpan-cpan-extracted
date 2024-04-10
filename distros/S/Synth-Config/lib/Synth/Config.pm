@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Synthesizer settings librarian
 
-our $VERSION = '0.0046';
+our $VERSION = '0.0047';
 
 use Moo;
 use strictures 2;
@@ -253,6 +253,24 @@ sub make_spec {
 }
 
 
+sub recall_specs {
+  my ($self) = @_;
+  my $sql = q/select id,model,spec,json_extract(spec, '$.group') as mygroup from /
+    . 'specs'
+    . " where model = '" . $self->model . "'"
+    . ' order by model,mygroup';
+  my $results = $self->_sqlite->query($sql);
+  my @specs;
+  while (my $next = $results->hash) {
+    my $set = from_json($next->{spec});
+    $set->{id} = $next->{id};
+    $set->{model} = $next->{model};
+    push @specs, $set;
+  }
+  return $specs[0];
+}
+
+
 sub recall_spec {
   my ($self, %args) = @_;
   my $id = delete $args{id};
@@ -262,8 +280,9 @@ sub recall_spec {
     ['spec'],
     { id => $id },
   )->expand(json => 'spec')->hash;
-  my $specs = $result->{spec};
-  return $specs;
+  my $spec = $result->{spec};
+  $spec->{id} = $id;
+  return $spec;
 }
 
 
@@ -289,7 +308,7 @@ Synth::Config - Synthesizer settings librarian
 
 =head1 VERSION
 
-version 0.0046
+version 0.0047
 
 =head1 SYNOPSIS
 
@@ -323,7 +342,7 @@ version 0.0046
   # [ 'My favorite setting' ]
 
   # declare the possible settings
-  my %spec = ( # default initial model specification
+  my %spec = (
     order      => [qw(group parameter control group_to param_to bottom top value unit is_default)],
     group      => [],
     parameter  => {},
@@ -337,7 +356,8 @@ version 0.0046
     is_default => [0, 1],
   );
   my $spec_id = $synth->make_spec(%spec);
-  my $specs = $synth->recall_spec(id => $spec_id);
+  my $spec = $synth->recall_spec(id => $spec_id);
+  my $specs = $synth->recall_specs;
 
   # remove stuff!
   $synth->remove_spec;
@@ -481,9 +501,15 @@ The spec is a single JSON field that can contain any key/value
 pairs that define the configuration - groups, parameters, values, etc.
 of a model.
 
+=head2 recall_specs
+
+  my $specs = $synth->recall_specs;
+
+Return the specs for the model.
+
 =head2 recall_spec
 
-  my $specs = $synth->recall_spec(id => $id);
+  my $spec = $synth->recall_spec(id => $id);
 
 Return the model configuration specification for the given B<id>.
 

@@ -1,10 +1,13 @@
 Revision history for Perl module DB::Object
 
+v1.3.0 2024-04-09T16:53:24+0900
+    - Added pg_notifies in DB::Object::Postgres
+
 v1.2.3 2024-04-06T15:21:07+0900
     - Correction of the DBD::SQLite constant bug unresolved previously.
 
 v1.2.2 2024-04-05T15:33:06+0900
-    - Corrected a bug when version of DBD::SQLite < 1.71 is used and thus doe snot have the constant DBD::SQLite::Constants::SQLITE_TEXT
+    - Corrected a bug when version of DBD::SQLite < 1.71 is used and thus does not have the constant DBD::SQLite::Constants::SQLITE_TEXT
 
 v1.2.1 2024-03-22T13:52:05+0900
     - Correction of unit test to better handle non-existing DBD modules

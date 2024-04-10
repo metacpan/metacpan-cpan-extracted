@@ -1,5 +1,13 @@
 Revision history for perl distribution Dist-Setup
 
+0.12 - 2024-04-10
+
+ - Query CPAN for the 001-cpanfile.t test so that not all modules of a given
+   distribution needs to be updated. Make this be an extended test, as it now
+   makes network requests.
+ - Add the missing File::SharedDir and File::ShareDir::Install dependencies in
+   the cpanfile.
+
 0.11 - 2024-04-07
 
  - Clean the cover_db with the `make clean` command.

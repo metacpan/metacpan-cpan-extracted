@@ -1,5 +1,13 @@
 Revision history for CGI-Info
 
+0.81	Tue Apr  9 10:08:29 EDT 2024
+	Use Test::Needs
+	Added t/version.t
+	Added t/tabs.t
+	Mark axios/1.6.7, ias_crawler and ZoominfoBot as robots
+	Block "/**/ORDER/**/BY/**/" in the argument
+	Strip NUL byte poison
+
 0.80	Fri Jan 19 08:05:29 EST 2024
 	Added documentroot() as a synonym to rootdir()
 		For compatability with Apache

@@ -1,4 +1,7 @@
-0.04	- 2024-01-20, H.Merijn Brand
+0.05	- 2024-04-10, H.Merijn Brand
+    * Remove unused requirement causing failure if not available
+
+0.04	- 2024-04-08, H.Merijn Brand
     * Strip WARNING if it prefixes the JSON data
     * Opt to install cpan-cve.pl (issue #1)
     * Pass verbosity from script to parser

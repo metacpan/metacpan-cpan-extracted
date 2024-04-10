@@ -15,7 +15,6 @@ my $exp = {
     version => "1.23",
     };
 
-use Data::Peek;
 foreach my $mf (split m/##\n/ => do { local $/; <DATA> }) {
     delete $cve->{mf};
     $cve->_read_MakefilePL (\$mf);
