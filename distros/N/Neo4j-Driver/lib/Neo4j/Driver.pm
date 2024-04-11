@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.47';
+$Neo4j::Driver::VERSION = '0.48';
 
 use Carp qw(croak);
 
@@ -188,7 +188,7 @@ sub _parse_options {
 	warnings::warnif deprecated => "Config option ca_file is deprecated; use trust_ca" if $options{ca_file};
 	warnings::warnif deprecated => "Config option cypher_types is deprecated" if $options{cypher_types};
 	if ($options{cypher_params}) {
-		croak "Unimplemented cypher params filter '$options{cypher_params}'" if $options{cypher_params} ne v2;
+		croak "Unimplemented cypher params filter '$options{cypher_params}'" if $options{cypher_params} !~ m<^\x02|v2$>;
 	}
 	elsif ($options{cypher_filter}) {
 		warnings::warnif deprecated => "Config option cypher_filter is deprecated; use cypher_params";
@@ -250,7 +250,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 

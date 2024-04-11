@@ -8,7 +8,6 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker::CPANfile;
 
-
 WriteMakefile(
     NAME             => 'Markdown::Perl',
     DISTNAME         => 'Markdown-Perl',
@@ -52,7 +51,8 @@ sub MY::postamble {
   my @postamble;
   push @postamble, ::postamble() if *::postamble{CODE};
 
-  push @postamble, <<"MAKE_FRAGMENT";
+  # Solaris has a weird (?) make that does not support our `export` statements.
+  push @postamble, <<"MAKE_FRAGMENT" unless $^O eq 'solaris';
 distupload: distcheck disttest
 \t\$(MAKE) tardist
 \tcpan-upload --directory Dist-Setup \$(DISTVNAME).tar\$(SUFFIX)
@@ -92,6 +92,7 @@ MAKE_FRAGMENT
 # End of the template. You can add custom content below this line.
 
 sub postamble {
+  return if $^O eq 'solaris';
   return <<"EOF";
 profile:
 \t-perl -Ilib -d:NYTProf t/900-cmark-test-suite.t --fast

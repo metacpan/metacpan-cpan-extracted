@@ -31,6 +31,7 @@ requires 'List::Util', '1.45';
 requires 'List::MoreUtils';
 requires 'Readonly';
 requires 'Unicode::CaseFold';
+requires 'YAML::Tiny';
 
 on 'test' => sub {
   requires 'JSON';

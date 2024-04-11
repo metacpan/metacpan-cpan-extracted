@@ -6,11 +6,9 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'TableData/Business/ID/BPOM/FoodCategory.pm',
-    'TableData/Business/ID/BPOM/FoodType.pm',
     'TableDataBundle/Business/ID/BPOM.pm'
 );
 

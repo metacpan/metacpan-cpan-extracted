@@ -13,7 +13,7 @@ Neo4j::Driver::Net - Explains the design of the networking modules
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 OVERVIEW
 
@@ -163,6 +163,7 @@ S<L<Neo4j::Driver> 0.21> is compatible with Neo4j S<versions 2.x>,
 S<3.x, and 4.x>. It supports HTTP responses in the
 L<formats|https://neo4j.com/docs/http-api/4.2/actions/result-format/>
 JSON and Jolt (both strict mode and sparse mode).
+Only HTTP 1.1 is supported.
 
 For Bolt as well as HTTP, future versions of the driver will tend
 to implement new requirements in order to stay compatible with

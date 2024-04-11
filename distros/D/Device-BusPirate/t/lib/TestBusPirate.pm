@@ -14,6 +14,8 @@ our @EXPORT = qw(
    check_and_clear
 );
 
+use Sub::Util qw( set_subname );
+
 require Test::Builder;
 my $builder = Test::Builder->new;
 
@@ -45,7 +47,7 @@ no warnings 'redefine';
 
 sub _stringify { sprintf "%v02X", $_[0] }
 
-*Future::IO::syswrite_exactly = async sub {
+*Future::IO::syswrite_exactly = set_subname "syswrite_exactly (wrapped by TestBusPirate)" => async sub {
    shift;
    my ( undef, $bytes ) = @_;
    my $e = $expectations[0];
@@ -63,7 +65,7 @@ sub _stringify { sprintf "%v02X", $_[0] }
    return length $bytes;
 };
 
-*Future::IO::sysread_exactly = async sub {
+*Future::IO::sysread_exactly = set_subname "sysread_exactly (wrapped by TestBusPirate)" => async sub {
    shift;
    my ( undef, $length ) = @_;
 

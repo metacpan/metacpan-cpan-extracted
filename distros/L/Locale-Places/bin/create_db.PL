@@ -35,7 +35,7 @@ if($Config{'osname'} ne 'MSWin32') {
 	File::Open::NoCache::ReadOnly->import();
 }
 
-my $dir = 'lib/Locale/Places/databases';
+my $dir = 'lib/Locale/Places/data';
 foreach my $country('GB', 'US') {
 	my $csv = File::Spec->catdir($dir, "$country.csv");
 	my $sqlite = File::Spec->catdir($dir, "$country.sql");

@@ -3,7 +3,7 @@ use warnings;
 
 package Open::This;
 
-our $VERSION = '0.000033';
+our $VERSION = '0.000034';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -142,6 +142,8 @@ sub to_editor_args {
 sub editor_args_from_parsed_text {
     my $parsed = shift;
     return unless $parsed;
+
+    die '$EDITOR has not been set' unless $ENV{EDITOR};
 
     my @args;
 
@@ -399,7 +401,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000033
+version 0.000034
 
 =head1 DESCRIPTION
 

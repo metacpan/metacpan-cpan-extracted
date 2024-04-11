@@ -13,7 +13,7 @@ Neo4j::Driver::Types - Type mapping from Neo4j to Perl and vice versa
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 MAPPING
 
@@ -170,6 +170,10 @@ released version of L<Neo4j::Bolt> (0.4203 at time of this writing):
 =over
 
 =item *
+Neo4j 5 element IDs are not yet supported
+(L<perlbolt#50|https://github.com/majensen/perlbolt/issues/50>).
+
+=item *
 Query parameters containing an empty list or empty map will
 be converted to a Cypher C<null> value
 (L<perlbolt#19|https://github.com/majensen/perlbolt/issues/19>).
@@ -192,7 +196,8 @@ Byte arrays are not yet supported as query parameters.
 Byte arrays are coded as unblessed strings in Bolt results.
 
 =item *
-Temporal and spatial values are not yet supported.
+Temporal and spatial values are not yet supported
+(L<perlbolt#36|https://github.com/majensen/perlbolt/issues/36>).
 
 =back
 

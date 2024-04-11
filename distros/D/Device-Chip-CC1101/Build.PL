@@ -16,7 +16,7 @@ my $build = Module::Build->new(
       'Future::IO' => 0,
    },
    test_requires => {
-      'Test::Device::Chip::Adapter' => 0,
+      'Test::Device::Chip::Adapter' => '0.24',
       'Test2::V0' => 0,
    },
    auto_configure_requires => 0, # Don't add M::B to configure_requires

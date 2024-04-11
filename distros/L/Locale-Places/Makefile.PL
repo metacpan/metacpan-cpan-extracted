@@ -34,7 +34,7 @@ if(scalar(@countries)) {
 	$test_requires->{'autodie'} = 0;
 
 	my @dirs = (
-		'lib/Locale/Places/databases',
+		'lib/Locale/Places/data',
 	);
 
 	foreach my $dir(@dirs) {
@@ -46,31 +46,31 @@ if(scalar(@countries)) {
 
 	eval { require 'autodie' };
 
-	# unlink('lib/Locale/Places/databases/GB.sql');
+	# unlink('lib/Locale/Places/data/GB.sql');
 	if(eval { require HTTP::Cache::Transparent }) {
 		HTTP::Cache::Transparent->import();
-		my $cachedir;
-		if(my $e = $ENV{'CACHEDIR'}) {
-			$cachedir = File::Spec->catfile($e, 'http-cache-transparent');
+		my $cache_dir;
+		if(my $e = $ENV{'CACHE_DIR'}) {
+			$cache_dir = File::Spec->catfile($e, 'http-cache-transparent');
 		} else {
 			require File::HomeDir;
 			File::HomeDir->import();
 
-			# $cachedir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'http-cache-transparent');
-			$cachedir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'http-cache-transparent');
+			# $cache_dir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'http-cache-transparent');
+			$cache_dir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'http-cache-transparent');
 		}
 
-		if(!-d $cachedir) {
-			print "Creating the cache directory $cachedir\n";
-			mkdir $cachedir, 02755 || die "$cachedir: $@";
+		if(!-d $cache_dir) {
+			print "Creating the cache directory $cache_dir\n";
+			mkdir $cache_dir, 02755 || die "$cache_dir: $@";
 		}
 		HTTP::Cache::Transparent::init({
-			BasePath => $cachedir,
+			BasePath => $cache_dir,
 			# Verbose => $opts{'v'} ? 1 : 0,
 			Verbose => 1,
 			NoUpdate => 60 * 60 * 24,
 			MaxAge => 30 * 24
-		}) || die "$0: $cachedir: $!";
+		}) || die "$0: $cache_dir: $!";
 	} elsif(!$ENV{'AUTOMATED_TESTING'}) {
 		print "Consider installing HTTP::Cache::Transparent to reduce downloads\n";
 	}
@@ -90,7 +90,7 @@ if(scalar(@countries)) {
 
 	foreach my $country(@countries) {
 		my $url = "https://$site/export/dump/alternatenames/$country.zip";
-		my $file = "lib/Locale/Places/databases/$country.zip";
+		my $file = "lib/Locale/Places/data/$country.zip";
 
 		my $use_mirror = 0;
 
@@ -141,8 +141,8 @@ if(scalar(@countries)) {
 		}
 		die $file if(!-r $file);
 
-		if(!(-r "lib/Locale/Places/databases/$country.csv")) {
-			my $zip = "lib/Locale/Places/databases/$country.zip";
+		if(!(-r "lib/Locale/Places/data/$country.csv")) {
+			my $zip = "lib/Locale/Places/data/$country.zip";
 
 			print "Exploding $zip\n";
 
@@ -152,15 +152,15 @@ if(scalar(@countries)) {
 			if($@) {
 				system("unzip $zip") or die "unzip $zip failed";
 
-				rename "$country.txt", "lib/Locale/Places/databases/$country.csv" or die "rename: $!";
+				rename "$country.txt", "lib/Locale/Places/data/$country.csv" or die "rename: $!";
 				unlink 'readme.txt';
-			} elsif(open(my $fout, '>', "lib/Locale/Places/databases/$country.csv")) {
+			} elsif(open(my $fout, '>', "lib/Locale/Places/data/$country.csv")) {
 				IO::Uncompress::Unzip->import();
 				if(my $fin = IO::Uncompress::Unzip->new($zip)) {
 					do {
 						if($fin->getHeaderInfo->{'Name'} eq "$country.txt") {
 							while(my $line = $fin->getline()) {
-								print $fout $line;
+								print $fout $line or die "Error exploding $zip"
 							}
 							# last; # Gives syntax error that it's not in a loop :-(
 						}
@@ -180,7 +180,7 @@ if(scalar(@countries)) {
 			truncate $zip, 0;
 		}
 
-		die if(!(-r "lib/Locale/Places/databases/$country.csv"));
+		die if(!(-r "lib/Locale/Places/data/$country.csv"));
 	}
 
 	# my $pm = {
@@ -190,9 +190,9 @@ if(scalar(@countries)) {
 	# };
 
 	# if($ENV{'AUTOMATED_TESTING'}) {
-		# $pm->{'lib/Locale/Places/databases/GB.csv'} = 'blib/lib/Locale/Places/databases/GB.csv';
+		# $pm->{'lib/Locale/Places/data/GB.csv'} = 'blib/lib/Locale/Places/data/GB.csv';
 	# } else {
-		# $pm->{'lib/Locale/Places/databases/GB.sql'} = 'blib/lib/Locale/Places/databases/GB.sql';
+		# $pm->{'lib/Locale/Places/data/GB.sql'} = 'blib/lib/Locale/Places/data/GB.sql';
 	# }
 
 	if($Config{'osname'} ne 'MSWin32') {
@@ -231,8 +231,9 @@ WriteMakefile(
 		'Text::CSV' => 0,
 		'Text::xSV::Slurp' => 0,
 	},
-	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
-	clean		=> { FILES => 'Locale-Places-*' },
+	dist	=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
+	clean	=> { FILES => 'Locale-Places-*' },
+	EXE_FILES	=> [ 'bin/translate' ],
 	# META_ADD => {
 		# provides => { }
 	# },

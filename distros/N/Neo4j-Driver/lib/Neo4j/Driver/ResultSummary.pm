@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ResultSummary;
 # ABSTRACT: Details about the result of running a statement
-$Neo4j::Driver::ResultSummary::VERSION = '0.47';
+$Neo4j::Driver::ResultSummary::VERSION = '0.48';
 
 use Carp qw(croak);
 
@@ -90,7 +90,7 @@ Neo4j::Driver::ResultSummary - Details about the result of running a statement
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -120,7 +120,7 @@ used to investigate details about the result, like the Neo4j server
 version, how many and which kinds of updates have been executed, and
 query plan information if available.
 
-To obtain a result summary, call L<Neo4j::Driver::Result/"summary">.
+To obtain a result summary, call L<Neo4j::Driver::Result/"consume">.
 
 =head1 METHODS
 

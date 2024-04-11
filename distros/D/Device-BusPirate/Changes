@@ -1,5 +1,10 @@
 Revision history for Device-BusPirate
 
+0.25    2024-04-10
+        [CHANGES]
+         * Implement Device::Chip::ProtocolBase::SPI in SPI protocol adapter
+           to ensure we get the extra methods (write, read, write_then_read)
+
 0.24    2024-01-09
         [CHANGES]
          * Much update for modern Object::Pad and style suggestions

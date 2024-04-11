@@ -1,0 +1,96 @@
+NAME
+    TableDataRole::Business::ID::BPOM::FoodAdditive - Food additives in BPOM
+
+VERSION
+    This document describes version 20240409.0.0 of
+    TableDataRole::Business::ID::BPOM::FoodAdditive (from Perl distribution
+    TableData-Business-ID-BPOM-FoodAdditive), released on 2024-04-10.
+
+SYNOPSIS
+    To use from Perl code:
+
+     use TableData::Business::ID::BPOM::FoodAdditive;
+
+     my $td = TableData::Business::ID::BPOM::FoodAdditive->new;
+
+     # Iterate rows of the table
+     $td->each_row_arrayref(sub { my $row = shift; ... });
+     $td->each_row_hashref (sub { my $row = shift; ... });
+
+     # Get the list of column names
+     my @columns = $td->get_column_names;
+
+     # Get the number of rows
+     my $row_count = $td->get_row_count;
+
+    See also TableDataRole::Spec::Basic for other methods.
+
+    To use from command-line (using tabledata CLI):
+
+     # Display as ASCII table and view with pager
+     % tabledata Business::ID::BPOM::FoodAdditive --page
+
+     # Get number of rows
+     % tabledata --action count_rows Business::ID::BPOM::FoodAdditive
+
+    See the tabledata CLI's documentation for other available actions and
+    options.
+
+DESCRIPTION
+    Keyword: BPOM, pangan olahan, BTP, bahan tambahan pangan
+
+TABLEDATA STATISTICS
+     +-------------+-------+
+     | key         | value |
+     +-------------+-------+
+     | num_columns | 11    |
+     | num_rows    | 55422 |
+     +-------------+-------+
+
+    The statistics is available in the %STATS package variable.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/TableData-Business-ID-BPOM-FoodAdditive>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-TableData-Business-ID-BPOM-FoodAdditi
+    ve>.
+
+SEE ALSO
+    TableData::Business::ID::BPOM::FoodIngredientRBA
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=TableData-Business-ID
+    -BPOM-FoodAdditive>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

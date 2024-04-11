@@ -41,6 +41,7 @@ do { my $x = {
                                       },
                       'requires' => {
                                       'Browser::Open' => '0',
+                                      'Cpanel::JSON::XS' => '0',
                                       'Getopt::Long' => '0',
                                       'Module::Runtime' => '0',
                                       'Module::Util' => '0.016',
@@ -63,6 +64,7 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'Test::Differences' => '0',
+                                   'Test::Fatal' => '0',
                                    'Test::More' => '0',
                                    'Test::Needs' => '0',
                                    'Test::Requires::Git' => '0',

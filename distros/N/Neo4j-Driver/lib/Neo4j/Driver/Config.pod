@@ -13,7 +13,7 @@ Neo4j::Driver::Config - Driver configuration options
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -114,8 +114,7 @@ This feature exists primarily to support legacy applications.
 Enables conversion of the old Cypher parameter syntax C<{param}>
 supported by Neo4j S<version 2> to the modern syntax C<$param>
 supported by Neo4j S<version 3> and newer. The only allowed value
-for this config option is the unquoted literal
-L<v-string|perldata/"Version Strings"> C<v2>.
+for this config option is C<v2> (quoted or unquoted).
 
 Cypher's modern C<$> parameter syntax unfortunately may cause string
 interpolations in Perl, which decreases database performance because

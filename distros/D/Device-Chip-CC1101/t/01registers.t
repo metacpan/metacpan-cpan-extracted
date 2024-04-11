@@ -4,7 +4,7 @@ use v5.26;
 use warnings;
 
 use Test2::V0;
-use Test::Device::Chip::Adapter;
+use Test::Device::Chip::Adapter 0.24; # ->will_done
 
 use Future::AsyncAwait;
 
@@ -20,7 +20,7 @@ await $chip->mount(
 {
    # FIFOTHR
    $adapter->expect_write_then_read( "\x83", 1 )
-      ->returns( "\x07" );
+      ->will_done( "\x07" );
 
    is( await $chip->read_register( 0x03 ), 0x07,
       '->read_register yields value' );
@@ -29,7 +29,7 @@ await $chip->mount(
 
    # VERSION is a status register so gets REG_BURST set
    $adapter->expect_write_then_read( "\xF1", 1 )
-      ->returns( "\x14" );
+      ->will_done( "\x14" );
 
    is( await $chip->read_register( 0x31 ), 0x14,
       '->read_register yields value' );
@@ -40,7 +40,7 @@ await $chip->mount(
 # ->read_marcstate
 {
    $adapter->expect_write_then_read( "\xF5", 1 )
-      ->returns( "\x01" );
+      ->will_done( "\x01" );
 
    is( await $chip->read_marcstate, "IDLE",
       '->read_marcstate yields string name' );
@@ -51,14 +51,14 @@ await $chip->mount(
 # ->read_chipstatus_*
 {
    $adapter->expect_readwrite( "\xBD" )
-      ->returns( "\x10" );
+      ->will_done( "\x10" );
 
    is( await $chip->read_chipstatus_rx,
       { STATE => "RX", FIFO_BYTES_AVAILABLE => 0 },
       '->read_chipstatus_rx yields status' );
 
    $adapter->expect_readwrite( "\x3D" )
-      ->returns( "\x2F" );
+      ->will_done( "\x2F" );
 
    is( await $chip->read_chipstatus_tx,
       { STATE => "TX", FIFO_BYTES_AVAILABLE => 15 },
@@ -70,7 +70,7 @@ await $chip->mount(
 # ->read_pktstatus
 {
    $adapter->expect_write_then_read( "\xF8", 1 )
-      ->returns( "\x30" );
+      ->will_done( "\x30" );
 
    is( await $chip->read_pktstatus,
       { CCA => 1, CRC_OK => '', CS => '', GDO0 => '', GDO2 => '', PQT_REACHED => 1, SFD => '' },

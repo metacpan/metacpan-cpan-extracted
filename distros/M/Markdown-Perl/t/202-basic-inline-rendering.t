@@ -14,7 +14,7 @@ is(run("abc\n"), "<p>abc</p>\n", 'line2');
 is(run(" abc "), "<p>abc</p>\n", 'line3');
 
 is(run("abc\ndef\n"), "<p>abc\ndef</p>\n", 'soft_break');
-is(run("abc  \ndef\n"), "<p>abc<br />\ndef</p>\n", 'hard_break1');
+is(run("abc  \ndef\n", two_spaces_hard_line_breaks => 1), "<p>abc<br />\ndef</p>\n", 'hard_break1');
 is(run("abc\ndef  \n"), "<p>abc\ndef</p>\n", 'hard_break2');
 is(run("abc\\\ndef"), "<p>abc<br />\ndef</p>\n", 'hard_break3');
 is(run("abc\\\\\ndef"), "<p>abc\\\ndef</p>\n", 'hard_break4');

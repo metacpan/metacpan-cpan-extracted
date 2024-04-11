@@ -400,7 +400,7 @@ subtest 'cypher params' => sub {
 	lives_ok { $r = 0; $r = $t->_prepare(@q); } 'prepare unfiltered';
 	is $r->{statement}, 'RETURN {a}', 'unfiltered';
 	# verify that filter flag is automatically cleared for Neo4j 2
-	my $config = {cypher_params => v2};
+	my $config = {cypher_params => 'v2'};
 	my $d;
 	lives_ok { $d = Neo4j::Driver->new($config)->plugin(Neo4j_Test::MockHTTP->new) } 'Neo4j 4: set filter mock';
 	lives_and { ok !! $d->session(database => 'dummy')->{cypher_params_v2} } 'Neo4j 4: filter';

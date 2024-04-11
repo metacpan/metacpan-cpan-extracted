@@ -4,7 +4,7 @@ Text::Minify::XS - Remove indentation and trailing whitespace from multi-line te
 
 # VERSION
 
-version v0.7.3
+version v0.7.4
 
 # SYNOPSIS
 
@@ -104,7 +104,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020-2023 by Robert Rothenberg.
+This software is Copyright (c) 2020-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

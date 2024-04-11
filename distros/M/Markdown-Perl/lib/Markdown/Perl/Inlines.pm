@@ -472,7 +472,13 @@ sub process_whitespaces {
     next unless $n->{type} eq 'text';
     # TODO: add tests for the fact that we don’t want hard break at the end of a
     # paragraph.
-    my @hard_breaks = split(/(?: {2,}|\\)\n(?=.) */s, $n->{content}, -1);
+    my $re;
+    if ($that->get_two_spaces_hard_line_breaks) {
+      $re = qr/(?: {2,}|\\)\n(?=.) */s;
+    } else {
+      $re = qr/\\\n(?=.) */s;
+    }
+    my @hard_breaks = split($re, $n->{content}, -1);
     for (my $j = 0; $j < @hard_breaks; $j++) {
       # $hard_breaks[$j] = '' unless defined($hard_breaks[$j]);
       $hard_breaks[$j] =~ s/^ +// if !$not_root && $i == 0 && $j == 0;
@@ -780,7 +786,6 @@ sub create_extended_email_autolinks {
   # these are not tested by the spec present in the current repo (although they
   # are documented online).
   ## no critic (ProhibitComplexRegexes)
-  # use re 'debug';
   while (
     $n->{content} =~ m/
     (?<prefix> ^ | [ \t\n*_~\(] )               # The link must start after a whitespace or some specific delimiters.

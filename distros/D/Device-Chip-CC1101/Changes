@@ -1,5 +1,12 @@
 Revision history for Device-Chip-CC1101
 
+0.10    2024-04-10
+        [CHANGES]
+         * Improvements to timeout behaviour
+            + Use gettimeofday to use real time
+            + Add timeout to marcstate transitions
+         * Use ->will_done of Test::Device::Chip::Adapter 0.24
+
 0.09    2023-09-13
         [CHANGES]
          * General module style updates:

@@ -17,7 +17,7 @@ use Scalar::Util 'blessed';
 
 use parent 'Markdown::Perl::Options';
 
-our $VERSION = '1.02';  # Remember to also set the App::pmarkdown version.
+our $VERSION = '1.03';  # Remember to also set the App::pmarkdown version.
 
 our @EXPORT_OK = qw(convert set_options);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -73,14 +73,28 @@ sub convert {  ## no critic (RequireArgUnpacking)
   my $md = \(shift @_);  # Taking a reference to avoid copying the input. is it useful?
   $this->SUPER::set_options(local_options => @_);
 
-  my $parser = Markdown::Perl::BlockParser->new($this, $md);
-
   # TODO: introduce an HtmlRenderer object that carries the $linkrefs states
   # around (instead of having to pass it in all the calls).
-  my ($linkrefs, $blocks) = $parser->process();
+  my ($blocks, $linkrefs) = $this->_parse($md);
   my $out = $this->_emit_html(0, 'root', $linkrefs, @{$blocks});
   $this->{local_options} = {};
   return $out;
+}
+
+# This is an internal call for now because the structure of the parse tree is
+# not defined.
+# Note that while convert() takes care not to copy the md argument, this is not
+# the case of this method, however, it can receive a scalar ref instead of a
+# scalar, to avoid the copy.
+# TODO: create a BlockTree class and document it, then make this be public.
+sub _parse {
+  my ($this, $md_or_ref) = &_get_this_and_args;  ## no critic (ProhibitAmpersandSigils)
+  my $md = ref($md_or_ref) ? $md_or_ref : \$md_or_ref;
+
+  my $parser = Markdown::Perl::BlockParser->new($this, $md);
+  my ($linkrefs, $blocks) = $parser->process();
+  return ($blocks, $linkrefs) if wantarray;
+  return $blocks;
 }
 
 sub _render_inlines {
@@ -136,6 +150,8 @@ sub _emit_html {  ## no critic (ProhibitExcessComplexity)
       $html .= $this->_render_inlines($linkrefs, @{$bl->{content}});
       if ($tight_block) {
         $out .= $html;
+      } elsif ($this->get_render_naked_paragraphs) {
+        $out .= "${html}\n";
       } else {
         $out .= "<p>${html}</p>\n";
       }
@@ -225,7 +241,7 @@ See the L<Markdown::Perl::Options> documentation for all the existing options.
 
 For the reference on the default syntax supported by the library, see the GitHub
 repository of the project:
-L<https://github.com/mkende/pmarkdown/blob/main/README.md>
+L<https://github.com/mkende/pmarkdown/blob/main/Syntax.md>
 
 =head2 set_options
 

@@ -104,7 +104,7 @@ change them (I<i.e.> C<$Object::Iterate::Next>). If your object does
 not have the specified methods, the functions will die.  You may want
 to wrap them in eval blocks.
 
-Since this module uses package variables to storethese methods names,
+Since this module uses package variables to store these methods names,
 the method names apply to every use of the functions no matter the
 object.  You might want to local()-ise the variables for different
 objects.
@@ -285,7 +285,7 @@ value of C<$Object::Iterate::Next>.
 
 This module is on Github:
 
-	http://github.com/briandfoy/Object-Iterate
+	http://github.com/briandfoy/object-iterate
 
 =head1 TO DO
 
@@ -297,11 +297,11 @@ Thanks to Slaven Rezic for adding C<__init__> support
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>.
+brian d foy, C<< <briandfoy@pobox.com> >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

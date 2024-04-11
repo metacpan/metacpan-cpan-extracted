@@ -1,5 +1,10 @@
 Revision history for Neo4j::Driver
 
+0.48  2024-04-10
+
+ - The cypher_params config option now allows 'v2' as a synonym for v2.
+ - Minor documentation updates.
+
 0.47  2024-04-09
 
  - Returning a Result object from a managed transaction function now issues

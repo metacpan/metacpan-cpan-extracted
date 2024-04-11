@@ -27,14 +27,14 @@
       "test" : {
          "requires" : {
             "Test2::V0" : "0",
-            "Test::Device::Chip::Adapter" : "0"
+            "Test::Device::Chip::Adapter" : "0.24"
          }
       }
    },
    "provides" : {
       "Device::Chip::CC1101" : {
          "file" : "lib/Device/Chip/CC1101.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -43,6 +43,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

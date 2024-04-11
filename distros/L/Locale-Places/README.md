@@ -4,7 +4,7 @@ Locale::Places - Translate places between different languages using http://downl
 
 # VERSION
 
-Version 0.09
+Version 0.11
 
 # SYNOPSIS
 
@@ -18,7 +18,7 @@ London is Londres in French.
 Create a Locale::Places object.
 
 Takes one optional parameter, directory,
-which tells the object where to find the file GB.sql
+which tells the object where to directory containing GB.sql and US.sql
 If that parameter isn't given,
 the module will attempt to find the databases,
 but that can't be guaranteed.
@@ -47,7 +47,7 @@ which is the country of that 'place' is in.
 
 ## AUTOLOAD
 
-Translate to the given language.
+Translate to the given language, where the routine's name will be the target language.
 
     # Prints 'Virginie', since that's Virginia in French
     print $places->fr({ place => 'Virginia', from => 'en', country => 'US' });

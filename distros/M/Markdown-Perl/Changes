@@ -1,5 +1,14 @@
 Revision history for pmarkdown and the Markdown::Perl module.
 
+1.03 - 2024-04-10
+
+ - Disable hard line breaks using two spaces in our default syntax because they
+   are invisible in the source file.
+ - Support a YAML table at the start of a document to provide metadata.
+ - Bugfixes:
+   - Disable some part of the Makefile of the project that can’t be parsed under
+     Solaris.
+
 1.02 - 2024-04-06
 
  - Improvement to the support of the original markdown syntax. This is probably

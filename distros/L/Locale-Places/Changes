@@ -1,5 +1,12 @@
 Revision history for Locale::Places
 
+0.11	Wed Apr 10 20:14:23 EDT 2024
+	Move the database directory to data
+	Added t/version.t
+	Use CACHE_DIR instead of CACHEDIR
+	Improved handling of directory argument to new()
+	Install the translate program
+
 0.10	Mon Feb  5 09:01:00 EST 2024
 	Fix https://github.com/nigelhorne/Locale-Places/issues/6
 		https://github.com/nigelhorne/Locale-Places/actions/runs/7452695411/job/20304898625

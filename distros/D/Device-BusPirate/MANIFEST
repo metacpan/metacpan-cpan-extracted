@@ -12,7 +12,11 @@ lib/Device/BusPirate/Mode/I2C.pm
 lib/Device/BusPirate/Mode/SPI.pm
 lib/Device/BusPirate/Mode/UART.pm
 lib/Device/Chip/Adapter/BusPirate.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01serial.t
 t/10bbio.t
@@ -20,9 +24,6 @@ t/20spi.t
 t/30i2c.t
 t/40uart.t
 t/71device-chip-i2c.t
+t/71device-chip-spi.t
 t/99pod.t
 t/lib/TestBusPirate.pm
-README
-LICENSE
-META.yml
-META.json

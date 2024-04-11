@@ -20,10 +20,10 @@ await $chip->mount(
 {
    # CONFIG
    $adapter->expect_write_then_read( "\xC0", 41 )
-      ->returns( Device::Chip::CC1101->CONFIG_DEFAULT );
+      ->will_done( Device::Chip::CC1101->CONFIG_DEFAULT );
    # PATABLE
    $adapter->expect_write_then_read( "\xFE", 8 )
-      ->returns( "\xC6\x00\x00\x00\x00\x00\x00\x00" );
+      ->will_done( "\xC6\x00\x00\x00\x00\x00\x00\x00" );
 
    await $chip->read_config;
 }
@@ -42,17 +42,17 @@ await $chip->mount(
    $adapter->expect_write( "\x36" );
    # read MARCSTATE, returns IDLE
    $adapter->expect_write_then_read( "\xF5", 1 )
-      ->returns( "\x01" );
+      ->will_done( "\x01" );
    # CMD_STX
    $adapter->expect_write( "\x35" );
    # read MARCSTATE, returns TX
    $adapter->expect_write_then_read( "\xF5", 1 )
-      ->returns( "\x13" );
+      ->will_done( "\x13" );
    # write TXFIFO
    $adapter->expect_write( "\x7F" . "ABCD" );
    # read chip status, returns IDLE
    $adapter->expect_readwrite( "\x3D" )
-      ->returns( "\x0F" );
+      ->will_done( "\x0F" );
 
    await $chip->transmit( "ABCD" );
 
@@ -72,17 +72,17 @@ await $chip->mount(
    $adapter->expect_write( "\x36" );
    # read MARCSTATE, returns IDLE
    $adapter->expect_write_then_read( "\xF5", 1 )
-      ->returns( "\x01" );
+      ->will_done( "\x01" );
    # CMD_STX
    $adapter->expect_write( "\x35" );
    # read MARCSTATE, returns TX
    $adapter->expect_write_then_read( "\xF5", 1 )
-      ->returns( "\x13" );
+      ->will_done( "\x13" );
    # write TXFIFO
    $adapter->expect_write( "\x7F" . "\x04EFGH" );
    # read chip status, returns IDLE
    $adapter->expect_readwrite( "\x3D" )
-      ->returns( "\x0F" );
+      ->will_done( "\x0F" );
 
    await $chip->transmit( "EFGH" );
 

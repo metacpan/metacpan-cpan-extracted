@@ -80,7 +80,7 @@
    "provides" : {
       "Text::Minify::XS" : {
          "file" : "lib/Text/Minify/XS.pm",
-         "version" : "v0.7.3"
+         "version" : "v0.7.4"
       }
    },
    "release_status" : "stable",
@@ -95,7 +95,7 @@
          "web" : "https://github.com/robrwo/Text-Minify-XS"
       }
    },
-   "version" : "v0.7.3",
+   "version" : "v0.7.4",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Node;
 # ABSTRACT: Describes a node from a Neo4j graph
-$Neo4j::Driver::Type::Node::VERSION = '0.47';
+$Neo4j::Driver::Type::Node::VERSION = '0.48';
 
 # For documentation, see Neo4j::Driver::Types.
 

@@ -1,3 +1,13 @@
+0.018   2024-04-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Use the more complete data from idn_bpom_bahan_tambahan_pangan2
+          table (source from
+          https://standarpangan.pom.go.id/cekbtp/web/relasi-baru/index
+          instead of from
+          https://e-reg.pom.go.id/ereg/index.php/register/detil/btp/row/600
+          0/page/1/order/3/ASC).
+
+
 0.017   2023-02-13  Released-By: PERLANCAR; Urgency: medium
 
         - First release, split from App-BPOMUtils-Table because that

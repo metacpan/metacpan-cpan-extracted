@@ -1,10 +1,10 @@
 {
    "abstract" : "iterators for objects that know the next element",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -16,7 +16,8 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "preprocess"
       ]
    },
    "prereqs" : {
@@ -36,7 +37,6 @@
       },
       "test" : {
          "requires" : {
-            "Test::Data" : "0",
             "Test::More" : "1"
          }
       }
@@ -49,10 +49,10 @@
       "homepage" : "https://github.com/briandfoy/object-iterate",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/object-iterate.git",
+         "url" : "https://github.com/briandfoy/object-iterate",
          "web" : "https://github.com/briandfoy/object-iterate"
       }
    },
-   "version" : "1.146",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.148",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

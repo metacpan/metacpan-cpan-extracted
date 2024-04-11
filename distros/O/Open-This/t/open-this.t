@@ -1,11 +1,21 @@
 use strict;
 use warnings;
 
-use Open::This qw( parse_text to_editor_args );
-use Path::Tiny qw( path );
+use Open::This  qw( editor_args_from_parsed_text parse_text to_editor_args );
+use Path::Tiny  qw( path );
+use Test::Fatal qw( exception );
 use Test::More import => [qw( done_testing is like ok )];
 use Test::Differences qw( eq_or_diff );
 use Test::Warnings    qw( warnings );
+
+{
+    local $ENV{EDITOR} = q{};
+    like(
+        exception { editor_args_from_parsed_text('slow-horses.txt') },
+        qr/\$EDITOR has not been set/,
+        'dies when $EDITOR is not defined'
+    );
+}
 
 # This gets really noisy on Travis if $ENV{EDITOR} is not set
 local $ENV{EDITOR} = 'vim';

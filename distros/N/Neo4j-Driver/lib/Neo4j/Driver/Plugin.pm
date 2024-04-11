@@ -4,7 +4,7 @@ use warnings;
 
 package Neo4j::Driver::Plugin;
 # ABSTRACT: Plug-in interface for Neo4j::Driver
-$Neo4j::Driver::Plugin::VERSION = '0.47';
+$Neo4j::Driver::Plugin::VERSION = '0.48';
 
 1;
 
@@ -20,7 +20,7 @@ Neo4j::Driver::Plugin - Plug-in interface for Neo4j::Driver
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNPOSIS
 
@@ -569,8 +569,7 @@ your code is used in production.
 
 If you have difficulties achieving your goals without the use of
 driver internals or private APIs, you are most welcome to file a
-GitHub issue about that (or write to my CPAN email address with
-your concerns).
+GitHub issue about that.
 
 I can't I<promise> that I'll be able to accommodate your use case,
 but I am going to try.

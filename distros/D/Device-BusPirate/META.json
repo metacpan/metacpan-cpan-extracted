@@ -31,6 +31,7 @@
             "List::Util" : "1.33",
             "Module::Pluggable" : "0",
             "Object::Pad" : "0.800",
+            "Sub::Util" : "0",
             "Time::HiRes" : "0",
             "perl" : "5.026"
          }
@@ -45,31 +46,31 @@
    "provides" : {
       "Device::BusPirate" : {
          "file" : "lib/Device/BusPirate.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "Device::BusPirate::Mode" : {
          "file" : "lib/Device/BusPirate/Mode.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "Device::BusPirate::Mode::BB" : {
          "file" : "lib/Device/BusPirate/Mode/BB.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "Device::BusPirate::Mode::I2C" : {
          "file" : "lib/Device/BusPirate/Mode/I2C.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "Device::BusPirate::Mode::SPI" : {
          "file" : "lib/Device/BusPirate/Mode/SPI.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "Device::BusPirate::Mode::UART" : {
          "file" : "lib/Device/BusPirate/Mode/UART.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "Device::Chip::Adapter::BusPirate" : {
          "file" : "lib/Device/Chip/Adapter/BusPirate.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       }
    },
    "release_status" : "stable",
@@ -78,6 +79,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.24",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.25",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

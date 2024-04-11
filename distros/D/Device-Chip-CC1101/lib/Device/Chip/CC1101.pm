@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
 use v5.26; # postfix-deref, signatures
 use warnings;
 use Object::Pad 0.800;
 
-package Device::Chip::CC1101 0.09;
+package Device::Chip::CC1101 0.10;
 class Device::Chip::CC1101
    :isa(Device::Chip);
 
@@ -15,6 +15,7 @@ use Carp;
 use Data::Bitfield 0.04 qw( bitfield boolfield enumfield intfield signed_intfield );
 use Future::AsyncAwait;
 use Future::IO;
+use Time::HiRes qw( gettimeofday );
 
 use constant PROTOCOL => "SPI";
 
@@ -581,13 +582,24 @@ Command the chip to enter RX mode.
 
 =cut
 
+async method _switch_marcstate ( $cmd, $state )
+{
+   # Each state transition should definitely be over in well under 50msec
+   my $deadline = gettimeofday + 0.050;
+
+   await $self->command( $cmd );
+   my $ok;
+   1 until ( await $self->read_marcstate ) eq $state && ($ok = 1) or
+      gettimeofday > $deadline;
+
+   croak "Timed out waiting for CC1101 chip to enter $state state" unless $ok;
+}
+
 async method start_rx ()
 {
-   await $self->command( CMD_SIDLE );
-   1 until ( await $self->read_marcstate ) eq "IDLE";
+   await $self->_switch_marcstate( CMD_SIDLE, "IDLE" );
 
-   await $self->command( CMD_SRX );
-   1 until ( await $self->read_marcstate ) eq "RX";
+   await $self->_switch_marcstate( CMD_SRX, "RX" );
 }
 
 =head2 start_tx
@@ -600,11 +612,9 @@ Command the chip to enter TX mode.
 
 async method start_tx ()
 {
-   await $self->command( CMD_SIDLE );
-   1 until ( await $self->read_marcstate ) eq "IDLE";
+   await $self->_switch_marcstate( CMD_SIDLE, "IDLE" );
 
-   await $self->command( CMD_STX );
-   1 until ( await $self->read_marcstate ) eq "TX";
+   await $self->_switch_marcstate( CMD_STX, "TX" );
 }
 
 =head2 idle
@@ -744,9 +754,11 @@ async method transmit ( $bytes )
 
    await $self->write_txfifo( $bytes );
 
-   my $timeout = 20; # TODO: configuration
+   # Transmit should definitely be over in well under 50msec
+   my $deadline = gettimeofday + 0.050;
+
    while( await( $self->read_chipstatus_tx )->{STATE} eq "TX" ) {
-      $timeout-- or croak "Timed out waiting for TX to complete";
+      gettimeofday < $deadline or croak "Timed out waiting for TX to complete";
       await Future::IO->sleep( $_poll_interval );
    }
 }

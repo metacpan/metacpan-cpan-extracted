@@ -3,9 +3,9 @@
 package TableDataBundle::Business::ID::BPOM;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-07'; # DATE
+our $DATE = '2024-04-10'; # DATE
 our $DIST = 'TableDataBundle-Business-ID-BPOM'; # DIST
-our $VERSION = '20230207.0.0'; # VERSION
+our $VERSION = '20230207.0.1'; # VERSION
 
 1;
 # ABSTRACT: Collection of TableData:: modules related to Indonesia's BPOM (Badan Pengawas Obat dan Makanan, or the National Agency or Drug and Food Control)
@@ -22,17 +22,13 @@ TableDataBundle::Business::ID::BPOM - Collection of TableData:: modules related 
 
 =head1 VERSION
 
-This document describes version 20230207.0.0 of TableDataBundle::Business::ID::BPOM (from Perl distribution TableDataBundle-Business-ID-BPOM), released on 2023-02-07.
+This document describes version 20230207.0.1 of TableDataBundle::Business::ID::BPOM (from Perl distribution TableDataBundle-Business-ID-BPOM), released on 2024-04-10.
 
 =head1 DESCRIPTION
 
 This distribution contains the following L<TableData>:: modules:
 
 =over
-
-=item * L<TableData::Business::ID::BPOM::FoodCategory>
-
-=item * L<TableData::Business::ID::BPOM::FoodType>
 
 =back
 
@@ -49,6 +45,11 @@ Source repository is at L<https://github.com/perlancar/perl-TableDataBundle-Busi
 L<TableData>
 
 L<https://pom.go.id>
+
+Due to some modules being renamed and the source changed to CSV, this
+distribution will be split to individual TableData modules, e.g.
+L<TableData::Business::ID::BPOM::FoodIngredientRBA>,
+L<TableData::Business::ID::BPOM::FoodAdditive>.
 
 =head1 AUTHOR
 
@@ -74,7 +75,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Device::Chip::Adapter::BusPirate 0.24;
+package Device::Chip::Adapter::BusPirate 0.25;
 class Device::Chip::Adapter::BusPirate;
 
 # Can't isa Device::Chip::Adapter because it doesn't have a 'new'
@@ -238,7 +238,10 @@ async method read_gpios ( $gpios )
 }
 
 class
-   Device::Chip::Adapter::BusPirate::_SPI :isa(Device::Chip::Adapter::BusPirate::_base);
+   Device::Chip::Adapter::BusPirate::_SPI
+   :isa(Device::Chip::Adapter::BusPirate::_base)
+   :does(Device::Chip::ProtocolBase::SPI)
+   ;
 
 use Carp;
 
@@ -261,11 +264,6 @@ method configure ( %args )
         ( defined $max_bitrate ?
            ( speed => $self->_find_speed( $max_bitrate, @SPI_SPEEDS ) ) : () ),
     );
-}
-
-method readwrite ( $data )
-{
-   $self->mode->writeread_cs( $data );
 }
 
 method readwrite_no_ss ( $data )

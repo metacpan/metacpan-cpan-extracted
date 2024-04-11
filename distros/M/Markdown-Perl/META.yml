@@ -31,9 +31,10 @@ requires:
   List::Util: '1.45'
   Readonly: '0'
   Unicode::CaseFold: '0'
+  YAML::Tiny: '0'
   perl: '5.026'
 resources:
   bugtracker: https://github.com/mkende/pmarkdown/issues
   repository: https://github.com/mkende/pmarkdown
-version: '1.02'
+version: '1.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

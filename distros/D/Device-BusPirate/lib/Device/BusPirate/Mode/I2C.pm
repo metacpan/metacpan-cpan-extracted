@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Device::BusPirate::Mode::I2C 0.24;
+package Device::BusPirate::Mode::I2C 0.25;
 class Device::BusPirate::Mode::I2C :isa(Device::BusPirate::Mode);
 
 use Carp;

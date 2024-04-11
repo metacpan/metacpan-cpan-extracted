@@ -21,10 +21,10 @@ await $chip->mount(
    # Power-up defaults
    # CONFIG
    $adapter->expect_write_then_read( "\xC0", 41 )
-      ->returns( Device::Chip::CC1101->CONFIG_DEFAULT );
+      ->will_done( Device::Chip::CC1101->CONFIG_DEFAULT );
    # PATABLE
    $adapter->expect_write_then_read( "\xFE", 8 )
-      ->returns( "\xC6\x00\x00\x00\x00\x00\x00\x00" );
+      ->will_done( "\xC6\x00\x00\x00\x00\x00\x00\x00" );
 
    is(
       { await $chip->read_config },

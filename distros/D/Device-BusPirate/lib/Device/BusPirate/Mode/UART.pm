@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Device::BusPirate::Mode::UART 0.24;
+package Device::BusPirate::Mode::UART 0.25;
 class Device::BusPirate::Mode::UART :isa(Device::BusPirate::Mode);
 
 use Carp;

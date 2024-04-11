@@ -1,5 +1,10 @@
 Revision history for Win32-ServiceManager
 
+0.003000  2024-04-10 16:36:35-05:00 America/Chicago
+ - use improved quoting from IPC::System::Simple 1.28
+ - fix arrayref format of 'depends' parameter
+ - remove dependency: Syntax::Keyword::Junction
+
 0.002005  2018-07-31 19:08:22-05:00 America/Chicago
  - add optional start type config
 

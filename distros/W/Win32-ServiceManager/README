@@ -1,24 +1,20 @@
 SYNOPSIS
 
      use Win32::ServiceManager;
-     use Path::Class 'file';
     
-     my $dir = file(__FILE__)->parent->absolute;
      my $sc = Win32::ServiceManager->new(
-        nssm_path => $dir->file(qw( cgi exe nssm.exe ))->stringify,
+        nssm_path => $your_nssm_path,
      );
     
      $sc->create_service(
-        name => 'LynxWebServer01',
-        display => 'Lynx Web Server 1',
+        name => 'GRWebServer01',
+        display => 'Giant Robot Web Server 1',
         description => 'Handles Web Requests on port 3001',
-        command =>
-           $dir->file(qw( App script server.pl ))->stringify .
-              ' -p 3001',
+        command => 'your_script.pl --port 3001',
      );
-     $sc->start_service('LynxWebServer01', { non_blocking => 0 });
-     $sc->stop_service('LynxWebServer01');
-     $sc->delete_service('LynxWebServer01');
+     $sc->start_service('GRWebServer01', { non_blocking => 0 });
+     $sc->stop_service('GRWebServer01');
+     $sc->delete_service('GRWebServer01');
 
 METHODS
 
@@ -295,7 +291,7 @@ PRO-TIPS
     The best way to use this module is to subclass it for your software. So
     for example we have a subclass that looks something like the following:
 
-     package Lynx::ServiceManager
+     package GiantRobot::ServiceManager;
     
      use Moo;
      extends 'Win32::ServiceManager';
@@ -305,8 +301,8 @@ PRO-TIPS
         my ($self, $i) = @_;
     
         $self->create_service(
-           name => "LynxWebServer$i",
-           display => "Lynx Web Server $i",
+           name => "GRWebServer$i",
+           display => "GRWeb Server $i",
            description => 'Handles Web Requests on port 3001',
            command =>
               $dir->file(qw( App script server.pl ))->stringify .
@@ -315,7 +311,7 @@ PRO-TIPS
     
      }
     
-     sub start_catalyst_service { $_[0]->start_service("LynxWebServer$_[1]", $_[2]) }
+     sub start_catalyst_service { $_[0]->start_service("GRWebServer$_[1]", $_[2]) }
     
      ...
 
@@ -324,10 +320,11 @@ PRO-TIPS
 
 CAVEAT LECTOR
 
-    I have used this at work and am confident in it, but it has only been
-    used on Windows Server 2008. The tests can do no better than ensure the
-    generated strings are as expected, instead of ensuring that a service
-    was correctly created or started or whatever.
+    This module has been used in production from Windows Server 2008 -
+    2022. It should also work fine on desktop versions of Windows as long
+    as the sc interface stays the same. The included tests can do no better
+    than ensure the generated strings are as expected, instead of ensuring
+    that a service was correctly created or started or whatever.
 
     Additionally, in my own work when I get an error from sc I just report
     it and move forward. Because of this I have done very little to make

@@ -4,16 +4,12 @@ NAME
     National Agency or Drug and Food Control)
 
 VERSION
-    This document describes version 20230207.0.0 of
+    This document describes version 20230207.0.1 of
     TableDataBundle::Business::ID::BPOM (from Perl distribution
-    TableDataBundle-Business-ID-BPOM), released on 2023-02-07.
+    TableDataBundle-Business-ID-BPOM), released on 2024-04-10.
 
 DESCRIPTION
     This distribution contains the following TableData:: modules:
-
-    *   TableData::Business::ID::BPOM::FoodCategory
-
-    *   TableData::Business::ID::BPOM::FoodType
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -27,6 +23,11 @@ SEE ALSO
     TableData
 
     <https://pom.go.id>
+
+    Due to some modules being renamed and the source changed to CSV, this
+    distribution will be split to individual TableData modules, e.g.
+    TableData::Business::ID::BPOM::FoodIngredientRBA,
+    TableData::Business::ID::BPOM::FoodAdditive.
 
 AUTHOR
     perlancar <perlancar@cpan.org>
@@ -48,7 +49,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022 by perlancar
+    This software is copyright (c) 2024, 2023, 2022 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

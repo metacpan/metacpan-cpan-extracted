@@ -120,12 +120,11 @@ set through B<--option>.
 The default mode if no other mode is specified. This mode uses the default value
 for all the options (as per their documentation). The default syntax is
 documented in the GitHub repository of the project:
-L<https://github.com/mkende/pmarkdown/blob/main/README.md>
+L<https://github.com/mkende/pmarkdown/blob/main/Syntax.md>
 
-Note that, in practice, setting the mode to B<default> will I<erase> the mode
-currently set, which means that no warning will be emitted if this mode is
-overridden afterward (as opposed to what happens when any other mode is being
-overridden, including by the default mode).
+Note that, in practice, setting the mode to B<default> is equivalent to not
+setting a mode at all, except that subsequent calls to set a mode will raise a
+warning about the mode being overwritten.
 
 =item B<cmark>
 

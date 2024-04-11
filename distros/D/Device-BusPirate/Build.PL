@@ -20,6 +20,7 @@ my $build = Module::Build->new(
       'List::Util' => '1.33',
       'Module::Pluggable' => 0,
       'Time::HiRes' => 0,
+      'Sub::Util' => 0,
    },
    test_requires => {
       'Test::Future::Deferred' => 0,

@@ -2,7 +2,7 @@ package Atomic::Pipe;
 use strict;
 use warnings;
 
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 use IO();
 use Fcntl();
@@ -344,7 +344,7 @@ sub get_line_burst_or_data {
 
     while (1) {
         $self->throw_invalid('Incomplete message received before EOF')
-            if $self->{+EOF} && (keys(%{$self->{+STATE}->{buffers}}) || keys (%{$self->{+STATE}->{parts}}));
+            if $self->eof && (keys(%{$self->{+STATE}->{buffers}}) || keys (%{$self->{+STATE}->{parts}}));
 
         if($buffer->{lines} || length($buffer->{lines})) {
             # Look for a complete line

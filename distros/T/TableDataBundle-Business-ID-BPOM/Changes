@@ -1,3 +1,11 @@
+20230207.0.1  2024-04-10  Released-By: PERLANCAR; Urgency: medium
+
+              [Removed]
+
+              - Delete TableData::* modules, will be split to separate
+                distributions.
+
+
 20230207.0.0  2023-02-07  Released-By: PERLANCAR; Urgency: high
 
               - Update module names of the source data.

@@ -11,6 +11,7 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 37050201
+49699333
 Alders
 Alders'
 Anwar
@@ -31,6 +32,7 @@ This
 bdaeppen
 choroba
 cynovg
+dependabot
 github
 jjatria
 lib

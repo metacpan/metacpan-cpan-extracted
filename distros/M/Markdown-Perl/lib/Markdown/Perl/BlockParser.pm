@@ -15,6 +15,7 @@ use List::MoreUtils 'first_index';
 use List::Util 'pairs', 'min';
 use Markdown::Perl::HTML 'html_escape', 'decode_entities', 'remove_disallowed_tags';
 use Markdown::Perl::Util ':all';
+use YAML::Tiny;
 
 our $VERSION = '0.01';
 
@@ -135,6 +136,9 @@ sub process {
   # https://spec.commonmark.org/0.30/#entity-and-numeric-character-references
   # Done at a later stage, as escaped characters don’t have their Markdown
   # meaning, we need a way to represent that.
+
+  # Note: for now, nothing is done with the extracted metadata.
+  $this->_parse_yaml_metadata() if $this->get_parse_file_metadata eq 'yaml';
 
   while (defined (my $l = $this->next_line())) {
     # This field might be set to true at the beginning of the processing, while
@@ -360,6 +364,21 @@ sub _parse_blocks {  ## no critic (RequireArgUnpacking)
   return;
 }
 
+sub _parse_yaml_metadata {
+  my ($this) = @_;
+
+  # At this point, pos(md) is guaranteed to be 0.
+  if ($this->{md} =~ m/ ^ ---\n (?<YAML> (?: .+\n )+? ) (?: --- | \.\.\. ) \n /gxc) {  ## no critic (ProhibitUnusedCapture)
+    my $metadata = eval { YAML::Tiny->read_string($+{YAML}) };
+    if ($EVAL_ERROR) {
+      pos($this->{md}) = 0;
+      return;
+    }
+  }
+
+  return;
+}
+
 # https://spec.commonmark.org/0.30/#atx-headings
 sub _do_atx_heading {
   my ($this) = @_;
@@ -516,6 +535,8 @@ sub _do_fenced_code_block {
 sub _do_html_block {
   my ($this) = @_;
   # HTML blocks can interrupt a paragraph.
+  # TODO: add an option so that they don’t interrupt a paragraph (make it be
+  # the default?).
   # TODO: PERF: test that $l =~ m/^ {0,3}</ to short circuit all these regex.
   my $html_end_condition;
   if ($l =~ m/ ^\ {0,3} < (?:pre|script|style|textarea) (?:\ |\t|>|$) /x) {

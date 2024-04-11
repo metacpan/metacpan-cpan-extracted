@@ -1,32 +1,40 @@
 package ## no critic: Modules::RequireFilenameMatchesPackage
     # hide from PAUSE
-    TableDataRole::Business::ID::BPOM::FoodCategory;
+    TableDataRole::Business::ID::BPOM::FoodAdditive;
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Role::Tiny;
-with 'TableDataRole::Source::AOA';
+with 'TableDataRole::Source::CSVInFile';
 
 around new => sub {
-    require App::BPOMUtils::Table::FoodCategory;
-
     my $orig = shift;
-    my $self = shift;
 
-    $orig->(
-        $self,
-        column_names => [ sort {
-            $App::BPOMUtils::Table::FoodCategory::meta_idn_bpom_kategori_pangan->{fields}{$a}{pos} <=>
-            $App::BPOMUtils::Table::FoodCategory::meta_idn_bpom_kategori_pangan->{fields}{$b}{pos};
-        } keys %{ $App::BPOMUtils::Table::FoodCategory::meta_idn_bpom_kategori_pangan->{fields} } ],
-        aoa => $App::BPOMUtils::Table::FoodCategory::data_idn_bpom_kategori_pangan,
-        @_,
-    );
+    my $filename;
+  FIND_CSV:
+    {
+      TRY_PROJ_DIR: {
+            $filename = __FILE__;
+            $filename =~ s!(.+)([/\\].+)!$1!;
+            $filename .= "/../../../../../share/merged.csv";
+            last FIND_CSV if -f $filename;
+
+        };
+        TRY_DIST_SHARE_DIR: {
+              require File::ShareDir;
+              my $dist_dir = File::ShareDir::dist_dir('TableData-Business-ID-BPOM-FoodAdditive');
+              $filename = "$dist_dir/merged.csv";
+              last FIND_CSV if -f $filename;
+          }
+        die "Can't find merged.csv anywhere";
+    }
+
+    $orig->(@_, filename => $filename);
 };
 
-package TableData::Business::ID::BPOM::FoodCategory;
+package TableData::Business::ID::BPOM::FoodAdditive;
 
 use 5.010001;
 use strict;
@@ -35,16 +43,16 @@ use warnings;
 use Role::Tiny::With;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-07'; # DATE
-our $DIST = 'TableDataBundle-Business-ID-BPOM'; # DIST
-our $VERSION = '20230207.0.0'; # VERSION
+our $DATE = '2024-04-10'; # DATE
+our $DIST = 'TableData-Business-ID-BPOM-FoodAdditive'; # DIST
+our $VERSION = '20240409.0.0'; # VERSION
 
-with 'TableDataRole::Business::ID::BPOM::FoodCategory';
+with 'TableDataRole::Business::ID::BPOM::FoodAdditive';
 
-our %STATS = ("num_rows",1959,"num_columns",4); # STATS
+our %STATS = ("num_rows",55422,"num_columns",11); # STATS
 
 1;
-# ABSTRACT: Food categories in BPOM processed food division
+# ABSTRACT: Food additives in BPOM
 
 __END__
 
@@ -54,19 +62,19 @@ __END__
 
 =head1 NAME
 
-TableDataRole::Business::ID::BPOM::FoodCategory - Food categories in BPOM processed food division
+TableDataRole::Business::ID::BPOM::FoodAdditive - Food additives in BPOM
 
 =head1 VERSION
 
-This document describes version 20230207.0.0 of TableDataRole::Business::ID::BPOM::FoodCategory (from Perl distribution TableDataBundle-Business-ID-BPOM), released on 2023-02-07.
+This document describes version 20240409.0.0 of TableDataRole::Business::ID::BPOM::FoodAdditive (from Perl distribution TableData-Business-ID-BPOM-FoodAdditive), released on 2024-04-10.
 
 =head1 SYNOPSIS
 
 To use from Perl code:
 
- use TableData::Business::ID::BPOM::FoodCategory;
+ use TableData::Business::ID::BPOM::FoodAdditive;
 
- my $td = TableData::Business::ID::BPOM::FoodCategory->new;
+ my $td = TableData::Business::ID::BPOM::FoodAdditive->new;
 
  # Iterate rows of the table
  $td->each_row_arrayref(sub { my $row = shift; ... });
@@ -83,39 +91,39 @@ See also L<TableDataRole::Spec::Basic> for other methods.
 To use from command-line (using L<tabledata> CLI):
 
  # Display as ASCII table and view with pager
- % tabledata Business::ID::BPOM::FoodCategory --page
+ % tabledata Business::ID::BPOM::FoodAdditive --page
 
  # Get number of rows
- % tabledata --action count_rows Business::ID::BPOM::FoodCategory
+ % tabledata --action count_rows Business::ID::BPOM::FoodAdditive
 
 See the L<tabledata> CLI's documentation for other available actions and options.
 
 =head1 DESCRIPTION
 
-Keyword: BPOM, pangan olahan, kategori pangan
+Keyword: BPOM, pangan olahan, BTP, bahan tambahan pangan
 
 =head1 TABLEDATA STATISTICS
 
  +-------------+-------+
  | key         | value |
  +-------------+-------+
- | num_columns | 4     |
- | num_rows    | 1959  |
+ | num_columns | 11    |
+ | num_rows    | 55422 |
  +-------------+-------+
 
 The statistics is available in the C<%STATS> package variable.
 
 =head1 HOMEPAGE
 
-Please visit the project's homepage at L<https://metacpan.org/release/TableDataBundle-Business-ID-BPOM>.
+Please visit the project's homepage at L<https://metacpan.org/release/TableData-Business-ID-BPOM-FoodAdditive>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-TableDataBundle-Business-ID-BPOM>.
+Source repository is at L<https://github.com/perlancar/perl-TableData-Business-ID-BPOM-FoodAdditive>.
 
 =head1 SEE ALSO
 
-L<TableData::Business::ID::BPOM::FoodType>
+L<TableData::Business::ID::BPOM::FoodIngredientRBA>
 
 =head1 AUTHOR
 
@@ -141,14 +149,14 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=TableDataBundle-Business-ID-BPOM>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=TableData-Business-ID-BPOM-FoodAdditive>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

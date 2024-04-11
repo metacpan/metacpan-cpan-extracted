@@ -26,6 +26,7 @@ t/300-containers.t
 t/301-inlines.t
 t/302-reference-links.t
 t/303-lists.t
+t/304-file_metadata.t
 t/400-opt-allow_spaces_in_links.t
 t/400-opt-allow_task_list_markers.t
 t/400-opt-disallowed_html_tags.t
@@ -34,6 +35,8 @@ t/400-opt-inline_delimiters.t
 t/400-opt-inline_delimiters_max_run_length.t
 t/400-opt-lists_can_interrupt_paragraph.t
 t/400-opt-multi_lines_setext_headings.t
+t/400-opt-render_naked_paragraphs.t
+t/400-opt-two_spaces_hard_line_breaks.t
 t/400-opt-use_fenced_code_blocks.t
 t/800-bugs.t
 t/801-fuzzing.t
@@ -41,6 +44,7 @@ t/900-cmark-test-suite.t
 t/901-github-test-suite.t
 t/902-markdown-test-suite.t
 t/903-mmd-test-suite.t
+t/904-pmarkdown.t
 t/data/cc-by-sa.png
 t/data/cmark.tests.json
 t/data/github.tests.json
@@ -48,5 +52,6 @@ t/data/README.md
 t/lib/CmarkTest.pm
 t/lib/HtmlSanitizer.pm
 t/lib/MmdTest.pm
+t/lib/PmarkdownTest.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

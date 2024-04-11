@@ -49,7 +49,7 @@ my %WriteMakefile = (
 	'NAME'          => $module,
 	'ABSTRACT_FROM' => $main_file,
 	'VERSION_FROM'  => $main_file,
-	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
+	'AUTHOR'        => 'brian d foy <briandfoy@pobox.com>',
 	'LICENSE'       => 'artistic_2',
 
 	'CONFIGURE_REQUIRES' => {
@@ -61,7 +61,6 @@ my %WriteMakefile = (
 		},
 
 	'TEST_REQUIRES' => {
-		'Test::Data' => '0',
 		'Test::More' => '1',
 		},
 
@@ -77,13 +76,16 @@ my %WriteMakefile = (
 		resources => {
 			repository => {
 				type => 'git',
-				url  => "$github.git",
+				url  => $github,
 				web  => $github,
 				},
 			bugtracker => {
 				web    => "$github/issues",
 				},
 			homepage => $github,
+			},
+		no_index => {
+			directory => [ 'preprocess' ]
 			},
 		},
 

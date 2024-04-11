@@ -1,12 +1,11 @@
 package Win32::ServiceManager;
-$Win32::ServiceManager::VERSION = '0.002005';
+$Win32::ServiceManager::VERSION = '0.003000';
 # ABSTRACT: Manage Windows Services
 
 use Moo;
-use IPC::System::Simple 'capture';
+use IPC::System::Simple 1.28 'capturex';
 use Win32::Service qw(StartService StopService GetStatus GetServices);
 use Time::HiRes 'sleep';
-use Syntax::Keyword::Junction 'any';
 use List::Util 'first';
 use Carp 'croak';
 
@@ -55,16 +54,16 @@ sub _nssm_install {
 }
 
 sub _sc_install {
-   qw(sc create), $_[1], qq(binpath= "$_[2]") . ($_[3] ?  " $_[3]" : ''),
+   qw(sc create), $_[1], 'binpath=', $_[2], ($_[3] ? $_[3] : ()),
 }
 
 sub _sc_configure {
    my ($self, $name, $c) = @_;
-   qw(sc config), $name, qq(DisplayName= "$c->{display}"),
-   qq(type= own)
-   . $self->_start($c->{start})
-   . $self->_depends($c->{depends})
-   . $self->_auth($c->{user}, $c->{password})
+   qw(sc config), $name, qq(DisplayName=), $c->{display},
+   qw(type= own),
+   $self->_start($c->{start}),
+   $self->_depends($c->{depends}),
+   $self->_auth($c->{user}, $c->{password}),
 }
 
 sub _start {
@@ -74,32 +73,33 @@ sub _start {
    my %types = map { $_ => 1 } qw{boot system auto demand disabled delayed-auto};
    croak 'Unknown start type' unless $types{$start};
 
-   return qq( start= $start);
+   return 'start=', $start;
 }
 
 sub _depends {
    my ($self, $depends) = @_;
 
-   return '' unless $depends;
+   return () unless $depends;
 
    my $d = $depends;
-   $d = join '\\', @$depends if ref $depends;
+   $d = join '/', @$depends if ref $depends;
 
-   return qq( depend= "$d");
+   return 'depend=', $d;
 }
 
 sub _auth {
    my ($self, $user, $pass) = @_;
-   return '' unless $user;
+   return () unless $user;
 
-   join ' ', '', grep defined $_,
-      $user ? qq(obj= "$user") : undef,
-      $pass ? qq(password= "$pass") : undef,
+   return (
+      $user ? ('obj=', $user) : (),
+      $pass ? ('password=', $pass) : (),
+   )
 }
 
-sub _sc_failure { qw(sc failure), $_[1], 'reset= 60', 'actions= restart/60000' }
+sub _sc_failure { qw(sc failure), $_[1], 'reset=', 60, 'actions=', 'restart/60000' }
 
-sub _sc_description { qw(sc description), $_[1], qq("$_[2]") }
+sub _sc_description { qw(sc description), $_[1], $_[2] }
 
 sub create_service {
    my ($self, %args) = @_;
@@ -113,9 +113,9 @@ sub create_service {
    my $idempotent = $self->idempotent_default;
    $idempotent = $args{idempotent} if exists $args{idempotent};
 
-   my $name    = $args{name}    or die 'name is required!';
-   my $display = $args{display} or die 'display is required!';
-   die "can't provide a password without a 'user'" if $args{password} && !$args{user};
+   my $name    = $args{name}    or croak 'name is required!';
+   my $display = $args{display} or croak 'display is required!';
+   croak "can't provide a password without a 'user'" if $args{password} && !$args{user};
 
    my $description = $args{description};
    my $config = {
@@ -131,38 +131,38 @@ sub create_service {
       my ($command, $args);
       if (exists $args{check_command}) {
          if ($args{check_command}) {
-            die "cannot find command: $args{command}"
+            croak "cannot find command: $args{command}"
                unless $self->_exists($args{command})
          }
       } elsif ($self->check_command_default) {
-         die "cannot find command: $args{command}"
+         croak "cannot find command: $args{command}"
             unless $self->_exists($args{command})
       }
       if ($use_perl) {
          $command = $^X;
-         die 'command is required!' unless $args{command};
+         croak 'command is required!' unless $args{command};
          $args = $args{command} . ($args{args} ? " $args{args}" : '')
       } else {
-         $command = $args{command} or die 'command is required!';
+         $command = $args{command} or croak 'command is required!';
          $args = $args{args};
       }
 
       if ($nssm) {
-         capture($self->_nssm_install($name, $command, $args))
+         capturex($self->_nssm_install($name, $command, $args))
       } else {
-         capture($self->_sc_install($name, $command, $args))
+         capturex($self->_sc_install($name, $command, $args))
       }
    }
 
-   capture($self->_sc_configure($name, $config));
-   capture($self->_sc_failure($name));
-   capture($self->_sc_description($name, $description)) if $description;
+   capturex($self->_sc_configure($name, $config));
+   capturex($self->_sc_failure($name));
+   capturex($self->_sc_description($name, $description)) if $description;
 }
 
 sub start_service {
    my ($self, $name, $options) = @_;
 
-   die 'name is required!' unless $name;
+   croak 'name is required!' unless $name;
    $options ||= {};
 
    my $idempotent = $self->idempotent_default;
@@ -171,11 +171,11 @@ sub start_service {
    my $non_blocking = $self->non_blocking_default;
    $non_blocking = $options->{non_blocking} if exists $options->{non_blocking};
 
+   my $state = $self->get_status($name)->{current_state};
    return if $idempotent &&
-      $self->get_status($name)->{current_state} eq
-         any('running', 'start pending');
+      ($state eq 'running' || $state eq 'start pending');
 
-   StartService('', $name) or die "failed to start service <$name>";
+   StartService('', $name) or croak "failed to start service <$name>";
    return if $non_blocking;
 
    my $starting = $self->get_status($name)->{current_state} eq 'start pending';
@@ -188,7 +188,7 @@ sub start_service {
 sub stop_service {
    my ($self, $name, $options) = @_;
 
-   die 'name is required!' unless $name;
+   croak 'name is required!' unless $name;
    $options ||= {};
 
    my $idempotent = $self->idempotent_default;
@@ -197,11 +197,11 @@ sub stop_service {
    my $non_blocking = $self->non_blocking_default;
    $non_blocking = $options->{non_blocking} if exists $options->{non_blocking};
 
+   my $state = $self->get_status($name)->{current_state};
    return if $idempotent &&
-      $self->get_status($name)->{current_state} eq
-         any('stopped', 'stop pending');
+      ($state eq 'stopped' || $state eq 'stop pending');
 
-   StopService('', $name) or die "failed to stop service <$name>";
+   StopService('', $name) or croak "failed to stop service <$name>";
    return if $non_blocking;
 
    my $stopping = $self->get_status($name)->{current_state} eq 'stop pending';
@@ -222,17 +222,17 @@ sub delete_service {
 
    return if $idempotent && !$self->_is_service_created($name);
 
-   die 'name is required!' unless $name;
+   croak 'name is required!' unless $name;
 
    $self->stop_service($name, $auto) if $auto;
 
-   capture( qw(sc delete), $name )
+   capturex( qw(sc delete), $name )
 }
 
 sub restart_service {
    my ($self, $name, $options) = @_;
 
-   die 'name is required!' unless $name;
+   croak 'name is required!' unless $name;
    $options ||= {};
 
    my $non_blocking = $self->non_blocking_default;
@@ -271,7 +271,7 @@ sub get_status {
    }
 
    warn "Got status of $name in $x tries\n" if defined $x && $self->warnings;
-   die "couldn't get status from $name" unless %ret;
+   croak "couldn't get status from $name" unless %ret;
 
    # more statuses will be added when I (or others) need them
    # http://msdn.microsoft.com/en-us/library/windows/desktop/ms685996%28v=vs.85%29.aspx
@@ -309,29 +309,25 @@ Win32::ServiceManager - Manage Windows Services
 
 =head1 VERSION
 
-version 0.002005
+version 0.003000
 
 =head1 SYNOPSIS
 
  use Win32::ServiceManager;
- use Path::Class 'file';
 
- my $dir = file(__FILE__)->parent->absolute;
  my $sc = Win32::ServiceManager->new(
-    nssm_path => $dir->file(qw( cgi exe nssm.exe ))->stringify,
+    nssm_path => $your_nssm_path,
  );
 
  $sc->create_service(
-    name => 'LynxWebServer01',
-    display => 'Lynx Web Server 1',
+    name => 'GRWebServer01',
+    display => 'Giant Robot Web Server 1',
     description => 'Handles Web Requests on port 3001',
-    command =>
-       $dir->file(qw( App script server.pl ))->stringify .
-          ' -p 3001',
+    command => 'your_script.pl --port 3001',
  );
- $sc->start_service('LynxWebServer01', { non_blocking => 0 });
- $sc->stop_service('LynxWebServer01');
- $sc->delete_service('LynxWebServer01');
+ $sc->start_service('GRWebServer01', { non_blocking => 0 });
+ $sc->stop_service('GRWebServer01');
+ $sc->delete_service('GRWebServer01');
 
 =head1 METHODS
 
@@ -627,7 +623,7 @@ RAM.  The code is at C<git://git.nssm.cc/nssm/nssm.git>.
 The best way to use this module is to subclass it for your software.  So for
 example we have a subclass that looks something like the following:
 
- package Lynx::ServiceManager
+ package GiantRobot::ServiceManager;
 
  use Moo;
  extends 'Win32::ServiceManager';
@@ -637,8 +633,8 @@ example we have a subclass that looks something like the following:
     my ($self, $i) = @_;
 
     $self->create_service(
-       name => "LynxWebServer$i",
-       display => "Lynx Web Server $i",
+       name => "GRWebServer$i",
+       display => "GRWeb Server $i",
        description => 'Handles Web Requests on port 3001',
        command =>
           $dir->file(qw( App script server.pl ))->stringify .
@@ -647,7 +643,7 @@ example we have a subclass that looks something like the following:
 
  }
 
- sub start_catalyst_service { $_[0]->start_service("LynxWebServer$_[1]", $_[2]) }
+ sub start_catalyst_service { $_[0]->start_service("GRWebServer$_[1]", $_[2]) }
 
  ...
 
@@ -656,10 +652,11 @@ services.
 
 =head1 CAVEAT LECTOR
 
-I have used this at work and am confident in it, but it has only been used on
-Windows Server 2008.  The tests can do no better than ensure the generated
-strings are as expected, instead of ensuring that a service was correctly
-created or started or whatever.
+This module has been used in production from Windows Server 2008 - 2022. It
+should also work fine on desktop versions of Windows as long as the C<sc>
+interface stays the same. The included tests can do no better than ensure the
+generated strings are as expected, instead of ensuring that a service was
+correctly created or started or whatever.
 
 Additionally, in my own work when I get an error from C<sc> I just report it
 and move forward.  Because of this I have done very little to make exceptions
@@ -682,7 +679,7 @@ Wes Malone <wesm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

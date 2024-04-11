@@ -20,10 +20,10 @@ await $chip->mount(
 {
    # CONFIG
    $adapter->expect_write_then_read( "\xC0", 41 )
-      ->returns( Device::Chip::CC1101->CONFIG_DEFAULT );
+      ->will_done( Device::Chip::CC1101->CONFIG_DEFAULT );
    # PATABLE
    $adapter->expect_write_then_read( "\xFE", 8 )
-      ->returns( "\xC6\x00\x00\x00\x00\x00\x00\x00" );
+      ->will_done( "\xC6\x00\x00\x00\x00\x00\x00\x00" );
 
    await $chip->read_config;
 }
@@ -40,9 +40,9 @@ await $chip->mount(
 
    # read RXFIFO, returns packet
    $adapter->expect_write_then_read( "\xFB", 1 )
-      ->returns( "\x06" );
+      ->will_done( "\x06" );
    $adapter->expect_write_then_read( "\xFF", 6 )
-      ->returns( "ABCD\x30\xA0" );
+      ->will_done( "ABCD\x30\xA0" );
 
    is( await $chip->receive,
       {
@@ -68,14 +68,14 @@ await $chip->mount(
 
    # read RXFIFO, returns length
    $adapter->expect_write_then_read( "\xFB", 1 )
-      ->returns( "\x01" );
+      ->will_done( "\x01" );
    $adapter->expect_write_then_read( "\xFF", 1 )
-      ->returns( "\x04" );
+      ->will_done( "\x04" );
    # read RXFIFO, returns packet
    $adapter->expect_write_then_read( "\xFB", 1 )
-      ->returns( "\x06" );
+      ->will_done( "\x06" );
    $adapter->expect_write_then_read( "\xFF", 6 )
-      ->returns( "EFGH\x32\xA1" );
+      ->will_done( "EFGH\x32\xA1" );
 
    is( await $chip->receive,
       {
