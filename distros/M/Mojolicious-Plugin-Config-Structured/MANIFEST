@@ -9,12 +9,14 @@ README
 README.md
 dist.ini
 lib/Mojolicious/Plugin/Config/Structured.pm
+lib/Mojolicious/Plugin/Config/Structured/Command/config_dump.pm
 perlcriticrc
 perltidyrc
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/01_load.t
 t/02_config.t
+t/02_dump.t
 t/conf/TestApp.conf.def
 t/conf/TestApp2.conf
 t/conf/TestApp2.conf.def

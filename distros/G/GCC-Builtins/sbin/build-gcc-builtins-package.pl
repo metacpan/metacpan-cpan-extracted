@@ -7,9 +7,13 @@
 # (for a function to be added must exist in whitelist and not exist in blacklist)
 # run current script: sbin/build-gcc-builtins-package.pl
 #  perl Makefile.PL && make all && make test
-# observe expected values and copy them in expected hash here
-# re-check the make test
-# and that is it.
+# observe expected values and copy them in expected hash
+#    %T_EXPECTED_RESULTS
+# below.
+# Then re-check the make test and that is it.
+# NOTE: in comparing floating point results to expected,
+# we check if their difference is less than $FLOATS_ARE_EQUAL_DIFF
+#
 
 #########################################################################
 #### WARNING: do not edit GCC/Buildins.pm or GCC/Buildins.xs
@@ -32,6 +36,8 @@ use FindBin;
 
 my $curdir = $FindBin::Bin;
 
+my $FLOATS_ARE_EQUAL_DIFF = 1E-09;
+
 my $GCC_Builtins_HTML_URL = 'https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html';
 # if you have the HTML from above URL then declare it here
 # it will use this without fetching it (for when trying to debug something and don't want to bother the server all the time)
@@ -43,43 +49,43 @@ my $TYPEMAP_outfile = File::Spec->catfile($curdir, '..', 'typemap');
 my $TDIR = File::Spec->catdir($curdir, '..', 't');
 
 my %function_names_whitelist = map { $_ => 1 } (
-	'__builtin_clz',
-	'__builtin_bswap16',
-	'__builtin_bswap32',
-	'__builtin_bswap64',
-	'__builtin_clrsb',
-	'__builtin_clrsbl',
-	'__builtin_clrsbll',
-	'__builtin_clz',
-	'__builtin_clzl',
-	'__builtin_clzll',
-	'__builtin_ctz',
-	'__builtin_ctzl',
-	'__builtin_ctzll',
-	'__builtin_ffs',
-	'__builtin_ffsl',
-	'__builtin_ffsll',
-	'__builtin_huge_val',
-	'__builtin_huge_valf',
-	'__builtin_huge_vall',
-	'__builtin_inf',
-	'__builtin_infd128',
-	'__builtin_infd32',
-	'__builtin_infd64',
-	'__builtin_inff',
-	'__builtin_infl',
-	'__builtin_nan',
-	'__builtin_nanf',
-	'__builtin_nanl',
-	'__builtin_parity',
-	'__builtin_parityl',
-	'__builtin_parityll',
-	'__builtin_popcount',
-	'__builtin_popcountl',
-	'__builtin_popcountll',
-	'__builtin_powi',
-	'__builtin_powif',
-	'__builtin_powil'
+'__builtin_clz',
+'__builtin_bswap16',
+'__builtin_bswap32',
+'__builtin_bswap64',
+'__builtin_clrsb',
+'__builtin_clrsbl',
+'__builtin_clrsbll',
+'__builtin_clz',
+'__builtin_clzl',
+'__builtin_clzll',
+'__builtin_ctz',
+'__builtin_ctzl',
+'__builtin_ctzll',
+'__builtin_ffs',
+'__builtin_ffsl',
+'__builtin_ffsll',
+'__builtin_huge_val',
+'__builtin_huge_valf',
+'__builtin_huge_vall',
+'__builtin_inf',
+'__builtin_infd128',
+'__builtin_infd32',
+'__builtin_infd64',
+'__builtin_inff',
+'__builtin_infl',
+'__builtin_nan',
+'__builtin_nanf',
+'__builtin_nanl',
+'__builtin_parity',
+'__builtin_parityl',
+'__builtin_parityll',
+'__builtin_popcount',
+'__builtin_popcountl',
+'__builtin_popcountll',
+'__builtin_powi',
+'__builtin_powif',
+'__builtin_powil',
 );
 
 # these are either unknown or depend on unknown symbols
@@ -175,7 +181,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our @ISA = (qw/Exporter DynaLoader/);
 our %EXPORT_TAGS = ( 'all' => [qw( <% list_of_sub_names %>)] );
@@ -203,7 +209,7 @@ GCC::Builtins - access GCC compiler builtin functions via XS
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 
@@ -421,7 +427,7 @@ use strict;
 use warnings;
 use Test::More;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use GCC::Builtins qw/:all/;
 
@@ -431,6 +437,7 @@ use GCC::Builtins qw/:all/;
 done_testing();
 EOP
 
+# Copy here expected results, all are covered anyway
 my %T_EXPECTED_RESULTS = (
 	'FUNCTION' => 'XS_GCC__Builtins_FUNCTION',
 	'bswap16' => '512',
@@ -659,9 +666,16 @@ EOX
 			$expected = 'dummy_expected';
 		}
 		$func{'test_func_is_ok'} = 'my $expected = "'.$expected.'";'
-					   ."\n".'is($res, $expected, "called '
+					   ."\n".'if( $expected =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/ ){'
+					   ."\n\t".'my $dif = abs($res-$expected);'
+					   ."\n\t".'ok($dif<'.$FLOATS_ARE_EQUAL_DIFF.', "called '
 					   .$func{'xs-name'}
-					   .'('.$testargs.') and got result ($res), expected ($expected).");'
+					   .'('.$testargs.') returned ($res) and expected ($expected) values differ ($dif) by less than '.$FLOATS_ARE_EQUAL_DIFF.'.");'
+					   ."\n} else {"
+					   ."\n\t".'is($res, $expected, "called '
+					   .$func{'xs-name'}
+					   .'('.$testargs.') returned ($res) and expected ($expected) values are identical.");'
+					   ."\n}"
 					   ."\n".'diag("copy-this-expected-value \''.$func{'xs-name'}.'\' => \'$res\',");'
 		;
 	}

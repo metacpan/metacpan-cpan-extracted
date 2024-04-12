@@ -7,7 +7,7 @@ use warnings;
 use Error::Pure qw(err);
 use List::Util qw(none);
 use Readonly;
-use Scalar::Util qw(blessed);
+use Scalar::Util qw(blessed looks_like_number);
 
 Readonly::Array our @EXPORT_OK => qw(check_angle check_array check_array_object
 	check_array_required check_bool check_code check_isa check_length
@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(check_angle check_array check_array_object
 	check_number_range check_regexp check_required check_string check_string_begin
 	check_strings);
 
-our $VERSION = 0.25;
+our $VERSION = 0.26;
 
 sub check_angle {
 	my ($self, $key) = @_;
@@ -150,7 +150,7 @@ sub check_number {
 
 	_check_key($self, $key) && return;
 
-	if ($self->{$key} !~ m/^[-+]?\d+(\.\d+)?$/ms) {
+	if (! looks_like_number($self->{$key})) {
 		err "Parameter '$key' must be a number.",
 			'Value', $self->{$key},
 		;
@@ -487,9 +487,10 @@ Returns undef.
 
  check_number($self, $key);
 
-I<Since version 0.01. Described functionality since version 0.09.>
+I<Since version 0.01. Described functionality since version 0.26.>
 
 Check parameter defined by C<$key> which is number (positive or negative) or no.
+Number could be integer, float, exponencial and negative.
 
 Put error if check isn't ok.
 
@@ -499,9 +500,10 @@ Returns undef.
 
  check_number_min($self, $key, $min);
 
-I<Since version 0.25.>
+I<Since version 0.25. Described functionality since version 0.26.>
 
 Check parameter defined by C<$key> which is number greater than C<$min> value.
+Number could be integer, float, exponencial and negative.
 
 Put error if check isn't ok.
 
@@ -525,9 +527,10 @@ Returns undef.
 
  check_number_range($self, $key, $min, $max);
 
-I<Since version 0.23.>
+I<Since version 0.23. Described functionality since version 0.26.>
 
 Check if number defined by C<$key> is in range between C<$min> and C<$max>.
+Number could be integer, float, exponencial and negative.
 
 Put error if check isn't ok.
 
@@ -650,6 +653,8 @@ Returns undef.
                  Value: %s
 
  check_number_min():
+         Parameter '%s' must be a number.
+                 Value: %s
          Parameter '%s' must be greater than %s.
                  Value: %s
 
@@ -1564,6 +1569,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.25
+0.26
 
 =cut

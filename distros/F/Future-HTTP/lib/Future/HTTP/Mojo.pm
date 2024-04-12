@@ -1,13 +1,11 @@
 package Future::HTTP::Mojo;
 use strict;
-use Future::Mojo;
+use Future::Mojo 1.003; # only 1.003+ is compatible with Future::XS
 use Mojo::UserAgent;
 use Moo 2; # or Moo::Lax if you can't have Moo v2
-use Filter::signatures;
-no warnings 'experimental::signatures';
-use feature 'signatures';
+use experimental 'signatures';
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 with 'Future::HTTP::Handler';
 
@@ -220,7 +218,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016-2023 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2024 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

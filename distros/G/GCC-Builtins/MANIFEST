@@ -11,6 +11,7 @@ sbin/build-gcc-builtins-package.sh
 t/000-load.t
 t/010-clz.t
 t/015-clz-exported.t
+t/020-clz-compare-to-pureperl.t
 t/666-bswap16.t
 t/667-bswap32.t
 t/668-bswap64.t

@@ -8,7 +8,7 @@ use Mo qw(build default is);
 use Mo::utils qw(check_bool check_number);
 use Mo::utils::CSS qw(check_css_class);
 
-our $VERSION = 0.11;
+our $VERSION = 0.13;
 
 has autofocus => (
 	is => 'ro',

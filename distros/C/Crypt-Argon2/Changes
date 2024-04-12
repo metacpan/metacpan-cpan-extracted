@@ -1,5 +1,8 @@
 Revision history for Crypt-Argon2
 
+0.022     2024-04-12 01:28:41+02:00 Europe/Brussels
+          - allow arch to be configured via environment
+
 0.021     2024-04-03 23:39:28+02:00 Europe/Brussels
           - Fix documentation of argon2_needs_rehash argument order
 

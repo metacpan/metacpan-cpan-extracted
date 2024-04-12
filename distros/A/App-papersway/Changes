@@ -1,0 +1,8 @@
+Revision history for App::papersway
+
+0.002     2024-04-12 16:17:09+08:00 Asia/Shanghai
+    - papersway(1): Add missing 'exec' to sample bindings.
+    - Attempt to fix distribution name for PAUSE indexer.
+
+0.001     2024-04-12 15:51:26+08:00 Asia/Shanghai
+    - First independent release.

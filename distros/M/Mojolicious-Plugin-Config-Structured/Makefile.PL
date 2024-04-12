@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.022000;
+use 5.026000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,10 +14,10 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Mojolicious-Plugin-Config-Structured",
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.022000",
+  "MIN_PERL_VERSION" => "5.026000",
   "NAME" => "Mojolicious::Plugin::Config::Structured",
   "PREREQ_PM" => {
-    "Config::Structured" => "2.006",
+    "Config::Structured" => "3.01",
     "Mojolicious" => 0
   },
   "TEST_REQUIRES" => {
@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Test2::Suite" => "0.000155",
     "Test::More" => 0
   },
-  "VERSION" => "1.004",
+  "VERSION" => "3.00",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Config::Structured" => "2.006",
+  "Config::Structured" => "3.01",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Mojolicious" => 0,

@@ -37,7 +37,7 @@ METHODS
 
   conf
     This method is used to access the loaded configuration from within the
-    Mojo application. Returns the root Config::Structured instance.
+    Mojo application. Returns the root "Config::Structured::Node" instance.
 
 AUTHOR
     Mark Tyrrell "<mark@tyrrminal.dev>"

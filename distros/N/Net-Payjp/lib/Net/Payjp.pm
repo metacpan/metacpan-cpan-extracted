@@ -20,6 +20,9 @@ use Net::Payjp::Transfer;
 use Net::Payjp::Event;
 use Net::Payjp::Tenant;
 use Net::Payjp::TenantTransfer;
+use Net::Payjp::Statement;
+use Net::Payjp::Balance;
+use Net::Payjp::Term;
 use Net::Payjp::Object;
 
 # ABSTRACT: API client for pay.jp
@@ -64,7 +67,7 @@ This is required. You get this from your Payjp Account settings.
 
 =cut
 
-our $VERSION = '0.2.2';
+our $VERSION = '0.3.0';
 our $API_BASE = 'https://api.pay.jp';
 our $INITIAL_DELAY_SEC = 2;
 our $MAX_DELAY_SEC = 32;
@@ -536,6 +539,21 @@ sub tenant{
 sub tenant_transfer{
   my $self = shift;
   return Net::Payjp::TenantTransfer->new(%$self);
+}
+
+sub statement{
+  my $self = shift;
+  return Net::Payjp::Statement->new(%$self);
+}
+
+sub balance{
+  my $self = shift;
+  return Net::Payjp::Balance->new(%$self);
+}
+
+sub term{
+  my $self = shift;
+  return Net::Payjp::Term->new(%$self);
 }
 
 sub _request{

@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our @ISA = (qw/Exporter DynaLoader/);
 our %EXPORT_TAGS = ( 'all' => [qw( bswap16 bswap32 bswap64 clrsb clrsbl clrsbll clz clzl clzll ctz ctzl ctzll ffs ffsl ffsll huge_val huge_valf huge_vall inf infd128 infd32 infd64 inff infl nan nanf nanl parity parityl parityll popcount popcountl popcountll powi powif powil )] );
@@ -32,7 +32,7 @@ GCC::Builtins - access GCC compiler builtin functions via XS
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 

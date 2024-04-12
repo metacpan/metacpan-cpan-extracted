@@ -1,4 +1,4 @@
-use v5.22;
+use v5.26;
 use warnings;
 
 use Test2::V0;

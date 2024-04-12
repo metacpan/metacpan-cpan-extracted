@@ -17,7 +17,7 @@ Readonly::Array our @ENCTYPES => (
 	'text/plain',
 );
 
-our $VERSION = 0.11;
+our $VERSION = 0.13;
 
 has action => (
 	is => 'ro',
@@ -145,8 +145,9 @@ Default value is [].
 
 Data type for content.
 
-Possible value are: plain tags
+Possible value are: cb plain tags
 
+The 'cb' content is code reference.
 The 'plain' content are string(s).
 The 'tags' content is structure described in L<Tags>.
 
@@ -357,6 +358,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.11
+0.13
 
 =cut

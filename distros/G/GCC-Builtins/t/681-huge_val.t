@@ -4,13 +4,18 @@ use strict;
 use warnings;
 use Test::More;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use GCC::Builtins qw/:all/;
 
 my $res = huge_val();
 my $expected = "Inf";
-is($res, $expected, "called huge_val() and got result ($res), expected ($expected).");
+if( $expected =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/ ){
+	my $dif = abs($res-$expected);
+	ok($dif<1e-09, "called huge_val() returned ($res) and expected ($expected) values differ ($dif) by less than 1e-09.");
+} else {
+	is($res, $expected, "called huge_val() returned ($res) and expected ($expected) values are identical.");
+}
 diag("copy-this-expected-value 'huge_val' => '$res',");
 
 done_testing();

@@ -4,12 +4,13 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-02-21'; # DATE
+our $DATE = '2024-04-12'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240221.0'; # VERSION
+our $VERSION = '20240412.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
-    'TYRRMINAL' => '',
+    'PERLANCAR' => '',
+    'SKIM' => '',
 );
 
 
@@ -28,19 +29,20 @@ Acme::CPANAuthors::CPAN::Streaks::DailyNewDistributions::Current - Authors with 
 
 =head1 VERSION
 
-This document describes version 20240221.0 of Acme::CPANAuthors::CPAN::Streaks::DailyNewDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-21.
+This document describes version 20240412.0 of Acme::CPANAuthors::CPAN::Streaks::DailyNewDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-04-12.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-02-21, produced by L<cpan-streaks>):
+Current standings (as of 2024-04-12, produced by L<cpan-streaks>):
 
-  +-----------+-----+------------+---------+
-  | author    | len | start_date | status  |
-  +-----------+-----+------------+---------+
-  | TYRRMINAL |   2 | 2024-02-19 | ongoing |
-  +-----------+-----+------------+---------+
+  +-----------+-----+------------+-------------+
+  | author    | len | start_date | status      |
+  +-----------+-----+------------+-------------+
+  | PERLANCAR |   5 | 2024-04-08 | ongoing     |
+  | SKIM      |   1 | 2024-04-11 | might-break |
+  +-----------+-----+------------+-------------+
 
 =head1 HOMEPAGE
 

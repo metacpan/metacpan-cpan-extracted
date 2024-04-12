@@ -1,5 +1,8 @@
 Revision history for Perl module Object::Iterate
 
+1.149 2024-04-11T16:53:34Z
+	* Put POD in its own file so MetaCPAN sees it (#17)
+
 1.148 2024-04-10T18:05:54Z
 	* need a user release for indexing?
 

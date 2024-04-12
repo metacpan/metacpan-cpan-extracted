@@ -1,7 +1,8 @@
 #!/usr/bin/perl
 use Data::Dumper;
 use Getopt::Long;
-use File::Basename qw( fileparse );
+use File::Basename qw( fileparse dirname basename );
+use File::Slurp;
 use File::Path qw( make_path );
 use Digest::SHA qw(sha256_hex);
 use Fcntl qw(:flock);
@@ -38,7 +39,7 @@ my $opt_document_class = 'book';
 my $opt_top_heading;
 my %global_labels = ();
 my $global_label_id = 1;
-my $re_ln_label = qr/\{#(\w+)}\s*$/;
+my $re_ln_label = qr/\{[#:](\w+)}\s*$/;
 my $global_vars = {
   built_at => strftime('%FT%TZ', gmtime(time()))
 };
@@ -46,6 +47,7 @@ my @env_chain = ();
 my $re_defvar = qr/^[@-]\s*\{([A-Za-z0-9_ -]+)}=\s+`(.*?)`/;
 my $re_command = qr/@(mark|table|c|\+)\s*\b(.*)/;
 my $re_defvar_inline = qr/^\{\{\s*(\w+):\s+'(.*?)'\s*}}/;
+my $re_code_inline = qr/^\[\[(.+)]]/;
 
 my @linePatterns = (
   {
@@ -181,14 +183,14 @@ my %options = (
   "--document-class CLASS"  => [\$opt_document_class, 'Set latex document class'],
   "--verbose"           => [\$opt_verbose, 'More logging'],
   "--output FILENAME"          => [\$opt_output_file, 'Set output file'],
-  "--port PORT:i"            => [\$opt_port, 'Start HTTP Server at port'],
-  "--daemon"          => [\$opt_daemon, "Run server in background"],
+  "--port PORT:i"       => [\$opt_port, 'Start HTTP Server at port'],
+  "--daemon"            => [\$opt_daemon, "Run server in background"],
   "--json-dump"         => [\$opt_json_dump, 'Dump the document'],
-  "-x SECTION"               => [\$opt_exec, 'short for --exec'],
-  "-o OUTPUTFILE"               => [\$opt_output_file, 'short for --output'],
-  "-t SECTION"               => [\$opt_target, 'short for --target'],
-  "-s SECTION"               => [\$opt_target, 'short for --section'],
-  "-h"                 => [\$opt_help, 'Shows help information'],
+  "-x SECTION"          => [\$opt_exec, 'short for --exec'],
+  "-o OUTPUTFILE"       => [\$opt_output_file, 'short for --output'],
+  "-t SECTION"          => [\$opt_target, 'short for --target'],
+  "-s SECTION"          => [\$opt_target, 'short for --section'],
+  "-h"                  => [\$opt_help, 'Shows help information'],
 );
 
 my %optionsSpec = map {
@@ -208,7 +210,7 @@ my %optionsSpec = map {
 
 GetOptions(%optionsSpec) or usage("Invalid options");
 
-usage() if $opt_help || (scalar @ARGV == 0 && !$opt_daemon);
+usage() if $opt_help || (scalar @ARGV == 0 && !$opt_port);
 
 if ($opt_top_heading) {
  while ($section_levels[0] ne $opt_top_heading) {
@@ -226,7 +228,7 @@ sub usage {
     print STDERR sprintf("  %-24s %s\n", $_, shift @desc);
     print STDERR sprintf("  %-24s $_\n", '') foreach (@desc);
   }
-  print STDERR "Zen Version: 0.07\n";
+  print STDERR "Zen Version: 0.08\n";
   exit(1);
 };
 sub add_label
@@ -631,6 +633,13 @@ sub load_zen_file
         value => trim($2),
         ln => $ln
       };
+    } elsif ($s =~ m/$re_code_inline/) {
+      push @{$curr_section->{blocks}}, {
+        type => 'code',
+        file => $filename,
+        ln => $ln,
+        lines => [$l]
+      };
     }
   }
   die "Error: $curr_block->{file}:$curr_block->{ln}: block not closed\n"
@@ -639,6 +648,7 @@ sub load_zen_file
   flock($fh, LOCK_UN) or die "Could not unlock file '$filename' $!";
   close($fh);
   return {
+    path => $filename,
     last_modified => $mtime,
     size => $filesize,
     sections => \@sections
@@ -1033,7 +1043,7 @@ use Data::Dumper;
 sub docgen_html {
  my $zf = shift;
  my $old = select(shift);
- print "<!DOCTYPE HTML>\n\n<html>\n<head>\n <meta charset=\"UTF-8\">\n <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n <link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/katex\@0.15.1/dist/katex.min.css\"\n   crossorigin=\"anonymous\">\n <style>\n :root {\n   --navbar-height: 1.6rem;\n }\n \n html,body {\n   margin: 0;\n   padding: 0;\n }\n \n html {\n   font-size: 12pt;\n }\n \n h1 { font-size: 1.5rem; }\n h2 { font-size: 1.3rem; }\n h3 { font-size: 1.1rem; }\n h4,h5 { font-size: 1rem; }\n \n .navbar {\n   background: #ccc;\n   padding: 4px 8px;\n   display: flex;\n   align-items: center;\n   height: var(--navbar-height);\n }\n .flex {\n   display: flex;\n }\n section.folded > .content {\n   display: none;\n }\n section.folded > .heading::before {\n   content: \"+\"\n }\n \n .align-right {\n   text-align: right;\n }\n \n .sticky-top {\n     position: sticky;\n     top: 0;\n }\n \n .container {\n   background: gray;\n }\n \n .xpad {\n   padding: 0 4px;\n }\n .xxpad {\n   padding: 0 8px;\n }\n \n .col-header {\n  display: flex;\n  background: #ccc;\n  height: var(--navbar-height);\n  align-items: center;\n }\n .fill-parent {\n   flex: 1;\n }\n \n p code {\n   background: #eee;\n }\n \n table {\n   border-collapse: collapse;\n   margin: 1em 0;\n }\n \n table, th, td {\n   border: 1px solid black;\n }\n \n th {\n   border-bottom: 4px solid black;\n }\n \n td {\n   padding: 0 4px;\n }\n \n thead > tr {\n   background: #ccc;\n }\n \n .container\n \n .col {\n  background: #eee;\n  overflow: scroll;\n  flex: 2;\n }\n \n \n .col.wide {\n   flex: 4;\n }\n .col.narrow {\n   flex: 1;\n }\n \n article {\n   max-width: 960px;\n   min-width: 320px;\n   margin: auto;\n   word-break: break-word;\n   padding: 1rem 8px;\n }\n \n aside {\n   background: #eee;\n   font-size: 0.8rem;\n   flex: 1;\n   max-height: 100vh;\n   overflow: auto;\n   position: sticky;\n   top: 0;\n }\n \n aside:not(.is-narrow) section {\n   column-width: 240px;\n   font-size: 0.8rem;\n   column-count: 2;\n }\n \n aside.is-wide section {\n   column-width: 240px;\n   font-size: 0.9rem;\n   column-count: 3;\n }\n \n .fullwidth {\n    width: 100%;\n }\n \n .collapse {\n   display: none;\n }\n \n .text-small {\n   font-size: 0.8rem;\n }\n \n section {\n \tscroll-margin-top: var(--navbar-height);\n }\n \n section.sidebar  {\n   position: fixed;\n   bottom: 0px;\n   background: #ccc;\n   overflow: auto;\n   top: var(--navbar-height);\n   z-index: 1000;\n   width: 320px;\n   right: 0;\n }\n \n .col.folded > article {\n   display: none;\n }\n \n \@media screen and (min-width: 960px) {\n   .container {\n     display: flex;\n     flex-direction: row;\n     position: absolute;\n     width: 100%;\n     height: 100%;\n     overflow: hidden;\n   }\n   .container > :not(:first-child) {\n     margin-left: 4px;\n   }\n \n   .col > .col-header {\n       position: sticky;\n       top: 0;\n   }\n \n   .col.folded > article {\n     visibility: hidden; /* can not use display none, because layout will be lost, scroll position lost */\n     display: block;\n   }\n \n   .col.folded > .col-header  {\n     writing-mode: vertical-rl; /* Vertical writing mode, content flows from top to bottom */\n     transform: rotate(180deg); /* Rotate the text 180 degrees */\n     width: 100%; /* Very important to fill the entire col */\n     height: 100%;\n   }\n \n   .col.folded {\n     overflow: hidden;\n     flex: 0;\n     min-width: 30px;\n  }\n \n   aside > section {\n     display: block !important;\n   }\n   #toggle-index {\n     display: none;\n   }\n }\n \n pre, pre.prettyprint {\n   padding: 0.5rem !important;\n   font-size: 0.9rem;\n   white-space: pre-wrap;\n }\n pre.listing {\n   padding-left: 3rem !important;\n   border: 2px solid black;\n }\n \n .line-number {\n   font-size: 0.7rem;\n   margin-left: -3rem !important;\n   margin-right: 1rem;\n   user-select: none; /*  */\n }\n \n \n .L-1 {\n  margin-left: 16px;\n }\n .L-2 {\n  margin-left: 28px;\n }\n .L-3,.L-4,.L-5,.L-6,.L-7,.L-8 {\n  margin-left: 36px;\n }\n \n \n img {\n   width: 100%;\n }\n \@media screen and (min-width: 480px) {\n    img.tiny { width: 50%; }\n }\n \n \@media screen and (min-width: 720px) {\n    img.tiny { width: 33%; }\n    img.small { width: 66%; }\n }\n \n \@media screen and (min-width: 960px) {\n   img.tiny { width: 25%; }\n   img.small { width: 50%; }\n   img.medium { width: 75%; }\n }\n \@media print {\n   img.tiny { width: 2.5in; }\n   img.small { width: 5in; }\n }\n \n \n figure { text-align: center}\n \n \@media print {\n   * {\n     /* Don't waste color ink */\n     color: black !important;\n   }\n   \@page {\n     size: auto; /* Magic: disable browser generated footer and header */\n     margin: 1em;\n     table {\n       page-break-inside: avoid;\n       page-break-after: avoid;\n     }\n   }\n   aside { display: none; }\n }\n \n </style>\n <script>\n   window.onload = function() {\n    function autoResizeTextArea(textarea) {\n      textarea.style.height = 'auto';\n      textarea.style.height = (textarea.scrollHeight + 2) + 'px';\n    }\n    \n    function applySearchFilter(searchTerms) {\n      document.querySelectorAll(\"div.col\").forEach(col => {\n        let n = 0;\n        col.querySelectorAll(\"section\").forEach(section => {\n          if (searchTerms.filter(t => section.innerText.toLowerCase().includes(t)).length == searchTerms.length) {\n            section.classList.remove('folded');\n            section.classList.remove('collapse');\n            n++;\n    \n          } else {\n            section.classList.add('collapse');\n          }\n        });\n    \n        if (n > 0) {\n          col.classList.remove('folded');\n        } else {\n          col.classList.add('folded');\n        }\n      });\n    }\n    \n    function clearSearchInput(el) {\n      el.value = '';\n      document.querySelectorAll(\"div.col\").forEach(col => {\n        col.querySelectorAll(\"section\").forEach(section => {\n          section.classList.remove('collapse');\n        })\n        col.classList.remove('folded');\n      });\n    }\n    \n    function onSearchInput(e) {\n      const el = e.target;\n      applySearchFilter(el.value.split(/\\s+/).map(x => x.toLowerCase()));\n    }\n    \n    document.addEventListener('click', async function(event) {\n      let el = event.target;\n      let handler = el.getAttribute('click');\n      if (handler == 'edit') {\n    \n        let editor = document.querySelector(\".editor\");\n        if (editor) {\n          let section = editor.closest('section');\n          section.scrollIntoView({ behavior: 'smooth', block: 'start' });\n          return;\n        }\n        let section = el.closest('section');\n        editor = document.createElement(\"div\");\n        editor.classList.add('editor');\n        section.appendChild(editor);\n    \n        let textarea = document.createElement('textarea');\n        textarea.classList.add('fullwidth');\n        textarea.addEventListener('input', function() {\n           this.style.resize = 'none';\n           autoResizeTextArea(this);\n        });\n        editor.appendChild(textarea);\n        el.classList.add('collapse');\n        let saveButton = document.createElement('button');\n        let cancelButton = document.createElement('button');\n        saveButton.innerText = 'Save';\n        editor.appendChild(saveButton);\n        cancelButton.innerText = 'Cancel';\n        editor.appendChild(cancelButton);\n    \n        let l = section.getAttribute('l');\n        let n = section.getAttribute('n');\n        let response = await fetch(`?raw=1&l=\${l}&n=\${n}`);\n        if (!response.ok) {\n          throw new Error(\"Bad\");\n        }\n        textarea.value = await response.text();\n        autoResizeTextArea(textarea);\n        saveButton.onclick = async function() {\n           let res = await fetch(`?l=\${l}&n=\${n}&last_modified=\${window.zen.last_modified}`, {\n             method: 'PUT',\n             headers: {\n               'Content-type': 'text/plain; charset=utf-8',\n             },\n             body: textarea.value\n           });\n           if (!res.ok) {\n             alert(res.status);\n             throw new Error(\"can not save\");\n           }\n           window.location.hash = section.getAttribute('id');\n           window.location.reload();\n        };\n        cancelButton.onclick = function() {\n           el.classList.remove('collapse');\n           section.removeChild(editor);\n        };\n    \n      } else if (handler == 'fold') {\n        let section = el.closest('.foldable');\n        section.classList.toggle('folded');\n      } else if (handler == 'expand') {\n        const col = el.closest('.col');\n        if (col.classList.contains('narrow')) {\n          col.classList.remove('narrow');\n          el.innerText = '+';\n        } else if (col.classList.contains('wide')) {\n          col.classList.remove('wide');\n          el.innerText = '-';\n        } else if (el.innerText == '-') {\n          col.classList.add('narrow');\n          el.innerText = '++';\n        } else if (el.innerText == '+') {\n          col.classList.add('wide');\n          el.innerText = '--';\n        }\n      } else if (handler == 'show-outline') {\n        let col = el.closest('.col');\n        if (col.querySelectorAll('section:not(.folded)').length == 0) {\n          col.querySelectorAll('section').forEach(section => {\n            section.classList.toggle('folded');\n          });\n        } else {\n          col.querySelectorAll('section').forEach(section => {\n            section.classList.add('folded');\n          });\n        }\n      } else if (handler == 'search') {\n        let header = el.closest('.col-header');\n        Array.from(header.children).forEach(x => x.classList.add('collapse'));\n        header.querySelector('#search').classList.remove('collapse');\n        header.querySelector('#search-text').addEventListener('input', onSearchInput);\n      } else if (handler == 'cancel-search') {\n        let header = el.closest('.col-header');\n        Array.from(header.children).forEach(x => x.classList.remove('collapse'));\n        header.querySelector('#search').classList.add('collapse');\n        header.querySelector('#search-text').removeEventListener('input',onSearchInput);\n        clearSearchInput(header.querySelector('#search-text'));\n      } else {\n        let col = el.closest('.col');\n        if (col.tagName == 'ASIDE' && el.tagName == 'A') {\n          if (!col.closest('.container').classList.contains('is-wide')) {\n            col.classList.toggle('folded');\n          }\n          // Unfold the target\n          let t = document.querySelector(el.getAttribute('href'));\n          if (t) {\n            let tcol = t.closest('.col');\n            if (tcol) tcol.classList.remove('folded');\n          }\n        }\n      }\n    });\n    \n    const observer = new ResizeObserver(entries => {\n      for (let entry of entries) {\n        const target = entry.target;\n    \n        if (target.classList.contains('folded'))\n          return;\n    \n        const width = target.getBoundingClientRect().width;\n        if (width < 640) {\n          target.classList.add('is-narrow');\n        } else {\n          target.classList.remove('is-narrow');\n        }\n        if (width > 960) {\n          target.classList.add('is-wide');\n        } else {\n          target.classList.remove('is-wide');\n        }\n      }\n    });\n    \n    document.querySelectorAll('.col,.container').forEach(col => {\n      observer.observe(col);\n    });\n   }\n </script>\n</head>\n<body>";
+ print "<!DOCTYPE HTML>\n\n<html>\n<head>\n <meta charset=\"UTF-8\">\n <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n <link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/katex\@0.15.1/dist/katex.min.css\"\n   crossorigin=\"anonymous\">\n <style>\n :root {\n   --navbar-height: 1.6rem;\n }\n \n html,body {\n   margin: 0;\n   padding: 0;\n }\n \n html {\n   font-size: 12pt;\n }\n \n h1 { font-size: 1.5rem; }\n h2 { font-size: 1.3rem; }\n h3 { font-size: 1.1rem; }\n h4,h5 { font-size: 1rem; }\n \n .navbar {\n   background: #ccc;\n   padding: 4px 8px;\n   display: flex;\n   align-items: center;\n   height: var(--navbar-height);\n }\n .flex {\n   display: flex;\n }\n section.folded > .content {\n   display: none;\n }\n section.folded > .heading::before {\n   content: \"+\"\n }\n \n .align-right {\n   text-align: right;\n }\n \n .sticky-top {\n     position: sticky;\n     top: 0;\n }\n \n .container {\n   background: gray;\n }\n \n .xpad {\n   padding: 0 4px;\n }\n .xxpad {\n   padding: 0 8px;\n }\n \n .col-header {\n  display: flex;\n  background: #ccc;\n  height: var(--navbar-height);\n  align-items: center;\n }\n .fill-parent {\n   flex: 1;\n }\n \n p code {\n   background: #eee;\n }\n \n table {\n   border-collapse: collapse;\n   margin: 1em 0;\n }\n \n table, th, td {\n   border: 1px solid black;\n }\n \n th {\n   border-bottom: 4px solid black;\n }\n \n td {\n   padding: 0 4px;\n }\n \n thead > tr {\n   background: #ccc;\n }\n \n .container\n \n .col {\n  background: #eee;\n  overflow: scroll;\n  flex: 2;\n }\n \n \n .col.wide {\n   flex: 4;\n }\n .col.narrow {\n   flex: 1;\n }\n \n article {\n   max-width: 960px;\n   min-width: 320px;\n   margin: auto;\n   word-break: break-word;\n   padding: 1rem 8px;\n }\n \n aside {\n   background: #eee;\n   font-size: 0.8rem;\n   flex: 1;\n   max-height: 100vh;\n   overflow: auto;\n   position: sticky;\n   top: 0;\n }\n \n aside:not(.is-narrow) section {\n   column-width: 240px;\n   font-size: 0.8rem;\n   column-count: 2;\n }\n \n aside.is-wide section {\n   column-width: 240px;\n   font-size: 0.9rem;\n   column-count: 3;\n }\n \n .fullwidth {\n    width: 100%;\n }\n \n .collapse {\n   display: none;\n }\n \n .text-small {\n   font-size: 0.8rem;\n }\n \n section {\n \tscroll-margin-top: var(--navbar-height);\n }\n \n section.sidebar  {\n   position: fixed;\n   bottom: 0px;\n   background: #ccc;\n   overflow: auto;\n   top: var(--navbar-height);\n   z-index: 1000;\n   width: 320px;\n   right: 0;\n }\n \n .col.folded > article {\n   display: none;\n }\n \n \@media screen and (min-width: 960px) {\n   .container {\n     display: flex;\n     flex-direction: row;\n     position: absolute;\n     width: 100%;\n     height: 100%;\n     overflow: hidden;\n   }\n   .container > :not(:first-child) {\n     margin-left: 4px;\n   }\n \n   .col > .col-header {\n       position: sticky;\n       top: 0;\n   }\n \n   .col.folded > article {\n     visibility: hidden; /* can not use display none, because layout will be lost, scroll position lost */\n     display: block;\n   }\n \n   .col.folded > .col-header  {\n     writing-mode: vertical-rl; /* Vertical writing mode, content flows from top to bottom */\n     transform: rotate(180deg); /* Rotate the text 180 degrees */\n     width: 100%; /* Very important to fill the entire col */\n     height: 100%;\n   }\n \n   .col.folded {\n     overflow: hidden;\n     flex: 0;\n     min-width: 30px;\n  }\n \n   aside > section {\n     display: block !important;\n   }\n   #toggle-index {\n     display: none;\n   }\n }\n \n pre, pre.prettyprint {\n   padding: 0.5rem !important;\n   font-size: 0.9rem;\n   white-space: pre-wrap;\n }\n pre.listing {\n   padding-left: 3rem !important;\n   border: 2px solid black;\n }\n \n .line-number {\n   font-size: 0.7rem;\n   margin-left: -3rem !important;\n   margin-right: 1rem;\n   user-select: none; /*  */\n }\n \n \n .L-1 {\n  margin-left: 16px;\n }\n .L-2 {\n  margin-left: 28px;\n }\n .L-3,.L-4,.L-5,.L-6,.L-7,.L-8 {\n  margin-left: 36px;\n }\n \n \n .fullwidth {\n   width: 100%;\n }\n \@media screen and (min-width: 480px) {\n    img.tiny { width: 50%; }\n }\n \n \@media screen and (min-width: 720px) {\n    img.tiny { width: 33%; }\n    img.small { width: 66%; }\n }\n \n \@media screen and (min-width: 960px) {\n   img.tiny { width: 25%; }\n   img.small { width: 50%; }\n   img.medium { width: 75%; }\n }\n \@media print {\n   img.tiny { width: 2.5in; }\n   img.small { width: 5in; }\n }\n \n \n figure { text-align: center}\n \n \@media print {\n   * {\n     /* Don't waste color ink */\n     color: black !important;\n   }\n   \@page {\n     size: auto; /* Magic: disable browser generated footer and header */\n     margin: 1em;\n     table {\n       page-break-inside: avoid;\n       page-break-after: avoid;\n     }\n   }\n   aside { display: none; }\n }\n \n </style>\n <script>\n   window.onload = function() {\n    function autoResizeTextArea(textarea) {\n      textarea.style.height = 'auto';\n      textarea.style.height = (textarea.scrollHeight + 2) + 'px';\n    }\n    \n    function applySearchFilter(searchTerms) {\n      document.querySelectorAll(\"div.col\").forEach(col => {\n        let n = 0;\n        col.querySelectorAll(\"section\").forEach(section => {\n          if (searchTerms.filter(t => section.innerText.toLowerCase().includes(t)).length == searchTerms.length) {\n            section.classList.remove('folded');\n            section.classList.remove('collapse');\n            n++;\n    \n          } else {\n            section.classList.add('collapse');\n          }\n        });\n    \n        if (n > 0) {\n          col.classList.remove('folded');\n        } else {\n          col.classList.add('folded');\n        }\n      });\n    }\n    \n    function clearSearchInput(el) {\n      el.value = '';\n      document.querySelectorAll(\"div.col\").forEach(col => {\n        col.querySelectorAll(\"section\").forEach(section => {\n          section.classList.remove('collapse');\n        })\n        col.classList.remove('folded');\n      });\n    }\n    \n    function onSearchInput(e) {\n      const el = e.target;\n      applySearchFilter(el.value.split(/\\s+/).map(x => x.toLowerCase()));\n    }\n    \n    document.addEventListener('click', async function(event) {\n      let el = event.target;\n      let handler = el.getAttribute('click');\n      if (handler == 'edit') {\n    \n        let editor = document.querySelector(\".editor\");\n        if (editor) {\n          let section = editor.closest('section');\n          section.scrollIntoView({ behavior: 'smooth', block: 'start' });\n          return;\n        }\n        let section = el.closest('section');\n        editor = document.createElement(\"div\");\n        editor.classList.add('editor');\n        section.appendChild(editor);\n    \n        let textarea = document.createElement('textarea');\n        textarea.classList.add('fullwidth');\n        textarea.addEventListener('input', function() {\n           this.style.resize = 'none';\n           autoResizeTextArea(this);\n        });\n        editor.appendChild(textarea);\n        el.classList.add('collapse');\n        let saveButton = document.createElement('button');\n        let cancelButton = document.createElement('button');\n        saveButton.innerText = 'Save';\n        editor.appendChild(saveButton);\n        cancelButton.innerText = 'Cancel';\n        editor.appendChild(cancelButton);\n    \n        let l = section.getAttribute('l');\n        let n = section.getAttribute('n');\n        let response = await fetch(`?raw=1&l=\${l}&n=\${n}`);\n        if (!response.ok) {\n          throw new Error(\"Bad\");\n        }\n        textarea.value = await response.text();\n        autoResizeTextArea(textarea);\n        saveButton.onclick = async function() {\n           let res = await fetch(`?l=\${l}&n=\${n}&last_modified=\${window.zen.last_modified}`, {\n             method: 'PUT',\n             headers: {\n               'Content-type': 'text/plain; charset=utf-8',\n             },\n             body: textarea.value\n           });\n           if (!res.ok) {\n             alert(res.status);\n             throw new Error(\"can not save\");\n           }\n           window.location.hash = section.getAttribute('id');\n           window.location.reload();\n        };\n        cancelButton.onclick = function() {\n           el.classList.remove('collapse');\n           section.removeChild(editor);\n        };\n    \n      } else if (handler == 'fold') {\n        let section = el.closest('.foldable');\n        section.classList.toggle('folded');\n      } else if (handler == 'expand') {\n        const col = el.closest('.col');\n        if (col.classList.contains('narrow')) {\n          col.classList.remove('narrow');\n          el.innerText = '+';\n        } else if (col.classList.contains('wide')) {\n          col.classList.remove('wide');\n          el.innerText = '-';\n        } else if (el.innerText == '-') {\n          col.classList.add('narrow');\n          el.innerText = '++';\n        } else if (el.innerText == '+') {\n          col.classList.add('wide');\n          el.innerText = '--';\n        }\n      } else if (handler == 'show-outline') {\n        let col = el.closest('.col');\n        if (col.querySelectorAll('section:not(.folded)').length == 0) {\n          col.querySelectorAll('section').forEach(section => {\n            section.classList.toggle('folded');\n          });\n        } else {\n          col.querySelectorAll('section').forEach(section => {\n            section.classList.add('folded');\n          });\n        }\n      } else if (handler == 'search') {\n        let header = el.closest('.col-header');\n        Array.from(header.children).forEach(x => x.classList.add('collapse'));\n        header.querySelector('#search').classList.remove('collapse');\n        header.querySelector('#search-text').addEventListener('input', onSearchInput);\n      } else if (handler == 'cancel-search') {\n        let header = el.closest('.col-header');\n        Array.from(header.children).forEach(x => x.classList.remove('collapse'));\n        header.querySelector('#search').classList.add('collapse');\n        header.querySelector('#search-text').removeEventListener('input',onSearchInput);\n        clearSearchInput(header.querySelector('#search-text'));\n      } else {\n        let col = el.closest('.col');\n        if (col && col.tagName == 'ASIDE' && el.tagName == 'A') {\n          if (!col.closest('.container').classList.contains('is-wide')) {\n            col.classList.toggle('folded');\n          }\n          // Unfold the target\n          let t = document.querySelector(el.getAttribute('href'));\n          if (t) {\n            let tcol = t.closest('.col');\n            if (tcol) tcol.classList.remove('folded');\n          }\n        }\n      }\n    });\n    \n    const observer = new ResizeObserver(entries => {\n      for (let entry of entries) {\n        const target = entry.target;\n    \n        if (target.classList.contains('folded'))\n          return;\n    \n        const width = target.getBoundingClientRect().width;\n        if (width < 640) {\n          target.classList.add('is-narrow');\n        } else {\n          target.classList.remove('is-narrow');\n        }\n        if (width > 960) {\n          target.classList.add('is-wide');\n        } else {\n          target.classList.remove('is-wide');\n        }\n      }\n    });\n    \n    document.querySelectorAll('.col,.container').forEach(col => {\n      observer.observe(col);\n    });\n   }\n </script>\n</head>\n<body>";
  print "<script>";
  print "window.zen = ";
  print JSON::encode_json({
@@ -1331,7 +1341,7 @@ sub gen_html_section {
       my $src = join("\n", map {$_->{text}} xtrim(@a));
       my $input_file;
       my $output_file;
-      my $dir = 'tmp';
+      my $dir = dirname($zenfile->{path}) . "/gen";
       if ( !-d  $dir) {
           make_path $dir or die "Failed to create path: $dir";
       }
@@ -1358,8 +1368,13 @@ sub gen_html_section {
         system($cmd);
       }
       
-      if ($output_file =~ m/\.(svg|png)$/) {
-        print "<img src=\"$output_file\">";
+      my $relpath = "gen/" . basename($output_file);
+      if ($output_file =~ m/\.(jpg|png)$/) {
+        print "<img src=\"$relpath\">";
+      } elsif ($output_file =~ m/\.(svg)$/) {
+        my $content = read_file($output_file);
+        $content =~ s/^\<\?.*+\?\>//;
+        print $content;
       } else {
         print "<xmp>$src</xmp>";
       }
@@ -1389,6 +1404,26 @@ sub gen_html_section {
       print "<div>{<b>$1</b>} &equiv; <code>",html_escape_code($2),"</code></div>\n";
     } elsif ($t =~ m/$re_defvar_inline/) {
       print "<div>{<b>$1</b>} &equiv; <code>",html_escape_code($2),"</code></div>\n";
+    } elsif ($t =~ m/$re_code_inline/) {
+      my $spaces = '';
+      my @names = split /;/, $1;
+      print "<div>";
+      print $spaces,"<span class=\"nocode\">&#x27e6;</span>";
+      my $n = 0;
+      foreach (@names) {
+        $n++;
+        my ($name, $params) = split /:/,trim($_);
+        my $section = find_section($name);
+        my $id = $section->{id};
+        if ($params) {
+          $params = "<small>(" . html_escape($params) . ")</small>";
+        }
+        print "; " if $n > 1;
+        $name = $section->{heading} if index($name, '...') != -1;
+        print "<span class=\"nocode\"><a href=\"#$id\" title=\"$section->{heading}\"><b>$name</b></a>$params</span>";
+      }
+      print "<span class=\"nocode\">&#x27e7;</span>";
+      print "</div>";
     } elsif ($t =~ m/^\.(\w+)\s+(.*)/) {
       print "<code><b>.$1</b></code> <code>",html_escape_code($2),"</code>\n";
     } elsif ($t =~ m/^\$\$/) {
@@ -1438,16 +1473,22 @@ sub gen_html_section {
       }
       print "</ol>\n";
     } elsif ($t =~ m/^\s*$/) {
-      while (@lines > 0) {
-        $l = shift @lines;
-        if ($l->{text} =~ m/^\s*$/) {
-          next;
-        } else {
-          unshift @lines, $l;
-          last;
+      # Skip blank lines
+      shift @lines while (@lines[0] && @lines[0]->{text} =~ m/^\s\S*$/);
+      
+      # Collect indented lines if there is any
+      my @indented = ();
+      push @indented, shift @lines while @lines[0] && @lines[0]->{text} =~ m/^\s\s+\S/;
+      
+      if (scalar(@indented) > 0) {
+        print "<pre><code>";              
+        foreach (xtrim(@indented)) {
+          print html_escape_code($_->{text}), "\n";
         }
+        print "</code></pre>";
+      } else {
+        print "<p>";
       }
-      print "<p>";
     } elsif ($t =~ m/^>/) {
       print "<blockquote>";
       print html_escape(substr($t,1)), "\n";
@@ -2126,298 +2167,298 @@ sub err
 
 
 if ($opt_port) {
-use warnings;
-use strict;
-
-{
-package App::zen::WebServer;
-
-use HTTP::Server::Simple::CGI;
-use base qw(HTTP::Server::Simple::CGI);
-use File::Slurp;
-use File::stat;
-use JSON;
-use Fcntl qw(:flock);
-use POSIX qw( strftime );
-use Data::Dumper;
-
-my %mimeTypes = (
-  html => 'text/html',
-  css => 'text/css',
-  js => 'text/javascript',
-  json => 'application/json',
-  svg => 'image/svg+xml',
-  png => 'image/png',
-  jpeg => 'image/jpeg',
-  jpg => 'image/jpeg',
-  gif => 'image/gif',
-  txt => 'text/plain',
-);
-
-sub handle_request {
-    my ($self, $cgi) = @_;
-
-    my $path = $cgi->path_info();
-    my $method = $cgi->request_method();
-
-    if ($method eq 'GET' && $path =~ m/\/$/) {
-      on_list_dir($cgi, ".$path");
-    } elsif ($method eq 'GET' && $path eq '/hello') {
-      on_hello($cgi);
-    } elsif ($method eq 'GET') {
-      on_get_file($cgi, ".$path");
-    } elsif ($method eq 'POST') {
-      on_append_file($cgi, ".$path");
-    } elsif ($method eq 'PUT') {
-      on_put_file($cgi, ".$path");
+  use warnings;
+  use strict;
+  
+  {
+  package App::zen::WebServer;
+  
+  use HTTP::Server::Simple::CGI;
+  use base qw(HTTP::Server::Simple::CGI);
+  use File::Slurp;
+  use File::stat;
+  use JSON;
+  use Fcntl qw(:flock);
+  use POSIX qw( strftime );
+  use Data::Dumper;
+  
+  my %mimeTypes = (
+    html => 'text/html',
+    css => 'text/css',
+    js => 'text/javascript',
+    json => 'application/json',
+    svg => 'image/svg+xml',
+    png => 'image/png',
+    jpeg => 'image/jpeg',
+    jpg => 'image/jpeg',
+    gif => 'image/gif',
+    txt => 'text/plain',
+  );
+  
+  sub handle_request {
+      my ($self, $cgi) = @_;
+  
+      my $path = $cgi->path_info();
+      my $method = $cgi->request_method();
+  
+      if ($method eq 'GET' && $path =~ m/\/$/) {
+        on_list_dir($cgi, ".$path");
+      } elsif ($method eq 'GET' && $path eq '/hello') {
+        on_hello($cgi);
+      } elsif ($method eq 'GET') {
+        on_get_file($cgi, ".$path");
+      } elsif ($method eq 'POST') {
+        on_append_file($cgi, ".$path");
+      } elsif ($method eq 'PUT') {
+        on_put_file($cgi, ".$path");
+      } else {
+        print "HTTP/1.0 400 Bad Request\r\n\r\nUnsupported Request\n";
+      }
+  }
+  
+   # Should return  the data since last fetch offset.
+  sub on_append_file {
+    my ($cgi, $path) = @_;
+    my $data = $cgi->param('POSTDATA');
+    append_to_file($path, $data);
+    my @stat_info = stat($path);
+    if (@stat_info) {
+      # Extract the last modification time
+      my $mtime = $stat_info[9];
+      print "HTTP/1.0 200 OK\r\n";
+      print "Last-Modified: $mtime\r\n";
+      print "Content-Length: 0\r\n\r\n";
     } else {
-      print "HTTP/1.0 400 Bad Request\r\n\r\nUnsupported Request\n";
-    }
-}
-
- # Should return  the data since last fetch offset.
-sub on_append_file {
-  my ($cgi, $path) = @_;
-  my $data = $cgi->param('POSTDATA');
-  append_to_file($path, $data);
-  my @stat_info = stat($path);
-  if (@stat_info) {
-    # Extract the last modification time
-    my $mtime = $stat_info[9];
-    print "HTTP/1.0 200 OK\r\n";
-    print "Last-Modified: $mtime\r\n";
-    print "Content-Length: 0\r\n\r\n";
-  } else {
-    print "HTTP/1.0 500 Server error\r\n";
-  }
-}
-
-sub write_error {
-  my ($code, $message, $body) = @_;
-  print "HTTP/1.1 $code $message\r\n\r\n";
-  print $body, "\n";
-}
-
-sub on_put_file {
-  my ($cgi, $path) = @_;
-
-  my $l = $cgi->url_param('l') || 0;
-  my $n = $cgi->url_param('n') || 0;
-  my $last_mtime = $cgi->url_param('last_modified');
-
-  if (-f $path) {
-    # override require last_mtime
-    my $stat = stat($path);
-    my $mtime = $stat->mtime;
-    if (!$last_mtime) {
-      write_error(409, "Conflict", "Missing query parameter 'last_modified' l=$l");
-      print Dumper $cgi;
-      return;
-    }
-    if ($last_mtime != $mtime) {
-      write_error(409, "Conflict", "last modified doesn't match: $mtime");
-      return;
+      print "HTTP/1.0 500 Server error\r\n";
     }
   }
-  my $data = $cgi->param('PUTDATA');
-  if ($l == 0) {
-    write_file($path, $data);
-  } elsif ($l > 0) {
-    $data .= "\n" unless !$data || substr($data, -1) eq "\n";
-    open my $fh, '<', $path or die "Can not open file: $!";
-    my $x = '';
-    my $y = '';
-    while (<$fh>) {
-      if ($l > 1) {
-        $x .= $_;
-        $l--;
-      } elsif ($l == 1) {
-        if ($n <= 0) {
-          $y .= $_;
-        } else {
-          $n--;
+  
+  sub write_error {
+    my ($code, $message, $body) = @_;
+    print "HTTP/1.1 $code $message\r\n\r\n";
+    print $body, "\n";
+  }
+  
+  sub on_put_file {
+    my ($cgi, $path) = @_;
+  
+    my $l = $cgi->url_param('l') || 0;
+    my $n = $cgi->url_param('n') || 0;
+    my $last_mtime = $cgi->url_param('last_modified');
+  
+    if (-f $path) {
+      # override require last_mtime
+      my $stat = stat($path);
+      my $mtime = $stat->mtime;
+      if (!$last_mtime) {
+        write_error(409, "Conflict", "Missing query parameter 'last_modified' l=$l");
+        print Dumper $cgi;
+        return;
+      }
+      if ($last_mtime != $mtime) {
+        write_error(409, "Conflict", "last modified doesn't match: $mtime");
+        return;
+      }
+    }
+    my $data = $cgi->param('PUTDATA');
+    if ($l == 0) {
+      write_file($path, $data);
+    } elsif ($l > 0) {
+      $data .= "\n" unless !$data || substr($data, -1) eq "\n";
+      open my $fh, '<', $path or die "Can not open file: $!";
+      my $x = '';
+      my $y = '';
+      while (<$fh>) {
+        if ($l > 1) {
+          $x .= $_;
+          $l--;
+        } elsif ($l == 1) {
+          if ($n <= 0) {
+            $y .= $_;
+          } else {
+            $n--;
+          }
         }
       }
-    }
-    close $fh;
-    write_file($path, $x.$data.$y);
-  } else {
-    print "HTTP/1.0 400 Bad request\r\n";
-    return;
-  }
-  my $mtime = stat($path)->mtime;
-  if ($mtime) {
-    print "HTTP/1.0 200 OK\r\n";
-    print "Last-Modified: $mtime\r\n";
-    print "Content-Length: 0\r\n\r\n";
-  } else {
-    print "HTTP/1.0 500 Server error\r\n";
-  }
-}
-
-sub on_get_file {
-  my ($cgi, $path) = @_;
-
-  if (-d $path) {
-    print "HTTP/1.1 301 Moved Permanently\r\n";
-    print "Location: ", $cgi->path_info(), "/\r\n";
-    print "\r\n";
-    return;
-  }
-
-  unless (-f $path) {
-    print "HTTP/1.0 404 Not found\r\n";
-    print $cgi->header,
-      $cgi->start_html('Not found'),
-      $cgi->h1('Not found'),
-      $path,
-      $cgi->end_html;
-    return;
-  }
-
-  my $raw = $cgi->param('raw') || 0;
-  my $l = $cgi->param('l') || 0;
-  my $n = $cgi->param('n') || 0;
-  if ($path =~ m/\.(md|zen)$/ && ($raw ne '1')) {
-    print "HTTP/1.0 200 OK\r\n";
-    my $action = $cgi->param('action');
-    my $section = $cgi->param('section');
-    $action = 'view' unless $action;
-    my $zenCommand = 'zen';
-    $zenCommand = 'perl ./zen2.pl' if -f './zen2.pl';
-    if ($action eq 'exec') {
-       print "Content-Type: text/plain\r\n\r\n";
-       open FH, "$zenCommand --exec \"$section\" $path|";
+      close $fh;
+      write_file($path, $x.$data.$y);
     } else {
-      if (!$section) {
-         print "Content-Type: text/html\r\n\r\n";
-         open FH, "$zenCommand --live --html $path|";
-      } else {
+      print "HTTP/1.0 400 Bad request\r\n";
+      return;
+    }
+    my $mtime = stat($path)->mtime;
+    if ($mtime) {
+      print "HTTP/1.0 200 OK\r\n";
+      print "Last-Modified: $mtime\r\n";
+      print "Content-Length: 0\r\n\r\n";
+    } else {
+      print "HTTP/1.0 500 Server error\r\n";
+    }
+  }
+  
+  sub on_get_file {
+    my ($cgi, $path) = @_;
+  
+    if (-d $path) {
+      print "HTTP/1.1 301 Moved Permanently\r\n";
+      print "Location: ", $cgi->path_info(), "/\r\n";
+      print "\r\n";
+      return;
+    }
+  
+    unless (-f $path) {
+      print "HTTP/1.0 404 Not found\r\n";
+      print $cgi->header,
+        $cgi->start_html('Not found'),
+        $cgi->h1('Not found'),
+        $path,
+        $cgi->end_html;
+      return;
+    }
+  
+    my $raw = $cgi->param('raw') || 0;
+    my $l = $cgi->param('l') || 0;
+    my $n = $cgi->param('n') || 0;
+    if ($path =~ m/\.(md|zen)$/ && ($raw ne '1')) {
+      print "HTTP/1.0 200 OK\r\n";
+      my $action = $cgi->param('action');
+      my $section = $cgi->param('section');
+      $action = 'view' unless $action;
+      my $zenCommand = 'zen';
+      $zenCommand = 'perl ./zen2.pl' if -f './zen2.pl';
+      if ($action eq 'exec') {
          print "Content-Type: text/plain\r\n\r\n";
-         open FH, "$zenCommand --section \"$section\" $path|";
-      }
-    }
-    while (<FH>) {
-       print $_;
-    }
-    close FH;
-  } elsif ($raw eq '1' && $l > 0) {
-    my $mtime = stat($path)->mtime;
-    print "HTTP/1.0 200 OK\r\n";
-    print "Last-Modified: $mtime\r\n";
-    print "Content-Type: text/plain\r\n\r\n";
-    open my $fh, '<', $path or die "Can not open file: $!";
-    while (<$fh>) {
-      if ($l == 1) {
-        last if $n == 0;
-        print $_;
-        $n--;
+         open FH, "$zenCommand --exec \"$section\" $path|";
       } else {
-        $l--;
+        if (!$section) {
+           print "Content-Type: text/html\r\n\r\n";
+           open FH, "$zenCommand --live --html $path|";
+        } else {
+           print "Content-Type: text/plain\r\n\r\n";
+           open FH, "$zenCommand --section \"$section\" $path|";
+        }
       }
-    }
-    close $fh;
-  } else {
-    my ($ext) = $path =~ /\.([^.]+)$/;
-    my $mime_type = $mimeTypes{lc($ext)} || 'application/octet-stream';
-    open my $fh, '<:raw', $path or die "Cannot open file: $!";
-    my $mtime = stat($path)->mtime;
-    my $filesize = -s $path;
-    print "HTTP/1.1 200 OK\r\n";
-    print "Content-Type: $mime_type\r\n";
-    print "Last-Modified: $mtime\r\n";
-    print "Content-Length: $filesize\r\n";
-    print "\r\n";
-
-    # Print the binary content of the file to the CGI output
-    binmode STDOUT;
-    while (read $fh, my $buffer, 4096) {
-        print $buffer;
-    }
-    close $fh;
-  }
-}
-
-sub on_list_dir {
-  my ($cgi, $path) = @_;
-
-  if (!-d $path) {
-    write_error(404, "Not found");
-    return;
-  }
-
-  my @contents = ();
-  opendir(my $dh, $path) or die "Cannot open directory: $!";
-  while (my $file = readdir $dh) {
-    next if $file =~ /^\./;
-    next if $file =~ /~$/;
-    my $filepath = "$path/$file";
-    my $mtime = stat($filepath)->mtime;
-    push @contents, {
-      name => -d $filepath ? "$file/" : $file,
-      size => -s "$path/$file",
-      mtime => $mtime,
-    };
-  }
-  @contents = sort { $a->{name} cmp $b->{name} } @contents;
-
-  my $fmt = $cgi->param('fmt');
-  if ($fmt) {
-    if ($fmt eq "csv") {
-      print "HTTP/1.1 200 OK\r\n";
-      print "\r\n";
-      for (@contents) {
-        print "$_->{name},$_->{size},$_->{mtime}\n";
+      while (<FH>) {
+         print $_;
       }
-      return;
-    } elsif ($fmt eq 'json') {
-      print "HTTP/1.1 200 OK\r\n";
-      print "\r\n";
-      print JSON::encode_json(\@contents);
-      return;
+      close FH;
+    } elsif ($raw eq '1' && $l > 0) {
+      my $mtime = stat($path)->mtime;
+      print "HTTP/1.0 200 OK\r\n";
+      print "Last-Modified: $mtime\r\n";
+      print "Content-Type: text/plain\r\n\r\n";
+      open my $fh, '<', $path or die "Can not open file: $!";
+      while (<$fh>) {
+        if ($l == 1) {
+          last if $n == 0;
+          print $_;
+          $n--;
+        } else {
+          $l--;
+        }
+      }
+      close $fh;
     } else {
-      write_error(400, "Bad parameter: unsupported fmt");
+      my ($ext) = $path =~ /\.([^.]+)$/;
+      my $mime_type = $mimeTypes{lc($ext)} || 'application/octet-stream';
+      open my $fh, '<:raw', $path or die "Cannot open file: $!";
+      my $mtime = stat($path)->mtime;
+      my $filesize = -s $path;
+      print "HTTP/1.1 200 OK\r\n";
+      print "Content-Type: $mime_type\r\n";
+      print "Last-Modified: $mtime\r\n";
+      print "Content-Length: $filesize\r\n";
+      print "\r\n";
+  
+      # Print the binary content of the file to the CGI output
+      binmode STDOUT;
+      while (read $fh, my $buffer, 4096) {
+          print $buffer;
+      }
+      close $fh;
+    }
+  }
+  
+  sub on_list_dir {
+    my ($cgi, $path) = @_;
+  
+    if (!-d $path) {
+      write_error(404, "Not found");
       return;
     }
-  }
-
-  print "HTTP/1.0 200 OK\r\n\r\n";
-  print "<!doctype html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>Index</title>\n    <style>\n      :root {\n        --navbar-height: 1.6rem;\n      }\n      \n      html,body {\n        margin: 0;\n        padding: 0;\n      }\n      \n      html {\n        font-size: 12pt;\n      }\n      \n      h1 { font-size: 1.5rem; }\n      h2 { font-size: 1.3rem; }\n      h3 { font-size: 1.1rem; }\n      h4,h5 { font-size: 1rem; }\n      \n      .navbar {\n        background: #ccc;\n        padding: 4px 8px;\n        display: flex;\n        align-items: center;\n        height: var(--navbar-height);\n      }\n      .flex {\n        display: flex;\n      }\n      section.folded > .content {\n        display: none;\n      }\n      section.folded > .heading::before {\n        content: \"+\"\n      }\n      \n      .align-right {\n        text-align: right;\n      }\n      \n      .sticky-top {\n          position: sticky;\n          top: 0;\n      }\n      \n      .container {\n        background: gray;\n      }\n      \n      .xpad {\n        padding: 0 4px;\n      }\n      .xxpad {\n        padding: 0 8px;\n      }\n      \n      .col-header {\n       display: flex;\n       background: #ccc;\n       height: var(--navbar-height);\n       align-items: center;\n      }\n      .fill-parent {\n        flex: 1;\n      }\n      \n      p code {\n        background: #eee;\n      }\n      \n      table {\n        border-collapse: collapse;\n        margin: 1em 0;\n      }\n      \n      table, th, td {\n        border: 1px solid black;\n      }\n      \n      th {\n        border-bottom: 4px solid black;\n      }\n      \n      td {\n        padding: 0 4px;\n      }\n      \n      thead > tr {\n        background: #ccc;\n      }\n      \n      .container\n      \n      .col {\n       background: #eee;\n       overflow: scroll;\n       flex: 2;\n      }\n      \n      \n      .col.wide {\n        flex: 4;\n      }\n      .col.narrow {\n        flex: 1;\n      }\n      \n      article {\n        max-width: 960px;\n        min-width: 320px;\n        margin: auto;\n        word-break: break-word;\n        padding: 1rem 8px;\n      }\n      \n      aside {\n        background: #eee;\n        font-size: 0.8rem;\n        flex: 1;\n        max-height: 100vh;\n        overflow: auto;\n        position: sticky;\n        top: 0;\n      }\n      \n      aside:not(.is-narrow) section {\n        column-width: 240px;\n        font-size: 0.8rem;\n        column-count: 2;\n      }\n      \n      aside.is-wide section {\n        column-width: 240px;\n        font-size: 0.9rem;\n        column-count: 3;\n      }\n      \n      .fullwidth {\n         width: 100%;\n      }\n      \n      .collapse {\n        display: none;\n      }\n      \n      .text-small {\n        font-size: 0.8rem;\n      }\n      \n      section {\n      \tscroll-margin-top: var(--navbar-height);\n      }\n      \n      section.sidebar  {\n        position: fixed;\n        bottom: 0px;\n        background: #ccc;\n        overflow: auto;\n        top: var(--navbar-height);\n        z-index: 1000;\n        width: 320px;\n        right: 0;\n      }\n      \n      .col.folded > article {\n        display: none;\n      }\n      \n      \@media screen and (min-width: 960px) {\n        .container {\n          display: flex;\n          flex-direction: row;\n          position: absolute;\n          width: 100%;\n          height: 100%;\n          overflow: hidden;\n        }\n        .container > :not(:first-child) {\n          margin-left: 4px;\n        }\n      \n        .col > .col-header {\n            position: sticky;\n            top: 0;\n        }\n      \n        .col.folded > article {\n          visibility: hidden; /* can not use display none, because layout will be lost, scroll position lost */\n          display: block;\n        }\n      \n        .col.folded > .col-header  {\n          writing-mode: vertical-rl; /* Vertical writing mode, content flows from top to bottom */\n          transform: rotate(180deg); /* Rotate the text 180 degrees */\n          width: 100%; /* Very important to fill the entire col */\n          height: 100%;\n        }\n      \n        .col.folded {\n          overflow: hidden;\n          flex: 0;\n          min-width: 30px;\n       }\n      \n        aside > section {\n          display: block !important;\n        }\n        #toggle-index {\n          display: none;\n        }\n      }\n      \n      pre, pre.prettyprint {\n        padding: 0.5rem !important;\n        font-size: 0.9rem;\n        white-space: pre-wrap;\n      }\n      pre.listing {\n        padding-left: 3rem !important;\n        border: 2px solid black;\n      }\n      \n      .line-number {\n        font-size: 0.7rem;\n        margin-left: -3rem !important;\n        margin-right: 1rem;\n        user-select: none; /*  */\n      }\n      \n      \n      .L-1 {\n       margin-left: 16px;\n      }\n      .L-2 {\n       margin-left: 28px;\n      }\n      .L-3,.L-4,.L-5,.L-6,.L-7,.L-8 {\n       margin-left: 36px;\n      }\n      \n      \n      img {\n        width: 100%;\n      }\n      \@media screen and (min-width: 480px) {\n         img.tiny { width: 50%; }\n      }\n      \n      \@media screen and (min-width: 720px) {\n         img.tiny { width: 33%; }\n         img.small { width: 66%; }\n      }\n      \n      \@media screen and (min-width: 960px) {\n        img.tiny { width: 25%; }\n        img.small { width: 50%; }\n        img.medium { width: 75%; }\n      }\n      \@media print {\n        img.tiny { width: 2.5in; }\n        img.small { width: 5in; }\n      }\n      \n      \n      figure { text-align: center}\n      \n      \@media print {\n        * {\n          /* Don't waste color ink */\n          color: black !important;\n        }\n        \@page {\n          size: auto; /* Magic: disable browser generated footer and header */\n          margin: 1em;\n          table {\n            page-break-inside: avoid;\n            page-break-after: avoid;\n          }\n        }\n        aside { display: none; }\n      }\n      \n    </style>\n  </head>\n  <body>";
-  print "<div class=\"xxpad\"><h1>Index</h1>\n";
-  print "<table>\n";
-  print "<thead><tr class=\"sticky-top\"><th>Name</th><th>Size</th><th>Last Modified</th></tr></thead>\n";
-  for (@contents) {
-     my $timestr = strftime('%FT%TZ%z', localtime($_->{mtime}));
-     print "<tr>";
-     print "<td><a href=\"$_->{name}\">$_->{name}</a></td>";
-     print "<td class=\"align-right\">$_->{size}</td>";
-     print "<td>$timestr</td>";
-     print "</tr>\n";
-  }
-  print "</table></div>";
-  print "  </body>\n</html>";
-}
-
-sub on_hello {
-    my $cgi  = shift;   # CGI.pm object
-                            return if !ref $cgi;
-
-    my $name = $cgi->param('name');
-    open FH, "perl ./zen2.pl --html  $name|";
-    while (<FH>) {
-       print $_;
+  
+    my @contents = ();
+    opendir(my $dh, $path) or die "Cannot open directory: $!";
+    while (my $file = readdir $dh) {
+      next if $file =~ /^\./;
+      next if $file =~ /~$/;
+      my $filepath = "$path/$file";
+      my $mtime = stat($filepath)->mtime;
+      push @contents, {
+        name => -d $filepath ? "$file/" : $file,
+        size => -s "$path/$file",
+        mtime => $mtime,
+      };
     }
-    close FH
-}
-}
-
-my $server = App::zen::WebServer->new($opt_port);
-if ($opt_daemon) {
-  $server->background();
-} else {
-  $server->run();
-}
-exit;
+    @contents = sort { $a->{name} cmp $b->{name} } @contents;
+  
+    my $fmt = $cgi->param('fmt');
+    if ($fmt) {
+      if ($fmt eq "csv") {
+        print "HTTP/1.1 200 OK\r\n";
+        print "\r\n";
+        for (@contents) {
+          print "$_->{name},$_->{size},$_->{mtime}\n";
+        }
+        return;
+      } elsif ($fmt eq 'json') {
+        print "HTTP/1.1 200 OK\r\n";
+        print "\r\n";
+        print JSON::encode_json(\@contents);
+        return;
+      } else {
+        write_error(400, "Bad parameter: unsupported fmt");
+        return;
+      }
+    }
+  
+    print "HTTP/1.0 200 OK\r\n\r\n";
+    print "<!doctype html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>Index</title>\n    <style>\n      :root {\n        --navbar-height: 1.6rem;\n      }\n      \n      html,body {\n        margin: 0;\n        padding: 0;\n      }\n      \n      html {\n        font-size: 12pt;\n      }\n      \n      h1 { font-size: 1.5rem; }\n      h2 { font-size: 1.3rem; }\n      h3 { font-size: 1.1rem; }\n      h4,h5 { font-size: 1rem; }\n      \n      .navbar {\n        background: #ccc;\n        padding: 4px 8px;\n        display: flex;\n        align-items: center;\n        height: var(--navbar-height);\n      }\n      .flex {\n        display: flex;\n      }\n      section.folded > .content {\n        display: none;\n      }\n      section.folded > .heading::before {\n        content: \"+\"\n      }\n      \n      .align-right {\n        text-align: right;\n      }\n      \n      .sticky-top {\n          position: sticky;\n          top: 0;\n      }\n      \n      .container {\n        background: gray;\n      }\n      \n      .xpad {\n        padding: 0 4px;\n      }\n      .xxpad {\n        padding: 0 8px;\n      }\n      \n      .col-header {\n       display: flex;\n       background: #ccc;\n       height: var(--navbar-height);\n       align-items: center;\n      }\n      .fill-parent {\n        flex: 1;\n      }\n      \n      p code {\n        background: #eee;\n      }\n      \n      table {\n        border-collapse: collapse;\n        margin: 1em 0;\n      }\n      \n      table, th, td {\n        border: 1px solid black;\n      }\n      \n      th {\n        border-bottom: 4px solid black;\n      }\n      \n      td {\n        padding: 0 4px;\n      }\n      \n      thead > tr {\n        background: #ccc;\n      }\n      \n      .container\n      \n      .col {\n       background: #eee;\n       overflow: scroll;\n       flex: 2;\n      }\n      \n      \n      .col.wide {\n        flex: 4;\n      }\n      .col.narrow {\n        flex: 1;\n      }\n      \n      article {\n        max-width: 960px;\n        min-width: 320px;\n        margin: auto;\n        word-break: break-word;\n        padding: 1rem 8px;\n      }\n      \n      aside {\n        background: #eee;\n        font-size: 0.8rem;\n        flex: 1;\n        max-height: 100vh;\n        overflow: auto;\n        position: sticky;\n        top: 0;\n      }\n      \n      aside:not(.is-narrow) section {\n        column-width: 240px;\n        font-size: 0.8rem;\n        column-count: 2;\n      }\n      \n      aside.is-wide section {\n        column-width: 240px;\n        font-size: 0.9rem;\n        column-count: 3;\n      }\n      \n      .fullwidth {\n         width: 100%;\n      }\n      \n      .collapse {\n        display: none;\n      }\n      \n      .text-small {\n        font-size: 0.8rem;\n      }\n      \n      section {\n      \tscroll-margin-top: var(--navbar-height);\n      }\n      \n      section.sidebar  {\n        position: fixed;\n        bottom: 0px;\n        background: #ccc;\n        overflow: auto;\n        top: var(--navbar-height);\n        z-index: 1000;\n        width: 320px;\n        right: 0;\n      }\n      \n      .col.folded > article {\n        display: none;\n      }\n      \n      \@media screen and (min-width: 960px) {\n        .container {\n          display: flex;\n          flex-direction: row;\n          position: absolute;\n          width: 100%;\n          height: 100%;\n          overflow: hidden;\n        }\n        .container > :not(:first-child) {\n          margin-left: 4px;\n        }\n      \n        .col > .col-header {\n            position: sticky;\n            top: 0;\n        }\n      \n        .col.folded > article {\n          visibility: hidden; /* can not use display none, because layout will be lost, scroll position lost */\n          display: block;\n        }\n      \n        .col.folded > .col-header  {\n          writing-mode: vertical-rl; /* Vertical writing mode, content flows from top to bottom */\n          transform: rotate(180deg); /* Rotate the text 180 degrees */\n          width: 100%; /* Very important to fill the entire col */\n          height: 100%;\n        }\n      \n        .col.folded {\n          overflow: hidden;\n          flex: 0;\n          min-width: 30px;\n       }\n      \n        aside > section {\n          display: block !important;\n        }\n        #toggle-index {\n          display: none;\n        }\n      }\n      \n      pre, pre.prettyprint {\n        padding: 0.5rem !important;\n        font-size: 0.9rem;\n        white-space: pre-wrap;\n      }\n      pre.listing {\n        padding-left: 3rem !important;\n        border: 2px solid black;\n      }\n      \n      .line-number {\n        font-size: 0.7rem;\n        margin-left: -3rem !important;\n        margin-right: 1rem;\n        user-select: none; /*  */\n      }\n      \n      \n      .L-1 {\n       margin-left: 16px;\n      }\n      .L-2 {\n       margin-left: 28px;\n      }\n      .L-3,.L-4,.L-5,.L-6,.L-7,.L-8 {\n       margin-left: 36px;\n      }\n      \n      \n      .fullwidth {\n        width: 100%;\n      }\n      \@media screen and (min-width: 480px) {\n         img.tiny { width: 50%; }\n      }\n      \n      \@media screen and (min-width: 720px) {\n         img.tiny { width: 33%; }\n         img.small { width: 66%; }\n      }\n      \n      \@media screen and (min-width: 960px) {\n        img.tiny { width: 25%; }\n        img.small { width: 50%; }\n        img.medium { width: 75%; }\n      }\n      \@media print {\n        img.tiny { width: 2.5in; }\n        img.small { width: 5in; }\n      }\n      \n      \n      figure { text-align: center}\n      \n      \@media print {\n        * {\n          /* Don't waste color ink */\n          color: black !important;\n        }\n        \@page {\n          size: auto; /* Magic: disable browser generated footer and header */\n          margin: 1em;\n          table {\n            page-break-inside: avoid;\n            page-break-after: avoid;\n          }\n        }\n        aside { display: none; }\n      }\n      \n    </style>\n  </head>\n  <body>";
+    print "<div class=\"xxpad\"><h1>Index</h1>\n";
+    print "<table>\n";
+    print "<thead><tr class=\"sticky-top\"><th>Name</th><th>Size</th><th>Last Modified</th></tr></thead>\n";
+    for (@contents) {
+       my $timestr = strftime('%FT%TZ%z', localtime($_->{mtime}));
+       print "<tr>";
+       print "<td><a href=\"$_->{name}\">$_->{name}</a></td>";
+       print "<td class=\"align-right\">$_->{size}</td>";
+       print "<td>$timestr</td>";
+       print "</tr>\n";
+    }
+    print "</table></div>";
+    print "  </body>\n</html>";
+  }
+  
+  sub on_hello {
+      my $cgi  = shift;   # CGI.pm object
+                              return if !ref $cgi;
+  
+      my $name = $cgi->param('name');
+      open FH, "perl ./zen2.pl --html  $name|";
+      while (<FH>) {
+         print $_;
+      }
+      close FH
+  }
+  }
+  
+  my $server = App::zen::WebServer->new($opt_port);
+  if ($opt_daemon) {
+    $server->background();
+  } else {
+    $server->run();
+  }
+  exit;
 }
 
 if (scalar @ARGV != 1) {

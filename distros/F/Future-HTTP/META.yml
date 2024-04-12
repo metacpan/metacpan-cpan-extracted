@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,15 +28,15 @@ recommends:
   MIME::Base64: '0'
   MIME::QuotedPrint: '0'
 requires:
-  Filter::signatures: '0.13'
-  Future: '0.31'
+  Future: '0.49'
   HTTP::Headers: '6.07'
   HTTP::Tiny: '0'
   Moo: '2'
-  perl: '5.006'
+  experimental: '0.031'
+  perl: '5.020'
 resources:
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/Future-HTTP.git
-version: '0.16'
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

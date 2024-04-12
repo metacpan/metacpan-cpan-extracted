@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         os: ['ubuntu-latest']
-        perl: [ '5.10', '5.30' ]
+        perl: [ '5.30', '5.38' ]
     name: Testing perl ${{ matrix.perl }} on ${{ matrix.os }}
     env:
       PERL_VERSION: ${{ matrix.perl }}

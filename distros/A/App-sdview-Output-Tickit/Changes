@@ -1,5 +1,14 @@
 Revision history for App-sdview-Output-Tickit
 
+0.06    2024-04-11
+        [CHANGES]
+         * Use Object::Pad v0.805 so `ADJUST :params` is no longer
+           experimental
+
+        [BUGFIXES]
+         * Fix rendering of items with leaderline - remember to ->restore the
+           renderbuffer
+
 0.05    2024-01-13
         [CHANGES]
          * Better handling of paragraph indent and leader leader text

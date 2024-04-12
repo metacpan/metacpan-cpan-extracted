@@ -4,7 +4,7 @@
       "ytnobody <ytnobody@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.4",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -65,7 +65,7 @@
    "provides" : {
       "Net::Azure::EventHubs" : {
          "file" : "lib/Net/Azure/EventHubs.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Net::Azure::EventHubs::Request" : {
          "file" : "lib/Net/Azure/EventHubs/Request.pm"
@@ -81,14 +81,15 @@
       },
       "homepage" : "https://github.com/ytnobody/p5-Net-Azure-EventHubs",
       "repository" : {
-         "url" : "git://github.com/ytnobody/p5-Net-Azure-EventHubs.git",
+         "type" : "git",
+         "url" : "https://github.com/ytnobody/p5-Net-Azure-EventHubs.git",
          "web" : "https://github.com/ytnobody/p5-Net-Azure-EventHubs"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_contributors" : [
       "sazuma <azuma.satoshi@colon.ne.jp>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.94",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

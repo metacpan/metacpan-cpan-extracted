@@ -13,7 +13,7 @@ use Readonly;
 
 Readonly::Array our @TARGETS => qw(_blank _parent _self _top);
 
-our $VERSION = 0.11;
+our $VERSION = 0.13;
 
 has css_class => (
 	is => 'ro',
@@ -90,13 +90,11 @@ Data::HTML::Element::A - Data object for HTML a element.
 
 Constructor.
 
-Returns instance of object.
-
 =over 8
 
 =item * C<css_class>
 
-Form CSS class.
+A element CSS class.
 
 Default value is undef.
 
@@ -112,8 +110,9 @@ Default value is [].
 
 Data type for content.
 
-Possible value are: plain tags
+Possible value are: cb plain tags
 
+The 'cb' content is code reference.
 The 'plain' content are string(s).
 The 'tags' content is structure described in L<Tags>.
 
@@ -153,11 +152,13 @@ Default value is undef.
 
 =back
 
+Returns instance of object.
+
 =head2 C<css_class>
 
  my $css_class = $obj->css_class;
 
-Get CSS class for form.
+Get CSS class for A element.
 
 Returns string.
 
@@ -307,6 +308,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.11
+0.13
 
 =cut

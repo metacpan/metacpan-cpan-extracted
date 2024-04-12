@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Getopt::Long;
 use Text::ParseWords;

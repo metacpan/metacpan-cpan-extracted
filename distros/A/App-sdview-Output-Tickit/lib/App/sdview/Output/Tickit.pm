@@ -7,10 +7,9 @@ use v5.26;
 use warnings;
 use utf8;
 
-use Object::Pad 0.800;
-use Object::Pad ':experimental(adjust_params)';
+use Object::Pad 0.805;
 
-package App::sdview::Output::Tickit 0.05;
+package App::sdview::Output::Tickit 0.06;
 class App::sdview::Output::Tickit
    :strict(params);
 
@@ -601,7 +600,10 @@ class App::sdview::Output::Tickit::_ParagraphItem
                },
             );
 
-            next if $_has_leaderline;
+            if( $_has_leaderline ) {
+               $rb->restore if $_pen;
+               next;
+            }
          }
 
          $rb->erase_to( $_margin_left + $_indent ) if $_indent;

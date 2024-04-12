@@ -38,7 +38,7 @@ used (`./{app}.{mode}.conf` or `./{app}.conf`)
 ## conf
 
 This method is used to access the loaded configuration from within the Mojo 
-application. Returns the root [Config::Structured](https://metacpan.org/pod/Config%3A%3AStructured) instance.
+application. Returns the root `Config::Structured::Node` instance.
 
 # AUTHOR
 

@@ -4,7 +4,7 @@ use warnings;
 use English;
 use Error::Pure::Utils qw(clean);
 use Mo::utils qw(check_number);
-use Test::More 'tests' => 8;
+use Test::More 'tests' => 11;
 use Test::NoWarnings;
 
 # Test.
@@ -34,6 +34,27 @@ $self = {
 };
 $ret = check_number($self, 'key');
 is($ret, undef, 'Right number is present (negative number).');
+
+# Test.
+$self = {
+	'key' => 0.00000001,
+};
+$ret = check_number($self, 'key');
+is($ret, undef, 'Right number is present (extremely small number).');
+
+# Test.
+$self = {
+	'key' => 1e-06,
+};
+$ret = check_number($self, 'key');
+is($ret, undef, 'Right number is present (1e-06).');
+
+# Test.
+$self = {
+	'key' => 1e+06,
+};
+$ret = check_number($self, 'key');
+is($ret, undef, 'Right number is present (1e+06).');
 
 # Test.
 $self = {};

@@ -31,10 +31,11 @@ requires:
   Mo::utils: 0.14
   Mo::utils::CSS: 0
   Readonly: 0
+  Scalar::Util: 0
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Data-HTML-Element/issues
   homepage: https://github.com/michal-josef-spacek/Data-HTML-Element
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-HTML-Element
-version: '0.11'
+version: '0.13'

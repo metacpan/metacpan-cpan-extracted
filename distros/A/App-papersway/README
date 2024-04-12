@@ -1,0 +1,62 @@
+App::papersway
+--------------
+
+This is an implementation of PaperWM-like window management for Sway/i3wm.
+If you like Sway/i3wm's commitments to stability, avoiding scope creep etc.
+but dislike the window management model, papersway might be of interest.
+
+papersway -- PaperWM-like window management using i3-ipc.
+
+papersway-msg -- Script for sending user commands to papersway.
+
+See also:
+
+    https://i3wm.org/
+    https://swaywm.org/
+    https://github.com/paperwm/PaperWM
+
+    https://material-shell.com/
+    https://spatial-shell.app/
+
+INSTALLATION
+
+To install these programs, run the following commands:
+
+    % perl Makefile.PL
+    % make
+    % make install
+
+If you don't see Makefile.PL, it can be generated from dist.ini using
+Dist::Zilla's 'dzil' program.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for these programs with
+the man command.
+
+    % man papersway
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (please see CONTRIBUTING.rst)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=papersway
+
+    MetaCPAN
+        https://metacpan.org/release/papersway
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2019-2024  Sean Whitton <spwhitton@spwhitton.name>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.

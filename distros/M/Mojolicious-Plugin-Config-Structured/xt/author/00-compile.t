@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2;
+plan tests => 3;
 
 my @module_files = (
-    'Mojolicious/Plugin/Config/Structured.pm'
+    'Mojolicious/Plugin/Config/Structured.pm',
+    'Mojolicious/Plugin/Config/Structured/Command/config_dump.pm'
 );
 
 

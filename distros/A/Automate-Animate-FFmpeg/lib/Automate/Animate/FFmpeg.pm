@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use utf8; # filenames can be in utf8
 
@@ -289,7 +289,8 @@ sub	input_pattern {
 				->file()
 				->name($pattern)
 				->in($indir)
-			: map { Encode::decode_utf8($_) }
+			:
+			    map { Encode::decode_utf8($_) }
 			    File::Find::Rule
 				->file()
 				->name($pattern)
@@ -378,7 +379,7 @@ Automate::Animate::FFmpeg - Create animation from a sequence of images using FFm
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 
 =head1 SYNOPSIS
@@ -845,9 +846,9 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Automate-Animate>
 
 L<http://annocpan.org/dist/Automate-Animate>
 
-=item * CPAN Ratings
+=item * Review this module at PerlMonks
 
-L<https://cpanratings.perl.org/d/Automate-Animate>
+L<https://www.perlmonks.org/?node_id=21144>
 
 =item * Search CPAN
 

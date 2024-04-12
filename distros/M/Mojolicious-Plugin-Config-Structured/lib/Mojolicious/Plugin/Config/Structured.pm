@@ -1,5 +1,5 @@
-package Mojolicious::Plugin::Config::Structured 1.004;
-use v5.22;
+package Mojolicious::Plugin::Config::Structured 3.00;
+use v5.26;
 use warnings;
 
 # ABSTRACT: Mojolicious Plugin for Config::Structured: provides Mojo app access to structured configuration data
@@ -61,6 +61,8 @@ used (C<./{app}.{mode}.conf> or C<./{app}.conf>)
 =cut
 
 sub register ($self, $app, $params) {
+  push($app->commands->namespaces->@*, __PACKAGE__ . '::Command');
+
   my @search =
     ($params->{structure_file}, $app->home->child(join($PERIOD, $app->moniker, $CONF_FILE_SUFFIX, $DEF_FILE_SUFFIX))->to_string);
   my ($def_file) = grep {defined && -r -f} @search;    #get the first existing, readable file
@@ -84,14 +86,14 @@ sub register ($self, $app, $params) {
     config    => $conf_file,
     structure => $def_file,
     hooks     => $params->{hooks},
-  )->__register_default;
+  );
 
 =pod
 
 =head2 conf
 
 This method is used to access the loaded configuration from within the Mojo 
-application. Returns the root L<Config::Structured> instance.
+application. Returns the root C<Config::Structured::Node> instance.
 
 =cut
 

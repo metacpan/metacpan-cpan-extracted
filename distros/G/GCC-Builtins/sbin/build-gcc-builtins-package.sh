@@ -36,4 +36,4 @@ mv blacklist.txt blacklist.txt.final
 
 echo "$0 : done, set the contents of whitelist.txt.final and blacklist.txt.final into '${WHEREAMI}/build-gcc-builtins-package.pl'"
 echo "then run '${WHEREAMI}/build-gcc-builtins-package.pl' and then perl Makefile.PL && make all && make test"
-echo "If any of the test files above t/666-\*.t fails, copy the expected value into '${WHEREAMI}/build-gcc-builtins-package.pl' and retry."
+echo "If any of the test files above t/666-\*.t fails, copy the expected value into '${WHEREAMI}/build-gcc-builtins-package.pl' (into '%T_EXPECTED_RESULTS') and retry."

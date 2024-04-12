@@ -21,5 +21,6 @@ t/t-data/images/red.png
 t/t-data/images/Περισσότερα/Κόκκινο.png
 t/t-data/images/Περισσότερα/πράσινο.png
 t/t-data/images/κίτρινο.png
+xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

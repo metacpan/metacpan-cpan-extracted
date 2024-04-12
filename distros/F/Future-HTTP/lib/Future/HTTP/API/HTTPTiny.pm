@@ -1,13 +1,11 @@
 package # hide from indexer as it's not really ready
     Future::HTTP::API::HTTPTiny;
 use strict;
-use Filter::signatures;
-no warnings 'experimental::signatures';
-use feature 'signatures';
+use experimental 'signatures';
 require HTTP::Tiny;
 require URI;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 NAME
 
@@ -70,8 +68,6 @@ sub munge_ht_options($self, $url, %options) {
 }
 
 sub mirror($self, $url, $file, $args) {
-    @_ == 3 || (@_ == 4 && ref $args eq 'HASH')
-      or Carp::croak(q/Usage: $http->mirror(URL, FILE, [HASHREF])/ . "\n");
     if ( -e $file and my $mtime = (stat($file))[9] ) {
         $args->{headers}{'if-modified-since'} ||= $self->_http_date($mtime);
     }

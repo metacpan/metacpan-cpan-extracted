@@ -1,5 +1,10 @@
 Revision history for perl distribition Mojolicious::Plugin::Config::Structured
 
+3.00       2024-04-11T08:54:52-05:00
+  - rework for Config::Structured v3
+  - require perl v5.26
+  - add config-dump mojo command
+
 1.004      2024-02-23T12:30:09-04:00
   - modernization improvements
   - bail out if structure file missing

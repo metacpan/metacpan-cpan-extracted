@@ -137,10 +137,10 @@ SUBROUTINES
   "check_number"
      check_number($self, $key);
 
-    *Since version 0.01. Described functionality since version 0.09.*
+    *Since version 0.01. Described functionality since version 0.26.*
 
     Check parameter defined by $key which is number (positive or negative)
-    or no.
+    or no. Number could be integer, float, exponencial and negative.
 
     Put error if check isn't ok.
 
@@ -149,9 +149,10 @@ SUBROUTINES
   "check_number_min"
      check_number_min($self, $key, $min);
 
-    *Since version 0.25.*
+    *Since version 0.25. Described functionality since version 0.26.*
 
     Check parameter defined by $key which is number greater than $min value.
+    Number could be integer, float, exponencial and negative.
 
     Put error if check isn't ok.
 
@@ -173,9 +174,10 @@ SUBROUTINES
   "check_number_range"
      check_number_range($self, $key, $min, $max);
 
-    *Since version 0.23.*
+    *Since version 0.23. Described functionality since version 0.26.*
 
     Check if number defined by $key is in range between $min and $max.
+    Number could be integer, float, exponencial and negative.
 
     Put error if check isn't ok.
 
@@ -293,6 +295,8 @@ ERRORS
                      Value: %s
 
      check_number_min():
+             Parameter '%s' must be a number.
+                     Value: %s
              Parameter '%s' must be greater than %s.
                      Value: %s
 
@@ -1080,5 +1084,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.25
+    0.26
 

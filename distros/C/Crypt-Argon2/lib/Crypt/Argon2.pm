@@ -1,5 +1,5 @@
 package Crypt::Argon2;
-$Crypt::Argon2::VERSION = '0.021';
+$Crypt::Argon2::VERSION = '0.022';
 use strict;
 use warnings;
 
@@ -53,7 +53,7 @@ Crypt::Argon2 - Perl interface to the Argon2 key derivation functions
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

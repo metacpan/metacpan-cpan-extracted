@@ -24,6 +24,7 @@ requires 'Mo' => 0;
 requires 'Mo::utils' => 0.14;
 requires 'Mo::utils::CSS' => 0;
 requires 'Readonly' => 0;
+requires 'Scalar::Util' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Data-HTML-Element/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Data-HTML-Element';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Data-HTML-Element';
@@ -32,7 +33,7 @@ test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.11';
+version '0.13';
 
 # Run.
 WriteAll();

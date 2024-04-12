@@ -77,7 +77,9 @@ t/Data-HTML-Element-Input/04-autofocus.t
 t/Data-HTML-Element-Input/05-checked.t
 t/Data-HTML-Element-Input/06-disabled.t
 t/Data-HTML-Element-Input/07-name.t
-t/Data-HTML-Element-Input/08-required.t
+t/Data-HTML-Element-Input/08-onclick.t
+t/Data-HTML-Element-Input/09-required.t
+t/Data-HTML-Element-Input/10-step.t
 t/Data-HTML-Element-Option/01-use.t
 t/Data-HTML-Element-Option/02-version.t
 t/Data-HTML-Element-Option/03-new.t

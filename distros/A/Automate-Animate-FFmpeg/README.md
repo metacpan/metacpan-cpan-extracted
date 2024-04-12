@@ -4,7 +4,7 @@ Automate::Animate::FFmpeg - Create animation from a sequence of images using FFm
 
 # VERSION
 
-Version 0.10
+Version 0.11
 
 # SYNOPSIS
 
@@ -397,9 +397,9 @@ You can also look for information at:
 
     [http://annocpan.org/dist/Automate-Animate](http://annocpan.org/dist/Automate-Animate)
 
-- CPAN Ratings
+- Review this module at PerlMonks
 
-    [https://cpanratings.perl.org/d/Automate-Animate](https://cpanratings.perl.org/d/Automate-Animate)
+    [https://www.perlmonks.org/?node\_id=21144](https://www.perlmonks.org/?node_id=21144)
 
 - Search CPAN
 

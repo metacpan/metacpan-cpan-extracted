@@ -59,7 +59,7 @@ my %module = (
         x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
 
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.020',
 
     'LICENSE'=> 'perl',
 
@@ -69,9 +69,9 @@ my %module = (
     },
 
     PREREQ_PM => {
-        'Filter::signatures'         => '0.13', # only needed for Perl <5.22
+        'experimental'               => '0.031', # signatures
         'Moo'                        => 2, # yeah, not all that great, but ...
-        'Future'                     => '0.31', # Future 0.25 is incompatible as it doesn't allow Future->done
+        'Future'                     => '0.49', # Future 0.49 is mostly compatible with Future::XS
         'HTTP::Tiny'                 => 0, # our fallback, even distributed with Perl 5.14+
         'HTTP::Headers'              => '6.07', # we want the ->flatten() method
     },

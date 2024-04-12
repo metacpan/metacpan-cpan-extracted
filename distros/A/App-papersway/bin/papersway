@@ -1,0 +1,908 @@
+#!/usr/bin/perl
+# PODNAME: papersway
+# ABSTRACT: PaperWM-like window management for Sway/i3wm
+#
+# Copyright (C) 2019-2024  Sean Whitton <spwhitton@spwhitton.name>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+use 5.032;
+use strict;
+use warnings;
+
+use JSON;
+use IO::Pipe;
+use AnyEvent;
+use AnyEvent::I3 ":all";
+use Getopt::Long;
+use Sys::Hostname;
+use POSIX "floor", "mkfifo";
+use File::Basename "basename", "dirname";
+use File::Spec::Functions "catfile";
+use List::Util qw(first min max zip);
+
+$| = 1;
+
+my ($pipe, $i3status);
+
+GetOptions 'i3status!' => \$i3status
+  or die "failed to parse command line options";
+
+if ($i3status) {
+    $pipe = IO::Pipe->new;
+    if ($i3status = fork // die "couldn't fork: $!") {
+	$pipe->reader;
+    } else {
+	$pipe->writer;
+	open STDOUT, ">&=", $pipe->fileno
+	  or die "couldn't re-open i3status's STDOUT: $!";
+	exec "i3status";
+    }
+}
+
+my (%paper_ws, $focused_ws, %col_rows, $caffe_id, $caffe_name);
+
+my $have_sway = !!$ENV{SWAYSOCK};
+my $wm_ipc_socket = $have_sway ? $ENV{SWAYSOCK} : $ENV{I3SOCK};
+my $wmipc = AnyEvent::I3->new($wm_ipc_socket);
+$wmipc->connect->recv or die "couldn't connect to WM IPC socket";
+sub with_ignored_events (&) {
+    $wmipc->send_tick("papersway-ign")->recv;
+    $_[0]->();
+    $wmipc->send_tick("papersway-unign")->recv;
+}
+
+sub for_each_node (&) {
+    my @trees = $wmipc->get_tree->recv;
+    while (@trees) {
+	foreach my $node ((shift @trees)->{nodes}->@*) {
+	    $_[0]->($node);
+	    unshift @trees, $node;
+	}
+    }
+}
+
+my @all_workspaces = (
+    "1",     "2",      "3",      "4",     "5",     "6",
+    "7",     "8",      "9",      "10",    "11:F1", "12:F2",
+    "13:F3", "14:F4",  "15:F5",  "16:F6", "17:F7", "18:F8",
+    "19:F9", "20:F10", "21:F11", "22:F12"
+);
+
+my $have_pending = AnyEvent->condvar;
+my (@pending_events, @pending_msgs);
+
+(basename $wm_ipc_socket) =~ /\d[\d.]*\d/;
+my $cmdpipe = catfile dirname($wm_ipc_socket), "papersway.$&.pipe";
+-e and unlink for $cmdpipe;
+mkfifo $cmdpipe, 0700 or die "mkfifo $cmdpipe failed: $!";
+
+# Hold the pipe open with a writer that won't write anything.
+open(my $cmdpipe_w, ">", $cmdpipe), sleep
+  unless fork // die "couldn't fork: $!";
+
+open my $cmdpipe_r, "<", $cmdpipe;
+my $cmdpipe_reader = AnyEvent->io(
+    fh => $cmdpipe_r, poll => "r", cb => sub {
+	# There are a few cases where we can handle the command by only
+	# updating data structures, but for simplicity, always handle commands
+	# outside of the event loop.
+	push @pending_msgs, scalar <$cmdpipe_r>;
+	$have_pending->send;
+    });
+
+my $ignore_events;
+sub queue_event { push @pending_events, shift; $have_pending->send }
+$wmipc->subscribe({
+    tick => sub {
+	my $payload = shift->{payload};
+	$ignore_events = 1 if $payload eq "papersway-ign";
+	$ignore_events = 0 if $payload eq "papersway-unign";
+    },
+
+    window => sub {
+	return if $ignore_events;
+	my $e = shift; state $last_e;
+
+	# New containers: have to read two events to find out whether it's
+	# just a floating dialog that we'll ignore.
+	if ($last_e) {
+	    undef $last_e;
+	    queue_event $e unless $e->{change} && $e->{change} eq "floating";
+	} elsif ($e->{change} && $e->{change} eq "new"
+		 && exists $paper_ws{$focused_ws}) {
+	    $last_e = $e;
+	}
+
+	# Mark changes -- can handle these without leaving event processing.
+	elsif ($e->{change} && $e->{change} eq "mark") {
+	    if (grep $_ eq "caffeinated", $e->{container}{marks}->@*) {
+		register_caffeinated($e->{container});
+	    } elsif ($caffe_id && $caffe_id == $e->{container}{id}) {
+		clear_caffeinated();
+	    }
+	}
+
+	# Other container changes we need to handle outside of any callback.
+	elsif ($e->{change} && exists $paper_ws{$focused_ws}
+	       && (# A container stopped floating: it's as though it's new.
+		   $e->{change} eq "floating"
+		   && $e->{container}{type} ne "floating_con"
+
+		   || $e->{change} eq "close" || $e->{change} eq "focus"
+
+	 	   || $e->{change} eq "move"
+	 	   && $e->{container} && $e->{container}{type} eq "con"))
+	  { queue_event $e }
+    },
+
+    workspace => sub {
+	my $e = shift;
+	if ($ignore_events || !$e->{change}) {
+	    return;
+	} elsif ($e->{change} eq "focus" && $e->{current}) {
+	    $focused_ws = $e->{current}{id};
+	    # If this is one of our workspaces, then we must normalise:
+	    # containers might have moved to or from here in our absence.
+	    if (exists $paper_ws{$focused_ws}) {
+		queue_event $e;
+	    } else {
+		# Update status bar display.
+		signal_i3status();
+	    }
+	} elsif ($e->{change} eq "init" && $e->{current}
+		 && grep $_ eq $e->{current}{name}, @all_workspaces) {
+	    $paper_ws{$e->{current}{id}}
+	      = { name => $e->{current}{name}, ncols => 2, cols => [],
+		  off_left => [], off_right => [], last_dir => 1 };
+	} elsif ($e->{change} eq "rename"
+		 && exists $paper_ws{$e->{current}{id}}) {
+	    $paper_ws{$e->{current}{id}}{name} = $e->{current}{name};
+	    signal_i3status();
+	} elsif ($e->{change} eq "empty" && $e->{current}) {
+	    delete $paper_ws{$e->{current}{id}};
+	    signal_i3status();
+	}
+    },
+})->recv->{success} or die "couldn't subscribe to window manager events";
+
+# Determine the initial state -- the WM might just have been reloaded.
+# Move any previously-hidden containers to a fresh workspace for perusal.
+my @old_ids;
+for ($wmipc->get_workspaces->recv->@*) {
+    $focused_ws = $_->{id} if $_->{focused};
+    push @old_ids, $1 if $_->{name} =~ /\A\*(\d+)\*\z/;
+}
+if (@old_ids) {
+    fresh_workspace(go => 1);
+    cmd(map("[con_id=$_] move container workspace current, floating disable",
+	    @old_ids),
+	"focus child");
+}
+for_each_node {
+    my $node = shift;
+    if ($node->{type} eq "workspace"
+	&& grep $_ eq $node->{name}, @all_workspaces) {
+	my $entry = $paper_ws{$node->{id}}
+	  //= { name => $node->{name},
+		off_left => [], off_right => [], last_dir => 1 };
+	sync_cols($node => $entry);
+	$entry->{ncols} = max 2, scalar $entry->{cols}->@*;
+    } elsif (grep $_ eq "caffeinated", $node->{marks}->@*) {
+	register_caffeinated($node);
+    }
+};
+
+my $username = $ENV{LOGNAME} || $ENV{USER} || getpwuid $<;
+my $hostinfo = { name => "hostinfo",
+		 full_text => sprintf "%s@%s", $username, hostname };
+
+# Skip the first line which contains the version header.
+print scalar <$pipe> if $i3status;
+
+# The second line contains the start of the infinite array.
+print scalar <$pipe> if $i3status;
+
+# Basic idea here from Michael Stapelberg's sample i3status-wrapper.
+my $i3status_wrapper = $i3status && AnyEvent->io(
+    fh => $pipe, poll => "r", cb => sub {
+
+	# If there is a decoding error then we just skip this line, as it's
+	# not worth crashing this script over that.  It should be fine to do
+	# this here because this filtering loop is in itself stateless.
+	# It's only if the decoding error involves newlines in wrong places,
+	# or similar, that this skip could cause us to produce invalid output.
+	my ($statusline) = (<$pipe> =~ /^,?(.*)/);
+	my $blocks = eval { decode_json $statusline } // next;
+
+	if ($focused_ws && keys %paper_ws > 1) {
+	    my @disp;
+	    foreach my $key (sorted_paper_ws()) {
+		push @disp,
+		  sprintf +($focused_ws == $key ? "<b>%s</b>" : "%s"),
+		  ws_name($paper_ws{$key}{name})
+	    }
+	    unshift @$blocks,
+	      { name => "ws", markup => "pango", full_text => "@disp" };
+	}
+
+	if ($focused_ws && exists $paper_ws{$focused_ws}) {
+	    sub nwin { join " ", ("\x{2021}")x$_[0] }
+
+	    my $ws    = $paper_ws{$focused_ws};
+	    my $left  = $ws->{off_left}->@*;
+	    my $right = $ws->{off_right}->@*;
+
+	    my $disp = sprintf "<b>%s</b>",
+	      $ws->{monocle} ? "\x{2020}" : nwin($ws->{ncols});
+	    $disp = sprintf "%s %s", nwin($left), $disp if $left;
+	    $disp = sprintf "%s %s", $disp, nwin($right) if $right;
+
+	    unshift @$blocks,
+	      { name => "cols", markup => "pango", full_text => $disp };
+	}
+
+	unshift @$blocks,
+	  { name => "caffeinated", full_text => "Caffeinated: $caffe_name" }
+	  if $caffe_name;
+
+	unshift @$blocks, $hostinfo;
+
+	print encode_json($blocks) . ",\n";
+    });
+
+# Start main loop.
+cmd("bar bar-0 workspace_buttons no") if $have_sway && $i3status;
+for (;;) {
+    $have_pending->recv;
+    $have_pending = AnyEvent::condvar;
+
+    if (@pending_events) {
+	# Generally we would like to update %paper_ws with the information we
+	# receive by subscription, but in some cases we can't be sure of what
+	# has happened.  For example, as we don't maintain a representation of
+	# the whole tree, on a change=move event, we don't know where the
+	# container has gone.  Or a focus change might be due to a new
+	# container, in which case we might need to push one off.  Currently,
+	# if we can't handle it within the callback, then we always normalise.
+	normalise_ws_cols();
+	signal_i3status();
+	@pending_events = ();
+    }
+    process_msg(shift @pending_msgs) while @pending_msgs;
+}
+
+sub register_caffeinated {
+    $caffe_id = $_[0]->{id};
+    $caffe_name = $_[0]->{name};
+    signal_i3status();
+}
+
+sub clear_caffeinated {
+    undef $caffe_id;
+    undef $caffe_name;
+    signal_i3status();
+}
+
+sub sync_cols {
+    my ($node, $entry) = @_;
+
+    # Here we assume that the containers for the columns are directly below
+    # the type=workspace node.  That won't be true if workspace_layout is not
+    # configured to 'default'.
+    foreach my $child_id ($node->{focus}->@*) {
+	my $child_node = first { $_->{id} == $child_id } $node->{nodes}->@*;
+	$entry->{focused_col} = $child_id, last
+	  if $child_node->{type} eq "con";
+    }
+    $entry->{cols} = [];
+    foreach my $child_node ($node->{nodes}->@*) {
+	next unless $child_node->{type} eq "con";
+	push $entry->{cols}->@*, $child_node->{id};
+	$col_rows{$child_node->{id}} = $child_node->{nodes}->@*;
+    }
+}
+
+sub normalise_ws_cols {
+    my $ws = $paper_ws{$focused_ws};
+    my $floating_focus;
+    my $old_cols = $ws->{cols};
+    my $old_i = shift // first { $old_cols->[$_] == $ws->{focused_col} }
+      0..$#$old_cols;
+    for_each_node {
+	my $node = shift;
+	if ($node->{id} == $focused_ws) {
+	    sync_cols($node => $ws);
+	    my $first_focus = $node->{focus}->[0];
+	    $floating_focus = ! grep $_ == $first_focus, $ws->{cols}->@*;
+	    goto DONE;
+	}
+    };
+  DONE:
+    my $cols = $ws->{cols};
+    my $i = first { $cols->[$_] eq $ws->{focused_col} } 0..$#$cols;
+
+    my @cmds;
+    my $avail_l = scalar $ws->{off_left}->@*;
+    my $avail_r = scalar $ws->{off_right}->@*;
+
+    if ($ws->{monocle} && !@$cols) {
+	undef $ws->{monocle};
+	$i = $old_i = !!$avail_l;
+    }
+
+    if ($ws->{focused_col} && $col_rows{$ws->{focused_col}}
+	&& $col_rows{$ws->{focused_col}} == 1) {
+	# Attempt to delete the vertically split container by moving the
+	# single window it contains over one of its edges.
+	# We can't always do this.  We assume the default focus_wrapping.
+	if ($i < $#$cols && !$col_rows{ @$cols[$i+1] }) {
+	    push @cmds, "move right";
+	    delete $col_rows{$ws->{focused_col}};
+	    $ws->{focused_col} = $cols->[$i] = node_first_child($cols->[$i]);
+	} elsif ($i > 0 && !$col_rows{ @$cols[$i-1] }) {
+	    push @cmds, "move left";
+	    delete $col_rows{$ws->{focused_col}};
+	    $ws->{focused_col} = $cols->[$i] = node_first_child($cols->[$i]);
+	}
+    }
+
+    if (!$ws->{monocle} && $ws->{ncols} > @$cols && ($avail_l || $avail_r)) {
+	# Pull columns in if there are too few columns but some available.
+	# Want the focused column, after pulls, to be the $old_i'th.
+	my ($from_l, $from_r);
+	my $want = $ws->{ncols} - @$cols;
+	# When we lose columns, the focused column either moves left or
+	# stays the same.  So always $old_i >= $i.
+	if ($old_i > $i) {
+	    if ($old_i == $#$old_cols) {
+		# We were in the final column.  Either we closed the
+		# rightmost column, or we lost arbitrary columns from the
+		# left (e.g. monocle from the last column).
+		# In either case it is fine to pull more from the left.
+		$from_l = min $avail_l, $want;
+	    } else {
+		# We have $i < $old_i < $#$old_cols.
+		# We must have lost at least $old_i-$i from the left.
+		$from_l = min $avail_l, $old_i-$i;
+	    }
+	} else {		# $old_i == $i.
+	    if ($old_i == 0) {
+		# We were in the first column.  Either we closed the leftmost
+		# column, or we lost arbitrary columns from the left
+		# (e.g. monocle from the first column).  We prefer to pull
+		# from the left in the former case.  If we are indeed exiting
+		# monocle mode, we must pull from the right.
+		if (@$cols == 1) {
+		    $from_r = min $avail_r, $want;
+		} else {
+		    $from_l = !!$avail_l;
+		}
+	    } else {
+		# It must be that we lost columns from the right.
+		$from_r = min $avail_r, $want;
+	    }
+	}
+
+	if ($from_l //= min $avail_l, $want-$from_r) {
+	    my @pulled = splice $ws->{off_left}->@*, -$from_l, $from_l;
+	    my @to_pull = reverse @pulled;
+	    @to_pull = zip \@to_pull, [@$cols[0], @to_pull[0..$#to_pull-1]];
+
+	    push @cmds, ("focus left")x$i;
+	    for (@to_pull) {
+		push @cmds, show_con(@$_[0]);
+		next unless @$_[1];
+		push @cmds, $col_rows{@$_[1]}
+		  ? "move left"
+		  : "swap container with con_id @$_[1]";
+	    }
+
+	    unshift @$cols, @pulled;
+	    $i = 0;
+	}
+	if ($from_r //= min $avail_r, $want-$from_l) {
+	    my @pulled
+	      = reverse splice $ws->{off_right}->@*, -$from_r, $from_r;
+	    my @to_pull = zip \@pulled, [@$cols[-1], @pulled[1..$#pulled]];
+	    push @cmds, ("focus right")x($#$cols-$i);
+	    for (@to_pull) {
+		push @cmds, show_con(@$_[0]);
+		push @cmds, "move right" if @$_[1] && $col_rows{@$_[1]};
+	    }
+
+	    push @$cols, @pulled;
+	    $i = $#$cols;
+	}
+
+	if ($i > $old_i) {
+	    push @cmds, ("focus left")x($i-$old_i);
+	} elsif ($old_i > $i) {
+	    push @cmds, ("focus right")x($old_i-$i);
+	}
+
+	$ws->{focused_col} = $cols->[$old_i];
+	push @cmds, "focus child" if $col_rows{$ws->{focused_col}};
+    }
+    # Push columns off if there are too many columns.
+    # This should never change which container is focused.
+    elsif (my $n = $ws->{monocle} ? @$cols-1 : @$cols-$ws->{ncols} > 0) {
+	my $left = $i;
+	my $right = $#$cols-$i;
+	if ($left >= $right) {
+	    $left = min $left, $n;
+	    $right = $n-$left;
+	} else {
+	    $right = min $right, $n;
+	    $left = $n-$right;
+	}
+	my @to_left = splice @$cols, 0, $left;
+	my @to_right = reverse splice @$cols, -$right, $right;
+
+	push @cmds, map hide_con($_), @to_left, @to_right;
+	push $ws->{off_left}->@*, @to_left;
+	push $ws->{off_right}->@*, @to_right;
+    }
+    if (@cmds) {
+	push @cmds, "focus floating" if $floating_focus;
+	with_ignored_events { cmd("focus tiling", @cmds) }
+    }
+}
+
+sub process_msg {
+    my $cmd = shift;
+
+    my $ws = $paper_ws{$focused_ws};
+    my $cols = $ws->{cols};
+    my $rows = $col_rows{$ws->{focused_col}};
+    my $i = first { $cols->[$_] == $ws->{focused_col} } 0..$#$cols;
+
+    my $mv = sub {
+	my ($j, $move) = @_;
+	if (@$cols > $j >= 0) {
+	    if ($move) {
+		# This does not trigger any events.
+		cmd(
+"[con_id=@$cols[$i]] swap container with con_id @$cols[$j]"
+		);
+		@$cols[$i, $j] = @$cols[$j, $i];
+	    } else {
+		cmd($j > $i ? "focus right" : "focus left");
+	    }
+	} elsif ($move && $ws->{monocle}) {
+	    if ($j > $i && $ws->{off_right}->@*) {
+		push $ws->{off_left}->@*, pop $ws->{off_right}->@*;
+	    } elsif ($j < $i && $ws->{off_left}->@*) {
+		push $ws->{off_right}->@*, pop $ws->{off_left}->@*;
+	    }
+	} elsif ($j == @$cols && $ws->{off_right}->@*) {
+	    my $pushed = shift @$cols;
+	    my $pulled = pop $ws->{off_right}->@*;
+	    my @cmds = show_con($pulled);
+	    push $ws->{off_left}->@*, $pushed;
+
+	    if ($move) {
+		if ($rows || @$cols) {
+		    push @cmds, $rows
+		      ? "move left"
+		      : "swap container with con_id @$cols[-1]";
+		    push @cmds, "focus right";
+		}
+		if (@$cols) {
+		    my $tem = pop @$cols;
+		    push @$cols, $pulled, $tem;
+		} else {
+		    push @$cols, $pulled;
+		}
+	    } else {
+		$ws->{focused_col} = $pulled;
+		push @cmds, "move right" if $rows;
+		push @$cols, $pulled;
+		push @cmds, "focus child" if $col_rows{$pulled};
+	    }
+
+	    with_ignored_events { cmd(@cmds, hide_con($pushed)) };
+	    signal_i3status();
+	} elsif ($j == -1 && $ws->{off_left}->@*) {
+	    my $pushed = pop @$cols;
+	    my $pulled = pop $ws->{off_left}->@*;
+	    my @cmds = show_con($pulled);
+
+	    push $ws->{off_right}->@*, $pushed;
+
+	    if ($move) {
+		if (@$cols) {
+		    push @cmds, "move right" if $rows;
+		    push @cmds, "focus left";
+		    my $tem = shift @$cols;
+		    unshift @$cols, $tem, $pulled;
+		} else {
+		    unshift @$cols, $pulled;
+		}
+	    } else {
+		if ($rows) {
+		    push @cmds, "move left";
+		} elsif (@$cols) {
+		    push @cmds, "swap container with con_id @$cols[0]";
+		}
+		$ws->{focused_col} = $pulled;
+		unshift @$cols, $pulled;
+		push @cmds, "focus child" if $col_rows{$pulled};
+	    }
+
+	    with_ignored_events { cmd(@cmds, hide_con($pushed)) };
+	    signal_i3status();
+	}
+	$ws->{last_dir} = $j > $i ? 1 : -1;
+    };
+
+    # Command dispatch
+
+    if ($cmd =~ /^(focus|move) (left|right)$/) {
+	$mv->($2 eq "right" ? $i+1 : $i-1, $1 eq "move");
+    } elsif ($cmd =~ /^cols (incr|decr)$/) {
+	$ws->{ncols} += $1 eq "incr" ? 1 : -1;
+	normalise_ws_cols();
+	signal_i3status();
+    } elsif ($cmd =~ /^other column$/) {
+	# This is meant to be similar to my custom Emacs C-x o.
+	if ($i == 0 || $ws->{last_dir} == -1 && $i < $#$cols) {
+	    $mv->($i+1);
+	} elsif ($i == $#$cols || $ws->{last_dir} == 1) {
+	    $mv->($i-1);
+	}
+    } elsif ($cmd eq "monocle toggle\n") {
+	unless (ensure_disable_monocle($ws)) {
+	    $ws->{monocle} = -$i-1;
+	    normalise_ws_cols();
+	}
+	signal_i3status();
+    } elsif ($cmd =~ /^fresh-workspace ?(take|send)?$/) {
+	fresh_workspace(do {
+	    if ($1 && $1 eq "take") {
+		go => 1, send => 1;
+	    } elsif ($1 && $1 eq "send") {
+		send => 1;
+	    } else {
+		go => 1;
+	    }
+	});
+    } elsif ($cmd =~ /^absorb_expel ?(left|right)?$/) {
+	my $dir = $1 eq "right" ? 1 : -1;
+	if ($rows > 1) {	# expel
+	    # If the column to the right or left also has rows, we'll just
+	    # move the container into that column instead of expelling it.
+	    # Possibly we could float the container, select the
+	    # appropriate full column and unfloat it into place?
+	    cmd(sprintf "move %s", $dir > 0 ? "right" : "left");
+	    $ws->{last_dir} = $dir;
+	} else { 		# absorb
+	    my @cmds;
+	    if ($i == 0 && $dir < 0 && $ws->{off_left}->@*) {
+		my $pulled = pop $ws->{off_left}->@*;
+		push @cmds, show_con($pulled), "move left";
+		push @cmds, "splitv" unless $col_rows{$pulled};
+		push @cmds, "focus right", "move left";
+
+		with_ignored_events { cmd(@cmds) };
+		normalise_ws_cols();
+	    } elsif ($i == $#$cols && $dir > 0 && $ws->{off_right}->@*) {
+		my $pulled = pop $ws->{off_right}->@*;
+		push @cmds, show_con($pulled);
+		push @cmds, "move right" if $rows;
+		push @cmds, "splitv" unless $col_rows{$pulled};
+		push @cmds, "focus left", "move right";
+
+		with_ignored_events { cmd(@cmds) };
+		normalise_ws_cols();
+	    } elsif ($i == $#$cols && $dir < 0
+		     || $#$cols > $i > 0
+		     || $i == 0 && $dir > 0) {
+		push @cmds, $dir > 0
+		  ? ("focus right", "splitv", "focus left")
+		  : ("focus left",  "splitv", "focus right")
+		  unless $col_rows{ @$cols[$i+$dir] };
+		push @cmds, $dir > 0 ? "move right" : "move left";
+
+		with_ignored_events { cmd(@cmds) };
+		normalise_ws_cols($ws->{off_left}->@* && $dir > 0
+				  || $ws->{off_right}->@* && $dir < 0
+				  ? min($#$cols, max 0, $i+$dir) : $i);
+	    }
+	    if (@cmds) {
+		$ws->{last_dir} = $dir;
+		signal_i3status();
+	    }
+	}
+    }
+
+    # Basic purpose of this wrapper command is to prevent accidentally
+    # moving to one of the holding workspaces using Sway's own commands.
+    elsif ($cmd =~ /^(move_)?workspace (prev|next)$/) {
+	my ($move, $dir) = (!!$1, $2);
+	$move && ensure_disable_monocle($ws);
+	my @keys = sorted_paper_ws();
+	my $k = first { $keys[$_] == $focused_ws } 0..$#keys;
+	if ($dir eq "next" && $k < $#keys || $dir eq "prev" && $k > 0) {
+	    my @cmds = "workspace $dir";
+	    $focused_ws = $keys[$dir eq "next" ? $k+1 : $k-1];
+	    if ($move) {
+		push @cmds, show_con($ws->{focused_col});
+		push @cmds, "move right"
+		  if $col_rows{ $paper_ws{$focused_ws}{focused_col} };
+		push @cmds, "focus child" if $rows;
+	    }
+	    cmd(@cmds);
+	}
+    }
+}
+
+# fresh_workspace(%opts)
+#
+# Switch to the next free workspace, if any.  Return the name of that
+# workspace, or undef if no workspace was available.
+
+sub fresh_workspace {
+    my $next_free_workspace = compact_workspaces(leave_gap => 1);
+
+    if ($next_free_workspace) {
+	my @cmds;
+	my %opts = @_;
+
+	# Special case: if we're about to leave a workspace empty by removing
+	# its monocle mode container, then that workspace will get an empty
+	# event, and we'll lose track of any windows pushed off to the sides.
+	# So turn off monocle mode first.
+	ensure_disable_monocle(my $ws = $paper_ws{$focused_ws});
+
+	# We need to ensure that the monitoring loop doesn't process the move
+	# event before it knows about the workspace change.  Otherwise, that
+	# loop might try to unhide containers from the old workspace onto the
+	# new one.  We do need it to process the workspace init event, else we
+	# don't know the ID of the new workspace without making our own query.
+	#
+	# We also want to ensure that the fresh workspace is the one that
+	# C-i ; will take us to.  In the case that !$opts{go}, can use C-i M-;
+	# to move any other wanted containers over, before a final C-i ;.
+	#
+	# There is a relevant i3/Sway difference here:
+	#     <https://github.com/swaywm/sway/issues/6081>.
+	# (Our use of hide_con elsewhere assumes Sway's behaviour.  Possibly
+	# we should write wrapper code that can handle either case.)
+
+	push @cmds, "workspace $next_free_workspace";
+	push @cmds, show_con($ws->{focused_col}) if $opts{send};
+	push @cmds, "workspace back_and_forth" unless $opts{go};
+
+	cmd(@cmds);
+    }
+    $next_free_workspace
+}
+
+# compact_workspaces(%opts)
+#
+# Rename workspaces so as to remove gaps in the sequence of workspaces.
+#
+# If C<$opts{leave_gap}>, ensure there is a gap of one workspace after the
+# currently focused workspace and return the name of the gap workspace, or
+# just return undef if there is no space for a gap.
+
+sub compact_workspaces {
+    my %opts = @_;
+    my @workspaces = sorted_paper_ws();
+    @workspaces < @all_workspaces or return;
+    my ($i, $gap_workspace, @pairs);
+
+    while (my $next = shift @workspaces) {
+        my $workspace = $all_workspaces[$i++];
+
+        $opts{leave_gap}
+          and $next == $focused_ws
+          and $gap_workspace = $all_workspaces[$i++];
+	my $next_name = $paper_ws{$next}{name};
+        next if $next_name eq $workspace;
+        my $pair = [$next, $workspace];
+        ws_num($next_name) > ws_num($workspace)
+          ? push @pairs, $pair
+          : unshift @pairs, $pair
+    }
+
+    with_ignored_events {
+	cmd(map sprintf("rename workspace %s to %s",
+			$paper_ws{$_->[0]}{name}, $_->[1]),
+	    @pairs)
+    };
+    $paper_ws{$_->[0]}{name} = $_->[1] for @pairs;
+
+    $opts{leave_gap} and $gap_workspace
+}
+
+sub node_first_child {
+    my $node_id = shift;
+    my $child_id;
+    for_each_node {
+	my $node = shift;
+	if ($node->{id} == $node_id) {
+	    $child_id = $node->{nodes}[0]{id};
+	    goto DONE;
+	}
+    };
+  DONE:
+    return $child_id;
+}
+
+sub ensure_disable_monocle {
+    my $ws = shift;
+    my $m = $ws->{monocle} or return 0;
+    undef $ws->{monocle};
+    normalise_ws_cols(abs ++$m);
+    return 1;
+}
+
+sub sorted_paper_ws {
+    sort { ws_num($paper_ws{$a}{name}) <=> ws_num($paper_ws{$b}{name}) }
+      keys %paper_ws
+}
+
+sub cmd { $wmipc->command(join "; ", @_)->recv }
+
+sub signal_i3status { kill USR1 => $i3status if $i3status }
+
+sub hide_con {
+    # Enable floating in order to preserve any rows the container might have.
+    # Otherwise, Sway subsumes the rows to the hidden workspace and the
+    # container with our known ID ceases to exist, s.t. we can't unhide it.
+    sprintf "[con_id=%s] floating enable, move container to workspace %s",
+      $_[0], "*$_[0]*"
+}
+
+sub show_con {
+    sprintf "[con_id=%s] %s",
+      $_[0], join ", ", "move container to workspace current",
+      "floating disable", "focus";
+}
+
+sub ws_name {
+    my ($before, $after) = split /:/, $_[0];
+    $after // $before
+}
+sub ws_num { (split /:/, $_[0])[0] }
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+papersway - PaperWM-like window management for Sway/i3wm
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+B<papersway> [B<--i3status>]
+
+=head1 DESCRIPTION
+
+This is an implementation of PaperWM-like window management for Sway/i3wm.
+If you like Sway/i3wm's commitments to stability, avoiding scope creep etc.
+but dislike the window management model, papersway is an alternative.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--i3status>
+
+Start a background instance of B<i3status>, filter and print its output.
+
+=back
+
+=head1 USAGE
+
+Here we discuss how to integrate papersway into your existing Sway/i3wm
+configuration file, usually found at F<~/.config/sway/config> or
+F<~/.config/i3/config>, as appropriate.
+
+=head2 Activation
+
+The recommended way to activate papersway is by using it as your bar command:
+
+=over 4
+
+    bar {
+        status_command papersway --i3status
+
+        # [.. further bar options .. ]
+    }
+
+=back
+
+This ensures that you can see a visual representation of your paper
+workspaces, which will be useful while getting the hang of papersway.
+
+=head2 Binding keys
+
+Here are some sample bindings to get you started.
+
+=over 4
+
+    set $mod Mod4
+
+    bindsym $mod+Left exec papersway-msg focus left
+    bindsym $mod+Down focus down
+    bindsym $mod+Up focus up
+    bindsym $mod+Right exec papersway-msg focus right
+
+    bindsym $mod+Shift+Left exec papersway-msg move left
+    bindsym $mod+Shift+Down move down
+    bindsym $mod+Shift+Up move up
+    bindsym $mod+Shift+Right move exec papersway-msg right
+
+    bindsym $mod+f exec papersway-msg monocle toggle
+    bindsym $mod+o exec papersway-msg other column
+
+    bindsym $mod+a exec papersway-msg fresh-workspace
+    bindsym $mod+n exec papersway-msg fresh-workspace send
+    bindsym $mod+t exec papersway-msg fresh-workspace take
+
+    bindsym $mod+e exec papersway-msg absorb_expel left
+    bindsym $mod+r exec papersway-msg absorb_expel right
+
+    bindsym $mod+minus exec papersway-msg cols decr
+    bindsym $mod+equal exec papersway-msg cols incr
+
+    bindsym $mod+i exec papersway-msg workspace prev
+    bindsym $mod+o exec papersway-msg workspace next
+    bindsym $mod+Shift+i exec papersway-msg move_workspace prev
+    bindsym $mod+Shift+i exec papersway-msg move_workspace next
+
+    bindsym $mod+c [con_mark=caffeinated] inhibit_idle none; \
+        inhibit_idle open, mark caffeinated
+    bindsym $mod+Shift+c [con_mark=caffeinated] inhibit_idle none, \
+        mark --toggle caffeinated
+    for_window [con_mark=caffeinated] inhibit_idle open
+
+=back
+
+=head2 Incompatibilities
+
+The current implementation assumes the default configuration values for the
+I<focus_wrapping> and I<workspace_layout> configuration options, so remove any
+customisations you've made to those.  You should also unbind the I<split>
+(and I<splith> etc.), I<layout>, I<focus parent> and I<focus child> commands
+to avoid confusion (on the parts of both yourself and of papersway).
+
+=head1 SEE ALSO
+
+L<https://github.com/paperwm/PaperWM>, i3status(1), sway(5)
+
+=head1 AUTHOR
+
+Sean Whitton <spwhitton@spwhitton.name>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019-2024 by Sean Whitton <spwhitton@spwhitton.name>.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

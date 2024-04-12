@@ -1,9 +1,12 @@
 Revision history for ExtUtils-HasCompiler
 
+0.024     2024-04-11 14:43:48+02:00 Europe/Brussels
+          - Make temporary dir absolute
+
 0.023     2020-12-24 15:10:29+01:00 Europe/Amsterdam
           - Take into account new Apple include paths
 
-0.022     2020-07-20 22:05:15+02:00 Europe/Amsterdam
+0.022     20Make temporary dir absolute20-07-20 22:05:15+02:00 Europe/Amsterdam
           - Adds support for MSYS2
 
 0.021     2017-06-26 14:37:05+02:00 Europe/Amsterdam

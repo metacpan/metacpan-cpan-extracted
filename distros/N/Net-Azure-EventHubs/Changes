@@ -1,5 +1,9 @@
 Revision history for Perl extension Net-Azure-EventHubs
 
+0.10 2024-04-12T05:00:19Z
+    - fix test that fails on perl-5.39.9
+    - move tests that requests to metacpan under xt directory
+
 0.09 2019-01-25T08:28:37Z
     - Just version increment
 

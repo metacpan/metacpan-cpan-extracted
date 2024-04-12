@@ -1,4 +1,4 @@
 db:
   user:
-    isa: Str
+    isa: Str|Undef
     

@@ -16,9 +16,9 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Config::Structured' => '2.006',
+                                      'Config::Structured' => '3.01',
                                       'Mojolicious' => '0',
-                                      'perl' => '5.022000'
+                                      'perl' => '5.026000'
                                     }
                     },
        'test' => {

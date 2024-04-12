@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Copyright © 2024  Sean Whitton
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[ -n "$1" ] || exit 127
+socket=${SWAYSOCK:-$I3SOCK}
+pipe="$(printf "%s/papersway.%s.pipe" \
+	       "$(dirname "$socket")" \
+	       "$(basename "$socket" \
+		      | sed -n 's/^[^0-9]*\([0-9][0-9.]*[0-9]\).*/\1/p')")"
+[ -w "$pipe" ] || exit 127
+echo "$@" >"$pipe"

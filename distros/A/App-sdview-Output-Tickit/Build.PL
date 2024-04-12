@@ -8,7 +8,7 @@ my $build = Module::Build->new(
    module_name => 'App::sdview::Output::Tickit',
    requires => {
       perl => '5.026',
-      'Object::Pad' => '0.800',
+      'Object::Pad' => '0.805',
 
       'App::sdview::Style' => '0.12',
       'String::Tagged' => '0.21',

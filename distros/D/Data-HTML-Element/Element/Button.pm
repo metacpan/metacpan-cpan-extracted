@@ -20,7 +20,7 @@ Readonly::Array our @ENCTYPES => (
 Readonly::Array our @FORM_METHODS => qw(get post);
 Readonly::Array our @TYPES => qw(button reset submit);
 
-our $VERSION = 0.11;
+our $VERSION = 0.13;
 
 has autofocus => (
 	ro => 1,
@@ -185,8 +185,6 @@ Data::HTML::Element::Button - Data object for HTML button element.
 
 Constructor.
 
-Returns instance of object.
-
 =over 8
 
 =item * C<autofocus>
@@ -204,6 +202,7 @@ Default value is undef.
 =item * C<data>
 
 Button data content. It's reference to array.
+
 Data type of data is described in 'data_type' parameter.
 
 Default value is [].
@@ -212,7 +211,11 @@ Default value is [].
 
 Button data type for content.
 
-Possible value are: plain tags
+Possible value are: cb plain tags
+
+The 'cb' content is code reference.
+The 'plain' content are string(s).
+The 'tags' content is structure described in L<Tags>.
 
 Default value is 'plain'.
 
@@ -291,6 +294,8 @@ Button value.
 Default value is undef.
 
 =back
+
+Returns instance of object.
 
 =head2 C<autofocus>
 
@@ -555,6 +560,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.11
+0.13
 
 =cut

@@ -1,3 +1,8 @@
+0.26 2024-04-11T23:53:29+02:00
+ - Add support for exponencial and extremely small numbers in
+   check_number(). Rewrite to Scalar::Util::looks_like_number().
+ - Describe missing error for check_number_min() in doc.
+
 0.25 2024-03-14T02:21:19+01:00
  - Add check_number_min().
 

@@ -13,9 +13,9 @@ t/10_new.t
 t/11_message_request.t
 t/12_uri.t
 t/13_req.t
-t/21_request_do.t
-t/31_response_as_hashref.t
 t/sas.conf.example
+xt/21_request_do.t
+xt/31_response_as_hashref.t
 xt/71_message_request_do.t
 META.yml
 MANIFEST

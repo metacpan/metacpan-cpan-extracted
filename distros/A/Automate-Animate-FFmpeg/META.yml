@@ -42,5 +42,5 @@ resources:
   bugtracker: https://github.com/hadjiprocopis/Automate-Animate-FFmpeg/issues
   homepage: https://metacpan.org/module/Automate::Animate::FFmpeg
   repository: https://github.com/hadjiprocopis/Automate-Animate-FFmpeg
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

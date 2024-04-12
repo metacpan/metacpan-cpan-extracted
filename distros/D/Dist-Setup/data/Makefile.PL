@@ -29,9 +29,12 @@ WriteMakefile(
       # Goes with NO_MYMETA (which would provide the dynamic config).
       dynamic_config => 0,
       no_index => {
-        directory => [ 'local', 'vendor' ],
-      },
-      resources => {
+        directory => [ 'local', 'vendor', 't' ],
+[% IF no_index.namespaces %]        namespace => [[% FOREACH n IN no_index.namespaces %]'[% n %]',[% END %]],
+[% END %][% IF no_index.packages %]        package => [[% FOREACH p IN no_index.packages %]'[% p %]',[% END %]],
+[% END %]      },
+[% IF keywords %]      keywords => [[% FOREACH k IN keywords %]'[% k %]',[% END %]],
+[% END %]      resources => {
 [% IF homepage %]        homepage => q{[% homepage %]},
 [% END %][% IF github %]        repository => {
           type => 'git',

@@ -65,7 +65,7 @@ subtest 'strange instance with path, payload' => sub {
     isa_ok $req, 'HTTP::Request';
     is $req->method, 'POST', 'request method is "POST"';
     is $req->uri->path, '/foo', 'request path is "/foo"';
-    is_deeply {$req->uri->query_form}, {timeout => '', api_version => ''}, 'query params is timeout: null, api_version: null';
+    is_deeply {$req->uri->query_form}, {}, 'query params is timeout: null, api_version: null';
     is $req->header('Content-Type'), 'application/atom+xml;type=entry;charset=utf-8', 'Content-Type is "application/atom+xml;type=entry;charset=utf-8"'; 
     is $req->header('Authorization'), $hub->authorizer->token($req->uri->as_string), 'Authorization header is generated completely';
     is_deeply $hub->serializer->decode($req->content), $payload, 'Content is a payload data that encoded to JSON format';   

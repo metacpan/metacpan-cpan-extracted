@@ -1,0 +1,142 @@
+NAME
+    Mo::utils::Country - Mo country utilities.
+
+SYNOPSIS
+     use Mo::utils::Country qw(check_country_3166_1_alpha_2 check_country_3166_1_alpha_3);
+
+     check_country_3166_1_alpha_2($self, $key);
+     check_country_3166_1_alpha_3($self, $key);
+
+DESCRIPTION
+    Mo country utilities for checking of data objects.
+
+SUBROUTINES
+  "check_country_3166_1_alpha_2"
+     check_country_3166_1_alpha_2($self, $key);
+
+    Check parameter defined by $key if it's ISO 3166-1 alpha-2 country code
+    and if country code exists. Value could be undefined.
+
+    Returns undef.
+
+  "check_country_3166_1_alpha_3"
+     check_country_3166_1_alpha_3($self, $key);
+
+    Check parameter defined by $key if it's ISO 3166-1 alpha-3 country code
+    and if country code exists. Value could be undefined.
+
+    Returns undef.
+
+ERRORS
+     check_country_3166_1_alpha_2():
+             Parameter '%s' doesn't contain valid ISO 639-1 code.
+                     Codeset: %s
+                     Value: %s
+
+     check_country_3166_1_alpha_3():
+             Parameter '%s' doesn't contain valid ISO 639-2 code.
+                     Codeset: %s
+                     Value: %s
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Mo::utils::Country qw(check_country_3166_1_alpha_2);
+
+     my $self = {
+             'key' => 'cz',
+     };
+     check_country_3166_1_alpha_2($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Country qw(check_country_3166_1_alpha_2);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'xx',
+     };
+     check_country_3166_1_alpha_2($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' doesn't contain valid ISO 3166-1 alpha-2 code.
+
+EXAMPLE3
+     use strict;
+     use warnings;
+
+     use Mo::utils::Country qw(check_country_3166_1_alpha_3);
+
+     my $self = {
+             'key' => 'cze',
+     };
+     check_country_3166_1_alpha_3($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE4
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Country qw(check_country_3166_1_alpha_3);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'xxx',
+     };
+     check_country_3166_1_alpha_3($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' doesn't contain valid ISO 3166-2 alpha-3 code.
+
+DEPENDENCIES
+    Error::Pure, Exporter, List::Util, Locale::Country, Readonly.
+
+SEE ALSO
+    Mo  Micro Objects. Mo is less.
+
+    Mo::utils
+        Mo utilities.
+
+    Wikibase::Datatype::Utils
+        Wikibase datatype utilities.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Mo-utils-Country>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

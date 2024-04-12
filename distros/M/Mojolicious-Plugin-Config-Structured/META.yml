@@ -27,15 +27,18 @@ no_index:
 provides:
   Mojolicious::Plugin::Config::Structured:
     file: lib/Mojolicious/Plugin/Config/Structured.pm
-    version: '1.004'
+    version: '3.00'
+  Mojolicious::Plugin::Config::Structured::Command::config_dump:
+    file: lib/Mojolicious/Plugin/Config/Structured/Command/config_dump.pm
+    version: '3.00'
 requires:
-  Config::Structured: '2.006'
+  Config::Structured: '3.01'
   Mojolicious: '0'
-  perl: '5.022000'
+  perl: '5.026000'
 resources:
   bugtracker: https://github.com/tyrrminal/mojolicious-plugin-config-structured/issues
   repository: https://github.com/tyrrminal/mojolicious-plugin-config-structured.git
-version: '1.004'
+version: '3.00'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: MIT

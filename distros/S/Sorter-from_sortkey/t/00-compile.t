@@ -6,10 +6,10 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2;
+plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'ExtUtils/HasCompiler.pm'
+    'Sorter/from_sortkey.pm'
 );
 
 
@@ -55,6 +55,6 @@ for my $lib (@module_files)
 
 
 is(scalar(@warnings), 0, 'no warnings found')
-    or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) );
+    or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) ) if $ENV{AUTHOR_TESTING};
 
 

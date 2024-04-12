@@ -4,19 +4,28 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-02-21'; # DATE
+our $DATE = '2024-04-12'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240221.0'; # VERSION
+our $VERSION = '20240412.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
-    'BRIANDFOY' => '',
+    'CORION' => '',
     'SKIM' => '',
-    'ASB' => '',
-    'JANW' => '',
-    'RAWLEYFOW' => '',
-    'ZMUGHAL' => '',
+    'DAVECROSS' => '',
+    'DJERIUS' => '',
+    'LNATION' => '',
+    'MATHIAS' => '',
+    'MYSOCIETY' => '',
+    'PHILIPPE' => '',
     'TYRRMINAL' => '',
+    'UTASHIRO' => '',
+    'ARISTOTLE' => '',
+    'BRIANDFOY' => '',
+    'GBROWN' => '',
+    'ISHIGAKI' => '',
+    'JMATES' => '',
+    'LEONT' => '',
 );
 
 
@@ -35,25 +44,34 @@ Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions::Current - Authors with on
 
 =head1 VERSION
 
-This document describes version 20240221.0 of Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-21.
+This document describes version 20240412.0 of Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-04-12.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-02-21, produced by L<cpan-streaks>):
+Current standings (as of 2024-04-12, produced by L<cpan-streaks>):
 
   +-----------+-----+------------+-------------+
   | author    | len | start_date | status      |
   +-----------+-----+------------+-------------+
-  | PERLANCAR | 496 | 2014-08-24 | ongoing     |
-  | BRIANDFOY |   2 | 2024-02-04 | might-break |
-  | SKIM      |   2 | 2024-02-04 | might-break |
-  | ASB       |   1 | 2024-02-11 | might-break |
-  | JANW      |   1 | 2024-02-11 | might-break |
-  | RAWLEYFOW |   1 | 2024-02-11 | might-break |
-  | ZMUGHAL   |   1 | 2024-02-11 | might-break |
-  | TYRRMINAL |   1 | 2024-02-18 | ongoing     |
+  | PERLANCAR | 503 | 2014-08-24 | ongoing     |
+  | CORION    |   2 | 2024-03-24 | might-break |
+  | SKIM      |   2 | 2024-03-31 | ongoing     |
+  | DAVECROSS |   1 | 2024-03-31 | might-break |
+  | DJERIUS   |   1 | 2024-03-31 | might-break |
+  | LNATION   |   1 | 2024-03-31 | might-break |
+  | MATHIAS   |   1 | 2024-03-31 | might-break |
+  | MYSOCIETY |   1 | 2024-03-31 | might-break |
+  | PHILIPPE  |   1 | 2024-03-31 | might-break |
+  | TYRRMINAL |   1 | 2024-03-31 | might-break |
+  | UTASHIRO  |   1 | 2024-03-31 | might-break |
+  | ARISTOTLE |   1 | 2024-04-07 | ongoing     |
+  | BRIANDFOY |   1 | 2024-04-07 | ongoing     |
+  | GBROWN    |   1 | 2024-04-07 | ongoing     |
+  | ISHIGAKI  |   1 | 2024-04-07 | ongoing     |
+  | JMATES    |   1 | 2024-04-07 | ongoing     |
+  | LEONT     |   1 | 2024-04-07 | ongoing     |
   +-----------+-----+------------+-------------+
 
 =head1 HOMEPAGE

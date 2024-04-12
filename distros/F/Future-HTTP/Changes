@@ -1,3 +1,8 @@
+0.17 2024-04-11
+    * Require Perl 5.020
+    * Move prerequisites and used modules to versions that work
+      with Future::XS (diagnosed by CPAN testers)
+
 0.16 2023-07-21
     * Update test suite to use Package->VERSION() for version checks, not
       Package->import('1.23')

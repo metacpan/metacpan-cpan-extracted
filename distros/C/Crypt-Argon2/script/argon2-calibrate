@@ -76,7 +76,7 @@ argon2-calibrate - a script to find the appropriate argon2 parameters
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 

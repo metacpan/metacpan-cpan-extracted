@@ -4,16 +4,20 @@ use Module::Build 0.3604;
 
 use File::Spec;
 use ExtUtils::CBuilder;
+
+my $arch = $ENV{CRYPT_ARGON2_ARCH} || 'native';
+my @flags = $arch eq 'NONE' ? () : ( "-march=$arch" );
+
 my $cbuilder = ExtUtils::CBuilder->new;
 my %opt_args = (
 	source               => 'opt/opt.c',
 	object_file          => File::Spec->devnull,
 	include_dirs         => [ 'include', 'src' ],
-	extra_compiler_flags => [ '-march=native' ],
+	@flags ? (extra_compiler_flags => \@flags ) : (),
 );
 
 my $optimized = $ENV{PERL5_CPAN_IS_RUNNING} && eval { $cbuilder->compile(%opt_args) };
-my ($dir, $compiler_flags, $linker_flags) = $optimized ? ('opt', ['-march=native']) : ('ref');
+my ($dir, $compiler_flags, $linker_flags) = $optimized ? ('opt', \@flags) : ('ref');
 
 if ($^O ne 'MSWin32') {
 	unshift @{ $compiler_flags }, '-pthread';

@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-02-21'; # DATE
+our $DATE = '2024-04-12'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240221.0'; # VERSION
+our $VERSION = '20240412.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
@@ -34,17 +34,18 @@ Acme::CPANAuthors::CPAN::Streaks::DailyDistributions::AllTime - Authors with all
 
 =head1 VERSION
 
-This document describes version 20240221.0 of Acme::CPANAuthors::CPAN::Streaks::DailyDistributions::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-21.
+This document describes version 20240412.0 of Acme::CPANAuthors::CPAN::Streaks::DailyDistributions::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-04-12.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-02-21, produced by L<cpan-streaks>, only streaks with length of at least 6 are included):
+Current standings (as of 2024-04-12, produced by L<cpan-streaks>, only streaks with length of at least 6 are included):
 
   +-----------+-----+------------+------------+--------+
   | author    | len | start_date | end_date   | status |
   +-----------+-----+------------+------------+--------+
+  | PERLANCAR |  40 | 2024-02-27 | 2024-04-06 | broken |
   | PERLANCAR |  39 | 2024-01-09 | 2024-02-16 | broken |
   | ZOFFIX    |  23 | 2008-03-05 | 2008-03-27 | broken |
   | CSSON     |  16 | 2014-12-31 | 2015-01-15 | broken |

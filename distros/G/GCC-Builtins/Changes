@@ -15,3 +15,7 @@ Revision history for GCC-Builtins
 
 0.04    2024/03/20 - 22:00
         There are now 36 GCC Builtins functions exported and readily available to Perl.
+
+0.05    2024/04/12 - 13:00
+        Changed the test files > 666-*.t so that it attempts to detect if expected result is a number. If it is, then expected and returned results are checked on their abs difference being less than a small number, instead of comparing their equality.
+
