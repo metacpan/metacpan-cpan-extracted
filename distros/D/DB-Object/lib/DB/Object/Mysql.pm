@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql.pm
-## Version v1.1.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v1.1.1
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/03/16
+## Modified 2024/04/11
 ## All rights reserved
 ## 
 ## 
@@ -262,7 +262,7 @@ BEGIN
     };
     # DBI->trace(5);
     our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
-    our $VERSION = 'v1.1.0';
+    our $VERSION = 'v1.1.1';
     use Devel::Confess;
 };
 
@@ -420,8 +420,8 @@ sub connect
 {
     my $that   = shift( @_ );
     my $param = $that->_connection_params2hash( @_ ) || return;
-    $param->{ 'driver' } = 'mysql';
-    $param->{ 'port' } = 3306 if( !length( $param->{ 'port' } ) );
+    $param->{driver} = 'mysql';
+    $param->{port} = 3306 if( !length( $param->{port} ) );
     return( $that->SUPER::connect( $param ) );
 }
 
@@ -676,7 +676,7 @@ sub tables
     $sth->execute();
     my $ref  = $sth->fetchall_arrayref();
     $sth->finish;
-    my @tables = map{ $_->[ 0 ] } @$ref;
+    my @tables = map{ $_->[0] } @$ref;
     return( \@tables );
 }
 
@@ -685,7 +685,15 @@ sub tables_info
     my $self = shift( @_ );
     my $db   = shift( @_ ) || $self->{database};
     my @tables = ();
-    my $query = "SELECT * FROM information_schema.tables WHERE table_schema=?";
+    my $query = <<EOT;
+SELECT
+   *
+  ,table_schema AS "database"
+  ,table_name AS "name"
+  ,table_type AS "type"
+FROM information_schema.tables
+WHERE table_schema=?
+EOT
     my $sth = $self->{dbh}->prepare_cached( $query ) || return( $self->error( sprintf( "Error while preparing query $query: %s", $self->{dbh}->errstr ) ) );
     $sth->execute( $db ) || return( $self->error( sprintf( "Error while executing query $query: %s", $sth->errstr ) ) );
     my $all = $sth->fetchall_arrayref( {} );
@@ -934,7 +942,7 @@ DB::Object::Mysql - Mysql Database Object
     
 =head1 VERSION
 
-    v1.1.0
+    v1.1.1
 
 =head1 DESCRIPTION
 
@@ -1623,17 +1631,13 @@ Information retrieved from the MySQL system tables for every table found in the 
 
 The object name
 
-=item * C<owner>
+=item * C<database>
 
-The object owner (role)
-
-=item * C<schema>
-
-Database schema, if any.
+Database name.
 
 =item * C<type>
 
-The object type, which may be one of: C<table>, C<view>, C<materialized view>, C<special>, C<foreign table>
+The object type, which may be one of: C<base table>, C<view>
 
 =back
 

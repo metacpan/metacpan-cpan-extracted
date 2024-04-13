@@ -21,7 +21,7 @@ use Travel::Status::DE::HAFAS::Polyline qw(decode_polyline);
 use Travel::Status::DE::HAFAS::Product;
 use Travel::Status::DE::HAFAS::StopFinder;
 
-our $VERSION = '6.01';
+our $VERSION = '6.02';
 
 # {{{ Endpoint Definition
 
@@ -1104,14 +1104,23 @@ sub station {
 
 	my %prefc_by_loc;
 
-	for my $i ( 0 .. $#locL ) {
-		my $loc = $locL[$i];
-		if ( $loc->{pRefL} ) {
-			$prefc_by_loc{$i} = $#{ $loc->{pRefL} };
+	if ( $self->{active_service} and $self->{active_service} eq 'ÖBB' ) {
+		for my $jny ( @{ $self->{raw_json}{svcResL}[0]{res}{jnyL} // [] } ) {
+			if ( defined $jny->{stbStop}{locX} ) {
+				$prefc_by_loc{ $jny->{stbStop}{locX} } += 1;
+			}
+		}
+	}
+	else {
+		for my $i ( 0 .. $#locL ) {
+			my $loc = $locL[$i];
+			if ( $loc->{pRefL} ) {
+				$prefc_by_loc{$i} = $#{ $loc->{pRefL} };
+			}
 		}
 	}
 
-	my @prefcounts = sort { $b->[0] <=> $a->[0] }
+	my @prefcounts = sort { $b->[1] <=> $a->[1] }
 	  map { [ $_, $prefc_by_loc{$_} ] } keys %prefc_by_loc;
 
 	if ( not @prefcounts ) {
@@ -1216,7 +1225,7 @@ monitors
 
 =head1 VERSION
 
-version 6.01
+version 6.02
 
 =head1 DESCRIPTION
 

@@ -25,6 +25,7 @@ no_index:
     - t
     - xt
 requires:
+  DateTime::Duration: 0
   DateTime::TimeZone: 0
   Error::Pure: 0.15
   Exporter: 0
@@ -35,4 +36,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Mo-utils-TimeZone
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Mo-utils-TimeZone
-version: '0.02'
+version: '0.03'

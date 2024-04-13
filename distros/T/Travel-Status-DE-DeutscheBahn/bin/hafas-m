@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '6.01';
+our $VERSION = '6.02';
 
 use utf8;
 use DateTime;
@@ -16,6 +16,7 @@ use Travel::Status::DE::HAFAS;
 
 my ( $date, $time, $language );
 my $arrivals;
+my $show_jid;
 my $types = q{};
 my $developer_mode;
 my $via;
@@ -37,6 +38,7 @@ GetOptions(
 	'a|arrivals'   => \$arrivals,
 	'd|date=s'     => \$date,
 	'h|help'       => sub { show_help(0) },
+	'j|with-jid'   => \$show_jid,
 	'l|language=s' => \$language,
 	'm|mot=s'      => \$types,
 	's|service=s'  => \$service,
@@ -611,6 +613,10 @@ for my $d (@results) {
 		  . $info_line;
 	}
 
+	if ($show_jid) {
+		$info_line = $d->id . '  ' . $info_line;
+	}
+
 	my $entry = [
 		  ( $d->is_cancelled ? '--:--' : $d->datetime->strftime('%H:%M') )
 		. ( $d->tz_offset    ? q{*}    : ( q{ } x $offset_len ) ),
@@ -666,8 +672,8 @@ hafas-m - Interface to the DeutscheBahn/HAFAS online departure monitor
 
 =head1 SYNOPSIS
 
-B<hafas-m> [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
-[B<-s> I<service>] [B<-l> I<language>] I<station>
+B<hafas-m> [B<-a>] [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
+[B<-v> I<via>] [B<-s> I<service>] [B<-l> I<language>] I<station>
 
 B<hafas-m> [B<-s> I<service>] B<?>I<query>|I<lat>B<:>I<lon>
 
@@ -675,7 +681,7 @@ B<hafas-m> [B<-s> I<service>] [B<-l> I<language>] B<!>I<query>|I<journeyID>
 
 =head1 VERSION
 
-version 6.01
+version 6.02
 
 =head1 DESCRIPTION
 
@@ -688,26 +694,28 @@ It has four operating modes that depend on the contents of its argument.
 
 Show departures (or arrivals) at I<station>, optionally filtered by mode of
 transport. I<station> may be given as a station name or HAFAS station ID.
+For each train, B<hafas-m> shows
 
 =over
 
-=item * estimated departure (or arrival) time
+=item * estimated departure (or arrival) time,
 
-=item * delay, if known
+=item * delay, if known,
 
-=item * trip name, number, or line
+=item * trip name, number, or line,
 
-=item * direction / destination
+=item * direction / destination,
 
-=item * platform, if known (B<!> indicates a platform change)
+=item * platform, if known (B<!> indicates a platform change), and
 
-=item * expected occupancy of first and second class, if known
+=item * expected occupancy of first and second class, if known.
 
 =back
 
-Departure/arrival times are marked with a C<< * >> if they differ from local
-time.  Occupancy indicators are, from least occupied to fully booked: B<.> B<o>
-B<*> B<!>.
+Times are always given in the selected service's default time zone (see
+B<--list>). Times that differ from the queried stop's local time are marked
+with C<< * >>. Occupancy indicators are, from least occupied to fully booked:
+B<.> B<o> B<*> B<!>.
 
 =head2 Location Search (B<?>I<query>|I<lat>B<:>I<lon>)
 
@@ -742,6 +750,11 @@ the end station.
 =item B<-d>, B<--date> I<dd>.I<mm>.[I<yyyy>]
 
 Date to list departures for.  Default: today.
+
+=item B<-j>, B<--with-jid>
+
+Show journey IDs in arrival/departure board. These can be used to obtain
+details on individual journeys with subsequent B<hafas-m> invocations.
 
 =item B<--json>
 

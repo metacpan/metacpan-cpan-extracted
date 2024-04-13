@@ -1,3 +1,11 @@
+2024-04-12  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.027
+
+        * Fixed return code logic
+
+	* Updated Copyright
+
 2023-05-25  Brian M. Kelly  <Brian.Kelly@fullauto.com>
 
         * Version 3.026

@@ -15,6 +15,7 @@ lib/Travel/Status/DE/HAFAS/Product.pm
 lib/Travel/Status/DE/HAFAS/Stop.pm
 lib/Travel/Status/DE/HAFAS/StopFinder.pm
 MANIFEST			This list of files
+META.json
 README.md
 scripts/check-hafas-urls
 scripts/makedeb-docker
@@ -40,5 +41,4 @@ xt/00-compile-pm.t
 xt/01-compile-pl.t
 xt/10-pod-coverage.t
 META.yml
-META.json
 SIGNATURE    Added here by Module::Build

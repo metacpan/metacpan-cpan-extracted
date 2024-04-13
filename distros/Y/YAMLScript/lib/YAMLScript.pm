@@ -10,9 +10,9 @@ use FFI::CheckLib ();
 use FFI::Platypus;
 use Cpanel::JSON::XS ();
 
-our $VERSION = '0.1.54';
+our $VERSION = '0.1.55';
 
-our $libyamlscript_version = '0.1.54';
+our $libyamlscript_version = '0.1.55';
 
 
 #------------------------------------------------------------------------------
@@ -122,7 +122,7 @@ sub find_libyamlscript {
 
     die <<"..."
 Shared library file $name not found
-Try: curl -sSL yamlscript.org/install | VERSION=$vers LIB=1 bash
+Try: curl https://yamlscript.org/install | VERSION=$vers LIB=1 bash
 See: https://github.com/yaml/yamlscript/wiki/Installing-YAMLScript
 ...
 }

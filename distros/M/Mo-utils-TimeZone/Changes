@@ -1,3 +1,6 @@
+0.03 2024-04-12T15:17:08+02:00
+ - Fix failing tests because missing DateTime::Duration.
+
 0.02 2024-04-04T09:53:49+02:00
  - Generate examples.
  - Rewrite to use of is_valid_name() method. Added support for timezones

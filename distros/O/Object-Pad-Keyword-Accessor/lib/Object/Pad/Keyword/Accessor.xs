@@ -184,9 +184,10 @@ static void anonmethod_set_start(pTHX_ void *hookdata)
   if(lex_read_unichar(0) != '$')
     croak("Expected a scalar lexical name");
 
-  if(!isIDFIRST_uni(lex_read_unichar(0)))
+  U32 c;
+  if(!(c = lex_read_unichar(0)) || !isIDFIRST_uni(c))
     croak("Expected a scalar lexical name");
-  while(isIDCONT_uni(lex_peek_unichar(0)))
+  while((c = lex_peek_unichar(0)) && isIDCONT_uni(c))
     lex_read_unichar(0);
 
   STRLEN namelen = PL_parser->bufptr - name;

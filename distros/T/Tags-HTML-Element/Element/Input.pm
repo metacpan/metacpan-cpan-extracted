@@ -9,7 +9,7 @@ use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 use Tags::HTML::Element::Utils qw(tags_boolean tags_label tags_value);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 sub _cleanup {
 	my $self = shift;
@@ -59,6 +59,7 @@ sub _process {
 		tags_boolean($self, $self->{'_input'}, 'disabled'),
 		tags_value($self, $self->{'_input'}, 'min'),
 		tags_value($self, $self->{'_input'}, 'max'),
+		tags_value($self, $self->{'_input'}, 'step'),
 		tags_value($self, $self->{'_input'}, 'onclick'),
 		['e', 'input'],
 	);
@@ -341,6 +342,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

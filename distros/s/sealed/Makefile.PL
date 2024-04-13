@@ -8,7 +8,6 @@ WriteMakefile(
         LICENSE => "apache_2_0",
         PREREQ_PM => {
           'B::Generate' => 0,
-          'Lexical::Types' => 0,
         },
         test => { TESTS => "t/*.pl" },
         SIGN => 1,

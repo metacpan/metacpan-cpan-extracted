@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v1.3.0
+## Version v1.4.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/04/09
+## Modified 2024/04/13
 ## All rights reserved
 ## 
 ## 
@@ -35,7 +35,7 @@ BEGIN
     use POSIX ();
     use Want;
     our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
-    our $VERSION = 'v1.3.0';
+    our $VERSION = 'v1.4.0';
     use Devel::Confess;
 };
 
@@ -1589,12 +1589,13 @@ sub _connection_parameters
 sub _connection_params2hash
 {
     my $self = shift( @_ );
+    my $argv = [@_];
     my $param = {};
     if( !( @_ % 2 ) )
     {
         $param = { @_ };
     }
-    elsif( @_ == 1 && ref( $_[0] ) eq 'HASH' )
+    elsif( @_ == 1 && ( ref( $_[0] ) // '' ) eq 'HASH' )
     {
         $param = shift( @_ );
     }
@@ -1624,7 +1625,7 @@ sub _connection_params2hash
     }
     
     # A simple json file
-    # An URI coul be http://localhost:5432?database=somedb etc...
+    # An URI could be http://localhost:5432?database=somedb etc...
     # or it could also be file:/foo/bar?opt={"RaiseError":true}
     if( $param->{uri} || $ENV{DB_CON_URI} )
     {
@@ -1701,6 +1702,8 @@ sub _connection_params2hash
         }
         
         my $json = {};
+        # try-catch
+        local $@;
         eval
         {
             require JSON;
@@ -1714,7 +1717,7 @@ sub _connection_params2hash
                 }
                 else
                 {
-                    warn( "Unable to open database connection parameter file \"$db_con_file\": $!\n" );
+                    warn( "Unable to open database connection parameter file \"$db_con_file\": ", $db_con_file->error );
                 }
             }
         };
@@ -1739,7 +1742,8 @@ sub _connection_params2hash
                 }
                 elsif( $param->{database} && $this->{database} eq $param->{database} &&
                     ( !$param->{host} || $param->{host} eq $this->{host} ) && 
-                    ( !$param->{port} || $param->{port} eq $this->{port} ) )
+                    ( !$param->{port} || $param->{port} eq $this->{port} ) &&
+                    ( !$param->{login} || $param->{login} eq $this->{login} ) )
                 {
                     $ref = $this;
                     last;
@@ -1818,28 +1822,69 @@ sub _dbi_connect
     my $dbh;
     my $dsn = $self->_dsn;
     # print( STDERR ref( $self ) . "::_dbi_connect() Options are: ", $self->dumper( $self->{opt} ), "\n" );
-    if( $self->{cache_connections} )
+    # See: <https://metacpan.org/pod/DBI#Timeout>
+    # signals to mask in the handler
+    my $mask = POSIX::SigSet->new( POSIX::SIGALRM );
+    my $action = POSIX::SigAction->new(
+        # the handler code ref
+        sub{ die( "connect timeout\n" ) },
+        $mask,
+        # not using (perl 5.8.2 and later) 'safe' switch or sa_flags
+    );
+    my $oldaction = POSIX::SigAction->new();
+    POSIX::sigaction( POSIX::SIGALRM, $action, $oldaction );
+    my $failed;
+    local $@;
+    eval
     {
-        $dbh = DBI->connect_cached(
-            $dsn,
-            $self->{login},
-            $self->{passwd}, 
-            $self->{opt},
-            undef(),
-            $CONNECT_VIA,
-        );
-    }
-    else
+        eval
+        {
+            # seconds before time out
+            alarm(5);
+            if( $self->{cache_connections} )
+            {
+                $dbh = DBI->connect_cached(
+                    $dsn,
+                    $self->{login},
+                    $self->{passwd}, 
+                    $self->{opt},
+                    undef(),
+                    $CONNECT_VIA,
+                );
+            }
+            else
+            {
+                $dbh = DBI->connect(
+                    $dsn,
+                    $self->{login},
+                    $self->{passwd}, 
+                    $self->{opt},
+                    undef(),
+                    $CONNECT_VIA,
+                );
+            }
+            1;
+        } or $failed = 1;
+        # cancel alarm (if connect worked fast)
+        alarm(0);
+        # connect died
+        die( "$@\n" ) if( $failed );
+        1;
+    } or $failed = 1;
+    # restore original signal handler
+    POSIX::sigaction( POSIX::SIGALRM, $oldaction );
+    if( defined( $failed ) && $failed )
     {
-        $dbh = DBI->connect(
-            $dsn,
-            $self->{login},
-            $self->{passwd}, 
-            $self->{opt},
-            undef(),
-            $CONNECT_VIA,
-        );
+        if( defined( $@ ) && $@ =~ /^connect timeout/ )
+        {
+            return( $self->error( "Connection timed out for dsn '", ( $dsn // 'undef' ), " and login '", ( $self->{login} // 'undef' ), "'" ) );
+        }
+        else
+        {
+            return( $self->error( "Error connecting with dsn '", ( $dsn // 'undef' ), " and login '", ( $self->{login} // 'undef' ), "': $@" ) );
+        }
     }
+
     return( $self->error( $DBI::errstr ) ) if( !$dbh );
     return( $dbh );
 }
@@ -2724,7 +2769,7 @@ Because the L<fields objects|DB::Object::Fields::Field> are overloaded, instead 
 
 =head1 VERSION
 
-    v1.3.0
+    v1.4.0
 
 =head1 DESCRIPTION
 

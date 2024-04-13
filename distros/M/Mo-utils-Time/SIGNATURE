@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 7220d84b3a2060abb60c063a2ce6a2b6cacae2a0ad89f933689dd2155f837a79 Changes
+SHA256 e9721661dbfb60dadebf3cd197cbc00239895aa73fb3431e19490cfad301cf99 LICENSE
+SHA256 f64cc6dcef87c2e9ddc0b619c1903a8828c301588fb9c09a1a8d97a39dba0dcd MANIFEST
+SHA256 78829a7f9788da9db1340d3984e674e31819d90f737cc901a25a0c53939baa52 META.yml
+SHA256 4f81c7e723bac7965d54fa57cba7ff4951ca63bc34bd5646b33e6b0719d1d69c Makefile.PL
+SHA256 0a45852e12898bc3dc1c0c55365c40710f0b014b8fc2638049ed84bd36f7e7b2 README
+SHA256 4bf2e9339f90335f36d48f5569c021251c3c395d48a3c6b82ecba4ee609eebeb Time.pm
+SHA256 476af38783491ed78498b4bb3adde4effb0ff49073833bcdcd216743140bdcda examples/check_time_24hhmm_fail.pl
+SHA256 93c7955c137bd77f11cb3a80183cf285dcddd42bfd7d98a10304aadde06fb054 examples/check_time_24hhmm_ok.pl
+SHA256 57bf9c4b83bc3add8d7777224ebb740e50a0ad4ee603920b48428752de610f35 examples/check_time_24hhmmss_fail.pl
+SHA256 83bb0cb233296ec7b9f35e2a7b6278a8f5ddef18a266e1efe2cd9f5dab54542f examples/check_time_24hhmmss_ok.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 c67eedf5a0a5e67ade6accc71aa1e32ea3266bb16c910d757ea1f90023e283db t/Mo-utils-Time/01-use.t
+SHA256 16369e6770cf4ffc8bbd62e6540ea8d1f5b845e88619089d240c9a4c4dae8370 t/Mo-utils-Time/02-version.t
+SHA256 9b9e9586660f84c5f7c8c75201b3f4d98abe2f9335ad5769cd3a1e4fdc0eca8e t/Mo-utils-Time/03-check_time_24hhmm.t
+SHA256 4ca14b4ec65239e65be2373f96c3fbc9f05655769f994d66c0723375c29f22ed t/Mo-utils-Time/04-check_time_24hhmmss.t
+SHA256 7247acd21095bd655dad56ea4e48a0d4117850770b0f25170885c3f343dd2337 xt/Mo-utils-Time/01-pod_coverage.t
+SHA256 abbc90ce50269845e5109d633ea15bdd35abef3f772744d0943ba021cde43f32 xt/Mo-utils-Time/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEbhzVZugfHqSVNvE7YSp92FNcjtAFAmYZRKgACgkQYSp92FNc
+jtA+5QwAno+O+4nlw8VbCmUgIkEV0aKcnNT/Q6K0dTRosKXvx7eJHtjj5DNCrze/
+tCONAznmvx8yeU5auPocu5Zhj6vHZ8GgbcCgrtcigrV0IEoEfChT5gKLTvmW5G/l
+S0lnsZnFNxVBnLoacrzDd4SLlN+RIRXzzl2s/Hwdmt/RRB03PfwcrgjJ9jWpkegg
+ZB3gEe+B/RQynnfk4ReZOk644Pv880g1+qgsdDmz/uJyg8rlRkRsEQMUtWLUFaFe
+KOx4n2T9bdACKltob+pgl0MRk5Nixow6zZAh8r7sw572cEfvWtEwmxksZn6s4NSi
+L6Gv99vLHDdj2mmb4YZROmq/h3ySyxn4SReP9SdEw2k439+b7t6cPYECsfEl1/52
+HqjO47QWSNVu2vdD/lzkRY64BV/vx2kq0c9DQhEXy7W96srb8Ac5UHvL1Qpxa9Mt
+Q12XgNHIysVZX0ehX/aAlnF/dlY1uj8/aw8aIhqZVMCpTnKDgfA5NWzIpyxW68SD
+NePpkn0K
+=AVb7
+-----END PGP SIGNATURE-----

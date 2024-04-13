@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad::Keyword::Accessor 0.02;
+package Object::Pad::Keyword::Accessor 0.03;
 
 use v5.14;
 use warnings;

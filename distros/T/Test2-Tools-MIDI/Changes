@@ -1,4 +1,8 @@
 Revision history for Test2::Tools::MIDI. See also the git repository.
 
+0.02    2024-04-13
+        Add more MIDI event test functions. Break the midi_track
+        interface a bit. Improve the documentation.
+
 0.01    2024-04-09
         First version, released on an unsuspecting world.

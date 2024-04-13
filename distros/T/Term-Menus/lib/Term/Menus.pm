@@ -2,7 +2,7 @@ package Term::Menus;
 
 #    Menus.pm
 #
-#    Copyright (C) 2000-2023
+#    Copyright (C) 2000-2024
 #
 #    by Brian M. Kelly. <Brian.Kelly@fullautosoftware.net>
 #
@@ -15,7 +15,7 @@ package Term::Menus;
 ## See user documentation at the end of this file.  Search for =head
 
 
-our $VERSION = '3.026';
+our $VERSION = '3.027';
 
 
 use 5.006;
@@ -1201,7 +1201,8 @@ sub fa_login
       $errr=~s/^\s*/\n       /s;
       print $errr;
    }
-   &Net::FullAuto::FA_Core::cleanup(0,$returned);
+   &Net::FullAuto::FA_Core::cleanup(1,$returned) if $returned;
+   &Net::FullAuto::FA_Core::cleanup(0,'');
 
 }
 
@@ -9037,7 +9038,7 @@ Brian M. Kelly <Brian.Kelly@fullautosoftware.net>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2000-2023
+Copyright (C) 2000-2024
 by Brian M. Kelly.
 
 This program is free software; you can redistribute it and/or

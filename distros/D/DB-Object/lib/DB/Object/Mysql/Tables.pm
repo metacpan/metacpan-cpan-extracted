@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql/Tables.pm
-## Version v1.0.0
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Version v1.0.1
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/11/17
+## Modified 2024/04/11
 ## All rights reserved
 ## 
 ## 
@@ -70,7 +70,7 @@ BEGIN
     qr/^(json)\b/                       => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'json' },
     };
     our $DEBUG = 0;
-    our $VERSION = 'v1.0.0';
+    our $VERSION = 'v1.0.1';
 };
 
 use strict;
@@ -470,18 +470,32 @@ sub structure
     my $sth1 = $self->prepare_cached( "SELECT * FROM information_schema.tables WHERE table_name = ?" ) ||
         return( $self->error( "An error occured while preparing the sql query to get the details of table \"$table\": ", $self->errstr() ) );
     $sth1->execute( $table ) ||
-        return( $self->error( "An erro occured while executing the sql query to get the details of table \"$table\": ", $sth1->errstr() ) );
+        return( $self->error( "An error occured while executing the sql query to get the details of table \"$table\": ", $sth1->errstr() ) );
     my $def = $sth1->fetchrow_hashref;
     $sth1->finish;
-    $self->{type} = lc( $def->{table_type} );
-    $self->{type} = 'table' if( $self->{type} eq 'base table' );
+    if( scalar( keys( %$def ) ) )
+    {
+        # Ensure all fields are in lower case.
+        foreach my $k ( keys( %$def ) )
+        {
+            # For example: AUTO_INCREMENT -> auto_increment
+            $def->{ lc( $k ) } = CORE::delete( $def->{ $k } );
+        }
+        $self->{type} = lc( $def->{table_type} );
+        $self->{type} = 'table' if( $self->{type} eq 'base table' );
+    }
+    else
+    {
+        warn( "No information found for table ${table}\n" ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
+    }
+    # <https://dev.mysql.com/doc/refman/8.0/en/information-schema-columns-table.html>
     my $query = <<EOT;
 SELECT
    a.column_name AS "field"
   ,a.ordinal_position AS "field_num"
   ,a.column_default AS "default"
   ,a.*
-FROM information_schema.columns
+FROM information_schema.columns a
 WHERE table_name = ?
 ORDER BY a.ordinal_position
 EOT
@@ -496,12 +510,22 @@ EOT
     my $c   = 0;
     while( $ref = $sth->fetchrow_hashref() )
     {
+        # Ensure all fields are in lower case.
+        foreach my $k ( keys( %$ref ) )
+        {
+            # For example: ORDINAL_POSITION -> ordinal_position
+            $ref->{ lc( $k ) } = CORE::delete( $ref->{ $k } );
+        }
         $self->messagec( 6, "Checking table ${table} field {green}", $ref->{field}, "{/} with type {green}", $ref->{type}, "{/}" );
         my $def =
         {
         name            => $ref->{field},
+        ( CORE::length( $ref->{column_comment} // '' ) ? ( comment => $ref->{column_comment} ) : () ),
         default         => $ref->{column_default},
-        is_nullable     => ( $ref->{is_nullable} ? 1 : 0 ),
+        # Damn MySQL not using boolean
+        is_nullable     => ( $ref->{is_nullable} eq 'YES' ? 1 : 0 ),
+        is_primary      => ( ( $ref->{column_key} // '' ) eq 'PRI' ? 1 : 0 ),
+        is_unique       => ( ( $ref->{column_key} // '' ) eq 'UNI' ? 1 : 0 ),
         pos             => $ref->{field_num},
         # query_object    => $q,
         size            => $ref->{character_maximum_length},
@@ -536,9 +560,34 @@ EOT
         $self->messagec( 6, "\tField {green}", $def->{name}, "{/} has type {green}", $def->{type}, "{/} and dictionary -> ", sub{ $self->Module::Generic::dump( $def ) } );
         $def->{query_object} = $q;
         $def->{table_object} = $self;
-        my @define = ( $def->{type} );
-        push( @define, "DEFAULT '$def->{default}'" ) if( defined( $def->{default} ) && length( $def->{default} // '' ) );
+        # The information schema field 'column_type' provides already what is needed, such as 'varchar(255)'
+        my @define = ( $ref->{column_type} );
         push( @define, "NOT NULL" ) if( !$def->{is_nullable} );
+        # <https://stackoverflow.com/questions/68639745/how-to-get-a-default-column-value-from-mysql-5-7-information-schema-columns-with>
+        if( defined( $def->{default} ) )
+        {
+            my $value;
+            if( ( $ref->{data_type} eq 'datetime' || $ref->{data_type} eq 'timestamp' ) &&
+                $def->{default} eq 'CURRENT_TIMESTAMP' )
+            {
+                $value = 'CURRENT_TIMESTAMP';
+            }
+            elsif( !length( $def->{default} // '' ) )
+            {
+                $value = "''";
+            }
+            else
+            {
+                $value = $self->database_object->quote( $def->{default}, ( CORE::length( $def->{datatype}->{constant} // '' ) ? $def->{datatype}->{constant} : () ) );
+            }
+            push( @define, "DEFAULT ${value}" );
+        }
+        push( @define, 'AUTO_INCREMENT' ) if( lc( $ref->{extra} // '' ) eq 'auto_increment' );
+        if( defined( $ref->{extra} ) &&
+            $ref->{extra} =~ /^DEFAULT_GENERATED[[:blank:]]+(ON[[:blank:]]+UPDATE[[:blank:]]+.*)$/i )
+        {
+            push( @define, $1 );
+        }
         push( @primary, $def->{name} ) if( $ref->{column_key} eq 'PRI' );
         $struct->{ $def->{name} } = CORE::join( ' ', @define );
         my $field = DB::Object::Fields::Field->new( %$def, debug => $self->debug ) ||
@@ -602,7 +651,7 @@ DB::Object::Mysql::Tables - MySQL Table Object
 
 =head1 VERSION
 
-    v1.0.0
+    v1.0.1
 
 =head1 DESCRIPTION
 

@@ -4,9 +4,10 @@ use strict;
 use warnings;
 use feature 'say';
 
+use JSON;
 use Path::Tiny;
+use File::HomeDir;
 
-use Finance::Dogecoin::Utils;
 use Finance::Dogecoin::Utils::NodeRPC;
 use Finance::Dogecoin::Utils::ProxyActions;
 
@@ -15,24 +16,41 @@ exit main( @ARGV );
 sub main {
     my ($action, @args)  = @_;
 
-    my $conf_dir     = get_conf_dir();
+    my $conf_dir     = path(File::HomeDir->my_data)->child('dogeutils')->mkdir;
+
+    if ($action =~ /^--(.+)$/) {
+        if (my $func = __PACKAGE__->can( $1 )) {
+            return $func->( $conf_dir, @args );
+        }
+    }
 
     my $address_file = $conf_dir->child( 'addressLabels.json' );
-    my $auth_file    = get_auth_file();
+    my $auth_file    = $conf_dir->child( 'auth.json' );
 
     my $rpc     = Finance::Dogecoin::Utils::NodeRPC->new( user => $ENV{DOGEUTILS_USER}, auth_file => $auth_file );
-    my $actions = Finance::Dogecoin::Utils::ProxyActions->new(
-        rpc          => $rpc,
-        address_file => $address_file,
-        conf_dir     => get_dogecoin_conf_dir(),
-    );
+    my $actions = Finance::Dogecoin::Utils::ProxyActions->new( rpc => $rpc, address_file => $address_file );
 
     if (my $action_method = $actions->can( $action )) {
-        return !! $actions->$action_method( @args );
+        eval {
+            my $result = $actions->$action_method( @args );
+            say JSON->new->pretty->encode( $result );
+            return 0;
+        };
+        if ($@) {
+            say JSON->new->pretty->encode( $@ );
+            return 1;
+        }
     } else {
         warn "Don't recognize action '$action'\n";
         return 1;
     }
+
+    return 0;
+}
+
+sub confdir {
+    my ($conf_dir, @args) = @_;
+    say "Configuration dir is $conf_dir";
 
     return 0;
 }
@@ -88,19 +106,19 @@ This suite supports a few commands right now:
 
 =item * C<setlabel>
 
-Given a Dogecoin address and a label, associates the label with this address. Yes, this matches the Bitcoin RPC method. That's no accident.
+Given a Dogecoin address and a label, associates the label with this address.
+Yes, this matches the Bitcoin RPC method. That's no accident.
 
 =item * C<getreceivedbylabel>
 
 Given a label corresponding to a Dogecoin address (already set with
 C<setlabel>), returns the JSON from the C<getreceivedbyaddress> RPC call.
 
-=item * C<dumpaddresses>
+=item * C<decodetransaction>
 
-Exports a wallet to your backup directory, extracts all public addresses from
-it, and writes them to standard output. This deletes the wallet export, but be
-cautious because this is a plain-text export of your wallet. This feature works
-best with Dogecoin Core 1.14.6 and later.
+Given a transaction hash, decodes the transaction. Note that this transaction
+must be in your wallet I<or> you must have C<txindex> enabled on your Core
+node.
 
 =back
 

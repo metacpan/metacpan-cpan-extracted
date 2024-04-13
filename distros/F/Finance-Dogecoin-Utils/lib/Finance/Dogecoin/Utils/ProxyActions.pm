@@ -8,21 +8,20 @@ use warnings;
 class Finance::Dogecoin::Utils::ProxyActions {
     use JSON;
     use Path::Tiny;
-    use Digest::MD5 'md5_hex';
-
     use feature 'say';
 
     field $rpc          :param;
     field $json         :param;
     field $addresses    :param;
     field $address_file :param;
-    field $conf_dir     :param;
 
     sub BUILDARGS( $class, %args ) {
         $args{json} //= JSON->new->utf8(1);
-        $args{address_file} = path( $args{address_file} );
+        $args{address_file} = $args{address_file}
+                            ? path( $args{address_file} )
+                            : '';
         $args{addresses} //= do {
-            if ($args{address_file}->exists) {
+            if ($args{address_file} && $args{address_file}->exists) {
                 $args{json}->decode( $args{address_file}->slurp_utf8 );
             }
             else {
@@ -50,24 +49,16 @@ class Finance::Dogecoin::Utils::ProxyActions {
         return 1;
     }
 
-    method exportaddresses {
-        my $dumpfile = md5_hex( $$ . time() );
-        my $result   = $rpc->call_method( 'dumpwallet', $dumpfile );
-
-        my $file     = $conf_dir->child($dumpfile);
-
-        for my $line ($file->lines_utf8) {
-            # skip header, blank, and comment lines
-            next unless $line =~ /\S/;
-            next if     $line =~ /^#/;
-
-            my ($private_key, $timestamp, $label, $comment, @rest) = split /\s+/, $line;
-
-            for my $rest (@rest) {
-                next unless $rest =~ /^addr=(\S+)/;
-                say $1;
-            }
+    method decodetransaction( $tx_hash ) {
+        my $tx = $rpc->call_method( getrawtransaction => "$tx_hash" );
+        my $result = $tx->{result};
+        if ($result) {
+            $tx = $rpc->call_method( decoderawtransaction => $result );
+            $result = $tx->{result};
+            return $result if $result;
         }
+
+        die $tx->{error};
     }
 
     method DESTROY {
@@ -89,7 +80,7 @@ Finance::Dogecoin::Utils::ProxyActions - proxy and enhance RPC made to a Dogecoi
 
 =head1 VERSION
 
-version 1.20230424.0253
+version 1.20240413.0031
 
 =head1 SYNOPSIS
 
@@ -97,7 +88,7 @@ Utilities to proxy RPC to a Dogecoin Core node.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2022 chromatic
+Copyright (c) 2022-2024 chromatic
 
 =head1 AUTHOR
 
@@ -109,7 +100,7 @@ chromatic <chromatic@wgz.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by chromatic.
+This software is Copyright (c) 2022-2024 by chromatic.
 
 This is free software, licensed under:
 

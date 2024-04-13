@@ -1,0 +1,150 @@
+NAME
+    Mo::utils::Time - Mo time utilities.
+
+SYNOPSIS
+     use Mo::utils::Time qw(check_time_24hhmm check_time_24hhmmss);
+
+     check_time_24hhmm($self, $key);
+     check_time_24hhmmss($self, $key);
+
+DESCRIPTION
+    Mo time utilities for checking of data objects.
+
+SUBROUTINES
+  "check_time_24hhmm"
+     check_time_24hhmm($self, $key);
+
+    Check parameter defined by $key if it's time in HH:MM format. Value
+    could be undefined or doesn't exist.
+
+    Returns undef.
+
+  "check_time_24hhmmss"
+     check_time_24hhmmss($self, $key);
+
+    Check parameter defined by $key if it's time in HH:MM:SS format. Value
+    could be undefined or doesn't exist.
+
+    Returns undef.
+
+ERRORS
+     check_time_24hhmm():
+             Parameter '%s' doesn't contain valid hour in HH:MM time format.
+                     Value: %s
+             Parameter '%s' doesn't contain valid minute in HH:MM time format.
+                     Value: %s
+             Parameter '%s' doesn't contain valid time in HH:MM format.
+                     Value: %s
+
+     check_time_24hhmmss():
+             Parameter '%s' doesn't contain valid hour in HH:MM:SS time format.
+                     Value: %s
+             Parameter '%s' doesn't contain valid minute in HH:MM:SS time format.
+                     Value: %s
+             Parameter '%s' doesn't contain valid second in HH:MM:SS time format.
+                     Value: %s
+             Parameter '%s' doesn't contain valid time in HH:MM:SS format.
+                     Value: %s
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Mo::utils::Time qw(check_time_24hhmm);
+
+     my $self = {
+             'key' => '12:32',
+     };
+     check_time_24hhmm($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Time qw(check_time_24hhmm);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'xx',
+     };
+     check_time_24hhmm($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' doesn't contain valid time in HH:MM format.
+
+EXAMPLE3
+     use strict;
+     use warnings;
+
+     use Mo::utils::Time qw(check_time_24hhmmss);
+
+     my $self = {
+             'key' => '12:30:30',
+     };
+     check_time_24hhmmss($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE4
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Time qw(check_time_24hhmmss);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'bad',
+     };
+     check_time_24hhmmss($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' doesn't contain valid time in HH:MM:SS format.
+
+DEPENDENCIES
+    Error::Pure, Exporter, Readonly.
+
+SEE ALSO
+    Mo  Micro Objects. Mo is less.
+
+    Mo::utils
+        Mo utilities.
+
+    Wikibase::Datatype::Utils
+        Wikibase datatype utilities.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Mo-utils-Time>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

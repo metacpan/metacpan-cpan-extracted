@@ -12,6 +12,7 @@ class Finance::Dogecoin::Utils::NodeRPC {
 
     field $ua   :param;
     field $auth :param;
+    field $url  :param;
 
     sub BUILDARGS( $class, %args ) {
         $args{ua} //= Mojo::UserAgent->new;
@@ -24,14 +25,15 @@ class Finance::Dogecoin::Utils::NodeRPC {
             }
         }
 
-        $args{auth} = "$args{user}:$args{password}";
+        $args{auth}  = "$args{user}:$args{password}";
+        $args{url} //= 'http://localhost:22555';
 
         return %args;
     }
 
     method call_method( $method, @params ) {
         my $res = $ua->post(
-            Mojo::URL->new('http://localhost:22555')->userinfo( $auth ),
+            Mojo::URL->new($url)->userinfo( $auth ),
             json => { jsonrpc => '1.0', id => 'Perl RPCAuth', method => $method, params => \@params }
         )->res;
 
@@ -42,7 +44,7 @@ class Finance::Dogecoin::Utils::NodeRPC {
         } elsif ($res->code == 403) {
             warn "Auth to Dogecoin RPC failed\n";
         } else {
-            warn "Something went wrong with Dogecoin RPC: " . $res->code . "\n";
+            return $res->json;
         }
 
         return {};
@@ -61,7 +63,7 @@ Finance::Dogecoin::Utils::NodeRPC - make authenticated RPC to a Dogecoin Core no
 
 =head1 VERSION
 
-version 1.20230424.0253
+version 1.20240413.0031
 
 =head1 SYNOPSIS
 
@@ -69,7 +71,7 @@ Class representing a Dogecoin Core node on which to perform RPC.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2022 chromatic
+Copyright (c) 2022-2024 chromatic
 
 =head1 AUTHOR
 
@@ -81,7 +83,7 @@ chromatic <chromatic@wgz.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by chromatic.
+This software is Copyright (c) 2022-2024 by chromatic.
 
 This is free software, licensed under:
 

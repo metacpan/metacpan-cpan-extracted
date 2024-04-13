@@ -29,7 +29,7 @@ test_requires 'CSS::Struct::Output::Indent' => 0;
 test_requires 'CSS::Struct::Output::Structure' => 0.03;
 test_requires 'Data::HTML::Element::Button' => 0.10;
 test_requires 'Data::HTML::Element::Form' => 0.10;
-test_requires 'Data::HTML::Element::Input' => 0.11;
+test_requires 'Data::HTML::Element::Input' => 0.13;
 test_requires 'Data::HTML::Element::Select' => 0.10;
 test_requires 'Data::HTML::Element::Textarea' => 0.10;
 test_requires 'English' => 0;
@@ -40,7 +40,7 @@ test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.09';
+version '0.10';
 
 # Run.
 WriteAll();

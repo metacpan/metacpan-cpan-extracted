@@ -1,3 +1,6 @@
+0.10 2024-04-12T17:41:38+02:00
+ - Add 'step' parameter to Input.
+
 0.09 2024-03-08T09:43:54+01:00
  - Fix minimal dependency to Tags::HTML.
 

@@ -14,14 +14,14 @@ use version;
 use B::Generate ();
 use B::Deparse  ();
 use XSLoader ();
+use Filter::Util::Call;
 
 our $VERSION;
 our $DEBUG;
 
 BEGIN {
-  our $VERSION = qv(6.0.1);
+  our $VERSION = qv(6.0.3);
   XSLoader::load("sealed", $VERSION);
-  sub UNIVERSAL::TYPEDSCALAR {shift}
 }
 
 my %valid_attrs                  = (sealed => 1);
@@ -163,14 +163,15 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 sub import {
   $DEBUG                         = $_[1];
-  my ($invoker) = caller;
-  local $@;
-  eval <<EOT;
-  package $invoker;
-  require Lexical::Types;
-  Lexical::Types->import()
-EOT
-  die $@ if $@;
+  local $_;
+  filter_add(bless []);
+}
+
+sub filter {
+  my ($self) = @_;
+  my $status = filter_read;
+  s/^\s*my\s+([\w:]+)\s+(\$\w+);/my $1 $2 = '$1';/gms if $status > 0;
+  $status;
 }
 
 1;

@@ -17,7 +17,7 @@ name: Test2-Tools-MIDI
 provides:
   Test2::Tools::MIDI:
     file: lib/Test2/Tools/MIDI.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Carp: '0'
   Test2::V0: '0.000060'
@@ -25,5 +25,5 @@ requires:
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://thrig.me/src/Test2-Tools-MIDI.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

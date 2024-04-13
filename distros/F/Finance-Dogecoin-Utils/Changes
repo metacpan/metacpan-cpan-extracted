@@ -1,6 +1,10 @@
-1.20230424.0253 2023-04-23 19:53:28-07:00 America/Los_Angeles
-    - add exportaddresses proxy command
-    - minor internal configuration and re-use improvements
+1.20240413.0031 2024-04-12 17:31:00-07:00 America/Los_Angeles
+    - removed unnecessary warning
+
+1.20240412.1911 2024-04-12 12:11:30-07:00 America/Los_Angeles
+    - add decodetransaction RPC proxy
+    - allow custom URL to RPC node constructor
+    - made address file optional for RPC proxy
 
 1.20221211.2353 2022-12-11 15:53:18-08:00 America/Los_Angeles
     - first version released upon an unsuspecting world

@@ -1,5 +1,11 @@
 Revision history for Perl module DB::Object
 
+v1.4.0 2024-04-13T17:55:40+0900
+    - Modified method connect() in DB::Object to use a timeout of 5 seconds, otherwise on some system, the connect attempt would hang for a long time.
+
+v1.3.1 2024-04-11T22:27:49+0900
+    - Modified method 'structure' in DB::Object::Mysql::Table to ensure all fields returned are in lowercase.
+
 v1.3.0 2024-04-09T16:53:24+0900
     - Added pg_notifies in DB::Object::Postgres
 

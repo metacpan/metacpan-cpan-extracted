@@ -1,5 +1,5 @@
 #!/usr/bin/env -S perl -Ilib
-use Test::More tests => 2;
+use Test::More tests => 3;
 use POSIX 'dup2';
 dup2 fileno(STDERR), fileno(STDOUT);
 use strict;
@@ -62,5 +62,32 @@ my %tests = (
 );
 
 cmpthese 20_000_000, \%tests;
+
+ok(1);
+
+use constant LOOPS => 3;
+
+sub method2 {
+  my $obj = "main";
+  for (1..LOOPS) {
+    $obj->foo;
+    $obj->bar;
+    $obj->reentrant;
+  }
+}
+
+sub sealed2 :Sealed {
+  my main $obj;
+  for (1..LOOPS) {
+    $obj->foo;
+    $obj->bar;
+    $obj->reentrant;
+  }
+}
+
+cmpthese 1_000_000, {
+  method => \&method2,
+  sealed => \&sealed2,
+};
 
 ok(1);

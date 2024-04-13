@@ -36,7 +36,7 @@
    "provides" : {
       "Test2::Tools::MIDI" : {
          "file" : "lib/Test2/Tools/MIDI.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "url" : "https://thrig.me/src/Test2-Tools-MIDI.git"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }
