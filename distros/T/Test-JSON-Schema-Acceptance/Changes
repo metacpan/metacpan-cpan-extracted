@@ -1,5 +1,11 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.023     2024-04-13 19:25:31Z
+        - include git location in generated results files when using a custom
+          test directory
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/bf0360f4b7c51b8f968aabe7f3f49e12b120fc85...57617f254a6734d5c64fa86fd3b08e8799970b25
+
 1.022     2024-03-09 22:26:06Z
         - handle out-of-range numeric test data by decoding to
           Math::BigFloat/Math::BigInt objects

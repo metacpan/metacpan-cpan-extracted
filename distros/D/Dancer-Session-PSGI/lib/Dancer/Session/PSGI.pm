@@ -36,9 +36,11 @@ sub destroy {
 
 1;
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -46,7 +48,7 @@ Dancer::Session::PSGI - Let Plack::Middleware::Session handle Dancer's session
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -90,9 +92,13 @@ Now, your two applications can share the same session informations.
 
 Dancer::Session::PSGI let you use C<Plack::Middleware::Session> as backend for your sessions.
 
+=head1 MAINTAINER
+
+Dancer Core Team
+
 =head1 AUTHOR
 
-  franck cuny <franck@lumberjaph.net>
+franck cuny <franck@lumberjaph.net>
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -102,4 +108,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

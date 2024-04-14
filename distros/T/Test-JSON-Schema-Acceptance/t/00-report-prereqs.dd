@@ -3,6 +3,7 @@ do { my $x = {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
                                         'File::ShareDir::Install' => '0.06',
+                                        'Text::ParseWords' => '0',
                                         'perl' => '5.020'
                                       }
                       },
@@ -40,6 +41,7 @@ do { my $x = {
                       'requires' => {
                                       'Feature::Compat::Try' => '0',
                                       'File::ShareDir' => '0',
+                                      'Git::Wrapper' => '0',
                                       'List::Util' => '1.33',
                                       'Mojo::JSON' => '0',
                                       'Moo' => '0',
@@ -106,7 +108,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::CheckStrictVersion' => '0',
                                            'Dist::Zilla::Plugin::ConfirmRelease' => '0',
                                            'Dist::Zilla::Plugin::CopyFilesFromRelease' => '0',
-                                           'Dist::Zilla::Plugin::DynamicPrereqs' => '0.029',
+                                           'Dist::Zilla::Plugin::DynamicPrereqs' => '0.040',
                                            'Dist::Zilla::Plugin::EnsureLatestPerl' => '0',
                                            'Dist::Zilla::Plugin::FileFinder::ByName' => '0',
                                            'Dist::Zilla::Plugin::GenerateFile' => '0',

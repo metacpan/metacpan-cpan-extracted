@@ -14,8 +14,8 @@ foreach my $file (__FILE__) {
         <$fh>;
     };
 
-    my $enc = lzhd_compress($str, undef, sub ($symbols, $out_fh) { print $out_fh abc_encode($symbols) });
-    my $dec = lzhd_decompress($enc, undef, sub ($fh) { abc_decode($fh) });
+    my $enc = lzhd_compress($str, undef, \&abc_encode);
+    my $dec = lzhd_decompress($enc, undef, \&abc_decode);
 
     is($str, $dec);
 }

@@ -1,4 +1,7 @@
+.github/workflows/testsuite.yml
 .gitignore
+.travis.yml
+.whitesource
 Changes
 LICENSE
 MANIFEST
@@ -6,6 +9,8 @@ Makefile.PL
 README
 Random.pm
 Random.xs
+appveyor.cmd
+appveyor.yml
 hints/MSWin32.pl
 t/0-basic.t
 t/z_kwalitee.t

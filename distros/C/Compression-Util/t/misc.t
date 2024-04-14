@@ -5,7 +5,7 @@ use Test::More;
 use Compression::Util qw(:all);
 use List::Util        qw(shuffle);
 
-plan tests => 70;
+plan tests => 145;
 
 ##################################
 
@@ -13,6 +13,7 @@ sub test_array ($arr) {
 
     my @copy = @$arr;
 
+    is_deeply(mtf_decode(mtf_encode($arr)),                      $arr);
     is_deeply(abc_decode(abc_encode($arr)),                      $arr);
     is_deeply(ac_decode(ac_encode($arr)),                        $arr);
     is_deeply(adaptive_ac_decode(adaptive_ac_encode($arr)),      $arr);
@@ -20,12 +21,17 @@ sub test_array ($arr) {
     is_deeply(elias_omega_decode(elias_omega_encode($arr)),      $arr);
     is_deeply(fibonacci_decode(fibonacci_encode($arr)),          $arr);
     is_deeply(delta_decode(delta_encode($arr)),                  $arr);
-    is_deeply(rle4_decode(rle4_decode($arr)),                    $arr);
+    is_deeply(rle4_decode(rle4_encode($arr)),                    $arr);
+    is_deeply(zrle_decode(zrle_encode($arr)),                    $arr);
     is_deeply([map { ($_->[0]) x $_->[1] } @{run_length($arr)}], $arr);
 
     is_deeply(obh_decode(obh_encode($arr)), $arr);
+    is_deeply(obh_decode(obh_encode($arr, \&obh_encode),               \&obh_decode),               $arr);
     is_deeply(obh_decode(obh_encode($arr, \&create_ac_entry),          \&decode_ac_entry),          $arr);
     is_deeply(obh_decode(obh_encode($arr, \&create_adaptive_ac_entry), \&decode_adaptive_ac_entry), $arr);
+
+    is_deeply(mrl_decompress(mrl_compress($arr)),                                                                $arr);
+    is_deeply(mrl_decompress(mrl_compress($arr, undef, \&create_adaptive_ac_entry), \&decode_adaptive_ac_entry), $arr);
 
     is_deeply(bz2_decompress_symbolic(bz2_compress_symbolic($arr)), $arr);
     is_deeply(bz2_decompress_symbolic(bz2_compress_symbolic($arr, undef, \&create_ac_entry),          \&decode_ac_entry),          $arr);
@@ -34,9 +40,30 @@ sub test_array ($arr) {
     is_deeply($arr, \@copy);    # make sure the array has not been modified in-place
 }
 
-#test_array([]); # FIXME
+test_array([]);
 test_array([1]);
+test_array([0]);
 test_array([shuffle((map { int(rand(100)) } 1 .. 20), (map { int(rand(1e6)) } 1 .. 10), 0, 5, 9, 999_999, 1_000_000, 1_000_001, 42, 1)]);
+
+is(bz2_decompress(bz2_compress('a')),   'a');
+is(lzss_decompress(lzss_compress('a')), 'a');
+is(lzhd_decompress(lzhd_compress('a')), 'a');
+is(lzw_decompress(lzw_compress('a')),   'a');
+
+is(bz2_decompress(bz2_compress('')),   '');
+is(lzss_decompress(lzss_compress('')), '');
+is(lzhd_decompress(lzhd_compress('')), '');
+is(lzw_decompress(lzw_compress('')),   '');
+
+is_deeply(mrl_decompress(mrl_compress([])),         []);
+is_deeply(mrl_decompress(mrl_compress([0])),        [0]);
+is_deeply(mrl_decompress(mrl_compress('a')),        [ord('a')]);
+is_deeply(mrl_decompress(mrl_compress([ord('a')])), [ord('a')]);
+
+is_deeply(bz2_decompress_symbolic(bz2_compress_symbolic('a')), [ord('a')]);
+is_deeply(bz2_decompress_symbolic(bz2_compress_symbolic([1])), [1]);
+is_deeply(bz2_decompress_symbolic(bz2_compress_symbolic([0])), [0]);
+is_deeply(bz2_decompress_symbolic(bz2_compress_symbolic([])),  []);
 
 ##################################
 
@@ -58,6 +85,9 @@ test_array([shuffle((map { int(rand(100)) } 1 .. 20), (map { int(rand(1e6)) } 1 
     is_deeply(decode_huffman_entry(create_huffman_entry(\@symbols)),         \@symbols);
     is_deeply(decode_ac_entry(create_ac_entry(\@symbols)),                   \@symbols);
     is_deeply(decode_adaptive_ac_entry(create_adaptive_ac_entry(\@symbols)), \@symbols);
+
+    is_deeply(mrl_decompress(mrl_compress(\@symbols)),                                              \@symbols);
+    is_deeply(mrl_decompress(mrl_compress(\@symbols, undef, \&create_ac_entry), \&decode_ac_entry), \@symbols);
 
     is_deeply(lzw_decompress(lzw_compress(pack('C*', @symbols))), pack('C*', @symbols));
     is_deeply(lzw_decompress(lzw_compress(pack('C*', @symbols), undef, \&delta_encode),             undef, \&delta_decode),             pack('C*', @symbols));
@@ -126,3 +156,34 @@ test_array([shuffle((map { int(rand(100)) } 1 .. 20), (map { int(rand(1e6)) } 1 
 }
 
 ##############################################
+
+{
+    my $int    = int(rand(1e6));
+    my $binary = pack('b*', int2bits_lsb($int, 32));
+    open my $fh, '<:raw', \$binary;
+    my $dec = bits2int_lsb($fh, 32, \my $buffer);
+    is($int, $dec);
+}
+
+{
+    my $int    = int(rand(1e6));
+    my $binary = pack('B*', int2bits($int, 32));
+    open my $fh, '<:raw', \$binary;
+    my $dec = bits2int($fh, 32, \my $buffer);
+    is($int, $dec);
+}
+
+##############################################
+
+{
+    my $str = "foo\0bar\0abracadabra\0";
+    open my $fh, '<:raw', \$str;
+
+    my $word1 = read_null_terminated($fh);
+    my $word2 = read_null_terminated($fh);
+    my $word3 = read_null_terminated($fh);
+
+    is($word1, "foo");
+    is($word2, "bar");
+    is($word3, "abracadabra");
+}

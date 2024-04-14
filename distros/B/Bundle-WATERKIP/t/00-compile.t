@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Bundle/WATERKIP.pm',
@@ -18,6 +18,7 @@ my @module_files = (
 
 my @scripts = (
     'bin/get-azure-token.pl',
+    'bin/i3-wod',
     'bin/jwt-decrypt.pl',
     'bin/opnpost',
     'bin/parse-phone-number',

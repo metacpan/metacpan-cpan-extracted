@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Synthesizer settings librarian
 
-our $VERSION = '0.0047';
+our $VERSION = '0.0048';
 
 use Moo;
 use strictures 2;
@@ -267,7 +267,7 @@ sub recall_specs {
     $set->{model} = $next->{model};
     push @specs, $set;
   }
-  return $specs[0];
+  return \@specs;
 }
 
 
@@ -308,7 +308,7 @@ Synth::Config - Synthesizer settings librarian
 
 =head1 VERSION
 
-version 0.0047
+version 0.0048
 
 =head1 SYNOPSIS
 
@@ -358,6 +358,7 @@ version 0.0047
   my $spec_id = $synth->make_spec(%spec);
   my $spec = $synth->recall_spec(id => $spec_id);
   my $specs = $synth->recall_specs;
+  # [ { order => [ ... ], etc => ... } ]
 
   # remove stuff!
   $synth->remove_spec;

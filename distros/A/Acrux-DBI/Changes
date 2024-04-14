@@ -1,4 +1,8 @@
 # Version/Revision history
 
+0.02 Sat 13 Apr 2024 17:27:46 MSK
+    * Documentation modified
+    * Added rules for error message getting
+
 0.01 Sun 04 Feb 2024 14:24:05 MSK
     * Initial release

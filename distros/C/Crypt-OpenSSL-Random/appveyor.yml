@@ -1,0 +1,33 @@
+version: '{build}'
+shallow_clone: true
+
+environment:
+  matrix:
+    - perl_type: system
+    - perl_type: cygwin
+    - perl_type: strawberry
+    - perl_type: strawberry
+      perl_version: 5.24.3.1
+    - perl_type: strawberry
+      perl_version: 5.20.3.3
+    - perl_type: strawberry
+      perl_version: 5.18.4.1
+install:
+  # use strawberry perl's OpenSSL, remove AppVeyor's buildin OpenSSL-Win32
+  - cmd: if [%perl_type%]==[strawberry] (
+      rd /s /q C:\OpenSSL-Win32 )
+  - cmd: if [%perl_type%]==[cygwin] (
+      C:\cygwin\setup-x86.exe -qgnNdO -l C:\cygwin\var\cache\setup -R c:\cygwin -s http://cygwin.mirror.constant.com -P openssl-devel )
+
+  - 'call appveyor.cmd perl_setup'
+  - '%perl% -V'
+  - '%cpanm% -n Crypt::OpenSSL::Guess'
+  - '%cpanm% --installdeps -n --with-develop --with-recommends .'
+
+build: off
+
+test_script:
+  - '%perl% Makefile.PL && %make% test'
+
+matrix:
+ fast_finish: true

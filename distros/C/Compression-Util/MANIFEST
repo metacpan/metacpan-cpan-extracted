@@ -9,6 +9,7 @@ examples/bzip2-like_string.pl
 examples/bzip2-like_string_symbolic.pl
 examples/bzip2-like_symbolic.pl
 examples/gzip_block_type_1.pl
+examples/gzip_block_type_2.pl
 examples/lz77.pl
 examples/lz77_ac_string.pl
 examples/lz77_string.pl
@@ -27,6 +28,8 @@ examples/lzw_string_delta.pl
 examples/lzw_string_elias_gamma.pl
 examples/lzw_string_elias_omega.pl
 examples/lzw_string_fibonacci.pl
+examples/mrl.pl
+examples/mrl_string.pl
 lib/Compression/Util.pm
 LICENSE
 Makefile.PL
@@ -58,6 +61,7 @@ t/lzw_elias_gamma.t
 t/lzw_elias_omega.t
 t/lzw_fibonacci.t
 t/misc.t
+t/mrl.t
 t/pod-coverage.t
 t/pod.t
 utils/auto_perltidy.sh

@@ -1,5 +1,26 @@
 Revision history for Compression-Util
 
+0.05    2024-04-13
+
+        [ADDITIONS]
+
+        - Added the mrl_compress() and mrl_decompress() functions.
+        - Added the read_bit_lsb(), read_bits_lsb(), int2bits(), int2bits_lsb(), bits2int() and bits2int_lsb() functions.
+        - Added the read_null_terminated() function.
+        - Added the string2symbols() and symbols2string() functions.
+
+        [IMPROVEMENTS]
+
+        - Extended `huffman_from_*` to check the context and return only the encoding dictionary in scalar context.
+
+        [CHANGES]
+
+        - Simplified `lzss_encode()` for better performance, with a minimal impact on compression ratio.
+
+        [BUG-FIXES]
+
+        - Fixed several special cases and added more tests.
+
 0.04    2024-04-06
 
         [ADDITIONS]

@@ -1,4 +1,4 @@
-#!/usr/bin/env -S perl -Ilib
+#!/usr/bin/env -S perl -Ilib -Iblib/arch
 use Test::More tests => 3;
 use POSIX 'dup2';
 dup2 fileno(STDERR), fileno(STDOUT);
@@ -24,10 +24,9 @@ BEGIN {
 sub func   {Foo::foo($x)}
 
 BEGIN {our @ISA=qw/Foo/}
-use sealed 'deparse'; # invokes Lexical::Types->import into this namespace
+use sealed 'deparse';
 
-# assigned to 'main' by UNIVERSAL::TYPESCALAR
-my main $y;
+my main $y; #sealed src filter transforms this into: my main $y = 'main';
 
 sub sealed :Sealed {
     $y->foo();
@@ -43,8 +42,8 @@ sub also_sealed :Sealed {
             $inner->foo($b->foo($inner->bar, $inner, $bench->cmpthese));
             $a = $inner;
             $a->foo;
-            $b->bar;
-        };
+            $b->bar; # error!
+          };
     }
     $a->bar();
 }
@@ -77,7 +76,7 @@ sub method2 {
 }
 
 sub sealed2 :Sealed {
-  my main $obj;
+  my main $obj; # sealed-src-filter
   for (1..LOOPS) {
     $obj->foo;
     $obj->bar;

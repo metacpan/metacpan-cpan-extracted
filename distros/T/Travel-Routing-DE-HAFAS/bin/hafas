@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use utf8;
 use DateTime;
@@ -20,6 +20,8 @@ my $types = q{};
 my $developer_mode;
 my ( $json_output, $raw_json_output );
 my $show_full_route;
+my $show_jid;
+my $exclude_infeasible;
 my ( $list_services, $service );
 my ( @excluded_mots, @exclusive_mots );
 my $max_change      = undef;
@@ -46,22 +48,24 @@ my $output_bold  = -t STDOUT ? "\033[1m" : q{};
 my $output_reset = -t STDOUT ? "\033[0m" : q{};
 
 GetOptions(
-	'a|arrive=s'      => sub { $arrival = 1; $time = $_[1] },
-	'c|max-change=s'  => \$max_change,
-	'C|change-time=s' => \$min_change_time,
-	'd|date=s'        => \$date,
-	'h|help'          => sub { show_help(0) },
-	'f|full-route'    => \$show_full_route,
-	'l|language=s'    => \$language,
-	'm|mot=s'         => \$types,
-	's|service=s'     => \$service,
-	't|time|depart=s' => \$time,
-	'v|verbose+'      => \$verbosity,
-	'V|version'       => \&show_version,
-	'devmode'         => \$developer_mode,
-	'json'            => \$json_output,
-	'raw-json'        => \$raw_json_output,
-	'list'            => \$list_services,
+	'a|arrive=s'           => sub { $arrival = 1; $time = $_[1] },
+	'c|max-change=s'       => \$max_change,
+	'C|change-time=s'      => \$min_change_time,
+	'd|date=s'             => \$date,
+	'f|full-route'         => \$show_full_route,
+	'h|help'               => sub { show_help(0) },
+	'j|with-jid'           => \$show_jid,
+	'l|language=s'         => \$language,
+	'm|mot=s'              => \$types,
+	's|service=s'          => \$service,
+	't|time|depart=s'      => \$time,
+	'x|exclude-infeasible' => \$exclude_infeasible,
+	'v|verbose+'           => \$verbosity,
+	'V|version'            => \&show_version,
+	'devmode'              => \$developer_mode,
+	'json'                 => \$json_output,
+	'raw-json'             => \$raw_json_output,
+	'list'                 => \$list_services,
 
 ) or show_help(1);
 
@@ -338,6 +342,9 @@ for my $res ( $hafas->connections ) {
 	}
 
 	if ( $cancelled or $negative_transfer or $part_cancelled ) {
+		if ($exclude_infeasible) {
+			next;
+		}
 		printf(
 			"%s  (%02d:%02d)  %s  %s  %s\n",
 			$res->dep->strftime('XX.XX. %H:%M'),
@@ -420,11 +427,22 @@ for my $res ( $hafas->connections ) {
 					$sec->arr_platform // q{},
 				);
 			}
+			if ($show_jid) {
+				say $sec->journey->id;
+			}
 		}
 		elsif ( $sec->type eq 'WALK' ) {
 			printf(
 				"${output_bold}Walk %dm${output_reset}  (approx. %d minute%s)",
 				$sec->distance,
+				$sec->duration->in_units('minutes'),
+				$sec->duration->in_units('minutes') == 1 ? q{} : 's'
+			);
+		}
+		elsif ( $sec->type eq 'TRSF' ) {
+			printf(
+"${output_bold}Transfer %.1fkm${output_reset} with local transit  (approx. %d minute%s)",
+				$sec->distance / 1000,
 				$sec->duration->in_units('minutes'),
 				$sec->duration->in_units('minutes') == 1 ? q{} : 's'
 			);
@@ -459,7 +477,7 @@ B<hafas> [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 
@@ -493,6 +511,11 @@ Planned departure (or arrival) date.  Default: today.
 =item B<-f>, B<--full-route>
 
 Show intermediate stops of each connection.
+
+=item B<-j>, B<--with-jid>
+
+Show journey IDs. These can be used to obtain details on individual journeys
+via B<hafas-m>.
 
 =item B<-l>, B<--language> I<language>
 
@@ -537,6 +560,12 @@ B<-v>) to 3 (B<-vvv>).
 =item B<-V>, B<--version>
 
 Show version information and exit.
+
+=item B<-x>, B<--exclude-infeasible>
+
+HAFAS responses include journeys that are infeasible e.g. due to delayed or
+cancelled trips. By default, B<hafas> displays those with an XX.XX. departure
+date. When this option is set, B<hafas> silently ignores them instead.
 
 =back
 

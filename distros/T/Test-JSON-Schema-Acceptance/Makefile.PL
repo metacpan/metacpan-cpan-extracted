@@ -17,7 +17,8 @@ my %WriteMakefileArgs = (
   "AUTHOR" => "Ben Hutton (\@relequestual) <relequest\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
-    "File::ShareDir::Install" => "0.06"
+    "File::ShareDir::Install" => "0.06",
+    "Text::ParseWords" => 0
   },
   "DISTNAME" => "Test-JSON-Schema-Acceptance",
   "LICENSE" => "mit",
@@ -26,6 +27,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Feature::Compat::Try" => 0,
     "File::ShareDir" => 0,
+    "Git::Wrapper" => 0,
     "List::Util" => "1.33",
     "Mojo::JSON" => 0,
     "Moo" => 0,
@@ -64,7 +66,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.022",
+  "VERSION" => "1.023",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -76,6 +78,7 @@ my %FallbackPrereqs = (
   "Feature::Compat::Try" => 0,
   "File::ShareDir" => 0,
   "File::Spec" => 0,
+  "Git::Wrapper" => 0,
   "JSON::MaybeXS" => "1.002004",
   "JSON::PP" => 0,
   "List::Util" => "1.33",
@@ -112,7 +115,7 @@ my %FallbackPrereqs = (
 );
 
 # inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.040
-if (can_xs()) {
+if (want_xs()) {
 requires('Cpanel::JSON::XS', '3.0223')
 }
 
@@ -160,9 +163,46 @@ use ExtUtils::HasCompiler 0.014 'can_compile_loadable_object';
   }
 }
 
+{
+  my $parsed_args;
+  sub parse_args {
+    return $parsed_args if defined $parsed_args;
+    require ExtUtils::MakeMaker;
+    require Text::ParseWords;
+    ExtUtils::MakeMaker::parse_args(
+      my $tmp = {},
+      Text::ParseWords::shellwords($ENV{PERL_MM_OPT} || ''),
+      @ARGV,
+    );
+    $parsed_args = $tmp->{ARGS} || {};
+  }
+}
+
 sub requires { goto &runtime_requires }
 
 sub runtime_requires {
   my ($module, $version_or_range) = @_;
   _add_prereq(PREREQ_PM => $module, $version_or_range);
 }
+
+{
+  my $want_pp;
+  sub want_pp {
+    return $$want_pp if defined $want_pp;
+    my $pp_only = parse_args()->{PUREPERL_ONLY};
+    $pp_only = !!$pp_only if defined $pp_only;
+    $want_pp = \$pp_only;
+    $pp_only;
+  }
+}
+
+{
+  my $want_xs;
+  sub want_xs {
+    return $want_xs if defined $want_xs;
+    my $want_pp = want_pp();
+    $want_xs = defined $want_pp ? !$want_pp : can_xs();
+    return $want_xs;
+  }
+}
+

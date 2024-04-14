@@ -1,11 +1,5 @@
-NAME
-    Dancer::Debug - Extend Plack::Middleware::Debug with some specific
-    panels for Dancer
-
-VERSION
-    version 0.03
-
 SYNOPSIS
+
     You can activate the panels in your development configuration file:
 
         plack_middlewares:
@@ -27,15 +21,11 @@ SYNOPSIS
         };
 
 DESCRIPTION
-    Dancer::Debug extends Plack::Middleware::Debug with some specific panels
-    for Dancer.
 
-AUTHOR
-    franck cuny <franck@lumberjaph.net>
+    Dancer::Debug extends Plack::Middleware::Debug with some specific
+    panels for Dancer.
 
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2010 by franck cuny.
+MAINTAINER
 
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
+    Dancer Core Team
 

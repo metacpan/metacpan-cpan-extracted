@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>8a985516-30dc-47d5-9b05-c69ec6becae6</MessageSerialNumber>
-  <MessageDate>Sat, 23 Mar 2024 03:40:55 GMT</MessageDate>
+  <MessageSerialNumber>8999af38-4812-4c38-b6b5-c89510c1861a</MessageSerialNumber>
+  <MessageDate>Sat, 13 Apr 2024 04:41:11 BST</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -8312,6 +8312,28 @@
         </Rule>
         <Rule>
           <Range>9850000-9999999</Range>
+          <Length>3</Length>
+        </Rule>
+      </Rules>
+    </Group>
+    <Group>
+      <Prefix>978-99995</Prefix>
+      <Agency>Seychelles</Agency>
+      <Rules>
+        <Rule>
+          <Range>0000000-4999999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>5000000-5299999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>5300000-9749999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>9750000-9999999</Range>
           <Length>3</Length>
         </Rule>
       </Rules>

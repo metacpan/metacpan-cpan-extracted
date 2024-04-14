@@ -1,3 +1,8 @@
+0.004   2024-03-02  Released-By: PERLANCAR; Urgency: medium
+
+        - Add participant: Data::MiniDumpX.
+
+
 0.003   2023-01-19  Released-By: PERLANCAR; Urgency: medium
 
         - Rename module/dist Bencher-Scenarios-{DataDmp,Data-Dmp}.

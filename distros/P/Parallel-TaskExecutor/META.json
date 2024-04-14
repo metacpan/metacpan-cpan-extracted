@@ -1,0 +1,92 @@
+{
+   "abstract" : "Cross-platform executor for parallel tasks executed in forked processes",
+   "author" : [
+      "Mathias Kende <mathias@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "promise",
+      "executor",
+      "fork",
+      "open2",
+      "open3",
+      "run",
+      "ipc"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Parallel-TaskExecutor",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "local",
+         "vendor",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "perl" : "v5.22.0"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Devel::Cover" : "0"
+         },
+         "suggests" : {
+            "CPAN::Uploader" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Log4perl" : "0",
+            "Readonly" : "0",
+            "perl" : "5.022"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::Pod" : "1.22"
+         },
+         "requires" : {
+            "CPAN::Common::Index::Mux::Ordered" : "0",
+            "Log::Log4perl::CommandLine" : "0",
+            "Readonly" : "0",
+            "Test2::V0" : "0",
+            "Test::CPANfile" : "0",
+            "Test::More" : "0"
+         },
+         "suggests" : {
+            "IPC::Run3" : "0",
+            "Perl::Tidy" : "20220613",
+            "Test2::Tools::PerlCritic" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mkende/perl_parallel_task_executor/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mkende/perl_parallel_task_executor"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.026000;
 
 use ExtUtils::MakeMaker;
 
@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Bundle-WATERKIP",
   "EXE_FILES" => [
     "bin/get-azure-token.pl",
+    "bin/i3-wod",
     "bin/jwt-decrypt.pl",
     "bin/opnpost",
     "bin/parse-phone-number",
@@ -24,9 +25,11 @@ my %WriteMakefileArgs = (
     "bin/today-is"
   ],
   "LICENSE" => "bsd",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.026000",
   "NAME" => "Bundle::WATERKIP",
   "PREREQ_PM" => {
+    "AnyEvent" => 0,
+    "AnyEvent::I3X::Workspace::OnDemand" => 0,
     "Authen::SASL" => 0,
     "Azure::AD::Password" => 0,
     "Crypt::JWT" => 0,
@@ -43,6 +46,7 @@ my %WriteMakefileArgs = (
     "Devel::Cover" => 0,
     "Digest::MD5" => 0,
     "Dist::Zilla::PluginBundle::Author::WATERKIP" => "3.3",
+    "EV" => 0,
     "ExtUtils::Installed" => 0,
     "ExtUtils::Packlist" => 0,
     "File::Find" => 0,
@@ -50,6 +54,7 @@ my %WriteMakefileArgs = (
     "File::MimeInfo::Magic" => 0,
     "File::ShareDir" => 0,
     "File::Spec" => 0,
+    "File::Spec::Functions" => 0,
     "File::Temp" => 0,
     "Finance::Crypto::Exchange::Kraken" => "0.002",
     "Finance::Loan::Repayment" => "1.5",
@@ -75,6 +80,7 @@ my %WriteMakefileArgs = (
     "Object::Pad" => "0.66",
     "POSIX" => 0,
     "Pod::Usage" => 0,
+    "Proc::Find" => 0,
     "SQL::Beautify" => 0,
     "Sys::Hostname" => 0,
     "Term::ReadLine" => 0,
@@ -87,6 +93,7 @@ my %WriteMakefileArgs = (
     "XML::LibXML" => 0,
     "YA::CLI" => "0.006",
     "YA::CLI::ActionRole" => 0,
+    "YAML::XS" => 0,
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
@@ -95,7 +102,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -103,6 +110,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "AnyEvent" => 0,
+  "AnyEvent::I3X::Workspace::OnDemand" => 0,
   "Authen::SASL" => 0,
   "Azure::AD::Password" => 0,
   "Crypt::JWT" => 0,
@@ -119,6 +128,7 @@ my %FallbackPrereqs = (
   "Devel::Cover" => 0,
   "Digest::MD5" => 0,
   "Dist::Zilla::PluginBundle::Author::WATERKIP" => "3.3",
+  "EV" => 0,
   "ExtUtils::Installed" => 0,
   "ExtUtils::Packlist" => 0,
   "File::Find" => 0,
@@ -126,6 +136,7 @@ my %FallbackPrereqs = (
   "File::MimeInfo::Magic" => 0,
   "File::ShareDir" => 0,
   "File::Spec" => 0,
+  "File::Spec::Functions" => 0,
   "File::Temp" => 0,
   "Finance::Crypto::Exchange::Kraken" => "0.002",
   "Finance::Loan::Repayment" => "1.5",
@@ -153,6 +164,7 @@ my %FallbackPrereqs = (
   "Object::Pad" => "0.66",
   "POSIX" => 0,
   "Pod::Usage" => 0,
+  "Proc::Find" => 0,
   "SQL::Beautify" => 0,
   "Sys::Hostname" => 0,
   "Term::ReadLine" => 0,
@@ -166,6 +178,7 @@ my %FallbackPrereqs = (
   "XML::LibXML" => 0,
   "YA::CLI" => "0.006",
   "YA::CLI::ActionRole" => 0,
+  "YAML::XS" => 0,
   "namespace::autoclean" => 0
 );
 

@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Roo::Role" => 0,
     "base" => 0
   },
-  "VERSION" => "v0.5.0",
+  "VERSION" => "v0.6.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

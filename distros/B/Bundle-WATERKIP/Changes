@@ -1,5 +1,9 @@
 Revision history for Bundle-WATERKIP
 
+0.003     2024-04-13 19:19:39Z
+
+    * Add i3-wod, workspace on demand
+
 0.002     2024-03-25 17:48:58Z
 
     * Bump YA::CLI version dep

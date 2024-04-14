@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.021-9-g938717d
+package Test::JSON::Schema::Acceptance; # git description: v1.022-8-gaeeeb7f
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators
 
-our $VERSION = '1.022';
+our $VERSION = '1.023';
 
 use 5.020;
 use Moo;
@@ -26,6 +26,7 @@ use Types::Common::Numeric 'PositiveOrZeroInt';
 use Path::Tiny 0.069;
 use List::Util 1.33 qw(any max sum0);
 use Ref::Util qw(is_plain_arrayref is_plain_hashref is_ref);
+use Git::Wrapper;
 use namespace::clean;
 
 # specification version => metaschema URI
@@ -423,6 +424,7 @@ has _test_data => (
            file => InstanceOf['Path::Tiny'],
            json => ArrayRef[Dict[
              # id => Optional[Str],
+             # specification => Optional[Str],
              description => Str,
              comment => Optional[Str],
              schema => $json_bool|HashRef,
@@ -471,7 +473,8 @@ sub _build__test_data ($self) {
 
 sub _build_results_text ($self) {
   my @lines;
-  push @lines, 'Results using '.ref($self).' '.$self->VERSION;
+  sub _pad ($s, $rest) { sprintf('%-29s', $s) . $rest }
+  push @lines, _pad('generated with:', ref($self).' '.$self->VERSION);
 
   my $test_dir = $self->test_dir;
   my $orig_dir = $self->_build_test_dir;
@@ -479,14 +482,14 @@ sub _build_results_text ($self) {
   my $submodule_status = path(dist_dir('Test-JSON-Schema-Acceptance'), 'submodule_status');
   if ($submodule_status->exists and $submodule_status->parent->subsumes($self->test_dir)) {
     chomp(my ($commit, $url) = $submodule_status->lines);
-    push @lines, 'with commit '.$commit;
-    push @lines, 'from '.$url.':';
+    push @lines, _pad('with commit:', $commit);
+    push @lines, _pad('from repository:', $url);
   }
   elsif ($test_dir eq $orig_dir and not -d '.git') {
     die 'submodule_status file is missing - packaging error? cannot continue';
   }
 
-  push @lines, 'specification version: '.($self->specification//'unknown');
+  push @lines, _pad('specification version:', $self->specification//'unknown');
 
   if ($test_dir ne $orig_dir) {
     if ($orig_dir->subsumes($test_dir)) {
@@ -495,10 +498,16 @@ sub _build_results_text ($self) {
     elsif (Path::Tiny->cwd->subsumes($test_dir)) {
       $test_dir = $test_dir->relative;
     }
-    push @lines, 'using custom test directory: '.$test_dir;
+    push @lines, _pad('using custom test directory:', $test_dir);
+
+    eval {
+      my $git  = Git::Wrapper->new($test_dir);
+      my @ref = $git->describe({ all => 1, long => 1, always => 1 });
+      push @lines, _pad('at ref:', $ref[0]);
+    };
   }
-  push @lines, 'optional tests included: '.($self->include_optional ? 'yes' : 'no');
-  push @lines, map 'skipping directory: '.$_, $self->skip_dir->@*;
+  push @lines, _pad('optional tests included:', $self->include_optional ? 'yes' : 'no');
+  push @lines, map _pad('skipping directory:', $_), $self->skip_dir->@*;
 
   push @lines, '';
   my $length = max(40, map length $_->{file}, $self->results->@*);
@@ -531,7 +540,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.022
+version 1.023
 
 =head1 SYNOPSIS
 

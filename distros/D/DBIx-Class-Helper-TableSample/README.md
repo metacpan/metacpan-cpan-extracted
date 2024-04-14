@@ -4,7 +4,7 @@ DBIx::Class::Helper::TableSample - Add support for tablesample clauses
 
 # VERSION
 
-version v0.5.0
+version v0.6.0
 
 # SYNOPSIS
 
@@ -145,6 +145,22 @@ Normally the value is a fraction, or a hash reference with the following options
     SELECT me.id FROM table me TABLESAMPLE SYSTEM (5)
     ```
 
+    The `fraction` and `method` options are not restricted, so they can be used with a variety of databases or
+    extensions. For example, if you have the PostgreSQL `tsm_system_rows` extension:
+
+    ```perl
+    my $rs = $schema->resultset('Wobbles')->search_rs(
+      undef,
+      {
+        columns     => [qw/ id name /],
+        tablesample => {
+           fraction => 200,
+           method   => 'system_rows',
+        },
+      }
+    );
+    ```
+
     See your database documentation for the allowable methods.  Note that some databases require it.
 
     Prior to version 0.3.0, this was called `type`. It is supported for
@@ -191,8 +207,6 @@ This is a helper method.
 It was added in v0.4.1.
 
 # KNOWN ISSUES
-
-Resultsets with joins or inner queries are not supported.
 
 Delete and update queries are not supported.
 

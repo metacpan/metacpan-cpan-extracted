@@ -11,7 +11,7 @@ use DateTime::Duration;
 use Travel::Routing::DE::HAFAS::Utils;
 use Travel::Status::DE::HAFAS::Journey;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 Travel::Routing::DE::HAFAS::Connection::Section->mk_ro_accessors(
 	qw(type schep_dep rt_dep sched_arr rt_arr dep arr arr_delay dep_delay journey distance duration transfer_duration dep_loc arr_loc
@@ -58,20 +58,30 @@ sub new {
 		time_zone => 'Europe/Berlin'
 	);
 
-	my $sched_dep = $sec->{dep}{dTimeS};
-	my $rt_dep    = $sec->{dep}{dTimeR};
-	my $sched_arr = $sec->{arr}{aTimeS};
-	my $rt_arr    = $sec->{arr}{aTimeR};
-
-	for my $ts ( $sched_dep, $rt_dep, $sched_arr, $rt_arr ) {
-		if ($ts) {
-			$ts = handle_day_change(
-				date     => $date,
-				time     => $ts,
-				strp_obj => $strptime,
-			);
-		}
-	}
+	my $sched_dep = handle_day_change(
+		date     => $date,
+		time     => $sec->{dep}{dTimeS},
+		offset   => $sec->{dep}{dTZOffset},
+		strp_obj => $strptime,
+	);
+	my $rt_dep = handle_day_change(
+		date     => $date,
+		time     => $sec->{dep}{dTimeR},
+		offset   => $sec->{dep}{dTZOffset},
+		strp_obj => $strptime,
+	);
+	my $sched_arr = handle_day_change(
+		date     => $date,
+		time     => $sec->{arr}{aTimeS},
+		offset   => $sec->{arr}{aTZOffset},
+		strp_obj => $strptime,
+	);
+	my $rt_arr = handle_day_change(
+		date     => $date,
+		time     => $sec->{arr}{aTimeR},
+		offset   => $sec->{arr}{aTZOffset},
+		strp_obj => $strptime,
+	);
 
 	my $tco = {};
 	for my $tco_id ( @{ $sec->{jny}{dTrnCmpSX}{tcocX} // [] } ) {
@@ -105,6 +115,8 @@ sub new {
 		$ref->{arr_delay} = ( $rt_arr->epoch - $sched_arr->epoch ) / 60;
 	}
 
+	# known types according to 2015 DB Navigator:
+	# HIDE, JNY, WALK, BIKE, KISS, PARK, TAXI, TRSF, DEVI
 	if ( $sec->{type} eq 'JNY' ) {
 
 		$ref->{journey} = Travel::Status::DE::HAFAS::Journey->new(
@@ -116,7 +128,7 @@ sub new {
 			hafas   => $hafas,
 		);
 	}
-	elsif ( $sec->{type} eq 'WALK' ) {
+	elsif ( $sec->{type} eq 'TRSF' or $sec->{type} eq 'WALK' ) {
 		$ref->{distance} = $sec->{gis}{dist};
 		my $duration = $sec->{gis}{durS};
 		$ref->{duration} = DateTime::Duration->new(
@@ -200,7 +212,7 @@ Travel::Routing::DE::HAFAS::Connection::Section - A single trip between two stop
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 
@@ -260,15 +272,15 @@ Travel::Status::DE::HAFAS::Location(3pm) object describing the departure stop.
 
 =item $section->dep_platform
 
-=item $section->distance (WALK)
+=item $section->distance (TRSF, WALK)
 
-Walking distance in meters. Does not take vertical elevation changes into
-account.
+Transfer or walking distance in meters. Does not take vertical elevation
+changes into account.
 
-=item $section->duration (WALK)
+=item $section->duration (TRSF, WALK)
 
-DateTime::Duration(3pm) oobject holding the walking duration.
-Typically assumes a slow pace.
+DateTime::Duration(3pm) oobject holding the estimated transfer or walk
+duration. Typically assumes a slow pace.
 
 =item $section->journey (JNY)
 
@@ -318,7 +330,8 @@ Undef for the first journey in a connection.
 =item $section->type
 
 Type of this section as exposeed by the HAFAS backend.
-Known types: B<JNY> (a public transit journey) and B<WALK> (walking).
+Known types: B<JNY> (a public transit journey), B<TRSF> (unspecified local
+transit), and B<WALK> (walking).
 
 =back
 

@@ -1,8 +1,5 @@
 package Plack::Middleware::Debug::Dancer::Logger;
-BEGIN {
-  $Plack::Middleware::Debug::Dancer::Logger::VERSION = '0.03';
-}
-
+$Plack::Middleware::Debug::Dancer::Logger::VERSION = '0.04';
 # ABSTRACT: Log message from you Dancer's application
 
 use strict;
@@ -48,9 +45,11 @@ sub run {
 
 1;
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -58,7 +57,7 @@ Plack::Middleware::Debug::Dancer::Logger - Log message from you Dancer's applica
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -82,4 +81,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

@@ -4,10 +4,12 @@ author:
   - 'Ian Robertson'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  Test::Pod: '1.22'
 configure_requires:
   Crypt::OpenSSL::Guess: '0.11'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,5 +22,5 @@ no_index:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/rurban/Crypt-OpenSSL-Random
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

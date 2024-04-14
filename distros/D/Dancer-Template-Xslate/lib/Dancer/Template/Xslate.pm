@@ -10,7 +10,7 @@ use Text::Xslate;
 
 use base "Dancer::Template::Abstract";
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 # ABSTRACT: Text::Xslate wrapper for Dancer
 
 # Note: The standard Xslate template extension is
@@ -60,9 +60,11 @@ sub render {
 
 1;
 
-
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -70,7 +72,7 @@ Dancer::Template::Xslate - Text::Xslate wrapper for Dancer
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -125,6 +127,10 @@ C<layout> can be disabled in favor of C<cascade>.
 
 =back
 
+=head1 MAINTAINER
+
+Dancer Core Team
+
 =head1 AUTHOR
 
 franck cuny <franck@lumberjaph.net>
@@ -137,7 +143,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

@@ -1,4 +1,7 @@
 Revision history for Perl extension Dancer::Session::PSGI
 
+0.02    Sat Apr 13 21:40:04 2024
+        - Show Dancer Core Team as new maintainer
+
 0.01    Wed Apr 21 21:10:58 2010
         - original version

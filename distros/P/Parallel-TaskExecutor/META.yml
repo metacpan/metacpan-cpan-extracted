@@ -1,0 +1,46 @@
+---
+abstract: 'Cross-platform executor for parallel tasks executed in forked processes'
+author:
+  - 'Mathias Kende <mathias@cpan.org>'
+build_requires:
+  CPAN::Common::Index::Mux::Ordered: '0'
+  ExtUtils::MakeMaker: '0'
+  Log::Log4perl::CommandLine: '0'
+  Readonly: '0'
+  Test2::V0: '0'
+  Test::CPANfile: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+  perl: v5.22.0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - promise
+  - executor
+  - fork
+  - open2
+  - open3
+  - run
+  - ipc
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parallel-TaskExecutor
+no_index:
+  directory:
+    - t
+    - inc
+    - local
+    - vendor
+    - t
+requires:
+  Log::Log4perl: '0'
+  Readonly: '0'
+  perl: '5.022'
+resources:
+  bugtracker: https://github.com/mkende/perl_parallel_task_executor/issues
+  repository: https://github.com/mkende/perl_parallel_task_executor
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

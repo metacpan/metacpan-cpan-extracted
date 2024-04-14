@@ -219,30 +219,91 @@ int32_t SPVM_BASIC_TYPE_is_integer_type_within_int(SPVM_COMPILER* compiler, int3
   }
 }
 
-int32_t SPVM_BASIC_TYPE_has_interface(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t interface_basic_type_id) {
+int32_t SPVM_BASIC_TYPE_has_interface(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t interface_basic_type_id, char* error_reason) {
+  
+  SPVM_BASIC_TYPE* interface_basic_type = SPVM_LIST_get(compiler->basic_types, interface_basic_type_id);
+  
+  if (!(interface_basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE)) {
+    if (error_reason) {
+      snprintf(error_reason, 255, "The \"%s\" type must an interface type.\n  at %s line %d", interface_basic_type->name, interface_basic_type->op_class->file, interface_basic_type->op_class->line);
+    }
+    return 0;
+  }
+  
+  return SPVM_BASIC_TYPE_has_interface_common(compiler, basic_type_id, interface_basic_type_id, error_reason);
+}
+
+int32_t SPVM_BASIC_TYPE_has_interface_common(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t interface_basic_type_id, char* error_reason) {
   
   SPVM_BASIC_TYPE* basic_type = SPVM_LIST_get(compiler->basic_types, basic_type_id);
   
   SPVM_BASIC_TYPE* interface_basic_type = SPVM_LIST_get(compiler->basic_types, interface_basic_type_id);
   
-  if (!(interface_basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE)) {
+  if (!(basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS || basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE)) {
+    if (error_reason) {
+      snprintf(error_reason, 255, "The \"%s\" type of the operand must a class type or an interface type.\n  at %s line %d", basic_type->name, basic_type->op_class->file, basic_type->op_class->line);
+    }
     return 0;
   }
   
-  if (!(basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS || basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE)) {
-    return 0;
+  const char* basic_type_category_name = NULL;
+  if (basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS) {
+    basic_type_category_name = "class";
+  }
+  else if (basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE) {
+    basic_type_category_name = "interface";
+  }
+  
+  const char* interface_basic_type_category_name = NULL;
+  if (interface_basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS) {
+    interface_basic_type_category_name = "class";
+  }
+  else if (interface_basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE) {
+    interface_basic_type_category_name = "interface";
   }
   
   for (int32_t interface_method_index = 0; interface_method_index < interface_basic_type->methods->length; interface_method_index++) {
     SPVM_METHOD* interface_method = SPVM_LIST_get(interface_basic_type->methods, interface_method_index);
     
-    for (int32_t method_index = 0; method_index < basic_type->methods->length; method_index++) {
-      SPVM_METHOD* method = SPVM_HASH_get(basic_type->method_symtable, interface_method->name, strlen(interface_method->name));
+    if (!interface_method->is_class_method) {
+      SPVM_METHOD* found_method = NULL;
+      SPVM_BASIC_TYPE* parent_basic_type = basic_type;
+      while (1) {
+        
+        if (!parent_basic_type) {
+          break;
+        }
+        
+        found_method = SPVM_HASH_get(parent_basic_type->method_symtable, interface_method->name, strlen(interface_method->name));
+        
+        if (found_method) {
+          break;
+        }
+        
+        parent_basic_type = parent_basic_type->parent;
+      }
       
-      int32_t can_override = SPVM_METHOD_satisfy_interface_method_requirement(compiler, interface_basic_type, interface_method, basic_type, method, "interface");
-      
-      if (can_override == 0) {
+      if (interface_method->is_required && !found_method) {
+        if (error_reason) {
+          snprintf(error_reason, 255, "The \"%s\" %s must define the \"%s\" method because its interface method is defined as a required method in the \"%s\" %s.\n  at %s line %d", basic_type->name, basic_type_category_name, interface_method->name, interface_basic_type->name, interface_basic_type_category_name, interface_basic_type->op_class->file, interface_basic_type->op_class->line);
+        }
         return 0;
+      }
+      
+      if (found_method) {
+        
+        if (found_method->is_class_method) {
+          if (error_reason) {
+            snprintf(error_reason, 255, "The \"%s\" method in the \"%s\" %s must be an instance method because its interface method is defined in the \"%s\" %s.\n  at %s line %d", found_method->name, basic_type->name, basic_type_category_name, interface_basic_type->name, interface_basic_type_category_name, basic_type->op_class->file, basic_type->op_class->line);
+          }
+          return 0;
+        }
+        
+        int32_t satisfy_interface_method_requirement = SPVM_METHOD_satisfy_interface_method_requirement(compiler, interface_method, found_method, error_reason);
+        
+        if (!satisfy_interface_method_requirement) {
+          return 0;
+        }
       }
     }
   }

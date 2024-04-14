@@ -17,36 +17,28 @@ use Synth::Config ();
 pod2usage(1) unless @ARGV;
 
 my %opts = (
-    model  => undef,
-    dbname => undef,
+    model => undef, # e.g. 'Modular'
+    patch => undef, # e.g. 'Simple 001'
 );
 GetOptions( \%opts,
     'model=s',
-    'dbname=s',
+    'patch=s',
 ) or pod2usage(2);
 
 pod2usage(1) if $opts{help};
 pod2usage(-exitval => 0, -verbose => 2) if $opts{man};
 
-if (my @missing = grep !defined($opts{$_}), qw(model)) {
-    die 'Missing: ' . join(', ', @missing);
-}
+die "Usage: perl $0 --model='Modular'\n"
+    unless $opts{model};
 
-my $name = prompt('What is the name of this setting?', 'required');
+my $name = $opts{patch};
+unless ($name) {
+    $name = prompt('What is the name of this setting?', 'required');
 die 'No name given' if $name eq 'required';
 
 my $synth = Synth::Config->new(model => $opts{model});
 
-# get a specs config file for the synth model
-my $set = './eg/' . $synth->model . '.set';
-my $specs = -e $set ? do $set : undef;
-
-# get the setting keys to loop over
-my @keys = qw(group parameter control bottom top value unit is_default);
-if ($specs) {
-    my $order = delete $specs->{order};
-    @keys = $order ? @$order : sort keys %$specs;
-}
+my $specs = $synth->recall_specs()->[0];
 
 # instantiate a chooser if needed
 my $tc = $specs ? Term::Choose->new : undef;
@@ -62,71 +54,71 @@ OUTER: while (1) {
     $counter++;
     # initialize the parameters to commit
     my %parameters = (name => $name);
-    # loop over the setting keys
-    INNER: for my $key (@keys) {
-        my $prompt = { prompt => "$counter. $key:" };
+    # loop over the settings
+    INNER: for my $spec (@$specs) {
+        my $prompt = { prompt => "$counter. $spec:" };
         # if there is a known synth...
         if ($specs) {
-            # use either a group parameter or the key list
-            my $things = $key eq 'parameter' ? $specs->{$key}{$group} : $specs->{$key};
+            # use either a group parameter or the spec list
+            my $things = $spec eq 'parameter' ? $specs->{$spec}{$group} : $specs->{$spec};
             # set the group
-            if ($key eq 'group') {
+            if ($spec eq 'group') {
                 $group = $tc->choose($things, $prompt);
-                print "\t$key set to: $group\n";
-                $parameters{$key} = $group;
+                print "\t$spec set to: $group\n";
+                $parameters{$spec} = $group;
             }
             # set the control
-            elsif ($key eq 'control') {
+            elsif ($spec eq 'control') {
                 $control = $tc->choose($things, $prompt);
-                print "\t$key set to: $control\n";
-                $parameters{$key} = $control;
+                print "\t$spec set to: $control\n";
+                $parameters{$spec} = $control;
             }
             # set a group_to patch
-            elsif ($key eq 'group_to' && $control eq 'patch') {
+            elsif ($spec eq 'group_to' && $control eq 'patch') {
                 $group_to = $tc->choose($specs->{group}, $prompt);
-                print "\t$key set to: $group_to\n";
-                $parameters{$key} = $group_to;
+                print "\t$spec set to: $group_to\n";
+                $parameters{$spec} = $group_to;
             }
-            # skip these keys unless control is patch
-            elsif (($key eq 'group_to' || $key eq 'param_to') && $control ne 'patch') {
+            # skip these specss unless control is patch
+            elsif (($spec eq 'group_to' || $spec eq 'param_to') && $control ne 'patch') {
                 next INNER;
             }
-            # skip these keys if a group_to is set
-            elsif (($key eq 'bottom' || $key eq 'top' || $key eq 'value' || $key eq 'unit') && $group_to) {
+            # skip these specss if a group_to is set
+            elsif (($spec eq 'bottom' || $spec eq 'top' || $spec eq 'value' || $spec eq 'unit') && $group_to) {
                 next INNER;
             }
             # set a param_to patch with the group_to parameter list
-            elsif ($key eq 'param_to' && $control eq 'patch') {
+            elsif ($spec eq 'param_to' && $control eq 'patch') {
                 $choice = $tc->choose($specs->{parameter}{$group_to}, $prompt);
-                print "\t$key set to: $choice\n";
-                $parameters{$key} = $choice;
+                print "\t$spec set to: $choice\n";
+                $parameters{$spec} = $choice;
             }
             # prompt for a value
-            elsif ($key eq 'value') {
-                $choice = prompt("$counter. Value for $key? (enter to skip)", 'enter');
+            elsif ($spec eq 'value') {
+                $choice = prompt("$counter. Value for $spec? (enter to skip)", 'enter');
                 unless ($choice eq 'enter') {
-                    print "\t$key set to: $choice\n";
-                    $parameters{$key} = $choice;
+                    print "\t$spec set to: $choice\n";
+                    $parameters{$spec} = $choice;
                 }
             }
             # prompt for a unit
-            elsif ($key eq 'unit') {
+            elsif ($spec eq 'unit') {
                 $choice = $tc->choose($things, $prompt);
                 if ($choice ne 'none') {
-                    print "\t$key set to: $choice\n";
-                    $parameters{$key} = $choice;
+                    print "\t$spec set to: $choice\n";
+                    $parameters{$spec} = $choice;
                 }
             }
-            # handle all other keys
+            # handle all other specss
             else {
                 $choice = $tc->choose($things, $prompt);
-                print "\t$key set to: $choice\n";
-                $parameters{$key} = $choice;
+                print "\t$spec set to: $choice\n";
+                $parameters{$spec} = $choice;
             }
         }
         # otherwise just ask for values
         else {
-            $choice = prompt("$counter. Value for $key? (enter to skip, q to quit)", 'enter');
+            $choice = prompt("$counter. Value for $spec? (enter to skip, q to quit)", 'enter');
             if ($choice eq 'q') {
                 last OUTER;
             }
@@ -134,7 +126,7 @@ OUTER: while (1) {
                 next INNER;
             }
             else {
-                $parameters{$key} = $choice;
+                $parameters{$spec} = $choice;
             }
         }
     }
@@ -158,7 +150,7 @@ synth-config.pl - Save synth settings
 
 =head1 SYNOPSIS
 
-  synth-config.pl --model=Something [--dbname=synth.db]
+  synth-config.pl --model=Modular
 
 =head1 OPTIONS
 
@@ -167,10 +159,6 @@ synth-config.pl - Save synth settings
 =item B<model>
 
 The required synthesizer model name.
-
-=item B<dbname>
-
-The name of the SQLite database in which to save settings.
 
 =back
 

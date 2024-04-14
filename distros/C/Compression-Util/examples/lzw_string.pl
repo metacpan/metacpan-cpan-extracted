@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# LZWW compressor/decompressor, for compressing a given string.
+# LZW compressor/decompressor, for compressing a given string.
 
 use 5.036;
 use lib               qw(../lib);

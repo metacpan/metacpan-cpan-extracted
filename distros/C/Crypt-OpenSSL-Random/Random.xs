@@ -22,7 +22,7 @@ PPCODE:
             PACKAGE_NAME);
     }
 
-    if(RAND_bytes(rand_bytes, num_bytes))
+    if(RAND_bytes(rand_bytes, num_bytes) == 1)
     {
       XPUSHs(sv_2mortal(newSVpv((const char*)rand_bytes, num_bytes)));
         Safefree(rand_bytes);
@@ -47,7 +47,7 @@ PPCODE:
             PACKAGE_NAME);
     }
 
-    if(RAND_bytes(rand_bytes, num_bytes))
+    if(RAND_bytes(rand_bytes, num_bytes) == 1)
     {
         XPUSHs(sv_2mortal(newSVpv((const char*)rand_bytes, num_bytes)));
         Safefree(rand_bytes);
@@ -77,6 +77,9 @@ PPCODE:
  # Seed the PRNG with data from the indicated EntropyGatheringDaemon;
  # returns the number of bytes gathered, or -1 if there was a
  # connection failure or if the PRNG is still insufficiently seeded.
+ # libressl considers this function insecure, so with libressl or an openssl with
+ # no-egd this function does not exist.
+
 
 #ifndef OPENSSL_NO_EGD
 
@@ -94,7 +97,7 @@ PPCODE:
 
 #endif
 
- # Returns true if the PRNG has enough seed data
+ # Returns 1 if the PRNG has enough seed data
 
 void
 random_status()

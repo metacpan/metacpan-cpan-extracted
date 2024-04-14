@@ -44,7 +44,7 @@ requires:
 resources:
   homepage: https://github.com/drzowie/Alien-Gnuplot
   repository: git://github.com/drzowie/Alien-Gnuplot.git
-version: '1.042'
+version: '1.043'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.38'
   requires:

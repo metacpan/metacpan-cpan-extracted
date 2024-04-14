@@ -1,5 +1,12 @@
 Revision history for DBIx-Class-Helper-TableSample:
 
+v0.6.0    2024-04-13 14:22:13+01:00 Europe/London
+  [Enhancements]
+  - Tablesame can be used when there are joins.
+
+  [Documented]
+  - Documented how to use this with the tsm_system_rows extension in PostgreSQL.
+
 v0.5.0    2023-11-21 17:19:41+00:00 Europe/London
   [Enhancements]
   - Added the tablesample method, GH#3.

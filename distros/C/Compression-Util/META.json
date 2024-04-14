@@ -28,7 +28,6 @@
          "requires" : {
             "Exporter" : "0",
             "List::Util" : "1.45",
-            "POSIX" : "0",
             "Test::More" : "0",
             "perl" : "v5.36.0"
          }
@@ -37,7 +36,7 @@
    "provides" : {
       "Compression::Util" : {
          "file" : "lib/Compression/Util.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -53,6 +52,6 @@
          "url" : "https://github.com/trizen/Compression-Util"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

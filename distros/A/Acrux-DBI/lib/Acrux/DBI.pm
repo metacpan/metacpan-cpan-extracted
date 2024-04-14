@@ -24,7 +24,7 @@ Database independent interface for Acrux applications
 
 Build new Acrux::DBI object
 
-Options:
+B<Options:>
 
 =over 8
 
@@ -50,15 +50,12 @@ This is a transaction method!
 
 This method marks the starting point for the start of a transaction
 
-    eval {
-      $dbi->begin;
-      $db->query('insert into test values (?)', 'Foo');
-      $db->query('insert into test values (?)', 'Bar');
-      $dbi->commit;
-    };
-    die $@ if $@;
+    $dbi->begin;
+    $dbi->query('insert into test values (?)', 'Foo');
+    $dbi->query('insert into test values (?)', 'Bar');
+    $dbi->commit;
 
-See slso L</commit>, L</rollback>
+See slso L</transaction>, L</commit>, L</rollback>
 
 =head2 cache
 
@@ -220,12 +217,6 @@ You can also append a 'bind_callback' to perform binding value manually:
           }
       });
 
-=head2 reconnect
-
-    $dbi = $dbi->reconnect;
-
-This method performs reconnecting to database and returns this object
-
 =head2 rollback
 
     $dbi->begin;
@@ -238,20 +229,6 @@ This method discards all changes to the database and marks the end
 point for the transaction to complete
 
 See also L</begin>, L</commit>
-
-=head2 url
-
-    $dbi = $dbi->url('sqlite:///tmp/test.db?sqlite_unicode=1');
-    $dbi = $dbi->url('postgres://foo:pass@localhost/mydb?PrintError=1');
-    my $url = $dbi->url;
-
-Database connect ur
-
-The database connection URL from which all other attributes can be derived.
-C<"url"> must be specified before the first call to C<"connect"> is made,
-otherwise it will have no effect on setting the defaults.
-
-Default: C<"sponge://">
 
 =head2 transaction
 
@@ -269,6 +246,20 @@ it is destroyed
       $tx->commit;
     };
     say $@ if $@;
+
+=head2 url
+
+    $dbi = $dbi->url('sqlite:///tmp/test.db?sqlite_unicode=1');
+    $dbi = $dbi->url('postgres://foo:pass@localhost/mydb?PrintError=1');
+    my $url = $dbi->url;
+
+Database connect ur
+
+The database connection URL from which all other attributes can be derived.
+C<"url"> must be specified before the first call to C<"connect"> is made,
+otherwise it will have no effect on setting the defaults.
+
+Default: C<"sponge://">
 
 =head2 username
 
@@ -315,7 +306,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp qw/carp croak/;
 use Scalar::Util 'weaken';
@@ -489,12 +480,12 @@ sub error {
 }
 sub err {
     my $self = shift;
-    return $self->dbh->err // $DBI::err if $self->dbh->can('err');
+    return $self->dbh->err // $DBI::err if defined($self->dbh) && $self->dbh->can('err');
     return $DBI::err
 }
 sub errstr {
     my $self = shift;
-    return $self->dbh->errstr // $DBI::errstr if $self->dbh->can('errstr');
+    return $self->dbh->errstr // $DBI::errstr if defined($self->dbh) && $self->dbh->can('errstr');
     return $DBI::errstr;
 }
 

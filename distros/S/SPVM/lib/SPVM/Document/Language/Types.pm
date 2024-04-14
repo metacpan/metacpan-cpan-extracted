@@ -1214,7 +1214,7 @@ Note that this is a concept, not an actual syntax.
 
 Some type casts perform a data conversion.
 
-Some type casts perform a runtime type check.
+Some type casts perform a data check.
 
 In the following description, the word "Type" is omitted when it is obvious.
 
@@ -1227,7 +1227,7 @@ To Larger:
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>byte</td><td>byte</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>short</td><td>short</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>int</td><td>int</td><td>No</td><td>No</td></tr>
@@ -1258,7 +1258,7 @@ To Smaller:
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>byte</td><td>short</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#Numeric-Narrowing-Conversion">Numeric Narrowing Conversion</a></td><td>No</td></tr>
   <tr><td>Yes</td><td>byte</td><td>int</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#Numeric-Narrowing-Conversion">Numeric Narrowing Conversion</a></td><td>No</td></tr>
   <tr><td>Yes</td><td>byte</td><td>long</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#Numeric-Narrowing-Conversion">Numeric Narrowing Conversion</a></td><td>No</td></tr>
@@ -1283,7 +1283,7 @@ To Smaller:
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>byte</td><td>Byte</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#Unboxing-Conversion">Unboxing Conversion</a></td><td>No</td></tr>
   <tr><td>Yes</td><td>short</td><td>Short</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#Unboxing-Conversion">Unboxing Conversion</a></td><td>No</td></tr>
   <tr><td>Yes</td><td>int</td><td>Int</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#Unboxing-Conversion">Unboxing Conversion</a></td><td>No</td></tr>
@@ -1299,7 +1299,7 @@ To Smaller:
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>NumericX</td><td>Any Object <code>object</code></td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#Unboxing-Conversion">Unboxing Conversion</a></td><td>No</td></tr>
 </table>
 
@@ -1312,7 +1312,7 @@ I<NumericX> is a L<numeric type|"Numeric Types">.
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>No</td><td>NumericX</td><td>Other</td><td>No</td><td>No</td></tr>
 </table>
 
@@ -1325,7 +1325,7 @@ I<NumericX> is a L<numeric type|"Numeric Types">.
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>Multi-NumericX</td><td>Multi-NumericX</td><td>No</td><td>No</td></tr>
   <tr><td>No</td><td>Multi-NumericX</td><td>Other</td><td>No</td><td>No</td></tr>
 </table>
@@ -1339,7 +1339,7 @@ I<Multi-NumericX> is a L<multi-numeric type|/"Multi-Numeric Types">.
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>ReferenceX</td><td>ReferenceX</td><td>No</td><td>No</td></tr>
   <tr><td>No</td><td>ReferenceX</td><td>Other</td><td>No</td><td>No</td></tr>
 </table>
@@ -1353,7 +1353,7 @@ I<ReferenceX> is a L<reference type|/"Reference Types">.
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>string</td><td>string</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>string</td><td>mutable string</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>mutable string</td><td>mutable string</td><td>No</td><td>No</td></tr>
@@ -1374,7 +1374,7 @@ I<NumericX> is a L<numeric type|"Numeric Types">.
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>NumericObjectX</td><td>NumericObjectX</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>NumericObjectX</td><td>NumericX</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#Boxing-Conversion">Boxing Conversion</a></td><td>No</td></tr>
   <tr><td>Yes</td><td>NumericObjectX</td><td>Any Object <code>object</code></td><td>No</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#isa-Operator">isa Operator</a></td></tr>
@@ -1393,7 +1393,7 @@ I<NumericX> is a L<numeric type|"Numeric Types">.
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>ClassX</td><td>ClassX</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>SuperClassX</td><td>ClassX</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>ClassX</td><td>SuperClassX</td><td>No</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#isa-Operator">isa Operator</a></td></tr>
@@ -1416,7 +1416,7 @@ I<InterfaceX> is a an L<interface type|"Interface Types">.
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>InterfaceX</td><td>InterfaceX</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>InterfaceX</td><td>InterfaceSatisfiedX</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>InterfaceX</td><td>InterfaceY</td><td>No</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#isa-Operator">isa Operator</a></td></tr>
@@ -1442,7 +1442,7 @@ I<InterfaceSatisfiedX> is a L<class type|"Class Types"> or an L<interface type|"
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>Any Object <code>object</code></td><td>ObjectX</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>Any Object <code>object</code></td><td>NumericX</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#Boxing-Conversion">Boxing Conversion</a></td><td>No</td></tr>
   <tr><td>Yes</td><td>Any Object <code>object</code></td><td>undef</td><td>No</td><td>No</td></tr>
@@ -1460,7 +1460,7 @@ I<NumericX> is a L<numeric type|"Numeric Types">.
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>byte[]</td><td>string</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#String-to-byte[]-Conversion">String-to-byte[] Conversion</a></td><td>No</td></tr>
   <tr><td>Yes</td><td>NumericX[]</td><td>NumericX[]</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>NumericX[]</td><td>Any Object <code>object</code></td><td>No</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#isa-Operator">isa Operator</a></td></tr>
@@ -1477,7 +1477,7 @@ I<NumericX> is a L<numeric type|"Numeric Types">.
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>Multi-NumericX[]</td><td>Multi-NumericX[]</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>Multi-NumericX[]</td><td>Any Object <code>object</code></td><td>No</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#isa-Operator">isa Operator</a></td></tr>
   <tr><td>Yes</td><td>Multi-NumericX[]</td><td>undef</td><td>No</td><td>No</td></tr>
@@ -1493,7 +1493,7 @@ I<Multi-NumericX> is a L<multi-numeric type|/"Multi-Numeric Types">.
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>string[]</td><td>string[]</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>string[]</td><td>Any Object <code>object</code></td><td>No</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#isa-Operator">isa Operator</a></td></tr>
   <tr><td>Yes</td><td>string[]</td><td>Any Object Array <code>object[]</code></td><td>No</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#isa-Operator">isa Operator</a></td></tr>
@@ -1508,7 +1508,7 @@ I<Multi-NumericX> is a L<multi-numeric type|/"Multi-Numeric Types">.
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>ClassX[]</td><td>ClassX[]</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>SuperClassX[]</td><td>ClassX[]</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>ClassX[]</td><td>SuperClassX[]</td><td>No</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#isa-Operator">isa Operator</a></td></tr>
@@ -1529,7 +1529,7 @@ I<SuperClassX> is a super class of I<ClassX>.
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>InterfaceX[]</td><td>InterfaceX[]</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>InterfaceX[]</td><td>InterfaceSatisfiedX[]</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>InterfaceX[]</td><td>InterfaceY[]</td><td>No</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#isa-Operator">isa Operator</a></td></tr>
@@ -1556,7 +1556,7 @@ I<InterfaceSatisfiedX> is a L<class type|"Class Types"> or an L<interface type|"
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>Any Object Array <code>object[]</code></td><td>ObjectX[]..</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>Any Object Array <code>object[]</code></td><td>undef</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>Any Object Array <code>object[]</code></td><td>Any Object <code>object</code></td><td>No</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#isa-Operator">isa Operator</a></td></tr>
@@ -1574,7 +1574,7 @@ C<[]..> is one or more C<[]>.
 =begin html
 
 <table>
-  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Runtime Type Check</th></tr>
+  <tr><th>Cast Requirement<br>Satisfaction</th><th>To</th><th>From</th><th>Data Conversion</th><th>Data Check</th></tr>
   <tr><td>Yes</td><td>X[]..D</td><td>X[]..D</td><td>No</td><td>No</td></tr>
   <tr><td>Yes</td><td>X[]..D</td><td>Any Object <code>object</code></td><td>No</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#isa-Operator">isa Operator</a></td></tr>
   <tr><td>Yes</td><td>X[]..D</td><td>Any Object Array <code>object[]</code></td><td>No</td><td><a href="https://metacpan.org/pod/SPVM::Document::Language::Operators#isa-Operator">isa Operator</a></td></tr>
@@ -1602,6 +1602,68 @@ I<SuperClassX> is a super class of I<ClassX>.
 I<InterfaceX> is a an L<interface type|"Interface Types">.
 
 I<InterfaceSatisfiedX> is a L<class type|"Class Types"> or an L<interface type|"Interface Types"> that satisfied the L<interface requirement|SPVM::Document::Language::Class/"Interface Requirement"> of I<InterfaceX>.
+
+=head1 Interface Requirement
+
+The interface requirement is the requirement if an L<object type|"Object Types"> is able to be assigned to an L<interface type|"Interface Types">.
+
+  INTERFACE_TYPE_TO = OBJECT_TYPE_FROM
+
+I<INTERFACE_TYPE_TO> must be an L<interface type|"Interface Types">.
+
+I<OBJECT_TYPE_FROM> must be a L<class type|"Class Types"> or an L<interface type|"Interface Types">.
+
+The following check is performed on every instance method of I<OBJECT_TYPE_FROM>.
+
+If an instance method of I<INTERFACE_TYPE_TO> has the C<required> method attribute, I<OBJECT_TYPE_FROM> or one of its super classes must have a method with the same name.
+
+If I<OBJECT_TYPE_FROM> or one of its super classes has an instance method(this is named I<METHOD_FROM>) with the same name as an instance method of I<INTERFACE_TYPE_TO>,
+I<METHOD_FROM> must be an instance method and satisfy the L<interface method requirement|/"Interface Method Requirement">.
+
+=head2 Interface Method Requirement
+
+The interface method requirement is the requirement if one instance method is able to be assigned to another instance method.
+
+What does it mean to assign one instance method to another instance method?
+
+Typically, it is sufficient to consider a case where a value of an instance method type I<INSTANT_METHOD_TYPE_FROM> is assigned to a variable of an instance method type I<INSTANCE_METHOD_TYPE_TO>.
+
+  my $value : INSTANCE_METHOD_TYPE_FROM;
+  my $var : INSTANCE_METHOD_TYPE_TO = $value;
+
+Note that the instance method type is a concept, not an actual one.
+
+Abstracting this, type-to-type assignment is defined.
+
+  INSTANCE_METHOD_TYPE_TO = INSTANCE_METHOD_TYPE_FROM
+
+Note that this is also a concept, not an actual syntax.
+
+And the interface method requirement is explained below.
+
+The length of the required arguments of the method of the I<INSTANT_METHOD_TYPE_FROM> type must be equal to the length of the required arguments the method of the I<INSTANT_METHOD_TYPE_TO> type.
+
+The length of the arguments of the method of the I<INSTANT_METHOD_TYPE_FROM> must be greather than or equal to the length of the arguments of the method of the I<INSTANT_METHOD_TYPE_TO> type.
+
+The every argument other than at 0 index of the method of the I<INSTANT_METHOD_TYPE_FROM> must satisfy the L<assignment requirement|/"Assignment Requirement"> to the argument as the same index of the method of the I<INSTANT_METHOD_TYPE_TO> without a data conversion and with interface exactly matched.
+
+The return type of the method of the I<INSTANT_METHOD_TYPE_FROM> must must satisfy the L<assignment requirement|/"Assignment Requirement"> to the return type of the method of the I<INSTANT_METHOD_TYPE_TO> without a data conversion and with interface exactly matched.
+
+=head1 See Also
+
+=over 2
+
+=item * L<SPVM::Document::Language::Class>
+
+=item * L<SPVM::Document::Language::Operators>
+
+=item * L<SPVM::Document::Language::Statements>
+
+=item * L<SPVM::Document::Language>
+
+=item * L<SPVM::Document>
+
+=back
 
 =head1 Copyright & License
 

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2024-03-02'; # DATE
 our $DIST = 'Bencher-Scenarios-Data-Dmp'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our $scenario = {
     summary => 'Benchmark Data::Dmp',
@@ -16,6 +16,7 @@ our $scenario = {
     },
     participants => [
         {name => 'Data::Dmp', fcall_template => 'Data::Dmp::dmp(<data>)'},
+        {name => 'Data::MiniDumpX', fcall_template => 'Data::MiniDumpX::dump(<data>)'},
         {module => 'Data::Dump', code_template => 'my $dummy = Data::Dump::dump(<data>)'},
     ],
     datasets => [
@@ -49,7 +50,7 @@ Bencher::Scenario::Data::Dmp::Dump - Benchmark Data::Dmp
 
 =head1 VERSION
 
-This document describes version 0.003 of Bencher::Scenario::Data::Dmp::Dump (from Perl distribution Bencher-Scenarios-Data-Dmp), released on 2023-01-19.
+This document describes version 0.004 of Bencher::Scenario::Data::Dmp::Dump (from Perl distribution Bencher-Scenarios-Data-Dmp), released on 2024-03-02.
 
 =head1 SYNOPSIS
 
@@ -73,7 +74,9 @@ Version numbers shown below are the versions used when running the sample benchm
 
 L<Data::Dmp> 0.242
 
-L<Data::Dump> 1.23
+L<Data::Dump> 1.25
+
+L<Data::MiniDumpX> 0.000001
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -84,6 +87,14 @@ L<Data::Dump> 1.23
 Function call template:
 
  Data::Dmp::dmp(<data>)
+
+
+
+=item * Data::MiniDumpX (perl_code)
+
+Function call template:
+
+ Data::MiniDumpX::dump(<data>)
 
 
 
@@ -109,65 +120,89 @@ Code template:
 
 =back
 
-=head1 SAMPLE BENCHMARK RESULTS
+=head1 BENCHMARK SAMPLE RESULTS
 
-Run on: perl: I<< v5.34.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 20.04 >>, OS kernel: I<< Linux version 5.4.0-91-generic >>.
+=head2 Sample benchmark #1
 
-Benchmark with default options (C<< bencher -m Data::Dmp::Dump >>):
+Run on: perl: I<< v5.38.2 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 20.04 >>, OS kernel: I<< Linux version 5.4.0-164-generic >>.
+
+Benchmark command (default options):
+
+ % bencher -m Data::Dmp::Dump
+
+Result formatted as table:
 
  #table1#
- +-------------+------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | participant | dataset          | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
- +-------------+------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | Data::Dump  | a100-num-various |      1900 |    530    |                 0.00% |             14877.50% | 9.1e-07 |      20 |
- | Data::Dump  | a100-num-int     |      3070 |    326    |                62.17% |              9135.81% | 5.3e-08 |      20 |
- | Data::Dmp   | a100-num-various |      6000 |    170    |               218.27% |              4605.86% |   2e-07 |      22 |
- | Data::Dmp   | a100-num-int     |     13000 |     76    |               595.19% |              2054.44% | 1.1e-07 |      20 |
- | Data::Dump  | a100-str         |     82000 |     12    |              4219.88% |               246.71% | 2.7e-08 |      20 |
- | Data::Dmp   | a100-str         |    283000 |      3.53 |             14877.50% |                 0.00% | 1.7e-09 |      20 |
- +-------------+------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ +-----------------+------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant     | dataset          | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +-----------------+------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | Data::Dump      | a100-num-various |      1600 |    630    |                 0.00% |             17587.16% | 8.3e-07 |      20 |
+ | Data::Dump      | a100-num-int     |      3100 |    323    |                95.03% |              8968.85% | 2.3e-07 |      20 |
+ | Data::MiniDumpX | a100-num-various |      3660 |    273    |               130.63% |              7569.15% | 2.7e-07 |      24 |
+ | Data::MiniDumpX | a100-num-int     |      4310 |    232    |               171.28% |              6419.96% | 2.1e-07 |      20 |
+ | Data::Dmp       | a100-num-various |      5720 |    175    |               260.32% |              4808.78% | 1.1e-07 |      23 |
+ | Data::Dmp       | a100-num-int     |     12300 |     81.2  |               676.23% |              2178.60% | 5.2e-08 |      20 |
+ | Data::Dump      | a100-str         |     76000 |     13    |              4701.80% |               268.34% | 5.1e-08 |      20 |
+ | Data::MiniDumpX | a100-str         |    201000 |      4.97 |             12584.93% |                39.43% | 1.3e-09 |      21 |
+ | Data::Dmp       | a100-str         |    281000 |      3.56 |             17587.16% |                 0.00% | 2.4e-09 |      20 |
+ +-----------------+------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
 
-Formatted as L<Benchmark.pm|Benchmark> result:
+The above result formatted in L<Benchmark.pm|Benchmark> style:
 
-                                   Rate  Data::Dump a100-num-various  Data::Dump a100-num-int  Data::Dmp a100-num-various  Data::Dmp a100-num-int  Data::Dump a100-str  Data::Dmp a100-str 
-  Data::Dump a100-num-various    1900/s                           --                     -38%                        -67%                    -85%                 -97%                -99% 
-  Data::Dump a100-num-int        3070/s                          62%                       --                        -47%                    -76%                 -96%                -98% 
-  Data::Dmp a100-num-various     6000/s                         211%                      91%                          --                    -55%                 -92%                -97% 
-  Data::Dmp a100-num-int        13000/s                         597%                     328%                        123%                      --                 -84%                -95% 
-  Data::Dump a100-str           82000/s                        4316%                    2616%                       1316%                    533%                   --                -70% 
-  Data::Dmp a100-str           283000/s                       14914%                    9135%                       4715%                   2052%                 239%                  -- 
+                                  Rate  Dump a100-num-various  Dump a100-num-int  MiniDumpX a100-num-various  MiniDumpX a100-num-int  Dmp a100-num-various  Dmp a100-num-int  Dump a100-str  MiniDumpX a100-str  Dmp a100-str 
+  Dump a100-num-various         1600/s                     --               -48%                        -56%                    -63%                  -72%              -87%           -97%                -99%          -99% 
+  Dump a100-num-int             3100/s                    95%                 --                        -15%                    -28%                  -45%              -74%           -95%                -98%          -98% 
+  MiniDumpX a100-num-various    3660/s                   130%                18%                          --                    -15%                  -35%              -70%           -95%                -98%          -98% 
+  MiniDumpX a100-num-int        4310/s                   171%                39%                         17%                      --                  -24%              -64%           -94%                -97%          -98% 
+  Dmp a100-num-various          5720/s                   260%                84%                         56%                     32%                    --              -53%           -92%                -97%          -97% 
+  Dmp a100-num-int             12300/s                   675%               297%                        236%                    185%                  115%                --           -83%                -93%          -95% 
+  Dump a100-str                76000/s                  4746%              2384%                       2000%                   1684%                 1246%              524%             --                -61%          -72% 
+  MiniDumpX a100-str          201000/s                 12576%              6398%                       5392%                   4568%                 3421%             1533%           161%                  --          -28% 
+  Dmp a100-str                281000/s                 17596%              8973%                       7568%                   6416%                 4815%             2180%           265%                 39%            -- 
  
  Legends:
-   Data::Dmp a100-num-int: dataset=a100-num-int participant=Data::Dmp
-   Data::Dmp a100-num-various: dataset=a100-num-various participant=Data::Dmp
-   Data::Dmp a100-str: dataset=a100-str participant=Data::Dmp
-   Data::Dump a100-num-int: dataset=a100-num-int participant=Data::Dump
-   Data::Dump a100-num-various: dataset=a100-num-various participant=Data::Dump
-   Data::Dump a100-str: dataset=a100-str participant=Data::Dump
+   Dmp a100-num-int: dataset=a100-num-int participant=Data::Dmp
+   Dmp a100-num-various: dataset=a100-num-various participant=Data::Dmp
+   Dmp a100-str: dataset=a100-str participant=Data::Dmp
+   Dump a100-num-int: dataset=a100-num-int participant=Data::Dump
+   Dump a100-num-various: dataset=a100-num-various participant=Data::Dump
+   Dump a100-str: dataset=a100-str participant=Data::Dump
+   MiniDumpX a100-num-int: dataset=a100-num-int participant=Data::MiniDumpX
+   MiniDumpX a100-num-various: dataset=a100-num-various participant=Data::MiniDumpX
+   MiniDumpX a100-str: dataset=a100-str participant=Data::MiniDumpX
 
-Benchmark module startup overhead (C<< bencher -m Data::Dmp::Dump --module-startup >>):
+=head2 Sample benchmark #2
+
+Benchmark command (benchmarking module startup overhead):
+
+ % bencher -m Data::Dmp::Dump --module-startup
+
+Result formatted as table:
 
  #table2#
  +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
  | participant         | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
- | Data::Dump          |      13   |               6.4 |                 0.00% |               100.46% | 6.1e-05 |      20 |
- | Data::Dmp           |      11   |               4.4 |                16.95% |                71.40% | 4.4e-05 |      20 |
- | perl -e1 (baseline) |       6.6 |               0   |               100.46% |                 0.00% | 4.5e-05 |      20 |
+ | Data::Dump          |      12.7 |               6.7 |                 0.00% |               113.40% | 1.2e-05 |      20 |
+ | Data::Dmp           |      11   |               5   |                17.13% |                82.19% | 1.2e-05 |      20 |
+ | Data::MiniDumpX     |      10   |               4   |                24.09% |                71.97% | 2.3e-05 |      20 |
+ | perl -e1 (baseline) |       6   |               0   |               113.40% |                 0.00% | 9.3e-06 |      20 |
  +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
 
 
-Formatted as L<Benchmark.pm|Benchmark> result:
+The above result formatted in L<Benchmark.pm|Benchmark> style:
 
-                          Rate  Data::Dump  Data::Dmp  perl -e1 (baseline) 
-  Data::Dump            76.9/s          --       -15%                 -49% 
-  Data::Dmp             90.9/s         18%         --                 -40% 
-  perl -e1 (baseline)  151.5/s         96%        66%                   -- 
+                          Rate  Data::Dump  Data::Dmp  Data::MiniDumpX  perl -e1 (baseline) 
+  Data::Dump            78.7/s          --       -13%             -21%                 -52% 
+  Data::Dmp             90.9/s         15%         --              -9%                 -45% 
+  Data::MiniDumpX      100.0/s         27%        10%               --                 -40% 
+  perl -e1 (baseline)  166.7/s        111%        83%              66%                   -- 
  
  Legends:
-   Data::Dmp: mod_overhead_time=4.4 participant=Data::Dmp
-   Data::Dump: mod_overhead_time=6.4 participant=Data::Dump
+   Data::Dmp: mod_overhead_time=5 participant=Data::Dmp
+   Data::Dump: mod_overhead_time=6.7 participant=Data::Dump
+   Data::MiniDumpX: mod_overhead_time=4 participant=Data::MiniDumpX
    perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -204,7 +239,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,9 +3,9 @@ package Bencher::Scenarios::Data::Dmp;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2024-03-02'; # DATE
 our $DIST = 'Bencher-Scenarios-Data-Dmp'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Benchmark Data::Dmp against some other related modules
@@ -22,17 +22,7 @@ Bencher::Scenarios::Data::Dmp - Benchmark Data::Dmp against some other related m
 
 =head1 VERSION
 
-This document describes version 0.003 of Bencher::Scenarios::Data::Dmp (from Perl distribution Bencher-Scenarios-Data-Dmp), released on 2023-01-19.
-
-=head1 DESCRIPTION
-
-This distribution contains the following L<Bencher> scenario modules:
-
-=over
-
-=item * L<Bencher::Scenario::Data::Dmp::Dump>
-
-=back
+This document describes version 0.004 of Bencher::Scenarios::Data::Dmp (from Perl distribution Bencher-Scenarios-Data-Dmp), released on 2024-03-02.
 
 =head1 HOMEPAGE
 
@@ -66,7 +56,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

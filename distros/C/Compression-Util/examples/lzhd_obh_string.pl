@@ -18,8 +18,8 @@ foreach my $file (__FILE__, $^X) {
         <$fh>;
     };
 
-    my $enc = lzhd_compress($str, undef, sub ($symbols, $out_fh) { print $out_fh obh_encode($symbols) });
-    my $dec = lzhd_decompress($enc, undef, sub ($fh) { obh_decode($fh) });
+    my $enc = lzhd_compress($str, undef, \&obh_encode);
+    my $dec = lzhd_decompress($enc, undef, \&obh_decode);
 
     say "Original size  : ", length($str);
     say "Compressed size: ", length($enc);

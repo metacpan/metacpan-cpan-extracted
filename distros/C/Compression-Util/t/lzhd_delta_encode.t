@@ -14,8 +14,8 @@ foreach my $file (__FILE__) {
         <$fh>;
     };
 
-    my $enc = lzhd_compress($str, undef, sub ($symbols, $out_fh) { print $out_fh delta_encode($symbols) });
-    my $dec = lzhd_decompress($enc, undef, sub ($fh) { delta_decode($fh) });
+    my $enc = lzhd_compress($str, undef, \&delta_encode);
+    my $dec = lzhd_decompress($enc, undef, \&delta_decode);
 
     is($str, $dec);
 }

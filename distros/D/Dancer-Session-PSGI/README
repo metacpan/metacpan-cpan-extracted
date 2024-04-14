@@ -1,16 +1,10 @@
-NAME
-    Dancer::Session::PSGI - Let Plack::Middleware::Session handle Dancer's
-    session
-
-VERSION
-    version 0.01
-
 SYNOPSIS
+
     A basic psgi application
 
         use strict; use warnings;
         use Plack::Builder;
-
+    
         my $app = sub {
             my $session = (shift)->{'psgix.session'};
             return [
@@ -19,7 +13,7 @@ SYNOPSIS
                 [ "Hello, you've been here for ", $session->{counter}++, "th time!" ],
             ];
         };
-
+    
         builder { enable 'Session', store => 'File'; $app; };
 
     In your app.psgi:
@@ -33,7 +27,7 @@ SYNOPSIS
 
        package session;
        use Dancer ':syntax';
-
+    
         get '/' => sub {
             my $count = session("counter");
             session "counter" => ++$count;
@@ -43,15 +37,11 @@ SYNOPSIS
     Now, your two applications can share the same session informations.
 
 DESCRIPTION
-    Dancer::Session::PSGI let you use "Plack::Middleware::Session" as
-    backend for your sessions.
 
-AUTHOR
-      franck cuny <franck@lumberjaph.net>
+    Dancer::Session::PSGI let you use Plack::Middleware::Session as backend
+    for your sessions.
 
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2010 by franck cuny.
+MAINTAINER
 
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
+    Dancer Core Team
 

@@ -479,14 +479,20 @@ void SPVM_CHECK_check_methods(SPVM_COMPILER* compiler) {
               int32_t need_data_conversion = 0;
               int32_t allow_narrowing_conversion = SPVM_CHECK_check_allow_narrowing_conversion(compiler, arg_type, op_arg_default);
               int32_t interface_match = 0;
+              char error_reason[256] = {0};
               int32_t satisfy_assignment_requirement = SPVM_TYPE_satisfy_assignment_requirement(
                 compiler,
                 arg_type->basic_type->id, arg_type->dimension, arg_type->flag,
                 constant_type->basic_type->id, constant_type->dimension, constant_type->flag,
-                &need_data_conversion, allow_narrowing_conversion, interface_match
+                &need_data_conversion, allow_narrowing_conversion, interface_match,
+                error_reason
               );
               
               if (!satisfy_assignment_requirement) {
+                if (strlen(error_reason)) {
+                  SPVM_COMPILER_error(compiler, error_reason);
+                }
+                
                 SPVM_COMPILER_error(compiler, "The default value of the optional argument \"%s\" must be able to be assigned to the argument.\n  at %s line %d", arg_var_decl->var->name, method->op_method->file, method->op_method->line);
                 return;
               }
@@ -569,46 +575,37 @@ void SPVM_CHECK_check_methods(SPVM_COMPILER* compiler) {
           method->is_precompile = 1;
         }
       }
-      
-      // Check method overide requirements
-      if (!method->is_class_method) {
-        SPVM_BASIC_TYPE* parent_basic_type = basic_type->parent;
-        while (1) {
-          if (!parent_basic_type) {
-            break;
-          }
-          
-          SPVM_METHOD* parent_method = SPVM_HASH_get(parent_basic_type->method_symtable, method->name, strlen(method->name));
-          
-          if (parent_method) {
-            int32_t can_override = SPVM_METHOD_satisfy_interface_method_requirement(compiler, parent_basic_type, parent_method, basic_type, method, "class");
-            
-            if (can_override == 0) {
-              return;
-            }
-          }
-          parent_basic_type = parent_basic_type->parent;
-        }
-      }
-      assert(method->current_basic_type->file);
-      
-      // Check interface method overide requirement
-      for (int32_t interface_basic_type_index = 0; interface_basic_type_index < basic_type->interface_basic_types->length; interface_basic_type_index++) {
-        
-        SPVM_BASIC_TYPE* interface_basic_type = SPVM_LIST_get(basic_type->interface_basic_types, interface_basic_type_index);
-        for (int32_t interface_method_index = 0; interface_method_index < interface_basic_type->methods->length; interface_method_index++) {
-          SPVM_METHOD* interface_method = SPVM_LIST_get(interface_basic_type->methods, interface_method_index);
-          
-          if (strcmp(method->name, interface_method->name) == 0) {
-            int32_t can_override = SPVM_METHOD_satisfy_interface_method_requirement(compiler, interface_basic_type, interface_method, basic_type, method, "interface");
-            
-            if (can_override == 0) {
-              return;
-            }
-          }
-        }
+    }
+    
+    // Check interface requirement to the super classes
+    SPVM_BASIC_TYPE* parent_basic_type = basic_type->parent;
+    while (1) {
+      if (!parent_basic_type) {
+        break;
       }
       
+      char error_reason[256] = {0};
+      int32_t has_interface = SPVM_BASIC_TYPE_has_interface_common(compiler, basic_type->id, parent_basic_type->id, error_reason);
+      
+      if (!has_interface) {
+        SPVM_COMPILER_error(compiler, error_reason);
+        return;
+      }
+      
+      parent_basic_type = parent_basic_type->parent;
+    }
+    
+    // Check interface requirement to interfaces
+    for (int32_t interface_basic_type_index = 0; interface_basic_type_index < basic_type->interface_basic_types->length; interface_basic_type_index++) {
+      SPVM_BASIC_TYPE* interface_basic_type = SPVM_LIST_get(basic_type->interface_basic_types, interface_basic_type_index);
+      
+      char error_reason[256] = {0};
+      int32_t has_interface = SPVM_BASIC_TYPE_has_interface(compiler, basic_type->id, interface_basic_type->id, error_reason);
+      
+      if (!has_interface) {
+        SPVM_COMPILER_error(compiler, error_reason);
+        return;
+      }
     }
     
     // Sort methods by name
@@ -2000,10 +1997,12 @@ void SPVM_CHECK_check_ast_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic
               int32_t need_data_conversion = 0;
               int32_t allow_narrowing_conversion = 0;
               
+              char error_reason[256] = {0};
               int32_t satisfy_assignment_requirement_without_data_conversion = SPVM_TYPE_satisfy_assignment_requirement_without_data_conversion(
                 compiler,
                 type->basic_type->id, type->dimension, type->flag,
-                operand_type->basic_type->id, operand_type->dimension, operand_type->flag
+                operand_type->basic_type->id, operand_type->dimension, operand_type->flag,
+                error_reason
               );
               
               if (satisfy_assignment_requirement_without_data_conversion) {
@@ -2013,6 +2012,9 @@ void SPVM_CHECK_check_ast_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic
                 op_cur = op_constant_true;
               }
               else {
+                if (strlen(error_reason)) {
+                  SPVM_COMPILER_error(compiler, error_reason);
+                }
                 SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
                 SPVM_OP* op_constant_false = SPVM_OP_new_op_constant_int(compiler, 0, op_cur->file, op_cur->line);
                 SPVM_OP_replace_op(compiler, op_stab, op_constant_false);
@@ -3155,13 +3157,19 @@ void SPVM_CHECK_check_ast_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic
             SPVM_TYPE* cast_type = SPVM_CHECK_get_type(compiler, op_cast);
             assert(cast_type);
             
+            char error_reason[256] = {0};
             int32_t castability = SPVM_TYPE_satisfy_cast_requirement(
               compiler,
               cast_type->basic_type->id, cast_type->dimension, cast_type->flag,
-              src_type->basic_type->id, src_type->dimension, src_type->flag
+              src_type->basic_type->id, src_type->dimension, src_type->flag,
+              error_reason
             );
-
+            
             if (!castability) {
+              if (strlen(error_reason)) {
+                SPVM_COMPILER_error(compiler, error_reason);
+              }
+              
               const char* src_type_name = SPVM_TYPE_new_type_name(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag);
               const char* cast_type_name = SPVM_TYPE_new_type_name(compiler, cast_type->basic_type->id, cast_type->dimension, cast_type->flag);
               SPVM_COMPILER_error(compiler, "The type cast from \"%s\" to \"%s\" is not allowed.\n  at %s line %d", src_type_name, cast_type_name, op_src->file, op_src->line);
@@ -3995,14 +4003,20 @@ SPVM_OP* SPVM_CHECK_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_type, 
   int32_t need_data_conversion = 0;
   int32_t allow_narrowing_conversion = SPVM_CHECK_check_allow_narrowing_conversion(compiler, dist_type, op_src);
   int32_t interface_match = 0;
+  char error_reason[255] = {0};
   int32_t satisfy_assignment_requirement = SPVM_TYPE_satisfy_assignment_requirement(
     compiler,
     dist_type_basic_type_id, dist_type_dimension, dist_type_flag,
     src_type_basic_type_id, src_type_dimension, src_type_flag,
-    &need_data_conversion, allow_narrowing_conversion, interface_match
+    &need_data_conversion, allow_narrowing_conversion, interface_match,
+    error_reason
   );
     
   if (!satisfy_assignment_requirement) {
+    if (strlen(error_reason)) {
+      SPVM_COMPILER_error(compiler, error_reason);
+    }
+    
     SPVM_COMPILER_error(compiler, "The \"%s\" type cannot be assigned to the \"%s\" type in %s.\n  at %s line %d", src_type_name, dist_type_name, place, file, line);
     return NULL;
   }

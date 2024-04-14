@@ -145,7 +145,7 @@ use Env qw( @PATH );
 # overload the system VERSION to compare a required version against gnuplot itself, rather
 # than against the module version.
 
-our $VERSION = '1.042';
+our $VERSION = '1.043';
 
 # On install, try to make sure at least this version is present.
 our $GNUPLOT_RECOMMENDED_VERSION = '4.6';  
@@ -311,12 +311,17 @@ script will try to install gnuplot) or get it yourself from L<https://gnuplot.so
 Alien::Gnuplot: the executable '$exec_path' appears not to be gnuplot,
 or perhaps there was a problem running it.  You can remove it or set
 your GNUPLOT_BINARY variable to an actual gnuplot.
+
+Raw output from Gnuplot:
+$lines
 };
     
     $lines =~ m/Version (\d+\.\d+) (patchlevel (\d+))?/ or die qq{
 Alien::Gnuplot: the executable file $exec_path claims to be gnuplot, but 
 I could not parse a version number from its output.  Sorry, I give up.
 
+Raw output from Gnuplot:
+$lines
 };
     
     $version = $1;

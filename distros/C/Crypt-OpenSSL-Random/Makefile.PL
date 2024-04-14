@@ -19,7 +19,11 @@ WriteMakefile(
   'LIBS'            => $libdir ? [ "-L$libdir $libs" ] : [ openssl_lib_paths() . " $libs" ],
   'INC'             => $incdir ? "-I$incdir" : openssl_inc_paths(),
   'AUTHOR'          => 'Ian Robertson',
-   (eval { ExtUtils::MakeMaker->VERSION('6.52'); 1 } ?
+  TEST_REQUIRES => {
+    'Test::Pod'           => '1.22',
+    'Test::More'          => 0,
+  },
+  (eval { ExtUtils::MakeMaker->VERSION('6.52'); 1 } ?
     ('CONFIGURE_REQUIRES' =>
      {
       'Crypt::OpenSSL::Guess' => '0.11',
@@ -38,7 +42,7 @@ WriteMakefile(
       },
      }
     ) : ()),
-    SIGN => 1
+    ($ENV{AUTOMATED_TESTING} ? () : (SIGN => 1)),
 );
 
 package MY;

@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 use warnings;
 use strict;
 
@@ -16,24 +16,41 @@ binmode STDOUT, ":utf8";
 
 my $today = DateTime->now();
 
-my $end = $ARGV[0]
-        ? $today->clone->add(days   => $ARGV[0])
-        : $today->clone->add(months => 1);
-
+my %default = (end_of_month => 'limit');
+my $end;
+if (@ARGV) {
+    if ($ARGV[0] < 0) {
+        $end = $today->clone;
+        $today->add(days   => $ARGV[0], %default)
+    }
+    else {
+        $end = $today->clone->add(days   => $ARGV[0], %default);
+    }
+}
+else {
+    $end = $today->clone->add(months => 1, %default);
+}
 my %dh;
 
-my @countries = qw(nl aw bq cw);
+my @countries = qw(aw nl bq cw);
 
 foreach (@countries) {
   $dh{$_} = Date::Holidays->new(countrycode => $_);
 }
 
+$dh{waterkip} = Date::Holidays->new(countrycode => 'WATERKIP', nocheck => 1);
+push(@countries, 'waterkip');
+
 my $day = $today->clone;
+
+my $rc;
 while ($day <= $end) {
-  $day->add(days => 1);
+  $rc=undef;
   foreach (@countries) {
-    _is_holiday($dh{$_}, $day);
+    $rc //= 1 if _is_holiday($dh{$_}, $day);
   }
+  print "\n" if $rc;
+  $day->add(days => 1);
 }
 
 
@@ -41,9 +58,13 @@ sub _is_holiday {
   my $dh  = shift;
   my $day = shift;
 
+  # This means a country isn't available
+  return unless $dh;
+
   my $is = $dh->is_holiday_dt($day, gov => 1);
   return unless $is;
   printf("%s is %s in %s\n", $day->ymd, $is, $dh->{_countrycode});
+  return 1;
 }
 
 # vim: ft=perl
@@ -60,7 +81,7 @@ today-is - Show vacation days for the day
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 

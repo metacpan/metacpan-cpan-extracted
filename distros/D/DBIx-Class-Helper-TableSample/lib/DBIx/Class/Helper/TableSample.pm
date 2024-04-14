@@ -13,7 +13,7 @@ use Ref::Util qw/ is_plain_arrayref is_plain_hashref is_plain_scalarref /;
 
 use namespace::clean;
 
-our $VERSION = 'v0.5.0';
+our $VERSION = 'v0.6.0';
 
 
 sub _resolved_attrs {
@@ -26,9 +26,6 @@ sub _resolved_attrs {
     if ( my $conf = delete $attrs->{tablesample} ) {
 
         my $from = $attrs->{from};
-
-        $rs->throw_exception('tablesample on joins is not supported')
-            if is_plain_arrayref($from) && @$from > 1;
 
         $conf = { fraction => $conf } unless is_plain_hashref($conf);
 
@@ -97,7 +94,7 @@ DBIx::Class::Helper::TableSample - Add support for tablesample clauses
 
 =head1 VERSION
 
-version v0.5.0
+version v0.6.0
 
 =head1 SYNOPSIS
 
@@ -218,6 +215,20 @@ will generate
 
   SELECT me.id FROM table me TABLESAMPLE SYSTEM (5)
 
+The C<fraction> and C<method> options are not restricted, so they can be used with a variety of databases or
+extensions. For example, if you have the PostgreSQL C<tsm_system_rows> extension:
+
+  my $rs = $schema->resultset('Wobbles')->search_rs(
+    undef,
+    {
+      columns     => [qw/ id name /],
+      tablesample => {
+         fraction => 200,
+         method   => 'system_rows',
+      },
+    }
+  );
+
 See your database documentation for the allowable methods.  Note that some databases require it.
 
 Prior to version 0.3.0, this was called C<type>. It is supported for
@@ -260,8 +271,6 @@ This is a helper method.
 It was added in v0.4.1.
 
 =head1 KNOWN ISSUES
-
-Resultsets with joins or inner queries are not supported.
 
 Delete and update queries are not supported.
 

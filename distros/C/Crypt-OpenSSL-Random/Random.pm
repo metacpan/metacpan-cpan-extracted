@@ -9,7 +9,7 @@ require Exporter;
 @EXPORT_OK = qw( random_bytes random_pseudo_bytes random_seed
                  random_egd random_status );
 
-$VERSION = '0.15';
+$VERSION = '0.16';
 XSLoader::load( __PACKAGE__, $VERSION );
 
 1;
@@ -73,12 +73,12 @@ gathering daemon.  Returns the number of bytes read from the daemon on
 success, or C<-1> if not enough bytes were read, or if the connection to
 the daemon failed.
 
-C<libressl> considers this function insecure, so with libressl this
-function does not exist.
+C<libressl> considers this function insecure, so with libressl or an openssl with
+no-egd this function does not exist.
 
 =item random_status ()
 
-This function returns true if the PRNG has sufficient seeding.
+This function returns 1 if the PRNG has sufficient seeding. or 0 if not.
 
 =back
 

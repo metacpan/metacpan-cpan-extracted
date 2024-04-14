@@ -15,171 +15,16 @@ use Encode      qw(decode encode);
 use JSON;
 use LWP::UserAgent;
 use Travel::Routing::DE::HAFAS::Connection;
+use Travel::Status::DE::HAFAS;
 use Travel::Status::DE::HAFAS::Location;
 use Travel::Status::DE::HAFAS::Message;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # {{{ Endpoint Definition
 
-my %hafas_instance = (
-	DB => {
-		mgate       => 'https://reiseauskunft.bahn.de/bin/mgate.exe',
-		name        => 'Deutsche Bahn',
-		productbits => [qw[ice ic_ec d regio s bus ferry u tram ondemand]],
-		salt        => 'bdI8UVj4' . '0K5fvxwf',
-		languages   => [qw[de en fr es]],
-		request     => {
-			client => {
-				id   => 'DB',
-				v    => '20100000',
-				type => 'IPH',
-				name => 'DB Navigator',
-			},
-			ext  => 'DB.R21.12.a',
-			ver  => '1.15',
-			auth => {
-				type => 'AID',
-				aid  => 'n91dB8Z77' . 'MLdoR0K'
-			},
-		},
-	},
-	NAHSH => {
-		mgate       => 'https://nah.sh.hafas.de/bin/mgate.exe',
-		name        => 'Nahverkehrsverbund Schleswig-Holstein',
-		productbits => [qw[ice ice ice regio s bus ferry u tram ondemand]],
-		request     => {
-			client => {
-				id   => 'NAHSH',
-				v    => '3000700',
-				type => 'IPH',
-				name => 'NAHSHPROD',
-			},
-			ver  => '1.16',
-			auth => {
-				type => 'AID',
-				aid  => 'r0Ot9FLF' . 'NAFxijLW'
-			},
-		},
-	},
-	NASA => {
-		mgate       => 'https://reiseauskunft.insa.de/bin/mgate.exe',
-		name        => 'Nahverkehrsservice Sachsen-Anhalt',
-		productbits => [qw[ice ice regio regio regio tram bus ondemand]],
-		languages   => [qw[de en]],
-		request     => {
-			client => {
-				id   => 'NASA',
-				v    => '4000200',
-				type => 'IPH',
-				name => 'nasaPROD',
-				os   => 'iPhone OS 13.1.2',
-			},
-			ver  => '1.18',
-			auth => {
-				type => 'AID',
-				aid  => 'nasa-' . 'apps',
-			},
-			lang => 'deu',
-		},
-	},
-	NVV => {
-		mgate       => 'https://auskunft.nvv.de/auskunft/bin/app/mgate.exe',
-		name        => 'Nordhessischer VerkehrsVerbund',
-		productbits =>
-		  [qw[ice ic_ec regio s u tram bus bus ferry ondemand regio regio]],
-		request => {
-			client => {
-				id   => 'NVV',
-				v    => '5000300',
-				type => 'IPH',
-				name => 'NVVMobilPROD_APPSTORE',
-				os   => 'iOS 13.1.2',
-			},
-			ext  => 'NVV.6.0',
-			ver  => '1.18',
-			auth => {
-				type => 'AID',
-				aid  => 'Kt8eNOH7' . 'qjVeSxNA',
-			},
-			lang => 'deu',
-		},
-	},
-	'ÖBB' => {
-		mgate       => 'https://fahrplan.oebb.at/bin/mgate.exe',
-		name        => 'Österreichische Bundesbahnen',
-		productbits => [
-			[ ice_rj => 'long distance trains' ],
-			[ sev    => 'rail replacement service' ],
-			[ ic_ec  => 'long distance trains' ],
-			[ d_n    => 'night trains and rapid trains' ],
-			[ regio  => 'regional trains' ],
-			[ s      => 'suburban trains' ],
-			[ bus    => 'busses' ],
-			[ ferry  => 'maritime transit' ],
-			[ u      => 'underground' ],
-			[ tram   => 'trams' ],
-			[ other  => 'other transit services' ]
-		],
-		request => {
-			client => {
-				id   => 'OEBB',
-				v    => '6030600',
-				type => 'IPH',
-				name => 'oebbPROD-ADHOC',
-			},
-			ver  => '1.57',
-			auth => {
-				type => 'AID',
-				aid  => 'OWDL4fE4' . 'ixNiPBBm',
-			},
-			lang => 'deu',
-		},
-	},
-	VBB => {
-		mgate       => 'https://fahrinfo.vbb.de/bin/mgate.exe',
-		name        => 'Verkehrsverbund Berlin-Brandenburg',
-		productbits => [qw[s u tram bus ferry ice regio]],
-		languages   => [qw[de en]],
-		request     => {
-			client => {
-				id   => 'VBB',
-				type => 'WEB',
-				name => 'VBB WebApp',
-				l    => 'vs_webapp_vbb',
-			},
-			ext  => 'VBB.1',
-			ver  => '1.33',
-			auth => {
-				type => 'AID',
-				aid  => 'hafas-vb' . 'b-webapp',
-			},
-			lang => 'deu',
-		},
-	},
-	VBN => {
-		mgate       => 'https://fahrplaner.vbn.de/bin/mgate.exe',
-		name        => 'Verkehrsverbund Bremen/Niedersachsen',
-		productbits => [qw[ice ice regio regio s bus ferry u tram ondemand]],
-		salt        => 'SP31mBu' . 'fSyCLmNxp',
-		micmac      => 1,
-		languages   => [qw[de en]],
-		request     => {
-			client => {
-				id   => 'VBN',
-				v    => '6000000',
-				type => 'IPH',
-				name => 'vbn',
-			},
-			ver  => '1.42',
-			auth => {
-				type => 'AID',
-				aid  => 'kaoxIXLn' . '03zCr2KR',
-			},
-			lang => 'deu',
-		},
-	},
-);
+my %hafas_instance
+  = map { $_->{shortname} => $_ } Travel::Status::DE::HAFAS->get_services;
 
 # }}}
 # {{{ Constructors
@@ -690,7 +535,7 @@ Travel::Routing::DE::HAFAS - Interface to HAFAS itinerary services
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 
@@ -868,7 +713,7 @@ None.
 
 =item * LWP::UserAgent(3pm)
 
-=item * Travel::Status::DE::HAFAS::Message(3pm)
+=item * Travel::Status::DE::HAFAS(3pm)
 
 =back
 
@@ -882,7 +727,7 @@ Travel::Routing::DE::HAFAS::Connection(3pm)
 
 =head1 AUTHOR
 
-Copyright (C) 2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2023-2024 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

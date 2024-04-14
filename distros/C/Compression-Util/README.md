@@ -62,16 +62,15 @@ use List::Util qw(uniq);
 use Compression::Util qw(:all);
 
 my $data = do { open my $fh, '<:raw', $^X; local $/; <$fh> };
-my $rle4 = rle4_encode([unpack('C*', $data)]);
-my ($bwt, $idx) = bwt_encode(pack('C*', @$rle4));
+my $rle4 = rle4_encode(string2symbols($data));
+my ($bwt, $idx) = bwt_encode(symbols2string($rle4));
 
-my ($mtf, $alphabet) = mtf_encode([unpack("C*", $bwt)]);
+my ($mtf, $alphabet) = mtf_encode(string2symbols($bwt));
 my $rle = zrle_encode($mtf);
 
-open my $out_fh, '>:raw', \my $enc;
-print $out_fh pack('N', $idx);
-print $out_fh encode_alphabet($alphabet);
-create_huffman_entry($rle, $out_fh);
+my $enc = pack('N', $idx)
+        . encode_alphabet($alphabet)
+        . create_huffman_entry($rle);
 
 say "Original size  : ", length($data);
 say "Compressed size: ", length($enc);
@@ -120,19 +119,22 @@ The encoding of input and output file-handles must be set to `:raw`.
       create_adaptive_ac_entry(\@symbols)  # Create an Adaptive Arithmetic Coding block
       decode_adaptive_ac_entry($fh)        # Decode an Adaptive Arithmetic Coding block
 
+      mrl_compress(\@symbols)              # MRL compression (MTF+ZRLE+RLE4+Huffman coding)
+      mrl_decompress($fh)                  # Inverse of the above method
+
       bz2_compress($string)                # Bzip2-like compression (RLE4+BWT+MTF+ZRLE+Huffman coding)
       bz2_decompress($fh)                  # Inverse of the above method
 
       bz2_compress_symbolic(\@symbols)     # Bzip2-like compression (RLE4+sBWT+MTF+ZRLE+Huffman coding)
       bz2_decompress_symbolic($fh)         # Inverse of the above method
 
-      lz77_compress($string)               # LZ77 + DEFLATE-like encoding of indices and lengths
+      lz77_compress($string)               # LZ77 + DEFLATE-like encoding of distances and lengths
       lz77_decompress($fh)                 # Inverse of the above method
 
-      lzss_compress($string)               # LZSS + DEFLATE-like encoding of indices and lengths
+      lzss_compress($string)               # LZSS + DEFLATE-like encoding of distances and lengths
       lzss_decompress($fh)                 # Inverse of the above method
 
-      lzhd_compress($string)               # LZ77 + Huffman coding of lengths and literals + OBH for indices
+      lzhd_compress($string)               # LZ77 + Huffman coding of lengths and literals + OBH for distances
       lzhd_decompress($fh)                 # Inverse of the above method
 
       lzw_compress($string)                # LZW + abc_encode() compression
@@ -197,8 +199,22 @@ The encoding of input and output file-handles must be set to `:raw`.
 # LOW-LEVEL FUNCTIONS
 
 ```perl
-      read_bit($fh, \$buffer)              # Read one bit from file-handle
-      read_bits($fh, $len)                 # Read `$len` bits from file-handle
+      read_bit($fh, \$buffer)              # Read one bit from file-handle (MSB)
+      read_bit_lsb($fh, \$buffer)          # Read one bit from file-handle (LSB)
+
+      read_bits($fh, $len)                 # Read `$len` bits from file-handle (MSB)
+      read_bits_lsb($fh, $len)             # Read `$len` bits from file-handle (LSB)
+
+      int2bits($symbol, $size)             # Convert an integer to bits of width `$size` (MSB)
+      int2bits_lsb($symbol, $size)         # Convert an integer to bits of width `$size) (LSB)
+
+      bits2int($fh, $size, \$buffer)       # Inverse of `int2bits()`
+      bits2int_lsb($fh, $size, \$buffer)   # Inverse of `int2bits_lsb()`
+
+      string2symbols($string)              # Returns an array-ref of code points
+      symbols2string(\@symbols)            # Returns a string, given an array of code points
+
+      read_null_terminated($fh)            # Read a binary string that ends with NULL ("\0")
 
       binary_vrl_encode($bitstring)        # Binary variable run-length encoding
       binary_vrl_decode($bitstring)        # Binary variable run-length decoding
@@ -216,8 +232,8 @@ The encoding of input and output file-handles must be set to `:raw`.
       make_deflate_tables($size)           # Returns the DEFLATE tables for distance and length symbols
       find_deflate_index($value, \@table)  # Returns the index in a DEFLATE table, given a numerical value
 
-      lz77_encode($string)                 # LZ77 compression of a string into literals, indices and lengths
-      lzss_encode($string)                 # LZSS compression of a string into literals, indices and lengths
+      lz77_encode($string)                 # LZ77 compression of a string into literals, distances and lengths
+      lzss_encode($string)                 # LZSS compression of a string into literals, distances and lengths
       lz77_decode(\@lits, \@idxs, \@lens)  # Inverse of the above two methods
 
       deflate_encode(\@lits, \@idxs, \@lens)  # DEFLATE-like encoding of values returned by lzss_encode()
@@ -369,7 +385,7 @@ High-level function that performs LZ77 (Lempel-Ziv 1977) compression on the prov
     1. lz77_encode
     2. create_huffman_entry(literals)
     3. create_huffman_entry(lengths)
-    4. obh_encode(indices)
+    4. obh_encode(distances)
 
 It takes a single parameter, `$data`, representing the data string to be compressed.
 
@@ -483,7 +499,7 @@ Inverse of `bz2_compress()`.
     my $string = bz2_compress_symbolic(\@symbols, undef, \&create_ac_entry);  # returns a binary string
 ```
 
-Similar to `bz2_compress()`, except that it accepts an arbitrary array-ref of non-negative integer symbols as input. It is also a bit slower on large inputs.
+Similar to `bz2_compress()`, except that it accepts an arbitrary array-ref of non-negative integer values as input. It is also a bit slower on large inputs.
 
 ## bz2\_decompress\_symbolic
 
@@ -498,6 +514,41 @@ Similar to `bz2_compress()`, except that it accepts an arbitrary array-ref of no
 ```
 
 Inverse of `bz2_compress_symbolic()`.
+
+## mrl\_compress
+
+```perl
+    # Does Huffman coding
+    mrl_compress(\@symbols, $out_fh);      # writes to file-handle
+    my $string = mrl_compress(\@symbols);  # returns a binary string
+
+    # Does Arithmetic coding
+    mrl_compress(\@symbols, $out_fh, \&create_ac_entry);             # writes to file-handle
+    my $string = mrl_compress(\@symbols, undef, \&create_ac_entry);  # returns a binary string
+```
+
+A fast compression method, using the following pipeline:
+
+    1. mtf_encode
+    2. zrle_encode
+    3. rle4_encode
+    4. create_huffman_entry
+
+It accepts an arbitrary array-ref of non-negative integer values as input.
+
+## mrl\_decompress
+
+```perl
+    # Using Huffman coding
+    my $symbols = mrl_decompress($fh);
+    my $symbols = mrl_decompress($string);
+
+    # Using Arithmetic coding
+    my $symbols = mrl_decompress($fh, \&decode_ac_entry);
+    my $symbols = mrl_decompress($string, \&decode_ac_entry);
+```
+
+Inverse of `mrl_compress()`.
 
 # INTERFACE FOR MEDIUM-LEVEL FUNCTIONS
 
@@ -643,7 +694,7 @@ Inverse of `abc_encode()`.
 
 Encodes a sequence of non-negative integers using offset bits and Huffman coding.
 
-This method is particularly effective in encoding a sequence of moderately large random integers, such as the list of indices returned by `lz77_encode()`.
+This method is particularly effective in encoding a sequence of moderately large random integers, such as the list of distances returned by `lz77_encode()`.
 
 ## obh\_decode
 
@@ -888,7 +939,17 @@ It takes a single parameter, `\@symbols`, representing the encoded symbols to be
     my $bit = read_bit($fh, \$buffer);
 ```
 
-Reads a single bit from a file-handle `$fh`.
+Reads a single bit from a file-handle `$fh` (MSB order).
+
+The function stores the extra bits inside the `$buffer`, reading one character at a time from the filehandle.
+
+## read\_bit\_lsb
+
+```perl
+    my $bit = read_bit_lsb($fh, \$buffer);
+```
+
+Reads a single bit from a file-handle `$fh` (LSB order).
 
 The function stores the extra bits inside the `$buffer`, reading one character at a time from the filehandle.
 
@@ -898,7 +959,71 @@ The function stores the extra bits inside the `$buffer`, reading one character a
     my $bitstring = read_bits($fh, $bits_len);
 ```
 
-Reads a specified number of bits (`$bits_len`) from a file-handle (`$fh`) and returns them as a string.
+Reads a specified number of bits (`$bits_len`) from a file-handle (`$fh`) and returns them as a string, in MSB order.
+
+## read\_bits\_lsb
+
+```perl
+    my $bitstring = read_bits_lsb($fh, $bits_len);
+```
+
+Reads a specified number of bits (`$bits_len`) from a file-handle (`$fh`) and returns them as a string, in LSB order.
+
+## int2bits
+
+```perl
+    my $bitstring = int2bits($symbol, $size)
+```
+
+Convert a non-negative integer to a bitstring of width `$size`, in MSB order.
+
+## int2bits\_lsb
+
+```perl
+    my $bitstring = int2bits_lsb($symbol, $size)
+```
+
+Convert a non-negative integer to a bitstring of width `$size`, in LSB order.
+
+## bits2int
+
+```perl
+    my $integer = bits2int($fh, $size, \$buffer)
+```
+
+Read `$size` bits from file-handle `$fh` and convert them to an integer, in MSB order. Inverse of `int2bits()`.
+
+## bits2int\_lsb
+
+```perl
+    my $integer = bits2int_lsb($fh, $size, \$buffer)
+```
+
+Read `$size` bits from file-handle `$fh` and convert them to an integer, in LSB order. Inverse of `int2bits_lsb()`.
+
+## string2symbols
+
+```perl
+    my $symbols = string2symbols($string)
+```
+
+Returns an array-ref of code points, given a string.
+
+## symbols2string
+
+```perl
+    my $string = symbols2string(\@symbols)
+```
+
+Returns a string, given an array-ref of code points.
+
+## read\_null\_terminated
+
+```perl
+    my $string = read_null_terminated($fh)
+```
+
+Read a string from file-handle `$fh` that ends with a NULL character ("\\0").
 
 ## binary\_vrl\_encode
 
@@ -946,6 +1071,7 @@ There is probably no need to call this function explicitly. Use `bwt_encode_symb
 ## huffman\_from\_freq
 
 ```perl
+    my $dict = huffman_from_freq(\%freq);
     my ($dict, $rev_dict) = huffman_from_freq(\%freq);
 ```
 
@@ -955,21 +1081,27 @@ It takes a single parameter, `\%freq`, representing the hash table where keys ar
 
 The function returns two values: `$dict`, which represents the constructed Huffman dictionary, and `$rev_dict`, which holds the reverse mapping of Huffman codes to symbols.
 
+The prefix codes are in canonical form, as defined in RFC 1951 (Section 3.2.2).
+
 ## huffman\_from\_symbols
 
 ```perl
+    my $dict = huffman_from_symbols(\@symbols);
     my ($dict, $rev_dict) = huffman_from_symbols(\@symbols);
 ```
 
 Low-level function that constructs Huffman prefix codes, given an array of symbols.
 
-It takes a single parameter, `\@symbols`. Interanlly, it computes the frequency of each symbols and generates the Huffman prefix codes.
+It takes a single parameter, `\@symbols`, from which it computes the frequency of each symbol and generates the corresponding Huffman prefix codes.
 
 The function returns two values: `$dict`, which represents the constructed Huffman dictionary, and `$rev_dict`, which holds the reverse mapping of Huffman codes to symbols.
+
+The prefix codes are in canonical form, as defined in RFC 1951 (Section 3.2.2).
 
 ## huffman\_from\_code\_lengths
 
 ```perl
+    my $dict = huffman_from_code_lengths(\@code_lengths);
     my ($dict, $rev_dict) = huffman_from_code_lengths(\@code_lengths);
 ```
 
@@ -982,7 +1114,7 @@ The function returns two values: `$dict`, which represents the constructed Huffm
 ## huffman\_encode
 
 ```perl
-    my $bits = huffman_encode(\@symbols, $dict);
+    my $bitstring = huffman_encode(\@symbols, $dict);
 ```
 
 Low-level function that performs Huffman encoding on a sequence of symbols using a provided dictionary, returned by `huffman_from_freq()`.
@@ -994,26 +1126,26 @@ The function returns a concatenated string of 1s and 0s, representing the Huffma
 ## huffman\_decode
 
 ```perl
-    my $symbols = huffman_decode($bits, $rev_dict);
+    my $symbols = huffman_decode($bitstring, $rev_dict);
 ```
 
 Low-level function that decodes a Huffman-encoded binary string into a sequence of symbols using a provided reverse dictionary.
 
-It takes two parameters: `$bits`, representing the Huffman-encoded string of 1s and 0s, as returned by `huffman_encode()`, and `$rev_dict`, representing the reverse dictionary mapping Huffman codes to their corresponding symbols.
+It takes two parameters: `$bitstring`, representing the Huffman-encoded string of 1s and 0s, as returned by `huffman_encode()`, and `$rev_dict`, representing the reverse dictionary mapping Huffman codes to their corresponding symbols.
 
 The function returns the decoded sequence of symbols as an array-ref.
 
 ## lzss\_encode
 
 ```perl
-    my ($literals, $indices, $lengths) = lzss_encode($data);
+    my ($literals, $distances, $lengths) = lzss_encode($data);
 ```
 
 Low-level function that performs LZSS (Lempel-Ziv-Storer-Szymanski) compression on the provided data.
 
 It takes a single parameter, `$data`, representing the data string to be compressed.
 
-The function returns three values: `$literals`, which is an array-ref of uncompressed bytes, `$indices`, which contains the indices of the back-references, and `$lengths`, which holds the lengths of the matched sub-strings.
+The function returns three values: `$literals`, which is an array-ref of uncompressed bytes, `$distances`, which contains the relative back-reference distances, and `$lengths`, which holds the lengths of the matched sub-strings.
 
 A back-reference is returned only when it's beneficial (i.e.: when it may not inflate the data). Otherwise, the corresponding index and length are both set to `0`.
 
@@ -1022,27 +1154,27 @@ The output can be decompressed with `lz77_decode()`.
 ## lz77\_encode
 
 ```perl
-    my ($literals, $indices, $lengths) = lz77_encode($data);
+    my ($literals, $distances, $lengths) = lz77_encode($data);
 ```
 
 Low-level function that performs LZ77 (Lempel-Ziv 1977) compression on the provided data.
 
 It takes a single parameter, `$data`, representing the data string to be compressed.
 
-The function returns three values: `$literals`, which is an array-ref of uncompressed bytes, `$indices`, which contains the indices of the matched sub-strings, and `$lengths`, which holds the lengths of the matched sub-strings.
+The function returns three values: `$literals`, which is an array-ref of uncompressed bytes, `$distances`, which contains the relative back-reference distances of the matched sub-strings, and `$lengths`, which holds the lengths of the matched sub-strings.
 
 Lengths are limited to `255`.
 
 ## lz77\_decode / lzss\_decode
 
 ```perl
-    my $data = lz77_decode($literals, $indices, $lengths);
-    my $data = lzss_decode($literals, $indices, $lengths);
+    my $data = lz77_decode($literals, $distances, $lengths);
+    my $data = lzss_decode($literals, $distances, $lengths);
 ```
 
-Low-level function that performs LZ77 (Lempel-Ziv 1977) decompression using the provided literals, indices, and lengths of matched sub-strings.
+Low-level function that performs LZ77 (Lempel-Ziv 1977) decompression using the provided literals, distances, and lengths of matched sub-strings.
 
-It takes three parameters: `$literals`, representing the array-ref of uncompressed bytes, `$indices`, containing the indices of the matched sub-strings, and `$lengths`, holding the lengths of the matched sub-strings.
+It takes three parameters: `$literals`, representing the array-ref of uncompressed bytes, `$distances`, containing the relative back-reference distances of the matched sub-strings, and `$lengths`, holding the lengths of the matched sub-strings.
 
 The function returns the decompressed data as a string.
 
@@ -1062,12 +1194,12 @@ An optional argument can be provided as `\&create_ac_entry` to use Arithmetic Co
 
 ```perl
     # Huffman decoding
-    my ($literals, $indices, $lengths) = deflate_decode($fh);
-    my ($literals, $indices, $lengths) = deflate_decode($string);
+    my ($literals, $distances, $lengths) = deflate_decode($fh);
+    my ($literals, $distances, $lengths) = deflate_decode($string);
 
     # Arithmetic decoding
-    my ($literals, $indices, $lengths) = deflate_decode($fh, \&decode_ac_entry);
-    my ($literals, $indices, $lengths) = deflate_decode($string, \&decode_ac_entry);
+    my ($literals, $distances, $lengths) = deflate_decode($fh, \&decode_ac_entry);
+    my ($literals, $distances, $lengths) = deflate_decode($string, \&decode_ac_entry);
 ```
 
 Inverse of `deflate_encode()`.
@@ -1078,7 +1210,7 @@ Inverse of `deflate_encode()`.
     my ($DISTANCE_SYMBOLS, $LENGTH_SYMBOLS, $LENGTH_INDICES) = make_deflate_tables($size);
 ```
 
-Low-level function that returns a list of tables used in encoding the indices and lengths returned by `lz77_encode()` and `lzss_encode()`.
+Low-level function that returns a list of tables used in encoding the relative back-reference distances and lengths returned by `lz77_encode()` and `lzss_encode()`.
 
 There is no need to call this function explicitly. Use `deflate_encode()` instead!
 

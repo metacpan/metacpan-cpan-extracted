@@ -4,15 +4,19 @@ SPVM::Document::Language::SyntaxParsing - Syntax Parsing in the SPVM Language
 
 =head1 Description
 
-This document describes syntax parsing in the SPVM language.
+This document describes the grammer of the SPVM language and syntax parsing.
 
 =head1 Syntax Parsing
 
-Syntax parsing is the next step to build an AST after L<tokenization|SPVM::Document::Language::Tokenization>.
+Syntax parsing is the step to build an AST.
 
-=head2 Syntax Parsing Rule
+Thie step is just after L<tokenization|SPVM::Document::Language::Tokenization>.
 
-The rule of the syntax parsing of the SPVM language is described using L<GNU Bison|https://en.wikipedia.org/wiki/GNU_Bison> syntax.
+Syntax parsing is performed according to the grammer of the SPVM language.
+
+=head2 Grammer
+
+The grammer of the SPVM language is described using L<GNU Bison|https://en.wikipedia.org/wiki/GNU_Bison> syntax.
 
   %token <opval> CLASS HAS METHOD OUR ENUM MY USE AS REQUIRE ALIAS ALLOW CURRENT_CLASS MUTABLE
   %token <opval> ATTRIBUTE MAKE_READ_ONLY INTERFACE EVAL_ERROR_ID ARGS_WIDTH VERSION_DECL
@@ -23,7 +27,7 @@ The rule of the syntax parsing of the SPVM language is described using L<GNU Bis
   %token <opval> RETURN WEAKEN DIE WARN PRINT SAY CURRENT_CLASS_NAME UNWEAKEN '[' '{' '('
   %type <opval> grammar
   %type <opval> field_name method_name class_name
-  %type <opval> type qualified_type basic_type array_type class_type opt_class_type
+  %type <opval> type qualified_type basic_type array_type opt_basic_type
   %type <opval> array_type_with_length ref_type return_type type_comment opt_type_comment union_type
   %type <opval> opt_classes classes class class_block opt_extends version_decl
   %type <opval> opt_definitions definitions definition
@@ -83,9 +87,6 @@ The rule of the syntax parsing of the SPVM language is described using L<GNU Bis
     | array_type
     | ref_type
 
-  class_type
-    : basic_type
-
   basic_type
     : SYMBOL_NAME
     | BYTE
@@ -132,14 +133,14 @@ The rule of the syntax parsing of the SPVM language is described using L<GNU Bis
     | class
 
   class
-    : CLASS opt_class_type opt_extends class_block END_OF_FILE
-    | CLASS opt_class_type opt_extends ':' opt_attributes class_block END_OF_FILE
-    | CLASS opt_class_type opt_extends ';' END_OF_FILE
-    | CLASS opt_class_type opt_extends ':' opt_attributes ';' END_OF_FILE
+    : CLASS opt_basic_type opt_extends class_block END_OF_FILE
+    | CLASS opt_basic_type opt_extends ':' opt_attributes class_block END_OF_FILE
+    | CLASS opt_basic_type opt_extends ';' END_OF_FILE
+    | CLASS opt_basic_type opt_extends ':' opt_attributes ';' END_OF_FILE
 
-  opt_class_type
+  opt_basic_type
     : /* Empty */
-    | class_type
+    | basic_type
 
   opt_extends
     : /* Empty */
@@ -541,9 +542,9 @@ The rule of the syntax parsing of the SPVM language is described using L<GNU Bis
   isweak_field
     : ISWEAK var ARROW '{' field_name '}'
 
-=head2 Syntax Parsing Token
+=head2 Grammer Token
 
-These are the values of the tokens used in L</"Syntax Parsing Rule">.
+These are tokens for L<grammer/"Grammer">.
 
 =begin html
 

@@ -64,11 +64,24 @@ would return 1
 
 Fetch one row from L</"sth"> and return it as an array reference
 
+    # [
+    #   'foo', 'bar', 'baz'
+    # ]
+
+See also L<CTK::DBI/record>
+
 =head2 arrays
 
     my $arrays = $res->arrays;
 
 Fetch all rows from L</"sth"> and return them as an array of arrays
+
+    # [
+    #   [ 'foo', 'bar', 'baz' ],
+    #   [ 'qux', 'quux' ],
+    # ]
+
+See also L<CTK::DBI/table>
 
 =head2 collection
 
@@ -77,7 +90,7 @@ Fetch all rows from L</"sth"> and return them as an array of arrays
 Fetch all rows from L</"sth"> and return them as a L<Mojo::Collection> object containing hash references
 
     # Process all rows at once
-    say $res->hashes->reduce(sub { $a + $b->{money} }, 0);
+    say $res->collection->reduce(sub { $a + $b->{money} }, 0);
 
 =head2 collection_list
 
@@ -121,6 +134,13 @@ Indicate that you are finished with L</"sth"> and will not be fetching all the r
 
 Fetch one row from L</"sth"> and return it as a hash reference
 
+    # {
+    #   'foo' => 1,
+    #   'bar' => 'one',
+    # }
+
+See also L<CTK::DBI/recordh>
+
 =head2 hashed_by
 
     my $hash = $res->hashed_by( $key_field );
@@ -148,11 +168,24 @@ For example:
 
 See L<DBI/fetchall_hashref> for details
 
+See also L<CTK::DBI/tableh>
+
 =head2 hashes
 
     my $hashes = $res->hashes;
 
 Fetch all rows from L</"sth"> and return them as an array containing hash references
+
+    # [
+    #   {
+    #      'id'   => 1,
+    #      'name' => 'foo'
+    #   },
+    #   {
+    #      'id'   => 2,
+    #      'name' => 'bar'
+    #   }
+    # ]
 
 =head2 last_insert_id
 
@@ -217,7 +250,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp qw/croak/;
 use Mojo::Collection;
@@ -262,11 +295,11 @@ sub errstr { shift->sth->errstr }
 sub finish { shift->sth->finish }
 
 # Main Accessors
-sub array { return shift->sth->fetchrow_arrayref() }
-sub arrays { return shift->sth->fetchall_arrayref() }
+sub array { return shift->sth->fetchrow_arrayref() } # See CTK::DBI::record
+sub arrays { return shift->sth->fetchall_arrayref() } # See CTK::DBI::table
 sub collection_list { return Mojo::Collection->new(shift->sth->fetchall_arrayref()) }
 sub columns { return shift->sth->{NAME} }
-sub hash { return shift->sth->fetchrow_hashref() }
+sub hash { return shift->sth->fetchrow_hashref() } # See CTK::DBI::recordh
 sub hashes { return shift->sth->fetchall_arrayref({}) }
 sub collection { return Mojo::Collection->new(@{(shift->sth->fetchall_arrayref({}))}) }
 sub rows { shift->sth->rows }
@@ -279,7 +312,7 @@ sub last_insert_id {
     my $liid = sprintf('%s_insertid', $self->{driver});
     return $self->sth->{$liid};
 }
-sub hashed_by {
+sub hashed_by { # See CTK::DBI::tableh
     my $self = shift;
     my $key_field = shift; # See keys (http://search.cpan.org/~timb/DBI-1.607/DBI.pm#fetchall_hashref)
     return unless defined($key_field);

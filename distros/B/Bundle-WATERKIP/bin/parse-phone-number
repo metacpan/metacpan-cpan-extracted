@@ -7,7 +7,7 @@ use strict;
 
 use Number::Phone;
 use Pod::Usage;
-use Getopt::Long;
+use Getopt::Long qw(:config no_getopt_compat);
 
 my ($help, $man, $cc, $v);
 
@@ -87,7 +87,18 @@ foreach (@ARGV) {
     for my $k (@order) {
         my $m = "is_$k";
         my $ok = $number->$m;
-        print "$_ is a $k", $/;
+        if ($ok) {
+            print "$_ is a $k", $/;
+            next;
+        }
+        if ($v) {
+            if (defined $ok) {
+                print "$_ is not a $k", $/;
+            }
+            else {
+                print "$_ cannot be determined to be a $k", $/;
+            }
+        }
     }
 }
 
@@ -105,7 +116,7 @@ parse-phone-number - Parse and validate phone numbers
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

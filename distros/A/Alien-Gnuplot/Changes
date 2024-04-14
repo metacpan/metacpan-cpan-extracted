@@ -1,3 +1,6 @@
+1.043 2024-04-13
+- make any failure more verbose to help debugging
+
 1.042 2023-03-30
 - Update Gnuplot 5.4.6 URI for second release of Windows binaries. GH#13.
 

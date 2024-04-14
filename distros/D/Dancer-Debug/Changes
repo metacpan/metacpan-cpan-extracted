@@ -1,5 +1,9 @@
 Revision history for Perl extension Dancer::Debug
 
+0.04    Sat 13 Apr 2024 10:12:32 PM America/New_York
+        - Change ownership to Dancer Core Team
+        - Fix prereqs for dzil
+
 0.03    Mon 02 Aug 2010 09:24:43 PM CEST
         - don't render log panel if no log is available
 

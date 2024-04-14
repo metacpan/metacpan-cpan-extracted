@@ -1,0 +1,75 @@
+NAME
+    Data::MiniDumpX - A simplistic data structure dumper (demo for
+    Plugin::System)
+
+VERSION
+    This document describes version 0.000001 of Data::MiniDumpX (from Perl
+    distribution Data-MiniDumpX), released on 2024-03-02.
+
+SYNOPSIS
+     use Data::MiniDumpX; # imports dd()
+
+     dd [1, 2, 3]; # prints "[1, 2, 3]"
+
+DESCRIPTION
+    This is a simplistic (limited) data structure dumper, meant to be a demo
+    and testing tool for Plugin::System. See Data::DumpX for the real thing.
+
+FUNCTIONS
+  dump
+    Usage:
+
+     my $dump = dump($data);
+
+    Not exported by default, exportable.
+
+  dd
+    Usage:
+
+     dd($data); # returns $data
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-MiniDumpX>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-MiniDumpX>.
+
+SEE ALSO
+    Data::DumpX
+
+    Plugin::System
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-MiniDumpX>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

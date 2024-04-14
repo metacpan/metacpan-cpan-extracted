@@ -44,6 +44,10 @@ sub before_release {
   # (now known as draft-next)
   $diff =~ s{^-share/tests/draft-future/.+\n}{}gm;
 
+  # note: if a removed file was re-added in the submodule, we will get a "aborting; duplicate files
+  # would be produced" fatal error from Gather plugins, so we don't need to explicitly check for
+  # this case
+
   if (my @missing = map s/^-//r, grep m{^-share/}, split /\n/, $diff) {
     $self->log_fatal(join "\n", '',
       'These files were removed from the test suite and must be added to the config for [=inc::OldShareDirFiles]:',

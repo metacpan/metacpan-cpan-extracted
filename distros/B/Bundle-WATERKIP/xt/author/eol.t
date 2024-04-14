@@ -8,6 +8,7 @@ use Test::EOL;
 
 my @files = (
     'bin/get-azure-token.pl',
+    'bin/i3-wod',
     'bin/jwt-decrypt.pl',
     'bin/opnpost',
     'bin/parse-phone-number',

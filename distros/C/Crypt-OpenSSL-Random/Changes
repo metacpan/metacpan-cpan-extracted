@@ -1,5 +1,13 @@
 Revision history for Perl extension Crypt::OpenSSL::Random.
 
+0.16  2024-04-13 rurban
+        - add github actions, travis and appveyor.
+        - Many patches by Takumi Akiyama.
+        - Fix broken github image for strawberry perl
+          by stripping its PATH. their new mingw is incompatible to their
+          old strawberry 5.32
+        - minor documentation fixes.
+
 0.15  2018-04-22 rurban
         - fix mingw hints for pkg-config support (akiym, PR #7)
 

@@ -1,8 +1,5 @@
 package Plack::Middleware::Debug::Dancer::Version;
-BEGIN {
-  $Plack::Middleware::Debug::Dancer::Version::VERSION = '0.03';
-}
-
+$Plack::Middleware::Debug::Dancer::Version::VERSION = '0.04';
 # ABSTRACT: Show Dancer's version
 
 use strict;
@@ -21,9 +18,11 @@ sub run {
 
 1;
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -31,7 +30,7 @@ Plack::Middleware::Debug::Dancer::Version - Show Dancer's version
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -55,4 +54,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

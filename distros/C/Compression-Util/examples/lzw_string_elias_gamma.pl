@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# LZWW compressor/decompressor + Elias Gamma coding, for compressing a given string.
+# LZW compressor/decompressor + Elias Gamma coding, for compressing a given string.
 
 use 5.036;
 use lib               qw(../lib);

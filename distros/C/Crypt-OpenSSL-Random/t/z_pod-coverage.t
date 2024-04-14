@@ -3,7 +3,10 @@ use strict;
 use warnings;
 use Test::More;
 
-plan skip_all => 'done_testing requires Test::More 0.88' if Test::More->VERSION < 0.88;
+BEGIN {
+    plan skip_all => 'done_testing requires Test::More 0.88' if Test::More->VERSION < 0.88;
+}
+
 plan skip_all => 'This test is only run for the module author'
     unless -d '.git' || $ENV{IS_MAINTAINER};
 

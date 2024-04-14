@@ -65,6 +65,18 @@ run_me {
     attr => {
         columns => [qw/ id /],
         tablesample => {
+            fraction => 150,
+            method   => 'system_rows',
+        },
+    },
+    sql => q{SELECT me.id FROM artist me TABLESAMPLE SYSTEM_ROWS (150)},
+};
+
+run_me {
+    table_class => 'Artist',
+    attr => {
+        columns => [qw/ id /],
+        tablesample => {
             method  => 'bernoulli',
             fraction => 0.5,
         },
@@ -108,6 +120,16 @@ run_me {
         },
     },
     sql => q{SELECT me.id FROM artist me TABLESAMPLE(20) REPEATABLE (1234)},
+};
+
+run_me {
+    table_class => 'Artist',
+    attr => {
+        join => 'cds',
+        columns => [qw/ id /],
+        tablesample => 5,
+    },
+    sql => q{SELECT me.id FROM artist me TABLESAMPLE(5) LEFT JOIN cd cds ON cds.artistid = me.artistid},
 };
 
 done_testing;

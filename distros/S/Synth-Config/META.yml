@@ -31,7 +31,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Synth-Config
   repository: https://github.com/ology/Synth-Config.git
-version: '0.0047'
+version: '0.0048'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

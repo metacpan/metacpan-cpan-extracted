@@ -19,7 +19,7 @@
             "CPAN::Meta::Requirements" : "2.120620",
             "ExtUtils::MakeMaker" : "0",
             "Module::Metadata" : "0",
-            "perl" : "5.010"
+            "perl" : "v5.26.0"
          }
       },
       "develop" : {
@@ -53,6 +53,8 @@
       },
       "runtime" : {
          "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::I3X::Workspace::OnDemand" : "0",
             "Authen::SASL" : "0",
             "Azure::AD::Password" : "0",
             "Crypt::JWT" : "0",
@@ -69,6 +71,7 @@
             "Devel::Cover" : "0",
             "Digest::MD5" : "0",
             "Dist::Zilla::PluginBundle::Author::WATERKIP" : "3.3",
+            "EV" : "0",
             "ExtUtils::Installed" : "0",
             "ExtUtils::Packlist" : "0",
             "File::Find" : "0",
@@ -76,6 +79,7 @@
             "File::MimeInfo::Magic" : "0",
             "File::ShareDir" : "0",
             "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
             "File::Temp" : "0",
             "Finance::Crypto::Exchange::Kraken" : "0.002",
             "Finance::Loan::Repayment" : "1.5",
@@ -101,6 +105,7 @@
             "Object::Pad" : "0.66",
             "POSIX" : "0",
             "Pod::Usage" : "0",
+            "Proc::Find" : "0",
             "SQL::Beautify" : "0",
             "Sys::Hostname" : "0",
             "Term::ReadLine" : "0",
@@ -113,8 +118,9 @@
             "XML::LibXML" : "0",
             "YA::CLI" : "0.006",
             "YA::CLI::ActionRole" : "0",
+            "YAML::XS" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "5.010"
+            "perl" : "v5.26.0"
          }
       },
       "test" : {
@@ -123,30 +129,30 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0.96",
-            "perl" : "5.010"
+            "perl" : "v5.26.0"
          }
       }
    },
    "provides" : {
       "Bundle::WATERKIP" : {
          "file" : "lib/Bundle/WATERKIP.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Bundle::WATERKIP::CLI::Azure" : {
          "file" : "lib/Bundle/WATERKIP/CLI/Azure.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Bundle::WATERKIP::CLI::Azure::Password" : {
          "file" : "lib/Bundle/WATERKIP/CLI/Azure/Password.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Bundle::WATERKIP::CLI::JWT" : {
          "file" : "lib/Bundle/WATERKIP/CLI/JWT.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Bundle::WATERKIP::CLI::JWT::Validate" : {
          "file" : "lib/Bundle/WATERKIP/CLI/JWT/Validate.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -157,7 +163,7 @@
          "web" : "https://gitlab.com/waterkip/bundle-waterkip"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_contributors" : [
       "Wesley Schwengle <waterkip@cpan.org>"
    ],

@@ -2,7 +2,7 @@ package ModPerl::RegistryCookerSealed;
 use strict;
 use warnings;
 use version;
-our $VERSION = qv(1.0.0);
+our $VERSION = qv(1.1.0);
 
 use Apache2::Const -compile => qw(:common &OPT_EXECCGI);
 use ModPerl::RegistryCooker;
@@ -40,6 +40,9 @@ sub convert_script_to_compiled_handler {
   my $base = File::Basename::basename($self->{FILENAME});
   my $nph = substr($base, 0, 4) eq 'nph-' ? '$_[0]->assbackwards(1);' : "";
   my $script_name = $self->get_script_name || $0;
+
+  # handle sealed.pm's source filter ourselves, since the string eval won't.
+  s/^\s*my\s+([\w:]+)\s+(\$\w+);/my $1 $2 = '$1';/gms for ${$self->{CODE}};
 
   my $eval = join '',
     'package ',

@@ -1,8 +1,5 @@
 package Dancer::Debug;
-BEGIN {
-  $Dancer::Debug::VERSION = '0.03';
-}
-
+$Dancer::Debug::VERSION = '0.04';
 # ABSTRACT: Extend Plack::Middleware::Debug with some specific panels for Dancer
 
 use strict;
@@ -10,9 +7,11 @@ use warnings;
 
 1;
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -20,7 +19,7 @@ Dancer::Debug - Extend Plack::Middleware::Debug with some specific panels for Da
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -48,6 +47,10 @@ or in your app.psgi:
 
 Dancer::Debug extends L<Plack::Middleware::Debug> with some specific panels for Dancer.
 
+=head1 MAINTAINER
+
+Dancer Core Team
+
 =head1 AUTHOR
 
 franck cuny <franck@lumberjaph.net>
@@ -60,4 +63,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

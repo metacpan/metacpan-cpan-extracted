@@ -1,7 +1,12 @@
 Revision history for Synth-Config
 
+0.0048 2024-04-13 10:44:44
+    - Improve eg/synth-config-cli.pl.
+    - Fix the return value of recall_specs().
+
 0.0047 2024-04-09 11:28:00
-    - Improve the specs logic.
+    - Add the recall_specs() method.
+    - Add a subtest for spec things.
     - Improve eg/patch-visualizer.pl.
     - Fix eg/synth-config-mojo.pl to use database specs.
 

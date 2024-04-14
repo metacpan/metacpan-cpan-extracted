@@ -20,5 +20,5 @@ no_index:
 requires:
   B::Generate: '0'
   perl: '5.028000'
-version: v6.0.3
+version: v6.0.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

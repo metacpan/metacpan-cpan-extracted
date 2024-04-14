@@ -1,3 +1,11 @@
+Travel::Routing::DE::HAFAS 0.07 - Sat Apr 13 2024
+
+    * Replace built-in HAFAS service list with the one provided by
+      Travel::Status::DE::HAFAS
+    * Convert non-local time stamps to backend-specific time zone
+    * hafas: Add -x / --exclude-infeasible and -j / --with-jid options
+    * HAFAS::Connection::Section: Support unspecified local transit (TRSF)
+
 Travel::Routing::DE::HAFAS 0.06 - Thu Mar 28 2024
 
     * hafas: Add -C / --change-time option

@@ -11,7 +11,7 @@ use DateTime::Duration;
 use Travel::Routing::DE::HAFAS::Utils;
 use Travel::Routing::DE::HAFAS::Connection::Section;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 Travel::Routing::DE::HAFAS::Connection->mk_ro_accessors(
 	qw(changes duration sched_dep rt_dep sched_arr rt_arr dep arr dep_platform arr_platform dep_loc arr_loc dep_cancelled arr_cancelled is_cancelled load)
@@ -62,20 +62,30 @@ sub new {
 	);
 
 	# dProgType/aProgType: CORRECTED oder PROGNOSED
-	my $sched_dep = $connection->{dep}{dTimeS};
-	my $rt_dep    = $connection->{dep}{dTimeR};
-	my $sched_arr = $connection->{arr}{aTimeS};
-	my $rt_arr    = $connection->{arr}{aTimeR};
-
-	for my $ts ( $sched_dep, $rt_dep, $sched_arr, $rt_arr ) {
-		if ($ts) {
-			$ts = handle_day_change(
-				date     => $date,
-				time     => $ts,
-				strp_obj => $strptime,
-			);
-		}
-	}
+	my $sched_dep = handle_day_change(
+		date     => $date,
+		time     => $connection->{dep}{dTimeS},
+		offset   => $connection->{dep}{dTZOffset},
+		strp_obj => $strptime,
+	);
+	my $rt_dep = handle_day_change(
+		date     => $date,
+		time     => $connection->{dep}{dTimeR},
+		offset   => $connection->{dep}{dTZOffset},
+		strp_obj => $strptime,
+	);
+	my $sched_arr = handle_day_change(
+		date     => $date,
+		time     => $connection->{arr}{aTimeS},
+		offset   => $connection->{arr}{aTZOffset},
+		strp_obj => $strptime,
+	);
+	my $rt_arr = handle_day_change(
+		date     => $date,
+		time     => $connection->{arr}{aTimeR},
+		offset   => $connection->{arr}{aTZOffset},
+		strp_obj => $strptime,
+	);
 
 	my @sections;
 	for my $sec (@secL) {
@@ -200,7 +210,7 @@ Travel::Routing::DE::HAFAS::Connection - A single connection between two stops
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 
