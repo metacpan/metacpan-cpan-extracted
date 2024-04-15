@@ -1,3 +1,12 @@
+0.484   2024-03-06  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename scripts: list-sah-schemas-modules ->
+          list-sah-schemabundle-modules, list-sah-pschemas-modules ->
+          list-sah-pschemabundle-modules.
+
+        - Tweak examaple summary.
+
+
 0.483   2023-01-20  Released-By: PERLANCAR; Urgency: medium
 
         - Add utilities: get-value-with-sah, list-sah-value-rule-modules,

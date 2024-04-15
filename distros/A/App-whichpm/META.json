@@ -4,7 +4,7 @@
       "Jozef Kutej <jkutej@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4202",
+   "generated_by" : "Module::Build version 0.4231",
    "keywords" : [
       "app",
       "which",
@@ -16,7 +16,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-whichpm",
    "prereqs" : {
@@ -41,7 +41,7 @@
    "provides" : {
       "App::whichpm" : {
          "file" : "lib/App/whichpm.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -56,5 +56,6 @@
          "url" : "http://github.com/jozef/App-whichpm/"
       }
    },
-   "version" : "0.05"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

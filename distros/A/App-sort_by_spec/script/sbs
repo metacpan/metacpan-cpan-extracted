@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-06'; # DATE
+our $DATE = '2024-03-06'; # DATE
 our $DIST = 'App-sort_by_spec'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/sort_by_spec/sort_by_spec",
@@ -40,7 +40,7 @@ sbs - Sort lines of text by spec (shorter alias for 'sort-by-spec')
 
 =head1 VERSION
 
-This document describes version 0.003 of sbs (from Perl distribution App-sort_by_spec), released on 2023-09-06.
+This document describes version 0.004 of sbs (from Perl distribution App-sort_by_spec), released on 2024-03-06.
 
 =head1 SYNOPSIS
 
@@ -271,7 +271,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 =head2 Put odd numbers first in ascending order, then put the specific numbers (4,2,42), then put even numbers last in descending order
 
- %  perl -E 'say for (1..15,42)' | sort-by-spec 'qr([13579]\z)' 'sub { $_[0] <=> $_[1] }' 4 2 42 'qr([13579]\z)' 'sub { $_[0] <=> $_[1] }'
+ %  perl -E 'say for (1..15,42)' | sort-by-spec 'qr([13579]\z)' 'sub { $_[0] <=> $_[1] }' 4 2 42 'qr([02468]\z)' 'sub { $_[1] <=> $_[0] }'
 
 This example is taken from the L<Sort::BySpec>'s Synopsis.
 
@@ -313,7 +313,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

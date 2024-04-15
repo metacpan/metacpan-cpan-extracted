@@ -517,54 +517,52 @@ Examples:
 
 =head2 Anon Class
 
-The anon class is the class that do not has its class name.
+An anon class is a class without specifying its class name.
+
+=head3 Anon Class Definition
+
+An anon class is defined by the following syntax.
 
   class {
   
   }
 
-But internally an anon class has its name, such as C<eval::anon::0>.
+An anon class cannot be defined in a L<class file|Class File>. It is able to be defined in a source code compiled by the L<compile_anon_class|SPVM::Document::NativeAPI::Compiler/"compile_anon_class"> compiler native API.
 
-An anon class is also defined by the anon method.
+An anon class has its L<class name|SPVM::Document::Language::Tokenization/"Class Name">, such as C<eval::anon_class::0>, C<eval::anon_class::1>, C<eval::anon_class::2>.
 
-A anon class for an anon method has its unique L<class name|SPVM::Document::Language::Tokenization/"Class Name"> corresponding to the class name, the line number and the position of columns the anon class is defined.
-
-A anon class for an anon method has the same access control as its outmost class.
-
-A anon class for an anon method has the same alias names as its outmost class.
+  eval::anon_class::123
 
 L<Examples:>
   
-  # Anon class
+  # Examples of the anon class definition
   class {
     static method sum : int ($num1 : int, $num2 : int) {
       return $num1 + $num2;
     }
   }
-  
-  # Anon method
-  class Foo::Bar {
-    method sum : void () {
-      my $anon_method = method : string () {
-        
-      }
-   }
-  }
-  
-  # The name of the anon class
-  Foo::Bar::anon::3::23;
 
 =head2 Outmost Class
 
-An outmost class is the outmost defined class.
+An outmost class is the outmost defined class. This is the same as the class defined by the L<class definition|/"Class Definition">.
 
-The outmost class is C<Foo::Bar> in the following example.
+  class OutmostClass {
+    
+  }
 
-  class Foo::Bar {
-    static method baz : void () {
+Examples:
+  
+  # Examples of the outmost class
+  class MyClass {
+    static method my_method : void () {
+      
+      # The __PACKAGE__ operator returns the outmost class "MyClass".
       my $outmost_class_name = __PACKAGE__;
       
+      # Anon method
       my $cb = method : void () {
+        
+        # The __PACKAGE__ operator returns the outmost class "MyClass".
         my $outmost_class_name = __PACKAGE__;
       };
     }
@@ -572,27 +570,64 @@ The outmost class is C<Foo::Bar> in the following example.
 
 =head2 Multi-Numeric Type Definition
 
-A L<multi-numeric type|SPVM::Document::Language::Types/"Multi-Numeric Types"> is defined by the L<class definition|/"Class Definition"> that has the C<mulnum_t> L<class attribute|/"Class Attribute">.
+A L<multi-numeric type|SPVM::Document::Language::Types/"Multi-Numeric Types"> is defined by the L<class definition|/"Class Definition"> with the C<mulnum_t> L<class attribute|/"Class Attributes">.
 
-  # Continuous two 64bit floating point
+  class CLASS_NAME : mulnum_t {
+    
+  }
+
+Compilation Errors:
+
+The type of all fields must be a L<numeric type|SPVM::Document::Language::Types/"Numeric Types">, otherwise a compilation error occurs.
+
+The types of all fields must be a same type, otherwise a compilation error occurs.
+
+The length of fields must be less than or equal to 255, otherwise a compilation error occurs.
+
+I<CLASS_NAME> must ends with a L<multi-numeric type suffix|/"Multi-Numeric Type Suffix"> corresponding to the type of fields, otherwise a compilation error occurs.
+
+I<FIELD_LENGTH> of the L<multi-numeric type suffix|/"Multi-Numeric Type Suffix"> must be the same as the length of fields, otherwise a compilation error occurs.
+
+I<TYPE_SUFFIX> of the L<multi-numeric type suffix|/"Multi-Numeric Type Suffix"> must correspond to the type of fields.
+
+Examples:
+  
+  # Examples of the multi-numeric type definition
+  class Complex_2f : mulnum_t {
+    re : float;
+    im : float;
+  }
+  
   class Complex_2d : mulnum_t {
     re : double;
     im : double;
   }
-
-The type of a field must be a L<numeric type|SPVM::Document::Language::Types/"Numeric Types">.
-
-The types of all fields must be the same types.
-
-The length of the fields must be less than or equal to 255.
+  
+  class Quaternion_4f : mulnum_t {
+    re : float;
+    i : float;
+    j : float;
+    k : float;
+  }
+  
+  class Quaternion_4d : mulnum_t {
+    re : double;
+    i : double;
+    j : double;
+    k : double;
+  }
 
 =head3 Multi-Numeric Type Suffix
 
 The multi-numeric type must end with the following suffix.
 
-  _[FieldsLength][TypeSuffix]
+  _(non-spaces)FIELD_LENGTH(non-spaces)TYPE_SUFFIX
 
-The List of the Multi-Numeric Type Suffix:
+I<FIELD_LENGTH> is the length of fields.
+
+I<TYPE_SUFFIX> is a type suffix.
+
+The List of Type Suffixes:
 
 =begin html
 
@@ -602,7 +637,7 @@ The List of the Multi-Numeric Type Suffix:
       Numeric Types
    </th>
     <th>
-     Type Suffix
+     Type Suffixes
    </th>
   </tr>
   <tr>
@@ -657,123 +692,13 @@ The List of the Multi-Numeric Type Suffix:
 
 =end html
 
-The length of the fields in the suffix must be the same as the length of the fields.
-
-The type suffix in the suffix must correspond to the L<numeric type|SPVM::Document::Language::Types/"Numeric Types"> that is explained in the L<multi-numeric type suffix|/"Multi-Numeric Types Suffix">.
-
-=head1 Enumeration
-
-The enumeration is the syntx to defines constant values of the int type.
-
-=head2 Enumeration Definition
-
-The C<enum> keyword defines an enumeration. An enumeration has definitions of constant values.
-
-  # Enumeration Definition
-  enum {
-    FLAG1,
-    FLAG2,
-    FLAG3
-  }
-
-The name given to an enumeration value must be a L<method name|SPVM::Document::Language::Tokenization/"Method Name">.
-
-The first enumeration value is 0. The next enumeration value is incremented by 1, and this is continued in the same way.
-
-In the above example, C<FLAG1> is 0, C<FALG2> is 1, and C<FLAG3> is 2.
-
-The type of an enumeration value is the int type.
-
-C<,> after the last enumeration value can be allowed.
-
-  enum {
-    FLAG1,
-    FLAG2,
-    FLAG3,
-  }
-
-An enumeration value can be set by C<=> explicitly.
-
-  enum {
-    FLAG1,
-    FLAG2 = 4,
-    FLAG3,
-  }
-
-In the above example, C<FLAG1> is 0, C<FALG2> is 4, and C<FLAG3> is 5.
-
-An enumeration value is got by the L<class method call|SPVM::Document::Language::Operators/"Class Method Call">.
-
-  Foo->FLAG1
-
-Compilation Errors:
-
-If an enumeration definition is invalid, a compilation error occurs.
-
 Examples:
-
-  class MyClass {
-    enum {
-      FLAG1,
-      FLAG2,
-      FLAG3,
-    }
-  }
-
-=head2 Enumeration Attributes
-
-Attributes can be specified to an enumeration definition.
-
-  private enum {
-    FLAG1,
-    FLAG2 = 4,
-    FLAG3,
-  }
-
-The List of Enumeration Attributes:
-
-=begin html
-
-<table>
-  <tr>
-    <th>
-      Attributes
-   </th>
-    <th>
-      Descriptions
-   </th>
-  </tr>
-  <tr>
-    <td>
-      <b>private</b>
-    </td>
-    <td>
-      This enumeration is private. Each value of this enumeration can not be accessed from other classes.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>protected</b>
-    </td>
-    <td>
-      This enumeration is protected. Each value of this enumeration can not be accessed from other classes except for the child classes.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>public</b>
-    </td>
-    <td>
-      This enumeration is public. Each value of this enumeration can be accessed from other classes. This is default setting.
-    </td>
-  </tr>
-</table>
-
-=end html
-
-Compilation Errors:
-
-Only one of enumeration attributes C<private>, C<protected> or C<public> can be specified, otherwise a compilation error occurs.
+  
+  # Examples of the multi-numeric type suffix
+  _2f;
+  _2d;
+  _4f;
+  _4d;
 
 =head1 Class Variable
 
@@ -1465,6 +1390,8 @@ The overridding method in the child class must satisfy the L<interface requireme
 
 =head2 Anon Method
 
+=head3 Anon Method Definition
+
 The anon method operator defines an L<anon calss|SPVM::Document::Language::Class/"Anon Class"> that has an anon instance method.
 
 And this operator creates an object which type is the anon class by the L<new/"new Operator"> operator, and returns it.
@@ -1475,6 +1402,14 @@ And this operator creates an object which type is the anon class by the L<new/"n
   }
 
 The way to define the method is the same as the L<method definition|SPVM::Document::Language::Class/"Method Definition">.
+
+If an anon method is defined, the name of the class that owns the anon method consist of the L<outmost class|/"Outmost Class">, the line number and the position of columns the anon class is defined conncted with C<::>.
+
+  MyClass::anon_method::3::23
+
+The class that onws an anon method has the same access control as its outmost class.
+
+The class that onws an anon method has the same alias names as its outmost class.
 
 Examples:
   
@@ -1497,12 +1432,12 @@ The above example is the same as the following codes.
   # Foo/Bar.spvm
   class Foo::Bar {
     method some_method : void () {
-      my $comparator = (Comparator)new Foo::Bar::anon::3::31;
+      my $comparator = (Comparator)new Foo::Bar::anon_method::3::31;
     }
   }
   
-  # Foo/Bar/anon/3/31.spvm
-  class Foo::Bar::anon::3::31 : public {
+  # Foo/Bar/anon_method/3/31.spvm
+  class Foo::Bar::anon_method::3::31 : public {
     method : int ($x1 : object, $x2 : object) {
       my $point1 = (Point)$x1;
       my $point2 = (Point)$x2;
@@ -1563,7 +1498,7 @@ The above example is the same as the following codes.
       my $foo = 1;
       my $bar = 5L;
       
-      my $anon = new Foo::Bar::anon::5::61;
+      my $anon = new Foo::Bar::anon_method::5::61;
       $anon->{foo} = $foo;
       $anon->{bar} = $bar;
       
@@ -1571,8 +1506,8 @@ The above example is the same as the following codes.
     }
   }
   
-  # Foo/Bar/anon/5/61.spvm
-  class Foo::Bar::anon::5::61 : public {
+  # Foo/Bar/anon_method/5/61.spvm
+  class Foo::Bar::anon_method::5::61 : public {
     has foo : public int;
     has bar : public long;
     
@@ -1623,7 +1558,7 @@ The return type is the void type.
 
 It has no arguments.
 
-=head1 Method Implementation
+=head2 Method Implementation
 
 Normally a method has a method block. L<Statements|SPVM::Document::Language::Statements/"Statements"> can be written in a method block.
   
@@ -1635,11 +1570,11 @@ Normally a method has a method block. L<Statements|SPVM::Document::Language::Sta
     return $total;
   }
 
-=head2 Local Variable
+=head3 Local Variable
 
 A local variable is a variable that has a L<scope|SPVM::Document::Language::GarbageCollection/"Scope">.
 
-=head3  Local Variable Declaration
+=head4  Local Variable Declaration
 
 B<Local Variable> is a variable that is declared in L</"Scope Block">.  Local Variable has the L<scope|SPVM::Document::Language::GarbageCollection/"Scope">. This is the same as Local Variable in C Language.
 
@@ -1704,7 +1639,7 @@ The local variable declaration returns the value of the local variable. The retu
 
 See the L<scope|SPVM::Document::Language::GarbageCollection/"Scope"> about the scope of the local variable.
 
-=head3  Type Inference
+=head4 Type Inference
 
 If the type of the local variable declaration is ommited, the type of the right operand of the assignment operator is set to it. This is called type inference.
 
@@ -1716,6 +1651,120 @@ If the type of the local variable declaration is ommited, the type of the right 
   
   # Foo
   my $foo = new Foo;
+
+=head1 Enumeration
+
+The enumeration is the syntx to defines constant values of the int type.
+
+=head2 Enumeration Definition
+
+The C<enum> keyword defines an enumeration. An enumeration has definitions of constant values.
+
+  # Enumeration Definition
+  enum {
+    FLAG1,
+    FLAG2,
+    FLAG3
+  }
+
+The name given to an enumeration value must be a L<method name|SPVM::Document::Language::Tokenization/"Method Name">.
+
+The first enumeration value is 0. The next enumeration value is incremented by 1, and this is continued in the same way.
+
+In the above example, C<FLAG1> is 0, C<FALG2> is 1, and C<FLAG3> is 2.
+
+The type of an enumeration value is the int type.
+
+C<,> after the last enumeration value can be allowed.
+
+  enum {
+    FLAG1,
+    FLAG2,
+    FLAG3,
+  }
+
+An enumeration value can be set by C<=> explicitly.
+
+  enum {
+    FLAG1,
+    FLAG2 = 4,
+    FLAG3,
+  }
+
+In the above example, C<FLAG1> is 0, C<FALG2> is 4, and C<FLAG3> is 5.
+
+An enumeration value is got by the L<class method call|SPVM::Document::Language::Operators/"Class Method Call">.
+
+  Foo->FLAG1
+
+Compilation Errors:
+
+If an enumeration definition is invalid, a compilation error occurs.
+
+Examples:
+
+  class MyClass {
+    enum {
+      FLAG1,
+      FLAG2,
+      FLAG3,
+    }
+  }
+
+=head2 Enumeration Attributes
+
+Attributes can be specified to an enumeration definition.
+
+  private enum {
+    FLAG1,
+    FLAG2 = 4,
+    FLAG3,
+  }
+
+The List of Enumeration Attributes:
+
+=begin html
+
+<table>
+  <tr>
+    <th>
+      Attributes
+   </th>
+    <th>
+      Descriptions
+   </th>
+  </tr>
+  <tr>
+    <td>
+      <b>private</b>
+    </td>
+    <td>
+      This enumeration is private. Each value of this enumeration can not be accessed from other classes.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <b>protected</b>
+    </td>
+    <td>
+      This enumeration is protected. Each value of this enumeration can not be accessed from other classes except for the child classes.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <b>public</b>
+    </td>
+    <td>
+      This enumeration is public. Each value of this enumeration can be accessed from other classes. This is default setting.
+    </td>
+  </tr>
+</table>
+
+=end html
+
+Compilation Errors:
+
+Only one of enumeration attributes C<private>, C<protected> or C<public> can be specified, otherwise a compilation error occurs.
 
 =head1 Block
 

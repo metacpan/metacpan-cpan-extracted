@@ -3,11 +3,11 @@ abstract: "locate a Perl module and it's version"
 author:
   - 'Jozef Kutej <jkutej@cpan.org>'
 build_requires:
-  Test::More: 0
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.38
+  Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4202, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 keywords:
   - app
   - which
@@ -16,18 +16,19 @@ keywords:
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-whichpm
 provides:
   App::whichpm:
     file: lib/App/whichpm.pm
-    version: 0.05
+    version: '0.06'
 requires:
-  File::Spec: 0
-  Getopt::Long: 0
-  Pod::Usage: 0
+  File::Spec: '0'
+  Getopt::Long: '0'
+  Pod::Usage: '0'
 resources:
   bugtracker: http://github.com/jozef/App-whichpm/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jozef/App-whichpm/
-version: 0.05
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -8,15 +8,15 @@ use Perinci::CmdLine::Any;
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-20'; # DATE
+our $DATE = '2024-03-06'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.483'; # VERSION
+our $VERSION = '0.484'; # VERSION
 
 our %SPEC;
 
 my $res = gen_read_table_func(
     name => 'app',
-    summary => 'List Sah::Schemas::* modules',
+    summary => 'List Sah::PSchemaBundle::* modules',
     table_spec => {
         fields => {
             name => {
@@ -30,10 +30,10 @@ my $res = gen_read_table_func(
     table_data => sub {
         require Module::List::Tiny;
         my $mods = Module::List::Tiny::list_modules(
-            'Sah::Schemas::', {list_modules=>1, recurse=>1});
+            'Sah::PSchemaBundle::', {list_modules=>1, recurse=>1});
         my @rows;
         for my $mod (sort keys %$mods) {
-            (my $name = $mod) =~ s/\ASah::Schemas:://;
+            (my $name = $mod) =~ s/\ASah::PSchemaBundle:://;
             push @rows, {
                 name => $name,
             };
@@ -48,7 +48,7 @@ Perinci::CmdLine::Any->new(
 )->run;
 
 # ABSTRACT: List Sah coerce rule modules
-# PODNAME: list-sah-schemas-modules
+# PODNAME: list-sah-pschemabundle-modules
 
 __END__
 
@@ -58,19 +58,19 @@ __END__
 
 =head1 NAME
 
-list-sah-schemas-modules - List Sah coerce rule modules
+list-sah-pschemabundle-modules - List Sah coerce rule modules
 
 =head1 VERSION
 
-This document describes version 0.483 of list-sah-schemas-modules (from Perl distribution App-SahUtils), released on 2023-01-20.
+This document describes version 0.484 of list-sah-pschemabundle-modules (from Perl distribution App-SahUtils), released on 2024-03-06.
 
 =head1 SYNOPSIS
 
-B<list-sah-schemas-modules> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+B<list-sah-pschemabundle-modules> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
-B<list-sah-schemas-modules> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+B<list-sah-pschemabundle-modules> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<list-sah-schemas-modules> [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--dist-contains|/"--dist-contains=s">>=I<str>] [(B<L<--dist-in|/"--dist-in=s@">>=I<str>)+|B<L<--dist-in-json|/"--dist-in=s@">>=I<json>] [B<L<--dist-is|/"--dist-is=s">>=I<str>] [B<L<--dist-isnt|/"--dist-isnt=s">>=I<str>] [B<L<--dist-max|/"--dist-max=s">>=I<str>] [B<L<--dist-min|/"--dist-min=s">>=I<str>] [B<L<--dist-not-contains|/"--dist-not-contains=s">>=I<str>] [(B<L<--dist-not-in|/"--dist-not-in=s@">>=I<str>)+|B<L<--dist-not-in-json|/"--dist-not-in=s@">>=I<json>] [B<L<--dist-xmax|/"--dist-xmax=s">>=I<str>] [B<L<--dist-xmin|/"--dist-xmin=s">>=I<str>] [B<L<--dist|/"--dist=s">>=I<str>] [(B<L<--exclude-field|/"--exclude-fields-json=s">>=I<str>)+|B<L<--exclude-fields-json|/"--exclude-fields-json=s">>=I<json>] [(B<L<--field|/"--fields-json=s">>=I<str>)+|B<L<--fields-json|/"--fields-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--might-fail|/"--might-fail">>|B<L<--no-might-fail|/"--might-fail">>|B<L<--nomight-fail|/"--might-fail">>] [B<L<--might-fail-is|/"--might-fail-is">>|B<L<--no-might-fail-is|/"--might-fail-is">>|B<L<--nomight-fail-is|/"--might-fail-is">>] [B<L<--might-fail-isnt|/"--might-fail-isnt">>|B<L<--no-might-fail-isnt|/"--might-fail-isnt">>|B<L<--nomight-fail-isnt|/"--might-fail-isnt">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [(B<L<--prio-in|/"--prio-in=s@">>=I<int>)+|B<L<--prio-in-json|/"--prio-in=s@">>=I<json>] [B<L<--prio-is|/"--prio-is=s">>=I<int>] [B<L<--prio-isnt|/"--prio-isnt=s">>=I<int>] [B<L<--prio-max|/"--prio-max=s">>=I<int>] [B<L<--prio-min|/"--prio-min=s">>=I<int>] [(B<L<--prio-not-in|/"--prio-not-in=s@">>=I<int>)+|B<L<--prio-not-in-json|/"--prio-not-in=s@">>=I<json>] [B<L<--prio-xmax|/"--prio-xmax=s">>=I<int>] [B<L<--prio-xmin|/"--prio-xmin=s">>=I<int>] [B<L<--prio|/"--prio=s">>=I<int>] [B<L<--query-boolean|/"--query-boolean=s">>=I<str>|B<L<--and|/"--query-boolean=s">>|B<L<--or|/"--query-boolean=s">>] [(B<L<--query|/"--query=s@">>=I<str>)+|B<L<--queries-json|/"--query=s@">>=I<json>|(B<L<-q|/"--query=s@">>=I<str>)+] [B<L<--random|/"--random">>|B<L<--no-random|/"--random">>|B<L<--norandom|/"--random">>] [B<L<--result-limit|/"--result-limit=s">>=I<int>] [B<L<--result-start|/"--result-start=s">>=I<int>] [B<L<--rule-contains|/"--rule-contains=s">>=I<str>] [(B<L<--rule-in|/"--rule-in=s@">>=I<str>)+|B<L<--rule-in-json|/"--rule-in=s@">>=I<json>] [B<L<--rule-is|/"--rule-is=s">>=I<str>] [B<L<--rule-isnt|/"--rule-isnt=s">>=I<str>] [B<L<--rule-max|/"--rule-max=s">>=I<str>] [B<L<--rule-min|/"--rule-min=s">>=I<str>] [B<L<--rule-not-contains|/"--rule-not-contains=s">>=I<str>] [(B<L<--rule-not-in|/"--rule-not-in=s@">>=I<str>)+|B<L<--rule-not-in-json|/"--rule-not-in=s@">>=I<json>] [B<L<--rule-xmax|/"--rule-xmax=s">>=I<str>] [B<L<--rule-xmin|/"--rule-xmin=s">>=I<str>] [B<L<--rule|/"--rule=s">>=I<str>] [(B<L<--sort|/"--sort=s@">>=I<str>)+|B<L<--sort-json|/"--sort=s@">>=I<json>] [B<L<--summary-contains|/"--summary-contains=s">>=I<str>] [(B<L<--summary-in|/"--summary-in=s@">>=I<str>)+|B<L<--summary-in-json|/"--summary-in=s@">>=I<json>] [B<L<--summary-is|/"--summary-is=s">>=I<str>] [B<L<--summary-isnt|/"--summary-isnt=s">>=I<str>] [B<L<--summary-max|/"--summary-max=s">>=I<str>] [B<L<--summary-min|/"--summary-min=s">>=I<str>] [B<L<--summary-not-contains|/"--summary-not-contains=s">>=I<str>] [(B<L<--summary-not-in|/"--summary-not-in=s@">>=I<str>)+|B<L<--summary-not-in-json|/"--summary-not-in=s@">>=I<json>] [B<L<--summary-xmax|/"--summary-xmax=s">>=I<str>] [B<L<--summary-xmin|/"--summary-xmin=s">>=I<str>] [B<L<--summary|/"--summary=s">>=I<str>] [B<L<--v-arg|/"--v-arg=s">>=I<str>] [B<L<--v-contains|/"--v-contains=s">>=I<str>] [(B<L<--v-in|/"--v-in=s@">>=I<str>)+|B<L<--v-in-json|/"--v-in=s@">>=I<json>] [B<L<--v-is|/"--v-is=s">>=I<str>] [B<L<--v-isnt|/"--v-isnt=s">>=I<str>] [B<L<--v-max|/"--v-max=s">>=I<str>] [B<L<--v-min|/"--v-min=s">>=I<str>] [B<L<--v-not-contains|/"--v-not-contains=s">>=I<str>] [(B<L<--v-not-in|/"--v-not-in=s@">>=I<str>)+|B<L<--v-not-in-json|/"--v-not-in=s@">>=I<json>] [B<L<--v-xmax|/"--v-xmax=s">>=I<str>] [B<L<--v-xmin|/"--v-xmin=s">>=I<str>] [B<L<--with-field-names|/"--with-field-names">>|B<L<--without-field-names|/"--with-field-names">>] -- [I<L<query|/"--query=s@">>] ...
+B<list-sah-pschemabundle-modules> [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--dist-contains|/"--dist-contains=s">>=I<str>] [(B<L<--dist-in|/"--dist-in=s@">>=I<str>)+|B<L<--dist-in-json|/"--dist-in=s@">>=I<json>] [B<L<--dist-is|/"--dist-is=s">>=I<str>] [B<L<--dist-isnt|/"--dist-isnt=s">>=I<str>] [B<L<--dist-max|/"--dist-max=s">>=I<str>] [B<L<--dist-min|/"--dist-min=s">>=I<str>] [B<L<--dist-not-contains|/"--dist-not-contains=s">>=I<str>] [(B<L<--dist-not-in|/"--dist-not-in=s@">>=I<str>)+|B<L<--dist-not-in-json|/"--dist-not-in=s@">>=I<json>] [B<L<--dist-xmax|/"--dist-xmax=s">>=I<str>] [B<L<--dist-xmin|/"--dist-xmin=s">>=I<str>] [B<L<--dist|/"--dist=s">>=I<str>] [(B<L<--exclude-field|/"--exclude-fields-json=s">>=I<str>)+|B<L<--exclude-fields-json|/"--exclude-fields-json=s">>=I<json>] [(B<L<--field|/"--fields-json=s">>=I<str>)+|B<L<--fields-json|/"--fields-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--might-fail|/"--might-fail">>|B<L<--no-might-fail|/"--might-fail">>|B<L<--nomight-fail|/"--might-fail">>] [B<L<--might-fail-is|/"--might-fail-is">>|B<L<--no-might-fail-is|/"--might-fail-is">>|B<L<--nomight-fail-is|/"--might-fail-is">>] [B<L<--might-fail-isnt|/"--might-fail-isnt">>|B<L<--no-might-fail-isnt|/"--might-fail-isnt">>|B<L<--nomight-fail-isnt|/"--might-fail-isnt">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [(B<L<--prio-in|/"--prio-in=s@">>=I<int>)+|B<L<--prio-in-json|/"--prio-in=s@">>=I<json>] [B<L<--prio-is|/"--prio-is=s">>=I<int>] [B<L<--prio-isnt|/"--prio-isnt=s">>=I<int>] [B<L<--prio-max|/"--prio-max=s">>=I<int>] [B<L<--prio-min|/"--prio-min=s">>=I<int>] [(B<L<--prio-not-in|/"--prio-not-in=s@">>=I<int>)+|B<L<--prio-not-in-json|/"--prio-not-in=s@">>=I<json>] [B<L<--prio-xmax|/"--prio-xmax=s">>=I<int>] [B<L<--prio-xmin|/"--prio-xmin=s">>=I<int>] [B<L<--prio|/"--prio=s">>=I<int>] [B<L<--query-boolean|/"--query-boolean=s">>=I<str>|B<L<--and|/"--query-boolean=s">>|B<L<--or|/"--query-boolean=s">>] [(B<L<--query|/"--query=s@">>=I<str>)+|B<L<--queries-json|/"--query=s@">>=I<json>|(B<L<-q|/"--query=s@">>=I<str>)+] [B<L<--random|/"--random">>|B<L<--no-random|/"--random">>|B<L<--norandom|/"--random">>] [B<L<--result-limit|/"--result-limit=s">>=I<int>] [B<L<--result-start|/"--result-start=s">>=I<int>] [B<L<--rule-contains|/"--rule-contains=s">>=I<str>] [(B<L<--rule-in|/"--rule-in=s@">>=I<str>)+|B<L<--rule-in-json|/"--rule-in=s@">>=I<json>] [B<L<--rule-is|/"--rule-is=s">>=I<str>] [B<L<--rule-isnt|/"--rule-isnt=s">>=I<str>] [B<L<--rule-max|/"--rule-max=s">>=I<str>] [B<L<--rule-min|/"--rule-min=s">>=I<str>] [B<L<--rule-not-contains|/"--rule-not-contains=s">>=I<str>] [(B<L<--rule-not-in|/"--rule-not-in=s@">>=I<str>)+|B<L<--rule-not-in-json|/"--rule-not-in=s@">>=I<json>] [B<L<--rule-xmax|/"--rule-xmax=s">>=I<str>] [B<L<--rule-xmin|/"--rule-xmin=s">>=I<str>] [B<L<--rule|/"--rule=s">>=I<str>] [(B<L<--sort|/"--sort=s@">>=I<str>)+|B<L<--sort-json|/"--sort=s@">>=I<json>] [B<L<--summary-contains|/"--summary-contains=s">>=I<str>] [(B<L<--summary-in|/"--summary-in=s@">>=I<str>)+|B<L<--summary-in-json|/"--summary-in=s@">>=I<json>] [B<L<--summary-is|/"--summary-is=s">>=I<str>] [B<L<--summary-isnt|/"--summary-isnt=s">>=I<str>] [B<L<--summary-max|/"--summary-max=s">>=I<str>] [B<L<--summary-min|/"--summary-min=s">>=I<str>] [B<L<--summary-not-contains|/"--summary-not-contains=s">>=I<str>] [(B<L<--summary-not-in|/"--summary-not-in=s@">>=I<str>)+|B<L<--summary-not-in-json|/"--summary-not-in=s@">>=I<json>] [B<L<--summary-xmax|/"--summary-xmax=s">>=I<str>] [B<L<--summary-xmin|/"--summary-xmin=s">>=I<str>] [B<L<--summary|/"--summary=s">>=I<str>] [B<L<--v-arg|/"--v-arg=s">>=I<str>] [B<L<--v-contains|/"--v-contains=s">>=I<str>] [(B<L<--v-in|/"--v-in=s@">>=I<str>)+|B<L<--v-in-json|/"--v-in=s@">>=I<json>] [B<L<--v-is|/"--v-is=s">>=I<str>] [B<L<--v-isnt|/"--v-isnt=s">>=I<str>] [B<L<--v-max|/"--v-max=s">>=I<str>] [B<L<--v-min|/"--v-min=s">>=I<str>] [B<L<--v-not-contains|/"--v-not-contains=s">>=I<str>] [(B<L<--v-not-in|/"--v-not-in=s@">>=I<str>)+|B<L<--v-not-in-json|/"--v-not-in=s@">>=I<json>] [B<L<--v-xmax|/"--v-xmax=s">>=I<str>] [B<L<--v-xmin|/"--v-xmin=s">>=I<str>] [B<L<--with-field-names|/"--with-field-names">>|B<L<--without-field-names|/"--with-field-names">>] -- [I<L<query|/"--query=s@">>] ...
 
 =head1 DESCRIPTION
 
@@ -708,7 +708,7 @@ shells.
 
 To activate bash completion for this script, put:
 
- complete -C list-sah-schemas-modules list-sah-schemas-modules
+ complete -C list-sah-pschemabundle-modules list-sah-pschemabundle-modules
 
 in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
@@ -721,7 +721,7 @@ which can activate shell completion for scripts immediately.
 
 To activate tcsh completion for this script, put:
 
- complete list-sah-schemas-modules 'p/*/`list-sah-schemas-modules`/'
+ complete list-sah-pschemabundle-modules 'p/*/`list-sah-pschemabundle-modules`/'
 
 in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
@@ -737,7 +737,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/list-sah-schemas-modules.conf>, F</home/u1/list-sah-schemas-modules.conf>, or F</etc/list-sah-schemas-modules.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/list-sah-pschemabundle-modules.conf>, F</home/u1/list-sah-pschemabundle-modules.conf>, or F</etc/list-sah-pschemabundle-modules.conf>.
 
 All found files will be read and merged.
 
@@ -837,17 +837,17 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 LIST_SAH_SCHEMAS_MODULES_OPT
+=head2 LIST_SAH_PSCHEMABUNDLE_MODULES_OPT
 
 String. Specify additional command-line options.
 
 =head1 FILES
 
-=head2 /home/u1/.config/list-sah-schemas-modules.conf
+=head2 /home/u1/.config/list-sah-pschemabundle-modules.conf
 
-=head2 /home/u1/list-sah-schemas-modules.conf
+=head2 /home/u1/list-sah-pschemabundle-modules.conf
 
-=head2 /etc/list-sah-schemas-modules.conf
+=head2 /etc/list-sah-pschemabundle-modules.conf
 
 =head1 HOMEPAGE
 
@@ -859,7 +859,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-SahUtils>.
 
 =head1 SEE ALSO
 
-L<list-sah-schema-modules>
+L<list-sah-pschema-modules>
 
 =head1 AUTHOR
 
@@ -885,7 +885,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

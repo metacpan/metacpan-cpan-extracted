@@ -1,9 +1,14 @@
 MANIFEST
+Changes
 Makefile.PL
 Int113.pm
 Int113.pod
+Int113.xs
+
 t/basic.t
 t/bitwise.t
+t/bitwise_feature.t
+t/bitwise_gmp_cross_checks.t
 t/corner_cases.t
 t/coverage.t
 t/modulus.t

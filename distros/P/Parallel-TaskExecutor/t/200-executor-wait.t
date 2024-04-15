@@ -6,11 +6,8 @@ use FindBin;
 use IO::Pipe;
 use Log::Log4perl::CommandLine ':all', ':loginit' => {layout => "[%p] %m (%c)%n" };
 use Parallel::TaskExecutor;
+use Test2::IPC;
 use Test2::V0;
-
-# TODO: Remove this line once the following issue is fixe:
-# https://github.com/Test-More/test-more/issues/928
-Test2::API::test2_load if $^O eq 'MSWin32';
 
 my $log = Log::Log4perl->get_logger();
 

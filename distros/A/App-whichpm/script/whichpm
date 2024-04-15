@@ -15,8 +15,12 @@ whichpm - locate a Perl module and it's version
 	whichpm -q Some::Module::Name
 	whichpm --quiet Some::Module::Name
 
+	# add lib/ into @INC
+	whichpmv -l Some::Module::Name
+	# add mylib into @INC
+	whichpmv -Imylib Some::Module::Name
+
 	# show version of App::whichpm
-	whichpm -V
 	whichpm --version
 
 	# show/edit .pm file
@@ -36,8 +40,8 @@ printing version too)
 use strict;
 use warnings;
 
-use App::whichpm 'which_pm';
-use Getopt::Long;
+use App::whichpm qw(which_pm);
+use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
 
 exit main();
@@ -45,15 +49,24 @@ exit main();
 sub main {
 	my $help;
 	my $quiet = (-t STDOUT ? 0 : 1);
-	my $version;
-	my $verbose;
+	my ($version, $verbose, @into_inc, $add_lib);
+
+	# allow -Ilib style of include dir options
+	@ARGV = map { $_ =~ m/^-I(.+)$/ ? ('-I', $1) : $_ } @ARGV;
+
 	GetOptions(
 		'help|h'    => \$help,
 		'quiet|q'   => \$quiet,
 		'version|V' => \$version,
 		'verbose|v' => \$verbose,
+		'I=s'       => \@into_inc,
+		'lib|l'     => \$add_lib,
 	) or pod2usage;
 	pod2usage if $help;
+
+	unshift(@INC, @into_inc);
+	unshift(@INC, 'lib')
+		if $add_lib;
 
 	$quiet = 0 if $verbose;
 

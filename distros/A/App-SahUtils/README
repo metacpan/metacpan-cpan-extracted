@@ -2,76 +2,45 @@ NAME
     App::SahUtils - Collection of CLI utilities for Sah and Data::Sah
 
 VERSION
-    This document describes version 0.483 of App::SahUtils (from Perl
-    distribution App-SahUtils), released on 2023-01-20.
+    This document describes version 0.484 of App::SahUtils (from Perl
+    distribution App-SahUtils), released on 2024-03-06.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
     to Sah and Data::Sah:
 
-    *   coerce-with-sah
-
-    *   filter-with-sah
-
-    *   format-with-sah
-
-    *   get-sah-type
-
-    *   get-value-with-sah
-
-    *   is-sah-builtin-type
-
-    *   is-sah-collection-builtin-type
-
-    *   is-sah-collection-type
-
-    *   is-sah-numeric-builtin-type
-
-    *   is-sah-numeric-type
-
-    *   is-sah-ref-builtin-type
-
-    *   is-sah-ref-type
-
-    *   is-sah-simple-builtin-type
-
-    *   is-sah-simple-type
-
-    *   is-sah-type
-
-    *   list-sah-clauses
-
-    *   list-sah-coerce-rule-modules
-
-    *   list-sah-filter-rule-modules
-
-    *   list-sah-pschema-modules
-
-    *   list-sah-pschemas-modules
-
-    *   list-sah-schema-modules
-
-    *   list-sah-schemas-modules
-
-    *   list-sah-type-modules
-
-    *   list-sah-value-rule-modules
-
-    *   normalize-sah-schema
-
-    *   resolve-sah-schema
-
-    *   sah-to-human
-
-    *   show-sah-coerce-rule-module
-
-    *   show-sah-filter-rule-module
-
-    *   show-sah-schema-module
-
-    *   show-sah-value-rule-modules
-
-    *   validate-with-sah
+    1. coerce-with-sah
+    2. filter-with-sah
+    3. format-with-sah
+    4. get-sah-type
+    5. get-value-with-sah
+    6. is-sah-builtin-type
+    7. is-sah-collection-builtin-type
+    8. is-sah-collection-type
+    9. is-sah-numeric-builtin-type
+    10. is-sah-numeric-type
+    11. is-sah-ref-builtin-type
+    12. is-sah-ref-type
+    13. is-sah-simple-builtin-type
+    14. is-sah-simple-type
+    15. is-sah-type
+    16. list-sah-clauses
+    17. list-sah-coerce-rule-modules
+    18. list-sah-filter-rule-modules
+    19. list-sah-pschema-modules
+    20. list-sah-pschemabundle-modules
+    21. list-sah-schema-modules
+    22. list-sah-schemabundle-modules
+    23. list-sah-type-modules
+    24. list-sah-value-rule-modules
+    25. normalize-sah-schema
+    26. resolve-sah-schema
+    27. sah-to-human
+    28. show-sah-coerce-rule-module
+    29. show-sah-filter-rule-module
+    30. show-sah-schema-module
+    31. show-sah-value-rule-modules
+    32. validate-with-sah
 
 FUNCTIONS
   get_sah_type
@@ -81,8 +50,8 @@ FUNCTIONS
 
     Extract type from a Sah string or array schema.
 
-    Uses Data::Sah::Util::Type's "get_type()" to extract the type name part
-    of the schema.
+    Uses Data::Sah::Util::Type's get_type() to extract the type name part of
+    the schema.
 
     This function is not exported.
 
@@ -113,8 +82,8 @@ FUNCTIONS
 
     Check that a string or array schema is a Sah builtin type.
 
-    Uses Data::Sah::Util::Type's "is_type()" to return the type of the
-    schema is the type is known builtin type, or undef if type is unknown.
+    Uses Data::Sah::Util::Type's is_type() to return the type of the schema
+    is the type is known builtin type, or undef if type is unknown.
 
     This function is not exported.
 
@@ -145,8 +114,8 @@ FUNCTIONS
 
     Check that a string or array schema is a Sah collection builtin type.
 
-    Uses Data::Sah::Util::Type's "is_collection()" to check whether the
-    schema is a collection Sah builtin type.
+    Uses Data::Sah::Util::Type's is_collection() to check whether the schema
+    is a collection Sah builtin type.
 
     This function is not exported.
 
@@ -210,7 +179,7 @@ FUNCTIONS
 
     Check that a string or array schema is a Sah numeric builtin type.
 
-    Uses Data::Sah::Util::Type's "is_ref()" to check whether the schema is a
+    Uses Data::Sah::Util::Type's is_ref() to check whether the schema is a
     numeric Sah builtin type.
 
     This function is not exported.
@@ -275,7 +244,7 @@ FUNCTIONS
 
     Check that a string or array schema is a Sah ref builtin type.
 
-    Uses Data::Sah::Util::Type's "is_ref()" to check whether the schema is a
+    Uses Data::Sah::Util::Type's is_ref() to check whether the schema is a
     ref Sah builtin type.
 
     This function is not exported.
@@ -340,8 +309,8 @@ FUNCTIONS
 
     Check that a string or array schema is a Sah simple builtin type.
 
-    Uses Data::Sah::Util::Type's "is_simple()" to check whether the schema
-    is a simple Sah builtin type.
+    Uses Data::Sah::Util::Type's is_simple() to check whether the schema is
+    a simple Sah builtin type.
 
     This function is not exported.
 
@@ -462,8 +431,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016,
-    2015 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2023, 2022, 2020, 2019, 2018, 2017,
+    2016, 2015 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

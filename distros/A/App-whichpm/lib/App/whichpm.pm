@@ -32,7 +32,7 @@ The similar function can be achieved via:
 use warnings;
 use strict;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use File::Spec;
 
@@ -117,13 +117,14 @@ Jozef Kutej
 
 =head1 CONTRIBUTORS
 
-The following people have contributed to the File::is by committing their
+The following people have contributed to the App::whichpm by committing their
 code, sending patches, reporting bugs, asking questions, suggesting useful
 advises, nitpicking, chatting on IRC or commenting on my blog (in no particular
 order):
 
 	Jerrad Pierce
 	Skye Shaw
+	Andreas Hadjiprocopis
 
 =head1 LICENSE AND COPYRIGHT
 

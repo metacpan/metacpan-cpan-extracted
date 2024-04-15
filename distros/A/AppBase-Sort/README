@@ -2,8 +2,8 @@ NAME
     AppBase::Sort - A base for sort-like CLI utilities
 
 VERSION
-    This document describes version 0.002 of AppBase::Sort (from Perl
-    distribution AppBase-Sort), released on 2023-09-05.
+    This document describes version 0.003 of AppBase::Sort (from Perl
+    distribution AppBase-Sort), released on 2024-03-06.
 
 FUNCTIONS
   sort_appbase
@@ -85,7 +85,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2023 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

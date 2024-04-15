@@ -5,6 +5,8 @@ use Math::Int113;
 
 use Test::More;
 
+my $ret;
+
 my $t1 = Math::Int113->new(10384593717069655257060992658440191);
 cmp_ok($t1, '==', 10384593717069655257060992658440191, '10384593717069655257060992658440191assigns ok');
 
@@ -37,6 +39,15 @@ if($nan != $nan) {
   eval { my $x = Math::Int113->new($nan);};
   like ($@, qr/overflows 113 bits/, 'NaN overflows');
 }
+
+eval{ $ret = Math::Int113->new(10) & $nan; };
+like ($@, qr/overflow/i, '& NaN overflows');
+
+eval{ $ret = Math::Int113->new(10) | $nan; };
+like ($@, qr/overflow/i, '| NaN overflows');
+
+eval{ $ret = Math::Int113->new(10) ^ $nan; };
+like ($@, qr/overflow/i, '^ NaN overflows');
 
 require Math::BigInt;
 my $v1 = Math::BigInt->new(18446744073709551615) ** 2;

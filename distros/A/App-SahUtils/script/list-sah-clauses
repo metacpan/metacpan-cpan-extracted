@@ -8,9 +8,9 @@ use Perinci::CmdLine::Any;
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-20'; # DATE
+our $DATE = '2024-03-06'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.483'; # VERSION
+our $VERSION = '0.484'; # VERSION
 
 our %SPEC;
 
@@ -110,7 +110,7 @@ list-sah-clauses - List clauses of a Sah type
 
 =head1 VERSION
 
-This document describes version 0.483 of list-sah-clauses (from Perl distribution App-SahUtils), released on 2023-01-20.
+This document describes version 0.484 of list-sah-clauses (from Perl distribution App-SahUtils), released on 2024-03-06.
 
 =head1 SYNOPSIS
 
@@ -903,7 +903,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

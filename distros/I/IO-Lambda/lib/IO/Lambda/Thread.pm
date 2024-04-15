@@ -11,6 +11,8 @@ use IO::Lambda qw(:all :dev swap_frame);
 our $DISABLED;
 eval { require threads; };
 $DISABLED = $@ if $@;
+$DISABLED = "broken threads on this perl version" if
+	!defined $DISABLED && $^O =~ /win32/i && $] < 5.020;
 
 our $DEBUG = $IO::Lambda::DEBUG{thread};
 

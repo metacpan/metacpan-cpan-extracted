@@ -50,7 +50,7 @@
    "provides" : {
       "Module::Load::Util" : {
          "file" : "lib/Module/Load/Util.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "web" : "https://github.com/perlancar/perl-Module-Load-Util"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -432,7 +432,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
                         "name" : "@Author::PERLANCAR/AppendPrepend",
-                        "version" : "0.01"
+                        "version" : "0.021"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::EnsureUniqueSections",

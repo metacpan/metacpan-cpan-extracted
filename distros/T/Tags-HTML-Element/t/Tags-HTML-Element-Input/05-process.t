@@ -106,7 +106,8 @@ is_deeply(
 		['a', 'type', 'number'],
 		['a', 'min', 0],
 		['a', 'max', 1],
-		['a', 'step', "1e-06"],
+		# In string version is 1e-06, on Windows 1e-006
+		['a', 'step', 0.000001],
 		['e', 'input'],
 	],
 	'Input HTML code (number with min, max and step).',

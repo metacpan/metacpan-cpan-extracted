@@ -5,7 +5,7 @@ lib::root - find perl root and push lib modules path to @INC
 
 # VERSION
 
-version 0.07
+version 0.08
 
 # SYNOPSIS
 

@@ -19,12 +19,12 @@ This module provides API web-server functionality
 =head1 OPTIONS
 
     sub startup {
-        my $self = shift->SUPER::startup( NAME => VALUE, ... );
+        my $self = shift->SUPER::startup( OPTION_NAME => VALUE, ... );
 
         # ...
     }
 
-List of allowed options:
+List of allowed options (pairs of name-value):
 
 =head2 all_features
 
@@ -97,7 +97,7 @@ See L<Mojo::Server::Prefork/accepts>
 
 =head2 cache
 
-The Mojo::Cache object
+The WWW::Suffit::Cache object
 
 =head2 clients
 
@@ -116,7 +116,7 @@ The Config::General object or undef
 
 =head2 acruxconfig
 
-The Acrux::Config object or undef
+The L<Acrux::Config> object or undef
 
 =head2 datadir
 
@@ -342,13 +342,41 @@ This method returns server listeners as list of URLs
 
 =head2 preforked_run
 
+    $app->preforked_run( COMMAND );
+    $app->preforked_run( COMMAND, ...OPTIONS... );
+    $app->preforked_run( COMMAND, { ...OPTIONS... } );
     $app->preforked_run( 'start' );
+    $app->preforked_run( 'start', prerun => sub { ... } );
     $app->preforked_run( 'stop' );
-    $app->preforked_run( 'restart' );
+    $app->preforked_run( 'restart', prerun => sub { ... } );
     $app->preforked_run( 'status' );
     $app->preforked_run( 'reload' );
 
-This method runs your application using a command that is passed as a argument
+This method runs your application using a command that is passed as the first argument
+
+B<Options:>
+
+=over 8
+
+=item prerun
+
+    prerun => sub {
+        my ($app, $prefork) = @_;
+
+        $prefork->on(finish => sub { # Finish
+            my $this = shift; # Prefork object
+            my $graceful = shift;
+            $this->app->log->debug($graceful
+                ? 'Graceful server shutdown'
+                : 'Server shutdown'
+            );
+        });
+    }
+
+This option defines callback function that performs operations with prefork
+instance L<Mojo::Server::Prefork> befor demonize and server running
+
+=back
 
 =head2 raise
 
@@ -401,7 +429,7 @@ Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<g
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2023 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2024 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -412,7 +440,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.08';
+our $VERSION = '1.10';
 
 use Mojo::Base 'Mojolicious';
 
@@ -421,12 +449,10 @@ use POSIX qw//;
 use File::Spec;
 
 use Mojo::URL;
-use Mojo::Cache;
 use Mojo::File qw/ path /;
 use Mojo::Home qw//;
 use Mojo::Util qw/decamelize steady_time/; # decamelize(ref($self))
 use Mojo::Loader qw/load_class/;
-
 use Mojo::Server::Prefork;
 
 use WWW::Suffit::Const qw/
@@ -435,6 +461,7 @@ use WWW::Suffit::Const qw/
     /;
 use WWW::Suffit::Util qw/ color parse_time_offset /;
 use WWW::Suffit::RefUtil qw/ as_array_ref as_hash_ref isnt_void is_true_flag /;
+use WWW::Suffit::Cache;
 use WWW::Suffit::RSA;
 use WWW::Suffit::JWT;
 
@@ -454,7 +481,7 @@ has 'server_port';          # 8080
 has 'debugmode';            # 0
 has 'configobj';            # Config::General object
 has 'acruxconfig';          # Acrux::Config object
-has 'cache' => sub { Mojo::Cache->new };
+has 'cache' => sub { WWW::Suffit::Cache->new };
 
 # Files and directories
 has 'documentroot';         # /var/www/<MONIKER>
@@ -477,7 +504,7 @@ has 'trustedproxies' => sub { [grep {length} @{(shift->conf->list("/trustedproxy
 # Prefork
 has 'clients' => sub { shift->conf->latest("/clients") || SERVER_MAX_CLIENTS }; # 10000
 has 'requests' => sub { shift->conf->latest("/requests") || SERVER_MAX_REQUESTS}; # 100
-has 'accepts' => sub { shift->conf->latest("/accepts") }; # SERVER_ACCEPTS
+has 'accepts' => sub { shift->conf->latest("/accepts") }; # SERVER_ACCEPTS is 0 -- by default not specified
 has 'spare' => sub { shift->conf->latest("/spare") || SERVER_SPARE }; # 2
 has 'workers' => sub { shift->conf->latest("/workers") || SERVER_WORKERS }; # 4
 has 'reload_sig' => sub { shift->conf->latest("/reload_sig") // 'USR2' };
@@ -529,7 +556,7 @@ sub startup {
     unless (exists($syslog_opts->{enable})) { $syslog_opts->{enable} = $syslogen };
     $self->plugin('Syslog' => $syslog_opts);
 
-    # Plugins
+    # PRE REQUIRED Plugins
     $self->plugin('CommonHelpers');
 
     # Logging
@@ -541,15 +568,15 @@ sub startup {
     $self->helper('token'               => \&_getToken);
     $self->helper('jwt'                 => \&_getJWT);
 
-    # DataDir (variable data, caches, temp files and etc.) -- /var/lib/suffit-api
+    # DataDir (variable data, caches, temp files and etc.) -- /var/lib/<MONIKER>
     $self->datadir(path(SHAREDSTATEDIR, $self->moniker)->to_string()) unless defined $self->datadir;
     $self->raise("Startup error! Data directory %s not exists", $self->datadir) unless -e $self->datadir;
 
-    # HomeDir (shared static files, default templates and etc.) -- /usr/share/suffit-api
+    # HomeDir (shared static files, default templates and etc.) -- /usr/share/<MONIKER>
     $self->homedir(path(DATADIR, $self->moniker)->to_string()) unless defined $self->homedir;
     $self->home(Mojo::Home->new($self->homedir)); # Switch to installable home directory
 
-    # DocumentRoot (user's static data) -- /var/www/suffit-api
+    # DocumentRoot (user's static data) -- /var/www/<MONIKER>
     my $documentroot = path(WEBDIR, $self->moniker)->to_string();
     $self->documentroot(-e $documentroot ? $documentroot : $self->homedir) unless defined $self->documentroot;
 
@@ -674,7 +701,7 @@ sub listeners {
     # Make master listener
     my $listener = $url->to_unsafe_string;
 
-    # Make listeners
+    # Make additional (slave) listeners
     my @listeners = ();
     push @listeners, $listener; # Ass master listener
     my $slaves = as_array_ref($self->conf->list("/listenurl")) // [];
@@ -686,6 +713,7 @@ sub listeners {
 sub preforked_run {
     my $self = shift; # app
     my $dash_k = shift || '';
+    my $opts = @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {};
 
     # Dash k
     $self->raise("Incorrect LSB command! Please use start, status, stop, restart or reload")
@@ -800,6 +828,11 @@ sub preforked_run {
             POSIX::setuid($uid) or $self->raise("setuid %s failed - %s", $uid, $!);
             $self->raise("detected strange uid") if !($< == $uid && $> == $uid); # just to be sure
         }
+    }
+
+    # PreRun callback
+    if (my $prerun = $opts->{prerun}) {
+        $prerun->($self, $prefork) if ref($prerun) eq 'CODE';
     }
 
     # Daemonize

@@ -5,10 +5,11 @@ use warnings;
 use utf8;
 
 use English;
+use Hash::Util 'lock_keys';
 use Log::Log4perl;
 use POSIX ':sys_wait_h';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $log = Log::Log4perl->get_logger();
 
@@ -59,7 +60,9 @@ sub new {
   # - catch_error: if false, a failed task will abort the parent.
   # - channel: may be set to read the data produced by the task
   # - data: will contain the data read from the channel.
-  return bless {%data, log => $log}, $class;
+  my $this = bless {%data, log => $log, data => undef, error => undef}, $class;
+  lock_keys(%{$this});
+  return $this;
 }
 
 =pod
@@ -85,8 +88,8 @@ sub DESTROY {
   if ($this->running()) {
     if ($this->{runner}) {
       $this->{log}->trace("Deferring reaping of task $this->{task_id}");
-      delete $this->{runner}{tasks}{$this};
       push @{$this->{runner}{zombies}}, $this;
+      delete $this->{runner}{tasks}{$this};
     } else {
       $this->wait();
     }
@@ -151,12 +154,12 @@ task started, then this method will die() with the child task error.
 sub data {
   my ($this) = @_;
   $this->{log}->logcroak('Trying to read the data of a still running task') unless $this->done();
-  die $this->{error} if exists $this->{error};  ## no critic (RequireCarping)
-                                                # TODO: we should have a variant for undef wantarray that does not setup
-                                                # the whole pipe to get the return data.
-                                                # Note: wantarray here is not necessarily the same as when the task was set
-                                                # up, it is the responsibility of the caller to set the 'scalar' option
-                                                # correctly.
+  die $this->{error} if defined $this->{error};  ## no critic (RequireCarping)
+                                                 # TODO: we should have a variant for undef wantarray that does not setup
+                                                 # the whole pipe to get the return data.
+                                                 # Note: wantarray here is not necessarily the same as when the task was set
+                                                 # up, it is the responsibility of the caller to set the 'scalar' option
+                                                 # correctly.
   return wantarray ? @{$this->{data}} : $this->{data}[0];
 }
 
@@ -230,7 +233,7 @@ sub _process_done {
   $this->{state} = 'done';
   if ($this->{runner}) {
     $this->{runner}{current_tasks}-- unless $this->{untracked};
-    delete $this->{task}{$this};
+    delete $this->{runner}{tasks}{$this};
   }
   if ($CHILD_ERROR) {
     if ($this->{catch_error}) {

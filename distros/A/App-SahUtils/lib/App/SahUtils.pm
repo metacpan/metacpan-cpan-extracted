@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-20'; # DATE
+our $DATE = '2024-03-06'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.483'; # VERSION
+our $VERSION = '0.484'; # VERSION
 
 our %SPEC;
 
@@ -348,7 +348,7 @@ App::SahUtils - Collection of CLI utilities for Sah and Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.483 of App::SahUtils (from Perl distribution App-SahUtils), released on 2023-01-20.
+This document describes version 0.484 of App::SahUtils (from Perl distribution App-SahUtils), released on 2024-03-06.
 
 =head1 SYNOPSIS
 
@@ -357,69 +357,69 @@ L<Sah> and L<Data::Sah>:
 
 =over
 
-=item * L<coerce-with-sah>
+=item 1. L<coerce-with-sah>
 
-=item * L<filter-with-sah>
+=item 2. L<filter-with-sah>
 
-=item * L<format-with-sah>
+=item 3. L<format-with-sah>
 
-=item * L<get-sah-type>
+=item 4. L<get-sah-type>
 
-=item * L<get-value-with-sah>
+=item 5. L<get-value-with-sah>
 
-=item * L<is-sah-builtin-type>
+=item 6. L<is-sah-builtin-type>
 
-=item * L<is-sah-collection-builtin-type>
+=item 7. L<is-sah-collection-builtin-type>
 
-=item * L<is-sah-collection-type>
+=item 8. L<is-sah-collection-type>
 
-=item * L<is-sah-numeric-builtin-type>
+=item 9. L<is-sah-numeric-builtin-type>
 
-=item * L<is-sah-numeric-type>
+=item 10. L<is-sah-numeric-type>
 
-=item * L<is-sah-ref-builtin-type>
+=item 11. L<is-sah-ref-builtin-type>
 
-=item * L<is-sah-ref-type>
+=item 12. L<is-sah-ref-type>
 
-=item * L<is-sah-simple-builtin-type>
+=item 13. L<is-sah-simple-builtin-type>
 
-=item * L<is-sah-simple-type>
+=item 14. L<is-sah-simple-type>
 
-=item * L<is-sah-type>
+=item 15. L<is-sah-type>
 
-=item * L<list-sah-clauses>
+=item 16. L<list-sah-clauses>
 
-=item * L<list-sah-coerce-rule-modules>
+=item 17. L<list-sah-coerce-rule-modules>
 
-=item * L<list-sah-filter-rule-modules>
+=item 18. L<list-sah-filter-rule-modules>
 
-=item * L<list-sah-pschema-modules>
+=item 19. L<list-sah-pschema-modules>
 
-=item * L<list-sah-pschemas-modules>
+=item 20. L<list-sah-pschemabundle-modules>
 
-=item * L<list-sah-schema-modules>
+=item 21. L<list-sah-schema-modules>
 
-=item * L<list-sah-schemas-modules>
+=item 22. L<list-sah-schemabundle-modules>
 
-=item * L<list-sah-type-modules>
+=item 23. L<list-sah-type-modules>
 
-=item * L<list-sah-value-rule-modules>
+=item 24. L<list-sah-value-rule-modules>
 
-=item * L<normalize-sah-schema>
+=item 25. L<normalize-sah-schema>
 
-=item * L<resolve-sah-schema>
+=item 26. L<resolve-sah-schema>
 
-=item * L<sah-to-human>
+=item 27. L<sah-to-human>
 
-=item * L<show-sah-coerce-rule-module>
+=item 28. L<show-sah-coerce-rule-module>
 
-=item * L<show-sah-filter-rule-module>
+=item 29. L<show-sah-filter-rule-module>
 
-=item * L<show-sah-schema-module>
+=item 30. L<show-sah-schema-module>
 
-=item * L<show-sah-value-rule-modules>
+=item 31. L<show-sah-value-rule-modules>
 
-=item * L<validate-with-sah>
+=item 32. L<validate-with-sah>
 
 =back
 
@@ -872,7 +872,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

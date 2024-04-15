@@ -795,7 +795,7 @@ If the type is a L<multi-numeric type|/"Multi-Numeric Types">, the type width is
 
 =head1 Assignment Requirement
 
-The assignment requirement is the requirement if one type is able to be assigned to another type.
+The assignment requirement is the requirement whether one type is able to be assigned to another type.
 
 What does it mean to assign one type to another type?
 
@@ -1197,7 +1197,7 @@ I<InterfaceSatisfiedX> is a L<class type|"Class Types"> or an L<interface type|"
 
 =head1 Cast Requirement
 
-The cast requirement is the requirement if one type is able to be cast to another type.
+The cast requirement is the requirement whether one type is able to be cast to another type.
 
 What does it mean to cast one type to another type?
 
@@ -1605,9 +1605,11 @@ I<InterfaceSatisfiedX> is a L<class type|"Class Types"> or an L<interface type|"
 
 =head1 Interface Requirement
 
-The interface requirement is the requirement if an L<object type|"Object Types"> is able to be assigned to an L<interface type|"Interface Types">.
+The interface requirement is the requirement whether an L<object type|"Object Types"> is able to be assigned to an L<interface type|"Interface Types">.
 
   INTERFACE_TYPE_TO = OBJECT_TYPE_FROM
+
+This is the same concept as type-to-type assignment explained in L<Assignment Requirement|/"Assignment Requirement">.
 
 I<INTERFACE_TYPE_TO> must be an L<interface type|"Interface Types">.
 
@@ -1622,24 +1624,15 @@ I<METHOD_FROM> must be an instance method and satisfy the L<interface method req
 
 =head2 Interface Method Requirement
 
-The interface method requirement is the requirement if one instance method is able to be assigned to another instance method.
+The interface method requirement is the requirement whether a method is able to be assigned to an interface method.
 
-What does it mean to assign one instance method to another instance method?
+  INTERFACE_METHOD_TO = METHOD_FROM
 
-Typically, it is sufficient to consider a case where a value of an instance method type I<INSTANT_METHOD_TYPE_FROM> is assigned to a variable of an instance method type I<INSTANCE_METHOD_TYPE_TO>.
+This is a concept that converts the type-to-type assignment explained in L<Assignment Requirement|/"Assignment Requirement"> to method-to-method assignment.
 
-  my $value : INSTANCE_METHOD_TYPE_FROM;
-  my $var : INSTANCE_METHOD_TYPE_TO = $value;
+I<INTERFACE_METHOD_TO> must be an instance method.
 
-Note that the instance method type is a concept, not an actual one.
-
-Abstracting this, type-to-type assignment is defined.
-
-  INSTANCE_METHOD_TYPE_TO = INSTANCE_METHOD_TYPE_FROM
-
-Note that this is also a concept, not an actual syntax.
-
-And the interface method requirement is explained below.
+I<METHOD_FROM> must be an instance method.
 
 The length of the required arguments of the method of the I<INSTANT_METHOD_TYPE_FROM> type must be equal to the length of the required arguments the method of the I<INSTANT_METHOD_TYPE_TO> type.
 

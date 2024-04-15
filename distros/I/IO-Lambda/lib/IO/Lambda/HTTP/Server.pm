@@ -123,7 +123,8 @@ sub handle_connection
 			$resp = _msg("500 Server Error", $error, !$keep_alive);
 		} elsif ( UNIVERSAL::isa( $resp, 'HTTP::Response')) {
 			$resp->header(Connection => ($keep_alive ? 'keep-alive' : 'close'));
-			$resp = "HTTP/1.1 " . $resp->as_string($CRLF);
+			$resp->protocol("HTTP/1.1");
+			$resp = $resp->as_string($CRLF);
 		} else {
 			$resp = _msg("200 OK", $resp // '', !$keep_alive);
 		}

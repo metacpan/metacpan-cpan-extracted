@@ -2,8 +2,8 @@ NAME
     Module::Load::Util - Some utility routines related to module loading
 
 VERSION
-    This document describes version 0.010 of Module::Load::Util (from Perl
-    distribution Module-Load-Util), released on 2024-01-24.
+    This document describes version 0.011 of Module::Load::Util (from Perl
+    distribution Module-Load-Util), released on 2024-03-06.
 
 SYNOPSIS
      use Module::Load::Util qw(
@@ -157,13 +157,25 @@ FUNCTIONS
 
     Examples:
 
-     call_module_function_with_optional_args("App::ChromeUtils::chrome_is_running");
-     call_module_function_with_optional_args("App::ChromeUtils::start_chrome=quiet,1");
-     call_module_function_with_optional_args("Color::RGB::Util::int2rgb=100500");
-     call_module_function_with_optional_args(["App::ChromeUtils::start_chrome" => {quiet=>1}]);
-     call_module_function_with_optional_args(["Color::RGB::Util::int2rgb" => [100500]]);
+     # function name will be stripped from module name
+
+    call_module_function_with_optional_args("App::ChromeUtils::chrome_is_run
+    ning");
+    call_module_function_with_optional_args("App::ChromeUtils::start_chrome=
+    quiet,1");
+    call_module_function_with_optional_args("Color::RGB::Util::int2rgb=10050
+    0");
+    call_module_function_with_optional_args(["App::ChromeUtils::start_chrome
+    " => {quiet=>1}]);
+    call_module_function_with_optional_args(["Color::RGB::Util::int2rgb" =>
+    [100500]]);
 
      call_module_function_with_optional_args({load=>0}, ["Color::RGB::Util::int2rgb" => [100500]]);
+
+     # if 'function' option is specified,
+
+     call_module_function_with_optional_args({function=>"chrome_is_running"}, "App::ChromeUtils");
+     call_module_function_with_optional_args({function=>"start_chrome"}, "App::ChromeUtils=quiet,1");
 
     Load module then call module's function with optional arguments.
 
@@ -175,9 +187,21 @@ FUNCTIONS
 
     *   ns_prefixes
 
+    *   function
+
   call_module_method_with_optional_args
     Just like "call_module_function_with_optional_args" except the
     subroutine call is replaced with a method call instead.
+
+    Known options:
+
+    *   load
+
+    *   ns_prefix
+
+    *   ns_prefixes
+
+    *   method
 
 HOMEPAGE
     Please visit the project's homepage at

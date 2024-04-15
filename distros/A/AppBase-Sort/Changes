@@ -1,3 +1,9 @@
+0.003   2024-03-06  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] Replace _sortgen with _gen_sorter +
+          _gen_comparer + _gen_sortkey.
+
+
 0.002   2023-09-05  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

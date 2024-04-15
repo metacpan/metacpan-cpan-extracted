@@ -34,4 +34,5 @@ requires 'Readonly';
 
 on 'test' => sub {
   requires 'Log::Log4perl::CommandLine';
+  requires 'Test2::IPC';
 };

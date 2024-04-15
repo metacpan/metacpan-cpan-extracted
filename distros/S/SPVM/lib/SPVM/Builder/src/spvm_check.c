@@ -193,16 +193,20 @@ void SPVM_CHECK_check_basic_types_relation(SPVM_COMPILER* compiler) {
   // Outer class
   for (int32_t basic_type_id = compiler->basic_types_base_id; basic_type_id < compiler->basic_types->length; basic_type_id++) {
     SPVM_BASIC_TYPE* basic_type = SPVM_LIST_get(compiler->basic_types, basic_type_id);
-    if (basic_type->is_anon && !strstr(basic_type->name, "eval::anon::")) {
+    
+    for (int32_t method_index = 0; method_index < basic_type->methods->length; method_index++) {
+      SPVM_METHOD* method = SPVM_LIST_get(basic_type->methods, method_index);
       
-      char* found_ptr = strstr(basic_type->name, "::anon::");
-      assert(found_ptr);
-      int32_t outmost_basic_type_name_length = (int32_t)(found_ptr - basic_type->name);
-      
-      SPVM_BASIC_TYPE* outmost_basic_type = SPVM_HASH_get(compiler->basic_type_symtable, basic_type->name, outmost_basic_type_name_length);
-      assert(outmost_basic_type);
-      
-      basic_type->outmost = outmost_basic_type;
+      if (method->is_anon) {
+        char* found_ptr = strstr(basic_type->name, "::anon_method::");
+        assert(found_ptr);
+        int32_t outmost_basic_type_name_length = (int32_t)(found_ptr - basic_type->name);
+        
+        SPVM_BASIC_TYPE* outmost_basic_type = SPVM_HASH_get(compiler->basic_type_symtable, basic_type->name, outmost_basic_type_name_length);
+        assert(outmost_basic_type);
+        
+        basic_type->outmost = outmost_basic_type;
+      }
     }
   }
 }
@@ -1091,7 +1095,7 @@ void SPVM_CHECK_check_ast_op_types(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* bas
               const char* unresolved_basic_type_name_maybe_alias = op_type->uv.type->unresolved_basic_type_name;
               
               SPVM_HASH* alias_symtable = NULL;
-              if (basic_type->is_anon && basic_type->outmost) {
+              if (basic_type->is_generated_by_anon_method && basic_type->outmost) {
                 alias_symtable = basic_type->outmost->alias_symtable;
               }
               else {
@@ -3067,7 +3071,7 @@ void SPVM_CHECK_check_ast_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic
             
             SPVM_FIELD* found_field_in_current_basic_type = SPVM_HASH_get(method->current_basic_type->unmerged_field_symtable, field_access->field->name, strlen(field_access->field->name));
             
-            int32_t is_parent_field = !found_field_in_current_basic_type && !method->current_basic_type->is_anon;
+            int32_t is_parent_field = !found_field_in_current_basic_type && !method->current_basic_type->is_generated_by_anon_method;
             
             if (!SPVM_CHECK_can_access(compiler, method->current_basic_type,  field_access->field->current_basic_type, field_access->field->access_control_type, is_parent_field)) {
               if (!SPVM_OP_is_allowed(compiler, method->current_basic_type, field->current_basic_type, is_parent_field)) {
@@ -3745,20 +3749,20 @@ SPVM_FIELD* SPVM_CHECK_search_unmerged_field(SPVM_COMPILER* compiler, SPVM_BASIC
   return found_field;
 }
 
-int32_t SPVM_CHECK_can_access(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type_from, SPVM_BASIC_TYPE* basic_type_to, int32_t access_controll_flag_to, int32_t is_parent_field) {
+int32_t SPVM_CHECK_can_access(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* src_basic_type, SPVM_BASIC_TYPE* dist_basic_type, int32_t dist_access_controll_flag, int32_t is_parent_field) {
   
   int32_t can_access = 0;
   
-  if (basic_type_from->is_anon) {
-    basic_type_from = basic_type_from->outmost;
+  if (src_basic_type->is_generated_by_anon_method) {
+    src_basic_type = src_basic_type->outmost;
   }
   
-  if (access_controll_flag_to == SPVM_ATTRIBUTE_C_ID_PRIVATE) {
+  if (dist_access_controll_flag == SPVM_ATTRIBUTE_C_ID_PRIVATE) {
     if (is_parent_field) {
       can_access = 0;
     }
     else {
-      if (strcmp(basic_type_from->name, basic_type_to->name) == 0) {
+      if (strcmp(src_basic_type->name, dist_basic_type->name) == 0) {
         can_access = 1;
       }
       else {
@@ -3766,12 +3770,12 @@ int32_t SPVM_CHECK_can_access(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_ty
       }
     }
   }
-  else if (access_controll_flag_to == SPVM_ATTRIBUTE_C_ID_PROTECTED) {
-    if (strcmp(basic_type_from->name, basic_type_to->name) == 0) {
+  else if (dist_access_controll_flag == SPVM_ATTRIBUTE_C_ID_PROTECTED) {
+    if (strcmp(src_basic_type->name, dist_basic_type->name) == 0) {
       can_access = 1;
     }
     else {
-      if (SPVM_BASIC_TYPE_is_super_class(compiler, basic_type_to->id, basic_type_from->id)) {
+      if (SPVM_BASIC_TYPE_is_super_class(compiler, dist_basic_type->id, src_basic_type->id)) {
         can_access = 1;
       }
       else {
@@ -3779,7 +3783,7 @@ int32_t SPVM_CHECK_can_access(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_ty
       }
     }
   }
-  else if (access_controll_flag_to == SPVM_ATTRIBUTE_C_ID_PUBLIC) {
+  else if (dist_access_controll_flag == SPVM_ATTRIBUTE_C_ID_PUBLIC) {
     can_access = 1;
   }
   else {

@@ -39,7 +39,7 @@ Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<g
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2023 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2024 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -50,7 +50,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 1;
 

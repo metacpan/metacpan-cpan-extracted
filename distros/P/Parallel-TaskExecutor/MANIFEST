@@ -11,5 +11,6 @@ t/001-podsyntax.t
 t/100-simple-perl.t
 t/200-executor-wait.t
 t/300-catch-error.t
+t/400-deletion-order.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

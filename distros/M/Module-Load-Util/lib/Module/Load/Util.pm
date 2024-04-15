@@ -4,9 +4,9 @@ use strict 'subs', 'vars';
 use Regexp::Pattern::Perl::Module ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-24'; # DATE
+our $DATE = '2024-03-06'; # DATE
 our $DIST = 'Module-Load-Util'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -127,12 +127,16 @@ sub call_module_function_with_optional_args {
 
     my ($module, $args) = _normalize_module_with_optional_args(
         $module_with_optional_args);
-    $module =~ s/\A(.+)::(\w+)\z/$1/ or die "Please specify MODULE::FUNCTION, not just module name '$module'";
-    my $func = $2;
+    my $function;
+    if (defined $opts->{function}) {
+        $function = $opts->{function};
+    } else {
+        $module =~ s/\A(.+)::(\w+)\z/$1/ or die "Please specify MODULE::FUNCTION, not just module name '$module'";
+        $function = $2;
+    }
+    $module = _load_module($opts, $module);
 
-    _load_module($opts, $module);
-
-    &{"$module\::$func"}(@$args);
+    &{"$module\::$function"}(@$args);
 }
 
 sub call_module_method_with_optional_args {
@@ -141,12 +145,17 @@ sub call_module_method_with_optional_args {
 
     my ($module, $args) = _normalize_module_with_optional_args(
         $module_with_optional_args);
-    $module =~ s/\A(.+)::(\w+)\z/$1/ or die "Please specify MODULE::FUNCTION, not just module name '$module'";
-    my $func = $2;
+    my $method;
+    if (defined $opts->{method}) {
+        $method = $opts->{method};
+    } else {
+        $module =~ s/\A(.+)::(\w+)\z/$1/ or die "Please specify MODULE::FUNCTION, not just module name '$module'";
+        $method = $2;
+    }
 
-    _load_module($opts, $module);
+    $module = _load_module($opts, $module);
 
-    $module->$func(@$args);
+    $module->$method(@$args);
 }
 
 1;
@@ -164,7 +173,7 @@ Module::Load::Util - Some utility routines related to module loading
 
 =head1 VERSION
 
-This document describes version 0.010 of Module::Load::Util (from Perl distribution Module-Load-Util), released on 2024-01-24.
+This document describes version 0.011 of Module::Load::Util (from Perl distribution Module-Load-Util), released on 2024-03-06.
 
 =head1 SYNOPSIS
 
@@ -328,13 +337,20 @@ Usage:
 
 Examples:
 
- call_module_function_with_optional_args("App::ChromeUtils::chrome_is_running");
+ # function name will be stripped from module name
+
+call_module_function_with_optional_args("App::ChromeUtils::chrome_is_running");
  call_module_function_with_optional_args("App::ChromeUtils::start_chrome=quiet,1");
  call_module_function_with_optional_args("Color::RGB::Util::int2rgb=100500");
  call_module_function_with_optional_args(["App::ChromeUtils::start_chrome" => {quiet=>1}]);
  call_module_function_with_optional_args(["Color::RGB::Util::int2rgb" => [100500]]);
 
  call_module_function_with_optional_args({load=>0}, ["Color::RGB::Util::int2rgb" => [100500]]);
+
+ # if 'function' option is specified,
+
+ call_module_function_with_optional_args({function=>"chrome_is_running"}, "App::ChromeUtils");
+ call_module_function_with_optional_args({function=>"start_chrome"}, "App::ChromeUtils=quiet,1");
 
 Load module then call module's function with optional arguments.
 
@@ -348,12 +364,28 @@ Known options:
 
 =item * ns_prefixes
 
+=item * function
+
 =back
 
 =head2 call_module_method_with_optional_args
 
 Just like L</call_module_function_with_optional_args> except the subroutine call
 is replaced with a method call instead.
+
+Known options:
+
+=over
+
+=item * load
+
+=item * ns_prefix
+
+=item * ns_prefixes
+
+=item * method
+
+=back
 
 =head1 HOMEPAGE
 

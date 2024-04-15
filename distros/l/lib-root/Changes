@@ -1,5 +1,9 @@
 Revision history for Perl extension lib::root
 
+0.08 2024-04-14T21:45:49Z
+
+    - update tests to fix a cygwin reported error in cpan testers
+
 0.07 2024-04-06T22:36:14Z
 
     - update docs, describe the features / parameters

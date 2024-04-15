@@ -10,9 +10,9 @@ use AppBase::Sort::File ();
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-05'; # DATE
+our $DATE = '2024-03-06'; # DATE
 our $DIST = 'AppBase-Sort'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our %SPEC;
 
@@ -96,7 +96,7 @@ App::sort_by_example - Sort lines of text by example
 
 =head1 VERSION
 
-This document describes version 0.002 of App::sort_by_example (from Perl distribution AppBase-Sort), released on 2023-09-05.
+This document describes version 0.003 of App::sort_by_example (from Perl distribution AppBase-Sort), released on 2024-03-06.
 
 =head1 FUNCTIONS
 
@@ -195,7 +195,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

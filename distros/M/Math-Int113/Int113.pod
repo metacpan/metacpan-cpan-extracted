@@ -60,11 +60,30 @@
     Take a look at t/coverage.t for other permutations, too.
     (Just another silly exercise ;-)
 
-  No other public functions are provided, except for new() and the
+  ($div, $mod) = divmod($sv1, $sv2);
+    If $sv1 and/or $sv2 are not already Math::Int113 objects their values,
+    assessed in numeric context, will be assigned to Math::Int113 objects.
+    $div is a Math::Int113 object containing the value of the (integer)
+    division $sv1 / $sv2.
+    $mod is a Math::Int113 object containing the value of the (integer)
+    operation $sv1 % $sv2.
+
+  No other functions are exportable although, of course, new() and the
   subroutines that are responsible for overloading the  '+', '-', '*',
   '/', '%', '**', '++', '--', '>=', '<=', '==', '!=', '>', '<', '<=>',
   '""', '+=', '-=', '*=', '/=', '/%=', '**=', '<<', '>>', '&', '|', '^',
-  '~', '<<=', '>>=', '&=', '|=', '^=' (and perhaps other) operations.
+  '~', '<<=', '>>=', '&=', '|=', '^=' operations can be accessed by their
+  fully qualified names.
+
+head1 BITWISE OPERATIONS ON NEGATIVE VALUES
+
+  For '<<', and '>>', a left  shift of -x is implemented as a right shift
+  of x, and a right shift of -x is implemented as a left shift of x.
+  All other negative values used in  &, |, ^, ~, <<, and >> operations
+  will be replaced by their respective 2s-complement value.
+  That is, for negative $x , we set $x = ~($x * -1) + 1 prior to
+  performing the operation.
+
 
 head1 LICENSE
 

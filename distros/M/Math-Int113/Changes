@@ -1,0 +1,31 @@
+Changes file for Math::Int113
+
+0.04
+ - Allow negative values to be passed to bitwise operators (&, |, ^, ~, >>, <<).
+   These negative values will be converted to their 113-bit 2s-complement value
+   prior to being acted upon by the bitwise operator - thus mimicking perl's
+   treatment of negative 32-bit/64-bit IVs.
+ - Add divmod() function.
+ - Add new test file t/bitwise_feature.t
+
+0.03
+ - Overload '%' operation.
+ - Disallow left shifts and right shifts of more than 112 places.
+ - Add coverage() function.
+
+0.02
+ - Fix Makefile.PL to disallow builds on perls whose nvtype is the 80-bit
+   extended precision long double.
+
+ - Alter the allowed range of values from:
+   -10384593717069655257060992658440192 .. 10384593717069655257060992658440192
+   to:
+   -10384593717069655257060992658440191 .. 10384593717069655257060992658440191
+   This is done because +/-1038...193 is also assigned as +/-1038...192.
+
+ - Handle NaN.
+
+0.01
+ - first release
+
+

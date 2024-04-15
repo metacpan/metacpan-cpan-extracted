@@ -21,16 +21,14 @@ no_index:
 requires:
   Mojolicious: '7.94'
   Mojolicious::Plugin::ConfigGeneral: '1.02'
-  WWW::Suffit: '1.06'
+  WWW::Suffit: '1.08'
   WWW::Suffit::API: '1'
-  WWW::Suffit::Plugin::BasicAuth: '1'
   WWW::Suffit::Plugin::CommonHelpers: '1'
-  WWW::Suffit::Plugin::ServerInfo: '1.01'
   WWW::Suffit::Plugin::Syslog: '1'
   perl: '5.020'
 resources:
   homepage: https://sourceforge.net/projects/www-suffit-server/
   license: https://dev.perl.org/licenses
   repository: https://abalama@git.code.sf.net/p/www-suffit-server/code
-version: '1.08'
+version: '1.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

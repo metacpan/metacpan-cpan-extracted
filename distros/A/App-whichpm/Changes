@@ -1,5 +1,9 @@
 Revision history for App-whichpm
 
+0.06    14 April 2024
+    * add -l and -I parameters to add @INC paths
+    * fix -v vs -V with Getopt::Long (thanks Andreas Hadjiprocopis)
+
 0.05    29 May 2015
     * whichpm does exit(1) when .pm not found (thanks Skye Shaw)
 

@@ -299,8 +299,14 @@ sub parse_proxy
 		}
 		my $proxy = $proxy{all} // $proxy{$scheme};
 		$proxy{no} //= '';
-		($host, $port) = ( $proxy =~ /^(.+?)\:(\d+)$/) ?  ($1, $2) : ($proxy, 80)
-			if defined($proxy) and $proxy{no} ne '*' and $proxy{no} !~ /\b\Q$host\E\b/;
+		if (defined($proxy) and $proxy{no} ne '*' and $proxy{no} !~ /\b\Q$host\E\b/) {
+			if ( $proxy =~ m[^http://(.*?)/?$]) {
+				$proxy = $1;
+				($host, $port) = ( $proxy =~ /^(.+?)\:(\d+)$/) ?  ($1, $2) : ($proxy, 80)
+			} else {
+				warn "bad proxy environment variable: $host\n";
+			}
+		}
 	}
 	return ( $host, $port);
 

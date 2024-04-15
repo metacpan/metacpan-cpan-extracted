@@ -1,5 +1,9 @@
 Revision history for Perl distribution IPC-Perl
 
+0.02 - 2024-04-14
+
+ - Fix a deletion order bug
+
 0.01 - 2024-04-13
 
  - Initial release

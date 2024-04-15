@@ -35,11 +35,9 @@
          "requires" : {
             "Mojolicious" : "7.94",
             "Mojolicious::Plugin::ConfigGeneral" : "1.02",
-            "WWW::Suffit" : "1.06",
+            "WWW::Suffit" : "1.08",
             "WWW::Suffit::API" : "1",
-            "WWW::Suffit::Plugin::BasicAuth" : "1",
             "WWW::Suffit::Plugin::CommonHelpers" : "1",
-            "WWW::Suffit::Plugin::ServerInfo" : "1.01",
             "WWW::Suffit::Plugin::Syslog" : "1",
             "perl" : "5.020"
          }
@@ -57,6 +55,6 @@
          "web" : "https://sourceforge.net/p/www-suffit-server/code/ci/master/tree/"
       }
    },
-   "version" : "1.08",
+   "version" : "1.10",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

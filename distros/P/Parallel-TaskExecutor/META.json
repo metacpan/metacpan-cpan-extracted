@@ -66,6 +66,7 @@
             "CPAN::Common::Index::Mux::Ordered" : "0",
             "Log::Log4perl::CommandLine" : "0",
             "Readonly" : "0",
+            "Test2::IPC" : "0",
             "Test2::V0" : "0",
             "Test::CPANfile" : "0",
             "Test::More" : "0"
@@ -87,6 +88,6 @@
          "web" : "https://github.com/mkende/perl_parallel_task_executor"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

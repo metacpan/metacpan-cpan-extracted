@@ -10,9 +10,9 @@ use Data::Sah::CoerceCommon;
 our %SPEC;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-20'; # DATE
+our $DATE = '2024-03-06'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.483'; # VERSION
+our $VERSION = '0.484'; # VERSION
 
 $SPEC{coerce_with_sah} = {
     v => 1.1,
@@ -327,7 +327,7 @@ coerce-with-sah - Coerce data
 
 =head1 VERSION
 
-This document describes version 0.483 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2023-01-20.
+This document describes version 0.484 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2024-03-06.
 
 =head1 SYNOPSIS
 
@@ -710,24 +710,32 @@ String. Specify additional command-line options.
                                                                "EBhm"              => "E h:mm B",
                                                                "EBhms"             => "E h:mm:ss B",
                                                                "Ed"                => "d E",
+                                                               "Ehm"               => "E h:mm\x{202F}a",
                                                                "EHm"               => "E HH:mm",
-                                                               "Ehm"               => "E h:mm a",
+                                                               "Ehm-alt-ascii"     => "E h:mm a",
+                                                               "Ehms"              => "E h:mm:ss\x{202F}a",
                                                                "EHms"              => "E HH:mm:ss",
-                                                               "Ehms"              => "E h:mm:ss a",
+                                                               "Ehms-alt-ascii"    => "E h:mm:ss a",
                                                                "Gy"                => "y G",
+                                                               "GyMd"              => "M/d/y G",
                                                                "GyMMM"             => "MMM y G",
                                                                "GyMMMd"            => "MMM d, y G",
                                                                "GyMMMEd"           => "E, MMM d, y G",
+                                                               "h"                 => "h\x{202F}a",
                                                                "H"                 => "HH",
-                                                               "h"                 => "h a",
+                                                               "h-alt-ascii"       => "h a",
+                                                               "hm"                => "h:mm\x{202F}a",
                                                                "Hm"                => "HH:mm",
-                                                               "hm"                => "h:mm a",
-                                                               "hms"               => "h:mm:ss a",
+                                                               "hm-alt-ascii"      => "h:mm a",
                                                                "Hms"               => "HH:mm:ss",
-                                                               "hmsv"              => "h:mm:ss a v",
+                                                               "hms"               => "h:mm:ss\x{202F}a",
+                                                               "hms-alt-ascii"     => "h:mm:ss a",
+                                                               "hmsv"              => "h:mm:ss\x{202F}a v",
                                                                "Hmsv"              => "HH:mm:ss v",
+                                                               "hmsv-alt-ascii"    => "h:mm:ss a v",
                                                                "Hmv"               => "HH:mm v",
-                                                               "hmv"               => "h:mm a v",
+                                                               "hmv"               => "h:mm\x{202F}a v",
+                                                               "hmv-alt-ascii"     => "h:mm a v",
                                                                "M"                 => "L",
                                                                "Md"                => "M/d",
                                                                "MEd"               => "E, M/d",
@@ -756,8 +764,8 @@ String. Specify additional command-line options.
                           date_format_long                => "MMMM d, y",
                           date_format_medium              => "MMM d, y",
                           date_format_short               => "M/d/yy",
-                          datetime_format_full            => "{1} 'at' {0}",
-                          datetime_format_long            => "{1} 'at' {0}",
+                          datetime_format_full            => "{1}, {0}",
+                          datetime_format_long            => "{1}, {0}",
                           datetime_format_medium          => "{1}, {0}",
                           datetime_format_short           => "{1}, {0}",
                           day_format_abbreviated          => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
@@ -802,8 +810,8 @@ String. Specify additional command-line options.
                                                                date_format_long                => "MMMM d, y",
                                                                date_format_medium              => "MMM d, y",
                                                                date_format_short               => "M/d/yy",
-                                                               datetime_format_full            => "{1} 'at' {0}",
-                                                               datetime_format_long            => "{1} 'at' {0}",
+                                                               datetime_format_full            => "{1}, {0}",
+                                                               datetime_format_long            => "{1}, {0}",
                                                                datetime_format_medium          => "{1}, {0}",
                                                                datetime_format_short           => "{1}, {0}",
                                                                day_format_abbreviated          => 'fix',
@@ -894,12 +902,12 @@ String. Specify additional command-line options.
                                                                quarter_stand_alone_wide        => ["1st quarter", "2nd quarter", "3rd quarter", "4th quarter"],
                                                                script                          => undef,
                                                                territory                       => "United States",
-                                                               time_format_full                => "h:mm:ss a zzzz",
-                                                               time_format_long                => "h:mm:ss a z",
-                                                               time_format_medium              => "h:mm:ss a",
-                                                               time_format_short               => "h:mm a",
+                                                               time_format_full                => "h:mm:ss\x{202F}a zzzz",
+                                                               time_format_long                => "h:mm:ss\x{202F}a z",
+                                                               time_format_medium              => "h:mm:ss\x{202F}a",
+                                                               time_format_short               => "h:mm\x{202F}a",
                                                                variant                         => undef,
-                                                               version                         => 39,
+                                                               version                         => 44,
                                                              },
                           month_format_abbreviated        => 'fix',
                           month_format_narrow             => 'fix',
@@ -921,21 +929,21 @@ String. Specify additional command-line options.
                           quarter_stand_alone_wide        => 'fix',
                           script                          => undef,
                           territory                       => "United States",
-                          time_format_full                => "h:mm:ss a zzzz",
-                          time_format_long                => "h:mm:ss a z",
-                          time_format_medium              => "h:mm:ss a",
-                          time_format_short               => "h:mm a",
+                          time_format_full                => "h:mm:ss\x{202F}a zzzz",
+                          time_format_long                => "h:mm:ss\x{202F}a z",
+                          time_format_medium              => "h:mm:ss\x{202F}a",
+                          time_format_short               => "h:mm\x{202F}a",
                           variant                         => undef,
-                          version                         => 39,
+                          version                         => 44,
                         }, "DateTime::Locale::FromData"),
      offset_modifier => 0,
      rd_nanosecs     => 0,
      tz              => bless({
                           is_olson => 1,
-                          max_year => 2031,
+                          max_year => 2033,
                           name => "Asia/Jakarta",
                           spans => [
-                            [-Inf, 58904383968, -Inf, 58904409600, 25632, 0, "LMT"],
+                            ["-Inf", 58904383968, "-Inf", 58904409600, 25632, 0, "LMT"],
                             [
                               58904383968,
                               60683964000,
@@ -999,7 +1007,7 @@ String. Specify additional command-line options.
                               0,
                               "+0730",
                             ],
-                            [61946267400, Inf, 61946292600, Inf, 25200, 0, "WIB"],
+                            [61946267400, "Inf", 61946292600, "Inf", 25200, 0, "WIB"],
                           ],
                         }, "DateTime::TimeZone::Asia::Jakarta"),
      utc_rd_days     => 736105,
@@ -1111,7 +1119,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

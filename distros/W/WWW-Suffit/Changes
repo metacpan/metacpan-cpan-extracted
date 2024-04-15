@@ -1,5 +1,8 @@
 # Version/Revision history
 
+1.08 Sun 14 Apr 2024 18:31:22 MSK
+    * Added WWW::Suffit::Cache module
+
 1.07 Sun 17 Dec 2023 16:10:16 MSK
     * Added randchars function into WWW::Suffit::Util
 

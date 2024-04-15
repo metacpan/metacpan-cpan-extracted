@@ -7,6 +7,7 @@ use utf8;
 use Data::Dumper;
 use English;
 use Exporter 'import';
+use Hash::Util 'lock_keys';
 use IO::Pipe;
 use Log::Log4perl;
 use Parallel::TaskExecutor::Task;
@@ -19,7 +20,7 @@ our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 our @CARP_NOT = 'Parallel::TaskExecutor::Task';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $log = Log::Log4perl->get_logger();
 
@@ -46,6 +47,20 @@ This module provides a simple interface to run Perl code in forked processes and
 receive the result of their processing. This is quite similar to
 L<Parallel::ForkManager> with a different OO approach, more centered on the task
 object that can be seen as a very lightweight promise.
+
+Note that this module uses L<Log::Log4perl> for its logging. If you don’t use
+use C<Log4perl> otherwise, you should include something like the following in
+the main script of your program:
+
+  use Log::Log4perl qw(:easy);
+  Log::Log4perl->easy_init($ERROR);
+
+In addition, when testing a module that uses B<Parallel::TaskExecutor>, if
+you’re using L<Test2>, you should add the following line at the beginning of
+each of your tests to initialize the multi-process feature of the test
+framework:
+
+  use Test2::IPC;
 
 =head1 METHODS
 
@@ -82,6 +97,7 @@ sub new {
     pid => $PID,
     log => $log,
   }, $class;
+  lock_keys(%{$this});
   return $this;
 }
 
@@ -208,8 +224,9 @@ sub _fork_and_run {
   weaken($this->{tasks}{$task});
 
   my $ready = <$miso>;
-  $this->{log}->logcroak("Got unexpected data during ready check: $ready")
-      unless $ready eq "ready\n";
+  $this->{log}->logcroak(
+    "Got unexpected data during ready check of child task (id == ${task_id}) with pid == ${pid}: $ready"
+  ) unless $ready eq "ready\n";
 
   if ($options{wait}) {
     $this->{log}->trace("Waiting for child $pid to exit (task id == ${task_id})");
@@ -334,8 +351,8 @@ sub wait {  ## no critic (ProhibitBuiltinHomonyms)
     $c->wait();
   }
   while (my (undef, $c) = each %{$this->{tasks}}) {
-    # $c is a weak reference, but it is never undef because the task will remove
-    # itself from this hash in its DESTROY method.
+    # $c is a weak reference, but it should never be undef because the task will
+    # remove itself from this hash in its DESTROY method.
     # $c->wait() will delete this entry from the hash, but this is legal when
     # looping with each.
     $c->wait();

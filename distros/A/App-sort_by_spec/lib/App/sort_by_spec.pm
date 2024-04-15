@@ -10,9 +10,9 @@ use AppBase::Sort::File ();
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-06'; # DATE
+our $DATE = '2024-03-06'; # DATE
 our $DIST = 'App-sort_by_spec'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our %SPEC;
 
@@ -61,7 +61,7 @@ MARKDOWN
         $meta->{examples} = [
             {
                 src_plang => 'bash',
-                src => q[ perl -E 'say for (1..15,42)' | sort-by-spec 'qr([13579]\z)' 'sub { $_[0] <=> $_[1] }' 4 2 42 'qr([13579]\z)' 'sub { $_[0] <=> $_[1] }'],
+                src => q[ perl -E 'say for (1..15,42)' | sort-by-spec 'qr([13579]\z)' 'sub { $_[0] <=> $_[1] }' 4 2 42 'qr([02468]\z)' 'sub { $_[1] <=> $_[0] }'],
                 summary => 'Put odd numbers first in ascending order, then put the specific numbers (4,2,42), then put even numbers last in descending order',
                 description => <<'MARKDOWN',
 
@@ -82,18 +82,18 @@ MARKDOWN
         my $examples = delete $args{examples};
 
         AppBase::Sort::File::set_source_arg(\%args);
-        $args{_sortgen} = sub {
+        $args{_gen_comparer} = sub {
             my $args = shift;
             require Sort::BySpec;
             my $spec = $args->{specs};
-            my $cmp = Sort::BySpec::cmp_by_spec(spec => $spec, reverse => $args->{reverse});
-            my $sort = sub {
+            my $cmp0 = Sort::BySpec::cmp_by_spec(spec => $spec, reverse => $args->{reverse});
+            my $cmp = sub {
                 my ($a, $b) = @_;
                 chomp($a); chomp($b);
                 if ($args->{ignore_case}) { $a = lc $a; $b = lc $b }
-                $cmp->($a, $b);
+                $cmp0->($a, $b);
             };
-            return ($sort, 1);
+            return $cmp;
         };
         AppBase::Sort::sort_appbase(%args);
     },
@@ -114,7 +114,7 @@ App::sort_by_spec - Sort lines of text by spec
 
 =head1 VERSION
 
-This document describes version 0.003 of App::sort_by_spec (from Perl distribution App-sort_by_spec), released on 2023-09-06.
+This document describes version 0.004 of App::sort_by_spec (from Perl distribution App-sort_by_spec), released on 2024-03-06.
 
 =head1 FUNCTIONS
 
@@ -224,7 +224,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

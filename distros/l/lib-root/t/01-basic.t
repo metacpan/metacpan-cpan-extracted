@@ -9,7 +9,7 @@ my $app_dir = "app-root-test";
 my $root    = path( Path::Tiny->rootdir, "tmp" );
 my $app     = $root->child( $app_dir );
 my @expected_lib_path
-  = ( Path::Tiny->rootdir, qw|tmp app-root-test perl \* lib| );
+  = ( Path::Tiny->rootdir, qw|tmp app-root-test perl * lib| );
 
 my %paths = (
   bin_script  => $app->child( qw|bin scripts script.pl| ),
@@ -35,7 +35,7 @@ my %paths = (
   my $cb = sub {
     my $libpaths = shift;
     my $rootfile = shift;
-    like $libpaths, qr|${\path( @expected_lib_path )}|smx,
+    is $libpaths, path( @expected_lib_path )->absolute,
       'modules are in perl/*/lib';
     ok -e lib::root->root->child( '.libroot' ), 'found root dir';
   };
@@ -51,7 +51,7 @@ my %paths = (
   my $cb = sub {
     my $libpaths = shift;
     my $rootfile = shift;
-    like $libpaths, qr|${\path( @expected_lib_path )}|smx,
+    is $libpaths, path( @expected_lib_path )->absolute,
       'modules are in perl/*/lib';
     ok -e lib::root->root->child( '.perl-version' ), 'found root dir';
   };
@@ -68,7 +68,7 @@ my %paths = (
   my $cb = sub {
     my $libpaths = shift;
     my $rootfile = shift;
-    like $libpaths, qr|${\path( @expected_lib_path )}|smx,
+    is $libpaths, path( @expected_lib_path )->absolute,
       'modules are in perl/*/lib';
     ok -e lib::root->root->child( '.perl-version' ), 'found root dir';
   };
@@ -86,7 +86,7 @@ my %paths = (
   my $cb = sub {
     my $libpaths = shift;
     my $rootfile = shift;
-    like $libpaths, qr|${\path( @expected_lib_path )}|smx,
+    is $libpaths, path( @expected_lib_path )->absolute,
       'modules are in perl/*/lib';
     ok -e lib::root->root->child( '.libroot' ), 'found root dir';
   };
@@ -104,8 +104,8 @@ my %paths = (
     my $libpaths = shift;
     my $rootfile = shift;
     my @expected_lib_path
-      = ( Path::Tiny->rootdir, qw|tmp app-root-test perl-app2 \* lib| );
-    like $libpaths, qr|${\path( @expected_lib_path )}|smx,
+      = ( Path::Tiny->rootdir, qw|tmp app-root-test perl-app2 * lib| );
+    is $libpaths, path( @expected_lib_path )->absolute,
       'modules are in perl/*/lib';
     ok -e lib::root->root->child( '.libroot' ), 'found root dir';
   };
@@ -123,9 +123,9 @@ my %paths = (
     my $libpaths          = shift;
     my $rootfile          = shift;
     my @expected_lib_path = (
-      Path::Tiny->rootdir, qw|tmp app-root-test sub dir perl-app3 \* lib|
+      Path::Tiny->rootdir, qw|tmp app-root-test sub dir perl-app3 * lib|
     );
-    like $libpaths, qr|${\path( @expected_lib_path )}|smx,
+    is $libpaths, path( @expected_lib_path )->absolute,
       'modules are in perl/*/lib';
     ok -e lib::root->root->child( '.libroot' ), 'found root dir';
   };
@@ -145,10 +145,10 @@ my %paths = (
   my $cb = sub {
     my $libpaths          = shift;
     my $rootfile          = shift;
-    my @expected_lib_path = (
-      Path::Tiny->rootdir, qw|tmp app-root-test sub dir perl-app4 \* lib|
-    );
-    like $libpaths, qr|${\path( @expected_lib_path )}|smx,
+    my $expected_lib_path = path(
+      Path::Tiny->rootdir, qw|tmp app-root-test sub dir perl-app4 * lib|
+    )->absolute;
+    is $libpaths->absolute, $expected_lib_path,
       'modules are in perl/*/lib';
     ok -e lib::root->rootdir->child( '.app-root' ), 'found root dir';
   };

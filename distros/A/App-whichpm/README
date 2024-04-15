@@ -1,7 +1,9 @@
 NAME
+
     App::whichpm - locate a Perl module and it's version
 
 SYNOPSIS
+
             use App::whichpm 'which_pm';
             my ($filename, $version) = which_pm('App::whichpm');
             my $filename = App::whichpm::find('App::whichpm');
@@ -12,6 +14,7 @@ SYNOPSIS
             whichpm Universe::ObservableUniverse::Filament::SuperCluster::Cluster::Group::Galaxy::Arm::Bubble::InterstellarCloud::SolarSystem::Earth
 
 DESCRIPTION
+
     Loads a given module and reports it's location and version.
 
     The similar function can be achieved via:
@@ -23,36 +26,45 @@ DESCRIPTION
             pmvers Some::Module
 
 EXPORTS
-  which_pm
-    same as find only exported under `which_pm' name.
+
+ which_pm
+
+    same as "find" only exported under which_pm name.
 
 FUNCTIONS
-  find($module_name)
-    Loads the `$module_name'.
 
-    In scalar context returns filename corresponding to `$module_name'. In
+ find($module_name)
+
+    Loads the $module_name.
+
+    In scalar context returns filename corresponding to $module_name. In
     array context returns filename and version.
 
-    `$module_name' can be either `Some::Module::Name' or
-    `Some/Module/Name.pm'
+    $module_name can be either Some::Module::Name or Some/Module/Name.pm
 
 SEE ALSO
-    http://perlmonks.org/?node=whichpm, pmpath, Module::InstalledVersion,
+
+    http://perlmonks.org/?node=whichpm, pmpath
+    <http://search.cpan.org/perldoc?pmpath>, Module::InstalledVersion,
     Module::Info
 
 AUTHOR
+
     Jozef Kutej
 
 CONTRIBUTORS
-    The following people have contributed to the File::is by committing
+
+    The following people have contributed to the App::whichpm by committing
     their code, sending patches, reporting bugs, asking questions,
     suggesting useful advises, nitpicking, chatting on IRC or commenting on
     my blog (in no particular order):
 
             Jerrad Pierce
             Skye Shaw
+            Andreas Hadjiprocopis
 
 LICENSE AND COPYRIGHT
+
     This program is free software; you can redistribute it and/or modify it
     under the terms of either: the GNU General Public License as published
     by the Free Software Foundation; or the Artistic License.

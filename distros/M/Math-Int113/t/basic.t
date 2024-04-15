@@ -5,7 +5,7 @@ use Config;
 
 use Test::More;
 
-cmp_ok($Math::Int113::VERSION, 'eq', '0.03', "version number is as expected");
+cmp_ok($Math::Int113::VERSION, 'eq', '0.04', "version number is as expected");
 
 my $obj1 = Math::Int113->new(~0);
 
@@ -87,10 +87,44 @@ cmp_ok($num, '==', $rem, "overload '%=' with NV numerator ok");
 $num %= Math::Int113->new(9384593717069655257060992660);
 cmp_ok($num, '==', 615406282930344742939007376, "overload '%=' ok");
 
-eval { my $x = Math::Int113->new(42) >> 113;};
-like ($@, qr/exceeds 112/, ">> 113 disallowed");
+my $x = Math::Int113->new(42) >> 113;
+cmp_ok($x, '==', 0, ">> 113 returns 0");
 
-eval { my $x = Math::Int113->new(42) << 113;};
-like ($@, qr/exceeds 112/, "<< 113 disallowed");
+$x = Math::Int113->new(42) << 113;
+cmp_ok($x, '==', 0, "<< 113 returns 0");
+
+my $expected_refcnt = 1;
+$expected_refcnt++
+  if $Config{ccflags} =~ /\-DPERL_RC_STACK/;
+
+cmp_ok(Math::Int113::get_refcnt($obj1), '==', $expected_refcnt, '$obj1 reference count ok');
+cmp_ok(Math::Int113::get_refcnt($obj2), '==', $expected_refcnt, '$obj2 reference count ok');
+cmp_ok(Math::Int113::get_refcnt($num),  '==', $expected_refcnt, '$num reference count ok' );
+cmp_ok(Math::Int113::get_refcnt($div),  '==', $expected_refcnt, '$div reference count ok' );
+cmp_ok(Math::Int113::get_refcnt($rem),  '==', $expected_refcnt, '$rem reference count ok' );
+cmp_ok(Math::Int113::get_refcnt($mnum), '==', $expected_refcnt, '$mnum reference count ok');
+cmp_ok(Math::Int113::get_refcnt($mdiv), '==', $expected_refcnt, '$mdiv reference count ok');
+
+for(1 .. 100) {
+  my $iv1 = int(rand(~0));
+  my $iv2 = int(rand(sqrt(~0)));
+  my $int113_1 = Math::Int113->new($iv1);
+  my $int113_2 = Math::Int113->new($iv2);
+
+#print "$iv1 $iv2\n";
+
+  cmp_ok($iv1 & $iv2, '==', $int113_1 & $int113_2, "$iv1 & $iv2 ok");
+  cmp_ok($iv1 & $int113_2, '==', $int113_1 & $iv2, "$iv1 & $iv2 (mixed types) ok");
+  cmp_ok($iv1 | $iv2, '==', $int113_1 | $int113_2, "$iv1 | $iv2 ok");
+  cmp_ok($iv1 | $int113_2, '==', $int113_1 | $iv2, "$iv1 | $iv2 (mixed types) ok");
+  cmp_ok($iv1 ^ $iv2, '==', $int113_1 ^ $int113_2, "$iv1 ^ $iv2 ok");
+  cmp_ok($iv1 ^ $int113_2, '==', $int113_1 ^ $iv2, "$iv1 ^ $iv2 (mixed types) ok");
+}
+
+cmp_ok(Math::Int113->new(1) << 112, '==', 5192296858534827628530496329220096, 'Math::Int113->new(1) << 112 == 5192296858534827628530496329220096');
+cmp_ok(Math::Int113->new(1) << 112, '==', $Math::Int113::MAX_OBJ << 112, 'Math::Int113->new(1) << 112 == $Math::Int113::MAX_OBJ << 112');
+cmp_ok(Math::Int113->new(17) << 113, '==', 0, 'Math::Int113->new(17) << 113 == 0');
+cmp_ok(Math::Int113->new(2) << 112, '==', 0, 'Math::Int113->new(2) << 112 == 0');
+
 
 done_testing();

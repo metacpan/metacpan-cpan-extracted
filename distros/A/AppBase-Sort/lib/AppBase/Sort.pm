@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-05'; # DATE
+our $DATE = '2024-03-06'; # DATE
 our $DIST = 'AppBase-Sort'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our %SPEC;
 
@@ -58,12 +58,16 @@ Should return the next line or undef if the source is exhausted.
 
 MARKDOWN
         },
-        _sortgen => {
+        _gen_keygen => {
             schema => 'code*',
             tags => ['hidden'],
             description => <<'MARKDOWN',
 
-Code to generate sorting routine. Required.
+Code to generate a key-generating (keygen) routine (routine that accepts a value
+and converts it to another value (key) that can be compared using `cmp` or
+`<=>`.
+
+Either `_gen_comparer`, `_gen_keygen`, or `_gen_sorter` argument is required.
 
 Will be called with these arguments:
 
@@ -71,15 +75,61 @@ Will be called with these arguments:
 
 Should return the following:
 
-    ($sort, $handle_ci_and_reverse)
+    ($keygen, $is_numeric)
 
-where `$sort` is the sort routine which in turn will be called during sort with:
+where `$keygen` is the keygen routine and `$is_numeric` is a boolean value which
+dictates whether key comparison will be done numerically (using `<=>`) or
+asciibetically (using `cmp`).
+
+MARKDOWN
+        },
+        _gen_sorter => {
+            schema => 'code*',
+            tags => ['hidden'],
+            description => <<'MARKDOWN',
+
+Code to generate a sorter routine (routine that accepts a list of values and
+return the sorted values, like Perl's builtin `sort`.
+
+Either `_gen_comparer`, `_gen_keygen`, or `_gen_sorter` argument is required.
+
+Will be called with these arguments:
+
+    ($args)
+
+Should return the following:
+
+    $sorter
+
+where `$sorter` is the comparer routine which in turn will be called during sort
+with:
+
+    (@lines)
+
+MARKDOWN
+        },
+        _gen_comparer => {
+            schema => 'code*',
+            tags => ['hidden'],
+            description => <<'MARKDOWN',
+
+Code to generate a comparer routine (routine that accepts two values and return
+-1/0/1, like Perl's builtin `cmp` or `<=>`.
+
+Either `_gen_comparer`, `_gen_keygen`, or `_gen_sorter` argument is required.
+
+Will be called with these arguments:
+
+    ($args)
+
+Should return the following:
+
+    $cmp
+
+where `$cmp` is the comparer routine which in turn will be called during sort
+with:
 
     ($a, $b)
-
-and `$handle_ci_and_reverse` can be set to true if the sorting routine already
-observes the `--ignore-case` (`-i`) and `--reverse` (`-r`). Otherwise,
-AppBase::Sort will handle the case conversion and reversing.
 
 MARKDOWN
         },
@@ -95,24 +145,34 @@ sub sort_appbase {
     my @lines;
     while (defined(my $line = $source->())) { push @lines, $line }
 
-    my ($sort, $handle_ci_and_reverse) = $args{_sortgen}->(%args);
-
-    if ($handle_ci_and_reverse) {
-        @lines = sort { $sort->($a, $b) } @lines;
-    } else {
+    if ($args{_gen_comparer}) {
+        my $cmp = $args{_gen_comparer}->(\%args);
         if ($opt_ci) {
             if ($opt_reverse) {
-                @lines = sort { $sort->(lc($b), lc($a)) } @lines;
+                @lines = sort { $cmp->(lc($b), lc($a)) } @lines;
             } else {
-                @lines = sort { $sort->(lc($a), lc($b)) } @lines;
+                @lines = sort { $cmp->(lc($a), lc($b)) } @lines;
             }
         } else {
             if ($opt_reverse) {
-                @lines = sort { $sort->($b, $a) } @lines;
+                @lines = sort { $cmp->($b, $a) } @lines;
             } else {
-                @lines = sort { $sort->($a, $b) } @lines;
+                @lines = sort { $cmp->($a, $b) } @lines;
             }
         }
+    } elsif ($args{_gen_sorter}) {
+        my $sorter = $args{_gen_sorter}->(\%args);
+        @lines = $sorter->(@lines);
+    } elsif ($args{_gen_sortkey}) {
+        my ($keygen, $is_numeric) = $args{_gen_keygen}->(\%args);
+        require Sort::Key;
+        if ($is_numeric) {
+            @lines = &Sort::Key::nkeysort($keygen, @lines);
+        } else {
+            @lines = &Sort::Key::keysort ($keygen, @lines);
+        }
+    } else {
+        die "Either _gen_comparer, _gen_sorter, or _gen_keygen must be specified";
     }
 
     return [
@@ -137,7 +197,7 @@ AppBase::Sort - A base for sort-like CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.002 of AppBase::Sort (from Perl distribution AppBase-Sort), released on 2023-09-05.
+This document describes version 0.003 of AppBase::Sort (from Perl distribution AppBase-Sort), released on 2024-03-06.
 
 =head1 FUNCTIONS
 
@@ -229,7 +289,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -7,6 +7,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Log::Log4perl::CommandLine: '0'
   Readonly: '0'
+  Test2::IPC: '0'
   Test2::V0: '0'
   Test::CPANfile: '0'
   Test::More: '0'
@@ -42,5 +43,5 @@ requires:
 resources:
   bugtracker: https://github.com/mkende/perl_parallel_task_executor/issues
   repository: https://github.com/mkende/perl_parallel_task_executor
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
