@@ -1,5 +1,8 @@
 Revision history for Alien-autoconf
 
+0.20      2024-04-15 08:16:02 -0600
+  - Fixes for 2.72 (gh#17, gh#18)
+
 0.19      2022-11-15 06:45:35 -0700
   - Update test to work with a system install of Alien::m4 on *BSD (gh#16)
 

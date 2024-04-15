@@ -7,7 +7,7 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-$Math::Int113::VERSION = '0.04';
+$Math::Int113::VERSION = '0.05';
 Math::Int113->DynaLoader::bootstrap($Math::Int113::VERSION);
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 

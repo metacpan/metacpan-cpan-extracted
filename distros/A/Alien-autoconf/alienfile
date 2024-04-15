@@ -97,7 +97,8 @@ share {
             "  \$ENV{AUTOCONF}            ||= File::Spec->catfile(\$dist_dir, 'bin/autoconf');\n",
             "  \$ENV{AUTOHEADER}          ||= File::Spec->catfile(\$dist_dir, 'bin/autoheader');\n",
             "  \$ENV{AUTOM4TE_CFG}        ||= File::Spec->catfile(\$dist_dir, 'share/autoconf/autom4te.blib.cfg')\n",
-            "    if \$d[-5] eq 'lib' && \$d[-6] eq 'blib'\n",
+            "    if \$d[-5] eq 'lib' && \$d[-6] eq 'blib';\n",
+            "  \$ENV{trailer_m4}          ||= File::Spec->catdir(\$dist_dir, 'share/autoconf/autoconf/trailer.m4');\n",
             "}\n",
             @lines
           );

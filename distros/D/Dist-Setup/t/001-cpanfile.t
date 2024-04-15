@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use CPAN::Common::Index::Mux::Ordered;
+use English;
 use Test::CPANfile;
 use Test2::V0;
 
@@ -18,6 +18,16 @@ BEGIN {
   }
 }
 
+BEGIN {
+  # This module seems to have trouble installing on some platform, so it’s
+  # optional in the cpanfile and we skip the test if it’s not installed.
+  eval 'use CPAN::Common::Index::Mux::Ordered';  ## no critic (ProhibitStringyEval, RequireCheckingReturnValueOfEval)
+  if ($EVAL_ERROR) {
+    my $msg = 'CPAN::Common::Index::Mux::Ordered required to validate the CPAN file';
+    skip_all($msg);
+  }
+}
+
 cpanfile_has_all_used_modules(
   perl_version => 5.024,
   develop => 1,
@@ -25,8 +35,7 @@ cpanfile_has_all_used_modules(
   index => CPAN::Common::Index::Mux::Ordered->assemble(
     MetaDB => {},
     Mirror => {},
-  )
-);
+  ));
 
 done_testing;
 

@@ -1,0 +1,11 @@
+This module provides 113-bit integer arithmetic using perl's native arithmetic operations.
+This requires that perl's NV either is '__float128' or the IEEE 754 'long double'.
+This module will fail to build && fail to load if that requirement is not met.
+
+A Math::Int113 object holds, by definition, an (113-bit) integer value in the range:
+  -10384593717069655257060992658440191 .. 10384593717069655257060992658440191
+
+All integer values in that range are exactly representable as Math::Int113 objects.
+
+The github repo for this module is at:
+https://github.com/sisyphus/math-int113 .

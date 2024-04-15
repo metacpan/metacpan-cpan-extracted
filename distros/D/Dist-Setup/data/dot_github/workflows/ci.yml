@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu, macos , windows]
+        os: [[% FOREACH o IN github.use_ci.runners %] [% o %], [% END %]]
         perl: [ '[% short_min_perl_version %]', '5.38' ]
         exclude:
           # MacOS runners are very expensive, so let’s run only on the latest Perl
@@ -54,11 +54,20 @@ jobs:
         sudo apt-get install aspell
 
     - name: Install Modules
+      if:  ${{ matrix.os != 'macos' }}
       run: |
         cpanm -V
         cpanm -v --installdeps --notest --with-configure --with-recommends --with-suggests --with-all-features [% FOREACH f IN github.use_ci.excluded_features %]--without-feature [% f %] [% END %].
 
-    - name: Run tests
+    # MacOS runners are very costly, so let’s install the minimum amount of
+    # dependency.
+    - name: Install Modules on MacOS
+      if:  ${{ matrix.os == 'macos' }}
+      run: |
+        cpanm -V
+        cpanm -v --installdeps --notest --with-configure --without-recommends --without-suggests .
+
+    - name: Run tests on Linux
       if:  ${{ matrix.os == 'ubuntu' }}
       env:
         AUTOMATED_TESTING: 1
@@ -72,7 +81,7 @@ jobs:
 
     # MacOS runners are very costly, so let’s not run the EXTENDED_TESTING
     # tests, to save some cost.
-    - name: Run tests
+    - name: Run tests on MacOS
       if:  ${{ matrix.os == 'macos' }}
       env:
         AUTOMATED_TESTING: 1
@@ -98,7 +107,7 @@ jobs:
         gmake
         gmake test
 
-    - name: Show Errors on Ubuntu
+    - name: Show Errors on Linux
       if:  ${{ failure() && matrix.os == 'ubuntu' }}
       run: |
          cat /home/runner/.cpanm/work/*/build.log
@@ -110,7 +119,7 @@ jobs:
          ls -l C:/Users/RUNNER~1/
          cat C:/Users/runneradmin/.cpanm/work/*/build.log
 
-    - name: Show Errors on OSX
+    - name: Show Errors on MacOS
       if:  ${{ failure() && matrix.os == 'macos' }}
       run: |
          cat  /Users/runner/.cpanm/work/*/build.log

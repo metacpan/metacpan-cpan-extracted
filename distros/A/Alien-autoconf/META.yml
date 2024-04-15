@@ -20,7 +20,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   perl: '5.008001'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/PerlAlien/Alien-autoconf/issues
   homepage: https://metacpan.org/pod/Alien::autoconf
   repository: git://github.com/PerlAlien/Alien-autoconf.git
-version: '0.19'
+version: '0.20'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
@@ -57,7 +57,7 @@ x_alienfile:
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Mark Jensen (MAJENSEN)'
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

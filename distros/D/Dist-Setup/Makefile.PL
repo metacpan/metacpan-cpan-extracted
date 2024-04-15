@@ -32,7 +32,7 @@ WriteMakefile(
       # Goes with NO_MYMETA (which would provide the dynamic config).
       dynamic_config => 0,
       no_index => {
-        directory => [ 'local', 'vendor' ],
+        directory => [ 'local', 'vendor', 't' ],
       },
       resources => {
         repository => {

@@ -1,8 +1,12 @@
 Changes file for Math::Int113
 
+0.05
+ - Add README file.
+ - Fix bug in t/bitwise_gmp_cross_checks.t
+
 0.04
  - Allow negative values to be passed to bitwise operators (&, |, ^, ~, >>, <<).
-   These negative values will be converted to their 113-bit 2s-complement value
+   Negative operands will be converted to their 113-bit 2s-complement value
    prior to being acted upon by the bitwise operator - thus mimicking perl's
    treatment of negative 32-bit/64-bit IVs.
  - Add divmod() function.

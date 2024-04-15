@@ -13,10 +13,12 @@ $gmpz = 0 if($@);
 eval {require Math::GMP;};
 $gmp = 0 if($@);
 
-my $max_gmp;
+my($max_gmp, $max_int113);
 
 if($gmpz) {
   $max_gmp = (Math::GMPz->new(1) << 113) - 1;
+  $max_int113 = Math::Int113->new("$max_gmp");
+
   for(1 .. 10) {
     my $neg = int(rand(~0)) * -1;
     my $pos = int(rand(~0));
@@ -116,6 +118,7 @@ if($gmpz) {
 
 if($gmp) {
   $max_gmp = (Math::GMP->new(1) << 113) - 1;
+  $max_int113 = Math::Int113->new("$max_gmp");
   for(1 .. 10) {
     my $neg = int(rand(~0)) * -1;
     my $pos = int(rand(~0));
@@ -208,6 +211,11 @@ if($gmp) {
     cmp_ok("$xor_113", 'eq', "$xor_gmp", "^: Math::Int113 and Math::GMP concur");
   }
 }
+
+if($gmpz == 0 && $gmp == 0) {
+  cmp_ok(1, '==', 1, "bogus test, run to avoid 'skipped' error");
+}
+
 
 sub complement {
   if($_[0] < 0) {

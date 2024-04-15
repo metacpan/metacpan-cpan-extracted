@@ -3,7 +3,6 @@ abstract: 'Simple opinionated tool to set up a Perl distribution directory.'
 author:
   - 'Mathias Kende <mathias@cpan.org>'
 build_requires:
-  CPAN::Common::Index::Mux::Ordered: '0'
   ExtUtils::MakeMaker: '0'
   Readonly: '0'
   Test2::V0: '0'
@@ -26,6 +25,7 @@ no_index:
     - inc
     - local
     - vendor
+    - t
 requires:
   Eval::Safe: '0'
   File::ShareDir: '0'
@@ -34,5 +34,5 @@ requires:
 resources:
   bugtracker: https://github.com/mkende/perl_dist_setup/issues
   repository: https://github.com/mkende/perl_dist_setup
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

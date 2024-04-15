@@ -4,6 +4,7 @@ Makefile.PL
 Int113.pm
 Int113.pod
 Int113.xs
+README
 
 t/basic.t
 t/bitwise.t

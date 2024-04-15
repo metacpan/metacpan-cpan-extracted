@@ -1,5 +1,8 @@
 Revision history for Parse-PMFile
 
+0.46 2024/04/15
+  - Strip BOM before finding a package
+
 0.45 2024/01/21
   - Make sure to stringify versions so that they are quoted when they are encoded in JSON
 

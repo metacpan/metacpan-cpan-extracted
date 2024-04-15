@@ -91489,3 +91489,7 @@ K/KI/KIMOTO/SPVM-0.989102.tar.gz
 S/SK/SKIM/Tags-HTML-Element-0.11.tar.gz
 A/AB/ABALAMA/WWW-Suffit-1.08.tar.gz
 A/AB/ABALAMA/WWW-Suffit-Server-1.10.tar.gz
+P/PL/PLICEASE/Alien-autoconf-0.20.tar.gz
+M/MA/MATHIAS/Dist-Setup/Dist-Setup-0.14.tar.gz
+S/SI/SISYPHUS/Math-Int113-0.05.tar.gz
+I/IS/ISHIGAKI/Parse-PMFile-0.46.tar.gz
