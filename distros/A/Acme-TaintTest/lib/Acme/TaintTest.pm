@@ -1,40 +1,20 @@
+# This is a dummy file for testing purposes
+
 package Acme::TaintTest;
-require v5.14.0;
 use strict;
 use warnings;
+# use bytes;
+use re 'taint';
 
-our $VERSION = "0.0.4";
+require v5.14.0;
 
-print "This is a dummy, it's all in the tests\n";
 
-1;
-__END__
+our $VERSION = "0.0.6";
 
-=encoding utf-8
+our @ISA = qw();
 
-=head1 NAME
+sub Version {
+  return $VERSION;
+}
 
-Acme::TaintTest - module for checking taint peculiarities on some CPAN testers
-
-=head1 SYNOPSIS
-
-    use Acme::TaintTest;
-
-=head1 DESCRIPTION
-
-Acme::TaintTest doesn't do anything.
-It is only for looking for some taint related problems on some CPAN tester machines
-
-=head1 LICENSE
-
-Copyright (C) 2024 sidney.
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=head1 AUTHOR
-
-SIDNEY on CPAN
-
-=cut
-
+1

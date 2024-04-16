@@ -7,12 +7,12 @@ use v5.20;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Scalar::Util 'reftype';
 use List::Util 1.45 'uniqstr';
 use Import::Into;
-use experimental 'signatures', 'postderef';
+use experimental 'signatures', 'postderef', 'lexical_subs';
 
 use Exporter 'import';
 
@@ -26,27 +26,27 @@ our %HOOK;
 
 install_EXPORTS();
 
-sub _croak {
+my sub _croak {
     require Carp;
     goto \&Carp::croak;
 }
 
-sub _EXPORT_TAGS ( $caller = scalar caller ) {
-    no strict 'refs';    ## no critic
-    *${ \"${caller}::EXPORT_TAGS" }{HASH}
-      // \%{ *${ \"${caller}::EXPORT_TAGS" } = {} };
+my sub _EXPORT_TAGS ( $caller = scalar caller ) {
+    no strict 'refs';    ## no critic (TestingAndDebugging::ProhibitNostrict)
+    *${ \"${caller}::EXPORT_TAGS" }{HASH} // \%{ *${ \"${caller}::EXPORT_TAGS" } = {} };
 }
 
-sub _EXPORT_OK ( $caller = scalar caller ) {
-    no strict 'refs';    ## no critic
-    *${ \"${caller}::EXPORT_OK" }{ARRAY}
-      // \@{ *${ \"${caller}::EXPORT_OK" } = [] };
+my sub _EXPORT_OK ( $caller = scalar caller ) {
+    no strict 'refs';    ## no critic (TestingAndDebugging::ProhibitNostrict)
+    *${ \"${caller}::EXPORT_OK" }{ARRAY} // \@{ *${ \"${caller}::EXPORT_OK" } = [] };
 }
 
-sub _EXPORT ( $caller = scalar caller ) {
-    no strict 'refs';    ## no critic
+my sub _EXPORT ( $caller = scalar caller ) {
+    no strict 'refs';    ## no critic (TestingAndDebugging::ProhibitNostrict)
     *${ \"${caller}::EXPORT" }{ARRAY} // \@{ *${ \"${caller}::EXPORT" } = [] };
 }
+
+my sub add_constant_to_tag;
 
 
 
@@ -110,17 +110,17 @@ sub _EXPORT ( $caller = scalar caller ) {
 
 sub install_EXPORTS {
 
-    my $export_tags = ( reftype( $_[0] )  // '' ) eq 'HASH' ? shift : undef;
-    my $u_opts      = ( reftype( $_[-1] ) // '' ) eq 'HASH' ? shift : {};
+    my $export_tags = ( reftype( $_[0] )  // q{} ) eq 'HASH' ? shift : undef;
+    my $u_opts      = ( reftype( $_[-1] ) // q{} ) eq 'HASH' ? shift : {};
 
     my %options = (
         overwrite => 0,
         all       => 'auto',
         package   => shift // scalar caller,
-        %$u_opts
+        %$u_opts,
     );
 
-    _croak( "too many arguments to INSTALL_EXPORTS" ) if @_;
+    _croak( 'too many arguments to INSTALL_EXPORTS' ) if @_;
 
     my $package     = delete $options{package};
     my $install_all = delete $options{all};
@@ -141,10 +141,7 @@ sub install_EXPORTS {
         else {
             # cheap one layer deep hash merge
             for my $tag ( keys $export_tags->%* ) {
-                push(
-                    ( $EXPORT_TAGS->{$tag} //= [] )->@*,
-                    $export_tags->{$tag}->@*
-                );
+                push( ( $EXPORT_TAGS->{$tag} //= [] )->@*, $export_tags->{$tag}->@* );
             }
         }
     }
@@ -234,14 +231,12 @@ sub install_CONSTANTS {
         my $type = reftype( $spec );
 
         if ( 'HASH' eq $type ) {
-            install_constant_tag( $_, $spec->{$_}, $package )
-              for keys $spec->%*;
+            install_constant_tag( $_, $spec->{$_}, $package ) for keys $spec->%*;
         }
 
         elsif ( 'ARRAY' eq $type ) {
             my $idx = $spec->@*;
-            _croak(
-                "constant spec passed as array has an odd number of elements" )
+            _croak( 'constant spec passed as array has an odd number of elements' )
               unless 0 == $idx % 2;
 
             while ( $idx ) {
@@ -252,10 +247,77 @@ sub install_CONSTANTS {
         }
 
         else {
-            _croak( "expect a HashRef or an ArrayRef" );
+            _croak( 'expect a HashRef or an ArrayRef' );
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -386,44 +448,53 @@ sub install_CONSTANTS {
 
 sub install_constant_tag ( $id, $constants, $package = scalar caller ) {
 
-    my ( @names, @values );
+    # caller may specify distinct tag and enumeration function names.
+    my ( $tag, $fn_values, $fn_names )
+      = 'ARRAY' eq ( reftype( $id ) // q{} )
+      ? ( $id->@* )
+      : ( lc( $id ), $id );
+
+    $fn_values //= uc( $tag );
+    $fn_names  //= $fn_values . '_NAMES';
+
+    my ( @names );
     if ( reftype( $constants ) eq 'HASH' ) {
-        @names  = keys $constants->%*;
-        @values = values $constants->%*;
+        @names = keys $constants->%*;
     }
     elsif ( reftype( $constants ) eq 'ARRAY' ) {
         my @copy = $constants->@*;
-        while ( my ( $name, $value ) = splice( @copy, 0, 2 ) ) {
-            push @names,  $name;
-            push @values, $value;
+        while ( my ( $name ) = splice( @copy, 0, 2 ) ) {
+            push @names, $name;
         }
         $constants = { $constants->@* };
     }
     else {
-        _croak(
-            '$constants argument should be either a hashref or an arrayref' );
+        _croak( '$constants argument should be either a hashref or an arrayref' );
     }
 
     constant->import::into( $package, $constants );
 
-    # caller may specify distinct tag and enumeration function names.
-    my ( $tag, $fname )
-      = 'ARRAY' eq ( reftype( $id ) // '' )
-      ? ( $id->[0], $id->[1] )
-      : ( lc( $id ), $id );
-
-
     push( ( _EXPORT_TAGS( $package )->{$tag} //= [] )->@*, @names );
 
-    my $fqdn = join '::', $package, $fname;
-    $HOOK{$package}{pre}{$fname} //= sub {
-        no strict 'refs';    ## no critic
+    $HOOK{$package}{pre}{$fn_values} //= sub {
+        my $fqdn = join q{::}, $package, $fn_values;
         _croak( "Error: attempt to redefine enumerating function $fqdn" )
           if exists &{$fqdn};
+        no strict 'refs';    ## no critic (TestingAndDebugging::ProhibitNostrict)
         my @values
           = map { &{"${package}::${_}"} } _EXPORT_TAGS( $package )->{$tag}->@*;
-        install_constant_func( $fname, \@values, $package );
+        install_constant_func( $fn_values, \@values, $package );
     };
+
+    $HOOK{$package}{pre}{$fn_names} //= sub {
+        my $fqdn = join q{::}, $package, $fn_names;
+        _croak( "Error: attempt to redefine enumerating function $fqdn" )
+          if exists &{$fqdn};
+        add_constant_to_tag( 'constant_name_funcs', $fn_names,
+            [ _EXPORT_TAGS( $package )->{$tag}->@* ], $package );
+
+    };
+
 }
 
 
@@ -470,10 +541,59 @@ sub install_constant_tag ( $id, $constants, $package = scalar caller ) {
 
 
 sub install_constant_func ( $tag, $values, $caller = scalar caller ) {
-    constant->import::into( $caller, $tag => $values->@* );
-    push( ( _EXPORT_TAGS( $caller )->{constants_funcs} //= [] )->@*, $tag );
+    add_constant_to_tag( 'constant_funcs', $tag, $values, $caller );
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub add_constant_to_tag ( $tag, $name, $values, $caller = scalar caller ) {
+    constant->import::into( $caller, $name => $values->@* );
+    push( ( _EXPORT_TAGS( $caller )->{$tag} //= [] )->@*, $name );
+}
 
 1;
 
@@ -499,7 +619,7 @@ CXC::Exporter::Util - Tagged Based Exporting
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -533,12 +653,18 @@ In the exporting code:
 
 In importing code:
 
-  # import all of the fruit functions, all of the DETECTORS constants,
-  # as well as a function enumerating the DETECTORS constants
-  use My::Exporter ':fruit', ':detector', 'DETECTORS';
+  use My::Exporter   # import ...
+   ':fruit',         # the 'fruit' functions
+   ':detector',      # the 'detector' functions
+   'DETECTORS'       # the function enumerating the DETECTORS constants  values
+   'DETECTORS_NAMES' # the function enumerating the DETECTORS constants' names
+   ;
 
   # print the DETECTORS constants' values;
   say $_ for DETECTORS;
+
+  # print the DETECTORS constants' names;
+  say $_ for DETECTORS_NAMES;
 
 =head1 DESCRIPTION
 
@@ -593,7 +719,7 @@ C<install_EXPORTS> may be called multiple times
 
 =head2 Exporting Constants
 
-L<CXC::Exporter::Util> provides additional support for creating,
+C<CXC::Exporter::Util> provides additional support for creating,
 organizing and installing constants via L</install_CONSTANTS>.
 Constants are created via Perl's L<constant> pragma.
 
@@ -617,12 +743,33 @@ e.g.:
    # install_CONSTANTS;
    install_EXPORTS;
 
-For each set an enumerating function is created which returns the
-set's values.
+This results in the definition of
 
-In the above example, constant functions C<ACIS>, C<HRC>, C<ALL>,
-C<NONE>, C<ANY>, tags C<detectors> and C<aggregates>, and constant
-functions C<DETECTORS> and C<AGGREGATES> are created.
+=over
+
+=item *
+
+the constant functions, i.e.,
+
+  ACIS HRC ALL NONE ANY
+
+returning their specified values,
+
+=item *
+
+functions enumerating the constants' values, i.e.
+
+  DETECTORS -> ( 'ACIS', 'HRC' )
+  AGGGREGATES -> ( 'all', 'none', 'any' )
+
+=item *
+
+functions enumerating the constants' names, i.e.
+
+  DETECTORS_NAMES -> ( 'ACIS', 'HRC' )
+  AGGGREGATES_NAMES -> ( 'ALL', 'NONE', 'ANY' )
+
+=back
 
 The enumerating functions are useful for generating enumerated types
 via e.g. L<Type::Tiny>:
@@ -733,11 +880,11 @@ specified either as a hash or an array.  For example,
           );
 
 The identifier is used to create an export tag for the set, as
-well as to name an enumerating function which returns the set's values.
-The individual C<$id>, C<$set> pairs are passed to L<install_constant_tag>;
+well as to name enumerating functions returning constant's names and values.
+The individual C<$id>, C<$set> pairs are passed to L</install_constant_tag>;
 see that function for more information on how the identifiers are used.
 
-A call to L<install_EXPORTS> I<must> be made after the last call to
+A call to L</install_EXPORTS> I<must> be made after the last call to
 C<install_CONSTANTS> or
 
 =over
@@ -777,22 +924,58 @@ can only be added once.
 Create and install constant functions for a set of constants.  Called either
 as
 
-  install_constant_tag( [ $tag, $fname], $constants, [$package] )
+=over
 
-or as
+=item install_constant_tag( \@names, $constants, [$package] )
 
-  install_constant_tag( $string, $constants, [$package] )
+where B<@names> contains
 
-in which case
+  $tag,
+  $fn_values, # optional name of function returning constants' values
+  $fn_names,  # optional name of function returning constants' names
 
-  ( $tag, $fname ) = ( lc($string), $string );
+and, if not specified,
 
-C<$constants> specifies the constants' names and values, and may be
+  $fn_values //= uc($tag);
+  $fn_names //= $fn_values . '_NAMES';
+
+=item install_constant_tag( $fn_values, $constants, [$package] )
+
+where
+
+  $tag = lc($fn_values);
+  $fn_names = $fn_values . '_NAMES';
+
+=back
+
+where
+
+=over
+
+=item B<$tag>
+
+is the name of the tag representing the set of constants
+
+=item C<$fn_values>
+
+is the name of the function which will return a list of the constants' values
+
+=item C<$fn_names>
+
+is the name of the function which will return a list of the constants' names
+
+=item C<$constants>
+
+specifies the constants' names and values, as
 either a hashref or an arrayref containing I<name> - I<value> pairs.
 
-C<$package> is the name of the package (the eventual exporter) into
+=item C<$package>
+
+is the name of the package (the eventual exporter) into
 which the constants will be installed. It defaults to the package of
 the caller.
+
+=back
 
 L</install_constant_tag> will
 
@@ -811,12 +994,25 @@ otherwise they are appended in random order.
 =item 2
 
 Add a hook so that the next time L</install_EXPORTS> is called, Perl's
-L<constant> pragma will be used to create an enumerating function
-named C<$fname> which returns a list of the I<values> of the constants
-associated with C<$tag>, in the order they were added to
-C<$EXPORT_TAGS{$tag}>.
+L<constant> pragma will be used to create
 
-The enumerating function C<$fname> is added to the symbols in
+=over
+
+=item *
+
+an enumerating function named C<$fn_values> which returns a list of
+the I<values> of the constants associated with C<$tag>, in the order
+they were added to C<$EXPORT_TAGS{$tag}>.
+
+=item *
+
+an enumerating function named C<$fn_names> which returns a list of
+the I<names> of the constants associated with C<$tag>, in the order
+they were added to C<$EXPORT_TAGS{$tag}>.
+
+=back
+
+These enumerating functions are added to the symbols in
 C<%EXPORT_TAGS> tagged with C<contant_funcs>.
 
 Just as you shouldn't interleave calls to L</install_CONSTANTS> for a
@@ -854,6 +1050,17 @@ calling package. C<AGGREGATES> will return the values
 
 C<AGGREGATES> will be added to the symbols tagged by C<constant_funcs> in C<%EXPORT_TAGS>
 
+=item 3
+
+A function named C<AGGREGATES_NAMES> will be created and installed in the
+calling package. C<AGGREGATES_NAMES> will return the values
+
+  'ALL', 'NONE', 'ANY'
+
+(in a random order, as C<$constants> is a hashref).
+
+C<AGGREGATES_NAMES> will be added to the symbols tagged by C<constant_name_funcs> in C<%EXPORT_TAGS>
+
 =back
 
 After this, a package importing from C<$package> can
@@ -875,14 +1082,20 @@ After this, a package importing from C<$package> can
 =back
 
 As mentioned above, if the first argument to L</install_constant_tag> is an
-arrayref, C<$tag> and C<$fname> may be specified directly. For example,
+arrayref, C<$tag>, C<$fn_values>, and C<$fn_names> may be specified directly. For example,
 
-  $id = [ 'Critters', 'Animals' ];
+  $id = [ 'Critters', 'Animals', 'Animal_names' ];
   $constants = { HORSE => 'horse', GOAT   => 'goat' };
   install_constant_tag( $id, $constants );
 
 will create the export tag C<Critters> for the C<GOAT> and C<HORSE>
-constant functions and an enumerating function called C<Animals>.
+constant functions, an enumerating function called C<Animals> returning
+
+  ( 'horse', 'goat' )
+
+and  a function called C<Animal_names> returning
+
+  ( 'HORSE', 'GOAT')
 
 C<install_constant_tag> uses L</install_constant_func> to create and install
 the constant functions which return the constant values.
@@ -936,6 +1149,48 @@ or directly
 
 =back
 
+=begin idocs
+
+=sub add_constant_to_tag( $tag, $name, \@values, $caller )
+
+This routine does the following in C<$package>, which defaults to the
+caller's package.
+
+=over
+
+=item 1
+
+Create a constant subroutine named C<$name> which returns C<@values>;
+
+=item 2
+
+Adds C<$name> to the C<$tag> tag in C<%EXPORT_TAGS>.
+
+=back
+
+For example, after calling
+
+  add_constant_to_tag( 'constant_name_funcs', 'AGGREGATES', [ 'all', 'none', 'any' ]  );
+=over
+
+=item 1
+
+The function C<AGGREGATES> will return C<all>, C<none>, C<any>.
+
+=item 2
+
+A package importing from C<$package> can import the C<AGGREGATE>
+constant function via the C<constant_name_funcs> tag:
+
+  use Package ':constant__name_funcs';
+
+or directly
+
+  use Package 'AGGREGATES';
+=back
+
+=end idocs
+
 =head1 BUGS
 
 No attempt is made to complain if enumerating functions' names clash
@@ -948,7 +1203,7 @@ with constant function names.
 =item Alternate constant generation modules.
 
 To use an alternate constant generation function bypass
-L<install_CONSTANTS> and load things manually.
+L</install_CONSTANTS> and load things manually.
 
 For example,  using L<enum>:
 
@@ -1010,7 +1265,7 @@ avoids errors.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-cxc-exporter-util@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Exporter-Util
+Please report any bugs or feature requests to bug-cxc-exporter-util@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Exporter-Util>
 
 =head2 Source
 

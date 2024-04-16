@@ -51,9 +51,9 @@ For more complicated setups, %EXPORT_TAGS may be specified first:
 
   Exporting Constants
 
-CXC::Exporter::Util provides additional support for creating, organizing
-and installing constants via "install_CONSTANTS". Constants are created
-via Perl's constant pragma.
+"CXC::Exporter::Util" provides additional support for creating,
+organizing and installing constants via "install_CONSTANTS". Constants
+are created via Perl's constant pragma.
 
 "install_CONSTANTS" is passed sets of constants grouped by tags, e.g.:
 
@@ -74,12 +74,23 @@ via Perl's constant pragma.
    # install_CONSTANTS;
    install_EXPORTS;
 
-For each set an enumerating function is created which returns the set's
-values.
+This results in the definition of
 
-In the above example, constant functions "ACIS", "HRC", "ALL", "NONE",
-"ANY", tags "detectors" and "aggregates", and constant functions
-"DETECTORS" and "AGGREGATES" are created.
+*   the constant functions, i.e.,
+
+      ACIS HRC ALL NONE ANY
+
+    returning their specified values,
+
+*   functions enumerating the constants' values, i.e.
+
+      DETECTORS -> ( 'ACIS', 'HRC' )
+      AGGGREGATES -> ( 'all', 'none', 'any' )
+
+*   functions enumerating the constants' names, i.e.
+
+      DETECTORS_NAMES -> ( 'ACIS', 'HRC' )
+      AGGGREGATES_NAMES -> ( 'ALL', 'NONE', 'ANY' )
 
 The enumerating functions are useful for generating enumerated types via
 e.g. Type::Tiny:

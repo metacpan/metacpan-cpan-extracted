@@ -1,26 +1,13 @@
-Changes
 LICENSE
 MANIFEST
 Makefile.PL
 README.md
 lib/Acme/TaintTest.pm
-t/a00_init.pm
-t/a00_tester_id.t
-t/a02_a5_init.pm
-t/a02_a5_tester_id.t
-t/a02_a6_init.pm
-t/a02_a6_tester_id.t
-t/a02_a7_init.pm
-t/a02_a7_tester_id.t
-t/a02_a8_init.pm
-t/a02_a8_tester_id.t
-t/a02_a9_init.pm
-t/a02_a9_tester_id.t
-t/a02_a10_init.pm
-t/a02_a10_tester_id.t
-t/a02_a11_init.pm
-t/a02_a11_tester_id.t
+log/dummy
+t/a1.t
+t/a2.t
+t/README
 t/testrules.yml
-t/test_dir
+t/log/dummy
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

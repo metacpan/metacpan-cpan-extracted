@@ -5,7 +5,7 @@ lib::root - find perl root and push lib modules path to @INC
 
 # VERSION
 
-version 0.08
+version 0.10
 
 # SYNOPSIS
 
@@ -50,7 +50,7 @@ For example, your app has the following structure:
 
 ... and the app needs to push all those perl/\*/lib to @INC. There are some ways to do that
 
-Add the directory to env PERLLIB or PERL5LIB
+Add the directory to env PERLLIB
 
     PERLLIB=$PERLLIB:/dir/myapp/perl/MyApp-Thing/lib:/dir/myapp/perl/MyApp-Another/lib
 

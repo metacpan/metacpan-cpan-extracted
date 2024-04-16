@@ -2,10 +2,10 @@
    "abstract" : "API wrapper around the 'tar' utility",
    "author" : [
       "Mike Schilli <cpan@perlmeister.com>",
-      "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>"
+      "Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -45,6 +45,7 @@
       },
       "test" : {
          "requires" : {
+            "Dumbbench" : "0.503",
             "Test::Simple" : "1.302073"
          }
       }
@@ -52,7 +53,7 @@
    "provides" : {
       "Archive::Tar::Wrapper" : {
          "file" : "lib/Archive/Tar/Wrapper.pm",
-         "version" : "0.38"
+         "version" : "0.39"
       }
    },
    "release_status" : "stable",
@@ -66,6 +67,6 @@
          "web" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl"
       }
    },
-   "version" : "0.38",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.39",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,16 @@
 Revision history for CXC-Exporter-Util
 
+0.06      2024-04-15 22:17:27-04:00 America/New_York
+
+  [BUG FIX]
+
+    * documented exporter tag 'constant_funcs' wasn't actually there
+
+  [ENHANCEMENT]
+
+    * constants now have an enumerating function for their names
+      in addition to the existing one for their values.
+
 0.05      2023-01-28 11:04:59-05:00 America/New_York
 
     * promote to production. no functional changes from 0.04

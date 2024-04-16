@@ -64,7 +64,7 @@ my $f3 = $a2->locate("foo/bar/permtest");
 my $perm = ( ( stat($f3) )[2] & oct('777') );
 
 SKIP: {
-    skip 'Permissions are too different on Microsoft Windows', 1 if ($Config{osname} eq 'MSWin32');
+    skip 'Permissions are too different on Microsoft Windows', 1 if ($Config{osname} eq 'MSWin32' || $Config{osname} eq 'msys');
     is( $perm, oct(770), 'testing file permission inside the tarball' );
 }
 
@@ -126,7 +126,7 @@ else {
 
 SKIP: {
     skip 'Cannot check permissions on a non-existent file', 1 unless $f1;
-    skip 'Permissions are too different on Microsoft Windows', 1 if ($Config{osname} eq 'MSWin32');
+    skip 'Permissions are too different on Microsoft Windows', 1 if ($Config{osname} eq 'MSWin32' || $Config{osname} eq 'msys');
     is( $perm, oct(664), 'testing file permissions' );
 }
 

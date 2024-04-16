@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.48';
+$Neo4j::Driver::VERSION = '0.49';
 
 use Carp qw(croak);
 
@@ -250,7 +250,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 
@@ -464,17 +464,25 @@ L<REST::Neo4p>
 
 =back
 
-=head1 ACKNOWLEDGEMENT
-
-Special thanks go to Mark A. Jensen (MAJENSEN). Without the
-inspiration of his L<REST::Neo4p>, this driver project I<probably>
-would never have been even gotten started. And without Mark's
-tremendous work on L<Neo4j::Bolt> and libneo4j-client, this
-driver I<certainly> would be in much worse shape than it is today.
-
 =head1 AUTHOR
 
 Arne Johannessen (L<AJNN|https://metacpan.org/author/AJNN>)
+
+=head1 CONTRIBUTORS
+
+=for stopwords Mark A. Jensen Mohammad S Anwar
+
+=over 4
+
+=item *
+
+Mark A. Jensen <majensen@cpan.org>
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

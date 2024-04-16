@@ -1,5 +1,5 @@
 package Net::Whois::Raw;
-$Net::Whois::Raw::VERSION = '2.99038';
+$Net::Whois::Raw::VERSION = '2.99039';
 # ABSTRACT: Get Whois information of domains and IP addresses.
 
 require 5.008_001;
@@ -308,7 +308,7 @@ sub whois_query {
 
             unless ( $sock ) {
                 $sock = IO::Socket::IP->new( @sockparams )
-                    or die "$srv: $!: " . join( ', ', @sockparams );
+                    or die "$srv: $IO::Socket::errstr: " . join( ', ', @sockparams );
             }
 
             if ($class->can ('whois_socket_fixup')) {
@@ -480,7 +480,7 @@ Net::Whois::Raw - Get Whois information of domains and IP addresses.
 
 =head1 VERSION
 
-version 2.99038
+version 2.99039
 
 =head1 SYNOPSIS
 

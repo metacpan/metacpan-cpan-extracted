@@ -2,7 +2,7 @@ package Archive::Tar::Wrapper;
 
 use strict;
 use warnings;
-use File::Temp qw(tempdir);
+use File::Temp    qw(tempdir);
 use Log::Log4perl qw(:easy);
 use File::Spec::Functions;
 use File::Spec;
@@ -11,14 +11,14 @@ use File::Copy;
 use File::Find;
 use File::Basename;
 use File::Which qw(which);
-use IPC::Run qw(run);
+use IPC::Run    qw(run);
 use Cwd;
 use Config;
 use IPC::Open3;
 use Symbol 'gensym';
 use Carp;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 my $logger = get_logger();
 
 =pod
@@ -217,7 +217,11 @@ sub new {
         dirs                  => 0,
         max_cmd_line_args     => 512,
         ramdisk               => undef,
-        _os_names             => { openbsd => 'openbsd', mswin => 'MSWin32' },
+        _os_names             => {
+            openbsd => 'openbsd',
+            mswin   => 'MSWin32',
+            solaris => 'solaris'
+        },
 
         # hack used to enable unit testing
         osname      => delete $options{osname} || $Config{osname},
@@ -317,6 +321,28 @@ sub _is_openbsd {
     return ( $self->{osname} eq $self->{_os_names}->{openbsd} );
 }
 
+sub _is_solaris {
+    my $self = shift;
+    return ( $self->{osname} eq $self->{_os_names}->{solaris} );
+}
+
+sub _read_solaris_opts {
+    my ( $self, $compress_opt ) = @_;
+    my @cmd;
+    push( @cmd, $self->{tar} );
+    push( @cmd, 'xp' );
+
+    if ($compress_opt) {
+        $cmd[-1] .= $compress_opt;
+    }
+
+    $cmd[-1] .= 'f';
+
+    push( @cmd, $self->{tar_read_options} )
+      if ( $self->{tar_read_options} ne '' );
+    return \@cmd;
+}
+
 sub _read_openbsd_opts {
     my ( $self, $compress_opt ) = @_;
     my @cmd;
@@ -357,16 +383,20 @@ sub read {    ## no critic (ProhibitBuiltinHomonyms)
 
     if ( $self->_is_openbsd ) {
         @cmd = @{ $self->_read_openbsd_opts($compr_opt) };
+        push @cmd, '-f';
+    }
+    elsif ( $self->_is_solaris ) {
+        @cmd = @{ $self->_read_solaris_opts($compr_opt) };
     }
     else {
         @cmd = (
             $self->{tar},
             "${compr_opt}x$self->{tar_read_options}",
-            @{ $self->{tar_gnu_read_options} },
+            @{ $self->{tar_gnu_read_options} }, '-f'
         );
     }
 
-    push( @cmd, '-f', $tarfile, @files );
+    push( @cmd, $tarfile, @files );
 
     $logger->debug("Running @cmd") if ( $logger->is_debug );
     my $error_code = run( \@cmd, \my ( $in, $out, $err ) );
@@ -459,6 +489,11 @@ sub _acquire_tar_info {
     if ( $self->_is_openbsd() ) {
 
 # there is no way to acquire version information from default tar program on OpenBSD
+        $self->{version_info}  = "Information not available on $Config{osname}";
+        $self->{tar_exit_code} = 0;
+        $self->{is_bsd}        = 1;
+    }
+    elsif ( $self->_is_solaris() ) {
         $self->{version_info}  = "Information not available on $Config{osname}";
         $self->{tar_exit_code} = 0;
         $self->{is_bsd}        = 1;
@@ -817,8 +852,8 @@ parameter is set when running the constructor.
 =cut
 
 sub list_next {
-    my ($self) = @_;
-    my $offset = $self->_offset();
+    my ($self)    = @_;
+    my $offset    = $self->_offset();
     my $list_file = File::Spec->catfile( $self->{objdir}, 'list' );
     open my $fh, '<', $list_file or LOGDIE "Can't open $list_file: $!";
     seek $fh, $offset, 0;
@@ -1054,7 +1089,7 @@ sub ramdisk_mount {
 
     my @cmd = (
         $self->{mount}, "-t", "tmpfs", "-o", "size=$self->{ramdisk}->{size}",
-        "tmpfs", $self->{ramdisk}->{tmpdir}
+        "tmpfs",        $self->{ramdisk}->{tmpdir}
     );
 
     INFO "Mounting ramdisk: @cmd";
@@ -1258,6 +1293,6 @@ Linux Gazette article from Ben Okopnik, L<issue 87|https://linuxgazette.net/87/o
 
 =head1 MAINTAINER
 
-2018, Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+2018, Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
 
 =cut

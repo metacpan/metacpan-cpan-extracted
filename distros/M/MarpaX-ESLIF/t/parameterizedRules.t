@@ -22,12 +22,12 @@ sub parameterizedRhs {
     my $output;
     $self->{nbParameterizedRhsCalls}++;
     if ($self->{nbParameterizedRhsCalls} == 5) {
-        $output = "start ::= '5'\n";
+        $output = "'5'";
     } elsif ($self->{nbParameterizedRhsCalls} > 5) {
-        $output = "start ::= 'no match'\n";
+        $output = "'no match'";
     } else {
         ++$parameter;
-        $output = "start ::= . => parameterizedRhs->($parameter, { x = 'Value of x', y = 'Value of y' }, 'Input should be \"$parameter\"')\n";
+        $output = ". => parameterizedRhs->($parameter, { x = 'Value of x', y = 'Value of y' }, 'Input should be \"$parameter\"')";
     }
     $log->infof('In rhs, parameters: %s => %s', \@_, $output);
 
@@ -50,7 +50,7 @@ sub setResult          { $_[0]->{result} = $_[1] }
 package main;
 use strict;
 use warnings FATAL => 'all';
-use Test::More tests => 3;
+use Test::More;
 use Log::Any qw/$log/;
 use Log::Any::Adapter 'Stdout';
 
@@ -72,11 +72,14 @@ my @strings = (
 for (my $i = 0; $i <= $#strings; $i++) {
   my $string = $strings[$i];
 
+  diag('Using recognizer');
   my $recognizerInterface = MyRecognizerInterface->new($string);
   my $valueInterface = MyValueInterface->new();
   my $eslifRecognizer = MarpaX::ESLIF::Recognizer->new($eslifGrammar, $recognizerInterface);
 
-  if ($eslifRecognizer->scan) {
+  my $eslifRecognizerScan = $eslifRecognizer->scan;
+  ok($eslifRecognizerScan, 'Recognizer scan success');
+  if ($eslifRecognizerScan) {
       my $ok = 1;
       while ($eslifRecognizer->isCanContinue) {
           if (! $eslifRecognizer->resume) {
@@ -84,13 +87,18 @@ for (my $i = 0; $i <= $#strings; $i++) {
               last;
           }
       }
+      ok($ok, 'Recognizer scan/resume success');
       if ($ok) {
           my $eslifValue = eval { MarpaX::ESLIF::Value->new($eslifRecognizer, $valueInterface) };
-          if (defined($eslifValue)) {
+          my $eslifValueDefined = defined($eslifValue);
+          ok($eslifValueDefined, 'Valuation success');
+          if ($eslifValueDefined) {
               while ($eslifValue->value) {
                   my $result = $valueInterface->getResult;
-                  if (defined($result)) {
-                      diag("$string => $result");
+                  my $resultDefined = defined($result);
+                  ok($resultDefined, 'Valuation result is defined');
+                  if ($resultDefined) {
+                      ok($result == 5, 'Result is 5');
                   } else {
                       diag("$string => <undef>");
                   }
@@ -99,12 +107,17 @@ for (my $i = 0; $i <= $#strings; $i++) {
       }
   }
 
+  diag('Using grammar');
   $recognizerInterface = MyRecognizerInterface->new($string);
   $valueInterface = MyValueInterface->new();
-  if ($eslifGrammar->parse($recognizerInterface, $valueInterface)) {
+  my $eslifGrammarParse = $eslifGrammar->parse($recognizerInterface, $valueInterface);
+  ok($eslifGrammarParse, 'Grammar parse success');
+  if ($eslifGrammarParse) {
     my $result = $valueInterface->getResult;
-    if (defined($result)) {
-      diag("$string => $result");
+    my $resultDefined = defined($result);
+    ok($resultDefined, 'Valuation result is defined');
+    if ($resultDefined) {
+        ok($result == 5, 'Result is 5');
     } else {
       diag("$string => <undef>");
     }
@@ -112,6 +125,8 @@ for (my $i = 0; $i <= $#strings; $i++) {
     diag("$string => ?");
   }
 }
+
+done_testing();
 
 __DATA__
 /*

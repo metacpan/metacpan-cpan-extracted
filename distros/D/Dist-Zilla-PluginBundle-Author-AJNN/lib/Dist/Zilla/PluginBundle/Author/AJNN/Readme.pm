@@ -3,11 +3,12 @@ use warnings;
 
 package Dist::Zilla::PluginBundle::Author::AJNN::Readme;
 # ABSTRACT: Build a README file for AJNN's distributions
-$Dist::Zilla::PluginBundle::Author::AJNN::Readme::VERSION = '0.06';
+$Dist::Zilla::PluginBundle::Author::AJNN::Readme::VERSION = '0.07';
 
 use Dist::Zilla;
 use Dist::Zilla::File::FromCode;
 use Encode;
+use List::Util qw(first);
 use Moose;
 use namespace::autoclean;
 use Pod::Elemental;
@@ -143,11 +144,16 @@ sub _main_module_name {
 	return $name;
 }
 
-	
+
 sub _main_module_description {
 	my ($self) = @_;
 	
-	my $pod = $self->zilla->main_module->content;
+	my $pod_file = first {
+		$_->name eq $self->zilla->main_module->name =~ s/\.pm$/.pod/r;
+	} $self->zilla->files->@*;
+	$pod_file //= $self->zilla->main_module;
+	
+	my $pod = $pod_file->content;
 	$pod = Encode::encode( 'UTF-8', $pod, Encode::FB_CROAK );
 	my $document = Pod::Elemental->read_string( $pod );
 	my $desc_found;
@@ -186,7 +192,7 @@ Dist::Zilla::PluginBundle::Author::AJNN::Readme - Build a README file for AJNN's
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 
@@ -251,10 +257,7 @@ L<Dist::Zilla::Plugin::Readme::Brief>
 
 =head1 AUTHOR
 
-Arne Johannessen <ajnn@cpan.org>
-
-If you contact me by email, please make sure you include the word
-"Perl" in your subject header to help beat the spam filters.
+Arne Johannessen (L<AJNN|https://metacpan.org/author/AJNN>)
 
 =head1 COPYRIGHT AND LICENSE
 

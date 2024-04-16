@@ -1,0 +1,102 @@
+NAME
+    App::sort_by_comparer - Sort lines of text by a Comparer module
+
+VERSION
+    This document describes version 0.001 of App::sort_by_comparer (from
+    Perl distribution App-sort_by_comparer), released on 2024-03-06.
+
+FUNCTIONS
+  sort_by_comparer
+    Usage:
+
+     sort_by_comparer(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Sort lines of text by a Comparer module.
+
+    This utility lets you sort lines of text using one of the available
+    Comparer::* perl modules.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   comparer_module* => *perl::comparer::modname_with_optional_args*
+
+        (No description)
+
+    *   dereference_recursive => *true*
+
+        Read all files under each directory, recursively, following all
+        symbolic links, unlike -r.
+
+    *   files => *array[filename]*
+
+        (No description)
+
+    *   ignore_case => *bool*
+
+        If set to true, will search case-insensitively.
+
+    *   recursive => *true*
+
+        Read all files under each directory, recursively, following symbolic
+        links only if they are on the command line.
+
+    *   reverse => *bool*
+
+        Reverse sort order.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-sort_by_comparer>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-sort_by_comparer>.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-sort_by_comparer>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

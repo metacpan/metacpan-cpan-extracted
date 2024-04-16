@@ -1,3 +1,5 @@
+![Unit tests](https://github.com/glasswalk3r/archive-tar-wrapper-perl/actions/workflows/unit-test.yml/badge.svg?branch=master)
+
 # NAME
 
 Archive::Tar::Wrapper - API wrapper around the 'tar' utility
@@ -72,18 +74,18 @@ stay in the tarball. You could try to `locate()` them and delete
 them. This will be fixed, though.
 * Filenames containing newlines are causing problems with the list
 iterators. To be fixed.
-* If you ask Archive::Tar::Wrapper to add a file to a tarball, it copies it into
+* If you ask `Archive::Tar::Wrapper` to add a file to a tarball, it copies it into
 a temporary directory and then calls the system tar to wrap up that directory
 into a tarball.
 
 This approach has limitations when it comes to file permissions: If the file to
-be added belongs to a different user/group, Archive::Tar::Wrapper will adjust
+be added belongs to a different user/group, `Archive::Tar::Wrapper` will adjust
 the uid/gid/permissions of the target file in the temporary directory to
 reflect the original file's settings, to make sure the system tar will add it
 like that to the tarball, just like a regular tar run on the original file
 would. But this will fail of course if the original file's uid is different
 from the current user's, unless the script is running with superuser rights.
-The tar program by itself (without Archive::Tar::Wrapper) works differently:
+The tar program by itself (without `Archive::Tar::Wrapper`) works differently:
 It'll just make a note of a file's uid/gid/permissions in the tarball (which it
 can do without superuser rights) and upon extraction, it'll adjust the
 permissions of newly generated files if the -p option is given (default for
@@ -140,4 +142,4 @@ Archive-Tar-Wrapper. If not, see [http://www.gnu.org/licenses/](http://www.gnu.o
 
 # MAINTAINER
 
-2018, Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+2018, Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>

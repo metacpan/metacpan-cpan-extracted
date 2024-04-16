@@ -11,6 +11,8 @@ sub usage {
     say "usage: $CMD [-f] [-d] CVE ...";
     say "    -f   --full     Return full report (default: summary)";
     say "    -d   --dump     Full data dump of JSON structure";
+    say "                    Will use Data::Peek if available,";
+    say "                    otherwise Data::Dumper";
     say "    -j   --json     Dump as json";
     say "    -J   --json-pp  Dump as json (formatted)";
     say "    -Q   --json-jq  Dump as json (formatted by jq)";

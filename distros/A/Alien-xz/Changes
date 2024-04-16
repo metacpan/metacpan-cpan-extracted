@@ -1,5 +1,8 @@
 Revision history for Alien-xz
 
+0.09      2024-04-15 11:21:20 -0600
+  - use GitHub plugin to fetch tarball (gh#8, gh#10)
+
 0.08      2021-07-02 08:24:08 -0600
   - Disable assembly on windows (gh#5)
 

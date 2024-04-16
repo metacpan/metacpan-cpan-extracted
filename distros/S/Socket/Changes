@@ -1,5 +1,13 @@
 Revision history for Socket
 
+2.038   2024-04-15
+        [CHANGES]
+         * Add extra TCP_ and IPV6_ constants for Linux (RT143712)
+
+        [BUGFIXES]
+         * Account for newer Solaris behaviour on AF_UNIX address length
+           (RT152866)
+
 2.037   2023-06-06
         [CHANGES]
          * Convert hard tabs to spaces in source files

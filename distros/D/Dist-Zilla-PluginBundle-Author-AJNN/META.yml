@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,24 +19,25 @@ name: Dist-Zilla-PluginBundle-Author-AJNN
 provides:
   Dist::Zilla::PluginBundle::Author::AJNN:
     file: lib/Dist/Zilla/PluginBundle/Author/AJNN.pm
-    version: '0.06'
+    version: '0.07'
   Dist::Zilla::PluginBundle::Author::AJNN::Readme:
     file: lib/Dist/Zilla/PluginBundle/Author/AJNN/Readme.pm
-    version: '0.06'
+    version: '0.07'
   Pod::Weaver::PluginBundle::Author::AJNN:
     file: lib/Pod/Weaver/PluginBundle/Author/AJNN.pm
-    version: '0.06'
+    version: '0.07'
   Pod::Weaver::PluginBundle::Author::AJNN::Author:
     file: lib/Pod/Weaver/PluginBundle/Author/AJNN/Author.pm
-    version: '0.06'
+    version: '0.07'
   Pod::Weaver::PluginBundle::Author::AJNN::License:
     file: lib/Pod/Weaver/PluginBundle/Author/AJNN/License.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Dist::Zilla: '0'
   Dist::Zilla::File::FromCode: '0'
   Dist::Zilla::Plugin::CheckChangeLog: '0.05'
   Dist::Zilla::Plugin::Git: '2.046'
+  Dist::Zilla::Plugin::Git::Contributors: '0'
   Dist::Zilla::Plugin::GithubMeta: '0'
   Dist::Zilla::Plugin::MetaProvides::Package: '0'
   Dist::Zilla::Plugin::PodWeaver: '0'
@@ -55,13 +56,14 @@ requires:
   Pod::Weaver: '4.009'
   Pod::Weaver::Config::Assembler: '0'
   Pod::Weaver::Role::Section: '0'
+  Pod::Weaver::Section::Contributors: '0.008'
   Software::License: '0.103014'
   namespace::autoclean: '0'
   perl: '5.026'
 resources:
   bugtracker: https://github.com/johannessen/dzil-pluginbundle/issues
   repository: https://github.com/johannessen/dzil-pluginbundle.git
-version: '0.06'
-x_generated_by_perl: v5.38.0
+version: '0.07'
+x_generated_by_perl: v5.39.9
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: CC0-1.0

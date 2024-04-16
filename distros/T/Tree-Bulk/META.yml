@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.4224'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,11 +15,11 @@ name: Tree-Bulk
 provides:
   Tree::Bulk:
     file: lib/Tree/Bulk.pm
-    version: '20210302'
+    version: '20240415'
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Table::Text: '20200101'
+  Data::Table::Text: '20240408'
   Test2::API: '0'
   Test::More: '0'
   feature: '0'
@@ -27,5 +27,5 @@ resources:
   bugtracker: https://github.com/philiprbrenan/TreeBulk/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/philiprbrenan/TreeBulk
-version: '20210302'
+version: '20240415'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -9,9 +9,12 @@ plugin 'Probe::CommandLine' => (
 
 share {
 
-  plugin Download => (
-    url     => 'https://tukaani.org/xz/',
-    version => qr/^xz-([0-9\.]+)\.tar\.gz$/,
+  requires 'Alien::Autotools';
+  requires 'Alien::autoconf' => '0.20';
+
+  plugin 'Download::GitHub' => (
+    github_user => 'tukaani-project',
+    github_repo => 'xz',
   );
 
   plugin Extract => 'tar.gz';
@@ -25,6 +28,7 @@ share {
   $configure_flags .= " --disable-assembler" if $^O eq 'MSWin32';
 
   build [
+    'sh autogen.sh --no-po4a --no-doxygen',
     "%{configure} --disable-shared $configure_flags",
     '%{make}',
     '%{make} install',
@@ -32,6 +36,7 @@ share {
 
   ffi {
     build [
+      'sh autogen.sh --no-po4a --no-doxygen',
       "%{configure} --enable-shared --disable-static --libdir=%{.install.autoconf_prefix}/dynamic $configure_flags",
       '%{make}',
       '%{make} install',

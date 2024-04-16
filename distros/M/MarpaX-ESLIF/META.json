@@ -152,91 +152,91 @@
    "provides" : {
       "MarpaX::ESLIF" : {
          "file" : "lib/MarpaX/ESLIF.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::Base" : {
          "file" : "lib/MarpaX/ESLIF/Base.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::Event::Type" : {
          "file" : "lib/MarpaX/ESLIF/Event/Type.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::Grammar" : {
          "file" : "lib/MarpaX/ESLIF/Grammar.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::Grammar::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Properties.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::Grammar::Rule::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Rule/Properties.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::Grammar::Symbol::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Symbol/Properties.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::JSON" : {
          "file" : "lib/MarpaX/ESLIF/JSON.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::JSON::Decoder" : {
          "file" : "lib/MarpaX/ESLIF/JSON/Decoder.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::JSON::Decoder::RecognizerInterface" : {
          "file" : "lib/MarpaX/ESLIF/JSON/Decoder/RecognizerInterface.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::JSON::Encoder" : {
          "file" : "lib/MarpaX/ESLIF/JSON/Encoder.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::Logger::Level" : {
          "file" : "lib/MarpaX/ESLIF/Logger/Level.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::Recognizer" : {
          "file" : "lib/MarpaX/ESLIF/Recognizer.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::RegexCallout" : {
          "file" : "lib/MarpaX/ESLIF/RegexCallout.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::Rule::PropertyBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Rule/PropertyBitSet.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::String" : {
          "file" : "lib/MarpaX/ESLIF/String.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::Symbol" : {
          "file" : "lib/MarpaX/ESLIF/Symbol.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::Symbol::EventBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/EventBitSet.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::Symbol::PropertyBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/PropertyBitSet.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::Symbol::Type" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/Type.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::Value" : {
          "file" : "lib/MarpaX/ESLIF/Value.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       },
       "MarpaX::ESLIF::Value::Type" : {
          "file" : "lib/MarpaX/ESLIF/Value/Type.pm",
-         "version" : "v6.0.33.4"
+         "version" : "v6.0.35.1"
       }
    },
    "release_status" : "stable",
@@ -251,7 +251,7 @@
          "web" : "https://github.com/jddurand/c-marpaESLIFPerl"
       }
    },
-   "version" : "6.0.33.4",
+   "version" : "6.0.35.1",
    "x_authority" : "cpan:JDDPAUSE",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",

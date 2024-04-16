@@ -37,7 +37,7 @@ ok( $arch->add( "foo/foofile", $foofile ), "adding file" );
 ok( $arch->write($tarfile), "Tarring up" );
 
 SKIP: {
-    skip 'Permissions are too different on Microsoft Windows', 1 if ($Config{osname} eq 'MSWin32');
+    skip 'Permissions are too different on Microsoft Windows', 1 if ($Config{osname} eq 'MSWin32' || $Config{osname} eq 'msys');
     my $tarread = Archive::Tar::Wrapper->new();
     $tarread->read($tarfile);
     my $loc = $tarread->locate("foo");

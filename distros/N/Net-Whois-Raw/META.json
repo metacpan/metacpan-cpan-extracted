@@ -64,7 +64,7 @@
          "web" : "https://github.com/regru/Net-Whois-Raw"
       }
    },
-   "version" : "2.99038",
+   "version" : "2.99039",
    "x_contributors" : [
       "Ariel Brosh <schop@cpan.org>",
       "Gabor Szabo <szabgab@cpan.org>",

@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99038';
+$Net::Whois::Raw::Data::VERSION = '2.99039';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -4485,7 +4485,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99038
+version 2.99039
 
 =head1 AUTHOR
 

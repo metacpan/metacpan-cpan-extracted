@@ -1,14 +1,8 @@
 ---
 seq:
+  # extra tests temporarily here for debugging
   - seq:
-    - t/a00_tester_id.t
-    - t/a02_a_tester_id.t
-    - t/a02_a5_tester_id.t
-    - t/a02_a6_tester_id.t
-    - t/a02_a7_tester_id.t
-    - t/a02_a8_tester_id.t
-    - t/a02_a9_tester_id.t
-    - t/a02_a10_tester_id.t
-    - t/a02_a11_tester_id.t
-  # rest of the tests
+    - t/a1.t
+    - t/a2.t
+ # rest of the tests
   - par: **

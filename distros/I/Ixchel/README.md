@@ -167,7 +167,6 @@ p5-Template-Toolkit p5-YAML-LibYAML p5-App-cpanminus`
 - Apache config management(genearlized manner)
 - actions for...
   - Lilith
-	- install client
 	- db server setup
   - CAPEv2
 - better documentation for Suricata outputs

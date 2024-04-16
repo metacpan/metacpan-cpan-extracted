@@ -3,7 +3,7 @@ use warnings;
 
 package Dist::Zilla::PluginBundle::Author::AJNN;
 # ABSTRACT: Dist::Zilla configuration the way AJNN does it
-$Dist::Zilla::PluginBundle::Author::AJNN::VERSION = '0.06';
+$Dist::Zilla::PluginBundle::Author::AJNN::VERSION = '0.07';
 
 use Dist::Zilla;
 use Moose;
@@ -151,6 +151,7 @@ sub configure {
 		@podweaver_skip = ( finder => '@Author::AJNN/PodWeaverFiles' );
 	}
 	$self->add_plugins(
+		[ 'Git::Contributors' => { remove => 'arne.johannessen.de' } ],
 		#[ 'PodWeaverIfPod' => {
 		[ 'PodWeaver' => {
 			config_plugin => '@Author::AJNN',
@@ -200,7 +201,7 @@ Dist::Zilla::PluginBundle::Author::AJNN - Dist::Zilla configuration the way AJNN
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -276,6 +277,7 @@ This plugin bundle is nearly equivalent to the following C<dist.ini> config:
  [FileFinder::Filter / PodWeaverFiles]
  finder = :InstallModules
  finder = :ExecFiles
+ [Git::Contributors]
  [PodWeaver]
  finder = PodWeaverFiles
  config_plugin = @Author::AJNN
@@ -299,8 +301,9 @@ L<RT 81958|https://github.com/rjbs/Dist-Zilla/issues/695>.
 =head2 cpan_release
 
 Whether or not this distribution is meant to be released to
-L<CPAN|https://www.cpan.org/>. The default is yes, but for software
-of low quality or little interest to others, it can be set to no.
+L<CPAN|https://www.cpan.org/>. The default is yes, but for cases
+where a public CPAN release is not desirable or possible, it can
+be set to no.
 
  cpan_release = 0
 
@@ -346,10 +349,7 @@ L<Dist::Zilla::Role::PluginBundle::Easy>
 
 =head1 AUTHOR
 
-Arne Johannessen <ajnn@cpan.org>
-
-If you contact me by email, please make sure you include the word
-"Perl" in your subject header to help beat the spam filters.
+Arne Johannessen (L<AJNN|https://metacpan.org/author/AJNN>)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -63,7 +63,7 @@ BEGIN {
 #
 BEGIN {
     #
-    our $VERSION = '6.0.33.4'; # VERSION
+    our $VERSION = '6.0.35.1'; # VERSION
     #
     # Note that $VERSION is always defined when you use a distributed CPAN package.
     # With old versions of perl, only the XSLoader::load(__PACKAGE__, $version) works.
@@ -123,7 +123,7 @@ MarpaX::ESLIF - ESLIF is Extended ScanLess InterFace
 
 =head1 VERSION
 
-version 6.0.33.4
+version 6.0.35.1
 
 =head1 SYNOPSIS
 

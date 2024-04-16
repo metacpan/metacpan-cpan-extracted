@@ -3,7 +3,7 @@ use warnings;
 
 package Pod::Weaver::PluginBundle::Author::AJNN::Author;
 # ABSTRACT: Pod section naming the author
-$Pod::Weaver::PluginBundle::Author::AJNN::Author::VERSION = '0.06';
+$Pod::Weaver::PluginBundle::Author::AJNN::Author::VERSION = '0.07';
 
 use Carp qw(croak);
 use Moose;
@@ -16,6 +16,8 @@ with 'Pod::Weaver::Role::Section';
 
 our $HEADER = 'AUTHOR';
 
+my $AJNN_URL = 'https://metacpan.org/author/AJNN';
+
 
 sub weave_section {
 	my ($self, $document, $input) = @_;
@@ -23,14 +25,8 @@ sub weave_section {
 	my $author = $input->{authors}->[0];
 	
 	croak "Unsupported declaration of multiple authors in dist.ini" if $input->{authors}->@* > 1;
-
-	if ( $author =~ m/<ajnn\@cpan\.org>/ ) {
-		$author .= <<~END;
-			\n
-			If you contact me by email, please make sure you include the word
-			"Perl" in your subject header to help beat the spam filters.
-			END
-	}
+	
+	$author =~ s/<ajnn\@cpan\.org>/(L<AJNN|$AJNN_URL>)/;
 	
 	push $document->children->@*, Pod::Elemental::Element::Nested->new({
 		command  => 'head1',
@@ -58,7 +54,7 @@ Pod::Weaver::PluginBundle::Author::AJNN::Author - Pod section naming the author
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -77,8 +73,12 @@ version 0.06
 
 This package provides AJNN's customised author statement.
 
-In particular, if AJNN is declared as a distribution's only author,
-a note is added that may help spam filtering.
+In particular, if AJNN is declared as a distribution's author,
+he will be identified with an HTTP link instead of the
+@cpan.org email address. 
+The Perl NOC is currently (2023) considering to sunset SMTP
+delivery to those addresses, so this provides some forward
+compatibility.
 
 =head1 BUGS
 
@@ -92,10 +92,7 @@ L<Pod::Weaver::Section::Authors>
 
 =head1 AUTHOR
 
-Arne Johannessen <ajnn@cpan.org>
-
-If you contact me by email, please make sure you include the word
-"Perl" in your subject header to help beat the spam filters.
+Arne Johannessen (L<AJNN|https://metacpan.org/author/AJNN>)
 
 =head1 COPYRIGHT AND LICENSE
 

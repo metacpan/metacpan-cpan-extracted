@@ -3,7 +3,7 @@ use warnings;
 
 package Pod::Weaver::PluginBundle::Author::AJNN;
 # ABSTRACT: AJNN Pod::Weaver configuration
-$Pod::Weaver::PluginBundle::Author::AJNN::VERSION = '0.06';
+$Pod::Weaver::PluginBundle::Author::AJNN::VERSION = '0.07';
 
 use Pod::Weaver 4.009;
 use Pod::Weaver::Config::Assembler;
@@ -25,13 +25,11 @@ sub mvp_bundle_config {
 		[ '@AJNN/Name',           _exp('Name'), {} ],
 		[ '@AJNN/Version',        _exp('Version'), {} ],
 		
-		[ 'OVERVIEW',             _exp('Generic'), {} ],
-		[ 'SYNOPSIS',             _exp('Generic'), {} ],
-		[ 'DESCRIPTION',          _exp('Generic'), {} ],
-		
 		[ '@AJNN/Leftovers',      _exp('Leftovers'), {} ],
 		
 		[ '@AJNN/Author',  __PACKAGE__ . '::Author', {} ],
+		[ '@AJNN/Contributors', _exp('Contributors'), {} ],
+		
 		[ '@AJNN/License', __PACKAGE__ . '::License', {} ],
 	);
 }
@@ -51,7 +49,7 @@ Pod::Weaver::PluginBundle::Author::AJNN - AJNN Pod::Weaver configuration
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -88,13 +86,11 @@ This plugin bundle is nearly equivalent to the following C<weaver.ini> config:
  [Name]
  [Version]
  
- [Generic / OVERVIEW]
- [Generic / SYNOPSIS]
- [Generic / DESCRIPTION]
- 
  [Leftovers]
  
  [@Author::AJNN::Author]
+ [Contributors]
+ 
  [@Author::AJNN::License]
 
 =head1 BUGS
@@ -117,10 +113,7 @@ L<Dist::Zilla::Plugin::PodWeaver>
 
 =head1 AUTHOR
 
-Arne Johannessen <ajnn@cpan.org>
-
-If you contact me by email, please make sure you include the word
-"Perl" in your subject header to help beat the spam filters.
+Arne Johannessen (L<AJNN|https://metacpan.org/author/AJNN>)
 
 =head1 COPYRIGHT AND LICENSE
 

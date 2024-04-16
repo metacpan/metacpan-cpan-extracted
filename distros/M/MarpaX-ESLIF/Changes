@@ -1,6 +1,14 @@
 Changelog for MarpaX-ESLIF
 
-6.0.33.4 2024-03-01T06:05:24
+6.0.35.1 2024-04-16T04:48:47
+ - No changes found
+
+6.0.35.0 2024-04-16T04:28:27
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Version 6.0.35
+ - t/parameterizedRules.t: Rewrite to truely use RHS generation
+
+6.0.33.4 2024-03-01T06:05:24Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - Remove two uneeded $ac calls [ci skip]
  - Try to limit $optimize flag v.s. compiler family [ci skip]

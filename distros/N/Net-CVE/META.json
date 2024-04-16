@@ -1,53 +1,34 @@
 {
-   "license" : [
-      "perl_5"
-   ],
-   "provides" : {
-      "Net::CVE" : {
-         "version" : "0.008",
-         "file" : "lib/Net/CVE.pm"
-      }
-   },
-   "resources" : {
-      "repository" : {
-         "web" : "https://github.com/CPAN-Security/Net-CVE",
-         "url" : "https://github.com/CPAN-Security/Net-CVE",
-         "type" : "git"
-      },
-      "bugtracker" : {
-         "web" : "https://github.com/CPAN-Security/Net-CVE/issues"
-      },
-      "x_IRC" : "irc://irc.perl.org/#metacpan",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
-   },
-   "abstract" : "Fetch CVE information from cve.org",
-   "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
-   },
    "prereqs" : {
       "build" : {
          "requires" : {
             "perl" : "5.014002"
          }
       },
-      "runtime" : {
+      "test" : {
+         "requires" : {
+            "Test::Warnings" : "0",
+            "Test::More" : "0.90"
+         },
          "recommends" : {
-            "Data::Dumper" : "2.188",
+            "Test::More" : "1.302198"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0.025",
+            "Carp" : "0",
+            "JSON::MaybeXS" : "1.004005",
+            "IO::Socket::SSL" : "1.42",
+            "Data::Dumper" : "0",
+            "perl" : "5.014002",
+            "List::Util" : "0"
+         },
+         "recommends" : {
+            "Data::Peek" : "0.52",
             "HTTP::Tiny" : "0.088",
             "IO::Socket::SSL" : "2.085",
-            "Data::Peek" : "0.52"
-         },
-         "requires" : {
-            "perl" : "5.014002",
-            "JSON::MaybeXS" : "1.004005",
-            "HTTP::Tiny" : "0.009",
-            "List::Util" : "0",
-            "Carp" : "0",
-            "Data::Dumper" : "0",
-            "IO::Socket::SSL" : "1.42"
+            "Data::Dumper" : "2.188"
          }
       },
       "configure" : {
@@ -60,23 +41,42 @@
          "suggests" : {
             "ExtUtils::MakeMaker" : "7.70"
          }
-      },
-      "test" : {
-         "requires" : {
-            "Test::Warnings" : "0",
-            "Test::More" : "0.90"
-         },
-         "recommends" : {
-            "Test::More" : "1.302198"
-         }
       }
    },
-   "release_status" : "stable",
-   "version" : "0.008",
    "author" : [
       "H.Merijn Brand <hmbrand@cpan.org>"
    ],
    "dynamic_config" : 1,
+   "version" : "0.009",
+   "provides" : {
+      "Net::CVE" : {
+         "version" : "0.009",
+         "file" : "lib/Net/CVE.pm"
+      }
+   },
    "name" : "Net-CVE",
-   "generated_by" : "Author"
+   "release_status" : "stable",
+   "abstract" : "Fetch CVE information from cve.org",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "generated_by" : "Author",
+   "license" : [
+      "perl_5"
+   ],
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "x_IRC" : "irc://irc.perl.org/#metacpan",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/CPAN-Security/Net-CVE",
+         "web" : "https://github.com/CPAN-Security/Net-CVE"
+      },
+      "bugtracker" : {
+         "web" : "https://github.com/CPAN-Security/Net-CVE/issues"
+      }
+   }
 }

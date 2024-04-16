@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use File::Temp qw(tempfile tempdir);
 use Test::More tests => 1;
-# Author test, you will need to declare P5LIB to run this test with prove
+use lib 'xt/lib';
 use ATWDumbbench;
 use constant BATCH_SIZE => 1000;
 
@@ -128,7 +128,7 @@ $bench->add_instances(
                 }
             }
 
-            splice( @temp, $first, 1 );
+            splice( @temp, $first,          1 );
             splice( @temp, ( $second - 1 ), 1 );
         }
     ),

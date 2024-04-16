@@ -31,7 +31,7 @@ my %wm = (
     PREREQ_PM    => {
 	# Core modules
 	"Carp"			=> 0,
-	"HTTP::Tiny"		=> 0.009,
+	"HTTP::Tiny"		=> 0.025,
 	"JSON::MaybeXS"		=> 1.004005,
 	"List::Util"		=> 0,
 

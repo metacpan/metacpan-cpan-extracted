@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-PluginBundle-Author-AJNN
 
+0.07  2024-04-15
+
+ - Add git contributors to meta and pod
+ - Use an HTTP link instead of an SMTP address in the pod author section
+ - Add readme support for main modules with separate .pod files
+ - Use Leftovers instead of Generic in PodWeaver
+
 0.06  2023-11-14
 
  - Put OVERVIEW before SYNOPSIS in pod

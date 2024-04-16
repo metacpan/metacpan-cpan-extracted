@@ -55,6 +55,9 @@
 [% IF config.snmp.extends.sagan.enable %]
 */5 * * * * root /usr/bin/env [% config.snmp.extend_env %] sagan_stat_check -u [% config.snmp.extends.sagan.args %] > /dev/null 2> /dev/null
 [% END %]
+[% IF config.snmp.extends.lilith.enable && config.lilith.enable %]
+*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] lilith -a extend -Z > /var/cache/lilith.extend 2> /dev/null
+[% END %]
 [% IF config.snmp.extends.suricata.enable %]
 30 0 * * * root /usr/bin/env [% config.snmp.extend_env %] suricata_stat_check -u [% config.snmp.extends.suricata.args %] > /dev/null 2> /dev/null
 [% END %]

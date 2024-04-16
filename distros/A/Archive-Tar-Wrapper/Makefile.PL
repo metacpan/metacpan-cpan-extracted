@@ -3,10 +3,6 @@ use strict;
 use ExtUtils::MakeMaker;
 use File::Which;
 
-if ( $^O eq 'solaris' ) {
-    die "OS unsupported\n";
-}
-
 if ( $^O eq 'MSWin32' ) {
     require Win32;
     my $product_info = Win32::GetOSDisplayName();
@@ -54,6 +50,7 @@ my %WriteMakefileArgs = (
     'VERSION'          => $module_version,
     'MIN_PERL_VERSION' => 5.008001,
     'NO_META'          => 0,
+    'NO_MYMETA'        => 0,
     'LICENSE'          => 'gpl_3',
     'PREREQ_PM'        => {
         'File::Temp'    => 0,
@@ -62,7 +59,8 @@ my %WriteMakefileArgs = (
         'IPC::Run'      => 0,
         'File::Which'   => 0,
         'CPAN::Meta'    => 0
-    }
+    },
+    'ABSTRACT_FROM' => 'lib/Archive/Tar/Wrapper.pm'
 );
 
 if ( $ExtUtils::MakeMaker::VERSION >= 6.46 ) {
@@ -77,7 +75,11 @@ if ( $ExtUtils::MakeMaker::VERSION >= 6.46 ) {
 }
 
 if ( $ExtUtils::MakeMaker::VERSION >= 6.50 ) {
-    $WriteMakefileArgs{META_MERGE}->{'meta-spec'} = { version => 2 };
+    $WriteMakefileArgs{META_MERGE}->{'meta-spec'} = {
+        'version'        => '2',
+        'url'            => 'http://search.cpan.org/perldoc?CPAN::Meta::Spec',
+        'release_status' => 'stable'
+    };
     $WriteMakefileArgs{META_MERGE}->{'resources'} = {
         'bugtracker' => {
             'web' =>
@@ -85,19 +87,11 @@ if ( $ExtUtils::MakeMaker::VERSION >= 6.50 ) {
         },
         'repository' => {
             'type' => 'git',
-            'url' =>
+            'url'  =>
               'https://github.com/glasswalk3r/archive-tar-wrapper-perl.git',
             'web' => 'https://github.com/glasswalk3r/archive-tar-wrapper-perl',
         }
     };
-}
-
-# Test::More::is_deeply is required for testing
-if ( $ExtUtils::MakeMaker::VERSION >= 6.64 ) {
-    $WriteMakefileArgs{TEST_REQUIRES}->{'Test::Simple'} = 1.302073;
-}
-else {
-    $WriteMakefileArgs{PREREQ_PM}->{'Test::Simple'} = 1.302073;
 }
 
 if ( $ExtUtils::MakeMaker::VERSION >= 6.52 ) {
@@ -107,11 +101,21 @@ if ( $ExtUtils::MakeMaker::VERSION >= 6.52 ) {
     };
 }
 
+# Test::More::is_deeply is required for testing
+if ( $ExtUtils::MakeMaker::VERSION >= 6.64 ) {
+    $WriteMakefileArgs{TEST_REQUIRES}->{'Test::Simple'} = 1.302073;
+    $WriteMakefileArgs{TEST_REQUIRES}->{'Dumbbench'}    = 0.503;
+}
+else {
+    $WriteMakefileArgs{PREREQ_PM}->{'Test::Simple'} = 1.302073;
+    $WriteMakefileArgs{PREREQ_PM}->{'Dumbbench'}    = 0.503;
+}
+
 if ( $] >= 5.005 ) {
     $WriteMakefileArgs{ABSTRACT_FROM} = 'lib/Archive/Tar/Wrapper.pm';
     $WriteMakefileArgs{AUTHOR}        = [
         'Mike Schilli <cpan@perlmeister.com>',
-        'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
+        'Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>'
     ];
 }
 

@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Tree::Bulk;
-our $VERSION = "20210302";
+our $VERSION = "20240415";
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess cluck);
@@ -13,7 +13,7 @@ use Data::Dump qw(dump);
 use Data::Table::Text qw(:all);
 use feature qw(say current_sub);
 
-sub saveLog($)                                                                  #P Save a result to the log file if we are developing
+sub saveLog($)                                                                  #P Save a result to the log file if we are developing.
  {my ($string) = @_;                                                            # String to save
   my $l = q(/home/phil/perl/z/bulkTree/zzz.txt);                                # Log file if available
 
@@ -22,17 +22,17 @@ sub saveLog($)                                                                  
   exit
  }
 
-sub save                                                                        # Simplified save
+sub save                                                                        # Simplified save.
  {my ($t) = @_;                                                                 # Tree
   saveLog($t->printKeys);
  }
 
-sub Left  {q(left)}                                                             # Left
-sub Right {q(right)}                                                            # Right
+sub Left  {q(left)}                                                             # Left.
+sub Right {q(right)}                                                            # Right.
 
-#D1 Bulk Tree                                                                   # Bulk Tree
+#D1 Bulk Tree                                                                   # Bulk Tree.
 
-sub node(;$$$$)                                                                 #P Create a new bulk tree node
+sub node(;$$$$)                                                                 #P Create a new bulk tree node.
  {my ($key, $data, $up, $side) = @_;                                            # Key, $data, parent node, side of parent node
   my $t = genHash(__PACKAGE__,                                                  # Bulk tree node
     keysPerNode => $up ? $up->keysPerNode : 4,                                  # Maximum number of keys per node
@@ -47,7 +47,7 @@ sub node(;$$$$)                                                                 
   if ($up)                                                                      # Install new node in tree
    {if ($side)
      {$up->{$side} = $t;
-      $up->setHeights(2);
+      $up->setHeights;
      }
     else
      {confess 'Specify side' if !$side;
@@ -56,28 +56,28 @@ sub node(;$$$$)                                                                 
   $t
  }
 
-sub new {node}                                                                  # Create a new tree
+sub new {node}                                                                  # Create a new tree.
 
-sub isRoot($)                                                                   # Return the tree if it is the root
+sub isRoot($)                                                                   # Return the tree if it is the root.
  {my ($tree) = @_;                                                              # Tree
   confess unless $tree;
   !$tree->up ? $tree : undef
  }
 
-sub root($)                                                                     # Return the root node of a tree
+sub root($)                                                                     # Return the root node of a tree.
  {my ($tree) = @_;                                                              # Tree
   confess unless $tree;
   for(; $tree->up; $tree = $tree->up) {}
   $tree
  }
 
-sub leaf($)                                                                     # Return the tree if it is a leaf
+sub leaf($)                                                                     # Return the tree if it is a leaf.
  {my ($tree) = @_;                                                              # Tree
   confess unless $tree;
   $tree and !$tree->right and !$tree->left ? $tree : undef
  }
 
-sub duplex($)                                                                   # Return the tree if it has left and right children
+sub duplex($)                                                                   # Return the tree if it has left and right children.
  {my ($tree) = @_;                                                              # Tree
   confess unless $tree;
   $tree->right and $tree->left             ? $tree : undef
@@ -98,68 +98,65 @@ sub simplexWithLeaf($)                                                          
   $tree
  }
 
-sub empty($)                                                                    # Return the tree if it is empty
+sub empty($)                                                                    # Return the tree if it is empty.
  {my ($tree) = @_;                                                              # Tree
   confess unless $tree;
   $tree->leaf and !$tree->keys->@*         ? $tree : undef
  }
 
-sub singleton($)                                                                # Return the tree if it contains only the root node and nothing else
+sub singleton($)                                                                # Return the tree if it contains only the root node and nothing else.
  {my ($tree) = @_;                                                              # Tree
   confess unless $tree;
   $tree->leaf and $tree->isRoot            ? $tree : undef;
  }
 
-sub isLeftChild($)                                                              # Return the tree if it is the left child
+sub isLeftChild($)                                                              # Return the tree if it is the left child.
  {my ($tree) = @_;                                                              # Tree
   confess unless $tree;
   $tree->up and $tree->up->left and $tree->up->left   == $tree ? $tree : undef;
  }
 
-sub isRightChild($)                                                             # Return the tree if it is the right child
+sub isRightChild($)                                                             # Return the tree if it is the right child.
  {my ($tree) = @_;                                                              # Tree
   confess unless $tree;
   $tree->up and $tree->up->right and $tree->up->right == $tree ? $tree : undef;
  }
 
-sub name($)                                                                     # Name of a tree
+sub name($)                                                                     # Name of a tree.
  {my ($tree) = @_;                                                              # Tree
   confess unless $tree;
   join ' ', $tree->keys->@*
  }
 
-sub names($)                                                                    # Names of all nodes in a tree in order
+sub names($)                                                                    # Names of all nodes in a tree in order.
  {my ($tree) = @_;                                                              # Tree
   confess unless $tree;
   join ' ', map {$_->name} $tree->inorder;
  }
 
-sub setHeights($)                                                               #P Set heights along path to root
+sub setHeights($)                                                               #P Set heights along path to root.
  {my ($tree) = @_;                                                              # Tree
   confess unless $tree;
   for(my $n = $tree; $n; $n = $n->up)
    {$n->setHeight;
     $n->balance;
    }
+  $tree
  } # setHeights
 
-sub actualHeight($)                                                             #P Get the height of a node
+sub actualHeight($)                                                             #P Get the height of a node.
  {my ($tree) = @_;                                                              # Tree
   return 0 unless $tree;
   $tree->height
  }
 
-sub maximum($$)                                                                 #P Maximum of two numbers
- {my ($a, $b) = @_;                                                             # First, second
-  $a > $b ? $a : $b
- }
-
-sub setHeight($)                                                                #P Set height of a tree from its left and right trees
+sub setHeight($)                                                                #P Set height of a tree from its left and right trees.
  {my ($tree) = @_;                                                              # Tree
   confess unless $tree;
   my $l = actualHeight($tree->left);
   my $r = actualHeight($tree->right);
   $tree->height = 1 + maximum($l, $r);
+  $tree
  } # setHeight
 
 # Rotate left
@@ -169,7 +166,7 @@ sub setHeight($)                                                                
 #    l   r              n   R
 #       L R           l  L
 
-sub rotateLeft($)                                                               #P Rotate a node left
+sub rotateLeft($)                                                               #P Rotate a node left.
  {my ($n) = @_;                                                                 # Node
   confess unless $n;
   my $p     = $n->up;
@@ -184,7 +181,7 @@ sub rotateLeft($)                                                               
   $r->refill;
  } # rotateLeft
 
-sub rotateRight($)                                                              #P Rotate a node right
+sub rotateRight($)                                                              #P Rotate a node right.
  {my ($n) = @_;                                                                 # Node
   confess unless $n;
   my $p     = $n->up;
@@ -208,7 +205,7 @@ sub rotateRight($)                                                              
 #    4                    3
 #  3
 
-sub balance($)                                                                  # Balance a node
+sub balance($)                                                                  # Balance a node.
  {my ($t) = @_;                                                                 # Tree
   confess unless $t;
   my ($l, $r) = (actualHeight($t->left), actualHeight($t->right));
@@ -233,7 +230,7 @@ sub balance($)                                                                  
   $t
  } # balance
 
-sub insertUnchecked($$$)                                                        #P Insert a key and some data into a tree
+sub insertUnchecked($$$)                                                        #P Insert a key and some data into a tree.
  {my ($tree, $key, $data) = @_;                                                 # Tree, key, data
   confess unless $tree;
   confess unless defined $key;
@@ -298,14 +295,14 @@ sub insertUnchecked($$$)                                                        
    }
  } # insertUnchecked
 
-sub insert($$$)                                                                 # Insert a key and some data into a tree
+sub insert($$$)                                                                 # Insert a key and some data into a tree.
  {my ($tree, $key, $data) = @_;                                                 # Tree, key, data
   confess unless $tree;
   confess unless defined $key;
   $tree->insertUnchecked($key, $data);
  } # insert
 
-sub find($$)                                                                    # Find a key in a tree and returns its data
+sub find($$)                                                                    # Find a key in a tree and returns its data.
  {my ($tree, $key) = @_;                                                        # Tree, key
   confess unless $tree;
   confess "No key" unless defined $key;
@@ -330,21 +327,21 @@ sub find($$)                                                                    
    }->($tree)
  } # find
 
-sub first($)                                                                    # First node in a tree
+sub first($)                                                                    # First node in a tree.
  {my ($n) = @_;                                                                 # Tree
   confess unless $n;
   $n = $n->left while $n->left;
   $n
  }
 
-sub last($)                                                                     # Last node in a tree
+sub last($)                                                                     # Last node in a tree.
  {my ($n) = @_;                                                                 # Tree
   confess unless $n;
   $n = $n->right while $n->right;
   $n
  }
 
-sub next($)                                                                     # Next node in order
+sub next($)                                                                     # Next node in order.
  {my ($tree) = @_;                                                              # Tree
   confess unless $tree;
   if   (my $r = $tree->right)
@@ -357,7 +354,7 @@ sub next($)                                                                     
   undef
  }
 
-sub prev($)                                                                     # Previous node in order
+sub prev($)                                                                     # Previous node in order.
  {my ($tree) = @_;                                                              # Tree
   confess unless $tree;
   if   (my $l = $tree->left)
@@ -370,7 +367,7 @@ sub prev($)                                                                     
   undef
  }
 
-sub inorder($)                                                                  # Return a list of all the nodes in a tree in order
+sub inorder($)                                                                  # Return a list of all the nodes in a tree in order.
  {my ($tree) = @_;                                                              # Tree
   confess unless $tree;
   my @n;
@@ -380,7 +377,7 @@ sub inorder($)                                                                  
   @n
  }
 
-sub unchain($)                                                                  #P Remove a tree from the middle of a chain. A leaf is considered to be in the middle of a chain and so can be removed with this method
+sub unchain($)                                                                  #P Remove a tree from the middle of a chain. A leaf is considered to be in the middle of a chain and so can be removed with this method.
  {my ($t) = @_;                                                                 # Tree
   confess unless $t;
   confess "Duplex tree cannot be unchained" if duplex $t;
@@ -391,16 +388,16 @@ sub unchain($)                                                                  
   $c->up = $p if $c;
   $t->up = undef;
 
-  if    (my $l = $p->left)  {$l->setHeights($l->height)}                        # Set heights from a known point
-  elsif (my $r = $p->right) {$r->setHeights($r->height)}
-  else                      {$p->setHeights(1)}
+  if    (my $l = $p->left)  {$l->setHeights}                                    # Set heights from a known point
+  elsif (my $r = $p->right) {$r->setHeights}
+  else                      {$p->setHeights}
 
   $p->balance;                                                                  # Rebalance parent
 
   $p                                                                            # Unchained node
  } # unchain
 
-sub refillFromRight($)                                                          #P Push a key to the target node from the next node
+sub refillFromRight($)                                                          #P Push a key to the target node from the next node.
  {my ($target) = @_;                                                            # Target tree
 
   confess unless $target;
@@ -415,7 +412,7 @@ sub refillFromRight($)                                                          
   $_->refill for $target, $source;
  } # refillFromRight
 
-sub refillFromLeft($)                                                           #P Push a key to the target node from the previous node
+sub refillFromLeft($)                                                           #P Push a key to the target node from the previous node.
  {my ($target) = @_;                                                            # Target tree
 
   confess unless $target;
@@ -431,11 +428,12 @@ sub refillFromLeft($)                                                           
   $_->refill for $target, $source;
  } # refillFromLeft
 
-sub refill($)                                                                   #P Refill a node so it has the expected number of keys
+sub refill($)                                                                   #P Refill a node so it has the expected number of keys.
  {my ($tree) = @_;                                                              # Tree
   confess unless $tree;
-  return if $tree->singleton;
-  return if $tree->keys->@* == $tree->keysPerNode;
+
+  return if $tree->singleton;                                                   # No need to refill a leaf
+  return if $tree->keys->@* == $tree->keysPerNode;                              # Interior node is full so no need of refill
 
   if ($tree->empty)                                                             # Remove an empty leaf that is not the root
    {$tree->unchain unless $tree->isRoot;
@@ -455,7 +453,7 @@ sub refill($)                                                                   
    }
  } # refill
 
-sub delete($$)                                                                  # Delete a key in a tree
+sub delete($$)                                                                  # Delete a key in a tree.
  {my ($tree, $key) = @_;                                                        # Tree, key
   confess unless $tree;
   confess "No key" unless defined $key;
@@ -479,7 +477,7 @@ sub delete($$)                                                                  
    }->($tree);
  } # delete
 
-sub printKeys2($$$)                                                             #P print the keys for a tree
+sub printKeys2($$$)                                                             #P Print the keys for a tree.
  {my ($t, $in, $g) = @_;                                                        # Tree, indentation, list of keys,
   return unless $t;
   __SUB__->($t->left, $in+1, $g);                                               # Left
@@ -496,7 +494,7 @@ sub printKeys2($$$)                                                             
   __SUB__->($t->right, $in+1, $g);                                              # Right
  }
 
-sub printKeys($)                                                                # Print the keys in a tree
+sub printKeys($)                                                                # Print the keys in a tree.
  {my ($t) = @_;                                                                 # Tree
   confess unless $t;
 
@@ -506,7 +504,7 @@ sub printKeys($)                                                                
   (join "\n", @s, "") =~ s(\s+\Z) (\n)sr
  } # printKeys
 
-sub setKeysPerNode($$)                                                          # Set the number of keys for the current node
+sub setKeysPerNode($$)                                                          # Set the number of keys for the current node.
  {my ($tree, $N) = @_;                                                          # Tree, keys per node to be set
   confess unless $tree;
   confess unless $N and $N > 0;
@@ -515,7 +513,7 @@ sub setKeysPerNode($$)                                                          
   $tree                                                                         # Allow chaining
  } # setKeysPerNode
 
-sub printKeysAndData($)                                                         # Print the mapping from keys to data in a tree
+sub printKeysAndData($)                                                         # Print the mapping from keys to data in a tree.
  {my ($t) = @_;                                                                 # Tree
   confess unless $t;
   my @s;
@@ -530,7 +528,7 @@ sub printKeysAndData($)                                                         
   formatTableBasic(\@s)
  } # printKeysAndData
 
-sub checkLRU($)                                                                 #P Confirm pointers in tree
+sub checkLRU($)                                                                 #P Confirm pointers in tree.
  {my ($tree) = @_;                                                              # Tree
   my %seen;                                                                     # Nodes we have already seen
 
@@ -545,7 +543,7 @@ sub checkLRU($)                                                                 
    }->($tree->root);
  }
 
-sub check($)                                                                    #P Confirm that each node in a tree is ordered correctly
+sub check($)                                                                    #P Confirm that each node in a tree is ordered correctly.
  {my ($tree) = @_;                                                              # Tree
   confess unless $tree;
   $tree->checkLRU;
@@ -608,7 +606,7 @@ sub check($)                                                                    
    }
  } # check
 
-sub checkAgainstHash($%)                                                        #P Check a tree against a hash
+sub checkAgainstHash($%)                                                        #P Check a tree against a hash.
  {my ($t, %t) = @_;                                                             # Tree, expected
 
   for my $k(keys %t)                                                            # Check we can find all the keys expected
@@ -697,7 +695,7 @@ END
 Bulk Tree operations
 
 
-Version "20210302".
+Version "20240415".
 
 
 The following sections describe the methods in each functional area of this
@@ -709,7 +707,7 @@ module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 Bulk Tree
 
-=head2 isRoot($tree)
+=head2 isRoot  ($tree)
 
 Return the tree if it is the root
 
@@ -816,7 +814,7 @@ B<Example:>
    }
 
 
-=head2 duplex($tree)
+=head2 duplex  ($tree)
 
 Return the tree if it has left and right children
 
@@ -849,7 +847,7 @@ B<Example:>
    }
 
 
-=head2 simplex($tree)
+=head2 simplex ($tree)
 
 Return the tree if it has either a left child or a right child but not both.
 
@@ -918,7 +916,7 @@ B<Example:>
    }
 
 
-=head2 simplexWithLeaf($tree)
+=head2 simplexWithLeaf ($tree)
 
 Return the tree if it has either a left child or a right child but not both and the child it has a leaf.
 
@@ -988,7 +986,7 @@ B<Example:>
    }
 
 
-=head2 empty($tree)
+=head2 empty   ($tree)
 
 Return the tree if it is empty
 
@@ -1008,7 +1006,7 @@ B<Example:>
    }
 
 
-=head2 singleton($tree)
+=head2 singleton   ($tree)
 
 Return the tree if it contains only the root node and nothing else
 
@@ -1028,7 +1026,7 @@ B<Example:>
    }
 
 
-=head2 isLeftChild($tree)
+=head2 isLeftChild ($tree)
 
 Return the tree if it is the left child
 
@@ -1206,7 +1204,7 @@ B<Example:>
    }
 
 
-=head2 names($tree)
+=head2 names   ($tree)
 
 Names of all nodes in a tree in order
 
@@ -1225,8 +1223,7 @@ B<Example:>
       srand(1);                                                                   # Same randomization
       my $t = Tree::Bulk::new->setKeysPerNode($keys);
       for my $r(randomizeArray 1..$N)
-       {$debug = $r == 74;
-        $t->insert($r, 2 * $r);
+       {$t->insert($r, 2 * $r);
         $t->check;
        }
 
@@ -1248,13 +1245,13 @@ B<Example:>
       is_deeply $t->actualHeight, 1;
      }
 
-    randomLoad(222, 1, 11);
+    randomLoad(222, 1, 11);                                                       # Random loads
     randomLoad(222, 8, 8);
     randomLoad(222, 4, 9);
    }
 
 
-=head2 balance($t)
+=head2 balance ($t)
 
 Balance a node
 
@@ -1305,7 +1302,7 @@ B<Example:>
    }
 
 
-=head2 insert($tree, $key, $data)
+=head2 insert  ($tree, $key, $data)
 
 Insert a key and some data into a tree
 
@@ -1383,7 +1380,7 @@ B<Example:>
    }
 
 
-=head2 first($n)
+=head2 first   ($n)
 
 First node in a tree
 
@@ -1615,7 +1612,7 @@ B<Example:>
    }
 
 
-=head2 inorder($tree)
+=head2 inorder ($tree)
 
 Return a list of all the nodes in a tree in order
 
@@ -1673,7 +1670,7 @@ B<Example:>
    }
 
 
-=head2 delete($tree, $key)
+=head2 delete  ($tree, $key)
 
 Delete a key in a tree
 
@@ -1790,7 +1787,7 @@ B<Example:>
    }
 
 
-=head2 printKeys($t)
+=head2 printKeys   ($t)
 
 Print the keys in a tree
 
@@ -1840,7 +1837,7 @@ B<Example:>
    }
 
 
-=head2 setKeysPerNode($tree, $N)
+=head2 setKeysPerNode  ($tree, $N)
 
 Set the number of keys for the current node
 
@@ -2060,6 +2057,11 @@ B<Example:>
 
 
 
+=head1 Hash Definitions
+
+
+
+
 =head2 Tree::Bulk Definition
 
 
@@ -2134,7 +2136,7 @@ Create a new bulk tree node
   3  $up        Parent node
   4  $side      Side of parent node
 
-=head2 setHeights($tree)
+=head2 setHeights  ($tree)
 
 Set heights along path to root
 
@@ -2287,35 +2289,14 @@ B<Example:>
    }
 
 
-=head2 maximum($a, $b)
-
-Maximum of two numbers
-
-     Parameter  Description
-  1  $a         First
-  2  $b         Second
-
-B<Example:>
-
-
-  if (1)
-
-   {is_deeply maximum(1,2), 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-
-    is_deeply maximum(2,1), 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-   }
-
-
-=head2 setHeight($tree)
+=head2 setHeight   ($tree)
 
 Set height of a tree from its left and right trees
 
      Parameter  Description
   1  $tree      Tree
 
-=head2 rotateLeft($n)
+=head2 rotateLeft  ($n)
 
 Rotate a node left
 
@@ -2385,7 +2366,7 @@ B<Example:>
    }
 
 
-=head2 rotateRight($n)
+=head2 rotateRight ($n)
 
 Rotate a node right
 
@@ -2455,7 +2436,7 @@ B<Example:>
    }
 
 
-=head2 insertUnchecked($tree, $key, $data)
+=head2 insertUnchecked ($tree, $key, $data)
 
 Insert a key and some data into a tree
 
@@ -2464,35 +2445,35 @@ Insert a key and some data into a tree
   2  $key       Key
   3  $data      Data
 
-=head2 unchain($t)
+=head2 unchain ($t)
 
 Remove a tree from the middle of a chain. A leaf is considered to be in the middle of a chain and so can be removed with this method
 
      Parameter  Description
   1  $t         Tree
 
-=head2 refillFromRight($target)
+=head2 refillFromRight ($target)
 
 Push a key to the target node from the next node
 
      Parameter  Description
   1  $target    Target tree
 
-=head2 refillFromLeft($target)
+=head2 refillFromLeft  ($target)
 
 Push a key to the target node from the previous node
 
      Parameter  Description
   1  $target    Target tree
 
-=head2 refill($tree)
+=head2 refill  ($tree)
 
 Refill a node so it has the expected number of keys
 
      Parameter  Description
   1  $tree      Tree
 
-=head2 printKeys2($t, $in, $g)
+=head2 printKeys2  ($t, $in, $g)
 
 print the keys for a tree
 
@@ -2508,7 +2489,7 @@ Confirm pointers in tree
      Parameter  Description
   1  $tree      Tree
 
-=head2 check($tree)
+=head2 check   ($tree)
 
 Confirm that each node in a tree is ordered correctly
 
@@ -2563,49 +2544,47 @@ Check a tree against a hash
 
 18 L<leaf|/leaf> - Return the tree if it is a leaf
 
-19 L<maximum|/maximum> - Maximum of two numbers
+19 L<name|/name> - Name of a tree
 
-20 L<name|/name> - Name of a tree
+20 L<names|/names> - Names of all nodes in a tree in order
 
-21 L<names|/names> - Names of all nodes in a tree in order
+21 L<next|/next> - Next node in order
 
-22 L<next|/next> - Next node in order
+22 L<node|/node> - Create a new bulk tree node
 
-23 L<node|/node> - Create a new bulk tree node
+23 L<prev|/prev> - Previous node in order
 
-24 L<prev|/prev> - Previous node in order
+24 L<printKeys|/printKeys> - Print the keys in a tree
 
-25 L<printKeys|/printKeys> - Print the keys in a tree
+25 L<printKeys2|/printKeys2> - print the keys for a tree
 
-26 L<printKeys2|/printKeys2> - print the keys for a tree
+26 L<printKeysAndData|/printKeysAndData> - Print the mapping from keys to data in a tree
 
-27 L<printKeysAndData|/printKeysAndData> - Print the mapping from keys to data in a tree
+27 L<refill|/refill> - Refill a node so it has the expected number of keys
 
-28 L<refill|/refill> - Refill a node so it has the expected number of keys
+28 L<refillFromLeft|/refillFromLeft> - Push a key to the target node from the previous node
 
-29 L<refillFromLeft|/refillFromLeft> - Push a key to the target node from the previous node
+29 L<refillFromRight|/refillFromRight> - Push a key to the target node from the next node
 
-30 L<refillFromRight|/refillFromRight> - Push a key to the target node from the next node
+30 L<root|/root> - Return the root node of a tree
 
-31 L<root|/root> - Return the root node of a tree
+31 L<rotateLeft|/rotateLeft> - Rotate a node left
 
-32 L<rotateLeft|/rotateLeft> - Rotate a node left
+32 L<rotateRight|/rotateRight> - Rotate a node right
 
-33 L<rotateRight|/rotateRight> - Rotate a node right
+33 L<setHeight|/setHeight> - Set height of a tree from its left and right trees
 
-34 L<setHeight|/setHeight> - Set height of a tree from its left and right trees
+34 L<setHeights|/setHeights> - Set heights along path to root
 
-35 L<setHeights|/setHeights> - Set heights along path to root
+35 L<setKeysPerNode|/setKeysPerNode> - Set the number of keys for the current node
 
-36 L<setKeysPerNode|/setKeysPerNode> - Set the number of keys for the current node
+36 L<simplex|/simplex> - Return the tree if it has either a left child or a right child but not both.
 
-37 L<simplex|/simplex> - Return the tree if it has either a left child or a right child but not both.
+37 L<simplexWithLeaf|/simplexWithLeaf> - Return the tree if it has either a left child or a right child but not both and the child it has a leaf.
 
-38 L<simplexWithLeaf|/simplexWithLeaf> - Return the tree if it has either a left child or a right child but not both and the child it has a leaf.
+38 L<singleton|/singleton> - Return the tree if it contains only the root node and nothing else
 
-39 L<singleton|/singleton> - Return the tree if it contains only the root node and nothing else
-
-40 L<unchain|/unchain> - Remove a tree from the middle of a chain.
+39 L<unchain|/unchain> - Remove a tree from the middle of a chain.
 
 =head1 Installation
 
@@ -2618,11 +2597,11 @@ comprehend, use, modify and install via B<cpan>:
 
 L<philiprbrenan@gmail.com|mailto:philiprbrenan@gmail.com>
 
-L<http://www.appaapps.com|http://www.appaapps.com>
+L<http://prb.appaapps.com|http://prb.appaapps.com>
 
 =head1 Copyright
 
-Copyright (c) 2016-2021 Philip R Brenan.
+Copyright (c) 2016-2023 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.

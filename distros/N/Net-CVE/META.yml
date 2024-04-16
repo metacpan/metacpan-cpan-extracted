@@ -16,7 +16,7 @@ name: Net-CVE
 provides: 
   Net::CVE: 
     file: lib/Net/CVE.pm
-    version: '0.008'
+    version: '0.009'
 recommends: 
   Data::Dumper: '2.188'
   Data::Peek: '0.52'
@@ -26,7 +26,7 @@ recommends:
 requires: 
   Carp: 0
   Data::Dumper: 0
-  HTTP::Tiny: '0.009'
+  HTTP::Tiny: '0.025'
   IO::Socket::SSL: '1.42'
   JSON::MaybeXS: '1.004005'
   List::Util: 0
@@ -38,4 +38,4 @@ resources:
   bugtracker: https://github.com/CPAN-Security/Net-CVE/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/CPAN-Security/Net-CVE
-version: '0.008'
+version: '0.009'

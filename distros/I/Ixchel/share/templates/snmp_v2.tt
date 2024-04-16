@@ -87,7 +87,11 @@ dlmod cmaX /usr/lib/libcmaX64.so
 pass .1.3.6.1.2.1.31.1.1.1.18 [% config.snmp.extend_base_dir %]/ifAlias
 
 [% END %]
-[% IF config.nptd.enable && config.snmp.extends.ntp_client.enable %]
+[% IF config.asterisk.enable && config.snmp.extends.asterisk.enable %]
+extend asterisk /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/asterisk
+
+[% END %]
+[% IF config.ntpd.enable && config.snmp.extends.ntp_client.enable %]
 extend ntp-client /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/ntp-client
 
 [% END %]
@@ -121,6 +125,10 @@ extend hv-monitor /bin/cat /var/cache/hv-monitor.json
 [% END %]
 [% IF config.snmp.extends.systemd.enable && is_systemd %]
 extend systemd /bin/cat /var/cache/systemd.extend
+
+[% END %]
+[% IF config.snmp.extends.lilith.enable && config.lilith.enable %]
+extend lilith /bin/cat /var/cache/lilith.extend
 
 [% END %]
 [% IF config.supervisord.enable && config.snmp.extends.supervisord.enable %]

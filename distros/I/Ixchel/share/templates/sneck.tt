@@ -1,0 +1,8 @@
+[% FOREACH vars IN config.sneck.vars -%]
+[% vars.key %]=[% vars.value %]
+
+[% END %]
+[% FOREACH tests IN config.sneck.tests -%]
+[% tests.key %]|[% tests.value %]
+
+[% END %]

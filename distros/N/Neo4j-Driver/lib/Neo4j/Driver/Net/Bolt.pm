@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::Bolt;
 # ABSTRACT: Network controller for Neo4j Bolt
-$Neo4j::Driver::Net::Bolt::VERSION = '0.48';
+$Neo4j::Driver::Net::Bolt::VERSION = '0.49';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -33,6 +33,8 @@ my %BOLT_ERROR = (
 
 my $RESULT_MODULE = 'Neo4j::Driver::Result::Bolt';
 
+our $verify_lib_version = 1;
+
 
 sub new {
 	# uncoverable pod
@@ -52,6 +54,7 @@ sub new {
 		croak "Protocol scheme 'bolt' is not supported (Neo4j::Bolt not installed)\n"
 			. "Neo4j::Driver will support 'bolt' URLs if the Neo4j::Bolt module is installed.\n"
 			unless eval { require Neo4j::Bolt; 1 };
+		_verify_lib_version() if $verify_lib_version;
 	}
 	
 	my $cxn;
@@ -75,6 +78,33 @@ sub new {
 		cypher_types => $driver->config('cypher_types'),
 		active_tx => 0,
 	}, $class;
+}
+
+
+# Some Neo4j::Client versions are known to provide broken versions of the lib.
+# Known-good module version pairs:
+#   +-- Neo4j::Bolt
+#   |       +-- Neo4j::Client
+#   |       |     +-- max recommended Neo4j server
+#   |       |     |
+#  0.5000  0.53  5.x  (neither is on CPAN yet - install from source)
+#  0.4203  0.46  4.4
+#  0.20    0.17  3.4
+#  0.12     -    3.4  (system libneo4j-client)
+sub _verify_lib_version {
+	no warnings 'uninitialized';
+	
+	# Running this check once (for the first session) is enough.
+	$verify_lib_version = 0;
+	
+	my $bolt_version = eval { Neo4j::Bolt->VERSION };
+	return unless $bolt_version eq '0.4203';
+	my $client_version = eval { require Neo4j::Client; Neo4j::Client->VERSION };
+	return unless $client_version =~ m/^0\.5[012]$/;
+	
+	warnings::warnif misc => sprintf
+		"Installed Neo4j::Client version %s is defective (downgrade to Neo4j::Client %s and reinstall Neo4j::Bolt %s, or use HTTP)",
+		$client_version, "0.46", $bolt_version;
 }
 
 

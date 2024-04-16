@@ -1,6 +1,6 @@
 requires   "Carp";
 requires   "Data::Dumper";
-requires   "HTTP::Tiny"               => "0.009";
+requires   "HTTP::Tiny"               => "0.025";
 requires   "IO::Socket::SSL"          => "1.42";
 requires   "JSON::MaybeXS"            => "1.004005";
 requires   "List::Util";

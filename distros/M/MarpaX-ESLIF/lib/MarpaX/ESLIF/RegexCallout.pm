@@ -7,7 +7,7 @@ package MarpaX::ESLIF::RegexCallout;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.33.4'; # VERSION
+our $VERSION = '6.0.35.1'; # VERSION
 
 
 use constant PCRE2_ERROR_NOMATCH => -1;
@@ -267,7 +267,7 @@ MarpaX::ESLIF::RegexCallout - ESLIF Regex Callout
 
 =head1 VERSION
 
-version 6.0.33.4
+version 6.0.35.1
 
 =head1 SYNOPSIS
 

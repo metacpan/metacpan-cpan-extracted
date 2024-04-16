@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use File::Temp qw(tempfile tempdir);
 use Test::More tests => 1;
-use lib 't/lib';
+use lib 'xt/lib';
 use ATWDumbbench;
 use constant BATCH_SIZE  => 1000;
 use constant TOTAL_FILES => 10;
@@ -12,7 +12,7 @@ my $bench = ATWDumbbench->new(
     initial_runs         => BATCH_SIZE,
 );
 
-my $dir = tempdir( CLEANUP => 1 );
+my $dir      = tempdir( CLEANUP => 1 );
 my $template = 'foobar-XXXXXXXX';
 for ( 1 .. TOTAL_FILES ) {
     my ( $fh, $filename ) = tempfile( $template, DIR => $dir );
@@ -154,6 +154,8 @@ diag( $bench->report_as_text );
 
 TODO: {
     local $TODO = 'Too many variables to account for success';
+
+    # See https://metacpan.org/pod/Number::WithError#full_cmp
     my $method_name = 'with enhanced eq mark3';
     cmp_ok(
         $bench->measurements(),
