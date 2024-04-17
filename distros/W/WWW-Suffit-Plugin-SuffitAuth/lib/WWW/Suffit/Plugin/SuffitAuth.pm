@@ -15,6 +15,8 @@ WWW::Suffit::Plugin::SuffitAuth - The Suffit plugin for Suffit API authenticatio
         $self->plugin('SuffitAuth', {
             configsection => 'suffitauth',
             expiration => SESSION_EXPIRATION,
+            public_key_file => 'suffitauth_pub.key',
+            userfile_format => 'user-%s.json',
         });
 
         # . . .
@@ -40,6 +42,14 @@ The Suffit plugin for Suffit API authentication and authorization providing
 
 This plugin supports the following options
 
+=head2 cache_expiration
+
+    cache_expiration => 300
+
+This option sets default cache expiration time for keep user data in cache
+
+Default: 300 (5 min)
+
 =head2 configsection
 
     configsection => 'suffitauth'
@@ -53,46 +63,31 @@ Default: 'suffitauth'
 
     expiration => SESSION_EXPIRATION
 
-This options performs set a default expiration time
+This option performs set a default expiration time of session
 
 Default: 3600 secs (1 hour)
 
 See L<WWW::Suffit::Const/SESSION_EXPIRATION>
 
+=head2 public_key_file
+
+    public_key_file => 'auth_public.key'
+
+This option sets default public key file location (relative to datadir)
+
+Default: 'auth_public.key'
+
+=head2 userfile_format
+
+    userfile_format => 'u.%s.json'
+
+This option sets default format of userdata authorization filename
+
+Default: 'u.%s.json'
+
 =head1 HELPERS
 
 This plugin provides the following helpers
-
-=head2 suffitauth.init
-
-    my $init = $self->suffitauth->init;
-
-This method returns the init object (L<Mojo::JSON::Pointer>)
-that contains data of initialization:
-
-    {
-        error       => '...',       # Error message
-        status      => 500,         # HTTP status code
-        code        => 'E7000',     # The Suffit error code
-    }
-
-For example (in your controller):
-
-    # Check init status
-    my $init = $self->suffitauth->init;
-    if (my $err = $init->get('/error')) {
-        $self->reply->error($init->get('/status'),
-            $init->get('/code'), $err);
-        return;
-    }
-
-=head2 suffitauth.client
-
-    my $client = $self->suffitauth->client;
-
-Returns authorization client
-
-See L<WWW::Suffit::Client::V1>
 
 =head2 suffitauth.authenticate
 
@@ -198,6 +193,60 @@ The 'user' is structure that describes found user. For eg.:
         "username": "admin"
     }
 
+=head2 suffitauth.client
+
+    my $client = $self->suffitauth->client;
+
+Returns authorization client
+
+See L<WWW::Suffit::Client::V1>
+
+=head2 suffitauth.init
+
+    my $init = $self->suffitauth->init;
+
+This method returns the init object (L<Mojo::JSON::Pointer>)
+that contains data of initialization:
+
+    {
+        error       => '...',       # Error message
+        status      => 500,         # HTTP status code
+        code        => 'E7000',     # The Suffit error code
+    }
+
+For example (in your controller):
+
+    # Check init status
+    my $init = $self->suffitauth->init;
+    if (my $err = $init->get('/error')) {
+        $self->reply->error($init->get('/status'),
+            $init->get('/code'), $err);
+        return;
+    }
+
+=head2 suffitauth.options
+
+    my $options = $self->suffitauth->options;
+
+Returns authorization plugin options as hashref
+
+=head2 suffitauth.unauthorize
+
+    my $auth = $self->suffitauth->unauthorize(username => $username);
+    if (my $err = $auth->get('/error')) {
+        $self->reply->error($authdata->get('/status'), $authdata->get('/code'), $err);
+    }
+
+This helper performs unauthorize process - remove userdata file from disk and returns
+result object (L<Mojo::JSON::Pointer>) that contains data structure:
+
+    {
+        error       => '',          # Error message
+        status      => 200,         # HTTP status code
+        code        => 'E0000',     # The Suffit error code
+        username    => $username,   # User name
+    }
+
 =head1 METHODS
 
 Internal methods
@@ -205,6 +254,49 @@ Internal methods
 =head2 register
 
 This method register the plugin and helpers in L<Mojolicious> application
+
+=head1 ERROR CODES
+
+=over 8
+
+=item B<E0xxx> -- General errors
+
+E01xx, E02xx, E03xx, E04xx and E05xx are reserved as HTTP errors
+
+    E0000   Ok
+    E0100   Continue
+    E0200   OK
+    E0300   Multiple Choices
+    E0400   Bad Request
+    E0500   Internal Server Error
+
+=item B<E1xxx> -- API errors
+
+See L<WWW::Suffit::API>
+
+=item B<E2xxx> -- Database errors
+
+See L<WWW::Suffit::API>
+
+=item B<E7xxx> -- SuffitAuth (application) errors
+
+B<Auth: E70xx>
+
+    E7000   [403]   Access denied
+    E7001   [400]   Incorrect username
+    E7002   [503]   Can't connect to authorization server
+    E7003   [500]   Can't get public key from authorization server
+    E7004   [500]   Can't save public key file %s
+    E7005   [*]     Authentication error
+    E7006   [*]     Authorization error
+    E7007   [500]   Can't save file <USERNAME>.json
+    E7008   [500]   File <USERNAME>.json not found or incorrect
+    E7009   [400]   Incorrect username (while authorize)
+    E7010   [400]   Incorrect username (while unauthorize)
+
+B<*> -- this code defines on server side
+
+=back
 
 =head1 SEE ALSO
 
@@ -229,7 +321,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use File::stat;
 use Mojo::File qw/path/;
@@ -239,12 +331,32 @@ use WWW::Suffit::Client::V1;
 use WWW::Suffit::Const qw/ :session /;
 use WWW::Suffit::Util qw/json_load json_save/;
 
+use constant {
+    SUFFITAUTH_PREFIX   => 'suffitauth',
+    PUBLIC_KEY_FILE     => 'auth_public.key',
+    USERFILE_FORMAT     => 'u.%s.json',
+    CACHE_EXPIRATION    => 300, # 5 min
+};
+
+has _options => sub { {} };
+
 sub register {
     my ($plugin, $app, $opts) = @_; # $self = $plugin
     $opts //= {};
-    my $configsection = $opts->{configsection} || 'suffitauth';
+    my $configsection = $opts->{configsection} || SUFFITAUTH_PREFIX;
     my $expiration = $opts->{expiration} // SESSION_EXPIRATION;
+    my $public_key_file = $opts->{public_key_file} || PUBLIC_KEY_FILE;
+       $public_key_file = path($app->app->datadir, $public_key_file)->to_string
+            unless path($public_key_file)->is_abs;
     my $now = time();
+
+    # Options
+    $plugin->_options->{ 'configsection' } = $configsection;
+    $plugin->_options->{ 'expiration' } = $expiration; # Session & Userdata expiration (3600)
+    $plugin->_options->{ 'cache_expiration' } = $opts->{cache_expiration} || CACHE_EXPIRATION;
+    $plugin->_options->{ 'public_key_file' } = $public_key_file;
+    $plugin->_options->{ 'userfile_format' } = $opts->{userfile_format} || USERFILE_FORMAT;
+    $app->helper( 'suffitauth.options' => sub { state $opts = $plugin->_options } );
 
     # Auth client (V1)
     $app->helper('suffitauth.client' => sub {
@@ -267,6 +379,7 @@ sub register {
     # Auth helpers (methods)
     $app->helper('suffitauth.authenticate'=> \&_authenticate);
     $app->helper('suffitauth.authorize'   => \&_authorize);
+    $app->helper('suffitauth.unauthorize' => \&_unauthorize);
 
     # Initialize auth client
     my %payload = ( # Ok by default
@@ -288,11 +401,10 @@ sub register {
     }
 
     # Get public_key and set it
-    my $public_key_file = path($app->app->datadir, "auth_public.key");
-    my $pkfile = $public_key_file->to_string;
-    $public_key_file->remove if $expiration && (-e $pkfile) && (stat($pkfile)->mtime + $expiration) < $now; # Remove expired public key file
-    if (-e $pkfile) { # Set public key
-        $client->public_key($public_key_file->slurp);
+    my $pkfile = path($public_key_file);
+    $pkfile->remove if $expiration && (-e $public_key_file) && (stat($public_key_file)->mtime + $expiration) < $now; # Remove expired public key file
+    if (-e $public_key_file) { # Set public key
+        $client->public_key($pkfile->slurp);
     } else { # No file found - try get from auth server
         unless ($client->pubkey(1)) {
             my $code = $client->res->json("/code") || 'E7003';
@@ -305,10 +417,10 @@ sub register {
         }
 
         # Save file
-        $public_key_file->spew($client->public_key);
-        unless (-e $pkfile) {
-            $app->log->error(sprintf("[E7004] Can't save public key file %s", $pkfile));
-            $payload{error}     = sprintf("Can't save public key file %s", $pkfile);
+        $pkfile->spew($client->public_key);
+        unless (-e $public_key_file) {
+            $app->log->error(sprintf("[E7004] Can't save public key file %s", $public_key_file));
+            $payload{error}     = sprintf("Can't save public key file %s", $public_key_file);
             $payload{status}    = 500;
             $payload{code}      = 'E7004';
             return $app->helper('suffitauth.init' => sub { Mojo::JSON::Pointer->new({%payload}) });
@@ -328,7 +440,7 @@ sub _authenticate {
        $password = encode('UTF-8', $password) if length $password; # chars to bytes
     my $referer = $args{referer} // $self->req->headers->header("Referer") // '';
     my $loginpage = $args{loginpage} // '';
-    my $expiration = $args{expiration} || 0;
+    my $expiration = $args{expiration} || $self->suffitauth->options->{expiration} || 0;
     my %payload = ( # Ok by default
         error       => '',          # Error message
         status      => 200,         # HTTP status code
@@ -338,7 +450,8 @@ sub _authenticate {
         loginpage   => $loginpage,  # Login page for redirects (location)
         location    => undef,       # Location URL for redirects
     );
-    my $json_file = path($self->app->datadir, sprintf("u.%s.json", $username));
+    my $fileformat = $self->suffitauth->options->{userfile_format};
+    my $json_file = path($self->app->datadir, sprintf($fileformat, $username));
     my $file = $json_file->to_string;
 
     # Check username
@@ -393,7 +506,7 @@ sub _authenticate {
     json_save($file, $client->res->json);
     unless (-e $file) {
         $self->log->error(sprintf("[E7007] Can't save file %s", $file));
-        $payload{error}     = sprintf("Can't save file DATADIR/u.%s.json", $username);
+        $payload{error}     = sprintf("Can't save file DATADIR/$fileformat", $username);
         $payload{status}    = 500;
         $payload{code}      = 'E7007';
         return Mojo::JSON::Pointer->new({%payload});
@@ -441,22 +554,70 @@ sub _authorize {
     }
 
     # Get user file name
-    my $file = path($self->app->datadir, sprintf("u.%s.json", $username))->to_string;
+    my $fileformat = $self->suffitauth->options->{userfile_format};
+    my $file = path($self->app->datadir, sprintf($fileformat, $username))->to_string;
 
-    # Load user file
-    my $user = -e $file ? json_load($file) : {};
+    # Get user data from cache first
+    my $cache = $self->app->cache;
+    my $user_cache_key = sprintf("auth.userdata.%s", $username);
+    my $user_data = $cache->get($user_cache_key);
+
+    # Load user data from file
+    unless ($user_data) {
+        $user_data = -e $file ? json_load($file) : {};
+
+        # Set loaded user data to cache
+        $cache->set($user_cache_key, $user_data, $self->suffitauth->options->{cache_expiration});
+    }
 
     # Check user data
-    unless ($user->{uid}) {
+    unless ($user_data->{uid}) {
         $self->log->error(sprintf("[E7008] File %s not found or incorrect", $file));
-        $payload{error}     = sprintf("File DATADIR/u.%s.json not found or incorrect", $username);
+        $payload{error}     = sprintf("File DATADIR/$fileformat not found or incorrect", $username);
         $payload{status}    = 500;
         $payload{code}      = 'E7008';
         return Mojo::JSON::Pointer->new({%payload});
     }
 
     # Ok
-    $payload{user} = {%{$user}}; # Set user data to pyload hash
+    $payload{user} = {%{$user_data}}; # Set user data to pyload hash
+    return Mojo::JSON::Pointer->new({%payload});
+}
+sub _unauthorize {
+    my $self = shift;
+    my %args = scalar(@_) ? scalar(@_) % 2 ? ref($_[0]) eq 'HASH' ? (%{$_[0]}) : () : (@_) : ();
+    my $username = $args{username} || '';
+
+    # Initialize auth client
+    my %payload = ( # Ok by default
+        error       => '',          # Error message
+        status      => 200,         # HTTP status code
+        code        => 'E0000',     # The Suffit error code
+        username    => $username,
+    );
+
+    # Check username
+    unless (length $username) {
+        $self->log->error("[E7010] Incorrect username");
+        $payload{error}     = "Incorrect username";
+        $payload{status}    = 400;
+        $payload{code}      = 'E7010';
+        return Mojo::JSON::Pointer->new({%payload});
+    }
+
+    # Remove user data from cache first
+    my $cache = $self->app->cache;
+    my $user_cache_key = sprintf("auth.userdata.%s", $username);
+    $cache->del($user_cache_key);
+
+    # Get user file name
+    my $fileformat = $self->suffitauth->options->{userfile_format};
+    my $file = path($self->app->datadir, sprintf($fileformat, $username))->to_string;
+
+    # Remove userdata file
+    path($file)->remove if -e $file;
+
+    # Ok
     return Mojo::JSON::Pointer->new({%payload});
 }
 

@@ -82,7 +82,7 @@ do { my $x = {
                                       'List::Util' => '1.45',
                                       'Scalar::Util' => '0',
                                       'experimental' => '0',
-                                      'perl' => '5.02000',
+                                      'perl' => '5.02200',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

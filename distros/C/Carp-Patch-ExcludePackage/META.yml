@@ -19,9 +19,9 @@ name: Carp-Patch-ExcludePackage
 provides:
   Carp::Patch::ExcludePackage:
     file: lib/Carp/Patch/ExcludePackage.pm
-    version: '0.001'
+    version: '0.002'
 requires:
-  Module::Patch: '0.276'
+  Module::Patch: '0.277'
   base: '0'
   perl: '5.010001'
   warnings: '0'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Carp-Patch-ExcludePackage
   homepage: https://metacpan.org/release/Carp-Patch-ExcludePackage
   repository: git://github.com/perlancar/perl-Carp-Patch-ExcludePackage.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

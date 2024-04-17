@@ -1,3 +1,8 @@
+0.002   2024-04-17  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Set -warn_target_loaded to 0 (GH#1).
+
+
 0.001   2024-02-06  Released-By: PERLANCAR
 
         - First release.

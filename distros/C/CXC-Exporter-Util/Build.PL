@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 
-use 5.02000;
+use 5.02200;
 use Module::Build::Tiny 0.034;
 Build_PL();
 

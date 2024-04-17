@@ -1,7 +1,7 @@
 package JSON::Schema::AsType;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: generates Type::Tiny types out of JSON schemas
-$JSON::Schema::AsType::VERSION = '0.4.3';
+$JSON::Schema::AsType::VERSION = '0.4.4';
 use 5.14.0;
 
 use strict;
@@ -72,7 +72,7 @@ has spec => (
     is => 'ro',
     lazy => 1,
     default => sub {
-        $_[0]->fetch( sprintf "http://json-schema.org/draft-%02d/schema", $_[0]->draft_version );
+        $_[0]->fetch( sprintf "https://json-schema.org/draft-%02d/schema", $_[0]->draft_version );
     },
 );
 
@@ -350,7 +350,7 @@ JSON::Schema::AsType - generates Type::Tiny types out of JSON schemas
 
 =head1 VERSION
 
-version 0.4.3
+version 0.4.4
 
 =head1 SYNOPSIS
 
@@ -533,7 +533,7 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015 by Yanick Champoux.
+This software is copyright (c) 2024 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

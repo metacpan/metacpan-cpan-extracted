@@ -4,13 +4,13 @@
       "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "JSON-Schema-AsType",
    "prereqs" : {
@@ -73,31 +73,31 @@
    "provides" : {
       "JSON::Schema::AsType" : {
          "file" : "lib/JSON/Schema/AsType.pm",
-         "version" : "v0.4.3"
+         "version" : "v0.4.4"
       },
       "JSON::Schema::AsType::Draft3" : {
          "file" : "lib/JSON/Schema/AsType/Draft3.pm",
-         "version" : "v0.4.3"
+         "version" : "v0.4.4"
       },
       "JSON::Schema::AsType::Draft3::Types" : {
          "file" : "lib/JSON/Schema/AsType/Draft3/Types.pm",
-         "version" : "v0.4.3"
+         "version" : "v0.4.4"
       },
       "JSON::Schema::AsType::Draft4" : {
          "file" : "lib/JSON/Schema/AsType/Draft4.pm",
-         "version" : "v0.4.3"
+         "version" : "v0.4.4"
       },
       "JSON::Schema::AsType::Draft4::Types" : {
          "file" : "lib/JSON/Schema/AsType/Draft4/Types.pm",
-         "version" : "v0.4.3"
+         "version" : "v0.4.4"
       },
       "JSON::Schema::AsType::Draft6" : {
          "file" : "lib/JSON/Schema/AsType/Draft6.pm",
-         "version" : "v0.4.3"
+         "version" : "v0.4.4"
       },
       "JSON::Schema::AsType::Draft6::Types" : {
          "file" : "lib/JSON/Schema/AsType/Draft6/Types.pm",
-         "version" : "v0.4.3"
+         "version" : "v0.4.4"
       }
    },
    "release_status" : "stable",
@@ -112,17 +112,22 @@
          "web" : "https://github.com/yanick/JSON-Schema-AsType"
       }
    },
-   "version" : "0.4.3",
+   "version" : "0.4.4",
    "x_author_pledge" : {
       "version" : 1
    },
    "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
    "x_contributors" : [
       "Ben Hutton <relequestual@gmail.com>",
       "Daniel Perrett <dp13@sanger.ac.uk>",
       "Ruslan Zakirov <ruz@bestpractical.com>",
       "Yanick Champoux <yanick@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.01"
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

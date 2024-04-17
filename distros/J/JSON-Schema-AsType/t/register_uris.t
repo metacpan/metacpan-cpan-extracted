@@ -40,12 +40,11 @@ $schema->type;
 cmp_deeply [ $schema->all_schema_uris ], bag(
     qw'
         http://json-schema.org/draft-04/schema
+        https://json-schema.org/draft-04/schema
         http://localhost:1234/node
         http://localhost:1234/tree
     '
 );
-
-#die $schema->registered_schema('http://localhost:1234/node')->type;
 
 ok $schema->check({
         meta => 'root',

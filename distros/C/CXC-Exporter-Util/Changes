@@ -1,5 +1,12 @@
 Revision history for CXC-Exporter-Util
 
+0.07      2024-04-16 11:35:06-04:00 America/New_York
+
+  [PORTABILITY]
+
+    * use of lexical subs caused a SEGV on Perl 5.20.3.  Bump
+      minimum version to 5.22, which seems to work.
+
 0.06      2024-04-15 22:17:27-04:00 America/New_York
 
   [BUG FIX]

@@ -39,7 +39,7 @@ no_index:
 provides:
   CXC::Exporter::Util:
     file: lib/CXC/Exporter/Util.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -47,13 +47,13 @@ requires:
   List::Util: '1.45'
   Scalar::Util: '0'
   experimental: '0'
-  perl: '5.02000'
+  perl: '5.02200'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Exporter-Util
   repository: https://gitlab.com/djerius/cxc-exporter-util.git
-version: '0.06'
-x_generated_by_perl: v5.28.3
+version: '0.07'
+x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: GPL-3.0-only

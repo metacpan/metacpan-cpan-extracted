@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000024';
+our $VERSION = '0.000026';
 
 use IPC::Cmd qw/can_run/;
 use DBIx::QuickDB::Util qw/strip_hash_defaults/;
@@ -31,12 +31,12 @@ my ($MYSQLD, $MYSQL, $DBDMYSQL, $DBDMARIA, $INSTALLDB);
 BEGIN {
     local $@;
 
-    $MYSQLD    = can_run('mysqld');
-    $MYSQL     = can_run('mysql');
-    $INSTALLDB = can_run('mysql_install_db');
-    if ($INSTALLDB = can_run('mysql_install_db')) {
+    $MYSQLD    = can_run('mariadbd') || can_run('mysqld');
+    $MYSQL     = can_run('mariadb')  || can_run('mysql');
+    $INSTALLDB = can_run('mariadb-install-db') || can_run('mysql_install_db');
+    if ($INSTALLDB) {
         my $output = `$INSTALLDB 2>&1`;
-        $INSTALLDB = undef if $output =~ m/mysql_install_db is deprecated/;
+        $INSTALLDB = undef if $output =~ m/install_db is deprecated/;
     }
 
     $DBDMYSQL = eval { require DBD::mysql;   'DBD::mysql' };

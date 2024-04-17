@@ -1,20 +1,24 @@
-Revision history for App-DzilUtils
+0.120   2024-04-17  Released-By: PERLANCAR; Urgency: medium
 
-0.11    2016-03-10 (PERLANCAR)
+        - [cli list-dzil-plugins] Add option -l to list more details, e.g.
+          roles of each plugin.
+
+
+0.11    2016-03-10  Released-By: PERLANCAR
 
 	- Replace JSON with JSON::MaybeXS.
 
 	- Make all CLI use dzilutils.ini.
 
 
-0.10    2016-01-18 (PERLANCAR)
+0.10    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD section ordering.
 
 
-0.09    2015-11-07 (PERLANCAR)
+0.09    2015-11-07  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -22,7 +26,7 @@ Revision history for App-DzilUtils
 	  version.
 
 
-0.08    2015-09-03 (PERLANCAR)
+0.08    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -31,12 +35,12 @@ Revision history for App-DzilUtils
 	  requirement.
 
 
-0.07    2015-04-25 (PERLANCAR)
+0.07    2015-04-25  Released-By: PERLANCAR
 
 	- Add utility: list-dist-deps.
 
 
-0.06    2015-03-21 (PERLANCAR)
+0.06    2015-03-21  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -44,24 +48,24 @@ Revision history for App-DzilUtils
 	  & See Also.
 
 
-0.05    2014-12-28 (PERLANCAR)
+0.05    2014-12-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Extract completion routine to separate dist Complete-Dist-Zilla.
 
 
-0.04    2014-12-27 (PERLANCAR)
+0.04    2014-12-27  Released-By: PERLANCAR
 
 	- Adjust to Complete::Module 0.06+.
 
 
-0.03    2014-12-15 (PERLANCAR)
+0.03    2014-12-15  Released-By: PERLANCAR
 
 	- Add utility: list-dzil-roles.
 
 
-0.02    2014-11-28 (PERLANCAR)
+0.02    2014-11-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -71,6 +75,6 @@ Revision history for App-DzilUtils
 	  build via Pod::Weaver::Section::BashCompletion::PerinciCmdLine).
 
 
-0.01    2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.01    2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
         - First release.

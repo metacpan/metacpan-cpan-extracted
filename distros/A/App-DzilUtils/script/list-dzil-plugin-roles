@@ -1,0 +1,365 @@
+#!perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use App::DzilUtils;
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-04-17'; # DATE
+our $DIST = 'App-DzilUtils'; # DIST
+our $VERSION = '0.120'; # VERSION
+
+our %SPEC;
+$SPEC{list_dzil_plugin_roles} = {
+    v => 1.1,
+    summary => 'List roles included in a Dist::Zilla plugin',
+    args => {
+        plugin => {
+            schema => 'str*',
+            req    => 1,
+            pos    => 0,
+            completion => sub {
+                require Complete::Dist::Zilla;
+                my %args = @_;
+                Complete::Dist::Zilla::complete_dzil_plugin(word=>$args{word});
+            },
+        },
+    },
+};
+sub list_dzil_plugin_roles {
+    require Module::Load;
+
+    my %args = @_;
+
+    my $plugin = $args{plugin};
+    $plugin =~ s/^Dist::Zilla::Plugin:://;
+    $plugin =~ s!/!::!g; # convenience
+
+    my $module = "Dist::Zilla::Plugin::$plugin";
+    Module::Load::load($module);
+
+    my $obj = $module->new(plugin_name => 'plugin', zilla=>bless({}, "Dist::Zilla"));
+
+    my $roles = $obj->meta->roles;
+    my $res = [];
+    for my $role (@$roles) {
+        my $name = $role->name;
+        for (split /\|/, $name) {
+            #next unless /^Dist::Zilla::Role::/;
+            next if /__ANON__/;
+            push @$res, $_;
+        }
+    }
+
+    [200, "OK", $res];
+}
+
+Perinci::CmdLine::Any->new(
+    url => '/main/list_dzil_plugin_roles',
+    %App::DzilUtils::Common_CLI_Attrs,
+)->run;
+
+# ABSTRACT: List roles included in a Dist::Zilla plugin
+# PODNAME: list-dzil-plugin-roles
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list-dzil-plugin-roles - List roles included in a Dist::Zilla plugin
+
+=head1 VERSION
+
+This document describes version 0.120 of list-dzil-plugin-roles (from Perl distribution App-DzilUtils), released on 2024-04-17.
+
+=head1 SYNOPSIS
+
+ % list-dzil-plugin-roles MetaJSON
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--plugin>=I<s>*
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-dzil-plugin-roles list-dzil-plugin-roles
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-dzil-plugin-roles 'p/*/`list-dzil-plugin-roles`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/dzilutils.ini>, F</home/u1/dzilutils.ini>, or F</etc/dzilutils.ini>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
+
+List of available configuration parameters:
+
+ format (see --format)
+ naked_res (see --naked-res)
+ plugin (see --plugin)
+
+=head1 ENVIRONMENT
+
+=head2 LIST_DZIL_PLUGIN_ROLES_OPT
+
+String. Specify additional command-line options.
+
+=head1 FILES
+
+=head2 /home/u1/.config/dzilutils.ini
+
+=head2 /home/u1/dzilutils.ini
+
+=head2 /etc/dzilutils.ini
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-DzilUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-DzilUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-DzilUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

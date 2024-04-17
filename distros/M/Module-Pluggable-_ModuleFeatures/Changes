@@ -1,0 +1,15 @@
+0.003   2024-04-17  Released-By: PERLANCAR; Urgency: medium
+
+        - [dist][bugfix] To index packages with underscore in its name, we
+          have to set [MetaProvides::Package] configuration:
+          include_underscores=1.
+
+
+0.002   2024-03-26  Released-By: PERLANCAR; Urgency: medium
+
+        - Update to Module::Features::PluginSystem (v=2).
+
+
+0.001   2024-02-12  Released-By: PERLANCAR
+
+        - First release.

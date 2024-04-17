@@ -1,3 +1,12 @@
+0.000026  2024-04-16 15:04:26-07:00 America/Los_Angeles
+
+    - Use MariaDB binaries when available
+    - Silence mariadb complaints about using mysql binaries
+
+0.000025  2024-04-16 14:34:21-07:00 America/Los_Angeles
+
+    - Fix test error when DBD::mysql is not installed
+
 0.000024  2024-02-07 17:19:03-08:00 America/Los_Angeles
 
     - Add QDB_MYSQL_SSL_FIPS env var

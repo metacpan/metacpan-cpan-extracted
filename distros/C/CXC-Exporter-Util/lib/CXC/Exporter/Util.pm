@@ -2,12 +2,12 @@ package CXC::Exporter::Util;
 
 # ABSTRACT: Tagged Based Exporting
 
-use v5.20;
+use v5.22;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Scalar::Util 'reftype';
 use List::Util 1.45 'uniqstr';
@@ -619,7 +619,7 @@ CXC::Exporter::Util - Tagged Based Exporting
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

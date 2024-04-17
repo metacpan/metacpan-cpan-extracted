@@ -1,8 +1,5 @@
 package Module::Patch;
 
-our $DATE = '2019-02-14'; # DATE
-our $VERSION = '0.276'; # VERSION
-
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
@@ -11,6 +8,11 @@ use Log::ger;
 use Monkey::Patch::Action qw();
 use Package::Stash;
 use Package::Util::Lite qw(package_exists);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-04-17'; # DATE
+our $DIST = 'Module-Patch'; # DIST
+our $VERSION = '0.278'; # VERSION
 
 our @EXPORT_OK = qw(patch_package);
 
@@ -36,7 +38,15 @@ sub import {
             *{"$caller\::$exp"} = \&{$exp};
         }
     } else {
-        # we are subclassed, patch caller with patch_data()
+        # patch already applied, ignore
+        return if ${"$self\::handles"};
+
+        # get patch data from patch_data()
+        unless (${"$self\::patch_data_cached"}) {
+            ${"$self\::patch_data_cached"} = $self->patch_data;
+        }
+
+        # we are subclassed, patch caller with patch data
         my %opts = @_;
 
         my $load;
@@ -44,26 +54,24 @@ sub import {
             $load = $opts{-load_target};
             delete $opts{-load_target};
         }
+        $load //= ${"$self\::patch_data_cached"}->{-load_target};
         $load //= 1;
+
         my $force;
         if (exists $opts{-force}) {
             $force = $opts{-force};
             delete $opts{-force};
         }
+        $force //= ${"$self\::patch_data_cached"}->{-force};
         $force //= 0;
+
         my $warn;
         if (exists $opts{-warn_target_loaded}) {
             $warn = $opts{-warn_target_loaded};
             delete $opts{-warn_target_loaded};
         }
+        $warn //= ${"$self\::patch_data_cached"}->{"-warn_target_loaded"};
         $warn //= 1;
-
-        # patch already applied, ignore
-        return if ${"$self\::handles"};
-
-        unless (${"$self\::patch_data_cached"}) {
-            ${"$self\::patch_data_cached"} = $self->patch_data;
-        }
 
         my $pdata = ${"$self\::patch_data_cached"} or
             die "BUG: $self: No patch data supplied";
@@ -104,7 +112,7 @@ sub import {
             }
         } else {
             if ($load) {
-                eval "package $caller; use $target";
+                eval "package $caller; use $target"; ## no critic: BuiltinFunctions::ProhibitStringyEval
                 die if $@;
                 $loaded_by_us{$target}++;
             } else {
@@ -286,7 +294,7 @@ Module::Patch - Patch package with a set of patches
 
 =head1 VERSION
 
-This document describes version 0.276 of Module::Patch (from Perl distribution Module-Patch), released on 2019-02-14.
+This document describes version 0.278 of Module::Patch (from Perl distribution Module-Patch), released on 2024-04-17.
 
 =head1 SYNOPSIS
 
@@ -385,7 +393,13 @@ In your patch module F<lib/HTTP/Tiny/Patch/Retry.pm>:
                      $res;
                  };
              },
-         ],
+         ], # patches
+
+         # other Module::Patch import options can be specified here
+         # -load_target => 1,
+         # -warn_target_loaded => 1,
+         # -force => 0,
+
      };
  }
  1;
@@ -614,14 +628,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Module-Pat
 
 Source repository is at L<https://github.com/perlancar/perl-Module-Patch>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Patch>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Monkey::Patch::Action>
@@ -640,11 +646,43 @@ L<Log::ger::For::Class>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2024, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Patch>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -1,0 +1,555 @@
+#!perl
+
+use 5.010001;
+use strict;
+use warnings;
+
+use App::DzilUtils;
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-04-17'; # DATE
+our $DIST = 'App-DzilUtils'; # DIST
+our $VERSION = '0.120'; # VERSION
+
+die "App::lcpan required, please install it first\n"
+    unless eval { require App::lcpan; 1 };
+
+no warnings 'once';
+
+our %SPEC;
+$SPEC{list_dist_deps} = {
+    v => 1.1,
+    summary => 'List dependencies from dist.ini',
+    description => <<'_',
+
+Check the Prereqs/* sections in your `dist.ini` and list them. There is an
+option to do recursive CPAN dependencies by using `lcpan`.
+
+AutoPrereqs is not supported.
+
+_
+    args => {
+        %App::lcpan::deps_args,
+    },
+};
+sub list_dist_deps {
+    require Config::IOD::Reader;
+
+    my %args = @_;
+
+    my $reader = Config::IOD::Reader->new(
+        ignore_unknown_directive => 1,
+    );
+    my $dist_ini = $reader->read_file('dist.ini');
+
+    my @res;
+    for my $sectname (keys %$dist_ini) {
+        next unless $sectname =~ m!^Prereqs(?:\s*/\s*
+                                       (develop|configure|build|runtime|test)
+                                       (requires|recommends|suggests|conflicts))?$!ix;
+        my $phase = lc($1 // 'runtime');
+        my $rel   = lc($2 // 'requires');
+        next if $args{phase} ne 'ALL' && $phase ne $args{phase};
+        next if $args{rel} ne 'ALL' && $rel ne $args{rel};
+        my $sect = $dist_ini->{$sectname};
+        for my $mod (keys %$sect) {
+            next if $mod eq 'perl';
+            push @res, {module=>$mod, phase=>$phase, rel=>$rel, version=>$sect->{$mod}};
+        }
+    }
+
+    if ($args{level}) {
+        require IPC::System::Options;
+        require JSON::MaybeXS;
+        my $res = IPC::System::Options::readpipe(
+            {die=>1, log=>1},
+            "lcpan", "deps",
+            "--phase", $args{phase},
+            "--rel", $args{rel},
+            "--level", $args{level},
+            ("--include-core") x !!($args{include_core}),
+            ("--no-include-core") x !!(!$args{include_core}),
+            "--perl-version", $args{perl_version},
+            "--json", "--no-naked-res",
+            map {$_->{module}} @res,
+        );
+        JSON::MaybeXS->new->decode($res);
+    } else {
+        [200,"OK",\@res];
+    }
+}
+
+Perinci::CmdLine::Any->new(
+    url => '/main/list_dist_deps',
+    %App::DzilUtils::Common_CLI_Attrs,
+)->run;
+
+# ABSTRACT: List dependencies from dist.ini
+# PODNAME: list-dist-deps
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list-dist-deps - List dependencies from dist.ini
+
+=head1 VERSION
+
+This document describes version 0.120 of list-dist-deps (from Perl distribution App-DzilUtils), released on 2024-04-17.
+
+=head1 SYNOPSIS
+
+ % list-dist-deps
+ % list-dist-deps --phase ALL --rel ALL -R
+
+=head1 DESCRIPTION
+
+Check the Prereqs/* sections in your C<dist.ini> and list them. There is an
+option to do recursive CPAN dependencies by using C<lcpan>.
+
+AutoPrereqs is not supported.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--dont-uniquify>
+
+Allow showing multiple modules for different dists.
+
+=item B<--flatten>
+
+Instead of showing tree-like information, flatten it.
+
+When recursing, the default is to show the final result in a tree-like table,
+i.e. indented according to levels, e.g.:
+
+ % lcpan deps -R MyModule
+ | module            | author  | version |
+ |-------------------|---------|---------|
+ | Foo               | AUTHOR1 | 0.01    |
+ |   Bar             | AUTHOR2 | 0.23    |
+ |   Baz             | AUTHOR3 | 1.15    |
+ | Qux               | AUTHOR2 | 0       |
+
+To be brief, if C<Qux> happens to also depends on C<Bar>, it will not be shown in
+the result. Thus we don't know the actual C<Bar> version that is needed by the
+dependency tree of C<MyModule>. For example, if C<Qux> happens to depends on C<Bar>
+version 0.45 then C<MyModule> indirectly requires C<Bar> 0.45.
+
+To list all the direct and indirect dependencies on a single flat list, with
+versions already resolved to the largest version required, use the C<flatten>
+option:
+
+ % lcpan deps -R --flatten MyModule
+ | module            | author  | version |
+ |-------------------|---------|---------|
+ | Foo               | AUTHOR1 | 0.01    |
+ | Bar               | AUTHOR2 | 0.45    |
+ | Baz               | AUTHOR3 | 1.15    |
+ | Qux               | AUTHOR2 | 0       |
+
+Note that C<Bar>'s required version is already 0.45 in the above example.
+
+
+=item B<--level>=I<s>, B<-l>
+
+Recurse for a number of levels (-1 means unlimited).
+
+Default value:
+
+ 1
+
+=item B<--perl-version>=I<s>, B<-V>
+
+Set base Perl version for determining core modules.
+
+Default value:
+
+ "v5.38.2"
+
+=item B<-R>
+
+Recurse (alias for `--level -1`).
+
+See C<--level>.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--added-or-updated-since-last-index-update>, B<--since-last-index-update>
+
+Include only records that are added/updated since the last index update.
+
+=item B<--added-or-updated-since-last-n-index-updates>=I<s>, B<--since-last-n-index-updates>
+
+Include only records that are added/updated since the last N index updates.
+
+=item B<--added-or-updated-since>=I<s>, B<--since>
+
+Include only records that are added/updated since a certain date.
+
+=item B<--added-since-last-index-update>
+
+Include only records that are added since the last index update.
+
+=item B<--added-since-last-n-index-updates>=I<s>
+
+Include only records that are added since the last N index updates.
+
+=item B<--added-since>=I<s>
+
+Include only records that are added since a certain date.
+
+=item B<--all>
+
+Equivalent to --phase ALL --rel ALL.
+
+See C<--phase>.
+
+=item B<--broken>
+
+Alias for --exclude-indexed --include-unindexed.
+
+See C<--exclude-unindexed>.
+
+=item B<--exclude-core>
+
+Exclude core modules.
+
+=item B<--exclude-indexed>
+
+Exclude modules that are indexed (listed in 02packages.details.txt.gz).
+
+=item B<--exclude-noncore>
+
+Exclude non-core modules.
+
+=item B<--exclude-unindexed>
+
+Exclude modules that are not indexed (not listed in 02packages.details.txt.gz).
+
+=item B<--phase>=I<s>
+
+Default value:
+
+ "runtime"
+
+=item B<--rel>=I<s>
+
+Default value:
+
+ "requires"
+
+=item B<--updated-since-last-index-update>
+
+Include only records that are updated since the last index update.
+
+=item B<--updated-since-last-n-index-updates>=I<s>
+
+Include only records that are updated since the last N index updates.
+
+=item B<--updated-since>=I<s>
+
+Include only records that are updated since certain date.
+
+=item B<--with-xs-or-pp>
+
+Check each dependency as XS/PP.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-dist-deps list-dist-deps
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-dist-deps 'p/*/`list-dist-deps`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/dzilutils.ini>, F</home/u1/dzilutils.ini>, or F</etc/dzilutils.ini>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
+
+List of available configuration parameters:
+
+ added_or_updated_since (see --added-or-updated-since)
+ added_or_updated_since_last_index_update (see --added-or-updated-since-last-index-update)
+ added_or_updated_since_last_n_index_updates (see --added-or-updated-since-last-n-index-updates)
+ added_since (see --added-since)
+ added_since_last_index_update (see --added-since-last-index-update)
+ added_since_last_n_index_updates (see --added-since-last-n-index-updates)
+ dont_uniquify (see --dont-uniquify)
+ flatten (see --flatten)
+ format (see --format)
+ include_core (see --exclude-core)
+ include_indexed (see --exclude-indexed)
+ include_noncore (see --exclude-noncore)
+ include_unindexed (see --exclude-unindexed)
+ level (see --level)
+ naked_res (see --naked-res)
+ perl_version (see --perl-version)
+ phase (see --phase)
+ rel (see --rel)
+ updated_since (see --updated-since)
+ updated_since_last_index_update (see --updated-since-last-index-update)
+ updated_since_last_n_index_updates (see --updated-since-last-n-index-updates)
+ with_xs_or_pp (see --with-xs-or-pp)
+
+=head1 ENVIRONMENT
+
+=head2 LIST_DIST_DEPS_OPT
+
+String. Specify additional command-line options.
+
+=head1 FILES
+
+=head2 /home/u1/.config/dzilutils.ini
+
+=head2 /home/u1/dzilutils.ini
+
+=head2 /etc/dzilutils.ini
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-DzilUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-DzilUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-DzilUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

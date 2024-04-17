@@ -1,7 +1,7 @@
 package JSON::Schema::AsType::Draft6::Types;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: JSON-schema v6 keywords as types
-$JSON::Schema::AsType::Draft6::Types::VERSION = '0.4.3';
+$JSON::Schema::AsType::Draft6::Types::VERSION = '0.4.4';
 
 use strict;
 use warnings;
@@ -141,7 +141,7 @@ JSON::Schema::AsType::Draft6::Types - JSON-schema v6 keywords as types
 
 =head1 VERSION
 
-version 0.4.3
+version 0.4.4
 
 =head1 SYNOPSIS
 
@@ -194,7 +194,7 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015 by Yanick Champoux.
+This software is copyright (c) 2024 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -10,7 +10,7 @@ my $build_requires = {
 my $prereq_pm = {
         'Mojolicious'           => 7.94,    # Ubuntu = libmojolicious-perl          RHEL = perl-Mojolicious
         'WWW::Suffit::Client'   => 1.02,    # Ubuntu = libwww-suffit-client-perl    RHEL = perl-WWW-Suffit-Client
-        'WWW::Suffit'           => 1.07,    # Ubuntu = libwww-suffit-perl           RHEL = perl-WWW-Suffit
+        'WWW::Suffit'           => 1.08,    # Ubuntu = libwww-suffit-perl           RHEL = perl-WWW-Suffit
     };
 
 WriteMakefile(

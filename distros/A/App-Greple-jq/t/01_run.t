@@ -4,8 +4,8 @@ use warnings;
 use Test::More;
 use Data::Dumper;
 
-use lib 't';
-use Util;
+use lib '.';
+use t::Util;
 
 $ENV{NO_COLOR} = "1";
 

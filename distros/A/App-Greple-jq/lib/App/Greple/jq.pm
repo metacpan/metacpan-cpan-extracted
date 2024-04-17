@@ -10,7 +10,7 @@ greple -Mjq --glob JSON-DATA --IN label pattern
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 DESCRIPTION
 
@@ -53,8 +53,6 @@ should not be used for gigantic data or infinite stream.
 =head2 CPANMINUS
 
     $ cpanm App::Greple::jq
-    or
-    $ curl -sL http://cpanmin.us | perl - App::Greple::jq
 
 =head1 OPTIONS
 
@@ -172,29 +170,49 @@ contains C<WRITE>.
 
 =head1 TIPS
 
+=over 2
+
+=item *
+
 Use C<--all> option to show entire data.
+
+=item *
 
 Use C<--nocolor> option or set C<NO_COLOR=1> to disable colored
 output.
 
+=item *
+
 Use C<-o> option to show only matched part.
 
+=item *
+
 Use C<--blockend=> option to cancel showing block separator.
+
+=item *
 
 Since this module implements original search function, L<greple(1)>
 B<-i> does not take effect.  Set modifier in regex like C<(?i)pattern>
 if you want case-insensitive match.
 
+=item *
+
 Use C<-Mjq::set=debug> to see actual regex.
+
+=item *
 
 Use C<-Mjq::set=noif> if you don't have to use L<jq> as an input
 filter.  Data have to be well-formatted in that case.
+
+=item *
 
 Use C<--color=always> and set C<LESSANSIENDCHARS=mK> if you want to
 see the output using L<less(1)>.  Put next line in your F<~/.greplerc>
 to enable colored output always.
 
     option default --color=always
+
+=back
 
 =head1 SEE ALSO
 
@@ -208,7 +226,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2022 Kazumasa Utashiro
+Copyright ©︎ 2022-2024 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -222,7 +240,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use Exporter 'import';
 our @EXPORT = qw(&jq_filter);
@@ -232,9 +250,9 @@ use App::Greple::Regions qw(match_regions merge_regions);
 use Data::Dumper;
 
 my %config;
-sub set {
-    %config = @_;
-}
+sub set   { %config = @_ }
+sub debug { set debug => 1 }
+sub noif  { set noif  => 1 }
 
 my $indent = '  ';
 my $indent_re = qr/$indent/;
@@ -326,25 +344,18 @@ __DATA__
 
 define JSON-OBJECTS ^([ ]*)\{(?s:.*?)^\g{-1}\},?\n
 
-option default \
-	--json-block --jq-filter
+option default --json-block --jq-filter
 
 option --jq-filter --if='jq "if type == \"array\" then .[] else . end"'
 
 option --json-block --block JSON-OBJECTS
 
-option --IN \
-	--face +E \
-	--le &__PACKAGE__::IN(label=$<shift>,pattern=$<shift>)
+define CALL_IN __PACKAGE__::IN(label=$<shift>,pattern=$<shift>)
 
-option --AND --IN
-
-option --MUST \
-	--face +E \
-	--le +&__PACKAGE__::IN(label=$<shift>,pattern=$<shift>)
-
-option --NOT \
-	--le -&__PACKAGE__::IN(label=$<shift>,pattern=$<shift>)
+option --AND  --IN
+option --IN   --le  &CALL_IN --face +E
+option --MUST --le +&CALL_IN --face +E
+option --NOT  --le -&CALL_IN
 
 #  LocalWords:  JSON jq json Zaphod greple CPANMINUS cpanm
 #  LocalWords:  perl pid regex LESSANSIENDCHARS greplerc Kazumasa Mjq

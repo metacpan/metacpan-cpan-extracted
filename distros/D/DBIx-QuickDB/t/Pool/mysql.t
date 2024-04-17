@@ -2,8 +2,7 @@ use Test2::V0;
 use Test2::Tools::QuickDB;
 use File::Spec;
 
-use Test2::V0;
-use Test2::Tools::QuickDB;
+use Test2::Require::Module 'DBD::mysql';
 
 my @ENV_VARS;
 

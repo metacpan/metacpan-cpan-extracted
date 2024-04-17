@@ -29,7 +29,19 @@ print STDERR "\n";
             mysql            => '-V',
             mysql_install_db => undef,
         },
+        MariaDB => {
+           'mariadbd'           => '-V',
+           'mariadb'            => '-V',
+           'mariadb-install-db' => undef,
+        },
     );
+
+    open(my $STDERR, '>&', *STDERR) or die "Could not clone STDERR: $!";
+    close(STDERR);
+    open(STDERR, '>&=', $STDERR) or do {
+        print $STDERR "Could not re-open STDERR: $!\n";
+        exit(1);
+    };
 
     for my $prog (sort keys %cmds) {
         my $set = $cmds{$prog};

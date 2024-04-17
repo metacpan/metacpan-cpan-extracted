@@ -1,5 +1,8 @@
 Revision history for Ixchel
 
+0.12.1 2024-04-16/22:45
+		 - Fix MANIFEST
+
 0.12.0 2024-04-16/00:45
 		 - Fix spelling of nptd.enable to ntpd.enable for snmpd v2 template
 		 - add support to auto cron and snmp_v2 for Lilith

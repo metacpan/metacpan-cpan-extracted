@@ -1,14 +1,16 @@
+# use with [IfBuilt]
+## no critic: TestingAndDebugging::RequireUseStrict
 package Text::Table::Tiny::_ModuleFeatures;
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-06'; # DATE
-our $DIST = 'Text-Table-Tiny-_ModuleFeatures'; # DIST
-our $VERSION = '0.002'; # VERSION
 
 #IFUNBUILT
 # use strict;
 # use warnings;
 #END IFUNBUILT
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-04-17'; # DATE
+our $DIST = 'Text-Table-Tiny-_ModuleFeatures'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 our %FEATURES = (
     module_v => "1.02",
@@ -63,7 +65,7 @@ Text::Table::Tiny::_ModuleFeatures - Features declaration for Text::Table::Tiny
 
 =head1 VERSION
 
-This document describes version 0.002 of Text::Table::Tiny::_ModuleFeatures (from Perl distribution Text-Table-Tiny-_ModuleFeatures), released on 2021-04-06.
+This document describes version 0.006 of Text::Table::Tiny::_ModuleFeatures (from Perl distribution Text-Table-Tiny-_ModuleFeatures), released on 2024-04-17.
 
 =head1 DECLARED FEATURES
 
@@ -257,14 +259,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Text-Table
 
 Source repository is at L<https://github.com/perlancar/perl-Text-Table-Tiny-_ModuleFeatures>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-Table-Tiny-_ModuleFeatures/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Text::Table::Tiny>
@@ -275,11 +269,37 @@ L<Module::Features>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2024, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-Tiny-_ModuleFeatures>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

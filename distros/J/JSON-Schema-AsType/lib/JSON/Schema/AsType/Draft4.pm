@@ -1,7 +1,7 @@
 package JSON::Schema::AsType::Draft4;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Role processing draft4 JSON Schema 
-$JSON::Schema::AsType::Draft4::VERSION = '0.4.3';
+$JSON::Schema::AsType::Draft4::VERSION = '0.4.4';
 
 use strict;
 use warnings;
@@ -290,8 +290,8 @@ sub _keyword_items {
 
 JSON::Schema::AsType->new(
         specification => 'draft4',
-        uri           => 'http://json-schema.org/draft-04/schema',
-        schema        => from_json <<'END_JSON' )->type;
+        uri           => "http${_}://json-schema.org/draft-04/schema",
+        schema        => from_json <<'END_JSON' )->type for '', 's';
 {
     "id": "http://json-schema.org/draft-04/schema#",
     "$schema": "http://json-schema.org/draft-04/schema#",
@@ -458,7 +458,7 @@ JSON::Schema::AsType::Draft4 - Role processing draft4 JSON Schema
 
 =head1 VERSION
 
-version 0.4.3
+version 0.4.4
 
 =head1 DESCRIPTION
 
@@ -474,7 +474,7 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015 by Yanick Champoux.
+This software is copyright (c) 2024 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

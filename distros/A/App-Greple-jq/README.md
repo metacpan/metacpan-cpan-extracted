@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/kaz-utashiro/greple-jq/workflows/test/badge.svg)](https://github.com/kaz-utashiro/greple-jq/actions)
+[![Actions Status](https://github.com/kaz-utashiro/greple-jq/workflows/test/badge.svg)](https://github.com/kaz-utashiro/greple-jq/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-Greple-jq.svg)](https://metacpan.org/release/App-Greple-jq)
 # NAME
 
 greple -Mjq - greple module to search JSON data with jq
@@ -9,11 +9,11 @@ greple -Mjq --glob JSON-DATA --IN label pattern
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # DESCRIPTION
 
-This is an experimental module for [App::Greple](https://metacpan.org/pod/App::Greple) to search JSON
+This is an experimental module for [App::Greple](https://metacpan.org/pod/App%3A%3AGreple) to search JSON
 formatted text using [jq(1)](http://man.he.net/man1/jq) as a backend.
 
 Search top level json object which includes both `Marvin` and
@@ -52,8 +52,6 @@ should not be used for gigantic data or infinite stream.
 ## CPANMINUS
 
     $ cpanm App::Greple::jq
-    or
-    $ curl -sL http://cpanmin.us | perl - App::Greple::jq
 
 # OPTIONS
 
@@ -156,40 +154,33 @@ Object `*pid` label contains 803.
 
     greple -Mjq --IN %pid 803
 
-Object any <path> contains `_mina` under `.file` and `.event`
+Object any &lt;path> contains `_mina` under `.file` and `.event`
 contains `WRITE`.
 
     greple -Mjq --IN .file..path _mina --IN .event WRITE
 
 # TIPS
 
-Use `--all` option to show entire data.
-
-Use `--nocolor` option or set `NO_COLOR=1` to disable colored
+- Use `--all` option to show entire data.
+- Use `--nocolor` option or set `NO_COLOR=1` to disable colored
 output.
-
-Use `-o` option to show only matched part.
-
-Use `--blockend=` option to cancel showing block separator.
-
-Since this module implements original search function, [greple(1)](http://man.he.net/man1/greple)
+- Use `-o` option to show only matched part.
+- Use `--blockend=` option to cancel showing block separator.
+- Since this module implements original search function, [greple(1)](http://man.he.net/man1/greple)
 **-i** does not take effect.  Set modifier in regex like `(?i)pattern`
 if you want case-insensitive match.
-
-Use `-Mjq::set=debug` to see actual regex.
-
-Use `-Mjq::set=noif` if you don't have to use [jq](https://metacpan.org/pod/jq) as an input
+- Use `-Mjq::set=debug` to see actual regex.
+- Use `-Mjq::set=noif` if you don't have to use [jq](https://metacpan.org/pod/jq) as an input
 filter.  Data have to be well-formatted in that case.
-
-Use `--color=always` and set `LESSANSIENDCHARS=mK` if you want to
+- Use `--color=always` and set `LESSANSIENDCHARS=mK` if you want to
 see the output using [less(1)](http://man.he.net/man1/less).  Put next line in your `~/.greplerc`
 to enable colored output always.
 
-    option default --color=always
+        option default --color=always
 
 # SEE ALSO
 
-[App::Greple](https://metacpan.org/pod/App::Greple), [https://github.com/kaz-utashiro/greple](https://github.com/kaz-utashiro/greple)
+[App::Greple](https://metacpan.org/pod/App%3A%3AGreple), [https://github.com/kaz-utashiro/greple](https://github.com/kaz-utashiro/greple)
 
 [https://stedolan.github.io/jq/](https://stedolan.github.io/jq/)
 
@@ -199,7 +190,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2022 Kazumasa Utashiro
+Copyright ©︎ 2022-2024 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

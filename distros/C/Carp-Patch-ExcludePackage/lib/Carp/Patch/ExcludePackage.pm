@@ -9,9 +9,9 @@ use Module::Patch;
 use base qw(Module::Patch);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-02-06'; # DATE
+our $DATE = '2024-04-17'; # DATE
 our $DIST = 'Carp-Patch-ExcludePackage'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %config;
 
@@ -87,6 +87,7 @@ sub patch_data {
                 code        => $p_ret_backtrace,
             },
         ],
+        -warn_target_loaded => 0,
    };
 }
 
@@ -105,7 +106,7 @@ Carp::Patch::ExcludePackage - Exclude some packages from stack trace
 
 =head1 VERSION
 
-This document describes version 0.001 of Carp::Patch::ExcludePackage (from Perl distribution Carp-Patch-ExcludePackage), released on 2024-02-06.
+This document describes version 0.002 of Carp::Patch::ExcludePackage (from Perl distribution Carp-Patch-ExcludePackage), released on 2024-04-17.
 
 =head1 SYNOPSIS
 

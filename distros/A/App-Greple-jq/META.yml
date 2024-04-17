@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,17 +26,17 @@ no_index:
 provides:
   App::Greple::jq:
     file: lib/App/Greple/jq.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   App::Greple: '8.5501'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/kaz-utashiro/greple-jq/issues
   homepage: https://github.com/kaz-utashiro/greple-jq
-  repository: git://github.com/kaz-utashiro/greple-jq.git
-version: '0.05'
+  repository: https://github.com/kaz-utashiro/greple-jq.git
+version: '0.06'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

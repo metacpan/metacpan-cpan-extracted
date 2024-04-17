@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-jq
 
+0.06 2024-04-17T07:43:00Z
+
+    - update test workflows
+
 0.05 2022-02-03T08:34:42Z
 
     - introduce -Mjq::set=noif control

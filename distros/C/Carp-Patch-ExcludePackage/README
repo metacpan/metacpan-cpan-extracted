@@ -2,9 +2,9 @@ NAME
     Carp::Patch::ExcludePackage - Exclude some packages from stack trace
 
 VERSION
-    This document describes version 0.001 of Carp::Patch::ExcludePackage
+    This document describes version 0.002 of Carp::Patch::ExcludePackage
     (from Perl distribution Carp-Patch-ExcludePackage), released on
-    2024-02-06.
+    2024-04-17.
 
 SYNOPSIS
     Using with Devel::Confess (since it uses Carp):

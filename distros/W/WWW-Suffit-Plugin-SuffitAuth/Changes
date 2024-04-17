@@ -1,4 +1,12 @@
 # Version/Revision history
 
+1.01 Tue 16 Apr 2024 21:00:40 MSK
+    * Added method suffitauth.options that returns options-set
+    * Added method suffitauth.unauthorize for unauthorize
+    * Added plugin option `cache_expiration`
+    * Added plugin option `public_key_file`
+    * Added plugin option `userfile_format`
+    * Added caching for user data
+
 1.00 Wed 21 Feb 2024 10:39:58 MSK
     * Initial release

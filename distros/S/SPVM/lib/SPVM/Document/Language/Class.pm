@@ -21,14 +21,31 @@ The C<class> keyword defines a L<class type|SPVM::Document::Language::Types/"Cla
   class CLASS_NAME {
   
   }
+  
+  class CLASS_NAME;
+  
+  class CLASS_NAME : ATTRIBUTES {
+  
+  }
+  
+  class CLASS_NAME : ATTRIBUTES;
+
+I<CLASS_NAME> is a L<class name|SPVM::Document::Language::Tokenization/"Class Name">.
+
+I<ATTRIBUTES> is one of
+  
+  ATTRIBUTES ATTRIBUTE
+  ATTRIBUTE
+
+I<ATTRIBUTE> is a L<class attributre|"Class Attributes">.
 
 A class type is also simply called a class.
 
-An object can be created from a class using the L<new operator|/"new Operator">.
+The L<new operator|/"new Operator"> creates an object from a class.
 
 Compilation Errors:
 
-The class name I<CLASS_NAME> must be a L<class name|SPVM::Document::Language::Tokenization/"Class Name">, otherwise a compilation error occurs.
+I<CLASS_NAME> must be a L<class name|SPVM::Document::Language::Tokenization/"Class Name">. Otherwise, a compilation error occurs.
 
 If more than one class is defined in a L<class file|/"Class File">, a compilation error occurs.
 
@@ -40,12 +57,6 @@ Examples:
   }
 
 =head2 Class Attributes
-
-One or more class attributes can be written after C<:>.
-
-  class CLASS_NAME : CLASS_ATTRIBUTE1 CLASS_ATTRIBUTE2 CLASS_ATTRIBUTEn {
-  
-  }
 
 The List of Class Attributes:
 
@@ -122,7 +133,7 @@ The List of Class Attributes:
 
 Compilation Errors:
 
-Only one of C<private>, C<protected> or C<public> must be specified, otherwise a compilation error occurs.
+Only one of C<private>, C<protected> or C<public> must be specified. Otherwise, a compilation error occurs.
 
 If more than one of C<interface_t>, C<mulnum_t>, and C<pointer> are specified, a compilation error occurs.
 
@@ -171,7 +182,7 @@ The name of a class file is the same as a class name, but all C<::> are replaced
 
 Compilation Errors:
 
-A class definition must be written in its corresponding class file, otherwise a compilation error occurs.
+A class definition must be written in its corresponding class file. Otherwise, a compilation error occurs.
 
 =head2 Version Statement
 
@@ -185,7 +196,7 @@ Compilation Errors:
 
 If the version has already been declared, a compilation error occurs.
 
-I<VERSION_STRING> must be a L<version string|/"Version String">, otherwise a compilation error occurs.
+I<VERSION_STRING> must be a L<version string|/"Version String">. Otherwise, a compilation error occurs.
 
 Examples:
   
@@ -267,9 +278,9 @@ is expanded to the following code using the L<alias|/"alias Statement"> statemen
 
 Compilation Errors:
 
-I<BASIC_TYPE> must be a L<class name|SPVM::Document::Language::Tokenization/"Class Name">, otherwise a compilation error occurs.
+I<BASIC_TYPE> must be a L<class name|SPVM::Document::Language::Tokenization/"Class Name">. Otherwise, a compilation error occurs.
 
-I<CLASS_NAME> must be a L<class name|SPVM::Document::Language::Tokenization/"Class Name">, otherwise a compilation error occurs.
+I<CLASS_NAME> must be a L<class name|SPVM::Document::Language::Tokenization/"Class Name">. Otherwise, a compilation error occurs.
 
 If I<BASIC_TYPE> does not found, a compilation error occurs.
 
@@ -340,9 +351,9 @@ I<BASIC_TYPE> is a L<class type|SPVM::Document::Language::Types/"Class Types">, 
 
 Compilation Errors:
 
-I<BASIC_TYPE> must be a L<class name|SPVM::Document::Language::Tokenization/"Class Name">, otherwise a compilation error occurs.
+I<BASIC_TYPE> must be a L<class name|SPVM::Document::Language::Tokenization/"Class Name">. Otherwise, a compilation error occurs.
 
-I<CLASS_NAME> must be a L<class name|SPVM::Document::Language::Tokenization/"Class Name">, otherwise a compilation error occurs.
+I<CLASS_NAME> must be a L<class name|SPVM::Document::Language::Tokenization/"Class Name">. Otherwise, a compilation error occurs.
 
 Examples:
 
@@ -392,15 +403,15 @@ The instance of the class I<CLASS_NAME> can calls instance methods of the parent
 
 Compilation Errors:
 
-The parent class I<PARENT_CLASS_NAME> must be a L<class type|SPVM::Document::Language::Types/"Class Types">, otherwise a compilation error occurs.
+The parent class I<PARENT_CLASS_NAME> must be a L<class type|SPVM::Document::Language::Types/"Class Types">. Otherwise, a compilation error occurs.
 
-The name of the parant class must be different from the name of the class, otherwise a compilation error occurs.
+The name of the parant class must be different from the name of the class. Otherwise, a compilation error occurs.
 
-The all super classes must be different from its own class, otherwise a compilation error occurs.
+The all super classes must be different from its own class. Otherwise, a compilation error occurs.
 
-The field that name is the same as the field of the super class cannnot be defined, otherwise a compilation error occurs.
+The field that name is the same as the field of the super class cannnot be defined. Otherwise, a compilation error occurs.
 
-The class I<CLASS_NAME> interpreted by an interface must satisfy the L<interface requirement|SPVM::Document::Language::Types/"Interface Requirement"> to the parent class I<PARENT_CLASS_NAME>, otherwise a compilation error occurs.
+The class I<CLASS_NAME> interpreted by an interface must satisfy the L<interface requirement|SPVM::Document::Language::Types/"Interface Requirement"> to the parent class I<PARENT_CLASS_NAME>. Otherwise, a compilation error occurs.
 
 Examples:
 
@@ -493,6 +504,8 @@ The C<interface> statement checks if the current class satisfies the L<interface
 
   interface BASIC_TYPE;
 
+I<BASIC_TYPE> is loaded by the L<use statement|/"use Statement">.
+
 Compilation Errors:
 
 The interface type I<BASIC_TYPE> must be an L<interface type|SPVM::Document::Language::Types/"Interface Types">, ohterwise a compilation error occurs.
@@ -542,6 +555,111 @@ L<Examples:>
     }
   }
 
+=head2 Anon Method Class
+
+An anon method class is a class defined by an L<anon method operator|SPVM::Document::Language::Operators/"Anon Method Operator">.
+
+=head3 Anon Method Class Definition
+
+The anon method class definition has the following syntax.
+
+  ANON_METHOD_CLASS_FIELD_DEFINITION METHOD_DEFINITION
+
+I<ANON_METHOD_CLASS_FIELD_DEFINITION> is an L<anon method class field definition|/"Anon Method Class Field Definition">.
+
+I<METHOD_DEFINITION> is a L<method definition|/"Method Definition">.
+
+The anon method class definition defines a class to which this method belongs.
+
+The name of this class is a string that joins the L<outmost class|/"Outmost Class">, a string C<"anon_method">, the line number and the position of columns where an anon method class definition is written with C<::>.
+
+  MyClass::anon_method::3::23
+
+An anon method class has the same access control as its outmost class.
+
+An anon method class has the same alias names as its outmost class.
+
+Compilation Errors:
+
+The method name of I<METHOD_DEFINITION> must be an empty string. Otherwise, a compilation error occurs.
+
+The method must be an instance method. Otherwise, a compilation error occurs.
+
+Examples:
+  
+  # Examples of the anon method definition
+  class Foo::Bar {
+    method my_method : void () {
+      my $comparator = (Comparator)method : int ($x1 : object, $x2 : object) {
+        my $point1 = (Point)$x1;
+        my $point2 = (Point)$x2;
+        
+        return $point1->x <=> $point2->x;
+      };
+    }
+  }
+
+=head4 Anon Method Class Field Definition
+
+An anon method class field definition defines fields of an L<anon class|/"Anon Class">, which is a part of the L<anon method class definition|Anon Method Class Definition>.
+  
+  [ANON_METHOD_CLASS_FIELD_DEFINITION_ITEM1, ANON_METHOD_CLASS_FIELD_DEFINITION_ITEM, ANON_METHOD_CLASS_FIELD_DEFINITION_ITEMn]
+
+I<ANON_METHOD_CLASS_FIELD_DEFINITION_ITEM> are one of
+  
+  has FIELD_NAME : TYPE
+  has FIELD_NAME : TYPE = OPERAND
+  VAR : TYPE
+  
+  has FIELD_NAME : ATTRIBUTE1 ATTRIBUTE2 ATTRIBUTEn TYPE
+  has FIELD_NAME : ATTRIBUTE1 ATTRIBUTE2 ATTRIBUTEn TYPE = OPERAND
+  VAR : ATTRIBUTE1 ATTRIBUTE2 ATTRIBUTEn TYPE
+
+I<FIELD_NAME> is a L<field name|SPVM::Document::Language::Tokenization/"Field Name">.
+
+I<TYPE> is a L<type|SPVM::Document::Language::Types/"Types">.
+
+I<OPERAND> is an L<operator|SPVM::Document::Language::Operators/"Operators">.
+
+C<VAR : TYPE> is expaneded to C<has FIELD_NAME : TYPE = OPERAND>. I<FIELD_NAME> is the same as the name of I<VAR>, but C<$> is removed. I<OPERAND> is I<VAR>.
+
+I<ATTRIBUTE> is a L<field attribute|/"Field Attributes">.
+
+Compilation Errors:
+
+Compilation errors caused by L<Field Definition|/"Field Definition"> could occur.
+
+Examples:
+  
+  # Examples of the anon method class field definition
+  class Foo::Bar {
+    method my_method : void () {
+      my $foo = 1;
+      my $bar = 5L;
+      
+      my $comparator = (Comparator)[has foo : int = $foo, has bar : long = $bar] method : int ($x1 : object, $x2 : object) {
+        my $foo = $self->{foo};
+        my $bar = $self->{bar};
+        
+        say "$foo";
+        say "$bar";
+      };
+    }
+  }
+  
+  # More simple
+  class Foo::Bar {
+    method my_method : void () {
+      my $foo = 1;
+      my $bar = 5L;
+      
+      my $comparator = (Comparator)[$foo : int, $bar : long] method : int ($x1 : object, $x2 : object) {
+        say "$foo";
+        say "$bar";
+      };
+    }
+  }
+
 =head2 Outmost Class
 
 An outmost class is the outmost defined class. This is the same as the class defined by the L<class definition|/"Class Definition">.
@@ -578,15 +696,15 @@ A L<multi-numeric type|SPVM::Document::Language::Types/"Multi-Numeric Types"> is
 
 Compilation Errors:
 
-The type of all fields must be a L<numeric type|SPVM::Document::Language::Types/"Numeric Types">, otherwise a compilation error occurs.
+The type of all fields must be a L<numeric type|SPVM::Document::Language::Types/"Numeric Types">. Otherwise, a compilation error occurs.
 
-The types of all fields must be a same type, otherwise a compilation error occurs.
+The types of all fields must be a same type. Otherwise, a compilation error occurs.
 
-The length of fields must be less than or equal to 255, otherwise a compilation error occurs.
+The length of fields must be less than or equal to 255. Otherwise, a compilation error occurs.
 
-I<CLASS_NAME> must ends with a L<multi-numeric type suffix|/"Multi-Numeric Type Suffix"> corresponding to the type of fields, otherwise a compilation error occurs.
+I<CLASS_NAME> must ends with a L<multi-numeric type suffix|/"Multi-Numeric Type Suffix"> corresponding to the type of fields. Otherwise, a compilation error occurs.
 
-I<FIELD_LENGTH> of the L<multi-numeric type suffix|/"Multi-Numeric Type Suffix"> must be the same as the length of fields, otherwise a compilation error occurs.
+I<FIELD_LENGTH> of the L<multi-numeric type suffix|/"Multi-Numeric Type Suffix"> must be the same as the length of fields. Otherwise, a compilation error occurs.
 
 I<TYPE_SUFFIX> of the L<multi-numeric type suffix|/"Multi-Numeric Type Suffix"> must correspond to the type of fields.
 
@@ -702,40 +820,61 @@ Examples:
 
 =head1 Class Variable
 
-A class variable is a global variable that has the name space.
+A class variable is a global variable that belongs to a L<class|/"Class">.
 
 =head2 Class Variable Definition
 
 C<our> keyword defines a class variable.
 
-  our CLASS_VARIABLE_NAME : TYPE;
+  our CLASS_VARIABLE_NAME : OPT_ATTRIBUTES TYPE;
 
-The type must be a L<numeric type|SPVM::Document::Language::Types/"Numeric Type"> or an L<object type|SPVM::Document::Language::Types/"Object Types">.
+I<CLASS_VARIABLE_NAME> is a L<class variable name|SPVM::Document::Language::Tokenization/"Class Variable Name"> that does not contains C<::>.
 
-L<Class variable attributes|/"Class Variable Attributes"> can be specified.
+I<TYPE> is a L<type|SPVM::Document::Language::Types/"Types">.
 
-  our CLASS_VARIABLE_NAME : ATTRIBUTE TYPE;
-  our CLASS_VARIABLE_NAME : ATTRIBUTE1 ATTRIBUTE2 ATTRIBUTE3 TYPE;
+I<OPT_ATTRIBUTES> is one of
+
+  EMPTY
+  ATTRIBUTES
+
+I<EMPTY> means nothing exists.
+
+I<ATTRIBUTES> is one of
+  
+  ATTRIBUTES ATTRIBUTE
+  ATTRIBUTE
+
+I<ATTRIBUTE> is a L<class variable attribute|/"Class Variable Attributes">.
+
+Each class variable is initialized by its L<type initial value|SPVM::Document::Language::Types/"Type Initial Value">.
+
+The value of a class variable is got by the operation of L<getting a class variable|SPVM::Document::Language::Operators/"Getting a Class Variable">.
+
+The value of a class variable is set by the operation of L<setting a class variable|SPVM::Document::Language::Operators/"Setting a Class Variable">.
 
 Compilation Errors:
 
-The class variable mame must follow the rule defined in the L<class variable name|SPVM::Document::Language::Tokenization/"Class Variable Name">, and must not contain C<::>, otherwise a compilation error occurs.
+I<CLASS_VARIABLE_NAME> must a L<class variable name|SPVM::Document::Language::Tokenization/"Class Variable Name"> that does not contains C<::>. Otherwise, a compilation error occurs.
 
-If a class name with the same name is defined, a compilation error occurs.
+I<TYPE> must be a L<numeric type|SPVM::Document::Language::Types/"Numeric Types"> or an L<object type|SPVM::Document::Language::Types/"Object Types">.
+
+I<ATTRIBUTE> must be a L<class variable attribute|/"Class Variable Attributes">. Otherwise, a compilation error occurs.
+
+If two or more class variables that has a same name are defined, a compilation error occurs.
 
 Examples:
 
   class MyClass {
-    our $NUM1 : byte;
-    our $NUM2 : short;
-    our $NUM3 : int;
-    our $NUM4 : long;
-    our $NUM5 : float;
-    our $NUM6 : double;
-  
+    our $NUM_BYTE : byte;
+    our $NUM_SHORT : short;
+    our $NUM_INT : int;
+    our $NUM_LONG : long;
+    our $NUM_FLOAT : float;
+    our $NUM_DOUBLE : double;
+    our $POINT : Point;
+    
     our $NUM_PUBLIC : public int;
     our $NUM_RO : ro int;
-    our $NUM_WO : wo int;
     our $NUM_RW : rw int;
   }
 
@@ -759,7 +898,7 @@ The List of Class Variable Attributes:
       <b>public</b>
     </td>
     <td>
-      The class variable is public. The class variable can be accessed from other classes.
+      This class variable is public. All classes can access this class variable.
     </td>
   </tr>
   <tr>
@@ -767,7 +906,7 @@ The List of Class Variable Attributes:
       <b>private</b>
     </td>
     <td>
-      The class variable is private. The class variable cannnot be accessed from other classes. This is default setting.
+      This class variable is private. All classes ohter than this class cannnot access this class variable. This is default.
     </td>
   </tr>
   <tr>
@@ -775,7 +914,7 @@ The List of Class Variable Attributes:
       <b>protected</b>
     </td>
     <td>
-      The class variable is protected. The class variable cannnot be accessed from other classes except for the child classes.
+      This class variable is protected. All classes ohter than this class and its child classes cannot access this class variable.
     </td>
   </tr>
   <tr>
@@ -783,7 +922,7 @@ The List of Class Variable Attributes:
       <b>ro</b>
     </td>
     <td>
-      The class variable has its <a href="#Class-Variable-Getter-Method">getter method</a>.
+      This class variable defines a <a href="#Class-Variable-Getter-Method">getter method</a>.
     </td>
   </tr>
   <tr>
@@ -791,7 +930,7 @@ The List of Class Variable Attributes:
       <b>wo</b>
     </td>
     <td>
-      The class variable has its <a href="#Class-Variable-Setter-Method">setter method</a>.
+      This class variable defineds a <a href="#Class-Variable-Setter-Method">setter method</a>.
     </td>
   </tr>
   <tr>
@@ -799,7 +938,7 @@ The List of Class Variable Attributes:
       <b>rw</b>
     </td>
     <td>
-      The class variable has its <a href="#Class-Variable-Getter-Method">getter method</a> and <a href="#Class-Variable-Setter-Method">setter method</a>.
+      This class variable defines a <a href="#Class-Variable-Getter-Method">getter method</a> and a <a href="#Class-Variable-Setter-Method">setter method</a>.
     </td>
   </tr>
 </table>
@@ -808,25 +947,23 @@ The List of Class Variable Attributes:
 
 Compilation Errors:
 
-Only one of class variable attributes C<private>, C<protected> or C<public> can be specified, otherwise a compilation error occurs.
+One of C<private>, C<protected> and C<public> must be specified. Otherwise, a compilation error occurs.
 
-If more than one of C<ro>, C<wo>, and C<rw> are specified, a compilation error occurs
+One of C<ro>, C<wo>, and C<rw> must be specified. Otherwise, a compilation error occurs.
 
 =head3 Class Variable Getter Method
 
-A class variable getter method is a method to perform the operation of the L<getting a class variable|SPVM::Document::Language::Operators/"Getting a Class Variable">.
+A class variable getter method is a method to perform the operation of L<getting a class variable|SPVM::Document::Language::Operators/"Getting a Class Variable">.
 
-It has no arguments. The return type is the same as the type of the class variable except that the type of the field is the L<byte type|SPVM::Document::Language::Types/"byte Type"> or the L<short type|short Type>.
+This method is a class method that has no arguments.
 
-If the type of the class variable is the L<byte type|SPVM::Document::Language::Types/"byte Type"> or the L<short type|short Type>, the return type is the int type.
+If the type of the class variable is the byte type or the short type, the return type is the int type. Otherwise, it is the same type as the class variable.
 
-It is defined by the C<ro> or C<rw> L<class variable attributes|/"Class Variable Attributes">.
-
-It is a method that name is the same as the class variable name removing C<$>. For example, if the class variable name is $FOO, its getter method name is C<FOO>.
+The method name is the same as the class variable name, but C<$> is removed. For example, if the class variable name is C<$FOO>, the method name is C<FOO>.
 
 Examples:
 
-  # Class variable getter method
+  # Examples of class variable getter methods
   class MyClass {
     our $NUM : ro int;
     
@@ -837,21 +974,19 @@ Examples:
 
 =head3 Class Variable Setter Method
 
-A class variable setter method is a method to perform the operation of the L<setting a class variable|SPVM::Document::Language::Operators/"Setting a Class Variable">.
+A class variable setter method is a method to perform the operation of L<setting a class variable|SPVM::Document::Language::Operators/"Setting a Class Variable">.
 
-The return type is the L<void type|SPVM::Document::Language::Types/"void Type">.
+This method is a class method that has an argument.
 
-It has an argument that type is the same as the type of the class variableexcept that the type of the field is the L<byte type|SPVM::Document::Language::Types/"byte Type"> or the L<short type|short Type>.
+If the type of the class variable is the byte type or the short type, the argument type is the int type. Otherwise, it is the same type as the class variable.
 
-If the type of the class variable is the L<byte type|SPVM::Document::Language::Types/"byte Type"> or the L<short type|short Type>, the argument type is the int type.
+The return type is the void type.
 
-It is defined by the C<wo>  or C<rw> L<class variable attributes|/"Class Variable Attributes">.
-
-It is a method that name is the same as the class variable name removing C<$> and adding C<SET_> to the beginning. For example, if the class variable name is $FOO, its setter method name is C<SET_FOO>.
+The method name is the same as the class variable name, but C<$> is removed and C<SET_> is added to the beginning of it. For example, if the class variable name is C<$FOO>, the method name is C<SET_FOO>.
 
 Examples:
 
-  # Class variable setter method
+  # Examples of class variable setter methods
   class MyClass {
     our $NUM : wo int;
     
@@ -862,34 +997,61 @@ Examples:
 
 =head1 Field
 
-Fields are the data that an object has.
+A field is a data member of a L<class|/"Class">.
 
 =head2 Field Definition
 
 The C<has> keyword defines a field.
   
-  # The field definition
   has FIELD_NAME : OPT_ATTRIBUTES TYPE;
-  
-  # An examples
-  has name : string;
-  has age : protected int;
-  has max : protected rw int
 
-L<Field attributes|/"Field Attributes"> can be specified.
+I<FIELD_NAME> is a L<field name|SPVM::Document::Language::Tokenization/"Field Name">.
+
+I<TYPE> is a L<type|SPVM::Document::Language::Types/"Types">.
+
+I<OPT_ATTRIBUTES> is one of
+
+  EMPTY
+  ATTRIBUTES
+
+I<EMPTY> means nothing exists.
+
+I<ATTRIBUTES> is one of
+  
+  ATTRIBUTES ATTRIBUTE
+  ATTRIBUTE
+
+I<ATTRIBUTE> is a L<field attribute|/"Field Attributes">.
+
+Each field of an object is initialized by its L<type initial value|SPVM::Document::Language::Types/"Type Initial Value"> when the object is created.
+
+The value of a field is got by the operation of L<getting a field|SPVM::Document::Language::Operators/"Getting a Field">.
+
+The value of a field is set by the operation of L<setting a field|SPVM::Document::Language::Operators/"Setting a Field">.
 
 Compilation Errors:
 
-The field definition needs the L<type|SPVM::Document::Language::Types/"Types">. The type must be a L<numeric type|SPVM::Document::Language::Types/"Numeric Type"> or an L<object type|SPVM::Document::Language::Types/"Object Types">, otherwise a compilation error occurs.
+I<FIELD_NAME> must a L<field name|SPVM::Document::Language::Tokenization/"Field Name">. Otherwise, a compilation error occurs.
 
-The field names must follows the rule of the L<field name|SPVM::Document::Language::Tokenization/"Field Name">, otherwise a compilation error occurs.
+I<TYPE> must be a L<numeric type|SPVM::Document::Language::Types/"Numeric Types"> or an L<object type|SPVM::Document::Language::Types/"Object Types">.
 
-Field names cannot be duplicated. If so, a compilation error occurs.
+I<ATTRIBUTE > must be a L<field attribute|/"Field Attributes">. Otherwise, a compilation error occurs.
+
+If two or more fields that has a same name are defined, a compilation error occurs.
 
 Examples:
 
   class MyClass {
-    has name : string;
+    has num_byte : byte;
+    has num_short : short;
+    has num_int : int;
+    has num_long : long;
+    has num_float : float;
+    has num_double : double;
+    
+    has num_public : public int;
+    has num_ro : ro int;
+    has num_rw : rw int;
   }
 
 =head2 Field Attributes
@@ -909,10 +1071,18 @@ The List of Field Attributes:
   </tr>
   <tr>
     <td>
+      <b>public</b>
+    </td>
+    <td>
+      This field is public. All classes can access this field.
+    </td>
+  </tr>
+  <tr>
+    <td>
       <b>private</b>
     </td>
     <td>
-      This field is private. This field cannnot be accessed from other class. This is default setting.
+      This field is private. All classes ohter than this class cannnot access this field. This is default.
     </td>
   </tr>
   <tr>
@@ -920,15 +1090,7 @@ The List of Field Attributes:
       <b>protected</b>
     </td>
     <td>
-      This field is protected. This field cannnot be accessed from other class except for the child classes.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>public</b>
-    </td>
-    <td>
-      This field is public. This field can be accessed from other class.
+      This field is protected. All classes ohter than this class and its child classes cannot access this field.
     </td>
   </tr>
   <tr>
@@ -936,7 +1098,7 @@ The List of Field Attributes:
       <b>ro</b>
     </td>
     <td>
-      This field has its getter method. The getter method name is the same as the field name. For example, If the field names is <code>foo</code>, The getter method name is C<foo>.
+      This field defines a <a href="#Field-Getter-Method">getter method</a>.
     </td>
   </tr>
   <tr>
@@ -944,7 +1106,7 @@ The List of Field Attributes:
       <b>wo</b>
     </td>
     <td>
-      This field has its setter method. The setter method name is the same as field names adding <code>set_</code> to top. For example, If the field names is <code>foo</code>, The setter method name is <code>set_foo</code>.
+      This field defineds a <a href="#Field-Setter-Method">setter method</a>.
     </td>
   </tr>
   <tr>
@@ -952,58 +1114,32 @@ The List of Field Attributes:
       <b>rw</b>
     </td>
     <td>
-      This field has its getter method and its setter method.
+      This field defines a <a href="#Field-Getter-Method">getter method</a> and a <a href="#Field-Setter-Method">setter method</a>.
     </td>
   </tr>
 </table>
 
 =end html
 
-A field getter method is an L<instance method|/"Instance Method">. It has no arguments. The return type of a field getter method is the same as its field type, except for the C<byte> and C<short> type.
-
-If the type of the field is the C<byte> or C<short> type, The return type of a field getter method is the C<int> type.
-
-A field setter method is an L<instance method|/"Instance Method">. It has an argument. The type of the argument is the same as the field type. The return type is the L<void type|SPVM::Document::Language::Types/"void Type">.
-
-If the type of the field is the C<byte> or C<short> type, The argument type of a field setter method is the C<int> type.
-
 Compilation Errors:
 
-Only one of field attributes C<private>, C<protected> or C<public> can be specified, otherwise a compilation error occurs.
+One of C<private>, C<protected> and C<public> must be specified. Otherwise, a compilation error occurs.
 
-If more than one of C<ro>, C<wo>, and C<rw> are specified at the same time, a compilation error occurs
-
-Examples:
-
-  class MyClass {
-    has num1 : byte;
-    has num2 : short;
-    has num3 : int;
-    has num4 : long;
-    has num5 : float;
-    has num6 : double;
-  
-    has num_public : public int;
-    has num_ro : ro int;
-    has num_wo : wo int;
-    has num_rw : rw int;
-  }
+One of C<ro>, C<wo>, and C<rw> must be specified. Otherwise, a compilation error occurs.
 
 =head3 Field Getter Method
 
-A field getter method is a method to perform the operation of the L<getting a field|SPVM::Document::Language::Operators/"Getting a Field">.
+A field getter method is a method to perform the operation of L<getting a field|SPVM::Document::Language::Operators/"Getting a Field">.
 
-It has no arguments. The return type is the same as the type of the field except that the type of the field is the L<byte type|SPVM::Document::Language::Types/"byte Type"> or the L<short type|short Type>.
+This method is an instance method that has no arguments.
 
-If the type of the field is the L<byte type|SPVM::Document::Language::Types/"byte Type"> or the L<short type|short Type>, the return type is the int type.
+If the type of the field is the byte type or the short type, the return type is the int type. Otherwise, it is the same type as the field.
 
-It is defined by the C<ro> or C<rw> L<field attributes|/"Field Attributes">.
-
-It is a method that name is the same as the field name.
+The method name is the same as the field name. For example, if the field name is C<foo>, the method name is C<foo>.
 
 Examples:
 
-  # Field getter method
+  # Examples of field getter methods
   class MyClass {
     has num : ro int;
     
@@ -1020,21 +1156,19 @@ Examples:
 
 =head3 Field Setter Method
 
-A field setter method is a method to perform the operation of the L<setting a field|SPVM::Document::Language::Operators/"Setting a Field">.
+A field setter method is a method to perform the operation of L<setting a field|SPVM::Document::Language::Operators/"Setting a Field">.
 
-The return type is the L<void type|SPVM::Document::Language::Types/"void Type">.
+This method is an instance method that has an argument.
 
-It has an argument that type is the same as the type of the fieldexcept that the type of the field is the L<byte type|SPVM::Document::Language::Types/"byte Type"> or the L<short type|short Type>.
+If the type of the field is the byte type or the short type, the argument type is the int type. Otherwise, it is the same type as the field.
 
-If the type of the field is the L<byte type|SPVM::Document::Language::Types/"byte Type"> or the L<short type|short Type>, the argument type is the int type.
+The return type is the void type.
 
-It is defined by the C<wo>  or C<rw> L<field attributes|/"Field Attributes">.
-
-It is a method that name is the same as the field name, but prepend C<set_> to it. For example, if the field name is C<foo>, its setter method name is C<set_foo>.
+The method name is the same as the field name, but C<set_> is added to the beginning of it. For example, if the field name is C<foo>, the method name is C<set_foo>.
 
 Examples:
 
-  # Field setter method
+  # Examples of field setter methods
   class MyClass {
     has num : wo int;
     
@@ -1053,122 +1187,100 @@ Examples:
 
 =head2 Method Definition
 
-The C<method> keyword defines a class method or an instance method.
+The C<method> keyword defines a method.
+
+  OPT_ATTRIBUTES method METHOD_NAME : RETURN_TYPE (OPT_ARGS) { }
+  OPT_ATTRIBUTES method METHOD_NAME : RETURN_TYPE (OPT_ARGS);
+
+I<OPT_ATTRIBUTES> is one of
+
+  EMPTY
+  ATTRIBUTES
+
+I<EMPTY> means nothing exists.
+
+I<ATTRIBUTES> is one of
   
-  # Static method
-  static method METHOD_NAME : RETURN_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 : ARG_TYPE2, ...) {
-    
-  }
+  ATTRIBUTES ATTRIBUTE
+  ATTRIBUTE
 
-  # Instance method
-  method METHOD_NAME : RETURN_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 : ARG_TYPE2, ...) {
-    
-  }
+I<ATTRIBUTE> is a L<method attribute|/"Method Attributes">.
 
-Method names must be follow the rule of L<method name|SPVM::Document::Language::Tokenization/"Method Name">.
+I<METHOD_NAME> is a L<method name|SPVM::Document::Language::Tokenization/"Method Name">.
 
-The argument names must be follow the rule of L<local variable name|SPVM::Document::Language::Tokenization/"Local Variable Name">.
+I<RETURN_TYPE> is a L<type|SPVM::Document::Language::Types/"Types">.
 
-The minimal length of arguments is 0. The max length of arguments is 255.
-
-Defined methods can be called using L</"Method Call"> syntax.
-
-A method can have L<method attributes|/"Method Attributes">.
-
-  ATTRIBUTES static method METHOD_NAME : RETURN_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 : ARG_TYPE2, ...) {
+I<ARG_ITEM> is one of
   
-  }
+  ARG_NAME : TYPE
+  ARG_NAME : TYPE = VALUE
 
-A method has L</"Method Block"> except for the case that the method has the C<native> L<method attributes|/"Method Attributes">. 
+I<OPT_ATTRIBUTES> is one of
+
+  EMPTY
+  ARGS
+
+I<EMPTY> means nothing exists.
+
+I<ARGS> is one of
+  
+  ARGS , ARG
+  ARG
+
+I<ARG> is one of
+
+  ARG_NAME : ARG_TYPE
+  ARG_NAME : ARG_TYPE = VALUE
+
+I<ARG_NAME> is a L<local variable name|SPVM::Document::Language::Tokenization/"Local Variable Name">.
+
+I<ARG_TYPE> is a L<type|SPVM::Document::Language::Types/"Types">.
+
+I<VALUE> is a L<literal|SPVM::Document::Language::Tokenization/"Literals"> or C<undef>. 
+
+A method with the C<static> L<method attribute|/"Method Attributes"> is a L<class method|/"Class Method">.
+
+A method without the C<static> L<method attribute|/"Method Attributes"> is an L<instance method|/"Instance Method">.
+
+An argument with I<VALUE> is an optional arguments. If a method call dose not give a value to an optional argument, I<VALUE> is given to the argument.
+
+A interface method defined in an L<interface|/"Interface"> is an L<interface method|/"Interface Method">.
+
+A method with the C<native> L<method attribute|/"Method Attributes"> is a L<native method|/"Native Method">.
 
 Compilation Errors:
 
-The types of the arguments must be a L<numeric type|SPVM::Document::Language::Types/"Numeric Type">, the L<multi-numeric type|SPVM::Document::Language::Types/"Multi-Numeric Types">, an L<object type|SPVM::Document::Language::Types/"Object Types">, or a L<reference type|SPVM::Document::Language::Types/"Reference Type">, otherwise a compilation error occurs.
+The count of I<ARGS> must be less than or equal to 255. Otherwise, a compilation error occurs.
 
-The type of the return value must be the L<void type|SPVM::Document::Language::Types/"void Type">, a L<numeric type|SPVM::Document::Language::Types/"Numeric Type">, the L<multi-numeric type|SPVM::Document::Language::Types/"Multi-Numeric Types"> or an L<object type|SPVM::Document::Language::Types/"Object Types">, otherwise a compilation error occurs.
+I<ARG_TYPE> must be a L<numeric type|SPVM::Document::Language::Types/"Numeric Types">, a L<multi-numeric type|SPVM::Document::Language::Types/"Multi-Numeric Types">, an L<object type|SPVM::Document::Language::Types/"Object Types">, or a L<reference type|SPVM::Document::Language::Types/"Reference Types">. Otherwise, a compilation error occurs.
 
-=head3 Optional Arguments
+I<RETURN_TYPE> must be the void type, a L<numeric type|SPVM::Document::Language::Types/"Numeric Types">, a L<multi-numeric type|SPVM::Document::Language::Types/"Multi-Numeric Types"> or an L<object type|SPVM::Document::Language::Types/"Object Types">. Otherwise, a compilation error occurs.
 
-The optional argument is the syntax to specify optional arguments.
+Methods other than interface methods and native methods must have a method block. Otherwise, a compilation error occurs.
 
-  static method METHOD_NAME : RETURN_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 : ARG_TYPE2 = DEFAULT_VALUE) {
-  
-  }
-  
-  # Deprecated
-  static method METHOD_NAME : RETURN_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 = DEFAULT_VALUE : ARG_TYPE2) {
-  
-  }
+I<VALUE> must satisfy L<assignment requirement|SPVM::Document::Language::Types/"Assignment Requirement"> to I<ARG_TYPE>. Otherwise, a compilation error occurs.
+
+I<METHOD_NAME> must not be C<INIT>. Otherwise, a compilation error occurs.
+
+A non-optional argument must not be placed after an optional argument. Otherwise, a compilation error occurs.
 
 Examples:
-
-  static method substr ($string : string, $offset : int, $length : int = -1) {
-    # ...
-  }
   
-  my $string = "abc";
-  my $offset = 1;
-  my $substr = &substr($string, $offset);
-  
-  # This is the same as the following code
-  my $string = "abc";
-  my $offset = 1;
-  my $length = -1;
-  my $substr = &substr($string, $offset, $length);
-  
-=head2 Class Method
-
-A class method is defined with the C<static> keyword.
-
-  static method sum : int ($num1 : int, $num2 : int) {
-    # ...
-  }
-
-A class method can be called from the L<class name|SPVM::Document::Language::Tokenization/"Class Name">.
-  
-  # Call a class method
-  my $total = Foo->sum(1, 2);
-
-If the class method is belong to the current class, a class method can be called using L<&|/"Current Class"> syntax.
-  
-  # Call a class method using C<&>
-  my $total = &sum(1, 2);
-
-=head2 Instance Method
-
-An instance method is defined without the C<static> keyword.
-
-  method add_chunk : void ($chunk : string) {
-    # ...
-  }
-
-An instance method can be called from the object.
-  
-  # Call an instance method
-  my $point = Point->new;
-  $point->set_x(3);
-
-=head2 Interface Method
-
-Instance methods defined in L<interface types|SPVM::Document::Language::Types/"Interface Types"> are called interface methods.
-
-Normally, an instance method does not have its method block.
-
-  method my_method : int ();
-
-But, an interface method can have its method block.
-
-  method my_method : int () {
+  class MyClass {
+    # Class method
+    static method substr : string ($string : string, $offset : int, $length : int = -1) {
+      # ...
+    }
     
+    # Instance method
+    method clear : void () {
+      
+    }
   }
-
-An interface method can have the C<required> L<method attribute|/"Method Attributes"> that indicates classes that implement this interface must implement this method.
-
-  required method my_method : int ();
 
 =head2 Method Attributes
 
-Method attributes are attributes used in a L<method definition|/"Method Definition">.
+The List of Method Attributes:
 
 =begin html
 
@@ -1183,10 +1295,18 @@ Method attributes are attributes used in a L<method definition|/"Method Definiti
   </tr>
   <tr>
     <td>
+      <b>public</b>
+    </td>
+    <td>
+      This method is public. All classes can call this method. This is default.
+    </td>
+  </tr>
+  <tr>
+    <td>
       <b>private</b>
     </td>
     <td>
-      This method is private. This method can not be accessed from other classes.
+      This method is private. All classes ohter than this class cannnot call this method.
     </td>
   </tr>
   <tr>
@@ -1194,15 +1314,7 @@ Method attributes are attributes used in a L<method definition|/"Method Definiti
       <b>protected</b>
     </td>
     <td>
-      This method is protected. This method can not be accessed from other classes except for the child classes.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>public</b>
-    </td>
-    <td>
-      This method is public. This method can be accessed from other classes. This is default setting.
+      This method is protected. All classes ohter than this class and its child classes cannot call this method.
     </td>
   </tr>
   <tr>
@@ -1210,7 +1322,7 @@ Method attributes are attributes used in a L<method definition|/"Method Definiti
       <b>precompile</b>
     </td>
     <td>
-      This method is a <a href="#Precompile-Method">precompile method</a>.
+      This method is a <a href="#Precompilation-Method">precompilation method</a>.
     </td>
   </tr>
   <tr>
@@ -1226,20 +1338,18 @@ Method attributes are attributes used in a L<method definition|/"Method Definiti
       <b>required</b>
     </td>
     <td>
-      This method is required.
+      A method that implements this interface method must be defined.
     </td>
   </tr>
 </table>
 
-If C<native> and C<precompile> attributes cannnot used together.
-
-C<required> can be only used in a method of a L<interface|/"Interface">.
+=end html
 
 Compilation Errors:
 
-Only one of method attributes C<private>, C<protected> or C<public> can be specified, otherwise a compilation error occurs.
+One of C<private>, C<protected> and C<public> must be specified. Otherwise, a compilation error occurs.
 
-If the specifed attribute is not found or the way to specify is invalid, a compilation error occurs.
+C<required> must be specified to an interface method. Otherwise, a compilation error occurs.
 
 Examples:
   
@@ -1256,63 +1366,79 @@ Examples:
   # native method
   native method : int sum ($num1 : int, $num2 : int);
 
-=end html
+=head2 Class Method
 
-=head2 INIT Block
+A method defined with the C<static> L<method attribute|/"Method Attributes"> is a class method.
 
-The C<INIT> block defines a C<INIT> method to be executed just after the program starts.
+A class method can be called by a L<class method call|SPVM::Document::Language::Operators/"Class Method Call">.
+
+=head2 Instance Method
+
+A method defined without the C<static> L<method attribute|/"Method Attributes"> is an instance method.
+
+An instance method can be called by an L<instance method call|SPVM::Document::Language::Operators/"Instance Method Call">.
+
+=head2 Interface Method
+
+An instance method defined in an L<interface|/"Interface"> is an interface method.
+
+Normally, an interface method does not have a method block.
+
+  method my_method : int ();
+
+But, an interface method can have a method block.
+
+  method my_method : int () {
+    
+  }
+
+An interface method can have the C<required> L<method attribute|/"Method Attributes"> that indicates classes must define a method with the same name that implements this interface method.
+
+  required method my_method : int ();
+
+=head2 INIT Method
+
+A C<INIT> method is a method that is executed just after a program starts.
+
+=head3 INIT Method Definition
+
+A C<INIT> block defines a C<INIT> method to be executed just after the program starts. A C<INIT> method is called only once.
 
   INIT {
     
   }
 
-Zero or more L<statements|SPVM::Document::Language::Statements/"Statements"> can be written in a C<INIT> block.
+A C<INIT> method has no arguments.
 
-  INIT {
-    my $foo = 1 + 1;
-    my $bar;
-  }
+The return type of a C<INIT> method is the void type.
 
-The L<return statement|SPVM::Document::Language::Statements/"return Statement"> cannot be written in C<INIT> block.
+If a C<INIT> method is not defined in a class, a C<INIT> method without statements is defined.
 
-If a C<INIT> block is not defined in a class, a default empty C<INIT> block is defined.
+If the current class has a parent class, the C<INIT> method of the parent class is called at the beginning of the INIT method of the current class.
 
-An C<INIT> block is editted.
+And C<INIT> methods of classes loaded by L<use statements|/"use Statement"> are called in loaded order.
 
-If a parent class exists, the INIT block of the parent class is called at the beginning of the INIT block.
-
-If classes are used by the L<use statement|/"use Statement">, the L<interface statement|/"interface Statement">, and the L<allow statement|/"allow Statement">, The INIT blocks in the classes are called in order after the above calling.
-  
-  # Before Editting
   class MyClass extends ParentClass {
     use Foo;
     use Bar;
     
     INIT {
-      $POINT = Point->new(1, 2);
-    }
-  }
-
-  # After Editting
-  class MyClass extends ParentClass {
-    use Point;
-    use Fn;
-    
-    INIT {
+      # INIT methods of the parent class and classes loaded by use statements are called automatically 
       ParentClass->INIT;
-      Point->INIT;
-      Fn->INIT;
+      Foo->INIT;
+      Bar->INIT;
       
-      $POINT = Point->new(1, 2);
+      # Do something
     }
   }
 
-An C<INIT> block is automatically called only once.
+The execution order of C<INIT> methods is not guaranteed except that C<INIT> methods are called explictly and except for the above explanation.
 
-The execution order of C<INIT> blocks is not guaranteed. The INIT blocks in the L<default loaded class/"Default Loaded Classes"> are called before INIT blocks of user defined classes.
+The C<INIT> methods in the L<default loaded class|/"Default Loaded Classes"> are called before C<INIT> methods of other classes, 
 
 Examples:
-
+  
+  # Examples of INIT methods
   class MyClass {
     use Point;
     
@@ -1320,7 +1446,7 @@ Examples:
     our $STRING : string;
     our $POINT : Point;
     
-    # INIT block
+    # INIT method
     INIT {
       $NUM = 3;
       $STRING = "abc";
@@ -1331,38 +1457,44 @@ Examples:
 
 =head2 Destructor
 
-A class can have a destructor.
+A destructor is a method called just before an object is destroyed.
 
   method DESTROY : void () {
   
   }
 
-The destructor is the method that is called when the object is destroyed by the L<garbage collection|SPVM::Document::Language::GarbageCollection/"Garbage Collection">.
+A destructor is an L<instance method|/"Instance Method">.
 
-The name of the destructor must be C<DESTROY>.
+The name of a destructor is C<DESTROY>.
 
-A destructor cannnot have its arguments.
+A destructor has no arguments.
 
-The retrun type must be L<void type|SPVM::Document::Language::Types/"void Type">.
+The retrun type is the void type.
 
-A destructor must be an L<instance method|/"Instance Method">.
+If an L<exception|SPVM::Document::Language::ExceptionHandling/"Exception Handling"> is thrown in a destructor, the exception is not thrown. Instead, a warning message is output to L<SPVM's standard error|SPVM::Document::Language::System/"Standard Streams">.
 
-If an L<exception|SPVM::Document::Language::ExceptionHandling/"Exception Handling"> occurs in the destructor, the exception is not thrown. Instead, a warnings message is printed to C<STDERR>.
+See also L<Garbage Collection|SPVM::Document::Language::GarbageCollection/"Garbage Collection">.
 
 Compilation Errors:
 
-If the definition of the destructor is invalid, a compilation error occurs.
+A destructor must be an L<instance method|/"Instance Method">. Otherwise, a compilation error occurs.
+
+The name of a destructor must be C<DESTROY>. Otherwise, a compilation error occurs.
+
+If a destructor has arguments, a compilation error occurs.
+
+The retrun type must be the void type. Otherwise, a compilation error occurs.
+
+If two or more destructor are defined, a compilation error occurs.
 
 Examples:
   
   # Destructor
   class MyClass {
     method DESTROY : void () {
-      print "DESTROY";
+      say "DESTROY";
     }
   }
-
-The child class inherits the destructor of the parent class if the destructor of the current class doesn't eixst.
 
 =head2 Method Override
 
@@ -1382,171 +1514,43 @@ An instance method in a parent class can be overridden by an instance method wit
     }
   }
 
-The overridding method in the child class must satisfy the L<interface requirement|SPVM::Document::Language::Types/"Interface Requirement"> to the parent method.
+The overridding method in the child class must satisfy the L<interface method requirement|SPVM::Document::Language::Types/"Interface Method Requirement"> to the parent method interpretted as an interface method.
 
 Compilation Errors:
 
-The overridding method in the child class must satisfy the L<interface requirement|SPVM::Document::Language::Types/"Interface Requirement"> to the parent method, otherwise a compilation error occurs.
-
-=head2 Anon Method
-
-=head3 Anon Method Definition
-
-The anon method operator defines an L<anon calss|SPVM::Document::Language::Class/"Anon Class"> that has an anon instance method.
-
-And this operator creates an object which type is the anon class by the L<new/"new Operator"> operator, and returns it.
-  
-  # Anon method
-  method : TYPE  (VAR1 : TYPE1, VAR2 : TYPE2, ...) {
-  
-  }
-
-The way to define the method is the same as the L<method definition|SPVM::Document::Language::Class/"Method Definition">.
-
-If an anon method is defined, the name of the class that owns the anon method consist of the L<outmost class|/"Outmost Class">, the line number and the position of columns the anon class is defined conncted with C<::>.
-
-  MyClass::anon_method::3::23
-
-The class that onws an anon method has the same access control as its outmost class.
-
-The class that onws an anon method has the same alias names as its outmost class.
-
-Examples:
-  
-  # Anon method
-  class Foo::Bar {
-    method some_method : void () {
-      my $comparator = (Comparator)method : int ($x1 : object, $x2 : object) {
-        my $point1 = (Point)$x1;
-        my $point2 = (Point)$x2;
-        
-        return $point1->x <=> $point2->x;
-      };
-    }
-  }
-
-See also L<Comparator|SPVM::Comparator>.
-
-The above example is the same as the following codes.
-  
-  # Foo/Bar.spvm
-  class Foo::Bar {
-    method some_method : void () {
-      my $comparator = (Comparator)new Foo::Bar::anon_method::3::31;
-    }
-  }
-  
-  # Foo/Bar/anon_method/3/31.spvm
-  class Foo::Bar::anon_method::3::31 : public {
-    method : int ($x1 : object, $x2 : object) {
-      my $point1 = (Point)$x1;
-      my $point2 = (Point)$x2;
-      
-      return $point1->x <=> $point2->x;
-    }
-  }
-
-=head3 Anon Method Field Definition
-
-The anon method field definition is the syntax to define the field of the anon class of the anon method.
-
-  # Anon method field definitions
-  [has FIELD_NAME : TYPE1, has FIELD_NAME : TYPE2, ...] ANON_METHOD_DEFINITION
-  
-  # Anon method field definitions with field default values
-  [has FIELD_NAME : TYPE1 = OPERAND1, has FIELD_NAME : TYPE2 = OPERAND2, ...] ANON_METHOD_DEFINITION
-  
-  [VAR1 : TYPE1, VAR2 : TYPE2, ...] ANON_METHOD_DEFINITION
-  
-Examples:
-
-  class Foo::Bar {
-    method some_method : void () {
-      my $foo = 1;
-      my $bar = 5L;
-      
-      my $comparator = (Comparator)[has foo : int = $foo, has bar : long = $bar] method : int ($x1 : object, $x2 : object) {
-        my $foo = $self->{foo};
-        my $bar = $self->{bar};
-        
-        print "$foo\n";
-        print "$bar\n";
-      };
-    }
-  }
-
-Same as avobe but more simple:
-
-  class Foo::Bar {
-    method some_method : void () {
-      my $foo = 1;
-      my $bar = 5L;
-      
-      my $comparator = (Comparator)[$foo : int, $bar : long] method : int ($x1 : object, $x2 : object) {
-        print "$foo\n";
-        print "$bar\n";
-      };
-    }
-  }
-
-The above example is the same as the following codes.
-
-  # Foo/Bar.spvm
-  class Foo::Bar {
-    method some_method : void () {
-      # Externally defined local variables
-      my $foo = 1;
-      my $bar = 5L;
-      
-      my $anon = new Foo::Bar::anon_method::5::61;
-      $anon->{foo} = $foo;
-      $anon->{bar} = $bar;
-      
-      my $comparator = (Comparator)$anon;
-    }
-  }
-  
-  # Foo/Bar/anon_method/5/61.spvm
-  class Foo::Bar::anon_method::5::61 : public {
-    has foo : public int;
-    has bar : public long;
-    
-    method : int ($x1 : object, $x2 : object) {
-      my $foo = $self->{foo};
-      my $bar = $self->{bar};
-      
-      print "$foo\n";
-      print "$bar\n";
-    }
-  }
+The overridding method in the child class must satisfy the L<interface requirement|SPVM::Document::Language::Types/"Interface Requirement"> to the parent method. Otherwise, a compilation error occurs.
 
 =head2 Native Method
 
-A native method is the method that is written by native languages such as the C language, C<C++>.
-
-A native method is defined by the C<native> L<method attribute|/"Method Attributes">.
+A method with the C<native> L<method attribute|/"Method Attributes"> is a native method.
 
   native sum : int ($num1 : int, $num2 : int);
 
-A native method doesn't have its L<method block|/"Method Block">.
+A native method has no L<method block|/"Method Block">.
 
-About the way to write native methods, please see L<SPVM Native Class|SPVM::Document::NativeClass> and L<SPVM Native API|SPVM::Document::NativeAPI>.
+The implementation of a native method is written by native languages such as the C language, C<C++>.
+
+See L<SPVM::Document::NativeClass> about the way to write the implementation of a native method.
 
 =head2 Precompilation Method
 
-If the class has the C<precompile> L<class attribute|/"Class Attributes">, the methods of the class are precompiled.
+A method with the C<precompile> L<method attribute|/"Method Attributes"> is a precompilation method.
 
-The source code of each precompiled method is translated to C source code and is compiled to the machine code such as C<MyMath.o>.
+  precompile sum : int ($num1 : int, $num2 : int) {
+  
+  }
 
-And it is linked to a shared library such as C<MyMath.so> on Linux/Unix, C<MyMath.dll> on Windows, or C<MyMath.dylib> on Mac.
+The source code of each precompilation method is converted to a C source code and it is compiled to the machine code.
 
-And each function in the shared library is bind to the SPVM method.
+And the machine codes of all precompilation methods in a class is linked to a dynamic link library such as C<MyClass.so> on Linux/Unix, C<MyClass.dll> on Windows, C<MyClass.dylib> on Mac.
 
-Precompiled methods need the L<build directory|SPVM/"SPVM_BUILD_DIR"> such as C<~/.spvm_build> to compile and link them.
+The address of machine code of each precompilation method in the dynamic link library is bind to a precompilation method.
+
+Precompilation methods need a L<build directory|SPVM::Document::EnvironmentVariables/"SPVM_BUILD_DIR"> such as C<~/.spvm_build> to compile and link them.
 
 =head2 Bootstrap Method
 
-A bootstrap method is the methods where the program start.
+A bootstrap method is a method where a program start.
 
   void main : void () {
     
@@ -1562,7 +1566,6 @@ It has no arguments.
 
 Normally a method has a method block. L<Statements|SPVM::Document::Language::Statements/"Statements"> can be written in a method block.
   
-  # Method implementation
   static method foo : int ($num1 : int, $num2 : int) {
     
     my $total = $num1 + $num2;
@@ -1570,63 +1573,53 @@ Normally a method has a method block. L<Statements|SPVM::Document::Language::Sta
     return $total;
   }
 
-=head3 Local Variable
+=head1 Local Variable
 
 A local variable is a variable that has a L<scope|SPVM::Document::Language::GarbageCollection/"Scope">.
 
-=head4  Local Variable Declaration
+=head2  Local Variable Declaration
 
-B<Local Variable> is a variable that is declared in L</"Scope Block">.  Local Variable has the L<scope|SPVM::Document::Language::GarbageCollection/"Scope">. This is the same as Local Variable in C Language.
+A C<my> keyword declares a local variable.
 
-The local variable is declared using B<my> L</"Keyword">.
+  my LOCAL_VARIABLE_NAME
+  my LOCAL_VARIABLE_NAME : TYPE
+  my LOCAL_VARIABLE_NAME = VALUE
+  my LOCAL_VARIABLE_NAME : TYPE = VALUE
 
-  my LOCAL_VARIABLE_NAME : TYPE;
+I<LOCAL_VARIABLE_NAME> is a L<local variable name|SPVM::Document::Language::Tokenization/"Local Variable Name">.
 
-The local variable name must be follow the rule of L<local variable name|SPVM::Document::Language::Tokenization/"Local Variable Name">.
+I<TYPE> is a L<type|SPVM::Document::Language::Types/"Types">.
 
-the L<type|SPVM::Document::Language::Types/"Types"> must be specified. Type must be a L<numeric type|SPVM::Document::Language::Types/"Numeric Type">, an L<object type|SPVM::Document::Language::Types/"Object Types">, the L<multi-numeric type|SPVM::Document::Language::Types/"Multi-Numeric Types">, or a L<reference type|SPVM::Document::Language::Types/"Reference Type">.
+If I<TYPE> is ommited, I<TYPE> is set to the type of I<VALUE>. This is called L<type inference|/"Type Inference">.
 
-  # Local Variable Declaration Examples
+I<VALUE> is an L<operator|SPVM::Document::Language::Operators/"Operators">.
+
+A local variable is declared in a L<scope block|/"Scope Block">.
+
+A local variable declaration performs the operation of L<pushing a local variable on the mortal stack|SPVM::Document::Language::GarbageCollection/"Pushing a Local Variable on the Mortal Stack">.
+
+A local variable declaration is a L<local variable access|SPVM::Document::Language::Operators/"Local Variable Access">.
+
+Compilation Errors:
+
+I<LOCAL_VARIABLE_NAME> must be a L<local variable name|SPVM::Document::Language::Tokenization/"Local Variable Name">. Otherwise a compilation error occurs.
+
+I<TYPE> must be a L<numeric type|SPVM::Document::Language::Types/"Numeric Types">, an L<object type|SPVM::Document::Language::Types/"Object Types">, the L<multi-numeric type|SPVM::Document::Language::Types/"Multi-Numeric Types">, or a L<reference type|SPVM::Document::Language::Types/"Reference Types">. Otherwise a compilation error occurs.
+
+If I<TYPE> is not resolved, a compilation error occurs.
+
+Examples:
+
+  # Examples of local variable declarations
   my $var : int;
   my $var : Point;
   my $var : Complex_2d;
   my $var : int*;
-
-The local variable is initialized by L<type initial value|SPVM::Document::Language::Types/"Type Initial Value">.
-
-  # Initialized by 0
-  my $num : int;
   
-  # Initialized by 0
-  my $num : double;
-  
-  # Initialized by undef
-  my $point : Point;
-  
-  # x is initialized by 0. y is initialized by 0.
-  my $z : Complex_2d;
-
-The initialization of the local variable can be written at the same time as the local variable declaration.
-
-  # Initialized by 1
-  my $num : int = 1;
-  
-  # Initialized by 2.5
-  my $num : double = 2.5;
-  
-  # Initialized by Point object
-  my $point : Point = new Point;
-
-The L<type|SPVM::Document::Language::Types/"Types"> can be omitted using the L<type inference|SPVM::Document::Language::Types/"Type Inference">, 
-
-  # Type inference - int
   my $num = 1;
   
-  # Type inference - double
   my $num = 1.0;
-
-The local variable declaration returns the value of the local variable. The return type is the type of the local variable.
-
+  
   my $ppp = my $bar = 4;
   
   if (my $bar = 1) {
@@ -1637,11 +1630,9 @@ The local variable declaration returns the value of the local variable. The retu
   
   }
 
-See the L<scope|SPVM::Document::Language::GarbageCollection/"Scope"> about the scope of the local variable.
+=head3 Type Inference
 
-=head4 Type Inference
-
-If the type of the local variable declaration is ommited, the type of the right operand of the assignment operator is set to it. This is called type inference.
+If the type of the local variable declaration is ommited, the type of the local variable is set to the type of the right operand of the assignment operator. This is called type inference.
 
   # int
   my $num = 1;
@@ -1654,72 +1645,73 @@ If the type of the local variable declaration is ommited, the type of the right 
 
 =head1 Enumeration
 
-The enumeration is the syntx to defines constant values of the int type.
+Enumeration is a syntax that defines 32-bit integers that belongs to a L<class|/"Class">.
 
 =head2 Enumeration Definition
 
-The C<enum> keyword defines an enumeration. An enumeration has definitions of constant values.
-
-  # Enumeration Definition
-  enum {
-    FLAG1,
-    FLAG2,
-    FLAG3
-  }
-
-The name given to an enumeration value must be a L<method name|SPVM::Document::Language::Tokenization/"Method Name">.
-
-The first enumeration value is 0. The next enumeration value is incremented by 1, and this is continued in the same way.
-
-In the above example, C<FLAG1> is 0, C<FALG2> is 1, and C<FLAG3> is 2.
-
-The type of an enumeration value is the int type.
-
-C<,> after the last enumeration value can be allowed.
+The C<enum> keyword defines an enumeration.
 
   enum {
-    FLAG1,
-    FLAG2,
-    FLAG3,
+    ITEM1,
+    ITEM2,
+    ITEMn
   }
 
-An enumeration value can be set by C<=> explicitly.
+C<,> after the last enumeration item is allowed.
 
   enum {
-    FLAG1,
-    FLAG2 = 4,
-    FLAG3,
+    ITEM1,
+    ITEM2,
+    ITEM3,
   }
 
-In the above example, C<FLAG1> is 0, C<FALG2> is 4, and C<FLAG3> is 5.
+I<ITEM> is one of
 
-An enumeration value is got by the L<class method call|SPVM::Document::Language::Operators/"Class Method Call">.
+  NAME
+  NAME = VALUE
 
-  Foo->FLAG1
+I<NAME> is a L<method name|SPVM::Document::Language::Tokenization/"Method Name">.
+
+I<VALUE> is an L<integer literal|SPVM::Document::Language::Tokenization/"Integer Literals"> within the int type. I<VALUE> is converted the value of the int type.
+
+If I<VALUE> of I<ITEM1> is omitted, it is set to 0.
+
+If I<VALUE> of I<ITEMn> is ommited, it is set to the value of the previous item plus 1.
+
+Each enumeration item is converted to a L<method definition|Method Definition> that defines a class method that returns the value of the enumeration item.
+
+The return type of the method is the int type.
 
 Compilation Errors:
 
-If an enumeration definition is invalid, a compilation error occurs.
+I<NAME> must be a L<method name|SPVM::Document::Language::Tokenization/"Method Name">. Otherwise, a compilation error occurs.
+
+I<VALUE> must be an L<integer literal|/"Integer Literal"> within the int type. Otherwise, a compilation error occurs.
 
 Examples:
-
+  
+  # Examples of enumerations
   class MyClass {
     enum {
       FLAG1,
       FLAG2,
       FLAG3,
     }
+    
+    static method main : void () {
+      my $flag1 = MyClass->FLAG1;
+    }
+  }
+  
+  class MyClass {
+    enum {
+      FLAG1,
+      FLAG2 = 2,
+      FLAG3,
+    }
   }
 
 =head2 Enumeration Attributes
-
-Attributes can be specified to an enumeration definition.
-
-  private enum {
-    FLAG1,
-    FLAG2 = 4,
-    FLAG3,
-  }
 
 The List of Enumeration Attributes:
 
@@ -1736,10 +1728,18 @@ The List of Enumeration Attributes:
   </tr>
   <tr>
     <td>
+      <b>public</b>
+    </td>
+    <td>
+      This enumeration is public. All classes can access all items of this enumeration. This is default.
+    </td>
+  </tr>
+  <tr>
+    <td>
       <b>private</b>
     </td>
     <td>
-      This enumeration is private. Each value of this enumeration can not be accessed from other classes.
+      This enumeration is private. All classes ohter than this class cannnot access all items of this enumeration.
     </td>
   </tr>
   <tr>
@@ -1747,15 +1747,7 @@ The List of Enumeration Attributes:
       <b>protected</b>
     </td>
     <td>
-      This enumeration is protected. Each value of this enumeration can not be accessed from other classes except for the child classes.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>public</b>
-    </td>
-    <td>
-      This enumeration is public. Each value of this enumeration can be accessed from other classes. This is default setting.
+      This enumeration is protected. All classes ohter than this class and its child classes cannot access all items of this enumeration.
     </td>
   </tr>
 </table>
@@ -1764,7 +1756,7 @@ The List of Enumeration Attributes:
 
 Compilation Errors:
 
-Only one of enumeration attributes C<private>, C<protected> or C<public> can be specified, otherwise a compilation error occurs.
+One of C<private>, C<protected> and C<public> must be specified. Otherwise, a compilation error occurs.
 
 =head1 Block
 
@@ -1774,16 +1766,14 @@ A block is the part enclosed by C<{> and C<}>.
 
 A class block is a block used in a class definition.
   
-  # Class block
-  class Point {
+  class MyClass {
   
   }
 
 =head2 Enumeration Block
 
-An enumeration block is a block used in a enumeration definition.
+An enumeration block is a block used in an enumeration definition.
 
-  # Enumeration block
   enum {
     ONE,
     TWO,
@@ -1791,29 +1781,31 @@ An enumeration block is a block used in a enumeration definition.
 
 =head2 Scope Block
 
-The scope block has its L<scope|SPVM::Document::Language::GarbageCollection/"Scope">. Zero or more L<statements|SPVM::Document::Language::Statements/"Statements"> are written in a scope block.
+A scope block is a block that has its L<scope|SPVM::Document::Language::GarbageCollection/"Scope">.
+
+Zero or more L<statements|SPVM::Document::Language::Statements/"Statements"> are written in a scope block.
 
 =head3 Simple Block
 
-The simple block is a L<scope block|/"Scope Block">.
+A simple block is a scope block.
 
-  # Simple block
   {
     1;
   }
 
-The simple block must have at least one statements, otherwise it is intepreted as the L<array initialization|SPVM::Document::Language::Operators/"The array Initialization">.
+A simple block must have at least one statements. Otherwise, it is intepreted as a L<key-value array initialization|SPVM::Document::Language::Operators/"Key-Value Array Initialization">.
 
 =head3 Method Block
 
-The method block is a L<scope block|/"Scope Block">.
+A method block is a scope block.
 
-  # Method block
   static method foo : int () {
   
   }
 
-The block of C<INIT> method is a method block.
+=head3 INIT block
+
+An C<INIT> block is a scope block.
 
   INIT {
     
@@ -1821,99 +1813,92 @@ The block of C<INIT> method is a method block.
 
 =head3 eval Block
 
-The C<eval> block is a L<scope block|/"Scope Block">.
+An C<eval> block is a scope block.
 
-  # eval block
   eval {
   
   }
 
 =head3 if Block
 
-The C<if> block is a L<scope block|/"Scope Block">.
+An C<if> block is a scope block.
 
-  # if block
   if (CONDITION) {
   
   }
 
 =head3 elsif Block
 
-The C<elsif> block is a L<scope block|/"Scope Block">.
+An C<elsif> block is a scope block.
 
-  # elsif block
   elsif (CONDITION) {
   
   }
 
 =head3 else Block
 
-The C<else> block is a L<scope block|/"Scope Block">.
+An C<else> block is a scope block.
 
-  # else block
   else {
   
   }
 
 =head3 for Block
 
-The C<for> block is a L<scope block|/"Scope Block">.
+A C<for> block is a scope block.
 
-  # for Block 
   for (my $i = 0; $i < 3; $i++) {
   
   }
 
 =head3 while Block
 
-The C<while> block is a L<scope block|/"Scope Block">.
+A C<while> block is a scope block.
 
-  # while block
   while (CONDITION) {
   
   }
 
 =head3 switch Block
 
-The C<switch> block is a L<scope block|/"Scope Block">.
+A C<switch> block is a scope block.
   
-  # switch block
   switch (CONDITION) {
   
   }
 
 =head3 case Block
 
-The C<case> block is a L<scope block|/"Scope Block">.
+A C<case> block is a scope block.
   
-  # case block
-  switch (CONDITION) {
-    case CASE_VALUE1: {
-      # ...
-    }
+  case CASE_VALUE1: {
+    # ...
   }
 
 =head3 default Block
 
-The C<default> block is a L<scope block|/"Scope Block">.
+A C<default> block is a scope block.
   
-  # default block
-  switch (CONDITION) {
-    default: {
-      # ...
-    }
+  default: {
+    # ...
   }
 
 =head1 Type Comment
 
-The type comment syntax is supported. The type comment can be written after C<of> keyword.
+The type comment is a syntax to write a comment for a type.
 
-  TYPE of TYPE
-  TYPE of TYPE1|TYPE2
-  TYPE of TYPE1|TYPE2|TYPE3
+  TYPE of TYPE_COMMENT
+  TYPE of TYPE_COMMENT1|TYPE_COMMENT2|TYPE_COMMENTn
 
-The type comment can be used the type of the L<field decralation|/"Field Definition">, the L<class variable definition|/"Class Variable Definition">, the L<local variable declaration|/"Local Variable Declaration">, and the return value and the types of arguments of the L<method definition|/"Method Definition">.
+I<TYPE> is a L<type|SPVM::Document::Language::Types/"Types">.
 
+I<TYPE> is a type used in the L<field definition|/"Field Definition">, the L<class variable definition|/"Class Variable Definition">, the L<local variable declaration|/"Local Variable Declaration">, and the return value and the types of arguments of the L<method definition|/"Method Definition">.
+
+I<TYPE_COMMENT> is a L<type|SPVM::Document::Language::Types/"Types">.
+
+Examples:
+
+  # Examples of type comments
   has points : List of Point;
   
   our $POINTS : List of Point;
@@ -1923,8 +1908,6 @@ The type comment can be used the type of the L<field decralation|/"Field Definit
   static method foo : List of Point ($arg : List of Point) { ... }
   
   my $replace : object of string|Regex::Replacer;
-
-Type comments have no meanings at runtime.
 
 Compilation Errors:
 

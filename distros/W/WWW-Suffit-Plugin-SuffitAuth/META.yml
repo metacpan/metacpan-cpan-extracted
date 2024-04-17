@@ -20,12 +20,12 @@ no_index:
     - inc
 requires:
   Mojolicious: '7.94'
-  WWW::Suffit: '1.07'
+  WWW::Suffit: '1.08'
   WWW::Suffit::Client: '1.02'
   perl: '5.020'
 resources:
   homepage: https://sourceforge.net/projects/www-suffit-plugin-suffitauth/
   license: https://dev.perl.org/licenses
   repository: https://abalama@git.code.sf.net/p/www-suffit-plugin-suffitauth/code
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
