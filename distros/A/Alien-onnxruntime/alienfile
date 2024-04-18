@@ -1,0 +1,17 @@
+use alienfile;
+
+probe sub { $_[0]->runtime_prop->{ffi_name} = 'onnxruntime' };
+
+share {
+    plugin qw'Download::GitHub github_user microsoft github_repo onnxruntime asset 1',
+        asset_name => qr/onnxruntime-linux-x64-\d+.\d+.\d+.tgz/a;
+    plugin 'Extract' => 'tgz';
+    plugin 'Build::Copy';
+    plugin 'Gather::IsolateDynamic';
+    gather sub {
+        my ($build) = @_;
+        my $prefix = $build->runtime_prop->{prefix};
+        $build->runtime_prop->{cflags} = "-I$prefix/include ";
+        $build->runtime_prop->{libs} = "-L$prefix/lib -lonnxruntime ";
+    }
+};

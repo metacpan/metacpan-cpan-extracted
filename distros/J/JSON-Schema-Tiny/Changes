@@ -1,5 +1,10 @@
 Revision history for JSON-Schema-Tiny
 
+0.023     2024-04-17 17:55:32Z
+          - remove use of JSON::MaybeXS, to avoid potential use of JSON::XS;
+            now we use Cpanel::JSON::XS or JSON::PP directly, using the same
+            environment variables as in Mojo::JSON for customization.
+
 0.022     2023-12-17 00:42:56Z
           - new $STRINGY_NUMBERS option, for validating numbers more loosely
 

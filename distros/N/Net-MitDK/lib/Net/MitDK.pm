@@ -2,7 +2,7 @@ package Net::MitDK;
 
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use Encode qw(encode decode);
 use DateTime;
 use MIME::Entity;
@@ -364,8 +364,9 @@ sub assemble_mail
 	}
 	$received = $date->strftime('%a, %d %b %Y %H:%M:%S %z');
 
+	my $from = $self->config->{email_from} // 'noreply@mit.dk';
 	my $mail = MIME::Entity->build(
-		From          => ( safe_encode('MIME-Q', $sender) . ' <noreply@mit.dk>' ) ,
+		From          => ( safe_encode('MIME-Q', $sender) . " <$from>" ) ,
 		To            => ( safe_encode('MIME-Q', $self->{session}->{mailboxes}->{ownerName}) . ' <' . ( $ENV{USER} // 'you' ) . '@localhost>' ),
 		Subject       => safe_encode('MIME-Header', $msg->{label}),
 		Data          => encode('utf-8', "Mail from $sender"),
@@ -512,9 +513,9 @@ sub save
 		mkdir $home or return (undef, "Cannot create $home: $!");
 		return (undef, "cannot chmod 0750 $home:$!") unless chmod 0750, $home;
 		if ( $^O !~ /win32/i) {
-			my ($name,$passwd,$uid,$gid) = getpwnam('nobody');
-			return (undef, "no user `nobody`") unless defined $name;
-			return (undef, "cannot chown user:$name $home:$!") unless chown $>, $gid, $home;
+			my (undef,undef,$gid) = getgrnam('nobody');
+			return (undef, "no group `nobody`") unless defined $gid;
+			return (undef, "cannot chown user:nobody $home:$!") unless chown $>, $gid, $home;
 		}
 	}
 
@@ -538,9 +539,9 @@ sub save
 
 	if ( $^O !~ /win32/i) {
 		return (undef, "cannot chmod 0640 $file:$!") unless chmod 0640, $file;
-		my ($name,$passwd,$uid,$gid) = getpwnam('nobody');
-		return (undef, "no user `nobody`") unless defined $name;
-		return (undef, "cannot chown user:$name $file:$!") unless chown $>, $gid, $file;
+		my (undef,undef,$gid) = getgrnam('nobody');
+		return (undef, "no group `nobody`") unless defined $gid;
+		return (undef, "cannot chown user:nobody $file:$!") unless chown $>, $gid, $file;
 	}
 
 	$self->{timestamps}->{$profile} = time;

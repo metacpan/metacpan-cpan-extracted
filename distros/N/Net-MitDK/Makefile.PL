@@ -13,7 +13,7 @@ WriteMakefile(
         LICENSE        => 'freebsd',
 	PREREQ_PM      => {
 		'LWP'             => 0,
-		'IO::Lambda'      => 1.32,
+		'IO::Lambda'      => 1.33,
 		'DateTime'        => 0,
 		'MIME::Entity'    => 0,
 		'MIME::Base64'    => 0,
@@ -29,3 +29,9 @@ WriteMakefile(
 		},
 	},
 );
+
+if ( $^O !~ /win32/i) {
+	my (undef,undef,$gid) = getgrnam('nobody');
+	warn "\n** Warning: group `nobody` not found. Run `sudo addgroup nobody` if you need to run mitdk2pop\n";
+}
+

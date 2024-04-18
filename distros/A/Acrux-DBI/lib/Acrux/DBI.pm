@@ -134,9 +134,23 @@ Default: C<sponge>
 =head2 dsn
 
     my $dsn = $dbi->dsn;
+    my $dsn = $dbi->dsn('DBI:SQLite::memory:');
 
 This method generates the connection DSN and returns it or
 returns already generated earley.
+
+=head2 dump
+
+    my $dump = $dbi->dump;
+    my $dump = $dbi->dump(name => 'schema');
+
+This method returns instance of L<Acrux::DBI::Dump> class that you
+can use to change your database schema more easily
+
+    # Load SQL dump file and import schema to database
+    $dbi->dump->from_file('/tmp/schema.sql')->poke('foo');
+
+See L<Acrux::DBI::Dump> for details
 
 =head2 err
 
@@ -249,15 +263,22 @@ it is destroyed
 
 =head2 url
 
-    $dbi = $dbi->url('sqlite:///tmp/test.db?sqlite_unicode=1');
-    $dbi = $dbi->url('postgres://foo:pass@localhost/mydb?PrintError=1');
     my $url = $dbi->url;
+    $dbi = $dbi->url('sqlite:///tmp/test.db?sqlite_unicode=1');
+    $dbi = $dbi->url('sqlite:///./test.db?sqlite_unicode=1'); # '/./' will be removed
+    $dbi = $dbi->url('postgres://foo:pass@localhost/mydb?PrintError=1');
+    $dbi = $dbi->url('mysql://foo:pass@localhost/test?mysql_enable_utf8=1');
 
-Database connect ur
+Database connect url
 
 The database connection URL from which all other attributes can be derived.
 C<"url"> must be specified before the first call to C<"connect"> is made,
 otherwise it will have no effect on setting the defaults.
+
+For using SQLite databases with files relative to current directory you cat use '/./' prefix:
+
+    # '/./' will be removed automatically
+    $dbi = $dbi->url('sqlite:///./test.db?sqlite_unicode=1');
 
 Default: C<"sponge://">
 
@@ -306,7 +327,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp qw/carp croak/;
 use Scalar::Util 'weaken';
@@ -318,6 +339,7 @@ use Acrux::Util qw//;
 use Acrux::RefUtil qw/is_array_ref is_code_ref/;
 use Acrux::DBI::Res;
 use Acrux::DBI::Tx;
+use Acrux::DBI::Dump;
 
 use constant {
     DEBUG            => $ENV{ACRUX_DBI_DEBUG} || 0,
@@ -411,6 +433,7 @@ sub database {
     my $db = '';
     if ($dr eq 'sqlite' or $dr eq 'file') {
         $db = $u->path->leading_slash(1)->trailing_slash(0)->to_string // '';
+        $db =~ s/^\/+\.\///;
     } else {
         $db = $u->path->leading_slash(0)->trailing_slash(0)->to_string // '';
     }
@@ -418,6 +441,7 @@ sub database {
 }
 sub dsn {
     my $self = shift;
+    $self->{dsn} = shift if scalar(@_) >= 1;
     return $self->{dsn} if $self->{dsn};
     my $dr = $self->driver;
 
@@ -481,7 +505,7 @@ sub error {
 sub err {
     my $self = shift;
     return $self->dbh->err // $DBI::err if defined($self->dbh) && $self->dbh->can('err');
-    return $DBI::err
+    return $DBI::err;
 }
 sub errstr {
     my $self = shift;
@@ -622,6 +646,12 @@ sub query { # SQL, { args }
         sth => $sth,
         affected_rows => $rv >= 0 ? 0 + $rv : -1,
     );
+}
+
+# Working with dumps
+sub dump {
+    my $self = shift;
+    return Acrux::DBI::Dump->new(dbi => $self, @_)
 }
 
 sub cleanup {

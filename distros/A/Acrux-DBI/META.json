@@ -52,6 +52,6 @@
          "web" : "https://sourceforge.net/p/acrux-dbi/code/ci/master/tree/"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

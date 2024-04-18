@@ -61,7 +61,8 @@ acceptance_tests(
           'ref to else',
           'ref with absolute-path-reference',
         ] },
-      { file => 'unknownKeyword.json', group_description => '$id inside an unknown keyword is not a real identifier', test_description => 'type matches second anyOf, which has a real schema in it' },
+      { file => ['unknownKeyword.json', 'optional/unknownKeyword.json'], group_description => '$id inside an unknown keyword is not a real identifier', test_description => 'type matches second anyOf, which has a real schema in it' },
+      { file => 'optional/id.json', '$id inside an enum is not a real identifier', 'exact match to enum, and type matches' },
       { file => 'optional/cross-draft.json', group_description => 'refs to future drafts are processed as future drafts' },
       # various edge cases that are difficult to accomodate
       { file => 'optional/ecmascript-regex.json', group_description => '\w in patterns matches [A-Za-z0-9_], not unicode letters', test_description => [ 'literal unicode character in json string', 'unicode character in hex format in string' ] },

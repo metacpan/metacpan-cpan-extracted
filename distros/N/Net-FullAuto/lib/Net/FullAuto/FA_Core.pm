@@ -28318,7 +28318,7 @@ sub ftpcmd
    my $stdout='';my $stderr='';my $hashcount=0;
    my $keepcount=0;my $gpfile='';my $seen=0;
    $gpfile=unpack('a3',$cmd) if 2<length $cmd;
-   $gpfile||=''
+   $gpfile||='';
    my $prcnt=0;my $firstvisit=0;my $gf='';
    if ($ftm_type eq 'ftp' && ($gpfile eq 'get' || $gpfile eq 'put')) {
       my $ex=($gpfile eq 'put')?'!':'';

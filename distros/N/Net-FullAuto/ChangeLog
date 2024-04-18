@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2024-04-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000645 released
+
+        * Added ; after gpfile||='' in FA_Core.pm
+
 2024-04-12  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000644 released

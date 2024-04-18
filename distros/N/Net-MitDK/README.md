@@ -9,12 +9,41 @@ and a simple downloader.
 Installation
 ============
 
+Browser security
+----------------
+
+Important: The authentication step proxies some requests and that doesn't go well with
+the [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) policy.
+That's why if you try to start the authentication in a normal browser window, you
+will not be able to see the MitID login window, but get an error instead.
+
+To sidestep that, the authentication must be done with some browser security settings
+lowered. You may want to use a standalone instance of a browser so it doesn't mess
+with your main security settings.
+
+* Chrome on Windows: create a folder f.ex `C:\chrome.nosec` and run
+`"C:\Program Files\Google\Chrome\Application\chrome.exe" --disable-web-security --user-data-dir="C:\chrome.nosec"`
+
+* Chrome on Linux: basically same, `mkdir /tmp/chrome` and `chrome --disable-web-security --user-data-dir=/tmp/chrome`
+
+* Firefox: apparently it cannot do this, but some extentions claim that they can (simple-modify-headers etc).
+I didn't succeed to setup a single one so if you know how to hack Firefox to
+add `Access-Control-Allow-Origin: *` to all responses, kindly ping me back.
+
+* Other browsers: I didn't care but again patches to this text are welcome.
+
 Unix/Linux
 ----------
 
-* Install this module by opening command line and typing `cpan Net::MitDK` (with `sudo` if needed)
+* Install this module by opening command line and typing `cpan Net::MitDK` (with `sudo` if needed).
 
-* Run `mitdk-authenticate`, open `http://localhost:9999/` in the browser, and login to NemID as described below.
+* Make sure group `nobody` is present. Run `sudo addgroup nobody` if needed.
+You may also add yourself to the group `nobody` if you want to let the
+utilities to edit your profile settings, by running `sudo usermod -a -G nobody
+$$USER`.
+
+* Run `mitdk-authenticate`, open `http://localhost:9999/` in the browser with
+* lowered security, and login to MitID as described below.
 
 * Add `mitdk-renew-lease -a` in a new cron job as yourself (see 'examples/cron'):
   - Run ``perl -le 'print q(*/10 * * * * ).($_=`which mitdk-renew-lease`,chomp,$_).q( -a)'``
@@ -32,7 +61,7 @@ Windows
   `mitdk-install-win32`
 
 that will fire up a browser-based install wizard. Click "Install", then login with
-NemID credentials as described below.
+MitID credentials as described below.
 
 * Set up your favourite desktop mail reader so it connects to a POP3 server
 running on server localhost, port 8111. Username is 'default', no password is needed.
@@ -63,19 +92,22 @@ Quit the setup.
 Quit the setup.
 
 
-One-time NemID registration
+One-time MitID registration
 ---------------------------
 
 For each user, you will need to go through one-time registration through your
-personal NemID signature. Run `mitdk-authenticate` to start a small webserver
+personal MitID signature. Run `mitdk-authenticate` to start a small webserver
 on `http://localhost:9999/`, where you will need to connect to with a browser
-(the Windows installer will run it for you).  There, it will will try to show a
-standard NemID window. You will need to log in there, in the way you usually
-do, using either one-time pads or the NemID app, and then confirm the request
-from MitDK. If that works, the script will create an authorization token and
-save it in your home catalog under `.mitdk/default.profile`. This token will be
-used for password-less logins to the MitDK site. In case it expires, in will
-need to be renewed using the same procedure.
+(the Windows installer will run it for you). There, it will will try to show a
+standard MitID window. If it fails with an error, make sure you lowered
+the security level (see the "Browser security" section above).
+
+You will need to log in there, in the way you usually do, using the MitID app,
+and then confirm the request from MitDK. If that works, the script will create
+an authorization token and save it in your home catalog under
+`.mitdk/default.profile`. This token will be used for password-less logins to
+the MitDK site. In case it expires, in will need to be renewed using the same
+procedure.
 
 In case you never logged in to the Digital Post, you'll get a login error.
 You shall need to log in manually to the website, eventually fill your phone
@@ -84,15 +116,15 @@ should work.
 
 **Security note**:
 
-Make sure that the content of .mitdk directory is only readable to you.
-By default, on unix installation, the directory and the files will be readable
-and writable by you and readable by user `nobody`. The latter is needed because
+Make sure that the content of .mitdk directory is only readable to you.  By
+default, on unix installation, the directory and the files will be readable and
+writable by you and readable by group `nobody`. The latter is needed because
 the mitdk2pop server runs as `nobody` and needs to use the login leases.
 
 Lease renewal
 -------------
 
-MidDK only allows sessions for 20 minutes, thereafter it may require a NemID
+MidDK only allows sessions for 20 minutes, thereafter it may require a MitID
 relogin.  Therefore there is added a daemon, `mitdk-renew-lease`. You can run
 it from cron (unix), or as a standalone program as `mitdk-renew-lease -la`
 (windows).  It then will renegotiate a lease every 10 minutes. If you installed
@@ -112,19 +144,19 @@ automatically.
 Lease migration
 ---------------
 
-If you cannot run a browser to authenticate with NemID on the server that will be used for mail
+If you cannot run a browser to authenticate with MitID on the server that will be used for mail
 fetching, or you want to migrate to another server, you will need the saved lease moved.
-The saved lease is located in your home directory 
+The saved lease is located in your home directory
 ( run `perl -MNet::MitDK -le "print Net::MitDK::ProfileManager->new->homepath"` if in doubt ),
 move it to another server. Make sure the `mitdk-renew-lease` is not running on the old server.
 
 Multi-user installation
 -----------------------
 
-The module and the POP3 server can operate on several users. By default, there is just one
+The module and the POP3 server can operate for several users. By default, there is just one
 default profile in `$HOME/.mitdk/default.profile` that is getting renewed. However you may
 rename it to whatever name.profile, and have more than one. The authenticator will allow
-you to switch between profiles for different NemID users, and the lease renewer will pick up
+you to switch between profiles for different MitID users, and the lease renewer will pick up
 new profiles automatically. The profile name can be used as login name in the POP3 proxy, too.
 
 Operations
@@ -180,7 +212,12 @@ setup is basically same as in previous section, but see
 
 The problem you might encounter is that the module generates mails as
 originated from `noreply@mit.dk` and f.ex. Gmail won't accept that due to
-[SPF](https://en.wikipedia.org/wiki/Sender_Policy_Framework). See if rewriting
+[SPF](https://en.wikipedia.org/wiki/Sender_Policy_Framework). In the
+authenticator web setup you can change the default email to one that matches
+your sending domain. If you own that domain, consider adding the SPF TXT
+record to it, something like `v=spf1 a mx ip4:1.2.3.4 ~all`.
+
+Alternatively see if rewriting
 the sender as in `examples/procmail.forward.srs` helps.
 
 Enjoy!

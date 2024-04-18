@@ -62,7 +62,7 @@ subtest 'equality, using inflated data' => sub {
   }
 };
 
-my $decoder = JSON::MaybeXS->new(allow_nonref => 1, utf8 => 0);
+my $decoder = (Mojo::JSON::JSON_XS ? 'Cpanel::JSON::XS' : 'JSON::PP')->new->allow_nonref(1)->utf8(0);
 
 subtest 'equality, using JSON strings' => sub {
   foreach my $test (

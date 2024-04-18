@@ -1,5 +1,11 @@
 # Version/Revision history
 
+0.03 Web 17 Apr 2024 18:04:54 MSK
+    * Added Acrux::DBI::Dump class
+    * Added set-context of dsn method
+    * Added database URL-string to examples
+    * Added dump method to faster access to Acrux::DBI::Dump
+
 0.02 Sat 13 Apr 2024 17:27:46 MSK
     * Documentation modified
     * Added rules for error message getting

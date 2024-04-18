@@ -63,7 +63,7 @@ foreach my $type (sort keys %inflated_data) {
   };
 }
 
-my $decoder = JSON::MaybeXS->new(allow_nonref => 1, canonical => 1, utf8 => 1, allow_bignum => 1);
+my $decoder = (Mojo::JSON::JSON_XS ? 'Cpanel::JSON::XS' : 'JSON::PP')->new->allow_nonref(1)->canonical(1)->utf8(1)->allow_bignum(1);
 
 foreach my $type (sort keys %json_data) {
   subtest 'JSON-encoded data, type: '.$type => sub {

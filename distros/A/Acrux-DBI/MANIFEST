@@ -11,6 +11,7 @@ TODO                                    TO DO
 
 # Acrux libs
 lib/Acrux/DBI.pm                        Main library
+lib/Acrux/DBI/Dump.pm                   Working with SQL dumps
 lib/Acrux/DBI/Res.pm                    Results
 lib/Acrux/DBI/Tx.pm                     Transactions
 
@@ -23,5 +24,6 @@ t/01-use.t                              Test script
 t/02-url.t                              Database connecting URL testing
 t/03-connect.t                          Database connecting testing
 t/04-transaction.t                      Database transaction testing
+t/05-dump.t                             SQL dumps
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

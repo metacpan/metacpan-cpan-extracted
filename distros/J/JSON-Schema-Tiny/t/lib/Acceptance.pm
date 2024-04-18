@@ -40,7 +40,7 @@ sub acceptance_tests (%options) {
   my $js = JSON::Schema::Tiny->new($options{evaluator}->%*);
   my $js_short_circuit = $ENV{NO_SHORT_CIRCUIT} || JSON::Schema::Tiny->new($options{evaluator}->%*, short_circuit => 1);
 
-  my $encoder = JSON::MaybeXS->new(allow_nonref => 1, utf8 => 0, canonical => 1, pretty => 1);
+  my $encoder = (Mojo::JSON::JSON_XS ? 'Cpanel::JSON::XS' : 'JSON::PP')->new->allow_nonref(1)->utf8(0)->canonical(1)->pretty(1);
   $encoder->indent_length(2) if $encoder->can('indent_length');
 
   $accepter->acceptance(
@@ -55,6 +55,8 @@ sub acceptance_tests (%options) {
       die 'results inconsistent between short_circuit = false and true'
         if not $ENV{NO_SHORT_CIRCUIT} and ($result->{valid} xor $result_short->{valid});
 
+      my $in_todo;
+
       # if any errors contain an exception, generate a warning so we can be sure
       # to count that as a failure (an exception would be caught and perhaps TODO'd).
       # (This might change if tests are added that are expected to produce exceptions.)
@@ -63,7 +65,8 @@ sub acceptance_tests (%options) {
           foreach
             grep +($_->{error} =~ /^EXCEPTION/
                 && $_->{error} !~ /but short_circuit is enabled/            # unevaluated*
-                && $_->{error} !~ /(max|min)imum value is not a number$/),  # optional/bignum.json
+                && $_->{error} !~ /(max|min)imum value is not a number$/)   # optional/bignum.json
+                && !($in_todo //= grep $_->{todo}, Test2::API::test2_stack->top->{_pre_filters}->@*),
               $r->{errors}->@*;
       }
 

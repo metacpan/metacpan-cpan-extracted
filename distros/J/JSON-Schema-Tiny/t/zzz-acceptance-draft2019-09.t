@@ -70,7 +70,9 @@ acceptance_tests(
           'ref to else',
           'ref with absolute-path-reference',
         ] },
-      { file => 'unknownKeyword.json', group_description => '$id inside an unknown keyword is not a real identifier', test_description => 'type matches second anyOf, which has a real schema in it' },
+      { file => ['unknownKeyword.json', 'optional/unknownKeyword.json'], group_description => '$id inside an unknown keyword is not a real identifier', test_description => 'type matches second anyOf, which has a real schema in it' },
+      { file => 'optional/anchor.json', '$anchor inside an enum is not a real identifier', 'exact match to enum, and type matches' },
+      { file => 'optional/id.json', '$id inside an enum is not a real identifier', 'exact match to enum, and type matches' },
       { file => 'optional/cross-draft.json', group_description => [
           'refs to future drafts are processed as future drafts',
           'refs to historic drafts are processed as historic drafts' ] },

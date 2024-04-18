@@ -15,7 +15,7 @@ use Test::Deep;
 use lib 't/lib';
 use Acceptance;
 use Path::Tiny;
-use JSON::MaybeXS;
+use Mojo::JSON 'decode_json';
 
 my $version = 'draft2020-12';
 
