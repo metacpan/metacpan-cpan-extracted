@@ -1,3 +1,9 @@
+0.006   2024-04-18  Released-By: PERLANCAR; Urgency: medium
+
+        - Use QRCode::Any instead of directly directing to google chart
+          (https://www.google.com/chart no longer works, 404).
+
+
 0.005   2021-05-25  Released-By: PERLANCAR; Urgency: high
 
 	- [build] Rebuild to update Sah coercion module names (old Sah coercion

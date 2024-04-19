@@ -1,18 +1,20 @@
 package App::GoogleAuthUtils;
 
-our $DATE = '2021-05-25'; # DATE
-our $VERSION = '0.005'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-04-18'; # DATE
+our $DIST = 'App-GoogleAuthUtils'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 our %SPEC;
 
 $SPEC{gen_google_auth_qrcode} = {
     v => 1.1,
     summary => 'Generate Google authenticator QR code (barcode) from a secret key',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 When generating a new 2FA token, you are usually presented with a secret key as
 well as a 2D barcode (QR code) representation of this secret key. You are
@@ -24,7 +26,7 @@ typing or copy-pasting the code.
 This utility will convert the secret key code into bar code (opened in a
 browser) so you can conveniently scan the bar code into your app.
 
-_
+MARKDOWN
     args => {
         secret_key => {
             schema => 'str*',
@@ -63,45 +65,16 @@ sub gen_google_auth_qrcode {
 
     my %args = @_;
 
-    if (File::Which::which("qrencode")) {
-        my $output = $args{output} // '-';
+    my $url = join(
+        "",
+        "otpauth://totp/",
+        URI::Encode::uri_encode($args{issuer} . ($args{account} ? ":$args{account}" : "")),
+        "?secret=", $args{secret_key},
+        "&issuer=", $args{issuer},
+    );
 
-        my $cmd = join(
-            "",
-            "qrencode -o ", String::ShellQuote::shell_quote($output),
-            " -d 300 -s 10 ",
-            String::ShellQuote::shell_quote(
-                join(
-                    "",
-                    "otpauth://totp/",
-                    URI::Encode::uri_encode($args{issuer} . ($args{account} ? ":$args{account}" : "")),
-                    "?secret=", $args{secret_key},
-                    "&issuer=", $args{issuer},
-                )
-            ),
-        );
-        if ($output eq '-') {
-            system "$cmd | display";
-        } else {
-            system $cmd;
-        }
-    } else {
-        my $url = join(
-            '',
-            'https://www.google.com/chart?chs=200x200&chld=M|0&cht=qr',
-            '&chl=otpauth://totp/', (
-                URI::Encode::uri_encode(
-                    $args{issuer} . ($args{account} ? ":$args{account}" : "")),
-                '%3Fsecret%3D', $args{secret_key},
-                '%26issuer%3D', $args{issuer},
-            ),
-        );
-
-        require Browser::Open;
-        my $err = Browser::Open::open_browser($url);
-        return [500, "Can't open browser for '$url'"] if $err;
-    }
-    [200];
+    require App::QRCodeUtils;
+    App::QRCodeUtils::gen_qrcode(text => $url);
 }
 
 1;
@@ -119,7 +92,7 @@ App::GoogleAuthUtils - Utilities related to Google Authenticator
 
 =head1 VERSION
 
-This document describes version 0.005 of App::GoogleAuthUtils (from Perl distribution App-GoogleAuthUtils), released on 2021-05-25.
+This document describes version 0.006 of App::GoogleAuthUtils (from Perl distribution App-GoogleAuthUtils), released on 2024-04-18.
 
 =head1 DESCRIPTION
 
@@ -173,23 +146,31 @@ Arguments ('*' denotes required arguments):
 
 =item * B<account> => I<str>
 
+(No description)
+
 =item * B<issuer>* => I<str>
+
+(No description)
 
 =item * B<output> => I<filename>
 
+(No description)
+
 =item * B<secret_key>* => I<str>
+
+(No description)
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element ($status_code) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or "OK" if status is
-200. Third element ($payload) is optional, the actual result. Fourth
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
 element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information.
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -201,14 +182,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Google
 
 Source repository is at L<https://github.com/perlancar/perl-App-GoogleAuthUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GoogleAuthUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<App::QRCodeUtils>
@@ -217,11 +190,37 @@ L<App::QRCodeUtils>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2024, 2021, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GoogleAuthUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -12,7 +12,7 @@ BEGIN {
 	}
     else {
 	require Encode;
-	plan tests => 61;
+	plan tests => 65;
 	}
     require "./t/util.pl";
     }
@@ -56,17 +56,57 @@ foreach my $cstr ("#", "//", "Comment", "\xe2\x98\x83") {
 	}
     }
 
-is_deeply (csv (
-    in               => *DATA,
-    sep_char         => "|",
-    headers          => "auto",
-    allow_whitespace => 1,
-    comment_str      => "#"
-    ), [{ id => 42, name => "foo" }], "Last record is comment");
-
-1;
-__END__
+my $data = <<"EOC";
 id | name
 #
 42 | foo
 #
+EOC
+
+is_deeply (csv (
+    in               => \$data,
+    sep_char         => "|",
+    headers          => "auto",
+    allow_whitespace => 1,
+    comment_str      => "#",
+    strict           => 0,
+    ), [{ id => 42, name => "foo" }], "Last record is comment");
+is_deeply (csv (
+    in               => \$data,
+    sep_char         => "|",
+    headers          => "auto",
+    allow_whitespace => 1,
+    comment_str      => "#",
+    strict           => 1,
+    ), [{ id => 42, name => "foo" }], "Last record is comment, under strict");
+
+$data .= "3\n";
+is_deeply (csv (
+    in               => \$data,
+    sep_char         => "|",
+    headers          => "auto",
+    allow_whitespace => 1,
+    comment_str      => "#",
+    strict           => 0,
+    ), [{ id => 42, name => "foo" },
+	{ id =>  3, name => undef },
+	], "Valid record past comment");
+is_deeply (csv (
+    in               => \$data,
+    sep_char         => "|",
+    headers          => "auto",
+    allow_whitespace => 1,
+    comment_str      => "#",
+    strict           => 1,
+    auto_diag        => 0,	# Suppress error 2014
+    ), [{ id => 42, name => "foo" }], "Invalid record past comment, under strict");
+is_deeply (csv (
+    in               => \"# comment\n42 | foo\n53 | bar\n",
+    sep_char         => "|",
+    allow_whitespace => 1,
+    comment_str      => "#",
+    strict           => 1,
+    auto_diag        => 1,
+    ), [[ 42, "foo" ], [ 53, "bar" ]], "Comment on first line, under strict");
+
+1;

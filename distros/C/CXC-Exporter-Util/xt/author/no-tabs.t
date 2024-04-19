@@ -13,6 +13,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/all.t',
     't/basic.t',
+    't/bugs/backcompat.t',
     't/constants.t',
     't/lib/My/Test/Utils.pm',
     't/types.t'

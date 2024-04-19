@@ -1,5 +1,11 @@
 Revision history for Ixchel
 
+0.12.2 2024-04-18/13:30
+		 - No config found and no --config means a empty hash is used.
+		 - Now --noConfig is respect.
+		 - Fix the check for the JSON config.
+		 - JSON now takes presidence over TOML. So it goes... YAML, JSON, TOML
+
 0.12.1 2024-04-16/22:45
 		 - Fix MANIFEST
 

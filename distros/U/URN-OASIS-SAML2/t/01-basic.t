@@ -23,7 +23,6 @@ cmp_deeply([sort keys %URN::OASIS::SAML2::EXPORT_TAGS], \@export_tags,          
 cmp_deeply($URN::OASIS::SAML2::EXPORT_TAGS{all},        [@URN::OASIS::SAML2::EXPORT_OK], "All exports everything");
 
 my $saml2   = 'urn:oasis:names:tc:SAML:2.0:';
-my $saml1_1 = 'urn:oasis:names:tc:SAML:1.1:';
 
 my %exports = (
     BINDING_HTTP_POST     => $saml2 . 'bindings:HTTP-POST',
@@ -56,17 +55,18 @@ my %exports = (
     URN_PROTOCOL_LOGOUT_REQUEST    => $saml2 . 'protocol' . ':LogoutRequest',
     URN_PROTOCOL_RESPONSE          => $saml2 . 'protocol' . ':Response',
 
-    NAMEID_FORMAT        => $saml1_1 . 'nameid-format',
-    NAMEID_FORMAT_ENTITY => $saml1_1 . 'nameid-format-entity',
-    NAMEID_EMAIL         => $saml1_1 . 'nameid-format:emailAddress',
-    NAMEID_TRANSIENT     => $saml1_1 . 'nameid-format:transient',
-    NAMEID_PERSISTENT    => $saml1_1 . 'nameid-format:persistent',
+    NAMEID_FORMAT        => $saml2 . 'nameid-format',
+    NAMEID_FORMAT_ENTITY => $saml2 . 'nameid-format-entity',
+    NAMEID_EMAIL         => $saml2 . 'nameid-format:emailAddress',
+    NAMEID_TRANSIENT     => $saml2 . 'nameid-format:transient',
+    NAMEID_PERSISTENT    => $saml2 . 'nameid-format:persistent',
 
     STATUS_AUTH_FAILED    => $saml2 . 'status:AuthnFailed',
     STATUS_REQUESTER      => $saml2 . 'status:Requester',
     STATUS_REQUEST_DENIED => $saml2 . 'status:RequestDenied',
     STATUS_RESPONDER      => $saml2 . 'status:Responder',
     STATUS_SUCCESS        => $saml2 . 'status:Success',
+    STATUS_PARTIAL_LOGOUT => $saml2 . 'status:PartialLogout',
 );
 
 my @exports = sort keys %exports;

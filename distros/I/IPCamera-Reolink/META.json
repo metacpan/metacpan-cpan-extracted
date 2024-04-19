@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Data::Dump" : "0",
+            "IO::Socket::SSL" : "0",
             "JSON" : "0",
             "REST::Client" : "0",
             "Time::HiRes" : "0",
@@ -49,6 +50,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

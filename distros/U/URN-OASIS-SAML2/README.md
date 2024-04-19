@@ -74,4 +74,5 @@ This module provides constants which are in use by the SAML2 implementation.
         STATUS_REQUEST_DENIED
         STATUS_RESPONDER
         STATUS_SUCCESS
+        STATUS_PARTIAL_LOGOUT
     );

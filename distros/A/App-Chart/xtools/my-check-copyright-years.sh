@@ -83,6 +83,7 @@ do
     | devel/devel/a341258-lazy-reverse.txt \
     | devel/a341258-lazy-reverse.txt \
     | oeis/a002251-Wythoff-LU-swap.txt \
+    | debian/user-background-jobs.conf \
     | */*/b3*.txt \
     | */*/saved-state.txt \
     | oeis/a159917-Zeckendorf-low2digits.txt \

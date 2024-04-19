@@ -1,5 +1,14 @@
 Revision history for CXC-Exporter-Util
 
+0.08      2024-04-18 15:48:13-04:00 America/New_York
+
+  [BACKWARDS COMPAT]
+
+    * introduce backwards compatibility for fix in 0.06 (which
+      corrected misspelling of exporter tag 'constant_funcs' as
+      'constants_funcs'), as it seems its use is out in the wilds.
+
+
 0.07      2024-04-16 11:35:06-04:00 America/New_York
 
   [PORTABILITY]

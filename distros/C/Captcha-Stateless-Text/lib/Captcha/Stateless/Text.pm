@@ -18,7 +18,7 @@ use Lingua::EN::Nums2Words;      # From CPAN (cpanm Lingua::EN::Nums2Words)
 $Data::Dumper::Sortkeys = 1;
 Lingua::EN::Nums2Words::set_case('lower');
 
-our $VERSION = "0.1";
+our $VERSION = "0.2";
 sub Version { $VERSION; }
 
 my %QAfuncs = {}; # Holds our private __ANON__ subroutines

@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2023 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2023, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -33,7 +33,7 @@ use GT::DateTime;
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-our $VERSION = 271;
+our $VERSION = 272;
 
 # extra appended to GT::Prices elements giving the tdate etc corresponding
 # to the $DATE element
@@ -207,7 +207,7 @@ L<http://user42.tuxfamily.org/chart/index.html>
 
 =head1 LICENCE
 
-Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2023 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2023, 2024 Kevin Ryde
 
 Chart is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software

@@ -3,7 +3,7 @@ package DateTime::Locale::Catalog;
 use strict;
 use warnings;
 
-our $VERSION = '1.41';
+our $VERSION = '1.42';
 
 1;
 
@@ -21,7 +21,7 @@ DateTime::Locale::Catalog - Provides a catalog of all valid locale names
 
 =head1 VERSION
 
-version 1.41
+version 1.42
 
 =head1 DESCRIPTION
 
@@ -525,7 +525,7 @@ The available locales are:
  hi               Hindi                                             हिन्दी
  hi-IN            Hindi India                                       हिन्दी भारत
  hi-Latn          Hindi Latin                                       Hindi Latin
- hi-Latn-IN       Hindi India Latin                                 Hindi India Latin
+ hi-Latn-IN       Hindi India Latin                                 Hindi Bharat Latin
  hnj              Hmong Njua                                        𞄀𞄄𞄰𞄩𞄍𞄜𞄰
  hnj-Hmnp         Hmong Njua Nyiakeng Puachue Hmong                 𞄀𞄄𞄰𞄩𞄍𞄜𞄰
  hnj-Hmnp-US      Hmong Njua United States Nyiakeng Puachue Hmong   𞄀𞄄𞄰𞄩𞄍𞄜𞄰 𞄒𞄫𞄱𞄔𞄩𞄴

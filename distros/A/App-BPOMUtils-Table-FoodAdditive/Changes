@@ -1,3 +1,8 @@
+0.019   2024-04-19  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add short alias for bpom-list-food-additives: bpomfa.
+
+
 0.018   2024-04-09  Released-By: PERLANCAR; Urgency: medium
 
         - Use the more complete data from idn_bpom_bahan_tambahan_pangan2

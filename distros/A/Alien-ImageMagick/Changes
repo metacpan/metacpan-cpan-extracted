@@ -1,5 +1,10 @@
 Revision history for Alien-ImageMagick
 
+0.10    2024-04-18
+        - Support pinned versions of ImageMagick (Thanks to Breno Oliveira)
+        - Support latest version of ImageMagick (7.1.1-30)
+        - Added github actions to test releases
+
 0.09    2022-06-28
         Update source download link. Thanks to Tim for warning me. 
 

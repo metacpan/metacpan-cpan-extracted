@@ -21,11 +21,11 @@ use namespace::autoclean;
 use File::ShareDir qw( dist_file );
 use File::Spec;
 
-our $VERSION = '1.41';
+our $VERSION = '1.42';
 
 #<<<
 ### :start CLDRVersion:
-our $CLDRVersion = 44.1;
+our $CLDRVersion = 45;
 ### :end CLDRVersion:
 #>>>
 
@@ -34,7 +34,7 @@ our $CLDRVersion = 44.1;
 our %LanguageCodes = (
   aa => "Afar",
   ab => "Abkhazian",
-  ace => "Achinese",
+  ace => "Acehnese",
   ach => "Acoli",
   ada => "Adangme",
   ady => "Adyghe",
@@ -3592,7 +3592,7 @@ our %NativeNames = (
   "Hausa Nijeriya" => "ha-NG",
   Hibena => "bez",
   "Hibena Hutanzania" => "bez-TZ",
-  "Hindi India Latin" => "hi-Latn-IN",
+  "Hindi Bharat Latin" => "hi-Latn-IN",
   "Hindi Latin" => "hi-Latn",
   Ichibemba => "bem",
   "Ichibemba Zambia" => "bem-ZM",
@@ -5332,7 +5332,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => "44.1",
+    version => 45,
   },
   en => {
     am_pm_abbreviated => [
@@ -5612,7 +5612,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss\N{U+202f}a",
     time_format_short => "h:mm\N{U+202f}a",
     variant => undef,
-    version => "44.1",
+    version => 45,
   },
   "en-CA" => {
     am_pm_abbreviated => [
@@ -5898,7 +5898,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss\N{U+202f}a",
     time_format_short => "h:mm\N{U+202f}a",
     variant => undef,
-    version => "44.1",
+    version => 45,
   },
   "en-US" => {
     am_pm_abbreviated => [
@@ -6178,7 +6178,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss\N{U+202f}a",
     time_format_short => "h:mm\N{U+202f}a",
     variant => undef,
-    version => "44.1",
+    version => 45,
   },
   es => {
     am_pm_abbreviated => [
@@ -6462,7 +6462,7 @@ my %LocaleData = (
     time_format_medium => "H:mm:ss",
     time_format_short => "H:mm",
     variant => undef,
-    version => "44.1",
+    version => 45,
   },
   "fr-FR" => {
     am_pm_abbreviated => [
@@ -6735,7 +6735,7 @@ my %LocaleData = (
     time_format_medium => "HH:mm:ss",
     time_format_short => "HH:mm",
     variant => undef,
-    version => "44.1",
+    version => 45,
   },
   hi => {
     am_pm_abbreviated => [
@@ -7012,7 +7012,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => "44.1",
+    version => 45,
   },
   "ja-JP" => {
     am_pm_abbreviated => [
@@ -7290,7 +7290,7 @@ my %LocaleData = (
     time_format_medium => "H:mm:ss",
     time_format_short => "H:mm",
     variant => undef,
-    version => "44.1",
+    version => 45,
   },
   "pt-BR" => {
     am_pm_abbreviated => [
@@ -7568,7 +7568,7 @@ my %LocaleData = (
     time_format_medium => "HH:mm:ss",
     time_format_short => "HH:mm",
     variant => undef,
-    version => "44.1",
+    version => 45,
   },
   "zh-Hans-CN" => {
     am_pm_abbreviated => [
@@ -7842,7 +7842,7 @@ my %LocaleData = (
     time_format_medium => "HH:mm:ss",
     time_format_short => "HH:mm",
     variant => undef,
-    version => "44.1",
+    version => 45,
   },
   "zh-Hant-TW" => {
     am_pm_abbreviated => [
@@ -8116,7 +8116,7 @@ my %LocaleData = (
     time_format_medium => "Bh:mm:ss",
     time_format_short => "Bh:mm",
     variant => undef,
-    version => "44.1",
+    version => 45,
   },
 );
 ### :end LocaleData:
@@ -8183,7 +8183,7 @@ DateTime::Locale::Data - Locale data generated from CLDR
 
 =head1 VERSION
 
-version 1.41
+version 1.42
 
 =head1 DESCRIPTION
 

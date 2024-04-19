@@ -114,27 +114,27 @@
    "provides" : {
       "DateTime::Locale" : {
          "file" : "lib/DateTime/Locale.pm",
-         "version" : "1.41"
+         "version" : "1.42"
       },
       "DateTime::Locale::Base" : {
          "file" : "lib/DateTime/Locale/Base.pm",
-         "version" : "1.41"
+         "version" : "1.42"
       },
       "DateTime::Locale::Catalog" : {
          "file" : "lib/DateTime/Locale/Catalog.pm",
-         "version" : "1.41"
+         "version" : "1.42"
       },
       "DateTime::Locale::Data" : {
          "file" : "lib/DateTime/Locale/Data.pm",
-         "version" : "1.41"
+         "version" : "1.42"
       },
       "DateTime::Locale::FromData" : {
          "file" : "lib/DateTime/Locale/FromData.pm",
-         "version" : "1.41"
+         "version" : "1.42"
       },
       "DateTime::Locale::Util" : {
          "file" : "lib/DateTime/Locale/Util.pm",
-         "version" : "1.41"
+         "version" : "1.42"
       }
    },
    "release_status" : "stable",
@@ -150,7 +150,7 @@
       },
       "x_MailingList" : "datetime@perl.org"
    },
-   "version" : "1.41",
+   "version" : "1.42",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -379,7 +379,7 @@
                }
             },
             "name" : "@DROLSKY/Dist::Zilla::PluginBundle::DROLSKY",
-            "version" : "0.058"
+            "version" : "0.060"
          },
          {
             "class" : "Dist::Zilla::Plugin::PromptIfStale",
@@ -405,7 +405,7 @@
                }
             },
             "name" : "@DROLSKY/PromptIfStale",
-            "version" : "0.058"
+            "version" : "0.060"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::PodSpelling",
@@ -2423,8 +2423,7 @@
                      "Caddo",
                      "Caggal",
                      "Caicos",
-                     "Cakcuse",
-                     "Cako",
+                     "Cak\u02bccuse",
                      "Caledonia",
                      "Cam",
                      "Cambodia",
@@ -5518,6 +5517,7 @@
                      "Nepali",
                      "Netherlands",
                      "Nettv",
+                     "Nettv\u02bccako",
                      "Nevis",
                      "New",
                      "Ngat",
@@ -13251,7 +13251,6 @@
                      "\u0baa\u0bbf",
                      "\u0baa\u0bbf\u0baa\u0bcd",
                      "\u0baa\u0bbf\u0baa\u0bcd\u0bb0\u0bb5\u0bb0\u0bbf",
-                     "\u0baa\u0bbf\u0bb1\u0bcd\u0baa\u0b95\u0bb2\u0bcd",
                      "\u0baa\u0bc1",
                      "\u0baa\u0bc1\u0ba4",
                      "\u0baa\u0bc1\u0ba4\u0ba9\u0bcd",
@@ -15099,7 +15098,7 @@
                }
             },
             "name" : "@DROLSKY/Git::Contributors",
-            "version" : "0.036"
+            "version" : "0.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::SurgicalPodWeaver",
@@ -15466,7 +15465,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.41",
+                  "tag" : "v1.42",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

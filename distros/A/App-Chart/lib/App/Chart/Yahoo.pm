@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011, 2015, 2016, 2017, 2019, 2020, 2023 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2015, 2016, 2017, 2019, 2020, 2023, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -423,8 +423,7 @@ sub daily_download {
       my $resp = App::Chart::Download->get ($url,
                                             allow_401 => 1,
                                             allow_404 => 1,
-                                            cookie_jar => $jar,
-                                           );
+                                            cookie_jar => $jar);
       if ($resp->code == 401) {
         if (++$crumb_errors >= 2) { die "Yahoo: crumb authorization failed"; }
         App::Chart::Database->write_extra ('', 'yahoo-daily-cookies', undef);
@@ -668,17 +667,22 @@ sub pad_decimals {
 # Could hard-code something likely here, but better to go from the symbol
 # which is wanted.
 # 
+# As of April 2024, some User-Agent strings result in 503 Service Unavailable.
+# Doesn't seem to affect other download parts, just this cookie/crumb
+# getting part.  "Mozilla/5.0" works.
+# 
 sub daily_cookie_data {
   my ($symbol) = @_;
   require App::Chart::Pagebits;
   $symbol = URI::Escape::uri_escape($symbol);
   return App::Chart::Pagebits::get
-    (name      => __('Yahoo daily cookie'),
-     url       => "https://finance.yahoo.com/quote/$symbol/history?p=$symbol",
-     key       => 'yahoo-daily-cookies',
-     freq_days => 3,
-     parse     => \&daily_cookie_parse,
-     allow_404 => 1);
+    (name       => __('Yahoo daily cookie'),
+     url        => "https://finance.yahoo.com/quote/$symbol/history?p=$symbol",
+     key        => 'yahoo-daily-cookies',
+     freq_days  => 3,
+     parse      => \&daily_cookie_parse,
+     user_agent => 'Mozilla/5.0',
+     allow_404  => 1);
 }
 sub daily_cookie_parse {
   my ($content, $resp) = @_;

@@ -4,7 +4,7 @@
       "Jerome Eteve <jerome.eteve@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -38,7 +38,7 @@
    "provides" : {
       "Alien::ImageMagick" : {
          "file" : "lib/Alien/ImageMagick.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "url" : "https://github.com/jeteve/Alien-ImageMagick"
       }
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 4.10"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

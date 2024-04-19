@@ -1,5 +1,12 @@
 Revision history for URN-OASIS-SAML2
 
+0.004     2024-04-18 19:50:56Z
+
+    * Add PartialLogout status
+
+    * Bump NAMEID_FORMAT constants to SAML 2 namespace. They were
+      previously in SAML 1.1 namespace, which was incorrect.
+
 0.003     2022-07-30 16:17:14Z
 
     * Add new constants for nameid's and status

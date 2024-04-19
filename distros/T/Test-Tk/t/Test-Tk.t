@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 BEGIN { use_ok('Test::Tk') };
 
 package AccessorTest;
@@ -78,7 +78,9 @@ push @tests, (
 	[sub { return \@list1 }, \@list2, 'list testing'],
 	[sub { return \%chash1 }, \%chash2, 'complex hash testing'],
 	[sub { return \@clist1 }, \@clist2, 'complex list testing'],
+	[sub { pause(500); return 1 }, 1, 'paused 500 ms'],
 );
 
 starttesting;
+
 

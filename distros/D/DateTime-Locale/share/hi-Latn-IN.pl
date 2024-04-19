@@ -235,9 +235,9 @@
   ],
   name => "Hindi India Latin",
   native_language => "Hindi",
-  native_name => "Hindi India Latin",
+  native_name => "Hindi Bharat Latin",
   native_script => "Latin",
-  native_territory => "India",
+  native_territory => "Bharat",
   native_variant => undef,
   quarter_format_abbreviated => [
     "Q1",
@@ -282,5 +282,5 @@
   time_format_medium => "h:mm:ss\N{U+202f}a",
   time_format_short => "h:mm\N{U+202f}a",
   variant => undef,
-  version => "44.1",
+  version => 45,
 }

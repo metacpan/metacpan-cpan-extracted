@@ -3,9 +3,9 @@ NAME
     BPOM
 
 VERSION
-    This document describes version 0.018 of
+    This document describes version 0.019 of
     App::BPOMUtils::Table::FoodAdditive (from Perl distribution
-    App-BPOMUtils-Table-FoodAdditive), released on 2024-04-10.
+    App-BPOMUtils-Table-FoodAdditive), released on 2024-04-19.
 
 DESCRIPTION
     This distribution contains the following CLIs:
@@ -13,6 +13,8 @@ DESCRIPTION
     *   bpom-daftar-bahan-tambahan-pangan
 
     *   bpom-list-food-additives
+
+    *   bpomfa
 
 FUNCTIONS
   bpom_list_food_additives

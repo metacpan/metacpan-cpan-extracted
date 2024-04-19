@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-04-17'; # DATE
+our $DATE = '2024-04-18'; # DATE
 our $DIST = 'App-QRCodeUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our %SPEC;
 
@@ -67,7 +67,7 @@ sub gen_qrcode {
     require QRCode::Any;
 
     my %args = @_;
-    my $format = $args{format};
+    my $format = $args{format} // 'png';
 
     my $filename = $args{filename};
     unless (defined $filename) {
@@ -85,7 +85,7 @@ sub gen_qrcode {
     require Desktop::Open;
     Desktop::Open::open_desktop($filename);
 
-    [200];
+    [200, "OK", undef, {"func.filename"=>$filename}];
 }
 
 1;
@@ -103,7 +103,7 @@ App::QRCodeUtils - Utilities related to QR Code
 
 =head1 VERSION
 
-This document describes version 0.003 of App::QRCodeUtils (from Perl distribution App-QRCodeUtils), released on 2024-04-17.
+This document describes version 0.004 of App::QRCodeUtils (from Perl distribution App-QRCodeUtils), released on 2024-04-18.
 
 =head1 DESCRIPTION
 

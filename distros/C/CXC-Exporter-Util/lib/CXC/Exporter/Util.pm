@@ -7,7 +7,7 @@ use v5.22;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Scalar::Util 'reftype';
 use List::Util 1.45 'uniqstr';
@@ -542,6 +542,8 @@ sub install_constant_tag ( $id, $constants, $package = scalar caller ) {
 
 sub install_constant_func ( $tag, $values, $caller = scalar caller ) {
     add_constant_to_tag( 'constant_funcs', $tag, $values, $caller );
+    # for backwards compatibility
+    _EXPORT_TAGS( $caller )->{constants_funcs} = _EXPORT_TAGS( $caller )->{constant_funcs};
 }
 
 
@@ -619,7 +621,7 @@ CXC::Exporter::Util - Tagged Based Exporting
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

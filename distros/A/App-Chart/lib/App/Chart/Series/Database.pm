@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2023 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2023, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -25,7 +25,7 @@ use App::Chart::Database;
 use App::Chart::DBI;
 use base 'App::Chart::Series::OHLCVI';
 
-our $VERSION = 271;
+our $VERSION = 272;
 
 use constant DEBUG => 0;
 
@@ -290,7 +290,7 @@ L<http://user42.tuxfamily.org/chart/index.html>
 
 =head1 LICENCE
 
-Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2023 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2023, 2024 Kevin Ryde
 
 Chart is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software

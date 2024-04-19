@@ -6,6 +6,7 @@ use strict;
 use warnings;
 
 use REST::Client;
+use IO::Socket::SSL;
 use JSON;
 use Data::Dump;
 use Time::HiRes;
@@ -63,17 +64,20 @@ use constant OSD_LowerRight  => "Lower Right";
 use constant OSD_OtherConfiguration  => "Other Configuration";
 
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 our $DEBUG = 0; # > 0 for debug output to STDERR
 
 sub new {
     my $class = shift;
     my $self = bless({}, $class);
-    my($camera_url, $camera_user_name, $camera_password) = @_;
+    my($camera_url, $camera_user_name, $camera_password, $camera_X509_certificate_file, $camera_X509_key_file, $camera_certificate_authority_file) = @_;
     $self->{CAMERA_URL} = $camera_url;
     $self->{CAMERA_USER_NAME} = $camera_user_name;
     $self->{CAMERA_PASSWORD} = $camera_password;
+    $self->{CAMERA_X509_certificate_file} = $camera_X509_certificate_file;
+    $self->{CAMERA_X509_key_file} = $camera_X509_key_file;
+    $self->{CAMERA_certificate_authority_file} = $camera_certificate_authority_file;
     $self->{_camera_rest_client} = undef; # defer REST connection to camera until first Login()
     $self->{_camera_login_token} = undef;  # pass to other API functions
     $self->{_camera_login_lease_time} = 0; # time in seconds that the login token is valid, force initial Login()
@@ -113,12 +117,15 @@ sub _sendCameraCommand($$$$){
     my $t5 = Time::HiRes::time() if($DEBUG > 1);
     print STDERR "$0: sendCameraCommand(): " . $t5 . ": call JSON::decode_json()\n" if($DEBUG > 1);
 
-    my $response_r = JSON::decode_json($response_content);
+    my $response_r;
+    eval{
+        $response_r = JSON::decode_json($response_content);
+    };
+    print STDERR "$0: sendCameraCommand(): JSON::decode_json() failed - '$@' - responseContent '$response_content'\n" if $@;
+    return undef if $@;
 
-    my $t6 = Time::HiRes::time() if($DEBUG > 1);
-    print STDERR "$0: sendCameraCommand(): " . $t5 . ": exit:()\n" if($DEBUG > 1);
-    my $t7 = Time::HiRes::time() if($DEBUG > 0);
-    print STDERR "$0: sendCameraCommand(): JSON encode " . ($t2 - $t1) . " POST " . ($t3 - $t2) . " responseCode " . ($t4 - $t3) . " responseContent " . ($t5 - $t4) . " JSON decode " . ($t6 - $t5) . " TOTAL " . ($t7 - $t1) . "\n" if($DEBUG > 1);
+    my $t6 = Time::HiRes::time() if($DEBUG > 0);
+    print STDERR "$0: sendCameraCommand(): JSON encode " . ($t2 - $t1) . " POST " . ($t3 - $t2) . " responseCode " . ($t4 - $t3) . " responseContent " . ($t5 - $t4) . " JSON decode " . ($t6 - $t5) . " TOTAL " . ($t6 - $t1) . "\n" if($DEBUG > 1);
     if($DEBUG > 0){
         if($DEBUG > 1){
             my @headers = $camera_rest_client->responseHeaders();
@@ -128,7 +135,7 @@ sub _sendCameraCommand($$$$){
         } # if
         my $save_linewidth = $Data::Dump::LINEWIDTH;
         $Data::Dump::LINEWIDTH = 500; # no linebreak
-        print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand(): command '" . $camera_command . "' token '" . (defined($token) ? $token : 'undef') . "' request '" . Data::Dump::dump($request_r) . "' response '" . Data::Dump::dump($response_r) . "' time " . ($t7 - $t1) . " seconds\n";
+        print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand(): command '" . $camera_command . "' token '" . (defined($token) ? $token : 'undef') . "' request '" . Data::Dump::dump($request_r) . "' response '" . Data::Dump::dump($response_r) . "' time " . ($t6 - $t1) . " seconds\n";
         $Data::Dump::LINEWIDTH = $save_linewidth; 
     } # if
 
@@ -165,9 +172,12 @@ sub _checkLoginLeaseTime($){
 # Login() - provides login credentials (username/password) to camera and returns API access token good for specified number of seconds
 sub Login(){
     my($self) = @_;
-    my($_camera_rest_client, $camera_url, $camera_user_name, $camera_password) = ($self->{_camera_rest_client}, $self->{CAMERA_URL}, $self->{CAMERA_USER_NAME}, $self->{CAMERA_PASSWORD});
+    my($_camera_rest_client, $camera_url, $camera_user_name, $camera_password, $camera_X509_certificate_file, $camera_X509_key_file, $camera_certificate_authority_file) = ($self->{_camera_rest_client}, $self->{CAMERA_URL}, $self->{CAMERA_USER_NAME}, $self->{CAMERA_PASSWORD}, $self->{CAMERA_X509_certificate_file}, $self->{CAMERA_X509_key_file}, $self->{CAMERA_certificate_authority_file});
     if(!defined($_camera_rest_client)){
-        $_camera_rest_client = REST::Client->new(host => $camera_url, timeout => 10, );
+        # disable check for valid certificate matching the expected hostname
+        $_camera_rest_client = REST::Client->new(host => $camera_url, timeout => 10, cert => $camera_X509_certificate_file, key => $camera_X509_key_file, ca => $camera_certificate_authority_file);
+        $_camera_rest_client->getUseragent()->ssl_opts(verify_hostname => 0);
+        $_camera_rest_client->getUseragent()->ssl_opts(SSL_verify_mode => SSL_VERIFY_NONE);
         $self->{_camera_rest_client} = $_camera_rest_client;
     } # if
     my $login_r = [ {cmd => "Login", param => { User => { Version => "0", userName => $camera_user_name, password => $camera_password, }}} ];
@@ -196,12 +206,29 @@ sub Logout(){
     } # if
     my $logout_r = [ {cmd => "Logout", param => { }} ];
     my $response_r = _sendCameraCommand($_camera_rest_client, 'Logout', $logout_r, $_camera_login_token);
+    $self->{_camera_rest_client} = undef;
     if(defined($response_r)){
         return 1; 
     }else{
         return 0;
     } # if
 } # Logout()
+
+# GetChannelstatus() - implement camera API GetChannelstatus interface.
+sub GetChannelstatus($){
+    my($self) = @_;
+    if(!_checkLoginLeaseTime($self)){
+        return undef;
+    } # if
+    my $get_channelstatus_r = [ {cmd => "GetChannelstatus", } ];
+    my($_camera_rest_client, $_camera_login_token) = ($self->{_camera_rest_client}, $self->{_camera_login_token});
+    my $response_r = _sendCameraCommand($_camera_rest_client, 'GetChannelstatus', $get_channelstatus_r, $_camera_login_token);
+    if(defined($response_r)){
+        return (@$response_r[0]->{value}->{count}, @$response_r[0]->{value}->{status});
+    }else{
+        return (undef, undef);
+    } # if
+} # GetChannelstatus()
 
 # GetDevInfo() - implement camera API GetDevInfo interface.
 sub GetDevInfo($){
@@ -316,7 +343,7 @@ IPCamera::Reolink - Reolink API provides access to the System, Security, Network
 
 =head1 VERSION
 
-1.00
+1.02
 
 =head1 SYNOPSIS
 
@@ -350,7 +377,7 @@ IPCamera::Reolink - Reolink API provides access to the System, Security, Network
 
 =head1 DESCRIPTION
 
-IPCamera::Reolink provides a simple way to interact with Reolink IP cameras and NVRs.
+IPCamera::Reolink provides a simple way to interact with Reolink IP cameras and NVRs via the device HTTP(S)/REST interface.
 
 Based on the "Reolink Camera API User Guide_V8 (Updated in April 2023)" document, available here:
 
@@ -438,6 +465,54 @@ Release Login() credentials.
 =item return
 
 Returns 1 if Logout() succeeded else 0 (zero) on failure, typically if Login() not called.
+
+=back
+
+=head2 GetChannelstatus()
+
+Return camera/NVR per channel status.
+
+=over 4
+
+=item return
+
+Returns ($count, $status_r) if GetChannelstatus() succeeded.
+
+=over 4
+
+=item $count
+
+The number of channels in the camera/NVR, typically 1 for a camera.
+
+The number of elements in the I<@status> array.
+
+=item $status_r
+
+reference to Per channel status array with I<$count> elements.
+
+=over 4
+
+=item $statu_r->[$i]->{channel} (0)
+
+Channel index, 0 < $i < $count.
+
+=item $status_r->[$i]->{name} ("CAM1")
+
+Channel name.
+
+=item $status_r->[$i]->{online} (1)
+
+0 if channel offline, 1 if channel online.
+
+=item $status_r->[$i]->{typeInfo} ("CAM1")
+
+Channel description.
+
+=back
+
+=back
+
+Returns (undef, undef)  if GetChannelstatus() failed.
 
 =back
 
@@ -780,7 +855,7 @@ Set Focus to specified pos value.
 
 =over 4
 
-=item camera_focus_pos 
+=item $camera_focus_pos 
 
 Set the camera Focus to the specified pos value in the range:
 
@@ -900,7 +975,7 @@ OSD time display position.
 
 =back
 
-=item osd_range_r
+=item $osd_range_r
 
 Hash reference to camera OSD value ranges.
 
@@ -910,7 +985,7 @@ Hash reference to camera OSD value ranges.
 
 =back
 
-=item osd_initial_r
+=item $osd_initial_r
 
 Hash reference to camera OSD initial values.
 
@@ -954,7 +1029,7 @@ If you are connected to an NVR then there is usually one channel per attached ca
 
 1 to enable display of channelName else 0.
 
-=item channelName ("rlc-823a-16x")
+=item $channelName ("rlc-823a-16x")
 
 Channel OSD text to display
 
@@ -994,7 +1069,7 @@ OSD position "Lower Right"
 
 1 to enable display of date/time else 0.
 
-=item timePos ("Upper Left") 
+=item $timePos ("Upper Left") 
 
 Date/Time OSD text position:
 
@@ -1032,9 +1107,13 @@ OSD position "Lower Right"
 
 =over 4
 
-=item Implememnt REST via HTTPS.
+=item *
 
-=item Camera seems to "forget" existing REST/HTTP(S) session after period of inactivity.
+Implement REST via HTTPS.
+
+=item *
+
+Camera seems to "forget" existing REST/HTTP(S) session after period of inactivity.
 
 =back
 

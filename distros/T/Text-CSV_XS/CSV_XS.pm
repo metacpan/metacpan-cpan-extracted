@@ -1,6 +1,6 @@
 package Text::CSV_XS;
 
-# Copyright (c) 2007-2023 H.Merijn Brand.  All rights reserved.
+# Copyright (c) 2007-2024 H.Merijn Brand.  All rights reserved.
 # Copyright (c) 1998-2001 Jochen Wiedmann. All rights reserved.
 # Copyright (c) 1997 Alan Citterman.       All rights reserved.
 #
@@ -23,7 +23,7 @@ use XSLoader;
 use Carp;
 
 use vars qw( $VERSION @ISA @EXPORT_OK %EXPORT_TAGS );
-$VERSION = "1.53";
+$VERSION = "1.54";
 @ISA     = qw( Exporter );
 XSLoader::load ("Text::CSV_XS", $VERSION);
 
@@ -1795,7 +1795,7 @@ Line termination by a single carriage return is accepted by default
 
 =item *
 
-The separation-, escape-, and escape- characters can be any ASCII character
+The separation-, quote-, and escape character(s) can be any ASCII character
 in the range from  C<0x20> (space) to  C<0x7E> (tilde).  Characters outside
 this range may or may not work as expected.  Multibyte characters, like UTF
 C<U+060C> (ARABIC COMMA),   C<U+FF0C> (FULLWIDTH COMMA),  C<U+241B> (SYMBOL
@@ -1979,6 +1979,9 @@ X<strict>
 
 If this attribute is set to C<1>, any row that parses to a different number
 of fields than the previous row will cause the parser to throw error 2014.
+
+Empty rows or rows that result in no fields (like comment lines) are exempt
+from these checks.
 
 =head3 skip_empty_rows
 X<skip_empty_rows>
@@ -3983,6 +3986,22 @@ will result in
   [ "1",   "2"       ],
   [ "3",   "4",  "5" ]]
 
+=head3 csv
+X<csv>
+
+The I<function>  L</csv> can also be called as a method or with an existing
+Text::CSV_XS object. This could help if the function is to be invoked a lot
+of times and the overhead of creating the object internally over  and  over
+again would be prevented by passing an existing instance.
+
+ my $csv = Text::CSV_XS->new ({ binary => 1, auto_diag => 1 });
+
+ my $aoa = $csv->csv (in => $fh);
+ my $aoa = csv (in => $fh, csv => $csv);
+
+both act the same. Running this 20000 times on a 20 lines CSV file,  showed
+a 53% speedup.
+
 =head2 Callbacks
 X<Callbacks>
 
@@ -4321,21 +4340,6 @@ C<$aoh> will be:
       bar => 2,
       }
     ]
-
-=item csv
-
-The I<function>  L</csv> can also be called as a method or with an existing
-Text::CSV_XS object. This could help if the function is to be invoked a lot
-of times and the overhead of creating the object internally over  and  over
-again would be prevented by passing an existing instance.
-
- my $csv = Text::CSV_XS->new ({ binary => 1, auto_diag => 1 });
-
- my $aoa = $csv->csv (in => $fh);
- my $aoa = csv (in => $fh, csv => $csv);
-
-both act the same. Running this 20000 times on a 20 lines CSV file,  showed
-a 53% speedup.
 
 =back
 
@@ -5156,7 +5160,7 @@ L</csv> function. See ChangeLog releases 0.25 and on.
 
 =head1 COPYRIGHT AND LICENSE
 
- Copyright (C) 2007-2023 H.Merijn Brand.  All rights reserved.
+ Copyright (C) 2007-2024 H.Merijn Brand.  All rights reserved.
  Copyright (C) 1998-2001 Jochen Wiedmann. All rights reserved.
  Copyright (C) 1997      Alan Citterman.  All rights reserved.
 

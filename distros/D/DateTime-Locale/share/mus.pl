@@ -67,8 +67,8 @@
     "Ennvrkvpv",
     "Ennvrkvpv Enhvyvtke",
     "Nak Okkoskv Nettv",
-    "Nettv Cakcuse",
-    "Nettv Cako",
+    "Nettv Cak\N{U+02bc}cuse",
+    "Nettv\N{U+02bc}cako",
   ],
   day_format_narrow => [
     "M",
@@ -85,8 +85,8 @@
     "Ennvrkvpv",
     "Ennvrkvpv Enhvyvtke",
     "Nak Okkoskv Nettv",
-    "Nettv Cakcuse",
-    "Nettv Cako",
+    "Nettv Cak\N{U+02bc}cuse",
+    "Nettv\N{U+02bc}cako",
   ],
   day_stand_alone_abbreviated => [
     "Enhvteceskv",
@@ -94,8 +94,8 @@
     "Ennvrkvpv",
     "Ennvrkvpv Enhvyvtke",
     "Nak Okkoskv Nettv",
-    "Nettv Cakcuse",
-    "Nettv Cako",
+    "Nettv Cak\N{U+02bc}cuse",
+    "Nettv\N{U+02bc}cako",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -112,8 +112,8 @@
     "Ennvrkvpv",
     "Ennvrkvpv Enhvyvtke",
     "Nak Okkoskv Nettv",
-    "Nettv Cakcuse",
-    "Nettv Cako",
+    "Nettv Cak\N{U+02bc}cuse",
+    "Nettv\N{U+02bc}cako",
   ],
   era_abbreviated => [
     "BCE",
@@ -267,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => "44.1",
+  version => 45,
 }

@@ -1,3 +1,9 @@
+0.021   2024-04-19  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add shorter alias for bpom-list-food-ingredients-rba:
+          bpomfi.
+
+
 0.020   2023-09-03  Released-By: PERLANCAR; Urgency: medium
 
         - In --detail mode, show the 'status' column first to make it

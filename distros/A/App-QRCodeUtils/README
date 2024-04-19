@@ -2,8 +2,8 @@ NAME
     App::QRCodeUtils - Utilities related to QR Code
 
 VERSION
-    This document describes version 0.003 of App::QRCodeUtils (from Perl
-    distribution App-QRCodeUtils), released on 2024-04-17.
+    This document describes version 0.004 of App::QRCodeUtils (from Perl
+    distribution App-QRCodeUtils), released on 2024-04-18.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:

@@ -36,22 +36,22 @@ no_index:
 provides:
   DateTime::Locale:
     file: lib/DateTime/Locale.pm
-    version: '1.41'
+    version: '1.42'
   DateTime::Locale::Base:
     file: lib/DateTime/Locale/Base.pm
-    version: '1.41'
+    version: '1.42'
   DateTime::Locale::Catalog:
     file: lib/DateTime/Locale/Catalog.pm
-    version: '1.41'
+    version: '1.42'
   DateTime::Locale::Data:
     file: lib/DateTime/Locale/Data.pm
-    version: '1.41'
+    version: '1.42'
   DateTime::Locale::FromData:
     file: lib/DateTime/Locale/FromData.pm
-    version: '1.41'
+    version: '1.42'
   DateTime::Locale::Util:
     file: lib/DateTime/Locale/Util.pm
-    version: '1.41'
+    version: '1.42'
 requires:
   Carp: '0'
   Dist::CheckConflicts: '0.02'
@@ -72,7 +72,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/DateTime-Locale/issues
   homepage: https://metacpan.org/release/DateTime-Locale
   repository: git://github.com/houseabsolute/DateTime-Locale.git
-version: '1.41'
+version: '1.42'
 x_Dist_Zilla:
   perl:
     version: '5.038002'
@@ -249,7 +249,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@DROLSKY/Dist::Zilla::PluginBundle::DROLSKY'
-      version: '0.058'
+      version: '0.060'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -271,7 +271,7 @@ x_Dist_Zilla:
             - Dist::Zilla::Plugin::DROLSKY::WeaverConfig
             - Pod::Weaver::PluginBundle::DROLSKY
       name: '@DROLSKY/PromptIfStale'
-      version: '0.058'
+      version: '0.060'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
@@ -2287,8 +2287,7 @@ x_Dist_Zilla:
             - Caddo
             - Caggal
             - Caicos
-            - Cakcuse
-            - Cako
+            - Cakʼcuse
             - Caledonia
             - Cam
             - Cambodia
@@ -5382,6 +5381,7 @@ x_Dist_Zilla:
             - Nepali
             - Netherlands
             - Nettv
+            - Nettvʼcako
             - Nevis
             - New
             - Ngat
@@ -13115,7 +13115,6 @@ x_Dist_Zilla:
             - பி
             - பிப்
             - பிப்ரவரி
-            - பிற்பகல்
             - பு
             - புத
             - புதன்
@@ -14925,7 +14924,7 @@ x_Dist_Zilla:
           order_by: name
           paths: []
       name: '@DROLSKY/Git::Contributors'
-      version: '0.036'
+      version: '0.037'
     -
       class: Dist::Zilla::Plugin::SurgicalPodWeaver
       config:
@@ -15211,7 +15210,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.41
+          tag: v1.42
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

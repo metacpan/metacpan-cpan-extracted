@@ -1,6 +1,6 @@
 # Download functions.
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2013, 2015, 2016, 2017, 2018, 2020, 2023 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2013, 2015, 2016, 2017, 2018, 2020, 2023, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #

@@ -11,6 +11,7 @@ dist.ini
 lib/App/BPOMUtils/Table/FoodAdditive.pm
 script/bpom-daftar-bahan-tambahan-pangan
 script/bpom-list-food-additives
+script/bpomfa
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

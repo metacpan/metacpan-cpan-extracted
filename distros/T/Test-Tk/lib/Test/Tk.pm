@@ -3,7 +3,7 @@ package Test::Tk;
 
 use strict;
 use warnings;
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 
 use Config;
 use Test::More;
@@ -22,6 +22,7 @@ our @EXPORT = qw(
 	createapp
 	hashcompare
 	listcompare
+	pause
 	starttesting
 	testaccessors
 );
@@ -85,6 +86,7 @@ sub hashcompare {
 
 sub listcompare {
 	my ($l1, $l2) = @_;;
+	warn "Depricated 'listcompare', use Test::Deep";
 	my $size1 = @$l1;
 	my $size2 = @$l2;
 	if ($size1 ne $size2) { return 0 }
@@ -102,6 +104,14 @@ sub listcompare {
 		}
 	}
 	return 1
+}
+
+sub pause {
+	return unless defined $app;
+	my $milisecs = shift;
+	my $var = 1;
+	$app->after($milisecs, sub { $var = 0 });
+	$app->waitVariable(\$var);
 }
 
 sub starttesting {
@@ -249,6 +259,10 @@ Depricated, use Test::Deep or Data::Compare.
 
 Depricated, use Test::Deep or Data::Compare.
 
+=item B<pause>I<($miliseconds)>
+
+Pauses the app for $miliseconds, allowing background processes to finish.
+
 =item B<starttesting>
 
 Launches the main loop and sets a timer with delay B<$delay> to start
@@ -292,3 +306,4 @@ it under the same terms as Perl itself, either Perl version 5.34.0 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
+

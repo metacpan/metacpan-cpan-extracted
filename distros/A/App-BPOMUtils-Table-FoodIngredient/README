@@ -3,9 +3,9 @@ NAME
     processed food division
 
 VERSION
-    This document describes version 0.020 of
+    This document describes version 0.021 of
     App::BPOMUtils::Table::FoodIngredient (from Perl distribution
-    App-BPOMUtils-Table-FoodIngredient), released on 2023-09-03.
+    App-BPOMUtils-Table-FoodIngredient), released on 2024-04-19.
 
 DESCRIPTION
     This distribution contains the following CLIs:
@@ -17,6 +17,8 @@ DESCRIPTION
     *   bpom-list-food-ingredients-old
 
     *   bpom-list-food-ingredients-rba
+
+    *   bpomfi
 
 FUNCTIONS
   bpom_list_food_ingredients_old
@@ -556,7 +558,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2023 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

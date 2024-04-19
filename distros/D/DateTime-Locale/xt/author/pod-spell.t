@@ -2020,8 +2020,7 @@ Caamsa
 Caddo
 Caggal
 Caicos
-Cakcuse
-Cako
+Cakʼcuse
 Caledonia
 Cam
 Cambodia
@@ -5126,6 +5125,7 @@ Nepal
 Nepali
 Netherlands
 Nettv
+Nettvʼcako
 Nevis
 New
 Ngat
@@ -13609,7 +13609,6 @@ zómi
 பி
 பிப்
 பிப்ரவரி
-பிற்பகல்
 பு
 புத
 புதன்

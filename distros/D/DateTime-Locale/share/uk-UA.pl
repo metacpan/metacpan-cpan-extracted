@@ -60,7 +60,7 @@
     "yw-count-other" => "w-'\N{U+0439}' '\N{U+0442}\N{U+0438}\N{U+0436}'. Y '\N{U+0440}'.",
   },
   code => "uk-UA",
-  date_format_full => "EEEE, d MMMM y\N{U+202f}'\N{U+0440}'.",
+  date_format_full => "cccc, d MMMM y\N{U+202f}'\N{U+0440}'.",
   date_format_long => "d MMMM y\N{U+202f}'\N{U+0440}'.",
   date_format_medium => "d MMM y\N{U+202f}'\N{U+0440}'.",
   date_format_short => "dd.MM.yy",
@@ -274,5 +274,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => "44.1",
+  version => 45,
 }

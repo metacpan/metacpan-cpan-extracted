@@ -62,7 +62,7 @@
    "provides" : {
       "App::BPOMUtils::Table::FoodAdditive" : {
          "file" : "lib/App/BPOMUtils/Table/FoodAdditive.pm",
-         "version" : "0.018"
+         "version" : "0.019"
       }
    },
    "release_status" : "stable",
@@ -77,7 +77,7 @@
          "web" : "https://github.com/perlancar/perl-App-BPOMUtils-Table-FoodAdditive"
       }
    },
-   "version" : "0.018",
+   "version" : "0.019",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -91,6 +91,11 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript bpom-list-food-additives",
+            "version" : "0.425"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript bpomfa",
             "version" : "0.425"
          },
          {

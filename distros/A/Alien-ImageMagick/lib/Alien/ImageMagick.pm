@@ -12,11 +12,11 @@ Alien::ImageMagick - cpanm compatible Image::Magick packaging.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 DESCRIPTION
 
@@ -26,8 +26,11 @@ compatible with cpanm ( L<https://metacpan.org/pod/distribution/App-cpanminus/bi
 and perlbrew ( L<https://metacpan.org/pod/distribution/App-perlbrew/bin/perlbrew> ).
 
 Installing it will download and install the B<freshest image magick library and Perl interface>
-from the official Image magick website ( See L<http://www.imagemagick.org/script/install-source.php> )
+from the official Image Magick website ( See L<http://www.imagemagick.org/script/install-source.php> )
 in a way that is compatible with perlbrew and/or cpanm.
+
+Alternatively, you may use the environment variable C<PERL_ALIEN_IMAGEMAGICK_VERSION>
+to pin a particular version of Image Magick (e.g. "7.1.1-30").
 
 If you use cpanm or perlbrew, this will not conflict with your system's Image Magick installation.
 
@@ -65,6 +68,10 @@ package.
 
 =back
 
+To install a specific version of ImageMagick run C<Build.PL> with the C<PERL_ALIEN_IMAGEMAGICK_VERSION> environment variable:
+
+   PERL_ALIEN_IMAGEMAGICK_VERSION=7.1.1-29 perl Build.PL
+
 =head1 SYNOPSIS
 
   use Image::Magick
@@ -98,9 +105,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * GitHub issues (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-ImageMagick>
+L<https://github.com/jeteve/Alien-ImageMagick/issues/>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -118,7 +125,7 @@ L<http://search.cpan.org/dist/Alien-ImageMagick/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014 Jerome Eteve.
+Copyright 2014-2024 Jerome Eteve.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

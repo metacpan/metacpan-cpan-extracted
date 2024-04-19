@@ -15,7 +15,8 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-BPOMUtils-Table-FoodAdditive",
   "EXE_FILES" => [
     "script/bpom-daftar-bahan-tambahan-pangan",
-    "script/bpom-list-food-additives"
+    "script/bpom-list-food-additives",
+    "script/bpomfa"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
@@ -42,7 +43,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.018",
+  "VERSION" => "0.019",
   "test" => {
     "TESTS" => "t/*.t"
   }

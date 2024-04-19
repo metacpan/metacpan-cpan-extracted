@@ -19,7 +19,7 @@ ok( lives { $obj->clear }, 'clear' ) or note $@;
 is( $obj->$_, undef, "$_ unset after clear" ) for ( qw( secret secret32 issuer key_id ) );
 
 ok( $obj->qr_code =~ m|
-    https://chart.googleapis.com/chart
+    https://quickchart.io/chart
     \?
     chs=200x200&cht=qr&chl=
     otpauth%3A%2F%2Ftotp%2FUndefined%3AUndefined%3Fsecret%3D
@@ -28,7 +28,7 @@ ok( $obj->qr_code =~ m|
 |x, 'qr_code from clear state' );
 
 ok( $obj->qr_code( 'bv5o3disbutz4tl3', 'gryphon@cpan.org', 'Gryphon Shafer' ) =~ m|
-    https://chart.googleapis.com/chart
+    https://quickchart.io/chart
     \?
     chs=200x200&cht=qr&chl=
     otpauth%3A%2F%2Ftotp%2FGryphon%2520Shafer%3Agryphon%2540cpan.org%3Fsecret%3D

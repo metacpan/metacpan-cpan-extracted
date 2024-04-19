@@ -10,9 +10,9 @@ use Exporter 'import';
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2024-04-19'; # DATE
 our $DIST = 'App-BPOMUtils-Table-FoodIngredient'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_list_food_ingredients_old
@@ -20983,7 +20983,7 @@ App::BPOMUtils::Table::FoodIngredient - List ingredients in BPOM processed food 
 
 =head1 VERSION
 
-This document describes version 0.020 of App::BPOMUtils::Table::FoodIngredient (from Perl distribution App-BPOMUtils-Table-FoodIngredient), released on 2023-09-03.
+This document describes version 0.021 of App::BPOMUtils::Table::FoodIngredient (from Perl distribution App-BPOMUtils-Table-FoodIngredient), released on 2024-04-19.
 
 =head1 DESCRIPTION
 
@@ -20998,6 +20998,8 @@ This distribution contains the following CLIs:
 =item * L<bpom-list-food-ingredients-old>
 
 =item * L<bpom-list-food-ingredients-rba>
+
+=item * L<bpomfi>
 
 =back
 
@@ -21470,7 +21472,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

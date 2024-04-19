@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
         'JSON' => '0',
         'Data::Dump' => '0',
         'Time::HiRes' => '0',
+        'IO::Socket::SSL' => '0',
         "constant" => '0',
         "strict" => '0',
         "warnings" => '0',

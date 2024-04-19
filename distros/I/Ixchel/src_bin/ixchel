@@ -28,16 +28,21 @@ If this is undef, it will be set to 'list_actions'.
 
 The config file to load. May be JSON, YAML, or TOML.
 If not specified the first one found below is used.
+If it is not found, a empty hash is used.
 
-    Default: /usr/local/etc/ixchel/server.ymal
-             /usr/local/etc/ixchel/server.toml
+    Default: /usr/local/etc/ixchel/server.yaml
              /usr/local/etc/ixchel/server.json
+             /usr/local/etc/ixchel/server.toml
+
+This option will be ignored if --noConfig specified.
 
 =head2 --noConfig
 
 Do not attempt to load the config even if it exists.
 
 This is automatic for the action 'list_actions' and 'sys_info'
+
+The option --config will be ignored if this is specified.
 
 =head1 ENVIROMENTAL VARIABLES
 
@@ -100,9 +105,10 @@ if ($help) {
 
 --config <file>   The config file to load. May be JSON, YAML, or TOML.
                   If not specified the first one found below is used.
-                  Default: /usr/local/etc/ixchel/server.ymal
-                           /usr/local/etc/ixchel/server.toml
+                  If it is not found, a empty hash is used.
+                  Default: /usr/local/etc/ixchel/server.yaml
                            /usr/local/etc/ixchel/server.json
+                           /usr/local/etc/ixchel/server.toml
 
 --noConfig        Do not attempt to load the config even if it exists.
 
@@ -130,10 +136,10 @@ For a list of actions use the action list_actions
 if ( !defined($config_file) ) {
 	if ( -e '/usr/local/etc/ixchel/server.yaml' ) {
 		$config_file = '/usr/local/etc/ixchel/server.yaml';
+	} elsif ( -e '/usr/local/etc/ixchel/server.json' ) {
+		$config_file = '/usr/local/etc/ixchel/server.json';
 	} elsif ( -e '/usr/local/etc/ixchel/server.toml' ) {
 		$config_file = '/usr/local/etc/ixchel/server.toml';
-	} elsif ('/usr/local/etc/ixchel/server.json') {
-		$config_file = '/usr/local/etc/ixchel/server.json';
 	}
 }
 
@@ -143,7 +149,7 @@ if ( $action eq 'list_actions' || $action eq 'sys_info' ) {
 }
 
 my $parsed_config;
-if ( defined($config_file) && -e $config_file ) {
+if ( defined($config_file) && -e $config_file && !$noConfig ) {
 
 	my $raw_config = read_file($config_file) || die( 'Failed to read "' . $config_file . '"' );
 
@@ -173,6 +179,8 @@ if ( defined($config_file) && -e $config_file ) {
 	} ## end elsif ( $config_file =~ /[Tt][Oo][Mm][Ll]$/ )
 } elsif ( defined($config_file) && !-e $config_file && !$noConfig ) {
 	die( '"' . $config_file . '" does not exist and --noConfig is not specified' );
+} else {
+	$parsed_config = {};
 }
 
 my $i = Ixchel->new( config => $parsed_config );

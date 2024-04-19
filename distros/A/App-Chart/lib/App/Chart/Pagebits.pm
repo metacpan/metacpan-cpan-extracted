@@ -1,6 +1,6 @@
 # Web page download and cache.
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2017 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2017, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -51,6 +51,7 @@ sub get {
        etag          => $h->{'ETag'},
        last_modified => $h->{'Last-Modified'},
        allow_404     => $options{'allow_404'},
+       user_agent    => $options{'user_agent'},
       );
 
     if ($options{'allow_404'} && $resp->code == 404) {
