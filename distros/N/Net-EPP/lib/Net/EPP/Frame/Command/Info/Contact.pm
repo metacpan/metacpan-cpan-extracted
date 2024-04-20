@@ -52,12 +52,12 @@ This results in an XML document like this:
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = bless($package->SUPER::new('info'), $package);
+    my $package = shift;
+    my $self    = bless($package->SUPER::new('info'), $package);
 
-	my $contact = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('contact'));
+    my $contact = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('contact'));
 
-	return $self;
+    return $self;
 }
 
 =pod
@@ -71,14 +71,14 @@ This specifies the contact object for which information is being requested.
 =cut
 
 sub setContact {
-	my ($self, $id) = @_;
+    my ($self, $id) = @_;
 
-	my $name = $self->createElement('contact:id');
-	$name->appendText($id);
+    my $name = $self->createElement('contact:id');
+    $name->appendText($id);
 
-	$self->getNode('info')->getChildNodes->shift->appendChild($name);
+    $self->getNode('info')->getChildNodes->shift->appendChild($name);
 
-	return 1;
+    return 1;
 }
 
 1;

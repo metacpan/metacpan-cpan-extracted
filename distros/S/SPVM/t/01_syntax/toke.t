@@ -24,8 +24,6 @@ use MyTest qw(compile_not_ok_file compile_not_ok);
 
 use Test::More;
 
-# Compilation Errors in spvm_toke.c 
-
 # Line Directive
 {
   {
@@ -122,6 +120,39 @@ use Test::More;
     compile_not_ok($source, q|A file directive must end with "\n".|);
   }
   
+}
+
+# POD
+{
+  {
+    my $source = "class MyClass {}\x0A=pod\x0A";
+    compile_ok($source);
+  }
+  
+  {
+    my $source = "\x0A=pod\x0A=cut\x0Aclass MyClass {}";
+    compile_ok($source);
+  }
+  
+  {
+    my $source = "class MyClass {\x0A=pod\x0A=cut\x0A}";
+    compile_ok($source);
+  }
+  
+  {
+    my $source = "class MyClass {\x0A=pod\x0A123\x0A=cut\x0A}";
+    compile_ok($source);
+  }
+  
+  {
+    my $source = "class MyClass {}\x0A=cut\x0A";
+    compile_ok($source);
+  }
+  
+  {
+    my $source = "class MyClass {}\x0A=1\x0A";
+    compile_not_ok($source, q|Unexpected token "="|);
+  }
 }
 
 # Line number
@@ -263,8 +294,18 @@ use Test::More;
     }
   }
   
-  # Octal Caharater literal
+  # Octal Escape Character
   {
+    {
+      my $source = q|class MyClass { static method main : void () { '\377'; } }|;
+      compile_ok($source);
+    }
+    
+    {
+      my $source = q|class MyClass { static method main : void () { '\477'; } }|;
+      compile_not_ok($source, q|The maxmum number of the octal escape charcater is 377.|);
+    }
+    
     {
       my $source = q|class MyClass { static method main : void () { '\o{}'; } }|;
       compile_not_ok($source, qr|At least one octal number must be followed by "\\o\{" of the octal escape character|);

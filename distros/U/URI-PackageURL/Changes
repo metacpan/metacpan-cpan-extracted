@@ -1,4 +1,13 @@
-Revision history for Perl extension URI::PackageURL.
+Revision history for URI::PackageURL.
+
+2.10 2024-04-19
+    - Improved the cpan PURL type to be compatible with the 'PURL-TYPES' specification
+      (giterlizzi/perl-URI-PackageURL#8 - https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst)
+    - Added "luarocks" PURL type support
+    - Improved test suite (giterlizzi/perl-URI-PackageURL#11)
+    - Renamed CLI package in "URI::PackageURL::App"
+    - Changed JSON module pre-requisite to "JSON::PP" to be compatible with CPAN Toolchain
+      (giterlizzi/perl-URI-PackageURL#12)
 
 2.04 2023-11-16
     - Added "docker", "bitbuket", "golang" support to

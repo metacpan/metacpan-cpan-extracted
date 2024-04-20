@@ -2,7 +2,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::SDK::InstrumentationScope;
 
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 class OpenTelemetry::SDK::InstrumentationScope :does(OpenTelemetry::Attributes) {
     use OpenTelemetry;

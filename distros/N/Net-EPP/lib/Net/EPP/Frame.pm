@@ -8,11 +8,10 @@ use Net::EPP::Frame::Response;
 use POSIX qw(strftime);
 use XML::LibXML;
 use base qw(XML::LibXML::Document);
-use vars qw($EPP_URN $SCHEMA_URI);
+use vars qw($EPP_URN);
 use strict;
 
-our $EPP_URN	= 'urn:ietf:params:xml:ns:epp-1.0';
-our $SCHEMA_URI	= 'http://www.w3.org/2001/XMLSchema-instance';
+our $EPP_URN = 'urn:ietf:params:xml:ns:epp-1.0';
 
 =pod
 
@@ -105,20 +104,20 @@ Net::EPP::Frame - An EPP XML frame system built on top of L<XML::LibXML>.
 
 =head1 DESCRIPTION
 
-The Extensible Provisioning Protocol (EPP) uses XML documents called "frames"
+The L<Extensible Provisioning Protocol
+(EPP)|https://www.rfc-editor.org/info/std69> uses XML documents called "frames"
 send data to and from clients and servers.
 
 This module implements a subclass of the L<XML::LibXML::Document> module that
 simplifies the process of creation of these frames. It is designed to be used
-alongside the L<Net::EPP::Client> module, but could also be used on the server
-side.
+alongside the L<Net::EPP::Client> and L<Net::EPP::Simple> modules, but could
+also be used on the server side.
 
 =head1 OBJECT HIERARCHY
 
     L<XML::LibXML::Node>
     +----L<XML::LibXML::Document>
         +----L<Net::EPP::Frame>
-
 
 =head1 USAGE
 
@@ -151,30 +150,30 @@ has to be a win.
 =cut
 
 sub new {
-	my ($package, $type) = @_;
+    my ($package, $type) = @_;
 
-	if (!$type) {
-		my @parts = split(/::/, $package);
-		$type = lc(pop(@parts));
-	}
+    if (!$type) {
+        my @parts = split(/::/, $package);
+        $type = lc(pop(@parts));
+    }
 
-	if ($type !~ /^(hello|greeting|command|response)$/) {
-		croak("'type' parameter to Net::EPP::Frame::new() must be one of: hello, greeting, command, response ('$type' given).");
-		return undef;
-	}
+    if ($type !~ /^(hello|greeting|command|response)$/) {
+        croak("'type' parameter to Net::EPP::Frame::new() must be one of: hello, greeting, command, response ('$type' given).");
+        return undef;
+    }
 
-	my $self = $package->SUPER::new('1.0', 'UTF-8');
-	bless($self, $package);
+    my $self = $package->SUPER::new('1.0', 'UTF-8');
+    bless($self, $package);
 
-	my $epp = $self->createElementNS($EPP_URN, 'epp');
-	$self->addChild($epp);
+    my $epp = $self->createElementNS($EPP_URN, 'epp');
+    $self->addChild($epp);
 
-	my $el = $self->createElement($type);
-	$epp->addChild($el);
+    my $el = $self->createElement($type);
+    $epp->addChild($el);
 
-	$self->_addExtraElements;
+    $self->_addExtraElements;
 
-	return $self;
+    return $self;
 }
 
 sub _addExtraElements {
@@ -192,8 +191,8 @@ is a convenience method.
 =cut
 
 sub formatTimeStamp {
-	my ($self, $stamp) = @_;
-	return strftime('%Y-%m-%dT%H:%M:%S.0Z', gmtime($stamp));
+    my ($self, $stamp) = @_;
+    return strftime('%Y-%m-%dT%H:%M:%S.0Z', gmtime($stamp));
 }
 
 =pod
@@ -210,17 +209,17 @@ If C<$ns> is provided, then I<getElementsByTagNameNS()> is used.
 =cut
 
 sub getNode {
-	my ($self, @args) = @_;
-	if (scalar(@args) == 2) {
-		return ($self->getElementsByTagNameNS(@args))[0];
+    my ($self, @args) = @_;
+    if (scalar(@args) == 2) {
+        return ($self->getElementsByTagNameNS(@args))[0];
 
-	} elsif (scalar(@args) == 1) {
-		return ($self->getElementsByTagName($args[0]))[0];
+    } elsif (scalar(@args) == 1) {
+        return ($self->getElementsByTagName($args[0]))[0];
 
-	} else {
-		croak('Invalid number of arguments to getNode()');
+    } else {
+        croak('Invalid number of arguments to getNode()');
 
-	}
+    }
 }
 
 =pod
@@ -233,8 +232,8 @@ only useful for low-level protocol stuff.
 =cut
 
 sub header {
-	my $self = shift;
-	return pack('N', length($self->toString) + 4);
+    my $self = shift;
+    return pack('N', length($self->toString) + 4);
 }
 
 =pod
@@ -248,8 +247,8 @@ low-level protocol stuff.
 =cut
 
 sub frame {
-	my $self = shift;
-	return $self->header.$self->toString;
+    my $self = shift;
+    return $self->header . $self->toString;
 }
 
 =pod
@@ -293,6 +292,12 @@ sub frame {
 Each subclass has its own subclasses for various objects, for example L<Net::EPP::Frame::Command::Check::Domain> creates a C<E<lt>checkE<gt>> frame for domain names.
 
 Coverage for all combinations of command and object type is not complete, but work is ongoing.
+
+=head1 COPYRIGHT
+
+This module is (c) 2008 - 2023 CentralNic Ltd and 2024 Gavin Brown. This module
+is free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.
 
 =cut
 

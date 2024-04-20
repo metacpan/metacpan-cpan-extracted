@@ -15,26 +15,24 @@ servers.
 
 	#!/usr/bin/perl
 	use Net::EPP::Protocol;
-	use IO::Socket;
 	use strict;
 
-	# create a socket:
-
-	my $socket = IO::Socket::INET->new( ... );
-
-	# send a frame down the socket:
+	# send a frame down a socket:
 
 	Net::EPP::Protocol->send_frame($socket, $xml);
 
-	# get a frame from the socket:
+	# get a frame from a socket:
 
 	my $xml = Net::EPP::Protocol->get_frame($socket);
 
 =head1 DESCRIPTION
 
 This module implements functions that are common to both EPP clients and
-servers that implement the TCP transport as defined in RFC 4934. The
-main consumer of this module is currently L<Net::EPP::Client>.
+servers that implement the TCP/TLS transport of the L<Extensible Provisioning
+Protocol (EPP)|https://www.rfc-editor.org/info/std69> as defined in
+L<RFC 5734|https://www.rfc-editor.org/rfc/rfc5734.html>. The only user of this
+module is L<Net::EPP::Client>, but it may be useful if you want to write an EPP
+server.
 
 =head1 VARIABLES
 
@@ -53,7 +51,7 @@ The default value is 1GB.
 =cut
 
 BEGIN {
-	our $THRESHOLD = 1000000000;
+    our $THRESHOLD = 1000000000;
 }
 
 =pod
@@ -62,84 +60,93 @@ BEGIN {
 
 	my $xml = Net::EPP::Protocol->get_frame($socket);
 
-This method reads a frame from the socket and returns a scalar
-containing the XML. C<$socket> must be an L<IO::Handle> or one of its
-subclasses (ie C<IO::Socket::*>).
+This method reads a frame from the socket and returns a scalar containing the
+XML. C<$socket> must be an L<IO::Handle> or one of its subclasses (ie
+C<IO::Socket::*>).
 
-If the transmission fails for whatever reason, this method will
-C<croak()>, so be sure to enclose it in an C<eval()>.
+If the transmission fails for whatever reason, this method will C<croak()>, so
+be sure to enclose it in an C<eval()>.
 
 =cut
 
 sub get_frame {
-	my ($class, $fh) = @_;
+    my ($class, $fh) = @_;
 
-	my $hdr;
-	if (!defined($fh->read($hdr, 4))) {
-		croak("Got a bad frame length from peer - connection closed?");
+    my $hdr;
+    if (!defined($fh->read($hdr, 4))) {
+        croak("Got a bad frame length from peer - connection closed?");
 
-	} else {
-		my $length = (unpack('N', $hdr) - 4);
-		if ($length < 0) {
-			croak("Got a bad frame length from peer - connection closed?");
+    } else {
+        my $length = (unpack('N', $hdr) - 4);
+        if ($length < 0) {
+            croak("Got a bad frame length from peer - connection closed?");
 
-		} elsif (0 == $length) {
-			croak('Frame length is zero');
+        } elsif (0 == $length) {
+            croak('Frame length is zero');
 
-		} elsif ($length > $THRESHOLD) {
-			croak("Frame length is $length which exceeds $THRESHOLD");
+        } elsif ($length > $THRESHOLD) {
+            croak("Frame length is $length which exceeds $THRESHOLD");
 
-		} else {
-			my $xml = '';
-			my $buffer;
-			while (length($xml) < $length) {
-				$buffer = '';
-				$fh->read($buffer, ($length - length($xml)));
-				last if (length($buffer) == 0); # in case the socket has closed
-				$xml .= $buffer;
-			}
+        } else {
+            my $xml = '';
+            my $buffer;
+            while (length($xml) < $length) {
+                $buffer = '';
+                $fh->read($buffer, ($length - length($xml)));
+                last if (length($buffer) == 0);    # in case the socket has closed
+                $xml .= $buffer;
+            }
 
-			return $xml;
-		}
-	}
+            return $xml;
+        }
+    }
 }
 
 =pod
 
 	Net::EPP::Protocol->send_frame($socket, $xml);
 
-This method prepares an RFC 4934 compliant EPP frame and transmits it to
-the remote peer. C<$socket> must be an L<IO::Handle> or one of its
-subclasses (ie C<IO::Socket::*>).
+This method prepares an RFC 5734 compliant EPP frame and transmits it to the
+remote peer. C<$socket> must be an L<IO::Handle> or one of its subclasses
+(ie C<IO::Socket::*>).
 
-If the transmission fails for whatever reason, this method will
-C<croak()>, so be sure to enclose it in an C<eval()>. Otherwise, it will
-return a true value.
+If the transmission fails for whatever reason, this method will C<croak()>, so
+be sure to enclose it in an C<eval()>. Otherwise, it will return a true value.
 
 =cut
 
 sub send_frame {
-	my ($class, $fh, $xml) = @_;
-	$fh->print($class->prep_frame($xml));
-	$fh->flush;
-	return 1;
+    my ($class, $fh, $xml) = @_;
+    $fh->print($class->prep_frame($xml));
+    $fh->flush;
+    return 1;
 }
 
 =pod
 
 	my $frame = Net::EPP::Protocol->prep_frame($xml);
 
-This method returns the XML frame in "wire format" with the protocol
-header prepended to it. The return value can be printed directly to an
-open socket, for example:
+This method returns the XML frame in "wire format" with the protocol header
+prepended to it. The return value can be printed directly to an open socket, for
+example:
 
 	print STDOUT Net::EPP::Protocol->prep_frame($frame->toString);
 
 =cut
 
 sub prep_frame {
-	my ($class, $xml) = @_;
-	return pack('N', length($xml) + 4).$xml;
+    my ($class, $xml) = @_;
+    return pack('N', length($xml) + 4) . $xml;
 }
 
 1;
+
+=pod
+
+=head1 COPYRIGHT
+
+This module is (c) 2008 - 2023 CentralNic Ltd and 2024 Gavin Brown. This module
+is free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.
+
+=cut

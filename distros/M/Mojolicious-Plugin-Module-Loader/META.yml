@@ -1,0 +1,41 @@
+---
+abstract: 'Automatically load mojolicious namespaces'
+author:
+  - 'Mark Tyrrell <mark@tyrrminal.dev>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test2::Suite: '0.000155'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Module-Loader
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Mojolicious::Plugin::Module::Loader:
+    file: lib/Mojolicious/Plugin/Module/Loader.pm
+    version: '0.02'
+requires:
+  Module::Find: '0.16'
+  Mojolicious: '9.00'
+  perl: '5.026000'
+resources:
+  bugtracker: https://github.com/tyrrminal/mojolicious-plugin-module-loader/issues
+  repository: https://github.com/tyrrminal/mojolicious-plugin-module-loader.git
+version: '0.02'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: MIT

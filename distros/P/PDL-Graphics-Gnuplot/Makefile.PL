@@ -37,13 +37,13 @@ WriteMakefile(
         ? ('LICENSE'          => 'perl')
         : ()
     ),
-    MIN_PERL_VERSION          => 5.006,
+    MIN_PERL_VERSION          => 5.010,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '6.64', # TEST_REQUIRES
         'Alien::Gnuplot'      => 0,
     },
     PREREQ_PM => { 
-            'Alien::Gnuplot'      => 0,
+	    'Alien::Gnuplot'      => '1.031',
 	    'PDL'                 => 0,
 	    'PDL::Transform::Color' => 0,
 	    'IPC::Run'            => 0,

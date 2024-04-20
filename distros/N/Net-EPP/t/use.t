@@ -1,9 +1,7 @@
-#!/usr/bin/env perl -w
-# $Id$
+#!perl
+use Test::More;
 use strict;
-use Test;
-BEGIN { plan tests => 1 }
 
-use Net::EPP; ok(1);
+require_ok(q{Net::EPP});
 
-exit;
+done_testing;

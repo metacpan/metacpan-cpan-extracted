@@ -52,17 +52,17 @@ This results in an XML document like this:
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = bless($package->SUPER::new('update'), $package);
+    my $package = shift;
+    my $self    = bless($package->SUPER::new('update'), $package);
 
-	my $contact = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('contact'));
+    my $contact = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('contact'));
 
-	foreach my $grp (qw(add rem chg)) {
-		my $el = $self->createElement(sprintf('contact:%s', $grp));
-		$self->getNode('update')->getChildNodes->shift->appendChild($el);
-	}
+    foreach my $grp (qw(add rem chg)) {
+        my $el = $self->createElement(sprintf('contact:%s', $grp));
+        $self->getNode('update')->getChildNodes->shift->appendChild($el);
+    }
 
-	return $self;
+    return $self;
 }
 
 =pod
@@ -76,15 +76,15 @@ This specifies the contact object to be updated.
 =cut
 
 sub setContact {
-	my ($self, $id) = @_;
+    my ($self, $id) = @_;
 
-	my $el = $self->createElement('contact:id');
-	$el->appendText($id);
+    my $el = $self->createElement('contact:id');
+    $el->appendText($id);
 
-	my $n = $self->getNode('update')->getChildNodes->shift;
-	$n->insertBefore( $el, $n->firstChild );
+    my $n = $self->getNode('update')->getChildNodes->shift;
+    $n->insertBefore($el, $n->firstChild);
 
-	return 1;
+    return 1;
 }
 
 =pod
@@ -96,8 +96,8 @@ Change the contacts voice number.
 =cut
 
 sub chgVoice {
-	my ($self, $voice) = @_;
-	return $self->addEl('voice', $voice);
+    my ($self, $voice) = @_;
+    return $self->addEl('voice', $voice);
 }
 
 =pod
@@ -109,8 +109,8 @@ Change the contacts voice number.
 =cut
 
 sub chgFax {
-	my ($self, $fax) = @_;
-	return $self->addEl('fax', $fax);
+    my ($self, $fax) = @_;
+    return $self->addEl('fax', $fax);
 }
 
 =pod
@@ -122,8 +122,8 @@ Change the contacts email.
 =cut
 
 sub chgEmail {
-	my ($self, $email) = @_;
-	return $self->addEl('email', $email);
+    my ($self, $email) = @_;
+    return $self->addEl('email', $email);
 }
 
 =pod
@@ -135,15 +135,15 @@ Add a status of $type with the optional extra $info.
 =cut
 
 sub addStatus {
-	my ($self, $type, $info) = @_;
-	my $status = $self->createElement('contact:status');
-	$status->setAttribute('s', $type);
-	$status->setAttribute('lang', 'en');
-	if ($info) {
-		$status->appendText($info);
-	}
-	$self->getElementsByLocalName('contact:add')->shift->appendChild($status);
-	return 1;
+    my ($self, $type, $info) = @_;
+    my $status = $self->createElement('contact:status');
+    $status->setAttribute('s',    $type);
+    $status->setAttribute('lang', 'en');
+    if ($info) {
+        $status->appendText($info);
+    }
+    $self->getElementsByLocalName('contact:add')->shift->appendChild($status);
+    return 1;
 }
 
 =pod
@@ -155,50 +155,49 @@ Remove a status of $type.
 =cut
 
 sub remStatus {
-	my ($self, $type) = @_;
-	my $status = $self->createElement('contact:status');
-	$status->setAttribute('s', $type);
-	$self->getElementsByLocalName('contact:rem')->shift->appendChild($status);
-	return 1;
+    my ($self, $type) = @_;
+    my $status = $self->createElement('contact:status');
+    $status->setAttribute('s', $type);
+    $self->getElementsByLocalName('contact:rem')->shift->appendChild($status);
+    return 1;
 }
 
 sub chgPostalInfo {
-	my ($self, $type, $name, $org, $addr) = @_;
+    my ($self, $type, $name, $org, $addr) = @_;
 
-	my $el = $self->createElement('contact:postalInfo');
-	$el->setAttribute('type', $type);
+    my $el = $self->createElement('contact:postalInfo');
+    $el->setAttribute('type', $type);
 
-	my $nel = $self->createElement('contact:name');
-	$nel->appendText($name);
+    my $nel = $self->createElement('contact:name');
+    $nel->appendText($name);
 
-	my $oel = $self->createElement('contact:org');
-	$oel->appendText($org);
+    my $oel = $self->createElement('contact:org');
+    $oel->appendText($org);
 
-	my $ael = $self->createElement('contact:addr');
+    my $ael = $self->createElement('contact:addr');
 
-	if (ref($addr->{street}) eq 'ARRAY') {
-		foreach my $street (@{$addr->{street}}) {
-			my $sel = $self->createElement('contact:street');
-			$sel->appendText($street);
-			$ael->appendChild($sel);
-		}
-	}
+    if (ref($addr->{street}) eq 'ARRAY') {
+        foreach my $street (@{$addr->{street}}) {
+            my $sel = $self->createElement('contact:street');
+            $sel->appendText($street);
+            $ael->appendChild($sel);
+        }
+    }
 
-	foreach my $name (qw(city sp pc cc)) {
-		my $vel = $self->createElement('contact:'.$name);
-		$vel->appendText($addr->{$name});
-		$ael->appendChild($vel);
-	}
+    foreach my $name (qw(city sp pc cc)) {
+        my $vel = $self->createElement('contact:' . $name);
+        $vel->appendText($addr->{$name});
+        $ael->appendChild($vel);
+    }
 
-	$el->appendChild($nel);
-	$el->appendChild($oel) if $org;
-	$el->appendChild($ael);
+    $el->appendChild($nel);
+    $el->appendChild($oel) if $org;
+    $el->appendChild($ael);
 
-	$self->getElementsByLocalName('contact:chg')->shift->appendChild($el);
+    $self->getElementsByLocalName('contact:chg')->shift->appendChild($el);
 
-	return $el;
+    return $el;
 }
-
 
 =pod
 
@@ -209,26 +208,26 @@ Change the authinfo.
 =cut
 
 sub chgAuthInfo {
-	my ($self,$authInfo) = @_;
+    my ($self, $authInfo) = @_;
 
-	my $el = $self->createElement('contact:authInfo');
-	my $pw = $self->createElement('contact:pw');
-	$pw->appendText($authInfo);
-	$el->appendChild($pw);
+    my $el = $self->createElement('contact:authInfo');
+    my $pw = $self->createElement('contact:pw');
+    $pw->appendText($authInfo);
+    $el->appendChild($pw);
 
-	$self->getElementsByLocalName('contact:chg')->shift->appendChild($el);
-	return 1;
+    $self->getElementsByLocalName('contact:chg')->shift->appendChild($el);
+    return 1;
 }
 
 sub addEl {
-	my ($self, $name, $value) = @_;
+    my ($self, $name, $value) = @_;
 
-	my $el = $self->createElement('contact:'.$name);
-	$el->appendText($value) if defined($value);
+    my $el = $self->createElement('contact:' . $name);
+    $el->appendText($value) if defined($value);
 
-	$self->getElementsByLocalName('contact:chg')->shift->appendChild($el);
+    $self->getElementsByLocalName('contact:chg')->shift->appendChild($el);
 
-	return $el;
+    return $el;
 
 }
 

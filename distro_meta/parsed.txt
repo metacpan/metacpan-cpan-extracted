@@ -91553,3 +91553,16 @@ P/PE/PERLANCAR/SortKey-date_in_text-0.001.tar.gz
 H/HA/HANJE/Test-Tk-3.03.tar.gz
 H/HM/HMBRAND/Text-CSV_XS-1.54.tgz
 W/WA/WATERKIP/URN-OASIS-SAML2-0.004.tar.gz
+W/WA/WATERKIP/AnyEvent-I3X-Workspace-OnDemand-0.002.tar.gz
+S/SP/SPWHITTON/App-papersway-0.003.tar.gz
+P/PE/PERLANCAR/AppBase-Sort-0.004.tar.gz
+G/GS/GSG/Date-RangeParser-EN-v1.0.1.tar.gz
+T/TY/TYRRMINAL/Mojolicious-Plugin-Module-Loader-0.02.tar.gz
+L/LN/LNATION/MooX-Pack-0.02.tar.gz
+G/GB/GBROWN/Net-EPP-0.27.tar.gz
+J/JJ/JJATRIA/OpenTelemetry-SDK-0.022.tar.gz
+E/ET/ETJ/PDL-Graphics-Gnuplot-2.025.tar.gz
+L/LN/LNATION/Seven-0.02.tar.gz
+K/KI/KIMOTO/SPVM-0.989104.tar.gz
+G/GD/GDT/URI-PackageURL-2.10.tar.gz
+W/WA/WATERKIP/URN-OASIS-SAML2-0.005.tar.gz

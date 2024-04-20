@@ -1,5 +1,6 @@
 package Net::EPP::Frame::Command::Create::Host;
-use base qw(Net::EPP::Frame::Command::Create);
+use List::Util qw(any);
+use base       qw(Net::EPP::Frame::Command::Create);
 use Net::EPP::Frame::ObjectSpec;
 use strict;
 
@@ -53,12 +54,12 @@ This results in an XML document like this:
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = bless($package->SUPER::new('create'), $package);
+    my $package = shift;
+    my $self    = bless($package->SUPER::new('create'), $package);
 
-	$self->addObject(Net::EPP::Frame::ObjectSpec->spec('host'));
+    $self->addObject(Net::EPP::Frame::ObjectSpec->spec('host'));
 
-	return $self;
+    return $self;
 }
 
 =pod
@@ -72,16 +73,15 @@ This sets the name of the object to be created. Returns the
 
 =cut
 
-
 sub setHost {
-	my ($self, $host) = @_;
+    my ($self, $host) = @_;
 
-	my $name = $self->createElement('host:name');
-	$name->appendText($host);
+    my $name = $self->createElement('host:name');
+    $name->appendText($host);
 
-	$self->getNode('create')->getChildNodes->shift->appendChild($name);
+    $self->getNode('create')->getChildNodes->shift->appendChild($name);
 
-	return 1;
+    return 1;
 }
 
 =pod
@@ -94,15 +94,46 @@ addresses of different versions.
 =cut
 
 sub setAddr {
-	my ($self, @addr) = @_;
+    my ($self, @addr) = @_;
 
-	foreach my $ip (@addr) {
-		my $hostAttr = $self->createElement('host:addr');
-		$hostAttr->appendText($ip->{ip});
-		$hostAttr->setAttribute('ip', $ip->{version});
-		$self->getNode('create')->getChildNodes->shift->appendChild($hostAttr);
-	}
-	return 1;
+    foreach my $ip (@addr) {
+        my $hostAttr = $self->createElement('host:addr');
+        $hostAttr->appendText($ip->{ip});
+        $hostAttr->setAttribute('ip', $ip->{version});
+        $self->getNode('create')->getChildNodes->shift->appendChild($hostAttr);
+    }
+    return 1;
+}
+
+=pod
+
+=head2 TTL Extension
+
+    $frame->setTTLs({
+        A => 3600,
+        AAAA => 900,
+    });
+
+Specify TTLs for glue records. The server must support the
+TTL extension.
+
+=cut
+
+sub setTTLs {
+    my ($self, $ttls) = @_;
+
+    foreach my $type (keys(%{$ttls})) {
+        my $ttl = $self->createExtensionElementFor(Net::EPP::Frame::ObjectSpec->xmlns('ttl'))->appendChild($self->createElement('ttl'));
+        $ttl->appendText($ttls->{$type});
+        if (any { $type eq $_ } qw(NS DS DNAME A AAAA)) {
+            $ttl->setAttribute('for', $type);
+
+        } else {
+            $ttl->setAttribute('for',    'custom');
+            $ttl->setAttribute('custom', $type);
+
+        }
+    }
 }
 
 1;

@@ -52,12 +52,12 @@ This results in an XML document like this:
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = bless($package->SUPER::new('create'), $package);
+    my $package = shift;
+    my $self    = bless($package->SUPER::new('create'), $package);
 
-	$self->addObject(Net::EPP::Frame::ObjectSpec->spec('contact'));
+    $self->addObject(Net::EPP::Frame::ObjectSpec->spec('contact'));
 
-	return $self;
+    return $self;
 }
 
 =pod
@@ -72,83 +72,83 @@ C<E<lt>contact:nameE<gt>> element.
 =cut
 
 sub setContact {
-	my ($self, $id) = @_;
-	return $self->addEl('id', $id);
+    my ($self, $id) = @_;
+    return $self->addEl('id', $id);
 }
 
 sub setVoice {
-	my ($self, $voice) = @_;
-	return $self->addEl('voice', $voice);
+    my ($self, $voice) = @_;
+    return $self->addEl('voice', $voice);
 }
 
 sub setFax {
-	my ($self, $fax) = @_;
-	return $self->addEl('fax', $fax);
+    my ($self, $fax) = @_;
+    return $self->addEl('fax', $fax);
 }
 
 sub setEmail {
-	my ($self, $email) = @_;
-	return $self->addEl('email', $email);
+    my ($self, $email) = @_;
+    return $self->addEl('email', $email);
 }
 
 sub setAuthInfo {
-	my ($self, $authInfo) = @_;
-	my $el = $self->addEl('authInfo');
-	my $pw = $self->createElement('contact:pw');
-	$pw->appendText($authInfo);
-	$el->appendChild($pw);
-	return $el;
+    my ($self, $authInfo) = @_;
+    my $el = $self->addEl('authInfo');
+    my $pw = $self->createElement('contact:pw');
+    $pw->appendText($authInfo);
+    $el->appendChild($pw);
+    return $el;
 }
 
 sub addPostalInfo {
-	my ($self, $type, $name, $org, $addr) = @_;
-	my $el = $self->addEl('postalInfo');
-	$el->setAttribute('type', $type);
+    my ($self, $type, $name, $org, $addr) = @_;
+    my $el = $self->addEl('postalInfo');
+    $el->setAttribute('type', $type);
 
-	my $nel = $self->createElement('contact:name');
-	$nel->appendText($name);
+    my $nel = $self->createElement('contact:name');
+    $nel->appendText($name);
 
-	my $oel = $self->createElement('contact:org');
-	$oel->appendText($org);
+    my $oel = $self->createElement('contact:org');
+    $oel->appendText($org);
 
-	my $ael = $self->createElement('contact:addr');
+    my $ael = $self->createElement('contact:addr');
 
-	if (ref($addr->{street}) eq 'ARRAY') {
-		foreach my $street (@{$addr->{street}}) {
-			my $sel = $self->createElement('contact:street');
-			$sel->appendText($street);
-			$ael->appendChild($sel);
-		}
-	}
+    if (ref($addr->{street}) eq 'ARRAY') {
+        foreach my $street (@{$addr->{street}}) {
+            my $sel = $self->createElement('contact:street');
+            $sel->appendText($street);
+            $ael->appendChild($sel);
+        }
+    }
 
-	foreach my $name (qw(city sp pc cc)) {
-		my $vel = $self->createElement('contact:'.$name);
-		$vel->appendText($addr->{$name});
-		$ael->appendChild($vel);
-	}
+    foreach my $name (qw(city sp pc cc)) {
+        my $vel = $self->createElement('contact:' . $name);
+        $vel->appendText($addr->{$name});
+        $ael->appendChild($vel);
+    }
 
-	$el->appendChild($nel);
-	$el->appendChild($oel) if $org;
-	$el->appendChild($ael);
+    $el->appendChild($nel);
+    $el->appendChild($oel) if $org;
+    $el->appendChild($ael);
 
-	return $el;
+    return $el;
 }
 
 sub appendStatus {
-	my ($self, $status) = @_;
-	return $self->addEl('status', $status);
+    my ($self, $status) = @_;
+    return $self->addEl('status', $status);
 }
 
 sub addEl {
-	my ($self, $name, $value) = @_;
+    my ($self, $name, $value) = @_;
 
-	my $el = $self->createElement('contact:'.$name);
-	$el->appendText($value) if defined($value);
+    my $el = $self->createElement('contact:' . $name);
+    $el->appendText($value) if defined($value);
 
-	$self->getNode('create')->getChildNodes->shift->appendChild($el);
+    $self->getNode('create')->getChildNodes->shift->appendChild($el);
 
-	return $el;
-	
+    return $el;
+
 }
 
 1;

@@ -73,71 +73,71 @@
    "provides" : {
       "OpenTelemetry::SDK" : {
          "file" : "lib/OpenTelemetry/SDK.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::SDK::Exporter::Console" : {
          "file" : "lib/OpenTelemetry/SDK/Exporter/Console.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::SDK::InstrumentationScope" : {
          "file" : "lib/OpenTelemetry/SDK/InstrumentationScope.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::SDK::Resource" : {
          "file" : "lib/OpenTelemetry/SDK/Resource.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::SDK::Trace::Sampler" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::SDK::Trace::Sampler::AlwaysOff" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler/AlwaysOff.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::SDK::Trace::Sampler::AlwaysOn" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler/AlwaysOn.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::SDK::Trace::Sampler::ParentBased" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler/ParentBased.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::SDK::Trace::Sampler::Result" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler/Result.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::SDK::Trace::Sampler::TraceIDRatioBased" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler/TraceIDRatioBased.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::SDK::Trace::Span" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Span.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::SDK::Trace::Span::Processor::Batch" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Span/Processor/Batch.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::SDK::Trace::Span::Processor::Simple" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Span/Processor/Simple.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::SDK::Trace::Span::Readable" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Span/Readable.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::SDK::Trace::SpanLimits" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/SpanLimits.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::SDK::Trace::Tracer" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Tracer.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       },
       "OpenTelemetry::SDK::Trace::TracerProvider" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/TracerProvider.pm",
-         "version" : "0.021"
+         "version" : "0.022"
       }
    },
    "release_status" : "stable",
@@ -151,10 +151,10 @@
          "web" : "https://github.com/jjatria/perl-opentelemetry-sdk"
       }
    },
-   "version" : "0.021",
+   "version" : "0.022",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.036000"
+         "version" : "5.038000"
       },
       "plugins" : [
          {
@@ -382,7 +382,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.021",
+                  "tag" : "0.022",
                   "tag_format" : "%v",
                   "tag_message" : ""
                },
@@ -603,9 +603,10 @@
    },
    "x_contributors" : [
       "Ask Bj\u00f8rn Hansen <ask@develooper.com>",
+      "K. Andrew Parker <kparker@citytech.cuny.edu>",
       "Tom Molesworth <tom@audioboundary.com>"
    ],
-   "x_generated_by_perl" : "v5.36.0",
+   "x_generated_by_perl" : "v5.38.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

@@ -13,27 +13,31 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "AnyEvent-I3X-Workspace-OnDemand",
+  "EXE_FILES" => [
+    "bin/i3-ipc"
+  ],
   "LICENSE" => "bsd",
   "MIN_PERL_VERSION" => "5.026000",
   "NAME" => "AnyEvent::I3X::Workspace::OnDemand",
   "PREREQ_PM" => {
-    "AnyEvent::I3" => 0,
+    "AnyEvent" => 0,
+    "AnyEvent::I3" => "0.19",
     "Carp" => 0,
     "Data::Compare" => 0,
+    "EV" => 0,
     "File::Spec::Functions" => 0,
+    "Getopt::Long" => 0,
     "List::Util" => 0,
-    "Object::Pad" => 0
+    "Object::Pad" => 0,
+    "Pod::Usage" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Import::Into" => "1.002003",
-    "Sub::Override" => 0,
-    "Test::More" => "0.96",
-    "Test::Most" => 0
+    "Test::More" => "0.96"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,19 +45,20 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "AnyEvent::I3" => 0,
+  "AnyEvent" => 0,
+  "AnyEvent::I3" => "0.19",
   "Carp" => 0,
   "Data::Compare" => 0,
+  "EV" => 0,
   "File::Spec" => 0,
   "File::Spec::Functions" => 0,
+  "Getopt::Long" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Import::Into" => "1.002003",
   "List::Util" => 0,
   "Object::Pad" => 0,
-  "Sub::Override" => 0,
-  "Test::More" => "0.96",
-  "Test::Most" => 0
+  "Pod::Usage" => 0,
+  "Test::More" => "0.96"
 );
 
 

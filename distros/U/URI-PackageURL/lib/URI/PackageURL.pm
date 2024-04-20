@@ -13,7 +13,7 @@ use constant PURL_DEBUG => $ENV{PURL_DEBUG};
 
 use overload '""' => 'to_string', fallback => 1;
 
-our $VERSION = '2.04';
+our $VERSION = '2.10';
 our @EXPORT  = qw(encode_purl decode_purl);
 
 my $PURL_REGEXP = qr{^pkg:[A-Za-z\\.\\-\\+][A-Za-z0-9\\.\\-\\+]*/.+};
@@ -49,8 +49,27 @@ sub new {
         Carp::croak "Invalid Package URL: '$qualifier' is not a valid qualifier" if ($qualifier =~ /\%/);
     }
 
-    $name =~ s/_/-/g  if $type eq 'pypi';
-    $name =~ s/::/-/g if $type eq 'cpan';
+    $name =~ s/_/-/g if $type eq 'pypi';
+
+    if ($type eq 'cpan') {
+
+        # CPAN Author name is MUST be uppercased
+        $namespace = uc $namespace if ($namespace);
+
+        if (($namespace && $name) && $namespace =~ /\:/) {
+            Carp::carp "Invalid Package URL: CPAN 'namespace' must have the distribution author";
+        }
+
+        if (($namespace && $name) && $name =~ /\:/) {
+            Carp::carp "Invalid Package URL: CPAN 'name' must have the distribution name";
+        }
+
+        if (!$namespace && $name =~ /\-/) {
+            Carp::carp "Invalid Package URL: CPAN 'name' must have the module name";
+        }
+
+    }
+
 
     if ($type eq 'swift') {
         Carp::croak "Invalid Package URL: Swift 'version' is required"   unless defined $version;
@@ -70,7 +89,8 @@ sub new {
         }
         else {
             if (defined $qualifiers->{channel}) {
-                Carp::croak "Invalid Package URL: Conan 'namespace' does not exist for channel '$qualifiers->{channel}'";
+                Carp::croak
+                    "Invalid Package URL: Conan 'namespace' does not exist for channel '$qualifiers->{channel}'";
             }
         }
 
@@ -347,21 +367,21 @@ URI::PackageURL - Perl extension for Package URL (aka "purl")
     type      => cpan,
     namespace => 'GDT',
     name      => 'URI-PackageURL',
-    version   => '2.04'
+    version   => '2.10'
   );
   
-  say $purl; # pkg:cpan/GDT/URI-PackageURL@2.04
+  say $purl; # pkg:cpan/GDT/URI-PackageURL@2.10
 
   # Parse Package URL string
-  $purl = URI::PackageURL->from_string('pkg:cpan/URI-PackageURL@2.04');
+  $purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.10');
 
-  # exported funtions
+  # exported functions
 
-  $purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.04');
+  $purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.10');
   say $purl->type;  # cpan
 
-  $purl_string = encode_purl(type => cpan, name => 'URI-PackageURL', version => '2.04');
-  say $purl_string; # pkg:cpan/URI-PackageURL@2.04
+  $purl_string = encode_purl(type => cpan, name => 'URI::PackageURL', version => '2.10');
+  say $purl_string; # pkg:cpan/URI::PackageURL@2.10
 
 =head1 DESCRIPTION
 
@@ -379,7 +399,7 @@ A purl is a URL composed of seven components:
 
 Components are separated by a specific character for unambiguous parsing.
 
-The defintion for each components is:
+The definition for each components is:
 
 =over
 
@@ -387,7 +407,7 @@ The defintion for each components is:
 One of the primary reason for this single scheme is to facilitate the future
 official registration of the "pkg" scheme for package URLs. Required.
 
-=item * "type": the package "type" or package "protocol" such as maven, npm,
+=item * "type": the package "type" or package "protocol" such as cpan, maven, npm,
 nuget, gem, pypi, etc. Required.
 
 =item * "namespace": some name prefix such as a Maven groupid, a Docker image
@@ -440,7 +460,7 @@ Create new B<URI::PackageURL> instance using provided Package URL components
 
 =item $purl->type
 
-The package "type" or package "protocol" such as maven, npm, nuget, gem, pypi, etc.
+The package "type" or package "protocol" such as cpan, maven, npm, nuget, gem, pypi, etc.
 
 =item $purl->namespace
 
@@ -477,7 +497,7 @@ Helper method for JSON modules (L<JSON>, L<JSON::PP>, L<JSON::XS>, L<Mojo::JSON>
 
     use Mojo::JSON qw(encode_json);
 
-    say encode_json($purl);  # {"name":"URI-PackageURL","namespace":"GDT","qualifiers":null,"subpath":null,"type":"cpan","version":"2.04"}
+    say encode_json($purl);  # {"name":"URI-PackageURL","namespace":"GDT","qualifiers":null,"subpath":null,"type":"cpan","version":"2.10"}
 
 =item $purl = URI::PackageURL->from_string($purl_string);
 
@@ -515,7 +535,7 @@ L<https://github.com/giterlizzi/perl-URI-PackageURL>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2022-2023 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2022-2024 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

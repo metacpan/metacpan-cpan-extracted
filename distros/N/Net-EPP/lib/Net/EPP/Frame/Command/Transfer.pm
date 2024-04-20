@@ -28,8 +28,8 @@ Sets the op of the frame (i.e. C<request>, C<cancel>, C<approve> or C<reject>).
 =cut
 
 sub setOp {
-	my ($self, $op) = @_;
-	$self->getCommandNode->setAttribute('op', $op);
+    my ($self, $op) = @_;
+    $self->getCommandNode->setAttribute('op', $op);
 }
 
 1;

@@ -242,6 +242,8 @@ EOF
 
 sub demo { @demo }
 
+sub done {'$w->close;'}
+
 1;
 
 =head1 NAME

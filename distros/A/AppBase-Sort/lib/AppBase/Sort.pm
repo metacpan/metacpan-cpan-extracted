@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-03-06'; # DATE
+our $DATE = '2024-03-07'; # DATE
 our $DIST = 'AppBase-Sort'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our %SPEC;
 
@@ -163,13 +163,29 @@ sub sort_appbase {
     } elsif ($args{_gen_sorter}) {
         my $sorter = $args{_gen_sorter}->(\%args);
         @lines = $sorter->(@lines);
-    } elsif ($args{_gen_sortkey}) {
+    } elsif ($args{_gen_keygen}) {
         my ($keygen, $is_numeric) = $args{_gen_keygen}->(\%args);
         require Sort::Key;
         if ($is_numeric) {
-            @lines = &Sort::Key::nkeysort($keygen, @lines);
+            if ($opt_reverse) {
+                @lines = &Sort::Key::rnkeysort($keygen, @lines);
+            } else {
+                @lines = &Sort::Key::nkeysort ($keygen, @lines);
+            }
         } else {
-            @lines = &Sort::Key::keysort ($keygen, @lines);
+            if ($opt_reverse) {
+                if ($opt_ci) {
+                    @lines = &Sort::Key::rkeysort(sub { lc $keygen->($_[0]) }, @lines);
+                } else {
+                    @lines = &Sort::Key::rkeysort($keygen, @lines);
+                }
+            } else {
+                if ($opt_ci) {
+                    @lines = &Sort::Key::keysort (sub { lc $keygen->($_[0]) }, @lines);
+                } else {
+                    @lines = &Sort::Key::keysort ($keygen, @lines);
+                }
+            }
         }
     } else {
         die "Either _gen_comparer, _gen_sorter, or _gen_keygen must be specified";
@@ -197,7 +213,7 @@ AppBase::Sort - A base for sort-like CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.003 of AppBase::Sort (from Perl distribution AppBase-Sort), released on 2024-03-06.
+This document describes version 0.004 of AppBase::Sort (from Perl distribution AppBase-Sort), released on 2024-03-07.
 
 =head1 FUNCTIONS
 

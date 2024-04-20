@@ -56,12 +56,12 @@ This results in an XML document like this:
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = bless($package->SUPER::new('check'), $package);
+    my $package = shift;
+    my $self    = bless($package->SUPER::new('check'), $package);
 
-	$self->addObject(Net::EPP::Frame::ObjectSpec->spec('contact'));
+    $self->addObject(Net::EPP::Frame::ObjectSpec->spec('contact'));
 
-	return $self;
+    return $self;
 }
 
 =pod
@@ -75,14 +75,14 @@ This adds a contact ID to the list of contacts to be checked.
 =cut
 
 sub addContact {
-	my ($self, $contact) = @_;
+    my ($self, $contact) = @_;
 
-	my $name = $self->createElement('contact:id');
-	$name->appendText($contact);
+    my $name = $self->createElement('contact:id');
+    $name->appendText($contact);
 
-	$self->getNode('check')->getChildNodes->shift->appendChild($name);
+    $self->getNode('check')->getChildNodes->shift->appendChild($name);
 
-	return 1;
+    return 1;
 }
 
 1;

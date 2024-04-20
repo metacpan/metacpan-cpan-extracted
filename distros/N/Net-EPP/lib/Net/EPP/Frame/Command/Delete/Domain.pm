@@ -52,12 +52,12 @@ This results in an XML document like this:
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = bless($package->SUPER::new('delete'), $package);
+    my $package = shift;
+    my $self    = bless($package->SUPER::new('delete'), $package);
 
-	my $domain = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('domain'));
+    my $domain = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('domain'));
 
-	return $self;
+    return $self;
 }
 
 =pod
@@ -71,14 +71,14 @@ This specifies the domain name to be deleted.
 =cut
 
 sub setDomain {
-	my ($self, $domain) = @_;
+    my ($self, $domain) = @_;
 
-	my $name = $self->createElement('domain:name');
-	$name->appendText($domain);
+    my $name = $self->createElement('domain:name');
+    $name->appendText($domain);
 
-	$self->getNode('delete')->getChildNodes->shift->appendChild($name);
+    $self->getNode('delete')->getChildNodes->shift->appendChild($name);
 
-	return 1;
+    return 1;
 }
 
 1;

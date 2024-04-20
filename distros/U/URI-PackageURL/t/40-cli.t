@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 use Test::More;
-use JSON;
+use JSON::PP qw(decode_json);
 
-use URI::PackageURL::CLI;
+use URI::PackageURL::App;
 
 sub cmd {
 
@@ -17,7 +17,7 @@ sub cmd {
     open(my $output_handle, '>', \$output) or die "Can't open handle file: $!";
     my $original_handle = select $output_handle;
 
-    URI::PackageURL::CLI->run(@arguments);
+    URI::PackageURL::App->run(@arguments);
     chomp $output;
 
     select $original_handle;
@@ -26,9 +26,9 @@ sub cmd {
 
 }
 
-my $t1 = 'pkg:cpan/GDT/URI-PackageURL@2.00';
+my $t1 = 'pkg:cpan/GDT/URI-PackageURL@2.10';
 
-subtest "CLI '$t1' (JSON output)" => sub {
+subtest "App '$t1' (JSON output)" => sub {
 
     my $test_1 = cmd($t1, '--json');
 
@@ -41,7 +41,7 @@ subtest "CLI '$t1' (JSON output)" => sub {
     is($test_2->{type},      'cpan',           'JSON output: Type');
     is($test_2->{namespace}, 'GDT',            'JSON output: Namespace');
     is($test_2->{name},      'URI-PackageURL', 'JSON output: Name');
-    is($test_2->{version},   '2.00',           'JSON output: Version');
+    is($test_2->{version},   '2.10',           'JSON output: Version');
 
 };
 

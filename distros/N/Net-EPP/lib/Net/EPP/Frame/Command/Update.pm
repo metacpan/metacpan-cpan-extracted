@@ -25,28 +25,28 @@ for the EPP C<E<lt>updateE<gt>> command.
 =cut
 
 sub add {
-	my $self = shift;
-	foreach my $el ($self->getNode('update')->getChildNodes->shift->getChildNodes) {
-		my (undef, $name) = split(/:/, $el->localName, 2);
-		return $el if ($name eq 'add');
-	}
+    my $self = shift;
+    foreach my $el ($self->getNode('update')->getChildNodes->shift->getChildNodes) {
+        my (undef, $name) = split(/:/, $el->localName, 2);
+        return $el if ($name eq 'add');
+    }
 }
 
 sub rem {
-	my $self = shift;
-	foreach my $el ($self->getNode('update')->getChildNodes->shift->getChildNodes) {
-		my (undef, $name) = split(/:/, $el->localName, 2);
-		return $el if ($name eq 'rem');
+    my $self = shift;
+    foreach my $el ($self->getNode('update')->getChildNodes->shift->getChildNodes) {
+        my (undef, $name) = split(/:/, $el->localName, 2);
+        return $el if ($name eq 'rem');
 
-	}
+    }
 }
 
 sub chg {
-	my $self = shift;
-	foreach my $el ($self->getNode('update')->getChildNodes->shift->getChildNodes) {
-		my (undef, $name) = split(/:/, $el->localName, 2);
-		return $el if ($name eq 'chg');
-	}
+    my $self = shift;
+    foreach my $el ($self->getNode('update')->getChildNodes->shift->getChildNodes) {
+        my (undef, $name) = split(/:/, $el->localName, 2);
+        return $el if ($name eq 'chg');
+    }
 }
 
 =pod

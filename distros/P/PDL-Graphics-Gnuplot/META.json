@@ -33,7 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Gnuplot" : "0",
+            "Alien::Gnuplot" : "1.031",
             "File::Temp" : "0.19",
             "IO::Select" : "0",
             "IPC::Open3" : "0",
@@ -44,7 +44,7 @@
             "Safe::Isa" : "0",
             "Storable" : "0",
             "Time::HiRes" : "0",
-            "perl" : "5.006"
+            "perl" : "5.01"
          }
       },
       "test" : {
@@ -64,6 +64,6 @@
          "url" : "git://github.com/PDLPorters/PDL-Graphics-Gnuplot.git"
       }
    },
-   "version" : "2.024",
+   "version" : "2.025",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

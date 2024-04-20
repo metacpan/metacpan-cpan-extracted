@@ -1,5 +1,6 @@
 package Net::EPP::Frame::Command::Update::Host;
-use base qw(Net::EPP::Frame::Command::Update);
+use List::Util qw(any);
+use base       qw(Net::EPP::Frame::Command::Update);
 use Net::EPP::Frame::ObjectSpec;
 use strict;
 
@@ -52,19 +53,19 @@ This results in an XML document like this:
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = bless($package->SUPER::new('update'), $package);
+    my $package = shift;
+    my $self    = bless($package->SUPER::new('update'), $package);
 
-	my $host = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('host'));
+    my $host = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('host'));
 
-	# 'chg' element's contents are not optional for hosts, so we'll add
-	# this element only when we plan to use it (accessor is overriden)
-	foreach my $grp (qw(add rem)) {
-		my $el = $self->createElement(sprintf('host:%s', $grp));
-		$self->getNode('update')->getChildNodes->shift->appendChild($el);
-	}
+    # 'chg' element's contents are not optional for hosts, so we'll add
+    # this element only when we plan to use it (accessor is overriden)
+    foreach my $grp (qw(add rem)) {
+        my $el = $self->createElement(sprintf('host:%s', $grp));
+        $self->getNode('update')->getChildNodes->shift->appendChild($el);
+    }
 
-	return $self;
+    return $self;
 }
 
 =pod
@@ -78,15 +79,15 @@ This specifies the host object to be updated.
 =cut
 
 sub setHost {
-	my ($self, $host) = @_;
+    my ($self, $host) = @_;
 
-	my $name = $self->createElement('host:name');
-	$name->appendText($host);
+    my $name = $self->createElement('host:name');
+    $name->appendText($host);
 
-	my $n = $self->getNode('update')->getChildNodes->shift;
-	$n->insertBefore($name, $n->firstChild);
+    my $n = $self->getNode('update')->getChildNodes->shift;
+    $n->insertBefore($name, $n->firstChild);
 
-	return 1;
+    return 1;
 }
 
 =pod
@@ -98,15 +99,15 @@ Add a status of $type with the optional extra $info.
 =cut
 
 sub addStatus {
-	my ($self, $type, $info) = @_;
-	my $status = $self->createElement('host:status');
-	$status->setAttribute('s', $type);
-	$status->setAttribute('lang', 'en');
-	if ($info) {
-		$status->appendText($info);
-	}
-	$self->getElementsByLocalName('host:add')->shift->appendChild($status);
-	return 1;
+    my ($self, $type, $info) = @_;
+    my $status = $self->createElement('host:status');
+    $status->setAttribute('s',    $type);
+    $status->setAttribute('lang', 'en');
+    if ($info) {
+        $status->appendText($info);
+    }
+    $self->getElementsByLocalName('host:add')->shift->appendChild($status);
+    return 1;
 }
 
 =pod
@@ -118,13 +119,12 @@ Remove a status of $type.
 =cut
 
 sub remStatus {
-	my ($self, $type) = @_;
-	my $status = $self->createElement('host:status');
-	$status->setAttribute('s', $type);
-	$self->getElementsByLocalName('host:rem')->shift->appendChild($status);
-	return 1;
+    my ($self, $type) = @_;
+    my $status = $self->createElement('host:status');
+    $status->setAttribute('s', $type);
+    $self->getElementsByLocalName('host:rem')->shift->appendChild($status);
+    return 1;
 }
-
 
 =pod
 
@@ -136,15 +136,15 @@ addresses of different versions.
 =cut
 
 sub addAddr {
-	my ($self, @addr) = @_;
+    my ($self, @addr) = @_;
 
-	foreach my $ip (@addr) {
-		my $el = $self->createElement('host:addr');
-		$el->appendText($ip->{ip});
-		$el->setAttribute('ip', $ip->{version});
-		$self->getElementsByLocalName('host:add')->shift->appendChild($el);
-	}
-	return 1;
+    foreach my $ip (@addr) {
+        my $el = $self->createElement('host:addr');
+        $el->appendText($ip->{ip});
+        $el->setAttribute('ip', $ip->{version});
+        $self->getElementsByLocalName('host:add')->shift->appendChild($el);
+    }
+    return 1;
 }
 
 =pod
@@ -157,17 +157,16 @@ addresses of different versions.
 =cut
 
 sub remAddr {
-	my ($self, @addr) = @_;
+    my ($self, @addr) = @_;
 
-	foreach my $ip (@addr) {
-		my $el = $self->createElement('host:addr');
-		$el->appendText($ip->{ip});
-		$el->setAttribute('ip', $ip->{version});
-		$self->getElementsByLocalName('host:rem')->shift->appendChild($el);
-	}
-	return 1;
+    foreach my $ip (@addr) {
+        my $el = $self->createElement('host:addr');
+        $el->appendText($ip->{ip});
+        $el->setAttribute('ip', $ip->{version});
+        $self->getElementsByLocalName('host:rem')->shift->appendChild($el);
+    }
+    return 1;
 }
-
 
 =pod
 	my $el = $frame->chg;
@@ -175,18 +174,18 @@ sub remAddr {
 Lazy-building of 'host:chg'element.
 
 =cut
-sub chg {
-	my $self = shift;
 
-	my $chg = $self->getElementsByLocalName('host:chg')->shift;
-	if ( $chg ) {
-		return $chg;
-	}
-	else {
-		my $el = $self->createElement('host:chg');
-		$self->getNode('update')->getChildNodes->shift->appendChild($el);
-		return $el;
-	}
+sub chg {
+    my $self = shift;
+
+    my $chg = $self->getElementsByLocalName('host:chg')->shift;
+    if ($chg) {
+        return $chg;
+    } else {
+        my $el = $self->createElement('host:chg');
+        $self->getNode('update')->getChildNodes->shift->appendChild($el);
+        return $el;
+    }
 }
 
 =pod
@@ -195,11 +194,42 @@ sub chg {
 Change a name of host.
 
 =cut
+
 sub chgName {
-	my ($self, $name) = @_;
-	my $el = $self->createElement('host:name');
-	$el->appendText($name);
-	$self->chg->appendChild($el);
+    my ($self, $name) = @_;
+    my $el = $self->createElement('host:name');
+    $el->appendText($name);
+    $self->chg->appendChild($el);
+}
+
+=pod
+
+=head2 TTL Extension
+
+    $frame->chgTTLs({
+        A => 3600,
+        AAAA => 900,
+    });
+
+Specify TTLs for glue records. The server must support the TTL extension.
+
+=cut
+
+sub chgTTLs {
+    my ($self, $ttls) = @_;
+
+    foreach my $type (keys(%{$ttls})) {
+        my $ttl = $self->createExtensionElementFor(Net::EPP::Frame::ObjectSpec->xmlns('ttl'))->appendChild($self->createElement('ttl'));
+        $ttl->appendText($ttls->{$type});
+        if (any { $type eq $_ } qw(NS DS DNAME A AAAA)) {
+            $ttl->setAttribute('for', $type);
+
+        } else {
+            $ttl->setAttribute('for',    'custom');
+            $ttl->setAttribute('custom', $type);
+
+        }
+    }
 }
 
 1;

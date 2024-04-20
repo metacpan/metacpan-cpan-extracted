@@ -1,3 +1,11 @@
+0.004   2024-03-07  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Forgot to handle --reverse and --ignore-case (-i) for
+          _gen_keygen.
+
+        - [bugfix] Typo.
+
+
 0.003   2024-03-06  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         - [incompatible change] Replace _sortgen with _gen_sorter +

@@ -52,12 +52,12 @@ This results in an XML document like this:
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = bless($package->SUPER::new('info'), $package);
+    my $package = shift;
+    my $self    = bless($package->SUPER::new('info'), $package);
 
-	my $domain = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('domain'));
+    my $domain = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('domain'));
 
-	return $self;
+    return $self;
 }
 
 =pod
@@ -73,16 +73,16 @@ by default).
 =cut
 
 sub setDomain {
-	my ($self, $domain, $hosts) = @_;
-	$hosts = ($hosts || 'all');
+    my ($self, $domain, $hosts) = @_;
+    $hosts = ($hosts || 'all');
 
-	my $name = $self->createElement('domain:name');
-	$name->appendText($domain);
-	$name->setAttribute('hosts', $hosts);
+    my $name = $self->createElement('domain:name');
+    $name->appendText($domain);
+    $name->setAttribute('hosts', $hosts);
 
-	$self->getNode('info')->getChildNodes->shift->appendChild($name);
+    $self->getNode('info')->getChildNodes->shift->appendChild($name);
 
-	return 1;
+    return 1;
 }
 
 1;

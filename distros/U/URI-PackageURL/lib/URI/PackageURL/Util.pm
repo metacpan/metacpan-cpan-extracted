@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Exporter qw(import);
 
-our $VERSION = '2.04';
+our $VERSION = '2.10';
 our @EXPORT  = qw(purl_to_urls);
 
 sub purl_to_urls {
@@ -30,6 +30,7 @@ sub purl_to_urls {
         github    => \&_github_urls,
         gitlab    => \&_gitlab_urls,
         golang    => \&_golang_urls,
+        luarocks  => \&_luarocks_urls,
         maven     => \&_maven_urls,
         npm       => \&_npm_urls,
         nuget     => \&_nuget_urls,
@@ -364,6 +365,34 @@ sub _golang_urls {
 
 }
 
+sub _luarocks_urls {
+
+    my $purl = shift;
+
+    my $name           = $purl->name;
+    my $namespace      = $purl->namespace;
+    my $version        = $purl->version;
+    my $qualifiers     = $purl->qualifiers;
+    my $repository_url = $qualifiers->{repository_url} || 'https://luarocks.org';
+
+    if ($repository_url !~ /^(http|https):\/\//) {
+        $repository_url = 'https://' . $repository_url;
+    }
+
+    my $urls = {};
+
+    if (!$namespace) {
+        $urls->{repository} = "$repository_url/modules/$name";
+    }
+
+    if ($name && $namespace) {
+        $urls->{repository} = "$repository_url/modules/$namespace/$name";
+    }
+
+    return $urls;
+
+}
+
 1;
 
 __END__
@@ -393,7 +422,7 @@ Converts the given Package URL string or L<URI::PackageURL> instance and return
 the hash with C<repository> and/or C<download> URL.
 
 B<NOTE>: This utility support few purl types (C<bitbucket>,  C<cargo>, C<composer>,
-C<cpan>, C<docker>, C<gem>, C<github>, C<gitlab>, C<maven>, C<npm>, C<nuget>, C<pypi>).
+C<cpan>, C<docker>, C<gem>, C<github>, C<gitlab>, C<luarocks>, C<maven>, C<npm>, C<nuget>, C<pypi>).
 
   +-----------+------------+--------------+
   | Type      | Repository | Download (*) |
@@ -407,6 +436,7 @@ C<cpan>, C<docker>, C<gem>, C<github>, C<gitlab>, C<maven>, C<npm>, C<nuget>, C<
   | generic   | NO         | YES (**)     |
   | github    | YES        | YES          |
   | gitlab    | YES        | YES          |
+  | luarocks  | YES        | NO           |
   | maven     | YES        | YES          |
   | npm       | YES        | YES          |
   | nuget     | YES        | YES          |
@@ -416,13 +446,13 @@ C<cpan>, C<docker>, C<gem>, C<github>, C<gitlab>, C<maven>, C<npm>, C<nuget>, C<
 (*)  Only with B<version> component
 (**) Only if B<download_url> qualifier is provided
 
-  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.04');
+  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.10');
 
   print Dumper($urls);
 
   # $VAR1 = {
-  #           'repository' => 'https://metacpan.org/release/GDT/URI-PackageURL-2.04',
-  #           'download' => 'http://www.cpan.org/authors/id/G/GD/GDT/URI-PackageURL-2.04.tar.gz'
+  #           'repository' => 'https://metacpan.org/release/GDT/URI-PackageURL-2.10',
+  #           'download' => 'http://www.cpan.org/authors/id/G/GD/GDT/URI-PackageURL-2.10.tar.gz'
   #         };
 
 =back
@@ -456,7 +486,7 @@ L<https://github.com/giterlizzi/perl-URI-PackageURL>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2022-2023 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2022-2024 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

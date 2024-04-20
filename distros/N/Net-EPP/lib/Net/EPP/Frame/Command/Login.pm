@@ -20,15 +20,15 @@ for the EPP C<E<lt>loginE<gt>> command.
 =cut
 
 sub _addCommandElements {
-	my $self = shift;
-	$self->getNode('login')->addChild($self->createElement('clID'));
-	$self->getNode('login')->addChild($self->createElement('pw'));
-	$self->getNode('login')->addChild($self->createElement('options'));
+    my $self = shift;
+    $self->getNode('login')->addChild($self->createElement('clID'));
+    $self->getNode('login')->addChild($self->createElement('pw'));
+    $self->getNode('login')->addChild($self->createElement('options'));
 
-	$self->getNode('options')->addChild($self->createElement('version'));
-	$self->getNode('options')->addChild($self->createElement('lang'));
+    $self->getNode('options')->addChild($self->createElement('version'));
+    $self->getNode('options')->addChild($self->createElement('lang'));
 
-	$self->getNode('login')->addChild($self->createElement('svcs'));
+    $self->getNode('login')->addChild($self->createElement('svcs'));
 }
 
 =pod
@@ -72,12 +72,12 @@ C<E<lt>langE<gt>> element.
 
 =cut
 
-sub clID { $_[0]->getNode('clID') }
-sub pw { $_[0]->getNode('pw') }
-sub newPW { $_[0]->getNode('newPW') }
-sub svcs { $_[0]->getNode('svcs') }
+sub clID    { $_[0]->getNode('clID') }
+sub pw      { $_[0]->getNode('pw') }
+sub newPW   { $_[0]->getNode('newPW') }
+sub svcs    { $_[0]->getNode('svcs') }
 sub options { $_[0]->getNode('options') }
 sub version { $_[0]->getNode('version') }
-sub lang { $_[0]->getNode('lang') }
+sub lang    { $_[0]->getNode('lang') }
 
 1;

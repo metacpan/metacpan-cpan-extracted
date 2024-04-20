@@ -858,29 +858,37 @@ my @tests = (
         beg               => '08/04/2023 12:00:00AM',
         end               => '08/04/2023 12:00:00AM',
     }, {
-        # Midnight
         date_range_string => '2023-07-27',
         as_of             => '2023-07-27 07:23:00',
         beg               => '07/27/2023 12:00:00AM',
         end               => '07/27/2023 11:59:59PM',
     }, {
-        # Midnight
         date_range_string => '2023-07-27 - 2023-07-28',
         as_of             => '2023-07-27 07:23:00',
         beg               => '07/27/2023 12:00:00AM',
         end               => '07/28/2023 11:59:59PM',
     }, {
-        # Midnight
         date_range_string => 'past four business days',
         as_of             => '2023-08-03 07:23:00',
         beg               => '07/31/2023 12:00:00AM',
         end               => '08/03/2023 11:59:59PM',
     }, {
-        # Midnight
         date_range_string => 'past four business days',
         as_of             => '2023-08-04 07:23:00',
         beg               => '08/01/2023 12:00:00AM',
         end               => '08/04/2023 11:59:59PM',
+    }, {
+        # Thirteenth
+        date_range_string => 'December thirteenth 2022',
+        as_of             => '2023-08-04 07:23:00',
+        beg               => '12/13/2022 12:00:00AM',
+        end               => '12/13/2022 11:59:59PM',
+    }, {
+        # Time with no date
+        date_range_string => '3:00pm through 4:00pm',
+        as_of             => '2023-08-04 07:23:00',
+        beg               => '08/04/2023 03:00:00PM',
+        end               => '08/04/2023 04:00:59PM',
     },
 );
 

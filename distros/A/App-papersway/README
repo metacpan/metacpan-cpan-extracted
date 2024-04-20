@@ -29,6 +29,8 @@ To install these programs, run the following commands:
 If you don't see Makefile.PL, it can be generated from dist.ini using
 Dist::Zilla's 'dzil' program.
 
+On Debian 13 or later & Ubuntu 24.10 or later, 'apt-get install papersway'.
+
 SUPPORT AND DOCUMENTATION
 
 After installing, you can find documentation for these programs with
@@ -38,7 +40,10 @@ the man command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker (please see CONTRIBUTING.rst)
+    Project homepage
+        https://spwhitton.name/tech/code/papersway/
+
+    RT, CPAN's bug tracker (please see CONTRIBUTING)
         http://rt.cpan.org/NoAuth/Bugs.html?Dist=papersway
 
     MetaCPAN

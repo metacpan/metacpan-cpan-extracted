@@ -53,12 +53,12 @@ This results in an XML document like this:
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = bless($package->SUPER::new('transfer'), $package);
+    my $package = shift;
+    my $self    = bless($package->SUPER::new('transfer'), $package);
 
-	my $contact = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('contact'));
+    my $contact = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('contact'));
 
-	return $self;
+    return $self;
 }
 
 =pod
@@ -72,14 +72,14 @@ This specifies the contact object for the transfer.
 =cut
 
 sub setContact {
-	my ($self, $id) = @_;
+    my ($self, $id) = @_;
 
-	my $name = $self->createElement('contact:id');
-	$name->appendText($id);
+    my $name = $self->createElement('contact:id');
+    $name->appendText($id);
 
-	$self->getNode('transfer')->getChildNodes->shift->appendChild($name);
+    $self->getNode('transfer')->getChildNodes->shift->appendChild($name);
 
-	return 1;
+    return 1;
 }
 
 =pod
@@ -91,17 +91,17 @@ This sets the authInfo code for the transfer.
 =cut
 
 sub setAuthInfo {
-	my ($self, $code) = @_;
+    my ($self, $code) = @_;
 
-	my $pw = $self->createElement('contact:pw');
-	$pw->appendText($code);
+    my $pw = $self->createElement('contact:pw');
+    $pw->appendText($code);
 
-	my $authInfo = $self->createElement('contact:authInfo');
-	$authInfo->appendChild($pw);
+    my $authInfo = $self->createElement('contact:authInfo');
+    $authInfo->appendChild($pw);
 
-	$self->getNode('transfer')->getChildNodes->shift->appendChild($authInfo);
+    $self->getNode('transfer')->getChildNodes->shift->appendChild($authInfo);
 
-	return 1;
+    return 1;
 }
 
 1;

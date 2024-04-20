@@ -1,0 +1,90 @@
+#!perl
+
+# PODNAME: i3-ipc
+# ABSTRACT: i3 IPC listener
+
+use v5.26;
+use warnings;
+use strict;
+
+use AnyEvent::I3X::Workspace::OnDemand;
+use AnyEvent;
+use EV;
+use Getopt::Long;
+use File::Spec::Functions qw(catfile);
+use Pod::Usage qw(pod2usage);
+
+
+my %options = (
+  logfile => catfile($ENV{HOME}, qw(.config i3 i3-ipc-events.log)),
+);
+
+GetOptions(\%options, qw(debug help man logfile=s socket=s));
+
+if ($options{help}) {
+    pod2usage(-verbose => 1);
+}
+if ($options{man}) {
+    pod2usage(-verbose => 2);
+}
+
+my $i3 = AnyEvent::I3X::Workspace::OnDemand->new(
+  debug          => $options{debug} // 0,
+  socket         => $options{socket},
+  log_all_events => $options{logfile},
+);
+
+EV::loop;
+AE::cv->recv;
+
+exit 0;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+i3-ipc - i3 IPC listener
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+i3-ipc OPTIONS
+
+=head1 DESCRIPTION
+
+An event listener for i3 which only logs which events are emitted
+
+=head1 OPTIONS
+
+=head2 --logfile
+
+Define a logfile to output the data too
+
+=head2 --socket
+
+Use a socket if you want to override it or want to specify it
+
+=head2 --help
+
+This help
+
+=head1 AUTHOR
+
+Wesley Schwengle <waterkip@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2024 by Wesley Schwengle.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

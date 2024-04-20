@@ -1,52 +1,72 @@
+=encoding utf8
+
 =head1 Name
 
-SPVM::Document::Language::Tokenization - Lexical Tokenization in the SPVM Language
+SPVM::Document::Language::Tokenization - Tokenization in the SPVM Language
 
 =head1 Description
 
-This document describes lexical tokenization in the SPVM language.
+This document describes the tokenization in the SPVM language.
 
 =head1 Tokenization
 
-The tokenizing the source codes of SPVM language is explained.
+This section describes the L<lexical analysis|https://en.wikipedia.org/wiki/Lexical_analysis> in the SPVM Language.
 
-=head2 Character Encoding of Source Code
+This is called tokenization.
+
+See L<SPVM::Document::Language::SyntaxParsing> about syntax parsing.
+
+=head2 Character Encoding
 
 The character encoding of SPVM source codes is UTF-8.
 
-If a character is ASCII, it must be ASCII printable characters or ASCII space characters except for ASCII C<CR>.
+If a character is an ASCII character, it must be an ASCII printable character or a L<space character|/"Space Characters">.
 
 Compilation Errors:
 
 The charactor encoding of SPVM source codes must be UTF-8. Otherwise a compilation error occurs.
 
-If a character in an SPVM source code is ASCII, it must be ASCII printable or space.
-
-The new line of SPVM source codes must be LF. The source code cannot contains CR and CRLF.
+If a character is an ASCII character, it must be an L<ASCII printable character|https://en.wikipedia.org/wiki/ASCII#Printable_characters> or a L<space character|/"Space Characters">. Otherwise a compilation error occurs.
 
 =head2 Line Terminators
 
-The line terminators are 0x2A C<LF> of ASCII.
+The line terminator is ASCII C<LF>.
 
 When a line terminator appears, the current line number is incremented by 1.
 
-=head2 Space Character
+=head2 Space Characters
 
-Space characters are C<SP>, C<HT>, C<FF> of ASCII and the L<line terminators|/"Line Terminators">.
+The space characters are ASCII C<SP>, C<HT>, C<FF>, C<LF>.
 
-=head2 Word Character
+=head2 Word Characters
 
-The word characters are alphabet(C<a-zA-Z>), number(0-9), and underscore(C<_>) of ASCII.
+The word characters are ASCII C<a-zA-Z>, C<0-9>, C<_>.
 
-=head2 Symbol Name
+=head2 Names
 
-A symbol name is the characters that are composed of L<word characters|/"Word Character"> and C<::>.
+This section describes names.
 
-A symbol name cannnot contains C<__>, and cannnot begin with a number 0-9.
+=head3 Symbol Name
 
-A symbol name cannnot begin with C<::>, and cannnot end with C<::>.
+A symbol name consists of L<word characters|/"Word Characters"> and C<::>.
 
-A symbol name cannnot contains C<::::>, and cannnot begin with a number 0-9.
+It dose not contains C<__>.
+
+It dose not begin with C<0-9>.
+
+It dose not begin with C<::>.
+
+It dose not end with C<::>.
+
+It dose not contains C<::::>.
+
+It dose not begin with C<0-9>.
+
+Compliation Errors:
+
+If a symbol name is invald, a compilation error occurs.
+
+Examples:
 
   # Symbol names
   foo
@@ -60,27 +80,17 @@ A symbol name cannnot contains C<::::>, and cannnot begin with a number 0-9.
   Foo::
   Foo::::Bar
 
-=head2 Class Name
+=head3 Class Name
 
 A class name is a L<symbol name|/"Symbol Name">.
 
-The part names of a class name must begin uppercase letter. If the class name is C<Foo:Bar::Baz>, part names are C<Foo>, C<Bar>, and C<Baz>.
+Each partial name of a class name must begin with an uppercase letter.
 
-A class name must be the name that the relative class file path's all C</> are replaced with C<::> and the trailing C<.spvm> is removed. For example, If the relative class file path is C<Foo/Bar/Baz.spvm>, the class name must be C<Foo::Bar::Baz>.
-
-  # Valid class name in the class file "Foo/Bar/Baz.spvm"
-  class Foo::Bar::Baz {
-    
-  }
-
-  # Invalid class name in the class file "Foo/Bar/Baz.spvm"
-  class Foo::Bar::Hello {
-    
-  }
+Partial names are individual names separated by C<::>. For example, the partial names of C<Foo::Bar::Baz> are C<Foo>, C<Bar>, and C<Baz>.
 
 Compilation Errors:
 
-If class names are invalid, a compilation error occurs.
+If a class name is invalid, a compilation error occurs.
 
 Examples:
   
@@ -90,7 +100,7 @@ Examples:
   Foo::Bar::Baz3
   Foo::bar
   Foo_Bar::Baz_Baz
-
+  
   # Invalid class names
   Foo
   Foo::::Bar
@@ -98,44 +108,39 @@ Examples:
   Foo__Bar
   Foo::bar
 
-=head2 Method Name
+=head3 Method Name
 
-A method name is a L<symbol name|/"Symbol Name"> that doesn't contains C<::>.
+A method name is a L<symbol name|/"Symbol Name"> without C<::> or an empty string C<"">.
 
-0-length method name is valid. This is used in the L<anon method|/"Anon Method">.
+Method names with the same name as L<keywords|/"Keywords"> are allowed.
 
 Compilation Errors:
 
-If method names are invalid, a compilation error occurs.
+If a method name is invalid, a compilation error occurs.
 
 Examples:
 
-  # Valid method names
+  # Method names
   FOO
   FOO_BAR3
   foo
   foo_bar
   _foo
   _foo_bar_
-
+  
   # Invalid method names
   foo__bar
   3foo
 
-A method name that is the same as a L<keyword/"Keyword"> is allowed.
-  
-  # "if" is a valid method name
-  static method if : void () {
-    
-  }
+=head3 Field Name
 
-=head2 Field Name
+A field name is a L<symbol name|/"Symbol Name"> without C<::>.
 
-A field name is a L<symbol name|/"Symbol Name"> that doesn't contains C<::>.
+Field names with the same name as L<keywords|/"Keywords"> are allowed.
 
 Compilation Errors:
 
-If field names are invalid, a compilation error occurs.
+If a field names is invalid, a compilation error occurs.
 
 Examples:
 
@@ -146,24 +151,23 @@ Examples:
   foo_bar
   _foo
   _foo_bar_
-
+  
   # Invalid field names
   foo__bar
   3foo
   Foo::Bar
 
-The field name that is the same as a L<keyword/"Keyword"> is allowed.
-  
-  # "if" is a valid field name
-  has if : int;
-
-=head2 Variable Name
+=head3 Variable Name
 
 A variable name begins with C<$> and is followed by a L<symbol name|/"Symbol Name">.
 
+The symbol name in a variable name can be surrounded by C<{> and C<}>.
+
 Compilation Errors:
 
-The L<symbol name|/"Symbol Name"> can be wrapped by C<{> and C<}>. If a opening C<{> exists and the closing C<}> doesn't exists, a compilation error occurs.
+If a field names is invalid, a compilation error occurs.
+
+If an opening C<{> exists and the closing C<}> dose not exist, a compilation error occurs.
 
 Examples:
 
@@ -174,7 +178,7 @@ Examples:
   $Foo::name
   $Foo::Bar::name
   ${Foo::name}
-
+  
   # Invalid variable names
   $::name
   $name::
@@ -182,13 +186,9 @@ Examples:
   $my__name
   ${name
 
-=head2 Class Variable Name
+=head4 Class Variable Name
 
 A class variable name is a L<variable name|/"Variable Name">.
-
-Compilation Errors:
-
-If class variable names are invalid, a compilation error occurs.
 
 Examples:
 
@@ -209,9 +209,9 @@ Examples:
   $3FOO
   ${NAME
 
-=head2 Local Variable Name
+=head4 Local Variable Name
 
-A local variable name is a L<variable name|/"Variable Name"> that doesn't contain C<::>.
+A local variable name is a L<variable name|/"Variable Name"> without C<::>.
 
 Examples:
 
@@ -231,28 +231,9 @@ Examples:
   ${name
   $3foo
 
-=head2 Current Class
+=head2 Keywords
 
-C<&> before method name means the current class. C<&> is replaced with C<CURRENT_CLASS_NAME-E<gt>>.
-
-Examples:
-
-  class Foo {
-    
-    static method test : void () {
-      # This means Foo->sum(1, 2)
-      my $ret = &sum(1, 2);
-    }
-  
-    static method sum : int ($num1 : int, $num2 : int) {
-      return $num1 + $num2;
-    }
-    
-  }
-
-=head2 Keyword
-
-The list of keywords:
+The List of Keywords:
 
   alias
   allow
@@ -352,9 +333,9 @@ The list of keywords:
   __FILE__
   __LINE__
 
-=head2 Operator for Tokenization
+=head2 Operator Tokens
 
-The list of the operators for tokenization:
+The List of Operator Tokens:
 
   !
   !=
@@ -410,33 +391,43 @@ The list of the operators for tokenization:
   ->
   =>
 
-Note that the operators for tokenization are different from the operators that are explained in L<operators|/"Operators">. The operators for tokenization are only for tokenization.
-
 =head2 Comment
 
-A comment begins with C<#> and ends with a L<line terminator|/"Line Terminators">.
+Comments have no meaning.
 
-  # Comment
+  #COMMENT
 
-Comments have no meaning in source codes.
+A comment begins with C<#>.
 
-L<Line directives|/"Line Directive"> take precedence over L<comments|/"Comment">.
+It is followed by any string I<COMMENT>.
 
-A L<File directive|/"File Directive"> take precedence over L<comments|/"Comment">.
+It ends with ASCII C<LF>.
+
+L<Line directives|/"Line Directive"> take precedence over comments.
+
+L<File directives|/"File Directive"> take precedence over comments.
+
+Examples:
+
+  # This is a comment line
 
 =head2 Line Directive
 
-A line directive begins from the beggining of the line.
+A line directive set the current line number.
 
-A line directive begins with C<#line > and positive 32bit integer
+  #line NUMBER
 
-  #line 39
+A line directive begins with C<#line> from the beggining of the line.
 
-And ends with a L<line terminator|/"Line Terminators">.
- 
-The line number in a line directive is set to the current line of the source code.
+It is followed by one or more ASCII C<SP>.
 
-L<Line directives|/"Line Directive"> take precedence over L<comments|/"Comment">.
+It is followed by I<NUMBER>. I<NUMBER> is a positive 32bit integer.
+
+It ends with ASCII C<LF>.
+
+The current line number of the source code is set to I<NUMBER>.
+
+Line directives take precedence over L<comments|/"Comment">.
 
 Compilation Errors:
 
@@ -448,19 +439,38 @@ A line directive must have a line number. Otherwise an compilation error occurs.
 
 The line number given to a line directive must be a positive 32bit integer. Otherwise an compilation error occurs.
 
+Examples:
+
+  class MyClass {
+    
+    static method main : void () {
+      
+  #line 39
+      
+    }
+  }
+
 =head2 File Directive
+
+A file directive set the current file path.
+
+  #file "FILE_PATH"
 
 A file directive begins from the beggining of the source code.
 
-A file directive begins with C<#file "> and is followed by a file path, and is closed with C<">
+It is followed by one or more ASCII C<SP>.
 
-  #file "/Foo/Bar.spvm"
+It is followed by C<">.
 
-And ends with a L<line terminator|/"Line Terminators">.
+It is followed by I<FILE_PATH>. I<FILE_PATH> is a string that represetns a file path.
 
-The file path is set to the current file path of the source code.
+It is closed with C<">.
 
-A L<file directive|/"File Directive"> take precedence over L<comments|/"Comment">.
+It ends with ASCII C<LF>.
+
+The current file path is set to I<FILE_PATH>.
+
+File directives take precedence over L<comments|/"Comment">.
 
 Compilation Errors:
 
@@ -472,86 +482,121 @@ A file directive must have a file path. Otherwise an compilation error occurs.
 
 A file directive must end with ". Otherwise an compilation error occurs.
 
+Examples:
+
+  #file "/path/MyClass.spvm"
+  class MyClass {
+  
+  }
+
+=head2 __END__
+
+If a line begins with C<__END__> and ends with ASCII C<LF>, the line with C<__END__> and the below lines are interpreted as L<comments|/"Comment">.
+
+Examples:
+  
+  class MyClass {
+    
+  }
+  
+  __END__
+  
+  foo
+  bar
+
 =head2 POD
 
-POD(Plain Old Document) is a syntax to write documents in source codes.
+POD is a syntax to write multiline comment. POD has no meaning.
 
-The biginning of POD begins with C<=>, and is followed by any string that is composed of ASCII printable characters, and end with a L<line terminator|/"Line Terminators">.
+The Beginning of a POD:
 
-The previous line of the biginning of POD must need a L<line terminator|/"Line Terminators">
+  =NAME
 
-The lator line of the biginning of POD must need a L<line terminator|/"Line Terminators">
-  
-  =pod
-  
-  =head1
-  
-  =item * foo
-  
+The beginning of a POD begins with C<=> from the beggining of the line.
 
-The end of POD begins with C<=>, and is followed by C<cut>, and ends with a L<line terminator|/"Line Terminators">.
+It is followed by I<NAME>. I<NAME> is any string that begins with ASCII C<a-zA-Z>.
 
-The previous line of the end of POD must need a L<line terminator|/"Line Terminators">
+It ends with ASCII C<LF>.
 
-The lator line of the end of POD must need a L<line terminator|/"Line Terminators">
+The End of a POD:
 
-  
   =cut
-  
+
+The end of a POD begins with C<=> from the beggining of the line.
+
+It is followed by C<cut>.
+
+It ends with ASCII C<LF>.
 
 Examples:
 
   
   =pod
   
-  Multi-Line
-  Comment
+  Comment1
+  Comment2
   
   =cut
   
   =head1
   
-  Multi-Line
-  Comment
+  Comment1
+  Comment2
   
   =cut
+
+=head2 Fat Comma
+
+A fat comma is
+
+  =>
+
+The fat comma is an alias for a comma C<,>.
+
+  # Comma
+  ["a", "b", "c", "d"]
   
+  # Fat Comma
+  ["a" => "b", "c" => "d"]
 
-POD has no meaning in source codes.
+If the left operand of a fat comma is a L<symbol name|/"Symbol Name"> without C<::>, it is wrraped by C<"> and is treated as a L<string literal|/"String Literal">.
 
-=head2 Literal
+  # foo_bar2 is treated as "foo_bar2"
+  [foo_bar2 => "Mark"]
+  
+  ["foo_bar2" => "Mark"]
 
-A literal is the way to write a constant value in source codes.
+=head1 Literals
 
-Literals are L<numeric literals|/"Numeric Literals">, the L<floating point literal|/"Floating Point Literal">, the L<character literal|/"Character Literal">, the L<string literal|/"String Literal"> and the L<bool literal|/"Bool Literal">.
+A literal represents a constant value.
 
-=head2 Numeric Literal
+=head2 Numeric Literals
 
-A numeric literal is the way to write a constant value that type is a L<numeric type|/"Numeric Type"> in source codes.
-
-Numeric literals are the L<integer literal|/"Integer Literals"> and the L<floating point literal|/"Floating Point Literal">.
+A numeric literal represents a constant L<number|SPVM::Document::Language::Types/"Number">.
 
 =head2 Integer Literals
 
-A interger literal is a L<numeric literal/"Numeric Literals"> to write a constant value that type is an L<integer type|/"Integer Type"> in source codes.
+A interger literal represents a constant number of an L<integer type|SPVM::Document::Language::Types/"Integer Types">.
 
 =head3 Integer Literal Decimal Notation
 
-The interger literal decimal notation is the way to write an L<integer literal|/"Integer Literals"> using decimal numbers 0-9.
+The interger literal decimal notation represents a number of the int type or the long type using decimal numbers C<0-9>.
+  
+It can begin with a minus C<->.
 
-A minus - can be at the beginning, and is followed by one or more of 0-9.
+It is followed by one or more of C<0-9>.
 
-C<_> can be used as a separator at the any positions after the first 0-9. C<_> has no meaning.
+C<_> can be placed at the any positions after the first C<0-9> as a separator. C<_> has no meaning.
 
-The suffix C<L> or C<l> can be at the end.
+It can end with the suffix C<L> or C<l>.
 
 If the suffix C<L> or C<l> exists, the return type is the long type. Otherwise the return type is the int type.
 
 Compilation Errors:
 
-If the return type is the int type and the value is greater than the max value of L<int type|/"int Type"> or less than the minimal value of L<int type|/"int Type">, a compilation error occurs.
+If the return type is the int type and the value is greater than the max value of the int type or less than the minimal value of the int type, a compilation error occurs.
 
-If the return type is the long type and the value is greater than the max value of L<long type|/"long Type"> or less than the minimal value of L<long type|/"long Type">, a compilation error occurs.
+If the return type is the long type and the value is greater than the max value of the long type or less than the minimal value of the long type, a compilation error occurs.
 
 Examples:
 
@@ -564,43 +609,29 @@ Examples:
 
 =head3 Integer Literal Hexadecimal Notation
 
-The interger literal hexadecimal notation is the way to write an L<integer literal|/"Integer Literals"> using hexadecimal numbers C<0-9a-zA-Z>.
+The interger literal hexadecimal notation represents a number of the int type or the long type using hexadecimal numbers C<0-9a-zA-Z>.
 
-A minus - can be at the beginning, and is followed by C<0x> or C<0X>, and is followed by one or more C<0-9a-zA-Z>.
+It can begin with a minus C<->.
 
-C<_> can be used as a separator at the any positions after C<0x> or C<0X>. C<_> has no meaning.
+It is followed by C<0x> or C<0X>.
 
-The suffix C<L> or C<l> can be at the end.
+It is followed by one or more C<0-9a-zA-Z>. This is called hexadecimal numbers part.
+
+C<_> can be placed at the any positions after C<0x> or C<0X> as a separator. C<_> has no meaning.
+
+It can end with the suffix C<L> or C<l>.
 
 If the suffix C<L> or C<l> exists, the return type is the long type. Otherwise the return type is the int type.
 
-If the return type is the int type, the value that is except for - is interpreted as unsigned 32 bit integer C<uint32_t> type in the C language, and the following conversion is performed.
+If the return type is the int type, the hexadecimal numbers part is interpreted as an unsigned 32 bit integer, and is converted to a signed 32-bit integer without changing the bits. For example, C<0xFFFFFFFF> is  -1.
 
-  uint32_t value_uint32_t;
-  int32_t value_int32_t = (int32_t)value_uint32_t;
-
-And if - exists, the following conversion is performed.
-
-  value_int32_t = -value_int32_t;
-
-For example, C<0xFFFFFFFF> is the same as -1, C<-0xFFFFFFFF> is the same as 1.
-
-If the return type is the long type, the value that is except for - is interpreted as unsigned 64 bit integer C<uint64_t> type in the C language, and the following conversion is performed.
-
-  uint64_t value_uint64_t;
-  value_int64_t = (int64_t)value_uint64_t;
-
-And if - exists, the following conversion is performed.
-
-  value_int64_t = -value_int64_t;
-
-For example, C<0xFFFFFFFFFFFFFFFFL> is the same as C<-1L>, C<-0xFFFFFFFFFFFFFFFFL> is the same as C<1L>.
+If the return type is the long type, the hexadecimal numbers part is interpreted as unsigned 64 bit integer, and is converted to a signed 64-bit integer without changing the bits. For example, C<0xFFFFFFFFFFFFFFFFL> is C<-1L>.
 
 Compilation Errors:
 
-If the return type is the int type and the value that is except for - is greater than hexadecimal C<FFFFFFFF>, a compilation error occurs.
+If the return type is the int type and the hexadecimal numbers part is greater than hexadecimal C<FFFFFFFF>, a compilation error occurs.
 
-If the return type is the long type and the value that is except for - is greater than hexadecimal C<FFFFFFFFFFFFFFFF>, a compilation error occurs.
+If the return type is the long type and the hexadecimal numbers part is greater than hexadecimal C<FFFFFFFFFFFFFFFF>, a compilation error occurs.
 
 Examples:
 
@@ -614,43 +645,31 @@ Examples:
 
 =head3 Integer Literal Octal Notation
 
-The interger literal octal notation is the way to write an L<integer literal|/"Integer Literals"> using octal numbers 0-7.
+The interger literal octal notation represents a number of the int type or the long type using octal numbers C<0-7>.
 
-A minus - can be at the beginning, and is followed by 0, and is followed by one or more 0-7.
+It can begin with a minus C<->.
 
-C<_> can be used as a separator at the any positions after 0. C<_> has no meaning.
+It is followed by C<0>.
 
-The suffix C<L> or C<l> can be at the end.
+It is followed by one or more C<0-7>. This is called octal numbers part.
+
+C<_> can be placed at the any positions after C<0> as a separator. C<_> has no meaning.
+
+It can end with the suffix C<L> or C<l>.
 
 If the suffix C<L> or C<l> exists, the return type is the long type. Otherwise the return type is the int type.
 
-If the return type is the int type, the value that is except for - is interpreted as unsigned 32 bit integer C<uint32_t> type in the C language, and the following conversion is performed.
+If the return type is the int type, the octal numbers part is interpreted as an unsigned 32 bit integer, and is converted to a signed 32-bit integer without changing the bits. For example, C<037777777777> is  -1.
 
-  uint32_t value_uint32_t;
-  int32_t value_int32_t = (int32_t)value_uint32_t;
+If the return type is the long type, the octal numbers part is interpreted as unsigned 64 bit integer, and is converted to a signed 64-bit integer without changing the bits. For example, C<01777777777777777777777L> is C<-1L>.
 
-And if - exists, the following conversion is performed.
-
-  value_int32_t = -value_int32_t;
-
-For example, 037777777777 is the same as -1, -037777777777 is the same as 1.
-
-If the return type is the long type, the value that is except for - is interpreted as unsigned 64 bit integer C<uint64_t> type in the C language, and the following conversion is performed.
-
-  uint64_t value_uint64_t;
-  value_int64_t = (int64_t)value_uint64_t;
-
-And if - exists, the following conversion is performed.
-
-  value_int64_t = -value_int64_t;
-
-For example, C<01777777777777777777777L> is the same as C<-1L>, C<-01777777777777777777777L> is the same as C<1L>.
+If the return type is the long type, the value that is except for C<-> is interpreted as unsigned 64 bit integer C<uint64_t> type in the C language, and the following conversion is performed.
 
 Compilation Errors:
 
-If the return type is the int type and the value that is except for - is greater than octal 37777777777, a compilation error occurs.
+If the return type is the int type and the octal numbers part is greater than octal 37777777777, a compilation error occurs.
 
-If the return type is the long type and the value that is except for - is greater than octal 1777777777777777777777, a compilation error occurs.
+If the return type is the long type and the octal numbers part is greater than octal 1777777777777777777777, a compilation error occurs.
 
 Examples:
 
@@ -661,43 +680,29 @@ Examples:
 
 =head3 Integer Literal Binary Notation
 
-The interger literal binary notation is the way to write an L<integer literal|/"Integer Literals"> using binary numbers 0 and 1.
+The interger literal binary notation represents a number of the int type or the long type using binary numbers C<0> and C<1>.
 
-A minus - can be at the beginning, and is followed by C<0b> or C<0B>, and is followed by one or more 0 and 1.
+It can begin with a minus C<->.
 
-C<_> can be used as a separator at the any positions after C<0b> or C<0B>. C<_> has no meaning.
+It is followed by C<0b> or C<0B>.
 
-The suffix C<L> or C<l> can be at the end.
+It is followed by one or more C<0> and C<1>. This is called binary numbers part.
+
+C<_> can be placed at the any positions after C<0b> or C<0B> as a separator. C<_> has no meaning.
+
+It can end with the suffix C<L> or C<l>.
 
 If the suffix C<L> or C<l> exists, the return type is the long type. Otherwise the return type is the int type.
 
-If the return type is the int type, the value that is except for - is interpreted as unsigned 32 bit integer C<uint32_t> type in the C language, and the following conversion is performed.
+If the return type is the int type, the binary numbers part is interpreted as an unsigned 32 bit integer, and is converted to a signed 32-bit integer without changing the bits. For example, C<0b11111111111111111111111111111111> is  -1.
 
-  uint32_t value_uint32_t;
-  int32_t value_int32_t = (int32_t)value_uint32_t;
-
-And if - exists, the following conversion is performed.
-
-  value_int32_t = -value_int32_t;
-
-For example, C<0b11111111111111111111111111111111> is the same as -1, C<-0b11111111111111111111111111111111> is the same as 1.
-
-If the return type is the long type, the value that is except for - is interpreted as unsigned 64 bit integer C<uint64_t> type in the C language, and the following conversion is performed.
-
-  uint64_t value_uint64_t;
-  value_int64_t = (int64_t)value_uint64_t;
-
-And if - exists, the following conversion is performed.
-
-  value_int64_t = -value_int64_t;
-
-For example, C<0b1111111111111111111111111111111111111111111111111111111111111111L> is the same as C<-1L>, C<-0b1111111111111111111111111111111111111111111111111111111111111111L> is the same as C<1L>.
+If the return type is the long type, the binary numbers part is interpreted as unsigned 64 bit integer, and is converted to a signed 64-bit integer without changing the bits. For example, C<0b1111111111111111111111111111111111111111111111111111111111111111L> is C<-1L>.
 
 Compilation Errors:
 
-If the return type is the int type and the value that is except for - is greater than binary 11111111111111111111111111111111, a compilation error occurs.
+If the return type is the int type and the value that is except for C<-> is greater than binary C<11111111111111111111111111111111>, a compilation error occurs.
 
-If the return type is the long type and the value that is except for - is greater than binary 1111111111111111111111111111111111111111111111111111111111111111, a compilation error occurs.
+If the return type is the long type and the value that is except for C<-> is greater than binary C<1111111111111111111111111111111111111111111111111111111111111111>, a compilation error occurs.
 
 Examples:
 
@@ -706,37 +711,51 @@ Examples:
   0b110000L
   0b10101010_10101010
 
-=head2 Floating Point Literal
+=head2 Floating Point Literals
 
-The floating point litral is a L<numeric literal/"Numeric Literals"> to write a constant value that type is a L<floating point type|/"Floating Point Type"> in source codes.
+The floating point litral represetns a floating point number.
 
 =head3 Floating Point Literal Decimal Notation
 
-The floating point litral decimal notation is the way to write a L<floating point literal|/"Floating Point Literal"> using decimal numbers 0-9 in source codes.
+The floating point litral decimal notation represents a number of the float type and the double type using decimal numbers C<0-9>.
 
-A minus - can be at the beginning, and is followed by one or more 0-9
+It can begin with a minus C<->.
 
-C<_> can be used as a separator at the any positions after the first 0-9.
+It is followed by one or more C<0-9>.
 
-And can be followed by a floating point part.
+C<_> can be placed at the any positions after the first C<0-9>.
 
-A floating point part is . and is followed by one or more 0-9.
+It can be followed by a floating point part, an exponent part, or a combination of a floating point part and an exponent part.
 
-And can be followed by an exponent part.
+[Floating Point Part Begin]
 
-An exponent part is C<e> or C<E> and is followed by C<+>, -, or C<"">, and followed by one or more 0-9.
+A floating point part begins with C<.>.
 
-And can be followed by a suffix is C<f>, C<F>, C<d>, or C<D>.
+It is followed by one or more C<0-9>.
 
-one of a floating point part, an exponent part, or a suffix must exist.
+[Floating Point Part End]
 
-If the suffix C<f> or C<F> exists, the return type is the L<float type|/"float Type">. Otherwise the return type is the L<double type|/"double Type">.
+[Exponent Part Begin]
+
+An exponent part begins with C<e> or C<E>.
+
+It can be followed by C<+> or C<->
+
+It is followed by one or more C<0-9>.
+
+[Exponent Part End]
+
+A floating point litral decimal notation can end with a suffix C<f>, C<F>, C<d>, or C<D>.
+
+If a suffix does not exists, a floating point litral decimal notation must have a floating point part or an exponent part.
+
+If the suffix C<f> or C<F> exists, the return type is the float type. Otherwise the return type is the double type.
 
 Compilation Errors:
 
-If the return type is the L<float type|/"float Type">, the floating point literal is parsed by the C<strtof> function of the C language. If the parsing fails, a compilation error occurs.
+If the return type is the float type, the floating point litral decimal notation without the suffix must be able to be parsed by the C<strtof> function in the C language. Otherwise, a compilation error occurs.
 
-If the return type is the L<double type|/"double Type">, the floating point literal is parsed by the C<strtod> function of the C language. If the parsing fails, a compilation error occurs.
+If the return type is the double type, the floating point litral decimal notation without the suffix must be able to be parsed by the C<strtod> function in the C language. Otherwise, a compilation error occurs.
 
 Examples:
 
@@ -750,38 +769,53 @@ Examples:
   1.32e-3
   1.32E+3
   1.32E-3
+  1.32e3f
   12e7
 
 =head3 Floating Point Literal Hexadecimal Notation
 
-The floating point litral hexadecimal notation is the way to write a L<floating point literal|/"Floating Point Literal"> using hexadecimal numbers C<0-9a-zA-Z> in source codes.
+The floating point litral hexadecimal notation represents a number of the float type and the double type using hexadecimal numbers C<0-9a-zA-Z>.
 
-A minus - can be at the beginning, and is followed by C<0x> or C<0X>, and is followed by one or more C<0-9a-zA-Z>.
+It can begin with a minus C<->.
 
-C<_> can be used as a separator at the any positions after C<0x> or C<0X>.
+It is followed by C<0x> or C<0X>.
 
-And can be followed by a floating point part.
+It is followed by one or more C<0-9a-zA-Z>.
 
-A floating point part is . and is followed by one or more C<0-9a-zA-Z>.
+C<_> can be placed at the any positions after C<0x> or C<0X>.
 
-And can be followed by an exponent part.
+It can be followed by a floating point part, an exponent part, or a combination of a floating point part and an exponent part.
 
-An exponent part is C<p> or C<P> and is followed by C<+>, -, or C<"">, and followed by one or more decimal numbers 0-9.
+[Floating Point Part Begin]
 
-And can be followed by a suffix C<f>, C<F>, C<d>, or C<D> if an exponent part exist.
+A floating point part begins with C<.>
 
-one of a floating point part or an exponent part must exist.
+It is followed by one or more C<0-9a-zA-Z>.
 
-If the suffix C<f> or C<F> exists, the return type is the L<float type|/"float Type">. Otherwise the return type is the L<double type|/"double Type">.
+[Floating Point Part End]
+
+[Exponent Part Begin]
+
+An exponent part begins with C<p> or C<P>.
+
+It can be followed by C<+> or C<->.
+
+It is followed by one or more C<0-9>.
+
+[Exponent Part End]
+
+A floating point litral hexadecimal notation can end with a suffix C<f>, C<F>, C<d>, or C<D>.
+
+If a suffix does not exists, a floating point litral hexadecimal notation must have a floating point part or an exponent part.
 
 Compilation Errors:
 
-If the return type is the L<float type|/"float Type">, the floating point literal is parsed by the C<strtof> function of the C language. If the parsing fails, a compilation error occurs.
+If the return type is the float type, the floating point litral hexadecimal notation without the suffix must be able to be parsed by the C<strtof> function in the C language. Otherwise, a compilation error occurs.
 
-If the return type is the L<double type|/"double Type">, the floating point literal is parsed by the C<strtod> function of the C language. If the parsing fails, a compilation error occurs.
+If the return type is the double type, thefloating point litral hexadecimal notation without the suffix must be able to be parsed by the C<strtod> function in the C language. Otherwise, a compilation error occurs.
 
 Examples:
-  
+
   0x3d3d.edp0
   0x3d3d.edp3
   0x3d3d.edP3
@@ -792,19 +826,43 @@ Examples:
   0x3d3d.edP-3D
   0x3d3dP+3
 
+=head2 Bool Literals
+
+The bool literal represents a bool object.
+
+=head3 true
+
+C<true> is the alias for the L<TRUE|SPVM::Bool/"TRUE"> method in the L<Bool|SPVM::Bool> class.
+
+  true
+
+Examples:
+
+  # true
+  my $bool_object_true = true;
+
+=head3 false
+
+C<false> is the alias for the L<FALSE|SPVM::Bool/"FALSE"> method in the L<Bool|SPVM::Bool> class.
+
+  false
+
+Examples:
+
+  # false
+  my $bool_object_false = false;
+
 =head2 Character Literal
 
-A character literal is a L<literal|/"Literal"> to write a constant value that type is the L<byte type|/"byte Type"> in source codes.
+A character literal represents a number of the L<byte type|SPVM::Document::Language::Types/"byte Type"> that normally represents an ASCII character.
 
-A character literal represents an ASCII character.
+It begins with C<'>.
 
-A character literal begins with C<'>.
+It is followed by a printable ASCII character C<0x20-0x7e> or an L<character literal escape character|/"Character Literal Escape Characters">.
 
-And is followed by a printable ASCII character C<0x20-0x7e> or an L<character literal escape character|/"Character Literal Escape Characters">.
+It ends with C<'>.
 
-And ends with C<'>.
-
-The return type is the L<byte type|/"byte Type">.
+The return type is the byte type.
 
 Compilation Errors:
 
@@ -812,26 +870,18 @@ If the format of the character literal is invalid, a compilation error occurs.
 
 =head3 Character Literal Escape Characters
 
-The list of character literal escape characters.
+The List of Character Literal Escape Characters:
 
 =begin html
 
 <table>
   <tr>
     <th>
-      Character literal escape characters
+      Character Literal Escape Characters
     </th>
     <th>
-      ASCII characters
+      Values
     </th>
-  </tr>
-  <tr>
-    <td>
-      \0
-    </td>
-    <td>
-      <code>0x00</code> NUL
-    </td>
   </tr>
   <tr>
     <td>
@@ -902,7 +952,7 @@ The list of character literal escape characters.
       <a href="#Octal-Escape-Character">Octal Escape Character</a>
     </td>
     <td>
-      An ASCII character
+      A number represented by an octal escape character
     </td>
   </tr>
   <tr>
@@ -910,12 +960,14 @@ The list of character literal escape characters.
       <a href="#Hexadecimal-Escape-Character">Hexadecimal Escape Character</a>
     </td>
     <td>
-      An ASCII character
+      A number represented by a hexadecimal escape character
     </td>
   </tr>
 </table>
 
 =end html
+
+The type of every character literal escape character is the byte type.
 
 Examples:
 
@@ -930,8 +982,11 @@ Examples:
   '\"'
   '\''
   '\\'
-  '\0'
   ' '
+  '\0'
+  '\012'
+  '\377'
+  '\o{1}'
   '\xab'
   '\xAB'
   '\x0D'
@@ -941,17 +996,84 @@ Examples:
   '\xFF'
   '\x{A}'
 
+=head2 Octal Escape Character
+
+The octal escape character represents an unsined 8-bit integer using octal numbers C<0-7>.
+
+The octal escape character is a part of a L<string literal|/"String Literal"> and a L<character literal|/"Character Literal">.
+
+It begins with C<\0>, C<\1>, C<\2>, C<\3>, C<\4>, C<\5>, C<\6>, C<\7>, or C<\o{>.
+
+If it begins with C<\0>, C<\1>, C<\2>, C<\3>, C<\4>, C<\5>, C<\6>, or C<\7>, it is followed by one to two C<0-7>.
+
+If it begins with C<\o{>, it is followed by one to three C<0-7>, and ends with C<}>.
+
+The octal numbers after C<\> or C<\o{> is called octal numbers part.
+
+Octal numbers part is interpreted as an unsined 8-bit integer, and is converted to a number of the byte type without changing the bits.
+
+Compilation Errors:
+
+The octal numbers part must be less than or equal to C<377>. Otherwise a compilation error occurs.
+
+If an octal escape character begins with C<\o{>, the close C<}> must exist. Otherwise a compilation error occurs.
+
+Examples:
+  
+  # Octal escape characters
+  \0
+  \01
+  \03
+  \012
+  \001
+  \077
+  \377
+  \o{1}
+  \o{12}
+
+=head2 Hexadecimal Escape Character
+
+The hexadecimal escape character represents an unsined 8-bit integer using hexadecimal numbers C<0-9a-fA-F>.
+
+The hexadecimal escape character is a part of a L<string literal|/"String Literal"> and a L<character literal|/"Character Literal">.
+
+The hexadecimal escape character begins with C<\x>.
+
+It can be followed by C<{>.
+
+It is followed by one or two C<0-9a-fA-F>. This is called hexadecimal numbers part.
+
+If it contains C<{>, it must be followed by C<}>.
+
+Hexadecimal numbers part is interpreted as an unsined 8-bit integer, and is converted to a number of the byte type without changing the bits.
+
+Compilation Errors:
+
+If the format of the hexadecimal escape character is invalid, a compilation error occurs.
+
+Examples:
+  
+  # Hexadecimal escape characters
+  \xab
+  \xAB
+  \x0D
+  \x0A
+  \xD
+  \xA
+  \xFF
+  \x{A}
+
 =head2 String Literal
 
-A string literal is a L<literal|/"Literal"> to write a constant value that type is the L<string type|/"string Type"> in source codes.
+A string literal represents a constant L<string|SPVM::Document::Language::Types/"String">.
 
-The return type is the L<string type|/"string Type">.
+A string literal begins with C<">.
 
-A character literal begins with C<">.
+It is followed by zero or more UTF-8 characters, L<string literal escape characters|/"String Literal Escape Characters">, or L<variable expansions|/"Variable Expansion">.
 
-And is followed by zero or more than zero UTF-8 character, or L<string literal escape characters|/"String Literal Escape Characters">, or L<variable expansions|/"Variable Expansion">.
+It ends with C<">.
 
-And ends with C<">.
+The return type is the L<string type|SPVM::Document::Language::Types/"string Type">.
 
 Compilation Errors:
 
@@ -960,12 +1082,16 @@ If the format of the string literal is invalid, a compilation error occurs.
 Examples:
 
   # String literals
+  ""
   "abc";
   "あいう"
   "hello\tworld\n"
   "hello\x0D\x0A"
   "hello\xA"
   "hello\x{0A}"
+  "hello\0"
+  "hello\012"
+  "hello\377"
   "AAA $foo BBB"
   "AAA $FOO BBB"
   "AAA $$foo BBB"
@@ -977,95 +1103,89 @@ Examples:
 
 =head3 String Literal Escape Characters
 
+The List of String Literal Escape Characters:
+
 =begin html
 
 <table>
   <tr>
     <th>
-      String literal escape characters
+      String Literal Escape Characters
    </th>
     <th>
-      Descriptions
+      Values
    </th>
   </tr>
   <tr>
     <td>
-      <b>\0</b>
+      \a
     </td>
     <td>
-      ASCII <code>0x00</code> NUL
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>\a</b>
-    </td>
-    <td>
-      ASCII <code>0x07</code> BEL
+      <code>0x07</code> BEL
     </td>
   </tr>
   <tr>
     <td>
-      <b>\t</b>
+      \t
     </td>
     <td>
-      ASCII <code>0x09</code> HT
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>\n</b>
-    </td>
-    <td>
-      ASCII <code>0x0A</code> LF
+      <code>0x09</code> HT
     </td>
   </tr>
   <tr>
     <td>
-      <b>\f</b>
+      \n
     </td>
     <td>
-      ASCII <code>0x0C</code> FF
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>\r</b>
-    </td>
-    <td>
-      ASCII <code>0x0D</code> CR
+      <code>0x0A</code> LF
     </td>
   </tr>
   <tr>
     <td>
-      <b>\"</b>
+      \f
     </td>
     <td>
-      ASCII <code>0x22</code> "
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>\$</b>
-    </td>
-    <td>
-      ASCII <code>0x24</code> $
+      <code>0x0C</code> FF
     </td>
   </tr>
   <tr>
     <td>
-      <b>\'</b>
+      \r
     </td>
     <td>
-      ASCII <code>0x27</code> '
+      <code>0x0D</code> CR
     </td>
   </tr>
   <tr>
     <td>
-      <b>\\</b>
+      \"
     </td>
     <td>
-      ASCII <code>0x5C</code> \
+      <code>0x22</code> "
+    </td>
+  </tr>
+  <tr>
+    <td>
+      \$
+    </td>
+    <td>
+      <code>0x24</code> $
+    </td>
+  </tr>
+  <tr>
+    <td>
+      \'
+    </td>
+    <td>
+      <code>0x27</code> '
+    </td>
+  </tr>
+  <tr>
+    <td>
+      \\
+    </td>
+    <td>
+      <code>0x5C</code> \
     </td>
   </tr>
   <tr>
@@ -1073,7 +1193,7 @@ Examples:
       <a href="#Octal-Escape-Character">Octal Escape Character</a>
     </td>
     <td>
-      An ASCII character
+      A number represented by an octal escape character
     </td>
   </tr>
   <tr>
@@ -1081,166 +1201,184 @@ Examples:
       <a href="#Hexadecimal-Escape-Character">Hexadecimal Escape Character</a>
     </td>
     <td>
-      An ASCII character
+      A number represented by a hexadecimal escape character
     </td>
   </tr>
   <tr>
     <td>
-      <a href="#Unicode-Escape-Character">Unicode escape character</a>
+      <a href="#Unicode-Escape-Character">A Unicode escape character</a>
     </td>
     <td>
-      An UTF-8 character
+      Numbers represented by an Unicode escape character
     </td>
   </tr>
   <tr>
     <td>
-      <a href="#Raw-Escape-Character">Raw escape character</a>
+      <a href="#Raw-Escape-Characters">A raw escape character</a>
     </td>
     <td>
-      The value of raw escape character
+      Numbers represented by a hexadecimal escape character
     </td>
   </tr>
 </table>
 
 =end html
 
+The type of every string literal escape character ohter than the Unicode escape character and the raw escape character is the byte type.
+
+The type of each number contained in the Unicode escape character and the raw escape character is the byte type.
+
 =head3 Unicode Escape Character
 
-The Unicode escape character is the way to write an UTF-8 character using an Unicode code point that is written by hexadecimal numbers C<0-9a-fA-F>.
+The Unicode escape character represents an UTF-8 character.
 
-The Unicode escape character can be used as an escape character of the L<string literal|/"String Literal">.
+An UTF-8 character is represented by an Unicode code point with hexadecimal numbers C<0-9a-fA-F>.
 
-The Unicode escape character begins with C<N{U+>.
+This is one to four numbers of the byte type.
 
-And is followed by one or more C<0-9a-fA-F>.
+The Unicode escape character is a part of a L<string literal|/"String Literal">.
 
-And ends with C<}>.
+It begins with C<\N{U+>.
+
+It is followed by one or more C<0-9a-fA-F>. This is called code point part.
+
+It ends with C<}>.
 
 Compilation Errors:
 
-If the Unicode code point is not a Unicode scalar value, a compilation error occurs.
+If a code point part is not a Unicode scalar value, a compilation error occurs.
 
 Examples:
   
-  # あいう
-  "\N{U+3042}\N{U+3044}\N{U+3046}"
+  # Unicode escape characters
   
-  # くぎが
-  "\N{U+304F}\N{U+304E}\N{U+304c}"
-
-=head3 Raw Escape Character
-
-The raw escape character is the escapa character that <\> has no effect and C<\> is interpreted as ASCII C<\>.
-
-For example, C<\s> is ASCII chracters C<\s>, C<\d> is ASCII chracters <\d>.
-
-The raw escape character can be used as an escape character of the L<string literal|/"String Literal">.
-
-The raw escape character is designed to be used by regular expression classes such as L<Regex|SPVM::Regex>.
-
-The list of raw escape characters.
+  # あ
+  \N{U+3042}
   
-  # Raw excape literals
-  \! \# \% \& \( \) \* \+ \, \- \. \/
-  \: \; \< \= \> \? \@
-  \A \B \D \G \H \K \N \P \R \S \V \W \X \Z
-  \[ \] \^ \_ \`
-  \b \d \g \h \k \p \s \v \w \z
-  \{ \| \} \~
+  # い
+  \N{U+3044}
+  
+  # う
+  \N{U+3046}"
 
-=head2 Octal Escape Character
+=head3 Raw Escape Characters
 
-The octal escape character is the way to write an ASCII code using octal numbers 0-7.
+A raw escape character is an escapa character that <\> is interpreted as ASCII C<\> and the following character is interpreted as itself.
 
-The octal escape character can be used as an escape character of the L<string literal|/"String Literal"> and the L<character literal|/"Character Literal">.
+For example, a raw escape character C<\s> is ASCII chracters C<\s>.
 
-The octal escape character begins with C<\o{>, and it must be followed by one to three 0-7, and ends with C<}>.
+A raw escape character is a part of a L<string literal|/"String Literal">.
 
-Or the octal escape character begins with C<\0>, C<\1>, C<\2>, C<\3>, C<\4>, C<\5>, C<\6>, C<\7>, and it must be followed by one or two 0-7.
+The List of Raw Escape Characters:
 
-  # Octal escape ch1racters in ch1racter literals
-  '\0'
-  '\012'
-  '\003'
-  '\001'
-  '\03'
-  '\01'
-  '\077'
-  '\377'
+=begin html
 
-  # Octal escape ch1racters in ch1racter literals
-  '\o{0}'
-  '\o{12}'
-  '\o{03}'
-  '\o{01}'
-  '\o{3}'
-  '\o{1}'
-  '\o{77}'
-  '\o{377}'
+<table>
+  <tr><th>Raw Escape Characters</th></tr>
+  <tr><td>\!</td></tr>
+  <tr><td>\#</td></tr>
+  <tr><td>\%</td></tr>
+  <tr><td>\&</td></tr>
+  <tr><td>\(</td></tr>
+  <tr><td>\)</td></tr>
+  <tr><td>\*</td></tr>
+  <tr><td>\+</td></tr>
+  <tr><td>\,</td></tr>
+  <tr><td>\-</td></tr>
+  <tr><td>\.</td></tr>
+  <tr><td>\/</td></tr>
+  <tr><td>\:</td></tr>
+  <tr><td>\;</td></tr>
+  <tr><td>\<</td></tr>
+  <tr><td>\=</td></tr>
+  <tr><td>\></td></tr>
+  <tr><td>\?</td></tr>
+  <tr><td>\@</td></tr>
+  <tr><td>\A</td></tr>
+  <tr><td>\B</td></tr>
+  <tr><td>\D</td></tr>
+  <tr><td>\G</td></tr>
+  <tr><td>\H</td></tr>
+  <tr><td>\K</td></tr>
+  <tr><td>\N</td></tr>
+  <tr><td>\P</td></tr>
+  <tr><td>\R</td></tr>
+  <tr><td>\S</td></tr>
+  <tr><td>\V</td></tr>
+  <tr><td>\W</td></tr>
+  <tr><td>\X</td></tr>
+  <tr><td>\Z</td></tr>
+  <tr><td>\[</td></tr>
+  <tr><td>\]</td></tr>
+  <tr><td>\^</td></tr>
+  <tr><td>\_</td></tr>
+  <tr><td>\`</td></tr>
+  <tr><td>\b</td></tr>
+  <tr><td>\d</td></tr>
+  <tr><td>\g</td></tr>
+  <tr><td>\h</td></tr>
+  <tr><td>\k</td></tr>
+  <tr><td>\p</td></tr>
+  <tr><td>\s</td></tr>
+  <tr><td>\v</td></tr>
+  <tr><td>\w</td></tr>
+  <tr><td>\z</td></tr>
+  <tr><td>\{</td></tr>
+  <tr><td>\|</td></tr>
+  <tr><td>\}</td></tr>
+  <tr><td>\~</td></tr>
+</table>
 
-  # Octal escape ch1racters in string literals
-  "Foo \0 Bar"
-  "Foo \012 Bar"
-  "Foo \003 Bar"
-  "Foo \001 Bar"
-  "Foo \03  Bar"
-  "Foo \01  Bar"
-  "Foo \077 Bar"
-  "Foo \377 Bar"
+=end html
 
-  # Octal escape ch1racters in string literals
-  "Foo \o{12} Bar"
-  "Foo \o{12} Bar"
-  "Foo \o{03} Bar"
-  "Foo \o{01} Bar"
-  "Foo \o{3}  Bar"
-  "Foo \o{1}  Bar"
-  "Foo \o{77} Bar"
-  "Foo \o{377} Bar"
+=head3 Variable Expansion
 
-=head2 Hexadecimal Escape Character
+The variable expasion is a syntax to embed L<getting a local variable|SPVM::Document::Language::Operators/"Getting a Local Variable">, L<getting a class variables|SPVM::Document::Language::Operators/"Getting a Class Variable">, a L<dereference|SPVM::Document::Language::Operators/"Dereference Operator">, L<getting a field|SPVM::Document::Language::Operators/"Getting a Field">, L<getting an array element|SPVM::Document::Language::Operators/"Getting an Array Element">, L<getting the exception variable|SPVM::Document::Language::Operators/"Getting the Exception Variable"> into a L<string literal|"String Literal">.
 
-The hexadecimal escape character is the way to write an ASCII code using hexadecimal numbers C<0-9a-fA-F>.
+  "AAA $foo BBB"
+  "AAA $FOO BBB"
+  "AAA $$foo BBB"
+  "AAA $foo->{x} BBB"
+  "AAA $foo->[3] BBB"
+  "AAA $foo->{x}[3] BBB"
+  "AAA $foo->{x}->[3] BBB"
+  "AAA $@ BBB"
+  "AAA ${foo}BBB"
 
-The hexadecimal escape character can be used as an escape character of the L<string literal|/"String Literal"> and the L<character literal|/"Character Literal">.
+The above codes are expanded to the following codes.
 
-The hexadecimal escape character begins with C<\x>.
+  "AAA " . $foo . " BBB"
+  "AAA " . $FOO . " BBB"
+  "AAA " . $$foo . " BBB"
+  "AAA " . $foo->{x} . " BBB"
+  "AAA " . $foo->[3] . " BBB"
+  "AAA " . $foo->{x}[3] . " BBB"
+  "AAA " . $foo->{x}->[3] . " BBB"
+  "AAA " . $@ . "BBB"
+  "AAA " . ${foo} . "BBB"
 
-And is followed by one or two C<0-9a-fA-F>.
+The operation of getting field does not contain L<space characters|/"Space Characters"> between C<{> and C<}>.
 
-The hexadecimal numbers can be sorrounded by C<{> and C<}>.
+The index of getting array element must be a constant interger.
 
-  # Hexadecimal escape characters in character literals
-  '\xab'
-  '\xAB'
-  '\x0D'
-  '\x0A'
-  '\xD'
-  '\xA'
-  '\xFF'
-  '\x{A}'
+The getting array dose not contain L<space characters|/"Space Characters"> between C<[> and C<]>.
 
-  # Hexadecimal escape characters in string literals
-  "Foo \xab  Bar"
-  "Foo \xAB  Bar"
-  "Foo \x0D  Bar"
-  "Foo \x0A  Bar"
-  "Foo \xD   Bar"
-  "Foo \xA   Bar"
-  "Foo \xFF  Bar"
-  "Foo \x{A} Bar"
+The end C<$> is interpreted by C<$>, not interpreted as a variable expansion.
+  
+  # AAA$
+  "AAA$"
 
 =head2 Single-Quoted String Literal
 
-A single-quoted string literal represents a constant string value in source codes.
+A single-quoted string literal represents a constant string without variable expansions with a few escape characters.
 
-The return type is the L<string type|/"string Type">.
+It begins with C<q'>.
 
-A character literal begins with C<q'>.
+It is followed by zero or more UTF-8 characters, or L<single-quoted string literal escape characters|/"Single-Quoted String Literal Escape Characters">.
 
-And is followed by zero or more than zero UTF-8 character, or L<escape characters|/"Single-Quoted String Literal Escape Characters">.
+It ends with C<'>.
 
-And ends with C<'>.
+The return type is the L<string type|SPVM::Document::Language::Types/"string Type">.
 
 Compilation Errors:
 
@@ -1256,137 +1394,62 @@ Examples:
 
 =head3 Single-Quoted String Literal Escape Characters
 
+The List of Single-Quoted String Literal Escape Characters:
+
 =begin html
 
 <table>
   <tr>
     <th>
-      Single-quoted string literal escape characters
+      Single-Quoted String Literal Escape Characters
    </th>
     <th>
-      Descriptions
+      Values
    </th>
   </tr>
   <tr>
     <td>
-      <b>\\</b>
+      \'
     </td>
     <td>
-      ASCII <code>0x5C</code> \
+      <code>0x27</code> '
     </td>
   </tr>
   <tr>
     <td>
-      <b>\'</b>
+      \\
     </td>
     <td>
-      ASCII <code>0x27</code> '
+      <code>0x5C</code> \
     </td>
   </tr>
 </table>
 
 =end html
 
-=head2 Bool Literal
-
-The bool literal is a L<literal|/"Literal"> to represent a bool value in source codes.
-
-=head3 true
-
-C<true> is the alias for the L<TRUE|SPVM::Bool/"TRUE"> method of L<Bool|SPVM::Bool>.
-
-  true
-
-Examples:
-
-  # true
-  my $is_valid = true;
-
-=head3 false
-
-C<false> is the alias for L<FALSE|SPVM::Bool/"FALSE"> method of L<Bool|SPVM::Bool>.
-
-  false
-
-Examples:
-
-  # false
-  my $is_valid = false;
-
-=head2 Variable Expansion
-
-The variable expasion is the feature to embed L<getting local variable|/"Getting Local Variable">, L<getting class variables|/"Getting Class Variable">, L<dereference|/"Dereference">, L<getting field/"Getting Field">, L<getting array element|/"Getting Array Element">, L<getting exception variable/"Getting Exception Variable"> into the L<string literal|"String Literal">.
-
-  "AAA $foo BBB"
-  "AAA $FOO BBB"
-  "AAA $$foo BBB"
-  "AAA $foo->{x} BBB"
-  "AAA $foo->[3] BBB"
-  "AAA $foo->{x}[3] BBB"
-  "AAA $foo->{x}->[3] BBB"
-  "AAA $@ BBB"
-  "AAA ${foo}BBB"
-
-The above codes are convarted to the following codes.
-
-  "AAA " . $foo . " BBB"
-  "AAA " . $FOO . " BBB"
-  "AAA " . $$foo . " BBB"
-  "AAA " . $foo->{x} . " BBB"
-  "AAA " . $foo->[3] . " BBB"
-  "AAA " . $foo->{x}[3] . " BBB"
-  "AAA " . $foo->{x}->[3] . " BBB"
-  "AAA " . $@ . "BBB"
-  "AAA " . ${foo} . "BBB"
-
-The getting field doesn't contain space characters between C<{> and C<}>.
-
-The index of getting array element must be a constant value. The getting array doesn't contain space characters between C<[> and C<]>.
-
-The end C<$> is not interpreted as a variable expansion.
-
-  "AAA$"
-
-=head2 Fat Comma
-
-The fat comma C<=>> is a L<separator|/"Separators">.
-
-  =>
-
-The fat comma is an alias for Comma C<,>.
-
-  # Comma
-  ["a", "b", "c", "d"]
-  
-  # Fat Comma
-  ["a" => "b", "c" => "d"]
-
-If the characters of I<LEFT_OPERAND> of the fat camma is not wrapped by C<"> and the characters are a L<symbol name|/"Symbol Name"> that does'nt contain C<::>, the characters are treated as a L<string literal|/"String Literal">.
-
-  # foo_bar2 is treated as "foo_bar2"
-  [foo_bar2 => "Mark"]
-
-  ["foo_bar2" => "Mark"]
+The type of every single-quoted string literal escape character is the byte type.
 
 =head2 Here Document
 
-Here document is syntax to write a string literal in multiple lines without escapes and variable expansions.
+A here document represents a constant string in multiple lines without escape characters and L<variable expansions|/"Variable Expansion">.
 
   <<'HERE_DOCUMENT_NAME';
-  line1
-  line2
-  line...
+  LINE1
+  LINE2
+  LINEn
   HERE_DOCUMENT_NAME
 
-Here document syntax begins with C<<<'HERE_DOCUMENT_NAME';> + a line terminator. C<HERE_DOCUMENT_NAME> is a L<here document name|/"Here Document Name">.
+A here document begins with C<<<'HERE_DOCUMENT_NAME';> and ASCII C<LF>.
 
-A string begins from the next line.
+I<HERE_DOCUMENT_NAME> is a L<here document name|/"Here Document Name">.
 
-Here document syntax ends with the line that begins C<HERE_DOCUMENT_NAME> + a line terminator.
+It is followed by a string in multiple lines.
+
+It ends with I<HERE_DOCUMENT_NAME> from the beginning of a line and ASCII C<LF>.
 
 Compilation Errors:
 
-C<<<'HERE_DOCUMENT_NAME'> cannot contains spaces. If so, a compilation error occurs.
+C<<<'HERE_DOCUMENT_NAME';> must not contain L<space characters|/"Space Characters">. Otherwise a compilation error occurs.
 
 Examples:
   
@@ -1395,25 +1458,20 @@ Examples:
   Hello
   World
   EOS
-  
-  # No escapes and variable expaneions are performed.
-  my $string = <<'EOS';
-  $foo
-  \t
-  \
-  EOS
 
 =head3 Here Document Name
 
-Here document name is composed of C<a-z>, C<A-Z>, C<_>, C<0-9>.
+A here document name consist of C<a-z>, C<A-Z>, C<_>, C<0-9>.
+
+The length of a here document name is greater than or equal to 0.
+
+A here document name cannot begin with C<0-9>.
+
+A here document name cannot contain C<__>.
 
 Compilaition Errors:
 
-The length of a here document name must be greater than or equal to 0. Otherwise a compilation error occurs.
-
-A here document name cannot start with a number. If so, a compilation error occurs.
-
-A here document name cannot contain C<__>. If so, a compilation error occurs.
+If the format of a here document name is invalid, a compilatio error occurs.
 
 =head1 See Also
 

@@ -7,7 +7,7 @@ use Test::More;
 
 use_ok('URI::PackageURL');
 use_ok('URI::PackageURL::Util');
-use_ok('URI::PackageURL::CLI');
+use_ok('URI::PackageURL::App');
 
 done_testing();
 

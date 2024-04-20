@@ -5,8 +5,8 @@ use strict;
 
 =head1 NAME
 
-Net::EPP::ResponseCodes - a module to export some constants that
-correspond to EPP response codes
+Net::EPP::ResponseCodes - a module to export some constants that correspond to
+EPP response codes.
 
 =head1 SYNOPSIS
 
@@ -46,11 +46,10 @@ correspond to EPP response codes
 
 =head1 DESCRIPTION
 
-Every response sent to the client by an EPP server contains a C<E<lt>resultE<gt>>
-element that has a C<code> attribute. This is a four-digit
-numeric code that describes the result of the request. This module exports
-a set of constants that provide handy mnemonics for each of the defined
-codes.
+Every response sent to the client by an EPP server contains at least one
+C<E<lt>resultE<gt>> element that has a C<code> attribute. This is a four-digit
+numeric code that describes the result of the request. This module exports a set
+of constants that provide handy mnemonics for each of the defined codes.
 
 =head1 EXPORTS
 
@@ -171,62 +170,68 @@ brackets is the integer value associated with the constant.
 
 =back
 
+=head1 COPYRIGHT
+
+This module is (c) 2008 - 2023 CentralNic Ltd and 2024 Gavin Brown. This module
+is free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.
+
 =cut
 
 #
 # Successful command completion responses:
 #
-use constant OK                    			=> 1000;
-use constant OK_PENDING                		=> 1001;
-use constant OK_NO_MESSAGES            		=> 1300;
-use constant OK_MESSAGES            		=> 1301;
-use constant OK_BYE               			=> 1500;
+use constant OK             => 1000;
+use constant OK_PENDING     => 1001;
+use constant OK_NO_MESSAGES => 1300;
+use constant OK_MESSAGES    => 1301;
+use constant OK_BYE         => 1500;
 
 #
 # Command error responses:
 #
 
 # Protocol Syntax:
-use constant UNKNOWN_COMMAND            	=> 2000;
-use constant SYNTAX_ERROR            		=> 2001;
-use constant USE_ERROR                		=> 2002;
-use constant MISSING_PARAM            		=> 2003;
-use constant PARAM_RANGE_ERROR          	=> 2004;
-use constant PARAM_SYNTAX_ERROR         	=> 2005;
+use constant UNKNOWN_COMMAND    => 2000;
+use constant SYNTAX_ERROR       => 2001;
+use constant USE_ERROR          => 2002;
+use constant MISSING_PARAM      => 2003;
+use constant PARAM_RANGE_ERROR  => 2004;
+use constant PARAM_SYNTAX_ERROR => 2005;
 
 # Implementation-specific Rules:
-use constant UNIMPLEMENTED_VERSION      	=> 2100;
-use constant UNIMPLEMENTED_COMMAND      	=> 2101;
-use constant UNIMPLEMENTED_OPTION       	=> 2102;
-use constant UNIMPLEMENTED_EXTENSION    	=> 2103;
-use constant BILLING_FAILURE            	=> 2104;
-use constant NOT_RENEWABLE            		=> 2105;
-use constant NOT_TRANSFERRABLE          	=> 2106;
+use constant UNIMPLEMENTED_VERSION   => 2100;
+use constant UNIMPLEMENTED_COMMAND   => 2101;
+use constant UNIMPLEMENTED_OPTION    => 2102;
+use constant UNIMPLEMENTED_EXTENSION => 2103;
+use constant BILLING_FAILURE         => 2104;
+use constant NOT_RENEWABLE           => 2105;
+use constant NOT_TRANSFERRABLE       => 2106;
 
 # Security:
-use constant AUTHENTICATION_ERROR       	=> 2200;
-use constant AUTHORISATION_ERROR        	=> 2201;
-use constant AUTHORIZATION_ERROR        	=> 2201;
-use constant INVALID_AUTH_INFO          	=> 2202;
+use constant AUTHENTICATION_ERROR => 2200;
+use constant AUTHORISATION_ERROR  => 2201;
+use constant AUTHORIZATION_ERROR  => 2201;
+use constant INVALID_AUTH_INFO    => 2202;
 
 # Data Management:
-use constant OBJECT_PENDING_TRANSFER        => 2300;
-use constant OBJECT_NOT_PENDING_TRANSFER    => 2301;
-use constant OBJECT_EXISTS            		=> 2302;
-use constant OBJECT_DOES_NOT_EXIST        	=> 2303;
-use constant STATUS_PROHIBITS_OP        	=> 2304;
-use constant ASSOC_PROHIBITS_OP            	=> 2305;
-use constant PARAM_POLICY_ERROR            	=> 2306;
-use constant UNIMPLEMENTED_OBJECT_SERVICE   => 2307;
-use constant DATA_MGMT_POLICY_VIOLATION     => 2308;
+use constant OBJECT_PENDING_TRANSFER      => 2300;
+use constant OBJECT_NOT_PENDING_TRANSFER  => 2301;
+use constant OBJECT_EXISTS                => 2302;
+use constant OBJECT_DOES_NOT_EXIST        => 2303;
+use constant STATUS_PROHIBITS_OP          => 2304;
+use constant ASSOC_PROHIBITS_OP           => 2305;
+use constant PARAM_POLICY_ERROR           => 2306;
+use constant UNIMPLEMENTED_OBJECT_SERVICE => 2307;
+use constant DATA_MGMT_POLICY_VIOLATION   => 2308;
 
 # Server System:
-use constant COMMAND_FAILED            		=> 2400;
+use constant COMMAND_FAILED => 2400;
 
 # Connection Management:
-use constant COMMAND_FAILED_BYE            	=> 2500;
-use constant AUTH_FAILED_BYE            	=> 2501;
-use constant SESSION_LIMIT_EXCEEDED_BYE     => 2502;
+use constant COMMAND_FAILED_BYE         => 2500;
+use constant AUTH_FAILED_BYE            => 2501;
+use constant SESSION_LIMIT_EXCEEDED_BYE => 2502;
 
 our @EXPORT;
 my $package = __PACKAGE__;

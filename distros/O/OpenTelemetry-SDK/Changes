@@ -1,5 +1,10 @@
 Revision history for OpenTelemetry-SDK
 
+0.022     2024-04-19 11:46:54+01:00 Europe/London
+
+    * Do not call start on the background function in the batch span
+      processor, this is handled automatically by the loop (GH #13)
+
 0.021     2023-12-03 14:46:29+00:00 Europe/London
 
     * Clarify meaning of OTEL_BSP_EXPORT_TIMEOUT in POD

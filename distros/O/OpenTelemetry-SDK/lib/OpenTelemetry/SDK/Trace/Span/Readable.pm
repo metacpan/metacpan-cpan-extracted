@@ -2,7 +2,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::SDK::Trace::Span::Readable;
 
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 class OpenTelemetry::SDK::Trace::Span::Readable :does(OpenTelemetry::Attributes) {
     use OpenTelemetry::Constants 'INVALID_SPAN_ID';

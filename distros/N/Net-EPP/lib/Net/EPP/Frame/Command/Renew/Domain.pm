@@ -3,7 +3,6 @@ use base qw(Net::EPP::Frame::Command::Renew);
 use Net::EPP::Frame::ObjectSpec;
 use strict;
 
-
 =pod
 
 =head1 NAME
@@ -53,12 +52,12 @@ This results in an XML document like this:
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = bless($package->SUPER::new('renew'), $package);
+    my $package = shift;
+    my $self    = bless($package->SUPER::new('renew'), $package);
 
-	my $domain = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('domain'));
+    my $domain = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('domain'));
 
-	return $self;
+    return $self;
 }
 
 =pod
@@ -72,16 +71,15 @@ This method specifies the domain name for the renew.
 =cut
 
 sub setDomain {
-	my ($self, $domain) = @_;
+    my ($self, $domain) = @_;
 
-	my $name = $self->createElement('domain:name');
-	$name->appendText($domain);
+    my $name = $self->createElement('domain:name');
+    $name->appendText($domain);
 
-	$self->getNode('renew')->getChildNodes->shift->appendChild($name);
+    $self->getNode('renew')->getChildNodes->shift->appendChild($name);
 
-	return 1;
+    return 1;
 }
-
 
 =pod
 
@@ -92,15 +90,15 @@ This sets the optional renewal period.
 =cut
 
 sub setPeriod {
-	my ($self, $years) = @_;
+    my ($self, $years) = @_;
 
-	my $period = $self->createElement('domain:period');
-	$period->setAttribute('unit', 'y');
-	$period->appendText($years);
+    my $period = $self->createElement('domain:period');
+    $period->setAttribute('unit', 'y');
+    $period->appendText($years);
 
-	$self->getNode('renew')->getChildNodes->shift->appendChild($period);
+    $self->getNode('renew')->getChildNodes->shift->appendChild($period);
 
-	return 1;
+    return 1;
 }
 
 =pod
@@ -112,13 +110,13 @@ This sets the current expiry date for the domain.
 =cut
 
 sub setCurExpDate {
-	my ($self, $date) = @_;
+    my ($self, $date) = @_;
 
-	my $cur = $self->createElement('domain:curExpDate');
-	$cur->appendText($date);
-	$self->getNode('renew')->getChildNodes->shift->appendChild($cur);
+    my $cur = $self->createElement('domain:curExpDate');
+    $cur->appendText($date);
+    $self->getNode('renew')->getChildNodes->shift->appendChild($cur);
 
-	return 1;
+    return 1;
 }
 
 1;

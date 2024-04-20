@@ -1,10 +1,11 @@
 package Net::EPP::Frame::Command::Update::Domain;
-use base qw(Net::EPP::Frame::Command::Update);
+use List::Util qw(any);
+use base       qw(Net::EPP::Frame::Command::Update);
 use Net::EPP::Frame::ObjectSpec;
 use strict;
 use warnings;
 
-our $DNSSEC_URN	= 'urn:ietf:params:xml:ns:secDNS-1.1';
+our $DNSSEC_URN = 'urn:ietf:params:xml:ns:secDNS-1.1';
 
 =pod
 
@@ -55,17 +56,17 @@ This results in an XML document like this:
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = bless($package->SUPER::new('update'), $package);
+    my $package = shift;
+    my $self    = bless($package->SUPER::new('update'), $package);
 
-	my $domain = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('domain'));
+    my $domain = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('domain'));
 
-	foreach my $grp (qw(add rem chg)) {
-		my $el = $self->createElement(sprintf('domain:%s', $grp));
-		$self->getNode('update')->getChildNodes->shift->appendChild($el);
-	}
+    foreach my $grp (qw(add rem chg)) {
+        my $el = $self->createElement(sprintf('domain:%s', $grp));
+        $self->getNode('update')->getChildNodes->shift->appendChild($el);
+    }
 
-	return $self;
+    return $self;
 }
 
 =pod
@@ -79,15 +80,15 @@ This specifies the domain name to be updated.
 =cut
 
 sub setDomain {
-	my ($self, $domain) = @_;
+    my ($self, $domain) = @_;
 
-	my $name = $self->createElement('domain:name');
-	$name->appendText($domain);
+    my $name = $self->createElement('domain:name');
+    $name->appendText($domain);
 
-	my $n = $self->getNode('update')->getChildNodes->shift;
-	$n->insertBefore( $name, $n->firstChild );
+    my $n = $self->getNode('update')->getChildNodes->shift;
+    $n->insertBefore($name, $n->firstChild);
 
-	return 1;
+    return 1;
 }
 
 =pod
@@ -99,15 +100,15 @@ Add a status of $type with the optional extra $info.
 =cut
 
 sub addStatus {
-	my ($self, $type, $info) = @_;
-	my $status = $self->createElement('domain:status');
-	$status->setAttribute('s', $type);
-	$status->setAttribute('lang', 'en');
-	if ($info) {
-		$status->appendText($info);
-	}
-	$self->getElementsByLocalName('domain:add')->shift->appendChild($status);
-	return 1;
+    my ($self, $type, $info) = @_;
+    my $status = $self->createElement('domain:status');
+    $status->setAttribute('s',    $type);
+    $status->setAttribute('lang', 'en');
+    if ($info) {
+        $status->appendText($info);
+    }
+    $self->getElementsByLocalName('domain:add')->shift->appendChild($status);
+    return 1;
 }
 
 =pod
@@ -119,11 +120,11 @@ Remove a status of $type.
 =cut
 
 sub remStatus {
-	my ($self, $type) = @_;
-	my $status = $self->createElement('domain:status');
-	$status->setAttribute('s', $type);
-	$self->getElementsByLocalName('domain:rem')->shift->appendChild($status);
-	return 1;
+    my ($self, $type) = @_;
+    my $status = $self->createElement('domain:status');
+    $status->setAttribute('s', $type);
+    $self->getElementsByLocalName('domain:rem')->shift->appendChild($status);
+    return 1;
 }
 
 =pod
@@ -135,14 +136,14 @@ Add a contact of $type.
 =cut
 
 sub addContact {
-	my ($self, $type, $contact_id) = @_;
-	
-	my $contact = $self->createElement('domain:contact');
-	$contact->setAttribute('type', $type);
-	$contact->appendText($contact_id);
+    my ($self, $type, $contact_id) = @_;
 
-	$self->getElementsByLocalName('domain:add')->shift->appendChild($contact);
-	return 1;
+    my $contact = $self->createElement('domain:contact');
+    $contact->setAttribute('type', $type);
+    $contact->appendText($contact_id);
+
+    $self->getElementsByLocalName('domain:add')->shift->appendChild($contact);
+    return 1;
 }
 
 =pod
@@ -154,14 +155,14 @@ Remove a contact of $type.
 =cut
 
 sub remContact {
-	my ($self, $type, $contact_id) = @_;
-	
-	my $contact = $self->createElement('domain:contact');
-	$contact->setAttribute('type', $type);
-	$contact->appendText($contact_id);
+    my ($self, $type, $contact_id) = @_;
 
-	$self->getElementsByLocalName('domain:rem')->shift->appendChild($contact);
-	return 1;
+    my $contact = $self->createElement('domain:contact');
+    $contact->setAttribute('type', $type);
+    $contact->appendText($contact_id);
+
+    $self->getElementsByLocalName('domain:rem')->shift->appendChild($contact);
+    return 1;
 }
 
 =pod
@@ -173,15 +174,15 @@ Change the authinfo.
 =cut
 
 sub chgAuthInfo {
-	my ($self,$authInfo) = @_;
+    my ($self, $authInfo) = @_;
 
-	my $el = $self->createElement('domain:authInfo');
-	my $pw = $self->createElement('domain:pw');
-	$pw->appendText($authInfo);
-	$el->appendChild($pw);
+    my $el = $self->createElement('domain:authInfo');
+    my $pw = $self->createElement('domain:pw');
+    $pw->appendText($authInfo);
+    $el->appendChild($pw);
 
-	$self->getElementsByLocalName('domain:chg')->shift->appendChild($el);
-	return 1;
+    $self->getElementsByLocalName('domain:chg')->shift->appendChild($el);
+    return 1;
 }
 
 =pod
@@ -193,13 +194,13 @@ Change the authinfo.
 =cut
 
 sub chgRegistrant {
-	my ($self,$contact) = @_;
+    my ($self, $contact) = @_;
 
-	my $registrant = $self->createElement('domain:registrant');
-	$registrant->appendText($contact);
+    my $registrant = $self->createElement('domain:registrant');
+    $registrant->appendText($contact);
 
-	$self->getElementsByLocalName('domain:chg')->shift->appendChild($registrant);
-	return 1;
+    $self->getElementsByLocalName('domain:chg')->shift->appendChild($registrant);
+    return 1;
 }
 
 =pod
@@ -211,63 +212,60 @@ sub chgRegistrant {
 =cut 
 
 sub addNS {
-	my ($self, @ns) = @_;
+    my ($self, @ns) = @_;
 
-	if ( ref $ns[0] eq 'HASH' ) {
-		$self->addHostAttrNS(@ns);
-	}
-	else {
-		$self->addHostObjNS(@ns);
-	}
-	return 1;
+    if (ref $ns[0] eq 'HASH') {
+        $self->addHostAttrNS(@ns);
+    } else {
+        $self->addHostObjNS(@ns);
+    }
+    return 1;
 }
-
 
 sub addHostAttrNS {
-	my ($self, @ns) = @_;
+    my ($self, @ns) = @_;
 
-	my $ns = $self->createElement('domain:ns');
+    my $ns = $self->createElement('domain:ns');
 
-	# Adding attributes
-	foreach my $host (@ns) {
-		my $hostAttr = $self->createElement('domain:hostAttr');
+    # Adding attributes
+    foreach my $host (@ns) {
+        my $hostAttr = $self->createElement('domain:hostAttr');
 
-		# Adding NS name
-		my $hostName = $self->createElement('domain:hostName');
-		$hostName->appendText($host->{name});
-		$hostAttr->appendChild($hostName);
+        # Adding NS name
+        my $hostName = $self->createElement('domain:hostName');
+        $hostName->appendText($host->{name});
+        $hostAttr->appendChild($hostName);
 
-		# Adding IP addresses
-		if ( exists $host->{addrs} && ref $host->{addrs} eq 'ARRAY' ) {
-			foreach my $addr ( @{ $host->{addrs} } ) {
-				my $hostAddr = $self->createElement('domain:hostAddr');
-				$hostAddr->appendText($addr->{addr});
-				$hostAddr->setAttribute(ip => $addr->{version});
-				$hostAttr->appendChild($hostAddr);
-			}
-		}
+        # Adding IP addresses
+        if (exists $host->{addrs} && ref $host->{addrs} eq 'ARRAY') {
+            foreach my $addr (@{$host->{addrs}}) {
+                my $hostAddr = $self->createElement('domain:hostAddr');
+                $hostAddr->appendText($addr->{addr});
+                $hostAddr->setAttribute(ip => $addr->{version});
+                $hostAttr->appendChild($hostAddr);
+            }
+        }
 
-		# Adding host info to frame
-		$ns->appendChild($hostAttr);
-	}
-	
-	$self->getElementsByLocalName('domain:add')->shift->appendChild($ns);
-	return 1;
+        # Adding host info to frame
+        $ns->appendChild($hostAttr);
+    }
+
+    $self->getElementsByLocalName('domain:add')->shift->appendChild($ns);
+    return 1;
 }
 
-
 sub addHostObjNS {
-	my ($self, @ns) = @_;
+    my ($self, @ns) = @_;
 
-	my $ns = $self->createElement('domain:ns');
-	foreach my $host (@ns) {
-		my $el = $self->createElement('domain:hostObj');
-		$el->appendText($host);
-		$ns->appendChild($el);
-	}
-	
-	$self->getElementsByLocalName('domain:add')->shift->appendChild($ns);
-	return 1;
+    my $ns = $self->createElement('domain:ns');
+    foreach my $host (@ns) {
+        my $el = $self->createElement('domain:hostObj');
+        $el->appendText($host);
+        $ns->appendChild($el);
+    }
+
+    $self->getElementsByLocalName('domain:add')->shift->appendChild($ns);
+    return 1;
 }
 
 =pod
@@ -279,63 +277,60 @@ sub addHostObjNS {
 =cut 
 
 sub remNS {
-	my ($self, @ns) = @_;
+    my ($self, @ns) = @_;
 
-	if ( ref $ns[0] eq 'HASH' ) {
-		$self->remHostAttrNS(@ns);
-	}
-	else {
-		$self->remHostObjNS(@ns);
-	}
-	return 1;
+    if (ref $ns[0] eq 'HASH') {
+        $self->remHostAttrNS(@ns);
+    } else {
+        $self->remHostObjNS(@ns);
+    }
+    return 1;
 }
-
 
 sub remHostAttrNS {
-	my ($self, @ns) = @_;
+    my ($self, @ns) = @_;
 
-	my $ns = $self->createElement('domain:ns');
+    my $ns = $self->createElement('domain:ns');
 
-	# Adding attributes
-	foreach my $host (@ns) {
-		my $hostAttr = $self->createElement('domain:hostAttr');
+    # Adding attributes
+    foreach my $host (@ns) {
+        my $hostAttr = $self->createElement('domain:hostAttr');
 
-		# Adding NS name
-		my $hostName = $self->createElement('domain:hostName');
-		$hostName->appendText($host->{name});
-		$hostAttr->appendChild($hostName);
+        # Adding NS name
+        my $hostName = $self->createElement('domain:hostName');
+        $hostName->appendText($host->{name});
+        $hostAttr->appendChild($hostName);
 
-		# Adding IP addresses
-		if ( exists $host->{addrs} && ref $host->{addrs} eq 'ARRAY' ) {
-			foreach my $addr ( @{ $host->{addrs} } ) {
-				my $hostAddr = $self->createElement('domain:hostAddr');
-				$hostAddr->appendText($addr->{addr});
-				$hostAddr->setAttribute(ip => $addr->{version});
-				$hostAttr->appendChild($hostAddr);
-			}
-		}
+        # Adding IP addresses
+        if (exists $host->{addrs} && ref $host->{addrs} eq 'ARRAY') {
+            foreach my $addr (@{$host->{addrs}}) {
+                my $hostAddr = $self->createElement('domain:hostAddr');
+                $hostAddr->appendText($addr->{addr});
+                $hostAddr->setAttribute(ip => $addr->{version});
+                $hostAttr->appendChild($hostAddr);
+            }
+        }
 
-		# Adding host info to frame
-		$ns->appendChild($hostAttr);
-	}
-	
-	$self->getElementsByLocalName('domain:rem')->shift->appendChild($ns);
-	return 1;
+        # Adding host info to frame
+        $ns->appendChild($hostAttr);
+    }
+
+    $self->getElementsByLocalName('domain:rem')->shift->appendChild($ns);
+    return 1;
 }
 
-
 sub remHostObjNS {
-	my ($self, @ns) = @_;
+    my ($self, @ns) = @_;
 
-	my $ns = $self->createElement('domain:ns');
-	foreach my $host (@ns) {
-		my $el = $self->createElement('domain:hostObj');
-		$el->appendText($host);
-		$ns->appendChild($el);
-	}
-	
-	$self->getElementsByLocalName('domain:rem')->shift->appendChild($ns);
-	return 1;
+    my $ns = $self->createElement('domain:ns');
+    foreach my $host (@ns) {
+        my $el = $self->createElement('domain:hostObj');
+        $el->appendText($host);
+        $ns->appendChild($el);
+    }
+
+    $self->getElementsByLocalName('domain:rem')->shift->appendChild($ns);
+    return 1;
 }
 
 =pod
@@ -345,21 +340,52 @@ sub remHostObjNS {
 =cut
 
 sub _get_dnsssec {
-	my $self = shift;
-	my $tag = shift;
+    my $self = shift;
+    my $tag  = shift;
 
-	my $el = self->getElementsByTagNameNS($DNSSEC_URN, $tag);
-	return $el if $el;
+    my $el = self->getElementsByTagNameNS($DNSSEC_URN, $tag);
+    return $el if $el;
 
-	my $ext = $self->getNode('extension');
-	$ext = $self->getNode('command')->addNewChild(undef, 'extension')
-	    if not defined $ext;
+    my $ext = $self->getNode('extension');
+    $ext = $self->getNode('command')->addNewChild(undef, 'extension')
+        if not defined $ext;
 
-	my $upd = $ext->addNewChild($DNSSEC_URN, 'secDNS:update');
-	$upd->addNewChild($DNSSEC_URN, 'secDNS:add');
-	$upd->addNewChild($DNSSEC_URN, 'secDNS:rem');
+    my $upd = $ext->addNewChild($DNSSEC_URN, 'secDNS:update');
+    $upd->addNewChild($DNSSEC_URN, 'secDNS:add');
+    $upd->addNewChild($DNSSEC_URN, 'secDNS:rem');
 
-	return $self->_get_dnssec($tag);
+    return $self->_get_dnssec($tag);
+}
+
+=pod
+
+=head2 TTL Extension
+
+    $frame->chgTTLs({
+        NS => 3600,
+        DS => 900,
+    });
+
+Specify TTLs for DNS records above the zone cut. The server must support the
+TTL extension.
+
+=cut
+
+sub chgTTLs {
+    my ($self, $ttls) = @_;
+
+    foreach my $type (keys(%{$ttls})) {
+        my $ttl = $self->createExtensionElementFor(Net::EPP::Frame::ObjectSpec->xmlns('ttl'))->appendChild($self->createElement('ttl'));
+        $ttl->appendText($ttls->{$type});
+        if (any { $type eq $_ } qw(NS DS DNAME A AAAA)) {
+            $ttl->setAttribute('for', $type);
+
+        } else {
+            $ttl->setAttribute('for',    'custom');
+            $ttl->setAttribute('custom', $type);
+
+        }
+    }
 }
 
 1;

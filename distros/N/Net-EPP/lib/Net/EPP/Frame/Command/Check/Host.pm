@@ -56,12 +56,12 @@ This results in an XML document like this:
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = bless($package->SUPER::new('check'), $package);
+    my $package = shift;
+    my $self    = bless($package->SUPER::new('check'), $package);
 
-	$self->addObject(Net::EPP::Frame::ObjectSpec->spec('host'));
+    $self->addObject(Net::EPP::Frame::ObjectSpec->spec('host'));
 
-	return $self;
+    return $self;
 }
 
 =pod
@@ -75,14 +75,14 @@ This adds a hostname to the list of hosts to be checked.
 =cut
 
 sub addHost {
-	my ($self, $host) = @_;
+    my ($self, $host) = @_;
 
-	my $name = $self->createElement('host:name');
-	$name->appendText($host);
+    my $name = $self->createElement('host:name');
+    $name->appendText($host);
 
-	$self->getNode('check')->getChildNodes->shift->appendChild($name);
+    $self->getNode('check')->getChildNodes->shift->appendChild($name);
 
-	return 1;
+    return 1;
 }
 
 1;

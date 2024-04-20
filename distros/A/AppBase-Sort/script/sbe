@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-03-06'; # DATE
+our $DATE = '2024-03-07'; # DATE
 our $DIST = 'AppBase-Sort'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/sort_by_example/sort_by_example",
@@ -40,7 +40,7 @@ sbe - Sort lines of text by example (shorter alias for 'sort-by-example')
 
 =head1 VERSION
 
-This document describes version 0.003 of sbe (from Perl distribution AppBase-Sort), released on 2024-03-06.
+This document describes version 0.004 of sbe (from Perl distribution AppBase-Sort), released on 2024-03-07.
 
 =head1 SYNOPSIS
 

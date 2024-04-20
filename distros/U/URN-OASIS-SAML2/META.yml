@@ -22,12 +22,12 @@ name: URN-OASIS-SAML2
 provides:
   URN::OASIS::SAML2:
     file: lib/URN/OASIS/SAML2.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   perl: '5.006'
 resources:
   repository: git://github.com/perl-net-saml2/urn-oasis-saml2.git
-version: '0.004'
+version: '0.005'
 x_contributors:
   - 'Wesley Schwengle <waterkip@cpan.org>'
 x_generated_by_perl: v5.38.2

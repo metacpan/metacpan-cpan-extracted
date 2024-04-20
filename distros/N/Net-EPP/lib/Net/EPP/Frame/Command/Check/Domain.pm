@@ -56,12 +56,12 @@ This results in an XML document like this:
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = bless($package->SUPER::new('check'), $package);
+    my $package = shift;
+    my $self    = bless($package->SUPER::new('check'), $package);
 
-	$self->addObject(Net::EPP::Frame::ObjectSpec->spec('domain'));
+    $self->addObject(Net::EPP::Frame::ObjectSpec->spec('domain'));
 
-	return $self;
+    return $self;
 }
 
 =pod
@@ -75,14 +75,14 @@ This adds a domain name to the list of domains to be checked.
 =cut
 
 sub addDomain {
-	my ($self, $domain) = @_;
+    my ($self, $domain) = @_;
 
-	my $name = $self->createElement('domain:name');
-	$name->appendText($domain);
+    my $name = $self->createElement('domain:name');
+    $name->appendText($domain);
 
-	$self->getNode('check')->getChildNodes->shift->appendChild($name);
+    $self->getNode('check')->getChildNodes->shift->appendChild($name);
 
-	return 1;
+    return 1;
 }
 
 1;

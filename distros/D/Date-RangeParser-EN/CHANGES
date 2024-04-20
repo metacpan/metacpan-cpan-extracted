@@ -1,6 +1,12 @@
 Changelog for Date-RangeParser-EN
 
-v1.0.0 2023-10-20T19:23:20
+v1.0.1 2024-04-19T16:50:33
+ - Update README (Andrew Hewus Fresh)
+ - Pull request #2: SM-4807 (James Hammer)
+ - SM-4807 Add POD for new features (James Hammer)
+ - SM-4807 Correct thirteenths to thirteenth typo (James Hammer)
+
+v1.0.0 2023-10-20T19:22:59
  - Update README with v1.0.0 (Andrew Hewus Fresh)
  - Pull request #1: Updates for 0.9 (Andrew Hewus Fresh)
  - Attribute MAq as an author (Mark Flickinger)

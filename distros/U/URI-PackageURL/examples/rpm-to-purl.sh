@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# rpm-to-purl - Convert all installed RPM packags in purl string
+# rpm-to-purl - Convert all installed RPM packages in purl string
 
 # (C) 2023, Giuseppe Di Terlizzi <giuseppe.diterlizzi@gmail.com>
 # License MIT

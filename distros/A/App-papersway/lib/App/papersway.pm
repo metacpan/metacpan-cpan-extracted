@@ -15,7 +15,7 @@ package App::papersway;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-$App::papersway::VERSION = '0.002';
+$App::papersway::VERSION = '0.003';
 # Placeholder module.
 
 1;
@@ -32,7 +32,7 @@ App::papersway - PaperWM-like window management for Sway/i3wm
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 

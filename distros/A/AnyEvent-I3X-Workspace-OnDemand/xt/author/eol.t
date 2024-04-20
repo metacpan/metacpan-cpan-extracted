@@ -7,6 +7,7 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
+    'bin/i3-ipc',
     'lib/AnyEvent/I3X/Workspace/OnDemand.pm',
     't/00-compile.t',
     't/01-basic.t'

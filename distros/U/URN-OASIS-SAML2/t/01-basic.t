@@ -60,6 +60,8 @@ my %exports = (
     NAMEID_EMAIL         => $saml2 . 'nameid-format:emailAddress',
     NAMEID_TRANSIENT     => $saml2 . 'nameid-format:transient',
     NAMEID_PERSISTENT    => $saml2 . 'nameid-format:persistent',
+    NAMEID_DEFAULT       => $saml2 . 'nameid-format:unspecified',
+    NAMEID_UNSPECIFIED   => $saml2 . 'nameid-format:unspecified',
 
     STATUS_AUTH_FAILED    => $saml2 . 'status:AuthnFailed',
     STATUS_REQUESTER      => $saml2 . 'status:Requester',

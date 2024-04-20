@@ -20,10 +20,10 @@ for the EPP C<E<lt>PollE<gt>> request command.
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = bless($package->SUPER::new('poll'), $package);
-	$self->getCommandNode->setAttribute('op' => 'req');
-	return $self;
+    my $package = shift;
+    my $self    = bless($package->SUPER::new('poll'), $package);
+    $self->getCommandNode->setAttribute('op' => 'req');
+    return $self;
 }
 
 =head1 METHODS

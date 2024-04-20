@@ -1,3 +1,15 @@
+2.025 2024-04-20
+- Split version checking from `use Alien::Gnuplot` line for easier downstream
+  packaging. Fixes #98.
+- fixes for Windows (#89)
+- use terminal "dumb" if probing shows "unknown" (#66)
+- fix numeric-only strings for legend (#100) - thanks @d-lamb for report
+- fix plot3d array-ref handling (#87) - thanks @djerius for report
+- fix gplot array-ref handling (#86) - thanks @djerius for report
+- add multiplot_next to skip one plot (#85)
+- add documentation to UTF-8 encode text labels etc (#74) - thanks @zmughal for report
+- add {multiplot,plot,multiplot_next,end_multi}_generate methods which return Gnuplot commands equivalent plot would execute (#95)
+
 2.024 2023-03-30
 - Add Alien::Gnuplot as a configure-time dependency. Fixes #92 - thanks @zmughal
 

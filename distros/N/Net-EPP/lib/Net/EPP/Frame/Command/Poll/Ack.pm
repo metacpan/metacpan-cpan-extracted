@@ -20,10 +20,10 @@ for the EPP C<E<lt>PollE<gt>> acknowledge command.
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = bless($package->SUPER::new('poll'), $package);
-	$self->getCommandNode->setAttribute('op' => 'ack');
-	return $self;
+    my $package = shift;
+    my $self    = bless($package->SUPER::new('poll'), $package);
+    $self->getCommandNode->setAttribute('op' => 'ack');
+    return $self;
 }
 
 =pod
@@ -38,9 +38,9 @@ is used to specify the message ID being acknowleged.
 =cut
 
 sub setMsgID {
-	my ($self, $id) = @_;
-	$self->getCommandNode->setAttribute('msgID' => $id);
-	return 1;
+    my ($self, $id) = @_;
+    $self->getCommandNode->setAttribute('msgID' => $id);
+    return 1;
 }
 
 1;

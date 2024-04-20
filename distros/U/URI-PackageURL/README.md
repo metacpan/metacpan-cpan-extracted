@@ -10,19 +10,19 @@ use URI::PackageURL;
 # OO-interface
 
 # Encode components in PackageURL string
-$purl = URI::PackageURL->new(type => cpan, namespace => 'GDT', name => 'URI-PackageURL', version => '2.04');
+$purl = URI::PackageURL->new(type => cpan, namespace => 'GDT', name => 'URI-PackageURL', version => '2.10');
 
-say $purl; # pkg:cpan/GDT/URI-PackageURL@2.04
+say $purl; # pkg:cpan/GDT/URI-PackageURL@2.10
 
 # Parse PackageURL string
-$purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.04');
+$purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.10');
 
-# exported funtions
+# exported functions
 
-$purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.04');
+$purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.10');
 say $purl->type;  # cpan
 
-$purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI::PackageURL', version => '2.04');
+$purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI::PackageURL', version => '2.10');
 ```
 
 
@@ -31,14 +31,14 @@ $purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI::Packa
 Inspect and export "purl" string in various formats (JSON, YAML, Data::Dumper, ENV):
 
 ```console
-$ purl-tool pkg:cpan/GDT/URI-PackageURL@2.04 --json | jq
+$ purl-tool pkg:cpan/GDT/URI-PackageURL@2.10 --json | jq
 {
   "name": "URI-PackageURL",
   "namespace": "GDT",
   "qualifiers": {},
   "subpath": null,
   "type": "cpan",
-  "version": "2.04"
+  "version": "2.10"
 }
 ```
 
@@ -46,7 +46,7 @@ $ purl-tool pkg:cpan/GDT/URI-PackageURL@2.04 --json | jq
 Download package using "purl" string:
 
 ```console
-$ wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.04 --download-url)
+$ wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.10 --download-url)
 ```
 
 
@@ -57,7 +57,7 @@ Use "purl" string in your shell-scripts:
 
 set -e 
 
-PURL="pkg:cpan/GDT/URI-PackageURL@2.04"
+PURL="pkg:cpan/GDT/URI-PackageURL@2.10"
 
 eval $(purl-tool "$PURL" --env)
 
@@ -79,7 +79,7 @@ Create on-the-fly a "purl" string:
 $ purl-tool --type cpan \
             --namespace GDT \
             --name URI-PackageURL \
-            --version 2.04
+            --version 2.10
 ```
 
 
@@ -108,4 +108,4 @@ Using App::cpanminus:
 
 ## Copyright
 
- - Copyright 2022-2023 © Giuseppe Di Terlizzi
+ - Copyright 2022-2024 © Giuseppe Di Terlizzi

@@ -50,12 +50,16 @@
       },
       "runtime" : {
          "requires" : {
-            "AnyEvent::I3" : "0",
+            "AnyEvent" : "0",
+            "AnyEvent::I3" : "0.19",
             "Carp" : "0",
             "Data::Compare" : "0",
+            "EV" : "0",
             "File::Spec::Functions" : "0",
+            "Getopt::Long" : "0",
             "List::Util" : "0",
             "Object::Pad" : "0",
+            "Pod::Usage" : "0",
             "perl" : "v5.26.0"
          }
       },
@@ -64,10 +68,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Import::Into" : "1.002003",
-            "Sub::Override" : "0",
             "Test::More" : "0.96",
-            "Test::Most" : "0",
             "perl" : "v5.26.0"
          }
       }
@@ -75,7 +76,7 @@
    "provides" : {
       "AnyEvent::I3X::Workspace::OnDemand" : {
          "file" : "lib/AnyEvent/I3X/Workspace/OnDemand.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -86,7 +87,7 @@
          "web" : "https://gitlab.com/waterkip/anyevent-i3x-workspace-ondemand"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_contributors" : [
       "Wesley Schwengle <waterkip@cpan.org>"
    ],

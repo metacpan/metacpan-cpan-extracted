@@ -8,6 +8,7 @@ META.json
 META.yml
 Makefile.PL
 README.md
+bin/i3-ipc
 cpanfile
 lib/AnyEvent/I3X/Workspace/OnDemand.pm
 t/00-compile.t

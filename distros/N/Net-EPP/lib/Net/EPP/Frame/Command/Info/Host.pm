@@ -52,12 +52,12 @@ This results in an XML document like this:
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = bless($package->SUPER::new('info'), $package);
+    my $package = shift;
+    my $self    = bless($package->SUPER::new('info'), $package);
 
-	my $host = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('host'));
+    my $host = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('host'));
 
-	return $self;
+    return $self;
 }
 
 =pod
@@ -71,14 +71,14 @@ This specifies the hostname for which information is being requested.
 =cut
 
 sub setHost {
-	my ($self, $host) = @_;
+    my ($self, $host) = @_;
 
-	my $name = $self->createElement('host:name');
-	$name->appendText($host);
+    my $name = $self->createElement('host:name');
+    $name->appendText($host);
 
-	$self->getNode('info')->getChildNodes->shift->appendChild($name);
+    $self->getNode('info')->getChildNodes->shift->appendChild($name);
 
-	return 1;
+    return 1;
 }
 
 1;

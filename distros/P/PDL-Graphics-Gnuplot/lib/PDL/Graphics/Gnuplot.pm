@@ -189,8 +189,8 @@ is called a "tuple".  These plots have two columns in their tuples:
 
 Normal threading rules apply across the arguments to a given plot.
 
-All data are required to be supplied as either PDLs or list refs.
-If you use a list ref as a data column, then normal
+All data are required to be supplied as either PDLs or array refs.
+If you use an array ref as a data column, then normal
 threading is disabled.  For example:
 
  $x = xvals(5);
@@ -287,6 +287,31 @@ Change font to (optional) fontname, and optional absolute font size or relative 
 Backslash escapes control characters to render them as themselves.
 
 =back
+
+=head2 Unicode text
+
+Separately to "enhanced" text above, if you wish to include text that
+is not ASCII, then you will need to pass data that has been UTF-8
+encoded. Sample code to achieve this:
+
+  use utf8;
+  use Encode;
+  use PDL;
+  use PDL::Graphics::Gnuplot;
+  use PDL::Constants qw(PI);
+
+  sub plot_sin {
+    my ($w, $coeff) = @_;
+    my $xrange = [ -2*PI, 2*PI ];
+    my $x = zeroes(1e3)->xlinvals(@$xrange); my $y = sin($coeff * 2 * PI * $x);
+    my $title = "y = sin( $coeff * 2π * x )";
+    # to get around sending text through syswrite()
+    my $title_octets = encode('UTF-8', $title);
+    $w->plot(with=>'lines', $x, $y, {
+      xrange => $xrange,
+      title => $title_octets, # can not pass $title as-is
+    });
+  }
 
 =head2 Color specification
 
@@ -463,14 +488,14 @@ by stacking data inside the passed-in PDLs.  (An exception is that
 threading is disabled if one or more of the data elements is a list
 ref).
 
-=head3 PDLs vs list refs
+=head3 PDLs vs array refs
 
 The usual way to pass in data is as a PDL -- one PDL per column of data
 in the tuple.  But strings, in particular, cannot easily be hammered into
-PDLs.  Therefore any column in each tuple can be a list ref containing
+PDLs.  Therefore any column in each tuple can be an array ref containing
 values (either numeric or string).  The column is interpreted using the
 usual polymorphous cast-behind-your-back behavior of Perl.  For the sake
-of sanity, if even one list ref is present in a tuple, then threading is
+of sanity, if even one array ref is present in a tuple, then threading is
 disabled in that tuple: everything has to have a nice 1-D shape.
 
 
@@ -677,7 +702,7 @@ specifies the printf format used by contour labels in contour plots.)
 
 C<key> controls where the plot key (that relates line/symbol style to label)
 is placed on the plot.  It takes a scalar boolean indicating whether to turn the
-key on (with default values) or off, or a list ref containing any of the following
+key on (with default values) or off, or an array ref containing any of the following
 arguments (all are optional) in the order listed:
 
 =over 3
@@ -778,21 +803,21 @@ These are Gnuplot's usual three options for line control.
 =back
 
 The C<grid> option indicates whether gridlines should be drawn on
-each axis.  It takes a list ref of arguments, each of which is either "no" or "m" or "",
+each axis.  It takes an array ref of arguments, each of which is either "no" or "m" or "",
 followed by an axis name and "tics" --
 e.g. C<< grid=>["noxtics","ymtics"] >> draws no X gridlines and draws
 (horizontal) Y gridlines on Y axis major and minor tics, while
 C<< grid=>["xtics","ytics"] >> or C<< grid=>["xtics ytics"] >> will draw both
 vertical (X) and horizontal (Y) grid lines on major tics.
 
-vTo draw a coordinate grid with default values, set C<< grid=>1 >>.  For more
-control, feed in a list ref with zero or more of the following parameters, in order:
+To draw a coordinate grid with default values, set C<< grid=>1 >>.  For more
+control, feed in an array ref with zero or more of the following parameters, in order:
 
 The C<zeroaxis> keyword indicates whether to actually draw each axis
 line at the corresponding zero along its indicated dimension.  For
 example, to draw the X axis (y=0), use C<< xzeroaxis=>1 >>.  If you just
 want the axis turned on with default values, you can feed in a Boolean
-scalar; if you want to set its parameters, you can feed in a list ref
+scalar; if you want to set its parameters, you can feed in an array ref
 containing linewidth, linestyle, and linetype (with appropriate
 parameters for each), e.g.  C<< xzeroaxis=>[linewidth=>2] >>.
 
@@ -829,7 +854,7 @@ The options described here are
 =back
 
 Gnuplot accepts explicit ranges as plot options for all axes.  Each option
-accepts a list ref with (min, max).  If either min or max is missing, then
+accepts an array ref with (min, max).  If either min or max is missing, then
 the opposite limit is autoscaled.  The x and y ranges refer to the usual
 ordinate and abscissa of the plot; x2 and y2 refer to alternate ordinate and
 abscissa; z if for 3-D plots; r is for polar plots; t, u, and v are for parametric
@@ -857,7 +882,7 @@ once by setting the keyword name to ' '.  Examples:
 
  autoscale=>{x=>'max',y=>'fix'};
 
-There is an older list ref syntax which is deprecated but still accepted.
+There is an older array ref syntax which is deprecated but still accepted.
 
 To not autoscale an axis at all, specify a range for it. The fix style of
 autoscaling forces the autoscaler to use the actual min/max of the data as
@@ -866,7 +891,7 @@ to the next minor tic (as set by the autoticker or by a tic specification, see
 below).
 
 C<logscale> allows you to turn on logarithmic scaling for any or all
-axes, and to set the base of the logarithm.  It takes a list ref, the
+axes, and to set the base of the logarithm.  It takes an array ref, the
 first element of which is a string mushing together the names of all
 the axes to scale logarithmically, and the second of which is the base
 of the logarithm: C<< logscale=>[xy=>10] >>.  You can also leave off the
@@ -955,7 +980,7 @@ If you pass in undef, tics get the default length.  If you pass in a scalar, maj
 
 =item * labels - sets tic locations explicitly, with text labels for each. If you specify both C<locations> and C<labels>, you get both sets of tics on the same axis.
 
-The labels should be a nested list ref that is a collection of duals
+The labels should be a nested array ref that is a collection of duals
 or triplets.  Each dual or triplet should contain [label, position, minorflag],
 as in C<< labels=>[["one",1,0],["three-halves",1.5,1],["two",2,0]] >>.
 
@@ -1145,7 +1170,7 @@ an alternative to the C<origin> and C<size> options below.
 The C<offsets> option allows you to put an empty boundary around the
 data, inside the plot borders, in an autosacaled graph.  The offsets
 only affect the x1 and y1 axes, and only in 2D plot commands.
-C<offsets> accepts a list ref with four values for the offsets, which
+C<offsets> accepts an array ref with four values for the offsets, which
 are given in scientific (plotted) axis units.
 
 The C<origin> option lets you specify the origin (lower left corner)
@@ -1176,7 +1201,7 @@ grayscale can have a "color box" that shows the photometric meaning of the color
 
 The colorbox generally appears when necessary but can be controlled manually
 with the C<colorbox> option.  C<colorbox> accepts a scalar boolean value indicating
-whether or no to draw a color box, or a list ref containing additional options.
+whether or no to draw a color box, or an array ref containing additional options.
 The options are all, well, optional but must appear in the order given:
 
 =over 3
@@ -1211,7 +1236,7 @@ of color tables, and have better support for scientific images.
 
 C<pseudocolor> (synonym C<pc>) gives access to the color tables built
 in to the C<PDL::Transform::Color> package, if that package is
-available.  It takes either a color table name or a list ref which
+available.  It takes either a color table name or an array ref which
 is a collection of arguments that get sent to the
 C<PDL::Transform::Color::t_pc> transform definition method. Sending
 the empty string or undef will generate a list of allowable color
@@ -1254,7 +1279,7 @@ version of the module but are explained in the gnuplot manual.
 
 C<hidden3d> accepts a list of parameters to control how hidden surfaces are
 plotted (or not) in 3D. It accepts a boolean argument indicating whether to hide
-"hidden" surfaces and lines; or a list ref containing parameters that control how
+"hidden" surfaces and lines; or an array ref containing parameters that control how
 hidden surfaces and lines are handled.  For details see the gnuplot manual.
 
 C<xyplane> sets the location of that plane (which is drawn) relative
@@ -1280,7 +1305,7 @@ C<contour> enables contour drawing on surfaces in 3D.  It takes a
 single string, which should be "base", "surface", or "both".
 
 C<cntrparam> manages how contours are generated and smoothed.  It
-accepts a list ref with a collection of Gnuplot parameters that are
+accepts an array ref with a collection of Gnuplot parameters that are
 issued one per line; refer to the Gnuplot manual for how to operate
 it.
 
@@ -1302,7 +1327,7 @@ You specify plot markup in advance of the plot command, with plot
 options (or add it later with the C<replot> method).  The options give
 you access to a collection of (separately) numbered descriptions that
 are accumulated into the plot object.  To add a markup object to the
-next plot, supply the appropriate options as a list ref or as a single
+next plot, supply the appropriate options as an array ref or as a single
 string.  To specify all markup objects at once, supply the appropriate
 options for all of them as a nested list-of-lists.
 
@@ -1335,7 +1360,7 @@ you care about.
 The C<label> option allows adding small bits of text at arbitrary
 locations on the plot.
 
-Each label specifier list ref accepts the following suboptions, in
+Each label specifier array ref accepts the following suboptions, in
 order.  All of them are optional -- if no options other than the index
 tag are given, then any existing label with that index is deleted.
 
@@ -1484,7 +1509,7 @@ filled rectangles (e.g. boxes, candlesticks, or histograms).
 =back
 
 If you pass in the undefined value you get no ticks on errorbars; if you pass in the
-empty list ref you get default ticks.
+empty array ref you get default ticks.
 
 B<C<boxwidth>> sets the width of drawn boxes in boxplots, candlesticks, and histograms.  It
 takes a list containing at most two elements:
@@ -1520,7 +1545,7 @@ B<C<style>> provides a great deal of customization for individual plot styles.
 It is not (yet) fully parsed by PDL::Graphics::Gnuplot; please refer to the Gnuplot
 manual for details (it is pp. 145ff in the Gnuplot 4.6.1 maual).  C<style> accepts
 a hash ref whose keys are plot styles (such as you would feed to the C<with> curve option),
-and whose values are list refs containing keywords and other parameters to modify how each
+and whose values are array refs containing keywords and other parameters to modify how each
 plot style should be displayed.
 
 =head2 POs for locale/internationalization - locale, decimalsign
@@ -1538,7 +1563,7 @@ placed on the side of the plot, e.g. for keeping track of drafts.
 
 C<zero> sets the approximation threshold for zero values within gnuplot.  Its default is 1e-8.
 
-C<fontpath> sets a font search path for gnuplot.  It accepts a collection of file names as a list ref.
+C<fontpath> sets a font search path for gnuplot.  It accepts a collection of file names as an array ref.
 
 =head2 POs for advanced Gnuplot tweaks: topcmds, extracmds, bottomcmds, binary, dump, tee
 
@@ -1552,7 +1577,7 @@ can send commands at the top of the configuration but just under the initial
 "set terminal" and "set output" commands (with the C<topcmds> option), at the bottom
 of the configuration and just before the "plot" command (with the C<extracmds> option),
 or after the plot command (with the C<bottomcmds> option).  Each of these plot
-options takes a list ref, each element of which should be one command line for
+options takes an array ref, each element of which should be one command line for
 gnuplot.
 
 Most plotting is done with binary data transfer to Gnuplot; however, due to
@@ -1625,9 +1650,9 @@ If you don't specify a C<dashtype> curve option, the default behavior
 matches the behavior of earlier gnuplots: many terminals support a
 "dashed" terminal/output option, and if you have set that option (with
 the constructor or with the C<output> method) then lines are uniquely
-dashed by default.  To make a single curve solid, specify C<dt=>0> as
+dashed by default.  To make a single curve solid, specify C<< dt=>0 >> as
 a curve option for it; or to make all curves solid, use the constructor
-or the C<output> method to set the terminal option C<dashed=>0>.
+or the C<output> method to set the terminal option C<< dashed=>0 >>.
 
 If your gnuplot is older than v5.0, the dashtype curve option is
 ignored (and causes a warning to be emitted).
@@ -2010,7 +2035,7 @@ use Time::HiRes qw(gettimeofday tv_interval);
 use Safe::Isa;
 use Carp;
 
-use Alien::Gnuplot 4.4;  # Ensure gnuplot exists and is recent, and get ancillary info about it.
+use Alien::Gnuplot;
 if($Alien::Gnuplot::VERSION < 1.031) {
     # Have to check explicitly since we use the version hack to check the *gnuplot* version.
     die "PDL::Graphics::Gnuplot requires Alien::Gnuplot version 1.031 or higher\n (v$Alien::Gnuplot::VERSION found). You can pull the latest from CPAN.\n";
@@ -2018,6 +2043,8 @@ if($Alien::Gnuplot::VERSION < 1.031) {
 
 our $gnuplot_dep_v = 4.006; # Versions below this are deprecated.
 our $gnuplot_req_v = 4.004; # Versions below this are not supported.
+# Ensure gnuplot exists and is recent, and get ancillary info about it.
+Alien::Gnuplot->VERSION('4.4');
 
 # Compile time config flags...
 our $check_syntax = 0;
@@ -2026,7 +2053,7 @@ our $echo_eating = 0;                             # Older versions of gnuplot on
 our $debug_echo = 0;                              # If set, mock up Losedows half-duplex pipes
 
 
-our $VERSION = '2.024';
+our $VERSION = '2.025';
 $VERSION = eval $VERSION;
 
 our $gp_version = undef;    # eventually gets the extracted gnuplot(1) version number.
@@ -2035,7 +2062,10 @@ our $gp_numversion = undef; # which is here converted to a float
 my $did_warn_non_numeric_patchlevel; # whether we already warned about this
 
 use base 'Exporter';
-our @EXPORT_OK = qw(plot plot3d line lines points image terminfo reset restart replot);
+our @EXPORT_OK = qw(
+  plot plot3d line lines points image terminfo reset restart replot
+  multiplot_generate plot_generate multiplot_next_generate end_multi_generate
+);
 our @EXPORT = qw(gpwin gplot greplot greset grestart);
 
 # when testing plots with binary i/o, this is the unit of test data
@@ -2298,9 +2328,8 @@ sub output {
 
     if(@_) {
 	# Check that, if there is at least one more argument, it is recognizable as a terminal
-	my $terminal;
-	$terminal = lc(shift);
-
+	my $terminal = lc(shift);
+	$terminal = 'dumb' if $terminal eq 'unknown';
 	##############################
 	# Check the terminal list here!
 	if(!exists($this->{valid_terms}->{$terminal})) {
@@ -2368,7 +2397,7 @@ FOO
 
 	    # Although 'output' is strictly speaking a terminal option, gnuplot treats it as a plot option -- so
 	    # we copy it into the main plot options hash to be emitted as part of the plot operation.
-	    $this->{options}->{output} = $termOptions->{output};
+	    $this->{options}{output} = $termOptions->{output};
 	    $this->{wait} = $termOptions->{wait} if defined $termOptions->{wait};
 
 	    ### Deal with anti-aliasing scaling factors
@@ -2396,9 +2425,9 @@ FOO
 	    delete $termOptions->{output};
 
 	    ## Emit the terminal options line for this terminal.
-	    $this->{options}->{terminal} = join(" ", ($terminal, _emitOpts( $termOptions, $termTab->{$terminal}->{opt} )));
+	    $this->{options}{terminal} = join(" ", ($terminal, _emitOpts( $termOptions, $termTab->{$terminal}{opt} )));
 	    $this->{terminal} = $terminal;
-	    $this->{mouse} = $termTab->{$terminal}->{mouse} || 0;
+	    $this->{mouse} = $termTab->{$terminal}{mouse} || 0;
 	} else {
 	    barf "PDL::Graphics::Gnuplot doesn't support the device '$terminal', sorry\n\n     Run PDL::Graphics::Gnuplot::terminfo() for a list of devices.\n\n";
 	}
@@ -2452,7 +2481,7 @@ sub close
 		carp "Can not read/write $this->{image_format} for anti-aliasing. Skipping aa operation.";
 		return;
 	}
-	my $im = rpic($this->{options}->{output},{FORMAT=>$this->{image_format}});
+	my $im = rpic($this->{options}{output},{FORMAT=>$this->{image_format}});
 	if($im->ndims==3) {
 	    $im = $im->mv(0,-1);
 	}
@@ -2464,7 +2493,7 @@ sub close
 	if($im->ndims==3){
 	    $im = $im->mv(-1,0);
 	}
-	wpic($im, $this->{options}->{output}, {FORMAT=>$this->{image_format}});
+	wpic($im, $this->{options}{output}, {FORMAT=>$this->{image_format}});
     }
     $this->{aa_ready} = 0;
 }
@@ -2496,12 +2525,12 @@ Called with no arguments, C<restart> applies to the global plot object.
 sub restart {
     my $this = _obj_or_global(\@_);
     my $dumpswitch = shift;
-    my $localdumpvar = $this->{options}->{dump};
+    my $localdumpvar = $this->{options}{dump};
     {
 	# We restart the process when the dump option is switched on or off.
 	# Since _killGnuplot uses _printGnuplotPipe, we have
 	# to hold the old state briefly while the old process is killed.
-	local($this->{options}->{dump}) =
+	local($this->{options}{dump}) =
 	    ($dumpswitch ? $this->{dumping} : $localdumpvar);
 
 	_killGnuplot($this);
@@ -2509,7 +2538,7 @@ sub restart {
     # When starting Gnuplot we use the {options}->{dump} flag as it should be.
     _startGnuplot($this,'main');
     _startGnuplot($this,'syntax') if($check_syntax);
-    $this->{options}->{multiplot} = 0;
+    $this->{options}{multiplot} = 0;
     undef $PDL::Graphics::Gnuplot::last_plotcmd;
     undef $PDL::Graphics::Gnuplot::last_testcmd;
     undef $this->{last_plotcmd};
@@ -2541,13 +2570,11 @@ gnuplot.
 *greset = \*reset;
 sub reset {
     my $this = _obj_or_global(\@_);
-     for my $k(keys %{$this->{options}}) {
-	unless ( $k =~ m/(terminal|output|termoptions|multiplot)/ ) {
-	    delete $this->{options}->{$k};
-	}
-    }
+    delete @{$this->{options}}{
+      grep !/(terminal|output|termoptions|multiplot)/, keys %{$this->{options}}
+    };
     my $checkpointMessage;
-    if($check_syntax) {
+    if ($check_syntax) {
 	# Send multiple newlines to avoid bugs in certain gnuplots, which
 	# appear to lose a character after reset.
 	_printGnuplotPipe( $this, "syntax", "reset\n\n\n");
@@ -2555,7 +2582,6 @@ sub reset {
     }
     _printGnuplotPipe($this, "main", "reset\n\n\n");
     $checkpointMessage = _checkpoint($this, "main");
-
     $this->{replottable} = 0;
     delete $this->{last_plot};
     return $this;
@@ -2591,12 +2617,11 @@ global gnuplot object.
 
 *option = \&options;
 sub options {
-    my($me) = _obj_or_global(\@_);
-    $me->{options} = {} unless defined($me->{options});
+    my ($me) = _obj_or_global(\@_);
+    $me->{options} //= {};
     _parseOptHash($me->{options}, $pOpt, @_);
-    if($me->{last_plot} && $me->{last_plot}->{options}) {
-	_parseOptHash($me->{last_plot}->{options}, $pOpt, @_);
-    }
+    _parseOptHash($me->{last_plot}{options}, $pOpt, @_)
+      if $me->{last_plot} && $me->{last_plot}{options};
     return $me->{options};
 }
 
@@ -2606,6 +2631,23 @@ sub options {
 # plot - the main API function to generate a plot.
 
 =pod
+
+=head2 plot_generate
+
+=for ref
+
+Called with the same arguments as L</plot>, it returns the text that
+would be sent to Gnuplot. Exportable.
+Added in 2.025.
+
+=cut
+
+sub plot_generate
+{
+  barf "plot_generate called with no arguments" unless @_;
+  my ($plotchunks) = _obj_or_global(\@_)->_plot_generate(@_);
+  join '', map ref $_ eq 'ARRAY' ? $_->[0] : ${$_->[0]}, @$plotchunks;
+}
 
 =head2 gplot
 
@@ -2656,15 +2698,10 @@ in each object as the {last_plotcmd} field.
 
 =cut
 
-*gplot = \&plot;
-sub plot
+sub _plot_generate
 {
-    barf( "Plot called with no arguments") unless @_;
-
-    my $this = _obj_or_global(\@_);
-
+    my $this = shift;
     delete $this->{last_dashtype}; # implement dashtype state function for gnuplot>=5.0
-
     ##############################
     # Parse optional plot options - must be an array or hash ref, if present.
     # Cheesy but hopefully effective method (from Dima): parse as plot options
@@ -2683,50 +2720,31 @@ sub plot
     # whereupon we switch to curve options.  The DWIMming is done by checking individual
     # option names to see if they (A) are NOT curve options and (B) are plot options.
     # We snarf up all such options and put 'em into a hash ref like they should have been.
-    {
-	my $dwim_plot_options = [];
-	while( 0+@_ and !(ref $_[0]) ) {
-	    my ($kk,$knum);
-
-	    ($kk,$knum) = eval { _expand_abbrev($_[0], $cOpt->[1], $cOpt->[2]) };
-
-	    if($@) {
-		($kk,$knum) = eval { _expand_abbrev($_[0], $pOpt->[1], $pOpt->[2]) };
-
-		if(!$@) {
-		    # It's a plot option and not a curve option -- pull it, and its argument, from the arg list and put them
-		    # into $dwim_plot_options.
-		    push(@{$dwim_plot_options}, shift);
-		    push(@{$dwim_plot_options}, shift);
-		} else {
-		    last;
-		}
-	    } else {
-		last;
-	    }
-	}
-	if( 0+@{$dwim_plot_options} ) {
-	    unshift(@_, $dwim_plot_options);
-	}
+    my @dwim_plot_options;
+    while( 0+@_ and !(ref $_[0]) ) {
+        my ($kk,$knum) = eval { _expand_abbrev($_[0], @$cOpt[1,2]) };
+        last if !$@;
+        ($kk,$knum) = eval { _expand_abbrev($_[0], @$pOpt[1,2]) };
+        last if $@;
+        # It's a plot option and not a curve option -- pull it, and its argument, from the arg list and put them
+        # into @dwim_plot_options.
+        push @dwim_plot_options, shift, shift;
     }
-
+    unshift @_, \@dwim_plot_options if @dwim_plot_options;
     # Any option parsing we do is ephemeral, so we have to localize the options hash, so we dclone it at
     # the start.  If we're replotting, start with the last_plot options - which gets the same treatment even
     # though it will be overwritten with its own clone on successful completion.  That is so, if we fail,
     # the last_plot hash options hash remains unchanged in the object.
     my $o;
     if($this->{replotting}) {
-	$o = dclone($this->{last_plot}->{options});
-	$o->{terminal} = $this->{options}->{terminal};
-	$o->{output}   = $this->{options}->{output};
+	$o = dclone($this->{last_plot}{options});
+	$o->{terminal} = $this->{options}{terminal};
+	$o->{output}   = $this->{options}{output};
     } else {
 	$o = dclone($this->{options});
-	;
     }
-
-
     # Now parse the initial hash of plot options (if there is one)
-    if(  (ref $_[0]) =~ m/^(HASH|ARRAY)/ ) {
+    if ( (ref $_[0]) =~ m/^(HASH|ARRAY)/ ) {
 	my $oo = dclone($o);
 	eval { _parseOptHash( $oo, $pOpt, $_[0] ); };
 	if($@ =~ m/^No /) {
@@ -2742,16 +2760,15 @@ sub plot
 	    shift @_;  # pull argument off the start.
 	}
     }
-
     # Now look for and parse a trailing hash of plot options (if there is one)
-    if( $#_ >= 1  and   ((ref $_[-1])=~ /^(HASH)/)) {
+    if (@_ >= 2  and   ((ref $_[-1])=~ /^(HASH)/)) {
 	my $oo = dclone($o);
 	eval { _parseOptHash( $oo, $pOpt, $_[-1] ); };
-	if($@ =~ m/^No /) {
+	if ($@ =~ m/^No /) {
 	    # Found an unrecognized keyword -- clear the error and keep going.
 	    # (not a set of plot options)
 	    $@ = "";
-	} elsif($@) {
+	} elsif ($@) {
 	    # Some other actual exception -- pass it down the line.  Oops.
 	    barf $@ . "   (while parsing presumed extra plot options at end of plot command)\n";
 	} else {
@@ -2760,57 +2777,31 @@ sub plot
 	    pop @_;  # pull argument off the end.
 	}
     }
-
     #  Localize the options hash for uniform reference.  Now the
     #  object options has the full parsed options, but it is fully localized --
     #  it will revert to its pre-call state when we exit this block.
     local($this->{options}) = $o;
     local($this->{tmp_options}) = {};
-
-
     # Make sure to reset the palette to the gnuplot default if it's not set here
-    $this->{options}->{palette} = [] unless($this->{options}->{palette});
-
+    $this->{options}{palette} ||= [];
     # If we're replotting, then any remaining arguments need to be put
     # *after* the arguments that we used for the last plot.
-    if($this->{replotting}) {
-	unless( $_[0]->$_isa('PDL') ) {
-	    @_ = (@{$this->{last_plot}->{args}},@_);
-	} else {
-	    @_ = (@{$this->{last_plot}->{args}},{},@_);
-	}
-
-    }
-
+    unshift @_, @{$this->{last_plot}{args}}, !$_[0]->$_isa('PDL') ? () : {}
+      if $this->{replotting};
     ##############################
     # Set binary mode default. This is a bit complex since
     # we sometimes default to binary and sometimes to ascii.
-    local($this->{binary_flag_defaulted});
-
-    unless(defined $this->{options}->{binary}) {
-	# The user didn't explicitly set binary or non-binary mode.  Try to guess.
-	# Also, under Microsoft Windows binary mode seems to be dicey (Juegen Mueck's hang
-	# test), so we default to ascii.
-	if($this->{early_gnuplot} or $MS_io_braindamage ) {
-	    # Early gnuplot - ASCII mode only (by default)
-	    $this->{options}->{binary} = 0;
-	} else {
-	    # Late-model gnuplot - binary for non time format plots, ASCII for time plots.
-	    # (Note: some transfer formats force binary transfer)
-		my $using_times = 0;
-		for my $k( qw/x x2 y y2 z cb/ ) {
-		    if($this->{options}->{$k."data"} and $this->{options}->{$k."data"} =~ m/time/) {
-			$using_times = 1;
-			last;
-		    }
-		}
-		$this->{options}->{binary} = !$using_times;
-	}
-	$this->{binary_flag_defaulted} = 1; # Mark that we set the binary/ascii mode by default rather than user command
-    } else {
-	$this->{binary_flag_defaulted} = 0;
-    }
-
+    local $this->{binary_flag_defaulted} = !defined $this->{options}{binary};
+    # The user didn't explicitly set binary or non-binary mode.  Try to guess.
+    # Also, under Microsoft Windows binary mode seems to be dicey
+    # (Juegen Mueck's hang test), so we default to ascii.
+    $this->{options}{binary} //=
+      # Early gnuplot - ASCII mode only (by default)
+      ($this->{early_gnuplot} || $MS_io_braindamage) ? 0 :
+      # Late-model gnuplot - binary for non time format plots, ASCII for time plots.
+      # (Note: some transfer formats force binary transfer)
+      !grep +($this->{options}{$_."data"}||'') =~ m/time/,
+	qw/x x2 y y2 z cb/;
     # Store the current arguments into the state array for next time.
     # (This has to be done here because plot options need to be stripped out first).
     #
@@ -2823,21 +2814,14 @@ sub plot
     # We don't store the arguments if we're carrying the "ephemeral" flag - that is
     # so we can do ephemeral markup of plots, without adding to the replot list.
     unless($this->{ephemeral}) {
-	$this->{last_plot}->{args}  = [@_];
-	$this->{last_plot}->{options} = dclone($this->{options});
-	if($this->{binary_flag_defaulted}) {
-	    delete $this->{last_plot}->{options}->{binary};
-	}
+	$this->{last_plot}{args}  = [@_];
+	$this->{last_plot}{options} = dclone($this->{options});
+	delete $this->{last_plot}{options}{binary}
+	  if $this->{binary_flag_defaulted};
     }
-
-
     # Now parse the rest of the arguments into chunks.
-    # parseArgs is a nested sub at the bottom of this one.
-    my($chunks, $Ncurves) = parseArgs($this, @_);
-
-    if( scalar @$chunks == 0)
-    { barf "plot() was not given any data"; }
-
+    my ($chunks, $Ncurves) = parseArgs($this, @_);
+    if (scalar @$chunks == 0) { barf "plot() was not given any data"; }
     ##############################
     #
     # Now generate the plot command.
@@ -2853,7 +2837,6 @@ sub plot
     # Then we cut up the command line into pieces at the fences, so that we can assemble the
     # data specifiers and build a complete command line.
     #
-
     ##########
     # Figure per-curve binary/ASCII mode, and fix up some of the option defaults based on context.
     # In particular, gnuplot 4.4-4.6 don't handle image scaling correctly, so unless an xrange/yrange
@@ -2861,66 +2844,47 @@ sub plot
     #
     # This is complicated in the case when there are multiple chunks, one of which is an image.
     # We can't set an overall range until we scan the whole collection of chunks.
-
-    my ($cbmin,$cbmax) = (undef, undef);
-    my $im_ranges = {};
-    my $active_axes = {};
-    my @axes_by_chunkno = ();
-
-    for my $i(0..$#$chunks) {
-
+    my ($im_ranges, $active_axes, $cbmin, $cbmax, @axes_by_chunkno) = ({}, {});
+    for my $i (0..$#$chunks) {
 	# Allow global binary/ASCII flag to be overridden by per-curve binary/ASCII flag
-	$chunks->[$i]->{binaryCurveFlag} = _def($chunks->[$i]->{binaryWith}, $this->{options}->{binary});
-
+	$chunks->[$i]{binaryCurveFlag} = $chunks->[$i]{binaryWith} // $this->{options}{binary};
 	# Figure which axes are active
-	my $axis_str = _def($chunks->[$i]->{options}->{axes}, 'x1y1');
+	my $axis_str = $chunks->[$i]{options}{axes} // 'x1y1';
 	my ($xax,$yax);
-
-	if($axis_str =~ m/x([12])y([12])/i) {
-	    my($x,$y) = ($1,$2);
-	    ($xax,$yax) = ( ($x==1 ? 'x' : 'x2') , ($y==1 ? 'y' : 'y2'));
+	if ($axis_str =~ m/x([12])y([12])/i) {
+	    my ($x,$y) = ($1,$2);
+	    ($xax,$yax) = ($x==1 ? 'x' : 'x2', $y==1 ? 'y' : 'y2');
 	} else {
 	    carp "WARNING: axes specifier '$axis_str' doesn't make sense.  Continuing anyway...\n";
 	    ($xax,$yax) = ('x','y');
 	}
 	$axes_by_chunkno[$i] = [$xax,$yax];
-
-	$active_axes->{$xax}++;
-	$active_axes->{$yax}++;
-
+	$_++ for @$active_axes{$xax, $yax};
 	# Everything else in this block is an image fix
-	next unless($chunks->[$i]->{imgFlag});
-
+	next unless($chunks->[$i]{imgFlag});
 	# Fix up gnuplot color scaling bug/misfeature for RGB images
 	# Here, we accumulate min/max color ranges across *all* imagelike chunks,
 	# so mixing rgb and palette images will scale right.
-	if(!defined( $this->{options}->{cbrange} )) {
-	    my $with = $chunks->[$i]->{options}->{with}->[0];
-
+	if(!defined( $this->{options}{cbrange} )) {
+	    my $with = $chunks->[$i]{options}{with}[0];
 	    my $slice = "-1";
-	    $slice = "-3:-1" if($with eq 'rgbimage');
-	    $slice = "-4:-2" if($with eq 'rgbalpha');
-
+	    $slice = "-3:-1" if $with eq 'rgbimage';
+	    $slice = "-4:-2" if $with eq 'rgbalpha';
 	    # Sometimes data comes in that has BAD values but they are
 	    # not marked as such, which messes up the cbmin &c. calc.
 	    if ($PDL::Bad::Status){
 		$chunks->[$i]->{data}->[0]->inplace->setvaltobad(
 		    $chunks->[$i]->{data}->[0]->type->badvalue)->check_badflag;
 	    }
-
 	    my $bolus = $chunks->[$i]->{data}->[0]->slice($slice);
-
 	    # Convert NaNs to bad if possible.  This is slow --
 	    # need to fix the minmax &c. operators in PDL to ignore NaNs on command;
 	    # currently the default behavior is that NaN poisons the whole min/max
 	    # operation.
-	    my ($cmin, $cmax);
-	    ($cmin,$cmax) = $bolus->where(isfinite($bolus))->minmax;
-
+	    my ($cmin,$cmax) = $bolus->where(isfinite($bolus))->minmax;
 	    $cbmin = $cmin if( !defined($cbmin)   or    $cmin < $cbmin );
 	    $cbmax = $cmax if( !defined($cbmax)   or    $cmax < $cbmax );
 	}
-
 	# Do image ranging.
 	# This is necessary to tighten up the boundaries around images -- gnuplot ranging
 	# has a wart in that case, where image boundaries are extended to the nearest round
@@ -2928,34 +2892,28 @@ sub plot
 	#
 	# We implement that here by accumulating the largest extent covered by images.
 	# If there are images and no xrange/yrange was set by the user, we set it to that.
-
 	my $z; # temp. holding space for xrange/yrange for this chunk
-
-	if($chunks->[$i]->{ArrayRec} eq 'array') {
-	    $z = [-0.5, $chunks->[$i]->{data}->[0]->dim(1) - 0.5];
+	if ($chunks->[$i]{ArrayRec} eq 'array') {
+	    $z = [-0.5, $chunks->[$i]{data}[0]->dim(1) - 0.5];
 	} else {
-	    my($xmin,$xmax) = $chunks->[$i]->{data}->[0]->slice("(0)")->minmax;
-	    my($dx) = ($xmax-$xmin) / $chunks->[$i]->{data}->[0]->dim(1) * 0.5;
+	    my($xmin,$xmax) = $chunks->[$i]{data}[0]->slice("(0)")->minmax;
+	    my($dx) = ($xmax-$xmin) / $chunks->[$i]{data}[0]->dim(1) * 0.5;
 	    $z = [$xmin - $dx, $xmax + $dx];
 	}
-
-	$im_ranges->{$xax} = [undef, undef] unless(defined($im_ranges->{$xax}));
-	$im_ranges->{$xax}->[0] = $z->[0]  if( !defined( $im_ranges->{$xax}->[0] ) or $z->[0] < $im_ranges->{$xax}->[0] );
-	$im_ranges->{$xax}->[1] = $z->[1]  if( !defined( $im_ranges->{$xax}->[1] ) or $z->[1] > $im_ranges->{$xax}->[1] );
-
+	$im_ranges->{$xax} //= [undef, undef];
+	$im_ranges->{$xax}[0] = $z->[0]  if( !defined( $im_ranges->{$xax}[0] ) or $z->[0] < $im_ranges->{$xax}[0] );
+	$im_ranges->{$xax}[1] = $z->[1]  if( !defined( $im_ranges->{$xax}[1] ) or $z->[1] > $im_ranges->{$xax}[1] );
 	if($chunks->[$i]->{ArrayRec} eq 'array') {
-	    $z= [ -0.5, $chunks->[$i]->{data}->[0]->dim(2) - 0.5 ];
+	    $z= [ -0.5, $chunks->[$i]{data}[0]->dim(2) - 0.5 ];
 	} else {
-	    my($ymin,$ymax) = $chunks->[$i]->{data}->[0]->slice("(1)")->minmax;
-	    my($dy) = ($ymax-$ymin) / $chunks->[$i]->{data}->[0]->dim(2) * 0.5;
+	    my ($ymin,$ymax) = $chunks->[$i]{data}[0]->slice("(1)")->minmax;
+	    my($dy) = ($ymax-$ymin) / $chunks->[$i]{data}[0]->dim(2) * 0.5;
 	    $z = [$ymin - $dy, $ymax + $dy];
 	}
-
-	$im_ranges->{$yax} = [undef, undef] unless(defined($im_ranges->{$yax}));
-	$im_ranges->{$yax}->[0] = $z->[0]  if( !defined( $im_ranges->{$yax}->[0] ) or $z->[0] < $im_ranges->{$yax}->[0] );
-	$im_ranges->{$yax}->[1] = $z->[1]  if( !defined( $im_ranges->{$yax}->[1] ) or $z->[1] > $im_ranges->{$yax}->[1] );
+	$im_ranges->{$yax} //= [undef, undef];
+	$im_ranges->{$yax}[0] = $z->[0]  if( !defined( $im_ranges->{$yax}[0] ) or $z->[0] < $im_ranges->{$yax}[0] );
+	$im_ranges->{$yax}[1] = $z->[1]  if( !defined( $im_ranges->{$yax}[1] ) or $z->[1] > $im_ranges->{$yax}[1] );
     }
-
     ##############################
     # If image xrange/yrange has been set, check it against the maximum extent of other types of
     # data.  If other types of data exceed the image xrange/yrange, then delete the corresponding
@@ -2965,73 +2923,57 @@ sub plot
     #
     # We don't actually keep the non-image range limits, since we want to fall back to gnuplot's
     # axis estimator in the case where a non-image curve is setting the size of the axis.
-
-    if( 0 + (keys %$im_ranges) ) {
+    if ( 0 + (keys %$im_ranges) ) {
 	my $ranges = {};
-	for my $i(0..$#$chunks) {
-	    next if($chunks->[$i]->{imgFlag});
-
-	    my($cxr, $cyr);
-
-	    if($chunks->[$i]->{ArrayRec} eq 'array') {
-		if( $chunks->[$i]->{cdims}==2 ) {
-		    $cxr = [0, $chunks->[$i]->{data}->[0]->dim(1)];
-		    $cyr = [0, $chunks->[$i]->{data}->[1]->dim(2)];
-		} elsif( $chunks->[$i]->{cdims}==1 ) {
-		    $cxr = [0, $chunks->[$i]->{data}->[0]->dim(0)];
-		    $cyr = [$chunks->[$i]->{data}->[0]->minmax];
+	for my $i (grep !$chunks->[$_]{imgFlag}, 0..$#$chunks) {
+	    my ($cxr, $cyr);
+	    if($chunks->[$i]{ArrayRec} eq 'array') {
+		my $data = $chunks->[$i]{data};
+		if ( $chunks->[$i]{cdims}==2 ) {
+		    $cxr = [0, $data->[0]->dim(1)];
+		    $cyr = [0, $data->[1]->dim(2)];
+		} elsif ( $chunks->[$i]->{cdims}==1 ) {
+		    $cxr = [0, $data->[0]->dim(0)];
+		    $cyr = [$data->[0]->minmax];
 		} else {
 		    carp "WARNING: Found an 'impossible' case in autoranging.  Your plot is probably OK.\n\tplease file a bug report for PDL::Graphics::Gnuplot version $VERSION\n";
 		    next;
 		}
 	    } else {
-		$cxr = [ PDL::topdl('PDL',$chunks->[$i]->{data}->[0])->minmax ];
-		$cyr = [ PDL::topdl('PDL',$chunks->[$i]->{data}->[1])->minmax ];
+		$cxr = [ PDL->topdl($chunks->[$i]{data}[0])->minmax ];
+		$cyr = [ PDL->topdl($chunks->[$i]{data}[1])->minmax ];
 	    }
-
-	    my $xax = $axes_by_chunkno[$i]->[0];
-	    my $yax = $axes_by_chunkno[$i]->[1];
-
-	    $ranges->{$xax} = [undef,undef] unless defined($ranges->{$xax});
-	    $ranges->{$xax}->[0] = $cxr->[0] if( !defined( $ranges->{$xax}->[0] ) or $cxr->[0] < $ranges->{$xax}->[0]);
-	    $ranges->{$xax}->[1] = $cxr->[1] if( !defined( $ranges->{$xax}->[1] ) or $cxr->[1] > $ranges->{$xax}->[1]);
-
-	    $ranges->{$yax} = [undef,undef] unless defined($ranges->{$yax});
-	    $ranges->{$yax}->[0] = $cyr->[0] if( !defined( $ranges->{$yax}->[0] ) or $cyr->[0] < $ranges->{$yax}->[0]);
-	    $ranges->{$yax}->[1] = $cyr->[1] if( !defined( $ranges->{$yax}->[1] ) or $cyr->[1] > $ranges->{$yax}->[1]);
+	    my ($xax,$yax) = @{$axes_by_chunkno[$i]}[0,1];
+	    $ranges->{$xax} //= [undef,undef];
+	    $ranges->{$xax}[0] = $cxr->[0] if( !defined( $ranges->{$xax}[0] ) or $cxr->[0] < $ranges->{$xax}[0]);
+	    $ranges->{$xax}[1] = $cxr->[1] if( !defined( $ranges->{$xax}[1] ) or $cxr->[1] > $ranges->{$xax}[1]);
+	    $ranges->{$yax} //= [undef,undef];
+	    $ranges->{$yax}[0] = $cyr->[0] if( !defined( $ranges->{$yax}[0] ) or $cyr->[0] < $ranges->{$yax}[0]);
+	    $ranges->{$yax}[1] = $cyr->[1] if( !defined( $ranges->{$yax}[1] ) or $cyr->[1] > $ranges->{$yax}[1]);
 	}
-
 	# Having accumulated the max/min values for non-image plots on this axis,
 	# if one of them goes past the image, then void the im_range for that axis
 	# in that direction (to allow gnuplot to autoscale that axis in that direction).
-	for my $ax(keys %$im_ranges) {
-	    if(defined($ranges->{$ax})) {
-		$im_ranges->{$ax}->[0] = undef if( defined($im_ranges->{$ax}->[0]) and
-						   defined($ranges->{$ax}->[0])    and
-						   $ranges->{$ax}->[0] < $im_ranges->{$ax}->[0] );
-
-		$im_ranges->{$ax}->[1] = undef if( defined($im_ranges->{$ax}->[1]) and
-						   defined($ranges->{$ax}->[1]) and
-						   $ranges->{$ax}->[1] > $im_ranges->{$ax}->[1] );
-	    }
+	for my $ax (grep defined($ranges->{$_}), keys %$im_ranges) {
+	    $im_ranges->{$ax}[0] = undef if defined($im_ranges->{$ax}[0]) and
+					    defined($ranges->{$ax}[0])    and
+					    $ranges->{$ax}[0] < $im_ranges->{$ax}[0];
+	    $im_ranges->{$ax}[1] = undef if defined($im_ranges->{$ax}[1]) and
+					    defined($ranges->{$ax}[1]) and
+					    $ranges->{$ax}[1] > $im_ranges->{$ax}[1];
 	}
     }
-
-
     ##############################
     # Fix up cbrange if necessary.
     if( defined($cbmin)   or   defined($cbmax) ) {
 	$cbmin = undef if(defined($cbmin) and "$cbmin" =~ m/nan/i);
 	$cbmax = undef if(defined($cbmax) and "$cbmax" =~ m/nan/i);
-
 	if($cbmin==$cbmax) {
 	    $cbmin -= 0.1;
 	    $cbmax += 0.1;
 	}
-
-	$this->{tmp_options}->{cbrange} = [$cbmin, $cbmax];
+	$this->{tmp_options}{cbrange} = [$cbmin, $cbmax];
     }
-
     ##############################
     # Now reconcile all of the <axis>range stuff for the plot itself,
     # and set it as a temporary plot option.
@@ -3039,34 +2981,29 @@ sub plot
     # Remember, the purpose of this whole shenanigan is to fix up image ranging.
     # Axes whose values are set by option only or by non-image curves only are just fine.
     # (Maybe it would have been better to just submit a gnuplot patch...)
-    for my $k(keys %$im_ranges) {
+    for my $k (keys %$im_ranges) {
 	my $rkey = $k."range";
-
 	# Calculate the widest-range merge of any supplied plot options and curve options
 	# for this axis.
-	my $po_range = _def( $this->{options}->{$rkey}, [undef,undef] );
-	if( defined( $chunks->[0]->{options}->{$rkey} ) ) {
-	    my $z = $chunks->[0]->{options}->{$rkey};
+	my $po_range = $this->{options}{$rkey} // [undef,undef];
+	if( defined( $chunks->[0]->{options}{$rkey} ) ) {
+	    my $z = $chunks->[0]->{options}{$rkey};
 	    $po_range->[0] = $z->[0] if( !defined($po_range->[0]) or (defined($z->[0]) and  $z->[0] < $po_range->[0]) );
 	    $po_range->[1] = $z->[1] if( !defined($po_range->[1]) or (defined($z->[1]) and  $z->[1] > $po_range->[1]) );
 	}
-
 	# If an image range exists for this axis, use it for any default (undef) values.
-	$po_range->[0] = $im_ranges->{$k}->[0] unless(defined($po_range->[0]));
-	$po_range->[1] = $im_ranges->{$k}->[1] unless(defined($po_range->[1]));
-
+	$po_range->[0] //= $im_ranges->{$k}[0];
+	$po_range->[1] //= $im_ranges->{$k}[1];
 	# Now we have a merged range value whose limits come from supplied options or existing image "curve"s.
 	# Normal curves are not represented and appear as undef, allowing gnuplot to pix the axis range.
 	# Create a temporary option representing this.
-	$this->{tmp_options}->{$rkey} = $po_range;
+	$this->{tmp_options}{$rkey} = $po_range;
     }
-
     ##############################
     # If we're working with time data, and timefmt isn't set, then default it to '%s'.
-    $this->{options}->{timefmt} = '%s'
-	if ( !defined($this->{options}->{timefmt}) and
-	     grep { _def($this->{options}->{$_."data"}, "") =~ m/^time/i }  qw/x x2 y y2 z cb/ );
-
+    $this->{options}{timefmt} = '%s'
+      if !defined($this->{options}{timefmt}) and
+	grep +($this->{options}{$_."data"} // "") =~ m/^time/i, qw/x x2 y y2 z cb/;
     ##############################
     # Now deal with x2/y2 ticks.  By default they don't get turned on (blech).  So if they are
     # active, we turn them on with default values -- and also turn off mirroring for the x/y ticks.
@@ -3075,39 +3012,31 @@ sub plot
 	my $ax2 = $ax.'2';
 	my $axtics = $ax.'tics';
 	my $ax2tics = $ax2.'tics';
-
 	if($active_axes->{$ax2}) {
 	    # Turn on the axis2 tick marks
-	    unless( exists($this->{options}->{$ax2tics} ) ) {
-		$this->{tmp_options}->{$ax2tics} = ' ';
+	    unless ( exists($this->{options}{$ax2tics} ) ) {
+		$this->{tmp_options}{$ax2tics} = ' ';
 	    }
-
 	    # Turn off the axis1 mirror marks by default.
 	    # Do this with a 'topcmds' command since it will be overridden
 	    # by whatever comes below (and axis1 ticks are on by default anyway,
 	    # so if the user doesn't want them he will have turned them off).
-	    my $tc = _def($this->{options}->{topcmds},"");
+	    my $tc = $this->{options}->{topcmds} // "";
 	    $tc .= "\nset $axtics nomirror\n";
 	    $this->{options}->{topcmds} = $tc;
 	}
     }
-
-
     ##########
     # Merge in any temporary options that have been set by the argument parsing.
     # (e.g. prefrobnicators can set plot options via $this->{tmp_options}).  This is OK since
     # we've already localized $this->{options}.
-    if(exists($this->{tmp_options})) {
-	for my $k(keys %{$this->{tmp_options}}) {
-	    $this->{options}->{$k} = $this->{tmp_options}->{$k};
-	}
+    if (my $t_o = $this->{tmp_options}) {
+	@{$this->{options}}{keys %$t_o} = values %$t_o;
     }
-
     ##########
     # Emit the plot options lines that go above the plot command.  We do this
     # twice -- once for the main plot command and once for the syntax test.
     my $plotOptionsString = "";
-
     if($this->{options}->{multiplot}) {
 	# In multiplot we can't issue a "reset", because that would end the multiplot.
 	# This should take care of the major view stuff, but state might leak in here!
@@ -3115,43 +3044,35 @@ sub plot
 set size noratio
 set view noequal
 set view 60,30,1.0,1.0
+unset label
 unset xlabel
 unset ylabel
 unset cblabel
 unset xrange
 unset yrange
+unset nonlinear x
+unset nonlinear y
+unset nonlinear x2
+unset nonlinear y2
+unset link x2
+unset link y2
 POS
     } else {
 	# In single-plot mode, just issue a reset.  Multiple newlines to work around a gnuplot problem.
 	$plotOptionsString .= "reset\n\n\n";
     }
-
     $plotOptionsString .= _emitOpts($this->{options}, $pOpt);
-
-    my $testOptionsString;
-    if($check_syntax){
-	local($this->{options}->{terminal}) = "dumb";
-	local($this->{options}->{output}) = ' ';
-	$testOptionsString = _emitOpts($this->{options}, $pOpt);
-    }
-
     ##########
     # Generate the plot command with the fences in it instead of data specifiers.
     # (The fences are emitted in _emitOpts and contained in the global $cmdFence)
-    my $plotcmd =  ($this->{options}->{'3d'} ? "splot " : "plot ") .
-	join( ", ",
-	      map {
-		  _emitOpts($chunks->[$_]->{options}, $cOpt, $this);
-	      } (0..$#$chunks)
-	);
-
+    my $plotcmd =  ($this->{options}{'3d'} ? "splot " : "plot ") .
+	join ", ", map _emitOpts($chunks->[$_]{options}, $cOpt, $this),
+	    0..$#$chunks;
     ##########
     # Break up the plot command so we can insert data specifiers in each location
     my @plotcmds = split /$cmdFence/, $plotcmd;
-    if(@plotcmds != @$chunks+1) {
-	barf "This should never happen, but it did.  That's odd.  I give up.";
-    }
-
+    barf "This should never happen, but it did.  That's odd.  I give up."
+      if @plotcmds != @$chunks+1;
     ##########
     # Rebuild the plot command by inserting the format string and data spec for each piece,
     # instead of the placeholder fence strings.
@@ -3159,241 +3080,127 @@ POS
     # Image-style formats use binary matrix format rather than ordinary binary format and must
     # be handled slightly differently.
     #
-    my $testcmd;
-    {
-	my $fl = shift @plotcmds;
-	$plotcmd =  $fl;
-	$testcmd =  $fl if($check_syntax);
-    }
-
-    for my $i(0..$#plotcmds){
-	my($pchunk, $tchunk);
-
-	if( $chunks->[$i]->{cdims} == 2 ) {
+    $plotcmd = my $fl = shift @plotcmds;
+    my $testcmd = $check_syntax ? $fl : undef;
+    for my $i (0..$#plotcmds) {
+	my ($pchunk, $tchunk);
+	if ( $chunks->[$i]{cdims} == 2 ) {
 	    # It's an image -- always use binary to push the image out.
-
 	    # The map statement ensures the main and test cmd get identical sprintf templates.
-	    my $fstr = "%double" x $chunks->[$i]->{tuplesize};
-	    ($pchunk, $tchunk) = map {
+	    my $fstr = "%double" x $chunks->[$i]{tuplesize};
+	    ($pchunk, $tchunk) = map
 		sprintf(' "-" binary %s=(%s) format="%s" %s',
-			$chunks->[$i]->{ArrayRec},
+			$chunks->[$i]{ArrayRec},
 			$_,
 			$fstr,
-			$plotcmds[$i]);
-	    } ( join(",", ($chunks->[$i]->{data}->[0]->slice("(0)")->dims)),
-		join(",", (("1") x ($chunks->[$i]->{data}->[0]->ndims - 1)))
-	      );
+			$plotcmds[$i]),
+		join(",", ($chunks->[$i]{data}[0]->slice("(0)")->dims)),
+		$check_syntax ? join(",", (("1") x ($chunks->[$i]{data}[0]->ndims - 1))) : ();
 	    # Mock up test data - just a single data point for each (8 is the size of an IEEE double)
-	    $chunks->[$i]->{testdata} = "." x ($chunks->[$i]->{tuplesize} * 8);
-
+	    $chunks->[$i]{testdata} = "." x ($chunks->[$i]->{tuplesize} * 8) if $check_syntax;
 	} else {
 	    # It's a non-image plot.  Calculate whether binary or ASCII output.
 	    # First, check the per-chunk flag (if set).  If it's not, then
 	    # use the global flag.
-
-	    if( $chunks->[$i]->{binaryCurveFlag} ) {
-		my $fstr = "%double" x $chunks->[$i]->{tuplesize};
-		my $first = $chunks->[$i]->{data}->[0];
+	    if( $chunks->[$i]{binaryCurveFlag} ) {
+		my $fstr = "%double" x $chunks->[$i]{tuplesize};
+		my $first = $chunks->[$i]{data}[0];
 		# The specifiers are identical, except that one gets a length of 1 and the other gets
 		# the correct length.   The map statement ensures the main and test cmd get identical
 		# sprintf templates.
-		($pchunk, $tchunk) = map {
+		($pchunk, $tchunk) = map
 		    sprintf(" '-' binary %s=(%d) format=\"%s\" %s",
-			    $chunks->[$i]->{ArrayRec},
+			    $chunks->[$i]{ArrayRec},
 			    $_,
 			    $fstr,
-			    $plotcmds[$i]);
-		} (  ((ref($first) eq 'ARRAY') ? 0+@{$first} : $first->dim(0))  , 1);
-
+			    $plotcmds[$i]),
+		(ref($first) eq 'ARRAY') ? 0+@{$first} : $first->dim(0), $check_syntax ? 1 : ();
 		# test data is a string containing the data to send -- just garbage. Use '.' to aid
 		# byte counting in the test string.
-		$chunks->[$i]->{testdata} = $testdataunit_binary x ($chunks->[$i]->{tuplesize});
+		$chunks->[$i]{testdata} = $testdataunit_binary x ($chunks->[$i]{tuplesize}) if $check_syntax;
 	    } else {
 		# ASCII transfer has been specified - plot command is easier, but the data are in ASCII.
-		$pchunk = $tchunk =   " '-' ".$plotcmds[$i];
-		$chunks->[$i]->{testdata} = " 1 " x ($chunks->[$i]->{tuplesize}) . "\ne\n";
+		$pchunk = " '-' ".$plotcmds[$i];
+		$tchunk = $pchunk if $check_syntax;
+		$chunks->[$i]{testdata} = " 1 " x ($chunks->[$i]{tuplesize}) . "\ne\n" if $check_syntax;
 	    }
 	}
-
 	$plotcmd .= $pchunk;
-	$testcmd .= $tchunk if($check_syntax);
-
+	$testcmd .= $tchunk if $check_syntax;
     }
-
     $plotcmd .= "\n";
-
-
-    my $postTestplotCheckpoint = 'xxxxxxx Plot succeeded xxxxxxx';
-    my $print_checkpoint = "; print \"$postTestplotCheckpoint\"";
-    $testcmd .= "$print_checkpoint\n" if($check_syntax);
-
-
-    ##########
-    # Put data and final checkpointing on the test command
-    $testcmd .= join("", map { $_->{testdata} } @$chunks) if($check_syntax);
-
-    # Stash this plot command in the debugging variable
-
-    our $last_plotcmd = $plotOptionsString.$plotcmd;
-    $this->{last_plotcmd} = $last_plotcmd;
-
     our $last_testcmd;
-    if($check_syntax) {
-	$last_testcmd = $plotOptionsString.$testcmd;
-	$this->{last_testcmd} = $last_testcmd;
+    if ($check_syntax) {
+      my $postTestplotCheckpoint = 'xxxxxxx Plot succeeded xxxxxxx';
+      my $print_checkpoint = "; print \"$postTestplotCheckpoint\"";
+      $testcmd .= "$print_checkpoint\n";
+      ##########
+      # Put data and final checkpointing on the test command
+      $testcmd .= join("", map $_->{testdata}, @$chunks);
+      # Stash this plot command in the debugging variable
+      $this->{last_testcmd} = $last_testcmd = $plotOptionsString.$testcmd;
+      #######
+      # The commands are assembled.  Now test 'em by sending the test command down the pipe.
+      _printGnuplotPipe( $this, "syntax", $plotOptionsString.$testcmd );
+      my $checkpointMessage = _checkpoint($this,"syntax");
+      if(defined $checkpointMessage && $checkpointMessage !~ /^$postTestplotCheckpoint/m)
+      {
+	  $checkpointMessage =~ s/$print_checkpoint//;
+	  barf "Gnuplot error: \"$checkpointMessage\" while syntax-checking the plot cmd \"$testcmd\"";
+      }
     }
-
-    if($PDL::Graphics::Gnuplot::DEBUG) {
-	print "plot command is:\n$plotcmd\n";
-    }
-
-    #######
-    # The commands are assembled.  Now test 'em by sending the test command down the pipe.
-    my $checkpointMessage;
-    if($check_syntax) {
-	_printGnuplotPipe( $this, "syntax", $plotOptionsString.$testcmd );
-	$checkpointMessage = _checkpoint($this,"syntax");
-
-	if(defined $checkpointMessage && $checkpointMessage !~ /^$postTestplotCheckpoint/m)
-	{
-	    $checkpointMessage =~ s/$print_checkpoint//;
-	    barf "Gnuplot error: \"$checkpointMessage\" while syntax-checking the plot cmd \"$testcmd\"";
-	}
-    }
-
-    ##############################
     ##############################
     ##### Send the PlotOptionsString
-    _printGnuplotPipe( $this, "main", $plotOptionsString);
-    my $optionsWarnings = _checkpoint($this, "main", {printwarnings=>1});
-
-    # Mask out some common useless chatter
-    $optionsWarnings =~ s/^Terminal type set to .*$//m;
-    $optionsWarnings =~ s/^Options are \'.*$//m;
-    $optionsWarnings = '' if($optionsWarnings =~ m/^\s+$/s);
-
-    if($optionsWarnings) {
-	if($MS_io_braindamage) {
-	    # MS Windows can yield some chatter on the line, and it's not necessarily an
-	    # error.  So we don't barf, we only warn. Blech.
-	    carp "WARNING: the gnuplot process gave some unexpected chatter during plot setup:\n$optionsWarnings\n\n";
-	} else {
-	    # Used to barf here, but now we just issue an announcement, since
-	    # some messages are warnings (rather than errors).
-	    carp "WARNING: the gnuplot process gave some unexpected chatter:\n$optionsWarnings\n\n";
-	}
-    }
-
-    ##############################
+    my @plot_chunks = [$plotOptionsString];
+    my $plotshow = $plotOptionsString;
     ##############################
     ##### Finally..... send the actual plot command to the gnuplot device.
-    _printGnuplotPipe( $this, "main", $plotcmd);
-    $this->{last_plot}->{command} = $plotcmd;
-
-    my $chunkno = 0;
-    for my $chunk(@$chunks){
-	my $p;
-
+    print "plot command is:\n$plotcmd\n" if $PDL::Graphics::Gnuplot::DEBUG;
+    push @plot_chunks, [$plotcmd];
+    $plotshow .= $plotcmd;
+    for my $chunk (@$chunks) {
 	# Gnuplot doesn't handle bad values, but it *does* know to
 	# omit nans.  If we're running under a PDL that uses the
 	# bad value handling stuff, replace bad values with nan in the current chunk.
-	if($PDL::Bad::Status) {
-	    for my $n(0..$#{$chunk->{data}}) {
-		my $dp = $chunk->{data}->[$n];
+	if ($PDL::Bad::Status) {
+	    for my $n (0..$#{$chunk->{data}}) {
+		my $dp = $chunk->{data}[$n];
 		next if(ref($dp) eq 'ARRAY');
-		if($dp->badflag) {
-		    $dp = $chunk->{data}->[$n] = $dp + pdl(0.0);  # force copy and convert to floating point
+		if ($dp->badflag) {
+		    $dp = $chunk->{data}[$n] = $dp + pdl(0.0);  # force copy and convert to floating point
 		    $dp->where($dp->isbad) .= asin(pdl(1.1));     # NaN
 		}
 	    }
 	}
-
-	if($chunk->{cdims}==2) {
+	if ($chunk->{cdims}==2) {
 	    # Currently all images are sent binary
-	    $p = $chunk->{data}->[0]->double->sever;
-	    {
-		my $s = " [ ".length(${$p->get_dataref})." bytes of binary image data ]\n";
-		$last_plotcmd .= $s;
-		$this->{last_plotcmd} .= $s;
-	    }
-	    _printGnuplotPipe($this, "main", ${$p->get_dataref}, {binary => 1, data => 1 } );
-
-	} elsif( $chunk->{binaryCurveFlag}  ) {
+	    my $p = $chunk->{data}[0]->double->sever;
+	    push @plot_chunks, [${$p->get_dataref}, {binary => 1, data => 1 }];
+	    $plotshow .= " [ ".length(${$p->get_dataref})." bytes of binary image data ]\n";
+	} elsif ($chunk->{binaryCurveFlag}) {
 	    # Send in binary if the binary flag is set.
-	    $p = pdl(@{$chunk->{data}})->mv(-1,0)->double->sever;
-	    {
-		my $s = " [ ".length(${$p->get_dataref})." bytes of binary data ]\n";
-		$last_plotcmd .= $s;
-		$this->{last_plotcmd} .= $s;
-	    }
-	    _printGnuplotPipe($this, "main", ${$p->get_dataref}, {binary => 1, data => 1 });
-
+	    my $p = pdl(@{$chunk->{data}})->mv(-1,0)->double->sever;
+	    push @plot_chunks, [${$p->get_dataref}, {binary => 1, data => 1 }];
+	    $plotshow .= " [ ".length(${$p->get_dataref})." bytes of binary data ]\n";
 	} else {
-	    # Not in binary mode - send this chunk in ASCII.  Each line gets one tuple, followed
-	    # a line with just "e".
-
-	    # Defining the emitter here lets me keep context inside it instead of breaking it
-	    # out, which would probably be a better way to do it.
-
-	    my $emitter;
-	    if($MS_io_braindamage) {
-		$emitter = sub {
-		    my @lines = split /\n/, shift;
-		    my $byte;
-		    my $pipe = $this->{"err-main"};
-
-		    for my $line(@lines) {
-			_printGnuplotPipe($this, "main", $line."\n", {data => 1 });
-			if( !$this->{dumping} && $echo_eating ) {
-			    do {
-				sysread $pipe, $byte, 1;
-				if( $byte eq \004 or $byte eq \000 ) {
-				    $byte = undef;
-				}
-			    } until( !defined($byte) or $byte eq '>' );
-			}
-		    }
-		    _printGnuplotPipe($this, "main", "e\n", {data => 1} );
-		};
-	    } else {
-		# Under real OSes, we can just send a schwack of stuff - there is no echo.
-		$emitter = sub {
-		    _printGnuplotPipe($this, "main", shift()."e\n", {data => 1} );
-		};
-	    }
-
-
-	    # Assemble and dump the ASCII through the just-defined emitter.
-
-	    if( $chunk->{data}->[0]->$_isa('PDL') ) {
-
+	    # Assemble and dump the ASCII
+	    if ($chunk->{data}[0]->$_isa('PDL')) {
 		# It's a collection of PDL data only.
-
-		$p = pdl(@{$chunk->{data}})->slice(":,:"); # ensure at least 2 dims
+		my $p = pdl(@{$chunk->{data}})->slice(":,:"); # ensure at least 2 dims
 		$p = $p->mv(-1,0);                         # tuple dim first, rows second
-
-		{
-		    my $s = " [ ".$p->dim(1)." lines of ASCII data ]\n";
-		    $last_plotcmd .= $s;
-		    $this->{last_plotcmd} .= $s;
-		}
-
+		$plotshow .= " [ ".$p->dim(1)." lines of ASCII data ]\n";
 		# Create a set of ASCII lines.  If any of the elements of a given row are NaN or BAD, blank that line.
-		my $outbuf = join("\n", map { ($_->isfinite->all) ? join(" ", $_->list) : "" } $p->dog) . "\n";
-
-		&$emitter($outbuf);
-
+		my $outbuf = join("\n", map $_->isfinite->all ? join(" ", $_->list) : "", $p->dog) . "\n";
+		push @plot_chunks, _emit_ascii($this, $outbuf);
 	    } else {
-		# It's a collection of list ref data only.  Assemble strings.
-
+		# It's a collection of array ref data only.  Assemble strings.
 		my $data = $chunk->{data};
-		my $last = $#{$chunk->{data}->[0]};
+		my $last = $#{$data->[0]};
 		my $s = "";
-
-		for my $i(0..$last) {
-		    for my $j(0..$#$data){
-			my $elem = $data->[$j]->[$i];
-			if($elem =~ m/[\s\"]/) {    # element contains whitespace or quotes
+		for my $i (0..$last) {
+		    for my $j (0..$#$data) {
+			my $elem = $data->[$j][$i];
+			if ($elem =~ m/[\s\"]/) {    # element contains whitespace or quotes
 			    $elem =~ s/\"/\\\"/g;   # Escape quotes
 			    $elem =~ s/[\n\r]/ /g;  # Remove any newlines or returns
 			    $elem = "\"$elem\"";    # quote the element
@@ -3402,458 +3209,420 @@ POS
 		    }
 		    $s .= "\n";                     # add newline
 		}
-
-		&$emitter( $s );
+		$plotshow .= $s;
+		push @plot_chunks, _emit_ascii($this, $s);
 	    }
 	}
     }
-
-    my $plotWarnings = _checkpoint($this, "main", {printwarnings=>1});
-    if($plotWarnings) {
-	if($MS_io_braindamage) {
-	    # MS Windows can yield some chatter on the line, and it's not necessarily an
-	    # error.  So we don't barf, we only warn. Blech.
-	    carp "WARNING: the gnuplot process gave some unexpected chatter:\n$plotWarnings\n\n";
-	} else {
-	    barf("the gnuplot process returned an error during plotting: $plotWarnings\n\n");
-	}
-    }
-
     ##############################
     # Finally, finally ...  send any required cleanup commands.  This
     # starts with {bottomcmds} and includes several things we don't want to persist,
     # but that do by default.
-
-    my $cleanup_cmd = "";
-    {
-	my $bc = $this->{options}->{bottomcmds};
-	if(defined($bc)){
-	    $cleanup_cmd = (  (ref($bc) eq 'ARRAY') ?
-			      join( "\n", @$bc,"" ) :
-			      $bc."\n"
-		);
-	}
-
-    }
-
+    my $bc = $this->{options}{bottomcmds};
+    my $cleanup_cmd = !defined $bc ? "" :
+       ref($bc) ne 'ARRAY' ? "$bc\n" : join("\n", @$bc, "");
     # Mark the gnuplot as replottable - we now have a full set of plot parameters stashed away.
     $this->{replottable} = 1;
-
-    if($check_syntax) {
-	$PDL::Graphics::Gnuplot::last_testcmd .= $cleanup_cmd;
-	$this->{last_testcmd} .= $cleanup_cmd;
+    if ($check_syntax) {
 	_printGnuplotPipe($this, "syntax", $cleanup_cmd);
-	$checkpointMessage= _checkpoint($this, "syntax", {printwarnings=>1});
-	if($checkpointMessage) {
-	    barf "Gnuplot error: \"$checkpointMessage\" after syntax-checking cleanup cmd \"$cleanup_cmd\"\n";
-	}
+	$_ .= $cleanup_cmd for $this->{last_testcmd}, $last_testcmd;
+	my $checkpointMessage = _checkpoint($this, "syntax", {printwarnings=>1});
+	barf "Gnuplot error: \"$checkpointMessage\" after syntax-checking cleanup cmd \"$cleanup_cmd\"\n"
+	  if $checkpointMessage;
     }
-
-    $PDL::Graphics::Gnuplot::last_plotcmd .= $cleanup_cmd;
-    $this->{last_plotcmd} .= $cleanup_cmd;
-    _printGnuplotPipe($this, "main", $cleanup_cmd);
-    $checkpointMessage= _checkpoint($this, "main", {printwarnings=>1});
-    if($checkpointMessage) {
-	if($MS_io_braindamage) {
-	    # MS Windows can yield some chatter on the line, and it's not necessarily an
-	    # error.  So we don't barf, we only warn.  Blech.
-	    carp "WARNING: the gnuplot process gave some unexpected chatter after plot cleanup:\n$checkpointMessage\n";
-	} else {
-	    barf "Gnuplot error: \"$checkpointMessage\" after sending cleanup cmd \"$cleanup_cmd\"\n";
-	}
-    }
-
+    push @plot_chunks, [$cleanup_cmd];
+    $plotshow .= $cleanup_cmd;
     # Flag the output as rescalable if anti-aliasing is in effect
-    if($this->{aa} && $this->{aa} != 1) {
-	$this->{aa_ready} = 1;
+    $this->{aa_ready} = 1 if $this->{aa} && $this->{aa} != 1;
+    (\@plot_chunks, $plotshow);
+}
+
+*gplot = \&plot;
+sub plot
+{
+  barf "Plot called with no arguments" unless @_;
+  my $this = _obj_or_global(\@_);
+  my ($plotchunks, $plotshow) = $this->_plot_generate(@_);
+  _printGnuplotPipe($this, "main", @{shift @$plotchunks}); # options
+  my $optionsWarnings = _checkpoint($this, "main", {printwarnings=>1});
+  # Mask out some common useless chatter
+  $optionsWarnings =~ s/^Terminal type set to .*$//m;
+  $optionsWarnings =~ s/^Options are \'.*$//m;
+  $optionsWarnings = '' if($optionsWarnings =~ m/^\s+$/s);
+  if ($optionsWarnings) {
+      if ($MS_io_braindamage) {
+	  # MS Windows can yield some chatter on the line, and it's not necessarily an
+	  # error.  So we don't barf, we only warn. Blech.
+	  carp "WARNING: the gnuplot process gave some unexpected chatter during plot setup:\n$optionsWarnings\n\n";
+      } else {
+	  # Used to barf here, but now we just issue an announcement, since
+	  # some messages are warnings (rather than errors).
+	  carp "WARNING: the gnuplot process gave some unexpected chatter:\n$optionsWarnings\n\n";
+      }
+  }
+  my $cleanup_chunk = pop @$plotchunks;
+  for my $data_chunk (@$plotchunks) {
+    if (ref $data_chunk eq 'ARRAY') {
+      _printGnuplotPipe($this, "main", @$data_chunk);
+    } else {
+      _printGnuplotPipe($this, "main", @$$data_chunk);
+      my $pipe = $this->{"err-main"};
+      my $byte;
+      while (1) {
+	sysread $pipe, $byte, 1;
+	last if $byte eq \004 or $byte eq \000 or $byte eq '>';
+      };
     }
+  }
+  my $plotWarnings = _checkpoint($this, "main", {printwarnings=>1});
+  if ($plotWarnings) {
+      barf("the gnuplot process returned an error during plotting: $plotWarnings\n\n")
+	if !$MS_io_braindamage;
+      # MS Windows can yield some chatter on the line, and it's not necessarily an
+      # error.  So we don't barf, we only warn. Blech.
+      carp "WARNING: the gnuplot process gave some unexpected chatter:\n$plotWarnings\n\n";
+  }
+  _printGnuplotPipe($this, "main", @$cleanup_chunk);
+  if (my $checkpointMessage = _checkpoint($this, "main", {printwarnings=>1})) {
+    barf "Gnuplot error: \"$checkpointMessage\" after sending cleanup cmd \"$cleanup_chunk->[0]\"\n"
+      if !$MS_io_braindamage;
+    # MS Windows can yield some chatter on the line, and it's not necessarily an
+    # error.  So we don't barf, we only warn.  Blech.
+    carp "WARNING: the gnuplot process gave some unexpected chatter after plot cleanup:\n$checkpointMessage\n";
+  }
+  $this->{last_plotcmd} = our $last_plotcmd = $plotshow;
+  # read and report any warnings that happened during the plot
+  return $plotWarnings;
+}
 
-    # read and report any warnings that happened during the plot
-    return $plotWarnings;
+# Not in binary mode - send this chunk in ASCII.  Each line gets one
+# tuple, followed a line with just "e".
+sub _emit_ascii {
+  my ($this, $chunk) = @_;
+  # Under real OSes, we can just send a schwack of stuff - there is no echo.
+  return [$chunk."e\n", {data => 1}]
+    if !$MS_io_braindamage;
+  my $pipe_stuff = !$this->{dumping} && $echo_eating;
+  ((map $pipe_stuff ? \$_ : $_, map ["$_\n", {data => 1 }], split /\n/, $chunk), ["e\n", {data => 1 }]);
+}
 
-    #####################
-    #
-    # parseArgs - helper sub nested inside plot
-    #
-    # This breaks out the parsing of the curve arguments.
-    #
-    # Each chunk of data to plot appears in the argument list as
-    #      plot(options, options, ..., data, data, ....).
-    # The options are a hashref or an inline hash and also serve as delimiters between
-    # chunks of data.
-    #
-    # Curve options, with the exception of "legend", are accumulated - each set
-    # is used as the default value of the same option for the next one.
-    #
-    # The data arguments are one-argument-per-tuple-element, but higher
-    # dims can be used for threading.  Plot elements that are to be treated
-    # as 1-D (non-image) data can be threaded over -- so, e.g., you can pass in
-    # a 50 PDL (as X) and a 50x3 PDL (as Y) and you'll get three separate plots with
-    # the same options.  As a special case, you can pass an array ref into the
-    # "legend" or "color" options in that case, and thereby specify a different legend/color
-    # for each of those threaded plots.
-    #
-    sub parseArgs
-    {
-	my $this = shift;
-
-	##############################
-	# Parse curve option / data chunks.
-
-	my @args = @_;
-
-	my $is3d = (defined $this->{options}->{'3d'}) ? $this->{options}->{'3d'} : 0;
-	my $ND = (('2D','3D')[!!$is3d]);  # mainly for error messages
-	my $spec_legends = 0;
-
-	# options were once cumulative.  The 'with' specifier is still kept, but most
-	# of that functionality is not present as of 2.003.
-	# We keep the lastOptions accumulator around just in case it comes in handy for
-	# a little more context.
-	my $lastOptions = {};
-
-	my @chunks;
-	my $Ncurves  = 0;
-	my $argIndex = 0;
-
-	while($argIndex <= $#args)
-	{
-	    # First, I find and parse the options in this chunk
-	    # Array refs are allowed in some curve options, but only as values of key/value
-	    # pairs -- so any list refs glommed in with a bunch of other refs are data.
-	    my $nextDataIdx = first { (ref $args[$_] ) and
-					  (  (ref($args[$_]) =~ m/ARRAY/ and ref($args[$_-1])) or
-					     $args[$_]->$_isa('PDL')
-					     )
-	    } $argIndex..$#args;
-
-	    last if !defined $nextDataIdx; # no more data. done.
-
-	    my $lastWith = {};
-	    $lastWith->{with} = $lastOptions->{with} if($lastOptions->{with});
-
-	    my %chunk;
-	    eval {
-		$chunk{options} = dclone(
-		    _parseOptHash( $lastWith, $cOpt, @args[$argIndex..$nextDataIdx-1] )
-		    );
-		### As of Gnuplot 5.0, some curve options (dashtype) require a default value to maintain legacy
-		### behavior in the default case.  This is the place where curve options are parsed, so we
-		### hand-tweak a couple of default values here.
-
-		# dashtype doesn't have to have a defined value it only has to exist in the curve options hash,
-		# to trigger emission of a dashtype.
-		$chunk{options}{dashtype} = undef unless(defined($chunk{options}{dashtype}));
-
-		## Even worse -- some plot types (notably "with labels") barf in newer gnuplots
-		## if you feed them a "dt".  So don't send a dashtype to those.
-		my $with = (
-		    ( ref($chunk{options}{'with'}) =~ m/ARRAY/ ) ?
-		    $chunk{options}{'with'}->[0] :
-		    $chunk{options}{'with'}
-		    ) //
-		    $this->{options}->{'globalwith'} //
-		    "";
-		if($with =~ m/^label/) {
-		    $chunk{options}{dashtype} = "INVALID";
-		}
-	    };
-	    if($@){
-		unless(@chunks){
-		    barf "$@\n(Did you mix plot options and curve options at the beginning of the arg list?)\n\n";
-		}
-		barf "$@\n";
-	    }
-
-	    $chunk{options}->{data}="dummy"; # force emission of the data field
-
-	    # Find the data for this chunk...
-	    $argIndex         = $nextDataIdx;
-	    my $nextOptionIdx = first { !(ref $args[$_]) or
-					!( (ref $args[$_]) eq 'ARRAY' or
-					    $args[$_]->$_isa('PDL')
-					 )
-	                              } $argIndex..$#args;
-	    $nextOptionIdx = @args unless defined $nextOptionIdx;
-	    # Make sure we know our "with" style...
-	    unless($chunk{options}{with}) {
-		$chunk{options}{with} = _def($this->{options}->{'globalwith'},["lines"]);
-	    }
-
-	    # validate "with" and get imgFlag and tupleSizes.
-	    # First, unpack the "with" -- we accept a list of with parameters, but also
-	    # unpack them if they are supplied as a single smushed-together string.
-	    our $plotStyleProps; # declared below
-	    my @with;
-	    if(@{$chunk{options}{with}}==1) {
-		@with = split /\s+/,$chunk{options}{with}->[0];
-		@{$chunk{options}{with}} = @with;
-	    } else {
-		@with = @{$chunk{options}{with}};
-	    }
-	    if(@with > 1) {
-		carp q{
+#####################
+#
+# parseArgs - helper sub nested inside plot
+#
+# This breaks out the parsing of the curve arguments.
+#
+# Each chunk of data to plot appears in the argument list as
+#    plot(options, options, ..., data, data, ....).
+# The options are a hashref or an inline hash and also serve as delimiters between
+# chunks of data.
+#
+# Curve options, with the exception of "legend", are accumulated - each set
+# is used as the default value of the same option for the next one.
+#
+# The data arguments are one-argument-per-tuple-element, but higher
+# dims can be used for threading.  Plot elements that are to be treated
+# as 1-D (non-image) data can be threaded over -- so, e.g., you can pass in
+# a 50 PDL (as X) and a 50x3 PDL (as Y) and you'll get three separate plots with
+# the same options.  As a special case, you can pass an array ref into the
+# "legend" or "color" options in that case, and thereby specify a different legend/color
+# for each of those threaded plots.
+#
+sub parseArgs
+{
+  my $this = shift;
+  ##############################
+  # Parse curve option / data chunks.
+  my @args = @_;
+  my $is3d = $this->{options}{'3d'} // 0;
+  my $ND = (('2D','3D')[!!$is3d]);  # mainly for error messages
+  my $spec_legends = 0;
+  # options were once cumulative.  The 'with' specifier is still kept, but most
+  # of that functionality is not present as of 2.003.
+  # We keep the lastOptions accumulator around just in case it comes in handy for
+  # a little more context.
+  my $lastOptions = {};
+  my @chunks;
+  my $Ncurves  = 0;
+  my $argIndex = 0;
+  while($argIndex <= $#args)
+  {
+    # First, I find and parse the options in this chunk
+    # Array refs are allowed in some curve options, but only as values of key/value
+    # pairs -- so any array refs glommed in with a bunch of other refs are data.
+    my $nextDataIdx = $argIndex;
+    while (1) {
+      $nextDataIdx = undef, last if $nextDataIdx > $#args;
+      $nextDataIdx += 2, next if !ref $args[$nextDataIdx]; # a key
+      last if ref $args[$nextDataIdx] ne 'HASH';
+      $nextDataIdx++;
+    }
+    last if !defined $nextDataIdx; # no more data. done.
+    my $lastWith = {};
+    $lastWith->{with} = $lastOptions->{with} if($lastOptions->{with});
+    my %chunk;
+    eval {
+      $chunk{options} = dclone(
+        _parseOptHash( $lastWith, $cOpt, @args[$argIndex..$nextDataIdx-1] )
+        );
+      ### As of Gnuplot 5.0, some curve options (dashtype) require a default value to maintain legacy
+      ### behavior in the default case.  This is the place where curve options are parsed, so we
+      ### hand-tweak a couple of default values here.
+      # dashtype doesn't have to have a defined value it only has to exist in the curve options hash,
+      # to trigger emission of a dashtype.
+      $chunk{options}{dashtype} = undef unless(defined($chunk{options}{dashtype}));
+      ## Even worse -- some plot types (notably "with labels") barf in newer gnuplots
+      ## if you feed them a "dt".  So don't send a dashtype to those.
+      my $with = (
+        ( ref($chunk{options}{with}) =~ m/ARRAY/ ) ?
+        $chunk{options}{with}[0] :
+        $chunk{options}{with}
+        ) //
+        $this->{options}{globalwith} //
+        "";
+      if($with =~ m/^label/) {
+        $chunk{options}{dashtype} = "INVALID";
+      }
+    };
+    if($@){
+      unless(@chunks){
+        barf "$@\n(Did you mix plot options and curve options at the beginning of the arg list?)\n\n";
+      }
+      barf "$@\n";
+    }
+    $chunk{options}{data}="dummy"; # force emission of the data field
+    # Find the data for this chunk...
+    $argIndex     = $nextDataIdx;
+    my $nextOptionIdx = first { !(ref $args[$_]) or
+                  !( (ref $args[$_]) eq 'ARRAY' or
+                    $args[$_]->$_isa('PDL')
+                   )
+                  } $argIndex..$#args;
+    $nextOptionIdx = @args unless defined $nextOptionIdx;
+    # Make sure we know our "with" style...
+    $chunk{options}{with} ||= $this->{options}{globalwith} // ["lines"];
+    # validate "with" and get imgFlag and tupleSizes.
+    # First, unpack the "with" -- we accept a list of with parameters, but also
+    # unpack them if they are supplied as a single smushed-together string.
+    our $plotStyleProps; # declared below
+    my @with;
+    if(@{$chunk{options}{with}}==1) {
+      @with = split /\s+/,$chunk{options}{with}->[0];
+      @{$chunk{options}{with}} = @with;
+    } else {
+      @with = @{$chunk{options}{with}};
+    }
+    if(@with > 1) {
+      carp q{
 WARNING: deprecated usage of complex 'with' detected.  Use a simple 'with'
 specifier and curve options instead.  This will fail in future releases of
 PDL::Graphics::Gnuplot. (Set $ENV{'PGG_DEP'}=1 to silence this warning.
 } unless($ENV{'PGG_DEP'});
-	    }
-
-	    # Look for the plotStyleProps entry.  If not there, try cleaning up the with style
-	    # before giving up entirely.
-	    unless( exists( $plotStyleProps->{$with[0]}->[0] ) ) {
-		our $plotStylesAbbrevs;
-
-		# Try pluralizing and lc'ing if that works...
-		if($with[0] !~ m/s$/i  and  exists( $plotStyleProps->{lc $with[0].'s'} ) ) {
-		    $with[0] = lc $with[0].'s';
-		    $chunk{options}{'with'}[0] = $with[0];
-		} else {
-		    # nope.  throw a fit.
-		    barf "invalid plotstyle 'with ".($with[0])."' in plot\n";
-		}
-	    }
-
-	    my $psProps = $plotStyleProps->{$with[0]};
-
-	    # Extract the data objects from the argument list.
-	    # They should all be either PDLs or array refs.
-	    my @dataPiddles = @args[$argIndex..$nextOptionIdx-1] ;
-
-
-	    # Some plot styles (currently just "fits") are implemented via a
-	    # prefrobnicator that processes the data.
-	    if( $psProps->[ 4 ] ) {
-		@dataPiddles = &{ $psProps->[4] }( \@with, $this, \%chunk, @dataPiddles );
-		$psProps = $plotStyleProps->{$with[0]};
-	    }
-
-
-	    # Image flag and base tuplesizes allowed for this plot style...
-	    my $tupleSizes     = $psProps->[ !!$is3d ];  # index is 0 or 1 depending on truth of 3D flag
-	    my $imgFlag        = $psProps->[ 2 ];
-	    $chunk{binaryWith} = $psProps->[ 3 ];
-
-	    # If the user wanted binary but this style requires ASCII (or vice
-	    # versa) I throw a warning
-	    if ( !$ENV{PGG_SUPPRESS_BINARY_MISMATCH_WARNING} &&
-		 defined $chunk{binaryWith} )
-	    {
-	      # style requires some specific ascii/binary transfer
-	      my $got	= $chunk{binaryWith}	     ? "binary" : "ascii";
-	      my $asked = $this->{options}->{binary} ? "binary" : "ascii";
-
-	      if( $got ne $asked  and  !($this->{binary_flag_defaulted}))
-	      {
-		carp <<EOF;
+    }
+    # Look for the plotStyleProps entry.  If not there, try cleaning up the with style
+    # before giving up entirely.
+    unless ( exists( $plotStyleProps->{$with[0]}[0] ) ) {
+      our $plotStylesAbbrevs;
+      # Try pluralizing and lc'ing if that works...
+      if($with[0] !~ m/s$/i  and  exists( $plotStyleProps->{lc $with[0].'s'} ) ) {
+        $with[0] = lc $with[0].'s';
+        $chunk{options}{with}[0] = $with[0];
+      } else {
+        # nope.  throw a fit.
+        barf "invalid plotstyle 'with $with[0]' in plot\n";
+      }
+    }
+    my $psProps = $plotStyleProps->{$with[0]};
+    # Extract the data objects from the argument list.
+    # They should all be either PDLs or array refs.
+    my @dataPiddles = @args[$argIndex..$nextOptionIdx-1];
+    # Some plot styles (currently just "fits") are implemented via a
+    # prefrobnicator that processes the data.
+    if( $psProps->[ 4 ] ) {
+      @dataPiddles = &{ $psProps->[4] }( \@with, $this, \%chunk, @dataPiddles );
+      $psProps = $plotStyleProps->{$with[0]};
+    }
+    # Image flag and base tuplesizes allowed for this plot style...
+    my $tupleSizes   = $psProps->[ !!$is3d ];  # index is 0 or 1 depending on truth of 3D flag
+    my $imgFlag    = $psProps->[ 2 ];
+    $chunk{binaryWith} = $psProps->[ 3 ];
+    # If the user wanted binary but this style requires ASCII (or vice
+    # versa) I throw a warning
+    if ( !$ENV{PGG_SUPPRESS_BINARY_MISMATCH_WARNING} &&
+       defined $chunk{binaryWith} )
+    {
+      # style requires some specific ascii/binary transfer
+      my $got	= $chunk{binaryWith}	   ? "binary" : "ascii";
+      my $asked = $this->{options}{binary} ? "binary" : "ascii";
+      if( $got ne $asked  and  !($this->{binary_flag_defaulted}))
+      {
+      carp <<EOF;
 PDL::Graphics::Gnuplot warning: user asked for $asked data transfer, but
 '$with[0]' plots are ALWAYS sent in $got. Ignoring '$asked' request.
 Set environment variable PGG_SUPPRESS_BINARY_MISMATCH_WARNING to suppress
 this warning.
 EOF
-	      $ENV{PGG_SUPPRESS_BINARY_MISMATCH_WARNING} = 1;
-	      }
-	    }
-
-	    # Reject disallowed plot styles
-	    unless(ref $tupleSizes) {
-		barf "plotstyle 'with ".($with[0])."' isn't valid in $ND plots\n";
-	    }
-
-	    # Additional columns are needed for certain 'with' modifiers. Figure 'em, cheesily: each
-	    # palette or variable option to 'with' needs an additional column.
-	    # The search over @with will disappear with the deprecated compound-with form;
-	    # the real one is the second line that scans through curve options.
-	    my $ExtraColumns = 0;
-	    map { $ExtraColumns++ } grep /(palette|variable)/,map { split /\s+/ } @with;
-	    for my $k( qw/linecolor textcolor fillstyle pointsize linewidth/ ) {
-		my $v = $chunk{options}{$k};
-		next unless defined($v);
-		my $s = (ref $v eq 'ARRAY') ? join(" ",@$v) : $v;
-		$ExtraColumns++ if($s =~ m/palette|variable/);
-	    }
-	    $ExtraColumns++ if($chunk{options}{palette});
-
-	    ##############################
-	    # Figure out what size of tuple we have, and check it against the tuple sizes we can take...
-	    my $NdataPiddles = @dataPiddles;
-
-	    # Check in case it was explicitly set [not normally needed, but still...]
-	    if($chunk{options}->{tuplesize}) {
-		if($NdataPiddles != $chunk{options}->{tuplesize}) {
-		    barf "You specified a tuple size of ".($chunk{options}->{tuplesize})." but only $NdataPiddles columns of data\n";
-		}
-	    }
-
-	    my (@tuplematch) = (grep ((abs($_)+$ExtraColumns == $NdataPiddles), @$tupleSizes));
-
-
-	    if( @tuplematch ) {
-		# Tuple sizes that require autogenerated dimensions require 'array' in binary mode;
-		# all others reqire 'record' in binary mode.   Note that in ascii mode it's slightly
-		# different -- an additional "using" column (or two) is needed (see below).
-		$chunk{ArrayRec} = ($tuplematch[0] < 0) ? 'array' : 'record';
-	    } else {
-		# No match -- barf unless you really meant it
-		if($chunk{options}->{tuplesize}) {
-		    $chunk{ArrayRec} = 'record';
-		    carp "WARNING: forced disallowed tuplesize with a curve option...\n";
-		} else {
-		    my $pl = ($NdataPiddles==1)?"":"s";
-		    my $s = "Found $NdataPiddles PDL$pl for $ND plot type 'with ".($with[0])."', which needs ";
-		    if(@$tupleSizes==0) {
-			barf "Ouch! I'm never supposed to take this path.  Please report a bug.";
-		    } elsif(@$tupleSizes==1) {
-			$s .= abs($tupleSizes->[0]) + $ExtraColumns;
-		    } else {
-			$s .= "one of [".join(",",map { abs($_)+$ExtraColumns } @$tupleSizes)."]";
-		    }
-		    if($ExtraColumns) {
-			my $pl = ($ExtraColumns==1)?"":"s";
-			$s .= " (including the $ExtraColumns extra$pl from your 'with' options).\n";
-		    } else {
-			$s .= ".\n";
-		    }
-		    barf $s;
-		}
-	    }
-
-	    ##############################
-	    # Implicit dimensions in 3-D plots require imgFlag to be set...
-	    my $cdims;
-	    if($chunk{options}->{cdims}) {
-		$cdims = $chunk{options}->{cdims};
-		if($cdims==1 and $imgFlag) {
-		    barf("You specified column dimension of 1 for an image plot type! Not allowed.");
-		}
-	    } else {
-		$cdims = ($imgFlag or ( $is3d && $dataPiddles[0]->ndims >= 2 )) ? 2 : 1;
-
-	    }
-
-	    ##############################
-	    # A little aside:  streamline the common optimization cases --
-	    # if the user specified "image" but handed in an RGB or RGBA image,
-	    # bust it up into components and update the 'with' accordingly.
-	    # This happens if RGB or RGBA is in dim 0 or in dim 2.
-	    # The other dimensions have to have at least five elements.
-	    if( $cdims==2 ) {
-		if($chunk{options}->{with}->[0] eq 'image') {
-
-		    my $dp = $dataPiddles[$#dataPiddles];
-
-		    if($dp->ndims==3) {
-			if($dp->dim(1) >= 5) {
-			    if($dp->dim(0) ==3 && $dp->dim(1) >= 5 && $dp->dim(2) >= 5) {
-				$chunk{options}->{with}->[0] = 'rgbimage';
-				pop @dataPiddles;
-				push(@dataPiddles,$dp->using(0,1,2));
-			    } elsif($dp->dim(2)==3 && $dp->dim(1)>=5 && $dp->dim(0) >= 5) {
-				$chunk{options}->{with}->[0] = 'rgbimage';
-				pop @dataPiddles;
-				push(@dataPiddles,$dp->mv(2,0)->using(0,1,2));
-			    } elsif($dp->dim(0)==4 && $dp->dim(1) >= 5 && $dp->dim(2) >= 5) {
-				$chunk{options}->{with}->[0] = 'rgbalpha';
-				pop @dataPiddles;
-				push(@dataPiddles,$dp->using(0,1,2,3));
-			    } elsif($dp->dim(2)==4 && $dp->dim(0) >= 5 && $dp->dim(1) >= 5) {
-				$chunk{options}->{with}->[0] = 'rgbalpha';
-				pop @dataPiddles;
-				push(@dataPiddles, $dp->mv(2,0)->using(0,1,2,3));
-			    }
-			}
-		    }
-		}
-	    }
-	    $chunk{cdims} = $cdims;
-
-	    $chunk{tuplesize} = @dataPiddles;
-
-	    # Get the threading dims right
-	    @dataPiddles = matchDims( @dataPiddles );
-
-	    ##############################
-	    # Make sure there is a using spec, in case one wasn't given.
-	    # If we have one implicit dim in ASCII, we need a different using spec
-	    # (blech).  If we have implicit dims in 3-D, imgFlag is set (see just above),
-	    # and we will be sending the data in binary anyway (see the emission code in plot itself).
-	    unless(exists($chunk{options}->{using})) {
-		if(
-		    defined($this->{options}->{binary}) and !$this->{options}->{binary} and
-		    !$imgFlag and
-		    $chunk{ArrayRec} eq 'array'
-		    ){
-		    # ASCII mode, not an image.  Add the requisite implicit columns.
-		    if($is3d) {
-			# Two implicit columns.  The first is column 0, the second is all zeroes since
-			# we'd have to be sending an image to make it otherwise.  We sleaze up the
-			# y=0 column by multipling column 0 by 0.
-			$chunk{options}->{using} = join(":",0,'($0*0)',1..$chunk{tuplesize});
-		    } else {
-			# one implicit column.  It is column 0.
-			$chunk{options}->{using} = join(":",0..$chunk{tuplesize});
-		    }
-
-		} else {
-		    # Binary mode and/or is an image.  Omit the implicit columns since they'll be
-		    # added by gnuplot.
-		    $chunk{options}->{using} = join(":",1..$chunk{tuplesize});
-		}
-	    }
-
-
-	    # Check number of lines threaded into this tupleset; make sure everything
-	    # is consistent...
-	    my $ncurves;
-
-	    if($imgFlag){
-		if($dataPiddles[0]->dims < 2) {
-		    barf "Image plot types require at least a 2-D input PDL\n";
-		}
-	    }
-
-	    # For the image case glom everything together into one 3-dimensional PDL,
-	    # pre-inverted so that the 0 dim runs across column.
-	    if($cdims==2) {
-		# Surfaces never get a label unless one is explicitly set
-		$chunk{options}->{legend} = undef unless( exists($chunk{options}->{legend}) );
-		$spec_legends = 1;
-
-		my $p = pdl(@dataPiddles);
-
-		# Coerce up to 3 dimensions, with (col, ix, iy).
-		if( $p->dims == 2) {
-		    $p = $p->dummy(0,1);
-		} else {
-		    $p = $p->mv(-1,0);
-		}
-
-		if( ($p->dims > 3) ) {
-		    barf("PDL::Graphics::Gnuplot::plot: I can't make sense of this dimensional mix -- \n  I ended up with (".join("x",$p->dims).") data after combining everything. \n   (Did you mix list and PDL-stack formulations, or try to thread 2-D columns?)\n");
-		}
-
-		# Place the PDL onto the argument stack.
-		@dataPiddles = ($p);
-
-		$chunk{tuplesize} = $p->dim(0);
-		$ncurves = 1;
-
-
-		$chunk{data}      = \@dataPiddles;
-		$chunk{imgFlag} = 1;
-		push @chunks, \%chunk;
-
-	    } elsif( $dataPiddles[0]->$_isa('PDL') ) {
-		# Non-image case: check that the legend count agrees with the
-		# number of curves we found, and break up compound chunks (with multiple
-		# curves) into separate chunks of one curve each.
-
-		$ncurves = $dataPiddles[0]->slice("(0)")->nelem;
-
-		# Speed bump for weird case
-		our $bigthreads;
-		if($ncurves >= 100 and !$bigthreads) {
-		    carp <<"FOO"
+      $ENV{PGG_SUPPRESS_BINARY_MISMATCH_WARNING} = 1;
+      }
+    }
+    # Reject disallowed plot styles
+    unless (ref $tupleSizes) {
+      barf "plotstyle 'with ".($with[0])."' isn't valid in $ND plots\n";
+    }
+    # Additional columns are needed for certain 'with' modifiers. Figure 'em, cheesily: each
+    # palette or variable option to 'with' needs an additional column.
+    # The search over @with will disappear with the deprecated compound-with form;
+    # the real one is the second line that scans through curve options.
+    my $ExtraColumns = grep /(palette|variable)/, map split(/\s+/,$_), @with;
+    for my $k (qw/linecolor textcolor fillstyle pointsize linewidth/ ) {
+      my $v = $chunk{options}{$k};
+      next unless defined($v);
+      my $s = ref $v eq 'ARRAY' ? join(" ",@$v) : $v;
+      $ExtraColumns++ if($s =~ m/palette|variable/);
+    }
+    $ExtraColumns++ if $chunk{options}{palette};
+    ##############################
+    # Figure out what size of tuple we have, and check it against the tuple sizes we can take...
+    my $NdataPiddles = @dataPiddles;
+    # Check in case it was explicitly set [not normally needed, but still...]
+    if ($chunk{options}{tuplesize} and $NdataPiddles != $chunk{options}{tuplesize}) {
+        barf "You specified a tuple size of ".($chunk{options}->{tuplesize})." but only $NdataPiddles columns of data\n";
+    }
+    my @tuplematch = grep abs($_)+$ExtraColumns == $NdataPiddles, @$tupleSizes;
+    if ( @tuplematch ) {
+      # Tuple sizes that require autogenerated dimensions require 'array' in binary mode;
+      # all others require 'record' in binary mode.   Note that in ascii mode it's slightly
+      # different -- an additional "using" column (or two) is needed (see below).
+      $chunk{ArrayRec} = ($tuplematch[0] < 0) ? 'array' : 'record';
+    } else {
+      # No match -- barf unless you really meant it
+      if (!$chunk{options}{tuplesize}) {
+        my $pl = ($NdataPiddles==1)?"":"s";
+        my $s = "Found $NdataPiddles PDL$pl for $ND plot type 'with ".($with[0])."', which needs ";
+        barf "Ouch! I'm never supposed to take this path. Please report a bug."
+	  if !@$tupleSizes;
+        if (@$tupleSizes==1) {
+          $s .= abs($tupleSizes->[0]) + $ExtraColumns;
+        } else {
+          $s .= "one of [".join(",",map abs($_)+$ExtraColumns, @$tupleSizes)."]";
+        }
+        if ($ExtraColumns) {
+          my $pl = ($ExtraColumns==1)?"":"s";
+          $s .= " (including the $ExtraColumns extra$pl from your 'with' options).\n";
+        } else {
+          $s .= ".\n";
+        }
+        barf $s;
+      }
+      $chunk{ArrayRec} = 'record';
+      carp "WARNING: forced disallowed tuplesize with a curve option...\n";
+    }
+    ##############################
+    # Implicit dimensions in 3-D plots require imgFlag to be set...
+    my $cdims = $chunk{options}{cdims} ||
+      ($imgFlag or ( $is3d && $dataPiddles[0]->$_isa('PDL') && $dataPiddles[0]->ndims >= 2 )) ? 2 : 1;
+    barf("You specified column dimension of 1 for an image plot type! Not allowed.")
+      if $cdims==1 and $imgFlag;
+    ##############################
+    # A little aside:  streamline the common optimization cases --
+    # if the user specified "image" but handed in an RGB or RGBA image,
+    # bust it up into components and update the 'with' accordingly.
+    # This happens if RGB or RGBA is in dim 0 or in dim 2.
+    # The other dimensions have to have at least five elements.
+    if ( $cdims==2 ) {
+      if ($chunk{options}{with}[0] eq 'image') {
+        my $dp = $dataPiddles[-1];
+        if ($dp->ndims==3) {
+          if ($dp->dim(1) >= 5) {
+            if ($dp->dim(0) ==3 && $dp->dim(1) >= 5 && $dp->dim(2) >= 5) {
+              $chunk{options}{with}[0] = 'rgbimage';
+              pop @dataPiddles;
+              push @dataPiddles,$dp->using(0,1,2);
+            } elsif ($dp->dim(2)==3 && $dp->dim(1)>=5 && $dp->dim(0) >= 5) {
+              $chunk{options}{with}[0] = 'rgbimage';
+              pop @dataPiddles;
+              push @dataPiddles,$dp->mv(2,0)->using(0,1,2);
+            } elsif ($dp->dim(0)==4 && $dp->dim(1) >= 5 && $dp->dim(2) >= 5) {
+              $chunk{options}{with}[0] = 'rgbalpha';
+              pop @dataPiddles;
+              push @dataPiddles,$dp->using(0,1,2,3);
+            } elsif ($dp->dim(2)==4 && $dp->dim(0) >= 5 && $dp->dim(1) >= 5) {
+              $chunk{options}{with}[0] = 'rgbalpha';
+              pop @dataPiddles;
+              push @dataPiddles, $dp->mv(2,0)->using(0,1,2,3);
+            }
+          }
+        }
+      }
+    }
+    $chunk{cdims} = $cdims;
+    $chunk{tuplesize} = @dataPiddles;
+    # Get the threading dims right
+    @dataPiddles = matchDims( @dataPiddles );
+    ##############################
+    # Make sure there is a using spec, in case one wasn't given.
+    # If we have one implicit dim in ASCII, we need a different using spec
+    # (blech).  If we have implicit dims in 3-D, imgFlag is set (see just above),
+    # and we will be sending the data in binary anyway (see the emission code in plot itself).
+    unless (exists($chunk{options}{using})) {
+      if (
+        defined($this->{options}{binary}) and !$this->{options}{binary} and
+        !$imgFlag and
+        $chunk{ArrayRec} eq 'array'
+      ) {
+        # ASCII mode, not an image.  Add the requisite implicit columns.
+        if ($is3d) {
+          # Two implicit columns.  The first is column 0, the second is all zeroes since
+          # we'd have to be sending an image to make it otherwise.  We sleaze up the
+          # y=0 column by multipling column 0 by 0.
+          $chunk{options}{using} = join(":",0,'($0*0)',1..$chunk{tuplesize});
+        } else {
+          # one implicit column.  It is column 0.
+          $chunk{options}{using} = join(":",0..$chunk{tuplesize});
+        }
+      } else {
+        # Binary mode and/or is an image.  Omit the implicit columns since they'll be
+        # added by gnuplot.
+        $chunk{options}{using} = join(":",1..$chunk{tuplesize});
+      }
+    }
+    # Check number of lines threaded into this tupleset; make sure everything
+    # is consistent...
+    barf "Image plot types require at least a 2-D input PDL\n"
+      if $imgFlag and $dataPiddles[0]->dims < 2;
+    # For the image case glom everything together into one 3-dimensional PDL,
+    # pre-inverted so that the 0 dim runs across column.
+    my $ncurves;
+    if($cdims==2) {
+      # Surfaces never get a label unless one is explicitly set
+      $chunk{options}{legend} = undef unless exists $chunk{options}{legend};
+      $spec_legends = 1;
+      my $p = pdl(@dataPiddles);
+      # Coerce up to 3 dimensions, with (col, ix, iy).
+      if ($p->dims == 2) {
+        $p = $p->dummy(0,1);
+      } else {
+        $p = $p->mv(-1,0);
+      }
+      if ( ($p->dims > 3) ) {
+        barf("PDL::Graphics::Gnuplot::plot: I can't make sense of this dimensional mix -- \n  I ended up with (".join("x",$p->dims).") data after combining everything. \n   (Did you mix list and PDL-stack formulations, or try to thread 2-D columns?)\n");
+      }
+      # Place the PDL onto the argument stack.
+      @dataPiddles = ($p);
+      $chunk{tuplesize} = $p->dim(0);
+      $ncurves = 1;
+      $chunk{data}    = \@dataPiddles;
+      $chunk{imgFlag} = 1;
+      push @chunks, \%chunk;
+    } elsif ( $dataPiddles[0]->$_isa('PDL') ) {
+      # Non-image case: check that the legend count agrees with the
+      # number of curves we found, and break up compound chunks (with multiple
+      # curves) into separate chunks of one curve each.
+      $ncurves = $dataPiddles[0]->slice("(0)")->nelem;
+      # Speed bump for weird case
+      our $bigthreads;
+      if ($ncurves >= 100 and !$bigthreads) {
+        carp <<"FOO"
 PDL::Graphics::Gnuplot: WARNING - you seem to be plotting $ncurves
 curves in a single threaded collection.  This could be because you fed
 in a 2-D (or higher) data set when you meant to plot a single curve.
@@ -3862,170 +3631,139 @@ this message, set \$PDL::Graphics::Gnuplot::bigthreads to be true).
 If you are trying to plot a surface, you might try setting 'trid=>1'
 in the plot options.
 FOO
-		}
+      }
+      if ($chunk{options}{legend} and
+         @{$chunk{options}{legend}} and
+         @{$chunk{options}{legend}} != $ncurves
+        ) {
+        my $ent = (0+@{$chunk{options}{legend}} == 1) ? "y" : "ies";
+        my $pl = ($ncurves==1)?"":"s";
+        barf "Legend has ".(0+@{$chunk{options}{legend}})." entr$ent; but ".($ncurves)." curve$pl supplied!";
+      }
+      # Ensure legend appears in the options parsing (to emit "notitle" if necessary)
+      $chunk{options}{legend} = undef unless(exists($chunk{options}{legend}));
+      $spec_legends = 1 if($chunk{options}{legend});
+      $chunk{tuplesize} = $NdataPiddles;
+      if ($ncurves==1) {
+        # The chunk is OK.
+        $chunk{data}    = \@dataPiddles;
+        push @chunks, \%chunk;
+      } else {
+        # The chunk needs splitting, options and all.
+        for my $i (0..$ncurves - 1) {
+          my $chk = dclone(\%chunk);
+          $chk->{data} = [ map $_->slice(":,($i)"), @dataPiddles ];
+          if (exists($chk->{options}{legend})) {
+            $chk->{options}{legend} = [$chk->{options}{legend}[$i]];
+          }
+          push @chunks, $chk;
+        }
+      }
+    } else {
+      # Non-image case, with array refs instead of PDLs -- we required the chunk to be
+      # simple in matchDims, so just push it.
+      $ncurves = 1;
+      $chunk{data} = \@dataPiddles;
+      $chunk{imgFlag} = 0;
+      # Ensure legend appears in the options parsing (to emit "notitle" if necessary)
+      $chunk{options}{legend} = undef unless(exists($chunk{options}{legend}));
+      push @chunks, \%chunk;
+    }
+    $Ncurves += $ncurves;
+    $chunk{imageflag} = $imgFlag;
+    $argIndex = $nextOptionIdx;
+  }
+  return (\@chunks, $Ncurves);
+}
 
-		if($chunk{options}->{legend} and
-		   @{$chunk{options}->{legend}} and
-		   @{$chunk{options}->{legend}} != $ncurves
-		    ) {
-		    my $ent = (0+@{$chunk{options}->{legend}} == 1) ? "y" : "ies";
-		    my $pl = ($ncurves==1)?"":"s";
-		    barf "Legend has ".(0+@{$chunk{options}->{legend}})." entr$ent; but ".($ncurves)." curve$pl supplied!";
-		}
-
-		# Ensure legend appears in the options parsing (to emit "notitle" if necessary)
-		$chunk{options}->{legend} = undef unless(exists($chunk{options}->{legend}));
-
-
-		$spec_legends = 1 if($chunk{options}->{legend});
-
-
-		$chunk{tuplesize} = $NdataPiddles;
-
-		if($ncurves==1) {
-		    # The chunk is OK.
-		    $chunk{data}      = \@dataPiddles;
-		    push @chunks, \%chunk;
-		} else {
-		    # The chunk needs splitting, options and all.
-		    for my $i(0..$ncurves - 1) {
-			my $chk = dclone(\%chunk);
-			$chk->{data} = [ map { $_->slice(":,($i)") } @dataPiddles ];
-
-			if(exists($chk->{options}->{legend})) {
-			    $chk->{options}->{legend} = [$chk->{options}->{legend}->[$i]];
-			}
-
-			push(@chunks, $chk);
-		    }
-		}
-	    } else {
-		# Non-image case, with array refs instead of PDLs -- we required the chunk to be
-		# simple in matchDims, so just push it.
-		$ncurves = 1;
-		$chunk{data} = \@dataPiddles;
-		$chunk{imgFlag} = 0;
-		# Ensure legend appears in the options parsing (to emit "notitle" if necessary)
-		$chunk{options}->{legend} = undef unless(exists($chunk{options}->{legend}));
-
-		push @chunks, \%chunk;
-	    }
-
-	    $Ncurves += $ncurves;
-	    $chunk{imageflag} = $imgFlag;
-
-
-	    $argIndex = $nextOptionIdx;
-	}
-
-	return (\@chunks, $Ncurves);
-    } # end of ParseArgs nested sub
-
-
-    ##########
-    # matchDims: nested sub inside plot - kludge up thread style matching across
-    # the data arguments to a given chunk.
-    sub matchDims
-    {
-	my @data = @_;
-
-	my $nonPDLCount = 0;
-	map { $nonPDLCount++ unless( $_->$_isa('PDL') ) } @data;
-
-	# In the case where all data are PDLs, we match dimensions.
-	unless($nonPDLCount) {
-	    # Make sure the domain and ranges describe the same number of data points,
-	    # and that all PDLs have at least one dim.
-	    #
-	    # ( This is complicated by the need/desire to preserve threading rules.  Here,
-	    # we accumulate thread dimensions manually and then match 'em using dummy
-	    # dimensions...  --CED )
-	    my @data_dims = (1);  # ensure at least 1 dim with at least 1 element
-
-	    # Assemble the thread-rules dim list
-	    for my $i(0..$#data) {
-		my @ddims = $data[$i]->dims;
-		for my $i(0..$#ddims) {
-		    if( (!defined($data_dims[$i])) || ($data_dims[$i] <= 1) ) {
-			$data_dims[$i] = $ddims[$i];
-		    }
-		    elsif( ( $ddims[$i]>1) && ($ddims[$i] != $data_dims[$i] )) {
-			barf "plot(): mismatched arguments in tuple (position $i)\n";
-		    }
-		}
-	    }
-
-	    # Now pad each data element out, by slicing, to match the full dim list.  If the
-	    # dim matches, mark a ':'; if not, put in the correct dummy dim to make it match.
-	    # Don't bother slicing unless at least one dummy dim is needed.
-	    for my $i(0..$#data) {
-		my @ddims = $data[$i]->dims;
-		my @s = ();
-		my $slice_needed = 0;
-
-		for my $id(0..$#data_dims) {
-		    if((!defined($ddims[$id])) || !$ddims[$id]) {
-			push(@s,"*$data_dims[$id]");
-			$slice_needed = 1;
-		    }
-		    elsif($data_dims[$id] == $ddims[$id]) {
-			push(@s,":");
-		    }
-		    elsif( $ddims[$id]==1 ) {
-			push(@s,"(0), *$data_dims[$id]");
-			$slice_needed = 1;
-		    } else {
-			# should never happen
-			barf "plot(): problem with dim assignments. This is a bug."; # no newline
-		    }
-		}
-
-		if($slice_needed) {
-		    my $s = join(",",@s);
-		    $data[$i] = $data[$i]->slice( join(",",@s) );
-		}
-	    }
-	    return @data;
-	}
-	# At least one of the data columns is a non-PDL.  Force them to be simple columns, and
-	# require exact dimensional match.
-	#
-	# Also, convert any contained PDLs to list refs.
-
-	my $nelem;
-	my @out = ();
-
-	for(@data) {
-	    barf "plot(): only 1-D PDLs are allowed to be mixed with array ref data\n"
-		if( $_->$_isa('PDL')   and   $_->ndims > 1 );
-
-	    if((ref $_) eq 'ARRAY') {
-		barf "plot(): row count mismatch:  ".(0+@$_)." != $nelem\n"
-		    if( (defined $nelem) and (@$_ != $nelem) );
-		$nelem = @$_;
-
-		for (@$_) {
-		    barf "plot(): nested references not allowed in list data\n"
-			if( ref($_) );
-		}
-
-		push(@out, $_);
-
-	    } elsif(  $_->$_isa('PDL')  ) {
-		barf "plot(): nelem disagrees with row count: ".$_->nelem." != $nelem\n"
-		    if( (defined $nelem) and ($_->nelem != $nelem) );
-		$nelem = $_->nelem;
-
-		push(@out, [ $_->list ]);
-
-	    } else {
-		barf "plot(): problem with dim checking.  This should never happen.";
-	    }
-	}
-
-	return @out;
-    } # end of matchDims (nested in plot)
-}  # end of plot
+##########
+# matchDims: nested sub inside plot - kludge up thread style matching across
+# the data arguments to a given chunk.
+sub matchDims
+{
+  my @data = @_;
+  my $nonPDLCount = 0;
+  map { $nonPDLCount++ unless( $_->$_isa('PDL') ) } @data;
+  # In the case where all data are PDLs, we match dimensions.
+  unless($nonPDLCount) {
+    # Make sure the domain and ranges describe the same number of data points,
+    # and that all PDLs have at least one dim.
+    #
+    # ( This is complicated by the need/desire to preserve threading rules.  Here,
+    # we accumulate thread dimensions manually and then match 'em using dummy
+    # dimensions...  --CED )
+    my @data_dims = (1);  # ensure at least 1 dim with at least 1 element
+    # Assemble the thread-rules dim list
+    for my $i(0..$#data) {
+      my @ddims = $data[$i]->dims;
+      for my $i(0..$#ddims) {
+        if( (!defined($data_dims[$i])) || ($data_dims[$i] <= 1) ) {
+          $data_dims[$i] = $ddims[$i];
+        }
+        elsif( ( $ddims[$i]>1) && ($ddims[$i] != $data_dims[$i] )) {
+          barf "plot(): mismatched arguments in tuple (position $i)\n";
+        }
+      }
+    }
+    # Now pad each data element out, by slicing, to match the full dim list.  If the
+    # dim matches, mark a ':'; if not, put in the correct dummy dim to make it match.
+    # Don't bother slicing unless at least one dummy dim is needed.
+    for my $i(0..$#data) {
+      my @ddims = $data[$i]->dims;
+      my @s = ();
+      my $slice_needed = 0;
+      for my $id(0..$#data_dims) {
+        if((!defined($ddims[$id])) || !$ddims[$id]) {
+          push(@s,"*$data_dims[$id]");
+          $slice_needed = 1;
+        }
+        elsif($data_dims[$id] == $ddims[$id]) {
+          push(@s,":");
+        }
+        elsif( $ddims[$id]==1 ) {
+          push(@s,"(0), *$data_dims[$id]");
+          $slice_needed = 1;
+        } else {
+          # should never happen
+          barf "plot(): problem with dim assignments. This is a bug."; # no newline
+        }
+      }
+      if($slice_needed) {
+        my $s = join(",",@s);
+        $data[$i] = $data[$i]->slice( join(",",@s) );
+      }
+    }
+    return @data;
+  }
+  # At least one of the data columns is a non-PDL.  Force them to be simple columns, and
+  # require exact dimensional match.
+  #
+  # Also, convert any contained PDLs to array refs.
+  my $nelem;
+  my @out = ();
+  for(@data) {
+    barf "plot(): only 1-D PDLs are allowed to be mixed with array ref data\n"
+      if( $_->$_isa('PDL')   and   $_->ndims > 1 );
+    if((ref $_) eq 'ARRAY') {
+      barf "plot(): row count mismatch:  ".(0+@$_)." != $nelem\n"
+        if( (defined $nelem) and (@$_ != $nelem) );
+      $nelem = @$_;
+      for (@$_) {
+        barf "plot(): nested references not allowed in list data\n"
+          if( ref($_) );
+      }
+      push(@out, $_);
+    } elsif(  $_->$_isa('PDL')  ) {
+      barf "plot(): nelem disagrees with row count: ".$_->nelem." != $nelem\n"
+        if( (defined $nelem) and ($_->nelem != $nelem) );
+      $nelem = $_->nelem;
+      push(@out, [ $_->list ]);
+    } else {
+      barf "plot(): problem with dim checking.  This should never happen.";
+    }
+  }
+  return @out;
+} # end of matchDims (nested in plot)
 
 ######################################################################
 ######################################################################
@@ -4116,7 +3854,7 @@ Generate 3D plots.  Synonym for C<plot(trid =E<gt> 1, ...)>
 *splot = \&plot3d;
 sub plot3d {
     my $this = _obj_or_global(\@_);
-    local($this->{options}->{'3d'}) = 1;
+    local($this->{options}{'3d'}) = 1;
     plot($this,@_);
 }
 
@@ -4133,7 +3871,7 @@ Generates plots with lines, by default. Shorthand for C<plot(globalwith =E<gt> '
 *line = \&lines;
 sub lines {
     my $this = _obj_or_global(\@_);
-    local($this->{options}->{'globalwith'}) = ['lines'];
+    local($this->{options}{globalwith}) = ['lines'];
     plot($this,@_);
 }
 
@@ -4149,7 +3887,7 @@ Generates plots with points, by default. Shorthand for C<plot(globalwith =E<gt> 
 
 sub points {
     my $this = _obj_or_global(\@_);
-    local($this->{options}->{'globalwith'}) = ['points'];
+    local($this->{options}{globalwith}) = ['points'];
     plot($this,@_);
 }
 
@@ -4166,7 +3904,7 @@ Displays an image (either greyscale or RGB).  Shorthand for C<plot(globalwith =E
 
 sub image {
     my $this = _obj_or_global(\@_);
-    local($this->{options}->{'globalwith'}) = ["image"];
+    local($this->{options}{globalwith}) = ["image"];
     plot($this, @_);
 }
 
@@ -4194,7 +3932,7 @@ Displays a FITS image.  Synonym for C<plot(globalwith =E<gt> 'fits', ...)>.
 
 sub fits {
     my $this = _obj_or_global(\@_);
-    local($this->{options}->{'globalwith'}) = ["fits"];
+    local($this->{options}{globalwith}) = ["fits"];
     plot($this,@_);
 }
 
@@ -4202,6 +3940,14 @@ sub fits {
 # Multiplot support
 
 =pod
+
+=head2 multiplot_generate
+
+=for ref
+
+Called with the same arguments as L</multiplot>, it returns the text that
+would be sent to Gnuplot.
+Added in 2.025.
 
 =head2 multiplot
 
@@ -4213,6 +3959,7 @@ sub fits {
  $w->multiplot(layout=>[2,2,"columnsfirst"]);
  $w->plot({title=>"points"},with=>"points",$a,$b);
  $w->plot({title=>"lines"}, with=>"lines", $a,$b);
+ $w->multiplot_next; # with Gnuplot 4.7+
  $w->plot({title=>"image"}, with=>"image", $a->(*1) * $b );
  $w->end_multi();
 
@@ -4248,7 +3995,7 @@ C<title> should be followed by a single scalar containing the title string.
 
 =item scale - make gridded plots larger or smaller than their allocated space
 
-C<scale> takes either a scalar or a list ref containing one or two
+C<scale> takes either a scalar or an array ref containing one or two
 values.  If only one value is supplied, it is a general scale factor
 of each plot in the grid.  If two values are supplied, the first is an
 X stretch factor for each plot in the grid, and the second is a Y
@@ -4256,10 +4003,32 @@ stretch factor for each plot in the grid.
 
 =item offset - offset each plot from its grid origin
 
-C<offset> takes a list ref containing two values, that control placement
+C<offset> takes an array ref containing two values, that control placement
 of each plot within the grid.
 
 =back
+
+=head2 multiplot_next_generate
+
+=for ref
+
+Called with the same arguments as L</multiplot_next>, it returns the text that
+would be sent to Gnuplot. Exportable.
+Added in 2.025.
+
+=head2 multiplot_next
+
+=for ref
+
+Skip one plot. Added in 2.025. Requires Gnuplot 4.7+.
+
+=head2 end_multi_generate
+
+=for ref
+
+Called with the same arguments as L</end_multi>, it returns the text that
+would be sent to Gnuplot. Exportable.
+Added in 2.025.
 
 =head2 end_multi
 
@@ -4310,34 +4079,27 @@ our $mpOptionsTable = {
 our $mpOptionsAbbrevs = _gen_abbrev_list(keys %$mpOptionsTable);
 our $mpOpt = [$mpOptionsTable, $mpOptionsAbbrevs, "multiplot option"];
 
-sub multiplot {
+sub multiplot_generate {
     my $this = _obj_or_global(\@_);
-    my @params = @_;
-
-    if($this->{options}->{multiplot}) {
+    if ($this->{options}{multiplot}) {
 	carp "Warning: multiplot: object is already in multiplot mode!\n  Exiting multiplot mode first...\n";
 	end_multi($this);
     }
-
     my $mp_opts = _parseOptHash( undef, $mpOpt, @_ );
-
     # Assemble the command.
-
-    my $command = "set multiplot " . _emitOpts($mp_opts, $mpOpt) . "\n";
-    my $preamble = _emitOpts({ 'terminal'   => $this->{options}->{terminal},
-			       'output'     => $this->{options}->{output},
-			       'termoption' => $this->{options}->{termoption}
+    my $preamble = _emitOpts({ 'terminal'   => $this->{options}{terminal},
+			       'output'     => $this->{options}{output},
+			       'termoption' => $this->{options}{termoption}
 			     },
 			     $pOpt);
-
-    my $checkpointMessage;
-    if($check_syntax){
+    my $command = "set multiplot " . _emitOpts($mp_opts, $mpOpt) . "\n";
+    if ($check_syntax) {
 	my $test_preamble = "set terminal dumb\nset output \" \"\n";
 	$PDL::Graphics::Gnuplot::last_testcmd = $test_preamble . $command;
 	$this->{last_testcmd} = $test_preamble . $command;
 	_printGnuplotPipe( $this, "syntax", $test_preamble . $command);
-	$checkpointMessage = _checkpoint($this, "syntax");
-	if($checkpointMessage) {
+	my $checkpointMessage = _checkpoint($this, "syntax");
+	if ($checkpointMessage) {
 	    if($MS_io_braindamage) {
 		carp "WARNING: unexpected chatter while sending multiplot command:\n$checkpointMessage\n\n";
 	    } else {
@@ -4345,48 +4107,89 @@ sub multiplot {
 	    }
 	}
     }
+    $this->{options}{multiplot} = 1;
+    $preamble . $command;
+}
 
-    $PDL::Graphics::Gnuplot::last_plotcmd = $preamble . $command;
-    $this->{last_plotcmd} = $preamble.$command;
-    _printGnuplotPipe( $this, "main", $preamble . $command);
-    $checkpointMessage = _checkpoint($this,"main");
-    if($checkpointMessage){
-	if($MS_io_braindamage) {
+sub multiplot {
+    my $this = _obj_or_global(\@_);
+    my $plotshow = $this->multiplot_generate(@_);
+    $this->{last_plotcmd} = our $last_plotcmd = $plotshow;
+    _printGnuplotPipe($this, "main", $plotshow);
+    my $checkpointMessage = _checkpoint($this,"main");
+    if ($checkpointMessage) {
+	if ($MS_io_braindamage) {
 	    carp "WARNING: unexpected chatter while sending final multiplot command:\n$checkpointMessage\n\n";
 	} else {
 	    barf("Gnuplot error: \"$checkpointMessage\" while sending final multiplot command.");
 	}
     }
-
-    $this->{options}->{multiplot} = 1;
-
     return;
 }
 
+sub multiplot_next_generate {
+  barf "multiplot_next: need Gnuplot 4.7+\n"
+    if $PDL::Graphics::Gnuplot::gp_version < 4.7;
+  my $this = _obj_or_global(\@_);
+  barf "multiplot_next: you can't, you're not in multiplot mode\n"
+    unless $this->{options}{multiplot};
+  my $checkpointMessage;
+  if ($check_syntax) {
+    _printGnuplotPipe($this, "syntax", "set multiplot next\n");
+    $checkpointMessage = _checkpoint($this, "syntax");
+    barf "Gnuplot error: set multiplot next failed on syntax check!\n$checkpointMessage"
+      if $checkpointMessage;
+  }
+  "set multiplot next\n";
+}
+
+sub multiplot_next {
+  barf "multiplot_next: need Gnuplot 4.7+\n"
+    if $PDL::Graphics::Gnuplot::gp_version < 4.7;
+  my $this = _obj_or_global(\@_);
+  barf "multiplot_next: you can't, you're not in multiplot mode\n"
+    unless $this->{options}{multiplot};
+  my $plotcmd = $this->multiplot_next_generate;
+  _printGnuplotPipe($this, "main", $plotcmd);
+  my $checkpointMessage = _checkpoint($this, "main");
+  if ($checkpointMessage) {
+    if ($MS_io_braindamage) {
+      carp "WARNING: unexpected chatter after set multiplot next:\n$checkpointMessage\n";
+    } else {
+      barf("Gnuplot error: set multiplot next failed!\n$checkpointMessage");
+    }
+  }
+}
+
+sub end_multi_generate {
+  my $this = _obj_or_global(\@_);
+  barf "end_multi: you can't, you're not in multiplot mode\n"
+    unless $this->{options}{multiplot};
+  if ($check_syntax) {
+    _printGnuplotPipe( $this, "syntax", "unset multiplot\n");
+    my $checkpointMessage = _checkpoint($this, "syntax");
+    barf "Gnuplot error: unset multiplot failed on syntax check!\n$checkpointMessage"
+      if $checkpointMessage;
+  }
+  $this->{options}{multiplot} = 0;
+  "unset multiplot\n";
+}
+
 sub end_multi {
-    my $this = _obj_or_global(\@_);
-    unless($this->{options}->{multiplot}) {
-	barf("end_multi: you can't, you're not in multiplot mode\n");
+  my $this = _obj_or_global(\@_);
+  barf "end_multi: you can't, you're not in multiplot mode\n"
+    unless $this->{options}{multiplot};
+  my $plotcmd = $this->end_multi_generate;
+  _printGnuplotPipe($this, "main", $plotcmd);
+  my $checkpointMessage = _checkpoint($this, "main");
+  if ($checkpointMessage) {
+    if ($MS_io_braindamage) {
+      carp "WARNING: unexpected chatter after unset multiplot:\n$checkpointMessage\n";
+    } else {
+      barf("Gnuplot error: unset multiplot failed!\n$checkpointMessage");
     }
-    my $checkpointMessage;
-    if($check_syntax){
-	_printGnuplotPipe( $this, "syntax", "unset multiplot\n");
-	$checkpointMessage = _checkpoint($this, "syntax");
-	if($checkpointMessage) {
-	    barf("Gnuplot error: unset multiplot failed on syntax check!\n$checkpointMessage");
-	}
-    }
-    _printGnuplotPipe($this, "main", "unset multiplot\n");
-    $checkpointMessage = _checkpoint($this, "main");
-    if($checkpointMessage) {
-	if($MS_io_braindamage) {
-	    carp "WARNING: unexpected chatter after unset multiplot:\n$checkpointMessage\n";
-	} else {
-	    barf("Gnuplot error: unset multiplot failed!\n$checkpointMessage");
-	}
-    }
-    $this->{options}->{multiplot} = 0;
-    $this->close if !$termTab->{$this->{terminal}}{disp};
+  }
+  $this->close if !$termTab->{$this->{terminal}}{disp};
 }
 
 ######################################################################
@@ -4420,7 +4223,7 @@ read_mouse blocks execution for input, but responds gracefully to interrupts.
 my $mouse_serial = 0;
 sub read_mouse {
     my $this = shift;
-    my $message = _def(shift(), "Click mouse or press key in plot to continue...");
+    my $message = shift() // "Click mouse or press key in plot to continue...";
 
     unless($this->{mouse}) {
 	my $s = "read_mouse: This plot uses the '$this->{terminal}' terminal, which doesn't support mousing\n";
@@ -4461,7 +4264,7 @@ EOC
 	$string =~ m/Key: (\-?\d+)( +at xy:([^\s\,]+)\,([^\s\,]+)? button:(\d+)? shift:(\d+) alt:(\d+) ctrl:(\d+))?\s*$/
 	    || barf "read_mouse: string $string doesn't look right - doesn't match parse regexp.\n";
 
-	($ch,$x,$y,$b,$sft,$alt,$ctl) = map { _def($_,"") } ($1,$3,$4,$5,$6,$7,$8);
+	($ch,$x,$y,$b,$sft,$alt,$ctl) = map $_//"", ($1,$3,$4,$5,$6,$7,$8);
 
     }
 
@@ -4481,7 +4284,7 @@ EOC
 	$string =~ m/Key:(\-?\d+)( +at xy:([^\s\,]+)\,([^\s\,]+) shift:(\d+) alt:(\d+) ctrl:(\d+))?/
 	    || barf "read_mouse: string $string doesn't look right - doesn't match parse regexp.\n";
 
-	($ch,$x,$y,$sft,$alt,$ctl) = map { _def($_, "") } ($1,$3,$4,$5,$6,$7);
+	($ch,$x,$y,$sft,$alt,$ctl) = map $_ // "", ($1,$3,$4,$5,$6,$7);
 
 	if($ch == 1063) {
 	    $b = 1;
@@ -4788,7 +4591,7 @@ sub _gen_abbrev_list {
 }
 
 sub _expand_abbrev {
-    my $s = _def(shift(),"");
+    my $s = shift() // "";
     my $sl = lc($s);
     my $abbrevs = shift;
     my $name = shift;
@@ -4811,9 +4614,9 @@ sub _expand_abbrev {
 # pOptionsTable - describes valid plot options and their allowed value types
 #
 # The keywords are the option name (from the Gnuplot 4.6 manual); the values are
-# a list ref containing:
+# an array ref containing:
 #   - value type:
-#     * list ref for a single value with options (first is default)
+#     * array ref for a single value with options (first is default)
 #     * "b" for boolean flag (actually ternary: true/false/undef)
 #     * "n" for number
 #     * "s" for a scalar string
@@ -4843,7 +4646,7 @@ sub _expand_abbrev {
 #
 #   - sort-after:
 #     * nothing: can appear in no particular order
-#     * list ref: options later than which this option should be presented
+#     * array ref: options later than which this option should be presented
 #
 #   - sort-order
 #     * a number: numbered options, if present appear at the beginning of the option dump, in numerical order.
@@ -5264,8 +5067,8 @@ use warnings;
 			       my @numbers = ();
 			       my @v = @$v;
 
-			       while( @v && (_def($v[0],"") =~ m/^(\s*\-?((\d+\.?\d*)|(\d*\.\d+))([eE][\+\-]\d*)?\s*)?$/ )) {
-				   push(@numbers, _def(shift(@v),""));
+			       while( @v && (($v[0]//"") =~ m/^(\s*\-?((\d+\.?\d*)|(\d*\.\d+))([eE][\+\-]\d*)?\s*)?$/ )) {
+				   push @numbers, shift(@v)//"";
 			       }
 			       my $s = "";
 			       $s .= "set view ".join(",",@numbers)."\n" if(@numbers);
@@ -5397,7 +5200,7 @@ our $cOptionsTable = {
          # data is here so that it gets sorted properly into each chunk -- but it doesn't get specified this way.
          # the output string just specifies STDIN.   The magic output string gets replaced post facto with the test and
          # real output format specifiers.
-    'cdims'     => [sub { my $s = _def($_[1], 0);  # Number of dimensions in a column
+    'cdims'     => [sub { my $s = $_[1] // 0; # Number of dimensions in a column
 			  barf "Curve option 'cdims' must be one of 0, 1, or 2\n" unless $s==0 or $s==1 or $s==2;
 			  return $s;
 		    },
@@ -5408,7 +5211,7 @@ our $cOptionsTable = {
 		   ],
     'using'    => ['l','cl',undef,6],        # using clauses in order (straight passthrough)
 # legend is a special case -- it gets parsed as a list but emitted as a quoted scalar.
-    'legend'   => ['l', sub { if(defined($_[1]) and defined $_[1]->[0]) {return "title \"$_[1]->[0]\"";} else {return "notitle"}},
+    'legend'   => ['l', sub { if(defined($_[1]) and defined $_[1][0]) {return "title \"$_[1][0]\"";} else {return "notitle"}},
 		   undef, 7],
     'axes'     => [['(x[12])(y[12])'],'cs',undef,8],
     'smooth'   => ['s','cs',undef,8.1],
@@ -5488,7 +5291,7 @@ $cOpt = [$cOptionsTable, $cOptionsAbbrevs, "curve option"];
 #              Currently, fits images are handled that way because of gnuplot's problem
 #              dealing with proper coordinate grids -- the fits image is sampled into
 #              scientific coordinates using PDL::Transform.  The prefrobnicator should accept:
-#               * the 'with' option list ref,
+#               * the 'with' option array ref,
 #               * the main plot object (for access to plot options)
 #               * the plot chunk (for access to curve options),
 #               * all the data passed in for that curve.
@@ -5634,7 +5437,7 @@ $palettesTab = {
 # definitions and either an options hash ref or a listified hash.
 # Used for parsing/adding plot options...
 #
-# Call with the options hash to be written to, then with the Opt list ref (e.g. $pOpt global above),
+# Call with the options hash to be written to, then with the Opt array ref (e.g. $pOpt global above),
 # then with the arguments.  The $me is needed to feed to special-handling subs in the
 # OptionsTable.
 
@@ -5652,7 +5455,7 @@ sub _parseOptHash {
     # unpack it inline.
     opt: while(@opts) {
 	# Pull the next key.  If it turns out to be a hash, interpolate the hash into the list
-	# of parameters.  If it turns out to be a list, do likewise.  Note that list refs that are
+	# of parameters.  If it turns out to be a list, do likewise.  Note that array refs that are
 	# in a value slot are *not* interpolated.
 	my $k = shift @opts;
 	if(ref $k eq 'HASH') {
@@ -5711,7 +5514,7 @@ sub _parseOptHash {
 	    if(ref($parser->[0])) {
 		barf("HELP!  Parser is confused.  This is a bug, please report it.\n");
 	    } elsif (  0+@$parser == 1 )  {
-		# A list ref with a single element - it's a regexp to match
+		# An array ref with a single element - it's a regexp to match
 		my $a = $parser->[0];
 		$parser = sub {
 		    my ($old, $newparam, $hash) = @_;
@@ -5719,7 +5522,7 @@ sub _parseOptHash {
 		    return $newparam;
 		};
 	    } else {
-		# A list ref with multiple elements - they are enums.
+		# An array ref with multiple elements - they are enums.
 		# Make a temporary abbrev list for 'em.
 		my $abbrevs = _gen_abbrev_list( @$parser );
 		my $p = sub {
@@ -5766,7 +5569,7 @@ $_pOHInputs = {
     ## one-line list (can also be boolean)
     'l' => sub { return undef unless(defined $_[1]);
 		 return "" unless(length($_[1]));                                 # false value yields false
-		 return $_[1] if( (!ref($_[1])) && "$_[1]" =~ m/^\s*\-?\d+\s*$/); # nonzero integers yield true
+		 return [$_[1]] if( (!ref($_[1])) && "$_[1]" =~ m/^\s*\-?\d+\s*$/); # nonzero integers yield true
 		 # Not setting a boolean value - it's a list (or a trivial list).
 		 return $_[1] if ref $_[1] eq 'ARRAY';
 		 # anything that's not an array ref (and not a number) gets put in the array
@@ -5853,7 +5656,7 @@ $_pOHInputs = {
 		     my $o = [];
 		     for my $l(@$new) {
 			 unless(ref $l eq 'ARRAY') {
-			     die "Markup option: nested lists must contain only list refs\n";
+			     die "Markup option: nested lists must contain only array refs\n";
 			 }
 			 push(@$o, [@$l]);
 		     }
@@ -5893,7 +5696,7 @@ $_pOHInputs = {
 
 		      # We don't fully parse gnuplot lines -- but we do
 		      # check for the simple numeric case -- if it's correct,
-		      # turn the list ref into a hash for future manipulability.
+		      # turn the array ref into a hash for future manipulability.
 		      if( @list == 0 ) {
 			  return {};
 		      } elsif(@list > 3) {
@@ -6180,8 +5983,8 @@ our $_OptionEmitters = {
 		  return "" unless($gp_numversion >= 5.0);
 		  return "" if(($v//"") eq 'INVALID');
 		  unless($v) {
-		      if($w->{options}->{terminal} =~ m/dashed/) {
-			  $w->{last_dashtype} = 0 unless(defined($w->{last_dashtype}));
+		      if($w->{options}{terminal} =~ m/dashed/) {
+			  $w->{last_dashtype} //= 0;
 			  return " dt ".(++$w->{last_dashtype})." ";
 		      } else {
 			  return " dt solid ";
@@ -6256,7 +6059,7 @@ our $_OptionEmitters = {
 
     #### A boolean or 'time' (for <foo>data plot options)
     'bt' => sub { my($k,$v,$h) = @_;
-		  return "set $k\n" unless (_def($v, "")  and  $v=~m/^t/i);
+		  return "set $k\n" unless ($v and $v=~m/^t/i);
 		  return "set $k $v\n";rxt hel
                  },
 
@@ -6302,7 +6105,7 @@ our $_OptionEmitters = {
 		      }
 		  }
 		  if( defined( my $v = delete $h{offset} ) ) {
-		      barf "<foo>tics option: 'offset' suboption must be a list ref or false"
+		      barf "<foo>tics option: 'offset' suboption must be an array ref or false"
 			if $v and ref($v) ne 'ARRAY';
 		      push @l, $v ? ("offset", join(",",@$v)) : 'nooffset';
 		  }
@@ -6323,7 +6126,7 @@ our $_OptionEmitters = {
 		  # gnuplot command with "add" marked.
 
 		  if(defined( my $v = $h{locations} )) {
-		      barf "<foo>tics: 'locations' elements must be scalar or list ref"
+		      barf "<foo>tics: 'locations' elements must be scalar or array ref"
 			if ref($v) and ref($v) ne 'ARRAY';
 		      if(ref($v) eq 'ARRAY'){
 			  push @l, @$v ? join(',', @$v) : 'autofreq';
@@ -6336,13 +6139,13 @@ our $_OptionEmitters = {
 		      $l[$#l] =~ s/^\s*\-/0\-/;
 		  }
 		  if(defined( my $v = $h{labels} )) {
-		      barf "<foo>tics: 'labels' elements must be list refs containing [label, val, flag]"
+		      barf "<foo>tics: 'labels' elements must be array refs containing [label, val, flag]"
 			  if ref($v) ne 'ARRAY';
-		      barf "<foo>tics: labels list elements must be duals or triples as list refs"
+		      barf "<foo>tics: labels list elements must be duals or triples as array refs"
 			  if grep ref() ne 'ARRAY', @$v;
 		      my $line =   "(".
 				    join(", ",
-					  map sprintf('"%s" %s %s', _def($_->[0],""), _def($_->[1],0), _def($_->[2],"") ),
+					  map sprintf('"%s" %s %s', $_->[0]//"", $_->[1]//0, $_->[2]//""),
 					  @$v
 				    ).
 				    ")"
@@ -6573,17 +6376,17 @@ our $_OptionEmitters = {
 
 
 		     #looks like 'set <foo>range restore' (only way 'r' can be the first char)
-		     return "set $k ".join(" ",@$v)."\n" if( _def($v->[0], '') =~ m/^\s*r/i);
+		     return "set $k ".join(" ",@$v)."\n" if ($v->[0]//'') =~ m/^\s*r/i;
 
 
 		     # first element is an empty range specifier - emit.
-		     return "set $k ".join(" ",@$v)."\n" if(_def($v->[0], '') =~ m/\s*\[\s*\]/);
+		     return "set $k ".join(" ",@$v)."\n" if ($v->[0]//'') =~ m/\s*\[\s*\]/;
 
 		     my $c = substr($k,0,1);
-		     my $tfmt = _def( $h->{$c."data"}, "" ) =~ m/time/;
+		     my $tfmt = ( $h->{$c."data"} // "" ) =~ m/time/;
 
 		     # first element has a nonempty range specifier (naked or not).
-		     if( _def($v->[0], '') =~ m/\:/) {
+		     if( ($v->[0] // '') =~ m/\:/) {
 			 $v->[0]=~ s/^\s*((.*[^\s])?)\s*$/$1/; # trim leading and trailing whitespace if present
 
 			 unless($v->[0] =~ m/^\[/) {
@@ -6606,7 +6409,7 @@ our $_OptionEmitters = {
 		     # specifier out of 'em, then emit.
 		     # Here's a little fillip: gnuplot requires quotes around time ranges
 		     # if the corresponding axes are time data.  Handle that bizarre case.
-		     if( _def($h->{$c."data"},  "" ) =~ m/time/ ) {
+		     if( ($h->{$c."data"} // "") =~ m/time/ ) {
 			 return sprintf("set %s [%s:%s]\n",$k, ((defined $v->[0])?"\"$v->[0]\"":"*"), ((defined $v->[1])?"\"$v->[1]\"":"*"));
 		     }
 
@@ -6614,14 +6417,14 @@ our $_OptionEmitters = {
     },
 
     "crange" => sub { my($k,$v,$h, $this) = @_;
-		      return "" unless(defined $v);
-		      return "$v" if(ref $v ne 'ARRAY');
+		      return "" unless defined $v;
+		      return "$v" if ref $v ne 'ARRAY';
 		      my $of = 946684800.0;
 		      # Here's a little fillip: gnuplot requires quotes around time ranges
 		      # if the corresponding axes are time data.  Handle that bizarre case.
 		      my $c = substr($k,0,1);
 
-		      if( (_def($this and $this->{options} and $this->{options}->{$c."data"}), "" ) =~ m/time/ ) {
+		      if( ($this and $this->{options} and $this->{options}{$c."data"} // "") =~ m/time/ ) {
 			  carp "WARNING: gnuplot-4.6.1 date range bug triggered.  Check the date scale.\n";
 			  return sprintf(" [%s:%s] ",((defined $v->[0])?"\"$v->[0]\"":""), ((defined $v->[1])?"\"$v->[1]\"":""));
 		      }
@@ -6784,7 +6587,6 @@ our $termTabSource = {
 			   ['jsdir',      's','cq',   "URL of directory where javascripts are found"],
 			   'title'],
 		    default_output=>'%s%d.js'},
-
     'cgm'      => { unit=>'pt', desc=> "Computer Graphic Metafile format (ANSI X3.122-1986)",
 		    opt=>[ qw/ color monochrome solid dashed rotate /,
 			   ['size',  'l', sub { my( $k, $v, $h) = @_;
@@ -7026,7 +6828,6 @@ our $termTabSource = {
 			'size']},
 			'xlib'    =>"Xlib command file (for debugging X11)  [NS: useless here]",
     'vgal'=>     "VGAL terminal                          [NS: bizarre]",
-
 };
 
 ##############################
@@ -7063,9 +6864,9 @@ for my $k(keys %$termTabSource) {
     $desc =~ s/\%u/$v->{unit}/;
     $termTab->{$k} = { desc => $desc,
 		       unit => $v->{unit},
-		       mouse => _def( $v->{mouse}, 0),
-		       disp  => _def( $v->{disp},  0),
-		       int   => _def( $v->{int},   0),
+		       mouse => $v->{mouse} // 0,
+		       disp  => $v->{disp}  // 0,
+		       int   => $v->{int}   // 0,
 		       opt  => [ $terminalOpt,
 				 undef, # This gets filled in on first use in the constructor.
 				 "$k terminal options"
@@ -7102,19 +6903,18 @@ interactive sessions.  It outputs information directly to the terminal.
 
 sub terminfo {
     my $this = _obj_or_global(\@_);
-    my $terminal = _def(shift, '');
+    my $terminal = shift() // '';
     my $brief_form = shift;
     my $dont_print = shift;
     my $s = "";
 
     if($termTabSource->{$terminal}) {
 	if(ref $termTabSource->{$terminal}) {
-	    my $ms = ( _def($termTabSource->{$terminal}->{mouse}, 0) ? ", mouse input ok" : "");
+	    my $ms = $termTabSource->{$terminal}{mouse} ? ", mouse input ok" : "";
 	    $s = "Gnuplot terminal '$terminal': size default unit is '$termTabSource->{$terminal}->{unit}'$ms, options are:\n";
 	    my $tt = $termTab->{$terminal}->{opt}->[0];
-	    for my $name(sort { _def($tt->{$a}->[3], 0) <=> _def($tt->{$b}->[3], 0)} keys %$tt) {
-		my @info = ();
-		@info = ($name, $tt->{$name}->[4]);
+	    for my $name(sort { ($tt->{$a}[3] // 0) <=> ($tt->{$b}->[3] // 0) } keys %$tt) {
+		my @info = ($name, $tt->{$name}[4]);
 		$info[0] =~ s/\_$//;         #remove trailing underscore on "output_" hack
 		if(defined($info[0]) and defined($info[1])) {
 		    my $ss = sprintf "%10s - %s\n",@info;
@@ -7256,7 +7056,7 @@ sub _load_alien_gnuplot {
 	if(exists($termTab->{$_})) {
 	    $valid_terms->{$_} = 1;
 	} else {
-	    $unknown_terms->{$_} = _def($termTabSource->{$_}, "Unknown but reported by gnuplot");
+	    $unknown_terms->{$_} = $termTabSource->{$_} // "Unknown but reported by gnuplot";
 	}
     }
 
@@ -7284,7 +7084,7 @@ sub _startGnuplot
 	_killGnuplot($this,$suffix);
     }
 
-    $this->{options}->{multiplot} = 0;
+    $this->{options}{multiplot} = 0;
 
     if( $this->{options}{dump} ) {
 	$this->{"in-$suffix"} = \*STDOUT;
@@ -7570,8 +7370,8 @@ sub _printGnuplotPipe
 
   # Autodetect the dump option
   # If it gets set or unset, restart gnuplot
-  if(($this->{options}->{dump} && !$this->{dumping})  or
-     ($this->{dumping} && !$this->{options}->{dump})
+  if(($this->{options}{dump} && !$this->{dumping})  or
+     ($this->{dumping} && !$this->{options}{dump})
       ) {
       $this->restart(1);
 
@@ -7604,13 +7404,13 @@ sub _printGnuplotPipe
 	      # Send the next block out.
 	      $len = syswrite($pipein,substr($string,$of),$chunksize);
 	      if(!defined($len) or $len==0) {
-		  my $err = (defined($len) ? "(No error but 0 bytes written)" : _def($!, "(Huh - no error code in \$!)"));
+		  my $err = defined($len) ? "(No error but 0 bytes written)" : $! // "(Huh - no error code in \$!)";
 		  barf "PDL::Graphics::Gnuplot: Error while writing ".
-		      (length($string)).
+		      length($string).
 		      " bytes to the gnuplot pipe.\nError was:\n\t$err";
 	      }
 	      $of += $len;
-	      } while($of < length($string) and !$int_flag);
+	      } while $of < length($string) and !$int_flag;
 
 	      if($int_flag) {
 		  # We were interrupted, which hoses up gnuplot.  Restart gnuplot.
@@ -7692,10 +7492,10 @@ our $cp_serial = 0;
 sub _checkpoint {
     my $this   = shift;
     my $suffix = shift || "main";
-    my $opt = _def(shift,  {});
-    my $notimeout = _def($opt->{notimeout}, 0);
-    my $printwarnings = (_def($opt->{printwarnings},  0) and !_def($this->{options}->{silent}, 0));
-    my $ignore_errors = _def($opt->{ignore_errors}, 0);
+    my $opt = shift() // {};
+    my $notimeout = $opt->{notimeout} // 0;
+    my $printwarnings = $opt->{printwarnings} && !$this->{options}{silent};
+    my $ignore_errors = $opt->{ignore_errors} // 0;
 
     my $pipeerr = $this->{"err-$suffix"};
 
@@ -7736,8 +7536,8 @@ sub _checkpoint {
 
     _logEvent($this, "Trying to read from gnuplot (suffix $suffix)") if $this->{options}{tee};
 
-    my $terminal =$this->{options}->{terminal};
-    my $delay = (_def($this->{'wait'}, 0) + 0) || 10;
+    my $terminal = $this->{options}{terminal};
+    my $delay = (($this->{wait} // 0) + 0) || 10;
     my $fromerr = '';
 
     if($this->{"echobuffer-$suffix"}) {
@@ -7921,7 +7721,7 @@ sub _logEvent
   my $this  = shift;
   my $event = shift;
 
-  return unless($this->{options}->{tee}); # only log when asked.
+  return unless $this->{options}{tee}; # only log when asked.
 
   my $t1 = tv_interval( $this->{t0}, [gettimeofday] );
   printf STDERR "==== PDL::Graphics::Gnuplot t=%.4f: %s\n", $t1, $event;
@@ -7943,7 +7743,7 @@ sub _obj_or_global {
 	    undef $@;
 	    $globalPlot = new("PDL::Graphics::Gnuplot") ;
 	}
-	$globalPlot->{options}->{globalPlot} = 1;
+	$globalPlot->{options}{globalPlot} = 1;
 	$this = $globalPlot;
     }
     return $this;
@@ -7981,7 +7781,7 @@ sub _with_fits_prefrobnicator {
 	    splice @$with, $i,1; # remove 'resample' from list
 	    $resample_flag = 1;
 	    if( ($with->[$i]) =~ m/(\d+)(\,(\d+))?/ ) {
-		@resample_dims = ($1, _def($3, $1));
+		@resample_dims = ($1, $3 // $1);
 		splice @$with, $i, 1;
 	    }
 	    $i--;
@@ -8016,23 +7816,22 @@ sub _with_fits_prefrobnicator {
     ##############################
     # Now find the dataspace boundaries for the map, so we don't waste pixels.
     my ($xmin,$xmax,$ymin,$ymax);
-    if(exists($this->{options}->{xrange})) {
-	$xmin = $this->{options}->{xrange}->[0];
-	$xmax = $this->{options}->{xrange}->[1];
+    if(exists($this->{options}{xrange})) {
+	$xmin = $this->{options}{xrange}[0];
+	$xmax = $this->{options}{xrange}[1];
     }
-    if(exists($this->{options}->{yrange})) {
-	$ymin = $this->{options}->{yrange}->[0];
-	$ymax = $this->{options}->{yrange}->[1];
+    if(exists($this->{options}{yrange})) {
+	$ymin = $this->{options}{yrange}[0];
+	$ymax = $this->{options}{yrange}[1];
     }
 
     unless(defined($xmin) && defined($xmax) && defined($ymin) && defined($ymax)) {
 	my $pix_corners = pdl([0,0],[0,1],[1,0],[1,1]) * pdl($data->dim(0),$data->dim(1)) - 0.5;
 	my $corners = $pix_corners->apply(t_fits($data));
-
-	$xmin = $corners->slice("(0)")->min unless defined($xmin);
-	$xmax = $corners->slice("(0)")->max unless defined($xmax);
-	$ymin = $corners->slice("(1)")->min unless defined($ymin);
-	$ymax = $corners->slice("(1)")->max unless defined($ymax);
+	$xmin //= $corners->slice("(0)")->min;
+	$xmax //= $corners->slice("(0)")->max;
+	$ymin //= $corners->slice("(1)")->min;
+	$ymax //= $corners->slice("(1)")->max;
     }
 
     if($ymin > $ymax) {
@@ -8064,20 +7863,20 @@ sub _with_fits_prefrobnicator {
     }
 
     # Now update plot options to set the axis labels, if they haven't been updated already...
-    unless(defined $this->{options}->{xlabel}) {
-	$this->{tmp_options}->{xlabel} = [join(" ",
+    unless(defined $this->{options}{xlabel}) {
+	$this->{tmp_options}{xlabel} = [join(" ",
 					  $h->{CTYPE1} || "X",
 					  $h->{CUNIT1} ? "($h->{CUNIT1})" : "(pixels)"
 				      )];
     }
-    unless(defined $this->{options}->{ylabel}) {
-	$this->{tmp_options}->{ylabel} = [join(" ",
+    unless(defined $this->{options}{ylabel}) {
+	$this->{tmp_options}{ylabel} = [join(" ",
 					  $h->{CTYPE2} || "Y",
 					  $h->{CUNIT2} ? "($h->{CUNIT2})" : "(pixels)"
 				      )];
     }
-    unless(defined $this->{options}->{cblabel}) {
-	$this->{tmp_options}->{cblabel} = [join(" ",
+    unless(defined $this->{options}{cblabel}) {
+	$this->{tmp_options}{cblabel} = [join(" ",
 					    $h->{BTYPE} || "Value",
 					    $h->{BUNIT} ? "($h->{BUNIT})" : ""
 				       )];
@@ -8089,7 +7888,7 @@ sub _with_fits_prefrobnicator {
 
     if($d2->ndims == 2) {
 	$with->[0] = 'image';
-	$chunk->{options}->{with} = [@$with];
+	$chunk->{options}{with} = [@$with];
 	return ($ndc->mv(0,-1)->dog, $d2);
     }
 
@@ -8105,14 +7904,6 @@ sub _with_fits_prefrobnicator {
 
     barf "PDL::Graphics::Gnuplot: 'with fits' needs an image, RGB triplet, or RGBA quad\n";
 
-}
-
-##########
-# Helper routine mocks up the // operator (so we can support earlier perls that don't have it).
-sub _def {
-    my $val = shift;
-    my $or = shift;
-    return (defined($val)?$val : $or);
 }
 
 ##########

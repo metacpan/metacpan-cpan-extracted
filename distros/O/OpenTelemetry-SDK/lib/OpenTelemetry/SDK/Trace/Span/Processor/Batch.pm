@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::SDK::Trace::Span::Processor::Batch;
 
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 class OpenTelemetry::SDK::Trace::Span::Processor::Batch
     :does(OpenTelemetry::Trace::Span::Processor)
@@ -88,11 +88,6 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Batch
         );
 
         IO::Async::Loop->new->add($function);
-
-        # TODO: Should this be made configurable? The Ruby SDK
-        # allows users to not start the thread on boot, although
-        # this is not standard
-        $function->start;
     }
 
     method $report_dropped_spans ( $reason, $count ) {

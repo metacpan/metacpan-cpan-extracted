@@ -26,28 +26,28 @@ C<E<lt>commandE<gt>> frame.
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = $package->SUPER::new('response');
-	return bless($self, $package);
+    my $package = shift;
+    my $self    = $package->SUPER::new('response');
+    return bless($self, $package);
 }
 
 sub _addExtraElements {
-	my $self = shift;
+    my $self = shift;
 
-	my $result = $self->createElement('result');
-	$result->appendChild($self->createElement('msg'));
-	$self->response->addChild($result);
+    my $result = $self->createElement('result');
+    $result->appendChild($self->createElement('msg'));
+    $self->response->addChild($result);
 
-	$self->result->setAttribute('code' => COMMAND_FAILED);
+    $self->result->setAttribute('code' => COMMAND_FAILED);
 
-	$self->response->addChild($self->createElement('resData'));
+    $self->response->addChild($self->createElement('resData'));
 
-	my $trID = $self->createElement('trID');
-	$trID->addChild($self->createElement('clTRID'));
-	$trID->addChild($self->createElement('svTRID'));
-	$self->response->addChild($trID);
+    my $trID = $self->createElement('trID');
+    $trID->addChild($self->createElement('clTRID'));
+    $trID->addChild($self->createElement('svTRID'));
+    $self->response->addChild($trID);
 
-	return 1;
+    return 1;
 }
 
 =pod
@@ -86,12 +86,12 @@ C<E<lt>svTRIDE<gt>> element.
 
 =cut
 
-sub response {$_[0]->getNode('response') }
-sub result {$_[0]->getNode('result') }
-sub resData {$_[0]->getNode('resData') }
-sub trID {$_[0]->getNode('trID') }
-sub clTRID {$_[0]->getNode('clTRID') }
-sub svTRID {$_[0]->getNode('svTRID') }
+sub response { $_[0]->getNode('response') }
+sub result   { $_[0]->getNode('result') }
+sub resData  { $_[0]->getNode('resData') }
+sub trID     { $_[0]->getNode('trID') }
+sub clTRID   { $_[0]->getNode('clTRID') }
+sub svTRID   { $_[0]->getNode('svTRID') }
 
 =pod
 
@@ -103,12 +103,12 @@ element.
 =cut
 
 sub code {
-	 my $self = shift;
-	 my $result = $self->result;
-	 if ($result) {
-		  return $result->getAttribute('code');
-	 }
-	 return COMMAND_FAILED;
+    my $self   = shift;
+    my $result = $self->result;
+    if ($result) {
+        return $result->getAttribute('code');
+    }
+    return COMMAND_FAILED;
 }
 
 =pod
@@ -121,9 +121,9 @@ C<E<lt>msgE<gt>> element.
 =cut
 
 sub msg {
-	my $self = shift;
-	my $msgs = $self->getElementsByLocalName('msg');
-	return $msgs->shift->textContent if ($msgs->size == 1);
+    my $self = shift;
+    my $msgs = $self->getElementsByLocalName('msg');
+    return $msgs->shift->textContent if ($msgs->size == 1);
 }
 
 1;

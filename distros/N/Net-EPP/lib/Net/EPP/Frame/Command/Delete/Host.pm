@@ -52,12 +52,12 @@ This results in an XML document like this:
 =cut
 
 sub new {
-	my $package = shift;
-	my $self = bless($package->SUPER::new('delete'), $package);
+    my $package = shift;
+    my $self    = bless($package->SUPER::new('delete'), $package);
 
-	my $host = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('host'));
+    my $host = $self->addObject(Net::EPP::Frame::ObjectSpec->spec('host'));
 
-	return $self;
+    return $self;
 }
 
 =pod
@@ -71,14 +71,14 @@ This specifies the host object to be deleted.
 =cut
 
 sub setHost {
-	my ($self, $host) = @_;
+    my ($self, $host) = @_;
 
-	my $name = $self->createElement('host:name');
-	$name->appendText($host);
+    my $name = $self->createElement('host:name');
+    $name->appendText($host);
 
-	$self->getNode('delete')->getChildNodes->shift->appendChild($name);
+    $self->getNode('delete')->getChildNodes->shift->appendChild($name);
 
-	return 1;
+    return 1;
 }
 
 1;

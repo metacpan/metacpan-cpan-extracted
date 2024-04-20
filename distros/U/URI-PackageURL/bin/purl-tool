@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use utf8;
 
-use URI::PackageURL::CLI;
+use URI::PackageURL::App;
 
-exit URI::PackageURL::CLI->run(@ARGV) unless caller();
+exit URI::PackageURL::App->run(@ARGV) unless caller();
 
 1;
 
@@ -53,18 +53,18 @@ purl-tool - Package URL tool
 
     Parse the given Package URL string and return JSON and send the STDOUT to jq:
 
-        purl-tool pkg:cpan/GDT/URI-PackageURL@2.04 --json | jq
+        purl-tool pkg:cpan/GDT/URI-PackageURL@2.10 --json | jq
 
     Download the package from the repository using Package URL string:
 
-        wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.04 --download-url)
+        wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.10 --download-url)
 
     Create a canonical Package URL string
 
         purl-tool --type cpan \
                   --namespace GDT \
                   --name URI-PackageURL \
-                  --version 2.04
+                  --version 2.10
 
 
 =head1 DESCRIPTION
@@ -75,18 +75,18 @@ C<purl-tool> Package URL tool
 
 Parse the given Package URL string and return JSON and send the STDOUT to L<jq>:
 
-    purl-tool pkg:cpan/GDT/URI-PackageURL@2.04 --json | jq
+    purl-tool pkg:cpan/GDT/URI-PackageURL@2.10 --json | jq
 
 Download the package from the repository using Package URL string:
 
-    wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.04 --download-url)
+    wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.10 --download-url)
 
 Create a canonical Package URL string:
 
     purl-tool --type cpan \
               --namespace GDT \
               --name URI-PackageURL \
-              --version 2.04
+              --version 2.10
 
 =head1 AUTHOR
 
@@ -94,7 +94,7 @@ L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2022-2023 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+Copyright © 2022-2024 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 You may use and distribute this module according to the same terms
 that Perl is distributed under.

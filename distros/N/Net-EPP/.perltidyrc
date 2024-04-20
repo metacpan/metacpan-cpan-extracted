@@ -1,0 +1,13 @@
+-l=4096
+-i=4
+-ci=4
+-ce
+-nsbl
+--weld-nested-containers
+-sot
+-sct
+-pt=2
+-sbt=2
+-bt=2
+-bbt=0
+-nolq

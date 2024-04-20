@@ -1,5 +1,5 @@
 package AnyEvent::I3X::Workspace::OnDemand;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use v5.26;
 use Object::Pad;
 
@@ -8,17 +8,23 @@ use Object::Pad;
 class AnyEvent::I3X::Workspace::OnDemand;
 use Carp qw(croak);
 
-use AnyEvent::I3 qw(:all);
+use AnyEvent::I3          qw(:all);
 use List::Util            qw(first any);
 use File::Spec::Functions qw(catfile);
 use Data::Compare;
+use Data::Dumper;
 
 field $i3;
-field $layout_path :param = catfile($ENV{HOME}, qw(.config i3));
+field $layout_path : param = catfile($ENV{HOME}, qw(.config i3));
 
 field @groups;
 field $starting_group :param = undef;
+field $starting_workspace :param = undef;
 field $debug :param          = 0;
+
+field $log_all_events :param = undef;
+
+field $socket :param = undef;
 
 field %workspace;
 field %tick;
@@ -46,9 +52,35 @@ ADJUSTPARAMS {
 
 }
 
+method log_all_events($event) {
+    return unless $log_all_events;
+
+    my $e;
+    if ($debug) {
+        $e = Dumper $event;
+    }
+    elsif ($event->{payload}) {
+        $e = "Processing tick with payload $event->{payload}";
+    }
+    else {
+        $e = "Processing event $event->{change} on $event->{current}{name}";
+    }
+
+    $self->log($e);
+    open my $fh, '>>', $log_all_events;
+    print $fh $e;
+    print $fh $/;
+    close($fh);
+}
+
 ADJUST {
-  $i3 = i3();
+
+  $i3 = $socket ? i3($socket) : i3();
   $i3->connect->recv or die "Error connecting to i3";
+
+  if ($log_all_events) {
+      use Data::Dumper;
+  }
 
   $c = Data::Compare->new();
 
@@ -59,23 +91,33 @@ ADJUST {
 
   $self->subscribe(
     workspace => sub {
-      return unless %workspace;
 
       my $event = shift;
       my $type  = $event->{change};
 
       $current_workspace = $event->{current}{name};
-      $name = $current_workspace;
+      $name              = $current_workspace;
 
       $self->log("Processing event $type for $name");
+
+      $self->log_all_events($event);
 
       # It doesn't have anything, skip skip next;
       return if $type eq 'reload';
 
+      return unless %workspace;
       # Don't allow access to workspace which aren't part of the current group
-      if (exists $workspace{$name}{group} && !$self->_is_in_group($name, $current_group)) {
+      if (exists $workspace{$name}{group}
+        && !$self->_is_in_group($name, $current_group)) {
+        if ($event->{old}{name}) {
           $self->workspace($event->{old}{name});
           return;
+        }
+
+        # it is strange that we don't have an old workspace here...
+        warn
+          "Unable to determine old workspace, but group hasn't defined a workspace",
+          $/;
       }
 
       my $layout = $workspace{$name}{layout};
@@ -83,8 +125,8 @@ ADJUST {
         if ($type eq 'init') {
           $layout = $self->_get_layout($name, $current_group);
           if ($layout) {
-              $self->append_layout($name, $layout_path, $layout);
-              $self->start_apps_of_layout($name);
+            $self->append_layout($name, $layout_path, $layout);
+            $self->start_apps_of_layout($name);
           }
 
 
@@ -107,10 +149,13 @@ ADJUST {
       my $payload = $event->{payload};
 
       $payload = "__EMPTY__" unless length($payload);
+      $event->{payload} = $payload;
 
       $self->log("Processing tick event $payload");
+      $self->log_all_events($event);
 
       if ($payload =~ /^group:([[:word:]]+)$/) {
+
         # Skip if we have no groups
         return unless any { $_ eq $1 } @groups;
         $self->switch_to_group($1);
@@ -124,6 +169,7 @@ ADJUST {
       }
     }
   );
+
 }
 
 method _is_in_group ($name, $group) {
@@ -140,8 +186,9 @@ method _get_layout ($name, $group) {
   return unless $ws;
 
   return $ws->{layout} unless exists $ws->{group};
-  return unless $self->_is_in_group($name, $group);
-  return $ws->{group}{$group}{layout} // $ws->{group}{all}{layout} // $ws->{layout};
+  return               unless $self->_is_in_group($name, $group);
+  return $ws->{group}{$group}{layout} // $ws->{group}{all}{layout}
+    // $ws->{layout};
 }
 
 method switch_to_group ($group) {
@@ -171,7 +218,7 @@ method switch_to_group ($group) {
           $self->workspace($name, "rename workspace to $current_group:$name");
         }
 
-        if ( any { "$group:$name" eq $_ } @available) {
+        if (any { "$group:$name" eq $_ } @available) {
           $self->workspace("$group:$name", "rename workspace to $name");
         }
       }
@@ -184,10 +231,10 @@ method switch_to_group ($group) {
 
 }
 
-method log($msg) {
-    return unless $debug;
-    warn $msg, $/;
-    return;
+method log ($msg) {
+  return unless $debug;
+  warn $msg, $/;
+  return;
 }
 
 method debug ($d = undef) {
@@ -262,13 +309,10 @@ method swallow_to_exec ($name, $node) {
     return;
   }
 
-  $self->command($_->{cmd})
-    for grep { $c->Cmp($targets[0], $_->{match}) }
-    grep {
-         !exists $_->{on}
-      || ($_->{on}{group}     // '') eq $current_group
-      || ($_->{on}{workspace} // '') eq $current_workspace
-    } @swallows;
+  $self->command("exec $_")
+    for map { $_->{cmd} =~ s/^exec (?:--no-startup-id )?//r; }
+    grep    { $c->Cmp($targets[0], $_->{match}) } @swallows;
+
 }
 
 method start_apps_of_layout ($name) {
@@ -302,7 +346,7 @@ AnyEvent::I3X::Workspace::OnDemand - An I3 workspace loader
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -335,14 +379,14 @@ version 0.001
         ],
         swallows => [
             {
-                cmd => 'exec --no-startup-id kitty',
+                cmd => 'kitty',
                 match => {
                     class => '^kitty$',
                 }
             },
             {
                 # Start firefox on group bar
-                cmd => 'exec --no-startup-id firefox',
+                cmd => 'firefox',
                 on => {
                     group => 'bar',
                 }
@@ -351,7 +395,7 @@ version 0.001
                 }
             },
             {
-                cmd => 'exec --no-startup-id google-chrome',
+                cmd => 'google-chrome',
                 on => {
                     group => 'foo',
                 }
@@ -366,53 +410,66 @@ version 0.001
 
 Workspace switcher for i3.
 
+This module listens to tick events which are named C<< group:$name >> where the
+name corresponds to the workspace groups you have defined. When you send a tick
+event the current workspaces get renamed to C<< $former_group:$workspace_name
+>> and leaves new workspaces for the ones you have defined.
+
+In your C<< .config/i3/config >> you can set something like this to switch
+groups:
+
+  bindsym $mod+w mode "Activities"
+  mode "Activities" {
+    bindsym 0 exec i3-msg -t send_tick group:foo; mode default
+    bindsym 9 exec i3-msg -t send_tick group:bar; mode default
+    bindsym 8 exec i3-msg -t send_tick group:baz; mode default
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+  }
+
 =head1 METHODS
 
-=head2 subscribe
+=head2 $self->subscribe
 
 See L<AnyEvent::I3/subscribe>
 
-=head2 get_i3
+=head2 $self->get_i3
 
 Get the L<AnyEvent::I3> instance
 
-=head2 command(@args)
+=head2 $self->command(@args)
 
 Execute a command, the command can be in scalar or list context.
 
-=head2 debug(1)
+See also L<AnyEvent::I3/command>.
+
+=head2 $self->debug(1)
 
 Enable or disable debug
 
-=head2 log($msg)
+=head2 $self->log($msg)
 
 Print warns when debug is enabled
 
-=head2 on_tick($payload, $sub)
+=head2 $self->on_tick($payload, $sub)
 
 Subscribe to a tick event with C<< $payload >> and perform the action. Your sub
 needs to support the following prototype:
 
-    sub foo($self, $i3, $event)
-
-    on_tick(
-      'foo',
-      sub {
-        my $self  = shift;
-        my $i3    = shift;
-        my $event = shift;
+    sub foo($self, $i3, $event) {
         print "Yay processed foo tick";
-      }
-    );
+    }
 
-=head2 on_workspace($name, $type, $sub)
+    $self->on_tick('foo', \&foo);
+
+=head2 $self->on_workspace($name, $type, $sub)
 
 Subscribe to a workspace event for workspace C<< $name >> of C<< $type >> with
 C<< $sub >>.
 
 C<< $type >> can be any of the following events from i3 plus C<any> or C<*>
 
-    on_workspace(
+    $i3->on_workspace(
       'www', 'init',
       sub {
         my $self  = shift;
@@ -422,31 +479,30 @@ C<< $type >> can be any of the following events from i3 plus C<any> or C<*>
       }
     );
 
-=head2 add_swallow($match, $cmd, $on)
+=head2 $self->add_swallow($match, $cmd, $on)
 
 Add a command that can be used to start after a layout has been appended
 
-    add_swallow({ class => '^kitty$' }, 'exec --no-startup-id kitty');
+    $self->add_swallow({ class => '^kitty$' }, 'exec --no-startup-id kitty');
 
     # or only on this group
-    add_swallow(
+    $self->add_swallow(
       { class => '^kitty$' },
       'exec --no-startup-id kitty',
       { group => 'foo' }
     );
 
     # or workspace
-    add_swallow(
+    $self->add_swallow(
       { class => '^kitty$' },
       'exec --no-startup-id kitty',
       { workspace => 'foo' }
     );
 
-=head2 workspace($name, @cmds)
+=head2 $self->workspace($name, @cmds)
 
-Runs commands on workspace by name
-
-=head2 command
+Runs commands on workspace by name. Without a command you only switch
+workspaces
 
 =head1 AUTHOR
 

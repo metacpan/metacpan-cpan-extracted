@@ -1,3 +1,4 @@
+.perltidyrc
 lib/Net/EPP.pm
 lib/Net/EPP/Client.pm
 lib/Net/EPP/Frame.pm
@@ -41,10 +42,11 @@ lib/Net/EPP/Protocol.pm
 lib/Net/EPP/ResponseCodes.pm
 lib/Net/EPP/Simple.pm
 Makefile.PL
-MANIFEST			This list of files
-Net-EPP-0.26/META.json
-Net-EPP-0.26/META.yml
+MANIFEST
+Net-EPP-0.27/META.json
+Net-EPP-0.27/META.yml
 README.md
 t/use.t
+tidy.sh
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

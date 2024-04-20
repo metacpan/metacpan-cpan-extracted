@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 our @FAKE;
 
@@ -32,7 +32,7 @@ sub import {
 	{
 		no strict 'refs';
 		*{"${caller}::luck"}  = sub {
-			print "You agreed to an unlimited debit card for me?\n";
+			print "It's the seventh day and not 128 boats, still a few hours left for that to be increased... though\n";
 		};
 	}
 }
@@ -47,7 +47,7 @@ Seven - The great new Seven!
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
