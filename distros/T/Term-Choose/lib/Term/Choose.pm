@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.763';
+our $VERSION = '1.764';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -161,8 +161,8 @@ sub __copy_orig_list {
                 $_ = $self->{empty} if ! length $_;
             }
             if ( $self->{color} ) {
-                s/\x{feff}//g;
-                s/\e\[[\d;]*m/\x{feff}/g;
+                s/${\PH}//g;
+                s/${\SGR_ES}/${\PH}/g;
             }
             s/\t/ /g;
             s/\v+/\ \ /g;
@@ -908,11 +908,11 @@ sub __prepare_cell {
             if ( $emphasised ) {
                 if ( $is_current_pos && $self->{color} == 1 ) {
                     # no color for the selected cell if color == 1
-                    $str =~ s/(\e\[[\d;]*m)//g;
+                    $str =~ s/${\SGR_ES}//g;
                 }
                 else {
                     # keep marked cells marked after color escapes
-                    $str =~ s/(\e\[[\d;]*m)/${1}$emphasised/g;
+                    $str =~ s/(${\SGR_ES})/${1}$emphasised/g;
                 }
                 $str = $emphasised . $str;
             }
@@ -933,14 +933,14 @@ sub __prepare_cell {
             my @color;
             if ( ! $self->{orig_list}[$idx] ) {
                 if ( ! defined $self->{orig_list}[$idx] ) {
-                    @color = $self->{undef} =~ /(\e\[[\d;]*m)/g;
+                    @color = $self->{undef} =~ /(${\SGR_ES})/g;
                 }
                 elsif ( ! length $self->{orig_list}[$idx] ) {
-                    @color = $self->{empty} =~ /(\e\[[\d;]*m)/g;
+                    @color = $self->{empty} =~ /(${\SGR_ES})/g;
                 }
             }
             else {
-                @color = $self->{orig_list}[$idx] =~ /(\e\[[\d;]*m)/g;
+                @color = $self->{orig_list}[$idx] =~ /(${\SGR_ES})/g;
             }
             if ( $emphasised ) {
                 for ( @color ) {
@@ -951,11 +951,11 @@ sub __prepare_cell {
                 if ( $is_current_pos && $self->{color} == 1 ) {
                     # no color for the selected cell if color == 1
                     @color = ();
-                    $str =~ s/\x{feff}//g;
+                    $str =~ s/${\PH}//g;
                 }
             }
             if ( @color ) {
-                $str =~ s/\x{feff}/shift @color/ge;
+                $str =~ s/${\PH}/shift @color/ge;
                 if ( ! $emphasised ) {
                     $str .= normal();
                 }
@@ -1275,7 +1275,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.763
+Version 1.764
 
 =cut
 

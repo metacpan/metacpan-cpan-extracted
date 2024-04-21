@@ -8,7 +8,7 @@ Tk::DocumentTree - ITree based document list
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -223,6 +223,30 @@ sub CreatePathBar {
 	)
 }
 
+=item B<collapseAll>
+
+Closes all folders in the Tree widget, except for the
+path leading to the currently selected entry.
+
+=cut
+
+sub collapseAll {
+	my ($self, $entry) = @_;
+	$entry = '' unless defined $entry;
+	my $collapsed = 1;
+	my @children = $self->infoChildren($entry);
+	my ($sel) = $self->infoSelection;
+	for (@children) {
+		if ($self->infoChildren($_)) {
+			$collapsed = $self->collapseAll($_) 
+		} else {
+			$collapsed = '' if $_ eq $sel
+		}
+	}
+	$self->close($entry) unless ($entry eq '') or (not $collapsed);
+	return $collapsed
+}
+
 sub DefaultDirIcon {
 	return $_[0]->Pixmap(-file => Tk->findINC('folder.xpm'))
 }
@@ -363,9 +387,32 @@ sub entrySelect {
 	my $sep = $self->cget('-separator');
 	$entry =~ s/^$sep// unless $Config{osname} eq 'MSWin32';
 	$entry = $self->StripPath($entry);
+	my $parent = $self->infoParent($entry);
+	while ($parent ne '') {
+		$self->open($parent);
+		$parent = $self->infoParent($parent);
+	}
 	$self->selectionClear;
 	$self->anchorClear;
 	$self->selectionSet($entry);
+}
+
+=item B<expandAll>
+
+Opens all folders in the Tree widget.
+
+=cut
+
+sub expandAll {
+	my ($self, $entry) = @_;
+	$entry = '' unless defined $entry;
+	my @children = $self->infoChildren($entry);
+	for (@children) {
+		if ($self->infoChildren($_)) {
+			$self->expandAll($_) 
+		}
+	}
+	$self->open($entry) unless $entry eq '';
 }
 
 =item B<fileList>
@@ -629,5 +676,6 @@ Unknown. If you find any, please contact the author.
 1;
 
 __END__
+
 
 

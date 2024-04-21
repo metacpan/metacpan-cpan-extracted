@@ -4,6 +4,7 @@ CONCEPT
 examples/download_app_pod_example.pl
 examples/process_module_name_and_version.pl
 Get.pm
+Get/MetaCPAN.pm
 Get/Utils.pm
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
@@ -23,6 +24,9 @@ MANIFEST			This list of files
 META.yml
 README
 SIGNATURE
+t/App-CPAN-Get-MetaCPAN/01-use.t
+t/App-CPAN-Get-MetaCPAN/02-version.t
+t/App-CPAN-Get-MetaCPAN/03-new.t
 t/App-CPAN-Get-Utils/01-use.t
 t/App-CPAN-Get-Utils/02-version.t
 t/App-CPAN-Get-Utils/03-process_module_name_and_version.t
@@ -30,6 +34,8 @@ t/App-CPAN-Get/01-use.t
 t/App-CPAN-Get/02-version.t
 t/App-CPAN-Get/03-new.t
 t/App-CPAN-Get/04-run.t
+xt/App-CPAN-Get-MetaCPAN/01-pod_coverage.t
+xt/App-CPAN-Get-MetaCPAN/02-pod.t
 xt/App-CPAN-Get-Utils/01-pod_coverage.t
 xt/App-CPAN-Get-Utils/02-pod.t
 xt/App-CPAN-Get/01-pod_coverage.t

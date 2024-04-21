@@ -7,7 +7,7 @@ use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Constructor.
 sub new {
@@ -42,6 +42,10 @@ sub new {
 		err "Parameter 'tags' must be a 'Tags::Output::*' class.";
 	}
 
+	$self->{'css_src'} = [];
+	$self->{'script_js'} = [];
+	$self->{'script_js_src'} = [];
+
 	# Object.
 	return $self;
 }
@@ -52,7 +56,22 @@ sub cleanup {
 
 	$self->_cleanup(@params);
 
+	$self->{'css_src'} = [];
+	$self->{'script_js'} = [];
+	$self->{'script_js_src'} = [];
+
 	return;
+}
+
+# CSS link handling.
+sub css_src {
+	my ($self, $css_link_ar) = @_;
+
+	if (defined $css_link_ar) {
+		$self->{'css_src'} = $css_link_ar;
+	}
+
+	return $self->{'css_src'};
 }
 
 # Initialize in dynamic part.
@@ -104,6 +123,28 @@ sub process_css {
 	return;
 }
 
+# Javascript handling.
+sub script_js {
+	my ($self, $js_code_ar) = @_;
+
+	if (defined $js_code_ar) {
+		$self->{'script_js'} = $js_code_ar;
+	}
+
+	return $self->{'script_js'};
+}
+
+# Javascript script handling.
+sub script_js_src {
+	my ($self, $js_link_ar) = @_;
+
+	if (defined $js_link_ar) {
+		$self->{'script_js_src'} = $js_link_ar;
+	}
+
+	return $self->{'script_js_src'};
+}
+
 sub _cleanup {
 	my ($self, @params) = @_;
 
@@ -144,6 +185,14 @@ sub _process_css {
 	return;
 }
 
+sub _process_js {
+	my ($self, @params) = @_;
+
+	err "Need to be implemented in inherited class in _process_js() method.";
+
+	return;
+}
+
 1;
 
 __END__
@@ -162,7 +211,10 @@ Tags::HTML - Tags helper abstract class.
 
  my $obj = Tags::HTML->new(%params);
  $obj->cleanup(@params);
+ my $css_src_ar = $obj->css_src($css_link_ar);
  $obj->init(@params);
+ my $script_js_ar = $obj->script_js($js_code_ar);
+ my $script_js_src_ar = $obj->script_js_src($js_link_ar);
  $obj->prepare(@params);
  $obj->process;
  $obj->process_css;
@@ -208,6 +260,17 @@ Process cleanup after page run.
 
 Returns undef.
 
+=head2 C<css_src>
+
+ my $css_src_ar = $obj->css_src($css_link_ar);
+
+Add CSS link to object.
+
+C<$css_link_ar> is reference to array of hashes with CSS information.
+CSS information is reference to hash with 'media' and 'link' keys.
+
+Returns actual reference to array with CSS link info.
+
 =head2 C<init>
 
  $obj->init(@params);
@@ -216,6 +279,22 @@ Process initialization in page run.
 It's useful in e.g. L<Plack::App::Tags::HTML>.
 
 Returns undef.
+
+=head2 C<script_js>
+
+ my $script_js_ar = $obj->script_js($js_code_ar);
+
+Set/Get Javascript code array to object.
+
+Returns reference to array with strings.
+
+=head2 C<script_js_src>
+
+ my $script_js_src_ar = $obj->script_js_src($js_link_ar);
+
+Set/Get Javascript script link array to object.
+
+Returns reference to array with strings.
 
 =head2 C<prepare>
 
@@ -239,6 +318,14 @@ Returns undef.
  $obj->process_css;
 
 Process L<CSS::Struct> structure.
+
+Returns undef.
+
+=head2 C<process_js>
+
+ $obj->process_js;
+
+Process structure.
 
 Returns undef.
 
@@ -482,6 +569,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

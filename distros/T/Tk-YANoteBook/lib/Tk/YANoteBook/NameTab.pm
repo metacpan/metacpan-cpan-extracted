@@ -2,6 +2,9 @@ package Tk::YANoteBook::NameTab;
 
 use strict;
 use warnings;
+use vars qw($VERSION);
+$VERSION = '0.06';
+
 use Tk;
 use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'NameTab';
@@ -65,12 +68,13 @@ sub Populate {
 	}
 	
 	$self->ConfigSpecs(@conf,
+		-borderwidth => [ [$self ], 'borderWidth', 'BorderWidth', 1],
 		-name => ['PASSIVE', undef, undef, ''],
 		-clickcall => ['CALLBACK', undef, undef, sub {}],
 		-closecall => ['CALLBACK', undef, undef, sub {}],
 		-motioncall => ['CALLBACK', undef, undef, sub {}],
 		-releasecall => ['CALLBACK', undef, undef, sub {}],
-		-relief => ['SELF'],
+		-relief => [ [$self ], 'relief', 'Relief',],
 		-title => [{-text => $l}],
 		-titleimg => [{-image => $l}],
 		DEFAULT => [$l],
@@ -108,3 +112,5 @@ sub TabMotion {
 }
 
 1;
+
+

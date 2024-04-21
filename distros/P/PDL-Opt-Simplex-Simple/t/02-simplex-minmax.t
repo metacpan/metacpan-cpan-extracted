@@ -18,9 +18,9 @@ my $simpl = PDL::Opt::Simplex::Simple->new(
 	nocache => 1,
 	opts => {
 		ssize => 3,
+		tolerance => 1e-9,
 	},
 	max_iter => 100,
-	tolerance => 1e-9,
         f => sub {
 			my $v = shift;
 			$count++;

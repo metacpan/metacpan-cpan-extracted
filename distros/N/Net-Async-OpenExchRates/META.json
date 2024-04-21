@@ -1,0 +1,117 @@
+{
+   "abstract" : "Interaction with OpenExchangeRates API",
+   "author" : [
+      "Nael Alolwani <VNEALV@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Async-OpenExchRates",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Dist::Zilla" : "6.015",
+            "Dist::Zilla::PluginBundle::Author::VNEALV" : "0",
+            "Software::License::Perl_5" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::Author::VNEALV" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Portability::Files" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cache::LRU" : "0.04",
+            "Digest::MD5" : "0",
+            "Future" : "0.50",
+            "Future::AsyncAwait" : "0.66",
+            "IO::Async" : "0",
+            "IO::Async::SSL" : "0.25",
+            "JSON::MaybeUTF8" : "2.000",
+            "Log::Any" : "1.717",
+            "Log::Any::Adapter" : "1.717",
+            "Net::Async::HTTP" : "0.49",
+            "Object::Pad" : "0.800",
+            "Syntax::Keyword::Dynamically" : "0.13",
+            "Syntax::Keyword::Try" : "0.29",
+            "Time::Moment" : "0.44",
+            "URI" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Async::OpenExchRates" : {
+         "file" : "lib/Net/Async/OpenExchRates.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vnealv/Net-Async-OpenExchRates/issues"
+      },
+      "homepage" : "https://github.com/vnealv/Net-Async-OpenExchRates",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vnealv/Net-Async-OpenExchRates.git",
+         "web" : "https://github.com/vnealv/Net-Async-OpenExchRates"
+      }
+   },
+   "version" : "0.001",
+   "x_authority" : "cpan:VNEALV",
+   "x_contributors" : [
+      "vnealv <naelalolwani@gmail.com>",
+      "vnealv <neal.alwani@gmail.com>"
+   ],
+   "x_generated_by_perl" : "v5.26.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2013 Kevin Ryde
+# Copyright 2008, 2009, 2013, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -64,8 +64,8 @@ sub name {
 
 sub fill_part_from_proc {
   my ($self, $lo, $hi) = @_;
-  if (DEBUG) { say "fill_part_from_proc $lo $hi,",
-                 " self=$self parent=$self->{'parent'}"; }
+  if (DEBUG) { print "fill_part_from_proc $lo $hi,",
+                 " self=$self parent=$self->{'parent'}\n"; }
   my $parent = $self->{'parent'};
 
   my $warmup_count = $self->warmup_count_for_position ($lo);

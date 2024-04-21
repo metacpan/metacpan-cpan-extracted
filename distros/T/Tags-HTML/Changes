@@ -1,3 +1,8 @@
+0.10 2024-04-21T00:11:40+02:00
+ - Add storing of CSS link, JS code and JS links in instance.
+ - Use CSS::Struct::Output::Structure in tests only.
+ - Use Tags::Output::Structure in tests only.
+
 0.09 2024-03-27T23:01:46+01:00
  - Add test for prepare().
  - Add test for process().

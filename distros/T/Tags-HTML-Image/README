@@ -1,0 +1,334 @@
+NAME
+    Tags::HTML::Image - Tags helper class for image presentation.
+
+SYNOPSIS
+     use Tags::HTML::Image;
+
+     my $obj = Tags::HTML::Image->new(%params);
+     $obj->cleanup;
+     $obj->init($image);
+     $obj->prepare;
+     $obj->process;
+     $obj->process_css;
+
+METHODS
+  "new"
+     my $obj = Tags::HTML::Image->new(%params);
+
+    Constructor.
+
+    *       "css_class"
+
+            Image CSS class.
+
+            Default value is 'image'.
+
+    *       "css_comment_height"
+
+            Image comment height (in pixels).
+
+            Default value is 50.
+
+    *       "fit_minus"
+
+            Length to minus of image fit.
+
+            Default value is undef.
+
+    *       "img_comment_cb"
+
+            Image comment callback.
+
+            Default value is undef.
+
+    *       "img_select_cb"
+
+            Image select callback.
+
+            Default value is undef.
+
+    *       "img_src_cb"
+
+            Image src callback across data object.
+
+            Default value is undef.
+
+    *       "img_width"
+
+            Image width in pixels.
+
+            Default value is undef.
+
+    *       "tags"
+
+            'Tags::Output' object.
+
+            Default value is undef.
+
+    *       "title"
+
+            Image title.
+
+            Default value is undef.
+
+    Returns instance of object.
+
+  "cleanup"
+     $obj->cleanup;
+
+    Process cleanup after page run.
+
+    Returns undef.
+
+  "init"
+     $obj->init($image);
+
+    Process initialization in page run.
+
+    Take Data::Image object as $image,
+
+    Returns undef.
+
+  "prepare"
+     $obj->prepare;
+
+    Process initialization before page run.
+
+    It is not used in this module.
+
+    Returns undef.
+
+  "process"
+     $obj->process;
+
+    Process Tags structure for output with hello world message.
+
+    Returns undef.
+
+  "process_css"
+     $obj->process_css;
+
+    Process CSS::Struct structure.
+
+    Returns undef.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+             From Tags::HTML::new():
+                     Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+                     Parameter 'tags' must be a 'Tags::Output::*' class.
+             Parameter 'img_comment_cb' must be a code.
+             Parameter 'img_select_cb' must be a code.
+             Parameter 'img_src_cb' must be a code.
+
+     init():
+             Image object is required.
+             Image object must be a instance of 'Data::Image'.
+             No image URL.
+
+     process():
+             From Tags::HTML::process():
+                     Parameter 'tags' isn't defined.
+
+     process_css():
+             From Tags::HTML::process_css():
+                     Parameter 'css' isn't defined.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Data::Image;
+     use DateTime;
+     use Tags::HTML::Image;
+     use Tags::Output::Indent;
+
+     # Object.
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new;
+     my $obj = Tags::HTML::Image->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+
+     # Definition of image.
+     my $image = Data::Image->new(
+             'author' => 'Zuzana Zonova',
+             'comment' => 'Michal from Czechia',
+             'dt_created' => DateTime->new(
+                     'day' => 1,
+                     'month' => 1,
+                     'year' => 2022,
+             ),
+             'height' => 2730,
+             'size' => 1040304,
+             'url' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg',
+             'width' => 4096,
+     );
+
+     # Init.
+     $obj->init($image);
+
+     # Process HTML and CSS.
+     $obj->process;
+     $obj->process_css;
+
+     # Print out.
+     print "HTML:\n";
+     print $tags->flush;
+     print "\n\n";
+     print "CSS:\n";
+     print $css->flush;
+
+     # Output:
+     # HTML:
+     # <figure class="image">
+     #   <img alt="Michal from Czechia" src=
+     #     "https://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg"
+     #     >
+     #   </img>
+     #   <figcaption>
+     #     Michal from Czechia
+     #   </figcaption>
+     # </figure>
+     # 
+     # CSS:
+     # .image img {
+     #         display: block;
+     #         height: 100%;
+     #         width: 100%;
+     #         object-fit: contain;
+     # }
+     # .image {
+     #         height: calc(100vh);
+     # }
+     # .image figcaption {
+     #         position: absolute;
+     #         bottom: 0;
+     #         background: rgb(0, 0, 0);
+     #         background: rgba(0, 0, 0, 0.5);
+     #         color: #f1f1f1;
+     #         width: 100%;
+     #         transition: .5s ease;
+     #         opacity: 0;
+     #         font-size: 25px;
+     #         padding: 12.5px 5px;
+     #         text-align: center;
+     # }
+     # figure.image:hover figcaption {
+     #         opacity: 1;
+     # }
+
+EXAMPLE2
+     use strict;
+     use warnings;
+ 
+     use CSS::Struct::Output::Indent;
+     use Data::Image;
+     use DateTime;
+     use Plack::App::Tags::HTML;
+     use Plack::Runner;
+     use Tags::Output::Indent;
+ 
+     my $image = Data::Image->new(
+            'author' => 'Zuzana Zonova',
+            'comment' => 'Michal from Czechia',
+            'dt_created' => DateTime->new(
+                    'day' => 1,
+                    'month' => 1,
+                    'year' => 2022,
+            ),
+            'height' => 2730,
+            'size' => 1040304,
+            'url' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg',
+            'width' => 4096,
+     );
+ 
+     my $app = Plack::App::Tags::HTML->new(
+            'component' => 'Tags::HTML::Image',
+            'css' => CSS::Struct::Output::Indent->new,
+            'data_init' => [$image],
+            'tags' => Tags::Output::Indent->new(
+                    'xml' => 1,
+                    'preserved' => ['style'],
+            ),
+            'title' => 'Image',
+     )->to_app;
+     Plack::Runner->new->run($app);
+
+     # Output (GET /):
+     # <!DOCTYPE html>
+     # <html lang="en">
+     #   <head>
+     #     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+     #     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     #     <title>
+     #       Image
+     #     </title>
+     #     <style type="text/css">
+     # * {
+     #         box-sizing: border-box;
+     #         margin: 0;
+     #         padding: 0;
+     # }
+     # .image img {
+     #         display: block;
+     #         height: 100%;
+     #         width: 100%;
+     #         object-fit: contain;
+     # }
+     # .image {
+     #         height: calc(100vh);
+     # }
+     # .image figcaption {
+     #         position: absolute;
+     #         bottom: 0;
+     #         background: rgb(0, 0, 0);
+     #         background: rgba(0, 0, 0, 0.5);
+     #         color: #f1f1f1;
+     #         width: 100%;
+     #         transition: .5s ease;
+     #         opacity: 0;
+     #         font-size: 25px;
+     #         padding: 12.5px 5px;
+     #         text-align: center;
+     # }
+     # figure.image:hover figcaption {
+     #         opacity: 1;
+     # }
+     # </style>
+     #   </head>
+     #   <body>
+     #     <figure class="image">
+     #       <img alt="Michal from Czechia" src=
+     #         "https://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg"
+     #         />
+     #       <figcaption>
+     #         Michal from Czechia
+     #       </figcaption>
+     #     </figure>
+     #   </body>
+     # </html>
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, Scalar::Util, Tags::HTML.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-HTML-Image>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2022-2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

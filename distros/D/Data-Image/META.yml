@@ -4,7 +4,7 @@ author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   DateTime: 0
-  Error::Pure: 0
+  Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
   File::Object: 0
   Test::More: 0
@@ -28,10 +28,11 @@ no_index:
 requires:
   Mo: 0
   Mo::utils: 0.14
+  Mo::utils::URI: 0
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Data-Image/issues
   homepage: https://github.com/michal-josef-spacek/Data-Image
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-Image
-version: '0.03'
+version: '0.04'

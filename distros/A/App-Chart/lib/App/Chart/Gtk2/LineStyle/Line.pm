@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -29,7 +29,7 @@ use constant DEBUG => 0;
 
 sub draw {
   my ($class, $graph, $series) = @_;
-  if (DEBUG) { say "LineStyle::Line draw $graph $series"; }
+  if (DEBUG) { print "LineStyle::Line draw $graph $series\n"; }
 
   my $win   = $graph->window;
   my $ret = 0;
@@ -64,8 +64,9 @@ sub draw {
     }
 
     if (DEBUG) { local $,=' ';
-                 say "Line values ",
-                   map {$_//'undef'} @{$values}[$lo .. $hi]; }
+                 print "Line values ",
+                   map {$_//'undef'} @{$values}[$lo .. $hi];
+                 print "\n"; }
 
     my $x = $initial_x;
     my $value;

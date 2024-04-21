@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker;
 my %prereqs_os_specific;
 if ( $^O eq 'MSWin32' ) {
     %prereqs_os_specific = (
-        'Term::Choose::Win32' => '1.736',
+        'Term::Choose::Win32' => '1.764',
     );
 }
 
@@ -48,7 +48,7 @@ WriteMakefile(
         'File::HomeDir'          => 0,
         'File::Spec::Functions'  => 0,
         'List::Util'             => '1.33',
-        'Term::Choose'           => '1.742',
+        'Term::Choose'           => '1.764',
         %prereqs_os_specific,
     },
     dist  => {

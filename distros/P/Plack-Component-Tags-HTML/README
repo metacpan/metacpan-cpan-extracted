@@ -97,17 +97,17 @@ ACCESSOR METHODS
   "status_code"
     HTTP status code. Default value is 200.
 
-  "title"
-    Title of page. Default value is undef.
-
   "tags"
     Tags::Output object. Default value is
 
      Tags::Output::Raw->new(
              'xml' => 1,
-             'no_simple' => ['textarea'],
-             'preserved' => ['pre'],
-     ));
+             'no_simple' => ['script', 'textarea'],
+             'preserved' => ['pre', 'style'],
+     );
+
+  "title"
+    Title of page. Default value is undef.
 
 METHODS TO OVERWRITE
   "_cleanup"
@@ -256,7 +256,7 @@ EXAMPLE2
      # Hello world
 
 DEPENDENCIES
-    CSS::Struct::Output::Raw, Encode, Plack::Component,
+    CSS::Struct::Output::Raw, Encode, Error::Pure, Plack::Component,
     Plack::Util::Accessor, Scalar::Util, Tags::HTML::Page::Begin,
     Tags::HTML::Page::End, Tags::Output::Raw.
 
@@ -273,10 +273,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2020-2023 Michal Josef Špaček
+    © 2020-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.15
+    0.17
 

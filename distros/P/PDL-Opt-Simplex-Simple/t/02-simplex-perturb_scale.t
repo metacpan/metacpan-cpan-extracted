@@ -15,9 +15,11 @@ foreach my $scale (0.1, 0.5, 1, 2, 5, 10, 20)
 		vars => {
 			x => { values => 30, perturb_scale => $scale }
 		},
-		opts => { ssize => 3 },
+		opts => {
+			ssize => 3,
+			tolerance => 1e-9,
+		},
 		max_iter => 100,
-		tolerance => 1e-9,
 		f => sub {
 				my $v = shift;
 				$count++;

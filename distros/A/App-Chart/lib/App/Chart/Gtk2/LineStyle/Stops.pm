@@ -1,4 +1,4 @@
-# Copyright 2006, 2007, 2009, 2011 Kevin Ryde
+# Copyright 2006, 2007, 2009, 2011, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -72,7 +72,7 @@ sub draw {
       # undef or outside window, don't extend segment
       $last_y = -1;
     }
-    if (DEBUG) { local $,=' ', say "  segments", @segments; }
+    if (DEBUG) { local $,=' ', print "  segments", @segments, "\n"; }
     if (@segments) { # Gtk2 1.220 doesn't allow no segments
       $win->draw_segments ($gc, @segments);
     }

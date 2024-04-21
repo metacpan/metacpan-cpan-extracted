@@ -24,5 +24,5 @@ requires:
   Tk::ITree: '0.01'
 resources:
   repository: git://github.com/haje61/Tk-DocumentTree.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

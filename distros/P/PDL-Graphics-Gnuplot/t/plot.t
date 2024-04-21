@@ -145,6 +145,13 @@ unlink($testoutput) or warn "\$!: $! for '$testoutput'";
   like $text, qr/unset multiplot/, 'end_multi_generate';
 }
 
+{
+  my $w = gpwin('dumb',size=>[79,24,'ch'], output=>$testoutput);
+  my $r9 = rvals(9,9);
+  eval {$w->plot({colorbox => 1},{with => 'image'},$r9->xvals,$r9->yvals,$r9)};
+  is($@, '', "colorbox succeeded");
+}
+
 if ($PDL::Graphics::Gnuplot::gp_version >= 4.7) { # only 4.7+
   $w = gpwin('dumb',size=>[79,24,'ch'], output=>$testoutput);
   $w->multiplot(layout=>[1,2]);

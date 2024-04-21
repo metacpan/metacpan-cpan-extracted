@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.555';
+our $VERSION = '0.556';
 use Exporter 'import';
 our @EXPORT_OK = qw( read_line );
 
@@ -263,8 +263,8 @@ sub __prepare_prompt {
     }
     my @color;
     if ( $self->{color} ) {
-        $prompt =~ s/\x{feff}//g;
-        $prompt =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
+        $prompt =~ s/${\PH}//g;
+        $prompt =~ s/(${\SGR_ES})/push( @color, $1 ) && ${\PH}/ge;
     }
     $prompt = $self->__sanitized_string( $prompt );
     $self->{i}{max_key_w} = print_columns( $prompt );
@@ -273,7 +273,7 @@ sub __prepare_prompt {
         $prompt = $self->__unicode_trim( $prompt, $self->{i}{max_key_w} );
     }
     if ( @color ) {
-        $prompt =~ s/\x{feff}/shift @color/ge;
+        $prompt =~ s/${\PH}/shift @color/ge;
         $prompt .= normal();
     }
     $self->{i}{prompt} = $prompt;
@@ -501,7 +501,7 @@ Term::Form::ReadLine - Read a line from STDIN.
 
 =head1 VERSION
 
-Version 0.555
+Version 0.556
 
 =cut
 

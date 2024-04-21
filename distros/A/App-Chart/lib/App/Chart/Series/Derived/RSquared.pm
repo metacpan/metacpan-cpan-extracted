@@ -1,4 +1,4 @@
-# Copyright 2007, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2007, 2009, 2010, 2011, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -101,7 +101,7 @@ if (DEBUG) {
   Math::Polynomial->configure(VARIABLE => "\$N");
   my $poly = Math::Polynomial::interpolate (map {
     ($_, Math::BigRat->new(12 * $yden->($_)))} (1..10));
-  say "yfactor 1/12 * ($poly)";
+  print "yfactor 1/12 * ($poly)\n";
 }
 
 # return the triangular number of N, ie. N*(N+1)/2

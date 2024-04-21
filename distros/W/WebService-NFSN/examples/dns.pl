@@ -1,4 +1,4 @@
-#! /usr/bin/perl
+#! /usr/local/bin/perl
 #---------------------------------------------------------------------
 # dns.pl
 # Copyright 2007 Christopher J. Madsen

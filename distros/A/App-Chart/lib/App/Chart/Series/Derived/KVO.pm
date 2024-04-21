@@ -1,4 +1,4 @@
-# Copyright 2004, 2005, 2006, 2007, 2009, 2010 Kevin Ryde
+# Copyright 2004, 2005, 2006, 2007, 2009, 2010, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -105,14 +105,14 @@ sub proc {
 }
 sub warmup_count_for_position {
   my ($self, $lo) = @_;
-  if (DEBUG) { say "KVO warmup_count_for_position $lo"; }
+  if (DEBUG) { print "KVO warmup_count_for_position $lo\n"; }
 
   # MACD warmup
   my $macd_warmup_count
     = App::Chart::Series::Derived::MACD->warmup_count(@{$self->{'parameters'}});
   my $parent = $self->{'parent'};
   $lo = $parent->find_before ($lo, $macd_warmup_count);
-  if (DEBUG) { say "  MACD $macd_warmup_count to $lo"; }
+  if (DEBUG) { print "  MACD $macd_warmup_count to $lo\n"; }
 
   return $self->App::Chart::Series::Derived::KVOforce::warmup_count_for_position($lo);
 }

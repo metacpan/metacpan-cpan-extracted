@@ -4,7 +4,7 @@ WriteMakefile(
 	NAME					=> 'Tk::YANoteBook',
 	VERSION_FROM		=> 'lib/Tk/YANoteBook.pm',
 	PREREQ_PM			=> {
-		'Test::Tk'		=> '0.03',
+		'Test::Tk'		=> '3.03',
 		'Tk'				=> '804.033',
 	},
 	ABSTRACT_FROM		=> 'lib/Tk/YANoteBook.pm',
@@ -21,4 +21,5 @@ WriteMakefile(
 		}}) : ()
 	),
 );
+
 

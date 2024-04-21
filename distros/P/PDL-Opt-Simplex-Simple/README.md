@@ -44,12 +44,14 @@ PDL::Opt::Simplex::Simple - A simplex optimizer for the rest of us
                         },
                 log => sub { },  # log callback
                 max_iter => 100, # max iterations
+                workers => 5,    # parallelize with 5 forked workers (optional)
 
                 # simplex-specific options:
                 opts => {
                         # initial simplex size, smaller means less perturbation
                         ssize => 0.1,   
                 },
+
         );
 
 
@@ -326,6 +328,17 @@ If you wish to disable caching then set "nocache => 1"
 
 Default: undef (cache enabled)
 
+## \* `workers` - Fork a number of workers to parallelize the computation
+
+Some computations may benefit from parallization.  Internally we use
+[Parallel::Pipes](https://metacpan.org/pod/Parallel::Pipes) to serialize `vars` and send them to a worker process.
+
+Example:
+
+        workers => 5
+
+Default: undef (no forking)
+
 ## \* `max_iter` - Maximim number of Simplex iterations
 
 Note that one Simplex iteration may call `f` multiple times.
@@ -336,6 +349,12 @@ Default: 1000
 
 The default is 1e-6.  It tells Simplex to stop before `max_iter` if 
 very little change is being made between iterations.
+
+Note: `tolerance` is a simplex-specific option that must be placed in `{opts}`:
+
+        opts => {
+                tolerance => 1e-3
+        }
 
 Default: 1e-6
 
@@ -566,6 +585,15 @@ passing it to the user's `f()` call.  This would then enable hash-named
 N-dimensional pdl optimization.
 
 Patches welcome ;)
+
+# ENVIRONMENT VARIABLES
+
+- `PDL_OPT_SIMPLEX_SIMPLE_WORKERS=N`
+
+    You can set `PDL_OPT_SIMPLEX_SIMPLE_WORKERS` in your environment to
+    control the number of workers.
+
+    Note: This environment variable overrides `workers` in `new()`
 
 # SEE ALSO
 

@@ -21,45 +21,79 @@ METHODS
 
     Constructor.
 
-    Returns instance of object.
-
     *       "author"
 
-            Image author. It's optional. Default value is undef.
+            Image author.
+
+            It's optional.
+
+            Default value is undef.
 
     *       "comment"
 
-            Image comment. It's optional. Default value is undef.
+            Image comment.
+
+            It's optional.
+
+            Default value is undef.
 
     *       "dt_created"
 
-            Date and time the image was created. Value must be DateTime
-            object. It's optional.
+            Date and time the image was created.
+
+            Value must be DateTime object.
+
+            It's optional.
 
     *       "height"
 
-            Image height. It's optional. Default value is undef.
+            Image height.
+
+            It's optional.
+
+            Default value is undef.
 
     *       "id"
 
-            Image id. It's optional. Default value is undef.
+            Image id.
+
+            It's optional.
+
+            Default value is undef.
 
     *       "size"
 
-            Image size. It's optional. Default value is undef.
+            Image size.
+
+            It's optional.
+
+            Default value is undef.
 
     *       "url"
 
-            URL of image. It's optional. Default value is undef.
+            URL (location) of image.
+
+            It's optional.
+
+            Default value is undef.
 
     *       "url_cb"
 
-            URL callback. To get URL from code. It's optional. Default value
-            is undef.
+            URL callback. To get URL from code.
+
+            It's optional.
+
+            Default value is undef.
 
     *       "width"
 
-            Image width. It's optional. Default value is undef.
+            Image width.
+
+            It's optional.
+
+            Default value is undef.
+
+    Returns instance of object.
 
   "author"
      my $author = $obj->author;
@@ -106,7 +140,7 @@ METHODS
   "url"
      my $url = $obj->url;
 
-    Get URL of image.
+    Get URL (location) of image.
 
     Returns string.
 
@@ -145,6 +179,10 @@ ERRORS
                      Parameter 'url_cb' must be a code.
                              Value: %s
                      Parameter 'width' must a number.
+                             Value: %s
+
+             From Mo::utils::URI:
+                     Parameter 'url' doesn't contain valid location.
                              Value: %s
 
 EXAMPLE
@@ -187,7 +225,7 @@ EXAMPLE
      # Date and time the photo was created: 2022-01-01T00:00:00
 
 DEPENDENCIES
-    Mo, Mo::utils.
+    Mo, Mo::utils, Mo::utils::URI.
 
 SEE ALSO
     Data::Commons::Image
@@ -202,10 +240,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2022-2023 Michal Josef Špaček
+    © 2022-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

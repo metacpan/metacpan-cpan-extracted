@@ -1,6 +1,12 @@
 Revision history for Term::TablePrint
 
 
+0.163   2024-04-20
+        - Term::Choose minimum version 1.764.
+        - Update search prompt.
+        - Return if the table has no columns.
+        - Code refactoring.
+
 0.162   2024-01-02
         - Don't prefix references with 'ref'.
         - Use a string instead of a 'qr' object to save the search regex.

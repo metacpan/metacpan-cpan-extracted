@@ -10,6 +10,7 @@ use feature qw(signatures);
 no warnings qw(experimental::signatures);
 use Sub::Util qw(set_subname);   # core
 use MIME::Base64 qw();           # core
+use Digest::MD5 qw(md5_hex);     # core
 use Data::Dumper;                # core
 use Try::Tiny;                   # libtry-tiny-perl
 use Crypt::Mode::CBC;            # libcryptx-perl
@@ -18,7 +19,7 @@ use Lingua::EN::Nums2Words;      # From CPAN (cpanm Lingua::EN::Nums2Words)
 $Data::Dumper::Sortkeys = 1;
 Lingua::EN::Nums2Words::set_case('lower');
 
-our $VERSION = "0.2";
+our $VERSION = "0.3";
 sub Version { $VERSION; }
 
 my %QAfuncs = {}; # Holds our private __ANON__ subroutines
@@ -29,14 +30,16 @@ sub new {
     cipher => 'AES',
     iv  => 'gkbx5g9hsvhqrosg',                 # Must be 16 bytes / 128 bits
     key => 'tyDjb39dQ20pdva0lTpyuiowWfxSSwa9', # 32 bytes / 256 bits (AES256)
+    ep_pre => 'captcha'.lc(substr(md5_hex(__PACKAGE__), 0, 6)).'.',
   };
   bless $self, $class;
   return $self;
 }
 
 #############################################################################
-# Object parameter set functions ############################################
+# Object parameter get/set functions ########################################
 #############################################################################
+sub get_ep_pre($self)           { return $self->{ep_pre}; }
 sub set_self_val($self, $k, $v) { $self->{$k} = $v; }
 sub set_cipher($self, $v)       { set_self_val($self, 'cipher', $v); }
 sub set_iv($self, $v)           { set_self_val($self, 'iv', $v); }
@@ -99,10 +102,15 @@ sub add_enc_payload($self, $qa) {
   # Make and add the enc_payload
   my $payload_json = to_json($qa);
   my $enc_payload = $self->encrypt_b64($payload_json);
-  $qa->{enc_payload} = $enc_payload;
+  $qa->{enc_payload} = $self->{ep_pre} . $enc_payload;
 }
 sub validate($self, $answer, $enc_payload) {
+  my $ep_pre = $self->{ep_pre};
+  return 0 if (!(defined($enc_payload) && length($enc_payload)));
+  return 0 if ($enc_payload !~ m/^\Q$ep_pre\E/); # Invalid payload
+  $enc_payload =~ s/^\Q$ep_pre\E//; # Trim the prefix
   my $payload = $self->decrypt_b64($enc_payload);
+  return 0 if (!defined($payload));
   my $qa = from_json($payload);
   return 1 if ($qa->{a} =~ m/^\d+$/ && $answer == $qa->{a});
   return 1 if ($answer eq $qa->{a});

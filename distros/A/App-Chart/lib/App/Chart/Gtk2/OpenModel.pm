@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -69,12 +69,14 @@ sub _symlist_filter_func {
   my $path = $symlist_filter->get_path ($iter);
   my $subiter = $symlist_model->get_iter ($path) || return undef;
 
-  if (DEBUG) { say "  submodel $symlist_model subiter $subiter";
-               say "    iter_is_valid ",
-                 $symlist_model->iter_is_valid($subiter)?"yes":"no";
+  if (DEBUG) { print "  submodel $symlist_model subiter $subiter\n";
+               print "    iter_is_valid ",
+                 $symlist_model->iter_is_valid($subiter)?"yes":"no",
+                 "\n";
                my $subpath = $symlist_model->get_path ($subiter);
-               say "    subpath=",
-                 (defined $subpath ? $subpath->to_string : 'undef');
+               print "    subpath=",
+                 (defined $subpath ? $subpath->to_string : 'undef'),
+                 "\n";
              }
 
   if ($col == COL_SYMLIST_OBJECT) {

@@ -25,6 +25,6 @@ requires:
 resources:
   bugtracker: https://github.com/giterlizzi/perl-URI-PackageURL/issues
   repository: git://github.com/giterlizzi/perl-URI-PackageURL
-version: '2.10'
+version: '2.11'
 x_purl: pkg:cpan/GDT/URI-PackageURL
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

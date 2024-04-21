@@ -6,7 +6,10 @@ SYNOPSIS
 
      my $obj = Tags::HTML->new(%params);
      $obj->cleanup(@params);
+     my $css_src_ar = $obj->css_src($css_link_ar);
      $obj->init(@params);
+     my $script_js_ar = $obj->script_js($js_code_ar);
+     my $script_js_src_ar = $obj->script_js_src($js_link_ar);
      $obj->prepare(@params);
      $obj->process;
      $obj->process_css;
@@ -45,6 +48,16 @@ METHODS
 
     Returns undef.
 
+  "css_src"
+     my $css_src_ar = $obj->css_src($css_link_ar);
+
+    Add CSS link to object.
+
+    $css_link_ar is reference to array of hashes with CSS information. CSS
+    information is reference to hash with 'media' and 'link' keys.
+
+    Returns actual reference to array with CSS link info.
+
   "init"
      $obj->init(@params);
 
@@ -52,6 +65,20 @@ METHODS
     Plack::App::Tags::HTML.
 
     Returns undef.
+
+  "script_js"
+     my $script_js_ar = $obj->script_js($js_code_ar);
+
+    Set/Get Javascript code array to object.
+
+    Returns reference to array with strings.
+
+  "script_js_src"
+     my $script_js_src_ar = $obj->script_js_src($js_link_ar);
+
+    Set/Get Javascript script link array to object.
+
+    Returns reference to array with strings.
 
   "prepare"
      $obj->prepare(@params);
@@ -72,6 +99,13 @@ METHODS
      $obj->process_css;
 
     Process CSS::Struct structure.
+
+    Returns undef.
+
+  "process_js"
+     $obj->process_js;
+
+    Process structure.
 
     Returns undef.
 
@@ -294,5 +328,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.09
+    0.10
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2016 Kevin Ryde
+# Copyright 2008, 2016, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -21,6 +21,25 @@ use warnings;
 use File::Slurp;
 use HTTP::Message;
 
+# uncomment this to run the ### lines
+use Smart::Comments;
+
+{
+  require LWP::Protocol::http;
+  my $socket_class = LWP::Protocol::http->socket_class;
+  ### $socket_class
+  # LWP::Protocol::http::Socket
+  # subclass of Net::HTTP
+
+  # Net::HTTP::Methods
+  # $max_line_length = 32*1024 unless defined $max_line_length;
+  # now 8*1024
+
+  # cf  https://github.com/Qarj/WebImblaze/raw/master/wi.pl
+  # push @LWP::Protocol::http::EXTRA_SOCK_OPTS, MaxLineLength => 0; # to prevent: Header line too long (limit is 8192)
+
+  exit 0;
+}
 
 my $file = File::Slurp::slurp ('foo.gz');
 print length($file),"\n";

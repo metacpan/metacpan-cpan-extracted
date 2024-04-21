@@ -1,3 +1,6 @@
+2.026 2024-04-20
+- fix {colorbox=>1} (#100)
+
 2.025 2024-04-20
 - Split version checking from `use Alien::Gnuplot` line for easier downstream
   packaging. Fixes #98.

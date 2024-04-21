@@ -1,4 +1,4 @@
-# Copyright 2004, 2005, 2006, 2007, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -90,7 +90,7 @@ sub new {
 }
 sub proc {
   my ($class_or_self, $fast_N, $slow_N, $smooth_N) = @_;
-  # say "MACD proc $fast_N, $slow_N, $smooth_N";
+  # print "MACD proc $fast_N, $slow_N, $smooth_N\n";
   my $fast_proc = App::Chart::Series::Derived::EMA->proc($fast_N);
   my $slow_proc = App::Chart::Series::Derived::EMA->proc($slow_N);
   my $smooth_proc = App::Chart::Series::Derived::EMA->proc($smooth_N);

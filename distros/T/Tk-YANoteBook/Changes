@@ -1,5 +1,9 @@
 Revision history for Perl extension Tk::YANoteBook.
 
+0.06  Sat Apr 20 2024
+	fixed relief of tab widget
+	beautified appearance of selected page.
+
 0.05  Mon Feb 12 2024
 	changed option -closetabcall to call deletePage by default.
 	updated documentation.
@@ -23,4 +27,5 @@ Revision history for Perl extension Tk::YANoteBook.
 
 0.01  Tue Jun 6 2023
 	Initial release
+
 

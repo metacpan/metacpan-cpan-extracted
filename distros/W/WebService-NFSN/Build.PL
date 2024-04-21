@@ -8,6 +8,9 @@
 use strict;
 use warnings;
 
+use FindBin;
+use lib $FindBin::RealBin;
+
 use inc::My_Build;           # Our customized version of Module::Build
 
 my $builder = inc::My_Build->new(
@@ -23,7 +26,9 @@ my $builder = inc::My_Build->new(
     'Test::More' => '0'
   },
   'configure_requires' => {
+    'FindBin' => '0',
     'Module::Build' => '0.36',
+    'lib' => '0',
     'parent' => '0'
   },
   'recommends' => {

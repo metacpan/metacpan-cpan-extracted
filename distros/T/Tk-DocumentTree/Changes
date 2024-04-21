@@ -1,6 +1,9 @@
 Revision history for Perl extension Tk::DocumentTree.
 
-0.05  Sun Fev 11 2-24
+0.06  Sat Apr 20 11 2024
+	- Added collapseAll and expandAll methods.
+
+0.05  Sun Fev 11 2024
 	- Updated documentation.
 
 0.04  Sun Nov 26 2023
@@ -14,6 +17,7 @@ Revision history for Perl extension Tk::DocumentTree.
 
 0.01  Fri Jun 30 2023
 	- Initial release.
+
 
 
 

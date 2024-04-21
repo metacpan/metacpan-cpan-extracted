@@ -1,5 +1,9 @@
 Revision history for WebService-NFSN
 
+1.04   2024-04-20
+	- Added the sync property to DNS objects
+	- Use FindBin to locate inc::My_Build in Build.PL
+
 1.03   2014-04-30
 	- Don't use NFSN's internal CA certificate
 	  The API server now uses a Thawte certificate instead.

@@ -1,4 +1,4 @@
-# Copyright 2006, 2007, 2009 Kevin Ryde
+# Copyright 2006, 2007, 2009, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -77,10 +77,10 @@ use constant WORST_EMA_WARMUP =>
   (App::Chart::Series::Derived::EMA::alpha_to_N
    (App::Chart::Series::Derived::KAMAalpha->minimum));
 if (DEBUG) {
-  say "KAMA minimum alpha ",App::Chart::Series::Derived::KAMAalpha->minimum;
-  say "     worst N       ",(App::Chart::Series::Derived::EMA::alpha_to_N
-                             (App::Chart::Series::Derived::KAMAalpha->minimum));
-  say "     WORST_EMA_WARMUP @{[WORST_EMA_WARMUP]}";
+  print "KAMA minimum alpha ",App::Chart::Series::Derived::KAMAalpha->minimum, "\n";
+  print "     worst N       ",(App::Chart::Series::Derived::EMA::alpha_to_N
+                             (App::Chart::Series::Derived::KAMAalpha->minimum)), "\n";
+  print "     WORST_EMA_WARMUP @{[WORST_EMA_WARMUP]}\n";
 }
 sub warmup_count {
   my ($self_or_class, $N) = @_;
@@ -132,7 +132,7 @@ sub warmup_count_for_position_alphaclass {
     }
   }
   if (DEBUG) {
-    say "warmup_count_for_position($alpha_class) for $lo is @{[$lo-$i]}"; }
+    print "warmup_count_for_position($alpha_class) for $lo is @{[$lo-$i]}\n"; }
   return $lo - $i;
 }
 

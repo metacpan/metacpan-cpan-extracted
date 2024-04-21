@@ -1,6 +1,6 @@
 # Latest quotes download handlers.
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2014, 2016, 2017 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2014, 2016, 2017, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -113,9 +113,9 @@ sub download {
     }) {
       my $err = $@;
       unless (utf8::is_utf8($err)) { $err = Encode::decode('locale',$err); }
-      say "Latest download error: ", $err;
+      print "Latest download error: ", $err, "\n";
       if (defined $trace) {
-        say $trace->as_string;
+        print $trace->as_string, "\n";
       }
     }
   }

@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011, 2016, 2018 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2016, 2018, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -51,6 +51,28 @@ use base 'Class::Singleton';
 # something ...
 # @LWP::Protocol::http::EXTRA_SOCK_OPTS = (PeerAddr => "foo.com");
 #
+
+# LWP::Protocol::http::EXTRA_SOCK_OPTS is used by LWP::Protocol::http
+# when creating its I/O socket class.  That class is
+# LWP::Protocol::http::Socket, which is a subclass Net::HTTP.
+#
+# Net::HTTP made an incompatible change, circa its version 6.23,
+# to its default MaxLineLength, dropping from 32 kbytes to 8 kbytes.
+# This breaks on some long header lines from finance.yahoo.com in
+# App::Chart::Yahoo data downloads.  Those lines are somewhere up
+# 6 kbytes, maybe more depending on the share symbol or something.
+# That's a foolish amount to have in a header line, but want it to
+# work here.
+#
+# MaxLineLength => 0 here means no length limit.
+# Would have preferred to get this in via the UserAgent instance
+# or class here, but looks like no way to get through to that
+# protocol bits.
+#
+use LWP::Protocol::http;
+push @LWP::Protocol::http::EXTRA_SOCK_OPTS,
+  MaxLineLength => 0;
+
 
 sub new {
   my ($class, %options) = @_;
@@ -219,7 +241,7 @@ L<http://user42.tuxfamily.org/chart/index.html>
 
 =head1 LICENCE
 
-Copyright 2008, 2009, 2010, 2011, 2016, 2018 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2016, 2018, 2024 Kevin Ryde
 
 Chart is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software

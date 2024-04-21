@@ -8,8 +8,9 @@ Tk::YANoteBook - Yet another NoteBook widget
 
 use strict;
 use warnings;
+use Carp;
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 use Tk;
 require Tk::YANoteBook::NameTab;
@@ -115,11 +116,11 @@ sub Populate {
 	
 	my $tabside = delete $args->{-'tabside'};
 	$tabside = 'top' unless defined $tabside;
-	$self->{TABSIDE} = $tabside;
 
 
 	$self->SUPER::Populate($args);
 
+	#configuring the tab bar
 	my @barpack = ();
 	my @tabpack = ();
 	my $buttonside;
@@ -132,8 +133,10 @@ sub Populate {
 		@tabpack = (-side => 'top', -fill => 'x');
 		$buttonside = 'bottom';
 	} else {
-		die "illegal value '$tabside' for -tabside. Must be top, bottom, left or right'"
+		carp "illegal value '$tabside' for -tabside. Must be top, bottom, left or right'"
 	}
+
+	$self->{TABSIDE} = $tabside;
 	$self->{TABPACK} = \@tabpack;
 
 	
@@ -141,6 +144,8 @@ sub Populate {
 		-relief => 'sunken',
 		-borderwidth => 1,
 	)->pack(@barpack);
+	$self->Advertise('BarFrame' => $barframe);
+	
 
 	my @side = ();
 	@side = (-side => 'left') if (($tabside eq 'top') or ($tabside eq 'bottom'));
@@ -187,6 +192,7 @@ sub Populate {
 	$self->bind('<Configure>', [$self, 'ConfigureCall']);
 	$self->{ACTIVE} = 0;
 	$self->{AUTOUPDATE} = 1;
+	$self->{COVERFRAME} = undef;
 	$self->{DISPLAYED} = [];
 	$self->{INMAINLOOP} = 0;
 	$self->{PAGES} = {};
@@ -270,7 +276,7 @@ sub addPage {
 		-closecall => $self->cget('-closetabcall'),
 		-motioncall => ['MotionCall', $self],
 		-releasecall => ['ReleaseCall', $self],
-		-borderwidth => 1,
+#		-borderwidth => 4,
 	);
 	my $ud = $self->{UNDISPLAYED};
 	push @$ud, $name;
@@ -313,13 +319,6 @@ sub ClickCall {
 sub ConfigureCall {
 	my $self = shift;
 	$self->UpdateTabs;
-#	# fixing deep recursion issue on UpdateTabs
-#	my $afterid = $self->{'ccafterid'};
-#
-#	$self->afterCancel($afterid) if defined $afterid;
-#
-#	my $id = $self->after(50, [UpdateTabs => $self]);
-#	$self->{'ccafterid'} = $id;
 }
 
 =item B<deletePage>I<($name)>
@@ -659,6 +658,8 @@ sub selectPage {
 		$self->unselectPage;
 		my $pfpack = $self->{PFPACK};
 		$self->Subwidget('PageFrame')->pack(@$pfpack) unless $self->cget('-rigid');
+
+		#make sure the tab is displayed
 		unless ($self->isDisplayed($name)) {
 			my $ud = $self->{UNDISPLAYED};
 			my @undisp = @$ud;
@@ -672,11 +673,52 @@ sub selectPage {
 			$self->UpdateTabs;
 		}
 		my ($tab, $frame) = @$page;
+
+		#configure the tab
 		my $o = $self->cget('-selectoptions');
 		$tab->configure(@$o,
 			-background => $self->cget('-background'),
 		);
 		$frame->pack(-expand => 1, -fill => 'both');
+		
+		#configure the cover frame
+		my $tabside = $self->{TABSIDE};
+		my $bf = $self->Subwidget('BarFrame');
+		my $tbw = $tab->cget(-borderwidth);
+		my $borderoffset = $tbw + $bf->cget(-borderwidth);
+		my ($cheight, $cwidth, $cx, $cy);
+		if ($tabside eq 'top') {
+			$cwidth = $tab->width - (2 * $tbw);
+			$cheight = $borderoffset;
+			$cx = $tab->x + $tbw;
+			$cy = $tab->height - $tbw;
+		} elsif ($tabside eq 'bottom') {
+			$cwidth = $tab->width - (2 * $tbw);
+			$cheight = $borderoffset;
+			$cx = $tab->x + $tbw;
+			$cy = - $tbw;
+		} elsif ($tabside eq 'left') {
+			$cwidth = $borderoffset;
+			$cheight = $tab->height - (2 * $tbw);
+			$cx = $tab->width - $tbw;
+			$cy =  $tab->y + $tbw;
+		} elsif ($tabside eq 'right') {
+			$cwidth = $borderoffset;
+			$cheight = $tab->height - (2 * $tbw);
+			$cx = - $tbw;
+			$cy =  $tab->y + $tbw;
+		}
+		my $cf = $self->Subwidget('BarFrame')->Frame(
+#			-background => 'red',
+			-height => $cheight,
+			-width => $cwidth,
+		)->place(
+			-x => $cx,
+			-y => $cy,
+		);
+		$cf->raise;
+		$self->{COVERFRAME} = $cf;
+
 		$self->{SELECTED} = $name;
 		$self->Callback('-selecttabcall', $name);
 	} else {
@@ -721,6 +763,11 @@ sub unselectPage {
 		$tab->configure(@$o,
 			-background => $self->cget('-backpagecolor'),
 		);
+		my $cf = $self->{COVERFRAME};
+		if (defined $cf) {
+			$cf->destroy;
+			$self->{COVERFRAME} = undef;
+		}
 		$frame->packForget;
 		$self->{SELECTED} = undef;
 		$self->Subwidget('PageFrame')->packForget unless $self->cget('-rigid');;
@@ -783,6 +830,8 @@ Unknown. If you find any, please contact the author.
 =cut
 
 1;
+
+
 
 
 

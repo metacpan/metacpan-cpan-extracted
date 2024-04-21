@@ -1,4 +1,4 @@
-# Copyright 2009 Kevin Ryde
+# Copyright 2009, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -24,7 +24,7 @@ use constant DEBUG => 0;
 
 sub new {
   my ($class, $key) = @_;
-  if (DEBUG) { say "IndicatorInfo $key"; }
+  if (DEBUG) { print "IndicatorInfo $key\n"; }
   if ($key && $key =~ /^(GT|TA)_/p) {
     $key = ${^POSTMATCH};
     $class = "App::Chart::IndicatorInfo::$1";
@@ -135,7 +135,7 @@ sub parameter_info {
     push @ret, $elem;
 
     my $dataset = $info->{'dataSet'};
-    if (DEBUG) { say "dataSet $dataset"; }
+    if (DEBUG) { print "dataSet $dataset\n"; }
 
     if ($info->{'type'} == $Finance::TA::TA_OptInput_RealRange) {
       $elem->{'type'} = 'float';

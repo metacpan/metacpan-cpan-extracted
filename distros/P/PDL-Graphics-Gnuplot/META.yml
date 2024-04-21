@@ -36,5 +36,5 @@ resources:
   bugtracker: http://github.com/PDLPorters/PDL-Graphics-Gnuplot/issues
   homepage: http://github.com/PDLPorters/PDL-Graphics-Gnuplot
   repository: git://github.com/PDLPorters/PDL-Graphics-Gnuplot.git
-version: '2.025'
+version: '2.026'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

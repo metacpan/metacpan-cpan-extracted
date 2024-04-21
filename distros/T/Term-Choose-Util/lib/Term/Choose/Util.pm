@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.140';
+our $VERSION = '0.141';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -20,6 +20,7 @@ use Encode::Locale qw();
 use File::HomeDir  qw();
 
 use Term::Choose                  qw( choose );
+use Term::Choose::Constants       qw( SGR_ES );
 use Term::Choose::LineFold        qw( cut_to_printwidth print_columns );
 use Term::Choose::ValidateOptions qw( validate_options );
 
@@ -185,7 +186,7 @@ sub _defaults {
         parent_dir          => '..',
         prefix              => '',
         prompt              => 'Your choice: ',
-        prompt_file_dir     => 'Choose the file directory:',
+        prompt_file_dir     => 'Choose the directory:',
         show_hidden         => 1,
         small_first         => 0,
         #tabs_info          => undef,
@@ -295,7 +296,7 @@ sub choose_directories {
     $self->__prepare_opt( $opt, $subseq_tab );
     my $dir = $self->__prepare_path();
     my $chosen_dirs = [];
-    my ( $confirm, $change_path, $add_dirs ) = ( '  ' . $self->{confirm}, '- Change Location', '- Add Directories' );
+    my ( $confirm, $change_path, $add_dirs ) = ( $self->{confirm}, '- Change Location', '- Add Directories' );
     my @bu;
 
     CHOOSE_MODE: while ( 1 ) {
@@ -309,7 +310,7 @@ sub choose_directories {
             [ undef, $confirm, $change_path, $add_dirs ],
             { info => $self->{info}, prompt => $prompt, layout => 2, mouse => $self->{mouse}, margin => $self->{margin},
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor}, page => $self->{page},
-              footer => $self->{footer}, keep => $self->{keep}, undef => '  ' . $self->{back},
+              footer => $self->{footer}, keep => $self->{keep}, undef => $self->{back}, color => $self->{color},
               tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt} }
         );
         if ( ! defined $choice ) {
@@ -326,10 +327,7 @@ sub choose_directories {
             return $decoded ? $chosen_dirs : [ map { encode 'locale_fs', $_ } @$chosen_dirs ];
         }
         elsif ( $choice eq $change_path ) {
-            my $prompt_fmt = $key_path . "%s";
-            if ( length $self->{prompt} ) {
-               $prompt_fmt .= "\n" . $self->{prompt};
-            }
+            my $prompt_fmt = $key_path . "%s\n" . 'Choose Location: ';
             my $tmp_dir = $self->__choose_a_path( $dir, $prompt_fmt, '<<', 'OK' );
             if ( defined $tmp_dir ) {
                $dir = $tmp_dir;
@@ -349,7 +347,7 @@ sub choose_directories {
             # choose_a_subset
             my $idxs = $self->choose_a_subset(
                 [ sort @$avail_dirs ],
-                { cs_label => $cs_label, back => '<<', confirm => 'OK', cs_begin => undef,index => 1,
+                { cs_label => $cs_label, back => '<<', confirm => 'OK', cs_begin => undef,index => 1, keep_chosen => 1,
                   #info => $self->{info}, prompt => $self->{prompt}, page => $self->{page}, footer => $self->{footer},
                   #keep => $self->{keep}, margin => $self->{margin}, tabs_info => $self->{tabs_info},
                   #tabs_prompt => $self->{tabs_prompt}
@@ -950,7 +948,7 @@ sub unicode_sprintf {
     $opt ||= {};
     my $colwidth;
     if ( $opt->{color} ) {
-        ( my $tmp = $str ) =~ s/\e\[[\d;]*m//g;
+        ( my $tmp = $str ) =~ s/${\SGR_ES}//g;
         $colwidth = print_columns( $tmp );
     }
     else {
@@ -980,7 +978,7 @@ sub unicode_sprintf {
 sub print_columns_ext {
     my ( $str, $color ) = @_;
     if ( $color ) {
-        $str =~ s/\e\[[\d;]*m//g;
+        $str =~ s/${\SGR_ES}//g;
     }
     return print_columns( $str );
 }
@@ -1002,7 +1000,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.140
+Version 0.141
 
 =cut
 
@@ -1683,7 +1681,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2023 Matthäus Kiem.
+Copyright 2014-2024 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

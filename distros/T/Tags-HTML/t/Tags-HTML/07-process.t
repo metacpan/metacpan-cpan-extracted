@@ -7,7 +7,6 @@ use File::Object;
 use Tags::HTML;
 use Test::More 'tests' => 5;
 use Test::NoWarnings;
-use Tags::Output::Raw;
 use Tags::Output::Structure;
 
 # Data directory.
@@ -23,7 +22,7 @@ clean();
 
 # Test.
 $obj = Tags::HTML->new(
-	'tags' => Tags::Output::Raw->new,
+	'tags' => Tags::Output::Structure->new,
 );
 eval {
 	$obj->process;

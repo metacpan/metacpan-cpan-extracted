@@ -33,7 +33,7 @@ use GT::DateTime;
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-our $VERSION = 272;
+our $VERSION = 273;
 
 # extra appended to GT::Prices elements giving the tdate etc corresponding
 # to the $DATE element

@@ -1,3 +1,15 @@
+0.17 2024-04-21T08:10:03+02:00
+ - Move inicialization of page begin to better place after actions phase.
+   It's possible to implement _process_actions without inheritance of it.
+
+0.16 2024-04-21T00:08:47+02:00
+ - Add handling of css_src().
+ - Fix DEPENDENCIES section in doc.
+ - Fix default value of 'tags' parameter in doc.
+ - Move inicialization of page begin from prepare to actions phase.
+ - Sort parameters in doc.
+ - Update copyright years.
+
 0.15 2023-06-20T10:33:58+02:00
  - Fix test dependencies.
 

@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011, 2013, 2014 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -296,7 +296,7 @@ sub INIT_INSTANCE {
 # sub _do_combobox_changed {
 #   my ($combobox) = @_;
 #   if (DEBUG) {
-#     say "Watchlist symlist combobox changed, switch notebook to symbols";
+#     print "Watchlist symlist combobox changed, switch notebook to symbols\n";
 #   }
 #   my $self = $combobox->get_toplevel;
 #   my $notebook = $self->{'notebook'};

@@ -1,4 +1,4 @@
-#! /usr/bin/perl
+#! /usr/local/bin/perl
 #---------------------------------------------------------------------
 # changeTTL.pl
 # Copyright 2008 Christopher J. Madsen

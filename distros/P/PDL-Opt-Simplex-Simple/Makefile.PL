@@ -32,6 +32,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
 	'Math::Round' => 0,
 	'PDL' => '2.056',
+	'Parallel::Pipes' => '0.200'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'PDL-Opt-Simplex-Simple-*' },

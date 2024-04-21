@@ -1,0 +1,63 @@
+---
+abstract: 'Interaction with OpenExchangeRates API'
+author:
+  - 'Nael Alolwani <VNEALV@cpan.org>'
+build_requires:
+  Dist::Zilla: '6.015'
+  Dist::Zilla::PluginBundle::Author::VNEALV: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Software::License::Perl_5: '0'
+  Test::CheckDeps: '0.010'
+  Test::More: '0.98'
+  Test::NoTabs: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Async-OpenExchRates
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Net::Async::OpenExchRates:
+    file: lib/Net/Async/OpenExchRates.pm
+    version: '0.001'
+requires:
+  Cache::LRU: '0.04'
+  Digest::MD5: '0'
+  Future: '0.50'
+  Future::AsyncAwait: '0.66'
+  IO::Async: '0'
+  IO::Async::SSL: '0.25'
+  JSON::MaybeUTF8: '2.000'
+  Log::Any: '1.717'
+  Log::Any::Adapter: '1.717'
+  Net::Async::HTTP: '0.49'
+  Object::Pad: '0.800'
+  Syntax::Keyword::Dynamically: '0.13'
+  Syntax::Keyword::Try: '0.29'
+  Time::Moment: '0.44'
+  URI: '0'
+resources:
+  bugtracker: https://github.com/vnealv/Net-Async-OpenExchRates/issues
+  homepage: https://github.com/vnealv/Net-Async-OpenExchRates
+  repository: https://github.com/vnealv/Net-Async-OpenExchRates.git
+version: '0.001'
+x_authority: cpan:VNEALV
+x_contributors:
+  - 'vnealv <naelalolwani@gmail.com>'
+  - 'vnealv <neal.alwani@gmail.com>'
+x_generated_by_perl: v5.26.3
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

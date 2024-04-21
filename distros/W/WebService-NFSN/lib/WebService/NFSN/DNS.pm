@@ -26,13 +26,13 @@ use parent 'WebService::NFSN::Object';
 #=====================================================================
 # Package Global Variables:
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 #=====================================================================
 BEGIN {
   __PACKAGE__->_define(
     type => 'dns',
-    ro   => [qw(serial)],
+    ro   => [qw(serial sync)],
     rw   => [qw(expire minTTL refresh retry)],
     methods => {
       addRR          => [qw(name type data ttl?)],
@@ -56,9 +56,9 @@ WebService::NFSN::DNS - Access NFSN DNS information
 
 =head1 VERSION
 
-This document describes version 1.03 of
-WebService::NFSN::DNS, released April 30, 2014
-as part of WebService-NFSN version 1.03.
+This document describes version 1.04 of
+WebService::NFSN::DNS, released April 20, 2024
+as part of WebService-NFSN version 1.04.
 
 =head1 SYNOPSIS
 
@@ -178,6 +178,15 @@ modified. You may, however, update the serial number in order to cause
 other nameservers to refresh any cached data in it by calling the
 C<updateSerial> method.
 
+=item C<< $dns->sync() >>
+
+Returns the fraction of NFSN's DNS servers that are up-to-date for this domain.
+This will be 1 if all servers are up-to-date, or 0 if no servers are up-to-date with a change you just made.
+A number between 0 and 1 (e.g. 0.5) indicates that some but not all servers are up-to-date.
+After making a DNS change, you may poll this property every few seconds
+to determine when it is safe to expect that NFSN's DNS responses will include that change.
+(But this does not consider third-party DNS servers that may have cached the previous record.)
+
 =back
 
 =head2 Methods
@@ -267,7 +276,7 @@ L<< https://github.com/madsen/webservice-nfsn >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Christopher J. Madsen.
+This software is copyright (c) 2024 by Christopher J. Madsen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

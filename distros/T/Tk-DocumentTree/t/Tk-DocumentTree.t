@@ -52,6 +52,19 @@ if (defined $app) {
 			$doctree->entrySaved($sel);
 		}
 	)->pack(-side => 'left');
+	$app->Button(
+		-text => 'Collapse',
+		-command => ['collapseAll', $doctree],
+	)->pack(-side => 'left');
+	$app->Button(
+		-text => 'Expand',
+		-command => ['expandAll', $doctree],
+	)->pack(-side => 'left');
+	my $sfile = File::Spec->rel2abs('lib/Tk/DocumentTree.pm');
+	$app->Button(
+		-text => 'Select',
+		-command => ['entrySelect', $doctree, $sfile],
+	)->pack(-side => 'left');
 }
 
 @tests = (
@@ -59,6 +72,7 @@ if (defined $app) {
 );
 
 starttesting;
+
 
 
 

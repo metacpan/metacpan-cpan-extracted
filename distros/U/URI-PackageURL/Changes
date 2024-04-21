@@ -1,6 +1,6 @@
 Revision history for URI::PackageURL.
 
-2.10 2024-04-19
+2.11 2024-04-19
     - Improved the cpan PURL type to be compatible with the 'PURL-TYPES' specification
       (giterlizzi/perl-URI-PackageURL#8 - https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst)
     - Added "luarocks" PURL type support

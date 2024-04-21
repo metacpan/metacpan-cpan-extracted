@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.763';
+our $VERSION = '1.764';
 
 use Exporter qw( import );
 
@@ -19,6 +19,7 @@ our @EXPORT_OK = qw(
     VK_F1 VK_F2 VK_F3 VK_F4
     ROW COL
     WIDTH_CURSOR TERM_READKEY
+    PH SGR_ES
 );
 
 our %EXPORT_TAGS = (
@@ -29,6 +30,11 @@ our %EXPORT_TAGS = (
 use constant TERM_READKEY => eval { require Term::ReadKey; 1 };
 
 use constant WIDTH_CURSOR => 1;
+
+use constant {
+    PH     => "\x{feff}",       # zero width placeholder character
+    SGR_ES => '\e\[[\d;]*m',
+};
 
 use constant {
     ROW => 0,

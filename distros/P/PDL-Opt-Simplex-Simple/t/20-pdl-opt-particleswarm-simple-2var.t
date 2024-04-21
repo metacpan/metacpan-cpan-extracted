@@ -6,10 +6,22 @@ use Test::More;
 use PDL;
 use PDL::Opt::ParticleSwarm::Simple;
 #use Data::Dumper;
-
-plan tests => 2;
-
 #$SIG{__DIE__} = \&backtrace;
+
+plan tests => 4;
+
+# This tests two things:
+#   1. multi-variable PDL-based optimization
+#   2. values starting at the same value defined by `minmax` complete successfully.
+#      There have been some issues starting out at max values, so we start x on
+#      max and y on min to test and see if it succeeds.  See the comment at the
+#      top of PDL::Opt::Simplex::Simple->_simplex_f() where it clamps to min/max
+#      and injects it into simplex's internal piddle.
+
+do_test();
+do_test(workers => 5);
+
+exit 0;
 
 sub _build_stack
 {
@@ -38,72 +50,67 @@ sub backtrace
 	}
 }
 
+sub do_test
+{
+	my %opts = @_;
 
-# This tests two things:
-#   1. multi-variable PDL-based optimization
-#   2. values starting at the same value defined by `minmax` complete successfully.
-#      There have been some issues starting out at max values, so we start x on
-#      max and y on min to test and see if it succeeds.  See the comment at the
-#      top of PDL::Opt::Simplex::Simple->_simplex_f() where it clamps to min/max
-#      and injects it into simplex's internal piddle.
-
-
-my $count = 0;
-my $simpl = PDL::Opt::ParticleSwarm::Simple->new(
-        vars => {
-                x => {
-			values => 50, # starts at max
-			enabled => 1,
-			round_each => 0.0005,
-			round_result => 0.5,
-			minmax => [[-35 => 50]]
+	my $count = 0;
+	my $simpl = PDL::Opt::ParticleSwarm::Simple->new(
+		%opts,
+		vars => {
+			x => {
+				values => 50, # starts at max
+				enabled => 1,
+				round_each => 0.0005,
+				round_result => 0.5,
+				minmax => [[-35 => 50]]
+			},
+			y => {
+				values => -35, # starts at min
+				enabled => 1,
+				round_each => 0.0005,
+				round_result => 0.5,
+				minmax => [[-35 => 50]]
+			},
 		},
-                y => {
-			values => -35, # starts at min
-			enabled => 1,
-			round_each => 0.0005,
-			round_result => 0.5,
-			minmax => [[-35 => 50]]
+		opts => {
 		},
-        },
-	opts => { },
-	max_iter => 100,
-	tolerance => 1e-6,
-        f => sub {
-			my $v = shift;
-			$count++;
-			
-			# Parabola with minima at x = -3
-			my $ret = (($v->{x}+3)**2 - 5) + (($v->{y}+7)**2 - 9);
+		max_iter => 1000,
+		f => sub {
+				my $v = shift;
+				$count++;
 
-			return $ret;
-		},
-	log => sub {
-			my $vars = shift;
-			my $state = shift;
+				# Parabola with minima at x = -3
+				my $ret = (($v->{x}+3)**2 - 5) + (($v->{y}+7)**2 - 9);
 
-			$vars->{y} //= '';
-			#print "$count [$state->{ssize}]: x=$vars->{x} y=$vars->{y}\n";
+				return $ret;
+			},
+		log => sub {
+				my $vars = shift;
+				my $state = shift;
 
-			#print "Log: " . Dumper 
-			#	{
-			#		vars => PDL::Opt::Simplex::Simple::dumpify($vars),
-			#		state => PDL::Opt::Simplex::Simple::dumpify($state),
-			#	};
-		}
-);
+				$vars->{y} //= '';
+				#print "$count [$state->{ssize}]: x=$vars->{x} y=$vars->{y}\n";
 
-$simpl->optimize;
+				#print "Log: " . Dumper 
+				#	{
+				#		vars => PDL::Opt::Simplex::Simple::dumpify($vars),
+				#		state => PDL::Opt::Simplex::Simple::dumpify($state),
+				#	};
+			}
+	);
 
-#use Data::Dumper;
-#print " optimize: " . Dumper(PDL::Opt::Simplex::Simple::dumpify($simpl->optimize));
-#print " best vec: " . $simpl->{best_vec}. "\n";
-#print "best vars: " . Dumper(PDL::Opt::Simplex::Simple::dumpify($simpl->{best_vars})). "\n";
-#print "  optimal: " . $simpl->{vec_optimal}. "\n";
-#print " optimal2: " . join(',', map { $_->sclr } $simpl->{vec_optimal}->clump(-1)->dog) . "\n";
-#print " expanded: " . Dumper(PDL::Opt::Simplex::Simple::dumpify($simpl->get_result_expanded()));
-#print "   simple: " . Dumper(PDL::Opt::Simplex::Simple::dumpify($simpl->get_result_simple()));
+	$simpl->optimize;
 
-ok(abs($simpl->get_result_simple()->{x} - (-3)) < 1e-6);
-ok(abs($simpl->get_result_simple()->{y} - (-7)) < 1e-6);
+	#use Data::Dumper;
+	#print " optimize: " . Dumper(PDL::Opt::Simplex::Simple::dumpify($simpl->optimize));
+	#print " best vec: " . $simpl->{best_vec}. "\n";
+	#print "best vars: " . Dumper(PDL::Opt::Simplex::Simple::dumpify($simpl->{best_vars})). "\n";
+	#print "  optimal: " . $simpl->{vec_optimal}. "\n";
+	#print " optimal2: " . join(',', map { $_->sclr } $simpl->{vec_optimal}->clump(-1)->dog) . "\n";
+	#print " expanded: " . Dumper(PDL::Opt::Simplex::Simple::dumpify($simpl->get_result_expanded()));
+	#print "   simple: " . Dumper(PDL::Opt::Simplex::Simple::dumpify($simpl->get_result_simple()));
 
+	ok(abs($simpl->get_result_simple()->{x} - (-3)) < 1e-6);
+	ok(abs($simpl->get_result_simple()->{y} - (-7)) < 1e-6);
+}

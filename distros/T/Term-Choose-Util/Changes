@@ -1,6 +1,11 @@
 Revision history for Term::Choose::Util
 
 
+0.141   2024-04-20
+        - Term::Choose minimum version 1.764.
+        - Updates 'choose_directories'.
+        - Code refactoring.
+
 0.140   2023-10-20
         - Update settings_menu: skip undefined values.
 

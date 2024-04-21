@@ -1,0 +1,445 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::OpenExchRates
+at lib/Net/Async/OpenExchRates.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+C<Net::Async::OpenExchRates> - interact with L<OpenExchangeRates API|https://openexchangerates.org/> via L<IO::Async>
+
+=head1 SYNOPSIS
+
+ use Future::AsyncAwait;
+ use IO::Async::Loop;
+ use Net::Async::OpenExchRates;
+
+ my $loop = IO::Async::Loop->new();
+ my $exch = Net::Async::OpenExchRates->new(
+    app_id => 'APP_ID',
+ );
+ $loop->add( $exch );
+
+ my $latest = await $exch->latest();
+
+=head1 DESCRIPTION
+
+This module is a simple L<IO::Async::Notifier> wrapper class with a L<Net::Async::HTTP> object constructed using L<Object::Pad>.
+Made to communicate with I<OpenExchangeRates API> providing all its available endpoints as methods to be called by a program.
+
+Acting as an active Asynchronous API package for L<Open Exchange Rates|https://openexchangerates.org/>
+following its L<API docs|https://docs.openexchangerates.org> along with providing extra functionalities
+like pre-validation, local caching and respecting API update frequency depending on your C<APP_ID> subscription plan.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+ $exch = Net::Async::OpenExchRates->new( %args );
+
+Returns a new C<Net::Async::OpenExchRates> instance,
+which is a C<IO::Async::Notifier> too,
+where one argument is required with others being optional, detailed as so:
+
+=over 4
+
+=item app_id => STRING (REQUIRED)
+
+The only required argument to be passed.
+Can be obtained from I<OpenExchangeRates> L<Account page|https://openexchangerates.org/account/app-ids>.
+
+=item base_uri => STRING
+
+C<default: 'https://openexchangerates.org'>
+
+The URL to be used as the base to form API request URI.
+
+=item use_cache => BOOL
+
+C<default: 1>
+
+Toggle to enable/disable the use of L<Cache::LRU> to have the response locally available
+for repeated requests only if the API responded with C<304 HTTP> code for a previously cached request.
+As I<OpenExchangeRates API> offers L<Cache Control|https://docs.openexchangerates.org/reference/etags>
+utilizing ETag identifiers.
+Having this enabled is effective for saving on network bandwidth and faster responses,
+but not much on API usage quota as it will still be counted as a resource request.
+
+=item cache_size => INT
+
+C<default: 1024>
+
+The size limit for the L<Cache::LRU> object.
+The maximum number of previous requests responses to be kept in memory.
+
+=item respect_api_frequency => BOOL
+
+C<default: 1>
+
+As every I<OpenExchangeRates API> L<subscription plan|https://openexchangerates.org/signup> comes with
+its own number of permitted requests per month and resources update frequency. This option is made purely
+to allow your program to query repeated requests without overwhelming API. If the request is already cached meaning we already have its
+response from a previous request invocation, it will check on the current resources C<update_frequency> from C<usage.json>
+API call, if the C<Last-Modified> timestamp HTTP header that is attached with our existing response compared to current time is less
+than C<update_frequency> then most probably even if we call the API it will return C<304 HTTP>, hence in this case
+respect the API and instead of requesting it to confirm, return the response we already have without requesting again.
+
+Suitable for repeated requests, and using a restricted subscription plan.
+
+=item enable_pre_validation => BOOL
+
+C<default: 1>
+
+Mainly requested currencies, date/time values along with other limitations for some endpoints.
+These options are here to toggle whether to validate those parameters before requesting them or not.
+
+=item local_conversion => BOOL
+
+C<default: 1>
+
+Given that C<convert> API endpoint is only available for Unlimited subscription plan,
+this option is to allow your program to perform conversion function locally, without applying any formatting
+to calculated amount. Not that if you want to use the API instead for L</convert> method you need to pass this as C<0>
+
+=item keep_http_response => BOOL
+
+C<default: 1>
+
+Used to allow your program to access the complete L<HTTP::Response> from the last
+API request made through L</last_http_response>. If turned of by passing C<0> last_http_response will stay empty.
+
+=back
+
+=head1 METHODS
+
+All available methods are C<async/await> following L<Future::AsyncAwait> and L<Future>
+
+=head2 do_request
+
+   await $exch->do_request($page, %args);
+
+The generic method to perform HTTP request for any I<OpenExchangeRates API> endpoint.
+It has the gist of the logic, from trying to check Cache if the request has been made before
+to actually triggering the request and parse its response. Takes to main arguments:
+
+=over 4
+
+=item $page
+
+as in the endpoint name that needs to be requested.
+
+=item %args
+
+A hash containing the named parameters to be passed as query parameters to the API call URI.
+
+=back
+
+use only when you want parse the complete request yourself, you should be able to get all whats needed from API
+using other methods.
+
+=head2 latest
+
+   await $exch->latest();
+   await $exch->latest('USD', 'CAD', ['JPY']);
+
+To request L<latest.json enpoint|https://docs.openexchangerates.org/reference/latest-json> from API.
+It accepts a list, C<ARRAYref> or a mixture of both for currencies as an argument where:
+
+=over 4
+
+=item $base currency
+
+as the B<first> param where its C<default: 'USD'>
+
+=item @symbols
+
+the rest of the list as symbols to be filtered.
+
+=back
+
+Note that C<show_alternative> is always passed as C<true> to the API.
+
+=head2 historical
+
+   await $exch->historical($date, $base, @symbols);
+   await $exch->historical('2024-04-04', 'CAD');
+
+To request L<historical/*.json endpoint|https://docs.openexchangerates.org/reference/historical-json> from API.
+Used to retrieve old rates, takes multiple parameters:
+
+=over 4
+
+=item $date
+
+required parameter; scalar string following a date format C<YYYY-MM-DD>
+
+=item $base
+
+base currency to be used with the request, C<default: 'USD'>.
+
+=item @symbols
+
+the rest of parameters will be taken the list of symbols to be filtered out.
+Can be passed as a flat list, an C<ARRAYref> or mix of both.
+
+=back
+
+note that show alternative is always on.
+
+=head2 currencies
+
+   await $exch->currencies();
+   # to list inactive currencies
+   await $exch->currencies(0, 1);
+
+To request L<currencies.json endpoint|https://docs.openexchangerates.org/reference/currencies-json> from API.
+it mainly returns list of offered currencies by I<OpenExchangeRates API>.
+takes two optional parameters:
+
+=over 4
+
+=item $show_alternative
+
+passed as C<0> or C<1>, donating to include alternative currencies or not.
+
+=item $show_inactive
+
+passed as C<0> or C<1>, donating to list inactive currencies or not.
+
+=back
+
+=head2 time_series
+
+   await $exch->time_series($start, $end, $base, @symbols);
+   await $exch->time_series('2024-04-02', '2024-04-04');
+
+To request L<time-series.json endpoint|https://docs.openexchangerates.org/reference/time-series-json> from API.
+Essentially its multiple historical requests just handled by I<OpenExchangeRates API> itself. Takes a couple of
+parameters:
+
+=over 4
+
+=item $start
+
+Required start date of the period needed. Following C<YYYY-MM-DD> format.
+
+=item $end
+
+Required end date of the period needed. Following C<YYYY-MM-DD> format.
+
+=item $base
+
+Base currency for the prices requested. C<default: 'USD'>
+
+=item @symbols
+
+Symbols to be filtered out, can be passed as a flat list list or an C<ARRAYref>
+
+=back
+
+=head2 convert
+
+   await $exch->convert($value, $from, $to, $reverse_convert);
+   await $exch->convert(22, 'USD', 'CAD');
+   await $exch->convert(22, 'JPY', 'USD', 1);
+
+To request L<convert endpoint|https://docs.openexchangerates.org/reference/convert> from API.
+This endpoint is only available in Unlimited subscription plan, however you can enable L</local_conversion>
+which will allow you to perform conversion operation locally, applying a simple math equation with no formatting to returned value
+so make sure to apply your own decimal point limit to returned value. Accepts these parameters:
+
+=over 4
+
+=item $value
+
+The amount you'd like to be converted. keep in mind that I<OpenExchangeRates API> only accepts C<INT> values.
+However enabling L</local_conversion> will accept none integer values too and be able to convert it.
+
+=item $from
+
+The currency of the C<$value> passed above, passed as three characters.
+
+=item $to
+
+The currency to be converted to.
+
+=item $reverse_convert
+
+This is used when L</local_conversion> is enabled, in order to overcome another restriction on API.
+Which is to get the prices of base currencies other than C<USD>. Set it to C<1> when you want to make it to use C<$to>
+for base to convert, and let it be as C<default: 0> to use C<$from> currency as the base to convert.
+
+=back
+
+In order for L</local_conversion> to work properly with Free subscription plans, one of the currencies has to be C<USD>
+where you'd set L</$reverse_convert> to C<1> when you are converting C<$to> C<USD> rather than C<$from>.
+
+=head2 ohlc
+
+   await $exch->ohlc($date, $time, $period, $base, @symbols);
+   await $exch->ohlc('2024-04-04', '02:00', '2m');
+
+To request L<ohlc.json endpoint|https://docs.openexchangerates.org/reference/ohlc-json> from API.
+Retrieving OHLC data requires some parameters to be present which are:
+
+=over 4
+
+=item $date
+
+Date for selection timeframe needed, follows C<YYYY-MM-DD> format.
+
+=item $time
+
+Time for selection timeframe needed, follows C<hh:mm> or C<h:m>.
+All timings would be based on UTC, as thats what API supports.
+
+=item $period
+
+Period of OHLC needed, like: C<'1m'>, C<'12h>, C<'1d'>, and so on.
+
+=item $base
+
+Optional base currency, C<default: 'USD'>
+
+=item @symbols
+
+Optional list of symbols to filter result based on.
+
+=back
+
+=head2 usage
+
+   await $exch->usage();
+
+To request L<usage.json endpoint|https://docs.openexchangerates.org/reference/usage-json> from API.
+returning both subscription plan details and app_id API usage so far, along with current app status.
+
+=head2 app_plan
+
+   await $exch->app_plan();
+   await $exch->app_plan($key);
+
+Retrieves only the subscription plan details from L</usage> call, with the possibility of passing:
+
+=over 4
+
+=item $key
+
+to get a specific key value from subscription plan details.
+
+=back
+
+=head2 app_usage
+
+   await $exch->app_usage();
+   await $exch->app_usage($key);
+
+Retrieves only the application current API usage section from L</usage> method.
+
+=over 4
+
+=item $key
+
+A specific key to get value for from API usage.
+
+=back
+
+=head2 app_features
+
+   await $exch->app_features();
+   await $exch->app_features($key);
+
+Retrieves the features that are currently enabled for current C<app_id>, accepts:
+
+=over 4
+
+=item $key
+
+as a specific feature, in order to know whether its enabled or not by API
+
+=back
+
+=head2 app_status
+
+   await $exch->app_status();
+
+Gets the current C<app_id> status on the API, originally in L</usage> call.
+
+=head2 plan_update_frequency
+
+   await $open_exch_api->plan_update_frequency();
+
+used in order to specifically retrieve the subscription plan update_frequency in seconds.
+Which is the rate that data are refreshed on current active plan.
+
+=head1 FIELD ACCESSORS
+
+No real difference between the other typical methods except that they are not async/await.
+Also for most of them they will only be populated after the first request.
+
+=head2 last_http_response
+
+   $exch->last_http_response();
+
+Used to access the complete L<HTTP::Response> for the last request that has been made.
+
+=head2 app_id
+
+   $exch->app_id();
+
+The current C<APP_ID> that is registered with this instance.
+
+=head2 api_query_params
+
+   $exch->api_query_params();
+
+Referenece of the list of parameters accepted by API.
+
+=head2 app_plan_keys
+
+   $exch->app_plan_keys();
+
+To get list of subscription plan response hash keys from L</usage> call.
+
+=head2 app_usage_keys
+
+   $exch->app_usage_keys();
+
+To get list of current API usage response hash keys from L</usage> call.
+
+=head2 app_features_keys
+
+   $exch->app_features_keys();
+
+To get list of available API features.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure|IO::Async::Notifier/configure>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure|IO::Async::Notifier/configure>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=item L<Object::Pad::UNIVERSAL>
+
+L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
+
+=back
+

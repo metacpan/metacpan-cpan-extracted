@@ -4,3 +4,5 @@ Version 0.1
 Version 0.2
   * Added missing requires to META.yml.
 
+Version 0.3
+  * Added protections for bad enc_payload to validate()

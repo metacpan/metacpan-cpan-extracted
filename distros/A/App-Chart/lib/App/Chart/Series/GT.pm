@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -38,7 +38,7 @@ my %class_to_timeframe = ('App::Chart::Timebase::Days'   => $DAY,
 
 sub new {
   my ($class, $type, $parent, @args) = @_;
-  if (DEBUG) { local $,=' '; say "GT->new type '$type' args", @args; }
+  if (DEBUG) { local $,=' '; print "GT->new type '$type' args", @args, "\n"; }
   my $indicator = GT::Eval::create_standard_object ($type, @args);
   my $nb_values = $indicator->get_nb_values;
   my $arrays = {};
@@ -66,7 +66,7 @@ sub name {
 
 sub fill_part {
   my ($self, $lo, $hi) = @_;
-  if (DEBUG) { say "GT fill_part $lo $hi"; }
+  if (DEBUG) { print "GT fill_part $lo $hi\n"; }
 
   my $parent = $self->{'parent'};
   my $timebase = $self->timebase;
@@ -86,7 +86,7 @@ sub fill_part {
   my $nb_item = 0;
   my $max_loaded_items = $hi - $lo + 1 + $indicator->days_required;
 
-  if (DEBUG) { say "  find_calculator  start=$start end=$end code=$code timeframe=$timeframe max_loaded_items=$max_loaded_items"; }
+  if (DEBUG) { print "  find_calculator  start=$start end=$end code=$code timeframe=$timeframe max_loaded_items=$max_loaded_items\n"; }
   my ($calc, $first, $last);
 
   if (! eval {
@@ -97,7 +97,7 @@ sub fill_part {
     if ($@ =~ /No data available/i) { return; }
     die $@;
   }
-  if (DEBUG) { say "  gives  first=$first last=$last"; }
+  if (DEBUG) { print "  gives  first=$first last=$last\n"; }
 
   $indicator->calculate_interval ($calc, $first, $last);
 

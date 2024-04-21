@@ -4,7 +4,7 @@ package Dist::Zilla::PluginBundle::Author::VNEALV;
 use strict;
 use warnings;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 =head1 NAME
@@ -27,7 +27,7 @@ has max_target_perl => (
     lazy    => 1,
     default => sub {
         my $self = shift;
-        $self->payload->{'Test::MinimumVersion.max_target_perl'} // $self->payload->{max_target_perl} // '5.14.0';
+        $self->payload->{'Test::MinimumVersion.max_target_perl'} // $self->payload->{max_target_perl} // '5.26.0';
     },
 );
 

@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.764   2024-04-20
+    - Code refactoring.
+
 1.763   2024-01-18
     - Unicode 15.1.
     - Zero width for Hangul Jamo Extended-B.

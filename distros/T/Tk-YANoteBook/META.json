@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Test::Tk" : "0.03",
+            "Test::Tk" : "3.03",
             "Tk" : "804.033"
          }
       }
@@ -45,6 +45,6 @@
          "web" : "https://github.com/haje61/Tk-YANoteBook"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

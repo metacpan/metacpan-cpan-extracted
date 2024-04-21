@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-VNEALV
 
+0.003     2024-04-20 11:31:25+00:00 UTC
+
+  Updated minimum version to support
+
 0.002     2021-06-26 04:03:11+00:00 UTC
 
   Remove push to GitHub step, but keep tagging.

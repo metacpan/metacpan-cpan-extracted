@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use CSS::Struct::Output::Raw;
+use CSS::Struct::Output::Structure;
 use English;
 use Error::Pure::Utils qw(clean);
 use Tags::HTML;
@@ -18,7 +18,7 @@ clean();
 
 # Test.
 $obj = Tags::HTML->new(
-	'css' => CSS::Struct::Output::Raw->new,
+	'css' => CSS::Struct::Output::Structure->new,
 );
 eval {
 	$obj->process_css;

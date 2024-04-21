@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.162';
+our $VERSION = '0.163';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -14,7 +14,7 @@ use List::Util   qw( sum max );
 use Scalar::Util qw( looks_like_number );
 
 use Term::Choose                  qw( choose );
-use Term::Choose::Constants       qw( WIDTH_CURSOR );
+use Term::Choose::Constants       qw( WIDTH_CURSOR PH SGR_ES );
 use Term::Choose::LineFold        qw( line_fold cut_to_printwidth print_columns );
 use Term::Choose::Screen          qw( hide_cursor show_cursor );
 use Term::Choose::ValidateOptions qw( validate_options );
@@ -164,11 +164,18 @@ sub print_table {
         # 'choose' functions: Deactivate 'hide_cursor', because if 'hide_cursor' is
         # activated (default), 'choose' activates the cursor before returning.
     }
-    if ( ! @$tbl_orig ) {
+    if ( ! @$tbl_orig || !@{$tbl_orig->[0]} ) {
+        my $message;
+        if ( ! @$tbl_orig ) {
+            $message = "'print_table': empty table without header row!";
+        }
+        else {
+            $message = "'print_table': no columns!";
+        }
         # Choose
         choose(
             [ 'Close with ENTER' ],
-            { prompt => "'print_table': empty table without header row!", hide_cursor => 0 }
+            { prompt => $message, hide_cursor => 0 }
         );
         $self->__reset();
         return;
@@ -285,7 +292,7 @@ sub __write_table {
     if ( $self->{footer} ) {
         $footer = $self->{footer};
         if ( $search->{filter} ) {
-            $footer .= $search->{filter};
+            $footer .= "[$search->{filter}]";
         }
     }
     my $old_row = exists $ENV{TC_POS_AT_SEARCH} && ! $search->{filter} ? delete( $ENV{TC_POS_AT_SEARCH} ) : 0;
@@ -395,8 +402,8 @@ sub __copy_table {
                 $str =~ s/\p{Space}+/ /g;
             }
             if ( $self->{color} ) {
-                $str =~ s/\x{feff}//g;
-                $str =~ s/\e\[[\d;]*m/\x{feff}/g;
+                $str =~ s/${\PH}//g;
+                $str =~ s/${\SGR_ES}/${\PH}/g;
             }
             if ( $self->{binary_filter} && substr( $str, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
                 if ( $self->{binary_filter} == 2 ) {
@@ -688,16 +695,16 @@ sub __cols_to_string {
             }
             if ( $self->{color} ) {
                 if ( defined $tbl_orig->[$row][$col] ) {
-                    my @color = $tbl_orig->[$row][$col] =~ /(\e\[[\d;]*m)/g;
+                    my @color = $tbl_orig->[$row][$col] =~ /(${\SGR_ES})/g;
                     if ( @color ) {
-                        $str =~ s/\x{feff}/shift @color/ge;
+                        $str =~ s/${\PH}/shift @color/ge;
                         $str .= "\e[0m";
                     }
                     #if ( @color ) {
                     #    if ( $color[-1] !~ /^\e\[0?m/ ) {
                     #        push @color, "\e[0m";
                     #    }
-                    #    $str =~ s/\x{feff}/shift @color/ge;
+                    #    $str =~ s/${\PH}/shift @color/ge;
                     #    if ( @color ) {
                     #        $str .= $color[-1];
                     #    }
@@ -741,8 +748,8 @@ sub __print_single_row {
         my $key = $tbl_orig->[0][$col] // $self->{undef};
         my @key_color;
         if ( $self->{color} ) {
-            $key =~ s/\x{feff}//g;
-            $key =~ s/(\e\[[\d;]*m)/push( @key_color, $1 ) && "\x{feff}"/ge;
+            $key =~ s/${\PH}//g;
+            $key =~ s/(${\SGR_ES})/push( @key_color, $1 ) && ${\PH}/ge;
         }
         if ( $self->{binary_filter} && substr( $key, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
             if ( $self->{binary_filter} == 2 ) {
@@ -766,7 +773,7 @@ sub __print_single_row {
             $key = ( ' ' x ( $max_key_w - $key_w ) ) . $key;
         }
         if ( @key_color ) {
-            $key =~ s/\x{feff}/shift @key_color/ge;
+            $key =~ s/${\PH}/shift @key_color/ge;
             $key .= "\e[0m";
         }
         my $value = $tbl_orig->[$row][$col];
@@ -809,14 +816,14 @@ sub __search {
     Term::Form::ReadLine->VERSION(0.544);
     my $term = Term::Form::ReadLine->new();
     my $error_message;
-    my $prompt = '> search-pattern: ';
+    my $prompt = "> \e[4msearch\e[0m: ";
     my $default = '';
 
     READ: while ( 1 ) {
         my $string = $term->readline(
             $prompt,
             { info => $error_message, hide_cursor => 2, clear_screen => defined $error_message ? 1 : 2,
-              default => $default }
+              default => $default, color => 1 }
         );
         if ( ! length $string ) {
             return;
@@ -933,7 +940,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.162
+Version 0.163
 
 =cut
 

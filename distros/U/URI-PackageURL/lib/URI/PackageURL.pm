@@ -13,7 +13,7 @@ use constant PURL_DEBUG => $ENV{PURL_DEBUG};
 
 use overload '""' => 'to_string', fallback => 1;
 
-our $VERSION = '2.10';
+our $VERSION = '2.11';
 our @EXPORT  = qw(encode_purl decode_purl);
 
 my $PURL_REGEXP = qr{^pkg:[A-Za-z\\.\\-\\+][A-Za-z0-9\\.\\-\\+]*/.+};
@@ -367,21 +367,21 @@ URI::PackageURL - Perl extension for Package URL (aka "purl")
     type      => cpan,
     namespace => 'GDT',
     name      => 'URI-PackageURL',
-    version   => '2.10'
+    version   => '2.11'
   );
   
-  say $purl; # pkg:cpan/GDT/URI-PackageURL@2.10
+  say $purl; # pkg:cpan/GDT/URI-PackageURL@2.11
 
   # Parse Package URL string
-  $purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.10');
+  $purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.11');
 
   # exported functions
 
-  $purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.10');
+  $purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.11');
   say $purl->type;  # cpan
 
-  $purl_string = encode_purl(type => cpan, name => 'URI::PackageURL', version => '2.10');
-  say $purl_string; # pkg:cpan/URI::PackageURL@2.10
+  $purl_string = encode_purl(type => cpan, name => 'URI::PackageURL', version => '2.11');
+  say $purl_string; # pkg:cpan/URI::PackageURL@2.11
 
 =head1 DESCRIPTION
 
@@ -497,7 +497,7 @@ Helper method for JSON modules (L<JSON>, L<JSON::PP>, L<JSON::XS>, L<Mojo::JSON>
 
     use Mojo::JSON qw(encode_json);
 
-    say encode_json($purl);  # {"name":"URI-PackageURL","namespace":"GDT","qualifiers":null,"subpath":null,"type":"cpan","version":"2.10"}
+    say encode_json($purl);  # {"name":"URI-PackageURL","namespace":"GDT","qualifiers":null,"subpath":null,"type":"cpan","version":"2.11"}
 
 =item $purl = URI::PackageURL->from_string($purl_string);
 

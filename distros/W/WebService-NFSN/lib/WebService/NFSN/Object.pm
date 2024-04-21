@@ -28,7 +28,7 @@ use WebService::NFSN 0.10 qw(_eval_or_die);
 #=====================================================================
 # Package Global Variables:
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 #=====================================================================
 sub get_converter # ($function)

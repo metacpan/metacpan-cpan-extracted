@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Plack::App::Tags::HTML::VERSION, 0.15, 'Version.');
+is($Plack::App::Tags::HTML::VERSION, 0.16, 'Version.');

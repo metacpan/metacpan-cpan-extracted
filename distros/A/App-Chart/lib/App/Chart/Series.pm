@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011, 2016 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2016, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -457,9 +457,9 @@ sub can {
     #     if (DEBUG) { print "  func $name class $class\n";
     #                  if (eval { Module::Load::load ($class); 1 }) {
     #                    no strict 'refs';
-    #                    say "    loads ok, new() is ", \&{"${class}::new"};
+    #                    print "    loads ok, new() is ", \&{"${class}::new"}, "\n";
     #                  } else {
-    #                    say "    didn't load -- $@";
+    #                    print "    didn't load -- $@\n";
     #                  }
     #                }
 
@@ -657,7 +657,7 @@ L<http://user42.tuxfamily.org/chart/index.html>
 
 =head1 LICENCE
 
-Copyright 2007, 2008, 2009, 2010, 2011, 2016 Kevin Ryde
+Copyright 2007, 2008, 2009, 2010, 2011, 2016, 2024 Kevin Ryde
 
 Chart is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software

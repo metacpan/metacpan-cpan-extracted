@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -606,7 +606,7 @@ sub _do_destroy {
   #   delete $self->{'statusbar'};
   #   delete $self->{'view'};
   #   delete $self->{'symbol_sensitive_actions'};
-  #   if (DEBUG) { say "  keys left: ", join(',', keys %$self); }
+  #   if (DEBUG) { print "  keys left: ", join(',', keys %$self), "\n"; }
   #   %$self = ();
   # print "children ",$self->get_children,"\n";
 
@@ -1032,7 +1032,7 @@ L<http://user42.tuxfamily.org/chart/index.html>
 
 =head1 LICENCE
 
-Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+Copyright 2007, 2008, 2009, 2010, 2011, 2024 Kevin Ryde
 
 Chart is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software

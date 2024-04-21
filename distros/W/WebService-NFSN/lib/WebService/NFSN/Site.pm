@@ -26,7 +26,7 @@ use parent 'WebService::NFSN::Object';
 #=====================================================================
 # Package Global Variables:
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 #=====================================================================
 BEGIN {
@@ -52,9 +52,9 @@ WebService::NFSN::Site - Access NFSN site API
 
 =head1 VERSION
 
-This document describes version 1.03 of
-WebService::NFSN::Site, released April 30, 2014
-as part of WebService-NFSN version 1.03.
+This document describes version 1.04 of
+WebService::NFSN::Site, released April 20, 2024
+as part of WebService-NFSN version 1.04.
 
 =head1 SYNOPSIS
 
@@ -126,7 +126,7 @@ L<< https://github.com/madsen/webservice-nfsn >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Christopher J. Madsen.
+This software is copyright (c) 2024 by Christopher J. Madsen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -17,6 +17,7 @@ if (defined $app) {
 	my $nbf = $app->Frame(-relief => 'groove', -borderwidth => 4);
 	my $adjuster;
 	$nb = $nbf->YANoteBook(
+		-background => 'red',
 		-relief => 'groove',
 		-borderwidth => 4,
 		-autoupdate => 1,
@@ -77,5 +78,6 @@ if (defined $app) {
 );
 
 starttesting;
+
 
 

@@ -1,4 +1,4 @@
-#! /usr/bin/perl
+#! /usr/local/bin/perl
 #---------------------------------------------------------------------
 # nfsn.pl
 # Copyright 2010 Christopher J. Madsen

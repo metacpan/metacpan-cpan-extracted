@@ -5,7 +5,7 @@ use warnings;
 
 use App::CPAN::Get;
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Run.
 exit App::CPAN::Get->new->run;
@@ -24,7 +24,7 @@ __END__
 
 =head1 NAME
 
-cpan-get - Script to fetch module from CPAN archive.
+cpan-get - Tool to fetch module from CPAN archive.
 
 =head1 SYNOPSIS
 
@@ -133,12 +133,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2023 Michal Josef Špaček
+© 2021-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

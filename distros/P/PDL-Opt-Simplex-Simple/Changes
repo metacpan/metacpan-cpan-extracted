@@ -1,5 +1,18 @@
 Revision history for PDL-Opt-Simplex-Simple
 
+2.001	2024-04-20T22:02:43-07:00
+	- bugfix: add workers as a valid option
+	- add parallel worker test
+
+2.0	2024-04-20T21:33:12-07:00
+	- Add support for parallel Simplex and ParticleSwarm workers
+	- Catch SIGINT to  provide the best values so far, and then return as
+	  if the simulation finished (without crashing).
+	- ParticleSwarm: Pre-seed "best" values if initialGuess is provided
+	- Simplex: move tolerance to simplex opts
+	- bugfix: Only clamp or round variables if the variables are enabled
+	- bugfix: Fix an undef dereference of best_minima
+
 1.8	2023-08-16T19:18:42-07:00
 	- Implement the PDL::Opt::ParticleSwarm optimization algorithm to
 	  optimize PDL's.  The function and log callback calling convention is

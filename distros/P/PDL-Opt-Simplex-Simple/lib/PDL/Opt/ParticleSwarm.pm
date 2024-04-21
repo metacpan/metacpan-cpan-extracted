@@ -336,6 +336,17 @@ sub _initParticles
 	$self->_calcNextPos($prtcls);
 	$prtcls->{bestFit} .= $self->_calcPosFit($prtcls->{bestPos});
 
+
+	# Now that bestFit has been calculated, store these as bestBest if no
+	# previous best has yet been calculated.  This is intended to happen
+	# only on the first call to _initParticles() when {initialGuess} is
+	# defined.
+	if (defined($self->{initialGuess}))
+	{
+		$self->{bestBest}    //= $prtcls->{bestFit}->slice(':', 0)->clump(-1)->sclr;
+		$self->{bestBestPos} //= $prtcls->{bestPos}->slice(':', 0)->copy;
+	}
+
 	return $prtcls;
 }
 
@@ -835,9 +846,6 @@ velocity is set to 0 on initalization.
 A range based on 1/100th of -I<-posMax> - I<-posMin> is used for the initial
 speed in each dimension of the velocity vector if a random start velocity is
 used.
-
-This can be a PDL object, so it should work in any dimension so long as it
-works in the broadcast sense.
 
 =item I<-stallSpeed>: positive number, optional
 

@@ -1,5 +1,5 @@
 ---
-abstract: 'Base class and script for getting of dist from CPAN.'
+abstract: 'Tool to fetch module from CPAN archive.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
@@ -9,6 +9,7 @@ build_requires:
   File::Object: 0
   File::Spec::Functions: 0
   Test::LWP::UserAgent: 0
+  Test::MockObject: 0
   Test::More: 0
   Test::NoWarnings: 0
   Test::Output: 0
@@ -30,18 +31,20 @@ no_index:
     - xt
 requires:
   Class::Utils: 0
+  Cpanel::JSON::XS: 0
+  English: 0
   Error::Pure: 0
   Exporter: 0
   Getopt::Std: 0
   IO::Barf: 0
   LWP::UserAgent: 0
-  Menlo::Index::MetaCPAN: 0
   Readonly: 0
-  URI::cpan: 0
+  Scalar::Util: 0
+  URI: 0
   perl: 5.6.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/App-CPAN-Get/issues
   homepage: https://github.com/michal-josef-spacek/App-CPAN-Get
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-CPAN-Get
-version: '0.09'
+version: '0.10'

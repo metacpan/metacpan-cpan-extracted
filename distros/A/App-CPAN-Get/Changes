@@ -1,3 +1,11 @@
+0.10 2024-04-20T14:51:38+02:00
+ - Add tests for App::CPAN::Get::MetaCPAN.
+ - Improve abstract.
+ - Improve check for LWP::UserAgent.
+ - Improve constructor tests of App::CPAN::Get.
+ - Rewrite from Menlo::Index::MetaCPAN to own implementation.
+ - Update copyright years.
+
 0.09 2023-11-25T16:02:35+01:00
  - Rename example files to better names.
  - Update Module::Install to 1.21 version.

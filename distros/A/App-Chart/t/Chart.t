@@ -28,7 +28,7 @@ BEGIN { MyTestHelpers::nowarnings() }
 require App::Chart;
 
 
-my $want_version = 272;
+my $want_version = 273;
 is ($App::Chart::VERSION, $want_version, 'VERSION variable');
 is (App::Chart->VERSION,  $want_version, 'VERSION class method');
 { ok (eval { App::Chart->VERSION($want_version); 1 },

@@ -7,7 +7,7 @@ use warnings;
 use CSS::Struct::Output::Raw;
 use Encode qw(encode);
 use Error::Pure qw(err);
-use Plack::Util::Accessor qw(author content_type css css_init encoding
+use Plack::Util::Accessor qw(author content_type css css_init css_src encoding
 	favicon flag_begin flag_end generator psgi_app script_js script_js_src
 	status_code title tags);
 use Scalar::Util qw(blessed);
@@ -15,13 +15,33 @@ use Tags::HTML::Page::Begin;
 use Tags::HTML::Page::End;
 use Tags::Output::Raw;
 
-our $VERSION = 0.15;
+our $VERSION = 0.17;
 
 sub call {
 	my ($self, $env) = @_;
 
 	# Process actions.
 	$self->_process_actions($env);
+
+	if ($self->flag_begin) {
+		$self->{'_page_begin'} = Tags::HTML::Page::Begin->new(
+			'author' => $self->author,
+			'css' => $self->css,
+			defined $self->css_init ? (
+				'css_init' => $self->css_init,
+			) : (),
+			'css_src' => $self->css_src,
+			'charset' => $self->encoding,
+			'favicon' => $self->favicon,
+			'generator' => $self->generator,
+			'lang' => {
+				'title' => $self->title,
+			},
+			'script_js' => $self->script_js,
+			'script_js_src' => $self->script_js_src,
+			'tags' => $self->tags,
+		);
+	}
 
 	# PSGI application.
 	if ($self->psgi_app) {
@@ -119,31 +139,16 @@ sub _prepare_app {
 		$self->flag_end(1);
 	}
 
+	if (! defined $self->css_src) {
+		$self->css_src([]);
+	}
+
 	if (! defined $self->script_js) {
 		$self->script_js([]);
 	}
 
 	if (! defined $self->script_js_src) {
 		$self->script_js_src([]);
-	}
-
-	if ($self->flag_begin) {
-		$self->{'_page_begin'} = Tags::HTML::Page::Begin->new(
-			'author' => $self->author,
-			'css' => $self->css,
-			defined $self->css_init ? (
-				'css_init' => $self->css_init,
-			) : (),
-			'charset' => $self->encoding,
-			'favicon' => $self->favicon,
-			'generator' => $self->generator,
-			'lang' => {
-				'title' => $self->title,
-			},
-			'script_js' => $self->script_js,
-			'script_js_src' => $self->script_js_src,
-			'tags' => $self->tags,
-		);
 	}
 
 	return;
@@ -312,11 +317,6 @@ Default value is [].
 HTTP status code.
 Default value is 200.
 
-=head2 C<title>
-
-Title of page.
-Default value is undef.
-
 =head2 C<tags>
 
 Tags::Output object.
@@ -324,9 +324,14 @@ Default value is
 
  Tags::Output::Raw->new(
          'xml' => 1,
-         'no_simple' => ['textarea'],
-         'preserved' => ['pre'],
- ));
+         'no_simple' => ['script', 'textarea'],
+         'preserved' => ['pre', 'style'],
+ );
+
+=head2 C<title>
+
+Title of page.
+Default value is undef.
 
 =head1 METHODS TO OVERWRITE
 
@@ -496,6 +501,7 @@ Call C<_prepare_app()>.
 
 L<CSS::Struct::Output::Raw>,
 L<Encode>,
+L<Error::Pure>,
 L<Plack::Component>,
 L<Plack::Util::Accessor>,
 L<Scalar::Util>,
@@ -525,12 +531,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2023 Michal Josef Špaček
+© 2020-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.15
+0.17
 
 =cut

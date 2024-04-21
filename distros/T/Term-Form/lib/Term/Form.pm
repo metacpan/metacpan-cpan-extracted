@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.555';
+our $VERSION = '0.556';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form );
 
@@ -62,7 +62,7 @@ sub _valid_options {
         page               => '[ 0 1 2 ]',         # undocumented
         keep               => '[ 1-9 ][ 0-9 ]*',   # undocumented
         read_only          => 'Array_Int',
-        skip_items         => 'Regexp',            # undocumented
+        skip_items         => 'Regexp',
                                                    # only keys are checked, passed values are ignored
                                                    # it's up to the user to remove the skipped items from the returned array
         back               => 'Str',
@@ -152,8 +152,8 @@ sub __get_list {
         for my $entry ( @$orig_list ) {
             my ( $key, $value ) = @$entry;
             my @color;
-            $key =~ s/\x{feff}//g;
-            $key =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
+            $key =~ s/${\PH}//g;
+            $key =~ s/(${\SGR_ES})/push( @color, $1 ) && ${\PH}/ge;
             $self->{i}{key_colors}[$count++] = [ @color ];
             push @$list, [ $self->__sanitized_string( $key ), $value ];
         }
@@ -632,7 +632,7 @@ sub __prepare_skip_row {
     my $row = $self->{i}{keys}[$idx] . $self->{i}{seps}[$idx] . $val;
     if ( exists $self->{i}{key_colors} && @{$self->{i}{key_colors}[$idx]} ) {
         my @key_colors = @{$self->{i}{key_colors}[$idx]};
-        $row =~ s/\x{feff}/shift @key_colors/ge;
+        $row =~ s/${\PH}/shift @key_colors/ge;
         $row .= normal();
     }
     return $row;
@@ -664,7 +664,7 @@ sub __get_row {
     }
     if ( exists $self->{i}{key_colors} && @{$self->{i}{key_colors}[$idx]} ) {
         my @key_colors = @{$self->{i}{key_colors}[$idx]};
-        $self->{i}{keys}[$idx] =~ s/\x{feff}/shift @key_colors/ge;
+        $self->{i}{keys}[$idx] =~ s/${\PH}/shift @key_colors/ge;
         $self->{i}{keys}[$idx] .= normal();
     }
     if ( defined $list->[$idx][1] ) {
@@ -759,15 +759,15 @@ sub __prepare_meta_menu_elements {
         my @color;
         my $tmp = $self->{i}{$meta_menu_element . '_orig'};
         if ( $self->{color} ) {
-            $tmp =~ s/\x{feff}//g;
-            $tmp =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
+            $tmp =~ s/${\PH}//g;
+            $tmp =~ s/(${\SGR_ES})/push( @color, $1 ) && ${\PH}/ge;
         }
         $tmp = $self->__sanitized_string( $tmp );
         if ( print_columns( $tmp ) > $term_w ) {
             $tmp = cut_to_printwidth( $tmp, $term_w, 0 );
         }
         if ( @color ) {
-            $tmp =~ s/\x{feff}/shift @color/ge;
+            $tmp =~ s/${\PH}/shift @color/ge;
             $tmp .= normal();
         }
         $self->{$meta_menu_element} = $tmp;
@@ -1161,7 +1161,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.555
+Version 0.556
 
 =cut
 
@@ -1191,6 +1191,9 @@ Version 0.555
 =head1 DESCRIPTION
 
 C<fill_form> reads a list of lines from STDIN.
+
+To close the form and get the modified list (reference to an array of arrays) as a return value, select the
+I<confirm> menu item. If the I<back> menu item is chosen instead to close the form, C<fill_form> returns nothing.
 
 The output is removed after leaving the method, so the user can decide what remains on the screen.
 
@@ -1343,8 +1346,12 @@ Expected value: a reference to an array with the indexes of the rows which shoul
 
 default: empty array
 
-To close the form and get the modified list (reference to an array or arrays) as the return value select the
-"confirm" menu entry. If the "back" menu entry is chosen to close the form, C<fill_form> returns nothing.
+=head3 skip_items
+
+When navigating the form, lines whose key string matches the regex pattern passed with this option will be skipped.
+Passed values are ignored. It's up to the user to remove these elements from the returned array.
+
+The expected value is a regex quoted with the C<qr> operator.
 
 =head1 REQUIREMENTS
 

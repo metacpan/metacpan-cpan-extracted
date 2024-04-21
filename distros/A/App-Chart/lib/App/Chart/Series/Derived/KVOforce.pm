@@ -1,4 +1,4 @@
-# Copyright 2006, 2007, 2009 Kevin Ryde
+# Copyright 2006, 2007, 2009, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -53,7 +53,7 @@ use constant
 
 sub new {
   my ($class, $parent) = @_;
-  if (DEBUG) { say "KVOforce new"; }
+  if (DEBUG) { print "KVOforce new\n"; }
 
   return $class->SUPER::new
     (parent     => $parent,
@@ -103,7 +103,7 @@ sub proc {
 sub warmup_count_for_position {
   my ($self, $lo) = @_;
   if (DEBUG) {
-    say "KVOforce warmup_count_for_position $lo, parent=$self->{'parent'}"; }
+    print "KVOforce warmup_count_for_position $lo, parent=$self->{'parent'}\n"; }
 
   my $parent = $self->{'parent'};
   my $p = $parent->values_array;
@@ -139,7 +139,7 @@ sub warmup_count_for_position {
   # then one further close for the $prev_dm for $cm=$dm+$prev_dm
   $lo = $parent->find_before ($lo, 1);
 
-  if (DEBUG) { say "KVOforce warmup_count_for_position for $lo==@{[$self->timebase->to_iso($lo)]} is @{[$lo-$i]}"; }
+  if (DEBUG) { print "KVOforce warmup_count_for_position for $lo==@{[$self->timebase->to_iso($lo)]} is @{[$lo-$i]}\n"; }
   return $lo - $i;
 }
 

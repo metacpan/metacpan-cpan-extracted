@@ -35,7 +35,15 @@ sub new
 {
 	my ($class, %args) = @_;
 
-	$args{max_iter} = $args{opts}{-iterations};
+	if (defined($args{max_iter}) && defined($args{opts}{-iterations}) && $args{max_iter} != $args{opts}{-iterations})
+	{
+		die "You defined both {max_iter} and {opts}{-iterations}, but they differ: $args{max_iter} != $args{opts}{-iterations}";
+	}
+
+	# One will get the other:
+	$args{max_iter} //= $args{opts}{-iterations};
+	$args{opts}{-iterations} //= $args{max_iter};
+
 	return PDL::Opt::Simplex::Simple::new($class, %args);
 }
 

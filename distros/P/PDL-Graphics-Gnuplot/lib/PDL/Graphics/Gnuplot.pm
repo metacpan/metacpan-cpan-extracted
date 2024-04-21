@@ -2053,7 +2053,7 @@ our $echo_eating = 0;                             # Older versions of gnuplot on
 our $debug_echo = 0;                              # If set, mock up Losedows half-duplex pipes
 
 
-our $VERSION = '2.025';
+our $VERSION = '2.026';
 $VERSION = eval $VERSION;
 
 our $gp_version = undef;    # eventually gets the extracted gnuplot(1) version number.
@@ -5211,7 +5211,7 @@ our $cOptionsTable = {
 		   ],
     'using'    => ['l','cl',undef,6],        # using clauses in order (straight passthrough)
 # legend is a special case -- it gets parsed as a list but emitted as a quoted scalar.
-    'legend'   => ['l', sub { if(defined($_[1]) and defined $_[1][0]) {return "title \"$_[1][0]\"";} else {return "notitle"}},
+    'legend'   => ['ln', sub { if(defined($_[1]) and defined $_[1][0]) {return "title \"$_[1][0]\"";} else {return "notitle"}},
 		   undef, 7],
     'axes'     => [['(x[12])(y[12])'],'cs',undef,8],
     'smooth'   => ['s','cs',undef,8.1],
@@ -5562,74 +5562,64 @@ our $footicsAbbrevs = _gen_abbrev_list(qw/axis border mirror in out scale rotate
 
 $_pOHInputs = {
     ## Simple cases - boolean, number, scalar
-    'b' => sub { ( (defined $_[1]) ? ($_[1] ? 1 : 0) : undef ); },
-    'n' => sub { ( (defined $_[1]) ? ($_[1] + 0)     : undef ); },
-    's' => sub { ( (defined $_[1]) ? "$_[1]"         : undef ); },
+    b => sub {return $_[1] if !defined $_[1]; $_[1] ? 1 : 0 },
+    n => sub {return $_[1] if !defined $_[1]; $_[1] + 0 },
+    s => sub {return $_[1] if !defined $_[1]; "$_[1]" },
 
     ## one-line list (can also be boolean)
-    'l' => sub { return undef unless(defined $_[1]);
-		 return "" unless(length($_[1]));                                 # false value yields false
-		 return [$_[1]] if( (!ref($_[1])) && "$_[1]" =~ m/^\s*\-?\d+\s*$/); # nonzero integers yield true
-		 # Not setting a boolean value - it's a list (or a trivial list).
-		 return $_[1] if ref $_[1] eq 'ARRAY';
-		 # anything that's not an array ref (and not a number) gets put in the array
-		 return [$_[1]];
+    l => sub { return $_[1] if !defined $_[1] or !length $_[1] or ref $_[1] eq 'ARRAY';
+	       return $_[1] if !ref($_[1]) && "$_[1]" =~ m/^\s*\-?\d+\s*$/; # nonzero integers yield true
+	       # Not setting a boolean value - it's a list (or a trivial list).
+	       # anything that's not an array ref (and not a number) gets put in the array
+	       return [$_[1]];
     },
 
     ## one-line list (no booleanity: scalars always get copied to the list)
-    'ln' => sub { return undef unless(defined $_[1]);
-		  return "" unless(length($_[1]));
-		  return [$_[1]] unless(ref($_[1]) eq 'ARRAY');
-		  return $_[1];
+    ln => sub { return $_[1] if !defined $_[1] or !length $_[1] or ref $_[1] eq 'ARRAY';
+                return [$_[1]];
     },
 
     ## one-line list (can also be boolean or hash)
-    'lh' => sub { return undef unless(defined $_[1]);
-		 return "" unless(length($_[1]));                                 # false value yields false
-		 return $_[1] if( (!ref($_[1])) && "$_[1]" =~ m/^\s*\-?\d+\s*$/); # nonzero integers yield true
+    lh => sub { return $_[1] if !defined $_[1] or !length $_[1]
+                  or ref $_[1] eq 'ARRAY' or ref $_[1] eq 'HASH'
+                  or ((!ref($_[1])) && "$_[1]" =~ m/^\s*\-?\d+\s*$/); # nonzero integers yield true
 		 # Not setting a boolean value - it's a list (or a trivial list).
-		 return $_[1] if ref $_[1] eq 'ARRAY' or ref $_[1] eq 'HASH';
 		 return [$_[1]];
-                },
+    },
 
     ## list or 2-PDL for a range parameter
-    'lr' => sub { return undef unless(defined $_[1]);
-		 return "" unless(length($_[1]));                                 # false value yields false
-		 return $_[1] if( (!ref($_[1])) && "$_[1]" =~ m/^\s*\-?\d+\s*$/); # nonzero integers yield true
-		 # Not setting a boolean value - it's a list (or a trivial list).
-		 return $_[1] if ref $_[1] eq 'ARRAY';
+    lr => sub { return $_[1] if !defined $_[1] or !length $_[1]
+                  or ((!ref($_[1])) && "$_[1]" =~ m/^\s*\-?\d+\s*$/) # nonzero integers yield true
+                  # Not setting a boolean value - it's a list (or a trivial list).
+                  or ref $_[1] eq 'ARRAY';
 		 return [$_[1]] if !$_[1]->$_isa('PDL');
 		 barf "PDL::Graphics::Gnuplot: range parser found a PDL, but it wasn't a 2-PDL (max,min)"
 		     unless( $_[1]->dims==1 and $_[1]->nelem==2 );
 		 return [$_[1]->list];
-                },
+    },
 
     ## cumulative list (delete on "undef")
-    'C' => sub { return undef unless(defined $_[1]);
+    C => sub { return $_[1] if !defined $_[1];
 		 return 0 unless($_[1]);                             # false value yields false
 		 return 1 if( $_[1] && "$_[1]" =~ m/^\s*-?\d+\s*$/); # nonzero integers yield true
 		 # Not setting a boolean value - it's a list, so append it.
 		 my $out = (ref $_[0] eq 'ARRAY') ? $_[0] : [];
 		 push @$out, ref $_[1] eq 'ARRAY' ? $_[1] : [ split ( /\s+/, $_[1] ) ];
 		 return $out;
-                },
+    },
 
     ## set hash values
-    'H' => sub { return undef unless(defined $_[1]);
+    H => sub { return $_[1] if !defined $_[1];
 		 my $out = (ref $_[0] eq 'HASH') ? $_[0] : {};
 		 my $in = $_[1];
-		 return undef unless defined($in);
-		 if(ref($in) eq 'ARRAY') {
-		     my %h = (@$in);
-		     $in = \%h;
-		 }
-		 if(ref($in) eq 'HASH') {
-		     for my $k(keys %{$_[1]}) {
+		 $in = {@$in} if ref $in eq 'ARRAY';
+		 if (ref($in) eq 'HASH') {
+		     for my $k (keys %{$_[1]}) {
 			 $out->{$k} = $_[1]->{$k};
 		     }
 		 } else {
 		     # scalar or <mumble>...
-		     if( $in =~ m/([^\s]+)\s+(.*)$/ ) {
+		     if ( $in =~ m/([^\s]+)\s+(.*)$/ ) {
 			 # key/value found
 			 $out->{$1} = $2;
 		     } else {
@@ -5640,12 +5630,12 @@ $_pOHInputs = {
 		     }
 		 }
 		 return $out;
-                },
+    },
 
     ## number-indexed list
     ##
-    'N' => sub { my($old,$new,$h) = @_;
-		 return undef unless(defined $new);
+    N => sub { my($old,$new,$h) = @_;
+		 return $_[1] if !defined $_[1];
 		 my $out = (ref($old) eq 'ARRAY') ? $old : [];
 
                  # Split strings into lists if necessary.
@@ -5680,71 +5670,50 @@ $_pOHInputs = {
 
     ## <foo>tics option list
     ## (For valid hash keys, see footicsAbbrevs definition above)
-    'lt' => sub { my($old, $new, $h, $fieldname) = @_;
-		  return undef unless(defined($new));
+    lt => sub { my($old, $new, $h, $fieldname) = @_;
+		  return $_[1] if !defined $_[1];
 		  return 0 unless($new);
-		  if (!ref($new) or ref($new) eq 'ARRAY') {
-		      my @list;
-
-		      if(!ref($new)) {
-			  $new =~ s/^\s+//;
-			  $new =~ s/\s+$//;
-			  @list = split /\s*[\s\,]\s*/,$new;
-		      } else {
-			  @list = @$new;
-		      }
-
-		      # We don't fully parse gnuplot lines -- but we do
-		      # check for the simple numeric case -- if it's correct,
-		      # turn the array ref into a hash for future manipulability.
-		      if( @list == 0 ) {
-			  return {};
-		      } elsif(@list > 3) {
-			  carp "Warning - explicit string or array refs are deprecated in tic specs\n";
-			  return [@list];
-		      }
-		      my $num_ok = 0;
-		      for my $i(0..$#list) {
-			  $num_ok++ if($list[$i] =~ s/^(\-?\d+(\.\d*)?([eE][\+\-]?\d+)?)(\s*\,\s*)?$/$1/);
-		      }
-		      if($num_ok == @list) {
-			  # Hashify the form if possible
-			  return {locations=>\@list};
-		      } else {
-			  carp "Warning - explicit list or string gnuplot commands are deprecated in tic specs\n";
-			  return \@list;
-		      }
-		      barf "This can't happen!";
-		  } elsif ( ref($new) eq 'HASH' ) {
+		  if ( ref($new) eq 'HASH' ) {
 		      my %h = ();
 		      for my $k(keys %$new) {
 			  my $k2 = _expand_abbrev($k, $footicsAbbrevs, "<foo>tics option");
-			  if(exists($h{$k2})) {
-			      barf("Error: '$k' expanded to '$k2', which already exists in <foo>tics option");
-			  }
+			  barf "Error: '$k' expanded to '$k2', which already exists in <foo>tics option"
+			    if exists $h{$k2};
 			  $h{$k2} = $new->{$k};
 		      }
 		      return \%h;
-		  } else {
-		      barf("Error: <foo>tics options require a scalar or a hash ref");
 		  }
+		  barf "Error: <foo>tics options require a scalar or a hash ref"
+		    if ref($new) and ref($new) ne 'ARRAY';
+		  my @list = ref($new) ? @$new : map { s/^\s+//; s/\s+$//; split /\s*[\s\,]\s*/ } $new;
+		  return {} if !@list;
+		  # We don't fully parse gnuplot lines -- but we do
+		  # check for the simple numeric case -- if it's correct,
+		  # turn the array ref into a hash for future manipulability.
+		  if(@list > 3) {
+		      carp "Warning - explicit string or array refs are deprecated in tic specs\n";
+		      return [@list];
+		  }
+		  my $num_ok = 0;
+		  for my $i(0..$#list) {
+		      $num_ok++ if($list[$i] =~ s/^(\-?\d+(\.\d*)?([eE][\+\-]?\d+)?)(\s*\,\s*)?$/$1/);
+		  }
+		  return {locations=>\@list} if $num_ok == @list; # Hashify if possible
+		  carp "Warning - explicit list or string gnuplot commands are deprecated in tic specs\n";
+		  return \@list;
     },
 
     ## dashtype option
-    'dt' => sub { my($old, $new, $h, $fieldname) = @_;
+    dt => sub { my($old, $new, $h, $fieldname) = @_;
 		  if($gp_version < 5.0) {
 		      carp "WARNING: 'dashtype' is not supported by your <5.0 gnuplot.  Ignoring...\n";
 		      return $old;
 		  }
-		  if(ref $new  and   ref $new ne 'ARRAY') {
-		      barf "Error:  dashtype curve option requires a scalar or an array ref";
-		  }
+		  barf "Error: dashtype curve option requires a scalar or an array ref"
+                    if ref $new and ref $new ne 'ARRAY';
 		  return $new;
-    }
-
+    },
 };
-
-
 
 
 ##############################

@@ -2,9 +2,10 @@ use strict;
 use warnings;
 
 use Data::Image;
+use DateTime;
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 7;
 use Test::NoWarnings;
 
 # Test.
@@ -13,11 +14,29 @@ isa_ok($obj, 'Data::Image');
 
 # Test.
 $obj = Data::Image->new(
-	'comment' => 'Michal from Czechia',
-	'id' => 1,
-	'url' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg',
+        'author' => 'Zuzana Zonova',
+        'comment' => 'Michal from Czechia',
+        'dt_created' => DateTime->new(
+                'day' => 1,
+                'month' => 1,
+                'year' => 2022,
+        ),
+        'height' => 2730,
+        'size' => 1040304,
+        'url' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg',
+        'width' => 4096,
 );
 isa_ok($obj, 'Data::Image');
+
+# Test.
+eval {
+	Data::Image->new(
+		'author' => 'x' x 256,
+	);
+};
+is($EVAL_ERROR, "Parameter 'author' has length greater than '255'.\n",
+	"Parameter 'author' has length greater than '255'.");
+clean();
 
 # Test.
 eval {
@@ -37,4 +56,14 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'url' has length greater than '255'.\n",
 	"Parameter 'url' has length greater than '255'.");
+clean();
+
+# Test.
+eval {
+	Data::Image->new(
+		'url' => 'urn:isbn:0451450523',
+	);
+};
+is($EVAL_ERROR, "Parameter 'url' doesn't contain valid location.\n",
+	"Parameter 'url' doesn't contain valid location (urn:isbn:0451450523).");
 clean();

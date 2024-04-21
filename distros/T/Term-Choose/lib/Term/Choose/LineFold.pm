@@ -4,11 +4,13 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.763';
+our $VERSION = '1.764';
 
 use Exporter qw( import );
 
 our @EXPORT_OK = qw( line_fold print_columns cut_to_printwidth );
+
+use Term::Choose::Constants qw( PH SGR_ES );
 
 
 BEGIN {
@@ -115,8 +117,8 @@ sub line_fold {
     }
     my @color;
     if ( $opt->{color} ) {
-        $str =~ s/\x{feff}//g;
-        $str =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
+        $str =~ s/${\PH}//g;
+        $str =~ s/(${\SGR_ES})/push( @color, $1 ) && ${\PH}/ge;
     }
     if ( $opt->{binary_filter} && substr( $str, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
         #$str = $self->{binary_filter} == 2 ? sprintf("%v02X", $_[0]) =~ tr/./ /r : 'BNRY';  # perl 5.14
@@ -185,12 +187,12 @@ sub line_fold {
                 if ( $last_color ) {
                     $paragraph = $last_color . $paragraph;
                 }
-                my $count = () = $paragraph =~ /\x{feff}/g;
+                my $count = () = $paragraph =~ /${\PH}/g;
                 if ( $count ) {
                     $last_color = $color[$count - 1];
                 }
             }
-            $paragraph =~ s/\x{feff}/shift @color/ge;
+            $paragraph =~ s/${\PH}/shift @color/ge;
             if ( ! @color ) {
                 last;
             }

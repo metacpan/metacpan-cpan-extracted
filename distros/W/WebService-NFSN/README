@@ -1,4 +1,4 @@
-WebService-NFSN version 1.03, released April 30, 2014
+WebService-NFSN version 1.04, released April 20, 2024
 
 
 WebService::NFSN is a client library for NearlyFreeSpeech.NET's member
@@ -42,17 +42,17 @@ Also, some of the example scripts use Data::Dumper to display the results.
 
 
 CHANGES
-    Here's what's new in version 1.03 of WebService-NFSN:
+    Here's what's new in version 1.04 of WebService-NFSN:
     (See the file "Changes" for the full revision history.)
 
-	- Don't use NFSN's internal CA certificate
-	  The API server now uses a Thawte certificate instead.
+	- Added the sync property to DNS objects
+	- Use FindBin to locate inc::My_Build in Build.PL
 
 
 
 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2014 by Christopher J. Madsen.
+This software is copyright (c) 2024 by Christopher J. Madsen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

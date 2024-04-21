@@ -20,6 +20,6 @@ lib/WebService/NFSN/Site.pm
 t/00-all_prereqs.t
 t/00-load.t
 t/10-credentials.t
+xt/author/pod-syntax.t
 xt/release/perlcritic.t
 xt/release/pod-coverage.t
-xt/release/pod-syntax.t

@@ -53,18 +53,18 @@ purl-tool - Package URL tool
 
     Parse the given Package URL string and return JSON and send the STDOUT to jq:
 
-        purl-tool pkg:cpan/GDT/URI-PackageURL@2.10 --json | jq
+        purl-tool pkg:cpan/GDT/URI-PackageURL@2.11 --json | jq
 
     Download the package from the repository using Package URL string:
 
-        wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.10 --download-url)
+        wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.11 --download-url)
 
     Create a canonical Package URL string
 
         purl-tool --type cpan \
                   --namespace GDT \
                   --name URI-PackageURL \
-                  --version 2.10
+                  --version 2.11
 
 
 =head1 DESCRIPTION
@@ -75,18 +75,18 @@ C<purl-tool> Package URL tool
 
 Parse the given Package URL string and return JSON and send the STDOUT to L<jq>:
 
-    purl-tool pkg:cpan/GDT/URI-PackageURL@2.10 --json | jq
+    purl-tool pkg:cpan/GDT/URI-PackageURL@2.11 --json | jq
 
 Download the package from the repository using Package URL string:
 
-    wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.10 --download-url)
+    wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.11 --download-url)
 
 Create a canonical Package URL string:
 
     purl-tool --type cpan \
               --namespace GDT \
               --name URI-PackageURL \
-              --version 2.10
+              --version 2.11
 
 =head1 AUTHOR
 
