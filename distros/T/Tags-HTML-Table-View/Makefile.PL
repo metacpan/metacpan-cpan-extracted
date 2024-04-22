@@ -34,7 +34,7 @@ test_requires 'Tags::Output::Structure' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.05';
+version '0.06';
 
 # Run.
 WriteAll();

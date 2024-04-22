@@ -73,9 +73,9 @@ close   $fh;
 my @pack = ([qw(plplot.pd PLplot PDL::Graphics::PLplot), undef, 1]);
 
 my %hash = pdlpp_stdargs(@pack);
-$hash{'PREREQ_PM'} = { PDL => 0 };
+$hash{PREREQ_PM} = { PDL => 0 };
 $hash{CONFIGURE_REQUIRES} = {
-  'PDL::Core::Dev' => 0,
+  'PDL' => '2.083', # output OtherPars
   'Devel::CheckLib' => 0,
   'Alien::PLplot' => 0,
 };
@@ -83,10 +83,10 @@ $hash{CONFIGURE_REQUIRES} = {
 $hash{TEST_REQUIRES} = {
   'Test::More' => '0.88', # done_testing
 };
-$hash{'VERSION_FROM'}   = 'plplot.pd';
+$hash{VERSION_FROM}   = 'plplot.pd';
 $hash{OBJECT} .= ' callback$(OBJ_EXT)';
-$hash{'LIBS'}      = [$libs];
-$hash{'INC'}      .= " $plplot_include_path";
+$hash{LIBS}      = [$libs];
+$hash{INC}      .= " $plplot_include_path";
 $hash{clean}{FILES} .= ' *svg.* *.xfig temp* OPTIONS!';
 $hash{META_MERGE} = {
   "meta-spec" => { version => 2 },
@@ -100,6 +100,7 @@ $hash{META_MERGE} = {
     x_IRC => 'irc://irc.perl.org/#pdl',
   },
 };
+$hash{PM}{'Demo.pm'} = '$(INST_LIB)/PDL/Demos/PLplot.pm';
 
 my $postamble = pdlpp_postamble(@pack);
 

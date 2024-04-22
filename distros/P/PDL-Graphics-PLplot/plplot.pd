@@ -9,7 +9,7 @@ use Carp qw(confess);
 
 our $VERSION;
 BEGIN {
-$VERSION = '0.83';
+$VERSION = '0.84';
 };
 
 =head1 NAME
@@ -2311,6 +2311,12 @@ pp_addhdr(<<'EOH');
 #define PDL PDL_Graphics_PLplot
 Core* PDL = NULL; PDL_COMMENT("Structure hold core C functions")
 #endif
+
+#define PLPTR_DEFINE(t) typedef t *t ## Ptr; typedef t *t ## Ptr__OUT;
+PLPTR_DEFINE(PLcGrid)
+PLPTR_DEFINE(PLcGrid2)
+#define PLPTR_RECEIVE_IN(t, v, v_in) t *v = (t *)v_in;
+#define PLPTR_RECEIVE_SV(v) ((PLPointer) (SvROK(v) ? SvIV((SV*)SvRV(v)) : (IV)NULL))
 EOH
 
 # The create_low_level_constants function is used to make the #define'd
@@ -3694,7 +3700,7 @@ pp_def ('plParseOpts',
                 newargc = argc = av_len (arr) + 1;
                 if (argc > 0) {
                   Newx(args, argc, char *);
-                  if(args == NULL) croak("Failed to allocate memory in plParseOpts");
+                  if(args == NULL) $CROAK("Failed to allocate memory in plParseOpts");
 
                   for (i = 0; i < argc; i++) {
                           STRLEN len;
@@ -3847,55 +3853,46 @@ pp_def ('plrandd',
 # pltr1: Linear interpolation from singly dimensioned coord arrays
 # Linear interpolation from doubly dimensioned coord arrays
 
-for my $func ('pltr0', 'pltr1', 'pltr2') {
-
+for my $t ([qw(pltr0 SV*)], [qw(pltr1 PLcGridPtr)], [qw(pltr2 PLcGrid2Ptr)]) {
+  my ($func, $type) = @$t;
   pp_addxs (<<"EOC");
 void
-$func (x, y, grid)
+$func(x, y, grid)
   double x
   double y
-  long grid
+  $type grid
 PPCODE:
   PLFLT tx, ty;
-
-  $func (x, y, &tx, &ty, (PLPointer) grid);
-
+  $func(x, y, &tx, &ty, (PLPointer) grid);
   EXTEND (SP, 2);
-  PUSHs (sv_2mortal (newSVnv ((double) tx)));
-  PUSHs (sv_2mortal (newSVnv ((double) ty)));
+  PUSHs(sv_2mortal(newSVnv((double) tx)));
+  PUSHs(sv_2mortal(newSVnv((double) ty)));
 EOC
-
-  pp_add_exported ($func);
+  pp_add_exported($func);
 }
 
 pp_def ('plAllocGrid',
         NoPthread => 1,
-        Pars => 'double xg(nx); double yg(ny); indx [o] grid()',
+        Pars => 'double xg(nx); double yg(ny)',
+        OtherPars => '[o] PLcGridPtr__OUT grid',
         GenericTypes => [D],
         Doc => 'Allocates a PLcGrid object for use in pltr1',
         Code => '
           PLcGrid *grid;
-          int i, nx, ny;
-
-          nx = $SIZE(nx);
-          ny = $SIZE(ny);
-
+          int i, nx = $SIZE(nx), ny = $SIZE(ny);
           Newx(grid, 1, PLcGrid);
-          if(grid == NULL) croak("Failed to allocate memory for grid");
+          if(grid == NULL) $CROAK("Failed to allocate memory for grid");
           Newxz(grid->xg, nx, PLFLT);
-          if(grid->xg == NULL) croak("Failed to allocate memory for grid->xg");
+          if(grid->xg == NULL) $CROAK("Failed to allocate memory for grid->xg");
           Newxz(grid->yg, ny, PLFLT);
-          if(grid->yg == NULL) croak("Failed to allocate memory for grid->yg");
+          if(grid->yg == NULL) $CROAK("Failed to allocate memory for grid->yg");
           grid->nx = nx;
           grid->ny = ny;
-
           for (i = 0; i < nx; i++)
             grid->xg[i] = $xg(nx => i);
-
           for (i = 0; i < ny; i++)
             grid->yg[i] = $yg(ny => i);
-
-          $grid() = (IV) grid;'
+          $COMP(grid) = (PLcGridPtr__OUT)grid;'
         );
 
 
@@ -3904,42 +3901,36 @@ pp_def ('plAllocGrid',
 pp_addxs (<<"EOC");
 void
 plFreeGrid (pg)
-  long pg
+  PLcGridPtr pg
 PPCODE:
-  PLcGrid* grid = (PLcGrid*) pg;
-  free (grid->xg);
-  free (grid->yg);
-  free (grid);
+  PLPTR_RECEIVE_IN(PLcGrid, grid, pg)
+  Safefree(grid->xg);
+  Safefree(grid->yg);
+  Safefree(grid);
 EOC
 
 pp_add_exported (plFreeGrid);
 
 pp_def ('plAlloc2dGrid',
         NoPthread => 1,
-        Pars => 'double xg(nx,ny); double yg(nx,ny); indx [o] grid()',
+        Pars => 'double xg(nx,ny); double yg(nx,ny)',
+        OtherPars => '[o] PLcGrid2Ptr__OUT grid',
         GenericTypes => [D],
         Doc => 'Allocates a PLcGrid2 object for use in pltr2',
         Code => '
-          PLcGrid2 *grid;
-          int i, j, nx, ny;
-
-          nx = $SIZE(nx);
-          ny = $SIZE(ny);
-
-          grid = (PLcGrid2*) malloc (sizeof (PLcGrid2));
-          plAlloc2dGrid (&(grid->xg), nx, ny);
-          plAlloc2dGrid (&(grid->yg), nx, ny);
-
+          int i, j, nx = $SIZE(nx), ny = $SIZE(ny);
+          PLcGrid2 *grid = (PLcGrid2*) malloc(sizeof(PLcGrid2));
+          if (!grid) $CROAK("Failed to allocate memory for grid");
+          plAlloc2dGrid(&(grid->xg), nx, ny);
+          plAlloc2dGrid(&(grid->yg), nx, ny);
           for (i = 0; i < nx; i++)
             for (j = 0; j < ny; j++) {
               grid->xg[i][j] = $xg(nx => i, ny => j);
               grid->yg[i][j] = $yg(nx => i, ny => j);
             }
-
           grid->nx = nx;
           grid->ny = ny;
-
-          $grid() = (IV) grid;'
+          $COMP(grid) = grid;'
         );
 
 
@@ -3947,13 +3938,13 @@ pp_def ('plAlloc2dGrid',
 
 pp_addxs (<<"EOC");
 void
-plFree2dGrid (pg)
-  long pg
+plFree2dGrid(pg)
+  PLcGrid2Ptr pg
 PPCODE:
-  PLcGrid2* grid = (PLcGrid2*) pg;
-  plFree2dGrid (grid->xg, grid->nx, grid->ny);
-  plFree2dGrid (grid->yg, grid->nx, grid->ny);
-  free (grid);
+  PLPTR_RECEIVE_IN(PLcGrid2, grid, pg)
+  plFree2dGrid(grid->xg, grid->nx, grid->ny);
+  plFree2dGrid(grid->yg, grid->nx, grid->ny);
+  free(grid);
 EOC
 
 pp_add_exported (plFree2dGrid);
@@ -4078,7 +4069,7 @@ pp_def ('plshades',
 
 	   pltrcb = get_standard_pltrcb ($COMP(pltr));
            if (pltrcb != pltr_callback)
-             pltrdt = (PLPointer) SvIV ($COMP(pltr_data));
+             pltrdt = PLPTR_RECEIVE_SV($COMP(pltr_data));
            else
              pltrdt = $COMP(pltr_data);
 
@@ -4118,7 +4109,7 @@ pp_def ('plcont',
 
 	   pltrcb = get_standard_pltrcb ($COMP(pltr));
            if (pltrcb != pltr_callback)
-             pltrdt = (PLPointer) SvIV ($COMP(pltr_data));
+             pltrdt = PLPTR_RECEIVE_SV($COMP(pltr_data));
            else
              pltrdt = $COMP(pltr_data);
 
@@ -4237,7 +4228,7 @@ pp_def ('plscmap1l',
 	   else if ($SIZE(nrev) == $SIZE(n))
    	     rev = $P(rev);
            else
-             croak ("plscmap1l: rev must have either length == 0 or have the same length of the other input arguments");
+             $CROAK("plscmap1l: rev must have either length == 0 or have the same length of the other input arguments");
 
 	   c_plscmap1l ($itype(), $SIZE(n), $P(isty), $P(coord1),
 	                       $P(coord2), $P(coord3), rev);'
@@ -4263,7 +4254,7 @@ pp_def ('plshade1',
            size_y = $SIZE(ny);
 
            plAlloc2dGrid (&a, size_x, size_y);
-           if(a == NULL) croak("Failed to allocate memory in plshade1_pp");
+           if(a == NULL) $CROAK("Failed to allocate memory in plshade1_pp");
 
            for (i = 0; i < size_x; i++)
              for (j = 0; j < size_y; j++)
@@ -4277,7 +4268,7 @@ pp_def ('plshade1',
 
 	   pltrcb = get_standard_pltrcb ($COMP(pltr));
            if (pltrcb != pltr_callback)
-             pltrdt = (PLPointer) SvIV ($COMP(pltr_data));
+             pltrdt = PLPTR_RECEIVE_SV($COMP(pltr_data));
            else
              pltrdt = $COMP(pltr_data);
 
@@ -4341,7 +4332,7 @@ pp_def ('plimagefr',
 
          pltrcb = get_standard_pltrcb ($COMP(pltr));
          if (pltrcb != pltr_callback)
-           pltrdt = (PLPointer) SvIV ($COMP(pltr_data));
+           pltrdt = PLPTR_RECEIVE_SV($COMP(pltr_data));
          else
            pltrdt = $COMP(pltr_data);
 
@@ -4601,15 +4592,15 @@ pp_def ('plstripc',
 
            if (! SvROK (sv_legline)
                || SvTYPE (SvRV (sv_legline)) != SVt_PVAV)
-             croak ("plstripc: legline must be a reference to an array");
+             $CROAK("plstripc: legline must be a reference to an array");
 
            av_legline = (AV*) SvRV (sv_legline);
 
            if (av_len (av_legline) != 3)
-             croak ("plstripc: legline must have four elements");
+             $CROAK("plstripc: legline must have four elements");
 
            if ($SIZE(n) != 4)
-             croak ("plstripc: colline and styline must have four elements");
+             $CROAK("plstripc: colline and styline must have four elements");
 
            for (i = 0; i < 4; i++) {
              SV** elem = av_fetch (av_legline, i, 0);
@@ -5197,7 +5188,7 @@ pp_def ('plvect',
 
          pltrcb = get_standard_pltrcb ($COMP(pltr));
          if (pltrcb != pltr_callback)
-           pltrdt = (PLPointer) SvIV ($COMP(pltr_data));
+           pltrdt = PLPTR_RECEIVE_SV($COMP(pltr_data));
          else
            pltrdt = $COMP(pltr_data);
 
@@ -5300,7 +5291,7 @@ if (!$noalpha) {
             else if ($SIZE(nrev) == $SIZE(n))
               rev = $P(rev);
             else
-              croak ("plscmap1la: rev must have either length == 0 or have the same length of the other input arguments");
+              $CROAK("plscmap1la: rev must have either length == 0 or have the same length of the other input arguments");
 
             c_plscmap1la ($itype(), $SIZE(n), $P(isty), $P(coord1),
                           $P(coord2), $P(coord3), $P(coord4), rev);'

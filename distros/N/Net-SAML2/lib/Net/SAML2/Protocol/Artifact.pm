@@ -1,9 +1,7 @@
-use strict;
-use warnings;
 package Net::SAML2::Protocol::Artifact;
-our $VERSION = '0.78'; # VERSION
-
 use Moose;
+our $VERSION = '0.79'; # VERSION
+
 use MooseX::Types::DateTime qw/ DateTime /;
 use DateTime::Format::XSD;
 use Net::SAML2::XML::Util qw/ no_comments /;
@@ -15,7 +13,7 @@ with 'Net::SAML2::Role::ProtocolMessage';
 
 
 has 'issue_instant'   => (isa => DateTime,  is => 'ro', required => 1);
-has 'in_response_to'  => (isa => 'Str',     is => 'ro', required => 1);
+has '+in_response_to'  => (required => 1);
 has 'issuer'          => (isa => 'Str',     is => 'ro', required => 1);
 has 'status'          => (isa => 'Str',     is => 'ro', required => 1);
 has 'logoutresponse_object'  => (
@@ -56,12 +54,11 @@ sub new_from_xml {
     }
 
     my $issue_instant;
-
     if (my $value = $xpath->findvalue('/samlp:ArtifactResponse/@IssueInstant')) {
         $issue_instant = DateTime::Format::XSD->parse_datetime($value);
     }
 
-    my $self = $class->new(
+    return $class->new(
         id             => $xpath->findvalue('/samlp:ArtifactResponse/@ID'),
         in_response_to => $xpath->findvalue('/samlp:ArtifactResponse/@InResponseTo'),
         issue_instant  => $issue_instant,
@@ -70,8 +67,6 @@ sub new_from_xml {
         $response       ? (response        => $response)        : (),
         $logoutresponse ? (logout_response => $logoutresponse)  : (),
     );
-
-    return $self;
 }
 
 
@@ -84,13 +79,6 @@ sub response {
 sub logout_response {
     my $self = shift;
     return $self->logoutresponse_object->toString;
-}
-
-
-sub success {
-    my ($self) = @_;
-    return 1 if $self->status eq $self->status_uri('success');
-    return 0;
 }
 
 
@@ -114,7 +102,7 @@ Net::SAML2::Protocol::Artifact - SAML2 artifact object
 
 =head1 VERSION
 
-version 0.78
+version 0.79
 
 =head1 SYNOPSIS
 
@@ -134,10 +122,6 @@ version 0.78
 
   # get_response returns the Response or LogoutResponse
   my art_response = $artifact->get_response();
-
-=head1 NAME
-
-Net::SAML2::Protocol::Artifact - SAML2 artifact object
 
 =head1 METHODS
 
@@ -164,10 +148,6 @@ Returns the response
 =head2 logout_response
 
 Returns the logoutresponse
-
-=head2 success( )
-
-Returns true if the Response's status is Success.
 
 =head2 get_response ( )
 

@@ -1119,7 +1119,7 @@ Specifying edges looks like this:
 
  imag_plot ([0 => 5], [1 => 10], $matrix);
 
-and the quivalent is:
+and the equivalent is:
 
  plot(-image => ds::Grid(
      $matrix,

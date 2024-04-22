@@ -1,3 +1,7 @@
+0.17 2024-04-21T12:34:17+02:00
+ - Add test for 'css_data'.
+ - Rewrite examples in doc to version with indented output.
+
 0.16 2024-04-21T09:16:38+02:00
  - Copy CSS links, Javascript and Javascript links from component to main
    object.

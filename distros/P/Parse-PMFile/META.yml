@@ -27,5 +27,5 @@ requires:
   version: '0.83'
 resources:
   repository: https://github.com/charsbar/Parse-PMFile
-version: '0.46'
+version: '0.47'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

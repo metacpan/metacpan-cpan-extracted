@@ -1,3 +1,6 @@
+0.14 2024-04-22T11:30:49+02:00
+ - Add 'onchange' parameter to Select.
+
 0.13 2024-04-12T00:54:37+02:00
  - Fix DEPENDENCIES section in Input doc.
  - Rewrite check of step to Scalar::Util::looks_like_number().

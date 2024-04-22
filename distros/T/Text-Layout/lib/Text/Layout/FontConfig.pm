@@ -8,7 +8,7 @@ package Text::Layout::FontConfig;
 
 use Carp;
 
- our $VERSION = "0.035";
+ our $VERSION = "0.036";
 
 use Text::Layout::FontDescriptor;
 
@@ -86,18 +86,19 @@ If true, a predefined set of font names (the PDF corefonts) is registered.
 sub new {
     my ( $pkg, %atts ) = @_;
     my $self = bless {} => $pkg;
+    $debug = $self->{debug} = $atts{debug};
     if ( $atts{corefonts} ) {
 	$self->register_corefonts;
     }
     if ( $atts{loader} ) {
 	$loader = $atts{loader};
     }
-    $debug = $self->{debug} = $atts{debug};
     return $self;
 }
 
 sub reset {
     my ( $self ) = @_;
+    warn("FC: Reset\n") if $debug;
     %fonts = ();
     @dirs = ();
 }
@@ -210,6 +211,7 @@ sub register_font {
     foreach ( split(/\s*,\s*/, $family) ) {
 	$fonts{lc $_}->{$style}->{$weight}->{loader} = $loader;
 	$fonts{lc $_}->{$style}->{$weight}->{loader_data} = $ff;
+	warn("FC: Registered: $ff for ", lc($_), "-$style-$weight\n") if $debug;
 	next unless $props;
 	while ( my($k,$v) = each %$props ) {
 	    $fonts{lc $_}->{$style}->{$weight}->{$k} = $v;
@@ -291,6 +293,8 @@ sub register_corefonts {
     shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
     my ( $noaliases ) = @_;
 
+    warn("FC: Registering corefonts\n") if $debug;
+
     register_font( "Times-Roman",           "Times"                );
     register_font( "Times-Bold",            "Times", "Bold"        );
     register_font( "Times-Italic",          "Times", "Italic"      );
@@ -319,6 +323,7 @@ sub register_corefonts {
 
     register_font( "ZapfDingbats",          "Dingbats"                );
 
+    if ( 0 ) {
     register_font( "Georgia",               "Georgia"                );
     register_font( "Georgia,Bold",          "Georgia",  "Bold"        );
     register_font( "Georgia,Italic",        "Georgia",  "Italic"      );
@@ -331,6 +336,7 @@ sub register_corefonts {
 
     register_font( "WebDings",              "WebDings"                );
     register_font( "WingDings",             "WingDings"               );
+    }
 }
 
 =over
@@ -350,7 +356,7 @@ sub find_font {
     my $atts;
     $atts = pop(@_) if UNIVERSAL::isa( $_[-1], 'HASH' );
     my ( $family, $style, $weight ) = @_;
-    warn("find_font( $family, $style, $weight )\n") if $debug;
+    warn("FC: find_font( $family, $style, $weight )\n") if $debug;
 
     my $try = sub {
 	if ( $fonts{$family}
@@ -383,7 +389,7 @@ sub find_font {
 	    }
 
 	    if ( $debug ) {
-		warn("found( $i{family}, $i{style}, $i{weight} ) -> ",
+		warn("FC: found( $i{family}, $i{style}, $i{weight} ) -> ",
 		     $i{loader_data}, "\n");
 	    }
 	    return Text::Layout::FontDescriptor->new(%i);
@@ -500,7 +506,7 @@ use File::Basename;
 
 sub from_filename {
     shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
-    my ( $file ) = @_;
+    my ( $file, $size ) = @_;
     my $b;
     ( $b, undef, undef ) = fileparse( $file, qr/\.\w+/ );
     my ( $family, $style, $weight ) = ( $b, "normal", "normal" );
@@ -522,7 +528,9 @@ sub from_filename {
 	loader => $loader,
 	family => $family,
 	style  => $style,
-	weight => $weight );
+	weight => $weight,
+	$size ? ( size => $size ) : (),
+      );
 
     $fonts{$family}{$style}{$weight} //= $fd;
 
@@ -578,7 +586,7 @@ sub _fallback {
     return unless $fallback;
 
     my ( $family, $style, $weight ) = @_;
-    warn("fallback( $family, $style, $weight )\n") if $debug;
+    warn("FC: fallback( $family, $style, $weight )\n") if $debug;
 
     my $pattern = $family;
     $pattern .= ":$style" if $style;
@@ -589,6 +597,7 @@ sub _fallback {
       or do { $fallback = ''; return };
 
     my $res;
+    local $_;
     while ( <$fd> ) {
 	chomp;
 	next unless -f -r $_;
@@ -599,7 +608,7 @@ sub _fallback {
 
     close($fd);
     register_font( $res, $family, $style, $weight ) if $res;
-    warn("Lookup $pattern -> $res\n") if $debug;
+    warn("FC: Lookup $pattern -> $res\n") if $debug;
     return $res;
 }
 

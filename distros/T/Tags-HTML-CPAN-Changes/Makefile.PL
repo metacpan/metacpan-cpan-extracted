@@ -33,12 +33,13 @@ test_requires 'CPAN::Changes::Release' => 0.500002;
 test_requires 'CSS::Struct::Output::Structure' => 0;
 test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0;
+test_requires 'File::Object' => 0;
 test_requires 'Tags::Output::Structure' => 0;
 test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

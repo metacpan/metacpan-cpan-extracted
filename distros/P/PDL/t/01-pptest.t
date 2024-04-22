@@ -82,8 +82,7 @@ pp_def(
 );
 
 pp_def("gelsd",
-        Pars => '[io,phys]A(m,n); [io,phys]B(p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info()',
-        RedoDimsCode => '$SIZE(r) = PDLMIN($SIZE(m),$SIZE(n));',
+        Pars => '[io,phys]A(m,n); [io,phys]B(p,q); [phys]rcond(); [o,phys]s(r=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o,phys]rank();int [o,phys]info()',
         GenericTypes => ['F'],
         Code => '$CROAK("croaking");'
 );
@@ -193,11 +192,13 @@ pp_def('incomp_dim',
 pp_addhdr('
 typedef NV NV_ADD1;
 typedef HV* NV_HR;
+typedef char thing;
 ');
 pp_add_typemaps(string=><<'EOT');
 TYPEMAP
 NV_ADD1 T_NV_ADD1
 NV_HR T_HVREF
+thing* T_PTROBJ
 
 INPUT
 T_NV_ADD1
@@ -210,7 +211,7 @@ EOT
 
 pp_def('typem',
   Pars => 'int [o] out()',
-  OtherPars => '[io] NV_ADD1 v1; NV_HR v2;',
+  OtherPars => '[io] NV_ADD1 v1; NV_HR v2; thing *ptr',
   Code => '$out() = $COMP(v1); $COMP(v1) = 8;',
 );
 
@@ -484,15 +485,16 @@ is "$o", 4;
 $o = incomp_dim([0..3]);
 is "$o", 4;
 
-$o = typem(my $oth = 3, {});
+my $ptrObj = bless \(my $thing), 'thingPtr';
+$o = typem(my $oth = 3, {}, $ptrObj);
 is "$o", 4;
 is "$oth", 7;
 
-typem($o = PDL->null, $oth = 3, {});
+typem($o = PDL->null, $oth = 3, {}, $ptrObj);
 is "$o", 4;
 is "$oth", 7;
 
-eval {typem($o = PDL->null, $oth = 3, []);};
+eval {typem($o = PDL->null, $oth = 3, [], $ptrObj);};
 like $@, qr/^typem:.*not a HASH reference/i;
 
 incomp_in($o = PDL->null, [sequence(3), sequence(byte, 4)]);

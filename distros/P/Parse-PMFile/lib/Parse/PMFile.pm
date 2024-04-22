@@ -10,7 +10,7 @@ use Dumpvalue;
 use version ();
 use File::Spec ();
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 our $VERBOSE = 0;
 our $ALLOW_DEV_VERSION = 0;
 our $FORK = 0;
@@ -358,6 +358,7 @@ sub _packages_per_pmfile {
     local $/ = "\n";
     my $inpod = 0;
 
+    my $package_or_class = 'package';
     my $checked_bom;
   PLINE: while (<$fh>) {
         chomp;
@@ -377,6 +378,32 @@ sub _packages_per_pmfile {
             last PLINE;
         }
 
+=pod
+        # hide in the pod block until 'class' is added to a version bundle
+        if ($pline =~ /^[\s\{;]*use\s(+v?5\.[0-9]+)/) {
+            my $version = $1;
+            my $version_bundle_for_class = version->parse("v5.xx.xx");
+            if (eval { version->parse($version) >= $version_bundle_for_class) {
+                $package_or_class = 'package|class|role';
+            }
+            next PLINE;
+        }
+=cut
+
+        # use feature 'class'; enabels class (and role, though not implemented yet)
+        if ($pline =~ /^[\s\{;]*use\s+(?:feature|experimental)\s+[^;]+\b(?:class|all)[^;]*;/) {
+            $package_or_class = 'package|class';
+        }
+
+        # some modules also enables class and role
+        # XXX: what to do with MooseX::Declare and a few minor experiments)
+        if ($pline =~ /^[\s\{;]*use\s+(?:Feature::Compat::Class)[^;]*;/) {
+            $package_or_class = 'package|class';
+        }
+        if ($pline =~ /^[\s\{;]*use\s+(?:Object::Pad)[^;]*;/) {
+            $package_or_class = 'package|class|role';
+        }
+
         my $pkg;
         my $strict_version;
 
@@ -385,7 +412,7 @@ sub _packages_per_pmfile {
                       # (.*) # takes too much time if $pline is long
                       #(?<![*\$\\@%&]) # no sigils
                       ^[\s\{;]*
-                      \b(?:package|class|role)\s+
+                      \b(?:$package_or_class)\s+
                       ([\w\:\']+)
                       \s*
                       (?: $ | [\}\;] | \{ | \s+($version::STRICT) )

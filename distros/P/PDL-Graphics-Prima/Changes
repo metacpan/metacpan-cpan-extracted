@@ -1,3 +1,6 @@
+0.21 2024-04-22
+- demo now only loads Prima when run, reducing perldl problems
+
 0.20 2023-03-07
 - improve handling of Win32 terminal in perldl (#50) - thanks @dk
 
@@ -167,7 +170,7 @@
     width, and/or height should be percentages of the canvas's width or height,
     or a multiple of the canvas's font's feature.
   
-  - The titleSpace property is now much more flexible. In additon to the integer
+  - The titleSpace property is now much more flexible. In addition to the integer
     number of pixels for the title space, the property now accepts either a
     subref that is expected to compute the titleSpace (in pixels) or a specially
     formatted string for a set of pre-canned calculations.
@@ -177,10 +180,10 @@
     needs to be labeled, allowing the user to return a string with the desired 
     label.
   
-  - Added pal::RainbowSV to make less-than-bright rainbow palettes eaiser to
+  - Added pal::RainbowSV to make less-than-bright rainbow palettes easier to
     create.
   
-  - Added a new Propeties dialog box and associated entry to the pop-up menu.
+  - Added a new Properties dialog box and associated entry to the pop-up menu.
     The dialog box lets the user set the title, axis labels, axis extrema,
     and axis scaling type. Furthermore, the user can continue manipulating
     the plot with their mouse, and the properties will automatically update

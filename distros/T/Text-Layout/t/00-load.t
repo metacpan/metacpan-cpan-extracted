@@ -7,14 +7,14 @@ BEGIN {
     use_ok( 'Text::Layout' );
 }
 
-diag( "Testing Text::Layout $Text::Layout::VERSION, Perl $], $^X" );
+note( "Testing Text::Layout $Text::Layout::VERSION, Perl $], $^X" );
 
 eval {
     require HarfBuzz::Shaper;
     HarfBuzz::Shaper->VERSION(0.018);
     diag( "Shaping enabled (HarfBuzz::Shaper $HarfBuzz::Shaper::VERSION)" );
     1;
-} || diag( "Shaping disabled (HarfBuzz::Shaper not found)" );
+} || note( "Shaping disabled (HarfBuzz::Shaper not found)" );
 
 BEGIN {
     use_ok( 'Text::Layout::Markdown' );

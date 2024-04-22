@@ -1,13 +1,13 @@
 package Net::SAML2::Protocol::LogoutRequest;
 use Moose;
 
-our $VERSION = '0.78'; # VERSION
+our $VERSION = '0.79'; # VERSION
 
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
 use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::XML::Util qw/ no_comments /;
 use XML::Generator;
-use URN::OASIS::SAML2 qw(:urn);
+use URN::OASIS::SAML2 qw(:urn NAMEID_PERSISTENT);
 use XML::LibXML::XPathContext;
 
 with 'Net::SAML2::Role::ProtocolMessage';
@@ -58,7 +58,7 @@ around BUILDARGS => sub {
     my $self = shift;
     my %args = @_;
 
-    if ($args{nameid_format} && $args{nameid_format} eq 'urn:oasis:names:tc:SAML:2.0:nameidformat:persistent') {
+    if ($args{nameid_format} && $args{nameid_format} eq NAMEID_PERSISTENT()) {
         $args{include_name_qualifier} = 1;
     }
 
@@ -157,16 +157,16 @@ Net::SAML2::Protocol::LogoutRequest - SAML2 LogoutRequest Protocol object
 
 =head1 VERSION
 
-version 0.78
+version 0.79
 
 =head1 SYNOPSIS
 
-  my $logout_req = Net::SAML2::Protocol::LogoutRequest->new(
-    issuer      => $issuer,
-    destination => $destination,
-    nameid      => $nameid,
-    session     => $session,
-  );
+    my $logout_req = Net::SAML2::Protocol::LogoutRequest->new(
+        issuer      => $issuer,
+        destination => $destination,
+        nameid      => $nameid,
+        session     => $session,
+    );
 
 =head1 METHODS
 

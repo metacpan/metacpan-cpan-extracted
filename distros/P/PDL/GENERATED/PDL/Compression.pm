@@ -72,7 +72,7 @@ use warnings;
 
 =for sig
 
-  Signature: (in(n); [o]out(m); int[o]len(); int blocksize)
+  Signature: (in(n); [o]out(m=CALC($SIZE(n))); int[o]len(); int blocksize)
 
 =for ref
 

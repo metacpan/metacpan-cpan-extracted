@@ -37,10 +37,10 @@ use constant nlevel => 10;
 
 # Pairs of points making the line segments used to plot the user defined
 # arrow
-my $arrow_x = pdl [-0.5, 0.5, 0.3, 0.5, 0.3, 0.5];
-my $arrow_y = pdl [0.0, 0.0,   0.2, 0.0, -0.2, 0.0];
-my $arrow2_x = pdl [-0.5, 0.3, 0.3, 0.5, 0.3, 0.3];
-my $arrow2_y = pdl [0.0, 0.0,   0.2, 0.0, -0.2, 0.0];
+my $arrow_x =  pdl [-0.5, 0.5, 0.3, 0.5, 0.3,  0.5];
+my $arrow_y =  pdl [0.0,  0.0, 0.2, 0.0, -0.2, 0.0];
+my $arrow2_x = pdl [-0.5, 0.3, 0.3, 0.5, 0.3,  0.3];
+my $arrow2_y = pdl [0.0,  0.0, 0.2, 0.0, -0.2, 0.0];
 
 #
 # Vector plot of the circulation about the origin
@@ -121,18 +121,10 @@ sub transform {
 # Vector plot of flow through a constricted pipe
 # with a coordinate transform
 sub constriction2 {
-    my $nx = nx;
-    my $ny = ny;
-    my $nc   = 11;
-    my $nseg = 20;
-
-    my $dx = 1.0;
-    my $dy = 1.0;
-
-    my $xmin = -$nx / 2 * $dx;
-    my $xmax = $nx / 2 * $dx;
-    my $ymin = -$ny / 2 * $dy;
-    my $ymax = $ny / 2 * $dy;
+    my ($nx, $ny, $nc, $nseg) = (nx, ny, 11, 20);
+    my ($dx, $dy) = (1.0, 1.0);
+    my ($xmin, $xmax) = (-$nx / 2 * $dx, $nx / 2 * $dx);
+    my ($ymin, $ymax) = (-$ny / 2 * $dy, $ny / 2 * $dy);
 
     plstransform( \&transform, $xmax );
 
@@ -163,13 +155,6 @@ sub constriction2 {
     plstransform( undef, undef );
 }
 
-sub f2mnmx {
-  my $f = shift;
-  my $fmin = min ($f);
-  my $fmax = max ($f);
-  return ($fmin, $fmax);
-}
-
 # Vector plot of the gradient of a shielded potential (see example 9)
 
 sub potential {
@@ -178,67 +163,46 @@ sub potential {
   # Charge 2 is placed at (d1, -d1), with image charge at (d2, -d2).
   # Also put in smoothing term at small distances.
 
-  my $rmax = nr;
-
-  my $eps = 2;
-
-  my $q1 = 1;
-  my $d1 = $rmax / 4;
-
-  my $q1i = - $q1 * $rmax / $d1;
-  my $d1i = $rmax * $rmax / $d1;
-
-  my $q2 = -1;
-  my $d2 = $rmax / 4;
-
-  my $q2i = - $q2 * $rmax / $d2;
-  my $d2i = $rmax * $rmax / $d2;
-
+  my ($rmax, $eps, $q1, $q2) = (nr, 2, 1, -1);
+  my ($d1, $d2) = ($rmax / 4, $rmax / 4);
+  my ($q1i, $d1i) = (- $q1 * $rmax / $d1, $rmax * $rmax / $d1);
+  my ($q2i, $d2i) = (- $q2 * $rmax / $d2, $rmax * $rmax / $d2);
   my $r = (0.5 + sequence (nr))->dummy (1, ntheta);
   my $theta = (2 * pi / (ntheta - 1) *
                (0.5 + sequence (ntheta)))->dummy (0, nr);
-  my $x = $r * cos ($theta);
-  my $y = $r * sin ($theta);
-  my $cgrid2 = plAlloc2dGrid ($x, $y);
-  my $div1 = sqrt (($x - $d1) ** 2 + ($y - $d1) ** 2 + $eps * $eps);
-  my $div1i = sqrt (($x - $d1i) ** 2 + ($y - $d1i) ** 2 + $eps * $eps);
-  my $div2 = sqrt (($x - $d2) ** 2 + ($y + $d2) ** 2 + $eps * $eps);
-  my $div2i = sqrt (($x - $d2i) ** 2 + ($y + $d2i) ** 2 + $eps * $eps);
+  my ($x, $y) = ($r * cos ($theta), $r * sin ($theta));
+  my ($div1, $div1i) =
+    map sqrt(($x - $_) ** 2 + ($y - $_) ** 2 + $eps * $eps), $d1, $d1i;
+  my ($div2, $div2i) =
+    map sqrt(($x - $_) ** 2 + ($y + $_) ** 2 + $eps * $eps), $d2, $d2i;
   my $z = $q1 / $div1 + $q1i / $div1i + $q2 / $div2 + $q2i / $div2i;
   my $u = -$q1 * ($x - $d1) / ($div1**3) - $q1i * ($x - $d1i) / ($div1i ** 3)
           -$q2 * ($x - $d2) / ($div2**3) - $q2i * ($x - $d2i) / ($div2i ** 3);
   my $v = -$q1 * ($y - $d1) / ($div1**3) - $q1i * ($y - $d1i) / ($div1i ** 3)
           -$q2 * ($y + $d2) / ($div2**3) - $q2i * ($y + $d2i) / ($div2i ** 3);
-
-  my ($xmin, $xmax) = f2mnmx ($x);
-  my ($ymin, $ymax) = f2mnmx ($y);
-  my ($zmin, $zmax) = f2mnmx ($z);
+  my ($xmin, $xmax, $ymin, $ymax, $zmin, $zmax) = map minmax($_), $x, $y, $z;
+  # Plot contours of the potential
+  my $dz = ($zmax - $zmin) / nlevel;
+  my $clevel = $zmin + (sequence (nlevel) + 0.5) * $dz;
+  # the perimeter of the cylinder
+  $theta = (2 * pi / (nper - 1)) * sequence (nper);
+  my $px = $rmax * cos ($theta);
+  my $py = $rmax * sin ($theta);
 
   plenv ($xmin, $xmax, $ymin, $ymax, 0, 0);
   pllab ("(x)", "(y)",
          "#frPLplot Example 22 - potential gradient vector plot");
-
-  # Plot contours of the potential
-  my $dz = ($zmax - $zmin) / nlevel;
-  my $clevel = $zmin + (sequence (nlevel) + 0.5) * $dz;
-
   plcol0 (3);
   pllsty (2);
+  my $cgrid2 = plAlloc2dGrid ($x, $y);
   plcont ($z, 1, nr, 1, ntheta, $clevel, \&pltr2, $cgrid2);
   pllsty (1);
   plcol0 (1);
-
   # Plot the vectors of the gradient of the potential
   plcol0 (2);
   plvect ($u, $v, 25.0, \&pltr2, $cgrid2);
   plcol0 (1);
-
-  # Plot the perimeter of the cylinder
-  $theta = (2 * pi / (nper - 1)) * sequence (nper);
-  my $px = $rmax * cos ($theta);
-  my $py = $rmax * sin ($theta);
-  plline ($px , $py);
-
+  plline ($px , $py); # Plot the cylinder
 }
 
 #--------------------------------------------------------------------------

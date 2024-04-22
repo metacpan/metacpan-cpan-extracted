@@ -1,3 +1,9 @@
+0.84 2024-04-22
+- add perldl demo
+- fix plFreeGrid to use free that matches the allocator
+- pl{Alloc,Free}{,2d}Grid error if not match allocating and freeing routine
+- minimum PDL 2.083 due to output OtherPars
+
 0.83 2022-07-17
 - immediate re-release to fix packaging problem
 

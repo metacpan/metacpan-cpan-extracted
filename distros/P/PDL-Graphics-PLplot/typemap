@@ -1,0 +1,25 @@
+PLcGridPtr T_PLPTROBJ
+PLcGridPtr__OUT T_PLPTROBJ__OUT
+PLcGrid2Ptr T_PLPTROBJ
+PLcGrid2Ptr__OUT T_PLPTROBJ__OUT
+
+INPUT
+
+T_PLPTROBJ
+	if (!(SvROK($arg) && sv_derived_from($arg, \"$ntype\")))
+	  Perl_croak_nocontext(\"%s: %s is not of type %s but %s, did you match allocate and free?\",
+	    ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	    \"$var\", \"$ntype\", sv_reftype(SvROK($arg) ? SvRV($arg) : $arg, 1));
+	IV tmp = SvIV((SV*)SvRV($arg));
+	$var = INT2PTR($type,tmp);
+
+T_PLPTROBJ__OUT
+	if (SvROK($arg) && sv_derived_from($arg, \"${(my $ntype = $type) =~ s:__OUT$::; \$ntype}\")) {
+	  IV tmp = SvIV((SV*)SvRV($arg));
+	  $var = INT2PTR($type,tmp);
+	}
+
+OUTPUT
+
+T_PLPTROBJ__OUT
+	sv_setref_pv($arg, \"${(my $ntype = $type) =~ s:__OUT$::; \$ntype}\", (void*)$var);

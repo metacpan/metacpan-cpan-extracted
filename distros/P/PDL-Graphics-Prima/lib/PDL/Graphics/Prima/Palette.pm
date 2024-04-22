@@ -614,7 +614,7 @@ sub pal::Rainbow {
 Runs from red->orange->yellow->green->blue->purple in ascending order. The two
 arguments it accepts are the saturation and value, which it holds uniformly.
 This makes it much easier to create palettes that can be easily seen against a
-white background. For example, the yellow from this palette is much eaiser to
+white background. For example, the yellow from this palette is much easier to
 see against a white background than the yellow from pal::Rainbow:
 
  pal::RainbowSV(1, 0.8)
@@ -787,7 +787,7 @@ sub pal::HSVrange {
 	croak("pal::HSVrange called with odd number of arguments")
 		if @_ % 2 == 1;
 
-	# replace piddles in either of the fist two args with arrayrefs
+	# replace piddles in either of the first two args with arrayrefs
 	$_[0] = [$_[0]->dog] if blessed($_[0]) and $_[0]->isa('PDL');
 	$_[1] = [$_[1]->dog] if blessed($_[1]) and $_[1]->isa('PDL');
 

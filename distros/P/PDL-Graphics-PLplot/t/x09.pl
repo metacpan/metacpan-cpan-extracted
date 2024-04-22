@@ -91,18 +91,7 @@ sub polar {
   plcol0 (1);
   pllab ("", "", "Polar Contour Plot");
 
-#  plFree2dGrid ($cgrid2);
-}
-
-# f2mnmx
-#
-# Returns min & max of input 2d array
-
-sub f2mnmx {
-  my $f = shift;
-  my $fmin = min ($f);
-  my $fmax = max ($f);
-  return ($fmin, $fmax)
+  plFree2dGrid($cgrid2);
 }
 
 # Shielded potential contour plot example
@@ -122,8 +111,8 @@ sub potential {
 
   my $rmax = 0.5 + (PRPTS - 1);
 
-  my ($xmin, $xmax) = f2mnmx ($xg);
-  my ($ymin, $ymax) = f2mnmx ($yg);
+  my ($xmin, $xmax) = minmax($xg);
+  my ($ymin, $ymax) = minmax($yg);
 
   my $x0 = ($xmin + $xmax) / 2;
   my $y0 = ($ymin + $ymax) / 2;
@@ -161,7 +150,7 @@ sub potential {
   my $div2i = sqrt (($xg - $d2i) ** 2 + ($yg + $d2i) ** 2 + $eps ** 2);
   my $z = $q1 / $div1 + $q1i / $div1i + $q2 / $div2 + $q2i / $div2i;
 
-  my ($zmin, $zmax) = f2mnmx ($z);
+  my ($zmin, $zmax) = minmax($z);
 
   # Positive and negative contour levels
 
@@ -222,7 +211,7 @@ sub potential {
   plcol0 ($ncollab);
   pllab ("", "", "Shielded potential of charges in a conducting sphere");
 
-#  plFree2dGrid ($cgrid2);
+  plFree2dGrid($cgrid2);
 }
 
 # main

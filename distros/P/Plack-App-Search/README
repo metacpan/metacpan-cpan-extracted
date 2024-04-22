@@ -77,6 +77,12 @@ METHODS
 
             Default value is Tags::Output::Raw->new('xml' => 1) instance.
 
+    *       "tags_after"
+
+            Reference to array with Tags code to add after search field.
+
+            Default value is undef.
+
     *       "title"
 
             Page title.
@@ -281,5 +287,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

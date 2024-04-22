@@ -2,9 +2,9 @@ package PDL::Demos::Prima;
 
 use strict;
 use warnings;
-use PDL::Graphics::Prima 0.13;
 
 sub info {('prima', 'Prima graphics')}
+sub init {('use PDL::Graphics::Prima')}
 sub demo {[actnw => q|
   # starting up the Prima GUI demo app
   |.__PACKAGE__.q|::run();
@@ -51,7 +51,7 @@ library written on top of the L<Prima> GUI toolkit.
 # );
 my @demo_data;
 my ($curr_section, $curr_par, $curr_code) = ('','','');
-while(my $line = <DATA>) {
+while ( my $line = <DATA> ) {
 	# Only =head2s in this documentation
 	if ($line =~ /=head1/) {
 		push @demo_data, [$curr_section, $curr_par, $curr_code]
@@ -129,13 +129,13 @@ sub setup_gui {
 			relx   => 0.15, relwidth => 0.7, relheight => 0.7, rely => 0.15,
 			anchor => 'sw',
 		},
+		font      => { size => 12 },
 		sizeMax   => [600, 800],
 		sizeMin   => [600, 800],
 		text      => 'PDL::Graphics::Prima Demo',
 		onDestroy => sub { $::application->stop },
 		onKeyUp   => \&keypress_handler,
 	);
-	$gui->{window}->font->size(12);
 																		# Title
 	# ---( Build list of windows that we don't want to close )---
 	my @dont_touch = $::application->get_widgets;
@@ -214,7 +214,7 @@ sub setup_gui {
 		text => 'Next',
 		onClick => sub {
 			$current_slide++ unless $current_slide == @demo_data;
-			setup_slide(@{$demo_data[$current_slide]}, _slide_posn($current_slide, scalar @demo_data), $gui);
+			setup_slide(@{$demo_data[$current_slide] // ['','','']}, _slide_posn($current_slide, scalar @demo_data), $gui);
 		},
 	);
 																	# Text
@@ -232,9 +232,6 @@ sub setup_gui {
 			y => $padding, relheight => 1, height => -2*$padding - 15,
 			anchor => 'sw',
 		},
-		# This Event does not appear to be documented!!! Beware!!!
-		# Modify link clicking so that it opens the help window instead
-		# of following the link.
 		onLink => sub {
 			my ($self, $handler, $url, $btn, $mod) = @_;
 			$handler-> open_podview($url, $btn, $mod);
@@ -294,13 +291,15 @@ sub keypress_handler {
 #############################################################
 
 # posn 0=first, 1=mid, 2=penultimate, 3=last
-sub _slide_posn {
-  my ($number, $total) = @_;
-  return 0 if ($number//0) <= 0;
-  return 2 if $number == $total - 1;
-  return 3 if $number >= $total;
-  1;
+sub _slide_posn
+{
+	my ($number, $total) = @_;
+	return 0 if ($number//0) <= 0;
+	return 2 if $number == $total - 1;
+	return 3 if $number >= $total;
+	1;
 }
+
 sub setup_slide {
 	my ($section, $text, $code, $posn, $gui) = @_; # see above for posn
 	if ($posn == 0) {
@@ -315,7 +314,7 @@ sub setup_slide {
 	}
 	elsif ($posn == 3) {
 		# Close the window
-		$gui->{window}->notify('Destroy');
+		$gui->{window}->close;
 		return;
 	}
 	else {
@@ -551,7 +550,7 @@ x and y axis options.
 =head2 Enjoy PDL::Graphics::Prima!
 
 I hope you've enjoyed the tour, and I hope you find
-L<PDL::Graphics::Prima|PDL::Graphics::Prima/> to be a useful plotting tool!
+L<PDL::Graphics::Prima> to be a useful plotting tool!
 
  # Thanks!
 
@@ -567,3 +566,5 @@ This module is free software; you can redistribute it and/or modify it under the
 same terms as Perl itself. See L<perlartistic>.
 
 =cut
+
+1;

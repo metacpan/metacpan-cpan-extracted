@@ -7,7 +7,7 @@ use Error::Pure::Utils qw(clean err_msg);
 use Tags::HTML::Container;
 use Tags::Output::Structure;
 use Test::MockObject;
-use Test::More 'tests' => 11;
+use Test::More 'tests' => 14;
 use Test::NoWarnings;
 
 # Test.
@@ -126,5 +126,61 @@ is_deeply(
 		'bad',
 	],
 	"Parameter 'vert_align' have a bad value.",
+);
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Container->new(
+		'height' => 'bad',
+	);
+};
+@error = err_msg();
+is_deeply(
+	\@error,
+	[
+		"Parameter 'height' doesn't contain number.",
+		'Value',
+		'bad',
+	],
+	"Parameter 'height' doesn't contain number.",
+);
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Container->new(
+		'height' => '100',
+	);
+};
+@error = err_msg();
+is_deeply(
+	\@error,
+	[
+		"Parameter 'height' doesn't contain unit.",
+		'Value',
+		'100',
+	],
+	"Parameter 'height' doesn't contain unit.",
+);
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Container->new(
+		'height' => '100xx',
+	);
+};
+@error = err_msg();
+is_deeply(
+	\@error,
+	[
+		"Parameter 'height' contain bad unit.",
+		'Unit',
+		'xx',
+		'Value',
+		'100xx',
+	],
+	"Parameter 'height' contain bad unit.",
 );
 clean();

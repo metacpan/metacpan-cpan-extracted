@@ -60,7 +60,7 @@ my $logout_resp = Net::SAML2::Protocol::LogoutResponse->new(
     issuer      => 'https://netsaml2-testapp.local',
     destination => 'destination',
     status      => 'status',
-    response_to => 'NETSAML2_dkajhdahdkhdkdj',
+    in_response_to => 'NETSAML2_dkajhdahdkhdkdj',
   )->as_xml;
 
 $post_request = $post->sign_xml($logout_resp);

@@ -5,7 +5,7 @@ use CSS::Struct::Output::Structure;
 use English;
 use Error::Pure::Utils qw(clean);
 use Tags::HTML::Container;
-use Test::More 'tests' => 10;
+use Test::More 'tests' => 11;
 use Test::NoWarnings;
 
 # Test.
@@ -187,6 +187,28 @@ is_deeply(
 );
 
 # Test.
+$css = CSS::Struct::Output::Structure->new;
+$obj = Tags::HTML::Container->new(
+	'css' => $css,
+	'padding' => '0.5em',
+);
+$obj->process_css;
+$ret_ar = $css->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['s', '.container'],
+		['d', 'display', 'flex'],
+		['d', 'align-items', 'center'],
+		['d', 'justify-content', 'center'],
+		['d', 'height', '100vh'],
+		['d', 'padding', '0.5em'],
+		['e'],
+	],
+	'Container CSS code (padding).',
+);
+
+# Test.
 $obj = Tags::HTML::Container->new;
 eval {
 	$obj->process_css;
@@ -194,3 +216,4 @@ eval {
 is($EVAL_ERROR, "Parameter 'css' isn't defined.\n",
 	"Parameter 'css' isn't defined.");
 clean();
+

@@ -22,6 +22,7 @@ META.yml
 README
 SIGNATURE
 t/lib/Hello.pm
+t/lib/HelloCSS.pm
 t/lib/HelloData.pm
 t/lib/HelloInit.pm
 t/lib/HelloInit2.pm
@@ -30,8 +31,9 @@ t/Plack-App-Tags-HTML/01-use.t
 t/Plack-App-Tags-HTML/02-version.t
 t/Plack-App-Tags-HTML/03-app-hello.t
 t/Plack-App-Tags-HTML/04-app-hello-data.t
-t/Plack-App-Tags-HTML/05-app-hello-init.t
-t/Plack-App-Tags-HTML/06-app-hello-inline.t
-t/Plack-App-Tags-HTML/07-app-hello-prepare.t
+t/Plack-App-Tags-HTML/05-app-hello-data_css.t
+t/Plack-App-Tags-HTML/06-app-hello-init.t
+t/Plack-App-Tags-HTML/07-app-hello-inline.t
+t/Plack-App-Tags-HTML/08-app-hello-prepare.t
 xt/Plack-App-Tags-HTML/01-pod_coverage.t
 xt/Plack-App-Tags-HTML/02-pod.t

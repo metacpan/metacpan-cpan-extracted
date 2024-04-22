@@ -9,7 +9,7 @@ exit 0 if $ENV{AUTOMATED_TESTING} && $] < 5.026000;
 use ExtUtils::MakeMaker 7.24;
 
 my $master = 'lib/Text/Layout/Version.pm';
-my $version = "0.035";
+my $version = "0.036";
 $master =~ s;/Version;;;
 
 WriteMakefile(
@@ -23,11 +23,13 @@ WriteMakefile(
  MIN_PERL_VERSION    => '5.026000',
  PREREQ_PM           => {
 			 'Object::Pad'                 => 0.78,
+			 'Text::ParseWords' => 0,
 			 'Test::More' => 0,
 			},
  TEST_REQUIRES       => {
 			 'Object::Pad'                 => 0.78,
 			 'PDF::API2'  => 2.036,
+			 'Text::ParseWords' => 0,
 			},
  META_MERGE => {
    resources    => {

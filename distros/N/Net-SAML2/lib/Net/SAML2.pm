@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2;
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 require 5.012;
 
@@ -40,7 +40,7 @@ Net::SAML2 - SAML2 bindings and protocol implementation
 
 =head1 VERSION
 
-version 0.78
+version 0.79
 
 =head1 SYNOPSIS
 

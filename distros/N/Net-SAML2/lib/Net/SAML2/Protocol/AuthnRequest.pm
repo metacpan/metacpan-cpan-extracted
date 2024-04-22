@@ -1,7 +1,7 @@
 package Net::SAML2::Protocol::AuthnRequest;
 use Moose;
 
-our $VERSION = '0.78'; # VERSION
+our $VERSION = '0.79'; # VERSION
 use MooseX::Types::URI            qw/ Uri /;
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
 use XML::Generator;
@@ -258,7 +258,7 @@ Net::SAML2::Protocol::AuthnRequest - SAML2 AuthnRequest object
 
 =head1 VERSION
 
-version 0.78
+version 0.79
 
 =head1 SYNOPSIS
 
@@ -287,10 +287,6 @@ version 0.78
     force_authn   => $force_authn,	# Force new authentication (Default: false)
     is_passive    => $is_passive,	# IdP should not take control of UI (Default: false)
   );
-
-=head1 NAME
-
-Net::SAML2::Protocol::AuthnRequest - SAML2 AuthnRequest object
 
 =head1 METHODS
 

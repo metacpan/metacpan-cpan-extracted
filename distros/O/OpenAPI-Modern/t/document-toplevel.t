@@ -17,7 +17,7 @@ use constant SCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2022-10-07';
 subtest 'basic construction' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => my $js = JSON::Schema::Modern->new,
+    evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 1),
     schema => {
       openapi => '3.1.0',
       info => {
@@ -47,7 +47,7 @@ subtest 'basic construction' => sub {
 subtest 'top level document fields' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => my $js = JSON::Schema::Modern->new,
+    evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 1),
     schema => 1,
   );
 
@@ -73,7 +73,7 @@ subtest 'top level document fields' => sub {
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => $js = JSON::Schema::Modern->new,
+    evaluator => $js = JSON::Schema::Modern->new(validate_formats => 1),
     schema => {},
   );
   cmp_deeply(
@@ -333,7 +333,7 @@ ERRORS
 ERRORS
 
 
-  $js = JSON::Schema::Modern->new;
+  $js = JSON::Schema::Modern->new(validate_formats => 1);
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js,
@@ -387,7 +387,7 @@ ERRORS
   );
 
 
-  $js = JSON::Schema::Modern->new;
+  $js = JSON::Schema::Modern->new(validate_formats => 1);
   $js->add_schema({
     '$id' => 'https://mymetaschema',
     '$vocabulary' => {

@@ -773,7 +773,7 @@ sub PDL::rld {
 
 =for sig
 
-  Signature: (c(n); indx [o]a(m); [o]b(m))
+  Signature: (c(n); indx [o]a(m=CALC($SIZE(n))); [o]b(m))
 
 =for ref
 
@@ -823,7 +823,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1083 "slices.pd"
+#line 1082 "slices.pd"
 sub PDL::rle {
   my $c = shift;
   my ($x,$y) = @_==2 ? @_ : (null,null);
@@ -911,7 +911,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1209 "slices.pd"
+#line 1208 "slices.pd"
 sub PDL::rldvec {
   my ($a,$b,$c) = @_;
   ($c,my $sm) = defined($c) ? ($c,$c->dim(1)) : (PDL->null,$a->sumover->max->sclr);
@@ -994,7 +994,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1282 "slices.pd"
+#line 1281 "slices.pd"
 sub PDL::rldseq {
   my ($a,$b,$c) = @_;
   ($c,my $sm) = defined($c) ? ($c,$c->dim(1)) : (PDL->null,$a->sumover->max->sclr);
@@ -1009,7 +1009,7 @@ sub PDL::rldseq {
 
 
 
-#line 1317 "slices.pd"
+#line 1316 "slices.pd"
 
 =head2 rleND
 
@@ -1136,7 +1136,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1476 "slices.pd"
+#line 1475 "slices.pd"
 
 =head2 reorder
 
@@ -1299,7 +1299,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1649 "slices.pd"
+#line 1648 "slices.pd"
 
 =head2 using
 
@@ -1516,7 +1516,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1976 "slices.pd"
+#line 1975 "slices.pd"
 
 =head2 dice
 
@@ -1841,7 +1841,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2295 "slices.pd"
+#line 2294 "slices.pd"
 sub PDL::slice {
     my ($source, @others) = @_;
     for my $i(0..$#others) {
@@ -1947,7 +1947,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2515 "slices.pd"
+#line 2514 "slices.pd"
 sub PDL::diagonal { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
 #line 1953 "Slices.pm"
 
@@ -1959,7 +1959,7 @@ sub PDL::diagonal { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
 
 
 
-#line 2565 "slices.pd"
+#line 2564 "slices.pd"
 
 =head1 BUGS
 

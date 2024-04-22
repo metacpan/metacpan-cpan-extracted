@@ -249,7 +249,7 @@ sub new {
 	}
 	
 	# Ensure that if they supplied a plotTypes, that it is an array reference,
-	# not a singulare plotType:
+	# not a singular plotType:
 	$self->{plotTypes} = [$self->{plotTypes}]
 		if (exists $self->{plotTypes} and ref($self->{plotTypes}) ne 'ARRAY');
 	

@@ -72,7 +72,7 @@ Currently only LU decomposition interfaces here. Pull requests welcome!
 
 =for sig
 
-  Signature: ([io,phys]A(n,m); indx [o,phys]ipiv(p); int [o,phys]signum())
+  Signature: ([io,phys]A(n,m); indx [o,phys]ipiv(p=CALC($PDL(A)->ndims > 1 ? PDLMIN($PDL(A)->dims[0], $PDL(A)->dims[1]) : 1)); int [o,phys]signum())
 
 =for ref
 

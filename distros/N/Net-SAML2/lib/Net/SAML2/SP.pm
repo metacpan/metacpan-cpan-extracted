@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::SP;
-our $VERSION = '0.78'; # VERSION
+our $VERSION = '0.79'; # VERSION
 
 use Moose;
 
@@ -158,15 +158,6 @@ around BUILDARGS => sub {
 
 sub _build_id {
     my $self = shift;
-
-    # This allows current clients to override the builder without changing
-    # their code
-    if (my $f = $self->can('generate_sp_desciptor_id')) {
-        Net::SAML2::Util::deprecation_warning
-          "generate_sp_desciptor_id has been deprecated, please override " .
-          "_build_id yourself or supply the ID to the constructor";
-          return $f->();
-    }
     return Net::SAML2::Util::generate_id();
 }
 
@@ -242,14 +233,14 @@ sub logout_request {
 
 
 sub logout_response {
-    my ($self, $destination, $status, $response_to) = @_;
+    my ($self, $destination, $status, $in_response_to) = @_;
 
     my $status_uri = Net::SAML2::Protocol::LogoutResponse->status_uri($status);
     my $logout_req = Net::SAML2::Protocol::LogoutResponse->new(
-        issuer      => $self->issuer,
-        destination => $destination,
-        status      => $status_uri,
-        response_to => $response_to,
+        issuer          => $self->issuer,
+        destination     => $destination,
+        status          => $status_uri,
+        in_response_to  => $in_response_to,
     );
 
     return $logout_req;
@@ -376,15 +367,17 @@ sub generate_metadata {
         $x->SPSSODescriptor(
             $md,
             {
-                AuthnRequestsSigned        => $self->authnreq_signed,
-                WantAssertionsSigned       => $self->want_assertions_signed,
+                AuthnRequestsSigned        => $self->authnreq_signed ? 'true' : 'false',
+                WantAssertionsSigned       => $self->want_assertions_signed ? 'true' : 'false',
                 errorURL                   => $error_uri,
                 protocolSupportEnumeration => URN_PROTOCOL,
             },
 
-            $self->_generate_key_descriptors($x, 'signing'),
+            $self->has_encryption_key
+                ? ($self->_generate_key_descriptors($x, 'encryption'),
+                   $self->_generate_key_descriptors($x, 'signing'))
+                : $self->_generate_key_descriptors($x, 'both'),
 
-            $self->has_encryption_key ? $self->_generate_key_descriptors($x, 'encryption') : (),
 
             $self->_generate_single_logout_service($x),
 
@@ -426,11 +419,11 @@ sub _generate_key_descriptors {
         && !$self->want_assertions_signed
         && !$self->sign_metadata;
 
-    my $key = $use eq 'signing' ? $self->_cert_text : $self->_encryption_key_text;
+    my $key = $use eq 'encryption' ? $self->_encryption_key_text : $self->_cert_text;
 
     return $x->KeyDescriptor(
         $md,
-        { use => $use },
+        $use ne 'both' ? { use => $use } : {},
         $x->KeyInfo(
             $ds,
             $x->X509Data($ds, $x->X509Certificate($ds, $key)),
@@ -443,7 +436,7 @@ sub _generate_key_descriptors {
 sub key_name {
     my $self = shift;
     my $use  = shift;
-    my $key = $use eq 'signing' ? $self->_cert_text : $self->_encryption_key_text;
+    my $key = $use eq 'encryption' ? $self->_encryption_key_text : $self->_cert_text;
     return unless $key;
     return Digest::MD5::md5_hex($key);
 }
@@ -530,7 +523,7 @@ Net::SAML2::SP - SAML Service Provider object
 
 =head1 VERSION
 
-version 0.78
+version 0.79
 
 =head1 SYNOPSIS
 
@@ -706,7 +699,7 @@ $params =   (
 
 =back
 
-=head2 logout_response( $destination, $status, $response_to )
+=head2 logout_response( $destination, $status, $in_response_to )
 
 Returns a LogoutResponse object created by this SP, intended for the
 given destination, which should be the identity URI of the IdP.

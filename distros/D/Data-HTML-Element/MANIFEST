@@ -104,8 +104,9 @@ t/Data-HTML-Element-Select/10-id.t
 t/Data-HTML-Element-Select/11-label.t
 t/Data-HTML-Element-Select/12-multiple.t
 t/Data-HTML-Element-Select/13-name.t
-t/Data-HTML-Element-Select/14-required.t
-t/Data-HTML-Element-Select/15-size.t
+t/Data-HTML-Element-Select/14-onchange.t
+t/Data-HTML-Element-Select/15-required.t
+t/Data-HTML-Element-Select/16-size.t
 t/Data-HTML-Element-Textarea/01-use.t
 t/Data-HTML-Element-Textarea/02-version.t
 t/Data-HTML-Element-Textarea/03-new.t

@@ -11,6 +11,8 @@
 #
 package PDL::Graphics::Simple::Gnuplot;
 
+use strict;
+use warnings;
 use File::Temp qw/tempfile/;
 use PDL::Options q/iparse/;
 use PDL;
@@ -21,10 +23,9 @@ our $mod = {
     module=>'PDL::Graphics::Simple::Gnuplot',
     engine => 'PDL::Graphics::Gnuplot',
     synopsis=> 'Gnuplot 2D/3D (versatile; beautiful output)',
-    pgs_version=> '1.010',
+    pgs_api_version=> '1.011',
 };
-eval { require PDL::Graphics::Gnuplot; 1; } and
-  PDL::Graphics::Simple::register( 'PDL::Graphics::Simple::Gnuplot' );
+PDL::Graphics::Simple::register( $mod );
 
 our $filetypes = {
     ps => ['pscairo','postscript'],
@@ -58,8 +59,8 @@ sub check {
     # Eval PDL::Graphics::Gnuplot.  Require relatively recent version.
     # We don't specify the version in the 'use', so we can issue a
     # warning on an older version.
-    eval 'use PDL::Graphics::Gnuplot;';
-    if($@) {
+    eval { require PDL::Graphics::Gnuplot; PDL::Graphics::Gnuplot->import; };
+    if ($@) {
 	$mod->{ok} = 0;
 	$mod->{msg} = $@;
 	return 0;
@@ -73,9 +74,8 @@ sub check {
 	return 0;
     }
 
-    my $gpw;
-    eval '$gpw = gpwin();';
-    if($@) {
+    my $gpw = eval { gpwin() };
+    if ($@) {
 	$mod->{ok} = 0;
 	$mod->{msg} = $@;
 	die "PDL::Graphics::Simple: PDL::Graphics::Gnuplot didn't construct properly.\n\t$@";
@@ -83,16 +83,20 @@ sub check {
     $mod->{valid_terms} = $gpw->{valid_terms};
 
     my $okterm = undef;
-    for my $term(@disp_terms){
-	if($mod->{valid_terms}->{$term}) {
-	    $okterm = $term;
-	    last;
+    if ($ENV{PDL_SIMPLE_DEVICE}) {
+	$okterm = 1;
+    } else {
+	for my $term (@disp_terms) {
+	    if ($mod->{valid_terms}{$term}) {
+		$okterm = $term;
+		last;
+	    }
 	}
     }
 
-    unless( defined $okterm ) {
+    unless ( defined $okterm ) {
 	$mod->{ok} = 0;
-	$s =  "Gnuplot doesn't seem to support any of the known display terminals:\n    they are: (".join(",",@disp_terms).")\n";
+	my $s =  "Gnuplot doesn't seem to support any of the known display terminals:\n    they are: (".join(",",@disp_terms).")\n";
 	$mod->{msg} = $s;
 	die "PDL::Graphics::Simple: $s";
     }
@@ -123,7 +127,7 @@ sub new {
     # Force a recheck on failure, in case the user fixed gnuplot.
     # Also loads PDL::Graphics::Gnuplot.
     unless(check()) {
-	die "$mod->{shortname} appears nonfunctional\n" unless(check(1));
+	die "$mod->{shortname} appears nonfunctional: $mod->{msg}\n" unless(check(1));
     }
 
     # Generate the @params array to feed to gnuplot
@@ -135,20 +139,27 @@ sub new {
 
     # Do different things for interactive and file types
     if($opt->{type} =~ m/^i/i) {
-	push(@params, "title"=>$opt->{output}) if(defined($opt->{output}));
-
-	# Interactive - try known terminals
-	if($mod->{itype}) {
-	    push(@params, (persist=>0)) if( ($disp_opts->{$mod->{itype}} // {})->{persist} );
-	    push(@params, (font=>"=16"));
-	    $gpw = gpwin($mod->{itype}, @params, persist=>0, font=>"=16" );
+	push(@params, title=>$opt->{output}) if defined $opt->{output};
+	# Interactive - try known terminals unless PDL_SIMPLE_DEVICE given
+	push @params, font=>"=16", dashed=>1;
+	if (my $try = $mod->{itype}) {
+	    $gpw = gpwin($mod->{itype}, @params,
+		($disp_opts->{$try} // {})->{persist} ? (persist=>0) : ()
+	    );
+            no warnings 'once';
 	    print $PDL::Graphics::Gnuplot::last_plotcmd;
 	} else {
-	    attempt:for my $try( @disp_terms ) {
-		push(@params, (persist=>0)) if( ($disp_opts->{$try} // {})->{persist} );
-		push(@params, (font=>"=16"));
-		eval { $gpw = gpwin($try, @params, persist=>0, font=>"=16",dashed=>1); };
-		last attempt if($gpw);
+	    if (my $try = $ENV{PDL_SIMPLE_DEVICE}) {
+		$gpw = gpwin($try, @params,
+		    ($disp_opts->{$try} // {})->{persist} ? (persist=>0) : ()
+		);
+	    } else {
+		attempt:for my $try( @disp_terms ) {
+		    eval { $gpw = gpwin($try, @params,
+			($disp_opts->{$try} // {})->{persist} ? (persist=>0) : ()
+		    ); };
+		    last attempt if($gpw);
+		}
 	    }
 	    die "Couldn't start a gnuplot interactive window" unless($gpw);
 	    $mod->{itype} = $gpw->{terminal};
@@ -173,24 +184,24 @@ sub new {
 	# At the end, $ft has either a valid terminal name from the table (at top),
 	# or undef.
 	my $ft = $filetypes->{$ext};
-	if(ref $ft eq ARRAY) {
-	  try:for my $try(@$ft) {
+	if (ref $ft eq 'ARRAY') {
+	  try:for my $try (@$ft) {
 	      if($mod->{valid_terms}->{$try}) {
 		  $ft = $try;
 		  last try;
 	      }
 	  }
-	    if(ref($ft)) {
+	    if (ref($ft)) {
 		$ft = undef;
 	    }
-	} elsif(!defined($mod->{valid_terms}->{$ft})) {
+	} elsif (!defined($mod->{valid_terms}->{$ft})) {
 	    $ft = undef;
 	}
 
 	# Now $ext has the file type - check if its a supported type.  If not, make a
 	# tempfilename to hold gnuplot's output.
-	unless( defined($ft) ) {
-	    unless($mod->{valid_terms}->{'pscairo'}  or  $mod->{valid_terms}->{'postscript'}) {
+	unless ( defined($ft) ) {
+	    unless ($mod->{valid_terms}->{'pscairo'}  or  $mod->{valid_terms}->{'postscript'}) {
 		die "PDL::Graphics::Simple: $ext isn't a valid output file type for your gnuplot,\n\tand it doesn't support .ps either.  Sorry, I give up.\n";
 	    }
 
@@ -395,3 +406,5 @@ sub plot {
 	unlink($me->{conv_fn});
     }
 }
+
+1;

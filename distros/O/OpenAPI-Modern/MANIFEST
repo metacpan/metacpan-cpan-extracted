@@ -10,6 +10,7 @@ META.yml
 README
 dist.ini
 examples/synopsis
+inc/AppendSupport.pm
 lib/JSON/Schema/Modern/Document/OpenAPI.pm
 lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm
 lib/OpenAPI/Modern.pm

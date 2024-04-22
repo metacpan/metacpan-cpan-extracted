@@ -10,7 +10,7 @@ use English;
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -104,11 +104,20 @@ sub _process {
 		);
 		foreach my $entry (@{$changes_rel->entries}) {
 			if (defined $entry->text && $entry->text ne '') {
-				$self->{'tags'}->put(
-					['b', 'h3'],
-					['d', '['.$entry->text.']'],
-					['e', 'h3'],
-				);
+				if (@{$entry->entries}) {
+					$self->{'tags'}->put(
+						['b', 'h3'],
+						['d', '['.$entry->text.']'],
+						['e', 'h3'],
+					);
+				} else {
+					$self->{'tags'}->put(
+						['b', 'li'],
+						['a', 'class', 'version-change'],
+						['d', $entry->text],
+						['e', 'li'],
+					);
+				}
 			}
 			foreach my $change (@{$entry->entries}) {
 				$self->{'tags'}->put(
@@ -534,6 +543,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

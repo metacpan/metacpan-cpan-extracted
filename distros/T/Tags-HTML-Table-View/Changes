@@ -1,3 +1,6 @@
+0.06 2024-04-21T17:26:14+02:00
+ - Fix of setting of table data. Copy in this time.
+
 0.05 2024-02-06T09:36:10+01:00
  - Add possibility of code in table field.
  - Add test for Data::HTML::Element::A in field.

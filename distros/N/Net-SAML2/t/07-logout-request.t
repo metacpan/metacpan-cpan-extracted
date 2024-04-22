@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::Lib;
 use Test::Net::SAML2;
-use URN::OASIS::SAML2 qw(:urn);
+use URN::OASIS::SAML2 qw(:urn NAMEID_EMAIL);
 
 use Net::SAML2::Protocol::LogoutRequest;
 
@@ -39,12 +39,34 @@ test_xml_attribute_ok($xpath, '/samlp:LogoutRequest/@IssueInstant', 'foo');
 my $name_id = get_single_node_ok($xpath, '/samlp:LogoutRequest/saml:NameID');
 is($name_id->getAttribute('Format'), $args{nameid_format});
 
-foreach (qw(NameQualifier SPNameQualifier SPProvidedID)) {
-    is(
-        $name_id->getAttribute($_),
-        undef,
-        "We don't have $_ as an attribute in the nameid"
+foreach (qw(NameQualifier SPNameQualifier)) {
+    isnt($name_id->getAttribute($_),
+        undef, "We don't have $_ as an attribute in the nameid");
+}
+
+is(
+    $name_id->getAttribute('SPProvidedID'),
+    undef,
+    "We don't have SPProvidedID as an attribute in the nameid"
+);
+
+{
+    my $lor = Net::SAML2::Protocol::LogoutRequest->new(%args, nameid_format => NAMEID_EMAIL());
+    my $xpath = get_xpath(
+        $lor->as_xml,
+        samlp => URN_PROTOCOL,
+        saml  => URN_ASSERTION,
     );
+    test_xml_attribute_ok($xpath, '/samlp:LogoutRequest/@ID', qr/^NETSAML2_/);
+    test_xml_attribute_ok($xpath, '/samlp:LogoutRequest/@IssueInstant', 'foo');
+    my $name_id = get_single_node_ok($xpath, '/samlp:LogoutRequest/saml:NameID');
+    is($name_id->getAttribute('Format'), NAMEID_EMAIL());
+
+    foreach (qw(NameQualifier SPNameQualifier SPProvidedID)) {
+        is($name_id->getAttribute($_),
+            undef, "We don't have $_ as an attribute in the nameid");
+    }
+
 }
 
 {

@@ -200,26 +200,26 @@ C<$c> is a contour value (or a list of contour values)
 C<$data> is an [m,n] array of values at each point
 
 C<$points> is a list of [3,m,n] points, it should be a grid
-monotonically increasing with m and n.  
+monotonically increasing with m and n.
 
-contour_segments returns a reference to a Perl array of 
+contour_segments returns a reference to a Perl array of
 line segments associated with each value of C<$c>.  It does not (yet) handle
-missing data values. 
+missing data values.
 
 =over 4
 
 =item Algorithm
 
-The data array represents samples of some field observed on the surface described 
+The data array represents samples of some field observed on the surface described
 by points.  For each contour value we look for intersections on the line segments
-joining points of the data.  When an intersection is found we look to the adjoining 
+joining points of the data.  When an intersection is found we look to the adjoining
 line segments for the other end(s) of the line segment(s).  So suppose we find an
 intersection on an x-segment.  We first look down to the left y-segment, then to the
-right y-segment and finally across to the next x-segment.  Once we find one in a 
+right y-segment and finally across to the next x-segment.  Once we find one in a
 box (two on a point) we can quit because there can only be one.  After we are done
 with a given x-segment, we look to the leftover possibilities for the adjoining y-segment.
 Thus the contours are built as a collection of line segments rather than a set of closed
-polygons.          
+polygons.
 
 =back
 
@@ -240,11 +240,11 @@ sub PDL::Graphics::TriD::Contours::contour_segments {
       next if($ncnt==-1);
 		$pcnt = $pcnt+$ncnt;
 		$this->{ContourSegCnt}[$i] =  $pcnt;
-		$pcnt=$pcnt+1;    
+		$pcnt=$pcnt+1;
 		$this->{Points} = $this->{Points}->append($segs->slice(":,0:$ncnt,($i)")->transpose);
 	}
 	$this->{Points} = $this->{Points}->transpose;
-	
+
 }
 #line 250 "Rout.pm"
 
@@ -256,7 +256,7 @@ sub PDL::Graphics::TriD::Contours::contour_segments {
 
 
 
-#line 436 "rout.pd"
+#line 396 "rout.pd"
 
 =head1 AUTHOR
 

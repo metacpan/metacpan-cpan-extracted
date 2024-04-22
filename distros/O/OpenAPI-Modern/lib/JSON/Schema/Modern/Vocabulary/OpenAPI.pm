@@ -3,7 +3,7 @@ package JSON::Schema::Modern::Vocabulary::OpenAPI;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema OpenAPI vocabulary
 
-our $VERSION = '0.061';
+our $VERSION = '0.062';
 
 use 5.020;
 use Moo;
@@ -118,7 +118,7 @@ JSON::Schema::Modern::Vocabulary::OpenAPI - Implementation of the JSON Schema Op
 
 =head1 VERSION
 
-version 0.061
+version 0.062
 
 =head1 DESCRIPTION
 
@@ -176,6 +176,8 @@ L<https://spec.openapis.org/oas/v3.1.0>
 Bugs may be submitted through L<https://github.com/karenetheridge/OpenAPI-Modern/issues>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+=for stopwords OpenAPI
 
 You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI
 Slack server|https://open-api.slack.com>, which are also great resources for finding help.

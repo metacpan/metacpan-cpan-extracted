@@ -10,7 +10,7 @@ use Mo qw(build is);
 use Mo::utils qw(check_array check_bool check_number);
 use Mo::utils::CSS qw(check_css_class);
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 has css_class => (
 	is => 'ro',

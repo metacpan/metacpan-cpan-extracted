@@ -27,5 +27,5 @@ resources:
   IRC: irc://irc.perl.org/#pdl
   bugtracker: https://github.com/PDLPorters/PDL-Graphics-Prima/issues
   repository: https://github.com/PDLPorters/PDL-Graphics-Prima
-version: '0.20'
+version: '0.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

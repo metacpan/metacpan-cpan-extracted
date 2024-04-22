@@ -1,3 +1,8 @@
+0.07 2024-04-21T12:13:54+02:00
+ - Add 'padding' parameter.
+ - Add check for unit in 'height' parameter.
+ - Add example with change password helper in container to doc.
+
 0.06 2024-03-23T11:17:28+01:00
  - Add tests.
  - Fix test message.

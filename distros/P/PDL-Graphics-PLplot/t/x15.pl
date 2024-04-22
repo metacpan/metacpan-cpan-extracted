@@ -37,7 +37,6 @@ my ($zmin, $zmax);
 
 sub plot1 ();
 sub plot2 ();
-sub f2mnmx ($);
 sub cmap1_init1	();
 sub cmap1_init2	();
 
@@ -78,7 +77,7 @@ sub main {
 	}
     }
 
-    ($zmin, $zmax) = f2mnmx ($z);
+    ($zmin, $zmax) = minmax($z);
 
     plot1 ();
     plot2 ();
@@ -281,15 +280,6 @@ sub plot3 () {
     plline3 ($xx->slice(":,1"), $yy->slice(":,1"), $zz->slice(":,1"));
     plfill3 (4, $xx->slice("0:4,1"), $yy->slice("0:4,1"), $zz->slice("0:4,1"));
     
-}
-
-# f2mnmx
-#
-# Returns min & max of input 2d array
-
-sub f2mnmx ($) {
-    my $f = shift;
-    return (min ($f), max ($f));
 }
 
 main ();

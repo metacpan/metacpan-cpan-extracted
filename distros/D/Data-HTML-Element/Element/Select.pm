@@ -8,7 +8,7 @@ use Mo qw(build default is);
 use Mo::utils qw(check_bool check_number);
 use Mo::utils::CSS qw(check_css_class);
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 has autofocus => (
 	is => 'ro',
@@ -48,6 +48,10 @@ has multiple => (
 );
 
 has name => (
+	is => 'ro',
+);
+
+has onchange => (
 	is => 'ro',
 );
 

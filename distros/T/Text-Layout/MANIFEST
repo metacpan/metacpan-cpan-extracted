@@ -9,6 +9,7 @@ lib/Text/Layout/Pango.pm
 lib/Text/Layout/PDFAPI2.pm
 lib/Text/Layout/PDFAPI2/ImageElement.pm
 lib/Text/Layout/Testing.pm
+lib/Text/Layout/Utils.pm
 lib/Text/Layout/Version.pm
 Makefile.PL
 MANIFEST
@@ -21,6 +22,7 @@ t/102-pdfapi.t
 t/150-pdfbuilder.t
 t/152-pdfbuilder.t
 t/200-extents.t
+t/210-struts.t
 t/Polo-SemiScript.ttf
 tests/pango00.pl
 tests/pango01.pl

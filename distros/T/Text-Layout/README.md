@@ -26,7 +26,7 @@ Example:
 
     # Create a PDF document.
     my $pdf = PDF::API2->new;	# or PDF::Builder->new
-    $pdf->mediabox( 595, 842 );	# A4, PDF units
+    $pdf->default_page_size("a4");
 
     # Set up page and get the text context.
     my $page = $pdf->page;
@@ -79,7 +79,7 @@ GitHub.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2019 Johan Vromans
+Copyright (C) 2019,2024 Johan Vromans
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -43,7 +43,7 @@ subtest 'missing arguments' => sub {
         openapi_document => JSON::Schema::Modern::Document::OpenAPI->new(
           canonical_uri => 'openapi.yaml',
           schema => $minimal_document,
-          evaluator => JSON::Schema::Modern->new,
+          evaluator => JSON::Schema::Modern->new(validate_formats => 0),
         )
       );
       is($openapi->openapi_uri, 'openapi.yaml', 'got uri out of object');
@@ -60,7 +60,7 @@ subtest 'missing arguments' => sub {
       my $openapi = OpenAPI::Modern->new(
         openapi_uri => 'openapi.yaml',
         openapi_schema => $minimal_document,
-        evaluator => JSON::Schema::Modern->new,
+        evaluator => JSON::Schema::Modern->new(validate_formats => 0),
       );
       is($openapi->openapi_uri, 'openapi.yaml', 'got uri out of object');
       cmp_deeply($openapi->openapi_schema, $minimal_document, 'got schema out of object');
@@ -126,7 +126,7 @@ subtest 'construct with document' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema',
-    evaluator => my $js = JSON::Schema::Modern->new,
+    evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 1),
     schema => {
       %$minimal_document,
       components => {

@@ -1,11 +1,10 @@
-use strict;
-use warnings;
 package Net::SAML2::Protocol::LogoutResponse;
-our $VERSION = '0.78'; # VERSION
-
 use Moose;
+our $VERSION = '0.79'; # VERSION
+
 use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::XML::Util qw/ no_comments /;
+use Net::SAML2::Util qw/ deprecation_warning /;
 use XML::LibXML::XPathContext;
 
 with 'Net::SAML2::Role::ProtocolMessage';
@@ -13,9 +12,31 @@ with 'Net::SAML2::Role::ProtocolMessage';
 # ABSTRACT: SAML2 LogoutResponse Protocol object
 
 
-has 'status'      => (isa => 'Str', is => 'ro', required => 1);
-has 'substatus'   => (isa => 'Str', is => 'ro', required => 0);
-has 'response_to' => (isa => 'Str', is => 'ro', required => 1);
+has 'status'          => (isa      => 'Str', is => 'ro', required => 1);
+has 'substatus'      => (isa      => 'Str', is => 'ro', required => 0);
+has '+in_response_to' => (required => 1);
+
+# Remove response_to/substatus after 6 months from now (april 18th 2024)
+around BUILDARGS => sub {
+    my $orig = shift;
+    my $self = shift;
+    my %args = @_;
+
+    if (my $irt = delete $args{response_to}) {
+        $args{in_response_to} = $irt;
+        deprecation_warning(
+            "Please use in_response_to instead of response_to");
+    }
+
+    return $self->$orig(%args);
+};
+
+
+sub response_to {
+    my $self = shift;
+    deprecation_warning("Please use in_response_to instead of response_to");
+    return $self->in_response_to;
+}
 
 
 sub new_from_xml {
@@ -29,12 +50,12 @@ sub new_from_xml {
 
     my $self = $class->new(
         id          => $xpath->findvalue('/samlp:LogoutResponse/@ID'),
-        response_to => $xpath->findvalue('/samlp:LogoutResponse/@InResponseTo'),
+        in_response_to => $xpath->findvalue('/samlp:LogoutResponse/@InResponseTo'),
         destination => $xpath->findvalue('/samlp:LogoutResponse/@Destination'),
         session     => $xpath->findvalue('/samlp:LogoutResponse/samlp:SessionIndex'),
         issuer      => $xpath->findvalue('/samlp:LogoutResponse/saml:Issuer'),
         status      => $xpath->findvalue('/samlp:LogoutResponse/samlp:Status/samlp:StatusCode/@Value'),
-        substatus   => $xpath->findvalue('/samlp:LogoutResponse/samlp:Status/samlp:StatusCode/samlp:StatusCode/@Value'),
+        substatus  => $xpath->findvalue('/samlp:LogoutResponse/samlp:Status/samlp:StatusCode/samlp:StatusCode/@Value'),
     );
 
     return $self;
@@ -55,7 +76,7 @@ sub as_xml {
               Version => '2.0',
               IssueInstant => $self->issue_instant,
               Destination => $self->destination,
-              InResponseTo => $self->response_to },
+              InResponseTo => $self->in_response_to },
             $x->Issuer(
                 $saml,
                 $self->issuer,
@@ -69,13 +90,6 @@ sub as_xml {
             )
         )
     );
-}
-
-
-sub success {
-    my ($self) = @_;
-    return 1 if $self->status eq $self->status_uri('success');
-    return 0;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -92,20 +106,21 @@ Net::SAML2::Protocol::LogoutResponse - SAML2 LogoutResponse Protocol object
 
 =head1 VERSION
 
-version 0.78
+version 0.79
 
 =head1 SYNOPSIS
 
-  my $logout_req = Net::SAML2::Protocol::LogoutResponse->new(
-    issuer      => $issuer,
-    destination => $destination,
-    status      => $status,
-    response_to => $response_to,
-  );
+    my $logout_req = Net::SAML2::Protocol::LogoutResponse->new(
+        issuer          => $issuer,
+        destination     => $destination,
+        status          => $status,
+        in_response_to  => $in_response_to,
+    );
 
-=head1 NAME
+=head1 DESCRIPTION
 
-Net::SAML2::Protocol::LogoutResponse - the SAML2 LogoutResponse object
+This object deals with the LogoutResponse messages from SAML. It implements the
+role L<Net::SAML2::Role::ProtocolMessage>.
 
 =head1 METHODS
 
@@ -119,7 +134,7 @@ Arguments:
 
 =item B<issuer>
 
-SP's identity URI
+SP's identity URI (required)
 
 =item B<destination>
 
@@ -127,13 +142,21 @@ IdP's identity URI
 
 =item B<status>
 
-response status
+Response status (required)
 
-=item B<response_to>
+=item B<substatus>
 
-request ID we're responding to
+The sub status
+
+=item B<in_response_to>
+
+Request ID we're responding to (required);
 
 =back
+
+=head2 response_to()
+
+Deprecated use B<in_response_to>
 
 =head2 new_from_xml( ... )
 
@@ -153,9 +176,9 @@ XML data
 
 Returns the LogoutResponse as XML.
 
-=head2 success( )
+=head1 SEE ALSO
 
-Returns true if the Response's status is Success.
+=head2 L<Net::SAML2::Roles::ProtocolMessage>
 
 =head1 AUTHORS
 

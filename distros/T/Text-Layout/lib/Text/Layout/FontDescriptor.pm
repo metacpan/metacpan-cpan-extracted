@@ -8,7 +8,7 @@ package Text::Layout::FontDescriptor;
 
 use Carp;
 
- our $VERSION = "0.035";
+ our $VERSION = "0.036";
 
 =head1 NAME
 

@@ -160,7 +160,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double [o]y(n); double [t]work(wn); char norm;  int lmax; int csphase)
+  Signature: (double x(); double [o]y(n=CALC($COMP(lmax)*($COMP(lmax)+1)/2+$COMP(lmax)+1)); double [t]work(wn=CALC(gsl_sf_legendre_array_n($COMP(lmax)))); char norm;  int lmax; int csphase)
 
 =for ref
 
@@ -212,7 +212,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int [o]l(n); int [o]m(n); int lmax)
+  Signature: (int [o]l(n=CALC($COMP(lmax)*($COMP(lmax)+1)/2+$COMP(lmax)+1)); int [o]m(n); int lmax)
 
 =for ref
 
@@ -484,7 +484,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 302 "gsl_sf_legendre.pd"
+#line 297 "gsl_sf_legendre.pd"
 
 =head1 AUTHOR
 

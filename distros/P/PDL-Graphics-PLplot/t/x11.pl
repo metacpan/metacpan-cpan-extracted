@@ -72,25 +72,13 @@ plParseOpts (\@ARGV, PL_PARSE_SKIP | PL_PARSE_NOPROGRAM);
 
 plinit ();
 
-my $z = zeroes (XPTS, YPTS);
-
-my $x = 3 * (sequence (XPTS) - int(XPTS / 2)) / int(XPTS / 2);
-my $y = 3 * (sequence (YPTS) - int(YPTS / 2)) / int(YPTS / 2);
-
-# The code below may be vectorized to improve speed
-for (my $i = 0; $i < XPTS; $i++) {
-  my $xx = $x->index ($i);
-  for (my $j = 0; $j < YPTS; $j++) {
-    my $yy = $y->index ($j);
-    $z->slice ("$i,$j") .=
-      3. * (1.-$xx)*(1.-$xx) * exp(-($xx*$xx) - ($yy+1.)*($yy+1.)) -
-      10. * ($xx/5. - pow($xx,3.) - pow($yy,5.)) * exp(-$xx*$xx-$yy*$yy) -
-      1./3. * exp(-($xx+1)*($xx+1) - ($yy*$yy));
-  }
-}
-
-my $zmax = max ($z);
-my $zmin = min ($z);
+my ($x, $y) = map 3*(sequence($_) - int($_ / 2)) / int($_ / 2), XPTS, YPTS;
+my ($xx, $yy) = ($x->dummy(1,YPTS), $y->dummy(0,XPTS));
+my $z =
+  3. * (1.-$xx)*(1.-$xx) * exp(-($xx*$xx) - ($yy+1.)*($yy+1.)) -
+  10. * ($xx/5. - pow($xx,3.) - pow($yy,5.)) * exp(-$xx*$xx-$yy*$yy) -
+  1./3. * exp(-($xx+1)*($xx+1) - ($yy*$yy));
+my ($zmin, $zmax) = (min($z), max($z));
 my $step = ($zmax - $zmin) / ($nlevel + 1);
 my $clevel = $zmin + $step + $step * sequence ($nlevel);
 

@@ -1,5 +1,12 @@
 Revision history for OpenAPI-Modern
 
+0.062     2024-04-21 18:11:43Z
+          - BREAKING CHANGE: operation_path is dropped from the populated
+            $options hash in validate_request, validate_response, and
+            find_path, and replaced with path_item_uri
+          - "servers" entries are now allowed in openapi documents, but they
+            are not yet considered when matching URIs to paths
+
 0.061     2024-04-01 05:33:15Z
           - fixed incompatibility with an internal change in
             JSON::Schema::Modern 0.583

@@ -788,7 +788,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (cr(n); ci(n); [o]rr(m); [o]ri(m))
+  Signature: (cr(n); ci(n); [o]rr(m=CALC($SIZE(n)-1)); [o]ri(m))
 
 =for ref
 
@@ -812,7 +812,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 349 "math.pd"
+#line 348 "math.pd"
 sub PDL::polyroots {
   my @args = map PDL->topdl($_), @_;
   my $natcplx = !$args[0]->type->real;
@@ -835,7 +835,7 @@ sub PDL::polyroots {
 
 =for sig
 
-  Signature: (r(m); [o]c(n))
+  Signature: (r(m); [o]c(n=CALC($SIZE(m)+1)))
 
 =for ref
 
@@ -859,7 +859,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 390 "math.pd"
+#line 388 "math.pd"
 sub PDL::polyfromroots {
   my @args = map PDL->topdl($_), @_;
   my $natcplx = !$args[0]->type->real;
@@ -919,7 +919,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 435 "math.pd"
+#line 433 "math.pd"
 sub PDL::polyval {
   my @args = map PDL->topdl($_), @_;
   my $natcplx = !$args[0]->type->real;
@@ -953,7 +953,7 @@ sub PDL::polyval {
 
 
 
-#line 472 "math.pd"
+#line 470 "math.pd"
 
 =head1 BUGS
 

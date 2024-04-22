@@ -9,8 +9,8 @@ my $verbose = 1;
 use PDF::API2;
 
 my $pdf = PDF::API2->new;
+$pdf->default_page_size("a4");
 my $page = $pdf->page;
-$page->boundaries( media => [ 842, 595 ] );
 my $text = $page->text;
 
 #my $font = $pdf->corefont('Times-Roman');
@@ -23,7 +23,7 @@ $text->text("jumps", -underline => ["auto","auto"] );
 
 use lib 'lib';
 use Text::Layout;
-
+warn("Text::Layout version ", $Text::Layout::VERSION, "\n");
 my $layout = Text::Layout->new($pdf);
 # Select a font.
 $font = Text::Layout::FontConfig->from_string("DejaVuSerif 40");
@@ -42,5 +42,5 @@ $layout->render( 50, 250, $text );
 
 
 
-$pdf->saveas("strikes.pdf");
+$pdf->save("strikes.pdf");
 

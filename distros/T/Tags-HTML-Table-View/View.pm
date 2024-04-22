@@ -10,7 +10,7 @@ use List::MoreUtils qw(none);
 use Scalar::Util qw(blessed);
 use Tags::HTML::Element::A;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -47,7 +47,7 @@ sub _cleanup {
 sub _init {
 	my ($self, $data_ar, $no_data_value) = @_;
 
-	$self->{'_data'} = $data_ar;
+	$self->{'_data'} = [@{$data_ar}];
 	$self->{'_no_data'} = $no_data_value;
 	$self->{'_tags_html_a'} = Tags::HTML::Element::A->new(
 		'css' => $self->{'css'},
@@ -609,6 +609,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

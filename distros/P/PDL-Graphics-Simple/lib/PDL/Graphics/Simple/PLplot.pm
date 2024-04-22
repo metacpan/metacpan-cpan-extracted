@@ -13,22 +13,21 @@
 
 package PDL::Graphics::Simple::PLplot;
 
+use strict;
+use warnings;
 use File::Temp qw/tempfile/;
 use Time::HiRes qw/usleep/;
 use PDL::Options q/iparse/;
 use PDL;
-
-eval 'use PDL::Graphics::PLplot';
 
 our $mod = {
     shortname => 'plplot',
     module=>'PDL::Graphics::Simple::PLplot',
     engine => 'PDL::Graphics::PLplot',
     synopsis=> 'PLplot (nice plotting, sloooow images)',
-    pgs_version=> '1.010',
+    pgs_api_version=> '1.011',
 };
-eval { require PDL::Graphics::PLplot; 1; } and
-  PDL::Graphics::Simple::register( 'PDL::Graphics::Simple::PLplot' );
+PDL::Graphics::Simple::register( $mod );
 
 my @DEVICES = qw(
   qtwidget wxwidgets xcairo xwin wingcc
@@ -39,6 +38,7 @@ our $guess_filetypes = {
     pdf => ['pdfcairo','pdfqt'],
     png => ['pngcairo','pngqt']
 };
+our $filetypes;
 
 ##########
 # PDL::Graphics::Simple::PLplot::check
@@ -50,104 +50,37 @@ sub check {
 
     return $mod->{ok} unless( $force or !defined($mod->{ok}) );
 
-    eval 'use PDL::Graphics::PLplot';
-    if($@) {
+    eval { require PDL::Graphics::PLplot; PDL::Graphics::PLplot->import };
+    if ($@) {
 	$mod->{ok} = 0;
 	$mod->{msg} = $@;
 	return 0;
     }
 
     # Module loaded OK, now try to extract valid devices from it.
-    # We would use a pipe, but Microsoft Windows doesn't play nice
-    # with them - so we use a temp file instead.
-    my ($fh1, $gzinta) = tempfile('pgs_gzinta_XXXX');
-    close $fh1;
-    my ($fh2, $gzouta) = tempfile('pgs_gzouta_XXXX');
-    close $fh2;
+    my $plgDevs = plgDevs();
+    $mod->{devices} = {map +($_=>1), keys %$plgDevs};
 
-    open FOO, ">$gzinta" or die "Couldn't write to temp file";
-    print FOO "1\n"; #Just one line
-    close FOO;
-
-    if($^O =~ /MSWin32/i) {
-      eval {require Win32::Process};
-      die "Win32::Process didn't load: $@"
-        if $@;
-
-      my $cmd_location = -e "\\Windows\\system32\\cmd.exe"
-                            ? "\\Windows\\system32\\cmd.exe"
-                            : cmd_location();
-
-      Win32::Process::Create(
-        $ProcessObj,
-        $cmd_location,
-        "cmd /c \"$^X -MPDL -MPDL::Graphics::PLplot -e \"PDL::Graphics::PLplot->new() \" <$gzinta >$gzouta\"",
-        0,
-        32, #NORMAL_PRIORITY_CLASS
-        ".")|| die ErrorReport();
-    }
-    else {
-      my $pid = fork();
-      unless(defined($pid)) {
-	print STDERR +($mod->{msg} = "Fork failed in PLplot probe -- returning 0"), "\n";
-	return 0;
-      }
-
-      if( $pid==0 ) {   # assignment
-
-	# Daughter: try to create a PLplot window with a bogus device, to stimulate a driver listing
-	open STDOUT,">$gzouta";
-	open STDERR,">&STDOUT";
-	open STDIN, "<$gzinta";
-	PDL::Graphics::PLplot->new(DEV=>'?');
-	exit(0);
-      }
-
-      # Parent - snarf up the results from the daughter
-      usleep(2e5);          # hang around for 0.2 seconds
-      eval {kill 9,$pid;};  # kill it dead, just in case it buzzed or hung (I'm looking at you, Microsoft Windows)
-      waitpid($pid,0);      # Clean up.
-    }
-
-    sleep 1 if $^O =~ /MSWin32/i; # Don't read $gzouta before it's written
-
-    # Snarf up the file.
-    open FOO, "<$gzouta";
-    @lines = <FOO>;
-    close FOO;
-
-    unlink $gzinta;
-    unlink $gzouta;
-
-    $mod->{devices} = {};
-    for my $l(@lines) {
-	if( $l=~ m/^\s+\<\s*\d+\>\s+(\w+)/ ) {
-	    $mod->{devices}->{$1} = 1;
-	}
-    }
-
-    if( my ($good_dev) = grep $mod->{devices}{$_}, @DEVICES ) {
+    if ( my ($good_dev) = $ENV{PDL_SIMPLE_DEVICE} || grep $mod->{devices}{$_}, @DEVICES ) {
 	$mod->{disp_dev} = $good_dev;
     } else {
 	$mod->{ok} = 0;
-	$mod->{msg} = join "\n\t", "No suitable display device found among:",
-          sort keys %{ $mod->{devices} };
+	$mod->{msg} = join("\n\t", "No suitable display device found among:",
+          sort keys %{ $mod->{devices} }) . "\n";
 	return 0;
     }
 
-    our $filetypes;
     $filetypes = {};
-
-    for $k(keys %{$guess_filetypes}) {
-	VAL:for $v( @{$guess_filetypes->{$k}} ) {
-	    if($mod->{devices}->{$v}) {
+    for my $k (keys %{$guess_filetypes}) {
+	VAL:for my $v ( @{$guess_filetypes->{$k}} ) {
+	    if ($mod->{devices}->{$v}) {
 		$filetypes->{$k} = $v;
 		last VAL;
 	    }
 	}
     }
 
-    unless($filetypes->{ps}) {
+    unless ($filetypes->{ps}) {
 	$mod->{ok} = 0;
 	$mod->{msg} = "No PostScript found";
 	return 0;
@@ -172,83 +105,61 @@ sub new {
     my $opt_in = shift;
     my $opt = { iparse( $new_defaults, $opt_in ) };
 
-    my $pgw;
-
     # Force a recheck on failure, in case the user fixed PLplot.
     unless(check()) {
-	die "$mod->{shortname} appears nonfunctional\n" unless(check(1));
+	die "$mod->{shortname} appears nonfunctional: $mod->{msg}\n" unless(check(1));
     }
 
     # Figure the device name and size to feed to PLplot.
-    # size has already been regularized.
     my $conv_tempfile;
     my $dev;
     my @params;
-
-    if( $opt->{type} =~ m/^i/i) {
+    if ( $opt->{type} =~ m/^i/i) {
 	## Interactive devices
 	$dev = $mod->{disp_dev};
-	push(@params,  DEV => $dev );
-	if($opt->{output}) {
+	if ($opt->{output}) {
 	    push(@params, FILE=>$opt->{output});
 	}
-
-
     } else {
 	my $ext;
 	## File devices
-
-	if( $opt->{output} =~ m/\.(\w{2,4})$/ ) {
+	if ( $opt->{output} =~ m/\.(\w{2,4})$/ ) {
 	    $ext = $1;
 	} else {
 	    $ext = 'png';
 	    $opt->{output} .= ".png";
 	}
-
-	our $mod;
 	unless(  $filetypes->{$ext}  and  $mod->{devices}->{$filetypes->{$ext}} ) {
 	    ## Have to set up file conversion
 	    my($fh);
-	    ($fh, $conv_tempfile) = tempfile('pgs_pgplot_XXXX');
+	    ($fh, $conv_tempfile) = tempfile('pgs_plplot_XXXX');
 	    close $fh;
 	    unlink $conv_tempfile; # just to be sure...
 	    $conv_tempfile .= ".ps";
 	    $dev = $filetypes->{ps};
-
 	    push(@params, FILE=>$conv_tempfile);
-
 	} else {
 	    $dev = "$filetypes->{$ext}";
 	    push(@params, FILE=>$opt->{output});
 	}
-
-	push(@params, DEV=>$dev);
-
     }
+    push @params, DEV=>$dev;
 
     my $size = PDL::Graphics::Simple::_regularize_size($opt->{size},'px');
     push(@params, PAGESIZE => [ $size->[0], $size->[1] ]);
 
     my $me = { opt=>$opt, conv_fn=>$conv_tempfile };
 
-    if( defined($opt->{multi}) ) {
+    if ( defined($opt->{multi}) ) {
 	push(@params, SUBPAGES => [$opt->{multi}->[0], $opt->{multi}->[1]] );
 	$me->{multi_cur} = 0;
 	$me->{multi_n} = $opt->{multi}->[0] * $opt->{multi}->[1];
     }
 
-    my $creator = sub { my $w = PDL::Graphics::PLplot->new( @params );
-			plsstrm($w->{STREAMNUMBER});
-			plspause(0);
-			return $w;
-    };
-    $pgw = eval { &$creator };
-    print STDERR $@ if($@);
-
-    $me->{creator} = $creator;
-    $me->{obj} = $pgw;
-
-    return bless($me, 'PDL::Graphics::Simple::PLplot');
+    $me->{obj} = my $w = PDL::Graphics::PLplot->new( @params );
+    plsstrm($w->{STREAMNUMBER});
+    plspause(0);
+    return bless $me;
 }
 
 sub DESTROY {
@@ -329,18 +240,12 @@ our $plplot_methods = {
 	my $b = (xvals(128)/127)**2;
 	plscmap1l( 1, xvals(128)/127, $r, $g, $b, ones(128));
 
-
-
-	my $fill_width = 2;
-	my $cont_color = 0;
-	my $cont_width = 0;
-
+	my ($fill_width, $cont_color, $cont_width) = (2, 0, 0);
 	my $clevel = ((PDL->sequence($nsteps)*(($max - $min)/($nsteps-1))) + $min);
 	my $grid = plAlloc2dGrid($data->[0], $data->[1]);
 	
 	plshades( $data->[2], $xmin, $xmax, $ymin, $ymax, $clevel, $fill_width, $cont_color, $cont_width, 0, 0, \&pltr2, $grid );
-	plFreeGrid($grid);
-	plflush();
+	plFree2dGrid($grid);
 
 	if($ipo->{wedge}) {
 	    # Work around PLplot justify bug
@@ -365,9 +270,9 @@ our $plplot_methods = {
 	# Call xyplot to make sure the axes get set up.
 	$me->{obj}->xyplot( pdl(1.1)->asin, pdl(1.1)->asin, %{$ppo} );
 
-	for $i(0..$data->[0]->dim(0)-1) {
+	for my $i (0..$data->[0]->dim(0)-1) {
 	    my $j = 0;
-	    $s = $data->[2]->[$i];
+	    my $s = $data->[2]->[$i];
 	    if ($s =~ s/^([\<\|\> ])//) {
 		$j = 1   if($1 eq '>');
 		$j = 0.5 if($1 eq '|');
@@ -440,11 +345,11 @@ sub plot {
 
     warn "P::G::S::PLplot: legends not implemented yet for PLplot" if($ipo->{legend});
 
-    while(@_) {
+    while (@_) {
 	my ($co, @data) = @{shift()};
 	my @extra_opts = ();
 
-	if( defined($co->{style}) and $co->{style}) {
+	if ( defined($co->{style}) and $co->{style}) {
 	    $me->{style} = $co->{style};
 	} else {
 	    $me->{style}++;
@@ -453,37 +358,35 @@ sub plot {
 	$ppo->{COLOR}     = $colors[$me->{style}%(@colors)];
 	$ppo->{LINESTYLE} = (($me->{style}-1) % 8) + 1;
 
-	if( defined($co->{width}) and $co->{width} ) {
+	if ( defined($co->{width}) and $co->{width} ) {
 	    $ppo->{LINEWIDTH} = $co->{width};
 	}
 
-	$plpm = $plplot_methods->{$co->{with}};
+	my $plpm = $plplot_methods->{$co->{with}};
 	die "Unknown curve option 'with $co->{with}'!" unless($plpm);
 
 	my %plplot_opts = (%$ppo);
 	my $plplot_opts = \%plplot_opts;
 
-	if($me->{logaxis} =~ m/x/i) {
+	if ($me->{logaxis} =~ m/x/i) {
 	    $data[0] = $data[0]->log10;
 	}
 
-	if($me->{logaxis} =~ m/y/i) {
+	if ($me->{logaxis} =~ m/y/i) {
 	    $data[1] = $data[1]->log10;
 	}
 
-	if(ref($plpm) eq 'CODE') {
-	    &$plpm($me, $ipo, \@data, $plplot_opts);
+	if (ref($plpm) eq 'CODE') {
+	    $plpm->($me, $ipo, \@data, $plplot_opts);
 	} else {
-	    my $str= sprintf('$me->{obj}->xyplot(@data,PLOTTYPE=>"%s",%s);%s',$plpm,'%plplot_opts',"\n");
-	    eval $str;
+	    $me->{obj}->xyplot(@data,PLOTTYPE=>$plpm,%plplot_opts);
 	}
+	plflush();
     }
 
-    $me->{obj}->close if($me->{opt}->{type} =~ m/^f/i and !defined($me->{opt}->{multi}));
+    $me->{obj}->close if $me->{opt}->{type} =~ m/^f/i and !defined($me->{opt}->{multi});
 
-    my $file = ( ($me->{conv_fn}) ? $me->{conv_fn} : $me->{output} );
-
-    if($me->{conv_fn}) {
+    if ($me->{conv_fn}) {
 	$a = rim($me->{conv_fn});
 	wim($a->mv(1,0)->slice(':,-1:0:-1'), $me->{opt}->{output});
 	unlink($me->{conv_fn});
@@ -499,7 +402,9 @@ sub cmd_location {
   my @path = File::Spec->path();
 
   for my $p(@path) {
-    if(-e "${p}\\cmd.exe") {return "${p}\\cmd.exe"}
+    if (-e "${p}\\cmd.exe") {return "${p}\\cmd.exe"}
   }
   die "Can't locate cmd.exe";
 }
+
+1;

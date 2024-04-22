@@ -1,7 +1,7 @@
 package Net::SAML2::Protocol::Assertion;
 use Moose;
 
-our $VERSION = '0.78'; # VERSION
+our $VERSION = '0.79'; # VERSION
 
 use MooseX::Types::DateTime qw/ DateTime /;
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
@@ -170,10 +170,10 @@ sub new_from_xml {
 
     my $status_node = $nodeset->get_node(1);
     my $status = $status_node->getAttribute('Value');
-    my $sub_status;
+    my $substatus;
 
     if (my $s = first { $_->isa('XML::LibXML::Element') } $status_node->childNodes) {
-        $sub_status = $s->getAttribute('Value');
+        $substatus = $s->getAttribute('Value');
     }
 
     my $self = $class->new(
@@ -189,7 +189,7 @@ sub new_from_xml {
         xpath          => $xpath,
         in_response_to => $xpath->findvalue('//saml:Subject/saml:SubjectConfirmation/saml:SubjectConfirmationData/@InResponseTo'),
         response_status => $status,
-        $sub_status ? (response_substatus => $sub_status) : (),
+        $substatus ? (response_substatus => $substatus) : (),
         $authnstatement ? (authnstatement => $authnstatement) : (),
     );
 
@@ -380,17 +380,13 @@ Net::SAML2::Protocol::Assertion - SAML2 assertion object
 
 =head1 VERSION
 
-version 0.78
+version 0.79
 
 =head1 SYNOPSIS
 
   my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
     xml => decode_base64($SAMLResponse)
   );
-
-=head1 NAME
-
-Net::SAML2::Protocol::Assertion - SAML2 assertion object
 
 =head1 METHODS
 

@@ -341,7 +341,6 @@ IO/IDL/t/basic.t
 IO/IDL/t/test.sav
 IO/IO.pod
 IO/Makefile.PL
-IO/Misc/get.c
 IO/Misc/Makefile.PL
 IO/Misc/misc.pd
 IO/Misc/t/misc.t
@@ -391,6 +390,7 @@ Libtmp/Fit/Makefile.PL
 Libtmp/Fit/Polynomial.pm
 Libtmp/Fit/t/poly.t
 Libtmp/Func.pm
+Libtmp/Func_demo.pm
 Libtmp/GIS/Makefile.PL
 Libtmp/GIS/Proj/Makefile.PL
 Libtmp/GIS/Proj/Proj.pd
@@ -522,6 +522,7 @@ Libtmp/Slatec/LinPred.pm
 Libtmp/Slatec/LM.pm
 Libtmp/Slatec/Makefile.PL
 Libtmp/Slatec/slatec.pd
+Libtmp/Slatec/slatec/bvalu.f
 Libtmp/Slatec/slatec/chfcm.f
 Libtmp/Slatec/slatec/chfdv.f
 Libtmp/Slatec/slatec/chfev.f
@@ -529,6 +530,7 @@ Libtmp/Slatec/slatec/chfie.f
 Libtmp/Slatec/slatec/d1mach.f
 Libtmp/Slatec/slatec/dasum.f
 Libtmp/Slatec/slatec/daxpy.f
+Libtmp/Slatec/slatec/dbvalu.f
 Libtmp/Slatec/slatec/dchfcm.f
 Libtmp/Slatec/slatec/dchfdv.f
 Libtmp/Slatec/slatec/dchfev.f
@@ -538,6 +540,7 @@ Libtmp/Slatec/slatec/dgeco.f
 Libtmp/Slatec/slatec/dgedi.f
 Libtmp/Slatec/slatec/dgefa.f
 Libtmp/Slatec/slatec/dgesl.f
+Libtmp/Slatec/slatec/dintrv.f
 Libtmp/Slatec/slatec/dp1vlu.f
 Libtmp/Slatec/slatec/dpchbs.f
 Libtmp/Slatec/slatec/dpchce.f
@@ -569,6 +572,7 @@ Libtmp/Slatec/slatec/ezffti.f
 Libtmp/Slatec/slatec/fdump.f
 Libtmp/Slatec/slatec/i1mach.f
 Libtmp/Slatec/slatec/idamax.f
+Libtmp/Slatec/slatec/intrv.f
 Libtmp/Slatec/slatec/isamax.f
 Libtmp/Slatec/slatec/j4save.f
 Libtmp/Slatec/slatec/pchbs.f
@@ -675,7 +679,7 @@ Perldl2/Profile/Perldl2.pm
 Perldl2/README
 Perldl2/Script.pm
 Perldl2/TODO
-README
+README.md
 t/00-report-prereqs.t
 t/01-pptest.t
 t/autoload.t

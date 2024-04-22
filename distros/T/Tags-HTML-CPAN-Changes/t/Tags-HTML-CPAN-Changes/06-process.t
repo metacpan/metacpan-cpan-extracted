@@ -4,10 +4,14 @@ use warnings;
 use CPAN::Changes;
 use CPAN::Changes::Entry;
 use CPAN::Changes::Release;
+use File::Object;
 use Tags::HTML::CPAN::Changes;
 use Tags::Output::Structure;
-use Test::More 'tests' => 10;
+use Test::More 'tests' => 11;
 use Test::NoWarnings;
+
+# Data directory.
+my $data_dir = File::Object->new->up->dir('data');
 
 # Test.
 my $tags = Tags::Output::Structure->new;
@@ -409,4 +413,42 @@ is_deeply(
 		['e', 'div'],
 	],
 	'Tags code for CPAN changes (one item, explicit blank group).',
+);
+
+# Test.
+$tags = Tags::Output::Structure->new;
+$obj = Tags::HTML::CPAN::Changes->new(
+	'tags' => $tags,
+);
+$changes = CPAN::Changes->load($data_dir->file('ex1.changes')->s);
+$obj->init($changes);
+$obj->process;
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['b', 'div'],
+		['a', 'class', 'changes'],
+
+		['b', 'div'],
+		['a', 'class', 'version'],
+
+		['b', 'h2'],
+		['d', '0.01'],
+		['e', 'h2'],
+
+		['b', 'ul'],
+		['a', 'class', 'version-changes'],
+
+		['b', 'li'],
+		['a', 'class', 'version-change'],
+		['d', 'First version.'],
+		['e', 'li'],
+
+		['e', 'ul'],
+		['e', 'div'],
+
+		['e', 'div'],
+	],
+	'Tags code for CPAN changes (ex1.changes file).',
 );

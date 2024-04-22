@@ -1,5 +1,6 @@
 callback.c
 Changes
+Demo.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -75,6 +76,7 @@ t/x31.pl
 t/x31c.c
 t/x33.pl
 t/x33c.c
+typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 GENERATED/PDL/Graphics/PLplot.pm         mod=PDL::Graphics::PLplot pd=plplot.pd (added by pdlpp_mkgen)

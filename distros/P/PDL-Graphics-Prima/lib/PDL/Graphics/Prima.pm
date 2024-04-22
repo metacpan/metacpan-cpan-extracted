@@ -4,7 +4,7 @@ use warnings;
 ############################################################################
                        package PDL::Graphics::Prima;
 ############################################################################
-our $VERSION = '0.20';   # do not delete these spaces; run update-version.pl
+our $VERSION = '0.21';   # do not delete these spaces; run update-version.pl
                        # if you change this
 
 # Add automatic support for PDL terminal interactivity
@@ -239,7 +239,7 @@ sub compute_min_max_for {
 			= $self->collect_collated_min_max_for('y');
 		return if not defined $trimmed_maxima;
 		
-		# Perform a round of minimazation:
+		# Perform a round of minimization:
 		my ($min, $max)
 			= $self->pair_down_collation('y', $trimmed_minima, $trimmed_maxima);
 		
@@ -295,7 +295,7 @@ sub collect_collated_min_max_for {
 	$collated_min(0) .= $self->{$axis_name}->min if $collated_min->isbad->all;
 	$collated_max(0) .= $self->{$axis_name}->max if $collated_max->isbad->all;
 	
-	# Iterativelye pair down the set until we've found the minmax. At this
+	# Iteratively pair down the set until we've found the minmax. At this
 	# point, we have two arrays with $pixel_extent elements each. Cat an
 	# index and what will eventually be a computed value onto the original
 	# lists so our slicing keeps track of the padding and original values.
@@ -310,7 +310,7 @@ sub collect_collated_min_max_for {
 	return ($trimmed_minima, $trimmed_maxima);
 }
 
-# Given a collated set of mininam and maxima (from collect_collated_min_max_for)
+# Given a collated set of minima and maxima (from collect_collated_min_max_for)
 # this function determines that minimum and maximum necessary for viewing *all*
 # the data.
 
@@ -627,7 +627,7 @@ sub dataSets {
 	# but it automatically performs all the data validation for me:
 	my ($self, %new_data) = @_;
 	
-	# Clear the dataset (except the widget key, whick never disappears):
+	# Clear the dataset (except the widget key, which never disappears):
 	%{$self->{dataSets}} = ();
 	
 	# Add each dataset individually, to ensure the validation does what it's
@@ -710,7 +710,7 @@ sub default_save_format {
 sub get_image {
 	my $self = shift;
 	
-	# Build a prima image canvas and draw to it:
+	# Build a Prima image canvas and draw to it:
 	my $image = Prima::Image->create(
 		height => $self->height,
 		width => $self->width,
@@ -1204,7 +1204,7 @@ sub on_mousemove {
 		}
 		
 		# working here - per-button mouse click tracking? I ask because sometimes
-		# I accidentially click the left mouse button when I'm selecting a zoom
+		# I accidentally click the left mouse button when I'm selecting a zoom
 		# rectangle and it messed things up.
 		
 		# The behavior depends upon where they initially clicked and where the
@@ -1851,7 +1851,7 @@ string will be parsed into a hashref, so the return value when you query this
 property as a getter is going to be an integer, a subref, or a hashref.
 
 If you specify an integer, that will be the number of pixels used to display
-the title. This requres the fewest calculations when rendering, and makes sense
+the title. This requires the fewest calculations when rendering, and makes sense
 if you set the font's height or size to an explicit value rather than a dynamic
 one. But this is also the least adaptable way to specify the titleSpace. You
 could use this as
@@ -1890,7 +1890,7 @@ specification.
 
 The default titleSpace is C<1line>.
 
-Note that although string speficifications are parsed only once (into a hashref
+Note that although string specifications are parsed only once (into a hashref
 representation), these dynamic sizes lead to more calculations than a bare pixel
 height or subref. If your goal is to have a title with fast rendering times,
 which can be important for animations, you should probably avoid dynamic sizes.
@@ -1906,7 +1906,7 @@ y-L<axis|PDL::Graphics::Prima::Axis>. For example:
 
 Actually, these accessors are not hard-coded into the plot library. Rather,
 these are the default L<name|Prima::Object>s of the axes. Any object of
-type Prima::Component (which is any object in the Prima object heierarchy)
+type Prima::Component (which is any object in the Prima object hierarchy)
 that has a name can be accessed from the parent by using the component's
 name as a method on the parent. That is, you can change the name of the
 axis and use the new name:
@@ -2007,7 +2007,7 @@ the whole container).
 
 Most L<methods|PDL::Graphics::Prima/METHODS> that are not properties provide
 means for generating images from a plot. Sometimes it is useful to draw a plot
-on a pre-formed image. Let's look at the different machanisms for doing this.
+on a pre-formed image. Let's look at the different mechanisms for doing this.
 
 For a point of comparison, if you simply want a L<raster image|Prima::Image/>
 object from a plot, you should simply obtain it from the plot object with
@@ -2042,7 +2042,7 @@ are invoking the L<Paint Event|Prima::Widget/Paint> from an arbitrary widget
 into a canvas. In that case, you should be able to say this:
 
  $some_widget->notify('Paint', $some_image);
- # This will set up a notification, which will not proces
+ # This will set up a notification, which will not process
  # until the next tick in the event loop. If you need the
  # image to be updated immediately, invoke a tick:
  $::application->yield;
@@ -2091,7 +2091,7 @@ quickly. This would require some sort of interface such as
  $plot->autoupdate(1);
 
 I have hit substantial performance problems when B<adding> over 20 datasets. 
-The actual drawing of those datasets and mouse interation is fine, but the
+The actual drawing of those datasets and mouse interaction is fine, but the
 process of just adding them to the plot can be quite sluggish.
 
 The exact pixel position of the left margin depends on the size of the y-tick

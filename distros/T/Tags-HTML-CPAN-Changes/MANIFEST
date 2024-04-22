@@ -19,6 +19,7 @@ MANIFEST			This list of files
 META.yml
 README
 SIGNATURE
+t/data/ex1.changes
 t/Tags-HTML-CPAN-Changes/01-use.t
 t/Tags-HTML-CPAN-Changes/02-version.t
 t/Tags-HTML-CPAN-Changes/03-new.t

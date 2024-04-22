@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.061';
+our $VERSION = '0.062';
 
 use 5.020;
 use Moo;
@@ -84,6 +84,7 @@ sub traverse ($self, $evaluator) {
     evaluator => $evaluator,
     identifiers => [],
     configs => {},
+    # note that this is the JSON Schema specification version, not OpenAPI
     spec_version => $evaluator->SPECIFICATION_VERSION_DEFAULT,
     vocabularies => [],
     subschemas => [],
@@ -151,12 +152,15 @@ sub traverse ($self, $evaluator) {
 
   # evaluate the document against its metaschema to find any errors, to identify all schema
   # resources within to add to the global resource index, and to extract all operationIds
-  my (@json_schema_paths, @operation_paths);
+  my (@json_schema_paths, @operation_paths, @servers_paths);
   my $result = $self->evaluator->evaluate(
     $schema, $self->metaschema_uri,
     {
       short_circuit => 1,
       callbacks => {
+        # Note that if we are using the default metaschema https://spec.openapis.org/oas/3.1/schema,
+        # we will only find the root of each schema, not all subschemas. We will traverse each
+        # of these schemas later using jsonSchemaDialect to find all subschemas and their $ids.
         '$dynamicRef' => sub ($, $schema, $state) {
           push @json_schema_paths, $state->{data_path} if $schema->{'$dynamicRef'} eq '#meta';
           return 1;
@@ -167,6 +171,10 @@ sub traverse ($self, $evaluator) {
 
           push @operation_paths, [ $data->{operationId} => $state->{data_path} ]
             if $schema->{'$ref'} eq '#/$defs/operation' and defined $data->{operationId};
+
+          # will contain duplicates; filter out later
+          push @servers_paths, ($state->{data_path} =~ s{/[0-9]+$}{}r)
+            if $schema->{'$ref'} eq '#/$defs/server';
 
           return 1;
         },
@@ -184,15 +192,77 @@ sub traverse ($self, $evaluator) {
   # are identical."
   my %seen_path;
   foreach my $path (sort keys $schema->{paths}->%*) {
-    my $normalized = $path =~ s/\{[^\}]+\}/\x00/r;
+    my %seen_names;
+    foreach my $name ($path =~ m!\{([^}]+)\}!g) {
+      if (++$seen_names{$name} == 2) {
+        ()= E({ %$state, data_path => jsonp('/paths', $path),
+          initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
+          'duplicate path template variable "%s"', $name);
+        $state->{errors}[-1]->mode('evaluate');
+      }
+    }
+
+    my $normalized = $path =~ s/\{[^}]+\}/\x00/r;
     if (my $first_path = $seen_path{$normalized}) {
       ()= E({ %$state, data_path => jsonp('/paths', $path),
         initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
-        'duplicate of templated path %s', $first_path);
+        'duplicate of templated path "%s"', $first_path);
       $state->{errors}[-1]->mode('evaluate');
       next;
     }
     $seen_path{$normalized} = $path;
+  }
+
+  my %seen_servers;
+  foreach my $servers_location (reverse @servers_paths) {
+    next if $seen_servers{$servers_location}++;
+
+    my $servers = $self->get($servers_location);
+    my %seen_url;
+
+    foreach my $server_idx (0 .. $servers->$#*) {
+      my $normalized = $servers->[$server_idx]{url} =~ s/\{[^}]+\}/\x00/r;
+      my @url_variables = $servers->[$server_idx]{url} =~ /\{([^}]+)\}/g;
+
+      if (my $first_url = $seen_url{$normalized}) {
+        ()= E({ %$state, data_path => jsonp($servers_location, $server_idx, 'url'),
+          initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
+          'duplicate of templated server url "%s"', $first_url);
+        $state->{errors}[-1]->mode('evaluate');
+      }
+      $seen_url{$normalized} = $servers->[$server_idx]{url};
+
+      my $variables_obj = $servers->[$server_idx]{variables};
+      if (@url_variables and not $variables_obj) {
+        # missing 'variables': needs variables/$varname/default
+        ()= E({ %$state, data_path => jsonp($servers_location, $server_idx),
+          initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
+          '"variables" property is required for templated server urls');
+        $state->{errors}[-1]->mode('evaluate');
+        next;
+      }
+
+      next if not $variables_obj;
+
+      foreach my $varname (keys $variables_obj->%*) {
+        if (exists $variables_obj->{$varname}{enum}
+            and not grep $variables_obj->{$varname}{default} eq $_, $variables_obj->{$varname}{enum}->@*) {
+          ()= E({ %$state, data_path => jsonp($servers_location, $server_idx, 'variables', $varname, 'default'),
+            initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
+            'servers default is not a member of enum');
+          $state->{errors}[-1]->mode('evaluate');
+        }
+      }
+
+      if (@url_variables
+          and my @missing_definitions = grep !exists $variables_obj->{$_}, @url_variables) {
+        ()= E({ %$state, data_path => jsonp($servers_location, $server_idx, 'variables'),
+          initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
+          'missing "variables" definition for templated variable%s "%s"',
+          @missing_definitions > 1 ? 's' : '', join('", "', @missing_definitions));
+        $state->{errors}[-1]->mode('evaluate');
+      }
+    }
   }
 
   return $state if $state->{errors}->@*;
@@ -315,7 +385,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.061
+version 0.062
 
 =head1 SYNOPSIS
 
@@ -429,6 +499,8 @@ L<https://spec.openapis.org/oas/v3.1.0>
 Bugs may be submitted through L<https://github.com/karenetheridge/OpenAPI-Modern/issues>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+=for stopwords OpenAPI
 
 You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI
 Slack server|https://open-api.slack.com>, which are also great resources for finding help.

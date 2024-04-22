@@ -3,7 +3,7 @@
 #
 package PDL::IO::Misc;
 
-our @EXPORT_OK = qw(rcols wcols swcols rgrep bswap2 bswap4 bswap8 isbigendian rasc rcube _rasc );
+our @EXPORT_OK = qw(rcols wcols swcols rgrep bswap2 bswap4 bswap8 isbigendian rcube rasc );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -168,7 +168,6 @@ sub _ext_lastD {                           # Called by rcols and rgrep
 sub _at_1D ($$) {                           # Called by wcols and swcols
     my $data = $_[0];
     my $index = $_[1];
-    
     if (ref $data eq 'ARRAY') {
        return $data->[$index];
     } else {
@@ -178,7 +177,7 @@ sub _at_1D ($$) {                           # Called by wcols and swcols
 
 # squeezes "fluffy" perl list values into column data type
 sub _burp_1D {
-   my $data = $_[0]->[0]; 
+   my $data = $_[0]->[0];
    my $databox = $_[0]->[1];
    my $index = $_[1];
 
@@ -209,14 +208,14 @@ sub _handle_types ($$$) {
         unless ref($deftype) eq "PDL::Type";
 
     my @cols = ref($types) eq "ARRAY" ? @$types : ();
-        
+
     if ( $#cols > -1 ) {
         # truncate if required
         $#cols = $ncols if $#cols > $ncols;
-        
+
         # check input values are sensible
         for ( 0 .. $#cols ) {
-            barf "Unknown value '$cols[$_]' in TYPES array.\n" 
+            barf "Unknown value '$cols[$_]' in TYPES array.\n"
                 unless ref($cols[$_]) eq "PDL::Type";
         }
     }
@@ -281,27 +280,27 @@ Options (case insensitive):
 
   EXCLUDE or IGNORE
   - ignore lines matching this pattern (default B<'/^#/'>).
-  
+
   INCLUDE or KEEP
   - only use lines which match this pattern (default B<''>).
-  
-  LINES   
+
+  LINES
   - a string pattern specifying which line numbers to use.
   Line numbers start at 0 and the syntax is 'a:b:c' to use
   every c'th matching line between a and b (default B<''>).
-  
+
   DEFTYPE
-  - default data type for stored data (if not specified, use the type 
+  - default data type for stored data (if not specified, use the type
   stored in C<$PDL::IO::Misc::deftype>, which starts off as B<double>).
-  
+
   TYPES
-  - reference to an array of data types, one element for each column 
+  - reference to an array of data types, one element for each column
   to be read in.  Any missing columns use the DEFTYPE value (default B<[]>).
-  
+
   COLSEP
   - splits on this string/pattern/qr{} between columns of data. Defaults to
   $PDL::IO::Misc::defcolsep.
-  
+
   PERLCOLS
   - an array of column numbers which are to be read into perl arrays
   rather than ndarrays.  Any columns not specified in the explicit list
@@ -353,21 +352,21 @@ For example:
   ($name,$x,$y) = rcols 'file4', 0, 1, 2, { PERLCOLS => [ 0 ] };
 
   # read in the first column as a perl array returned first followed by the
-  # the next two data columns in the file as a single Nx2 ndarray 
+  # the next two data columns in the file as a single Nx2 ndarray
   ($name,$xy) = rcols 'file4', 0, [1, 2], { PERLCOLS => [ 0 ] };
 
   NOTES:
 
   1. Quotes are required on patterns or use the qr{} quote regexp syntax.
-  
+
   2. Columns are separated by whitespace by default, use the COLSEP option
      separator to specify an alternate split pattern or string or specify an
      alternate default separator by setting C<$PDL::IO::Misc::defcolsep> .
-  
+
   3. Legacy support is present to use C<$PDL::IO::Misc::colsep> to set the
      column separator but C<$PDL::IO::Misc::colsep> is not defined by default.
      If you set the variable to a defined value it will get picked up.
-  
+
   4. LINES => '-1:0:3' may not work as you expect, since lines are skipped
      when read in, then the whole array reversed.
 
@@ -387,10 +386,10 @@ my $usecolsep;          # This is the colsep value that is actually used
 
 # NOTE: XXX
 #  need to look at the line-selection code. For instance, if want
-#   lines => '-1:0:3', 
+#   lines => '-1:0:3',
 #  read in all lines, reverse, then apply the step
 #  -> fix point 4 above
-# 
+#
 # perhaps should just simplify the LINES option - ie remove
 # support for reversed arrays?
 
@@ -398,7 +397,7 @@ sub rcols{ PDL->rcols(@_) }
 
 sub PDL::rcols {
    my $class = shift;
-   barf 'Usage ($x,$y,...) = rcols( *HANDLE|"filename", ["/pattern/" or \%options], $col1, $col2, ..., [ \%options] )' 
+   barf 'Usage ($x,$y,...) = rcols( *HANDLE|"filename", ["/pattern/" or \%options], $col1, $col2, ..., [ \%options] )'
    if $#_<0;
 
    my $is_handle = _is_io_handle $_[0];
@@ -423,7 +422,7 @@ sub PDL::rcols {
 
    # has the user supplied any options
    if ( defined($_[0]) ) {
-      # ensure the old-style behaviour by setting the exclude pattern to undef 
+      # ensure the old-style behaviour by setting the exclude pattern to undef
       if ( $_[0] =~ m|^/.*/$| )        { $opt->options( { EXCLUDE => undef, INCLUDE => shift } ); }
       elsif ( ref($_[0]) eq "Regexp" ) { $opt->options( { EXCLUDE => undef, INCLUDE => shift } ); }
       elsif ( ref($_[0]) eq "HASH" )   { $opt->options( shift ); }
@@ -433,7 +432,7 @@ sub PDL::rcols {
    $opt->options( pop ) if defined($_[-1]) and ref($_[-1]) eq "HASH";
 
    # a reference to a hash array
-   my $options = $opt->current();   
+   my $options = $opt->current();
 
    # handle legacy colsep variable
    $usecolsep = (defined $colsep) ? qr{$colsep} : undef;
@@ -496,7 +495,7 @@ if ( ($index_start >= 0 and $index_end < 0) ) {
    $line_rev = 0; $line_start = $index_start;
 } elsif ( $index_end >= 0 and $index_start < 0 ) {
    # eg -1:0
-   $line_rev = 1; $line_start = $index_end; 
+   $line_rev = 1; $line_start = $index_end;
 } elsif ( $index_end >= $index_start and $index_start >= 0 ) {
    # eg 0:10
    $line_rev = 0; $line_start = $index_start; $line_end = $index_end;
@@ -513,7 +512,7 @@ if ( ($index_start >= 0 and $index_end < 0) ) {
 
 my @ret;
 
-my ($k,$fhline); 
+my ($k,$fhline);
 
 my $line_num = -1;
 my $line_ctr = $line_step - 1;  # ensure first line is always included
@@ -595,7 +594,7 @@ RCOLS_IO: {
                @$col = grep { !$is_explicit->{$_} } ( 0 .. $#v );
             }
          }
-            
+
          # remove declared perl columns from pdl data list
          $k = 0;
          my @pdl_cols = ();
@@ -677,7 +676,7 @@ RCOLS_IO: {
 
 close($fh) unless $is_handle;
 
-# burp one final time if needed and 
+# burp one final time if needed and
 # clean out additional ARRAY ref level for @ret
 for (@ret, $line_store) {
    _burp_1D($_,$index) if defined $_ and scalar @{$_->[1]};
@@ -697,7 +696,7 @@ if ( $index == -1 ) {
       }
       for ( @end_perl_cols ) { push @ret, []; }
       return ( @ret );
-   } else { 
+   } else {
       return PDL->null;
    }
 }
@@ -733,7 +732,7 @@ if ( $line_rev ) {
    } elsif ( defined($line_start) ) {
       $line_end = $line_start;
    } else {
-      $line_start = $line_end; 
+      $line_start = $line_end;
    }
 }
 $line_start = $line_num + 1 + $index_start if $index_start < 0;
@@ -741,7 +740,7 @@ $line_end   = $line_num + 1 + $index_end   if $index_end   < 0;
 
 my $indices;
 
-{ no warnings 'precedence';	
+{ no warnings 'precedence';
    if ( $line_rev ) {
       $indices = which( $line_store >= $line_end & $line_store <= $line_start )->slice('-1:0');
    } else {
@@ -1011,7 +1010,7 @@ sub PDL::swcols{
          $step =~ s/(%%|[^%])//g;  # use step to count number of format items
          $step = length ($step);
   }
-  
+
   my @p = @_;
   my $n = (ref $p[0] eq 'ARRAY') ? $#{$p[0]}+1 : $p[0]->nelem;
   for (@p) {
@@ -1060,29 +1059,28 @@ sub PDL::swcols{
 =for ref
 
   Read columns into ndarrays using full regexp pattern matching.
-  
 
   Options:
-  
-  UNDEFINED: This option determines what will be done for undefined 
-  values. For instance when reading a comma-separated file of the type 
-  C<1,2,,4> where the C<,,> indicates a missing value. 
-  
+
+  UNDEFINED: This option determines what will be done for undefined
+  values. For instance when reading a comma-separated file of the type
+  C<1,2,,4> where the C<,,> indicates a missing value.
+
   The default value is to assign C<$PDL::undefval> to undefined values,
-  but if C<UNDEFINED> is set this is used instead. This would normally 
+  but if C<UNDEFINED> is set this is used instead. This would normally
   be set to a number, but if it is set to C<Bad> and PDL is compiled
   with Badvalue support (see L<PDL::Bad/>) then undefined values are set to
   the appropriate badvalue and the column is marked as bad.
-  
+
   DEFTYPE: Sets the default type of the columns - see the documentation for
-   L</rcols()>
-  
-  TYPES:   A reference to a Perl array with types for each column - see 
-  the documentation for L</rcols()>
-  
+   L</rcols>
+
+  TYPES:   A reference to a Perl array with types for each column - see
+  the documentation for L</rcols>
+
   BUFFERSIZE: The number of lines to extend the ndarray by. It might speed
   up the reading a little bit by setting this to the number of lines in the
-  file, but in general L</rasc()> is a better choice
+  file, but in general L</rasc> is a better choice
 
 Usage
 
@@ -1116,7 +1114,6 @@ of C<$1>, C<$2> etc.
          die "Got a ".ref($pattern)." for rgrep?!";
      }
 
-	
      # set up default options
      my $opt = PDL::Options->new( {
          DEFTYPE => $deftype,
@@ -1128,7 +1125,7 @@ of C<$1>, C<$2> etc.
      my $u_opt = $_[1] || {};
      $opt->options( $u_opt);
 
-     my $options = $opt->current();   
+     my $options = $opt->current();
 
      # If UNDEFINED is set to .*bad.* then undefined are set to
      # bad - unless we have a Perl that is not compiled with Bad support
@@ -1144,7 +1141,7 @@ of C<$1>, C<$2> etc.
            $nret = $#v;   # Last index of values to return
 
 	   # Handle various columns as in rcols - added 18/04/05
-           my @types = _handle_types( $nret, $$options{DEFTYPE}, $$options{TYPES} );	
+           my @types = _handle_types( $nret, $$options{DEFTYPE}, $$options{TYPES} );
            for (0..$nret) {
                 # Modified 18/04/05 to use specified precision.
 	 	$ret[$_] = [ PDL->zeroes($types[$_], 1), [] ];
@@ -1158,7 +1155,7 @@ of C<$1>, C<$2> etc.
            }
            $n += $$options{BUFFERSIZE};
       }
-       for(0..$nret) { 
+       for(0..$nret) {
 	# Set values - '1*' is to ensure numeric
 	# We now (JB - 18/04/05) also check for defined values or not
 	# Ideally this should include Badvalue support..
@@ -1170,13 +1167,13 @@ of C<$1>, C<$2> etc.
                $ret[$_]->[0]->badflag(1);
            } else {
                set $ret[$_]->[0], $m, $$options{UNDEFINED};
-           } 
+           }
 	} else {
     	   set $ret[$_]->[0], $m, 1*$v[$_];
 	}
-     } 
+     }
    }
-                                 
+
    close($fh) unless $is_handle;
    for (@ret) { $_ = $_->[0]->slice("0:$m")->copy; }; # Truncate
    wantarray ? return(@ret) : return $ret[0];
@@ -1190,59 +1187,11 @@ of C<$1>, C<$2> etc.
 
 =cut
 
-#line 1180 "misc.pd"
+#line 1179 "misc.pd"
 sub PDL::isbigendian { return 0; };
 *isbigendian = \&PDL::isbigendian;
 
-#line 1196 "misc.pd"
-
-=head2 rasc
-
-=for ref
-
-  Simple function to slurp in ASCII numbers quite quickly,
-  although error handling is marginal (to nonexistent).
-
-=for usage
-
-  $pdl->rasc("filename"|FILEHANDLE [,$noElements]);
-
-      Where:
-        filename is the name of the ASCII file to read or open file handle
-        $noElements is the optional number of elements in the file to read.
-            (If not present, all of the file will be read to fill up $pdl).
-        $pdl can be of type float or double (for more precision).
-
-=for example
-
-  #  (test.num is an ascii file with 20 numbers. One number per line.)
-  $in = PDL->null;
-  $num = 20;
-  $in->rasc('test.num',20);
-  $imm = zeroes(float,20,2);
-  $imm->rasc('test.num');
-
-=cut
-
-sub rasc {PDL->rasc(@_)}
-sub PDL::rasc {
-  my ($pdl, $file, $num) = @_;
-  $num = -1 unless defined $num;
-  my $is_openhandle = defined fileno $file;
-  my $fi;
-  if ($is_openhandle) {
-    $fi = $file;
-  } else {
-    barf 'usage: rasc $pdl, "filename"|FILEHANDLE, [$num_to_read]'
-       if !defined $file || ref $file;
-    open $fi, "<", $file or barf "Can't open $file";
-  }
-  $pdl->_rasc(my $ierr=null,$num,$fi);
-  close $fi unless $is_openhandle;
-  return all $ierr > 0;
-}
-
-# ----------------------------------------------------------
+#line 1195 "misc.pd"
 
 =head2 rcube
 
@@ -1299,9 +1248,69 @@ sub rcube {
 
       return $cube;
 }
-#line 1303 "Misc.pm"
+#line 1252 "Misc.pm"
 
-*_rasc = \&PDL::_rasc;
+
+=head2 rasc
+
+=for sig
+
+  Signature: ([o] nums(n); int [o] ierr(n); PerlIO *fp; int num => n)
+
+=for ref
+
+  Simple function to slurp in ASCII numbers quite quickly,
+  although error handling is marginal (to nonexistent).
+
+=for usage
+
+  $pdl->rasc("filename"|FILEHANDLE [,$noElements]);
+
+      Where:
+        filename is the name of the ASCII file to read or open file handle
+        $noElements is the optional number of elements in the file to read.
+            (If not present, all of the file will be read to fill up $pdl).
+        $pdl can be of type float or double (for more precision).
+
+=for example
+
+  #  (test.num is an ascii file with 20 numbers. One number per line.)
+  $in = PDL->null;
+  $num = 20;
+  $in->rasc('test.num',20);
+  $imm = zeroes(float,20,2);
+  $imm->rasc('test.num');
+
+=for bad
+
+rasc does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+sub rasc {PDL->rasc(@_)}
+sub PDL::rasc {
+  my ($pdl, $file, $num) = @_;
+  $num = -1 unless defined $num;
+  my $is_openhandle = defined fileno $file;
+  my $fi;
+  if ($is_openhandle) {
+    $fi = $file;
+  } else {
+    barf 'usage: rasc $pdl, "filename"|FILEHANDLE, [$num_to_read]'
+       if !defined $file || ref $file;
+    open $fi, "<", $file or barf "Can't open $file";
+  }
+  $pdl->_rasc_int(my $ierr=null,$fi,$num);
+  close $fi unless $is_openhandle;
+  return all $ierr > 0;
+}
+
+
+
 
 
 
@@ -1322,7 +1331,7 @@ separated from the PDL distribution, the copyright notice
 should be included in the file.
 
 =cut
-#line 1326 "Misc.pm"
+#line 1335 "Misc.pm"
 
 # Exit with OK status
 

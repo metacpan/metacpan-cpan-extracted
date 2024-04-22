@@ -14,4 +14,5 @@ on test => sub {
 on develop => sub {
   requires 'PAUSE::Permissions' => '0.08' if $] > 5.010000;
   requires 'WorePAN' => '0.13';
+  requires 'Test::Deep';
 };

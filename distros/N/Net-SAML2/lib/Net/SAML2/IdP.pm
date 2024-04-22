@@ -1,8 +1,7 @@
 package Net::SAML2::IdP;
 use Moose;
 
-our $VERSION = '0.78'; # VERSION
-
+our $VERSION = '0.79'; # VERSION
 
 # ABSTRACT: SAML Identity Provider object
 
@@ -273,7 +272,7 @@ Net::SAML2::IdP - SAML Identity Provider object
 
 =head1 VERSION
 
-version 0.78
+version 0.79
 
 =head1 SYNOPSIS
 
@@ -299,10 +298,6 @@ may affect the use of https see:
 =item * L<PERL_LWP_SSL_CA_PATH and HTTPS_CA_DIR|https://metacpan.org/pod/LWP::UserAgent#SSL_ca_path-=%3E-$path>
 
 =back
-
-=head1 NAME
-
-Net::SAML2::IdP - SAML Identity Provider object
 
 =head1 METHODS
 

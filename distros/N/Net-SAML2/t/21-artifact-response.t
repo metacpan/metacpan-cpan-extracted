@@ -94,9 +94,9 @@ isa_ok($assertion, "Net::SAML2::Protocol::Assertion");
 
 is($assertion->valid("https://netsaml2-testapp.local"), "1", "Assertion is Valid - ok");
 
-is($assertion->{in_response_to}, 'NETSAML2_2b2bcaa750d745ed5ffec2e3cc3a905ab855de0f7970d9391427641a720e6a97', "Assertion InResponseTo - ok");
+is($assertion->in_response_to, 'NETSAML2_2b2bcaa750d745ed5ffec2e3cc3a905ab855de0f7970d9391427641a720e6a97', "Assertion InResponseTo - ok");
 
-is($assertion->{id}, 'ID_ef9c4328-63de-4d55-ae05-e5342e67f36c', "Assertion ID - ok");
+is($assertion->id, 'ID_ef9c4328-63de-4d55-ae05-e5342e67f36c', "Assertion ID - ok");
 
 $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
     xml => $assertion_artifact->get_response(),
@@ -106,9 +106,9 @@ isa_ok($assertion, "Net::SAML2::Protocol::Assertion", "from get_response");
 
 is($assertion->valid("https://netsaml2-testapp.local"), "1", "Assertion is Valid - ok");
 
-is($assertion->{in_response_to}, 'NETSAML2_2b2bcaa750d745ed5ffec2e3cc3a905ab855de0f7970d9391427641a720e6a97', "Assertion InResponseTo - ok");
+is($assertion->in_response_to, 'NETSAML2_2b2bcaa750d745ed5ffec2e3cc3a905ab855de0f7970d9391427641a720e6a97', "Assertion InResponseTo - ok");
 
-is($assertion->{id}, 'ID_ef9c4328-63de-4d55-ae05-e5342e67f36c', "Assertion ID - ok");
+is($assertion->id, 'ID_ef9c4328-63de-4d55-ae05-e5342e67f36c', "Assertion ID - ok");
 
 ########################################
 # LogoutResponse from ArtifactResponse #
@@ -127,9 +127,15 @@ isa_ok($logout, "Net::SAML2::Protocol::LogoutResponse");
 
 ok($logout->success(), "Logout Response has a Success");
 
-is($logout->{response_to}, 'NETSAML2_0b499739aa1d76eb80093a068053b8fee62cade60f7dc27826d0f13b19cad16a', "Logout Response InResponseTo - ok");
+is($logout->in_response_to, 'NETSAML2_0b499739aa1d76eb80093a068053b8fee62cade60f7dc27826d0f13b19cad16a', "Logout Response InResponseTo - ok");
 
-is($logout->{id}, 'ID_bfc25851-4da2-4420-8240-9103b77b12dc', "Logout Response Id - ok");
+{
+  # TODO: Remove once response_to has been eradicated
+  local $SIG{__WARN__} = sub { }; # Suppress the warning in the testsuite
+  is($logout->response_to, $logout->in_response_to, ".. and old method still works");
+}
+
+is($logout->id, 'ID_bfc25851-4da2-4420-8240-9103b77b12dc', "Logout Response Id - ok");
 
 $logout = Net::SAML2::Protocol::LogoutResponse->new_from_xml(
     xml => $logout_artifact->get_response(),
@@ -139,6 +145,6 @@ isa_ok($logout, "Net::SAML2::Protocol::LogoutResponse", "from get_response");
 
 ok($logout->success(), "Logout Response has a Success");
 
-is($logout->{response_to}, 'NETSAML2_0b499739aa1d76eb80093a068053b8fee62cade60f7dc27826d0f13b19cad16a', "Logout Response InResponseTo - ok");
+is($logout->in_response_to, 'NETSAML2_0b499739aa1d76eb80093a068053b8fee62cade60f7dc27826d0f13b19cad16a', "Logout Response InResponseTo - ok");
 
 done_testing;

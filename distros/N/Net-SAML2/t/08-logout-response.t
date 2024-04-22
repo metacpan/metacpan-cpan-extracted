@@ -9,7 +9,7 @@ my $lor = Net::SAML2::Protocol::LogoutResponse->new(
     issuer      => 'http://some/sp',
     destination => 'http://some/idp',
     status      => 'success',
-    response_to => 'randomID',
+    in_response_to => 'randomID',
 );
 
 isa_ok($lor, 'Net::SAML2::Protocol::LogoutResponse');

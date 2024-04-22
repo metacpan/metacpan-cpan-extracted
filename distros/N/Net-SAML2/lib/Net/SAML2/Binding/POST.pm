@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Binding::POST;
-our $VERSION = '0.78'; # VERSION
+our $VERSION = '0.79'; # VERSION
 
 use Moose;
 use Carp qw(croak);
@@ -96,7 +96,7 @@ Net::SAML2::Binding::POST - HTTP POST binding for SAML
 
 =head1 VERSION
 
-version 0.78
+version 0.79
 
 =head1 SYNOPSIS
 
@@ -106,10 +106,6 @@ version 0.78
   my $xml = $post->handle_response(
     $saml_response
   );
-
-=head1 NAME
-
-Net::SAML2::Binding::POST - HTTP POST binding for SAML2
 
 =head1 METHODS
 

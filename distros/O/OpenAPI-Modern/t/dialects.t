@@ -35,7 +35,7 @@ my $schema = {
 
 subtest 'normal case' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
-    evaluator => JSON::Schema::Modern->new,
+    evaluator => JSON::Schema::Modern->new(validate_formats => 1),
     schema => $schema,
   );
 
@@ -49,7 +49,7 @@ subtest 'normal case' => sub {
 subtest 'dialect, via metaschema_uri' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     metaschema_uri => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/strict-schema.json',
-    evaluator => JSON::Schema::Modern->new,
+    evaluator => JSON::Schema::Modern->new(validate_formats => 1),
     schema => $schema,
   );
 
@@ -68,7 +68,7 @@ subtest 'dialect, via metaschema_uri' => sub {
 subtest 'dialect, via metaschema_uri and jsonSchemaDialect too' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     metaschema_uri => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/strict-schema.json',
-    evaluator => JSON::Schema::Modern->new,
+    evaluator => JSON::Schema::Modern->new(validate_formats => 1),
     schema => {
       %$schema,
       jsonSchemaDialect => STRICT_DIALECT_URI,

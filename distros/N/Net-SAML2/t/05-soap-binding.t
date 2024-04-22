@@ -109,7 +109,7 @@ is($soaped_request->nameid, $request->nameid,
             url      => 'https://example.com/auth/saml',
             key      => $sp->key,
             cert     => $sp->cert,
-            idp_cert => $idp_cert,
+            idp_cert => [$idp_cert],
             anchors  => { $_ => $anchors{$_} }
         );
         isa_ok($soap, "Net::SAML2::Binding::SOAP");
@@ -122,7 +122,7 @@ is($soaped_request->nameid, $request->nameid,
         url      => 'https://example.com/auth/saml',
         key      => $sp->key,
         cert     => $sp->cert,
-        idp_cert => $idp_cert,
+        idp_cert => [ $idp_cert ],
         anchors  => { subject => 'testsuite failure expected' }
     );
 

@@ -625,7 +625,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,m); [t]w(wsize); [o]u(n,m); [o,phys]z(n); [o]v(n,n))
+  Signature: (a(n,m); [t]w(wsize=CALC($SIZE(n) * ($SIZE(m) + $SIZE(n)))); [o]u(n,m); [o,phys]z(n); [o]v(n,n))
 
 =for usage
 
@@ -691,7 +691,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 764 "matrixops.pd"
+#line 763 "matrixops.pd"
 
 =head2 lu_decomp
 
@@ -866,7 +866,7 @@ sub lu_decomp {
    wantarray ? ($out,$permute,$parity) : $out;
 }
 
-#line 943 "matrixops.pd"
+#line 942 "matrixops.pd"
 
 =head2 lu_decomp2
 
@@ -983,7 +983,7 @@ sub lu_decomp2 {
   wantarray ? ($out,$perm,$par) : $out;
 }
 
-#line 1065 "matrixops.pd"
+#line 1064 "matrixops.pd"
 
 =head2 lu_backsub
 
@@ -1275,7 +1275,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,n); [o]b(m))
+  Signature: (a(n,n); [o]b(m=CALC(($SIZE(n) * ($SIZE(n)+1))/2)))
 
 =for ref
 
@@ -1328,7 +1328,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1391 "matrixops.pd"
+#line 1389 "matrixops.pd"
 
 =head1 AUTHOR
 

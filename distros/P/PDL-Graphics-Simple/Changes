@@ -1,3 +1,12 @@
+1.011 2024-04-22
+- P{GPLOT,Lplot} to read devices using proper API not subprocesses
+- if PDL_SIMPLE_ENGINE in ENV, use ONLY that if engine unspecified
+- each driver module now publishes which $P:G:S::API_VERSION it conforms to
+- PGS::register takes hashref instead of magic var in driver namespace
+- loading driver module not eval-ed
+- PDL_SIMPLE_DEVICE in env replaces driver guessing
+- PDL_SIMPLE_OUTPUT in env overrides input parameters
+
 1.010 2024-03-24
 - fix PGPLOT to read devices correctly
 
@@ -25,8 +34,11 @@
 1.003 2013-03-20
 - Fix tests for smoker compatibility
 
-1.002
+1.002 2013-03-20
+- window name, default to inches
+
+1.001 2013-03-20
 - Include Prima support
 
-1.001 2013-03-19
+1.000 2013-03-14
 - initial CPAN release

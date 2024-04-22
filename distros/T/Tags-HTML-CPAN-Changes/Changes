@@ -1,3 +1,7 @@
+0.04 2024-04-21T16:06:08+02:00
+ - Add trivial Changes file and test on it.
+ - Fix output on ex1.changes test file.
+
 0.03 2024-03-27T16:29:45+01:00
  - Add test of constructor.
  - Fix minimal dependency to Tags::HTML.

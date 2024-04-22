@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<samlp:ArtifactResponse xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ec="http://www.w3.org/2001/10/xml-exc-c14n#" ID="_5ede0a3002fb0efe627efc4bf3a076b7a3810a80" Version="2.0" IssueInstant="2024-04-16T14:52:40Z" InResponseTo="NETSAML2_10aad5b7776e047b40637fec9793fa1b8259e7e7845ca379cd8a01008e1b93f8">
+  <saml:Issuer>https://was-preprod1.digid.nl/saml/idp/metadata</saml:Issuer>
+  <ds:Signature>
+    <ds:SignedInfo>
+      <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+      <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+      <ds:Reference URI="#_5ede0a3002fb0efe627efc4bf3a076b7a3810a80">
+        <ds:Transforms>
+          <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+          <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#">
+            <ec:InclusiveNamespaces PrefixList="ds saml samlp xs"/>
+          </ds:Transform>
+        </ds:Transforms>
+        <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+        <ds:DigestValue>value here</ds:DigestValue>
+      </ds:Reference>
+    </ds:SignedInfo>
+    <ds:SignatureValue>some sig here</ds:SignatureValue>
+    <ds:KeyInfo>
+      <ds:KeyName>7593b799e735055fcd479caa35d44d455576cefc</ds:KeyName>
+      <ds:X509Data>
+        <ds:X509Certificate>Some cert here</ds:X509Certificate>
+      </ds:X509Data>
+    </ds:KeyInfo>
+  </ds:Signature>
+  <samlp:Status>
+    <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+  </samlp:Status>
+  <samlp:Response ID="_bee5133d91cddac59c1943a451915948a0563d5b" Version="2.0" IssueInstant="2024-04-16T14:52:40Z" InResponseTo="NETSAML2_730fbcbf9aca0d79eb18aeee3ad03908f805a3b441d586753c6dd68e53cb5d73">
+    <saml:Issuer>https://was-preprod1.digid.nl/saml/idp/metadata</saml:Issuer>
+    <samlp:Status>
+      <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Responder">
+        <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:AuthnFailed"/>
+      </samlp:StatusCode>
+    </samlp:Status>
+  </samlp:Response>
+</samlp:ArtifactResponse>

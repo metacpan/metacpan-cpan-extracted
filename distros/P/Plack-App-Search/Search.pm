@@ -5,10 +5,11 @@ use strict;
 use warnings;
 
 use Plack::Util::Accessor qw(generator image_height image_link image_radius
-	search_method search_placeholder search_title search_url title);
+	search_method search_placeholder search_title search_url tags_after
+	title);
 use Tags::HTML::Container;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub _prepare_app {
 	my $self = shift;
@@ -130,6 +131,10 @@ sub _tags_middle {
 				) : (),
 				['e', 'button'],
 				['e', 'form'],
+
+				defined $self->tags_after ? (
+					@{$self->tags_after},
+				) : (),
 			);
 		},
 	);
@@ -229,6 +234,12 @@ Default value is 'https://env.skim.cz'.
 Instance of Tags::Output object.
 
 Default value is Tags::Output::Raw->new('xml' => 1) instance.
+
+=item * C<tags_after>
+
+Reference to array with L<Tags> code to add after search field.
+
+Default value is undef.
 
 =item * C<title>
 
@@ -450,6 +461,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

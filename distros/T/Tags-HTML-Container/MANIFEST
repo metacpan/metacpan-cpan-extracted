@@ -1,6 +1,8 @@
 Changes
 Container.pm
 examples/container_with_text.pl
+examples/plack_app_change_password.pl
+images/plack_app_change_password.png
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

@@ -75,7 +75,7 @@ my %boundary2value = (Reflect=>1, Truncate=>2, Replicate=>3);
 
 =for sig
 
-  Signature: (a(m,n); kern(p,q); [o]b(m,n); indx [t]mapi(isize); indx [t]mapj(jsize); int opt)
+  Signature: (a(m,n); kern(p,q); [o]b(m,n); indx [t]mapi(isize=CALC($SIZE(p) + $SIZE(m))); indx [t]mapj(jsize=CALC($SIZE(q) + $SIZE(n))); int opt)
 
 =for ref
 
@@ -138,7 +138,7 @@ sub PDL::conv2d {
 
 =for sig
 
-  Signature: (a(m,n); kern(p,q); [o]b(m,n); double+ [t]tmp(pq); indx [t]mapi(isize); indx [t]mapj(jsize); int opt)
+  Signature: (a(m,n); kern(p,q); [o]b(m,n); double+ [t]tmp(pq=CALC($SIZE(p)*$SIZE(q))); indx [t]mapi(isize=CALC($SIZE(p) + $SIZE(m))); indx [t]mapj(jsize=CALC($SIZE(q) + $SIZE(n))); int opt)
 
 =for ref
 
@@ -202,7 +202,7 @@ sub PDL::med2d {
 
 =for sig
 
-  Signature: (a(m,n); [o]b(m,n); indx [t]mapi(isize); indx [t]mapj(jsize); int p_size=>p; int q_size=>q; int opt)
+  Signature: (a(m,n); [o]b(m,n); indx [t]mapi(isize=CALC($SIZE(p) + $SIZE(m))); indx [t]mapj(jsize=CALC($SIZE(q) + $SIZE(n))); int p_size=>p; int q_size=>q; int opt)
 
 =for ref
 
@@ -434,7 +434,7 @@ something with negatives in...) then the output values are set bad.
 
 
 
-#line 791 "image2d.pd"
+#line 740 "image2d.pd"
 
 =head2 crop
 
@@ -463,7 +463,7 @@ sub PDL::crop {
   $x1->cat($x2, $y1, $y2)->mv(-1,0);
 }
 
-#line 821 "image2d.pd"
+#line 770 "image2d.pd"
 
 =head2 cc8compt
 
@@ -549,7 +549,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 991 "image2d.pd"
+#line 937 "image2d.pd"
 
 =head2 polyfill
 
@@ -604,7 +604,7 @@ sub PDL::polyfill {
 
 *polyfill = \&PDL::polyfill;
 
-#line 1048 "image2d.pd"
+#line 994 "image2d.pd"
 
 =head2 pnpoly
 
@@ -662,10 +662,10 @@ and vectorized for PDL by Karl Glazebrook.
 
 sub PDL::pnpoly {
 	barf('Usage: $mask = pnpoly($img, $ps);') unless(@_==2 || @_==4);
- 	my ($tx, $ty, $vertx, $verty) = @_;
+	my ($tx, $ty, $vertx, $verty) = @_;
 
- 	# if only two inputs, use the pure PP version
- 	unless( defined $vertx ) {
+	# if only two inputs, use the pure PP version
+	unless( defined $vertx ) {
 		barf("ps must contain pairwise points.\n") unless $ty->getdim(0) == 2;
 
 		# Input mapping:  $img => $tx, $ps => $ty
@@ -684,7 +684,7 @@ sub PDL::pnpoly {
 
 *pnpoly = \&PDL::pnpoly;
 
-#line 1131 "image2d.pd"
+#line 1077 "image2d.pd"
 
 =head2 polyfillv
 
@@ -849,7 +849,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1435 "image2d.pd"
+#line 1363 "image2d.pd"
 
 =head2 fitwarp2d
 

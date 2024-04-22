@@ -10,6 +10,7 @@ build_requires:
   English: 0
   Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.36
+  File::Object: 0
   Tags::Output::Structure: 0
   Test::MockObject: 0
   Test::More: 0
@@ -43,4 +44,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-CPAN-Changes
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-CPAN-Changes
-version: '0.03'
+version: '0.04'

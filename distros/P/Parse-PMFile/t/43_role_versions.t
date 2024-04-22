@@ -43,7 +43,7 @@ sub test {
   my $pmfile = "$tmpdir/Test.pm";
 
   open my $fh, '>', $pmfile or plan skip_all => "Failed to create a pmfile";
-  print $fh join "\n", @lines, "";
+  print $fh join "\n", 'use Object::Pad;', @lines, "";
   close $fh;
 
   for (0..1) {

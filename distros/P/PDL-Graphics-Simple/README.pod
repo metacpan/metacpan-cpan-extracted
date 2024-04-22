@@ -52,7 +52,7 @@ Only a small subset of PDL's complete graphics functionality is
 supported -- each individual plotting module has unique advantages and
 functionality that are beyond what PDL::Graphics::Simple can do.  Only
 2-D plotting is supported.  For 3-D plotting, use
-PDL::Graphics::Gnuplot or PDL::Graphics::Trid directly.
+L<PDL::Graphics::Gnuplot> or L<PDL::Graphics::TriD> directly.
 
 When plotting to a file, the file output is not guaranteed to be
 present until the plot object is destroyed (e.g. by being undefed or
@@ -133,9 +133,24 @@ object.
 
 The non-object interface will keep using the last plot engine you used
 successfully.  On first start, you can specify an engine with the
-environment variable PDL_SIMPLE_ENGINE.  If that one isn't working, or
+environment variable C<PDL_SIMPLE_ENGINE>. As of 1.011, only that will be tried, but
 if you didn't specify one, all known engines are tried in alphabetical
 order until one works.
+
+The value of C<PDL_SIMPLE_ENGINE> should be the "shortname" of the
+engine, currently:
+
+=over
+
+=item C<gnuplot>
+
+=item C<plplot>
+
+=item C<pgplot>
+
+=item C<prima>
+
+=back
 
 =over 3
 
@@ -281,7 +296,7 @@ C<pgswin(%opts)> is exactly the same as calling C<< PDL::Graphics::Simple->new(%
 
 =for usage
 
- $w = new PDL::Graphics::Simple( %opts );
+ $w = PDL::Graphics::Simple->new( %opts );
 
 =for ref
 
@@ -296,9 +311,9 @@ If specified, this must be one of the supported plotting engines.  You
 can use a module name or the shortened name.  If you don't give one,
 the constructor will try the last one you used, or else scan through
 existing modules and pick one that seems to work.  It will first check
-the environment variable PDL_SIMPLE_ENGINE, then search through all
-the known engines in alphabetical order until it finds one that seems
-to work on your system.
+the environment variable C<PDL_SIMPLE_ENGINE>, and as of 1.011, only that will be tried, but
+if you didn't specify one, all known engines are tried in alphabetical
+order until one works.
 
 =item size
 
@@ -313,10 +328,6 @@ This describes the kind of plot to create, and should be either "file"
 or "interactive" - though only the leading character is checked.  If
 you don't specify either C<type> or C<output> (below), the default is
 "interactive". If you specify only C<output>, the default is "file".
-
-For PGPLOT, if the type is "interactive", the environment variable
-C<PGPLOT_DEV> is set (eg C</NULL>), that will be used as the output
-device.
 
 =item output
 
@@ -341,7 +352,7 @@ is always horizontal first, and left-to-right, top-to-bottom.
 
 =for usage
 
- $w = new PDL::Graphics::Simple ( %opts );
+ $w = PDL::Graphics::Simple->new( %opts );
  $w->plot($data);
 
 =for ref
@@ -533,7 +544,7 @@ to denote default justification (left).
 
 =for usage
 
- $w = new PDL::Graphics::Simple ( %opts );
+ $w = PDL::Graphics::Simple->new( %opts );
  $w->plot($data);
  $w->oplot($more_data);
 
@@ -549,7 +560,7 @@ so that the plot will be overlain on the previous one.
 =for usage
 
  # Object-oriented convenience
- $w = new PDL::Graphics::Simple ( % opts );
+ $w = PDL::Graphics::Simple->new( % opts );
  $w->line($data);
 
  # Very Lazy Convenience
@@ -623,15 +634,14 @@ Releases a hold placed by C<hold>.
 
 =for usage
 
- PDL::Graphics::Simple::register( $module_name );
+ PDL::Graphics::Simple::register( \%description );
 
 =for ref
 
 This is the registration mechanism for new driver methods for
 C<PDL::Graphics::Simple>.  Compliant drivers should announce
-themselves at compile time by calling C<register>.  When they do that,
-they should have already defined a package global hash ref, C<$mod>,
-containing the following keys:
+themselves at compile time by calling C<register>, passing
+a hash ref containing the following keys:
 
 =over
 
@@ -651,11 +661,15 @@ This is the fully qualified package name of the Perl API for the graphics engine
 
 This is a brief string describing the backend
 
-=item pgs_version
+=item pgs_api_version
 
 This is a one-period version number of PDL::Graphics::Simple against which
 the module has been tested.  A warning will be thrown if the version isn't the
-same as C<$PDL::Graphics::Simple::VERSION>.
+same as C<$PDL::Graphics::Simple::API_VERSION>.
+
+That value will only change when the API changes, allowing the modules
+to be released independently, rather than with every version of
+PDL::Graphics::Simple as up to 1.010.
 
 =back
 
@@ -758,23 +772,30 @@ legend (if present).  The C<with> option will be one of C<points>,
 C<lines>, C<bins>, C<errorbars>, C<limitbars>, C<circles>
 C<image>, or C<labels>.
 
-=cut
+=head1 ENVIRONMENT
+
+Setting some environment variables affects operation of the module:
+
+=head2 PDL_SIMPLE_ENGINE
+
+See L</new>.
+
+=head2 PDL_SIMPLE_DEVICE
+
+If this is a meaningful thing for the given engine, this value will be
+used instead of the driver module guessing.
+
+=head2 PDL_SIMPLE_OUTPUT
+
+Overrides passed-in arguments, to create the given file as output.
+If it contains C<%d>, then with Gnuplot that will be replaced with an
+increasing number (an amazing L<PDL::Graphics::Gnuplot> feature).
+
 =head1 TO-DO
 
 Deal with legend generation.  In particular: adding legends with multi-call
 protocols is awkward and leads to many edge cases in the internal protocol.
 This needs more thought.
-
-=head1 RELEASE NOTES
-
-=head3 v1.003
-
-Fix tests for smoker compatibility
-
-=head3 v1.002
-
-Include Prima support
-
 
 =head1 REPOSITORY
 

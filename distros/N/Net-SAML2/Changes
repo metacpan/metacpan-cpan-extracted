@@ -1,5 +1,39 @@
 Revision history for Perl extension Net::SAML2.
 
+0.79 -- Sun Apr 21 18:13:48 ADT 2024
+
+    [Compatibility Deprecation Warning]
+    Please not that the following have been changed and the old version my be removed in an
+    upcoming release.
+    - Net::SAML2::Protocol::Artifact
+        - response_to changed to in_response_to
+    - Net::SAML2::Protocol::LogoutResponse
+        - response_to changed to in_response_to
+
+    [Significant Changes]
+    - Implement a new Response object that properly deals with Responses that lack Assertions
+    - Metadata fixes:
+        - Move boolean values to literals
+        - Fix KeyDescriptor when only one key exists
+
+    [Detailed Change Log]
+    - bbb127d Revert and standardize substatus spelling
+    - 2fadb47 Update for in_response_to changes
+    - e0efd64 Quiet perlcritic and podcoverage tests
+    - 001d34a Update required version URN::OASIS::SAML2
+    - ecee0e3 Remove warnings from testsuite
+    - 971434a Add Object::Response to Net::SAML2
+    - 90d2c80 Add in_response_to to Role::ProtocolMessage
+    - fa5a690 Remove NAME sections in modules
+    - ca4fcda Add addtional test for NameID formats
+    - 67438b5 Correctly test NameID attributes
+    - a7dac91 Use method, not Moose interals in tests
+    - bcfc4d2 Fix boolean values for integrations with crappy IdP's
+    - 70adeb6 Remove code for old builders
+    - 3c87e51 Don't mention key usage unless we have both signing and encryption
+    - 239d1b4 Increment repo version
+    - eff3908 v0.78
+
 0.78 -- Sun Feb 25 21:09:15 AST 2024
 
     [Compatibility Deprecation Warning]

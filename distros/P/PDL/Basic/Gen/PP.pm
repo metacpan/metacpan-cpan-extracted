@@ -378,7 +378,7 @@ sub dosubst_private {
       PP => sub { (my $o = ($sig->objs->{$_[0]}//confess "Can't get PP for unknown ndarray '$_[0]'"))->{FlagPhys} = 1; $o->do_pointeraccess; },
       P => sub { (my $o = ($sig->objs->{$_[0]}//confess "Can't get P for unknown ndarray '$_[0]'"))->{FlagPhys} = 1; $o->do_pointeraccess; },
       PDL => sub { ($sig->objs->{$_[0]}//confess "Can't get PDL for unknown ndarray '$_[0]'")->do_pdlaccess },
-      SIZE => sub { ($sig->ind_obj($_[0])//confess "Can't get SIZE of unknown dim '$_[0]'")->get_size },
+      SIZE => sub { ($sig->dims_obj->ind_obj($_[0])//confess "Can't get SIZE of unknown dim '$_[0]'")->get_size },
       SETNDIMS => sub {"PDL_RETERROR(PDL_err, PDL->reallocdims(__it,$_[0]));"},
       SETDIMS => sub {"PDL_RETERROR(PDL_err, PDL->setdims_careful(__it));"},
       SETDELTABROADCASTIDS => sub {PDL::PP::pp_line_numbers(__LINE__, <<EOF)},
@@ -1081,8 +1081,9 @@ sub callPerlInit {
 sub callTypemap {
   my ($x, $ptype, $pname) = @_;
   my ($setter, $type) = typemap($ptype, 'get_inputmap');
+  (my $ntype = $type) =~ s:\s+::g; $ntype =~ s:\*:Ptr:g;
   my $ret = typemap_eval($setter, {var=>$x, type=>$type, arg=>("${x}_SV"),
-      pname=>$pname});
+      pname=>$pname, ntype=>$ntype});
   $ret =~ s/^\s*(.*?)\s*$/$1/g;
   $ret =~ s/\s*\n\s*/ /g;
   $ret;
@@ -1479,7 +1480,7 @@ EOD
    PDL::PP::Rule->new("CallCopy", ["SignatureObj", "Name"],
       sub {
 	  my ($sig, $Name, $hasp2c) = @_;
-	  my $noDimmedArgs = $sig->dims_count;
+	  my $noDimmedArgs = $sig->dims_obj->ind_names;
 	  my $noArgs = @{$sig->names};
 	  # Check for 2-arg function with 0-dim signatures
 	  return 0 if !($noDimmedArgs == 0 and $noArgs == 2);
@@ -1855,7 +1856,7 @@ sub make_vfn_args {
       sub { "PDL_RETERROR(PDL_err, PDL->redodims_default($_[0]));\n" }),
    PDL::PP::Rule->new("DimsSetters",
       ["SignatureObj"],
-      sub { join "\n", sort map $_->get_initdim, $_[0]->dims_values }),
+      sub { $_[0]->dims_init }),
    PDL::PP::Rule->new("RedoDimsFuncName", [qw(Name RedoDims? RedoDimsCode? DimsSetters)],
       sub { (scalar grep $_ && /\S/, @_[1..$#_]) ? "pdl_$_[0]_redodims" : 'NULL'}),
    PDL::PP::Rule::Returns->new("RedoDimsCode", [],
@@ -2015,7 +2016,7 @@ EOF
         my $realdim_ind_start = join(", ", @starts) || '0';
         my @rd_inds = map $_->get_index, map @{$_->{IndObjs}}, @$pobjs{@$pnames};
         my $realdim_inds = join(", ", @rd_inds) || '0';
-        my @indnames = $sig->ind_names_sorted;
+        my @indnames = sort $sig->dims_obj->ind_names;
         my $indnames = join(",", map qq|"$_"|, @indnames) || '""';
         my $sizeof = $ptype ? "sizeof($ptype)" : '0';
         <<EOF;
