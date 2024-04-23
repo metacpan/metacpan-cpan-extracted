@@ -1,6 +1,6 @@
 package App::cat::v;
 
-our $VERSION = "0.9902";
+our $VERSION = "0.9903";
 
 use 5.024;
 use warnings;
@@ -80,7 +80,7 @@ bless $_, 'Visibility' for values %control;
 
 my %code = pairmap { $a => $b->code } %control;
 
-our $DEFAULT_TABSTYLE = 'pin';
+our $DEFAULT_TABSTYLE = 'needle';
 if ($DEFAULT_TABSTYLE) {
     Text::ANSI::Tabs->configure(tabstyle => $DEFAULT_TABSTYLE);
 }

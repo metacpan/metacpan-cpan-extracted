@@ -205,7 +205,7 @@ pheno-ranker -r <individuals.json> -t <patient.json> [-options]
        -t|target                      BFF/PXF file (JSON|YAML object or array of 1 object)
 
      Options:
-       -age                           Include age-related variables [>no-age|age]
+       -age                           Include variables related to age and onset; excludes agent-like terms [>no-age|age]
        -a|align                       Write alignment file(s). If no argument is given the files will be named [alignment.*]
        -append-prefixes               The prefixes to be added to the primary_key of individuals when #cohorts >= 2 [C]
        -config                        YAML config file to change default parameters [share/conf/config.yaml)

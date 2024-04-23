@@ -30,7 +30,7 @@ cat-v \[ オプション \] 引数 ...
 
 # VERSION
 
-Version 0.9902
+Version 0.9903
 
 # DESCRIPTION
 
@@ -53,7 +53,7 @@ Version 0.9902
 `cat-v` を使用すると、表示上のスペースが変わらないようにタブ文字が可視化されます。
 
 <div>
-    <p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-cat-v/main/images/tabstyle-pin.png">
+    <p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-cat-v/main/images/tabstyle-needle.png">
 </div>
 
 制御文字は制御フォーマットとUnicode記号文字で表示することができます。デフォルトでは、改行とエスケープ文字以外の制御文字は対応するUnicode記号として表示されます。
@@ -182,7 +182,7 @@ Version 0.9902
         cat-v -t4
         cat-v -t --tabstop=4
 
-    デフォルトでは、スタイル`pin`が適用されますが、`--tabstyle`で変更することができます。引数なしで`--tabstyle`オプションが指定された場合、利用可能なスタイルのリストが表示されます。
+    デフォルトでは、スタイル `needle` が適用されますが、`--tabstyle` で変更することができます。引数なしで `--tabstyle` オプションが指定された場合、利用可能なスタイルのリストが表示されます。
 
     `~/.cat-vrc`ファイルに以下の設定を入れることで、デフォルトでタブ展開を無効にすることができます。
 

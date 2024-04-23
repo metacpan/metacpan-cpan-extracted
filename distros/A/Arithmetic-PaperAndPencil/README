@@ -1,0 +1,56 @@
+Arithmetic-PaperAndPencil
+
+Arithmetic::PaperAndPencil  is a  module which  allows simulating  the
+paper  and  pencil  techniques  for  basic  arithmetic  operations  on
+integers: addition, subtraction, multiplication and division, but also
+square root extraction and conversion from a radix to another.
+
+Actually, this module is the porting of a similarly-named Raku module.
+
+INSTALLATION
+
+To install this module, first check that the Perl version in use is 5.38
+or higher. If necessary, install a recent version with perlbrew or similar.
+
+Then download the repository from Github or from CPAN and
+run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+The  first non-core  prerequisite is  Test::Exception which  is needed
+only if you run the extended tests in directory xt.
+
+The other non-core prerequisites are Test::CheckManifest,
+Test::Pod::Coverage, Pod::Coverage and Test::Pod which are used only
+if you run the `RELEASE_TESTING` tests.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Arithmetic::PaperAndPencil
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Arithmetic-PaperAndPencil
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Arithmetic-PaperAndPencil
+
+    Search CPAN
+        https://metacpan.org/release/Arithmetic-PaperAndPencil
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2024 by jforget.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

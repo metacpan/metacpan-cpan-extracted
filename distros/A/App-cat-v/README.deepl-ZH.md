@@ -30,7 +30,7 @@ cat-v \[ 选项 \] args ...
 
 # VERSION
 
-Version 0.9902
+Version 0.9903
 
 # DESCRIPTION
 
@@ -53,7 +53,7 @@ Version 0.9902
 使用 `cat-v`，制表符可以可视化，显示的空格不会改变。
 
 <div>
-    <p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-cat-v/main/images/tabstyle-pin.png">
+    <p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-cat-v/main/images/tabstyle-needle.png">
 </div>
 
 控制字符可以用控制格式和 Unicode 符号字符显示。默认情况下，换行符和转义字符以外的控制字符显示为相应的 Unicode 符号。
@@ -182,7 +182,7 @@ Version 0.9902
         cat-v -t4
         cat-v -t --tabstop=4
 
-    默认情况下，应用 `pin` 样式，可以使用 `--tabstyle` 进行更改。如果 `--tabstyle` 选项没有指定参数，则会显示可用样式列表。
+    默认情况下使用 `needle` 样式，可以使用 `--tabstyle` 更改。如果指定 `--tabstyle` 选项且不带参数，则会显示可用样式列表。
 
     通过在 `~/.cat-vrc` 文件中设置以下选项，可以默认禁用制表符扩展。
 

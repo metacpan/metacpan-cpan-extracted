@@ -10,7 +10,7 @@ use Scalar::Util qw(blessed);
 use Tags::HTML::Element::Option;
 use Tags::HTML::Element::Utils qw(tags_boolean tags_data tags_label tags_value);
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 sub _cleanup {
 	my $self = shift;
@@ -57,6 +57,7 @@ sub _process {
 		tags_value($self, $self->{'_select'}, 'name'),
 		tags_value($self, $self->{'_select'}, 'size'),
 		tags_boolean($self, $self->{'_select'}, 'disabled'),
+		tags_value($self, $self->{'_select'}, 'onchange'),
 		# TODO Other. https://www.w3schools.com/tags/tag_select.asp
 	);
 	tags_data($self, $self->{'_select'});
@@ -290,6 +291,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.11
+0.12
 
 =cut

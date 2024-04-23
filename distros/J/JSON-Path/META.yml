@@ -16,16 +16,16 @@ name: JSON-Path
 provides:
   JSON::Path:
     file: lib/JSON/Path.pm
-    version: v1.0.4
+    version: v1.0.5
   JSON::Path::Constants:
     file: lib/JSON/Path/Constants.pm
-    version: v1.0.4
+    version: v1.0.5
   JSON::Path::Evaluator:
     file: lib/JSON/Path/Evaluator.pm
-    version: v1.0.4
+    version: v1.0.5
   JSON::Path::Tokenizer:
     file: lib/JSON/Path/Tokenizer.pm
-    version: v1.0.4
+    version: v1.0.5
 requires:
   Carp::Assert: '0'
   Exporter::Tiny: '0'
@@ -33,14 +33,13 @@ requires:
   LV: '0'
   List::Util: '1.45'
   Readonly: '0'
-  Tie::IxHash: '0'
   Try::Tiny: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/popefelix/p5-json-path/issues
   homepage: https://github.com/popefelix/p5-json-path
   repository: https://github.com/popefelix/p5-json-path.git
-version: 1.0.4
+version: 1.0.5
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -12,5 +12,9 @@ t/pod-coverage.t
 t/pod.t
 t/sizeof.t
 t/bool.t
+lib/Test2/Tools/Type.pm
+t/test2-tools-type.t
+lib/Test2/Compare/Type.pm
+lib/Test2/Tools/Type/Extras.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -6,7 +6,7 @@ requires 'Pod::Usage';
 requires 'Getopt::Long';
 requires 'Getopt::EX';
 requires 'Getopt::EX::Hashed';
-requires 'Text::ANSI::Fold', '2.22';
+requires 'Text::ANSI::Fold', '2.23';
 requires 'Text::ANSI::Tabs', '1.0501';
 
 on 'develop' => sub {

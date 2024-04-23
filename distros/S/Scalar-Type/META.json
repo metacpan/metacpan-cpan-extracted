@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown",
       "open_source"
@@ -37,8 +37,8 @@
             "Carp" : "0",
             "Devel::Peek" : "0",
             "Scalar::Util" : "0",
-            "Test::Exception" : "0",
-            "Test::More" : "0.96",
+            "Test2::API" : "1.302198",
+            "Test2::V0" : "0.000159",
             "if" : "0"
          }
       }
@@ -52,6 +52,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Scalar-Type"
       }
    },
-   "version" : "v1.0.0",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v1.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

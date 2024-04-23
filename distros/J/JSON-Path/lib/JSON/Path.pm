@@ -1,5 +1,5 @@
 package JSON::Path;
-$JSON::Path::VERSION = '1.0.4';
+$JSON::Path::VERSION = '1.0.5';
 use strict;
 use warnings;
 
@@ -134,7 +134,7 @@ JSON::Path
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.5
 
 =head1 SYNOPSIS
 
@@ -357,6 +357,9 @@ Specification: L<http://goessner.net/articles/JsonPath/>.
 Implementations in PHP, Javascript and C#:
 L<http://code.google.com/p/jsonpath/>.
 
+Jayway JsonPath:
+L<https://github.com/json-path/JsonPath>
+
 Related modules: L<JSON>, L<JSON::JOM>, L<JSON::T>, L<JSON::GRDDL>,
 L<JSON::Hyper>, L<JSON::Schema>.
 
@@ -433,7 +436,7 @@ Aurelia Peters <popefelix@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Aurelia Peters.
+This software is copyright (c) 2024 by Aurelia Peters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

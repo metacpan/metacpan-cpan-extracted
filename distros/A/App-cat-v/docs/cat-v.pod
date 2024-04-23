@@ -32,7 +32,7 @@ cat-v [ options ] args ...
 
 =head1 VERSION
 
-Version 0.9902
+Version 0.9903
 
 =head1 DESCRIPTION
 
@@ -70,7 +70,7 @@ space on the display does not change.
 
 =begin html
 
-<p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-cat-v/main/images/tabstyle-pin.png">
+<p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-cat-v/main/images/tabstyle-needle.png">
 
 =end html
 
@@ -226,7 +226,7 @@ a tab width.  The following two commands are equivalent:
     cat-v -t4
     cat-v -t --tabstop=4
 
-By default, the style C<pin> is applied, which can be changed with
+By default, the style C<needle> is applied, which can be changed with
 C<--tabstyle>. If the C<--tabstyle> option is specified with no
 arguments, a list of available styles is displayed.
 

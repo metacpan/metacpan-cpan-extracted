@@ -212,20 +212,18 @@ sub compare_and_rank {
 
     # 0/1
     push @dataframe, join ';', qq/T|$tar/,
-      ( split //, $tar_binary_hash->{$tar}{binary_digit_string} );  # Add Target
+      ( split //, $tar_binary_hash->{$tar}{binary_digit_string} );    # Add Target
 
     # Sort %score by value and load results
     my $count = 1;
-    $max_out++;    # to be able to start w/ ONE
+    $max_out++;                                                       # to be able to start w/ ONE
 
     # Start loop
     for my $key (
         sort {
-            $sort_by eq 'jaccard'           #
-              ? $score->{$b}{$sort_by}
-              <=> $score->{$a}{$sort_by}    # 1 to 0 (similarity)
-              : $score->{$a}{$sort_by}
-              <=> $score->{$b}{$sort_by}    # 0 to N (distance)
+            $sort_by eq 'jaccard'                                    #
+              ? $score->{$b}{$sort_by} <=> $score->{$a}{$sort_by}    # 1 to 0 (similarity)
+              : $score->{$a}{$sort_by} <=> $score->{$b}{$sort_by}    # 0 to N (distance)
         } keys %$score
       )
     {
@@ -247,10 +245,10 @@ sub compare_and_rank {
             }
           );
 
-     # *** IMPORTANT ***
-     # The LENGTH of the alignment is based on the #variables in the REF-COHORT
-     # Compute estimated av and dev for binary_string of L = length_align - n_00
-     # Corrected length_align L = length_align - n_00
+        # *** IMPORTANT ***
+        # The LENGTH of the alignment is based on the #variables in the REF-COHORT
+        # Compute estimated av and dev for binary_string of L = length_align - n_00
+        # Corrected length_align L = length_align - n_00
         my $length_align_corrected = $length_align - $n_00;
 
         #$estimated_average, $estimated_std_dev
@@ -430,10 +428,10 @@ qq/$char1 $format{ $char1 . $char2 } $char2 | (w:$val|d:$distance_pretty|cd:$cum
         push @out_csv,
 qq/$ref_key;$char1;$format{ $char1 . $char2 };$char2;$glob_hash->{$key};$distance;$sorted_key;$label/;
 
-#REF(107:week_0_arm_1);indicator;TAR(125:week_0_arm_1);weight;hamming-distance;json-path
-#0;;0;1;0;diseases.ageOfOnset.ageRange.end.iso8601duration.P16Y
-#0;;0;1;0;diseases.ageOfOnset.ageRange.end.iso8601duration.P24Y
-#1;-----;1;1;0;diseases.ageOfOnset.ageRange.end.iso8601duration.P39Y
+        #REF(107:week_0_arm_1);indicator;TAR(125:week_0_arm_1);weight;hamming-distance;json-path
+        #0;;0;1;0;diseases.ageOfOnset.ageRange.end.iso8601duration.P16Y
+        #0;;0;1;0;diseases.ageOfOnset.ageRange.end.iso8601duration.P24Y
+        #1;-----;1;1;0;diseases.ageOfOnset.ageRange.end.iso8601duration.P39Y
     }
     return $n_00, \$out_ascii, \@out_csv;
 }
@@ -581,9 +579,9 @@ sub remap_hash {
 
     # *** IMPORTANT ***
     # The user may include a term that:
-    # A - may not exist in any individual
-    # B - does not exist in some individuals
-    # If the term does not exist in a invidual
+    # 1 - may not exist in any individual
+    # 2 - does not exist in some individuals
+    # If the term does not exist in a individual
     #  - a) -include-terms contains ANOTHER TERM THAT EXISTS
     #        %$hash will contain keys => OK
     #  - b) -include-terms only includes the term/terms not present
@@ -591,15 +589,30 @@ sub remap_hash {
     #print Dumper $hash;
     return {} unless %$hash;
 
-    # A bit more pruning plus collapsing
+    # A bit more pruning plus folding
     # NB: Hash::Fold keeps white spaces on keys
+    #
+    # Options for 1D-array folding:
+    # A) Array to Hash then Fold
+    # B) Fold then Regex <=== CHOSEN
+    #  - Avoids the need for deep cloning
+    #  - Works across any JSON data structure (without specific key requirements)
+    #  - BUT profiling shows it's ~5-10% slower than 'Array to Hash then Fold'
+    #  - Does not accommodate specific remappings like 'interpretations.diagnosis.genomicInterpretations'
     $hash = fold( undef_excluded_phenotypicFeatures($hash) );
 
-    # Load the hash that points to the hierarchy for ontology
+    # Load the hash that points to the hierarchy for ontology-term-id
     #  *** IMPORTANT ***
     # - phenotypicFeatures.featureType.id => BFF
     # - phenotypicFeatures.type.id        => PXF
-    my $id_correspondence = $self->{id_correspondence};
+    my $id_correspondence           = $self->{id_correspondence};
+
+    # Load values for the for loop
+    my $exclude_properties_regex_qr = $self->{exclude_properties_regex_qr};
+    my $misc_regex_qr = qr/1900-01-01|NA0000|P999Y|P9999Y|phenopacket_id/;
+
+    # Pre-compile a list of fixed scalar values to exclude into a hash for quick lookup
+    my %exclude_values = map { $_ => 1 } ('NA', 'NaN', 'Fake', 'None:No matching concept');
 
     # Now we proceed for each key
     for my $key ( keys %{$hash} ) {
@@ -610,31 +623,30 @@ sub remap_hash {
         # Discard undefined
         next unless defined $hash->{$key};
 
-# Discarding lines with 'low quality' keys (Time of regex profiled with :NYTProf: ms time)
-# Some can be "rescued" by adding the ontology as ($1)
-# NB1: We discard _labels too!!
-# NB2: info|metaData are always discarded
+        # Discarding lines with 'low quality' keys (Time of regex profiled with :NYTProf: ms time)
+        # Some can be "rescued" by adding the ontology as ($1)
+        # NB1: We discard _labels too!!
+        # NB2: info|metaData are always discarded
 
-        my $regex = $self->{exclude_properties_regex};
         next
-          if ( $regex && $key =~ m/$regex/ )
-          ;    # $regex has to be defined and be != ''
+          if ( defined $exclude_properties_regex_qr
+            && $key =~ $exclude_properties_regex_qr );
 
         # The user can turn on age related values
         next
-          if ( $key =~ m/age(?!nt)|onset/i && !$self->{age} )
-          ;    # $self->{age} [0|1]
+          if ( $key =~ m/\.age(?!nt)|onset/i && !$self->{age} );    # $self->{age} [0|1]
 
         # Load values
         my $val = $hash->{$key};
 
-        # Discarding lines with val (Time profiled with :NYTProf: ms time)
+        # Discarding lines with unsupported val (Time profiled with :NYTProf: ms time)
         next
-          if ( $val eq 'NA'
-            || $val eq 'NaN'
-            || $val eq 'Fake'
-            || $val eq 'None:No matching concept'
-            || $val =~ m/1900-01-01|NA0000|P999Y|P9999Y|ARRAY|phenopacket_id/ );
+          if (
+            ( ref($val) eq 'HASH' && !keys %{$val} )    # Discard {} (e.g.,subject.vitalStatus: {})
+            || ( ref($val) eq 'ARRAY' && !@{$val} )     # Discard []
+            || exists $exclude_values{$val}
+            || $val =~ $misc_regex_qr
+          );
 
         # Add IDs to key
         my $id_key = add_id2key( $key, $hash, $self );
@@ -653,8 +665,8 @@ sub remap_hash {
         # Assign weights #
         ##################
 
-   # NB: mrueda (04-12-23) - it's ok if $weight == undef => NO AUTOVIVIFICATION!
-   # NB: We don't warn if user selection does not exist, just assign 1
+        # NB: mrueda (04-12-23) - it's ok if $weight == undef => NO AUTOVIVIFICATION!
+        # NB: We don't warn if user selection does not exist, just assign 1
 
         my $tmp_key_at_term_level = $tmp_key_at_variable_level;
 
@@ -678,11 +690,11 @@ sub remap_hash {
               # VARIABLE LEVEL
               # NB: exists stringifies the weights
               exists $weight->{$tmp_key_at_variable_level}
-              ? $weight->{$tmp_key_at_variable_level} + 0   # coercing to number
+              ? $weight->{$tmp_key_at_variable_level} + 0    # coercing to number
 
               # TERM LEVEL
               : exists $weight->{$tmp_key_at_term_level}
-              ? $weight->{$tmp_key_at_term_level} + 0       # coercing to number
+              ? $weight->{$tmp_key_at_term_level} + 0        # coercing to number
 
               # NO WEIGHT
               : 1;
@@ -734,21 +746,20 @@ sub add_hpo_ascendants {
         $copy_parent_id = $1;
         $copy_parent_id =~ tr/_/:/;
 
-# *** IMPORTANT ***
-# We cannot add any label to the ascendants, otherwise they will
-# not be matched by an indv down the tree
-# Myopia
-# Mild Myopia
-# We want that 'Mild Myopia' matches 'Myopia', thus we can not add a label from 'Mild Myopia'
-# Use the labels only for debug
+        # *** IMPORTANT ***
+        # We cannot add any label to the ascendants, otherwise they will
+        # not be matched by an indv down the tree
+        # Myopia
+        # Mild Myopia
+        # We want that 'Mild Myopia' matches 'Myopia', thus we can not add a label from 'Mild Myopia'
+        # Use the labels only for debug
         my $asc_key = DEVEL_MODE ? $key . '.HPO_asc_DEBUG_ONLY' : $key;
         $asc_key =~ s/HP:$ontology/$copy_parent_id/g;
         push @ascendants, $asc_key;
 
         # We finally add the label to %nomenclature
-        my $hpo_asc_str = $hpo_url
-          . $copy_parent_id;    # 'http://purl.obolibrary.org/obo/HP_HP:0000539
-        $hpo_asc_str =~ s/HP://;    # 0000539
+        my $hpo_asc_str = $hpo_url . $copy_parent_id;    # 'http://purl.obolibrary.org/obo/HP_HP:0000539
+        $hpo_asc_str =~ s/HP://;                         # 0000539
         $nomenclature{$asc_key} = $nodes->{$hpo_asc_str}{lbl};
     }
     return \@ascendants;
@@ -757,66 +768,65 @@ sub add_hpo_ascendants {
 sub add_id2key {
 
     my ( $key, $hash, $self ) = @_;
-    my $id_correspondence     = $self->{id_correspondence}{ $self->{format} };
-    my $array_regex           = $self->{array_regex};
-    my $array_terms_regex_str = $self->{array_terms_regex_str};
+    my $id_correspondence    = $self->{id_correspondence}{ $self->{format} };
+    my $array_regex_qr       = $self->{array_regex_qr};
+    my $array_terms_regex_qr = $self->{array_terms_regex_qr};
 
-    #say "HERE -> [$key] /$array_terms_regex_str]/ [$array_regex]";
     #############
     # OBJECTIVE #
     #############
 
-# This subroutine is important as it replaces the index (numeric) for a given
-# array element for selected ontology. It's done for all subkeys on that element
+    # This subroutine is important as it replaces the index (numeric) for a given
+    # array element by a selected ontology. It's done for all subkeys on that element
 
-   #"interventionsOrProcedures" : [
-   #     {
-   #        "bodySite" : {
-   #           "id" : "NCIT:C12736",
-   #           "label" : "intestine"
-   #        },
-   #        "procedureCode" : {
-   #           "id" : "NCIT:C157823",
-   #           "label" : "Colon Resection"
-   #        }
-   #     },
-   #   {
-   #        "bodySite" : {
-   #           "id" : "NCIT:C12736",
-   #           "label" : "intestine"
-   #        },
-   #        "procedureCode" : {
-   #           "id" : "NCIT:C86074",
-   #           "label" : "Hemicolectomy"
-   #        }
-   #     },
-   #]
-   #
-   # Will become:
-   #
-   #"interventionsOrProcedures.NCIT:C157823.bodySite.id.NCIT:C12736" : 1,
-   #"interventionsOrProcedures.NCIT:C157823.procedureCode.id.NCIT:C157823" : 1,
-   #"interventionsOrProcedures.NCIT:C86074.bodySite.id.NCIT:C12736" : 1,
-   #"interventionsOrProcedures.NCIT:C86074.procedureCode.id.NCIT:C86074" : 1,
-   #
-   # To make the replecament we use $id_correspondence, after we perform a regex
-   # to fetch the key parts
+    #"interventionsOrProcedures" : [
+    #     {
+    #        "bodySite" : {
+    #           "id" : "NCIT:C12736",
+    #           "label" : "intestine"
+    #        },
+    #        "procedureCode" : {
+    #           "id" : "NCIT:C157823",
+    #           "label" : "Colon Resection"
+    #        }
+    #     },
+    #   {
+    #        "bodySite" : {
+    #           "id" : "NCIT:C12736",
+    #           "label" : "intestine"
+    #        },
+    #        "procedureCode" : {
+    #           "id" : "NCIT:C86074",
+    #           "label" : "Hemicolectomy"
+    #        }
+    #     },
+    #]
+    #
+    # Will become:
+    #
+    #"interventionsOrProcedures.NCIT:C157823.bodySite.id.NCIT:C12736" : 1,
+    #"interventionsOrProcedures.NCIT:C157823.procedureCode.id.NCIT:C157823" : 1,
+    #"interventionsOrProcedures.NCIT:C86074.bodySite.id.NCIT:C12736" : 1,
+    #"interventionsOrProcedures.NCIT:C86074.procedureCode.id.NCIT:C86074" : 1,
+    #
+    # To make the replacement we use $id_correspondence, then we perform a regex
+    # to fetch the key parts
 
     # Only proceed if $key is one of the array_terms
-    if ( $key =~ /$array_terms_regex_str/ ) {
+    if ( $key =~ $array_terms_regex_qr ) {
 
-        # Now we use $array_regex to capture $1, $2 and $3 for BFF/PXF
+        # Now we use $array_regex_qr to capture $1, $2 and $3 for BFF/PXF
         # NB: For others (e.g., MXF) we will have only $1 and $2
-        $key =~ m/$array_regex/;
+        $key =~ $array_regex_qr;
 
-        #say "[$key] <$1> <$2> <$3>";
+        #say "$array_regex_qr -- [$key] <$1> <$2> <$3>"; # $3 can be undefined
 
         my ( $tmp_key, $val );
 
         # Normal behaviour for BFF/PXF
         if ( defined $3 ) {
 
-# If id_correspondence is an array (e.g., medicalActions) we have to grep the right match
+            # If id_correspondence is an array (e.g., medicalActions) we have to grep the right match
             my $correspondence;
             if ( ref $id_correspondence->{$1} eq ref [] ) {
 
@@ -831,13 +841,9 @@ sub add_id2key {
             }
 
             # Now that we know which is the term we use to find key-val in $hash
-            $tmp_key =
-                $1 . ':'
-              . $2 . '.'
-              . $correspondence;    # medicalActions.0.treatment.agent.id
-            $val = $hash->{$tmp_key};    # DrugCentral:257
-            $key = join '.', $1, $val, $3
-              ; # medicalActions.DrugCentral:257.treatment.routeOfAdministration.id
+            $tmp_key = $1 . ':' . $2 . '.' . $correspondence;    # medicalActions.0.treatment.agent.id
+            $val     = $hash->{$tmp_key};                        # DrugCentral:257
+            $key     = join '.', $1, $val, $3;                   # medicalActions.DrugCentral:257.treatment.routeOfAdministration.id
         }
 
         # MXF or similar (...we haven't encountered other regex yet)
@@ -894,20 +900,20 @@ sub parse_hpo_json {
 
     my $data = shift;
 
-# The <hp.json> file is a structured representation of the Human Phenotype Ontology (HPO) in JSON format.
-# The HPO is structured into a directed acyclic graph (DAG)
-# Here's a brief overview of the structure of the hpo.json file:
-# - graphs: This key contains an array of ontology graphs. In the case of HPO, there is only one graph. The graph has two main keys:
-# - nodes: An array of objects, each representing an HPO term. Each term object has the following keys:
-# - id: The identifier of the term (e.g., "HP:0000118").
-# - lbl: The label (name) of the term (e.g., "Phenotypic abnormality").
-# - meta: Metadata associated with the term, including definition, synonyms, and other information.
-# - type: The type of the term, usually "CLASS".
-# - edges: An array of objects, each representing a relationship between two HPO terms. Each edge object has the following keys:
-# - sub: The subject (child) term ID (e.g., "HP:0000924").
-# - obj: The object (parent) term ID (e.g., "HP:0000118").
-# - pred: The predicate that describes the relationship between the subject and object terms, typically "is_a" in HPO.
-# - meta: This key contains metadata about the HPO ontology as a whole, such as version information, description, and other details.
+    # The <hp.json> file is a structured representation of the Human Phenotype Ontology (HPO) in JSON format.
+    # The HPO is structured into a directed acyclic graph (DAG)
+    # Here's a brief overview of the structure of the hpo.json file:
+    # - graphs: This key contains an array of ontology graphs. In the case of HPO, there is only one graph. The graph has two main keys:
+    # - nodes: An array of objects, each representing an HPO term. Each term object has the following keys:
+    # - id: The identifier of the term (e.g., "HP:0000118").
+    # - lbl: The label (name) of the term (e.g., "Phenotypic abnormality").
+    # - meta: Metadata associated with the term, including definition, synonyms, and other information.
+    # - type: The type of the term, usually "CLASS".
+    # - edges: An array of objects, each representing a relationship between two HPO terms. Each edge object has the following keys:
+    # - sub: The subject (child) term ID (e.g., "HP:0000924").
+    # - obj: The object (parent) term ID (e.g., "HP:0000118").
+    # - pred: The predicate that describes the relationship between the subject and object terms, typically "is_a" in HPO.
+    # - meta: This key contains metadata about the HPO ontology as a whole, such as version information, description, and other details.
 
     my $graph = $data->{graphs}->[0];
     my %nodes = map { $_->{id} => $_ } @{ $graph->{nodes} };

@@ -28,6 +28,8 @@ END {
 like($orchestrator->get_version, qr/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/,
     'get_version ok');
 
+is($orchestrator->_is_version_93, D(), '_is_version_93 ok');
+
 like (
     dies {
         my $res = $orchestrator->get('/gms/rest/nonexisting');

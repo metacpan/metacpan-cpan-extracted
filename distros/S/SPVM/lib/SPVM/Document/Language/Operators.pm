@@ -1803,19 +1803,13 @@ Examples:
 
 The local variable access has the following syntax.
 
+  VAR_NAME
+
+See L<Variable Name Resolution|SPVM::Document::Language::Class/"Variable Name Resolution"> about I<VAR_NAME> and the resolution of a local variable name.
+
+Examples:
+
   $var
-
-I<$var> is a L<local variable name|SPVM::Document::Language::Tokenization/"Local Variable Name">.
-
-If local variables with the same name are declared in different scopes, the local variable declared in the inner scope is accessed.
-
-If a class variable with the same name as a local variable is defined, the local variable is accessed.
-
-Compilation Errors:
-
-I<$var> must be a valid local variable name. Otherwise, a compilation error occurs.
-
-The declaration of I<$var> must exists before I<$var>. Otherwise, a compilation error occurs.
 
 =head3 Getting a Class Variable
 
@@ -1893,22 +1887,16 @@ Examples:
 
 The class variable access has the following syntax.
 
+  VAR_NAME
+  CLASS_TYPE::VAR_NAME
+
+See L<Variable Name Resolution|SPVM::Document::Language::Class/"Variable Name Resolution"> about I<VAR_NAME>, I<CLASS_TYPE>, and the resolution of a class variable name.
+
+Examples:
+
   $VAR
-
-I<$VAR> is a L<class variable name|SPVM::Document::Language::Tokenization/"Class Variable Name">.
-
-If the class name is ommited, the class is set to the L<outmost class|/"Outmost Class">.
-
-Compilation Errors:
-
-I<$VAR> must be a valid class variable name. Otherwise, a compilation error occurs.
-
-The class specified by I<$VAR> must be loaded. Otherwise, a compilation error occurs.
-
-The class variable relative name specified by I<$VAR> must be defined in the class specified by I<$VAR>. Otherwise, a compilation error occurs.
-
-The L<outmost class|/"Outmost Class"> must be allowed access to I<$VAR>. Otherwise, a compilation error occurs.
-
+  $MyClass::VAR
+  
 =head3 Getting an Array Element
 
 The operation of getting an array element gets an element of an L<array|SPVM::Document::Language::Types/"Array">.
@@ -2217,33 +2205,11 @@ The field access has the following syntax.
 
   INVOCANT->{FIELD_NAME}
 
-I<INVOCANT> is an object of a L<class type|SPVM::Document::Language::Types/"Class Type">, a value of a L<multi-numeric type|SPVM::Document::Language::Types/"Multi-Numeric Type">, a value of a L<multi-numeric reference type|SPVM::Document::Language::Types/"Multi-Numeric Reference Type">.
+See L<Field Access Resolution|SPVM::Document::Language::Class/"Field Access Resolution"> about I<INVOCANT>, I<FIELD_NAME>, and the resolution of a field access.
 
-I<FIELD_NAME> is a L<field name|SPVM::Document::Language::Tokenization/"Field Name">.
+Examples:
 
-Compilation Errors:
-
-I<INVOCANT> must be an object of a L<class type|SPVM::Document::Language::Types/"Class Type">, a value of a L<multi-numeric type|SPVM::Document::Language::Types/"Multi-Numeric Type">, a value of a L<multi-numeric reference type|SPVM::Document::Language::Types/"Multi-Numeric Reference Type">. Otherwise, a compilation error occurs.
-
-Depending on the type of I<INVOCANT>, there are the following field access.
-
-=head4 Field Access for Class Types
-
-Compilation Errors:
-
-If the type of I<INVOCANT> is a class type, the field specified by I<FIELD_NAME> must be defined in the class, or its super classes. Otherwise, a compilation error occurs.
-
-=head4 Field Access for Multi-Numeric Types
-
-Compilation Errors:
-
-If the type of I<INVOCANT> is a multi-numeric type, the field specified by I<FIELD_NAME> must be defined in the multi-numeric type. Otherwise, a compilation error occurs.
-
-=head4 Field Access for Multi-Numeric Reference Types
-
-Compilation Errors:
-
-If the type of I<INVOCANT> is a multi-numeric reference type, the field specified by I<FIELD_NAME> must be defined in the multi-numeric type referenced by the multi-numeric reference type. Otherwise, a compilation error occurs.
+  $point->{x}
 
 =head3 Getting a Referenced Value
 
@@ -3109,121 +3075,6 @@ Examples:
   
   my $error_basic_type_id = basic_type_id Error;
 
-=head2 Method Call
-
-The method call syntax calls a L<method|SPVM::Document::Language::Class/"Method">.
-
-=head3 Class Method Call
-
-A method defined as the L<class method|/"Class Method"> can be called using the class method call.
-
-  ClassName->MethodName(ARGS1, ARGS2, ...);
-  
-  &MethodName(ARGS1, ARGS2, ...);
-
-C<&> means the current class.
-
-If C<&> is used in anon method, it means its outmost class.
-
-Compilation Errors:
-
-If the number of arguments does not correct, a compilation error occurs.
-
-If the types of arguments have no type compatible, a compilation error occurs.
-
-Examples:
-  
-  class Foo {
-    
-    static method main : void () {
-      
-      my $result = Foo->bar(1, 2, 3);
-      
-      # Same as Foo->bar
-      my $result = &bar(1, 2, 3);
-      
-      my $anon_method = method : void () {
-        # Same as Foo->bar;
-        my $result = &foo;
-      };
-    }
-    
-    static method foo : int () {
-      return 5;
-    }
-  }
-
-=head4 Getting an Enumeration Value
-
-The operation of getting an enumeration value gets a value of an L<enumeration|SPVM::Document::Language::Class/"Enumeration">.
-
-The definition of an enumeration value is replaced to a class method, so this operation is the same as a L<class method call|/"Class Method Call">.
-  
-  # Definition of an enumeration
-  class MyClass {
-    enum {
-      VALUE1,
-      VALUE2,
-      VALUE3,
-    }
-  }
-  
-  # These are replaced to definitions of class methods
-  class MyClass {
-    static method VALUE1 : int () { return 0; }
-    static method VALUE2 : int () { return 1; }
-    static method VALUE3 : int () { return 2; }
-  }
-
-However, there is one important difference.
-
-The class method calls are replaced to L<interger literals|SPVM::Document::Language::Tokenization/"Integer Literals"> at compilation time.
-
-For this replacement, this operation is used as an operand of the L<case statement|SPVM::Document::Language::Statements/"case Statement">.
-
-  switch ($num) {
-    case MyClass->VALUE1: {
-      # ...
-    }
-    case MyClass->VALUE2: {
-      # ...
-    }
-    case MyClass->VALUE3: {
-      # ...
-    }
-    default: {
-      # ...
-    }
-  }
-
-Note that if an enumeration value is changed, the binary compatibility is broken.
-
-=head3 Instance Method Call
-
-A method defined as the instance method can be called using the instance method call.
-
-  Instance->MethodName(ARGS1, ARGS2, ...);
-
-The called method is resolved from the type of the instance.
-
-Compilation Errors:
-
-If the number of arguments does not correct, a compilation error occurs.
-
-If the types of arguments have no type compatible, a compilation error occurs.
-
-Examples:
-
-  $object->bar(5, 3. 6);
-
-The C<SUPER::> qualifier calls the method of the super class of the current class.
-
-  $object->SUPER::bar(5, 3. 6);
-
-A instance method can be called statically by specifing the calss name.
-
-  $point3d->Point::clear;
-
 =head2 can Operator
 
 The C<can> operator checks if a method can be called. 
@@ -3386,6 +3237,133 @@ Examples:
 =head2 Scope Operations
 
 See the doc of L<scope|SPVM::Document::Language::GarbageCollection/"Scope"> about scope operations.
+
+=head1 Method Call
+
+A method call is an L<operator|/"Operators"> to call a L<method|SPVM::Document::Language::Class/"Method">.
+
+A method call resolves to one of the three types of method calls, a L<class method call|/"Class Method Call">, a L<static instance method call|/"Static Instance Method Call">, and an L<instance method call|/"Instance Method Call"> by L<method call resolution|SPVM::Document::Language::Class/"Method Call Resolution">.
+
+If the method call is a static instance method call or an instance method call, the invocant is prepended to the given arguments.
+
+The method call performs the L<method call execution|/"Method Call Execution"> given the arguments.
+
+=head2 Class Method Call
+
+A class method call calls a class method.
+
+  CLASS_TYPE->METHOD_NAME
+  CLASS_TYPE->METHOD_NAME(OPT_ARGS)
+  &METHOD_NAME
+  &METHOD_NAME(OPT_ARGS)
+
+See L<Class Method Call Resolution|SPVM::Document::Language::Class/"Class Method Call Resolution"> about I<CLASS_TYPE>, I<METHOD_NAME>, I<OPT_ARGS>, C<&>, and the resolution of a class method call.
+
+Examples:
+
+  # Examples of static instance method calls
+  my $point3d = Point3D->new;
+  
+  $point3d->Point::clear;
+  
+  $point3d->SUPER::clear;
+
+=head2 Static Instance Method Call
+
+A static instance method call calls an instance method specifying a class.
+
+  INVOCANT->CLASS_TYPE::METHOD_NAME
+  INVOCANT->CLASS_TYPE::METHOD_NAME(OPT_ARGS)
+
+See L<Static Instance Method Call Resolution|SPVM::Document::Language::Class/"Static Instance Method Call Resolution"> about I<INVOCANT>, I<CLASS_TYPE>, I<METHOD_NAME>, I<OPT_ARGS>, and the resolution of a static instance method call.
+
+Examples:
+
+  # Examples of static instance method calls
+  $object->SUPER::bar(5, 3. 6);
+  
+  $point3d->Point::clear;
+
+=head2 Instance Method Call
+
+An instance method call calls an instance method.
+
+  INVOCANT->METHOD_NAME
+  INVOCANT->METHOD_NAME(OPT_ARGS)
+
+See L<Instance Method Call Resolution|SPVM::Document::Language::Class/"Instance Method Call Resolution"> about I<INVOCANT>, I<CLASS_TYPE>, I<METHOD_NAME>, I<OPT_ARGS>, and the resolution of an instance method call.
+
+Examples:
+
+  # Examples of instance method calls
+  
+  my $point = Point->new;
+  
+  $point->clear;
+  
+  my $stringable = (Stringable)$point;
+  
+  my $string = $strinble->to_string;
+
+=head2 Method Call Execution
+
+The L<argument width|SPVM::Document::NativeClass/"Arguments Width"> is stored to the L<runtime stack|/"Runtime Stack">.
+
+The call stack depth stored in the L<runtime stack|SPVM::Document::NativeClass/"Runtime Stack"> is incremented by 1.
+
+If the call stack depth is greater than 1000, an exception is thrown.
+
+If the method call is not a class method call, the arugments of the object type are checked whether the following L<isa|/"isa Operator"> operator returns a true value.
+
+  ARG isa TYPE_OF_ARG
+
+I<ARG> is an argument. I<TYPE_OF_ARG> is the type of the corresponding arugment of the method.
+
+If the return vlaue is not a true value, an exception is thrown.
+
+If the method is a L<INIT method|SPVM::Document::Language::Class/"INIT Method"> and it is already called, nothing is performed.
+
+If the method is a L<native method|SPVM::Document::Language::Class/"Native Method">, a L<native method call execution|/"Native Method Call Execution"> is performed.
+
+Otherwise if the method is a L<precompilation method|SPVM::Document::Language::Class/"Precompilation Method">, a L<precompilation method call execution|/"Precompilation Method Call Execution"> is performed.
+
+Otherwise a L<VM method call execution|/"VM Method Call Execution"> is performed.
+
+If an exception is thrown by the method call execution, the exception is thrown.
+
+If the return type of the method is an object type, the object is pushed to the L<native mortal stack|SPVM::Document::NativeClass/"Native Mortal Stack">.
+
+The call stack depth stored in the L<runtime stack|SPVM::Document::NativeClass/"Runtime Stack"> is decremented by 1. This resotre is always performed even if an excetpion is thrown.
+
+=head3 VM Method Call Execution
+
+Heap memories for local variables are allocated.
+
+The L<enter_scope|SPVM::Document::NativeAPI/"enter_scope"> native API is called.
+
+SPVM operation codes generated from the L<method implementation|SPVM::Document::Language::Class/"Method Implementation"> are executed.
+
+The L<leave_scope|SPVM::Document::NativeAPI/"leave_scope"> native API is called.
+
+Heap memories for local variables are released.
+
+=head3 Precompilation Method Call Execution
+
+If a set of the machine codes of the precompilation method is loaded, the program executes it.
+
+Otherwise if the L<is_precompile_fallback|SPVM::Document::NativeAPI::Method/"is_precompile_fallback"> method native API returns a true value, the program executes L</"VM Method Call Execution">.
+
+Otherwise an exception is thrown.
+
+=head3 Native Method Call Execution
+
+The L<enter_scope|SPVM::Document::NativeAPI/"enter_scope"> native API is called.
+
+If a set of the machine codes of the L<native function|SPVM::Document::NativeClass/"Native Function"> of the native method is loaded, the program executes it.
+
+Otherwise an exception is thrown after executing the following code.
+
+The L<leave_scope|SPVM::Document::NativeAPI/"leave_scope"> native API is called.
 
 =head1 See Also
 

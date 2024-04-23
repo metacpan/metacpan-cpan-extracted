@@ -52,7 +52,7 @@
             "Hash::Util" : "0",
             "List::Util" : "1.29",
             "Pod::Usage" : "0",
-            "Text::ANSI::Fold" : "2.22",
+            "Text::ANSI::Fold" : "2.23",
             "Text::ANSI::Tabs" : "1.0501",
             "perl" : "5.024"
          }
@@ -66,7 +66,7 @@
    "provides" : {
       "App::cat::v" : {
          "file" : "lib/App/cat/v.pm",
-         "version" : "0.9902"
+         "version" : "0.9903"
       }
    },
    "release_status" : "stable",
@@ -81,7 +81,7 @@
          "web" : "https://github.com/tecolicom/App-cat-v"
       }
    },
-   "version" : "0.9902",
+   "version" : "0.9903",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

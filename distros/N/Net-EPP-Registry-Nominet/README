@@ -1,6 +1,6 @@
-Net::EPP::Registry::Nominet 0.09
+Net::EPP::Registry::Nominet 0.10
 
-Released: 15th February 2024
+Released: 22nd April 2024
 
 
 INSTALLATION
@@ -42,8 +42,8 @@ compatible interface to Net::EPP::Simple so far as is practical.
 NEW SINCE LAST PRODUCTION VERSION
 ---------------------------------
 
-Work around Net::EPP::Simple issue
-Test suite: update local certificate chain and expiry
+Update minimum Net::EPP version to 0.27
+Remove the workaround from 0.08_01 as upstream now patched
 
 See the Changes file for a complete history.
 

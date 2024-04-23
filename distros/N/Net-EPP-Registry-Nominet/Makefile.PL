@@ -22,7 +22,7 @@ my %MF = (
 	},
 	MIN_PERL_VERSION => '5.8.0',
 	PREREQ_PM        => {
-		'Net::EPP' => '0.19',
+		'Net::EPP' => '0.27',
 		'Carp'     => '0',
 	},
 	TEST_REQUIRES    => {

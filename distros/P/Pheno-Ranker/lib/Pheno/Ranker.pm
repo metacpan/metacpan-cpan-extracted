@@ -26,7 +26,7 @@ $SIG{__DIE__}  = sub { die BOLD RED "Error: ", @_ };
 
 # Global variables:
 $Data::Dumper::Sortkeys = 1;
-our $VERSION   = '0.06';
+our $VERSION   = '0.07';
 our $share_dir = dist_dir('Pheno-Ranker');
 
 # Set developoent mode
@@ -100,12 +100,18 @@ sub _set_additional_config {
     my ( $self, $config, $config_file ) = @_;
     $self->{primary_key}              = $config->{primary_key} // 'id';       # setter
     $self->{exclude_properties_regex} = $config->{exclude_properties_regex}
-      // '';                                                                  # setter
-    $self->{array_terms} = $config->{array_terms} // ['foo'];                 # setter (TBV)
-    $self->{array_regex} = $config->{array_regex} // '^(\w+):(\d+)';          # setter (TBV)
+      // undef;                                                               # setter
+    $self->{exclude_properties_regex_qr} =
+      defined $self->{exclude_properties_regex}
+      ? qr/$self->{exclude_properties_regex}/
+      : undef;                                                                # setter
+    $self->{array_terms}    = $config->{array_terms} // ['foo'];              # setter (TBV)
+    $self->{array_regex}    = $config->{array_regex} // '^([^:]+):(\d+)';       # setter (TBV)
+    $self->{array_regex_qr} = qr/$self->{array_regex}/;                       # setter (TBV)
     $self->{array_terms_regex_str} =
       '^(' . join( '|', map { "\Q$_\E" } @{ $self->{array_terms} } ) . '):';   # setter (TBV)
-    $self->{format} = $config->{format};                                       #setter
+    $self->{array_terms_regex_qr} = qr/$self->{array_terms_regex_str}/;        # setter (TBV)
+    $self->{format}               = $config->{format};                         #setter
 
     # Validate $config->{id_correspondence} for "real" array_terms
     if ( $self->{array_terms}[0] ne 'foo' ) {
@@ -322,9 +328,9 @@ sub run {
 
         # Check for existence of primary_key otherwise die
         # Expected cases:
-        #  - A) BFF/PXF (default  config) exists primary_key('id') 
+        #  - A) BFF/PXF (default  config) exists primary_key('id')
         #  - B) JSON    (default  config) exists primary_key('id') - i.e., OpenEHR
-        #  - C) JSON    (external config) exists primary_key 
+        #  - C) JSON    (external config) exists primary_key
         my $msg =
 "Sorry, <$cohort_file> does not contain primary_key <$primary_key>. Are you using the right configuration file?\n";
         if ( ref $json_data eq ref [] ) {    # array - 1st element only
@@ -380,7 +386,7 @@ sub run {
         $self->{include_terms} );
 
     # We have to check if we have BFF|PXF or others (unless defined at config)
-    add_attribute( $self, 'format', check_format($ref_data) )
+    $self->add_attribute( 'format', check_format($ref_data) )
       unless defined $self->{format};    # setter via sub
 
     # First we create:

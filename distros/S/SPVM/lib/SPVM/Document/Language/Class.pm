@@ -341,11 +341,11 @@ The following classes are loaded by default.
 
 =head2 alias Statement
 
-The C<alias> statemenet creates an alias name for a type.
+The C<alias> statemenet creates an class alias name for a type.
   
   alias BASIC_TYPE as CLASS_NAME;
 
-This statemenet creates an alias name I<CLASS_NAME> for a type I<BASIC_TYPE>.
+This statemenet creates an class alias name I<CLASS_NAME> for a type I<BASIC_TYPE>.
 
 I<BASIC_TYPE> is a L<class type|SPVM::Document::Language::Types/"Class Types">, an L<interface type|SPVM::Document::Language::Types/"Interface Types">, or a L<multi-numeric type|SPVM::Document::Language::Types/"Multi-Numeric Types">.
 
@@ -818,6 +818,135 @@ Examples:
   _4f;
   _4d;
 
+=head1 Enumeration
+
+Enumeration is a syntax that defines 32-bit integers that belongs to a L<class|/"Class">.
+
+=head2 Enumeration Definition
+
+The C<enum> keyword defines an enumeration.
+
+  enum {
+    ITEM1,
+    ITEM2,
+    ITEMn
+  }
+
+C<,> after the last enumeration item is allowed.
+
+  enum {
+    ITEM1,
+    ITEM2,
+    ITEM3,
+  }
+
+I<ITEM> is one of
+
+  NAME
+  NAME = VALUE
+
+I<NAME> is a L<method name|SPVM::Document::Language::Tokenization/"Method Name">.
+
+I<VALUE> is an L<integer literal|SPVM::Document::Language::Tokenization/"Integer Literals"> within the int type. I<VALUE> is converted the value of the int type.
+
+If I<VALUE> of I<ITEM1> is omitted, it is set to 0.
+
+If I<VALUE> of I<ITEMn> is ommited, it is set to the value of the previous item plus 1.
+
+The return type of the method is the int type.
+
+Every enumeration item is converted to a L<method definition|/"Method Definition"> that defines a class method that returns the value of the enumeration item.
+
+  # Definition of an enumeration
+  class MyClass {
+    enum {
+      NAME = 5,
+    }
+  }
+  
+  # This are replaced with a definition of a class method
+  class MyClass {
+    static method NAME : int () { return 5; }
+  }
+
+See also L</"Inline Expansion of Method Call to Get an Enuemration Value">.
+
+Compilation Errors:
+
+I<NAME> must be a L<method name|SPVM::Document::Language::Tokenization/"Method Name">. Otherwise, a compilation error occurs.
+
+I<VALUE> must be an L<integer literal|/"Integer Literal"> within the int type. Otherwise, a compilation error occurs.
+
+Examples:
+  
+  # Examples of enumerations
+  class MyClass {
+    enum {
+      FLAG1,
+      FLAG2,
+      FLAG3,
+    }
+    
+    static method main : void () {
+      my $flag1 = MyClass->FLAG1;
+    }
+  }
+  
+  class MyClass {
+    enum {
+      FLAG1,
+      FLAG2 = 2,
+      FLAG3,
+    }
+  }
+
+=head2 Enumeration Attributes
+
+The List of Enumeration Attributes:
+
+=begin html
+
+<table>
+  <tr>
+    <th>
+      Attributes
+   </th>
+    <th>
+      Descriptions
+   </th>
+  </tr>
+  <tr>
+    <td>
+      <b>public</b>
+    </td>
+    <td>
+      This enumeration is public. All classes can access all items of this enumeration. This is default.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <b>private</b>
+    </td>
+    <td>
+      This enumeration is private. All classes ohter than this class cannnot access all items of this enumeration.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <b>protected</b>
+    </td>
+    <td>
+      This enumeration is protected. All classes ohter than this class and its child classes cannot access all items of this enumeration.
+    </td>
+  </tr>
+</table>
+
+=end html
+
+Compilation Errors:
+
+One of C<private>, C<protected> and C<public> must be specified. Otherwise, a compilation error occurs.
+
 =head1 Class Variable
 
 A class variable is a global variable that belongs to a L<class|/"Class">.
@@ -1189,8 +1318,8 @@ Examples:
 
 The C<method> keyword defines a method.
 
-  OPT_ATTRIBUTES method METHOD_NAME : RETURN_TYPE (OPT_ARGS) { }
-  OPT_ATTRIBUTES method METHOD_NAME : RETURN_TYPE (OPT_ARGS);
+  OPT_ATTRIBUTES method METHOD_NAME : RETURN_TYPE (OPT_ARG_ITEMS) { }
+  OPT_ATTRIBUTES method METHOD_NAME : RETURN_TYPE (OPT_ARG_ITEMS);
 
 I<OPT_ATTRIBUTES> is one of
 
@@ -1210,29 +1339,26 @@ I<METHOD_NAME> is a L<method name|SPVM::Document::Language::Tokenization/"Method
 
 I<RETURN_TYPE> is a L<type|SPVM::Document::Language::Types/"Types">.
 
-I<ARG_ITEM> is one of
-  
-  ARG_NAME : TYPE
-  ARG_NAME : TYPE = VALUE
-
-I<OPT_ATTRIBUTES> is one of
+I<OPT_ARG_ITEMS> is one of
 
   EMPTY
-  ARGS
+  ARG_ITEMS
 
 I<EMPTY> means nothing exists.
 
-I<ARGS> is one of
+I<ARG_ITEMS> is one of
   
-  ARGS , ARG
-  ARG
+  ARG_ITEMS , ARG_ITEM
+  ARG_ITEM
 
-I<ARG> is one of
+I<ARG_ITEM> is one of
 
   ARG_NAME : ARG_TYPE
   ARG_NAME : ARG_TYPE = VALUE
 
 I<ARG_NAME> is a L<local variable name|SPVM::Document::Language::Tokenization/"Local Variable Name">.
+
+The local variable specified I<ARG_NAME> is declared at the beginning of the L<method implementation|/"Method Implementation">.
 
 I<ARG_TYPE> is a L<type|SPVM::Document::Language::Types/"Types">.
 
@@ -1573,6 +1699,8 @@ Normally a method has a method block. L<Statements|SPVM::Document::Language::Sta
     return $total;
   }
 
+SPVM operation codes are generated from a method implementation.
+
 =head1 Local Variable
 
 A local variable is a variable that has a L<scope|SPVM::Document::Language::GarbageCollection/"Scope">.
@@ -1581,12 +1709,12 @@ A local variable is a variable that has a L<scope|SPVM::Document::Language::Garb
 
 A C<my> keyword declares a local variable.
 
-  my LOCAL_VARIABLE_NAME
-  my LOCAL_VARIABLE_NAME : TYPE
-  my LOCAL_VARIABLE_NAME = VALUE
-  my LOCAL_VARIABLE_NAME : TYPE = VALUE
+  my LOCAL_VAR_NAME
+  my LOCAL_VAR_NAME : TYPE
+  my LOCAL_VAR_NAME = VALUE
+  my LOCAL_VAR_NAME : TYPE = VALUE
 
-I<LOCAL_VARIABLE_NAME> is a L<local variable name|SPVM::Document::Language::Tokenization/"Local Variable Name">.
+I<LOCAL_VAR_NAME> is a L<local variable name|SPVM::Document::Language::Tokenization/"Local Variable Name">.
 
 I<TYPE> is a L<type|SPVM::Document::Language::Types/"Types">.
 
@@ -1602,7 +1730,7 @@ A local variable declaration is a L<local variable access|SPVM::Document::Langua
 
 Compilation Errors:
 
-I<LOCAL_VARIABLE_NAME> must be a L<local variable name|SPVM::Document::Language::Tokenization/"Local Variable Name">. Otherwise a compilation error occurs.
+I<LOCAL_VAR_NAME> must be a L<local variable name|SPVM::Document::Language::Tokenization/"Local Variable Name">. Otherwise a compilation error occurs.
 
 I<TYPE> must be a L<numeric type|SPVM::Document::Language::Types/"Numeric Types">, an L<object type|SPVM::Document::Language::Types/"Object Types">, the L<multi-numeric type|SPVM::Document::Language::Types/"Multi-Numeric Types">, or a L<reference type|SPVM::Document::Language::Types/"Reference Types">. Otherwise a compilation error occurs.
 
@@ -1643,120 +1771,287 @@ If the type of the local variable declaration is ommited, the type of the local 
   # Foo
   my $foo = new Foo;
 
-=head1 Enumeration
+=head1 Symbol Name Resolution
 
-Enumeration is a syntax that defines 32-bit integers that belongs to a L<class|/"Class">.
+This section describes resolutions of symbol names, such as variable names, class names, field names, method names in the current L<method implementation|/"Method Implementation">.
 
-=head2 Enumeration Definition
+=head2 Variable Name Resolution
 
-The C<enum> keyword defines an enumeration.
+A variable name resolves to a L<class variable access|SPVM::Document::Language::Operators/"Class Variable Access"> or a L<local variable access|SPVM::Document::Language::Operators/"Local Variable Access">.
 
-  enum {
-    ITEM1,
-    ITEM2,
-    ITEMn
-  }
+If C<::> is contained in a variable name, a class variable definition as the same name as I<VAR_NAME> in I<CLASS_TYPE> is searched.
 
-C<,> after the last enumeration item is allowed.
+  CLASS_TYPE::VAR_NAME
 
-  enum {
-    ITEM1,
-    ITEM2,
-    ITEM3,
-  }
+If found, a variable name resloves to a L<class variable access|SPVM::Document::Language::Operators/"Class Variable Access">.
 
-I<ITEM> is one of
+If C<::> is not contained in a variable name, a local variable declaration as the same name as I<VAR_NAME> is searched upwards from the posotion of I<VAR_NAME>.
 
-  NAME
-  NAME = VALUE
+  VAR_NAME
 
-I<NAME> is a L<method name|SPVM::Document::Language::Tokenization/"Method Name">.
+If found, a variable name resloves to a L<local variable access|SPVM::Document::Language::Operators/"Local Variable Access">.
 
-I<VALUE> is an L<integer literal|SPVM::Document::Language::Tokenization/"Integer Literals"> within the int type. I<VALUE> is converted the value of the int type.
+If not found, a class variable definition as the same name as I<VAR_NAME> in the L<outmost class|/"Outmost Class"> is searched.
 
-If I<VALUE> of I<ITEM1> is omitted, it is set to 0.
-
-If I<VALUE> of I<ITEMn> is ommited, it is set to the value of the previous item plus 1.
-
-Each enumeration item is converted to a L<method definition|Method Definition> that defines a class method that returns the value of the enumeration item.
-
-The return type of the method is the int type.
+If found, a variable name resloves to a L<class variable access|SPVM::Document::Language::Operators/"Class Variable Access">.
 
 Compilation Errors:
 
-I<NAME> must be a L<method name|SPVM::Document::Language::Tokenization/"Method Name">. Otherwise, a compilation error occurs.
+I<VAR_NAME> must be a valid variable name. Otherwise, a compilation error occurs.
 
-I<VALUE> must be an L<integer literal|/"Integer Literal"> within the int type. Otherwise, a compilation error occurs.
+The class specified by I<CLASS_TYPE> must be loaded. Otherwise, a compilation error occurs.
+
+The class variable relative name specified by I<VAR_NAME> must be defined in the class specified by I<VAR_NAME>. Otherwise, a compilation error occurs.
+
+If it resolves to a class variable, the L<outmost class|/"Outmost Class"> must has the access control to I<VAR_NAME> in the I<CLASS_TYPE>. Otherwise, a compilation error occurs.
+
+=head2 Field Access Resolution
+
+The following syntax resolves to a L<field access|SPVM::Document::Language::Operators/"Field Access">.
+
+  INVOCANT->{FIELD_NAME}
+
+The type of I<INVOCANT> is a L<class type|SPVM::Document::Language::Types/"Class Type">, a L<multi-numeric type|SPVM::Document::Language::Types/"Multi-Numeric Type">, or a L<multi-numeric reference type|SPVM::Document::Language::Types/"Multi-Numeric Reference Type">.
+
+I<FIELD_NAME> is a L<field name|SPVM::Document::Language::Tokenization/"Field Name">.
+
+A field specified by I<FIELD_NAME> is searched in the type of I<INVOCANT>.
+
+If it is found and the type of I<INVOCANT> is a L<class type|SPVM::Document::Language::Types/"Class Type">, it resolves to a field access for class types.
+
+If it is found and the type of I<INVOCANT> is a L<multi-numeric type|SPVM::Document::Language::Types/"Multi-Numeric Type">, it resolves to a field access for multi-numeric types.
+
+If it is found and the type of I<INVOCANT> is a L<multi-numeric reference type|SPVM::Document::Language::Types/"Multi-Numeric Reference Type">, it resolves to a field access for multi-numeric reference types.
+
+Compilation Errors:
+
+I<INVOCANT> must be an object of a L<class type|SPVM::Document::Language::Types/"Class Type">, a multi-numeric number of a L<multi-numeric type|SPVM::Document::Language::Types/"Multi-Numeric Type">, a multi-numeric number referenced by a L<multi-numeric reference type|SPVM::Document::Language::Types/"Multi-Numeric Reference Type">. Otherwise, a compilation error occurs.
+
+If the type of I<INVOCANT> is a class type, the field specified by I<FIELD_NAME> must be defined in the class, or its super classes. Otherwise, a compilation error occurs.
+
+If the type of I<INVOCANT> is a multi-numeric type, the field specified by I<FIELD_NAME> must be defined in the multi-numeric type. Otherwise, a compilation error occurs.
+
+If the type of I<INVOCANT> is a multi-numeric reference type, the field specified by I<FIELD_NAME> must be defined in the multi-numeric type referenced by the multi-numeric reference type. Otherwise, a compilation error occurs.
+
+The L<outmost class|/"Outmost Class"> must has the access control to I<FIELD_NAME> in the type of I<INVOCANT>. Otherwise, a compilation error occurs.
+
+=head2 Method Call Resolution
+
+A L<method call|SPVM::Document::Language::Operators/"Method Call"> is an operation to call a method.
+
+A method call resolves to one of the three types of method calls, a class method call, a static instance method call, and an instance method call.
+
+=head3 Class Method Call Resolution
+
+A class method call calls a class method.
+
+  CLASS_TYPE->METHOD_NAME
+  CLASS_TYPE->METHOD_NAME(OPT_ARGS)
+  &METHOD_NAME
+  &METHOD_NAME(OPT_ARGS)
+
+I<CLASS_TYPE> is a L<class type|SPVM::Document::Language::Types/"Class Types"> or a class alias name created by an L<alias statement|/"alias Statement">.
+
+C<&> is converted to the L<outmost class|/"Outmost Class">. This becomes C<I<CLASS_TYPE-E<gt>>>.
+
+I<METHOD_NAME> is a L<method name|SPVM::Document::Language::Tokenization/"Method Name">.
+
+I<OPT_ARGS> is one of
+
+  EMPTY
+  ARGS
+
+I<EMPTY> means nothing exists.
+
+I<ARGS> is one of
+  
+  ARGS , ARG
+  ARG
+
+I<ARG> is an L<operator|SPVM::Document::Language::Operators/"Operators">.
+
+If a method specified I<METHOD_NAME> is searched in I<CLASS_TYPE>.
+
+If found, it resolves to a L<class method call|SPVM::Document::Language::Operators/"Class Method Call">.
+
+The return type is the type of the found method.
+
+Compilation Errors:
+
+If the method is not found, a compilation error occurs.
+
+If the found method is an instance method, a compilation error occurs.
+
+If the type of I<ARG> does not satisfy L<assignment requirement|SPVM::Document::Language::Types/"Assignment Requirement">, a compilation error occurs.
+
+If the length of I<ARGS> is too many, a compilation error occurs.
+
+If the length of I<ARGS> is too few, a compilation error occurs.
+
+The L<outmost class|/"Outmost Class"> must has the access control to the found method. Otherwise, a compilation error occurs.
+
+Examples:
+
+  # Examples of class method calls
+  class MyClass {
+    
+    static method main : void () {
+      my $ret = Fn->INT_MAX;
+      
+      my $ret = Fn->abs(-5);
+      
+      my $ret = &sum(1, 2);
+    }
+    
+    static method sum : int ($num1 : int, $num2 : int) {
+      return $num1 + $num2;
+    }
+  }
+
+=head4 Inline Expansion of Method Call to Get an Enuemration Value
+
+An inline expansion is performed on every class method call to get an enumeration value, and it is replaced with the return value.
+
+Examples:
+
+  class MyClass {
+    enum {
+      FLAG1 = 5;
+    }
+    
+    method main : void () {
+      
+      # This is replaced with 5.
+      MyClass->FLAG1;
+    }
+  }
+
+=head3 Static Instance Method Call Resolution
+
+A static instance method call calls an instance method specifying a class.
+
+  INVOCANT->CLASS_TYPE::METHOD_NAME
+  INVOCANT->CLASS_TYPE::METHOD_NAME(OPT_ARGS)
+
+I<INVOCANT> is an object of a L<class type|SPVM::Document::Language::Types/"Class Types"> or an L<interface type|SPVM::Document::Language::Types/"Interface Types">.
+
+I<CLASS_TYPE> is a L<class type|SPVM::Document::Language::Types/"Class Types">, an L<interface type|SPVM::Document::Language::Types/"Interface Types">, or C<SUPER>.
+
+If C<SUPER> is specified, a method specified by I<METHOD_NAME> is searched in the super classes of the current class. If it is found and it is an instance method, C<SUPER> is replaced to the class of the found method. This becomes I<CLASS_TYPE>.
+
+I<METHOD_NAME> is a L<method name|SPVM::Document::Language::Tokenization/"Method Name">.
+
+I<OPT_ARGS> is one of
+
+  EMPTY
+  ARGS
+
+I<EMPTY> means nothing exists.
+
+I<ARGS> is one of
+  
+  ARGS , ARG
+  ARG
+
+I<ARG> is an L<operator|SPVM::Document::Language::Operators/"Operators">.
+
+A method specified I<METHOD_NAME> is searched in I<CLASS_TYPE>.
+
+If found, it resolves to a L<static instance method call|SPVM::Document::Language::Operators/"Static Instance Method Call">.
+
+The return type is the type of the found method.
+
+Compilation Errors:
+
+I<CLASS_TYPE> must be a L<class type|SPVM::Document::Language::Types/"Class Types">, an L<interface type|SPVM::Document::Language::Types/"Interface Types">, or C<SUPER>. Ohterwise a compilation error occurs.
+
+The type of I<INVOCANT> must satisfies the L<assignment requirement|SPVM::Document::Language::Types/"Assignment Requirement"> to I<CLASS_TYPE>. Ohterwise a compilation error occurs.
+
+If C<SUPER> is specified and the found method is a class method, a compilation error occurs.
+
+If the method is not found, a compilation error occurs.
+
+If the found method is a class method, a compilation error occurs.
+
+If the type of I<ARG> does not satisfy L<assignment requirement|SPVM::Document::Language::Types/"Assignment Requirement">, a compilation error occurs.
+
+If the length of I<ARGS> is too many, a compilation error occurs.
+
+If the length of I<ARGS> is too few, a compilation error occurs.
+
+The L<outmost class|/"Outmost Class"> must has the access control to the found method. Otherwise, a compilation error occurs.
 
 Examples:
   
-  # Examples of enumerations
-  class MyClass {
-    enum {
-      FLAG1,
-      FLAG2,
-      FLAG3,
-    }
-    
-    static method main : void () {
-      my $flag1 = MyClass->FLAG1;
-    }
-  }
+  # Examples of static instance method calls
+  my $point3d = Point3D->new;
   
-  class MyClass {
-    enum {
-      FLAG1,
-      FLAG2 = 2,
-      FLAG3,
-    }
-  }
+  $point3d->Point::clear;
+  
+  $point3d->SUPER::clear;
+  
+=head3 Instance Method Call Resolution
 
-=head2 Enumeration Attributes
+An instance method call calls an instance method.
 
-The List of Enumeration Attributes:
+  INVOCANT->METHOD_NAME
+  INVOCANT->METHOD_NAME(OPT_ARGS)
 
-=begin html
+I<INVOCANT> is an object of a L<class type|SPVM::Document::Language::Types/"Class Types"> or an L<interface type|SPVM::Document::Language::Types/"Interface Types">.
 
-<table>
-  <tr>
-    <th>
-      Attributes
-   </th>
-    <th>
-      Descriptions
-   </th>
-  </tr>
-  <tr>
-    <td>
-      <b>public</b>
-    </td>
-    <td>
-      This enumeration is public. All classes can access all items of this enumeration. This is default.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>private</b>
-    </td>
-    <td>
-      This enumeration is private. All classes ohter than this class cannnot access all items of this enumeration.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>protected</b>
-    </td>
-    <td>
-      This enumeration is protected. All classes ohter than this class and its child classes cannot access all items of this enumeration.
-    </td>
-  </tr>
-</table>
+I<METHOD_NAME> is a L<method name|SPVM::Document::Language::Tokenization/"Method Name">.
 
-=end html
+I<OPT_ARGS> is one of
+
+  EMPTY
+  ARGS
+
+I<EMPTY> means nothing exists.
+
+I<ARGS> is one of
+  
+  ARGS , ARG
+  ARG
+
+I<ARG> is an L<operator|SPVM::Document::Language::Operators/"Operators">.
+
+If the type of I<INVOCANT> is a L<class type|SPVM::Document::Language::Types/"Class Types">, a method specified I<METHOD_NAME> is searched in the class and its super classes.
+
+If found, it resolves to an L<instance method call|SPVM::Document::Language::Operators/"Instance Method Call">.
+
+If the type of I<INVOCANT> is an L<interface type|SPVM::Document::Language::Types/"Interface Types">, a method specified I<METHOD_NAME> is searched in the interface.
+
+If found, it resolves to an L<instance method call|SPVM::Document::Language::Operators/"Instance Method Call">.
+
+The return type is the type of the found method.
 
 Compilation Errors:
 
-One of C<private>, C<protected> and C<public> must be specified. Otherwise, a compilation error occurs.
+The type of I<INVOCANT> must be a L<class type|SPVM::Document::Language::Types/"Class Types"> or an L<interface type|SPVM::Document::Language::Types/"Interface Types">.
+
+If the method specified by I<METHOD_NAME> is not found, a compilation error occurs.
+
+If the found method is a class method, a compilation error occurs.
+
+If the type of I<ARG> does not satisfy L<assignment requirement|SPVM::Document::Language::Types/"Assignment Requirement">, a compilation error occurs.
+
+If the length of I<ARGS> is too many, a compilation error occurs.
+
+If the length of I<ARGS> is too few, a compilation error occurs.
+
+The L<outmost class|/"Outmost Class"> must has the access control to the found method. Otherwise, a compilation error occurs.
+
+Examples:
+  
+  # Examples of instance method calls
+  
+  my $point = Point->new;
+  
+  $point->clear;
+  
+  my $stringable = (Stringable)$point;
+  
+  my $string = $strinble->to_string;
 
 =head1 Block
 

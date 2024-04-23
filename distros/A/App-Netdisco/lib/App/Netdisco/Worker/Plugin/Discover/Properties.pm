@@ -11,6 +11,7 @@ use App::Netdisco::Util::Device 'get_device';
 use App::Netdisco::Util::DNS 'hostname_from_ip';
 use App::Netdisco::Util::SNMP 'snmp_comm_reindex';
 use App::Netdisco::Util::Web 'sort_port';
+use App::Netdisco::DB::ExplicitLocking ':modes';
 
 use Dancer::Plugin::DBIC 'schema';
 use Scope::Guard 'guard';
@@ -389,7 +390,7 @@ register_worker({ phase => 'early', driver => 'snmp' }, sub {
   # support for Hooks
   vars->{'hook_data'}->{'ports'} = [values %deviceports];
 
-  schema('netdisco')->resultset('DevicePort')->txn_do_locked(sub {
+  schema('netdisco')->resultset('DevicePort')->txn_do_locked(ACCESS_EXCLUSIVE, sub {
     my $coder = JSON::PP->new->utf8(0)->allow_nonref(1)->allow_unknown(1);
 
     # backup the custom_fields

@@ -30,7 +30,7 @@ cat-v \[ 옵션 \] args ...
 
 # VERSION
 
-Version 0.9902
+Version 0.9903
 
 # DESCRIPTION
 
@@ -53,7 +53,7 @@ Version 0.9902
 `cat-v`를 사용하면 탭 문자가 디스플레이의 공백이 변하지 않는 방식으로 시각화됩니다.
 
 <div>
-    <p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-cat-v/main/images/tabstyle-pin.png">
+    <p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-cat-v/main/images/tabstyle-needle.png">
 </div>
 
 제어 문자는 제어 형식과 유니코드 기호 문자로 표시할 수 있습니다. 기본적으로 개행 및 이스케이프 문자를 제외한 제어 문자는 해당 유니코드 기호로 표시됩니다.
@@ -182,7 +182,7 @@ Version 0.9902
         cat-v -t4
         cat-v -t --tabstop=4
 
-    기본적으로 `핀` 스타일이 적용되며, `--탭 스타일`로 변경할 수 있습니다. `--탭스타일` 옵션을 인자 없이 지정하면 사용 가능한 스타일 목록이 표시됩니다.
+    기본적으로 `-needle` 스타일이 적용되며, `--탭스타일`로 변경할 수 있습니다. `--탭스타일` 옵션을 인자 없이 지정하면 사용 가능한 스타일 목록이 표시됩니다.
 
     `~/.cat-vrc` 파일에 다음 설정을 넣어 탭 확장을 기본적으로 비활성화할 수 있습니다.
 

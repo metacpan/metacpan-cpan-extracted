@@ -1,0 +1,50 @@
+---
+abstract: 'simulating paper and pencil techniques for basic arithmetic operations'
+author:
+  - 'jforget <J2N-FORGET@orange.fr>'
+build_requires:
+  Carp: '0'
+  ExtUtils::MakeMaker: 6.57_02
+  POSIX: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: 6.57_02
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Arithmetic-PaperAndPencil
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Arithmetic::PaperAndPencil:
+    file: lib/Arithmetic/PaperAndPencil.pm
+    version: '0.01'
+  Arithmetic::PaperAndPencil::Action:
+    file: lib/Arithmetic/PaperAndPencil/Action.pm
+    version: '0.01'
+  Arithmetic::PaperAndPencil::Char:
+    file: lib/Arithmetic/PaperAndPencil/Char.pm
+    version: '0.01'
+  Arithmetic::PaperAndPencil::Label:
+    file: lib/Arithmetic/PaperAndPencil/Label.pm
+    version: '0.01'
+  Arithmetic::PaperAndPencil::Number:
+    file: lib/Arithmetic/PaperAndPencil/Number.pm
+    version: '0.01'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  List::Util: '0'
+  POSIX: '0'
+  perl: '5.038000'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/jforget/perl-Arithmetic-PaperAndPencil.git
+version: 0.01
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

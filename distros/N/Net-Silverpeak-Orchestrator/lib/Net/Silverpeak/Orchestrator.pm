@@ -1,5 +1,5 @@
 package Net::Silverpeak::Orchestrator;
-$Net::Silverpeak::Orchestrator::VERSION = '0.010000';
+$Net::Silverpeak::Orchestrator::VERSION = '0.011000';
 # ABSTRACT: Silverpeak Orchestrator REST API client library
 
 use 5.024;
@@ -125,6 +125,15 @@ sub get_version($self) {
     return $res->data->{current};
 }
 
+sub _is_version_93 ($self) {
+    state $rv;
+    return $rv
+        if defined $rv;
+    my $version = $self->get_version;
+    my ($major, $minor) = split(/\./, $version);
+    return ($major == 9 && $minor >= 3) || $major > 9;
+}
+
 
 sub list_templategroups($self) {
     my $res = $self->get('/gms/rest/template/templateGroups');
@@ -135,10 +144,16 @@ sub list_templategroups($self) {
 
 
 sub get_templategroup($self, $name) {
-    my $res = $self->get('/gms/rest/template/templateGroups/' . $name);
+    my $res = $self->_is_version_93
+        ? $self->get('/gms/rest/template/templateGroups?templateGroup=' . $name)
+        : $self->get('/gms/rest/template/templateGroups/' . $name);
     $self->_error_handler($res)
         unless $res->code == 200;
-    return $res->data;
+    # version 9.3+ returns an array with a single hashref
+    # instead of the hashref
+    return $self->_is_version_93
+        ? $res->data->[0]
+        : $res->data;
 }
 
 
@@ -156,8 +171,11 @@ sub update_templates_of_templategroup($self, $name, $templatenames) {
     croak('templates names must be passed as an arrayref')
         unless ref $templatenames eq 'ARRAY';
 
-    my $res = $self->post('/gms/rest/template/templateSelection/' . $name,
-        $templatenames);
+    my $res = $self->_is_version_93
+        ? $self->post("/gms/rest/template/templateSelection?templateGroup=$name",
+            $templatenames)
+        : $self->post('/gms/rest/template/templateSelection/' . $name,
+            $templatenames);
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -165,8 +183,9 @@ sub update_templates_of_templategroup($self, $name, $templatenames) {
 
 
 sub update_templategroup($self, $name, $data) {
-    my $res = $self->post('/gms/rest/template/templateGroups/' . $name,
-        $data);
+    my $res = $self->_is_version_93
+        ? $self->post("/gms/rest/template/templateGroups?templateGroup=$name", $data)
+        : $self->post('/gms/rest/template/templateGroups/' . $name, $data);
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -174,7 +193,9 @@ sub update_templategroup($self, $name, $data) {
 
 
 sub delete_templategroup($self, $name) {
-    my $res = $self->delete('/gms/rest/template/templateGroups/' . $name);
+    my $res = $self->_is_version_93
+        ? $self->delete("/gms/rest/template/templateGroups?templateGroup=$name")
+        : $self->delete('/gms/rest/template/templateGroups/' . $name);
     $self->_error_handler($res)
         unless $res->code == 204;
     return 1;
@@ -206,7 +227,9 @@ sub get_vrf_by_id ($self) {
 
 
 sub get_vrf_security_policies_by_ids ($self, $source_vrf_id, $destination_vrf_id) {
-    my $res = $self->get('/gms/rest/vrf/config/securityPolicies/' . $source_vrf_id . '_' . $destination_vrf_id);
+    my $res = $self->_is_version_93
+        ? $self->get('/gms/rest/vrf/config/securityPolicies?map=' . $source_vrf_id . '_' . $destination_vrf_id)
+        : $self->get('/gms/rest/vrf/config/securityPolicies/' . $source_vrf_id . '_' . $destination_vrf_id);
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -214,7 +237,9 @@ sub get_vrf_security_policies_by_ids ($self, $source_vrf_id, $destination_vrf_id
 
 
 sub update_vrf_security_policies_by_ids ($self, $source_vrf_id, $destination_vrf_id, $data) {
-    my $res = $self->post('/gms/rest/vrf/config/securityPolicies/' . $source_vrf_id . '_' . $destination_vrf_id, $data);
+    my $res = $self->_is_version_93
+        ? $self->post('/gms/rest/vrf/config/securityPolicies?map=' . $source_vrf_id . '_' . $destination_vrf_id, $data)
+        : $self->post('/gms/rest/vrf/config/securityPolicies/' . $source_vrf_id . '_' . $destination_vrf_id, $data);
     $self->_error_handler($res)
         unless $res->code == 204;
     return 1;
@@ -230,7 +255,9 @@ sub list_appliances($self) {
 
 
 sub get_appliance($self, $id) {
-    my $res = $self->get('/gms/rest/appliance/' . $id);
+    my $res = $self->_is_version_93
+        ? $self->get('/gms/rest/appliance?nePk=' . $id)
+        : $self->get('/gms/rest/appliance/' . $id);
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -238,7 +265,9 @@ sub get_appliance($self, $id) {
 
 
 sub get_appliance_extrainfo ($self, $id) {
-    my $res = $self->get("/gms/rest/appliance/extraInfo/$id");
+    my $res = $self->_is_version_93
+        ? $self->get("/gms/rest/appliance/extraInfo?nePk=$id")
+        : $self->get("/gms/rest/appliance/extraInfo/$id");
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -254,7 +283,9 @@ sub get_ha_groups_by_id ($self) {
 
 
 sub get_deployment ($self, $id) {
-    my $res = $self->get("/gms/rest/deployment/$id");
+    my $res = $self->_is_version_93
+        ? $self->get("/gms/rest/deployment?nePk=$id")
+        : $self->get("/gms/rest/deployment/$id");
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -262,7 +293,9 @@ sub get_deployment ($self, $id) {
 
 
 sub get_interface_state ($self, $id) {
-    my $res = $self->get("/gms/rest/interfaceState/$id");
+    my $res = $self->_is_version_93
+        ? $self->get("/gms/rest/interfaceState?nePk=$id")
+        : $self->get("/gms/rest/interfaceState/$id");
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -313,7 +346,9 @@ sub list_addressgroup_names($self) {
 
 
 sub get_addressgroup($self, $name) {
-    my $res = $self->get('/gms/rest/ipObjects/addressGroup/' . $name);
+    my $res = $self->_is_version_93
+        ? $self->get('/gms/rest/ipObjects/addressGroup/?name=' . $name)
+        : $self->get('/gms/rest/ipObjects/addressGroup/' . $name);
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -341,7 +376,9 @@ sub update_addressgroup($self, $name, $data) {
 
 
 sub delete_addressgroup($self, $name) {
-    my $res = $self->delete('/gms/rest/ipObjects/addressGroup/' . $name);
+    my $res = $self->_is_version_93
+        ? $self->delete('/gms/rest/ipObjects/addressGroup/?name=' . $name)
+        : $self->delete('/gms/rest/ipObjects/addressGroup/' . $name);
     $self->_error_handler($res)
         unless $res->code == 204;
     return 1;
@@ -365,7 +402,9 @@ sub list_servicegroup_names($self) {
 
 
 sub get_servicegroup($self, $name) {
-    my $res = $self->get('/gms/rest/ipObjects/serviceGroup/' . $name);
+    my $res = $self->_is_version_93
+        ? $self->get('/gms/rest/ipObjects/serviceGroup/?name=' . $name)
+        : $self->get('/gms/rest/ipObjects/serviceGroup/' . $name);
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -393,7 +432,9 @@ sub update_servicegroup($self, $name, $data) {
 
 
 sub delete_servicegroup($self, $name) {
-    my $res = $self->delete('/gms/rest/ipObjects/serviceGroup/' . $name);
+    my $res = $self->_is_version_93
+        ? $self->delete('/gms/rest/ipObjects/serviceGroup/?name=' . $name)
+        : $self->delete('/gms/rest/ipObjects/serviceGroup/' . $name);
     $self->_error_handler($res)
         unless $res->code == 204;
     return 1;
@@ -419,7 +460,9 @@ sub create_or_update_domain_application($self, $domain, $data) {
 
 
 sub delete_domain_application($self, $domain) {
-    my $res = $self->delete('/gms/rest/applicationDefinition/dnsClassification/' . $domain);
+    my $res = $self->_is_version_93
+        ? $self->delete('/gms/rest/applicationDefinition/dnsClassification?domain=' . $domain)
+        : $self->delete('/gms/rest/applicationDefinition/dnsClassification/' . $domain);
     $self->_error_handler($res)
         unless $res->code == 200;
     return 1;
@@ -484,7 +527,7 @@ Net::Silverpeak::Orchestrator - Silverpeak Orchestrator REST API client library
 
 =head1 VERSION
 
-version 0.010000
+version 0.011000
 
 =head1 SYNOPSIS
 
@@ -512,7 +555,10 @@ version 0.010000
 =head1 DESCRIPTION
 
 This module is a client library for the Silverpeak Orchestrator REST API.
-Currently it is developed and tested against version 9.0.2.
+Currently it is developed and tested against version 9.3.3.
+
+The REST API endpoints have changed with version 9.3 and since version 0.011
+this module handles both.
 
 =head1 ATTRIBUTES
 

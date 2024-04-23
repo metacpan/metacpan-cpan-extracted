@@ -8,7 +8,7 @@ build_requires:
   Data::HTML::Element::Button: 0.1
   Data::HTML::Element::Form: 0.1
   Data::HTML::Element::Input: 0.13
-  Data::HTML::Element::Select: 0.1
+  Data::HTML::Element::Select: 0.14
   Data::HTML::Element::Textarea: 0.1
   English: 0
   Error::Pure::Utils: 0
@@ -45,4 +45,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-Element
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-Element
-version: '0.11'
+version: '0.12'

@@ -32,7 +32,7 @@ cat-v [ オプション ] 引数 ...
 
 =head1 VERSION
 
-Version 0.9902
+Version 0.9903
 
 =head1 DESCRIPTION
 
@@ -60,7 +60,7 @@ C<cat-v> を使用すると、表示上のスペースが変わらないよう�
 
 =begin html
 
-<p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-cat-v/main/images/tabstyle-pin.png">
+<p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-cat-v/main/images/tabstyle-needle.png">
 
 =end html
 
@@ -193,7 +193,7 @@ B<-t> オプションに任意の数値が指定された場合、それはタ�
     cat-v -t4
     cat-v -t --tabstop=4
 
-デフォルトでは、スタイルC<pin>が適用されますが、C<--tabstyle>で変更することができます。引数なしでC<--tabstyle>オプションが指定された場合、利用可能なスタイルのリストが表示されます。
+デフォルトでは、スタイル C<needle> が適用されますが、C<--tabstyle> で変更することができます。引数なしで C<--tabstyle> オプションが指定された場合、利用可能なスタイルのリストが表示されます。
 
 C<~/.cat-vrc>ファイルに以下の設定を入れることで、デフォルトでタブ展開を無効にすることができます。
 

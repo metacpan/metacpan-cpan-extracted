@@ -4,6 +4,7 @@ use Dancer qw/:moose :syntax !error/;
 use aliased 'App::Netdisco::Worker::Status';
 
 use Moo;
+use Term::ANSIColor qw(:constants :constants256);
 use namespace::clean;
 
 foreach my $slot (qw/
@@ -195,7 +196,7 @@ sub enter_phase {
   my ($job, $phase) = @_;
 
   $job->_current_phase( $phase );
-  debug "=> running workers for phase: $phase";
+  debug BRIGHT_CYAN, "//// ", uc($phase), ' \\\\\\\\ ', GREY10, 'phase', RESET;
 
   $job->_last_namespace( undef );
   $job->_last_priority( undef );
@@ -213,8 +214,9 @@ sub add_status {
   return unless ref $status eq 'App::Netdisco::Worker::Status';
   $status->phase( $job->_current_phase || '' );
   push @{ $job->_statuslist }, $status;
-  debug $status->log if $status->log
-    and (($status->phase eq 'check') or $status->not_ok);
+  if ($status->log) {
+      debug GREEN, "\N{LEFTWARDS BLACK ARROW} ", BRIGHT_GREEN, '(', $status->status, ') ', GREEN, $status->log, RESET;
+  }
 }
 
 =head1 ADDITIONAL COLUMNS

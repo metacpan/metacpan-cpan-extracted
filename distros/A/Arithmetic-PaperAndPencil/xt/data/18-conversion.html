@@ -1,0 +1,604 @@
+<h1>Conversion de 628, base 10 vers base 10, multiplications en cascade (schéma de Horner)</h1>
+<p>Fastoche, 628 converti de la base 10 vers la base 10 donne 628</p>
+<h1>Conversion de 4, base 10 vers base 16, multiplications en cascade (schéma de Horner)</h1>
+<p>Fastoche, 4 converti de la base 10 vers la base 16 donne 4</p>
+<h1>Conversion de 628, base 10 vers base 8, multiplications en cascade (schéma de Horner)</h1>
+<pre>
+
+  <strong>8      10</strong>
+  <strong>9      11</strong>
+ <strong>10      12</strong>
+</pre>
+<p>Changement de page</p>
+<p>La conversion de 6 donne 6</p>
+<pre>
+
+<strong>6</strong>
+</pre>
+<p>2 fois 6, 14</p>
+<p>1 fois 6, 6</p>
+<pre>
+
+   <em>6</em>
+<strong>×</strong><u> <strong>12</strong></u>
+  <strong>14</strong>
+ <u> <strong>6.</strong></u>
+</pre>
+<p>Je pose 4</p>
+<p>1 et 6, 7</p>
+<pre>
+
+   6
+×<u> 12</u>
+  <em>14</em>
+ <u> <em>6</em>.</u>
+  <strong>74</strong>
+</pre>
+<p>La conversion de 2 donne 2</p>
+<p>4 et 2, 6</p>
+<p>Je pose 6 et je ne retiens rien</p>
+<p>Je pose 7</p>
+<pre>
+
+   6
+×<u> 12</u>
+  14
+ <u> 6.</u>
+  <em>74</em>
+<strong>+</strong><u>  <strong>2</strong></u>
+  <strong>76</strong>
+</pre>
+<p>2 fois 6, 14</p>
+<p>Je pose 4 et je retiens 1</p>
+<p>2 fois 7, 16</p>
+<p>et 1, 17</p>
+<p>1 fois 6, 6</p>
+<p>Je pose 6 et je ne retiens rien</p>
+<p>1 fois 7, 7</p>
+<pre>
+
+   6
+×<u> 12</u>
+  14
+ <u> 6.</u>
+  74
++<u>  2</u>
+  <em>76</em>
+<strong>×</strong><u> <strong>12</strong></u>
+ <strong>174</strong>
+<u> <strong>76.</strong></u>
+</pre>
+<p>Je pose 4</p>
+<p>7 et 6, 15</p>
+<p>Je pose 5 et je retiens 1</p>
+<p>1 et 1, 2</p>
+<p>et 7, 11</p>
+<pre>
+
+   6
+×<u> 12</u>
+  14
+ <u> 6.</u>
+  74
++<u>  2</u>
+  76
+×<u> 12</u>
+ <em>174</em>
+<u> <em>76</em>.</u>
+<strong>1154</strong>
+</pre>
+<p>La conversion de 8 donne 10</p>
+<p>4 et 0, 4</p>
+<p>Je pose 4 et je ne retiens rien</p>
+<p>5 et 1, 6</p>
+<p>Je pose 6 et je ne retiens rien</p>
+<p>Je pose 1</p>
+<p>Je pose 1</p>
+<pre>
+
+     6
+  ×<u> 12</u>
+    14
+   <u> 6.</u>
+    74
+  +<u>  2</u>
+    76
+  ×<u> 12</u>
+   174
+  <u> 76.</u>
+  <em>1154</em>
+<strong>+</strong><u>   <strong>10</strong></u>
+  <strong>1164</strong>
+</pre>
+<h1>Conversion de 628, base 10 vers base 16, multiplications en cascade (schéma de Horner)</h1>
+<p>La conversion de 6 donne 6</p>
+<pre>
+
+<strong>6</strong>
+</pre>
+<p>A fois 6, 3C</p>
+<p>La conversion de 2 donne 2</p>
+<p>C et 2, E</p>
+<p>Je pose E et je ne retiens rien</p>
+<p>Je pose 3</p>
+<pre>
+
+   <em>6</em>
+ <strong>×</strong><u> <strong>A</strong></u>
+  <strong>3C</strong>
+<strong>+</strong><u>  <strong>2</strong></u>
+  <strong>3E</strong>
+</pre>
+<p>A fois E, 8C</p>
+<p>Je pose C et je retiens 8</p>
+<p>A fois 3, 1E</p>
+<p>et 8, 26</p>
+<p>La conversion de 8 donne 8</p>
+<p>C et 8, 14</p>
+<p>Je pose 4 et je retiens 1</p>
+<p>6 et 1, 7</p>
+<p>Je pose 7 et je ne retiens rien</p>
+<p>Je pose 2</p>
+<pre>
+
+    6
+  ×<u> A</u>
+   3C
+ +<u>  2</u>
+   <em>3E</em>
+ <strong>×</strong><u>  <strong>A</strong></u>
+  <strong>26C</strong>
+<strong>+</strong><u>   <strong>8</strong></u>
+  <strong>274</strong>
+</pre>
+<h1>Conversion de Y, base 36 vers base 10, multiplications en cascade (schéma de Horner)</h1>
+<pre>
+
+  <strong>A      10</strong>
+  <strong>B      11</strong>
+  <strong>C      12</strong>
+  <strong>D      13</strong>
+  <strong>E      14</strong>
+  <strong>F      15</strong>
+  <strong>G      16</strong>
+  <strong>H      17</strong>
+  <strong>I      18</strong>
+  <strong>J      19</strong>
+  <strong>K      20</strong>
+  <strong>L      21</strong>
+  <strong>M      22</strong>
+  <strong>N      23</strong>
+  <strong>O      24</strong>
+  <strong>P      25</strong>
+  <strong>Q      26</strong>
+  <strong>R      27</strong>
+  <strong>S      28</strong>
+  <strong>T      29</strong>
+  <strong>U      30</strong>
+  <strong>V      31</strong>
+  <strong>W      32</strong>
+  <strong>X      33</strong>
+  <strong>Y      34</strong>
+  <strong>Z      35</strong>
+ <strong>10      36</strong>
+</pre>
+<p>Changement de page</p>
+<p>La conversion de Y donne 34</p>
+<pre>
+
+<strong>34</strong>
+</pre>
+<h1>Conversion de Y, base 36 vers base 2, multiplications en cascade (schéma de Horner)</h1>
+<pre>
+
+  <strong>2      10</strong>
+  <strong>3      11</strong>
+  <strong>4     100</strong>
+  <strong>5     101</strong>
+  <strong>6     110</strong>
+  <strong>7     111</strong>
+  <strong>8    1000</strong>
+  <strong>9    1001</strong>
+  <strong>A    1010</strong>
+  <strong>B    1011</strong>
+  <strong>C    1100</strong>
+  <strong>D    1101</strong>
+  <strong>E    1110</strong>
+  <strong>F    1111</strong>
+  <strong>G   10000</strong>
+  <strong>H   10001</strong>
+  <strong>I   10010</strong>
+  <strong>J   10011</strong>
+  <strong>K   10100</strong>
+  <strong>L   10101</strong>
+  <strong>M   10110</strong>
+  <strong>N   10111</strong>
+  <strong>O   11000</strong>
+  <strong>P   11001</strong>
+  <strong>Q   11010</strong>
+  <strong>R   11011</strong>
+  <strong>S   11100</strong>
+  <strong>T   11101</strong>
+  <strong>U   11110</strong>
+  <strong>V   11111</strong>
+  <strong>W  100000</strong>
+  <strong>X  100001</strong>
+  <strong>Y  100010</strong>
+  <strong>Z  100011</strong>
+ <strong>10  100100</strong>
+</pre>
+<p>Changement de page</p>
+<p>La conversion de Y donne 100010</p>
+<pre>
+
+<strong>100010</strong>
+</pre>
+<h1>Conversion de 4095, base 10 vers base 16, multiplications en cascade (schéma de Horner)</h1>
+<p>La conversion de 4 donne 4</p>
+<pre>
+
+<strong>4</strong>
+</pre>
+<p>A fois 4, 28</p>
+<p>La conversion de 0 donne 0</p>
+<pre>
+
+  <em>4</em>
+<strong>×</strong><u> <strong>A</strong></u>
+ <strong>28</strong>
+</pre>
+<p>A fois 8, 50</p>
+<p>Je pose 0 et je retiens 5</p>
+<p>A fois 2, 14</p>
+<p>et 5, 19</p>
+<p>La conversion de 9 donne 9</p>
+<p>0 et 9, 9</p>
+<p>Je pose 9 et je ne retiens rien</p>
+<p>Je pose 9</p>
+<p>Je pose 1</p>
+<pre>
+
+    4
+  ×<u> A</u>
+   <em>28</em>
+ <strong>×</strong><u>  <strong>A</strong></u>
+  <strong>190</strong>
+<strong>+</strong><u>   <strong>9</strong></u>
+  <strong>199</strong>
+</pre>
+<p>Changement de page</p>
+<p>Déjà converti : 199, reste à convertir : 5</p>
+<p>A fois 9, 5A</p>
+<p>Je pose A et je retiens 5</p>
+<p>A fois 9, 5A</p>
+<p>et 5, 5F</p>
+<p>Je pose F et je retiens 5</p>
+<p>A fois 1, A</p>
+<p>et 5, F</p>
+<p>La conversion de 5 donne 5</p>
+<p>A et 5, F</p>
+<p>Je pose F et je ne retiens rien</p>
+<p>Je pose F</p>
+<p>Je pose F</p>
+<pre>
+
+  <strong>199</strong>
+<strong>×</strong><u>   <strong>A</strong></u>
+  <strong>FFA</strong>
+<strong>+</strong><u>   <strong>5</strong></u>
+  <strong>FFF</strong>
+</pre>
+<h1>Conversion de 4095, base 10 vers base 8, multiplications en cascade (schéma de Horner)</h1>
+<pre>
+
+  <strong>8      10</strong>
+  <strong>9      11</strong>
+ <strong>10      12</strong>
+</pre>
+<p>Changement de page</p>
+<p>La conversion de 4 donne 4</p>
+<pre>
+
+<strong>4</strong>
+</pre>
+<p>2 fois 4, 10</p>
+<p>1 fois 4, 4</p>
+<pre>
+
+   <em>4</em>
+<strong>×</strong><u> <strong>12</strong></u>
+  <strong>10</strong>
+ <u> <strong>4.</strong></u>
+</pre>
+<p>Je pose 0</p>
+<p>1 et 4, 5</p>
+<pre>
+
+   4
+×<u> 12</u>
+  <em>10</em>
+ <u> <em>4</em>.</u>
+  <strong>50</strong>
+</pre>
+<p>La conversion de 0 donne 0</p>
+<pre>
+
+   4
+×<u> 12</u>
+  10
+ <u> 4.</u>
+  50
+</pre>
+<p>2 fois 0, 0</p>
+<p>Je pose 0 et je ne retiens rien</p>
+<p>2 fois 5, 12</p>
+<p>1 fois 0, 0</p>
+<p>Je pose 0 et je ne retiens rien</p>
+<p>1 fois 5, 5</p>
+<pre>
+
+   4
+×<u> 12</u>
+  10
+ <u> 4.</u>
+  <em>50</em>
+<strong>×</strong><u> <strong>12</strong></u>
+ <strong>120</strong>
+<u> <strong>50.</strong></u>
+</pre>
+<p>Je pose 0</p>
+<p>2 et 0, 2</p>
+<p>Je pose 2 et je ne retiens rien</p>
+<p>1 et 5, 6</p>
+<pre>
+
+   4
+×<u> 12</u>
+  10
+ <u> 4.</u>
+  50
+×<u> 12</u>
+ <em>120</em>
+<u> <em>50</em>.</u>
+ <strong>620</strong>
+</pre>
+<p>La conversion de 9 donne 11</p>
+<p>0 et 1, 1</p>
+<p>Je pose 1 et je ne retiens rien</p>
+<p>2 et 1, 3</p>
+<p>Je pose 3 et je ne retiens rien</p>
+<p>Je pose 6</p>
+<pre>
+
+    4
+ ×<u> 12</u>
+   10
+  <u> 4.</u>
+   50
+ ×<u> 12</u>
+  120
+ <u> 50.</u>
+  <em>620</em>
+<strong>+</strong><u>  <strong>11</strong></u>
+  <strong>631</strong>
+</pre>
+<p>Changement de page</p>
+<p>Déjà converti : 631, reste à convertir : 5</p>
+<p>2 fois 1, 2</p>
+<p>Je pose 2 et je ne retiens rien</p>
+<p>2 fois 3, 6</p>
+<p>Je pose 6 et je ne retiens rien</p>
+<p>2 fois 6, 14</p>
+<p>1 fois 1, 1</p>
+<p>Je pose 1 et je ne retiens rien</p>
+<p>1 fois 3, 3</p>
+<p>Je pose 3 et je ne retiens rien</p>
+<p>1 fois 6, 6</p>
+<pre>
+
+  <strong>631</strong>
+<strong>×</strong><u>  <strong>12</strong></u>
+ <strong>1462</strong>
+<u> <strong>631.</strong></u>
+</pre>
+<p>Je pose 2</p>
+<p>6 et 1, 7</p>
+<p>Je pose 7 et je ne retiens rien</p>
+<p>4 et 3, 7</p>
+<p>Je pose 7 et je ne retiens rien</p>
+<p>1 et 6, 7</p>
+<pre>
+
+  631
+×<u>  12</u>
+ <em>1462</em>
+<u> <em>631</em>.</u>
+ <strong>7772</strong>
+</pre>
+<p>La conversion de 5 donne 5</p>
+<p>2 et 5, 7</p>
+<p>Je pose 7 et je ne retiens rien</p>
+<p>Je pose 7</p>
+<p>Je pose 7</p>
+<p>Je pose 7</p>
+<pre>
+
+   631
+ ×<u>  12</u>
+  1462
+ <u> 631.</u>
+  <em>7772</em>
+<strong>+</strong><u>    <strong>5</strong></u>
+  <strong>7777</strong>
+</pre>
+<h1>Conversion de 4095, base 10 vers base 8, multiplications en cascade (schéma de Horner)</h1>
+<pre>
+
+  <strong>8      10</strong>
+  <strong>9      11</strong>
+ <strong>10      12</strong>
+</pre>
+<p>Changement de page</p>
+<p>La conversion de 4 donne 4</p>
+<pre>
+
+<strong>4</strong>
+</pre>
+<p>2 fois 4, 10</p>
+<p>1 fois 4, 4</p>
+<pre>
+
+   <em>4</em>
+<strong>×</strong><u> <strong>12</strong></u>
+  <strong>10</strong>
+ <u> <strong>4.</strong></u>
+</pre>
+<p>Je pose 0</p>
+<p>1 et 4, 5</p>
+<pre>
+
+   4
+×<u> 12</u>
+  <em>10</em>
+ <u> <em>4</em>.</u>
+  <strong>50</strong>
+</pre>
+<p>La conversion de 0 donne 0</p>
+<pre>
+
+   4
+×<u> 12</u>
+  10
+ <u> 4.</u>
+  50
+</pre>
+<p>2 fois 0, 0</p>
+<p>Je pose 0 et je ne retiens rien</p>
+<p>2 fois 5, 12</p>
+<p>1 fois 0, 0</p>
+<p>Je pose 0 et je ne retiens rien</p>
+<p>1 fois 5, 5</p>
+<pre>
+
+   4
+×<u> 12</u>
+  10
+ <u> 4.</u>
+  <em>50</em>
+<strong>×</strong><u> <strong>12</strong></u>
+ <strong>120</strong>
+<u> <strong>50.</strong></u>
+</pre>
+<p>Je pose 0</p>
+<p>2 et 0, 2</p>
+<p>Je pose 2 et je ne retiens rien</p>
+<p>1 et 5, 6</p>
+<pre>
+
+   4
+×<u> 12</u>
+  10
+ <u> 4.</u>
+  50
+×<u> 12</u>
+ <em>120</em>
+<u> <em>50</em>.</u>
+ <strong>620</strong>
+</pre>
+<p>La conversion de 9 donne 11</p>
+<p>0 et 1, 1</p>
+<p>Je pose 1 et je ne retiens rien</p>
+<p>2 et 1, 3</p>
+<p>Je pose 3 et je ne retiens rien</p>
+<p>Je pose 6</p>
+<pre>
+
+    4
+ ×<u> 12</u>
+   10
+  <u> 4.</u>
+   50
+ ×<u> 12</u>
+  120
+ <u> 50.</u>
+  <em>620</em>
+<strong>+</strong><u>  <strong>11</strong></u>
+  <strong>631</strong>
+</pre>
+<p>2 fois 1, 2</p>
+<p>Je pose 2 et je ne retiens rien</p>
+<p>2 fois 3, 6</p>
+<p>Je pose 6 et je ne retiens rien</p>
+<p>2 fois 6, 14</p>
+<p>1 fois 1, 1</p>
+<p>Je pose 1 et je ne retiens rien</p>
+<p>1 fois 3, 3</p>
+<p>Je pose 3 et je ne retiens rien</p>
+<p>1 fois 6, 6</p>
+<pre>
+
+    4
+ ×<u> 12</u>
+   10
+  <u> 4.</u>
+   50
+ ×<u> 12</u>
+  120
+ <u> 50.</u>
+  620
++<u>  11</u>
+  <em>631</em>
+<strong>×</strong><u>  <strong>12</strong></u>
+ <strong>1462</strong>
+<u> <strong>631.</strong></u>
+</pre>
+<p>Je pose 2</p>
+<p>6 et 1, 7</p>
+<p>Je pose 7 et je ne retiens rien</p>
+<p>4 et 3, 7</p>
+<p>Je pose 7 et je ne retiens rien</p>
+<p>1 et 6, 7</p>
+<pre>
+
+    4
+ ×<u> 12</u>
+   10
+  <u> 4.</u>
+   50
+ ×<u> 12</u>
+  120
+ <u> 50.</u>
+  620
++<u>  11</u>
+  631
+×<u>  12</u>
+ <em>1462</em>
+<u> <em>631</em>.</u>
+ <strong>7772</strong>
+</pre>
+<p>La conversion de 5 donne 5</p>
+<p>2 et 5, 7</p>
+<p>Je pose 7 et je ne retiens rien</p>
+<p>Je pose 7</p>
+<p>Je pose 7</p>
+<p>Je pose 7</p>
+<pre>
+
+     4
+  ×<u> 12</u>
+    10
+   <u> 4.</u>
+    50
+  ×<u> 12</u>
+   120
+  <u> 50.</u>
+   620
+ +<u>  11</u>
+   631
+ ×<u>  12</u>
+  1462
+ <u> 631.</u>
+  <em>7772</em>
+<strong>+</strong><u>    <strong>5</strong></u>
+  <strong>7777</strong>
+</pre>

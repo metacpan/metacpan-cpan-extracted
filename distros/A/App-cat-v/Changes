@@ -1,5 +1,9 @@
 Revision history for Perl extension App-cat-v
 
+0.9903 2024-04-23T09:23:56Z
+
+    - change default tabstyle name to "needle"
+
 0.9902 2024-04-02T10:12:53Z
 
     - make option -t to take tab width

@@ -1,8 +1,4 @@
-use strict;
-use warnings;
-
-use Test::More;
-use Test::Exception;
+use Test2::V0;
 
 use Config;
 
@@ -17,16 +13,14 @@ subtest "sizeof(number)" => sub {
 };
 
 subtest "sizeof(whatever)" => sub {
-    throws_ok(
-        sub { sizeof() },
+    like
+        dies { sizeof() },
         qr{::sizeof requires an argument at t/sizeof.t line},
-        "sizeof() requires an argument"
-    );
-    throws_ok(
-        sub { sizeof("banana") },
+        "sizeof() requires an argument";
+    like
+        dies { sizeof("banana") },
         qr{::sizeof: 'banana' isn't numeric: SCALAR},
-        "sizeof()'s arg must be plausibly numeric"
-    );
+        "sizeof()'s arg must be plausibly numeric";
 };
 
 done_testing;

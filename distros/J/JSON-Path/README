@@ -1,9 +1,9 @@
 This archive contains the distribution JSON-Path,
-version 1.0.4:
+version 1.0.5:
 
   search nested hashref/arrayref structures using JSONPath
 
-This software is copyright (c) 2022 by Aurelia Peters.
+This software is copyright (c) 2024 by Aurelia Peters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

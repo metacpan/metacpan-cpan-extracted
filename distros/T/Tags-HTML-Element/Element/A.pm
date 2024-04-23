@@ -9,7 +9,7 @@ use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 use Tags::HTML::Element::Utils qw(tags_data tags_value);
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 sub _cleanup {
 	my $self = shift;
@@ -254,6 +254,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.11
+0.12
 
 =cut

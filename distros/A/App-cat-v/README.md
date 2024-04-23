@@ -31,7 +31,7 @@ cat-v \[ options \] args ...
 
 # VERSION
 
-Version 0.9902
+Version 0.9903
 
 # DESCRIPTION
 
@@ -64,7 +64,7 @@ Using `cat-v`, tab characters are visualized in such a way that the
 space on the display does not change.
 
 <div>
-    <p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-cat-v/main/images/tabstyle-pin.png">
+    <p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-cat-v/main/images/tabstyle-needle.png">
 </div>
 
 Control characters can be displayed in control format and Unicode
@@ -216,7 +216,7 @@ characters
         cat-v -t4
         cat-v -t --tabstop=4
 
-    By default, the style `pin` is applied, which can be changed with
+    By default, the style `needle` is applied, which can be changed with
     `--tabstyle`. If the `--tabstyle` option is specified with no
     arguments, a list of available styles is displayed.
 

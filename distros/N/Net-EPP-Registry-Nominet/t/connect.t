@@ -90,8 +90,8 @@ SKIP: {
 	ok ((not defined $epp->hello()), 'Hello attempt when logged out');
 
 	# rt-147136 login as new user.
-	is $epp->{authenticated}, 0, 'Unauthenticated';
-	is $epp->{connected}, undef, 'Unconnected';
+	ok !$epp->{authenticated}, 'Unauthenticated';
+	ok !$epp->connected, 'Unconnected';
 	isnt ($epp->login ("$ENV{NOMTAG}_", $ENV{NOMPASS}), undef, 'Login as secondary user with good credentials');
 	is ($Net::EPP::Registry::Nominet::Code, 1000, 'Logged in') or diag
 	$epp->get_message;

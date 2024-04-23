@@ -35,6 +35,7 @@ sub process_csv {
         'primary-key-name=s'   => \my $primary_key_name,                       # string
         'generate-primary-key' => \my $generate_primary_key,                   # flag
         'separator|sep=s'      => \my $sep,                                    # str
+        'output-dir=s'         => \my $output_dir,                             # str
         'help|?'               => \my $help,                                   # flag
         'man'                  => \my $man,                                    # flag
         'debug=i'              => \my $debug,                                  # integer
@@ -52,6 +53,10 @@ sub process_csv {
         -message => "Please specify a --primary-key-name <my_string>\n",
         -exitval => 1
     ) if ( $generate_primary_key && !$primary_key_name );
+    pod2usage(
+        -message => "Please specify a valid directory for --output-dir\n",
+        -exitval => 1
+    ) if ( defined $output_dir && !-d $output_dir );
 
     # Create object
     my $csv = CSV2PhenoRanker->new(
@@ -59,6 +64,7 @@ sub process_csv {
             input                => $input,
             primary_key_name     => $primary_key_name,
             generate_primary_key => $generate_primary_key,
+            output_dir           => $output_dir,
             sep                  => $sep,
             debug                => $debug,
             verbose              => $verbose
@@ -78,6 +84,7 @@ use feature qw(say);
 use Data::Dumper;
 use Path::Tiny;
 use File::Basename;
+use File::Spec::Functions qw(catdir catfile);
 use Scalar::Util qw(looks_like_number);
 use YAML::XS qw(LoadFile DumpFile);
 use JSON::XS;
@@ -94,22 +101,25 @@ sub run {
     my $self = shift;
 
     # Read the input file
-    my ( $data, $arrays, $non_arrays ) = read_csv($self);
+    my ( $data, $arrays, $non_arrays ) = $self->read_csv();
+
+    # Define output directory
+    my ( $name, $path, undef ) = fileparse( $self->{input}, qr/\.[^.]*/ );
+    my $output_dir = $self->{output_dir} // $path;    # Use defined-or operator
 
     # Write data as JSON
-    my ( $name, $path, $suffix ) = fileparse( $self->{input}, qr/\.[^.]*/ );
-    my $json_file = qq/$path$name.json/;
+    my $json_file = catfile( $output_dir, qq/${name}.json/ );
     say "Writting <$json_file> " if $self->{verbose};
     write_json( { filepath => $json_file, data => $data } );
 
     # Load the configuration file data
-    my $config = create_config( $arrays, $non_arrays, $self );
+    my $config = $self->create_config( $arrays, $non_arrays );
 
     # Write the configuration file as YAML
-    my $yaml_file = qq/$path${name}_config.yaml/;
+    my $yaml_file = catfile( $output_dir, qq/${name}_config.yaml/ );
     say "Writting <$yaml_file> " if $self->{verbose};
     write_yaml( { filepath => $yaml_file, data => $config } );
-
+    return 1;
 }
 
 sub write_json {
@@ -235,7 +245,7 @@ sub read_csv {
 
 sub create_config {
 
-    my ( $array, $non_array, $self ) = @_;
+    my ( $self, $array, $non_array ) = @_;
     my $primary_key_name = $self->{primary_key_name};
 
     my @arrays     = sort keys %$array;
@@ -315,9 +325,11 @@ csv2pheno-ranker -i <input.csv> [-options]
 
      Options:
 
-       -generate-primary-key          Generates a primary key if absent. Use --primary-key-name to set its name.
-       -primary-key-name              Sets the name for the primary key. Must be a single, non-array field.
+       -generate-primary-key          Generates a primary key if absent. Use --primary-key-name to set its name
+       -primary-key-name              Sets the name for the primary key. Must be a single, non-array field
        -sep|separator                 Delimiter character for CSV files [;] e.g., --sep $'\t'
+       -output-dir                    Specify the directory where output files will be stored. If not specified, outputs will be placed in the same directory as the input file
+
 
      Generic Options;
        -debug                         Print debugging (from 1 to 5, being 5 max)
@@ -329,11 +341,9 @@ csv2pheno-ranker -i <input.csv> [-options]
 
 =head1 DESCRIPTION
 
-There are hundreds of online tools available for converting CSV to JSON, and we saw no need to reinvent the wheel. Our primary focus was on efficiently getting the job done, enabling seamless compatibility between CSV and Pheno-Ranker.
+Numerous tools exist for CSV to JSON conversion, but our focus here was on creating JSON specifically for C<Pheno-Ranker>. The script supports both basic CSV files and complex, comma-separated CSV files with nested fields, ensuring seamless C<Pheno-Ranker> integration.
 
-This script is designed to handle both simple CSV files without nested fields in columns, as well as more complex ones with nested fields, as long as they are comma-separated.
-
-The script will create both a JSON file and the configuration file for C<Pheno-Ranker>. You can run C<Pheno-Ranker> as:
+The script will create both a JSON file and the configuration file for C<Pheno-Ranker>. Then, you can run C<Pheno-Ranker> as:
 
  $ pheno-ranker -r my_csv.json --config --my_csv_config.yaml
 
@@ -341,7 +351,7 @@ Note that we load all data in memory before dumping the JSON file. If you have a
 
 =head1 SUMMARY
 
-A script to convert a CSV to an input suitable for Pheno-Ranker
+A script to convert a CSV to an input suitable for C<Pheno-Ranker>
 
 =head1 INSTALLATION
 
@@ -359,13 +369,18 @@ A script to convert a CSV to an input suitable for Pheno-Ranker
 
 =head1 HOW TO RUN CSV2PHENO-RANKER
 
-The software needs a csv as input file and assumes defaults. If you want to change some parameters please take a look to the synopsis.
+The software requires a CSV file as the input and operates with default settings. By default, both the C<JSON> file and the configuration file will be created in the same directory as the input file, and will share the same basename
+
+If you want to change some parameters please take a look to the synopsis.
 
 B<Examples:>
 
  $ ./csv2pheno-ranker -i example.csv
  
  $ ./csv2pheno-ranker -i example.csv --generate-primary-key --primary-key-name ID
+
+ $ ./csv2pheno-ranker -i example.csv --generate-primary-key --primary-key-name ID  --output-dir /my-path
+
 
 =head2 COMMON ERRORS AND SOLUTIONS
 

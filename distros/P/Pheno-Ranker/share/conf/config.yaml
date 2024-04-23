@@ -27,7 +27,7 @@ exclude_properties_regex: 'info|notes|label|value|\.high|\.low|metaData|familyHi
 array_terms: [biosamples,diseases,exposures,interpretations,interventionsOrProcedures,measures,measurements,medicalActions,phenotypicFeatures,treatments]
 
 # Set the regex to identify array indexes, guiding their substitution within array elements
-array_regex: '^(\w+):(\d+)\.(\S+)'
+array_regex: '^([^:]+):(\d+)\.(\S+)'
 
 # Set the path to select values for substituting array indexes
 id_correspondence:

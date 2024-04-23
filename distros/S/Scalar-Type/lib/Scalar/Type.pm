@@ -21,7 +21,7 @@ use if bool_supported() eq 'builtin::is_bool', qw(experimental builtin);
 use Carp qw(croak);
 use Config;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -52,7 +52,7 @@ Scalar::Type - figure out what type a scalar is
 Perl scalars can be either strings or numbers, and normally you don't really
 care which is which as it will do all the necessary type conversions automagically.
 This means that you can perform numeric operations on strings and provided that they
-B<looks like> a number you'll get a sensible result:
+B<look like> a number you'll get a sensible result:
 
     my $string = "4";
     my $number = 1;
@@ -348,6 +348,8 @@ the number.
 
 =head1 SEE ALSO
 
+L<Test2::Tools::Type>, which is bundled with this module.
+
 L<Scalar::Util> in particular its C<blessed> function.
 
 L<builtin> if you have perl 5.35.7 or later.
@@ -370,7 +372,7 @@ I welcome feedback about my code, especially constructive criticism.
 
 =head1 AUTHOR, COPYRIGHT and LICENCE
 
-Copyright 2023 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2024 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used,
 distributed, and modified under the terms of either the GNU

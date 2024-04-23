@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Net::EPP" : "0.19",
+            "Net::EPP" : "0.27",
             "perl" : "5.008000"
          }
       },
@@ -56,6 +56,6 @@
          "web" : "https://gitlab.com/openstrike/nominet-epp"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

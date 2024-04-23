@@ -2,7 +2,6 @@ use Test2::V0;
 use JSON::MaybeXS qw/encode_json decode_json/;
 use JSON::Path::Evaluator;
 use Storable qw(dclone);
-use Tie::IxHash;
 
 my $json = sample_json();
 my %data = %{ decode_json($json) };

@@ -1,9 +1,6 @@
-use strict;
-use warnings;
-no warnings 'void';
+use Test2::V0;
 
-use Test::More;
-use Test::Exception;
+no warnings 'void';
 
 use Scalar::Type qw(is_* type);
 use B;
@@ -190,20 +187,17 @@ subtest "type returns the documented values for non-reference types" => sub {
     is(type(undef), 'UNDEF', 'undef is of type UNDEF');
 };
 
-throws_ok(
-    sub { type() },
+like
+    dies { type() },
     qr{::type requires an argument at t/types.t line},
-    "type() requires an argument"
-);
-throws_ok(
-    sub { is_number() },
+    "type() requires an argument";
+like
+    dies { is_number() },
     qr{::is_number requires an argument at t/types.t line},
-    "is_number() requires an argument"
-);
-throws_ok(
-    sub { is_integer() },
+    "is_number() requires an argument";
+like
+    dies { is_integer() },
     qr{::is_integer requires an argument at t/types.t line},
-    "is_integer() requires an argument"
-);
+    "is_integer() requires an argument";
 
 done_testing;

@@ -8,18 +8,18 @@ bff-pxf-simulator \[-options\]
 
      Options:
        -f|format                      Format [>bff|pxf]
-       -n|number                      Number of individuals
+       -n|number                      Set the number of individuals to generate [100]
        -o|output                      Output file [individuals.json]
-       -external-ontologies           YAML file with ontologies for diseases, exposures, phenotypicFeatures, procedures and treatments
+       -external-ontologies           Path to a YAML file containing ontology terms for diseases, exposures, phenotypicFeatures, procedures, and treatments
        -random-seed                   Initializes pseudorandom number sequences for reproducible results (int)
 
-       -diseases                      Number of [1]
-       -exposures                     IDEM
-       -phenotypicFeatures            IDEM
-       -procedures                    IDEM
-       -treatments                    IDEM
-       -max-[term]-pool               To narrow the selection to N first array elements.
-       -max-ethnicity-pool            Each individual can have only 1 ethnicity. However, you can also set a fixed sample size for the pool
+       -diseases                      Set the number of diseases per individual [1]
+       -exposures                     Set the number of exposures per individual [1]
+       -phenotypicFeatures            Set the number of phenotypic features per individual [1]
+       -procedures                    Set the number of procedures per individual [1]
+       -treatments                    Set the number of treatments per individual [1]
+       -max-[term]-pool               Limit the selection to the first N elements of the term array
+       -max-ethnicity-pool            Restrict the ethnicity pool size; each individual will have only one ethnicity
 
      Generic Options;
        -debug                         Print debugging (from 1 to 5, being 5 max)

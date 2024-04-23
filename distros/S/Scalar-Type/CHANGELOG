@@ -1,3 +1,7 @@
+1.0.1    2024-04-22
+
+- Add Test2::Tools::Type
+
 1.0.0    2023-10-29
 
 - change: trying to use is_bool on a perl that doesn't support it is now a

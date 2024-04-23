@@ -180,7 +180,7 @@ The C<switch> statement is a conditional statement with the following syntax.
 
 The L<integer promotional conversion|SPVM::Document::Language::Types/"Integer Promotional Conversion"> is performed on the condition I<CONDITION>.
 
-The operand of the case statement I<CASEn> must be a L<character literal|SPVM::Document::Language::Tokenization/"Character Literal">, an L<integer literal|SPVM::Document::Language::Tokenization/"Integer Literals"> and an L<enumeration value|SPVM::Document::Language::Class/"Getting Enumeration Value">.
+The operand of the case statement I<CASEn> must be a L<character literal|SPVM::Document::Language::Tokenization/"Character Literal">, an L<integer literal|SPVM::Document::Language::Tokenization/"Integer Literals"> and an L<inline-expaned class method call to get an enumeration value|SPVM::Document::Language::Class/"Inline Expansion of Method Call to Get an Enuemration Value">.
 
 If I<CASEn> is a L<character literal|SPVM::Document::Language::Tokenization/"Character Literal">, the value is converted to the int type at compile-time.
 
@@ -215,7 +215,7 @@ Compilation Errors:
 
 I<CONDITION> must be an integer type within int. Otherwise, a compilation error occurs.
 
-The values of the case statements cannnot be duplicated. If so, a compilation error occurs.
+The values of the case statements must not be duplicated. Otherwise, a compilation error occurs.
 
 Examples:
 
@@ -245,7 +245,7 @@ Examples:
     }
   }
   
-  # switch statement using enumeration
+  # switch statement with enumeration
   class Foo {
     enum {
       ID1,
@@ -456,17 +456,25 @@ Example:
 
 =head2 return Statement
 
-The C<return> statement returns a value for a L<method|SPVM::Document::Language::Class/"Method">.
-  
+The return statement causes the program to return to its caller. And it set the return value.
+
   // void
   return;
   
   // non-void
   return OPERAND;
 
+This statement causes the program to return to its caller.
+
+If I<OPERAND> is specified, the return vlaue is set to I<OPERAND>.
+
+I<OPERAND> is an an L<operator|SPVM::Document::Language::Operators/"Operators">.
+
+This is because leave scope operations must not destroy I<OPERAND>.
+
 Compilation Errors:
 
-If the return type of the current method is the void typ, I<OPERAND> cannnot exist. If so, a compilation error occurs.
+If the return type of the current method is the void type, I<OPERAND> must not exist. Otherwise, a compilation error occurs.
 
 If the return type of the current method is the non-void type, I<OPERAND> must exist. Otherwise, a compilation error occurs.
 

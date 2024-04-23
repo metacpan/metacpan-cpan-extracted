@@ -23,13 +23,12 @@ my %WriteMakefileArgs = (
     "LV" => 0,
     "List::Util" => "1.45",
     "Readonly" => 0,
-    "Tie::IxHash" => 0,
     "Try::Tiny" => 0
   },
   "TEST_REQUIRES" => {
     "Test2::V0" => 0
   },
-  "VERSION" => "1.0.4",
+  "VERSION" => "1.0.5",
   "test" => {
     "TESTS" => "t/*.t t/evaluator/*.t"
   }
@@ -44,7 +43,6 @@ my %FallbackPrereqs = (
   "List::Util" => "1.45",
   "Readonly" => 0,
   "Test2::V0" => 0,
-  "Tie::IxHash" => 0,
   "Try::Tiny" => 0
 );
 

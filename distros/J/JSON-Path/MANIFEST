@@ -10,6 +10,7 @@ build/Dockerfile
 cpanfile
 dist.ini
 examples/eg1.pl
+issues/issue48/Dockerfile
 lib/JSON/Path.pm
 lib/JSON/Path/Constants.pm
 lib/JSON/Path/Evaluator.pm

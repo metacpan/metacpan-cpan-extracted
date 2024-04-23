@@ -1,0 +1,91 @@
+{
+   "abstract" : "simulating paper and pencil techniques for basic arithmetic operations",
+   "author" : [
+      "jforget <J2N-FORGET@orange.fr>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Arithmetic-PaperAndPencil",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.57_02"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.57_02"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "List::Util" : "0",
+            "POSIX" : "0",
+            "perl" : "5.038000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Pod::Coverage" : "0",
+            "Test::CheckManifest" : "0.9",
+            "Test::Exception" : "0.18",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.08"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "POSIX" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Arithmetic::PaperAndPencil" : {
+         "file" : "lib/Arithmetic/PaperAndPencil.pm",
+         "version" : "0.01"
+      },
+      "Arithmetic::PaperAndPencil::Action" : {
+         "file" : "lib/Arithmetic/PaperAndPencil/Action.pm",
+         "version" : "0.01"
+      },
+      "Arithmetic::PaperAndPencil::Char" : {
+         "file" : "lib/Arithmetic/PaperAndPencil/Char.pm",
+         "version" : "0.01"
+      },
+      "Arithmetic::PaperAndPencil::Label" : {
+         "file" : "lib/Arithmetic/PaperAndPencil/Label.pm",
+         "version" : "0.01"
+      },
+      "Arithmetic::PaperAndPencil::Number" : {
+         "file" : "lib/Arithmetic/PaperAndPencil/Number.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jforget/perl-Arithmetic-PaperAndPencil.git",
+         "web" : "https://github.com/jforget/perl-Arithmetic-PaperAndPencil"
+      }
+   },
+   "version" : 0.01,
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

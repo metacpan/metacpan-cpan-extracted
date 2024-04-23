@@ -11,9 +11,11 @@ csv2pheno-ranker -i &lt;input.csv> \[-options\]
 
      Options:
 
-       -generate-primary-key          Generates a primary key if absent. Use --primary-key-name to set its name.
-       -primary-key-name              Sets the name for the primary key. Must be a single, non-array field.
+       -generate-primary-key          Generates a primary key if absent. Use --primary-key-name to set its name
+       -primary-key-name              Sets the name for the primary key. Must be a single, non-array field
        -sep|separator                 Delimiter character for CSV files [;] e.g., --sep $'\t'
+       -output-dir                    Specify the directory where output files will be stored. If not specified, outputs will be placed in the same directory as the input file
+
 
      Generic Options;
        -debug                         Print debugging (from 1 to 5, being 5 max)
@@ -24,11 +26,9 @@ csv2pheno-ranker -i &lt;input.csv> \[-options\]
 
 # DESCRIPTION
 
-There are hundreds of online tools available for converting CSV to JSON, and we saw no need to reinvent the wheel. Our primary focus was on efficiently getting the job done, enabling seamless compatibility between CSV and Pheno-Ranker.
+Numerous tools exist for CSV to JSON conversion, but our focus here was on creating JSON specifically for `Pheno-Ranker`. The script supports both basic CSV files and complex, comma-separated CSV files with nested fields, ensuring seamless `Pheno-Ranker` integration.
 
-This script is designed to handle both simple CSV files without nested fields in columns, as well as more complex ones with nested fields, as long as they are comma-separated.
-
-The script will create both a JSON file and the configuration file for `Pheno-Ranker`. You can run `Pheno-Ranker` as:
+The script will create both a JSON file and the configuration file for `Pheno-Ranker`. Then, you can run `Pheno-Ranker` as:
 
     $ pheno-ranker -r my_csv.json --config --my_csv_config.yaml
 
@@ -36,7 +36,7 @@ Note that we load all data in memory before dumping the JSON file. If you have a
 
 # SUMMARY
 
-A script to convert a CSV to an input suitable for Pheno-Ranker
+A script to convert a CSV to an input suitable for `Pheno-Ranker`
 
 # INSTALLATION
 
@@ -54,13 +54,17 @@ A script to convert a CSV to an input suitable for Pheno-Ranker
 
 # HOW TO RUN CSV2PHENO-RANKER
 
-The software needs a csv as input file and assumes defaults. If you want to change some parameters please take a look to the synopsis.
+The software requires a CSV file as the input and operates with default settings. By default, both the `JSON` file and the configuration file will be created in the same directory as the input file, and will share the same basename
+
+If you want to change some parameters please take a look to the synopsis.
 
 **Examples:**
 
     $ ./csv2pheno-ranker -i example.csv
     
     $ ./csv2pheno-ranker -i example.csv --generate-primary-key --primary-key-name ID
+
+    $ ./csv2pheno-ranker -i example.csv --generate-primary-key --primary-key-name ID  --output-dir /my-path
 
 ## COMMON ERRORS AND SOLUTIONS
 

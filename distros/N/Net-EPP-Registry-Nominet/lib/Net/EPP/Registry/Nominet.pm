@@ -28,7 +28,7 @@ use constant EPP_XMLNS	=> 'urn:ietf:params:xml:ns:epp-1.0';
 use vars qw($Error $Code $Message);
 
 BEGIN {
-	our $VERSION = '0.09';
+	our $VERSION = '0.10';
 }
 
 # file-scoped lexicals
@@ -250,18 +250,6 @@ sub _go_connect {
 	$self->{connected}      = 1;
 }
 
-# Workaround for connection status bug in Net::EPP::Simple
-# https://github.com/gbxyz/perl-net-epp/issues/2
-sub connect {
-	my ($self, %params) = @_;
-
-	my $meth = '_connect_' . (defined ($self->{sock}) ? 'unix' : 'tcp');
-	$self->{connected} = $self->$meth (%params);
-
-	return ($params{'no_greeting'} ? 1 : $self->get_frame);
-}
-
-
 =pod
 
 =head1 Login
@@ -303,7 +291,7 @@ sub login {
 		return;
 	}
 
-	$self->_go_connect () unless $self->{connected};
+	$self->_go_connect () unless $self->connected;
 
 	# Set login frame
 	my $login = Net::EPP::Frame::Command::Login->new;
@@ -1610,7 +1598,7 @@ extensive error handling.
 
 sub hello {
 	my $self = shift;
-	unless ($self->{connected}) {
+	unless ($self->connected) {
 		warn "Hello attempt while disconnected\n" if $Debug;
 		return undef;
 	}
