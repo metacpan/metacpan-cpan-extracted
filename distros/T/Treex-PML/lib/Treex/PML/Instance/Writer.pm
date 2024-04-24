@@ -6,11 +6,10 @@ use warnings;
 no warnings qw(recursion);
 use Carp;
 use Data::Dumper;
-use Scalar::Util qw(blessed);
 use UNIVERSAL::DOES;
 
 BEGIN {
-  our $VERSION = '2.24'; # version template
+  our $VERSION = '2.26'; # version template
 }
 use List::Util qw(first);
 use Treex::PML::Instance::Common qw(:diagnostics :constants);
@@ -616,7 +615,11 @@ sub compile_schema {
           } else {
             $href = $references->{$id};
           }
-          $href=Treex::PML::IO::make_relative_URI($href,$filename);
+          if (ref $href && $href->isa('Treex::PML::Resource::URI')) {
+              $href = Treex::PML::IO::make_relative_URI($href,$href);
+          } else {
+              $href = Treex::PML::IO::make_relative_URI($href,$filename);
+          }
           my $name = $names{$id};
           for ($id,$href, (defined $name ? $name : ())) { s/&/&amp;/g;  s/</&lt;/g;  s/"/&quot;/g; }
           print $out qq(_^__^__^_<reffile id="${id}").(defined $name ? qq( name="${name}") : ()).qq( href="${href}" />\n);
@@ -1218,7 +1221,7 @@ L<Treex::PML::Instance>, L<Treex::PML::Instance::Reader>,
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2010 by Petr Pajas
+Copyright (C) 2008-2010 by Petr Pajas, 2010-2024 Jan Stepanek
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.2 or,

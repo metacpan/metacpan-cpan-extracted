@@ -85,11 +85,13 @@ sub read_json {
 
     my $file = shift;
 
-    # NB: hp.json is non-UTF8
+    # NB: file -bi hp.json 
+    # text/plain; charset=utf-8
     # malformed UTF-8 character in JSON string, at character offset 680 (before "\x{fffd}r"\n      },...")
-    my $str =
-      $file =~ /hp\.json/ ? path($file)->slurp : path($file)->slurp_utf8;
-    return decode_json($str);    # Decode to Perl data structure
+    
+    # Load file contents
+    my $str = path($file)->slurp;
+    return decode_json($str);    # Decode (utf-8) to Perl data structure
 }
 
 sub read_yaml {
@@ -105,7 +107,7 @@ sub write_json {
 
     # Note that canonical DOES not match the order of nsort from Sort:.Naturally
     my $json = JSON::XS->new->utf8->canonical->pretty->encode($json_data);
-    path($file)->spew_utf8($json);
+    path($file)->spew($json);
     return 1;
 }
 

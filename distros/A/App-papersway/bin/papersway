@@ -381,11 +381,11 @@ sub normalise_ws_cols {
 	} else {		# $old_i == $i.
 	    if ($old_i == 0) {
 		# We were in the first column.  Either we closed the leftmost
-		# column, or we lost arbitrary columns from the left
+		# column, or we lost arbitrary columns from the right
 		# (e.g. monocle from the first column).  We prefer to pull
 		# from the left in the former case.  If we are indeed exiting
-		# monocle mode, we must pull from the right.
-		if (@$cols == 1) {
+		# monocle mode, we must pull more from the right.
+		if (@$old_cols == 1) {
 		    $from_r = min $avail_r, $want;
 		} else {
 		    $from_l = !!$avail_l;
@@ -792,7 +792,7 @@ papersway - PaperWM-like window management for Sway/i3wm
 
 =head1 VERSION
 
-version 0.003
+version 1.000
 
 =head1 SYNOPSIS
 
@@ -829,7 +829,7 @@ The recommended way to activate papersway is by using it as your bar command:
     bar {
         status_command papersway --i3status
 
-        # [.. further bar options .. ]
+        # [ .. further bar options .. ]
     }
 
 =back

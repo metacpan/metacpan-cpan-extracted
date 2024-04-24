@@ -102,3 +102,8 @@ Revision history for Perl module Devel::Git::MultiBisect
 
     - Introduce helper function
       Devel::Git::MultiBisect::Auxiliary::write_transitions_report.
+
+0.21 Tue Apr 23 05:11:47 PM EDT 2024
+    - Devel::Git::MultiBisect: introduce method 'set_outside_targets()' to
+      handle case bisection exercises a test file located outside the git
+      checkout of the source code.

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<pml_schema version="1.1" xmlns="http://ufal.mff.cuni.cz/pdt/pml/schema/">
+  <revision>0.1</revision>
+  <description>
+    Testing references
+  </description>
+  <reference name="absolute" readas="dom"/>
+  <reference name="relative" readas="dom"/>
+  <reference name="resources" readas="dom"/>
+  <root name="annotation">
+    <structure>
+      <member name="meta" type="meta.type"/>
+    </structure>
+  </root>
+  <type name="meta.type">
+    <structure>
+      <member name="annotator"><cdata format="any"/></member>
+      <member name="datetime"><cdata format="any"/></member>
+    </structure>
+  </type>
+</pml_schema>
+
+

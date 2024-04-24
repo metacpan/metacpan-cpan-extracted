@@ -45,4 +45,11 @@ is( [ qw( one two three ) Z ( 1 .. 2 ) ],
    is( Z, "normal function", 'Z() parses as a normal function call' );
 }
 
+# list-associative
+{
+   is( [ qw( one two three ) Z qw( I II III ) Z ( 1, 2, 3 ) ],
+      [ [ one => I => 1 ], [ two => II => 2 ], [ three => III => 3 ] ],
+      'zip is list-associative with itself' );
+}
+
 done_testing;

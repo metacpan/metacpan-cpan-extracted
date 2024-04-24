@@ -40,7 +40,7 @@ our @EXPORT    = qw(system_identity suite_run calc_scalability);
 our $datadir   = dist_dir("Benchmark-DKbench");
 my $mono_clock = $^O !~ /win/i || $Time::HiRes::VERSION >= 1.9764;
 
-our $VERSION = '2.4';
+our $VERSION = '2.5';
 
 =head1 NAME
 
@@ -68,7 +68,7 @@ performance of systems when running computationally intensive Perl (both pure Pe
 and C/XS) workloads. It is a good overall indicator for generic CPU performance in
 real-world scenarios. It runs single and multi-threaded (able to scale to hundreds
 of CPUs) and can be fully customized to run the benchmarks that better suit your own
-scenario.
+scenario - even allowing you to add your own custom benchmarks.
 
 =head1 INSTALLATION
 
@@ -316,8 +316,20 @@ Prints out software/hardware configuration and returns then number of cores dete
 Runs the benchmark suite given the C<%options> and prints results. Returns a hash
 with run stats.
 
-The options accepted are the same as the C<dkbench> script (in their long form),
-except C<help>, C<setup> and C<max_threads> which are command-line only.
+The options of the C<dkbench> script (in their long form) are accepted, except
+C<help>, C<setup> and C<max_threads> which are exclusive to the command-line script.
+
+In addition, C<%options> may contain the key C<%extra_bench>, with a hashref value
+containing custom benchmarks in the following format:
+
+ extra_bench => { bench_name => [$exp_output, $ref_time, $coderef, $quick_arg, $normal_arg] ... }
+
+Where C<bench_name> is a unique name for each benchmark and the arrayref assigned
+to it contains: The expected output (string) for the test to be considered a pass,
+the reference time in seconds for a score of 1000, a reference to the actual bench
+function, an argument (workload scaling) to pass to the function for the C<quick> 
+bench run and an argument to pass for the normal run. For more info with an example
+see the L<CUSTOM BENCHMARKS> section.
 
 =head2 C<calc_scalability>
 
@@ -325,6 +337,44 @@ except C<help>, C<setup> and C<max_threads> which are command-line only.
 
 Given the C<%stat_single> results of a single-threaded C<suite_run> and C<%stat_multi>
 results of a multi-threaded run, will calculate and print the multi-thread scalability.
+
+=head1 CUSTOM BENCHMARKS
+
+Version 2.5 introduced the ability to add custom benchmarks to be run along any
+of the included ones of the suite. This allows you to create a suite that is more
+relevant to you, by including the actual code you will be running on the systems
+you are benchmarking. Remember, the best benchmark is your own code.
+
+Here is an example of adding a benchmark to the test suite and running it together
+with the default benchmarks:
+
+  use Benchmark::DKbench;
+  use Math::Trig qw/:great_circle :pi/;
+
+  sub great_circle {
+    my $iter = shift || 1;  # Optionally have an argument that scales the workload
+    my $dist = 0;
+    $dist +=
+      great_circle_distance(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi)) -
+      great_circle_bearing(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi)) +
+      great_circle_direction(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi))
+      for 1 .. $iter;
+    return $dist;
+  }
+
+  my %stats = suite_run({
+      extra_bench => { 'Math::Trig' =>  # A unique name for the benchmark
+        [
+        '3144042.81433949',  # The output for your reference Perl - determines Pass/Fail
+        5.5,                 # Seconds to complete in normal mode for score = 1000
+        \&great_circle,      # Reference to bench function
+        400000,              # Argument to pass for --quick mode (if needed)
+        2000000              # Argument to pass for normal mode (if needed)
+        ]},
+    }
+  );
+
+You can pass the C<include> option to run only the custom benchmark(s).
 
 =head1 NOTES
 
@@ -373,7 +423,7 @@ L<https://github.com/dkechag/Benchmark-DKbench>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2021-2023 by Dimitrios Kechagias.
+This software is copyright (c) 2021-2024 by Dimitrios Kechagias.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -381,9 +431,10 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 sub benchmark_list {
+    my $extra_bench = shift || {};
     return {               # idx : 0 = result, 1 = ref time, 2 = func, 3 = quick test, 4 = normal test, 5 = ver
         'Astro'             => ['e71c7ae08f16fe26aea7cfdb72785873', 5.674, \&bench_astro, 20000, 80000],
-        'BioPerl Codons'    => ['97c443c099886ca60e99f7ab9df689b5', 8.752, \&bench_bioperl_codons, 3, 5, 1],
+        'BioPerl Codons'    => ['97c443c099886ca60e99f7ab9df689b5', 8.752, \&bench_bioperl_codons, 3, 5],
         'BioPerl Monomers'  => ['d29ed0a5c205c803c112be1338d1f060', 5.241, \&bench_bioperl_mono, 6, 20],
         'Crypt::JWT'        => ['d41d8cd98f00b204e9800998ecf8427e', 6.451, \&bench_jwt, 250, 900],
         'CSS::Inliner'      => ['82c1b6de9ca0500a48f8a8df0998df3c', 4.603, \&bench_css, 2, 5],
@@ -403,6 +454,7 @@ sub benchmark_list {
         'Regex/Subst utf8'  => ['857eb4e63a4d174ca4a16fe678f7626f', 5.703, \&bench_regex_utf8, 3, 10],
         'Text::Levenshtein' => ['2948a300ed9131fa0ce82bb5eabb8ded', 5.539, \&bench_textlevenshtein, 7, 25, 2.1],
         'Time::Piece'       => ['2d4b149fe7f873a27109fc376d69211b', 5.907, \&bench_timepiece, 75_000, 275_000],
+        %$extra_bench
     };
 }
 
@@ -437,6 +489,7 @@ sub suite_run {
     $datadir = $opt->{datapath} if $opt->{datapath};
     $opt->{threads} //= 1;
     $opt->{scale} //= 1;
+    $opt->{iter} ||= 1;
     $opt->{f} = $opt->{time} ? '%.3f' : '%5.0f';
     my %stats = (threads => $opt->{threads});
 
@@ -457,9 +510,9 @@ sub suite_run {
 
 sub calc_scalability {
     my ($opt, $stats1, $stats2) = @_;
-    my $benchmarks = benchmark_list();
-    my $threads = $stats2->{threads}/$stats1->{threads};
-    my $display = $opt->{time} ? 'times' : 'scores';
+    my $benchmarks = benchmark_list($opt->{extra_bench});
+    my $threads    = $stats2->{threads} / $stats1->{threads};
+    my $display    = $opt->{time} ? 'times' : 'scores';
     $opt->{f} = $opt->{time} ? '%.3f' : '%5.0f';
     my (@perf, @scal);
     print "Multi thread Scalability:\n".pad_to("Benchmark",24).pad_to("Multi perf xSingle",24).pad_to("Multi scalability %",24);
@@ -497,8 +550,8 @@ sub calc_scalability {
 
 sub run_iteration {
     my ($opt, $stats) = @_;
-    my $benchmarks = benchmark_list();
-    my $title = $opt->{time} ? 'Time (sec)' : 'Score';
+    my $benchmarks    = benchmark_list($opt->{extra_bench});
+    my $title         = $opt->{time} ? 'Time (sec)' : 'Score';
     print pad_to("Benchmark").pad_to($title);
     print "Pass/Fail" unless $opt->{time};
     print "\n";
@@ -584,7 +637,7 @@ sub bench_astro {
 
 sub bench_bioperl_codons {
     my $skip = shift;
-    my $iter = shift;
+    my $iter = shift || 1;
     my $d    = Digest->new("MD5");
     my $file = catfile($datadir, "gbbct5.seq");
     foreach (1..$iter) {
@@ -1049,9 +1102,9 @@ sub bench_timepiece {
 
 sub total_stats {
     my ($opt, $stats) = @_;
-    my $benchmarks = benchmark_list();
-    my $display = $opt->{time} ? 'times' : 'scores';
-    my $title   = $opt->{time} ? 'Time (sec)' : 'Score';
+    my $benchmarks = benchmark_list($opt->{extra_bench});
+    my $display    = $opt->{time} ? 'times' : 'scores';
+    my $title      = $opt->{time} ? 'Time (sec)' : 'Score';
     print "Aggregates ($opt->{iter} iterations):\n".pad_to("Benchmark",24).pad_to("Avg $title").pad_to("Min $title").pad_to("Max $title");
     print pad_to("stdev %") if $opt->{stdev};
     print pad_to("Pass %") unless $opt->{time};

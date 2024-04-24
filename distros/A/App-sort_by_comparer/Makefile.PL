@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::sort_by_comparer",
   "PREREQ_PM" => {
-    "AppBase::Sort" => "0.003",
+    "AppBase::Sort" => "0.004",
     "AppBase::Sort::File" => 0,
     "Data::Sah::Compiler::perl::TH::array" => "0.914",
     "Data::Sah::Compiler::perl::TH::bool" => "0.914",
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "AppBase::Sort" => "0.003",
+  "AppBase::Sort" => "0.004",
   "AppBase::Sort::File" => 0,
   "Data::Sah::Compiler::perl::TH::array" => "0.914",
   "Data::Sah::Compiler::perl::TH::bool" => "0.914",

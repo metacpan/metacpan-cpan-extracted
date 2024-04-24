@@ -4,7 +4,7 @@ Error::Show - Show context around syntax errors and exceptions
 
 # SYNOPSIS
 
-## Command Line
+## Command Line Syntax Checking
 
 Consider the following program (at examples/synopsis.pl in this distribution).
 It has a syntax error on line 13, and uses an experimental feature on line 7.
@@ -76,9 +76,58 @@ examples/synopsis.pl
 BEGIN not safe after errors--compilation aborted at examples/synopsis.pl line 15.
 ```
 
+## Command Line Exception Call Stack Dump (from v0.4.0)
+
+Consder the following short program (examples/synopsis2.pl
+
+```perl
+use v5.36;
+
+sub test {
+
+  my $a=1/0;
+}
+
+
+test;
+```
+
+Running this program with perl normally gives this error output:
+
+```
+perl examples/synopsis2.pl  
+Illegal division by zero at examples/synopsis2.pl line 5.
+```
+
+With `Error::Show` enabled with the `-M` switch, this instead looks like this:
+
+```perl
+perl -MError::Show examples/synopsis2.pl
+examples/synopsis2.pl
+1   use v5.36;
+2
+3   sub test {
+4
+5=>   my $a=1/0;
+6   }
+7
+8
+9   test;
+Illegal division by zero at examples/synopsis2.pl 5
+
+    examples/synopsis2.pl
+    4
+    5     my $a=1/0;
+    6   }
+    7
+    8
+    9=> test;
+Illegal division by zero at examples/synopsis2.pl 5
+```
+
 ## In Program
 
-Use at runtime to supplement exception handling:
+Use at runtime to supplement exception handling without signal handler modification:
 
 ```perl
 use Error::Show;
@@ -148,7 +197,7 @@ context reporting of dynamically generated code.
 
 # USAGE
 
-## Command Line Usage (Syntax check and run)
+## Command Line Usage (Syntax check and Exception Catching)
 
 ```
     perl -MError::Show  [options] file.pl 
@@ -159,7 +208,14 @@ the input program. If the syntax is OK, normal execution continues in a
 transparent fashion.  Otherwise, detailed code context surrounding the source
 of the error is generated and printed on STDERR.
 
-**NOTE:** It is important that it's the first `-M` switch.
+**From v0.4.0** a global \_\_DIE\_\_ handler is also installed, which will catch any
+stray execptions during execution and present a line numbered summary stack
+trace. Programs a free to overload this handler. However the features of this
+moudle will be lost.
+
+**NOTE:** It is important that it's the first `-M` switch for this module to
+operate correctly and to prevent any incompatibilites withe global signal
+handlers.
 
 If the **-c** flag is specified, only a syntax check will be performed,
 mimicking normal perl behaviour.
@@ -167,7 +223,7 @@ mimicking normal perl behaviour.
 Additional `@INC` directories using the **-I** switch are supported as are
 additional modules via the **-M** switch.
 
-### CLI Syntax Checking Options
+### CLI Usage Options
 
 The following options can be used in isolation or together:
 
@@ -196,6 +252,14 @@ probable reasons behind the error or warning
 ```
 perl -MError::Show=splain file.pl
 ```
+
+#### no\_handler (from v0.4.0)
+
+```
+perl -MError::Show=no_handler file.pl
+```
+
+Prevents the global DIE handler from being installed.
 
 ### Return code
 
@@ -677,6 +741,7 @@ showing up in the user program context.
 
 # FUTURE WORK/TODO
 
+- Possible just use the DIE and WARN signal handler instead of forking processes
 - Make usable from a Language Server?
 - Colour terminal output
 - JSON output?

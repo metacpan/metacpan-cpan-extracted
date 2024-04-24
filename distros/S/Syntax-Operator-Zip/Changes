@@ -1,5 +1,9 @@
 Revision history for Syntax-Operator-Zip
 
+0.10    2024-04-23
+        [CHANGES]
+         * Support N-way list-associative syntax
+
 0.09    2024-01-06
         [CHANGES]
          * Quiet the meta::experimental warnings of meta 0.003_002

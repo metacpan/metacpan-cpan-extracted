@@ -41,8 +41,8 @@ my ($probe, $probe_validated);
 my $compiler = 'clang';
 
 $git_checkout_dir = cwd();
-#$outputdir = tempdir( CLEANUP => 1 );
-$outputdir = tempdir(); # Permit CLEANUP only when we're set
+$outputdir = tempdir( CLEANUP => 1 );
+#$outputdir = tempdir(); # Permit CLEANUP only when we're set
 
 $branch = 'blead';
 $first = 'b38ce61ef5b98631f9924bea9364ec344b9a8d10';

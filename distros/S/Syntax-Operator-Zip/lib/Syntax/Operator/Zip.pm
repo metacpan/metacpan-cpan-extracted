@@ -1,16 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::Zip 0.09;
+package Syntax::Operator::Zip 0.10;
 
 use v5.14;
 use warnings;
 
 use Carp;
 
-use meta 0.003_002;
+use meta 0.004;
 no warnings 'meta::experimental';
 
 require XSLoader;
@@ -43,9 +43,9 @@ Or on Perl v5.14 or later:
 
 =head1 DESCRIPTION
 
-This module provides infix operators that compose two lists of elements by
-associating successive elements from the left and right-hand lists together,
-forming a new list.
+This module provides infix operators that compose lists of elements by
+associating successive elements from each of the input lists, forming a new
+list.
 
 Support for custom infix operators was added in the Perl 5.37.x development
 cycle and is available from development release v5.37.7 onwards, and therefore
@@ -126,6 +126,14 @@ two operand lists. If one of the operand lists is shorter than the other, the
 missing elements will be filled in with C<undef> so that every array reference
 in the result contains exactly two items.
 
+   my @result = @alphas Z @betas Z @gammas Z ...
+
+   # returns [$alphas[0], $betas[0], $gammas[0], ...], ...
+
+I<Since version 0.10> this module supports list-associative combinations of
+more than two input lists at once. The result will be composed of parallel
+items from each of the given input lists.
+
 =head2 M
 
    my @result = @lhs M @rhs;
@@ -137,10 +145,25 @@ flattened. If one of the operand lists is shorter than the other, the missing
 elements will be filled in with C<undef> so that the result is correctly lined
 up.
 
+   my @result = @alphas M @betas M @gammas M ...
+
+   # returns $alphas[0], $betas[0], $gammas[0], ..., $alphas[1], ...
+
+I<Since version 0.10> this module supports list-associative combinations of
+more than two input lists at once. The result will be composed of parallel
+items from each of the given input lists.
+
 The result of this operator is useful for constructing hashes from two lists
 containing keys and values
 
    my %hash = @keys M @values;
+
+This is also useful combined with the multiple variable C<foreach> syntax of
+Perl 5.36 and above:
+
+   foreach my ( $alpha, $beta, $gamma ) ( @alphas M @betas M @gammas ) {
+      ...
+   }
 
 =cut
 
@@ -148,13 +171,13 @@ containing keys and values
 
 As a convenience, the following functions may be imported which implement the
 same behaviour as the infix operators, though are accessed via regular
-function call syntax. The two lists for these functions to operate on must be
+function call syntax. The lists for these functions to operate on must be
 passed as references to arrays (either named variables, or anonymously
 constructed by C<[...]>).
 
 =head2 zip
 
-   my @result = zip( \@lhs, \@rhs );
+   my @result = zip( \@lhs, \@rhs, ... );
 
 A function version of the L</Z> operator.
 
@@ -162,7 +185,7 @@ See also L<List::Util/zip>.
 
 =head2 mesh
 
-   my @result = mesh( \@lhs, \@rhs );
+   my @result = mesh( \@lhs, \@rhs, ... );
 
 A function version of the L</M> operator.
 

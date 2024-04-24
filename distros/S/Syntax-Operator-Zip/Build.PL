@@ -16,8 +16,8 @@ my $build = Module::Build->new(
    },
    requires => {
       'perl' => '5.014', # pluggable keywords, XOP
-      'meta' => '0.003_002',
-      'XS::Parse::Infix' => '0.26',
+      'meta' => '0.004',
+      'XS::Parse::Infix' => '0.40',
    },
    license => 'perl',
    create_license => 1,

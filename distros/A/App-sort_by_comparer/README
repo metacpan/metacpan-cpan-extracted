@@ -2,8 +2,8 @@ NAME
     App::sort_by_comparer - Sort lines of text by a Comparer module
 
 VERSION
-    This document describes version 0.001 of App::sort_by_comparer (from
-    Perl distribution App-sort_by_comparer), released on 2024-03-06.
+    This document describes version 0.002 of App::sort_by_comparer (from
+    Perl distribution App-sort_by_comparer), released on 2024-03-07.
 
 FUNCTIONS
   sort_by_comparer
@@ -67,6 +67,9 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-App-sort_by_comparer>.
+
+SEE ALSO
+    Comparer.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

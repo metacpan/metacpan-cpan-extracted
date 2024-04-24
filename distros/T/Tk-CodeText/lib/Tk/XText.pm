@@ -7,7 +7,7 @@ Tk::XText - Extended Text widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.47';
+$VERSION = '0.48';
 use strict;
 use warnings;
 use Carp;
@@ -164,6 +164,7 @@ sub Populate {
 	$self->eventAdd('<<Redo>>', '<Control-Z>');
 	$self->bind('<Control-Tab>', 'UnIndent' );
 	$self->bind('<KeyRelease>', 'matchCheck');
+	$self->bind('<ButtonRelease-1>', 'matchCheck');
 	$self->bind('<Control-a>', 'selectAll');
 	$self->markSet('match', '0.0');
 }
@@ -276,6 +277,16 @@ sub clearModified {
 	for (@$r, @$u) { $_->{'modified'} = 1 }
 }
 
+sub clipboardCopy {
+	my $self = shift;
+	$self->SUPER::clipboardCopy(@_) if $self->tagRanges('sel');
+}
+ 
+sub clipboardCut {
+	my $self = shift;
+	$self->SUPER::clipboardCut(@_) if $self->tagRanges('sel');
+}
+ 
 =item B<comment>
 
 =cut
@@ -1205,6 +1216,8 @@ Unknown. If you find any, please contact the author.
 1;
 
 __END__
+
+
 
 
 

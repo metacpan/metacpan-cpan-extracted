@@ -1,3 +1,9 @@
+0.128   2024-03-07  Released-By: PERLANCAR; Urgency: medium
+
+        - [clis strftime, strftimeq] Use localtime() instead of gmtime(). We can
+          still show UTC using "TZ=UTC strftime ...".
+
+
 0.127   2021-09-06  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] [cli parse-date] Show datetime object in local as well as

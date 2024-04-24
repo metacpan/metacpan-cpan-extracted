@@ -12,7 +12,7 @@ use Readonly;
 Readonly::Array our @DATA_TYPES => qw(cb plain tags);
 Readonly::Array our @EXPORT_OK => qw(check_data check_data_type);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 sub check_data {
 	my $self = shift;

@@ -52,7 +52,7 @@
          "web" : "https://git.spwhitton.name/papersway"
       }
    },
-   "version" : "0.003",
+   "version" : "1.000",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "GPL-3.0-only"

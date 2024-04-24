@@ -1,0 +1,3 @@
+- We could use a different default ncols for workspaces on different outputs.
+  It could be configurable and/or calculated from the dimensions of the outputs.
+  E.g. three or four columns default ncols, automatically, on wider monitors.

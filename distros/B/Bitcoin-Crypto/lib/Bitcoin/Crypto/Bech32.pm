@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Bech32;
-$Bitcoin::Crypto::Bech32::VERSION = '2.003';
+$Bitcoin::Crypto::Bech32::VERSION = '2.004';
 use v5.10;
 use strict;
 use warnings;
@@ -375,7 +375,7 @@ Bech32 encoding / decoding valid for SegWit addresses. Human readable part
 validation is not included.
 
 These functions also perform segwit program validation, see
-L<Bitcoin::Crypto::Segwit>.
+L<Bitcoin::Crypto::Util/validate_segwit>.
 
 Encoding takes two arguments which are a human readable part and a bytestring
 (segwit program).
@@ -435,7 +435,8 @@ C<translate_5to8> during decoding. They are used as means to store full byte
 data in bech32 strings, like so:
 
 	my $data = encode_bech32('hrp', translate_8to5($bytes));
-	my $decoded = translate_5to8(decode_bech32($data));
+	my @decoded_parts = decode_bech32($data);
+	my $decoded = translate_5to8($decoded_parts[1]);
 
 =head2 get_hrp
 
@@ -462,6 +463,4 @@ L<Bitcoin::Crypto::Exception> namespace:
 =head1 SEE ALSO
 
 L<Bitcoin::Crypto::Base58>
-
-L<Bitcoin::Crypto::Segwit>
 

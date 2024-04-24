@@ -5,6 +5,7 @@ examples/Exception-Base.pl
 examples/Exception-Class-Base.pl
 examples/Mojo-Exception.pl
 examples/synopsis.pl
+examples/synopsis2.pl
 lib/Error/Show.pm
 lib/Error/Show.pod
 lib/Error/Show/Internal.pm

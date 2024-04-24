@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-06'; # DATE
+our $DATE = '2024-03-07'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.127'; # VERSION
+our $VERSION = '0.128'; # VERSION
 
 our %SPEC;
 
@@ -579,7 +579,7 @@ sub strftime {
     my $format = $args{format};
     my $date   = $args{date} // DateTime->now;
 
-    POSIX::strftime($format, gmtime($date->epoch));
+    POSIX::strftime($format, localtime($date->epoch));
 }
 
 $SPEC{strftimeq} = {
@@ -624,7 +624,7 @@ sub strftimeq {
     my $format = $args{format};
     my $date   = $args{date} // DateTime->now;
 
-    Date::strftimeq::strftimeq($format, gmtime($date->epoch));
+    Date::strftimeq::strftimeq($format, localtime($date->epoch));
 }
 
 $SPEC{durconv} = {
@@ -809,7 +809,7 @@ App::DateUtils - An assortment of date-/time-related CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.127 of App::DateUtils (from Perl distribution App-DateUtils), released on 2021-09-06.
+This document describes version 0.128 of App::DateUtils (from Perl distribution App-DateUtils), released on 2024-03-07.
 
 =head1 SYNOPSIS
 
@@ -818,35 +818,35 @@ date/time:
 
 =over
 
-=item * L<dateconv>
+=item 1. L<dateconv>
 
-=item * L<datediff>
+=item 2. L<datediff>
 
-=item * L<durconv>
+=item 3. L<durconv>
 
-=item * L<parse-date>
+=item 4. L<parse-date>
 
-=item * L<parse-date-using-df-alami-en>
+=item 5. L<parse-date-using-df-alami-en>
 
-=item * L<parse-date-using-df-alami-id>
+=item 6. L<parse-date-using-df-alami-id>
 
-=item * L<parse-date-using-df-flexible>
+=item 7. L<parse-date-using-df-flexible>
 
-=item * L<parse-date-using-df-natural>
+=item 8. L<parse-date-using-df-natural>
 
-=item * L<parse-duration>
+=item 9. L<parse-duration>
 
-=item * L<parse-duration-using-df-alami-en>
+=item 10. L<parse-duration-using-df-alami-en>
 
-=item * L<parse-duration-using-df-alami-id>
+=item 11. L<parse-duration-using-df-alami-id>
 
-=item * L<parse-duration-using-df-natural>
+=item 12. L<parse-duration-using-df-natural>
 
-=item * L<parse-duration-using-td-parse>
+=item 13. L<parse-duration-using-td-parse>
 
-=item * L<strftime>
+=item 14. L<strftime>
 
-=item * L<strftimeq>
+=item 15. L<strftimeq>
 
 =back
 
@@ -867,7 +867,7 @@ Examples:
 
 =item * Convert "today" to epoch:
 
- dateconv(date => "today"); # -> 1630886400
+ dateconv(date => "today"); # -> 1709769600
 
 =item * Convert epoch to ymd:
 
@@ -888,9 +888,9 @@ Examples:
 Result:
 
  {
-   epoch => 1630934937,
-   iso8601 => "2021-09-06T13:28:57Z",
-   ymd => "2021-09-06",
+   epoch => 1709802621,
+   iso8601 => "2024-03-07T09:10:21.491146Z",
+   ymd => "2024-03-07",
  }
 
 =back
@@ -903,7 +903,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<date>* => I<date>
 
+(No description)
+
 =item * B<to> => I<str> (default: "epoch")
+
+(No description)
 
 
 =back
@@ -974,9 +978,15 @@ Arguments ('*' denotes required arguments):
 
 =item * B<as> => I<str> (default: "iso8601")
 
+(No description)
+
 =item * B<date1>* => I<date>
 
+(No description)
+
 =item * B<date2>* => I<date>
+
+(No description)
 
 
 =back
@@ -1027,7 +1037,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<duration>* => I<duration>
 
+(No description)
+
 =item * B<to> => I<str> (default: "secs")
+
+(No description)
 
 
 =back
@@ -1071,16 +1085,16 @@ Result:
        module => "DateTime::Format::Flexible",
        original => "tomorrow",
        is_parseable => 1,
-       as_epoch => 1630972800,
-       as_datetime_obj => "2021-09-07T00:00:00",
-       as_datetime_obj_tz_local => "2021-09-07T00:00:00+07:00",
-       as_datetime_obj_tz_utc => "2021-09-06T17:00:00Z",
+       as_epoch => 1709856000,
+       as_datetime_obj => "2024-03-08T00:00:00",
+       as_datetime_obj_tz_local => "2024-03-08T00:00:00+07:00",
+       as_datetime_obj_tz_utc => "2024-03-07T17:00:00Z",
      },
      {
        module       => "DateTime::Format::Flexible",
        original     => "foo",
        is_parseable => 0,
-       error_msg    => "Invalid date format: foo at /home/u1/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/Perinci/Access.pm line 81. ",
+       error_msg    => "Invalid date format: foo at /home/u1/perl5/perlbrew/perls/perl-5.38.2/lib/site_perl/5.38.2/Perinci/Access.pm line 81. ",
      },
    ],
    {
@@ -1111,9 +1125,15 @@ Parse using all installed modules and return all the result at once.
 
 =item * B<dates>* => I<array[str]>
 
+(No description)
+
 =item * B<module> => I<str> (default: "DateTime::Format::Flexible")
 
+(No description)
+
 =item * B<time_zone> => I<str>
+
+(No description)
 
 
 =back
@@ -1157,10 +1177,10 @@ Result:
        module => "DateTime::Format::Alami::EN",
        original => "23 May",
        is_parseable => 1,
-       as_epoch => 1621728000,
-       as_datetime_obj => "2021-05-23T00:00:00",
-       as_datetime_obj_tz_local => "2021-05-23T07:00:00+07:00",
-       as_datetime_obj_tz_utc => "2021-05-23T00:00:00Z",
+       as_epoch => 1716422400,
+       as_datetime_obj => "2024-05-23T00:00:00",
+       as_datetime_obj_tz_local => "2024-05-23T07:00:00+07:00",
+       as_datetime_obj_tz_utc => "2024-05-23T00:00:00Z",
        pattern => "p_dateymd",
      },
    ],
@@ -1218,7 +1238,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<dates>* => I<array[str]>
 
+(No description)
+
 =item * B<time_zone> => I<str>
+
+(No description)
 
 
 =back
@@ -1262,10 +1286,10 @@ Result:
        module => "DateTime::Format::Alami::ID",
        original => "23 Mei",
        is_parseable => 1,
-       as_epoch => 1621728000,
-       as_datetime_obj => "2021-05-23T00:00:00",
-       as_datetime_obj_tz_local => "2021-05-23T07:00:00+07:00",
-       as_datetime_obj_tz_utc => "2021-05-23T00:00:00Z",
+       as_epoch => 1716422400,
+       as_datetime_obj => "2024-05-23T00:00:00",
+       as_datetime_obj_tz_local => "2024-05-23T07:00:00+07:00",
+       as_datetime_obj_tz_utc => "2024-05-23T00:00:00Z",
        pattern => "p_dateymd",
      },
    ],
@@ -1323,7 +1347,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<dates>* => I<array[str]>
 
+(No description)
+
 =item * B<time_zone> => I<str>
+
+(No description)
 
 
 =back
@@ -1367,10 +1395,10 @@ Result:
        module => "DateTime::Format::Flexible",
        original => "23rd Jun",
        is_parseable => 1,
-       as_epoch => 1624406400,
-       as_datetime_obj => "2021-06-23T00:00:00",
-       as_datetime_obj_tz_local => "2021-06-23T00:00:00+07:00",
-       as_datetime_obj_tz_utc => "2021-06-22T17:00:00Z",
+       as_epoch => 1719100800,
+       as_datetime_obj => "2024-06-23T00:00:00",
+       as_datetime_obj_tz_local => "2024-06-23T00:00:00+07:00",
+       as_datetime_obj_tz_utc => "2024-06-22T17:00:00Z",
      },
    ],
    {
@@ -1401,10 +1429,10 @@ Result:
        module => "DateTime::Format::Flexible(de)",
        original => "23 Dez",
        is_parseable => 1,
-       as_epoch => 1640217600,
-       as_datetime_obj => "2021-12-23T00:00:00",
-       as_datetime_obj_tz_local => "2021-12-23T00:00:00+07:00",
-       as_datetime_obj_tz_utc => "2021-12-22T17:00:00Z",
+       as_epoch => 1734912000,
+       as_datetime_obj => "2024-12-23T00:00:00",
+       as_datetime_obj_tz_local => "2024-12-23T00:00:00+07:00",
+       as_datetime_obj_tz_utc => "2024-12-22T17:00:00Z",
      },
    ],
    {
@@ -1435,7 +1463,7 @@ Result:
        module       => "DateTime::Format::Flexible",
        original     => "foo",
        is_parseable => 0,
-       error_msg    => "Invalid date format: foo at /home/u1/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/Perinci/Access.pm line 81. ",
+       error_msg    => "Invalid date format: foo at /home/u1/perl5/perlbrew/perls/perl-5.38.2/lib/site_perl/5.38.2/Perinci/Access.pm line 81. ",
      },
    ],
    {
@@ -1462,9 +1490,15 @@ Arguments ('*' denotes required arguments):
 
 =item * B<dates>* => I<array[str]>
 
+(No description)
+
 =item * B<lang> => I<str> (default: "en")
 
+(No description)
+
 =item * B<time_zone> => I<str>
+
+(No description)
 
 
 =back
@@ -1508,10 +1542,10 @@ Result:
        module => "DateTime::Format::Natural",
        original => "23rd Jun",
        is_parseable => 1,
-       as_epoch => 1624406400,
-       as_datetime_obj => "2021-06-23T00:00:00",
-       as_datetime_obj_tz_local => "2021-06-23T00:00:00+07:00",
-       as_datetime_obj_tz_utc => "2021-06-22T17:00:00Z",
+       as_epoch => 1719100800,
+       as_datetime_obj => "2024-06-23T00:00:00",
+       as_datetime_obj_tz_local => "2024-06-23T00:00:00+07:00",
+       as_datetime_obj_tz_utc => "2024-06-22T17:00:00Z",
      },
    ],
    {
@@ -1569,7 +1603,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<dates>* => I<array[str]>
 
+(No description)
+
 =item * B<time_zone> => I<str>
+
+(No description)
 
 
 =back
@@ -1607,7 +1645,11 @@ Parse using all installed modules and return all the result at once.
 
 =item * B<durations>* => I<array[str]>
 
+(No description)
+
 =item * B<module> => I<str> (default: "Time::Duration::Parse")
+
+(No description)
 
 
 =back
@@ -1705,6 +1747,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<durations>* => I<array[str]>
 
+(No description)
+
 
 =back
 
@@ -1801,6 +1845,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<durations>* => I<array[str]>
 
+(No description)
+
 
 =back
 
@@ -1843,10 +1889,10 @@ Result:
        module => "DateTime::Format::Natural",
        original => "for 2 weeks",
        is_parseable => 1,
-       as_secs => 1209600,
-       as_dtdur_obj => "P14D",
-       date1 => "2021-09-06T13:28:57",
-       date2 => "2021-09-20T13:28:57",
+       as_secs => 1209600.000768,
+       as_dtdur_obj => "P14DT0.000768S",
+       date2 => "2024-03-21T09:10:21",
+       date1 => "2024-03-07T09:10:21",
      },
    ],
    {
@@ -1875,10 +1921,10 @@ Result:
        module => "DateTime::Format::Natural",
        original => "from 23 Jun to 29 Jun",
        is_parseable => 1,
-       as_secs => 5912937,
-       as_dtdur_obj => "P2M7DT13H28M57S",
-       date1 => "2021-09-06T13:28:57",
-       date2 => "2021-06-29T00:00:00",
+       as_secs => 9757178.285926,
+       as_dtdur_obj => "P3M21DT14H49M38.285926S",
+       date1 => "2024-03-07T09:10:21",
+       date2 => "2024-06-29T00:00:00",
      },
    ],
    {
@@ -1931,6 +1977,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<durations>* => I<array[str]>
+
+(No description)
 
 
 =back
@@ -2003,7 +2051,7 @@ Result:
        module       => "Time::Duration::Parse",
        original     => "foo",
        is_parseable => 0,
-       error_msg    => "Unknown timespec: foo at lib/App/DateUtils.pm line 385. ",
+       error_msg    => "Unknown timespec: foo at (eval 2220) line 385. ",
      },
    ],
    {
@@ -2027,6 +2075,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<durations>* => I<array[str]>
+
+(No description)
 
 
 =back
@@ -2058,11 +2108,11 @@ Examples:
 
 =item * Format current time as yyyy-mm-dd:
 
- strftime(format => "%Y-%m-%d"); # -> "2021-09-06"
+ strftime(format => "%Y-%m-%d"); # -> "2024-03-07"
 
 =item * Format a specific time as yyyy-mm-dd:
 
- strftime(format => "%Y-%m-%d", date => "tomorrow"); # -> "2021-09-07"
+ strftime(format => "%Y-%m-%d", date => "tomorrow"); # -> "2024-03-08"
 
 =back
 
@@ -2074,7 +2124,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<date> => I<date>
 
+(No description)
+
 =item * B<format>* => I<str>
+
+(No description)
 
 
 =back
@@ -2101,7 +2155,7 @@ Examples:
 
 Result:
 
- "2021-09-06"
+ "2024-03-07"
 
 =back
 
@@ -2117,7 +2171,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<date> => I<date>
 
+(No description)
+
 =item * B<format>* => I<str>
+
+(No description)
 
 
 =back
@@ -2135,7 +2193,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-DateUtils>.
 =head1 SEE ALSO
 
 
-L<dateparse>. Perinci::To::POD=HASH(0x556ac4fbeaf8).
+L<dateparse>. Perinci::To::POD=HASH(0x555af311e1c8).
 
 L<App::datecalc>
 
@@ -2158,13 +2216,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2021, 2020, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

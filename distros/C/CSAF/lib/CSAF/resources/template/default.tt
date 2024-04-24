@@ -1,0 +1,492 @@
+
+[% # CSAF Document Template (based on secvisogram template)
+   # https://github.com/secvisogram/secvisogram/blob/main/app/lib/app/SecvisogramPage/View/shared/HTMLTemplate/Template.html
+   # %]
+
+[% USE dumper %]
+
+[% BLOCK document_note %]
+  [% IF note.title %]<h2>[% note.title %]</h2>[% END %]
+  [% IF note.audience %]<small>[% note.audience %]</small>[% END %]
+  [% IF note.text %]<p>[% note.text | html_line_break %]</p>[% END %]
+[% END %]
+
+[% BLOCK vulnerability_note %]
+  [% IF note.title %]<b>[% note.title %]</b>[% END %] [% IF note.audience %] ([% note.audience %])[% END %]
+  [% IF note.text %]<p>[% note.text | html_line_break %]</p>[% END %]
+[% END %]
+
+[% BLOCK product_status_header %]
+<thead>
+  <tr>
+    <th>Product</th>
+    <th>CVSS-Vector</th>
+    <th>CVSS Base Score</th>
+  </tr>
+</thead>
+[% END %]
+
+[% BLOCK product_status_row %]
+
+  <tr>
+    <td>[% product_id FILTER product_name %]</td>
+
+    [% FOREACH score IN vulnerability.scores.each %]
+      [% FOREACH score_product_id IN score.products %]
+        [% IF score_product_id == product_id %]
+          <td>[% score.cvss_v3.vectorString %]</td>
+          <td>[% score.cvss_v3.baseScore %]</td>
+        [% END %]
+      [% END %]
+    [% END %]
+  </tr>
+
+[% END %]
+
+[% BLOCK reference %]
+  <li>
+    [% reference.summary %] ([% reference.category %]) [% PROCESS link url=reference.url %]
+  </li>
+[% END %]
+
+[% BLOCK link %]
+    <a href="[% url | url %]">[% label || url %]</a>
+    [% label = undef
+       url   = undef %]
+[% END %]
+
+[% BLOCK acknowledgment %]
+  <li>
+    [% acknowledgment.names.join(', ') %]
+    [% IF acknowledgment.organization %]
+      [% IF acknowledgment.names.size %] from [% END %] [% acknowledgment.organization %]
+    [% END %]
+    [% IF acknowledgment.summary %]
+      for [% acknowledgment.summary %]
+    [% END %]
+    [% IF acknowledgment.urls.size %]
+      (see: [% acknowledgment.urls.join(', ') %]) [% # TODO convert URL to hyperlink %]
+    [% END %]
+  </li>
+[% END %]
+
+[% BLOCK remediation %]
+
+  <h5>
+    [% remediation.category.replace('_', ' ').ucfirst %] 
+    [% IF remediation.date %]
+      [% remediation.date.datetime() %]
+    [% END %]
+  </h5>
+  <p>[% remediation.details %]</p>
+
+  [% IF remediation.product_ids.size %]
+    <h6>For products:</h6>
+    <ul>
+    [% FOREACH product_id IN remediation.product_ids %]
+      <li>[% product_id | product_name %]</li>
+    [% END %]
+    </ul>
+  [% END %]
+
+  [% IF remediation.group_ids.size %]
+    <h6>For groups:</h6>
+    <ul>
+    [% FOREACH group_id IN remediation.group_ids %]
+      <li>[% group_id %]</li>
+    [% END %]
+    </ul>
+  [% END %]
+
+  [% IF remediation.url %]
+    <p>[% PROCESS link url = remediation.url %]</p>
+  [% END %]
+
+  [% IF remediation.entitlements.size %]
+    [% FOREACH entitlement IN remediation.entitlements %]
+      <p>[% entitlement %]</p>
+    [% END %]
+  [% END %]
+
+  [% IF remediation.restart_required %]
+    Restart required: <b>[% remediation.restart_required.category.replace('_', ' ').ucfirst %]</b>
+    <p>[% remediation.restart_required.details %]</p>
+  [% END %]
+
+[% END %]
+
+
+[% BLOCK threat %]
+  <h5>
+    [% threat.category.replace('_', ' ').ucfirst %] 
+    [% IF threat.date %]
+      [% threat.date.datetime() %]
+    [% END %]
+  </h5>
+  <p>[% threat.details %]</p>
+
+  [% IF threat.product_ids.size %]
+    <h6>For products:</h6>
+    <ul>
+    [% FOREACH product_id IN threat.product_ids %]
+      <li>[% product_id | product_name %]</li>
+    [% END %]
+    </ul>
+  [% END %]
+
+  [% IF threat.group_ids.size %]
+    <h6>For groups:</h6>
+    <ul>
+    [% FOREACH group_id IN threat.group_ids %]
+      <li>[% group_id %]</li>
+    [% END %]
+    </ul>
+  [% END %]
+
+[% END %]
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://unpkg.com/gutenberg-css" charset="utf-8">
+  <link rel="stylesheet" href="https://unpkg.com/gutenberg-css/dist/themes/modern.min.css" charset="utf-8">
+  <meta charset="utf-8" />
+  <style>
+    .tlp-white,
+    .tlp-green,
+    .tlp-amber,
+    .tlp-red {
+      background: #000 !important;
+      font-weight: bold;
+      padding-left: .20em;
+      padding-right: .20em; 
+      display: inline-block;
+    }
+    .tlp-white { color: #FFF; }
+    .tlp-green { color: #3f0; }
+    .tlp-amber { color: #ffc000; }
+    .tlp-red   { color: #FF2B2B; }
+  </style>
+
+  <title>[% IF document.tracking.id %][% document.tracking.id %]: [% END %] [% document.title %]</title>
+</head>
+
+<body>
+
+<h1>[% IF document.tracking.id %][% document.tracking.id %]: [% END %] [% document.title %]</h1>
+
+<table>
+  <tr>
+    <td>
+      Publisher: [% document.publisher.name %]
+    </td>
+    <td>
+      Document category: [% document.category %]
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Initial release date: [% document.tracking.initial_release_date.datetime() %]
+    </td>
+    <td>
+      Engine: [% "${document.tracking.generator.engine.name} ${document.tracking.generator.engine.version}" %]
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Current release date: [% document.tracking.current_release_date.datetime() %]
+    </td>
+    <td>
+      Build Date: [% document.tracking.generator.date.datetime() %]
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Current version: [% document.tracking.version %]
+    </td>
+    <td>
+      Status: [% document.tracking.status %]
+    </td>
+  </tr>
+  <tr>
+    <td>CVSSv3.1 Base Score: [% max_base_score %]</td>
+    <td>Severity: <span class="severity-[% document.aggregate_severity.text.lower %]">
+      [% IF document.aggregate_severity.text %]
+        [% IF document.aggregate_severity.namespace %]
+          [% PROCESS link url=document.aggregate_severity.namespace label=document.aggregate_severity.text %]
+        [% ELSE %]
+          [% document.aggregate_severity.text %]
+        [% END %]
+      [% END %]
+        </span>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Original language: [% document.source_lang %]
+    </td>
+    <td>
+      Language: [% document.lang %]
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">Also referred to: [% document.tracking.aliases.join(', ') %]</td>
+  </tr>  
+</table>
+
+[% FOREACH note IN document.notes.get_category('summary')     %][% PROCESS document_note %][% END %]
+[% FOREACH note IN document.notes.get_category('details')     %][% PROCESS document_note %][% END %]
+[% FOREACH note IN document.notes.get_category('general')     %][% PROCESS document_note %][% END %]
+[% FOREACH note IN document.notes.get_category('description') %][% PROCESS document_note %][% END %]
+[% FOREACH note IN document.notes.get_category('faq')         %][% PROCESS document_note %][% END %]
+[% FOREACH note IN document.notes.get_category('unknown')     %][% PROCESS document_note %][% END %]
+
+
+[% IF product_tree.product_groups.size %]
+<h2>Product groups</h2>
+{{#product_tree.product_groups}}
+  <b>{{#summary}}{{.}}{{/summary}}{{^summary}}{{group_id}}{{/summary}}</b>
+  <ul>
+  {{#product_ids}}
+    <li>{{name}}</li>
+  {{/product_ids}}
+  </ul>    
+{{/product_tree.product_groups}}
+[% END %]
+
+
+<h2>Vulnerabilities</h2>
+
+[% FOREACH vulnerability IN vulnerabilities.each %]
+
+  <h3>[% vulnerability.title %][% IF vulnerability.cve %] ([% vulnerability.cve %])[% END %]</h3>
+
+  [% FOREACH note IN vulnerability.notes.get_category('summary')     %][% PROCESS vulnerability_note %][% END %]
+  [% FOREACH note IN vulnerability.notes.get_category('details')     %][% PROCESS vulnerability_note %][% END %]
+  [% FOREACH note IN vulnerability.notes.get_category('general')     %][% PROCESS vulnerability_note %][% END %]
+  [% FOREACH note IN vulnerability.notes.get_category('description') %][% PROCESS vulnerability_note %][% END %]
+  [% FOREACH note IN vulnerability.notes.get_category('faq')         %][% PROCESS vulnerability_note %][% END %]
+  [% FOREACH note IN vulnerability.notes.get_category('unknown')     %][% PROCESS vulnerability_note %][% END %]
+
+  <table>
+    [% IF vulnerability.cwe.id %]
+    <tr>
+      <th>CWE:</th>
+      <td>
+        [% vulnerability.cwe.id %] : [% vulnerability.cwe.name %]
+      </td>
+    </tr>
+    [% END %]
+    [% FOREACH id IN vulnerability.ids.each %]
+    <tr>
+      <th>ID:</th>
+      <td>[% id.text %] ([% id.system_name %])</td>
+    </tr>
+    [% END %]
+    [% IF vulnerability.discovery_date %]
+    <tr>
+      <th>Discovery date:</th>
+      <td>[% vulnerability.discovery_date.datetime() %]</td>
+    </tr>
+    [% END %]
+    [% IF vulnerability.release_date %]
+    <tr>
+      <th>Release date:</th>
+      <td>[% vulnerability.release_date.datetime() %]</td>
+    </tr>
+    [% END %]
+  </table>
+
+  <h4>Product status</h4>
+
+  [% IF vulnerability.product_status.known_affected.size %]
+    <h5>Known affected</h5>
+    <table>
+      [% PROCESS product_status_header %]
+      <tbody>
+      [% FOREACH product_id IN vulnerability.product_status.known_affected %]
+        [% PROCESS product_status_row %]
+      [% END %]
+      </tbody>
+    </table>
+  [% END %]
+
+  [% IF vulnerability.product_status.first_affected.size %]
+    <h5>First affected</h5>
+    <table>
+      [% PROCESS product_status_header %]
+      <tbody>
+      [% FOREACH product_id IN vulnerability.product_status.first_affected %]
+        [% PROCESS product_status_row %]
+      [% END %]
+      </tbody>
+    </table>
+  [% END %]
+
+  [% IF vulnerability.product_status.last_affected.size %]
+    <h5>Last affected</h5>
+    <table>
+      [% PROCESS product_status_header %]
+      <tbody>
+      [% FOREACH product_id IN vulnerability.product_status.last_affected %]
+        [% PROCESS product_status_row %]
+      [% END %]
+      </tbody>
+    </table>
+  [% END %]
+
+  [% IF vulnerability.product_status.known_not_affected.size %]
+    <h5>Known not affected</h5>
+    <ul>
+      [% FOREACH product_id IN vulnerability.product_status.known_not_affected %]
+        <li>[% product_id | product_name %]</li>
+      [% END %]
+    </ul>
+  [% END %]
+
+  [% IF vulnerability.product_status.recommended.size %]
+    <h5>Recommended</h5>
+    <ul>
+      [% FOREACH product_id IN vulnerability.product_status.recommended %]
+        <li>[% product_id | product_name %]</li>
+      [% END %]
+    </ul>
+  [% END %]
+
+  [% IF vulnerability.product_status.fixed.size %]
+    <h5>Fixed</h5>
+    <ul>
+    [% FOREACH product_id IN vulnerability.product_status.fixed %]
+      <li>[% product_id | product_name %]</li>
+    [% END %]
+    </ul>
+  [% END %]
+
+  [% IF vulnerability.product_status.first_fixed.size %]
+    <h5>First fixed</h5>
+    <ul>
+    [% FOREACH product_id IN vulnerability.product_status.first_fixed %]
+      <li>[% product_id | product_name %]</li>
+    [% END %]
+    </ul>
+  [% END %]
+
+  [% IF vulnerability.product_status.under_investigation.size %]
+    <h5>Under investgation</h5>
+    <ul>
+    [% FOREACH product_id IN vulnerability.product_status.under_investigation %]
+      <li>[% product_id | product_name %]</li>
+    [% END %]
+    </ul>
+  [% END %]
+
+  [% IF vulnerability.remediations.size %]
+    <h4>Remediations</h4>
+    [% FOREACH remediation IN vulnerability.remediations.get_category('vendor_fix')     %][% PROCESS remediation %][% END %]
+    [% FOREACH remediation IN vulnerability.remediations.get_category('mitigation')     %][% PROCESS remediation %][% END %]
+    [% FOREACH remediation IN vulnerability.remediations.get_category('workaround')     %][% PROCESS remediation %][% END %]
+    [% FOREACH remediation IN vulnerability.remediations.get_category('none_available') %][% PROCESS remediation %][% END %]
+    [% FOREACH remediation IN vulnerability.remediations.get_category('no_fix_planned') %][% PROCESS remediation %][% END %]
+    [% FOREACH remediation IN vulnerability.remediations.get_category('unknown')        %][% PROCESS remediation %][% END %]
+  [% END %]
+
+  [% IF vulnerability.acknowledgments.size %]
+    <h4>Acknowledgments</h4>
+    <ul>
+    [% FOREACH acknowledgment IN vulnerability.acknowledgments.each %]
+      [% PROCESS acknowledgment %]
+    [% END %]
+    </ul>
+  [% END %]
+
+  [% IF vulnerability.involvements.size %]
+    <h4>Involvement</h4>      
+    <ul>
+    [% FOREACH involvement IN vulnerability.involvements.each %]
+      <li>
+        [% IF involvement.date %][% involvement.date.datetime() %][% END %] [% involment.party.upper %] [% IF involvement.status %][% involment.status.replace('_', ' ') %][% END %] [% IF involment.summary %]: [% involment.summary %][% END %]
+      </li>
+    [% END %]
+    </ul>
+  [% END %]
+
+  [% IF vulnerability.references.size %]
+    <h4>References</h4>
+    <ul>
+    [% FOREACH reference IN vulnerability.references.each %]
+        [% PROCESS reference %]
+    [% END %]
+    </ul>
+  [% END %]
+
+  [% IF vulnerability.threats.size %]
+    <h4>Threats</h4>
+    [% FOREACH threat IN vulnerability.threats.get_category('exploit_status') %][% PROCESS threat %][% END %]
+    [% FOREACH threat IN vulnerability.threats.get_category('impact')         %][% PROCESS threat %][% END %]
+    [% FOREACH threat IN vulnerability.threats.get_category('target_set')     %][% PROCESS threat %][% END %]
+    [% FOREACH threat IN vulnerability.threats.get_category('unknown')        %][% PROCESS threat %][% END %]
+  [% END %]
+
+[% END %]
+
+[% IF document.acknowledgments.size %]
+<h2>Acknowledgments</h2>
+[% document.publisher.name %] thanks the following parties for their efforts:
+<ul>
+  [% FOREACH acknowledgment IN document.acknowledgments.each %]
+    [% PROCESS acknowledgment %]
+  [% END %]
+</ul>
+[% END %]
+
+[% FOREACH note IN document.notes.get_category('other') %][% PROCESS document_note %][% END %]
+
+<h2>[% document.publisher.name %]</h2>
+<p>Namespace: [% document.publisher.namespace %]</p>
+<p>[% document.publisher.contact_details %]</p>
+<p>[% document.publisher.issuing_authority %]</p>
+
+[% IF document.references.size %]
+<h2>References</h2>
+<ul>
+  [% FOREACH reference IN document.references.each %]
+  [% PROCESS reference %]
+  [% END %]
+</ul>
+[% END %]
+
+<h2>Revision history</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Version</th>
+      <th>Date of the revision</th>
+      <th>Summary of the revision</th>
+    </tr>
+  </thead>
+  <tbody>
+  [% FOREACH revision_history IN document.tracking.revision_history.each %]
+    <tr>
+      <td>[% revision_history.number %]</td>
+      <td>[% revision_history.date %]</td>
+      <td>[% revision_history.summary %]</td>
+    </tr>
+  [% END %]
+  </tbody>
+</table>
+
+<h2>Sharing rules</h2>
+<p>
+  [% IF document.distribution.tlp %]
+    <b class="tlp-[% document.distribution.tlp.label.lower %]">TLP:[% document.distribution.tlp.label %]</b><br>
+    For the TLP version see: [% INCLUDE link url=(document.distribution.tlp.url || "https://www.first.org/tlp/") xlabel=(document.distribution.tlp.url || "https://www.first.org/tlp/") %]
+  [% END %]
+</p>
+<p>[% document.distribution.text %]</p>
+
+[% FOREACH note IN document.notes.get_category('legal_disclaimer') %][% PROCESS document_note %][% END %]
+
+</body>
+</html>

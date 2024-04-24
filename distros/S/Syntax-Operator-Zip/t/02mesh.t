@@ -36,4 +36,11 @@ is( [ qw( one two three ) M ( 1 .. 2 ) ],
    is( \@n, [1..3], 'mesh returns copies of arguments' );
 }
 
+# list-associative
+{
+   is( [ qw( one two three ) M qw( I II III ) M ( 1, 2, 3 ) ],
+      [ one => I => 1, two => II => 2, three => III => 3 ],
+      'mesh is list-associative with itself' );
+}
+
 done_testing;

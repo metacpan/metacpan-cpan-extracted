@@ -16,7 +16,7 @@ package Treex::PML;
 use vars qw(@EXPORT @EXPORT_OK @ISA $VERSION $API_VERSION %COMPATIBLE_API_VERSION
             $FSError $Debug $resourcePath $resourcePathSplit @BACKENDS);
 BEGIN {
-$VERSION = "2.24";        # change when new functions are added etc
+$VERSION = "2.26";        # change when new functions are added etc
 }
 
 
@@ -27,6 +27,7 @@ use Treex::PML::Document;
 
 use Treex::PML::Factory;
 use Treex::PML::StandardFactory;
+use Treex::PML::Resource::URI;
 BEGIN { Treex::PML::StandardFactory->make_default() }
 use Treex::PML::IO;
 use UNIVERSAL::DOES qw(does);
@@ -319,7 +320,7 @@ sub ResolvePath ($$;$) {
       my ($res) = FindInResources($rel_f,{strict=>1});
       if ($res) {
 	print STDERR "\t=> (resources) result='$res'\n" if $Treex::PML::Debug;
-	return $res;
+	return Treex::PML::Resource::URI->new($res)
       }
     }
     print STDERR "\t=> (relative) result='$abs_uri'\n" if $Treex::PML::Debug;
@@ -945,7 +946,7 @@ L<http://search.cpan.org/dist/Treex-PML/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006-2013 by Petr Pajas, Jan Stepanek
+Copyright (C) 2006-2024 by Petr Pajas, Jan Stepanek
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.2 or,

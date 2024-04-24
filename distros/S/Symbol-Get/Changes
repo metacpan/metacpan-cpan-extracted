@@ -1,5 +1,14 @@
 Revision history for Perl module Symbol::Get
 
+0.12 Tue 23 Apr 2024
+    - Update license in Makefile.PL. (Thank you, @mavit!)
+
+0.11 Tue 23 Apr 2024
+    - (No code changes.)
+    - Remove Travis CI.
+    - Change README to Markdown.
+    - Re-license under the MIT License.
+
 0.10 Fri 24 Aug 2018
     - Fix LICENSE file (again)
 

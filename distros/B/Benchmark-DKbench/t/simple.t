@@ -9,7 +9,6 @@ like($std[0], qr/CPU/, 'System identity');
 diag $std[0];
 
 my %opt = (
-    iter       => 1,
     skip_bio   => 1,
     time_piece => 1,
     time       => 1,

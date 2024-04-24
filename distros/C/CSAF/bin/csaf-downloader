@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use utf8;
+
+use App::CSAF::Downloader;
+
+exit App::CSAF::Downloader->run(@ARGV) unless caller();
+
+1;
+
+__END__
+=encoding utf-8
+
+=head1 NAME
+
+csaf-downloader - CSAF Downloader
+
+=head1 SYNOPSIS
+
+    csaf-downloader --url URL
+    csaf-downloader --config FILE
+    csaf-downloader [--help|--man|--version]
+
+    Options:
+      -u, --url=URL                "provider-metadata.json", "index.txt" or ROLIE feed URL
+      -k, --insecure                Skip TLS verification
+          --parallel-downloads=NUM  Number of parallel downloads (default: 10)
+
+          --validate=[type]         Validate CSAF document (type: schema, mandatory, optional, informative)
+          --signature-check         Enable GPG signature chec
+          --integrity-check         Enable SHA-(256|512) integrity check
+
+          --include=REGEXP          Include file
+          --exclude=REGEXP          Exclude file
+
+      -v, --verbose                 Verbose
+
+          --config=FILE             Configuration file
+
+          --help                    Brief help message
+          --man                     Full documentation
+          --version                 Print version
+
+=head1 DESCRIPTION
+
+C<csaf-downloader> CSAF Downloader
+
+=head1 EXAMPLES
+
+Download using C<index.txt> file
+
+    $ csaf-downloader -u https://security.acme.tld/advisories/csaf/index.txt
+
+Download using C<provider-metadata.json> with ROLIE feed document:
+
+    $ csaf-downloader -u https://psirt.domain.tld/advisories/csaf/provider-metadata.json
+
+Download using ROLIE feed document:
+
+    $ csaf-downloader -u https://psirt.domain.tld/advisories/csaf/feed-tlp-white.json
+
+=head1 SEE ALSO
+
+L<csaf-rolie>
+
+=head1 AUTHOR
+
+L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2023-2024 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+
+You may use and distribute this module according to the same terms
+that Perl is distributed under.

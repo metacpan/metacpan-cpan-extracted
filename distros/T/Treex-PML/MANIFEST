@@ -24,6 +24,7 @@ lib/Treex/PML/Instance/Writer.pm
 lib/Treex/PML/IO.pm
 lib/Treex/PML/List.pm
 lib/Treex/PML/Node.pm
+lib/Treex/PML/Resource/URI.pm
 lib/Treex/PML/Schema.pm
 lib/Treex/PML/Schema/Alt.pm
 lib/Treex/PML/Schema/Attribute.pm
@@ -61,6 +62,7 @@ t/01-pml.t
 t/02-csts.t
 t/03-fs.t
 t/04-xslt.t
+t/05-resources.t
 t/boilerplate.t
 t/manifest.t
 t/pod-coverage.t
@@ -86,6 +88,7 @@ test_data/pml/example1.xml
 test_data/pml/example10_schema.xml
 test_data/pml/example11.xml
 test_data/pml/example11_schema.xml
+test_data/pml/example12.xml
 test_data/pml/example1_schema.xml
 test_data/pml/example2.xml
 test_data/pml/example2_schema.xml
@@ -106,6 +109,10 @@ test_data/pml/example9_schema.xml
 test_data/pml/templates1_schema.xml
 test_data/pml/templates1_schema_simple.xml
 test_data/pml/templates2_schema.xml
+test_data/resources/example12_schema.xml
+test_data/resources/res1.xml
+test_data/resources/res2.xml
+test_data/resources/res3.xml
 test_data/url/mdata_schema.xml
 test_data/url/sample0.m.gz
 test_data/url/sample0.w.gz

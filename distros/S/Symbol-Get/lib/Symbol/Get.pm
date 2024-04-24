@@ -5,7 +5,7 @@ use warnings;
 
 use Call::Context ();
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 =encoding utf-8
 
@@ -71,7 +71,7 @@ Perl versions, though, so don’t do it; instead, use C<copy_constant()>.
 
 =head1 LICENSE
 
-This module is licensed under the same license as Perl.
+This module is licensed under the MIT License.
 
 =cut
 

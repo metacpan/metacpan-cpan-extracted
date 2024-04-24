@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<annotation xmlns="http://ufal.mff.cuni.cz/pdt/pml/">
+  <head>
+    <schema href="example12_schema.xml"/>
+    <references>
+      <reffile name="resources" id="res" href="res1.xml"/>
+      <reffile name="absolute" id="abs" href="__REPLACE__"/>
+      <reffile name="relative" id="rel" href="../resources/res3.xml"/>
+    </references>
+  </head>
+  <meta>
+    <annotator>Jan Novak</annotator>
+    <datetime>Sun May 1 18:56:55 2005</datetime>
+  </meta>
+</annotation>

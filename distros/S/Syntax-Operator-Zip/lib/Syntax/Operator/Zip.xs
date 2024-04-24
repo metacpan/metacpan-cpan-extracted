@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
  */
 #include "EXTERN.h"
 #include "perl.h"
@@ -12,27 +12,39 @@
 
 #include "XSParseInfix.h"
 
+#if !HAVE_PERL_VERSION(5, 16, 0)
+#  define true  TRUE
+#  define false FALSE
+#endif
+
 static OP *pp_zip(pTHX)
 {
   dSP;
-  U32 rhs_mark = POPMARK;
-  U32 lhs_mark = POPMARK;
+  int nlists = (PL_op->op_flags & OPf_STACKED) ? POPu : PL_op->op_private;
 
-  U32 rhs_count = SP - (PL_stack_base + rhs_mark);
-  U32 lhs_count = rhs_mark - lhs_mark;
+  /* Most invocations will only have 2 lists. We'll account for up to 4 as
+   * local variables; anything bigger we'll allocate temporary SV buffers
+   */
+  U32 counts4[4];
+  SV **svp4[4];
 
-  SP = PL_stack_base + lhs_mark;
+  U32 maxcount = 0;
+  U32 *counts = nlists <= 4 ? counts4 : (U32 *)SvPVX(sv_2mortal(newSV(nlists * sizeof(U32))));
+  for(int i = nlists; i > 0; i--) {
+    U32 mark = POPMARK;
+    U32 count = SP - (PL_stack_base + mark);
+    counts[i-1] = count;
+    if(count > maxcount)
+      maxcount = count;
+
+    SP = PL_stack_base + mark;
+  }
 
   if(GIMME_V == G_VOID)
     return NORMAL;
   if(GIMME_V == G_SCALAR) {
-    int count = 0;
-    if(lhs_count > count)
-      count = lhs_count;
-    if(rhs_count > count)
-      count = rhs_count;
     EXTEND(SP, 1);
-    mPUSHi(count);
+    mPUSHi(maxcount);
     RETURN;
   }
 
@@ -41,33 +53,39 @@ static OP *pp_zip(pTHX)
   /* No need to EXTEND because we know the stack will be big enough */
   PUSHMARK(SP);
 
-  SV **lhs = PL_stack_base + lhs_mark + 1;
-  SV **rhs = PL_stack_base + rhs_mark + 1;
-  SV **lhs_stop = lhs + lhs_count;
-  SV **rhs_stop = rhs + rhs_count;
+  if(!maxcount)
+    RETURN;
 
-  while(lhs < lhs_stop || rhs < rhs_stop) {
+  SV ***svp = nlists <= 4 ? svp4 : (SV ***)SvPVX(sv_2mortal(newSV(nlists * sizeof(SV **))));
+  svp[0] = SP + 1;
+  for(int i = 1; i < nlists; i++)
+    svp[i] = svp[i-1] + counts[i-1];
+
+  bool more = true;
+  do {
+    more = false;
     AV *av = newAV();
+    for(int i = 0; i < nlists; i++) {
+      if(counts[i]) {
+        av_push(av, newSVsv(*(svp[i])));
+        svp[i]++, counts[i]--;
 
-    if(lhs < lhs_stop)
-      av_push(av, newSVsv(*lhs++));
-    else
-      av_push(av, &PL_sv_undef);
-
-    if(rhs < rhs_stop)
-      av_push(av, newSVsv(*rhs++));
-    else
-      av_push(av, &PL_sv_undef);
-
+        if(counts[i])
+          more = true;
+      }
+      else
+        av_push(av, &PL_sv_undef);
+    }
     mPUSHs(newRV_noinc((SV *)av));
-  }
+  } while(more);
 
   RETURN;
 }
 
-struct XSParseInfixHooks infix_zip = {
+static const struct XSParseInfixHooks infix_zip = {
   /* Parse this at ADD precedence, so that (LIST)xCOUNT can be used on RHS */
   .cls       = XPI_CLS_ADD_MISC,
+  .flags     = XPI_FLAG_LISTASSOC,
   .lhs_flags = XPI_OPERAND_TERM_LIST|XPI_OPERAND_ONLY_LOOK,
   .rhs_flags = XPI_OPERAND_TERM_LIST|XPI_OPERAND_ONLY_LOOK,
   .permit_hintkey = "Syntax::Operator::Zip/Z",
@@ -80,75 +98,85 @@ struct XSParseInfixHooks infix_zip = {
 static OP *pp_mesh(pTHX)
 {
   dSP;
-  U32 rhs_mark = POPMARK;
-  U32 lhs_mark = POPMARK;
+  int nlists = (PL_op->op_flags & OPf_STACKED) ? POPu : PL_op->op_private;
 
-  U32 rhs_count = SP - (PL_stack_base + rhs_mark);
-  U32 lhs_count = rhs_mark - lhs_mark;
+  /* Most invocations will only have 2 lists. We'll account for up to 4 as
+   * local variables; anything bigger we'll allocate temporary SV buffers
+   */
+  U32 counts4[4];
+  SV **svp4[4];
 
-  int count = 0;
-  if(lhs_count > count)
-    count = lhs_count;
-  if(rhs_count > count)
-    count = rhs_count;
+  U32 maxcount = 0;
+  U32 *counts = nlists <= 4 ? counts4 : (U32 *)SvPVX(sv_2mortal(newSV(nlists * sizeof(U32))));
+  for(int i = nlists; i > 0; i--) {
+    U32 mark = POPMARK;
+    U32 count = SP - (PL_stack_base + mark);
+    counts[i-1] = count;
+    if(count > maxcount)
+      maxcount = count;
 
-  SP = PL_stack_base + lhs_mark;
+    SP = PL_stack_base + mark;
+  }
+
+  U32 retcount = maxcount * nlists;
 
   if(GIMME_V == G_VOID)
     return NORMAL;
   if(GIMME_V == G_SCALAR) {
     EXTEND(SP, 1);
-    mPUSHi(count * 2);
+    mPUSHi(retcount);
     RETURN;
   }
 
   /* known G_LIST */
-  EXTEND(SP, count * 2);
+  EXTEND(SP, retcount);
   PUSHMARK(SP);
 
-  SV **lhs = PL_stack_base + lhs_mark + 1;
-  SV **rhs = PL_stack_base + rhs_mark + 1;
+  if(!retcount)
+    RETURN;
 
-  /* We can't easily do this inplace so we'll have to store the LHS values
-   * in a temporary array
+  SV ***svp = nlists <= 4 ? svp4 : (SV ***)SvPVX(sv_2mortal(newSV(nlists * sizeof(SV **))));
+  svp[0] = SP + 1;
+  for(int i = 1; i < nlists; i++)
+    svp[i] = svp[i-1] + counts[i-1];
+
+  /* We can't easily do this inplace so we'll have to store the result in a
+   * temporary array
    */
   AV *tmpav = newAV();
-  SAVEFREESV(tmpav);
-  av_extend(tmpav, lhs_count - 1);
+  sv_2mortal((SV *)tmpav);
+  av_extend(tmpav, retcount - 1);
 
-  Copy(lhs, AvARRAY(tmpav), lhs_count, SV *);
+  SV **result = AvARRAY(tmpav);
 
-  lhs = AvARRAY(tmpav);
+  bool more = true;
+  do {
+    more = false;
+    for(int i = 0; i < nlists; i++) {
+      if(counts[i]) {
+        *result = sv_mortalcopy(*(svp[i]));
+        svp[i]++, counts[i]--;
 
-  /* If the LHS list was too small, we'll have to move up the RHS list so we
-   * don't trash it too early
-   */
-  if(lhs_count < rhs_count) {
-    U32 offset = rhs_count - lhs_count;
-    Move(rhs, rhs + offset, rhs_count, SV *);
-    rhs += offset;
-  }
+        if(counts[i])
+          more = true;
+      }
+      else
+        *result = &PL_sv_undef;
+      result++;
+    }
+  } while(more);
 
-  SV **lhs_stop = lhs + lhs_count;
-  SV **rhs_stop = rhs + rhs_count;
+  result = AvARRAY(tmpav);
+  for(U32 i = 0; i < retcount; i++)
+    PUSHs(*result++);
 
-  while(lhs < lhs_stop || rhs < rhs_stop) {
-    if(lhs < lhs_stop)
-      mPUSHs(newSVsv(*lhs++));
-    else
-      PUSHs(&PL_sv_undef);
-
-    if(rhs < rhs_stop)
-      mPUSHs(newSVsv(*rhs++));
-    else
-      PUSHs(&PL_sv_undef);
-  }
-
+  AvREAL_off(tmpav); // AV shouldn't own the SVs
   RETURN;
 }
 
-struct XSParseInfixHooks infix_mesh = {
+static const struct XSParseInfixHooks infix_mesh = {
   .cls       = XPI_CLS_ADD_MISC,
+  .flags     = XPI_FLAG_LISTASSOC,
   .lhs_flags = XPI_OPERAND_TERM_LIST|XPI_OPERAND_ONLY_LOOK,
   .rhs_flags = XPI_OPERAND_TERM_LIST|XPI_OPERAND_ONLY_LOOK,
   .permit_hintkey = "Syntax::Operator::Zip/M",
@@ -161,7 +189,7 @@ struct XSParseInfixHooks infix_mesh = {
 MODULE = Syntax::Operator::Zip    PACKAGE = Syntax::Operator::Zip
 
 BOOT:
-  boot_xs_parse_infix(0.26);
+  boot_xs_parse_infix(0.40);
 
   register_xs_parse_infix("Z", &infix_zip, NULL);
   register_xs_parse_infix("M", &infix_mesh, NULL);

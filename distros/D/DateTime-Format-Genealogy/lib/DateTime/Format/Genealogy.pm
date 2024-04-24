@@ -1,7 +1,7 @@
 package DateTime::Format::Genealogy;
 
 # Author Nigel Horne: njh@bandsman.co.uk
-# Copyright (C) 2018-2023, Nigel Horne
+# Copyright (C) 2018-2024, Nigel Horne
 
 # Usage is subject to licence terms.
 # The licence terms of this software are as follows:
@@ -38,17 +38,19 @@ our %months = (
 	'December' => 'Dec'
 );
 
+our @months = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
+
 =head1 NAME
 
 DateTime::Format::Genealogy - Create a DateTime object from a Genealogy Date
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -89,9 +91,9 @@ is before AD100,
 is just a year or if it is an approximate date starting with "c", "ca" or "abt".
 Can be called as a class or object method.
 
-    my $dt = DateTime::Format::Genealogy('25 Dec 2022');
-    $dt = $dtg->(date => '25 Dec 2022');
+    my $dt = DateTime::Format::Genealogy->new()->parse_datetime('25 Dec 2022');
 
+Optional arguments:
 date: the date to be parsed
 quiet: set to fail silently if there is an error with the date
 strict: more strictly enforce the Gedcom standard, for example don't allow long month names
@@ -131,13 +133,15 @@ sub parse_datetime {
 			Carp::carp("$date is invalid, there are only 30 days in November");
 			return;
 		}
-		my $dfn = $self->{'dfn'};
-		if(!defined($dfn)) {
-			$self->{'dfn'} = $dfn = DateTime::Format::Natural->new();
-		}
 		if($date =~ /^\s*(.+\d\d)\s*\-\s*(.+\d\d)\s*$/) {
-			Carp::carp("Changing date '$date' to 'bet $1 and $2'");
-			$date = "bet $1 and $2";
+			if($date =~ /^(\d{4})\-(\d{2})\-(\d{2})$/) {
+				my $month = $months[$2 - 1];
+				Carp::carp("Changing date '$date' to '$3 $month $1'") unless($quiet);
+				$date = "$3 $month $1";
+			} else {
+				Carp::carp("Changing date '$date' to 'bet $1 and $2'") unless($quiet);
+				$date = "bet $1 and $2";
+			}
 		}
 		if($date =~ /^bet (.+) and (.+)/i) {
 			if(wantarray) {
@@ -160,6 +164,13 @@ sub parse_datetime {
 					Carp::carp("Unparseable date $date - often because the month name isn't 3 letters") unless($quiet);
 					return;
 				}
+			} elsif($date =~ /^(\d{1,2})\s+Mai\s+(\d{3,4})$/i) {
+				# I've seen a tree that uses some French months
+				$date = "$1 May $2";
+			}
+			my $dfn = $self->{'dfn'};
+			if(!defined($dfn)) {
+				$self->{'dfn'} = $dfn = DateTime::Format::Natural->new();
 			}
 			if(($date =~ /^\d/) && (my $d = $self->_date_parser_cached($date))) {
 				# D:T:Natural doesn't seem to work before AD100
@@ -177,11 +188,9 @@ sub parse_datetime {
 				} else {
 					Carp::carp("Can't parse date '$date'") unless($quiet);
 				}
-				return;
 			}
-		} else {
-			return;	# undef
 		}
+		return;	# undef
 	} else {
 		Carp::croak('Usage: ', __PACKAGE__, '::parse_datetime(date => $date)');
 	}
@@ -211,7 +220,7 @@ sub _date_parser_cached
 		$d = $date_parser->parse(date => $date);
 	};
 	if(my $error = $date_parser->error()) {
-		Carp::carp("$date: '$error'");
+		Carp::carp("$date: '$error'") unless($self->{'quiet'});
 		return;
 	}
 	if($d && (ref($d) eq 'ARRAY')) {
@@ -220,6 +229,29 @@ sub _date_parser_cached
 	}
 	return $d;
 }
+
+# From https://github.com/nigelhorne/DateTime-Format-Genealogy/commit/dd61fefde3d037e251df34654a67e241c4117461
+# TODO: I have not been able to get this to work, but it's a good idea so I'm leaving it here for future investigation
+# sub _fetch_params {
+	# my $self = shift;
+	# my $sub_name = shift;
+	# my %params;
+#
+	# if(!ref($self)) {
+		# %params = ( 'date' => $self );
+		# $self = __PACKAGE__->new();
+	# } elsif(ref($_[0]) eq 'HASH') {
+		# %params = %{$_[0]};
+	# } elsif(ref($_[0])) {
+		# Carp::croak("Usage: $sub_name(date => \$date)");
+	# } elsif(scalar(@_) % 2 == 0) {
+		# %params = @_;
+	# } else {
+		# $params{'date'} = shift;
+	# }
+#
+	# return ($self, \%params);
+# }
 
 1;
 
@@ -241,7 +273,7 @@ L<DateTime>
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc DateTime::Format::Gedcom
+    perldoc DateTime::Format::Genealogy
 
 You can also look for information at:
 
@@ -249,17 +281,13 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Format-Gedcom>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/DateTime-Format-Gedcom>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Format-Genealogy>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018-2023 Nigel Horne.
+Copyright 2018-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

@@ -12,6 +12,10 @@ use Syntax::Operator::Zip qw( zip mesh );
    is( [ zip [qw( one two three )], [ 1 .. 3 ] ],
       [ [ one => 1 ], [ two => 2 ], [ three => 3 ] ],
       'zip()' );
+
+   is( [ zip [qw( one )], [qw( I )], [ 1 ] ],
+      [ [ one => I => 1 ] ],
+      'zip() 3args' );
 }
 
 # mesh
@@ -19,12 +23,23 @@ use Syntax::Operator::Zip qw( zip mesh );
    is( [ mesh [qw( one two three )], [ 1 .. 3 ] ],
       [ one => 1, two => 2, three => 3 ],
       'mesh()' );
+
+   is( [ mesh [qw( one )], [qw( I )], [ 1 ] ],
+      [ one => I => 1 ],
+      'mesh() 3args' );
 }
 
-no Syntax::Operator::Zip qw( zip );
+{
+   package another::namespace;
 
-like( dies { zip( [1,2], [3,4] ) },
-   qr/^Undefined subroutine &main::zip called at /,
-   'unimport' );
+   use Test2::V0;
+
+   use Syntax::Operator::Zip qw( zip );
+   no Syntax::Operator::Zip qw( zip );
+
+   like( dies { zip( [1,2], [3,4] ) },
+      qr/^Undefined subroutine &another::namespace::zip called at /,
+      'unimport' );
+}
 
 done_testing;

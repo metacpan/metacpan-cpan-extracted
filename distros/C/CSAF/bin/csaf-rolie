@@ -1,0 +1,132 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use utf8;
+
+use App::CSAF::ROLIE;
+
+exit App::CSAF::ROLIE->run(@ARGV) unless caller();
+
+1;
+
+__END__
+=encoding utf-8
+
+=head1 NAME
+
+csaf-rolie - Build ROLIE (Resource-Oriented Lightweight Information Exchange) feed
+
+=head1 SYNOPSIS
+
+    csaf-rolie --csaf DIRECTORY [--tlp-label STRING|--feed-id STRING|--feed-title STRING|--base-url URL|--output PATH]
+    csaf-rolie [--help|--man|-v]
+
+    Options:
+      -c, --conf PATH     YAML config path
+      -d, --csaf DIR      CSAF documents directory
+          --output PATH   Feed output file path (default {csaf}/{feed-id}.json)
+          --tlp-label     TLP (Traffic Light Protocol) label (default "WHITE")
+          --base-url      Feed base URL (default "https://psirt.domain.tld/advisories/csaf")
+          --feed-id       Feed ID (default "csaf-feed-tlp-{tlp-label}")
+          --feed-title    Feed title (default "CSAF feed (TLP:{tlp-label})")
+          --stdout        Write ROLIE feed in STDOUT
+          --verbose       Print verbose messages
+          --test          Test the configuration and exit
+          --help          Brief help message
+          --man           Full documentation
+      -v, --version       Print version
+
+
+=head1 DESCRIPTION
+
+C<csaf-rolie> build a ROLIE (Resource-Oriented Lightweight Information Exchange)
+feed using the CSAF documents.
+
+L<https://docs.oasis-open.org/csaf/csaf/v2.0/os/csaf-v2.0-os.html>
+
+The Resource Oriented Lightweight Information Exchange (ROLIE) is standard (RFC-8322)
+for exchanging security automation information between two machines, or between
+a machine and a human operator.
+
+L<https://tools.ietf.org/html/rfc8322>
+
+
+=head1 EXAMPLES
+
+=head2 Create a new ROLIE feed
+
+    $ csaf-rolie --csaf /var/www/html/advisories/csaf \
+                 --base-url https://security.acme.tld/advisories/csaf \
+                 --feed-title "ACME CSAF feed (TLP:WHITE)" \
+                 --verbose
+
+    CSAF directory : /var/www/html/advisories/csaf
+    TLP label      : WHITE
+    Base URL       : https://security.acme.tld/advisories/csaf
+    Feed ID        : csaf-feed-tlp-white
+    Feed title     : CSAF feed (TLP:WHITE)
+    Feed filename  : csaf-feed-tlp-white.json
+    Output file    : /var/www/html/advisories/csaf/csaf-feed-tlp-white.json
+
+    [*] Add ACMESA-2024:0001 in ROLIE feed
+    [*] Add ACMESA-2024:1337 in ROLIE feed
+
+    [...]
+
+    ROLIE feed saved in /var/www/html/advisories/csaf/csaf-feed-tlp-white.json
+
+
+=head2 Create a new ROLIE feed using a config file
+
+Available config items:
+
+=over
+
+=item C<csaf> CSAF documents directory
+
+=item C<output> Feed output file path (default {csaf}/{feed-id}.json)
+
+=item C<tlp-label> TLP (Traffic Light Protocol) label (default "WHITE")
+
+=item C<base-url> Feed base URL (default "https://psirt.domain.tld/advisories/csaf")
+
+=item C<feed-id> Feed ID (default "csaf-feed-tlp-{tlp-label}")
+
+=item C<feed-title> Feed title (default "CSAF feed (TLP:{tlp-label})")
+
+=back
+
+
+ROLIE config file (F<rolie.conf>):
+
+    ---
+    csaf: /var/www/html/advisories/csaf
+    base_url: https://security.acme.tld/advisories/csaf
+    tlp_label: WHITE
+    feed_id: acme-csaf-feed-tlp-white
+    feed_title: ACME CSAF feed (TLP:WHITE)
+
+Use F<rolie.conf> with C<csaf-rolie> command:
+
+    $ csaf-rolie --config /etc/csaf/rolie.conf
+
+Schedule the refresh of ROLIE feed in L<crontab>:
+
+    */2 * * * * csaf-rolie --config /etc/csaf/rolie.conf 2> /dev/null
+
+=head1 SEE ALSO
+
+L<csaf-validator>
+
+
+=head1 AUTHOR
+
+L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2023-2024 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+
+You may use and distribute this module according to the same terms
+that Perl is distributed under.

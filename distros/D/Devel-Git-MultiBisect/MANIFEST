@@ -27,6 +27,8 @@ t/011-run-test-files-combined.t
 t/012-build-transitions-probe-error.t
 t/013-build-transitions-probe-warning.t
 t/014-build-transitions-probe-stderr.t
+t/015-transitions-probe-stderr-outside-target.t
+t/lib/gh-22159-class.t
 t/lib/Helpers.pm
 t/lib/output1.txt
 t/lib/output2.txt

@@ -184,4 +184,40 @@ sub is_deparsed
       'deparsed call to list/list wrapper func on anonlist';
 }
 
+# list-associative
+{
+   # wrapper by direct call
+   is( t::infix::catfunc( "a", "b", "c" ), "^abc^",
+      'List-associative wrapper function by direct call' );
+
+   # wrapper by direct call non-convertable
+   my @args = qw( a b c );
+   is( t::infix::catfunc( @args ), "^abc^",
+      'List-associative wrapper function by non-convertable direct call' );
+
+   my $wrapper = \&t::infix::catfunc;
+   is( $wrapper->( "d", "e", "f" ), "^def^",
+      'List-associative wrapper function by CODE reference' );
+}
+
+# call-checker for list-associative ops
+{
+   my $code;
+   my %opcounts;
+
+   # scalars
+   %opcounts = count_ops $code = sub { t::infix::catfunc "X", "Y" };
+   ok( (scalar grep { m/^infix_cat_0x/ } keys %opcounts),
+      'callchecker generated an OP_CUSTOM call for listassoc scalars' );
+   ok( !$opcounts{entersub}, 'callchecker removed an OP_ENTERSUB call for listassoc scalars' );
+   is( $code->(), "^XY^", 'result of callcheckered code for listassoc scalars' );
+
+   # lists
+   %opcounts = count_ops $code = sub { t::infix::LLfunc ["X"], ["Y"] };
+   ok( (scalar grep { m/^infix_LL_0x/ } keys %opcounts),
+      'callchecker generated an OP_CUSTOM call for listassoc lists' );
+   ok( !$opcounts{entersub}, 'callchecker removed an OP_ENTERSUB call for listassoc lists' );
+   is( $code->(), "([X][Y])", 'result of callcheckered code for listassoc lists' );
+}
+
 done_testing;

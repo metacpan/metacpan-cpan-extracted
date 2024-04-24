@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
  */
 
 #define PERL_NO_GET_CONTEXT
@@ -35,7 +35,7 @@ struct XSParseInfixHooks_v1 {
 
 static void XSParseInfix_register_v1(pTHX_ const char *opname, const struct XSParseInfixHooks_v1 *hooks_v1, void *hookdata)
 {
-  if(hooks_v1->rhs_flags & XPI_OPERAND_CUSTOM)
+  if(hooks_v1->rhs_flags & (1 << 7) /* was XPI_OPERAND_CUSTOM */)
     croak("XPI_OPERAND_CUSTOM is no longer supported");
   if(hooks_v1->parse_rhs)
     croak("XSParseInfixHooks.parse_rhs is no longer supported");

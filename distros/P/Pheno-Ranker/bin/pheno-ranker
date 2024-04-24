@@ -197,39 +197,39 @@ pheno-ranker: A script that performs semantic similarity in PXF/BFF data structu
 
 pheno-ranker -r <individuals.json> -t <patient.json> [-options]
 
-     Arguments:                       
-     * Cohort mode:
-       -r|reference                   BFF/PXF file(s) (JSON|YAML array or object)
+     Arguments:
+       * Cohort mode:
+         -r, --reference <file>       BFF/PXF file(s) in JSON or YAML format (array or object)
 
-     * Patient mode:
-       -t|target                      BFF/PXF file (JSON|YAML object or array of 1 object)
+       * Patient mode:
+         -t, --target <file>          BFF/PXF file in JSON or YAML format (object or array of 1 object)
 
      Options:
-       -age                           Include variables related to age and onset; excludes agent-like terms [>no-age|age]
-       -a|align                       Write alignment file(s). If no argument is given the files will be named [alignment.*]
-       -append-prefixes               The prefixes to be added to the primary_key of individuals when #cohorts >= 2 [C]
-       -config                        YAML config file to change default parameters [share/conf/config.yaml)
-       -e|export                      Export miscellanea JSON files. If no argument is given the files will be named [export.*]
-       -exclude-terms                 Exclude BFF/PXF terms (e.g., --exclude-terms sex id)
+       -age                           Include age-related variables; excludes agent-like terms (BFF/PXF-only) [>no-age|age]
+       -a, --align [path/basename]    Write alignment file(s). If not specified, default filenames are used [default: alignment.*]
+       -append-prefixes <prefixes>    Prefixes for primary_key when #cohorts >= 2 [default: C]
+       -config <file>                 YAML config file to modify default parameters [default: share/conf/config.yaml]
+       -e, --export [path/basename]   Export miscellaneous JSON files. If not specified, default filenames are used [default: export.*]
+       -exclude-terms <terms>         Exclude BFF/PXF terms (e.g., --exclude-terms sex, id)
        -include-hpo-ascendants        Include ascendant terms from the Human Phenotype Ontology (HPO)
-       -include-terms                 Include BFF/PXF terms (e.g., --ixclude-terms diseases)
-       -max-number-var                Maximum number of variables to be used in binary string [10000]
-       -max-out                       Print only N of comparisons (used with --t)  [50]
-       -o|out-file                    Output file path [-r matrix.txt|-t rank.txt]
-       -poi|patients-of-interest      Export JSON files for the selected individual ids (dry-run)
-       -poi-out-dir                   Directory where to write JSON files (to be used with --poi)
-       -similarity-metric-cohort      Similarity metric for cohort mode [>hamming|jaccard]
-       -sort-by                       Sort reference-patient comparison by Hamming-distance or Jaccard-index [>hamming|jaccard]
-       -w|weights                     YAML file with weights
+       -include-terms <terms>         Include BFF/PXF terms (e.g., --include-terms diseases)
+       -max-number-var <number>       Maximum variables for binary string [default: 10000]
+       -max-out <number>              Print only N comparisons [default: 50]
+       -o, --out-file <file>          Output file path [default: -r matrix.txt | -t rank.txt]
+       -poi, --patients-of-interest <id_list>   Export JSON files for the selected individual IDs during a dry-run
+       -poi-out-dir <directory>       Directory for JSON files (used with --poi)
+       -similarity-metric-cohort <metric>  Similarity metric for cohort mode [>hamming|jaccard]
+       -sort-by <metric>              Sort by Hamming distance or Jaccard index [>hamming|jaccard]
+       -w, --weights <file>           YAML file with weights
 
      Generic Options:
-       -debug                         Print debugging (from 1 to 5, being 5 max)
-       -h|help                        Brief help message
-       -log                           Save log file (JSON). If no argument is given then the log is named [pheno-ranker-log.json]
+       -debug <level>                 Print debugging (from 1 to 5, being 5 max)
+       -h, --help                     Brief help message
+       -log                           Save log file [default: pheno-ranker-log.json]
        -man                           Full documentation
-       -no-color                      Don't print colors to STDOUT [>color|no-color]
-       -v|verbose                     Verbosity on
-       -V|version                     Print version
+       -no-color                      Toggle color output [>color|no-color]
+       -v, --verbose                  Verbosity on
+       -V, --version                  Print version
 
 
 =head1 DESCRIPTION

@@ -26,7 +26,7 @@ $SIG{__DIE__}  = sub { die BOLD RED "Error: ", @_ };
 
 # Global variables:
 $Data::Dumper::Sortkeys = 1;
-our $VERSION   = '0.07';
+our $VERSION   = '0.08';
 our $share_dir = dist_dir('Pheno-Ranker');
 
 # Set developoent mode
@@ -557,7 +557,7 @@ L<https://github.com/CNAG-Biomedical-Informatics/pheno-ranker#readme>
 
 The author requests that any published work that utilizes C<Pheno-Ranker> includes a cite to the the following reference:
 
-Rueda, M. et al. "Advancing Semantic Similarity Analysis of Phenotypic Data Stored in GA4GH Standards and Beyond. (2024) I<Submitted>.
+Leist, I.C. et al. "Advancing Semantic Similarity Analysis of Phenotypic Data Stored in GA4GH Standards and Beyond. (2024) I<Submitted>.
 
 =head1 AUTHOR
 

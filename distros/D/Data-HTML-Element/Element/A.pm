@@ -7,13 +7,13 @@ use Data::HTML::Element::Utils qw(check_data check_data_type);
 use Error::Pure qw(err);
 use List::Util 1.33 qw(none);
 use Mo qw(build is);
-use Mo::utils qw(check_array check_strings);
+use Mo::utils 0.15 qw(check_array check_strings);
 use Mo::utils::CSS qw(check_css_class);
 use Readonly;
 
 Readonly::Array our @TARGETS => qw(_blank _parent _self _top);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 has css_class => (
 	is => 'ro',
@@ -202,8 +202,8 @@ Returns string.
          Parameter 'css_class' has bad CSS class name (number on begin).
                  Value: %s
          Parameter 'data' must be a array.
-                Value: %s
-                Reference: %s
+                 Value: %s
+                 Reference: %s
          Parameter 'data' in 'plain' mode must contain reference to array with scalars.
          Parameter 'data' in 'tags' mode must contain reference to array with references to array with Tags structure.
          Parameter 'data_type' has bad value.
@@ -308,6 +308,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

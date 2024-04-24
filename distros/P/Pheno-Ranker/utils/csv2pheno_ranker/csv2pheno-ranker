@@ -27,7 +27,8 @@ exit;
 
 sub process_csv {
 
-    my $VERSION = '0.06';
+    my $VERSION   = '0.06';
+    my $array_sep = '\|';
 
     # Reading arguments
     GetOptions(
@@ -35,6 +36,7 @@ sub process_csv {
         'primary-key-name=s'   => \my $primary_key_name,                       # string
         'generate-primary-key' => \my $generate_primary_key,                   # flag
         'separator|sep=s'      => \my $sep,                                    # str
+        'array-separator=s'    => \$array_sep,                                 # str
         'output-dir=s'         => \my $output_dir,                             # str
         'help|?'               => \my $help,                                   # flag
         'man'                  => \my $man,                                    # flag
@@ -66,6 +68,7 @@ sub process_csv {
             generate_primary_key => $generate_primary_key,
             output_dir           => $output_dir,
             sep                  => $sep,
+            array_sep            => $array_sep,
             debug                => $debug,
             verbose              => $verbose
         }
@@ -128,9 +131,9 @@ sub write_json {
     my $file      = $arg->{filepath};
     my $json_data = $arg->{data};
 
-    # Note that canonical DOES not match the order of nsort from Sort:.Naturally
+    # Note that canonical DOES not match the order of nsort from Sort::Naturally
     my $json = JSON::XS->new->utf8->canonical->pretty->encode($json_data);
-    path($file)->spew_utf8($json);
+    path($file)->spew($json);
     return 1;
 }
 
@@ -151,6 +154,8 @@ sub read_csv {
     my $primary_key_name     = $self->{primary_key_name};       # has to be non-array
     my $generate_primary_key = $self->{generate_primary_key};
     my $sep                  = $self->{sep};
+    my $array_sep            = $self->{array_sep};
+    my $array_sep_qr         = qr/$array_sep/;
 
     # Create a Text::CSV object with semicolon as the separator
     my $csv = Text::CSV_XS->new(
@@ -162,7 +167,7 @@ sub read_csv {
     );
 
     # Open filehandle
-    open my $fh, '<', $input;
+    open my $fh, '<:encoding(utf-8)', $input;
 
     # Parse the CSV data
     my $headers = $csv->getline($fh);
@@ -216,7 +221,7 @@ sub read_csv {
                 $numeric{$key} = looks_like_number( $data{$key} ) ? 1 : 0;
 
                 # Check array/non-array
-                if ( $data{$key} =~ /,/ ) {
+                if ( $data{$key} =~ $array_sep_qr ) {
                     $array{$key} = 1;
                 }
                 else {
@@ -227,7 +232,7 @@ sub read_csv {
 
         # Split array fields (comma-separated values) into an array_ref
         for my $key ( keys %array ) {
-            $data{$key} = [ split /,/, $data{$key} ];
+            $data{$key} = [ split /$array_sep/, $data{$key} ];
         }
 
         push @rows, \%data;
@@ -253,7 +258,7 @@ sub create_config {
 
     # Set primary key
     if ( defined $primary_key_name ) {
-        die "<$primary_key_name> not found\n"
+        die "Primary-key <$primary_key_name> not found\n"
           unless ( exists $array->{$primary_key_name}
             || exists $non_array->{$primary_key_name} );
     }
@@ -321,22 +326,21 @@ csv2pheno-ranker: A script to convert a CSV to an input suitable for Pheno-Ranke
 csv2pheno-ranker -i <input.csv> [-options]
 
      Arguments:
-       -i|input                       CSV file
+       -i, --input <input.csv>        CSV file
 
      Options:
-
        -generate-primary-key          Generates a primary key if absent. Use --primary-key-name to set its name
-       -primary-key-name              Sets the name for the primary key. Must be a single, non-array field
-       -sep|separator                 Delimiter character for CSV files [;] e.g., --sep $'\t'
-       -output-dir                    Specify the directory where output files will be stored. If not specified, outputs will be placed in the same directory as the input file
+       -primary-key-name <name>       Sets the name for the primary key. Must be a single, non-array field
+       -sep, --separator <char>       Delimiter for CSV fields [;] (e.g., --sep $'\t' for tabs)
+       -array-separator <char>        Delimiter for nested arrays [|] (e.g., --array-separator ';' for semicolons)
+       -output-dir <directory>        Specify the directory where output files will be stored. If not specified, outputs will be placed in the same directory as the input file
 
-
-     Generic Options;
-       -debug                         Print debugging (from 1 to 5, being 5 max)
-       -h|help                        Brief help message
+     Generic Options:
+       -debug <level>                 Print debugging (from 1 to 5, being 5 max)
+       -h, --help                     Brief help message
        -man                           Full documentation
-       -v|verbose                     Verbosity on
-       -V|version                     Print version
+       -v, --verbose                  Verbosity on
+       -V, --version                  Print version
 
 
 =head1 DESCRIPTION
@@ -369,7 +373,9 @@ A script to convert a CSV to an input suitable for C<Pheno-Ranker>
 
 =head1 HOW TO RUN CSV2PHENO-RANKER
 
-The software requires a CSV file as the input and operates with default settings. By default, both the C<JSON> file and the configuration file will be created in the same directory as the input file, and will share the same basename
+The software requires a CSV file as the input and operates with default settings. By default, both the C<JSON> file and the configuration file will be created in the same directory as the input file, and will share the same basename.
+
+If you have columns with nested values make sure that you use C<--array-separator> to define the delimiting character (default is "|").
 
 If you want to change some parameters please take a look to the synopsis.
 
@@ -379,8 +385,7 @@ B<Examples:>
  
  $ ./csv2pheno-ranker -i example.csv --generate-primary-key --primary-key-name ID
 
- $ ./csv2pheno-ranker -i example.csv --generate-primary-key --primary-key-name ID  --output-dir /my-path
-
+ $ ./csv2pheno-ranker -i example.csv --generate-primary-key --primary-key-name ID  --output-dir /my-path --sep ';' --array-separator ','
 
 =head2 COMMON ERRORS AND SOLUTIONS
 

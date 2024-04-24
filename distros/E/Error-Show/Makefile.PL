@@ -3,10 +3,11 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
+	  MIN_PERL_VERSION  => 'v5.24',
     NAME              => 'Error::Show',
     VERSION_FROM      => 'lib/Error/Show.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
     PREREQ_PM         => {
-      enum=>0
+      "constant::more"  =>"v0.3.1"
     }, # e.g., Module::Name => 1.1
     ABSTRACT_FROM     => 'lib/Error/Show.pod', # retrieve abstract from module
     AUTHOR            => 'Ruben Westerberg <drclaw@mac.com>',

@@ -16,7 +16,7 @@ Readonly::Array our @TYPES => qw(button checkbox color date datetime-local
 	submit tel text time url week);
 Readonly::Array our @STEP_TYPES => qw(date datetime-local month number range time week);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 has autofocus => (
 	is => 'ro',
@@ -173,7 +173,7 @@ __END__
 
 =head1 NAME
 
-Data::HTML::Element::Input - Data object for HTML form element.
+Data::HTML::Element::Input - Data object for HTML input element.
 
 =head1 SYNOPSIS
 
@@ -222,7 +222,7 @@ Default value is 0.
 
 =item * C<css_class>
 
-Form CSS class.
+Input CSS class.
 
 Default value is undef.
 
@@ -234,13 +234,13 @@ Default value is 0.
 
 =item * C<id>
 
-Form identifier.
+Input identifier.
 
 Default value is undef.
 
 =item * C<label>
 
-Form label.
+Input label.
 
 Default value is undef.
 
@@ -384,7 +384,7 @@ Returns bool value (1/0).
 
  my $css_class = $obj->css_class;
 
-Get CSS class for form.
+Get CSS class for input.
 
 Returns string.
 
@@ -400,7 +400,7 @@ Returns bool value (1/0).
 
  my $id = $obj->id;
 
-Get form identifier.
+Get input identifier.
 
 Returns string.
 
@@ -408,7 +408,7 @@ Returns string.
 
  my $label = $obj->label;
 
-Get form label.
+Get input label.
 
 Returns string.
 
@@ -591,6 +591,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

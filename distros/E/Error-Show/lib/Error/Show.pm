@@ -7,14 +7,25 @@ use feature "say";
 
 
 
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.4.0';
 
-use constant DEBUG=>undef;
-use enum ("PACKAGE=0",qw<FILENAME LINE SUBROUTINE 
-  HASARGS WANTARRAY EVALTEXT IS_REQUIRE HINTS BITMASK 
-  HINT_HASH MESSAGE SEQUENCE CODE_LINES>);
-
-
+use constant::more DEBUG=>undef;
+use constant::more {
+  PACKAGE=>     0,
+  FILENAME=>    1,
+  LINE=>        2,
+  SUBROUTINE=>  3,
+  HASARGS=>     4,
+  WANTARRAY=>   5,
+  EVALTEXT=>    6,
+  IS_REQUIRE=>  7,
+  HINTS=>       8,
+  BITMASK=>     9,
+  HINT_HASH=>   10,
+  MESSAGE=>     11,
+  SEQUENCE=>    12,
+  CODE_LINES=>  13,
+};
 
 #
 # A list of top level file paths or scalar refs to check for syntax errors
@@ -25,7 +36,8 @@ sub context;
  
 sub import {
   my $package=shift;
-  my @caller=caller;
+  # Add support for reexporters that manipulate the export level
+  my @caller=caller($Exporter::ExportLevel//0);;
   my @options=@_;
 
 
@@ -51,6 +63,7 @@ sub import {
   my $clean=grep /clean/i, @options;
   my $splain=grep /splain/i, @options;
   my $do_warn=grep /warn/i, @options;
+  my $no_handler=grep /no_handler/i, @options;
 
   my @warn=$do_warn?():"-MError::Show::Internal";
 
@@ -149,6 +162,24 @@ sub import {
     #not checking, we want to run
     if($runnable){
       # don't bother with warnings
+
+      # v0.4.0
+      # Install an global handler, unless asked not to
+      #
+      unless($no_handler){
+        $SIG{__DIE__}=sub {
+          # propagate eval and parsing errors
+          die @_ if $^S or ! defined $^S;
+
+          # Otherwise hard error
+          my @frames;
+          my $i=0;
+          push @frames , [caller $i++] while caller $i;
+          say STDERR Error::Show::context message=>$_[0], frames=>\@frames;
+          exit;
+        };
+      }
+
 
     }
     else{
@@ -444,7 +475,6 @@ sub context{
   }
   
   # Convert from supported exceptions classes to internal format
-
   my $ref=ref $opts{error};
   my $dstf="Devel::StackTrace::Frame";
 
@@ -507,7 +537,7 @@ sub context{
       }
 
 
-      if($e->[FILENAME] and $e->[LINE]){
+      if($e->[FILENAME] and defined $e->[LINE]){
         $e->[MESSAGE]//="";
 
         #Force a message if one is provided
@@ -572,11 +602,5 @@ sub splain {
   }
   $out;
 }
-
-#sub wrap_eval{
-#  my $program=shift;
-#  "sub { $program }";
-#}
-
 1;
 __END__

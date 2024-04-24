@@ -16,12 +16,13 @@ use namespace::clean 0.25;
 use File::Spec;
 use Carp;
 use File::Temp qw/:POSIX/;
-our $VERSION = '0.002'; # VERSION
+
+our $VERSION = '0.003'; # VERSION
 
 =head1 SYNOPSIS
 
     use Net::SSH::Putty;
-    
+
     my $ssh = Net::SSH::Putty->new({ host => $fqdn, user => $user, password => $password});
     $ssh->exec(['. .bash_profile', $cmd]);
 
@@ -60,7 +61,8 @@ The SSH login password to be used for authentication.
 
 =cut
 
-has password => ( is => 'ro', isa => Str, required => 1, reader => 'get_password' );
+has password =>
+  ( is => 'ro', isa => Str, required => 1, reader => 'get_password' );
 
 =head3 host
 
@@ -80,7 +82,14 @@ The complete pathname to the location where Putty program is installed. By defau
 
 =cut
 
-has putty_path => ( is => 'ro', isa => Str, required => 0, reader => 'get_putty_path', default => sub { File::Spec->catdir(('C:','Program Files (x86)','PuTTY')) } );
+has putty_path => (
+    is       => 'ro',
+    isa      => Str,
+    required => 0,
+    reader   => 'get_putty_path',
+    default  =>
+      sub { File::Spec->catdir( ( 'C:', 'Program Files (x86)', 'PuTTY' ) ) }
+);
 
 =head3 output
 
@@ -90,7 +99,14 @@ Stores an array reference containing the last command (executed through the SSH 
 
 =cut
 
-has output => ( is => 'ro', isa => ArrayRef[Str], required => 0, reader => 'get_output', writer => '_set_output', default => sub { [] } );
+has output => (
+    is       => 'ro',
+    isa      => ArrayRef [Str],
+    required => 0,
+    reader   => 'get_output',
+    writer   => '_set_output',
+    default  => sub { [] }
+);
 
 =head2 METHODS
 
@@ -110,7 +126,11 @@ Getter for C<putty_path>.
 
 Getter for C<output>.
 
-=head3 exec
+=head3 get_host
+
+Getter for C<host>.
+
+=head3 exec_plink
 
 Connects to the host with C<plink.exe> and execute the commands passed as parameters.
 
@@ -122,55 +142,60 @@ This method also sets the C<output> attribute.
 
 =cut
 
-sub exec {
-    my ($self, $cmds_ref) = @_;
-    confess('command parameter must be an array reference') unless (ref($cmds_ref) eq 'ARRAY');
-    my $log = tmpnam();
+sub exec_plink {
+    my ( $self, $cmds_ref ) = @_;
+    confess('command parameter must be an array reference')
+      unless ( ref($cmds_ref) eq 'ARRAY' );
+    my $log  = tmpnam();
     my $cmds = File::Temp->new();
-    
-    foreach my $cmd(@{$cmds_ref}) {
+
+    foreach my $cmd ( @{$cmds_ref} ) {
         print $cmds "$cmd\n";
     }
-    
+
     $cmds->close();
-    my @params = ('-ssh','-batch', '-l', $self->get_user, '-pw', $self->get_password, '-m', $cmds->filename, $self->get_host, '>', $log, '2>&1');
-    my $prog = File::Spec->catfile($self->get_putty_path,'plink.exe');
-    my $cmd = '"' . $prog . '" ' . join(' ',@params);
-    my $exec_ok  = 0;
-    my $ret = system($cmd);
-    
-    unless ($ret == 0) {
-    
-        if ($? == -1) {
+    my @params = (
+        '-ssh', '-batch', '-l', $self->get_user, '-pw', $self->get_password,
+        '-m',   $cmds->filename, $self->get_host, '>', $log, '2>&1',
+    );
+    my $prog    = File::Spec->catfile( $self->get_putty_path, 'plink.exe' );
+    my $cmd     = '"' . $prog . '" ' . join( ' ', @params );
+    my $exec_ok = 0;
+    my $ret     = system $cmd;
+
+    unless ( $ret == 0 ) {
+
+        if ( $? == -1 ) {
             print "failed to execute: $!\n";
         }
-        elsif ($? & 127) {
+        elsif ( $? & 127 ) {
             printf "child died with signal %d, %s coredump\n",
-                ($? & 127),  ($? & 128) ? 'with' : 'without';
+              ( $? & 127 ), ( $? & 128 ) ? 'with' : 'without';
         }
         else {
             printf "child exited with value %d\n", $? >> 8;
         }
-    
-    } else {
+
+    }
+    else {
         $exec_ok = 1;
     }
-    
+
     $self->_set_output( $self->_read_out($log) );
     return $exec_ok;
 }
 
 sub _read_out {
-    my($self,$log) = @_;
-    open(my $in,'<',$log) or die "Cannot read $log: $!";
+    my ( $self, $log ) = @_;
+    open( my $in, '<', $log ) or croak "Cannot read $log: $!";
     my @log = <$in>;
-    close($log);
-    chomp(@log);
-    warn "output file read is empty" unless (scalar(@log)>0);
+    close $log or croak "Cannot close $log: $!";
+    chomp @log;
+    carp 'output file read is empty' unless ( scalar(@log) > 0 );
     return \@log;
 }
 
-=head1 download
+=head3 download
 
 This methods allow a instance to download a single file with C<psftp.exe> program.
 
@@ -221,40 +246,49 @@ Returns true or false (in Perl sense) if the commands were executed successfully
 =cut
 
 sub download {
-    my ($self, $remote_dir, $remote_file, $local_dir) = @_;
-    my @cmds = ("cd $remote_dir", "lcd \"$local_dir\"", "get $remote_file", "del $remote_file");
+    my ( $self, $remote_dir, $remote_file, $local_dir ) = @_;
+    my @cmds = (
+        "cd $remote_dir",
+        "lcd \"$local_dir\"",
+        "get $remote_file",
+        "del $remote_file"
+    );
     my $cmds = File::Temp->new();
-    
-    foreach my $cmd(@cmds) {
+
+    foreach my $cmd (@cmds) {
         print $cmds "$cmd\n";
     }
-    
+
     $cmds->close();
     my $log = tmpnam();
-    
-    my @params = ('-batch', '-l', $self->get_user, '-pw', $self->get_password, '-b', $cmds->filename, $self->get_host, '>', $log, '2>&1');
-    my $prog = File::Spec->catfile($self->get_putty_path,'psftp.exe');
-    my $cmd = '"' . $prog . '" ' . join(' ',@params);
-    my $exec_ok  = 0;
-    my $ret = system($cmd);
-    
-    unless ($ret == 0) {
-    
-        if ($? == -1) {
+
+    my @params = (
+        '-batch', '-l', $self->get_user, '-pw', $self->get_password, '-b',
+        $cmds->filename, $self->get_host, '>', $log, '2>&1'
+    );
+    my $prog    = File::Spec->catfile( $self->get_putty_path, 'psftp.exe' );
+    my $cmd     = '"' . $prog . '" ' . join( ' ', @params );
+    my $exec_ok = 0;
+    my $ret     = system($cmd);
+
+    unless ( $ret == 0 ) {
+
+        if ( $? == -1 ) {
             print "failed to execute: $!\n";
         }
-        elsif ($? & 127) {
+        elsif ( $? & 127 ) {
             printf "child died with signal %d, %s coredump\n",
-                ($? & 127),  ($? & 128) ? 'with' : 'without';
+              ( $? & 127 ), ( $? & 128 ) ? 'with' : 'without';
         }
         else {
             printf "child exited with value %d\n", $? >> 8;
         }
-    
-    } else {
+
+    }
+    else {
         $exec_ok = 1;
     }
-    
+
     $self->_set_output( $self->_read_out($log) );
     sleep 1;
     unlink $log or warn "Could not remove $log: $!";
@@ -274,67 +308,72 @@ Expects as parameter the complete path to this "binary" log file.
 =cut
 
 sub read_log {
-    my($self,$log) = @_;
+    my ( $self, $log ) = @_;
     my @log;
+
     #Incoming packet #0xd, type 94 / 0x5e (SSH2_MSG_CHANNEL_DATA)
-    my $data_regex = qr/^Incoming\spacket.*\(SSH2_MSG_CHANNEL_DATA\)$/;
+    my $data_regex  = qr/^Incoming\spacket.*\(SSH2_MSG_CHANNEL_DATA\)$/;
     my $other_regex = qr/^\w+/;
-    open(my $in, '<', $log) or die "Cannot read log on $log: $!";
+    open( my $in, '<', $log ) or croak "Cannot read log on $log: $!";
     my $is_data = 0;
     my $line;
-    
-    while(<$in>) {
-        chomp();
-        
-        if ($_ =~ $data_regex) {
+
+    while (<$in>) {
+        chomp;
+
+        if ( $_ =~ $data_regex ) {
             $is_data = 1;
             next;
         }
-        
-        if ( ($is_data) and ($_ !~ $other_regex) ) {
-            my @columns = split(/\s{2}/,$_);
-            
-            #  00000000  00 00 01 00 00 00 00 48 20 31 36 3a 34 34 3a 35  .......H 16:44:5
-            #00 00 01 00 00 00 00 48 20 31 36 3a 34 34 3a 35            
-            if ( substr($columns[2],0,8) eq '00 00 01' ) { # "control" characters, or whatever they really mean
-                my @tmp = split(/\s/, substr($columns[2],24));
-                
-                foreach my $chr( @tmp ) {
-                
+
+        if ( ($is_data) and ( $_ !~ $other_regex ) ) {
+            my @columns = split( /\s{2}/, $_ );
+
+  #  00000000  00 00 01 00 00 00 00 48 20 31 36 3a 34 34 3a 35  .......H 16:44:5
+  #00 00 01 00 00 00 00 48 20 31 36 3a 34 34 3a 35
+            if ( substr( $columns[2], 0, 8 ) eq '00 00 01' )
+            {    # "control" characters, or whatever they really mean
+                my @tmp = split( /\s/, substr( $columns[2], 24 ) );
+
+                foreach my $chr (@tmp) {
+
                     if ( $chr eq '0a' ) {
-                        push(@log,$line) if(defined($line));
+                        push( @log, $line ) if ( defined($line) );
                         $line = undef;
-                    } else {
-                        $line .= chr(hex($chr));
                     }
-                    
+                    else {
+                        $line .= chr( hex($chr) );
+                    }
+
                 }
-                
-            } else {
-                my @tmp = split(/\s/, $columns[2]);
+
+            }
+            else {
+                my @tmp = split /\s/, $columns[2];
 
                 # TODO: duplicated code from above
-                foreach my $chr( @tmp ) {
-                
+                foreach my $chr (@tmp) {
+
                     if ( $chr eq '0a' ) {
-                        push(@log,$line) if(defined($line));
+                        push @log, $line if ( defined($line) );
                         $line = undef;
-                    } else {
-                        $line .= chr(hex($chr));
                     }
-                    
+                    else {
+                        $line .= chr hex $chr;
+                    }
+
                 }
             }
             next;
         }
-        
-        if ($_ =~ $other_regex) {
+
+        if ( $_ =~ $other_regex ) {
             $is_data = 0;
         }
-        
+
     }
-    
-    close($in);
+
+    close $in or croak "Cannot read log on $log: $!";;
     return \@log;
 }
 
@@ -345,7 +384,7 @@ This program is a hack, not a robust solution. Keep that in mind if you're going
 The C<download> method is not very flexible. If you need to download a series of files, it will be inefficient since multiple SFTP sessions
 will be open instead of a single one. Maybe in the future this might change.
 
-Also, since C<read_log> is experimental and output redirection on MS Windows requires using C<system> invoking the shell, this might be considered 
+Also, since C<read_log> is experimental and output redirection on MS Windows requires using C<system> invoking the shell, this might be considered
 insecure if malicious values are used during object creation. Taint mode is not active in this module.
 
 =head1 SEE ALSO
@@ -372,11 +411,11 @@ L<http://www.putty.org/>
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 of Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+This software is copyright (c) 2017 of Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 This file is part of net-ssh-putty project.
 

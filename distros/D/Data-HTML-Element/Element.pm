@@ -3,7 +3,7 @@ package Data::HTML::Element;
 use strict;
 use warnings;
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 1;
 
@@ -79,6 +79,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

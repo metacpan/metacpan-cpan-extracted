@@ -14,7 +14,7 @@ use testcase "t::infix";
 
 BEGIN { plan skip_all => "No PL_infix_plugin" unless XS::Parse::Infix::HAVE_PL_INFIX_PLUGIN; }
 
-use v5.16;
+use feature 'current_sub';
 
 BEGIN { $^H{"t::infix/permit"} = 1; }
 
@@ -154,6 +154,27 @@ sub is_deparsed
    is_deparsed sub { (1,2,3) addpairs (4,5,6) },
       '(1, 2, 3) addpairs (4, 5, 6);',
       'deparsed call to infix list/list operator';
+}
+
+# list-associative operator
+{
+   is( "a" cat "b" cat "c", "^abc^",
+      'cat operator runs correctly' );
+
+   is_optree sub { "a" cat "b" cat "c" },
+      "infix_cat_0xXXX[const, const, const]",
+      'optree of list-associative cat operator';
+
+   is_optree sub { ( "a" cat "b" ) cat "c" },
+      "infix_cat_0xXXX[infix_cat_0xXXX[const, const], const]",
+      'parens on LHS defeat list-associativity';
+   is_optree sub { "a" cat ( "b" cat "c" ) },
+      "infix_cat_0xXXX[const, infix_cat_0xXXX[const, const]]",
+      'parens on RHS defeat list-associativity';
+
+   is_deparsed sub { "a" cat "b" cat "c" },
+      q['a' cat 'b' cat 'c';],
+      'deparsed list-associative cat operator';
 }
 
 done_testing;

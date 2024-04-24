@@ -1,21 +1,40 @@
 Revision history for Perl extension Error::Show.
+v0.4.0 2024-04-23
+  [fixes]
+  - Clean up of warnings test output
+  - Support errors/stack frames using a line number of zero (change to defined test)
+
+  [new features]
+  - Command line usage now automatically adds a global signal handler for DIE
+    to dump stack trace of uncaught fatal exceptions. As this module must be the
+    first -M switch used, it should not interfere with other code which
+    overwrites this handler later during execution
+
+  [improvements]
+  - reduce memory usage by removing use enum and use constant. Replace
+    with constant::more
+
+  [other]
+  - Document addition of signal handler
+  - Update dependency versions
+
 
 v0.3.0 2023-05-09
   [new features]
   - calling context sub with an explicit single undef value (ie
     Error::Show::context undef) internally captures a stack trace/frame stack
     which is used for generating context. Aids in debugging when you just want
-    to know how the context a subrotine was called in a non error state.
+    to know how the context a subroutine was called in a non error state.
 
 
-  [improvments]
+  [improvements]
 
   - Reduced memory usage. The IPC::Open3 and Symbol modules are not loaded
     unless they are actually required for CLI usage. Saves approx 25% on memory
     usage otherwise. Scalar::Util is only loaded for in program usage (for
     blessed subroutine). 
-  - context subroutine is now callable via -> notation if prefered
-  - the context subrotine symbol in now exported by defualt (when called from
+  - context subroutine is now callable via -> notation if preferred
+  - the context subroutine symbol in now exported by default (when called from
     code). Previous behaviour can be achieved by explicitly importing the empty
     list
   - Removed unused importing/exporter code

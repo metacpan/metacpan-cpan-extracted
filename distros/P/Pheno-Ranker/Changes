@@ -1,5 +1,11 @@
 Revision history for Perl distribution Pheno-Ranker
 
+0.08 2024-XX-XXT00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Added UTF-8 support in csv2pheno-ranker
+ - Introduced --array-separator option in csv2pheno-ranker with default '\|'
+ - Fixed option --age to be used with BFF/PXF formats only
+
 0.07 2024-04-22T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Excluded keys with {} or [] values (e.g. subject.vitalStatus: {})

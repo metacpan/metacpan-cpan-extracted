@@ -1,0 +1,82 @@
+package Web::Async::WebSocket::Server;
+use Myriad::Class extends => 'IO::Async::Notifier';
+
+our $VERSION = '0.001'; ## VERSION
+## AUTHORITY
+
+=head1 NAME
+
+Web::Async::WebSocket::Server - L<Future>-based web+HTTP handling
+
+=head1 DESCRIPTION
+
+Although other HTTP-adjacent protocols are planned, currently this only contains L<Web::Async::WebSocket::Server>,
+see documentation there for more details.
+
+=cut
+
+use Ryu::Async;
+use IO::Async::Listener;
+
+use Web::Async::WebSocket::Server::Connection;
+
+field $srv;
+field $ryu : reader : param = undef;
+field $port : reader : param = undef;
+
+field $incoming_client : reader : param = undef;
+
+field $on_handshake_failure : reader : param = undef;
+
+method configure (%args) {
+    $port = delete $args{port} if exists $args{port};
+    $on_handshake_failure = delete $args{on_handshake_failure} if exists $args{on_handshake_failure};
+    return $self->next::method(%args);
+}
+
+method _add_to_loop ($loop) {
+    $self->add_child(
+        $ryu = Ryu::Async->new
+    ) unless $ryu;
+    $incoming_client //= $self->ryu->source;
+    $self->add_child(
+        $srv = IO::Async::Listener->new(
+            on_stream => $self->curry::weak::on_stream,
+        )
+    );
+    $self->adopt_future(
+        $srv->listen(
+            service  => $port,
+            socktype => 'stream',
+        )
+    );
+}
+
+method on_stream ($listener, $stream, @) {
+    $log->tracef('Connection %s for listener %s', "$stream", "$listener");
+    $stream->configure(
+        on_read => sub { 0 }
+    );
+    $self->add_child(
+        my $client = Web::Async::WebSocket::Server::Connection->new(
+            stream => $stream,
+            ryu    => $ryu,
+            on_handshake_failure => $on_handshake_failure,
+        )
+    );
+    $incoming_client->emit($client);
+    $self->adopt_future(
+        $client->handle_connection
+    );
+}
+
+1;
+
+=head1 AUTHOR
+
+Tom Molesworth C<< <TEAM@cpan.org> >>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2024. Licensed under the same terms as Perl itself.
+

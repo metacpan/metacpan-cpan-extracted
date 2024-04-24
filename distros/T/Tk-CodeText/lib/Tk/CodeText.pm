@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.47';
+$VERSION = '0.49';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -178,6 +178,11 @@ By default set to undef, meaning no popup menu.
 Image used for the collapse state of a folding point.
 By default it is a bitmap defined in this module.
 
+=item Switch: B<-mmodifiedcall>
+
+Callback called whenever text is modified. It gets
+the location index as parameter.
+
 =item Switch: B<-plusimg>
 
 Image used for the expand state of a folding point.
@@ -342,7 +347,7 @@ sub Populate {
 		-width => 20,
 		-height => 10,
 		-findandreplacecall => sub { $self->FindAndOrReplace(@_) },
-		-modifycall => ['modifiedCheck', $self],
+		-modifycall => ['OnModify', $self],
 		-relief => 'flat',
 		-scrollbars => $scrollbars,
 	);
@@ -479,6 +484,7 @@ sub Populate {
 			-data => $minusimg,
 			-foreground => $fg,
 		)],
+		-modifiedcall => ['CALLBACK', undef, undef, sub {}],
 		-plusimg => ['PASSIVE', undef, undef, $self->Bitmap(
 			-data => $plusimg,
 			-foreground => $fg,
@@ -514,8 +520,7 @@ sub Populate {
 	$text->bind('<KeyPress>', [$self, 'OnKeyPress', Ev('K') ]);
 	#lazy events
 	my @levents = qw(
-		ButtonPress ButtonRelease-1 
-		ButtonRelease-2 B2-Motion 
+		ButtonPress B2-Motion 
 		B1-Motion MouseWheel
 	);
 	foreach my $levent (@levents) {
@@ -753,12 +758,14 @@ sub foldsCheck {
 	my $self = shift;
 	return unless $self->cget('-showfolds');
 
+	my $last = $self->visualEnd;
+	return if $self->Colored < $last;
+
 	my $folds = $self->Kamelon->Formatter->Folds;
 	my $inf = $self->FoldInf;
+	my $fbuttons = $self->FoldButtons;
 	my $fframe = $self->Subwidget('Folds');
 	my $line = $self->visualBegin;
-	my $last = $self->visualEnd;
-	my $fbuttons = $self->FoldButtons;
 
 	#clear out currently mapped fold keys
 	$self->foldsClear;
@@ -1060,14 +1067,6 @@ sub LoopActive {
 	return $self->{LOOPACTIVE}
 }
 
-sub modifiedCheck {
-	my ($self, $index) = @_;
-	my $line = $self->linenumber($index);
-	$self->Colored($line);
-	$self->highlightCheck($index);
-# 	$self->lnumberCheck;
-}
-
 sub NoHighlighting {
 	my $self = shift;
 	$self->{NOHIGHLIGHTING} = shift if @_;
@@ -1079,6 +1078,12 @@ sub OnKeyPress {
 	if (length($key) > 1) {
 		$self->contentCheckLight;
 	}
+}
+
+sub OnModify {
+	my ($self, $index) = @_;
+	$self->highlightCheck($index);
+	$self->Callback('-modifiedcall', $index);
 }
 
 sub position {
@@ -1461,6 +1466,11 @@ If you find any, please contact the author.
 1;
 
 __END__
+
+
+
+
+
 
 
 

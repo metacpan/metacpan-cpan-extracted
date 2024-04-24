@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -141,6 +141,80 @@ static const struct XSParseInfixHooks hooks_addpairs = {
   .ppaddr = &pp_addpairs,
 };
 
+OP *pp_cat(pTHX)
+{
+  dSP;
+  int n = (PL_op->op_flags & OPf_STACKED) ? POPu : PL_op->op_private;
+
+  SV *ret = newSVpvs("^");
+  SV **args = SP - n + 1;
+  for(int i = 0; i < n; i++)
+    sv_catsv(ret, args[i]);
+
+  sv_catpvs(ret, "^");
+
+  SP -= n;
+  mPUSHs(ret);
+
+  RETURN;
+}
+
+static const struct XSParseInfixHooks hooks_cat = {
+  .cls = XPI_CLS_ADD_MISC,
+  .flags = XPI_FLAG_LISTASSOC,
+  .permit_hintkey = hintkey,
+
+  .wrapper_func_name = "t::infix::catfunc",
+
+  .ppaddr = &pp_cat,
+};
+
+OP *pp_LL(pTHX)
+{
+  dSP;
+  int n = (PL_op->op_flags & OPf_STACKED) ? POPu : PL_op->op_private;
+
+  if(n > 2)
+    croak("TODO: unit test cannot cope with n > 2");
+
+  U32 counts[2];
+  SV **args[2];
+  for(int listi = n-1; listi >= 0; listi--) {
+    SV **mark = PL_stack_base + POPMARK;
+    counts[listi] = SP - mark;
+    args[listi] = mark + 1;
+    SP = mark;
+  }
+
+  SV *ret = newSVpvs("(");
+
+  for(int listi = 0; listi < n; listi++) {
+    sv_catpvs(ret, "[");
+
+    for(int argi = 0; argi < counts[listi]; argi++)
+      sv_catsv(ret, args[listi][argi]);
+
+    sv_catpvs(ret, "]");
+  }
+
+  sv_catpvs(ret, ")");
+
+  mPUSHs(ret);
+  RETURN;
+}
+
+static const struct XSParseInfixHooks hooks_LL = {
+  .cls = XPI_CLS_ADD_MISC,
+  .flags = XPI_FLAG_LISTASSOC,
+  .lhs_flags = XPI_OPERAND_LIST|XPI_OPERAND_ONLY_LOOK,
+  .rhs_flags = XPI_OPERAND_LIST|XPI_OPERAND_ONLY_LOOK,
+  .permit_hintkey = hintkey,
+
+  .wrapper_func_name = "t::infix::LLfunc",
+
+  .ppaddr = &pp_LL,
+};
+
 MODULE = t::infix  PACKAGE = t::infix
 
 BOOT:
@@ -154,3 +228,6 @@ BOOT:
   register_xs_parse_infix("intersperse", &hooks_intersperse, NULL);
 
   register_xs_parse_infix("addpairs", &hooks_addpairs, NULL);
+
+  register_xs_parse_infix("cat", &hooks_cat, NULL);
+  register_xs_parse_infix("LL", &hooks_LL, NULL);

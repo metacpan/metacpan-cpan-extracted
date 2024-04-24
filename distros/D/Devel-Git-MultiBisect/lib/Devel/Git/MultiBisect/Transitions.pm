@@ -11,7 +11,7 @@ use Cwd;
 use File::Temp;
 use List::Util qw(sum);
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -27,6 +27,11 @@ Devel::Git::MultiBisect::Transitions - Gather test output where it changes over 
     $commit_range = $self->get_commits_range();
 
     $full_targets = $self->set_targets(\@target_args);
+
+... or, under certain circumstances:
+
+    $full_targets = $self->set_outside_targets(\@target_args);
+
 
     $self->multisect_all_targets();
 
@@ -71,6 +76,7 @@ F<Devel::Git::MultiBisect> for all other methods, including:
 
     get_commits_range()
     set_targets()
+    set_outside_targets()
 
 =head2 C<new()>
 

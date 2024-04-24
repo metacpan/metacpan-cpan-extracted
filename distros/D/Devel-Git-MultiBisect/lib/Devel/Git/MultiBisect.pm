@@ -13,7 +13,7 @@ use File::Spec;
 use File::Temp;
 use List::Util qw(sum);
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -46,6 +46,10 @@ parent package may be called from any of these child classes.
     $commit_range = $self->get_commits_range();
 
     $full_targets = $self->set_targets(\@target_args);
+
+... or, under certain circumstances:
+
+    $full_targets = $self->set_outside_targets(\@target_args);
 
     $outputs = $self->run_test_files_on_one_commit($commit_range->[0]);
 
@@ -111,6 +115,10 @@ The range of sequential commits (determined by F<git log>) requested for analysi
 
 A test file from the test suite of the application or library under study.
 
+=item * B<outside_target>
+
+A test file outside the test suite of the application or library under study.
+
 =item * B<test output>
 
 What is sent to STDOUT or STDERR as a result of calling a test program such as
@@ -120,8 +128,8 @@ L<Test Anything Protocol (TAP)|https://en.wikipedia.org/wiki/Test_Anything_Proto
 
 =item * B<transitional commit>
 
-A commit at which the test output for a given target changes from that of the
-commit immediately preceding.
+A commit at which the test output for a given target (or outside target)
+changes from that of the commit immediately preceding.
 
 =item * B<digest>
 
@@ -178,8 +186,7 @@ Reference to a hash, typically the return value of
 C<Devel::Git::MultiBisect::Opts::process_options()>.
 
 The hashref passed as argument must contain key-value pairs for C<gitdir>,
-C<outputdir>.  C<new()> tests for the existence of each of
-these directories.
+C<outputdir>.  C<new()> tests for the existence of each of these directories.
 
 =item * Return Value
 
@@ -231,8 +238,12 @@ sub get_commits_range {
 =item * Purpose
 
 Identify the test files which will be run at different points in the commits
-range.  We shall assume that the test file has existed with its name unchanged
-over the entire commit range.
+range.  We shall assume that each such test file has existed with its name
+unchanged over the entire commit range.  We further assume that each such test
+file resides in or under the top-level directory of the F<git> checkout,
+I<i.e.,> that the file can be specified by its relative path from the
+top-level directory.  (Should the latter assumption not be valid, use
+C<set_outside_targets()>.)
 
 =item * Arguments
 
@@ -308,13 +319,99 @@ sub set_targets {
     return \@full_targets;
 }
 
+=head2 C<set_outside_targets()>
+
+=over 4
+
+=item * Purpose
+
+Identify the test files which will be run at different points in the commits
+range.  This method differs from C<set_targets()> in that it assumes that the
+targeted test file sits I<outside> the F<git> repository in which the source
+code resides and, consequently, must be specified with an absolute path.
+
+=item * Arguments
+
+    $target_args = [
+        '/tmp/gh-22159-class.t',
+    ];
+    $full_targets = $self->set_outside_targets($target_args);
+
+Reference to an array holding the absolute paths to the test files selected
+for examination.  B<NOTE:> This method has not yet been tested with more than
+one file in C<$target_args>.
+
+=item * Return Value
+
+Reference to an array holding hash references with these elements:
+
+=over 4
+
+=item * C<path>
+
+Absolute paths to the test files selected for examination.  Test file is
+tested for its existence.
+
+=item * C<stub>
+
+String composed by taking an element in the array ref passed as argument and
+substituting underscores C(<_>) for forward slash (C</>) and dot (C<.>)
+characters.  So,
+
+    /tmp/gh-22159-class.t
+
+... becomes:
+
+    _tmp_gh-22159-class_t
+
+=back
+
+=back
+
+=cut
+
+sub set_outside_targets {
+    my ($self, $explicit_targets) = @_;
+
+    my @raw_targets = @{$self->{targets}};
+
+    # If set_targets() is provided with an appropriate argument
+    # ($explicit_targets), override whatever may have been stored in the
+    # object by new().
+
+    if (defined $explicit_targets) {
+        croak "Explicit targets passed to set_targets() must be in array ref"
+            unless ref($explicit_targets) eq 'ARRAY';
+        @raw_targets = @{$explicit_targets};
+    }
+
+    my @full_targets = ();
+    my @missing_files = ();
+    for my $rt (@raw_targets) {
+        my $ft = $rt;
+        if (! -e $ft) { push @missing_files, $ft; next }
+        my $stub;
+        ($stub = $rt) =~ s{[./]}{_}g;
+        push @full_targets, {
+            path    => $ft,
+            stub    => $stub,
+        };
+    }
+    if (@missing_files) {
+        croak "Cannot find file(s) to be tested: @missing_files";
+    }
+    $self->{targets} = [ @full_targets ];
+    return \@full_targets;
+}
+
 =head2 C<run_test_files_on_one_commit()>
 
 =over 4
 
 =item * Purpose
 
-Capture the output from running the selected test files at one specific F<git> checkout.
+Capture the output from running the selected test files at one specific F<git>
+checkout.
 
 =item * Arguments
 
@@ -625,7 +722,7 @@ or through the web interface at L<http://rt.cpan.org>.
 James E. Keenan (jkeenan at cpan dot org).  When sending correspondence, please
 include 'Devel::Git::MultiBisect' or 'Devel-Git-MultiBisect' in your subject line.
 
-Creation date:  October 12 2016. Last modification date:  September 12 2021.
+Creation date:  October 12 2016. Last modification date:  April 23 2024.
 
 Development repository: L<https://github.com/jkeenan/devel-git-multibisect>
 

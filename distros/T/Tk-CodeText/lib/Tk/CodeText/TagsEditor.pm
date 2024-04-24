@@ -42,7 +42,7 @@ Tk:CodeText::TagsEditor - Edit highlighting tags for L<Tk::CodeText>
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.47';
+$VERSION = '0.48';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -145,7 +145,14 @@ sub Populate {
 
 	my @columns = ('Tag', 'Foreground', 'Background', 'Bold', 'Italic');
 	my $list;
+
+	#hack changing list background
+	my $l = $self->Label;
+	my $bg = $l->cget('-background');
+	$l->destroy;
+
 	$list = $self->Scrolled('HList',
+		-background => $bg,
 		-browsecmd => sub { $list->selectionClear; $list->anchorClear },
 		-columns => 5,
 		-header => 1,
@@ -153,7 +160,8 @@ sub Populate {
 	)->pack(-expand => 1, -fill => 'both');
 	my $count = 0;
 	for (@columns) {
-		my $header = $list->Label(-text => $_);
+		my $header = $list->Frame;
+		$header->Label(-text => $_)->pack(-side => 'left');
 		$list->headerCreate($count, -itemtype => 'window', -widget => $header);
 #		$list->headerCreate($count, -text => $_);
 		$count ++;
@@ -392,6 +400,7 @@ Unknown. If you find any, please contact the author.
 1;
 
 __END__
+
 
 
 

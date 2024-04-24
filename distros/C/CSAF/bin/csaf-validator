@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use utf8;
+
+use App::CSAF::Validator;
+
+exit App::CSAF::Validator->run(@ARGV) unless caller();
+
+1;
+
+__END__
+=encoding utf-8
+
+=head1 NAME
+
+csaf-validator - CSAF Validator
+
+=head1 SYNOPSIS
+
+    csaf-validator --file PATH
+    csaf-validator [--help|--man|-v]
+
+    Options:
+      -f, --file PATH   CSAF document path
+          --help        Brief help message
+          --man         Full documentation
+      -v, --version     Print version
+
+=head1 DESCRIPTION
+
+C<csaf-validator> CSAF Validator
+
+=head1 EXAMPLES
+
+    $ csaf-validator -f csaf-document.json
+    [error] /document/tracking/revision_history: Sorted Revision History (6.1.14 - mandatory)
+    [error] /document/tracking/version: Detected newer revision of document (6.1.16 - mandatory)
+
+    $ cat csaf-document.json | csaf-validator
+    [error] /product_tree/branches/0/branches/0/branches/name: Version Range in Product Version (6.1.31 - mandatory)
+
+=head1 SEE ALSO
+
+L<csaf-rolie>
+
+=head1 AUTHOR
+
+L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2023-2024 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+
+You may use and distribute this module according to the same terms
+that Perl is distributed under.

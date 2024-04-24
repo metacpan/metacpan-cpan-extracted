@@ -49,7 +49,7 @@ SKIP: {
         verbose => 1,
         # Until development is complete, we will want to be able to inspect
         # files created in the outputdir.
-        outputdir => tempdir( CLEANUP => 0 ),
+        outputdir => tempdir( CLEANUP => 1 ),
     );
     $params = process_options(%args);
     $self = Devel::Git::MultiBisect::AllCommits->new($params);
@@ -190,7 +190,7 @@ SKIP: {
         verbose => 1,
         # Until development is complete, we will want to be able to inspect
         # files created in the outputdir.
-        outputdir => tempdir( CLEANUP => 0 ),
+        outputdir => tempdir( CLEANUP => 1 ),
     );
     $params = process_options(%args);
     $self = Devel::Git::MultiBisect::AllCommits->new($params);
@@ -326,7 +326,7 @@ SKIP: {
         verbose => 0,
         # Until development is complete, we will want to be able to inspect
         # files created in the outputdir.
-        outputdir => tempdir( CLEANUP => 0 ),
+        outputdir => tempdir( CLEANUP => 1 ),
     );
     $params = process_options(%args);
     $target_args = [ File::Spec->catdir( qw| t 001_load.t | ) ];
@@ -455,7 +455,7 @@ SKIP: {
         verbose => 0,
         # Until development is complete, we will want to be able to inspect
         # files created in the outputdir.
-        outputdir => tempdir( CLEANUP => 0 ),
+        outputdir => tempdir( CLEANUP => 1 ),
     );
     $params = process_options(%args);
     $target_args = [
@@ -637,9 +637,9 @@ SKIP: {
 
     $Ttransitions = $Tself->inspect_transitions();
     is(ref($Ttransitions), 'HASH',
-        "get_multisected_outputs() returned hash reference");
+        "inspect_transitions() returned hash reference");
     is(scalar(keys %{$Ttransitions}), scalar(@{$target_args}),
-        "get_multisected_outputs() has one element for each target");
+        "inspect_transitions() has one element for each target");
     for my $target (keys %{$Ttransitions}) {
         for my $k ( qw| newest oldest transitions | ) {
             ok(exists $Ttransitions->{$target}->{$k},
@@ -721,7 +721,7 @@ SKIP: {
         last => $good_last,
         # Until development is complete, we will want to be able to inspect
         # files created in the outputdir.
-        outputdir => tempdir( CLEANUP => 0 ),
+        outputdir => tempdir( CLEANUP => 1 ),
     );
     $params = process_options(%args);
 
@@ -762,9 +762,9 @@ SKIP: {
 
     $transitions = $self->inspect_transitions();
     is(ref($transitions), 'HASH',
-        "get_multisected_outputs() returned hash reference");
+        "inspect_transitions() returned hash reference");
     is(scalar(keys %{$transitions}), scalar(@{$target_args}),
-        "get_multisected_outputs() has one element for each target");
+        "inspect_transitions() has one element for each target");
     for my $target (keys %{$transitions}) {
         for my $k ( qw| newest oldest transitions | ) {
             ok(exists $transitions->{$target}->{$k},

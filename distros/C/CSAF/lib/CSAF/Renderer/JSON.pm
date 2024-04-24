@@ -1,0 +1,89 @@
+package CSAF::Renderer::JSON;
+
+use 5.010001;
+use strict;
+use warnings;
+use utf8;
+
+use Cpanel::JSON::XS;
+
+use Moo;
+extends 'CSAF::Renderer::Base';
+
+sub render {
+
+    my $json = Cpanel::JSON::XS->new->utf8->canonical->allow_nonref->allow_unknown->allow_blessed->convert_blessed
+        ->stringify_infnan->escape_slash(0)->allow_dupkeys->pretty;
+
+    my $csaf        = shift->csaf->build;
+    my $json_string = $json->encode($csaf);
+
+    return $json_string;
+
+}
+
+1;
+
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+CSAF::Renderer::JSON - Render a CSAF document in JSON
+
+=head1 SYNOPSIS
+
+    use CSAF::Renderer::JSON;
+    my $renderer = CSAF::Renderer::JSON->new( csaf => $csaf );
+
+    my $json = $renderer->render;
+
+
+=head1 DESCRIPTION
+
+L<CSAF::Renderer::JSON> render the CSAF document in JSON format.
+
+
+=head2 METHODS
+
+L<CSAF::Renderer::JSON> inherits all methods from L<CSAF::Renderer::Base>.
+
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/giterlizzi/perl-CSAF/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software.  The code repository is available for
+public review and contribution under the terms of the license.
+
+L<https://github.com/giterlizzi/perl-CSAF>
+
+    git clone https://github.com/giterlizzi/perl-CSAF.git
+
+
+=head1 AUTHOR
+
+=over 4
+
+=item * Giuseppe Di Terlizzi <gdt@cpan.org>
+
+=back
+
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2023-2024 by Giuseppe Di Terlizzi.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

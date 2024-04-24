@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/DateUtils/strftime
-# and generated automatically using Perinci::CmdLine::Gen version 0.500
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-06'; # DATE
+our $DATE = '2024-03-07'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.127'; # VERSION
+our $VERSION = '0.128'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/DateUtils/strftime",
@@ -38,13 +38,19 @@ strftime - Format date using strftime()
 
 =head1 VERSION
 
-This document describes version 0.127 of strftime (from Perl distribution App-DateUtils), released on 2021-09-06.
+This document describes version 0.128 of strftime (from Perl distribution App-DateUtils), released on 2024-03-07.
 
 =head1 SYNOPSIS
 
-Usage:
+B<strftime> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
-% B<strftime> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<format>E<gt> [I<date>]
+B<strftime> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<strftime> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<format|/"--format-arg=s*">>E<gt> [I<L<date|/"--date=s">>]
+
+
+
+See examples in the L</EXAMPLES> section.
 
 =head1 OPTIONS
 
@@ -56,9 +62,15 @@ C<*> marks required options.
 
 =item B<--date>=I<s>
 
+(No description)
+
+
 Can also be specified as the 2nd command-line argument.
 
 =item B<--format-arg>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -76,6 +88,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -90,24 +108,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -161,15 +188,15 @@ For fish and zsh, install L<shcompgen> as described above.
 
 =head1 EXAMPLES
 
-Format current time as yyyy-mm-dd:
+=head2 Format current time as yyyy-mm-dd
 
  % strftime %Y-%m-%d
- 2021-09-06
+ 2024-03-07
 
-Format a specific time as yyyy-mm-dd:
+=head2 Format a specific time as yyyy-mm-dd
 
  % strftime %Y-%m-%d tomorrow
- 2021-09-07
+ 2024-03-08
 
 =head1 HOMEPAGE
 
@@ -196,13 +223,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2021, 2020, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

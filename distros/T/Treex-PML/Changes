@@ -1,5 +1,11 @@
 Revision history for Treex-PML
 
+2.26    Tue Apr 23 17:31:17 CEST 2024
+        Properly fix saving relative paths to resource files.
+
+2.25    Tue Apr 23 15:11:42 CEST 2024
+        Fix saving relative paths to resource files.
+
 2.24    Sun Mar  4 23:59:58 CET 2018
         Explicitly depend on XML::SAX (TEIXML).
 

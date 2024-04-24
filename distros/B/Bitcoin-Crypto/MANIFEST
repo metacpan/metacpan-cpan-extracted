@@ -49,7 +49,6 @@ lib/Bitcoin/Crypto/Script/Opcode.pm
 lib/Bitcoin/Crypto/Script/Recognition.pm
 lib/Bitcoin/Crypto/Script/Runner.pm
 lib/Bitcoin/Crypto/Script/Transaction.pm
-lib/Bitcoin/Crypto/Segwit.pm
 lib/Bitcoin/Crypto/Transaction.pm
 lib/Bitcoin/Crypto/Transaction/Digest.pm
 lib/Bitcoin/Crypto/Transaction/Input.pm

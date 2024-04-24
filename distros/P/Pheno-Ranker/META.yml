@@ -50,6 +50,6 @@ resources:
   homepage: https://github.com/CNAG-Biomedical-Informatics/pheno-ranker
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/CNAG-Biomedical-Informatics/pheno-ranker.git
-version: '0.07'
+version: '0.08'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

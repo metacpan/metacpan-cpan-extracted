@@ -84,7 +84,6 @@ GetOptions (
 
 pod2usage({ -verbose => 1, -output => \*STDOUT, -noperldoc => 1}) if $opt{help};
 
-$opt{iter}  ||= 1;
 $opt{scale} ||= 1;
 ($opt{time}, $opt{scale}) = (1, 1) if $opt{quick};
 

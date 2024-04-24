@@ -69,12 +69,16 @@ loaded until instantiation.
 
 https://github.com/FGasper/p5-Call-Context
 
+=head1 LICENSE
+
+This module is licensed under the MIT License.
+
 =cut
 
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my $_OVERLOADED_X;
 

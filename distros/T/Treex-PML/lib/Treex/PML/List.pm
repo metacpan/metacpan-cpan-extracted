@@ -19,7 +19,7 @@ use warnings;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.24'; # version template
+  $VERSION='2.26'; # version template
 }
 use strict;
 
@@ -355,7 +355,7 @@ L<Treex::PML>, L<Treex::PML::Factory>, L<Treex::PML::Schema>, L<Treex::PML::Alt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006-2010 by Petr Pajas
+Copyright (C) 2006-2010 by Petr Pajas, 2010-2024 Jan Stepanek
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.2 or,

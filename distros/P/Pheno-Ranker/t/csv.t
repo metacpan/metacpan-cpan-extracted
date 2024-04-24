@@ -26,7 +26,7 @@ my $inc = join ' -I', '', @INC; # prepend -I to each path in @INC
     my $config = catfile( 't', 'example_config.yaml' );
 
     # Run the command line script with the input file, and redirect the output to the output_file
-    system("$^X $inc $script -i $input_file -sep ';' --generate-primary-key --primary-key-name Id");
+    system("$^X $inc $script -i $input_file -sep ';' --generate-primary-key --primary-key-name Id --array-separator ','");
 
     # Compare the output_file and the reference_file
     ok(

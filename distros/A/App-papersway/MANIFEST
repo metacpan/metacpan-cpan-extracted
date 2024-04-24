@@ -8,6 +8,7 @@ META.json
 META.yml
 Makefile.PL
 README
+TODO
 bin/papersway
 bin/papersway-msg
 dist.ini

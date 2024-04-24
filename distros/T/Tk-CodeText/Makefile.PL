@@ -10,12 +10,11 @@ WriteMakefile(
 	PREREQ_PM => {
 		'File::Path' => 0,
 		'Math::Round' => 0,
-		'Syntax::Kamelon' => '0.23',
-		'Test::Tk' => '2.00',
+		'Syntax::Kamelon' => '0.24',
+		'Test::Tk' => '3.03',
 		'Tk' => '800.024',
-		'Tk::ColorEntry' => '0.03',
-		'Tk::GtkSettings' => '0.05',
-		'Tk::PopList' => '0.04',
+		'Tk::ColorEntry' => '0.05',
+		'Tk::PopList' => '0.07',
 	},
 	ABSTRACT_FROM => "lib/Tk/$pm.pm",
 	VERSION_FROM => "lib/Tk/$pm.pm",
@@ -33,3 +32,4 @@ WriteMakefile(
 		}}) : ()
 	),
 );
+

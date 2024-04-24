@@ -2,42 +2,28 @@ NAME
     App::DateUtils - An assortment of date-/time-related CLI utilities
 
 VERSION
-    This document describes version 0.127 of App::DateUtils (from Perl
-    distribution App-DateUtils), released on 2021-09-06.
+    This document describes version 0.128 of App::DateUtils (from Perl
+    distribution App-DateUtils), released on 2024-03-07.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
     to date/time:
 
-    *   dateconv
-
-    *   datediff
-
-    *   durconv
-
-    *   parse-date
-
-    *   parse-date-using-df-alami-en
-
-    *   parse-date-using-df-alami-id
-
-    *   parse-date-using-df-flexible
-
-    *   parse-date-using-df-natural
-
-    *   parse-duration
-
-    *   parse-duration-using-df-alami-en
-
-    *   parse-duration-using-df-alami-id
-
-    *   parse-duration-using-df-natural
-
-    *   parse-duration-using-td-parse
-
-    *   strftime
-
-    *   strftimeq
+    1. dateconv
+    2. datediff
+    3. durconv
+    4. parse-date
+    5. parse-date-using-df-alami-en
+    6. parse-date-using-df-alami-id
+    7. parse-date-using-df-flexible
+    8. parse-date-using-df-natural
+    9. parse-duration
+    10. parse-duration-using-df-alami-en
+    11. parse-duration-using-df-alami-id
+    12. parse-duration-using-df-natural
+    13. parse-duration-using-td-parse
+    14. strftime
+    15. strftimeq
 
 FUNCTIONS
   dateconv
@@ -51,7 +37,7 @@ FUNCTIONS
 
     *   Convert "today" to epoch:
 
-         dateconv(date => "today"); # -> 1630886400
+         dateconv(date => "today"); # -> 1709769600
 
     *   Convert epoch to ymd:
 
@@ -72,9 +58,9 @@ FUNCTIONS
         Result:
 
          {
-           epoch => 1630934937,
-           iso8601 => "2021-09-06T13:28:57Z",
-           ymd => "2021-09-06",
+           epoch => 1709802621,
+           iso8601 => "2024-03-07T09:10:21.491146Z",
+           ymd => "2024-03-07",
          }
 
     This function is not exported.
@@ -83,7 +69,11 @@ FUNCTIONS
 
     *   date* => *date*
 
+        (No description)
+
     *   to => *str* (default: "epoch")
+
+        (No description)
 
     Return value: (any)
 
@@ -142,9 +132,15 @@ FUNCTIONS
 
     *   as => *str* (default: "iso8601")
 
+        (No description)
+
     *   date1* => *date*
 
+        (No description)
+
     *   date2* => *date*
+
+        (No description)
 
     Return value: (any)
 
@@ -183,7 +179,11 @@ FUNCTIONS
 
     *   duration* => *duration*
 
+        (No description)
+
     *   to => *str* (default: "secs")
+
+        (No description)
 
     Return value: (any)
 
@@ -219,16 +219,16 @@ FUNCTIONS
                module => "DateTime::Format::Flexible",
                original => "tomorrow",
                is_parseable => 1,
-               as_epoch => 1630972800,
-               as_datetime_obj => "2021-09-07T00:00:00",
-               as_datetime_obj_tz_local => "2021-09-07T00:00:00+07:00",
-               as_datetime_obj_tz_utc => "2021-09-06T17:00:00Z",
+               as_epoch => 1709856000,
+               as_datetime_obj => "2024-03-08T00:00:00",
+               as_datetime_obj_tz_local => "2024-03-08T00:00:00+07:00",
+               as_datetime_obj_tz_utc => "2024-03-07T17:00:00Z",
              },
              {
                module       => "DateTime::Format::Flexible",
                original     => "foo",
                is_parseable => 0,
-               error_msg    => "Invalid date format: foo at /home/u1/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/Perinci/Access.pm line 81. ",
+               error_msg    => "Invalid date format: foo at /home/u1/perl5/perlbrew/perls/perl-5.38.2/lib/site_perl/5.38.2/Perinci/Access.pm line 81. ",
              },
            ],
            {
@@ -255,9 +255,15 @@ FUNCTIONS
 
     *   dates* => *array[str]*
 
+        (No description)
+
     *   module => *str* (default: "DateTime::Format::Flexible")
 
+        (No description)
+
     *   time_zone => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -296,10 +302,10 @@ FUNCTIONS
                module => "DateTime::Format::Alami::EN",
                original => "23 May",
                is_parseable => 1,
-               as_epoch => 1621728000,
-               as_datetime_obj => "2021-05-23T00:00:00",
-               as_datetime_obj_tz_local => "2021-05-23T07:00:00+07:00",
-               as_datetime_obj_tz_utc => "2021-05-23T00:00:00Z",
+               as_epoch => 1716422400,
+               as_datetime_obj => "2024-05-23T00:00:00",
+               as_datetime_obj_tz_local => "2024-05-23T07:00:00+07:00",
+               as_datetime_obj_tz_utc => "2024-05-23T00:00:00Z",
                pattern => "p_dateymd",
              },
            ],
@@ -353,7 +359,11 @@ FUNCTIONS
 
     *   dates* => *array[str]*
 
+        (No description)
+
     *   time_zone => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -392,10 +402,10 @@ FUNCTIONS
                module => "DateTime::Format::Alami::ID",
                original => "23 Mei",
                is_parseable => 1,
-               as_epoch => 1621728000,
-               as_datetime_obj => "2021-05-23T00:00:00",
-               as_datetime_obj_tz_local => "2021-05-23T07:00:00+07:00",
-               as_datetime_obj_tz_utc => "2021-05-23T00:00:00Z",
+               as_epoch => 1716422400,
+               as_datetime_obj => "2024-05-23T00:00:00",
+               as_datetime_obj_tz_local => "2024-05-23T07:00:00+07:00",
+               as_datetime_obj_tz_utc => "2024-05-23T00:00:00Z",
                pattern => "p_dateymd",
              },
            ],
@@ -449,7 +459,11 @@ FUNCTIONS
 
     *   dates* => *array[str]*
 
+        (No description)
+
     *   time_zone => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -488,10 +502,10 @@ FUNCTIONS
                module => "DateTime::Format::Flexible",
                original => "23rd Jun",
                is_parseable => 1,
-               as_epoch => 1624406400,
-               as_datetime_obj => "2021-06-23T00:00:00",
-               as_datetime_obj_tz_local => "2021-06-23T00:00:00+07:00",
-               as_datetime_obj_tz_utc => "2021-06-22T17:00:00Z",
+               as_epoch => 1719100800,
+               as_datetime_obj => "2024-06-23T00:00:00",
+               as_datetime_obj_tz_local => "2024-06-23T00:00:00+07:00",
+               as_datetime_obj_tz_utc => "2024-06-22T17:00:00Z",
              },
            ],
            {
@@ -522,10 +536,10 @@ FUNCTIONS
                module => "DateTime::Format::Flexible(de)",
                original => "23 Dez",
                is_parseable => 1,
-               as_epoch => 1640217600,
-               as_datetime_obj => "2021-12-23T00:00:00",
-               as_datetime_obj_tz_local => "2021-12-23T00:00:00+07:00",
-               as_datetime_obj_tz_utc => "2021-12-22T17:00:00Z",
+               as_epoch => 1734912000,
+               as_datetime_obj => "2024-12-23T00:00:00",
+               as_datetime_obj_tz_local => "2024-12-23T00:00:00+07:00",
+               as_datetime_obj_tz_utc => "2024-12-22T17:00:00Z",
              },
            ],
            {
@@ -556,7 +570,7 @@ FUNCTIONS
                module       => "DateTime::Format::Flexible",
                original     => "foo",
                is_parseable => 0,
-               error_msg    => "Invalid date format: foo at /home/u1/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/Perinci/Access.pm line 81. ",
+               error_msg    => "Invalid date format: foo at /home/u1/perl5/perlbrew/perls/perl-5.38.2/lib/site_perl/5.38.2/Perinci/Access.pm line 81. ",
              },
            ],
            {
@@ -579,9 +593,15 @@ FUNCTIONS
 
     *   dates* => *array[str]*
 
+        (No description)
+
     *   lang => *str* (default: "en")
 
+        (No description)
+
     *   time_zone => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -620,10 +640,10 @@ FUNCTIONS
                module => "DateTime::Format::Natural",
                original => "23rd Jun",
                is_parseable => 1,
-               as_epoch => 1624406400,
-               as_datetime_obj => "2021-06-23T00:00:00",
-               as_datetime_obj_tz_local => "2021-06-23T00:00:00+07:00",
-               as_datetime_obj_tz_utc => "2021-06-22T17:00:00Z",
+               as_epoch => 1719100800,
+               as_datetime_obj => "2024-06-23T00:00:00",
+               as_datetime_obj_tz_local => "2024-06-23T00:00:00+07:00",
+               as_datetime_obj_tz_utc => "2024-06-22T17:00:00Z",
              },
            ],
            {
@@ -677,7 +697,11 @@ FUNCTIONS
 
     *   dates* => *array[str]*
 
+        (No description)
+
     *   time_zone => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -710,7 +734,11 @@ FUNCTIONS
 
     *   durations* => *array[str]*
 
+        (No description)
+
     *   module => *str* (default: "Time::Duration::Parse")
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -799,6 +827,8 @@ FUNCTIONS
 
     *   durations* => *array[str]*
 
+        (No description)
+
     Returns an enveloped result (an array).
 
     First element ($status_code) is an integer containing HTTP-like status
@@ -886,6 +916,8 @@ FUNCTIONS
 
     *   durations* => *array[str]*
 
+        (No description)
+
     Returns an enveloped result (an array).
 
     First element ($status_code) is an integer containing HTTP-like status
@@ -923,10 +955,10 @@ FUNCTIONS
                module => "DateTime::Format::Natural",
                original => "for 2 weeks",
                is_parseable => 1,
-               as_secs => 1209600,
-               as_dtdur_obj => "P14D",
-               date1 => "2021-09-06T13:28:57",
-               date2 => "2021-09-20T13:28:57",
+               as_secs => 1209600.000768,
+               as_dtdur_obj => "P14DT0.000768S",
+               date2 => "2024-03-21T09:10:21",
+               date1 => "2024-03-07T09:10:21",
              },
            ],
            {
@@ -955,10 +987,10 @@ FUNCTIONS
                module => "DateTime::Format::Natural",
                original => "from 23 Jun to 29 Jun",
                is_parseable => 1,
-               as_secs => 5912937,
-               as_dtdur_obj => "P2M7DT13H28M57S",
-               date1 => "2021-09-06T13:28:57",
-               date2 => "2021-06-29T00:00:00",
+               as_secs => 9757178.285926,
+               as_dtdur_obj => "P3M21DT14H49M38.285926S",
+               date1 => "2024-03-07T09:10:21",
+               date2 => "2024-06-29T00:00:00",
              },
            ],
            {
@@ -1007,6 +1039,8 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   durations* => *array[str]*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -1074,7 +1108,7 @@ FUNCTIONS
                module       => "Time::Duration::Parse",
                original     => "foo",
                is_parseable => 0,
-               error_msg    => "Unknown timespec: foo at lib/App/DateUtils.pm line 385. ",
+               error_msg    => "Unknown timespec: foo at (eval 2220) line 385. ",
              },
            ],
            {
@@ -1094,6 +1128,8 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   durations* => *array[str]*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -1120,11 +1156,11 @@ FUNCTIONS
 
     *   Format current time as yyyy-mm-dd:
 
-         strftime(format => "%Y-%m-%d"); # -> "2021-09-06"
+         strftime(format => "%Y-%m-%d"); # -> "2024-03-07"
 
     *   Format a specific time as yyyy-mm-dd:
 
-         strftime(format => "%Y-%m-%d", date => "tomorrow"); # -> "2021-09-07"
+         strftime(format => "%Y-%m-%d", date => "tomorrow"); # -> "2024-03-08"
 
     This function is not exported.
 
@@ -1132,7 +1168,11 @@ FUNCTIONS
 
     *   date => *date*
 
+        (No description)
+
     *   format* => *str*
+
+        (No description)
 
     Return value: (any)
 
@@ -1152,7 +1192,7 @@ FUNCTIONS
 
         Result:
 
-         "2021-09-06"
+         "2024-03-07"
 
     strftimeq() is like POSIX's strftime(), but allows an extra conversion
     "%(...)q" to insert Perl code, for flexibility in customizing format.
@@ -1164,7 +1204,11 @@ FUNCTIONS
 
     *   date => *date*
 
+        (No description)
+
     *   format* => *str*
+
+        (No description)
 
     Return value: (any)
 
@@ -1177,7 +1221,7 @@ SOURCE
     <https://github.com/perlancar/perl-App-DateUtils>.
 
 SEE ALSO
-    dateparse. Perinci::To::POD=HASH(0x556ac4fbeaf8).
+    dateparse. Perinci::To::POD=HASH(0x555af311e1c8).
 
     App::datecalc
 
@@ -1197,14 +1241,14 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015 by
-    perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2021, 2020, 2019, 2017, 2016, 2015
+    by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

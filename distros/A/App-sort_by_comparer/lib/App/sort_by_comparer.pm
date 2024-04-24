@@ -10,9 +10,9 @@ use AppBase::Sort::File ();
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-03-06'; # DATE
+our $DATE = '2024-03-07'; # DATE
 our $DIST = 'App-sort_by_comparer'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -52,6 +52,11 @@ MARKDOWN
                 'x.doc.show_result' => 0,
             },
         ];
+
+        $meta->{links} //= [];
+        push @{ $meta->{links} }, {url=>'pm:Comparer'};
+        push @{ $meta->{links} }, {url=>'prog:sort-by-sorter'};
+        push @{ $meta->{links} }, {url=>'prog:sort-by-sortkey'};
     },
     output_code => sub {
         require Module::Load::Util;
@@ -84,7 +89,7 @@ App::sort_by_comparer - Sort lines of text by a Comparer module
 
 =head1 VERSION
 
-This document describes version 0.001 of App::sort_by_comparer (from Perl distribution App-sort_by_comparer), released on 2024-03-06.
+This document describes version 0.002 of App::sort_by_comparer (from Perl distribution App-sort_by_comparer), released on 2024-03-07.
 
 =head1 FUNCTIONS
 
@@ -151,6 +156,11 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-sort_b
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-sort_by_comparer>.
+
+=head1 SEE ALSO
+
+
+L<Comparer>.
 
 =head1 AUTHOR
 

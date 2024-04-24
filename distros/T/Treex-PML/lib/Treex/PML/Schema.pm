@@ -10,9 +10,10 @@ use UNIVERSAL::DOES;
 
 use Carp;
 use Treex::PML::Schema::Constants;
+use Treex::PML::Resource::URI;
 
 BEGIN {
-  our $VERSION = '2.24'; # version template
+  our $VERSION = '2.26'; # version template
   require Exporter;
   import Exporter qw(import);
   our @EXPORT = (
@@ -280,7 +281,7 @@ sub new {
   }
   my $parse_opts = {%parse_opts,%$opts};
   $parse_opts->{Bless}{pml_schema}=$class;
-  $parse_opts->{URL} = $file;
+  $parse_opts->{URL} = (ref $file && $file->isa('Treex::PML::Resource::URI')) ? $file->file : $file;
 
   my $pml_reader = Treex::PML::Schema::Reader->new($parse_opts);
   my $reader = $pml_reader->reader;
@@ -1412,7 +1413,7 @@ L<Treex::PML::Instance>,
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006-2010 by Petr Pajas
+Copyright (C) 2006-2010 by Petr Pajas, 2010-2024 Jan Stepanek
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.2 or,

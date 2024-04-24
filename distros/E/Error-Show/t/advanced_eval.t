@@ -13,13 +13,14 @@ my $program=
 # line before 3
 ##_START
 sub{
-1+1;
-1+1;
-1+1;
+my $tmp;
+$tmp=1+1;
+$tmp=1+1;
+$tmp=1+1;
 my $test=1+a;
-1+1;
-1+1;
-1+1;
+$tmp=1+1;
+$tmp=1+1;
+$tmp=1+1;
 }
 ##_END
 # line after 1
@@ -35,7 +36,7 @@ ok $@, "Expected syntax error";
 
 if($@){
   my $context=Error::Show::context error=>$@, program=>$program;
-  my $match='9=> my \$test=1\+a;';
+  my $match='10=> my \$test=1\+a;';
   ok $context=~/$match/s, "Found error on expected unmodified line";
   say $context;
 }
@@ -48,7 +49,7 @@ if($@){
   end_mark=>'##_END';
   
   #my $match='5=> my $test=1+a;';
-  my $match='5=> my \$test=1\+a;';
+  my $match='6=> my \$test=1\+a;';
   ok $context=~/$match/s, "Found error on expected modified line";
   say $context;
 }
@@ -63,13 +64,14 @@ $program=
 # line before 3
 ##_START
 sub{
-1+1;
-1+1;
-1+1;
+my $tmp;
+$tmp=1+1;
+$tmp=1+1;
+$tmp=1+1;
 my $test=1/0;
-1+1;
-1+1;
-1+1;
+$tmp=1+1;
+$tmp=1+1;
+$tmp=1+1;
 }
 ##_END
 # line after 1
@@ -87,7 +89,7 @@ eval {
 
 if($@){
   my $context=Error::Show::context error=>$@, program=>$program;
-  my $match='9=> my \$test=1/0;';
+  my $match='10=> my \$test=1/0;';
   ok $context=~/$match/ms;
   say $context;
 }
@@ -99,7 +101,7 @@ if($@){
   my $context=Error::Show::context error=>$@, program=>$program,
   start_mark=>'##_START',
   end_mark=>'##_END';
-  my $match='5=> my \$test=1/0;';
+  my $match='6=> my \$test=1/0;';
   ok $context=~/$match/ms;
   say $context;
 }

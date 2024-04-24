@@ -1,10 +1,8 @@
-.gitignore
-.travis.yml
 Changes
 LICENSE
 MANIFEST
 Makefile.PL
-README.pod
+README.md
 Todo
 lib/Call/Context.pm
 t/001_load.t

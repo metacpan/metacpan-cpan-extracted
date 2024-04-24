@@ -18,13 +18,13 @@ name: Syntax-Operator-Zip
 provides:
   Syntax::Operator::Zip:
     file: lib/Syntax/Operator/Zip.pm
-    version: '0.09'
+    version: '0.10'
 requires:
-  XS::Parse::Infix: '0.26'
-  meta: 0.003_002
+  XS::Parse::Infix: '0.40'
+  meta: '0.004'
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

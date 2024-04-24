@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix 0.39;
+package XS::Parse::Infix 0.40;
 
 use v5.14;
 use warnings;
@@ -124,7 +124,7 @@ The C<XSParseInfixHooks> structure provides the following fields which are
 used at various stages of parsing.
 
    struct XSParseInfixHooks {
-      U16 flags; /* currently ignored */
+      U16 flags;
       U8 lhs_flags;
       U8 rhs_flags;
       enum XSParseInfixClassification cls;
@@ -143,8 +143,42 @@ used at various stages of parsing.
 
 =head2 Flags
 
-The C<flags> field is currently ignored. It is defined simply to reserve the
-space in case used in a later version. It should be set to zero.
+The C<flags> field gives details on how to handle the operator overall. It
+should be a bitmask of the following constants, or left as zero:
+
+=over 4
+
+=item XPI_FLAG_LISTASSOC
+
+I<Since version 0.40.>
+
+If set, the operator supports n-way list-associative syntax; written in the
+form
+
+   OPERAND op OPERAND op OPERAND op ...
+
+In this case, the custom operator will be a LISTOP rather than a BINOP, and
+every operand of the entire chain will be stored as a child op of it. The op
+function will need to know how many operands it is working on. There are two
+ways this may be indicated, depending on whether it was known at compile-time.
+
+If the number operands is known at compile-time, the C<OPf_STACKED> flag is
+not set, and the C<op_private> field indicates the number of operand
+expressions that were present.
+
+If the number is not known (for example, the operator is being used as the
+body of a generated wrapper function), the C<OPf_STACKED> flag is set. The
+number of arguments will be passed as the UV of an extra SV which is pushed
+last to the stack. The op function should pop this first to find out.
+
+It is typical to begin a list-associative op function with code such as:
+
+   int n = (PL_op->op_flags & OPf_STACKED) ? POPu : PL_op->op_private;
+
+If the operator is list-associative, then C<lhs_flags> and C<rhs_flags> must
+be equal.
+
+=back
 
 The C<lhs_flags> and C<rhs_flags> fields give details on how to handle the
 left- and right-hand side operands, respectively.
@@ -244,9 +278,9 @@ earlier, the C<SV **> pointer passed here will point to the same storage that
 C<parse> had previously had access to, so it can retrieve the results.
 
 If C<new_op> is not present, then the C<ppaddr> will be used instead to
-construct a new BINOP of the C<OP_CUSTOM> type. If an earlier C<parse> stage
-had stored additional results into the C<SV *> variable these will be lost
-here.
+construct a new BINOP or LISTOP of the C<OP_CUSTOM> type. If an earlier
+C<parse> stage had stored additional results into the C<SV *> variable these
+will be lost here.
 
 =head2 The Wrapper Function
 
@@ -433,13 +467,18 @@ sub B::Deparse::_deparse_infix_named
 {
    my ( $self, $opname, $op, $ctx ) = @_;
 
-   my $lhs = $op->first;
-   my $rhs = $op->last;
+   # Cope with list-associatives
+   my $kid = $op->first;
 
-   return join " ",
-      $self->deparse_binop_left( $op, $lhs, 14 ),
-      $opname,
-      $self->deparse_binop_right( $op, $rhs, 14 );
+   my @operands = ( $self->deparse_binop_left( $op, $kid, 14 ) );
+   $kid = $kid->sibling;
+
+   while( !B::Deparse::null( $kid ) ) {
+      push @operands, $self->deparse_binop_right( $op, $kid, 14 );
+      $kid = $kid->sibling;
+   }
+
+   return join " $opname ", @operands;
 }
 
 =head1 TODO

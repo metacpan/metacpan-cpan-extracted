@@ -42,6 +42,11 @@ enum XSParseInfixSelection {
   XPI_SELECT_MATCH_SMART,   /* any equality or other match operator, not including smartmatch */
 };
 
+/* flags */
+enum {
+  XPI_FLAG_LISTASSOC = (1<<0),
+};
+
 /* lhs_flags, rhs_flags */
 enum {
   XPI_OPERAND_TERM_LIST = 6, /* term in list context */
@@ -50,10 +55,6 @@ enum {
   /* Other bitflags */
   XPI_OPERAND_ONLY_LOOK = (1<<3),
 };
-// No longer used
-#define XPI_OPERAND_ARITH 0
-#define XPI_OPERAND_TERM  0
-#define XPI_OPERAND_CUSTOM (1<<7)
 
 struct XSParseInfixHooks {
   U16 flags;

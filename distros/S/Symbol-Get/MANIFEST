@@ -1,9 +1,8 @@
-.gitignore
 Changes
 LICENSE
 MANIFEST
 Makefile.PL
-README.pod
+README.md
 lib/Symbol/Get.pm
 t/001_load.t
 t/002_usage.t

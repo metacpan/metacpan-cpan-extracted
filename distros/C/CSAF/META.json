@@ -1,0 +1,76 @@
+{
+   "abstract" : "Common Security Advisory Framework",
+   "author" : [
+      "Giuseppe Di Terlizzi <gdt@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CSAF",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cpanel::JSON::XS" : "0",
+            "Digest::SHA" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Spec::Functions" : "0",
+            "GnuPG::Interface" : "0",
+            "JSON::Validator" : "0",
+            "LWP::UserAgent" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Log::Any" : "0",
+            "Moo" : "0",
+            "Parallel::ForkManager" : "0",
+            "Template" : "0",
+            "Tie::File" : "0",
+            "Time::Piece" : "0",
+            "URI::PackageURL" : "0",
+            "YAML::XS" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/giterlizzi/perl-CSAF/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/giterlizzi/perl-CSAF",
+         "web" : "https://github.com/giterlizzi/perl-CSAF"
+      }
+   },
+   "version" : "0.22",
+   "x_purl" : "pkg:cpan/GDT/CSAF",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

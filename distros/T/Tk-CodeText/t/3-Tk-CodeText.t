@@ -15,6 +15,7 @@ if (defined $app) {
 		-autoindent => 1,
 		-tabs => '7m',
 		-font => 'Monospace 12',
+		-modifiedcall => sub { my $index = shift; print "index $index\n"; },
 		-syntax => 'XML',
 	)->pack(
 		-expand => 1,
@@ -87,4 +88,5 @@ push @tests, (
 
 
 starttesting;
+
 

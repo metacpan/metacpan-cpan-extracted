@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -74,6 +74,8 @@ enum OperandShape {
   SHAPE_SCALARSCALAR,
   SHAPE_SCALARLIST,
   SHAPE_LISTLIST,
+  SHAPE_LISTASSOC_SCALARS,
+  SHAPE_LISTASSOC_LISTS,
 };
 
 static enum OperandShape operand_shape(const struct HooksAndData *hd)
@@ -92,6 +94,16 @@ static enum OperandShape operand_shape(const struct HooksAndData *hd)
     default:
       croak("TODO: Unsure how to classify operand shape of .lhs_flags=%02X\n",
           hd->hooks->lhs_flags & 0x07);
+  }
+
+  if(hd->hooks->flags & XPI_FLAG_LISTASSOC) {
+    switch(lhs_gimme) {
+      case G_SCALAR:
+        return SHAPE_LISTASSOC_SCALARS;
+
+      case G_LIST:
+        return SHAPE_LISTASSOC_LISTS;
+    }
   }
 
   U8 rhs_gimme;
@@ -162,7 +174,38 @@ static OP *new_op(pTHX_ const struct HooksAndData hd, U32 flags, OP *lhs, OP *rh
     return (*hd.hooks->new_op)(aTHX_ flags, lhs, rhs, parsedata, hd.data);
   }
 
-  OP *ret = newBINOP_CUSTOM(hd.hooks->ppaddr, flags, lhs, rhs);
+  OP *ret;
+  if(hd.hooks->flags & XPI_FLAG_LISTASSOC) {
+    OP *listop = lhs;
+    /* Skip an ex-list + pushmark structure */
+    if(listop->op_type == OP_NULL && cUNOPx(listop)->op_first &&
+        cUNOPx(listop)->op_first->op_type == OP_PUSHMARK)
+      listop = OpSIBLING(cUNOPx(listop)->op_first);
+
+    if(listop &&
+        listop->op_type == OP_CUSTOM && listop->op_ppaddr == hd.hooks->ppaddr &&
+        !(listop->op_flags & OPf_PARENS)) {
+      /* combine new operand with existing listop */
+      if(listop->op_private == 255)
+        croak("TODO: Unable to handle a list-associative infix operator with > 255 operands");
+
+      OP *last = cLISTOPx(listop)->op_last;
+      OpMORESIB_set(last, rhs);
+      cLISTOPx(listop)->op_last = rhs;
+      OpLASTSIB_set(rhs, listop);
+
+      listop->op_private++;
+
+      ret = lhs;
+    }
+    else {
+      /* base case */
+      ret = newLISTOP_CUSTOM(hd.hooks->ppaddr, flags, lhs, rhs);
+      ret->op_private = 2;
+    }
+  }
+  else
+    ret = newBINOP_CUSTOM(hd.hooks->ppaddr, flags, lhs, rhs);
 
   /* TODO: opchecker? */
 
@@ -238,14 +281,14 @@ static OP *S_unwrap_list(pTHX_ OP *o, bool may_unwrap_anonlist)
 
 #ifdef HAVE_PL_INFIX_PLUGIN
 
-void parse(pTHX_ SV **parsedata, struct Perl_custom_infix *def)
+static void parse(pTHX_ SV **parsedata, struct Perl_custom_infix *def)
 {
   struct Registration *reg = (struct Registration *)def;
 
   (*reg->hd.hooks->parse)(aTHX_ 0, parsedata, reg->hd.data);
 }
 
-OP *build_op(pTHX_ SV **parsedata, OP *lhs, OP *rhs, struct Perl_custom_infix *def)
+static OP *build_op(pTHX_ SV **parsedata, OP *lhs, OP *rhs, struct Perl_custom_infix *def)
 {
   struct Registration *reg = (struct Registration *)def;
 
@@ -492,6 +535,157 @@ static OP *ckcall_wrapper_func_listlist(pTHX_ OP *op, GV *namegv, SV *ckobj)
       NULL);
 }
 
+static OP *ckcall_wrapper_func_listassoc_scalars(pTHX_ OP *op, GV *namegv, SV *ckobj)
+{
+  struct HooksAndData *hd = NUM2PTR(struct HooksAndData *, SvUV(ckobj));
+
+  /* We'll convert this if it looks like a compiletime-constant number of 
+   * scalar arguments
+   */
+  assert(op->op_type == OP_ENTERSUB);
+
+  OP *kid = cUNOPx(op)->op_first;
+  /* The first kid is usually an ex-list whose ->op_first begins the actual args list */
+  if(kid->op_type == OP_NULL && kid->op_targ == OP_LIST)
+    kid = cUNOPx(kid)->op_first;
+
+  assert(kid->op_type == OP_PUSHMARK);
+  OP *pushmark = kid;
+
+  kid = OpSIBLING(kid);
+  OP *firstarg = kid, *lastarg;
+
+  int argcount = 0;
+  OP *nextkid;
+  while(kid && (nextkid = OpSIBLING(kid))) {
+    if(!op_yields_oneval(kid)) {
+      op = ck_entersub_args_proto_or_list(op, namegv, &PL_sv_undef);
+      return op;
+    }
+
+    argcount++;
+    lastarg = kid;
+    kid = nextkid;
+  }
+  /* kid now points at final op which is the gvop of the OP_ENTERSUB */
+
+  /* Splice out the args list and throw away the old optree */
+  OpMORESIB_set(pushmark, kid);
+  op_free(op);
+
+  /* newLISTOP_CUSTOM doesn't quite handle already created child op chains. We
+   * must pass in NULL then set the child ops manually */
+  op = newLISTOP_CUSTOM(hd->hooks->ppaddr, 0, NULL, NULL);
+  op->op_private = argcount;
+
+  op->op_flags |= OPf_KIDS;
+  cLISTOPx(op)->op_first = firstarg;
+  cLISTOPx(op)->op_last  = lastarg;
+  OpLASTSIB_set(lastarg, op);
+
+  return op;
+}
+
+static OP *ckcall_wrapper_func_listassoc_lists(pTHX_ OP *op, GV *namegv, SV *ckobj)
+{
+  struct HooksAndData *hd = NUM2PTR(struct HooksAndData *, SvUV(ckobj));
+
+  /* We'll convert this if it looks like a compiletime-constant number of 
+   * scalar arguments
+   */
+  assert(op->op_type == OP_ENTERSUB);
+
+  OP *kid = cUNOPx(op)->op_first;
+  /* The first kid is usually an ex-list whose ->op_first begins the actual args list */
+  if(kid->op_type == OP_NULL && kid->op_targ == OP_LIST)
+    kid = cUNOPx(kid)->op_first;
+
+  assert(kid->op_type == OP_PUSHMARK);
+  OP *pushmark = kid;
+
+  kid = OpSIBLING(kid);
+  OP *firstarg = kid, *lastarg;
+
+  int argcount = 0;
+  OP *nextkid;
+  while(kid && (nextkid = OpSIBLING(kid))) {
+    if(!op_yields_oneval(kid)) {
+      op = ck_entersub_args_proto_or_list(op, namegv, &PL_sv_undef);
+      return op;
+    }
+
+    argcount++;
+    lastarg = kid;
+    kid = nextkid;
+  }
+  /* kid now points at final op which is the gvop of the OP_ENTERSUB */
+
+  /* Splice out the args list and throw away the old optree */
+  OpMORESIB_set(pushmark, kid);
+  OpLASTSIB_set(lastarg, NULL);
+  op_free(op);
+
+  /* We now need to unwrap_list() on each of the args ops */
+
+  kid = firstarg;
+  firstarg = NULL;
+  lastarg = NULL;
+  while(kid) {
+    OP *nextkid = OpSIBLING(kid);
+    OpLASTSIB_set(kid, NULL);
+
+    OP *newkid = unwrap_list(kid, hd->hooks->lhs_flags & XPI_OPERAND_ONLY_LOOK);
+
+    if(lastarg)
+      OpMORESIB_set(lastarg, newkid);
+
+    if(!firstarg)
+      firstarg = newkid;
+    lastarg = newkid;
+
+    kid = nextkid;
+  }
+
+  /* newLISTOP_CUSTOM doesn't quite handle already created child op chains. We
+   * must pass in NULL and then set the child ops manually */
+  op = newLISTOP_CUSTOM(hd->hooks->ppaddr, 0, NULL, NULL);
+  op->op_private = argcount;
+
+  op->op_flags |= OPf_KIDS;
+  cLISTOPx(op)->op_first = firstarg;
+  cLISTOPx(op)->op_last  = lastarg;
+  OpLASTSIB_set(lastarg, op);
+
+  return op;
+}
+
+static OP *pp_push_defav_with_count(pTHX)
+{
+  dSP;
+  AV *defav = GvAV(PL_defgv);
+  bool explode = (PL_op->op_flags & OPf_SPECIAL);
+
+  U32 count = av_count(defav);
+  SV **svp = AvARRAY(defav);
+  for(U32 i = 0; i < count; i++)
+    if(explode) {
+      if(!SvRV(svp[i]) || SvTYPE(SvRV(svp[i])) != SVt_PVAV)
+        croak("Expected an ARRAY reference, got %" SVf, SVfARG(svp[i]));
+      AV *av = (AV *)SvRV(svp[i]);
+      PUSHMARK(SP);
+      U32 acount = av_count(av);
+      SV **asvp = AvARRAY(av);
+      for(U32 i = 0; i < acount; i++)
+        PUSHs(asvp[i]);
+    }
+    else
+      PUSHs(svp[i]);
+
+  mPUSHu(count);
+
+  RETURN;
+}
+
 static void make_wrapper_func(pTHX_ const struct HooksAndData *hd)
 {
   SV *funcname = newSVpvn(hd->hooks->wrapper_func_name, strlen(hd->hooks->wrapper_func_name));
@@ -560,6 +754,40 @@ static void make_wrapper_func(pTHX_ const struct HooksAndData *hd)
             NULL));
 
       ckcall = &ckcall_wrapper_func_listlist;
+      break;
+
+    case SHAPE_LISTASSOC_SCALARS:
+      if(hd->hooks->new_op)
+        croak("TODO: Cannot make wrapper func for list-associative operator that has hooks->new_op");
+
+      body = op_append_list(OP_LINESEQ, body,
+          newSTATEOP(0, NULL, NULL));
+
+      /* Body of the function invokes the op with the values from @_, and an extra IV giving the count */
+      body = op_append_list(OP_LINESEQ, body,
+          newLISTOP_CUSTOM(hd->hooks->ppaddr, OPf_STACKED,
+            newOP_CUSTOM(&pp_push_defav_with_count, 0),
+            NULL));
+
+      ckcall = &ckcall_wrapper_func_listassoc_scalars;
+      break;
+
+    case SHAPE_LISTASSOC_LISTS:
+      if(hd->hooks->new_op)
+        croak("TODO: Cannot make wrapper func for list-associative operator that has hooks->new_op");
+
+      body = op_append_list(OP_LINESEQ, body,
+          newSTATEOP(0, NULL, NULL));
+
+      /* Body of the function invokes the op with the values from all the 
+       * ARRAYs refed by @_, plus marks on the markstack, and an extra IV
+       * giving the count */
+      body = op_append_list(OP_LINESEQ, body,
+          newLISTOP_CUSTOM(hd->hooks->ppaddr, OPf_STACKED /* explode */,
+            newOP_CUSTOM(&pp_push_defav_with_count, OPf_SPECIAL),
+            NULL));
+
+      ckcall = &ckcall_wrapper_func_listassoc_lists;
       break;
   }
 
@@ -687,14 +915,10 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
     }
   }
 
-  switch(hooks->flags) {
-    case (1<<15):
-      /* undocumented internal flag to indicate v1-compatible ->new_op hook function */
-    case 0:
-      break;
-    default:
-      croak("Unrecognised XSParseInfixHooks.flags value 0x%X", hooks->flags);
-  }
+  bool is_listassoc = hooks->flags & XPI_FLAG_LISTASSOC;
+  if(hooks->flags & ~(XPI_FLAG_LISTASSOC | (1<<15)))
+    /* (1<<15) == undocumented internal flag to indicate v1-compatible ->new_op hook function */
+    croak("Unrecognised XSParseInfixHooks.flags value 0x%X", hooks->flags);
 
   switch(hooks->lhs_flags & ~(XPI_OPERAND_ONLY_LOOK)) {
     case 0:
@@ -713,8 +937,14 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
     default:
       croak("Unrecognised XSParseInfixHooks.rhs_flags value 0x%X", hooks->rhs_flags);
 
-    case XPI_OPERAND_CUSTOM:
+    case (1 << 7) /* was XPI_OPERAND_CUSTOM */:
       croak("TODO: Currently XPI_OPERAND_CUSTOM is not supported");
+  }
+
+  if(is_listassoc) {
+    if(hooks->lhs_flags != hooks->rhs_flags)
+      croak("Cannot register a list-associative infix operator with lhs_flags=%02X not equal to rhs_flags=%02X",
+          hooks->lhs_flags, hooks->rhs_flags);
   }
 
 #ifdef HAVE_PL_INFIX_PLUGIN
@@ -835,7 +1065,7 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
 
     XopENTRY_set(xop, xop_name, savepv(SvPVX(namesv) + sizeof("B::Deparse::pp")));
     XopENTRY_set(xop, xop_desc, "custom infix operator");
-    XopENTRY_set(xop, xop_class, OA_BINOP);
+    XopENTRY_set(xop, xop_class, is_listassoc ? OA_LISTOP : OA_BINOP);
     XopENTRY_set(xop, xop_peep, NULL);
 
     Perl_custom_op_register(aTHX_ hooks->ppaddr, xop);

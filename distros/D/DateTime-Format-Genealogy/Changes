@@ -1,5 +1,10 @@
 Revision history for DateTime::Format::Genealogy
 
+0.06	Tue Apr 23 08:28:40 EDT 2024
+	Handle entries which have the French 'Mai' instead of the English 'May'
+	Some messages were printed even in quiet mode
+	Handle '1517-05-04' as '04/05/1517'
+
 0.05	Thu Mar  2 09:55:57 EST 2023
 	Some people use 4 letters for months - handle them
 	Allow more formats to be parsed when not strict

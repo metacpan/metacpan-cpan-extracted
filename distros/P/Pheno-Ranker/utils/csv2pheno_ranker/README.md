@@ -7,22 +7,21 @@ csv2pheno-ranker: A script to convert a CSV to an input suitable for Pheno-Ranke
 csv2pheno-ranker -i &lt;input.csv> \[-options\]
 
      Arguments:
-       -i|input                       CSV file
+       -i, --input <input.csv>        CSV file
 
      Options:
-
        -generate-primary-key          Generates a primary key if absent. Use --primary-key-name to set its name
-       -primary-key-name              Sets the name for the primary key. Must be a single, non-array field
-       -sep|separator                 Delimiter character for CSV files [;] e.g., --sep $'\t'
-       -output-dir                    Specify the directory where output files will be stored. If not specified, outputs will be placed in the same directory as the input file
+       -primary-key-name <name>       Sets the name for the primary key. Must be a single, non-array field
+       -sep, --separator <char>       Delimiter for CSV fields [;] (e.g., --sep $'\t' for tabs)
+       -array-separator <char>        Delimiter for nested arrays [|] (e.g., --array-separator ';' for semicolons)
+       -output-dir <directory>        Specify the directory where output files will be stored. If not specified, outputs will be placed in the same directory as the input file
 
-
-     Generic Options;
-       -debug                         Print debugging (from 1 to 5, being 5 max)
-       -h|help                        Brief help message
+     Generic Options:
+       -debug <level>                 Print debugging (from 1 to 5, being 5 max)
+       -h, --help                     Brief help message
        -man                           Full documentation
-       -v|verbose                     Verbosity on
-       -V|version                     Print version
+       -v, --verbose                  Verbosity on
+       -V, --version                  Print version
 
 # DESCRIPTION
 
@@ -54,7 +53,9 @@ A script to convert a CSV to an input suitable for `Pheno-Ranker`
 
 # HOW TO RUN CSV2PHENO-RANKER
 
-The software requires a CSV file as the input and operates with default settings. By default, both the `JSON` file and the configuration file will be created in the same directory as the input file, and will share the same basename
+The software requires a CSV file as the input and operates with default settings. By default, both the `JSON` file and the configuration file will be created in the same directory as the input file, and will share the same basename.
+
+If you have columns with nested values make sure that you use `--array-separator` to define the delimiting character (default is "|").
 
 If you want to change some parameters please take a look to the synopsis.
 
@@ -64,7 +65,7 @@ If you want to change some parameters please take a look to the synopsis.
     
     $ ./csv2pheno-ranker -i example.csv --generate-primary-key --primary-key-name ID
 
-    $ ./csv2pheno-ranker -i example.csv --generate-primary-key --primary-key-name ID  --output-dir /my-path
+    $ ./csv2pheno-ranker -i example.csv --generate-primary-key --primary-key-name ID  --output-dir /my-path --sep ';' --array-separator ','
 
 ## COMMON ERRORS AND SOLUTIONS
 

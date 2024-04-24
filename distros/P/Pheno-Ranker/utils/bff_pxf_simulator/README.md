@@ -7,26 +7,26 @@ bff-pxf-simulator: A script that creates a JSON array of simulated BFF/PXF
 bff-pxf-simulator \[-options\]
 
      Options:
-       -f|format                      Format [>bff|pxf]
-       -n|number                      Set the number of individuals to generate [100]
-       -o|output                      Output file [individuals.json]
-       -external-ontologies           Path to a YAML file containing ontology terms for diseases, exposures, phenotypicFeatures, procedures, and treatments
-       -random-seed                   Initializes pseudorandom number sequences for reproducible results (int)
+       -f, --format <format>          Format [bff|pxf]
+       -n, --number <number>          Set the number of individuals to generate [100]
+       -o, --output <file>            Output file [individuals.json]
+       --external-ontologies <file>   Path to a YAML file containing ontology terms
+       --random-seed <seed>           Initializes pseudorandom number sequences (seed must be an integer)
 
-       -diseases                      Set the number of diseases per individual [1]
-       -exposures                     Set the number of exposures per individual [1]
-       -phenotypicFeatures            Set the number of phenotypic features per individual [1]
-       -procedures                    Set the number of procedures per individual [1]
-       -treatments                    Set the number of treatments per individual [1]
-       -max-[term]-pool               Limit the selection to the first N elements of the term array
-       -max-ethnicity-pool            Restrict the ethnicity pool size; each individual will have only one ethnicity
+       --diseases <number>            Set the number of diseases per individual [1]
+       --exposures <number>           Set the number of exposures per individual [1]
+       --phenotypicFeatures <number>  Set the number of phenotypic features per individual [1]
+       --procedures <number>          Set the number of procedures per individual [1]
+       --treatments <number>          Set the number of treatments per individual [1]
+       --max-[term]-pool <size>       Limit the selection to the first N elements of the term array
+       --max-ethnicity-pool <size>    Restrict the ethnicity pool size; each individual will have only one ethnicity
 
-     Generic Options;
-       -debug                         Print debugging (from 1 to 5, being 5 max)
-       -h|help                        Brief help message
+     Generic Options:
+       -debug <level>                 Print debugging (from 1 to 5, being 5 max)
+       -h, --help                     Brief help message
        -man                           Full documentation
-       -v|verbose                     Verbosity on
-       -V|version                     Print version
+       -v, --verbose                  Verbosity on
+       -V, --version                  Print version
 
 # DESCRIPTION
 

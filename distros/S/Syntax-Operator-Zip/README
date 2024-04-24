@@ -25,9 +25,9 @@ SYNOPSIS
 
 DESCRIPTION
 
-    This module provides infix operators that compose two lists of elements
-    by associating successive elements from the left and right-hand lists
-    together, forming a new list.
+    This module provides infix operators that compose lists of elements by
+    associating successive elements from each of the input lists, forming a
+    new list.
 
     Support for custom infix operators was added in the Perl 5.37.x
     development cycle and is available from development release v5.37.7
@@ -58,6 +58,14 @@ OPERATORS
     other, the missing elements will be filled in with undef so that every
     array reference in the result contains exactly two items.
 
+       my @result = @alphas Z @betas Z @gammas Z ...
+    
+       # returns [$alphas[0], $betas[0], $gammas[0], ...], ...
+
+    Since version 0.10 this module supports list-associative combinations
+    of more than two input lists at once. The result will be composed of
+    parallel items from each of the given input lists.
+
  M
 
        my @result = @lhs M @rhs;
@@ -69,22 +77,37 @@ OPERATORS
     other, the missing elements will be filled in with undef so that the
     result is correctly lined up.
 
+       my @result = @alphas M @betas M @gammas M ...
+    
+       # returns $alphas[0], $betas[0], $gammas[0], ..., $alphas[1], ...
+
+    Since version 0.10 this module supports list-associative combinations
+    of more than two input lists at once. The result will be composed of
+    parallel items from each of the given input lists.
+
     The result of this operator is useful for constructing hashes from two
     lists containing keys and values
 
        my %hash = @keys M @values;
 
+    This is also useful combined with the multiple variable foreach syntax
+    of Perl 5.36 and above:
+
+       foreach my ( $alpha, $beta, $gamma ) ( @alphas M @betas M @gammas ) {
+          ...
+       }
+
 FUNCTIONS
 
     As a convenience, the following functions may be imported which
     implement the same behaviour as the infix operators, though are
-    accessed via regular function call syntax. The two lists for these
+    accessed via regular function call syntax. The lists for these
     functions to operate on must be passed as references to arrays (either
     named variables, or anonymously constructed by [...]).
 
  zip
 
-       my @result = zip( \@lhs, \@rhs );
+       my @result = zip( \@lhs, \@rhs, ... );
 
     A function version of the "Z" operator.
 
@@ -92,7 +115,7 @@ FUNCTIONS
 
  mesh
 
-       my @result = mesh( \@lhs, \@rhs );
+       my @result = mesh( \@lhs, \@rhs, ... );
 
     A function version of the "M" operator.
 
