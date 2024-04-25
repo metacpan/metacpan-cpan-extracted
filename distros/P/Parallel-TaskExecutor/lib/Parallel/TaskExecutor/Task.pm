@@ -6,12 +6,10 @@ use utf8;
 
 use English;
 use Hash::Util 'lock_keys';
-use Log::Log4perl;
+use Log::Any::Simple ':default';
 use POSIX ':sys_wait_h';
 
-our $VERSION = '0.02';
-
-my $log = Log::Log4perl->get_logger();
+our $VERSION = '0.03';
 
 =pod
 
@@ -60,7 +58,7 @@ sub new {
   # - catch_error: if false, a failed task will abort the parent.
   # - channel: may be set to read the data produced by the task
   # - data: will contain the data read from the channel.
-  my $this = bless {%data, log => $log, data => undef, error => undef}, $class;
+  my $this = bless {%data, data => undef, error => undef}, $class;
   lock_keys(%{$this});
   return $this;
 }
@@ -87,7 +85,7 @@ sub DESTROY {
   # the runner.
   if ($this->running()) {
     if ($this->{runner}) {
-      $this->{log}->trace("Deferring reaping of task $this->{task_id}");
+      trace("Deferring reaping of task $this->{task_id}");
       push @{$this->{runner}{zombies}}, $this;
       delete $this->{runner}{tasks}{$this};
     } else {
@@ -116,11 +114,11 @@ task started, then this method will return a false value.
 sub wait {  ## no critic (ProhibitBuiltinHomonyms)
   my ($this) = @_;
   return if $this->{state} eq 'done';
-  $this->{log}->trace("Starting blocking waitpid($this->{pid})");
+  trace("Starting blocking waitpid($this->{pid})");
   local ($ERRNO, $CHILD_ERROR) = (0, 0);
   my $ret = waitpid($this->{pid}, 0);
-  $this->{log}->logdie("No children with pid $this->{pid} for task $this->{task_id}") if $ret == -1;
-  $this->{log}->logdie(
+  fatal("No children with pid $this->{pid} for task $this->{task_id}") if $ret == -1;
+  fatal(
     "Incoherent PID returned by waitpid: actual $ret; expected $this->{pid} for task $this->{task_id}"
   ) if $ret != $this->{pid};
   $this->_process_done();
@@ -153,7 +151,7 @@ task started, then this method will die() with the child task error.
 
 sub data {
   my ($this) = @_;
-  $this->{log}->logcroak('Trying to read the data of a still running task') unless $this->done();
+  fatal('Trying to read the data of a still running task') unless $this->done();
   die $this->{error} if defined $this->{error};  ## no critic (RequireCarping)
                                                  # TODO: we should have a variant for undef wantarray that does not setup
                                                  # the whole pipe to get the return data.
@@ -220,7 +218,7 @@ sub get {
 sub _try_wait {
   my ($this) = @_;
   return if $this->{state} ne 'running';
-  $this->{log}->trace("Starting non blocking waitpid($this->{pid})");
+  trace("Starting non blocking waitpid($this->{pid})");
   local ($ERRNO, $CHILD_ERROR) = (0, 0);
   if ((my $pid = waitpid($this->{pid}, WNOHANG)) > 0) {
     $this->_process_done();
@@ -241,26 +239,26 @@ sub _process_done {
     } else {
       # Ideally, we should first wait for all child processes of all runners
       # before dying, to print the dying message last.
-      $Log::Log4perl::LOGEXIT_CODE = 2;
-      $this->{log}->logexit(
+      error(
         "Child process (pid == $this->{pid}, task_id == $this->{task_id}) failed (${CHILD_ERROR})");
+      exit 2;
     }
   } elsif ($this->{channel}) {
     local $INPUT_RECORD_SEPARATOR = undef;
     my $fh = $this->{channel};
     my $data = <$fh>;
-    close $fh or $this->{log}->logcluck("Cannot close task output channel: ${ERRNO}");
+    close $fh or warning("Cannot close task output channel: ${ERRNO}");
     {
       no strict;  ## no critic (ProhibitNoStrict)
       no warnings;  ## no critic (ProhibitNoWarnings)
       $this->{data} = eval $data;  ## no critic (ProhibitStringyEval)
     }
-    $this->{log}->logdie(
+    fatal(
       "Cannot parse the output of child task $this->{task_id} (pid == $this->{pid}): ${EVAL_ERROR}")
         if $EVAL_ERROR;
   }
-  $this->{log}->trace("Child pid == $this->{pid} returned (task id == $this->{task_id})");
-  $this->{log}->trace("  --> current tasks == $this->{runner}{current_tasks}") if $this->{runner};
+  trace("Child pid == $this->{pid} returned (task id == $this->{task_id})");
+  trace("  --> current tasks == $this->{runner}{current_tasks}") if $this->{runner};
   return;
 }
 

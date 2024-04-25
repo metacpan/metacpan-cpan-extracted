@@ -37,6 +37,8 @@ Acting as an active Asynchronous API package for L<Open Exchange Rates|https://o
 following its L<API docs|https://docs.openexchangerates.org> along with providing extra functionalities
 like pre-validation, local caching and respecting API update frequency depending on your C<APP_ID> subscription plan.
 
+For examples and more ways to use this package, please check Examples directory in L<package distribution page|https://metacpan.org/dist/Net-Async-OpenExchRates>
+
 =head1 CONSTRUCTOR
 
 =head2 new
@@ -418,16 +420,6 @@ To get list of current API usage response hash keys from L</usage> call.
    $exch->app_features_keys();
 
 To get list of available API features.
-
-=head1 INHERITED METHODS
-
-=over 4
-
-=item L<IO::Async::Notifier>
-
-L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure|IO::Async::Notifier/configure>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
-
-=back
 
 =head1 INHERITED METHODS
 

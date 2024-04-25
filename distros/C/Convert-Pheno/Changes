@@ -1,5 +1,15 @@
 Revision history for Perl distribution Convert-Pheno
 
+0.19 2024-0X-XXT00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Updated docs
+ - Updated how to obtain nproc for FreeBSD
+ - Moved t/{ohdsi,protobuff}.t to xt/
+ - Added experimental -ojsond (JSON-LD) (to be used with -i{bff|pxf}
+ - Extended Unicode support
+ - Separated Windows builds into a distinct workflow due to JSONLD dependency issues
+ - Dynamically load JSONLD module with require (if installed)
+
 0.18 2024-02-29T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Updated docs
@@ -12,7 +22,7 @@ Revision history for Perl distribution Convert-Pheno
  - Added info.convertPheno to individuals.json
  - Added project.version to mapping (schema|src|files)
  - Refactored CSV.pm and IO.pm to IO::CSVHandler and IO::FileIO
- - Implemented -o{csv,jsonf}(to be used with -i{bff|pxf}
+ - Implemented -o{csv,jsonf} (to be used with -i{bff|pxf}
 
 0.17 2024-02-03T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 

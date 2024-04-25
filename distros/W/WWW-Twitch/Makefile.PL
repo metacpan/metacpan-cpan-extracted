@@ -42,7 +42,7 @@ my %module = (
 
     MIN_PERL_VERSION => '5.020', # I use signatures
 
-    'LICENSE'=> 'perl',
+    'LICENSE'=> 'artistic_2',
 
     PL_FILES            => {},
     BUILD_REQUIRES => {
@@ -50,13 +50,17 @@ my %module = (
     },
 
     PREREQ_PM => {
-        'HTTP::Tiny'         => 0,
+        'experimental'       => '0.031',
+        'Future::HTTP'       => 0.17,
         'Text::Table'        => 0,
         'JSON'               => 0,
         'YAML'               => 0,
         'Getopt::Long'       => 0,
         'Pod::Usage'         => 0,
         'Moo'                => 2, # for some hashes-as-objects
+        'Future::AsyncAwait' => 0, # for convenience
+        'Future::Utils'      => 0,
+        'IO::Async'          => 0, # well, any kind of event loop does
     },
     TEST_REQUIRES => {
         'Test::More'   => 0,

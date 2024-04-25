@@ -335,11 +335,11 @@ C<http://www.qmail.org/man/man5/mbox.html>.
 
 =head1 AUTHOR
 
-20230510 raf <raf@raf.org>
+20240424 raf <raf@raf.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2007, 2023 raf <raf@raf.org>
+Copyright (C) 2005-2007, 2023-2024 raf <raf@raf.org>
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

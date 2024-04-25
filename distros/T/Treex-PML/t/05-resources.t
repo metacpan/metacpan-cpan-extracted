@@ -18,7 +18,7 @@ my $tdom = XML::LibXML->load_xml(location => $template);
 my ($href) = $tdom->findnodes('//@href[.="__REPLACE__"]');
 $href->setValue($abs);
 
-my $output = $template =~ s/xml$/out/r;
+(my $output = $template) =~ s/xml$/out/;
 my $instance = Treex::PML::Factory->createPMLInstance(
     {dom => $tdom,
      filename => $output,

@@ -14,6 +14,7 @@ lib/Convert/Pheno/IO/FileIO.pm
 lib/Convert/Pheno/Mapping.pm
 lib/Convert/Pheno/OMOP.pm
 lib/Convert/Pheno/PXF.pm
+lib/Convert/Pheno/RDF.pm
 lib/Convert/Pheno/REDCap.pm
 lib/Convert/Pheno/Schema.pm
 lib/Convert/Pheno/SQLite.pm
@@ -47,7 +48,6 @@ t/cdisc2pxf/out/pxf.json
 t/cli.t
 t/mapping.t
 t/module.t
-t/ohdsi.t
 t/omop2bff/in/CONCEPT.csv
 t/omop2bff/in/gz/CONCEPT.csv.gz
 t/omop2bff/in/gz/MEASUREMENT.csv.gz
@@ -83,5 +83,7 @@ t/redcap2pxf/out/pxf.json
 t/schema/malformed.json
 t/stream.t
 VERSION
+xt/ohdsi.t
+xt/protobuff.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

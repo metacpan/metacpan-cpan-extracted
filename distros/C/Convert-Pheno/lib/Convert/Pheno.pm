@@ -22,6 +22,7 @@ use Convert::Pheno::IO::FileIO;
 use Convert::Pheno::SQLite;
 use Convert::Pheno::Mapping;
 use Convert::Pheno::CSV qw(do_bff2csv do_pxf2csv);
+use Convert::Pheno::RDF qw(do_bff2jsonld do_pxf2jsonld);
 use Convert::Pheno::OMOP;
 use Convert::Pheno::PXF;
 use Convert::Pheno::BFF;
@@ -41,7 +42,7 @@ $SIG{__WARN__} = sub { warn "Warn: ", @_ };
 $SIG{__DIE__}  = sub { die "Error: ", @_ };
 
 # Global variables:
-our $VERSION   = '0.18';
+our $VERSION   = '0.19';
 our $share_dir = dist_dir('Convert-Pheno');
 
 ############################################
@@ -193,6 +194,18 @@ sub bff2jsonf {
     # <array_dispatcher> will deal with JSON arrays
     return array_dispatcher(shift);
 }
+##############
+##############
+# BFF2JSONLD #
+##############
+##############
+
+sub bff2jsonld {
+
+    # <array_dispatcher> will deal with JSON arrays
+    return array_dispatcher(shift);
+}
+
 
 ################
 ################
@@ -224,7 +237,7 @@ sub redcap2bff {
     $self->{convertPheno}      = get_info($self);
 
     # array_dispatcher will deal with JSON arrays
-    return array_dispatcher($self);
+    return $self->array_dispatcher;
 }
 
 ################
@@ -247,7 +260,7 @@ sub redcap2pxf {
     $self->{in_textfile} = 0;            # setter
 
     # Run second iteration
-    return array_dispatcher($self);
+    return $self->array_dispatcher;
 }
 
 ##############
@@ -445,7 +458,7 @@ sub omop2bff {
     # --no-stream
     else {
         # array_dispatcher will deal with JSON arrays
-        return array_dispatcher($self);
+        return $self->array_dispatcher;
     }
 }
 
@@ -479,7 +492,7 @@ sub omop2pxf {
         $self->{in_textfile} = 0;            # setter
 
         # Run second iteration
-        return array_dispatcher($self);
+        return $self->array_dispatcher;
 
         # CLI
     }
@@ -524,7 +537,7 @@ sub cdisc2bff {
     $self->{data_mapping_file} = $data_mapping_file;    # Dynamically adding attributes (setter)
 
     # array_dispatcher will deal with JSON arrays
-    return array_dispatcher($self);
+    return $self->array_dispatcher;
 }
 
 ###############
@@ -547,7 +560,7 @@ sub cdisc2pxf {
     $self->{in_textfile} = 0;            # setter
 
     # Run second iteration
-    return array_dispatcher($self);
+    return $self->array_dispatcher;
 }
 
 #############
@@ -586,6 +599,18 @@ sub pxf2jsonf {
     return array_dispatcher(shift);
 }
 
+##############
+##############
+# PXF2JSONLD #
+##############
+##############
+
+sub pxf2jsonld {
+
+    # <array_dispatcher> will deal with JSON arrays
+    return array_dispatcher(shift);
+}
+
 ######################
 ######################
 #  MISCELLANEA SUBS  #
@@ -598,7 +623,7 @@ sub array_dispatcher {
 
     # Load the input data as Perl data structure
     my $in_data =
-      ( $self->{in_textfile} && $self->{method} !~ m/^redcap2|^omop2|^cdisc2/ )
+      ( $self->{in_textfile} && $self->{method} !~ m/^(redcap2|omop2|cdisc2)/ )
       ? io_yaml_or_json( { filepath => $self->{in_file}, mode => 'read' } )
       : $self->{data};
 
@@ -610,9 +635,11 @@ sub array_dispatcher {
         bff2pxf    => \&do_bff2pxf,
         bff2csv    => \&do_bff2csv,
         bff2jsonf  => \&do_bff2csv,      # Not a typo, is the same as above
+        bff2jsonld => \&do_bff2jsonld,      
         pxf2bff    => \&do_pxf2bff,
         pxf2csv    => \&do_pxf2csv,
-        pxf2jsonf  => \&do_pxf2csv      # Not a typo, is the same as above
+        pxf2jsonf  => \&do_pxf2csv,     # Not a typo, is the same as above
+        pxf2jsonld => \&do_pxf2jsonld
     );
 
     # Open connection to SQLlite databases ONCE
@@ -708,13 +735,16 @@ sub omop_dispatcher {
 
     # omop2bff encode directly
     if ( $self->{method_ori} ne 'omop2pxf' ) {
-        $out = JSON::XS->new->utf8->canonical->pretty->encode($method_result);
+
+        # Watch out!! Don't double encode by using utf8 here. $fh is already utf-8!!!
+        #out = JSON::XS->new->utf8->canonical->pretty->encode($method_result);
+        $out = JSON::XS->new->canonical->pretty->encode($method_result);
     }
 
     # omop2pxf convert to PXF
     else {
         my $pxf = do_bff2pxf( $self, $method_result );
-        $out = JSON::XS->new->utf8->canonical->pretty->encode($pxf);
+        $out = JSON::XS->new->canonical->pretty->encode($pxf);
     }
     chomp $out;
     return \$out;

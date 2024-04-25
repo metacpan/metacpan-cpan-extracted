@@ -32,9 +32,10 @@ my %WriteMakefileArgs = (
     "Test::FailWarnings" => 0,
     "Test::Kwalitee" => 0,
     "Test::More" => 0,
+    "locale" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.001",
+  "VERSION" => "1.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,6 +54,7 @@ my %FallbackPrereqs = (
   "Test::FailWarnings" => 0,
   "Test::Kwalitee" => 0,
   "Test::More" => 0,
+  "locale" => 0,
   "strict" => 0,
   "utf8" => 0,
   "warnings" => 0

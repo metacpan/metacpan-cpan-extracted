@@ -44,6 +44,6 @@
          "web" : "https://github.com/FGasper/p5-Call-Context"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

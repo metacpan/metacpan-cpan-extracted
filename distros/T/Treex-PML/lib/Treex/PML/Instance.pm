@@ -75,7 +75,7 @@ $EXPORT_TAGS{'all'} = [ @{ $EXPORT_TAGS{'constants'} },
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(  );
-our $VERSION = '2.26'; # version template
+our $VERSION = '2.27'; # version template
 
 BEGIN {
 require Treex::PML::IO;

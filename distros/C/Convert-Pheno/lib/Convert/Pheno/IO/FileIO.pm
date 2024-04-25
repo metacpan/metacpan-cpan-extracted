@@ -7,7 +7,7 @@ use feature qw(say);
 use Path::Tiny;
 use File::Basename;
 use List::Util qw(any);
-use YAML::XS   qw(LoadFile DumpFile);
+use YAML::XS qw(LoadFile DumpFile);
 $YAML::XS::Boolean = 'JSON::PP';    # use JSON::PP::Boolean objects
 use JSON::XS;
 use Sort::Naturally qw(nsort);
@@ -42,8 +42,8 @@ sub io_yaml_or_json {
     my $mode = $arg->{mode};
     my $data = $mode eq 'write' ? $arg->{data} : undef;
 
-    # Checking only for qw(.yaml .yml .json)
-    my @exts = qw(.yaml .yml .json);
+    # Checking for the below extension
+    my @exts = qw(.yaml .yml .json .jsonld .ymlld .yamlld);
     my $msg  = qq(Can't recognize <$file> extension. Extensions allowed are: )
       . ( join ',', @exts ) . "\n";
     my ( undef, undef, $ext ) = fileparse( $file, @exts );
@@ -51,6 +51,7 @@ sub io_yaml_or_json {
 
     # To simplify return values, we create a hash
     $ext =~ tr/a.//d;    # Unify $ext (delete 'a' and '.')
+    $ext =~ s/ld$//;     # delete ending ld
     my $return = {
         read  => { json => \&read_json,  yml => \&read_yaml },
         write => { json => \&write_json, yml => \&write_yaml }
@@ -67,8 +68,8 @@ sub write_json {
     my $arg       = shift;
     my $file      = $arg->{filepath};
     my $json_data = $arg->{data};
-    my $json      = JSON::XS->new->utf8->canonical->pretty->encode($json_data);
-    path($file)->spew_utf8($json);
+    my $json      = JSON::XS->new->utf8->canonical->pretty->encode($json_data); # utf-8
+    path($file)->spew($json); # already need utf-8
     return 1;
 }
 

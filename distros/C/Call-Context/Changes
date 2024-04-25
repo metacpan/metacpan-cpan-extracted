@@ -1,5 +1,8 @@
 Revision history for Perl module Call::Context
 
+0.05 Wed Apr 24 2024
+    - Fix documentation. (Thank you, RSAVAGE!)
+
 0.04 Tue Apr 23 2024
     - (no code changes)
     - Switched to MIT license.

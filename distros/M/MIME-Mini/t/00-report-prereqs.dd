@@ -37,6 +37,7 @@ do { my $x = {
                                    'Test::FailWarnings' => '0',
                                    'Test::Kwalitee' => '0',
                                    'Test::More' => '0',
+                                   'locale' => '0',
                                    'utf8' => '0'
                                  }
                  }

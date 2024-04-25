@@ -2,7 +2,7 @@ package Locale::Babelfish;
 
 # ABSTRACT: Perl I18n using https://github.com/nodeca/babelfish format.
 
-our $VERSION = '2.12'; # VERSION
+our $VERSION = '2.13'; # VERSION
 
 
 use utf8;
@@ -361,42 +361,92 @@ sub _process_list_items {
 
     return sub {
         my $results = [];
+        my @params = @_;
 
         for my $item ( @compiled_items )  {
+            push @{ $results }, __get_compiled_value($item, @params);
+         }
+        return $results;
+
+        sub __get_compiled_value {
+            my ($item, @params) = @_;
+            my $result;            
+
             if ( ref( $item ) eq 'CODE' ) {
-                push @{ $results }, $item->(@_);
+                $result = $item->(@params);
             }
             # Нужно скомпилить значения в хэшрефе
             elsif ( ref( $item ) eq 'HASH' ) {
                 my $new_item = {};
                 while ( my ( $key, $value ) = each ( %$item ) ) {
                     if ( ref ($value) eq 'CODE' ) {
-                        $new_item->{$key}  = $value->(@_);
-                    } else {
+                        $new_item->{$key}  = $value->(@params);
+                    }
+                    elsif ( ref( $value ) eq 'HASH' ) {
+                        my $sub_item = {};
+                        foreach my $sub_key (keys %$value) {
+                            $sub_item->{$sub_key} = __get_compiled_value($value->{$sub_key}, @params );
+                        }
+                        $new_item->{$key} = $sub_item;
+                    }
+                    elsif ( ref( $value ) eq 'ARRAY' ) {
+                        my $sub_item = [];
+                        foreach my $sub_value (@$value) {
+                            push @$sub_item, __get_compiled_value($sub_value, @params );
+                        }
+                        $new_item->{$key} = $sub_item;
+                    }
+                    else {
                         $new_item->{$key} = $value;
                     }
                 }
-                push @{ $results }, $new_item;
+                $result = $new_item;
             }
             else {
-                push @{ $results }, $item;
+                $result =  $item;
             }
+        
+            return $result;
         }
 
         return $results;
     };
+
 }
 
 sub _process_nested_hash_item {
     my ( $hashref, $locale ) = @_;
 
     while ( my ( $key, $value ) = each ( %$hashref ) ) {
-        my $compiled_value = $compiler->compile( $parser->parse( $value, $locale ) );
+        my $compiled_value = _process_nested_item_value( $value, $locale );
         $hashref->{$key}   = $compiled_value;
     }
 
     return $hashref;
 }
+
+sub _process_nested_array_item {
+    my ( $arrayref, $locale ) = @_;
+    my $arrayref_out = [];
+
+    foreach my $value (@$arrayref )  {
+        my $compiled_value = _process_nested_item_value( $value, $locale );
+        push @$arrayref_out, $compiled_value;
+    }
+
+    return $arrayref_out;
+}
+
+sub _process_nested_item_value {
+    my ( $item_value, $locale ) = @_;
+   
+    my $compiled_value = ref $item_value eq 'HASH' ? _process_nested_hash_item( $item_value, $locale ) :
+        ref $item_value eq 'ARRAY' ? _process_nested_array_item( $item_value, $locale ) :
+        $compiler->compile( $parser->parse( $item_value, $locale ) );
+
+    return $compiled_value;
+}
+
 
 
 1;
@@ -413,7 +463,7 @@ Locale::Babelfish - Perl I18n using https://github.com/nodeca/babelfish format.
 
 =head1 VERSION
 
-version 2.12
+version 2.13
 
 =head1 DESCRIPTION
 
@@ -624,7 +674,7 @@ $params - хэш параметров
     _process_list_items( $dictionary_values);
 
 Обрабатывает ключи словарей содержащие списки, и оборачивает в функцию для компиляции списка.
-Поддерживаются вложенные в список плоские хэшрефы
+Поддерживаются вложенные структуры в виде hashref и arrayref
 
 =back
 

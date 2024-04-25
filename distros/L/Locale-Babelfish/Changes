@@ -1,6 +1,9 @@
 Revision history for Perl extension Locale::Babelfish.
 
-2.12    Fri Nov 10 07:37:12 2023 +0000
+2.13    Mon Mar 18 10:22:07 2024 +0000
+
+2.13 Thu Feb 01 12:55:00 2024 MSK
+    - Added support of nested lists and hashrefs
 
 2.12 
     - Fix caching issue with list processing

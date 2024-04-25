@@ -1,6 +1,6 @@
 .travis.yml
-data/rand.fastq.gz
-data/rand2.fastq.gz
+t/data/rand.fastq.gz
+t/data/rand2.fastq.gz
 lib/Bio/Kmer.pm
 LICENSE.md
 Makefile.PL

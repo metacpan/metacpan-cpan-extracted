@@ -30,6 +30,10 @@ DESCRIPTION
     functionalities like pre-validation, local caching and respecting API
     update frequency depending on your APP_ID subscription plan.
 
+    For examples and more ways to use this package, please check Examples
+    directory in package distribution page
+    <https://metacpan.org/dist/Net-Async-OpenExchRates>
+
 CONSTRUCTOR
 
  new
@@ -411,13 +415,4 @@ FIELD ACCESSORS
        $exch->app_features_keys();
 
     To get list of available API features.
-
-INHERITED METHODS
-
-    IO::Async::Notifier
-
-      add_child, adopt_future, adopted_futures, can_event, children,
-      configure, debug_printf, get_loop, invoke_error, invoke_event, loop,
-      make_event_cb, maybe_invoke_event, maybe_make_event_cb, new,
-      notifier_name, parent, remove_child, remove_from_parent
 

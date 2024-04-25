@@ -1,0 +1,56 @@
+###########################################################################
+   Math::Ryu enables stringification of perl's floating point NV values
+   such that:
+   1) the condition ("$nv" == $nv) is always true (except, of course, when
+      $nv is NaN);
+   2) the number of significant decimal digits used is the least possible
+      needed for condition 1) to be met.
+
+   It may not be immediately apparent, but neither perl's print() nor
+   printf() function will always satisfy both 1) and 2).
+
+   Example 1:
+   $ perl -le '$nv = 1 / 3; print "WTF" if "$nv" != $nv;'
+   WTF
+
+   The problem there is that perl has, in stringifying $nv, rounded it to
+   too few significant digits - thereby breaking the equivalence.
+
+   Perl can also present more siginificant digits than are needed. The
+   following example pertains to perls whose NV type is "double", though
+   the same sort of thing occurs with other NV types.
+
+   Example 2:
+   $ perl -le 'print 2 ** -1074;'
+   4.94065645841247e-324
+   $ perl -le 'print "OK" if "5e-324" == 2 ** -1074;'
+   OK
+
+   As we can see, perl presents us with a value of "4.94065645841247e-324",
+   though "5e-324" will suffice.
+
+   Math::Ryu's nv2s($nv) function returns a string that avoids both these
+   types of nonsense:
+
+   $ perl -MMath::Ryu=":all" -le 'print "OK" if nv2s(1 / 3) == 1 / 3;'
+   OK
+
+   $ perl -MMath::Ryu=":all" -le 'print nv2s(2 ** -1074);'
+   5e-324
+
+   This module uses the Ryu C implementation,  which is included with
+   this module's source (in the Ryu_Library/ryu folder). It is therefore
+   unnecessary to download that Ryu code - but, should you wish to grab
+   it, it's also available at:
+   https://github.com/ulfjack/ryu/tree/master/ryu
+
+   If `perl -V:nvtype` reports anything other than 'double', then the C
+   compiler that built perl (and which will build this module) must provide
+   the '__uint128_t' data type.
+   This generally means that, if you have a 32-bit build of perl, you won't
+   be able to build this module if 'nvtype' is other than 'double'.
+   (It is, of course, quite rare to have a 32-bit build of perl with an
+   'nvtype' that is not 'double'.)
+   There should , however, be no such problem with 64-bit builds - unless,
+   perhaps, you're using a particularly old 64-bit C toolset, or running
+   on a particularly uncooperative system.

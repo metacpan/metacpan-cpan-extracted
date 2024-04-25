@@ -3,7 +3,7 @@ package Net::DNS::SEC::Digest;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Digest.pm 1849 2021-08-19 08:25:20Z willem $)[2];
+our $VERSION = (qw$Id: Digest.pm 1971 2024-04-17 09:35:43Z willem $)[2];
 
 
 =head1 NAME
@@ -47,6 +47,8 @@ my %digest = (
 	SHA3_256 => sub { Net::DNS::SEC::libcrypto::EVP_sha3_256() },
 	SHA3_384 => sub { Net::DNS::SEC::libcrypto::EVP_sha3_384() },
 	SHA3_512 => sub { Net::DNS::SEC::libcrypto::EVP_sha3_512() },
+
+	SM3 => sub { Net::DNS::SEC::libcrypto::EVP_sm3() },
 	);
 
 
@@ -87,6 +89,9 @@ package Net::DNS::SEC::Digest::SHA;
 our @ISA = qw(Net::DNS::SEC::Digest);
 
 package Net::DNS::SEC::Digest::SHA3;
+our @ISA = qw(Net::DNS::SEC::Digest);
+
+package Net::DNS::SEC::Digest::SM3;
 our @ISA = qw(Net::DNS::SEC::Digest);
 
 

@@ -37,4 +37,4 @@ requires:
   perl: 5.8.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 5.503
+version: 5.515

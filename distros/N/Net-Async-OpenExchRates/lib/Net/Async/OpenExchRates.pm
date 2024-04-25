@@ -9,7 +9,7 @@ use Object::Pad 0.800;
 
 class Net::Async::OpenExchRates :isa(IO::Async::Notifier);
 
-our $VERSION = 0.001;
+our $VERSION = 0.003;
 
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
@@ -39,6 +39,8 @@ Made to communicate with I<OpenExchangeRates API> providing all its available en
 Acting as an active Asynchronous API package for L<Open Exchange Rates|https://openexchangerates.org/>
 following its L<API docs|https://docs.openexchangerates.org> along with providing extra functionalities
 like pre-validation, local caching and respecting API update frequency depending on your C<APP_ID> subscription plan.
+
+For examples and more ways to use this package, please check Examples directory in L<package distribution page|https://metacpan.org/dist/Net-Async-OpenExchRates>
 
 =head1 CONSTRUCTOR
 
@@ -165,8 +167,8 @@ field $_flatten_out_list = sub {
 field $_date_validation = sub {
     my $date = shift;
     my %date_validation;
-    @date_validation{qw(year month day)} = $date =~ /^([0-9]{4})-([1-9]|1[012]|0[1-9])-([1-9]|[12][0-9]|3[01]|0[1-9])$/;
-    Future::Exception->throw("Wrong date formate $date", 'DATE FORMAT', $date, %date_validation)
+    @date_validation{qw(year month day)} =  map { $_ + 0 } $date =~ /^([0-9]{4})-([1-9]|1[012]|0[1-9])-([1-9]|[12][0-9]|3[01]|0[1-9])$/;
+    Future::Exception->throw("Wrong date format $date", 'DATE FORMAT', $date, %date_validation)
         if grep { ! defined } values %date_validation;
     return %date_validation;
 };
@@ -176,9 +178,12 @@ field $_time_obj_from_date_str = sub{
         $date_str =~ m/^[a-zA-Z]{3},\s([1-9]|[12][0-9]|3[01]|0[1-9])\s([A-Za-z]{3})\s(\d{4})\s(\d{2}:\d{2}:\d{2}\s\w{3})/;
     my $date;
     try {
+        my @defined = grep { defined $_ } ($year, $month, $day, $time);
+        die if scalar(@defined) < 4;
         $date = Time::Moment->from_string(sprintf('%04d-%02d-%02d %s', $year, $_m_hash->{lc$month}, $day, $time), lenient => 1);
     } catch ($error) {
         $log->warnf('Unable to create time object from date string. %s %s', $date_str, $error);
+        $date = undef;
     }
     return $date;
 };
@@ -775,18 +780,6 @@ To get list of current API usage response hash keys from L</usage> call.
    $exch->app_features_keys();
 
 To get list of available API features.
-
-=cut
-
-=head1 INHERITED METHODS
-
-=over 4
-
-=item L<IO::Async::Notifier>
-
-L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure|IO::Async::Notifier/configure>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
-
-=back
 
 =cut
 

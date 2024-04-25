@@ -53,18 +53,17 @@
       },
       "runtime" : {
          "requires" : {
-            "Log::Log4perl" : "0",
+            "Log::Any::Simple" : "0",
             "Readonly" : "0",
             "perl" : "5.022"
          }
       },
       "test" : {
          "recommends" : {
+            "CPAN::Common::Index::Mux::Ordered" : "0",
             "Test::Pod" : "1.22"
          },
          "requires" : {
-            "CPAN::Common::Index::Mux::Ordered" : "0",
-            "Log::Log4perl::CommandLine" : "0",
             "Readonly" : "0",
             "Test2::IPC" : "0",
             "Test2::V0" : "0",
@@ -88,6 +87,6 @@
          "web" : "https://github.com/mkende/perl_parallel_task_executor"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

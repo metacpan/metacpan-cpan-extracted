@@ -1,6 +1,13 @@
 Revision history for Perl extension Devel::Size.
 
-0.83 2019-004-23 nicholas
+0.84 2023-04-25 nicholas
+ [no changes]
+
+0.83_50 2024-04-21 nicholas
+    patch from Slaven:
+  * CvOUTSIDE is again set on all cloned subs [CPAN #149902]
+
+0.83 2019-04-23 nicholas
  [no changes]
 
 0.82_51 2019-04-17 nicholas

@@ -50,7 +50,7 @@ SKIP:{
     my $tempdir=tempdir("biokmertest.XXXXXX",TMPDIR=>1,CLEANUP=>1);
 
     # Make the bioperl input file
-    gunzip (dirname($0)."/../data/rand.fastq.gz" => "$tempdir/bp.fastq") or die "ERROR: could not decompress rand.fastq.gz with gunzip: $!";
+    gunzip ($RealBin."/data/rand.fastq.gz" => "$tempdir/bp.fastq") or die "ERROR: could not decompress rand.fastq.gz with gunzip: $!";
     my $seqin=Bio::SeqIO->new(-file=>"$tempdir/bp.fastq");
     my $kmerBP=Bio::Kmer->new($seqin,{kmerlength=>8});
     my $histBP=$kmerBP->histogram();

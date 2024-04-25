@@ -3,6 +3,7 @@ Changes
 Makefile.PL
 MANIFEST
 math_ryu_include.h
+README
 Ryu.pm
 Ryu.pod
 Ryu.xs
@@ -14,6 +15,8 @@ t/1_basic.t
 t/d2s.t
 t/mpfr_cross_checks.t
 t/round_trip.t
+t/sprintf.t
+
 have_uint128_t.in
 
 benchmark/benchmark.p

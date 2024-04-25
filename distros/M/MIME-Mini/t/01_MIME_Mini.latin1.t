@@ -13,11 +13,14 @@ use Test::More;
 use Test::Deep;
 use Test::FailWarnings;
 
+use locale;
+setlocale(LC_TIME, 'C');
+
 plan tests => 16;
 
 sub rfc822date { strftime '%a, %d %b %Y %H:%M:%S +0000', gmtime shift }
-my $rfc822date_re = '\w+,\s{1,2}\d{1,2} \w+ \d{4} \d{2}:\d{2}:\d{2} [+-]\d{4}';
-my $mboxdate_re = '\w+ \w+\s{1,2}\d{1,2}\s{1,2}\d{1,2}:\d{2}:\d{2} \d{4}';
+my $rfc822date_re = '\S+,\s{1,2}\d{1,2} \S+ \d{4} \d{2}:\d{2}:\d{2} [+-]\d{4}';
+my $mboxdate_re = '\S+ \S+\s{1,2}\d{1,2}\s{1,2}\d{1,2}:\d{2}:\d{2} \d{4}';
 sub writefile { open my $fh, '>', $_[0] or return; print $fh $_[1]; close $fh; }
 sub readfile { local $/; open my $fh, '<', shift or return ''; return <$fh>; }
 my $boundary_re = '("[^"]+"|\S+)';
@@ -454,13 +457,11 @@ Date: $rfc822date_re
 MIME-Version: 1\.0
 Message-ID: <[^>]+>
 Content-Disposition: inline; filename=fname; size=1[67];
- creation-date=\"$rfc822date_re\";
- modification-date=\"$rfc822date_re\";
- read-date=\"$rfc822date_re\"
+ creation-date.+;\\s+modification-date.+;\\s+read-date.+
 
 This is a file.
 
-\$/",
+\$/m",
 		'newmail: headers and read file by name';
 	unlink 'fname';
 };

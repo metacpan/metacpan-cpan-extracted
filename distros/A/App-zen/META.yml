@@ -16,7 +16,7 @@ name: App-zen
 provides:
   App::zen:
     file: lib/App/zen.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   File::Basename: '0'
   File::Path: '0'
@@ -26,5 +26,5 @@ requires:
   JSON: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

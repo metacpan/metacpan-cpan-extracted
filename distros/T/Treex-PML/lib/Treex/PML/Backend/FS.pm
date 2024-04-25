@@ -13,7 +13,7 @@ use strict;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.26'; # version template
+  $VERSION='2.27'; # version template
 }
 use Treex::PML::IO qw(open_backend close_backend);
 use Treex::PML::Factory;

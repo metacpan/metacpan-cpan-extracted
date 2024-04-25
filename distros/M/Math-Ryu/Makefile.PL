@@ -3,8 +3,10 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Cwd;
 
-# We need to know whether the uint128_t type is available.
+# We need to know whether the __uint128_t type is available.
 my $defines = '';
+my $ccflags = $Config::Config{ccflags}; # Below, we will append '-std=c99' to the
+                                        # CCFLAGS, if we detect that it's necessary.
 
 my $mycc    = '';
 my $avoid_generic_128 = 0;
@@ -56,7 +58,12 @@ if($defines =~ /\-DCOMPILER/ && !$avoid_generic_128) {
     my $make = $Config::Config{make};
     my $cc = $Config::Config{cc};
     my @flags = ("CC=$cc");
-    push(@flags, "CFLAGS=-fPIC -std=c99") if $Config::Config{cccdlflags} =~ /\-fPIC/;
+    if($Config::Config{cccdlflags} =~ /\-fPIC/) {
+      push(@flags, "CFLAGS=-fPIC -std=c99");
+      $ccflags .= ' -std=c99' unless $ccflags =~ /\-std=c99/;
+    }
+    $ccflags .= '-KPIC' if $Config::Config{cccdlflags} =~ /\-KPIC/; # Might fix (?) solaris failure:
+                                                                    # https://www.cpantesters.org/cpan/report/7e6176b8-d7b0-11ee-ae74-376db46fd3dd
     system($make, @flags);
   }
 
@@ -70,6 +77,7 @@ my %options = (
   NAME => 'Math::Ryu',
   PREREQ_PM    => { 'Test::More' => '0.88', },
   DEFINE       => $defines,
+  CCFLAGS      => $ccflags,
   LICENSE      => 'perl',
   INC          => "-I${top_dir}/${lib_loc}",
   VERSION_FROM => 'Ryu.pm',

@@ -9,7 +9,7 @@ use English;
 use Exporter 'import';
 use Hash::Util 'lock_keys';
 use IO::Pipe;
-use Log::Log4perl;
+use Log::Any::Simple ':default';
 use Parallel::TaskExecutor::Task;
 use Readonly;
 use Scalar::Util 'weaken';
@@ -20,9 +20,7 @@ our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 our @CARP_NOT = 'Parallel::TaskExecutor::Task';
 
-our $VERSION = '0.02';
-
-my $log = Log::Log4perl->get_logger();
+our $VERSION = '0.03';
 
 =pod
 
@@ -48,12 +46,11 @@ receive the result of their processing. This is quite similar to
 L<Parallel::ForkManager> with a different OO approach, more centered on the task
 object that can be seen as a very lightweight promise.
 
-Note that this module uses L<Log::Log4perl> for its logging. If you don’t use
-use C<Log4perl> otherwise, you should include something like the following in
-the main script of your program:
+Note that this module uses L<Log::Any::Simple> for its logging. So you can use
+any L<Log::Any::Adapter> to consume its log. For example, put the following in
+your main application file:
 
-  use Log::Log4perl qw(:easy);
-  Log::Log4perl->easy_init($ERROR);
+  use Log::Any::Adapter ('Stderr');
 
 In addition, when testing a module that uses B<Parallel::TaskExecutor>, if
 you’re using L<Test2>, you should add the following line at the beginning of
@@ -95,7 +92,6 @@ sub new {
     zombies => [],  # Store all the non-done tasks whose other reference went out of scope.
     tasks => {},  # Stores all the non-done tasks, as a weak reference.
     pid => $PID,
-    log => $log,
   }, $class;
   lock_keys(%{$this});
   return $this;
@@ -152,9 +148,9 @@ sub _fork_and_run {
   my ($this, $sub, %options) = @_;
   my $miso = IO::Pipe->new();  # From the child to the parent.
   my $task_id = $task_count++;
-  $this->{log}->trace("Will fork for task ${task_id}");
+  trace("Will fork for task ${task_id}");
   my $pid = fork();
-  $this->{log}->logdie('Cannot fork a sub-process') unless defined $pid;
+  fatal('Cannot fork a sub-process') unless defined $pid;
   $this->{current_tasks}++ unless $options{untracked};
 
   if ($pid == 0) {
@@ -163,7 +159,7 @@ sub _fork_and_run {
     # and probably allow a better separation of the properties of the Task class
     # between those used by the executor or those used by the task.
     $miso->writer();
-    $this->{log}->trace("Starting child task (id == ${task_id}) in process ${PID}");
+    trace("Starting child task (id == ${task_id}) in process ${PID}");
 
     if (exists $options{SIG}) {
       while (my ($k, $v) = each %{$options{SIG}}) {
@@ -175,14 +171,13 @@ sub _fork_and_run {
     $miso->flush();
 
     my @out;
-    $this->{log}->trace("Starting user code in child task (id == ${task_id}) in process ${PID}");
+    trace("Starting user code in child task (id == ${task_id}) in process ${PID}");
     if ($options{scalar}) {
       @out = scalar($sub->());
     } else {
       @out = $sub->();
     }
-    $this->{log}
-        ->trace("Serializing task result in child task (id == ${task_id}) in process ${PID}");
+    trace("Serializing task result in child task (id == ${task_id}) in process ${PID}");
     my $serialized_out;
     {
       local $Data::Dumper::Indent = 0;
@@ -191,24 +186,21 @@ sub _fork_and_run {
       local $Data::Dumper::Varname = 'TASKEXECUTORVAR';
       $serialized_out = Dumper(\@out);
     }
-    $this->{log}->trace("Emitting task result in child task (id == ${task_id}) in process ${PID}");
+    trace("Emitting task result in child task (id == ${task_id}) in process ${PID}");
     my $size = length($serialized_out);
     my $max_size = $default_response_channel_buffer_size;
-    $this->{log}->warn(
-      sprintf(
-        "Data returned by process ${PID} for task ${task_id} is too large (%dB)", $size)
-    ) if $size > $max_size;
+    warning("Data returned by process ${PID} for task ${task_id} is too large (%dB)", $size)
+        if $size > $max_size;
     # Nothing will be read before the process terminate, so the data
     print $miso scalar($serialized_out);
-    $this->{log}->trace("Done sending result in child task (id == ${task_id}) in process ${PID}");
-    close $miso
-        or $this->{log}->logcluck("Can’t close writer side of child task miso channel: ${ERRNO}");
-    $this->{log}->trace("Exiting child task (id == ${task_id}) in process ${PID}");
+    trace("Done sending result in child task (id == ${task_id}) in process ${PID}");
+    close $miso or warning("Can’t close writer side of child task miso channel: ${ERRNO}");
+    trace("Exiting child task (id == ${task_id}) in process ${PID}");
     exit 0;
   }
 
   # Still in the parent task
-  $this->{log}->trace("Started child task (id == ${task_id}) with pid == ${pid}");
+  trace("Started child task (id == ${task_id}) with pid == ${pid}");
   $miso->reader();
   my $task = Parallel::TaskExecutor::Task->new(
     untracked => $options{untracked},
@@ -224,14 +216,14 @@ sub _fork_and_run {
   weaken($this->{tasks}{$task});
 
   my $ready = <$miso>;
-  $this->{log}->logcroak(
+  fatal(
     "Got unexpected data during ready check of child task (id == ${task_id}) with pid == ${pid}: $ready"
   ) unless $ready eq "ready\n";
 
   if ($options{wait}) {
-    $this->{log}->trace("Waiting for child $pid to exit (task id == ${task_id})");
+    trace("Waiting for child $pid to exit (task id == ${task_id})");
     $task->wait();
-    $this->{log}->trace("OK, child $pid exited (task id == ${task_id})");
+    trace("OK, child $pid exited (task id == ${task_id})");
   }
   return $task;
 }
@@ -346,7 +338,7 @@ sub wait {  ## no critic (ProhibitBuiltinHomonyms)
   my ($this) = @_;
   my $nb_children = $this->{current_tasks};
   return unless $nb_children;
-  $this->{log}->debug("Waiting for ${nb_children} running tasks...");
+  debug("Waiting for ${nb_children} running tasks...");
   while (my $c = shift @{$this->{zombies}}) {
     $c->wait();
   }

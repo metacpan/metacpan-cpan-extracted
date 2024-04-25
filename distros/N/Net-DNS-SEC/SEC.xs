@@ -1,5 +1,5 @@
 
-#define XS_Id "$Id: SEC.xs 1942 2023-11-07 13:30:39Z willem $"
+#define XS_Id "$Id: SEC.xs 1975 2024-04-22 14:41:36Z willem $"
 
 
 =head1 NAME
@@ -13,7 +13,7 @@ upon which the Net::DNS::SEC cryptographic components are built.
 
 =head1 COPYRIGHT
 
-Copyright (c)2018-2023 Dick Franks
+Copyright (c)2018-2024 Dick Franks
 
 All Rights Reserved
 
@@ -49,24 +49,18 @@ extern "C" {
 
 #include <openssl/opensslv.h>
 
-#ifndef OPENSSL_VERSION_NUMBER		/* 0xMMmmmmppL	adapt or die! */
-#define OPENSSL_RELEASE	\
-	( (OPENSSL_VERSION_MAJOR<<24) | (OPENSSL_VERSION_MINOR<<8) | OPENSSL_VERSION_PATCH | 0x0L )
+#ifdef OPENSSL_VERSION_NUMBER
+#define OPENSSL_RELEASE	( OPENSSL_VERSION_NUMBER>>4 )	/* 0xMMmm0000 */
 #else
-#define OPENSSL_RELEASE	(OPENSSL_VERSION_NUMBER>>4)
+#define OPENSSL_RELEASE	( OPENSSL_VERSION_MAJOR<<24 | OPENSSL_VERSION_MINOR<<16 )
 #endif
 
-#if (OPENSSL_RELEASE < 0x0F000000)
+#if (OPENSSL_RELEASE < 0x03000000)
 #define API_1_1_1
-#undef  OSSL_DEPRECATED
-#define OSSL_DEPRECATED(since)	extern
 #include <openssl/dsa.h>
 #include <openssl/ecdsa.h>
 #include <openssl/rsa.h>
-#endif
-
-#if !(OPENSSL_RELEASE < 0x03000000)
-#define API_3_0_0
+#else
 #include <openssl/core_names.h>
 #include <openssl/param_build.h>
 static OSSL_LIB_CTX *libctx = NULL;
@@ -98,6 +92,10 @@ static OSSL_LIB_CTX *libctx = NULL;
 #define NO_EdDSA
 #endif
 
+#ifdef OPENSSL_NO_SM3
+#define NO_SM3
+#endif
+
 
 #if (OPENSSL_RELEASE < 0x01000100)
 #error	ancient libcrypto version
@@ -105,11 +103,32 @@ static OSSL_LIB_CTX *libctx = NULL;
 #endif
 
 
+#if (OPENSSL_RELEASE < 0x03040000)
+#define EOL 20260409
+#endif
+
+#if (OPENSSL_RELEASE < 0x03030000)
+#undef  EOL
+#define EOL 20251123
+#endif
+
+#if (OPENSSL_RELEASE < 0x03020000)
+#undef  EOL
+#define EOL 20250314
+#endif
+
+#if (OPENSSL_RELEASE < 0x03010000)
+#undef  EOL
 #define EOL 20260907
+#endif
 
 #if (OPENSSL_RELEASE < 0x03000000)
 #undef  EOL
 #define EOL 20230911
+#define NO_SM3
+#ifndef NID_ED25519
+#define NO_EdDSA
+#endif
 #endif
 
 
@@ -150,8 +169,6 @@ int RSA_set0_factors(RSA *r, BIGNUM *p, BIGNUM *q)
 
 
 #if (OPENSSL_RELEASE < 0x01010100)
-#define NO_EdDSA
-#define NO_SHA3
 int EVP_DigestSign(EVP_MD_CTX *ctx,
 		unsigned char *sig, size_t *sig_len,
 		const unsigned char *data, size_t data_len)
@@ -171,21 +188,13 @@ int EVP_DigestVerify(EVP_MD_CTX *ctx,
 
 
 #ifdef OPENSSL_IS_BORINGSSL
-#undef EOL
-#ifndef NID_ED25519
-#define NO_EdDSA
-#endif
+#undef  EOL
 #define NO_DSA
-#define NO_SHA3
 #endif
 
 #ifdef LIBRESSL_VERSION_NUMBER
-#undef EOL
-#if (LIBRESSL_VERSION_NUMBER < 0x30702000)
-#define NO_EdDSA
-#endif
+#undef  EOL
 #define NO_DSA
-#define NO_SHA3
 #endif
 
 
@@ -200,7 +209,7 @@ void checkret(const int ret, int line)
 }
 
 
-#ifdef API_3_0_0
+#ifdef EVP_PKEY_PUBLIC_KEY
 int EVP_PKEY_fromparams(EVP_PKEY_CTX *ctx, EVP_PKEY **ppkey, int selection, OSSL_PARAM_BLD *bld)
 {
 	int retval;
@@ -236,7 +245,7 @@ VERSION(void)
 #endif
     CODE:
 #ifdef EOL
-	strftime( buf, sizeof buf, "%Y%m00", gmtime(&today) );
+	strftime( buf, sizeof buf, "%Y%m%d", gmtime(&today) );
 	txt = selecttxt( EOL, atoi(buf), "" );	/* get 100% coverage by calling this twice */
 	txt = selecttxt( atoi(buf), EOL, "	[UNSUPPORTED]" );
 	RETVAL = newSVpvf( "%s	%s%s", v-5, OPENSSL_VERSION_TEXT, txt );
@@ -333,18 +342,9 @@ const EVP_MD*
 EVP_sha512()
 
 
-#ifndef NO_SHA3
+#ifndef NO_SM3
 const EVP_MD*
-EVP_sha3_224()
-
-const EVP_MD*
-EVP_sha3_256()
-
-const EVP_MD*
-EVP_sha3_384()
-
-const EVP_MD*
-EVP_sha3_512()
+EVP_sm3()
 
 #endif
 
@@ -356,7 +356,7 @@ EVP_sha3_512()
 EVP_PKEY*
 EVP_PKEY_new_DSA(SV *p_SV, SV *q_SV, SV *g_SV, SV *y_SV, SV *x_SV=UNDEF )
     INIT:
-#ifndef API_3_0_0
+#ifdef API_1_1_1
 	DSA *dsa = DSA_new();
 #else
 	EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new_from_name( libctx, "DSA", NULL );
@@ -364,7 +364,7 @@ EVP_PKEY_new_DSA(SV *p_SV, SV *q_SV, SV *g_SV, SV *y_SV, SV *x_SV=UNDEF )
 	BIGNUM *p, *q, *g, *x, *y;
 #endif
     CODE:
-#ifndef API_3_0_0
+#ifdef API_1_1_1
 	RETVAL = EVP_PKEY_new();
 	checkerr( DSA_set0_pqg( dsa, SV2BN(p_SV), SV2BN(q_SV), SV2BN(g_SV) ) );
 	checkerr( DSA_set0_key( dsa, SV2BN(y_SV), SV2BN(x_SV) ) );
@@ -402,7 +402,7 @@ EVP_PKEY_new_DSA(SV *p_SV, SV *q_SV, SV *g_SV, SV *y_SV, SV *x_SV=UNDEF )
 EVP_PKEY*
 EVP_PKEY_new_RSA(SV *n_SV, SV *e_SV, SV *d_SV=UNDEF, SV *p1_SV=UNDEF, SV *p2_SV=UNDEF, SV *e1_SV=UNDEF, SV *e2_SV=UNDEF, SV *c_SV=UNDEF )
     INIT:
-#ifndef API_3_0_0
+#ifdef API_1_1_1
 	RSA *rsa = RSA_new();
 #else
 	EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new_from_name( libctx, "RSA", NULL );
@@ -410,7 +410,7 @@ EVP_PKEY_new_RSA(SV *n_SV, SV *e_SV, SV *d_SV=UNDEF, SV *p1_SV=UNDEF, SV *p2_SV=
 	BIGNUM *n, *e, *d, *p1, *p2, *e1, *e2, *c;
 #endif
     CODE:
-#ifndef API_3_0_0
+#ifdef API_1_1_1
 	RETVAL = EVP_PKEY_new();
 	checkerr( RSA_set0_factors( rsa, SV2BN(p1_SV), SV2BN(p2_SV) ) );
 	checkerr( RSA_set0_key( rsa, SV2BN(n_SV), SV2BN(e_SV), SV2BN(d_SV) ) );
@@ -422,11 +422,11 @@ EVP_PKEY_new_RSA(SV *n_SV, SV *e_SV, SV *d_SV=UNDEF, SV *p1_SV=UNDEF, SV *p2_SV=
 	checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_RSA_E, e=SV2BN(e_SV) ) );
 	if ( SvCUR(d_SV) > 0 ) {
 		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_RSA_D, d=SV2BN(d_SV) ) );
-		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_RSA_FACTOR, p1=SV2BN(p1_SV) ) );
-		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_RSA_FACTOR, p2=SV2BN(p2_SV) ) );
-		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_RSA_EXPONENT, e1=SV2BN(e1_SV) ) );
-		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_RSA_EXPONENT, e2=SV2BN(e2_SV) ) );
-		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_RSA_COEFFICIENT, c=SV2BN(c_SV) ) );
+		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_RSA_FACTOR1, p1=SV2BN(p1_SV) ) );
+		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_RSA_FACTOR2, p2=SV2BN(p2_SV) ) );
+		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_RSA_EXPONENT1, e1=SV2BN(e1_SV) ) );
+		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_RSA_EXPONENT2, e2=SV2BN(e2_SV) ) );
+		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_RSA_COEFFICIENT1, c=SV2BN(c_SV) ) );
 		checkerr( EVP_PKEY_fromparams( ctx, &RETVAL, EVP_PKEY_KEYPAIR, bld ) );
 		BN_free(d);
 		BN_free(p1);
@@ -457,12 +457,14 @@ EVP_PKEY_new_ECDSA(SV *curve, SV *qx_SV, SV *qy_SV=UNDEF )
     INIT:
 #ifdef API_1_1_1
 	EC_KEY *eckey = NULL;
+	BIGNUM *qx, *qy;
 #else
 	EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new_from_name( libctx, "EC", NULL );
 	OSSL_PARAM_BLD *bld = OSSL_PARAM_BLD_new();
+	SV *ksv = newSVpvn("\4",1);
+	BIGNUM *qx;
 #endif
 	char *name = SvPVX(curve);
-	BIGNUM *qx, *qy;
     CODE:
 #ifdef API_1_1_1
 	RETVAL = EVP_PKEY_new();
@@ -470,20 +472,21 @@ EVP_PKEY_new_ECDSA(SV *curve, SV *qx_SV, SV *qy_SV=UNDEF )
 	if ( strcmp(name,"P-384") == 0 ) eckey = EC_KEY_new_by_curve_name(NID_secp384r1);
 	if ( SvCUR(qy_SV) > 0 ) {
 		checkerr( EC_KEY_set_public_key_affine_coordinates( eckey, qx=SV2BN(qx_SV), qy=SV2BN(qy_SV) ) );
+		BN_free(qx);
 		BN_free(qy);
 	} else {
 		checkerr( EC_KEY_set_private_key( eckey, qx=SV2BN(qx_SV) ) );
+		BN_clear_free(qx);
 	}
 	checkerr( EVP_PKEY_assign( RETVAL, EVP_PKEY_EC, (char*)eckey ) );
 #else
 	RETVAL = NULL;
 	checkerr( OSSL_PARAM_BLD_push_utf8_string( bld, OSSL_PKEY_PARAM_GROUP_NAME, name, 0 ) );
 	if ( SvCUR(qy_SV) > 0 ) {
-		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_EC_PUB_X, qx=SV2BN(qx_SV) ) );
-		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_EC_PUB_Y, qy=SV2BN(qy_SV) ) );
+		sv_catpvn_nomg(ksv, SvPVX(qx_SV), SvCUR(qx_SV));
+		sv_catpvn_nomg(ksv, SvPVX(qy_SV), SvCUR(qy_SV));
+		checkerr( OSSL_PARAM_BLD_push_octet_string( bld, OSSL_PKEY_PARAM_PUB_KEY, SvPVX(ksv), SvCUR(ksv) ) );
 		checkerr( EVP_PKEY_fromparams( ctx, &RETVAL, EVP_PKEY_PUBLIC_KEY, bld ) );
-		BN_free(qx);
-		BN_free(qy);
 	} else {
 		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_PRIV_KEY, qx=SV2BN(qx_SV) ) );
 		checkerr( EVP_PKEY_fromparams( ctx, &RETVAL, EVP_PKEY_KEYPAIR, bld ) );
@@ -505,7 +508,7 @@ EVP_PKEY_new_ECDSA(SV *curve, SV *qx_SV, SV *qy_SV=UNDEF )
 EVP_PKEY*
 EVP_PKEY_new_EdDSA(SV *curve, SV *public, SV *private=NULL)
     INIT:
-#ifndef API_3_0_0
+#ifdef API_1_1_1
 	char *name = SvPVX(curve);
 	int nid = 0;
 #else
@@ -514,7 +517,7 @@ EVP_PKEY_new_EdDSA(SV *curve, SV *public, SV *private=NULL)
 #endif
     CODE:
 	RETVAL = NULL;
-#ifndef API_3_0_0
+#ifdef API_1_1_1
 	if ( strcmp(name,"ED25519") == 0 ) nid = NID_ED25519;
 #ifdef NID_ED448		/* not yet implemented in BoringSSL & LibreSSL */
 	if ( strcmp(name,"ED448") == 0 )   nid = NID_ED448;

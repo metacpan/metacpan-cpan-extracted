@@ -92,3 +92,12 @@ Internal method to fetch the stream playback access token
     my $tok = $twitch->live_stream( 'somechannel' );
 
 Internal method to fetch information about a stream on a channel
+
+## `->stream_status( $channel )`
+
+    my $status = $twitch->stream_status_f( 'somechannel', 'another_channel' );
+    for my $channel ($status->get) {
+        say $status->{channel}, $status->{status};
+    }
+
+Fetches the status of multiple channels

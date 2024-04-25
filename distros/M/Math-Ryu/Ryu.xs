@@ -29,10 +29,11 @@
 
 typedef struct floating_decimal_128 t_fd128;
 
-#if defined(COMPILER_HAS_UINT128_T) && !defined(AVOID_GENERIC_128)
+#if defined(COMPILER_HAS_UINT128_T) && !defined(AVOID_GENERIC_128) && MAX_DEC_DIG == 36
+/* To be called only by q2s(). Cannot be accessed directly from perl */
 struct floating_decimal_128 quad_to_fd128(NV d) {
   uint128_t bits = 0;
-  memcpy(&bits, &d, sizeof(NV));
+  memcpy(&bits, &d, 16);
   return generic_binary_to_decimal(bits, QUAD_MANTISSA_BITS, QUAD_EXPONENT_BITS, false);
 }
 #endif
@@ -93,12 +94,12 @@ SV * q2s(pTHX_ SV * nv) {
 #endif
 }
 
-int _SvIOK(SV * sv) {
+int ryu_SvIOK(SV * sv) {
     if(SvIOK(sv)) return 1;
     return 0;
 }
 
-int _SvNOK(SV * sv) {
+int ryu_SvNOK(SV * sv) {
     if(SvNOK(sv)) return 1;
     return 0;
 }
@@ -175,7 +176,7 @@ SV * fmtpy(pTHX_ SV * in) {
 
     if(exponent > 0 && exponent < MAX_DEC_DIG) {
       len = strlen(s);
-      zero_pad = exponent - (len - 2);
+      zero_pad = exponent - ((int)len - 2);
       if(zero_pad >= 0 && (zero_pad + len < MAX_DEC_DIG + 1)) {
         /* Return, eg, '1.23E15' as '1230000000000000.0' */
         if(is_neg) man_str[0] = '-';
@@ -241,7 +242,7 @@ SV * fmtpy(pTHX_ SV * in) {
       len = strlen(exp_str);
       if(exponent > 0) {
         man_str[i + 1 + is_neg] = '+';
-        dec = i + 2 + is_neg;
+        dec = (int)i + 2 + is_neg;
         for(i = 0; i < len; i ++) man_str[dec + i] = exp_str[i];
         man_str[dec + i] = '\0';
         outsv = newSVpv(man_str, 0);
@@ -251,7 +252,7 @@ SV * fmtpy(pTHX_ SV * in) {
         return outsv;
       }
       /* exponent < -4 */
-      dec = i + 1 + is_neg;
+      dec = (int)i + 1 + is_neg;
       if(len == 2) {
         man_str[dec] = '-';
         man_str[dec + 1] = '0';
@@ -275,9 +276,9 @@ SV * fmtpy(pTHX_ SV * in) {
      man_str[1 + is_neg] = '.';
      zero_pad = -exponent;
      zero_pad --;
-     for(i = 0; i < zero_pad; i++) man_str[i + 2 + is_neg] = '0';
+     for(i = 0; i < (size_t)zero_pad; i++) man_str[i + 2 + is_neg] = '0';
      man_str[i + 2 + is_neg] = s[0];
-     dec = i + 1 + is_neg;
+     dec = (int)i + 1 + is_neg;
      len = strlen(s);
      for(i = 2; i < len; i++) man_str[dec + i] = s[i];
      man_str[dec + i] = '\0';
@@ -290,8 +291,13 @@ SV * fmtpy(pTHX_ SV * in) {
   else {
     /*** NO DECIMAL POINT IN STRING ***/
     if(s[0] == 'I') {
-      if(is_neg) return newSVpv("-inf", 0);
-      else return newSVpv("inf", 0);
+      if(is_neg) {
+        s--;
+        return newSVpv("-inf", 0);
+      }
+      else {
+        return newSVpv("inf", 0);
+      }
     }
     if(s[0] == 'N') {
       if(is_neg) {
@@ -350,8 +356,8 @@ SV * fmtpy(pTHX_ SV * in) {
       exp_str[0 + is_neg] = s[0];
       exp_str[1 + is_neg] = 'e';
       exp_str[2 + is_neg] = '+';
-      for(dec = 2; dec < len; dec++) exp_str[dec + 1 + is_neg] = s[dec];
-      exp_str[dec + 1 + is_neg] = '\0';
+      for(i = 2; i < len; i++) exp_str[i + 1 + is_neg] = s[i];
+      exp_str[i + 1 + is_neg] = '\0';
       outsv = newSVpv(exp_str, 0);
       Safefree(exp_str);
       if(is_neg) s--;
@@ -374,6 +380,13 @@ SV * fmtpy(pTHX_ SV * in) {
     if(is_neg) s--;
     return outsv;
   }
+}
+
+SV * _from_NV(pTHX_ NV arg ) {
+  if(arg >= 0)  {
+    return newSVuv((UV)arg);
+  }
+  return newSViv((IV)arg);
 }
 
 
@@ -407,11 +420,11 @@ CODE:
 OUTPUT:  RETVAL
 
 int
-_SvIOK (sv)
+ryu_SvIOK (sv)
 	SV *	sv
 
 int
-_SvNOK (sv)
+ryu_SvNOK (sv)
 	SV *	sv
 
 int
@@ -440,3 +453,12 @@ fmtpy (in)
 CODE:
   RETVAL = fmtpy (aTHX_ in);
 OUTPUT:  RETVAL
+
+SV *
+_from_NV (arg)
+	NV	arg
+CODE:
+  RETVAL = _from_NV (aTHX_ arg);
+OUTPUT:  RETVAL
+
+

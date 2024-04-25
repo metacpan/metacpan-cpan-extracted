@@ -6,7 +6,7 @@ use warnings;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.26'; # version template
+  $VERSION='2.27'; # version template
 }
 use Carp;
 

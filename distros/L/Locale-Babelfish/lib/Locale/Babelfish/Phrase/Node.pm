@@ -8,7 +8,7 @@ use warnings;
 
 use parent qw( Class::Accessor::Fast );
 
-our $VERSION = '2.12'; # VERSION
+our $VERSION = '2.13'; # VERSION
 
 
 sub new {
@@ -39,7 +39,7 @@ Locale::Babelfish::Phrase::Node - Babelfish AST abstract node.
 
 =head1 VERSION
 
-version 2.12
+version 2.13
 
 =head1 METHODS
 

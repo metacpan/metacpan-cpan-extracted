@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use Carp;
 
-our $SVNVERSION = (qw$Id: SEC.pm 1943 2023-11-08 09:02:03Z willem $)[2];
+our $SVNVERSION = (qw$Id: SEC.pm 1976 2024-04-25 09:05:27Z willem $)[2];
 our $VERSION;
-$VERSION = '1.23';
+$VERSION = '1.24';
 
 use base qw(Exporter DynaLoader);
 
@@ -99,7 +99,7 @@ sub key_difference {
 
 ########################################
 
-foreach (qw(DS CDS RRSIG)) {
+foreach (qw(RRSIG DS CDS)) {
 	Net::DNS::RR->new( type => $_ );			# pre-load to access class methods
 }
 

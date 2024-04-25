@@ -1,0 +1,42 @@
+---
+abstract: 'A very thin wrapper around Log::Any, using a functional interface that dies automatically when you log above a given level.'
+author:
+  - 'Mathias Kende <mathias@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Readonly: '0'
+  Test2::V0: '0'
+  Test::CPANfile: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+  perl: v5.22.0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - Log::Any
+  - log
+  - functional
+  - carp
+  - die
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Any-Simple
+no_index:
+  directory:
+    - t
+    - inc
+    - local
+    - vendor
+    - t
+requires:
+  Log::Any: '0'
+  Readonly: '0'
+  perl: '5.022'
+resources:
+  bugtracker: https://github.com/mkende/perl_log_any_simple/issues
+  repository: https://github.com/mkende/perl_log_any_simple
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

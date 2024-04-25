@@ -3,45 +3,6 @@ package Math::Ryu;
 use warnings;
 use strict;
 use Config;
-BEGIN {
-  # In this BEGIN{} block we check for the presence of a
-  # perl bug that can set the POK flag when it should not.
-  use B qw(svref_2object);
-
-  if($] < 5.035010) {
-    my %flags;
-    {
-      no strict 'refs';
-      for my $flag (qw(
-        SVf_IOK
-        SVf_NOK
-        SVf_POK
-        SVp_IOK
-        SVp_NOK
-        SVp_POK
-                )) {
-        if (defined &{'B::'.$flag}) {
-          $flags{$flag} = &{'B::'.$flag};
-        }
-      }
-    }
-
-    my $test_nv = 1.3;
-    my $buggery = "$test_nv";
-    my $flags = B::svref_2object(\$test_nv)->FLAGS;
-    my $fstr = join ' ', sort grep $flags & $flags{$_}, keys %flags;
-
-    if($fstr =~ /SVf_POK/) {
-      $Math::Ryu::PV_NV_BUG = 1;
-    }
-    else {
-      $Math::Ryu::PV_NV_BUG = 0;
-    }
-  } # close if{} block
-  else {
-    $Math::Ryu::PV_NV_BUG = 0;
-  }
-};  # close BEGIN{} block
 
 BEGIN {
   if($Config{nvsize} == 8)               { $::max_dig = 17 }
@@ -52,25 +13,29 @@ BEGIN {
 
 };  # close BEGIN{} block
 
-use constant PV_NV_BUG   => $Math::Ryu::PV_NV_BUG;
 use constant IVSIZE      => $Config{ivsize};
 use constant MAX_DEC_DIG => $::max_dig; # set in second BEGIN{} block
+use constant RYU_MAX_INT => $Config{ivsize} == 4 ? 4294967295
+                                                 : 18446744073709551615;
+use constant RYU_MIN_INT => $Config{ivsize} == 4 ? -2147483648
+                                                 : -9223372036854775808;
 
 require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 DynaLoader::bootstrap Math::Ryu $VERSION;
 
 my @tagged = qw(
   d2s ld2s q2s nv2s
-  pn pnv sn snv
+  pn pnv pany sn snv sany
+  spanyf
   n2s
   s2d
   fmtpy fmtpy_pp
-  ryu_lln
+  ryu_lln ryu_SvIOK ryu_SvNOK
   );
 
 @Math::Ryu::EXPORT = ();
@@ -91,28 +56,28 @@ sub nv2s {
 
 sub n2s {
   my $arg = shift;
-  my $ref = ref($arg);
-  die "n2s() does not currently handle  \"$ref\" references"
-    if $ref;
-  return "$arg" if _SvIOK($arg);
-  if(PV_NV_BUG && _SvPOK($arg)) {
-    # perl might have set the POK flag when it should not
-    return nv2s($arg) if (_SvNOK($arg) && !_SvIOKp($arg));
+  die "The n2s() function does not accept ", ref($arg), " references"
+    if ref($arg);
+  if(!_SvPOK($arg)) {
+    return $arg if ryu_SvIOK($arg);
+    return _from_NV($arg) if _NV_fits_IV($arg);
   }
-  return nv2s($arg) if _SvNOK($arg);
+  return nv2s($arg) if ryu_SvNOK($arg);
+  # When this sub is called by pany() or sany(), it
+  # will have returned before reaching here.
   # $arg is neither integer nor float nor reference.
   # If the numified $arg fits into an IV, return the
   # stringification of that value.
   # Else, return nv2s($arg), which will coerce $arg
   # to an NV.
-  if(_SvIOK($arg + 0)) {
-    my $ret = $arg + 0;
-    return "$ret";
-  }
+  my $ret = $arg + 0;
+  return "$ret"     if ryu_SvIOK($ret);
+  #return nv2s($ret) if ryu_SvNOK($ret);
   return nv2s($arg);
 }
 
 sub fmtpy_pp {
+  # Pure perl rendition of the fmtpy function. Not exported.
   # The given argument will be either 'Infinity', '-Infinity', 'NaN'
   # or a finite value of the form "mantissaEexponent".
   # The mantissa portion will include a decimal point (with that decimal
@@ -190,9 +155,23 @@ sub s2d {
   die "s2d() is available only to perls whose NV is of type 'double'"
     unless MAX_DEC_DIG == 17;
   my $str = shift;
-  return $double_inf  if $str =~ /^(\s+|\+)?inf/i;
-  return -$double_inf if $str =~ /^(\s+)?\-inf/i;
+
+  die("Strings passed to s2d() must \"look like a number\"")
+    unless ryu_lln($str);
+  # For _s2d, we need to remove all leading and trailing whitespace.
+  # If $str contained internal whitespace, then s2d has already died.
+  $str =~ s/\s//g;
+
+  # _s2d doesn't handle inf/nan, so we attend to that first.
+  # However, if perl recognizes these strings as numeric, then it's
+  # not really necessary to assign them using s2d.
+  # And if perl does NOT recognize these strings as numeric, then s2d
+  # is simply going to croak.
+  # Anyway, here they are:
+  return $double_inf  if $str =~ /^\+?inf/i;
+  return -$double_inf if $str =~ /^\-inf/i;
   return $double_nan  if $str =~ /^(\-|\+)?nan/i;
+
   return _s2d($str);
 }
 
@@ -214,6 +193,59 @@ sub pnv {
 sub snv {
   my $nv = shift;
   print nv2s($nv), "\n";
+}
+
+sub pany { # "p"rint "any"
+  for my $arg (@_) {
+    if(ryu_lln($arg)) {
+      if(_SvPOK($arg) || ryu_SvIOK($arg)) { print $arg }
+      else {
+        # At this point we know that $arg looks like a number
+        # and neither its POK flag nor its NOK flag is set.
+        # It must be an NV.
+        if(_NV_fits_IV($arg)) { print _from_NV($arg) }
+        else { print nv2s($arg) }
+      }
+    }
+    else {
+      print $arg;
+    }
+  }
+}
+
+sub sany {
+  pany(@_);
+  print "\n";
+}
+
+sub spanyf {
+  # Returns the string that pany() would have
+  # printed, given the same argument(s).
+  my $ret = '';
+  for my $arg (@_) {
+    if(ryu_lln($arg)) {
+      if(_SvPOK($arg) || ryu_SvIOK($arg)) { $ret .= "$arg" }
+      else {
+        # At this point we know that $arg looks like a number
+        # and neither its POK flag nor its NOK flag is set.
+        # It must be an NV.
+        if(_NV_fits_IV($arg)) { $ret .= _from_NV($arg) }
+        else { $ret .= nv2s($arg) }
+      }
+    }
+    else {
+      $ret .= "$arg";
+    }
+  }
+  return $ret;
+}
+
+sub _NV_fits_IV {
+  # Called only when the argument is an NV
+  my $nv = shift;
+  return 0 if $nv != int($nv);
+  return 1 if ( $nv <= RYU_MAX_INT && $nv >= RYU_MIN_INT );
+  return 0;
 }
 
 1;

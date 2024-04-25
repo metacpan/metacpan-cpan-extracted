@@ -30,3 +30,144 @@ nested:
       username: 'Ivan Petrov \##{user_id}'
     -
       username: 'Sergey Ivanov \##{user_id}'
+
+  users_with_address:
+    -
+      name: 'Иван'
+      surname: 'Петров'
+      address:
+        country: 'Россия'
+        city: 'Москва'
+    -
+      name: 'Сергей'
+      surname: 'Иванov'
+      address:
+        country: 'РФ'
+        city: 'Санкт-Петербург'
+        
+  users_with_address_params:
+    -
+      name: 'Иван'
+      surname: 'Петров'
+      age: '#{age}'
+      address:
+        country: 'Россия'
+        city: 'Москва'
+        street: 'Тверская'
+        building: '#{building_num}'
+    -
+      name: 'Сергей'
+      surname: 'Иванov'
+      age: '#{age}'
+      address:
+        country: 'РФ'
+        city: 'Санкт-Петербург'
+        street: 'Садовая'
+        building: '#{building_num}'        
+
+  users_with_address_combine_params:
+    -
+      name: 'Иван'
+      surname: 'Петров'
+      address:
+        country: 'Россия'
+        city: 'Москва'
+        street: 'Тверская'
+        building: '#{building.first.num}'
+    -
+      name: 'Сергей'
+      surname: 'Иванov'
+      address:
+        country: 'РФ'
+        city: 'Санкт-Петербург'
+        street: 'Садовая'
+        building: '#{building.second.num}'
+
+  address_with_counted_buildings:
+    -
+      country: 'Россия'
+      city: 'Москва'
+      address:
+        street: 'Тверская'
+        building: 'На этой улице #{test} ((дом|дома|домов)):test ((пройден|пройдено|пройдено)):test'
+    -
+      country: 'РФ'
+      city: 'Санкт-Петербург'
+      address:
+        street: 'Садовая'
+        building: 'На этой улице #{test} ((дом|дома|домов)):test ((пройден|пройдено|пройдено)):test'
+        
+  users_with_children:
+  -
+    name: 'Иван'
+    surname: 'Петров'
+    children:
+      -
+        name: 'Кирилл'
+        age: 12
+      -
+        name: 'Ольга'
+        age: 8
+
+  users_with_children_params:
+  -
+    name: 'Иван'
+    surname: 'Петров'
+    role: '#{role}'
+    children:
+      -
+        name: 'Ольга'
+        age: 12
+        relative: '#{relative}'
+      -
+        name: 'Ирина'
+        age: 8
+        relative: '#{relative}'
+
+  users_with_children_combine_params:
+  -
+    name: 'Иван'
+    surname: 'Петров'
+    children:
+      -
+        name: 'Ольга'
+        age: '#{child.first.age}'
+      -
+        name: 'Ирина'
+        age: '#{child.second.age}'
+
+  users_with_children_class_params:
+  -
+    name: 'Иван'
+    surname: 'Петров'
+    children:
+      -
+        name: 'Ольга'
+        school: 'В школе окончила #{test} ((класс|класса|класса|класса|классов)):test, хорошистка'
+      -
+        name: 'Ирина'
+        school: 'В школе окончила #{test} ((класс|класса|класса|класса|классов)):test, отличница'
+
+  users_with_nested_level_params:
+  -
+    name: 'Иван'
+    surname: 'Петров'
+    children:
+      -
+        name: 'Ольга'
+        age: '#{age}'
+        hobby:
+        -
+          what: 'коньки'
+          experience:  '#{experience1}'
+        -
+          what: 'лыжи'
+          experience:  '#{experience2}'
+          coaches:
+          -
+            coach: 'Сидоров'
+            jobs:
+            -
+              place: '#{place1}'
+            -
+              place: '#{place2}'

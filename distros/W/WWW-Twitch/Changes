@@ -1,3 +1,9 @@
+0.03 2024-04-24
+    * More caching of Twitch data
+    * Allow downloading multiple Twitch streams in one invocation of scripts/twitch-record-live.pl
+    * Added a --dry-run option
+    * Now uses asynchronous HTTP integrating with other event loops
+
 0.02 2023-07-21
     * Support other output filename formats in duplicate detection
     * Better stale recording detection

@@ -12,7 +12,7 @@ Call::Context - Sanity-check calling context
 
     sub gives_a_list {
 
-        #Will die() if the context is not list.
+        # Will die() if the context is not list.
         Call::Context::must_be_list();
 
         return (1, 2, 3);
@@ -28,19 +28,19 @@ Call::Context - Sanity-check calling context
 
     sub scalar_is_bad {
 
-        #Will die() if the context is not list.
+        # Will die() if the context is scalar.
         Call::Context::must_not_be_scalar();
 
         return (1, 2, 3);
     }
 
-    scalar_is_bad();            # lives
+    scalar_is_bad();            # die()s: incorrect context (void)
 
     my $v = scalar_is_bad();    # die()s: incorrect context (scalar)
 
     my @list = scalar_is_bad(); # lives
 
-=head1 DISCUSSION
+=head1 DESCRIPTION
 
 If your function only expects to return a list, then a call in some other
 context is, by definition, an error. The problem is that, depending on how
@@ -78,7 +78,7 @@ This module is licensed under the MIT License.
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my $_OVERLOADED_X;
 

@@ -5,7 +5,7 @@
       "Olaf Kolkman"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -35,10 +35,10 @@
          "requires" : {
             "Carp" : "1.1",
             "DynaLoader" : "1.09",
-            "Exporter" : "5.56",
+            "Exporter" : "5.63",
             "File::Spec" : "3.29",
             "IO::File" : "1.14",
-            "MIME::Base64" : "2.13",
+            "MIME::Base64" : "3.07",
             "Net::DNS" : "1.08",
             "perl" : "5.008009"
          }
@@ -54,6 +54,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.23",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "1.24",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

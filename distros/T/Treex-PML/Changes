@@ -1,5 +1,8 @@
 Revision history for Treex-PML
 
+2.27    Wed Apr 24 13:03:14 CEST 2024
+        Make the tests 5.10 compatible.
+
 2.26    Tue Apr 23 17:31:17 CEST 2024
         Properly fix saving relative paths to resource files.
 

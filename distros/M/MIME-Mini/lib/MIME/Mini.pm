@@ -1,18 +1,18 @@
 # MIME::Mini - Minimal code to parse/create mbox files and mail messages
 #
-# Copyright (C) 2005-2007, 2023 raf <raf@raf.org>
+# Copyright (C) 2005-2007, 2023-2024 raf <raf@raf.org>
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
 #
-# 20230510 raf <raf@raf.org>
+# 20240424 raf <raf@raf.org>
 
 package MIME::Mini;
 use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 use Exporter;
 our @ISA = ('Exporter');

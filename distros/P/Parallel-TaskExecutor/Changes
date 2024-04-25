@@ -1,5 +1,9 @@
 Revision history for Perl distribution IPC-Perl
 
+0.03 - 2024-04-24
+
+ - Switch to using Log::Any::Simple instead of Log4perl directly.
+
 0.02 - 2024-04-14
 
  - Fix a deletion order bug

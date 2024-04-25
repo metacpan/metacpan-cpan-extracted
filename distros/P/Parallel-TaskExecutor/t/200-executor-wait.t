@@ -4,12 +4,9 @@ use utf8;
 
 use FindBin;
 use IO::Pipe;
-use Log::Log4perl::CommandLine ':all', ':loginit' => {layout => "[%p] %m (%c)%n" };
 use Parallel::TaskExecutor;
 use Test2::IPC;
 use Test2::V0;
-
-my $log = Log::Log4perl->get_logger();
 
 {
   my $e = Parallel::TaskExecutor->new();
@@ -19,11 +16,8 @@ my $log = Log::Log4perl->get_logger();
   {
     my $t = $e->run(sub {
       $mosi->reader();
-      $log->trace("zombie started");
       $mosi->read(my $buf, 1);
-      $log->trace("zombie unblocked");
       $mosi->close();
-      $log->trace("zombie done");
     });
   }
   $mosi->writer();

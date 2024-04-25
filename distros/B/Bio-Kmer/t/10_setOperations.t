@@ -17,9 +17,9 @@ subtest "pure perl kmer counting and databasing" => sub{
   }
   plan tests => 4;
 
-  my $kmer1=Bio::Kmer->new(dirname($0)."/../data/rand.fastq.gz",{kmerlength=>8});
-  my $kmer2=Bio::Kmer->new(dirname($0)."/../data/rand2.fastq.gz",{kmerlength=>8});
-  my $kmer3=Bio::Kmer->new(dirname($0)."/../data/rand2.fastq.gz",{kmerlength=>7});
+  my $kmer1=Bio::Kmer->new($RealBin."/data/rand.fastq.gz",{kmerlength=>8});
+  my $kmer2=Bio::Kmer->new($RealBin."/data/rand2.fastq.gz",{kmerlength=>8});
+  my $kmer3=Bio::Kmer->new($RealBin."/data/rand2.fastq.gz",{kmerlength=>7});
 
   my $subtraction = $kmer1->subtract($kmer2);
   note "Subtraction of kmers: ".scalar(@$subtraction);

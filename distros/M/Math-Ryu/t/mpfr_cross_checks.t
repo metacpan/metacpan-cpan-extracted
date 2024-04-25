@@ -128,21 +128,55 @@ if($mpfr) {
 
   my $nvprec = Math::Ryu::MAX_DEC_DIG - 2;
   my $nv = ('6' . ('0' x $nvprec) . '.0') + 0;
-  cmp_ok(nv2s($nv),  'eq', Math::MPFR::nvtoa($nv), "6e+${nvprec} ok");
+  cmp_ok(nv2s($nv),  'eq', Math::MPFR::nvtoa($nv), " 6e+${nvprec} ok");
   cmp_ok(nv2s(-$nv),  'eq', Math::MPFR::nvtoa(-$nv), "-6e+${nvprec} ok");
+  unlike(nv2s($nv),  qr/e/i, " 6e+${nvprec} is NOT expressed in scientific notation");
+  unlike(nv2s(-$nv), qr/e/i, "-6e+${nvprec} is NOT expressed in scientific notation");
 
   $nv = ('6125' . ('0' x ($nvprec - 3)) . '.0') + 0;
-  cmp_ok(nv2s($nv),  'eq', Math::MPFR::nvtoa($nv), "6.125e+${nvprec} ok");
+  cmp_ok(nv2s($nv),  'eq', Math::MPFR::nvtoa($nv), " 6.125e+${nvprec} ok");
   cmp_ok(nv2s(-$nv),  'eq', Math::MPFR::nvtoa(-$nv), "-6.125e+${nvprec} ok");
+  unlike(nv2s($nv),  qr/e/i, " 6.125e+${nvprec} is NOT expressed in scientific notation");
+  unlike(nv2s(-$nv), qr/e/i, "-6.125e+${nvprec} is NOT expressed in scientific notation");
 
-  $nvprec++;
+  $nvprec ++;
   $nv = ('6' . ('0' x $nvprec) . '.0') + 0;
-  cmp_ok(nv2s($nv),  'eq', Math::MPFR::nvtoa($nv), "6e+${nvprec}  ok");
+  cmp_ok(nv2s($nv),  'eq', Math::MPFR::nvtoa($nv), " 6e+${nvprec}  ok");
   cmp_ok(nv2s(-$nv),  'eq', Math::MPFR::nvtoa(-$nv), "-6e+${nvprec}  ok");
+  like(nv2s($nv),  qr/e/i, " 6e+${nvprec} IS expressed in scientific notation");
+  like(nv2s(-$nv), qr/e/i, "-6e+${nvprec} IS expressed in scientific notation");
 
   $nv = ('6125' . ('0' x ($nvprec - 3)) . '.0') + 0;
-  cmp_ok(nv2s($nv),  'eq', Math::MPFR::nvtoa($nv), "6.125e+${nvprec} ok");
+  cmp_ok(nv2s($nv),  'eq', Math::MPFR::nvtoa($nv), " 6.125e+${nvprec} ok");
   cmp_ok(nv2s(-$nv),  'eq', Math::MPFR::nvtoa(-$nv), "-6.125e+${nvprec} ok");
+  like(nv2s($nv),  qr/e/i, " 6.125e+${nvprec} IS expressed in scientific notation");
+  like(nv2s(-$nv), qr/e/i, "-6.125e+${nvprec} IS expressed in scientific notation");
+
+  $nvprec ++;
+  $nv = ('6' . ('0' x $nvprec) . '.0') + 0;
+  cmp_ok(nv2s($nv),  'eq', Math::MPFR::nvtoa($nv),  " 6e+${nvprec}  ok");
+  cmp_ok(nv2s(-$nv),  'eq', Math::MPFR::nvtoa(-$nv), "-6e+${nvprec}  ok");
+  like(nv2s($nv),  qr/e/i, " 6e+${nvprec} IS expressed in scientific notation");
+  like(nv2s(-$nv), qr/e/i, "-6e+${nvprec} IS expressed in scientific notation");
+
+  $nv = ('6125' . ('0' x ($nvprec - 3)) . '.0') + 0;
+  cmp_ok(nv2s($nv),  'eq', Math::MPFR::nvtoa($nv), " 6.125e+${nvprec} ok");
+  cmp_ok(nv2s(-$nv),  'eq', Math::MPFR::nvtoa(-$nv), "-6.125e+${nvprec} ok");
+  like(nv2s($nv),  qr/e/i, " 6.125e+${nvprec} IS expressed in scientific notation");
+  like(nv2s(-$nv), qr/e/i, "-6.125e+${nvprec} IS expressed in scientific notation");
+
+  $nvprec ++;
+  $nv = ('6' . ('0' x $nvprec) . '.0') + 0;
+  cmp_ok(nv2s($nv),  'eq', Math::MPFR::nvtoa($nv), " 6e+${nvprec}  ok");
+  cmp_ok(nv2s(-$nv),  'eq', Math::MPFR::nvtoa(-$nv), "-6e+${nvprec}  ok");
+  like(nv2s($nv),  qr/e/i, " 6e+${nvprec} IS expressed in scientific notation");
+  like(nv2s(-$nv), qr/e/i, "-6e+${nvprec} IS expressed in scientific notation");
+
+  $nv = ('6125' . ('0' x ($nvprec - 3)) . '.0') + 0;
+  cmp_ok(nv2s($nv),  'eq', Math::MPFR::nvtoa($nv), " 6.125e+${nvprec} ok");
+  cmp_ok(nv2s(-$nv),  'eq', Math::MPFR::nvtoa(-$nv), "-6.125e+${nvprec} ok");
+  like(nv2s($nv),  qr/e/i, " 6.125e+${nvprec} IS expressed in scientific notation");
+  like(nv2s(-$nv), qr/e/i, "-6.125e+${nvprec} IS expressed in scientific notation");
 
 }
 

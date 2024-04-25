@@ -1,3 +1,10 @@
+5.515	  2024-04-24  Dianne Skoll <dianne@skoll.ca>
+
+	* VERSION 5.514 RELEASED
+
+	* Fix the "version" setting in META.yml.  There are no other changes
+	  since 5.514.
+
 5.514	  2024-02-06  Dianne Skoll <dianne@skoll.ca>
 
 	* VERSION 5.514 RELEASED

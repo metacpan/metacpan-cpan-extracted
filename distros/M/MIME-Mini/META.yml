@@ -10,6 +10,7 @@ build_requires:
   Test::FailWarnings: '0'
   Test::Kwalitee: '0'
   Test::More: '0'
+  locale: '0'
   utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -31,7 +32,7 @@ no_index:
 provides:
   MIME::Mini:
     file: lib/MIME/Mini.pm
-    version: '1.001'
+    version: '1.002'
 requires:
   Encode: '0'
   Exporter: '0'
@@ -44,7 +45,7 @@ resources:
   bugtracker: https://github.com/rafmod/MIME-Mini/issues
   homepage: https://metacpan.org/dist/MIME-Mini
   repository: git://github.com/rafmod/MIME-Mini.git
-version: '1.001'
-x_generated_by_perl: v5.32.1
+version: '1.002'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

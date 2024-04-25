@@ -10,7 +10,7 @@ else { warn "\nCompiler HAS_UINT128: 0\n" }
 
 warn "MAX_DEC_DIG: ", Math::Ryu::MAX_DEC_DIG, "\n";
 
-cmp_ok($Math::Ryu::VERSION, 'eq', '1.02', "\$Math::Ryu::VERSION is as expected");
+cmp_ok($Math::Ryu::VERSION, 'eq', '1.03', "\$Math::Ryu::VERSION is as expected");
 
 cmp_ok(Math::Ryu::MAX_DEC_DIG, '!=', 0, "MAX_DEC_DIG is non-zero");
 
@@ -31,6 +31,19 @@ else {
   *NV2S = \&q2s;
   my $s = fmtpy(q2s(1.4 / 10));
   cmp_ok($s, 'eq', '0.13999999999999999999999999999999999', "fmtpy(q2s(1.4 / 10)) is as expected");
+}
+
+# It's not intended for nv2s() to take a string as its argument,
+# but let's keep an eye on the behaviour anyway:
+cmp_ok(nv2s('hello'), 'eq', '0.0', "nv2s('hello') returns 0.0");
+my $t = nv2s(1.4 / 10);
+$t .= 'mmm';
+
+if($] < 5.03 && $Config{nvtype} eq 'double' && 0.13999999999999999 == 0.14) {
+  warn "Skipping a test because this perl ($]) assigns the string '0.13999999999999999' incorrectly\n";
+}
+else {
+  cmp_ok(nv2s($t), 'eq', nv2s(1.4 / 10), "nv2s('$t') behaves ok");
 }
 
 cmp_ok(nv2s(6.0), 'eq', '6.0', "6.0 appears in expected format");

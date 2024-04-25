@@ -4,9 +4,9 @@
       "Max Maischein <corion@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -32,13 +32,17 @@
       },
       "runtime" : {
          "requires" : {
+            "Future::AsyncAwait" : "0",
+            "Future::HTTP" : "0.17",
+            "Future::Utils" : "0",
             "Getopt::Long" : "0",
-            "HTTP::Tiny" : "0",
+            "IO::Async" : "0",
             "JSON" : "0",
             "Moo" : "2",
             "Pod::Usage" : "0",
             "Text::Table" : "0",
             "YAML" : "0",
+            "experimental" : "0.031",
             "perl" : "5.020"
          }
       },
@@ -62,7 +66,7 @@
          "web" : "https://github.com/Corion/WWW-Twitch"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.11",
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

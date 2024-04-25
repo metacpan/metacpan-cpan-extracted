@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1926 2023-05-31 12:05:13Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1971 2024-04-17 09:35:43Z willem $	-*-perl-*-
 #
 
 use 5.008009;
@@ -38,10 +38,10 @@ my %metadata = (
 my %prerequisite = (
 	'Carp'	       => 1.10,
 	'DynaLoader'   => 1.09,
-	'Exporter'     => 5.56,
+	'Exporter'     => 5.63,
 	'File::Spec'   => 3.29,
 	'IO::File'     => 1.14,
-	'MIME::Base64' => 2.13,
+	'MIME::Base64' => 3.07,
 	'Net::DNS'     => 1.08,
 	);
 
@@ -170,16 +170,15 @@ sub postamble {
 	return <<"PlanA" if `gcov -v 2>$devnull`;
 test_cover :
 	cover -delete
-	HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) -W SEC.xs test CCFLAGS="$ccflags" OTHERLDFLAGS="$ldflags"
-	cover
+	\$(MAKE) -W SEC.xs CCFLAGS="$ccflags" OTHERLDFLAGS="$ldflags"
+	cover -test
 	\$(NOECHO) \$(TOUCH) SEC.c	# force XS rebuild before install
 PlanA
 
 	return <<'PlanB';
 test_cover :
 	cover -delete
-	HARNESS_PERL_SWITCHES=-MDevel::Cover $(MAKE) test
-	cover
+	cover -test
 PlanB
 }
 

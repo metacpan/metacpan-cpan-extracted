@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 20-digest.t 1863 2022-03-14 14:59:21Z willem $	-*-perl-*-
+# $Id: 20-digest.t 1971 2024-04-17 09:35:43Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -18,7 +18,7 @@ foreach my $package ( sort keys %prerequisite ) {
 plan skip_all => 'unable to access OpenSSL libcrypto library'
 		unless eval { Net::DNS::SEC::libcrypto->can('EVP_MD_CTX_new') };
 
-plan tests => 22;
+plan tests => 16;
 
 
 my $text = 'The quick brown fox jumps over the lazy dog';
@@ -34,6 +34,7 @@ my %digest = (
 	SHA3_256 => '69070dda01975c8c120c3aada1b282394e7f032fa9cf32f4cb2259a0897dfc04',
 	SHA3_384 => '7063465e08a93bce31cd89d2e3ca8f602498696e253592ed26f07bf7e703cf328581e1471a7ba7ab119b1a9ebdf8be41',
 	SHA3_512 => '01dedd5de4ef14642445ba5f5b97c15e47b9ad931326e4b0727cd94cefc44fff23f07bf543139939b49128caf436dc1bdee54fcb24023a08d9403f9b4bf0d450',
+	SM3	=> '5fdfe814b8573ca021983970fc79b2218c9570369b4859684e2e4c3fc76cb8ea',
 			);
 
 
@@ -65,10 +66,7 @@ test( 'SHA256', 'Net::DNS::SEC::Digest::SHA', 256 );
 test( 'SHA384', 'Net::DNS::SEC::Digest::SHA', 384 );
 test( 'SHA512', 'Net::DNS::SEC::Digest::SHA', 512 );
 
-test( 'SHA3_224', 'Net::DNS::SEC::Digest::SHA3', 224 );
-test( 'SHA3_256', 'Net::DNS::SEC::Digest::SHA3', 256 );
-test( 'SHA3_384', 'Net::DNS::SEC::Digest::SHA3', 384 );
-test( 'SHA3_512', 'Net::DNS::SEC::Digest::SHA3', 512 );
+test( 'SM3', 'Net::DNS::SEC::Digest::SM3' );
 
 exit;
 

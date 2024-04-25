@@ -38,7 +38,7 @@ my %query=(
 # Test JellyFish
 SKIP:{
   my $jellyfish = which("jellyfish");
-  if(! -e $jellyfish){
+  if(!defined($jellyfish) or ! -e $jellyfish){
     #diag "Jellyfish not found in PATH. Skipping.";
     skip("Jellyfish not found in PATH.", 15);
   }
@@ -46,7 +46,7 @@ SKIP:{
   my $jfVersion=`$jellyfish --version 2>/dev/null`; chomp($jfVersion);
   if($?){
     #diag "Jellyfish error and/or jellyfish version < 2. Skipping Jellyfish tests.";
-    skip("Jellyfish error and/or jellyfish version < 2.", 14);
+    skip("Jellyfish error and/or jellyfish version < 2.", 15);
   }
 
   # e.g., jellyfish 2.2.6
@@ -54,15 +54,15 @@ SKIP:{
     my $majorVersion=$2;
     if($majorVersion < 2){
       diag "Jellyfish v2 or greater is required for Jellyfish counting. Skipping Jellyfish tests.";
-      skip("Jellyfish test", 14);
+      skip("Jellyfish test", 15);
     }
   }
   if(!$jfVersion){
     diag "Jellyfish version was not found. Skipping Jellyfish tests.";
-    skip("Jellyfish test.", 14);
+    skip("Jellyfish test.", 15);
   }
 
-  my $kmerJf=Bio::Kmer->new(dirname($0)."/../data/rand.fastq.gz",{kmerlength=>8, kmercounter=>"jellyfish"});
+  my $kmerJf=Bio::Kmer->new($RealBin."/data/rand.fastq.gz",{kmerlength=>8, kmercounter=>"jellyfish"});
   my $histJf=$kmerJf->histogram();
   for(my $i=0;$i<@correctCounts;$i++){
     is $$histJf[$i], $correctCounts[$i], "Freq of $i checks out";

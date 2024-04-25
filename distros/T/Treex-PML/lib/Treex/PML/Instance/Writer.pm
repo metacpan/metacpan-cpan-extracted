@@ -9,7 +9,7 @@ use Data::Dumper;
 use UNIVERSAL::DOES;
 
 BEGIN {
-  our $VERSION = '2.26'; # version template
+  our $VERSION = '2.27'; # version template
 }
 use List::Util qw(first);
 use Treex::PML::Instance::Common qw(:diagnostics :constants);

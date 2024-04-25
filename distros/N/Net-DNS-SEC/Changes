@@ -1,6 +1,12 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.24 Apr 25, 2024
+
+	Eliminate deprecated RSA CRT parameter names.
+	Add support for SM3 digest.
+
+
 **** 1.23 Nov 8, 2023
 
 	Code refactoring of XS component.
@@ -680,4 +686,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1943 2023-11-08 09:02:03Z willem $
+$Id: Changes 1976 2024-04-25 09:05:27Z willem $

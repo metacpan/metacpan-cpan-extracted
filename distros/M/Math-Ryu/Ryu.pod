@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Math::Ryu - perl interface to Ryu (NV-to-string conversion).
+Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
 
 =head1 DEPENDENCIES
 
@@ -17,7 +17,7 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
    NVs of type 'double', '__float128' and 'long double' (but not
    DoubleDouble), are now supported, though the 'long double' and
    '__float128' support requires that the underlying C compiler
-   provides the uint128_t data type. This caveat probably rules out
+   provides the __uint128_t data type. This caveat probably rules out
    'long double' and '__float128' support on old 32-bit builds of perl,
    but not on the vast majority of modern 64-bit builds.
 
@@ -37,7 +37,7 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
    to provide the stringification. Then we will find that, except for
    NaN, the condition ( sprintf("%.17g", $nv) == $nv ) is always true.
    But this presents another problem in that "%.17g" formatting will
-   sometimes provide more sugnificant decimal digits than are needed.
+   sometimes provide more significant decimal digits than are needed.
    For example:
     printf("%.17g", 0.1); # prints '0.10000000000000001', even though
                           # the condition ("0.1" == 0.1) is also true.
@@ -79,18 +79,19 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
 =head1 FUNCTIONS
 
    $str = nv2s($nv);
-    $nv holds a perl floating point numeric value (NV). $str is a string in
-    floating point format, that accurately and succinctly represents the
-    value held by $nv. When $str is correctly assigned to a perl number,
-    that nnumber will be equivalent to $nv. Also, $str will contain as few
-    digits as possible, without compromising that accuracy.
+    Treats the argument as an NV, even if it's not.
+    You can check that the argument $nv is an NV by checking that the
+    condition (!ryu_SvPOK($nv) && ryu_SvNOK($nv)) is TRUE.
+    $str is a string in floating point format that accurately and
+    succinctly represents the value held by $nv. When $str is correctly
+    assigned to a perl number, that number will be equivalent to $nv.
+    Also, $str will contain as few digits as possible, without
+    compromising that accuracy.
     $str is formatted by fmtpy() - documented below. (The format is the
     same as provided by Python3's print() function for the same value.)
-    There is no need for the caller to know the type of NV (nvtype) that
+    There is no need for the caller to know the type (nvtype) of NV that
     $nv is - the nv2s() function handles that.
-    Arguments that are references will be rejected, causing the script to
-    die with an explanatory message. Other arguments that are not an NV
-    will be coerced to NV, following the usual rules that perl employs.
+
 
     Note: nv2s() spends some time reformatting the string that the ryu
           library returned. If you are happy enough with that original
@@ -102,6 +103,8 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
           and "without" reformatting.
 
    $str = n2s($sv);
+    Use this function if the argument is to be evaluated in numeric context.
+    Arguments that are perl references will throw an exception.
     Handles "integer", "floating point" and "string" values. If the
     argument is a floating point numeric value, then this function returns
     the same as nv2s(). Otherwise, it stringifies the numeric value of the
@@ -111,19 +114,7 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
     value of $sv considered in numeric context. For example
     n2s('hello world') would return '0.0', not 'hello world'.
 
-  pnv($nv); # mnemonic: "print nv2s($nv)"
-   prints nv2s($nv) to STDOUT.
-
-  snv($nv); # mnemonic: "say nv2s($nv)"
-   prints nv2s($nv)."\n" to STDOUT.
-
-  pn($arg); # mnemonic: "print n2s($arg)"
-   prints n2s($arg) to STDOUT.
-
-  sn($arg); # mnemonic: "say n2s($arg)"
-   prints n2s($arg)."\n" to STDOUT.
-
-  $str = d2s($nv);  # Use only when $Config{nvtype} is 'double'.
+ $str = d2s($nv);  # Use only when $Config{nvtype} is 'double'.
     Returns a decimal string representation of the value of $nv in the
     format 'mantissaEexponent' - eg '1E-1' (for 0.1) and
     '1.4142135623730951E0' (for square root of 2).
@@ -151,13 +142,77 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
    $bool = ryu_lln($sv);
    This is an interface to the API function 'looks_like_number'.
    Returns 1 if $sv looks like a number, else returns 0.
-   There's not really any reason to include this subroutine, but
+   There's not really any reason to export this subroutine, but
    it's there to use if it's ever helpful.
 
+   $bool = ryu_SvIOK($sv);
+   $bool = ryu_SvNOK($sv);
+    Return 1 if the IOK (respectively, NOK) flag of $sv is set.
+    Else return 0.
+
   $nv = s2d($str); # string to double
-   Available only to perls whose $Config{nvsize} is 8. Converts the
-   string ($str) to a double precision floating point value ($nv)
-   and returns it.
+   Available only to perls whose $Config{nvsize} is 8.
+   If ryu_lln($str) returns a false value, then the s2d() call
+   will die with an appropriate error message.
+   Otherwise, it returns an NV (double) of the specified value.
+   (This can be useful on pre-5.30.0 perls, where perl frequently
+   assigns values incorrectly.)
+
+
+=head1 PRINT FUNCTIONS
+
+  Just some shorthand ways of printing out values to STDOUT.
+
+  pnv($nv); # mnemonic: "print nv2s($nv)"
+  snv($nv); # mnemonic: "say nv2s($nv)"
+   (nv2s is documented above in "FUNCTIONS".)
+   prints nv2s($nv) to STDOUT
+   and respectively:
+   prints nv2s($nv)."\n" to STDOUT.
+
+  pn($sv); # mnemonic: "print n2s($sv)"
+  sn($sv); # mnemonic: "say n2s($sv)"
+   (n2s is documented above in "FUNCTIONS".)
+   prints n2s($sv) to STDOUT
+   and respectively:
+   prints n2s($sv)."\n" to STDOUT.
+
+  pany(@args); # "p"rint "any"
+  sany(@args); # "s"ay   "any"
+   Both functions print out $arg if the perl API function
+   looks_like_number($arg) returns true && either:
+     a) the POK flag is set;
+     or
+     b) the IOK flag is set.
+
+   If that looks_like_number($arg) returns true but both the POK and
+   IOK flags are unset, then $arg must be an NV.
+   If that NV fits into an IV, then cast it to an IV, and print out
+   that (IV) value. Else print out nv2s($arg).
+
+   For all other arguments (ie those for which looks_like_number($arg)
+   has returned false), we simply print($arg).
+
+   After sany() has printed the final arg, a terminating "\n" is printed.
+   Otherwise sany() and pany() are identical.
+   We should find that pany() and sany() produce  outputs aidentical to
+   print() - except for those NV values that perl would misrepresent.
+   The aim is that pany/sany alone will suffice, and there is no need
+   for the user to ever call perl's print()/say() functions if
+   Math::Ryu has been loaded.
+   Of course, if you really do want to print out an NV as stringified
+   by perl (as opposed to being stringified by nv2s) then you'll need
+   to use print/say, not pany()/sany().
+   Unlike "print" and "say", which are generally called without
+   bracketed args, "pany()" and "sany()" should be called with their
+   argument(s) enclosed in brackets.
+
+=head1 SPRINTF FUNCTION
+
+  $str = spanyf(@args); # No "format" arg - not *really* a "sprintf"
+   Return the string that pany(@args) would have printed.
+   Note that the arguments given to spanyf() should be enclosed in
+   brackets, just as with pany() and sany().
 
 =head1 LICENSE
 

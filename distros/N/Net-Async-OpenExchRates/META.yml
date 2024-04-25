@@ -10,8 +10,10 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Software::License::Perl_5: '0'
+  Test2::V0: '0'
+  Test::Async::HTTP: '0'
   Test::CheckDeps: '0.010'
-  Test::More: '0.98'
+  Test::More: '0.94'
   Test::NoTabs: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -32,7 +34,7 @@ no_index:
 provides:
   Net::Async::OpenExchRates:
     file: lib/Net/Async/OpenExchRates.pm
-    version: '0.001'
+    version: '0.003'
 requires:
   Cache::LRU: '0.04'
   Digest::MD5: '0'
@@ -53,7 +55,7 @@ resources:
   bugtracker: https://github.com/vnealv/Net-Async-OpenExchRates/issues
   homepage: https://github.com/vnealv/Net-Async-OpenExchRates
   repository: https://github.com/vnealv/Net-Async-OpenExchRates.git
-version: '0.001'
+version: '0.003'
 x_authority: cpan:VNEALV
 x_contributors:
   - 'vnealv <naelalolwani@gmail.com>'

@@ -98,7 +98,7 @@ sub closure_without_eval {
     return sub { require ""; $a };
 }
 
-if ($] > 5.017001) {
+if ($] > 5.017001 && "$]" < 5.039004) {
     # Again relying too much on the core's implementation, but while that holds,
     # this does test that CvOUTSIDE() is being followed.
     cmp_ok(total_size(closure_with_eval()), '>',

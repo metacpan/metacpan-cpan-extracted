@@ -42,11 +42,13 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Test2::V0" => 0,
+    "Test::Async::HTTP" => 0,
     "Test::CheckDeps" => "0.010",
-    "Test::More" => "0.98",
+    "Test::More" => "0.94",
     "Test::NoTabs" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,8 +76,10 @@ my %FallbackPrereqs = (
   "Software::License::Perl_5" => 0,
   "Syntax::Keyword::Dynamically" => "0.13",
   "Syntax::Keyword::Try" => "0.29",
+  "Test2::V0" => 0,
+  "Test::Async::HTTP" => 0,
   "Test::CheckDeps" => "0.010",
-  "Test::More" => "0.98",
+  "Test::More" => "0.94",
   "Test::NoTabs" => 0,
   "Time::Moment" => "0.44",
   "URI" => 0

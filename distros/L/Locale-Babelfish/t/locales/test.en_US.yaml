@@ -28,3 +28,144 @@ nested:
       username: 'Ivan Petrov \##{user_id}'
     -
       username: 'Sergey Ivanov \##{user_id}'
+
+  users_with_address:
+    -
+      name: 'Ivan'
+      surname: 'Petrov'
+      address:
+        country: 'Russia'
+        city: 'Moscow'
+    -
+      name: 'Sergey'
+      surname: 'Ivanov'
+      address:
+        country: 'RF'
+        city: 'Saint-Petersburg'
+
+  users_with_address_params:
+    -
+      name: 'Ivan'
+      surname: 'Petrov'
+      age: '#{age}'
+      address:
+        country: 'Russia'
+        city: 'Moscow'
+        street: 'Tverskaya'
+        building: '#{building_num}'
+    -
+      name: 'Sergey'
+      surname: 'Ivanov'
+      age: '#{age}'
+      address:
+        country: 'RF'
+        city: 'Saint-Petersburg'
+        street: 'Sadovaya'
+        building: '#{building_num}'
+
+  users_with_address_combine_params:
+    -
+      name: 'Ivan'
+      surname: 'Petrov'
+      address:
+        country: 'Russia'
+        city: 'Moscow'
+        street: 'Tverskaya'
+        building: '#{building.first.num}'
+    -
+      name: 'Sergey'
+      surname: 'Ivanov'
+      address:
+        country: 'RF'
+        city: 'Saint-Petersburg'
+        street: 'Sadovaya'
+        building: '#{building.second.num}'
+
+  address_with_counted_buildings:
+    -
+      country: 'Russia'
+      city: 'Moscow'
+      address:
+        street: 'Tverskaya'
+        building: 'On this street #{test} ((house|houses)):test ((has|have)):test been passed'
+    -
+      country: 'RF'
+      city: 'Saint-Petersburg'
+      address:
+        street: 'Sadovaya'
+        building: 'On this street #{test} ((house|houses)):test ((has|have)):test been passed'
+        
+  users_with_children:
+  -
+    name: 'Ivan'
+    surname: 'Petrov'
+    children:
+      -
+        name: 'Kirill'
+        age: 12
+      -
+        name: 'Olga'
+        age: 8
+
+  users_with_children_params:
+  -
+    name: 'Ivan'
+    surname: 'Petrov'
+    role: '#{role}'
+    children:
+      -
+        name: 'Olga'
+        age: 12
+        relative: '#{relative}'
+      -
+        name: 'Irina'
+        age: 8
+        relative: '#{relative}'
+
+  users_with_children_combine_params:
+  -
+    name: 'Ivan'
+    surname: 'Petrov'
+    children:
+      -
+        name: 'Olga'
+        age: '#{child.first.age}'
+      -
+        name: 'Irina'
+        age: '#{child.second.age}'
+
+  users_with_children_class_params:
+  -
+    name: 'Ivan'
+    surname: 'Petrov'
+    children:
+      -
+        name: 'Olga'
+        school: 'Finished #{test} ((class|classes)):test at school, is a good girl'
+      -
+        name: 'Irina'
+        school: 'Finished #{test} ((class|classes)):test at school, excellent student'
+
+  users_with_nested_level_params:
+  -
+    name: 'Ivan'
+    surname: 'Petrov'
+    children:
+      -
+        name: 'Olga'
+        age: '#{age}'
+        hobby:
+        -
+          what: 'skates'
+          experience:  '#{experience1}'
+        -
+          what: 'ski'
+          experience:  '#{experience2}'
+          coaches:
+          -
+            coach: 'Sidorov'
+            jobs:
+            -
+              place: '#{place1}'
+            -
+              place: '#{place2}'

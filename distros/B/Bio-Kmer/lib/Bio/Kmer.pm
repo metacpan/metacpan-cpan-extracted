@@ -5,7 +5,7 @@
 
 package Bio::Kmer;
 require 5.10.0;
-our $VERSION=0.41;
+our $VERSION=0.54;
 
 use strict;
 use warnings;
@@ -80,6 +80,9 @@ A module for helping with kmer analysis.
   my $kmerHash=$kmer->kmers();
   my $countOfCounts=$kmer->histogram();
 
+  my $minimizers = $kmer->minimizers();
+  my $minimizerCluster = $kmer->minimizerCluster();
+
 The BioPerl way
 
   use strict;
@@ -99,7 +102,12 @@ The BioPerl way
 
 A module for helping with kmer analysis. The basic methods help count kmers and can produce a count of counts.  Currently this module only supports fastq format.  Although this module can count kmers with pure perl, it is recommended to give the option for a different kmer counter such as Jellyfish.
 
-=pod
+=head1 DEPENDENCIES
+
+  * BioPerl
+  * Jellyfish >=2
+  * Perl threads
+  * Perl >=5.10
 
 =head1 VARIABLES
 
@@ -607,6 +615,85 @@ sub kmers{
 
 =over
 
+=item $kmer->minimizers(5)
+
+Finds minimizer of each kmer
+
+  Arguments: length of minimizer (default: 5)
+  returns: hash ref, e.g., $hash = {AAAAA=>AAA, TAGGGT=>AGG,...}
+
+=back
+
+=cut
+
+sub minimizers{
+  my($self, $l) = @_;
+
+  if($self->{minimizer}){
+    return $self->{minimizer};
+  }
+
+  $l //= 5;
+  $$self{l} = $l;
+
+  my %minimizer;
+
+  my $numLmersPerKmer = $$self{kmerlength}-$l+1;
+
+  for my $kmer(keys(%{ $self->kmers})){
+    # Start findig the minimizer by seeding it with the first l-mer
+    my $minimizer = substr($kmer, 0, $l);
+    for(my $i=1; $i<$numLmersPerKmer; $i++){
+      my $candidate = substr($kmer, $i, $l);
+      if($candidate lt $minimizer){
+        $minimizer = $candidate;
+      }
+    }
+    $minimizer{$kmer} = $minimizer;
+  }
+
+  $self->{minimizer} = \%minimizer;
+
+  return \%minimizer;
+}
+
+=pod
+
+=over
+
+=item $kmer->minimizerCluster(5)
+
+Finds minimizer of each kmer
+
+  Arguments: length of minimizer (default: 5). 
+    Internally, calls $kmer->minimizer($l) 
+    If $kmer->minimizer has already been called, this parameter will be ignored.
+  returns: hash ref, e.g., $hash = {AAA=>[TAAAT, AAAGG,...], ATT=>[GATTC,...]}}
+
+=back
+
+=cut
+
+sub minimizerCluster{
+  my($self, $l) = @_;
+  if($$self{l}){
+    $l = $$self{l};
+  }
+
+  my %cluster;
+
+  my $minimizer = $self->minimizers($l);
+
+  for my $kmer(keys(%$minimizer)){
+    push(@{ $cluster{$$minimizer{$kmer}} }, $kmer);
+  }
+  return \%cluster;
+}
+
+=pod
+
+=over
+
 =item $kmer->union($kmer2)
 
 Finds the union between two sets of kmers
@@ -863,8 +950,6 @@ Author: Lee Katz <lkatz@cdc.gov>
 For additional help, go to https://github.com/lskatz/Bio--Kmer
 
 CPAN module at http://search.cpan.org/~lskatz/Bio-Kmer/
-
-=for html <a href="https://travis-ci.org/lskatz/Bio--Kmer"><img src="https://travis-ci.org/lskatz/Bio--Kmer.svg?branch=master"></a>
 
 =cut
 

@@ -12,6 +12,9 @@ SYNOPSIS
       my $kmerHash=$kmer->kmers();
       my $countOfCounts=$kmer->histogram();
 
+      my $minimizers = $kmer->minimizers();
+      my $minimizerCluster = $kmer->minimizerCluster();
+
     The BioPerl way
 
       use strict;
@@ -33,6 +36,12 @@ DESCRIPTION
     supports fastq format. Although this module can count kmers with pure
     perl, it is recommended to give the option for a different kmer counter
     such as Jellyfish.
+
+DEPENDENCIES
+      * BioPerl
+      * Jellyfish >=2
+      * Perl threads
+      * Perl >=5.10
 
 VARIABLES
     $Bio::Kmer::iThreads
@@ -113,6 +122,20 @@ METHODS
 
           Arguments: None
           Returns:   Reference to a hash of kmers and their counts
+
+    $kmer->minimizers(5)
+        Finds minimizer of each kmer
+
+          Arguments: length of minimizer (default: 5)
+          returns: hash ref, e.g., $hash = {AAAAA=>AAA, TAGGGT=>AGG,...}
+
+    $kmer->minimizerCluster(5)
+        Finds minimizer of each kmer
+
+          Arguments: length of minimizer (default: 5). 
+            Internally, calls $kmer->minimizer($l) 
+            If $kmer->minimizer has already been called, this parameter will be ignored.
+          returns: hash ref, e.g., $hash = {AAA=>[TAAAT, AAAGG,...], ATT=>[GATTC,...]}}
 
     $kmer->union($kmer2)
         Finds the union between two sets of kmers

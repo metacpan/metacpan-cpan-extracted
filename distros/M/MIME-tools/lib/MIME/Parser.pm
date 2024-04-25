@@ -153,7 +153,7 @@ use MIME::Parser::Results;
 #------------------------------
 
 ### The package version, both in 1.23 style *and* usable by MakeMaker:
-$VERSION = "5.514";
+$VERSION = "5.515";
 
 ### How to catenate:
 $CAT = '/bin/cat';

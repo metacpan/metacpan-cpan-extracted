@@ -47,8 +47,7 @@ my @files = (
     't/locales/sub/test.en_US.yaml',
     't/locales/sub/test.ru_RU.yaml',
     't/locales/test.en_US.yaml',
-    't/locales/test.ru_RU.yaml',
-    't/t.pl'
+    't/locales/test.ru_RU.yaml'
 );
 
 notabs_ok($_) foreach @files;

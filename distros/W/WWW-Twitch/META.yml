@@ -8,8 +8,8 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -19,18 +19,22 @@ no_index:
     - t
     - inc
 requires:
+  Future::AsyncAwait: '0'
+  Future::HTTP: '0.17'
+  Future::Utils: '0'
   Getopt::Long: '0'
-  HTTP::Tiny: '0'
+  IO::Async: '0'
   JSON: '0'
   Moo: '2'
   Pod::Usage: '0'
   Text::Table: '0'
   YAML: '0'
+  experimental: '0.031'
   perl: '5.020'
 resources:
   bugtracker: https://github.com/Corion/WWW-Twitch/issues
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/WWW-Twitch.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1
