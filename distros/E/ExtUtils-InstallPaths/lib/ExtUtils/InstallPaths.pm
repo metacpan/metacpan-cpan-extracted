@@ -1,5 +1,5 @@
 package ExtUtils::InstallPaths;
-$ExtUtils::InstallPaths::VERSION = '0.012';
+$ExtUtils::InstallPaths::VERSION = '0.013';
 use 5.006;
 use strict;
 use warnings;
@@ -342,7 +342,7 @@ sub install_map {
 
 	my (%map, @skipping);
 	foreach my $type (keys %localdir_for) {
-		next if not -e $localdir_for{$type};
+		next if not $self->is_default_installable($type);
 		if (my $dest = $self->install_destination($type)) {
 			$map{$localdir_for{$type}} = $dest;
 		} else {
@@ -404,7 +404,7 @@ ExtUtils::InstallPaths - Build.PL install path logic made easy
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

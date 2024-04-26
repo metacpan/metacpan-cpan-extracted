@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMemXS.pm
-## Version v0.2.0
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 1970/01/01
-## Modified 2023/09/05
+## Modified 2024/04/26
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -109,7 +109,7 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -369,10 +369,11 @@ sub lock
     {
         $self->locked( $type );
     }
-    else
-    {
-        return( $self->error( "Failed to set a lock on semaphore id \"$semid\" for lock type $type: $!" ) );
-    }
+    # else
+    # {
+    #     # $self->message( 3, "Unable to set a lock on semaphore id \"$semid\": $!" );
+    #     return( $self->error( "Failed to set a lock on semaphore id \"$semid\" for lock type $type: $!" ) );
+    # }
     return( $self );
 }
 
@@ -918,10 +919,12 @@ sub unlock
         return( $self->error( "No IPC::Semaphore object set. Have you opened the shared memory?" ) );
     my $type = ( $self->locked | LOCK_UN );
     $type ^= LOCK_NB if( $type & LOCK_NB );
-    if( defined( $self->op( @{$SEMOP_ARGS->{ $type }} ) ) )
-    {
-        $self->locked(0);
-    }
+    # if( defined( $self->op( @{$SEMOP_ARGS->{ $type }} ) ) )
+    # {
+    #     $self->locked(0);
+    # }
+    $self->op( @{$SEMOP_ARGS->{ $type }} );
+    $self->locked(0);
     return( $self );
 }
 
@@ -1425,7 +1428,7 @@ Module::Generic::SharedMemXS - Shared Memory Manipulation with XS API
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

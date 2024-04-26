@@ -178,7 +178,7 @@ The C<switch> statement is a conditional statement with the following syntax.
     }
   }
 
-The L<integer promotional conversion|SPVM::Document::Language::Types/"Integer Promotional Conversion"> is performed on the condition I<CONDITION>.
+The L<integer promotional conversion|SPVM::Document::Language::Operators/"Integer Promotional Conversion"> is performed on the condition I<CONDITION>.
 
 The operand of the case statement I<CASEn> must be a L<character literal|SPVM::Document::Language::Tokenization/"Character Literal">, an L<integer literal|SPVM::Document::Language::Tokenization/"Integer Literals"> and an L<inline-expaned class method call to get an enumeration value|SPVM::Document::Language::Class/"Inline Expansion of Method Call to Get an Enuemration Value">.
 
@@ -299,7 +299,7 @@ The C<default> statement specifies a default case in the L<switch statement|/"sw
 
 =head4 break Statement
 
-The C<break> statement makes the program jump to the end of the L<switch||/"switch Statement"> block.
+The C<break> statement makes the program jump to the end of the L<switch|/"switch Statement"> block.
 
   # The break statement
   break;
@@ -509,7 +509,7 @@ If I<OPERAND_MESSAGE> is not given or C<undef>, I<OPERAND_MESSAGE> is set to C<"
 
 I<ERROR_CLASS> is a class name, normally of the L<Error|SPVM::Error> class, or its child class. If the exception thrown by the C<die> statement is catched, the L<eval_error_id|SPVM::Document::Language::Operators/"eval_error_id Operator"> is set to the basic type ID of I<ERROR_CLASS>.
 
-The L<integer promotional conversion|SPVM::Document::Language::Types/"Integer Promotional Conversion"> is performed on I<OPERAND_ERROR_ID>.
+The L<integer promotional conversion|SPVM::Document::Language::Operators/"Integer Promotional Conversion"> is performed on I<OPERAND_ERROR_ID>.
 
 I<OPERAND_ERROR_ID> is an integer value within int type. If it is given and the exception thrown by the C<die> statement is catched, the L<eval_error_id|SPVM::Document::Language::Operators/"eval_error_id Operator"> is set to I<OPERAND_ERROR_ID>.
 
@@ -565,37 +565,35 @@ The empty statement operates nothing.
 
 =head2 require Statement
 
-If the C<require> statement that loads a class only if it exists in the class path, and if it does not exist, the block does not exist.
+The C<require> statement loads a class only if it is found.
 
-It was designed to implement a part of features of "#ifdef" in the C language.
-
-  if (require Foo) {
-  
+  if (require BASIC_TYPE) {
+    
   }
-
-if C<require> Statement can be followed by else Statement. 
-
-  if (require Foo) {
   
+  if (require BASIC_TYPE) {
+    
   }
   else {
-  
+    
   }
 
-Note that elsif Statement cannot be followed.
+This statement searches for the type I<BASIC_TYPE> in L<class search directories|SPVM::Document::Language::Class/"Class Search Directories"> from the beginning, and if found, it loads I<BASIC_TYPE> at compilation time.
 
-Let's look at an example. if Foo does not exist, no a compilation error occurs and it is assumed that there is no if block
+If I<BASIC_TYPE> is found, the C<if> block is converted to a L<simple block|SPVM::Document::Language::Class/"Simple Block"> and the C<else> block(if it eixsts) is removed at compilation time.
 
-Therefore, "$foo = new Foo;" does not result in a compilation error because it is assumed that there is no if block.
+If I<BASIC_TYPE> is not found, a compilation error does not occur.
 
-In the other hand, the else block exists, so a warning is issued.
+If I<BASIC_TYPE> is not found, the C<else> block (if it eixstgs) is converted to a L<simple block|SPVM::Document::Language::Class/"Simple Block"> and the C<if> block is removed at compilation time.
+
+Examples:
 
   my $foo : object;
-  if (require Foo) {
-    $foo = new Foo;
+  if (require MyClass) {
+    $foo = new MyClass;
   }
   else {
-    warn "Warning: Can't load Foo";
+    warn "Warning: Can't load MyClass";
   }
 
 =head1 See Also

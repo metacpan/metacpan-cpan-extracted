@@ -6,6 +6,8 @@ examples/html5lib_tests.pl
 examples/simple.pl
 gen/modest_errors.c
 gen/tags_ua_style.c
+HTML5-DOM-1.26/META.json
+HTML5-DOM-1.26/META.yml
 leaks.pl
 lib/HTML5/DOM.pm
 lib/HTML5/DOM.pod

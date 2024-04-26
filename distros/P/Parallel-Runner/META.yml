@@ -1,30 +1,26 @@
 ---
 abstract: 'An object to manage running things in parallel processes.'
 author:
-  - 'Chad Granum <exodist7@gmail.com>'
+  - 'Chad Granum <exodist@cpan.org>'
 build_requires:
-  Test::Exception::LessClever: 0
-  Test::More: 0
+  Test2::V0: '0.000159'
 configure_requires:
-  Module::Build: 0.40
-dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Parallel-Runner
-provides:
-  Parallel::Runner:
-    file: lib/Parallel/Runner.pm
-    version: 0.013
 requires:
-  Child: 0.009
-  POSIX: 0
-  Time::HiRes: 0
+  Child: '0.009'
+  Time::HiRes: '0'
+  perl: v5.10.1
 resources:
-  bugtracker: http://github.com/exodist/Parallel-Runner/issues
-  homepage: http://open-exodus.net/projects/parrallel-runner
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/exodist/Parallel-Runner
-version: 0.013
+  bugtracker: https://github.com/exodist/Parallel-Runner/issues
+  repository: https://github.com/exodist/Parallel-Runner/
+version: '0.014'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

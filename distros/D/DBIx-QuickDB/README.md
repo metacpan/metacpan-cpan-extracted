@@ -5,7 +5,8 @@ DBIx::QuickDB - Quickly start a db server.
 # DESCRIPTION
 
 This library makes it easy to spin up a temporary database server for any
-supported driver. PostgreSQL and MySQL are the initially supported drivers.
+supported driver. PostgreSQL, MySQL and SQLite are the initially supported
+drivers.
 
 # SYNOPSIS
 
@@ -29,7 +30,7 @@ run-time and you have to store them in variables.
     use DBIx::QuickDB;
 
     my $msql = DBIx::QuickDB->build_db(mysql_db => {driver => 'MySQL'});
-    my $psql = DBIx::QuickDB->build_db(mysql_db => {driver => 'PostgreSQL'});
+    my $psql = DBIx::QuickDB->build_db(pg_db => {driver => 'PostgreSQL'});
 
     my $m_dbh = $msql->connect;
     my $p_dbh = $psql->connect;

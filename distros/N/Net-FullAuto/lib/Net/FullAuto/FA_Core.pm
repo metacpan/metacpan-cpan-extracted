@@ -494,16 +494,15 @@ BEGIN {
          if ($handle) {
             if (ref $handle eq 'Net::Telnet') {
                my $shell='';
-               ($stdout,$stderr)=Rem_Command::cmd(
+               $stdout=Rem_Command::cmd_raw(
                   { _cmd_handle=>$handle,
                     _hostlabel=>[ $hostlabel,'' ] },
-                   'env');
+                   'env',2);
                if ($stdout=~/^SHELL=(.*)$/m) {
                   $shell=$1;chomp $shell;
                }
                if ((-1<index $shell, 'bash') ||
                      (-1<index $shell, 'ksh')) {
-#print "ARE WE HERE and CMD=$cmd??????????\n";
                   ($stdout,$stderr)=Rem_Command::cmd(
                      { _cmd_handle=>$handle,
                        _hostlabel=>[ $hostlabel,'' ] },
@@ -577,15 +576,13 @@ BEGIN {
             } else {
                unless (exists $handle->{_shell}) {
                   bless($handle);
+                  $handle->autoflush(1);
                   ($stdout,$stderr)=$handle->cmd('env');
                   if ($stdout=~/^SHELL=(.*)$/m) {
                      my $shell=$1;chomp $shell;
                      $handle->{_shell}=$shell;
                   }
-                  if ($^O eq 'cygwin') {
-                     my $cfh_ignore='';my $cfh_error='';
-                     ($cfh_ignore,$cfh_error)=&clean_filehandle($handle);
-                  }
+                  $handle->autoflush(0);
                }
                $handle->{_shell}||='';
                if ((-1<index $handle->{_shell}, 'bash') ||
@@ -1655,6 +1652,7 @@ if ($^O eq 'cygwin') {
 }
 
 sub die {
+
    my @topcaller=caller;
    print "\nINFO: main::die() (((((((CALLER))))))):\n       ",
       (join ' ',@topcaller),"\n\n"
@@ -1666,6 +1664,7 @@ sub die {
       if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
    CORE::die($@);
+
 }
 
 sub get {
@@ -2595,6 +2594,7 @@ sub fetch
       if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
    my $self=$_[0];my $output='';my $select_timeout=2;my $ready='';
+   bless $self;
    my $save=$_[1]||'';
    my $display=(grep { /__display__/ } @_)?1:0;
    if (select $ready=${${*{$self->{_cmd_handle}}}{'net_telnet'}}{'fdmask'},
@@ -2627,9 +2627,13 @@ sub cmd_raw
 {
 
    my $self=$_[0];
+   bless $self;
    my $cmd=$_[1];
+   my $sleep=$_[2]||0;
    my $display=(grep { /__display__/ } @_)?'__display__':'';
    $self->print($cmd);
+#print "SLEEP=$sleep and CMD=$cmd\n";
+   sleep $sleep;
    my $prompt=$self->prompt();
    my $alloutput='';
    my $save='';
@@ -8093,8 +8097,14 @@ sub master_transfer_dir
    my $output='';my $stderr='';my $work_dirs={};my $endp=0;my $testd='';
    while (1) {
       if ($^O eq 'cygwin') {
-         ($curdir,$stderr)=&Net::FullAuto::FA_Core::cmd($localhost,'pwd');
-         &handle_error($stderr,'-1') if $stderr;
+         sleep 1;
+         $curdir=cmd_raw($localhost,'pwd');
+         $curdir=~s/^.*?(\/.*)/$1/s;
+         $curdir=~tr/\0-\11\13-\37\177-\377//d;
+         $curdir=~s/\[\?2004h//s;
+         $curdir=~s/_funkyPrompt_$//s;
+         chomp($curdir);
+#print "MASTER-CURDIR=$curdir<==\n";
          my $cdr='';
          if (-1<index $curdir,$localhost->{_cygdrive}) {
             my $l_cd=(length $localhost->{_cygdrive})+1;
@@ -8105,8 +8115,12 @@ sub master_transfer_dir
          } elsif (exists $Net::FullAuto::FA_Core::cygpathw{$curdir}) {
             $cdr=$Net::FullAuto::FA_Core::cygpathw{$curdir};
          } else {
-            ($cdr,$stderr)=&Net::FullAuto::FA_Core::cmd(
-               $localhost,"cygpath -w \"$curdir\"");
+#print "CURDIR_PERFECT=$curdir<==\n";
+            foreach (1..5) {
+               ($cdr,$stderr)=$localhost->cmd("cygpath -w \'$curdir\'");
+               last unless $stderr;
+            }
+#print "CYGPATH CURDIR=$cdr and STDERR=$stderr\n";
             &handle_error($stderr,'-1') if $stderr;
             $cdr=~s/\\/\\\\/g;
             $Net::FullAuto::FA_Core::cygpathw{$curdir}=$cdr;
@@ -8226,7 +8240,11 @@ sub master_transfer_dir
       }
    }
    if ($^O eq 'cygwin') {
-      ($output,$stderr)=$localhost->cmd("cd /tmp");
+      foreach (1..10) {
+         ($output,$stderr)=$localhost->cmd("cd /tmp;pwd");
+         last if $stderr=~/tmp$/s;
+         sleep 1;
+      }
       print $Net::FullAuto::FA_Core::LOG
          "\nTTTTTTT cd /tmp TTTTTTT OUTPUT ==>$output<== ",
          "and STDERR ==>$stderr<==",
@@ -8237,11 +8255,19 @@ sub master_transfer_dir
          "and STDERR ==>$stderr<==",
          "\n       at Line ",__LINE__,"\n\n"
          if !$Net::FullAuto::FA_Core::cron && $Net::FullAuto::FA_Core::debug;
-      if (!$stderr || ($stderr=~/^.*cd \/tmp 2[>][&]1$/)) {
+      #if (!$stderr || ($stderr=~/^.*cd \/tmp 2[>][&]1$/)) {
+      if ($stderr) {
          my $cnt=2;
          while ($cnt--) {
-            ($curdir,$stderr)=&Net::FullAuto::FA_Core::cmd($localhost,'pwd');
-            &handle_error($stderr,'-1') if $stderr;
+            my ($cfh_ignore,$cfh_error)=('','');
+            ($cfh_ignore,$cfh_error)=&clean_filehandle($localhost->{_cmd_handle});
+            &handle_error("CLEANUP ERROR -> $cfh_error",'-1') if $cfh_error;
+            foreach (1..5) {
+               ($curdir,$stderr)=$localhost->cmd('echo;pwd'); 
+               $curdir=~s/^.*\s+//s;
+               last if $curdir=~/tmp$/;
+            }
+#print "CURDIR_ALSO_PERFECT=$curdir<==\n";
             my $cdr='';
             if (-1<index $curdir,$localhost->{_cygdrive}) {
                my $l_cd=(length $localhost->{_cygdrive})+1;
@@ -8252,8 +8278,15 @@ sub master_transfer_dir
             } elsif (exists $Net::FullAuto::FA_Core::cygpathw{$curdir}) {
                $cdr=$Net::FullAuto::FA_Core::cygpathw{$curdir};
             } else {
-               ($cdr,$stderr)=&Net::FullAuto::FA_Core::cmd(
-                  $localhost,"cygpath -w \"$curdir\"");
+               foreach (1..10) {
+                  ($cdr,$stderr)=&Net::FullAuto::FA_Core::cmd(
+                     $localhost,"cygpath -w \"$curdir\"");
+                  last if $cdr=~s/^.*\s*(\w[:].*tmp)$/$1/s;
+                  my ($cfh_ignore,$cfh_error)=('','');
+                  ($cfh_ignore,$cfh_error)=&clean_filehandle($localhost->{_cmd_handle});
+                  &handle_error("CLEANUP ERROR -> $cfh_error",'-1') if $cfh_error;
+                  sleep 1;
+               }
                &handle_error($stderr,'-1') if $stderr;
                $cdr=~s/\\/\\\\/g;
                $Net::FullAuto::FA_Core::cygpathw{$curdir}=$cdr;
@@ -8280,7 +8313,7 @@ sub master_transfer_dir
                ($output,$stderr)=$localhost->cmd('cd -')
                &handle_error($stderr,'-2','__cleanup__') if $stderr;
             }
-            my $cfh_ignore='';my $cfh_error='';
+            #my $cfh_ignore='';my $cfh_error='';
             ($cfh_ignore,$cfh_error)=&clean_filehandle($localhost);
             &handle_error($cfh_error,'-1') if $cfh_error;
          }
@@ -8318,11 +8351,8 @@ sub master_transfer_dir
          }
       }
       ($output,$stderr)=$localhost->cmd("cd $home_dir");
-      my $cfh_ignore='';my $cfh_error='';
-      ($cfh_ignore,$cfh_error)=&clean_filehandle($localhost);
-      &handle_error($cfh_error,'-1') if $cfh_error;
       if (!$stderr) {
-         ($curdir,$stderr)=&Net::FullAuto::FA_Core::cmd($localhost,'pwd');
+         ($curdir,$stderr)=$localhost->cmd('pwd');
          &handle_error($stderr,'-1') if $stderr;
          my $cdr='';
          if (-1<index $curdir,$localhost->{_cygdrive}) {
@@ -14938,15 +14968,12 @@ print $LOG "FA_LOGINTRYINGTOKILL=$line\n"
             $local_host->prompt("/_funkyPrompt_\$/");
             $local_host->print(
                " export PS1=_funkyPrompt_;unset PROMPT_COMMAND");
+            my $cfh_ignore='';my $cfh_error='';
+            ($cfh_ignore,$cfh_error)=&clean_filehandle($local_host);
+            &handle_error($cfh_error,'-1') if $cfh_error;
             $localhost->{_cmd_handle}->close()
                if exists $localhost->{_cmd_handle};
             $local_host->print();my $out='';
-            while (my $line=$local_host->get(Timeout=>$timeout)) {
-               $out.=$line;
-               last if $out=~/_funkyPrompt_\s*$/;
-               select(undef,undef,undef,0.02); # sleep for 1/50th second;
-               $local_host->print();
-            }
             $localhost->{_cmd_handle}=$local_host;
             $localhost->{_cmd_pid}=$cmd_pid;
             $localhost->{_connect}='connect_shell';
@@ -15114,13 +15141,15 @@ print $Net::FullAuto::FA_Core::LOG "GOT OUT OF COMMANDPROMPT<==\n"
             ## Make sure prompt won't match anything in send data.
             $local_host->prompt("/_funkyPrompt_\$/");
             $local_host->print(" export PS1=_funkyPrompt_;unset PROMPT_COMMAND");
+            my $cfh_ignore='';my $cfh_error='';
+            ($cfh_ignore,$cfh_error)=&clean_filehandle($local_host);
+            &handle_error($cfh_error,'-1') if $cfh_error;
             $localhost->{_ftp_type}='';
             $localhost->{_cwd}='';
             $localhost->{_hostlabel}=[ "__Master_${$}__",'' ];
             $localhost->{_hostname}=$hostname;
             $localhost->{_ip}=$ip;
             $localhost->{_connect}=$_connect;
-            my $cfh_ignore='';my $cfh_error='';
             ($cfh_ignore,$cfh_error)=&clean_filehandle($local_host);
             &handle_error($cfh_error,'-1') if $cfh_error;
             foreach my $host (keys %same_host_as_Master) {
@@ -15143,8 +15172,10 @@ print $Net::FullAuto::FA_Core::LOG "GOT OUT OF COMMANDPROMPT<==\n"
             }
          }
          my $wloop=0;
-         ($stdout,$stderr)=Rem_Command::cmd(
-            $localhost,'export HISTCONTROL="ignorespace"');
+         $local_host->print(' export HISTCONTROL="ignorespace"');
+         my ($cfh_ignore,$cfh_error)=('','');
+         ($cfh_ignore,$cfh_error)=&clean_filehandle($local_host);
+         &handle_error($cfh_error,'-1') if $cfh_error;
          while (1) {
             my $_sh_pid='';
             ($_sh_pid,$stderr)=Rem_Command::cmd(
@@ -17096,8 +17127,11 @@ sub cmd
 print $Net::FullAuto::FA_Core::LOG "main::cmd() CMD to Rem_Command=",
    (join ' ',@_),"\n" if -1<index $Net::FullAuto::FA_Core::LOG,'*';
          my $cfh_ignore='';my $cfh_error='';
-         ($cfh_ignore,$cfh_error)=&clean_filehandle($self->{_cmd_handle});
-         &handle_error($cfh_error,'__cleanup__') if $cfh_error;
+         #($cfh_ignore,$cfh_error)=&clean_filehandle($self->{_cmd_handle});
+         #&handle_error($cfh_error,'__cleanup__') if $cfh_error;
+         $self->{_cmd_handle}->autoflush(1);
+         $self->{_cmd_handle}->print();
+         $self->{_cmd_handle}->autoflush(0);
          sleep 1 if $delay;
          eval {
             ($stdout,$stderr,$exitcode)=Rem_Command::cmd(@_);
@@ -18146,6 +18180,7 @@ print $Net::FullAuto::FA_Core::LOG "File_Transfer::lcd() PATH=$path<==\n" if -1<
 
 sub get
 {
+
    my @topcaller=caller;
    print "File_Transfer::get() CALLER=",
       (join ' ',@topcaller),"\n" if $Net::FullAuto::FA_Core::debug;
@@ -29960,7 +29995,7 @@ print $Net::FullAuto::FA_Core::LOG "WEVE GOT WINDOWSCOMMAND=$command\n"
             $bckgrd=1 if $command=~s/[\t ][&](?>\s*)$//s;
             my $live_command='';
             if ($command=~/^cd[\t ]/) {
-               $live_command=" $command 2>&1";
+               $live_command="$command 2>&1";
                if (-1<$#{$self->{_hostlabel}} &&
                      $self->{_hostlabel}->[$#{$self->{_hostlabel}}]
                      eq "__Master_${$}__") {
@@ -29969,8 +30004,8 @@ print $Net::FullAuto::FA_Core::LOG "WEVE GOT WINDOWSCOMMAND=$command\n"
                }
             } else {
                $live_command=
-                  ' ('.$command.';echo $?) | '.
-                  $Net::FullAuto::FA_Core::gbp->('sed',$self).
+                  '('.$command.';echo $?) | '.
+                  $Net::FullAuto::FA_Core::gbp->('sed',$self->{_cmd_handle}).
                   "sed -e 's/^/stdout: /' 2>&1";
             }
             $live_command.=' &' if $bckgrd;
@@ -29987,9 +30022,8 @@ print $Net::FullAuto::FA_Core::LOG "WEVE GOT WINDOWSCOMMAND=$command\n"
                (join ' ',@{[keys %{$self}]}),"\n\n"
                if !$Net::FullAuto::FA_Core::cron &&
                $Net::FullAuto::FA_Core::debug;
+
             $self->{_cmd_handle}->timeout($cmtimeout);
-            #$live_command=~s/\\\\/\\/g;
-            #$live_command=~s/\\/\\\\/g;
             $live_command=~s/\\$//mg;
             $self->{_cmd_handle}->print($live_command);
             my $growoutput='';my $ready='';my $firstout=0;
@@ -31089,20 +31123,22 @@ sub cmd_raw
 {
 
    my $self=$_[0];
+   bless $self;
    my $cmd=$_[1];
+   my $sleep=$_[2]||0;
    my $display=(grep { /__display__/ } @_)?1:0;
-   $self->{_cmd_handle}->print($cmd);
    my $prompt=substr($self->{_cmd_handle}->prompt(),1,-1);
-   my $alloutput='';
+   $self->{_cmd_handle}->print($cmd);
+   sleep $sleep;
    my $save='';
+   my $output='';
    while (1) {
-      my $output.=Net::FullAuto::FA_Core::fetch($self);
-      $alloutput.=$output;
+      $output.=Net::FullAuto::FA_Core::fetch($self);
       last if $output=~/$prompt/;
       $save=&Rem_Command::display($output,$prompt,$save)
          if $display;
    }
-   return $alloutput;
+   return $output;
 
 }
 

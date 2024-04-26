@@ -26,7 +26,7 @@ skipall_unless_can_db('MySQL');
 {
     local $@;
     eval { require DBD::mysql };
-    no warnings 'redefine';
+    no warnings qw/redefine once/;
     *DBD::mysql::dr::connect = sub { die "Should not be using me!" };
 }
 

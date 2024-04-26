@@ -4,7 +4,7 @@ StreamFinder::Podchaser - Fetch actual raw streamable URLs on podchaser.com
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2023 by
+This module is Copyright (C) 2023-2024 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -318,7 +318,7 @@ L<http://search.cpan.org/dist/StreamFinder-Podchaser/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2023 Jim Turner.
+Copyright 2023-2024 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -541,6 +541,8 @@ TRYIT:
 				my $epikey = "$created|$title";
 				print STDERR "---FOUND ($special) EPISODE($created): $title ($streams[0])\n"  if ($DEBUG);
 				$epiHash{$epikey} = "id=$ep1id\x02_complete=0";
+				$epiHash{$epikey} .= "\x02_epiurl=" . $1
+						if ($latest =~ m#\"url\"\:\"([^\"]+)#s);
 				$epiHash{$epikey} .= "\x02streamstr=";
 				foreach my $s (@streams) {
 					$epiHash{$epikey} .= $s . '|';
@@ -571,37 +573,41 @@ TRYIT:
 			next  unless ($epid);  #SKIP EPISODE IF NO EPISODE-ID (SHOULD NOT HAPPEN).
 
 			#SCRAPE THE DETAILED METADATA FOR EACH EPISODE (WE DON'T KNOW WHICH ONE IS LATEST YET):
-			if ($epihtml =~ s#\,\"podcast_id\"\:\"?(\d+)\"?\,\"title\"\:\"([^\"]+)##o) {
+			if ($epihtml =~ s#\,\"podcast_id\"\:\"?(\d+)##o) {
 				my $temp;
 				$temp->{'_podcast_id'} = $1;
-				$temp->{'title'} = $2;
-				foreach my $field (qw(album genre created year iconurl articonurl description)) {
-					$temp->{$field} = '';   #INIT 'EM TO AVOID PERL NANNY WARNINGS.
-				}
-				if ($epihtml =~ m#\"air_date\"\:\"([^\"]+)#so) {
-					$temp->{'created'} = $1;
-					$temp->{'year'} = ($temp->{'created'} =~ /(\d\d\d\d)/o) ? $1 : '';
-				}
-				$temp->{'articonurl'} = $self->{'articonurl'};
-				$temp->{'articonurl'} ||= $1  if ($epihtml =~ m#\:\{\"image_url\"\:\"([^\"]+)#o);
-				$temp->{'iconurl'} = $1  if ($epihtml =~ m#\,\"image_url\"\:\"([^\"]+)#o);
-				$temp->{'album'} = $1  if ($epihtml =~ m#\,\"title\"\:\"([^\"]+)#o);
-				$temp->{'description'} = $1  if ($epihtml =~ m#\,\"description\"\:\"([^\"]+)#o);
-				$temp->{'genre'} = $1  if ($epihtml =~ m#\,\"text\"\:\"([^\"]+)#o);
-				$temp->{'_complete'} = 1;
-				@{$temp->{'streams'}} = @streams;
+				if ($epihtml =~ s#\,\"title\"\:\"([^\"]+)##o) {
+					$temp->{'title'} = $1;
+					foreach my $field (qw(album genre created year iconurl articonurl description)) {
+						$temp->{$field} = '';   #INIT 'EM TO AVOID PERL NANNY WARNINGS.
+					}
+					if ($epihtml =~ m#\"air_date\"\:\"([^\"]+)#so) {
+						$temp->{'created'} = $1;
+						$temp->{'year'} = ($temp->{'created'} =~ /(\d\d\d\d)/o) ? $1 : '';
+					}
+					$temp->{'articonurl'} = $self->{'articonurl'};
+					$temp->{'articonurl'} ||= $1  if ($epihtml =~ m#\:\{\"image_url\"\:\"([^\"]+)#o);
+					$temp->{'iconurl'} = $1  if ($epihtml =~ m#\,\"image_url\"\:\"([^\"]+)#o);
+					$temp->{'album'} = $1  if ($epihtml =~ m#\,\"title\"\:\"([^\"]+)#o);
+					$temp->{'description'} = $1  if ($epihtml =~ m#\,\"description\"\:\"([^\"]+)#o);
+					$temp->{'genre'} = $1  if ($epihtml =~ m#\,\"text\"\:\"([^\"]+)#o);
+					$temp->{'_complete'} = 1;
+					@{$temp->{'streams'}} = @streams;
 
-				#STORE SCRAPED METADATA IN EPISODE HASH FOR LATER SORTING:
-				my $epikey = "$$temp{'created'}|$$temp{'title'}";
-				$epiHash{$epikey} = "id=$epid";
-				foreach my $field (qw(_complete _podcast_id album genre created year iconurl articonurl description)) {
-					$epiHash{$epikey} .= "\x02${field}=$$temp{$field}";
+					#STORE SCRAPED METADATA IN EPISODE HASH FOR LATER SORTING:
+					my $epikey = "$$temp{'created'}|$$temp{'title'}";
+					$epiHash{$epikey} = "id=$epid";
+					foreach my $field (qw(_complete _podcast_id album genre created year iconurl articonurl description)) {
+						$epiHash{$epikey} .= "\x02${field}=$$temp{$field}";
+					}
+					$epiHash{$epikey} .= "\x02_epiurl=" . $1
+							if ($epihtml =~ m#\"url\"\:\"([^\"]+)#s);
+					$epiHash{$epikey} .= "\x02streamstr=";
+					foreach my $s (@{$temp->{'streams'}}) {
+						$epiHash{$epikey} .= $s . '|';
+					}
+					$epiHash{$epikey} =~ s#\|$##o;
 				}
-				$epiHash{$epikey} .= "\x02streamstr=";
-				foreach my $s (@{$temp->{'streams'}}) {
-					$epiHash{$epikey} .= $s . '|';
-				}
-				$epiHash{$epikey} =~ s#\|$##o;
 			}
 		}
 
@@ -616,10 +622,11 @@ TRYIT:
 					($name, $value) = split(/\=/o, $f);
 					$self->{$name} = $value;
 				}
+				$url2fetch = $self->{'_epiurl'};
 				$first = 0  if ($self->{'_complete'});  #STOP LOOKING IF EPISODE HAS COMPLETE DATA.
 				@{$self->{'streams'}} = split(/\|/o, $self->{'streamstr'});
-				$self->{'Url'} = ${$self->{'streams'}}[0];
 				unless ($titleHash{$self->{'title'}}) { #ADD TO PLAYLIST UNLESS DUPLICATE TITLE:
+					print STDERR "----1ADD($$self{'title'}) TO PLAYLIST.\n"  if ($DEBUG);
 					push @epiTitles, $self->{'title'};
 					push @epiStreams, ${$self->{'streams'}}[0];
 					$titleHash{$self->{'title'}} = 1;
@@ -634,11 +641,14 @@ TRYIT:
 					if ($name eq 'streamstr') {
 						my ($epiStream) = split(/\|/o, $value);
 						push @epiTitles, $epiTitle;
+						print "----2ADD($epiTitle) TO PLAYLIST.\n"  if ($DEBUG);
 						push @epiStreams, $epiStream;
 						$titleHash{$epiTitle} = 1;
-						last  if ($self->{'id'});
 					} elsif ($name eq 'id') {
 						$self->{'id'} ||= $value;
+					} elsif ($name eq '_epiurl') {
+						($url2fetch = $value) =~ s/\\u00([0-9A-Fa-f]{2})/chr(hex($1))/e;
+						print STDERR "--WILL TRY EPI URL=$url2fetch!=\n"  if ($DEBUG);
 					}
 				}
 			}
@@ -662,16 +672,6 @@ TRYIT:
 	$self->{'cnt'} = scalar(@{$self->{'streams'}});
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'Url'} = ($self->{'total'} > 0) ? $self->{'streams'}->[0] : '';
-
-	if ($DEBUG) {
-		foreach my $i (sort keys %{$self}) {
-			print STDERR "--KEY=$i= VAL=".$self->{$i}."=\n";
-		}
-		print STDERR "--FIRST STREAM=".${$self->{'streams'}}[0]."=\n";
-		print STDERR "-(all)count=".$self->{'total'}."= ID=".$self->{'id'}."= iconurl="
-				.$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}
-				."= YEAR=".$self->{'year'}."=\n";
-	}
 
 	return undef  unless ($self->{'cnt'} > 0);
 
@@ -703,7 +703,13 @@ TRYIT:
 		$self->{'playlist'} .= ${$self->{'streams'}}[0] . "\n";
 	}
 
-	print "---Playlist Count=".$self->{'playlist_cnt'}."=\n---Playlist=".$self->{'playlist'}."=\n"  if ($DEBUG); 
+	if ($DEBUG) {
+		foreach my $i (sort keys %{$self}) {
+			print STDERR "--KEY=$i= VAL=".$self->{$i}."=\n";
+		}
+		print STDERR "-SUCCESS: 1st stream=".$self->{'Url'}."=\n";
+	}
+
 	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!

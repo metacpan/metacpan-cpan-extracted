@@ -30,7 +30,7 @@ my $config = ExtUtils::Config->new({
 	installstyle	=> catdir(@installstyle),
 
 	installprivlib  => catdir($tmp, @installstyle),
-	installarchlib  => catdir($tmp, @installstyle, @Config{qw(version archname)}),
+	installarchlib  => catdir($tmp, @installstyle, $Config{version}, $Config{archname}),
 	installbin      => catdir($tmp, 'bin'),
 	installscript   => catdir($tmp, 'bin'),
 	installman1dir  => catdir($tmp, 'man', 'man1'),
@@ -39,7 +39,7 @@ my $config = ExtUtils::Config->new({
 	installhtml3dir => catdir($tmp, 'html'),
 
 	installsitelib      => catdir($tmp, 'site', @installstyle, 'site_perl'),
-	installsitearch     => catdir($tmp, 'site', @installstyle, 'site_perl', @Config{qw(version archname)}),
+	installsitearch     => catdir($tmp, 'site', @installstyle, 'site_perl', $Config{version}, $Config{archname}),
 	installsitebin      => catdir($tmp, 'site', 'bin'),
 	installsitescript   => catdir($tmp, 'site', 'bin'),
 	installsiteman1dir  => catdir($tmp, 'site', 'man', 'man1'),
@@ -89,7 +89,7 @@ isa_ok(get_ei, 'ExtUtils::InstallPaths');
 
 	test_install_destinations($ei, {
 		lib     => catdir($tmp, 'site', @installstyle, 'site_perl'),
-		arch	=> catdir($tmp, 'site', @installstyle, 'site_perl', @Config{qw(version archname)}),
+		arch	=> catdir($tmp, 'site', @installstyle, 'site_perl', $Config{version}, $Config{archname}),
 		bin     => catdir($tmp, 'site', 'bin'),
 		script  => catdir($tmp, 'site', 'bin'),
 		bindoc  => catdir($tmp, 'site', 'man', 'man1'),
@@ -101,7 +101,7 @@ isa_ok(get_ei, 'ExtUtils::InstallPaths');
 		read                      => '',
 		write                     => catfile($ei->install_destination('arch'), qw/auto ExtUtils InstallPaths .packlist/),
 		catdir('blib', 'lib')     => catdir($tmp, 'site', @installstyle, 'site_perl'),
-		catdir('blib', 'arch')    => catdir($tmp, 'site', @installstyle, 'site_perl', @Config{qw(version archname)}),
+		catdir('blib', 'arch')    => catdir($tmp, 'site', @installstyle, 'site_perl', $Config{version}, $Config{archname}),
 		catdir('blib', 'bin')     => catdir($tmp, 'site', 'bin'),
 		catdir('blib', 'script')  => catdir($tmp, 'site', 'bin'),
 	}, 'installdirs=site');
@@ -114,7 +114,7 @@ isa_ok(get_ei, 'ExtUtils::InstallPaths');
 
 	test_install_destinations($ei, {
 		lib     => catdir($tmp, @installstyle),
-		arch	=> catdir($tmp, @installstyle, @Config{qw(version archname)}),
+		arch	=> catdir($tmp, @installstyle, $Config{version}, $Config{archname}),
 		bin     => catdir($tmp, 'bin'),
 		script  => catdir($tmp, 'bin'),
 		bindoc  => catdir($tmp, 'man', 'man1'),

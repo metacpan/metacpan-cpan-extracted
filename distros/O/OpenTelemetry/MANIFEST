@@ -6,6 +6,7 @@ MANIFEST
 META.json
 META.yml
 README.md
+examples/integrations/lwp
 lib/OpenTelemetry.pm
 lib/OpenTelemetry.pod
 lib/OpenTelemetry/Attributes.pm

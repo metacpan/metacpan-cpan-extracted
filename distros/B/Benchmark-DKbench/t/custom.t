@@ -13,14 +13,26 @@ sub great_circle {
     return $dist;
 }
 
-
 my %stats = suite_run({
+        time        => 1,
         threads     => 1,
         include     => 'Math::Trig',
-        extra_bench => { 'Math::Trig' => ['3144042.81433949', 5.5, \&great_circle, 400000, 2000000]}        
+        extra_bench => { 'Math::Trig' => [\&great_circle, 'x', 1]}
     }
 );
 
 ok($stats{'Math::Trig'}->{scores} > 0, 'Custom bench scored') or diag(\%stats);
+
+%stats = suite_run({
+        include     => 'custom',
+        extra_bench => {
+            'custom1' => [sub {my @a=split(//, 'x'x$_) for 1..100}, 1, 1],
+            'custom2' => [sub {my @a=split(//, 'x'x$_) for 1..100}, 1, 0],
+            'custom3' => [sub {my @a=split(//, 'x'x$_) for 1..100}]
+        }
+    }
+);
+
+ok($stats{custom1}->{scores} > 0, 'Custom bench still scored') or diag(\%stats);
 
 done_testing();

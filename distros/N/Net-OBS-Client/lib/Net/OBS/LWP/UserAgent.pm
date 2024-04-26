@@ -3,6 +3,7 @@ package Net::OBS::LWP::UserAgent;
 use strict;
 use warnings;
 use Const::Fast;
+use Carp;
 
 use base 'LWP::UserAgent';
 

@@ -1,5 +1,9 @@
 Revision history for ExtUtils-Config
 
+0.009     2024-04-25 12:22:53+02:00 Europe/Brussels
+          - Add a but method
+          - Add ExtUtils::Config::MakeMaker
+
 0.008     2014-06-25 11:37:13-04:00 America/Nassau
           Remove set, clear, clone methods
 

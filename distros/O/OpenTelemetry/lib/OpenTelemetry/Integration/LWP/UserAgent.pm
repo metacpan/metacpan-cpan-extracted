@@ -1,7 +1,7 @@
 package OpenTelemetry::Integration::LWP::UserAgent;
 # ABSTRACT: OpenTelemetry integration for LWP::UserAgent
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 use strict;
 use warnings;
@@ -40,8 +40,8 @@ sub uninstall ( $class ) {
     return unless $loaded;
     no strict 'refs';
     no warnings 'redefine';
-    delete $Class::Method::Modifiers::MODIFIER_CACHE{'LWP::UserAgent'}{request};
-    *{'LWP::UserAgent::request'} = $original;
+    delete $Class::Method::Modifiers::MODIFIER_CACHE{'LWP::UserAgent'}{simple_request};
+    *{'LWP::UserAgent::simple_request'} = $original;
     undef $loaded;
     return;
 }
@@ -56,8 +56,8 @@ sub install ( $class, %config ) {
     my @wanted_response_headers = map qr/^\Q$_\E$/i, map tr/-/_/r,
         @{ delete $config{response_headers} // [] };
 
-    $original = \&LWP::UserAgent::request;
-    install_modifier 'LWP::UserAgent' => around => request => sub {
+    $original = \&LWP::UserAgent::simple_request;
+    install_modifier 'LWP::UserAgent' => around => simple_request => sub {
         my ( $code, $self, $request, @rest ) = @_;
 
         my $uri    = $request->uri->clone;

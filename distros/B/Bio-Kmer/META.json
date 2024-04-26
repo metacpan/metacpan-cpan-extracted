@@ -59,6 +59,6 @@
          "web" : "https://github.com/lskatz/Bio--Kmer"
       }
    },
-   "version" : 0.54,
+   "version" : 0.55,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -16,6 +16,19 @@ queries for L<CPAN::Testers::Schema::Result::Upload> objects.
 
 use CPAN::Testers::Schema::Base 'Test';
 
+my %common = (
+  Stats => {
+    type => 2,
+    postdate => '202401',
+    fulldate => '202401010000',
+    tester => 'Doug Bell <doug@preaction.me>',
+    platform => 'x86_64-linux-thread-multi',
+    perl => '5.28.0',
+    osname => 'Linux',
+    osvers => '2.21.4',
+  },
+);
+
 my %data = (
 
     Upload => [
@@ -47,11 +60,49 @@ my %data = (
             released => 1479524800,
         },
     ],
+  );
 
-);
+$data{Stats} = [
+  {
+      uploadid => 1,
+      state => 'pass',
+      guid => 'df7fd789-4ECE-4923-8623-935DC4306330',
+      $common{Stats}->%*,
+      $data{Upload}[0]->%{qw(dist version)},
+  },
+  {
+      uploadid => 2,
+      state => 'pass',
+      guid => '78de1ed2-d47d-4ef5-b7d0-67e95b6a5fe9',
+      $common{Stats}->%*,
+      $data{Upload}[1]->%{qw(dist version)},
+  },
+  {
+      uploadid => 2,
+      state => 'fail',
+      guid => 'eab00b13-ac66-458e-b0b2-eb69709a49e5',
+      $common{Stats}->%*,
+      $data{Upload}[1]->%{qw(dist version)},
+  },
+  {
+      uploadid => 3,
+      state => 'pass',
+      guid => '2b06a21a-f4c9-4f80-af86-860f33399fc2',
+      $common{Stats}->%*,
+      $data{Upload}[2]->%{qw(dist version)},
+  },
+  {
+      uploadid => 3,
+      state => 'pass',
+      guid => 'f0e4962a-b300-4fe2-9a07-d449e81daa47',
+      $common{Stats}->%*,
+      $data{Upload}[2]->%{qw(dist version)},
+  },
+];
 
 my $schema = prepare_temp_schema;
-$schema->populate( $_, $data{ $_ } ) for keys %data;
+my $version_row = $schema->resultset( 'PerlVersion' )->create({ version => $common{Stats}{perl} });
+$schema->populate( $_, $data{ $_ } ) for qw( Upload Stats );
 
 my $rs = $schema->resultset( 'Upload' );
 $rs->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
@@ -108,6 +159,30 @@ subtest 'recent' => sub {
     is_deeply [ $rs->all ], [ $data{Upload}->@[2,1,0] ],
         'get up to 20 most recent items sorted newest to oldest'
         or diag explain [ $rs->all ];
+};
+
+subtest 'latest_by_dist' => sub {
+  my $rs = $schema->resultset( 'Upload' )->latest_by_dist;
+  $rs->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
+  is_deeply [ $rs->all ], [ map +{ $_->%{qw( uploadid dist version )} }, $data{Upload}->@[1,2] ], 'get most recent version for all dists'
+      or diag explain [ $rs->all ];
+
+  $rs = $schema->resultset( 'Upload' )->latest_by_dist->by_author('PREACTION');
+  $rs->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
+  is_deeply [ $rs->all ], [ map +{ $_->%{qw( uploadid dist version )} }, $data{Upload}->@[0,2] ], 'get most recent version for all dists by PREACTION'
+      or diag explain [ $rs->all ];
+
+  subtest 'join report_stats' => sub {
+    my $rs = $schema->resultset( 'Upload' )->latest_by_dist->search_related('report_stats');
+    $rs->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
+    is_deeply [ map +{ $_->%{keys $data{Stats}[0]->%*} }, $rs->all ], [ $data{Stats}->@[1,2,3,4] ]
+        or diag explain [ $rs->all ];
+
+    $rs = $schema->resultset( 'Upload' )->by_author('PREACTION')->latest_by_dist->search_related('report_stats');
+    $rs->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
+    is_deeply [ map +{ $_->%{keys $data{Stats}[0]->%*} }, $rs->all ], [ $data{Stats}->@[0,3,4] ]
+        or diag explain [ $rs->all ];
+  };
 };
 
 done_testing;

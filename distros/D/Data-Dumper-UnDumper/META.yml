@@ -1,0 +1,27 @@
+---
+abstract: 'load Data::Dumper output, including self-references'
+author:
+  - 'David Precious <davidp@preshweb.co.uk>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Dumper-UnDumper
+requires:
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/bigpresh/Data-Dumper-UnDumper/issues
+  homepage: https://github.com/bigpresh/Data-Dumper-UnDumper
+  repository: git://github.com/bigpresh/Data-Dumper-UnDumper.git
+version: '0.01'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

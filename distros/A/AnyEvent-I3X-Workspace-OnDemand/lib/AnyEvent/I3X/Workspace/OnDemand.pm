@@ -1,5 +1,5 @@
 package AnyEvent::I3X::Workspace::OnDemand;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use v5.26;
 use Object::Pad;
 
@@ -28,6 +28,8 @@ field $socket :param = undef;
 
 field %workspace;
 field %tick;
+field %shutdown;
+
 field @swallows;
 field $c;
 
@@ -37,6 +39,8 @@ field $current_workspace;
 ADJUSTPARAMS {
   my $args = shift;
 
+  $debug = 1 if $log_all_events;
+
   if (ref $args->{workspace} eq 'HASH') {
     %workspace = %{ delete $args->{workspace} };
   }
@@ -45,6 +49,9 @@ ADJUSTPARAMS {
   }
   if (ref $args->{tick} eq 'HASH') {
     %tick = %{ delete $args->{tick} };
+  }
+  if (ref $args->{shutdown} eq 'HASH') {
+    %shutdown = @{ delete $args->{shutdown} };
   }
   if (ref $args->{groups} eq 'ARRAY') {
     @groups = @{ delete $args->{groups} };
@@ -61,6 +68,12 @@ method log_all_events($event) {
     }
     elsif ($event->{payload}) {
         $e = "Processing tick with payload $event->{payload}";
+    }
+    elsif ($event->{container}) {
+        $e = "Processing window with payload $event->{change}";
+    }
+    elsif ($event->{change}) {
+        $e = "Processing shutdown with payload $event->{change}";
     }
     else {
         $e = "Processing event $event->{change} on $event->{current}{name}";
@@ -170,6 +183,21 @@ ADJUST {
     }
   );
 
+  $self->subscribe(
+    shutdown => sub {
+      my $event   = shift;
+
+      my $payload = $event->{change};
+      $self->log("Processing shutdown event $payload");
+
+      $self->log_all_events($event);
+
+      if (my $sub = $shutdown{$payload}) {
+        $sub->($self, $i3, $event);
+      }
+    }
+  );
+
 }
 
 method _is_in_group ($name, $group) {
@@ -200,9 +228,10 @@ method switch_to_group ($group) {
     sub {
       my $y = shift;
       my $x = $y->recv;
+      my @current_workspaces = @$x;
 
       if ($cur eq '__EMPTY__') {
-        ($cur) = map { $_->{name} } grep { $_->{focused} } @$x;
+        ($cur) = map { $_->{name} } grep { $_->{focused} } @current_workspaces;
         $current_workspace = $cur;
         return if $current_group eq $group;
       }
@@ -214,8 +243,10 @@ method switch_to_group ($group) {
         my $ws = $workspace{$name};
         next unless exists $ws->{group};
 
-        if ($self->_is_in_group($name, $current_group)) {
-          $self->workspace($name, "rename workspace to $current_group:$name");
+        if (any { $name eq $_->{name}} @current_workspaces) {
+          if ($self->_is_in_group($name, $current_group)) {
+            $self->workspace($name, "rename workspace to $current_group:$name");
+          }
         }
 
         if (any { "$group:$name" eq $_ } @available) {
@@ -242,20 +273,42 @@ method debug ($d = undef) {
   $debug = $d;
 }
 
+my @any = qw(any *);
+
 method on_workspace ($name, $type, $sub) {
 
   if (ref $sub ne 'CODE') {
     croak("Please supply a code ref!");
   }
 
-  if ($type eq 'any' || $type eq '*') {
-    $workspace{$name}{$_} = $sub for qw(init focus empty);
+  state @actions = qw(init focus empty urgent reload rename restored move);
+
+  if (any { $_ eq $type } @any) {
+    $workspace{$name}{$_} = $sub for @actions;
   }
-  elsif ($type eq 'layout') {
-    croak("You cannot set a layout via on_workspace");
+  elsif (any { $_ eq $type } @actions) {
+    $workspace{$name}{$type} = $sub;
   }
   else {
-    $workspace{$name}{$type} = $sub;
+    croak("Unsupported action '$type', please use any of the following:"
+        . join(", ", @actions));
+  }
+}
+
+method on_shutdown ($payload, $sub) {
+  if (ref $sub ne 'CODE') {
+    croak("Please supply a code ref!");
+  }
+  state @payloads = qw(exit restart);
+  if (any { $_ eq $payload } @any) {
+    $shutdown{$_} = $sub for @payloads;
+  }
+  elsif (any { $_ eq $payload } @payloads) {
+    $shutdown{$payload} = $sub;
+  }
+  else {
+    croak("Unsupported action '$payload', please use any of the following:"
+        . join(", ", @payloads));
   }
 }
 
@@ -346,7 +399,7 @@ AnyEvent::I3X::Workspace::OnDemand - An I3 workspace loader
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

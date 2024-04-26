@@ -1,0 +1,8 @@
+Revision history for ExtUtils-Builder
+
+0.002     2024-04-26 11:33:00+02:00 Europe/Brussels
+          - Move get_perl into ExtUtils::Builder::Util
+          - Remove accidental test dependency on Devel::Confess
+
+0.001     2024-04-25 14:13:26+02:00 Europe/Brussels
+          First release

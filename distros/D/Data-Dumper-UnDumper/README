@@ -1,0 +1,77 @@
+NAME
+
+    Data::Dumper::UnDumper - load Dumper output including $VAR1 refs
+
+SYNOPSIS
+
+    Load in a Data::Dumper output via eval, including supporting $VAR1
+    style references etc as emitted if you don't set the Purity option:
+
+        use Data::Dumper::UnDumper;
+        
+        my $complex_ref = { ... };
+        my $dumped = Data::Dumper::Dumper($complex_ref);
+    
+        my $undumped = Data::Dumper::UnDumper::undumper($dumped);
+
+DESCRIPTION
+
+    Firstly, a safety warning: loading Data::Dumper output, which is
+    designed to be evaled, is a big safety risk if the data comes from an
+    untrusted source. It's evaled as Perl code, so it can do anything you
+    could write a Perl program to. Future versions of this module may use
+    Safe to mitigate that risk somewhat, but it's still there - to support
+    object references, bless would have to be allowed.
+
+    So, given the choice, what should you use instead? Any of the many
+    serialisation options that don't serialise as code - for e.g. JSON,
+    YAML, etc.
+
+    I wrote this module, though, because I didn't have a choice - I was
+    receiving Data::Dumper output which had been written to a log in the
+    past by some code, without using the <$Data::Dumper::PURITY> setting,
+    so it included $VAR1 references, including re-used JSON::PP objects.
+
+    This has been lightly tested with the default output from
+    Data::Dumper::Dump(). It's quite likely that you could have
+    Data::Dumper generate output this will not handle by setting some of
+    the dumping options.
+
+SUBROUTINES
+
+ undumper
+
+    Given the output of Data::Dumper's Dumper / Dump method, "undump" it,
+    deserialising it back in to a Perl scalar/object, handling `$VAR1`
+    references.
+
+SEE ALSO
+
+    Data::Undump
+
+      Doesn't support cyclical references, blessed objects.
+
+    Data::Undump::PPI
+
+      Safer as it uses PPI not eval, but doesn't support blessed objects or
+      refs.
+
+    plain old eval
+
+      For simple Data::Dumper output you can of course just eval it, but
+      that falls down when the output includes references to other parts of
+      the object e.g. 'foo' => $VAR1->{'bar'}
+
+AUTHOR
+
+    David Precious (BIGPRESH), <davidp@preshweb.co.uk>
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2023-2024 by David Precious
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+ACKNOWLEDGEMENTS
+

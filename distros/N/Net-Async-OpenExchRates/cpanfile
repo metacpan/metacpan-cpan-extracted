@@ -23,6 +23,8 @@ on 'build' => sub {
 
 on 'test' => sub {
     requires 'Test2::V0';
+    # not sure about that but repo vanished from cpan
+    requires 'Test::More';
     requires 'Test::NoTabs';
     requires 'Test::Async::HTTP';
 };

@@ -667,6 +667,8 @@ static OP *pp_push_defav_with_count(pTHX)
 
   U32 count = av_count(defav);
   SV **svp = AvARRAY(defav);
+  if(!explode)
+    EXTEND(SP, count);
   for(U32 i = 0; i < count; i++)
     if(explode) {
       if(!SvRV(svp[i]) || SvTYPE(SvRV(svp[i])) != SVt_PVAV)
@@ -675,13 +677,14 @@ static OP *pp_push_defav_with_count(pTHX)
       PUSHMARK(SP);
       U32 acount = av_count(av);
       SV **asvp = AvARRAY(av);
+      EXTEND(SP, acount);
       for(U32 i = 0; i < acount; i++)
         PUSHs(asvp[i]);
     }
     else
       PUSHs(svp[i]);
 
-  mPUSHu(count);
+  mXPUSHu(count);
 
   RETURN;
 }

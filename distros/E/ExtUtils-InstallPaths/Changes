@@ -1,5 +1,8 @@
 Revision history for ExtUtils-InstallPaths
 
+0.013     2024-04-25 12:28:37+02:00 Europe/Brussels
+          - Try to install any installable paths
+
 0.012     2018-05-10 21:03:33+02:00 Europe/Amsterdam
           - Allow a argument to install_map with source dirs
           - Make tests prove and 5.6 friendly

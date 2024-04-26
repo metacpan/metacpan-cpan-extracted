@@ -1,3 +1,11 @@
+0.000028  2024-04-25 13:00:04+01:00 Europe/Lisbon
+
+    - Fix mariadb warning
+
+0.000027  2024-04-25 12:24:25+01:00 Europe/Lisbon
+
+    - Fix doc issue
+
 0.000026  2024-04-16 15:04:26-07:00 America/Los_Angeles
 
     - Use MariaDB binaries when available

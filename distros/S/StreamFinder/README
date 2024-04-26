@@ -158,6 +158,9 @@ DESCRIPTION
     longer possible to obtain a playlist or first episode from them via our
     scripts.
 
+    NOTE: StreamFinder::Google has been removed as Google Podcasts has shut
+    down.
+
     NOTE: StreamFinder::LinkTV has been removed as that site no longer
     provides streams anymore but only links to the various (and diverse)
     streaming sites that provide their own streams. Some may possibly work

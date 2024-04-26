@@ -8,7 +8,6 @@ lib/StreamFinder/Blogger.pm
 lib/StreamFinder/BrandNewTube.pm
 lib/StreamFinder/Brighteon.pm
 lib/StreamFinder/Castbox.pm
-lib/StreamFinder/Google.pm
 lib/StreamFinder/IHeartRadio.pm
 lib/StreamFinder/InternetRadio.pm
 lib/StreamFinder/Odysee.pm

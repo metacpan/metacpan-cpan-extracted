@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::Upload;
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 # ABSTRACT: Query the CPAN uploads data
 
 #pod =head1 SYNOPSIS
@@ -88,6 +88,26 @@ sub recent( $self, $count = 20 ) {
     } );
 }
 
+#pod =method latest_by_dist
+#pod
+#pod Return the dist/version pair for the latest version of all dists
+#pod selected by the current resultset.
+#pod
+#pod =cut
+
+sub latest_by_dist( $self ) {
+    return $self->search( {}, {
+        select => [
+            qw( uploadid dist ),
+            \'MAX(me.version)',
+        ],
+        as => [ qw( uploadid dist version ) ],
+        group_by => [ map "me.$_", qw( dist ) ],
+        having => \'me.version = MAX(me.version)',
+        order_by => undef,
+    } );
+}
+
 1;
 
 __END__
@@ -100,7 +120,7 @@ CPAN::Testers::Schema::ResultSet::Upload - Query the CPAN uploads data
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -149,6 +169,11 @@ ISO8601 date.
 
 Return the most-recently released distributions sorted by their release
 date/time, descending. Defaults to returning up to 20 results.
+
+=head2 latest_by_dist
+
+Return the dist/version pair for the latest version of all dists
+selected by the current resultset.
 
 =head1 SEE ALSO
 

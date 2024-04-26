@@ -1,5 +1,5 @@
 {
-   "abstract" : "SPVM Language",
+   "abstract" : "The SPVM Language",
    "author" : [
       "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
@@ -54,6 +54,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM"
       }
    },
-   "version" : "0.989105",
+   "version" : "0.990001",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

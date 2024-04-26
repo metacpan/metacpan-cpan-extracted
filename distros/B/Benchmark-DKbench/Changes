@@ -1,6 +1,10 @@
 Revision history for Benchmark-DKbench
 
-2.4     2024-04-24
+2.6     2024-04-25
+        - Custom benchmark improvements.
+        - Fix BSD tar xattr.
+
+2.5     2024-04-24
         - Added support for custom benchmarks.
         - Corrected BioPerl Codons bench.
         - Updated some reference modules.

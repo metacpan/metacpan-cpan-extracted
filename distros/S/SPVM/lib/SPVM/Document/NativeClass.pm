@@ -626,13 +626,13 @@ The dependencies of compilation and link of a L<native class|/"Native Class">, L
 
 =back
 
-If the L<force|SPVM::Builder::Config/"force"> in the C<SPVM::Builder::Config> class field is set to 1, the compilation and the link are forced.
+If L<SPVM::Builder::Config#force|SPVM::Builder::Config/"force"> field is set to 1, the compilation and the link are forced.
 
   $config->force(1);
 
 =head1 Resource
 
-A native class can use native header files and native source files writen by native langauges such as the C language and C++ using the L<use_resource|SPVM::Builder::Config/"use_resource"> method in the SPVM::Builder::Config class.
+A native class can use native header files and native source files writen by native langauges such as the C language and C++ using L<SPVM::Builder::Config#use_resource|SPVM::Builder::Config/"use_resource">.
 
   # MyClass.config
   $config->use_resource("Resource::Zlib");

@@ -1,5 +1,5 @@
 ---
-abstract: 'SPVM Language'
+abstract: 'The SPVM Language'
 author:
   - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
@@ -25,5 +25,5 @@ requires:
 resources:
   bugtracker: https://github.com/yuki-kimoto/SPVM/issues
   repository: https://github.com/yuki-kimoto/SPVM.git
-version: '0.989105'
+version: '0.990001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

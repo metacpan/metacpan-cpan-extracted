@@ -164,6 +164,8 @@ episode page to fetch streams from, as Podcastaddict.com has javascripted up
 their podcast pages now to the point that it is no longer possible to obtain 
 a playlist or first episode from them via our scripts.  
 
+NOTE:  StreamFinder::Google has been removed as Google Podcasts has shut down.
+
 NOTE:  StreamFinder::LinkTV has been removed as that site no longer provides 
 streams anymore but only links to the various (and diverse) streaming sites 
 that provide their own streams.  Some may possibly work via 
@@ -548,7 +550,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '2.23';
+our $VERSION = '2.30';
 our $DEBUG = 0;
 
 require Exporter;
@@ -621,9 +623,6 @@ sub new
 	} elsif ($url =~ m#\bcastbox\.\w+\/# && $useit{'Castbox'}) {
 		eval { require 'StreamFinder/Castbox.pm'; $haveit = 1; };
 		return new StreamFinder::Castbox($url, @args)  if ($haveit);
-	} elsif ($url =~ m#\b\.google\.\w+\/# && $useit{'Google'}) {
-		eval { require 'StreamFinder/Google.pm'; $haveit = 1; };
-		return new StreamFinder::Google($url, @args)  if ($haveit);
 	} elsif ($url =~ m#\bradio\.net\/# && $useit{'RadioNet'}) {
 		eval { require 'StreamFinder/RadioNet.pm'; $haveit = 1; };
 		return new StreamFinder::RadioNet($url, @args)  if ($haveit);

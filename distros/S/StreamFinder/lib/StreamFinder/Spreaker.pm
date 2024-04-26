@@ -4,7 +4,7 @@ StreamFinder::Spreaker - Fetch actual raw streamable URLs on widget.spreaker.com
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2021 by
+This module is Copyright (C) 2021-2024 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -108,9 +108,10 @@ One or more stream URLs can be returned for each podcast.
 Accepts a spreaker.com podcast ID or URL and creates and returns a 
 a new podcast object, or I<undef> if the URL is not a valid podcast, or no streams 
 are found.  The URL can be the full URL, ie. 
-https://widget.spreaker.com/player?episode_id=B<podcast-id>, 
+https://widget.spreaker.com/player?episode_id=B<episode-id>, 
 https://www.spreaker.com/user/B<user-id>/B<podcast-id-string>, or just 
-I<podcast-id>.
+I<podcast-id>.  Due to multiple Spreaker URL combinations, it is advised to provide 
+a full Spreaker URL, if possible.
 
 The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
 then only secure ("https://") streams will be returned.
@@ -290,7 +291,7 @@ L<http://search.cpan.org/dist/StreamFinder-Spreaker/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Jim Turner.
+Copyright 2021-2024 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -356,6 +357,7 @@ sub new
 	my $tried = 0;
 	my @epiTitles = ();
 	my @epiStreams = ();
+	my $episodeID = '';
 	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
 	$ua->timeout($self->{'timeout'});
 	$ua->cookie_jar({});
@@ -363,29 +365,39 @@ sub new
 	my $html = '';
 	my $response;
 
-TRYIT:
 	if ($url2fetch =~ m#^(https?\:\/\/([^\/]+))#) {
 		if ($url2fetch =~ m#\?\w+?\_id\=([\d]+)#) {
 			$self->{'id'} = $1;
 		} else {  #WE'RE A FULL URL, IE. "https://www.spreaker.com/user/<user-id>/<podcast-id-string>"
 		          #OR https://www.spreaker.com/show/<podcast-id>
 			$self->{'id'} = ($url2fetch =~ m#([^\/]+)$#) ? $1 : '';
+#			$self->{'id'} =~ s/^[^\d]+(\d+)$/$1/;
 		}
 	} else {
 		$self->{'id'} = $url2fetch;
 	}
 	if ($self->{'id'} =~ m#\/#) {
-		$self->{'_podcast_id'} = $1  if ($self->{'id'} =~ m#^(\d\d\d\d\d\d\d)\/#);
+		$self->{'_podcast_id'} = $1  if ($self->{'id'} =~ m#^(\d+)\/#);
 		$self->{'id'} =~ s#^.*\/##;
+		$episodeID = $self->{'id'};
+	} else {
+#		$episodeID = ($self->{'id'} =~ /(\d\d\d\d\d\d\d\d)$/) ? $1 : $self->{'id'}
+		$episodeID = ($self->{'id'} =~ /(\d\d\d\d\d\d\d\d)$/) ? $1 : '';
 	}
-	if ($self->{'id'} =~ /^\d+$/) {
-		$url2fetch = (length($self->{'id'}) < 8)
-				? "https://www.spreaker.com/show/$self->{'id'}/episodes/feed"
-				: "https://api.spreaker.com/episode/$self->{'id'}";
+	if ($episodeID) {
+		$url2fetch = "https://api.spreaker.com/episode/$episodeID";
+	} elsif ($self->{'id'} =~ /^\d+$/) {
+		if (length($self->{'id'}) < 8) {
+			$url2fetch = "https://www.spreaker.com/show/$self->{'id'}/episodes/feed";
+		} else {
+			$url2fetch = "https://api.spreaker.com/episode/$self->{'id'}";
+			$episodeID = $self->{'id'};
+		}
 	}
 
 	$html = '';
 	print STDERR "-0(Spreaker): ($tried) FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+	print STDERR "-!!!-ID=$$self{'id'}= episodeID=$episodeID= fetch=$url2fetch=\n"  if ($DEBUG);
 	$response = $ua->get($url2fetch);
 	if ($response->is_success) {
 		$html = $response->decoded_content;
@@ -393,13 +405,12 @@ TRYIT:
 		print STDERR $response->status_line  if ($DEBUG);
 	}
 	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
-	print STDERR "-1: id=$self->{'id'}=\n"  if ($DEBUG);
 	return undef  unless ($html && $self->{'id'});  #STEP 1 FAILED, INVALID PODCAST URL, PUNT!
 
 	$self->{'genre'} = 'Podcast';
 	$self->{'albumartist'} = $url2fetch;
 	print STDERR "---ID=".$self->{'id'}."= tried=$tried=\n"  if ($DEBUG);
-	if ($self->{'id'} =~ /^\d+$/) {   #NUMERIC ID:
+	if ($self->{'id'} =~ /^\d+$/) {   #NUMERIC ID:                            ** DEPRECIATED? **
 		if (length($self->{'id'}) < 8) {   #PODCAST PAGE ID (FETCH XML PAGE):
 			print STDERR "-----WE'RE AN XML PODCAST PAGE!\n"  if ($DEBUG);
 			my $ep1id = '';
@@ -441,53 +452,95 @@ TRYIT:
 				$self->{'cnt'}++;
 			}
 		}
-	} elsif (!$tried) {  #NON-NUMERIC ID, SEE IF WE CAN FIND IT IN THE PAGE:
-
-		print STDERR "--nonnumeric ID ($tried)!\n"  if ($DEBUG);
-		if ($html =~ m#\<meta\s+property\=\"og\:image\:alt\"\s+content\=\"Image.+?(episode|podcast)([^\"]+)#) {
-			my $pgtype = $1;
-			(my $id = $2) =~ s#^.+?(\d+)$#$1#;
-			$url2fetch = $id;
-			++$tried;
-			if ($pgtype =~ /podcast/i || length($id) < 8) {  #WE'RE A PODCAST PAGE!:
-				if ($html =~ m#\"show\_cover\_image\"([^\>]+)#) {  #PODCAST PAGE (NON-API) MAY HAVE A BANNER IMAGE!:
-					my $bannerdata = $1;
-					$self->{'imageurl'} = $1  if ($bannerdata =~ m#src\=\"(http[^\"]+)#);
-				}
-				$self->{'_podcast_id'} ||= $id  if ($pgtype =~ /podcast/i);
-				$url2fetch = $1  if ($html =~ m#\bdata\-episode\_id\=\"([^\"]+)\"#is);
-				print STDERR "-!!!!- RETRY w/EPISODE ID=$url2fetch= BANNER URL=".$self->{'imageurl'}."=\n"  if ($DEBUG);
-			} else {   #WE'RE AN EPISODE PAGE:
-				print STDERR "-!!!!- RETRY w/EPISODE URL=$url2fetch=\n";
+	} elsif ($episodeID) {   #EXTRACT EPISODE DATA FROM api.spreaker.com:
+		$html = HTML::Entities::decode_entities($html);
+		$html = uri_unescape($html);
+		$html =~ s#\\\/#\/#gs;
+		$self->{'title'} = ($html =~ s#\"title\"\:\"([^\"]+)##s) ? $1 : '';
+		$self->{'description'} = ($html =~ m#\"description\"\:\"([^\"]+)#s) ? $1 : '';
+		$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
+		$self->{'description'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
+		$self->{'description'} =~ s#\\$##gs;
+		$self->{'album'} = ($html =~ m#\"title\"\:\"([^\"]+)#s) ? $1 : '';
+		$self->{'iconurl'} = ($html =~ s#\"medium\_url\"\:\"([^\"]+)##s) ? $1 : '';
+		$self->{'articonurl'} = ($html =~ m#\"medium\_url\"\:\"([^\"]+)#s) ? $1 : '';
+		$self->{'imageurl'} = ($html =~ m#\"(?:image\_original|big)\_url\"\:\"([^\"]+)#s) ? $1 : '';
+		$self->{'artimageurl'} = ($html =~ m#\"cover\_url\"\:\"([^\"]+)#s) ? $1 : '';
+		$self->{'artist'} = ($html =~ m#\"fullname\"\:\"([^\"]+)#s) ? $1 : '';
+		$self->{'genre'} = ($html =~ m#\"category\_id\"\:\d+\,\"name\"\:\"([^\"]+)#s) ? $1 : '';
+		$self->{'created'} = ($html =~ m#\"published\_at\"\:\"([^\"]+)\"#s) ? $1 : '';
+		$self->{'year'} = $1  if ($self->{'created'} =~ /(\d\d\d\d)/o);
+		my $stream = ($html =~ m#\"download\_url\"\:\"([^\"]+)#s) ? $1 : '';
+		if ($stream) {
+			unless ($self->{'secure'} && $stream !~ /^https/o) {
+				push @epiTitles, $self->{'title'};
+				push @epiStreams, $stream;
+				push @{$self->{'streams'}}, $stream;
+				$self->{'cnt'}++;
 			}
-			$self->{'_podcast_id'} ||= $1  if ($html =~ m#\"show_id\"\:(\d{7})\,#s);
-			print STDERR "------ FOUND PODCAST ID=".$self->{'_podcast_id'}."=\n"  if ($DEBUG);
-			goto TRYIT;
 		}
-		#TRY ONE MORE TIME TO FIND AN EPISODE-ID:
-		if ($html =~ m#\"station\_url\"\s*\:\s*\"([^\"]+)\"#is
-				|| $html =~ m#episode\_id\:\s*(\d+)#s) {
-			($url2fetch = $1) =~ s#\\##g;
-			++$tried;
-			print STDERR "-!!!!- RETRY w/URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
-			goto TRYIT;
+	} else {    #EXTRACT PODCAST PAGE DATA FROM EMBEDDED, ENCODED JSON:
+		$html = HTML::Entities::decode_entities($html);
+		$html = uri_unescape($html);
+		$html =~ s#\\\/#\/#gs;
+		$self->{'album'} = ($html =~ m#\<meta\s+property\=\"(?:og|twitter)\:title\"\s+content\=\"([^\"]+)\"\s*\/\>#s) ? $1 : '';
+		$self->{'articonurl'} = ($html =~ m#\<link\s+rel\=\"image\_src\"\s+href\=\"([^\"]+)#s) ? $1 : '';
+		$self->{'articonurl'} ||= ($html =~ m#\<meta\s+property\=\"(?:og|twitter)\:image\"\s+content\=\"([^\"]+)\"\s*\/\>#s) ? $1 : '';
+		$self->{'artist'} = ($html =~ m#\"fullname\"\:\"([^\"]+)#s) ? $1 : '';
+		$self->{'genre'} = ($html =~ m#\"category\_id\"\:\d+\,\"name\"\:\"([^\"]+)#s) ? $1 : '';
+
+		my $episodes = $1  if ($html =~ m#\"episodes\"\:\[(.+)$#s);
+
+		#EXTRACT PLAYLIST DATA FOR ALL EPISODES & ALL DATA FOR THE FIRST/LATEST EPISODE:
+		my $haveit = 0;  #TRUE WHEN WE HAVE DETAILED DATA FOR THE LATEST EPISODE.
+		while ($episodes =~ s#^.+?\{\"miniplayer_data\"\:##s) {
+			(my $ephtml = $episodes) =~ s/\{\"miniplayer_data\"\:.*$//so;
+			next  unless ($ephtml =~ /\"episode_id\"\:(\d+)/so);
+			my $epiID = $1;
+			my $stream = ($ephtml =~ /\"playback\_url\"\:\"([^\"]+)/so) ? $1 : '';
+			my $title = ($stream && $ephtml =~ /\"title\"\:\"([^\"]+)/so) ? $1 : '';
+			if ($title) {
+				unless ($self->{'secure'} && $stream !~ /^https/o) {
+					push @epiTitles, $title;    #ADD ALL EPISODES TO THE PLAYLIST:
+					push @epiStreams, $stream;
+					print STDERR "--haveit=$haveit= epiID=$epiID= episodeID=$episodeID=\n"  if ($DEBUG);
+					if (!$haveit && (!$episodeID || $episodeID eq $epiID)) { #GRAB 1ST/LATEST EPISODE DETAILS:
+						$episodeID = $epiID;
+						$haveit = 1;
+						$self->{'title'} = $title;
+						print STDERR "---GRABBED EPI=$epiID= title=$title=\n"  if ($DEBUG);
+						$self->{'description'} = $1  if ($ephtml =~ m#\"description\"\:\"([^\"]+)\"#so);
+						$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
+						$self->{'description'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
+						$self->{'description'} =~ s#\\$##gs;
+						$self->{'iconurl'} = $1  if ($ephtml =~ m#\"image\_url\"\:\"([^\"]+)\"#so);
+						$self->{'imageurl'} = $1  if ($ephtml =~ m#\"image\_original\_url\"\:\"([^\"]+)\"#so);
+						$self->{'iconurl'} ||= $self->{'imageurl'};
+						$self->{'imageurl'} ||= $self->{'iconurl'};
+						$self->{'created'} = $1 if ($ephtml =~ m#\"published\_at\"\:\"([^\"]+)\"#so);
+						$self->{'year'} = $1  if ($self->{'created'} =~ /(\d\d\d\d)/o);
+						push @{$self->{'streams'}}, $stream;
+						$self->{'cnt'}++;
+					}
+				}
+			}
 		}
 	}
 
 	$self->{'total'} = $self->{'cnt'};
+	$self->{'Url'} = ($self->{'total'} > 0) ? $self->{'streams'}->[0] : '';
 
 	print STDERR "-(all)count=".$self->{'total'}."= ID=".$self->{'id'}."= iconurl="
 			.$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}
 			."= YEAR=".$self->{'year'}."=\n"  if ($DEBUG);
 	return undef  unless ($self->{'cnt'} > 0);
 
-	#GENERATE EXTENDED-M3U PLAYLIST (NOTE: MAY NOT BE ABLE TO UNTIL USER CALLS $podcast->get('playlist')!):
+	#GENERATE EXTENDED-M3U PLAYLIST:
 
 	$self->{'playlist'} = "#EXTM3U\n";
-	if ($#epiStreams >= 0) {
+	if ($#epiStreams >= 0) {  #PLAYLIST PAGE SPECIFIED, ADD ALL EPISODES TO PLAYLIST:
 		$self->{'playlist_cnt'} = scalar @epiStreams;
 		for (my $i=0;$i<=$#epiStreams;$i++) {
-
 			last  if ($i > $#epiTitles);
 			$self->{'playlist'} .= "#EXTINF:-1, " . $epiTitles[$i] . "\n";
 			$self->{'playlist'} .= "#EXTART:" . $self->{'artist'} . "\n"
@@ -498,7 +551,7 @@ TRYIT:
 					if ($self->{'genre'});
 			$self->{'playlist'} .= $epiStreams[$i] . "\n";
 		}
-	} else {
+	} else {  #EPISODE PAGE SPECIFIED, ONLY THAT EPISODE ADDED TO PLAYLIST:
 		$self->{'playlist_cnt'} = 1;
 		$self->{'playlist'} .= "#EXTINF:-1, " . $self->{'title'} . "\n";
 		$self->{'playlist'} .= "#EXTART:" . $self->{'artist'} . "\n"
@@ -508,6 +561,13 @@ TRYIT:
 		$self->{'playlist'} .= "#EXTGENRE:" . $self->{'genre'} . "\n"
 				if ($self->{'genre'});
 		$self->{'playlist'} .= ${$self->{'streams'}}[0] . "\n";
+	}
+
+	if ($DEBUG) {
+		foreach my $i (sort keys %{$self}) {
+			print STDERR "--KEY=$i= VAL=".$self->{$i}."=\n";
+		}
+		print STDERR "-SUCCESS: 1st stream=".$self->{'Url'}."=\n"  if ($DEBUG);
 	}
 
 	$self->_log($url);
@@ -520,7 +580,7 @@ TRYIT:
 #IF WE WERE GIVEN A PODCAST PAGE W/O A NUMERIC PODCAST-ID, WE WAIT UNTIL HERE (ASKED BY USER) TO 
 #FETCH THE XML PODCAST PAGE (REQUIRES NUMERIC PODCAST-ID)
 #OTHERWISE, WE ALREADY HAVE THE PLAYLIST DATA, SO WE RETURN THAT:
-sub get
+sub get   ## DEPRECIATED? ##
 {
 	my $self = shift;
 

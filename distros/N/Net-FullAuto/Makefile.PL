@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000645';
+our $VERSION='1.0000646';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -5072,6 +5072,10 @@ sub build_berkeleydb {
       print "*** Completed Encrypted BerkeleyDB build\n";
    } else {
       print "*** Starting Non-Encrypted BerkeleyDB build\n";
+      # REMOVE JAVA UTILITIES BECAUSE LOG4J VULNERABILITY
+      fa_system("(cd ${filename}.NC_$uniq/lang;".
+         "rm -rf java;cd -) 2>&1")
+         || warn $!;
       fa_system("(cd ${filename}.NC_$uniq/build_unix;".
          $CPAN::Config->{make}." install) 2>&1")
          || warn $!;

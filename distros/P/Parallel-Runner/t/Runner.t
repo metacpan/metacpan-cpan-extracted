@@ -2,11 +2,8 @@
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Exception::LessClever;
-
-my $CLASS = 'Parallel::Runner';
-use_ok($CLASS);
+use Test2::V0 -target => 'Parallel::Runner';
+use Test2::IPC;
 
 can_ok( $CLASS, qw/new exit_callback iteration_callback children _children pid max/ );
 
@@ -21,7 +18,7 @@ $one->reap_callback(
 isa_ok( $one, $CLASS );
 is( $one->max, 1,  "got max" );
 is( $one->pid, $$, "Stored pid" );
-is_deeply(
+is(
     $one,
     {
         iteration_delay => 0.1,
@@ -49,12 +46,15 @@ $one->run(
 
 $one->finish;
 
-throws_ok {
-    my $one = $CLASS->new(2);
-    $one->pid(0.5);
-    $one->run( sub { 1 } );
-}
-qr/Called run\(\) in child process/, "Do not run in fork";
+like(
+    dies {
+        my $one = $CLASS->new(2);
+        $one->pid(0.5);
+        $one->run(sub { 1 });
+    },
+    qr/Called run\(\) in child process/,
+    "Do not run in fork"
+);
 
 my $ran           = 0;
 my $iter_callback = sub { $ran++ };
@@ -105,13 +105,15 @@ $one->run( sub { 1 } );
 $one->finish;
 
 my $data;
-lives_ok {
-    local $SIG{ALRM} = sub { die('alarm') };
-    alarm 5;
-    $data = <$read>;
-    alarm 0;
-}
-"read from pipe";
+ok(
+    lives {
+        local $SIG{ALRM} = sub { die('alarm') };
+        alarm 5;
+        $data = <$read>;
+        alarm 0;
+    },
+    "read from pipe"
+);
 is( $data, "ran\n", "exit callback ran" );
 
 my @accum_data;
@@ -128,7 +130,7 @@ $one->run( sub { return "baz" } );
 $one->run( sub { return "bat" } );
 $one->finish;
 
-is_deeply(
+is(
     [sort @accum_data],
     [sort qw/foo bar baz bat/],
     "Got all data returned by subprocesses"
@@ -148,7 +150,7 @@ $one->run( sub { return "baz" } );
 $one->run( sub { return "bat" } );
 $one->finish;
 
-is_deeply(
+is(
     [sort @accum_data],
     [sort qw/foo bar baz bat/],
     "Got all data returned when not forking"

@@ -4,7 +4,7 @@ StreamFinder::Subsplash - Fetch actual raw streamable URLs on subsplash.com
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2021-2023 by
+This module is Copyright (C) 2021-2024 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -276,7 +276,7 @@ L<http://search.cpan.org/dist/StreamFinder-Subsplash/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021-2023 Jim Turner.
+Copyright 2021-2024 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -388,7 +388,6 @@ sub new
 	foreach my $tag ('video', 'audio') {
 		if ($html =~ s#\<$tag\s+preload(.+?)\<\/$tag\>##s) {
 			my $stuff = $1;
-print STDERR "---($tag) stuff=$stuff=\n";
 			$stream = $1  if ($stuff =~ m#\<source\s+src\=\"([^\"]+)#);
 			unless (!$stream || ($self->{'secure'} && $stream !~ /^https/o)) {
 				push @{$self->{'streams'}}, $stream;
@@ -397,7 +396,6 @@ print STDERR "---($tag) stuff=$stuff=\n";
 		}
 	}
 
-print STDERR "---CNT=".$self->{'cnt'}."=\n";
 	return undef  unless ($self->{'cnt'} > 0);
 
 	foreach my $tag ('og:title', 'twitter:title') {
@@ -432,11 +430,27 @@ print STDERR "---CNT=".$self->{'cnt'}."=\n";
 		my $date = $1;
 		$self->{'year'} = $1  if ($date =~ /(\d\d\d\d)/);
 	}
-	if ($html =~ s#kit\-player\_\_info\-text\-\-additional\"\>(.+?)\<\/div\>##s) {
+	if ($html =~ m#\<div\s+class\=\"route\-media\-item\_\_basic\-info\"\>(.+?)\<\/div\>#s) {
 		my $addtl = $1;
+		if ($addtl =~ m#\<p\>\s*(.+?)\<\/p\>#s) {
+			my $stuff = $1;
+			if ($stuff =~ s#^\s*(.+?\d\d\d\d)##) {
+				$self->{'created'} = $1;
+				$self->{'year'} = $1  if ($self->{'created'} =~ /(\d\d\d\d)/);
+				($self->{'artist'} = $stuff) =~ s#^[^\w]+##;
+				$self->{'artist'} =~ s/\s+$//;
+			}
+		}
+	} elsif ($html =~ s#kit\-player\_\_info\-text\-\-additional\"\>(.+?)\<\/div\>##s) { ## DEPRECIATED? ##:
 		$self->{'artist'} = $1;
 		$self->{'artist'} =~ s/^\s+//s;
 		$self->{'artist'} =~ s/\s+$//s;
+	}
+	if ($html =~ m#\<div\s+class\=\"route\-media\-item\_\_more\-items\-title\"(.+?)\<\/div\>#s) {
+		my $addtl = $1;
+		if ($addtl =~ m#\<a[^\>]+\>\s*(.+?)\<\/a\>#s) {
+			($self->{'album'} = $1) =~ s/\s+$//;
+		}
 	}
 	foreach my $field (qw(title description artist)) {
 		$self->{$field} = HTML::Entities::decode_entities($self->{$field});
@@ -445,172 +459,19 @@ print STDERR "---CNT=".$self->{'cnt'}."=\n";
 	}
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'id'} =~ s/[\+\-]//g;
-	print STDERR "-(all)count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}."= YEAR=".$self->{'year'}."=\n"  if ($DEBUG);
-	print STDERR "--ALBUM=".$self->{'album'}."= ALBUMARTIST=".$self->{'albumartist'}."=\n"  if ($DEBUG);
-	print STDERR "-SUCCESS: 1st stream=".${$self->{'streams'}}[0]."=\n"  if ($DEBUG);
+	$self->{'Url'} = ($self->{'total'} > 0) ? $self->{'streams'}->[0] : '';
+	print STDERR "-SUCCESS: 1st stream=".$self->{'Url'}."=\n"  if ($DEBUG);
 	$self->_log($url);
+	if ($DEBUG) {
+		foreach my $i (sort keys %{$self}) {
+			print STDERR "--KEY=$i= VAL=".$self->{$i}."=\n";
+		}
+		print STDERR "--FIRST STREAM=".${$self->{'streams'}}[0]."=\n";
+	}
 
 	bless $self, $class;   #BLESS IT!
 
 	return $self;
-}
-
-sub get
-{
-	my $self = shift;
-
-	return wantarray ? @{$self->{'streams'}} : ${$self->{'streams'}}[0];
-}
-
-sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELIABILITY:
-{
-	my $self = shift;
-	my $arglist = (defined $_[0]) ? join('|',@_) : '';
-	my $idx = ($arglist =~ /\b\-?random\b/) ? int rand scalar @{$self->{'streams'}} : 0;
-	if (($arglist =~ /\b\-?nopls\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls)$/i)
-			|| ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls|m3u8?)$/i)) {
-		my $plType = $1;
-		my $firstStream = ${$self->{'streams'}}[$idx];
-		print STDERR "-getURL($idx): NOPLAYLISTS and (".${$self->{'streams'}}[$idx].")\n"  if ($DEBUG);
-		my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
-		$ua->timeout($self->{'timeout'});
-		$ua->cookie_jar({});
-		$ua->env_proxy;
-		my $html = '';
-		my $response = $ua->get($firstStream);
-		if ($response->is_success) {
-			$html = $response->decoded_content;
-		} else {
-			print STDERR $response->status_line  if ($DEBUG);
-			my $no_wget = system('wget','-V');
-			unless ($no_wget) {
-				print STDERR "\n..trying wget...\n"  if ($DEBUG);
-				$html = `wget -t 2 -T 20 -O- -o /dev/null \"$firstStream\" 2>/dev/null `;
-			}
-		}
-		my @lines = split(/\r?\n/, $html);
-		my @plentries = ();
-		my $firstTitle = '';
-		my $plidx = ($arglist =~ /\b\-?random\b/) ? 1 : 0;
-		if ($plType =~ /pls/i) {  #PLS:
-			foreach my $line (@lines) {
-				if ($line =~ m#^\s*File\d+\=(.+)$#o) {
-					push (@plentries, $1);
-				} elsif ($line =~ m#^\s*Title\d+\=(.+)$#o) {
-					$firstTitle ||= $1;
-				}
-			}
-			$self->{'title'} ||= $firstTitle;
-			print STDERR "-getURL(PLS): title=$firstTitle= pl_idx=$plidx=\n"  if ($DEBUG);
-		} elsif ($arglist =~ /\b\-?noplaylists\b/) {  #m3u*:
-			(my $urlpath = ${$self->{'streams'}}[$idx]) =~ s#[^\/]+$##;
-			foreach my $line (@lines) {
-				if ($line =~ m#^\s*([^\#].+)$#o) {
-					my $urlpart = $1;
-					$urlpart =~ s#^\s+##o;
-					$urlpart =~ s#^\/##o;
-					push (@plentries, ($urlpart =~ m#https?\:#) ? $urlpart : ($urlpath . '/' . $urlpart));
-					last  unless ($plidx);
-				}
-			}
-			print STDERR "-getURL(m3u?): pl_idx=$plidx=\n"  if ($DEBUG);
-		}
-		if ($plidx && $#plentries >= 0) {
-			$plidx = int rand scalar @plentries;
-		} else {
-			$plidx = 0;
-		}
-		$firstStream = (defined($plentries[$plidx]) && $plentries[$plidx]) ? $plentries[$plidx]
-				: ${$self->{'streams'}}[$idx];
-
-		return $firstStream;
-	}
-
-	return ${$self->{'streams'}}[$idx];
-}
-
-sub count
-{
-	my $self = shift;
-	return $self->{'total'};  #TOTAL NUMBER OF PLAYABLE STREAM URLS FOUND.
-}
-
-sub getType
-{
-	my $self = shift;
-	return 'Subsplash';  #PODCAST TYPE (FOR PARENT StreamFinder MODULE).
-}
-
-sub getID
-{
-	my $self = shift;
-	return $self->{'fccid'}  if (defined($_[0]) && $_[0] =~ /fcc/i);  #PODCAST'S CALL LETTERS OR IHEARTRADIO-ID.
-	return $self->{'id'};
-}
-
-sub getTitle
-{
-	my $self = shift;
-	return $self->{'description'}  if (defined($_[0]) && $_[0] =~ /^\-?(?:long|desc)/i);
-	return $self->{'title'};  #PODCAST'S TITLE(DESCRIPTION), IF ANY.
-}
-
-sub getIconURL
-{
-	my $self = shift;
-	return $self->{'iconurl'};  #URL TO THE PODCAST'S THUMBNAIL ICON, IF ANY.
-}
-
-sub getIconData
-{
-	my $self = shift;
-	return ()  unless ($self->{'iconurl'});
-
-	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
-	$ua->timeout($self->{'timeout'});
-	$ua->cookie_jar({});
-	$ua->env_proxy;
-	my $art_image = '';
-	my $response = $ua->get($self->{'iconurl'});
-	if ($response->is_success) {
-		$art_image = $response->decoded_content;
-	} else {
-		print STDERR $response->status_line  if ($DEBUG);
-	}
-	return ()  unless ($art_image);
-
-	(my $image_ext = $self->{'iconurl'}) =~ s/^.+\.//;
-	$image_ext =~ s/[^A-Za-z].*$//;
-
-	return ($image_ext, $art_image);
-}
-
-sub getImageURL
-{
-	my $self = shift;
-	return $self->{'imageurl'};  #URL TO THE PODCAST'S BANNER IMAGE, IF ANY.
-}
-
-sub getImageData
-{
-	my $self = shift;
-	return ()  unless ($self->{'imageurl'});
-	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
-	$ua->timeout($self->{'timeout'});
-	$ua->cookie_jar({});
-	$ua->env_proxy;
-	my $art_image = '';
-	my $response = $ua->get($self->{'imageurl'});
-	if ($response->is_success) {
-		$art_image = $response->decoded_content;
-	} else {
-		print STDERR $response->status_line  if ($DEBUG);
-	}
-	return ()  unless ($art_image);
-	my $image_ext = $self->{'imageurl'};
-	$image_ext = ($self->{'imageurl'} =~ /\.(\w+)$/) ? $1 : 'png';
-	$image_ext =~ s/[^A-Za-z].*$//;
-	return ($image_ext, $art_image);
 }
 
 1

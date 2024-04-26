@@ -1,4 +1,9 @@
 Revision history for Net-OBS-Client
+0.1.3 2024-04-26
+
+  * add "use Carp" in Net::OBS::LWP::UserAgent
+
+
 0.1.2 2024-03-27
 
   * added Net::OBS::LWP::UserAgent with 'mirror' method

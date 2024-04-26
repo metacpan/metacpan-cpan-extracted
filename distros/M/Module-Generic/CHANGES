@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Generic
 
+v0.35.4 2024-04-26T13:55:12+0900
+    - Minor improvements to Module::Generic::SharedMemXS
+
 v0.35.3 2024-04-10T06:42:08+0900
     - Minor correction of unused variable warning in method _parse_timestamp() in Module::Generic
 

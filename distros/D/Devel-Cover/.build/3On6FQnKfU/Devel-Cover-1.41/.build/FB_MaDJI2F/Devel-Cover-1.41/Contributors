@@ -1,0 +1,144 @@
+The following people have helped to make Devel::Cover what it is today, either
+by sending pull requests, patches or suggestions, or by reporting or working
+to fix bugs.
+
+Thank-you to one and all!
+
+Alexandr Evstigneev            hurricup@evstigneev.com
+Alex Balhatchet                alex@balhatchet.net
+Alexey Sokolov
+Allison Regier                 penneraa@acm.org
+Andrew Billeb                  [private]
+Andy Lester                    andy@petdance.com
+Arthur Axel 'fREW' Schmidt     frioux@gmail.com
+Artur Bergman                  arthur@contiller.se
+Audrey Tang (唐鳳)             audreyt@audreyt.org
+Axel Beckert                   abe@deuxchevaux.org
+B Fraser                       fraserbn@gmail.com
+Brandon Black                  blblack@gmail.com
+Brian Cassidy                  bricas@cpan.org
+brian d foy                    brian.d.foy@gmail.com
+Buddy Burden                   barefootcoder@gmail.com
+Celogeek                       me@celogeek.com
+Chad Granum                    exodist7@gmail.com
+Chia-liang Kao                 clkao@clkao.org
+Chisel Wright                  chisel@chizography.net
+Christian Walde                walde.christian@gmail.com
+cono                           q@cono.org.ua
+Curtis Jewell                  csjewell@cpan.org
+Dagfinn Ilmari Mannsåker       ilmari@ilmari.org
+Daisuke Maki                   dmaki@cpan.org
+Dan Collins                    dcollinsn@gmail.com
+Daniel Coupal                  dcoupal@cisco.com
+Daniel Egeberg                 daniel.egeberg@gmail.com
+Daniel Perrett                 perrettdl@googlemail.com
+Dave Rolsky                    autarch@urth.org
+David Cantrell                 david@cantrell.org.uk
+David E. Wheeler               david@justatheory.com
+David Steinbrunner             dsteinbrunner@pobox.com
+Denis Howe                     denis.howe@gmail.com
+Dick Franks                    rwfranks@acm.org
+Dinis Rebolo                   dinisrebolo@gmail.com
+Dominic Mitchell               dom@happygiraffe.net
+Eden Hochbaum                  eden.hochbaum@gmail.com
+Ed J                           etj at cpan.org
+Emiliya Boyadjieva             emiliya.boyadjieva@sap.com
+Erwan Lemonnier                erwan@cpan.org
+Felipe Gasper                  felipe@felipegasper.com
+Florian Ragwitz                rafl@debian.org
+Gábor Szabó                    szabgab@gmail.com
+Gisle Aas                      gisle@ActiveState.com
+Goro Fuji                      gfuji@cpan.org
+Graham Knop                    haarg@haarg.org
+Gregor Herrmann                gregoa@debian.org
+Guillaume Aubert               aubertg@cpan.org
+Guillermo O. Freschi           kedrot@gmail.com
+Haydn Newport                  haydn@catalyst.net.nz
+Heikki J Laaksonen             heikki.j.laaksonen@kolumbus.fi
+Heinz Knutzen                  heinz.knutzen@gmail.com
+Helmut Wollmersdorfer          helmut@wollmersdorfer.at
+H.Merijn Brand                 h.m.brand@xs4all.nl
+Ivan Wills                     ivan.wills@gmail.com
+Jacques Germishuys             jacquesg@cpan.org
+James E Keenan                 jkeenan@cpan.org
+James Raspass                  jraspass@gmail.com
+Jeff Wren                      jeffrey.wren@paradigm-works.com
+Jens Rehsack                   sno@netbsd.org
+Jesús Alonso Abad              https://github.com/Kencho
+Jim Cromie                     jcromie@cpan.org
+jkahrman
+Joel Berger                    joel.a.berger@gmail.com
+John Lightsey                  jd@cpanel.net
+John LoVerso                   jloverso@mathworks.com
+Jonathan "Duke" Leto           jonathan@leto.net
+jpsalvesen
+Kan Fushihara                  kan.fushihara@gmail.com
+Karen Etheridge                ether@cpan.org
+Keith Wissing
+Kent Fredric                   kentfredric@gmail.com
+Kevin Brannen                  kbrannen@pwhome.com
+Kirk Kimmel                    kimmel@cpan.org
+Larry Leszczynski              larryl@cpan.org
+Lasse Makholm                  lasse@unity3d.com
+Lee Johnson                    lee@givengain.ch
+Léon Brocard                   acme@astray.com
+Marcel Grünauer                marcel@cpan.org
+Marc-Philip                    mpw96@gmx.de
+Mark Stosberg                  mark@summersault.com
+Matthew Horsfall               wolfsage@gmail.com
+mauke
+Max Maischein                  corion@cpan.org
+Michael Carman                 mjcarman@cpan.org
+Michael G Schwern              schwern@pobox.com
+Mohammad S Anwar               mohammad.anwar@yahoo.com
+Nathan Haigh                   n.haigh@sheffield.ac.uk
+Nicholas Clark                 nick@ccl4.org
+ℕicolas ℝ.                     nicolas@atoomic.org
+Niko Tyni                      ntyni@debian.org
+Norman Nunley                  nnunley@gmail.com
+Olaf Alders                    olaf@wundersolutions.com
+Olivier Mengué                 dolmen@cpan.org
+Oliver Youle                   youle.oliver@gmail.com
+Opera Wang                     Opera.Wang+step@gmail.com
+Pau Amma                       pauamma@cpan.org
+Paul Hirst                     paulhirst@bearandgiraffe.org
+Paul Johnson                   paul@pjcj.net
+Paul "LeoNerd" Evans           leonerd@leonerd.org.uk
+Philippe M. Chiasson           gozer@cpan.org
+philip r brenan                philiprbrenan@gmail.com
+pjuhasz                        https://github.com/pjuhasz
+Reini Urban                    rurban@cpan.org
+Robert Freimuth                rfreimuth@cpan.org
+Robin Barker                   RMBarker@cpan.org
+Rob Kinyon                     rob.kinyon@gmail.com
+Ruslan Zakirov                 Ruslan.Zakirov@gmail.com
+Ryan Voots                     simcop2387@simcop2387.info
+sago35                         sago35@gmail.com
+Sebastian Paaske Tørholm       eckankar@gmail.com
+Sébastien Aperghis-Tramoni     saper@cpan.org
+Sergiy Borodych                Sergiy.Borodych@gmail.com
+Slaven Rezić                   slaven@rezic.de
+Stefan Becker                  Stefan.Becker@nokia.com
+Steffen Schwigon               ss5@renormalist.net
+Stephan Loyd                   stephanloyd9@gmail.com
+Stephen Thirlwall              sdt@dr.com
+Steve Hay                      shay@cpan.org
+Steve Peters                   smpeters@cpan.org
+Steve Rogerson
+Steve Sanbeg                   sanbeg@cpan.org
+Sullivan Beck                  sbeck@cpan.org
+Tatsuhiko Miyagawa             miyagawa@bulknews.net
+Thomas Dorner                  dorner (AT) cpan.org
+Tina Müller                    tinita at cpan.org
+Todd Rinaldo                   toddr@cpan.org
+Vadim O. Ustiansky             ustiansky@cpan.org
+waterbeetle
+Xavier Caron                   xcaron@gmail.com
+Zakariyya Mughal               zmughal@cpan.org
+Zefram                         zefram@fysh.org
+
+
+If you should be on this list and I have overlooked your contribution, please
+accept my apologies and let me know what your entry should look like.
+Similarly, if you would like your entry changed or deleted, please let me
+know.

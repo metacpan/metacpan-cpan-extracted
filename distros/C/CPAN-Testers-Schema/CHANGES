@@ -1,5 +1,13 @@
 Changelog for CPAN-Testers-Schema
 
+0.026     2024-04-25 15:15:16+01:00 Europe/Lisbon
+
+  [Added]
+
+  - Added method to get latest versions of dists
+  - Added relationship to get stat rows for dists
+  - Combined, I can now get stat rows for latest versions of dists!
+
 0.025     2020-01-13 21:13:16-05:00 America/New_York
 
     [Added]

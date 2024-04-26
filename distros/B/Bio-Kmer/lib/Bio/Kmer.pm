@@ -5,7 +5,7 @@
 
 package Bio::Kmer;
 require 5.10.0;
-our $VERSION=0.54;
+our $VERSION=0.55;
 
 use strict;
 use warnings;
@@ -841,12 +841,15 @@ sub countKmersJellyfish{
   # Counting
   my $jellyfishCountOptions="-s 10000000 -m $kmerlength -o $outfile -t $self->{numcpus}";
   my $uncompressedFastq="$self->{tempdir}/$basename.fastq";
-  my $zcat = which("zcat");
   if($seqfile=~/\.gz$/i){
-    if(!-e $zcat){
-      croak "ERROR: could not find zcat in PATH for uncompressing $seqfile";
+    my $inFh = $self->openFastq($seqfile);
+    open(my $outFh, ">", $uncompressedFastq) or croak "ERROR: could not write decompressed fastq to $uncompressedFastq: $!";
+    while(<$inFh>){
+      print $outFh $_;
     }
-    system("$zcat \Q$seqfile\E > $uncompressedFastq"); croak "ERROR uncompressing $seqfile" if $?;
+    close $outFh;
+    close $inFh;
+
     system("$$self{jellyfish} count $jellyfishCountOptions \Q$uncompressedFastq\E");
   } else {
     system("$$self{jellyfish} count $jellyfishCountOptions \Q$seqfile\E");

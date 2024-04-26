@@ -1,5 +1,10 @@
 Revision history for XS-Parse-Keyword
 
+0.41    2024-04-25
+        [BUGFIXES]
+         * Remmeber to EXTEND the stack in list-associative operator wrapper
+           functions (thanks aquanight) (RT153173)
+
 0.40    2024-04-23
         [CHANGES]
          * Support N-way list-associative operators, implemented as LISTOPs

@@ -31,6 +31,7 @@ use ExtUtils::MakeMaker;
         'URI::URL'            =>  0,
         'Path::Class'         =>  0,
         'Const::Fast'         =>  0,
+        'Carp'                =>  0,
     },
     META_MERGE    => {
         'meta-spec' => { version => 2 },

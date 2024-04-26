@@ -602,6 +602,12 @@ sub new
 				if ($self->{'genre'});
 		$self->{'playlist'} .= ${$self->{'streams'}}[0] . "\n";
 	}
+	if ($DEBUG) {
+		foreach my $f (sort keys %{$self}) {
+			print "--KEY=$f= VAL=$$self{$f}=\n";
+		}
+	}
+
 	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!

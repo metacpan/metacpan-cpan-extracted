@@ -1,5 +1,13 @@
 Revision history for OpenTelemetry
 
+0.020     2024-04-25 18:54:56+01:00 Europe/London
+
+    * Switch LWP::UserAgent integration to wrap around that module's
+      'simple_request' method instead of its 'request' method. This
+      should catch some more cases, and fix GH #13.
+    * Added a minimal example application. See the `examples` directory
+      in the distribution files.
+
 0.019     2023-12-03 14:44:05+00:00 Europe/London
 
     * Document OpenTelemetry->logger as deprecated, as this will soon

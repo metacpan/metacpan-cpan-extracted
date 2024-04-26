@@ -7,7 +7,7 @@ use Time::HiRes qw/sleep/;
 use Carp;
 use Child qw/child/;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 for my $accessor (qw/ exit_callback data_callback iteration_callback _children pid max iteration_delay reap_callback pipe/) {
     my $sub = sub {
@@ -105,7 +105,8 @@ sub _fork {
     $self->_iterate( sub { !defined $proc->exit_status } )
         if $self->max == 1;
 
-    $self->children($proc);
+    $self->children($proc)
+        unless defined $proc->exit_status;
 
     return $proc;
 }
@@ -189,11 +190,11 @@ Parallel::Runner - An object to manage running things in parallel processes.
 
 There are several other modules to do this, you probably want one of them. This
 module exists as a super specialised parallel task manager. You create the
-object with a proces limit and callbacks for what to do while waiting for a
-free process slot, as well as a callback for what a process shoudl do just
+object with a process limit and callbacks for what to do while waiting for a
+free process slot, as well as a callback for what a process should do just
 before exiting.
 
-You must explicetly call $runner->finish() when you are done. If the runner is
+You must explicitly call $runner->finish() when you are done. If the runner is
 destroyed before it's children are finished a warning will be generated and
 your child processes will be killed, by force if necessary.
 
@@ -236,7 +237,7 @@ allowed, defaults to 1.
 
 =head1 ACCESSORS
 
-These are simple accessors, provididng an argument sets the accessor to that
+These are simple accessors, providing an argument sets the accessor to that
 argument, no argument it simply returns the current value.
 
 =over 4
@@ -294,7 +295,7 @@ process slot.
 Codref to call whenever a pid is reaped using waitpid. The callback sub will be
 passed 3 values The first is the exit status of the child process. The second
 is the pid of the child process. The third used to be the return of waitpid,
-but this is depricated as L<Child> is now used and throws an exception when
+but this is deprecated as L<Child> is now used and throws an exception when
 waitpid is not what it should be. The third is simply the pid of the child
 process again. The final argument is the child process object itself.
 
@@ -381,7 +382,7 @@ Together the tools that make up the Fennec framework provide a potent testing
 environment.
 
 The tools provided by Fennec are also useful on their own. Sometimes a tool
-created for Fennec is useful outside the greator framework. Such tools are
+created for Fennec is useful outside the greater framework. Such tools are
 turned into their own projects. This is one such project.
 
 =over 2

@@ -1,5 +1,5 @@
 package CPAN::Testers::Schema;
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 # ABSTRACT: Schema for CPANTesters database processed from test reports
 
 #pod =head1 SYNOPSIS
@@ -316,7 +316,7 @@ CPAN::Testers::Schema - Schema for CPANTesters database processed from test repo
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 

@@ -551,7 +551,7 @@ L<HTML5::DOM::CSS::Selector|/HTML5::DOM::CSS::Selector::Entry>.
 =back
 
  my $tree = HTML5::DOM->new->parse('<div class="red">red</div><div class="blue">blue</div>')
- my $collection = $tree->at('body > div.red, body > div.blue');
+ my $collection = $tree->find('body > div.red, body > div.blue');
  print $collection->[0]->html; # <div class="red">red</div>
  print $collection->[1]->html; # <div class="red">blue</div>
 

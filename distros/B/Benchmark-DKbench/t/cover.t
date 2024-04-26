@@ -26,6 +26,8 @@ is([Benchmark::DKbench::avg_stdev([])], [0, 0], 'Empty array');
 is([Benchmark::DKbench::min_max_avg([])], [0, 0, 0], 'Empty array');
 is(length(Benchmark::DKbench::_random_str()), 1, 'Default len 1');
 
+is(Benchmark::DKbench::mce_bench_run({scale=>0,threads=>0}), 'Pass', 'Empty mce_bench_run');
+
 $Benchmark::DKbench::datadir = '';
 
 ok(dies {Benchmark::DKbench::bench_imager(1)}, "No image file found");

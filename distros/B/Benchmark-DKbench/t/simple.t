@@ -54,6 +54,16 @@ diag $std[0];
 $stats2{threads} = 2;
 calc_scalability({}, \%stats1, \%stats2);
 
+@std = capture {calc_scalability({iter => 1, scale => 1}, \%stats1, \%stats2)};
+
+unlike($std[0], qr/scale/, 'No scale listed');
+unlike($std[0], qr/iterations/, 'No iterations listed');
+
+@std = capture {calc_scalability({iter => 2, scale => 2}, \%stats1, \%stats2)};
+
+like($std[0], qr/scale/, 'Scale listed');
+like($std[0], qr/iterations/, 'Iterations listed');
+
 @std = capture {
     suite_run({
             threads => 1,
@@ -76,7 +86,6 @@ my $datadir = dist_dir("Benchmark-DKbench");
             threads  => 1,
             time     => 1,
             iter     => 1,
-            scale    => 1,
             no_mce   => 1,
             include  => 'prove',
         }

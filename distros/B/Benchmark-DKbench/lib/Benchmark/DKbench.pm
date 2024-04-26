@@ -7,6 +7,7 @@ use Config;
 use Digest;
 use Digest::MD5 qw(md5_hex);
 use Encode;
+use Exporter 'import';
 use File::Spec::Functions;
 use List::Util qw(min max sum);
 use Time::HiRes qw(CLOCK_MONOTONIC);
@@ -35,12 +36,11 @@ use System::Info;
 use Text::Levenshtein::Damerau::XS;
 use Text::Levenshtein::XS;
 
-use Exporter 'import';
-our @EXPORT    = qw(system_identity suite_run calc_scalability);
-our $datadir   = dist_dir("Benchmark-DKbench");
 my $mono_clock = $^O !~ /win/i || $Time::HiRes::VERSION >= 1.9764;
 
-our $VERSION = '2.5';
+our $VERSION = '2.6';
+our @EXPORT  = qw(system_identity suite_run calc_scalability);
+our $datadir = dist_dir("Benchmark-DKbench");
 
 =head1 NAME
 
@@ -74,7 +74,7 @@ scenario - even allowing you to add your own custom benchmarks.
 
 See the L</"setup_dkbench"> script below for more on the installation of a couple
 of optional benchmarks and standardizing your benchmarking environment, otherwise
-here are some general guidelines for verious systems.
+here are some general guidelines for various systems.
 
 =head2 Linux / WSL etc
 
@@ -104,7 +104,7 @@ the benchmark suite.
 =head2 Strawberry Perl
 
 If you are on Windows, you should be using the Windows Subsystem for Linux (WSL)
-for running Perl or, if you can't (e.g. old Windows verions), cygwin instead.
+for running Perl or, if you can't (e.g. old Windows versions), cygwin instead.
 The suite should still work on Strawberry Perl, as long as you don't try to run
 tests when installing (some dependencies will not pass them). The simplest way is
 with L<App::cpanminus> (most Strawberry Perl verions have it installed):
@@ -307,7 +307,7 @@ exported functions that the C<dkbench> script uses for reference:
 
  my $cores = system_identity();
 
-Prints out software/hardware configuration and returns then number of cores detected.
+Prints out software/hardware configuration and returns the number of cores detected.
 
 =head2 C<suite_run>
 
@@ -322,14 +322,17 @@ C<help>, C<setup> and C<max_threads> which are exclusive to the command-line scr
 In addition, C<%options> may contain the key C<%extra_bench>, with a hashref value
 containing custom benchmarks in the following format:
 
- extra_bench => { bench_name => [$exp_output, $ref_time, $coderef, $quick_arg, $normal_arg] ... }
+ extra_bench => { bench_name => [$coderef, $exp_output, $ref_time, $quick_arg, $normal_arg], ... }
 
 Where C<bench_name> is a unique name for each benchmark and the arrayref assigned
-to it contains: The expected output (string) for the test to be considered a pass,
-the reference time in seconds for a score of 1000, a reference to the actual bench
-function, an argument (workload scaling) to pass to the function for the C<quick> 
-bench run and an argument to pass for the normal run. For more info with an example
-see the L<CUSTOM BENCHMARKS> section.
+to it contains: A reference to the benchmarking code, the expected output (string)
+for the test to be considered a pass, the reference time in seconds for a score of
+1000, an argument (workload scaling) to pass to the function for the C<quick> bench
+run and an argument to pass for the normal run. If the second argument is undef,
+a "Pass" is always recorded, if the third argument is not defined and non-zero,
+C<time> will be implied.
+
+For more info with an example see the L<CUSTOM BENCHMARKS> section.
 
 =head2 C<calc_scalability>
 
@@ -343,7 +346,7 @@ results of a multi-threaded run, will calculate and print the multi-thread scala
 Version 2.5 introduced the ability to add custom benchmarks to be run along any
 of the included ones of the suite. This allows you to create a suite that is more
 relevant to you, by including the actual code you will be running on the systems
-you are benchmarking. Remember, the best benchmark is your own code.
+you are benchmarking.
 
 Here is an example of adding a benchmark to the test suite and running it together
 with the default benchmarks:
@@ -359,22 +362,31 @@ with the default benchmarks:
       great_circle_bearing(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi)) +
       great_circle_direction(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi))
       for 1 .. $iter;
-    return $dist;
+    return $dist; # Returning something is optional, but is used to Fail bench on no match
   }
 
   my %stats = suite_run({
       extra_bench => { 'Math::Trig' =>  # A unique name for the benchmark
         [
-        '3144042.81433949',  # The output for your reference Perl - determines Pass/Fail
-        5.5,                 # Seconds to complete in normal mode for score = 1000
         \&great_circle,      # Reference to bench function
-        400000,              # Argument to pass for --quick mode (if needed)
-        2000000              # Argument to pass for normal mode (if needed)
+        '3144042.81433949',  # Output for your reference Perl - determines Pass/Fail (optional)
+        5.5,                 # Seconds to complete in normal mode for score = 1000 (optional)
+        400000,              # Argument to pass for --quick mode (optional)
+        2000000              # Argument to pass for normal mode (optional)
         ]},
     }
   );
 
-You can pass the C<include> option to run only the custom benchmark(s).
+You can use a prefix for the naming of your custom benchmarks and make use of the
+C<include> argument to run only the custom benchmarks. Here is an example, where
+a custom test is defined inline, without any of the optional arguments and specified
+to run by itself:
+
+  my %stats = suite_run({
+      include     => 'custom',
+      extra_bench => { custom1 => [sub {split //, 'x'x$_ for 1..10000}] }
+    }
+  );
 
 =head1 NOTES
 
@@ -387,9 +399,9 @@ on the servers I was testing, in order to choose the optimal types for the compa
 I was working for. The second version has expanded a bit over that, and is friendlier
 to use.
 
-Althought this benchmark is in general a good indicator of general CPU performance
+Although this benchmark is in general a good indicator of general CPU performance
 and can be customized to your needs, no benchmark is as good as running your own
-actual workload.
+actual workload (which can be done via the L<CUSTOM BENCHMARKS> functionality).
 
 =head2 SCORES
 
@@ -433,27 +445,27 @@ the same terms as the Perl 5 programming language system itself.
 sub benchmark_list {
     my $extra_bench = shift || {};
     return {               # idx : 0 = result, 1 = ref time, 2 = func, 3 = quick test, 4 = normal test, 5 = ver
-        'Astro'             => ['e71c7ae08f16fe26aea7cfdb72785873', 5.674, \&bench_astro, 20000, 80000],
-        'BioPerl Codons'    => ['97c443c099886ca60e99f7ab9df689b5', 8.752, \&bench_bioperl_codons, 3, 5],
-        'BioPerl Monomers'  => ['d29ed0a5c205c803c112be1338d1f060', 5.241, \&bench_bioperl_mono, 6, 20],
-        'Crypt::JWT'        => ['d41d8cd98f00b204e9800998ecf8427e', 6.451, \&bench_jwt, 250, 900],
-        'CSS::Inliner'      => ['82c1b6de9ca0500a48f8a8df0998df3c', 4.603, \&bench_css, 2, 5],
-        'DBI/SQL'           => ['2b8252daad9568a5b39038c696df4be3', 5.700, \&bench_dbi, 5000, 15000, 2.1],
-        'DateTime'          => ['b08d2eeb994083b7422f6c9d86fed2c6', 6.198, \&bench_datetime, 5000, 15000],
-        'Digest'            => ['4b69f6cf0f53cbf6c3444f2f767dd21d', 4.513, \&bench_digest, 50, 250],
-        'Encode'            => ['PASS 1025',                        5.725, \&bench_encode, 40, 120],
-        'HTML::FormatText'  => ['8c2589f0a5276252805e11301fc2ab56', 4.756, \&bench_formattext, 4, 10],
-        'Imager'            => ['8829cb3703e884054eb025496f336c63', 6.792, \&bench_imager, 4, 16],
-        'JSON::XS'          => ['PASS',                             5.388, \&bench_json, 600, 2200],
-        'Math::DCT'         => ['766e3bfd7a2276f452bb3d1bd21939bc', 7.147, \&bench_dct, 25000, 100_000],
-        'Math::MatrixReal'  => ['4606231b1309fb21ae1223fa0043fd76', 4.293, \&bench_matrixreal, 200, 650],
-        'Moose'             => ['d1cb92c513f6378506dfa11f694cffac', 4.968, \&bench_moose, 10_000, 30_000],
-        'Moose prove'       => ['PASS',                             7.974, \&bench_moose_prv, 0.5, 1],
-        'Primes'            => ['4266f70a7a9efb3484cf5d98eba32244', 3.680, \&bench_primes_m, 2, 5],
-        'Regex/Subst'       => ['30ce365b25f3d597578b3bdb14aa3f57', 4.652, \&bench_regex_asc, 8, 24],
-        'Regex/Subst utf8'  => ['857eb4e63a4d174ca4a16fe678f7626f', 5.703, \&bench_regex_utf8, 3, 10],
-        'Text::Levenshtein' => ['2948a300ed9131fa0ce82bb5eabb8ded', 5.539, \&bench_textlevenshtein, 7, 25, 2.1],
-        'Time::Piece'       => ['2d4b149fe7f873a27109fc376d69211b', 5.907, \&bench_timepiece, 75_000, 275_000],
+        'Astro'             => [\&bench_astro,       'e71c7ae08f16fe26aea7cfdb72785873', 5.674, 20000, 80000],
+        'BioPerl Codons'    => [\&bench_bio_codons,  '97c443c099886ca60e99f7ab9df689b5', 8.752, 3,     5],
+        'BioPerl Monomers'  => [\&bench_bio_mono,    'd29ed0a5c205c803c112be1338d1f060', 5.241, 6,     20],
+        'Crypt::JWT'        => [\&bench_jwt,         'd41d8cd98f00b204e9800998ecf8427e', 6.451, 250,   900],
+        'CSS::Inliner'      => [\&bench_css,         '82c1b6de9ca0500a48f8a8df0998df3c', 4.603, 2,     5],
+        'DBI/SQL'           => [\&bench_dbi,         '2b8252daad9568a5b39038c696df4be3', 5.700, 5000,  15000, 2.1],
+        'DateTime'          => [\&bench_datetime,    'b08d2eeb994083b7422f6c9d86fed2c6', 6.198, 5000,  15000],
+        'Digest'            => [\&bench_digest,      '4b69f6cf0f53cbf6c3444f2f767dd21d', 4.513, 50,    250],
+        'Encode'            => [\&bench_encode,      'PASS 1025',                        5.725, 40,    120],
+        'HTML::FormatText'  => [\&bench_formattext,  '8c2589f0a5276252805e11301fc2ab56', 4.756, 4,     10],
+        'Imager'            => [\&bench_imager,      '8829cb3703e884054eb025496f336c63', 6.792, 4,     16],
+        'JSON::XS'          => [\&bench_json,        'PASS',                             5.388, 600,   2200],
+        'Math::DCT'         => [\&bench_dct,         '766e3bfd7a2276f452bb3d1bd21939bc', 7.147, 25000, 100000],
+        'Math::MatrixReal'  => [\&bench_matrixreal,  '4606231b1309fb21ae1223fa0043fd76', 4.293, 200,   650],
+        'Moose'             => [\&bench_moose,       'd1cb92c513f6378506dfa11f694cffac', 4.968, 10000, 30000],
+        'Moose prove'       => [\&bench_moose_prv,   'PASS',                             7.974, 0.5,   1],
+        'Primes'            => [\&bench_primes_m,    '4266f70a7a9efb3484cf5d98eba32244', 3.680, 2,     5],
+        'Regex/Subst'       => [\&bench_regex_asc,   '30ce365b25f3d597578b3bdb14aa3f57', 4.652, 8,     24],
+        'Regex/Subst utf8'  => [\&bench_regex_utf8,  '857eb4e63a4d174ca4a16fe678f7626f', 5.703, 3,     10],
+        'Text::Levenshtein' => [\&bench_levenshtein, '2948a300ed9131fa0ce82bb5eabb8ded', 5.539, 7,     25,    2.1],
+        'Time::Piece'       => [\&bench_timepiece,   '2d4b149fe7f873a27109fc376d69211b', 5.907, 75000, 275000],
         %$extra_bench
     };
 }
@@ -486,11 +498,9 @@ sub system_identity {
 
 sub suite_run {
     my $opt = shift;
+    _init_options($opt);
     $datadir = $opt->{datapath} if $opt->{datapath};
-    $opt->{threads} //= 1;
-    $opt->{scale} //= 1;
-    $opt->{iter} ||= 1;
-    $opt->{f} = $opt->{time} ? '%.3f' : '%5.0f';
+
     my %stats = (threads => $opt->{threads});
 
     MCE::Loop::init {
@@ -506,6 +516,19 @@ sub suite_run {
     total_stats($opt, \%stats) if $opt->{iter} > 1;
 
     return %stats;
+}
+
+sub _init_options {
+    my $opt = shift;
+    $opt->{threads} //= 1;
+    $opt->{scale}   //= 1;
+    $opt->{iter} ||= 1;
+    if ($opt->{extra_bench} && !$opt->{time}) {
+        foreach my $arr (values %{$opt->{extra_bench}}) {
+            $opt->{time} = 1 unless scalar(@$arr) > 2 && $arr->[2] > 0;
+        }
+    }
+    $opt->{f} = $opt->{time} ? '%.3f' : '%5.0f';
 }
 
 sub calc_scalability {
@@ -567,11 +590,14 @@ sub run_iteration {
         if ($bench =~ /Bio/) {
             require Bio::SeqIO;
             require Bio::Tools::SeqStats;
-         }
+        }
         my ($time, $res) = mce_bench_run($opt, $benchmarks->{$bench});
-        my $score = int(1000*$opt->{threads}*$benchmarks->{$bench}->[1]/($time || 1)+0.5);
+        my $score =
+            $benchmarks->{$bench}->[2] && $time
+            ? int(1000 * $opt->{threads} * $benchmarks->{$bench}->[2] / $time + 0.5)
+            : 1;
         $total_score += $score;
-        $total_time += $time;
+        $total_time  += $time;
         $i++;
         push @{$stats->{$bench}->{times}}, $time;
         push @{$stats->{$bench}->{scores}}, $score;
@@ -618,9 +644,10 @@ sub bench_run {
     $srand //= 1;
     srand($srand); # For repeatability
     my $t0   = _get_time();
-    my $out  = $benchmark->[2]->($benchmark->[3]);
+    my $out  = $benchmark->[0]->($benchmark->[3]);
     my $time = sprintf("%.3f", _get_time()-$t0);
-    my $r    = $out eq $benchmark->[0] ? 'Pass' : "Fail ($out)";
+    my $r    = !defined $benchmark->[1]
+        || $out eq $benchmark->[1] ? 'Pass' : "Fail ($out)";
     return $time, $r;
 }
 
@@ -635,7 +662,7 @@ sub bench_astro {
     return $d->hexdigest;
 }
 
-sub bench_bioperl_codons {
+sub bench_bio_codons {
     my $skip = shift;
     my $iter = shift || 1;
     my $d    = Digest->new("MD5");
@@ -643,7 +670,7 @@ sub bench_bioperl_codons {
     foreach (1..$iter) {
         my $in = Bio::SeqIO->new(-file => $file, -format => "genbank");
         $in->next_seq for (1..$skip);
-        my $seq = $in->next_seq;
+        my $seq       = $in->next_seq;
         my $seq_stats = Bio::Tools::SeqStats->new($seq);
         my $codon_ref = $seq_stats->count_codons();
         $d->add($_, $codon_ref->{$_}) for sort keys %$codon_ref;
@@ -651,7 +678,7 @@ sub bench_bioperl_codons {
     return $d->hexdigest;
 }
 
-sub bench_bioperl_mono {
+sub bench_bio_mono {
     my $iter = shift;
     my $file = catfile($datadir, "gbbct5.seq");
     my $in   = Bio::SeqIO->new(-file => $file, -format => "genbank");
@@ -784,25 +811,25 @@ sub bench_digest {
 }
 
 sub bench_encode {
-    my $iter    = shift;
-    my $str     = _read_wiki_files('utf8');
-    my $UTF8    = Encode::find_encoding('UTF-8');
-    my $UTF16   = Encode::find_encoding('UTF-16');
-    our $cp1252 = Encode::find_encoding('cp-1252');
+    my $iter  = shift;
+    my $str   = _read_wiki_files('utf8');
+    my $UTF8  = Encode::find_encoding('UTF-8');
+    my $UTF16 = Encode::find_encoding('UTF-16');
     my $res   = 'PASS';
     my $unenc = 0;
+    our $cp1252 = Encode::find_encoding('cp-1252');
 
     foreach (1..$iter) {
         my $bytes = encode_utf8($str);
         $res = 'Fail' unless length($bytes) > length($str);
-        my $cp = decode_utf8($bytes);
+        my $cp  = decode_utf8($bytes);
         my $enc = rand(1) > 0.25 ? $UTF8 : $UTF16;
         $bytes = $enc->encode($cp);
-        $cp = $enc->decode($bytes);
-        $res = 'Fail' unless $cp eq $str;
+        $cp    = $enc->decode($bytes);
+        $res   = 'Fail' unless $cp eq $str;
         my $str2 = $cp1252->encode($cp);
         $enc->encode($cp1252->decode($str2));
-        $unenc = () = $str2 =~ /\?/g; # Non-encodable
+        $unenc =()= $str2 =~ /\?/g;    # Non-encodable
     }
     return "$res $unenc";
 }
@@ -817,9 +844,12 @@ sub bench_imager {
     close($fh);
 
     foreach (1..$iter) {
-        my $img = Imager->new(data=>$data, type=>'bmp') or die Imager->errstr();
-        my $thumb = $img->scale(scalefactor=>.3);
-        my $newimg = $img->scale(scalefactor=>1.15);
+        my $img = Imager->new(
+            data => $data,
+            type => 'bmp'
+        ) or die Imager->errstr();
+        my $thumb  = $img->scale(scalefactor => .3);
+        my $newimg = $img->scale(scalefactor => 1.15);
         $newimg->filter(type=>'autolevels');
         $newimg->filter(type=>"gaussian", stddev=>0.5);
         $newimg->paste(left=>40,top=>20,img=>$thumb);
@@ -880,20 +910,20 @@ sub bench_jwt {
     -----END PRIVATE KEY-----';
     foreach (1..$iter) {
         my $extra   = _random_str(100);
-        my $data_in = $data.$extra;
+        my $data_in = $data . $extra;
         my $token   = encode_jwt(
-            payload       => $data_in,
-            alg           => 'ES256',
-            key           => \$key,
+            payload => $data_in,
+            alg     => 'ES256',
+            key     => \$key,
         );
 
         my $data_out = _decode_jwt2(token=>$token, key=>\$key);
         $d->add($token) if $data_in eq $data_out.$extra;
 
-        $token   = encode_jwt(
-            payload       => $data_in,
-            alg           => 'RS256',
-            key           => \$rsa,
+        $token = encode_jwt(
+            payload => $data_in,
+            alg     => 'RS256',
+            key     => \$rsa,
         );
 
         $data_out = _decode_jwt2(token=>$token, key=>\$rsa);
@@ -909,9 +939,9 @@ sub bench_formattext {
     for (0..$iter-1) {
         my $i = $_ % 2;
         $file = catfile($datadir, "wiki$i.html");
-        my $tree = HTML::TreeBuilder->new->parse_file($file);
+        my $tree      = HTML::TreeBuilder->new->parse_file($file);
         my $formatter = HTML::FormatText->new();
-        my $text = $formatter->format($tree);
+        my $text      = $formatter->format($tree);
         $formatter = HTML::FormatText->new(leftmargin => 0, rightmargin => 30);
         $d->add(Encode::encode_utf8($formatter->format($tree)));
     }
@@ -926,7 +956,7 @@ sub bench_matrixreal {
     my $bmatrix = Math::MatrixReal->new_random(72);
 
     for (1..$iter) {
-        my $r = rand(10);
+        my $r  = rand(10);
         my $m1 = $r*$bmatrix;
         my $m2 = $bmatrix*$r;
         my $m3 = $bmatrix->multiply_scalar($bmatrix,$r);
@@ -1059,7 +1089,7 @@ sub bench_subst {
     return "$count Replaced";
 }
 
-sub bench_textlevenshtein {
+sub bench_levenshtein {
     my $iter = shift;
     my $d    = Digest->new("MD5");
     my $data = _fuzzy_data();
@@ -1103,7 +1133,7 @@ sub bench_timepiece {
 sub total_stats {
     my ($opt, $stats) = @_;
     my $benchmarks = benchmark_list($opt->{extra_bench});
-    my $display    = $opt->{time} ? 'times' : 'scores';
+    my $display    = $opt->{time} ? 'times'      : 'scores';
     my $title      = $opt->{time} ? 'Time (sec)' : 'Score';
     print "Aggregates ($opt->{iter} iterations):\n".pad_to("Benchmark",24).pad_to("Avg $title").pad_to("Min $title").pad_to("Max $title");
     print pad_to("stdev %") if $opt->{stdev};
@@ -1188,8 +1218,8 @@ sub _read_wiki_files {
 sub _random_str {
     my $length = shift || 1;
     my $abc    = shift;
+    my $str    = "";
     my ($base, $rng) = $abc ? (65, 26) : (32, 95);
-    my $str = "";
     $str .= chr(int(rand($rng))+$base) for 1..$length;
     return $str;
 }
@@ -1228,9 +1258,9 @@ sub _db_data {
     my (@data, @cols);
     foreach (1..20) {
         my $d = {
-        id   => int(rand(10000000)),
-        date => \"NOW()",
-        map {"data".$_ => "foo bar" x int(rand(5)+1)} 1..int(rand(20)+1)
+            id   => int(rand(10000000)),
+            date => \"NOW()",
+            map {"data".$_ => "foo bar" x int(rand(5)+1)} 1..int(rand(20)+1)
         };
         push @data, $d;
         push @cols, [sort keys %$d];

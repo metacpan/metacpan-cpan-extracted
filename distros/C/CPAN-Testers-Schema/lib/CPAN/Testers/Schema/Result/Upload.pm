@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Result::Upload;
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 # ABSTRACT: Information about uploads to CPAN
 
 #pod =head1 SYNOPSIS
@@ -179,6 +179,18 @@ has_many report_metrics => 'CPAN::Testers::Schema::Result::Release',
         'foreign.version' => 'self.version',
     };
 
+#pod =method report_stats
+#pod
+#pod The linked report stats rows for this distribution, a L<CPAN::Testers::Schema::ResultSet::Stats>
+#pod object.
+#pod
+#pod =cut
+
+has_many report_stats => 'CPAN::Testers::Schema::Result::Stats',
+    {
+        'foreign.uploadid' => 'self.uploadid',
+    };
+
 package
     CPAN::Testers::Schema::DateTime::Formatter {
     sub format_datetime( $self, $dt ) {
@@ -215,7 +227,7 @@ CPAN::Testers::Schema::Result::Upload - Information about uploads to CPAN
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -310,6 +322,11 @@ Inflated from a UNIX epoch into a L<DateTime> object.
 =head2 report_metrics
 
 The linked report metrics rows for this distribution, a L<CPAN::Testers::Schema::ResultSet::Release>
+object.
+
+=head2 report_stats
+
+The linked report stats rows for this distribution, a L<CPAN::Testers::Schema::ResultSet::Stats>
 object.
 
 =head1 SEE ALSO

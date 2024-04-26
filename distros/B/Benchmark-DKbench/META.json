@@ -80,6 +80,6 @@
          "web" : "https://github.com/dkechag/Benchmark-DKbench"
       }
    },
-   "version" : "2.5",
+   "version" : "2.6",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

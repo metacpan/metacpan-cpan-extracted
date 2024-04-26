@@ -20,6 +20,7 @@ no_index:
     - t
     - inc
 requires:
+  Carp: '0'
   Config::INI::Reader: '0'
   Config::Tiny: '0'
   Const::Fast: '0'
@@ -35,5 +36,5 @@ requires:
 resources:
   bugtracker: https://github.com/M0ses/Net-OBS-Client/issues
   repository: https://github.com/M0ses/Net-OBS-Client.git
-version: v0.1.2
+version: v0.1.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

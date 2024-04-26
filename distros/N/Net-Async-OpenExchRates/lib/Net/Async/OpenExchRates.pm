@@ -9,7 +9,7 @@ use Object::Pad 0.800;
 
 class Net::Async::OpenExchRates :isa(IO::Async::Notifier);
 
-our $VERSION = 0.003;
+our $VERSION = 0.004;
 
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 

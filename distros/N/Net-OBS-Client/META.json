@@ -34,6 +34,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Config::INI::Reader" : "0",
             "Config::Tiny" : "0",
             "Const::Fast" : "0",
@@ -60,6 +61,6 @@
          "web" : "https://github.com/M0ses/Net-OBS-Client"
       }
    },
-   "version" : "v0.1.2",
+   "version" : "v0.1.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

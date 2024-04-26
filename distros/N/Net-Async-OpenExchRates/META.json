@@ -91,7 +91,7 @@
    "provides" : {
       "Net::Async::OpenExchRates" : {
          "file" : "lib/Net/Async/OpenExchRates.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -106,7 +106,7 @@
          "web" : "https://github.com/vnealv/Net-Async-OpenExchRates"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_authority" : "cpan:VNEALV",
    "x_contributors" : [
       "vnealv <naelalolwani@gmail.com>",

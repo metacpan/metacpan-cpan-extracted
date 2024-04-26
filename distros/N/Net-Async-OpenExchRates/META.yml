@@ -34,7 +34,7 @@ no_index:
 provides:
   Net::Async::OpenExchRates:
     file: lib/Net/Async/OpenExchRates.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Cache::LRU: '0.04'
   Digest::MD5: '0'
@@ -55,7 +55,7 @@ resources:
   bugtracker: https://github.com/vnealv/Net-Async-OpenExchRates/issues
   homepage: https://github.com/vnealv/Net-Async-OpenExchRates
   repository: https://github.com/vnealv/Net-Async-OpenExchRates.git
-version: '0.003'
+version: '0.004'
 x_authority: cpan:VNEALV
 x_contributors:
   - 'vnealv <naelalolwani@gmail.com>'

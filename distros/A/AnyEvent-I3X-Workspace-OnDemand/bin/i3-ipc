@@ -51,7 +51,7 @@ i3-ipc - i3 IPC listener
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
