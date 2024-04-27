@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::Upload;
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 # ABSTRACT: Query the CPAN uploads data
 
 #pod =head1 SYNOPSIS
@@ -98,13 +98,12 @@ sub recent( $self, $count = 20 ) {
 sub latest_by_dist( $self ) {
     return $self->search( {}, {
         select => [
-            qw( uploadid dist ),
-            \'MAX(me.version)',
+            qw( dist ),
+            \'MAX(me.version) AS version',
         ],
-        as => [ qw( uploadid dist version ) ],
+        as => [ qw( dist version ) ],
         group_by => [ map "me.$_", qw( dist ) ],
-        having => \'me.version = MAX(me.version)',
-        order_by => undef,
+        having => \'version = MAX(version)',
     } );
 }
 
@@ -120,7 +119,7 @@ CPAN::Testers::Schema::ResultSet::Upload - Query the CPAN uploads data
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

@@ -16,7 +16,7 @@ use POSIX qw/ceil/;
 #use Data::Dump qw/dump/;
 #use Smart::Comments;
 
-our $VERSION = '0.033';
+our $VERSION = '0.034';
 
 our @ISA = qw(Exporter);
 
@@ -29,8 +29,7 @@ our @EXPORT = qw(
   map_to_curve_sswu_not_straight_line
   map_to_curve_sswu_straight_line
 
-  sn2z
-  sn2k_m
+  sn2kv
   get_hash2curve_params
   expand_message_xmd
   hash_to_field
@@ -47,29 +46,31 @@ XSLoader::load( 'Crypt::OpenSSL::Hash2Curve', $VERSION );
 
 our %H2C_CNF = (
   'prime256v1' => {
-    'h2f' => {
       k => 0x80,
       m => 1,
-    },
-    'sswu' => {
-      z                 => '-10',
-      calc_c1_c2_func   => \&calc_c1_c2_for_sswu,
-      map_to_curve_func => \&map_to_curve_sswu_straight_line,
-    },
+      'sswu' => {
+          z                 => '-10',
+          calc_c1_c2_func   => \&calc_c1_c2_for_sswu,
+          map_to_curve_func => \&map_to_curve_sswu_straight_line,
+      },
   },
 );
+
+sub sn2kv {
+my ($group_name, $param_name) = @_;
+return $H2C_CNF{$group_name}{$param_name};
+}
 
 
 sub get_hash2curve_params {
     my ( $group_name, $type ) = @_;
 
     my $ec_params_r = get_ec_params($group_name);
+    
+    $ec_params_r->{$_} = $H2C_CNF{$group_name}{$_} for keys(%{$H2C_CNF{$group_name}});
 
-    $ec_params_r->{h2f} = $H2C_CNF{$group_name}{h2f};
-
-    if($type){
-        my $z = sn2z( $group_name, $type );
-
+    if($type eq 'sswu'){
+        my $z = Crypt::OpenSSL::Bignum->new_from_decimal( $H2C_CNF{$group_name}{$type}{z} );
         my $c1 = Crypt::OpenSSL::Bignum->new();
         my $c2 = Crypt::OpenSSL::Bignum->new();
         $H2C_CNF{$group_name}{$type}{calc_c1_c2_func}->( $c1, $c2, 
@@ -93,7 +94,7 @@ sub hash_to_curve {
 
   my $count = 2;
   #my ( $k, $m ) = sn2k_m( $group_name );
-  my @res = hash_to_field( $msg, $count, $DST, $h2c_r->{p}, $h2c_r->{h2f}{m}, $h2c_r->{h2f}{k}, $hash_name, $expand_message_func );
+  my @res = hash_to_field( $msg, $count, $DST, $h2c_r->{p}, $h2c_r->{m}, $h2c_r->{k}, $hash_name, $expand_message_func );
 
   my $u0 = $res[0][0];
   my $Q0 = map_to_curve( $h2c_r, $group_name, $type, $u0, $clear_cofactor_flag );
@@ -121,7 +122,7 @@ sub encode_to_curve {
   my $count = 1;
   #my ( $k, $m ) = sn2k_m( $group_name );
   #my @res = hash_to_field( $msg, $count, $DST, $p, $m, $k, $hash_name, $expand_message_func );
-  my @res = hash_to_field( $msg, $count, $DST, $h2c_r->{p}, $h2c_r->{h2f}{m}, $h2c_r->{h2f}{k}, $hash_name, $expand_message_func );
+  my @res = hash_to_field( $msg, $count, $DST, $h2c_r->{p}, $h2c_r->{m}, $h2c_r->{k}, $hash_name, $expand_message_func );
 
   my $u = $res[0][0];
   my $P = map_to_curve( $h2c_r, $group_name, $type, $u, $clear_cofactor_flag );
@@ -140,7 +141,6 @@ sub map_to_curve {
       $u, $x, $y, $params_ref->{ctx} );
 
   my $Q = Crypt::OpenSSL::EC::EC_POINT::new( $params_ref->{group} );
-  Crypt::OpenSSL::EC::EC_POINT::new( $params_ref->{group} );
   EC_POINT_set_affine_coordinates( $params_ref->{group}, $Q, $x, $y, $params_ref->{ctx} );
 
   return $Q unless ( $clear_cofactor_flag );
@@ -150,18 +150,7 @@ sub map_to_curve {
   return $P;
 } ## end sub map_to_curve
 
-sub sn2z {
-  my ( $sn, $type ) = @_;
-  my $z = Crypt::OpenSSL::Bignum->new_from_decimal( $H2C_CNF{$sn}{$type}{z} );
-  return $z;
-}
 
-sub sn2k_m {
-  my ( $sn ) = @_;
-  my $k      = $H2C_CNF{$sn}{h2f}{k};
-  my $m      = $H2C_CNF{$sn}{h2f}{m};
-  return ( $k, $m );
-}
 
 #sub CMOV {
 #my ($a, $b, $c) = @_;
@@ -237,10 +226,10 @@ sub expand_message_xmd {
   ### msg_prime: unpack("H*", $msg_prime)
   
   my $len       = pack( "C*", 1 );
-  my $b0        = digest( $h_r, $msg_prime );
+  my $b0        = digest( $hash_name, $msg_prime );
 
 
-  my $b1 = digest( $h_r, $b0 . $len . $DST_prime );
+  my $b1 = digest( $hash_name, $b0 . $len . $DST_prime );
 
   ### b0: unpack("H*", $b0)
   ### b1: unpack("H*", $b1)
@@ -252,7 +241,7 @@ sub expand_message_xmd {
   my $uniform_bytes = $b1;
   for my $i ( 2 .. $ell ) {
     my $tmp = ( $b0 ^ $b_prev ) . pack( "C*", $i ) . $DST_prime;
-    my $bi  = digest( $h_r, $tmp );
+    my $bi  = digest( $hash_name, $tmp );
 
     ### bi: unpack("H*", $bi)
 

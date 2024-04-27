@@ -12,13 +12,13 @@ HTML::Object::XQuery - HTML XQuery Extension
 
 =head1 VERSION
 
-    v0.2.2
+    v0.3.0
 
 =head1 DESCRIPTION
 
 This class extends L<HTML::Object::DOM::Element> and provided jQuery-like methods to manipulate and query L<HTML objects|HTML::Object::DOM::Element>. It is very extensive and closely mirrors L<jQuery api|https://api.jquery.com/> with some additional features specific to perl.
 
-By calling C<use HTML::Object::DOM global_dom => 1;>, this will instantiate a global DOM mimicking the one on a web page. This, in turns, enables calls such as:
+By calling C<< use HTML::Object::DOM global_dom => 1; >>, this will instantiate a global DOM mimicking the one on a web page. This, in turns, enables calls such as:
 
     $("li")->addClass("hello");
 
@@ -28,11 +28,11 @@ Without the need to specify any context like:
     my $context = $p->parse_file( "/path/to/some/file.html" );
     $("li", $context)->addClass("hello");
 
-Calling C<use HTML::Object::DOM global_dom => 1;> also enables the use of the special function C<$()>, which is, normally, not possible in perl.
+Calling C<< use HTML::Object::DOM global_dom => 1; >> also enables the use of the special function C<$()>, which is, normally, not possible in perl.
 
 Since L<HTML::Object::XQuery> extends L<HTML::Object::DOM::Element>, but does not inherit from it, you cannot create a C<HTML::Object::XQuery> object. You can simply load L<HTML::Object::DOM> and then load C<HTML::Object::XQuery> to extend the methods available in L<HTML::Object::DOM::Element>
 
-    use HTML::Object::DOM use_dom => 1;
+    use HTML::Object::DOM global_dom => 1;
     use HTML::Object::XQuery;
     # and the rest as usua;
     my $p = HTML::Object::DOM->new;
@@ -95,7 +95,7 @@ The paragraph will have been created dynamically and added to the set, but is no
 
     $( "p" )->clone()->add( "<span>Again</span>" )->appendTo( "body" );
 
-B<Note>: To reverse the L</add> you can use C<$e->not( elements | selector )> to remove elements from the collection results, or L</end> to return to the selection before you added.
+B<Note>: To reverse the L</add> you can use C<< $e->not( elements | selector ) >> to remove elements from the collection results, or L</end> to return to the selection before you added.
 
 See L<https://api.jquery.com/add/>
 
@@ -166,11 +166,559 @@ L<https://api.jquery.com/after/>
 
 Perform an asynchronous HTTP (Ajax) request.
 
-This takes an url and an optional hash reference of parameters.
+This takes an url and an optional hash or hash reference of parameters.
 
-B<This is still a work in progress>
+This method requires L<HTTP::Promise> version C<0.5.0> or higher to be installed.
+
+The URL can be a contextual URL such as absolute or relative URL provided you have set the value for L<documentURI|HTML::Object::DOM::Document/documentURI> in class L<HTML::Object::DOM::Document>, which is the root element of the DOM. You can access it using the L<getRootNode|HTML::Object::DOM::Node> method.
+
+For example:
+
+    $doc->documentURI = 'https://example.com/some/where';
+    my $body = $('body', $doc);
+    # The URI will become https://example.com/other/path
+    $body->ajax( '/other/path' )->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        say "Yeah!";
+        # Do some work here...
+    });
+
+Below are the options supported, mirroring the ones implemented in jQuery, whenever possible:
+
+=over 4
+
+=item * C<accept>
+
+    $el->ajax( $url,
+        accept => 'text/html, text/plain, image/*',
+    )->then(sub
+    (
+        # do something...
+    });
+
+String. Set the HTTP C<Accept> header value, such as: C<text/html, text/plain, image/*>
+
+=item * C<accepts>
+
+    $el->ajax( $url,
+        accepts => [
+            mycustomtype => 'application/x-some-custom-type',
+        ],
+        converters =>
+        {
+            mycustomtype => sub
+            {
+                my $result = shift( @_ );
+                # Do Stuff
+                return( $newresult );
+            },
+        },
+        dataType => 'mycustomtype',
+    )->then(sub
+    (
+        # do something...
+    });
+
+Array reference. This takes an array reference of key-value pairs, with the key being a data type and the value being the MIME-type.
+
+The data type thus defined should also be set with the C<converters> option.
+
+=item * C<async>
+
+    my( $content, $status, $resp, $http ) = $el->ajax( $url,
+        async => 0,
+    ) || die( $el->error );
+
+Or
+
+    $el->ajax( $url,
+        # No need to specify actually, because it defaults to true.
+        async => 1,
+    )->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        my( $content, $status, $resp, $http ) = @_;
+        # Do something
+    })->catch(sub
+    {
+        my $err = shift( @_ );
+        say "An error occurred: ", $err->message;
+    });
+
+Boolean. This defaults to true. This specifies whether the HTTP request is made asynchronously or synchronously.
+
+When the HTTP request is made asynchronously, it returns a L<Promise::Me> object that you can use to chain C<then> and C<catch> methods.
+
+The next C<then> method will receive an L<HTTP::Promise> object
+
+When it is used synchronously, this method will return 4 values: the C<$content>, the C<$status>, the L<HTTP::Promise::Response> object and the L<HTTP object|HTTP::Promise> used.
+
+=item * C<beforeSend>
+
+    $el->ajax( $url,
+        beforeSend => sub
+        {
+            # Receive a HTTP::Promise::Request object
+            my $req = shift( @_ );
+            # Do some work
+            return( $req );
+            # Return undef to cancel the query
+        },
+    )->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        my( $content, $status, $resp, $http ) = @_;
+        # Do something
+    })->catch(sub
+    {
+        my $err = shift( @_ );
+        say "An error occurred: ", $err->message;
+    });
+
+This is a pre-request callback function that can be used to modify the L<HTTP::Promise::Request> object, before it is used. Use this to set custom headers, etc. The current L<HTTP::Promise::Request> object is passed as the sole argument to the callback.
+
+Returning false in the beforeSend function will cancel the request. Otherwise, it expects a valid L<HTTP::Promise::Request> object.
+
+Cancelling the request means the resulting values returned will be: an empty string, the status C<abort>, C<undef> (because there is no L<HTTP::Promise::Response> object), and the L<HTTP::Promise> object.
+
+The C<complete> option can accept an array of code reference. Each callback will be called in turn.
+
+=item * C<complete>
+
+A callback as code reference to be called when the request finishes (after success and error callbacks are executed). The callback gets passed three arguments:
+
+=over 8
+
+=item 1. the L<HTTP::Promise::Response> object; and
+
+=item 2. a string categorizing the status of the request (C<success>, C<notmodified>, C<nocontent>, C<error>, C<timeout>, C<abort>, or C<parsererror>); and
+
+=item 3. the L<HTTP::Promise> object
+
+=back
+
+=item * C<contents>
+
+This option is not used.
+
+=item * C<contentType>
+
+String. By default C<application/x-www-form-urlencoded; charset=UTF-8>
+
+When sending data to the server, use this content type. Default is C<application/x-www-form-urlencoded; charset=UTF-8>, which is fine for most cases. If you explicitly pass in a content-type to C<ajax>(), then it is always sent to the server (even if no data is sent). You can pass false to tell this method to not set any content type header.
+
+=item * C<context>
+
+This option is not used.
+
+=item * C<converters>
+
+    $el->ajax( $url,
+        converters =>
+        {
+            "* text" => sub{ return( Module::Generic::Scalar->new( $_[0] ) ); },
+            # true
+            "text html" => 1,
+            "text json" => sub
+            {
+                my $json = shift( @_ );
+                # Do something decoding JSON
+                return( $hash_ref );
+            },
+            "text xml" => sub
+            {
+                my $xml = shift( @_ );
+                # Decode XML
+                return( $xml_object );
+            },
+        },
+    )->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        my( $content, $status, $http ) = @_;
+        # Do something
+    })->catch(sub
+    {
+        my $err = shift( @_ );
+        say "An error occurred: ", $err->message;
+    });
+
+An object containing dataType-to-dataType converters. Each converter's value is a function that returns the transformed value of the response.
+
+=item * C<crossDomain>
+
+This option is not used.
+
+=item * C<data>
+
+C<data> can be an hash reference, a string or an array reference.
+
+Data to be sent to the server. If the HTTP method is one that cannot have an entity body, such as C<GET>, the data is appended to the URL.
+
+When data is an hash reference, this method generates the data string from the hash reference's key/value pairs unless the C<processData> option is set to false. For example, { a: "bc", d: "e,f" } is converted to the string "a=bc&d=e%2Cf". If the value is an array, L<HTTP::Promise> serialises multiple values with same key based on the value of the traditional setting (described below). For example, { a: [1,2] } becomes the string "a%5B%5D=1&a%5B%5D=2" with the default traditional: false setting.
+
+When data is passed as a string it should already be encoded using the correct encoding for C<contentType>, which by default is C<application/x-www-form-urlencoded>.
+
+=item * C<dataFilter>
+
+    $el->ajax( $url,
+        dataFilter => sub
+        {
+            my( $content, $dataType ) = @_;
+            # Do some processing on the $content
+            return( $new_content );
+        },
+    )->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        my( $content, $status, $http ) = @_;
+        # Do something
+    })->catch(sub
+    {
+        my $err = shift( @_ );
+        say "An error occurred: ", $err->message;
+    });
+
+A callback code reference to be used to handle the raw response data of HTTP response. This is a pre-filtering function to sanitise the response. You should return the sanitized data. The function accepts two arguments: The raw data returned from the server and the C<dataType> parameter.
+
+=item * C<dataType>
+
+The type of data that you are expecting back from the server. If none is specified, this method will try to infer it based on the MIME type of the response. The available types (and the result passed as the first argument to your success callback) are:
+
+=over 8
+
+=item * C<xml>
+
+    Returns a XML document that can be processed via jQuery.
+
+=item * C<html>
+
+    Returns HTML as plain text; included script tags are evaluated when inserted in the DOM.
+
+=item * C<script>
+
+    Evaluates the response as JavaScript and returns it as plain text. Disables caching by appending a query string parameter, _=[TIMESTAMP], to the URL unless the cache option is set to true. Note: This will turn POSTs into GETs for remote-domain requests. Prior to jQuery 3.5.0, unsuccessful HTTP responses with a script Content-Type were still executed.
+
+=item * C<json>:
+
+Evaluates the response as JSON and returns a JavaScript object. Cross-domain "json" requests that have a callback placeholder, e.g. ?callback=?, are performed using JSONP unless the request includes jsonp: false in its request options. The JSON data is parsed in a strict manner; any malformed JSON is rejected and a parse error is thrown. As of jQuery 1.9, an empty response is also rejected; the server should return a response of null or {} instead. (See json.org for more information on proper JSON formatting.)
+
+=item * C<jsonp>
+
+Loads in a JSON block using JSONP. Adds an extra "?callback=?" to the end of your URL to specify the callback. Disables caching by appending a query string parameter, "_=[TIMESTAMP]", to the URL unless the cache option is set to true.
+
+=item * C<text>
+
+A plain text string.
+
+=item * C<multiple, space-separated values>
+
+This method can convert a C<dataType> from what it received in the C<Content-Type> header to what you require. For example, if you want a text response to be treated as XML, use C<text xml> for the C<dataType>. You can also make a C<JSONP> request, have it received as text, and interpreted by this method as XML: C<jsonp text xml>. Similarly, a shorthand string such as C<jsonp xml> will first attempt to convert from jsonp to xml, and, failing that, convert from jsonp to text, and then from text to xml.
+
+=back
+
+=item * C<error>
+
+A callback code reference to be called if the request fails. The callback receives three arguments:
+
+=over 8
+
+=item 1. the L<HTTP::Promise::Request> object;
+
+=item 2. a string describing the type of error that occurred; and
+
+=item 3. an optional exception object, if one occurred.
+
+=back
+
+Possible values for the second argument (besides null) are C<timeout>, C<error>, C<abort>, and C<parsererror>. When an HTTP error occurs, C<errorThrown> receives the textual portion of the HTTP status, such as C<Not Found> or C<Internal Server Error>. (in HTTP/2 it may instead be an empty string). The C<error> setting can accept an array of callbacks. Each callback will be called in turn.
+
+=item * C<global>
+
+B<This option is not used.>
+
+Boolean.
+
+Whether to trigger global Ajax event handlers for this request. The default is true. Set to false to prevent the global handlers like ajaxStart or ajaxStop from being triggered. This can be used to control various Ajax Events.
+
+=item * C<headers>
+
+An object of additional header key/value pairs to send along with requests using the L<HTTP::Promise> object. The header C<X-Requested-With: XMLHttpRequest> is always added, but its default XMLHttpRequest value can be changed here. Values in the headers setting can also be overwritten from within the beforeSend function.
+
+=item * C<ifModified>
+
+    $el->ajax( $url,
+        ifModified =>
+        {
+            since => 1714023492,
+            etag => '33a64df551425fcc55e4d42a148795d9f25f89d4',
+            # or, explicitly specifying weak algorithm, which is superflous since it is
+            # the default used in the HTTP protocol for If-None-Match
+            # etag => 'W/"33a64df551425fcc55e4d42a148795d9f25f89d4"',
+        },
+    )->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        my( $content, $status, $http ) = @_;
+        # Do something
+    })->catch(sub
+    {
+        my $err = shift( @_ );
+        say "An error occurred: ", $err->message;
+    });
+
+This takes an hash reference with possible key C<since> and C<etag>
+
+This allows the request to be successful only if the response has changed since the last request. This is done by checking the C<Last-Modified> header. Default value is false, ignoring the header.
+
+If C<since> is provided with a value of a 10 digits integer, it will be used to issue a C<If-Modified-Since> HTTP header.
+
+If C<etag> is provided with a value of alphanumeric characters and C<_> and C<->, this will be used to issue an HTTP header C<If-None-Match>
+
+=item * C<isLocal>
+
+This option is not used.
+
+=item * C<jsonp>
+
+This option is not used.
+
+=item * C<jsonpCallback>
+
+This option is not used.
+
+=item * C<method>
+
+This takes a string specifying the HTTP method to use for the request. Supported values are: C<GET>, C<HEAD>, C<OPTIONS>, C<PATCH>, C<POST>, C<PUT>. The value is case-insensitive.
+
+=item * C<mimeType>
+
+    # Will issue a Content-Type: application/json
+    $el->ajax( $url,
+        mimeType => 'application/json',
+        data =>
+        {
+            client_id => 1234567,
+            created_on => 1714023492,
+        },
+    )->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        my( $content, $status, $http ) = @_;
+        # Do something
+    })->catch(sub
+    {
+        my $err = shift( @_ );
+        say "An error occurred: ", $err->message;
+    });
+
+A mime type to override the HTTP mime type.
+
+=item * C<password>
+
+    my $url = "https://john:helloworld@example.com/some/where";
+    $el->ajax( $url )->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        my( $content, $status, $http ) = @_;
+        # Do something
+    })->catch(sub
+    {
+        my $err = shift( @_ );
+        say "An error occurred: ", $err->message;
+    });
+
+would result in:
+
+    GET /some/where HTTP/1.1
+    Host: example.com
+    Authorization: Basic am9objpoZWxsb3dvcmxk
+
+Or
+
+    my $url = "https://example.com/some/where";
+    $el->ajax( $url,
+        username => 'john',
+        password => 'helloworld',
+    )->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        my( $content, $status, $http ) = @_;
+        # Do something
+    })->catch(sub
+    {
+        my $err = shift( @_ );
+        say "An error occurred: ", $err->message;
+    });
+
+would yield identical result
+
+A password to be used with the HTTP request in response to an HTTP access authentication request.
+
+This is to be used in conjonction with the C<username> option. This will result in an HTTP header such as C<Authorization: Basic am9objpoZWxsb3dvcmxk>
+
+You can also provide it as part of the URL, and it will be removed from the URL before the HTTP request is made.
+
+=item * C<processData>
+
+The way the data is handled depends on their nature, i.e. whether it is an hash reference, or an array reference or a regular string.
+
+By default, data passed in to the data option as an hash reference or array reference (technically, anything other than a string) will be processed and transformed into a query string, fitting to the default content-type C<application/x-www-form-urlencoded>. If you want to send a DOMDocument, or other non-processed data, set this option to false.
+
+=item * C<scriptAttrs>
+
+This option is not used.
+
+Original jQuery documentation states:
+
+Defines an object with additional attributes to be used in a C<script> or C<jsonp> request. The key represents the name of the attribute and the value is the attribute's value. If this object is provided it will force the use of a script-tag transport. For example, this can be used to set C<nonce>, C<integrity>, or C<crossorigin> attributes to satisfy Content Security Policy requirements.
+
+=item * C<scriptCharset>
+
+This option is not used.
+
+Original jQuery documentation states:
+
+Only applies when the C<script> transport is used. Sets the charset attribute on the script tag used in the request. Used when the character set on the local page is not the same as the one on the remote script. Alternatively, the C<charset> attribute can be specified in C<scriptAttrs> instead, which will also ensure the use of the C<script> transport.
+
+=item * C<statusCode>
+
+An hash reference of numeric HTTP codes and callback code reference to be called when the response has the corresponding code. For example, the following will alert when the response status is a 404:
+
+    $el->ajax( $url,
+        statusCode:
+        {
+            404 => sub
+            {
+                warn( "page not found" );
+            }
+        }
+    )->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        my( $content, $status, $http ) = @_;
+        # Do something
+    })->catch(sub
+    {
+        my $err = shift( @_ );
+        say "An error occurred: ", $err->message;
+    });
+
+If the request is successful, the status code callbacks take the same parameters as the C<success> callback, i.e. C<$content>, C<$status>, L<HTTP::Promise::Response> object, L<HTTP::Promise> object; if it results in an error (including 3xx redirect), they take the same parameters as the C<error> callback, i.e. L<HTTP::Promise::Request> object, C<$status>, C<$errorthrown>.
+
+=item * C<success>
+
+    $el->ajax( $url,
+        success => sub
+        {
+            my( $content, $status, $resp_object ) = @_;
+            # Do something
+        },
+    )->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        my( $content, $status, $http ) = @_;
+        # Do something
+    })->catch(sub
+    {
+        my $err = shift( @_ );
+        say "An error occurred: ", $err->message;
+    });
+
+Or
+
+    $el->ajax( $url,
+        success => [
+            sub
+            {
+                my( $content, $status, $http_object ) = @_;
+                # Do something
+            },
+            # another callback
+            sub
+            {
+                my( $content, $status, $http_object ) = @_;
+                # Do something else
+            },
+            # and you can add more callbacks
+        ],
+    )->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        my( $content, $status, $http ) = @_;
+        # Do something
+    })->catch(sub
+    {
+        my $err = shift( @_ );
+        say "An error occurred: ", $err->message;
+    });
+
+A function to be called if the request succeeds. The function gets passed four arguments:
+
+=over 8
+
+=item 1. The data returned from the server, formatted according to the dataType parameter or the dataFilter callback function, if specified;
+
+=item 2. a string describing the status; and
+
+=item 3. the L<HTTP::Promise::Response> object; and
+
+=item 4. the L<HTTP::Promise> object.
+
+=back
+
+The success setting can accept an array of callbacks. Each callback will be called in turn. This is an Ajax Event.
+
+=item * C<timeout>
+
+Set a timeout for the request. The value can be in seconds (an integer) or milliseconds using fractional number such as 0.25 for 250 milliseconds. See L<select|perlfunc/select>
+
+A value of 0 means there will be no timeout. The timeout period starts at the point the C<ajax> call is made; if several other requests are in progress and the browser has no connections available, it is possible for a request to time out before it can be sent.
+
+=item * C<traditional>
+
+This option is not used.
+
+Original jQuery documentation states:
+
+Set this to true if you wish to use the traditional style of L<param serialization|https://api.jquery.com/jQuery.param/>.
+
+=item * C<type>
+
+An alias for C<method>.
+
+=item * C<url>
+
+A string containing the URL to which the request is sent. This will override the C<$url> argument passed to the C<ajax> method.
+
+=item * C<username>
+
+A username to be used with the HTTP request in response to an HTTP access authentication request.
+
+This is to be used in conjonction with the C<password> option. This will result in an HTTP header such as C<Authorization: Basic am9objpoZWxsb3dvcmxk>
+
+You can also provide it as part of the URL, and it will be removed from the URL before the HTTP request is made.
+
+=item * C<xhr>
+
+Callback code reference for creating the L<HTTP::Promise::Request> object. Override to provide your own implementation for L<HTTP::Promise::Request>.
+
+This will override all parameters provided to instantiate a new L<HTTP::Promise::Request> object. It expects a L<HTTP::Promise::Request> object in return, or will return an error.
+
+=item * C<xhrFields>
+
+This option is not used.
+
+Original jQuery documentation states:
+
+An object of fieldName-fieldValue pairs to set on the native XHR object. For example, you can use it to set C<withCredentials> to true for cross-domain requests if needed.
+
+=back
 
 L<https://api.jquery.com/jQuery.ajax/>
+
+See the L<load method|/load>>
 
 =head2 ajaxSetup
 
@@ -458,6 +1006,245 @@ Returns the current element.
 Originally, in jQuery, this returns the underlying DOM element, but here, in perl context, this does not mean much, and we return our own object.
 
 L<https://api.jquery.com/get/>
+
+=head2 getDataJson
+
+    <div data-options='{"customer_id": 123, "issued_on": 1713832131}'></div>
+    # or, URI encoded
+    <div data-options="%7B%22customer_id%22%3A%20123%2C%20%22issued_on%22%3A%201713832131%7D"></div>
+    my $elem = $('[data-options]', $doc);
+    my $ref = $elem->getDataJson( 'options' );
+
+This method takes the name of the data attribute for the element it is being called on, and returns an hash reference of the JSON data stored.
+
+If this is called on a L<collection|HTML::Object::Collection>, then it will use the first element in the collection.
+
+Once the JSON decoded, its associated hash reference will be saved in place so that following calls returns it much faster.
+
+If there is no data, it returns an empty hash, but if there is an error, such as decoding the JSON data, then it will set an L<exception object|HTML::Object::Exception> and return C<undef> in scalar context, or an empty list in list context.
+
+=head2 getJSON
+
+    $el->getJSON( $url )->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        my( $hash_ref, $status, $resp, $http ) = @_;
+        # Do something
+    })->catch(sub
+    {
+        my $err = shift( @_ );
+        say "Oh no: $err";
+    });
+
+or, with both the data and the success callback specified:
+
+    $el->getJSON( $url, {
+        client_id => 1234567,
+        tag => 'something',
+    }, sub
+    {
+        # or an array reference depending on the JSON data structure
+        my( $hash_ref, $status, $resp, $http ) = @_;
+        # Do something
+    })->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        my( $hash_ref, $status, $resp, $http ) = @_;
+        # Do something
+    })->catch(sub
+    {
+        my $err = shift( @_ );
+        say "Oh no: $err";
+    });
+
+or, with the success callback first, then the data to be sent:
+
+    $el->getJSON( $url, sub
+    {
+        # or an array reference depending on the JSON data structure
+        my( $hash_ref, $status, $resp, $http ) = @_;
+        # Do something
+    },
+    {
+        client_id => 1234567,
+        tag => 'something',
+    })->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        my( $hash_ref, $status, $resp, $http ) = @_;
+        # Do something
+    })->catch(sub
+    {
+        my $err = shift( @_ );
+        say "Oh no: $err";
+    });
+
+or, with just the data provided. You can also just provide the success callback instead:
+
+    $el->getJSON( $url, 
+    {
+        client_id => 1234567,
+        tag => 'something',
+    })->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        my( $hash_ref, $status, $resp, $http ) = @_;
+        # Do something
+    })->catch(sub
+    {
+        my $err = shift( @_ );
+        say "Oh no: $err";
+    });
+
+Load JSON-encoded data from the server using a GET HTTP request.
+
+This takes an URL, an optional data that can be an hash reference, an array reference or a regular string, an optional success callback code reference. The URL is the first argument, but the C<data> and C<success> arguments can be in any order.
+
+The URL can be a C<file://> URI, and you can even use contextual URL such as absolute or relative URL provided you have set the value for L<documentURI|HTML::Object::DOM::Document/documentURI> in class L<HTML::Object::DOM::Document>, which is the root element of the DOM. You can access it using the L<getRootNode|HTML::Object::DOM::Node> method.
+
+For example:
+
+    $doc->documentURI = 'https://example.com/some/where';
+    my $body = $('body', $doc);
+    # The URI will become https://example.com/other/path
+    $body->getJSON( '/other/path.json' )->then(sub
+    {
+        my( $resolve, $reject ) = @$_;
+        say "Yeah!";
+        # Do some work here...
+    });
+
+This is a shorthand Ajax method, which is equivalent to:
+
+    $el->ajax({
+        dataType => "json",
+        url      => $url,
+        data     => $data,
+        success  => $success
+    });
+
+Returns a L<Promise::Me> object.
+
+This method requires L<HTTP::Promise> version C<0.5.0> or higher to be installed.
+
+Data that is sent to the server is appended to the URL as a query string.
+If the value of the data parameter is a plain object, it is converted to a string and url-encoded before it is appended to the URL.
+
+Most implementations will specify a success handler:
+
+    use Class::Array;
+    $el->getJSON( "ajax/test.json", sub
+    {
+        my $data = shift( @_ );
+        my $items = Class::Array->new([]);
+        Class::Array->new( $data )->each(sub
+        {
+            my( $key, $val ) = @_;
+            $items->push( "<li id='" . $key . "'>" . $val . "</li>" );
+        });
+        
+        $( "<ul/>", 
+        {
+            class => 'my-new-list',
+            html -> $items->join( '' )
+        })->appendTo( 'body' );
+    });
+
+This example, of course, relies on the structure of the JSON file:
+
+    {
+        "one": "Singular sensation",
+        "two": "Beady little eyes",
+        "three": "Little birds pitch by my doorstep"
+    }
+
+Using this structure, the example loops through the requested data, builds an unordered list, and appends it to the body.
+
+The C<success> callback is passed the returned data, which is typically an hash reference or array reference as defined by the JSON structure and parsed using the L<JSON/decode> method. It is also passed the text status of the response and the L<HTTP::Promise::Response> object.
+
+C<getJSON>() implements the L<Promise|Promise::Me> interface, giving it all the properties, methods, and behavior of a Promise, namely L<Promise::Me/then> and L<Promise::Me/catch>
+
+It is different from the jQuery interface that implements the methods C<done>, C<fail> and C<always>
+
+    my $promise = $el->getJSON( 'example.json', sub
+    {
+        say( "success" );
+    })->then(sub
+    {
+        say( "second success" );
+    })->catch(sub
+    {
+        say( "error" );
+    });
+
+Example:
+
+Loads the four most recent pictures of Mount Rainier from the Flickr JSONP API.
+
+    my $html = <<EOT+
+    <!doctype html>
+    <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <title>getJSON demo</title>
+            <style>
+            img {
+                height: 100px;
+                float: left;
+            }
+            </style>
+        </head>
+        <body>
+            <div id="images"></div>
+        </body>
+    </html>
+    EOT
+
+    my $p = HTML::Parser->new;
+    my $doc = $p->parse( $html ) || die( $p->error );
+    my $body = $('body', $doc);
+    use Class::Array;
+
+    my $flickerAPI = 'https://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?';
+    $body->getJSON( $flickerAPI, 
+    {
+        tags => "mount rainier",
+        tagmode => "any",
+        format => "json",
+    })->then(sub
+    {
+        my $data = shift( @_ );
+        Class::Array->new( $data->items )->each(sub
+        {
+            my( $i, $item ) = @_;
+            $( '<img>' )->attr( 'src', $item->{media}->{m} )->appendTo( '#images' );
+            if( $i === 3 )
+            {
+                return(0);
+            }
+        });
+    });
+
+Load the JSON data from test.js and access a name from the returned JSON data.
+
+    $body->getJSON( 'test.js', sub
+    {
+        my $json = shift( @_ );
+        say( "JSON Data: " . $json->{users}->[3]->{name} );
+    });
+
+Load the JSON data from test.js, passing along additional data, and access a name from the returned JSON data. If an error occurs, report an error message instead.
+
+    $body->getJSON( 'test.js', { name => 'John', time => '2pm' } )->then(sub
+    {
+        my $json = shift( @_ );
+        say( "JSON Data: " . $json->{users}->[3]->{name} );
+    })->catch(sub
+    {
+        my( $resp, $textStatus, $error ) = @_;
+        my $err = $textStatus . ", " . $error;
+        say( "Request Failed: " . $err );
+    });
 
 head2 has
 
@@ -826,7 +1613,21 @@ The callback function receives 3 arguments: C<$responseContent>, C<$textStatus> 
 
 This method fetches data from the given C<uri> and, when a successful response is detected (i.e. when C<textStatus> is C<success> or C<notmodified>), L</load> sets the HTML contents of the matched elements to the returned data. This means that most uses of the method can be quite simple:
 
-    $( "#result" )->load( "/some/test.html" );
+    $( "#result" )->load( "https://example.com/some/test.html" );
+
+The URL can be a C<file://> URI, and you can even use contextual URL such as absolute or relative URL provided you have set the value for L<documentURI|HTML::Object::DOM::Document/documentURI> in class L<HTML::Object::DOM::Document>, which is the root element of the DOM. You can access it using the L<getRootNode|HTML::Object::DOM::Node> method.
+
+For example:
+
+    $doc->documentURI = 'https://example.com/some/where';
+    my $body = $('body', $doc);
+    # The URI will become https://example.com/other/path
+    $body->load( '/other/path', sub
+    {
+        my( $data, $textStatus, $httpResponse ) = @_;
+        say "Yeah!";
+        # Do some work here...
+    });
 
 Upon error, be it internal, or when the returned http code is not a 2XX code, C<$textStatus> is set to C<error>
 
@@ -1039,6 +1840,56 @@ Returns L</value> if the current element is comment node. Otherwise, returns L</
 =head2 tagname
 
 Returns the tag name for the current element.
+
+=head2 text
+
+When no argument is provided, this returns the combined text contents, as a L<scalar object|Module::Generic::Scalar> of each element in the set of matched elements, including their descendants.
+
+    my $text = $element->text();
+    # or, here this is a collection object
+    xq('body', $doc)->text();
+    # or if this is a single html element object
+    xq('body', $doc)->first->text();
+
+When an argument is provided, it takes either some text data as a string, or a code reference.
+
+In the case of a code reference, it is called with the element position, starting at 0 and the old text data string. It expects in returns either:
+
+=over 4
+
+=item 1. an empty or undefined value, in which case the current element will have its content emptied using L</empty>
+
+=item 2. some text data, and the content of the current element object will be replaced.
+
+=back
+
+Be mindful that this method will add the data as is, and will not treat it as HTML if some were provided. Thus, if some HTML were provided, it would be escaped in order to be rendered properly.
+
+Quoting jQuery documentation, for example, consider this html:
+
+    <div class="demo-container">
+        <div class="demo-box">Demonstration Box</div>
+        <ul>
+            <li>list item 1</li>
+            <li>list <strong>item</strong> 2</li>
+        </ul>
+    </div>
+
+The code C<< $( "div.demo-container" )->text( "<p>This is a test.</p>" ); >> will produce the following DOM output:
+
+    <div class="demo-container">
+        &lt;p&gt;This is a test.&lt;/p&gt;
+    </div>
+
+It will appear on a rendered page as though the tags were exposed, like this:
+
+    <p>This is a test</p>
+
+The C<text()> method cannot be used on input elements. For input field text, use the C<val()> method.
+
+Afer the text value is set, it returns the object it was called with.
+
+L<https://api.jquery.com/text/>
 
 =head2 toggleClass
 

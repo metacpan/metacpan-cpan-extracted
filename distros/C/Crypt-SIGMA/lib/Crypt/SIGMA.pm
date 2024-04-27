@@ -18,7 +18,7 @@ use Crypt::OpenSSL::ECDSA;
 
 #use Smart::Comments;
 
-our $VERSION=0.012;
+our $VERSION=0.013;
 
 our @ISA    = qw(Exporter);
 our @EXPORT = qw/
@@ -43,16 +43,17 @@ our @EXPORT_OK = @EXPORT;
 sub derive_z_ke_km {
   my ( $self_priv, $peer_pub, $hash_name, $key_len ) = @_;
 
-  my $z = ecdh_pkey( $self_priv, $peer_pub );
-  ### z: unpack("H*", $z)
+  my $z = ecdh( $self_priv, $peer_pub );
+  my $z_hex = unpack("H*", $z);
+  ### $z_hex
 
   my $zero_salt = pack( "H64", '0' );
   ### zero_salt: unpack("H*", $zero_salt)
 
-  my $ke = hkdf( $z, $zero_salt, $hash_name, $key_len, "sigma encrypt key" );
+  my $ke = Crypt::KeyDerivation::hkdf( $z, $zero_salt, $hash_name, $key_len, "sigma encrypt key" );
   ### ke: unpack("H*", $ke)
 
-  my $km = hkdf( $z, $zero_salt, $hash_name, $key_len, "sigma mac key" );
+  my $km = Crypt::KeyDerivation::hkdf( $z, $zero_salt, $hash_name, $key_len, "sigma mac key" );
   ### km: unpack("H*", $km)
 
   return { z => $z, ke => $ke, km => $km };
@@ -61,7 +62,7 @@ sub derive_z_ke_km {
 sub derive_ks {
   my ( $z, $na, $nb, $hash_name, $key_len ) = @_;
 
-  my $ks = hkdf( $z, $na . $nb, $hash_name, $key_len, "sigma session key" );
+  my $ks = Crypt::KeyDerivation::hkdf( $z, $na . $nb, $hash_name, $key_len, "sigma session key" );
 }
 
 sub a_send_msg1 {
@@ -71,7 +72,9 @@ sub a_send_msg1 {
 
   my $na = Crypt::OpenSSL::Bignum->rand_range( $random_range );
 
-  my $ek_key_a_r = generate_ec_key( $group, undef, $point_compress_t, $ctx );
+  my $nid = Crypt::OpenSSL::EC::EC_GROUP::get_curve_name($group);
+  my $group_name = OBJ_nid2sn($nid);
+  my $ek_key_a_r = generate_ec_key( $group_name, undef );
 
   my $msg1 = $pack_msg_func->( [ $ek_key_a_r->{pub_bin}, $na->to_bin, $other_data_a ] );
 
@@ -89,7 +92,9 @@ sub b_recv_msg1 {
   ### b_recv_na: unpack("H*", $b_recv_na)
   ### b_recv_other_data_a: unpack("H*", $b_recv_other_data_a)
 
-  my $b_recv_ek_a_pub_pkey = evp_pkey_from_point_hex( $group, unpack( "H*", $b_recv_ek_a_pub ), $ctx );
+  my $nid = Crypt::OpenSSL::EC::EC_GROUP::get_curve_name($group);
+  my $group_name = OBJ_nid2sn($nid);
+  my $b_recv_ek_a_pub_pkey = gen_ec_pubkey( $group_name, unpack( "H*", $b_recv_ek_a_pub ));
 
   return { na => $b_recv_na, gx => $b_recv_ek_a_pub, gx_pkey => $b_recv_ek_a_pub_pkey, other_data_a => $b_recv_other_data_a, };
 }
@@ -114,7 +119,9 @@ sub b_send_msg2 {
 
   #nb, ek
   my $nb         = Crypt::OpenSSL::Bignum->rand_range( $random_range );
-  my $ek_key_b_r = generate_ec_key( $group, undef, $point_compress_t, $ctx );
+  my $nid = Crypt::OpenSSL::EC::EC_GROUP::get_curve_name($group);
+  my $group_name = OBJ_nid2sn($nid);
+  my $ek_key_b_r = generate_ec_key( $group_name, undef );
 
   my $kr = derive_z_ke_km( $ek_key_b_r->{priv_pkey}, $b_recv_ek_a_pub_pkey, $hash_name, $key_len );
 
@@ -141,7 +148,9 @@ sub a_recv_msg2 {
   ### a_recv_ek_b_pub: unpack("H*", $a_recv_ek_b_pub)
   ### a_recv_nb: unpack("H*", $a_recv_nb)
   ### a_recv_cipher_info: unpack("H*", $a_recv_cipher_info)
-  my $a_recv_ek_b_pub_pkey = evp_pkey_from_point_hex( $group, unpack( "H*", $a_recv_ek_b_pub ), $ctx );
+  my $nid = Crypt::OpenSSL::EC::EC_GROUP::get_curve_name($group);
+  my $group_name = OBJ_nid2sn($nid);
+  my $a_recv_ek_b_pub_pkey = gen_ec_pubkey( $group_name, unpack( "H*", $a_recv_ek_b_pub ));
 
   my $key_r = derive_z_ke_km( $ek_key_a_r->{priv_pkey}, $a_recv_ek_b_pub_pkey, $hash_name, $key_len );
 
@@ -150,11 +159,9 @@ sub a_recv_msg2 {
   ### b_plaintext: unpack("H*", $b_plaintext)
 
   my $b_plaintext_r = $unpack_msg_func->( $b_plaintext );
-  my ( $a_recv_id_b, $a_recv_other_data_b, @a_recv_sig_b ) = @$b_plaintext_r;
+  my ( $a_recv_id_b, $a_recv_other_data_b, $a_recv_sig_b ) = @$b_plaintext_r;
   ### $a_recv_id_b
   ### a_recv_other_data_b: unpack("H*", $a_recv_other_data_b)
-  ### r : unpack("H*", $a_recv_sig_b[0])
-  ### s : unpack("H*", $a_recv_sig_b[1])
 
   return {
     nb           => $a_recv_nb,
@@ -163,7 +170,7 @@ sub a_recv_msg2 {
     derive_key   => $key_r,
     id_b         => $a_recv_id_b,
     other_data_b => $a_recv_other_data_b,
-    sig          => \@a_recv_sig_b,
+    sig          => $a_recv_sig_b,
   };
 } ## end sub a_recv_msg2
 
@@ -208,16 +215,16 @@ sub gen_msg_mac_sig_enc {
     my $tbs = $mac_func->( $tbm, $km );
     ### tbs: unpack("H*", $tbs)
 
-    my @sig = $sign_func->( $sign_priv, $tbs );
-    ### sig.r: unpack("H*", $sig[0])
-    ### sig.s: unpack("H*", $sig[1])
+    my $sig = $sign_func->( $sign_priv, $tbs );
+    ### sig: unpack("H*", $sig)
 
-    my $tbe = $pack_msg_func->( [ @$data_to_enc_r, @sig ] );
+    my $tbe = $pack_msg_func->( [ @$data_to_enc_r, $sig ] );
     ### tbe: unpack("H*", $tbe)
 
     my $cipher_info_r = $enc_func->( $ke, $tbe );
     my $cipher_info = $pack_msg_func->($cipher_info_r);
     ### cipher_info: unpack("H*", $cipher_info)
+    return $cipher_info;
 }
 
 sub a_send_msg3 {
@@ -252,10 +259,8 @@ sub b_recv_msg3 {
   my $plaintext = $dec_func->( $kr->{ke}, @$cipher_info );
 
   my $plaintext_r = $unpack_msg_func->( $plaintext );
-  my ( $b_recv_id_a, @b_recv_sig_a ) = @$plaintext_r;
+  my ( $b_recv_id_a, $b_recv_sig_a ) = @$plaintext_r;
   ### $b_recv_id_a
-  ### r : unpack("H*", $b_recv_sig_a[0])
-  ### s : unpack("H*", $b_recv_sig_a[1])
 
   my $nb            = $b_send_msg2_r->{nb};
   my $data_to_mac_r = [ 0, $nb->to_bin, $b_recv_id_a, $b_recv_msg1_r->{gx}, $b_send_msg2_r->{other_data_b}, $b_recv_msg1_r->{other_data_a} ];
@@ -263,7 +268,7 @@ sub b_recv_msg3 {
   ### $b_recv_id_a
   ### b recv gx: unpack("H*", $b_recv_msg1_r->{gx})
 
-  my $verify_res = verify_msg_mac_sig($data_to_mac_r, \@b_recv_sig_a, $kr->{km}, $s_pub_a, $pack_msg_func, $mac_func, $verify_func);
+  my $verify_res = verify_msg_mac_sig($data_to_mac_r, $b_recv_sig_a, $kr->{km}, $s_pub_a, $pack_msg_func, $mac_func, $verify_func);
   ### $verify_res
 
   croak "b verify msg3 fail" unless ( $verify_res );

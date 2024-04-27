@@ -1,12 +1,14 @@
 package Data::TableReader::Field;
 use Moo 2;
-use Carp ();
+use Carp;
+use namespace::clean;
 
 # ABSTRACT: Field specification for Data::TableReader
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 
 has name     => ( is => 'ro', required => 1 );
+*addr=       \&Scalar::Util::refaddr;
 has header   => ( is => 'ro' );
 has required => ( is => 'ro', default => sub { 1 } );
 has trim     => ( is => 'ro', default => sub { 1 } );
@@ -20,7 +22,7 @@ sub follows_list { my $f= shift->follows; ref $f? @$f : defined $f? ( $f ) : () 
 sub BUILD {
    my $self= shift;
    if ($self->coerce) {
-      Carp::croak "To coerce field ".$self->name.", either 'coerce' must be a coderef or 'type' must have a ->coerce method"
+      croak "To coerce field ".$self->name.", either 'coerce' must be a coderef or 'type' must have a ->coerce method"
          unless ref $self->coerce eq 'CODE' or (defined $self->type && ref($self->type)->can('coerce'));
    }
 }
@@ -57,7 +59,7 @@ sub _build_trim_coderef {
 	return \&_default_trim_coderef if !ref $t;
 	return $t if ref $t eq 'CODE';
 	return sub { s/$t//g; } if ref $t eq 'Regexp';
-	Carp::croak("Can't convert ".ref($t)." to a coderef");
+	croak("Can't convert ".ref($t)." to a coderef");
 }
 
 1;
@@ -74,7 +76,7 @@ Data::TableReader::Field - Field specification for Data::TableReader
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 DESCRIPTION
 
@@ -86,6 +88,11 @@ This class describes aspects of one of the fields you want to find in your sprea
 
 Required.  Used for the hashref key if you pull records as hashes, and used in diagnostic
 messages.
+
+=head2 addr
+
+Convenience for C<< refaddr($field) >>.  This should be used any time you use the field
+as a key in a hashref, if there is any chance your names aren't distinct.
 
 =head2 header
 
@@ -221,8 +228,8 @@ starting from the header C<'Scores'> until a column of any other header.
 
 =head2 follows_list
 
-Convenience accessor for C<< @{ ->follows } >>, useful because C<follows> might only be a
-scalar.
+Convenience accessor for C<< @{ ->follows } >>, useful because C<follows> might be either a
+scalar or arrayref.
 
 =head2 header_regex
 

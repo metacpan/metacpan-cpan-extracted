@@ -1,5 +1,10 @@
 Revision history for Test::MockModule
 
+v0.178.0
+- 6724a30 - Simplify CI workflow - Nicolas R
+- 1801372 - Multiple improvements -  Nicolas R
+- e97e316 - Add protection to _replace_sub - Nicolas R
+
 v0.177.0
 - 35f0d0b Update changelog - Geoff Franks
 - 1d5b485 Move test modules from build to test requires - Olaf Alders

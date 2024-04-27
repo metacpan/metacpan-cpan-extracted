@@ -4,7 +4,7 @@
       "Michael Conrad <mike@nrdvana.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Data::TableReader" : "0.009",
+            "Data::TableReader" : "0.09",
             "Data::TableReader::Decoder" : "0",
             "Data::TableReader::Iterator" : "0",
             "HTML::Parser" : "0",
@@ -45,7 +45,7 @@
       },
       "test" : {
          "requires" : {
-            "Data::TableReader" : "0.009",
+            "Data::TableReader" : "0.09",
             "File::Spec::Functions" : "0",
             "FindBin" : "0",
             "Log::Any" : "0",
@@ -69,9 +69,12 @@
          "web" : "https://github.com/nrdvana/perl-Data-TableReader"
       }
    },
-   "version" : "0.012",
-   "x_generated_by_perl" : "v5.26.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "version" : "0.015",
+   "x_contributors" : [
+      "Christian Walde <walde.christian@gmail.com>"
+   ],
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

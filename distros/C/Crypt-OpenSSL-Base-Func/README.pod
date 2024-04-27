@@ -13,83 +13,60 @@ Crypt::OpenSSL::Base::Func - Base Functions, using the OpenSSL libraries
 
 =head1 Methods
 
-=head2 ecdh
-    
-    z_bin = ecdh(local_priv_pem_file, peer_pub_pem_file)
+=head2 symmetric
 
-=head2 aes_cmac
+=head3 aes_cmac
 
 RFC4493: aes_cmac
 
-    mac = aes_cmac(key, plaintext, cipher_name)
+    my $mac = aes_cmac($cipher_name, $key, $plaintext)
 
+    my $cipher_name = 'aes-128-cbc'; 
     my $key = pack("H*", '2b7e151628aed2a6abf7158809cf4f3c');
     my $msg_1 = pack("H*", '6bc1bee22e409f96e93d7e117393172a');
-    my $mac_1 = aes_cmac($key, $msg_1, 'aes-128-cbc');
+    my $mac_1 = aes_cmac($cipher_name, $key, $msg_1);
     print unpack("H*", $mac_1), "\n";
 
     #$ echo -n '6bc1bee22e409f96e93d7e117393172a' | xxd -r -p | openssl dgst -mac cmac -macopt cipher:aes-128-cbc -macopt hexkey:2b7e151628aed2a6abf7158809cf4f3c 
     #(stdin)= 070a16b46b4d4144f79bdd9dd04a287c
 
-=head2 PKCS12_key_gen
+=head3 aead_encrypt
+    
+    my $r = aead_encrypt($cipher_name, $plaintext, $aad, $key, $iv, $tag_len);
+    # $r = [ $ciphertext, $tag ];
+
+=head3 aead decrypt
+
+    my $plaintext = aead_decrypt($cipher_name, $ciphertext, $aad, $tag, $key, $iv);
+
+
+=head2 pkcs
+
+=head3 pkcs12_key_gen
 
 RFC7292 : PKCS12_key_gen
 
 see also openssl/crypto/pkcs12/p12_key.c
 
-    PKCS12_key_gen(password, salt_hexstr, id, iteration, outlen, digest_name)
+    pkcs12_key_gen($password, $salt, $id, $iteration, $digest_name)
 
-    my $macdata_key = PKCS12_key_gen('123456', pack("H*", 'e241f01650dbeae4'), 3, 2048, 32, 'sha256');
+    my $macdata_key = pkcs12_key_gen('123456', pack("H*", 'e241f01650dbeae4'), 3, 2048, 'sha256');
     print unpack("H*", $macdata_key), "\n";
 
-=head2 PKCS5_PBKDF2_HMAC
+=head3 pkcs5_pbkdf2_hmac
 
 RFC2898 : PBKDF2
 
 see also openssl/crypto/evp/p5_crpt2.c 
 
-    PKCS5_PBKDF2_HMAC(password, salt, iteration, digest_name, outlen)
+    my $k = pkcs5_pbkdf2_hmac($password, $salt, $iteration, $digest_name)
 
-    my $pbkdf2_key = PKCS5_PBKDF2_HMAC('123456', pack("H*", 'b698314b0d68bcbd'), 2048, 'sha256', 32);
+    my $pbkdf2_key = pkcs5_pbkdf2_hmac('123456', pack("H*", 'b698314b0d68bcbd'), 2048, 'sha256');
     print unpack("H*", $pbkdf2_key), "\n";
 
-=head2 bn_mod_sqrt
+=head2 bignum
 
-see also openssl/crypto/bn/bn_sqrt.c
-
-    s = bn_mod_sqrt(a, p)
-
-    my $a = '04'; #hexstring
-    my $p = '05'; #hexstring
-    my $s = bn_mod_sqrt($a, $p); #hexstring
-    print $s, "\n";
-    #03
-
-=head2  evp_pkey_from_point_hex
-
-    my $ec_pkey_pub = evp_pkey_from_point_hex($ec_group, $ec_point_hex, $bn_ctx);
-
-=head2 evp_pkey_from_priv_hex
-
-    my $ec_pkey_priv = evp_pkey_from_priv_hex($ec_group, $ec_priv_hex); 
-
-=head2 pem_write_evp_pkey    
-
-    my $ret = pem_write_evp_pkey($dst_fname, $evp_pkey, $is_priv);
-
-=head2 pem_read_pkey
-
-    my $evp_pkey = pem_read_pkey($key_file, $is_priv);
-
-=head2  ecdh_pkey
-
-    my $z = ecdh_pkey($pkey_priv, $pkey_peer_pub);
-
-=head2  generate_ec_key
-
-    my $ec_key_hash_ref = generate_ec_key( $group, $priv_bn, $point_compress_t, $ctx );
-
-=head2  random_bn
+=head3  random_bn
 
     my $random_bn = random_bn($Nn);
 
@@ -97,8 +74,90 @@ see also openssl/crypto/bn/bn_sqrt.c
     my $random_bn = random_bn($Nn);
     print $random_bn->to_hex, "\n";
 
-=head2 point2hex
+=head2 hash
 
-    my $point_hex = point2hex($group_name, $point, $point_compress_t);
+=head3 digest
 
-=over
+    my $dgst = digest($digest_name, $msg);
+
+=head2 ec
+
+=head3  gen_ec_key
+
+    my $priv_pkey = gen_ec_key(group_name, $priv_hex);
+
+=head3 gen_ec_pubkey
+
+    my $pub_pkey = gen_ec_pubkey(group_name, $pub_hex);
+
+=head3 export_ec_pubkey
+
+    my $pub_pkey = export_ec_pubkey($priv_pkey);
+
+=head3 read_ec_pubkey
+
+    my $pub_hex = read_ec_pubkey($pub_pkey, $want_compressed);
+
+=head3  ecdh
+
+    my $z_bin = ecdh($local_priv_pkey, $peer_pub_pkey);
+
+=head3 ecdh_pem
+    
+    my $z_bin = ecdh_pem($local_priv_pem_file, $peer_pub_pem_file);
+
+=head2 pkey
+
+=head3 read_key
+
+    my $priv_hex = read_key($priv_pkey);
+
+=head3 read_pubkey
+
+    my $pub_hex = read_pubkey($pub_pkey);
+
+=head3 read_key_from_pem
+    
+    my $priv_pkey = read_key_from_pem($priv_pem_filename);
+
+=head3 read_pubkey_from_pem
+    
+    my $pub_pkey = read_pubkey_from_pem($pub_pem_filename);
+
+=head3 read_key_from_der
+    
+    my $priv_pkey = read_key_from_der($priv_der_filename);
+
+=head3 read_pubkey_from_der
+    
+    my $pub_pkey = read_pubkey_from_der($pub_der_filename);
+
+=head3 write_key_to_pem
+
+    write_key_to_pem($dst_fname, $priv_pkey);
+
+=head3 write_pubkey_to_pem
+
+    write_key_to_pem($dst_fname, $pub_pkey);
+
+=head3 write_key_to_der
+
+    write_key_to_der($dst_fname, $priv_pkey);
+
+=head3 write_pubkey_to_der
+
+    write_key_to_der($dst_fname, $pub_pkey);
+
+=head3 get_pkey_bn_param
+
+    my $x_bn = get_pkey_bn_param($pkey, $param_name);
+
+=head3 get_pkey_octet_string_param
+
+    my $x_hex = get_pkey_octet_string_param($pkey, $param_name);
+
+=head3 get_pkey_utf8_string_param
+
+    my $s = get_pkey_utf8_string_param($pkey, $param_name);
+
+=cut

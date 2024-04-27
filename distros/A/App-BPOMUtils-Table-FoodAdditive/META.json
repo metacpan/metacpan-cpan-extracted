@@ -62,7 +62,7 @@
    "provides" : {
       "App::BPOMUtils::Table::FoodAdditive" : {
          "file" : "lib/App/BPOMUtils/Table/FoodAdditive.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       }
    },
    "release_status" : "stable",
@@ -77,7 +77,7 @@
          "web" : "https://github.com/perlancar/perl-App-BPOMUtils-Table-FoodAdditive"
       }
    },
-   "version" : "0.019",
+   "version" : "0.020",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

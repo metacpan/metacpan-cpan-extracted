@@ -16,7 +16,7 @@ t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/01_load.t
 t/02_config.t
-t/02_dump.t
+t/03_dump.t
 t/conf/TestApp.conf.def
 t/conf/TestApp2.conf
 t/conf/TestApp2.conf.def

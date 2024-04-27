@@ -4,7 +4,7 @@
       "KMX <kmx@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -64,14 +64,14 @@
          "requires" : {
             "File::ShareDir" : "1.00",
             "Module::Build" : "0.38",
-            "perl" : "5.012"
+            "perl" : "5.014"
          }
       }
    },
    "provides" : {
       "Perl::Dist::Strawberry" : {
          "file" : "lib/Perl/Dist/Strawberry.pm",
-         "version" : "4.022"
+         "version" : "4.023"
       },
       "Perl::Dist::Strawberry::Step" : {
          "file" : "lib/Perl/Dist/Strawberry/Step.pm"
@@ -140,6 +140,6 @@
       "x_IRC" : "irc://irc.perl.org/#win32",
       "x_MailingList" : "http://groups.google.com/group/perl.win32.vanilla"
    },
-   "version" : "4.022",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "4.023",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

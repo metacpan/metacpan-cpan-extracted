@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.8.1
+## Version v0.8.2
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2024/02/21
+## Modified 2024/04/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.8.1';
+    our $VERSION = 'v0.8.2';
 };
 
 use strict;
@@ -1280,6 +1280,11 @@ sub filename
             $self->resolved(1);
         }
         
+        if( substr( $newfile, 0, 7 ) eq 'file://' )
+        {
+            $newfile = URI->new( $newfile )->file;
+        }
+
         # If we provide a string for the abs() method it works on Unix, but not on Windows
         # By providing an object, we make it work
         unless( $self->_spec_file_name_is_absolute( $newfile ) )
@@ -2782,6 +2787,10 @@ sub resolve
     return( $self->error( "Too many recursion. Exceeded the threshold of $max_recursion" ) ) if( $max_recursion > 0 && $opts->{recurse} >= $max_recursion );
     my $os = $self->{os} || $^O;
     my $globbing = CORE::exists( $opts->{globbing} ) ? $opts->{globbing} : $self->{globbing};
+    if( substr( $path, 0, 7 ) eq 'file://' )
+    {
+        $path = URI->new( $path )->file;
+    }
     # Those do not work in virtualisation
     if( $globbing && $os eq $^O )
     {
@@ -2841,6 +2850,7 @@ sub resolve
         my $test = $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname );
         if( !CORE::length( $test ) )
         {
+            # Resolved file is empty
         }
     }
     return( $self->new( $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname ), { resolved => 1, os => $self->{os}, ( $self->{base_dir} ? ( base_dir => $self->{base_dir} ) : () ), debug => $self->debug }) );
@@ -4547,7 +4557,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.8.1
+    v0.8.2
 
 =head1 DESCRIPTION
 

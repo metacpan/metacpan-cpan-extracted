@@ -1,2 +1,7 @@
+0.02 2024-04-26T23:02:53+02:00
+ - Add tests for error parameters.
+ - Rewrite the tests so that the functional tests are first and then the
+   errors.
+
 0.01 2024-01-08T00:50:40+01:00
  - First version.

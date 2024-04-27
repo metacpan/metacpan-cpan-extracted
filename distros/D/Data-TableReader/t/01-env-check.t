@@ -11,6 +11,8 @@ for (qw(
 	Spreadsheet::XLSX
 	Spreadsheet::ParseXLSX
 	Spreadsheet::ParseExcel
+	Type::Tiny
+	Types::Standard
 )) {
 	if (eval "require $_") {
 		diag "Have $_ ".$_->VERSION;

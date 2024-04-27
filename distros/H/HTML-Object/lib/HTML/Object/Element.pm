@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Element.pm
-## Version v0.2.7
+## Version v0.2.8
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/25
-## Modified 2023/11/06
+## Modified 2024/04/20
 ## All rights reserved
 ## 
 ## 
@@ -34,7 +34,7 @@ BEGIN
     our $LOOK_LIKE_HTML = qr/^[[:blank:]\h]*\<\w+.*?\>/;
     our $LOOK_LIKE_IT_HAS_HTML = qr/\<\w+.*?\>/;
     our $ATTRIBUTE_NAME_RE = qr/\w[\w\-]*/;
-    our $VERSION = 'v0.2.7';
+    our $VERSION = 'v0.2.8';
 };
 
 use strict;
@@ -252,6 +252,7 @@ sub as_text
     my $self = shift( @_ );
     return( $self->{_cache_text} ) if( $self->{_cache_text} && !CORE::length( $self->{_reset} ) );
     my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{unescape} //= 0;
     my $a = $self->new_array;
     my $seen = {};
     my $crawl;
@@ -272,7 +273,18 @@ sub as_text
                     # If value returned is not true, we skip this element
                     $opts->{callback}->( $e ) || return(1);
                 }
-                $a->push( $e->as_string->scalar );
+                if( $opts->{unescape} )
+                {
+                    my $txt = $e->as_string->scalar;
+                    $txt =~ s,<br[[:blank:]]*/>\n,\n,gs;
+                    $txt =~ s/\&gt;/>/gs;
+                    $txt =~ s/\&lt;/</gs;
+                    $a->push( $txt );
+                }
+                else
+                {
+                    $a->push( $e->as_string->scalar );
+                }
             }
             
             unless( $e->isa( 'HTML::Object::Text' ) ||
@@ -285,7 +297,18 @@ sub as_text
     if( $self->isa( 'HTML::Object::Text' ) ||
         $self->isa( 'HTML::Object::Space' ) )
     {
-        $a->push( $self->value->scalar );
+        if( $opts->{unescape} )
+        {
+            my $txt = $self->value->scalar;
+            $txt =~ s,<br[[:blank:]]*/>\n,\n,gs;
+            $txt =~ s/\&gt;/>/gs;
+            $txt =~ s/\&lt;/</gs;
+            $a->push( $txt );
+        }
+        else
+        {
+            $a->push( $self->value->scalar );
+        }
     }
     else
     {
@@ -1619,11 +1642,12 @@ HTML::Object::Element - HTML Element Object
 =head1 SYNOPSIS
 
     use HTML::Object::Element;
-    my $this = HTML::Object::Element->new || die( HTML::Object::Element->error, "\n" );
+    my $this = HTML::Object::Element->new ||
+        die( HTML::Object::Element->error, "\n" );
 
 =head1 VERSION
 
-    v0.2.7
+    v0.2.8
 
 =head1 DESCRIPTION
 
@@ -1722,6 +1746,22 @@ If a cached version of that string exists, it is returned instead.
 Returns a string representation of the text content of the current element and its descendant.
 
 If a cached version of that string exists, it is returned instead.
+ 
+It takes an optional hash or hash reference of parameters:
+
+=over 4
+
+=item * C<callback>
+
+This is a callback subroutine reference of anonymous subroutine. It is called for each textual element found and is passed as its sole argument, the element object.
+
+=item * C<unescape>
+
+Boolean. If true, the value of textual elements found will be unescaped before being returned. This means that C<< &lt; >> will be converted back to C<< < >> and C<< &gt; >> to C<< > >> and C<< <br > >> followed by a new line will be removed to only leave the new line.
+
+=back
+
+See also L<HTML::Object::DOM::Element/innerText>, L<HTML::Object::Node/textContent> and L<HTML::Object::XQuery/text>
 
 =head2 as_trimmed_text
 

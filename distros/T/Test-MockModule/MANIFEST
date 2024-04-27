@@ -4,6 +4,8 @@ lib/Test/MockModule.pm
 LICENSE
 MANIFEST			This list of files
 MANIFEST.SKIP
+META.json
+META.yml
 README.md
 t/chaining.t
 t/define.t
@@ -21,5 +23,3 @@ t/pod_coverage.t
 t/prototype.t
 t/redefine.t
 t/strict_scoped_files.t
-META.yml
-META.json

@@ -51,9 +51,12 @@ sub test_seek_tell {
 	ok( $dec->parse, 'able to parse HTML' );
 	ok( my $iter= $dec->iterator, 'got iterator' );
 	my $pos= $iter->tell;
+	is( $iter->row, 0, 'row=0' );
 	is( $iter->progress, 0, 'progress=0' );
 	is_deeply( $iter->(), $expected_data[0][0], 'correct first row' );
+	is( $iter->row, 1, 'row=1' );
 	$iter->seek($pos);
+	is( $iter->row, 0, 'row=0' );
 	is( $iter->progress, 0, 'progress=0 again' );
 	is_deeply( $iter->(), $expected_data[0][0], 'correct first row' );
 	

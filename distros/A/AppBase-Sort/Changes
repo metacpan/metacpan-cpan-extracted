@@ -1,3 +1,16 @@
+0.006   2024-04-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] Express following the Sorter, Comparer, SortKey
+          specifications.
+
+
+0.005   2024-03-07  Released-By: PERLANCAR; Urgency: medium
+
+        - Split sort-by-example to another dist, to make this dist lighter.
+
+
 0.004   2024-03-07  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Forgot to handle --reverse and --ignore-case (-i) for

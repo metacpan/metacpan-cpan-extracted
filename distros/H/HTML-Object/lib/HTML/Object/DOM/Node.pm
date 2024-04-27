@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Node.pm
-## Version v0.2.2
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.3
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2023/11/06
+## Modified 2024/04/20
 ## All rights reserved
 ## 
 ## 
@@ -72,7 +72,7 @@ BEGIN
         'eq'    => \&isSameNode,
     );
     our $XP;
-    our $VERSION = 'v0.2.2';
+    our $VERSION = 'v0.2.3';
 };
 
 use strict;
@@ -1220,6 +1220,9 @@ sub textContent : lvalue { return( shift->_set_get_callback({
             return;
         }
         my $str = $self->as_text;
+        $str =~ s,<br[[:blank:]]*/>\n,\n,gs;
+        $str =~ s/\&gt;/>/gs;
+        $str =~ s/\&lt;/</gs;
         return( $str );
     },
     set => sub
@@ -1240,7 +1243,11 @@ sub textContent : lvalue { return( shift->_set_get_callback({
             }
             else
             {
-                my $e = $self->new_text( value => $arg, parent => $self );
+                my $val = "$arg";
+                $val =~ s/</\&lt;/gs;
+                $val =~ s/>/\&gt;/gs;
+                $val =~ s,\n,<br />\n,gs;
+                my $e = $self->new_text( value => $val, parent => $self );
                 $self->children->set( $e );
             }
             $self->reset(1);
@@ -1388,7 +1395,7 @@ HTML::Object::DOM::Node - HTML Object DOM Node Class
 
 =head1 VERSION
 
-    v0.2.2
+    v0.2.3
 
 =head1 DESCRIPTION
 
@@ -1607,7 +1614,13 @@ Returns / Sets the textual content of an element and all its descendants.
 
 If this is called on a L<text node|HTML::Object::DOM::Text> or a L<comment node|HTML::Object::DOM::Comment>, it will, instead, set the object value to the textual content provided.
 
+When setting some values, this method will ensure that HTML characters are escaped, namely: C<< < >>, C<< > >> and new lines are preceded by the C<< <br /> >> tag.
+
+When the value is retrieved, this is reversed.
+
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent>
+
+See also L<HTML::Object::DOM::Element/innerText>, L<HTML::Object::Element/as_text> and L<HTML::Object::XQuery/text>
 
 =head1 METHODS
 

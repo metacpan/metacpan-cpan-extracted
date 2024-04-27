@@ -4,7 +4,7 @@
       "Pan Lanlan <abbypan@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -39,7 +39,7 @@
          },
          "requires" : {
             "Carp" : "0.01",
-            "Crypt::OpenSSL::Base::Func" : "0.036",
+            "Crypt::OpenSSL::Base::Func" : "0.038",
             "Crypt::OpenSSL::Bignum" : "0.09",
             "Crypt::OpenSSL::EC" : "1.31",
             "Crypt::OpenSSL::Guess" : "0.12",
@@ -64,6 +64,6 @@
          "url" : "http://github.com/abbypan/Crypt-OpenSSL-Hash2Curve"
       }
    },
-   "version" : "0.033",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.034",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

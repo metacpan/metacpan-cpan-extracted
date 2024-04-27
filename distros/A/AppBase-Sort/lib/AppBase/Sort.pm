@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-03-07'; # DATE
+our $DATE = '2024-04-20'; # DATE
 our $DIST = 'AppBase-Sort'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our %SPEC;
 
@@ -213,7 +213,7 @@ AppBase::Sort - A base for sort-like CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.004 of AppBase::Sort (from Perl distribution AppBase-Sort), released on 2024-03-07.
+This document describes version 0.006 of AppBase::Sort (from Perl distribution AppBase-Sort), released on 2024-04-20.
 
 =head1 FUNCTIONS
 

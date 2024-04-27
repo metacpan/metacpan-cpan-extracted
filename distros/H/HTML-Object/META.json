@@ -40,17 +40,17 @@
             "Digest::MD5" : "2.58",
             "Encode" : "3.08",
             "Exporter" : "5.74",
-            "Filter::Util::Call" : "1.60",
-            "HTML::Parser" : "3.76",
-            "HTML::Selector::XPath" : "0.26",
-            "JSON" : "4.05",
+            "Filter::Util::Call" : "1.64",
+            "HTML::Parser" : "3.82",
+            "HTML::Selector::XPath" : "0.28",
+            "JSON" : "4.10",
             "List::Util" : "1.56",
-            "Module::Generic" : "v0.32.4",
+            "Module::Generic" : "v0.35.5",
             "POSIX" : "0",
-            "Promise::Me" : "v0.4.7",
+            "Promise::Me" : "v0.4.11",
             "Scalar::Util" : "1.60",
             "Time::HiRes" : "1.9764",
-            "URI" : "5.10",
+            "URI" : "5.28",
             "Want" : "0.29",
             "constant" : "1.33",
             "curry" : "1.001000",
@@ -85,6 +85,6 @@
          "web" : "https://gitlab.com/jackdeguest/HTML-Object"
       }
    },
-   "version" : "v0.3.1",
+   "version" : "v0.4.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

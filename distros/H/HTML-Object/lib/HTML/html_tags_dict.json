@@ -342,7 +342,7 @@
          "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/ellipse"
       },
       "em" : {
-         "description" : "Defines emphasized textÂ ",
+         "description" : "Defines emphasized text",
          "is_empty" : false,
          "is_inline" : true,
          "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/em"
@@ -730,6 +730,7 @@
       },
       "isindex" : {
          "description" : "Put a text field in a page for querying the document.",
+         "is_deprecated" : true,
          "is_empty" : false,
          "is_inline" : false,
          "link_in" : [
@@ -751,7 +752,7 @@
          "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/keygen"
       },
       "label" : {
-         "description" : "Defines a labelÂ for an <input> element",
+         "description" : "Defines a label for an <input> element",
          "is_empty" : false,
          "is_inline" : true,
          "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/label"
@@ -825,6 +826,7 @@
       },
       "marquee" : {
          "description" : "Insert a scrolling area of text",
+         "is_deprecated" : true,
          "is_empty" : false,
          "is_inline" : false,
          "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/marquee"
@@ -1407,7 +1409,7 @@
    },
    "meta" : {
       "author" : "Jacques Deguest",
-      "updated" : "2021-12-20T01:33:09+0900",
-      "version" : "v0.1.1"
+      "updated" : "2024-04-18T11:30:17+0900",
+      "version" : "v0.1.2"
    }
 }

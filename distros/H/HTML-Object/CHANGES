@@ -1,5 +1,17 @@
 Revision history for Perl module HTML::Object
 
+v0.4.0 2024-04-27T16:18:36+0900
+    - Minor improvement and some correction to method html() in HTML::Object::XQuery
+    - Added missing method text() in HTML::Object::XQuery
+    - Corrected some documentation formatting
+    - HTML tags dictionary update
+    - Minor correction in loading the HTML tags dictionary
+    - Corrected the documentation for HTML::Object::DOM::Text falsely stating isTextNode() returned false.
+    - Modified the method as_text() in HTML::Object::Element to add the option 'unescape'
+    - Modified the method textContent() in HTML::Object::DOM::Node, and method innerText() in HTML::Object::DOM::Element to escape/unescape characters used in HTML
+    - Option utf8 in method parse_file() in HTML::Object is now true, by default.
+    - Added the methods getDataJson(), ajax() and getJSON() in HTML::Object::XQuery
+
 v0.3.1 2023-11-06T12:37:30+0900
     - Improved code for speed
 

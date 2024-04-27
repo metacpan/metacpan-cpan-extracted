@@ -52,8 +52,12 @@ sub run {
   }
   die "ERROR: cannot detect perl-src dir" unless $perlsrc;
  
-  #get verion string - e.g. '5.15.9'
-  my ($version) = grep { /INST_VER/ } read_file(catfile($unpack_to, $perlsrc, qw/win32 makefile.mk/));
+  #get version string - e.g. '5.15.9'
+  my $file_to_check = catfile($unpack_to, $perlsrc, qw/win32 makefile.mk/);
+  if (!-e $file_to_check) {
+    $file_to_check = catfile($unpack_to, $perlsrc, qw/win32 GNUMakefile/);
+  }
+  my ($version) = grep { /INST_VER/ } read_file($file_to_check);
   $version =~ s/^.*?(5\..*?)[\r\n]*$/$1/;
 
   # some handy variables
@@ -74,7 +78,9 @@ sub run {
   my $patch = $self->{config}->{patch};
   if ($patch) {
     while (my ($new, $dst) = each %$patch) {
-      $self->_patch_file($self->boss->resolve_name($new), catfile($unpack_to, $perlsrc, $dst), catdir($unpack_to, $perlsrc), $tt_vars);
+      #  double pack refs, or update the names
+      $dst = ref ($dst) ? $dst : catfile($unpack_to, $perlsrc, $dst);
+      $self->_patch_file($self->boss->resolve_name($new), $dst, catdir($unpack_to, $perlsrc), $tt_vars);
     }
   }
   
@@ -232,6 +238,8 @@ sub run {
   copy($from, catfile($image_dir, qw/perl bin libstdc++-6.dll/)) if -f $from;
   $from = catfile($image_dir, qw/c bin libwinpthread-1.dll/);
   copy($from, catfile($image_dir, qw/perl bin libwinpthread-1.dll/)) if -f $from;
+  $from = catfile($image_dir, qw/c bin libmcfgthread-1.dll/);
+  copy($from, catfile($image_dir, qw/perl bin libmcfgthread-1.dll/)) if -f $from;
 
   # Delete a2p.exe (Can't relocate a binary).
   my $a = catfile($image_dir, 'perl', 'bin', 'a2p.exe');

@@ -4,7 +4,7 @@
       "Pan Lanlan <abbypan@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -22,9 +22,15 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Carp" : "0.01",
+            "Crypt::OpenSSL::Bignum" : "0.09",
+            "Crypt::OpenSSL::EC" : "1.31",
             "Crypt::OpenSSL::Guess" : "0.12",
             "ExtUtils::MakeMaker" : "0",
-            "Test" : "0"
+            "Math::BigInt" : "1.999815",
+            "Test" : "0.01",
+            "Test::More" : "0.01",
+            "bignum" : "0.52"
          }
       },
       "configure" : {
@@ -63,6 +69,6 @@
          "url" : "http://github.com/abbypan/Crypt-OpenSSL-Base-Func"
       }
    },
-   "version" : "0.037",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.038",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -62,28 +62,31 @@ my $mac_func = \&hmac_sha256;
 my $sig_verify_func = sub {
   my ( $tbs, $sig_r, $pkey_fname ) = @_;
 
-  my $a_know_b_s_pub_pkey = pem_read_pkey( $pkey_fname, 0 );
-  my $a_know_b_s_pub      = EVP_PKEY_get1_EC_KEY( $a_know_b_s_pub_pkey );
+  my $a_know_b_s_pub_pkey = read_pubkey_from_pem($pkey_fname);
 
-  my $a_recv_sig = Crypt::OpenSSL::ECDSA::ECDSA_SIG->new();
-  $a_recv_sig->set_r( $sig_r->[0] );
-  $a_recv_sig->set_s( $sig_r->[1] );
+  my $a_verify = ecdsa_verify($a_know_b_s_pub_pkey, 'sha256', $tbs, $sig_r);
+  #my $a_know_b_s_pub      = EVP_PKEY_get1_EC_KEY( $a_know_b_s_pub_pkey );
 
-  my $a_verify = Crypt::OpenSSL::ECDSA::ECDSA_do_verify( $tbs, $a_recv_sig, $a_know_b_s_pub );
+  ### sig : unpack("H*", $sig_r)
+
+  #my $a_verify = Crypt::OpenSSL::ECDSA::ECDSA_do_verify( $tbs, $a_recv_sig, $a_know_b_s_pub );
   ### verify sig : $a_verify
   return $a_verify;
 };
 
 my $sign_func = sub {
   my ( $pkey_fname, $b_tbs ) = @_;
-  my $b_s_priv_pkey = pem_read_pkey( $pkey_fname, 1 );
-  my $b_s_priv      = EVP_PKEY_get1_EC_KEY( $b_s_priv_pkey );
-  my $b_sig         = Crypt::OpenSSL::ECDSA::ECDSA_do_sign( $b_tbs, $b_s_priv );
-  return ( $b_sig->get_r, $b_sig->get_s );
+  my $b_s_priv_pkey = read_key_from_pem($pkey_fname);
+  my $sig = ecdsa_sign($b_s_priv_pkey, 'sha256', $b_tbs);
+  return $sig;
+  #my $b_s_priv      = EVP_PKEY_get1_EC_KEY( $b_s_priv_pkey );
+  #my $b_sig         = Crypt::OpenSSL::ECDSA::ECDSA_do_sign( $b_tbs, $b_s_priv );
+  #return ( $b_sig->get_r, $b_sig->get_s );
 };
 
 my $group_params = get_ec_params( $group_name );
 my $group        = $group_params->{group};
+print ref($group), "\n\n";
 my $ctx          = $group_params->{ctx};
 
 # a->b { g^x, na
@@ -98,10 +101,10 @@ my ( $na, $ek_key_a_r, $msg1 ) = @{$msg1_r}{qw/na x_r msg1/};
 
 my ( $ek_a, $ek_a_priv, $ek_a_pub, $ek_a_pub_hex_compressed, $ek_a_pub_pkey, $ek_a_priv_pkey ) =
   @{$ek_key_a_r}{qw/priv_key priv_bn pub_point pub_hex pub_pkey priv_pkey/};
-pem_write_evp_pkey( "$Bin/a_ek_pub.pem", $ek_a_pub_pkey, 0 );
+  write_pubkey_to_pem("$Bin/a_ek_pub.pem", $ek_a_pub_pkey);
 ###  $ek_a_pub_hex_compressed
 
-pem_write_evp_pkey( "$Bin/a_ek_priv.pem", $ek_a_priv_pkey, 1 );
+write_key_to_pem( "$Bin/a_ek_priv.pem", $ek_a_priv_pkey );
 ###  ek_a_priv: $ek_a_priv->to_hex
 
 ### msg1: unpack("H*", $msg1)
@@ -131,10 +134,10 @@ my ( $ek_b,      $ek_b_priv,       $ek_b_pub, $ek_b_pub_hex_compressed, $ek_b_pu
 ### $other_data_b
 ### nb: $nb->to_hex
 
-pem_write_evp_pkey( "$Bin/b_ek_pub.pem", $ek_b_pub_pkey, 0 );
+write_pubkey_to_pem( "$Bin/b_ek_pub.pem", $ek_b_pub_pkey );
 ###  $ek_b_pub_hex_compressed
 
-pem_write_evp_pkey( "$Bin/b_ek_priv.pem", $ek_b_priv_pkey, 1 );
+write_key_to_pem( "$Bin/b_ek_priv.pem", $ek_b_priv_pkey );
 ###  ek_b_priv: $ek_b_priv->to_hex
 
 ### msg2: unpack("H*", $msg2)
@@ -158,8 +161,8 @@ my $a_verify_msg2 = a_verify_msg2(
   $sig_verify_func, 
 );
 
-my $a_recv_ek_b_pub_pkey = evp_pkey_from_point_hex( $group, unpack( "H*", $a_recv_msg2_r->{gy} ), $ctx );
-pem_write_evp_pkey( "$Bin/a_recv_b_ek_pub.pem", $a_recv_ek_b_pub_pkey, 0 );
+my $a_recv_ek_b_pub_pkey = gen_ec_pubkey( $group_name, unpack( "H*", $a_recv_msg2_r->{gy} ) );
+write_pubkey_to_pem( "$Bin/a_recv_b_ek_pub.pem", $a_recv_ek_b_pub_pkey  );
 
 my $a_send_msg3 = a_send_msg3(
   $id_a,

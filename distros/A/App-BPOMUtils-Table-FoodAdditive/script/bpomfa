@@ -13,7 +13,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-04-19'; # DATE
 our $DIST = 'App-BPOMUtils-Table-FoodAdditive'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/Table/FoodAdditive/bpom_list_food_additives",
@@ -25,7 +25,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Short alias for bpom-list-food-additives
+# ABSTRACT: Short alias for bpom-list-*f*ood-*a*dditives
 # PODNAME: bpomfa
 
 __END__
@@ -36,11 +36,11 @@ __END__
 
 =head1 NAME
 
-bpomfa - Short alias for bpom-list-food-additives
+bpomfa - Short alias for bpom-list-*f*ood-*a*dditives
 
 =head1 VERSION
 
-This document describes version 0.019 of bpomfa (from Perl distribution App-BPOMUtils-Table-FoodAdditive), released on 2024-04-19.
+This document describes version 0.020 of bpomfa (from Perl distribution App-BPOMUtils-Table-FoodAdditive), released on 2024-04-19.
 
 =head1 SYNOPSIS
 

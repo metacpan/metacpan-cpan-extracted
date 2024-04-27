@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-03-07'; # DATE
+our $DATE = '2024-04-20'; # DATE
 our $DIST = 'AppBase-Sort'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our %argspecs_files = (
     files => {
@@ -109,7 +109,7 @@ AppBase::Sort::File - Resources for AppBase::Sort-based scripts that use file so
 
 =head1 VERSION
 
-This document describes version 0.004 of AppBase::Sort::File (from Perl distribution AppBase-Sort), released on 2024-03-07.
+This document describes version 0.006 of AppBase::Sort::File (from Perl distribution AppBase-Sort), released on 2024-04-20.
 
 =head1 FUNCTIONS
 

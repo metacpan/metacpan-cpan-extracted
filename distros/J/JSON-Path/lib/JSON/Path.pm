@@ -1,5 +1,5 @@
 package JSON::Path;
-$JSON::Path::VERSION = '1.0.5';
+$JSON::Path::VERSION = '1.0.6';
 use strict;
 use warnings;
 
@@ -134,7 +134,7 @@ JSON::Path
 
 =head1 VERSION
 
-version 1.0.5
+version 1.0.6
 
 =head1 SYNOPSIS
 
@@ -198,7 +198,7 @@ JSONPath is described at L<http://goessner.net/articles/JsonPath/>.
 
 =item C<<  JSON::Path->new($string)  >>
 
-Given a JSONPath expression $string, returns a JSON::Path object.
+Given a JSONPath expression C<$string>, returns a C<JSON::Path> object.
 
 =back
 
@@ -369,9 +369,9 @@ L<Data::Hierarchy>... yes, the idea's not especially new. What's different
 is that JSON::Path uses a vaguely standardised syntax with implementations
 in at least three other programming languages.
 
--head1 AUTHOR
+=head1 AUTHOR
 
-Aurelia Peters https://github.com/popefelix
+Aurelia Peters L<https://github.com/popefelix>
 
 =head1 CONTRIBUTORS
 
@@ -394,6 +394,12 @@ James Bowery https://github.com/jabowery
 Slaven Rezić https://github.com/eserte
 
 Max Laager https://github.com/mlaagerc2c
+
+Elvin Aslanov https://github.com/rwp0
+
+James Raspass https://github.com/JRaspass
+
+Bernhard Schmalhofer https://github.com/bschmalhofer
 
 =head1 COPYRIGHT AND LICENCE
 

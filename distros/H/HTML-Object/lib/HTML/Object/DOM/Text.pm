@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Text.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2022/09/18
+## Modified 2024/04/20
 ## All rights reserved
 ## 
 ## 
@@ -18,7 +18,7 @@ BEGIN
     use warnings;
     use parent qw( HTML::Object::Text HTML::Object::DOM::CharacterData );
     use vars qw( $VERSION );
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -234,7 +234,7 @@ HTML::Object::DOM::Text - HTML Object DOM Text Class
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 
@@ -351,7 +351,7 @@ Returns false.
 
 =head2 isTextNode
 
-Returns false.
+Returns true.
 
 =head2 parent
 

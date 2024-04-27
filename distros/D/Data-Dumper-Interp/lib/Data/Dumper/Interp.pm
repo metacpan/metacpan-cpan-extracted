@@ -27,8 +27,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '7.006'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-03-22'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '7.007'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-04-26'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Moose;
 
@@ -2031,7 +2031,7 @@ sub DB_Vis_Interpolate {
 
 # eval a string in the user's context and return the result.  The nearest
 # non-DB frame must be the original user's call; this is accomplished by
-# dvis(), and friends using "goto &_Interpolate", which in turn
+# dvis() and friends using "goto &_Interpolate", which in turn
 # does "goto &DB::DB_Vis_Interpolate" to enter package DB.
 sub DB_Vis_Eval($$) {
   my ($label_for_errmsg, $evalarg) = @_;
@@ -2039,50 +2039,66 @@ sub DB_Vis_Eval($$) {
   # Inspired perl5db.pl but at this point has been rewritten
 
   # Find the closest non-DB caller.  The eval will be done in that package.
-  # Find the next caller further up which has arguments (i.e. wasn't doing
+  #
+  # We want @_ to refer to the arguments to *that* caller, not to e.g. dvis;
+  # find the next caller further up which has arguments (i.e. wasn't doing
   # "&subname;"), and make @_ contain those arguments.
   my ($distance, $pkg, $fname, $lno);
   for ($distance = 0 ; ; $distance++) {
     ($pkg, $fname, $lno) = caller($distance);
     last if $pkg ne "DB";
   }
-  local *_ = [];
+  local @_; # = ("*DDI:Should not see*");
   while() {
     $distance++;
     my ($p, $hasargs) = (caller($distance))[0,4];
     if (! defined $p){
-      *_ = [ '<@_ is not defined in the outer block>' ];
+      @_ = ( '<@_ is not defined in the outer block>' );
       last
     }
     if ($hasargs) {
-      *_ = [ @DB::args ];  # copy in case of recursion
+      #WAS: @_ = @{ [ @DB::args ] };  # copy in case of recursion
+      #4/26/24: This sometimes gets "panic: attempt to copy freed scalar"
+      #
+      # N.B. We can not copy args using +0 or ."" because then objects
+      # will numify/stringify and we can't display their internals.
+      #
+      # I tried cloning DB::args with Clone::clone but still got SEGV somewhere
+      # or "Attempt to free unreferenced scalar".
+      #
+      # Trying code lifted from Carp.pm :
+      @_ = map {
+                my $arg;
+                local $@= $@;
+                eval {
+                    $arg = $_;
+                    1;
+                } or do {
+                    $arg = '** argument not available anymore **';
+                };
+                $arg;
+            } @DB::args;
       last
     }
   }
 
-  my @result = do {
-    local @Data::Dumper::Interp::result;
-    local $Data::Dumper::Interp::string_to_eval =
-      "package $pkg; "
-       # N.B. eval first clears $@ so we must restore $@ inside the eval
-     .' &Data::Dumper::Interp::_RestorePunct_NoPop();'  # saved in _Interpolate
-       # In case something carps or croaks (e.g. because of ${\(somefunc())}
-       # or a tie handler), force a full backtrace so the user's call location
-       # is visible.  Unfortunately there is no way to make carp() show only
-       # the location of the user's call because we must force the eval'd
-       # string into in e.g. package main so user functions can be found.
-     .' local $Carp::Verbose = 1;'
-     .' @Data::Dumper::Interp::result = '.$evalarg.';'
-     .' $Data::Dumper::Interp::save_stack[-1]->[0] = $@;' # possibly changed by a tie handler
-     ;
-     ###??? FIXME why is DB_Vis_Evalwrapper needed?  Lexical scope?
-     &DB_Vis_Evalwrapper;
-#Data::Dumper::Interp::btw("-------------\n\$@=",$@,"\n",
-#  "string_to_eval=",$Data::Dumper::Interp::string_to_eval,"\n",
-#  "result=",Data::Dumper::Interp::_dbavis(@Data::Dumper::Interp::result));
-     @Data::Dumper::Interp::result
-  };
+  local @Data::Dumper::Interp::result;
+  local $Data::Dumper::Interp::string_to_eval =
+    "package $pkg; "
+     # N.B. eval first clears $@ so we must restore $@ inside the eval
+   .' &Data::Dumper::Interp::_RestorePunct_NoPop();'  # saved in _Interpolate
+     # In case something carps or croaks (e.g. because of ${\(somefunc())}
+     # or a tie handler), force a full backtrace so the user's call location
+     # is visible.  Unfortunately there is no way to make carp() show only
+     # the location of the user's call because we must force the eval'd
+     # string into in e.g. package main so user functions can be found.
+   .' local $Carp::Verbose = 1;'
+   .' @Data::Dumper::Interp::result = '.$evalarg.';'
+   .' $Data::Dumper::Interp::save_stack[-1]->[0] = $@;' # possibly changed by a tie handler
+   ;
+  &DB_Vis_Evalwrapper;
   my $errmsg = $@;
+  my @result = @Data::Dumper::Interp::result;
 
   if ($errmsg) {
     $errmsg = Data::Dumper::Interp::_chop_ateval($errmsg);

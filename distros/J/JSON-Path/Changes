@@ -1,6 +1,10 @@
-1.0.5     2024-04-22 16:10:46-05:00 America/Chicago
+1.0.6     2024-04-26 11:58:01-05:00 America/Chicago
 
-1.0.4     2023-12-11 13:29:46-06:00 America/Chicago
+    [ Other ]
+    - Correct POD
+     Elvin Aslanov++
+
+1.0.5     2024-04-22 16:10:46-05:00 America/Chicago
 
     [ Other ]
     - Remove dependency on Tie::IxHash

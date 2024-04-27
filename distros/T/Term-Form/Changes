@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.557   2024-04-26
+    - readline: removed broken 'history' behaviour.
+
 0.556   2024-04-20
     - Update documentation.
     - Term::Choose minimum version 1.764.

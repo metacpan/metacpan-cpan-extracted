@@ -46,6 +46,7 @@
             "Scalar::Util" : "0",
             "Text::CSV" : "1.95",
             "Try::Tiny" : "0",
+            "namespace::clean" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -58,8 +59,7 @@
             "File::Spec::Functions" : "0",
             "Log::Any::Adapter" : "0",
             "Log::Any::Adapter::TAP" : "0",
-            "Test::More" : "0",
-            "Types::Standard" : "0"
+            "Test::More" : "0"
          }
       }
    },
@@ -75,7 +75,7 @@
          "web" : "https://github.com/nrdvana/perl-Data-TableReader"
       }
    },
-   "version" : "0.014",
+   "version" : "0.015",
    "x_contributors" : [
       "Christian Walde <walde.christian@gmail.com>"
    ],

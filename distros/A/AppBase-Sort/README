@@ -2,8 +2,8 @@ NAME
     AppBase::Sort - A base for sort-like CLI utilities
 
 VERSION
-    This document describes version 0.004 of AppBase::Sort (from Perl
-    distribution AppBase-Sort), released on 2024-03-07.
+    This document describes version 0.006 of AppBase::Sort (from Perl
+    distribution AppBase-Sort), released on 2024-04-20.
 
 FUNCTIONS
   sort_appbase

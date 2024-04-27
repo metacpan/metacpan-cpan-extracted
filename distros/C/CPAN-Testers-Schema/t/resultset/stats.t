@@ -19,6 +19,7 @@ my $schema = CPAN::Testers::Schema->connect( 'dbi:SQLite::memory:', undef, undef
 $schema->deploy;
 my $rs = $schema->resultset('Stats');
 
+my $upload_id = 0;
 subtest 'insert_test_report' => sub {
     my $report = $schema->resultset('TestReport')->create({
         id => 'd0ab4d36-3343-11e7-b830-917e22bfee97',
@@ -55,29 +56,13 @@ subtest 'insert_test_report' => sub {
         },
     });
 
+    my $stat_id;
     subtest 'upload does not exist' => sub {
         my $stat = eval { $rs->insert_test_report($report) };
         my $err = $@;
-        ok !$stat, 'stat record was not created';
-        like $err, qr'No upload matches for dist Sorauta-SVN-AutoCommit version 0.02 \(report d0ab4d36-3343-11e7-b830-917e22bfee97\)', 'correct error';
-    };
-
-    my $upload = $schema->resultset('Upload')->create({
-        uploadid => 169497,
-        type => 'cpan',
-        author => 'YUKI',
-        dist => 'Sorauta-SVN-AutoCommit',
-        version => 0.02,
-        filename => 'Sorauta-SVN-AutoCommit-0.02.tar.gz',
-        released => 1327657454,
-    });
-
-    my $stat_id;
-    subtest 'upload exists' => sub {
-        my $stat = $rs->insert_test_report($report);
+        ok $stat, 'stat record was still created';
         $stat_id = $stat->id;
 
-        isa_ok $stat, 'CPAN::Testers::Schema::Result::Stats';
         ok looks_like_number($stat->id), 'an id was generated';
         is $stat->guid, 'd0ab4d36-3343-11e7-b830-917e22bfee97', 'correct guid';
         is $stat->state, 'fail', 'correct test state';
@@ -91,7 +76,13 @@ subtest 'insert_test_report' => sub {
         is $stat->osvers, '4.8.0-2-amd64', 'correct osvers';
         is $stat->fulldate, 201705071640, 'correct fulldate';
         is $stat->type, 2, 'correct type';
-        is $stat->uploadid, 169497, 'correct uploadid';
+
+        # Provisional upload record was created
+        my $upload = $schema->resultset('Upload')->find({ dist => 'Sorauta-SVN-AutoCommit', version => '0.02' });
+        ok $upload, 'provisional upload record created';
+        is $upload->type, 'unknown', 'provisional record is "unknown"';
+        is $stat->uploadid, $upload->id, 'stat is related to upload';
+        $upload_id = $upload->id;
     };
 
     subtest 'reprocess report' => sub {
@@ -122,7 +113,7 @@ subtest 'since' => sub {
                 'state' => 'pass',
                 'tester' => '"Andreas J. Koenig" <andreas.koenig.gmwojprw@franz.ak.mind.de>',
                 'type' => 2,
-                'uploadid' => 169497,
+                'uploadid' => $upload_id,
                 'version' => '0.02',
             },
         ],

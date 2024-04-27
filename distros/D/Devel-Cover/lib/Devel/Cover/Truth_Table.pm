@@ -176,7 +176,7 @@ sub error {
 package Devel::Cover::Truth_Table;
 use warnings;
 use strict;
-our $VERSION = '1.41'; # VERSION
+our $VERSION = '1.42'; # VERSION
 
 #-------------------------------------------------------------------------------
 # Subroutine : new()
@@ -483,7 +483,7 @@ Devel::Cover::Truth_Table - Truth tables for coverage objects.
 
 =head1 VERSION
 
-version 1.41
+version 1.42
 
 =head1 SYNOPSIS
 

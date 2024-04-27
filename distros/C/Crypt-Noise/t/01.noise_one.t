@@ -84,14 +84,14 @@ for my $pattern_name ( qw/N K X/ ) {
                 psk    => $psk,
                 psk_id => $psk_id,
 
-                s_priv => pem_read_pkey( $FindBin::Bin . '/a_s_priv.pem', 1 ),
-                s_pub  => pem_read_pkey( $FindBin::Bin . '/a_s_pub.pem',  0 ),
-                rs_pub => pem_read_pkey( $FindBin::Bin . '/b_s_pub.pem',  0 ),
+                s_priv => read_key_from_pem( $FindBin::Bin . '/a_s_priv.pem' ),
+                s_pub  => read_pubkey_from_pem( $FindBin::Bin . '/a_s_pub.pem'   ),
+                rs_pub => read_pubkey_from_pem( $FindBin::Bin . '/b_s_pub.pem'   ),
 
                 s_pub_type  => 'raw',
-                s_pub_bin   => pack( "H*", pem_read_pub_hex( $FindBin::Bin . '/a_s_pub.pem', 2 ) ),
+                s_pub_bin   => pack( "H*", read_pubkey(read_pubkey_from_pem( $FindBin::Bin . '/a_s_pub.pem' )) ),
                 rs_pub_type => 'raw',
-                rs_pub_bin  => pack( "H*", pem_read_pub_hex( $FindBin::Bin . '/a_rs_pub.pem', 2 ) ),
+                rs_pub_bin  => pack( "H*", read_pubkey(read_pubkey_from_pem( $FindBin::Bin . '/a_rs_pub.pem' )) ),
             },
         );
 
@@ -108,14 +108,14 @@ for my $pattern_name ( qw/N K X/ ) {
                 psk    => $psk,
                 psk_id => $psk_id,
 
-                s_priv => pem_read_pkey( $FindBin::Bin . '/b_s_priv.pem', 1 ),
-                s_pub  => pem_read_pkey( $FindBin::Bin . '/b_s_pub.pem',  0 ),
-                rs_pub => pem_read_pkey( $FindBin::Bin . '/a_s_pub.pem',  0 ),
+                s_priv => read_key_from_pem( $FindBin::Bin . '/b_s_priv.pem' ),
+                s_pub  => read_pubkey_from_pem( $FindBin::Bin . '/b_s_pub.pem' ),
+                rs_pub => read_pubkey_from_pem( $FindBin::Bin . '/a_s_pub.pem'   ),
 
                 s_pub_type  => 'raw',
-                s_pub_bin   => pack( "H*", pem_read_pub_hex( $FindBin::Bin . '/b_s_pub.pem', 2 ) ),
+                s_pub_bin   => pack( "H*", read_pubkey(read_pubkey_from_pem( $FindBin::Bin . '/b_s_pub.pem' )) ),
                 rs_pub_type => 'raw',
-                rs_pub_bin  => pack( "H*", pem_read_pub_hex( $FindBin::Bin . '/b_rs_pub.pem', 2 ) ),
+                rs_pub_bin  => pack( "H*", read_pubkey(read_pubkey_from_pem( $FindBin::Bin . '/b_rs_pub.pem' )) ),
             } );
 
         ### a write message to b

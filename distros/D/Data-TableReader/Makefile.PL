@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "Scalar::Util" => 0,
     "Text::CSV" => "1.95",
     "Try::Tiny" => 0,
+    "namespace::clean" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -32,10 +33,9 @@ my %WriteMakefileArgs = (
     "File::Spec::Functions" => 0,
     "Log::Any::Adapter" => 0,
     "Log::Any::Adapter::TAP" => 0,
-    "Test::More" => 0,
-    "Types::Standard" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.014",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,7 +56,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Text::CSV" => "1.95",
   "Try::Tiny" => 0,
-  "Types::Standard" => 0,
+  "namespace::clean" => 0,
   "strict" => 0,
   "warnings" => 0
 );

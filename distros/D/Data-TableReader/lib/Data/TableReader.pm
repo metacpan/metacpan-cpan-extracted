@@ -2,14 +2,15 @@ package Data::TableReader;
 use Moo 2;
 use Try::Tiny;
 use Carp;
-use Scalar::Util ();
-use List::Util ();
+use Scalar::Util qw( blessed refaddr );
+use List::Util 'max';
 use Module::Runtime 'require_module';
 use Data::TableReader::Field;
 use Data::TableReader::Iterator;
+use namespace::clean;
 
 # ABSTRACT: Extract records from "dirty" tabular data sources
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 
 has input               => ( is => 'rw', required => 1 );
@@ -19,21 +20,46 @@ has decoder             => ( is => 'lazy', init_arg => undef );
 has fields              => ( is => 'rw', required => 1, coerce => \&_coerce_field_list );
 sub field_list             { @{ shift->fields } }
 has field_by_name       => ( is => 'lazy' );
+has field_by_addr       => ( is => 'lazy' );
 has record_class        => ( is => 'rw', required => 1, default => sub { 'HASH' } );
 has static_field_order  => ( is => 'rw' ); # force order of columns
 has header_row_at       => ( is => 'rw', default => sub { [1,10] } ); # row of header, or range to scan
 has header_row_combine  => ( is => 'rw', lazy => 1, builder => 1 );
-has on_unknown_columns  => ( is => 'rw', default => sub { 'use' } );
+has table_search_results=> ( is => 'rw', lazy => 1, builder => 1, clearer => 1, predicate => 1 );
+has col_map             => ( is => 'rw', lazy => 1, builder => 1, predicate => 1 );
+has on_partial_match    => ( is => 'rw', default => sub { 'next' } );
+has on_ambiguous_columns=> ( is => 'rw', default => sub { 'error' } );
+has on_unknown_columns  => ( is => 'rw', default => sub { 'warn' } );
 has on_blank_row        => ( is => 'rw', default => sub { 'next' } );
 has on_validation_fail  => ( is => 'rw', default => sub { 'die' } );
 has log                 => ( is => 'rw', trigger => sub { shift->_clear_log } );
+
+sub BUILD {
+	my ($self)= @_;
+	# If user supplied col_map, it probably contains names instead of Field objects.
+	if ($self->has_col_map) {
+		# Make a new array in case other parts of user code refer to current one
+		$self->col_map($self->_resolve_colmap_names([ @{ $self->col_map } ]));
+	}
+}
+
+# Modifies array to replace name with field ref
+sub _resolve_colmap_names {
+	my ($self, $col_map)= @_;
+	for (grep defined && !ref, @$col_map) {
+		defined(my $f= $self->field_by_name->{$_})
+			or croak("col_map specifies non-existent field '$_'");
+		$_= $f;
+	}
+	$col_map;
+}
 
 # Open 'input' if it isn't already a file handle
 sub _build__file_handle {
 	my $self= shift;
 	my $i= $self->input;
 	return undef if ref($i) && (
-		(Scalar::Util::blessed($i) && ($i->can('get_cell') || $i->can('worksheets')))
+		(blessed($i) && ($i->can('get_cell') || $i->can('worksheets')))
 		or ref($i) eq 'ARRAY'
 	);
 	return $i if ref($i) && (ref($i) eq 'GLOB' or ref($i)->can('read'));
@@ -108,13 +134,19 @@ sub _coerce_field_list {
 sub _build_field_by_name {
 	my $self= shift;
 	# reverse list so first field of a name takes precedence
-	{ map { $_->name => $_ } reverse @{ $self->fields } }
+	return { map +( $_->name => $_ ), reverse @{ $self->fields } }
+}
+
+sub _build_field_by_addr {
+	my $self= shift;
+	return { map +( refaddr $_ => $_ ), @{ $self->fields } }
 }
 
 sub _build_header_row_combine {
 	my $self= shift;
 	# If headers contain "\n", we need to collect multiple cells per column
-	List::Util::max(map { 1+(()= ($_->header_regex =~ /\\n|\n/g)) } $self->field_list);
+	# Find the maximum number of \n contained in any regex.
+	max map { 1+(()= ($_->header_regex =~ /\\n|\n/g)) } $self->field_list;
 }
 
 # 'log' can be a variety of things, but '_log' will always be a coderef
@@ -228,250 +260,352 @@ sub detect_input_format {
 }
 
 
-has _table_found => ( is => 'rw', lazy => 1, builder => 1, clearer => 1, predicate => 1 );
-sub _build__table_found {
+sub _build_table_search_results {
 	my $self= shift;
-	my %loc= ( croak_on_fail => 1 );
-	$self->_find_table($self->decoder->iterator, \%loc);
-	\%loc;
+	my $result= $self->_find_table($self->decoder->iterator);
+	# When called during lazy-build, not finding the table is fatal
+	if (!$result->{found}) {
+		my $err= $$result->{fatal} || "Can't locate valid header";
+		$self->_log->('error', $err);
+		croak $err;
+	}
+	$result;
+}
+
+sub _build_col_map {
+	shift->table_search_results->{col_map}
 }
 
 sub find_table {
 	my $self= shift;
-	return 1 if $self->_has_table_found;
-	my %loc;
-	if ($self->_find_table($self->decoder->iterator, \%loc)) {
-		$self->_table_found(\%loc);
-		return 1;
-	}
-	return 0;
+	my $result= $self->_find_table($self->decoder->iterator);
+	$self->table_search_results($result);
+	return defined $result->{found};
 }
 
-sub col_map                { shift->_table_found->{col_map}; }
-sub field_map              { shift->_table_found->{field_map}; }
+sub field_map { _field_map(shift->col_map) }
+
+sub _field_map {
+	my $col_map= shift;
+	my %fmap;
+	for my $i (0 .. $#$col_map) {
+		next unless defined $col_map->[$i];
+		if ($col_map->[$i]->array) {
+			push @{ $fmap{$col_map->[$i]->name} }, $i;
+		} else {
+			$fmap{$col_map->[$i]->name}= $i;
+		}
+	}
+	return \%fmap;
+}
 
 sub _find_table {
-	my ($self, $data_iter, $stash)= @_;
-	$stash ||= {};
-	while (!$self->_find_table_in_dataset($data_iter, $stash)
-		&& !defined $stash->{fatal}
-		&& $data_iter->next_dataset)
-	{}
-	if ($stash->{col_map}) {
-		# Calculate field map from col map
-		my $col_map= $stash->{col_map};
-		my %fmap;
-		for my $i (0 .. $#$col_map) {
-			next unless $col_map->[$i];
-			if ($col_map->[$i]->array) {
-				push @{ $fmap{$col_map->[$i]->name} }, $i;
-			} else {
-				$fmap{$col_map->[$i]->name}= $i;
-			}
-		}
-		$stash->{field_map}= \%fmap;
-		# And record the stream position of the start of the table
-		$stash->{first_record_pos}= $data_iter->tell;
-		$stash->{data_iter}= $data_iter;
-		return $stash;
-	}
-	else {
-		my $err= $stash->{fatal} || "Can't locate valid header";
-		$self->_log->('error', $err);
-		croak $err if $stash->{croak_on_fail};
-		return undef;
-	}
-}
-
-sub _find_table_in_dataset {
-	my ($self, $data_iter, $stash)= @_;
-	# If header_row_at is undef, then there is no header.
-	# Ensure static_field_order, then set up columns.
+	my ($self, $data_iter)= @_;
+#	$stash ||= {};
+#	while (1) {
+#		$success= $self->_find_table_in_dataset($data_iter, $stash);
+#		&& !defined $stash->{fatal}
+#		&& $data_iter->next_dataset
+#	) {}
+#	if ($success) {
+#		# And record the stream position of the start of the table
+#		$self->col_map($stash->{col_map});
+#		$stash->{first_record_pos}= $data_iter->tell;
+#		$stash->{data_iter}= $data_iter;
+#		return $stash;
+#	}
+#	else {
+#		my $err= $stash->{fatal} || "Can't locate valid header";
+#		$self->_log->('error', $err);
+#		croak $err if $stash->{croak_on_fail};
+#		return undef;
+#	}
 	my @fields= $self->field_list;
 	my $header_at= $self->header_row_at;
+	my %result;
+
+	# Special case for the file not having any headers in it.
+	# If header_row_at is undef, then there is no header.
+	# Ensure static_field_order, then set up columns.
 	if (!defined $header_at) {
 		unless ($self->static_field_order) {
-			$stash->{fatal}= "You must enable 'static_field_order' if there is no header row";
+			$result{fatal}= "You must enable 'static_field_order' if there is no header row";
 			return;
 		}
-		$stash->{col_map}= \@fields;
-		return 1;
+		my $col_map= [ $self->has_col_map? @{$self->col_map} : @fields ];
+		$result{found}= {
+			row_idx => -1,
+			dataset_idx => 0,
+			col_map => $col_map,
+			messages => [],
+			first_record_pos => $data_iter->tell,
+			_data_iter => $data_iter,
+      };
+		$result{candidates}= [ $result{found} ];
+		return \%result;
 	}
-	
-	# If headers contain "\n", we need to collect multiple cells per column
-	my $row_accum= $self->header_row_combine;
-	
-	my ($start, $end)= ref $header_at? @$header_at : ( $header_at, $header_at );
-	my @rows;
-	
-	# If header_row_at doesn't start at 1, seek forward
-	if ($start > 1) {
-		$self->_log->('trace', 'Skipping to row %s', $start);
-		push @rows, $data_iter->() for 1..$start-1;
-	}
-	
-	# Scan through the rows of the dataset up to the end of header_row_at, accumulating rows so that
-	# multi-line regexes can match.
-	for ($start .. $end) {
-		my $vals= $data_iter->();
-		if (!$vals) { # if undef, we reached end of dataset
-			$self->_log->('trace', 'EOF');
-			last;
+
+	my $dataset_idx= 0;
+	dataset: do {
+		# If headers contain "\n", we need to collect multiple cells per column
+		my $row_accum= $self->header_row_combine;
+		
+		my ($start, $end)= ref $header_at? @$header_at : ( $header_at, $header_at );
+		my @rows;
+		
+		# If header_row_at doesn't start at 1, seek forward
+		if ($start > 1) {
+			$self->_log->('trace', 'Skipping to row %s', $start);
+			push @rows, $data_iter->() for 1..$start-1;
 		}
-		if ($row_accum > 1) {
-			push @rows, $vals;
-			shift @rows while @rows > $row_accum;
-			$vals= [ map { my $c= $_; join("\n", map $_->[$c], @rows) } 0 .. $#{$rows[-1]} ];
-			$stash->{context}= $row_accum.' rows ending at '.$data_iter->position;
-		} else {
-			$stash->{context}= $data_iter->position;
+		
+		# Scan through the rows of the dataset up to the end of header_row_at, accumulating rows so that
+		# multi-line regexes can match.
+		for ($start .. $end) {
+			my %attempt= (
+				row_idx => $_,
+				dataset_idx => $dataset_idx,
+				messages => []
+			);
+			my $vals= $data_iter->();
+			if (!$vals) { # if undef, we reached end of dataset
+				$self->_log->('trace', 'EOF');
+				last;
+			}
+			if ($row_accum > 1) {
+				push @rows, $vals;
+				shift @rows while @rows > $row_accum;
+				$vals= [ map { my $c= $_; join("\n", map $_->[$c], @rows) } 0 .. $#{$rows[-1]} ];
+				$attempt{context}= $row_accum.' rows ending at '.$data_iter->position;
+			} else {
+				$attempt{context}= $data_iter->position;
+			}
+			$self->_log->('trace', 'Checking for headers on %s', $attempt{context});
+			# Now fill-in the col_map
+			my $found= $self->static_field_order?
+				# If static field order, look for headers in sequence
+				$self->_match_headers_static($vals, \%attempt)
+				# else search for each header
+				: $self->_match_headers_dynamic($vals, \%attempt);
+			$attempt{first_record_pos}= $data_iter->tell;
+			$self->_log->(@$_) for @{$attempt{messages}};
+			push @{$result{candidates}}, \%attempt;
+			if ($found) {
+				$result{found}= \%attempt;
+				$result{found}{_data_iter}= $data_iter;
+				$self->col_map($attempt{col_map});
+				$self->_log->(info => 'Found header at '.$attempt{context});
+				return \%result;
+			} else {
+				# Back-compat: if attempt ends with 'fatal' message, stop looking for header
+				last dataset
+					if delete $attempt{fatal};
+				# Was this a partial match?  See if any col_map entries were added vs. what user already gave us.
+				my $initial_colmap_count= !$self->has_col_map? 0
+					: scalar(grep defined, @{$self->col_map});
+				if ($initial_colmap_count < scalar(grep defined, @{$attempt{col_map}})) {
+					# Handling of partial match determined by on_partial_match setting
+					my $act= $self->on_partial_match;
+					$act= $act->($self, \%attempt) if ref $act eq 'CODE';
+					last dataset
+						if $act eq 'last';
+				}
+			}
+			$self->_log->('debug', '%s: No match', $attempt{context});
 		}
-		$self->_log->('trace', 'Checking for headers on %s', $stash->{context});
-		$stash->{context}.= ': ';
-		$stash->{col_map}= $self->static_field_order?
-			# If static field order, look for headers in sequence
-			$self->_match_headers_static($vals, $stash)
-			# else search for each header
-			: $self->_match_headers_dynamic($vals, $stash);
-		return 1 if $stash->{col_map};
-		return if $stash->{fatal};
-		$self->_log->('debug', '%sNo match', $stash->{context});
-	}
-	$self->_log->('warn','No row in dataset matched full header requirements');
-	return;
+		$self->_log->('error','No row in dataset matched full header requirements');
+		++$dataset_idx;
+	} while ($data_iter->next_dataset);
+	return \%result;
 }
 
+# This mode assumes all headers match exactly as perscribed in the fields list or user-supplied col_map
 sub _match_headers_static {
-	my ($self, $header, $stash)= @_;
-	my $fields= $self->fields;
-	for my $i (0 .. $#$fields) {
-		next if $header->[$i] =~ $fields->[$i]->header_regex;
-		
+	my ($self, $header, $attempt)= @_;
+	my @col_map= $self->has_col_map? @{$self->col_map} : @{$self->fields};
+	$attempt->{col_map}= \@col_map;
+	for my $i (0 .. $#col_map) {
+		next unless defined $col_map[$i];
+		next if $header->[$i] =~ $col_map[$i]->header_regex;
 		# Field header doesn't match.  Start over on next row.
-		$self->_log->('debug','%sMissing field %s', $stash->{context}||'', $fields->[$i]->name);
-		return;
+		push @{$attempt->{messages}}, [ error => "Header at column $i does not look like field ".$col_map[$i]->name ];
+		return 0;
 	}
 	# found a match for every field!
-	$self->_log->('debug','%sFound!', $stash->{context}||'');
-	return $fields;
+	$self->_log->('debug','%s: Found!', $attempt->{context});
+	return 1;
 }
 
 sub _match_headers_dynamic {
-	my ($self, $header, $stash)= @_;
-	my $context= $stash->{context} || '';
-	my %col_map;
+	my ($self, $header, $attempt)= @_;
+	my $context= $attempt->{context};
 	my $fields= $self->fields;
-	my $free_fields=    $stash->{free_fields} ||= [
-		# Sort required fields to front, to fail faster on non-matching rows
-		sort { $a->required? -1 : $b->required? 1 : 0 }
-		grep { !$_->follows_list } @$fields
-	];
-	my $follows_fields= $stash->{follows_fields} ||= [
-		grep { $_->follows_list } @$fields
-	];
-	for my $f (@$free_fields) {
+	# Colmap starts empty unless user supplied one
+	my $user_colmap= $self->has_col_map? $self->col_map : [];
+	my @colmap= map +(defined $_? [ $_ ] : undef), @$user_colmap;
+	$attempt->{col_map}= \@colmap;
+	# Search every cell of the header, except ones specified by the user
+	my @col_search_idx= grep !defined $user_colmap->[$_], 0 .. $#$header;
+	# Divide remaining fields (not specified by user) into list that can only occur following
+	# another field, or the ones that can occur anywhere.
+	my %seen= map +(refaddr $_ => 1 ), grep defined, @$user_colmap;
+	my (@follows_fields, @free_fields);
+	defined $seen{refaddr $_} or push @{($_->follows_list? \@follows_fields : \@free_fields)}, $_
+		for @$fields;
+	undef %seen;
+	# Sort required fields to front, to fail faster on non-matching rows
+	# But otherwise preserve field order in case it matters for priority of matching
+	@free_fields= ( (grep $_->required, @free_fields), (grep !$_->required, @free_fields) );
+
+	# For each freely-located field (free = lacking placement requirements) scan every un-used
+	# column for a match.  Record all matches, for later analysis of ambiguity.
+	# But, stop as soon as a required column is missing; it helps speed up the search for the
+	# header.
+	my $ambiguous_log_level= $self->on_ambiguous_columns eq 'error'? 'error' : 'warn';
+	my %fieldname_cols;
+	for my $f (@free_fields) {
 		my $hr= $f->header_regex;
-		$self->_log->('debug', 'looking for %s', $hr);
-		my @found= grep { $header->[$_] =~ $hr } 0 .. $#$header;
-		if (@found == 1) {
-			if ($col_map{$found[0]}) {
-				$self->_log->('debug', 'search status: '._colmap_progress_str(\%col_map, $header));
-				$self->_log->('info','%sField %s and %s both match column %s',
-					$context, $f->name, $col_map{$found[0]}->name, $found[0]);
-				return;
-			}
-			$col_map{$found[0]}= $f;
-		}
-		elsif (@found > 1) {
-			if ($f->array) {
-				# Array columns may be found more than once
-				$col_map{$_}= $f for @found;
+		push @{$attempt->{messages}}, [ trace => "looking for $hr" ];
+		my @found_idx= grep $header->[$_] =~ $hr, @col_search_idx;
+		push @{$attempt->{messages}}, [ debug => "found ".$f->name." header at col [".join(',', map $_+1, @found_idx).']' ];
+		for my $idx (@found_idx) {
+			# If another field of the same name matches a column, the first gets priority.
+			# ignore the duplicate.
+			if ($fieldname_cols{$f->name}{$idx}) {
+				push @{$attempt->{messages}}, [ debug => "Ignored; column $idx is already claimed by a field named ".$f->name ];
 			} else {
-				$self->_log->('debug', 'search status: '._colmap_progress_str(\%col_map, $header));
-				$self->_log->('info','%sField %s matches more than one column: %s',
-					$context, $f->name, join(', ', @found));
-				return;
+				push @{$colmap[$idx]}, $f;
+				#$col_fieldnames{$idx}{$f->name}= 1;
+				$fieldname_cols{$f->name}{$idx}= $f;
 			}
 		}
-		elsif ($f->required) {
-			$self->_log->('debug', 'search status: '._colmap_progress_str(\%col_map, $header));
-			$self->_log->('info','%sNo match for required field %s', $context, $f->name);
-			return;
+		# Flag missing required fields
+		if (!@found_idx && $f->required) {
+			push @{$attempt->{missing_required}}, $f;
+			push @{$attempt->{messages}}, [ error => 'No match for required field '.$f->name ];
+			# Missing required fields probably means this isn't he header row, or the input is
+			# garbage, so might as well stop here before genering a bunch of analysis.
+			last;
 		}
-		# else Not required, and not found
-	}
-	# Need to have found at least one column (even if none required)
-	unless (keys %col_map) {
-		$self->_log->('debug', 'search status: '._colmap_progress_str(\%col_map, $header));
-		$self->_log->('debug','%sNo field headers found', $context);
-		return;
 	}
 	# Now, check for any of the 'follows' fields, some of which might also be 'required'.
-	if (@$follows_fields) {
+	if (@follows_fields && !$attempt->{missing_required}) {
 		my %following;
 		my %found;
-		for my $i (0 .. $#$header) {
-			if ($col_map{$i}) {
-				%following= ( $col_map{$i}->name => $col_map{$i} );
+		for my $idx (0 .. $#$header) {
+			if ($colmap[$idx] && 1 == @{$colmap[$idx]}) {
+				%following= ( $colmap[$idx][0]->name => $colmap[$idx][0] );
 			} else {
-				my $val= $header->[$i];
-				my @match;
-				for my $f (@$follows_fields) {
+				my $val= $header->[$idx];
+				for my $f (@follows_fields) {
 					next unless grep $following{$_}, $f->follows_list;
-					push @match, $f if $val =~ $f->header_regex;
-				}
-				if (@match == 1) {
-					if ($found{$match[0]} && !$match[0]->array) {
-						$self->_log->('debug', 'search status: '._colmap_progress_str(\%col_map, $header));
-						$self->_log->('info','%sField %s matches multiple columns',
-							$context, $match[0]->name);
-						return;
+					next unless $val =~ $f->header_regex;
+					# If another field of the same name matches a column, the first gets priority.
+					# ignore the duplicate.
+					if ($fieldname_cols{$f->name}{$idx}) {
+						push @{$attempt->{messages}}, [ debug => "Ignored; column $idx is already claimed by a field named ".$f->name ];
+					} else {
+						push @{$colmap[$idx]}, $f;
+						$fieldname_cols{$f->name}{$idx}= $f;
+						$found{refaddr $f}= 1;
 					}
-					$col_map{$i}= $match[0];
-					$found{$match[0]}= $i;
-					$following{$match[0]->name}= $match[0];
 				}
-				elsif (@match > 1) {
-					$self->_log->('debug', 'search status: '._colmap_progress_str(\%col_map, $header));
-					$self->_log->('info','%sField %s and %s both match column %d',
-						$context, $match[0]->name, $match[1]->name, $i+1);
-					return;
+				# If successfully matched exactly one field, add it to the 'following' set.
+				if ($colmap[$idx] && @{$colmap[$idx]} == 1) {
+					$following{$colmap[$idx][0]->name}= $colmap[$idx][0];
 				}
+				# Else if no matches, or ambiguous, so reset the following set
 				else {
 					%following= ();
 				}
 			}
 		}
 		# Check if any of the 'follows' fields were required
-		if (my @unfound= grep { !$found{$_} && $_->required } @$follows_fields) {
-			$self->_log->('debug', 'search status: '._colmap_progress_str(\%col_map, $header));
-			$self->_log->('info','%sNo match for required %s %s', $context,
-				(@unfound > 1? ('fields', join(', ', map { $_->name } sort @unfound))
-					: ('field', $unfound[0]->name)
-				));
-			return;
+		if (my @unfound= grep +($_->required && !$found{refaddr $_}), @follows_fields) {
+			push @{$attempt->{missing_required}}, @unfound;
+			push @{$attempt->{messages}}, [ error =>
+				sprintf('No match for required %s [%s]',
+					(@unfound > 1? 'fields':'field'),
+					join(', ', map $_->name, sort @unfound))
+			];
 		}
 	}
-	# Now, if there are any un-claimed columns, handle per 'on_unknown_columns' setting.
-	my @unclaimed= grep { !$col_map{$_} } 0 .. $#$header;
-	if (@unclaimed) {
-		my $act= $self->on_unknown_columns;
-		my $unknown_list= join(', ', map $self->_fmt_header_text($header->[$_]), @unclaimed);
-		$act= $act->($self, $header, \@unclaimed) if ref $act eq 'CODE';
-		if ($act eq 'use') {
-			$self->_log->('warn','%sIgnoring unknown columns: %s', $context, $unknown_list);
-		} elsif ($act eq 'next') {
-			$self->_log->('warn','%sWould match except for unknown columns: %s',
-				$context, $unknown_list);
-		} elsif ($act eq 'die') {
-			$stash->{fatal}= "${context}Header row includes unknown columns: $unknown_list";
+
+	# Make the list of columns which didn't match anything before starting to munge things
+	# related to ambiguities.
+	my @unmatched= grep !defined $colmap[$_], 0 .. $#$header;
+	$attempt->{unmatched}= \@unmatched if @unmatched;
+
+	# Ambiguity check: each field *name* may only be located in one column, unless
+	# the field(s) are flagged as being arrays.
+	my %ambiguous_fields;
+	for my $name (sort keys %fieldname_cols) {
+		my $cols= $fieldname_cols{$name};
+		next unless keys %$cols > 1;
+		next unless grep !$_->array, values %$cols;
+		push @{$attempt->{messages}}, [ $ambiguous_log_level =>
+			sprintf "Found field '%s' at multiple columns: %s",
+				$name, join(', ', map 1+$_, sort { $a <=> $b } keys %$cols)
+		];
+		$ambiguous_fields{$name}= $cols;
+	}
+	$attempt->{ambiguous_fields}= \%ambiguous_fields
+		if keys %ambiguous_fields;
+
+	# Ambiguity check: there must be only one field claiming each column
+	# If it's OK, resolve the arrayref down to its single member.
+	my $col_collision= 0;
+	for my $idx (0 .. $#colmap) {
+		next unless defined $colmap[$idx];
+		if (@{$colmap[$idx]} == 1) { # only claimed by one field
+			my $f= $colmap[$idx][0];
+			# but if that one field is ambiguous, discard it
+			$colmap[$idx]= $ambiguous_fields{$f->name}? undef : $f;
 		} else {
-			$stash->{fatal}= "Invalid action '$act' for 'on_unknown_columns'";
+			push @{$attempt->{messages}}, [ $ambiguous_log_level =>
+				sprintf "Column %d claimed by multiple fields: %s",
+					$idx+1, join(', ', sort map $_->name, @{$colmap[$idx]})
+			];
+			$attempt->{ambiguous_columns}{$idx}= $colmap[$idx];
+			$colmap[$idx]= undef;
 		}
-		$self->_log->('debug', 'search status: '._colmap_progress_str(\%col_map, $header));
-		return if $stash->{fatal};
 	}
-	return [ map $col_map{$_}, 0 .. $#$header ];
+
+	# Need to have found at least one column (even if none required)
+	unless (grep defined, @colmap) {
+		push @{$attempt->{messages}}, [
+			error => ($attempt->{ambiguous_columns} || $attempt->{ambiguous_fields})
+			? 'All matching headers were ambiguous'
+			: 'No field headers matched'
+		];
+		return 0;
+	}
+
+	return 0
+		if $attempt->{missing_required}
+		or $self->on_ambiguous_columns ne 'warn'
+			&& ($attempt->{ambiguous_columns} || $attempt->{ambiguous_fields});
+
+	# Now, if there are any un-claimed columns, handle per 'on_unknown_columns' setting.
+	if (@unmatched) {
+		my $act= $self->on_unknown_columns;
+		my $unknown_list= join(', ', map $self->_fmt_header_text($header->[$_]), @unmatched);
+		$act= $act->($self, $header, \@unmatched) if ref $act eq 'CODE';
+		if ($act eq 'warn' || $act eq 'use') { # 'use' is back-compat, 'warn' is official now.
+			push @{$attempt->{messages}}, [ warn => 'Ignoring unknown columns: '.$unknown_list ];
+		} elsif ($act eq 'error' || $act eq 'next') { # 'next' is back-compat, 'error' is official now.
+			push @{$attempt->{messages}}, [ error => 'Would match except for unknown columns: '.$unknown_list ];
+			return 0;
+		} else {
+			push @{$attempt->{messages}}, [ error =>
+				$act eq 'die'? "${context}Header row includes unknown columns: $unknown_list"
+				: "Invalid action '$act' for 'on_unknown_columns'"
+			];
+			$attempt->{fatal}= 1;
+			return 0;
+		}
+	}
+	return 1;
 }
 # Make header string readable for log messages
 sub _fmt_header_text {
@@ -493,17 +627,19 @@ sub _colmap_progress_str {
 sub iterator {
 	my $self= shift;
 	my $fields= $self->fields;
+	$self->table_search_results->{found}
+		or croak "table_search_results does not contain 'found'";
 	# Creating the record iterator consumes the data source's iterator.
 	# The first time after detecting the table, we continue with the same iterator.
 	# Every time after that we need to create a new data iterator and seek to the
 	# first record under the header.
-	my $data_iter= delete $self->_table_found->{data_iter};
+	my $data_iter= delete $self->table_search_results->{found}{_data_iter};
 	unless ($data_iter) {
 		$data_iter= $self->decoder->iterator;
-		$data_iter->seek($self->_table_found->{first_record_pos});
+		$data_iter->seek($self->table_search_results->{found}{first_record_pos});
 	}
-	my $col_map=   $self->_table_found->{col_map};
-	my $field_map= $self->_table_found->{field_map};
+	my $col_map=   $self->table_search_results->{found}{col_map};
+	my $field_map= _field_map($col_map);
 	my @row_slice; # one column index per field, and possibly more for array_val_map
 	my @arrayvals; # list of source index and destination index for building array values
 	my @field_names; # ordered list of field names where row slice should be assigned
@@ -719,7 +855,7 @@ Data::TableReader - Extract records from "dirty" tabular data sources
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -814,6 +950,26 @@ instance of L<Data::TableReader::Field>, with plain strings becoming the
 C<name> attribute.  See L<Data::TableReader::Field/header> for how names are
 automatically converted to the header-matching regex.
 
+There are some convenience accessors for the fields:
+
+=over
+
+=item field_list
+
+List access for C<< @{ $reader->fields } >>
+
+=item field_by_name
+
+Map of C<< { $field->name => $field } >>.  If you have multiple fields of the
+same name (allowed, but not recommended) the value is the first per the order
+of C<field_list>.
+
+=item field_by_addr
+
+Map of C<< { refaddr($field) => $field } >>.
+
+=back
+
 =head2 record_class
 
 Default is the special value C<'HASH'> for un-blessed hashref records.
@@ -836,11 +992,101 @@ As a special case, if you are reading a source which lacks headers and you
 trust the source to deliver the columns in the right order, you can set this
 to undef if you also set C<< static_field_order => 1 >>.
 
+=head2 col_map
+
+This is an arrayref, one element per column of input data, listing which field was detected
+to come from that column.  If you specify this to the constructor, L</find_table> will respect
+any defined element of the array, but still search for matching headers in the undefined
+columns.  After a successful L</find_table>, C<col_map> is changed to refer to the same hash as
+C<< ->table_search_results->{found}{col_map} >>.  (If you wanted to re-run the search for the
+table, you need to both C<clear_table_search_results> I<and> reset C<col_map> to whatever
+you passed to the constructor.)
+
+For backward compatibility, if you did not specify this attribute to the constructor and try
+accessing it before calling L</find_table>, it automatically calls L</find_table> for you
+(and die if it fails).
+
+=head2 has_col_map
+
+Check whether col_map has been defined, to avoid lazy-building it.
+
+=head2 table_search_results
+
+This is the output of the most recent L</find_table> operation.
+
+  {
+    candidates => [
+      { row_idx => $n,
+        dataset_idx => $n,
+        col_map => [ $field_or_undef, $field_or_undef, ... ],
+        missing_required => \@fields,
+        ambiguous_columns => { $col_idx => \@fields, ... },
+        ambiguous_fields => { $field_name => { $col_idx => $field }, ... },
+        unmatched => \@col_idx,
+        messages => [],
+      },
+      ...
+    ],
+    found => $ref_to_candidate, # undef if find_table failed
+  }
+
+The fields describing problems (C<missing_required>, C<ambiguous_columns>, C<ambiguous_fields>,
+and C<unmatched>) are not present unless they contain data.
+All C<@fields> are refs to the actual Field objects.  C<col_map> has one element per element
+of the header row.  If C<missing_required> is populated, the analysis of ambiguity may be
+incomplete, because missing required columns abort the search for the header.
+All C<"_idx"> values are 0-based, but the errors in C<messages> use 1-based descriptions.
+
+=head2 has_table_search_results, clear_table_search_results
+
+Predicate and clearer for lazy-built table_search_results.
+
+=head2 on_partial_match
+
+  on_partial_match    => 'next'    # keep searching for a better line of headers
+  on_partial_match    => 'last'    # return failure from ->find_table
+  on_partial_match    => sub {
+    my ($reader, $candidate, $header_row)= @_;
+    return $action; # one of the above values
+  }
+
+During L</find_table>, if a row is found that matches at least one header, but fails to match
+all the requirements (required columns, unknown or ambiguous columns if those are configured as
+an error) you can either keep searching for a better header row, or stop here.  The default is
+'next', to keep searching, but this may result in a lot of noise.  The 'last' setting allows
+you to stop after a likely header row.
+
+If you supply a coderef, you receive the "candidate" info described in L</table_search_results>.
+
+=head2 on_ambiguous_columns
+
+  on_ambiguous_columns => 'warn'    # warn, and omit from the match
+  on_ambiguous_columns => 'error'   # fail the header match for this row
+
+During L</find_table>, when matching a field's header pattern vs. the columns of a row, if the
+pattern could match more than one cell it is an error.  You might want to handle it
+in various ways:
+
+=over
+
+=item C<'warn'>
+
+If a Field matches multiple columns (and isn't an array field) omit the field from the col_map
+entirely.  If a column matches multiple fields, leave the col_map blank for this column.
+Both generate warnings, but the header match can still proceeed to a successful result.
+
+=item C<'error'> (default)
+
+Any ambiguities (field matching multiple columns, multiple fields matching a column) cause the
+match of the header on this row to fail.  Further attempts at finding the header depend on the
+L</on_partial_headers> setting.
+
+=back
+
 =head2 on_unknown_columns
 
-  on_unknown_columns => 'use'  # warn, and then use the table
-  on_unknown_columns => 'next' # warn, and then look for another table which matches
-  on_unknown_columns => 'die'  # fatal error
+  on_unknown_columns => 'warn'  # warn, and then accept these headers
+  on_unknown_columns => 'error' # fail the header match for this row
   on_unknown_columns => sub {
     my ($reader, $col_headers)= @_;
     ...;
@@ -854,20 +1100,15 @@ leftover columns.
 
 =over
 
-=item C<'use'>  (default)
+=item C<'warn'>  (default)
 
 You don't care if there are extra columns, just log warnings about them and proceed extracting
 from this table.
 
-=item C<'next'>
+=item C<'error'>
 
 Extra columns mean that you didn't find the table you wanted.  Log the near-miss, and
-keep searching additional rows or additional tables.
-
-=item C<'die'>
-
-This header is probably what you want, but you consider extra columns to be an error
-condition.  Logs the details and calls C<croak>.
+keep searching additional rows or additional tables, according to L</on_partial_headers>.
 
 =item C<sub {}>
 
@@ -969,30 +1210,19 @@ or is installed; it might just echo the file extension back to you.
   if ($tr->find_table) { ... }
 
 Search through the input for the beginning of the records, identified by a header row matching
-the various constraints defined in L</fields>.  If L</header_row_at> is undef, then this does
+the various constraints defined in L</fields>.  If L</header_row_at> is C<undef>, then this does
 nothing and assumes success.
 
-Returns a boolean of whether it succeeded.  This method does B<not> C<croak> on failure like
+Returns a boolean of whether it succeeded.  This method does I<not> C<croak> on failure like
 L</iterator> does, on the assumption that you want to handle them gracefully.
-All diagnostics about the search are logged via L</log>.
-
-=head2 col_map
-
-This is a lazy attribute from table detection.  After calling L</find_table> you can inspect
-which fields were found for each column via this method.  If called before C<find_table>, this
-triggers table detection and throws an exception if one isn't found.
-
-Returns an arrayref with one element for each column, each undefined or a reference to the
-Field object it matched.
+All diagnostics about the search are logged via L</log>, but also reported in
+L</table_search_results>.
 
 =head2 field_map
 
-This is another lazy attribute from table detection, mapping from field name to column
-index/indicies which the field will be loaded from.  If called before C<find_table>, this
-triggers table detection and throws an exception if one isn't found.
-
-Returns a hashref where key is the field name, and value is either a single column index, or
-an arrayref of column indicies if the field is an L<array|Data::TableReader::Field/array> field.
+Build a hashref of C<< { $field_name => $col_idx_or_arrayref } >>  for the current L</col_map>.
+If the field is defined as an array field, the value will be an arrayref (even if only found in
+one column).  Otherwise, the value is a simple scalar of the column index.
 
 =head2 iterator
 

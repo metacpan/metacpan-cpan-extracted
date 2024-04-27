@@ -19,7 +19,7 @@ name: App-BPOMUtils-Table-FoodAdditive
 provides:
   App::BPOMUtils::Table::FoodAdditive:
     file: lib/App/BPOMUtils/Table/FoodAdditive.pm
-    version: '0.019'
+    version: '0.020'
 requires:
   Data::Sah::Compiler::perl::TH::array: '0.914'
   Data::Sah::Compiler::perl::TH::bool: '0.914'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils-Table-FoodAdditive
   homepage: https://metacpan.org/release/App-BPOMUtils-Table-FoodAdditive
   repository: git://github.com/perlancar/perl-App-BPOMUtils-Table-FoodAdditive.git
-version: '0.019'
+version: '0.020'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

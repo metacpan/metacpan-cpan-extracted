@@ -2,10 +2,10 @@ use strict;
 use warnings;
 
 use English;
-use Error::Pure::Utils qw(clean);
+use Error::Pure::Utils qw(clean err_msg_hr);
 use Mo::utils::Email qw(check_email);
 use Readonly;
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 7;
 use Test::NoWarnings;
 
 Readonly::Array our @RIGHT_EMAILS => qw(
@@ -14,18 +14,7 @@ Readonly::Array our @RIGHT_EMAILS => qw(
 );
 
 # Test.
-my $self = {
-	'key' => 'foo',
-};
-eval {
-	check_email($self, 'key');
-};
-is($EVAL_ERROR, "Parameter 'key' doesn't contain valid email.\n",
-	"Parameter 'key' doesn't contain valid email.");
-clean();
-
-# Test.
-my $ret;
+my ($ret, $self);
 foreach my $right_email (@RIGHT_EMAILS) {
 	$self = {
 		'key' => $right_email,
@@ -38,3 +27,17 @@ foreach my $right_email (@RIGHT_EMAILS) {
 $self = {};
 $ret = check_email($self, 'key');
 is($ret, undef, 'Right not exist key.');
+
+# Test.
+$self = {
+	'key' => 'foo',
+};
+eval {
+	check_email($self, 'key');
+};
+is($EVAL_ERROR, "Parameter 'key' doesn't contain valid email.\n",
+	"Parameter 'key' doesn't contain valid email.");
+my $err_msg_hr = err_msg_hr();
+is(keys %{$err_msg_hr}, 1, 'One error parameter.');
+is($err_msg_hr->{'Value'}, 'foo', 'Test error parameter (Value: foo).');
+clean();

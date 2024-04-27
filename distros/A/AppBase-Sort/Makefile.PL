@@ -13,28 +13,12 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "AppBase-Sort",
-  "EXE_FILES" => [
-    "script/sbe",
-    "script/sort-by-example"
-  ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "AppBase::Sort",
   "PREREQ_PM" => {
-    "Data::Sah::Compiler::perl::TH::array" => "0.914",
-    "Data::Sah::Compiler::perl::TH::bool" => "0.914",
-    "Data::Sah::Compiler::perl::TH::code" => "0.914",
-    "Data::Sah::Compiler::perl::TH::str" => "0.914",
-    "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
-    "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
     "File::Find" => 0,
     "Log::ger" => "0.038",
-    "Perinci::CmdLine::Any" => "0.154",
-    "Perinci::CmdLine::Lite" => "1.924",
-    "Perinci::Sub::Util" => "0.472",
-    "Sah::Schema::filename" => 0,
-    "Sah::Schema::true" => 0,
-    "Sort::ByExample" => 0,
     "Sort::Key" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -45,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,23 +37,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Sah::Compiler::perl::TH::array" => "0.914",
-  "Data::Sah::Compiler::perl::TH::bool" => "0.914",
-  "Data::Sah::Compiler::perl::TH::code" => "0.914",
-  "Data::Sah::Compiler::perl::TH::str" => "0.914",
-  "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
-  "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
   "File::Find" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.038",
-  "Perinci::CmdLine::Any" => "0.154",
-  "Perinci::CmdLine::Lite" => "1.924",
-  "Perinci::Sub::Util" => "0.472",
-  "Sah::Schema::filename" => 0,
-  "Sah::Schema::true" => 0,
-  "Sort::ByExample" => 0,
   "Sort::Key" => 0,
   "Test::More" => 0,
   "strict" => 0,

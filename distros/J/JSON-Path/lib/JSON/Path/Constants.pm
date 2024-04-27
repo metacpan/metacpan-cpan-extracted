@@ -1,5 +1,5 @@
 package JSON::Path::Constants;
-$JSON::Path::Constants::VERSION = '1.0.5';
+$JSON::Path::Constants::VERSION = '1.0.6';
 use strict;
 use warnings;
 
@@ -90,7 +90,7 @@ JSON::Path::Constants - Constants used in the JSON::Path distribution
 
 =head1 VERSION
 
-version 1.0.5
+version 1.0.6
 
 =head1 AUTHOR
 

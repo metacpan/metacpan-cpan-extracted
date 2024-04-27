@@ -1,5 +1,12 @@
 Changelog for CPAN-Testers-Schema
 
+0.027     2024-04-27 09:49:52+01:00 Europe/Lisbon
+
+  - Fixed relationship between dists and stat rows
+  - Added unique constraint on cpan uploads table
+  - Added provisional uploads records when missing while processing
+    report
+
 0.026     2024-04-25 15:15:16+01:00 Europe/Lisbon
 
   [Added]

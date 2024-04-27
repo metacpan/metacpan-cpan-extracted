@@ -1,3 +1,4 @@
+.gitattributes
 Build.PL
 Changes
 HelperCA.dll_src/HelperCA.sln
@@ -50,8 +51,6 @@ lib/Perl/Dist/Strawberry/Step/UninstallModules.pm
 lib/Perl/Dist/Strawberry/Step/UpgradeCpanModules.pm
 LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
 README
 script/perldist_strawberry
 share/32bit-5.16.3.1-SPP-min.pp
@@ -97,6 +96,7 @@ share/32bit-5.30.2.1.pp
 share/32bit-5.30.3.1.pp
 share/32bit-5.32.0.1.pp
 share/32bit-5.32.1.1.pp
+share/32bit-5.38.2.1.pp
 share/64bit-5.16.3.1.pp
 share/64bit-5.18.2.1.pp
 share/64bit-5.18.2.2.pp
@@ -136,6 +136,12 @@ share/64bit-5.30.2.1.pp
 share/64bit-5.30.3.1.pp
 share/64bit-5.32.0.1.pp
 share/64bit-5.32.1.1.pp
+share/64bit-5.36.1.1.pp
+share/64bit-5.36.3.1.pp
+share/64bit-5.38.0.1.pp
+share/64bit-5.38.0.2.pp
+share/64bit-5.38.2.1.pp
+share/64bit-5.38.2.2.pp
 share/config-files/CPAN_Config.pm.tt
 share/extra-files/DISTRIBUTIONS.txt.tt
 share/extra-files/licenses/License.rtf
@@ -232,7 +238,6 @@ share/perl-5.20/win32_config.gc.tt
 share/perl-5.20/win32_config_H.gc
 share/perl-5.20/win32_FindExt.pm
 share/perl-5.20/win32_makefile.mk
-share/perl-5.20/win32_win32.c
 share/perl-5.20/win32_win32.h
 share/perl-5.22/diffs_for_info_only/win32_config.gc.diff
 share/perl-5.22/diffs_for_info_only/win32_config_H.gc.diff
@@ -284,6 +289,16 @@ share/perl-5.32/perlexe.rc.tt
 share/perl-5.32/win32_config.gc.tt
 share/perl-5.32/win32_config_H.gc
 share/perl-5.32/win32_FindExt.pm
+share/perl-5.36/19663.patch
+share/perl-5.36/GNUmakefile
+share/perl-5.36/perl_pr19663.diff
+share/perl-5.36/perl_pr19912_commit1.patch
+share/perl-5.36/perl_pr20008.diff
+share/perl-5.36/perl_pr20136.patch
+share/perl-5.36/perlexe.rc.tt
+share/perl-5.36/rt142390.patch
+share/perl-5.38/GNUmakefile
+share/perl-5.38/vmem.patch
 share/portable/portable.perl.32
 share/portable/portable.perl.32-NEW
 share/portable/portable.perl.473.32
@@ -312,3 +327,5 @@ TODO
 xt/common_mistakes.t
 xt/fixme.t
 xt/meta_json.t
+META.yml
+META.json

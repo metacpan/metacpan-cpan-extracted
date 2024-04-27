@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::Config::Structured 3.00;
+package Mojolicious::Plugin::Config::Structured 3.01;
 use v5.26;
 use warnings;
 

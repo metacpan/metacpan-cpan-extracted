@@ -162,14 +162,46 @@ subtest 'recent' => sub {
 };
 
 subtest 'latest_by_dist' => sub {
+  if ( !eval { require Test::mysqld; 1 } ) {
+      plan skip_all => 'Requires Test::mysqld';
+      return;
+  }
+
+  no warnings 'once';
+  my $mysqld = Test::mysqld->new(
+      my_cnf => {
+          'skip-networking' => '', # no TCP socket
+      },
+  );
+  if ( !$mysqld ) {
+      plan skip_all => "Failed to start up server: $Test::mysqld::errstr";
+      return;
+  }
+
+  my ( undef, $version ) = DBI->connect( $mysqld->dsn(dbname => 'test') )->selectrow_array( q{SHOW VARIABLES LIKE 'version'} );
+  my ( $mversion ) = $version =~ /^(\d+[.]\d+)/;
+  diag "MySQL version: $version; Major version: $mversion";
+  if ( $mversion < 5.7 ) {
+      plan skip_all => "Need MySQL version 5.7 or higher. This is $version";
+      return;
+  }
+
+  my $schema = CPAN::Testers::Schema->connect(
+      $mysqld->dsn(dbname => 'test'), undef, undef, { ignore_version => 1 },
+  );
+  $schema->deploy;
+
+  my $version_row = $schema->resultset( 'PerlVersion' )->create({ version => $common{Stats}{perl} });
+  $schema->populate( $_, $data{ $_ } ) for qw( Upload Stats );
+
   my $rs = $schema->resultset( 'Upload' )->latest_by_dist;
   $rs->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
-  is_deeply [ $rs->all ], [ map +{ $_->%{qw( uploadid dist version )} }, $data{Upload}->@[1,2] ], 'get most recent version for all dists'
+  is_deeply [ $rs->all ], [ map +{ $_->%{qw( dist version )} }, $data{Upload}->@[1,2] ], 'get most recent version for all dists'
       or diag explain [ $rs->all ];
 
   $rs = $schema->resultset( 'Upload' )->latest_by_dist->by_author('PREACTION');
   $rs->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
-  is_deeply [ $rs->all ], [ map +{ $_->%{qw( uploadid dist version )} }, $data{Upload}->@[0,2] ], 'get most recent version for all dists by PREACTION'
+  is_deeply [ $rs->all ], [ map +{ $_->%{qw( dist version )} }, $data{Upload}->@[0,2] ], 'get most recent version for all dists by PREACTION'
       or diag explain [ $rs->all ];
 
   subtest 'join report_stats' => sub {

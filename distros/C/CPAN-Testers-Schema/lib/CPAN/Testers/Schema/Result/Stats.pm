@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Result::Stats;
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 # ABSTRACT: The basic statistics information extracted from test reports
 
 #pod =head1 SYNOPSIS
@@ -351,6 +351,24 @@ sub tester_name( $self ) {
     return html_unescape $self->tester;
 }
 
+#pod =method datetime
+#pod
+#pod Get a L<DateTime> object for the date/time this report was generated.
+#pod
+#pod =cut
+
+sub datetime( $self ) {
+  my ( $y, $m, $d, $h, $n, $s ) = $self->fulldate =~ /^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})?$/;
+  return DateTime->new(
+    year => $y,
+    month => $m,
+    day => $d,
+    hour => $h,
+    minute => $n,
+    second => $s // 0,
+  );
+}
+
 1;
 
 __END__
@@ -363,7 +381,7 @@ CPAN::Testers::Schema::Result::Stats - The basic statistics information extracte
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 
@@ -537,6 +555,10 @@ The report grade. One of 'pass', 'fail', 'na', 'unknown'.
 =head2 tester_name
 
 The name of the tester who sent the report
+
+=head2 datetime
+
+Get a L<DateTime> object for the date/time this report was generated.
 
 =head1 SEE ALSO
 

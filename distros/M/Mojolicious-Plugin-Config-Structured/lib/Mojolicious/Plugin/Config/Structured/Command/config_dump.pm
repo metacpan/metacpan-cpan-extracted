@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::Config::Structured::Command::config_dump 3.00;
+package Mojolicious::Plugin::Config::Structured::Command::config_dump 3.01;
 use v5.26;
 use warnings;
 
@@ -99,7 +99,7 @@ my sub dump_node($conf, %params) {
   my $indent   = '  ' x $depth;
 
   if (defined($name)) {
-    say stringify_value($conf->$name) and return unless (is_branch($conf->$name));
+    say stringify_value($conf->$name($allow_sensitive)) and return unless (is_branch($conf->$name));
     $conf = $conf->$name;
   }
 

@@ -13,7 +13,7 @@ use TableData::Business::ID::BPOM::FoodAdditive;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-04-19'; # DATE
 our $DIST = 'App-BPOMUtils-Table-FoodAdditive'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_list_food_additives
@@ -67,7 +67,7 @@ App::BPOMUtils::Table::FoodAdditive - List registered food additives in BPOM
 
 =head1 VERSION
 
-This document describes version 0.019 of App::BPOMUtils::Table::FoodAdditive (from Perl distribution App-BPOMUtils-Table-FoodAdditive), released on 2024-04-19.
+This document describes version 0.020 of App::BPOMUtils::Table::FoodAdditive (from Perl distribution App-BPOMUtils-Table-FoodAdditive), released on 2024-04-19.
 
 =head1 DESCRIPTION
 

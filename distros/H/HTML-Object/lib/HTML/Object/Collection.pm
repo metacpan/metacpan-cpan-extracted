@@ -112,9 +112,9 @@ It inherits from L<HTML::Object::Document> and does not do much except for a han
 
 =head1 INHERITANCE
 
-    +-----------------------+     +------------------------+     +--------------------------+
-    | HTML::Object::Element | --> | HTML::Object::Document | --> | HTML::Object::Collection |
-    +-----------------------+     +------------------------+     +--------------------------+
+    +-----------------------+     +----------------------------+     +--------------------------+
+    | HTML::Object::Element | --> | HTML::Object::DOM::Element | --> | HTML::Object::Collection |
+    +-----------------------+     +----------------------------+     +--------------------------+
 
 =head1 PROPERTIES
 

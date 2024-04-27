@@ -5,7 +5,7 @@ use vars qw/$VERSION/;
 use Scalar::Util qw/reftype weaken/;
 use Carp;
 use SUPER;
-$VERSION = '0.177.0';
+$VERSION = '0.178.0';
 
 sub import {
     my ( $class, @args ) = @_;
@@ -19,7 +19,7 @@ sub import {
         } elsif ( $arg eq 'nostrict' ) {
             $^H{'Test::MockModule/STRICT_MODE'} = 0;
         } else {
-            warn "Test::MockModule unknown import option '$arg'";
+            carp "Test::MockModule unknown import option '$arg'";
         }
     }
     return;
@@ -38,13 +38,12 @@ sub _strict_mode {
 
 my %mocked;
 sub new {
-	my $class = shift;
-	my ($package, %args) = @_;
+	my ($class, $package, %args) = @_;
 	if ($package && (my $existing = $mocked{$package})) {
 		return $existing;
 	}
 
-	croak "Cannot mock $package" if $package && $package eq $class;
+	croak "Cannot mock $package" if $package && $class && $package eq $class;
 	unless (_valid_package($package)) {
 		$package = 'undef' unless defined $package;
 		croak "Invalid package name $package";
@@ -77,9 +76,10 @@ sub get_package {
 }
 
 sub redefine {
-	my ($self, @mocks) = (shift, @_);
+	my ($self, @mocks) = (@_);
 
-	while ( my ($name, $value) = splice @mocks, 0, 2 ) {
+	my @mocks_copy = @mocks;
+	while ( my ($name, $value) = splice @mocks_copy, 0, 2 ) {
 		my $sub_name = $self->_full_name($name);
 		my $coderef = *{$sub_name}{'CODE'};
 		next if 'CODE' eq ref $coderef;
@@ -94,13 +94,14 @@ sub redefine {
 		}
 	}
 
-	return $self->_mock(@_);
+	return $self->_mock(@mocks);
 }
 
 sub define {
-	my ($self, @mocks) = (shift, @_);
+	my ($self, @mocks) = @_;
 
-	while ( my ($name, $value) = splice @mocks, 0, 2 ) {
+	my @mocks_copy = @mocks;
+	while ( my ($name, $value) = splice @mocks_copy, 0, 2 ) {
 		my $sub_name = $self->_full_name($name);
 		my $coderef = *{$sub_name}{'CODE'};
 
@@ -109,13 +110,13 @@ sub define {
 		}
 	}
 
-	return $self->_mock(@_);
+	return $self->_mock(@mocks);
 }
 
 sub mock {
-	my ($self, @mocks) = (shift, @_);
+	my ($self, @mocks) = @_;
 
-	croak "mock is not allowed in strict mode. Please use define or redefine" if($self->_strict_mode());
+	croak "mock is not allowed in strict mode. Please use define or redefine" if $self->_strict_mode();
 
 	return $self->_mock(@mocks);
 }
@@ -153,7 +154,7 @@ sub _mock {
 sub noop {
     my $self = shift;
 
-    croak "noop is not allowed in strict mode. Please use define or redefine" if($self->_strict_mode());
+    croak "noop is not allowed in strict mode. Please use define or redefine" if $self->_strict_mode();
 
     $self->_mock($_,1) for @_;
 
@@ -161,17 +162,19 @@ sub noop {
 }
 
 sub original {
-	my $self = shift;
-	my ($name) = @_;
+	my ($self, $name) = @_;
+
+	carp 'Please provide a valid function name' unless _valid_subname($name);
+
 	return carp _full_name($self, $name) . " is not mocked"
 		unless $self->{_mocked}{$name};
 	return defined $self->{_orig}{$name} ? $self->{_orig}{$name} : $self->{_package}->super($name);
 }
 sub unmock {
-	my $self = shift;
+	my ( $self, @names ) = @_;
 
-	carp 'Nothing to unmock' unless @_;
-	for my $name (@_) {
+	carp 'Nothing to unmock' unless @names;
+	for my $name (@names) {
 		croak "Invalid subroutine name: $name" unless _valid_subname($name);
 
 		my $sub_name = _full_name($self, $name);
@@ -190,37 +193,42 @@ sub unmock {
 
 sub unmock_all {
 	my $self = shift;
-	foreach (keys %{$self->{_mocked}}) {
-		$self->unmock($_);
+	foreach my $name (keys %{$self->{_mocked}}) {
+		$self->unmock($name);
 	}
 
 	return;
 }
 
 sub is_mocked {
-	my $self = shift;
-	my ($name) = shift;
+	my ($self, $name) = @_;
+
+	return unless _valid_subname($name);
+
 	return $self->{_mocked}{$name};
 }
 
 sub _full_name {
 	my ($self, $sub_name) = @_;
-	sprintf "%s::%s", $self->{_package}, $sub_name;
+	return sprintf( "%s::%s", $self->{_package}, $sub_name );
 }
 
 sub _valid_package {
-	defined($_[0]) && $_[0] =~ /^[a-z_]\w*(?:::\w+)*$/i;
+	my $name = shift;
+	return unless defined $name && length $name;
+	return $name =~ /^[a-z_]\w*(?:::\w+)*$/i;
 }
 
 sub _valid_subname {
-	$_[0] =~ /^[a-z_]\w*$/i;
+	my $name = shift;
+	return unless defined $name && length $name;
+	return $name =~ /^[a-z_]\w*$/i;
 }
 
 sub _replace_sub {
 	my ($sub_name, $coderef) = @_;
 
-    no warnings 'redefine';
-    no warnings 'prototype';
+    no warnings qw< redefine prototype >;
 
 	if (defined $coderef) {
 		*{$sub_name} = $coderef;
@@ -231,16 +239,17 @@ sub _replace_sub {
 
 		# save a copy of all non-code slots
 		my %slot;
-		foreach (qw(ARRAY FORMAT HASH IO SCALAR)) {
-			next unless defined(my $elem = *{$symbols{$sub}}{$_});
-			$slot{$_} = $elem;
+		foreach my $slot_name (qw(ARRAY FORMAT HASH IO SCALAR)) {
+			next unless defined $symbols{$sub};
+			next unless defined(my $elem = *{$symbols{$sub}}{$slot_name});
+			$slot{$slot_name} = $elem;
 		}
 
 		# clear the symbol table entry for the subroutine
 		undef *$sub_name;
 
 		# restore everything except the code slot
-		return unless keys %slot;
+		return unless scalar keys %slot;
 		foreach (keys %slot) {
 			*$sub_name = $slot{$_};
 		}

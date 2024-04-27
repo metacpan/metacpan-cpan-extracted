@@ -42,11 +42,14 @@ sub run_test {
 	ok( my $iter2= $decoder->iterator, 'second parallel iterator' );
 
 	is_deeply( $iter->(), [ 'Name', 'Address', 'City', 'State', 'Zip' ], 'row 1' );
+	is( $iter->row, 1, 'iter1 row=1' );
+	is( $iter2->row, 0, 'iter2 row=0' );
 	is_deeply( $iter2->(), [ 'Name', 'Address', 'City', 'State', 'Zip' ], 'row 1 from iterator 2' );
 	is_deeply( $iter->(), [ 'Someone', '123 Long St', 'Somewhere', 'OH', 45678 ], 'row 2' );
 	ok( my $pos= $iter->tell, 'tell position' );
 	is_deeply( $iter->(), [ ('') x 5 ], 'row 3 blank' );
 	is_deeply( $iter->(), [ 'Another', '01 Main St', 'Elsewhere', 'OH', 45678 ], 'row 4' );
+	is( $iter->row, 4, 'iter1 row=4' );
 	is_deeply( $iter->(), undef, 'no row 5' );
 	return if $skip_second;
 

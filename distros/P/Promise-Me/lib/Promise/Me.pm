@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Promise - ~/lib/Promise/Me.pm
-## Version v0.4.10
+## Version v0.4.11
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/28
-## Modified 2024/03/22
+## Modified 2024/04/25
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -125,7 +125,7 @@ BEGIN
     our $OBJECTS_REPO = [];
     our $EXCEPTION_CLASS = 'Module::Generic::Exception';
     our $SERIALISER = 'storable';
-    our $VERSION = 'v0.4.10';
+    our $VERSION = 'v0.4.11';
 };
 
 use strict;
@@ -319,6 +319,7 @@ sub init
     $self->{exit_signal}  = '';
     $self->{exit_status}  = '';
     $self->{has_coredump} = 0;
+    $self->{id}           = Scalar::Util::refaddr( $self );
     $self->{is_child}     = 0;
     $self->{pid}          = $$;
     $self->{share_auto_destroy} = 1;
@@ -647,7 +648,16 @@ sub exec
                 Scalar::Util::blessed( $rv[0] ) && 
                 $rv[0]->isa( 'Promise::Me' ) )
             {
-                shift( @rv )->resolve( @rv );
+                # shift( @rv )->resolve( @rv );
+                my $other = shift( @rv );
+                if( $self->id eq $other->id )
+                {
+                    $other->resolve( @rv );
+                }
+                else
+                {
+                    # Received a promise object ($other), which is not one of ours. Discarding it.
+                }
             }
             elsif( scalar( @rv ) &&
                    Scalar::Util::blessed( $rv[0] ) && 
@@ -743,6 +753,8 @@ sub get_next_resolve_handler { return( shift->get_next_by_type( 'then' ) ); }
 
 sub has_coredump { return( shift->_set_get_boolean( 'has_coredump', @_ ) ); }
 
+sub id { return( shift->{id} ); }
+
 sub is_child { return( shift->_set_get_boolean( 'is_child', @_ ) ); }
 
 sub is_parent { return( !shift->is_child ); }
@@ -803,7 +815,8 @@ sub reject
     }
     try
     {
-        my @rv = $code->( @$vals );
+        local $_ = [ $self->curry::resolve, $self->curry::reject ];
+        my @rv = @$vals ? $code->( @$vals ) : $code->();
         # The code returned another promise
         if( scalar( @rv ) && 
             Scalar::Util::blessed( $rv[0] ) && 
@@ -841,17 +854,9 @@ sub resolve
 {
     my $self = shift( @_ );
     my $vals = [@_];
-    my $prefix = '[' . ( $self->is_child ? 'child' : 'parent' ) . ']';
-    if( $self->debug >= 3 )
-    {
-        my $trace = $self->_get_stack_trace;
-    }
     # Maybe there is no more resolve handler, like when we are at the end of the chain.
     my $code = $self->get_next_resolve_handler();
-    {
-        no warnings;
-    }
-    # # No more resolve handler. We are at the end of the chain. Mark this as resolved
+    # No more resolve handler. We are at the end of the chain. Mark this as resolved
     # No actually, mark this resolved right now, and if next iteration is a fail, 
     # then it will be marked differently
     $self->resolved(1);
@@ -863,8 +868,19 @@ sub resolve
     
     try
     {
-        my @rv = $code->( @$vals );
-        $self->result( @rv ) || return( $self->reject( Promise::Me::Exception->new( $self->error ) ) );
+        local $_ = [ $self->curry::resolve, $self->curry::reject ];
+        my @rv = @$vals ? $code->( @$vals ) : $code->();
+        # It seems the user used the resolve or reject callbacks and returned, such as return( $resolve->() )
+        # In which case, we do not save our promise object, because it would not make sense obviously.
+        if( scalar( @rv ) && $self->_is_a( $rv[0] => 'Promise::Me' ) )
+        {
+            return( $self );
+        }
+        # User returned some other values from its then() method, so we save it and resolve it
+        else
+        {
+            $self->result( @rv ) || return( $self->reject( Promise::Me::Exception->new( $self->error ) ) );
+        }
         # The code returned another promise
         if( scalar( @rv ) && 
             Scalar::Util::blessed( $rv[0] ) && 
@@ -2499,7 +2515,7 @@ Promise::Me - Fork Based Promise with Asynchronous Execution, Async, Await and S
 
 =head1 VERSION
 
-    v0.4.10
+    v0.4.11
 
 =head1 DESCRIPTION
 

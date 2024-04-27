@@ -6,7 +6,7 @@ use IO::Handle;
 extends 'Data::TableReader::Decoder';
 
 # ABSTRACT: Access rows of a comma-delimited text file
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 our @csv_probe_modules= ( ['Text::CSV_XS' => 1.06], ['Text::CSV' => 1.91] );
 our $default_csv_module;
@@ -90,8 +90,8 @@ sub iterator {
 	}
 	my $i= Data::TableReader::Decoder::CSV::_Iter->new(
 		sub {
-			++$$row_ref;
 			my $r= $parser->getline($fh) or return undef;
+			++$$row_ref;
 			@$r= @{$r}[ @{$_[0]} ] if $_[0]; # optional slice argument
 			return $r;
 		},
@@ -154,6 +154,10 @@ sub Data::TableReader::Decoder::CSV::_Iter::position {
 	'row '.${ $f->{row} };
 }
 
+sub Data::TableReader::Decoder::CSV::_Iter::row {
+	${ shift->_fields->{row} }
+}
+
 sub Data::TableReader::Decoder::CSV::_Iter::progress {
 	my $f= shift->_fields;
 	# lazy-build the file size, using seek
@@ -198,7 +202,7 @@ Data::TableReader::Decoder::CSV - Access rows of a comma-delimited text file
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 DESCRIPTION
 

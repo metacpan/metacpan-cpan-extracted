@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element.pm
-## Version v0.3.1
+## Version v0.3.2
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2023/11/06
+## Modified 2024/04/20
 ## All rights reserved
 ## 
 ## 
@@ -28,7 +28,7 @@ BEGIN
         DOCUMENT_POSITION_PRECEDING DOCUMENT_POSITION_FOLLOWING DOCUMENT_POSITION_CONTAINS 
         DOCUMENT_POSITION_CONTAINED_BY DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
     );
-    our $VERSION = 'v0.3.1';
+    our $VERSION = 'v0.3.2';
 };
 
 use strict;
@@ -594,6 +594,9 @@ sub innerText : lvalue { return( shift->_set_get_callback({
         my $self = shift( @_ );
         # Create a new document, because we want to use the document object as_string function which produce a string of its children, and no need to reproduce it here
         my $txt = $self->as_trimmed_text;
+        $txt =~ s,<br[[:blank:]]*/>\n,\n,gs;
+        $txt =~ s/\&gt;/>/gs;
+        $txt =~ s/\&lt;/</gs;
         my $obj = $self->new_scalar( \$txt );
         return( $obj );
     },
@@ -605,13 +608,23 @@ sub innerText : lvalue { return( shift->_set_get_callback({
         # We are provided with an element, so we set it as our inner html
         if( $self->_is_a( $this => 'HTML::Object::DOM::Text' ) )
         {
-            $children = $self->new_array( $this );
+            my $copy = $this->clone;
+            my $val = $copy->value;
+            $val =~ s/</\&lt;/gs;
+            $val =~ s/>/\&gt;/gs;
+            $val =~ s,\n,<br />\n,gs;
+            $copy->value( $val );
+            $children = $self->new_array( $copy );
         }
         elsif( !ref( $this ) ||
                ( ref( $this ) && overload::Overloaded( $this ) && overload::Method( $this, '""' ) ) )
         {
-            $this =~ s,\n,<br />\n,gs;
-            my $txt = $self->new_text( value => $this ) || die( $self->error );
+            # $this =~ s,\n,<br />\n,gs;
+            my $val = "$this";
+            $val =~ s/</\&lt;/gs;
+            $val =~ s/>/\&gt;/gs;
+            $val =~ s,\n,<br />\n,gs;
+            my $txt = $self->new_text( value => $val ) || die( $self->error );
             $children = $self->new_array( $txt );
         }
         else
@@ -2075,7 +2088,7 @@ HTML::Object::DOM::Element - HTML Object
 
 =head1 VERSION
 
-    v0.3.1
+    v0.3.2
 
 =head1 DESCRIPTION
 
@@ -2375,7 +2388,13 @@ See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTM
 
 Represents the rendered text content of a node and its descendants. As a getter, it approximates the text the user would get if they highlighted the contents of the element with the cursor and then copied it to the clipboard. This returns a L<string object|Module::Generic::Scalar>. As a setter, it replaces the content inside the selected element, with either a L<text object|HTML::Object::DOM::Text> or by a string converting any line breaks into C<<br />> elements.
 
+When setting some values, this method will ensure that HTML characters are escaped, namely: C<< < >>, C<< > >> and new lines are preceded by the C<< <br /> >> tag.
+
+When the value is retrieved, this is reversed.
+
 See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/innerText> for more information.
+
+See also L<HTML::Object::DOM::Node/textContent>, L<HTML::Object::Element/as_text> and L<HTML::Object::XQuery/text>
 
 =head2 inputMode
 

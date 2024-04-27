@@ -18,6 +18,8 @@ use t_TestCommon ##':silent', # Test2::V0 etc.
                     rawstr showstr showcontrols
                     mycheckeq_literal mycheck @quotes/;
 
+diag "executing at line ".__LINE__; # try to find mystery Windows crash
+
 sub oops(@) {
   @_ = ("TestOOPS:", @_);
   goto &confess;
@@ -29,6 +31,8 @@ BEGIN{ diag "before use Data::Compare etc."; } # try to find mystery Windows cra
 use Data::Compare qw(Compare);
 use Data::Dumper::Interp qw/:all/;
 BEGIN{ diag "after  use Data::Compare etc."; } # try to find mystery Windows crash
+
+diag "executing at line ".__LINE__; # try to find mystery Windows crash
 
 # This test mysteriously dies (exit 255) with no visible message
 # on certain Windows machines.  Try to explicitly 'fail' instead of
@@ -284,11 +288,13 @@ use overload
   # will decide it should be displayed as an unquoted number.
   '&'  => sub{ my ($self,$operand,$swapped)=@_; $$self & $operand },
   ;
+BEGIN{ main::diag("end of pkg main::Mybase  at line ".__LINE__."\n"); } # try to find mystery Windows crash
 package main::Myderived;
 our @ISA = ("main::Mybase");
 
 package main;
 
+BEGIN{ main::diag("compiling main at line ".__LINE__."\n"); } # try to find mystery Windows crash
 diag "Now at line ".__LINE__."\n"; # try to find mystery Windows crash
 
 $_ = "GroupA.GroupB";
@@ -1069,5 +1075,7 @@ confess "Non-zero CHILD_ERROR ($?)" if $? != 0;
 ok(1, "The whole shebang");
 done_testing();
 exit 0;
+
+BEGIN{ main::diag("end of compiling ".__LINE__."\n"); } # try to find mystery Windows crash
 
 # End Tester

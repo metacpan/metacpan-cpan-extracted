@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::Stats;
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 # ABSTRACT: Query the raw test reports
 
 #pod =head1 SYNOPSIS
@@ -92,9 +92,19 @@ sub insert_test_report ( $self, $report ) {
     })->all;
 
     if ( !@uploads ) {
-        die $LOG->error(
-            sprintf 'No upload matches for dist %s version %s (report %s)',
+        $LOG->warnf(
+            'No upload matches for dist %s version %s (report %s). Creating provisional record.',
             $data->{distribution}->@{qw( name version )}, $guid,
+        );
+        @uploads = (
+          $schema->resultset('Upload')->create({
+            dist => $data->{distribution}{name},
+            $data->{distribution}->%{qw( version )},
+            type => 'unknown',
+            author => '',
+            filename => '',
+            released => 0,
+          }),
         );
     }
     elsif ( @uploads > 1 ) {
@@ -136,7 +146,7 @@ CPAN::Testers::Schema::ResultSet::Stats - Query the raw test reports
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

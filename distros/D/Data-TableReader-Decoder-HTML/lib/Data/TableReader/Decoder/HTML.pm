@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::HTML;
-$Data::TableReader::Decoder::HTML::VERSION = '0.012';
+$Data::TableReader::Decoder::HTML::VERSION = '0.015';
 use Moo 2;
 use Try::Tiny;
 use Carp;
@@ -141,6 +141,10 @@ sub Data::TableReader::Decoder::HTML::_Iter::position {
 	'table '.${ $f->{table_i} }.' row '.${ $f->{row_i} };
 }
 
+sub Data::TableReader::Decoder::HTML::_Iter::row {
+	${ shift->_fields->{row_i} };
+}
+
 sub Data::TableReader::Decoder::HTML::_Iter::progress {
 	my $f= shift->_fields;
 	return ! $f->{total_records}? 0
@@ -182,6 +186,10 @@ __END__
 
 Data::TableReader::Decoder::HTML - Access the tables of an HTML document
 
+=head1 VERSION
+
+version 0.015
+
 =head1 DESCRIPTION
 
 This decoder iterates the <TR> tags of the <TABLE>s of an HTML file.
@@ -209,9 +217,15 @@ arrayref.  The iterator supports C<< $i->next_dataset >> to move to the next tab
 
 Michael Conrad <mike@nrdvana.net>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Christian Walde
+
+Christian Walde <walde.christian@gmail.com>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Michael Conrad.
+This software is copyright (c) 2024 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

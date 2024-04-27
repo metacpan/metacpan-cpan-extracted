@@ -14,7 +14,7 @@ use Crypt::OpenSSL::Base::Func;
 
 #use Smart::Comments;
 
-our $VERSION = 0.011;
+our $VERSION = 0.012;
 
 our @ISA    = qw(Exporter);
 our @EXPORT = qw/
@@ -43,7 +43,6 @@ sub derive_key_pair {
     my $l = length($info);
     my $derive_input = join("", $seed, i2osp($l, 2), $info);
     ### derive_input: unpack("H*", $derive_input)
-    ### p ref: ref($p)
 
 
     my $counter = 0;
@@ -53,7 +52,8 @@ sub derive_key_pair {
             return;
         }
 
-        my ($k, $m) = sn2k_m($group_name); 
+        my $k = sn2kv($group_name, 'k');
+        my $m = sn2kv($group_name, 'm');
 
         my $msg = $derive_input.i2osp($counter, 1); 
         #my $DST = "DeriveKeyPair".$context_string;
@@ -77,7 +77,12 @@ sub derive_key_pair {
     ### skS hex: $skS->to_hex()
     ### skS decimal: $skS->to_decimal()
 
-    my $ec_key_r = generate_ec_key($ec_params_r->{group}, $skS, 2, $ec_params_r->{ctx});
+    #my $ec_key_r = generate_ec_key($ec_params_r->{group}, $skS, 2, $ec_params_r->{ctx});
+    ### xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+    my $ec_key_r = generate_ec_key($group_name, $skS->to_hex());
+    ### yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+    use Data::Dumper;
+    print Dumper($ec_key_r);
     ### $ec_key_r
 
     #my $pkS_point = $ec_key_r->{pub_point};
@@ -138,8 +143,8 @@ sub finalize {
     my $msg = join("", map { i2osp(length($_), 2).$_ } ($input, $unblindedElement_bin))."Finalize";    
     ### msg: unpack("H*", $msg)
 
-    my $h_r = EVP_get_digestbyname( $hash_name );
-    my $dgst        = digest( $h_r, $msg );
+    #my $h_r = EVP_get_digestbyname( $hash_name );
+    my $dgst        = digest( $hash_name, $msg );
 
     return $dgst;
 }

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.87.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,13 +14,13 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: RIPEMD160
 
-SHA256 3f2f03cf96bcec06823df5045f3c247007ac08dd27f7069701cbfffe4e224167 Changes
-SHA256 e18fd195c30c0110fffb5d7b479b447d016a6519d59e6c691ea2678958578f8d Email.pm
+SHA256 0b4ee5be7cf8252e4c155ce9e25cefe2a2e0de0b30dc8798b1c7c13ddcc5287a Changes
+SHA256 cc87cbe27cd426564aa2969b96c93ef07bf3e5af12ebaef32f27ff3b9d841fe9 Email.pm
 SHA256 d53de1de5e97aadb5bffa1eb84038b24a8c916622c44a16e0239d4cdafbe2df2 LICENSE
 SHA256 2c75980888c56353a615e36a9d49911d493da53b553b7aec57f43864a25fff15 MANIFEST
-SHA256 eb111f9f543d3caeda5c9860dd47898ec84de70f8513429719149371fc759aa3 META.yml
-SHA256 b8019b9d15399ff8337243da4606166ebb926c974e0e12ba4b2775a301cfe17c Makefile.PL
-SHA256 8d247da16b785cbf89eeb0d9285d5f3c75d91d38f3ee85b47de3a20d293d30b8 README
+SHA256 9f19f78b0ecb3382b557b8ca1b0eb321b7555df38c541cc1cfd25888b204fee5 META.yml
+SHA256 97df25e99d5a7a2c0e5e54876160e3cfadd10c98e916bb2d71ad2b14ebe8c0af Makefile.PL
+SHA256 6282cbef6670247ca2dbe664d1639af37ebcafebbd0786d7f69fc921263c538e README
 SHA256 ee6a7194a1f70ebfbb90cabcae4b04567f44b232098de0dde03fd993615b9956 examples/check_email_fail.pl
 SHA256 784534129c85205706b8630c6c8d8343cb8b861490c60b7ea65c30b2df5fd317 examples/check_email_ok.pl
 SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
@@ -35,23 +35,21 @@ SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Modu
 SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
 SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
 SHA256 a8f6a80aaaae9a80c6d2f158b61304ac1b2208ad889aa21a6e410eb237d7b25f t/Mo-utils-Email/01-use.t
-SHA256 3c8a32ac277a9e71d0e0d5ea3177d1bbaedf6a03bfae6b1262a990b3d26ce0cd t/Mo-utils-Email/02-version.t
-SHA256 91abad2f313dd9e3824872f4d7e78941ec17178bf9aa2e16efedefdc775dddfd t/Mo-utils-Email/03-check_email.t
+SHA256 11f0e278fdc1032b1b020c2485ce55de6036d6e8abff0b71a999f15d9b0c8a12 t/Mo-utils-Email/02-version.t
+SHA256 18bd5e37ac3bc66e60707b0c2b47f7b67b912c6d1b6deb9a63206a1cd90903eb t/Mo-utils-Email/03-check_email.t
 SHA256 a5cc05da5052625f8c72e7a71ffadb4380e88e9f0ca39e4012503ed62be88a62 xt/Mo-utils-Email/01-pod_coverage.t
 SHA256 38d9e7e9263a513a60ea15292ed75ec2fc386de27e6e9f4bfaa85d777d554b8d xt/Mo-utils-Email/02-pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmWbONkACgkQojV9Rpe/
-B8trLw/+PeNI/1zFRsa4Dtp6VAP+lijOy9g+irVlm4xaPfu0VBCLkcJn6N9AcAwv
-kApndPCGNXMk8GYuKZ3kzktC4niwxv+kwyeJz/chA2XA5N5t32/rBeV+LsZrsn+E
-MYkYIa7/omqrcwbeX/EGMJe9167Y2/LevggqeFr6GbKrm3GTua/Uu1acwqORVFGD
-hB6RfVfFkVtFmK+cZL4IA1pW7dvvfc7JQrjM3uVpHm1kfxiq/JtN7att44MjiPcJ
-uMONVyvppFGClZiOeXtX/s3M67mlVeDt5wFfCgADXrjVra7+PnVvqXzdqbXRu3HS
-qfwXioW/kc92g5K0d6jEler0nsvnXND6DIDiT1/yJtdfcUv96Pjfgyha1nWzLAD/
-z7EHiibcmeaB2B8EsodZV1alJY8xSLSce5URkKfYcOzIqVTigc1T+5ZKdsDazmdV
-htSPYpidhWS2014cbuqnnMhR2HHlXvS0M5knf8hsIFOuetlaUda0wBRn1DUOtgVv
-zHiZMYJZONe1j6GO6+tYYLR4qME/qri5w/k3UJ2SU8+rtJGcghso1q8FdaiFZ3xu
-4gXTVeu4dX/DNUa1gAF5NvonKdhRrzwTXwfZUbqaH6WAKvBDP7vVlWJHLfCL0usj
-jpPTfvxjol+RPqUpV7ezBQQEklq0yQTFfmVy0W2dNV5IlTWgxHM=
-=EaNW
+iQGzBAEBAwAdFiEEbhzVZugfHqSVNvE7YSp92FNcjtAFAmYsFn8ACgkQYSp92FNc
+jtDifAv+PMwZ6DmusEblt4zGIl5NzhX9v7xY1DuhH7MdwhdG82s/BPysKLnqGFoT
+ZOSiB/AZVsw4QaonUdcJg3SGP+QlM1O6nQewY1N+GZeCkybV/sG1wB10WVJkEt4h
+hqL04EqfErQPToufKeuYEC/bHdIxxn7vMbmIz8HCltjl2mxSmkhISHp8oiHmFwA7
+J65iUpJUoJaiTVMClh309NSPo3LvdbnWkgRp3aPYnblkfVG5J8/tR1a08rIkTcbx
+beL7OFUAoO4ldWy3KHljw3kXmkQ0ASxuMFSIKDXnTeBPkTrwbnHBGCPRwJ+NyX6o
+y5MNNeSzzNEw05JvbfWmXzzNU/29TMFJJGFIbUHQcJ9hZamAf9KwlNp4KJbM55Ww
+E6o+AXmIQtABvV0+HvE5/JFBro13EBiGpJUvjp+3reODCefDapTu3+uvLQeRWXgo
+wgT84uR57YJstV0x0vqE/uCEmT9wJoRd1/cJrBqsjFS/88TTt7wvXWjbjX4rD1H2
+A4B1DcRp
+=OW2+
 -----END PGP SIGNATURE-----

@@ -1,7 +1,10 @@
 package Dist::Zilla::Plugin::BuildSelf;
-$Dist::Zilla::Plugin::BuildSelf::VERSION = '0.006';
+$Dist::Zilla::Plugin::BuildSelf::VERSION = '0.007';
 use Moose;
-with qw/Dist::Zilla::Role::BuildPL Dist::Zilla::Role::TextTemplate Dist::Zilla::Role::PrereqSource/;
+with qw/Dist::Zilla::Role::BuildPL Dist::Zilla::Role::TextTemplate Dist::Zilla::Role::ConfigureSelf/;
+
+use MooseX::Types::Perl qw/StrictVersionStr/;
+use MooseX::Types::Moose qw/Str Bool/;
 
 use experimental 'signatures', 'postderef';
 
@@ -9,7 +12,7 @@ use Dist::Zilla::File::InMemory;
 
 has add_buildpl => (
 	is => 'ro',
-	isa => 'Bool',
+	isa => Bool,
 	lazy => 1,
 	default => sub($self) {
 		return not grep { $_->name eq 'Build.PL' } $self->zilla->files->@*;
@@ -18,52 +21,28 @@ has add_buildpl => (
 
 has template => (
 	is  => 'ro',
-	isa => 'Str',
+	isa => Str,
 	default => "use {{ \$minimum_perl }};\nuse lib 'lib';\nuse {{ \$module }};\nBuild_PL(\\\@ARGV, \\\%ENV);\n",
 );
 
 has module => (
 	is => 'ro',
-	isa => 'Str',
+	isa => Str,
 	builder => '_module_builder',
 	lazy => 1,
 );
 
-has auto_configure_requires => (
-	is => 'ro',
-	isa => 'Bool',
-	default => 1,
-);
-
 has minimum_perl => (
 	is      => 'ro',
-	isa     => 'Str',
+	isa     => StrictVersionStr,
 	lazy    => 1,
 	default => sub($self) {
 		return $self->zilla->prereqs->requirements_for('runtime', 'requires')->requirements_for_module('perl') || '5.006'
 	},
 );
 
-has sanatize_for => (
-	is => 'ro',
-	isa => 'Str',
-	default => 0,
-);
-
 sub _module_builder($self) {
 	return $self->zilla->name =~ s/-/::/gr;
-}
-
-sub register_prereqs($self) {
-	if ($self->auto_configure_requires) {
-		my $prereqs = $self->zilla->prereqs;
-		if (my $for = $self->sanatize_for) {
-			require CPAN::Meta::Prereqs::Filter;
-			$prereqs = CPAN::Meta::Prereqs::Filter::filter_prereqs($prereqs, omit_core => $for);
-		}
-		my $reqs = $prereqs->requirements_for('runtime', 'requires');
-		$self->zilla->register_prereqs({ phase => 'configure' }, $reqs->as_string_hash->%*);
-	}
 }
 
 sub setup_installer($self) {
@@ -92,7 +71,7 @@ Dist::Zilla::Plugin::BuildSelf - Build a Build.PL that uses the current module t
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 

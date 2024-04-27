@@ -7,7 +7,6 @@ build_requires:
   Log::Any::Adapter: '0'
   Log::Any::Adapter::TAP: '0'
   Test::More: '0'
-  Types::Standard: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -32,13 +31,14 @@ requires:
   Scalar::Util: '0'
   Text::CSV: '1.95'
   Try::Tiny: '0'
+  namespace::clean: '0'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/nrdvana/perl-Data-TableReader/issues
   homepage: https://github.com/nrdvana/perl-Data-TableReader
   repository: https://github.com/nrdvana/perl-Data-TableReader.git
-version: '0.014'
+version: '0.015'
 x_contributors:
   - 'Christian Walde <walde.christian@gmail.com>'
 x_generated_by_perl: v5.36.0

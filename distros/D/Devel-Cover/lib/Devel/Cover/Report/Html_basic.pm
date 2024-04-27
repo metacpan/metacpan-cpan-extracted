@@ -13,7 +13,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-  our $VERSION = '1.41'; # VERSION
+  our $VERSION = '1.42'; # VERSION
 }
 
 use Devel::Cover::DB;
@@ -456,7 +456,7 @@ package Devel::Cover::Report::Html_basic::Template::Provider;
 use strict;
 use warnings;
 
-our $VERSION = '1.41'; # VERSION
+our $VERSION = '1.42'; # VERSION
 
 use base "Template::Provider";
 
@@ -815,7 +815,7 @@ Devel::Cover::Report::Html_basic - HTML backend for Devel::Cover
 
 =head1 VERSION
 
-version 1.41
+version 1.42
 
 =head1 SYNOPSIS
 

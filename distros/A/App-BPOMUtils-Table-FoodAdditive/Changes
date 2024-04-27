@@ -1,3 +1,10 @@
+0.020   2024-04-19  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [cli bpomfa] Tweak abstract.
+
+
 0.019   2024-04-19  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Add short alias for bpom-list-food-additives: bpomfa.

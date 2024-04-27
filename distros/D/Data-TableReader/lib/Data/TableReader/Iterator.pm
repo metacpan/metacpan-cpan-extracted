@@ -6,7 +6,7 @@ use Carp;
 use Scalar::Util 'refaddr';
 
 # ABSTRACT: Base class for iterators (blessed coderefs)
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 
 our %_iterator_fields;
@@ -56,7 +56,7 @@ Data::TableReader::Iterator - Base class for iterators (blessed coderefs)
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -90,6 +90,11 @@ not all of the record is needed.
 
 Return a human-readable string describing the current location within the source file.
 This will be something like C<"$filename row $row"> or C<"$filename $worksheet:$cell_id">.
+
+=head2 row
+
+A numeric 1-based row number for the current position of the current dataset.  This is not
+affected by which row the header was found on.
 
 =head2 progress
 

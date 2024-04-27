@@ -7,11 +7,8 @@ META.yml
 Makefile.PL
 README
 dist.ini
-lib/App/sort_by_example.pm
 lib/AppBase/Sort.pm
 lib/AppBase/Sort/File.pm
-script/sbe
-script/sort-by-example
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

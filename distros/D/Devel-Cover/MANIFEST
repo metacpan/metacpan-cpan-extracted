@@ -2163,6 +2163,8 @@ test_output/cover/cond_or.5.022000
 test_output/cover/cond_or.5.038000
 test_output/cover/cond_xor.5.012000
 test_output/cover/cop.5.012000
+test_output/cover/dbm_cond.5.014000
+test_output/cover/dbm_cond.5.022000
 test_output/cover/default_param.5.012000
 test_output/cover/default_param.5.014000
 test_output/cover/deparse.5.012000

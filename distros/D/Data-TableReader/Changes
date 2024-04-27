@@ -1,3 +1,23 @@
+Version 0.015 - 2024-04-27
+ - Better support for fields sharing name, with Field->addr (refaddr) and
+   TableReader->field_by_addr
+ - Decoder iterators now have ->row attribute
+ - Spreadsheet decoder ->position includes sheet number and now uses
+   1-based row number (as originally intended)
+ - Results of find_table are stored in table_search_results for better
+   inspection and reporting on a failure.  This allows detection messages
+   to be associated with a row, and various conflicts to be associated with
+   a column (without parsing message text).
+ - On a failed find_table, user can inspect the attempts in
+   table_search_results->{candidates} and select one to be ->{found}, and
+   then proceed to create the iterator.
+ - col_map is now a full attribute and can be specified in the constructor.
+   find_table starts with the user-supplied value and tries to fill in any
+   'undef' values in that array.
+ - New settings on_partial_match, on_ambiguous_columns, and modified
+   official values of on_unknown_columns.  These provide better control
+   over what counts as an error and whether to continue the search.
+
 Version 0.014 - 2024-03-25
  - Fix compatibility with newest Spreadsheet::ParseXLSX
 

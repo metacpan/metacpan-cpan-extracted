@@ -1,6 +1,6 @@
 package Perl::Dist::Strawberry;
 
-use 5.012;
+use 5.014;
 use warnings;
 
 use Data::Dump            qw(pp);
@@ -17,7 +17,7 @@ use File::ShareDir        qw();
 use Pod::Usage            qw(pod2usage);
 use LWP::UserAgent;
 
-our $VERSION = '4.022';
+our $VERSION = '4.023';
 
 sub new {
   my $class = shift;
@@ -28,7 +28,7 @@ sub new {
         working_dir   => 'c:\strawberry_build',
         image_dir     => 'c:\strawberry',
         cpan_url      => 'http://cpan.strawberryperl.com',
-        package_url   => 'http://strawberryperl.com/package/',
+        package_url   => 'https://strawberryperl.com/package/',
         test_modules  => 1,
         test_core     => 0,
         offline       => 0,
@@ -59,7 +59,7 @@ sub parse_options {
     'perl_64bitint!'    => \$self->global->{perl_64bitint}, #<flag>   default: undef (0)
     'perl_ldouble!'     => \$self->global->{perl_ldouble},  #<flag>   default: undef (0)
     'verbosity=s'       => \$self->global->{verbosity},     #<level>  default: 2 (you can use values 1/silent to 5/verbose)
-    'package_url=s'     => \$self->global->{package_url},   #<url>    default: http://strawberryperl.com/package/ (or use e.g. file://C|/pkgmirror/)
+    'package_url=s'     => \$self->global->{package_url},   #<url>    default: https://strawberryperl.com/package/ (or use e.g. file://C|/pkgmirror/)
     'app_simplename=s'  => \$self->global->{app_simplename},#<name>   default: undef
     'app_fullname=s'    => \$self->global->{app_fullname},  #<name>   default: undef
     'beta=i'            => \$self->global->{beta},          #<name>   default: undef
@@ -422,6 +422,10 @@ sub message {
 
 sub resolve_name {
   my ($self, $name, $skip_canon) = @_;
+
+  #  don't change references
+  return $name if ref ($name);
+
   if ($name =~ /<(package_url|dist_sharedir|image_dir)>/) {
     my $r = $self->global->{$1};
     $name =~ s/<(package_url|dist_sharedir|image_dir)>/$r/g if defined $r;
@@ -452,7 +456,9 @@ sub mirror_url {
 
   # Check if the file already is downloaded.
   my $file = $url;
-  $file =~ s|^.+\/||;# Delete anything before the last forward slash, leaves only the filename.
+  # Delete anything before the last slash, leaves only the filename.
+  # The backward slashes allow for file URLs.
+  $file =~ s|^.+[/\\]||;
   my $target = catfile( $dir, $file );
 
   return $target if $self->global->{offline} and -f $target;
@@ -483,7 +489,8 @@ sub zip_dir {
   $level //= 1;
   $self->message(3, "started: zip_dir('$dir', '$zip_filename', $level)\n");
   die "ERROR: non-existing dir '$dir'" unless -d $dir;
-  my @items = File::Find::Rule->in($dir);
+  $dir =~ s{\\}{/}g;  #  normalise paths
+  my @items = map {s{\\}{/}gr} File::Find::Rule->in($dir);
   my $zip = Archive::Zip->new();
   for my $fs_name (@items) {
     (my $archive_name = $fs_name) =~ s|^\Q$dir\E[/\\]*||i;
@@ -576,7 +583,7 @@ Strawberry Perl is a binary distribution of Perl for the Windows operating
 system.  It includes a bundled compiler and pre-installed modules that offer
 the ability to install XS CPAN modules directly from CPAN.
 
-You can download Strawberry Perl from L<http://strawberryperl.com|http://strawberryperl.com>
+You can download Strawberry Perl from L<https://strawberryperl.com|https://strawberryperl.com>
 
 The purpose of the Strawberry Perl series is to provide a practical Win32 Perl
 environment for experienced Perl developers to experiment with and test the

@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Result::Upload;
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 # ABSTRACT: Information about uploads to CPAN
 
 #pod =head1 SYNOPSIS
@@ -166,6 +166,10 @@ __PACKAGE__->inflate_column(
     },
 );
 
+unique_constraint(
+  dist_version => [ qw/dist version/ ],
+);
+
 #pod =method report_metrics
 #pod
 #pod The linked report metrics rows for this distribution, a L<CPAN::Testers::Schema::ResultSet::Release>
@@ -188,7 +192,8 @@ has_many report_metrics => 'CPAN::Testers::Schema::Result::Release',
 
 has_many report_stats => 'CPAN::Testers::Schema::Result::Stats',
     {
-        'foreign.uploadid' => 'self.uploadid',
+        'foreign.dist' => 'self.dist',
+        'foreign.version' => 'self.version',
     };
 
 package
@@ -227,7 +232,7 @@ CPAN::Testers::Schema::Result::Upload - Information about uploads to CPAN
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

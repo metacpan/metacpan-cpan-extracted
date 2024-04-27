@@ -27,6 +27,8 @@ t/12-decoder-idiot-csv.t
 t/15-decoder-xls.t
 t/35-record-iterator.t
 t/40-locate-table.t
+t/41-user-supplied-colmap.t
+t/42-user-overrides-found-header.t
 t/50-validation.t
 t/51-typetiny-validation.t
 t/data/AddressAuxData.xls

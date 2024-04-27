@@ -1,5 +1,8 @@
 Revision history for Perl extension Crypt::OpenSSL::Base::Func.
 
+0.038 2024/04/26
+   -  ec_conv.pl
+
 0.035 2022/05/16
    - gcm: aead_encrypt/aead_decrypt 
 

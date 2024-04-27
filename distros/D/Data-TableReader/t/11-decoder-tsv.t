@@ -20,10 +20,13 @@ my $d= new_ok( 'Data::TableReader::Decoder::TSV',
 ok( my $iter= $d->iterator, 'got iterator' );
 
 is_deeply( $iter->(), [ 'a', 'b', 'c', 'd' ], 'first row' );
+is( $iter->row, 1, 'row=1' );
 is_deeply( $iter->(), [ '1', '2', '3', '4' ], 'second row' );
 is_deeply( $iter->(), undef, 'no third row' );
+is( $iter->row, 2, 'row=2' );
 ok( $iter->seek(0), 'rewind' );
 is_deeply( $iter->(), [ 'a', 'b', 'c', 'd' ], 'first row again' );
+is( $iter->row, 1, 'row=1' );
 is_deeply( $iter->([2,1]), [ '3', '2' ], 'slice from second row' );
 ok( !$iter->next_dataset, 'no next dataset' );
 

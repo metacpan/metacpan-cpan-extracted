@@ -15,16 +15,16 @@ WriteMakefile(
     'LICENSE'  => 'Mozilla_2_0', 
     'DISTNAME'         => 'Crypt-OpenSSL-Base-Func',
     PREREQ_PM         => { 
-        'Crypt::OpenSSL::Guess' => 0.12,
+        'Carp' => 0.01,
         'Crypt::OpenSSL::Bignum' => 0.09,
         'Crypt::OpenSSL::EC' => 1.31,
-        'bignum' => 0.52, 
-        'Math::BigInt' => 1.999815,
-        'Carp' => 0.01,
-        'Test::More' => 0.01,
-        'Test' => 0.01,
         'Crypt::OpenSSL::Guess' => 0.12,
+        'Math::BigInt' => 1.999815,
+        'Test' => 0.01,
+        'Test::More' => 0.01,
+        'bignum' => 0.52, 
     }, 
+    EXE_FILES => [ 'bin/ec_conv.pl' ], 
     'LIBS'   => [openssl_lib_paths() . ' -lssl -lcrypto'],
     DEFINE            => '-DPERL5 -DOPENSSL_NO_KRB5',
     'INC' => openssl_inc_paths(),    # e.g., '-I/usr/include/other'
@@ -46,7 +46,14 @@ WriteMakefile(
                 },
                 build_requires => {
                     'Test' => 0,    # For testing
+                    'Carp' => 0.01,
+                    'Crypt::OpenSSL::Bignum' => 0.09,
+                    'Crypt::OpenSSL::EC' => 1.31,
                     'Crypt::OpenSSL::Guess' => 0.12,
+                    'Math::BigInt' => 1.999815,
+                    'Test' => 0.01,
+                    'Test::More' => 0.01,
+                    'bignum' => 0.52, 
                 },
                 resources => {
                     'license'    => 'http://dev.perl.org/licenses/',

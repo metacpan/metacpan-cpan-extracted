@@ -1,5 +1,8 @@
 Revision history for tiny-prof
 
+0.02    2024-04-27
+        Fixed typos in pod (Thanks ronsavage).
+
 0.01    2024-04-26
         First version.
 

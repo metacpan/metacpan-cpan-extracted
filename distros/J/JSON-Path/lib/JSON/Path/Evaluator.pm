@@ -1,5 +1,5 @@
 package JSON::Path::Evaluator;
-$JSON::Path::Evaluator::VERSION = '1.0.5';
+$JSON::Path::Evaluator::VERSION = '1.0.6';
 use strict;
 use warnings;
 
@@ -671,7 +671,7 @@ JSON::Path::Evaluator - A module that recursively evaluates JSONPath expressions
 
 =head1 VERSION
 
-version 1.0.5
+version 1.0.6
 
 =head1 SYNOPSIS
 

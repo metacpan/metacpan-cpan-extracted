@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object.pm
-## Version v0.3.1
+## Version v0.4.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/20
-## Modified 2023/11/06
+## Modified 2024/04/20
 ## All rights reserved
 ## 
 ## 
@@ -34,7 +34,7 @@ BEGIN
     use JSON;
     use Module::Generic::File qw( file );
     use Scalar::Util ();
-    our $VERSION = 'v0.3.1';
+    our $VERSION = 'v0.4.0';
     our $DICT = {};
     our $LINK_ELEMENTS = {};
     our $FATAL_ERROR = 0;
@@ -56,7 +56,7 @@ use warnings;
         {
             my $json = $tags_repo->load_utf8 ||
                 die( "Unable to open html tags json dictionary \"$tags_repo\": ", $tags_repo->error, "\n" );
-            my $j = JSON->new->relaxed->utf8;
+            my $j = JSON->new->relaxed;
             my $hash = $j->decode( $json );
             die( "No html tags found inside dictionary file \"$tags_repo\"\n" ) if( !scalar( keys( %{$hash->{dict}} ) ) );
             $DICT = $hash->{dict};
@@ -555,6 +555,7 @@ sub parse_data
     my $self = shift( @_ );
     my $html = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
+    $html = "$html";
     # try-catch
     local $@;
     eval
@@ -607,6 +608,8 @@ sub parse_file
     my $self = shift( @_ );
     my $file = shift( @_ ) || return( $self->error( "No file to parse was provided." ) );
     my $opts = $self->_get_args_as_hash( @_ );
+    # On, by default, if not provided
+    $opts->{utf8} //= 1;
     my $f = $self->new_file( $file );
     if( !$f->exists )
     {
@@ -872,7 +875,7 @@ To enable fatal error and also implement try-catch (using L<Nice::Try>) :
 
 =head1 VERSION
 
-    v0.3.1
+    v0.4.0
 
 =head1 DESCRIPTION
 

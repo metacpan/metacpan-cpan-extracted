@@ -2,17 +2,16 @@
 use utf8;
 use Test::More;
 use Crypt::OpenSSL::Base::Func qw/bn_mod_sqrt/;
+use Crypt::OpenSSL::Bignum;
+use Data::Dumper;
 
-my $p = '05';
-my $a = '04';
+my $p = Crypt::OpenSSL::Bignum->new_from_hex('05');
+my $a = Crypt::OpenSSL::Bignum->new_from_hex('04');
 my $s = bn_mod_sqrt($a, $p);
-print "find ($s)^2 = $a mod $p\n";
-ok($s eq '03');
+ok($s->to_hex eq '03');
 
-
-$a = '02';
-$s = bn_mod_sqrt($a, $p);
-print "find ($s)^2 = $a mod $p\n";
-ok($s eq '');
+my $b = Crypt::OpenSSL::Bignum->new_from_hex('02');
+my $z = bn_mod_sqrt($b, $p);
+ok($z, undef);
 
 done_testing();

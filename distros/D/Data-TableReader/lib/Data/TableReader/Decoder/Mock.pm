@@ -7,7 +7,7 @@ require MRO::Compat if $] < '5.010';
 extends 'Data::TableReader::Decoder';
 
 # ABSTRACT: Decoder that returns supplied data without decoding anything
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 
 sub BUILDARGS {
@@ -45,8 +45,7 @@ sub iterator {
 		sub {
 			my $slice= shift;
 			return undef unless $row < $rowmax;
-			++$row;
-			my $datarow= $table->[$row];
+			my $datarow= $table->[++$row];
 			return [ @{$datarow}[@$slice] ] if $slice;
 			return $datarow;
 		},
@@ -57,7 +56,7 @@ sub iterator {
 			row_ref => \$row,
 			colmax_ref => \$colmax,
 			rowmax_ref => \$rowmax,
-			origin => [ $table, $row ],
+			origin => [ 0, $row ],
 		}
 	);
 }
@@ -69,7 +68,11 @@ BEGIN { @Data::TableReader::Decoder::Mock::_Iter::ISA= ('Data::TableReader::Iter
 
 sub Data::TableReader::Decoder::Mock::_Iter::position {
 	my $f= shift->_fields;
-	'row '.${ $f->{row_ref} };
+	'row '.(1 + ${ $f->{row_ref} });
+}
+
+sub Data::TableReader::Decoder::Mock::_Iter::row {
+	1 + ${ shift->_fields->{row_ref} };
 }
 
 sub Data::TableReader::Decoder::Mock::_Iter::progress {
@@ -120,7 +123,7 @@ Data::TableReader::Decoder::Mock - Decoder that returns supplied data without de
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

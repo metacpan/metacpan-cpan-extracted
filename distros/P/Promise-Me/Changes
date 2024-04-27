@@ -1,10 +1,14 @@
 Revision history for Perl module Promise::Me
 
+v0.4.11 2024-04-25T23:38:38+0900
+    - Minor corrections in resolve to pass the variable $_ to the sub routine called in then()
+    - Improvements allowing embedded promises
+
 v0.4.10 2024-03-22T16:50:25+0900
+    - Improved unit tests
 
 v0.4.9 2024-03-22T14:04:36+0900
     - Minor correction of untrapped condition
-    - Improved unit tests
 
 v0.4.8 2023-10-11T21:11:43+0900
     - Corrected malformed signature for distribution release

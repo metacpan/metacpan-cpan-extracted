@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/XQuery.pm
-## Version v0.2.2
+## Version v0.3.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/01
-## Modified 2023/11/06
+## Modified 2024/04/20
 ## All rights reserved
 ## 
 ## 
@@ -20,7 +20,7 @@ BEGIN
     use vars qw( @EXPORT $DEBUG $VERSION );
     our @EXPORT = qw( xq );
     our $DEBUG = 0;
-    our $VERSION = 'v0.2.2';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -58,7 +58,7 @@ BEGIN
     );
     our $XP;
     # As perl jQuery documentation
-    our $LOOK_LIKE_HTML = qr/^[[:blank:]\h]*\<\w+.*?\>/;
+    our $LOOK_LIKE_HTML = qr/^[[:blank:]\h\v]*\<\w+.*?\>/;
 };
 
 no warnings 'redefine';
@@ -149,7 +149,7 @@ sub add
     return( $collection );
 }
 
-## To make it look like really like jQuery
+# To make it look like really like jQuery
 sub addClass
 {
     my( $self, $class ) = @_;
@@ -206,6 +206,558 @@ sub addClass
 
 # <https://api.jquery.com/after/>
 sub after { return( shift->_before_after( @_, { action => 'after' } ) ); }
+
+sub ajax
+{
+    my $self = shift( @_ );
+    my $url = shift( @_ ) ||
+        return( $self->error( "No URL was provided." ) );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{async} //= 1;
+    $opts->{cache} = 0;
+    $opts->{processData} //= 1;
+    $opts->{debug} //= 0;
+    $self->_load_class( 'HTTP::Promise', { version => 'v0.5.0' } ) ||
+        return( $self->pass_error );
+    $self->_load_class( 'HTTP::Promise::Request' ) ||
+        return( $self->pass_error );
+    $self->_load_class( 'URI', { version => '5.21' } ) ||
+        return( $self->pass_error );
+    if( !$self->_is_empty( $opts->{url} ) )
+    {
+        $url = $opts->{url};
+    }
+    my $uri = URI->new( "$url" );
+    # Contextual URL that requires a base URL.
+    # We check for documentURI of the root element, if any
+    my( $doc_root, $doc_uri );
+    if( ( substr( $url, 0, 1 ) eq '/' ||
+          substr( $url, 0, 2 ) eq './' ||
+          substr( $url, 0, 3 ) eq '../' ) &&
+        ( $doc_root = $self->getRootNode ) &&
+        $doc_root->isa( 'HTML::Object::DOM::Document' ) &&
+        ( $doc_uri = $doc_root->documentURI ) )
+    {
+        $uri = $doc_uri->clone;
+        $uri->path( $url );
+    }
+    # !contents
+    # !context
+    # converters
+    # !crossDomain
+    # NOTE dataType
+    my $dataType;
+    $dataType = $opts->{dataType} if( !$self->_is_empty( $opts->{dataType} ) );
+    # NOTE error
+    my $error;
+    if( $self->_is_code( $opts->{error} ) )
+    {
+        $error = [$opts->{error}];
+    }
+    elsif( $self->_is_array( $opts->{error} ) )
+    {
+        for( my $i = 0; $i < scalar( @{$opts->{error}} ); $i++ )
+        {
+            my $this = $opts->{error}->[$i];
+            if( !$self->_is_code( $opts->{error}->[$i] ) )
+            {
+                return( $self->error( "Value provided at offset $i with the 'error' argument to ajax method, is not a code reference." ) );
+            }
+        }
+        $error = $opts->{error};
+    }
+    # NOTE headers
+    my $headers = ( ( exists( $opts->{headers} ) && ref( $opts->{headers} // '' ) eq 'HASH' ) ? $opts->{headers} : {} );
+    unless( exists( $headers->{X_Requested_With} ) || exists( $headers->{ 'X-Requested-With' } ) )
+    {
+        $headers->{X_Requested_With} = 'XMLHttpRequest';
+    }
+    # !global
+    # !isLocal
+    # !jsonp
+    # !jsonpCallback
+    my $params =
+    {
+        use_promise => ( $opts->{async} ? 1 : 0 ),
+        # NOTE timeout
+        ( $self->_is_integer( $opts->{timeout} ) ? ( timeout => $opts->{timeout} ) : () ),
+        ( ( $self->_is_integer( $opts->{debug} ) && $opts->{debug} ) ? ( debug => $opts->{debug} ) : () ),
+    };
+    # NOTE accepts
+    if( !$self->_is_empty( $opts->{accepts} ) )
+    {
+        $headers->{accept} = $opts->{accepts};
+    }
+    elsif( !$self->_is_empty( $opts->{accept} ) )
+    {
+        $headers->{accept} = $opts->{accept};
+    }
+    # NOTE contentType
+    if( !$self->_is_empty( $opts->{contentType} ) )
+    {
+        $headers->{Content_Type} = $opts->{contentType};
+    }
+    # NOTE ifModified
+    if( exists( $opts->{ifModified} ) &&
+        ref( $opts->{ifModified} ) eq 'HASH' )
+    {
+        my $ifmod = $opts->{ifModified};
+        if( exists( $ifmod->{since} ) &&
+            defined( $ifmod->{since} ) &&
+            CORE::length( $ifmod->{since} ) )
+        {
+            my $dt;
+            if( $ifmod->{since} =~ /^\d{10}$/ )
+            {
+                # try-catch
+                local $@;
+                $dt = eval
+                {
+                    DateTime->from_epoch( epoch => $ifmod->{since} );
+                };
+                if( $@ )
+                {
+                    return( $self->error( "Error with the timestamp provided for the option ifModified: $@" ) );
+                }
+            }
+            elsif( $self->_is_a( $ifmod->{since} => [qw( DateTime Module::Generic::DateTime )] ) )
+            {
+                $dt = $ifmod->{since};
+            }
+            else
+            {
+                return( $self->error( "Unsupported value provided to option ifModified->since: '", ( $ifmod->{since} // 'undef' ), "'" ) );
+            }
+
+            $self->_load_class( 'DateTime::Format::Strptime' ) ||
+                return( $self->pass_error );
+            $dt->set_time_zone( 'GMT' );
+            my $fmt = DateTime::Format::Strptime->new(
+                pattern => '%a, %d %b %Y %H:%M:%S GMT',
+                locale  => 'en_GB',
+                time_zone => 'GMT',
+            );
+            $dt->set_formatter( $fmt );
+            $headers->{If_Modified_Since} = $dt;
+        }
+        if( exists( $ifmod->{etag} ) &&
+            defined( $ifmod->{etag} ) &&
+            CORE::length( $ifmod->{etag} ) )
+        {
+            if( $ifmod->{etag} =~ /^[\w\-]+$/ )
+            {
+                $headers->{If_None_Match} = '"' . $ifmod->{etag} . '"';
+            }
+            # Useless to use the weak prefix since If-None-Match only uses the weak algorithm
+            elsif( $ifmod->{etag} =~ m,W/"^[\w\-]+"$, )
+            {
+                $headers->{If_None_Match} = $ifmod->{etag};
+            }
+            else
+            {
+                return( $self->error( "The etag provided for the option ifModified->etag contains illegal characters." ) );
+            }
+        }
+    }
+    # !isLocal
+    # !jsonp
+    # NOTE method, type
+    my $method = 'get';
+    $opts->{method} = $opts->{type} if( !$self->_is_empty( $opts->{method} ) && !$self->_is_empty( $opts->{type} ) );
+    if( exists( $opts->{method} ) &&
+        defined( $opts->{method} ) &&
+        CORE::length( $opts->{method} // '' ) )
+    {
+        if( $opts->{method} =~ /^(get|head|options|patch|post|put)$/i )
+        {
+            $method = lc( $1 );
+        }
+        else
+        {
+            return( $self->error( "Unsupported HTTP method '$opts->{method}'" ) );
+        }
+    }
+    # NOTE data, processData
+    my $data;
+    if( $opts->{data} )
+    {
+        if( $opts->{processData} )
+        {
+            $headers->{Content} = $data;
+        }
+        else
+        {
+            $headers->{Content} = "$data";
+        }
+    }
+    else
+    {
+    }
+
+    # NOTE mimeType
+    if( !$self->_is_empty( $opts->{mimeType} ) )
+    {
+        $headers->{Content_Type} = $opts->{mimeType};
+    }
+    # !scriptAttrs
+    # !scriptCharset
+    # NOTE statusCode
+    my $statusCode;
+    if( exists( $opts->{statusCode} ) &&
+        defined( $opts->{statusCode} ) &&
+        ref( $opts->{statusCode} // '' ) eq 'HASH' )
+    {
+        foreach my $c ( sort( keys( %{$opts->{statusCode}} ) ) )
+        {
+            if( !defined( $c ) || !CORE::length( "$c" // '' ) )
+            {
+                return( $self->error( "The code value provided in the option statusCode is empty!" ) );
+            }
+            elsif( "$c" !~ /^\d{3}$/ )
+            {
+                return( $self->error( "The code value provided (${c}) is invalid. It should be a 3 digits code, such as 200" ) );
+            }
+
+            my $code_ref = $opts->{statusCode}->{ $c };
+            if( !$self->_is_code( $code_ref ) )
+            {
+                return( $self->error( "The value provided for status code '${c}' is not a code reference." ) );
+            }
+        }
+        $statusCode = $opts->{statusCode};
+    }
+    # NOTE success
+    my $success;
+    if( exists( $opts->{success} ) )
+    {
+        if( $self->_is_code( $opts->{success} ) )
+        {
+            $success = $opts->{success};
+        }
+        else
+        {
+            return( $self->error( "The success callback provided is not a code reference." ) );
+        }
+    }
+    # !traditional
+
+    my $http = HTTP::Promise->new( %$params ) ||
+        return( $self->pass_error( HTTP::Promise->error ) );
+    my $req = $http->prepare( $method => $uri, %$headers ) ||
+        return( $self->pass_error( $http->error ) );
+    if( exists( $opts->{xhr} ) && defined( $opts->{xhr} ) )
+    {
+        if( $self->_is_code( $opts->{xhr} ) )
+        {
+            my $code_ref = $opts->{xhr};
+            # try-catch
+            local $@;
+            my $this = eval
+            {
+                $code_ref->( $req );
+            };
+            if( $@ )
+            {
+                return( $self->error( "An error occurred while calling the callback code reference for xhr: $@" ) ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
+            }
+            if( $self->_is_a( $this => 'HTTP::Promise::Request' ) )
+            {
+                $req = $this;
+            }
+            else
+            {
+                return( $self->error( "The value returned by the callback (", overload::StrVal( $this // '' ), ") is not an HTTP::Promise::Request object." ) );
+            }
+        }
+        else
+        {
+            return( $self->error( "The value provided for the xhr callback is not a code reference." ) );
+        }
+    }
+
+    # NOTE password & username
+    if( !$self->_is_empty( $opts->{password} ) ||
+        !$self->_is_empty( $opts->{username} ) )
+    {
+        $req->headers->authorization_basic( ( $opts->{username} // '' ), ( $opts->{password} // '' ) );
+    }
+    # NOTE beforeSend
+    my $beforeSend = ( $self->_is_code( $opts->{beforeSend} ) ? $opts->{beforeSend} : sub{ $_[0] } );
+    my $complete;
+    if( $self->_is_code( $opts->{complete} ) )
+    {
+        $complete = [$opts->{complete}];
+    }
+    elsif( $self->_is_array( $opts->{complete} ) )
+    {
+        for( my $i = 0; $i < scalar( @{$opts->{complete}} ); $i++ )
+        {
+            my $this = $opts->{complete}->[$i];
+            if( !$self->_is_code( $opts->{complete}->[$i] ) )
+            {
+                return( $self->error( "Value provided at offset $i with the 'complete' argument to ajax method, is not a code reference." ) );
+            }
+        }
+        $complete = $opts->{complete};
+    }
+    
+    # NOTE dataFilter
+    my $dataFilter = ( $self->_is_code( $opts->{dataFilter} ) ? $opts->{dataFilter} : sub{ $_[0] } );
+    my $code2status = sub
+    {
+        my $resp = shift( @_ );
+        my $code = $resp->code;
+        if( $code == 200 )
+        {
+            return( 'success' );
+        }
+        elsif( $code == 204 )
+        {
+            return( 'nocontent' );
+        }
+        elsif( $code == 304 )
+        {
+            return( 'notmodified' );
+        }
+        elsif( $code == 408 )
+        {
+            return( 'timeout' );
+        }
+        elsif( $code >= 400 && $code <= 599 )
+        {
+            return( 'error' );
+        }
+        else
+        {
+            return( 'success' );
+        }
+    };
+
+    my $process = sub
+    {
+        my $resp = shift( @_ );
+        my( $resolve, $reject ) = @_;
+        my $status = $code2status->( $resp );
+        my $code = $resp->code;
+        # TODO: converters
+        my $content = $resp->decoded_content;
+        $content = $dataFilter->( $content );
+        my $decoded;
+        unless( defined( $dataType ) )
+        {
+            my $type = $resp->headers->type;
+            if( defined( $type ) )
+            {
+                if( $type =~ m,^application/json,i )
+                {
+                    $dataType = 'json';
+                }
+                elsif( $type =~ m,^text/html,i )
+                {
+                    $dataType = 'html';
+                }
+                elsif( $type =~ m,^text/xml,i )
+                {
+                    $dataType = 'xml';
+                }
+                elsif( $type =~ m,^text/plain,i )
+                {
+                    $dataType = 'text';
+                }
+                else
+                {
+                    $dataType = 'application/octet-stream';
+                }
+            }
+        }
+
+        if( defined( $dataType ) )
+        {
+            if( ( $dataType eq 'json' ||
+                  $dataType eq 'jsonp' ) &&
+                defined( $content ) )
+            {
+                my $j = $self->new_json->relaxed->utf8;
+                # try-catch
+                local $@;
+                $decoded = eval
+                {
+                    $j->decode( "$content" );
+                };
+                if( $@ )
+                {
+                    $self->error( "Error decoding ", CORE::length( $content ), " bytes of JSON data: $@" );
+                    if( defined( $reject ) )
+                    {
+                        return({ error => $self->error });
+                    }
+                    else
+                    {
+                        return( $self->pass_error );
+                    }
+                }
+                else
+                {
+                    # $resolve->( $decoded );
+                    $content = $decoded;
+                }
+            }
+        }
+        else
+        {
+            # Hmm, dataType is still undefined
+        }
+
+        if( defined( $statusCode ) )
+        {
+            my $code_ref = $statusCode->{ $code };
+            # try-catch
+            local $@;
+            eval
+            {
+                $code_ref->( $content, $status, $resp, $http );
+            };
+            if( $@ )
+            {
+                warn( "Error calling statusCode callback for code '${code}': $@" ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
+            }
+        }
+
+        if( defined( $complete ) )
+        {
+            foreach my $coderef ( @$complete )
+            {
+                $coderef->( $resp, $status, $http );
+            }
+        }
+
+        if( defined( $success ) )
+        {
+            # try-catch
+            local $@;
+            eval
+            {
+                $success->( $content, $status, $resp, $http );
+            };
+            if( $@ )
+            {
+                warn( "Error calling success callback: $@" ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
+            }
+        }
+        if( defined( $error ) && ( $code >= 400 && $code < 600 ) )
+        {
+            my $status = $resp->status;
+            for( my $i = 0; $i < scalar( @$error ); $i++ )
+            {
+                my $code_ref = $error->[$i];
+                # try-catch
+                local $@;
+                eval
+                {
+                    # No exception object, because this is just a regular HTTP error
+                    $code_ref->( $req, $status );
+                };
+                if( $@ )
+                {
+                    warn( "An error occurred while calling the error callback at offset $i: $@" ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
+                }
+            }
+        }
+        return({
+            content => $content,
+            status  => $status,
+            resp    => $resp,
+            http    => $http,
+        });
+    };
+
+    if( $params->{use_promise} )
+    {
+        my $p;
+        $p = Promise::Me->new(sub
+        {
+            my( $resolve_main, $reject_main ) = @$_;
+            # NOTE: Process beforeSend for asynchronous process
+            my $this = $beforeSend->( $req );
+            if( !defined( $this ) || !CORE::length( $this // '' ) )
+            {
+                return( $resolve_main->( '', 'abort', undef, $http ) );
+            }
+            elsif( !$self->_is_a( $this => 'HTTP::Promise::Request' ) )
+            {
+                $self->error( "Value returned by the beforeSend callback is not an HTTP::Promise::Request object." );
+                my $err = $self->error;
+                return( $reject_main->( $err ) );
+            }
+            $req = $this;
+            my $prom = $http->request( $req, 
+                ( defined( $opts->{promise_debug} ) ? ( promise_debug => $opts->{promise_debug} ) : () ),
+            )->then(sub
+            {
+                my( $resolve, $reject ) = @$_;
+                my $resp = shift( @_ );
+                if( !$resp )
+                {
+                    return( $reject_main->( $http->error ) );
+                }
+                my $res = $process->( $resp, $resolve_main, $reject_main );
+                if( $res->{error} )
+                {
+                    return( $reject_main->( $res->{error} ) );
+                }
+                return( $resolve_main->( @$res{qw( content status resp http )} ) );
+            })->catch(sub
+            {
+                my $err = shift( @_ );
+                if( defined( $error ) )
+                {
+                    my $status = 'error';
+                    for( my $i = 0; $i < scalar( @$error ); $i++ )
+                    {
+                        my $code_ref = $error->[$i];
+                        # try-catch
+                        local $@;
+                        eval
+                        {
+                            $code_ref->( $req, $status, $err );
+                        };
+                        if( $@ )
+                        {
+                            warn( "An error occurred while calling the error callback at offset $i: $@" ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
+                        }
+                    }
+                }
+                return( $reject_main->( $err ) );
+            });
+            return( $reject_main->( $http->error ) ) if( !$prom );
+            # return(1);
+            return( $prom );
+        },
+        {
+            ( defined( $opts->{promise_debug} ) ? ( debug => $opts->{promise_debug} ) : () ),
+        });
+        return( $p );
+    }
+    # No promise
+    else
+    {
+        # NOTE: Process beforeSend for synchronous process
+        my $this = $beforeSend->( $req );
+        if( !defined( $this ) || !CORE::length( $this // '' ) )
+        {
+            return( '', 'abort', undef, $http );
+        }
+        elsif( !$self->_is_a( $this => 'HTTP::Promise::Request' ) )
+        {
+            return( $self->error( "Value returned by the beforeSend callback is not an HTTP::Promise::Request object." ) );
+        }
+        $req = $this;
+        my $resp = $http->request( $req );
+        my $res = $process->( $resp );
+        return( $self->pass_error ) if( $res->{error} );
+        return( @$res{qw( content status resp http )} );
+    }
+}
 
 # Takes html string (start with <tag...), text object (HTML::Object::DOM::Text), array or element object
 # or alternatively a code reference that returns the above
@@ -958,6 +1510,172 @@ sub first
 # this does not mean much, and we return our own object.
 sub get { return( $_[0] ); }
 
+sub getDataJson
+{
+    my $self = shift( @_ );
+    my $dataName = shift( @_ ) ||
+        return( $self->error( "No data name was provided to get its JSON object" ) );
+    my $el;
+    if( $self->isa_collection )
+    {
+        $el = $self->children->first;
+        return({}) if( !$el );
+    }
+    else
+    {
+        $el = $self;
+    }
+    my $json;
+    my $shortName = $dataName;
+    if( substr( $dataName, 0, 5 ) eq 'data-' )
+    {
+        $shortName = substr( $dataName, 5, length( $dataName ) );
+    }
+    my $data = $self->data( $shortName );
+    return({}) if( !defined( $data ) || !length( $data // '' ) );
+    if( ref( $data ) eq 'HASH' )
+    {
+        $json = $data;
+    }
+    else
+    {
+        # Taken from URI::Escape
+        my $decodeURIComponent = sub
+        {
+            my $str = shift( @_ );
+            if( @_ && wantarray )
+            {
+                # not executed for the common case of a single argument
+                # need to copy
+                my @str = ( $str, @_ );
+                for( @str )
+                {
+                    s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+                }
+                return( @str );
+            }
+            $str =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg if( defined( $str ) );
+            return( $str );
+        };
+        # try-catch
+        local $@;
+        eval
+        {
+            my $j = $self->new_json;
+            if( index( $data, '{' ) != -1 )
+            {
+                $json = $j->decode( $data );
+            }
+            else
+            {
+                $json = $j->decode( $decodeURIComponent->( $data ) );
+            }
+        };
+        if( $@ )
+        {
+            return( $self->error( "An error occurred while trying to decode the json data: $@" ) );
+        }
+        # Replace parsed json string by its object representation
+        $self->data( $shortName => $json );
+    }
+    return( $json );
+}
+
+sub getJSON
+{
+    my $self = shift( @_ );
+    my $url = shift( @_ ) || return( $self->error( "No URL was provided." ) );
+    my @args = @_;
+    my( $data, $success );
+    for( my $i = 0; $i < scalar( @args ); $i++ )
+    {
+        if( !defined( $data ) && ref( $args[$i] // '' ) eq 'HASH' )
+        {
+            $data = $args[$i];
+        }
+        elsif( !defined( $success ) && ref( $args[$i] // '' ) eq 'CODE' )
+        {
+            $success = $args[$i];
+        }
+    }
+
+    $self->_load_class( 'Promise::Me' ) || return( $self->pass_error );
+    if( lc( substr( "$url", 0, 7 ) ) eq 'file://' )
+    {
+        $self->_load_class( 'HTTP::Promise::Response' ) || return( $self->pass_error );
+        return( Promise::Me->new(sub
+        {
+            my( $resolve, $reject ) = @$_;
+            my $f = $self->new_file( $url ) || return( $reject->( $self->error ) );
+            if( $f->exists )
+            {
+                my $ref = $f->load_json || return( $reject->( $f->error ) );
+                my $resp2 = HTTP::Promise::Response->new( 200 => 'OK' );
+                if( defined( $success ) )
+                {
+                    my $ua = HTTP::Promise->new;
+                    $success->( $ref, 'success', $resp2, $ua );
+                }
+                return( $resolve->( $ref, 'success', $resp2 ) );
+            }
+            else
+            {
+                my $resp2 = HTTP::Promise::Response->new( 404 => 'Not found' );
+                my $err = "File $url is not found.";
+                if( defined( $success ) )
+                {
+                    my $ua = HTTP::Promise->new;
+                    $success->( $err, 'error', $resp2, $ua );
+                }
+                $self->error({
+                    code => 404,
+                    message => $err,
+                });
+                my $ex = $self->error;
+                return( $reject->( $ex ) );
+            }
+        }) );
+    }
+    else
+    {
+        return( Promise::Me->new(sub
+        {
+            my( $resolve, $reject ) = @$_;
+            my( $uri, $doc_root, $doc_uri );
+            if( lc( substr( $url, 0, 7 ) ) eq 'http://' ||
+                lc( substr( $url, 0, 7 ) ) eq 'http://' )
+            {
+                $uri = $url;
+            }
+            # Contextual URL that requires a base URL.
+            # We check for documentURI of the root element, if any
+            elsif( ( substr( $url, 0, 1 ) eq '/' ||
+                   substr( $url, 0, 2 ) eq './' ||
+                   substr( $url, 0, 3 ) eq '../' ) &&
+                   ( $doc_root = $self->getRootNode ) &&
+                   $doc_root->isa( 'HTML::Object::DOM::Document' ) &&
+                   ( $doc_uri = $doc_root->documentURI ) )
+            {
+                $uri = $doc_uri->clone;
+                $uri->path( $url );
+            }
+            else
+            {
+                $self->error( "Unsupported URL '${url}'" );
+                return( $reject->( $self->error ) );
+            }
+            $self->ajax( $uri,
+                dataType => 'json',
+                ( defined( $data ) ? ( data => $data ) : () ),
+                ( defined( $success ) ? ( success => $success ) : () ),
+            )->catch(sub
+            {
+                return( $reject->( @_ ) );
+            });
+        }) );
+    }
+}
+
 sub has
 {
     my $self = shift( @_ );
@@ -1157,10 +1875,11 @@ sub html
             return( $self->error( "I was expecting some html data or a code reference in replacement of html for this element \"", $self->tag, "\", but instead got '$this'." ) );
         }
         
-        $self->children->for(sub
+        my $is_code = ref( $this ) eq 'CODE' ? 1 : 0;
+        my $process = sub
         {
-            my( $i, $e ) = @_;
-            if( ref( $this ) eq 'CODE' )
+            my( $e, $i ) = @_;
+            if( $is_code )
             {
                 my $current_html = $e->as_string;
                 my $html = $this->( $i, $current_html );
@@ -1183,7 +1902,7 @@ sub html
                     {
                         $_->parent( $e );
                     });
-                    $self->reset(1);
+                    $e->reset(1);
                     return(1);
                 }
                 elsif( ref( $html ) &&
@@ -1205,7 +1924,7 @@ sub html
                 {
                     $_->parent( $e );
                 });
-                $self->reset(1);
+                $e->reset(1);
             }
             # It's an HTML::Object::DOM::Document object
             else
@@ -1216,10 +1935,24 @@ sub html
                     $a->push( $_->clone );
                 });
                 $e->children( $a );
+                $e->reset(1);
             }
-            # Return true at the end to satisfy Module::Generic::Array->for
-            return(1);
-        });
+        };
+
+        if( $self->isa_collection )
+        {
+            $self->children->for(sub
+            {
+                my( $i, $e ) = @_;
+                $process->( $e, $i );
+                # Return true at the end to satisfy Module::Generic::Array->for
+                return(1);
+            });
+        }
+        else
+        {
+            $process->( $self, 0 );
+        }
     }
     else
     {
@@ -1515,6 +2248,7 @@ sub load
         $opts = pop( @_ );
     }
     
+    return( $self->error( "No url was provided to load data" ) ) if( !defined( $url ) || !CORE::length( "$url" ) );
     if( !defined( $complete ) && defined( $data ) && ref( $data ) eq 'CODE' )
     {
         $complete = $data;
@@ -1522,11 +2256,11 @@ sub load
     }
     if( defined( $data ) && ref( $data ) ne 'HASH' )
     {
-        return( $self->error( "Data to be submitted to $url was provided, but I was expecting an hash reference and I got '$data'" ) );
+        return( $self->error( "Data to be submitted to $url was provided, but I was expecting an hash reference and I got '", overload::StrVal( $data ), "'" ) );
     }
     if( defined( $complete ) && ref( $complete ) ne 'CODE' )
     {
-        return( $self->error( "A callback parameter was provided, and I was expecting a code reference, such as an anonymous subroutine, but instead I got '$complete'" ) );
+        return( $self->error( "A callback parameter was provided, and I was expecting a code reference, such as an anonymous subroutine, but instead I got '", overload::StrVal( $complete ), "'" ) );
     }
     
     # No need to go further if there is nothing in our collection
@@ -1548,16 +2282,16 @@ sub load
     # Ultimately, if the callback is not set, we set a dummy one instead
     $complete = sub{1} if( !defined( $complete ) );
     
-    return( $self->error( "No url was provided to load data" ) ) if( !defined( $url ) || !CORE::length( "$url" ) );
-    if( !$self->_load_class( 'LWP::UserAgent', { version => '6.49' } ) )
+    if( !$self->_load_class( 'HTTP::Promise', { version => 'v0.5.0' } ) )
     {
-        return( $self->error( "LWP::UserAgent version 6.49 or higher is required to use load()" ) );
+        return( $self->error( "HTTP::Promise version v0.5.0 or higher is required to use load()" ) );
     }
     if( !$self->_load_class( 'URI', { version => '1.74' } ) )
     {
         return( $self->error( "URI version 1.74 or higher is required to use load()" ) );
     }
     $opts->{timeout} //= 10;
+    $opts->{agent} ||= "HTML::Object/$VERSION";
     # "If one or more space characters are included in the string, the portion of the string following the first space is assumed to be a jQuery selector that determines the content to be loaded."
     # e.g.: $( "#new-projects" )->load( "/resources/load.html #projects li" );
     # <https://api.jquery.com/load/#load-url-data-complete>
@@ -1577,13 +2311,41 @@ sub load
     
     my $content;
     my $resp;
-    # try-catch
-    eval
+    my @http_options = qw(
+        accept_encoding accept_language auto_switch_https cookie_jar dnt max_redirect
+        proxy
+    );
+    my $params = {};
+    foreach my $k ( @http_options )
     {
-        my $ua = LWP::UserAgent->new(
-            agent   => "HTML::Object/$VERSION",
-            timeout => $opts->{timeout},
-        );
+        if( exists( $opts->{ $k } ) &&
+            defined( $opts->{ $k } ) &&
+            CORE::length( $opts->{ $k } ) )
+        {
+            $params->{ $k } = $opts->{ $k };
+        }
+    }
+    $params->{use_promise} = 0;
+    # try-catch
+    my $ua = HTTP::Promise->new( %$params );
+    
+    # Contextual URL that requires a base URL.
+    # We check for documentURI of the root element, if any
+    my( $doc_root, $doc_uri );
+    if( ( substr( $uri, 0, 1 ) eq '/' ||
+           substr( $uri, 0, 2 ) eq './' ||
+           substr( $uri, 0, 3 ) eq '../' ) &&
+           ( $doc_root = $self->getRootNode ) &&
+           $doc_root->isa( 'HTML::Object::DOM::Document' ) &&
+           ( $doc_uri = $doc_root->documentURI ) )
+    {
+        my $clone = $doc_uri->clone;
+        $clone->path( $uri );
+        $uri = $clone;
+    }
+
+    if( $uri->scheme eq 'http' || $uri->scheme eq 'https' )
+    {
         # "The POST method is used if data is provided as an object; otherwise, GET is assumed."
         # <https://api.jquery.com/load/#load-url-data-complete>
         if( defined( $data ) )
@@ -1595,38 +2357,80 @@ sub load
             $resp = $ua->get( $uri, ( ref( $opts->{headers} ) eq 'HASH' && scalar( keys( %{$opts->{headers}} ) ) ) ? %{$opts->{headers}} : () );
         }
         
+        if( !$resp )
+        {
+            $self->_load_class( 'HTTP::Promise::Response' ) || return( $self->pass_error );
+            my $err = "Error trying to get url \"${url}\": " . ( $ua->error ? $ua->error->message : 'unknown' );
+            my $resp2 = HTTP::Promise::Response->new( 500, "Unexpected error", [], $err );
+            $complete->( $err, 'error', $resp2, $ua );
+            return( $self->error({
+                code => 500,
+                message => $err,
+            }) );
+        }
         $content = $resp->decoded_content;
-    };
-    if( $@ )
+        
+        if( $resp->header( 'Client-Warning' ) || !$resp->is_success )
+        {
+            $complete->( $content, 'error', $resp, $ua );
+            return( $self->error({
+                code => $resp->code,
+                message => $resp->message,
+            }) );
+        }
+    }
+    elsif( $uri->scheme eq 'file' )
     {
-        require HTTP::Response;
-        my $err = "Error trying to get url \"$url\": $@";
-        my $resp2 = HTTP::Response->new( 500, "Unexpected error", [], $err );
-        $complete->( $err, 'error', $resp2 );
+        $self->_load_class( 'HTTP::Promise::Response' ) || return( $self->pass_error );
+        my $f = $self->new_file( $uri ) || return( $self->pass_error );
+        if( $f->exists )
+        {
+            $resp = HTTP::Promise::Response->new( 200 => 'OK' );
+            $content = $f->load;
+        }
+        else
+        {
+            my $resp2 = HTTP::Promise::Response->new( 404 => 'Not found' );
+            my $err = "File $uri is not found.";
+            $complete->( $err, 'error', $resp2, $ua );
+            return( $self->error({
+                code => 404,
+                message => $err,
+            }) );
+        }
+    }
+    else
+    {
+        my $resp2 = HTTP::Promise::Response->new( 400 => 'Bad request' );
+        my $err = "The URL provided is unsupported.";
+        $complete->( $err, 'error', $resp2, $ua );
         return( $self->error({
-            code => 500,
+            code => 400,
             message => $err,
         }) );
     }
-    
-    if( $resp->header( 'Client-Warning' ) || !$resp->is_success )
+
+    my $new;
+    if( defined( $content ) && CORE::length( $content // '' ) )
     {
-        $complete->( $content, 'error', $resp );
-        return( $self->error({
-            code => $resp->code,
-            message => $resp->message,
-        }) );
+        my $parser = $self->new_parser;
+        # HTML::Object::DOM::Document
+        my $doc = $parser->parse_data( $content ) ||
+            return( $self->pass_error( $parser->error ) );
+        $new = $doc->children;
+        # "When this method executes, it retrieves the content of ajax/test.html, but then jQuery parses the returned document to find the element with an ID of container. This element, along with its contents, is inserted into the element with an ID of result, and the rest of the retrieved document is discarded."
+        if( defined( $target ) )
+        {
+            my $elem = $doc->find( $target ) || return( $self->pass_error( $doc->error ) );
+            # $new = $self->new_array( $elem );
+            $new = $elem->children;
+        }
     }
-    my $parser = $self->new_parser;
-    # HTML::Object::DOM::Document
-    my $doc = $parser->parse_data( $content );
-    my $new = $doc->children;
-    # "When this method executes, it retrieves the content of ajax/test.html, but then jQuery parses the returned document to find the element with an ID of container. This element, along with its contents, is inserted into the element with an ID of result, and the rest of the retrieved document is discarded."
-    if( defined( $target ) )
+    # The content returned is empty, so we cannot parse it, and instead we provide a HTML::Object::DOM::Text element with an empty value inside.
+    else
     {
-        my $elem = $doc->find( $target ) || return( $self->pass_error( $doc->error ) );
-        # $new = $self->new_array( $elem );
-        $new = $elem->children;
+        my $txt = $self->new_text( value => '' ) || return( $self->pass_error );
+        $new = $self->new_array( $txt );
     }
     
     # "If a "complete" callback is provided, it is executed after post-processing and HTML insertion has been performed. The callback is fired once for each element in the collection, and $_ is set to each DOM element in turn."
@@ -2425,6 +3229,100 @@ sub tagname
     return( $a );
 }
 
+# This method work for absolutely any element, including the root element (html)
+sub text
+{
+    my $self = shift( @_ );
+    my $this = shift( @_ );
+    # Mutator
+    if( defined( $this ) )
+    {
+        if( !ref( $this ) ||
+            ( ref( $this ) && overload::Overloaded( $this ) && overload::Method( $this, '""' ) ) )
+        {
+            $this = "$this";
+        }
+        elsif( ref( $this ) ne 'CODE' )
+        {
+            return( $self->error( "I was expecting some text data or a code reference in replacement of text for this element \"", $self->tag, "\", but instead got '$this'." ) );
+        }
+        
+        my $is_code = ref( $this ) eq 'CODE' ? 1 : 0;
+        my $process = sub
+        {
+            my( $e, $i ) = @_;
+            if( $is_code )
+            {
+                my $current_text = $e->as_text( unescape => 1 );
+                my $text = $this->( $i, $current_text );
+                if( !defined( $text ) || !CORE::length( $text ) )
+                {
+                    $e->empty();
+                    # Next please
+                    return(1);
+                }
+                elsif( ref( $text ) &&
+                       !( overload::Overloaded( $text ) && overload::Method( $text, '""' ) ) )
+                {
+                    warn( "I was provided a reference '$text' as a result from calling this code reference to get the replacement text for tag \"", $e->tag, "\", but I do not know what to do with it.\n" );
+                    return(1);
+                }
+                $text = "$text";
+                $text =~ s/</\&lt;/gs;
+                $text =~ s/>/\&gt;/gs;
+                $text =~ s,\n,<br />\n,gs;
+                if( $self->isa( 'HTML::Object::DOM::Comment' ) ||
+                    $self->isa( 'HTML::Object::DOM::Text' ) )
+                {
+                    $self->value( $text );
+                }
+                else
+                {
+                    my $new = $self->new_text( value => $text, parent => $self );
+                    # If this is an empty tag, such as <input /> or <img />, the text cannot be added to it.
+                    # jQuery actually accepts the text and attach it to the element as a child, but the web browser does not show it, because it is an empty element.
+                    # Since this is not a web browser interface, we need to silently ignore it, so it does not end up in the DOM and turn an empty tag into a tag with children and a closing tag, which would be an heresy.
+                    if( !$e->is_empty )
+                    {
+                        $e->children->set( $new );
+                    }
+                }
+            }
+            else
+            {
+                my $new = $self->new_text( value => $this, parent => $e );
+                # See comment just above
+                if( !$e->is_empty )
+                {
+                    $e->children->set( $new );
+                }
+            }
+        };
+
+        if( $self->isa_collection )
+        {
+            $self->children->for(sub
+            {
+                my( $i, $e ) = @_;
+                $process->( $e, $i );
+                $e->reset(1);
+                # Return true at the end to satisfy Module::Generic::Array->for
+                return(1);
+            });
+        }
+        else
+        {
+            $process->( $self, 0 );
+            $self->reset(1);
+        }
+    }
+    # Accessor
+    else
+    {
+        return( $self->as_text( unescape => 1 ) );
+    }
+}
+
 # Takes a class name; or
 # class name and state (true or false); or
 # array of class names; or
@@ -2573,11 +3471,15 @@ sub xp
 sub xq
 {
     my( $this, $more ) = @_;
+    print( STDERR __PACKAGE__, "::xq: Argument provided is a reference ? ", ( ref( $this ) ? 'yes -> ' . ref( $this ) : 'no' ), "\n" ) if( $HTML::Object::XQuery::DEBUG >= 4 );
     # e.g. $('<div />', { id => 'pouec', class => 'hello' });
-    if( $this =~ /$LOOK_LIKE_HTML/ )
+    if( $this =~ /^$LOOK_LIKE_HTML/ )
     {
         print( STDERR __PACKAGE__, "::xq: Argument provided looks like ", CORE::length( $this ), " bytes of HTML, parsing it.\n" ) if( $HTML::Object::XQuery::DEBUG >= 4 );
         my $p = HTML::Object::DOM->new;
+        $this = "$this";
+        # We trim the string, so that leading and trailing space do not get counted
+        $this =~ s/^[[:blank:]\h\v]+|[[:blank:]\h\v]+$//gs;
         my $doc = $p->parse_data( $this ) || do
         {
             $! = $p->error;
@@ -2614,7 +3516,7 @@ sub xq
         }
         return( $collection );
     }
-    elsif( !ref( $this ) || ( overload::Overloaded( $this ) && overload::Method( $this, '""' ) ) )
+    elsif( ( !ref( $this ) || ( overload::Overloaded( $this ) && overload::Method( $this, '""' ) ) ) && CORE::index( "$this", "\n" ) == -1 )
     {
         print( STDERR __PACKAGE__, "::xq: Argument provided '$this' looks like a selector, searching for it.\n" ) if( $HTML::Object::XQuery::DEBUG >= 4 );
         # e.g. $('div')

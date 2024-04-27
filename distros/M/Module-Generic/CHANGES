@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Generic
 
+v0.35.5 2024-04-27T08:48:40+0900
+    - Minor correction in Module::Generic::File to better handle file:// URIs.
+
 v0.35.4 2024-04-26T13:55:12+0900
     - Minor improvements to Module::Generic::SharedMemXS
 

@@ -1,17 +1,19 @@
 #!/usr/bin/perl
 #use Digest::SHA qw/sha256/;
-use List::Util qw/min/;
 use strict;
 use warnings;
 
-#use lib '../lib';
+use FindBin;
+use List::Util qw/min/;
+
+#use lib "$FindBin::RealBin/../lib";
 
 use Test::More ;
 
 use Crypt::OpenSSL::EC;
 use Crypt::OpenSSL::Hash2Curve;
 use Crypt::OpenSSL::Base::Func;
-use Crypt::CPace ;
+use Crypt::CPace;
 
 # a, b with same info
 my $PRS = 'Password';
@@ -54,7 +56,7 @@ my $ISKa_order = prepare_ISK($DSI, $sid, $group, $ya, $MSGa, $MSGb, 1, 0, 'SHA25
 print "order isk a: ", unpack("H*", $ISKa_order), "\n";
 
 my $ISKa_unorder = prepare_ISK($DSI, $sid, $group, $ya, $MSGa, $MSGb, 1, 1, 'SHA256', $ctx);
-print "unorder isk: ", unpack("H*", $ISKa_unorder), "\n\n";
+print "unorder isk a: ", unpack("H*", $ISKa_unorder), "\n\n";
 
 # b recv Msga, calc ISK
 my $ISKb_order = prepare_ISK($DSI, $sid, $group, $yb, $MSGb, $MSGa, 0, 0, 'SHA256', $ctx);

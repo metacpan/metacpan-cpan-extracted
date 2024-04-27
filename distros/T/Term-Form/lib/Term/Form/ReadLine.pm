@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.556';
+our $VERSION = '0.557';
 use Exporter 'import';
 our @EXPORT_OK = qw( read_line );
 
@@ -208,25 +208,7 @@ sub __select_history {
     if ( none { $_ eq $current } @{$self->{history}} ) {
         $self->{i}{curr_string} = $current;
     }
-    my @history;
-    if ( any { $_ eq $current } @{$self->{i}{prev_filtered_history}//[]} ) {
-        @history = @{$self->{i}{prev_filtered_history}}
-    }
-    elsif ( any { $_ =~ /^\Q$current\E/i && $_ ne $current } @{$self->{history}} ) {
-        @history = grep { $_ =~ /^\Q$current\E/i && $_ ne $current } @{$self->{history}};
-        @{$self->{i}{prev_filtered_history}} = @history;
-        $self->{i}{history_idx} = @history;
-    }
-    else {
-        @history = @{$self->{history}};
-        if ( @{$self->{i}{prev_filtered_history}//[]} ) {
-            $self->{i}{prev_filtered_history} = [];
-            $self->{i}{history_idx} = @history;
-        };
-        if ( ! defined $self->{i}{history_idx} ) {
-            $self->{i}{history_idx} = @history;
-        }
-    }
+    my @history = @{$self->{history}};
     if ( ! defined $self->{i}{history_idx} ) {
         $self->{i}{history_idx} = @history;
         # first up-key pressed -> last history entry and not curr_string
@@ -501,7 +483,7 @@ Term::Form::ReadLine - Read a line from STDIN.
 
 =head1 VERSION
 
-Version 0.556
+Version 0.557
 
 =cut
 

@@ -19,7 +19,7 @@ Tiny::Prof - Perl profiling made simple to use.
     ...
 
     # $profiler goes out of scope and
-    # the builds the results page.
+    # then builds the results page.
 
 # DESCRIPTION
 
@@ -67,7 +67,9 @@ and/or data in the results!
     #           sleep or print.
 
 If running as a service, the environmental variables
-should be stored in the service file instead:
+should be stored in the service file instead.
+
+On a Debian-based machine/box that may mean:
 
     systemctl status MY_SERVICE
     sudo vi /etc/systemdsystem/MY_SERVICE.service
@@ -140,7 +142,9 @@ goes out of scope (by default).
 
 # BUGS
 
-None :)
+None
+
+... and then came along Ron :)
 
 # SUPPORT
 

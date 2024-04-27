@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # ABSTRACT: Install, upgrade and examine the CPAN Testers database schema
 # PODNAME: cpantesters-schema
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 #pod =head1 SYNOPSIS
 #pod
@@ -147,7 +147,7 @@ cpantesters-schema - Install, upgrade and examine the CPAN Testers database sche
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

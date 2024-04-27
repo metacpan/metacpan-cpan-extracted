@@ -3,7 +3,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use lib qw( ./lib ./dev );
+    use lib qw( ./lib );
     use vars qw( $DEBUG );
     use Test::More;
     use Module::Generic::File qw( file );
@@ -220,7 +220,7 @@ subtest 'load' => sub
         });
         diag( "load() returned '$rv'" ) if( $DEBUG );
         is( $status, 'error', 'failed status' );
-        ok( !defined( $rv ), 'load returned undefined' );
+        is( $rv, undef, 'load returned undefined' );
     };
 };
 

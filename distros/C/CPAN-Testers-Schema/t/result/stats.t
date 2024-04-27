@@ -46,6 +46,8 @@ subtest 'reader methods' => sub {
     is $row->platform, 'darwin-2level', 'platform is correct';
     is $row->grade, 'pass', 'grade is correct';
     is $row->tester_name, "Doug Bell", 'tester_name is correct';
+    isa_ok $row->datetime, 'DateTime';
+    is $row->datetime->datetime, '2016-07-14T12:34:00';
 };
 
 subtest 'relationships' => sub {

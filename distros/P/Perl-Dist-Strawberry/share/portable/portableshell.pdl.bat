@@ -17,11 +17,22 @@ set PERL_MB_OPT=
 
 if "%1" == "/SETENV" goto END
 
-if not "%1" == "" "%~dp0perl\bin\perl.exe" %* & goto ENDLOCAL
+if "%1" == "" goto INTERACTIVE
 
+REM For non-interactive invocations of this batch file, run Perl with all
+REM provided argument and return its exit code.  Clear the ERRORLEVEL
+REM variable in our local environment to ensure our "exit /b" statement
+REM returns the error level from Perl even if there is already an ERRORLEVEL
+REM variable in the environment:
+REM   https://devblogs.microsoft.com/oldnewthing/20080926-00
+set ERRORLEVEL=
+"%~dp0perl\bin\perl.exe" %*
+exit /b %ERRORLEVEL%
+
+:INTERACTIVE
 echo ----------------------------------------------
 echo  Welcome to Strawberry Perl PDL Edition!
-echo  * URL - http://strawberryperl.com + http://pdl.perl.org
+echo  * URL - https://strawberryperl.com + http://pdl.perl.org
 echo  * to launch perl script run:      perl c:\my\scripts\pdl-test.pl
 echo  * to start PDL console run:       pdl2
 echo  * to update PDL run:              cpanm PDL

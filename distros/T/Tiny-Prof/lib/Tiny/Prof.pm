@@ -20,7 +20,7 @@ use File::Basename  qw( basename );
 use Cwd             qw( realpath );
 use Time::Piece;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -36,7 +36,7 @@ Tiny::Prof - Perl profiling made simple to use.
     ...
 
     # $profiler goes out of scope and
-    # the builds the results page.
+    # then builds the results page.
 
 =cut
 
@@ -86,7 +86,9 @@ and/or data in the results!
     #           sleep or print.
 
 If running as a service, the environmental variables
-should be stored in the service file instead:
+should be stored in the service file instead.
+
+On a Debian-based machine/box that may mean:
 
     systemctl status MY_SERVICE
     sudo vi /etc/systemdsystem/MY_SERVICE.service
@@ -377,7 +379,9 @@ sub _show_html_link {
 
 =head1 BUGS
 
-None :)
+None
+
+... and then came along Ron :)
 
 =cut
 

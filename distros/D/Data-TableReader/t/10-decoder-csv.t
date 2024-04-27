@@ -24,10 +24,15 @@ sub test_basic {
 	ok( my $iter= $d->iterator, 'got iterator' );
 
 	is_deeply( $iter->(), [ 'a', 'b', 'c', 'd' ], 'first row' );
+	is( $iter->row, 1, 'row=1' );
 	is_deeply( $iter->(), [ '1', '2', '3', '4' ], 'second row' );
+	is( $iter->row, 2, 'row=2' );
 	is_deeply( $iter->(), undef, 'no third row' );
+	is( $iter->row, 2, 'row=2' );
 	ok( $iter->seek(0), 'rewind' );
+	is( $iter->row, 0, 'row=0' );
 	is_deeply( $iter->(), [ 'a', 'b', 'c', 'd' ], 'first row again' );
+	is( $iter->row, 1, 'row=1' );
 	is_deeply( $iter->([2,1]), [ '3', '2' ], 'slice from second row' );
 	ok( !$iter->next_dataset, 'no next dataset' );
 }
@@ -110,17 +115,31 @@ sub utf8_bom {
 	# BOM "test\n"
 	# "\x{8A66}\x{3057},1,2,3\n"
 	# "\x{27000}\n"
-	return "\xEF\xBB\xBF"."test\n"."\xE8\xA9\xA6\xE3\x81\x97,1,2,3\n"."\xF0\xA7\x80\x80\n";
+	return "\xEF\xBB\xBF"
+		."test\n"
+		."\xE8\xA9\xA6\xE3\x81\x97,1,2,3\n"
+		."\xF0\xA7\x80\x80\n";
 }
 sub utf16_le_bom {
-	return "\xFF\xFE"."t\0e\0s\0t\0\n\0"."\x66\x8A\x57\x30,\x001\x00,\x002\x00,\x003\x00\n\x00"."\x5C\xD8\x00\xDC\n\0";
+	return "\xFF\xFE"
+		."t\0e\0s\0t\0\n\0"
+		."\x66\x8A\x57\x30,\x001\x00,\x002\x00,\x003\x00\n\x00"
+		."\x5C\xD8\x00\xDC\n\0";
 }
 sub utf16_be_bom {
-	return "\xFE\xFF"."\x00t\x00e\x00s\x00t\x00\n"."\x8A\x66\x30\x57\x00,\x001\x00,\x002\x00,\x003\x00\n"."\xD8\x5C\xDC\x00\0\n";
+	return "\xFE\xFF"
+		."\x00t\x00e\x00s\x00t\x00\n"
+		."\x8A\x66\x30\x57\x00,\x001\x00,\x002\x00,\x003\x00\n"
+		."\xD8\x5C\xDC\x00\0\n";
 }
 sub utf8_nobom {
-	return "test\n"."\xE8\xA9\xA6\xE3\x81\x97,1,2,3\n"."\xF0\xA7\x80\x80\n";
+	return "test\n"
+		."\xE8\xA9\xA6\xE3\x81\x97,1,2,3\n"
+		."\xF0\xA7\x80\x80\n";
 }
 sub deceptive_utf8_nobom {
-	return "\xEF\xBF\xBD"."test\n"."\xE8\xA9\xA6\xE3\x81\x97,1,2,3\n"."\xF0\xA7\x80\x80\n";
+	return "\xEF\xBF\xBD"
+		."test\n"
+		."\xE8\xA9\xA6\xE3\x81\x97,1,2,3\n"
+		."\xF0\xA7\x80\x80\n";
 }
