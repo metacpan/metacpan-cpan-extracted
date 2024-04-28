@@ -1,3 +1,9 @@
+0.07	- 2024-04-28, H.Merijn Brand
+    * Use Module::CoreList to up unspecified minimum for core modules
+
+0.06	- 2024-04-27, H.Merijn Brand
+    * Do not die on missing Makefile.PL
+
 0.05	- 2024-04-10, H.Merijn Brand
     * Remove unused requirement causing failure if not available
 

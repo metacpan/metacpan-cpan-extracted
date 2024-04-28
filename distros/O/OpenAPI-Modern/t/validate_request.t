@@ -24,7 +24,7 @@ info:
   version: 1.2.3
 YAML
 
-my $doc_uri = Mojo::URL->new('https://example.com/api');
+my $doc_uri = Mojo::URL->new('http://example.com/api');
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
 my $type_index = 0;
@@ -1883,7 +1883,7 @@ YAML
         {
           instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo), lc),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo), lc))->to_string,
+          absoluteKeywordLocation => $doc_uri->clone->scheme('https')->fragment(jsonp(qw(/paths /foo), lc))->to_string,
           error => 'unspecified body is present in '.$_.' request',
         },
       ],
@@ -1911,7 +1911,7 @@ SKIP: {
         {
           instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo), lc),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo), lc))->to_string,
+          absoluteKeywordLocation => $doc_uri->clone->scheme('https')->fragment(jsonp(qw(/paths /foo), lc))->to_string,
           error => 'unspecified body is present in '.$_.' request',
         },
       ],

@@ -1,5 +1,10 @@
 Revision history for `optex' command.
 
+v0.99.2 2024-04-28T08:34:50Z
+
+    - Update option value handling.
+    - Set exit code in END block so that module's END block works.
+
 v0.99.1 2024-03-22T09:31:18Z
 
     - Make tabstop configurable in -Mutil::filter module.

@@ -1,4 +1,11 @@
 Revision history for Dist-Build
 
+0.003     2024-04-27 22:55:07+02:00 Europe/Brussels
+          - Allow extra compiler and linker flags to be a string
+
+0.002     2024-04-27 12:07:09+02:00 Europe/Brussels
+          - Add dynamic prereqs
+          - Depend on ExtUtils::HasCompiler 0.024
+
 0.001     2024-04-26 12:49:11+02:00 Europe/Brussels
           Initial release to an unsuspecting world

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker;
-$ExtUtils::Builder::Linker::VERSION = '0.001';
+$ExtUtils::Builder::Linker::VERSION = '0.002';
 use base qw/ExtUtils::Builder::ArgumentCollector ExtUtils::Builder::Binary/;
 
 use ExtUtils::Builder::Action::Command;
@@ -137,7 +137,7 @@ ExtUtils::Builder::Linker
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 METHODS
 
@@ -165,7 +165,7 @@ This must be either C<executable>, C<shared-library>, C<loadable-object> or C<st
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

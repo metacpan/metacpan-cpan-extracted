@@ -1,6 +1,12 @@
 CHANGES
 -------
 
+  2.212 27 April 2024
+
+    * #12 remove 5.6.0 & 5.6.1 from workflow
+      Mon Apr 8 09:42:40 2024 +0100
+      aa14f89e9fd06ee5ddf8ecceb73b6420086334e8
+
   2.211 6 April 2024
 
     * version 2.211
@@ -26,7 +32,7 @@ CHANGES
     * Add xz 5.6.0 to workflow
       Sat Feb 24 10:37:19 2024 +0000
       bb252c8d1290cbbbd669a4ccd31e4429a3cf7e8a
-      
+
   2.209 19 February 2024
 
     * Merge pull request #11 from pkg-perl-tools/pkg-perl-1708373862

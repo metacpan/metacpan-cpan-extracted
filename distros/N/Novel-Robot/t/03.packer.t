@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+use lib '../lib';
 use Test::More;
 use Novel::Robot;
 

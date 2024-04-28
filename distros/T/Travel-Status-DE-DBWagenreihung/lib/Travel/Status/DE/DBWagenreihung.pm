@@ -5,7 +5,7 @@ use warnings;
 use 5.020;
 use utf8;
 
-our $VERSION = '0.12';
+use parent 'Class::Accessor';
 
 use Carp qw(cluck confess);
 use JSON;
@@ -13,6 +13,13 @@ use List::Util qw(uniq);
 use LWP::UserAgent;
 use Travel::Status::DE::DBWagenreihung::Section;
 use Travel::Status::DE::DBWagenreihung::Wagon;
+
+our $VERSION = '0.13';
+
+Travel::Status::DE::DBWagenreihung->mk_ro_accessors(
+	qw(direction platform station train_no train_type));
+
+# {{{ Rolling Stock Models
 
 my %is_redesign = (
 	"02" => 1,
@@ -98,6 +105,9 @@ my %power_desc = (
 	99 => 'Sonderfahrzeug',
 );
 
+# }}}
+# {{{ Constructors
+
 sub new {
 	my ( $class, %opt ) = @_;
 
@@ -117,7 +127,6 @@ sub new {
 		departure      => $opt{departure},
 		from_json      => $opt{from_json},
 		json           => JSON->new,
-		serializable   => $opt{serializable},
 		train_number   => $opt{train_number},
 		user_agent     => $opt{user_agent},
 	};
@@ -176,178 +185,47 @@ sub get_wagonorder {
 
 	$self->{data} = $json->{data};
 	$self->{meta} = $json->{meta};
+
+	return $self->parse_wagonorder;
 }
 
-sub errstr {
-	my ($self) = @_;
+# }}}
+# {{{ Internal Helpers
 
-	return $self->{errstr};
-}
+sub get_with_cache {
+	my ( $self, $cache, $url ) = @_;
 
-sub direction {
-	my ($self) = @_;
-
-	if ( not exists $self->{direction} ) {
-
-		# direction is set while parsing wagons
-		$self->wagons;
+	if ( $self->{developer_mode} ) {
+		say "GET $url";
 	}
 
-	return $self->{direction};
-}
-
-sub has_bad_wagons {
-	my ($self) = @_;
-
-	if ( defined $self->{has_bad_wagons} ) {
-		return $self->{has_bad_wagons};
-	}
-
-	for my $group ( @{ $self->{data}{istformation}{allFahrzeuggruppe} } ) {
-		for my $wagon ( @{ $group->{allFahrzeug} } ) {
-			my $pos = $wagon->{positionamhalt};
-			if (   $pos->{startprozent} eq ''
-				or $pos->{endeprozent} eq ''
-				or $pos->{startmeter} eq ''
-				or $pos->{endemeter} eq '' )
-			{
-				return $self->{has_bad_wagons} = 1;
+	if ($cache) {
+		my $content = $cache->thaw($url);
+		if ($content) {
+			if ( $self->{developer_mode} ) {
+				say '  cache hit';
 			}
+			return ( ${$content}, undef );
 		}
 	}
 
-	return $self->{has_bad_wagons} = 0;
-}
-
-sub origins {
-	my ($self) = @_;
-
-	if ( exists $self->{origins} ) {
-		return @{ $self->{origins} };
+	if ( $self->{developer_mode} ) {
+		say '  cache miss';
 	}
 
-	my @origins;
+	my $ua  = $self->{user_agent};
+	my $res = $ua->get($url);
 
-	for my $group ( @{ $self->{data}{istformation}{allFahrzeuggruppe} } ) {
-		push( @origins, $group->{startbetriebsstellename} );
+	if ( $res->is_error ) {
+		return ( undef, $res->status_line );
+	}
+	my $content = $res->decoded_content;
+
+	if ($cache) {
+		$cache->freeze( $url, \$content );
 	}
 
-	@origins = uniq @origins;
-
-	$self->{origins} = \@origins;
-
-	return @origins;
-}
-
-sub destinations {
-	my ($self) = @_;
-
-	if ( exists $self->{destinations} ) {
-		return @{ $self->{destinations} };
-	}
-
-	my @destinations;
-	my %section;
-
-	for my $group ( @{ $self->{data}{istformation}{allFahrzeuggruppe} } ) {
-		my $destination = $group->{zielbetriebsstellename};
-		my @sections = map { $_->{fahrzeugsektor} } @{ $group->{allFahrzeug} };
-		push( @{ $section{$destination} }, @sections );
-		push( @destinations,               $destination );
-	}
-
-	@destinations = uniq @destinations;
-
-	@destinations
-	  = map { { name => $_, sections => [ uniq @{ $section{$_} } ] } }
-	  @destinations;
-
-	$self->{destinations} = \@destinations;
-
-	return @destinations;
-}
-
-sub platform {
-	my ($self) = @_;
-
-	return $self->{data}{istformation}{halt}{gleisbezeichnung};
-}
-
-sub sections {
-	my ($self) = @_;
-
-	if ( exists $self->{sections} ) {
-		return @{ $self->{sections} };
-	}
-
-	for my $section ( @{ $self->{data}{istformation}{halt}{allSektor} } ) {
-		my $pos = $section->{positionamgleis};
-		if ( $pos->{startprozent} eq '' or $pos->{endeprozent} eq '' ) {
-			next;
-		}
-		push(
-			@{ $self->{sections} },
-			Travel::Status::DE::DBWagenreihung::Section->new(
-				name          => $section->{sektorbezeichnung},
-				start_percent => $pos->{startprozent},
-				end_percent   => $pos->{endeprozent},
-				start_meters  => $pos->{startmeter},
-				end_meters    => $pos->{endemeter},
-			)
-		);
-	}
-
-	return @{ $self->{sections} // [] };
-}
-
-sub station_ds100 {
-	my ($self) = @_;
-
-	return $self->{data}{istformation}{halt}{rl100};
-}
-
-sub station_name {
-	my ($self) = @_;
-
-	return $self->{data}{istformation}{halt}{bahnhofsname};
-}
-
-sub station_uic {
-	my ($self) = @_;
-
-	return $self->{data}{istformation}{halt}{evanummer};
-}
-
-sub train_type {
-	my ($self) = @_;
-
-	return $self->{data}{istformation}{zuggattung};
-}
-
-sub train_numbers {
-	my ($self) = @_;
-
-	if ( exists $self->{train_numbers} ) {
-		return @{ $self->{train_numbers} };
-	}
-
-	my @numbers;
-
-	for my $group ( @{ $self->{data}{istformation}{allFahrzeuggruppe} } ) {
-		push( @numbers, $group->{verkehrlichezugnummer} );
-	}
-
-	@numbers = uniq @numbers;
-
-	$self->{train_numbers} = \@numbers;
-
-	return @numbers;
-}
-
-sub train_no {
-	my ($self) = @_;
-
-	return $self->{data}{istformation}{zugnummer};
+	return ( $content, undef );
 }
 
 sub wagongroup_powertype {
@@ -382,17 +260,147 @@ sub wagongroup_powertype {
 	return $likelihood[0];
 }
 
+sub parse_wagonorder {
+	my ($self) = @_;
+
+	$self->{platform} = $self->{data}{istformation}{halt}{gleisbezeichnung};
+
+	$self->{station} = {
+		ds100 => $self->{data}{istformation}{halt}{rl100},
+		eva   => $self->{data}{istformation}{halt}{evanummer},
+		name  => $self->{data}{istformation}{halt}{bahnhofsname},
+	};
+
+	$self->{train_type} = $self->{data}{istformation}{zuggattung};
+	$self->{train_no}   = $self->{data}{istformation}{zugnummer};
+
+	$self->parse_wagons;
+	$self->{origins}      = $self->parse_wings('startbetriebsstellename');
+	$self->{destinations} = $self->parse_wings('zielbetriebsstellename');
+}
+
+sub parse_wings {
+	my ( $self, $attr ) = @_;
+
+	my @names;
+	my %section;
+
+	for my $group ( @{ $self->{data}{istformation}{allFahrzeuggruppe} } ) {
+		my $name     = $group->{$attr};
+		my @sections = map { $_->{fahrzeugsektor} } @{ $group->{allFahrzeug} };
+		push( @{ $section{$name} }, @sections );
+		push( @names,               $name );
+	}
+
+	@names = uniq @names;
+
+	@names
+	  = map { { name => $_, sections => [ uniq @{ $section{$_} } ] } } @names;
+
+	return \@names;
+}
+
+sub parse_wagons {
+	my ($self) = @_;
+
+	my @wagon_groups;
+
+	for my $group ( @{ $self->{data}{istformation}{allFahrzeuggruppe} } ) {
+		my @group;
+		for my $wagon ( @{ $group->{allFahrzeug} } ) {
+			my $wagon_object
+			  = Travel::Status::DE::DBWagenreihung::Wagon->new( %{$wagon},
+				train_no => $group->{verkehrlichezugnummer} );
+			push( @{ $self->{wagons} }, $wagon_object );
+			push( @group,               $wagon_object );
+			if ( not $wagon_object->{position}{valid} ) {
+				$self->{has_bad_wagons} = 1;
+			}
+		}
+		push( @wagon_groups, [@group] );
+	}
+	if ( @{ $self->{wagons} // [] } > 1 and not $self->has_bad_wagons ) {
+		if ( $self->{wagons}[0]->{position}{start_percent}
+			> $self->{wagons}[-1]->{position}{start_percent} )
+		{
+			$self->{direction} = 100;
+		}
+		else {
+			$self->{direction} = 0;
+		}
+	}
+	if ( not $self->has_bad_wagons ) {
+		@{ $self->{wagons} } = sort {
+			$a->{position}->{start_percent} <=> $b->{position}->{start_percent}
+		} @{ $self->{wagons} };
+	}
+
+	for my $i ( 0 .. $#wagon_groups ) {
+		my $group = $wagon_groups[$i];
+		my $tt    = $self->wagongroup_subtype( @{$group} );
+		if ($tt) {
+			for my $wagon ( @{$group} ) {
+				$wagon->set_traintype( $i, $tt );
+			}
+		}
+	}
+
+	$self->{wagongroups} = [@wagon_groups];
+}
+
+# }}}
+# {{{ Public Functions
+
+sub errstr {
+	my ($self) = @_;
+
+	return $self->{errstr};
+}
+
+sub destinations {
+	my ($self) = @_;
+
+	return @{ $self->{destinations} // [] };
+}
+
+sub origins {
+	my ($self) = @_;
+
+	return @{ $self->{origins} // [] };
+}
+
+sub sections {
+	my ($self) = @_;
+
+	if ( exists $self->{sections} ) {
+		return @{ $self->{sections} };
+	}
+
+	for my $section ( @{ $self->{data}{istformation}{halt}{allSektor} } ) {
+		my $pos = $section->{positionamgleis};
+		if ( $pos->{startprozent} eq '' or $pos->{endeprozent} eq '' ) {
+			next;
+		}
+		push(
+			@{ $self->{sections} },
+			Travel::Status::DE::DBWagenreihung::Section->new(
+				name          => $section->{sektorbezeichnung},
+				start_percent => $pos->{startprozent},
+				end_percent   => $pos->{endeprozent},
+				start_meters  => $pos->{startmeter},
+				end_meters    => $pos->{endemeter},
+			)
+		);
+	}
+
+	return @{ $self->{sections} // [] };
+}
+
 sub train_descriptions {
 	my ($self) = @_;
 
 	if ( exists $self->{train_descriptions} ) {
 		return @{ $self->{train_descriptions} };
-	}
-
-	if ( not exists $self->{wagons} ) {
-
-		# wagongroups are set while parsong wagons
-		$self->wagons;
 	}
 
 	for my $wagons ( @{ $self->{wagongroups} } ) {
@@ -410,6 +418,49 @@ sub train_descriptions {
 	}
 
 	return @{ $self->{train_descriptions} };
+}
+
+sub train_numbers {
+	my ($self) = @_;
+
+	if ( exists $self->{train_numbers} ) {
+		return @{ $self->{train_numbers} };
+	}
+
+	my @numbers;
+
+	for my $group ( @{ $self->{data}{istformation}{allFahrzeuggruppe} } ) {
+		push( @numbers, $group->{verkehrlichezugnummer} );
+	}
+
+	@numbers = uniq @numbers;
+
+	$self->{train_numbers} = \@numbers;
+
+	return @numbers;
+}
+
+sub has_bad_wagons {
+	my ($self) = @_;
+
+	if ( defined $self->{has_bad_wagons} ) {
+		return $self->{has_bad_wagons};
+	}
+
+	for my $group ( @{ $self->{data}{istformation}{allFahrzeuggruppe} } ) {
+		for my $wagon ( @{ $group->{allFahrzeug} } ) {
+			my $pos = $wagon->{positionamhalt};
+			if (   $pos->{startprozent} eq ''
+				or $pos->{endeprozent} eq ''
+				or $pos->{startmeter} eq ''
+				or $pos->{endemeter} eq '' )
+			{
+				return $self->{has_bad_wagons} = 1;
+			}
+		}
+	}
+
+	return $self->{has_bad_wagons} = 0;
 }
 
 sub wagongroup_description {
@@ -659,93 +710,25 @@ sub wagongroup_subtype {
 
 sub wagons {
 	my ($self) = @_;
-
-	if ( exists $self->{wagons} ) {
-		return @{ $self->{wagons} };
-	}
-
-	my @wagon_groups;
-
-	for my $group ( @{ $self->{data}{istformation}{allFahrzeuggruppe} } ) {
-		my @group;
-		for my $wagon ( @{ $group->{allFahrzeug} } ) {
-			my $wagon_object
-			  = Travel::Status::DE::DBWagenreihung::Wagon->new( %{$wagon},
-				train_no => $group->{verkehrlichezugnummer} );
-			push( @{ $self->{wagons} }, $wagon_object );
-			push( @group,               $wagon_object );
-			if ( not $wagon_object->{position}{valid} ) {
-				$self->{has_bad_wagons} = 1;
-			}
-		}
-		push( @wagon_groups, [@group] );
-	}
-	if ( @{ $self->{wagons} // [] } > 1 and not $self->has_bad_wagons ) {
-		if ( $self->{wagons}[0]->{position}{start_percent}
-			> $self->{wagons}[-1]->{position}{start_percent} )
-		{
-			$self->{direction} = 100;
-		}
-		else {
-			$self->{direction} = 0;
-		}
-	}
-	if ( not $self->has_bad_wagons ) {
-		@{ $self->{wagons} } = sort {
-			$a->{position}->{start_percent} <=> $b->{position}->{start_percent}
-		} @{ $self->{wagons} };
-	}
-
-	for my $i ( 0 .. $#wagon_groups ) {
-		my $group = $wagon_groups[$i];
-		my $tt    = $self->wagongroup_subtype( @{$group} );
-		if ($tt) {
-			for my $wagon ( @{$group} ) {
-				$wagon->set_traintype( $i, $tt );
-			}
-		}
-	}
-
-	$self->{wagongroups} = [@wagon_groups];
-
 	return @{ $self->{wagons} // [] };
 }
 
-sub get_with_cache {
-	my ( $self, $cache, $url ) = @_;
+sub TO_JSON {
+	my ($self) = @_;
 
-	if ( $self->{developer_mode} ) {
-		say "GET $url";
-	}
+	# ensure that all objects are available
+	$self->train_numbers;
+	$self->train_descriptions;
+	$self->sections;
 
-	if ($cache) {
-		my $content = $cache->thaw($url);
-		if ($content) {
-			if ( $self->{developer_mode} ) {
-				say '  cache hit';
-			}
-			return ( ${$content}, undef );
-		}
-	}
+	my %copy = %{$self};
 
-	if ( $self->{developer_mode} ) {
-		say '  cache miss';
-	}
+	delete $copy{from_json};
 
-	my $ua  = $self->{user_agent};
-	my $res = $ua->get($url);
-
-	if ( $res->is_error ) {
-		return ( undef, $res->status_line );
-	}
-	my $content = $res->decoded_content;
-
-	if ($cache) {
-		$cache->freeze( $url, \$content );
-	}
-
-	return ( $content, undef );
+	return {%copy};
 }
+
+# }}}
 
 1;
 
@@ -770,7 +753,7 @@ Travel::Status::DE::DBWagenreihung - Interface to Deutsche Bahn Wagon Order API.
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 This is beta software. The API may change without notice.
 
@@ -820,13 +803,13 @@ Train number. Do not include the train type: Use "8" for "EC 8" or
 
 =item $wr->destinations
 
-Returns a list describing all final destinations of this train. In most
-cases, it contains one element, however, for trains consisting of multiple
-wings, it contains one element for each wing.
+Returns a list describing the destinations of this train's wagons. In most
+cases, it contains one element. For trains consisting of multiple wings or
+trains that switch locomotives along the way, it contains one element for each
+wing or other kind of wagon group.
 
-Each destination is a hash ref containing the destination B<name> and the
-corresponding platform I<sections> (at the moment, this is a list of section
-identifiers).
+Each destination is a hash ref containing its B<name> and the corresponding
+platform I<sections> (at the moment, this is a list of section identifiers).
 
 This function is subject to change.
 
@@ -843,11 +826,13 @@ Returns undef otherwise.
 
 =item $wr->origins
 
-Returns a list of stations this train originates from. In most cases, this is
-just one element; however, for trains consisting of multiple wings, it gives
-the origin of each wing unless they are identical.
+Returns a list describing the origins of this train's wagons. In most
+cases, it contains one element. For trains consisting of multiple wings or
+trains that switch locomotives along the way, it contains one element for each
+wing or other kind of wagon group.
 
-Each origin is a station name.
+Each origin is a hash ref containing its B<name> and the corresponding
+platform I<sections> (at the moment, this is a list of section identifiers).
 
 This function is subject to change.
 
@@ -860,17 +845,11 @@ Returns the platform name.
 Describes the sections of the platform this train will depart from.
 Returns a list of L<Travel::Status::DE::DBWagenreihung::Section> objects.
 
-=item $wr->station_ds100
+=item $wr->station
 
-Returns the DS100 identifier of the requested station.
-
-=item $wr->station_name
-
-Returns the name of the requested station.
-
-=item $wr->station_uic
-
-Returns the international id (UIC ID / IBNR) of the requested station.
+Returns a hashref describing the requested station. The hashref contains three
+entries: B<ds100> (DS100 / Ril100 identifier), B<eva> (EVA ID, related to but
+not necessarily identical with UIC station ID), and B<name> (station name).
 
 =item $wr->train_descriptions
 
@@ -933,7 +912,7 @@ L<https://github.com/derf/Travel-Status-DE-DBWagenreihung>
 
 =head1 AUTHOR
 
-Copyright (C) 2018-2019 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2018-2024 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

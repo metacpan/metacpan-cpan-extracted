@@ -505,6 +505,7 @@ TRYIT:
 			$self->{'album'} = $self->{'artist'}  if ($self->{'artist'});
 			$self->{'artist'} = $1;
 		}
+		$self->{'album'} = $1  if ($html =~ m# property\=\"(?:og\:|twitter\:?)title\"\s+content\=\"([^\"]+)#s);
 
 		#WE NEED TO EXTRACT 1ST EPISODE ID, BUT WHILST AT IT, GO AHEAD AND FETCH PLAYLIST DATA HERE TOO!:
 		my %epiHash = ();
@@ -578,6 +579,8 @@ TRYIT:
 				$temp->{'_podcast_id'} = $1;
 				if ($epihtml =~ s#\,\"title\"\:\"([^\"]+)##o) {
 					$temp->{'title'} = $1;
+					next  if ($temp->{'title'} =~ /Date Aired/o);  #HACK!
+
 					foreach my $field (qw(album genre created year iconurl articonurl description)) {
 						$temp->{$field} = '';   #INIT 'EM TO AVOID PERL NANNY WARNINGS.
 					}
@@ -586,11 +589,12 @@ TRYIT:
 						$temp->{'year'} = ($temp->{'created'} =~ /(\d\d\d\d)/o) ? $1 : '';
 					}
 					$temp->{'articonurl'} = $self->{'articonurl'};
-					$temp->{'articonurl'} ||= $1  if ($epihtml =~ m#\:\{\"image_url\"\:\"([^\"]+)#o);
-					$temp->{'iconurl'} = $1  if ($epihtml =~ m#\,\"image_url\"\:\"([^\"]+)#o);
-					$temp->{'album'} = $1  if ($epihtml =~ m#\,\"title\"\:\"([^\"]+)#o);
-					$temp->{'description'} = $1  if ($epihtml =~ m#\,\"description\"\:\"([^\"]+)#o);
-					$temp->{'genre'} = $1  if ($epihtml =~ m#\,\"text\"\:\"([^\"]+)#o);
+					$temp->{'articonurl'} ||= $1  if ($epihtml =~ s#\:\{\"image\_url\"\:\"([^\"]+)##so);
+					$temp->{'articonurl'} ||= $1  if ($epihtml =~ s#\,\"image\_url\"\:\"([^\"]+)##so);
+					$temp->{'iconurl'} = $1  if ($epihtml =~ s#\,\"image\_url\"\:\"([^\"]+)##so);  #2ND IMAGE!!!
+					$temp->{'album'} = ($epihtml =~ m#\,\"title\"\:\"([^\"]+)#so) ? $1 : $self->{'album'};
+					$temp->{'description'} = $1  if ($epihtml =~ m#\,\"description\"\:\"([^\"]+)#so);
+					$temp->{'genre'} = $1  if ($epihtml =~ m#\,\"text\"\:\"([^\"]+)#so);
 					$temp->{'_complete'} = 1;
 					@{$temp->{'streams'}} = @streams;
 

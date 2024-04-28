@@ -74,7 +74,7 @@ sub __drop {
         $type = 'table';
     }
     $sql->{table} = $ax->quote_table( $sf->{d}{tables_info}{$table} );
-    my $stmt_type = 'Drop_' . $type;
+    my $stmt_type = 'Drop_' . ucfirst( $type );
     $sf->{d}{stmt_types} = [ $stmt_type ];
     my $info = $ax->get_sql_info( $sql );
     # Choose

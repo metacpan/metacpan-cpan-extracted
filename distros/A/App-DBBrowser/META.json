@@ -36,6 +36,7 @@
             "DBD::SQLite" : "1.74",
             "DBD::SQLite::Constants" : "0",
             "DBI" : "0",
+            "DateTime::Format::Strptime" : "0",
             "Encode" : "0",
             "Encode::Locale" : "0",
             "File::Basename" : "0",
@@ -54,11 +55,11 @@
             "Storable" : "0",
             "String::Substitution" : "0",
             "String::Unescape" : "0",
-            "Term::Choose" : "1.763",
-            "Term::Choose::Util" : "0.140",
-            "Term::Form" : "0.554",
-            "Term::Form::ReadLine" : "0.554",
-            "Term::TablePrint" : "0.162",
+            "Term::Choose" : "1.764",
+            "Term::Choose::Util" : "0.141",
+            "Term::Form" : "0.557",
+            "Term::Form::ReadLine" : "0.557",
+            "Term::TablePrint" : "0.163",
             "Text::CSV_XS" : "0",
             "bytes" : "0",
             "open" : "0",
@@ -79,6 +80,6 @@
          "web" : "https://github.com/kuerbis/App-DBBrowser"
       }
    },
-   "version" : "2.407",
+   "version" : "2.409",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

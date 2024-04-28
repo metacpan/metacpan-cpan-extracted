@@ -35,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::DataSource;
 use AsposeCellsCloud::Object::FileSource;
 use AsposeCellsCloud::Object::OperateObject;
 use AsposeCellsCloud::Object::OperateParameter;
@@ -142,6 +143,13 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
+     'destinatio_data_source' => {
+     	datatype => 'DataSource',
+     	base_name => 'DestinatioDataSource',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'destination_workbook' => {
      	datatype => 'FileSource',
      	base_name => 'DestinationWorkbook',
@@ -154,12 +162,14 @@ __PACKAGE__->method_documentation({
 __PACKAGE__->swagger_types( {
     'operate_object' => 'OperateObject',
     'operate_parameter' => 'OperateParameter',
+    'destinatio_data_source' => 'DataSource',
     'destination_workbook' => 'FileSource' 
 } );
 
 __PACKAGE__->attribute_map( {
     'operate_object' => 'OperateObject',
     'operate_parameter' => 'OperateParameter',
+    'destinatio_data_source' => 'DestinatioDataSource',
     'destination_workbook' => 'DestinationWorkbook' 
 } );
 

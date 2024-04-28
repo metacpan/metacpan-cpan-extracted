@@ -1,5 +1,5 @@
 package Dist::Build::XS;
-$Dist::Build::XS::VERSION = '0.001';
+$Dist::Build::XS::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -7,6 +7,13 @@ use parent 'ExtUtils::Builder::Planner::Extension';
 
 use File::Basename qw/basename dirname/;
 use File::Spec::Functions qw/catfile curdir/;
+use Text::ParseWords 'shellwords';
+
+sub get_flags {
+	my ($raw) = @_;
+	return $raw if not defined($raw) or ref($raw);
+	return [ shellwords($raw) ]
+}
 
 sub add_methods {
 	my ($self, $planner, %args) = @_;
@@ -47,10 +54,11 @@ sub add_methods {
 		);
 		my @include_dirs = (curdir, dirname($xs_file), 'include', @{ $args{include_dirs} || [] });
 
+		my $compiler_flags = get_flags($args{extra_compiler_flags});
 		$planner->compile($c_file, $o_file,
 			defines      => \%defines,
 			include_dirs => \@include_dirs,
-			extra_args   => $args{extra_compiler_args},
+			extra_args   => $compiler_flags,
 		);
 
 		my @objects = ($o_file, @{ $args{extra_objects} || [] });
@@ -60,7 +68,7 @@ sub add_methods {
 			$planner->compile($source, $object,
 				defines      => $args{defines},
 				include_dirs => \@include_dirs,
-				extra_args   => $args{extra_compiler_args},
+				extra_args   => $compiler_flags,
 			);
 			push @objects, $object;
 		}
@@ -69,7 +77,7 @@ sub add_methods {
 		$planner->link(\@objects, $lib_file,
 			module_name  => $module_name,
 			mkdir        => 1,
-			extra_args   => $args{extra_linker_args},
+			extra_args   => get_flags($args{extra_linker_args}),
 			library_dirs => $args{library_dirs},
 			libraries    => $args{libraries},
 		);
@@ -94,7 +102,7 @@ Dist::Build::XS - An XS implementation for Dist::Build
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -145,7 +153,7 @@ A list of object files to link with the module.
 
 =item * extra_compiler_flags
 
-Additional flags to feed to the compiler.
+Additional flags to feed to the compiler. This can either be an array or a (shell-quoted) string.
 
 =item * extra_sources
 
@@ -161,7 +169,7 @@ Libraries to link to.
 
 =item * extra_linker_flags
 
-Additional flags to feed to the compiler.
+Additional flags to feed to the compiler. This can either be an array or a (shell-quoted) string.
 
 =back
 

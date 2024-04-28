@@ -119,8 +119,8 @@ sub join_tables {
         my $master_alias = $ax->alias( $sql, 'join_table', $qt_master, $data->{default_alias} );
         push @{$data->{aliases}}, [ $master, $master_alias ];
         push @{$sql->{join_data}}, { table => $qt_master . " " . $ax->quote_alias( $master_alias ) };
-        $sf->{d}{col_names}{$master} //= $ax->column_names( $qt_master . " " . $ax->quote_alias( $master_alias ), $sql->{ctes} ); ##
-        if ( ! defined $sf->{d}{col_names}{$master} ) {
+        ( $data->{col_names}{$master}, undef ) = $ax->column_names_and_types( $qt_master . " " . $ax->quote_alias( $master_alias ), $sql->{ctes} );
+        if ( ! defined $data->{col_names}{$master} ) {
             next MASTER;
         }
         my @bu;
@@ -171,7 +171,7 @@ sub join_tables {
     my %col_names;
     #my $qualified_column_names;              ##
     for my $table ( @{$data->{used_tables}} ) {
-        for my $col ( @{$sf->{d}{col_names}{$table}} ) {
+        for my $col ( @{$data->{col_names}{$table}} ) {
             ++$col_names{lc $col};
             #if ( $col_names{lc $col} > 1 ) { ##
             #    $qualified_column_names = 1; ##
@@ -182,7 +182,7 @@ sub join_tables {
     my $qt_aliases = {};
     for my $table ( @{$data->{used_tables}} ) {
         for my $table_alias ( @{$aliases_hash->{$table}} ) {
-            for my $col ( @{$sf->{d}{col_names}{$table}} ) {
+            for my $col ( @{$data->{col_names}{$table}} ) {
                 my $col_qt = $ax->quote_column( $table_alias, $col );
                 #my $col_qt = $ax->quote_column( $qualified_column_names ? ( $table_alias, $col ) : ( $col ) ); ##
                 if ( any { $_ eq $col_qt } @$qt_columns ) {
@@ -289,13 +289,14 @@ sub __add_slave_with_join_condition {
         my $slave_alias = $ax->alias( $sql, 'join_table', $qt_slave, ++$data->{default_alias} );
         $sql->{join_data}[-1]{table} = $qt_slave . " " . $ax->quote_alias( $slave_alias );
         push @{$data->{aliases}}, [ $slave, $slave_alias ];
-        $sf->{d}{col_names}{$slave} //= $ax->column_names( $qt_slave . " " . $ax->quote_alias( $slave_alias ), $sql->{ctes} ); ##
-        if ( ! defined $sf->{d}{col_names}{$slave} ) {
+        ( $data->{col_names}{$slave}, undef ) = $ax->column_names_and_types( $qt_slave . " " . $ax->quote_alias( $slave_alias ), $sql->{ctes} );
+        if ( ! defined $data->{col_names}{$slave} ) {
             if ( @{$sql->{ctes}} && $slave eq $sql->{ctes}[-1]{table} ) {
                 pop @{$sql->{ctes}};
             }
             $sql->{join_data}[-1] = { join_type => $sql->{join_data}[-1]{join_type} };
             delete @{$data}{ keys %$data };
+            # copy by key, so that $data still refers to the original hash:
             for my $key ( keys %$bu_data ) {
                 $data->{$key} = $bu_data->{$key};
             }
@@ -309,6 +310,7 @@ sub __add_slave_with_join_condition {
                 }
                 $sql->{join_data}[-1] = { join_type => $sql->{join_data}[-1]{join_type} };
                 delete @{$data}{ keys %$data };
+                # copy by key, so that $data still refers to the original hash:
                 for my $key ( keys %$bu_data ) {
                     $data->{$key} = $bu_data->{$key};
                 }
@@ -335,13 +337,13 @@ sub __add_join_condition {
             if ( $used_table eq $slave && $table_alias eq $slave_alias ) {
                 next;
             }
-            for my $col ( @{$sf->{d}{col_names}{$used_table}} ) {
+            for my $col ( @{$data->{col_names}{$used_table}} ) {
                 $avail_pk_cols{ $table_alias . '.' . $col } = $ax->quote_column( $table_alias, $col );
             }
         }
     }
     my %avail_fk_cols;
-    for my $col ( @{$sf->{d}{col_names}{$slave}} ) {
+    for my $col ( @{$data->{col_names}{$slave}} ) {
         $avail_fk_cols{ $slave_alias . '.' . $col } = $ax->quote_column( $slave_alias, $col );
     }
     $sql->{join_data}[-1]{condition} = "ON";

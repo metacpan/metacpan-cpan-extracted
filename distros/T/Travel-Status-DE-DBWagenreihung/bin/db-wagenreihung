@@ -4,7 +4,7 @@ use warnings;
 use 5.020;
 use utf8;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Getopt::Long;
 use List::Util qw(min);
@@ -73,7 +73,12 @@ my $wr = Travel::Status::DE::DBWagenreihung->new(
 printf(
 	"%s: %s → %s\n",
 	join( ' / ', map { $wr->train_type . ' ' . $_ } $wr->train_numbers ),
-	join( ' / ', $wr->origins ),
+	join(
+		' / ',
+		map {
+			sprintf( '%s (%s)', $_->{name}, join( q{}, @{ $_->{sections} } ) )
+		} $wr->origins
+	),
 	join(
 		' / ',
 		map {
@@ -82,7 +87,7 @@ printf(
 	),
 );
 
-printf( "%s Gleis %s\n\n", $wr->station_name, $wr->platform );
+printf( "%s Gleis %s\n\n", $wr->station->{name}, $wr->platform );
 
 for my $section ( $wr->sections ) {
 	my $section_length = $section->length_percent;
@@ -101,7 +106,9 @@ for my $section ( $wr->sections ) {
 print "\n";
 
 my @start_percentages = map { $_->{position}{start_percent} } $wr->wagons;
-print ' ' x ( ( min @start_percentages ) - 1 );
+if ( my $min_percentage = min @start_percentages ) {
+	print ' ' x ( $min_percentage - 1 );
+}
 print $wr->direction == 100 ? '>' : '<';
 
 for my $wagon ( $wr->wagons ) {
@@ -172,7 +179,7 @@ B<db-wagenreihung> I<station> I<train-number>
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 This is beta software: API and output format may change without notice.
 

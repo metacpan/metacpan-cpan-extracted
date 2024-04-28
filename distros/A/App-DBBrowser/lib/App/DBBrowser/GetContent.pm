@@ -42,7 +42,7 @@ sub get_content {
         [ 'plain', '- Plain' ],
         [ 'file',  '- From File' ],
     );
-    my $data_source_choice_idx = $sf->{o}{insert}{'data_source_' . $sf->{d}{stmt_types}[0]};
+    my $data_source_choice_idx = $sf->{o}{insert}{'data_source_' . lc( $sf->{d}{stmt_types}[0]) };
     $source->{old_idx_menu} //= 0;
 
     MENU: while ( 1 ) {
@@ -180,7 +180,6 @@ sub get_content {
                         }
                         $source->{old_idx_file} = $idx;
                     }
-
                     if ( $menu->[$idx]  eq $hidden ) {
                         require App::DBBrowser::Opt::Set;
                         my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
@@ -204,6 +203,7 @@ sub get_content {
                         }
                     }
                 }
+                $source->{old_idx_sheet} = 0;
 
                 PARSE: while ( 1 ) {
                     my $parse_mode_idx = $sf->{o}{insert}{parse_mode_input_file};
@@ -240,10 +240,10 @@ sub get_content {
                             if ( ! $parse_ok ) {
                                 next FILE;
                             }
-                            if ( ! @{$sql->{insert_args}} ) {
+                            if ( ! @{$sql->{insert_args}} || ! @{$sql->{insert_args}[0]} ) {
                                 $tc->choose(
-                                    [ 'empty file!' ],
-                                    { prompt => 'Press ENTER' }
+                                    [ 'Press ENTER' ],
+                                    { prompt => 'Empty File!' }
                                 );
                                 close $fh;
                                 next FILE;
@@ -255,7 +255,11 @@ sub get_content {
                                 if ( ! $ok ) {
                                     next FILE;
                                 }
-                                if ( ! @{$sql->{insert_args}} ) { #
+                                if ( ! @{$sql->{insert_args}} || ! @{$sql->{insert_args}[0]} ) {
+                                    $tc->choose(
+                                        [ 'Press ENTER' ],
+                                        { prompt => 'Empty Sheet!' }
+                                    );
                                     next SHEET if $source->{saved_book};
                                     next FILE;
                                 }

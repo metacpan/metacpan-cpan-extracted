@@ -136,7 +136,7 @@ sub __choose_query {
                 $readline_history = [ @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} ];
             }
             else {
-                $readline_history = [ @{$sql->{cols}} ];
+                $readline_history = [ @{$sql->{columns}} ];
             }
         }
         else {

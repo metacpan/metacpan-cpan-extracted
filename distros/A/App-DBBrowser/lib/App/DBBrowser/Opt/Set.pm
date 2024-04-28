@@ -464,8 +464,8 @@ sub set_options {
             elsif ( $opt eq '_data_source_type' ) {
                 my $prompt = 'Data source options';
                 my $sub_menu = [
-                    [ 'data_source_Create_table', "- Data source \"Create table\"", [ 'plain', 'file', 'menu' ], ],
-                    [ 'data_source_Insert',       "- Data source \"Insert into\"",  [ 'plain', 'file', 'menu' ], ],
+                    [ 'data_source_create_table', "- Data source \"Create table\"", [ 'plain', 'file', 'menu' ], ],
+                    [ 'data_source_insert',       "- Data source \"Insert into\"",  [ 'plain', 'file', 'menu' ], ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -697,7 +697,8 @@ sub __choose_a_number_wrap {
     #$info = $prompt . "\n" . $info;
     # Choose_a_number
     my $choice = $tu->choose_a_number( $digits,
-        { prompt => $prompt, cs_label => $name, info => $info, small_first => $small_first, clear_screen => 1 }
+        { prompt => $prompt, cs_label => $name, info => $info, small_first => $small_first,
+          clear_screen => 1, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} }
     );
     return if ! defined $choice;
     $sf->{o}{$section}{$opt} = $choice;
@@ -710,7 +711,10 @@ sub __choose_a_directory_wrap {
     my ( $sf, $section, $opt, $prompt ) = @_;
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     #my $current = $sf->{o}{$section}{$opt};
-    my $choice = $tu->choose_a_directory( { show_hidden => 1, prompt => $prompt, clear_screen => 1, decoded => 1 } );
+    my $choice = $tu->choose_a_directory(
+        { show_hidden => 1, prompt => $prompt, clear_screen => 1, decoded => 1,
+          confirm => $sf->{i}{confirm}, back => $sf->{i}{back} } ##
+    );
     return if ! defined $choice;
     $sf->{o}{$section}{$opt} = $choice;
     $sf->{write_config}++;

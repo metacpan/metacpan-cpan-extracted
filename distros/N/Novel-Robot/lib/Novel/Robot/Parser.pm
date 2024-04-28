@@ -11,14 +11,15 @@ use Encode;
 use Web::Scraper;
 use HTML::TreeBuilder;
 use Data::Dumper;
+#use Smart::Comments;
 
-### {{{ data
 
 #our $VERSION = 0.32;
 
 our %SITE_DOM_NAME = (
   'bbs.jjwxc.net'   => 'hjj',
   'www.jjwxc.net'   => 'jjwxc',
+  'm.jjwxc.net'   => 'jjwxc',
   'tieba.baidu.com' => 'tieba',
 
   'www.ddshu.net'    => 'ddshu',
@@ -52,9 +53,7 @@ our %NULL_CHAPTER = (
   type       => '',
 );
 
-### }}}
 
-### init {{{
 sub new {
   my ( $self, %opt ) = @_;
 
@@ -82,19 +81,22 @@ sub detect_domain {
 }
 
 sub detect_site {
-  my ( $self, $url ) = @_;
+  my ( $self, $s ) = @_;
 
-  if ( $url and $url =~ /^https?:/ ) {
-    my ( $dom ) = $url =~ m#^.*?\/\/(.+?)/#;
+  if ( $s and $s =~ /^https?:/ ) {
+    my ( $dom ) = $s =~ m#^.*?\/\/(.+?)/#;
     return $SITE_DOM_NAME{$dom} if ( exists $SITE_DOM_NAME{$dom} );
+  }
+
+  if($s and -f $s){
+    my ( $suffix ) = $s =~ m#\.([^.]+)$#;
+    return 'txt' if(lc($suffix) eq 'txt');
     return 'default';
   }
 
-  return $url // 'default';
+  return $s;
 }
-### }}}
 
-### {{{ common
 sub site_type { 'novel' }
 sub charset   { 'cp936' }
 sub base_url  { }
@@ -104,9 +106,7 @@ sub generate_novel_url {
   return ( $index_url, @args );
 }
 
-### }}}
 
-### {{{ novel
 
 sub get_novel_info {
   my ( $self,  $url )       = @_;
@@ -118,6 +118,7 @@ sub get_novel_info {
     path => $self->scrape_novel(),
     sub  => $self->can( "parse_novel" ),
   );
+  $r->{url} = $i_url;
   $r->{item_list} = $self->parse_item_list( \$c, $r );
   ( $r->{item_list}, $r->{item_num} ) = $self->update_item_list( $r->{item_list}, $url );
   return $r;
@@ -426,9 +427,7 @@ sub guess_novel_item {
   return $grep_next_r[-1] || {};
 } ## end sub guess_novel_item
 
-### }}}
 
-### {{{ tiezi
 
 sub get_tiezi_ref {
   my ( $self, $url, %o ) = @_;
@@ -472,9 +471,7 @@ sub get_tiezi_ref {
   return \%r;
 } ## end sub get_tiezi_ref
 
-### }}}
 
-### {{{ iterate_ref
 sub get_iterate_ref {
   my ( $self, $url, %o ) = @_;
   my ( $info, $item_list ) = $self->{browser}->request_url_whole(
@@ -504,9 +501,7 @@ sub get_iterate_ref {
   return $info;
 } ## end sub get_iterate_ref
 
-### }}}
 
-### {{{ base
 
 sub update_item_list {
   my ( $self, $arr, $base_url ) = @_;
@@ -719,7 +714,29 @@ sub encode_cjk_for_url {
   return $b;
 }
 
-### }}}
+sub get_query_ref {
+    my ( $self, $keyword, %o ) = @_;
+    my ($url, $post_data) = $self->make_query_request($keyword, %o);
+    my $r = $self->get_iterate_ref($url, 
+        post_data => $post_data, 
+        info_sub => sub { return { title => "query: $keyword"} }, 
+        page_list_sub => sub { $self->can( "parse_query_list" )->( $self, @_ ) },
+        item_list_sub => sub { $self->can( "parse_query_item" )->( $self, @_ ) },
+        %o,
+    );
+    return $r;
+}
+
+sub get_board_ref {
+    my ( $self, $board_url, %o ) = @_;
+    my $r = $self->get_iterate_ref(
+        $board_url, 
+        info_sub => sub { $self->extract_elements( @_, sub => $self->can( "parse_board" ),); }, 
+        item_list_sub => sub { $self->can( "parse_board_item" )->( $self, @_ ) },
+        %o,
+    );
+    return $r;
+}
 
 1;
 

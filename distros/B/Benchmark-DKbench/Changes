@@ -1,5 +1,9 @@
 Revision history for Benchmark-DKbench
 
+2.7     2024-04-27
+        - Improved calc_scalability, returns a hash.
+        - Improved and documented suite_run output.
+
 2.6     2024-04-25
         - Custom benchmark improvements.
         - Fix BSD tar xattr.

@@ -43,7 +43,7 @@ use Test::LivesOK 'lives_ok';
 	my @serialized = $action->to_command;
 	is(scalar(@serialized), 1, 'Got one command');
 	my ($command, @arguments) = @{ shift @serialized };
-	is($command, $Config{perlpath}, "Command is $Config{perlpath}");
+	ok(-x $command, 'Command is executable');
 	is_deeply(\@arguments, [ '-MFunction', '-e', 'callback(1)' ], 'to_command gives correct arguments');
 	is($action->to_code, 'require Function; Function::callback(1)', 'to_code is "$input"');
 

@@ -2,7 +2,7 @@ package DBIx::QuickDB::Util::HashBase;
 use strict;
 use warnings;
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000029';
 
 #################################################################
 #                                                               #

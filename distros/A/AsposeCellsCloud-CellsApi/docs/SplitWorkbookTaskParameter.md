@@ -10,6 +10,8 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Workbook** | **FileSource** |  |
 **DestinationFilePosition** | **FileSource** |  |
+**DataSource** | **DataSource** |  |
+**TargetDataSource** | **DataSource** |  |
 **DestinationFileFormat** | **string** |  |
 **SplitNameRule** | **string** | SheetName /NewGuid |
 **VerticalResolution** | **int** | When destination file format is image , vertical resolution can not be null. |

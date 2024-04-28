@@ -35,7 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-use AsposeCellsCloud::Object::FileSource;
+use AsposeCellsCloud::Object::DataSource;
 use AsposeCellsCloud::Object::ImportPosition; 
 
 
@@ -127,7 +127,7 @@ __PACKAGE__->class_documentation({description => 'Indicates import xml data requ
 
 __PACKAGE__->method_documentation({
      'json_file_source' => {
-     	datatype => 'FileSource',
+     	datatype => 'DataSource',
      	base_name => 'JsonFileSource',
      	description => 'Json file source',
      	format => '',
@@ -150,7 +150,7 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->swagger_types( {
-    'json_file_source' => 'FileSource',
+    'json_file_source' => 'DataSource',
     'import_position' => 'ImportPosition',
     'json_content' => 'string' 
 } );

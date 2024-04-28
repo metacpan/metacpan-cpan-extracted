@@ -4,7 +4,7 @@
 /* Combined Normal/Wide-Character helper functions */
 
 /* April 2014, Edgar Fuﬂ, Mathematisches Institut der Universit‰t Bonn,
-  <ef@math.uni-bonn.de> 
+  <ef@math.uni-bonn.de>
 */
 
 #include <wchar.h>
@@ -35,7 +35,7 @@ utf8_to_uvchr_buf_x(U8 *     s,
            there is no utf8_to_uvchr_buf, etc.
 #endif
 }
-    
+
 
 
 static void
@@ -71,69 +71,96 @@ c_bstr2sv(SV *            const sv,
     SvUTF8_off(sv);
 }
 
+
+
 static void
 c_wstr2sv(SV *      const sv,
           wchar_t * const ws) {
 /*----------------------------------------------------------------------------
   Set SV to a Perl string holding a given wide string
 -----------------------------------------------------------------------------*/
-    wint_t *ws_p;
-    int need_utf8 = 0;
-    size_t ws_len = wcslen(ws);
-    
-    for (ws_p = ws; *ws_p; ws_p++) {
-        if (*ws_p > 0xff) {
-            need_utf8 = 1;
-            break;
-        }
+    size_t const wsLen = wcslen(ws);
+
+    bool needUtf8;
+    unsigned int i;
+
+    for (i = 0, needUtf8 = false; ws[i]; ++i) {
+        if (ws[i] > 0xff)
+            needUtf8 = true;
     }
+
     SvPOK_on(sv);
-    if (need_utf8) {
-        U8 *u8, *u8_p;
-        u8 = (U8 *)sv_grow(sv, (ws_len + 1) * UTF8_MAXBYTES);
-        for (ws_p = ws, u8_p = u8; *ws_p; ws_p++)
-            u8_p = UVCHR_TO_UTF8(u8_p, *ws_p);
-        *u8_p = 0;
-        SvCUR_set(sv, u8_p - u8);
+
+    if (needUtf8) {
+        U8 * u8;
+        U8 * u8Cursor;
+        unsigned int i;
+
+        u8 = (U8 *)sv_grow(sv, (wsLen + 1) * UTF8_MAXBYTES);
+        for (i = 0, u8Cursor = &u8[0]; ws[i]; ++i)
+            u8Cursor = UVCHR_TO_UTF8(u8Cursor, ws[i]);
+        *u8Cursor = 0;
+        SvCUR_set(sv, u8Cursor - &u8[0]);
         SvUTF8_on(sv);
     } else {
-        U8 *u8, *u8_p;
-        u8 = (U8 *)sv_grow(sv, ws_len + 1);
-        for (ws_p = ws, u8_p = u8; *ws_p; ws_p++, u8_p++)
-            *u8_p = *ws_p;
-        *u8_p = 0;
-        SvCUR_set(sv, ws_len);
+        U8 * u8;
+        unsigned int i;
+
+        u8 = (U8 *)sv_grow(sv, wsLen + 1);
+        for (i = 0; ws[i]; ++i)
+            u8[i] = ws[i];
+        u8[i] = 0;
+        SvCUR_set(sv, wsLen);
         SvUTF8_off(sv);
     }
 }
 
-static wint_t
-c_sv2wchar(SV * const sv) {
+static void
+c_sv2GetWchar(SV *      const sv,
+              wchar_t * const wcP,
+              bool *    const succeededP) {
 /*----------------------------------------------------------------------------
    Extract a wide character from a SV holding a one-character Perl string
 
-   Fails (returning WEOF) if SV doesn't hold a string or the string is not one
-   character long.
+   Fails (returning *succeededP false) iff SV doesn't hold a string or the
+   string is not one character long.
 -----------------------------------------------------------------------------*/
-    U8 *s;
-    STRLEN s_len;
     if (!SvPOK(sv))
-        return WEOF;
-    s = (U8 *)SvPV(sv, s_len);
-    if (s_len == 0)
-        return WEOF;
-    if (SvUTF8(sv)) {
-        STRLEN len;
-        UV uv = utf8_to_uvchr_buf_x(s, s + s_len, &len);
-        if (len != s_len)
-            return WEOF;
-        return (wint_t) uv;
-    } else {
-        if (s_len != 1)
-            return WEOF;
-        return *s;
+        *succeededP = false;
+    else {
+        U8 * s;
+        STRLEN sLen;
+
+        s = (U8 *)SvPV(sv, sLen);
+
+        if (sLen == 0)
+            *succeededP = false;
+        else {
+            if (SvUTF8(sv)) {
+                STRLEN len;
+                UV uv;
+
+                uv = utf8_to_uvchr_buf_x(s, s + sLen, &len);
+
+                if (len != sLen)
+                    *succeededP = false;
+                else {
+                    *succeededP = true;
+                    *wcP = (wchar_t)uv;
+                }
+            } else {
+                if (sLen != 1)
+                    *succeededP = false;
+                else {
+                    *succeededP = true;
+                    *wcP = s[0];
+                }
+            }
+        }
     }
 }
+
+
 
 static unsigned char *
 c_sv2bstr(SV *     const sv,
@@ -197,54 +224,69 @@ c_sv2bstr(SV *     const sv,
 
 }
 
-static wint_t *
+static wchar_t *
 c_sv2wstr(SV *     const sv,
-          size_t * const w_len) {
+          size_t * const wLenP) {
 /*----------------------------------------------------------------------------
    Extract a wide char string from a SV holding a Perl string.
 
    Fails (returning NULL) if SV doesn't hold a string or doesn't UTF-8
    decode.
 
-   set w_len s to length of result.
+   set *wLenP to length of result.
 
-   Caller must free() result
+   Caller must free result
 -----------------------------------------------------------------------------*/
-    U8 *s, *s_p, *s_end;
-    STRLEN s_len;
-    wint_t *ws, *ws_p;
+    wchar_t * ws;
 
-    if (!SvPOK(sv)) return NULL;
-    s = (U8 *)SvPV(sv, s_len);
-    s_p = s;
-    s_end = s + s_len;
-    ws = malloc((s_len + 1) * sizeof(*ws));
+    if (!SvPOK(sv))
+        ws = NULL;
+    else {
+        STRLEN sLen;
+        U8 * s;
+
+        s = (U8 *)SvPV(sv, sLen);
+        ws = malloc((sLen + 1) * sizeof(ws[0]));
         /* number of bytes is an upper bound on the number of characters */
-    if (ws == NULL) croak("c_sv2wstr: malloc");
-    ws_p = ws;
-    if (SvUTF8(sv)) {
-        while (s_p < s_end) {
-            if (UTF8_IS_INVARIANT(*s_p)) {
-                *ws_p++ = *s_p++;
-            } else {
-                STRLEN len;
-                *ws_p++ = utf8_to_uvchr_buf_x(s_p, s_end, &len);
-                s_p += len;
+        if (!ws)
+            croak("c_sv2wstr: malloc");
+        if (SvUTF8(sv)) {
+            U8 * sP;
+            U8 * sEnd;
+            unsigned int i;
+
+            sP = &s[0];
+            sEnd = &s[sLen];
+            i = 0;
+
+            while (sP < sEnd) {
+                if (UTF8_IS_INVARIANT(*sP)) {
+                    ws[i++] = *sP++;
+                } else {
+                    STRLEN len;
+                    ws[i++] = utf8_to_uvchr_buf_x(sP, sEnd, &len);
+                    sP += len;
+                }
             }
-        }
-        if (s_p != s_end) {
-            free(ws);
-            *w_len = 0;
-            return NULL;
-        }
-    } else {
-        s_p = s;
-        while (s_p < s_end) {
-            *ws_p++ = *s_p++;
+            if (sP != sEnd) {
+                free(ws);
+                *wLenP = 0;
+                ws = NULL;
+            } else {
+                ws[i] = 0;
+                *wLenP = sLen;
+            }
+        } else {
+            unsigned int i;
+
+            for (i = 0; i < sLen; ++i)
+                ws[i] = s[i];
+
+            ws[i] = 0;
+            *wLenP = sLen;
         }
     }
-    *ws_p = 0;
-    *w_len = s_len;
     return ws;
 }
+
 

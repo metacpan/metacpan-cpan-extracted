@@ -35,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::DataSource;
 use AsposeCellsCloud::Object::FileSource;
 use AsposeCellsCloud::Object::TaskParameter; 
 
@@ -146,19 +147,46 @@ __PACKAGE__->method_documentation({
      	description => '',
      	format => '',
      	read_only => '',
+     		},
+     'data_source' => {
+     	datatype => 'DataSource',
+     	base_name => 'DataSource',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'target_data_source' => {
+     	datatype => 'DataSource',
+     	base_name => 'TargetDataSource',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'xml_file_data_source' => {
+     	datatype => 'DataSource',
+     	base_name => 'XMLFileDataSource',
+     	description => '',
+     	format => '',
+     	read_only => '',
      		},    
 });
 
 __PACKAGE__->swagger_types( {
     'source_workbook' => 'FileSource',
     'destination_workbook' => 'FileSource',
-    'xml_file' => 'FileSource' 
+    'xml_file' => 'FileSource',
+    'data_source' => 'DataSource',
+    'target_data_source' => 'DataSource',
+    'xml_file_data_source' => 'DataSource' 
 } );
 
 __PACKAGE__->attribute_map( {
     'source_workbook' => 'SourceWorkbook',
     'destination_workbook' => 'DestinationWorkbook',
-    'xml_file' => 'xmlFile' 
+    'xml_file' => 'xmlFile',
+    'data_source' => 'DataSource',
+    'target_data_source' => 'TargetDataSource',
+    'xml_file_data_source' => 'XMLFileDataSource' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

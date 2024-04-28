@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.014;
-our $VERSION = '2.407';
+our $VERSION = '2.409';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.407
+Version 2.409
 
 =head1 SYNOPSIS
 
@@ -534,6 +534,19 @@ By selecting the prompt line (I<Your choice:>), one can save I<search & replace>
 If a I<search & replace> has altered the first row of the input data, a menu entry named C<RESTORE header row> is
 offered.
 
+
+=item Convert DateTime
+
+Convert a I<DateTime> to another format or to seconds since the Unix epoch.
+
+    id | date_time                            id | date_time
+    ---|----------------------------          ---|--------------------
+     1 | Sat 13 Aug 2022 07:38:49 PM           1 | 2022-08-13 19:38:49
+    ---|----------------------------          ---|--------------------
+     2 | Mon 15 Aug 2022 12:08:54 PM           2 | 2022-08-15 12:08:54
+    ---|----------------------------          ---|--------------------
+     3 | Tue 16 Aug 2022 09:56:13 AM           3 | 2022-08-16 09:56:13
+
 =item Split Table
 
      y  | factor | y  | factor              y  | factor
@@ -789,12 +802,15 @@ Selecting C<func()> opens the menu, where the user can choose from a list of sca
 Extended arguments for scalar functions can be temporarily enabled by selecting the prompt line (I<Scalar functions:>)
 of the scalar function menu.
 
-Function C<DATEADD> and C<EXTRACT>: use the keys C<Up-Arrow> and C<Down-Arrow> to choose one of the predefined fields
-(in C<Value> if the extended arguments are enabled).
+C<DATEADD>, C<EXTRACT> and some other functions: use the keys C<Up-Arrow> and C<Down-Arrow> to choose one of the
+predefined fields (in C<Value> if the extended arguments are enabled).
 
 To subtract from a date, use C<DATEADD> with a negative amount.
 
-Non-ANSI SQL scalar functions may not work with the C<ODBC> plugin.
+C<TO_EPOCH> and C<Oracle>: the argument I<Column type> can be any of the following: I<DATE>, I<TIMESTAMP> or
+I<TIMESTAMP_TZ>. If the column type is I<DATE> or I<TIMESTAMP> the session timezone is used as timezone.
+
+Scalar functions may not work with the C<ODBC> plugin.
 
 =item Window Functions
 
@@ -900,7 +916,7 @@ Non-unique columns in JOIN
 
 Derived table
 
-C<Postgres>, C<MySQL> and C<MariaDB>: ensure that aliases for derived tables are enabled.
+C<PostgreSQL>, C<MySQL> and C<MariaDB>: ensure that aliases for derived tables are enabled.
 
 =item
 

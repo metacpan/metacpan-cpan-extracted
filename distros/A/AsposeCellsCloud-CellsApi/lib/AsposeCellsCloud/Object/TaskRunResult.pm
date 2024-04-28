@@ -35,7 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-use AsposeCellsCloud::Object::FileSource; 
+use AsposeCellsCloud::Object::DataSource; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -133,7 +133,7 @@ __PACKAGE__->method_documentation({
      	read_only => '',
      		},
      'out_file_list' => {
-     	datatype => 'ARRAY[FileSource]',
+     	datatype => 'ARRAY[DataSource]',
      	base_name => 'OutFileList',
      	description => '',
      	format => '',
@@ -143,7 +143,7 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'description' => 'string',
-    'out_file_list' => 'ARRAY[FileSource]' 
+    'out_file_list' => 'ARRAY[DataSource]' 
 } );
 
 __PACKAGE__->attribute_map( {

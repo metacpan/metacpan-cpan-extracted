@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl CPU Benchmark'
+abstract: 'Perl CPU Benchmark Suite'
 author:
   - 'Dimitrios Kechagias <dkechag@cpan.org>'
 build_requires:
@@ -50,5 +50,5 @@ requires:
   perl: '5.012000'
 resources:
   repository: git://github.com/dkechag/Benchmark-DKbench.git
-version: '2.6'
+version: '2.7'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

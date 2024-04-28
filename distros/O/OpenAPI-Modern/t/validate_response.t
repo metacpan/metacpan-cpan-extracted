@@ -25,7 +25,7 @@ info:
 YAML
 
 my $doc_uri_rel = Mojo::URL->new('/api');
-my $doc_uri = $doc_uri_rel->to_abs(Mojo::URL->new('https://example.com'));
+my $doc_uri = $doc_uri_rel->to_abs(Mojo::URL->new('http://example.com'));
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
 subtest 'bad conversion to Mojo::Message::Request or ::Response' => sub {
@@ -43,14 +43,14 @@ YAML
 
   cmp_deeply(
     (my $result = $openapi->validate_response(HTTP::Response->new(404),
-      { request => HTTP::Request->new(GET => 'http://example.com/', [ Host => 'example.com' ]) }))->TO_JSON,
+      { request => my $request = HTTP::Request->new(GET => 'http://example.com/', [ Host => 'example.com' ]) }))->TO_JSON,
     {
       valid => false,
       errors => [
         {
           instanceLocation => '/request',
           keywordLocation => '',
-          absoluteKeywordLocation => $doc_uri->clone->to_string,
+          absoluteKeywordLocation => $doc_uri->clone->scheme('http')->to_string,
           error => 'Bad request start-line',
         },
       ],

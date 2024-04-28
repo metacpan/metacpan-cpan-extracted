@@ -4,6 +4,10 @@ information, see the file 'HISTORY'.
 Note that the filename "ChangeLog" is recognized by the CPAN machinery as the
 name of a change log.
 
+New in 1.45 (Released April 27, 2023)
+
+  Correct wide character data types to fix compile failure.
+
 New in 1.44 (Released March 07, 2023)
 
   Implement A_ITALIC

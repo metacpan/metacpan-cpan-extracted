@@ -1,6 +1,7 @@
 requires   "HTTP::Tiny";
 requires   "IO::Socket::SSL";
 requires   "JSON::MaybeXS";
+requires   "Module::CoreList";
 requires   "Text::Wrap";
 requires   "version";
 

@@ -632,3 +632,11 @@ Revision history for StreamFinder
         - StreamFinder::Subsplash - Fix extraction of the artist & album fields 
         due to minor changes in their site.  Also add missing "Url" (first 
         stream) field (not required for fetching streams).
+2.31    2024/04/27
+        - StreamFinder::Castbox - Document new feature (in v2.30) that appends 
+        any transcript (.lrc) link into the "description" field.
+        - StreamFinder::Podchaser - Fix failure to fetch the proper iconurl for 
+        the first episode and the podcast's album fields when given a podcast 
+        URL.
+        - docs - Remove StreamFinder::Google (removed in v2.30) from supported 
+        podcast list.

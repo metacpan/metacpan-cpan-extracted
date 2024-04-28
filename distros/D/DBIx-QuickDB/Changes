@@ -1,3 +1,7 @@
+0.000029  2024-04-28 09:58:52+01:00 Europe/Lisbon
+
+    - Add QDB_TMPDIR env var
+
 0.000028  2024-04-25 13:00:04+01:00 Europe/Lisbon
 
     - Fix mariadb warning

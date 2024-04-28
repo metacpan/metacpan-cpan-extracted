@@ -17,6 +17,7 @@
       "configure" : {
          "requires" : {
             "CPAN::Meta" : "0",
+            "CPAN::Requirements::Dynamic" : "0",
             "ExtUtils::Builder::Action::Function" : "0",
             "ExtUtils::Builder::Node" : "0",
             "ExtUtils::Builder::Planner" : "0",
@@ -26,6 +27,7 @@
             "ExtUtils::Helpers" : "0.007",
             "ExtUtils::InstallPaths" : "0",
             "Getopt::Long" : "2.36",
+            "List::Util" : "1.33",
             "Parse::CPAN::Meta" : "0",
             "TAP::Harness::Env" : "0",
             "parent" : "0",
@@ -44,6 +46,7 @@
          },
          "requires" : {
             "CPAN::Meta" : "0",
+            "CPAN::Requirements::Dynamic" : "0",
             "Carp" : "0",
             "Exporter" : "5.57",
             "ExtUtils::Builder::Action::Function" : "0",
@@ -63,10 +66,11 @@
             "File::Path" : "0",
             "File::Spec::Functions" : "0",
             "Getopt::Long" : "2.36",
-            "List::Util" : "0",
+            "List::Util" : "1.33",
             "Parse::CPAN::Meta" : "0",
             "Pod::Man" : "0",
             "TAP::Harness::Env" : "0",
+            "Text::ParseWords" : "0",
             "parent" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -77,7 +81,7 @@
          "requires" : {
             "Cwd" : "0",
             "Data::Dumper" : "0",
-            "ExtUtils::HasCompiler" : "0",
+            "ExtUtils::HasCompiler" : "0.024",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "IO::File" : "0",
@@ -98,23 +102,23 @@
    "provides" : {
       "Dist::Build" : {
          "file" : "lib/Dist/Build.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       },
       "Dist::Build::Core" : {
          "file" : "lib/Dist/Build/Core.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       },
       "Dist::Build::Serializer" : {
          "file" : "lib/Dist/Build/Serializer.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       },
       "Dist::Build::ShareDir" : {
          "file" : "lib/Dist/Build/ShareDir.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       },
       "Dist::Build::XS" : {
          "file" : "lib/Dist/Build/XS.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -128,7 +132,7 @@
          "web" : "https://github.com/Leont/dist-build-old"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_generated_by_perl" : "v5.38.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

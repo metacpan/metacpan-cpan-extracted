@@ -1,4 +1,8 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.002     2024-04-27 11:56:02+02:00 Europe/Brussels
+          - Fix linker flag passing for Mac
+          - Skip executable test when libperl seems unavailable
+
 0.001     2024-04-25 15:17:34+02:00 Europe/Brussels
     -

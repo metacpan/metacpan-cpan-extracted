@@ -134,7 +134,6 @@ blogger.com videos (L<StreamFinder::Blogger>),
 ugetube.com videos (L<StreamFinder::BrandNewTube>), 
 brighteon.com videos (L<StreamFinder::Brighteon>), 
 castbox.fm podcasts (L<StreamFinder::Castbox>), 
-podcasts.google.com podcasts (L<StreamFinder::Google>), 
 iheart.com (aka iheartradio.com) radio stations and podcasts 
 (L<StreamFinder::IHeartRadio>), 
 www.internet-radio.com radio stations (L<StreamFinder::InternetRadio>), 
@@ -162,7 +161,8 @@ NOTE:  StreamFinder::Podcastaddict is now considered depreciated and may be
 removed in a later StreamFinder release as it now requires a specific valid 
 episode page to fetch streams from, as Podcastaddict.com has javascripted up 
 their podcast pages now to the point that it is no longer possible to obtain 
-a playlist or first episode from them via our scripts.  
+a playlist from them via our scripts.  However, it still seems to be able to 
+return the first episode data when given a podcast page for now.
 
 NOTE:  StreamFinder::Google has been removed as Google Podcasts has shut down.
 
@@ -550,7 +550,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '2.30';
+our $VERSION = '2.31';
 our $DEBUG = 0;
 
 require Exporter;

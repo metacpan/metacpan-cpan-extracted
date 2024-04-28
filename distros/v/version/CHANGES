@@ -4,6 +4,9 @@ This is not a complete list of changes.  See repository for full details:
 
     https://github.com/Perl/version.pm
 
+0.9931
+  * Fix definitions of LIKELY and UNLIKELY on older perls
+
 0.9930
   * Permit a colon after a vstring, thus allowing an attrlist to follow a version declaration on a 'class' statement (Perl5 #20891)
   * Simplify and fix w.r.t locale handling

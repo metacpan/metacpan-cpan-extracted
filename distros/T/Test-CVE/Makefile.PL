@@ -3,6 +3,7 @@
 # Copyright Toolchain Gang / CPAN Security group (c) 2023-2024 H.Merijn Brand
 
 require 5.014000;
+use strict;
 
 use ExtUtils::MakeMaker;
 
@@ -26,6 +27,7 @@ my %wm = (
 			     "HTTP::Tiny"	=> 0,
 			     "Text::Wrap"	=> 0,
 			     "JSON::MaybeXS"	=> 0,
+			     "Module::CoreList"	=> 0,
 			     },
     MIN_PERL_VERSION	=> "5.014",
     clean		=> { FILES => join " ", qw(
@@ -92,7 +94,7 @@ sub postamble {
 	'	ccache -C',
 	'	-@rm -f *.gc??',
 	'	cover -test',
-	"	cover -report html_basic $no_inc",
+	"	cover -report html_basic",
 	'',
 	'spellcheck:',
 	'	pod-spell-check --aspell --ispell',

@@ -44,17 +44,6 @@ sub __stmt_fold {
 }
 
 
-sub quote_constant {
-    my ( $sf, $value ) = @_;
-    if ( looks_like_number $value ) {
-        return $value;
-    }
-    else {
-        return $sf->{d}{dbh}->quote( $value );
-    }
-}
-
-
 sub get_stmt {
     my ( $sf, $sql, $stmt_type, $used_for ) = @_;
     my $in = ' ' x $sf->{o}{G}{base_indent};
@@ -79,20 +68,20 @@ sub get_stmt {
         push @tmp, $sf->__stmt_fold( $used_for, $sql->{case_stmt}, $indent0 );
         push @tmp, $sf->__stmt_fold( $used_for, $sql->{when_stmt}, $indent0 ) if $sql->{when_stmt};
     }
-    elsif ( $stmt_type eq 'Drop_table' ) {
+    elsif ( $stmt_type eq 'Drop_Table' ) {
         @tmp = ( $sf->__stmt_fold( $used_for, "DROP TABLE $qt_table", $indent0 ) );
     }
-    elsif ( $stmt_type eq 'Drop_view' ) {
+    elsif ( $stmt_type eq 'Drop_View' ) {
         @tmp = ( $sf->__stmt_fold( $used_for, "DROP VIEW $qt_table", $indent0 ) );
     }
-    elsif ( $stmt_type eq 'Create_table' ) {
+    elsif ( $stmt_type eq 'Create_Table' ) {
         my $stmt = sprintf "CREATE TABLE $qt_table (%s)", join ', ', @{$sql->{ct_column_definitions}}, @{$sql->{ct_table_constraints}};
         if ( @{$sql->{ct_table_options}} ) {
             $stmt .= ' ' . join ', ', @{$sql->{ct_table_options}};
         }
         @tmp = ( $sf->__stmt_fold( $used_for, $stmt, $indent0 ) );
     }
-    elsif ( $stmt_type eq 'Create_view' ) {
+    elsif ( $stmt_type eq 'Create_View' ) {
         @tmp = ( $sf->__stmt_fold( $used_for, "CREATE VIEW $qt_table", $indent0 ) );
         push @tmp, $sf->__stmt_fold( $used_for, "AS " . $sql->{view_select_stmt}, $indent1 );
     }
@@ -123,16 +112,13 @@ sub get_stmt {
         push @tmp, $sf->__stmt_fold( $used_for, $sql->{where_stmt}, $indent1 ) if $sql->{where_stmt};
     }
     elsif ( $stmt_type eq 'Insert' ) {
-        my $stmt = sprintf "INSERT INTO $sql->{table} (%s)", join ', ', map { $_ // '' } @{$sql->{insert_col_names}};
+        my $columns = join ', ', map { $_ // '' } @{$sql->{insert_col_names}};
+        my $placeholders = join ', ', ( '?' ) x @{$sql->{insert_col_names}};
+        my $stmt = "INSERT INTO $sql->{table} ($columns) VALUES($placeholders)";
         @tmp = ( $sf->__stmt_fold( $used_for, $stmt, $indent0 ) );
-        if ( $used_for eq 'prepare' ) {
-            push @tmp, sprintf " VALUES(%s)", join( ', ', ( '?' ) x @{$sql->{insert_col_names}} );
-        }
-        else {
-            push @tmp, $sf->__stmt_fold( $used_for, "VALUES(", $indent1 );
+        if ( $used_for eq 'print' ) {
             my $arg_rows = $sf->info_format_insert_args( $sql, $in x 2 );
             push @tmp, @$arg_rows;
-            push @tmp, $sf->__stmt_fold( $used_for, ")", $indent1 );
         }
     }
     elsif ( $stmt_type eq 'Join' ) {
@@ -196,7 +182,7 @@ sub info_format_insert_args {
         return [];
     }
     my $col_count = 0; ##
-    if ( $sf->{d}{stmt_types}[0] && $sf->{d}{stmt_types}[0] eq 'Create_table' ) {
+    if ( $sf->{d}{stmt_types}[0] && $sf->{d}{stmt_types}[0] eq 'Create_Table' ) {
         $col_count = @{$sql->{insert_args}[0]//[]};
         #$col_count = @{$sql->{ct_column_definitions//[]}};
         $col_count += 1 + $sf->{o}{create}{table_constraint_rows} if $sf->{o}{create}{table_constraint_rows};
@@ -243,6 +229,7 @@ sub info_format_insert_args {
     return $tmp;
 }
 
+
 sub __prepare_table_row {
     my ( $sf, $row, $indent, $term_w ) = @_;
     my $list_sep = ', ';
@@ -264,7 +251,7 @@ sub __select_cols {
         @cols = ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} );
     }
     elsif ( keys %{$sql->{alias}} ) {
-        @cols = @{$sql->{cols}};
+        @cols = @{$sql->{columns}};
         # use column names and not * if columns have aliases
     }
     if ( ! @cols ) {
@@ -312,18 +299,17 @@ sub get_sql_info {
 
 
 sub alias {
-    # Aliases:
-    #   JOIN: mandatory
+    # Aliases mandatory:
+    # JOIN talbes
+    # Derived Tables: mysql, MariaDB, Pg
     #
-    #   Subqueries in FROM (Derived Table, UNION):
-    #                       mandatory: mysql, MariaDB, Pg
-    #                       optional: SQLite, Firebird, DB2, Informix, Oracle
-    #
-    #   Columns: optional (SQ, functions)
-
     my ( $sf, $sql, $type, $identifier, $default ) = @_;
     my $prompt = 'as ';
     my $alias;
+    # 0 = NO
+    # 1 = AUTO
+    # 2 = ASK
+    # 3 = ASK/AUTO
     if ( $sf->{o}{alias}{$type} == 0 ) {
         return;
     }
@@ -438,6 +424,32 @@ sub unquote_identifier {
 }
 
 
+sub quote_constant {
+    my ( $sf, $value ) = @_;
+    if ( looks_like_number $value ) {
+        return $value;
+    }
+    else {
+        return $sf->{d}{dbh}->quote( $value );
+    }
+}
+
+
+sub unquote_constant {
+    my ( $sf, $constant ) = @_;
+    return if ! defined $constant;
+    $constant =~ s/^'|'\z//g;
+    if ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+        $constant =~ s/\\(.)/$1/g;
+    }
+    else {
+        $constant =~ s/''/'/g;
+        #$constant =~ s/'(?=(?:'')*(?:[^']|\z))//g;
+    }
+    return $constant;
+}
+
+
 sub clone_data {
     my ( $sf, $data ) = @_;
     require Storable;
@@ -447,13 +459,16 @@ sub clone_data {
 
 sub reset_sql {
     my ( $sf, $sql ) = @_;
-    my $backup = {};
-    for my $y ( qw( db schema table cols ) ) {
-        $backup->{$y} = $sql->{$y} if exists $sql->{$y};
-    }
+    # preserve base data: table name, column names and data types:
+    my $backup = {
+        table => $sql->{table} // '',
+        columns => $sql->{columns} // [],
+        data_types => $sql->{data_types} // {},
+    };
+    # reset/initialize:
     delete @{$sql}{ keys %$sql }; # not "$sql = {}" so $sql is still pointing to the outer $sql
     my @string = qw( distinct_stmt set_stmt where_stmt group_by_stmt having_stmt order_by_stmt limit_stmt offset_stmt );
-    my @array  = qw( cols group_by_cols aggr_cols selected_cols set_args
+    my @array  = qw( group_by_cols aggr_cols selected_cols set_args
                      ctes
                      ct_column_definitions ct_table_constraints ct_table_options
                      insert_col_names insert_args );
@@ -493,29 +508,62 @@ sub sql_limit {
 }
 
 
-sub column_names {
+sub column_names_and_types {
     my ( $sf, $qt_table, $ctes ) = @_;
     # without `LIMIT 0` slower with big tables: mysql, MariaDB and Pg
     # no difference with SQLite, Firebird, DB2 and Informix
-    my $columns;
+    my $column_names = [];
+    my $column_types = [];
     if ( ! eval {
         my $stmt = '';
         if ( defined $ctes && @$ctes ) {
             $stmt = "WITH " . join ', ', map { sprintf '%s AS (%s)', $_->{name}, $_->{query} } @$ctes;
             $stmt .= ' ';
         }
-
         $stmt .= "SELECT * FROM " . $qt_table . $sf->sql_limit( 0 );
         my $sth = $sf->{d}{dbh}->prepare( $stmt );
-        if ( $sf->{i}{driver} ne 'SQLite' ) {
-            $sth->execute();
+        if ( $sf->{i}{driver} eq 'SQLite' ) {
+            my $rx_numeric = 'INT|DOUBLE|REAL|NUM|FLOAT|DEC|BOOL|BIT|MONEY';
+            $column_names = [ @{$sth->{NAME}} ];
+            $column_types = [ map { ! $_ || $_ =~ /$rx_numeric/i ? 2 : 1 } @{$sth->{TYPE}} ];
         }
-        $columns = [ @{$sth->{NAME}} ];
+        else {
+            $sth->execute();
+            $column_names = [ @{$sth->{NAME}} ];
+            $column_types = [ @{$sth->{TYPE}} ];
+        }
         1 }
     ) {
         $sf->print_error_message( $@ );
+        return;
     }
-    return $columns;
+    return $column_names, $column_types;
+}
+
+
+sub major_server_version {
+    my ( $sf ) = @_;
+    my $driver = $sf->{i}{driver};
+    my $major_server_version;
+    if ( $driver eq 'Pg' ) {
+        eval {
+            my ( $pg_version ) = $sf->{d}{dbh}->selectrow_array( "SELECT version()" );
+            ( $major_server_version ) = $pg_version =~ /^\S+\s+(\d+)\./;
+        };
+    }
+    elsif ( $driver eq 'Firebird' ) {
+        eval {
+            my ( $firebird_version ) = $sf->{d}{dbh}->selectrow_array( "SELECT RDB\$GET_CONTEXT('SYSTEM', 'ENGINE_VERSION') FROM RDB\$DATABASE" );
+            ( $major_server_version  ) = $firebird_version =~ /^(\d+)\./;
+        };
+    }
+    elsif ( $driver eq 'Oracle' ) {
+        eval {
+            my $ora_server_version = $sf->{d}{dbh}->func( 'ora_server_version' );
+            $major_server_version = $ora_server_version->[0];
+      };
+    }
+    return $major_server_version // 1;
 }
 
 

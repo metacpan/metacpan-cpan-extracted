@@ -172,6 +172,14 @@ Returns the podcast's title, or (long description).  Podcasts
 on Castbox can have separate descriptions, but for podcasts, 
 it is always the podcast's title.
 
+Note:  Castbox podcasts sometimes contain a transcript text in a "lyrics" 
+(.lrc) link, which we download and append to the long description field.  
+This is useful in media players like Fauxdacious which display the 
+description field for podcasts and videos in the place where song lyrics 
+are displayed for songs.  If this is undesirable, one can simply add 
+something like "$podcast->{'description'} =~ s#\n\nTranscript:.+$##s;" 
+in their code.
+
 =item $podcast->B<getIconURL>(['artist'])
 
 Returns the URL for the podcast's "cover art" icon image, if any.
@@ -500,7 +508,7 @@ sub new
 				print STDERR "--WE HAVE LYRICS!, COOL!\n"  if ($DEBUG);
 				$lyrics = HTML::Entities::decode_entities($lyrics);
 				$lyrics =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/eg;
-				$self->{'description'} .= "\n\nLyrics:  $lyrics";
+				$self->{'description'} .= "\n\nTranscript:  $lyrics";
 			}
 		} else {
 			print STDERR $response->status_line  if ($DEBUG);

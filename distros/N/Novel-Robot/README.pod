@@ -20,130 +20,19 @@ support robot ouput file type, 支持小说输出形式
 
 L<Novel::Robot::Packer>
 
-=head2 install
+=head1 INSTALL
 
 for example, on debian, 以debian环境为例
 
     $ apt-get install parallel ansible calibre cpanminus
     $ cpanm Novel::Robot
 
-=head1 run_novel.pl
+=head2 example
 
-=head2 download url and convert
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t epub
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o mytest.epub
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o abc.epub -i 1-3
 
-download and convert ebook, 简单下载或处理电子书
-
-download the whole novel and convert to ebook 下载全本小说并转换为电子书
-
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t epub
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o mytest.epub
-
-download 1-3 chapter 下载小说的1-3章，最终输出文件名为abc.epub
-
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o abc.epub -i 1-3
-
-=head2 deal txt and convert
-
-convert txt to ebook, 把txt文件转成电子书
-
-    run_novel.pl -f 飘灯-风尘叹.txt -t epub
-    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -t epub
-
-=head2  download by site-writer-book and convert
-
-    run_novel.pl -s lofter -t epub -w chuweizhiyu -b 时之足
-    run_novel.pl -s lofter -t epub -w chuweizhiyu -b 时之足 -i 3-
-    run_novel.pl -s lofter -t epub -w chuweizhiyu -b 时之足 -i 3-5
-
-=head2 send novel with email
-
-download/convert novel, use calibre-smtp to send ebook to email address : xxx@kindle.cn
-
-下载小说并使用calibre-smtp推送到指定邮箱
-
-local smtp service 本地已安装smtp服务
-
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t epub -T "xxx@kindle.cn" -F "yyy@somesite.cn"
-    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -t epub -T "xxx@kindle.cn" -F "yyy@somesite.cn"
-
-remote smtp service 使用远程smtp服务
-
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t epub -T "xxx@kindle.cn" -i 1-3  -M smtp.src.com -p 587 -U xxx -P somepwd -F yyy@somesite.cn
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t epub -T "xxx@kindle.cn" -M smtp.qq.com -p 587 -U yyy -P 'aaaaaaaaaaaaagga' -F yyy@qq.com
-    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -t epub  -T "xxx@kindle.cn" -M smtp.qq.com -p 587 -U yyy -P 'aaaaaaaaaaaaagga' -F yyy@qq.com
-
-use L<ansible|https://www.ansible.com/>，push ebook to remote host, and then send email 
-
-使用ansible把电子书上传到远程服务器，再在远程服务器调用calibre-smtp在服务器直接smtp推送
-
-//todo
-
-
-=head2 ARG
-
-    -s : site, 小说站点
-    -u : book url，小说url
-    -w : writer name, 作者
-    -b : book name，书名
-    -f : txt file, txt文件或目录
-
-    -o : output ebook filename，输出电子书文件名
-    -t : ebook type，电子书类型
-
-
-=head1 get_novel.pl
-
-=head2 download 
-
-download novel from url
-
-下载小说
-
-    get_novel.pl -u [url] -t [type] -i [min_item_num-max_item_num] --cookie [cookie] -o [dst_file/dst_dir]
-    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [起止章节号] --cookie [cookie登录信息] -o [目标文件名/目标文件夹]
-
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t txt
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html
-
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-4
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i -3
-
-use chrome to parse dom: 
-
-飘灯-青春期妖怪.html
-
-    get_novel.pl -u "https://www.aliwx.com.cn/chapter?bid=7964189" --use_chrome --writer_path "//div[@class='chapterbox']//span" --book_regex "<title>(.+?)-" --content_path "//div[@class='chapter-content']"
-
-公众号
-
-    get_novel.pl -u "https://mp.weixin.qq.com/s?xxxx" --use_chrome --content_path "//div[@id='js_content']" --item_list_path "//div[@id='js_content']//a"  -w somewriter -b somebook
-
-jjwxc vip: 可以使用firefox浏览器，先登录m.jjwxc.net，然后用 L<cookies.txt|https://addons.mozilla.org/zh-CN/firefox/addon/cookies-txt/> 扩展导出cookies.txt，则可以下载当前登录账号所购买的小说；也可直接指定firefox配置目录下的cookies.sqlite文件；或者直接使用m.jjwxc.net的cookie字符串
-
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie cookies.txt
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie ~/.mozilla/firefox/*/cookies.sqlite
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie "name1=value1; name2=value2"
-
-=head2 convert txt
-
-convert txt, parse chapter name with regex
-
-转换txt，可指定章节标题的正则式
-
-    get_novel.pl -w [writer] -b [book] -f [txt_file/directory] -t [type] -r [chapter_regex]
-    get_novel.pl -w [作者] -b [书名] -f [txt文件或目录] -t [目标文件类型] -r [章节标题匹配的正则式]
-    get_novel.pl -w 牵机 -b 断情逐妖记 -f dq1.txt -t html
-    get_novel.pl -w 牵机 -b 断情逐妖记 -f dq1.txt,dq2.txt,dir1 -r "第[ \\t\\d]+章" -t html
-    get_novel.pl -f 飘灯-像妖怪一样自由.txt -t html
-
-=head2 only print info
-
-only print info, but not download, 输出小说信息（不下载）
-
-    get_novel.pl -u [url] -D 1
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838"  -D 1
 
 =head2 ARG
 
@@ -164,7 +53,7 @@ only print info, but not download, 输出小说信息（不下载）
 
     -D : only print info, not download, 只输出信息，不下载
     -v : verbose
-    --term_progress_bar: 显示进度条(默认不显示)
+    --progress: 显示进度条(默认不显示)
 
     --use_chrome      : use chrome dump_dom, only support GET method
     --with_toc        : 小说保存时是否生成目录(默认是)
@@ -183,8 +72,79 @@ only print info, but not download, 输出小说信息（不下载）
     --writer_regex    : regex to extract writer, 提取writer的正则
     --book_regex      : regex to extract book, 提取book的正则
 
+    -B : board_url / board_id  版块url，或版块编号
+    -q : query type, 查询类型
+    -k : query keyword, 查询关键字
 
-=head1 conv_novel.pl
+=head2 download novel
+
+download novel from url
+
+下载小说
+
+    get_novel.pl -u [url] -t [type] -i [min_item_num-max_item_num] --cookie [cookie] -o [dst_file/dst_dir]
+    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [起止章节号] --cookie [cookie登录信息] -o [目标文件名/目标文件夹]
+
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t txt
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html
+
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-4
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i -3
+
+=head3 use chrome
+
+阿里文学
+
+    get_novel.pl -u "https://www.aliwx.com.cn/chapter?bid=7964189" --use_chrome --writer_path "//div[@class='chapterbox']//span" --book_regex "<title>(.+?)-" --content_path "//div[@class='chapter-content']"
+
+公众号
+
+    get_novel.pl -u "https://mp.weixin.qq.com/s?xxxx" --use_chrome --content_path "//div[@id='js_content']" --item_list_path "//div[@id='js_content']//a"  -w somewriter -b somebook
+
+=head3 use cookie
+
+以firefox浏览器为例，先登录对应站点，然后用 L<cookies.txt|https://addons.mozilla.org/zh-CN/firefox/addon/cookies-txt/> 扩展导出cookies.txt，则可以下载当前登录账号所购买的小说；
+也可直接指定firefox配置目录下的cookies.sqlite文件；
+或者直接使用m.jjwxc.net的cookie字符串
+
+绿晋江VIP
+
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie cookies.txt
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie ~/.mozilla/firefox/*/cookies.sqlite
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie "name1=value1; name2=value2"
+
+=head3  download by site, writer, book 
+
+    get_novel.pl -s lofter -t epub -w chuweizhiyu -b 时之足
+    get_novel.pl -s lofter -t epub -w chuweizhiyu -b 时之足 -i 3-
+    get_novel.pl -s lofter -t epub -w chuweizhiyu -b 时之足 -i 3-5
+
+
+=head2 parse txt
+
+parse chapter name with regex, convert txt to ebook 
+
+可指定章节标题的正则式，把txt文件转成电子书
+
+    get_novel.pl -s txt -w [writer] -b [book] -f [txt_file/directory] -t [type] -r [chapter_regex]
+    get_novel.pl -s txt -w [作者] -b [书名] -f [txt文件或目录] -t [目标文件类型] -r [章节标题匹配的正则式]
+
+    get_novel.pl -s txt -w 牵机 -b 断情逐妖记 -f dq1.txt -t html
+    get_novel.pl -s txt -w 牵机 -b 断情逐妖记 -f dq1.txt,dq2.txt,dir1 -r "第[ \\t\\d]+章" -t html
+    get_novel.pl -s txt -f 飘灯-像妖怪一样自由.txt -t html
+    get_novel.pl -s txt -f 飘灯-风尘叹.txt -t epub
+    get_novel.pl -s txt -f fct.txt -w 飘灯 -b 风尘叹 -t epub
+
+=head2 only print info
+
+only print info, but not download, 输出小说信息（不下载）
+
+    get_novel.pl -u [url] -D 1
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838"  -D 1
+
+=head1 convert ebook
     
 use L<calibre|https://calibre-ebook.com/> to convert novel file into epub/epub/..., default filename format is [writer]-[bookname].[type]
 
@@ -196,163 +156,71 @@ use L<calibre|https://calibre-ebook.com/> to convert novel file into epub/epub/.
     conv_novel.pl -f 天平-风起阿房.html -t epub
     conv_novel.pl -f mxj.html -w 施定柔 -b 迷侠记 -t epub
 
-=head1 bulk_novel.pl
+=head2 send email 
+
+download/convert novel, use calibre-smtp to send ebook to email address : xxx@kindle.com
+
+下载小说并使用calibre-smtp推送到指定邮箱
+
+local smtp service 本地已安装smtp服务
+
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t epub -T "xxx@kindle.com" -F "yyy@somesite.cn"
+    get_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -t epub -T "xxx@kindle.com" -F "yyy@somesite.cn"
+
+remote smtp service 使用远程smtp服务
+
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t epub -T "xxx@kindle.com" -i 1-3  -M smtp.src.com -p 587 -U xxx -P somepwd -F yyy@somesite.cn
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t epub -T "xxx@kindle.com" -M smtp.qq.com -p 587 -U yyy -P 'aaaaaaaaaaaaagga' -F yyy@qq.com
+    get_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -t epub  -T "xxx@kindle.com" -M smtp.qq.com -p 587 -U yyy -P 'aaaaaaaaaaaaagga' -F yyy@qq.com
+
+use L<ansible|https://www.ansible.com/>，push ebook to remote host, and then send email 
+
+使用ansible把电子书上传到远程服务器，再在远程服务器调用calibre-smtp在服务器直接smtp推送
+
+=head2 bulk novel info
 
     get bulk novel info: <writer,book,url> , default option is not download
 
-get writer's novels info, not download
+=head3 query
 
-批量获取版块/作者专栏的小说信息，默认-D=1不下载
+查询关键字，不下载  
 
-    bulk_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=14644"
-    bulk_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=14644" -i 1-3
+    get_novel.pl -s jjwxc -q 作者 -k 牵机 -i 1-10 -D 1
+    get_novel.pl -s hjj -b 153 -q 贴子主题 -k 迷侠记 -D 1
+
+=head3 board
+
+批量获取版块/作者专栏的小说信息
+
+    get_novel.pl -B "http://www.jjwxc.net/oneauthor.php?authorid=14644" -D 1
+    get_novel.pl -B "http://www.jjwxc.net/oneauthor.php?authorid=14644" -i 1-3 -D 1
+    get_novel.pl -B "http://bbs.jjwxc.net/board.php?board=153&page=0" -P 1-2 -D 1
+    get_novel.pl -B "http://bbs.jjwxc.net/board.php?board=153&page=0" -i 1-20 -D 1
 
 
-get board's threads info, not download
-
-查询版块贴子信息，默认-D=1不下载
-
-    bulk_novel.pl -b "http://bbs.jjwxc.net/board.php?board=153&page=0" -P 1-2
-    bulk_novel.pl -b "http://bbs.jjwxc.net/board.php?board=153&page=0" -i 1-20
-
-query novels info, not download
-
-批量查询，不下载  
-
-    bulk_novel.pl -s jjwxc -q 作者 -k 牵机 -i 1-10
-    bulk_novel.pl -s jjwxc -q 作品 -k 网王 -P 1-3
-    bulk_novel.pl -s hjj -b 153 -q 贴子主题 -k 迷侠记
-
-bulk download novels
+=head3 bulk download
 
 下载专栏内的所有小说
 
-    bulk_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=14644" -D 0
+    get_novel.pl -B "http://www.jjwxc.net/oneauthor.php?authorid=14644" -D 0
 
 manually select some novels, use parallel for multiple novels download
     
-手动选择下载部分小说，用L<parallel|https://www.gnu.org/software/parallel/>批量调用run_novel.pl获取epub
+手动选择下载部分小说，用L<parallel|https://www.gnu.org/software/parallel/>批量调用get_novel.pl获取epub
 
-    bulk_novel.pl -s jjwxc -q 作者 -k 牵机 -P 1 > raw_booklist.txt
+    get_novel.pl -s jjwxc -q 作者 -k 牵机 -D 1  > raw_booklist.txt
     awk -F, '$1=="牵机"' raw_booklist.txt > refine_booklist.txt
-    parallel --colsep , run_novel.pl -u "{3}" -T epub :::: refine_booklist.txt
-
-=head2 ARG
-
-    -s : site, 指定站点
-
-    -b : board_url / board_id  版块url，或版块编号
-
-    -q : query type, 查询类型
-    -k : query keyword, 查询关键字
-
-    -i : min_item_num-max_item_num, 只取 x-y 项
-    -j : min_page_num-max_page_num, 只取 x-y 页
-
-    -D : only print info, not download, 只输出信息，不下载
+    parallel --colsep , get_novel.pl -u "{3}" -t epub :::: refine_booklist.txt
 
 =head1 FUNCTION
 
-=head2 new 
-
-init to set src site and dst type
-
-初始化设置解析引擎，目标文件类型
 
     my $xs = Novel::Robot->new(
     site => 'jjwxc',
     type => 'html', 
     );
 
-=head2 set_parser 
-
-set src site, 设置解析引擎
-
-    $xs->set_parser('jjwxc');
-
-=head2 set_packer 
-
-set dst type, 设置打包引擎
-
-    $xs->set_packer('html');
-
-=head2 get_novel 
-
-download one novel/thread 下载整本小说
-
-    $xs->set_parser('jjwxc');
     my $index_url = 'http://www.jjwxc.net/onebook.php?novelid=2456';
     $xs->get_novel($index_url);
-
-
-    $xs->set_parser('txt');
-    $xs->get_novel([ '/somepath/somefile.txt' ]
-            writer => '牵机', book => '断情逐妖记', 
-            );
-
-=head2 bulk novels and download 
-
-bulk download writer's novel 下载作者专栏
-
-    #!/usr/bin/perl   
-    use strict;
-    use warnings;
-    use utf8;
-
-    use Novel::Robot;
-    use Data::Dumper;
-    use Encode::Locale;
-    use Encode;
-
-    my $xs = Novel::Robot->new();
-
-    $xs->set_parser( 'jjwxc' );
-    $xs->set_packer( 'html' );
-
-    my $writer_url = 'http://www.jjwxc.net/oneauthor.php?authorid=14644';
-    my $writer_ref = $xs->{parser}->get_iterate_ref(
-      $writer_url,
-        info_sub => sub {
-                $xs->{parser}->extract_elements(
-                      @_,
-                            sub => $xs->{parser}->can( "parse_board" ),
-                                );
-                  },
-                    item_list_sub => sub { $xs->{parser}->can( "parse_board_item" )->( $xs->{parser}, @_ ) },
-                    );
-
-    print encode( locale => "$writer_ref->{writer},$_->{book},$_->{url}\n" ) for @{ $writer_ref->{item_list} };
-
-    print "\nstart download\n";
-    $xs->get_novel( $_->{url} ) for @{ $writer_ref->{item_list} };
-
-bulk download query novel 下载查询结果
-
-    #!/usr/bin/perl   
-    use strict;
-    use warnings;
-    use utf8;
-
-    use Novel::Robot;
-    use Data::Dumper;
-    use Encode::Locale;
-    use Encode;
-
-    my $xs = Novel::Robot->new();
-
-    $xs->set_parser( 'jjwxc' );
-    $xs->set_packer( 'html' );
-
-    my $keyword = '断情逐妖记';
-    my $query_url = $xs->{parser}->make_query_request($keyword, query_type =>  '作品');
-    my $query_ref = $xs->{parser}->get_iterate_ref(
-      $query_url,
-        info_sub => sub { return {}; },
-          item_list_sub => sub { $xs->{parser}->can( "parse_query_item" )->( $xs->{parser}, @_ ) },
-          );
-    print encode( locale => "$_->{writer},$_->{book},$_->{url}\n" ) for @{ $query_ref->{item_list} };
-
-    print "\nonly download first\n";
-    $xs->get_novel( $_->{url} ) for @{ $query_ref->{item_list} }[0];
 
 =cut

@@ -22,14 +22,11 @@ Enhance your Perl applications with the [Aspose.Cells Cloud](https://products.as
 
 
 
-## Feature & Enhancements in Version 24.3
+## Feature & Enhancements in Version 24.4
 
 Full list of issues covering all changes in this release:
 
-- Support data deduplication.
-- Support data filling.
-- Support to delete incomplete rows.
-- Support data cleansing.
+- Support data transformation.
 
 ## Support file format
 
@@ -121,6 +118,13 @@ $instance->put_convert_workbook(request=> $request);
 
 
 # Release history version
+
+## Feature & Enhancements in Version 24.3
+
+- Support data deduplication.
+- Support data filling.
+- Support to delete incomplete rows.
+- Support data cleansing.
 
 ## Enhancements in Version 24.2.1
 

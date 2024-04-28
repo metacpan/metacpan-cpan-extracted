@@ -37,6 +37,14 @@ sub get_db_driver {
 }
 
 
+sub read_attributes {
+    my ( $sf ) = @_;
+    return [
+        { name => 'sqlite_busy_timeout', default => 30000 },
+    ];
+}
+
+
 sub set_attributes {
     my ( $sf ) = @_;
     my $values = [
@@ -58,6 +66,7 @@ sub get_db_handle {
     my ( $sf, $db ) = @_;
     my $db_opt_get = App::DBBrowser::Opt::DBGet->new( $sf->{i}, $sf->{o} );
     my $db_opt = $db_opt_get->read_db_config_files();
+    my $read_attributes = $db_opt_get->get_read_attributes( $db, $db_opt );
     my $set_attributes = $db_opt_get->get_set_attributes( $db, $db_opt );
     my $dsn = "dbi:$sf->{i}{driver}:dbname=$db";
     my $dbh = DBI->connect( $dsn, '', '', {
@@ -67,6 +76,9 @@ sub get_db_handle {
         ShowErrorStatement => 1,
         %$set_attributes,
     } );
+    if ( DBI::looks_like_number( $read_attributes->{sqlite_busy_timeout} ) ) {
+        $dbh->sqlite_busy_timeout( 0 + $read_attributes->{sqlite_busy_timeout} );
+    }
     return $dbh;
 }
 
@@ -96,7 +108,7 @@ sub get_databases {
         elsif ( $choice eq $change ) {
             my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
             #my $info = 'Curr: ' . join( ', ', @$dirs ); #
-            my $new_dirs = $tu->choose_directories();
+            my $new_dirs = $tu->choose_directories( { confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} } );
             if ( ! @{$new_dirs//[]} ) {
                 next;
             }

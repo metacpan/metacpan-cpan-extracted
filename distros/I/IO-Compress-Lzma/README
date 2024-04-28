@@ -1,9 +1,9 @@
 
                             IO-Compress-Lzma
 
-                             Version 2.211
+                              Version 2.212
 
-                              6 April 2024
+                              27 April 2024
 
         Copyright (c) 2009-2024 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
@@ -84,7 +84,7 @@ To help me help you, I need all of the following information:
         If you haven't installed IO-Compress-Lzma then search IO::Compress::Lzma.pm
         for a line like this:
 
-          $VERSION = "2.211" ;
+          $VERSION = "2.212" ;
 
  2. If you are having problems building IO-Compress-Lzma, send me a
     complete log of what happened. Start by unpacking the IO-Compress-Lzma

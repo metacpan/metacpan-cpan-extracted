@@ -26,7 +26,7 @@ YAML
 
 # the absolute uri we will see in errors
 my $doc_uri_rel = Mojo::URL->new('/api');
-my $doc_uri = $doc_uri_rel->to_abs(Mojo::URL->new('https://example.com'));
+my $doc_uri = $doc_uri_rel->to_abs(Mojo::URL->new('http://example.com'));
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
 subtest 'bad conversion to Mojo::Message::Request' => sub {
@@ -183,8 +183,6 @@ YAML
       request => isa('Mojo::Message::Request'),
       method => 'post',
       path_template => '/foo/{foo_id}',
-      _path_item => { get => ignore },
-      path_item_uri => $doc_uri_rel->clone->fragment(jsonp('/paths', qw(/foo/bar))),
       path_captures => {},
       operation_id => 'my-get-path',
       errors => [
@@ -209,8 +207,6 @@ YAML
       request => isa('Mojo::Message::Request'),
       method => 'post',
       path_captures => {},
-      _path_item => { get => ignore },
-      path_item_uri => $doc_uri_rel->clone->fragment(jsonp('/paths', qw(/foo/bar))),
       operation_id => 'my-get-path',
       errors => [
         methods(TO_JSON => {
@@ -373,8 +369,6 @@ YAML
       method => 'get',
       path_captures => {},
       operation_id => 'my-get-path',
-      _path_item => { get => ignore },
-      path_item_uri => $doc_uri_rel->clone->fragment('/paths/~1foo~1bar'),
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/uri/path',
@@ -398,8 +392,6 @@ YAML
       method => 'post',
       path_captures => { foo_id => 'goodbye' },
       operation_id => 'my-post-path',
-      _path_item => { post => ignore },
-      path_item_uri => $doc_uri_rel->clone->fragment('/paths/~1foo~1{foo_id}'),
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/uri/path',
@@ -578,7 +570,6 @@ YAML
     'path capture variables are found to be consistent with the URI when some values are url-escaped',
   );
 
-
   ok($openapi->find_path($options = { request => request('GET', $uri) } ), 'find_path returns successfully');
   cmp_deeply(
     $options,
@@ -593,6 +584,113 @@ YAML
       errors => [],
     },
     'path captures can be properly extracted from the URI when some values are url-escaped',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => '/api',
+    openapi_schema => $yamlpp->load_string(<<YAML));
+$openapi_preamble
+paths:
+  /foo.bar: # dot sorts higher than /, so this will match if we are sloppy with regexes
+    get:
+      operationId: dotted-foo-bar
+  /foo/bar:
+    get:
+      operationId: concrete-foo-bar
+  /foo/{foo_id}.bar:
+    get:
+      operationId: templated-foo-bar
+  /foo/.....:
+    get:
+      operationId: all-dots
+YAML
+
+  $request = request('GET', 'http://example.com/foo/bar');
+  ok($openapi->find_path($options = { request => $request } ), 'find_path returns successfully');
+  cmp_deeply(
+    $options,
+    my $got_options = {
+      request => isa('Mojo::Message::Request'),
+      path_captures => {},
+      path_template => '/foo/bar',
+      method => 'get',
+      operation_id => 'concrete-foo-bar',
+      _path_item => { get => ignore },
+      path_item_uri => $doc_uri_rel->clone->fragment('/paths/~1foo~1bar'),
+      errors => [],
+    },
+    'paths with dots are not treated as regex wildcards when matching against URIs',
+  );
+
+  ok(!$openapi->find_path($options = { operation_id => 'dotted-foo-bar', request => $request } ), 'find_path fails');
+  cmp_deeply(
+    $options,
+    {
+      request => isa('Mojo::Message::Request'),
+      method => 'get',
+      operation_id => 'dotted-foo-bar',
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '/request/uri/path',
+          keywordLocation => jsonp('/paths/~1foo.bar'),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths/~1foo.bar'))->to_string,
+          error => 'provided operation_id does not match request URI',
+        }),
+      ],
+    },
+    'provided operation_id and inferred path_template does not match request uri',
+  );
+
+  ok($openapi->find_path($options = { operation_id => 'concrete-foo-bar', request => $request } ), 'find_path returns successfully');
+  cmp_deeply(
+    $options,
+    $got_options,
+    'inferred (correct) path_template matches request uri',
+  );
+
+
+  $request = request('GET', 'http://example.com/foo/x.bar');
+  ok($openapi->find_path($options = { request => $request } ), 'find_path returns successfully');
+  cmp_deeply(
+    $got_options = $options,
+    {
+      request => isa('Mojo::Message::Request'),
+      path_captures => { foo_id => 'x' },
+      path_template => '/foo/{foo_id}.bar',
+      operation_id => 'templated-foo-bar',
+      method => 'get',
+      _path_item => { get => ignore },
+      path_item_uri => $doc_uri_rel->clone->fragment('/paths/~1foo~1{foo_id}.bar'),
+      errors => [],
+    },
+    'capture values are still captured when using dots in path template',
+  );
+
+  ok(!$openapi->find_path($options = { operation_id => 'all-dots', request => $request } ), 'find_path fails');
+  cmp_deeply(
+    $options,
+    {
+      request => isa('Mojo::Message::Request'),
+      operation_id => 'all-dots',
+      method => 'get',
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '/request/uri/path',
+          keywordLocation => jsonp('/paths/~1foo~1.....'),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths/~1foo~1.....'))->to_string,
+          error => 'provided operation_id does not match request URI',
+        }),
+      ],
+    },
+    'provided operation_id and inferred path_template does not match request uri',
+  );
+
+  ok($openapi->find_path($options = { operation_id => 'templated-foo-bar', request => $request } ), 'find_path returns successfully');
+  cmp_deeply(
+    $options,
+    $got_options,
+    'inferred (correct) path_template matches request uri',
   );
 
 
@@ -666,8 +764,6 @@ YAML
       operation_id => 'my-get-path',
       method => 'POST',
       path_captures => {},
-      _path_item => { get => ignore },
-      path_item_uri => $doc_uri_rel->clone->fragment('/paths/~1foo~1{foo_id}'),
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/method',

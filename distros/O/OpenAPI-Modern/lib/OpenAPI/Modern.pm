@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.061-18-g1d526aa
+package OpenAPI::Modern; # git description: v0.062-7-g2d75f60
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.062';
+our $VERSION = '0.063';
 
 use 5.020;
 use utf8;
@@ -227,8 +227,6 @@ sub validate_response ($self, $response, $options = {}) {
 
     return $self->_result($state, 0, 1) if not exists $operation->{responses};
 
-    $state->{effective_base_uri} = Mojo::URL->new->scheme('https')->host($options->{request}->headers->host)
-      if $options->{request};
     $state->{schema_path} = jsonp($state->{schema_path}, $method);
     $state->{data_path} = '/response';
 
@@ -313,7 +311,10 @@ sub find_path ($self, $options, $state = {}) {
   $state->{traversed_schema_path} = '';    # the accumulated traversal path as of the start, or last $id, or up to the last traversed $ref
   $state->{schema_path} = '';              # the rest of the path, since the last $id or the last traversed $ref
   $state->{errors} = $options->{errors} //= [];
-  $state->{effective_base_uri} = Mojo::URL->new->scheme('https')->host($options->{request}->headers->host) if $options->{request};
+  $state->{effective_base_uri} = Mojo::URL->new
+      ->scheme($options->{request}->url->to_abs->scheme // 'https')
+      ->host($options->{request}->headers->host)
+    if $options->{request};
   $state->{depth} = 0;
 
   # requests don't have response codes, so if 'error' is set, it is some sort of parsing error
@@ -347,9 +348,6 @@ sub find_path ($self, $options, $state = {}) {
     ($path_template, $method) = @bits[-2,-1];
     pop @bits;
     $path_item_path = jsonp(@bits);
-
-    $options->{_path_item} = $self->openapi_document->get($path_item_path);
-    $options->{path_item_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment($path_item_path);
 
     # FIXME: the path_template is not correct if there was a $ref from the original /paths/ entry to
     # get to this path-item and operation. We need to look up the path_template from the request as
@@ -391,7 +389,11 @@ sub find_path ($self, $options, $state = {}) {
     # sorting (ascii-wise) gives us the desired results that concrete path components sort ahead of
     # templated components, except when the concrete component is a non-ascii character or matches [|}~].
     foreach $path_template (sort keys $schema->{paths}->%*) {
-      my $path_pattern = $path_template =~ s!\{[^}]+\}!([^/?#]*)!gr;
+      # §3.2: "The value for these path parameters MUST NOT contain any unescaped “generic syntax”
+      # characters described by [RFC3986]: forward slashes (/), question marks (?), or hashes (#)."
+      my $path_pattern = join '',
+        map +(substr($_, 0, 1) eq '{' ? '([^/?#]*)' : quotemeta($_)),
+        split /(\{[^}]+\})/, $path_template;
 
       # TODO: consider 'servers' fields when matching request URIs: this requires looking at
       # path prefixes present in server urls
@@ -441,8 +443,7 @@ sub find_path ($self, $options, $state = {}) {
 
   # FIXME: follow $ref chain in path-item
   $path_item_path = jsonp('/paths', $path_template);
-  $options->{_path_item} = $self->openapi_document->get($path_item_path);
-  $options->{path_item_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment($path_item_path);
+  my $path_item = $self->openapi_document->get($path_item_path);
 
   # note: we aren't doing anything special with escaped slashes. this bit of the spec is hazy.
   my @capture_names = ($path_template =~ m!\{([^}]+)\}!g);
@@ -452,8 +453,9 @@ sub find_path ($self, $options, $state = {}) {
       and not is_equal([ sort keys $options->{path_captures}->%* ], [ sort @capture_names ]);
 
   if (not $options->{request}) {
-    $options->@{qw(path_template operation_id)} =
-      ($path_template, $self->openapi_document->schema->{paths}{$path_template}{$method}{operationId});
+    $options->@{qw(path_template operation_id _path_item path_item_uri)} =
+      ($path_template, $self->openapi_document->schema->{paths}{$path_template}{$method}{operationId},
+      $path_item, Mojo::URL->new($state->{initial_schema_uri})->fragment($path_item_path));
     delete $options->{operation_id} if not defined $options->{operation_id};
     $state->{schema_path} = $path_item_path;
     return 1;
@@ -463,9 +465,12 @@ sub find_path ($self, $options, $state = {}) {
   # operation_id, and now we verify it against path_captures and the request URI.
   my $uri_path = $options->{request}->url->path;
 
-  # 3.2: "The value for these path parameters MUST NOT contain any unescaped “generic syntax”
+  # §3.2: "The value for these path parameters MUST NOT contain any unescaped “generic syntax”
   # characters described by [RFC3986]: forward slashes (/), question marks (?), or hashes (#)."
-  my $path_pattern = $path_template =~ s!\{[^}]+\}!([^/?#]*)!gr;
+  my $path_pattern = join '',
+    map +(substr($_, 0, 1) eq '{' ? '([^/?#]*)' : quotemeta($_)),
+    split /(\{[^}]+\})/, $path_template;
+
   return E({ %$state, keyword => 'paths', _schema_path_suffix => $path_template },
       'provided %s does not match request URI', exists $options->{path_template} ? 'path_template' : 'operation_id')
     if $uri_path !~ m/^$path_pattern$/;
@@ -877,7 +882,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.062
+version 0.063
 
 =head1 SYNOPSIS
 
@@ -1007,7 +1012,7 @@ The URI that identifies the OpenAPI document.
 Ignored if L</openapi_document> is provided.
 
 If it is not absolute, it is resolved at runtime against the request's C<Host> header (when available)
-and the https scheme is assumed.
+and scheme (e.g. C<https>).
 
 =head2 openapi_schema
 

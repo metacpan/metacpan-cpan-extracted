@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000029';
 
 use IPC::Cmd qw/can_run/;
 use DBIx::QuickDB::Util qw/strip_hash_defaults/;

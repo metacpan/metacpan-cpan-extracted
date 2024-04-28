@@ -184,7 +184,11 @@ sub _gen_default_filedata {
         "url": "https://metacpan.org/pod/CPAN::Meta::Spec",
         "version": 2.0
       },
-      "release_status": "stable"
+      "release_status": "stable",
+      "x_dynamic_prereqs": {
+		"version": 1,
+		"expressions": [ { "condition": [ "has_perl", "$]"], "prereqs": { "Bar": 1 } } ]
+	  }
     }
     ----
 }

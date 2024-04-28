@@ -2,7 +2,7 @@ package DBIx::QuickDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000029';
 
 use Carp;
 use List::Util qw/first/;
@@ -37,7 +37,7 @@ sub build_db {
         if $name && $CACHE{$name} && !$spec->{nocache};
 
     unless ($spec->{dir}) {
-        $spec->{dir}       = tempdir('DB-QUICK-XXXXXXXX', CLEANUP => 0, TMPDIR => 1);
+        $spec->{dir}       = tempdir('DB-QUICK-XXXXXXXX', CLEANUP => 0, $ENV{QDB_TMPDIR} ? (DIR => $ENV{QDB_TMPDIR}) : (TMPDIR => 1));
         $spec->{cleanup}   = 1 unless defined $spec->{cleanup};
         $spec->{bootstrap} = 1 unless defined $spec->{bootstrap};
     }
@@ -153,6 +153,16 @@ run-time and you have to store them in variables.
     my $p_dbh = $psql->connect;
 
     ...
+
+=head2 ENV VARS
+
+=over 4
+
+=item QDB_TMPDIR
+
+Set this env var if you want QDB to use a temp dir other than the default.
+
+=back
 
 =head1 METHODS
 

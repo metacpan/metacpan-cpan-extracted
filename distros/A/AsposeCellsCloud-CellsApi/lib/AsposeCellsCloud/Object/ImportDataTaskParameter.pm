@@ -35,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::DataSource;
 use AsposeCellsCloud::Object::FileSource;
 use AsposeCellsCloud::Object::ImportOption;
 use AsposeCellsCloud::Object::TaskParameter; 
@@ -127,6 +128,13 @@ __PACKAGE__->class_documentation({description => '',
 
 
 __PACKAGE__->method_documentation({
+     'data_source' => {
+     	datatype => 'DataSource',
+     	base_name => 'DataSource',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'workbook' => {
      	datatype => 'FileSource',
      	base_name => 'Workbook',
@@ -141,6 +149,13 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
+     'target_data_source' => {
+     	datatype => 'DataSource',
+     	base_name => 'TargetDataSource',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'destination_workbook' => {
      	datatype => 'FileSource',
      	base_name => 'DestinationWorkbook',
@@ -151,14 +166,18 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->swagger_types( {
+    'data_source' => 'DataSource',
     'workbook' => 'FileSource',
     'import_option' => 'ImportOption',
+    'target_data_source' => 'DataSource',
     'destination_workbook' => 'FileSource' 
 } );
 
 __PACKAGE__->attribute_map( {
+    'data_source' => 'DataSource',
     'workbook' => 'Workbook',
     'import_option' => 'ImportOption',
+    'target_data_source' => 'TargetDataSource',
     'destination_workbook' => 'DestinationWorkbook' 
 } );
 

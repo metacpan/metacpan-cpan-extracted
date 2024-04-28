@@ -63,7 +63,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "24.3"
+         "version" : "24.4"
       },    
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
@@ -200,11 +200,17 @@
       "AsposeCellsCloud::Object::DataFillValue" : {
          "file" : "lib/AsposeCellsCloud/Object/DataFillValue.pm"
       },
+      "AsposeCellsCloud::Object::DataItem" : {
+         "file" : "lib/AsposeCellsCloud/Object/DataItem.pm"
+      },
       "AsposeCellsCloud::Object::DataSorter" : {
          "file" : "lib/AsposeCellsCloud/Object/DataSorter.pm"
       },
       "AsposeCellsCloud::Object::DataSorterKey" : {
          "file" : "lib/AsposeCellsCloud/Object/DataSorterKey.pm"
+      },
+      "AsposeCellsCloud::Object::DataSource" : {
+         "file" : "lib/AsposeCellsCloud/Object/DataSource.pm"
       },
       "AsposeCellsCloud::Object::DateTimeGroupItem" : {
          "file" : "lib/AsposeCellsCloud/Object/DateTimeGroupItem.pm"
@@ -217,6 +223,9 @@
       },
       "AsposeCellsCloud::Object::FileInfo" : {
          "file" : "lib/AsposeCellsCloud/Object/FileInfo.pm"
+      },
+      "AsposeCellsCloud::Object::FileSource" : {
+         "file" : "lib/AsposeCellsCloud/Object/FileSource.pm"
       },
       "AsposeCellsCloud::Object::FilesResult" : {
          "file" : "lib/AsposeCellsCloud/Object/FilesResult.pm"
@@ -307,9 +316,6 @@
       },
       "AsposeCellsCloud::Object::ProtectSheetParameter" : {
          "file" : "lib/AsposeCellsCloud/Object/ProtectSheetParameter.pm"
-      },
-      "AsposeCellsCloud::Object::QueryTable" : {
-         "file" : "lib/AsposeCellsCloud/Object/QueryTable.pm"
       },
       "AsposeCellsCloud::Object::Range" : {
          "file" : "lib/AsposeCellsCloud/Object/Range.pm"
@@ -415,9 +421,6 @@
       },
       "AsposeCellsCloud::Object::ConvertWorksheetTaskParameter" : {
          "file" : "lib/AsposeCellsCloud/Object/ConvertWorksheetTaskParameter.pm"
-      },
-      "AsposeCellsCloud::Object::FileSource" : {
-         "file" : "lib/AsposeCellsCloud/Object/FileSource.pm"
       },
       "AsposeCellsCloud::Object::ImportDataTaskParameter" : {
          "file" : "lib/AsposeCellsCloud/Object/ImportDataTaskParameter.pm"
@@ -923,6 +926,9 @@
       "AsposeCellsCloud::Object::DataFillRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/DataFillRequest.pm"
       },
+      "AsposeCellsCloud::Object::DataTransformationRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/DataTransformationRequest.pm"
+      },
       "AsposeCellsCloud::Object::DeleteIncompleteRowsRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/DeleteIncompleteRowsRequest.pm"
       },
@@ -979,6 +985,27 @@
       },
       "AsposeCellsCloud::Object::RenderingWatermark" : {
          "file" : "lib/AsposeCellsCloud/Object/RenderingWatermark.pm"
+      },
+      "AsposeCellsCloud::Object::LoadData" : {
+         "file" : "lib/AsposeCellsCloud/Object/LoadData.pm"
+      },
+      "AsposeCellsCloud::Object::LoadTo" : {
+         "file" : "lib/AsposeCellsCloud/Object/LoadTo.pm"
+      },
+      "AsposeCellsCloud::Object::PivotColumn" : {
+         "file" : "lib/AsposeCellsCloud/Object/PivotColumn.pm"
+      },
+      "AsposeCellsCloud::Object::QueryDataSource" : {
+         "file" : "lib/AsposeCellsCloud/Object/QueryDataSource.pm"
+      },
+      "AsposeCellsCloud::Object::QueryTable" : {
+         "file" : "lib/AsposeCellsCloud/Object/QueryTable.pm"
+      },
+      "AsposeCellsCloud::Object::Transformation" : {
+         "file" : "lib/AsposeCellsCloud/Object/Transformation.pm"
+      },
+      "AsposeCellsCloud::Object::UnpivotColumn" : {
+         "file" : "lib/AsposeCellsCloud/Object/UnpivotColumn.pm"
       },
       "AsposeCellsCloud::Object::PivotField" : {
          "file" : "lib/AsposeCellsCloud/Object/PivotField.pm"
@@ -1643,6 +1670,9 @@
       "AsposeCellsCloud::Request::PostDeleteIncompleteRowsRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostDeleteIncompleteRowsRequest.pm"
       },
+      "AsposeCellsCloud::Request::PostDataTransformationRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostDataTransformationRequest.pm"
+      },
       "AsposeCellsCloud::Request::GetWorksheetHyperlinksRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/GetWorksheetHyperlinksRequest.pm"
       },
@@ -2287,6 +2317,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "24.3",
+   "version" : "24.4",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

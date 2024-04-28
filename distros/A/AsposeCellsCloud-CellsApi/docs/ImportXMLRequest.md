@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ImportXMLRequest;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**XMLFileSource** | **FileSource** | XML file source |
+**XMLFileSource** | **DataSource** | XML file source |
 **ImportPosition** | **ImportPosition** | Import position description. |
 **XMLContent** | **string** | Base64String default is null |  
 

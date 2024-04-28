@@ -101,9 +101,9 @@ sub request_url_whole {
 
   if ( $o{item_sub} ) {
     my $item_id = 0;
-    print "\n\n" if ( $o{term_progress_bar} );
+    print "\n\n" if ( $o{progress} );
     my $progress;
-    $progress = Term::ProgressBar->new( { count => scalar(@$data_list) } ) if ( $o{term_progress_bar} );
+    $progress = Term::ProgressBar->new( { count => scalar(@$data_list) } ) if ( $o{progress} );
 
     for my $i ( 0 .. $#$data_list ) {
       my $r = $data_list->[$i];
@@ -133,12 +133,12 @@ sub request_url_whole {
           }
       }
 
-           $progress->update( $item_id ) if ( $o{term_progress_bar} );
+           $progress->update( $item_id ) if ( $o{progress} );
     }
 
-   $progress->update( scalar(@$data_list) ) if ( $o{term_progress_bar} ); 
+   $progress->update( scalar(@$data_list) ) if ( $o{progress} ); 
   }
-  print "\n\n" if ( $o{term_progress_bar} );
+  print "\n\n" if ( $o{progress} );
   return ( $info, $data_list );
 } ## end sub request_url_whole
 

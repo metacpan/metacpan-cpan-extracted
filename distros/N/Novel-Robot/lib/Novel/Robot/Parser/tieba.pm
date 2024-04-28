@@ -52,11 +52,11 @@ sub parse_novel_item {
 
 sub parse_item_list {
     my ( $self, $h ) = @_;
-    my $parse_query = scraper {
+    my $parse_item = scraper {
         process_first '//link[@rel="canonical"]',   'base' => '@href';
         process_first '//li[@class="l_reply_num"]', 'page' => 'TEXT';
     };
-    my $ref      = $parse_query->scrape( $h );
+    my $ref      = $parse_item->scrape( $h );
     my ( $page ) = $ref->{page} =~ /共(\d+)页/s;
     my @urls     = map { "$ref->{base}?pn=$_" } ( 2 .. $page );
     return \@urls;

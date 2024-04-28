@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "File::Spec::Functions" => 0,
-    "List::Util" => 0,
+    "List::Util" => "1.45",
     "Scalar::Util" => 0,
     "parent" => 0,
     "strict" => 0,
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.89",
     "lib" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,7 +59,7 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "List::Util" => 0,
+  "List::Util" => "1.45",
   "Scalar::Util" => 0,
   "Test::Builder" => 0,
   "Test::More" => "0.89",

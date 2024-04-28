@@ -8,8 +8,10 @@ use AsposeCellsCloud::Object::ConvertWorksheetTaskParameter;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**DataSource** | **DataSource** |  |
 **Workbook** | **FileSource** |  |
 **Sheet** | **string** |  |
+**TargetDataSource** | **DataSource** |  |
 **Target** | **FileSource** |  |
 **Format** | **string** |  |
 **Area** | **string** |  |

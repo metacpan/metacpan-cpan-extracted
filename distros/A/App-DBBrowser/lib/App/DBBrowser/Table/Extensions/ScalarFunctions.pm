@@ -5,20 +5,77 @@ use warnings;
 use strict;
 use 5.014;
 
-use Scalar::Util qw( looks_like_number );
-
-use List::MoreUtils qw( all minmax uniq );
-
 use Term::Choose           qw();
-use Term::Choose::LineFold qw( line_fold );
-use Term::Choose::Util     qw( unicode_sprintf get_term_height get_term_width );
-use Term::Form             qw(); ##
 use Term::Form::ReadLine   qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Table::Extensions;
+use App::DBBrowser::Table::Extensions::ScalarFunctions::EpochToDate;
 use App::DBBrowser::Table::Extensions::ScalarFunctions::SQL;
 use App::DBBrowser::Table::Substatements;
+
+my $abs                = 'ABS';
+my $cast               = 'CAST';
+my $ceil               = 'CEIL';
+my $char_length        = 'CHAR_LENGTH';
+my $coalesce           = 'COALESCE';
+my $concat             = 'CONCAT';
+my $dateadd            = 'DATEADD';
+my $date_format        = 'DATE_FORMAT';
+my $day                = 'DAY';
+my $dayofweek          = 'DAYOFWEEK';
+my $dayofyear          = 'DAYOFYEAR';
+my $epoch_to_date      = 'EPOCH_TO_DATE';
+my $epoch_to_datetime  = 'EPOCH_TO_DATETIME';
+my $epoch_to_timestamp = 'EPOCH_TO_TIMESTAMP';
+my $exp                = 'EXP';
+my $extract            = 'EXTRACT';
+my $floor              = 'FLOOR';
+my $format             = 'FORMAT';
+my $hour               = 'HOUR';
+my $instr              = 'INSTR';
+my $left               = 'LEFT';
+my $length             = 'LENGTH';
+my $lengthb            = 'LENGTHB';
+my $ln                 = 'LN';
+my $locate             = 'LOCATE';
+my $lower              = 'LOWER';
+my $lpad               = 'LPAD';
+my $ltrim              = 'LTRIM';
+my $minute             = 'MINUTE';
+my $mod                = 'MOD';
+my $month              = 'MONTH';
+my $now                = 'NOW';
+my $octet_length       = 'OCTET_LENGTH';
+my $position           = 'POSITION';
+my $power              = 'POWER';
+my $quarter            = 'QUARTER';
+my $rand               = 'RAND';
+my $replace            = 'REPLACE';
+my $reverse            = 'REVERSE';
+my $right              = 'RIGHT';
+my $round              = 'ROUND';
+my $rpad               = 'RPAD';
+my $rtrim              = 'RTRIM';
+my $second             = 'SECOND';
+my $sign               = 'SIGN';
+my $sqrt               = 'SQRT';
+my $strftime           = 'STRFTIME';
+my $str_to_date        = 'STR_TO_DATE';
+my $substring          = 'SUBSTRING';
+my $substr             = 'SUBSTR';
+my $to_char            = 'TO_CHAR';
+my $to_date            = 'TO_DATE';
+my $to_number          = 'TO_NUMBER';
+my $to_timestamp       = 'TO_TIMESTAMP';
+my $to_timestamp_tz    = 'TO_TIMESTAMP_TZ';
+my $to_epoch           = 'TO_EPOCH';
+my $trim               = 'TRIM';
+my $truncate           = 'TRUNCATE';
+my $trunc              = 'TRUNC';
+my $upper              = 'UPPER';
+my $week               = 'WEEK';
+my $year               = 'YEAR';
 
 
 sub new {
@@ -31,12 +88,469 @@ sub new {
 }
 
 
+sub __format_history {
+    my ( $sf, $func ) = @_;
+    my $driver = $sf->{i}{driver};
+    if ( $driver eq 'SQLite' ) {
+        return [ '%Y-%m-%d %H:%M:%f', '%Y-%m-%d %H:%M:%S' ] if $func eq $strftime;
+    }
+    elsif ( $driver =~ /^(?:mysql|MariaDB)\z/ ) {
+        return [ '%Y-%m-%d %H:%i:%S.%f', '%a %d %b %Y %h:%i:%S %p' ] if $func eq $date_format;
+        return [ '%Y-%m-%d %H:%i:%S.%f', '%a %d %b %Y %h:%i:%S %p' ] if $func eq $str_to_date;
+        return [                                                   ] if $func eq $format;
+    }
+    elsif ( $driver eq 'Pg' ) {
+        return [ 'YYYY-MM-DD HH24:MI:SS.FF6TZH:TZM', 'Dy DD Mon YYYY HH:MI:SS AM TZ OF' ] if $func eq $to_char; # TZ and OF only in to_char
+        return [ 'YYYY-MM-DD'                                                           ] if $func eq $to_date;
+        return [ 'YYYY-MM-DD HH24:MI:SS.FF6TZH:TZM', 'Dy DD Mon YYYY HH:MI:SS AM'       ] if $func eq $to_timestamp;
+        return [                                                                        ] if $func eq $to_number;
+    }
+    elsif ( $driver eq 'DB2' ) {
+        return [ 'YYYY-MM-DD HH24:MI:SS.FF6', 'Dy DD Mon YYYY HH:MI:SS AM' ] if $func eq $to_char;
+        return [ 'YYYY-MM-DD HH24:MI:SS.FF6', 'Dy DD Mon YYYY HH:MI:SS AM' ] if $func eq $to_date;
+        return [                                                           ] if $func eq $to_number;
+    }
+    elsif ( $driver eq 'Informix' ) {
+        return [ '%Y-%m-%d %H:%M:%S.%F5', '%a %d %b %Y %I:%M:%S %p' ] if $func eq $to_char;
+        return [ '%Y-%m-%d %H:%M:%S.%F5', '%a %d %b %Y %I:%M:%S %p' ] if $func eq $to_date;
+        return [                                                    ] if $func eq $to_number;
+    }
+    elsif ( $driver eq 'Oracle' ) {
+        return [ 'YYYY-MM-DD HH24:MI:SS.FF9TZH:TZM', 'Dy DD Mon YYYY HH:MI:SSXFF AM TZR TZD' ] if $func eq $to_char;
+        return [ 'YYYY-MM-DD HH24:MI:SS'           , 'Dy DD Mon YYYY HH:MI:SS AM'            ] if $func eq $to_date; # not in the DATE format: FF, TZD, TZH, TZM, and TZR.  Max length 22
+        return [ 'YYYY-MM-DD HH24:MI:SS.FF'        , 'Dy DD Mon YYYY HH:MI:SS AM'            ] if $func eq $to_timestamp;
+        return [ 'YYYY-MM-DD HH24:MI:SS.FFTZH:TZM' , 'Dy DD Mon YYYY HH:MI:SS AM TZD'        ] if $func eq $to_timestamp_tz;
+        return [                                                                             ] if $func eq $to_number;
+    }
+    else {
+        return [];
+    }
+}
+
+
+sub __available_functions {
+    my ( $sf, $type ) = @_;
+    my $functions = {
+       string => {
+            $char_length        => [  000000 , 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix',  000000  ],
+            $instr              => [ 'SQLite',  00000 ,  0000000 ,  00 ,  00000000 , 'DB2', 'Informix', 'Oracle' ],
+            $concat             => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $left               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $length             => [ 'SQLite',  00000 ,  0000000 ,  00 ,  00000000 ,  000 ,  00000000 , 'Oracle' ], # Pg
+            $lengthb            => [  000000 ,  00000 ,  0000000 ,  00 ,  00000000 ,  000 ,  00000000 , 'Oracle' ],
+            $locate             => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 ,  000 ,  00000000 ,  000000  ], # DB2
+            $lower              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $lpad               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $ltrim              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg',  00000000 , 'DB2', 'Informix', 'Oracle' ],
+            $octet_length       => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix',  000000  ],
+            $position           => [  000000 , 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2',  00000000 ,  000000  ],
+            $replace            => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $reverse            => [  000000 , 'mysql', 'MariaDB', 'Pg', 'Firebird',  000 , 'Informix', 'Oracle' ],
+            $right              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $rpad               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $rtrim              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg',  00000000 , 'DB2', 'Informix', 'Oracle' ],
+            $substring          => [  000000 ,  00000 ,  0000000 ,  00 , 'Firebird',  000 ,  00000000 ,  000000  ], # mysql, MariaDB, Pg, DB2, Informix
+            $substr             => [ 'SQLite', 'mysql', 'MariaDB', 'Pg',  00000000 , 'DB2', 'Informix', 'Oracle' ],
+            $trim               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $upper              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+        },
+        numeric => {
+            $abs                => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $ceil               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $exp                => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $floor              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $ln                 => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $mod                => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $power              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $rand               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2',  00000000 , 'Oracle' ],
+            $round              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $sign               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $sqrt               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $truncate           => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
+            $trunc              => [ 'SQLite',  00000 ,  0000000 , 'Pg', 'Firebird',  000 , 'Informix', 'Oracle' ],
+        },
+        date => {
+            $dateadd            => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $extract            => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $now                => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $year               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $quarter            => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $month              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $week               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2',  00000000 , 'Oracle' ],
+            $day                => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $hour               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $minute             => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $second             => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $dayofweek          => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $dayofyear          => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2',  00000000 , 'Oracle' ],
+
+        },
+        to => {
+            $epoch_to_date      => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $epoch_to_datetime  => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $epoch_to_timestamp => [  000000 ,  00000 ,  0000000 , 'Pg', 'Firebird',  000 ,  00000000 , 'Oracle' ],
+            $to_char            => [  000000 ,  00000 ,  0000000 , 'Pg',  00000000 , 'DB2', 'Informix', 'Oracle' ], # MariaDB
+            $to_date            => [  000000 ,  00000 ,  0000000 , 'Pg',  00000000 , 'DB2', 'Informix', 'Oracle' ], # MariaDB
+            $to_timestamp       => [  000000 ,  00000 ,  0000000 , 'Pg',  00000000 ,  000 ,  00000000 , 'Oracle' ], # DB2
+            $to_timestamp_tz    => [  000000 ,  00000 ,  0000000 ,  00 ,  00000000 ,  000 ,  00000000 , 'Oracle' ],
+            $to_number          => [  000000 ,  00000 , 'MariaDB', 'Pg',  00000000 , 'DB2', 'Informix', 'Oracle' ],
+            $to_epoch           => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2',  00000000 , 'Oracle' ],
+            $strftime           => [ 'SQLite',  00000 ,  0000000 ,  00 ,  00000000 ,  000 ,  00000000 ,  000000  ],
+            $date_format        => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 ,  000 ,  00000000 ,  000000  ],
+            $format             => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 ,  000 ,  00000000 ,  000000  ],
+            $str_to_date        => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 ,  000 ,  00000000 ,  000000  ],
+        },
+        other => {
+            $cast               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $coalesce           => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+        },
+    };
+    my $driver = $sf->{i}{driver};
+    my $index = {
+        SQLite => 0, mysql => 1, MariaDB => 2, Pg => 3, Firebird => 4, DB2 => 5, Informix => 6, Oracle => 7
+    };
+    my $avail_functions = [];
+    for my $func ( sort keys %{$functions->{$type}} ) {
+        if ( ! exists $index->{$driver} ) {
+            # return all functions
+            push @$avail_functions, $func;
+        }
+        elsif ( $functions->{$type}{$func}[$index->{$driver}] ) {
+            push @$avail_functions, $func;
+        }
+    }
+    return $avail_functions;
+}
+
+
+sub col_function {
+    my ( $sf, $sql, $clause, $qt_cols, $r_data ) = @_;
+    if ( ! defined $r_data->{nested_func} ) {
+        # reset recursion data other than nested_func
+        # at the first call of col_function
+        $r_data = { nested_func => [] };
+    }
+    my $parent;
+    if ( ref $r_data->{nested_func}[0] eq 'ARRAY' ) {
+        # because called from a multi-col function
+        $parent = shift @{$r_data->{nested_func}};
+        $parent = $parent->[0];
+        # $r_data->{nested_func} is now empty
+    }
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $driver = $sf->{i}{driver};
+    my $rx_only_func        = join( '|', $now, $rand );
+    my $rx_multi_col_func   = join( '|', $concat, $coalesce );
+    my $rx_to_format_func   = join( '|', $to_char, $to_date, $to_timestamp, $to_timestamp_tz, $to_number, $strftime, $date_format, $format, $str_to_date );
+    my $hidden = 'Scalar functions:';
+    my $info = $ax->get_sql_info( $sql );
+    my $old_idx_cat = 1;
+
+    CATEGORY: while( 1 ) {
+        my $tmp_info = $info;
+        if ( length $parent ) {
+            # $parent only available at the first recursion after parent
+            $tmp_info .= "\n" . $parent;
+        }
+        if ( @{$r_data->{nested_func}} ) {
+            $tmp_info .= "\n" . $sf->__nested_func_info( $r_data->{nested_func}, '?' );
+        }
+        my @pre = ( $hidden, undef );
+        my $menu = [ @pre, '- String', '- Numeric', '- Date', '- To', '- Other' ];
+        # Choose
+        my $idx_cat = $tc->choose(
+            $menu,
+            { %{$sf->{i}{lyt_v}}, info => $tmp_info, prompt => '', index => 1, default => $old_idx_cat, undef => '<=' }
+        );
+        if ( ! defined $idx_cat || ! defined $menu->[$idx_cat] ) {
+            return;
+        }
+        if ( $sf->{o}{G}{menu_memory} ) {
+            if ( $old_idx_cat == $idx_cat && ! $ENV{TC_RESET_AUTO_UP} ) {
+                $old_idx_cat = 1;
+                next CATEGORY;
+            }
+            $old_idx_cat = $idx_cat;
+        }
+        my $choice = $menu->[$idx_cat];
+        if ( $choice eq $hidden ) {
+            $ext->enable_extended_arguments( $tmp_info );
+            next CATEGORY;
+        }
+        my $old_idx_func = 0;
+
+        FUNCTION: while( 1 ) {
+            my $type = lc( $choice =~ s/^-\s//r );
+            @pre = ( undef );
+            my $avail_functions = $sf->__available_functions( $type );
+            $menu = [ @pre, map { '- ' . $_ } @$avail_functions ];
+            # Choose
+            my $idx_func = $tc->choose(
+                $menu,
+                { %{$sf->{i}{lyt_v}}, info => $tmp_info, prompt => '', index => 1, default => $old_idx_func, undef => '<=' }
+            );
+            if ( ! defined $idx_func || ! defined $menu->[$idx_func] ) {
+                next CATEGORY;
+            }
+            if ( $sf->{o}{G}{menu_memory} ) {
+                if ( $old_idx_func == $idx_func && ! $ENV{TC_RESET_AUTO_UP} ) {
+                    $old_idx_func = 0;
+                    next FUNCTION;
+                }
+                $old_idx_func = $idx_func;
+            }
+            my $func = $menu->[$idx_func] =~ s/^-\s//r;
+            push @{$r_data->{nested_func}}, $func;
+            my $function_stmt;
+            if ( $func =~ /^(?:$rx_only_func)\z/ ) {
+                $function_stmt =  $sf->__func_with_no_col( $func );
+            }
+            elsif ( $func =~ /^(?:$rx_multi_col_func)\z/ ) {
+                my $chosen_cols = $sf->__choose_columns( $sql, $clause, $info, $qt_cols, $r_data );
+                if ( ! defined $chosen_cols ) {
+                    if ( @{$r_data->{nested_func}} == 1 ) {
+                        $r_data->{nested_func} = [];
+                        next FUNCTION;
+                    }
+                    pop @{$r_data->{nested_func}};
+                    return;
+                }
+                if ( $func eq $concat ) {
+                    $function_stmt = $sf->__func_Concat( $sql, $clause, $info, $func, $chosen_cols );
+                }
+                elsif ( $func eq $coalesce ) {
+                    $function_stmt = $sf->__func_Coalesce( $sql, $func, $chosen_cols );
+                }
+            }
+            else {
+                my $chosen_col = $sf->__choose_a_column( $sql, $clause, $info, $qt_cols, $r_data );
+                if ( ! defined $chosen_col ) {
+                    if ( @{$r_data->{nested_func}} == 1 ) {
+                        $r_data->{nested_func} = [];
+                        next FUNCTION;
+                    }
+                    pop @{$r_data->{nested_func}};
+                    return;
+                }
+                if ( $func =~ /^EPOCH_TO_/ ) {
+                    my $dt = App::DBBrowser::Table::Extensions::ScalarFunctions::EpochToDate->new( $sf->{i}, $sf->{o}, $sf->{d} );
+                    $function_stmt = $dt->func_Date_Time( $sql, $chosen_col, $func, $info );
+                }
+                else {
+                    my $args_data = [];
+                    if ( $func eq $cast ) {
+                        $args_data = [
+                            { prompt => 'Data type: ', history => [ sort qw(VARCHAR CHAR TEXT INT DECIMAL DATE DATETIME TIME TIMESTAMP) ], unquote => 1 },
+                        ];
+                    }
+                    elsif ( $func =~ /^(?:$rx_to_format_func)\z/ ) {
+                        $args_data = [
+                            { prompt => 'Format: ', history => $sf->__format_history( $func ) },
+                        ];
+                        if ( $func eq $strftime ) {
+                            push @$args_data, { prompt => 'Modifiers: ', history => [], unquote => 1 };
+                        }
+                        if ( $func eq $format ) {
+                            push @$args_data, { prompt => 'Locale: ', history => [] };
+                        }
+                    }
+                    elsif ( $func eq $extract ) {
+                        $args_data = [
+                            { prompt => 'Field: ', history => [ qw(YEAR QUARTER MONTH WEEK DAY HOUR MINUTE SECOND DAYOFWEEK DAYOFYEAR) ], unquote => 1 },
+                        ];
+                    }
+                    elsif ( $func =~ /^(?:$round|$trunc|$truncate)\z/ ) {
+                        $args_data = [
+                            { prompt => 'Decimal places: ', is_numeric => 1 },
+                        ];
+                    }
+                    elsif ( $func =~ /^(?:$position|$instr|$locate)\z/ ) {
+                        $args_data = [
+                            { prompt => 'Substring: ' },
+                        ];
+                        if ( $func eq $instr ) {
+                            push @$args_data, { prompt => 'Start: ', is_numeric => 1 }, { prompt => 'Count: ', is_numeric => 1 };
+                        }
+                        if ( $func eq $locate ) {
+                            push @$args_data, { prompt => 'Start: ', is_numeric => 1 };
+                        }
+                    }
+                    elsif ( $func =~ /^(?:$left|$right)\z/ ) {
+                        $args_data = [
+                            { prompt => 'Length: ', is_numeric => 1 },
+                        ];
+                    }
+                    elsif ( $func eq $mod ) {
+                        $args_data = [
+                            { prompt => 'Divider: ', is_numeric => 1 },
+                        ];
+                    }
+                    elsif ( $func eq $power ) {
+                        $args_data = [
+                            { prompt => 'Exponent: ', is_numeric => 1 },
+                        ];
+                    }
+                    elsif ( $func eq $replace ) {
+                        $args_data = [
+                            { prompt => 'From string: ' },
+                            { prompt => 'To string: ' },
+                        ];
+                    }
+                    elsif ( $func =~ /^(?:$substr|$substring)\z/ ) {
+                        $args_data = [
+                            { prompt => 'StartPos: ', is_numeric => 1 },
+                            { prompt => 'Length: ', is_numeric => 1 },
+                        ];
+                    }
+                    elsif ( $func =~ /^(?:$lpad|$rpad)\z/ ) {
+                        $args_data = [
+                            { prompt => 'Length: ', is_numeric => 1 },
+                            { prompt => 'Fill: ' },
+                        ];
+                    }
+                    elsif ( $func eq $trim ) {
+                        $args_data = [
+                            { prompt => 'Where: ', history => [ qw(BOTH LEADING TRAILING) ], unquote => 1 },
+                            { prompt => 'What: ' },
+                        ];
+                    }
+                    elsif ( $func eq $dateadd ) {
+                        $args_data = [
+                            { prompt => 'Amount: ', is_numeric => 1 },
+                            { prompt => 'Unit: ', history => [ qw(YEAR MONTH DAY HOUR MINUTE SECOND) ], unquote => 1 },
+                        ];
+                    }
+                    else {
+                        $args_data = [];
+                    }
+                    if ( $driver eq 'SQLite' ) {
+                        $args_data = [ { prompt => 'What: ' } ]      if $func eq $trim;
+                        $args_data = [ { prompt => 'Substring: ' } ] if $func eq $instr;
+                    }
+                    elsif ( $driver eq 'Firebird' ) {
+                        push @$args_data, { prompt => 'Start: ', is_numeric => 1 } if $func eq $position;
+                    }
+                    elsif ( $driver eq 'DB2' ) {
+                        if ( $func eq $to_char ) {
+                            push @$args_data, { prompt => 'Locale: ' };
+                        }
+                        elsif ( $func eq $to_date ) {
+                            push @$args_data, { prompt => 'Decimals: ', is_numeric => 1 }, { prompt => 'Locale: ' };
+                        }
+                        # string units: $position, $instr, $locate, $left, $right, $length, $substring, $upper, $lower
+                        # $round datetime: locale
+                    }
+                    elsif ( $driver eq 'Informix' ) {
+                        if ( $func eq $extract ) {
+                            $args_data->{history} = [ grep { ! /^(?:WEEK|DAYOFYEAR)\z/ } @{$args_data->{history}} ];
+                        }
+                    }
+                    elsif ( $driver eq 'Oracle' ) {
+                        if ( $func =~ /^TO_/ ) {
+                            push @$args_data, { prompt => 'nls_parameter: ' };
+                        }
+                        elsif ( $func eq $to_epoch ) {
+                            push @$args_data, { prompt => 'Column type: ', history => [ qw(DATE TIMESTAMP TIMESTAMP_TZ) ], unquote => 1 };
+                        }
+                    }
+                    $function_stmt = $sf->__func_with_one_col( $sql, $clause, $info, $func, $chosen_col, $args_data );
+                }
+            }
+            if ( ! $function_stmt ) {
+                return;
+            }
+            return $function_stmt;
+        }
+    }
+}
+
+
+sub __func_with_no_col {
+    my ( $sf, $func ) = @_;
+    my $fsql = App::DBBrowser::Table::Extensions::ScalarFunctions::SQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $function_stmt = $fsql->function_with_no_col( $func );
+    return $function_stmt;
+}
+
+
+sub __func_with_one_col {
+    my ( $sf, $sql, $clause, $info, $func, $chosen_col, $args_data ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $fsql = App::DBBrowser::Table::Extensions::ScalarFunctions::SQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tail = ',?)';
+    $info .= "\n" . $func . '(' . $chosen_col . $tail;
+    my $args = [];
+
+    for my $arg_data ( @$args_data ) {
+        # Readline
+        my $arg = $ext->argument(
+            $sql, $clause,
+            { info => $info, history => $arg_data->{history}, prompt => $arg_data->{prompt},
+              is_numeric => $arg_data->{is_numeric} }
+        );
+        #last if ! defined $arg; ##
+        if ( ! length $arg || $arg eq "''" ) { ##
+            if ( $func eq $replace && @$args == 1 ) {
+                # replacement_string: an empty string is a valid argument
+                $arg = '';
+            }
+            elsif ( $func =~ /^(?:$position|$instr|$locate)\z/ && @$args == 0 ) {
+                # substring: an empty string is a valid argument
+                $arg = '';
+            }
+            elsif ( $func eq $trim ) {
+                # an unset argument does not close the function
+                next;
+            }
+            else {
+                my $function_stmt = $fsql->function_with_one_col( $func, $chosen_col, $args );
+                return $function_stmt;
+            }
+        }
+        if ( $arg_data->{unquote} ) {
+            $arg = $ax->unquote_constant( $arg );
+        }
+        push @$args, $arg;
+        $info =~ s/\Q$tail\E\z/,${arg}${tail}/;
+    }
+    my $function_stmt = $fsql->function_with_one_col( $func, $chosen_col, $args );
+    return $function_stmt;
+}
+
+
+sub __func_Concat {
+    my ( $sf, $sql, $clause, $info, $func, $chosen_cols ) = @_;
+    my $fsql = App::DBBrowser::Table::Extensions::ScalarFunctions::SQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    $info .= "\n" . 'Concat(' . join( ',', @$chosen_cols ) . ')';
+    my $history = [ '-', ' ', '_', ',', '/', '=', '+' ];
+    # Readline
+    my $sep = $ext->argument( $sql, $clause, { info => $info, history => $history, prompt => 'Separator: ' } );
+    if ( ! defined $sep ) {
+        return;
+    }
+    my $function_stmt = $fsql->concatenate( $chosen_cols, $sep );
+    return $function_stmt;
+}
+
+
+sub __func_Coalesce {
+    my ( $sf, $sql, $func, $chosen_cols ) = @_;
+    my $fsql = App::DBBrowser::Table::Extensions::ScalarFunctions::SQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $function_stmt = $fsql->coalesce( $chosen_cols );
+    return $function_stmt;
+}
+
+
 sub __choose_columns {
-    my ( $sf, $sql, $clause, $qt_cols, $info, $r_data ) = @_;
+    my ( $sf, $sql, $clause, $info, $qt_cols, $r_data ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $const = '[val]';
+    my $const = '[value]';
     my @pre = ( undef, $sf->{i}{ok}, $sf->{i}{menu_addition}, $const );
     my $menu = [ @pre, @$qt_cols ];
     my $subset = [];
@@ -112,7 +626,7 @@ sub __choose_columns {
 
 
 sub __choose_a_column {
-    my ( $sf, $sql, $clause, $qt_cols, $info, $r_data ) = @_;
+    my ( $sf, $sql, $clause, $info, $qt_cols, $r_data ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     $info .= "\n" . $sf->__nested_func_info( $r_data->{nested_func}, '?' );
     my @pre = ( undef, $sf->{i}{menu_addition} );
@@ -150,556 +664,6 @@ sub __choose_a_column {
 sub __nested_func_info {
     my ( $sf, $nested_func, $fill_string ) = @_;
     return join( '', map { $_ . '(' } @$nested_func ) . ( $fill_string // '' ) . ( ')' x @$nested_func );
-}
-
-
-sub col_function {
-    my ( $sf, $sql, $clause, $qt_cols, $r_data ) = @_;
-    if ( ! defined $r_data->{nested_func} ) {
-        # reset recursion data other than nested_func
-        # at the first call of col_function
-        $r_data = { nested_func => [] };
-    }
-    my $parent;
-    if ( ref $r_data->{nested_func}[0] eq 'ARRAY' ) {
-        # because called from a multi-col function
-        $parent = shift @{$r_data->{nested_func}};
-        $parent = $parent->[0];
-        # $r_data->{nested_func} is now empty
-    }
-    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $driver = $sf->{i}{driver};
-    my %functions;
-
-    my $char_length  = 'CHAR_LENGTH';
-    my $concat       = 'CONCAT';
-    my $left         = 'LEFT';
-    my $lower        = 'LOWER';
-    my $lpad         = 'LPAD';
-    my $ltrim        = 'LTRIM';
-    my $octet_length = 'OCTET_LENGTH';
-    my $position     = 'POSITION';
-    my $replace      = 'REPLACE';
-    my $reverse      = 'REVERSE';
-    my $right        = 'RIGHT';
-    my $rpad         = 'RPAD';
-    my $rtrim        = 'RTRIM';
-    my $substr       = 'SUBSTR';
-    my $trim         = 'TRIM';
-    my $upper        = 'UPPER';
-    $functions{string} = [ sort( $char_length, $concat, $left, $lower, $lpad, $ltrim, $octet_length, $position, $replace, $reverse, $right, $rpad, $rtrim, $substr, $trim, $upper ) ];
-    if ( $sf->{i}{driver} eq 'SQLite' ) {
-        $functions{string} = [ grep { ! /^(?:$reverse)\z/ } @{$functions{string}} ];
-    }
-    if ( $sf->{i}{driver} eq 'DB2' ) {
-        $functions{string} = [ grep { ! /^(?:$reverse)\z/ } @{$functions{string}} ];
-    }
-
-    my $abs          = 'ABS';
-    my $ceil         = 'CEIL';
-    my $exp          = 'EXP';
-    my $floor        = 'FLOOR';
-    my $log          = 'LN';
-    my $mod          = 'MOD';
-    my $power        = 'POWER';
-    my $rand         = 'RAND';
-    my $round        = 'ROUND';
-    my $sign         = 'SIGN';
-    my $sqrt         = 'SQRT';
-    my $truncate     = 'TRUNCATE';
-    $functions{numeric} = [ sort( $abs, $ceil, $exp, $floor, $log, $mod, $power, $rand, $round, $sign, $sqrt, $truncate ) ];
-    if ( $sf->{i}{driver} eq 'Informix' ) {
-        $functions{numeric} = [ grep { ! /^$rand\z/ } @{$functions{numeric}} ];
-    }
-
-    my $dateadd      = 'DATEADD';
-    my $epoch_to_d   = 'EPOCH_TO_DATE';
-    my $epoch_to_dt  = 'EPOCH_TO_DATETIME';
-    my $extract      = 'EXTRACT';
-    my $now          = 'NOW';
-    my $year         = 'YEAR';
-    my $quarter      = 'QUARTER';
-    my $month        = 'MONTH';
-    my $week         = 'WEEK';
-    my $day          = 'DAY';
-    my $hour         = 'HOUR';
-    my $minute       = 'MINUTE';
-    my $second       = 'SECOND';
-    my $day_of_week  = 'DAYOFWEEK';
-    my $day_of_year  = 'DAYOFYEAR';
-    my $unix_ts      = 'UNIX_TIMESTAMP';
-    $functions{date} = [ sort( $dateadd, $epoch_to_d, $epoch_to_dt, $extract, $now, $year, $quarter, $month, $week, $day, $hour, $minute, $second, $day_of_week, $day_of_year ) ]; # , $unix_ts # ###
-    if ( $sf->{i}{driver} eq 'Informix' ) {
-        $functions{date} = [ grep { ! /^(?:$week|$day_of_year|$unix_ts)\z/ } @{$functions{date}} ];
-    }
-
-    my $cast         = 'CAST';
-    my $coalesce     = 'COALESCE';
-    $functions{other} = [ sort( $cast, $coalesce ) ];
-
-    my @only_func = ( $now, $rand );
-    my @one_col_func = (
-        $trim, $ltrim, $rtrim, $upper, $lower, $octet_length, $char_length, $reverse,
-        $abs, $ceil, $exp, $floor, $log, $sign, $sqrt,
-        $year, $quarter, $month, $week, $day, $hour, $minute, $second, $day_of_week, $day_of_year, $unix_ts
-    );
-    my @one_col_one_arg_func = (
-        $left, $position, $right,
-        $mod, $power, $round, $truncate,
-        $extract,
-        $cast,
-    );
-    my @one_col_two_arg_func = (
-        $lpad, $replace, $rpad, $substr,
-        $dateadd,
-    );
-    my @multi_col_func = (
-        $concat,
-        $coalesce,
-    );
-    my @epoch_dt_func = (
-        $epoch_to_d, $epoch_to_dt,
-    );
-
-    my $rx_only_func = join( '|', @only_func );
-    my $rx_one_col_func = join( '|', @one_col_func );
-    my $rx_one_col_one_arg_func = join( '|', @one_col_one_arg_func );
-    my $rx_one_col_two_arg_func = join( '|', @one_col_two_arg_func );
-    my $rx_multi_col_func = join( '|', @multi_col_func );
-    my $rx_epoch_dt_func = join( '|', @epoch_dt_func );
-
-    my $hidden = 'Scalar functions:';
-    my $info = $ax->get_sql_info( $sql );
-    my $old_idx_cat = 1;
-
-    CATEGORY: while( 1 ) {
-
-        my $tmp_info = $info;
-        if ( length $parent ) {
-            # $parent only available at the first recursion after parent
-            $tmp_info .= "\n" . $parent;
-        }
-        if ( @{$r_data->{nested_func}} ) {
-            $tmp_info .= "\n" . $sf->__nested_func_info( $r_data->{nested_func}, '?' );
-        }
-        my @pre = ( $hidden, undef );
-        my $menu = [ @pre, '- String', '- Numeric', '- Date', '- Other' ];
-        # Choose
-        my $idx_cat = $tc->choose(
-            $menu,
-            { %{$sf->{i}{lyt_v}}, info => $tmp_info, prompt => '', index => 1, default => $old_idx_cat, undef => '<=' }
-        );
-        if ( ! defined $idx_cat || ! defined $menu->[$idx_cat] ) {
-            return;
-        }
-        if ( $sf->{o}{G}{menu_memory} ) {
-            if ( $old_idx_cat == $idx_cat && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $old_idx_cat = 1;
-                next CATEGORY;
-            }
-            $old_idx_cat = $idx_cat;
-        }
-        my $choice = $menu->[$idx_cat];
-#        my $func;
-        if ( $choice eq $hidden ) {
-            $ext->enable_extended_arguments( $tmp_info );
-            if ( $sf->{o}{enable}{extended_args} ) {
-                $hidden = 'Scalar functions:*';
-            }
-            else {
-                $hidden = 'Scalar functions:';
-            }
-            next CATEGORY;
-        }
-        my $old_idx_func = 0;
-
-        FUNCTION: while( 1 ) {
-            my $type = lc( $choice =~ s/^-\s//r );
-            @pre = ( undef );
-            $menu = [ @pre, map { '- ' . $_ } @{$functions{$type}} ];
-            # Choose
-            my $idx_func = $tc->choose(
-                $menu,
-                { %{$sf->{i}{lyt_v}}, info => $tmp_info, prompt => '', index => 1, default => $old_idx_func, undef => '<=' }
-            );
-            if ( ! defined $idx_func || ! defined $menu->[$idx_func] ) {
-                next CATEGORY;
-            }
-            if ( $sf->{o}{G}{menu_memory} ) {
-                if ( $old_idx_func == $idx_func && ! $ENV{TC_RESET_AUTO_UP} ) {
-                    $old_idx_func = 0;
-                    next FUNCTION;
-                }
-                $old_idx_func = $idx_func;
-            }
-            my $func = $menu->[$idx_func] =~ s/^-\s//r;
-            push @{$r_data->{nested_func}}, $func;
-            my $function_stmt;
-            if ( $func =~ /^(?:$rx_only_func)\z/i ) {
-                $function_stmt =  $sf->__func_with_no_col( $func );
-            }
-            elsif ( $func =~ /^(?:$rx_multi_col_func)\z/i ) {
-                my $chosen_cols = $sf->__choose_columns( $sql, $clause, $qt_cols, $info, $r_data );
-                if ( ! defined $chosen_cols ) {
-                    if ( @{$r_data->{nested_func}} == 1 ) {
-                        $r_data->{nested_func} = [];
-                        next FUNCTION;
-                    }
-                    pop @{$r_data->{nested_func}};
-                    return;
-                }
-                if ( $func =~ /^$concat\z/i ) {
-                    $function_stmt = $sf->__func_Concat( $sql, $chosen_cols, $func, $info );
-                }
-                elsif ( $func =~ /^$coalesce\z/i ) {
-                    $function_stmt = $sf->__func_Coalesce( $sql, $chosen_cols, $func );
-                }
-            }
-            else {
-                my $chosen_col = $sf->__choose_a_column( $sql, $clause, $qt_cols, $info, $r_data );
-                if ( ! defined $chosen_col ) {
-                    if ( @{$r_data->{nested_func}} == 1 ) {
-                        $r_data->{nested_func} = [];
-                        next FUNCTION;
-                    }
-                    pop @{$r_data->{nested_func}};
-                    return;
-                }
-                if ( $func =~ /^(?:$rx_one_col_func)\z/i ) {
-                    $function_stmt = $sf->__func_with_col( $sql, $chosen_col, $func );
-                }
-                elsif ( $func =~ /^(?:$rx_one_col_one_arg_func)\z/i ) {
-                    my ( $prompt, $history );
-                    if ( $func =~ /^$cast\z/i ) {
-                        $prompt = 'Data type: ';
-                        $history = [ sort qw(VARCHAR CHAR TEXT INT DECIMAL DATE DATETIME TIME TIMESTAMP) ];
-                    }
-                    if ( $func =~ /^$extract\z/i ) {
-                        $prompt = 'Field: ';
-                        $history = [ qw(YEAR QUARTER MONTH WEEK DAY HOUR MINUTE SECOND DAYOFWEEK DAYOFYEAR) ];
-                        if ( $sf->{i}{driver} eq 'Informix' ) {
-                            $history = [ grep { ! /^(?:WEEK|DAYOFYEAR)\z/ } @$history ];
-                        }
-                    }
-                    elsif ( $func =~ /^(?:$round|$truncate)\z/i ) {
-                        $prompt = 'Decimal places: ';
-                    }
-                    elsif ( $func =~ /^(?:$position)\z/i ) {
-                        $prompt = 'Substr: ';
-                        $history = [];
-                    }
-                    elsif ( $func =~ /^(?:$left|$right)\z/i ) {
-                        $prompt = 'Length: ';
-                    }
-                    elsif ( $func =~ /^(?:$mod)\z/i ) {
-                        $prompt = 'Divider: ';
-                    }
-                    elsif ( $func =~ /^(?:$power)\z/i ) {
-                        $prompt = 'Exponent: ';
-                    }
-                    $function_stmt = $sf->__func_with_col_and_arg( $sql, $clause, $chosen_col, $func, $info, $prompt, $history );
-                }
-                elsif ( $func =~ /^(?:$rx_one_col_two_arg_func)\z/i ) {
-                    my ( $prompts, $histories );;
-                    if ( $func =~ /^(?:$replace)\z/i ) {
-                        $prompts = [ 'From string: ', 'To string: ' ];
-                    }
-                    elsif ( $func =~ /^(?:$substr)\z/i ) {
-                        $prompts = [ 'StartPos: ', 'Length: ' ];
-                    }
-                    elsif ( $func =~ /^(?:$lpad|$rpad)\z/i ) {
-                        $prompts = [ 'Length: ', 'Fill: ' ];
-                    }
-                    elsif ( $func =~ /^(?:$dateadd)\z/i ) {
-                        $histories = [
-                            undef,
-                            [ qw(YEAR MONTH DAY HOUR MINUTE SECOND) ],
-                        ];
-                        $prompts = [ 'Amount: ', 'Unit: ' ];
-                    }
-                    $function_stmt = $sf->__func_with_col_and_2args( $sql, $clause, $chosen_col, $func, $info, $prompts, $histories );
-                }
-                elsif ( $func =~ /^(?:$rx_epoch_dt_func)\z/i ) {
-                    $function_stmt = $sf->__func_Date_Time( $sql, $chosen_col, $func, $info );
-                }
-            }
-            if ( ! $function_stmt ) {
-                return;
-            }
-            return $function_stmt;
-        }
-    }
-}
-
-sub __func_with_no_col {
-    my ( $sf, $func ) = @_;
-    my $fsql = App::DBBrowser::Table::Extensions::ScalarFunctions::SQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $function_stmt = $fsql->function_with_no_col( $func );
-    return $function_stmt;
-}
-
-
-sub __func_with_col {
-    my ( $sf, $sql, $chosen_col, $func ) = @_;
-    my $fsql = App::DBBrowser::Table::Extensions::ScalarFunctions::SQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $function_stmt = $fsql->function_with_col( $func, $chosen_col );
-    return $function_stmt;
-}
-
-
-sub __func_with_col_and_arg {
-    my ( $sf, $sql, $clause, $chosen_col, $func, $info, $prompt, $history ) = @_;
-    my $fsql = App::DBBrowser::Table::Extensions::ScalarFunctions::SQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    $info .= "\n" . $func . '(' . $chosen_col . ',?)';
-    my $value = $ext->argument( $sql, $clause, { info => $info, history => $history, prompt => $prompt } );
-    if ( ! length $value && $func !~ /^(?:ROUND|TRUNCATE)\z/i ) {
-        return;
-    }
-    my $function_stmt = $fsql->function_with_col_and_arg( $func, $chosen_col, $value );
-    return $function_stmt;
-}
-
-
-sub __func_with_col_and_2args {
-    my ( $sf, $sql, $clause, $chosen_col, $func, $info, $prompts, $history ) = @_;
-    my $fsql = App::DBBrowser::Table::Extensions::ScalarFunctions::SQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tail = ',?)';
-    my ( $arg1, $arg2 );
-
-    while( 1 ) {
-        my $tmp_info = $info . "\n" . $func . '(' . $chosen_col . $tail;
-        # Readline ##
-        $arg1 = $ext->argument( $sql, $clause, { info => $tmp_info, history => $history->[0], prompt => $prompts->[0] } );
-        if ( ! length $arg1 ) {
-            return;
-        }
-        $tmp_info =~ s/\Q$tail\E\z/,${arg1}${tail}/;
-        # Readline ##
-        $arg2 = $ext->argument( $sql, $clause, { info => $tmp_info, history => $history->[1], prompt => $prompts->[1] } );
-        if ( ! length $arg2 && $func !~ /^(?:SUBSTR)\z/i ) {
-            next;
-        }
-        last;
-    }
-    my $function_stmt = $fsql->function_with_col_and_2args( $func, $chosen_col, $arg1, $arg2 );
-    return $function_stmt;
-}
-
-
-sub __func_Concat {
-    my ( $sf, $sql, $chosen_cols, $func, $info ) = @_;
-    my $fsql = App::DBBrowser::Table::Extensions::ScalarFunctions::SQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
-    $info .= "\n" . 'Concat(' . join( ',', @$chosen_cols ) . ')';
-    my $sep = $tr->readline(
-        'Separator: ',
-        { info => $info, history => [ '-', ' ', '_', ',', '/', '=', '+' ] }
-    );
-    if ( ! defined $sep ) {
-        return;
-    }
-    my $function_stmt = $fsql->concatenate( $chosen_cols, $sep );
-    return $function_stmt;
-}
-
-
-sub __func_Coalesce {
-    my ( $sf, $sql, $chosen_cols, $func ) = @_;
-    my $fsql = App::DBBrowser::Table::Extensions::ScalarFunctions::SQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $function_stmt = $fsql->coalesce( $chosen_cols );
-    return $function_stmt;
-}
-
-
-sub __func_Date_Time {
-    my ( $sf, $sql, $chosen_col, $func, $info ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $stmt = $sf->__select_stmt( $sql, $chosen_col, $chosen_col );
-    my $epochs = $sf->{d}{dbh}->selectcol_arrayref( $stmt, { Columns => [1], MaxRows => 500 });
-    my $avail_h = get_term_height() - ( $info =~ tr/\n// + 10 ); # 10 = "\n" + col_name +  '...' + prompt + (4 menu) + empty row + footer
-    my $max_examples = 50;
-    $max_examples = ( minmax $max_examples, $avail_h, scalar( @$epochs ) )[0];
-    my ( $function_stmt, $example_results ) = $sf->__guess_interval( $sql, $func, $chosen_col, $epochs, $max_examples, $info );
-
-    while ( 1 ) {
-        if ( ! defined $function_stmt ) {
-            ( $function_stmt, $example_results ) = $sf->__choose_interval( $sql, $func, $chosen_col, $epochs, $max_examples, $info );
-            if ( ! defined $function_stmt ) {
-                return;
-            }
-            return $function_stmt;
-        }
-        my @info_rows = ( $chosen_col );
-        push @info_rows, @$example_results;
-        if ( @$epochs > $max_examples ) {
-            push @info_rows, '...';
-        }
-        my $tmp_info = $info . "\n" . join( "\n", @info_rows );
-        # Choose
-        my $choice = $tc->choose(
-            [ undef, $sf->{i}{_confirm} ],
-            { %{$sf->{i}{lyt_v}}, info => $tmp_info, layout => 2, keep => 3 }
-        );
-        if ( ! defined $choice ) {
-            $function_stmt = undef;
-            $example_results = undef;
-            next;
-        }
-        else {
-            return $function_stmt;
-        }
-    }
-}
-
-
-sub __select_stmt {
-    my ( $sf, $sql, $select_col, $where_col ) = @_;
-    my $stmt;
-    if ( length $sql->{where_stmt} ) {
-        $stmt = "SELECT $select_col FROM $sql->{table} " . $sql->{where_stmt} . " AND $where_col IS NOT NULL";
-    }
-    else {
-        $stmt = "SELECT $select_col FROM $sql->{table} WHERE $where_col IS NOT NULL";
-    }
-    if ( $sf->{i}{driver} =~ /^(?:Firebird|DB2|Oracle)\z/ ) {
-        $stmt .= " " . $sql->{offset_stmt} if $sql->{offset_stmt};
-        $stmt .= " " . $sql->{limit_stmt}  if $sql->{limit_stmt};
-    }
-    else {
-        $stmt .= " " . $sql->{limit_stmt}  if $sql->{limit_stmt};
-        $stmt .= " " . $sql->{offset_stmt} if $sql->{offset_stmt};
-    }
-    return $stmt;
-}
-
-
-sub __interval_to_converted_epoch {
-    my ( $sf, $sql, $func, $max_examples, $chosen_col, $interval ) = @_;
-    my $fsql = App::DBBrowser::Table::Extensions::ScalarFunctions::SQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $function_stmt;
-    if ( $func =~ /^EPOCH_TO_DATETIME\z/i ) {
-        $function_stmt = $fsql->epoch_to_datetime( $chosen_col, $interval );
-    }
-    else {
-        $function_stmt = $fsql->epoch_to_date( $chosen_col, $interval );
-    }
-    my $stmt = $sf->__select_stmt( $sql, $function_stmt, $chosen_col );
-    my $example_results = $sf->{d}{dbh}->selectcol_arrayref(
-        $stmt,
-        { Columns => [1], MaxRows => $max_examples }
-    );
-    return $function_stmt, [ map { $_ // 'undef' } @$example_results ];
-}
-
-
-sub __guess_interval {
-    my ( $sf, $sql, $func, $chosen_col, $epochs, $max_examples ) = @_;
-    my ( $function_stmt, $example_results );
-    if ( ! eval {
-        my %count;
-
-        for my $epoch ( @$epochs ) {
-            if ( ! looks_like_number( $epoch ) ) {
-                return;
-            }
-            ++$count{length( $epoch )};
-        }
-        if ( keys %count != 1 ) {
-            return;
-        }
-        my $epoch_w = ( keys %count )[0];
-        my $interval;
-        if ( $epoch_w <= 10 ) {
-            $interval = 1;
-        }
-        elsif ( $epoch_w <= 13 ) {
-            $interval = 1_000;
-        }
-        else {
-            $interval = 1_000_000;
-        }
-        ( $function_stmt, $example_results ) = $sf->__interval_to_converted_epoch( $sql, $func, $max_examples, $chosen_col, $interval );
-
-        1 }
-    ) {
-        return;
-    }
-    else {
-        return $function_stmt, $example_results;
-    }
-}
-
-
-sub __choose_interval {
-    my ( $sf, $sql, $func, $chosen_col, $epochs, $max_examples, $info  ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $epoch_formats = [
-        [ '      Seconds',  1             ],
-        [ 'Milli-Seconds',  1_000         ],
-        [ 'Micro-Seconds',  1_000_000     ],
-    ];
-    my $old_idx = 0;
-
-    CHOOSE_INTERVAL: while ( 1 ) {
-        my @example_epochs = ( $chosen_col );
-        if ( @$epochs > $max_examples ) {
-            push @example_epochs, @{$epochs}[0 .. $max_examples - 1];
-            push @example_epochs, '...';
-        }
-        else {
-            push @example_epochs, @$epochs;
-        }
-        my $epoch_info = $info . "\n" . join( "\n", @example_epochs );
-        my @pre = ( undef );
-        my $menu = [ @pre, map( $_->[0], @$epoch_formats ) ];
-        # Choose
-        my $idx = $tc->choose(
-            $menu,
-            { %{$sf->{i}{lyt_v}}, prompt => 'Choose interval:', info => $epoch_info, default => $old_idx,
-                index => 1, keep => @$menu + 1, layout => 2, undef => '<<' }
-        );
-        if ( ! $idx ) {
-            return;
-        }
-        if ( $sf->{o}{G}{menu_memory} ) {
-            if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $old_idx = 0;
-                next CHOOSE_INTERVAL;
-            }
-            $old_idx = $idx;
-        }
-        my $interval = $epoch_formats->[$idx-@pre][1];
-        my ( $function_stmt, $example_results );
-        if ( ! eval {
-            ( $function_stmt, $example_results ) = $sf->__interval_to_converted_epoch( $sql, $func, $max_examples, $chosen_col, $interval );
-            if ( ! $function_stmt || ! $example_results ) {
-                die "No results!";
-            }
-            1 }
-        ) {
-            my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            $ax->print_error_message( $@ );
-            next CHOOSE_INTERVAL;
-        }
-        unshift @$example_results, $chosen_col;
-        if ( @$epochs > $max_examples ) {
-            push @$example_results, '...';
-        }
-        my $result_info = $info . "\n" . join( "\n", @$example_results );
-        # Choose
-        my $choice = $tc->choose(
-            [ undef, $sf->{i}{_confirm} ],
-            { %{$sf->{i}{lyt_v}}, info => $result_info, layout => 2, keep => 3 }
-        );
-        if ( ! $choice ) {
-            next CHOOSE_INTERVAL;
-        }
-        return $function_stmt, $example_results;
-    }
 }
 
 

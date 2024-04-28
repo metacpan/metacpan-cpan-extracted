@@ -1,5 +1,5 @@
 package Dist::Build;
-$Dist::Build::VERSION = '0.001';
+$Dist::Build::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -146,6 +146,14 @@ sub Build_PL {
 	save_json(catfile(qw/_build graph/), $serializer->serialize_plan($plan));
 	save_json(catfile(qw/_build params/), [ $args, \@env ]);
 
+	if (my $dynamic = $meta->custom('x_dynamic_prereqs')) {
+		my %meta = (%{ $meta->as_struct }, dynamic_config => 0);
+		require CPAN::Requirements::Dynamic;
+		my $dynamic_parser = CPAN::Requirements::Dynamic->new(%options);
+		my $prereq = $dynamic_parser->evaluate($dynamic);
+		$meta{prereqs} = $meta->effective_prereqs->with_merged_prereqs($prereq)->as_string_hash;
+		$meta = CPAN::Meta->new(\%meta);
+	}
 	$meta->save('MYMETA.json');
 
 	printf "Creating new 'Build' script for '%s' version '%s'\n", $meta->name, $meta->version;
@@ -187,7 +195,7 @@ Dist::Build - A modern module builder, author tools not included!
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -206,6 +214,8 @@ C<Dist::Build> is a Build.PL implementation. Unlike L<Module::Build::Tiny> it is
    libraries     => [ 'foo' ],
    extra_sources => [ glob 'src/*.c' ],
  );
+
+ At configure time, it will run a L<dynamic-prereqs.json|CPAN::Requirements::Dynamic> file if present to determine the conditional dependencies
 
 =head1 AUTHOR
 

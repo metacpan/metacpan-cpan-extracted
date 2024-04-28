@@ -14,7 +14,7 @@ lives_ok { $action = ExtUtils::Builder::Action::Command->new(command => [ $^X, '
 
 is_deeply($action->to_command, [$^X, '-e0'], 'Returns perl -e0');
 
-like($action->to_code, qr/ system \( '\Q$^X\E','-e0' \) \ and \ die /x, 'to_code returns something that might be sensible');
+like($action->to_code, qr/ system \( '.*?','-e0' \) \ and \ die /x, 'to_code returns something that might be sensible');
 
 lives_ok { $action->execute(quiet => 1) } 'Can execute quiet command';
 

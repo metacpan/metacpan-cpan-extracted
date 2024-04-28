@@ -1,11 +1,11 @@
 package ExtUtils::Builder::Planner;
-$ExtUtils::Builder::Planner::VERSION = '0.002';
+$ExtUtils::Builder::Planner::VERSION = '0.004';
 use strict;
 use warnings;
 
 use Carp ();
 use File::Spec;
-use List::Util ();
+use List::Util 1.45 ();
 
 use ExtUtils::Builder::Plan;
 use ExtUtils::Builder::Node;
@@ -156,7 +156,7 @@ ExtUtils::Builder::Planner - An ExtUtils::Builder Plan builder
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 

@@ -4980,6 +4980,41 @@ sub post_delete_incomplete_rows{
 }
 
 #
+# PostDataTransformationRequest
+#
+# Transform spreadsheet data is mainly used to pivot columns, unpivot columns.
+# 
+# @dataTransformationRequest  DataTransformationRequest (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostDataTransformationRequest',
+            description => 'PostDataTransformation Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_data_transformation' } = { 
+    	summary => 'Transform spreadsheet data is mainly used to pivot columns, unpivot columns.',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_data_transformation{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
 # GetWorksheetHyperlinksRequest
 #
 # Retrieve descriptions of hyperlinks in the worksheet.

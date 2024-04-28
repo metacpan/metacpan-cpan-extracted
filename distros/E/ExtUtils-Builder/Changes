@@ -1,5 +1,11 @@
 Revision history for ExtUtils-Builder
 
+0.004     2024-04-27 12:01:16+02:00 Europe/Brussels
+          - Add dependency on List::Util 1.45 for uniq
+
+0.003     2024-04-27 11:45:41+02:00 Europe/Brussels
+          - Don't test for exact perl paths
+
 0.002     2024-04-26 11:33:00+02:00 Europe/Brussels
           - Move get_perl into ExtUtils::Builder::Util
           - Remove accidental test dependency on Devel::Confess

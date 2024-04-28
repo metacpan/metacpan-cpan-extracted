@@ -37,6 +37,13 @@ SYNOPSIS
     
         ...
 
+ ENV VARS
+
+    QDB_TMPDIR
+
+      Set this env var if you want QDB to use a temp dir other than the
+      default.
+
 METHODS
 
     $db = DBIx::QuickDB->build_db();

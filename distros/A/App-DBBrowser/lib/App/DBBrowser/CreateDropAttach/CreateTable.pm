@@ -41,7 +41,7 @@ sub create_view {
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $sql = {};
     $ax->reset_sql( $sql );
-    $sf->{d}{stmt_types} = [ 'Create_view' ];
+    $sf->{d}{stmt_types} = [ 'Create_View' ];
 
     SELECT_STMT: while ( 1 ) {
         $sql->{table} = '';
@@ -106,7 +106,7 @@ sub create_table {
     my $source = {};
 
     GET_CONTENT: while ( 1 ) {
-        $sf->{d}{stmt_types} = [ 'Create_table', 'Insert' ];
+        $sf->{d}{stmt_types} = [ 'Create_Table', 'Insert' ];
         # first use of {stmt_types} in get_content/from_col_by_col
         my $ok = $gc->get_content( $sql, $source, $goto_filter );
         if ( ! $ok ) {
@@ -131,22 +131,19 @@ sub create_table {
                 $sql->{ct_column_definitions} = [];
                 $sql->{insert_col_names}  = [];
                 my $header_row = $sf->__get_column_names( $sql );
-                if ( ! $header_row ) {
+                if ( ! defined $header_row ) {
                     $sql->{table} = '';
-                    if ( $orig_row_count - 1 == @{$sql->{insert_args}[0]} ) {
-                        unshift @{$sql->{insert_args}}, $bu_first_row;
-                    }
                     $count_table_name_loop++;
                     next GET_TABLE_NAME;
                 }
                 if ( ! @{$sql->{insert_args}} ) {
-                    $sf->{d}{stmt_types} = [ 'Create_table' ];
+                    $sf->{d}{stmt_types} = [ 'Create_Table' ];
                 }
                 $count_table_name_loop = 0;
 
                 AUTO_INCREMENT: while( 1 ) {
                     $sql->{ct_column_definitions} = [ @$header_row ];  # not quoted
-                    $sql->{insert_col_names}  = [ @$header_row ];  # not quoted
+                    $sql->{insert_col_names}  = [ @$header_row ];      # not quoted
                     $sf->{auto_increment} = 0;
                     if ( $sf->{o}{create}{option_ai_column_enabled} && $sf->__primary_key_autoincrement_constraint() ) {
                         my $return = $sf->__autoincrement_column( $sql);
@@ -154,13 +151,13 @@ sub create_table {
                             next GET_COLUMN_NAMES;
                         }
                     }
-                    my @bu_orig_ct_column_definitions = @{$sql->{ct_column_definitions}};
+                    my @unquoted_ct_column_definitions = @{$sql->{ct_column_definitions}};
+                    my @unquoted_insert_col_names = @{$sql->{insert_col_names}};
                     my $column_names = []; # column_names memory
 
                     EDIT_COLUMN_NAMES: while( 1 ) {
-                        $column_names = $sf->__edit_column_names( $sql, $column_names );
-                        if ( ! $column_names ) {
-                            $sql->{ct_column_definitions} = [ @bu_orig_ct_column_definitions ];
+                        $column_names = $sf->__edit_column_names( $sql, $column_names );  # now quoted
+                        if ( ! defined $column_names ) {
                             next AUTO_INCREMENT if $sf->{auto_increment};
                             next GET_COLUMN_NAMES;
                         }
@@ -181,29 +178,28 @@ sub create_table {
                             );
                             next EDIT_COLUMN_NAMES;
                         }
-                        my @bu_edited_ct_column_definitions = @{$sql->{ct_column_definitions}};
+                        my @unedited_ct_column_definitions = @{$sql->{ct_column_definitions}};
                         my $data_types = {}; # data_types memory
 
                         EDIT_COLUMN_TYPES: while( 1 ) {
-                            $data_types = $sf->__edit_column_types( $sql, $data_types ); # `ct_column_definitions` quoted in `__edit_column_types`
+                            $data_types = $sf->__edit_column_types( $sql, $data_types );
                             if ( ! $data_types ) {
-                                $sql->{ct_column_definitions} = [ @bu_orig_ct_column_definitions ];
+                                $sql->{ct_column_definitions} = [ @unquoted_ct_column_definitions ];
+                                $sql->{insert_col_names} = [ @unquoted_insert_col_names ];
                                 next EDIT_COLUMN_NAMES;
                             }
                             # CREATE_TABLE
                             my $ok_create_table = $sf->__create( $sql, 'table' );
                             if ( ! defined $ok_create_table ) {
-                                $sql->{ct_column_definitions} = [ @bu_edited_ct_column_definitions ];
-                                $sql->{insert_col_names}  = [];
+                                $sql->{ct_column_definitions} = [ @unedited_ct_column_definitions ];
                                 next EDIT_COLUMN_TYPES;
                             }
-                            if ( ! $ok_create_table ) {
+                            elsif ( ! $ok_create_table ) {
                                 return;
                             }
-                            if ( @{$sql->{insert_args}} ) {
-
+                            elsif ( @{$sql->{insert_args}} ) {
                                 # INSERT_DATA
-                                my $ok_insert = $sf->__insert_data( $sql ); # `insert_col_names` quoted in `__insert_data`
+                                my $ok_insert = $sf->__insert_data( $sql );
                                 if ( ! $ok_insert ) {
                                    return;
                                 }
@@ -349,6 +345,7 @@ sub __autoincrement_column {
 sub __primary_key_autoincrement_constraint {
     # provide "primary_key_autoincrement_constraint" only if also "first_col_is_autoincrement" is available
     my ( $sf ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $driver = $sf->{i}{driver};
     if ( $driver eq 'SQLite' ) {
         return "INTEGER PRIMARY KEY";
@@ -358,8 +355,8 @@ sub __primary_key_autoincrement_constraint {
         # mysql: NOT NULL added automatically with AUTO_INCREMENT
     }
     if ( $driver eq 'Pg' ) {
-        my ( $pg_version ) = $sf->{d}{dbh}->selectrow_array( "SELECT version()" );
-        if ( $pg_version =~ /^\S+\s+([0-9]+)(?:\.[0-9]+)*\s/ && $1 >= 10 ) {
+        my $pg_major_version = $ax->major_server_version();
+        if ( $pg_major_version >= 10 ) {
             # since PostgreSQL version 10
             return "INT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY";
         }
@@ -368,8 +365,7 @@ sub __primary_key_autoincrement_constraint {
         }
     }
     if ( $driver eq 'Firebird' ) {
-        my ( $firebird_version ) = $sf->{d}{dbh}->selectrow_array( "SELECT RDB\$GET_CONTEXT('SYSTEM', 'ENGINE_VERSION') FROM RDB\$DATABASE" );
-        my $firebird_major_version = $firebird_version =~ s/^(\d+).+\z/$1/r;
+        my $firebird_major_version = $ax->major_server_version();
         if ( $firebird_major_version >= 4 ) {
             return "INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY";
         }
@@ -381,9 +377,9 @@ sub __primary_key_autoincrement_constraint {
         return "INT NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY";
     }
     if ( $driver eq 'Oracle' ) {
-        my $ora_server_version = $sf->{d}{dbh}->func( 'ora_server_version' );
-        if ( $ora_server_version->[0] >= 12 ) {
-            return "NUMBER GENERATED ALWAYS as IDENTITY";   # Oracle 12c or greater
+        my $ora_major_server_version = $ax->major_server_version();
+        if ( $ora_major_server_version >= 12 ) {
+            return "NUMBER GENERATED ALWAYS AS IDENTITY";   # Oracle 12c or greater
         }
     }
 }
@@ -411,7 +407,12 @@ sub __edit_column_names {
     if ( ! defined $form ) {
         return;
     }
-    $column_names = $sql->{ct_column_definitions} = [ map { $_->[1] } @$form ]; # not quoted
+    $column_names = [ map { $_->[1] } @$form ];
+    $sql->{ct_column_definitions} = $ax->quote_cols( $column_names ); # now quoted
+    $sql->{insert_col_names} = [ @{$sql->{ct_column_definitions}} ];  # now quoted
+    if ( $sf->{auto_increment} ) {
+        shift @{$sql->{insert_col_names}};
+    }
     $sql->{ct_table_constraints} = [];
     $sql->{ct_table_options} = [];
     return $column_names;
@@ -422,12 +423,6 @@ sub __edit_column_types {
     my ( $sf, $sql, $data_types ) = @_;
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $unquoted_table_cols = [ @{$sql->{ct_column_definitions}} ];
-    $sql->{ct_column_definitions} = $ax->quote_cols( $sql->{ct_column_definitions} ); # now quoted
-    $sql->{insert_col_names} = [ @{$sql->{ct_column_definitions}} ];
-    if ( $sf->{auto_increment} ) {
-        shift @{$sql->{insert_col_names}};
-    }
     my $fields;
     if ( ! %$data_types && $sf->{o}{create}{data_type_guessing} ) {
         $ax->print_sql_info( $ax->get_sql_info( $sql ), 'Column data types: guessing ... ' );
@@ -459,7 +454,8 @@ sub __edit_column_types {
     if ( $sf->{i}{driver} =~ /^(?:Pg|Firebird|Informix|Oracle)\z/ ) {
         for my $field ( @$fields ) {
             if ( defined $field->[1] && $field->[1] eq 'DATETIME' ) {
-                $field->[1] = 'TIMESTAMP'                 if $sf->{i}{driver} =~ /^(?:Pg|Firebird|Oracle)\z/;
+                $field->[1] = 'TIMESTAMP'                 if $sf->{i}{driver} =~ /^(?:Pg|Firebird)\z/;
+                $field->[1] = 'DATE'                      if $sf->{i}{driver} eq 'Oracle';
                 $field->[1] = 'DATETIME YEAR TO FRACTION' if $sf->{i}{driver} eq 'Informix';
                 # Informix: DATETIME largest_qualifier TO smallest_qualifier
             }
@@ -538,7 +534,7 @@ sub __create {
     if ( $create_table_ok eq $no ) {
         return 0;
     }
-    my $stmt = $ax->get_stmt( $sql, 'Create_' . $type, 'prepare' );
+    my $stmt = $ax->get_stmt( $sql, 'Create_' . ucfirst( $type ), 'prepare' );
     # don't reset `$sql->{ct_column_definitions}` and `$sf->{d}{stmt_types}`:
     #    to get a consistent print_sql_info output in CommitSQL
     #    to avoid another confirmation prompt in CommitSQL
@@ -553,14 +549,6 @@ sub __create {
 sub __insert_data {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $columns = $ax->column_names( $sql->{table} );
-    if ( ! defined $columns ) {
-        return;
-    }
-    if ( $sf->{auto_increment} ) {
-        shift @$columns;
-    }
-    $sql->{insert_col_names} = $ax->quote_cols( $columns ); # now quoted
     require App::DBBrowser::Table::CommitWriteSQL;
     my $cs = App::DBBrowser::Table::CommitWriteSQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $commit_ok = $cs->commit_sql( $sql );

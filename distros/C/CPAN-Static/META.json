@@ -86,15 +86,15 @@
    "provides" : {
       "CPAN::Static" : {
          "file" : "lib/CPAN/Static.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "CPAN::Static::Install" : {
          "file" : "lib/CPAN/Static/Install.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "CPAN::Static::Spec" : {
          "file" : "lib/CPAN/Static/Spec.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -108,7 +108,7 @@
          "web" : "https://github.com/Perl-Toolchain-Gang/cpan-static"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_generated_by_perl" : "v5.38.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",

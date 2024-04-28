@@ -103,8 +103,8 @@ sub __transaction {
         else {
             $sth->execute();
         }
-        if ( $stmt_type eq 'Insert' && $sf->{d}{stmt_types}[0] eq 'Create_table' ) {
-            # already asked for confirmation (create table + insert data) in Create_table
+        if ( $stmt_type eq 'Insert' && $sf->{d}{stmt_types}[0] eq 'Create_Table' ) {
+            # already asked for confirmation (create table + insert data) in Create_Table
             $dbh->commit;
         }
         else {
@@ -145,8 +145,8 @@ sub __auto_commit {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $dbh = $sf->{d}{dbh};
-    if ( $stmt_type eq 'Insert' && $sf->{d}{stmt_types}[0] eq 'Create_table' ) {
-        # already asked for confirmation (create table + insert data) in Create_table
+    if ( $stmt_type eq 'Insert' && $sf->{d}{stmt_types}[0] eq 'Create_Table' ) {
+        # already asked for confirmation (create table + insert data) in Create_Table
     }
     else {
         my $commit_ok = sprintf qq(  %s %s "%s"), 'EXECUTE', insert_sep( $count_affected, $sf->{i}{info_thsd_sep} ), $stmt_type;

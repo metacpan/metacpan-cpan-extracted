@@ -81,8 +81,8 @@ sub convert_novel {
 
   $conv_str = encode( locale => $conv_str );
   my $cmd = qq[ebook-convert "$input" "$output" $conv_str];
-
-#system( $cmd);
+  #print "$cmd\n";
+  #system($cmd);
   `$cmd`;
 
   return $output;

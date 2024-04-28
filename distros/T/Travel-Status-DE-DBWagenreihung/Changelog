@@ -1,3 +1,14 @@
+Travel::Status::DE::DBWagenreihung 0.13 - Sat Apr 27 2024
+
+    * DBWagenreihung: Add station accessor.
+    * DBWagenreihung: Add TO_JSON function.
+    * DBWagenreihung: remove station_ds100, station_name, and station_uic
+      accessors. Use station->{ds100}, station->{name} and station->{eva}
+      instead. This is a breaking change.
+    * DBWagenreihung: origins now returns a list of hashrefs, just like
+      destinations. It used to return a list of names. This is a breaking
+      change.
+
 Travel::Status::DE::DBWagenreihung 0.12 - Fri Mar 29 2024
 
     * Wagon: Add is_closed accessor

@@ -6,12 +6,6 @@
 
 =head1 FUNCTION
 
-=head2 make_query_request
-
-  #$type：作品，作者，主角，配角，其他
-
-  $parser->make_query_request( $type, $keyword );
-
 =cut
 
 package Novel::Robot::Parser::jjwxc;
@@ -23,6 +17,7 @@ use base 'Novel::Robot::Parser';
 use Web::Scraper;
 use Encode;
 use Data::Dumper;
+#use Smart::Comments;
 
 sub base_url { 'https://www.jjwxc.net' }
 
@@ -36,11 +31,11 @@ sub generate_novel_url {
 }
 
 sub parse_novel {
-  my ( $self, $h ) = @_;
+  my ( $self, $h , $r) = @_;
   $$h =~ s#本书霸王票读者排行.*##s;
 
-  my %r;
-  ( $r{book}, $r{writer} ) = $$h =~ m#<title>\s*《(.+?)》(.+?)_晋江文学城#s;
+  my ($title)= $$h=~m#<title>(.+?)<\/title>#s;
+  ( $r->{book}, $r->{writer} ) = $title =~ m#\s*《(.+?)》(.+?)_晋江文学城#s;
 
   my ( $cc )          = $$h =~ m#章节列表：<br/>.+?(<a.+?)<\/div>#s;
   my @f               = $cc =~ m#<a.+?href="(.+?/\d+/\d+.*?)".+?>(.+?)</a>#sg;
@@ -55,10 +50,10 @@ sub parse_novel {
 
     my $ui = 2 * $i - 2;
     my $u  = "https://m.jjwxc.net$f[$ui]";
-    push @{ $r{item_list} }, { id => $i, title => $t, url => $u };
+    push @{ $r->{item_list} }, { id => $i, title => $t, url => $u };
   }
 
-  return \%r;
+  return $r;
 } ## end sub parse_novel
 
 sub parse_novel_item {
@@ -128,10 +123,10 @@ sub parse_writer_book_info {
   substr( $bookname, 0, 1 ) = '';
   $bookname .= '[锁]' if ( $tr->look_down( 'color', 'gray' ) );
 
-  my $progress = ( $tr->look_down( '_tag', 'td' ) )[4]->as_trimmed_text;
+  my $status = ( $tr->look_down( '_tag', 'td' ) )[4]->as_trimmed_text;
   return {
     series => $series,
-    book   => "$bookname($progress)",
+    book   => "$bookname($status)",
     url    => $self->base_url() . "/$book_url",
   };
 
@@ -182,8 +177,8 @@ sub parse_query_item {
       };
 
     process '//div[@class="info"]', 'writers[]' => sub {
-      my ( $writer, $progress ) = $_[0]->as_text =~ /作者：(.+?) \┃ 进度：(\S+)/s;
-      return { writer => $writer, progress => $progress };
+      my ( $writer, $status ) = $_[0]->as_text =~ /作者：(.+?) \┃ 进度：(\S+)/s;
+      return { writer => $writer, status => $status };
     };
   };
   my $ref = $parse_query->scrape( $h );
@@ -194,7 +189,7 @@ sub parse_query_item {
     next unless ( $r->{url} );
 
     my $w = $ref->{writers}[$i];
-    $r->{title} .= "($w->{progress})";
+    $r->{title} .= "($w->{status})";
     push @result, { %$w, %$r };
   }
 

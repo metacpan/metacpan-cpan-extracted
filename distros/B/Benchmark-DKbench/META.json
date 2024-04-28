@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl CPU Benchmark",
+   "abstract" : "Perl CPU Benchmark Suite",
    "author" : [
       "Dimitrios Kechagias <dkechag@cpan.org>"
    ],
@@ -80,6 +80,6 @@
          "web" : "https://github.com/dkechag/Benchmark-DKbench"
       }
    },
-   "version" : "2.6",
+   "version" : "2.7",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

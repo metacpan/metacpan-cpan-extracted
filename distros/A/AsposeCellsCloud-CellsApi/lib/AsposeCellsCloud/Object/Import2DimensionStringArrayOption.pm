@@ -35,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::DataSource;
 use AsposeCellsCloud::Object::FileSource;
 use AsposeCellsCloud::Object::ImportOption; 
 
@@ -168,6 +169,13 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
+     'data_source' => {
+     	datatype => 'DataSource',
+     	base_name => 'DataSource',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'source' => {
      	datatype => 'FileSource',
      	base_name => 'Source',
@@ -184,6 +192,7 @@ __PACKAGE__->swagger_types( {
     'destination_worksheet' => 'string',
     'is_insert' => 'boolean',
     'import_data_type' => 'string',
+    'data_source' => 'DataSource',
     'source' => 'FileSource' 
 } );
 
@@ -194,6 +203,7 @@ __PACKAGE__->attribute_map( {
     'destination_worksheet' => 'DestinationWorksheet',
     'is_insert' => 'IsInsert',
     'import_data_type' => 'ImportDataType',
+    'data_source' => 'DataSource',
     'source' => 'Source' 
 } );
 

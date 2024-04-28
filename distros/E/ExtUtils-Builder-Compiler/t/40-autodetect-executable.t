@@ -20,6 +20,8 @@ sub capturex {
 	return $ret;
 }
 
+plan skip_all => 'No libperl' unless -e "$Config{archlibexp}/CORE/$Config{libperl}";
+
 my $planner = ExtUtils::Builder::Planner->new;
 $planner->load_module('ExtUtils::Builder::AutoDetect::C',
 	profile => '@Perl', type => 'executable',

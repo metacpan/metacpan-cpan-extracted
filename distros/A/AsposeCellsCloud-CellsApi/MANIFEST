@@ -43,12 +43,15 @@ docs/DataCleansing.md
 docs/DataColumnFillValue.md
 docs/DataFill.md
 docs/DataFillValue.md
+docs/DataItem.md
 docs/DataSorter.md
 docs/DataSorterKey.md
+docs/DataSource.md
 docs/DateTimeGroupItem.md
 docs/DeduplicationRegion.md
 docs/DynamicFilter.md
 docs/FileInfo.md
+docs/FileSource.md
 docs/FilesResult.md
 docs/FilterColumn.md
 docs/Font.md
@@ -79,7 +82,6 @@ docs/PasteOptions.md
 docs/PdfSecurityOptions.md
 docs/Protection.md
 docs/ProtectSheetParameter.md
-docs/QueryTable.md
 docs/Range.md
 docs/Ranges.md
 docs/Row.md
@@ -115,7 +117,6 @@ docs/XmlMap.md
 docs/CellsObjectOperateTaskParameter.md
 docs/ConvertTaskParameter.md
 docs/ConvertWorksheetTaskParameter.md
-docs/FileSource.md
 docs/ImportDataTaskParameter.md
 docs/ResultDestination.md
 docs/SaveFilesToCloudResult.md
@@ -284,6 +285,7 @@ docs/CreatePivotTableRequest.md
 docs/DataCleansingRequest.md
 docs/DataDeduplicationRequest.md
 docs/DataFillRequest.md
+docs/DataTransformationRequest.md
 docs/DeleteIncompleteRowsRequest.md
 docs/ImportJsonRequest.md
 docs/ImportXMLRequest.md
@@ -303,6 +305,13 @@ docs/WorksheetMovingRequest.md
 docs/ImageOrPrintOptions.md
 docs/RenderingFont.md
 docs/RenderingWatermark.md
+docs/LoadData.md
+docs/LoadTo.md
+docs/PivotColumn.md
+docs/QueryDataSource.md
+docs/QueryTable.md
+docs/Transformation.md
+docs/UnpivotColumn.md
 docs/PivotField.md
 docs/PivotFilter.md
 docs/PivotItem.md
@@ -524,6 +533,7 @@ docs/PostDataDeduplicationRequest.md
 docs/PostWorkbookDataFillRequest.md
 docs/PostDataFillRequest.md
 docs/PostDeleteIncompleteRowsRequest.md
+docs/PostDataTransformationRequest.md
 docs/GetWorksheetHyperlinksRequest.md
 docs/GetWorksheetHyperlinkRequest.md
 docs/DeleteWorksheetHyperlinkRequest.md
@@ -784,12 +794,15 @@ lib/AsposeCellsCloud/Object/DataCleansing.pm
 lib/AsposeCellsCloud/Object/DataColumnFillValue.pm
 lib/AsposeCellsCloud/Object/DataFill.pm
 lib/AsposeCellsCloud/Object/DataFillValue.pm
+lib/AsposeCellsCloud/Object/DataItem.pm
 lib/AsposeCellsCloud/Object/DataSorter.pm
 lib/AsposeCellsCloud/Object/DataSorterKey.pm
+lib/AsposeCellsCloud/Object/DataSource.pm
 lib/AsposeCellsCloud/Object/DateTimeGroupItem.pm
 lib/AsposeCellsCloud/Object/DeduplicationRegion.pm
 lib/AsposeCellsCloud/Object/DynamicFilter.pm
 lib/AsposeCellsCloud/Object/FileInfo.pm
+lib/AsposeCellsCloud/Object/FileSource.pm
 lib/AsposeCellsCloud/Object/FilesResult.pm
 lib/AsposeCellsCloud/Object/FilterColumn.pm
 lib/AsposeCellsCloud/Object/Font.pm
@@ -820,7 +833,6 @@ lib/AsposeCellsCloud/Object/PasteOptions.pm
 lib/AsposeCellsCloud/Object/PdfSecurityOptions.pm
 lib/AsposeCellsCloud/Object/Protection.pm
 lib/AsposeCellsCloud/Object/ProtectSheetParameter.pm
-lib/AsposeCellsCloud/Object/QueryTable.pm
 lib/AsposeCellsCloud/Object/Range.pm
 lib/AsposeCellsCloud/Object/Ranges.pm
 lib/AsposeCellsCloud/Object/Row.pm
@@ -856,7 +868,6 @@ lib/AsposeCellsCloud/Object/XmlMap.pm
 lib/AsposeCellsCloud/Object/CellsObjectOperateTaskParameter.pm
 lib/AsposeCellsCloud/Object/ConvertTaskParameter.pm
 lib/AsposeCellsCloud/Object/ConvertWorksheetTaskParameter.pm
-lib/AsposeCellsCloud/Object/FileSource.pm
 lib/AsposeCellsCloud/Object/ImportDataTaskParameter.pm
 lib/AsposeCellsCloud/Object/ResultDestination.pm
 lib/AsposeCellsCloud/Object/SaveFilesToCloudResult.pm
@@ -1025,6 +1036,7 @@ lib/AsposeCellsCloud/Object/CreatePivotTableRequest.pm
 lib/AsposeCellsCloud/Object/DataCleansingRequest.pm
 lib/AsposeCellsCloud/Object/DataDeduplicationRequest.pm
 lib/AsposeCellsCloud/Object/DataFillRequest.pm
+lib/AsposeCellsCloud/Object/DataTransformationRequest.pm
 lib/AsposeCellsCloud/Object/DeleteIncompleteRowsRequest.pm
 lib/AsposeCellsCloud/Object/ImportJsonRequest.pm
 lib/AsposeCellsCloud/Object/ImportXMLRequest.pm
@@ -1044,6 +1056,13 @@ lib/AsposeCellsCloud/Object/WorksheetMovingRequest.pm
 lib/AsposeCellsCloud/Object/ImageOrPrintOptions.pm
 lib/AsposeCellsCloud/Object/RenderingFont.pm
 lib/AsposeCellsCloud/Object/RenderingWatermark.pm
+lib/AsposeCellsCloud/Object/LoadData.pm
+lib/AsposeCellsCloud/Object/LoadTo.pm
+lib/AsposeCellsCloud/Object/PivotColumn.pm
+lib/AsposeCellsCloud/Object/QueryDataSource.pm
+lib/AsposeCellsCloud/Object/QueryTable.pm
+lib/AsposeCellsCloud/Object/Transformation.pm
+lib/AsposeCellsCloud/Object/UnpivotColumn.pm
 lib/AsposeCellsCloud/Object/PivotField.pm
 lib/AsposeCellsCloud/Object/PivotFilter.pm
 lib/AsposeCellsCloud/Object/PivotItem.pm
@@ -1265,6 +1284,7 @@ lib/AsposeCellsCloud/Request/PostDataDeduplicationRequest.pm
 lib/AsposeCellsCloud/Request/PostWorkbookDataFillRequest.pm
 lib/AsposeCellsCloud/Request/PostDataFillRequest.pm
 lib/AsposeCellsCloud/Request/PostDeleteIncompleteRowsRequest.pm
+lib/AsposeCellsCloud/Request/PostDataTransformationRequest.pm
 lib/AsposeCellsCloud/Request/GetWorksheetHyperlinksRequest.pm
 lib/AsposeCellsCloud/Request/GetWorksheetHyperlinkRequest.pm
 lib/AsposeCellsCloud/Request/DeleteWorksheetHyperlinkRequest.pm

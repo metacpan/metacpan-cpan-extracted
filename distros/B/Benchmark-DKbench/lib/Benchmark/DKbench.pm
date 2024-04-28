@@ -38,13 +38,13 @@ use Text::Levenshtein::XS;
 
 my $mono_clock = $^O !~ /win/i || $Time::HiRes::VERSION >= 1.9764;
 
-our $VERSION = '2.6';
+our $VERSION = '2.7';
 our @EXPORT  = qw(system_identity suite_run calc_scalability);
 our $datadir = dist_dir("Benchmark-DKbench");
 
 =head1 NAME
 
-Benchmark::DKbench - Perl CPU Benchmark
+Benchmark::DKbench - Perl CPU Benchmark Suite
 
 =head1 SYNOPSIS
 
@@ -305,21 +305,31 @@ exported functions that the C<dkbench> script uses for reference:
 
 =head2 C<system_identity>
 
- my $cores = system_identity();
+ my $cores = system_identity($quiet?);
 
-Prints out software/hardware configuration and returns the number of cores detected.
+Prints out software/hardware configuration and returns the number of logical cores
+detected using L<System::CPU>.
+
+Any argument will suppress printout and will only return the number of cores.
 
 =head2 C<suite_run>
 
  my %stats = suite_run(\%options);
 
 Runs the benchmark suite given the C<%options> and prints results. Returns a hash
-with run stats.
+with run stats that looks like this:
+
+ %stats = (
+   bench_name => {times => [ ... ], scores => [ ... ]},
+    ...
+   _total => {times => [ ... ], scores => [ ... ]},
+   _opt   => {iter => $iterations, threads => $no_threads, ...}
+ );
 
 The options of the C<dkbench> script (in their long form) are accepted, except
 C<help>, C<setup> and C<max_threads> which are exclusive to the command-line script.
 
-In addition, C<%options> may contain the key C<%extra_bench>, with a hashref value
+In addition, C<%options> may contain the key C<extra_bench>, with a hashref value
 containing custom benchmarks in the following format:
 
  extra_bench => { bench_name => [$coderef, $exp_output, $ref_time, $quick_arg, $normal_arg], ... }
@@ -336,10 +346,19 @@ For more info with an example see the L<CUSTOM BENCHMARKS> section.
 
 =head2 C<calc_scalability>
 
- calc_scalability(\%options, \%stat_single, \%stat_multi);
+ my %scal = calc_scalability(\%stat_single, \%stat_multi);
 
 Given the C<%stat_single> results of a single-threaded C<suite_run> and C<%stat_multi>
-results of a multi-threaded run, will calculate and print the multi-thread scalability.
+results of a multi-threaded run, will calculate, print and return the multi-thread
+scalability (including averages, ranges etc for multiple iterations.
+
+The result hash return looks like this:
+
+ %scal = (
+   bench_name => $bench_avg_scalability,
+    ...
+   _total => $total_avg_scalability
+ );
 
 =head1 CUSTOM BENCHMARKS
 
@@ -358,10 +377,8 @@ with the default benchmarks:
     my $iter = shift || 1;  # Optionally have an argument that scales the workload
     my $dist = 0;
     $dist +=
-      great_circle_distance(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi)) -
-      great_circle_bearing(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi)) +
-      great_circle_direction(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi))
-      for 1 .. $iter;
+      great_circle_distance(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi))
+        for 1 .. $iter;
     return $dist; # Returning something is optional, but is used to Fail bench on no match
   }
 
@@ -371,8 +388,8 @@ with the default benchmarks:
         \&great_circle,      # Reference to bench function
         '3144042.81433949',  # Output for your reference Perl - determines Pass/Fail (optional)
         5.5,                 # Seconds to complete in normal mode for score = 1000 (optional)
-        400000,              # Argument to pass for --quick mode (optional)
-        2000000              # Argument to pass for normal mode (optional)
+        1000000,             # Argument to pass for --quick mode (optional)
+        5000000              # Argument to pass for normal mode (optional)
         ]},
     }
   );
@@ -384,9 +401,20 @@ to run by itself:
 
   my %stats = suite_run({
       include     => 'custom',
-      extra_bench => { custom1 => [sub {split //, 'x'x$_ for 1..10000}] }
+      extra_bench => { custom1 => [sub {my @a=split(//, 'x'x$_) for 1..10000}] }
     }
   );
+
+If you want to do a multi-threaded run as well and then calculate scalability:
+
+  my %stats_multi = suite_run({
+      threads     => system_identity(1);
+      include     => 'custom',
+      extra_bench => { custom1 => [sub {my @a=split(//, 'x'x$_) for 1..10000}] }
+    }
+  );
+
+  my %scal = calc_scalability(\%stats, \%stats_multi);
 
 =head1 NOTES
 
@@ -473,6 +501,8 @@ sub benchmark_list {
 sub system_identity {
     my ($physical, $cores, $ncpu) = System::CPU::get_cpu;
     $ncpu ||= 1;
+    return $ncpu if @_;
+
     local $^O = 'linux' if $^O =~ /android/;
     my $info  = System::Info->sysinfo_hash;
     my $osn   = $info->{distro} || $info->{os} || $^O;
@@ -499,9 +529,13 @@ sub system_identity {
 sub suite_run {
     my $opt = shift;
     _init_options($opt);
-    $datadir = $opt->{datapath} if $opt->{datapath};
 
-    my %stats = (threads => $opt->{threads});
+    my %stats;
+    $stats{_opt}->{$_} = $opt->{$_} foreach qw/threads scale iter time/;
+
+    my $thread = $opt->{threads} > 1 ? "$opt->{threads}-thread" : "single-thread";
+    print "DKbench $thread run";
+    print  $opt->{no_mce} ? " (no MCE):\n" : ":\n";
 
     MCE::Loop::init {
         max_workers => $opt->{threads},
@@ -520,46 +554,63 @@ sub suite_run {
 
 sub _init_options {
     my $opt = shift;
-    $opt->{threads} //= 1;
-    $opt->{scale}   //= 1;
-    $opt->{iter} ||= 1;
+    $opt->{threads} ||= 1;
+    $opt->{scale}   ||= 1;
+    $opt->{iter}    ||= 1;
+    ($opt->{time}, $opt->{scale}) = (1, 1) if $opt->{quick};
     if ($opt->{extra_bench} && !$opt->{time}) {
         foreach my $arr (values %{$opt->{extra_bench}}) {
             $opt->{time} = 1 unless scalar(@$arr) > 2 && $arr->[2] > 0;
         }
     }
+    $datadir  = $opt->{datapath} if $opt->{datapath};
     $opt->{f} = $opt->{time} ? '%.3f' : '%5.0f';
+    $opt->{threads} = 1 if $opt->{no_mce};
 }
 
 sub calc_scalability {
-    my ($opt, $stats1, $stats2) = @_;
-    my $benchmarks = benchmark_list($opt->{extra_bench});
-    my $threads    = $stats2->{threads} / $stats1->{threads};
-    my $display    = $opt->{time} ? 'times' : 'scores';
+    my ($stats1, $stats2) = @_;
+    my ($opt,    $opt2)   = ($stats1->{_opt}, $stats2->{_opt});
+
+    die "Different, non-zero thread count expected between runs"
+        if !$opt->{threads}
+        || !$opt2->{threads}
+        || $opt->{threads} == $opt2->{threads};
+
+    ($opt, $opt2) = ($stats2->{_opt}, $stats1->{_opt})
+        if $opt->{threads} > $opt2->{threads};
+
+    die "Same scale expected between runs" if $opt->{scale} != $opt2->{scale};
+
+    my $threads = $opt2->{threads} / $opt->{threads};
+    my $display = $opt->{time} ? 'times' : 'scores';
+
     $opt->{f} = $opt->{time} ? '%.3f' : '%5.0f';
-    my (@perf, @scal);
-    print "Multi thread Scalability:\n".pad_to("Benchmark",24).pad_to("Multi perf xSingle",24).pad_to("Multi scalability %",24);
-    print "\n";
-    my $cnt;
-    foreach my $bench (sort keys %$benchmarks) {
+    my ($cnt, @perf, @scal, %scal);
+    print "Multi thread Scalability:\n".pad_to("Benchmark",24).pad_to("Multi perf xSingle",24).pad_to("Multi scalability %",24)."\n";
+    foreach my $bench (sort keys %{$stats1}) {
+        next if $bench eq '_total';
         next unless $stats1->{$bench}->{times} && $stats2->{$bench}->{times};
         $cnt++;
         my @res1 = min_max_avg($stats1->{$bench}->{times});
         my @res2 = min_max_avg($stats2->{$bench}->{times});
+        $scal{$bench} = $res1[2]/$res2[2]*100 if $res2[2];
         push @perf, $res1[2]/$res2[2]*$threads if $res2[2];
-        push @scal, $res1[2]/$res2[2]*100 if $res2[2];
-        print pad_to("$bench:",24).pad_to(sprintf("%.2f",$perf[-1]),24).pad_to(sprintf("%2.0f",$scal[-1]),24)."\n";
+        push @scal, $scal{$bench} if $scal{$bench};
+        print pad_to("$bench:", 24)
+            . pad_to(sprintf("%.2f",  $perf[-1]), 24)
+            . pad_to(sprintf("%2.0f", $scal[-1]), 24) . "\n"
+            if @perf;
     }
+    die "No bench times recorded" unless @perf;
     print (("-"x40)."\n");
-    my $avg1 = min_max_avg($stats1->{total}->{$display});
-    my $avg2 = min_max_avg($stats2->{total}->{$display});
+    my $avg1 = min_max_avg($stats1->{_total}->{$display});
+    my $avg2 = min_max_avg($stats2->{_total}->{$display});
     print "DKbench summary ($cnt benchmark";
     print "s" if $cnt > 1;
-    print " x$opt->{scale} scale" if $opt->{scale} && $opt->{scale} > 1;
-    print ", $opt->{iter} iterations" if $opt->{iter} && $opt->{iter} > 1;
-    print ", $stats2->{threads} thread";
-    print "s" if $stats2->{threads} > 1;
-    print "):\n";
+    print " x$opt->{scale} scale"     if $opt->{scale} > 1;
+    print ", $opt->{iter} iterations" if $opt->{iter} > 1;
+    print ", $opt2->{threads} threads):\n";
     $opt->{f} .= "s" if $opt->{time};
     print pad_to("Single:").sprintf($opt->{f}, $avg1)."\n";
     print pad_to("Multi:").sprintf($opt->{f}, $avg2)."\n";
@@ -567,8 +618,11 @@ sub calc_scalability {
     my @newscal = Benchmark::DKbench::drop_outliers(\@scal, -1);
     @perf = min_max_avg(\@newperf);
     @scal = min_max_avg(\@newscal);
+    $scal{_total} = $scal[2];
     print pad_to("Multi/Single perf:").sprintf("%.2fx\t(%.2f - %.2f)", $perf[2], $perf[0], $perf[1])."\n";
     print pad_to("Multi scalability:").sprintf("%2.1f%% \t(%.0f%% - %.0f%%)", $scal[2], $scal[0], $scal[1])."\n";
+
+    return %scal;
 }
 
 sub run_iteration {
@@ -602,7 +656,7 @@ sub run_iteration {
         push @{$stats->{$bench}->{times}}, $time;
         push @{$stats->{$bench}->{scores}}, $score;
         my $d = $stats->{$bench}->{$opt->{time} ? 'times' : 'scores'}->[-1];
-        $stats->{$bench}->{fail}++ if $res ne 'Pass';
+        $stats->{$bench}->{fail}++ if !$opt->{quick} && $res ne 'Pass';
         print pad_to("$bench:").pad_to(sprintf($opt->{f}, $d));
         print "$res" unless $opt->{time};
         print "\n";
@@ -611,8 +665,8 @@ sub run_iteration {
     die "No tests to run\n" unless $i;
     my $s = int($total_score/$i+0.5);
     print pad_to("Overall $title: ").sprintf($opt->{f}."\n", $opt->{time} ? $total_time : $s);
-    push @{$stats->{total}->{times}}, $total_time;
-    push @{$stats->{total}->{scores}}, $s;
+    push @{$stats->{_total}->{times}}, $total_time;
+    push @{$stats->{_total}->{scores}}, $s;
 }
 
 sub mce_bench_run {
@@ -636,7 +690,7 @@ sub mce_bench_run {
         $res = $_->[1] if $_->[1] ne 'Pass';
     }
 
-    return $time/($opt->{threads}*$opt->{scale} || 1), $res;
+    return $time/$opt->{threads} * $opt->{scale}, $res;
 }
 
 sub bench_run {
@@ -1135,7 +1189,12 @@ sub total_stats {
     my $benchmarks = benchmark_list($opt->{extra_bench});
     my $display    = $opt->{time} ? 'times'      : 'scores';
     my $title      = $opt->{time} ? 'Time (sec)' : 'Score';
-    print "Aggregates ($opt->{iter} iterations):\n".pad_to("Benchmark",24).pad_to("Avg $title").pad_to("Min $title").pad_to("Max $title");
+    print "Aggregates ($opt->{iter} iterations"
+        . ($opt->{threads} > 1 ? ", $opt->{threads} threads" : "") . "):\n"
+        . pad_to("Benchmark", 24)
+        . pad_to("Avg $title")
+        . pad_to("Min $title")
+        . pad_to("Max $title");
     print pad_to("stdev %") if $opt->{stdev};
     print pad_to("Pass %") unless $opt->{time};
     print "\n";
@@ -1148,7 +1207,7 @@ sub total_stats {
             unless $opt->{time};
         print "\n";
     }
-    my $str = calc_stats($opt, $stats->{total}->{$display});
+    my $str = calc_stats($opt, $stats->{_total}->{$display});
     print pad_to("Overall Avg $title:", 24)."$str\n";
 }
 

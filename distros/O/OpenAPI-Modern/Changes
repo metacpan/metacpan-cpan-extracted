@@ -1,5 +1,11 @@
 Revision history for OpenAPI-Modern
 
+0.063     2024-04-27 22:26:47Z
+          - the url scheme of absoluteKeywordLocations in errors is now taken
+            from the incoming request, rather than always being "https"
+          - fix matching of request uri against path templates so that
+            all characters are matched literally, not treated as regexes
+
 0.062     2024-04-21 18:11:43Z
           - BREAKING CHANGE: operation_path is dropped from the populated
             $options hash in validate_request, validate_response, and

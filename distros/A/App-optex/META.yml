@@ -29,7 +29,7 @@ no_index:
 provides:
   App::optex:
     file: lib/App/optex.pm
-    version: v0.99.1
+    version: v0.99.2
   App::optex::Tmpfile:
     file: lib/App/optex/Tmpfile.pm
   App::optex::debug:
@@ -57,7 +57,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/optex/issues
   homepage: https://github.com/kaz-utashiro/optex
   repository: https://github.com/kaz-utashiro/optex.git
-version: v0.99.1
+version: v0.99.2
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::Mach::GCC;
-$ExtUtils::Builder::Linker::Mach::GCC::VERSION = '0.001';
+$ExtUtils::Builder::Linker::Mach::GCC::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -19,8 +19,8 @@ my %flag_for = (
 );
 
 sub linker_flags {
-	my ($self, %args) = @_;
-	my @ret = $self->SUPER::linker_flags(%args);
+	my ($self, $from, $to, %args) = @_;
+	my @ret = $self->SUPER::linker_flags($from, $to, %args);
 	push @ret, $self->new_argument(rank => 10, value => $flag_for{ $self->type }) if $flag_for{ $self->type };
 	return @ret;
 }
@@ -45,11 +45,11 @@ ExtUtils::Builder::Linker::Mach::GCC
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

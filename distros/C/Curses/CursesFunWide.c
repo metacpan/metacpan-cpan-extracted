@@ -49,10 +49,12 @@ XS(XS_CURSES_getchar) {
 }
 
 XS(XS_CURSES_ungetchar) {
+    bool succeeded;
+    wchar_t wc;
     dXSARGS;
     c_exactargs("ungetchar", items, 1);
-    wint_t wc = c_sv2wchar(ST(0));
-    if (wc == WEOF)
+    c_sv2GetWchar(ST(0), &wc, &succeeded);
+    if (!succeeded)
         XSRETURN_NO;
 #ifdef C_UNGET_WCH
     int ret;
@@ -111,7 +113,7 @@ XS(XS_CURSES_addstring) {
 #ifdef C_ADDNWSTR
     int ret;
     size_t len;
-    wint_t *wstr = c_sv2wstr(ST(c_arg), &len);
+    wchar_t *wstr = c_sv2wstr(ST(c_arg), &len);
     if (wstr == NULL)
         XSRETURN_NO;
     ret = waddnwstr(win, wstr, len);
@@ -147,7 +149,7 @@ XS(XS_CURSES_insstring) {
 #ifdef C_INS_NWSTR
     int ret;
     size_t len;
-    wint_t *wstr = c_sv2wstr(ST(c_arg), &len);
+    wchar_t *wstr = c_sv2wstr(ST(c_arg), &len);
     if (wstr == NULL)
         XSRETURN_NO;
     ret = wins_nwstr(win, wstr, len);

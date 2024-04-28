@@ -2,7 +2,7 @@ package version::regex;
 
 use strict;
 
-our $VERSION = '0.9930';
+our $VERSION = '0.9931';
 
 #--------------------------------------------------------------------------#
 # Version regexp components

@@ -8,6 +8,7 @@ use AsposeCellsCloud::Object::ConvertTaskParameter;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**DataSource** | **DataSource** |  |
 **Workbook** | **FileSource** |  |
 **DestinationFile** | **string** |  |
 **Region** | **string** |  |

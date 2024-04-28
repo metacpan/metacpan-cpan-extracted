@@ -1,5 +1,37 @@
 Revision history for App-DBBrowser
 
+
+2.409  2024-04-28
+        - SQLite plugin: new option to set the busy timeout.
+        - SQLite: Renamed and modified the user defined scalar function 'truncate'.
+                  Now 'trunc' treats any value that looks like a number as a number.
+        - Bugfix in the limit/offset submenu.
+        - New input filter 'convert datetime'.
+        - Quote entered numbers if the data type is not numeric and no placeholders are used.
+        - Added scalar convert functions.
+        - Epoch_to_DateTime: bugfix and updates.
+        - Data import: if chosen a deleted directory warn and remove the directory from history.
+
+2.408_05  2024-04-21
+        - sqlite_busy_timeout.
+        - Bugfix limit, offset.
+
+2.408_04  2024-04-15
+        - New input filter: convert_datetime.
+
+2.408_03  2024-04-05
+        - Quote numbers if the data type is not numeric.
+        - Refactoring.
+
+2.408_02  2024-04-01
+        - New: to_xxx scalar functions.
+        - Refactored ScalarFunctions.
+        - If chosen a deleted directory: warn and remove it from history.
+
+2.408_01  2024-03-21
+        - Epoch_to_DateTime: bugfix and updates.
+        - New: Unix_Timestamp.
+
 2.407  2024-03-11
         - Bugfix: auto-increment primary key quoted twice.
 

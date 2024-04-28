@@ -1,11 +1,11 @@
 package Dist::Build::Serializer;
-$Dist::Build::Serializer::VERSION = '0.001';
+$Dist::Build::Serializer::VERSION = '0.003';
 use strict;
 use warnings;
 
 use parent 'ExtUtils::Builder::Serializer';
 
-use List::Util 'any';
+use List::Util 1.33 'any';
 
 use ExtUtils::Builder::Action::Function;
 use Dist::Build::Core;
@@ -76,7 +76,7 @@ Dist::Build::Serializer - A Serializer for a Dist::Build plan
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 DESCRIPTION
 

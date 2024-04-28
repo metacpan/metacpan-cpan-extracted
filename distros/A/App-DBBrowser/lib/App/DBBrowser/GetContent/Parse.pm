@@ -352,7 +352,6 @@ sub parse_with_Spreadsheet_Read {
         my @sheets = map { '- ' . ( length $book->[$_]{label} ? $book->[$_]{label} : 'sheet_' . $_ ) } 1 .. $#$book;
         my @pre = ( undef );
         my $menu = [ @pre, @sheets ];
-        $source->{old_idx_sheet} //= 0;
 
         SHEET: while ( 1 ) {
             # Choose
@@ -375,14 +374,14 @@ sub parse_with_Spreadsheet_Read {
             last SHEET;
         }
     }
-    if ( $book->[$sheet_idx]{maxrow} == 0 ) {
-        my $sheet = length $book->[$sheet_idx]{label} ? $book->[$sheet_idx]{label} : 'sheet_' . $_;
-        $tc->choose(
-            [ 'Press ENTER' ],
-            { prompt => $sheet . ': empty sheet!' }
-        );
-        return 1;
-    }
+#    if ( $book->[$sheet_idx]{maxrow} == 0 ) { # works for some file formats; catch empty sheets later ##
+#        my $sheet = length $book->[$sheet_idx]{label} ? $book->[$sheet_idx]{label} : 'sheet_' . $_;
+#        $tc->choose(
+#            [ 'Press ENTER' ],
+#            { prompt => $sheet . ': Empty Sheet!' }
+#        );
+#        return 1;
+#    }
     $sql->{insert_args} = [ Spreadsheet::Read::rows( $book->[$sheet_idx] ) ];
     if ( ! -T $file_fs && length $book->[$sheet_idx]{label} ) {
         $source->{sheet_name} = $book->[$sheet_idx]{label};

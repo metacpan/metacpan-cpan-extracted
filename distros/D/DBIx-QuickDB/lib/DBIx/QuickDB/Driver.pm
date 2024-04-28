@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000029';
 
 use Carp qw/croak confess/;
 use File::Path qw/remove_tree/;
@@ -147,7 +147,7 @@ sub clone {
         if $self->started;
 
     my $orig_dir = $self->{+DIR};
-    my $new_dir  = delete $params{dir} // tempdir('DB-QUICK-CLONE-XXXXXX', CLEANUP => 0, TMPDIR => 1);
+    my $new_dir  = delete $params{dir} // tempdir('DB-QUICK-CLONE-XXXXXX', CLEANUP => 0, $ENV{QDB_TMPDIR} ? (DIR => $ENV{QDB_TMPDIR}) : (TMPDIR => 1));
 
     clone_dir($orig_dir, $new_dir, verbose => (($self->{+VERBOSE} // 0) > 2) ? 1 : 0);
 

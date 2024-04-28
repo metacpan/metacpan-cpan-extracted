@@ -19,6 +19,7 @@ lib/App/DBBrowser/DB/Pg.pm
 lib/App/DBBrowser/DB/SQLite.pm
 lib/App/DBBrowser/GetContent.pm
 lib/App/DBBrowser/GetContent/Filter.pm
+lib/App/DBBrowser/GetContent/Filter/ConvertDate.pm
 lib/App/DBBrowser/GetContent/Filter/SearchAndReplace.pm
 lib/App/DBBrowser/GetContent/Parse.pm
 lib/App/DBBrowser/GetContent/Source.pm
@@ -35,6 +36,7 @@ lib/App/DBBrowser/Table/Extensions/Case.pm
 lib/App/DBBrowser/Table/Extensions/ColumnAliases.pm
 lib/App/DBBrowser/Table/Extensions/Maths.pm
 lib/App/DBBrowser/Table/Extensions/ScalarFunctions.pm
+lib/App/DBBrowser/Table/Extensions/ScalarFunctions/EpochToDate.pm
 lib/App/DBBrowser/Table/Extensions/ScalarFunctions/SQL.pm
 lib/App/DBBrowser/Table/Extensions/WindowFunctions.pm
 lib/App/DBBrowser/Table/InsertUpdateDelete.pm

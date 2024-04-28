@@ -168,14 +168,11 @@ sub union_tables {
         }
         push @$used_tables, $table;
     }
-    my $qt_columns = delete $data->[0]{cols};
-    my $qt_aliases = delete $data->[0]{alias};
-    my $ctes = $sql->{ctes};
     $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
     my $union_derived_table = $ax->get_stmt( $sql, 'Union', 'prepare' );
     my $union_alias = $ax->alias( $sql, 'derived_table', '', 'u1' );
     $union_derived_table .= " " . $ax->quote_alias( $union_alias );
-    return $union_derived_table, $qt_columns, $qt_aliases, $ctes;
+    return $union_derived_table, $sql->{ctes};
 }
 
 
@@ -217,108 +214,67 @@ sub __choose_table_columns {
     my ( $sf, $sql, $data, $table, $qt_table, $operator ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $next_idx = @$data;
-    my $chosen_cols = [];
-    my @bu_cols;
-    $sf->{d}{col_names}{$table} //= $ax->column_names( $qt_table, $sql->{ctes} ); ##
-    if ( ! defined $sf->{d}{col_names}{$table} ) {
+    my $idx = @$data;
+    my @bu;
+    ( my $column_names, undef ) = $ax->column_names_and_types( $qt_table, $sql->{ctes} );
+    if ( ! defined $column_names ) {
         return;
     }
-    $data->[$next_idx] = { qt_table => $qt_table, table => $table };
+    my $qt_columns = $ax->quote_cols( $column_names );
+    $data->[$idx] = {
+        qt_table => $qt_table, table => $table, qt_columns => $qt_columns, chosen_qt_cols => [], qt_alias => {}
+    };
     if ( $operator ) {
-        $data->[$next_idx]{operator} = $operator;
+        $data->[$idx]{operator} = $operator;
     }
 
     COLUMNS: while ( 1 ) {
         my @pre = ( undef, $sf->{i}{ok} );
         push @pre, $sf->{i}{menu_addition} if $sf->{o}{enable}{extended_cols};
-        $sf->__cols_alias_sub_stmt( $data, $next_idx, $chosen_cols );
         $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
         my $info = $ax->get_sql_info( $sql );
         # Choose
         my @choices = $tc->choose(
-            [ @pre, @{$sf->{d}{col_names}{$table}} ],
+            [ @pre, @$qt_columns ],
             { %{$sf->{i}{lyt_h}}, info => $info, prompt => 'Columns:', meta_items => [ 0 .. $#pre ],
               include_highlighted => 2 }
         );
         $ax->print_sql_info( $info );
         if ( ! defined $choices[0] ) {
-            if ( @bu_cols ) {
-                $chosen_cols = pop @bu_cols;
+            if ( @bu ) {
+                $data->[$idx] = pop @bu;
                 next COLUMNS;
             }
-            $#$data = $next_idx - 1;
+            $#$data = $idx - 1;
             return;
         }
         if ( $choices[0] eq $sf->{i}{ok} ) {
             shift @choices;
-            push @$chosen_cols, map { { name => $_ } } @choices;
-            if ( ! @$chosen_cols ) {
-                $chosen_cols = [ map { { name => $_ } } @{$sf->{d}{col_names}{$table}} ];
-            }
-            $sf->__cols_alias_sub_stmt( $data, $next_idx, $chosen_cols );
-            if ( $next_idx == 0 ) {
-                $sf->__cols_alias_main_stmt( $data, $chosen_cols );
+            push @{$data->[$idx]{chosen_qt_cols}}, @choices;
+            if ( ! @{$data->[$idx]{chosen_qt_cols}} ) {
+                $data->[$idx]{chosen_qt_cols} = $qt_columns;
             }
             return 1;
         }
         elsif ( $choices[0] eq $sf->{i}{menu_addition} ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            $sql->{cols} = $ax->quote_cols( $sf->{d}{col_names}{$table} );
+            $sql->{columns} = [ @$qt_columns  ];
             my $complex_col = $ext->column( $sql, 'Union' );
-            $sql->{cols} = [];
+            $sql->{columns} = [];
             if ( ! defined $complex_col ) {
                 next COLUMNS;
             }
-            my $default = 'col_' . ( @$chosen_cols + 1 );
+            my $default = 'col_' . ( @{$data->[$idx]{chosen_qt_cols}} + 1 );
             my $alias = $ax->alias( $sql, 'select_complex_col', $complex_col, $default );
-            push @bu_cols, [ @$chosen_cols ];
-            push @$chosen_cols, { name => $complex_col, alias => $alias };
+            push @bu, $ax->clone_data( $data->[$idx] );
+            push @{$data->[$idx]{chosen_qt_cols}}, $complex_col;
+            $data->[$idx]{qt_alias}{$complex_col} = $ax->quote_alias( $alias );
          }
         else {
-            push @bu_cols, [ @$chosen_cols ];
-            push @$chosen_cols, map { { name => $_ } } @choices;
-         }
-    }
-}
-
-
-sub __cols_alias_main_stmt {
-    my ( $sf, $data, $chosen_cols ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    # column names in the result-set of a UNION are taken from the first query.
-    for my $col ( @$chosen_cols ) {
-        if ( length $col->{alias} ) {
-            $data->[0]{alias}{$col->{name}} = $ax->quote_alias( $col->{alias} );
-            push @{$data->[0]{cols}}, $col->{name};
-        }
-        else {
-            push @{$data->[0]{cols}}, $ax->quote_column( $col->{name} );
+            push @bu, $ax->clone_data( $data->[$idx] );
+            push @{$data->[$idx]{chosen_qt_cols}}, @choices;
         }
     }
-    return;
-}
-
-
-sub __cols_alias_sub_stmt {
-    my ( $sf, $data, $tbl_idx, $chosen_cols ) = @_;
-    if ( ! @{$chosen_cols//[]} ) {
-        $data->[$tbl_idx]{qt_columns} = [ '*' ];
-        return;
-    }
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $qt_cols = [];
-    for my $col ( @$chosen_cols ) {
-        if ( length $col->{alias} ) {
-            # $col->{name} is scalar_functions or a subquery if it has an alias
-            push @$qt_cols, $col->{name} . ' AS ' . $ax->quote_alias( $col->{alias} );
-        }
-        else {
-            push @$qt_cols, $ax->quote_column( $col->{name} );
-        }
-    }
-    $data->[$tbl_idx]{qt_columns} = $qt_cols;
-    return;
 }
 
 
@@ -332,7 +288,16 @@ sub __get_sub_select_stmts {
         if ( $d->{parentheses_open} ) {
             push @$stmts, ( "(" ) x $d->{parentheses_open};
         }
-        my $select = "SELECT " . join( ', ', @{$d->{qt_columns}} ) . " FROM " . $d->{qt_table};
+
+        my $qt_columns = $d->{chosen_qt_cols};
+        if ( ! @$qt_columns ) {
+            $qt_columns = [ '*' ];
+        }
+        else {
+            # it is a scalar_functions or a subquery if it has an alias
+            $qt_columns = [ map { length $d->{qt_alias}{$_} ? $_ . ' AS ' . $d->{qt_alias}{$_} : $_ } @$qt_columns ];
+        }
+        my $select = "SELECT " . join( ', ', @$qt_columns ) . " FROM " . $d->{qt_table};
         if ( length $d->{where_stmt} ) {
             $select .= " " . $d->{where_stmt};
         }
@@ -401,12 +366,11 @@ sub __add_where_stmt {
     $sf->{d}{stmt_types} = [ 'Select' ]; # to see what is happening
     my $table = $data->[$idx_tbl]{table};
     my $qt_table = $data->[$idx_tbl]{qt_table};
-    my $columns = $sf->{d}{col_names}{$table};
-    my $qt_columns = $ax->quote_cols( $columns );
+    my $qt_columns = $data->[$idx_tbl]{qt_columns};
     my $tmp_sql = {};
     $ax->reset_sql( $tmp_sql );
     $tmp_sql->{table} = $qt_table;
-    $tmp_sql->{cols} = $qt_columns;           # 'cols' required in WHERE
+    $tmp_sql->{columns} = $qt_columns;           # 'cols' required in WHERE
     $tmp_sql->{selected_cols} = $qt_columns;  # 'selected_cols' required in SELECT
     my $ret = $sb->where( $tmp_sql );
     $sf->{d}{stmt_types} = $bu_stmt_types;

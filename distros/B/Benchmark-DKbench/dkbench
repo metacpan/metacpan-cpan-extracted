@@ -84,9 +84,6 @@ GetOptions (
 
 pod2usage({ -verbose => 1, -output => \*STDOUT, -noperldoc => 1}) if $opt{help};
 
-$opt{scale} ||= 1;
-($opt{time}, $opt{scale}) = (1, 1) if $opt{quick};
-
 Benchmark::DKbench::Setup::fetch_genbank($opt{datapath}) if $opt{setup};
 
 check_kit();
@@ -95,22 +92,17 @@ $max_threads  = $opt{max_threads} if $opt{max_threads};
 $opt{threads} = $max_threads if $opt{multi} && $max_threads;
 $opt{threads} = 1 if ($opt{threads} && $opt{threads} < 0) || $opt{no_mce};
 
-my $mce = $opt{no_mce} ? 'no MCE' :'MCE';
-
 if ($opt{threads} || !$max_threads || $max_threads == 1) {
     $opt{threads} ||= 1;
-    print "DKbench threads: $opt{threads} (".($opt{no_mce} ? 'no ':'')."MCE)\n";
     suite_run(\%opt);
 } else {
-    print "DKbench single-thread run:\n";
     $opt{threads} = 1;
     my %stat1 = suite_run(\%opt);
     print (("-"x40)."\n");
-    print "DKbench multi-thread run ($max_threads threads):\n";
     $opt{threads} = $max_threads;
     my %stat2 = suite_run(\%opt);
     print (("-"x40)."\n");
-    calc_scalability(\%opt, \%stat1, \%stat2);
+    calc_scalability(\%stat1, \%stat2);
 }
 
 sub check_kit {

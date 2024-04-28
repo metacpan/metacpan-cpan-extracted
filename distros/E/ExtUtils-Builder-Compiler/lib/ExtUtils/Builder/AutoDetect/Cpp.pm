@@ -1,5 +1,5 @@
 package ExtUtils::Builder::AutoDetect::Cpp;
-$ExtUtils::Builder::AutoDetect::Cpp::VERSION = '0.001';
+$ExtUtils::Builder::AutoDetect::Cpp::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -34,11 +34,11 @@ ExtUtils::Builder::AutoDetect::Cpp
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

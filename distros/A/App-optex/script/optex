@@ -201,10 +201,15 @@ warn "$abs_name: exec $exec_name @ARGV\n" if $debug;
 ##
 my $status = system $exec_name, @ARGV;
 
-close STDOUT;
-close STDERR;
-
-exit($exit_code // ( $status >> 8 ));
+END {
+    if (defined $exit_code) {
+	$? = $exit_code;
+    } elsif (defined $status) {
+	$? = $status >> 8;
+    }
+    close STDOUT;
+    close STDERR;
+}
 
 ######################################################################
 
@@ -244,7 +249,7 @@ sub self_option {
     Getopt::Long::Configure(qw"bundling require_order");
     use Getopt::EX::Hashed qw(has); {
 	Getopt::EX::Hashed->configure(DEFAULT => [ is => 'ro' ]);
-	has debug   => " ! d  " , default => \$debug;
+	has debug   => " ! d  " , action => sub { $debug = $_[1] };
 	has version => "   v  " ;
 	has man     => "   h  " ;
 	has link    => "   ln " ;
@@ -256,9 +261,9 @@ sub self_option {
 	has path    => "   p  " ;
 	has cat     => "   m  " ;
 	has M       => "      " ;
-	has module  => " !    " , default => \$main::mod_arg;
-	has nop     => " ! x  " , default => \$main::no_operation;
-	has exit    => " =i   " , default => \$main::exit_code;
+	has module  => " !    " , action => sub { $mod_arg = $_[1] };
+	has nop     => " ! x  " , action => sub { $no_operation = $_[1] };
+	has exit    => " =i   " , action => sub { $exit_code = $_[1] } ;
     }; no Getopt::EX::Hashed;
     my $opt = Getopt::EX::Hashed->new->reset();
     GetOptionsFromArray($argv, $opt->optspec) or usage();

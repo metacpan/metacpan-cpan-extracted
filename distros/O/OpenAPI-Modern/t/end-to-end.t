@@ -18,7 +18,7 @@ use lib 't/lib';
 use Helper;
 
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
-my $doc_uri = Mojo::URL->new('https://example.com/api');
+my $doc_uri = Mojo::URL->new('http://example.com/api');
 
 subtest 'full end-to-end test of transmitted request and response' => sub {
   my $openapi = OpenAPI::Modern->new(

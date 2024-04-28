@@ -8,6 +8,7 @@ use AsposeCellsCloud::Object::OperateObjectPosition;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**DataSource** | **DataSource** |  |
 **Workbook** | **FileSource** |  |
 **SheetName** | **string** |  |
 **ChartIndex** | **int** |  |

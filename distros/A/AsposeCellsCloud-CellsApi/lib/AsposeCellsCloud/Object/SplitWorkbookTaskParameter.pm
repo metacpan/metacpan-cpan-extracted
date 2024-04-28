@@ -35,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::DataSource;
 use AsposeCellsCloud::Object::FileSource;
 use AsposeCellsCloud::Object::TaskParameter; 
 
@@ -140,6 +141,20 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
+     'data_source' => {
+     	datatype => 'DataSource',
+     	base_name => 'DataSource',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'target_data_source' => {
+     	datatype => 'DataSource',
+     	base_name => 'TargetDataSource',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'destination_file_format' => {
      	datatype => 'string',
      	base_name => 'DestinationFileFormat',
@@ -173,6 +188,8 @@ __PACKAGE__->method_documentation({
 __PACKAGE__->swagger_types( {
     'workbook' => 'FileSource',
     'destination_file_position' => 'FileSource',
+    'data_source' => 'DataSource',
+    'target_data_source' => 'DataSource',
     'destination_file_format' => 'string',
     'split_name_rule' => 'string',
     'vertical_resolution' => 'int',
@@ -182,6 +199,8 @@ __PACKAGE__->swagger_types( {
 __PACKAGE__->attribute_map( {
     'workbook' => 'Workbook',
     'destination_file_position' => 'DestinationFilePosition',
+    'data_source' => 'DataSource',
+    'target_data_source' => 'TargetDataSource',
     'destination_file_format' => 'DestinationFileFormat',
     'split_name_rule' => 'SplitNameRule',
     'vertical_resolution' => 'VerticalResolution',

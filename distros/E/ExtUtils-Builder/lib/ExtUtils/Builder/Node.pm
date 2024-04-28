@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Node;
-$ExtUtils::Builder::Node::VERSION = '0.002';
+$ExtUtils::Builder::Node::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -56,7 +56,7 @@ ExtUtils::Builder::Node - An ExtUtils::Builder Node
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 

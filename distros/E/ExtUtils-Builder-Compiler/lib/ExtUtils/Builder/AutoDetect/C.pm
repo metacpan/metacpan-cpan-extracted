@@ -1,5 +1,5 @@
 package ExtUtils::Builder::AutoDetect::C;
-$ExtUtils::Builder::AutoDetect::C::VERSION = '0.001';
+$ExtUtils::Builder::AutoDetect::C::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -179,7 +179,7 @@ ExtUtils::Builder::AutoDetect::C - compiler configuration, derived from perl's c
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -293,7 +293,7 @@ A list of additional arguments to the compiler.
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

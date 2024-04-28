@@ -62,7 +62,7 @@ sub select {
         $menu = [ @pre, @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} ];
     }
     else {
-        $menu = [ @pre, @{$sql->{cols}} ];
+        $menu = [ @pre, @{$sql->{columns}} ];
     }
 
     COLUMNS: while ( 1 ) {
@@ -228,7 +228,7 @@ sub set {
         my $info = $ax->get_sql_info( $sql );
         # Choose
         my $qt_col = $tc->choose(
-            [ @pre, @{$sql->{cols}} ],
+            [ @pre, @{$sql->{columns}} ],
             { %{$sf->{i}{lyt_h}}, info => $info }
         );
         $ax->print_sql_info( $info );
@@ -263,7 +263,7 @@ sub where {
     my ( $sf, $sql ) = @_;
     my $clause = 'where';
     my $substmt_type = "WHERE";
-    my $items = [ @{$sql->{cols}} ];
+    my $items = [ @{$sql->{columns}} ];
     my $ret = $sf->__add_condition( $sql, $clause, $substmt_type, $items );
     return $ret;
 }
@@ -282,7 +282,7 @@ sub group_by {
     if ( $sf->{o}{enable}{extended_cols} ) {
         push @pre, $sf->{i}{menu_addition};
     }
-    my $menu = [ @pre, @{$sql->{cols}} ];
+    my $menu = [ @pre, @{$sql->{columns}} ];
 
     GROUP_BY: while ( 1 ) {
         $sql->{group_by_stmt} = "GROUP BY " . join ', ', @{$sql->{group_by_cols}};
@@ -376,7 +376,7 @@ sub order_by {
         @tmp_cols = ( @{$sql->{group_by_cols}}, map( '@' . $_, @{$sql->{aggr_cols}} ), @{$sf->{i}{avail_aggr}} );
     }
     else {
-        @tmp_cols = @{$sql->{cols}};
+        @tmp_cols = @{$sql->{columns}};
     }
     my ( @cols, @aliases );
     my %count;
@@ -463,7 +463,13 @@ sub limit_offset {
     my $use_limit = $driver =~ /^(?:SQLite|mysql|MariaDB|Pg|Informix)\z/ ? 1 : 0;
     my @pre = ( undef, $sf->{i}{ok} );
     my ( $limit, $offset ) = ( 'LIMIT', 'OFFSET' );
-    my @bu = @{$sql->{bu_limit_offset}//[['','']]};
+    my @bu;
+    if ( @{$sql->{bu_limit_offset}//[]} ) {
+        @bu = @{$sql->{bu_limit_offset}};
+    }
+    else {
+        @bu = ( ['',''] );
+    }
     ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @bu};
 
     LIMIT: while ( 1 ) {
@@ -479,7 +485,7 @@ sub limit_offset {
                 ( $sql->{limit_stmt}, $sql->{offset_stmt} )  = @{pop @bu};
                 next LIMIT;
             }
-            $sql->{bu_limit_offset} = [];
+            delete $sql->{bu_limit_offset};
             return;
         }
         if ( $choice eq $sf->{i}{ok} ) {
@@ -498,7 +504,10 @@ sub limit_offset {
             }
             my $info = $ax->get_sql_info( $sql );
             # Choose_a_number
-            my $limit = $tu->choose_a_number( $digits, { info => $info, cs_label => $limit . ': ' } );
+            my $limit = $tu->choose_a_number(
+                $digits,
+                { info => $info, cs_label => $limit . ': ', confirm => $sf->{i}{confirm}, back => $sf->{i}{back} }
+            );
             if ( ! defined $limit ) {
                 ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @bu};
                 next LIMIT;
@@ -514,7 +523,10 @@ sub limit_offset {
             $sql->{offset_stmt} = "OFFSET";
             my $info = $ax->get_sql_info( $sql );
             # Choose_a_number
-            my $offset = $tu->choose_a_number( $digits, { info => $info, cs_label => $offset . ': ' } );
+            my $offset = $tu->choose_a_number(
+                $digits,
+                { info => $info, cs_label => $offset . ': ', confirm => $sf->{i}{confirm}, back => $sf->{i}{back} }
+            );
             if ( ! defined $offset ) {
                 ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @bu};
                 next LIMIT;
@@ -709,7 +721,7 @@ sub get_prepared_aggr_func {
             my $info = $ax->get_sql_info( $tmp_sql );
             # Choose
             $qt_col = $tc->choose(
-                [ @pre, @{$tmp_sql->{cols}} ],
+                [ @pre, @{$tmp_sql->{columns}} ],
                 { %{$sf->{i}{lyt_h}}, info => $info }
             );
             $ax->print_sql_info( $info );

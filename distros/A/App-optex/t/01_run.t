@@ -27,6 +27,10 @@ is(optex('-Mutil::filter', 'true'),  0);
 }
 is(optex('-Mutil::argv', 'true'),  0);
 
+isnt(optex('false'),  0);
+is(optex('--exit=0', 'false'),  0);
+is(optex('--exit=2', 'true'),  2);
+
 done_testing;
 
 sub optex {

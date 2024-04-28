@@ -37,6 +37,12 @@ run-time and you have to store them in variables.
 
     ...
 
+## ENV VARS
+
+- QDB\_TMPDIR
+
+    Set this env var if you want QDB to use a temp dir other than the default.
+
 # METHODS
 
 - $db = DBIx::QuickDB->build\_db();

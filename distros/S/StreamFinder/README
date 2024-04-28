@@ -130,8 +130,7 @@ DESCRIPTION
     blogger.com videos (StreamFinder::Blogger), ugetube.com videos
     (StreamFinder::BrandNewTube), brighteon.com videos
     (StreamFinder::Brighteon), castbox.fm podcasts (StreamFinder::Castbox),
-    podcasts.google.com podcasts (StreamFinder::Google), iheart.com (aka
-    iheartradio.com) radio stations and podcasts
+    iheart.com (aka iheartradio.com) radio stations and podcasts
     (StreamFinder::IHeartRadio), www.internet-radio.com radio stations
     (StreamFinder::InternetRadio), onlineradiobox.com radio stations
     (StreamFinder::OnlineRadiobox), odysee.com videos
@@ -155,8 +154,9 @@ DESCRIPTION
     be removed in a later StreamFinder release as it now requires a specific
     valid episode page to fetch streams from, as Podcastaddict.com has
     javascripted up their podcast pages now to the point that it is no
-    longer possible to obtain a playlist or first episode from them via our
-    scripts.
+    longer possible to obtain a playlist from them via our scripts. However,
+    it still seems to be able to return the first episode data when given a
+    podcast page for now.
 
     NOTE: StreamFinder::Google has been removed as Google Podcasts has shut
     down.

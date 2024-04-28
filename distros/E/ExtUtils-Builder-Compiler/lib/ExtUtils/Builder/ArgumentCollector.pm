@@ -1,5 +1,5 @@
 package ExtUtils::Builder::ArgumentCollector;
-$ExtUtils::Builder::ArgumentCollector::VERSION = '0.001';
+$ExtUtils::Builder::ArgumentCollector::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -50,7 +50,7 @@ ExtUtils::Builder::ArgumentCollector - Helper role for argument collecting class
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 
@@ -58,7 +58,7 @@ This is a helper role for classes that collect arguments for their command. Clas
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
