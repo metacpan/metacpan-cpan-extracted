@@ -1,5 +1,14 @@
 Revision history for Perl extension DBIx::DataModel.
 
+v3.11 28.04.2024
+  - Carp::Clan replaced by Carp::Object
+  - new Schema attribute: 'frame_filter' (to be transmitted to Devel::StackTrace)
+  - new Schema attribute: 'auto_show_error_statement'
+  - $dbh->{ShowErrorStatement} is automatically turned on by default
+  - more precise multiplicity rules for Compositions
+      - the composite multiplicity must be 1..1     (previously 0..1 was incorrectly allowed)
+      - the component multiplicity must not be 1..1 (previously 0..1 was incorrectly forbidden)
+
 v3.10 11.03.2024
   - bug fix : schema attribute setters must accept undef (for erasing the attribute)
   - added tests for the debug() method

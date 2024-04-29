@@ -7,6 +7,7 @@ use Test::More 0.89;
 
 use Config;
 use File::Temp qw/tempdir/;
+use ExtUtils::Builder::Util 'get_perl';
 
 system $^X, '-e0' and plan(skip_all => 'Can\'t find perl');
 
@@ -16,7 +17,7 @@ chdir $tempdir;
 
 open my $mfpl, '>', 'Makefile.PL';
 
-my @touch_prefix = $^O eq 'MSWin32' || $^O eq 'VMS' ? ($^X, '-MExtUtils::Command', '-e') : ();
+my @touch_prefix = $^O eq 'MSWin32' || $^O eq 'VMS' ? (get_perl(), '-MExtUtils::Command', '-e') : ();
 my $touch = join ', ', map { qq{'$_'} } @touch_prefix, 'touch';
 
 printf $mfpl <<'END', $touch;

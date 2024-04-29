@@ -153,23 +153,39 @@ sub _gen_default_filedata {
     ok 1;
     ---
 
-  $self->$add_unless('META.yml', undent(<<"    ----"));
-    ---
-    name: $dist_name
-    version: 0.001
-    author:
-      - 'David Golden <dagolden\@cpan.org>'
-      - 'Leon Timmermans <leont\@cpan.org>'
-    abstract: 'A testing dist'
-    license: perl
-    requires:
-      perl: 5.006
-      Module::Build::Tiny: 0
-    generated_by: Leon Timmermans
-    dynamic_config: 0
-    meta-spec:
-      url: http://module-build.sourceforge.net/META-spec-v1.4.html
-      version: 1.4
+  $self->$add_unless('META.json', undent(<<"    ----"));
+	{
+		"name": "Foo-Bar",
+		"version": 0.001,
+		"author": [
+			"David Golden <dagolden\@cpan.org>",
+			"Leon Timmermans <leont\@cpan.org>"
+		],
+		"abstract": "A testing dist",
+		"license": "perl_5",
+		"prereqs": {
+			"configure": {
+				"requires": {
+					"Module::Build::Tiny": 0
+				}
+			},
+			"runtime": {
+				"requires": {
+					"perl": 5.006
+				}
+			}
+		},
+		"generated_by": "Leon Timmermans",
+		"dynamic_config": 1,
+		"meta-spec": {
+			"url": "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+			"version": 2
+		},
+        "x_dynamic_prereqs": {
+			"version": 1,
+			"expressions": [ { "condition": [ "has_perl", "$]"], "prereqs": { "Bar": 1 } } ]
+        }
+	  }
     ----
 }
 

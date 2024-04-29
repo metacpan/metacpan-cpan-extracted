@@ -5,11 +5,11 @@ use parent "DBIx::DataModel::Meta";
 use DBIx::DataModel;
 use DBIx::DataModel::Meta::Utils qw/define_class define_readonly_accessors
                                     define_abstract_methods/;
+use DBIx::DataModel::Carp;
 
 use Params::Validate qw/validate_with SCALAR ARRAYREF HASHREF OBJECT/;
 use Scalar::Util     qw/weaken/;
 use List::MoreUtils  qw/any/;
-use Carp::Clan       qw[^(DBIx::DataModel::|SQL::Abstract)];
 
 use namespace::clean;
 

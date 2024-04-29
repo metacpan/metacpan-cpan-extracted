@@ -1,8 +1,7 @@
 package Test::Smoke::Patcher;
 use strict;
 
-use vars qw( $VERSION @EXPORT );
-$VERSION = '0.012';
+our $VERSION = '0.012';
 
 use base 'Exporter';
 use File::Spec;
@@ -10,7 +9,7 @@ use Cwd;
 
 use Test::Smoke::Util qw( get_regen_headers );
 
-@EXPORT = qw( &TRY_REGEN_HEADERS );
+our @EXPORT = qw( &TRY_REGEN_HEADERS );
 
 sub MAX_FLAG_COUNT    () { 16 }
 sub ALL_FLAGS         () { (2**MAX_FLAG_COUNT) - 1 }

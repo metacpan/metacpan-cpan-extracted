@@ -4,8 +4,11 @@ use warnings;
 use parent "DBIx::DataModel::Meta";
 use DBIx::DataModel;
 use DBIx::DataModel::Meta::Utils qw/define_method define_readonly_accessors/;
+use DBIx::DataModel::Carp;
+# use Carp::Clan qw(^(DBIx::DataModel|SQL::Abstract));
 
-use Carp::Clan       qw[^(DBIx::DataModel::|SQL::Abstract)];
+
+
 use Params::Validate qw/validate_with SCALAR ARRAYREF HASHREF OBJECT UNDEF/;
 use List::MoreUtils  qw/pairwise/;
 use Scalar::Util     qw/weaken dualvar looks_like_number/;
@@ -225,10 +228,11 @@ sub _check_composition {
   my $self = shift;
 
   # multiplicities must be 1-to-n
-  $self->{A}{multiplicity}[1] == 1
-    or croak "max multiplicity of first class in a composition must be 1";
-  $self->{B}{multiplicity}[1] > 1
-    or croak "max multiplicity of second class in a composition must be > 1";
+  my $msg = "Composition([$self->{A}{table}{name} ..], [$self->{B}{table}{name} ..])";
+  $self->_multiplicity_is_exactly_1('A')
+    or croak "$msg: $self->{A}{table}{name} must have multiplicity 1..1";
+  ! $self->_multiplicity_is_exactly_1('B')
+    or croak "$msg: $self->{B}{table}{name} must not have multiplicity 1..1";
 
   # check for conflicting compositions
   while (my ($name, $path) = each %{$self->{B}{table}{path} || {}}) {
@@ -240,6 +244,14 @@ sub _check_composition {
     }
   }
 }
+
+sub _multiplicity_is_exactly_1 {
+  my ($self, $end) = @_;
+  my $mult = $self->{$end}{multiplicity};
+
+  return $mult->[0] == 1 && $mult->[1] == 1;
+}
+
 
 
 1;
@@ -402,7 +414,7 @@ Special behaviour is attached to the kind C<Composition> :
 
 =item *
 
-the multiplicity must be 1-to-n
+the multiplicity must be 1-to-n or 1-to-0..1
 
 =item * 
 

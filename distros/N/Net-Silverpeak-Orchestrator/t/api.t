@@ -190,6 +190,12 @@ ok(
     'get_appliance_extrainfo for not existing appliance throws exception'
 );
 
+is(my $appliance_groups = $orchestrator->list_groups,
+    array {
+        etc();
+    },
+    'list_groups ok');
+
 ok(
     dies { $orchestrator->get_deployment('not-existing') },
     'get_deployment for not existing appliance throws exception'

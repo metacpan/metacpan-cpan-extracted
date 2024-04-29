@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps;
 use strict;
 use warnings;
 
-our $VERSION = '0.77';
+our $VERSION = '0.78';
 
 use List::Util 'first';
 
@@ -266,6 +266,7 @@ sub _detect_linux_distribution_fallback {
 		 10 => 'buster',
 		 11 => 'bullseye',
 		 12 => 'bookworm',
+		 13 => 'trixie',
 		}->{$info{linuxdistroversion}};
 	    return \%info;
 	} elsif ($line =~ m{^(Ubuntu) (\d+\.\d+)}) {
@@ -278,6 +279,7 @@ sub _detect_linux_distribution_fallback {
 		 '18.04' => 'bionic',
 		 '20.04' => 'focal',
 		 '22.04' => 'jammy',
+		 '24.04' => 'noble',
 		}->{$info{linuxdistroversion}};
 	    return \%info;
 	} else {
@@ -644,7 +646,7 @@ sub _filter_uninstalled_packages {
 		my @single_packages = split /\s*\|\s*/, $package_spec;
 		my @missing_in_packages_spec = $self->$find_missing_packages(@single_packages);
 		if (@missing_in_packages_spec == @single_packages) {
-		    push @missing_packages, $single_packages[0];
+		    push @missing_packages, $single_packages[0]; # XXX this could go wrong if the first alternative is not available at all; see problem with jpeg|jpeg-turbo in Mapping.pm
 		}
 	    } else {
 		push @plain_packages, $package_spec;

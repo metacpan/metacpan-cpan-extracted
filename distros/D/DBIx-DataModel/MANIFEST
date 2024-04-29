@@ -1,6 +1,7 @@
 Build.PL
 Changes
 lib/DBIx/DataModel.pm
+lib/DBIx/DataModel/Carp.pm
 lib/DBIx/DataModel/Compatibility/V0.pm
 lib/DBIx/DataModel/Compatibility/V1.pm
 lib/DBIx/DataModel/Doc/Cookbook.pod

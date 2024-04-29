@@ -2,7 +2,7 @@ package Test::Smoke::Poster::Curl;
 use warnings;
 use strict;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use base 'Test::Smoke::Poster::Base';
 
@@ -77,6 +77,53 @@ sub _post_data {
             $self->smokedb_url,
             $self->curl->exitcode
         );
+    }
+
+    $self->log_debug("[CoreSmokeDB] %s", $response);
+
+    return $response;
+}
+
+=head2 $poster->_post_data_api()
+
+Post the json to CoreSmokeDB API-function using L<curl(1)>.
+
+=cut
+
+sub _post_data_api {
+    my $self = shift;
+
+    $self->log_info("Posting to %s via %s.", $self->smokedb_url, $self->poster);
+    $self->log_debug("Report data: %s", my $json = $self->get_json);
+
+    my $post_data = sprintf(qq/{"report_data": %s}/, $json);
+    my ($fh, $filename) = tempfile('curl-tsrepostXXXXXX', TMPDIR => 1);
+    print {$fh} $post_data;
+    close($fh);
+
+    my $response = $self->curl->run(
+        '-H' => 'Content-Type: application/json',
+        '-A' => $self->agent_string(),
+        '-d' => "\@$filename",
+        ($self->ua_timeout    ? ('--max-time' => $self->ua_timeout) : ()),
+        ($self->curl->verbose ? () : '--silent'),
+        @{ $self->curlargs },
+        $self->smokedb_url,
+    );
+    1 while unlink($filename);
+
+    if ($self->curl->exitcode) {
+        $self->log_warn(
+            "[POST] curl exitcode: %d %s",
+            $self->curl->exitcode, $response || ''
+        );
+        if (not $self->queue_this_report()) {
+            die sprintf(
+                "POST to '%s' curl failed: %d\n",
+                $self->smokedb_url,
+                $self->curl->exitcode
+            );
+        }
     }
 
     $self->log_debug("[CoreSmokeDB] %s", $response);

@@ -2,6 +2,8 @@ package Test::Smoke::Util::Win32ErrorMode;
 use warnings;
 use strict;
 
+our $VERSION = '0.001';
+
 BEGIN {
     if ($^O eq 'MSWin32') {
         require Win32::API;

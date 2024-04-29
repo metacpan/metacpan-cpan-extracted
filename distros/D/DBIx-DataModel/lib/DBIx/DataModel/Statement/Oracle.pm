@@ -8,7 +8,7 @@ no strict 'refs';
 use parent      qw/DBIx::DataModel::Statement/;
 use mro         qw/c3/;
 use DBD::Oracle 1.62 qw/:ora_fetch_orient :ora_exe_modes/;
-use Carp::Clan qw[^(DBIx::DataModel::|SQL::Abstract)];
+use DBIx::DataModel::Carp;
 
 
 sub sqlize {

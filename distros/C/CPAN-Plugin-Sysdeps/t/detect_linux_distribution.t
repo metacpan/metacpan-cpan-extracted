@@ -7,12 +7,18 @@ use TestUtil;
 use Getopt::Long;
 use List::Util 'first';
 use File::Temp 'tempdir';
+use POSIX 'strftime';
 use Test::More;
 
 use CPAN::Plugin::Sysdeps ();
 require_CPAN_Distribution;
 
+# Debian releases happen every two years, with a release possible
+# to be as late as in August. See https://en.wikipedia.org/wiki/Debian_version_history
+use constant DEBIAN_TRIXIE_PROBABLY_RELEASED => strftime('%F', gmtime) gt '2025-08-31';
+
 sub os_release_test ($$$$$$);
+sub set_todo_for_linuxdistroversion ($);
 
 plan skip_all => "Only works on linux" if $^O ne 'linux';
 plan 'no_plan';
@@ -206,7 +212,10 @@ SKIP: {
 	    fail "Unexpected error: os-release file exists, but cannot be parsed";
 	} else {
 	    ok $info_os_release->{linuxdistro},         "via os-release: linuxdistro=$info_os_release->{linuxdistro}";
-	    ok $info_os_release->{linuxdistroversion},  "via os-release: linuxdistroversion=$info_os_release->{linuxdistroversion}";
+	    {
+		local $TODO = set_todo_for_linuxdistroversion $info_os_release;
+		ok $info_os_release->{linuxdistroversion},  "via os-release: linuxdistroversion=$info_os_release->{linuxdistroversion}";
+	    }
 	    if ($info_os_release->{linuxdistrocodename}) {
 		ok $info_os_release->{linuxdistrocodename}, "via os-release: linuxdistrocodename=$info_os_release->{linuxdistrocodename}";
 	    } else {
@@ -244,6 +253,7 @@ SKIP: {
 		diag "linuxdistrocodename comparison: lsb_release=$info_lsb_release->{linuxdistrocodename} os-release=$info_os_release->{linuxdistrocodename}";
 	    }
 	    if ($info_os_release->{linuxdistro} eq 'debian') {
+		local $TODO = set_todo_for_linuxdistroversion $info_os_release;
 		(my $lsb_major_version = $info_lsb_release->{linuxdistroversion}) =~ s{\..*}{};
 		is $lsb_major_version, $info_os_release->{linuxdistroversion}, 'os-release vs lsb_release: compare linuxdistroversion (debian: only major version)';
 	    } elsif ($info_os_release->{linuxdistro} =~ m{^(ubuntu|fedora)$}) {
@@ -295,6 +305,20 @@ sub traverse_warnings_test {
     local $CPAN::Plugin::Sysdeps::TRAVERSE_ONLY = 1;
     $p->post_get($cpandist);
     is_deeply \@warnings, [], "no warnings while traversing";
+}
+
+sub set_todo_for_linuxdistroversion ($) {
+    my $info = shift;
+    if (($info->{linuxdistrocodename}||'') eq 'trixie') {
+	if (DEBIAN_TRIXIE_PROBABLY_RELEASED) {
+	    diag "Author note: debian:trixie is probably released, please remove special handling";
+	    undef;
+	} else {
+	    "debian:trixie not yet released, probably VERSION_ID is missing";
+	}
+    } else {
+	undef;
+    }
 }
 
 __END__

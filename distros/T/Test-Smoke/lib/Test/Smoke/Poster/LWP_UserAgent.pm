@@ -2,11 +2,9 @@ package Test::Smoke::Poster::LWP_UserAgent;
 use warnings;
 use strict;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use base 'Test::Smoke::Poster::Base';
-
-use Test::Smoke::Util::LoadAJSON;
 
 =head1 NAME
 
@@ -69,6 +67,45 @@ sub _post_data {
             $response->status_line,
             ($response->content ? sprintf(" (%s)", $response->content) : ""),
         );
+    }
+
+    $self->log_debug("[CoreSmokeDB] %s", $response->content);
+
+    return $response->content;
+}
+
+=head2 $poster->_post_data_api()
+
+This uses the (newish) API function to post the data.
+
+=cut
+
+sub _post_data_api {
+    my $self = shift;
+
+    $self->log_info("Posting to %s via %s.", $self->smokedb_url, $self->poster);
+    $self->log_debug("Report data: %s", my $json = $self->get_json);
+
+    my $post_data = sprintf(qq/{"report_data": %s}/, $json);
+
+    require HTTP::Request;
+    require HTTP::Headers;
+    my $request = HTTP::Request->new(
+        POST => $self->smokedb_url,
+        HTTP::Headers->new('Content-Type', 'application/json'),
+        $post_data,
+    );
+    my $response = $self->ua->request($request);
+    if (!$response->is_success) {
+        $self->log_warn("POST failed: %s", $response->status_line);
+        if (not $self->queue_this_report()) {
+            die sprintf(
+                "POST to '%s' failed: %s%s\n",
+                $self->smokedb_url,
+                $response->status_line,
+                ($response->content ? sprintf(" (%s)", $response->content) : ""),
+            );
+        }
     }
 
     $self->log_debug("[CoreSmokeDB] %s", $response->content);

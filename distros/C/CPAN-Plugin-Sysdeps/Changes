@@ -1,5 +1,9 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.78  2024-04-28
+	- mapping update
+	- fix failures on debian:trixie
+
 0.77  2024-03-22
 	- support for rpm --whatprovides
 	- new test script rpm.t

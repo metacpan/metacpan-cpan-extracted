@@ -9,6 +9,7 @@ use base 'Test::Smoke::ObjectBase';
 use Test::Smoke::LogMixin;
 
 require Test::Smoke;
+require Test::Smoke::PostQueue;
 
 use File::Spec::Functions;
 use Test::Smoke::Util::LoadAJSON;
@@ -144,15 +145,33 @@ HTTP or Test::Smoke::Gateway-application errors.
 sub post {
     my $self = shift;
 
-    my $response = eval { $self->_post_data() };
+    my $post_method = $self->smokedb_url =~ m{ /api/ }x
+        ? '_post_data_api'
+        : '_post_data';
+    my $response = eval { $self->$post_method() };
     confess("[POST]: >$@<") if $@;
 
-    my $response_body = eval {
-        Test::Smoke::Util::LoadAJSON->new->utf8->allow_nonref->decode($response);
-    };
+    my $response_body;
+    eval { $response_body = JSON->new->utf8->allow_nonref->decode($response); 1 };
     confess("[decode_json] >$response< " . $@) if $@;
 
     $self->_process_post_result($response_body);
+}
+
+=head2 $poster->queue_this_report()
+
+Use the new queue mechanism to try to send this report before the next smoke
+run.
+
+=cut
+
+sub queue_this_report {
+    my $self = shift;
+
+    use Test::Smoke::Util qw< get_patch >;
+    my $patch = get_patch($self->ddir)->[0];
+    my $queue = Test::Smoke::PostQueue->new(qfile => $self->qfile);
+    return $queue->add($patch);
 }
 
 =head2 $poster->_post_data()
@@ -170,6 +189,25 @@ The body of the response.
 =cut
 
 sub _post_data {
+    my $class = ref($_[0]) || $_[0];
+    croak("Must be implemented by '$class'");
+}
+
+=head2 $poster->_post_data_api()
+
+Abstract method that should be implemented by the subclass.
+
+=head3 Arguments
+
+None.
+
+=head3 Returns
+
+The body of the response.
+
+=cut
+
+sub _post_data_api {
     my $class = ref($_[0]) || $_[0];
     croak("Must be implemented by '$class'");
 }

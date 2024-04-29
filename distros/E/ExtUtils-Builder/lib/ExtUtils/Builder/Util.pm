@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Util;
-$ExtUtils::Builder::Util::VERSION = '0.004';
+$ExtUtils::Builder::Util::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -49,7 +49,7 @@ ExtUtils::Builder::Util - Utility functions for ExtUtils::Builder
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

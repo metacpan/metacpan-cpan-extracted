@@ -2,8 +2,7 @@ package Test::Smoke::Reporter;
 use warnings;
 use strict;
 
-use vars qw( $VERSION );
-$VERSION = '0.054';
+our $VERSION = '0.054';
 
 require File::Path;
 require Test::Smoke;
@@ -885,7 +884,7 @@ sub smokedb_data {
     }
     delete $rpt{$_} for qw/from send_log send_out user_note/, grep m/^_/ => keys %rpt;
 
-    my $json = Test::Smoke::Util::LoadAJSON->new->utf8(1)->pretty(1)->encode(\%rpt);
+    my $json = JSON->new->utf8(1)->pretty(1)->encode(\%rpt);
 
     # write the json to file:
     my $jsn_file = catfile($self->{ddir}, $self->{jsnfile});
@@ -1343,7 +1342,12 @@ sub bldenv_legend {
     }
 
     my $locale = ''; # XXX
-    return  $locale ? <<EOL : $self->{defaultenv} ? <<EOS : <<EOE;
+    my %l;
+@l{qw( EOS EOaL EOpL EOaE EOpE )} = (<<"EOS", <<"EOaL", <<"EOpL", <<"EOaE", <<"EOpE");
+| +--------- $debugging
++----------- no debugging
+
+EOS
 | | | | | +- LC_ALL = $locale $debugging
 | | | | +--- PERLIO = perlio $debugging
 | | | +----- PERLIO = stdio  $debugging
@@ -1351,17 +1355,26 @@ sub bldenv_legend {
 | +--------- PERLIO = perlio
 +----------- PERLIO = stdio
 
-EOL
-| +--------- $debugging
-+----------- no debugging
+EOaL
+| | | +----- LC_ALL = $locale $debugging
+| | +------- PERLIO = perlio $debugging
+| +--------- LC_ALL = $locale
++----------- PERLIO = perlio
 
-EOS
+EOpL
 | | | +----- PERLIO = perlio $debugging
 | | +------- PERLIO = stdio  $debugging
 | +--------- PERLIO = perlio
 +----------- PERLIO = stdio
 
-EOE
+EOaE
+| +--------- PERLIO = perlio $debugging
++----------- PERLIO = perlio
+
+EOpE
+    return  $self->{perlio_only}
+        ? $locale ? $l{EOaL} : $self->{defaultenv} ? $l{EOS} : $l{EOaE}
+        : $locale ? $l{EOpL} : $self->{defaultenv} ? $l{EOS} : $l{EOpE};
 }
 
 =head2 $reporter->letter_legend( )

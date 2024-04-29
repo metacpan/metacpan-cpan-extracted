@@ -33,11 +33,11 @@
       "runtime" : {
          "requires" : {
             "Capture::Tiny" : "0",
+            "Cpanel::JSON::XS" : "0",
             "File::Spec" : "0.82",
             "Getopt::Long" : "2.39",
             "HTTP::Tiny" : "0",
             "IO::Socket::SSL" : "0",
-            "JSON::XS" : "0",
             "Net::SSLeay" : "0",
             "POSIX" : "0",
             "System::Info" : "0.05",
@@ -51,6 +51,7 @@
             "ExtUtils::MakeMaker" : "6.55_03",
             "HTTP::Daemon" : "0",
             "HTTP::Message" : "0",
+            "JSON" : "4.1",
             "Test::Fatal" : "0",
             "Test::More" : "0.88",
             "Test::NoWarnings" : "0"
@@ -70,6 +71,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#smoke"
    },
-   "version" : "1.81",
+   "version" : "1.82",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

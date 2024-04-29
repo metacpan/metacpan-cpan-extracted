@@ -1,8 +1,7 @@
 package Test::Smoke::Policy;
 use strict;
 
-use vars qw( $VERSION );
-$VERSION = '0.004';
+our $VERSION = '0.004';
 
 use File::Spec;
 use Test::Smoke::LogMixin;

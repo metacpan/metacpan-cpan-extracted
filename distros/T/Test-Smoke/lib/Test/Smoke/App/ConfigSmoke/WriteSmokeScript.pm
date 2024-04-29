@@ -87,6 +87,8 @@ sub write_as_shell {
         ($self->current_values->{renice} ? "" : "# ") . "renice " . $self->current_values->{renice},
         Cwd::abs_path(File::Spec->curdir),
         $self->configfile,
+        ($self->current_values->{qfile} ? $^X : "# $^X"),
+        File::Spec->catfile($FindBin::Bin, 'tshandlequeue.pl'),
         $self->prefix. ".lck",
         $handle_lock,
         $p5env,
@@ -107,6 +109,7 @@ sub write_as_shell {
 %s
 cd %s
 CFGNAME=${CFGNAME:-%s}
+%s %s - "$CFGNAME"
 LOCKFILE=${LOCKFILE:-%s}
 continue=''
 if test -f "$LOCKFILE" && test -s "$LOCKFILE" ; then
@@ -171,6 +174,8 @@ sub write_as_cmd {
         $cronline,
         Cwd::abs_path(File::Spec->curdir),
         $self->configfile,
+        ($self->current_values->{qfile} ? qq["$^X"] : qq[REM "$^X"]),
+        File::Spec->catfile($FindBin::Bin, 'tshandlequeue.pl'),
         $self->prefix. ".lck",
         File::Spec->canonpath($FindBin::Bin), $ENV{PATH},
         $^X, File::Spec->catfile($FindBin::Bin, 'tssmokeperl.pl'), $self->current_values->{lfile},
@@ -197,6 +202,7 @@ REM Change drive-Letter, then directory
 for %%%%L in ( "%%WD%%" ) do %%%%~dL
 cd "%%WD%%"
 if "%%CFGNAME%%"  == "" set CFGNAME=%s
+%s %s -c "%CFGNAME%"
 if "%%LOCKFILE%%" == "" set LOCKFILE=%s
 if NOT EXIST %%LOCKFILE%% goto START_SMOKE
     FIND "%%CFGNAME%%" %%LOCKFILE%% > NUL:

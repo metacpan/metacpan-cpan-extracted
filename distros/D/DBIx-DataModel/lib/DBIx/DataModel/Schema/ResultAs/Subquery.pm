@@ -3,7 +3,7 @@ package DBIx::DataModel::Schema::ResultAs::Subquery;
 #----------------------------------------------------------------------
 use warnings;
 use strict;
-use Carp::Clan                 qw[^(DBIx::DataModel::|SQL::Abstract)];
+use DBIx::DataModel::Carp;
 use DBIx::DataModel::Statement ();
 
 use parent 'DBIx::DataModel::Schema::ResultAs';

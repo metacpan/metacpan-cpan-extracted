@@ -35,9 +35,10 @@ my %CONFIG = (
     df_poster  => 'HTTP::Tiny',
     df_ddir    => undef,
     df_jsnfile => 'mktest.jsn',
+    df_qfile   => undef,
     df_v       => 0,
 
-    df_smokedb_url => 'http://perl5.test-smoke.org/report',
+    df_smokedb_url => 'https://perl5.test-smoke.org/api/report',
 
     df_ua_timeout => undef,
 
@@ -64,7 +65,7 @@ my %CONFIG = (
         'HTTP::Tiny'     => 1,
     },
 
-    general_options => [qw/ddir jsnfile v smokedb_url poster/],
+    general_options => [qw/ddir jsnfile qfile v smokedb_url poster/],
 );
 
 =head2 Test::Smoke::Poster->new($poster_type, %arguments)

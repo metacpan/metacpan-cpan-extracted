@@ -1,6 +1,7 @@
-package Module::Faker::Dist 0.025;
+package Module::Faker::Dist 0.026;
 # ABSTRACT: a fake CPAN distribution
 
+use v5.20.0;
 use Moose;
 
 use Module::Faker::File;
@@ -80,9 +81,8 @@ has release_status => (is => 'ro', isa => 'Str', default => 'stable');
 #pod =attr archive_ext
 #pod
 #pod This is the extension of the archive to build, when you build an archive.  This
-#pod defaults to C<tar.gz>.  C<zip> should work, but right now it doesn't.  So
-#pod probably stuck to C<tar.gz>.  It would be cool to support more attributes in
-#pod the future.
+#pod defaults to C<tar.gz>.  C<zip> works.  Other things might.  Try it and find
+#pod out.
 #pod
 #pod =attr append
 #pod
@@ -168,7 +168,7 @@ has include_provides_in_meta => (
 #pod
 #pod This is a hashref that gets used as the C<provides> in the metadata.
 #pod
-#pod If no provided, it is built from the C<packages> provided in construction.
+#pod If not provided, it is built from the C<packages> provided in construction.
 #pod
 #pod If no packages were provided, for a dist named Foo-Bar, it defaults to:
 #pod
@@ -803,7 +803,7 @@ Module::Faker::Dist - a fake CPAN distribution
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -828,14 +828,15 @@ to C<new>, but with more sugar.
 =head1 PERL VERSION
 
 This module should work on any version of perl still receiving updates from
-the Perl 5 Porters.  This means it should work on any version of perl released
-in the last two to three years.  (That is, if the most recently released
-version is v5.40, then this module should work on both v5.40 and v5.38.)
+the Perl 5 Porters.  This means it should work on any version of perl
+released in the last two to three years.  (That is, if the most recently
+released version is v5.40, then this module should work on both v5.40 and
+v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -865,9 +866,8 @@ This is the PAUSE id of the author, like C<RJBS>.
 =head2 archive_ext
 
 This is the extension of the archive to build, when you build an archive.  This
-defaults to C<tar.gz>.  C<zip> should work, but right now it doesn't.  So
-probably stuck to C<tar.gz>.  It would be cool to support more attributes in
-the future.
+defaults to C<tar.gz>.  C<zip> works.  Other things might.  Try it and find
+out.
 
 =head2 append
 
@@ -912,7 +912,7 @@ most common behavior of dists in the wild.
 
 This is a hashref that gets used as the C<provides> in the metadata.
 
-If no provided, it is built from the C<packages> provided in construction.
+If not provided, it is built from the C<packages> provided in construction.
 
 If no packages were provided, for a dist named Foo-Bar, it defaults to:
 

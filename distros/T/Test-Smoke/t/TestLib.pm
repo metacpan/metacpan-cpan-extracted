@@ -1,13 +1,12 @@
 package TestLib;
 use strict;
 
-use vars qw( $VERSION @EXPORT );
-$VERSION = '0.06';
+our $VERSION = '0.06';
 
 use Test::Smoke::Util qw( whereis );
 
 use base 'Exporter';
-@EXPORT = qw(
+our @EXPORT = qw(
     &whereis
     &find_a_patch
     &find_unzip &do_unzip

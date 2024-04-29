@@ -4,9 +4,9 @@ use warnings;
 use parent "DBIx::DataModel::Meta::Source";
 use DBIx::DataModel;
 use DBIx::DataModel::Meta::Utils qw/define_method does/;
+use DBIx::DataModel::Carp;
 use Params::Validate             qw/HASHREF ARRAYREF SCALAR/;
 use List::MoreUtils              qw/any/;
-use Carp::Clan                   qw[^(DBIx::DataModel::|SQL::Abstract)];
 
 use namespace::clean;
 

@@ -4,7 +4,7 @@ configsmoke - Explain the options during configuration.
 
 # VERSION
 
-This is version: **0.093**
+This is version: **0.094**
 
 # SYNOPSIS
 
@@ -355,6 +355,35 @@ There are several build-cfg files provided with the distribution:
 
 One of these files is used as the default build configurations file, depending
 on the OS one is on.
+
+# COMMAND LINE OPTIONS `Makefile.PL`
+
+## --site-lib
+
+This will leave the `PREFIX` and `INSTALLSITESCRIPT` as-is and install as a
+regular Perl module.
+
+# ENVIRONMENT VARIABLES
+
+These change the behaviour of `Makefile.PL`:
+
+## SMOKE\_INST\_DIR
+
+Sets `PREFIX` and `INSTALLSITESCRIPT` to this directory
+
+## SMOKE\_INST\_SITE\_LIB
+
+When true, will leave `PREFIX` and `INSTALLSITESCRIPT` as is, and install as
+a regular Perl module. No questions asked
+
+## PERL\_MM\_OPT
+
+This may contain `INSTALL_BASE=` that needs to be honoured.
+
+## AUTOMATED\_TESTING
+
+When true, will not ask for the installation dir and use whatever default is in
+place.
 
 # COPYRIGHT
 

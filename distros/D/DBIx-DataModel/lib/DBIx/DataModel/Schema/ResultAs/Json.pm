@@ -3,7 +3,7 @@ package DBIx::DataModel::Schema::ResultAs::Json;
 #----------------------------------------------------------------------
 use warnings;
 use strict;
-use Carp::Clan        qw[^(DBIx::DataModel::|SQL::Abstract)];
+use DBIx::DataModel::Carp;
 use JSON::MaybeXS     ();
 
 use parent 'DBIx::DataModel::Schema::ResultAs';

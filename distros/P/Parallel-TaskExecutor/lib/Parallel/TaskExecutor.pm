@@ -20,7 +20,7 @@ our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 our @CARP_NOT = 'Parallel::TaskExecutor::Task';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =pod
 
@@ -89,8 +89,12 @@ sub new {
     max_parallel_tasks => $options{max_parallel_tasks} // $default_max_parallel_tasks,
     options => \%options,
     current_tasks => 0,
-    zombies => [],  # Store all the non-done tasks whose other reference went out of scope.
-    tasks => {},  # Stores all the non-done tasks, as a weak reference.
+    # Stores a weak reference to all the non-done tasks that have another
+    # reference held by the user.
+    tasks => {},
+    # Stores a non-weak reference to all the non-done tasks that would have went
+    # out of scope otherwise.
+    zombies => {},
     pid => $PID,
   }, $class;
   lock_keys(%{$this});
@@ -114,7 +118,7 @@ sub DESTROY {
   # wait for the task here.
   return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
   return unless $PID == $this->{pid};
-  for my $c (@{$this->{zombies}}) {
+  while (my (undef, $c) = each %{$this->{zombies}}) {
     # TODO: add an option to abandon the children (but they must be awaited by
     # someone).
     $c->wait();
@@ -291,8 +295,10 @@ Readonly::Scalar my $busy_loop_wait_time_us => 1000;
 sub run {
   my ($this, $sub, %options) = @_;
   %options = (%{$this->{options}}, %options);
-  if (!$options{forced}) {
-    usleep($busy_loop_wait_time_us) while $this->{current_tasks} >= $this->{max_parallel_tasks};
+  # TODO: add an option to always call _remove_done_tasks here, to cleanup.
+  while (!$options{forced} && $this->{current_tasks} >= $this->{max_parallel_tasks}) {
+    $this->_remove_done_tasks();
+    usleep($busy_loop_wait_time_us);
   }
   return $this->_fork_and_run($sub, %options);
 }
@@ -339,12 +345,16 @@ sub wait {  ## no critic (ProhibitBuiltinHomonyms)
   my $nb_children = $this->{current_tasks};
   return unless $nb_children;
   debug("Waiting for ${nb_children} running tasks...");
-  while (my $c = shift @{$this->{zombies}}) {
+  while (my (undef, $c) = each %{$this->{zombies}}) {
+    # $c is never weak here and wait() will also not delete from this hash
+    # itself
     $c->wait();
+    delete $this->{zombies}{$c};  # $c is both the key and the value.
   }
   while (my (undef, $c) = each %{$this->{tasks}}) {
-    # $c is a weak reference, but it should never be undef because the task will
-    # remove itself from this hash in its DESTROY method.
+    # $c can be a weak reference, but it should never be undef because the task
+    # will remove itself from this hash when it’s done (and the reference is
+    # unweakened when it’s the last reference to the task).
     # $c->wait() will delete this entry from the hash, but this is legal when
     # looping with each.
     $c->wait();
@@ -365,6 +375,23 @@ Sets the B<max_parallel_tasks> option of the executor.
 sub set_max_parallel_tasks {
   my ($this, $max_parallel_tasks) = @_;
   $this->{max_parallel_tasks} = $max_parallel_tasks;
+  return;
+}
+
+sub _remove_done_tasks {
+  my ($this) = @_;
+  my $done = 0;
+  while (my (undef, $c) = each %{$this->{zombies}}) {
+    if ($c->_try_wait()) {
+      delete $this->{zombies}{$c};
+      $done += 1;
+    }
+  }
+  while (my (undef, $c) = each %{$this->{tasks}}) {
+    # See the comment in wait()
+    $done += $c->_try_wait() ? 1 : 0;
+  }
+  debug("Removed ${done} done tasks") if $done;
   return;
 }
 

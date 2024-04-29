@@ -272,7 +272,6 @@ we will introduce the new concept of I<composition>.
                   [qw/Activity   activities  * /]);
 
 This looks exactly like an association declaration; but it states that
-
 an activity somehow "belongs" to an employee (cannot exist without
 being attached to an employee). In a UML class diagram, this would be
 pictured with a black diamond on the Employee side.  In this

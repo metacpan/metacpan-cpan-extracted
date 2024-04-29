@@ -4,10 +4,10 @@ use warnings;
 use parent "DBIx::DataModel::Meta";
 use DBIx::DataModel;
 use DBIx::DataModel::Meta::Utils qw/define_readonly_accessors does/;
+use DBIx::DataModel::Carp;
 
 use Scalar::Util         qw/weaken/;
 use Params::Validate     qw/validate_with OBJECT SCALAR HASHREF/;
-use Carp::Clan           qw[^(DBIx::DataModel::|SQL::Abstract)];
 use namespace::clean;
 
 {no strict 'refs'; *CARP_NOT = \@DBIx::DataModel::CARP_NOT;}

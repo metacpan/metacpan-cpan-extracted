@@ -2,6 +2,8 @@ package Test::Smoke::App::ConfigSmoke::Files;
 use warnings;
 use strict;
 
+our $VERSION = '0.002';
+
 use Exporter 'import';
 our @EXPORT = qw/ config_files /;
 
@@ -19,7 +21,7 @@ These methods will be added to the L<Test::Smoke::App::ConfigSmoke> class.
 
 =head2 config_files
 
-Configure options C<outfile>, C<rptfile>, C<jsnfile>, C<lfile> and C<adir>.
+Configure options C<outfile>, C<rptfile>, C<jsnfile>, C<lfile>, C<adir> and C<qfile>.
 
 =cut
 
@@ -36,6 +38,17 @@ sub config_files {
     $self->current_values->{lfile} = File::Spec->rel2abs($self->prefix . ".log", getcwd());
 
     $self->handle_option(Test::Smoke::App::Options->adir);
+
+    if ($self->current_values->{adir} && $self->current_values->{smokedb_url}) {
+        print "\nI see you post your reports to the Perl5 CoreSmokeDB\n";
+        print "and archive previous reports...\n";
+        my $qfile_option = Test::Smoke::App::Options->qfile;
+        my $qdft = $self->default_for_option($qfile_option);
+        if (!$qdft && !length($qdft)) {
+            $qfile_option->configdft(sub { $self->prefix . ".qfile" });
+        }
+        $self->handle_option($qfile_option);
+    }
 
     $self->current_values->{delay_report} = $^O eq 'VMS' ? 1 : 0;
 }

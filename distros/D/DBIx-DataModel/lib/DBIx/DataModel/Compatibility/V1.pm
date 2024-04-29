@@ -147,7 +147,7 @@ package DBIx::DataModel::Schema;
 use strict;
 use warnings;
 no warnings 'redefine';
-use Carp;
+use DBIx::DataModel::Carp;
 
 
 *_createPackage  = \&DBIx::DataModel::Meta::Utils::define_class;
@@ -236,7 +236,7 @@ package DBIx::DataModel::Source;
 use strict;
 use warnings;
 no warnings 'redefine';
-use Carp;
+use DBIx::DataModel::Carp;
 
 *primKey        = \&primary_key;
 
@@ -376,7 +376,7 @@ package DBIx::DataModel::Statement;
 use strict;
 use warnings;
 no warnings 'redefine';
-use Carp;
+use DBIx::DataModel::Carp;
 use Scalar::Util qw/reftype/;
 
 my $orig_refine = \&refine;
@@ -429,7 +429,7 @@ package DBIx::DataModel::Statement::JDBC;
 use strict;
 use warnings;
 no warnings 'redefine';
-use Carp;
+use DBIx::DataModel::Carp;
 
 *{rowCount}       = \&row_count;
 

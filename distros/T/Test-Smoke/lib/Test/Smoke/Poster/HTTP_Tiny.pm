@@ -2,7 +2,7 @@ package Test::Smoke::Poster::HTTP_Tiny;
 use warnings;
 use strict;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use base 'Test::Smoke::Poster::Base';
 
@@ -74,6 +74,52 @@ sub _post_data {
             $response->{status}, $response->{reason},
             ($response->{content} ? " ($response->{content})" : ""),
         );
+    }
+
+    $self->log_debug("[CoreSmokeDB] %s", $response->{content});
+
+    return $response->{content};
+}
+
+=head2 $poster->_post_data_api()
+
+Post the json to CoreSmokeDB using HTTP::Tiny, using the API-function.
+
+=cut
+
+sub _post_data_api {
+    my $self = shift;
+
+    $self->log_info("Posting to %s via %s.", $self->smokedb_url, $self->poster);
+    $self->log_debug("Report data: %s", my $json = $self->get_json);
+
+    my $post_data = sprintf(qq/{"report_data": %s}/, $json);
+    my $response = $self->ua->request(
+        POST => $self->smokedb_url,
+        {
+            headers => {
+                'Content-Type'   => 'application/json',
+                'Content-Length' => length($post_data),
+            },
+            content => $post_data,
+        },
+    );
+
+    if (!$response->{success}) {
+        $self->log_warn(
+            "POST failed: %s %s%s",
+            $response->{status},
+            $response->{reason},
+            ($response->{content} ? " ($response->{content})" : ""),
+        );
+        if (not $self->queue_this_report()) {
+        die sprintf(
+            "POST to '%s' failed: %s %s%s\n",
+            $self->smokedb_url,
+            $response->{status}, $response->{reason},
+            ($response->{content} ? " ($response->{content})" : ""),
+        );
+        }
     }
 
     $self->log_debug("[CoreSmokeDB] %s", $response->{content});

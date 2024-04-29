@@ -9,7 +9,7 @@ use List::MoreUtils  qw/firstval any/;
 use Scalar::Util     qw/weaken dualvar/;
 use POSIX            qw/LONG_MAX/;
 use Clone            qw/clone/;
-use Carp::Clan       qw[^(DBIx::DataModel::|SQL::Abstract)];
+use DBIx::DataModel::Carp;
 use Try::Tiny        qw/try catch/;
 use mro              qw/c3/;
 

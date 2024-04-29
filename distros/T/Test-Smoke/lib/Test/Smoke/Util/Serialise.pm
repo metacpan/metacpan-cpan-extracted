@@ -2,6 +2,8 @@ package Test::Smoke::Util::Serialise;
 use warnings;
 use strict;
 
+our $VERSION = '0.001';
+
 use Exporter 'import';
 our @EXPORT_OK = qw( serialise );
 

@@ -1,5 +1,8 @@
 Revision history for Module::Build::Tiny
 
+0.048     2024-04-28 14:58:04+02:00 Europe/Brussels
+          - Implement dynamic prerequisites
+
 0.047     2023-09-28 17:53:41+02:00 Europe/Brussels
           - Avoid using empty regex for backwards compatability
 

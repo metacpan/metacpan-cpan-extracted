@@ -365,6 +365,16 @@ sub cmd_install {
 sub install {
     my ($self, $master, $worker, $num) = @_;
 
+    if ($num > 1
+        && $^O eq "darwin"
+        && !exists $ENV{OBJC_DISABLE_INITIALIZE_FORK_SAFETY}
+        && !$self->{_darwin_fixed}
+    ) {
+        require Socket;
+        Socket::inet_aton("call-inet_aton-before_fork");
+        $self->{_darwin_fixed} = 1;
+    }
+
     my @task = $master->get_task;
     Parallel::Pipes::App->run(
         num => $num,

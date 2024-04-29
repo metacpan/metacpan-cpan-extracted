@@ -27,5 +27,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=version
   repository: git://github.com/Perl/version.pm.git
-version: '0.9931'
+version: '0.9932'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,13 +4,15 @@ README - Perl Core Test Smoke Suite
 
 =head1 SYNOPSIS
 
-  $ perl configsmoke.pl      # will generate smokecurrent.sh
+Make sure you are in the directory where you installed the software!
+
+  $ perl tsconfigsmoke.pl      # will generate smokecurrent.sh
   $ sh smokecurrent.sh
 
 or on windows:
 
-    C:\smoke>configsmoke     # will generate smokecurrent.bat
-    C:\smoke>smokecurrent
+    C:>tsconfigsmoke           # will generate smokecurrent.bat
+    C:>smokecurrent
 
 For the impatient: see the section L</"GETTING STARTED">
 
@@ -57,9 +59,9 @@ $ENV{AUTOMATED_TESTING}=1>
 
 =head1 GETTING STARTED
 
-You are now ready to run the F<configsmoke.pl> configuration program:
+You are now ready to run the F<tsconfigsmoke.pl> configuration program:
 
-    $ perl configsmoke.pl
+    $ perl tsconfigsmoke.pl
 
 You will have to answer some questions that help create a
 configuration file for the Test::Smoke suite.
@@ -76,12 +78,14 @@ If something useful happens, do it every night using a scheduler.
 
 =head1 CONFIGURATION
 
+Please also read F<README2.md> for instructions.
+
 =over 4
 
 =item Test::Smoke configuration
 
-You can create configurations by running the F<configsmoke.pl>
-program. Please see its L<documentation|configsmoke.pl>.
+You can create configurations by running the F<tsconfigsmoke.pl>
+program. Please see its L<documentation|tsconfigsmoke.pl>.
 
 =item Build configurations
 
@@ -175,7 +179,7 @@ run time of Test::Smoke.
 We also keep a database of smokereports that are created by Test::Smoke
 1.58 or higher.
 
-    http://perl5.test-smoke.org/
+    https://perl5.test-smoke.org/
 
 =back
 
@@ -183,7 +187,7 @@ We also keep a database of smokereports that are created by Test::Smoke
 
 =head1 COPYRIGHT and LICENSE
 
-Copyright (C) 2001-2014
+Copyright (C) 2001-2023
 
   * H.Merijn Brand
   * Abe Timmerman

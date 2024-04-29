@@ -6,13 +6,13 @@ use DBIx::DataModel;
 use DBIx::DataModel::Meta::Utils qw/define_class define_readonly_accessors/;
 use DBIx::DataModel::Source::Join;
 use DBIx::DataModel::Meta::Source::Join;
+use DBIx::DataModel::Carp;
 
 use Params::Validate     qw/validate_with SCALAR ARRAYREF CODEREF UNDEF BOOLEAN
                                           OBJECT HASHREF/;
 use List::MoreUtils      qw/any firstval lastval uniq/;
 use Hash::Util           qw/lock_keys/;
 use Module::Load         qw/load/;
-use Carp::Clan           qw[^(DBIx::DataModel::|SQL::Abstract)];
 use Try::Tiny;
 use mro                  qw/c3/;
 use namespace::clean;

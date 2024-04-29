@@ -49,7 +49,7 @@ done_testing;
 
 sub refresh_dbh  {
   my ($handler) = @_;
-  my $dbh = DBI->connect('dbi:SQLite:dbname=:memory:', '', '', {RaiseError => 1, AutoCommit => 1});
+  my $dbh = DBI->connect('dbi:SQLite:dbname=:memory:', '', '', {RaiseError => 1, ShowErrorStatement => 1, AutoCommit => 1});
   $dbh->{HandleError} = $handler if $handler;
   $schema->dbh($dbh);
 }
@@ -57,7 +57,7 @@ sub refresh_dbh  {
 sub error_msg {
   eval {$schema->table('Foo')->select(-columns => [qw/Foo Bar/]) };
   my $err = $@;
-  # note $err;
+   note $err;
   return $err;
 }
 

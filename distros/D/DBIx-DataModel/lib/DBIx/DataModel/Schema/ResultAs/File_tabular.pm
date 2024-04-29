@@ -3,7 +3,7 @@ package DBIx::DataModel::Schema::ResultAs::File_tabular;
 #----------------------------------------------------------------------
 use warnings;
 use strict;
-use Carp::Clan       qw[^(DBIx::DataModel::|SQL::Abstract)];
+use DBIx::DataModel::Carp;
 use File::Tabular;
 
 use parent 'DBIx::DataModel::Schema::ResultAs';

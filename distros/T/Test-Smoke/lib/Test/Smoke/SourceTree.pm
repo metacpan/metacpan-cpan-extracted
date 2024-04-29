@@ -1,8 +1,7 @@
 package Test::Smoke::SourceTree;
 use strict;
 
-use vars qw( $VERSION @EXPORT_OK %EXPORT_TAGS $NOCASE );
-$VERSION = '0.008';
+our $VERSION = '0.008';
 
 use File::Spec;
 use File::Find;
@@ -11,13 +10,13 @@ use Carp;
 use Test::Smoke::LogMixin;
 
 use base 'Exporter';
-%EXPORT_TAGS = (
+our %EXPORT_TAGS = (
     mani_const => [qw( &ST_MISSING &ST_UNDECLARED )],
     const      => [qw( &ST_MISSING &ST_UNDECLARED )],
 );
-@EXPORT_OK = @{ $EXPORT_TAGS{mani_const} };
+our @EXPORT_OK = @{ $EXPORT_TAGS{mani_const} };
 
-$NOCASE = $^O eq 'MSWin32' || $^O eq 'VMS';
+our $NOCASE = $^O eq 'MSWin32' || $^O eq 'VMS';
 
 =head1 NAME
 

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Planner::Extension;
-$ExtUtils::Builder::Planner::Extension::VERSION = '0.004';
+$ExtUtils::Builder::Planner::Extension::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -40,7 +40,7 @@ ExtUtils::Builder::Planner::Extension - a base class for Planner extensions
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 METHODS
 

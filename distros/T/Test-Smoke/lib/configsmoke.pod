@@ -14,7 +14,7 @@ configsmoke - Explain the options during configuration.
 
 =head1 VERSION
 
-This is version: B<0.093>
+This is version: B<0.094>
 
 =head1 SYNOPSIS
 
@@ -569,6 +569,35 @@ Will extract the files to C<ddir>.
 NB: C<< <branch> >> can be a branch-name, tag or commit.
 
 =end GitHubSnapshots
+
+=head1 COMMAND LINE OPTIONS F<Makefile.PL>
+
+=head2 --site-lib
+
+This will leave the C<PREFIX> and C<INSTALLSITESCRIPT> as-is and install as a
+regular Perl module.
+
+=head1 ENVIRONMENT VARIABLES
+
+These change the behaviour of F<Makefile.PL>:
+
+=head2 SMOKE_INST_DIR
+
+Sets C<PREFIX> and C<INSTALLSITESCRIPT> to this directory
+
+=head2 SMOKE_INST_SITE_LIB
+
+When true, will leave C<PREFIX> and C<INSTALLSITESCRIPT> as is, and install as
+a regular Perl module. No questions asked
+
+=head2 PERL_MM_OPT
+
+This may contain C<INSTALL_BASE=> that needs to be honoured.
+
+=head2 AUTOMATED_TESTING
+
+When true, will not ask for the installation dir and use whatever default is in
+place.
 
 =head1 COPYRIGHT
 

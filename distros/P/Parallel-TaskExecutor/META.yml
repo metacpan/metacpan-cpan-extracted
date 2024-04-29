@@ -41,5 +41,5 @@ requires:
 resources:
   bugtracker: https://github.com/mkende/perl_parallel_task_executor/issues
   repository: https://github.com/mkende/perl_parallel_task_executor
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,10 +4,10 @@ use warnings;
 use parent "DBIx::DataModel::Meta";
 use DBIx::DataModel;
 use DBIx::DataModel::Meta::Utils qw/define_readonly_accessors/;
+use DBIx::DataModel::Carp;
 
 use Scalar::Util                 qw/looks_like_number weaken/;
 use Params::Validate             qw/validate_with SCALAR HASHREF ARRAYREF OBJECT/;
-use Carp::Clan                   qw[^(DBIx::DataModel::|SQL::Abstract)];
 use namespace::clean;
 
 {no strict 'refs'; *CARP_NOT = \@DBIx::DataModel::CARP_NOT;}
@@ -43,7 +43,7 @@ sub new {
 
   # if this is a composition path, remember it in the 'components' array
   push @{$self->{from}{components}}, $path
-    if $self->{association}{kind} eq 'Composition' && $self->{multiplicity}[1] > 1;
+    if $self->{association}{kind} eq 'Composition' && $self->{direction} eq 'AB';
 
   # install a navigation method into the 'from' table class
   my @navigation_args = ($self->{name},  # method name

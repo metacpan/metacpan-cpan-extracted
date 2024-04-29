@@ -1,0 +1,57 @@
+{
+   "abstract" : "a replacement for Carp or Carp::Clan, object-oriented",
+   "author" : [
+      "Laurent Dami <dami@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Carp-Object",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clone" : "0",
+            "Devel::StackTrace" : "0",
+            "Module::Load" : "0",
+            "perl" : "5.010001",
+            "utf8" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Carp::Object" : {
+         "file" : "lib/Carp/Object.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/damil/Carp-Object/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/damil/Carp-Object"
+      }
+   },
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

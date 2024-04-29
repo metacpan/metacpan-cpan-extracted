@@ -11,8 +11,7 @@ use Test::Smoke::Syncer::Snapshot;
 use Test::Smoke::Syncer::FTP;
 use Test::Smoke::Syncer::Forest;
 
-use vars qw( $VERSION );
-$VERSION = '0.029';
+our $VERSION = '0.029';
 
 use Config;
 use Cwd qw( cwd abs_path);

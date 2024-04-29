@@ -8,7 +8,8 @@ MANIFEST			This list of files
 t/000-load.t
 t/001-cpanfile.t
 t/001-podsyntax.t
-t/100-simple-perl.t
+t/100-simple-run.t
+t/110-many-run.t
 t/200-executor-wait.t
 t/300-catch-error.t
 t/400-deletion-order.t

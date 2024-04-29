@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Carp/Object.pm
+MANIFEST			This list of files
+META.json
+META.yml
+t/01_object_oriented_API.t
+t/02_functional_API.t
+t/03_reexport.t
+t/04_clan_like.t
+t/05_carp_not.t
+t/lib/TestReexport.pm
+

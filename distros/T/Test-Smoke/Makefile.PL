@@ -44,7 +44,7 @@ if (my $perl_mm_opt = $ENV{PERL_MM_OPT}) {
 }
 
 my %install = ( );
-unless ( @ARGV ) {
+if (!@ARGV and !$ENV{SMOKE_INST_SITE_LIB}) {
     my $dft_install = exists $ENV{SMOKE_INSTDIR} && $ENV{SMOKE_INSTDIR} ne ""
         ? $ENV{SMOKE_INSTDIR}
         : catdir( updir(), 'smoke' );
@@ -69,6 +69,12 @@ unless ( @ARGV ) {
         ),
     );
 }
+else { # this will be the default in some time
+    if (my ($switch) = grep { m{^--site-lib$} } @ARGV) {
+        @ARGV = grep { $_ !~ m{^--site-lib$} } @ARGV;
+    }
+}
+
 my @scripts = qw(
     smokestatus.pl chkbcfg.pl sysinfo.pl
     tssynctree.pl tsrunsmoke.pl tssendrpt.pl tsarchive.pl
@@ -99,14 +105,20 @@ for ($^O) {
     };
 }
 
-# We won't enforce JSON::PP if JSON::XS is installed.
+# We won't enforce JSON::PP if Cpanel::JSON::XS or JSON::XS is installed.
 # But JSON serialisation is needed.
-eval { require JSON::XS };
+eval {require Cpanel::JSON::XS };
 if ( $@ ) {
-    $extra_deps{'JSON::PP'} = 0;
+    eval { require JSON::XS };
+    if ( $@ ) {
+        $extra_deps{'JSON::PP'} = 0;
+    }
+    else {
+        $extra_deps{'JSON::XS'} = 0;
+    }
 }
 else {
-    $extra_deps{'JSON::XS'} = 0;
+    $extra_deps{'Cpanel::JSON::XS'} = 0;
 }
 my %posters;
 my @ua_clients = qw/HTTP::Tiny LWP::UserAgent/;
@@ -143,6 +155,7 @@ my %TEST_REQUIRES = (
     'Test::Fatal'      => 0,
     'HTTP::Daemon'     => 0,
     'HTTP::Message'    => 0,
+    'JSON'             => 4.10,
     ($mmver > 6.64 ? (%BUILD_REQUIRES) : ()),
 );
 

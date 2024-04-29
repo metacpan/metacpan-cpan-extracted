@@ -9,35 +9,35 @@ use warnings;
 use strict;
 use DBIx::DataModel::Meta::Utils   qw/does/;
 use DBIx::DataModel::Source::Table;
+use DBIx::DataModel::Carp;
 
 use Scalar::Util                   qw/blessed/;
 use Data::Structure::Util;           # for calling unbless(), fully qualified
 use Module::Load                   qw/load/;
 use Params::Validate               qw/validate_with SCALAR ARRAYREF CODEREF UNDEF
                                                     OBJECT BOOLEAN/;
-
-use Carp::Clan                     qw[^(DBIx::DataModel::|SQL::Abstract)];
-
 use SQL::Abstract::More 1.41;
 use Try::Tiny;
+use Devel::StackTrace;
 use mro                            qw/c3/;
 
 use namespace::clean;
 
-
 my $schema_attributes_spec = {
-  dbh                   => {type => OBJECT|ARRAYREF, optional => 1                                        },
-  debug                 => {type => OBJECT|SCALAR,   optional => 1                                        },
-  sql_abstract          => {type => OBJECT,          optional => 1,         isa   => 'SQL::Abstract::More'},
-  dbi_prepare_method    => {type => SCALAR,          default  => 'prepare'                                },
-  placeholder_prefix    => {type => SCALAR,          default  => '?:'                                     },
-  select_implicitly_for => {type => SCALAR,          default  => ''                                       },
-  autolimit_firstrow    => {type => BOOLEAN,         optional => 1                                        },
-  db_schema             => {type => SCALAR,          optional => 1                                        },
-  handleError_policy    => {type => SCALAR,          default  => 'combine', regex => qr(^(if_absent
-                                                                                         |combine
-                                                                                         |override
-                                                                                         |none)$)x        },
+  dbh                       => {type => OBJECT|ARRAYREF, optional => 1                                        },
+  debug                     => {type => OBJECT|SCALAR,   optional => 1                                        },
+  sql_abstract              => {type => OBJECT,          optional => 1,         isa   => 'SQL::Abstract::More'},
+  dbi_prepare_method        => {type => SCALAR,          default  => 'prepare'                                },
+  placeholder_prefix        => {type => SCALAR,          default  => '?:'                                     },
+  select_implicitly_for     => {type => SCALAR,          default  => ''                                       },
+  autolimit_firstrow        => {type => BOOLEAN,         optional => 1                                        },
+  db_schema                 => {type => SCALAR,          optional => 1                                        },
+  auto_show_error_statement => {type => BOOLEAN,         default  => 1                                        },
+  frame_filter              => {type => CODEREF,         optional => 1                                        },
+  handleError_policy        => {type => SCALAR,          default  => 'combine', regex => qr(^(if_absent
+                                                                                             |combine
+                                                                                             |override
+                                                                                             |none)$)x        },
 };
 
 
@@ -162,20 +162,30 @@ sub dbh {
       $dbh->{RaiseError} 
         or croak "arg to dbh(..) must have RaiseError=1";
 
-      # install a HandleError attribute so that error reporting goes through Carp::Clan
-      my $HE_policy = $self->handleError_policy;
-      if ($HE_policy ne 'none') {
-        my $prev_handler   = $dbh->{HandleError}; # see L<DBI/HandleError>
+      # set ShowErrorStatement if necessary
+      $dbh->{ShowErrorStatement} or !$self->auto_show_error_statement
+        or $dbh->{ShowErrorStatement} = 1;
 
-        my $should_install = !$prev_handler || ($HE_policy eq 'combine' || $HE_policy eq 'override');
-        $should_install  &&= 0 if ($prev_handler || -1) == ($dbh->{private_dbix_datamodel_handle_error} || -2);
-        if ($should_install) {
-          my $new_handler = $prev_handler && $HE_policy eq 'combine'   ? sub {my $was_handled = $prev_handler->(@_);
-                                                                              croak shift unless $was_handled}
-                                                                       : sub {croak shift};
-          $dbh->{HandleError} = $new_handler;
-          $dbh->{private_dbix_datamodel_handle_error} = $new_handler;
-        }
+      # decide if we should install a HandleError attribute so that error reporting goes through Carp::Object
+      my $HE_policy      = $self->handleError_policy;
+      my $prev_handler   = $dbh->{HandleError};
+      my $should_install = $HE_policy eq 'none'      ? 0
+                         : $HE_policy eq 'if_absent' ? !$prev_handler
+                         : $HE_policy eq 'combine'   ? 1
+                         : $HE_policy eq 'override'  ? 1
+                         : die "unexpected value for 'handleError_policy': $HE_policy";
+
+      # actually, no need to re8install if the previous handler on this $dbh was already installed by the present module
+      $should_install  &&= 0 if ($prev_handler || -1) == ($dbh->{private_dbix_datamodel_handle_error} || -2);      
+
+      # install the handler
+      if ($should_install) {
+        my $must_combine    = $prev_handler && $HE_policy eq 'combine';
+        my $new_handler     = $must_combine ? sub {my $was_handled = $prev_handler->(@_);
+                                                   die $self->_handle_SQL_error(@_) if !$was_handled; }
+                                            : sub {die $self->_handle_SQL_error(@_)};
+        $dbh->{HandleError} = $new_handler;
+        $dbh->{private_dbix_datamodel_handle_error} = $new_handler;
       }
 
       # default values for $dbh_options{returning_through}
@@ -200,6 +210,26 @@ sub dbh {
 }
 
 
+sub _handle_SQL_error {
+  my ($self, $dbi_errstr, $dbh, $unused) = @_;
+
+  # skip intermediate ORM stack frames so that errors are reported from the caller's perspective
+  local %DBIx::DataModel::Carp::CARP_OBJECT_CONSTRUCTOR = (frame_filter => sub {
+    my ($frame_ref) = @_; 
+    my $pkg = $frame_ref->{caller}[0];
+    return 0  if $pkg =~ /^DBIx::DataModel/ or $pkg =~ /^SQL::Abstract/;   # skip packages used by DBIx::DataModel
+    return $self->{frame_filter}->($frame_ref) if $self->{frame_filter};   # skip packages specified by client
+    return 1;                                                              # otherwise, don't skip
+   });
+
+  # clear the DBI error, to make sure that upper levels like DBIx::RetryOverDisconnects will use
+  # our $dbi_errstr and not DBI->errstr
+  $dbh->set_err(undef, "");
+
+  croak $dbi_errstr;
+}
+
+  
 
 sub with_db_schema {
   my ($self, $db_schema) = @_;
@@ -433,7 +463,7 @@ use overload '""' => sub {
   my $self = shift;
   my $err             = $self->initial_error;
   my @rollback_errs   = $self->rollback_errors;
-  my $rollback_status = @rollback_errs ? join(", ", @rollback_errs) : "OK";
+  my $rollback_status = @rollback_errs ? CORE::join(", ", @rollback_errs) : "OK";
   return "FAILED TRANSACTION: $err (rollback: $rollback_status)";
 };
 
@@ -528,6 +558,14 @@ Methods implemented in this module :
 =item L<placeholder_prefix|DBIx::DataModel::Doc::Reference/placeholder_prefix>
 
 =item L<autolimit_firstrow|DBIx::DataModel::Doc::Reference/autolimit_firstrow>
+
+=item L<db_schema|DBIx::DataModel::Doc::Reference/db_schema>
+
+=item L<auto_show_error_statement|DBIx::DataModel::Doc::Reference/auto_show_error_statement>
+
+=item L<frame_filter|DBIx::DataModel::Doc::Reference/frame_filter>
+
+=item L<handleError_policy|DBIx::DataModel::Doc::Reference/handleError_policy>
 
 =item L<localize_state|DBIx::DataModel::Doc::Reference/localize_state>
 

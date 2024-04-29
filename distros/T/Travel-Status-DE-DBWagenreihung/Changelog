@@ -1,3 +1,17 @@
+Travel::Status::DE::DBWagenreihung 0.14 - Sun Apr 28 2024
+
+    * This module now explicitly treats carriages as groups, just like the
+      backend does. Each group contains at least one carriage and has a
+      distinct number, origin, destination, and train type / description.
+    * Add Travel::Status::DE::DBWagenreihung::Group module.
+    * DBWagenreihung: Add groups, carriages, and train_nos accessors.
+    * DBWagenreihung: origins, destinations: Return hashrefs with
+      "name" / "groups" / "sections" rather than "name" / "sections".
+    * DBWagenreihung: Remove train_descriptions, wagongroup_description,
+      wagongroup_subtype, and wagongroup_model accessors. Use $wr->groups and
+      $group->description / $group->desc_short instead.
+      This is a breaking change.
+
 Travel::Status::DE::DBWagenreihung 0.13 - Sat Apr 27 2024
 
     * DBWagenreihung: Add station accessor.

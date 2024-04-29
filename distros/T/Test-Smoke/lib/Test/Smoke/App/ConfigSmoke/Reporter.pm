@@ -2,6 +2,8 @@ package Test::Smoke::App::ConfigSmoke::Reporter;
 use warnings;
 use strict;
 
+our $VERSION = '0.001';
+
 use Exporter 'import';
 our @EXPORT = qw/ config_reporter_options /;
 

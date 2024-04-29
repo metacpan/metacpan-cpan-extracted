@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Action::Command;
-$ExtUtils::Builder::Action::Command::VERSION = '0.004';
+$ExtUtils::Builder::Action::Command::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -53,7 +53,7 @@ ExtUtils::Builder::Action::Command - An action object for external commands
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

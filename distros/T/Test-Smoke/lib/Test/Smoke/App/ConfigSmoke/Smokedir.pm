@@ -2,6 +2,8 @@ package Test::Smoke::App::ConfigSmoke::Smokedir;
 use warnings;
 use strict;
 
+our $VERSION = '0.001';
+
 use Exporter 'import';
 our @EXPORT = qw/ config_smokedir check_smokedir /;
 

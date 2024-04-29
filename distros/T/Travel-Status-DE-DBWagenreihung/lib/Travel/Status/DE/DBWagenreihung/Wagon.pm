@@ -8,7 +8,7 @@ use utf8;
 use parent 'Class::Accessor';
 use Carp qw(cluck);
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 Travel::Status::DE::DBWagenreihung::Wagon->mk_ro_accessors(
 	qw(attributes class_type group_index has_ac has_accessibility
 	  has_bahn_comfort has_bike_storage has_bistro has_compartments
@@ -203,7 +203,12 @@ sub parse_type {
 sub set_traintype {
 	my ( $self, $group_index, $tt ) = @_;
 
-	$self->{group_index}   = $group_index;
+	$self->{group_index} = $group_index;
+
+	if ( not $tt ) {
+		return;
+	}
+
 	$self->{train_subtype} = $tt;
 
 	if ( not $self->{number} or not exists( $type_attributes{$tt} ) ) {

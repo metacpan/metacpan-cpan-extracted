@@ -3,14 +3,15 @@ Changes
 MANIFEST			This list of files
 MANIFEST.SKIP
 Makefile.PL
-README
 README2.md
+README.pod
 ReleaseNotes
 bin/chkbcfg.pl
 bin/patchtree.pl
 bin/smokestatus.pl
 bin/sysinfo.pl
 bin/tsarchive.pl
+bin/tshandlequeue.pl
 bin/tsreport.pl
 bin/tsrepostjsn.pl
 bin/tsrunsmoke.pl
@@ -37,6 +38,7 @@ lib/Test/Smoke/App/ConfigSmoke/SmokeEnv.pm
 lib/Test/Smoke/App/ConfigSmoke/Smokedir.pm
 lib/Test/Smoke/App/ConfigSmoke/Sync.pm
 lib/Test/Smoke/App/ConfigSmoke/WriteSmokeScript.pm
+lib/Test/Smoke/App/HandleQueue.pm
 lib/Test/Smoke/App/Options.pm
 lib/Test/Smoke/App/Reporter.pm
 lib/Test/Smoke/App/RepostFromArchive.pm
@@ -67,6 +69,7 @@ lib/Test/Smoke/Poster/Base.pm
 lib/Test/Smoke/Poster/Curl.pm
 lib/Test/Smoke/Poster/HTTP_Tiny.pm
 lib/Test/Smoke/Poster/LWP_UserAgent.pm
+lib/Test/Smoke/PostQueue.pm
 lib/Test/Smoke/Reporter.pm
 lib/Test/Smoke/Smoker.pm
 lib/Test/Smoke/SourceTree.pm
@@ -107,6 +110,7 @@ t/app/130-smokeperl.t
 t/app/140-synctree.t
 t/app/150-reporter.t
 t/app/160-repostjsn.t
+t/app/170-handlequeue.t
 t/buildcfg.t
 t/cfgstuff.t
 t/for_gmake.t
@@ -163,6 +167,7 @@ t/patcher_forest.t
 t/pc09.out
 t/policy.t
 t/poster-post.t
+t/postqueue.t
 t/regenstuff.t
 t/report-hostname.t
 t/report-usernote.t

@@ -14,7 +14,7 @@ BEGIN {
         )
     );
     require $coretests;
-    use_ok('version::vpp', 0.9931);
+    use_ok('version::vpp', 0.9932);
 }
 
 BaseTests("version::vpp","new","qv");

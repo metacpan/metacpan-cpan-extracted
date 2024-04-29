@@ -58,6 +58,6 @@
          "web" : "https://github.com/Perl/version.pm"
       }
    },
-   "version" : "0.9931",
+   "version" : "0.9932",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

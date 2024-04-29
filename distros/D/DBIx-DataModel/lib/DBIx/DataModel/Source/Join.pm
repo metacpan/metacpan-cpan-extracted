@@ -4,7 +4,7 @@ use strict;
 use parent 'DBIx::DataModel::Source';
 use mro 'c3';
 require 5.008; # for filehandle in memory
-use Carp::Clan qw[^(DBIx::DataModel::|SQL::Abstract)];
+use DBIx::DataModel::Carp;
 
 sub db_from {
   my $self = shift;

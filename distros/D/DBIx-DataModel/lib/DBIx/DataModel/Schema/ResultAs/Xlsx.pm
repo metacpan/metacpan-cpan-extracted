@@ -3,7 +3,7 @@ package DBIx::DataModel::Schema::ResultAs::Xlsx;
 #----------------------------------------------------------------------
 use warnings;
 use strict;
-use Carp::Clan           qw[^(DBIx::DataModel::|SQL::Abstract)];
+use DBIx::DataModel::Carp;
 use Excel::Writer::XLSX;
 use Params::Validate qw/validate_with SCALAR/;
 

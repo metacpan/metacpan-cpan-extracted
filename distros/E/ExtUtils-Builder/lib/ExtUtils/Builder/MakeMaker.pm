@@ -1,5 +1,5 @@
 package ExtUtils::Builder::MakeMaker;
-$ExtUtils::Builder::MakeMaker::VERSION = '0.004';
+$ExtUtils::Builder::MakeMaker::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -19,15 +19,22 @@ sub import {
 	return;
 }
 
-my $escape_command = sub {
-	my ($maker, $elements) = @_;
-	return join ' ', map { (my $temp = m{[^\w/\$().-]} ? $maker->quote_literal($_) : $_) =~ s/\n/\\\n\t/g; $temp } @{$elements};
-};
+my $escape_command = $^O eq 'MSWin32'
+	? sub {
+		my (undef, @args) = @_;
+		require Win32::ShellQuote;
+		Win32::ShellQuote::quote_cmd(@args);
+	}
+	: sub {
+		my ($maker, @elements) = @_;
+		return join ' ', map { (my $temp = m{[^\w/\$().-]} ? $maker->quote_literal($_) : $_) =~ s/\n/\\\n\t/g; $temp } @elements;
+	}
+;
 
 my %double_colon = map { $_ => 1 } qw/all pure_all subdirs config dynamic static clean distdir test install/;
 my $make_entry = sub {
 	my ($maker, $target, $dependencies, $actions) = @_;
-	my @commands = map { $maker->$escape_command($_) } map { $_->to_command(perl => '$(ABSPERLRUN)') } @{$actions};
+	my @commands = map { $maker->$escape_command(@{$_}) } map { $_->to_command(perl => '$(ABSPERLRUN)') } @{$actions};
 	my $quote_dep = $maker->can('quote_dep') || sub { $_[1] };
 	my @dependencies = map { $maker->$quote_dep($_) } @{$dependencies};
 	my $colon = $double_colon{$target} ? '::' : ':';
@@ -79,7 +86,7 @@ ExtUtils::Builder::MakeMaker - A MakeMaker consumer for ExtUtils::Builder Plan o
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

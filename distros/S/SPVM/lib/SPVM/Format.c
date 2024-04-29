@@ -10,7 +10,6 @@
 static const char* FILE_NAME = "Format.c";
 
 int32_t SPVM__Format___native_snprintf_d(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   int32_t value = stack[0].ival;
   
@@ -24,8 +23,27 @@ int32_t SPVM__Format___native_snprintf_d(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
+// Copy this from spvm_implemenet.h
+static inline int SPVM_IMPLEMENT_snprintf_fp(char* buffer, size_t length, const char* format, double value) {
+  
+#ifdef _WIN32
+  #ifdef _TWO_DIGIT_EXPONENT
+    unsigned int oldexpform = _set_output_format(_TWO_DIGIT_EXPONENT);
+  #endif
+#endif
+  
+  int32_t ret_length = snprintf(buffer, length, format, value);
+  
+#ifdef _WIN32
+  #ifdef _TWO_DIGIT_EXPONENT
+    _set_output_format(oldexpform);
+  #endif
+#endif
+
+  return ret_length;
+}
+
 int32_t SPVM__Format___native_snprintf_f(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   double value = stack[0].dval;
   int32_t precision = stack[1].ival;
@@ -45,7 +63,7 @@ int32_t SPVM__Format___native_snprintf_f(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   char* formatted_string = (char*)env->get_chars(env, stack, obj_formatted_string);
   
-  int32_t length = snprintf(formatted_string, max_length + 1, specifier, value);
+  int32_t length = SPVM_IMPLEMENT_snprintf_fp(formatted_string, max_length + 1, specifier, value);
   
   stack[0].oval = env->new_string(env, stack, formatted_string, length);
   
@@ -53,7 +71,6 @@ int32_t SPVM__Format___native_snprintf_f(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Format___native_snprintf_g(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   double value = stack[0].dval;
   int32_t precision = stack[1].ival;
@@ -73,7 +90,7 @@ int32_t SPVM__Format___native_snprintf_g(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   char* formatted_string = (char*)env->get_chars(env, stack, obj_formatted_string);
   
-  int32_t length = snprintf(formatted_string, max_length + 1, specifier, value);
+  int32_t length = SPVM_IMPLEMENT_snprintf_fp(formatted_string, max_length + 1, specifier, value);
   
   stack[0].oval = env->new_string(env, stack, formatted_string, length);
   
@@ -81,7 +98,6 @@ int32_t SPVM__Format___native_snprintf_g(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Format___native_snprintf_ld(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   int64_t value = stack[0].lval;
   
@@ -96,7 +112,6 @@ int32_t SPVM__Format___native_snprintf_ld(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Format___native_snprintf_lu(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   uint64_t value = (uint64_t)stack[0].lval;
   
@@ -111,7 +126,6 @@ int32_t SPVM__Format___native_snprintf_lu(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Format___native_snprintf_lx(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   uint64_t value = (uint64_t)stack[0].lval;
   
@@ -125,7 +139,6 @@ int32_t SPVM__Format___native_snprintf_lx(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 int32_t SPVM__Format___native_snprintf_p(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   void* value = stack[0].oval;
   
@@ -143,7 +156,6 @@ int32_t SPVM__Format___native_snprintf_p(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Format___native_snprintf_u(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   uint32_t value = (uint32_t)stack[0].ival;
   
@@ -158,7 +170,6 @@ int32_t SPVM__Format___native_snprintf_u(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Format___native_snprintf_x(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   uint32_t value = (uint32_t)stack[0].ival;
   

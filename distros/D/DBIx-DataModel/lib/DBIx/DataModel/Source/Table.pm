@@ -11,7 +11,7 @@ use Module::Load                 qw/load/;
 use List::MoreUtils              qw/none/;
 use Params::Validate             qw/validate_with HASHREF/;
 use DBIx::DataModel::Meta::Utils qw/does/;
-use Carp::Clan                   qw[^(DBIx::DataModel::|SQL::Abstract)];
+use DBIx::DataModel::Carp;
 
 use namespace::clean;
 

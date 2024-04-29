@@ -2,11 +2,11 @@ package Test::Smoke::Util::LoadAJSON;
 use warnings;
 use strict;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
-Test::Smoke::Util::LoadAJSON - A JSON:PP/JSON::XS Factory Class
+Test::Smoke::Util::LoadAJSON - A Cpanel::JSON::XS/JSON:PP/JSON::XS Factory Class
 
 =head1 SYNOPSIS
 
@@ -25,7 +25,7 @@ Also checks for C<$ENV{PERL_JSON_BACKEND}> to force either of the two.
 =cut
 
 use Exporter 'import';
-our @EXPORT = qw/encode_json decode_json/;
+our @EXPORT = qw/encode_json decode_json JSON/;
 
 no warnings 'redefine';
 my $json_base_class;
@@ -46,7 +46,7 @@ sub import {
 
 =head2 my $class = Test::Smoke::Util::LoadAJSON->find_base_class()
 
-On success returns one of: B<JSON::PP>, B<JSON::XS>
+On success returns one of: B<Cpanel::JSON::XS>, B<JSON::PP>, B<JSON::XS>
 
 Returns undef on failure.
 
@@ -55,7 +55,7 @@ Returns undef on failure.
 sub find_base_class {
     my @backends = $ENV{PERL_JSON_BACKEND}
         ? ($ENV{PERL_JSON_BACKEND})
-        : qw/JSON::PP JSON::XS/;
+        : qw/Cpanel::JSON::XS JSON::PP JSON::XS/;
     for my $try_class (@backends) {
         eval "use $try_class";
         next if $@;
@@ -64,6 +64,14 @@ sub find_base_class {
     }
     return;
 }
+
+=head2 JSON
+
+Returns the current C<$json_base_class>.
+
+=cut
+
+sub JSON { $json_base_class }
 
 =head2 my $obj = Test::Smoke::Util::LoadAJSON->new(<arguments>)
 
@@ -82,7 +90,7 @@ sub new {
 
 =head1 COPYRIGHT
 
-(c) 2014, All rights reserved.
+E<copy> MMXIV-MMXXIII, All rights reserved.
 
   * Abe Timmerman <abeltje@cpan.org>
 

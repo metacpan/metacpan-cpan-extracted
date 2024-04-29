@@ -1,0 +1,25 @@
+#!perl
+use v5.20.0;
+use warnings;
+# PODNAME: module-blaster
+# ABSTRACT: create a random CPAN distribution
+
+# This goofy little program spits out one or more faked up CPAN distributions.
+# They should be valid, but will have no useful code in them.
+
+use lib 'lib';
+
+use Data::Fake qw(CPAN);
+use Getopt::Long::Descriptive;
+
+my ($opt, $usage) = describe_options(
+  '%c %o',
+  [ 'number|n=i', 'how many dists to blast out', { default => 1 } ],
+);
+
+for my $n (1 .. $opt->number) {
+  my $dist = fake_cpan_distribution()->();
+  my $archive = $dist->make_archive({ dir => '.' });
+  say "Produced archive as $archive (cpan author: " . $dist->cpan_author . ")";
+  say "- $_" for sort map {; $_->name } $dist->packages;
+}

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use DBIx::DataModel::Meta::Utils qw/define_abstract_methods/;
 
-use Carp::Clan       qw[^(DBIx::DataModel::|SQL::Abstract)];
+use DBIx::DataModel::Carp;
 
 define_abstract_methods(__PACKAGE__, qw/get_result/);
 

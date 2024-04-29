@@ -8,8 +8,9 @@ use English;
 use Hash::Util 'lock_keys';
 use Log::Any::Simple ':default';
 use POSIX ':sys_wait_h';
+use Scalar::Util 'unweaken';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =pod
 
@@ -86,8 +87,13 @@ sub DESTROY {
   if ($this->running()) {
     if ($this->{runner}) {
       trace("Deferring reaping of task $this->{task_id}");
-      push @{$this->{runner}{zombies}}, $this;
+      # We could unweaken the entry in the tasks hash, but it’s cleaner to have
+      # only weak objects there, and non-weak objects in zombies (otherwise we
+      # would need to rely on isweak in the TaskExecutor DESTROY method).
+      $this->{runner}{zombies}{$this} = $this;
       delete $this->{runner}{tasks}{$this};
+      # Once we are a zombie, we can be deleted only once done, so this code path
+      # will not keep creating reference to the object.
     } else {
       $this->wait();
     }
@@ -220,8 +226,11 @@ sub _try_wait {
   return if $this->{state} ne 'running';
   trace("Starting non blocking waitpid($this->{pid})");
   local ($ERRNO, $CHILD_ERROR) = (0, 0);
-  if ((my $pid = waitpid($this->{pid}, WNOHANG)) > 0) {
+  my $pid = waitpid($this->{pid}, WNOHANG);
+  if ($pid > 0 || $pid < -1) {  # Perl fake processes on Windows use negative PIDs.
+                                # TODO: do the same validation on $pid than in the wait() method.
     $this->_process_done();
+    return 1;
   }
   return;
 }
@@ -231,7 +240,7 @@ sub _process_done {
   $this->{state} = 'done';
   if ($this->{runner}) {
     $this->{runner}{current_tasks}-- unless $this->{untracked};
-    delete $this->{runner}{tasks}{$this};
+    delete $this->{runner}{tasks}{$this};  # might not exist if we are a zombie, this is fine.
   }
   if ($CHILD_ERROR) {
     if ($this->{catch_error}) {

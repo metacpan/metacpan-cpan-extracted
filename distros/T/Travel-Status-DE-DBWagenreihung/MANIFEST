@@ -4,6 +4,7 @@ Build.PL
 Changelog
 cpanfile.snapshot
 lib/Travel/Status/DE/DBWagenreihung.pm
+lib/Travel/Status/DE/DBWagenreihung/Group.pm
 lib/Travel/Status/DE/DBWagenreihung/Section.pm
 lib/Travel/Status/DE/DBWagenreihung/Wagon.pm
 MANIFEST			This list of files

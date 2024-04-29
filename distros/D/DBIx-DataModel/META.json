@@ -4,7 +4,7 @@
       "Laurent Dami <dami AT cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4232",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -38,7 +38,7 @@
             "YAML::XS" : "0"
          },
          "requires" : {
-            "Carp::Clan" : "0",
+            "Carp::Object" : "0",
             "Clone" : "0",
             "DBI" : "0",
             "Data::Structure::Util" : "0",
@@ -61,7 +61,10 @@
    "provides" : {
       "DBIx::DataModel" : {
          "file" : "lib/DBIx/DataModel.pm",
-         "version" : "3.10"
+         "version" : "3.11"
+      },
+      "DBIx::DataModel::Carp" : {
+         "file" : "lib/DBIx/DataModel/Carp.pm"
       },
       "DBIx::DataModel::Compatibility::V0" : {
          "file" : "lib/DBIx/DataModel/Compatibility/V0.pm"
@@ -190,6 +193,6 @@
          "url" : "https://github.com/damil/DBIx-DataModel"
       }
    },
-   "version" : "3.10",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "3.11",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

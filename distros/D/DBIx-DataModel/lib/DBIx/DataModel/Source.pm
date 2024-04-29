@@ -12,7 +12,7 @@ use List::MoreUtils              qw/firstval/;
 use Module::Load                 qw/load/;
 use Scalar::Util                 qw/refaddr/;
 use Storable                     qw/freeze/;
-use Carp::Clan                   qw[^(DBIx::DataModel::|SQL::Abstract)];
+use DBIx::DataModel::Carp;
 use DBIx::DataModel::Meta::Utils qw/does/;
 
 use namespace::clean;

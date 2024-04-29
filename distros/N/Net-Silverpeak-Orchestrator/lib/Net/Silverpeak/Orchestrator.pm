@@ -1,5 +1,5 @@
 package Net::Silverpeak::Orchestrator;
-$Net::Silverpeak::Orchestrator::VERSION = '0.011000';
+$Net::Silverpeak::Orchestrator::VERSION = '0.012000';
 # ABSTRACT: Silverpeak Orchestrator REST API client library
 
 use 5.024;
@@ -282,6 +282,14 @@ sub get_ha_groups_by_id ($self) {
 }
 
 
+sub list_groups ($self) {
+    my $res = $self->get('/gms/rest/gms/group');
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
 sub get_deployment ($self, $id) {
     my $res = $self->_is_version_93
         ? $self->get("/gms/rest/deployment?nePk=$id")
@@ -527,7 +535,7 @@ Net::Silverpeak::Orchestrator - Silverpeak Orchestrator REST API client library
 
 =head1 VERSION
 
-version 0.011000
+version 0.012000
 
 =head1 SYNOPSIS
 
@@ -665,6 +673,10 @@ Returns a hashref with additional infos about the appliance like its location.
 =head2 get_ha_groups_by_id
 
 Returns a hashref of HA groups indexed by their id.
+
+=head2 list_groups
+
+Returns an arrayref of appliance groups.
 
 =head2 get_deployment
 

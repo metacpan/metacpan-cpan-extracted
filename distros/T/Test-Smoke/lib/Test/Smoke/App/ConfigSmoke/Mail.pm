@@ -2,6 +2,8 @@ package Test::Smoke::App::ConfigSmoke::Mail;
 use warnings;
 use strict;
 
+our $VERSION = '0.001';
+
 use Exporter 'import';
 our @EXPORT = qw/ config_mail /;
 

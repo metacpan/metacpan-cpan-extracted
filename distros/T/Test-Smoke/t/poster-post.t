@@ -21,6 +21,9 @@ use Test::Smoke::Util::FindHelpers 'has_module';
 if (!has_module('HTTP::Daemon')) {
     plan skip_all => "Need 'HTTP::Daemon' for this test!";
 }
+use File::Copy qw/copy/;
+use File::Temp qw/tempdir/;
+use File::Spec::Functions;
 require URI;
 require HTTP::Daemon;
 require HTTP::Status; HTTP::Status->import('RC_OK', 'RC_NOT_IMPLEMENTED');
@@ -31,6 +34,7 @@ my $debug = $ENV{SMOKE_DEBUG};
 
 my ($pid, $daemon, $url);
 
+my $tempdir = tempdir(CLEANUP => 1);
 my $timeout = 60;
 my $jsnfile = 'testsuite.jsn';
 my $sockhost;
@@ -69,8 +73,23 @@ my $sockhost;
                     $data  =  2 if $r->header('User-Agent') =~ /Test::Smoke/;
                     eval {
                         $data += 40 if decode_json($json)->{sysinfo} eq $^O;
-                    };
-                    $data = $@ if $@;
+                        1;
+                    } or $data = $@ || 'decode_json-error';
+                    my $response = HTTP::Response->new(
+                        RC_OK(), "OK",
+                        HTTP::Headers->new('Content-Type', 'application/json'),
+                        encode_json({id => $data}),
+                    );
+                    $c->send_response($response);
+                }
+                elsif ($r->method eq 'POST' && $r->uri->path eq '/api/report') {
+                    my $json = encode_json(decode_json($r->decoded_content)->{report_data});
+                    my $data;
+                    $data  =  2 if $r->header('User-Agent') =~ /Test::Smoke/;
+                    eval {
+                        $data += 40 if decode_json($json)->{sysinfo} eq $^O;
+                        1;
+                    } or $data = $@ || 'decode_json-error';
                     my $response = HTTP::Response->new(
                         RC_OK(), "OK",
                         HTTP::Headers->new('Content-Type', 'application/json'),
@@ -85,7 +104,8 @@ my $sockhost;
                         uri_unescape($r->decoded_content),
                     );
                     $c->send_response($response);
-                    diag("<<<Error: @{[$r->as_string]}>>>");
+                    note(">>>Error: @{[$r->as_string]}<<<")
+                        unless $r->uri->path eq '/api/report-error';
                 }
                 $c->close;
             }
@@ -111,11 +131,12 @@ my $sysinfo = { sysinfo => $^O };
 SKIP: {
     skip("Could not load LWP::UserAgent", 3) if !has_module('LWP::UserAgent');
 
+    (my $sdb_url = $url->clone)->path('/report');
     my $poster = Test::Smoke::Poster->new(
         'LWP::UserAgent',
-        ddir        => 't',
-        jsnfile     => 'testsuite.jsn',
-        smokedb_url => "${url}report",
+        ddir        => $tempdir,
+        jsnfile     => $jsnfile,
+        smokedb_url => $sdb_url->as_string,
         v           => $debug ? 2 : 0,
     );
     isa_ok($poster, 'Test::Smoke::Poster::LWP_UserAgent');
@@ -123,7 +144,29 @@ SKIP: {
     ok(write_json($poster->json_filename, $sysinfo), "write_json");
     my $response = eval { $poster->post() };
     $response = $@ if $@;
-    is($response, 42, "Got id (LWP::Useragent: ${url}report)")
+    is($response, 42, "Got id (LWP::Useragent: $sdb_url")
+        or diag(explain({poster => $poster, response => $response}));
+
+    unlink $poster->json_filename;
+}
+
+SKIP: {
+    skip("Could not load LWP::UserAgent", 3) if !has_module('LWP::UserAgent');
+
+    (my $sdb_url = $url->clone)->path('/api/report');
+    my $poster = Test::Smoke::Poster->new(
+        'LWP::UserAgent',
+        ddir        => $tempdir,
+        jsnfile     => $jsnfile,
+        smokedb_url => $sdb_url->as_string,
+        v           => $debug ? 2 : 0,
+    );
+    isa_ok($poster, 'Test::Smoke::Poster::LWP_UserAgent');
+
+    ok(write_json($poster->json_filename, $sysinfo), "write_json");
+    my $response = eval { $poster->post() };
+    $response = $@ if $@;
+    is($response, 42, "Got id (LWP::Useragent: $sdb_url")
         or diag(explain({poster => $poster, response => $response}));
 
     unlink $poster->json_filename;
@@ -139,13 +182,14 @@ SKIP: {
     my $needs_globoff = $is_v6_address &&
         (version->parse($cv) < version->parse("7.68.0"));
 
+    (my $sdb_url = $url->clone)->path('/report');
     my $poster = Test::Smoke::Poster->new(
         'curl',
-        ddir        => 't',
-        jsnfile     => 'testsuite.jsn',
-        smokedb_url => qq{"${url}report"},
+        ddir        => $tempdir,
+        jsnfile     => $jsnfile,
+        smokedb_url => $sdb_url->as_string,
         curlbin     => $curlbin,
-        ($needs_globoff ? (curlargs => ['--globoff']) : ()),
+        ($needs_globoff ? (curlargs => ['--globoff', '-s']) : ()),
         v           => $debug ? 2 : 0,
     );
     isa_ok($poster, 'Test::Smoke::Poster::Curl');
@@ -153,7 +197,38 @@ SKIP: {
     ok(write_json($poster->json_filename, $sysinfo), "write_json");
     my $response = eval { $poster->post() };
     $response = $@ if $@;
-    is($response, 42, "Got id (curl: ${url}report) curl v$cv")
+    is($response, 42, "Got id (curl: $sdb_url curl v$cv")
+        or diag(explain({poster => $poster, response => $response}));
+
+    unlink $poster->json_filename;
+}
+
+SKIP: {
+    my $curlbin = whereis('curl');
+    skip("Could not find curl", 3) if !$curlbin;
+    my $curl_version = qx{$curlbin --version};
+    my $cv = $curl_version =~ m{curl ([0-9.]+)} ? $1 : '0';
+
+    my $is_v6_address = $url =~ m{^ https?://\[ [0-9a-fA-F:]+ \] /? }x;
+    my $needs_globoff = $is_v6_address &&
+        (version->parse($cv) < version->parse("7.68.0"));
+
+    (my $sdb_url = $url->clone)->path('/api/report');
+    my $poster = Test::Smoke::Poster->new(
+        'curl',
+        ddir        => $tempdir,
+        jsnfile     => $jsnfile,
+        smokedb_url => $sdb_url->as_string,
+        curlbin     => $curlbin,
+        ($needs_globoff ? (curlargs => ['--globoff', '-s']) : ()),
+        v           => $debug ? 2 : 0,
+    );
+    isa_ok($poster, 'Test::Smoke::Poster::Curl');
+
+    ok(write_json($poster->json_filename, $sysinfo), "write_json");
+    my $response = eval { $poster->post() };
+    $response = $@ if $@;
+    is($response, 42, "Got id (curl: $sdb_url curl v$cv")
         or diag(explain({poster => $poster, response => $response}));
 
     unlink $poster->json_filename;
@@ -165,11 +240,12 @@ SKIP: {
         if    $sockhost eq '::'
           and version->parse($HTTP::Tiny::VERSION) < version->parse("0.042");
 
+    (my $sdb_url = $url->clone)->path('/report');
     my $poster = Test::Smoke::Poster->new(
         'HTTP::Tiny',
-        ddir        => 't',
-        jsnfile     => 'testsuite.jsn',
-        smokedb_url => "${url}report",
+        ddir        => $tempdir,
+        jsnfile     => $jsnfile,
+        smokedb_url => $sdb_url->as_string,
         v           => $debug ? 2 : 0,
     );
     isa_ok($poster, 'Test::Smoke::Poster::HTTP_Tiny');
@@ -177,12 +253,117 @@ SKIP: {
     ok(write_json($poster->json_filename, $sysinfo), "write_json");
     my $response = eval { $poster->post() };
     $response = $@ if $@;
-    is($response, 42, "Got id (HTTP::Tiny: ${url}report")
+    is($response, 42, "Got id (HTTP::Tiny: $sdb_url")
         or diag(explain({poster => $poster, response => $response}));
 
     unlink $poster->json_filename;
 }
 
+SKIP: {
+    skip("Could not load HTTP::Tiny", 3) if ! has_module('HTTP::Tiny');
+    skip("HTTP::Tiny too old $HTTP::Tiny::VERSION (IPv6 support >= 0.042)", 3)
+        if    $sockhost eq '::'
+          and version->parse($HTTP::Tiny::VERSION) < version->parse("0.042");
+
+    (my $sdb_url = $url->clone)->path('/api/report');
+    my $poster = Test::Smoke::Poster->new(
+        'HTTP::Tiny',
+        ddir        => $tempdir,
+        jsnfile     => $jsnfile,
+        smokedb_url => $sdb_url->as_string,
+        v           => $debug ? 2 : 0,
+    );
+    isa_ok($poster, 'Test::Smoke::Poster::HTTP_Tiny');
+
+    ok(write_json($poster->json_filename, $sysinfo), "write_json");
+    my $response = eval { $poster->post() };
+    $response = $@ if $@;
+    is($response, 42, "Got id (HTTP::Tiny: $sdb_url")
+        or diag(explain({poster => $poster, response => $response}));
+
+    unlink $poster->json_filename;
+}
+
+SKIP: {
+    skip("Could not load HTTP::Tiny", 3) if ! has_module('HTTP::Tiny');
+    skip("HTTP::Tiny too old $HTTP::Tiny::VERSION (IPv6 support >= 0.042)", 3)
+        if    $sockhost eq '::'
+          and version->parse($HTTP::Tiny::VERSION) < version->parse("0.042");
+
+    # Capture the log statements
+    $Test::Smoke::LogMixin::USE_TIMESTAMP = 0;
+    open(my $out, '>', \my $outbuffer);
+    my $old_out = select($out);
+
+    # Prepare a .patch-file and archive directory
+    my $patch_level = "654321";
+    my $adir = catdir($tempdir, "archive");
+    mkdir($adir) or die "Cannot mkdir($adir): $!";
+    open(my $pl, '>', catfile($tempdir, '.patch'));
+    print {$pl} $patch_level;
+    close($pl);
+    my $qfile = catfile($tempdir, "archive.qfile");
+
+    # Set a URL that is not supported by the test-daemon,
+    # so we get an error.
+    (my $sdb_url = $url->clone)->path('/api/report-error');
+    my $poster = Test::Smoke::Poster->new(
+        'HTTP::Tiny',
+        ddir        => $tempdir,
+        jsnfile     => $jsnfile,
+        qfile       => $qfile,
+        smokedb_url => $sdb_url->as_string,
+        v           => $debug ? 2 : 0,
+    );
+    isa_ok($poster, 'Test::Smoke::Poster::HTTP_Tiny');
+
+    # Prepare the Queue.
+    require Test::Smoke::PostQueue;
+    my $queue = Test::Smoke::PostQueue->new(
+        adir   => $adir,
+        qfile  => $qfile,
+        poster => $poster,
+        v      => 1,
+    );
+    isa_ok($queue, 'Test::Smoke::PostQueue');
+
+    # Try to post, but it should fail, and queue this report.
+    ok(write_json($poster->json_filename, $sysinfo), "write_json");
+    my $response = eval { $poster->post() };
+    $response = $@ if $@;
+    is(
+        $response,
+        undef,
+        "Posting the report failed (ok)"
+    ) or diag(explain({poster => $poster, response => $response}));
+
+    # Copy the jsn to "the archive" $adir.
+    copy($poster->json_filename, catfile($adir, "jsn$patch_level.jsn"));
+
+    # Check the queue
+    ok(-e $qfile, "Queue exists");
+    open(my $fh, '<', $qfile) or die "Cannot open($qfile): $!";
+    chomp(my @q = <$fh>);
+    close($fh);
+    is_deeply(\@q, [ $patch_level ], "Queue has the correct items");
+
+    # Fix the poster URL and handle the queue
+    $sdb_url->path('/report');
+    $poster->smokedb_url($sdb_url->as_string);
+    $queue->handle();
+    is(-s $qfile, 0, "All queue items reposted");
+
+    select($old_out);
+
+    is($outbuffer, <<EOL, "Logfile ok");
+POST failed: 501 NOT IMPLEMENTED ({"report_data": {"sysinfo":"$^O"}})
+Posted 654321 from queue: report_id = 42
+EOL
+
+    unlink $poster->json_filename;
+}
+
+ENDTEST:
 Test::NoWarnings::had_no_warnings();
 $Test::NoWarnings::do_end_test = 0;
 done_testing();

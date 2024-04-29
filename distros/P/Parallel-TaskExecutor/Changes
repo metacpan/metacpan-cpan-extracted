@@ -1,5 +1,9 @@
 Revision history for Perl distribution IPC-Perl
 
+0.04 - 2024-04-28
+
+ - Correctly wait for done tasks when trying to add new ones beyond the limit.
+
 0.03 - 2024-04-24
 
  - Switch to using Log::Any::Simple instead of Log4perl directly.

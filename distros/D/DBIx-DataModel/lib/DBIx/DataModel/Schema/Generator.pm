@@ -8,13 +8,12 @@ package DBIx::DataModel::Schema::Generator;
 use strict;
 use warnings;
 no warnings 'uninitialized';
-use Carp;
+use DBIx::DataModel::Carp;
 use List::Util   qw/max/;
 use Exporter     qw/import/;
 use DBI;
 use Try::Tiny;
 use Module::Load ();
-use Carp::Clan   qw[^(DBIx::DataModel::|SQL::Abstract)];
 
 
 our @EXPORT = qw/fromDBIxClass fromDBI/;

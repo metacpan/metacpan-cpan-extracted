@@ -5,14 +5,13 @@ use warnings;
 use strict;
 use warnings;
 
-use Carp;
+use DBIx::DataModel::Carp;
 use Module::Load               qw/load/;
 use Params::Validate           qw/validate_with SCALAR ARRAYREF CODEREF
                                                 BOOLEAN OBJECT HASHREF/;
 use List::MoreUtils            qw/any/;
 use mro                        qw/c3/;
 use SQL::Abstract::More 1.39;
-use Carp::Clan                 qw[^(DBIx::DataModel::|SQL::Abstract)];
 
 # utility function 'does' imported by hand because not really meant
 # to be publicly exportable from SQL::Abstract::More
