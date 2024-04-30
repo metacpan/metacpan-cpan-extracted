@@ -55,6 +55,7 @@ sub test_seek_tell {
 	is( $iter->progress, 0, 'progress=0' );
 	is_deeply( $iter->(), $expected_data[0][0], 'correct first row' );
 	is( $iter->row, 1, 'row=1' );
+	is( $iter->dataset_idx, 0, 'dataset_idx=0' );
 	$iter->seek($pos);
 	is( $iter->row, 0, 'row=0' );
 	is( $iter->progress, 0, 'progress=0 again' );
@@ -73,12 +74,18 @@ sub test_multiple_tables {
 	my $iter= $dec->iterator;
 	is_deeply( $iter->(), $expected_data[0][0], 'correct first row' );
 	my $pos= $iter->tell;
+	is( $iter->dataset_idx, 0, 'dataset_idx=0' );
 	ok( $iter->next_dataset, 'next_dataset' );
 	for (@{ $expected_data[1] }) {
 		is_deeply( $iter->(), $_, $iter->position );
 	}
+	is( $iter->dataset_idx, 1, 'dataset_idx=1' );
 	$iter->seek($pos);
+	is( $iter->dataset_idx, 0, 'dataset_idx=0' );
 	is_deeply( $iter->(), $expected_data[0][1], 'correct second row' );
+	ok( $iter->next_dataset, 'next_dataset' );
+	ok( !$iter->next_dataset, 'no third dataset' );
+	is( $iter->dataset_idx, 1, 'dataset_idx=1' );
 	
 	done_testing;
 }

@@ -9,7 +9,7 @@ require Exporter;
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(perl_tokens);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =encoding utf8
 
@@ -19,7 +19,7 @@ Perl::Tokenizer - A tiny Perl code tokenizer.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
@@ -581,7 +581,7 @@ sub perl_tokens(&$) {
         }
 
         if ($code =~ m{\G$perl_filetests\b}gco) {
-            my @pos = ($-[0], $+[0]);
+            my @pos          = ($-[0], $+[0]);
             my $is_bare_word = ($code =~ /\G(?=\h*=>)/);
 
             $callback->(($is_bare_word ? 'bare_word' : 'file_test'), @pos);
@@ -819,11 +819,11 @@ L<https://github.com/trizen/Perl-Tokenizer>
 
 =head1 AUTHOR
 
-Daniel "Trizen" Șuteu, E<lt>trizen@protonmail.comE<gt>
+Daniel Șuteu, C<< <trizen at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2017
+Copyright (C) 2013-2017 Daniel Șuteu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.22.0 or,

@@ -12,7 +12,7 @@ sub default_xlsx_module {
 }
 
 # ABSTRACT: Access sheets/rows of a modern Microsoft Excel workbook
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 
 sub _build_workbook {
@@ -49,7 +49,7 @@ Data::TableReader::Decoder::XLSX - Access sheets/rows of a modern Microsoft Exce
 
 =head1 VERSION
 
-version 0.015
+version 0.020
 
 =head1 DESCRIPTION
 

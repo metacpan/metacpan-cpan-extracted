@@ -21,6 +21,7 @@ my @argv = qw(
     --both 99
     Everything
     --paranoid Marvin
+    --ind-1 42
     );
 
 BEGIN {
@@ -29,6 +30,8 @@ BEGIN {
 
 use App::Foo;
 $App::Foo::DEFAULT = 42;
+$App::Foo::ind_1 = 101;
+$App::Foo::ind_2 = 102;
 @argv = (my $app = App::Foo->new)->run(@argv);
 
 is_deeply($app->{string}, "Alice", "String");
@@ -51,5 +54,7 @@ if ($App::Foo::TAKE_IT_ALL) {
 }
 is_deeply($app->{default}, 99, "normal default");
 is_deeply($app->{lazy}, 42, "lazy default");
+is_deeply($App::Foo::ind_1, 42, "indirect variable");
+is_deeply($App::Foo::ind_2, 102, "indirect variable");
 
 done_testing;

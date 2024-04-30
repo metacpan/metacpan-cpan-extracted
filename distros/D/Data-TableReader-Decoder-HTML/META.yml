@@ -3,7 +3,7 @@ abstract: 'HTML support for Data::TableReader'
 author:
   - 'Michael Conrad <mike@nrdvana.net>'
 build_requires:
-  Data::TableReader: '0.09'
+  Data::TableReader: '0.015'
   File::Spec::Functions: '0'
   FindBin: '0'
   Log::Any: '0'
@@ -23,7 +23,7 @@ meta-spec:
 name: Data-TableReader-Decoder-HTML
 requires:
   Carp: '0'
-  Data::TableReader: '0.09'
+  Data::TableReader: '0.015'
   Data::TableReader::Decoder: '0'
   Data::TableReader::Iterator: '0'
   HTML::Parser: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/nrdvana/perl-Data-TableReader/issues
   homepage: https://github.com/nrdvana/perl-Data-TableReader
   repository: https://github.com/nrdvana/perl-Data-TableReader.git
-version: '0.015'
+version: '0.020'
 x_contributors:
   - 'Christian Walde <walde.christian@gmail.com>'
 x_generated_by_perl: v5.36.0

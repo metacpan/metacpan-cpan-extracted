@@ -2,8 +2,8 @@ Build.PL
 Changes
 INSTALL
 lib/Module/Build/Convert.pm
-Makefile.PL
 MANIFEST			This list of files
+META.json
 META.yml
 README
 scripts/make2build

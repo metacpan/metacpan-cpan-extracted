@@ -45,8 +45,9 @@ no_index:
 provides:
   UUID:
     file: UUID.pm
-    version: '0.33'
+    version: '0.34'
 requires:
+  Carp: '0'
   DynaLoader: '0'
   Exporter: '0'
   Time::HiRes: '0'
@@ -54,6 +55,6 @@ requires:
   strict: '0'
   vars: '0'
   warnings: '0'
-version: '0.33'
+version: '0.34'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
 

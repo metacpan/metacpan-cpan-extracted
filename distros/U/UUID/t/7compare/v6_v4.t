@@ -30,7 +30,7 @@ ok 1, 'loaded';
 
 {# string
     my $u0 = uuid6();
-    my $u1 = uuid7();
+    my $u1 = uuid4();
     isnt $u0, $u1, 'string equal 0';
 
     my $t0 = compare($u0, $u1);

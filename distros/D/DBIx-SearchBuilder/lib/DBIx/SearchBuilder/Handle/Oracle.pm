@@ -446,6 +446,10 @@ sub HasSupportForNullsOrder {
     return 1;
 }
 
+sub HasSupportForEmptyString {
+    return 0;
+}
+
 sub CastAsDecimal {
     my $self  = shift;
     my $field = shift or return;

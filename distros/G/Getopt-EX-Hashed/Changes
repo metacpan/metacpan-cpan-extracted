@@ -1,5 +1,14 @@
 Revision history for Perl extension Getopt-EX-Hashed
 
+1.0601 2024-04-30T02:12:00Z
+
+    - update document
+
+1.06 2024-04-29T12:34:52Z
+
+    - Support "default => \$scalar" style option storage.
+      I guess former Getopt::Long supported this.
+
 1.0503 2022-08-28T13:14:36Z
 
     - defining existing function causes fatal error

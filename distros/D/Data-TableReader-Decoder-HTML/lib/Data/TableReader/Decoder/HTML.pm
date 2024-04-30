@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::HTML;
-$Data::TableReader::Decoder::HTML::VERSION = '0.015';
+$Data::TableReader::Decoder::HTML::VERSION = '0.020';
 use Moo 2;
 use Try::Tiny;
 use Carp;
@@ -145,6 +145,10 @@ sub Data::TableReader::Decoder::HTML::_Iter::row {
 	${ shift->_fields->{row_i} };
 }
 
+sub Data::TableReader::Decoder::HTML::_Iter::dataset_idx {
+	${ shift->_fields->{table_i} }
+}
+
 sub Data::TableReader::Decoder::HTML::_Iter::progress {
 	my $f= shift->_fields;
 	return ! $f->{total_records}? 0
@@ -170,7 +174,7 @@ sub Data::TableReader::Decoder::HTML::_Iter::seek {
 
 sub Data::TableReader::Decoder::HTML::_Iter::next_dataset {
 	my $f= $_[0]->_fields;
-	return if ${$f->{table_i}} >= @{$f->{tables}};
+	return 0 if ${$f->{table_i}} >= $#{$f->{tables}};
 	$_[0]->seek([ ${$f->{table_i}}+1, 0 ]);
 }
 
@@ -188,7 +192,7 @@ Data::TableReader::Decoder::HTML - Access the tables of an HTML document
 
 =head1 VERSION
 
-version 0.015
+version 0.020
 
 =head1 DESCRIPTION
 

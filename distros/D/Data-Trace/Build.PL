@@ -6,7 +6,18 @@ use warnings;
 use Module::Build;
 Module::Build->VERSION( '0.4004' );
 
-my $builder = Module::Build->new(
+my $class = Module::Build->subclass(
+    code => q{
+        sub ACTION_readme {
+            my ($s) = @_;
+            print "Building README\n";
+            system "pod2markdown lib/Data/Trace.pm > README.md";
+        }
+    },
+);
+$class->ACTION_readme();
+
+my $builder = $class->new(
     module_name        => 'Data::Trace',
     license            => 'artistic_2',
     dist_author        => q{Tim Potapov <tim.potapov@gmail.com>},
@@ -22,7 +33,12 @@ my $builder = Module::Build->new(
         'perl'        => '5.006',
         'Data::DPath' => '0.58',
     },
-    add_to_cleanup => ['Data-Trace-*'],
+    add_to_cleanup => [
+        'Data-Trace-*',
+        'MANIFEST*.bak',
+        'README*',
+        'blib/',
+    ],
     meta_merge     => {
         resources => {
             bugtracker => 'https://github.com/poti1/data-trace/issues',

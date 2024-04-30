@@ -108,9 +108,11 @@ sub manifest_extras {
         grep { ! m{ulib/gen.o}      }
         grep { ! m{ulib/gettime.o}  }
         grep { ! m{ulib/isnull.o}   }
+        grep { ! m{ulib/md5.o}      }
         grep { ! m{ulib/node.o}     }
         grep { ! m{ulib/pack.o}     }
         grep { ! m{ulib/parse.o}    }
+        grep { ! m{ulib/sha1.o}     }
         grep { ! m{ulib/splitmix.o} }
         grep { ! m{ulib/unpack.o}   }
         grep { ! m{ulib/unparse.o}  }

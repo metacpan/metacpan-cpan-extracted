@@ -25,6 +25,7 @@ my $app = Plack::App::Tags::HTML->new(
         'component' => 'Tags::HTML::Container',
         'data' => [sub {
                 my $self = shift;
+                $login->process_css;
                 $login->process;
                 return;
         }],

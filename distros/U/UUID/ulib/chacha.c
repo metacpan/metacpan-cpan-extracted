@@ -166,11 +166,18 @@ static U32 cc_refill(pUCXT) {
   return cc->have;
 }
 
+static void cc_srandp(pUCXT, Pid_t pid) {
+  UCXT.cc.pid = pid;
+  cc_srand(aUCXT);
+}
+
 /* API */
 
 void cc_srand(pUCXT) {
   U64     d, n, *cp;
   UCHAR   data[40];
+
+  UCXT.cc.pid = getpid();
 
   cp = (U64*)&data;
 
@@ -193,6 +200,10 @@ void cc_srand(pUCXT) {
 void cc_rand16(pUCXT, U16 *out) {
   cc_st *cc = &UCXT.cc;
   UCHAR *ptr;
+  Pid_t pid;
+
+  if (cc->pid != (pid = getpid()))
+    cc_srandp(aUCXT, pid);
 
   if (cc->have < 2) cc_refill(aUCXT);
   ptr = cc->buf + CC_BUFSZ - cc->have;
@@ -204,6 +215,10 @@ void cc_rand16(pUCXT, U16 *out) {
 void cc_rand32(pUCXT, U32 *out) {
   cc_st *cc = &UCXT.cc;
   UCHAR *ptr;
+  Pid_t pid;
+
+  if (cc->pid != (pid = getpid()))
+    cc_srandp(aUCXT, pid);
 
   if (cc->have < 4) cc_refill(aUCXT);
   ptr = cc->buf + CC_BUFSZ - cc->have;
@@ -215,6 +230,10 @@ void cc_rand32(pUCXT, U32 *out) {
 void cc_rand64(pUCXT, U64 *out) {
   cc_st *cc = &UCXT.cc;
   UCHAR *ptr;
+  Pid_t pid;
+
+  if (cc->pid != (pid = getpid()))
+    cc_srandp(aUCXT, pid);
 
   if (cc->have < 8) cc_refill(aUCXT);
   ptr = cc->buf + CC_BUFSZ - cc->have;
@@ -227,6 +246,10 @@ void cc_rand128(pUCXT, void *out) {
   cc_st *cc = &UCXT.cc;
   U64   a, b;
   UCHAR *ptr;
+  Pid_t pid;
+
+  if (cc->pid != (pid = getpid()))
+    cc_srandp(aUCXT, pid);
 
   if (cc->have < 16) cc_refill(aUCXT);
   ptr = cc->buf + CC_BUFSZ - cc->have;

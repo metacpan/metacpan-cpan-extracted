@@ -152,6 +152,49 @@ subtest array_at_end => sub {
 	is( $i->(), undef, 'eof' );
 };
 
+subtest multiple_arrays => sub {
+	my $ex= new_ok( 'Data::TableReader', [
+			input => [
+				[qw( a b b b c d d d e )],
+				[qw( 1 2 3 4 5 6 7 8 9 )],
+			],
+			fields => [
+				'a',
+				{ name => 'b', array => 1 },
+				'c',
+				{ name => 'd', array => 1 },
+				'e',
+			],
+			log => \my @messages,
+		], 'TableReader' );
+	ok( $ex->find_table, 'found table' ) or diag explain \@messages;
+	is_deeply( $ex->field_map, { a => 0, b => [1,2,3], c => 4, d => [5,6,7], e => 8 }, 'field_map' );
+	my $i= $ex->iterator;
+	is_deeply( $i->(), { a => 1, b => [2,3,4], c => 5, d => [6,7,8], e => 9 }, 'row1' );
+	is( $i->(), undef, 'eof' );
+};
+
+subtest discontinuous_array => sub {
+	my $ex= new_ok( 'Data::TableReader', [
+			input => [
+				[qw( a b b b c b b e )],
+				[qw( 1 2 3 4 5 6 7 8 )],
+			],
+			fields => [
+				'a',
+				{ name => 'b', array => 1 },
+				'c',
+				'e',
+			],
+			log => \my @messages,
+		], 'TableReader' );
+	ok( $ex->find_table, 'found table' ) or diag explain \@messages;
+	is_deeply( $ex->field_map, { a => 0, b => [1,2,3,5,6], c => 4, e => 7 }, 'field_map' );
+	my $i= $ex->iterator;
+	is_deeply( $i->(), { a => 1, b => [2,3,4,6,7], c => 5, e => 8 }, 'row1' );
+	is( $i->(), undef, 'eof' );
+};
+
 subtest complex_follows => sub {
 	my $ex= new_ok( 'Data::TableReader', [
 			input => [

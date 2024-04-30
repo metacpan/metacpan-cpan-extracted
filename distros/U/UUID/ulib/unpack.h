@@ -3,7 +3,8 @@
 
 #include "ulib/UUID.h"
 
-void uu_unpack(const uu_t in, struct_uu1_t *out);
+/* unpack uu string, big-endian, to uuid struct */
+void uu_unpack(const uu_t in, struct_uu_t *out);
 
 #endif
 /* ex:set ts=2 sw=2 itab=spaces: */

@@ -17,7 +17,7 @@ use IO::Prompt ();
 use PPI ();
 use Text::Balanced ();
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 use constant LEADCHAR => '* ';
 
@@ -1589,6 +1589,9 @@ Module::Build::Convert - Makefile.PL to Build.PL converter
 
 =head1 DESCRIPTION
 
+B<This module is highly experimental und use at own risk. It originated when I was a
+novice programmer, thus I apologize for some messy code.>
+
 C<ExtUtils::MakeMaker> has been a de-facto standard for the common distribution of Perl
 modules; C<Module::Build> is expected to supersede C<ExtUtils::MakeMaker> in some time
 (part of the Perl core as of 5.9.4).
@@ -1833,6 +1836,6 @@ Steven Schubiger <schubiger@cpan.org>
 This program is free software; you may redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See L<http://www.perl.com/perl/misc/Artistic.html>
+See L<http://dev.perl.org/licenses/>
 
 =cut

@@ -21,54 +21,48 @@ sub t (&) {
 }
 
 my ($rv, $er);
+my $FILE = __FILE__;
+$FILE =~ s/\\/\\\\/g; # windows!
 
 ##############################################################################
 # make sure we can get the state path.
 #
 
 # default statepath is disabled, so undef.
-($rv,$er) = t{ UUID::_statepath() };
-is $rv, undef, 'statepath seems to work';
-is $er, undef, 'statepath works';
-
-# get statepath, with args.
-($rv,$er) = t{ UUID::_statepath(0) };
-is $rv, undef,        'statepath with too many dies';
-like $er, qr/Usage:/, 'statepath with too many error';
+($rv,$er) = t{ UUID::_persist() };
+is $rv, undef, 'default path seems correct';
+is $er, undef, 'default path correct';
 
 ##############################################################################
 # set state path.
 #
 
-# set to custom
-($rv,$er) = t{ UUID::_persist('foo') };
+# set to custom (use number as test)
+($rv,$er) = t{ UUID::_persist(8675309) };
 ok $rv,        'persist seems to work';
 is $er, undef, 'persist works';
 
 # check
-($rv,$er) = t{ UUID::_statepath() };
-is $rv, 'foo', 'path correct';
-is $er, undef, 'path correct no error';
-
-# set to custom, too few args
 ($rv,$er) = t{ UUID::_persist() };
-is $rv, undef,        'persist too few seems to die';
-like $er, qr/Usage:/, 'persist too few dies';
+is $rv, '8675309', 'path correct';
+is $er, undef,     'path correct no error';
 
-# recheck
-($rv,$er) = t{ UUID::_statepath() };
-is $rv, 'foo', 'path still correct';
-is $er, undef, 'path still correct no error';
+# recheck (as number)
+($rv,$er) = t{ UUID::_persist() };
+is $rv, 8675309, 'path still correct';
+is $er, undef,   'path still correct no error';
 
 # set to custom, too many args
 ($rv,$er) = t{ UUID::_persist(qw(foo bar bam)) };
-is $rv, undef,        'persist too many seems to die';
-like $er, qr/Usage:/, 'persist too many dies';
+#note $er;
+is $rv, undef,               'persist too many seems to die';
+like $er, qr/Usage:/,        'persist too many dies';
+like $er, qr/at $FILE line/, 'persist too many location';
 
 # rerecheck
-($rv,$er) = t{ UUID::_statepath() };
-is $rv, 'foo', 'path really still correct';
-is $er, undef, 'path really still correct no error';
+($rv,$er) = t{ UUID::_persist() };
+is $rv, '8675309', 'path really still correct';
+is $er, undef,     'path really still correct no error';
 
 ##############################################################################
 # disable state paths.
@@ -80,7 +74,7 @@ is $rv, 1,     'persist undef seems to work';
 is $er, undef, 'persist undef works';
 
 # check
-($rv,$er) = t{ UUID::_statepath() };
+($rv,$er) = t{ UUID::_persist() };
 is $rv, undef, 'disable seems correct';
 is $er, undef, 'disable correct';
 

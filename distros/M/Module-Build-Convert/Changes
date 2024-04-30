@@ -1,5 +1,25 @@
 Revision history for Perl extension Module::Build::Convert.
 
+0.50  2024-04-29  <schubiger@cpan.org>
+
+ - Mark module as highly experimental.
+
+ - Update broken license link.
+
+ - Run bogus test instead of true ones.
+
+ - Skip documentation tests for non-release testing.
+
+ - Do no longer recommend Test::Pod and Test::Pod::Coverage.
+
+ - Remove the testing diagnostic.
+
+ - Move testing module to test_requires.
+
+ - Drop generating compat Makefile.PL.
+
+ - Add metadata repository link.
+
 0.49 Wed Aug 15 23:17:25 CEST 2007
 
  - Merged development version to stable.

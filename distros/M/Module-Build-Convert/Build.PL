@@ -26,15 +26,15 @@ my $build = Module::Build->new
                  'PPI' => 0,
                  'Text::Balanced' => 0,
                },
-   build_requires => { 'Test::More' => 0 },
-   recommends => {
-                   'Test::Pod' => '1.14',
-                   'Test::Pod::Coverage' => '1.04',
-                 },
+   test_requires => { 'Test::More' => 0 },
    script_files => [ 'scripts/make2build' ],
    license => 'perl',
    create_readme => 1,
-   create_makefile_pl => 'traditional',
+   meta_merge => {
+       resources => {
+           repository => 'https://github.com/stsc/Module-Build-Convert',
+       },
+   },
   );
 
 $build->create_build_script;

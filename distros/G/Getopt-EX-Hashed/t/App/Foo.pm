@@ -28,6 +28,8 @@ if (defined our $REMOVE_UNDERSCORE) {
 }
 
 our $DEFAULT = 99;
+our $ind_1;
+our $ind_2;
 
 has string   => ( spec => '=s' );
 has say      => ( spec => '=s', default => "Hello" );
@@ -42,6 +44,8 @@ has list     => ( spec => '=s@' );
 has hash     => ( spec => '=s%' );
 has lazy     => ( spec => ''), default => sub { $DEFAULT };
 has default  => ( spec => ''), default => $DEFAULT;
+has ind_1 => ( spec => '=i'), default => \$ind_1;
+has ind_2 => ( spec => '=i'), default => \$ind_2;
 
 # imcremental coderef
 has [ qw( left right both ) ] => ( spec => '=i' );

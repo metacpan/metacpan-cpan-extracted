@@ -64,7 +64,7 @@
    "provides" : {
       "Mojolicious::Plugin::Cron::Scheduler" : {
          "file" : "lib/Mojolicious/Plugin/Cron/Scheduler.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/tyrrminal/mojolicious-plugin-cron-scheduler.git"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "MIT"

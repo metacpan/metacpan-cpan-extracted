@@ -11,7 +11,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(check_language check_language_639_1 check_language_639_2);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 sub check_language {
 	my ($self, $key) = @_;
@@ -87,9 +87,8 @@ Mo::utils::Language - Mo language utilities.
 
 =head1 SYNOPSIS
 
- use Mo::utils::Language qw(check_language check_language_639_1 check_language_639_2);
+ use Mo::utils::Language qw(check_language_639_1 check_language_639_2);
 
- check_language($self, $key);
  check_language_639_1($self, $key);
  check_language_639_2($self, $key);
 
@@ -103,6 +102,10 @@ Mo language utilities for checking of data objects.
 
  check_language($self, $key);
 
+B<It is deprecated, use other checks.>
+
+I<Since version 0.01. Described functionality since version 0.04.>
+
 Check parameter defined by C<$key> if it's ISO 639-1 language code and if language exists.
 Value could be undefined.
 
@@ -112,6 +115,8 @@ Returns undef.
 
  check_language_639_1($self, $key);
 
+I<Since version 0.05.>
+
 Check parameter defined by C<$key> if it's ISO 639-1 language code and if language code exists.
 Value could be undefined.
 
@@ -120,6 +125,8 @@ Returns undef.
 =head2 C<check_language_639_2>
 
  check_language_639_2($self, $key);
+
+I<Since version 0.05.>
 
 Check parameter defined by C<$key> if it's ISO 639-2 language code and if language code exists.
 Value could be undefined.
@@ -315,6 +322,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

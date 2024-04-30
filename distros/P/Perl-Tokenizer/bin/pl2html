@@ -20,8 +20,7 @@ use Perl::Tokenizer qw(perl_tokens);
 use HTML::Entities qw(encode_entities);
 
 my $header = <<'EOT';
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>pl2html</title>
@@ -96,12 +95,26 @@ my $code = (
       // die "usage: $0 [file]\n"
 );
 
+my %highlight_tokens;
+@highlight_tokens{$header =~ /^\.(\w+)/mg} = ();
+
 print $header;
+
 perl_tokens {
     my ($token, $from, $to) = @_;
-    print qq{<span class="$token">}, encode_entities(substr($code, $from, $to - $from)), '</span>';
-}
-$code;
+
+    my $substr = encode_entities(substr($code, $from, $to - $from));
+
+    $substr =~ s{\R}{<br/>}g;
+
+    if (exists $highlight_tokens{$token}) {
+        print qq{<span class="$token">}, $substr, '</span>';
+    }
+    else {
+        print $substr;
+    }
+} $code;
+
 print $footer;
 
 =encoding utf8
@@ -120,7 +133,7 @@ pl2html reads a Perl script and outputs an highlighted HTML version of it.
 
 =head1 AUTHOR
 
-Daniel "Trizen" Șuteu, E<lt>trizen@protonmail.comE<gt>
+Trizen, E<lt>trizen@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -5,7 +5,7 @@ use Carp;
 use Log::Any '$log';
 
 # ABSTRACT: Access rows of a tab-delimited text file
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 
 extends 'Data::TableReader::Decoder::CSV';
@@ -36,7 +36,7 @@ Data::TableReader::Decoder::TSV - Access rows of a tab-delimited text file
 
 =head1 VERSION
 
-version 0.015
+version 0.020
 
 =head1 DESCRIPTION
 

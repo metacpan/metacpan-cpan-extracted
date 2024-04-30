@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::Cron::Scheduler 0.01;
+package Mojolicious::Plugin::Cron::Scheduler 0.02;
 use v5.26;
 use warnings;
 

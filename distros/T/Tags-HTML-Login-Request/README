@@ -1,0 +1,284 @@
+NAME
+    Tags::HTML::Login::Request - Tags helper for login request.
+
+SYNOPSIS
+     use Tags::HTML::Login::Request;
+
+     my $obj = Tags::HTML::Login::Request->new(%params);
+     $obj->process($message_ar);
+     $obj->process_css($message_types_hr);
+
+METHODS
+  "new"
+     my $obj = Tags::HTML::Login::Request->new(%params);
+
+    Constructor.
+
+    Returns instance of object.
+
+    *       "css"
+
+            'CSS::Struct::Output' object for process_css processing.
+
+            Default value is undef.
+
+    *       "css_class"
+
+            CSS class.
+
+            Default value is 'form-request'.
+
+    *       "form_method"
+
+            Form method.
+
+            Possible values are 'post' and 'get'.
+
+            Default value is 'post'.
+
+    *       "lang"
+
+            Language in ISO 639-2 code.
+
+            Default value is 'eng'.
+
+    *       "logo_image_url"
+
+            URL to logo image.
+
+            Default value is undef.
+
+    *       "tags"
+
+            'Tags::Output' object.
+
+            Default value is undef.
+
+    *       "text"
+
+            Hash reference with keys defined language in ISO 639-2 code and
+            value with hash reference with texts.
+
+            Required keys are 'login_request', 'email_label' and 'submit'.
+
+            Default value is:
+
+             {
+                    'eng' => {
+                            'login_request' => 'Login request',
+                            'email_label' => 'Email',
+                            'submit' => 'Request',
+                    },
+             }
+
+  "process"
+     $obj->process($message_ar);
+
+    Process Tags structure for login box.
+
+    Reference to array with message objects $message_ar must be a instance
+    of Data::Message::Simple object.
+
+    Returns undef.
+
+  "process_css"
+     $obj->process_css($message_types_hr);
+
+    Process CSS::Struct structure for login box.
+
+    Variable $message_type_hr is reference to hash with keys for message
+    type and value for color in CSS style. Possible message types are info
+    and error now. Types are defined in Data::Message::Simple.
+
+    Returns undef.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+             From Mo::utils::Language::check_language_639_2():
+                     Parameter 'lang' doesn't contain valid ISO 639-2 code.
+                             Codeset: %s
+                             Value: %s
+             From Tags::HTML::new():
+                     Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+                     Parameter 'tags' must be a 'Tags::Output::*' class.
+
+     process():
+             From Tags::HTML::process():
+                     Parameter 'tags' isn't defined.
+
+     process_css():
+             From Tags::HTML::process_css():
+                     Parameter 'css' isn't defined.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Tags::HTML::Login::Request;
+     use Tags::Output::Indent;
+
+     # Object.
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new;
+     my $obj = Tags::HTML::Login::Request->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+
+     # Process login button.
+     $obj->process_css;
+     $obj->process;
+
+     # Print out.
+     print "CSS\n";
+     print $css->flush."\n\n";
+     print "HTML\n";
+     print $tags->flush."\n";
+
+     # Output:
+     # CSS
+     # .form-request {
+     #         width: 300px;
+     #         background-color: #f2f2f2;
+     #         padding: 20px;
+     #         border-radius: 5px;
+     #         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+     # }
+     # .form-request .logo {
+     #         height: 5em;
+     #         width: 100%;
+     # }
+     # .form-request img {
+     #         margin: auto;
+     #         display: block;
+     #         max-width: 100%;
+     #         max-height: 5em;
+     # }
+     # .form-request fieldset {
+     #         border: none;
+     #         padding: 0;
+     #         margin-bottom: 20px;
+     # }
+     # .form-request legend {
+     #         font-weight: bold;
+     #         margin-bottom: 10px;
+     # }
+     # .form-request p {
+     #         margin: 0;
+     #         padding: 10px 0;
+     # }
+     # .form-request label {
+     #         display: block;
+     #         font-weight: bold;
+     #         margin-bottom: 5px;
+     # }
+     # .form-request input[type="email"] {
+     #         width: 100%;
+     #         padding: 8px;
+     #         border: 1px solid #ccc;
+     #         border-radius: 3px;
+     # }
+     # .form-request button[type="submit"] {
+     #         width: 100%;
+     #         padding: 10px;
+     #         background-color: #4CAF50;
+     #         color: #fff;
+     #         border: none;
+     #         border-radius: 3px;
+     #         cursor: pointer;
+     # }
+     # .form-request button[type="submit"]:hover {
+     #         background-color: #45a049;
+     # }
+     # .form-request .messages {
+     #         text-align: center;
+     # }
+     # 
+     # HTML
+     # <form class="form-request" method="post">
+     #   <fieldset>
+     #     <legend>
+     #       Login request
+     #     </legend>
+     #     <p>
+     #       <label for="email">
+     #       </label>
+     #       Email
+     #       <input type="email" name="email" id="email" autofocus="autofocus">
+     #       </input>
+     #     </p>
+     #     <p>
+     #       <button type="submit" name="login_request" value="login_request">
+     #         Request
+     #       </button>
+     #     </p>
+     #   </fieldset>
+     # </form>
+
+EXAMPLE2
+     use strict;
+     use warnings;
+ 
+     use CSS::Struct::Output::Indent;
+     use Plack::App::Tags::HTML;
+     use Plack::Runner;
+     use Tags::HTML::Login::Request;
+     use Tags::Output::Indent;
+     use Unicode::UTF8 qw(decode_utf8);
+ 
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new(
+             'xml' => 1,
+             'preserved' => ['style'],
+     );
+     my $login_request = Tags::HTML::Login::Request->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+     $login_request->process_css;
+     my $app = Plack::App::Tags::HTML->new(
+             'component' => 'Tags::HTML::Container',
+             'data' => [sub {
+                     my $self = shift;
+                     $login_request->process;
+                     $login_request->process_css;
+                     return;
+             }],
+             'css' => $css,
+             'tags' => $tags,
+             'title' => 'Login and password',
+     )->to_app;
+     Plack::Runner->new->run($app);
+
+     # Output screenshot is in images/ directory.
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, List::Util, Mo::utils::Language, Readonly,
+    Tags::HTML, Tags::HTML::Messages.
+
+SEE ALSO
+    Tags::HTML::Login::Button
+        Tags helper for login button.
+
+    Tags::HTML::Login::Register
+        Tags helper for login register.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-HTML-Login-Request>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

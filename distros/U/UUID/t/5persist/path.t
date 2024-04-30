@@ -10,7 +10,8 @@ use Try::Tiny;
 use vars '@OPTS';
 
 BEGIN {
-    @OPTS = ':persist=foo';
+    # use a number here. does it see a PV?
+    @OPTS = ':persist=8675309';
     ok 1, 'began';
 }
 
@@ -26,8 +27,8 @@ sub t (&) {
     return $rv, $err;
 }
 
-my ($rv,$er) = t{ UUID::_statepath() };
-is $rv, 'foo', 'path seems correct';
-is $er, undef, 'path correct';
+my ($rv,$er) = t{ UUID::_persist() };
+is $rv, 8675309, 'path seems correct';
+is $er, undef,   'path correct';
 
 done_testing;

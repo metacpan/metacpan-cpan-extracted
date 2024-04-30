@@ -1,5 +1,13 @@
 Revision history for Perl extension DBIx::SearchBuilder.
 
+1.82 2024-04-29
+
+ - Format reference to other docs as links
+ - Document the possibly different encoding of returned values
+ - Make wide character tests pass for Oracle
+ - Test if empty strings are saved as NULL on Oracle CLOB fields
+ - Prefer NULL instead of empty CLOBs for Oracle
+
 1.81 2024-01-18
  - Add explicit support for MariaDB in addition to MySQL
 

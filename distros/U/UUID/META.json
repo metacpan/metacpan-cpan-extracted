@@ -43,6 +43,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "DynaLoader" : "0",
             "Exporter" : "0",
             "Time::HiRes" : "0",
@@ -79,11 +80,11 @@
    "provides" : {
       "UUID" : {
          "file" : "UUID.pm",
-         "version" : "0.33"
+         "version" : "0.34"
       }
    },
    "release_status" : "stable",
-   "version" : "0.33",
+   "version" : "0.34",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }
 

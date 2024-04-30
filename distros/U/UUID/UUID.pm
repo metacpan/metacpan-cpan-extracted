@@ -2,6 +2,7 @@ package UUID;
 require 5.005;
 use strict;
 use warnings;
+use Carp 'croak';
 use Time::HiRes ();
 
 require Exporter;
@@ -10,15 +11,15 @@ require DynaLoader;
 use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK $VERSION);
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.33';
+$VERSION = '0.34';
 
 %EXPORT_TAGS = (
     'all' => [qw(
         &clear &compare &copy &generate &generate_random &generate_time
-        &generate_v0 &generate_v1 &generate_v4 &generate_v6 &generate_v7
-        &is_null &parse &time &type &unparse &unparse_lower
-        &unparse_upper &uuid &uuid0 &uuid1 &uuid4 &uuid6 &uuid7 &variant
-        &version
+        &generate_v0 &generate_v1 &generate_v3 &generate_v4 &generate_v5
+        &generate_v6 &generate_v7 &is_null &parse &time &type &unparse
+        &unparse_lower &unparse_upper &uuid &uuid0 &uuid1 &uuid3 &uuid4
+        &uuid5 &uuid6 &uuid7 &variant &version
     )],
 );
 
@@ -29,9 +30,15 @@ bootstrap UUID $VERSION;
 sub import {
     for (my $i=scalar(@_)-1 ; $i>0 ; --$i) {
         my $v = $_[$i];
+        chomp $v;
         # :persist=FOO
-        if (length($v) > 9 and substr($v,0,9) eq ':persist=') {
-            _persist(substr($v, 9));
+        if (length($v) > 8 and substr($v,0,8) eq ':persist') {
+            my $arg = substr $v, 8;
+            if (length($arg) < 2 or substr($arg, 0, 1) ne '=') {
+                croak "Usage: :persist=FILE";
+            }
+            my $file = substr $arg, 1;
+            _persist($file);
             splice @_, $i, 1;
             next;
         }
@@ -44,6 +51,21 @@ sub import {
         # :mac=unique
         if (length($v) == 11 and $v eq ':mac=unique') {
             _hide_always();
+            splice @_, $i, 1;
+            next;
+        }
+        # :defer[=N]
+        if (length($v) >= 6 and substr($v,0,6) eq ':defer') {
+            my $arg = substr $v, 6;
+            my $len = length $arg;
+            if ($len == 0) {
+                $arg = '=0.001';
+            }
+            elsif ($len == 1 or substr($arg, 0, 1) ne '=') {
+                croak "Usage: :defer[=N]";
+            }
+            my $val = substr $arg, 1;
+            _defer($val);
             splice @_, $i, 1;
             next;
         }
@@ -62,22 +84,29 @@ UUID - Universally Unique Identifier library for Perl
 
 =head1 SYNOPSIS
 
+    # SIMPLE
     use UUID qw(uuid);    # see EXPORTS
-
     my $str = uuid();     # generate version 4 UUID string
 
-    $str = uuid();                    # new stringified UUID; prefer v4
-    $str = uuid1();                   # new stringified UUID; always v1
-    $str = uuid4();                   # new stringified UUID; always v4
-    $str = uuid6();                   # new stringified UUID; always v6
-    $str = uuid7();                   # new stringified UUID; always v7
+    # SPECIFIC
+    $str = uuid1();                   # new version 1 UUID string
+    $str = uuid4();                   # new version 4 UUID string
+    $str = uuid6();                   # new version 6 UUID string
+    $str = uuid7();                   # new version 7 UUID string
 
-    UUID::generate($bin);             # new binary UUID; prefer v4
-    UUID::generate_v1($bin);          # new binary UUID; always v1
-    UUID::generate_v4($bin);          # new binary UUID; always v4
-    UUID::generate_v6($bin);          # new binary UUID; always v6
-    UUID::generate_v7($bin);          # new binary UUID; always v7
+    # NAMESPACE is 'dns', 'url', 'oid', or 'x500'; case-insensitive.
+    $str = uuid3(dns => 'www.example.com');
+    $str = uuid5(url => 'https://www.example.com/foo.html');
 
+    UUID::generate_v1($bin);          # new version 1 binary UUID
+    UUID::generate_v4($bin);          # new version 4 binary UUID
+    UUID::generate_v6($bin);          # new version 6 binary UUID
+    UUID::generate_v7($bin);          # new version 7 binary UUID
+
+    UUID::generate_v3($bin, dns => 'www.example.com');
+    UUID::generate_v5($bin, url => 'https://www.example.com/foo.txt');
+
+    UUID::generate($bin);             # alias for generate_v1()
     UUID::generate_time($bin);        # alias for generate_v1()
     UUID::generate_random($bin);      # alias for generate_v4()
 
@@ -111,11 +140,11 @@ system, and unique across all systems, and are compatible with those
 created by the Open Software Foundation (OSF) Distributed Computing
 Environment (DCE).
 
-All generated UUIDs are either version 1, 4, 6, or version 7. And all
-are variant 1, meaning compliant with the OSF DCE standard as described
-in RFC4122.
+All generated UUIDs are either version 1, 3, 4, 5, 6, or version 7. And
+all are variant 1, meaning compliant with the OSF DCE standard as
+described in RFC4122.
 
-Versions 6, 7, and 8 are not standardized. They are presented here as
+Versions 6 and 7 are not standardized. They are presented here as
 proposed in RFC4122bis, version 14, and may change in the future.
 RFC4122bis is noted to replace RFC4122, if approved.
 
@@ -189,10 +218,34 @@ is requested (see B<:mac> in B<EXPORTS>), a random address is used. The
 multicast bit of this address is set to avoid conflict with addresses
 returned from network cards.
 
+=head2 B<generate_v3(> I<$uuid>, I<NAMESPACE> => I<NAME> B<)>
+
+Generate a new version 3 binary UUID using the given namespace and name
+hashed through the MD5 algorithm.
+
+Namespace is one of "dns", "url", "oid", or "x500", and
+case-insensitive. It is used to select the namespace UUID to hash with
+the name.
+
+Name should be an entity from the given namespace, but can really be any
+text.
+
 =head2 B<generate_v4(> I<$uuid> B<)>
 
 Generates a new version 4 binary UUID using mostly random data. There
 are 6 bits used for the UUID format, leaving 122 bits for randomness.
+
+=head2 B<generate_v5(> I<$uuid>, I<NAMESPACE> => I<NAME> B<)>
+
+Generate a new version 5 binary UUID using the given namespace and name
+hashed through the SHA1 algorithm.
+
+Namespace is one of "dns", "url", "oid", or "x500", and
+case-insensitive. It is used to select the namespace UUID to hash with
+the name.
+
+Name should be an entity from the given namespace, but can really be any
+text.
 
 =head2 B<generate_v6(> I<$uuid> B<)>
 
@@ -272,9 +325,17 @@ Returns a new string format version 1 UUID. Functionally the equivalent
 of calling B<generate_v1()> then B<unparse()>, but throwing away the
 intermediate binary UUID.
 
+=head2 B<uuid3(NAMESPACE => NAME)>
+
+Same as B<uuid1()> but version 3. See B<generate_v3()>.
+
 =head2 B<uuid4()>
 
 Same as B<uuid1()> but version 4.
+
+=head2 B<uuid5(NAMESPACE => NAME)>
+
+Same as B<uuid1()> but version 5. See B<generate_v5()>.
 
 =head2 B<uuid6()>
 
@@ -288,8 +349,8 @@ Same as B<uuid1()> but version 7.
 
 Returns the variant of binary I<$uuid>.
 
-This module only generates variant 1 UUIDs, but others may be found in
-the wild.
+This module only generates variant 1 UUIDs. Others may be found in the
+wild.
 
 Known variants:
 
@@ -302,10 +363,11 @@ Known variants:
 
 Returns the version of binary I<$uuid>.
 
-This module only generates version 1, 4, 6, and version 7 UUIDs, but
-others may be found in the wild.
+This module only generates version 1, 3, 4, 5, 6, and version 7 UUIDs.
+Others may be found in the wild.
 
 Known versions:
+
     v1  date/time and node address
     v2  date/time and node address, security version
     v3  namespace based, MD5 hash
@@ -341,11 +403,13 @@ non-issue.
 
 =head1 RANDOM NUMBERS
 
+Versions 4 and 7 UUIDs are partially filled with random numbers, as well
+as versions 1 and 6 when used with the B<:mac> option.
+
 Prior to version 0.33, UUID obtained randomness from the system's
 I</dev/random> device, or similar interface. On some platforms it called
 B<getrandom()> and on others it read directly from I</dev/urandom>. And
-of course, Win32 did something completely different depending on the
-environment.
+of course, Win32 did something completely different.
 
 Starting in 0.33, UUID generates random numbers itself using the
 ChaCha20 algorithm which is considered crypto-strength in most circles.
@@ -359,6 +423,41 @@ key much more unlikely than it already is. And without the keys, you
 can't predict the future.
 
 Well, that's the theory anyway.
+
+=head1 NAMESPACES
+
+Versions 3 and 5 generate UUIDs within namespaces. What this really
+means is that the I<NAME> value is concatenated with a dedicated
+I<NAMESPACE> UUID before hashing.
+
+Available namespaces and UUIDs:
+
+    dns   6ba7b810-9dad-11d1-80b4-00c04fd430c8
+    url   6ba7b811-9dad-11d1-80b4-00c04fd430c8
+    oid   6ba7b812-9dad-11d1-80b4-00c04fd430c8
+    x500  6ba7b814-9dad-11d1-80b4-00c04fd430c8
+
+For example, if you need to create some UUIDs within your own
+"questions" and "answers" namespaces using SHA1:
+
+    $ns_base = uuid5( dns => 'www.example.com' );
+
+    $ns_questions = uuid5( $ns_base, 'questions' );
+    $ns_answers   = uuid5( $ns_base, 'answers'   );
+
+    for $topic ( next_qa_aref() ) {
+        ($q, $a) = @$topic;
+        $uuid_question = uuid5( $ns_questions, $q );
+        $uuid_answer   = uuid5( $ns_answers,   $a );
+        ...
+    }
+
+This way, you can deterministically convert existing (and likely
+colliding) namespaces over to one UUID namespace, which is often useful
+when merging datasets.
+
+You also don't need to publish your base and namespace UUIDs. Anyone
+using the same logic can generate the same question and answer UUIDs.
 
 =head1 EXPORTS
 
@@ -399,6 +498,18 @@ will ignore it. No state will be maintained.
 B<WARNING>: Do not B<:persist> in a public directory. See CVE-2013-4184.
 UUID attempts to avoid this, but nothing is foolproof. Only YOU can
 prevent symlink attacks!
+
+=head2 B<:defer>[=I<N>]
+
+Persistence of state is deferred I<N> seconds when generating time-based
+UUIDs. More precisely, state is only saved every I<N> seconds. If UUIDs
+are generated more often, those within the I<N> second window will not
+save state.
+
+Defer values greater than some platform-specific interval greatly reduce
+the performance penalty introduced through persistence. While the
+default, B<:defer=0.001>, is probably fine, you can run B<make persist>
+in the distribution directory to see the effect of various values.
 
 =head1 THREAD SAFETY
 
@@ -447,6 +558,8 @@ gregor herrmann
 Slaven Rezic
 
 twata
+
+Christopher Rasch-Olsen Raa
 
 =head1 SEE ALSO
 

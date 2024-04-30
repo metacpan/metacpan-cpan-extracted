@@ -6,13 +6,14 @@ use warnings;
 
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
-use List::Util qw(none);
+use List::Util 1.33 qw(none);
+use Mo::utils::Language 0.05 qw(check_language_639_2);
 use Readonly;
 use Tags::HTML::Messages;
 
 Readonly::Array our @FORM_METHODS => qw(post get);
 
-our $VERSION = 0.07;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -61,7 +62,8 @@ sub new {
 		err "Parameter 'form_method' has bad value.";
 	}
 
-	# TODO Check lang.
+	# Check lang.
+	check_language_639_2($self, 'lang');
 
 	# Check text for lang
 	if (! defined $self->{'text'}) {
@@ -292,13 +294,13 @@ Returns instance of object.
 
 =item * C<css>
 
-'CSS::Struct::Output' object for L<process_css> processing.
+L<CSS::Struct::Output> object for L<process_css> processing.
 
 Default value is undef.
 
 =item * C<css_access>
 
-CSS style for access box.
+CSS class for access box.
 
 Default value is 'form-login'.
 
@@ -312,7 +314,7 @@ Default value is 'post'.
 
 =item * C<lang>
 
-Language in ISO 639-3 code.
+Language in ISO 639-2 code.
 
 Default value is 'eng'.
 
@@ -330,13 +332,13 @@ Default value is undef.
 
 =item * C<tags>
 
-'Tags::Output' object.
+L<Tags::Output> object.
 
 Default value is undef.
 
 =item * C<text>
 
-Hash reference with keys defined language in ISO 639-3 code and value with hash
+Hash reference with keys defined language in ISO 639-2 code and value with hash
 reference with texts.
 
 Required keys are 'login', 'password_label', 'username_label' and 'submit'.
@@ -381,6 +383,10 @@ Returns undef.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+         From Mo::utils::Language::check_language_639_2():
+                 Parameter 'lang' doesn't contain valid ISO 639-2 code.
+                         Codeset: %s
+                         Value: %s
          From Tags::HTML::new():
                  Parameter 'css' must be a 'CSS::Struct::Output::*' class.
                  Parameter 'tags' must be a 'Tags::Output::*' class.
@@ -393,7 +399,7 @@ Returns undef.
          From Tags::HTML::process_css():
                  Parameter 'css' isn't defined.
 
-=head1 EXAMPLE
+=head1 EXAMPLE1
 
 =for comment filename=print_block_html_and_css.pl
 
@@ -525,6 +531,7 @@ Returns undef.
          'component' => 'Tags::HTML::Container',
          'data' => [sub {
                  my $self = shift;
+                 $login->process_css;
                  $login->process;
                  return;
          }],
@@ -549,6 +556,7 @@ Returns undef.
 L<Class::Utils>,
 L<Error::Pure>,
 L<List::Util>,
+L<Mo::utils::Language>,
 L<Readonly>,
 L<Tags::HTML>,
 L<Tags::HTML::Messages>.
@@ -579,12 +587,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2023 Michal Josef Špaček
+© 2021-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.09
 
 =cut

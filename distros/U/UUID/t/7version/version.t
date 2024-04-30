@@ -15,9 +15,19 @@ use UUID qw(:all);
     is $v, 1, 'generate 1';
 }
 {
+    generate_v3(my $u, dns => 'www.example.com');
+    my $v = version($u);
+    is $v, 3, 'generate 3';
+}
+{
     generate_v4(my $u);
     my $v = version($u);
     is $v, 4, 'generate 4';
+}
+{
+    generate_v5(my $u, dns => 'www.example.com');
+    my $v = version($u);
+    is $v, 5, 'generate 5';
 }
 {
     generate_v6(my $u);

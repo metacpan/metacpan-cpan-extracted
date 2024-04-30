@@ -1,7 +1,10 @@
 Revision history for Perl extension UUID.
 
-ToDo:
-  - Version 3 and 5 UUIDs.
+0.34 Mon Apr 29 21:03:51 EDT 2024
+  - Added version 3 and 5 UUIDs.
+  - Added deferred persistence, default 0.001 seconds.
+  - Now forces reseed after fork().
+    - Thanks to Christopher Rasch-Olsen Raa. [rt.cpan.org #152751]
 
 0.33 Sat Mar 16 07:34:19 EDT 2024
   - Removed most bundled e2fsprogs UUID code.
@@ -21,7 +24,7 @@ ToDo:
   - Added benchmarks in tests.
     > make test TEST_VERBOSE=1 TEST_FILES=t/9benchmark/*.t
   - Added benchmark comparing version speeds, calling styles,
-    and persitence.
+    and persistence.
     > make compare
   - Now believed to be thread safe.
 

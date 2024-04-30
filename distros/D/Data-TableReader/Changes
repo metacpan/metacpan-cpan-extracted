@@ -1,3 +1,13 @@
+Version 0.020 - 2024-04-30
+ - Rename on_validation_fail -> on_validation_error
+   The action codes are the same, but the callback has different arguments.
+   Old callbacks applied using the attribute name 'on_validation_fail' will
+   continue to work.
+ - New iterator attribute 'dataset_idx', for keeping track of which dataset
+   you're on.
+ - Unimplemented Iterator->seek now dies as per the documentation.
+   (no built-in iterator lacked support for seek, so unlikely to matter)
+
 Version 0.015 - 2024-04-27
  - Better support for fields sharing name, with Field->addr (refaddr) and
    TableReader->field_by_addr

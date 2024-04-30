@@ -8,6 +8,7 @@ BEGIN { require "./t/utils.pl" }
 our (@AvailableDrivers);
 
 use constant TESTS_PER_DRIVER => 75;
+use Encode;
 
 my $total = scalar(@AvailableDrivers) * TESTS_PER_DRIVER;
 plan tests => $total;
@@ -61,7 +62,7 @@ SKIP: {
 
 	is($rec->id, $id, "The record has its id");
 	is ($rec->Name, 'Jesse', "The record's name is Jesse");
-    is( $rec->Content, 'Håvard', "The record's Content is Håvard");
+    is( $rec->Content, $d eq 'Oracle' ? Encode::decode('UTF-8', 'Håvard') : 'Håvard', "The record's Content is Håvard");
 
 	my ($val, $msg) = $rec->SetName('Obra');
 	ok($val, $msg) ;
@@ -75,7 +76,7 @@ SKIP: {
     ok($rec2->Load($id2), "Loaded the record");
 
     is($rec2->id, $id2, "The record has its id");
-    is ($rec2->Name, 'Håvard', "The record's name is Håvard");
+    is ($rec2->Name, $d eq 'Oracle' ? Encode::decode('UTF-8', 'Håvard') : 'Håvard', "The record's name is Håvard");
 
 # Validate immutability of the field id
 	($val, $msg) = $rec->Setid( $rec->id + 1 );

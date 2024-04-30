@@ -2,3 +2,6 @@ Revision history for perl distribution Mojolicious::Plugin::Cron::Scheduler
 
 0.01      2024-04-12T09:44:22-05:00
   - initial release
+
+0.02      2024-04-29T10:57:53-05:00
+  - fix tests so that they pass regardless of time of day they're run

@@ -6,14 +6,14 @@ use Carp;
 use Scalar::Util 'refaddr';
 
 # ABSTRACT: Base class for iterators (blessed coderefs)
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 
 our %_iterator_fields;
 sub new {
 	my ($class, $sub, $fields)= @_;
 	ref $sub eq 'CODE' and ref $fields eq 'HASH'
-		or die "Expected new(CODEREF, HASHREF)";
+		or croak "Expected new(CODEREF, HASHREF)";
 	$_iterator_fields{refaddr $sub}= $fields;
 	return bless $sub, $class;
 }
@@ -30,12 +30,20 @@ sub progress {
 	undef;
 }
 
+sub row {
+	croak "Unimplemented";
+}
+
+sub dataset_idx {
+	0
+}
+
 sub tell {
 	undef;
 }
 
 sub seek {
-	undef;
+	croak "Unimplemented";
 }
 
 sub next_dataset {
@@ -56,7 +64,7 @@ Data::TableReader::Iterator - Base class for iterators (blessed coderefs)
 
 =head1 VERSION
 
-version 0.015
+version 0.020
 
 =head1 SYNOPSIS
 
@@ -96,6 +104,11 @@ This will be something like C<"$filename row $row"> or C<"$filename $worksheet:$
 A numeric 1-based row number for the current position of the current dataset.  This is not
 affected by which row the header was found on.
 
+=head2 dataset_idx
+
+A numeric 0-based dataset number.  For Decoders which only support a single dataset, this is
+always C<0>.
+
 =head2 progress
 
 An estimate of how much of the data has already been returned.  If the stream
@@ -127,8 +140,8 @@ the stream.
 
 =head2 next_dataset
 
-If a file format supports more than one tabular group of data, this method
-allows you to jump to the next.
+If a file format supports more than one tabular group of data, this method allows you to jump
+to the next.  Returns true if it moved to a new dataset, and false at the end of iteration.
 
 =head1 AUTHOR
 

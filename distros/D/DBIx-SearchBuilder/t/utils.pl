@@ -146,6 +146,9 @@ sub connect_pg
 
 sub connect_oracle
 {
+    local $ENV{'NLS_LANG'} = "AMERICAN_AMERICA.AL32UTF8";
+    local $ENV{'NLS_NCHAR'} = "AL32UTF8";
+
 	my $handle = shift;
 	return $handle->Connect(
 		Driver   => 'Oracle',

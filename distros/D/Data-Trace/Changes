@@ -1,5 +1,7 @@
 Revision history for Data-Trace
 
+0.13    2024-04-29 - Fixes in upload.
+0.12    2024-04-29 - Monitoring deletion.
 0.11
         2022-10-18 - Added complex CI.
 0.10    2022-10-11

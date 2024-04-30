@@ -1,10 +1,10 @@
 {
-   "abstract" : "A tiny Perl code tokenizer",
+   "abstract" : "A tiny Perl code tokenizer.",
    "author" : [
-      "Daniel Șuteu <trizen@protonmail.com>"
+      "Daniel Șuteu <trizen@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "artistic_2"
    ],
@@ -43,7 +43,7 @@
    "provides" : {
       "Perl::Tokenizer" : {
          "file" : "lib/Perl/Tokenizer.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "url" : "https://github.com/trizen/Perl-Tokenizer"
       }
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

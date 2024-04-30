@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Data::TableReader" : "0.09",
+            "Data::TableReader" : "0.015",
             "Data::TableReader::Decoder" : "0",
             "Data::TableReader::Iterator" : "0",
             "HTML::Parser" : "0",
@@ -45,7 +45,7 @@
       },
       "test" : {
          "requires" : {
-            "Data::TableReader" : "0.09",
+            "Data::TableReader" : "0.015",
             "File::Spec::Functions" : "0",
             "FindBin" : "0",
             "Log::Any" : "0",
@@ -69,7 +69,7 @@
          "web" : "https://github.com/nrdvana/perl-Data-TableReader"
       }
    },
-   "version" : "0.015",
+   "version" : "0.020",
    "x_contributors" : [
       "Christian Walde <walde.christian@gmail.com>"
    ],

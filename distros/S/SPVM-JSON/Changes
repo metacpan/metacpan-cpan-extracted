@@ -1,3 +1,6 @@
+1.001002 2024-04-30
+  [Prerequirement Changes]
+    * SPVM 0.990002+ is required. This fixed strigification of floating point numbers.
 1.001001 2023-05-08
   [Prerequirement Changes]
     * SPVM 0.973+ is required.

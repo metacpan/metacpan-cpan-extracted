@@ -82,5 +82,28 @@
 #ifndef CVf_AUTOLOAD
 #define CvAUTOLOAD_off(cv) NOOP
 #endif
+
+#ifndef ibcmp
+#define ibcmp Perl_my_ibcmp
+I32 Perl_my_ibcmp(pTHX_ const char *s1, const char *s2, register I32 len) {
+  register U8 *a = (U8 *)s1;
+  register U8 *b = (U8 *)s2;
+  while (len--) {
+    if (*a != *b && *a != PL_fold[*b])
+    return 1;
+    a++,b++;
+  }
+  return 0;
+}
+#endif
+
+#ifndef NOT_REACHED
+#define NOT_REACHED
+#endif
+
+#ifndef croak_caller
+#define croak_caller  my_croak_caller
+#endif
+
 #endif
 /* ex:set ts=2 sw=2 itab=spaces: */

@@ -34,11 +34,11 @@ subtest trim_validate_coerce => sub {
 				{ name => 'name', trim => 1, type => $camelcase, coerce => 1 },
 				{ name => 'description', trim => 1, type => Types::Standard::Maybe([Types::Standard::Str()]) },
 			],
-			on_validation_fail => sub {
-				my ($reader, $failures, $values, $context)= @_;
+			on_validation_error => sub {
+				my ($reader, $failures, $record, $data_iter)= @_;
 				for (@$failures) {
-					my ($field, $value_index, $message)= @$_;
-					$values->[$value_index]= [ $values->[$value_index], $message ];
+					my ($field, $value_ref, $message)= @$_;
+					$$value_ref= [ $$value_ref, $message ];
 				}
 				return 'use';
 			},

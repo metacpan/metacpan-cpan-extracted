@@ -4,7 +4,7 @@ use Carp;
 use namespace::clean;
 
 # ABSTRACT: Field specification for Data::TableReader
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 
 has name     => ( is => 'ro', required => 1 );
@@ -76,7 +76,7 @@ Data::TableReader::Field - Field specification for Data::TableReader
 
 =head1 VERSION
 
-version 0.015
+version 0.020
 
 =head1 DESCRIPTION
 
@@ -175,13 +175,11 @@ If C<type> validation fails, this gives you a second chance at fixing the field.
 a true value to call C<< $field->type->coerce >> on the value, or set it to a coderef of the
 form C<< $coerced_value= $coerce->($value) >>.  Type validation will be attempted a second
 time on the coerced value, and if successful it replaces the original value.  If it fails, the
-original value remains in the record (and you can handle it how you like in the TableReader
-on_validation_failure callback).
+original value remains in the record (and you can handle it how you like in the L<TableReader
+C<on_validation_error> callback|Data::TableReader/on_validation_error>.
 
 If you want to apply a coercion before the first type validation is attempted, you can put that
 logic into the L</trim> attribute.
-
-Note that validation/coercion is skipped entirely for blank values
 
 =head2 array
 

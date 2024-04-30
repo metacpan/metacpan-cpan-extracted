@@ -10,7 +10,7 @@ use Data::TableReader::Iterator;
 use namespace::clean;
 
 # ABSTRACT: Extract records from "dirty" tabular data sources
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 
 has input               => ( is => 'rw', required => 1 );
@@ -31,16 +31,34 @@ has on_partial_match    => ( is => 'rw', default => sub { 'next' } );
 has on_ambiguous_columns=> ( is => 'rw', default => sub { 'error' } );
 has on_unknown_columns  => ( is => 'rw', default => sub { 'warn' } );
 has on_blank_row        => ( is => 'rw', default => sub { 'next' } );
-has on_validation_fail  => ( is => 'rw', default => sub { 'die' } );
+has on_validation_error => ( is => 'rw', default => sub { 'die' } );
 has log                 => ( is => 'rw', trigger => sub { shift->_clear_log } );
 
 sub BUILD {
-	my ($self)= @_;
+	my ($self, $args)= @_;
 	# If user supplied col_map, it probably contains names instead of Field objects.
 	if ($self->has_col_map) {
 		# Make a new array in case other parts of user code refer to current one
 		$self->col_map($self->_resolve_colmap_names([ @{ $self->col_map } ]));
 	}
+	# Back-compat for previous API
+	if (defined (my $act= $args->{on_validation_fail})) {
+		croak "on_validation_fail (back-compat alias) conflicts with on_validation_error"
+			if defined $args->{on_validation_error};
+		$self->on_validation_fail($act);
+	}
+}
+
+sub on_validation_fail {
+	my $self= shift;
+	if (@_) {
+		my $act= shift;
+		#warn "on_validation_fail is deprecated (see on_validation_error)";
+		# adapt for the old API
+		$act= _wrap_on_validation_fail($act) if ref $act eq 'CODE';
+		return $self->on_validation_error($act);
+	}
+	return $self->on_validation_error;
 }
 
 # Modifies array to replace name with field ref
@@ -273,7 +291,7 @@ sub _build_table_search_results {
 }
 
 sub _build_col_map {
-	shift->table_search_results->{col_map}
+	shift->table_search_results->{found}{col_map}
 }
 
 sub find_table {
@@ -638,149 +656,229 @@ sub iterator {
 		$data_iter= $self->decoder->iterator;
 		$data_iter->seek($self->table_search_results->{found}{first_record_pos});
 	}
+
+	# The goal for this iterator is to perform as little work as possible on each iteration,
+	# while making all the features possible, but avoiding building custom perl code with 'eval'.
+	# To that end, most of the operations get vectorized and stored in array variables that
+	# get closed-over by the iterator function.
+	#
+	# The iterator algorithm goes like this:
+	#
+	#   - Collect a slice of the next row from the Decoder, selecting only the columns we need.
+	#     i.e. @row_slice= @decoder_row[@slice_idx];
+	#   - Run trim functions on each value that needs trimmed.
+	#     i.e. $row_slice[$i]= $trim[$i]->($row_slice[$i]) if defined $row_slice[$i]
+	#   - Apply "blank" value to any value that is zero length
+	#     i.e. $row_slice[$i]= $blank_value[$i] unless length $row_slice[$i]
+	#   - Special handling if the entire row is blank
+	#   - If user wanted validation, do type checks on each relevant value
+	#     i.e. $type->validate($row_slice[$i])
+	#   - Assemble array-valued fields into a single arrayref value
+	#     i.e. $row_slice[$from]= [ splice(@row_slice, $from, $to, undef) ];
+   #   - If user wanted an array matching the Field order, alter @row_slice to match
+	#   - else if user wanted a hashref, build one,
+	#   - If validations failed, run user callback
+	#   - if user wanted an object, construct one
+
 	my $col_map=   $self->table_search_results->{found}{col_map};
 	my $field_map= _field_map($col_map);
-	my @row_slice; # one column index per field, and possibly more for array_val_map
-	my @arrayvals; # list of source index and destination index for building array values
-	my @field_names; # ordered list of field names where row slice should be assigned
-	my %trimmer;   # list of trim functions and the array indicies they should be applied to
-	my @blank_val; # blank value per each fetched column
-	my @type_check;# list of 
-	my $class;     # optional object class for the resulting rows
-
-	# If result is array, the slice of the row must match the position of the fields in the
-	#  $self->fields array.  If a field was not found it will get an undef for that slot.
-	# It also results in an undef for secondary fields of the same name as the first.
-	if ($self->record_class eq 'ARRAY') {
-		my %remaining= %$field_map;
-		@row_slice= map {
-			my $src= delete $remaining{$_->name};
-			defined $src? $src : 0x7FFFFFFF
-			} @$fields;
-	}
-	# If result is anything else, then only slice out the columns that are used for the fields
-	# that we located.
-	else {
-		$class= $self->record_class
-			unless 'HASH' eq $self->record_class;
-		@field_names= keys %$field_map;
-		@row_slice= values %$field_map;
-	}
-	# For any field whose value is an array of more that one source column,
-	#  encode those details in @arrayvals, and update @row_slice and @trim_idx accordingly
-	for (0 .. $#row_slice) {
-		if (!ref $row_slice[$_]) {
-			my $field= $col_map->[$row_slice[$_]];
-			if (my $t= $field->trim_coderef) {
-				$trimmer{$t} ||= [ $t, [] ];
-				push @{ $trimmer{$t}[1] }, $_;
-			}
-			push @blank_val, $field->blank;
-			push @type_check, $self->_make_validation_callback($field, $_)
-				if $field->type;
-		}
-		else {
-			# This field is an array-value, so add the src columns to @row_slice
-			#  and list it in @arrayvals, and update @trim_idx if needed
-			my $src= $row_slice[$_];
-			$row_slice[$_]= 0x7FFFFFFF;
-			my $from= @row_slice;
-			push @row_slice, @$src;
-			push @arrayvals, [ $_, $from, scalar @$src ];
-			for ($from .. $#row_slice) {
-				my $field= $col_map->[$row_slice[$_]];
-				if (my $t= $field->trim_coderef) {
-					$trimmer{$t} ||= [ $t, [] ];
-					push @{ $trimmer{$t}[1] }, $_;
-				}
-				push @blank_val, $field->blank;
-				push @type_check, $self->_make_validation_callback($field, $_)
-					if $field->type;
-			}
-		}
-	}
-	my @trim= values %trimmer;
-	@arrayvals= reverse @arrayvals;
+	my @input_slice;  # list of column idx to retrieve from input
+	my @output_slice; # list of column idx to store in output, for record_class=>'ARRAY'
+	my @output_keys;  # list of hash key names where values get stored
+	my @array_ranges; # list of value indices that get bundled into an arrayref
+	my @blank_val;    # blank value per each fetched column
+	my @trim;         # list of trim functions and the value indicies they should be applied to
+	my @type_check;   # list of validation coderefs that should be applied
+	my $class;        # optional object class to construct for the resulting rows
 	my ($n_blank, $first_blank, $eof);
 	my $sub= sub {
+		my (@failed, $out, $vals);
 		again:
 		# Pull the specific slice of the next row that we need
-		my $row= !$eof && $data_iter->(\@row_slice)
+		$vals= !$eof && $data_iter->(\@input_slice)
 			or ++$eof && return undef;
 		# Apply 'trim' to any column whose field requested it
 		for my $t (@trim) {
-			$t->[0]->() for grep defined, @{$row}[@{$t->[1]}];
+			defined and $t->[0]->() for @{$vals}[@{$t->[1]}];
 		}
 		# Apply 'blank value' to every column which is zero length
 		$n_blank= 0;
-		$row->[$_]= $blank_val[$_]
-			for grep { (!defined $row->[$_] || !length $row->[$_]) && ++$n_blank } 0..$#$row;
+		(defined $vals->[$_] and length $vals->[$_]) or (++$n_blank, $vals->[$_]= $blank_val[$_])
+			for 0..$#$vals;
 		# If all are blank, then handle according to $on_blank_row setting
-		if ($n_blank == @$row) {
-			$first_blank ||= $data_iter->position;
+		if ($n_blank == @$vals) {
+			$first_blank ||= $data_iter->row;
 			goto again;
 		} elsif ($first_blank) {
 			# At the end of a series of blank rows, run the callback to decide what to do
-			unless ($self->_handle_blank_row($first_blank, $data_iter->position)) {
+			unless ($self->_handle_blank_row($data_iter, $data_iter->row - $first_blank)) {
 				$eof= 1;
 				return undef;
 			}
 			$first_blank= undef;
 		}
 		# Check type constraints, if any
-		if (@type_check) {
-			if (my @failed= map $_->($row), @type_check) {
-				$self->_handle_validation_fail(\@failed, $row, $data_iter->position.': ')
-					or goto again;
+		@failed= ();
+		push @failed, $_->($vals) for @type_check;
+		# Combine each set of array-valued fields into an arrayref
+		$vals->[$_->[0]]= [ splice @$vals, $_->[0], $_->[1], undef ] for @array_ranges;
+		# Generate the output structure
+		$out= @output_keys? do { my %out; @out{@output_keys}= @$vals; \%out }
+			: @output_slice? do { my @out; $#out= $#$fields; @out[@output_slice]= @$vals; \@out }
+			: $vals;
+		# Handle any validation errors detected above
+		if (@failed) {
+			$self->_handle_validation_error(\@failed, $out, $data_iter)
+				or goto again;
+		}
+		# Construct a class, if requested, else return hashref
+		return $class? $class->new($out) : $out;
+	};
+
+	# User wants arrayref output, with one element per field?
+	if ($self->record_class eq 'ARRAY') {
+		# If two fields share a name, only the first one gets the value(s).
+		my %remaining= %$field_map;
+		my $need_output_slice= 0;
+		for my $field_idx (0 .. $#$fields) {
+			my $f= $fields->[$field_idx];
+			my $src= delete $remaining{$f->name};
+			# If this field has a source, add it to the input slice and output slice
+			if (defined $src) {
+				push @output_slice, $field_idx
+					if $need_output_slice;
+				push @input_slice, $src;
+			}
+			# output_slice isn't needed until the first field that doesn't have a source
+			elsif (!$need_output_slice) {
+				$need_output_slice= 1;
+				@output_slice= ( 0 .. $field_idx-1 );
 			}
 		}
-		# Collect all the array-valued fields from the tail of the row
-		$row->[$_->[0]]= [ splice @$row, $_->[1], $_->[2] ] for @arrayvals;
-		# stop here if the return class is 'ARRAY'
-		return $row unless @field_names;
-		# Convert the row to a hashref
-		my %rec;
-		@rec{@field_names}= @$row;
-		# Construct a class, if requested, else return hashref
-		return $class? $class->new(\%rec) : \%rec;
-	};
+	} else {
+		# For any other record_class, we are building a hashref
+		# Only set the 'class' variable if we also need to construct an object.
+		$class= $self->record_class
+			unless 'HASH' eq $self->record_class;
+		@input_slice= values %$field_map;
+		@output_keys= keys %$field_map;
+	}
+
+	my %trimmer;
+	for (my ($i, $out_ofs, $array_start, $array_lim)= (0,0); $i <= $#input_slice; $i++) {
+		my $col_idx= $input_slice[$i];
+		if (ref $col_idx eq 'ARRAY') {
+			$array_start= $i;
+			$array_lim= $array_start + @$col_idx;
+			splice(@input_slice, $i, 1, @$col_idx);
+			push @array_ranges, [ $i+$out_ofs, scalar @$col_idx ];
+			$col_idx= $col_idx->[0];
+		} elsif (defined $array_lim) {
+			if ($i >= $array_lim) {
+				$array_start= $array_lim= undef;
+			} else {
+				--$out_ofs; # each iteration within an array increases the offset
+			}
+		}
+		my $field= $col_map->[$col_idx];
+		# Handling for ->trim feature
+		if (my $t= $field->trim_coderef) {
+			$trimmer{refaddr $t} ||= [ $t, [] ];
+			push @{ $trimmer{refaddr $t}[1] }, $i;
+		}
+		# Handling for ->blank feature
+		push @blank_val, $field->blank;
+		# Handling for ->type and ->coerce features
+		if ($field->type) {
+			# @path is needed to show the on_validation_fail callback where to find the value in
+			# the output.  First element of @path is either ->{$name} or ->[$idx] depending whether
+			# the output is an array or hashref.  Second element only happens if that field's value
+			# is an arrayref.
+			my $output_idx= $i + $out_ofs;
+			my @path= (
+				@output_keys? $output_keys[$output_idx]
+				: @output_slice? $output_slice[$output_idx]
+				: $output_idx
+			);
+			push @path, ($i - $array_start)
+				if defined $array_start;
+			push @type_check, $self->_make_validation_check_coderef($field, $i, \@path);
+		}
+	}
+	@trim= values %trimmer;
+
 	return Data::TableReader::_RecIter->new(
 		$sub, { data_iter => $data_iter, reader => $self },
 	);
 }
 
-sub _make_validation_callback {
-	my ($self, $field, $index)= @_;
+sub _make_validation_check_coderef {
+	my ($self, $field, $vals_idx, $out_path)= @_;
 	my $t= $field->type;
 	my $c= $field->coerce;
-	$index =~ /^[0-9]+\Z/ or die "$index"; # sanity check for security, since using eval
-	# The validate can either be Type::Tiny or a coderef that inspects $_ and returns the error.
-	my $validate_fn= ref $t eq 'CODE'? '$t->'
-		: $t->can('validate')         ? '$t->validate'
-		: croak "Invalid type constraint $t on field ".$field->name;
-	# Coerce can either be Type::Tiny or a coderef that inspects $_[0] and returns the coerced value.
-	my $coerce_fn= ref $c eq 'CODE'? '$c->'
-		: $c && (!$t->can('has_coercions') || $t->has_coercions)? '$t->coerce'
-		: undef;
-	my $field_lvalue= '$_[0]['.$index.']';
-	my $code= 'sub { my $e= '.$validate_fn.'('.$field_lvalue.'); ';
-	if (defined $coerce_fn) {
-		$code .= 'if (defined $e) {'
-		      .  '  my $tmp= '.$coerce_fn.'('.$field_lvalue.');'
-		      .  '  ('.$field_lvalue.', $e)= ($tmp) unless defined '.$validate_fn.'($tmp);'
-		      .  '}';
-	}
-	$code .= 'defined $e? ([ $field, '.$index.', $e ]) : () }';
-	return eval($code) || die "error compiling validation callback: $@";
+	my $t_can_validate= blessed($t) && $t->can('validate');
+	# If type object has method 'coerce' but does not have method 'has_coercions', just run it.
+	# But, if has_coercions is false, then there's no point in running it.
+	my $t_can_coerce= blessed($t) && ($t->can('has_coercions')? $t->has_coercions : $t->can('coerce'));
+
+	# There are 5 possibilities for the callback:
+	# type is a coderef, and coerce is false
+	ref $t eq 'CODE'? (
+		!$c? sub {
+			my $e= $t->($_[0][$vals_idx]);
+			defined $e? ([ $field, undef, $e, $out_path ]) : ()
+		}
+	# type is a coderef, and coerce is a coderef
+		: ref $c eq 'CODE'? sub {
+			my $e= $t->($_[0][$vals_idx]);
+			if (defined $e) {
+				my $tmp= $c->($_[0][$vals_idx]);
+		      ($_[0][$vals_idx], $e)= ($tmp) unless defined $t->($tmp);
+			}
+			defined $e? ([ $field, undef, $e, $out_path ]) : ()
+		}
+		: croak("Can't coerce field ".$field->name.": ->type is coderef and ->coerce is not a coderef")
+	)
+	# type is a Type::Tiny, and coerce is a coderef
+	: $t_can_validate? (
+		ref $c eq 'CODE'? sub {
+			my $e= $t->validate($_[0][$vals_idx]);
+			if (defined $e) {
+				my $tmp= $c->($_[0][$vals_idx]);
+		      ($_[0][$vals_idx], $e)= ($tmp) unless defined $t->validate($tmp);
+			}
+			defined $e? ([ $field, undef, $e, $out_path ]) : ()
+		}
+	# type is a Type::Tiny, and coerce is requested and is available from the type object
+		: $c && $t_can_coerce? sub {
+			my $e= $t->validate($_[0][$vals_idx]);
+			if (defined $e) {
+				my $tmp= $t->coerce($_[0][$vals_idx]);
+		      ($_[0][$vals_idx], $e)= ($tmp) unless defined $t->validate($tmp);
+			}
+			defined $e? ([ $field, undef, $e, $out_path ]) : ()
+		}
+	# type is a Type::Tiny, and coerce is not requested or not available
+		: sub {
+			my $e= $t->validate($_[0][$vals_idx]);
+			defined $e? ([ $field, undef, $e, $out_path ]) : ()
+		}
+	)
+	: croak "Invalid type constraint $t on field ".$field->name;
 }
 
 sub _handle_blank_row {
-	my ($self, $first, $last)= @_;
+	my ($self, $data_iter, $count)= @_;
+	my $last= $data_iter->row - 1;
+	my $first= $last - $count + 1;
 	my $act= $self->on_blank_row;
 	$act= $act->($self, $first, $last)
 		if ref $act eq 'CODE';
 	if ($act eq 'next') {
-		$self->_log->('warn', 'Skipping blank rows from %s until %s', $first, $last);
+		$self->_log->('warn', $first == $last?
+			( 'Skipping blank row at %s', $first )
+			: ('Skipping blank rows from %s until %s', $first, $last )
+		);
 		return 1;
 	}
 	if ($act eq 'last') {
@@ -795,33 +893,64 @@ sub _handle_blank_row {
 	croak "Invalid value for 'on_blank_row': \"$act\"";
 }
 
-sub _handle_validation_fail {
-	my ($self, $failures, $values, $context)= @_;
-	my $act= $self->on_validation_fail;
-	$act= $act->($self, $failures, $values, $context)
-		if ref $act eq 'CODE';
+sub _handle_validation_error {
+	my ($self, $failures, $output, $data_iter)= @_;
+	my $act= $self->on_validation_error;
+	if (ref $act eq 'CODE') {
+		# Fill in the second element (ref to $output) for each failure
+		for (@$failures) {
+			my $path= $_->[3];
+			my $ref= ref $output eq 'HASH'? \$output->{$path->[0]} : \$output->[$path->[0]];
+			$ref= \(${$ref}->[$path->[1]]) if @$path > 1;
+			$_->[1]= $ref;
+		}
+		$act= $act->($self, $failures, $output, $data_iter);
+	}
 	my $errors= join(', ', map $_->[0]->name.': '.$_->[2], @$failures);
 	if ($act eq 'next') {
-		$self->_log->('warn', "%sSkipped for data errors: %s", $context, $errors) if $errors;
+		$self->_log->('warn', "%s: Skipped for data errors: %s", $data_iter->position, $errors) if $errors;
 		return 0;
 	}
 	if ($act eq 'use') {
-		$self->_log->('warn', "%sPossible data errors: %s", $context, $errors) if $errors;
+		$self->_log->('warn', "%s: Possible data errors: %s", $data_iter->position, $errors) if $errors;
 		return 1;
 	}
 	if ($act eq 'die') {
-		my $msg= "${context}Invalid record: $errors";
+		my $msg= $data_iter->position.": Invalid record: $errors";
 		$self->_log->('error', $msg);
 		croak $msg;
 	}
 }
 
+# This is back-compat for the previous callback API which was an attribute named 'on_validation_fail'
+sub _wrap_on_validation_fail {
+	my $orig_cb= shift;
+	return sub {
+		my ($self, $failures, $output, $data_iter)= @_;
+		# Old API gave the user a value index rather than a ref to the value
+		my @value_refs= map $_->[1], @$failures;
+		my @values= map $$_, @value_refs;
+		$failures->[$_][1]= $_ for 0 .. $#$failures;
+		my $act= $orig_cb->($self, $failures, \@values, $data_iter->position.': ');
+		# if they changed any values, write them back to the refs.
+		${$value_refs[$_]}= $values[$_] for 0 .. $#value_refs;
+		return $act;
+	};
+}
+
 BEGIN { @Data::TableReader::_RecIter::ISA= ( 'Data::TableReader::Iterator' ) }
+
 sub Data::TableReader::_RecIter::all {
 	my $self= shift;
 	my (@rec, $x);
 	push @rec, $x while ($x= $self->());
 	return \@rec;
+}
+sub Data::TableReader::_RecIter::dataset_idx {
+	shift->_fields->{data_iter}->dataset_idx(@_);
+}
+sub Data::TableReader::_RecIter::row {
+	shift->_fields->{data_iter}->row(@_);
 }
 sub Data::TableReader::_RecIter::position {
 	shift->_fields->{data_iter}->position(@_);
@@ -855,7 +984,7 @@ Data::TableReader - Extract records from "dirty" tabular data sources
 
 =head1 VERSION
 
-version 0.015
+version 0.020
 
 =head1 SYNOPSIS
 
@@ -887,7 +1016,7 @@ but there are plenty of options to choose from...
     
     # Our data provider is horrible; just ignore any nonsense we encounter
     on_blank_row => 'next',
-    on_validation_fail => 'next',
+    on_validation_error => 'next',
     
     # Capture warnings and show to user who uploaded file
     log => \(my @messages)
@@ -1137,25 +1266,28 @@ generate your own.
 
 The default is C<'next'>.
 
-=head2 on_validation_fail
+=head2 on_validation_error
 
-  on_validation_fail => 'next'  # warn, and then skip the record
-  on_validation_fail => 'use'   # warn, and then use the record anyway
-  on_validation_fail => 'die'   # fatal error
-  on_validation_fail => sub {
-    my ($reader, $failures, $values, $context)= @_;
+  on_validation_error => 'next'  # warn, and then skip the record
+  on_validation_error => 'use'   # warn, and then use the record anyway
+  on_validation_error => 'die'   # fatal error
+  on_validation_error => sub {
+    my ($tablereader, $failures, $record, $data_iterator)= @_;
+    # $record is the assembled hashref (unblessed) or arrayref of fields
+    # $data_iterator is the Decoder's row iterator, useful for context
     for (@$failures) {
-      my ($field, $value_index, $message)= @$_;
+      my ($field, $value_ref, $message, $path)= @$_;
       ...
       # $field is a Data::TableReader::Field
-      # $values->[$value_index] is the string that failed validation
+      # $$value_ref is the string that failed validation
       # $message is the error returned from the validation function
-      # $context is a string describing the source of the row, like "Row 5"
-      # You may modify $values to alter the record that is about to be created
+      # $path is the element (and maybe sub-element) of $record
+      #   i.e.  $value_ref= \$record->{$path[0]}[$path[1]]
+      # You may modify $$value_ref or $record to alter the output
     }
     # Clear the failures array to suppress warnings, if you actually corrected
     # the validation problems.
-    @$failures= () if $opt eq 'use';
+    @$failures= ();
     # return one of the above constants to tell the iterator what to do next
     return $opt;
   }
@@ -1163,8 +1295,6 @@ The default is C<'next'>.
 This determines what happens when you've found the table, are extracting
 records, and one row fails its validation.  In addition to deciding an option,
 the callback gives you a chance to alter the record before C<'use'>ing it.
-If you use the callback, it suppresses the default warning, since you can
-generate your own.
 
 The default is 'die'.
 

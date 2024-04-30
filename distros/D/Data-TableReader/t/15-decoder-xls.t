@@ -51,15 +51,23 @@ sub run_test {
 	is_deeply( $iter->(), [ 'Another', '01 Main St', 'Elsewhere', 'OH', 45678 ], 'row 4' );
 	is( $iter->row, 4, 'iter1 row=4' );
 	is_deeply( $iter->(), undef, 'no row 5' );
+	is( $iter->dataset_idx, 0, 'dataset_idx=0' );
 	return if $skip_second;
 
 	ok( $iter->next_dataset, 'next dataset (worksheet)' );
+	is( $iter->dataset_idx, 1, 'dataset_idx=1' );
 	is_deeply( $iter->(), [ 'Zip Codes', '', '', '', 'Cities', '', '', '', 'State Postal Codes', '', '' ], 'sheet 2, first row' );
 
 	ok( $iter->seek($pos), 'seek back to previous sheet' );
+	is( $iter->dataset_idx, 0, 'dataset_idx=0' );
 	is_deeply( $iter->(), [ ('') x 5 ], 'row 3 blank' );
 	is_deeply( $iter->(), [ 'Another', '01 Main St', 'Elsewhere', 'OH', 45678 ], 'row 4' );
 	is_deeply( $iter->(), undef, 'no row 5' );
+
+	ok( $iter->next_dataset, 'next dataset (worksheet)' );
+	is( $iter->dataset_idx, 1, 'dataset_idx=1' );
+	ok( !$iter->next_dataset, 'no more worksheets' );
+	is( $iter->dataset_idx, 1, 'dataset_idx=1' );
 }
 
 sub run_test_w_sheet {

@@ -39,6 +39,7 @@ like $uu, qr/^[-0-9a-f]{36}$/, 'smells like uuid';
 {
     open my $fh, '<', $STATEFILE or die "open: $STATEFILE: $!";
     my $state = <$fh>;
+    note $state;
     is length($state), 56, 'content length';
     like $state, qr/clock:\s+[0-9a-f]{4}\s/,             'clock field';
     like $state, qr/tv:\s+[0-9a-f]{16}\s+[0-9a-f]{8}\s/, 'tv field';

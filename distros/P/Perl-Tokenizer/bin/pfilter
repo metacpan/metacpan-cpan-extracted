@@ -28,7 +28,7 @@ getopts('hnlpcNb:a:t', \%opts);
 sub usage {
     my ($code) = @_;
     print <<"HELP";
-usage: $0 [options] [types] [files]
+usage: $0 [options] [tokens] [files]
 
 options:
         -b [i]  : before characters
@@ -40,8 +40,8 @@ options:
         -t      : print the token names only
         -N      : don't print a newline after the token
 
-types:
-        Types are regular expressions.
+tokens:
+        Tokens are regular expressions.
         Example: ^operator
                  ^keyword
                  ^heredoc
@@ -159,7 +159,7 @@ pfilter extracts tokens from a Perl script that match a given regular expression
 
 =head1 AUTHOR
 
-Daniel "Trizen" Șuteu, E<lt>trizen@protonmail.comE<gt>
+Trizen, E<lt>trizen@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

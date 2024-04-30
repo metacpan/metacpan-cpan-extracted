@@ -1,36 +1,38 @@
 ---
-name: Module-Build-Convert
-version: 0.49
+abstract: 'Makefile.PL to Build.PL converter'
 author:
   - 'Steven Schubiger <schubiger@cpan.org>'
-abstract: Makefile.PL to Build.PL converter
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  Carp: 0
-  Cwd: 0
-  Data::Dumper: 0
-  ExtUtils::MakeMaker: 0
-  File::Basename: 0
-  File::HomeDir: 0
-  File::Slurp: 0
-  File::Spec: 0
-  Getopt::Long: 0
-  IO::File: 0
-  IO::Prompt: 0
-  PPI: 0
-  Text::Balanced: 0
 build_requires:
-  Test::More: 0
-recommends:
-  Test::Pod: 1.14
-  Test::Pod::Coverage: 1.04
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Build-Convert
 provides:
   Module::Build::Convert:
     file: lib/Module/Build/Convert.pm
-    version: 0.49
-generated_by: Module::Build version 0.2808
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+    version: '0.50'
+requires:
+  Carp: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::HomeDir: '0'
+  File::Slurp: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  IO::File: '0'
+  IO::Prompt: '0'
+  PPI: '0'
+  Text::Balanced: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/stsc/Module-Build-Convert
+version: '0.50'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

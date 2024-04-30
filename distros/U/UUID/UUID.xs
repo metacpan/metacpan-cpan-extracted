@@ -17,8 +17,10 @@ extern "C" {
 #include "ulib/compare.h"
 #include "ulib/gen.h"
 #include "ulib/isnull.h"
+#include "ulib/md5.h"
 #include "ulib/pack.h"
 #include "ulib/parse.h"
+#include "ulib/sha1.h"
 #include "ulib/splitmix.h"
 #include "ulib/unpack.h"
 #include "ulib/unparse.h"
@@ -60,40 +62,42 @@ UMTX_DECL;
 # define UCXT_INIT my_cxt_t *my_cxtp = &my_cxt;
 #endif
 
-#define UU_GEN_TMPL(ver, out, su, dptr) \
-    SV_CHECK_THINKFIRST_COW_DROP(out);  \
-    if (isGV_with_GP(out))              \
-        croak("%s", PL_no_modify);      \
-    SvUPGRADE(out, SVt_PV);             \
-    dptr = SvGROW(out, sizeof(uu_t)+1); \
-    UMTX_LOCK;                          \
-    uu_v ## ver ## gen(aUCXT, &su);     \
-    UMTX_UNLOCK;                        \
-    uu_pack##ver(&su, (U8*)dptr);       \
-    dptr[sizeof(uu_t)] = '\0';          \
-    SvCUR_set(out, sizeof(uu_t));       \
-    (void)SvPOK_only(out);              \
-    if (SvTYPE(out) == SVt_PVCV)        \
+#define UU_GEN_TMPL(ver, out, su, dptr)   \
+    SV_CHECK_THINKFIRST_COW_DROP(out);    \
+    if (isGV_with_GP(out))                \
+        croak("%s", PL_no_modify);        \
+    SvUPGRADE(out, SVt_PV);               \
+    UMTX_LOCK;                            \
+    uu_v ## ver ## gen(aUCXT, &su, dptr); \
+    UMTX_UNLOCK;                          \
+    dptr = SvGROW(out, sizeof(uu_t)+1);   \
+    uu_pack##ver(&su, (U8*)dptr);         \
+    dptr[sizeof(uu_t)] = '\0';            \
+    SvCUR_set(out, sizeof(uu_t));         \
+    (void)SvPOK_only(out);                \
+    if (SvTYPE(out) == SVt_PVCV)          \
         CvAUTOLOAD_off(out);
 
 #define UU_ALIAS_GEN_V0(out, su, dptr) UU_GEN_TMPL(0, out, su, dptr)
 #define UU_ALIAS_GEN_V1(out, su, dptr) UU_GEN_TMPL(1, out, su, dptr)
+#define UU_ALIAS_GEN_V3(out, su, dptr) UU_GEN_TMPL(3, out, su, dptr)
 #define UU_ALIAS_GEN_V4(out, su, dptr) UU_GEN_TMPL(4, out, su, dptr)
+#define UU_ALIAS_GEN_V5(out, su, dptr) UU_GEN_TMPL(5, out, su, dptr)
 #define UU_ALIAS_GEN_V6(out, su, dptr) UU_GEN_TMPL(6, out, su, dptr)
 #define UU_ALIAS_GEN_V7(out, su, dptr) UU_GEN_TMPL(7, out, su, dptr)
 
 
-#define UU_UNPARSE_TMPL(case, in, out, us, dptr) \
+#define UU_UNPARSE_TMPL(case, in, out, su, dptr) \
     if (SvPOK(in)) {                             \
         dptr = SvGROW(in, sizeof(uu_t));         \
-        uu_unpack((unsigned char*)dptr, &us);    \
+        uu_unpack((unsigned char*)dptr, &su);    \
         SV_CHECK_THINKFIRST_COW_DROP(out);       \
         if (isGV_with_GP(out))                   \
             croak("%s", PL_no_modify);           \
         SvUPGRADE(out, SVt_PV);                  \
         SvPOK_only(out);                         \
         dptr = SvGROW(out, UUID_BUFFSZ+1);       \
-        uu_unparse_ ## case ## er1(&us, dptr);   \
+        uu_unparse_ ## case ## er1(&su, dptr);   \
         dptr[UUID_BUFFSZ] = '\0';                \
         SvCUR_set(out, UUID_BUFFSZ);             \
         (void)SvPOK_only(out);                   \
@@ -101,24 +105,26 @@ UMTX_DECL;
             CvAUTOLOAD_off(out);                 \
     }
 
-#define UU_ALIAS_UNPARSE_LOWER(in, out, us, dptr) UU_UNPARSE_TMPL(low, in, out, us, dptr)
-#define UU_ALIAS_UNPARSE_UPPER(in, out, us, dptr) UU_UNPARSE_TMPL(upp, in, out, us, dptr)
+#define UU_ALIAS_UNPARSE_LOWER(in, out, su, dptr) UU_UNPARSE_TMPL(low, in, out, su, dptr)
+#define UU_ALIAS_UNPARSE_UPPER(in, out, su, dptr) UU_UNPARSE_TMPL(upp, in, out, su, dptr)
 
 
-#define UU_UUID_TMPL(ver, su, dptr) \
-    UMTX_LOCK;                      \
-    uu_v ## ver ## gen(aUCXT, &su); \
-    UMTX_UNLOCK;                    \
-    RETVAL = newSV(UUID_BUFFSZ+1);  \
-    dptr = SvPVX(RETVAL);           \
-    uu_unparse##ver(&su, dptr);     \
-    dptr[UUID_BUFFSZ] = '\0';       \
-    SvCUR_set(RETVAL, UUID_BUFFSZ); \
+#define UU_UUID_TMPL(ver, su, dptr)       \
+    UMTX_LOCK;                            \
+    uu_v ## ver ## gen(aUCXT, &su, dptr); \
+    UMTX_UNLOCK;                          \
+    RETVAL = newSV(UUID_BUFFSZ+1);        \
+    dptr = SvPVX(RETVAL);                 \
+    uu_unparse##ver(&su, dptr);           \
+    dptr[UUID_BUFFSZ] = '\0';             \
+    SvCUR_set(RETVAL, UUID_BUFFSZ);       \
     SvPOK_only(RETVAL);
 
 #define UU_ALIAS_UUID0(su, dptr) UU_UUID_TMPL(0, su, dptr)
 #define UU_ALIAS_UUID1(su, dptr) UU_UUID_TMPL(1, su, dptr)
+#define UU_ALIAS_UUID3(su, dptr) UU_UUID_TMPL(3, su, dptr)
 #define UU_ALIAS_UUID4(su, dptr) UU_UUID_TMPL(4, su, dptr)
+#define UU_ALIAS_UUID5(su, dptr) UU_UUID_TMPL(5, su, dptr)
 #define UU_ALIAS_UUID6(su, dptr) UU_UUID_TMPL(6, su, dptr)
 #define UU_ALIAS_UUID7(su, dptr) UU_UUID_TMPL(7, su, dptr)
 
@@ -132,6 +138,11 @@ UMTX_DECL;
             RETVAL = uu_type(&su);               \
         }                                        \
     }
+
+const struct_uu_t UU_namespace_dns  = { 0x6ba7b810, 0x9dad, 0x11d1, 0x80b4, {0x00, 0xc0, 0x4f, 0xd4, 0x30, 0xc8}};
+const struct_uu_t UU_namespace_url  = { 0x6ba7b811, 0x9dad, 0x11d1, 0x80b4, {0x00, 0xc0, 0x4f, 0xd4, 0x30, 0xc8}};
+const struct_uu_t UU_namespace_oid  = { 0x6ba7b812, 0x9dad, 0x11d1, 0x80b4, {0x00, 0xc0, 0x4f, 0xd4, 0x30, 0xc8}};
+const struct_uu_t UU_namespace_x500 = { 0x6ba7b814, 0x9dad, 0x11d1, 0x80b4, {0x00, 0xc0, 0x4f, 0xd4, 0x30, 0xc8}};
 
 
 MODULE = UUID		PACKAGE = UUID
@@ -176,10 +187,6 @@ BOOT:
         uu_clock_init(aUCXT); /* after srand */
 
         uu_gen_init(aUCXT); /* after srand */
-
-        /* are these not redundant? */
-        UCXT.uu_statepath = NULL;
-        UCXT.uu_statepath_len = 0;
     }
     UMTX_UNLOCK;
 
@@ -204,36 +211,43 @@ _hide_mac()
         uu_gen_setrand(aUCXT);
         UMTX_UNLOCK;
 
-int
+SV *
 _persist(...)
     PROTOTYPE: @
     PREINIT:
         dUCXT;
     INIT:
-        char    *ptr;
-        STRLEN  len;
-        SV      *str;
+        struct_pathlen_t    sp;
+        char                *ptr;
+        SV                  *sv;
     CODE:
-        if (items != 1)
-            croak("Usage: _persist(path/to/file)");
-        str = ST(0);
-        UMTX_LOCK;
-        if (SvTRUE(str)) {
-            ptr = SvPVbyte(str, len);
-            if (UCXT.uu_statepath)
-                Safefree(UCXT.uu_statepath);
-            Newz(0, UCXT.uu_statepath, len+1, char);
-            Copy(ptr, UCXT.uu_statepath, len, char);
-            uu_init_statepath(aUCXT, UCXT.uu_statepath);
-            UCXT.uu_statepath_len = len;
+        if (items > 1)
+            croak("Usage: _persist([path/to/file])");
+        if (items == 0) {
+            UMTX_LOCK;
+            uu_clock_getpath(aUCXT, &sp);
+            UMTX_UNLOCK;
+            RETVAL = newSVpvn(sp.path, sp.len);
         }
-        else {
-            UCXT.uu_statepath     = NULL;
-            UCXT.uu_statepath_len = 0;
-            uu_init_statepath(aUCXT, UCXT.uu_statepath);
+        else { /* items == 1 */
+            if (SvTRUE(ST(0))) {
+                sv = ST(0);
+                ptr = SvPV(sv, sp.len);
+                Newz(0, sp.path, sp.len+1, char);
+                Copy(ptr, sp.path, sp.len, char);
+                UMTX_LOCK;
+                uu_clock_setpath(aUCXT, &sp);
+                UMTX_UNLOCK;
+            }
+            else {
+                sp.path = NULL;
+                sp.len  = 0;
+                UMTX_LOCK;
+                uu_clock_setpath(aUCXT, &sp);
+                UMTX_UNLOCK;
+            }
+            RETVAL = &PL_sv_yes;
         }
-        UMTX_UNLOCK;
-        RETVAL = 1;
     OUTPUT:
         RETVAL
 
@@ -245,7 +259,7 @@ _realnode()
     INIT:
         int             rv;
         char            *dptr;
-        struct_uu1_t    su;
+        struct_uu_t     su;
     CODE:
         UMTX_LOCK;
         rv = uu_realnode(aUCXT, &su);
@@ -264,16 +278,27 @@ _realnode()
         RETVAL
 
 SV *
-_statepath(...)
+_defer(...)
     PROTOTYPE: @
     PREINIT:
         dUCXT;
+    INIT:
+        SV *duration;
     CODE:
-        if (items > 0)
-            croak("Usage: _statepath()");
-        UMTX_LOCK;
-        RETVAL = newSVpvn(UCXT.uu_statepath, UCXT.uu_statepath_len);
-        UMTX_UNLOCK;
+        if (items == 0) {
+            RETVAL = newSVnv(UCXT.clock_defer_100ns / 10000000.0);
+        }
+        else if (items == 1) {
+            duration = ST(0);
+            if (!looks_like_number(duration))
+                croak_caller("Non-numeric :defer argument");
+            UMTX_LOCK;
+            UCXT.clock_defer_100ns = (U64)(SvNV(duration) * 10000000.0);
+            UMTX_UNLOCK;
+            RETVAL = &PL_sv_yes;
+        }
+        else
+            croak("Too many arguments for _defer()");
     OUTPUT:
         RETVAL
 
@@ -284,8 +309,8 @@ clear(io)
     PREINIT:
         dUCXT;
     INIT:
-        struct_uu1_t    su;
-        char            *dptr;
+        struct_uu_t     su;
+        char            *dptr = NULL;
     CODE:
         UU_ALIAS_GEN_V0(io, su, dptr);
 
@@ -323,7 +348,7 @@ copy(out, in)
     PREINIT:
         dUCXT;
     INIT:
-        struct_uu1_t    su;
+        struct_uu_t     su;
         STRLEN          len;
         char            *dptr;
     CODE:
@@ -350,8 +375,8 @@ generate(out)
     PREINIT:
         dUCXT;
     INIT:
-        char            *dptr;
-        struct_uu4_t    su;
+        char            *dptr = NULL;
+        struct_uu_t     su;
     CODE:
         UU_ALIAS_GEN_V4(out, su, dptr);
 
@@ -362,8 +387,8 @@ generate_random(out)
     PREINIT:
         dUCXT;
     INIT:
-        char            *dptr;
-        struct_uu4_t    su;
+        char            *dptr = NULL;
+        struct_uu_t     su;
     CODE:
         UU_ALIAS_GEN_V4(out, su, dptr);
 
@@ -374,8 +399,8 @@ generate_time(out)
     PREINIT:
         dUCXT;
     INIT:
-        char            *dptr;
-        struct_uu1_t    su;
+        char            *dptr = NULL;
+        struct_uu_t     su;
     CODE:
         UU_ALIAS_GEN_V1(out, su, dptr);
 
@@ -386,8 +411,8 @@ generate_v0(out)
     PREINIT:
         dUCXT;
     INIT:
-        char            *dptr;
-        struct_uu1_t    su;
+        char            *dptr = NULL;
+        struct_uu_t     su;
     CODE:
         UU_ALIAS_GEN_V0(out, su, dptr);
 
@@ -398,10 +423,47 @@ generate_v1(out)
     PREINIT:
         dUCXT;
     INIT:
-        char            *dptr;
-        struct_uu1_t    su;
+        char            *dptr = NULL;
+        struct_uu_t     su;
     CODE:
         UU_ALIAS_GEN_V1(out, su, dptr);
+
+void
+generate_v3(out, namespace, name)
+    SV * out
+    SV * namespace
+    SV * name
+    PROTOTYPE: $$$
+    PREINIT:
+        dUCXT;
+    INIT:
+        char            *dptr, *sptr;
+        STRLEN          dlen, slen;
+        struct_uu_t     su;
+    CODE:
+        SvUPGRADE(namespace, SVt_PV);
+        SvUPGRADE(name,      SVt_PV);
+        sptr = SvPV(namespace, slen);
+        dptr = SvPV(name,      dlen);
+
+        if (slen == 36 && !uu_parse(sptr, &su)) {
+            /* uuid string */
+            UU_ALIAS_GEN_V3(out, su, dptr);
+        }
+        else if (slen == 16) {
+            /* assume binary uuid */
+            uu_unpack((unsigned char*)sptr, &su);
+            UU_ALIAS_GEN_V3(out, su, dptr);
+        }
+        else if (slen > 0 /* ibcmp first appears in v5.7.3 */
+            && ( slen == 3 && !ibcmp(sptr, "dns",  (I32)slen) && CopyD(&UU_namespace_dns,  &su, 1, struct_uu_t)
+              || slen == 3 && !ibcmp(sptr, "url",  (I32)slen) && CopyD(&UU_namespace_url,  &su, 1, struct_uu_t)
+              || slen == 3 && !ibcmp(sptr, "oid",  (I32)slen) && CopyD(&UU_namespace_oid,  &su, 1, struct_uu_t)
+              || slen == 4 && !ibcmp(sptr, "x500", (I32)slen) && CopyD(&UU_namespace_x500, &su, 1, struct_uu_t)
+            )
+        ) {
+            UU_ALIAS_GEN_V3(out, su, dptr);
+        }
 
 void
 generate_v4(out)
@@ -410,10 +472,47 @@ generate_v4(out)
     PREINIT:
         dUCXT;
     INIT:
-        char            *dptr;
-        struct_uu4_t    su;
+        char            *dptr = NULL;
+        struct_uu_t     su;
     CODE:
         UU_ALIAS_GEN_V4(out, su, dptr);
+
+void
+generate_v5(out, namespace, name)
+    SV * out
+    SV * namespace
+    SV * name
+    PROTOTYPE: $$$
+    PREINIT:
+        dUCXT;
+    INIT:
+        char            *dptr, *sptr;
+        STRLEN          dlen, slen;
+        struct_uu_t     su;
+    CODE:
+        SvUPGRADE(namespace, SVt_PV);
+        SvUPGRADE(name,      SVt_PV);
+        sptr = SvPV(namespace, slen);
+        dptr = SvPV(name,      dlen);
+
+        if (slen == 36 && !uu_parse(sptr, &su)) {
+            /* uuid string */
+            UU_ALIAS_GEN_V5(out, su, dptr);
+        }
+        else if (slen == 16) {
+            /* assume binary uuid */
+            uu_unpack((unsigned char*)sptr, &su);
+            UU_ALIAS_GEN_V5(out, su, dptr);
+        }
+        else if (slen > 0 /* ibcmp first appears in v5.7.3 */
+            && ( slen == 3 && !ibcmp(sptr, "dns",  (I32)slen) && CopyD(&UU_namespace_dns,  &su, 1, struct_uu_t)
+              || slen == 3 && !ibcmp(sptr, "url",  (I32)slen) && CopyD(&UU_namespace_url,  &su, 1, struct_uu_t)
+              || slen == 3 && !ibcmp(sptr, "oid",  (I32)slen) && CopyD(&UU_namespace_oid,  &su, 1, struct_uu_t)
+              || slen == 4 && !ibcmp(sptr, "x500", (I32)slen) && CopyD(&UU_namespace_x500, &su, 1, struct_uu_t)
+            )
+        ) {
+            UU_ALIAS_GEN_V5(out, su, dptr);
+        }
 
 void
 generate_v6(out)
@@ -422,8 +521,8 @@ generate_v6(out)
     PREINIT:
         dUCXT;
     INIT:
-        char            *dptr;
-        struct_uu6_t    su;
+        char            *dptr = NULL;
+        struct_uu_t     su;
     CODE:
         UU_ALIAS_GEN_V6(out, su, dptr);
 
@@ -434,8 +533,8 @@ generate_v7(out)
     PREINIT:
         dUCXT;
     INIT:
-        char            *dptr;
-        struct_uu7_t    su;
+        char            *dptr = NULL;
+        struct_uu_t     su;
     CODE:
         UU_ALIAS_GEN_V7(out, su, dptr);
 
@@ -466,7 +565,7 @@ parse(in, out)
         dUCXT;
     INIT:
         char            *dptr;
-        struct_uu1_t    su;
+        struct_uu_t     su;
     CODE:
         /* XXX might see uninitialized data */
         RETVAL = -1;
@@ -494,7 +593,7 @@ time(in)
     PREINIT:
         dUCXT;
     INIT:
-        struct_uu1_t    su;
+        struct_uu_t     su;
         char            *str;
         STRLEN          len;
     CODE:
@@ -516,7 +615,7 @@ type(in)
     PREINIT:
         dUCXT;
     INIT:
-        struct_uu1_t    su;
+        struct_uu_t     su;
         char            *str;
         STRLEN          len;
     CODE:
@@ -532,10 +631,10 @@ unparse(in, out)
     PREINIT:
         dUCXT;
     INIT:
-        struct_uu1_t    us;
-        char            *dptr;
+        struct_uu_t     su;
+        char            *dptr = NULL;
     CODE:
-        UU_ALIAS_UNPARSE_LOWER(in, out, us, dptr);
+        UU_ALIAS_UNPARSE_LOWER(in, out, su, dptr);
 
 void
 unparse_lower(in, out)
@@ -545,10 +644,10 @@ unparse_lower(in, out)
     PREINIT:
         dUCXT;
     INIT:
-        struct_uu1_t    us;
-        char            *dptr;
+        struct_uu_t     su;
+        char            *dptr = NULL;
     CODE:
-        UU_ALIAS_UNPARSE_LOWER(in, out, us, dptr);
+        UU_ALIAS_UNPARSE_LOWER(in, out, su, dptr);
 
 void
 unparse_upper(in, out)
@@ -558,10 +657,10 @@ unparse_upper(in, out)
     PREINIT:
         dUCXT;
     INIT:
-        struct_uu1_t    us;
-        char            *dptr;
+        struct_uu_t     su;
+        char            *dptr = NULL;
     CODE:
-        UU_ALIAS_UNPARSE_UPPER(in, out, us, dptr);
+        UU_ALIAS_UNPARSE_UPPER(in, out, su, dptr);
 
 SV *
 uuid()
@@ -569,8 +668,8 @@ uuid()
     PREINIT:
         dUCXT;
     INIT:
-        char            *dptr;
-        struct_uu4_t    su;
+        char            *dptr = NULL;
+        struct_uu_t     su;
     CODE:
         UU_ALIAS_UUID4(su, dptr);
     OUTPUT:
@@ -582,8 +681,8 @@ uuid0()
     PREINIT:
         dUCXT;
     INIT:
-        char        *dptr;
-        struct_uu1_t  su;
+        char            *dptr = NULL;
+        struct_uu_t     su;
     CODE:
         UU_ALIAS_UUID0(su, dptr);
     OUTPUT:
@@ -595,10 +694,48 @@ uuid1()
     PREINIT:
         dUCXT;
     INIT:
-        char        *dptr;
-        struct_uu1_t  su;
+        char            *dptr = NULL;
+        struct_uu_t     su;
     CODE:
         UU_ALIAS_UUID1(su, dptr);
+    OUTPUT:
+        RETVAL
+
+SV *
+uuid3(namespace, name)
+    SV * namespace
+    SV * name
+    PROTOTYPE: $$
+    PREINIT:
+        dUCXT;
+    INIT:
+        char            *dptr, *sptr;
+        STRLEN          dlen, slen;
+        struct_uu_t     su;
+    CODE:
+        SvUPGRADE(namespace, SVt_PV);
+        SvUPGRADE(name,      SVt_PV);
+        sptr = SvPV(namespace, slen);
+        dptr = SvPV(name,      dlen);
+
+        if (slen == 36 && !uu_parse(sptr, &su)) {
+            /* uuid string */
+            UU_ALIAS_UUID3(su, dptr);
+        }
+        else if (slen == 16) {
+            /* assume binary uuid */
+            uu_unpack((unsigned char*)sptr, &su);
+            UU_ALIAS_UUID3(su, dptr);
+        }
+        else if (slen > 0 /* ibcmp first appears in v5.7.3 */
+            && ( slen == 3 && !ibcmp(sptr, "dns",  (I32)slen) && CopyD(&UU_namespace_dns,  &su, 1, struct_uu_t)
+              || slen == 3 && !ibcmp(sptr, "url",  (I32)slen) && CopyD(&UU_namespace_url,  &su, 1, struct_uu_t)
+              || slen == 3 && !ibcmp(sptr, "oid",  (I32)slen) && CopyD(&UU_namespace_oid,  &su, 1, struct_uu_t)
+              || slen == 4 && !ibcmp(sptr, "x500", (I32)slen) && CopyD(&UU_namespace_x500, &su, 1, struct_uu_t)
+            )
+        ) {
+            UU_ALIAS_UUID3(su, dptr);
+        }
     OUTPUT:
         RETVAL
 
@@ -608,10 +745,48 @@ uuid4()
     PREINIT:
         dUCXT;
     INIT:
-        char            *dptr;
-        struct_uu4_t    su;
+        char            *dptr = NULL;
+        struct_uu_t     su;
     CODE:
         UU_ALIAS_UUID4(su, dptr);
+    OUTPUT:
+        RETVAL
+
+SV *
+uuid5(namespace, name)
+    SV * namespace
+    SV * name
+    PROTOTYPE: $$
+    PREINIT:
+        dUCXT;
+    INIT:
+        char            *dptr, *sptr;
+        STRLEN          dlen, slen;
+        struct_uu_t     su;
+    CODE:
+        SvUPGRADE(namespace, SVt_PV);
+        SvUPGRADE(name,      SVt_PV);
+        sptr = SvPV(namespace, slen);
+        dptr = SvPV(name,      dlen);
+
+        if (slen == 36 && !uu_parse(sptr, &su)) {
+            /* uuid string */
+            UU_ALIAS_UUID5(su, dptr);
+        }
+        else if (slen == 16) {
+            /* assume binary uuid */
+            uu_unpack((unsigned char*)sptr, &su);
+            UU_ALIAS_UUID5(su, dptr);
+        }
+        else if (slen > 0 /* ibcmp first appears in v5.7.3 */
+            && ( slen == 3 && !ibcmp(sptr, "dns",  (I32)slen) && CopyD(&UU_namespace_dns,  &su, 1, struct_uu_t)
+              || slen == 3 && !ibcmp(sptr, "url",  (I32)slen) && CopyD(&UU_namespace_url,  &su, 1, struct_uu_t)
+              || slen == 3 && !ibcmp(sptr, "oid",  (I32)slen) && CopyD(&UU_namespace_oid,  &su, 1, struct_uu_t)
+              || slen == 4 && !ibcmp(sptr, "x500", (I32)slen) && CopyD(&UU_namespace_x500, &su, 1, struct_uu_t)
+            )
+        ) {
+            UU_ALIAS_UUID5(su, dptr);
+        }
     OUTPUT:
         RETVAL
 
@@ -621,8 +796,8 @@ uuid6()
     PREINIT:
         dUCXT;
     INIT:
-        char            *dptr;
-        struct_uu6_t    su;
+        char            *dptr = NULL;
+        struct_uu_t     su;
     CODE:
         UU_ALIAS_UUID6(su, dptr);
     OUTPUT:
@@ -634,8 +809,8 @@ uuid7()
     PREINIT:
         dUCXT;
     INIT:
-        char            *dptr;
-        struct_uu7_t    su;
+        char            *dptr = NULL;
+        struct_uu_t     su;
     CODE:
         UU_ALIAS_UUID7(su, dptr);
     OUTPUT:
@@ -648,7 +823,7 @@ variant(in)
     PREINIT:
         dUCXT;
     INIT:
-        struct_uu1_t    su;
+        struct_uu_t     su;
         char            *str;
         STRLEN          len;
     CODE:
@@ -670,7 +845,7 @@ version(in)
     PREINIT:
         dUCXT;
     INIT:
-        struct_uu1_t    su;
+        struct_uu_t     su;
         char            *str;
         STRLEN          len;
     CODE:

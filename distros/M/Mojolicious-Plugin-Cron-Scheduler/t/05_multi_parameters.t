@@ -3,6 +3,7 @@ use warnings;
 
 use Test::Mock::Time;
 use Test2::V0;
+use Test2::Tools::Compare qw(bag item);
 use Test::Mojo;
 use Mojolicious::Lite;
 use File::Path qw(rmtree);
@@ -45,6 +46,6 @@ $t->get_ok('/')->status_is(200);
 
 ff(24 * 60 * 60);    # go forward one day
 
-is(\%record, {job1 => [qw(red blue)]}, 'test multi params');
+is(\%record, {job1 => bag {item('red'), item('blue')}}, 'test multi params');
 
 done_testing;

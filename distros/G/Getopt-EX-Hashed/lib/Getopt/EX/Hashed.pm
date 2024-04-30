@@ -1,6 +1,8 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '1.0503';
+our $VERSION = '1.0601';
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -8,7 +10,7 @@ Getopt::EX::Hashed - Hash store object automation for Getopt::Long
 
 =head1 VERSION
 
-Version 1.0503
+Version 1.0601
 
 =head1 SYNOPSIS
 
@@ -133,7 +135,7 @@ sub has {
     my $member = __Member__($caller);
     for my $name (@name) {
 	my $append = $name =~ s/^\+//;
-	my $i = first { $member->[$_][0] eq $name } 0 .. $#{$member};
+	my $i = first { $member->[$_][0] eq $name } keys @$member;
 	if ($append) {
 	    defined $i or die "$name: Not found\n";
 	    push @{$member->[$i]}, @param;
@@ -298,6 +300,8 @@ sub _opt_dest {
     else {
 	if (ref $obj->{$name} eq 'CODE') {
 	    sub { &{$obj->{$name}} for $obj };
+	} elsif (ref $obj->{$name} eq 'SCALAR') {
+	    $obj->{$name};
 	} else {
 	    \$obj->{$name};
 	}
@@ -309,7 +313,7 @@ my %tester = (
     max  => sub { $_[-1] <= $_->{max} },
     must => sub {
 	my $must = $_->{must};
-	for $_ (ref($must) eq 'ARRAY' ? @$must : $must) {
+	for (ref($must) eq 'ARRAY' ? @$must : $must) {
 	    return 0 if not &$_;
 	}
 	return 1;
@@ -373,8 +377,9 @@ __END__
 
 B<Getopt::EX::Hashed> is a module to automate a hash object to store
 command line option values for B<Getopt::Long> and compatible modules
-including B<Getopt::EX::Long>.  Module name shares B<Getopt::EX>, but
-it works independently from other modules in B<Getopt::EX>, so far.
+including B<Getopt::EX::Long>.  Module name shares B<Getopt::EX>
+prefix, but it works independently from other modules in
+B<Getopt::EX>, so far.
 
 Major objective of this module is integrating initialization and
 specification into single place.  It also provides simple validation
@@ -389,15 +394,25 @@ Problems may occur when multiple objects are present at the same time.
 
 =head2 B<has>
 
-Declare option parameters in a form of:
+Declare option parameters in a following form.  The parentheses are
+for clarity only and may be omitted.
 
     has option_name => ( param => value, ... );
+
+For example, to define the option C<--number>, which takes an integer
+value as a parameter, and also can be used as C<-n>, do the following
+
+    has number => spec => "=i n";
+
+The accessor is created with the first name. In this
+example, the accessor will be defined as C<< $app->number >>.
 
 If array reference is given, multiple names can be declared at once.
 
     has [ 'left', 'right' ] => ( spec => "=i" );
 
-If the name start with plus (C<+>), given parameter updates values.
+If the name start with plus (C<+>), given parameter updates existing
+setting.
 
     has '+left' => ( default => 1 );
 
@@ -420,11 +435,15 @@ Give option specification.  C<< spec => >> label can be omitted if and
 only if it is the first parameter.
 
 In I<string>, option spec and alias names are separated by white
-space, and can show up in any order.  Declaration
+space, and can show up in any order.
+
+To have an option called C<--start> that takes an integer as its value
+and can also be used with the names C<-s> and C<--begin>, declare as
+follows.
 
     has start => "=i s begin";
 
-will be compiled into string:
+Above declaration will be compiled into the next string.
 
     start|s|begin=i
 
@@ -434,11 +453,11 @@ as this:
     has start => "s|begin=i";
 
 If the name and aliases contain underscore (C<_>), another alias name
-is defined with dash (C<->) in place of underscores.  So
+is defined with dash (C<->) in place of underscores.
 
     has a_to_z => "=s";
 
-will be compiled into:
+Above declaration will be compiled into the next string.
 
     a_to_z|a-to-z=s
 
@@ -462,7 +481,7 @@ You can use like this:
 
     $app->foo //= 1;
 
-which is simpler than:
+This is much simpler than writing as in the following.
 
     $app->foo(1) unless defined $app->foo;
 
@@ -487,8 +506,13 @@ times and alter the member data.
 
 If a code reference is given, it is called at the time of B<new> to
 get default value.  This is effective when you want to evaluate the
-value at the time of execution, rather than declaration.  Use
-B<action> parameter to define a default action.
+value at the time of execution, rather than declaration.  If you want
+to define a default action, use the B<action> parameter.
+
+If a reference to SCALAR is given, the option value is stored in the
+data indicated by the reference, not in the hash object member.  In
+this case, the expected value cannot be obtained by accessing the hash
+member.
 
 =item [ B<action> => ] I<coderef>
 
@@ -588,7 +612,7 @@ options.
 
     $obj->getopt(\@argv);
 
-are shortcut for:
+Above examples are shortcut for following code.
 
     GetOptions($obj->optspec)
 
@@ -686,7 +710,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2021-2022 Kazumasa Utashiro
+Copyright 2021-2024 Kazumasa Utashiro
 
 =head1 LICENSE
 

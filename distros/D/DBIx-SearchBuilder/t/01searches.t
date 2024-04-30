@@ -7,7 +7,7 @@ use Test::More;
 BEGIN { require "./t/utils.pl" }
 our (@AvailableDrivers);
 
-use constant TESTS_PER_DRIVER => 153;
+use constant TESTS_PER_DRIVER => 157;
 
 my $total = scalar(@AvailableDrivers) * TESTS_PER_DRIVER;
 plan tests => $total;
@@ -457,6 +457,21 @@ SKIP: {
     my $hinted_sql = $users_obj->BuildSelectQuery( PreferBind => 0 );
     like( $hinted_sql, qr|/\*\+FooBar \*/|, "..but are when QueryHint() IS called" );
 
+    $users_obj->UnLimit;
+    $users_obj->Limit( FIELD => 'Comments', VALUE => 'NULL', OPERATOR => 'IS NOT' );
+    if ( $d eq 'Oracle' ) {
+        is( $users_obj->Count, 1, 'Found 1 user who has no comment' );
+        is( $users_obj->First->Login, 'cubic', 'Found the correct user who has no comment' );
+    }
+    else {
+        is( $users_obj->Count, 2, 'Found 2 users who have no comment' );
+        is_deeply(
+            [ map { $_->Login } @{ $users_obj->ItemsArrayRef } ],
+            [ 'cubic', 'obra' ],
+            'Found the correct users who have no comment'
+        );
+    }
+
 	cleanup_schema( 'TestApp', $handle );
 }} # SKIP, foreach blocks
 
@@ -472,6 +487,7 @@ CREATE TABLE Users (
         Login varchar(18) NOT NULL,
         Name varchar(36),
 	Phone varchar(18),
+    Comments blob,
   	PRIMARY KEY (id))
 EOF
 ]}
@@ -487,6 +503,7 @@ CREATE TABLE Users (
     Login varchar(18) NOT NULL,
     Name varchar(36),
     Phone varchar(18),
+    Comments blob,
     PRIMARY KEY (id))
 EOF
 ]}
@@ -500,7 +517,8 @@ CREATE TEMPORARY TABLE Users (
         id serial PRIMARY KEY,
         Login varchar(18) NOT NULL,
         Name varchar(36),
-        Phone varchar(18)
+        Phone varchar(18),
+        Comments text
 )
 EOF
 
@@ -513,7 +531,8 @@ CREATE TABLE Users (
 	id integer primary key,
 	Login varchar(18) NOT NULL,
 	Name varchar(36),
-	Phone varchar(18))
+	Phone varchar(18),
+    Comments blob)
 EOF
 
 }
@@ -524,7 +543,8 @@ sub schema_oracle { [
         id integer CONSTRAINT Users_Key PRIMARY KEY,
         Login varchar(18) NOT NULL,
         Name varchar(36),
-        Phone varchar(18)
+        Phone varchar(18),
+        Comments clob
     )",
 ] }
 
@@ -559,15 +579,17 @@ sub _ClassAccessible {
         {read => 1, write => 1, type => 'varchar(36)' },
         Phone =>
         {read => 1, write => 1, type => 'varchar(18)', default => ''},
+        Comments =>
+        {read => 1, write => 1, type => 'blob', default => ''},
     }
 }
 
 sub init_data {
     return (
-	[ 'Login',	'Name',			'Phone' ],
-	[ 'cubic',	'Ruslan U. Zakirov',	'+7-903-264-XX-XX' ],
-	[ 'obra',	'Jesse Vincent',	undef ],
-	[ 'glasser',	'David Glasser',	undef ],
+	[ 'Login',	'Name',			'Phone', 'Comments' ],
+	[ 'cubic',	'Ruslan U. Zakirov',	'+7-903-264-XX-XX', 'one comment' ],
+	[ 'obra',	'Jesse Vincent',	undef, '' ],
+	[ 'glasser',	'David Glasser',	undef, undef ],
 	[ 'autrijus',	'Autrijus Tang',	'+X-XXX-XXX-XX-XX' ],
     );
 }

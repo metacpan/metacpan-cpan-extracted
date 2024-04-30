@@ -1,3 +1,17 @@
+0.09 2024-04-29T13:23:21+02:00
+ - Add links to doc.
+ - Fix typo in doc.
+ - Remove usage of Tags::Output::Raw and CSS::Struct::Output::Raw.
+ - Use Test::MockObject instance for test of bad instance.
+
+0.08 2024-04-29T13:06:26+02:00
+ - Add check for 'lang' parameter.
+ - Add required version to List::Util in code.
+ - Fix EXAMPLE2 in doc.
+ - Fix naming of doc sections.
+ - Fix typo in doc.
+ - Update copyright years.
+
 0.07 2023-06-29T19:51:27+02:00
  - Remove lastpass buttons from image in doc.
 

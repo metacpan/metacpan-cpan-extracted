@@ -1,0 +1,37 @@
+---
+abstract: ~
+author:
+  - 'Dragos Trif <drd.trif@gmail.com>'
+build_requires:
+  DBD::SQLite: '1.74'
+  DBI: '1.643'
+  ExtUtils::MakeMaker: 6.36
+  Test2::V0: '0.000145'
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.21'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBD-Mock-Session-GenerateFixtures
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: '1.52'
+  Cpanel::JSON::XS: '4.37'
+  DBD::Mock: '1.59'
+  Data::Walk: '2.01'
+  English: '1.11'
+  File::Path: '2.18'
+  File::Slurper: '0.014'
+  File::Spec: '3.84'
+  Readonly: '2.05'
+  Sub::Override: '0.10'
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

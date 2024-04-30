@@ -46,24 +46,25 @@ WriteMakefile1(
     'OBJECT'           => '$(O_FILES)',
     'LDFROM'           => join( ' ', qw{
         UUID.o ulib/chacha.o ulib/clear.o ulib/clock.o ulib/compare.o
-        ulib/copy.o ulib/gen.o ulib/gettime.o ulib/isnull.o ulib/node.o
-        ulib/pack.o ulib/parse.o ulib/splitmix.o ulib/unpack.o
-        ulib/unparse.o ulib/util.o ulib/xoshiro.o
+        ulib/copy.o ulib/gen.o ulib/gettime.o ulib/isnull.o ulib/md5.o
+        ulib/node.o ulib/pack.o ulib/parse.o ulib/sha1.o ulib/splitmix.o
+        ulib/unpack.o ulib/unparse.o ulib/util.o ulib/xoshiro.o
     }),
     'C' => [qw{
         UUID.c ulib/chacha.c ulib/clear.c ulib/clock.c ulib/compare.c
-        ulib/copy.c ulib/gen.c ulib/gettime.c ulib/isnull.c ulib/node.c
-        ulib/pack.c ulib/parse.c ulib/splitmix.c ulib/unpack.c
-        ulib/unparse.c ulib/util.c ulib/xoshiro.c
+        ulib/copy.c ulib/gen.c ulib/gettime.c ulib/isnull.c ulib/md5.c
+        ulib/node.c ulib/pack.c ulib/parse.c ulib/sha1.c ulib/splitmix.c
+        ulib/unpack.c ulib/unparse.c ulib/util.c ulib/xoshiro.c
     }],
     'H' => [qw{
         ulib/EUMM.h ulib/PORT.h ulib/TYPE.h ulib/UUID.h ulib/chacha.h
-        ulib/clear.h ulib/clock.h ulib/compare.h ulib/copy.h
+        ulib/clear.h ulib/clock.h ulib/compare.h ulib/copy.h ulib/md5.h
         ulib/isnull.h ulib/gen.h ulib/gettime.h ulib/node.h ulib/pack.h
-        ulib/parse.h ulib/splitmix.h ulib/unpack.h ulib/unparse.h
-        ulib/util.h ulib/xoshiro.h
+        ulib/parse.h ulib/sha1.h ulib/splitmix.h ulib/unpack.h
+        ulib/unparse.h ulib/util.h ulib/xoshiro.h
     }],
     'PREREQ_PM'          => {
+        'Carp'        => 0,
         'DynaLoader'  => $DL_version,
         'Exporter'    => $EX_version,
         'Time::HiRes' => $HRT_version,
@@ -134,6 +135,7 @@ WriteMakefile1(
             UUID.pdb
             UUID.xsc
             assertconf*.h
+            assertconf*.txt
             assertlib*.c
             assertlib*.exe
             assertlib*.obj
@@ -267,9 +269,18 @@ use Config;
 #
 sub top_targets {
     my $t = shift->SUPER::top_targets(@_);
-    # add 'compare' target.
-    $t .= "\ncompare : dynamic pure_all\n";
-    $t .= "\t\$(ABSPERLRUN) -Iblib\$(DFSEP)lib -Iblib\$(DFSEP)arch ubin\$(DFSEP)compare.pl 1\n";
+    # add 'compare' targets.
+    $t .= "\nspeeds : dynamic pure_all\n";
+    $t .= "\t\$(NOECHO) \$(ABSPERLRUN) -Iblib\$(DFSEP)lib -Iblib\$(DFSEP)arch ubin\$(DFSEP)cmp_speeds.pl 1\n";
+    $t .= "\n";
+    $t .= "\nstyles : dynamic pure_all\n";
+    $t .= "\t\$(NOECHO) \$(ABSPERLRUN) -Iblib\$(DFSEP)lib -Iblib\$(DFSEP)arch ubin\$(DFSEP)cmp_styles.pl 1\n";
+    $t .= "\n";
+    $t .= "\npersist : dynamic pure_all\n";
+    $t .= "\t\$(NOECHO) \$(ABSPERLRUN) -Iblib\$(DFSEP)lib -Iblib\$(DFSEP)arch ubin\$(DFSEP)cmp_persist.pl 1\n";
+    $t .= "\n";
+    $t .= "\ncompare : speeds styles persist\n";
+    $t .= "\t\$(NOECHO) \$(NOOP)";
     # remove blibdirs from config prereq.
     $t =~ s{^(config\s*::.*)\s+blibdirs} {$1}m;
     # change pure_all prereqs
@@ -440,9 +451,11 @@ ulib_copy      = ulib$(DFSEP)copy
 ulib_gen       = ulib$(DFSEP)gen
 ulib_gettime   = ulib$(DFSEP)gettime
 ulib_isnull    = ulib$(DFSEP)isnull
+ulib_md5       = ulib$(DFSEP)md5
 ulib_node      = ulib$(DFSEP)node
 ulib_pack      = ulib$(DFSEP)pack
 ulib_parse     = ulib$(DFSEP)parse
+ulib_sha1      = ulib$(DFSEP)sha1
 ulib_splitmix  = ulib$(DFSEP)splitmix
 ulib_unpack    = ulib$(DFSEP)unpack
 ulib_unparse   = ulib$(DFSEP)unparse
@@ -546,6 +559,9 @@ $(ulib_gettime).obj  : $(deps) $(ulib_gettime).c $(ulib_gettime).h
 $(ulib_isnull).obj   : $(deps) $(ulib_isnull).c $(ulib_isnull).h
 	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) -Fd$(*).pdb -Fo$(*).obj $*.c
 
+$(ulib_md5).obj      : $(deps) $(ulib_md5).c $(ulib_md5).h
+	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) -Fd$(*).pdb -Fo$(*).obj $*.c
+
 $(ulib_node).obj     : $(deps) $(ulib_node).c $(ulib_node).h
 	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) -Fd$(*).pdb -Fo$(*).obj $*.c
 
@@ -553,6 +569,9 @@ $(ulib_pack).obj     : $(deps) $(ulib_pack).c $(ulib_pack).h
 	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) -Fd$(*).pdb -Fo$(*).obj $*.c
 
 $(ulib_parse).obj    : $(deps) $(ulib_parse).c $(ulib_parse).h
+	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) -Fd$(*).pdb -Fo$(*).obj $*.c
+
+$(ulib_sha1).obj     : $(deps) $(ulib_sha1).c $(ulib_sha1).h
 	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) -Fd$(*).pdb -Fo$(*).obj $*.c
 
 $(ulib_splitmix).obj : $(deps) $(ulib_splitmix).c $(ulib_splitmix).h
@@ -598,6 +617,9 @@ $(ulib_gettime).o  : $(deps) $(ulib_gettime).c  $(ulib_gettime).h
 $(ulib_isnull).o   : $(deps) $(ulib_isnull).c   $(ulib_isnull).h
 	$(cccmd) $(ulib_isnull).c   -o $(ulib_isnull).o
 
+$(ulib_md5).o      : $(deps) $(ulib_md5).c      $(ulib_md5).h
+	$(cccmd) $(ulib_md5).c      -o $(ulib_md5).o
+
 $(ulib_node).o     : $(deps) $(ulib_node).c     $(ulib_node).h
 	$(cccmd) $(ulib_node).c     -o $(ulib_node).o
 
@@ -606,6 +628,9 @@ $(ulib_pack).o     : $(deps) $(ulib_pack).c     $(ulib_pack).h
 
 $(ulib_parse).o    : $(deps) $(ulib_parse).c    $(ulib_parse).h
 	$(cccmd) $(ulib_parse).c    -o $(ulib_parse).o
+
+$(ulib_sha1).o     : $(deps) $(ulib_sha1).c    $(ulib_sha1).h
+	$(cccmd) $(ulib_sha1).c     -o $(ulib_sha1).o
 
 $(ulib_splitmix).o : $(deps) $(ulib_splitmix).c $(ulib_splitmix).h
 	$(cccmd) $(ulib_splitmix).c -o $(ulib_splitmix).o
@@ -638,9 +663,11 @@ $(INST_DYNAMIC) : \
 	ulib/gen.obj \
 	ulib/gettime.obj \
 	ulib/isnull.obj \
+	ulib/md5.obj \
 	ulib/node.obj \
 	ulib/pack.obj \
 	ulib/parse.obj \
+	ulib/sha1.obj \
 	ulib/splitmix.obj \
 	ulib/unpack.obj \
 	ulib/unparse.obj \
@@ -658,9 +685,11 @@ $(INST_DYNAMIC) : \
 	ulib/gen.obj \
 	ulib/gettime.obj \
 	ulib/isnull.obj \
+	ulib/md5.obj \
 	ulib/node.obj \
 	ulib/pack.obj \
 	ulib/parse.obj \
+	ulib/sha1.obj \
 	ulib/splitmix.obj \
 	ulib/unpack.obj \
 	ulib/unparse.obj \
@@ -678,9 +707,7 @@ EOP
 $(INST_DYNAMIC) : $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists \
 	$(EXPORT_LIST) $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)
 	$(RM_F) $@
-	$(LD) $(LDDLFLAGS) $(LDFROM) $(OTHERLDFLAGS) -o $@ $(MYEXTLIB) \
-	  $(PERL_ARCHIVE) $(LDLOADLIBS) $(PERL_ARCHIVE_AFTER) $(EXPORT_LIST) \
-	  $(INST_DYNAMIC_FIX)
+	$(LD) $(LDDLFLAGS) $(LDFROM) $(OTHERLDFLAGS) -o $@ $(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) $(PERL_ARCHIVE_AFTER) $(EXPORT_LIST) $(INST_DYNAMIC_FIX)
 	$(NOECHO) $(CHMOD) $(PERM_RWX) $@
 EOP
     }

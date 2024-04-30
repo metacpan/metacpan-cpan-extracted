@@ -15,13 +15,9 @@ use Carp qw(longmess);    # Stack trace.
 
 Data::Trace - Trace when a data structure gets updated.
 
-=head1 VERSION
-
-Version 0.11
-
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -72,7 +68,12 @@ sub Trace {
                 my ( $self, $v ) = @_;
                 $self->Store( $v );
                 print "Storing here:" . longmess();
-            }
+            },
+            -delete    => sub {
+                my ( $self, $v ) = @_;
+                $self->Store( $v );
+                print "Deleting here:" . longmess();
+            },
         );
     }
 }

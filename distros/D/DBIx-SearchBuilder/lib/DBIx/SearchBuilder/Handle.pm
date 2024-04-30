@@ -1833,6 +1833,16 @@ sub HasSupportForCombineSearchAndCount {
     return 1;
 }
 
+=head2 HasSupportForEmptyString
+
+Returns true value if DB supports empty string.
+
+=cut
+
+sub HasSupportForEmptyString {
+    return 1;
+}
+
 =head2 QuoteName
 
 Quote table or column name to avoid reserved word errors.

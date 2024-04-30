@@ -2,7 +2,7 @@
 # MIT License
 
 class JSON : precompile {
-  version "1.001001";
+  version "1.001002";
   
   use Hash;
   use List;

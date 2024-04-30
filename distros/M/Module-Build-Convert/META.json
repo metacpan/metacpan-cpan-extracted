@@ -1,0 +1,62 @@
+{
+   "abstract" : "Makefile.PL to Build.PL converter",
+   "author" : [
+      "Steven Schubiger <schubiger@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Module-Build-Convert",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Basename" : "0",
+            "File::HomeDir" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "IO::File" : "0",
+            "IO::Prompt" : "0",
+            "PPI" : "0",
+            "Text::Balanced" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Module::Build::Convert" : {
+         "file" : "lib/Module/Build/Convert.pm",
+         "version" : "0.50"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/stsc/Module-Build-Convert"
+      }
+   },
+   "version" : "0.50",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

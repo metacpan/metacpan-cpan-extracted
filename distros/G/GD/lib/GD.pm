@@ -16,7 +16,7 @@ use GD::Polygon;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $AUTOLOAD);
 
-$VERSION = '2.78';
+$VERSION = '2.79';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -302,7 +302,7 @@ image by providing an open filehandle, a filename, or the image data
 itself.  The image formats automatically recognized and accepted are:
 GIF, PNG, JPEG, XBM, XPM, BMP, GD2, TIFF, WEBP, HEIF or AVIF. Other formats,
 including WBMP, and GD version 1, cannot be recognized automatically
-at this time.
+at this time, only by filename.
 
 If something goes wrong (e.g. insufficient memory), this call will
 return undef.

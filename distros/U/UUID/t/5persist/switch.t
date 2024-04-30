@@ -69,7 +69,7 @@ sub gettime {
     #clock: 3735 tv: 0000001707180262 00390359 adj: 00000000
     my $dat = <$fh>;
     undef $fh;
-    #note $dat;
+    note $dat;
     my @vals = (split /\s+/, $dat)[3,4,6];
 
     # sleep here so the timestamps actually change.

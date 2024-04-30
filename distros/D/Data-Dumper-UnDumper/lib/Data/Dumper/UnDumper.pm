@@ -1,5 +1,5 @@
 package Data::Dumper::UnDumper;
-$Data::Dumper::UnDumper::VERSION = '0.01';
+$Data::Dumper::UnDumper::VERSION = '0.02';
 # ABSTRACT: load Data::Dumper output, including self-references
 
 use 5.006;
@@ -104,7 +104,7 @@ sub _recurse_resolve {
         for (values %$value) { _recurse_resolve($_, $obj, $depth); }
     } else {
         # A plain value, resolve it if it's a DUMPERREF
-        if ($value =~ /^DUMPERREF:(.+)$/) {
+        if ($value && $value =~ /^DUMPERREF:(.+)$/) {
             # We need to unescape the escaped braces first, then what we're
             # left with should be safe to eval (FIXME prob use Safe here?)
             my $ref = $1;

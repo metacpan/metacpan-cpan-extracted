@@ -4,7 +4,7 @@ package DBIx::SearchBuilder;
 use strict;
 use warnings;
 
-our $VERSION = "1.81";
+our $VERSION = "1.82";
 
 use Clone qw();
 use Encode qw();
@@ -46,6 +46,11 @@ DBIx::SearchBuilder - Encapsulate SQL queries and rows in simple perl objects
   $sb->Limit( FIELD => "column_1", VALUE => "matchstring" );
 
   while ( my $record = $sb->Next ) {
+
+      # SearchBuilder returns the vanilla value fetched from database drivers. Note
+      # that different drivers handle the encoding differently. Check your
+      # driver's documentation to get more details.
+
       print $record->my_column_name();
   }
 
@@ -2122,6 +2127,6 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-DBIx::SearchBuilder::Handle, DBIx::SearchBuilder::Record.
+L<DBIx::SearchBuilder::Handle>, L<DBIx::SearchBuilder::Record>.
 
 =cut

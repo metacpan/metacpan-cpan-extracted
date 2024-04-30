@@ -67,7 +67,7 @@ sub doit {
     note 'in doit()';
     my $c; { lock $cnt; $c = ++$cnt }
     note "c: $c";
-    my ($rv,$er) = t{ UUID::_statepath };
+    my ($rv,$er) = t{ UUID::_persist() };
     is $rv, 'foo', "path seems correct $cnt";
     is $er, undef, "path correct $cnt";
 }

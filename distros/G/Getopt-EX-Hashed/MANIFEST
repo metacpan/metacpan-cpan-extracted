@@ -1,9 +1,17 @@
 Build.PL
 Changes
 LICENSE
+MANIFEST.SKIP
 META.json
+README.JA.md
+README.KO.md
+README.ZH.md
 README.md
 cpanfile
+docs/Hashed.JA.pod
+docs/Hashed.KO.pod
+docs/Hashed.ZH.pod
+docs/Hashed.pod
 lib/Getopt/EX/Hashed.pm
 minil.toml
 t/00_compile.t

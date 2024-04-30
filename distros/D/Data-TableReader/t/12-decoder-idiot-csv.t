@@ -19,8 +19,10 @@ my $d= new_ok( 'Data::TableReader::Decoder::IdiotCSV',
 
 ok( my $iter= $d->iterator, 'got iterator' );
 
+is( $iter->dataset_idx, 0, 'dataset_idx=0' );
 is_deeply( $iter->(), [ 'First Name', 'Last Name', 'Email' ], 'first row' );
 is_deeply( $iter->(), [ 'Joseph "Joe', 'Smith', '"Smith, Joe" <jsmith@example.com>' ], 'second row' );
 is_deeply( $iter->(), undef, 'no third row' );
+is( $iter->dataset_idx, 0, 'dataset_idx=0' );
 
 done_testing;

@@ -6,7 +6,7 @@ use IO::Handle;
 extends 'Data::TableReader::Decoder';
 
 # ABSTRACT: Base class for implementing spreadsheet decoders
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 
 has workbook => ( is => 'lazy' );
@@ -102,6 +102,10 @@ sub Data::TableReader::Decoder::Spreadsheet::_Iter::row {
 	1 + ${ shift->_fields->{row_ref} };
 }
 
+sub Data::TableReader::Decoder::Spreadsheet::_Iter::dataset_idx {
+	shift->_fields->{sheet_idx};
+}
+
 sub Data::TableReader::Decoder::Spreadsheet::_Iter::progress {
 	my $f= shift->_fields;
 	return ${ $f->{row_ref} } / (${ $f->{rowmax_ref} } || 1);
@@ -151,7 +155,7 @@ Data::TableReader::Decoder::Spreadsheet - Base class for implementing spreadshee
 
 =head1 VERSION
 
-version 0.015
+version 0.020
 
 =head1 DESCRIPTION
 

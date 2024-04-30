@@ -75,45 +75,52 @@
 
 typedef union {
   struct {
+    /* keep this struct first for namespace init */
     U32 time_low;
     U16 time_mid;
     U16 time_high_and_version;
     U16 clock_seq_and_variant;
     U8  node[6];
-  } members;
-  U64 __align;
-} struct_uu1_t;
-
-typedef union {
+  } v1;
+  struct {
+    U64 low;
+    U64 high;
+  } v0;
+  struct {
+    U32 md5_high32;
+    U16 md5_high16;
+    U16 md5_mid_and_version;
+    U32 md5_low_and_variant;
+    U32 md5_low;
+  } v3;
   struct {
     U32 rand_a;
     U32 rand_b_and_version;
     U32 rand_c_and_variant;
     U32 rand_d;
-  } members;
-  U64 __align;
-} struct_uu4_t;
-
-typedef union {
+  } v4;
+  struct {
+    U32 sha1_high32;
+    U16 sha1_high16;
+    U16 sha1_mid_and_version;
+    U32 sha1_low_and_variant;
+    U32 sha1_low;
+  } v5;
   struct {
     U32 time_high;
     U16 time_mid;
     U16 time_low_and_version;
     U16 clock_seq_and_variant;
     U8  node[6];
-  } members;
-  U64 __align;
-} struct_uu6_t;
-
-typedef union {
+  } v6;
   struct {
     U32 time_high;
     U16 time_low;
     U16 rand_a_and_version;
     U64 rand_b_and_variant;
-  } members;
+  } v7;
   U64 __align;
-} struct_uu7_t;
+} struct_uu_t;
 
 typedef unsigned char UCHAR;
 
@@ -124,36 +131,42 @@ typedef unsigned char UCHAR;
 #define CC_ROUNDS   20
 
 typedef struct {
-  U32     state[CC_STATESZ];
-  UCHAR   buf[CC_BUFSZ];
-  U16     have;
-  U64     __align;
+  U32           state[CC_STATESZ];
+  UCHAR         buf[CC_BUFSZ];
+  U16           have;
+  unsigned int  pid;
+  U64           __align;
 } cc_st;
+
+typedef struct {
+  char    *path;
+  STRLEN  len;
+} struct_pathlen_t;
 
 /* this should be aligned at least 4 bytes, better yet 16 */
 typedef U8 uu_t[16];
 
 typedef struct {
-  U64             xo_s[4];
-  U64             sm_x;
-  U64             gen_epoch;
-  U8              gen_node[6];  /* need 64bit align */
-  U16             __align;
-  U8              gen_real_node[6];  /* need 64bit align */
-  NV              (*myNVtime)();
-  void            (*myU2time)(pTHX_ UV ret[2]);
-  int             gen_has_real_node;
-  int             gen_use_unique;
-  cc_st           cc;  /* aligned 64bit */
-  int             clock_state_fd;
-  FILE            *clock_state_f;
-  char            *clock_state_path;
-  int             clock_adj;
-  struct timeval  clock_last;
-  U16             clock_seq;
-  STRLEN          uu_statepath_len;
-  char            *uu_statepath;
-  UV              thread_id;
+  U64               xo_s[4];
+  U64               sm_x;
+  U64               gen_epoch;
+  U8                gen_node[6];  /* need 64bit align */
+  U16               __align;
+  U8                gen_real_node[6];  /* need 64bit align */
+  NV                (*myNVtime)();
+  void              (*myU2time)(pTHX_ UV ret[2]);
+  int               gen_has_real_node;
+  int               gen_use_unique;
+  cc_st             cc;  /* aligned 64bit */
+  int               clock_state_fd;
+  FILE              *clock_state_f;
+  struct_pathlen_t  clock_pathlen;
+  int               clock_adj;
+  struct timeval    clock_last;
+  U16               clock_seq;
+  UV                thread_id;
+  U64               clock_defer_100ns;
+  U64               clock_prev_reg;
 } my_cxt_t;
 
 #define pUCXT pTHX_ my_cxt_t *my_cxtp

@@ -2,9 +2,8 @@ NAME
     Mo::utils::Language - Mo language utilities.
 
 SYNOPSIS
-     use Mo::utils::Language qw(check_language check_language_639_1 check_language_639_2);
+     use Mo::utils::Language qw(check_language_639_1 check_language_639_2);
 
-     check_language($self, $key);
      check_language_639_1($self, $key);
      check_language_639_2($self, $key);
 
@@ -15,6 +14,10 @@ SUBROUTINES
   "check_language"
      check_language($self, $key);
 
+    It is deprecated, use other checks.
+
+    *Since version 0.01. Described functionality since version 0.04.*
+
     Check parameter defined by $key if it's ISO 639-1 language code and if
     language exists. Value could be undefined.
 
@@ -23,6 +26,8 @@ SUBROUTINES
   "check_language_639_1"
      check_language_639_1($self, $key);
 
+    *Since version 0.05.*
+
     Check parameter defined by $key if it's ISO 639-1 language code and if
     language code exists. Value could be undefined.
 
@@ -30,6 +35,8 @@ SUBROUTINES
 
   "check_language_639_2"
      check_language_639_2($self, $key);
+
+    *Since version 0.05.*
 
     Check parameter defined by $key if it's ISO 639-2 language code and if
     language code exists. Value could be undefined.
@@ -188,5 +195,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 
