@@ -3,7 +3,7 @@ package Lemonldap::NG::Portal::Lib::U2F;
 use strict;
 use Mouse;
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.19.0';
 
 has origin => ( is => 'rw', );
 
@@ -15,7 +15,7 @@ sub init {
         $self->error("Can't load U2F library: $@");
         return 0;
     }
-    my $p = $_[0]->{conf}->{portal};
+    my $p = $self->p->HANDLER->tsv->{portal}->();
     $p =~ s#^(https?://[^/]+).*$#$1#;
     $self->origin($p);
 

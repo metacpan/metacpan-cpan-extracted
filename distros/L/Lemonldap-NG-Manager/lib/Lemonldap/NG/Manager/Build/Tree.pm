@@ -55,6 +55,7 @@ sub tree {
                                 'showLanguages',
                                 'scrollTop',
                                 'portalCustomCss',
+                                'portalCustomJs',
                                 'portalSkin',
                                 'portalSkinBackground',
                                 'portalSkinRules',
@@ -550,6 +551,34 @@ sub tree {
                             ]
                         },
                         {
+                            title => 'issuerDBJitsiMeetTokens',
+                            help  => 'idpjitsimeettokens.html',
+                            nodes => [
+                                'issuerDBJitsiMeetTokensActivation',
+                                'issuerDBJitsiMeetTokensPath',
+                                'issuerDBJitsiMeetTokensRule',
+                                {
+                                    title => 'jitsiOptions',
+                                    nodes => [
+                                        'jitsiDefaultServer',
+                                        'jitsiAppId',
+                                        'jitsiAppSecret',
+                                        'jitsiSigningAlg',
+                                        'jitsiExpiration',
+                                        {
+                                            title => 'jitsiAttributes',
+                                            form  => 'simpleInputContainer',
+                                            nodes => [
+                                                'jitsiIdAttribute',
+                                                'jitsiNameAttribute',
+                                                'jitsiMailAttribute',
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
                             title => 'issuerOptions',
                             help  => 'start.html#options',
                             form  => 'simpleInputContainer',
@@ -928,12 +957,31 @@ sub tree {
                 {
                     title => 'secondFactors',
                     help  => 'secondfactor.html',
-                    nodes => [
-                        'sfManagerRule',
-                        'sfRequired',
-                        'sfOnlyUpgrade',
-                        'sfLoginTimeout',
-                        'sfRegisterTimeout',
+                    nodes => [ {
+                            title => 'sfOptions',
+                            help  => 'secondfactor.html',
+                            form  => 'simpleInputContainer',
+                            nodes => [
+                                'sfManagerRule',
+                                'sfRequired',
+                                'sfOnlyUpgrade',
+                                'sfLoginTimeout',
+                                'sfRegisterTimeout',
+                                'sfRetries',
+                                {
+                                    title => 'sfRemovedNotification',
+                                    help  => 'secondfactor.html',
+                                    form  => 'simpleInputContainer',
+                                    nodes => [
+                                        'sfRemovedMsgRule',
+                                        'sfRemovedUseNotif',
+                                        'sfRemovedNotifRef',
+                                        'sfRemovedNotifTitle',
+                                        'sfRemovedNotifMsg'
+                                    ],
+                                }
+                            ]
+                        },
                         {
                             title => 'utotp2f',
                             help  => 'utotp2f.html',
@@ -985,6 +1033,7 @@ sub tree {
                                 'webauthn2fAttestation',
                                 'webauthn2fAttestationTrust',
                                 'webauthnRpName',
+                                'webauthnRpId',
                                 'webauthnDisplayNameAttr',
                                 'webauthn2fAuthnLevel',
                                 'webauthn2fLabel',
@@ -1049,6 +1098,18 @@ sub tree {
                             ]
                         },
                         {
+                            title => 'okta2f',
+                            help  => 'okta2f.html',
+                            form  => 'simpleInputContainer',
+                            nodes => [
+                                'okta2fActivation', 'okta2fAdminURL',
+                                'okta2fApiKey',     'okta2fLoginAttribute',
+                                'okta2fAuthnLevel', 'okta2fLabel',
+                                'okta2fLogo',
+                            ]
+                        },
+
+                        {
                             title => 'radius2f',
                             help  => 'radius2f.html',
                             form  => 'simpleInputContainer',
@@ -1084,16 +1145,6 @@ sub tree {
                             ]
                         },
                         'sfExtra',
-                        {
-                            title => 'sfRemovedNotification',
-                            help  => 'secondfactor.html',
-                            form  => 'simpleInputContainer',
-                            nodes => [
-                                'sfRemovedMsgRule',  'sfRemovedUseNotif',
-                                'sfRemovedNotifRef', 'sfRemovedNotifTitle',
-                                'sfRemovedNotifMsg'
-                            ],
-                        }
                     ]
                 },
                 {
@@ -1142,6 +1193,7 @@ sub tree {
                                 'formTimeout',
                                 'tokenUseGlobalStorage',
                                 'strictTransportSecurityMax_Age',
+                                'hashedSessionStore',
                                 {
                                     title => 'CrowdSecPlugin',
                                     help  => 'crowdsec.html',
@@ -1447,6 +1499,7 @@ sub tree {
         'samlSPMetaDataNodes',
         {
             title => 'oidcServiceMetaData',
+            form  => 'displayOidcMetadata',
             help  => 'openidconnectservice.html#service-configuration',
             nodes => [
                 'oidcServiceMetaDataIssuer',
@@ -1524,6 +1577,7 @@ sub tree {
                         'oidcDropCspHeaders',
                         'oidcServiceEncAlgorithmAlg',
                         'oidcServiceEncAlgorithmEnc',
+                        'oidcServiceHideMetadata',
                     ],
                 },
                 {
@@ -1550,10 +1604,14 @@ sub tree {
             title => 'casServiceMetadata',
             help  => 'idpcas.html#configuring-the-cas-service',
             nodes => [
-                'casAttr',                    'casAccessControlPolicy',
-                'casStrictMatching',          'casTicketExpiration',
-                'casBackChannelSingleLogout', 'casStorage',
-                'casStorageOptions',          'casAttributes',
+                'casAttr',
+                'casAccessControlPolicy',
+                'casStrictMatching',
+                'casTicketExpiration',
+                'casBackChannelSingleLogout',
+                'casStorage',
+                'casStorageOptions',
+                'casAttributes',
             ]
         },
         'casSrvMetaDataNodes',

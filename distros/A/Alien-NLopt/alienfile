@@ -1,0 +1,51 @@
+#! perl
+
+use v5.10;
+use strict;
+use warnings;
+
+use alienfile;
+use Path::Tiny;
+use Sort::Versions;
+use File::Which;
+
+#<<<
+use constant PACKAGE_NAME    =>  'nlopt';
+use constant PACKAGE_VERSION =>  '2.7.1';
+
+our $VERSION = 'v2.7.1.1';
+
+#>>>
+
+# plugin 'Gather::IsolateDynamic';
+
+share {
+    plugin 'Build::CMake';
+
+    plugin Extract => 'tar.gz';
+    start_url( ( path( 'src' )->children( qr/@{[PACKAGE_NAME]}.*-v@{[PACKAGE_VERSION]}/ ) )[0] );
+
+    plugin Download => (
+        filter  => qr/(?:\d+[.]\d+[.]\d+)[.](?:tar[.].gz|tgz)$/,
+        version => qr/(\d+[.]\d+[.]\d+)[.](?:tar[.].gz|tgz)$/,
+    );
+
+    plugin Extract => 'tar.gz';
+
+    # only if necessary; e.g to add a CMake flag
+    build [ [
+            '%{cmake}', @{ meta->prop->{plugin_build_cmake}->{args} },
+            '-D',       'BUILD_SHARED_LIBS=OFF',
+            '%{.install.extract}',
+        ],
+        '%{make}',
+        '%{make} install',
+    ];
+
+};
+
+gather [
+    [ "pkg-config --modversion @{[ PACKAGE_NAME ]}", \'%{.runtime.version}' ],
+    [ "pkg-config --cflags     @{[ PACKAGE_NAME ]}", \'%{.runtime.cflags}' ],
+    [ "pkg-config --libs       @{[ PACKAGE_NAME ]}", \'%{.runtime.libs}' ],
+];

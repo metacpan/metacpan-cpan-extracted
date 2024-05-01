@@ -15,7 +15,7 @@ use Lemonldap::NG::Common::Apache::Session::Serialize::JSON;
 use Lemonldap::NG::Common::Apache::Session::Store;
 use Lemonldap::NG::Common::Apache::Session::Lock;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.19.0';
 
 sub _load {
     my ( $backend, $func ) = @_;
@@ -61,7 +61,9 @@ sub populate {
     }
 
     # If cache is configured, use our specific object store module
-    if ( $> and $self->{args}->{localStorage} ) {
+    if ( ( $> or $self->{args}->{allow_cache_for_root} )
+        and $self->{args}->{localStorage} )
+    {
         $self->{args}->{object_store} = $self->{object_store};
         $self->{object_store} =
           Lemonldap::NG::Common::Apache::Session::Store->new($self);
@@ -123,6 +125,29 @@ sub searchOnExpr {
             my $entry = shift;
             my $id    = shift;
             return undef unless ( $entry->{$selectField} =~ $value );
+            if (@fields) {
+                $res{$id}->{$_} = $entry->{$_} foreach (@fields);
+            }
+            else {
+                $res{$id} = $entry;
+            }
+            undef;
+        }
+    );
+    return \%res;
+}
+
+sub searchGt {
+    my ( $class, $args, $selectField, $value, @fields ) = splice @_;
+    return $args->{backend}->searchGt( $args, $selectField, $value, @fields )
+      if ( _load( $args->{backend}, 'searchGt' ) );
+    my %res = ();
+    $class->get_key_from_all_sessions(
+        $args,
+        sub {
+            my $entry = shift;
+            my $id    = shift;
+            return undef unless ( $entry->{$selectField} > $value );
             if (@fields) {
                 $res{$id}->{$_} = $entry->{$_} foreach (@fields);
             }

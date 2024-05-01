@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Api::2F;
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.19.0';
 
 package Lemonldap::NG::Manager::Api;
 
@@ -16,8 +16,8 @@ sub getSecondFactors {
     my ( $self, $req ) = @_;
     my ( $uid, $res );
 
-    $uid = $req->params('uid')
-      or return $self->sendError( $req, 'uid is missing', 400 );
+    $uid = $req->params('_uid')
+      or return $self->searchSecondFactors($req);
 
     $self->logger->debug("[API] 2F for $uid requested");
 
@@ -33,7 +33,7 @@ sub getSecondFactorsByType {
     my ( $self, $req ) = @_;
     my ( $uid, $type, $res );
 
-    $uid = $req->params('uid')
+    $uid = $req->params('_uid')
       or return $self->sendError( $req, 'Uid is missing', 400 );
 
     $type = $req->params('type')
@@ -53,7 +53,7 @@ sub getSecondFactorsById {
     my ( $self, $req ) = @_;
     my ( $uid, $id, $res );
 
-    $uid = $req->params('uid')
+    $uid = $req->params('_uid')
       or return $self->sendError( $req, 'uid is missing', 400 );
 
     $id = $req->params('id')
@@ -74,20 +74,64 @@ sub getSecondFactorsById {
 }
 
 sub deleteSecondFactors {
-    my ( $self, $req ) = @_;
+    my ( $self, $req, @path ) = @_;
     my ( $uid, $res );
+
+    # Return an error on
+    @path
+      and return $self->sendError( $req, 'Invalid URI, provide /id/ or /type/',
+        400 );
 
     $uid = $req->params('uid')
       or return $self->sendError( $req, 'uid is missing', 400 );
 
     $self->logger->debug("[API] Delete all 2F for $uid requested");
 
-    $res = $self->_delete2F($uid);
+    $res = $self->_delete2F( $req, $uid );
 
     return $self->sendError( $req, $res->{msg}, $res->{code} )
       unless ( $res->{res} eq 'ok' );
 
     return $self->sendJSONresponse( $req, { message => $res->{msg} } );
+}
+
+sub searchSecondFactors {
+    my ( $self, $req ) = @_;
+
+    my $uid   = $req->param('uid') || '*';
+    my @types = $req->parameters->get_all('type');
+    use Hash::MultiValue;
+    my $search_params =
+      Hash::MultiValue->from_mixed( { _session_uid => $uid, type => \@types } );
+
+    my $res = $self->search2F( $req, $self->_getPersistentMod, "Persistent",
+        $search_params, 1 );
+
+    if ( $res->{result} ) {
+        my $api_result = [];
+
+        my @sorted_results =
+          sort { $a->{userId} cmp $b->{userId} } @{ $res->{values} || [] };
+        for my $result (@sorted_results) {
+            push @$api_result, {
+                uid           => $result->{userId},
+                secondFactors => [
+                    map {
+                        {
+                            id   => genId2F($_),
+                            type => $_->{type},
+                            name => $_->{name}
+                        }
+                    } @{ $result->{_2fDevices} || [] }
+                ]
+
+            };
+        }
+        return $self->sendJSONresponse( $req, $api_result );
+    }
+    else {
+        return $self->sendError( $req, $res->{msg}, $res->{code} );
+    }
 }
 
 sub deleteSecondFactorsById {
@@ -102,7 +146,7 @@ sub deleteSecondFactorsById {
 
     $self->logger->debug("[API] Delete 2F for $uid with id $id requested");
 
-    $res = $self->_delete2F( $uid, undef, $id );
+    $res = $self->_delete2F( $req, $uid, undef, $id );
 
     return $self->sendError( $req, $res->{msg}, $res->{code} )
       unless ( $res->{res} eq 'ok' );
@@ -127,7 +171,7 @@ sub deleteSecondFactorsByType {
     $self->logger->debug(
         "[API] Delete all 2F for $uid with type $type requested");
 
-    $res = $self->_delete2F( $uid, uc $type );
+    $res = $self->_delete2F( $req, $uid, uc $type );
 
     return $self->sendError( $req, $res->{msg}, $res->{code} )
       unless ( $res->{res} eq 'ok' );
@@ -272,7 +316,7 @@ sub _delete2FFromSessions {
 }
 
 sub _delete2F {
-    my ( $self, $uid, $type, $id ) = @_;
+    my ( $self, $req, $uid, $type, $id ) = @_;
     my ( $res, $removed, $count );
 
     $res =
@@ -292,11 +336,15 @@ sub _delete2F {
     $removed = { %$removed, %{ $res->{removed} } };
     $count   = scalar( keys %$removed );
     if ($count) {
-        my $list_log = join(
-            ",", map { display2F( $removed->{$_} ) }
-              keys %$removed
+        my @list_log = map { display2F( $removed->{$_} ) } keys %$removed;
+        my $list_log = join( ",", @list_log );
+        $self->auditLog(
+            $req,
+            code        => "API_2FA_DELETED",
+            message     => ("[API] 2FA deletion for $uid: $list_log"),
+            user        => $uid,
+            removed_2fa => \@list_log,
         );
-        $self->userLogger->notice("[API] 2FA deletion for $uid: $list_log");
     }
 
     return {
@@ -327,6 +375,205 @@ sub _getDevicesFromSessionData {
         }
     }
     return [];
+}
+
+sub addSecondFactor {
+    my ( $self, $req ) = @_;
+
+    my $uid = $req->params('uid')
+      or return $self->sendError( $req, 'uid is missing', 400 );
+
+    $self->logger->debug("[API] Add 2F for $uid");
+
+    my $add = $req->jsonBodyToObj;
+    return $self->sendError( $req, "Invalid input: " . $req->error, 400 )
+      unless ( $add and ref($add) eq "HASH" );
+
+    return $self->sendError( $req, 'Invalid input: type is missing', 400 )
+      unless ( defined $add->{type} );
+
+    return $self->sendError( $req, 'Invalid input: epoch is forbidden', 400 )
+      if ( defined $add->{epoch} );
+
+    my $allow_create =
+      (      $req->params('create')
+          && $req->params('create') ne "false"
+          && $req->params('create') ne "0" );
+
+    my $res = $self->_add2F( $uid, undef, $add, $allow_create );
+
+    return $self->sendError( $req, $res->{msg}, $res->{code} )
+      if ( $res->{res} ne 'ok' );
+    return $self->sendJSONresponse(
+        $req,
+        { message => "Successful operation" },
+        code => 201
+    );
+}
+
+sub addSecondFactorByType {
+    my ( $self, $req ) = @_;
+
+    my $uid = $req->params('uid')
+      or return $self->sendError( $req, 'uid is missing', 400 );
+
+    my $type = $req->params('type')
+      or return $self->sendError( $req, 'type is missing', 400 );
+
+    my $add = $req->jsonBodyToObj;
+    return $self->sendError( $req, "Invalid input: " . $req->error, 400 )
+      unless ( $add and ref($add) eq "HASH" );
+
+    $self->logger->debug("[API] Add $type 2F for $uid");
+
+    my $allow_create =
+      (      $req->params('create')
+          && $req->params('create') ne "false"
+          && $req->params('create') ne "0" );
+
+    my $res = $self->_add2F( $uid, $type, $add, $allow_create );
+
+    return $self->sendError( $req, $res->{msg}, $res->{code} )
+      unless ( $res->{res} eq 'ok' );
+
+    return $self->sendJSONresponse(
+        $req,
+        { message => "Successful operation" },
+        code => 201
+    );
+}
+
+sub _transformNew2f {
+    my ( $self, $type, $add ) = @_;
+
+    # Generic API, no transformation is done
+    if ( !defined($type) ) {
+        return {
+            res    => "ok",
+            device => $add,
+        };
+    }
+
+    if ( uc($type) eq "TOTP" ) {
+        return $self->_transformNew2fTotp( $type, $add );
+    }
+
+    else {
+        return {
+            res  => "ko",
+            code => 400,
+            msg  => "Invalid type: $type",
+        };
+    }
+}
+
+sub _transformNew2fTotp {
+    my ( $self, $type, $add ) = @_;
+
+    if ( !$add->{key} ) {
+        return {
+            res  => "ko",
+            code => 400,
+            msg  => "Invalid input: missing \"key\" parameter",
+        };
+    }
+
+    my $secret = $self->_totpKeyToSecret( $add->{key} );
+    if ( !$secret ) {
+        return {
+            res  => "ko",
+            code => 400,
+            msg  => "Invalid secret: you must provide a base32-encoded key",
+        };
+    }
+
+    my $newdevice = {
+        type => "TOTP",
+        ( $add->{name} ? ( name => $add->{name} ) : () ),
+        _secret => $secret,
+    };
+
+    return {
+        res    => "ok",
+        device => $newdevice,
+    };
+}
+
+sub _totpKeyToSecret {
+    my ( $self, $key ) = @_;
+
+    return unless $key;
+
+    # Make sure only BASE32 characters are present
+    if ( uc($key) =~ /^[ABCDEFGHIJKLMNOPQRSTUVWXYZ234567\s]*$/ ) {
+
+        # Trim spaces and normalize to lowercase
+        my $newKey = $key =~ s/\s//gr;
+        return $self->totp_encrypt->get_storable_secret( lc($newKey) );
+    }
+
+    return undef;
+}
+
+sub _add2F {
+    my ( $self, $uid, $type, $add, $allow_create ) = @_;
+
+    my $res = $self->_transformNew2f( $type, $add );
+    return $res if ( $res->{res} ne 'ok' );
+
+    my $device = $res->{device};
+
+    $device->{epoch} = time();
+
+    $res =
+      $self->_add2FToSessions( $uid, $device, $self->_getPersistentMod,
+        'Persistent', '_session_uid', $allow_create );
+    return $res if ( $res->{res} ne 'ok' );
+
+    # Add to existing sessions
+    my $whatToTrace = Lemonldap::NG::Handler::PSGI::Main->tsv->{whatToTrace};
+    $res =
+      $self->_add2FToSessions( $uid, $device, $self->_getSSOMod, 'SSO',
+        $whatToTrace );
+
+    return { res => "ok" };
+}
+
+sub _add2FToSessions {
+    my ( $self, $uid, $add, $mod, $kind, $key, $allow_create ) = @_;
+
+    my ( $sessions, $session, $devices, @keep, $removed,
+        $total, $module, $localStorage );
+    $sessions = $self->_getSessions2F( $mod, $kind, $key, $uid );
+    my $found = keys %$sessions;
+
+    if ( !$found and $allow_create ) {
+        my $ps = $self->getPersistentSession( $mod, $uid );
+        $sessions = { $ps->id => { _2fDevices => undef } };
+        $found    = 1;
+    }
+
+    foreach ( keys %$sessions ) {
+        $session = $self->_getSession2F( $_, $mod )
+          or return { res => 'ko', code => 500, msg => $@ };
+
+        $devices = $self->_getDevicesFromSessionData( $session->data );
+        push @$devices, $add;
+
+        # Update session
+        $self->logger->debug(
+            "Adding " . display2F($add) . " to sessionId $_" );
+        $session->data->{_2fDevices} = to_json($devices);
+        $session->update( $session->data );
+    }
+    return {
+        res     => "notfound",
+        message => "User $uid was not found",
+        code    => 404
+      }
+      if !$found;
+
+    return { res => 'ok' };
 }
 
 1;

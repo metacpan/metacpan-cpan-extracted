@@ -5,7 +5,7 @@ use HTML::TreeBuilder::XPath 0.14;
 use Exporter 'import';
 use Carp 'croak';
 
-use App::SpamcupNG::Error::Factory qw(create_error);
+use App::SpamcupNG::Error::Factory   qw(create_error);
 use App::SpamcupNG::Warning::Factory qw(create_warning);
 
 our @EXPORT_OK = (
@@ -20,7 +20,7 @@ my %regexes = (
     message_age => qr/^Message\sis\s(\d+)\s(\w+)\sold/
 );
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 =head1 NAME
 
@@ -63,7 +63,7 @@ case.
 sub find_header_info {
     my $content_ref = shift;
     croak "Must receive an scalar reference as parameter"
-        unless ( ref($content_ref) eq 'SCALAR' );
+      unless ( ref($content_ref) eq 'SCALAR' );
     my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($$content_ref);
     my @nodes = $tree->findnodes('/html/body/div[@id="content"]/pre');
@@ -143,7 +143,7 @@ If nothing is found, returns C<undef>;
 sub find_message_age {
     my $content_ref = shift;
     croak "Must receive an scalar reference as parameter"
-        unless ( ref($content_ref) eq 'SCALAR' );
+      unless ( ref($content_ref) eq 'SCALAR' );
     my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($$content_ref);
     my @nodes = $tree->findnodes('/html/body/child::div[@id="content"]');
@@ -179,7 +179,7 @@ Returns the ID if found, otherwise C<undef>.
 sub find_next_id {
     my $content_ref = shift;
     croak "Must receive an scalar reference as parameter"
-        unless ( ref($content_ref) eq 'SCALAR' );
+      unless ( ref($content_ref) eq 'SCALAR' );
     my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($$content_ref);
     my @nodes = $tree->findnodes('//strong/a');
@@ -194,7 +194,7 @@ sub find_next_id {
                 my $expected = 45;
                 warn
 "Unexpected length for SPAM ID: got $length, expected $expected"
-                    unless ( $length == $expected );
+                  unless ( $length == $expected );
                 last;
             }
         }
@@ -217,18 +217,17 @@ Returns an array reference with all warnings found.
 sub find_warnings {
     my $content_ref = shift;
     croak "Must receive an scalar reference as parameter"
-        unless ( ref($content_ref) eq 'SCALAR' );
+      unless ( ref($content_ref) eq 'SCALAR' );
     my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($$content_ref);
-    my @nodes
-        = $tree->findnodes('//div[@id="content"]/div[@class="warning"]');
+    my @nodes = $tree->findnodes('//div[@id="content"]/div[@class="warning"]');
     my @warnings;
 
     foreach my $node (@nodes) {
         my @all_text;
         push( @all_text, $node->as_trimmed_text );
 
-  # Spamcop page might add other text lines after the div, until the next div.
+    # Spamcop page might add other text lines after the div, until the next div.
         foreach my $next ( $node->right() ) {
             if ( ref $next ) {
                 next if ( $next->tag eq 'br' );
@@ -258,7 +257,7 @@ Returns an array reference with all errors found.
 sub find_errors {
     my $content_ref = shift;
     croak "Must receive an scalar reference as parameter"
-        unless ( ref($content_ref) eq 'SCALAR' );
+      unless ( ref($content_ref) eq 'SCALAR' );
     my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($$content_ref);
     my @nodes = $tree->findnodes('//div[@id="content"]/div[@class="error"]');
@@ -319,7 +318,7 @@ Returns an array reference with all best contacts found.
 sub find_best_contacts {
     my $content_ref = shift;
     croak "Must receive an scalar reference as parameter"
-        unless ( ref($content_ref) eq 'SCALAR' );
+      unless ( ref($content_ref) eq 'SCALAR' );
     my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($content_ref);
     my @nodes = $tree->findnodes('//div[@id="content"]');
@@ -358,7 +357,7 @@ Returns an array reference with all the lines of the e-mail header found.
 sub find_spam_header {
     my $content_ref = shift;
     croak "Must receive an scalar reference as parameter"
-        unless ( ref($content_ref) eq 'SCALAR' );
+      unless ( ref($content_ref) eq 'SCALAR' );
     my $formatted //= 0;
     my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($content_ref);
@@ -432,7 +431,7 @@ Returns an array reference, where each item is a string.
 sub find_receivers {
     my $content_ref = shift;
     croak "Must receive an scalar reference as parameter"
-        unless ( ref($content_ref) eq 'SCALAR' );
+      unless ( ref($content_ref) eq 'SCALAR' );
     my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($content_ref);
     my @nodes = $tree->findnodes('//*[@id="content"]');
@@ -451,14 +450,13 @@ sub find_receivers {
             my $result_ref;
             my @parts = split( /\s/, $inner );
 
-  # /dev/null\'ing report for google-abuse-bounces-reports@devnull.spamcop.net
+    # /dev/null\'ing report for google-abuse-bounces-reports@devnull.spamcop.net
             if ( substr( $inner, 0, length($devnull) ) eq $devnull ) {
                 $result_ref = [ ( split( '@', $parts[-1] ) )[0], undef ];
             }
 
-          # Spam report id 7151980235 sent to: dl_security_whois@navercorp.com
-            elsif (
-                substr( $inner, 0, length($report_sent) ) eq $report_sent )
+            # Spam report id 7151980235 sent to: dl_security_whois@navercorp.com
+            elsif ( substr( $inner, 0, length($report_sent) ) eq $report_sent )
             {
                 $result_ref = [ $parts[6], $parts[3] ];
             }
@@ -485,12 +483,12 @@ L<HTML::TreeBuilder::XPath>
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2018 of Alceu Rodrigues de Freitas Junior,
-E<lt>arfreitas@cpan.orgE<gt>
+E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 This file is part of App-SpamcupNG distribution.
 

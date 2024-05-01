@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Logger;
-$Playwright::Logger::VERSION = '1.401';
+$Playwright::Logger::VERSION = '1.431';
 use parent 'Playwright::Base';
 
 sub new {
@@ -86,7 +86,7 @@ Playwright::Logger - Automatically generated class for Playwright::Logger
 
 =head1 VERSION
 
-version 1.401
+version 1.431
 
 =head1 CONSTRUCTOR
 

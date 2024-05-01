@@ -3,7 +3,7 @@ package Lemonldap::NG::Common::Module;
 use strict;
 use Mouse;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.19.0';
 
 # Object that provides loggers and error methods (typically PSGI object)
 has p => ( is => 'rw', weak_ref => 1 );
@@ -14,6 +14,11 @@ has conf => ( is => 'rw', weak_ref => 1 );
 has logger => ( is => 'rw', lazy => 1, default => sub { $_[0]->{p}->logger } );
 has userLogger =>
   ( is => 'rw', lazy => 1, default => sub { $_[0]->{p}->userLogger } );
+
+sub auditLog {
+    my $self = shift;
+    return $self->p->auditLog(@_);
+}
 
 sub error {
     my $self = shift;

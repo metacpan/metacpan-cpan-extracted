@@ -8,8 +8,7 @@ require 't/test-lib.pm';
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel               => 'error',
             passwordDB             => 'Demo',
@@ -38,8 +37,7 @@ expectOK($res);
 my $id = expectCookie($res);
 
 # Check encrypted password in session
-my $json =
-  expectJSON( $client->_get("/sessions/global/$id"), 'Get session content' );
+my $json = getSession($id)->data;
 ok( $json->{_password} ne "dwho", "password encrypted in session" );
 count(1);
 

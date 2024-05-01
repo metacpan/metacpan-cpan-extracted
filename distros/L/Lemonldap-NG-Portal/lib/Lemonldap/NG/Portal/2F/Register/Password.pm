@@ -29,7 +29,7 @@ has ott => (
     }
 );
 
-has 'key' => (
+has key => (
     is      => 'ro',
     lazy    => 1,
     default => sub {
@@ -38,7 +38,7 @@ has 'key' => (
     }
 );
 
-has 'crypto' => (
+has crypto => (
     is      => 'ro',
     lazy    => 1,
     default => sub {

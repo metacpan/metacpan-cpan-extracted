@@ -1,6 +1,6 @@
 package Lemonldap::NG::Portal::Main::Process;
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -147,7 +147,7 @@ sub controlUrl {
         else {
             if ( $url =~ m#[^A-Za-z0-9\+/=]# ) {
                 unless ( $req->maybeNotBase64 ) {
-                    $self->userLogger->error(
+                    $self->logger->error(
 "Value must be BASE64 encoded (param: url | value: $url)"
                     );
                     return PE_BADURL;
@@ -182,7 +182,12 @@ sub controlUrl {
 
         # Unprotected hosts
         if ( $tmp and ( $tmp !~ URIRE ) ) {
-            $self->userLogger->error("Bad URL $tmp");
+            $self->auditLog(
+                $req,
+                message => "Bad URL $tmp",
+                code    => "UNAUTHORIZED_REDIRECT",
+                url     => $tmp,
+            );
             delete $req->{urldc};
             return PE_BADURL;
         }
@@ -205,16 +210,27 @@ sub controlUrl {
 
         # If the target URL has an authLevel set in config, remember it.
         my $level = $self->HANDLER->getLevel( $req, $appuri, $originalVhost );
-        $req->pdata->{targetAuthnLevel} = $level if $level;
+
+        if ($level) {
+            $self->logger->debug( "VirtualHost $originalVhost requires"
+                  . " authentication level $level" );
+            $req->pdata->{targetAuthnLevel} = $level;
+        }
 
         if (    $tmp
             and !$self->isTrustedUrl($tmp)
             and !$self->isTrustedUrl($vhost) )
         {
-            $self->userLogger->error(
-                    "URL contains an unprotected host (param: "
-                  . ( $req->param('logout') ? 'HTTP Referer' : 'urldc' )
-                  . " | value: $tmp | alias: $vhost)" );
+            $self->auditLog(
+                $req,
+                message => (
+                        "URL contains an unprotected host (param: "
+                      . ( $req->param('logout') ? 'HTTP Referer' : 'urldc' )
+                      . " | value: $tmp | alias: $vhost)"
+                ),
+                code => "UNAUTHORIZED_REDIRECT",
+                url  => $tmp,
+            );
             delete $req->{urldc};
             return PE_UNPROTECTEDURL;
         }
@@ -242,6 +258,17 @@ sub checkUnauthLogout {
     if ( defined $req->param('logout') ) {
         $self->_unauthLogout($req);
         $req->steps( [ 'controlUrl', sub { PE_LOGOUT_OK } ] );
+    }
+    return PE_OK;
+}
+
+sub checkCancel {
+    my ( $self, $req ) = @_;
+    if ( $req->param('cancel') ) {
+        $self->logger->debug('Cancel called, run authCancel calls');
+        $req->mustRedirect(1);
+        $req->steps( [ @{ $self->authCancel }, sub { PE_OK } ] );
+        return PE_OK;
     }
     return PE_OK;
 }
@@ -319,7 +346,7 @@ sub deleteSession {
         # Redirect on logout page if no other target defined
         if ( !$req->urldc and !$req->postUrl ) {
             $self->logger->debug('No other target defined, redirect on logout');
-            $req->urldc( $self->buildUrl( { logout => 1 } ) );
+            $req->urldc( $self->buildUrl( $req->portal, { logout => 1 } ) );
         }
     }
     $req->userData( {} );
@@ -330,14 +357,14 @@ sub deleteSession {
         return PE_OK;
     }
 
-    if ( $req->urldc and $req->urldc ne $self->conf->{portal} ) {
+    if ( $req->urldc and $req->urldc ne $req->portal ) {
         $req->steps( [] );
         return PE_REDIRECT;
     }
 
     # If logout redirects to another URL, just remove next steps for the
     # request so autoRedirect will be called
-    if ( $req->{urldc} and $req->{urldc} ne $self->conf->{portal} ) {
+    if ( $req->{urldc} and $req->{urldc} ne $req->portal ) {
         $req->steps( [] );
         return PE_OK;
     }
@@ -359,7 +386,7 @@ sub checkXSSAttack {
     # Test value
     $value =~ s/\%25/\%/g;
     if ( $value =~ m/(?:\0|<|'|"|`|\%(?:00|3C|22|27))/ ) {
-        $self->userLogger->error(
+        $self->logger->error(
             "XSS attack detected (param: $name | value: $value)");
         return $self->conf->{checkXSS};
     }
@@ -382,10 +409,10 @@ sub extractFormInfo {
         and $req->cookies->{ $self->conf->{cookieName} } )
     {
         $req->addCookie(
-            $self->cookie(
+            $self->genCookie(
+                $req,
                 name    => $self->conf->{cookieName},
                 value   => 0,
-                domain  => $self->conf->{domain},
                 secure  => $self->conf->{securedCookie},
                 expires => 'Wed, 21 Oct 2015 00:00:00 GMT'
             )
@@ -561,7 +588,7 @@ sub store {
 
     # Fill session
     my $infos = {};
-    foreach my $k ( keys %{ $req->{sessionInfo} } ) {
+    foreach my $k ( sort keys %{ $req->{sessionInfo} } ) {
         next unless defined $req->{sessionInfo}->{$k};
         my $displayValue = $req->{sessionInfo}->{$k};
         $displayValue = '****' if isHiddenAttr( $self->conf, $k );
@@ -573,6 +600,7 @@ sub store {
     # Main session
     my $session = $self->getApacheSession(
         $req->id,
+        hashStore => $req->data->{hashStore},
         force => $req->{force},
         info  => $infos
     );
@@ -602,19 +630,19 @@ sub buildCookie {
     my ( $self, $req ) = @_;
     if ( $req->id ) {
         $req->addCookie(
-            $self->cookie(
+            $self->genCookie(
+                $req,
                 name   => $self->conf->{cookieName},
                 value  => $req->id,
-                domain => $self->conf->{domain},
                 secure => $self->conf->{securedCookie},
             )
         );
         if ( $self->conf->{securedCookie} >= 2 ) {
             $req->addCookie(
-                $self->cookie(
+                $self->genCookie(
+                    $req,
                     name   => $self->conf->{cookieName} . "http",
                     value  => $req->{sessionInfo}->{_httpSession},
-                    domain => $self->conf->{domain},
                     secure => 0,
                 )
             );
@@ -625,9 +653,16 @@ sub buildCookie {
         ? $req->{sessionInfo}
         : $req->{userData}
     );
-    $self->userLogger->notice( 'User '
-          . $ref->{ $self->conf->{whatToTrace} }
-          . " successfully authenticated at level $ref->{authenticationLevel}"
+    $self->auditLog(
+        $req,
+        message => (
+                'User '
+              . $ref->{ $self->conf->{whatToTrace} }
+              . " successfully authenticated at level $ref->{authenticationLevel}"
+        ),
+        code  => "AUTHENTICATED",
+        user  => $ref->{ $self->conf->{whatToTrace} },
+        level => $ref->{authenticationLevel},
     );
     return PE_OK;
 }
@@ -643,6 +678,30 @@ sub storeHistory {
         $self->registerLogin($req);
     }
     return PE_OK;
+}
+
+# This method returns the domain for a new cookie
+# In modern browsers:
+# - an empty value means the cookie is only valid on the portal itself
+# - in other situations, the cookie is sent to all subdomains
+#   and a leading dot is added for compatibility
+sub getCookieDomain {
+    my ( $self, $req ) = @_;
+
+    if ( my $domain = $self->conf->{domain} ) {
+        if ( $domain eq '#PORTALDOMAIN#' ) {
+            my $host = URI->new( $req->portal )->host;
+            return $host =~ s/^([^\.]*)//r;
+        }
+        elsif ( $domain eq '#PORTAL#' ) {
+            my $host = URI->new( $req->portal )->host;
+            return ".$host";
+        }
+        else {
+            return $domain =~ s/^(?!\.)/./r;
+        }
+    }
+    return;
 }
 
 1;

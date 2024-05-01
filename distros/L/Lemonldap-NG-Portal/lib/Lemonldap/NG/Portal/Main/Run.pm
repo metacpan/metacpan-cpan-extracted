@@ -9,7 +9,7 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -54,6 +54,9 @@ sub handler {
 
     bless $req, 'Lemonldap::NG::Portal::Main::Request';
     $req->init( $self->conf );
+
+    # Set portal URL dynamically
+    $req->portal( HANDLER->tsv->{portal}->($req) );
     my $sp = 0;
 
     # Restore pdata
@@ -104,7 +107,7 @@ sub handler {
                 : ()
             ),
         );
-        push @{ $res->[1] }, 'Set-Cookie', $self->cookie(%v);
+        push @{ $res->[1] }, 'Set-Cookie', $self->genCookie( $req, %v );
     }
     return $res;
 }
@@ -147,11 +150,11 @@ sub login {
     return $self->do(
         $req,
         [
-            'checkUnauthLogout',            'controlUrl',          # Fix 2342
-            @{ $self->beforeAuth },         $self->authProcess,
-            @{ $self->betweenAuthAndData }, $self->sessionData,
-            @{ $self->afterData },          $self->validSession,
-            @{ $self->endAuth }
+            'checkUnauthLogout', 'checkCancel',
+            'controlUrl',        @{ $self->beforeAuth },
+            $self->authProcess,  @{ $self->betweenAuthAndData },
+            $self->sessionData,  @{ $self->afterData },
+            $self->validSession, @{ $self->endAuth }
         ]
     );
 }
@@ -194,14 +197,20 @@ sub postAuthenticatedRequest {
     );
 }
 
-sub refresh {
+sub processRefreshSession {
     my ( $self, $req ) = @_;
-    $req->mustRedirect(1);
+
     my %data = %{ $req->userData };
-    $self->userLogger->notice(
-        'Refresh request for ' . $data{ $self->conf->{whatToTrace} } );
     $req->user( $data{_user} || $data{ $self->conf->{whatToTrace} } );
     $req->id( $data{_session_id} );
+
+    $self->auditLog(
+        $req,
+        message => ( 'Refresh request for ' . $req->user ),
+        code    => "SESSION_REFRESH",
+        user    => $req->user,
+    );
+
     foreach ( keys %data ) {
 
         # Variables that start with _ are kept accross refresh
@@ -228,6 +237,10 @@ sub refresh {
     $data{_updateTime} = strftime( "%Y%m%d%H%M%S", localtime() );
     $self->logger->debug(
         "Set session $req->{id} _updateTime with $data{_updateTime}");
+
+    # Avoid interferences when refresh is run on multiple sessions
+    # in the same request
+    $req->sessionInfo({});
     $req->steps( [
             'getUser',
             @{ $self->betweenAuthAndData },
@@ -239,10 +252,28 @@ sub refresh {
             },
             $self->groupsAndMacros,
             'setLocalGroups',
-            'store'
         ]
     );
-    my $res = $req->error( $self->process($req) );
+    return $self->process($req);
+}
+
+sub refresh {
+    my ( $self, $req ) = @_;
+    $req->mustRedirect(1);
+
+    $self->userLogger->notice( 'Refresh request for '
+          . $req->userData->{ $self->conf->{whatToTrace} } );
+
+    my $res = $self->processRefreshSession($req);
+
+    # Run additional 'store' step We need to call process() here in case
+    # 'store' is hooked by aroundSub or afterSub
+    if ( $res == PE_OK ) {
+        $req->steps( ['store'] );
+        $res = $self->process($req);
+    }
+
+    $req->error($res);
     if ($res) {
         $req->info(
             $self->loadTemplate(
@@ -250,7 +281,7 @@ sub refresh {
                 'simpleInfo', params => { trspan => 'rightsReloadNeedsLogout' }
             )
         );
-        $req->urldc( $self->conf->{portal} );
+        $req->urldc( $req->portal );
         return $self->do( $req, [ sub { PE_INFO } ] );
     }
     return $self->do( $req, [ sub { PE_OK } ] );
@@ -277,14 +308,14 @@ sub unauthLogout {
 
 sub _unauthLogout {
     my ( $self, $req ) = @_;
-    $self->userLogger->info('Unauthenticated logout request');
+    $self->logger->debug('Unauthenticated logout request');
     $self->logger->debug('Cleaning pdata');
     $self->logger->debug("Removing $self->{conf}->{cookieName} cookie");
     $req->pdata( {} );
     $req->addCookie(
-        $self->cookie(
+        $self->genCookie(
+            $req,
             name    => $self->conf->{cookieName},
-            domain  => $self->conf->{domain},
             secure  => $self->conf->{securedCookie},
             expires => 'Wed, 21 Oct 2015 00:00:00 GMT',
             value   => 0
@@ -334,7 +365,7 @@ sub do {
                 $req, $json,
                 code    => 401,
                 headers => [
-                    'WWW-Authenticate' => "SSO " . $self->conf->{portal},
+                    'WWW-Authenticate' => "SSO " . $req->portal,
                     "Content-Type"     => "application/json"
                 ],
             );
@@ -430,31 +461,43 @@ sub autoRedirect {
     my ( $self, $req ) = @_;
 
     # Set redirection URL if needed
-    $req->{urldc} ||= $self->conf->{portal}
+    $req->{urldc} ||= $req->portal
       if ( $req->mustRedirect and not( $req->info ) );
 
     # Redirection should be made if urldc defined
     if ( $req->{urldc} ) {
-        $self->logger->debug("Building redirection to $req->{urldc}");
-        if (    $req->{pdata}->{_url}
-            and $req->{pdata}->{_url} eq encode_base64( $req->{urldc}, '' ) )
-        {
-            $self->logger->info("Force cleaning pdata");
-            delete $req->{pdata}->{_url};
-        }
-        if ( $self->_jsRedirect->( $req, $req->sessionInfo ) ) {
-            $req->error(PE_REDIRECT);
-            $req->data->{redirectFormMethod} = "get";
+        if ( $req->{urldc} =~ /^\s*((?:java|vb)script|data):/ ) {
+            $self->auditLog(
+                $req,
+                message => "Redirection to $req->{urldc} blocked",
+                code    => "UNAUTHORIZED_REDIRECT",
+                url     => $req->{urldc},
+            );
+            delete $req->{urldc};
         }
         else {
-            return [
-                302,
-                [
-                    Location => URI->new( $req->{urldc} )->as_string,
-                    $req->spliceHdrs
-                ],
-                []
-            ];
+            $self->logger->debug("Building redirection to $req->{urldc}");
+            if (    $req->{pdata}->{_url}
+                and $req->{pdata}->{_url} eq encode_base64( $req->{urldc}, '' )
+              )
+            {
+                $self->logger->info("Force cleaning pdata");
+                delete $req->{pdata}->{_url};
+            }
+            if ( $self->_jsRedirect->( $req, $req->sessionInfo ) ) {
+                $req->error(PE_REDIRECT);
+                $req->data->{redirectFormMethod} = "get";
+            }
+            else {
+                return [
+                    302,
+                    [
+                        Location => URI->new( $req->{urldc} )->as_string,
+                        $req->spliceHdrs
+                    ],
+                    []
+                ];
+            }
         }
     }
     my ( $tpl, $prms ) = $self->display($req);
@@ -475,6 +518,11 @@ sub getApacheSession {
     }
 
     my $as = Lemonldap::NG::Common::Session->new( {
+
+            # The $args{hashStore} permits one to override the
+            # hashedSessionStore parameter. It is used when sessions are given
+            # by searchOn (like in Refresh plugin)
+            hashStore => $args{hashStore} // $self->conf->{hashedSessionStore},
             storageModule        => $self->conf->{globalStorage},
             storageModuleOptions => $self->conf->{globalStorageOptions},
             cacheModule          => $self->conf->{localSessionStorage},
@@ -684,10 +732,10 @@ sub _deleteSession {
 
         # Create an obsolete cookie to remove it
         $req->addCookie(
-            $self->cookie(
+            $self->genCookie(
+                $req,
                 name    => $self->conf->{cookieName} . 'http',
                 value   => 0,
-                domain  => $self->conf->{domain},
                 secure  => 0,
                 expires => 'Wed, 21 Oct 2015 00:00:00 GMT'
             )
@@ -699,10 +747,10 @@ sub _deleteSession {
 
     # Create an obsolete cookie to remove it
     $req->addCookie(
-        $self->cookie(
+        $self->genCookie(
+            $req,
             name    => $self->conf->{cookieName},
             value   => 0,
-            domain  => $self->conf->{domain},
             secure  => $self->conf->{securedCookie},
             expires => 'Wed, 21 Oct 2015 00:00:00 GMT'
         )
@@ -711,9 +759,16 @@ sub _deleteSession {
     # Log
     my $user = $req->{sessionInfo}->{ $self->conf->{whatToTrace} };
     my $mod  = $req->{sessionInfo}->{_auth};
-    $self->userLogger->notice(
+    if ($user) {
+        $self->auditLog(
+            $req,
+            message => (
 "User $user has been disconnected from $mod ($req->{sessionInfo}->{ipAddr})"
-    ) if $user;
+            ),
+            code => "LOGOUT",
+            auth => $mod,
+        );
+    }
 
     return $session->error ? 0 : 1;
 }
@@ -742,6 +797,15 @@ sub autoPost {
 
     # Get URL and Form fields
     $req->{urldc} = $req->postUrl;
+    if ( $req->{urldc} =~ /^\s*((?:java|vb)script|data):/ ) {
+        $self->auditLog(
+            $req,
+            message => "Redirection to $req->{urldc} blocked",
+            code    => "UNAUTHORIZED_REDIRECT",
+            url     => $req->{urldc},
+        );
+        return PE_BADURL;
+    }
     my $formFields = $req->postFields;
 
     $self->clearHiddenFormValue($req);
@@ -756,6 +820,13 @@ sub autoPost {
     }
 
     $req->data->{redirectFormMethod} = "post";
+
+    # Case 2F wait
+    if ( $req->data->{sfWait} ) {
+        return PE_2FWAIT;
+    }
+
+    # Default case -> redirect
     return PE_REDIRECT;
 }
 
@@ -849,21 +920,41 @@ sub info {
 
 sub fullUrl {
     my ( $self, $req ) = @_;
-    my $pHost = $self->conf->{portal};
+    my $pHost = $req->portal;
     $pHost =~ s#^(https?://[^/]+)(?:/.*)?$#$1#;
     return $pHost . $req->env->{REQUEST_URI};
 }
 
-sub cookie {
-    my ( $self, %h ) = @_;
-    my @res;
-    $res[0] = "$h{name}" or die("name required");
-    $res[0] .= "=$h{value}";
+# Generates a cookie header which can depend on the request
+sub genCookie {
+    my ( $self, $req, %h ) = @_;
     $h{path} ||= '/';
     $h{HttpOnly} //= $self->conf->{httpOnly};
     $h{max_age}  //= $self->conf->{cookieExpiration}
       if ( $self->conf->{cookieExpiration} );
     $h{SameSite} ||= $self->cookieSameSite;
+    $h{domain}   ||= $self->getCookieDomain($req);
+    return $self->assemble_cookie(%h);
+}
+
+# Deprecated method, does not handle dynamic portal URL
+sub cookie {
+    my ( $self, %h ) = @_;
+    $h{path} ||= '/';
+    $h{HttpOnly} //= $self->conf->{httpOnly};
+    $h{max_age}  //= $self->conf->{cookieExpiration}
+      if ( $self->conf->{cookieExpiration} );
+    $h{SameSite} ||= $self->cookieSameSite;
+
+    return $self->assemble_cookie(%h);
+}
+
+sub assemble_cookie {
+    my ( $self, %h ) = @_;
+
+    my @res;
+    $res[0] = "$h{name}" or die("name required");
+    $res[0] .= "=$h{value}";
 
     foreach (qw(domain path expires max_age HttpOnly SameSite)) {
         my $f = $_;
@@ -885,11 +976,19 @@ sub _dump {
     return;
 }
 
+sub getSkinTplDir {
+    my ( $self, $req, $skin ) = @_;
+
+    $skin ||= $self->getSkin($req);
+    my $base = $self->conf->{skinTemplateDir} || $self->conf->{templateDir};
+    return ( $base . '/' . $skin );
+}
+
 # Warning: this function returns a JSON string
 sub getTrOver {
     my ( $self, $req, $templateDir ) = @_;
 
-    $templateDir //= $self->conf->{templateDir} . '/' . $self->getSkin($req);
+    $templateDir //= $self->getSkinTplDir($req);
 
     unless ( $self->trOverCache->{$templateDir} ) {
 
@@ -934,8 +1033,7 @@ sub getTrOver {
 sub sendHtml {
     my ( $self, $req, $template, %args ) = @_;
 
-    my $skin_template_dir =
-      $self->conf->{templateDir} . '/' . $self->getSkin($req);
+    my $skin_template_dir = $self->getSkinTplDir($req);
 
     # Look for templates in skin subdirectories instead of templateDir
     $args{templateDir} =
@@ -956,7 +1054,7 @@ sub sendHtml {
     $self->setCorsHeaderFromConfig($res);
 
     if (    $self->conf->{strictTransportSecurityMax_Age}
-        and $self->conf->{portal} =~ /^https:/ )
+        and $req->portal =~ /^https:/ )
     {
         push @{ $res->[1] },
           'Strict-Transport-Security' =>
@@ -1025,7 +1123,7 @@ sub sendHtml {
     # created in the code, and remove this
     my @url;
     if ( $req->info ) {
-        @url = map { s#https?://([^/]+).*#$1#; $_ }
+        @url = map { s#https?://([^/]+).*#$1#r }
           ( $req->info =~ /<iframe.*?src="(.*?)"/sg );
     }
 
@@ -1059,10 +1157,7 @@ sub sendImage {
     return [
         302,
         [
-                'Location' => $self->conf->{portal}
-              . $self->staticPrefix
-              . '/common/'
-              . $img,
+            'Location' => ($req->portal . $self->staticPrefix . "/common/$img")
         ],
         [],
     ];
@@ -1110,7 +1205,7 @@ sub lmError {
     my %templateParams = (
         MAIN_LOGO  => $self->conf->{portalMainLogo},
         LANGS      => $self->conf->{showLanguages},
-        LOGOUT_URL => $self->conf->{portal} . "?logout=1",
+        LOGOUT_URL => $self->buildUrl( $req->portal, { logout => 1 } ),
         URL        => $req->{urldc},
     );
 
@@ -1135,7 +1230,7 @@ sub tplParams {
     my ( $self, $req ) = @_;
     my %templateParams;
 
-    my $portalPath = $self->conf->{portal};
+    my $portalPath = $req->portal;
     $portalPath =~ s#^https?://[^/]+/?#/#;
     $portalPath =~ s#[^/]+\.fcgi$##;
 
@@ -1149,7 +1244,7 @@ sub tplParams {
     }
 
     return (
-        PORTAL_URL   => $self->conf->{portal},
+        PORTAL_URL   => $req->portal,
         MAIN_LOGO    => $self->conf->{portalMainLogo},
         LANGS        => $self->conf->{showLanguages},
         SCROLL_TOP   => $self->conf->{scrollTop},
@@ -1160,6 +1255,7 @@ sub tplParams {
         SKIN_BG      => $self->conf->{portalSkinBackground},
         FAVICON      => $self->conf->{portalFavicon} || 'common/favicon.ico',
         CUSTOM_CSS   => $self->conf->{portalCustomCss},
+        CUSTOM_JS    => $self->conf->{portalCustomJs},
         (
             $self->customParameters
             ? ( %{ $self->customParameters } )
@@ -1209,8 +1305,9 @@ sub registerLogin {
     $history->{$type} ||= [];
     $self->logger->debug("Current login saved into $type");
 
-    # Gather current login's parameters
-    my $login = $self->_sumUpSession( $req->{sessionInfo}, 1 );
+    # Gather current login's parameters and force current time
+    my $login =
+      $self->_sumUpSession( { %{ $req->sessionInfo }, _utime => time }, 1 );
     $login->{error} = $self->error( $req->authResult )
       if ( $req->authResult );
 
@@ -1242,7 +1339,11 @@ sub _sumUpSession {
     $res->{$_} = $session->{$_}
       foreach (
         "_utime", "ipAddr",
-        keys %{ $self->conf->{sessionDataToRemember} },
+        map {
+            # Modifying key to remove ordering prefix
+            $_ =~ s/(\d+_)?//;
+            $_;
+        } keys %{ $self->conf->{sessionDataToRemember} },
         keys %{ $self->pluginSessionDataToRemember }
       );
     return $res;
@@ -1278,7 +1379,7 @@ sub sendJSONresponse {
     # (Ajax SSL to a different VHost)
     # we allow CORS
     if ( $req->origin
-        and index( $self->conf->{portal}, $req->origin ) == 0 )
+        and index( $req->portal, $req->origin ) == 0 )
     {
         $self->logger->debug('AJAX request from portal, allowing CORS');
         push @{ $res->[1] },
@@ -1322,7 +1423,7 @@ sub loadTemplate {
     my $tpl = HTML::Template->new(
         filename => $name,
         path     => [
-            $self->conf->{templateDir} . '/' . $self->getSkin($req),
+            $self->getSkinTplDir($req),
             $self->conf->{templateDir} . '/bootstrap/',
             $self->conf->{templateDir} . '/common/'
         ],

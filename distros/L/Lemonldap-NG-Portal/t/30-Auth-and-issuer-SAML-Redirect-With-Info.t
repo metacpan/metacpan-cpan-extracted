@@ -50,7 +50,6 @@ SKIP: {
 
     expectCookie($res);
 
-    switch ('sp');
 
     $sp = register( 'sp', \&sp );
 
@@ -68,7 +67,6 @@ SKIP: {
         qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
     # Push SAML request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             $url,
@@ -120,7 +118,6 @@ SKIP: {
         'SAMLResponse', 'RelayState' );
 
     # Post SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($query),

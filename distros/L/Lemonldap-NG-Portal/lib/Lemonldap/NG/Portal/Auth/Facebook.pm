@@ -7,7 +7,7 @@ use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_BADCREDENTIALS);
 use utf8;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.19.0';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -161,7 +161,7 @@ sub fb {
     my $conf = $self->{conf};
     my $fb;
     my $sep = '?';
-    my $ret = $conf->{portal};
+    my $ret = $req->portal;
 
     eval {
         $fb = Net::Facebook::Oauth2->new(

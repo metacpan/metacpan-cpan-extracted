@@ -14,7 +14,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 # API secret key
 has initializePasswordResetSecret => ( is => 'rw' );
@@ -88,9 +88,10 @@ sub initializePasswordReset {
         my $mail_session_id = $mailSession->id;
 
         $response_params->{"mail_token"} = $mail_session_id;
-        $response_params->{"url"} =
-          $self->p->buildUrl( $self->p->passwordResetUrl,
-            { mail_token => $mail_session_id } );
+        $response_params->{"url"}        = $self->p->buildUrl(
+            $self->p->passwordResetUrl,
+            { mail_token => $mail_session_id }
+        );
 
         return $self->sendJSONresponse( $req, $response_params );
     }

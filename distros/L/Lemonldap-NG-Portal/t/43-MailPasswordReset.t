@@ -11,7 +11,7 @@ BEGIN {
 }
 
 my ( $res, $user, $pwd );
-my $maintests = 18;
+my $maintests = 17;
 
 SKIP: {
     eval
@@ -78,9 +78,6 @@ SKIP: {
         'Found custom Main Logo'
     ) or print STDERR Dumper( $res->[2]->[0] );
 
-    ok( mail() =~ m%Content-Type: image/png; name="logo_llng_old.png"%,
-        'Found custom Main logo in mail' )
-      or print STDERR Dumper( mail() );
     like( mail(), qr#<span>Hello</span>#, "Found english greeting" );
     ok( mail() =~ m#a href="http://other\.example\.com/passwdreset\?(.*?)"#,
         'Found link in mail' )

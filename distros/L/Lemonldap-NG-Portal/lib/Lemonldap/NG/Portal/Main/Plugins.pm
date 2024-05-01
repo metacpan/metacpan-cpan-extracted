@@ -2,7 +2,7 @@
 # into "plugins" list in lemonldap-ng.ini, section "portal"
 package Lemonldap::NG::Portal::Main::Plugins;
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -45,6 +45,8 @@ our @pList = (
     locationDetect      => '::Plugins::LocationDetect',
     globalLogoutRule    => '::Plugins::GlobalLogout',
     samlFederationFiles => '::Plugins::SamlFederation',
+    'or::oidcOPMetaDataOptions/*/oidcOPMetaDataOptionsRequirePkce' =>
+      '::Plugins::AuthOidcPkce',
 );
 
 ##@method list enabledPlugins
@@ -56,7 +58,7 @@ sub enabledPlugins {
     my @res;
 
     # Search for Issuer* modules enabled
-    foreach my $key (qw(SAML OpenID CAS OpenIDConnect Get)) {
+    foreach my $key (qw(SAML OpenID CAS OpenIDConnect Get JitsiMeetTokens)) {
         if ( $conf->{"issuerDB${key}Activation"} ) {
             $self->logger->debug("Issuer${key} enabled");
             push @res, "::Issuer::$key";
@@ -72,15 +74,15 @@ sub enabledPlugins {
 
     # Load static plugin list
     for ( my $i = 0 ; $i < @pList ; $i += 2 ) {
-        my $pluginConf = $conf->{ $pList[$i] };
-        if ( ref($pluginConf) eq "HASH" ) {
-
-            # Do not load plugin if config is an empty hash
-            push @res, $pList[ $i + 1 ] if %{$pluginConf};
+        my $pluginConf;
+        if ( $pList[$i] =~ /^(.*?)::(.*)$/ ) {
+            $pluginConf = checkConf( $conf, $2, $1 );
         }
         else {
-            push @res, $pList[ $i + 1 ] if $pluginConf;
+            my $c = $conf->{ $pList[$i] };
+            $pluginConf = ( ref($c) && ref($c) eq 'HASH' ? scalar(%$c) : $c );
         }
+        push @res, $pList[ $i + 1 ] if $pluginConf;
     }
 
     # Check if SOAP is enabled
@@ -114,6 +116,31 @@ sub enabledPlugins {
       if $conf->{impersonationRule};
 
     return @res;
+}
+
+sub checkConf {
+    my ( $conf, $path, $type ) = @_;
+    if ( $path =~ s#^(.*?)/## ) {
+        my $w = $1;
+        if ( $w eq '*' ) {
+            my @res;
+            foreach my $k ( keys %{ $conf || {} } ) {
+                push @res, checkConf( $conf->{$k}, $path, $type );
+            }
+            if ( $type eq 'or' ) {
+                my $res = 0;
+                map { $res ||= $_ } @res;
+                return $res;
+            }
+            else { die "Unkown type $type"; }
+        }
+        else {
+            return checkConf( $conf->{$w}, $path, $type );
+        }
+    }
+    else {
+        return $conf->{$path};
+    }
 }
 
 1;

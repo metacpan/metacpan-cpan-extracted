@@ -148,6 +148,7 @@ Lemonldap::NG::Common::Apache::Session->get_key_from_all_sessions(
 
         print "Processing session $id\n" if $debug;
         my $s = Lemonldap::NG::Common::Session->new( {
+                hashStore            => 0,
                 storageModule        => $backendTo->{backend},
                 storageModuleOptions => $backendTo,
                 id                   => $id,

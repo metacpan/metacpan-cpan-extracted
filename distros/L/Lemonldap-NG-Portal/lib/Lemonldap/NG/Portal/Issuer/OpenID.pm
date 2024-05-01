@@ -16,7 +16,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OID_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.19.0';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer';
 
@@ -76,7 +76,7 @@ sub init {
         return 0;
     }
     return 0 unless ( $self->SUPER::init() );
-    $self->openidPortal( $self->conf->{portal} . '/' . $self->path . '/' );
+    $self->openidPortal( $self->p->buildUrl( $self->path ) . '/' );
 
     #$openidPortal =~ s#(?<!:)//#/#g;
     return 1;

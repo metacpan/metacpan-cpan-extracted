@@ -18,5 +18,6 @@ requires 'Data::Walk'       => '2.01';
 test_requires 'DBI'         => '1.643';
 test_requires 'Test2::V0'   => '0.000145';
 test_requires 'DBD::SQLite' => '1.74';
+test_requires 'Exporter::NoWork' => '0.03';
 
 WriteAll;

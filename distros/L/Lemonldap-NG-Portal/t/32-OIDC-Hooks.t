@@ -120,6 +120,8 @@ my $id_token = $json->{id_token};
 ok( $id_token, 'ID token present' );
 my $refresh_token = $json->{refresh_token};
 ok( $refresh_token, 'Refresh token present' );
+my $customToken = $json->{custom_token};
+is( $customToken, 'CustomToken', 'Found custom token in token response' );
 my $id_token_payload = id_token_payload($id_token);
 is( $id_token_payload->{id_token_hook}, 1, "Found hooked claim in ID token" );
 

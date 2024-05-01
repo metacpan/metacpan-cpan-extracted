@@ -50,7 +50,6 @@ SKIP: {
         qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
     # Push SAML request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             $url,
@@ -87,7 +86,6 @@ SKIP: {
     expectPortalError( $res, 84, 'PE_UNAUTHORIZEDPARTNER' );
 
     # Access to unknown SP
-    switch ("unknownsp");
     ok(
         $res = $unknownsp->_get(
             '/',
@@ -100,7 +98,6 @@ SKIP: {
         qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
     # Push SAML request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             $url,

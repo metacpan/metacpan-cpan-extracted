@@ -13,7 +13,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 21;
+my $maintests = 19;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 
@@ -55,7 +55,6 @@ SKIP: {
         qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
     # Push SAML request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             $url,
@@ -165,7 +164,6 @@ qr@SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
     );
 
     # Post SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($query),
@@ -182,11 +180,7 @@ qr@SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
     expectAuthenticatedAs( $res, 'fa@badwolf.org@idp' );
 
     # Verify UTF-8
-    ok( $res = $sp->_get("/sessions/global/$spId"), 'Get UTF-8' );
-    expectOK($res);
-    ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-      or print STDERR $@;
-    ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
+    ok( getSession($spId)->data->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
       or explain( $res, 'cn => Frédéric Accents' );
 
     # Logout initiated by SP
@@ -211,7 +205,6 @@ qr@SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
     );
 
     # Push SAML logout request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             $url,
@@ -229,7 +222,6 @@ qr#^http://auth.sp.com(/saml/proxySingleLogoutReturn)\?(SAMLResponse=.+)#
     is( $removedCookie, 0, "IDP Cookie removed" );
 
     # Send SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_get(
             $url,
@@ -241,7 +233,6 @@ qr#^http://auth.sp.com(/saml/proxySingleLogoutReturn)\?(SAMLResponse=.+)#
     expectOK($res);
 
     # Test if logout is done
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             '/', cookie => "lemonldap=$idpId",
@@ -250,7 +241,6 @@ qr#^http://auth.sp.com(/saml/proxySingleLogoutReturn)\?(SAMLResponse=.+)#
     );
     expectReject($res);
 
-    switch ('sp');
     ok(
         $res = $sp->_get(
             '/',
@@ -268,8 +258,7 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
@@ -316,8 +305,7 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',

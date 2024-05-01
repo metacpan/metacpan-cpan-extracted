@@ -3,6 +3,7 @@ use JSON;
 use MIME::Base64;
 use Data::Dumper;
 use URI::Escape;
+use HTTP::Headers;
 
 BEGIN {
     require 't/test-psgi-lib-traefik.pm';
@@ -43,18 +44,25 @@ ok(
 ok( $res->[0] == 200, 'Code is 200' ) or explain( $res->[0], 200 );
 count(2);
 
-# Check headers
-%h = @{ $res->[1] };
-ok(
-    $h{'Lm-Remote-Custom'} eq
+# Check headers, make sure they are not duplicated
+my $h = HTTP::Headers->new( @{ $res->[1] } );
+is(
+    $h->header('Lm-Remote-Custom'),
 'dwho@badwolf.org alias Doctor_Who:users; timelords by using Mozilla/5.0 (X11; VAX4000; rv:43.0) Gecko/20100101 Firefox/143.0 Iceweasel/143.0.1',
     'Lm-Remote-Custom is overwriten'
-  )
-  or explain(
-    \%h,
-'Lm-Remote-Custom => "dwho@badwolf.org alias Doctor_Who:users; timelords by using Mozilla/5.0 (X11; VAX4000; rv:43.0) Gecko/20100101 Firefox/143.0 Iceweasel/143.0.1"'
-  );
+);
 count(1);
+
+# Check echo of Authorization header
+ok(
+    $res = $client->_get(
+        '/', undef, undef, "lemonldap=$sessionId", HTTP_AUTHORIZATION => "xx"
+    ),
+    'Authentified query'
+);
+my $h = HTTP::Headers->new( @{ $res->[1] } );
+is( $h->header('Authorization'), "xx", 'Authorization header is echoed' );
+count(2);
 
 # Authorized query
 ok( $res = $client->_get( '/', undef, undef, "lemonldap=$sessionId" ),
@@ -186,28 +194,6 @@ ok(
       . uri_escape( encode_base64( 'http://test2.example.com/', '' ) )
   );
 count(3);
-
-# Clean headers
-ok(
-    $res = $client->_get(
-        '/skipif/zz', undef, 'test1.example.com', undef,
-        HTTP_AUTH_USER => 'rtyler'
-    ),
-    'Test skip() with forged header'
-);
-ok( $res->[0] == 200, 'Code is 200' ) or explain( $res, 200 );
-count(2);
-%h = @{ $res->[1] };
-my %delete;
-foreach ( keys %h ) {
-    /^Deleteheader\d$/ and $delete{ $h{$_} }++;
-}
-foreach (qw(Cookie HTTP_COOKIE Auth-User HTTP_AUTH_USER)) {
-    ok( $delete{$_}, "Delete command for $_" )
-      or explain( \%h, 'Delete* headers' );
-    ok( !$h{$_}, "$_ is deleted" ) or explain( \%h, 'Delete* headers' );
-    count(2);
-}
 
 done_testing( count() );
 

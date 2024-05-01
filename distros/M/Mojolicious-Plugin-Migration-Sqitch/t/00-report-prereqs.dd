@@ -1,0 +1,41 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'App::Sqitch' => 'v1.4.1',
+                                      'DBI' => '1.643',
+                                      'Mojolicious' => '9.00',
+                                      'Readonly' => '2.05',
+                                      'Syntax::Keyword::Try' => '0.29',
+                                      'perl' => '5.026000'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'DBD::SQLite' => '1.74',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test2::Suite' => '0.000155',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

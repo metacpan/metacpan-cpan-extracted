@@ -10,13 +10,13 @@ our $VERSION = '2.0.10';
 extends 'Lemonldap::NG::Common::PSGI';
 
 # Properties
-has 'routes' => (
+has routes => (
     is      => 'rw',
     isa     => 'HashRef',
     default =>
       sub { { GET => {}, POST => {}, PUT => {}, PATCH => {}, DELETE => {} } }
 );
-has 'defaultRoute' => ( is => 'rw', default => 'index.html' );
+has defaultRoute => ( is => 'rw', default => 'index.html' );
 
 # Routes initialization
 

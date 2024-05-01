@@ -119,7 +119,7 @@ sub verify_external {
     foreach my $k ( keys %{ $self->{vrfyAttrs} } ) {
 
         # in older versions, code was not automatically defined
-        # if admins defined it explicitely, do not treat it as a session
+        # if admins defined it explicitly, do not treat it as a session
         # attribute
         $args->{$k} = (
               $k eq 'code'

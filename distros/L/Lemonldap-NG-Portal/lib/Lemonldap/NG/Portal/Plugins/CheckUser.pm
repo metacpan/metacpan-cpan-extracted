@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -286,7 +286,11 @@ sub check {
 
         my $age = '1';
         foreach my $id ( keys %$sessions ) {
-            my $session = $self->p->getApacheSession($id) or next;
+
+            # searchOn() returns sessions indexed by their storage ID, then
+            # it is required to set hashStore to 0
+            my $session = $self->p->getApacheSession( $id, hashStore => 0, )
+              or next;
 
             if ( $session->{data}->{_utime} gt $age ) {
                 $attrs = $session->{data};
@@ -444,7 +448,7 @@ sub _resolveURL {
     my ($port) = $vhost =~ m#^.+(:\d+)$#;
     $port ||= '';
     $vhost =~ s/:\d+$//;
-    $vhost .= $self->conf->{domain} unless ( $vhost =~ /\./ );
+    $vhost .= $self->p->getCookieDomain($req) unless ( $vhost =~ /\./ );
     $proto =
       $self->p->HANDLER->_isHttps( $req, $vhost ) ? 'https://' : 'http://'
       unless $proto;

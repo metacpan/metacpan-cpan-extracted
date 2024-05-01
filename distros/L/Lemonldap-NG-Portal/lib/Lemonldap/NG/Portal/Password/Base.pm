@@ -15,9 +15,10 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PP_INSUFFICIENT_PASSWORD_QUALITY
 );
 
-extends 'Lemonldap::NG::Portal::Main::Plugin';
+extends
+  qw/Lemonldap::NG::Portal::Main::Plugin Lemonldap::NG::Portal::Lib::SMTP/;
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 # INITIALIZATION
 
@@ -118,11 +119,61 @@ sub _modifyPassword {
                 { _passwordDB => $self->p->getModule( $req, 'password' ) } );
         }
 
-        # Set a flag to ignore password change in Menu
-        $req->{ignorePasswordChange} = 1;
+        if ( $self->conf->{mailOnPasswordChange} ) {
 
-        # Set a flag to allow sending a mail
-        $req->{passwordWasChanged} = 1;
+            # Send mail containing the new password
+            $req->data->{mailAddress} ||=
+              $self->p->getFirstValue(
+                $req->{sessionInfo}->{ $self->conf->{mailSessionKey} } );
+
+            # Build mail content
+            my $tr      = $self->translate($req);
+            my $subject = $self->conf->{mailSubject};
+            unless ($subject) {
+                $subject = 'mailSubject';
+                $tr->( \$subject );
+            }
+            my $body;
+            my $html;
+            my $password = $req->data->{newpassword};
+
+            if ( $self->conf->{mailBody} ) {
+
+                # We use a specific text message, no html
+                $body = $self->conf->{mailBody};
+
+                # Replace variables in body
+                $body =~ s/\$password/$password/g;
+                $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
+
+            }
+
+            else {
+
+                # Use HTML template
+                $body = $self->loadMailTemplate(
+                    $req,
+                    'mail_password',
+                    filter => $tr,
+                    params => {
+                        password => $password,
+                    },
+                );
+                $html = 1;
+            }
+
+            # Send mail
+            unless (
+                $self->send_mail(
+                    $req->data->{mailAddress},
+                    $subject, $body, $html
+                )
+              )
+            {
+                $self->logger->warn( "Unable to send password changed mail to "
+                      . $req->data->{mailAddress} );
+            }
+        }
 
         #  Continue process if password change is ok
         return ( $hook_result != PE_OK ) ? $hook_result : PE_PASSWORD_OK;

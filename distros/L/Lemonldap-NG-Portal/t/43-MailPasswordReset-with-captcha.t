@@ -11,7 +11,7 @@ BEGIN {
 }
 
 my ( $res, $host, $url, $query );
-my $maintests = 18;
+my $maintests = 17;
 my $mailSend  = 0;
 my $mail2     = 0;
 
@@ -94,9 +94,6 @@ m#<img class="renewcaptchaclick" src="/static/common/icons/arrow_refresh.png"#,
         ),
         'Post mail'
     );
-    ok( mail() =~ m%Content-Type: image/png; name="logo_llng_old.png"%,
-        'Found custom Main logo in mail' )
-      or print STDERR Dumper( mail() );
 
     ok( mail() =~ m#a href="http://auth.example.com/resetpwd\?(.*?)"#,
         'Found link in mail' );

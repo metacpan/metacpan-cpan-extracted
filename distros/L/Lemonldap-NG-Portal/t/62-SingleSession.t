@@ -112,7 +112,6 @@ sub testGetParam {
 
 ####################
 # Test singleSession
-switch ($client1);
 
 # Test login
 $res = loginUser( $client1, "dwho", "127.0.0.1" );
@@ -137,7 +136,6 @@ clean_sessions();
 
 ####################
 # Test singleIP
-switch ($client2);
 
 $res = loginUser( $client2, "dwho", "127.0.0.1" );
 $id1 = expectCookie($res);
@@ -160,7 +158,6 @@ clean_sessions();
 
 ####################
 # Test singleUserByIP
-switch ($client3);
 
 $res = loginUser( $client3, "rtyler", "127.0.0.1" );
 $id1 = expectCookie($res);
@@ -183,7 +180,6 @@ clean_sessions();
 
 ####################
 # Test DisplayDeleted & DisplayOther
-switch ($client5);
 
 $res = loginUser( $client5, "dwho", "127.0.0.1" );
 $id1 = expectCookie($res);
@@ -194,7 +190,6 @@ $id2 = expectCookie($res);
 $res = loginUser( $client5, "dwho", "127.0.0.2" );
 $id3 = expectCookie($res);
 
-switch ($client4);
 
 $res = loginUser( $client4, "dwho", "127.0.0.2",
     query => 'url=' . encode_base64( "http://test1.example.com/", '' ) );

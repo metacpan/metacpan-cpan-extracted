@@ -10,12 +10,17 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+49699333
 Alders
 Alders'
 App
+Håkon
+Hægland
 Inc
 MaxMind
 Olaf
+dependabot
+hakon
 lib
 olaf
 perlvars

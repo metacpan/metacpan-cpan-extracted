@@ -96,13 +96,11 @@ expectOK($res);
 my $metadata = $res->[2]->[0];
 count(3);
 
-switch ('rp');
 &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
 ok( $rp = rp( $jwks, $metadata ), 'RP portal' );
 count(1);
 
 # Authentication
-switch ('op');
 my $query = "user=french&password=french";
 ok(
     $res = $op->_post(
@@ -117,7 +115,6 @@ count(1);
 my $idpId = expectCookie($res);
 
 # Query RP for auth
-switch ('rp');
 ok( $res = $rp->_get( '/', accept => 'text/html' ), 'Unauth SP request' );
 count(1);
 my $url;
@@ -125,7 +122,6 @@ my $url;
   expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
 
 # MAIN PART OF TEST
-switch ('op');
 foreach my $badUrl (@badUrls) {
     my $badArg = build_urlencoded( redirect_uri => $badUrl );
     my $forged = $query;

@@ -4,10 +4,10 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants 'PE_OK';
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.19.0';
 
 extends qw(
-  Lemonldap::NG::Common::Module
+  Lemonldap::NG::Portal::Main::UserDB
   Lemonldap::NG::Portal::Lib::Remote
 );
 
@@ -26,10 +26,6 @@ sub setSessionInfo {
     delete $req->data->{rSessionInfo}->{_session_id};
     $req->{sessionInfo} = $req->data->{rSessionInfo};
 
-    return PE_OK;
-}
-
-sub setGroups {
     return PE_OK;
 }
 

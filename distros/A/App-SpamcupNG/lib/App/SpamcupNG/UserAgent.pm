@@ -1,15 +1,15 @@
 package App::SpamcupNG::UserAgent;
 use warnings;
 use strict;
-use Carp qw(croak);
-use LWP::UserAgent 6.60;
-use HTTP::Request 6.36;
-use Log::Log4perl 1.54 qw(get_logger :levels);
-use HTTP::CookieJar::LWP 0.012;
+use Carp qw(confess);
+use LWP::UserAgent 6.72;
+use HTTP::Request 6.44;
+use Log::Log4perl 1.57 qw(get_logger :levels);
+use HTTP::CookieJar::LWP 0.014;
 use Mozilla::PublicSuffix v1.0.6;
-use HTTP::Request::Common qw(POST);
+use HTTP::Request::Common 6.44 qw(POST);
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 =head1 NAME
 
@@ -38,7 +38,7 @@ Returns a new instance.
 
 sub new {
     my ( $class, $version ) = @_;
-    die 'The parameter version is required' unless ($version);
+    confess 'The parameter version is required' unless ($version);
 
     my $self = {
         name             => 'SpamcupNG user agent',
@@ -125,12 +125,12 @@ sub _redact_auth_req {
         push( @lines, _request_line($request) );
         push( @lines, $request->headers_as_string );
         my @params = split( '&', $request->content );
-        my %params
-            = map { my @tmp = split( '=', $_ ); $tmp[0] => $tmp[1] } @params;
-        croak(    'Unexpected request content, missing '
-                . $self->{password_field}
-                . ' field' )
-            unless exists( $params{ $self->{password_field} } );
+        my %params =
+          map { my @tmp = split( '=', $_ ); $tmp[0] => $tmp[1] } @params;
+        croak(  'Unexpected request content, missing '
+              . $self->{password_field}
+              . ' field' )
+          unless exists( $params{ $self->{password_field} } );
         my $redacted = '*' x length( $params{ $self->{password_field} } );
         $params{ $self->{password_field} } = $redacted;
 
@@ -149,9 +149,9 @@ sub _redact_auth_req {
 }
 
 sub _dump_cookies {
-    my $self    = shift;
-    my @cookies = $self->{user_agent}
-        ->cookie_jar->dump_cookies( { persistent => 1 } );
+    my $self = shift;
+    my @cookies =
+      $self->{user_agent}->cookie_jar->dump_cookies( { persistent => 1 } );
     my $counter = 0;
     my @dump;
 
@@ -178,7 +178,7 @@ sub login {
     }
 
     if ( $self->_is_authenticated ) {
-        $logger->info('Already authenticated');
+        $logger->debug('Already authenticated');
         $request = HTTP::Request->new( GET => $self->{domain} );
     }
     else {
@@ -190,18 +190,18 @@ sub login {
             }
             else {
                 $request = POST $self->{form_login_url},
-                    [
+                  [
                     username                => $id,
                     $self->{password_field} => $password,
                     duration                => '+12h',
                     action                  => 'cookielogin',
                     returnurl               => '/'
-                    ];
+                  ];
             }
         }
         else {
-            $request
-                = HTTP::Request->new( GET => $self->{code_login_url} . $id );
+            $request =
+              HTTP::Request->new( GET => $self->{code_login_url} . $id );
         }
     }
 
@@ -255,9 +255,8 @@ Returns the HTML content as a scalar reference.
 
 sub spam_report {
     my ( $self, $report_id ) = @_;
-    my $logger = get_logger('SpamcupNG');
-    my $request
-        = HTTP::Request->new( GET => $self->{report_url} . $report_id );
+    my $logger  = get_logger('SpamcupNG');
+    my $request = HTTP::Request->new( GET => $self->{report_url} . $report_id );
 
     if ( $logger->is_debug ) {
         $logger->debug( "Request to be sent:\n" . $request->as_string );
@@ -308,8 +307,7 @@ sub complete_report {
     }
 
     unless ( $response->is_success ) {
-        $logger->fatal(
-            'Cannot connect to server. Try again later. Quitting.');
+        $logger->fatal('Cannot connect to server. Try again later. Quitting.');
         return undef;
     }
 
@@ -318,12 +316,12 @@ sub complete_report {
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2018 of Alceu Rodrigues de Freitas Junior,
-E<lt>arfreitas@cpan.orgE<gt>
+E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 This file is part of App-SpamcupNG distribution.
 

@@ -3,7 +3,7 @@ package Lemonldap::NG::Common::Apache::Session::Store;
 
 use strict;
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.19.0';
 
 sub new {
     my $class = shift;
@@ -17,7 +17,7 @@ sub insert {
 
     # Store session in cache
     my $id = $session->{data}->{_session_id};
-    $self->cache->set( $id, $session->{serialized} );
+    $self->storeInCache( $id, $session->{serialized} );
 
     # Store in session backend
     return $self->module->insert($session);
@@ -36,8 +36,8 @@ sub update {
 
         # Update session in cache
         my $id = $session->{data}->{_session_id};
-        $self->cache->remove($id) if ( $self->cache->get($id) );
-        $self->cache->set( $id, $session->{serialized} );
+        $self->removeFromCache($id) if ( $self->getFromCache($id) );
+        $self->storeInCache( $id, $session->{serialized} );
     }
 
     unless ( defined( $session->{args}->{updateCache} )
@@ -56,16 +56,23 @@ sub materialize {
 
     # Get session from cache
     my $id = $session->{data}->{_session_id};
-    if ( !$self->{args}->{noCache} and $self->cache->get($id) ) {
-        $session->{serialized} = $self->cache->get($id);
-        return;
+    if ( !$self->{args}->{noCache} and $self->getFromCache($id) ) {
+        $session->{serialized} = $self->getFromCache($id);
+        eval { JSON::from_json( $session->{serialized} ); };
+        if ($@) {
+            print STDERR "Local data corrupted, ignore cached session\n";
+            $session->{serialized} = undef;
+        }
+        else {
+            return;
+        }
     }
 
     # Get session from backend
     $self->module->materialize($session);
 
     # Store session in cache
-    $self->cache->set( $id, $session->{serialized} );
+    $self->storeInCache( $id, $session->{serialized} );
 
     return;
 }
@@ -83,7 +90,7 @@ sub remove {
 
         # Remove session from cache
         my $id = $session->{data}->{_session_id};
-        $self->cache->remove($id) if ( $self->cache->get($id) );
+        $self->removeFromCache($id) if ( $self->getFromCache($id) );
     }
 
     unless ($session->{args}->{updateCache}
@@ -118,6 +125,19 @@ sub cache {
     $self->{cache} = $module->new( $self->{args}->{localStorageOptions} );
 
     return $self->{cache};
+}
+
+sub storeInCache { _cache_call( 'set', @_ ); }
+
+sub getFromCache { _cache_call( 'get', @_ ); }
+
+sub removeFromCache { _cache_call( 'remove', @_ ); }
+
+sub _cache_call {
+    my ( $sub, $self, @args ) = @_;
+    my $res = eval { $self->cache->$sub(@args); };
+    print STDERR "Unable to use cache: $@\n" if $@;
+    return $res;
 }
 
 1;

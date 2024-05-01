@@ -1,13 +1,13 @@
 package App::SpamcupNG;
 use warnings;
 use strict;
-use HTML::Form 6.07;
+use HTML::Form 6.11;
 use Getopt::Std;
-use YAML::XS 0.62 qw(LoadFile);
+use YAML::XS 0.88 qw(LoadFile);
 use File::Spec;
 use Hash::Util qw(lock_hash);
 use Exporter 'import';
-use Log::Log4perl 1.54 qw(get_logger :levels);
+use Log::Log4perl 1.57 qw(get_logger :levels);
 use Carp qw(confess);
 
 use App::SpamcupNG::HTMLParse (
@@ -22,8 +22,8 @@ use App::SpamcupNG::Summary::Recorder;
 
 use constant TARGET_HTML_FORM => 'sendreport';
 
-our @EXPORT_OK
-    = qw(read_config main_loop %OPTIONS_MAP config_logger TARGET_HTML_FORM);
+our @EXPORT_OK =
+  qw(read_config main_loop %OPTIONS_MAP config_logger TARGET_HTML_FORM);
 our %OPTIONS_MAP = (
     'check_only' => 'n',
     'all'        => 'a',
@@ -41,7 +41,7 @@ my %regexes = (
 
 lock_hash(%OPTIONS_MAP);
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 =head1 NAME
 
@@ -83,13 +83,13 @@ sub read_config {
     my ( $cfg, $cmd_opts ) = @_;
     my $data = LoadFile($cfg);
     confess 'second parameter must be a hash reference'
-        unless ( ref($cmd_opts) eq 'HASH' );
+      unless ( ref($cmd_opts) eq 'HASH' );
 
     # sanity checking
     for my $opt ( keys( %{ $data->{ExecutionOptions} } ) ) {
         confess
 "'$opt' is not a valid option for configuration files. Check the documentation."
-            unless ( exists( $OPTIONS_MAP{$opt} ) );
+          unless ( exists( $OPTIONS_MAP{$opt} ) );
     }
 
     for my $opt ( keys(%OPTIONS_MAP) ) {
@@ -120,8 +120,8 @@ sub read_config {
 
 sub _report_form {
     my ( $html_ref, $base_uri ) = @_;
-    die 'Must receive an scalar reference of the HTML response'
-        unless ( ref($html_ref) );
+    confess 'Must receive an scalar reference of the HTML response'
+      unless ( ref($html_ref) );
 
     my @forms = HTML::Form->parse( $$html_ref, $base_uri );
 
@@ -194,9 +194,9 @@ L<Log::Log4perl> for more details about the levels.
 sub config_logger {
     my ( $level, $log_file ) = @_;
     confess "Must receive a string for the level parameter"
-        unless ( ( defined($level) ) and ( $level ne '' ) );
+      unless ( ( defined($level) ) and ( $level ne '' ) );
     confess "Must receive a string for the log file parameter"
-        unless ( ( defined($log_file) ) and ( $log_file ne '' ) );
+      unless ( ( defined($log_file) ) and ( $log_file ne '' ) );
 
 # :TODO:21/01/2018 12:07:01:ARFREITAS: Do we need to import :levels from Log::Log4perl at all?
     my %levels = (
@@ -207,7 +207,7 @@ sub config_logger {
         FATAL => $FATAL
     );
     confess "The value '$level' is not a valid value for level"
-        unless ( exists( $levels{$level} ) );
+      unless ( exists( $levels{$level} ) );
 
     my $conf;
 
@@ -240,13 +240,13 @@ sub _error_handling {
 
         foreach my $error ( @{$errors_ref} ) {
             if ( $error->is_fatal() ) {
-                $logger->fatal($error->message());
+                $logger->warn( $error->message() );
 
-              # must stop processing the HTML for this report and move to next
+                # must stop processing the HTML for this report and move to next
                 return 1;
             }
             else {
-                $logger->error($error->message());
+                $logger->error( $error->message() );
             }
 
         }
@@ -326,7 +326,7 @@ sub main_loop {
     sleep $opts_ref->{delay};
     my $response_ref = $ua->login( $opts_ref->{ident}, $opts_ref->{pass} );
     return 0 if ( _error_handling($response_ref) );
-    $logger->info('Log in completed');
+    $logger->debug('Log in completed');
     my $next_id;
     my $summary = App::SpamcupNG::Summary->new;
 
@@ -335,7 +335,7 @@ sub main_loop {
 
         if ( $logger->is_debug ) {
             $logger->debug("ID of next SPAM report found: $next_id")
-                if ($next_id);
+              if ($next_id);
         }
 
         $summary->set_tracking_id($next_id);
@@ -349,9 +349,9 @@ sub main_loop {
     if ( ($last_seen) and ( $next_id eq $last_seen ) ) {
         $logger->fatal(
             'I have seen this ID earlier, we do not want to report it again.'
-                . 'This usually happens because of a bug in Spamcup.'
-                . 'Make sure you use latest version!'
-                . "You may also want to go check from Spamcop what is happening: http://www.spamcop.net/sc?id=$next_id"
+              . 'This usually happens because of a bug in Spamcup.'
+              . 'Make sure you use latest version!'
+              . "You may also want to go check from Spamcop what is happening: http://www.spamcop.net/sc?id=$next_id"
         );
     }
 
@@ -373,9 +373,9 @@ sub main_loop {
 
             if ( $logger->is_info ) {
                 $logger->info( 'Message age: '
-                        . $age_info_ref->[0]
-                        . ', unit: '
-                        . $age_info_ref->[1] );
+                      . $age_info_ref->[0]
+                      . ', unit: '
+                      . $age_info_ref->[1] );
             }
 
             $summary->set_age( $age_info_ref->[0] );
@@ -406,7 +406,7 @@ sub main_loop {
             if ( $error->is_fatal() ) {
                 $logger->fatal( $error->message() );
 
-              # must stop processing the HTML for this report and move to next
+                # must stop processing the HTML for this report and move to next
                 return 0;
             }
             else {
@@ -485,7 +485,7 @@ sub main_loop {
                 $send
                 and (  ( $send eq 'on' )
                     or ( $type =~ /^mole/ and $send == 1 ) )
-                )
+              )
             {
                 $willsend .= "$master ($info)\n";
             }
@@ -494,8 +494,8 @@ sub main_loop {
             }
         }
 
-        my $message
-            = 'Would send the report to the following addresses (reason in parenthesis): ';
+        my $message =
+'Would send the report to the following addresses (reason in parenthesis): ';
 
         if ($willsend) {
             $message .= $willsend;
@@ -572,9 +572,9 @@ sub main_loop {
         }
 
     }
-    elsif ( $$response_ref
-        =~ /click reload if this page does not refresh automatically in \n(\d+) seconds/gs
-        )
+    elsif ( $$response_ref =~
+/click reload if this page does not refresh automatically in \n(\d+) seconds/gs
+      )
 
     {
         my $delay = $1;
@@ -589,8 +589,8 @@ sub main_loop {
         # fake that everything is ok
         return 1;
     }
-    elsif ( $$response_ref
-        =~ /No source IP address found, cannot proceed. Not full header/gs )
+    elsif ( $$response_ref =~
+        /No source IP address found, cannot proceed. Not full header/gs )
     {
         $logger->warn(
 'No source IP address found. Your report might be missing headers. Skipping.'
@@ -599,7 +599,7 @@ sub main_loop {
     }
     else {
 
-      # Shit happens. If you know it should be parseable, please report a bug!
+        # Shit happens. If you know it should be parseable, please report a bug!
         $logger->warn(
 "Can't parse Spamcop.net's HTML. If this does not happen very often you can ignore this warning. Otherwise check if there's new version available. Skipping."
         );
@@ -647,7 +647,7 @@ sub main_loop {
 
         if ( $logger->is_info ) {
             $logger->info( 'Spamcop.net sent following SPAM reports: '
-                    . $summary->to_text('receivers') );
+                  . $summary->to_text('receivers') );
             $logger->info('Finished processing.');
         }
 
@@ -665,12 +665,12 @@ EOM
     }
 
     $logger->debug( 'SPAM report summary: ' . $summary->as_text )
-        if ( $logger->is_debug );
+      if ( $logger->is_debug );
 
     if ( $opts_ref->{database}->{enabled} ) {
         $logger->info( 'Persisting summary to SQLite database at '
-                . $opts_ref->{database}->{path} )
-            if ( $logger->is_info );
+              . $opts_ref->{database}->{path} )
+          if ( $logger->is_info );
         my $recorder = App::SpamcupNG::Summary::Recorder->new(
             $opts_ref->{database}->{path} );
         $recorder->init;
@@ -694,12 +694,12 @@ L<Log::Log4perl>
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2018 of Alceu Rodrigues de Freitas Junior,
-E<lt>arfreitas@cpan.orgE<gt>
+E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 This file is part of App-SpamcupNG distribution.
 

@@ -114,6 +114,20 @@ sub runTest {
     ok( $json->{'sub'} eq "french",            'Got User Info' );
     ok( $json->{'name'} eq "Frédéric Accents", 'Got User Info' );
 
+    # Skip ahead in time again
+    Time::Fake->offset("+4h");
+
+    # Verify access token is rejected
+    $res = getUserinfo( $op, $access_token );
+    is( $res->[0], 401, "Access token rejected" );
+
+    # Refresh access token a second time
+    $json         = expectJSON( refreshGrant( $op, "rpid", $refresh_token ) );
+    $access_token = $json->{access_token};
+    $json         = expectJSON( getUserinfo( $op, $access_token ) );
+    ok( $json->{'sub'} eq "french",            'Got User Info' );
+    ok( $json->{'name'} eq "Frédéric Accents", 'Got User Info' );
+
     # Check failure conditions
     $op->logout($idpId);
 
@@ -171,6 +185,12 @@ runTest($op);
 # Re-run tests with JWT access tokens
 $baseConfig->{ini}->{oidcRPMetaDataOptions}->{rp}
   ->{oidcRPMetaDataOptionsAccessTokenJWT} = 1;
+$op = LLNG::Manager::Test->new($baseConfig);
+runTest( $op, 1 );
+
+# Re-run tests with activity timeout.
+# Make sure Refresh tokens extend session activity
+$baseConfig->{ini}->{timeoutActivity} = 7500;
 $op = LLNG::Manager::Test->new($baseConfig);
 runTest( $op, 1 );
 

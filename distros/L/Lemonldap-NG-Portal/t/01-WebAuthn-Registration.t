@@ -52,8 +52,7 @@ ENDKEY
 
     my $res;
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => 'error',
                 useSafeJail                => 1,
@@ -135,6 +134,8 @@ ENDKEY
 
         my $reg_challenge = from_json $res->[2]->[0];
 
+        is( $reg_challenge->{request}->{rp}->{id},
+            "auth.example.com", "rp.id is set" );
         is( $reg_challenge->{request}->{rp}->{name},
             "LemonLDAP::NG", "rp.name is set" );
         is( $reg_challenge->{request}->{user}->{name},
@@ -152,8 +153,7 @@ ENDKEY
 
         my $credential_response =
           $webauthn_tester->get_credential_response($reg_challenge);
-        my $registration_response = buildForm(
-            {
+        my $registration_response = buildForm( {
                 credential =>
                   $webauthn_tester->encode_credential($credential_response),
                 state_id => $state_id,
@@ -217,8 +217,7 @@ ENDKEY
         $webauthn_tester->sign_count( $webauthn_tester->sign_count + 1 );
         my $credential_response =
           $webauthn_tester->get_assertion_response($verif_challenge);
-        my $verification_response = buildForm(
-            {
+        my $verification_response = buildForm( {
                 state_id   => $state_id,
                 credential =>
                   $webauthn_tester->encode_credential($credential_response),
@@ -372,8 +371,7 @@ ENDKEY
     verify_device(
         $client, $id,
         $webauthn_tester_1,
-        [
-            {
+        [ {
                 'id'   => encode_base64url($credential_id_1),
                 'type' => 'public-key'
             },

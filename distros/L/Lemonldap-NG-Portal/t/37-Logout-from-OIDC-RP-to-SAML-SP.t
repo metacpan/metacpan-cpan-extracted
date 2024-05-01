@@ -101,7 +101,6 @@ SKIP: {
         qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
 
     # Push request to OP
-    switch ('op');
     ok( $res = $op->_get( $url, query => $query, accept => 'text/html' ),
         "Push request to OP,         endpoint $url" );
     expectOK($res);
@@ -137,13 +136,11 @@ SKIP: {
     ($query) = expectRedirection( $res, qr#^http://auth.rp.com/?\?(.*)$# );
 
     # Push OP response to RP
-    switch ('rp');
 
     ok( $res = $rp->_get( '/', query => $query, accept => 'text/html' ),
         'Call openidconnectcallback on RP' );
     my $rpId = expectCookie($res);
 
-    switch ('op');
     ok(
         $res = $op->_get( '/oauth2/checksession.html', accept => 'text.html' ),
         'Check session,      endpoint /oauth2/checksession.html'
@@ -155,7 +152,6 @@ SKIP: {
         'Content-Security-Policy does not contain a frame-ancestors' );
 
     # SAML
-    switch ('sp');
     ok(
         $res = $sp->_get(
             '/', accept => 'text/html',
@@ -166,7 +162,6 @@ SKIP: {
       expectAutoPost( $res, 'auth.op.com', '/saml/singleSignOn',
         'SAMLRequest' );
 
-    switch ('op');
     ok(
         $res = $op->_post(
             $url,
@@ -182,7 +177,6 @@ SKIP: {
         'SAMLResponse' );
 
     # Post SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($query),
@@ -194,7 +188,6 @@ SKIP: {
     my $spId = expectCookie($res);
 
     # Logout initiated by RP
-    switch ('rp');
     ok(
         $res = $rp->_get(
             '/',
@@ -209,7 +202,6 @@ SKIP: {
     );
 
     # Push logout to OP
-    switch ('op');
 
     ok(
         $res = $op->_get(
@@ -243,7 +235,6 @@ m#iframe src="http://auth.op.com(/saml/relaySingleLogoutPOST)\?(relay=.*?)"#s,
         'Get iframe request'
     ) or explain( $res, '' );
     ( $url, $query ) = ( $1, $2 );
-    switch ('op');
     ok(
         $res = $op->_get(
             $url,
@@ -257,7 +248,6 @@ m#iframe src="http://auth.op.com(/saml/relaySingleLogoutPOST)\?(relay=.*?)"#s,
         'SAMLRequest' );
 
     # Post SAML logout request to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($query),
@@ -272,7 +262,6 @@ m#iframe src="http://auth.op.com(/saml/relaySingleLogoutPOST)\?(relay=.*?)"#s,
         'SAMLResponse' );
 
     # Post SAML logout response to IdP
-    switch ('op');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($query),
@@ -292,7 +281,6 @@ m#iframe src="http://auth.op.com(/saml/relaySingleLogoutPOST)\?(relay=.*?)"#s,
     );
     expectReject($res);
 
-    switch ('rp');
     ok(
         $res = $rp->_get(
             '/',
@@ -303,7 +291,6 @@ m#iframe src="http://auth.op.com(/saml/relaySingleLogoutPOST)\?(relay=.*?)"#s,
     );
     expectRedirection( $res, qr#^http://auth.op.com/oauth2/authorize# );
 
-    switch ('sp');
     ok(
         $res = $sp->_get(
             '/',

@@ -218,6 +218,13 @@ sub is_deparsed
       'callchecker generated an OP_CUSTOM call for listassoc lists' );
    ok( !$opcounts{entersub}, 'callchecker removed an OP_ENTERSUB call for listassoc lists' );
    is( $code->(), "([X][Y])", 'result of callcheckered code for listassoc lists' );
+
+   # RT153244
+   $code = sub { t::infix::catfunc() };
+   pass( 'Compiling a zero argument listassoc scalars wrapper did not crash' );
+
+   $code = sub { t::infix::LLfunc() };
+   pass( 'Compiling a zero argument listassoc scalars wrapper did not crash' );
 }
 
 done_testing;

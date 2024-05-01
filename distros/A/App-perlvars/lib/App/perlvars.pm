@@ -3,9 +3,9 @@ package App::perlvars;
 use Moo;
 use autodie;
 
-our $VERSION = '0.000004';
+our $VERSION = '0.000005';
 
-use Path::Tiny qw( path );
+use Path::Tiny    qw( path );
 use PPI::Document ();
 use Test::Vars import => [qw( test_vars )];
 
@@ -129,7 +129,7 @@ App::perlvars - CLI tool to detect unused variables in Perl modules
 
 =head1 VERSION
 
-version 0.000004
+version 0.000005
 
 =head1 DESCRIPTION
 

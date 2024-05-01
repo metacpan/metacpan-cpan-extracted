@@ -5,9 +5,12 @@ use Mouse;
 use utf8;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
 
-extends 'Lemonldap::NG::Portal::Lib::LDAP';
+extends qw(
+  Lemonldap::NG::Portal::Main::UserDB
+  Lemonldap::NG::Portal::Lib::LDAP
+);
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.19.0';
 
 has ldapGroupAttributeNameSearch => (
     is      => 'rw',

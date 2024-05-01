@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SESSIONNOTGRANTED
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.19.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -42,7 +42,7 @@ sub init {
             "crowdsecUrl isn't set, fallback to http://localhost:8080");
         $self->crowdsecUrl('http://localhost:8080');
     }
-    $self->logger->notice( 'CrowdSec policy is: '
+    $self->logger->info( 'CrowdSec policy is: '
           . ( $self->conf->{crowdsecAction} ? 'reject' : 'warn' ) );
     return 1;
 }
@@ -62,7 +62,7 @@ sub check {
     }
     my $content = $resp->decoded_content;
     if ( !$content or $content eq 'null' ) {
-        $self->userLogger->info("$ip isn't known by CrowdSec");
+        $self->userLogger->debug("$ip isn't known by CrowdSec");
         return PE_OK;
     }
     my $json_hash;

@@ -63,7 +63,9 @@ use Time::Fake;
 use URI::Escape;
 use MIME::Base64;
 use Lemonldap::NG::Common::FormEncode;
+use Lemonldap::NG::Common::Session 'id2storage';
 use Lemonldap::NG::Common::Util qw/getPSessionID/;
+use Carp                        qw/shortmess/;
 
 #use 5.10.0;
 
@@ -188,7 +190,8 @@ sub getCache {
 }
 
 sub getSession {
-    my $id           = shift;
+    my $id = shift;
+    $id = $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($id) : $id;
     my @sessionsOpts = (
         storageModule        => "Apache::Session::File",
         storageModuleOptions => {
@@ -421,6 +424,7 @@ sub expectSessionAttributes {
 sub getSessionAttributes {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $app, $id ) = @_;
+    $id = $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($id) : $id;
     my $res;
     ok(
         $res = $app->_get("/sessions/global/$id"),
@@ -702,38 +706,125 @@ sub tempdb {
 }
 
 my %handlerOR;
+my %handlerTSHV;
 
 =head4 register
 
-Registers a new LLNG instance
+Multi-handler system. This automatically takes care of loading the correct
+handler when processing a request.
+
 
 =cut
+
+our @currenthandler;
 
 sub register {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $type, $constructor ) = @_;
     my $obj;
+
+    # Clear previous global handler data
     @Lemonldap::NG::Handler::Main::_onReload = ();
+    $Lemonldap::NG::Handler::Main::_tshv     = {
+        tsv             => {},
+        cfgNum          => 0,
+        cfgDate         => 0,
+        lastCheck       => 0,
+        checkTime       => 600,
+        confAcc         => {},
+        logger          => {},
+        userLogger      => {},
+        lmConf          => {},
+        localConfig     => {},
+        _auditLogger    => {},
+    };
     &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
+
+    # Set currenthandler stack to the type being initialized
+    @currenthandler = $type;
+
     ok( $obj = $constructor->(), 'Register $type' );
+
+    # If the constructed object has an app (most cases)
+    # we wrap the app in a function that loads the correct handler context
+    # before processing the request, and unloads if afterwards
+    use Scalar::Util 'blessed';
+    if ( $obj and blessed($obj) and $obj->can('app') ) {
+        my $inner_app = $obj->app;
+
+        my $wrapper = sub {
+            pushHandler($type);
+            my $res = $inner_app->(@_);
+            popHandler();
+            return $res;
+        };
+        $obj->app($wrapper);
+    }
     count(1);
-    $handlerOR{$type} = \@Lemonldap::NG::Handler::Main::_onReload;
+
+    # Save the initialized handler data for future requests
+    $handlerOR{$type}   = [@Lemonldap::NG::Handler::Main::_onReload];
+    $handlerTSHV{$type} = $Lemonldap::NG::Handler::Main::_tshv;
+    pop @currenthandler;
     return $obj;
 }
 
-=head4 register
+=head4 withHandler
 
-Switch to a registered instance
+This method lets you run handler methods (such as conf reload)
+inside a give context
 
 =cut
 
-sub switch {
+sub withHandler {
+    my ( $type, $sub ) = @_;
+    pushHandler($type);
+    $sub->();
+    popHandler();
+}
+
+sub pushHandler {
     my $type = shift;
-    return [] unless $handlerOR{$type};
-    note( '==> Switching to ' . uc($type) . ' <==' );
+
+    # Save the current state of the previous handler, this is needed
+    # for tests in which portal initialization requires a HTTP request to
+    # another portal
+    if (@currenthandler) {
+        my $type = $currenthandler[-1];
+        note( '==> Saving handler  ' . uc($type) . ' <==' );
+        $handlerOR{$type}   = [@Lemonldap::NG::Handler::Main::_onReload];
+        $handlerTSHV{$type} = $Lemonldap::NG::Handler::Main::_tshv;
+    }
+    note( '==> Pushing ' . uc($type) . ' <==' );
+    push @currenthandler, $type;
     @Lemonldap::NG::Handler::Main::_onReload = @{
         $handlerOR{$type};
     };
+
+    $Lemonldap::NG::Handler::Main::_tshv = $handlerTSHV{$type};
+}
+
+sub popHandler {
+    my $type = pop @currenthandler;
+    note( '==> Popping ' . uc($type) . ' <==' );
+
+    # Restore previous handler context
+    if (@currenthandler) {
+        my $type = $currenthandler[-1];
+        return [] unless $handlerOR{$type};
+        note( '==> Restoring ' . uc($type) . ' <==' );
+        @Lemonldap::NG::Handler::Main::_onReload = @{
+            $handlerOR{$type};
+        };
+
+        $Lemonldap::NG::Handler::Main::_tshv = $handlerTSHV{$type};
+    }
+}
+
+# Not needed anymore, all the work is done by "register"
+sub switch {
+    note shortmess( 'Manual switching is deprecated,'
+          . ' you can remove it from your tests' );
 }
 
 =head4 encodeUrl( $url );
@@ -869,9 +960,11 @@ has ini => (
         }
         if ( $ENV{DEBUG} ) {
             $ini->{logLevel} = 'debug';
+            $ini->{logger}   = "t::TestStdLogger";
         }
         if ( $ENV{LLNGLOGLEVEL} ) {
             $ini->{logLevel} = $ENV{LLNGLOGLEVEL};
+            $ini->{logger}   = "t::TestStdLogger";
         }
         $self->{ini} = $ini;
         main::ok( $self->{p} = $self->class->new(), 'Portal object' );
@@ -1177,6 +1270,19 @@ sub _put {
     my ( $self, $path, $body, %args ) = @_;
     $args{method} = 'PUT';
     return $self->_post( $path, $body, %args );
+}
+
+sub getHistory {
+    my ( $self, $uid, $only_type ) = @_;
+    my $psession = $self->p->getPersistentSession($uid);
+    my @entries;
+    my $history = $psession->data->{_loginHistory} || {};
+    for my $type ( keys %$history ) {
+        if ( !$only_type or $type eq "${only_type}Login" ) {
+            push @entries, @{ $history->{$type} || [] };
+        }
+    }
+    return @entries;
 }
 
 1;

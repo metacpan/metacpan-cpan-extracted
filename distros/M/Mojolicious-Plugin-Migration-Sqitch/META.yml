@@ -1,0 +1,51 @@
+---
+abstract: 'Run Sqitch database migrations from a Mojo app'
+author:
+  - 'Mark Tyrrell <mark@tyrrminal.dev>'
+build_requires:
+  DBD::SQLite: '1.74'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test2::Suite: '0.000155'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Migration-Sqitch
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Mojolicious::Plugin::Migration::Sqitch:
+    file: lib/Mojolicious/Plugin/Migration/Sqitch.pm
+    version: '0.01'
+  Mojolicious::Plugin::Migration::Sqitch::Command::schema_initdb:
+    file: lib/Mojolicious/Plugin/Migration/Sqitch/Command/schema_initdb.pm
+    version: '0.01'
+  Mojolicious::Plugin::Migration::Sqitch::Command::schema_migrate:
+    file: lib/Mojolicious/Plugin/Migration/Sqitch/Command/schema_migrate.pm
+    version: '0.01'
+requires:
+  App::Sqitch: v1.4.1
+  DBI: '1.643'
+  Mojolicious: '9.00'
+  Readonly: '2.05'
+  Syntax::Keyword::Try: '0.29'
+  perl: '5.026000'
+resources:
+  bugtracker: https://github.com/tyrrminal/mojolicious-plugin-migration-sqitch/issues
+  repository: https://github.com/tyrrminal/mojolicious-plugin-migration-sqitch.git
+version: '0.01'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: MIT

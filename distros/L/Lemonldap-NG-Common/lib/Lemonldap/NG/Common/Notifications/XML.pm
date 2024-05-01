@@ -61,7 +61,7 @@ sub newNotification {
                 push @data, $tmp;
             }
             else {
-                $self->userLogger->info(
+                $self->logger->info(
                     "Set defaultCondition ($defaultCond) for notification "
                       . $notif->{reference} );
                 push @data, $defaultCond;

@@ -3,7 +3,7 @@ package Lemonldap::NG::Common::Apache::Session::Serialize::JSON;
 use strict;
 use JSON qw(to_json from_json);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.19.0';
 
 sub serialize {
     my $session = shift;
@@ -38,9 +38,16 @@ sub _unserialize {
     my $tmp;
     eval { $tmp = from_json( $serialized, { allow_nonref => 1 } ) };
     if ($@) {
-        require Storable;
-        $next ||= \&Storable::thaw;
-        return &$next($serialized);
+        eval {
+            require Storable;
+            $next ||= \&Storable::thaw;
+            return &$next($serialized);
+        };
+        if ($@) {
+
+            # Error is catched in unserialize
+            return undef;
+        }
     }
     return $tmp;
 }

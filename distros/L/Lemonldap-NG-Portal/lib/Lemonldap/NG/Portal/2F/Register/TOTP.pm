@@ -5,7 +5,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 extends qw(
   Lemonldap::NG::Portal::2F::Register::Base
@@ -72,7 +72,7 @@ sub run {
           $self->checkNameSfa( $req, $self->type, $req->param('TOTPName') );
         return $self->p->sendError( $req, 'badName', 200 ) unless $TOTPName;
 
-        my $r = $self->verifyCode(
+        my ($r, $range) = $self->verifyCode(
             $self->conf->{totp2fInterval},
             $self->conf->{totp2fRange},
             $self->conf->{totp2fDigits},
@@ -88,6 +88,7 @@ sub run {
             return $self->p->sendError( $req, 'badCode', 200 );
         }
 
+        $self->userLogger->info("Codes match at range $range");
         $self->logger->debug( $self->prefix . '2f: code verified' );
 
         # Test if a TOTP is already registered
@@ -161,7 +162,7 @@ sub run {
             }
         );
         unless ( $issuer = $self->conf->{totp2fIssuer} ) {
-            $issuer = $self->conf->{portal};
+            $issuer = $req->portal;
             $issuer =~ s#^https?://([^/:]+).*$#$1#;
         }
 

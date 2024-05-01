@@ -11,11 +11,11 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 );
 
 extends qw(
-  Lemonldap::NG::Common::Module
+  Lemonldap::NG::Portal::Main::UserDB
   Lemonldap::NG::Portal::Lib::REST
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.19.0';
 
 # INITIALIZATION
 
@@ -117,7 +117,8 @@ sub findUser {
         $self->logger->debug("REST UserDB random rank: $rank");
         $self->userLogger->info(
             "FindUser: REST UserDB returns $results->[$rank]");
-        $req->data->{findUser} = $results->[$rank];
+        $req->data->{findUser}    = $results->[$rank];
+        $req->data->{findUserAll} = $results;
         return PE_OK;
     }
 
@@ -129,10 +130,6 @@ sub setSessionInfo {
     $req->sessionInfo->{$_} = $req->data->{restUserDBInfo}->{$_}
       foreach ( keys %{ $req->data->{restUserDBInfo} } );
 
-    return PE_OK;
-}
-
-sub setGroups {
     return PE_OK;
 }
 

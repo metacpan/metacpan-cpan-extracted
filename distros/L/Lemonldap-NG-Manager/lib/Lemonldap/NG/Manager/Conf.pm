@@ -24,7 +24,7 @@ extends qw(
   Lemonldap::NG::Common::Conf::RESTServer
 );
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -451,8 +451,16 @@ sub newConf {
         $s = $self->confAcc->saveConf( $parser->newConf, %args )
           unless ( @{ $parser->{needConfirmation} } && !$args{force} );
         if ( $s > 0 ) {
-            $self->userLogger->notice(
-                'User ' . $self->p->userId($req) . " has stored conf $s" );
+            $self->auditLog(
+                $req,
+                message => (
+                    'User ' . $self->p->userId($req) . " has stored conf $s"
+                ),
+                code   => "CONF_STORED",
+                user   => $self->p->userId($req),
+                cfgNum => $s,
+            );
+
             $res->{result} = 1;
             $res->{cfgNum} = $s;
             if ( my $status = $self->applyConf( $parser->newConf ) ) {
@@ -462,9 +470,16 @@ sub newConf {
             }
         }
         else {
-            $self->userLogger->notice(
-                'Saving attempt rejected, asking for confirmation to '
-                  . $self->p->userId($req) );
+            $self->auditLog(
+                $req,
+                message => (
+                    'Saving attempt rejected, asking for confirmation to '
+                      . $self->p->userId($req)
+                ),
+                code => "CONF_REJECTED",
+                user => $self->p->userId($req),
+            );
+
             $res->{result} = 0;
             if ( $s == CONFIG_WAS_CHANGED ) {
                 $res->{needConfirm} = 1;
@@ -502,15 +517,28 @@ sub newRawConf {
     # chances to be equal to last config cfgNum
     my $s = $self->confAcc->saveConf( $new, force => 1 );
     if ( $s > 0 ) {
-        $self->userLogger->notice(
-            'User ' . $self->p->userId($req) . " has stored (raw) conf $s" );
+        $self->auditLog(
+            $req,
+            message => (
+                'User ' . $self->p->userId($req) . " has stored (raw) conf $s"
+            ),
+            code   => "CONF_STORED_RAW",
+            user   => $self->p->userId($req),
+            cfgNum => $s,
+        );
         $res->{result} = 1;
         $res->{cfgNum} = $s;
     }
     else {
-        $self->userLogger->notice(
-            'Raw saving attempt rejected, asking for confirmation to '
-              . $self->p->userId($req) );
+        $self->auditLog(
+            $req,
+            message => (
+                'Raw saving attempt rejected, asking for confirmation to '
+                  . $self->p->userId($req)
+            ),
+            code => "CONF_REJECTED_RAW",
+            user => $self->p->userId($req),
+        );
         $res->{result}      = 0;
         $res->{needConfirm} = 1 if ( $s == CONFIG_WAS_CHANGED );
         $res->{message} .= '__needConfirmation__';

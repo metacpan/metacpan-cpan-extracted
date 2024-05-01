@@ -94,7 +94,6 @@ SKIP: {
     $proxy = register( 'proxy', sub { proxy( $jwks, $metadata ) } );
 
     # SAML
-    switch ('sp');
     ok(
         $res = $sp->_get(
             '/', accept => 'text/html',
@@ -105,7 +104,6 @@ SKIP: {
         qr#^http://auth.proxy.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
     # Push SAML request to IdP
-    switch ('proxy');
     ok(
         $res = $proxy->_get(
             $url,
@@ -120,7 +118,6 @@ SKIP: {
     my $proxyPdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
 
     # Push request to OP
-    switch ('op');
     ok( $res = $op->_get( $url, query => $query, accept => 'text/html' ),
         "Push request to OP,         endpoint $url" );
     count(1);
@@ -159,7 +156,6 @@ SKIP: {
     ($query) = expectRedirection( $res, qr#^http://auth.proxy.com/?\?(.*)$# );
 
     # Push OP response to Proxy
-    switch ('proxy');
 
     ok(
         $res = $proxy->_get(
@@ -191,7 +187,6 @@ SKIP: {
         'SAMLResponse' );
 
     # Push SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($query),
@@ -217,7 +212,6 @@ SKIP: {
         qr#^http://auth.proxy.com(/saml/singleLogout)\?(SAMLRequest=.+)# );
 
     # Push SAML logout request to proxy
-    switch ('proxy');
     ok(
         $res = $proxy->_get(
             $url,
@@ -235,7 +229,6 @@ qr#^http://auth.sp.com(/saml/proxySingleLogoutReturn)\?(SAMLResponse=.+)#
     is( $removedCookie, 0, "SSO cookie removed" );
 
     # Forward logout to SP
-    switch ('sp');
     ok(
         $res = $sp->_get(
             $url,

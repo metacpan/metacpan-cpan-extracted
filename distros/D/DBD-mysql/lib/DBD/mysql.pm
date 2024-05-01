@@ -13,7 +13,7 @@ our @ISA = qw(DynaLoader);
 # SQL_DRIVER_VER is formatted as dd.dd.dddd
 # for version 5.x please switch to 5.00(_00) version numbering
 # keep $VERSION in Bundle/DBD/mysql.pm in sync
-our $VERSION = '5.004';
+our $VERSION = '5.005';
 
 bootstrap DBD::mysql $VERSION;
 
@@ -179,24 +179,6 @@ sub data_sources {
     @dsn;
 }
 
-sub admin {
-    my($drh) = shift;
-    my($command) = shift;
-    my($dbname) = ($command eq 'createdb'  ||  $command eq 'dropdb') ?
-	shift : '';
-    my($host, $port) = DBD::mysql->_OdbcParseHost(shift(@_) || '');
-    my($user) = shift || '';
-    my($password) = shift || '';
-
-    warn 'admin() is deprecated and will be removed in an upcoming version';
-
-    $drh->func(undef, $command,
-	       $dbname || '',
-	       $host || '',
-	       $port || '',
-	       $user, $password, '_admin_internal');
-}
-
 package DBD::mysql::db; # ====== DATABASE ======
 use strict;
 use DBI qw(:sql_types);
@@ -257,19 +239,6 @@ sub ANSI2db {
     my $self = shift;
     my $type = shift;
     return $DBD::mysql::db::ANSI2db{"$type"};
-}
-
-sub admin {
-    my($dbh) = shift;
-    my($command) = shift;
-    my($dbname) = ($command eq 'createdb'  ||  $command eq 'dropdb') ?
-	shift : '';
-    $dbh->{'Driver'}->func($dbh, $command, $dbname, '', '', '',
-			   '_admin_internal');
-}
-
-sub _SelectDB ($$) {
-    die "_SelectDB is removed from this module; use DBI->connect instead.";
 }
 
 sub table_info ($) {
@@ -1378,29 +1347,6 @@ This returns:
 
 =back
 
-=back
-
-
-=head2 Private MetaData Methods
-
-=over
-
-=item B<ListDBs>
-
-    my $drh = DBI->install_driver("mysql");
-    @dbs = $drh->func("$hostname:$port", '_ListDBs');
-    @dbs = $drh->func($hostname, $port, '_ListDBs');
-    @dbs = $dbh->func('_ListDBs');
-
-Returns a list of all databases managed by the MySQL server
-running on C<$hostname>, port C<$port>. This is a legacy
-method.  Instead, you should use the portable method
-
-    @dbs = DBI->data_sources("mysql");
-
-=back
-
-
 =head1 DATABASE HANDLES
 
 The DBD::mysql driver supports the following attributes of database
@@ -1430,19 +1376,19 @@ against:
 
   print "$dbh->{mysql_clientinfo}\n";
 
-  5.2.0-MariaDB
+  8.3.0
 
 =item mysql_clientversion
 
   print "$dbh->{mysql_clientversion}\n";
 
-  50200
+  80300
 
 =item mysql_serverversion
 
   print "$dbh->{mysql_serverversion}\n";
 
-  50200
+  80300
 
 =item mysql_dbd_stats
 
@@ -1591,7 +1537,7 @@ character column, if this column is indexed, if you query that
 column with the integer value not being quoted, it will not
 use the index:
 
-    MariaDB [test]> explain select * from test where value0 = '3' \G
+    mysql> explain select * from test where value0 = '3' \G
     *************************** 1. row ***************************
                id: 1
       select_type: SIMPLE
@@ -1605,7 +1551,7 @@ use the index:
             Extra: Using index condition
     1 row in set (0.00 sec)
 
-    MariaDB [test]> explain select * from test where value0 = 3
+    mysql> explain select * from test where value0 = 3
         -> \G
     *************************** 1. row ***************************
                id: 1

@@ -1,8 +1,6 @@
 Changes
 eg/handler.psgi
 eg/llng-server.psgi
-eg/scripts/purgeLocalCache
-eg/scripts/purgeLocalCache.cron.d
 lib/Lemonldap/NG/Handler.pm
 lib/Lemonldap/NG/Handler/ApacheMP2.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/AuthBasic.pm
@@ -66,6 +64,11 @@ MANIFEST.SKIP
 META.json
 META.yml
 README
+scripts/lemonldap-ng-handler.preset
+scripts/lemonldap-ng-handler.service
+scripts/lemonldap-ng-handler.timer
+scripts/purgeLocalCache
+scripts/purgeLocalCache.cron.d
 t/01-Lemonldap-NG-Handler-Main.t
 t/05-Lemonldap-NG-Handler-Reload.t
 t/12-Lemonldap-NG-Handler-Jail.t

@@ -94,13 +94,51 @@ foreach my $user (qw(dwho rtyler)) {
     expectAuthenticatedAs( $res, $user );
 }
 
+foreach my $user (qw(dwho rtyler)) {
+    ok(
+        $res = handler(
+            req => [
+                GET => 'http://test2.example.com/',
+                [
+                    'Authorization' => 'Basic '
+                      . encode_base64( "$user:badpw", '' )
+                ]
+            ],
+            sub => sub {
+                my ($res) = @_;
+                $subtest++;
+                subtest 'REST request to Portal' => sub {
+                    plan tests => 3;
+                    ok( $res->[0] eq 'POST', 'Get POST request' );
+                    my ( $url, $query ) = split /\?/, $res->[1];
+                    ok(
+                        $res = $p->_post(
+                            $url, IO::String->new( $res->[3] ),
+                            length => length( $res->[3] ),
+                            query  => $query,
+                        ),
+                        'Push request to portal'
+                    );
+                    ok( $res->[0] == 401, 'Response is 401' );
+                    return $res;
+                };
+                count(1);
+                return $res;
+            },
+        ),
+        'New AuthBasic request'
+    );
+    count(1);
+    is( $res->[0], 401, "Request was rejected" );
+    count(1);
+}
+
 end_handler();
 clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel          => $debug,
                 domain            => 'idp.com',

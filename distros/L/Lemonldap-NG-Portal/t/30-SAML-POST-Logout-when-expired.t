@@ -50,7 +50,6 @@ SKIP: {
         'SAMLRequest' );
 
     # Push SAML request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_post(
             $url,
@@ -126,7 +125,6 @@ SKIP: {
         'SAMLResponse' );
 
     # Post SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($s),
@@ -162,7 +160,6 @@ SKIP: {
     Time::Fake->offset( "+" . ( $timeout * 1.5 ) . "s" );
 
     # Push SAML logout request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_post(
             $url,
@@ -178,7 +175,6 @@ SKIP: {
         'SAMLResponse' );
 
     # Post SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($s),

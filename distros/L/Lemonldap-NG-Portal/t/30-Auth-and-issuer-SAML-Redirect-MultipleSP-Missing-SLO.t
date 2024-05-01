@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 19;
+my $maintests = 17;
 my $debug     = 'error';
 my ( $issuer, $sp, $sp2, $res );
 
@@ -51,7 +51,6 @@ SKIP: {
         qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
     # Push SAML request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             $url,
@@ -90,7 +89,6 @@ SKIP: {
         'SAMLResponse', 'RelayState' );
 
     # Post SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($query),
@@ -107,16 +105,11 @@ SKIP: {
     expectAuthenticatedAs( $res, 'fa@badwolf.org@idp' );
 
     # Verify UTF-8
-    ok( $res = $sp->_get("/sessions/global/$spId"), 'Get UTF-8' );
-    expectOK($res);
-    ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-      or print STDERR $@;
-    ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
+    ok( getSession($spId)->data->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
       or explain( $res, 'cn => Frédéric Accents' );
 
     # Simple SP2 access
 
-    switch ('sp2');
     ok(
         $res = $sp2->_get(
             '/',
@@ -130,7 +123,6 @@ SKIP: {
         qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
     # Push SAML request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             $url,
@@ -145,7 +137,6 @@ SKIP: {
         'SAMLResponse', 'RelayState' );
 
     # Post SAML response to SP2
-    switch ('sp2');
     ok(
         $res = $sp2->_post(
             $url, IO::String->new($query),
@@ -176,7 +167,6 @@ SKIP: {
         qr#^http://auth.idp.com(/saml/singleLogout)\?(SAMLRequest=.+)# );
 
     # Push SAML logout request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             $url,
@@ -205,7 +195,6 @@ SKIP: {
     );
     expectReject($res);
 
-    switch ('sp');
     ok(
         $res = $sp->_get(
             '/',
@@ -218,7 +207,6 @@ SKIP: {
     expectRedirection( $res,
         qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
-    switch ('sp2');
     ok(
         $res = $sp2->_get(
             '/',
@@ -236,8 +224,7 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
@@ -436,8 +423,7 @@ EOF
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',
@@ -491,8 +477,7 @@ sub sp {
 }
 
 sub sp2 {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp2.com',

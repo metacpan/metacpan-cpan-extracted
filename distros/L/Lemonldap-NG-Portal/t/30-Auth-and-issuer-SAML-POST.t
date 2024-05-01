@@ -38,7 +38,6 @@ SKIP: {
 
         # SP-initiated flow
         my $res;
-        switch ('sp');
         ok(
             $res = $sp->_get(
                 '/', accept => 'text/html',
@@ -54,7 +53,6 @@ SKIP: {
             1, 'samlGenerateRequestHook called' );
 
         # Push SAML request to IdP
-        switch ('issuer');
         ok(
             $res = $issuer->_post(
                 $url,
@@ -149,7 +147,6 @@ SKIP: {
             1, 'samlGotRequestHookCalled called' );
 
         # Post SAML response to SP
-        switch ('sp');
         ok(
             $res = $sp->_post(
                 $url, IO::String->new($s),
@@ -171,10 +168,7 @@ SKIP: {
         expectAuthenticatedAs( $res, 'fa@badwolf.org@idp' );
 
         # Verify UTF-8
-        ok( $res = $sp->_get("/sessions/global/$spId"), 'Get UTF-8' );
-        expectOK($res);
-        ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-          or print STDERR $@;
+        $res = getSession($spId)->data;
         is( $res->{gotResponseHookCalled}, 1, 'samlGotResponseHook called' );
         ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
           or explain( $res, 'cn => Frédéric Accents' );
@@ -194,7 +188,6 @@ SKIP: {
             'SAMLRequest' );
 
         # Push SAML logout request to IdP
-        switch ('issuer');
         ok(
             $res = $issuer->_post(
                 $url,
@@ -213,7 +206,6 @@ SKIP: {
         is( $removedCookie, 0, "IDP Cookie removed" );
 
         # Post SAML response to SP
-        switch ('sp');
         ok(
             $res = $sp->_post(
                 $url, IO::String->new($s),
@@ -225,7 +217,6 @@ SKIP: {
         expectRedirection( $res, 'http://auth.sp.com' );
 
         # Test if logout is done
-        switch ('issuer');
         ok(
             $res = $issuer->_get(
                 '/', cookie => "lemonldap=$idpId",
@@ -234,7 +225,6 @@ SKIP: {
         );
         expectReject($res);
 
-        switch ('sp');
         ok(
             $res = $sp->_get(
                 '/',
@@ -312,7 +302,6 @@ SKIP: {
             1, 'samlGotRequestHookCalled called' );
 
         # Post SAML response to SP
-        switch ('sp');
         ok(
             $res = $sp->_post(
                 $url, IO::String->new($s),
@@ -334,10 +323,7 @@ SKIP: {
         expectAuthenticatedAs( $res, 'fa@badwolf.org@idp' );
 
         # Verify UTF-8
-        ok( $res = $sp->_get("/sessions/global/$spId"), 'Get UTF-8' );
-        expectOK($res);
-        ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-          or print STDERR $@;
+        $res = getSession($spId)->data;
         is( $res->{gotResponseHookCalled}, 1, 'samlGotResponseHook called' );
         ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
           or explain( $res, 'cn => Frédéric Accents' );
@@ -346,8 +332,7 @@ SKIP: {
         ok(
             $res = $sp->_get(
                 '/',
-                query => buildForm(
-                    {
+                query => buildForm( {
                         logout => 1,
                         url    => encodeUrl("http://test1.example.com")
                     }
@@ -362,7 +347,6 @@ SKIP: {
             'SAMLRequest' );
 
         # Push SAML logout request to IdP
-        switch ('issuer');
         ok(
             $res = $issuer->_post(
                 $url,
@@ -381,7 +365,6 @@ SKIP: {
         is( $removedCookie, 0, "IDP Cookie removed" );
 
         # Post SAML response to SP
-        switch ('sp');
         ok(
             $res = $sp->_post(
                 $url, IO::String->new($s),
@@ -393,7 +376,6 @@ SKIP: {
         expectRedirection( $res, 'http://test1.example.com' );
 
         # Test if logout is done
-        switch ('issuer');
         ok(
             $res = $issuer->_get(
                 '/', cookie => "lemonldap=$idpId",
@@ -402,7 +384,6 @@ SKIP: {
         );
         expectReject($res);
 
-        switch ('sp');
         ok(
             $res = $sp->_get(
                 '/',
@@ -421,8 +402,7 @@ clean_sessions();
 done_testing();
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
@@ -470,8 +450,7 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',

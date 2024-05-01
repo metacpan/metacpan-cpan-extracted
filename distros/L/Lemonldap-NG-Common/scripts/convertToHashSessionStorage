@@ -1,0 +1,130 @@
+#!/usr/bin/perl
+
+use strict;
+use Getopt::Long;
+use JSON;
+use Lemonldap::NG::Common::Session qw(id2storage hashedKinds);
+use Lemonldap::NG::Common::Conf;
+use Lemonldap::NG::Common;
+use Pod::Usage;
+
+my %opts;
+my $result = GetOptions( \%opts, 'help|h', 'version|v' );
+
+if ( $opts{version} ) {
+    print "$Lemonldap::NG::Common::VERSION\n";
+    exit;
+}
+pod2usage(0) if $opts{help};
+
+my @storages = map { s/SSO/global/; lc($_) } hashedKinds;
+
+my $confAcc = Lemonldap::NG::Common::Conf->new( {} ) or die $Lemonldap::NG::Common::Conf::msg;
+
+my $cfgNum = $confAcc->lastCfg
+  or die 'No configuration found:' . $Lemonldap::NG::Common::Conf::msg;
+
+my $conf = $confAcc->getConf({cfgNum => $cfgNum});
+
+my %done;
+foreach my $kind (hashedKinds) {
+    my $type = shift @storages;
+    my $moduleOptions = $conf->{"${type}StorageOptions"} // $conf->{globalStorageOptions};
+    $moduleOptions->{backend} = $conf->{"${type}Storage"} // $conf->{globalStorage};
+    my $sessions = Lemonldap::NG::Common::Apache::Session->searchOn($moduleOptions, '_session_kind', $kind);
+    my $found = 0;
+    foreach my $oldId ( keys %$sessions ) {
+        my $oldSession = Lemonldap::NG::Common::Session->new({
+            hashStore => 0,
+            id => $oldId,
+            storageModule => $moduleOptions->{backend},
+            storageModuleOptions => $moduleOptions,
+            kind => $kind,
+        });
+        next unless $oldSession;
+        next if $oldSession->data->{_session_hashed};
+        my $info = $oldSession->data;
+        $info->{_session_hashed} = JSON::true;
+        delete $info->{_session_id};
+        my $newSession = Lemonldap::NG::Common::Session->new({
+            hashStore => 1,
+            id => $oldId,
+            storageModule => $moduleOptions->{backend},
+            storageModuleOptions => $moduleOptions,
+            kind => $kind,
+            info => $info,
+            force => 1,
+        });
+        $found++;
+
+        $oldSession->remove;
+    }
+    print "$found $kind session(s) converted\n";
+}
+
+__END__
+
+=head1 NAME
+
+=encoding utf8
+
+convertToHashSessionStorage - A tool to migrate sessions to hashed storage.
+
+=head1 SYNOPSIS
+
+    /usr/share/lemonldap-ng/scripts/convertToHashSessionStorage
+
+=head1 DESCRIPTION
+
+
+B<This tool should be used only when an existing Lemonldap::NG installation
+migrates from standard session storage to hashed session storage>.
+
+B<Do not use it a second time>.
+
+convertToHashSessionStorage converts all unhashed sessions into hashed session.
+
+=head1 SEE ALSO
+
+L<http://lemonldap-ng.org/>
+
+=head1 AUTHORS
+
+=over
+
+=item Xavier Guimard, E<lt>yadd@debian.orgE<gt>
+
+=back
+
+=head1 BUG REPORT
+
+Use OW2 system to report bug or ask for features:
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
+
+=head1 DOWNLOAD
+
+Lemonldap::NG is available at
+L<https://lemonldap-ng.org/download>
+
+=head1 COPYRIGHT AND LICENSE
+
+=over
+
+=item Copyright (C) 2024 by Xavier Guimard, E<lt>yadd@debian.orgE<gt>
+
+=back
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut

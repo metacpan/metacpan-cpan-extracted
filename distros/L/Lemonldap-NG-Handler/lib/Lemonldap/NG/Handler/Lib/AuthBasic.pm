@@ -11,7 +11,7 @@ use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Common::Session;
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 our @ISA     = ('Exporter');
 our @EXPORT  = qw(fetchId retrieveSession createSession hideCookie goToPortal);
 our @EXPORT_OK = @EXPORT;
@@ -95,7 +95,7 @@ sub createSession {
     $class->logger->debug("AuthBasic authentication for user: $user");
 
     #my $soapRequest = $soapClient->getCookies( $user, $pwd, $id );
-    my $url = $class->tsv->{portal}->() . "/sessions/global/$id?auth";
+    my $url = $class->tsv->{portal}->($req) . "/sessions/global/$id?auth";
     $url =~ s#//sessions/#/sessions/#g;
     my $get = HTTP::Request->new( POST => $url );
     $get->header( 'X-Forwarded-For' => $xheader );
@@ -117,33 +117,25 @@ sub createSession {
     my $resp = $class->ua->request($get);
 
     if ( $resp->is_success ) {
-        $class->userLogger->notice("Good REST authentication for $user");
+        $class->auditLog(
+            $req,
+            message => "Good REST authentication for $user",
+            code    => "REST_AUTHENTICATION_SUCCESS",
+            user    => $user,
+        );
         return 1;
     }
     else {
-        $class->userLogger->warn(
-            "Authentication failed for $user: " . $resp->status_line );
+        $class->auditLog(
+            $req,
+            message =>
+              ( "Authentication failed for $user: " . $resp->status_line ),
+            code   => "REST_AUTHENTICATION_FAILURE",
+            user   => $user,
+            status => $resp->status_line,
+        );
         return 0;
     }
-
-    ## Catch SOAP errors
-    #if ( $soapRequest->fault ) {
-    #    $class->abort( "SOAP request to the portal failed: "
-    #          . $soapRequest->fault->{faultstring} );
-    #}
-    #else {
-    #    my $res = $soapRequest->result();
-
-    #    # If authentication failed, display error
-    #    if ( $res->{errorCode} ) {
-    #        $class->userLogger->notice( "Authentication failed for $user: "
-    #              . $soapClient->error( $res->{errorCode}, 'en' )->result() );
-    #        return 0;
-    #    }
-    #    else {
-    #        return 1;
-    #    }
-    #}
 }
 
 ## @rmethod protected void hideCookie()

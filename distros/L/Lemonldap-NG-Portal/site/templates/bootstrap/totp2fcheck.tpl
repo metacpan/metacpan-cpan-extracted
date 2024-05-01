@@ -2,7 +2,11 @@
 
 <main id="logincontent" class="container">
 
+<TMPL_IF NAME="AUTH_ERROR">
+  <div class="message message-<TMPL_VAR NAME="AUTH_ERROR_TYPE"> alert" role="<TMPL_VAR NAME="AUTH_ERROR_ROLE">"><span trmsg="<TMPL_VAR NAME="AUTH_ERROR">"></span></div>
+<TMPL_ELSE>
 <div class="message message-positive alert"><span trspan="enterTotpCode"></span></div>
+</TMPL_IF>
 
 <div class="card">
 

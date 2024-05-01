@@ -11,6 +11,10 @@
 #   * PUT /sessions/<type>/<session-id>          : update some keys
 #   * DELETE /sessions/<type>/<session-id>       : delete a session
 #
+# When the storage is hashed, and if those APIs are called with real IDs, not
+# the storage IDs, it is required to add a "hash=1" parameter in the URL.
+#
+#
 # - Sessions for connected users (if restSessionServer is on):
 #   * GET /session/my/<type>                     : get session data
 #   * GET /session/my/<type>/key                 : get session key
@@ -61,6 +65,7 @@ use Mouse;
 use JSON qw(from_json to_json);
 use MIME::Base64;
 use Lemonldap::NG::Common::Languages;
+use Lemonldap::NG::Common::Session qw(id2storage reHashedKinds);
 use Lemonldap::NG::Portal::Main::Constants qw(
   URIRE
   PE_OK
@@ -68,7 +73,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PASSWORD_OK
 );
 
-our $VERSION = '2.17.2';
+our $VERSION = '2.19.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -298,7 +303,17 @@ sub newSession {
         }
         return $self->p->sendJSONresponse( $req, $sessions );
     }
-    my $session = $self->getApacheSession( $mod, $id, $infos, $force );
+
+    # The "hashStore" here doesn't override configuration:
+    # Lemonldap::NG::Common::Session::REST module check the configuration
+    # parameter. So here it means "use hashed id if possible" and of course
+    # if session kind is OIDC or SSO
+    my $session = $self->getApacheSession(
+        $mod, $id,
+        info      => $infos,
+        force     => $force,
+        hashStore => ( $mod->{kind} =~ reHashedKinds ),
+    );
     return $self->p->sendError( $req, 'Unable to create session', 500 )
       unless ($session);
 
@@ -341,7 +356,8 @@ sub newAuthSession {
         $self->p->deleteSession($req);
         return $self->p->sendError( $req, 'Unauthorized', 401 );
     }
-    return $self->session( $req, $id );
+    return $self->session( $req,
+        $self->conf->{hashedSessionStore} ? id2storage($id) : $id );
 }
 
 sub updateSession {
@@ -360,8 +376,18 @@ sub updateSession {
     my $force  = $self->_checkSecret($secret);
 
     # Get session and store info
-    my $session = $self->getApacheSession( $mod, $id, $infos, $force )
-      or return $self->p->sendError( $req, 'Session Id does not exist', 400 );
+    # The hashed store is used if explicitly asked and if session type is
+    # SSO or OIDC
+    my $session = $self->getApacheSession(
+        $mod, $id,
+        info      => $infos,
+        force     => $force,
+        hashStore => (
+              ( $mod->{kind} =~ reHashedKinds )
+            ? ( $req->param('hash') ) // 0
+            : 0
+        ),
+    ) or return $self->p->sendError( $req, 'Session Id does not exist', 400 );
 
     return $self->p->sendJSONresponse( $req, { result => 1 } );
 }
@@ -373,8 +399,16 @@ sub delSession {
     return $self->p->sendError( $req, 'ID is required', 400 ) unless ($id);
 
     # Get session
-    my $session = $self->getApacheSession( $mod, $id )
-      or return $self->p->sendError( $req, 'Session Id does not exist', 400 );
+    # The hashed store is used if explicitly asked and if session type is
+    # SSO or OIDC
+    my $session = $self->getApacheSession(
+        $mod, $id,
+        hashStore => (
+              ( $mod->{kind} =~ reHashedKinds )
+            ? ( $req->param('hash') ) // 0
+            : 0
+        ),
+    ) or return $self->p->sendError( $req, 'Session Id does not exist', 400 );
 
     # Delete it
     $self->logger->debug("REST request to delete session $id");
@@ -442,6 +476,10 @@ sub mysession {
 
 sub getMyKey {
     my ( $self, $req, $key ) = @_;
+
+    # All /my/ API are called with user's session, so indicates here that
+    # it uses hashed store if available
+    $req->data->{hashStore} = 1;
     $key ||= '';
     if ($key) {
         $self->logger->debug(
@@ -454,15 +492,17 @@ sub getMyKey {
         $self->logger->debug("REST request to get exported attributes: $keys");
     }
 
-    return $self->session(
-        $req,
-        $req->userData->{_session_id},
-        $key || $self->exportedAttr
-    );
+    my $id = $req->userData->{_session_id};
+    $id = id2storage($id) if $req->userData->{_session_hashed};
+    return $self->session( $req, $id, $key || $self->exportedAttr );
 }
 
 sub updateMySession {
     my ( $self, $req ) = @_;
+
+    # All /my/ API are called with user's session, so indicates here that
+    # it uses hashed store if available
+    $req->data->{hashStore} = 1;
     my $res   = 0;
     my $mKeys = [];
 
@@ -508,6 +548,10 @@ sub updateMySession {
 
 sub delKeyInMySession {
     my ( $self, $req ) = @_;
+
+    # All /my/ API are called with user's session, so indicates here that
+    # it uses hashed store if available
+    $req->data->{hashStore} = 1;
     my $res   = 0;
     my $mKeys = [];
     my $dkey  = $req->param('key');
@@ -619,7 +663,9 @@ sub removeSession {
       or return $self->p->sendError( $req, undef, 400 );
 
     # Get session
-    my $session = $self->getApacheSession( $mod, $id )
+    my $session =
+      $self->getApacheSession( $mod, $id,
+        hashStore => ( $mod->{kind} =~ reHashedKinds ), )
       or return $self->p->sendError( $req, 'Session Id does not exist', 400 );
 
     # Delete it
@@ -785,7 +831,7 @@ sub getUser {
 
 sub myApplications {
     my ( $self, $req ) = @_;
-    my $basePath = $self->conf->{portal};
+    my $basePath = $req->portal;
     $basePath =~ s#/*$##;
     $basePath .= $self->p->{staticPrefix} . '/common/apps/';
     my @appslist = map {
@@ -819,7 +865,9 @@ sub languages {
                 {
                     code => $_,
                     name => langName->{$_},
-                    flag => $self->conf->{portal}.$self->p->{staticPrefix} . "/languages/$_.png"
+                    flag => $req->portal
+                      . $self->p->{staticPrefix}
+                      . "/languages/$_.png"
                 }
             } split /[,;]\s*/,
             $self->p->{languages}

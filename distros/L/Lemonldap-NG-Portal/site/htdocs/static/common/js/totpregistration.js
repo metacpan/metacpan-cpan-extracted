@@ -64,6 +64,7 @@ LemonLDAP::NG TOTP registration script
           size: 150
         });
         secret = data.secret || "";
+        $('.otpauth-url').attr("href", s);
         $('#secret').text(secret.toUpperCase().replace(/(.{4})/g, '$1 ').trim());
         if (data.newkey) {
           setMsg('yourNewTotpKey', 'warning');

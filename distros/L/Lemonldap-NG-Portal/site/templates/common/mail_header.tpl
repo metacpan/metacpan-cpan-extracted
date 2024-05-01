@@ -10,4 +10,3 @@
 	</head>
 	<body>
         <div class="content">
-        <!-- <div style="text-align:center;"><img src="cid:logo:../../htdocs/static/<TMPL_VAR NAME="MAIN_LOGO">" style="max-width:150px;" alt="logo"/></div> -->

@@ -14,7 +14,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_IMPERSONATION_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.16.1';
+our $VERSION = '2.19.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -178,7 +178,7 @@ sub run {
     }
     else {
         $self->logger->debug("contextSwitching NOT required");
-        $req->urldc( $self->conf->{portal} );
+        $req->urldc( $req->portal );
         return $self->p->do( $req, [ sub { PE_OK } ] );
     }
 
@@ -290,7 +290,7 @@ sub _abortImpersonation {
     # Restore real session
     $req->{$type} = { %{ $session->data } };
     $req->{user} = $session->data->{_user};
-    $req->urldc( $self->conf->{portal} );
+    $req->urldc( $req->portal );
     $req->id($realSessionId);
     $self->p->buildCookie($req);
     delete $req->{$type}->{ $self->prefixedSId };

@@ -106,7 +106,6 @@ SKIP: {
         qr#http://auth.proxy.com(/saml/singleSignOn)\?(.*)$# );
 
     # Push request to PROXY
-    switch ('proxy');
     ok( $res = $proxy->_get( $url, query => $query, accept => 'text/html' ),
         "Push request to PROXY,         endpoint $url" );
 
@@ -117,7 +116,6 @@ SKIP: {
         qr#http://auth.idp.com(/saml/singleSignOn)\?(.*)$# );
 
     # Push request to IDP
-    switch ('idp');
 
     # Try to authenticate to IdP
     ok(
@@ -155,7 +153,6 @@ SKIP: {
     my ($resp) = $query =~ qr/SAMLResponse=([^&]*)/;
 
     # Post SAML response to PROXY
-    switch ('proxy');
     ok(
         $res = $proxy->_post(
             $url, IO::String->new($query),
@@ -188,7 +185,6 @@ SKIP: {
     ($resp) = $query =~ qr/SAMLResponse=([^&]*)/;
 
     # Post SAML response to PROXY
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($query),
@@ -222,7 +218,6 @@ SKIP: {
     ok( $res->[2]->[0] =~ /trmsg="47"/, 'Test disconnexion message on SP' );
 
     # test connexion on PROXY
-    switch ('proxy');
     ok(
         $res = $proxy->_get(
             '/',
@@ -238,7 +233,6 @@ SKIP: {
         qr#http://auth.idp.com(/saml/singleSignOn)\?(.*)$# );
 
     # test connexion on IDP
-    switch ('idp');
     ok(
         $res = $idp->_get(
             '/',

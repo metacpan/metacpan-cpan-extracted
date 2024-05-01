@@ -37,8 +37,7 @@ ENDKEY
 
     my $res;
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => 'error',
                 useSafeJail                => 1,
@@ -53,8 +52,7 @@ ENDKEY
     $portal->getPersistentSession(
         "dwho",
         {
-            _2fDevices => to_json [
-                {
+            _2fDevices => to_json [ {
                     "_credentialId"        => "bFpZbHRQOU10b1JOdVhLOGY4dFdm",
                     "_credentialPublicKey" =>
                       encode_base64url( $webauthn_tester->encode_cosekey ),
@@ -74,6 +72,7 @@ ENDKEY
             '/',
             IO::String->new('user=dwho&password=dwho'),
             length => 23,
+            accept => 'text/html',
         ),
         'Auth query'
     );
@@ -102,8 +101,9 @@ ENDKEY
     is( $request->{allowCredentials}->[0]->{type},
         "public-key", "Correct public key" );
 
-    my $credential = $webauthn_tester->get_assertion_response(
-        {
+    is( $request->{rpId}, "auth.example.com", "Correct RP ID" );
+
+    my $credential = $webauthn_tester->get_assertion_response( {
             request => $request,
         }
     );
@@ -112,8 +112,7 @@ ENDKEY
 
     #diag $credential;
 
-    my $urlencoded_credential = buildForm(
-        {
+    my $urlencoded_credential = buildForm( {
             credential => $credential
         }
     );

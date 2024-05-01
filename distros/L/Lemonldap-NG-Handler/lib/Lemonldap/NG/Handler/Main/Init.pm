@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Init;
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.19.0';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -80,6 +80,14 @@ sub logLevelInit {
         )
     );
     $class->logger->debug("User logger $logger loaded");
+
+    my $auditlogger =
+         $ENV{LLNG_AUDITLOGGER}
+      || $class->localConfig->{auditLogger}
+      || "Lemonldap::NG::Common::AuditLogger::UserLoggerCompat";
+    eval "require $auditlogger";
+    die $@ if ($@);
+    $class->_auditLogger( $auditlogger->new($class) );
 }
 
 # @method void serverSignatureInit

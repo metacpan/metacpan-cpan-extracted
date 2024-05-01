@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use v5.14;
 
-use App::perlvars ();
+use App::perlvars             ();
 use Getopt::Long::Descriptive qw( describe_options );
 
 my ( $opt, $usage ) = describe_options(
@@ -70,7 +70,7 @@ perlvars - A command line utility for detecting unused Perl variables
 
 =head1 VERSION
 
-version 0.000004
+version 0.000005
 
 =head1 SYNOPSIS
 

@@ -80,7 +80,6 @@ expectOK($res);
 my $metadata = $res->[2]->[0];
 count(3);
 
-switch ('rp');
 &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
 ok( $rp = rp( $jwks, $metadata ), 'RP portal' );
 count(1);
@@ -99,7 +98,7 @@ count(3);
 # Found OIDC idp logo and display name
 ok(
     $res->[2]->[0] =~
-qr%<img src="http://auth.rp.com/static/common/icons/sfa_manager.png" class="mr-2" alt="op2" title="My_tooltip" />%,
+qr%<img src="/static/common/icons/sfa_manager.png" class="mr-2" alt="op2" title="My_tooltip" />%,
     'Found OIDC idp logo and tooltip'
 ) or print STDERR Dumper( $res->[2]->[0] );
 ok( $res->[2]->[0] =~ qr%idpOPtest%, 'Found OIDC idp display name' )

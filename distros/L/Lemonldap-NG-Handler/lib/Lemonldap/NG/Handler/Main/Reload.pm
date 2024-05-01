@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Reload;
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -84,6 +84,9 @@ sub checkConf {
                     $class->logger->error( "Underlying object can't load conf ("
                           . ref($obj)
                           . "->$sub)" );
+                    if ( $obj->can('error') ) {
+                        $Lemonldap::NG::Common::Conf::msg = $obj->error;
+                    }
                     return 0;
                 }
             }
@@ -214,6 +217,7 @@ sub defaultValuesInit {
         useSafeJail  httpOnly   whatToTrace        handlerInternalCache
         handlerServiceTokenTTL  customToTrace      lwpOpts lwpSslOpts
         authChoiceAuthBasic     authChoiceParam    upgradeSession
+        hashedSessionStore
         )
       );
 
@@ -523,14 +527,16 @@ sub conditionSub {
             $url
             ? (
                 sub {
-                    $_[1]->{_logout} = $url;
+                    my ( $req, $session ) = @_;
+                    $session->{_logout} = $url;
                     return 0;
                 },
                 0
               )
             : (
                 sub {
-                    $_[1]->{_logout} = $class->tsv->{portal}->();
+                    my ( $req, $session ) = @_;
+                    $session->{_logout} = $class->tsv->{portal}->($req);
                     return 0;
                 },
                 0
@@ -633,6 +639,10 @@ sub substitute {
 
     # handle inSubnet
     $expr =~ s/\binSubnet\(([^)]*)\)/ipInSubnet(\$r->{env}->{REMOTE_ADDR},$1)/g;
+
+    # handle inSubnet
+    $expr =~
+      s/\binDomain\(([^)]*)\)/inDomain_internal(\$r->{env}->{HTTP_HOST},$1)/g;
 
     return $expr;
 }

@@ -7,9 +7,9 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.19.0';
 
-extends 'Lemonldap::NG::Common::Module';
+extends 'Lemonldap::NG::Portal::Main::UserDB';
 
 # INITIALIZATION
 
@@ -47,11 +47,6 @@ sub setSessionInfo {
         $req->{sessionInfo}->{$_} = $req->data->{casAttrs}->{$_};
     }
 
-    return PE_OK;
-}
-
-# Does nothing
-sub setGroups {
     return PE_OK;
 }
 

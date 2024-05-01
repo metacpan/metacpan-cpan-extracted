@@ -22,9 +22,11 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
   PE_TOKENEXPIRED
   PE_NO_SECOND_FACTORS
+  PE_RETRY_2FA
+  portalConsts
 );
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 with qw(
@@ -316,7 +318,13 @@ sub run {
                 $self->logger->debug(
 "Remove $device->{type} -> $device->{name} / $device->{epoch}"
                 );
-                $self->userLogger->info("Remove expired $device->{type}");
+                $self->auditLog(
+                    $req,
+                    message => ("Remove expired $device->{type}"),
+                    code    => "2FA_DEVICE_EXPIRED",
+                    device  => display2F($device),
+                    user    => $req->user,
+                );
                 push @expired2fDevices, $device;
                 $name .= "$device->{name}; ";
                 $removed++;
@@ -378,8 +386,14 @@ sub run {
               $self->regOtt->createToken( $self->save2faSessionInfo($req) );
             $self->logger->debug("Just one 2F is enabled");
             $self->logger->debug(" -> Redirect to 2fregisters/");
-            $req->response(
-                [ 302, [ Location => $self->p->buildUrl('2fregisters') ], [] ]
+            $req->response( [
+                    302,
+                    [
+                        Location =>
+                          $self->p->buildUrl( $req->portal, '2fregisters' )
+                    ],
+                    []
+                ]
             );
             return PE_SENDRESPONSE;
         }
@@ -397,19 +411,35 @@ sub run {
         }
     }
 
-    $self->userLogger->info( 'Second factor required for '
-          . $req->sessionInfo->{ $self->conf->{whatToTrace} } );
+    $self->auditLog(
+        $req,
+        message => (
+            'Second factor required for '
+              . $req->sessionInfo->{ $self->conf->{whatToTrace} }
+        ),
+        code => "2FA_REQUIRED",
+        user => $req->sessionInfo->{ $self->conf->{whatToTrace} },
+    );
 
     delete $req->{authResult};
 
+    $req->data->{_2fRetries} = $self->conf->{sfRetries};
     my $token = $self->ott->createToken( $self->save2faSessionInfo($req) );
 
     # If only one 2F is authorized, display it
     unless ($#am) {
-        $self->userLogger->info( 'Second factor '
-              . $am[0]->prefix
-              . '2F selected for '
-              . $req->sessionInfo->{ $self->conf->{whatToTrace} } );
+        $self->auditLog(
+            $req,
+            message => (
+                    'Second factor '
+                  . $am[0]->prefix
+                  . '2F selected for '
+                  . $req->sessionInfo->{ $self->conf->{whatToTrace} }
+            ),
+            code => "2FA_SELECTED",
+            user => $req->sessionInfo->{ $self->conf->{whatToTrace} },
+            type => $am[0]->prefix,
+        );
 
         my $res = $am[0]->run( $req, $token );
         $req->authResult($res);
@@ -449,6 +479,7 @@ sub save2faSessionInfo {
     my $info = { %{ $req->sessionInfo } };
 
     # Store user data in a token
+    $info->{_2fRetries}     = $req->data->{_2fRetries};
     $info->{_2fRealSession} = $req->id;
     $info->{_2fUrldc}       = $req->urldc;
     $info->{_2fUtime}       = $req->sessionInfo->{_utime};
@@ -466,6 +497,7 @@ sub restore2faSessionInfo {
     # Update sessionInfo
     delete $info->{$_}
       foreach (qw(tokenSessionStartTimestamp tokenTimeoutTimestamp _type));
+    $req->data->{_2fRetries} = delete $info->{_2fRetries};
     $req->sessionInfo($info);
     $req->id( delete $req->sessionInfo->{_2fRealSession} );
     $req->urldc( delete $req->sessionInfo->{_2fUrldc} );
@@ -486,26 +518,18 @@ sub display2fRegisters {
 
 sub _choice {
     my ( $self, $req ) = @_;
-    my $token;
 
-    # Restore session
-    unless ( $token = $req->param('token') ) {
-        $self->userLogger->error('2F choice requested without token');
-        $req->mustRedirect(1);
-        return $self->p->do( $req, [ sub { PE_NOTOKEN } ] );
-    }
-
-    my $session;
-    unless ( $session = $self->ott->getToken($token) ) {
-        $self->userLogger->info('Invalid 2F choice form token');
-        $req->noLoginDisplay(1);
-        return $self->p->do( $req, [ sub { PE_TOKENEXPIRED } ] );
-    }
-
-    unless ( $session->{_2fRealSession} ) {
-        $self->logger->error("Invalid 2FA session token");
-        $req->noLoginDisplay(1);
-        return $self->p->do( $req, [ sub { PE_ERROR } ] );
+    my ( $tokres, $session ) = $self->_check_token($req);
+    if ( $tokres != PE_OK ) {
+        $self->auditLog(
+            $req,
+            message      => "Token validation failed during 2FA type selection",
+            code         => "2FA_SELECTION_FAILED",
+            user         => $req->sessionInfo->{ $self->conf->{whatToTrace} },
+            reason       => "Token validation failed",
+            portal_error => portalConsts->{$tokres},
+        );
+        return $self->p->do( $req, [ sub { $tokres } ] );
     }
 
     $req->sessionInfo($session);
@@ -513,14 +537,22 @@ sub _choice {
     my $ch = $req->param('sf');
     foreach my $m ( @{ $self->sfModules } ) {
         if ( $m->{m}->prefix eq $ch ) {
-            $self->userLogger->info( 'Second factor '
-                  . $m->{m}->prefix
-                  . '2f selected for '
-                  . $req->sessionInfo->{ $self->conf->{whatToTrace} } );
+            $self->auditLog(
+                $req,
+                message => (
+                        'Second factor '
+                      . $m->{m}->prefix
+                      . '2f selected for '
+                      . $req->sessionInfo->{ $self->conf->{whatToTrace} }
+                ),
+                code => "2FA_SELECTED",
+                user => $req->sessionInfo->{ $self->conf->{whatToTrace} },
+                type => $m->{m}->prefix,
+            );
 
             # New token
-            $token = $self->ott->createToken( $req->sessionInfo );
-            my $res = $m->{m}->run( $req, $token );
+            my $token = $self->ott->createToken( $req->sessionInfo );
+            my $res   = $m->{m}->run( $req, $token );
             $req->authResult($res);
             return $self->p->do(
                 $req,
@@ -531,17 +563,24 @@ sub _choice {
             );
         }
     }
-    $self->userLogger->error('Bad 2F choice');
-    return $self->p->lmError( $req, 500 );
+    $self->auditLog(
+        $req,
+        message      => ('Bad 2F choice'),
+        code         => "2FA_SELECTION_FAILED",
+        reason       => "Unknown type",
+        user         => $req->sessionInfo->{ $self->conf->{whatToTrace} },
+        portal_error => portalConsts->{PE_ERROR},
+        type         => $ch,
+    );
+    return $self->p->do( $req, [ sub { PE_ERROR } ] );
 }
 
 sub _redirect {
     my ( $self, $req ) = @_;
     my $arg = $req->env->{QUERY_STRING};
+
     $self->logger->debug('Call sfEngine _redirect method');
-    return [
-        302, [ Location => $self->conf->{portal} . ( $arg ? "?$arg" : '' ) ], []
-    ];
+    return [ 302, [ Location => $req->portal . ( $arg ? "?$arg" : '' ) ], [] ];
 }
 
 sub _displayRegister {
@@ -607,7 +646,11 @@ sub _displayRegister {
     # If only one 2F is available, redirect to it
     return [
         302,
-        [ Location => $self->p->buildUrl( '2fregisters', $am[0]->{CODE} ) ], []
+        [
+            Location =>
+              $self->p->buildUrl( $req->portal, '2fregisters', $am[0]->{CODE} )
+        ],
+        []
       ]
       if (
         @am == 1
@@ -651,8 +694,9 @@ sub _displayRegister {
             DISPLAY_UPG  => $displayUpgBtn,
             MSG          => $self->canUpdateSfa($req) || 'choose2f',
             ALERT => ( $self->canUpdateSfa($req) ? 'warning' : 'positive' ),
-            SFREGISTERS_URL =>
-              encode_base64( "$self->{conf}->{portal}2fregisters", '' ),
+            SFREGISTERS_URL => encode_base64(
+                $self->p->buildUrl( $req->portal, '2fregisters' ), ''
+            ),
             %tplParams,
         }
     );
@@ -669,12 +713,13 @@ sub isRegistrationEnabled {
     my $module = $reg_mod_info->{m};
     my $prefix = $module->prefix;
 
+    my $rule = $reg_mod_info->{r};
+
     # Extra modules require special processing
     if ( $self->conf->{sfExtra}->{$prefix} ) {
-        return 1;
+        return $rule->( $req, $req->userData );
     }
     else {
-        my $rule = $reg_mod_info->{r};
         return $self->conf->{ $prefix . '2fActivation' }
           && $rule->( $req, $req->userData );
     }
@@ -695,8 +740,7 @@ sub register {
           unless $m;
         unless ( $m->{r}->( $req, $req->userData ) ) {
             $self->userLogger->error("${prefix}2F registration not allowed");
-            return $self->p->sendError( $req,
-                "${prefix}2F registration not allowed", 403 );
+            return $self->p->sendError( $req, "notAuthorized", 403 );
         }
 
         my $can_update_error = $self->canUpdateSfa( $req, $m->{m}, @args );
@@ -730,7 +774,7 @@ sub restoreSession {
 
             unless ( $sessionData->{_2fRealSession} ) {
                 $self->logger->error("Invalid 2FA registration token");
-                return [ 302, [ Location => $self->conf->{portal} ], [] ];
+                return [ 302, [ Location => $req->portal ], [] ];
             }
             $self->restore2faSessionInfo( $req, $sessionData );
 
@@ -762,7 +806,7 @@ sub restoreSession {
     }
     $self->logger->warn(
         "Cannot restore session state during mandatory 2FA registration");
-    return [ 302, [ Location => $self->conf->{portal} ], [] ];
+    return [ 302, [ Location => $req->portal ], [] ];
 }
 
 sub continueLoginAfterRegistration {
@@ -858,27 +902,17 @@ sub _verify {
       unless $m;
     my $module = $m->{m};
 
-    # Check token
-    my $token;
-    unless ( $token = $req->param('token') ) {
-        $self->userLogger->error(
-            $module->prefix . ' 2F access without token' );
-        eval { $module->setSecurity($req) };
-        $req->mustRedirect(1);
-        return $self->p->do( $req, [ sub { PE_NOTOKEN } ] );
-    }
-
-    my $session;
-    unless ( $session = $self->ott->getToken($token) ) {
-        $self->userLogger->info(
-            'Invalid token during ' . $module->prefix . '2f validation' );
-        $req->noLoginDisplay(1);
-        return $self->p->do( $req, [ sub { PE_TOKENEXPIRED } ] );
-    }
-    unless ( $session->{_2fRealSession} ) {
-        $self->logger->error("Invalid 2FA session token");
-        $req->noLoginDisplay(1);
-        return $self->p->do( $req, [ sub { PE_ERROR } ] );
+    my ( $tokres, $session ) = $self->_check_token($req);
+    if ( $tokres != PE_OK ) {
+        $self->auditLog(
+            $req,
+            message      => "Token validation failed during 2FA verification",
+            code         => "2FA_VERIFICATION_FAILED",
+            user         => $req->sessionInfo->{ $self->conf->{whatToTrace} },
+            reason       => "Token validation failed",
+            portal_error => portalConsts->{$tokres},
+        );
+        return $self->p->do( $req, [ sub { $tokres } ] );
     }
 
     # Evaluate hook
@@ -894,10 +928,38 @@ sub _verify {
     $self->restore2faSessionInfo( $req, $session );
 
     # Case error
-    if ($res) {
+    if ( $res and !$req->data->{_2fRetries} ) {
         $req->noLoginDisplay(1);
         $req->authResult(PE_BADCREDENTIALS);
+
+        # Set the failed 2f type in case you want to store it in history
+        # through sessionDataToRemember
+        $req->sessionInfo->{'_2f'} = $module->prefix;
         return $self->p->do( $req, [ 'storeHistory', sub { $res } ] );
+    }
+    elsif ($res) {
+        $req->data->{_2fRetries} = (
+            ( $req->data->{_2fRetries} > 0 )
+            ? $req->data->{_2fRetries} - 1
+            : 0
+        );
+
+        # Evaluate hook
+        my $h = $self->p->processHook( $req, 'sfBeforeRetry', $module );
+        if ( $h != PE_OK ) {
+            $req->noLoginDisplay(1);
+            return $self->p->do( $req, [ sub { $h } ] );
+        }
+
+        $self->logger->debug(
+            "Retrying 2FA: " . $req->data->{_2fRetries} . " retries left" );
+
+        $req->error(PE_RETRY_2FA);
+        my $token = $self->ott->createToken( $self->save2faSessionInfo($req) );
+        my $res   = $module->run( $req, $token );
+        $req->authResult($res);
+
+        return $self->p->do( $req, [ sub { $res } ] );
     }
 
     # Else restore session
@@ -1091,11 +1153,39 @@ sub get2fTplParams {
     $self->logger->debug( $module->prefix . '2f: stayConnected set' )
       if $stayConnected;
 
-
     $param{CHECKLOGINS}   = $checkLogins;
     $param{STAYCONNECTED} = $stayConnected;
 
+    $param{AUTH_ERROR}      = $req->error;
+    $param{AUTH_ERROR_TYPE} = $req->error_type;
+    $param{AUTH_ERROR_ROLE} = $req->error_role;
+
     return %param;
+}
+
+sub _check_token {
+    my ( $self, $req ) = @_;
+
+    my $token;
+    unless ( $token = $req->param('token') ) {
+        $self->logger->error('2F choice requested without token');
+        $req->mustRedirect(1);
+        return PE_NOTOKEN;
+    }
+
+    my $session;
+    unless ( $session = $self->ott->getToken($token) ) {
+        $self->logger->error('Invalid 2F choice form token');
+        $req->noLoginDisplay(1);
+        return PE_TOKENEXPIRED;
+    }
+
+    unless ( $session->{_2fRealSession} ) {
+        $self->logger->error("Invalid 2FA session token");
+        $req->noLoginDisplay(1);
+        return PE_ERROR;
+    }
+    return ( PE_OK, $session );
 }
 
 1;

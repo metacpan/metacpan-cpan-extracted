@@ -4,6 +4,7 @@ use strict;
 use Mouse;
 use MIME::Base64;
 use JSON qw(from_json to_json);
+use Lemonldap::NG::Common::Session 'id2storage';
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_ERROR
@@ -11,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.19.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -33,6 +34,11 @@ has ott => (
         return $ott;
     }
 );
+
+sub storageId {
+    my ( $self, $id ) = @_;
+    return $self->conf->{hashedSessionStore} ? id2storage($id) : $id;
+}
 
 sub init {
     my ($self) = @_;
@@ -83,7 +89,11 @@ sub run {
 
         if ( $self->conf->{securedCookie} == 2 ) {
             $self->logger->debug("Looking for double sessions...");
-            $linkedSessionId = $sessions->{ $req->id }->{_httpSession};
+
+            # searchOn() returns sessions indexed by their storage ID, then
+            # it is required to use hashed ID
+            $linkedSessionId =
+              $sessions->{ $self->storageId( $req->id ) }->{_httpSession};
             my $msg =
               $linkedSessionId
               ? "Linked session found -> $linkedSessionId / " . $req->id
@@ -91,10 +101,15 @@ sub run {
             $self->logger->debug($msg);
         }
 
+        # searchOn() returns sessions indexed by their storage ID, then
+        # it is required to use hashed ID
+        my $storageId = $self->storageId( $req->id );
         foreach my $id ( keys %$sessions ) {
-            next if ( $req->id eq $id );
-            next if ( $linkedSessionId and $id eq $linkedSessionId );
-            my $session = $self->p->getApacheSession($id) or next;
+            next if $id eq $storageId;
+            next
+              if $linkedSessionId and $id eq $self->storageId($linkedSessionId);
+            my $session = $self->p->getApacheSession( $id, hashStore => 0 )
+              or next;
             if (
                 $self->singleSessionRule->( $req, $req->sessionInfo )
                 or (    $self->singleIPRule->( $req, $req->sessionInfo )
@@ -122,9 +137,14 @@ sub run {
         my $sessions =
           $self->module->searchOn( $moduleOptions, 'ipAddr',
             $req->sessionInfo->{ipAddr} );
+
         foreach my $id ( keys %$sessions ) {
-            next if ( $req->id eq $id );
-            my $session = $self->p->getApacheSession($id) or next;
+            next if $self->storageId( $req->id ) eq $id;
+
+            # searchOn() returns sessions indexed by their storage ID, then
+            # it is required to set hashStore to 0
+            my $session = $self->p->getApacheSession( $id, hashStore => 0, )
+              or next;
             unless ( $req->{sessionInfo}->{ $self->conf->{whatToTrace} } eq
                 $session->data->{ $self->conf->{whatToTrace} } )
             {
@@ -162,7 +182,12 @@ sub removeOther {
             }
             my $as;
             foreach (@$sessions) {
-                unless ( $as = $self->p->getApacheSession($_) ) {
+
+                # searchOn() returns sessions indexed by their storage ID, then
+                # it is required to set hashStore to 0
+                unless ( $as =
+                    $self->p->getApacheSession( $_, hashStore => 0, ) )
+                {
                     $self->userLogger->info(
                         "SingleSession: session $_ expired");
                     next;
@@ -209,7 +234,8 @@ sub _mkRemoveOtherLink {
         $req,
         'removeOther',
         params => {
-            link => $self->conf->{portal} . "removeOther?token=$token"
+            link =>
+              $self->p->buildUrl( $req->portal, "removeOther", { token => $token } ),
         }
     );
 }

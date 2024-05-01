@@ -1,12 +1,12 @@
 package App::SpamcupNG::Summary::Recorder;
 use strict;
 use warnings;
-use Carp qw(confess);
+use Carp       qw(confess);
 use Hash::Util qw(lock_hash);
 use DBI 1.643;
-use DateTime 1.55;
+use DateTime 1.59;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 =pod
 
@@ -46,7 +46,7 @@ sub new {
 
     # TODO: add tables names for DRY also replacing in _save_attrib
     $self->{dbh} = DBI->connect( ( 'dbi:SQLite:dbname=' . $file ), '', '' )
-        or die $DBI::errstr;
+      or confess $DBI::errstr;
     bless $self, $class;
     return $self;
 }
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS email_content_type (
   name TEXT NOT NULL UNIQUE
 )
     }
-    ) or die $self->{dbh}->errstr;
+    ) or confess $self->{dbh}->errstr;
 
     $self->{dbh}->do(
         q{
@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS spam_age_unit (
   name TEXT NOT NULL UNIQUE
 )
     }
-    ) or die $self->{dbh}->errstr;
+    ) or confess $self->{dbh}->errstr;
 
     $self->{dbh}->do(
         q{
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS email_charset (
   name TEXT NOT NULL UNIQUE
 )
     }
-    ) or die $self->{dbh}->errstr;
+    ) or confess $self->{dbh}->errstr;
 
     $self->{dbh}->do(
         q{
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS receiver (
   email TEXT NOT NULL UNIQUE
 )
     }
-    ) or die $self->{dbh}->errstr;
+    ) or confess $self->{dbh}->errstr;
 
     $self->{dbh}->do(
         q{
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS mailer (
   name TEXT NOT NULL UNIQUE
 )
     }
-    ) or die $self->{dbh}->errstr;
+    ) or confess $self->{dbh}->errstr;
 
     $self->{dbh}->do(
         q{
@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS summary (
   mailer_id INTEGER REFERENCES mailer ON DELETE SET NULL
 )
     }
-    ) or die $self->{dbh}->errstr;
+    ) or confess $self->{dbh}->errstr;
 
     $self->{dbh}->do(
         q{
@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS summary_receiver (
   report_id TEXT UNIQUE
 )
     }
-    ) or die $self->{dbh}->errstr;
+    ) or confess $self->{dbh}->errstr;
 
 }
 
@@ -145,7 +145,7 @@ sub save {
     my $summary_class = 'App::SpamcupNG::Summary';
     my $ref           = ref($summary);
     confess "summary must be instance of $summary_class class, not '$ref'"
-        unless ( $ref eq $summary_class );
+      unless ( $ref eq $summary_class );
 
     # TODO: create a method for Summary to provide those names
     my @fields = qw(content_type age_unit charset mailer);
@@ -153,8 +153,8 @@ sub save {
 
     foreach my $field_name (@fields) {
         my $method = "get_$field_name";
-        $fields{$field_name}
-            = $self->_save_attrib( $field_name, $summary->$method );
+        $fields{$field_name} =
+          $self->_save_attrib( $field_name, $summary->$method );
     }
 
     lock_hash(%fields);
@@ -163,8 +163,7 @@ sub save {
 
     foreach my $receiver ( @{ $summary->get_receivers } ) {
         my $receiver_id = $self->_save_attrib( 'receiver', $receiver->email );
-        $self->_save_sum_rec( $summary_id, $receiver_id,
-            $receiver->report_id );
+        $self->_save_sum_rec( $summary_id, $receiver_id, $receiver->report_id );
     }
 
     return 1;
@@ -196,7 +195,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?)
         $fields_ref->{mailer}
     );
     $self->{dbh}->do( $insert, undef, @values )
-        or confess $self->{dbh}->errstr;
+      or confess $self->{dbh}->errstr;
     return $self->{dbh}->last_insert_id;
 }
 
@@ -212,7 +211,7 @@ sub _save_attrib {
 
     return undef unless ( defined($value) );
     confess "'$attrib' is not a valid attribute"
-        unless ( exists( $attrib_to_table{$attrib} ) );
+      unless ( exists( $attrib_to_table{$attrib} ) );
     my $table = $attrib_to_table{$attrib};
     my $column;
 
@@ -223,9 +222,9 @@ sub _save_attrib {
         $column = 'name';
     }
 
-    my $row_ref
-        = $self->{dbh}
-        ->selectrow_arrayref( "SELECT id FROM $table WHERE $column = ?",
+    my $row_ref =
+      $self->{dbh}
+      ->selectrow_arrayref( "SELECT id FROM $table WHERE $column = ?",
         undef, $value );
     return $row_ref->[0] if ( defined( $row_ref->[0] ) );
 

@@ -59,9 +59,14 @@ close $editFile;
 
 my $editor = $ENV{EDITOR} || 'editor';
 
-system "$editor $editFile";
+my $rc = system $editor, $editFile;
 
-if ( compare( $refFile->filename, $editFile->filename ) == 1 ) {
+if ( $rc != 0 ) {
+    print STDERR "Could not run $editor: $!\n" if $rc == -1;
+    print STDERR "$editor returned status code ", ( $rc >> 8 ), "\n" if $rc > 0;
+}
+
+if ( $rc == 0 and compare( $refFile->filename, $editFile->filename ) == 1 ) {
 
     # Check if the new configuration hash is valid
     open my $F1, "<", $editFile->filename();

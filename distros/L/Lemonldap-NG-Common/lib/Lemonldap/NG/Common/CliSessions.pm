@@ -9,7 +9,7 @@ use Lemonldap::NG::Common::Apache::Session;
 use Lemonldap::NG::Common::Session;
 use Lemonldap::NG::Common::Util qw/getPSessionID genId2F/;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.19.0';
 
 has opts => ( is => 'rw' );
 
@@ -26,15 +26,17 @@ has stderr => (
 has conf => (
     is      => 'ro',
     default => sub {
-        my $res = Lemonldap::NG::Common::Conf->new( { (
+        my $ca = Lemonldap::NG::Common::Conf->new( { (
                     ref $_[0] && $_[0]->{iniFile}
                     ? ( confFile => $_[0]->{iniFile} )
                     : ()
                 )
             }
         );
-        die $Lemonldap::NG::Common::Conf::msg unless ($res);
-        return $res->getConf();
+        die $Lemonldap::NG::Common::Conf::msg unless ($ca);
+        my $res       = $ca->getConf('all');
+        my $localConf = $ca->getLocalConf( 'all', $_[0]->{iniFile} );
+        return { %$res, %$localConf };
     },
 );
 
@@ -73,6 +75,14 @@ sub _search {
             $res = Lemonldap::NG::Common::Apache::Session->searchOn( $args,
                 $selectField, $value, @fields );
         }
+        elsif ( $self->opts->{where} =~ /^(\w+)\s*<\s*(.*)/ ) {
+            $res = Lemonldap::NG::Common::Apache::Session->searchLt( $args,
+                $1, $2, @fields );
+        }
+        elsif ( $self->opts->{where} =~ /^(\w+)\s*>\s*(.*)/ ) {
+            $res = Lemonldap::NG::Common::Apache::Session->searchGt( $args,
+                $1, $2, @fields );
+        }
         else {
             die "Invalid --where option : " . $self->opts->{where};
         }
@@ -104,6 +114,8 @@ sub search {
 sub _get_one_session {
     my ( $self, $id, $backend ) = @_;
 
+    $id = id2storage($id) if $id and $self->opts->{hash};
+
     # Lookup backend storage from CLI options
     my $backendStorage =
       ( lc( $self->opts->{backend} || 'global' ) ) . "Storage";
@@ -123,6 +135,7 @@ sub _get_one_session {
     $backendStorage = "globalStorage" unless $self->conf->{$backendStorage};
 
     my $as = Lemonldap::NG::Common::Session->new( {
+            hashStore            => 0,
             storageModule        => $self->conf->{$backendStorage},
             storageModuleOptions => $self->conf->{"${backendStorage}Options"},
             id                   => $id,

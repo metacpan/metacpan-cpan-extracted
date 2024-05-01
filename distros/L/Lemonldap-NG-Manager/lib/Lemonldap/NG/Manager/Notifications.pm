@@ -18,7 +18,7 @@ extends qw(
   Lemonldap::NG::Common::Conf::AccessLib
 );
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 has notifAccess => ( is => 'rw' );
 has notifFormat => ( is => 'rw' );
@@ -252,7 +252,7 @@ sub notification {
         my ( $uid, $ref ) = ( $id =~ /([^_]+?)_(.+)/ );
         my $n = $self->notifAccess->get( $uid, $ref );
         unless ($n) {
-            $self->userLogger->notice(
+            $self->logger->notice(
                 "Active notification $ref not found for user $uid");
             return $self->sendJSONresponse(
                 $req,
@@ -278,7 +278,7 @@ sub notification {
               $ref && $uid
               ? "Done notification $ref not found for user $uid"
               : 'Done notification not found';
-            $self->userLogger->notice($msg);
+            $self->logger->notice($msg);
             return $self->sendJSONresponse(
                 $req,
                 {

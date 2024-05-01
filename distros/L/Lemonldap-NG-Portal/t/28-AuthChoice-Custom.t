@@ -8,8 +8,7 @@ require 't/test-lib.pm';
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel          => 'error',
             useSafeJail       => 1,
@@ -46,9 +45,8 @@ ok(
 );
 expectOK($res);
 my $id = expectCookie($res);
-ok( $res = $client->_get("/sessions/global/$id"), 'Get session' );
-my $sessiondata = from_json( $res->[2]->[0] );
-is( $sessiondata->{authenticationLevel}, 3, "Overriden authentication level" );
+is( getSession($id)->data->{authenticationLevel},
+    3, "Overriden authentication level" );
 $client->logout($id);
 
 # Authenticate on second choice
@@ -66,9 +64,8 @@ ok(
 );
 expectOK($res);
 $id = expectCookie($res);
-ok( $res = $client->_get("/sessions/global/$id"), 'Get session' );
-$sessiondata = from_json( $res->[2]->[0] );
-is( $sessiondata->{authenticationLevel}, 1, "Default authentication level" );
+is( getSession($id)->data->{authenticationLevel},
+    1, "Default authentication level" );
 $client->logout($id);
 clean_sessions();
 done_testing();

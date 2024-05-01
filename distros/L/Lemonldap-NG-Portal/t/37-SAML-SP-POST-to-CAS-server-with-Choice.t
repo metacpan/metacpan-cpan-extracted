@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 13;
+my $maintests = 11;
 my $debug     = 'error';
 my ( $issuer, $proxy, $sp, $res );
 
@@ -82,7 +82,6 @@ SKIP: {
         'SAMLRequest' );
 
     # Push SAML request to IdP
-    switch ('proxy');
     ok(
         $res = $proxy->_post(
             $url,
@@ -117,7 +116,6 @@ qr'^http://auth.idp.com/cas/login\?(service=http%3A%2F%2Fauth.proxy.com%2F.*)$'
     );
 
     # Follow redirection to CAS server
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             '/cas/login',
@@ -148,7 +146,6 @@ qr'^http://auth.idp.com/cas/login\?(service=http%3A%2F%2Fauth.proxy.com%2F.*)$'
         qr#^http://auth.proxy.com(/saml/singleSignOn)\?(.*ticket=.*)$# );
 
     # Push CAS response to proxy
-    switch ('proxy');
     ok(
         $res = $proxy->_get(
             $url,
@@ -166,7 +163,6 @@ qr'^http://auth.idp.com/cas/login\?(service=http%3A%2F%2Fauth.proxy.com%2F.*)$'
         'SAMLResponse' );
 
     # Post SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($query),
@@ -185,11 +181,7 @@ qr'^http://auth.idp.com/cas/login\?(service=http%3A%2F%2Fauth.proxy.com%2F.*)$'
     expectAuthenticatedAs( $res, 'fa@badwolf.org@proxy' );
 
     # Verify UTF-8
-    ok( $res = $sp->_get("/sessions/global/$spId"), 'Get UTF-8' );
-    expectOK($res);
-    ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-      or print STDERR $@;
-    ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
+    ok( getSession($spId)->data->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
       or explain( $res, 'cn => Frédéric Accents' );
 
 }
@@ -199,8 +191,7 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 skipRenewConfirmation => 1,
                 logLevel              => $debug,
@@ -220,8 +211,7 @@ sub issuer {
 }
 
 sub proxy {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel          => $debug,
                 domain            => 'proxy.com',
@@ -285,8 +275,7 @@ sub proxy {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',

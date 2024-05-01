@@ -73,7 +73,7 @@ LWP::Protocol::PSGI->register(
 );
 
 # Initialization
-ok( $op = op(), 'OP portal' );
+ok( $op = register( 'op', sub { op() } ), 'OP portal' );
 
 ok( $res = $op->_get('/oauth2/jwks'), 'Get JWKS,     endpoint /oauth2/jwks' );
 expectOK($res);
@@ -105,9 +105,8 @@ ok(
 count(1);
 my $idpId = expectCookie($res);
 
-switch ('rp');
 &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-ok( $rp = rp( $jwks, $metadata ), 'RP portal' );
+ok( $rp = register( 'rp', sub { rp( $jwks, $metadata ) } ), 'RP portal' );
 count(1);
 
 # Query RP for auth
@@ -117,7 +116,6 @@ count(1);
   expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
 
 # Push request to OP
-switch ('op');
 ok(
     $res = $op->_get(
         $url,
@@ -210,7 +208,6 @@ count(1);
 ($query) = expectRedirection( $res, qr#^http://auth.rp.com/?\?(.*)$# );
 
 # Push OP response to RP
-switch ('rp');
 
 ok( $res = $rp->_get( '/', query => $query, accept => 'text/html' ),
     'Call openidconnectcallback on RP' );
@@ -232,7 +229,6 @@ count(1);
   expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
 
 # Push request to OP
-switch ('op');
 ok( $res = $op->_get( $url, query => $query, accept => 'text/html' ),
     "Push request to OP,         endpoint $url" );
 count(1);
@@ -301,7 +297,6 @@ count(1);
 ($query) = expectRedirection( $res, qr#^http://auth.rp.com/?\?(.*)$# );
 
 # Push OP response to RP
-switch ('rp');
 
 ok( $res = $rp->_get( '/', query => $query, accept => 'text/html' ),
     'Call openidconnectcallback on RP' );

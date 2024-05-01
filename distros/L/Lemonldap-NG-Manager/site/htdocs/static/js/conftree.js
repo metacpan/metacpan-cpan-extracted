@@ -286,6 +286,12 @@ function templates(tpl,key) {
                   "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsUserAttribute",
                   "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsUserAttribute",
                   "title" : "oidcOPMetaDataOptionsUserAttribute"
+               },
+               {
+                  "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsRequirePkce",
+                  "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsRequirePkce",
+                  "title" : "oidcOPMetaDataOptionsRequirePkce",
+                  "type" : "bool"
                }
             ],
             "id" : "oidcOPMetaDataOptionsConfiguration",
@@ -350,6 +356,84 @@ function templates(tpl,key) {
                   "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsAcrValues",
                   "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsAcrValues",
                   "title" : "oidcOPMetaDataOptionsAcrValues"
+               },
+               {
+                  "default" : "get",
+                  "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsAuthnEndpointAuthMethod",
+                  "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsAuthnEndpointAuthMethod",
+                  "select" : [
+                     {
+                        "k" : "",
+                        "v" : "None"
+                     },
+                     {
+                        "k" : "jws",
+                        "v" : "Signed JWT"
+                     }
+                  ],
+                  "title" : "oidcOPMetaDataOptionsAuthnEndpointAuthMethod",
+                  "type" : "select"
+               },
+               {
+                  "default" : "RS256",
+                  "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsAuthnEndpointAuthSigAlg",
+                  "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsAuthnEndpointAuthSigAlg",
+                  "select" : [
+                     {
+                        "k" : "HS256",
+                        "v" : "HS256"
+                     },
+                     {
+                        "k" : "HS384",
+                        "v" : "HS384"
+                     },
+                     {
+                        "k" : "HS512",
+                        "v" : "HS512"
+                     },
+                     {
+                        "k" : "RS256",
+                        "v" : "RS256"
+                     },
+                     {
+                        "k" : "RS384",
+                        "v" : "RS384"
+                     },
+                     {
+                        "k" : "RS512",
+                        "v" : "RS512"
+                     },
+                     {
+                        "k" : "PS256",
+                        "v" : "PS256"
+                     },
+                     {
+                        "k" : "PS384",
+                        "v" : "PS384"
+                     },
+                     {
+                        "k" : "PS512",
+                        "v" : "PS512"
+                     },
+                     {
+                        "k" : "ES256",
+                        "v" : "ES256"
+                     },
+                     {
+                        "k" : "ES384",
+                        "v" : "ES384"
+                     },
+                     {
+                        "k" : "ES512",
+                        "v" : "ES512"
+                     },
+                     {
+                        "k" : "EdDSA",
+                        "v" : "EdDSA"
+                     }
+                  ],
+                  "title" : "oidcOPMetaDataOptionsAuthnEndpointAuthSigAlg",
+                  "type" : "select"
                },
                {
                   "default" : "client_secret_post",
@@ -477,34 +561,6 @@ function templates(tpl,key) {
             "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRedirectUris",
             "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRedirectUris",
             "title" : "oidcRPMetaDataOptionsRedirectUris"
-         },
-         {
-            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthMethod",
-            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthMethod",
-            "select" : [
-               {
-                  "k" : "",
-                  "v" : "Any"
-               },
-               {
-                  "k" : "client_secret_post",
-                  "v" : "client_secret_post"
-               },
-               {
-                  "k" : "client_secret_basic",
-                  "v" : "client_secret_basic"
-               },
-               {
-                  "k" : "client_secret_jwt",
-                  "v" : "client_secret_jwt"
-               },
-               {
-                  "k" : "private_key_jwt",
-                  "v" : "private_key_jwt"
-               }
-            ],
-            "title" : "oidcRPMetaDataOptionsAuthMethod",
-            "type" : "select"
          }
       ],
       "help" : "idpopenidconnect.html#basic-options",
@@ -626,6 +682,109 @@ function templates(tpl,key) {
             ],
             "id" : "oidcRPMetaDataOptionsScopes",
             "title" : "oidcRPMetaDataOptionsScopes"
+         },
+         {
+            "_nodes" : [
+               {
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRequirePKCE",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRequirePKCE",
+                  "title" : "oidcRPMetaDataOptionsRequirePKCE",
+                  "type" : "bool"
+               },
+               {
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowOffline",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowOffline",
+                  "title" : "oidcRPMetaDataOptionsAllowOffline",
+                  "type" : "bool"
+               },
+               {
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowPasswordGrant",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowPasswordGrant",
+                  "title" : "oidcRPMetaDataOptionsAllowPasswordGrant",
+                  "type" : "bool"
+               },
+               {
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowClientCredentialsGrant",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowClientCredentialsGrant",
+                  "title" : "oidcRPMetaDataOptionsAllowClientCredentialsGrant",
+                  "type" : "bool"
+               },
+               {
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRequestUris",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRequestUris",
+                  "title" : "oidcRPMetaDataOptionsRequestUris"
+               },
+               {
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthnLevel",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthnLevel",
+                  "title" : "oidcRPMetaDataOptionsAuthnLevel",
+                  "type" : "intOrNull"
+               },
+               {
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRule",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRule",
+                  "title" : "oidcRPMetaDataOptionsRule"
+               },
+               {
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthMethod",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthMethod",
+                  "select" : [
+                     {
+                        "k" : "",
+                        "v" : "Any"
+                     },
+                     {
+                        "k" : "client_secret_post",
+                        "v" : "client_secret_post"
+                     },
+                     {
+                        "k" : "client_secret_basic",
+                        "v" : "client_secret_basic"
+                     },
+                     {
+                        "k" : "client_secret_jwt",
+                        "v" : "client_secret_jwt"
+                     },
+                     {
+                        "k" : "private_key_jwt",
+                        "v" : "private_key_jwt"
+                     }
+                  ],
+                  "title" : "oidcRPMetaDataOptionsAuthMethod",
+                  "type" : "select"
+               },
+               {
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthRequiredForAuthorize",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthRequiredForAuthorize",
+                  "title" : "oidcRPMetaDataOptionsAuthRequiredForAuthorize",
+                  "type" : "bool"
+               },
+               {
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthnRequireState",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthnRequireState",
+                  "title" : "oidcRPMetaDataOptionsAuthnRequireState",
+                  "type" : "bool"
+               },
+               {
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthnRequireNonce",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthnRequireNonce",
+                  "title" : "oidcRPMetaDataOptionsAuthnRequireNonce",
+                  "type" : "bool"
+               },
+               {
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsUserinfoRequireHeaderToken",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsUserinfoRequireHeaderToken",
+                  "title" : "oidcRPMetaDataOptionsUserinfoRequireHeaderToken",
+                  "type" : "bool"
+               }
+            ],
+            "id" : "security",
+            "title" : "security",
+            "type" : "simpleInputContainer"
          },
          {
             "_nodes" : [
@@ -823,50 +982,6 @@ function templates(tpl,key) {
                   ],
                   "title" : "oidcRPMetaDataOptionsUserInfoSignAlg",
                   "type" : "select"
-               },
-               {
-                  "default" : 0,
-                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRequirePKCE",
-                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRequirePKCE",
-                  "title" : "oidcRPMetaDataOptionsRequirePKCE",
-                  "type" : "bool"
-               },
-               {
-                  "default" : 0,
-                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowOffline",
-                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowOffline",
-                  "title" : "oidcRPMetaDataOptionsAllowOffline",
-                  "type" : "bool"
-               },
-               {
-                  "default" : 0,
-                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowPasswordGrant",
-                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowPasswordGrant",
-                  "title" : "oidcRPMetaDataOptionsAllowPasswordGrant",
-                  "type" : "bool"
-               },
-               {
-                  "default" : 0,
-                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowClientCredentialsGrant",
-                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowClientCredentialsGrant",
-                  "title" : "oidcRPMetaDataOptionsAllowClientCredentialsGrant",
-                  "type" : "bool"
-               },
-               {
-                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRequestUris",
-                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRequestUris",
-                  "title" : "oidcRPMetaDataOptionsRequestUris"
-               },
-               {
-                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthnLevel",
-                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthnLevel",
-                  "title" : "oidcRPMetaDataOptionsAuthnLevel",
-                  "type" : "intOrNull"
-               },
-               {
-                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRule",
-                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRule",
-                  "title" : "oidcRPMetaDataOptionsRule"
                },
                {
                   "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAccessTokenEncKeyMgtAlg",
@@ -1161,8 +1276,8 @@ function templates(tpl,key) {
                   "type" : "select"
                }
             ],
-            "id" : "security",
-            "title" : "security",
+            "id" : "algorithms",
+            "title" : "algorithms",
             "type" : "simpleInputContainer"
          },
          {

@@ -47,7 +47,9 @@ $(document).on 'checkpassword', (event, context) ->
 			# send a request to checkentropy endpoint
 			$.ajax
 				dataType: "json"
-				url: "/checkentropy?password=" + btoa(newpasswordVal)
+				url: "/checkentropy"
+				method: "POST"
+				data: { "password": btoa(newpasswordVal) }
 				context: document.body
 				success: (data) ->
 					level = data.level

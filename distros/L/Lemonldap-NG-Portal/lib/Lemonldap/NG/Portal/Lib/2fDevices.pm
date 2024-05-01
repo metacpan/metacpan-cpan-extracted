@@ -27,7 +27,7 @@ use JSON;
 
 requires qw(p conf logger);
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.19.0';
 
 =item update2fDevice
 
@@ -106,8 +106,15 @@ sub add2fDevice {
     push @{$_2fDevices}, $device;
 
     my $uid = $info->{ $self->conf->{whatToTrace} };
-    $self->userLogger->notice(
-        "User " . $uid . " registered 2F device: " . display2F($device) );
+    $self->auditLog(
+        $req,
+        message => (
+            "User " . $uid . " registered 2F device: " . display2F($device)
+        ),
+        code   => "2FA_DEVICE_REGISTERED",
+        user   => $uid,
+        device => display2F($device),
+    );
     $self->p->updatePersistentSession( $req,
         { _2fDevices => to_json($_2fDevices) } );
     return 1;
@@ -159,10 +166,15 @@ sub del2fDevices {
         if ( @updated_2fDevices < $size_before ) {
             $need_update = 1;
             my $uid = $info->{ $self->conf->{whatToTrace} };
-            $self->userLogger->notice( "User "
-                  . $uid
-                  . " deleted 2F device: "
-                  . display2F($device_spec) );
+            $self->auditLog(
+                $req,
+                message => (
+                    "User $uid deleted 2F device: " . display2F($device_spec)
+                ),
+                code   => "2FA_DEVICE_DELETED",
+                user   => $uid,
+                device => display2F($device_spec),
+            );
         }
     }
 

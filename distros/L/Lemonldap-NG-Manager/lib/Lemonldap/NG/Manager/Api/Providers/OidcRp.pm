@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Api::Providers::OidcRp;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.19.0';
 
 package Lemonldap::NG::Manager::Api;
 
@@ -387,7 +387,7 @@ sub _pushOidcRp {
             my $optionName = $self->_translateOptionApiToConf( $_, 'oidcRP' );
             eval {
                 my $optionValue =
-                  $self->_translateValueApiToConf( $_, $push->{options}->{$_} );
+                  $self->_translateValueApiToConf( $optionName, $push->{options}->{$_} );
                 $translatedOptions->{$optionName} = $optionValue;
             };
             if ($@) {

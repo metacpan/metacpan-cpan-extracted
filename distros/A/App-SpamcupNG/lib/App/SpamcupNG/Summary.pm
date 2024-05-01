@@ -8,7 +8,7 @@ use Set::Tiny 0.04;
 
 use App::SpamcupNG::Summary::Receiver;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 =pod
 
@@ -105,7 +105,7 @@ sub as_text {
     my $self = shift;
     my @simple;
 
-# Set::Tiny->members is not ordered and we need that to have deterministic text
+ # Set::Tiny->members is not ordered and we need that to have deterministic text
     my @fields  = sort( $fields->members );
     my $complex = Set::Tiny->new(qw(contacts receivers age));
 
@@ -180,7 +180,7 @@ sub _receivers_as_text {
 sub _contacts_as_text {
     my $self = shift;
     return '(' . join( ';', @{ $self->{contacts} } ) . ')'
-        if ( $self->{contacts} );
+      if ( $self->{contacts} );
     return '()';
 }
 
@@ -219,7 +219,7 @@ Returns "true" (1) if everything goes fine.
 sub set_receivers {
     my ( $self, $receivers_ref ) = @_;
     confess 'An array reference is expected as parameter'
-        unless ( ref($receivers_ref) eq 'ARRAY' );
+      unless ( ref($receivers_ref) eq 'ARRAY' );
     my @items;
 
     foreach my $receiver_ref ( @{$receivers_ref} ) {
@@ -242,12 +242,12 @@ L<Class::Accessor>
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2018 of Alceu Rodrigues de Freitas Junior,
-E<lt>arfreitas@cpan.orgE<gt>
+E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 This file is part of App-SpamcupNG distribution.
 

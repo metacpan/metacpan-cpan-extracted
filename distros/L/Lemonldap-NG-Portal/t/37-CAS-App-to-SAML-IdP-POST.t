@@ -76,7 +76,6 @@ SKIP: {
       expectRedirection( $res, qr#http://auth.proxy.com(/cas/login)\?(.*)$# );
 
     # Push request to Proxy
-    switch ('proxy');
     ok(
         $res = $proxy->_get(
             $url,
@@ -93,7 +92,6 @@ SKIP: {
         'SAMLRequest' );
 
     # Post SAML request to IdP
-    switch ('idp');
     ok(
         $res = $idp->_post(
             $url,
@@ -135,7 +133,6 @@ SKIP: {
     ok( $idpPdata !~ 'issuerRequestsaml', 'SAML request cleared from pdata' );
 
     # Post SAML response
-    switch ('proxy');
     ok(
         $res = $proxy->_post(
             $url, IO::String->new($query),
@@ -160,7 +157,6 @@ SKIP: {
       expectRedirection( $res, qr#^http://auth.app.com/\?(ticket.*)$# );
 
     # Follow redirection to App
-    switch ('app');
     ok( $res = $app->_get( '/', query => $query, accept => 'text/html' ),
         'Follow redirection to RP' );
     my $appId = expectCookie($res);

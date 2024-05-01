@@ -1,0 +1,15 @@
+Revision history for Alien-NLopt
+
+v2.7.1.1  2024-05-01 00:58:56-04:00 America/New_York
+
+   [BUILD]
+
+     * test required higher Perl version than code; fix that.
+
+   [MISC]
+
+     * rename to Alien::NLopt.  The library is NLopt, not NLopt.
+
+v2.7.1.0  2024-04-27 21:25:38-04:00 America/New_York
+
+* First release upon an unsuspecting world.

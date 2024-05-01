@@ -51,9 +51,9 @@ sub runTest {
     my $refresh_token = $json->{refresh_token};
 
     # Make sure refresh token session has no _lastSeen to avoid purge
-    ok (!getSamlSession($refresh_token)->{data}->{_lastSeen});
+    ok( !getSamlSession($refresh_token)->{data}->{_lastSeen} );
 
-    my $id_token      = $json->{id_token};
+    my $id_token = $json->{id_token};
     ok( $access_token,  "Got access token" );
     ok( $refresh_token, "Got refresh token" );
     ok( $id_token,      "Got ID token" );
@@ -80,7 +80,7 @@ sub runTest {
     $json = expectJSON( refreshGrant( $op, 'rpid', $refresh_token ) );
 
     # Make sure refresh token session has no _lastSeen to avoid purge
-    ok (!getSamlSession($refresh_token)->{data}->{_lastSeen});
+    ok( !getSamlSession($refresh_token)->{data}->{_lastSeen} );
 
     $access_token = $json->{access_token};
     if ($jwt) {
@@ -121,7 +121,7 @@ sub runTest {
     $json = expectJSON( refreshGrant( $op, 'rpid', $refresh_token ) );
 
     # Make sure refresh token session has no _lastSeen to avoid purge
-    ok (!getSamlSession($refresh_token)->{data}->{_lastSeen});
+    ok( !getSamlSession($refresh_token)->{data}->{_lastSeen} );
 
     $access_token = $json->{access_token};
     if ($jwt) {
@@ -147,8 +147,7 @@ sub runTest {
     );
     ok( ( grep { $_ eq "rpid" } @{ $id_token_payload->{aud} } ),
         'Check that clientid is in audience' );
-    ok(
-        (
+    ok( (
             grep { $_ eq "http://my.extra.audience/test" }
               @{ $id_token_payload->{aud} }
         ),
@@ -174,6 +173,49 @@ sub runTest {
         ( grep { $_ eq "!weird:scope.name~" } ( split /\s+/, $json->{scope} ) ),
         "Scope contains weird scope name"
     );
+}
+
+sub runTestRemoveUser {
+    my ($op) = @_;
+    Time::Fake->reset;
+
+    my $query;
+    my $res;
+
+    $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{goner} = {
+        uid  => 'goner',
+        cn   => 'James Goner',
+        mail => 'goner@badwolf.org',
+    };
+
+    my $idpId = login( $op, 'goner' );
+
+    my $code = codeAuthorize(
+        $op, $idpId,
+        {
+            response_type => "code",
+
+            scope        => "openid email offline_access",
+            client_id    => "rpid",
+            state        => "af0ifjsldkj",
+            redirect_uri => "http://test/"
+        }
+    );
+
+    my $json = expectJSON( codeGrant( $op, "rpid", $code, "http://test/" ) );
+    my $refresh_token = $json->{refresh_token};
+    ok( $refresh_token, "Got refresh token" );
+
+    $op->logout($idpId);
+
+    # Refresh access token after logging out
+    $json = expectJSON( refreshGrant( $op, 'rpid', $refresh_token ) );
+    ok( $json->{access_token}, "Found access token" );
+
+    # Remove user from storage
+    delete $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{goner};
+    $json = expectReject( refreshGrant( $op, 'rpid', $refresh_token ),
+        400, "invalid_grant" );
 }
 
 my $baseConfig = {
@@ -227,6 +269,8 @@ $baseConfig->{ini}->{oidcRPMetaDataOptions}->{rp}
   ->{oidcRPMetaDataOptionsAccessTokenJWT} = 1;
 $op = LLNG::Manager::Test->new($baseConfig);
 runTest( $op, 1 );
+
+runTestRemoveUser($op);
 
 clean_sessions();
 done_testing();

@@ -16,13 +16,12 @@ use strict;
 
 use File::Basename qw(basename);
 use Getopt::Std qw(getopts);
+use IO::File;
 
 use constant EX_SUCCESS => 0;
 use constant EX_FAILURE => 1;
 
 my $Program = basename($0);
-
-sub parse_time ($);
 
 my ($VERSION) = '1.3';
 
@@ -31,7 +30,7 @@ my $rc = EX_SUCCESS;
 my %options;
 getopts('acmfr:t:', \%options) or usage();
 unless (@ARGV) {
-    warn "$Program: missing file agument\n";
+    warn "$Program: missing file argument\n";
     usage();
 }
 
@@ -40,12 +39,12 @@ my $modification_time = exists $options {m}  ||  !exists $options {a};
 my $no_create         = exists $options {c};
 
 my ($atime, $mtime, $special_time);
-if ($options {r}) {
+if (defined $options{'r'}) {
     ($atime, $mtime) = (stat $options {r}) [8, 9] or die "$options{r}: $!\n";
     $special_time = 1;
 }
 elsif ($options {t}) {
-    $atime = $mtime = parse_time $options {t};
+    $atime = $mtime = parse_time($options{'t'});
     die "-t $options{t}: Time out of range!\n" if $atime < 0;
     $special_time = 1;
 }
@@ -58,15 +57,17 @@ foreach my $file (@ARGV) {
     # Check if the file exists. If not, create it.
     unless (-e $file) {
         next if $no_create;
-        local *FILE;
-        require Fcntl;  # Import
-        sysopen FILE, $file, Fcntl::O_CREAT () or do {
-            warn "$Program: $file: $!\n";
+        my $fh = IO::File->new($file, O_CREAT);
+        unless ($fh) {
+            warn "$Program: failed to create '$file': $!\n";
             $rc = EX_FAILURE;
             next;
-        };
-        close FILE;
-
+        }
+        unless ($fh->close) {
+            warn "$Program: failed to close '$file': $!\n";
+            $rc = EX_FAILURE;
+            next;
+        }
         # Nothing to be done, unless time different than now.
         next unless $special_time;
     }
@@ -90,11 +91,11 @@ exit $rc;
 
 sub usage {
     warn "$Program (Perl bin utils) $VERSION\n";
-    warn "usage: $Program [-acfm] [-r file] [-t [[CC]YY]MMDDhhmm[.SS]] file...\n";
+    warn "usage: $Program [-acm] [-r file] [-t [[CC]YY]MMDDhhmm[.SS]] file...\n";
     exit EX_FAILURE;
 }
 
-sub parse_time ($) {
+sub parse_time {
     my $time = shift;
 
     my ($first, $seconds) = split /\./ => $time, 2;
@@ -137,7 +138,7 @@ touch - change access and modification times of files
 
 =head1 SYNOPSIS
 
-touch [-acfm] [-r file] [-t [[CC]YY]MMDDhhmm[.SS]] file [files ...]
+touch [-acm] [-r file] [-t [[CC]YY]MMDDhhmm[.SS]] file...
 
 =head1 DESCRIPTION
 
@@ -145,8 +146,8 @@ I<touch> sets the access and modification timestamps of files. By default,
 both the access and modification times are set to the current time.
 If necessary, files will be created.
 
-I<touch> exits succesfully if and only if all timestamps could be set
-succesfully.
+I<touch> exits successfully if and only if all timestamps could be set
+successfully.
 
 =head2 OPTIONS
 
@@ -166,7 +167,7 @@ not influence the exit status.
 
 =item -f
 
-This option is ignored, and only recognized for compatability reasons.
+This option is ignored, and only recognized for compatibility reasons.
 
 =item -m
 
@@ -196,15 +197,12 @@ The working of I<touch> is not influenced by any environment variables.
 
 =head1 BUGS
 
-I<touch> does not implement the I<-f> option.
-
 I<touch> uses C<Time::Local> to translate the time format to epoch
 seconds
 
 =head1 STANDARDS
 
-This I<touch> implementation is compatible with the B<OpenBSD> implementation,
-except for the I<-f> option.
+This I<touch> implementation is compatible with the B<OpenBSD> implementation.
 
 =head1 AUTHOR
 

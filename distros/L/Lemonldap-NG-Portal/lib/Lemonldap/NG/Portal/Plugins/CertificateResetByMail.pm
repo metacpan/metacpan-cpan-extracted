@@ -31,7 +31,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MAILCONFIRMATION_ALREADY_SENT
 );
 
-our $VERSION = '2.16.1';
+our $VERSION = '2.19.0';
 
 extends qw(
   Lemonldap::NG::Portal::Lib::SMTP
@@ -59,20 +59,6 @@ has registerModule => ( is => 'rw' );
 
 # Captcha generator
 has captcha => ( is => 'rw' );
-
-# Reset URL to set in mail
-has resetUrl => (
-    is      => 'ro',
-    lazy    => 1,
-    default => sub {
-        my $self = $_[0];
-        my $p    = $self->conf->{portal};
-        $p =~ s#/*$##;
-        return $self->conf->{certificateResetByMailURL}
-          ? $self->conf->{certificateResetByMailURL}
-          : "$p/certificateReset";
-    }
-);
 
 # Mail timeout token generator
 has mailott => (
@@ -338,13 +324,16 @@ sub _certificateReset {
         # Build confirmation url
         my $req_url = $req->data->{_url};
         my $skin    = $self->p->getSkin($req);
-        my $url =
-          $self->resetUrl . '?'
-          . build_urlencoded(
-            mail_token => $req->{id},
-            skin       => $skin,
-            ( $req_url ? ( url => $req_url ) : () ),
-          );
+        my $url     = $self->p->buildUrl( (
+                $self->conf->{certificateResetByMailURL}
+                  || ( $req->portal, "certificateReset" )
+            ),
+            {
+                mail_token => $req->{id},
+                skin       => $skin,
+                ( $req_url ? ( url => $req_url ) : () ),
+            }
+        );
 
         # Build mail content
         my $tr      = $self->translate($req);

@@ -1,5 +1,8 @@
 Revision history for App-perlvars
 
+0.000005  2024-04-30 23:26:40Z
+    - Temporarily fix test failures for perl > 5.37.3 (GH#12) (Håkon Hægland)
+
 0.000004  2022-02-24 17:42:56Z
     - Don't index test-data directory
 

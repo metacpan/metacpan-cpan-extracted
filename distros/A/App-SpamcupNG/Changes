@@ -1,10 +1,85 @@
 ==================================================
-Changes from 2022-08-10 00:00:00 +0000 to present.
+Changes from 2023-05-02 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.017 at 2023-08-10 00:43:13 +0000
+version 0.018 at 2024-05-01 03:13:55 +0000
 ------------------------------------------
+
+  Change: ddba72f540968edb6b102682a88ad6ec712d0075
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-05-01 00:11:37 +0000
+
+    Merge pull request #13 from glasswalk3r/refactor/log-messages
+
+    Refactor/log messages 
+
+  Change: 2d69d6cd784e4fcd62bf59a1e55423a8ec8617ed
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-05-01 00:05:54 +0000
+
+    chore: required for contact 
+
+  Change: 8cf89743ebd0e6318e18b45d6d567a9962899a9f
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-04-30 23:57:25 +0000
+
+    refactor: requirements cleanup 
+
+  Change: 564ef6b635931e28abf279d6f75f67220f04d781
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-04-30 23:55:03 +0000
+
+    chore: bumped requirements version 
+
+  Change: 2bc7f74fc9aab1e3fd0498ebae5f4b4227e1bdf5
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-04-30 23:42:22 +0000
+
+    refactor: log level revision
+
+    The previous log levels were generating a chatty progress on the CLI
+    and aren't really necessary to be shown everytime 
+
+  Change: 6c93a7c6ded6dc86d5437c2af176da338ab19cb9
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-04-30 23:42:09 +0000
+
+    chore: updated email 
+
+  Change: 34a96502d53947696b88a17e400decf28188a623
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-04-13 21:02:45 +0000
+
+    Merge pull request #12 from glasswalk3r/bugfix/missing_dependency
+
+    fix: required during xtest 
+
+  Change: e905b9d94fee3249fc0d962bf24822b3ad82b2c8
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-04-13 19:28:54 +0000
+
+    fix: required during xtest 
+
+  Change: 091f32c825d39048172a102e2a4f0381e53787f2
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-04-07 16:54:27 +0000
+
+    Merge pull request #11 from glasswalk3r/feature/gha
+
+    Feature/gha 
+
+  Change: cf0839ca73a05ff55f2c9db9f8e178a554acb88c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-04-07 16:50:37 +0000
+
+    feat: github actions workflow 
+
+  Change: dc136d14de069f775a915b6d2a2206be7edca4aa
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-04-07 16:50:22 +0000
+
+    doc: required update 
 
   Change: 0d3f707965dd08671fecb3d3218d52c51727af80
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>

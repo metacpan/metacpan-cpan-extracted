@@ -83,10 +83,10 @@ subtest "new" => sub {
         parent => $$,
         pid    => 666,
         port   => 420,
-        cdp_uri => '',
         host   => 'localhost',
         timeout => 5,
         cleanup => 1,
+        cdp_uri => '',
     }, 'Playwright');
 
     is(Playwright->new( timeout => 5, ua => 'whee', debug => 1), $expected, "Constructor functions as expected");
@@ -97,10 +97,10 @@ subtest "new" => sub {
         parent => $$,
         pid    => 666,
         port   => 420,
-        cdp_uri => '',
         host   => 'localhost',
         timeout => 30,
         cleanup => 1,
+        cdp_uri => '',
     }, 'Playwright');
 
     is(Playwright->new(), $expected, "Constructor defaults expected");

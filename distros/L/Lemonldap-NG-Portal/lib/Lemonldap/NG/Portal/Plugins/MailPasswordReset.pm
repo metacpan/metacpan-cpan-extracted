@@ -33,7 +33,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PP_INSUFFICIENT_PASSWORD_QUALITY
 );
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 extends qw(
   Lemonldap::NG::Portal::Lib::SMTP
@@ -42,18 +42,6 @@ extends qw(
 );
 
 # PROPERTIES
-
-# Reset URL to set in mail
-has resetUrl => (
-    is      => 'ro',
-    lazy    => 1,
-    default => sub {
-        my $self = $_[0];
-        my $p    = $self->conf->{portal};
-        $p =~ s#/*$##;
-        return $self->conf->{mailUrl} ? $self->conf->{mailUrl} : "$p/resetpwd";
-    }
-);
 
 # Mail timeout token generator
 # Form timout token generator (used even if requireToken is not set)
@@ -190,7 +178,12 @@ sub createMailSession {
     $infos->{_pdata} = $req->pdata;
 
     # create session
-    return $self->p->getApacheSession( undef, kind => "TOKEN", info => $infos );
+    return $self->p->getApacheSession(
+        undef,
+        kind      => "TOKEN",
+        info      => $infos,
+        hashStore => 0,
+    );
 }
 
 sub _reset {
@@ -219,8 +212,11 @@ sub _reset {
         $self->logger->debug("Token given for password reset: $mailToken");
 
         # Check if token is valid
-        my $mailSession =
-          $self->p->getApacheSession( $mailToken, kind => "TOKEN" );
+        my $mailSession = $self->p->getApacheSession(
+            $mailToken,
+            kind      => "TOKEN",
+            hashStore => 0,
+        );
         unless ($mailSession) {
             $self->userLogger->warn('Bad reset token');
             return PE_BADMAILTOKEN;
@@ -333,13 +329,14 @@ sub _reset {
         # Build confirmation url
         my $req_url = $req->data->{_url};
         my $skin    = $self->p->getSkin($req);
-        my $url =
-          $self->resetUrl . '?'
-          . build_urlencoded(
-            mail_token => $req->{id},
-            skin       => $skin,
-            ( $req_url ? ( url => $req_url ) : () ),
-          );
+        my $url     = $self->p->buildUrl(
+            ( $self->conf->{mailUrl} || ( $req->portal, "resetpwd" ) ),
+            {
+                mail_token => $req->{id},
+                skin       => $skin,
+                ( $req_url ? ( url => $req_url ) : () ),
+            }
+        );
 
         # Build mail content
         my $tr      = $self->translate($req);
@@ -441,8 +438,11 @@ sub changePwd {
         $self->logger->debug("Token given for password reset: $mailToken");
 
         # Check if token is valid
-        my $mailSession =
-          $self->p->getApacheSession( $mailToken, kind => "TOKEN" );
+        my $mailSession = $self->p->getApacheSession(
+            $mailToken,
+            kind      => "TOKEN",
+            hashStore => 0,
+        );
         unless ($mailSession) {
             $self->userLogger->warn('Bad reset token');
             return PE_BADMAILTOKEN;

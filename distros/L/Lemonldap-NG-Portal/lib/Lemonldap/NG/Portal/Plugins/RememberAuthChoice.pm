@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.16.1';
+our $VERSION = '2.19.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -76,7 +76,8 @@ sub storeRememberedAuthChoice {
                   . " with authentication choice lmAuth="
                   . $lmAuth );
             $req->addCookie(
-                $self->p->cookie(
+                $self->p->genCookie(
+                    $req,
                     name     => $self->rememberCookieName,
                     value    => $lmAuth,
                     max_age  => $self->rememberCookieTimeout,
@@ -93,7 +94,8 @@ sub storeRememberedAuthChoice {
                   . $self->rememberCookieName );
 
             $req->addCookie(
-                $self->p->cookie(
+                $self->p->genCookie(
+                    $req,
                     name    => $self->rememberCookieName,
                     value   => 0,
                     expires => 'Wed, 21 Oct 2015 00:00:00 GMT',

@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 24;
+use Test::More tests => 20;
 require 't/test.pm';
 BEGIN { use_ok('Lemonldap::NG::Handler::Main::Jail') }
 
@@ -97,18 +97,6 @@ is(
     0,
     "Function works"
 );
-
-$sub  = "sub { return(ipInSubnet(\@_)) }";
-$code = $jail->jail_reval($sub);
-ok(
-    ( defined($code) and ref($code) eq 'CODE' ),
-    'ipInSubnet extended function is defined'
-);
-is( $code->( "127.0.0.1", "127.0.0.0/8" ), 1, "ipInSubnet works as expected" );
-is( $code->( "192.168.0.1", "127.0.0.0/8" ), 0,
-    "ipInSubnet works as expected" );
-is( $code->( "192.168.0.1", "127.0.0.0/8", "192.168.0.0/16" ),
-    1, "ipInSubnet works as expected" );
 
 $sub  = "sub { return()";
 $code = $jail->jail_reval($sub);

@@ -240,7 +240,6 @@ sub try {
     my $stop = 0;
     if ( $nb < @$stack - 1 ) {
 
-        # TODO: change logLevel for userLog()
         ( $res, $name ) = $stack->[$nb]->[$type]->( $subname, $req, @args );
 
         # On error, restart authentication with next scheme

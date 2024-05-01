@@ -74,7 +74,6 @@ expectRedirection( $res,
     'http://auth.idp.com/cas/login?service=http%3A%2F%2Fauth.sp.com%2F' );
 
 # Query IdP
-switch ('issuer');
 ok(
     $res = $issuer->_get(
         '/cas/login',
@@ -118,7 +117,6 @@ my ($query) =
   expectRedirection( $res, qr#^http://auth.sp.com/\?(ticket=[^&]+)$# );
 
 # Back to SP
-switch ('sp');
 ok(
     $res = $sp->_get(
         '/',
@@ -139,15 +137,12 @@ expectOK($res);
 expectAuthenticatedAs( $res, 'french' );
 
 # Test attributes
-ok( $res = $sp->_get("/sessions/global/$spId"), 'Get UTF-8' );
-expectOK($res);
-ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-  or print STDERR $@;
+$res = getSession($spId)->data;
 ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
   or explain( $res, 'cn => Frédéric Accents' );
 ok( $res->{multi} =~ /value1;value2/ )
   or explain( $res->{multi}, 'Multi valued attribute' );
-count(4);
+count(2);
 
 # Logout initiated by SP
 ok(
@@ -172,7 +167,6 @@ my $url = $1;
 $query = $2;
 expectCspChildOK( $res, "auth.idp.com" );
 
-switch ('issuer');
 ok(
     $res = $issuer->_get(
         $url,
@@ -195,7 +189,6 @@ ok( $res = $issuer->_get( '/', cookie => "lemonldap=$idpId" ), 'Query IdP' );
 count(1);
 expectReject($res);
 
-switch ('sp');
 ok(
     $res = $sp->_get(
         '/',
@@ -212,8 +205,7 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel              => $debug,
                 domain                => 'idp.com',
@@ -233,8 +225,7 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'sp.com',

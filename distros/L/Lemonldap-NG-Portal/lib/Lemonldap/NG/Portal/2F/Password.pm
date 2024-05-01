@@ -27,7 +27,7 @@ with 'Lemonldap::NG::Portal::Lib::2fDevices';
 has prefix => ( is => 'ro', default => 'password' );
 has logo   => ( is => 'rw', default => 'password.png' );
 
-has 'key' => (
+has key => (
     is      => 'ro',
     lazy    => 1,
     default => sub {
@@ -36,7 +36,7 @@ has 'key' => (
     }
 );
 
-has 'crypto' => (
+has crypto => (
     is      => 'ro',
     lazy    => 1,
     default => sub {

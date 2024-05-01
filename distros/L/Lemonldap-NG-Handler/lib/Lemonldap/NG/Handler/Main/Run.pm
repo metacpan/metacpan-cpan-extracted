@@ -1,7 +1,7 @@
 # Main running methods file
 package Lemonldap::NG::Handler::Main::Run;
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -288,6 +288,11 @@ sub lmLog {
     return $class->logger->$level($msg);
 }
 
+sub auditLog {
+    my ( $class, $req, %info ) = @_;
+    $class->_auditLogger->log( $req, %info );
+}
+
 ## @rmethod protected boolean checkMaintenanceMode
 # Check if we are in maintenance mode
 # @return true if maintenance mode is enabled
@@ -398,7 +403,7 @@ sub grant {
 sub forbidden {
     my ( $class, $req, $session, $vhost ) = @_;
     my $uri    = $req->{env}->{REQUEST_URI};
-    my $portal = $class->tsv->{portal}->();
+    my $portal = $class->tsv->{portal}->($req);
     $portal = ( $portal =~ m#^https?://([^/]*).*# )[0];
     $portal =~ s/:\d+$//;
     $vhost ||= $class->resolveAlias($req);
@@ -416,9 +421,17 @@ sub forbidden {
     }
 
     # Log forbidding
-    $class->userLogger->notice( "User "
-          . $session->{ $class->tsv->{whatToTrace} }
-          . " was forbidden to access to $vhost$uri" );
+    $class->auditLog(
+        $req,
+        message => (
+                "User "
+              . $session->{ $class->tsv->{whatToTrace} }
+              . " was forbidden to access to $vhost$uri"
+        ),
+        code => "ACCESS_REFUSED",
+        user => $session->{ $class->tsv->{whatToTrace} },
+
+    );
     $class->updateStatus( $req, 'REJECT',
         $session->{ $class->tsv->{whatToTrace} } );
 
@@ -476,7 +489,7 @@ sub goToPortal {
     $class->logger->debug(
         'Redirect ' . $req->address . " to portal (url was $url)" );
     $class->set_header_out( $req,
-            'Location' => $class->tsv->{portal}->()
+            'Location' => $class->tsv->{portal}->($req)
           . "$path?url=$urlc_init"
           . ( $arg ? "&$arg" : "" ) );
     return $class->REDIRECT;
@@ -488,7 +501,7 @@ sub goToError {
     $class->logger->debug(
         "Redirect $req->{env}->{REMOTE_ADDR} to lmError (url was $url)");
     $class->set_header_out( $req,
-            'Location' => $class->tsv->{portal}->()
+            'Location' => $class->tsv->{portal}->($req)
           . "/lmerror/$code"
           . "?url=$urlc_init" );
     return $class->REDIRECT;
@@ -516,8 +529,14 @@ sub fetchId {
     elsif ( $value =~ s/^c:// ) {
         $value = $class->tsv->{cipher}->decrypt($value);
         unless ( $value =~ s/^(.*)? (.*)$/$1/ and $2 eq $vhost ) {
-            $class->userLogger->error(
-                "Bad CDA cookie: available for $2 instead of $vhost");
+            $class->auditLog(
+                $req,
+                message =>
+                  ("Bad CDA cookie: available for $2 instead of $vhost"),
+                code      => "CDA_BAD_HOST",
+                vhost     => $vhost,
+                cda_vhost => $2,
+            );
             return undef;
         }
     }
@@ -550,6 +569,7 @@ sub retrieveSession {
     # 2. Get the session from cache or backend
     my $session = $req->data->{session} = (
         Lemonldap::NG::Common::Session->new( {
+                hashStore            => $class->tsv->{hashedSessionStore},
                 storageModule        => $class->tsv->{sessionStorageModule},
                 storageModuleOptions => $class->tsv->{sessionStorageOptions},
                 cacheModule          => $class->tsv->{sessionCacheModule},
@@ -905,7 +925,7 @@ sub postJavascript {
 
     my $jqueryUrl = $formParams->{jqueryUrl} || "";
     $jqueryUrl =
-      &{ $class->tsv->{portal} } . "static/bwr/jquery/dist/jquery.min.js"
+      $class->tsv->{portal}->($req) . "static/bwr/jquery/dist/jquery.min.js"
       if ( $jqueryUrl eq "default" );
     $jqueryUrl = "<script type='text/javascript' src='$jqueryUrl'></script>\n"
       if ($jqueryUrl);

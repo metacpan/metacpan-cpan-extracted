@@ -127,7 +127,6 @@ SKIP: {
         'SAMLResponse' );
 
     # Post SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($s),
@@ -160,7 +159,6 @@ SKIP: {
         'SAMLRequest' );
 
     # Push SAML logout request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_post(
             $url,
@@ -179,7 +177,6 @@ SKIP: {
     is( $removedCookie, 0, "SSO cookie removed" );
 
     # Post SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($s),
@@ -191,7 +188,6 @@ SKIP: {
     expectRedirection( $res, 'http://auth.sp.com' );
 
     # Test if logout is done
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             '/', cookie => "lemonldap=$idpId",
@@ -200,7 +196,6 @@ SKIP: {
     );
     expectReject($res);
 
-    switch ('sp');
     ok(
         $res = $sp->_get(
             '/',

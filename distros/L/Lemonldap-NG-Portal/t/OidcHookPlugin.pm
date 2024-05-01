@@ -29,6 +29,7 @@ use constant hook => {
     oidcGotRequest                    => 'addScopeToRequest',
     oidcResolveScope                  => 'addHardcodedScope',
     oidcGenerateAccessToken           => 'addClaimToAccessToken',
+    oidcGenerateTokenResponse         => 'addCustomToken',
     oidcGotClientCredentialsGrant     => 'oidcGotClientCredentialsGrant',
     oidcGenerateAuthenticationRequest => 'genAuthRequest',
     oidcGenerateTokenRequest          => 'genTokenRequest',
@@ -78,6 +79,12 @@ sub modifyRedirectUri {
 sub addClaimToAccessToken {
     my ( $self, $req, $payload, $rp ) = @_;
     $payload->{"access_token_hook"} = 1;
+    return PE_OK;
+}
+
+sub addCustomToken {
+    my ( $self, $req, $rp, $response, $codeSession, $userSession ) = @_;
+    $response->{custom_token} = 'CustomToken';
     return PE_OK;
 }
 

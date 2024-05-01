@@ -11,7 +11,7 @@ use Time::Local;
 use DBI;
 use Encode;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.19.0';
 
 extends 'Lemonldap::NG::Common::Notifications';
 
@@ -41,21 +41,6 @@ has dbiUser => (
 );
 
 has dbiPassword => ( is => 'ro', default => '' );
-
-# Database handle object
-has _dbh => (
-    is      => 'rw',
-    lazy    => 1,
-    builder => sub {
-        my $self = shift;
-        my $r    = DBI->connect_cached(
-            $self->{dbiChain}, $self->{dbiUser},
-            $self->{dbiPassword}, { RaiseError => 1 }
-        );
-        $self->logger->error($DBI::errstr) unless ($r);
-        return $r;
-    }
-);
 
 # Current query
 has sth => ( is => 'rw' );
@@ -275,6 +260,7 @@ sub getDone {
 sub _execute {
     my ( $self, $query, @args ) = @_;
     my $dbh = $self->_dbh or die "DB connection unavailable";
+    $self->logger->debug("Notification DBI proccessing query: $query");
     unless ( $self->sth( $dbh->prepare($query) ) ) {
         $self->logger->warn( $dbh->errstr() );
         return 0;
@@ -298,5 +284,27 @@ sub getIdentifier {
     return $date . "#" . $uid . "#" . $ref;
 }
 
-1;
+sub _dbh {
+    my $self = shift;
+    return $self->{_dbh} if ( $self->{_dbh} and $self->{_dbh}->ping );
+    $self->logger->debug("Notification DBI connection lost, getting a new one");
+    $self->{_dbh} = DBI->connect_cached( $self->{dbiChain}, $self->{dbiUser},
+        $self->{dbiPassword}, { RaiseError => 1, AutoCommit => 1, } );
+    if ( $self->{dbiChain} =~ /^dbi:sqlite/i ) {
+        $self->{_dbh}->{sqlite_unicode} = 1;
+    }
+    elsif ( $self->{dbiChain} =~ /^dbi:mysql/i ) {
+        eval {
+            $self->{_dbh}->{mysql_enable_utf8} = 1;
+            $self->{_dbh}->do("set names 'utf8'");
+        };
+    }
 
+    elsif ( $self->{dbiChain} =~ /^dbi:pg/i ) {
+        $self->{_dbh}->{pg_enable_utf8} = 1;
+    }
+
+    return $self->{_dbh};
+}
+
+1;

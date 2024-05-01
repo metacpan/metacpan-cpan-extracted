@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::PlaywrightAssertions;
-$Playwright::PlaywrightAssertions::VERSION = '1.401';
+$Playwright::PlaywrightAssertions::VERSION = '1.431';
 use parent 'Playwright::Base';
 
 sub new {
@@ -42,11 +42,11 @@ sub expectAPIResponse {
     );
 }
 
-sub setDefaultAssertionTimeout {
+sub expectGeneric {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'setDefaultAssertionTimeout',
+        command => 'expectGeneric',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -62,11 +62,11 @@ sub expectPage {
     );
 }
 
-sub expectGeneric {
+sub setDefaultAssertionTimeout {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'expectGeneric',
+        command => 'setDefaultAssertionTimeout',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +116,7 @@ Playwright::PlaywrightAssertions - Automatically generated class for Playwright:
 
 =head1 VERSION
 
-version 1.401
+version 1.431
 
 =head1 CONSTRUCTOR
 
@@ -139,11 +139,11 @@ Execute the PlaywrightAssertions::expectAPIResponse playwright routine.
 
 See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectAPIResponse> for more information.
 
-=head2 setDefaultAssertionTimeout(@args)
+=head2 expectGeneric(@args)
 
-Execute the PlaywrightAssertions::setDefaultAssertionTimeout playwright routine.
+Execute the PlaywrightAssertions::expectGeneric playwright routine.
 
-See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-setDefaultAssertionTimeout> for more information.
+See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectGeneric> for more information.
 
 =head2 expectPage(@args)
 
@@ -151,11 +151,11 @@ Execute the PlaywrightAssertions::expectPage playwright routine.
 
 See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectPage> for more information.
 
-=head2 expectGeneric(@args)
+=head2 setDefaultAssertionTimeout(@args)
 
-Execute the PlaywrightAssertions::expectGeneric playwright routine.
+Execute the PlaywrightAssertions::setDefaultAssertionTimeout playwright routine.
 
-See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectGeneric> for more information.
+See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-setDefaultAssertionTimeout> for more information.
 
 =head2 on(@args)
 

@@ -10,9 +10,9 @@ use Crypt::URandom;
 use Digest::HMAC_SHA1 'hmac_sha1_hex';
 use Lemonldap::NG::Common::Crypto;
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.19.0';
 
-has 'key' => (
+has key => (
     is      => 'ro',
     lazy    => 1,
     default => sub {
@@ -30,7 +30,7 @@ has encryptSecret => (
     }
 );
 
-has 'crypto' => (
+has crypto => (
     is      => 'ro',
     lazy    => 1,
     default => sub {
@@ -89,8 +89,7 @@ sub verifyCode {
     }
     for ( -$range .. $range ) {
         if ( $code eq $self->_code( $s, $_, $interval, $digits ) ) {
-            $self->userLogger->info("Codes match at range $_");
-            return 1;
+            return (wantarray() ? (1, $_) : 1 );
         }
     }
     return 0;

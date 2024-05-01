@@ -1,0 +1,9 @@
+[Unit]
+Description=Purge Lemonldap::NG handler cache every 30 minutes
+
+[Timer]
+OnCalendar=*-*-* *:17,47:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -35,7 +35,6 @@ LWP::Protocol::PSGI->register(
             return [ 500, [], [] ];
         }
         count(1);
-        switch ($host);
         if ( $req->method =~ /^post$/i ) {
             my $s = $req->content;
             ok(
@@ -75,7 +74,6 @@ LWP::Protocol::PSGI->register(
             ) or explain( $res->[1], 'Content-Type => application/json' );
             count(1);
         }
-        switch ( $host eq 'rp' ? 'op' : 'rp' );
         return $res;
     }
 );
@@ -96,7 +94,6 @@ my $metadata = $res->[2]->[0];
 count(2);
 
 $rp = register( 'rp', sub { rp( $jwks, $metadata ) } );
-switch ('rp');
 
 # Query RP for auth
 ok( $res = $rp->_get( '/', accept => 'text/html' ), 'Unauth RP request' );
@@ -105,7 +102,6 @@ my ( $url, $query ) =
   expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
 
 # Push request to OP
-switch ('op');
 ok( $res = $op->_get( $url, query => $query, accept => 'text/html' ),
     "Push request to OP,         endpoint $url" );
 count(1);
@@ -142,7 +138,6 @@ count(1);
 ($query) = expectRedirection( $res, qr#^http://auth.rp.com/?\?(.*)$# );
 
 # Push OP response to RP
-switch ('rp');
 
 ok( $res = $rp->_get( '/', query => $query, accept => 'text/html' ),
     'Call openidconnectcallback on RP' );
@@ -150,10 +145,9 @@ count(1);
 my $spId = expectCookie($res);
 
 # Logout initiated by OP
-switch ('op');
 
 # Reset conf to make sure to make sure lazy loading works during logout (#3014)
-$op->p->HANDLER->checkConf(1);
+withHandler( 'op', sub { $op->p->HANDLER->checkConf(1) } );
 
 ok(
     $res = $op->_get(
@@ -178,7 +172,6 @@ ok(
 count(1);
 expectReject($res);
 
-switch ('rp');
 ok(
     $res = $rp->_get(
         '/',
@@ -278,6 +271,8 @@ sub rp {
                         oidcOPMetaDataOptionsClientID     => "rpid",
                         oidcOPMetaDataOptionsConfigurationURI =>
 "https://auth.op.com/.well-known/openid-configuration",
+                        oidcOPMetaDataOptionsAuthnEndpointAuthMethod => 'jws',
+                        oidcOPMetaDataOptionsAuthnEndpointAuthSigAlg => 'HS256',
                         oidcOPMetaDataOptionsTokenEndpointAuthMethod =>
                           'client_secret_jwt',
                     }

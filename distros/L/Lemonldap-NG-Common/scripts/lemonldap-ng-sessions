@@ -5,6 +5,7 @@ use strict;
 use POSIX;
 
 use Lemonldap::NG::Common::CliSessions;
+use Lemonldap::NG::Common::Session 'id2storage';
 
 use strict;
 use Getopt::Long;
@@ -19,15 +20,16 @@ my $opt_user  = '__APACHEUSER__';
 my $opt_group = '__APACHEGROUP__';
 
 GetOptions(
-    'help|h'       => \$help,
-    'select|s=s@'  => \$opts->{select},
-    'where|w=s'    => \$opts->{where},
-    'all|a'        => \$opts->{all},
-    'backend|b=s'  => \$opts->{backend},
-    'persistent|p' => \$opts->{persistent},
-    'id-only|i'    => \$opts->{idonly},
-    'user|u=s'     => \$opt_user,
-    'group|g=s'    => \$opt_group,
+    'help|h'        => \$help,
+    'select|s=s@'   => \$opts->{select},
+    'where|w=s'     => \$opts->{where},
+    'all|a'         => \$opts->{all},
+    'backend|b=s'   => \$opts->{backend},
+    'persistent|p'  => \$opts->{persistent},
+    'hash|cookie|c' => \$opts->{hash},
+    'id-only|i'     => \$opts->{idonly},
+    'user|u=s'      => \$opt_user,
+    'group|g=s'     => \$opt_group,
 ) or pod2usage( -exitcode => 1, -verbose => 0 );
 
 pod2usage( -exitcode => 0, -verbose => 2 ) if $help;
@@ -112,32 +114,58 @@ lemonldap-ng-sessions - Scripting CLI for LemonLDAP::NG sessions
 
 =head1 SYNOPSIS
 
-lemonldap-ng-sessions [<options>] <command> [<arguments> ...]
+  lemonldap-ng-sessions [<options>] <command> [<arguments> ...]
 
-Commands:
+=head1 DESCRIPTION
 
-	get		get one or several session from known IDs
-	search		search for sessions
-	delete		delete existing sessions
-	setKey		add/change key in existing session
-	delKey		delete key from existing session
-	secondfactors	manage second factors
-	consents	manage OIDC user consents
+B<Commands>:
 
-Options:
+=over
 
-	--help		Show full help
-	--select 	Select which fields to print
-	--backend	Specify session backend
-	--persistent	Search in persistent sessions
-	--where		Set search filter (search/delete only)
-	--id-only	Only return IDs (search only)
-	--user      Change user running the script
-	--group     Change group running the script
+=item B<L</get>>: get one or several session from known IDs
 
-=head1 COMMANDS
+=item B<L</search>>: search for sessions
 
-=head2 Get
+=item B<L</delete>>: delete existing sessions
+
+=item B<L</setKey>>: add/change key in existing session
+
+=item B<L</delKey>>: delete key from existing session
+
+=item B<L</secondfactors>>: manage second factors
+
+=item B<L</consents>>: manage OIDC user consents
+
+=back
+
+B<Options>:
+
+=over
+
+=item B<--help>: Show full help
+
+=item B<--select>: Select which fields to print
+
+=item B<--backend>: Specify session backend
+
+=item B<--persistent>:Search in persistent sessions
+
+=item B<--where>: Set search filter (search/delete only)
+
+=item B<--id-only>: Only return IDs (search only)
+
+=item B<--user>: Change user running the script
+
+=item B<--group>: Change group running the script
+
+=item B<--hash>: When "hashed session storage" is in use, indicates that the
+given session ID is the original value (cookie value)
+
+=back
+
+=head2 COMMANDS
+
+=head3 get
 
     lemonldap-ng-sessions get <id> [<id> ...]
 
@@ -152,7 +180,7 @@ Examples
 
 	lemonldap-ng-sessions get --persistent dwho
 
-=head2 Search
+=head3 search
 
     lemonldap-ng-sessions search [<options>]
 
@@ -179,7 +207,10 @@ Examples
 	lemonldap-ng-sessions search --where uid=dwho \
 		--select authenticationLevel
 
-=head2 Delete
+    lemonldap-ng-sessions search --where '_startTime>20240410063538'
+    lemonldap-ng-sessions search --where '_startTime<20240410063538'
+
+=head3 delete
 
     lemonldap-ng-sessions delete <id> [<id> ...]
     lemonldap-ng-sessions delete --where <filter>
@@ -202,7 +233,7 @@ Examples:
 
 	lemonldap-ng-sessions delete --persistent --where _session_uid=dwho
 
-=head2 Set Key
+=head3 setKey
 
     lemonldap-ng-sessions setKey <id> <key> <value> [<key> <value> ...]
 
@@ -214,7 +245,7 @@ Examples:
 		authenticationLevel 1
 
 
-=head2 Delete Key
+=head3 delKey
 
     lemonldap-ng-sessions delKey <id> <key> [<key> ...]
 
@@ -228,23 +259,34 @@ Examples:
 	lemonldap-ng-sessions delKey --persistent dwho _oidcConsents
 		
 
-=head2 Second Factors
+=head3 secondfactors
 
     lemonldap-ng-sessions secondfactors <command> <user> [<id> ... ]
 
-Commands:
-	
-    get <user>
-        show all second factors for a user
-    delete <user> <id> [<id> ...]
-        delete second factors for a user. The ID must match one of the
-        IDs returned by the "show" command.
-    delType [<user>|--all] <type> [<type> ...]
-        delete all second factors of a given type for a user
-    migrateu2f [<user>|--all]
-        migrate U2F device registrations to WebAuthn device registrations
+B<Commands>:
 
-=head2 Consents
+=over
+
+=item B<get> <user>
+
+show all second factors for a user
+
+=item B<delete> <user> <id> [<id> ...]
+
+delete second factors for a user. The ID must match one of the
+IDs returned by the "show" command.
+
+=item B<delType> [<user>|--all] <type> [<type> ...]
+
+delete all second factors of a given type for a user
+
+=item B<migrateu2f> [<user>|--all]
+
+migrate U2F device registrations to WebAuthn device registrations
+
+=back
+
+=head3 consents
 
     lemonldap-ng-sessions consents <command> <user> [<id> ... ]
 
@@ -255,7 +297,7 @@ Commands:
     delete <user> <id> [<id> ...]
         delete OIDC consents for a user
 
-=head1 OPTIONS
+=head2 OPTIONS
 
 =over
 
@@ -272,12 +314,12 @@ This option lets you filter your session search according to a filter.
 
 For now, only one filter can be set.
 
-Only exact matches are supported
-
 Examples:
 
 	--search uid=dwho
 	--search _sessionType=OIDC
+    --search '_startTime>20240410063538'
+    --search '_startTime<20240410063538'
 
 =item B<--backend>,B<-b>
 
@@ -327,6 +369,13 @@ This option forces the system user that runs the script.
 =item B<--group>,B<-g>
 
 This option forces the system group that runs the script.
+
+=item B<--hash>, B<-c>
+
+When the session storage is protected by
+L<hashed session storage|https://lemonldap-ng.org/documentation/latest/security.html#configure-security-settings>,
+this option indicates that the given session is the original value
+I<(cookie value)>
 
 =back
 

@@ -181,6 +181,10 @@ llapp.controller 'TreeCtrl', [
 		$scope.downloadConf = () ->
 			window.open $scope.confPrefix + $scope.currentCfg.cfgNum + '?full=1'
 
+		# Download OIDC metadata
+		$scope.downloadOidcMetadata = () ->
+			window.open $scope.confPrefix + $scope.currentCfg.cfgNum + '?oidcMetadata=1'
+
 		# Main save function
 		$scope.save = ->
 			$scope.showModal('save.html').then ->

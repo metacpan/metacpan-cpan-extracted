@@ -34,7 +34,6 @@ LWP::Protocol::PSGI->register(
             fail('  Aborting REST request (external)');
             return [ 500, [], [] ];
         }
-        switch ($host);
         if ( $req->method =~ /^post$/i ) {
             my $s = $req->content;
             ok(
@@ -65,13 +64,12 @@ LWP::Protocol::PSGI->register(
               or explain( $res->[1], 'Content-Type => application/json' );
             count(1);
         }
-        switch ( $host eq 'rp' ? 'op' : 'rp' );
         return $res;
     }
 );
 
 # Initialization
-ok( $op = op(), 'OP portal' );
+ok( $op = register( 'op', sub { op() } ), 'OP portal' );
 
 ok( $res = $op->_get('/oauth2/jwks'), 'Get JWKS,     endpoint /oauth2/jwks' );
 expectOK($res);
@@ -85,9 +83,8 @@ expectOK($res);
 my $metadata = $res->[2]->[0];
 count(3);
 
-switch ('rp');
 &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-ok( $rp = rp( $jwks, $metadata ), 'RP portal' );
+ok( $rp = register( 'rp', sub { rp( $jwks, $metadata ) } ), 'RP portal' );
 count(1);
 
 # Query RP for auth
@@ -97,7 +94,6 @@ my ( $url, $query ) =
   expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
 
 # Push request to OP
-switch ('op');
 ok( $res = $op->_get( $url, query => $query, accept => 'text/html' ),
     "Push request to OP,         endpoint $url" );
 count(1);
@@ -134,7 +130,6 @@ count(1);
 ($query) = expectRedirection( $res, qr#^http://auth.rp.com/?\?(.*)$# );
 
 # Push OP response to RP
-switch ('rp');
 
 ok( $res = $rp->_get( '/', query => $query, accept => 'text/html' ),
     'Call openidconnectcallback on RP' );
@@ -142,10 +137,9 @@ count(1);
 my $spId = expectCookie($res);
 
 # Logout initiated by OP
-switch ('op');
 
 # Reset conf to make sure to make sure lazy loading works during logout (#3014)
-$op->p->HANDLER->checkConf(1);
+withHandler( 'op', sub { $op->p->HANDLER->checkConf(1) } );
 
 ok(
     $res = $op->_get(
@@ -169,7 +163,6 @@ ok(
 count(1);
 expectReject($res);
 
-switch ('rp');
 ok(
     $res = $rp->_get(
         '/',
@@ -185,8 +178,7 @@ clean_sessions();
 done_testing( count() );
 
 sub op {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',
@@ -232,7 +224,7 @@ sub op {
                     'loa-2' => 2,
                     'loa-3' => 3
                 },
-                oidcServiceKeyTypeSig       => 'EC',
+                oidcServiceKeyTypeSig    => 'EC',
                 oidcServicePrivateKeySig => &oidc_key_op_private_ec_sig,
                 oidcServicePublicKeySig  => &oidc_key_op_public_ec_sig,
             }
@@ -242,8 +234,7 @@ sub op {
 
 sub rp {
     my ( $jwks, $metadata ) = @_;
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',

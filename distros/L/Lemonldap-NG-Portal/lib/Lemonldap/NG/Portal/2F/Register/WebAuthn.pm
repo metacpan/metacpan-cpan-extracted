@@ -7,7 +7,7 @@ use JSON qw(from_json to_json);
 use MIME::Base64 qw(encode_base64url decode_base64url);
 use Crypt::URandom;
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 extends 'Lemonldap::NG::Portal::2F::Register::Base';
 with 'Lemonldap::NG::Portal::Lib::WebAuthn';
@@ -102,6 +102,7 @@ sub _registrationchallenge {
     my $request          = {
         rp => {
             name => $self->rpName,
+            id   => $self->rp_id($req),
         },
         user => {
             name        => $user,
@@ -125,8 +126,8 @@ sub _registrationchallenge {
         }
     );
 
-
-    $self->logger->debug( "Register parameters " . to_json($request) );
+    $self->logger->debug(
+        "WebAuthn registration parameters " . to_json($request) );
     return $self->p->sendJSONresponse( $req,
         { request => $request, state_id => $token } );
 }

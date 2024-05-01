@@ -9,7 +9,6 @@ BEGIN {
     require 't/test-lib.pm';
 }
 
-my $debug = 'error';
 my ( $issuer, $sp, $res, $spId );
 
 # Redefine LWP methods for tests
@@ -18,7 +17,9 @@ LWP::Protocol::PSGI->register(
         my $req = Plack::Request->new(@_);
         ok(
             $req->uri =~ m#http://auth.idp.com(.*?)(?:\?(.*))?$#,
-            ' @ REST request (' . $req->method . " $1)"
+            ' @ REST request ('
+              . $req->method . " $1"
+              . ( $2 ? "?$2" : '' ) . ")"
         );
         count(1);
         my $url   = $1;
@@ -31,6 +32,7 @@ LWP::Protocol::PSGI->register(
                 $res = $issuer->$mth(
                     $url,
                     IO::String->new($s),
+                    query  => $query,
                     length => length($s),
                     type   => $req->header('Content-Type'),
                 ),
@@ -92,36 +94,33 @@ count(1);
 expectOK($res);
 
 # Test other REST queries
-switch ('issuer');
 
 # Session content
-ok( $res = $issuer->_get("/sessions/global/$spId"), 'Session content' );
-expectOK($res);
-ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-  or print STDERR $@;
-ok( $res->{_session_id} eq $spId, ' Good ID' )
-  or explain( $res, "_session_id => $spId" );
+$res = getSession($spId)->data;
+ok(
+    $res->{_session_id} eq
+      ( $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($spId) : $spId ),
+    ' Good ID'
+) or explain( $res, "_session_id => $spId" );
 ok( $res->{array} =~ /;/, 'Mulivalued attribute found' )
   or explain( $res, "Multivalued attribute" );
-count(4);
+count(2);
 
 # Session key
-ok( $res = $issuer->_get("/sessions/global/$spId/[_session_id,uid,cn]"),
-    'Some session keys' );
-expectOK($res);
-ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-  or print STDERR $@;
-ok( $res->{_session_id} eq $spId, ' Good ID' )
-  or explain( $res, "_session_id => $spId" );
+$res = getSession($spId)->data;
+ok(
+    $res->{_session_id} eq
+      ( $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($spId) : $spId ),
+    ' Good ID'
+) or explain( $res, "_session_id => $spId" );
 ok( $res->{uid} eq 'french', ' Uid is french' )
   or explain( $res, 'uid => french' );
 
 #ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
 #  or explain( $res->{cn}, 'Frédéric Accents' );
-count(4);
+count(2);
 
 # Logout
-switch ('sp');
 ok(
     $res = $sp->_get(
         '/',
@@ -148,10 +147,8 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
-                logLevel          => $debug,
                 domain            => 'idp.com',
                 portal            => 'http://auth.idp.com',
                 authentication    => 'Demo',
@@ -163,10 +160,8 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
-                logLevel       => $debug,
                 domain         => 'sp.com',
                 portal         => 'http://auth.sp.com',
                 authentication => 'Demo',

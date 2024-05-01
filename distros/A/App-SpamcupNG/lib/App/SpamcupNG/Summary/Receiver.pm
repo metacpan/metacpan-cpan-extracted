@@ -7,7 +7,7 @@ use Carp 'confess';
 
 use App::SpamcupNG::Summary;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 =pod
 
@@ -61,7 +61,7 @@ The first parameter cannot be C<undef>, while the second is acceptabled.
 sub new {
     my ( $class, $attribs_ref ) = @_;
     confess 'Expects an array reference as parameter'
-        unless ( ref($attribs_ref) eq 'ARRAY' );
+      unless ( ref($attribs_ref) eq 'ARRAY' );
     confess 'email cannot be undef' unless ( $attribs_ref->[0] );
 
     my $self = {
@@ -115,12 +115,12 @@ L<Class::Accessor>
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2018 of Alceu Rodrigues de Freitas Junior,
-E<lt>arfreitas@cpan.orgE<gt>
+E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 This file is part of App-SpamcupNG distribution.
 

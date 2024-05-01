@@ -7,7 +7,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants ':all';
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.19.0';
 
 extends 'Lemonldap::NG::Common::PSGI::Request';
 
@@ -43,6 +43,10 @@ has mustRedirect => ( is => 'rw' );
 # Boolean to indicate that login form must not be displayed (used to reset
 # authentication)
 has noLoginDisplay => ( is => 'rw' );
+
+# Portal URL, can be dynamic
+
+has portal => ( is => 'rw' );
 
 # Store URL for redirections
 has urldc                  => ( is => 'rw' );
@@ -135,6 +139,7 @@ sub error_type {
                 PE_REGISTERFORMEMPTY,
                 PE_PP_CHANGE_AFTER_RESET,
                 PE_RESETCERTIFICATE_FORMEMPTY,
+                PE_RETRY_2FA,
             )
         )
       );
@@ -149,7 +154,9 @@ sub init {
     my ( $self, $conf ) = @_;
     $self->{$_} = {} foreach (qw(data customParameters sessionInfo pdata));
     $self->{$_} = [] foreach (qw(respCookies));
-    if ( my $tmp = $self->userData->{ $conf->{whatToTrace} } ) {
+    if ( $conf->{whatToTrace}
+        and my $tmp = $self->userData->{ $conf->{whatToTrace} } )
+    {
         $self->user($tmp);
     }
 }

@@ -8,8 +8,7 @@ BEGIN {
 }
 
 my $res;
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel            => 'error',
             authentication      => 'Demo',
@@ -66,8 +65,8 @@ ok( ${ $res->[1] }[5] !~ /secure/, " -> Cookie 'lemonldaphttp' is NOT secure" )
 count(3);
 
 my $nbr = count_sessions();
-ok( $nbr == 2, " -> Doule Cookies for two sessions found" )
-  or explain("Number of session(s) found = $nbr");
+ok( $nbr == 2, " -> Double Cookies for two sessions found" )
+  or explain( $nbr, 2 );
 count(1);
 
 expectRedirection( $res, 'http://auth.example.com/' );

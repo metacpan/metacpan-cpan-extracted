@@ -6,7 +6,7 @@ use Plack::Util;
 use URI;
 use URI::Escape;
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 # Build Plack::Request (inspired from Plack::Handler::Apache2)
 sub new {
@@ -19,13 +19,17 @@ sub new {
     my $env      = {
 
         #%ENV,
-        HTTP_HOST         => $r->hostname,
-        REMOTE_ADDR       => $r->useragent_ip,
-        QUERY_STRING      => $args,
-        REQUEST_URI       => $uri_full,
-        PATH_INFO         => '',
-        SERVER_PORT       => $ENV{SERVER_PORT} || $r->get_server_port,
-        REQUEST_METHOD    => $r->method,
+        HTTP_HOST      => $r->hostname,
+        REMOTE_ADDR    => $r->useragent_ip,
+        QUERY_STRING   => $args,
+        REQUEST_URI    => $uri_full,
+        PATH_INFO      => '',
+        SERVER_PORT    => $ENV{SERVER_PORT} || $r->get_server_port,
+        REQUEST_METHOD => $r->method,
+        UNIQUE_ID      => (
+            $r->subprocess_env('UNIQUE_ID')
+              || join( '', map { [ 0 .. 9, 'a' .. 'f' ]->[ rand 16 ] } 1 .. 16 )
+        ),
         'psgi.version'    => [ 1, 1 ],
         'psgi.url_scheme' => ( $ENV{HTTPS} || 'off' ) =~ /^(?:on|1)$/i
         ? 'https'
@@ -72,5 +76,7 @@ sub wantJSON {
         and $_[0]->env->{HTTP_ACCEPT} =~ m#(?:application|text)/json#i );
     return 0;
 }
+
+sub request_id { return $_[0]->env->{UNIQUE_ID} }
 
 1;

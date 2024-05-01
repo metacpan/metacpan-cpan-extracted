@@ -6,7 +6,7 @@ use IO::String;
 require 't/test-lib.pm';
 
 my $res;
-my $maintests = 7;
+my $maintests = 4;
 
 my $userdb = tempdb();
 
@@ -19,8 +19,7 @@ SKIP: {
     $dbh->do('CREATE TABLE users (user text,password text,cn text)');
     $dbh->do("INSERT INTO users VALUES ('french','french','Frédéric Accents')");
     $dbh->do("INSERT INTO users VALUES ('russian','russian','Русский')");
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                 => 'error',
                 useSafeJail              => 1,
@@ -57,10 +56,7 @@ SKIP: {
     expectOK($res);
     my $id = expectCookie($res);
 
-    ok( $res = $client->_get("/sessions/global/$id"), 'Get UTF-8' );
-    expectOK($res);
-    $res = expectJSON($res);
-    ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
+    ok( getSession($id)->data->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
       or explain( $res, 'cn => Frédéric Accents' );
 
     # 2- Characters UTF-8 only
@@ -74,11 +70,7 @@ SKIP: {
     expectOK($res);
     $id = expectCookie($res);
 
-    ok( $res = $client->_get("/sessions/global/$id"), 'Get UTF-8' );
-    expectOK($res);
-    ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-      or print STDERR $@;
-    ok( $res->{cn} eq 'Русский', 'UTF-8 values' )
+    ok( getSession($id)->data->{cn} eq 'Русский', 'UTF-8 values' )
       or explain( $res, 'cn => Русский' );
 
     clean_sessions();

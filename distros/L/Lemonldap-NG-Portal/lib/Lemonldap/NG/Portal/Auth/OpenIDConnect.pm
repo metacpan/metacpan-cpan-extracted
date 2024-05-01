@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -39,7 +39,6 @@ sub init {
         return 0;
     }
     my @list       = ();
-    my $portalPath = $self->conf->{portal};
 
     foreach (@tab) {
         my $name = $_;
@@ -56,7 +55,7 @@ sub init {
             $img_src =
               ( $icon =~ m#^https?://# )
               ? $icon
-              : $portalPath . $self->p->staticPrefix . "/common/" . $icon;
+              : $self->p->staticPrefix . "/common/" . $icon;
         }
 
         push @list,
@@ -69,12 +68,10 @@ sub init {
           };
     }
 
-    my $portal = $self->conf->{portal};
     my $re     = '^/' . $self->path . '/(?:' . join(
         '|',
         map {
             my $s = $self->conf->{$_};
-            $s =~ s/^$portal\/*//;
             $s =~ s/#PORTAL#\/*//;
             $s
         } ( qw(
@@ -190,9 +187,9 @@ sub extractFormInfo {
             $self->logger->debug("Token response is valid");
         }
 
-        my $access_token = $token_response->{access_token};
-        my $expires_in   = $token_response->{expires_in};
-        my $id_token     = $self->decryptJwt( $token_response->{id_token} );
+        my $access_token  = $token_response->{access_token};
+        my $expires_in    = $token_response->{expires_in};
+        my $id_token      = $self->decryptJwt( $token_response->{id_token} );
         my $refresh_token = $token_response->{refresh_token};
 
         undef $expires_in unless looks_like_number($expires_in);
@@ -433,7 +430,7 @@ sub authLogout {
     my $client_id = $self->opOptions->{$op}->{oidcOPMetaDataOptionsClientID};
 
     if ($endsession_endpoint) {
-        my $logout_url = $self->conf->{portal} . '?logout=1';
+        my $logout_url = $self->p->buildUrl( $req->portal, { logout => 1 } );
         $req->urldc(
             $self->buildLogoutRequest(
                 $endsession_endpoint, $req->{sessionInfo}->{_oidc_id_token},
@@ -502,7 +499,10 @@ sub frontLogout {
             '_oidc_sid', $sid );
         my @sessionToDelete = keys %$oidcSessions;
         foreach (@sessionToDelete) {
-            if ( my $as = $self->p->getApacheSession($_) ) {
+
+            # searchOn() returns sessions indexed by their storage ID, then
+            # it is required to set hashStore to 0
+            if ( my $as = $self->p->getApacheSession( $_, hashStore => 0, ) ) {
                 if ( $self->p->_deleteSession( $req, $as, 1 ) ) {
                     $self->logger->debug(
                         "$logName: session $_ deleted from global storage");
@@ -533,15 +533,16 @@ sub frontLogout {
     if ($badRequest) {
         return $self->p->sendError( $req, 'Bad OIDC Logout Request', 200 );
     }
+    $req->steps( $self->p->beforeLogout );
+    my $res = $self->p->process($req);
     return $self->p->do(
         $req,
         [
-            @{ $self->p->beforeLogout },
             'authLogout',
             'deleteSession',
             sub {
                 $req->response($response);
-                return PE_SENDRESPONSE;
+                return $res ? $res : PE_SENDRESPONSE;
             }
         ]
     );
@@ -647,7 +648,10 @@ sub backLogout {
             );
         }
         foreach (@userSessions) {
-            if ( my $as = $self->p->getApacheSession($_) ) {
+
+            # searchOn() returns sessions indexed by their storage ID, then
+            # it is required to set hashStore to 0
+            if ( my $as = $self->p->getApacheSession( $_, hashStore => 0 ) ) {
                 if ( $self->p->_deleteSession( $req, $as, 1 ) ) {
                     $self->logger->debug(
                         "$logName: session $_ deleted from global storage");

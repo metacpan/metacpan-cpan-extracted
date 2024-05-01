@@ -77,7 +77,7 @@ SKIP: {
     $dbh->do("INSERT INTO users VALUES ('dwho','dwho','Doctor who')");
 
     # Initialization
-    ok( $op = op(), 'OP portal' );
+    ok( $op = register( 'op', sub { op() } ), 'OP portal' );
 
     ok(
         $res = $op->_get('/oauth2/jwks'),
@@ -93,9 +93,8 @@ SKIP: {
     expectOK($res);
     my $metadata = $res->[2]->[0];
 
-    switch ('rp');
     &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-    ok( $rp = rp( $jwks, $metadata ), 'RP portal' );
+    ok( $rp = register( 'rp', sub { rp( $jwks, $metadata ) } ), 'RP portal' );
 
     # Query RP for auth
     ok( $res = $rp->_get( '/', accept => 'text/html' ), 'Unauth SP request' );
@@ -104,7 +103,6 @@ SKIP: {
         qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
 
     # Push request to OP
-    switch ('op');
     ok( $res = $op->_get( $url, query => $query, accept => 'text/html' ),
         "Push request to OP,         endpoint $url" );
     my ( $host, $tmp );
@@ -141,13 +139,11 @@ SKIP: {
     ($query) = expectRedirection( $res, qr#^http://auth.rp.com/?\?(.*)$# );
 
     # Push OP response to RP
-    switch ('rp');
 
     ok( $res = $rp->_get( '/', query => $query, accept => 'text/html' ),
         'Call openidconnectcallback on RP' );
     my $spId = expectCookie($res);
 
-    switch ('op');
     ok(
         $res = $op->_get( '/oauth2/checksession.html', accept => 'text.html' ),
         'Check session,      endpoint /oauth2/checksession.html'
@@ -173,7 +169,6 @@ SKIP: {
     );
 
     # Push logout to OP
-    switch ('op');
 
     ok(
         $res = $op->_get(
@@ -223,7 +218,6 @@ SKIP: {
     );
     expectReject($res);
 
-    switch ('rp');
     ok(
         $res = $rp->_get(
             '/',

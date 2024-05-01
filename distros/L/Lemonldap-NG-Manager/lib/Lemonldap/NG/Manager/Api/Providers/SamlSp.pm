@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Api::Providers::SamlSp;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.19.0';
 
 package Lemonldap::NG::Manager::Api;
 
@@ -384,7 +384,7 @@ sub _pushSamlSp {
         foreach ( keys %{ $push->{options} } ) {
             my $optionName = $self->_translateOptionApiToConf( $_, 'samlSP' );
             my $optionValue =
-              $self->_translateValueApiToConf( $_, $push->{options}->{$_} );
+              $self->_translateValueApiToConf( $optionName, $push->{options}->{$_} );
             $translatedOptions->{$optionName} = $optionValue;
         }
 

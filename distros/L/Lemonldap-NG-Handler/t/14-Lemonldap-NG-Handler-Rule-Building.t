@@ -10,7 +10,7 @@ use strict;
 use warnings;
 require 't/test.pm';
 
-use Test::More tests => 17;
+use Test::More tests => 4;
 BEGIN { use_ok('Lemonldap::NG::Handler::Main') }
 
 # get a standard basic configuration in $args hashref
@@ -35,6 +35,7 @@ my $conf = {
     globalStorage => 'Apache::Session::File',
     post          => {},
     key           => 1,
+    useSafeJail   => 0,
     locationRules => {
         'test1.example.com' => {
 
@@ -54,10 +55,6 @@ my $conf = {
     },
 };
 
-eval { $h->localConfig($conf); $h->logLevelInit() };
-ok( !$@,                     'init' );
-ok( $h->configReload($conf), 'Load conf' );
-
 #########################
 # Make sure that the rule building idiom (substitute/buildRule) yields
 # consistent results in edge cases see #2595
@@ -67,38 +64,132 @@ sub compileRule {
     return $h->buildSub( $h->substitute($rule) );
 }
 
-# Undef expression yields a sub that returns undef
-my $r = compileRule(undef);
-is( ref($r), "CODE", "Returned code ref" );
-is( $r->(),  undef,  "Returned undef" );
+sub runTests {
+    my ($h) = @_;
 
-# empty expression yields a sub that returns undef
-$r = compileRule("");
-is( ref($r), "CODE", "Returned code ref" );
-is( $r->(),  undef,  "Returned undef" );
+    # Undef expression yields a sub that returns undef
+    my $r = compileRule(undef);
+    is( ref($r), "CODE", "Returned code ref" );
+    is( $r->(),  undef,  "Returned undef" );
 
-# empty string yields a sub that returns undef
-$r = compileRule("\"\"");
-is( ref($r), "CODE", "Returned code ref" );
-is( $r->(),  "",     "Returned empty string" );
+    # empty expression yields a sub that returns undef
+    $r = compileRule("");
+    is( ref($r), "CODE", "Returned code ref" );
+    is( $r->(),  undef,  "Returned undef" );
 
-# 0 expression returns a sub that returns 0
-$r = compileRule("0");
-is( ref($r), "CODE", "Returned code ref" );
-is( $r->(),  0,      "Returned 0" );
+    # empty string yields a sub that returns undef
+    $r = compileRule("\"\"");
+    is( ref($r), "CODE", "Returned code ref" );
+    is( $r->(),  "",     "Returned empty string" );
 
-# string expression returns a sub that returns the string
-#
-$r = compileRule("\"abc def\"");
-is( ref($r), "CODE",    "Returned code ref" );
-is( $r->(),  "abc def", "Returned abc def" );
+    # 0 expression returns a sub that returns 0
+    $r = compileRule("0");
+    is( ref($r), "CODE", "Returned code ref" );
+    is( $r->(),  0,      "Returned 0" );
 
-# Access sessionInfo
-$r = compileRule('$foo');
-is( ref($r),                      "CODE", "Returned code ref" );
-is( $r->( {}, { foo => "bar" } ), "bar",  "Returned bar" );
+    # string expression returns a sub that returns the string
+    #
+    $r = compileRule("\"abc def\"");
+    is( ref($r), "CODE",    "Returned code ref" );
+    is( $r->(),  "abc def", "Returned abc def" );
 
-# Access request
-$r = compileRule('$ENV{foo}');
-is( ref($r),                                 "CODE", "Returned code ref" );
-is( $r->( { env => { foo => "bar" } }, {} ), "bar",  "Returned bar" );
+    # Access sessionInfo
+    $r = compileRule('$foo');
+    is( ref($r),                      "CODE", "Returned code ref" );
+    is( $r->( {}, { foo => "bar" } ), "bar",  "Returned bar" );
+
+    # Access request
+    $r = compileRule('$ENV{foo}');
+    is( ref($r),                                 "CODE", "Returned code ref" );
+    is( $r->( { env => { foo => "bar" } }, {} ), "bar",  "Returned bar" );
+
+    # inSubnet
+    $r = compileRule("inSubnet('127.0.0.1/8')");
+    is( ref($r), "CODE", "Returned code ref" );
+
+    is( $r->( { env => { REMOTE_ADDR => "127.0.0.1" } }, {} ),
+        "1", "ipInSubnet works" );
+    is( $r->( { env => { REMOTE_ADDR => "192.168.0.1" } }, {} ),
+        "0", "ipInSubnet works" );
+
+    $r = compileRule("inSubnet('127.0.0.1/8', '192.168.0.0/16')");
+    is( ref($r), "CODE", "Returned code ref" );
+
+    is( $r->( { env => { REMOTE_ADDR => "192.168.0.1" } }, {} ),
+        "1", "ipInSubnet works" );
+
+    # ipInSubnet
+    $r = compileRule("ipInSubnet(\$ENV{X_FORWARDED_FOR},'127.0.0.1/8')");
+    is( ref($r), "CODE", "Returned code ref" );
+
+    is( $r->( { env => { X_FORWARDED_FOR => "127.0.0.1" } }, {} ),
+        "1", "ipInSubnet works" );
+    is( $r->( { env => { X_FORWARDED_FOR => "192.168.0.1" } }, {} ),
+        "0", "ipInSubnet works" );
+
+    $r = compileRule(
+        "ipInSubnet(\$ENV{X_FORWARDED_FOR}, '127.0.0.1/8', '192.168.0.0/16')");
+    is( ref($r), "CODE", "Returned code ref" );
+
+    is( $r->( { env => { X_FORWARDED_FOR => "192.168.0.1" } }, {} ),
+        "1", "ipInSubnet works" );
+
+    # inDomain
+    $r = compileRule("inDomain('example.com') || 0");
+    is( ref($r), "CODE", "Returned code ref" );
+
+    is( $r->( { env => { HTTP_HOST => "AUTH.EXAMPLE.COM" } }, {} ),
+        "1", "inDomain works for AUTH.EXAMPLE.COM" );
+
+    is( $r->( { env => { HTTP_HOST => "auth.example.com" } }, {} ),
+        "1", "inDomain works for auth.example.com" );
+
+    is( $r->( { env => { HTTP_HOST => "example.com" } }, {} ),
+        "1", "inDomain works for example.com" );
+
+    is( $r->( { env => { HTTP_HOST => "cda.com" } }, {} ),
+        "0", "inDomain works for cda.com" );
+
+    is( $r->( { env => { HTTP_HOST => "notexample.com" } }, {} ),
+        "0", "inDomain works for notexample.com" );
+    is( $r->( { env => { HTTP_HOST => "exampleacom" } }, {} ),
+        "0", "inDomain works for exampleacom" );
+}
+
+sub runUnsafeTests {
+    my ($h) = @_;
+    my $r;
+
+    $r = compileRule('basic($user, $_password)');
+    is( ref($r), "CODE", "Returned code ref" );
+    is(
+        $r->( { env => {} }, { user => "aa", _password => "bc" } ),
+        "Basic YWE6YmM=",
+        "Returned correct Basic header"
+    );
+}
+
+eval { $h->localConfig($conf); $h->logLevelInit() };
+ok( !$@, 'init' );
+
+subtest "Safe jail off" => sub {
+    plan tests => 35;
+    ok( $h->configReload($conf), 'Load conf' );
+    is(
+        ref( $h->tsv->{jail}->jail ),
+        "Lemonldap::NG::Handler::Main::Jail",
+        "Safe jail is disabled"
+    );
+
+    runTests($h);
+    runUnsafeTests($h);
+};
+
+subtest "Safe jail on" => sub {
+    plan tests => 33;
+    ok( $h->configReload( { %$conf, useSafeJail => 1 } ), 'Load conf' );
+    is( ref( $h->tsv->{jail}->jail ), "Safe", "Safe jail is enabled" );
+
+    runTests($h);
+};
+

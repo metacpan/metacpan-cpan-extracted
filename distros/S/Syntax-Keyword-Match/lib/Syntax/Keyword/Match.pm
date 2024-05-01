@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Match 0.13;
+package Syntax::Keyword::Match 0.14;
 
 use v5.14;
 use warnings;
@@ -172,6 +172,8 @@ default, but can be enabled for extra performance in critical sections.
    case if(EXPR) { STATEMENTS... }
 
    case(VAL), case if(EXPR) { STATEMENTS... }
+
+I<Since version 0.13.>
 
 A C<case> statement may also be written C<case if> with a boolean predicate
 expression in parentheses. This inserts a direct boolean test into the

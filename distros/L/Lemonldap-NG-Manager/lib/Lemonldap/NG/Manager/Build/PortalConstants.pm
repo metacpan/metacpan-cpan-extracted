@@ -5,13 +5,14 @@
 
 package Lemonldap::NG::Manager::Build::PortalConstants;
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 sub portalConstants {
     return {
 
         # Portal errors
         # Developers warning, do not use PE_INFO, it's reserved to autoRedirect.
+        PE_2FWAIT                            => -6,
         PE_IDPCHOICE                         => -5,
         PE_SENDRESPONSE                      => -4,
         PE_INFO                              => -3,
@@ -117,7 +118,8 @@ sub portalConstants {
         PE_OIDC_AUTH_ERROR                   => 106,
         PE_UNKNOWNPARTNER                    => 107,
         PE_UNAUTHORIZEDURL                   => 108,
-        PE_UNPROTECTEDURL                    => 109
+        PE_UNPROTECTEDURL                    => 109,
+        PE_RETRY_2FA                         => 110,
     };
 }
 

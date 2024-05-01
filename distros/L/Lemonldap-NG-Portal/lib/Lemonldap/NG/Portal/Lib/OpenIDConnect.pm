@@ -8,10 +8,11 @@ package Lemonldap::NG::Portal::Lib::OpenIDConnect;
 use strict;
 use Crypt::OpenSSL::RSA;
 use Crypt::OpenSSL::X509;
-use Crypt::JWT  qw(encode_jwt decode_jwt);
+use Crypt::JWT qw(encode_jwt decode_jwt);
 use Digest::SHA qw/sha1 hmac_sha256_base64 sha256 sha384 sha512 sha256_base64/;
 use JSON;
 use Lemonldap::NG::Common::FormEncode;
+use Lemonldap::NG::Common::OpenIDConnect::Constants;
 use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Common::JWT
   qw(getAccessTokenSessionId getJWTPayload getJWTHeader getJWTSignature getJWTSignedData);
@@ -24,54 +25,10 @@ use Mouse;
 use Crypt::URandom;
 use URI;
 
-use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_REDIRECT PE_ERROR);
+use Lemonldap::NG::Portal::Main::Constants
+  qw(PE_OK PE_REDIRECT PE_ERROR portalConsts);
 
-our $VERSION = '2.18.1';
-
-use constant BACKCHANNEL_EVENTSKEY =>
-  'http://schemas.openid.net/event/backchannel-logout';
-
-# OpenID Connect standard claims
-use constant PROFILE => [
-    qw/name family_name given_name middle_name nickname preferred_username
-      profile picture website gender birthdate zoneinfo locale updated_at/
-];
-use constant EMAIL => [qw/email email_verified/];
-use constant ADDRESS =>
-  [qw/formatted street_address locality region postal_code country/];
-use constant PHONE => [qw/phone_number phone_number_verified/];
-
-use constant DEFAULT_SCOPES => {
-    profile => PROFILE,
-    email   => EMAIL,
-    address => ADDRESS,
-    phone   => PHONE,
-};
-
-use constant COMPLEX_CLAIM => {
-    formatted      => "address",
-    street_address => "address",
-    locality       => "address",
-    region         => "address",
-    postal_code    => "address",
-    country        => "address",
-};
-
-use constant ENC_ALG_SUPPORTED => [ qw(
-      RSA-OAEP ECDH-ES RSA-OAEP-256
-      ECDH-ES+A256KW
-      ECDH-ES+A192KW
-      ECDH-ES+A128KW
-      RSA1_5
-    )
-];
-
-# Unsupported: A128KW A192KW A256KW A128GCMKW A192GCMKW A256GCMKW PBES2-HS256+A128KW PBES2-HS384+A192KW PBES2-HS512+A256KW
-
-use constant ENC_SUPPORTED => [ qw(
-      A256CBC-HS512 A256GCM A192CBC-HS384 A192GCM A128CBC-HS256 A128GCM
-    )
-];
+our $VERSION = '2.19.0';
 
 # PROPERTIES
 
@@ -335,7 +292,7 @@ sub load_rp {
     }
     else {
         $self->logger->error(
-            "Relaying Party $rp has errors and will be ignored");
+            "Relying Party $rp has errors and will be ignored");
     }
     return;
 }
@@ -355,49 +312,59 @@ sub refreshJWKSdata {
     }
 
     foreach ( keys %{ $self->conf->{oidcOPMetaDataJSON} } ) {
-
-        # Refresh JWKS data if
-        # 1/ oidcOPMetaDataOptionsJWKSTimeout > 0
-        # 2/ jwks_uri defined in metadata
-
-        my $jwksTimeout =
-          $self->opOptions->{$_}->{oidcOPMetaDataOptionsJWKSTimeout};
-        my $jwksUri = $self->opMetadata->{$_}->{conf}->{jwks_uri};
-
-        unless ($jwksTimeout) {
-            $self->logger->debug(
-                "No JWKS refresh timeout defined for $_, skipping...");
-            next;
-        }
-
-        unless ($jwksUri) {
-            $self->logger->debug("No JWKS URI defined for $_, skipping...");
-            next;
-        }
-
-        if ( $self->opMetadata->{$_}->{jwks}->{time} + $jwksTimeout > time ) {
-            $self->logger->debug("JWKS data still valid for $_, skipping...");
-            next;
-        }
-
-        $self->logger->debug("Refresh JWKS data for $_ from $jwksUri");
-
-        my $response = $self->ua->get($jwksUri);
-
-        if ( $response->is_error ) {
-            $self->logger->warn(
-                "Unable to get JWKS data for $_ from $jwksUri: "
-                  . $response->message );
-            $self->logger->debug( $response->content );
-            next;
-        }
-
-        my $content = $self->decodeJSON( $response->decoded_content );
-
-        $self->opMetadata->{$_}->{jwks} = $content;
-        $self->opMetadata->{$_}->{jwks}->{time} = time;
-
+        $self->refreshJWKSdataForOp($_);
     }
+    return 1;
+}
+
+sub refreshJWKSdataForOp {
+    my ( $self, $op ) = @_;
+
+    $self->logger->debug("Attempting to refresh JWKS data for $op");
+
+    # Refresh JWKS data if
+    # 1/ oidcOPMetaDataOptionsJWKSTimeout > 0
+    # 2/ jwks_uri defined in metadata
+
+    my $jwksTimeout =
+      $self->opOptions->{$op}->{oidcOPMetaDataOptionsJWKSTimeout};
+    my $jwksUri = $self->opMetadata->{$op}->{conf}->{jwks_uri};
+
+    unless ($jwksTimeout) {
+        $self->logger->debug(
+            "No JWKS refresh timeout defined for $op, skipping...");
+        return;
+    }
+
+    unless ($jwksUri) {
+        $self->logger->debug("No JWKS URI defined for $op, skipping...");
+        return;
+    }
+
+    if ( $self->opMetadata->{$op}->{jwks}->{time}
+        && ( $self->opMetadata->{$op}->{jwks}->{time} + $jwksTimeout > time ) )
+    {
+        $self->logger->debug("JWKS data still valid for $op, skipping...");
+        return;
+    }
+
+    $self->logger->debug("Refresh JWKS data for $op from $jwksUri");
+
+    my $response = $self->ua->get($jwksUri);
+
+    if ( $response->is_error ) {
+        $self->logger->warn(
+            "Unable to get JWKS data for $op from $jwksUri: "
+              . $response->message );
+        $self->logger->debug( $response->content );
+        return;
+    }
+
+    my $content = $self->decodeJSON( $response->decoded_content );
+
+    $self->opMetadata->{$op}->{jwks} = $content;
+    $self->opMetadata->{$op}->{jwks}->{time} = time;
+
     return 1;
 }
 
@@ -408,11 +375,7 @@ sub getCallbackUri {
 
     my $callback_get_param = $self->conf->{oidcRPCallbackGetParam};
 
-    my $callback_uri = $self->conf->{portal};
-    $callback_uri .=
-      ( $self->conf->{portal} =~ /\?/ )
-      ? '&' . $callback_get_param . '=1'
-      : '?' . $callback_get_param . '=1';
+    my $callback_uri = $self->p->buildUrl( $req->portal, { $callback_get_param => 1 } );
 
     $self->logger->debug("OpenIDConnect Callback URI: $callback_uri");
     return $callback_uri;
@@ -424,6 +387,8 @@ sub getCallbackUri {
 # return String Authentication Request URI
 sub buildAuthorizationCodeAuthnRequest {
     my ( $self, $req, $op, $state, $nonce ) = @_;
+    my $authMode =
+      $self->opOptions->{$op}->{oidcOPMetaDataOptionsAuthnEndpointAuthMethod};
 
     my $authorize_uri =
       $self->opMetadata->{$op}->{conf}->{authorization_endpoint};
@@ -445,13 +410,16 @@ sub buildAuthorizationCodeAuthnRequest {
     my $ui_locales = $self->opOptions->{$op}->{oidcOPMetaDataOptionsUiLocales};
     my $acr_values = $self->opOptions->{$op}->{oidcOPMetaDataOptionsAcrValues};
 
-    my $authorize_request_params = {
+    my $authorize_request_oauth2_params = {
         response_type => $response_type,
         client_id     => $client_id,
         scope         => $scope,
         redirect_uri  => $redirect_uri,
-        ( defined $state      ? ( state      => $state )      : () ),
-        ( defined $nonce      ? ( nonce      => $nonce )      : () ),
+        ( defined $state ? ( state => $state ) : () ),
+        ( defined $nonce ? ( nonce => $nonce ) : () ),
+    };
+    my $authorize_request_params = {
+        %$authorize_request_oauth2_params,
         ( defined $display    ? ( display    => $display )    : () ),
         ( defined $prompt     ? ( prompt     => $prompt )     : () ),
         ( $max_age            ? ( max_age    => $max_age )    : () ),
@@ -462,10 +430,41 @@ sub buildAuthorizationCodeAuthnRequest {
     # Call oidcGenerateAuthenticationRequest
     my $h = $self->p->processHook(
         $req, 'oidcGenerateAuthenticationRequest',
-        $op,  $authorize_request_params
+        $op,  $authorize_request_params,
     );
     return if ( $h != PE_OK );
 
+    if ( $authMode and $authMode =~ /^jw(?:s|e)$/ ) {
+
+        # Save hook changes if any
+        $authorize_request_oauth2_params->{$_} = $authorize_request_params->{$_}
+          foreach ( keys %$authorize_request_oauth2_params );
+        my $aud = $authorize_uri;
+        $aud =~ s#^(https://[^/]*).*?$#$1#;
+        my $jwt = $self->createJWTForOP( {
+                iss => $client_id,
+                aud => $aud,
+                jti => $self->generateNonce,
+                exp => time + 30,
+                iat => time,
+                %$authorize_request_params,
+            },
+            $self->opOptions->{op}
+              ->{oidcOPMetaDataOptionsAuthnEndpointAuthSigAlg} || 'RS256',
+            $op
+        );
+        if ($jwt) {
+            $authorize_request_params =
+              { %$authorize_request_oauth2_params, request => $jwt };
+            if ( $authMode eq 'jwe' ) {
+                $self->logger->error('jwe mode not yet implemented');
+            }
+        }
+        else {
+            $self->logger->error(
+                'Unable to generate JWT, continue with unauthenticated query');
+        }
+    }
     my $authn_uri =
         $authorize_uri
       . ( $authorize_uri =~ /\?/ ? '&' : '?' )
@@ -1207,7 +1206,7 @@ sub makeJWT {
     my $client_id = $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientID};
 
     my $access_token_payload = {
-        iss       => $self->iss,                  # Issuer Identifier
+        iss       => $self->get_issuer($req),     # Issuer Identifier
         exp       => $exp,                        # expiration
         aud       => $self->getAudiences($rp),    # Audience
         client_id => $client_id,                  # Client ID
@@ -1316,6 +1315,7 @@ sub updateToken {
             $self->_storeOpts(),
             cacheModule        => $self->conf->{localSessionStorage},
             cacheModuleOptions => $self->conf->{localSessionStorageOptions},
+            hashStore          => $self->conf->{hashedSessionStore},
             id                 => $id,
             info               => $infos,
         }
@@ -1342,6 +1342,7 @@ sub getOpenIDConnectSession {
             $self->_storeOpts(),
             cacheModule        => $self->conf->{localSessionStorage},
             cacheModuleOptions => $self->conf->{localSessionStorageOptions},
+            hashStore          => $self->conf->{hashedSessionStore},
             id                 => $id,
             kind               => $self->sessionKind,
             (
@@ -1484,10 +1485,14 @@ sub decodeJWT {
         return;
     }
 
-   # For now, only OP has JWKS
-   #my $jwks =
-   #  $op ? $self->opMetadata->{$op}->{jwks} : $self->rpMetadata->{$rp}->{jwks};
-    my $jwks = $op ? $self->opMetadata->{$op}->{jwks} : $self->rpSigKey->{$rp};
+    my $jwks;
+    if ($op) {
+        $self->refreshJWKSdataForOp($op);
+        $jwks = $self->opMetadata->{$op}->{jwks};
+    }
+    else {
+        $jwks = $self->rpSigKey->{$rp};
+    }
 
     unless ( $alg =~ /^HS/ ) {
         unless ($jwks) {
@@ -1639,6 +1644,16 @@ sub returnRedirectError {
     my ( $self, $req, $redirect_url, $error, $error_description,
         $error_uri, $state, $fragment )
       = @_;
+
+    my $reason = $error_description ? ": $error_description" : "";
+    $self->auditLog(
+        $req,
+        code    => "ISSUER_OIDC_LOGIN_FAILED",
+        message => ( "OIDC login failed" . $reason ),
+        ( $error_description ? ( reason => $error_description ) : () ),
+        oauth_error  => $error,
+        portal_error => portalConsts->{PE_REDIRECT},
+    );
 
     my $urldc =
         $redirect_url
@@ -1906,18 +1921,20 @@ sub getEndPointAuthenticationCredentials {
 # @return access_token
 sub getEndPointAccessToken {
     my ( $self, $req ) = @_;
-    my $access_token;
+    my ( $access_token, $method );
 
     my $authorization = $req->authorization;
     if ( $authorization and $authorization =~ /^Bearer ([\w\-\.]+)/i ) {
         $self->logger->debug("Bearer access token");
         $access_token = $1;
+        $method       = 'header';
     }
     elsif ( $access_token = $req->param('access_token') ) {
         $self->logger->debug("GET/POST access token");
+        $method = 'param';
     }
 
-    return $access_token;
+    return wantarray ? ( $access_token, $method ) : $access_token;
 }
 
 # DEPRECATED, remove in 3.0, use getAttributeListFromScopeValue instead
@@ -2265,8 +2282,8 @@ sub _createJWT {
     # Encode payload here due to #2748
     my $jwt = eval {
         encode_jwt(
-            payload       => to_json($payload),
-            alg           => $alg,
+            payload => to_json($payload),
+            alg     => $alg,
             @keyArg,
         );
     };

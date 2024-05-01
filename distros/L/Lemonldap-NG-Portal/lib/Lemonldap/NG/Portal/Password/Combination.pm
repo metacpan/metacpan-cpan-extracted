@@ -13,7 +13,7 @@ with 'Lemonldap::NG::Portal::Lib::OverConf';
 
 our $VERSION = '2.0.16';
 
-has 'mods' => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
+has mods => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
 
 sub init {
     my $self = shift;

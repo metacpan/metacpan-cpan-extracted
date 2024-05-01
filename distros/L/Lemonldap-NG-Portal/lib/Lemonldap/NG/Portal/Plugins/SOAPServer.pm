@@ -19,7 +19,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   URIRE
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.19.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -93,7 +93,7 @@ has wsdl => (
         close DATA;
         $resp =~ s/\$cookieList/$cookieList/g;
         $resp =~ s/\$attrList/$attrList/g;
-        $resp =~ s/\$portal/$self->conf->{portal}/ge;
+        $resp =~ s/\$portal/$self->p->buildUrl/ge;
         return [
             200,
             [
@@ -286,7 +286,8 @@ sub getAttributes {
     my ( $self, $req, $id ) = @_;
     die 'id is required' unless ($id);
 
-    my $session = $self->p->getApacheSession( $id, kind => '' );
+    my $session =
+      $self->p->getApacheSession( $id, kind => '', hashStore => 0, );
 
     my @tmp = ();
     unless ($session) {
@@ -337,7 +338,8 @@ sub setAttributes {
     my $infos = {};
     %$infos = %$args;
 
-    my $session = $self->p->getApacheSession( $id, info => $infos );
+    my $session =
+      $self->p->getApacheSession( $id, info => $infos, hashStore => 0 );
 
     unless ($session) {
         $self->logger->warn("Session $id does not exists ($@)");

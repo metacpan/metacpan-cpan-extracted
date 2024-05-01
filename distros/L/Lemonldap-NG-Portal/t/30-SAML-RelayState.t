@@ -38,38 +38,70 @@ SKIP: {
     # Initialization
     my $issuer = register( 'issuer', \&issuer );
 
-    # Login at issuer
-    ok(
-        $res = $issuer->_post(
-            '/',
-            IO::String->new('user=dwho&password=dwho'),
-            accept => 'text/html',
-            length => 23
-        ),
-        'Auth query'
-    );
-    my $id = expectCookie($res);
+    subtest "RelayState handing with Redirect binding" => sub {
+        runTest( $issuer, "HTTP-Redirect" );
+    };
+    subtest "RelayState handing with POST binding" => sub {
+        runTest( $issuer, "HTTP-POST" );
+    };
 
-    my $login = eval { getAuthnRequest("HTTP-Redirect"); };
+    sub runTest {
+        my ( $issuer, $method ) = @_;
 
-    my $url = URI->new( $login->msg_url );
-    ok(
-        $res = $issuer->_get(
-            $url->path,
-            query  => $url->query,
-            cookie => "lemonldap=$id",
-            accept => 'text/html',
-        ),
-        ' Follow redirection'
-    );
-    my ($relayState) =
-      $res->[2]->[0] =~ m#<input.+?name="RelayState"[^>]+(?:value="([^"]*?)")#s;
+        # Login at issuer
+        ok(
+            $res = $issuer->_post(
+                '/',
+                IO::String->new('user=dwho&password=dwho'),
+                accept => 'text/html',
+                length => 23
+            ),
+            'Auth query'
+        );
+        my $id = expectCookie($res);
 
-    is(
-        $relayState,
-        '{&quot;url&quot;: &quot;http://test/%22&quot;}',
-        "Correct html encoding of special characters in RelayState"
-    );
+        my $login = eval { getAuthnRequest($method); };
+
+        if ( $method eq "HTTP-POST" ) {
+            my $url  = URI->new( $login->msg_url );
+            my $url2 = URI->new;
+            $url2->query_form( {
+                    SAMLRequest => $login->msg_body,
+                    RelayState  => $login->msg_relayState
+                }
+            );
+            ok(
+                $res = $issuer->_post(
+                    $url->path,
+                    $url2->query,
+                    cookie => "lemonldap=$id",
+                    accept => 'text/html',
+                ),
+                ' Follow redirection'
+            );
+        }
+        else {
+            my $url = URI->new( $login->msg_url );
+            ok(
+                $res = $issuer->_get(
+                    $url->path,
+                    query  => $url->query,
+                    cookie => "lemonldap=$id",
+                    accept => 'text/html',
+                ),
+                ' Follow redirection'
+            );
+        }
+        my ($relayState) =
+          $res->[2]->[0] =~
+          m#<input.+?name="RelayState"[^>]+(?:value="([^"]*?)")#s;
+
+        is(
+            $relayState,
+            '{&quot;url&quot;: &quot;http://test/%22&quot;}',
+            "Correct html encoding of special characters in RelayState"
+        );
+    }
 
     sub getAuthnRequest {
         my ($method) = @_;
@@ -84,7 +116,8 @@ SKIP: {
 
         my $login = Lasso::Login->new($server);
         $method = $saml->getHttpMethod($method);
-        $login->init_authn_request("http://auth.idp.com/saml/metadata");
+        $login->init_authn_request( "http://auth.idp.com/saml/metadata",
+            $method );
         $login->msg_relayState('{"url": "http://test/%22"}');
         $login->build_authn_request_msg();
         return $login;
@@ -95,8 +128,7 @@ clean_sessions();
 done_testing();
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',

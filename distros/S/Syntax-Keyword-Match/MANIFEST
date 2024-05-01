@@ -6,6 +6,7 @@ hax/perl-backcompat.c.inc
 include/dispatchop.h
 lib/Syntax/Keyword/Match.pm
 lib/Syntax/Keyword/Match.xs
+lib/Syntax/Keyword/Match/Deparse.pm
 LICENSE
 MANIFEST			This list of files
 META.json
@@ -24,6 +25,7 @@ t/10context.t
 t/11ordering.t
 t/20experimental-dispatch.t
 t/21experimental-dispatch-isa.t
+t/70deparse.t
 t/80await+matchcase.t
 t/80match-divides.t
 t/80match-eqr.t

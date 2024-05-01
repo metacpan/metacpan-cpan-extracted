@@ -163,6 +163,8 @@ KEYWORDS
     
        case(VAL), case if(EXPR) { STATEMENTS... }
 
+    Since version 0.13.
+
     A case statement may also be written case if with a boolean predicate
     expression in parentheses. This inserts a direct boolean test into the
     comparison logic, allowing for other logical tests that aren't easily

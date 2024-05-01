@@ -5,7 +5,7 @@ use Mouse;
 use Lemonldap::NG::Manager::Conf::Parser;
 use Lemonldap::NG::Common::Conf::Constants;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.19.0';
 
 *defaultValue = \&Lemonldap::NG::Manager::Conf::Parser::defaultValue;
 
@@ -90,7 +90,7 @@ sub diff {
     }
     while ( my $key = shift @{ $keys[1] } ) {
         next unless ( defined( $conf[1]->{$key} ) );
-        next if ( $key =~ $hashParameters and not( %{ $conf[1]->{$key} } ) );
+        next if ( $key =~ $hashParameters and ref( $conf[1]->{$key} ) eq 'HASH' and not( %{ $conf[1]->{$key} } ) );
         if ( (
                 not ref( $conf[1]->{$key} ) and not( (
                         defined defaultValue( $self, $key )

@@ -68,7 +68,6 @@ use_ok('Lemonldap::NG::Common::PSGI::Cli::Lib');
 count(2);
 
 my ( $cli, $app );
-switch ('app');
 $app = register( 'app',
     sub { Lemonldap::NG::Handler::Server->run( $client->ini ) } );
 

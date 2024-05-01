@@ -20,9 +20,10 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADOTP
   PE_FORMEMPTY
   PE_SENDRESPONSE
+  portalConsts
 );
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.19.0';
 
 has resend_interval => (
     is      => 'rw',
@@ -102,10 +103,20 @@ sub challenge {
 sub _resend {
     my ( $self, $req ) = @_;
 
+    $self->logger->debug("Request to re-send code");
+
     # Check token
     my $token;
     unless ( $token = $req->param('token') ) {
-        $self->userLogger->error( $self->prefix . '2f access without token' );
+        $self->auditLog(
+            $req,
+            message      => ( $self->prefix . '2f access without token' ),
+            code         => "2FA_RESEND_FAILED",
+            reason       => "Missing token",
+            portal_error => portalConsts->{PE_NOTOKEN},
+            type         => $self->prefix,
+        );
+
         eval { $self->setSecurity($req) };
         $req->mustRedirect(1);
         return $self->p->do( $req, [ sub { PE_NOTOKEN } ] );
@@ -115,8 +126,15 @@ sub _resend {
 
     # Do not invalidate the token while getting it
     unless ( $session = $self->ott->getToken( $token, 1 ) ) {
-        $self->userLogger->info(
-            'Invalid token during ' . $self->prefix . '2f resend' );
+        $self->auditLog(
+            $req,
+            message =>
+              ( 'Invalid token during ' . $self->prefix . '2f resend' ),
+            code         => "2FA_RESEND_FAILED",
+            reason       => "Token expired",
+            portal_error => portalConsts->{PE_TOKENEXPIRED},
+            type         => $self->prefix,
+        );
         $self->setSecurity($req);
         return $self->p->do( $req, [ sub { PE_TOKENEXPIRED } ] );
     }
@@ -128,17 +146,24 @@ sub _resend {
     # Timer
     my $lastretry =
       $session->{__lastRetry} || $session->{tokenSessionStartTimestamp} || time;
+
+    $self->p->_sfEngine->restore2faSessionInfo( $req, $session );
+
     if ( $self->resend_interval
         and ( $lastretry + $self->resend_interval < time ) )
     {
 
+        $self->logger->debug("Re-sending code");
+        $self->populateDestAttribute( $req, $req->sessionInfo );
+
         # Resend code and update last retry
-        unless ( $self->sendCode( $req, $session, $code ) ) {
+        unless ( $self->sendCode( $req, $req->sessionInfo, $code ) ) {
             return $self->p->do( $req, [ sub { PE_ERROR } ] );
         }
         $self->ott->updateToken( $token, __lastRetry => time );
     }
     else {
+        $self->logger->debug("Resend request arrived too soon");
         $legend = "resendTooSoon";
     }
 
@@ -149,7 +174,14 @@ sub verify {
     my ( $self, $req, $session ) = @_;
     my $usercode;
     unless ( $usercode = $req->param('code') ) {
-        $self->userLogger->error( $self->prefix . '2f: no code found' );
+        $self->auditLog(
+            $req,
+            message      => ( $self->prefix . '2f: no code found' ),
+            code         => "2FA_VERIFICATION_FAILED",
+            reason       => "Code not provided",
+            portal_error => portalConsts->{PE_FORMEMPTY},
+            user         => $session->{ $self->conf->{whatToTrace} },
+        );
         return PE_FORMEMPTY;
     }
 
@@ -161,8 +193,16 @@ sub verify {
     if ( $res == PE_OK && $req->data->{__2fDevice_registrable} ) {
         my $uid    = $session->{ $self->conf->{whatToTrace} };
         my $device = $req->data->{__2fDevice_registrable};
-        $self->userLogger->info(
-            "User $uid authenticated with 2F device: " . display2F($device) );
+        $self->auditLog(
+            $req,
+            message => (
+                "User $uid authenticated with 2F device: " . display2F($device)
+            ),
+            code   => "2FA_SUCCESS",
+            user   => $uid,
+            type   => $self->prefix,
+            device => display2F($device)
+        );
     }
     return $res;
 }
@@ -194,8 +234,16 @@ sub verify_internal {
         return PE_OK;
     }
     else {
-        $self->userLogger->warn( 'Second factor failed for '
-              . $session->{ $self->conf->{whatToTrace} } );
+        $self->auditLog(
+            $req,
+            message => (
+                'Second factor failed for '
+                  . $session->{ $self->conf->{whatToTrace} }
+            ),
+            code => "2FA_FAILED",
+            user => $session->{ $self->conf->{whatToTrace} },
+            type => $self->prefix,
+        );
         return PE_BADOTP;
     }
 }

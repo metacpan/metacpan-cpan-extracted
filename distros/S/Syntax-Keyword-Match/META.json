@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -41,7 +41,11 @@
    "provides" : {
       "Syntax::Keyword::Match" : {
          "file" : "lib/Syntax/Keyword/Match.pm",
-         "version" : "0.13"
+         "version" : "0.14"
+      },
+      "Syntax::Keyword::Match::Deparse" : {
+         "file" : "lib/Syntax/Keyword/Match/Deparse.pm",
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -51,6 +55,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.13",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

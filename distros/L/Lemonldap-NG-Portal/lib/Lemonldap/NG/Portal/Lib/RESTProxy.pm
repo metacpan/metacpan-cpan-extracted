@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 );
 use Lemonldap::NG::Common::FormEncode;
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.19.0';
 
 has ua             => ( is => 'rw' );
 has cookieName     => ( is => 'rw' );
@@ -97,7 +97,7 @@ sub getUser {
     }
 
     $req->sessionInfo->{_proxyCookies} = join '; ',
-      map { s/;.*$//; $_ } $resp->header('Set-Cookie');
+      map { s/;.*$//r } $resp->header('Set-Cookie');
     $self->logger->debug( 'Store remote cookies in session ('
           . $req->sessionInfo->{_proxyCookies}
           . ')' );

@@ -1,9 +1,11 @@
 package App::SpamcupNG::Error::Mailhost;
 use strict;
 use warnings;
+use Carp qw(confess);
+
 use parent 'App::SpamcupNG::Error';
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 =head1 NAME
 
@@ -27,8 +29,8 @@ index is a string of the message.
 
 sub new {
     my ( $class, $message_ref ) = @_;
-    die 'message must be an array reference with size = 3'
-        unless ( ( ref($message_ref) eq 'ARRAY' )
+    confess 'message must be an array reference with size = 3'
+      unless ( ( ref($message_ref) eq 'ARRAY' )
         and ( scalar( @{$message_ref} ) == 3 ) );
 
     return $class->SUPER::new($message_ref);
@@ -50,12 +52,12 @@ sub message {
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2018 of Alceu Rodrigues de Freitas Junior,
-E<lt>arfreitas@cpan.orgE<gt>
+E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 This file is part of App-SpamcupNG distribution.
 

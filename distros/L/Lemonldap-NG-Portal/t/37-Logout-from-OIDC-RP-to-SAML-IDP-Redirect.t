@@ -120,7 +120,6 @@ SKIP: {
         qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
 
     # Push request to OP
-    switch ('op');
     ok( $res = $op->_get( $url, query => $query, accept => 'text/html' ),
         "Push request to OP,         endpoint $url" );
 
@@ -131,7 +130,6 @@ SKIP: {
         qr#http://auth.idp.com(/saml/singleSignOn)\?(.*)$# );
 
     # Push request to IDP
-    switch ('idp');
 
     # Try to authenticate to IdP
     ok(
@@ -169,7 +167,6 @@ SKIP: {
     my ($resp) = $query =~ qr/SAMLResponse=([^&]*)/;
 
     # Post SAML response to SP
-    switch ('op');
     ok(
         $res = $op->_post(
             $url, IO::String->new($query),
@@ -203,7 +200,6 @@ SKIP: {
     ($query) = expectRedirection( $res, qr#^http://auth.rp.com/?\?(.*)$# );
 
     # Push OP response to RP
-    switch ('rp');
 
     ok( $res = $rp->_get( '/', query => $query, accept => 'text/html' ),
         'Call openidconnectcallback on RP' );
@@ -232,7 +228,6 @@ SKIP: {
     ( $url, $query ) =
       expectRedirection( $res, qr#^http://auth.op.com(/.*)\?(.*)$# );
 
-    switch ('op');
 
     ok(
         $res = $op->_get(
@@ -266,7 +261,6 @@ SKIP: {
     ( $url, $query ) =
       expectRedirection( $res, qr#^http://auth.idp.com(/.*)\?(.*)$# );
 
-    switch ('idp');
 
     ok(
         $res = $idp->_get(
@@ -285,7 +279,6 @@ SKIP: {
     ( $url, $query ) =
       expectRedirection( $res, qr#^http://auth.op.com(/.*)\?(.*)$# );
 
-    switch ('op');
 
     ok(
         $res = $op->_get(

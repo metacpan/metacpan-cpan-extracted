@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
 );
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.19.0';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -94,8 +94,15 @@ sub createNotification {
 
     if ( $notifEngine->module->notifObject->newNotification($content) ) {
         $self->logger->debug("Notification $ref successfully created");
-        $self->userLogger->notice(
-            "Notification $ref / $date successfully created for $uid");
+        $self->auditLog(
+            $req,
+            message =>
+              ("Notification $ref / $date successfully created for $uid"),
+            code => "NOTIFICATION_CREATED",
+            ref  => $ref,
+            date => $date,
+            user => $uid,
+        );
         return PE_OK;
     }
     else {

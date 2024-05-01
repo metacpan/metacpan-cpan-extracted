@@ -17,7 +17,7 @@ use File::Spec;
 use Readonly;
 use Data::Walk;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 our $override;
 my $JSON_OBJ = Cpanel::JSON::XS->new()->utf8->pretty();

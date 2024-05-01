@@ -558,16 +558,19 @@ static OP *ckcall_wrapper_func_listassoc_scalars(pTHX_ OP *op, GV *namegv, SV *c
   int argcount = 0;
   OP *nextkid;
   while(kid && (nextkid = OpSIBLING(kid))) {
-    if(!op_yields_oneval(kid)) {
-      op = ck_entersub_args_proto_or_list(op, namegv, &PL_sv_undef);
-      return op;
-    }
+    if(!op_yields_oneval(kid))
+      goto no_wrapper;
 
     argcount++;
     lastarg = kid;
     kid = nextkid;
   }
   /* kid now points at final op which is the gvop of the OP_ENTERSUB */
+
+  if(!argcount) {
+    op_free(op);
+    return newLISTOP_CUSTOM(hd->hooks->ppaddr, 0, NULL, NULL);
+  }
 
   /* Splice out the args list and throw away the old optree */
   OpMORESIB_set(pushmark, kid);
@@ -583,6 +586,10 @@ static OP *ckcall_wrapper_func_listassoc_scalars(pTHX_ OP *op, GV *namegv, SV *c
   cLISTOPx(op)->op_last  = lastarg;
   OpLASTSIB_set(lastarg, op);
 
+  return op;
+
+no_wrapper:
+  op = ck_entersub_args_proto_or_list(op, namegv, &PL_sv_undef);
   return op;
 }
 
@@ -609,16 +616,19 @@ static OP *ckcall_wrapper_func_listassoc_lists(pTHX_ OP *op, GV *namegv, SV *cko
   int argcount = 0;
   OP *nextkid;
   while(kid && (nextkid = OpSIBLING(kid))) {
-    if(!op_yields_oneval(kid)) {
-      op = ck_entersub_args_proto_or_list(op, namegv, &PL_sv_undef);
-      return op;
-    }
+    if(!op_yields_oneval(kid))
+      goto no_wrapper;
 
     argcount++;
     lastarg = kid;
     kid = nextkid;
   }
   /* kid now points at final op which is the gvop of the OP_ENTERSUB */
+
+  if(!argcount) {
+    op_free(op);
+    return newLISTOP_CUSTOM(hd->hooks->ppaddr, 0, NULL, NULL);
+  }
 
   /* Splice out the args list and throw away the old optree */
   OpMORESIB_set(pushmark, kid);
@@ -656,6 +666,10 @@ static OP *ckcall_wrapper_func_listassoc_lists(pTHX_ OP *op, GV *namegv, SV *cko
   cLISTOPx(op)->op_last  = lastarg;
   OpLASTSIB_set(lastarg, op);
 
+  return op;
+
+no_wrapper:
+  op = ck_entersub_args_proto_or_list(op, namegv, &PL_sv_undef);
   return op;
 }
 

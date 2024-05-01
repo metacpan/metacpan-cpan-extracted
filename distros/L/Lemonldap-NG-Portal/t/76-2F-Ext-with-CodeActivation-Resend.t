@@ -25,6 +25,7 @@ sub getCodeFromFile {
     return do {
         local $/;
         my $filename = $ENV{llngtmpfile};
+        return undef unless -f $filename;
         open my $fh, '<', $filename;
         <$fh>;
     };
@@ -120,8 +121,7 @@ sub init_login {
     return $res;
 }
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel            => 'error',
             ext2fActivation     => 1,
@@ -133,6 +133,17 @@ my $client = LLNG::Manager::Test->new(
         }
     }
 );
+
+# Hook on sendHtml to make sure ext2fcheck can use $req->sessionInfo (#3136)
+my $sessionInfoCheck = 0;
+push @{ $client->p->hook->{sendHtml} }, sub {
+    my ( $req, $tpl ) = @_;
+    if ( $$tpl eq "ext2fcheck" ) {
+        is( $req->sessionInfo->{uid},
+            "dwho", "Make sure sessionInfo is populated" );
+        $sessionInfoCheck = 1;
+    }
+};
 
 # Try to authenticate
 # -------------------
@@ -165,6 +176,9 @@ subtest 'Login after several resend' => sub {
     $client->logout($id);
 };
 
+# If the session info check was not run during the test, then something
+# probably is wrong with the hook system
+is( $sessionInfoCheck, 1, "SessionInfo check was called during the test" );
 clean_sessions();
 
 done_testing();

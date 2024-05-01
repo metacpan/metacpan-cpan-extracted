@@ -401,7 +401,7 @@ sub restore {
         $conf = join '', <STDIN>;
     }
     else {
-        die "Unable to read $file" unless ( -r $file );
+        die "Unable to read $file: $!" unless ( -r $file );
         open( my $f, '<', $file ) or die $!;
         $conf = join '', <$f>;
         close $f;

@@ -4,7 +4,7 @@ use strict;
 use URI;
 use URI::QueryParam;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.19.0';
 
 sub run {
     my ( $class, $req, $rule, $protection ) = @_;
@@ -69,6 +69,7 @@ sub getCDAInfos {
 
     # Get the session
     my $cdaSession = Lemonldap::NG::Common::Session->new( {
+            hashStore            => $class->tsv->{hashedSessionStore},
             storageModule        => $class->tsv->{sessionStorageModule},
             storageModuleOptions => $class->tsv->{sessionStorageOptions},
             cacheModule          => $class->tsv->{sessionCacheModule},

@@ -110,7 +110,7 @@ SKIP: {
         expected_nameid => 'french'
     );
 
-    # Using email explicitely return the email
+    # Using email explicitly return the email
     runTest(
         requested_format =>
           "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",

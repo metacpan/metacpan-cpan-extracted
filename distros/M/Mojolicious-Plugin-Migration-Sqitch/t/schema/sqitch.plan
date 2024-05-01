@@ -1,0 +1,4 @@
+%syntax-version=1.0.0
+%project=myapp
+
+test_migration 2024-04-29T17:00:32Z ,,, <dzil@e83219f931fe> # a test migration

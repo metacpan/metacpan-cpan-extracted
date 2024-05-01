@@ -95,7 +95,6 @@ m%<img src="http://auth.sp.com/static/common/icons/sfa_manager.png" class="mr-2"
         'SAMLRequest' );
 
     # Push SAML request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_post(
             $url,
@@ -126,7 +125,6 @@ m%<img src="http://auth.sp.com/static/common/icons/sfa_manager.png" class="mr-2"
         'SAMLResponse' );
 
     # Post SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($query),
@@ -160,7 +158,6 @@ m%<img src="http://auth.sp.com/static/common/icons/sfa_manager.png" class="mr-2"
         'SAMLRequest' );
 
     # Push SAML logout request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_post(
             $url,
@@ -179,7 +176,6 @@ m%<img src="http://auth.sp.com/static/common/icons/sfa_manager.png" class="mr-2"
     is( $removedCookie, 0, "SSO cookie removed" );
 
     # Post SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($query),
@@ -191,7 +187,6 @@ m%<img src="http://auth.sp.com/static/common/icons/sfa_manager.png" class="mr-2"
     expectRedirection( $res, 'http://auth.sp.com' );
 
     # Test if logout is done
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             '/', cookie => "lemonldap=$idpId",
@@ -200,7 +195,6 @@ m%<img src="http://auth.sp.com/static/common/icons/sfa_manager.png" class="mr-2"
     );
     expectReject($res);
 
-    switch ('sp');
     ok(
         $res = $sp->_get(
             '/', cookie => "lemonldap=$spId"

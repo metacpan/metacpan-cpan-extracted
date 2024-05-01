@@ -5,7 +5,7 @@ use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Common::Util qw(isHiddenAttr);
 use JSON qw(from_json);
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.19.0';
 our $_ua;
 
 sub ua {
@@ -101,8 +101,14 @@ q"I refuse to compile 'rules.json' when useSafeJail isn't activated! Yes I know,
         $header =~ s/^\$//;
         if ( isHiddenAttr( $class->localConfig, $header ) ) {
             delete $json->{headers}->{$_};
-            $class->userLogger->warn(
+            $class->auditLog(
+                $req,
+                message => (
 "DevOps handler: $vhost tried to retrieve a hidden attribute -> $header"
+                ),
+                code      => "HANDLER_DEVOPS_HIDDEN_ATTRIBUTE_REQUESTED",
+                vhost     => $vhost,
+                attribute => $header,
             );
         }
     }

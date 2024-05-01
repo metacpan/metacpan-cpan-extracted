@@ -7,6 +7,7 @@ use URI::QueryParam;
 use HTML::Entities qw(encode_entities);
 use Lemonldap::NG::Portal::Lib::SAML;
 use Lemonldap::NG::Portal::Main::Constants qw(
+  portalConsts
   PE_OK
   PE_REDIRECT
   PE_SESSIONEXPIRED
@@ -22,7 +23,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_UNAUTHORIZEDPARTNER
 );
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::SAML';
@@ -292,16 +293,16 @@ sub run {
 
             if ($session) {
                 unless ( $self->setSessionFromDump( $login, $session ) ) {
-                    $self->logger->error("Unable to load Lasso Session");
-                    return PE_SAML_SSO_ERROR;
+                    return $self->_failAuthnRequest( $req,
+                        msg => "Unable to load Lasso Session" );
                 }
                 $self->logger->debug("Lasso Session loaded");
             }
 
             if ($identity) {
                 unless ( $self->setIdentityFromDump( $login, $identity ) ) {
-                    $self->logger->error("Unable to load Lasso Identity");
-                    return PE_SAML_SSO_ERROR;
+                    return $self->_failAuthnRequest( $req,
+                        msg => "Unable to load Lasso Identity" );
                 }
                 $self->logger->debug("Lasso Identity loaded");
             }
@@ -313,10 +314,14 @@ sub run {
 
                 # Need sp or spConfKey parameter
                 unless ( $idp_initiated_sp or $idp_initiated_spConfKey ) {
-                    $self->userLogger->warn(
-"sp or spConfKey parameter needed to make IDP initiated SSO"
+                    return $self->_failAuthnRequest(
+                        $req,
+                        msg => (
+                                "sp or spConfKey parameter needed"
+                              . " to make IDP initiated SSO"
+                        ),
+                        userLogger => 1,
                     );
-                    return PE_SAML_SSO_ERROR;
                 }
 
                 unless ($idp_initiated_sp) {
@@ -335,9 +340,12 @@ sub run {
                     $self->lazy_load_entityid($idp_initiated_sp);
 
                     unless ( defined $self->spList->{$idp_initiated_sp} ) {
-                        $self->userLogger->error(
-                            "SP $idp_initiated_sp not known");
-                        return PE_UNKNOWNPARTNER;
+                        return $self->_failAuthnRequest(
+                            $req,
+                            msg        => "SP $idp_initiated_sp not known",
+                            res        => PE_UNKNOWNPARTNER,
+                            userLogger => 1,
+                        );
                     }
                     $idp_initiated_spConfKey =
                       $self->spList->{$idp_initiated_sp}->{confKey};
@@ -347,20 +355,27 @@ sub run {
                 unless ( $self->spOptions->{$idp_initiated_sp}
                     ->{samlSPMetaDataOptionsEnableIDPInitiatedURL} )
                 {
-                    $self->userLogger->error(
-"IDP Initiated SSO not allowed for SP $idp_initiated_spConfKey"
+                    return $self->_failAuthnRequest(
+                        $req,
+                        msg => (
+                                "IDP Initiated SSO not allowed"
+                              . " for SP $idp_initiated_spConfKey"
+                        ),
+                        userLogger => 1,
                     );
-                    return PE_SAML_SSO_ERROR;
                 }
 
                 $result =
                   $self->initIdpInitiatedAuthnRequest( $login,
                     $idp_initiated_sp );
                 unless ($result) {
-                    $self->logger->error(
-                        "SSO: Fail to init IDP Initiated authentication request"
+                    return $self->_failAuthnRequest(
+                        $req,
+                        msg => (
+                                "SSO: Fail to init IDP Initiated"
+                              . " authentication request"
+                        )
                     );
-                    return PE_SAML_SSO_ERROR;
                 }
 
                 # Force NameID Format
@@ -399,17 +414,18 @@ sub run {
                     Lasso::Constants::SERVER_ERROR_PROVIDER_NOT_FOUND )
                 {
                     my $sp = eval { $login->remote_providerID() };
-                    $self->logger->error(
-                            "SSO: Incoming entity ID $sp was not found"
-                          . " in registered Service Providers metadata." );
-
-                    return PE_UNKNOWNPARTNER;
+                    return $self->_failAuthnRequest(
+                        $req,
+                        msg => (
+                                "SSO: Incoming entity ID $sp was not found"
+                              . " in registered Service Providers metadata."
+                        ),
+                        res => PE_UNKNOWNPARTNER,
+                    );
                 }
                 elsif ( $lasso_error ==
                     Lasso::Constants::PROFILE_ERROR_INVALID_PROTOCOLPROFILE )
                 {
-                    $self->logger->error(
-                        "SSO: Fail to process authentication request");
                     if ( my $ACS =
                         eval { $login->request->AssertionConsumerServiceURL } )
                     {
@@ -417,13 +433,19 @@ sub run {
                                 "Requested AssertionConsumerServiceURL $ACS"
                               . " might be missing from registered metadata" );
                     }
+                    else {
+                        $self->logger->error(
+                            "Make sure AssertionConsumerServiceURL from the "
+                              . " SAML requests is defined in registered metadata"
+                        );
+                    }
 
-                    return PE_SAML_SSO_ERROR;
+                    return $self->_failAuthnRequest( $req,
+                        msg => "SSO: Fail to process authentication request" );
                 }
                 else {
-                    $self->logger->error(
-                        "SSO: Fail to process authentication request");
-                    return PE_SAML_SSO_ERROR;
+                    return $self->_failAuthnRequest( $req,
+                        msg => "SSO: Fail to process authentication request" );
                 }
             }
 
@@ -434,9 +456,16 @@ sub run {
             # SP conf key
             my $spConfKey = $self->spList->{$sp}->{confKey};
             unless ($spConfKey) {
-                $self->userLogger->error(
-                    "$sp do not match any SP in configuration");
-                return PE_UNKNOWNPARTNER;
+                return $self->_failAuthnRequest(
+                    $req,
+                    msg     => "$sp do not match any SP in configuration",
+                    res     => PE_UNKNOWNPARTNER,
+                    logInfo => {
+                        sp        => $spConfKey,
+                        entity_id => $sp,
+                    },
+                    userLogger => 1,
+                );
             }
             $self->logger->debug("$sp match $spConfKey SP in configuration");
 
@@ -460,10 +489,18 @@ sub run {
                 }
 
                 unless ($result) {
-                    $self->logger->error(
-"Could not verify signature of incoming SSO request from $spConfKey"
+                    return $self->_failAuthnRequest(
+                        $req,
+                        msg => (
+                                "Could not verify signature of "
+                              . "incoming SSO request from $spConfKey"
+                        ),
+                        res     => PE_SAML_SIGNATURE_ERROR,
+                        logInfo => {
+                            sp        => $spConfKey,
+                            entity_id => $sp,
+                        },
                     );
-                    return PE_SAML_SIGNATURE_ERROR;
                 }
                 else {
                     $self->logger->debug("Signature is valid");
@@ -476,7 +513,15 @@ sub run {
             # Hook must be run after processAuthnRequestMsg
             my $h =
               $self->p->processHook( $req, 'samlGotAuthnRequest', $login );
-            return $h if ( $h != PE_OK );
+            return $self->_failAuthnRequest(
+                $req,
+                msg     => 'samlGotAuthnRequest hook failed',
+                res     => $h,
+                logInfo => {
+                    sp        => $spConfKey,
+                    entity_id => $sp,
+                },
+            ) if ( $h != PE_OK );
 
             # Set environment for rule/macro evaluation
             $req->env->{llng_saml_sp}        = $sp;
@@ -493,16 +538,23 @@ sub run {
             # Check access rule
             if ( my $rule = $self->spRules->{$spConfKey} ) {
                 unless ( $rule->( $req, $req->sessionInfo ) ) {
-                    $self->userLogger->warn( 'User '
-                          . $req->sessionInfo->{ $self->conf->{whatToTrace} }
-                          . " is not authorized to access to $spConfKey" );
-                    return PE_UNAUTHORIZEDPARTNER;
+                    return $self->_failAuthnRequest(
+                        $req,
+                        msg => (
+                            'User '
+                              . $req->sessionInfo->{ $self->conf->{whatToTrace}
+                              }
+                              . " is not authorized to access to $spConfKey"
+                        ),
+                        res        => PE_UNAUTHORIZEDPARTNER,
+                        userLogger => 1,
+                        logInfo    => {
+                            sp        => $spConfKey,
+                            entity_id => $sp,
+                        },
+                    );
                 }
             }
-
-            $self->userLogger->notice( 'User '
-                  . $req->sessionInfo->{ $self->conf->{whatToTrace} }
-                  . " is authorized to access to $spConfKey" );
 
             my $nameIDFormat;
 
@@ -554,8 +606,14 @@ sub run {
 
             # Validate request
             unless ( $self->validateRequestMsg( $login, 1, 1 ) ) {
-                $self->logger->error("Unable to validate SSO request message");
-                return PE_SAML_SSO_ERROR;
+                return $self->_failAuthnRequest(
+                    $req,
+                    msg     => "Unable to validate SSO request message",
+                    logInfo => {
+                        sp        => $spConfKey,
+                        entity_id => $sp,
+                    },
+                );
             }
 
             $self->logger->debug("SSO: authentication request is valid");
@@ -596,8 +654,17 @@ sub run {
 
             # Check Destination (only in non proxy mode)
             unless ( $req->data->{_proxiedRequest} ) {
-                return PE_SAML_DESTINATION_ERROR
-                  unless ( $self->checkDestination( $login->request, $url ) );
+                if ( !$self->checkDestination( $login->request, $url ) ) {
+                    return $self->_failAuthnRequest(
+                        $req,
+                        msg     => "Invalid destination",
+                        res     => PE_SAML_DESTINATION_ERROR,
+                        logInfo => {
+                            sp        => $spConfKey,
+                            entity_id => $sp,
+                        },
+                    );
+                }
             }
 
             # Check if we have sufficient auth level
@@ -630,8 +697,14 @@ sub run {
                 )
               )
             {
-                $self->logger->error("Unable to build assertion");
-                return PE_SAML_SSO_ERROR;
+                return $self->_failAuthnRequest(
+                    $req,
+                    msg     => "Unable to build assertion",
+                    logInfo => {
+                        sp        => $spConfKey,
+                        entity_id => $sp,
+                    },
+                );
             }
 
             $self->logger->debug("SSO: assertion is built");
@@ -734,31 +807,43 @@ sub run {
                 # Check whether the value is required or not
                 unless ( defined $value ) {
                     if ($mandatory) {
-                        $self->logger->error(
-"Session key $_ is required to set SAML $name attribute ($sp)"
+                        return $self->_failAuthnRequest(
+                            $req,
+                            msg => (
+                                    "Session key $_ is required to set"
+                                  . " SAML $name attribute ($sp)"
+                            ),
+                            res     => PE_ISSUERMISSINGREQATTR,
+                            logInfo => {
+                                sp        => $spConfKey,
+                                entity_id => $sp,
+                            },
                         );
-                        return PE_ISSUERMISSINGREQATTR;
                     }
                     else {
                         $self->logger->debug(
-"SAML2 attribute $name has no value but is not mandatory ($sp), skip it"
-                        );
+                                "SAML2 attribute $name has no value"
+                              . " but is not mandatory ($sp), skip it" );
                         next;
                     }
                 }
 
-                $self->logger->debug(
-"SAML2 attribute $name will be set with $_ session key ($sp)"
-                );
+                $self->logger->debug( "SAML2 attribute $name will be set"
+                      . " with $_ session key ($sp)" );
 
                 # SAML2 attribute
                 my $attribute =
                   $self->createAttribute( $name, $format, $friendly_name );
 
                 unless ($attribute) {
-                    $self->logger->error(
-                        "Unable to create a new SAML attribute");
-                    return PE_SAML_SSO_ERROR;
+                    return $self->_failAuthnRequest(
+                        $req,
+                        msg     => "Unable to create a new SAML attribute",
+                        logInfo => {
+                            sp        => $spConfKey,
+                            entity_id => $sp,
+                        },
+                    );
                 }
 
                 # Set attribute value(s)
@@ -773,10 +858,16 @@ sub run {
                           ->{samlSPMetaDataOptionsForceUTF8} );
 
                     unless ($saml2value) {
-                        $self->logger->error(
-                            "Unable to create a new SAML attribute value");
                         $self->checkLassoError($@);
-                        return PE_SAML_SSO_ERROR;
+                        return $self->_failAuthnRequest(
+                            $req,
+                            msg =>
+                              "Unable to create a new SAML attribute value",
+                            logInfo => {
+                                sp        => $spConfKey,
+                                entity_id => $sp,
+                            },
+                        );
                     }
 
                     push @saml2values, $saml2value;
@@ -796,8 +887,14 @@ sub run {
             my @response_assertions = $login->response->Assertion;
 
             unless ( $response_assertions[0] ) {
-                $self->logger->error("Unable to get response assertion");
-                return PE_SAML_SSO_ERROR;
+                return $self->_failAuthnRequest(
+                    $req,
+                    msg     => "Unable to get response assertion",
+                    logInfo => {
+                        sp        => $spConfKey,
+                        entity_id => $sp,
+                    },
+                );
             }
 
             # Rewrite Issuer with domain
@@ -839,7 +936,14 @@ sub run {
                 };
                 if ($@) {
                     $self->checkLassoError($@);
-                    return PE_SAML_SSO_ERROR;
+                    return $self->_failAuthnRequest(
+                        $req,
+                        msg     => "Unable to create attribute statement",
+                        logInfo => {
+                            sp        => $spConfKey,
+                            entity_id => $sp,
+                        },
+                    );
                 }
 
                 # Register attributes in attribute statement
@@ -856,7 +960,17 @@ sub run {
 
             # Set sessionIndex
             my $sessionIndexSession = $self->getSamlSession();
-            return PE_SAML_SESSION_ERROR unless $sessionIndexSession;
+            if ( !$sessionIndexSession ) {
+                return $self->_failAuthnRequest(
+                    $req,
+                    msg     => "Unable to create SAML Session",
+                    res     => PE_SAML_SESSION_ERROR,
+                    logInfo => {
+                        sp        => $spConfKey,
+                        entity_id => $sp,
+                    },
+                );
+            }
 
             $sessionIndexSession->update(
                 { '_utime' => time, '_saml_id' => $session_id } );
@@ -904,25 +1018,17 @@ sub run {
                     "SSO response signature according to metadata");
             }
 
-            # log that a SAML authn response is build
-            my $user      = $req->{sessionInfo}->{ $self->conf->{whatToTrace} };
-            my $nameIDLog = '';
-            foreach my $format (qw(persistent transient)) {
-                if ( $login->nameIdentifier->Format eq
-                    $self->getNameIDFormat($format) )
-                {
-                    $nameIDLog =
-                      " with $format NameID " . $login->nameIdentifier->content;
-                    last;
-                }
-            }
-            $self->userLogger->notice(
-"SAML authentication response sent to SAML SP $spConfKey for $user$nameIDLog"
-            );
-
             $h =
               $self->p->processHook( $req, 'samlBuildAuthnResponse', $login );
-            return $h if ( $h != PE_OK );
+            return $self->_failAuthnRequest(
+                $req,
+                msg     => 'samlBuildAuthnResponse hook failed',
+                res     => $h,
+                logInfo => {
+                    sp        => $spConfKey,
+                    entity_id => $sp,
+                },
+            ) if ( $h != PE_OK );
 
             # Build SAML response
             $protocolProfile = $login->protocolProfile();
@@ -951,9 +1057,15 @@ sub run {
 
                 # Build artifact message
                 unless ( $self->buildArtifactMsg( $login, $artifact_method ) ) {
-                    $self->logger->error(
-                        "Unable to build SSO artifact response message");
-                    return PE_SAML_ART_ERROR;
+                    return $self->_failAuthnRequest(
+                        $req,
+                        msg => "Unable to build SSO artifact response message",
+                        res => PE_SAML_ART_ERROR,
+                        logInfo => {
+                            sp        => $spConfKey,
+                            entity_id => $sp,
+                        },
+                    );
                 }
 
                 $self->logger->debug("SSO: artifact response is built");
@@ -970,9 +1082,14 @@ sub run {
             else {
 
                 unless ( $self->buildAuthnResponseMsg($login) ) {
-                    $self->logger->error(
-                        "Unable to build SSO response message");
-                    return PE_SAML_SSO_ERROR;
+                    return $self->_failAuthnRequest(
+                        $req,
+                        msg     => "Unable to build SSO response message",
+                        logInfo => {
+                            sp        => $spConfKey,
+                            entity_id => $sp,
+                        },
+                    );
                 }
 
                 $self->logger->debug("SSO: authentication response is built");
@@ -1013,7 +1130,17 @@ sub run {
 
             my $samlSessionInfo = $self->getSamlSession( undef, $infos );
 
-            return PE_SAML_SESSION_ERROR unless $samlSessionInfo;
+            if ( !$samlSessionInfo ) {
+                return $self->_failAuthnRequest(
+                    $req,
+                    msg     => "Could not get SAML session",
+                    res     => PE_SAML_SESSION_ERROR,
+                    logInfo => {
+                        sp        => $spConfKey,
+                        entity_id => $sp,
+                    },
+                );
+            }
 
             my $saml_session_id = $samlSessionInfo->id;
 
@@ -1055,6 +1182,20 @@ sub run {
                 );
             }
 
+            # log that a SAML authn response is build
+            my $user      = $req->{sessionInfo}->{ $self->conf->{whatToTrace} };
+            my $nameIDLog = '';
+            foreach my $format (qw(persistent transient)) {
+                if ( $login->nameIdentifier->Format eq
+                    $self->getNameIDFormat($format) )
+                {
+                    $nameIDLog =
+                      " with $format NameID " . $login->nameIdentifier->content;
+                    last;
+                }
+            }
+            my $name_id_content = $login->nameIdentifier->content;
+
             # HTTP-POST
             if ( (
                        !$artifact
@@ -1066,6 +1207,22 @@ sub run {
                     $self->getHttpMethod("artifact-post") )
               )
             {
+
+                $self->auditLog(
+                    $req,
+                    code      => "ISSUER_SAML_LOGIN_SUCCESS",
+                    entity_id => $sp,
+                    sp        => $spConfKey,
+                    message   => (
+                            'User '
+                          . $req->sessionInfo->{ $self->conf->{whatToTrace} }
+                          . " is authorized to access to $sp."
+                          . " SAML authentication response sent to"
+                          . " SAML SP $spConfKey for $user$nameIDLog"
+                    ),
+                    user    => $user,
+                    name_id => $name_id_content,
+                );
 
                 # Use autosubmit form
                 my $sso_url  = $login->msg_url;
@@ -1099,6 +1256,22 @@ sub run {
                 Lasso::Constants::LOGIN_PROTOCOL_PROFILE_REDIRECT or $artifact )
             {
 
+                $self->auditLog(
+                    $req,
+                    code      => "ISSUER_SAML_LOGIN_SUCCESS",
+                    entity_id => $sp,
+                    sp        => $spConfKey,
+                    message   => (
+                            'User '
+                          . $req->sessionInfo->{ $self->conf->{whatToTrace} }
+                          . " is authorized to access to $sp."
+                          . " SAML authentication response sent to"
+                          . " SAML SP $spConfKey for $user$nameIDLog"
+                    ),
+                    user    => $user,
+                    name_id => $name_id_content,
+                );
+
                 # Redirect user to response URL
                 my $sso_url = $login->msg_url;
                 $self->logger->debug("Redirect user to $sso_url");
@@ -1129,6 +1302,27 @@ sub run {
     }
     $self->logger->debug("Not an issuer request $url");
     return PE_OK;
+}
+
+sub _failAuthnRequest {
+    my ( $self, $req, %params ) = @_;
+
+    my $reason  = $params{'msg'} ? ": $params{'msg'}" : "";
+    my $res     = $params{res} || PE_SAML_SSO_ERROR;
+    my $user    = $req->sessionInfo->{ $self->conf->{whatToTrace} };
+    my %logInfo = %{ $params{logInfo} || {} };
+
+    $self->auditLog(
+        $req,
+        code    => "ISSUER_SAML_LOGIN_FAILED",
+        message => ( "SAML login failed" . $reason ),
+        ( $params{'msg'} ? ( reason => $params{'msg'} ) : () ),
+        portal_error => portalConsts->{$res},
+        user         => $user,
+        %logInfo,
+    );
+
+    return $res;
 }
 
 sub artifactServer {
@@ -1281,9 +1475,8 @@ sub soapSloServer {
 
         $sessionIndexSession->remove;
 
-        $self->logger->debug(
-"Get session id $local_session_id (from session index $session_index)"
-        );
+        $self->logger->debug( "Get session id $local_session_id"
+              . " (from session index $session_index)" );
 
         # Open local session
         my $local_session = $self->p->getApacheSession($local_session_id);
@@ -1442,7 +1635,7 @@ sub logout {
     # for them.
     # Redirect on logout page when all is done.
     if ( $self->sendLogoutRequestToProviders( $req, $logout ) ) {
-        $req->urldc( $self->p->buildUrl( { logout => 1 } ) );
+        $req->urldc( $self->p->buildUrl($req->portal, { logout => 1 } ) );
         return PE_OK;
     }
 
@@ -1742,7 +1935,7 @@ sub _finishSlo {
     # Else build SLO status relay URL and display info
     else {
         $req->{urldc} =
-          $self->conf->{portal} . '/saml/relaySingleLogoutTermination';
+          $self->p->buildUrl( $req->portal, 'saml', 'relaySingleLogoutTermination' );
         $self->p->setHiddenFormValue( $req, 'relay', $relayID, '', 0 );
         return $self->p->do( $req, [] );
     }
@@ -1823,9 +2016,8 @@ sub sloServer {
 
             $sessionIndexSession->remove;
 
-            $self->logger->debug(
-"Get session id $local_session_id (from session index $session_index)"
-            );
+            $self->logger->debug( "Get session id $local_session_id"
+                  . " (from session index $session_index)" );
         }
         else {
             $local_session_id = $req->id;
@@ -1962,7 +2154,8 @@ sub sloServer {
             $logoutContextSession =
               $self->getSamlSession( undef, $logoutInfos );
             my $uri =
-              URI->new( $self->conf->{portal} . '/saml/singleLogoutResume' );
+              URI->new(
+                $self->p->buildUrl( $req->portal, 'saml', 'singleLogoutResume' ) );
             $uri->query_param( ResumeParams => $logoutContextSession->id );
             $req->{issuerUrldc} = $uri->as_string;
         }
@@ -1972,6 +2165,8 @@ sub sloServer {
         $req->setInfo('');
 
         # Launch normal logout and ignore errors
+        my $tmp = $req->data->{nofail};
+        $req->data->{nofail} = 1;
         $req->steps( [
                 @{ $self->p->beforeLogout },
                 ( $doAuthLogout ? 'authLogout' : () ),
@@ -1979,6 +2174,7 @@ sub sloServer {
             ]
         );
         my $res = $self->p->process($req);
+        $req->data->{nofail} = $tmp;
 
         if ( $res eq PE_REDIRECT ) {
 
@@ -2036,9 +2232,8 @@ sub sloServer {
 
         if ($checkSLOMessageSignature) {
             unless ( $self->checkSignatureStatus($logout) ) {
-                $self->logger->error(
-"Could not verify signature of incoming SLO request from $spConfKey"
-                );
+                $self->logger->error( "Could not verify signature of"
+                      . " incoming SLO request from $spConfKey" );
                 $self->imgnok($req);
             }
             else {
@@ -2059,15 +2254,13 @@ sub sloServer {
                     "Store SLO status for $spConfKey in session $relaystate");
             }
             else {
-                $self->logger->warn(
-"Unable to store SLO status for $spConfKey in session $relaystate"
-                );
+                $self->logger->warn( "Unable to store SLO status for"
+                      . " $spConfKey in session $relaystate" );
             }
         }
         else {
-            $self->logger->warn(
-"Unable to store SLO status for $spConfKey because there is no RelayState"
-            );
+            $self->logger->warn( "Unable to store SLO status for"
+                  . " $spConfKey because there is no RelayState" );
         }
 
         # SLO response is OK
@@ -2230,7 +2423,7 @@ sub attributeServer {
                 [$req_attr] );
 
             $self->logger->debug(
-                "Some values are explicitely requested: $rvalue")
+                "Some values are explicitly requested: $rvalue")
               if defined $rvalue;
 
             # Get session value
@@ -2263,9 +2456,8 @@ sub attributeServer {
                             ) )
                       )
                     {
-                        $self->logger->warn(
-"$local_value value is not in requested values, it will not be sent"
-                        );
+                        $self->logger->warn( "$local_value value is not in"
+                              . " requested values, it will not be sent" );
                         next;
                     }
 

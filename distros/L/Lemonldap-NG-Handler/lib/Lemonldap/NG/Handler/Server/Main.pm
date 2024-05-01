@@ -5,7 +5,7 @@ package Lemonldap::NG::Handler::Server::Main;
 
 use strict;
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.19.0';
 
 use base 'Lemonldap::NG::Handler::PSGI::Main';
 
@@ -36,9 +36,22 @@ sub unset_header_in {
     my $i = $req->data->{deleteIndex};
     foreach my $header (@headers) {
         $class->logger->debug("Delete header $header");
-        $req->{respHeaders} =
-          [ grep { $_ ne $header and $_ ne cgiName($header) }
-              @{ $req->{respHeaders} } ];
+        my $del = 0;
+        $req->{respHeaders} = [
+            map {
+                my @res;
+                if ($del) {
+                    $del = 0;
+                }
+                elsif ( $_ and ( $_ eq $header or $_ eq cgiName($header) ) ) {
+                    $del = 1;
+                }
+                else {
+                    @res = ($_);
+                }
+                @res;
+            } @{ $req->{respHeaders} }
+        ];
         delete $req->{env}->{ cgiName($header) };
         push @{ $req->{respHeaders} }, "Deleteheader$i", $header;
         $i++;

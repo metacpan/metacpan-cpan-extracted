@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::BrowserServer;
-$Playwright::BrowserServer::VERSION = '1.401';
+$Playwright::BrowserServer::VERSION = '1.431';
 use parent 'Playwright::Base';
 
 sub new {
@@ -32,11 +32,11 @@ sub kill {
     );
 }
 
-sub wsEndpoint {
+sub process {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'wsEndpoint',
+        command => 'process',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -52,11 +52,11 @@ sub close {
     );
 }
 
-sub process {
+sub wsEndpoint {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'process',
+        command => 'wsEndpoint',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::BrowserServer - Automatically generated class for Playwright::Browse
 
 =head1 VERSION
 
-version 1.401
+version 1.431
 
 =head1 CONSTRUCTOR
 
@@ -123,11 +123,11 @@ Execute the BrowserServer::kill playwright routine.
 
 See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-kill> for more information.
 
-=head2 wsEndpoint(@args)
+=head2 process(@args)
 
-Execute the BrowserServer::wsEndpoint playwright routine.
+Execute the BrowserServer::process playwright routine.
 
-See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-wsEndpoint> for more information.
+See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-process> for more information.
 
 =head2 close(@args)
 
@@ -135,11 +135,11 @@ Execute the BrowserServer::close playwright routine.
 
 See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-close> for more information.
 
-=head2 process(@args)
+=head2 wsEndpoint(@args)
 
-Execute the BrowserServer::process playwright routine.
+Execute the BrowserServer::wsEndpoint playwright routine.
 
-See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-process> for more information.
+See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-wsEndpoint> for more information.
 
 =head2 on(@args)
 

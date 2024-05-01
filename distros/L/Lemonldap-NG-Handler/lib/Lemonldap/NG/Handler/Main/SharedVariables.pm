@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::SharedVariables;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.19.0';
 
 # Since handler has no instance but only static classes, this module provides
 # classes properties with accessors
@@ -12,16 +12,17 @@ use strict;
 BEGIN {
 # Thread shared properties (if threads are available: needs to be loaded elsewhere)
     our $_tshv = {
-        tsv         => {},
-        cfgNum      => 0,
-        cfgDate     => 0,
-        lastCheck   => 0,
-        checkTime   => 600,
-        confAcc     => {},
-        logger      => {},
-        userLogger  => {},
-        lmConf      => {},
-        localConfig => {},
+        tsv             => {},
+        cfgNum          => 0,
+        cfgDate         => 0,
+        lastCheck       => 0,
+        checkTime       => 600,
+        confAcc         => {},
+        logger          => {},
+        userLogger      => {},
+        _auditLogger    => {},
+        lmConf          => {},
+        localConfig     => {},
     };
 
     # Current sessions properties

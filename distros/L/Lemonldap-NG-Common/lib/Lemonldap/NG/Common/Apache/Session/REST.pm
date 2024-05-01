@@ -5,7 +5,7 @@ use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Common::Apache::Session::Generate::SHA256;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.19.0';
 
 our @ISA = qw(Lemonldap::NG::Common::Apache::Session::Generate::SHA256);
 
@@ -55,7 +55,7 @@ sub STORE {
     my $value = shift;
 
     $self->{data}->{$key} = $value;
-    $self->{modified} = 1;
+    $self->{modified} = 1 unless $key eq '_session_id';
     return $value;
 }
 

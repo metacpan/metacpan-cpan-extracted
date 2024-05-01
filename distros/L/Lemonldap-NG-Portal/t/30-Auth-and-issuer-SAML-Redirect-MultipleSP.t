@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 30;
+my $maintests = 28;
 my $debug     = 'error';
 my ( $issuer, $sp, $sp2, $sp3, $res );
 
@@ -55,7 +55,6 @@ SKIP: {
         qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
     # Push SAML request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             $url,
@@ -94,7 +93,6 @@ SKIP: {
         'SAMLResponse', 'RelayState' );
 
     # Post SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($query),
@@ -111,16 +109,11 @@ SKIP: {
     expectAuthenticatedAs( $res, 'fa@badwolf.org@idp' );
 
     # Verify UTF-8
-    ok( $res = $sp->_get("/sessions/global/$spId"), 'Get UTF-8' );
-    expectOK($res);
-    ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-      or print STDERR $@;
-    ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
+    ok( getSession($spId)->data->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
       or explain( $res, 'cn => Frédéric Accents' );
 
     # Simple SP2 access
 
-    switch ('sp2');
     ok(
         $res = $sp2->_get(
             '/',
@@ -134,7 +127,6 @@ SKIP: {
         qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
     # Push SAML request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             $url,
@@ -149,7 +141,6 @@ SKIP: {
         'SAMLResponse', 'RelayState' );
 
     # Post SAML response to SP2
-    switch ('sp2');
     ok(
         $res = $sp2->_post(
             $url, IO::String->new($query),
@@ -166,7 +157,6 @@ SKIP: {
     expectAuthenticatedAs( $res, 'fa@badwolf.org@idp' );
 
     # Simple SP3 access
-    switch ('sp3');
     ok(
         $res = $sp3->_get(
             '/',
@@ -180,7 +170,6 @@ SKIP: {
         qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
     # Push SAML request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             $url,
@@ -195,7 +184,6 @@ SKIP: {
         'SAMLResponse', 'RelayState' );
 
     # Post SAML response to SP3
-    switch ('sp3');
     ok(
         $res = $sp3->_post(
             $url, IO::String->new($query),
@@ -226,7 +214,6 @@ SKIP: {
         qr#^http://auth.idp.com(/saml/singleLogout)\?(SAMLRequest=.+)# );
 
     # Push SAML logout request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             $url,
@@ -250,7 +237,6 @@ SKIP: {
     # Logout from SP2
     # Load iframe
     my $iframe = $iframes{'auth.sp2.com'};
-    switch ('sp2');
     ok(
         $res = $sp2->_get(
             '/saml/proxySingleLogout',
@@ -265,7 +251,6 @@ SKIP: {
         qr#^http://auth.idp.com(/saml/singleLogoutReturn)\?(SAMLResponse=.+)# );
 
     # Get OK icon from IDP
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             $url,
@@ -279,7 +264,6 @@ SKIP: {
     # Logout from SP3
     # Load iframe
     $iframe = $iframes{'auth.sp3.com'};
-    switch ('sp3');
     ok(
         $res = $sp3->_get(
             '/saml/proxySingleLogout',
@@ -294,7 +278,6 @@ SKIP: {
         qr#^http://auth.idp.com(/saml/singleLogoutReturn)\?(SAMLResponse=.+)# );
 
     # Get OK icon from IDP
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             $url,
@@ -324,7 +307,6 @@ qr#^http://auth.sp.com(/saml/proxySingleLogoutReturn)\?(SAMLResponse=.+)#
     );
 
     # Send SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_get(
             $url,
@@ -335,7 +317,6 @@ qr#^http://auth.sp.com(/saml/proxySingleLogoutReturn)\?(SAMLResponse=.+)#
     );
 
     # Test if logout is done
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             '/', cookie => "lemonldap=$idpId",
@@ -344,7 +325,6 @@ qr#^http://auth.sp.com(/saml/proxySingleLogoutReturn)\?(SAMLResponse=.+)#
     );
     expectReject($res);
 
-    switch ('sp');
     ok(
         $res = $sp->_get(
             '/',
@@ -356,7 +336,6 @@ qr#^http://auth.sp.com(/saml/proxySingleLogoutReturn)\?(SAMLResponse=.+)#
     expectRedirection( $res,
         qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
-    switch ('sp2');
     ok(
         $res = $sp2->_get(
             '/',
@@ -368,7 +347,6 @@ qr#^http://auth.sp.com(/saml/proxySingleLogoutReturn)\?(SAMLResponse=.+)#
     expectRedirection( $res,
         qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
-    switch ('sp3');
     ok(
         $res = $sp3->_get(
             '/',
@@ -386,8 +364,7 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
@@ -466,8 +443,7 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',
@@ -522,8 +498,7 @@ sub sp {
 }
 
 sub sp2 {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp2.com',
@@ -577,8 +552,7 @@ sub sp2 {
 }
 
 sub sp3 {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp3.com',

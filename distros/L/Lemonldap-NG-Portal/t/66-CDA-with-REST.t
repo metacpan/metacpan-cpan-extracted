@@ -26,7 +26,6 @@ LWP::Protocol::PSGI->register(
         my $url   = $1;
         my $query = $2;
         my $res;
-        switch ('portal');
         if ( $req->method =~ /^(post|put)$/i ) {
             my $mth = '_' . lc($1);
             my $s   = $req->content;
@@ -60,7 +59,6 @@ LWP::Protocol::PSGI->register(
         }
         pass(' @ END OF REST REQUEST @');
         count(1);
-        switch ('app');
         return $res;
     }
 );
@@ -114,7 +112,6 @@ use_ok('Lemonldap::NG::Common::PSGI::Cli::Lib');
 
 my ( $cli, $app );
 &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-switch ('app');
 $app = register(
     'app',
     sub {

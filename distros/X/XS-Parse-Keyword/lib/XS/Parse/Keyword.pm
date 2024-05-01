@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword 0.41;
+package XS::Parse::Keyword 0.42;
 
 use v5.14;
 use warnings;

@@ -2,17 +2,13 @@
 
 use warnings;
 use strict;
-use LWP::UserAgent 6.05;
-use HTML::Form 6.03;
 use HTTP::Cookies 6.01;
 use Getopt::Std;
-use YAML::XS 0.62 qw(LoadFile);
 use File::Spec;
-use App::SpamcupNG
-  qw(main_loop read_config %OPTIONS_MAP config_logger);
+use App::SpamcupNG qw(main_loop read_config %OPTIONS_MAP config_logger);
 use App::SpamcupNG::UserAgent;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 # Delay between HTTP requests. Adjust this if Spamcop.net asks!
 use constant DELAY => 5;
 
@@ -60,8 +56,8 @@ if ( -e $cfg ) {
     $opts{delay} = DELAY;
 }
 
-$opts{V} = 'INFO' unless ( exists( $opts{V} ) );
-$opts{delay} = DELAY unless ( exists($opts{delay}) );
+$opts{V}     = 'INFO' unless ( exists( $opts{V} ) );
+$opts{delay} = DELAY  unless ( exists( $opts{delay} ) );
 
 config_logger( $opts{V}, File::Spec->catfile( my_home(), 'spamcup.log' ) );
 my $logger = Log::Log4perl->get_logger('SpamcupNG');
@@ -99,7 +95,8 @@ if ( $logger->is_info() ) {
 
 my ( $ident, $pass ) = define_auth( \%opts );
 compat_opts( $ident, $pass, \%opts );
-$logger->logdie('Could not define authentication method through configuration') unless($ident || $accounts);
+$logger->logdie('Could not define authentication method through configuration')
+  unless ( $ident || $accounts );
 my $ua = App::SpamcupNG::UserAgent->new($VERSION);
 
 if ($accounts) {
@@ -149,7 +146,7 @@ sub run_report {
 
             unless ($retval) {
                 $logger->warn(
-'Something did not go well while processing SPAM. Going to the next.'
+'Something did not go well while processing the SPAM message. Going to the next.'
                 );
             }
 
@@ -166,7 +163,7 @@ sub run_report {
 # prints footer information and exits
 sub print_footer {
     print
-qq(\n* App-SpamcupNG $VERSION - (C) Alceu Rodrigues de Freitas Junior <arfreitas\@cpan.org>
+qq(\n* App-SpamcupNG $VERSION - (C) Alceu Rodrigues de Freitas Junior <glasswalk3r\@yahoo.com.br>
 Based on Spamcup from Toni Willberg
 * Source code and bug reports: https://github.com/glasswalk3r/App-SpamcupNG/issues
 );
@@ -213,7 +210,7 @@ sub define_auth {
 }
 
 sub my_home {
-    return ($^O eq 'MSWin32') ? $ENV{HOMEPATH} : $ENV{HOME};
+    return ( $^O eq 'MSWin32' ) ? $ENV{HOMEPATH} : $ENV{HOME};
 }
 
 __END__
@@ -253,7 +250,7 @@ Usage: spamcup [options] <Spamcop-Username>
 
 App-SpamcupNG is a Perl web crawler for finishing Spamcop.net reports automatically.
 
-It will use your account details to login into Spamcop.net web page and finish reporting your SPAM. App-SpamcupNG tries to be as polite as possible, 
+It will use your account details to login into Spamcop.net web page and finish reporting your SPAM. App-SpamcupNG tries to be as polite as possible,
 introducing forced delays to not overwhelm Spamcop.net website. All reports are sent sequentially.
 
 App-SpamcupNG is a fork from the original Spamcup project.
@@ -268,12 +265,12 @@ App-SpamcupNG provides the following features:
 
 =item *
 
-Can use both command line parameters and/or a configuration file. The configuration file allows you to define and use multiple accounts of Spamcop 
+Can use both command line parameters and/or a configuration file. The configuration file allows you to define and use multiple accounts of Spamcop
 (but you can't send reports from them in parallel and never will since we want to be as polite as possible with Spamcop website).
 
 =item *
 
-Advanced logging capabilities (provided by usage of L<Log::Log4perl>): you can setup additional levels of information on screen or even have 
+Advanced logging capabilities (provided by usage of L<Log::Log4perl>): you can setup additional levels of information on screen or even have
 everything logged into a text file (if DEBUG is enabled). See L<App::SpamcupNG> for details about that.
 
 =item *
@@ -315,7 +312,7 @@ developed.
 
 =item WWW::Mechanize is not required
 
-L<WWW::Mechanize> (the base of L<WWW::Mechanize::SpamCop>) is pretty neaty, easier to use than L<LWP::UserAgent>, but on the other hand has 
+L<WWW::Mechanize> (the base of L<WWW::Mechanize::SpamCop>) is pretty neaty, easier to use than L<LWP::UserAgent>, but on the other hand has
 more dependencies and wouldn't add any value compared to the already in place webcrawler implementation. If the Spamcop.net website changes, I
 might consider moving to it, but not before that.
 
@@ -327,11 +324,11 @@ Some important warnings before starting using it:
 
 =over
 
-=item * 
+=item *
 
 The script does NOT know where the SPAM report will be sent so IT'S YOUR RESPONSIBILITY!
 
-=item * 
+=item *
 
 If the script asks Spamcop to send reports to wrong places IT'S YOUR FAULT!
 
@@ -403,11 +400,11 @@ L<App::SpamcupNG>
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 of Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+This software is copyright (c) 2015 of Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 This file is part of App-SpamcupNG distribution.
 

@@ -36,7 +36,6 @@ SKIP: {
     $sp     = register( 'sp',     \&sp );
 
     subtest "Test logging in to a federated IDP" => sub {
-        switch ('sp');
 
         ok(
             $res = $sp->_get(
@@ -57,7 +56,6 @@ SKIP: {
     };
 
     subtest "Responding to a federated SP" => sub {
-        switch ('issuer');
         my $res;
         my $query = buildForm( {
                 user     => 'french',

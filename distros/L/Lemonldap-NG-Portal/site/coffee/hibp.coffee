@@ -13,7 +13,9 @@ $(document).on 'checkpassword', (event, context) ->
 				setResult('ppolicy-checkhibp-feedback', "waiting")
 				$.ajax
 					dataType: "json"
-					url: "/checkhibp?password=" + btoa(newpasswordVal)
+					url: "/checkhibp"
+					method: "POST"
+					data: { "password": btoa(newpasswordVal) }
 					context: document.body
 					success: (data) ->
 						code = data.code

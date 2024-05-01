@@ -10,14 +10,14 @@ use Mouse;
 use JSON qw(from_json);
 use MIME::Entity;
 use Lemonldap::NG::Common::EmailAddress qw(format_email);
-use Email::Sender::Simple qw(sendmail);
-use Email::Date::Format   qw(email_date);
+use Email::Sender::Simple               qw(sendmail);
+use Email::Date::Format                 qw(email_date);
 use HTML::FormatText::WithLinks;
 use Lemonldap::NG::Common::EmailTransport;
 use MIME::Base64;
 use Encode;
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 our $transport;
 
@@ -118,7 +118,7 @@ sub send_mail {
     my ( $self, $mail, $subject, $body, $html ) = @_;
 
     if ( $mail =~ /^\S+\@\S+$/ ) {
-        $mail = format_email($mail, $mail);
+        $mail = format_email( $mail, $mail );
     }
 
     $self->logger->info("send_mail called to send \"$subject\" to $mail");
@@ -167,7 +167,8 @@ sub send_mail {
                 Date    => email_date,
             );
 
-            my $alternative = $message->attach( Type => 'multipart/alternative' );
+            my $alternative =
+              $message->attach( Type => 'multipart/alternative' );
 
             # Text message
             $alternative->attach(
@@ -240,7 +241,7 @@ sub getMailSession {
     # Browse found sessions to check if it's a mail session
     foreach my $id ( keys %$sessions ) {
         my $mailSession =
-          $self->p->getApacheSession( $id, ( kind => "TOKEN" ) );
+          $self->p->getApacheSession( $id, kind => "TOKEN", hashStore => 0, );
         next unless ($mailSession);
         return $mailSession if ( $mailSession->data->{_type} =~ /^mail$/ );
     }
@@ -266,7 +267,7 @@ sub getRegisterSession {
     # Browse found sessions to check if it's a register session
     foreach my $id ( keys %$sessions ) {
         my $registerSession =
-          $self->p->getApacheSession( $id, ( kind => "TOKEN" ) );
+          $self->p->getApacheSession( $id, kind => "TOKEN", hashStore => 0, );
         next unless ($registerSession);
         return $id
           if (  $registerSession->data->{_type}

@@ -6,7 +6,7 @@ use JSON;
 use Plack::Request;
 use URI::Escape;
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.19.0';
 
 our @ISA = ('Plack::Request');
 
@@ -27,8 +27,10 @@ sub new {
     $self->env->{PATH_INFO} =~ s|//+|/|g;
     $self->env->{PATH_INFO} ||= '/';
     $self->env->{REQUEST_URI} =~ s|^//+|/|g;
-    $self->{uri}         = uri_unescape( $self->env->{REQUEST_URI} );
-    $self->{data}        = {};
+    $self->{uri}        = uri_unescape( $self->env->{REQUEST_URI} );
+    $self->{data}       = {};
+    $self->{request_id} = ( $self->env->{UNIQUE_ID}
+          || join( '', map { [ 0 .. 9, "a" .. "f" ]->[ rand 16 ] } 1 .. 16 ) );
     $self->{error}       = 0;
     $self->{respHeaders} = [];
     return bless( $self, $_[0] );
@@ -37,6 +39,8 @@ sub new {
 sub data { return $_[0]->{data} }
 
 sub uri { return $_[0]->{uri} }
+
+sub request_id { return $_[0]->{request_id} }
 
 sub userData {
     my ( $self, $v ) = @_;

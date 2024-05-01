@@ -25,6 +25,7 @@ LWP::Protocol::PSGI->register(
         my $query = $2;
         my $res;
         my $s = $req->content;
+
         if ( $req->method =~ /^(post|put)$/i ) {
             my $mth = '_' . lc($1);
             my $s   = $req->content;
@@ -62,16 +63,14 @@ LWP::Protocol::PSGI->register(
     }
 );
 
-$issuer = register( 'issuer', \&issuer );
+$issuer = register( 'issuer', sub { issuer() } );
 
 # Test REST config backend
 ok( $res = $issuer->_get('/config/latest'), 'Get latest conf metadata' );
 count(1);
 expectOK($res);
 
-$sp = register( 'sp', \&sp );
-
-switch ('sp');
+$sp = register( 'sp', sub { sp() } );
 
 # Simple SP access
 ok(
@@ -101,25 +100,32 @@ count(1);
 expectOK($res);
 
 # Test other REST queries
-switch ('issuer');
 
 # Session content
-ok( $res = $issuer->_get("/sessions/global/$spId"), 'Session content' );
-expectOK($res);
-ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-  or print STDERR $@;
-ok( $res->{_session_id} eq $spId, ' Good ID' )
-  or explain( $res, "_session_id => $spId" );
-count(3);
+ok(
+    getSession($spId)->data->{_session_id} eq
+      ( $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($spId) : $spId ),
+    ' Good ID'
+) or explain( $res, "_session_id => $spId" );
+count(1);
 
 # Session key
-ok( $res = $issuer->_get("/sessions/global/$spId/[_session_id,uid,cn]"),
-    'Some session keys' );
+ok(
+    $res = $issuer->_get(
+            "/sessions/global/"
+          . ( $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($spId) : $spId )
+          . "/[_session_id,uid,cn]"
+    ),
+    'Some session keys'
+);
 expectOK($res);
 ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
   or print STDERR $@;
-ok( $res->{_session_id} eq $spId, ' Good ID' )
-  or explain( $res, "_session_id => $spId" );
+ok(
+    $res->{_session_id} eq
+      ( $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($spId) : $spId ),
+    ' Good ID'
+) or explain( $res, "_session_id => $spId" );
 ok( $res->{uid} eq 'french', ' Uid is french' )
   or explain( $res, 'uid => french' );
 ok( $res->{cn} eq 'Frédéric Accents', ' UTF-8 values' );
@@ -178,7 +184,6 @@ ok( $res->{result} eq '1', ' Good result' )
 count(6);
 
 # Logout
-switch ('sp');
 ok(
     $res = $sp->_get(
         '/',
@@ -205,8 +210,7 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel          => $debug,
                 domain            => 'idp.com',
@@ -223,8 +227,7 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel       => $debug,
                 domain         => 'sp.com',

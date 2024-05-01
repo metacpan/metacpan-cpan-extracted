@@ -2,7 +2,7 @@ package Lemonldap::NG::Handler::Lib::ServiceToken;
 
 use strict;
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 sub fetchId {
     my ( $class, $req ) = @_;
@@ -46,7 +46,11 @@ sub fetchId {
 
     # $_session_id and at least one vhost or RegExp
     unless ( $_session_id and ( @vhosts or @vhostRegexp ) ) {
-        $class->userLogger->error('Bad service token');
+        $class->auditLog(
+            $req,
+            message => 'Bad service token',
+            code    => "INVALID_SERVICE_TOKEN",
+        );
         $class->logger->debug(
             $_session_id ? 'No VH or RegExp found' : 'No _session_id found' );
         return 0;
@@ -62,9 +66,16 @@ sub fetchId {
             @vhostRegexp );
     }
     else {
-        $class->userLogger->error( "$vhost not allowed in token scope ("
-              . join( ', ', ( @vhostRegexp, @vhosts ) )
-              . ')' );
+        $class->auditLog(
+            $req,
+            message => (
+                "$vhost not allowed in token scope ("
+                  . join( ', ', ( @vhostRegexp, @vhosts ) ) . ')'
+            ),
+            code        => "INVALID_SERVICE_TOKEN_SCOPE",
+            vhostRegexp => \@vhostRegexp,
+            vhosts      => \@vhosts,
+        );
         return 0;
     }
 
@@ -75,7 +86,11 @@ sub fetchId {
       : $class->tsv->{handlerServiceTokenTTL};
     my $now = time;
     unless ( $t <= $now and $t > $now - $ttl ) {
-        $class->userLogger->warn('Expired service token');
+        $class->auditLog(
+            $req,
+            message => 'Expired service token',
+            code    => "EXPIRED_SERVICE_TOKEN",
+        );
         $class->logger->debug("VH: $vhost with ServiceTokenTTL: $ttl");
         $class->logger->debug("TokenTime: $t / Time: $now");
         return 0;

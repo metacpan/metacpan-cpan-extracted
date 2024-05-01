@@ -80,6 +80,7 @@ sub init {
     };
 
     my $as = Lemonldap::NG::Common::Session->new( {
+            hashStore            => $ENV{LLNG_HASHED_SESSION_STORE},
             storageModule        => 'Apache::Session::File',
             storageModuleOptions => { Directory => 't/sessions' },
             id                   => $sessionId,
@@ -148,14 +149,14 @@ sub _get {
             'HTTP_ACCEPT_LANGUAGE' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
             'PATH_INFO'            => $path,
             'REQUEST_METHOD'       => 'GET',
-            'HTTP_X_FORWARDED_URI'          => '/lmauth',
+            'HTTP_X_FORWARDED_URI' => '/lmauth',
             'X_ORIGINAL_URI'       => $path . ( $query ? "?$query" : '' ),
             'SERVER_PORT'          => '80',
             'SERVER_PROTOCOL'      => 'HTTP/1.1',
             'HTTP_USER_AGENT'      =>
               'Mozilla/5.0 (VAX-4000; rv:36.0) Gecko/20350101 Firefox',
-            'REMOTE_ADDR' => '127.0.0.1',
-            'HTTP_X_FORWARDED_HOST'   => $host,
+            'REMOTE_ADDR'           => '127.0.0.1',
+            'HTTP_X_FORWARDED_HOST' => $host,
             ( $cookie ? ( HTTP_COOKIE => $cookie ) : ( HTTP_COOKIE => '' ) ),
             %custom,
         }

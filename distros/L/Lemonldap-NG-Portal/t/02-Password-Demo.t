@@ -10,8 +10,7 @@ require 't/test-lib.pm';
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel                 => 'error',
             passwordDB               => 'Demo',
@@ -140,9 +139,7 @@ count(1);
 expectReject( $res, 200, 35, "Expect PE_PASSWORD_OK" );
 
 # Check updated password in session (#2430)
-$json =
-  expectJSON( $client->_get("/sessions/global/$id"), 'Get session content' );
-is( $json->{_password}, "test", "password updated in session" );
+is( getSession($id)->data->{_password}, "test", "password updated in session" );
 count(1);
 
 # Test $client->logout

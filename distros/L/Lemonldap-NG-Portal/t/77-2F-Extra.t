@@ -11,8 +11,7 @@ use_ok('Lemonldap::NG::Common::FormEncode');
 count(1);
 
 my $res;
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel              => 'error',
             localSessionStorage   => "Cache::NullCache",
@@ -173,12 +172,9 @@ $id = expectCookie($res);
 expectSessionAttributes( $client, $id, _2f => "home" );
 
 # Verify Authn Level
-ok( $res = $client->_get("/sessions/global/$id"), 'Get session' );
-expectOK($res);
-ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-  or print STDERR $@;
-is( $res->{authenticationLevel}, 5, "Correct authentication level" );
-count(3);
+is( getSession($id)->data->{authenticationLevel},
+    5, "Correct authentication level" );
+count(1);
 
 $client->logout($id);
 

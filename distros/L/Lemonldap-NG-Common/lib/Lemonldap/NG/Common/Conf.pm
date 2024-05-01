@@ -27,7 +27,7 @@ use Config::IniFiles;
 #inherits Lemonldap::NG::Common::Conf::Backends::SOAP
 #inherits Lemonldap::NG::Common::Conf::Backends::LDAP
 
-our $VERSION = '2.17.2';
+our $VERSION = '2.19.0';
 our $msg     = '';
 our $iniObj;
 
@@ -86,7 +86,7 @@ sub new {
             $msg .= "Error: configStorage: type is not well formed.\n";
         }
         $self->{type} = "Lemonldap::NG::Common::Conf::Backends::$self->{type}"
-          unless $self->{type} =~ /^Lemonldap::/;
+          unless $self->{type} =~ /::/;
         eval "require $self->{type}";
         if ($@) {
             $msg .= "Error: failed to load $self->{type}: \n $@";
@@ -145,6 +145,7 @@ sub saveConf {
     $msg .= "Configuration $conf->{cfgNum} stored.\n";
     if ( $self->{refLocalStorage} ) {
         $self->setDefault($conf);
+        $self->setValuesFromEnv($conf);
         $self->compactConf($conf);
         eval { Lemonldap::NG::Handler::Main->reload() };
     }
@@ -164,10 +165,21 @@ sub saveConf {
 sub getConf {
     my ( $self, $args ) = @_;
     my $res;
+    my $local                = $args->{local};
+    my $cfgNum               = $args->{cfgNum};
+    my $localPrm             = $args->{localPrm};
+    my $noCache              = $args->{noCache};
+    my $raw                  = $args->{raw};
+    my $allow_cache_for_root = $args->{allow_cache_for_root};
 
-    # Use only cache to get conf if $args->{local} is set
-    if (    $>
-        and $args->{local}
+    # If running as UID=0, disabled the cache unless explicitely allowed
+    if ( $> == 0 and !$allow_cache_for_root ) {
+        $noCache = 1;
+    }
+
+    # Use only cache to get conf if $local is set
+    if (   !$noCache
+        and $local
         and ref( $self->{refLocalStorage} )
         and $res = $self->{refLocalStorage}->get('conf') )
     {
@@ -177,34 +189,34 @@ sub getConf {
     # Check cfgNum in conf backend
     # Get conf in backend only if a newer configuration is available
     else {
-        $args->{cfgNum} ||= $self->lastCfg;
-        unless ( $args->{cfgNum} ) {
+        $cfgNum ||= $self->lastCfg;
+        unless ($cfgNum) {
             $msg .= "Error: No configuration available in backend.\n";
         }
         my $r;
         unless ( ref( $self->{refLocalStorage} ) ) {
             $msg .= "Get remote configuration (localStorage unavailable).\n";
-            $r = $self->getDBConf($args);
+            $r = $self->getDBConf( { cfgNum => $cfgNum } );
             return undef unless ( $r->{cfgNum} );
-            $self->setDefault( $r, $args->{localPrm} );
+            $self->setDefault( $r, $localPrm );
+            $self->setValuesFromEnv($r);
             $self->compactConf($r);
         }
         else {
             eval { $r = $self->{refLocalStorage}->get('conf') }
-              if ( $> and not $args->{noCache} );
+              if ( !$noCache );
             $msg .= "Warn: $@" if ($@);
 
             if (    ref($r)
                 and $r->{cfgNum}
-                and $args->{cfgNum}
-                and $r->{cfgNum} == $args->{cfgNum} )
+                and $cfgNum
+                and $r->{cfgNum} == $cfgNum )
             {
                 $msg .=
                   "Configuration unchanged, get configuration from cache.\n";
-                $args->{noCache} = 1;
             }
             else {
-                my $r2 = $self->getDBConf($args);
+                my $r2 = $self->getDBConf( { cfgNum => $cfgNum } );
                 unless ( $r2->{cfgNum} ) {
                     $r = $self->{refLocalStorage}->get('conf') unless ($r);
                     $msg .=
@@ -217,13 +229,10 @@ sub getConf {
                     $r = $r2;
                 }
 
-                $self->setDefault( $r, $args->{localPrm} );
-                $self->compactConf($r);
-
-                # Store modified configuration in cache
+                # Store configuration in cache
                 $self->setLocalConf($r)
                   if ( $self->{refLocalStorage}
-                    and not( $args->{noCache} == 1 or $args->{raw} ) );
+                    and not( $noCache == 1 or $raw ) );
             }
         }
 
@@ -231,8 +240,12 @@ sub getConf {
         $res = $r;
     }
 
+    $self->setDefault( $res, $localPrm );
+    $self->setValuesFromEnv($res);
+    $self->compactConf($res);
+
     # Create cipher object and replace variable placeholder
-    unless ( $args->{raw} ) {
+    unless ($raw) {
 
         $self->replacePlaceholders($res) if $self->{useServerEnv};
         eval {
@@ -275,6 +288,13 @@ sub setDefault {
         $conf->{whatToTrace} =~ s/^\$//;
     }
 
+    return $conf;
+}
+
+sub setValuesFromEnv {
+    my ( $self, $conf ) = @_;
+    $conf->{hashedSessionStore} = $ENV{LLNG_HASHED_SESSION_STORE}
+      if $ENV{LLNG_HASHED_SESSION_STORE};
     return $conf;
 }
 
@@ -383,7 +403,6 @@ sub getLocalConf {
 # @param $conf Lemonldap::NG configuration hashRef
 sub setLocalConf {
     my ( $self, $conf ) = @_;
-    return unless ($>);
     eval { $self->{refLocalStorage}->set( "conf", $conf ) };
     $msg .= "Warn: $@\n" if ($@);
 }
@@ -391,20 +410,21 @@ sub setLocalConf {
 ## @method hashRef getDBConf(hashRef args)
 # Get configuration from remote storage system.
 # @param $args hashRef that must contains a key "cfgNum" (number of the wanted
-# configuration) and optionaly a key "fields" that points to an array of wanted
-# configuration keys
+# configuration)
 # @return Lemonldap::NG configuration hashRef
 sub getDBConf {
     my ( $self, $args ) = @_;
-    return undef unless $args->{cfgNum};
-    if ( $args->{cfgNum} < 0 ) {
+    my $cfgNum = $args->{cfgNum};
+    return undef unless $cfgNum;
+
+    if ( $cfgNum < 0 ) {
         my @a = $self->available();
-        $args->{cfgNum} =
-            ( @a + $args->{cfgNum} > 0 )
-          ? ( $a[ $#a + $args->{cfgNum} ] )
+        $cfgNum =
+            ( @a + $cfgNum > 0 )
+          ? ( $a[ $#a + $cfgNum ] )
           : $a[0];
     }
-    my $conf = $self->load( $args->{cfgNum} );
+    my $conf = $self->load($cfgNum);
     return undef if $conf == "-1";
     $msg .= "Get configuration $conf->{cfgNum}.\n"
       if ( defined $conf->{cfgNum} );
@@ -619,9 +639,6 @@ a hash reference as first argument containing 2 optional parameters:
 
 =item * C<cfgNum => $number>: the number of the configuration wanted. If this
 argument is omitted, the last configuration is returned.
-
-=item * C<fields => [array of names]: the desired fields asked. By default,
-getConf returns all (C<select * from lmConfig>).
 
 =back
 

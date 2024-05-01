@@ -1,0 +1,9 @@
+[Unit]
+Description=Clean Lemonldap::NG sessions DB every 1h
+
+[Timer]
+OnCalendar=*-*-* *:07:07
+Persistent=true
+
+[Install]
+WantedBy=timers.target

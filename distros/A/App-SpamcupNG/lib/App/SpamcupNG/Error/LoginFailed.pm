@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use parent 'App::SpamcupNG::Error';
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 =head1 NAME
 
@@ -43,21 +43,21 @@ Overrided from the parent class, adding required behavior.
 
 sub message {
     my $self = shift;
-    my $additional
-        = ' Also consider obtaining a password to Spamcop.net instead of using '
-        . 'the old-style authorization token.';
+    my $additional =
+        ' Also consider obtaining a password to Spamcop.net instead of using '
+      . 'the old-style authorization token.';
 
     return join( '.', ( $self->{message}->[0], $additional ) );
 }
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2018 of Alceu Rodrigues de Freitas Junior,
-E<lt>arfreitas@cpan.orgE<gt>
+E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 This file is part of App-SpamcupNG distribution.
 

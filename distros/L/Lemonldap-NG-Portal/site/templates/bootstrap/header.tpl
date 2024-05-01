@@ -56,6 +56,9 @@
   <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/portal.js"></script>
   <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/bootstrap/dist/js/bootstrap.js"></script>
  <!-- //endif -->
+ <TMPL_IF NAME="CUSTOM_JS">
+  <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX"><TMPL_VAR NAME="CUSTOM_JS">"></script>
+ </TMPL_IF>
  <TMPL_VAR NAME="CUSTOM_SCRIPT">
  <TMPL_INCLUDE NAME="customhead.tpl">
 </head>

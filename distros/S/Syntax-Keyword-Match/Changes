@@ -1,5 +1,9 @@
 Revision history for Syntax-Keyword-Match
 
+0.14    2024-04-30
+        [CHANGES]
+         * Added an initial attempt at B::Deparse logic
+
 0.13    2023-07-20
         [CHANGES]
          * Provide new `case if` syntax (RT148939)

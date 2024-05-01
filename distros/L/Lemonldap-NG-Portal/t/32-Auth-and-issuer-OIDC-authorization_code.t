@@ -79,7 +79,7 @@ LWP::Protocol::PSGI->register(
 );
 
 # Initialization
-ok( $op = op(), 'OP portal' );
+ok( $op = register( 'op', sub { op() } ), 'OP portal' );
 
 ok( $res = $op->_get('/oauth2/jwks'), 'Get JWKS,     endpoint /oauth2/jwks' );
 expectOK($res);
@@ -93,9 +93,8 @@ expectOK($res);
 my $metadata = $res->[2]->[0];
 count(3);
 
-switch ('rp');
 &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-ok( $rp = rp( $jwks, $metadata ), 'RP portal' );
+ok( $rp = register( 'rp', sub { rp( $jwks, $metadata ) } ), 'RP portal' );
 count(1);
 
 # Query RP for auth
@@ -105,7 +104,6 @@ my ( $url, $query ) =
   expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
 
 # Push request to OP
-switch ('op');
 ok( $res = $op->_get( $url, query => $query, accept => 'text/html' ),
     "Push request to OP,         endpoint $url" );
 count(1);
@@ -159,14 +157,12 @@ count(1);
 ($query) = expectRedirection( $res, qr#^http://auth.rp.com/?\?(.*)$# );
 
 # Push OP response to RP
-switch ('rp');
 
 ok( $res = $rp->_get( '/', query => $query, accept => 'text/html' ),
     'Call openidconnectcallback on RP' );
 count(1);
 my $spId = expectCookie($res);
 
-switch ('op');
 ok(
     $res = $op->_get( '/oauth2/checksession.html', accept => 'text.html' ),
     'Check session,      endpoint /oauth2/checksession.html'
@@ -191,22 +187,35 @@ ok( $res->{name} eq 'Frédéric Accents', 'UTF-8 values' )
   or explain( $res, 'name => Frédéric Accents' );
 count(2);
 
-ok( $res = $op->_get("/sessions/global/$spId"), 'Get UTF-8' );
-$res = expectJSON($res);
-ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
+ok( getSession($spId)->data->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
   or explain( $res, 'cn => Frédéric Accents' );
-count(2);
+count(1);
 
-switch ('rp');
-ok( $res = $rp->_get("/sessions/global/$spId"), 'Get UTF-8' );
-$res = expectJSON($res);
+$res = getSession($spId)->data;
 my $access_token_eol = $res->{_oidc_access_token_eol};
 my $access_token_old = $res->{_oidc_access_token};
 ok( $access_token_eol, 'OIDC EOL time is stored' );
 ok( $access_token_old, 'Obtained refresh token' );
 is( $res->{cn},   'Frédéric Accents', 'UTF-8 values' );
 is( $res->{mail}, 'fa@badwolf.org',   'Correct email' );
-count(5);
+is_deeply(
+    [ sort split( /[; ]+/, $res->{groups} ) ],
+    [ "earthlings", "users" ],
+    'Correct groups'
+);
+is_deeply(
+    $res->{hGroups},
+    {
+        'earthlings' => {
+            'name' => 'earthlings'
+        },
+        'users' => {
+            'name' => 'users'
+        }
+    },
+    "Correct hGroups"
+);
+count(6);
 
 is( $res->{userinfo_hook}, "op/french", "oidcGotUserInfo called" );
 is( $res->{id_token_hook}, "op/french", "oidcGotIDToken called" );
@@ -224,10 +233,8 @@ $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{french} = {
     guy  => '',
     type => '',
 };
-switch ('op');
 ok( $op->_get( '/refresh', cookie => "lemonldap=$idpId" ) );
 count(1);
-switch ('rp');
 
 # Test session refresh (before access token refresh)
 ok(
@@ -240,9 +247,7 @@ ok(
 );
 count(1);
 
-ok( $res = $rp->_get("/sessions/global/$spId"), 'Get session after refresh' );
-count(1);
-$res = expectJSON($res);
+$res = getSession($spId)->data;
 my $access_token_new     = $res->{_oidc_access_token};
 my $access_token_new_eol = $res->{_oidc_access_token_eol};
 is( $access_token_new_eol, $access_token_eol,
@@ -259,10 +264,8 @@ $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{french} = {
     guy  => '',
     type => '',
 };
-switch ('op');
 ok( $op->_get( '/refresh', cookie => "lemonldap=$idpId" ) );
 count(1);
-switch ('rp');
 
 # Test session refresh (with access token refresh)
 Time::Fake->offset("+2h");
@@ -276,16 +279,31 @@ ok(
 );
 count(1);
 
-ok( $res = $rp->_get("/sessions/global/$spId"), 'Get session after refresh' );
-count(1);
-$res                  = expectJSON($res);
+$res                  = getSession($spId)->data;
 $access_token_new     = $res->{_oidc_access_token};
 $access_token_new_eol = $res->{_oidc_access_token_eol};
 isnt( $access_token_new_eol, $access_token_eol,
     "Access token EOL has changed" );
 isnt( $access_token_new, $access_token_old, "Access token has changed" );
 is( $res->{mail}, 'fa3@badwolf.org', 'Updated RP session' );
-count(3);
+is_deeply(
+    [ sort split( /[; ]+/, $res->{groups} ) ],
+    [ "earthlings", "users" ],
+    'Still correct groups'
+);
+is_deeply(
+    $res->{hGroups},
+    {
+        'earthlings' => {
+            'name' => 'earthlings'
+        },
+        'users' => {
+            'name' => 'users'
+        }
+    },
+    "Still correct hGroups"
+);
+count(5);
 
 # Logout initiated by RP
 ok(
@@ -302,7 +320,6 @@ count(1);
     qr#http://auth.op.com(/oauth2/logout)\?.*(post_logout_redirect_uri=.+)$# );
 
 # Push logout to OP
-switch ('op');
 
 ok(
     $res = $op->_get(
@@ -361,7 +378,6 @@ ok(
 count(1);
 expectReject($res);
 
-switch ('rp');
 ok(
     $res = $rp->_get(
         '/',
@@ -384,7 +400,6 @@ count(1);
 # -------------------------
 
 # Push request to OP
-switch ('op');
 ok( $res = $op->_get( $url, query => $query, accept => 'text/html' ),
     "Push request to OP,         endpoint $url" );
 count(1);
@@ -412,8 +427,7 @@ clean_sessions();
 done_testing( count() );
 
 sub op {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',
@@ -423,11 +437,13 @@ sub op {
                 issuerDBOpenIDConnectActivation => "1",
                 restSessionServer               => 1,
                 restExportSecretKeys            => 1,
+                oidcServiceIgnoreScopeForClaims => 1,
                 oidcRPMetaDataExportedVars      => {
                     rp => {
                         email       => "mail",
                         family_name => "cn",
-                        name        => "cn"
+                        name        => "cn",
+                        groups      => "groups",
                     }
                 },
                 oidcServiceAllowHybridFlow            => 1,
@@ -470,8 +486,7 @@ sub op {
 
 sub rp {
     my ( $jwks, $metadata ) = @_;
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',
@@ -482,10 +497,11 @@ sub rp {
                 restExportSecretKeys       => 1,
                 oidcOPMetaDataExportedVars => {
                     op => {
-                        cn   => "name",
-                        uid  => "sub",
-                        sn   => "family_name",
-                        mail => "email"
+                        cn     => "name",
+                        uid    => "sub",
+                        sn     => "family_name",
+                        mail   => "email",
+                        groups => "groups",
                     }
                 },
                 oidcOPMetaDataOptions => {

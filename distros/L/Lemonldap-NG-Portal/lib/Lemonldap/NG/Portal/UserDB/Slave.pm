@@ -13,10 +13,10 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_FORBIDDENIP
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.19.0';
 
 extends qw(
-  Lemonldap::NG::Common::Module
+  Lemonldap::NG::Portal::Main::UserDB
   Lemonldap::NG::Portal::Lib::Slave
 );
 
@@ -52,10 +52,6 @@ sub setSessionInfo {
         $v =~ s/\-/_/g;
         $req->{sessionInfo}->{$k} = $req->{$v};
     }
-    return PE_OK;
-}
-
-sub setGroups {
     return PE_OK;
 }
 

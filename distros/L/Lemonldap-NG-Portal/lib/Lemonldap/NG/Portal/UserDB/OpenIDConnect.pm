@@ -9,10 +9,10 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.19.0';
 
 extends qw(
-  Lemonldap::NG::Common::Module
+  Lemonldap::NG::Portal::Main::UserDB
   Lemonldap::NG::Portal::Lib::OpenIDConnect
 );
 
@@ -87,14 +87,16 @@ sub setSessionInfo {
     );
 
     while ( my ( $k, $v ) = each %vars ) {
-        $req->{sessionInfo}->{$k} = $req->data->{OpenIDConnect_user_info}->{$v};
+        my $value = $req->data->{OpenIDConnect_user_info}->{$v};
+        if (  ref($value) and ref($value) eq "ARRAY" ) {
+            $req->{sessionInfo}->{$k} =
+              join( $self->conf->{multiValuesSeparator}, @$value );
+        }
+        else {
+            $req->{sessionInfo}->{$k} = $value;
+        }
     }
 
-    return PE_OK;
-}
-
-# Does nothing
-sub setGroups {
     return PE_OK;
 }
 

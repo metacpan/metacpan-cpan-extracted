@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Api::Providers::CasApp;
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.19.0';
 
 package Lemonldap::NG::Manager::Api;
 
@@ -352,7 +352,7 @@ sub _pushCasApp {
         foreach ( keys %{ $push->{options} } ) {
             my $optionName = $self->_translateOptionApiToConf( $_, 'casApp' );
             my $optionValue =
-              $self->_translateValueApiToConf( $_, $push->{options}->{$_} );
+              $self->_translateValueApiToConf( $optionName, $push->{options}->{$_} );
 
             $translatedOptions->{$optionName} = $optionValue;
         }

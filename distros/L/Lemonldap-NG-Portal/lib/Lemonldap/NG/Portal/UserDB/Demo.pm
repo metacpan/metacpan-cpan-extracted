@@ -13,9 +13,9 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-extends 'Lemonldap::NG::Common::Module';
+extends 'Lemonldap::NG::Portal::Main::UserDB';
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.19.0';
 
 # Sample accounts from Doctor Who characters
 our %demoAccounts = (
@@ -123,7 +123,8 @@ sub findUser {
         $self->logger->debug("Demo UserDB random rank: $rank");
         $self->userLogger->info(
             "FindUser: Demo UserDB returns $results[$rank]");
-        $req->data->{findUser} = $results[$rank];
+        $req->data->{findUser}    = $results[$rank];
+        $req->data->{findUserAll} = \@results;
         return PE_OK;
     }
 

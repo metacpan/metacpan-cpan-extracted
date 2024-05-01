@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Handler::Server::Main;
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.19.0';
 
 extends 'Lemonldap::NG::Handler::PSGI';
 
@@ -36,11 +36,23 @@ sub _run {
 
 sub handler {
     my ( $self, $req ) = @_;
-    my @convertedHdrs = (
-        @{ $req->{respHeaders} },
-        'Content-Length' => 0,
-        Cookie           => ( $req->env->{HTTP_COOKIE} // '' )
-    );
+    my @convertedHdrs =
+      ( 'Content-Length' => 0, Cookie => ( $req->env->{HTTP_COOKIE} // '' ) );
+    while ( my ( $k, $v ) = splice( @{ $req->{respHeaders} }, 0, 2 ) ) {
+        if ( $k =~ /^(?:Deleteheader\d+|Cookie)$/ ) {
+            next;
+        }
+        else {
+            push @convertedHdrs, $k, $v;
+        }
+    }
+
+    # Echo the Authorization header to compensate the fact that Traefik removes
+    # it from the incoming HTTP request
+    if ( my $authorization = $req->headers->header('Authorization') ) {
+        push @convertedHdrs, "Authorization" => $authorization;
+    }
+
     return [ 200, \@convertedHdrs, [] ];
 }
 

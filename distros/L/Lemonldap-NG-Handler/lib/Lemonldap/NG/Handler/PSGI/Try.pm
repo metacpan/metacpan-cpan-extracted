@@ -7,7 +7,7 @@ our $VERSION = '2.17.0';
 
 extends 'Lemonldap::NG::Handler::PSGI::Router';
 
-has 'authRoutes' => (
+has authRoutes => (
     is      => 'rw',
     isa     => 'HashRef',
     default => sub {
@@ -22,7 +22,7 @@ has 'authRoutes' => (
     }
 );
 
-has 'unAuthRoutes' => (
+has unAuthRoutes => (
     is      => 'rw',
     isa     => 'HashRef',
     default => sub {

@@ -18,7 +18,6 @@ plan skip_all => "Missing dependencies: $@" if ($@);
 
 ok( $issuer = issuer(), 'Issuer portal' );
 count(1);
-switch ('issuer');
 
 ok(
     $res = $issuer->_get(

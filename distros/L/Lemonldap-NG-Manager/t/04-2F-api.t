@@ -6,6 +6,7 @@ use strict;
 use JSON;
 use IO::String;
 use Lemonldap::NG::Common::Session;
+use Lemonldap::NG::Common::TOTP;
 
 eval { mkdir 't/sessions' };
 `rm -rf t/sessions/*`;
@@ -18,8 +19,7 @@ sub newSession {
     my ( $uid, $ip, $kind, $sfaDevices ) = splice @_;
     my $tmp;
     ok(
-        $tmp = Lemonldap::NG::Common::Session->new(
-            {
+        $tmp = Lemonldap::NG::Common::Session->new( {
                 storageModule        => 'Apache::Session::File',
                 storageModuleOptions => {
                     Directory      => 't/sessions',
@@ -34,20 +34,67 @@ sub newSession {
     );
     count(1);
     ok(
-        $tmp->update(
-            {
+        $tmp->update( {
                 ipAddr        => $ip,
                 _whatToTrace  => $uid,
                 uid           => $uid,
                 _session_uid  => $uid,
                 _utime        => time,
                 _session_kind => $kind,
-                _2fDevices    => to_json($sfaDevices),
+                (
+                    defined $sfaDevices
+                    ? ( _2fDevices => to_json($sfaDevices) )
+                    : ()
+                ),
             }
         ),
         "New $kind session for $uid"
     );
     count(1);
+    return $tmp->id;
+}
+
+sub get2fDevices {
+    my ($id) = @_;
+    my $tmp;
+    ok(
+        $tmp = Lemonldap::NG::Common::Session->new( {
+                storageModule        => 'Apache::Session::File',
+                storageModuleOptions => {
+                    Directory      => 't/sessions',
+                    LockDirectory  => 't/sessions',
+                    backend        => 'Apache::Session::File',
+                    generateModule =>
+'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
+                },
+                id => $id,
+            }
+        ),
+        'Sessions module'
+    );
+    count(1);
+    return from_json( $tmp->data->{_2fDevices}, { allow_nonref => 1 } );
+}
+
+sub checkTotpData {
+    my ( $totp, $key, %attr ) = @_;
+
+    is( $totp->{type}, "TOTP", "Correct type" );
+    ok( $totp->{epoch}, "Epoch was set" );
+    while ( my ( $k, $v ) = each %attr ) {
+        is( $totp->{$k}, $v, "Correct $k" );
+    }
+
+    like( $totp->{_secret}, qr/llngcrypt/, "Secret was encrypted" );
+
+    my $totp_decrypt = Lemonldap::NG::Common::TOTP->new(
+        key           => "abc",
+        encryptSecret => 1,
+    );
+
+    is( $totp_decrypt->get_cleartext_secret( $totp->{_secret} ),
+        $key, "Correct normalized key" );
+
 }
 
 sub check200 {
@@ -57,11 +104,27 @@ sub check200 {
     checkJson( $test, $res );
 }
 
-sub check400 {
+sub check201 {
     my ( $test, $res ) = splice @_;
-    ok( $res->[0] == 400, "$test: Result code is 400" );
+
+    is( $res->[0], "201", "$test: Result code is 201" );
     count(1);
     checkJson( $test, $res );
+}
+
+sub check204 {
+    my ( $test, $res ) = splice @_;
+
+    is( $res->[0], "204", "$test: Result code is 204" );
+    count(1);
+    is( $res->[2]->[0], undef, "204 code returns no content" );
+}
+
+sub check400 {
+    my ( $test, $res, $regex ) = splice @_;
+    ok( $res->[0] == 400, "$test: Result code is 400" );
+    count(1);
+    checkJson( $test, $res, $regex );
 }
 
 sub check404 {
@@ -71,13 +134,58 @@ sub check404 {
     checkJson( $test, $res );
 }
 
-sub checkJson {
+sub check409 {
     my ( $test, $res ) = splice @_;
+    is( $res->[0], "409", "$test: Result code is 409" );
+    count(1);
+    checkJson( $test, $res );
+}
+
+sub checkJson {
+    my ( $test, $res, $regex ) = splice @_;
     my $key;
 
     #diag Dumper($res->[2]->[0]);
     ok( $key = from_json( $res->[2]->[0] ), "$test: Response is JSON" );
+    if ($regex) {
+        like( $key->{error}, $regex, "Expected error message" );
+        count(1);
+    }
     count(1);
+}
+
+sub checkSearchNotFound {
+    my ($params) = @_;
+    my $test =
+      "Searching for " . ( $params || '[no params]' ) . " returns no results";
+    my $res = search( $test, $params );
+    check200( $test, $res );
+    my $result = from_json( $res->[2]->[0] );
+    is_deeply( $result, [], "Empty list was returned" );
+}
+
+sub checkSearch {
+    my ( $params, $expected_list ) = @_;
+    $expected_list ||= [];
+    my $test =
+        "Searching for "
+      . ( $params || '[no params]' )
+      . " returns "
+      . join( ",", @$expected_list );
+    my $res = search( $test, $params );
+    check200( $test, $res );
+    my $result = from_json( $res->[2]->[0] );
+    my @names  = map { $_->{uid} } @$result;
+    is_deeply( [ sort @names ], $expected_list, "Expected results" );
+    return $result;
+}
+
+sub search {
+    my ( $test, $params ) = @_;
+    ok( my $res = &client->_get( "/api/v1/secondFactor", $params ),
+        "$test: Request succeed" );
+    count(1);
+    return $res;
 }
 
 sub get {
@@ -209,6 +317,86 @@ sub checkDeleteBadType {
     check400( $test, $res );
 }
 
+sub replace {
+    my ( $test, $uid, $id, $obj ) = splice @_;
+    my $j = $_json->encode($obj);
+    my $res;
+    ok(
+        $res = &client->_put(
+            "/api/v1/secondFactor/$uid/id/$id", '',
+            IO::String->new($j),                'application/json',
+            length($j)
+        ),
+        "$test: Request succeed"
+    );
+    count(1);
+    return $res;
+}
+
+sub checkReplace {
+    my ( $test, $uid, $id, $replace ) = splice @_;
+    check204( $test, replace( $test, $uid, $id, $replace ) );
+}
+
+sub checkReplaceAlreadyThere {
+    my ( $test, $uid, $id, $replace ) = splice @_;
+    check400( $test, replace( $test, $uid, $id, $replace ) );
+}
+
+sub checkReplaceNotFound {
+    my ( $test, $uid, $id, $update ) = splice @_;
+    check404( $test, replace( $test, $uid, $id, $update ) );
+}
+
+sub checkReplaceWithInvalidAttribute {
+    my ( $test, $uid, $id, $replace ) = splice @_;
+    check400( $test, replace( $test, $uid, $id, $replace ) );
+}
+
+sub add {
+    my ( $test, $uid, $type, $obj, $query ) = splice @_;
+    my $j = $_json->encode($obj);
+    my $res;
+
+    my $path = $type ? "/type/$type" : "";
+    ok(
+        $res = &client->_post(
+            "/api/v1/secondFactor/${uid}${path}", ( $query || '' ),
+            IO::String->new($j), 'application/json',
+            length($j)
+        ),
+        "$test: Request succeed"
+    );
+    count(1);
+    return $res;
+}
+
+sub checkAdd {
+    my ( $test, $uid, $type, $add, $query ) = splice @_;
+    check201( $test, add( $test, $uid, $type, $add, $query ) );
+}
+
+sub checkAddFailsIfExists {
+    my ( $test, $uid, $type, $add ) = splice @_;
+    check409( $test, add( $test, $uid, $type, $add ) );
+}
+
+sub checkAddWithBadAttributes {
+    my ( $test, $uid, $type, $add, $regex ) = splice @_;
+    $regex ||= qr/Invalid input/;
+    check400( $test, add( $test, $uid, $type, $add ), $regex );
+}
+
+sub checkAddWithUnknownUser {
+    my ( $test, $uid, $type, $add, $query ) = splice @_;
+    check404( $test, add( $test, $uid, $type, $add, $query ) );
+}
+
+sub checkAddWithUnknownType {
+    my ( $test, $uid, $type, $add ) = splice @_;
+    check400( $test, add( $test, $uid, $type, $add ), qr/Invalid type: $type/ );
+}
+
 my $sfaDevices = [];
 my $ret;
 
@@ -218,8 +406,7 @@ newSession( 'msmith', '127.10.0.1', 'SSO',        $sfaDevices );
 newSession( 'msmith', '127.10.0.1', 'Persistent', $sfaDevices );
 
 # dwho
-$sfaDevices = [
-    {
+$sfaDevices = [ {
         "name"       => "MyU2FKey",
         "type"       => "U2F",
         "_userKey"   => "123456",
@@ -251,8 +438,7 @@ newSession( 'dwho', '127.10.0.1', 'SSO',        $sfaDevices );
 newSession( 'dwho', '127.10.0.1', 'Persistent', $sfaDevices );
 
 # rtyler
-$sfaDevices = [
-    {
+$sfaDevices = [ {
         "name"       => "MyU2FKey",
         "type"       => "U2F",
         "_userKey"   => "123456",
@@ -276,8 +462,7 @@ newSession( 'rtyler', '127.10.0.1', 'SSO',        $sfaDevices );
 newSession( 'rtyler', '127.10.0.1', 'Persistent', $sfaDevices );
 
 # davros
-$sfaDevices = [
-    {
+$sfaDevices = [ {
         "name"       => "MyU2FKey",
         "type"       => "U2F",
         "_userKey"   => "123456",
@@ -295,8 +480,7 @@ newSession( 'davros', '127.10.0.1', 'SSO',        $sfaDevices );
 newSession( 'davros', '127.10.0.1', 'Persistent', $sfaDevices );
 
 # tof
-$sfaDevices = [
-    {
+$sfaDevices = [ {
         "name"       => "MyU2FKey",
         "type"       => "U2F",
         "_userKey"   => "123456",
@@ -306,6 +490,10 @@ $sfaDevices = [
 ];
 newSession( 'tof', '127.10.0.1', 'SSO',        $sfaDevices );
 newSession( 'tof', '127.10.0.1', 'Persistent', $sfaDevices );
+
+# donna
+newSession( 'donna', '127.10.0.1', 'SSO',        [] );
+newSession( 'donna', '127.10.0.1', 'Persistent', [] );
 
 # dwho
 checkGetList( 1, 'dwho', 'U2F' );
@@ -362,5 +550,171 @@ checkDelete( 'tof', @$ret[0]->{id} );
 checkDelete404( 'tof', @$ret[0]->{id} );
 checkGetList( 0, 'tof' );
 checkDeleteList( 0, 'tof' );
+
+# 2FA add (generic)
+checkAddWithBadAttributes( "Add/noattr ", "donna", undef, {},
+    qr/Invalid input/ );
+checkAddWithBadAttributes(
+    "Add/epoch", "donna", undef,
+    { name => "test", type => "test", epoch => 1 },
+    qr/Invalid input: epoch is forbidden/
+);
+checkAdd( "Add second factor",
+    "donna", undef, { type => "test", name => "test" } );
+$ret = checkGetList( 1, 'donna', 'test' );
+checkAdd( "Add second factor",
+    "donna", undef, { type => "test", name => "test" } );
+$ret = checkGetList( 2, 'donna', 'test' );
+
+# 2FA add (invalid type)
+checkAddWithUnknownType( "Add/noattr ", "amy", "xxx", {} );
+
+# 2FA add (TOTP)
+newSession( 'amy', '127.10.0.1', 'SSO', [] );
+my $amypsession = newSession( 'amy', '127.10.0.1', 'Persistent', [] );
+
+checkAddWithBadAttributes( "Add/noattr ", "amy", "TOTP", {} );
+checkAddWithBadAttributes( "Add/epoch", "amy", "TOTP",
+    { name => "test", type => "test", epoch => 1 } );
+
+checkAddWithBadAttributes( "Add/nokey", "amy", "TOTP", { name => "test" } );
+
+checkAddWithBadAttributes(
+    "Add/badkey", "amy", "TOTP",
+    { name => "test", key => "123xxx" },
+    qr/Invalid secret/
+);
+
+checkAdd( "Add/goodkey", "amy", "TOTP",
+    { name => "test", key => "GEZDGNBVGY3TQOJQ GEZDGNBVG Y3TQOJQ  " } );
+checkGetList( 1, 'amy', 'TOTP' );
+
+checkTotpData(
+    get2fDevices($amypsession)->[0],
+    "gezdgnbvgy3tqojqgezdgnbvgy3tqojq",
+    name => "test"
+);
+
+# 2FA add (TOTP) with undef 2fDevices
+newSession( 'rory', '127.10.0.1', 'SSO', undef );
+my $rorypsession = newSession( 'rory', '127.10.0.1', 'Persistent', undef );
+
+checkAdd( "Add/goodkey", "rory", "TOTP",
+    { name => "test", key => "GEZDGNBVGY3TQOJQ GEZDGNBVG Y3TQOJQ  " } );
+checkGetList( 1, 'rory', 'TOTP' );
+
+checkTotpData(
+    get2fDevices($rorypsession)->[0],
+    "gezdgnbvgy3tqojqgezdgnbvgy3tqojq",
+    name => "test"
+);
+
+# 2FA add with nonexisting session
+checkAddWithUnknownUser( "Add/missinguser", "unknowng", undef,
+    { type => "test", name => "test" } );
+checkAddWithUnknownUser( "Add/missinguser", "unknownt", "TOTP",
+    { type => "test", key => "GEZDGNBVGY3TQOJQ GEZDGNBVG Y3TQOJQ  " } );
+checkAddWithUnknownUser( "Add/missinguser", "unknowng", undef,
+    { type => "test", name => "test" },
+    "create=false" );
+checkAddWithUnknownUser( "Add/missinguser", "unknownt", "TOTP",
+    { type => "test", key => "GEZDGNBVGY3TQOJQ GEZDGNBVG Y3TQOJQ  " },
+    "create=false" );
+
+checkAdd( "Add/missinguser", "unknowng", undef,
+    { type => "test", name => "test" },
+    "create=true" );
+checkGetList( 1, 'unknowng', 'test' );
+
+checkAdd( "Add/missinguser", "unknownt", "TOTP",
+    { name => "test", key => "GEZDGNBVGY3TQOJQ GEZDGNBVG Y3TQOJQ  " },
+    "create=true" );
+checkGetList( 1, 'unknownt', 'TOTP' );
+
+# 2FA search
+
+`rm -rf t/sessions/*`;
+
+checkSearchNotFound;
+
+# Populate some test factors
+newSession(
+    'dwho',
+    '127.10.0.1',
+    'Persistent',
+    [ {
+            "name"  => "MyTOTP",
+            "type"  => "TOTP",
+            "epoch" => "1643201784",
+        },
+        {
+            "epoch" => "1643201784",
+            "name"  => "MyFidoKey",
+            "type"  => "WebAuthn"
+        },
+    ]
+);
+newSession(
+    'rtyler',
+    '127.10.0.1',
+    'Persistent',
+    [ {
+            "name"  => "MyTOTP",
+            "type"  => "TOTP",
+            "epoch" => "1643201784",
+        }
+    ]
+);
+newSession(
+    'mjones',
+    '127.10.0.1',
+    'Persistent',
+    [ {
+            "name"  => "MyUBK",
+            "type"  => "Yubikey",
+            "epoch" => "1643201784",
+        }
+    ]
+);
+newSession( 'msmith', '127.10.0.1', 'Persistent', [] );
+
+checkSearch( "", [qw/dwho mjones rtyler/] );
+my $result = checkSearch( "type=TOTP", [qw/dwho rtyler/] );
+is_deeply(
+    $result,
+
+    [ {
+            'secondFactors' => [ {
+                    'id'   => 'MTY0MzIwMTc4NDo6VE9UUDo6TXlUT1RQ',
+                    'name' => 'MyTOTP',
+                    'type' => 'TOTP'
+                },
+                {
+                    'id'   => 'MTY0MzIwMTc4NDo6V2ViQXV0aG46Ok15Rmlkb0tleQ==',
+                    'name' => 'MyFidoKey',
+                    'type' => 'WebAuthn'
+                }
+            ],
+            'uid' => 'dwho'
+        },
+        {
+            'secondFactors' => [ {
+                    'id'   => 'MTY0MzIwMTc4NDo6VE9UUDo6TXlUT1RQ',
+                    'name' => 'MyTOTP',
+                    'type' => 'TOTP'
+                }
+            ],
+            'uid' => 'rtyler'
+        }
+    ],
+    "Expected API response"
+);
+
+checkSearch( "uid=m*",              [qw/mjones/] );
+checkSearch( "uid=m*&type=Yubikey", [qw/mjones/] );
+checkSearchNotFound("uid=m*&type=TOTP");
+checkSearch( "uid=dwho&type=TOTP", [qw/dwho/] );
+checkSearchNotFound("uid=dwho&type=Yubikey");
+checkSearch( "type=TOTP&type=WebAuthn", [qw/dwho/] );
 
 done_testing();

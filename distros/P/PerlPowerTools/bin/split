@@ -21,7 +21,6 @@ License: perl
 #   Perl Power Tools -- http://language.perl.com/ppt/
 #
 
-$^W = 1;  # -w
 use strict;
 use Getopt::Std;
 use File::Basename;
@@ -31,18 +30,11 @@ my $me = basename($0);
 ## get_count expands byte/linecount 'k' and 'm' and checks sanity
 sub get_count {
     my $count = shift;
-
-    return undef unless $count =~ /^\d+[KkMm]?$/;   # sane?
-
-    if ($count =~ /[Kk]$/) {
-	$count =~ s/[Kk]//g;
-	$count *= 1024;
-    } elsif ($count =~ /[Mm]$/) {
-	$count =~ s/[Mm]//g;
-	$count *= 1024 * 1024;
-    }
-
-    return $count;
+    my %mult = ('k' => 1024, 'm' => 1024 * 1024);
+    return if $count !~ m/\A([0-9]+)([KkMm]?)\Z/;
+    my $n = $1;
+    $n *= $mult{lc($2)} if $2;
+    return $n;
 }
 
 # nextfile creates the next file for output, and returns the
@@ -97,6 +89,16 @@ exit 1;
 #### Main program starts here. ####
 
 getopts('b:l:p:', \my %opt) or clue;
+my $nbytes;
+if (defined $opt{'b'}) {
+    $nbytes = get_count($opt{'b'}) or die qq($me: "$opt{b}" is invalid number of bytes\n);
+}
+my $nlines;
+if (defined $opt{'l'}) {
+    $nlines = get_count($opt{'l'}) or die qq($me: "$opt{l}" is invalid number of lines\n);
+}
+clue() if ($nbytes && $nlines);
+clue() if ($opt{'p'} && ($nbytes || $nlines));
 
 my $infile = shift;
 my $prefix = shift;
@@ -118,14 +120,9 @@ else {
 }
 binmode $in;
 ## Byte operations.
-if ($opt{b} and (! $opt{p}) and (! $opt{l})) {
-
+if ($opt{'b'}) {
     my ($chunk, $fh);
-    my $count = get_count ($opt{b});
-
-    unless ($count) { die qq($me: "$opt{b}" is invalid number of bytes.\n) }
-
-    while (read ($in, $chunk, $count) == $count) {
+    while (read ($in, $chunk, $nbytes) == $nbytes) {
 	$fh = nextfile ($prefix);
 	print {$fh} $chunk;
     }
@@ -139,8 +136,7 @@ if ($opt{b} and (! $opt{p}) and (! $opt{l})) {
 }
 
 ## Split on patterns.
-elsif ($opt{p} and (! $opt{b}) and (! $opt{l})) {
-
+elsif ($opt{'p'}) {
     my $regex = $opt{p};
     my $fh = nextfile ($prefix);
 
@@ -151,21 +147,16 @@ elsif ($opt{p} and (! $opt{b}) and (! $opt{l})) {
 }
 
 ## Line operations.
-elsif ((! $opt{p}) and (! $opt{b})) {
-
-    # default is -l 1000  (NOT 1k!)
+elsif ((! $opt{'p'}) and (! $opt{'b'})) {
     my $fh;
-    my $count = (defined $opt{l} ? get_count($opt{l}) : 1000);
+    $nlines = 1000 unless $nlines;
     my $line = 0;
 
-    unless ($count) { die qq($me: "$opt{l}" is invalid number of lines.\n) }
-
     while (<$in>) {
-	$fh = nextfile ($prefix) if $line % $count == 0;
+	$fh = nextfile ($prefix) if $line % $nlines == 0;
 	print {$fh} $_;
 	$line++;
     }
-
 }
 
 else { clue };

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use parent 'App::SpamcupNG::Error';
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 =head1 NAME
 
@@ -49,19 +49,19 @@ sub message {
     $temp[0] =~ s/\:$/,/;
     $temp[1] .= ',';
     $temp[2] .= '.';
-    $temp[3]
-        = 'Please, access manually the Spamcop website and fix this before trying to run spamcup again.';
+    $temp[3] =
+'Please, access manually the Spamcop website and fix this before trying to run spamcup again.';
     return join( ' ', @temp );
 }
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2018 of Alceu Rodrigues de Freitas Junior,
-E<lt>arfreitas@cpan.orgE<gt>
+E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 This file is part of App-SpamcupNG distribution.
 

@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.19.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -38,7 +38,6 @@ sub init {
     }
     $self->srvNumber( scalar @tab );
     my @list;
-    my $portalPath = $self->conf->{portal};
 
     foreach (@tab) {
         my $name = $_;
@@ -59,7 +58,7 @@ sub init {
             $img_src =
               ( $icon =~ m#^https?://# )
               ? $icon
-              : $portalPath . $self->p->staticPrefix . "/common/" . $icon;
+              : $self->p->staticPrefix . "/common/" . $icon;
         }
         push @list,
           {
@@ -199,7 +198,8 @@ sub extractFormInfo {
         $req->{urldc} = $login_url;
         $req->steps( [] );
         $req->addCookie(
-            $self->p->cookie(
+            $self->p->genCookie(
+                $req,
                 name   => 'llngcasserver',
                 value  => $srv,
                 secure => $self->conf->{securedCookie},

@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR);
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.19.0';
 
 # INITIALIZATION
 
@@ -126,7 +126,8 @@ sub extractFormInfo {
 
             # 1.2 Store token key and secret in cookies (available 180s)
             $req->addCookie(
-                $self->p->cookie(
+                $self->p->genCookie(
+                    $req,
                     name    => '_twitSec',
                     value   => $response->token_secret,
                     max_age => 180,
@@ -169,7 +170,7 @@ sub extractFormInfo {
         signature_method => 'HMAC-SHA1',
         verifier         => $verifier,
         token            => $request_token,
-        token_secret     => $self->p->cookie( name => '_twitSec' ),
+        token_secret     => $self->p->genCookie( $req, name => '_twitSec' ),
         timestamp        => time,
         nonce            => $nonce,
     );
@@ -210,7 +211,8 @@ sub extractFormInfo {
 
     # Clean temporaries cookies
     $req->addCookie(
-        $self->p->cookie(
+        $self->p->genCookie(
+            $req,
             name    => '_twitSec',
             value   => 0,
             expires => 'Wed, 21 Oct 2015 00:00:00 GMT'

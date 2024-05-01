@@ -11,7 +11,7 @@ BEGIN {
 }
 
 my ( $res, $user, $pwd );
-my $maintests = 11;
+my $maintests = 10;
 my $mailSend  = 0;
 
 my $mail2 = 0;
@@ -69,9 +69,6 @@ m%<a class="btn btn-secondary" href="http://auth.example.com/resetpwd\?skin=boot
         $res->[2]->[0] =~ m%<img src="/static/common/logos/logo_llng_old.png"%,
         'Found custom Main Logo'
     ) or print STDERR Dumper( $res->[2]->[0] );
-    ok( mail() =~ m%Content-Type: image/png; name="logo_llng_old.png"%,
-        'Found custom Main logo in mail' )
-      or print STDERR Dumper( mail() );
     ok( mail() =~ m#a href="http://auth.example.com/resetpwd\?(.*?)"#,
         'Found link in mail' );
     $query = $1;

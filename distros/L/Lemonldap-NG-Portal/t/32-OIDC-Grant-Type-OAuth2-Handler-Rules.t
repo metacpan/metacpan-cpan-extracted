@@ -13,7 +13,6 @@ BEGIN {
 }
 
 my $res;
-my $debug = "error";
 
 # Handler part
 use_ok('Lemonldap::NG::Handler::Server');
@@ -146,7 +145,6 @@ sub portal {
     return LLNG::Manager::Test->new(
         {
             ini => {
-                logLevel                           => $debug,
                 domain                             => 'op.com',
                 portal                             => 'http://auth.op.com',
                 authentication                     => 'Demo',

@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
 );
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 extends 'Lemonldap::NG::Portal::2F::Register::Base';
 with 'Lemonldap::NG::Portal::Lib::2fDevices';
@@ -76,7 +76,7 @@ sub run {
                     302,
                     [
                         Location => $self->p->buildUrl(
-                            "2fregisters", { continue => 1 }
+                            $req->portal, "2fregisters", { continue => 1 }
                         )
                     ],
                     []

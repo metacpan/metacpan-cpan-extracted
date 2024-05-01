@@ -32,13 +32,13 @@ $dirsep = '/';     # Assume '/' is the directory separator
 $blocksize = $ENV{BLOCKSIZE} if $ENV{BLOCKSIZE}; # use environment if present
 
 # Process command line options
-getopts('HLPacklrsx') or usage_exit(1);
+getopts('HLPacklrsx') or usage();
 
 $blocksize = 1024 if $opt_k;
 
 if ($opt_a && $opt_s) {
   print STDERR "$0: cannot both summarize and show all entries\n";
-  usage_exit(1);
+  usage();
 }
 
 # Default to traversing current directory if no files specified
@@ -57,8 +57,10 @@ sub traverse {
   my $total = 0;
   local $depth = $depth + 1;
   my @s = ($opt_L || $opt_H && $depth == 1) ? stat $fn : lstat $fn;
-  # If we can't stat the file, return silently
-  return 0 unless @s;
+  unless (@s) {
+    warn "$0: cannot access '$fn': $!\n";
+    return 0;
+  }
   # Check for cross-filesystem traversals (-x option)
   if ($depth == 1) {
     $filesystem = $s[0];
@@ -94,9 +96,9 @@ sub traverse {
   return $total;
 }
 
-sub usage_exit {
+sub usage {
   print STDERR "Usage: $0 [-H | -L | -P] [-a | -s] [-cklrx] [file ...]\n";
-  exit(@_);
+  exit 1;
 }
 
 =head1 NAME

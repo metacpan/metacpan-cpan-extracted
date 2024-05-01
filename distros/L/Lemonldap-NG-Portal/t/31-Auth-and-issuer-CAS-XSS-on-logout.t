@@ -74,7 +74,6 @@ expectRedirection( $res,
     'http://auth.idp.com/cas/login?service=http%3A%2F%2Fauth.sp.com%2F' );
 
 # Query IdP
-switch ('issuer');
 ok(
     $res = $issuer->_get(
         '/cas/login',
@@ -113,7 +112,6 @@ my ($query) =
   expectRedirection( $res, qr#^http://auth.sp.com/\?(ticket=[^&]+)$# );
 
 # Back to SP
-switch ('sp');
 ok(
     $res = $sp->_get(
         '/',
@@ -149,7 +147,6 @@ my $url = $1;
 $query = $2;
 $query .= '%3F%3Cscript%3E';
 
-switch ('issuer');
 ok(
     $res = $issuer->_get(
         $url,
@@ -172,7 +169,6 @@ ok( $res = $issuer->_get( '/', cookie => "lemonldap=$idpId" ), 'Query IdP' );
 count(1);
 expectReject($res);
 
-switch ('sp');
 ok(
     $res = $sp->_get(
         '/',

@@ -5,6 +5,7 @@ author:
 build_requires:
   DBD::SQLite: '1.74'
   DBI: '1.643'
+  Exporter::NoWork: '0.03'
   ExtUtils::MakeMaker: 6.36
   Test2::V0: '0.000145'
 configure_requires:
@@ -34,4 +35,4 @@ requires:
   Sub::Override: '0.10'
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.02
+version: 0.03

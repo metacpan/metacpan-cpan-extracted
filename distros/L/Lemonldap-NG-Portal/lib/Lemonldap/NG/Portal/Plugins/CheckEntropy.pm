@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PP_INSUFFICIENT_PASSWORD_QUALITY
 );
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -73,11 +73,11 @@ sub init {
     # Declare REST route
     $self->addUnauthRoute(
         checkentropy => '_checkEntropyJSON',
-        ['GET']
+        ['POST']
     );
     $self->addAuthRoute(
         checkentropy => '_checkEntropyJSON',
-        ['GET']
+        ['POST']
     );
 
     $self->p->addPasswordPolicyDisplay(

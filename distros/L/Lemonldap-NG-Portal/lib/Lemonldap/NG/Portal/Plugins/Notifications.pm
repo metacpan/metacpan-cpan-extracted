@@ -20,7 +20,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_NOTIFICATION
 );
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -141,7 +141,7 @@ sub checkNotifDuringAuth {
             and $req->env->{PATH_INFO} ne '/' )
         {
             $req->data->{_url} =
-              encode_base64( $self->conf->{portal} . $req->env->{PATH_INFO},
+              encode_base64( $req->portal . $req->env->{PATH_INFO},
                 '' );
         }
 

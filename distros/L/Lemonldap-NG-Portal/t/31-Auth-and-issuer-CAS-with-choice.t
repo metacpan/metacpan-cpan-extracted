@@ -94,7 +94,6 @@ SKIP: {
         'http://auth.idp.com/cas/login?service=http%3A%2F%2Fauth.sp.com%2F' );
 
     # Follow redirection to CAS server
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             '/cas/login',
@@ -135,7 +134,6 @@ SKIP: {
     ok( $pdata !~ 'issuerRequestsaml', 'SAML request cleared from pdata' );
 
     # Back to SP
-    switch ('sp');
 
     # Follow redirection to CAS app
     ok(
@@ -170,7 +168,6 @@ SKIP: {
         'http://auth.idp.com/cas/login?service=http%3A%2F%2Fauth.sp.com%2F' );
 
     # Follow redirection to CAS server with "renew" set to "true"
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             '/cas/login',
@@ -227,7 +224,6 @@ SKIP: {
       expectRedirection( $res, qr#http://auth.sp.com/?\?(ticket=.*)$# );
 
     # Follow redirection to CAS app
-    switch ('sp');
     ok( $res = $sp->_get( '/', query => $query ), 'Follow redirection' );
 
     expectCookie($res);
@@ -257,7 +253,6 @@ SKIP: {
     expectCspChildOK( $res, "auth.idp.com" );
 
     # Get iframe from CAS server
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             $url,
@@ -274,7 +269,6 @@ SKIP: {
         'Query CAS server' );
     expectReject($res);
 
-    switch ('sp');
     ok(
         $res = $sp->_get(
             '/',

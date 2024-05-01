@@ -37,7 +37,6 @@ SKIP: {
     $proxy = register( 'proxy', \&proxy );
 
     # SP
-    switch ('sp');
     ok(
         $res = $sp->_get(
             '/', accept => 'text/html',
@@ -49,7 +48,6 @@ SKIP: {
         qr#^http://auth.proxy.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
     # Push SAML request to Proxy
-    switch ('proxy');
     ok(
         $res = $proxy->_get(
             $url,
@@ -63,7 +61,6 @@ SKIP: {
     my $proxyPdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
 
     # Push SAML request to Proxy
-    switch ('idp');
     ok(
         $res = $idp->_get(
             $url,
@@ -113,7 +110,6 @@ SKIP: {
       expectAutoPost( $res, 'auth.proxy.com', '/saml/proxySingleSignOnPost',
         'SAMLResponse' );
 
-    switch ('proxy');
     ok(
         $res = $proxy->_post(
             $url,
@@ -146,7 +142,6 @@ SKIP: {
       expectAutoPost( $res, 'auth.sp.com', '/saml/proxySingleSignOnPost',
         'SAMLResponse' );
 
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url,
@@ -178,7 +173,6 @@ SKIP: {
         qr#^http://auth.proxy.com(/saml/singleLogout)\?(SAMLRequest=.+)# );
 
     # Follow redirection to Proxy
-    switch ('proxy');
     ok(
         $res = $proxy->_get(
             $url,
@@ -195,7 +189,6 @@ SKIP: {
         qr#^http://auth.idp.com(/saml/singleLogout)\?(SAMLRequest=.+)# );
 
     # Follow redirection to IDP
-    switch ('idp');
     ok(
         $res = $idp->_get(
             $url,
@@ -213,7 +206,6 @@ qr#^http://auth.proxy.com(/saml/proxySingleLogoutReturn)\?(SAMLResponse=.+)#
     );
 
     # Follow redirection to Proxy
-    switch ('proxy');
     ok(
         $res = $proxy->_get(
             $url,
@@ -244,7 +236,6 @@ qr#^http://auth.sp.com(/saml/proxySingleLogoutReturn)\?(SAMLResponse=.+)#
     );
 
     # Follow redirection to SP
-    switch ('sp');
     ok(
         $res = $sp->_get(
             $url,

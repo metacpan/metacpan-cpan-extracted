@@ -4,12 +4,13 @@ package Lemonldap::NG::Portal::Main::Constants;
 use strict;
 use Exporter 'import';
 
-our $VERSION = '2.18.2';
+our $VERSION = '2.19.0';
 
 use constant HANDLER => 'Lemonldap::NG::Handler::PSGI::Main';
 use constant URIRE =>
 qr{(((?^:https?))://((?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-9]*[a-zA-Z0-9]|[a-zA-Z])[.]?)|(?:[0-9]+[.][0-9]+[.][0-9]+[.][0-9]+)))(?::((?:[0-9]*)))?(/(((?:(?:(?:(?:[a-zA-Z0-9\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)(?:;(?:(?:[a-zA-Z0-9\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*))*)(?:/(?:(?:(?:[a-zA-Z0-9\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)(?:;(?:(?:[a-zA-Z0-9\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*))*))*))(?:[?]((?:(?:[;/?:\@&=+\$,a-zA-Z0-9\-_.!~*'()]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)))?))?)};
 use constant {
+    PE_2FWAIT                            => -6,
     PE_IDPCHOICE                         => -5,
     PE_SENDRESPONSE                      => -4,
     PE_INFO                              => -3,
@@ -116,6 +117,7 @@ use constant {
     PE_UNKNOWNPARTNER                    => 107,
     PE_UNAUTHORIZEDURL                   => 108,
     PE_UNPROTECTEDURL                    => 109,
+    PE_RETRY_2FA                         => 110,
 };
 
 sub portalConsts {
@@ -125,6 +127,7 @@ sub portalConsts {
         '-3'  => 'PE_INFO',
         '-4'  => 'PE_SENDRESPONSE',
         '-5'  => 'PE_IDPCHOICE',
+        '-6'  => 'PE_2FWAIT',
         '0'   => 'PE_OK',
         '1'   => 'PE_SESSIONEXPIRED',
         '10'  => 'PE_BADCERTIFICATE',
@@ -138,6 +141,7 @@ sub portalConsts {
         '107' => 'PE_UNKNOWNPARTNER',
         '108' => 'PE_UNAUTHORIZEDURL',
         '109' => 'PE_UNPROTECTEDURL',
+        '110' => 'PE_RETRY_2FA',
         '2'   => 'PE_FORMEMPTY',
         '20'  => 'PE_NO_PASSWORD_BE',
         '21'  => 'PE_PP_ACCOUNT_LOCKED',
@@ -235,6 +239,7 @@ our @EXPORT_OK = (
     'portalConsts',
     'HANDLER',
     'URIRE',
+    'PE_2FWAIT',
     'PE_IDPCHOICE',
     'PE_SENDRESPONSE',
     'PE_INFO',
@@ -340,7 +345,8 @@ our @EXPORT_OK = (
     'PE_OIDC_AUTH_ERROR',
     'PE_UNKNOWNPARTNER',
     'PE_UNAUTHORIZEDURL',
-    'PE_UNPROTECTEDURL'
+    'PE_UNPROTECTEDURL',
+    'PE_RETRY_2FA'
 );
 our %EXPORT_TAGS = ( 'all' => [ @EXPORT_OK, 'import' ], );
 

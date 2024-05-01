@@ -13,7 +13,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Common::Module';
 
-our $VERSION = '2.16.1';
+our $VERSION = '2.19.0';
 
 # PROPERTIES
 
@@ -113,6 +113,7 @@ sub _buildFilter {
 
 sub init {
     my ($self) = @_;
+
     # #2932: no need to initialize LDAP connection at this step,
     # it will be done later, in other ldap methods
     $self->filter;
@@ -217,14 +218,18 @@ sub findUser {
     $self->logger->debug(
         'LDAP UserDB number of result(s): ' . $mesg->count() );
     if ( $mesg->count() ) {
-        my $rank = int( rand( $mesg->count() ) );
-        $self->logger->debug("LDAP UserDB random rank: $rank");
-        my $entry =
-          ( $mesg->entry($rank)->dn() =~ /\b(?:uid|sAMAccountName)\x3d(.+?),/ )
-          [0] || '';
-        $self->userLogger->info("FindUser: LDAP UserDB returns $entry")
-          if $entry;
-        $req->data->{findUser} = $entry;
+        my @results =
+          map { ( $_->dn() =~ /\b(?:uid|sAMAccountName)\x3d(.+?),/ )[0] || () }
+          $mesg->entries;
+        if (@results) {
+            $req->data->{findUserAll} = \@results;
+            my $rank = int( rand(@results) );
+            $self->logger->debug("LDAP UserDB random rank: $rank");
+            my $entry = $results[$rank];
+            $self->userLogger->info("FindUser: LDAP UserDB returns $entry")
+              if $entry;
+            $req->data->{findUser} = $entry;
+        }
         return PE_OK;
     }
 

@@ -58,5 +58,5 @@ resources:
   bugtracker: https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues
   homepage: https://lemonldap-ng.org/
   license: http://opensource.org/licenses/GPL-2.0
-version: v2.18.2
+version: v2.19.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

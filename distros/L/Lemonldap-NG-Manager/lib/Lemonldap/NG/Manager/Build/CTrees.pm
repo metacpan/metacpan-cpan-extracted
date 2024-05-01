@@ -14,7 +14,7 @@
 
 package Lemonldap::NG::Manager::Build::CTrees;
 
-our $VERSION = '2.17.2';
+our $VERSION = '2.19.0';
 
 sub cTrees {
     return {
@@ -183,6 +183,7 @@ sub cTrees {
                             'oidcOPMetaDataOptionsClientSecret',
                             'oidcOPMetaDataOptionsStoreIDToken',
                             'oidcOPMetaDataOptionsUserAttribute',
+                            'oidcOPMetaDataOptionsRequirePkce',
                         ]
                     },
                     {
@@ -195,6 +196,8 @@ sub cTrees {
                             'oidcOPMetaDataOptionsMaxAge',
                             'oidcOPMetaDataOptionsUiLocales',
                             'oidcOPMetaDataOptionsAcrValues',
+                            'oidcOPMetaDataOptionsAuthnEndpointAuthMethod',
+                            'oidcOPMetaDataOptionsAuthnEndpointAuthSigAlg',
                             'oidcOPMetaDataOptionsTokenEndpointAuthMethod',
                             'oidcOPMetaDataOptionsCheckJWTSignature',
                             'oidcOPMetaDataOptionsIDTokenMaxAge',
@@ -226,7 +229,6 @@ sub cTrees {
                     'oidcRPMetaDataOptionsClientID',
                     'oidcRPMetaDataOptionsClientSecret',
                     'oidcRPMetaDataOptionsRedirectUris',
-                    'oidcRPMetaDataOptionsAuthMethod',
                 ]
             },
             'oidcRPMetaDataExportedVars',
@@ -257,9 +259,6 @@ sub cTrees {
                         title => 'security',
                         form  => 'simpleInputContainer',
                         nodes => [
-                            'oidcRPMetaDataOptionsIDTokenSignAlg',
-                            'oidcRPMetaDataOptionsAccessTokenSignAlg',
-                            'oidcRPMetaDataOptionsUserInfoSignAlg',
                             'oidcRPMetaDataOptionsRequirePKCE',
                             'oidcRPMetaDataOptionsAllowOffline',
                             'oidcRPMetaDataOptionsAllowPasswordGrant',
@@ -267,6 +266,20 @@ sub cTrees {
                             'oidcRPMetaDataOptionsRequestUris',
                             'oidcRPMetaDataOptionsAuthnLevel',
                             'oidcRPMetaDataOptionsRule',
+                            'oidcRPMetaDataOptionsAuthMethod',
+                            'oidcRPMetaDataOptionsAuthRequiredForAuthorize',
+                            'oidcRPMetaDataOptionsAuthnRequireState',
+                            'oidcRPMetaDataOptionsAuthnRequireNonce',
+                            'oidcRPMetaDataOptionsUserinfoRequireHeaderToken',
+                        ]
+                    },
+                    {
+                        title => 'algorithms',
+                        form  => 'simpleInputContainer',
+                        nodes => [
+                            'oidcRPMetaDataOptionsIDTokenSignAlg',
+                            'oidcRPMetaDataOptionsAccessTokenSignAlg',
+                            'oidcRPMetaDataOptionsUserInfoSignAlg',
                             'oidcRPMetaDataOptionsAccessTokenEncKeyMgtAlg',
                             'oidcRPMetaDataOptionsAccessTokenEncContentEncAlg',
                             'oidcRPMetaDataOptionsIdTokenEncKeyMgtAlg',
@@ -275,7 +288,7 @@ sub cTrees {
                             'oidcRPMetaDataOptionsUserInfoEncContentEncAlg',
                             'oidcRPMetaDataOptionsLogoutEncKeyMgtAlg',
                             'oidcRPMetaDataOptionsLogoutEncContentEncAlg',
-                        ]
+                        ],
                     },
                     {
                         title => 'keys',

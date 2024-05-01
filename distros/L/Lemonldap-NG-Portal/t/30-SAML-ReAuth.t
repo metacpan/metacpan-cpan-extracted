@@ -36,7 +36,6 @@ SKIP: {
     $sp     = register( 'sp',     \&sp );
 
     # Simple authentication on IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_post(
             '/', IO::String->new('user=russian&password=russian'),
@@ -63,7 +62,6 @@ SKIP: {
         'SAMLRequest' );
 
     # Push SAML request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_post(
             $url,
@@ -127,7 +125,6 @@ SKIP: {
         'SAMLResponse' );
 
     # Post SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($query),

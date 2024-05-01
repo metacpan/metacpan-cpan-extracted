@@ -1,0 +1,95 @@
+{
+   "abstract" : "Run Sqitch database migrations from a Mojo app",
+   "author" : [
+      "Mark Tyrrell <mark@tyrrminal.dev>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-Migration-Sqitch",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Sqitch" : "v1.4.1",
+            "DBI" : "1.643",
+            "Mojolicious" : "9.00",
+            "Readonly" : "2.05",
+            "Syntax::Keyword::Try" : "0.29",
+            "perl" : "5.026000"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "DBD::SQLite" : "1.74",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test2::Suite" : "0.000155",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::Migration::Sqitch" : {
+         "file" : "lib/Mojolicious/Plugin/Migration/Sqitch.pm",
+         "version" : "0.01"
+      },
+      "Mojolicious::Plugin::Migration::Sqitch::Command::schema_initdb" : {
+         "file" : "lib/Mojolicious/Plugin/Migration/Sqitch/Command/schema_initdb.pm",
+         "version" : "0.01"
+      },
+      "Mojolicious::Plugin::Migration::Sqitch::Command::schema_migrate" : {
+         "file" : "lib/Mojolicious/Plugin/Migration/Sqitch/Command/schema_migrate.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tyrrminal/mojolicious-plugin-migration-sqitch/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tyrrminal/mojolicious-plugin-migration-sqitch.git",
+         "web" : "https://github.com/tyrrminal/mojolicious-plugin-migration-sqitch.git"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "MIT"
+}
+

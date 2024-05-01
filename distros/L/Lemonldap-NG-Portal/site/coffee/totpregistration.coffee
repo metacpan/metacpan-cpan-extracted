@@ -51,7 +51,13 @@ getKey = () ->
 				size:150
 			# Display serialized key
 			secret = data.secret || ""
+
+			# If an element on the page has class="otpauth-url", set the URL to it
+			$('.otpauth-url').attr("href", s)
+
+			# If an element on the page has id="secret", set a human-readable secret to it
 			$('#secret').text(secret.toUpperCase().replace(/(.{4})/g, '$1 ').trim())
+
 			# Show message (warning level if key is new)
 			if data.newkey
 				setMsg 'yourNewTotpKey', 'warning'

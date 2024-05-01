@@ -47,8 +47,8 @@ init(
 );
 
 # Inject an on-line access token session
-Lemonldap::NG::Common::Session->new(
-    {
+Lemonldap::NG::Common::Session->new( {
+        hashStore            => $ENV{LLNG_HASHED_SESSION_STORE},
         storageModule        => 'Apache::Session::File',
         storageModuleOptions => { Directory => 't/sessions' },
         id                   =>
@@ -66,8 +66,8 @@ Lemonldap::NG::Common::Session->new(
 );
 
 # Inject an offline access token session
-Lemonldap::NG::Common::Session->new(
-    {
+Lemonldap::NG::Common::Session->new( {
+        hashStore            => $ENV{LLNG_HASHED_SESSION_STORE},
         storageModule        => 'Apache::Session::File',
         storageModuleOptions => { Directory => 't/sessions' },
         id                   => '999888777',
@@ -84,8 +84,8 @@ Lemonldap::NG::Common::Session->new(
 );
 
 # Inject the refresh token containing user attributes
-Lemonldap::NG::Common::Session->new(
-    {
+Lemonldap::NG::Common::Session->new( {
+        hashStore            => $ENV{LLNG_HASHED_SESSION_STORE},
         storageModule        => 'Apache::Session::File',
         storageModuleOptions => { Directory => 't/sessions' },
         id                   => '000999000',

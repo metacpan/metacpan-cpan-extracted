@@ -10,11 +10,8 @@ use Carp;
 with 'Lemonldap::NG::Portal::Lib::2fDevices';
 use Lemonldap::NG::Common::Util qw/display2F/;
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
-has rp_id    => ( is => 'rw', lazy => 1, builder => "_build_rp_id" );
-has origin   => ( is => 'rw', lazy => 1, builder => "_build_origin" );
-has verifier => ( is => 'rw', lazy => 1, builder => "_build_verifier" );
 has trust_anchors => (
     is      => 'rw',
     lazy    => 1,
@@ -26,25 +23,34 @@ sub _build_trust_anchors {
     return [];
 }
 
-sub _build_verifier {
-    my $self = shift;
+sub verifier {
+    my ( $self, $req ) = @_;
     return Authen::WebAuthn->new(
-        rp_id  => $self->rp_id,
-        origin => $self->origin,
+        rp_id  => $self->rp_id($req),
+        origin => $self->origin($req),
     );
 }
 
-sub _build_rp_id {
-    my ($self) = @_;
+sub rp_id {
+    my ( $self, $req ) = @_;
 
-    # TODO make this configurable
-    my $portal_uri = URI->new( $self->{conf}->{portal} );
-    return $portal_uri->authority;
+    if ( $self->conf->{webauthnRpId} ) {
+        return $self->conf->{webauthnRpId};
+    }
+    else {
+        my $portal_uri = URI->new( $req->portal );
+        if ( $portal_uri->can('host') ) {
+            return $portal_uri->host;
+        }
+        else {
+            return $portal_uri->authority;
+        }
+    }
 }
 
-sub _build_origin {
-    my ($self) = @_;
-    my $portal_uri = URI->new( $self->{conf}->{portal} );
+sub origin {
+    my ( $self, $req ) = @_;
+    my $portal_uri = URI->new( $req->portal );
     return ( $portal_uri->scheme . "://" . $portal_uri->authority );
 }
 
@@ -87,13 +93,14 @@ sub generateChallenge {
 
     return {
         challenge        => $challenge_base64,
+        rpId             => $self->rp_id($req),
         allowCredentials => [
             map { { type => "public-key", id => $_->{_credentialId}, } }
               @webauthn_devices
         ],
         ( $userVerification ? ( userVerification => $userVerification ) : () ),
         extensions => {
-            appid => $self->origin,
+            appid => $self->origin($req),
         },
     };
 }
@@ -114,20 +121,24 @@ sub validateCredential {
 
     # If Authen::WebAuthn is too old, we can't check attestation
     my $attestation = $registration_options->{attestation} || "none";
-    if ($attestation ne "none" and $Authen::WebAuthn::VERSION < 0.002) {
-        croak("Authen::WebAuthn version is too old, cannot validate attestation");
+    if ( $attestation ne "none" and $Authen::WebAuthn::VERSION < 0.002 ) {
+        croak(  "Authen::WebAuthn version is too old"
+              . " ($Authen::WebAuthn::VERSION < 0.002),"
+              . " cannot validate attestation" );
     }
 
-
-    return $self->verifier->validate_registration(
+    return $self->verifier($req)->validate_registration(
         challenge_b64          => $challenge_b64,
         requested_uv           => $requested_uv,
         client_data_json_b64   => $client_data_json_b64,
         attestation_object_b64 => $attestation_object_b64,
         token_binding_id_b64   => $token_binding_id_b64,
         trust_anchors          => $self->trust_anchors,
-        ($attestation ne "none" ? (
-            allowed_attestation_types => [ "Basic" ] ) : ()),
+        (
+            $attestation ne "none"
+            ? ( allowed_attestation_types => ["Basic"] )
+            : ()
+        ),
     );
 }
 
@@ -193,7 +204,7 @@ sub validateAssertion {
         $req->headers->header('Sec-Provided-Token-Binding-ID') )
       : '';
 
-    my $validation_result = $self->verifier->validate_assertion(
+    my $validation_result = $self->verifier($req)->validate_assertion(
         challenge_b64          => $signature_options->{challenge},
         credential_pubkey_b64  => $matching_credential->{_credentialPublicKey},
         stored_sign_count      => $matching_credential->{_signCount},
@@ -208,9 +219,19 @@ sub validateAssertion {
     if ( $validation_result->{success} == 1 ) {
         my $new_signature_count = $validation_result->{signature_count};
 
-        $self->userLogger->info( "User $user authenticated with 2F device: "
-              . display2F($matching_credential)
-              . " (signature count: $new_signature_count) " );
+        $self->auditLog(
+            $req,
+            message => (
+                    "User $user authenticated with 2F device: "
+                  . display2F($matching_credential)
+                  . " (signature count: $new_signature_count) "
+            ),
+            code            => "2FA_SUCCESS",
+            user            => $user,
+            type            => $self->prefix,
+            device          => display2F($matching_credential),
+            signature_count => $new_signature_count,
+        );
 
         # Update storedSignCount to be the value of authData.signCount
         $self->update2fDevice( $req, $data, $self->type,

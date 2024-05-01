@@ -11,137 +11,219 @@ BEGIN {
     require 't/oidc-lib.pm';
 }
 
-my $debug = 'error';
+my $debug = 'debug';
 my $access_token;
 my $op;
 my $res;
 
 # Initialization
 ok( $op = op(), 'OP portal' );
-count(1);
 
-# Request for RP1
-my $authrequest1 = buildForm(
-    {
-        scope         => "openid",
-        response_type => "code",
-        client_id     => "rpid",
-        redirect_uri  => "http://rp1.example.com/",
-    }
-);
-ok(
-    $res = $op->_get(
-        '/oauth2/authorize',
-        accept => 'text/html',
-        query  => $authrequest1
-    ),
-    'Authorization request to RP1'
-);
-count(1);
+subtest "Request RP1, wait for timeout, request RP2" => sub {
 
-my $pdata = expectCookie( $res, 'lemonldappdata' );
+    # Request for RP1
+    my $authrequest1 = buildForm( {
+            scope         => "openid",
+            response_type => "code",
+            client_id     => "rpid",
+            redirect_uri  => "http://rp1.example.com/",
+        }
+    );
+    ok(
+        $res = $op->_get(
+            '/oauth2/authorize',
+            accept => 'text/html',
+            query  => $authrequest1
+        ),
+        'Authorization request to RP1'
+    );
 
-# Uncomment this to make the unit test pass
-#my $pdata = "";
+    my $pdata = expectCookie( $res, 'lemonldappdata' );
 
 # Uncomment this to wait until issuersTimeout has expired, leading to a different error
-Time::Fake->offset("+10m");
+    Time::Fake->offset("+10m");
 
-# Request for RP2 with previous pdata still around
-my $authrequest2 = buildForm(
-    {
-        scope         => "openid",
-        response_type => "code",
-        client_id     => "rp2id",
-        redirect_uri  => "http://rp2.example.com/",
-    }
-);
-ok(
-    $res = $op->_get(
-        '/oauth2/authorize',
-        accept => 'text/html',
-        query  => $authrequest2,
-        cookie => "lemonldappdata=$pdata",
+    # Request for RP2 with previous pdata still around
+    my $authrequest2 = buildForm( {
+            scope         => "openid",
+            response_type => "code",
+            client_id     => "rp2id",
+            redirect_uri  => "http://rp2.example.com/",
+        }
+    );
+    ok(
+        $res = $op->_get(
+            '/oauth2/authorize',
+            accept => 'text/html',
+            query  => $authrequest2,
+            cookie => "lemonldappdata=$pdata",
 
-    ),
-    'Authorization request to RP2'
-);
-count(1);
+        ),
+        'Authorization request to RP2'
+    );
 
-$pdata = expectCookie( $res, 'lemonldappdata' );
-my ( $host, $url, $query ) = expectForm( $res, '#', undef, 'user', 'password' );
+    $pdata = expectCookie( $res, 'lemonldappdata' );
+    my ( $host, $url, $query ) =
+      expectForm( $res, '#', undef, 'user', 'password' );
 
-$query =~ s/user=/user=dwho/;
-$query =~ s/password=/password=dwho/;
+    $query =~ s/user=/user=dwho/;
+    $query =~ s/password=/password=dwho/;
 
-# Login to OP
-ok(
-    $res = $op->_post(
-        '/oauth2/authorize',
-        IO::String->new($query),
-        query  => $authrequest2,
-        accept => 'text/html',
-        length => length($query),
-        cookie => "lemonldappdata=$pdata",
+    # Login to OP
+    ok(
+        $res = $op->_post(
+            '/oauth2/authorize',
+            IO::String->new($query),
+            query  => $authrequest2,
+            accept => 'text/html',
+            length => length($query),
+            cookie => "lemonldappdata=$pdata",
 
-    ),
-    'Authorization request to RP2'
-);
-count(1);
+        ),
+        'Authorization request to RP2'
+    );
 
-$pdata = expectCookie( $res, 'lemonldappdata' );
+    $pdata = expectCookie( $res, 'lemonldappdata' );
 
-# Process second factor
-( $host, $url, $query ) =
-  expectForm( $res, undef, '/ext2fcheck?skin=bootstrap', 'token', 'code' );
+    # Process second factor
+    ( $host, $url, $query ) =
+      expectForm( $res, undef, '/ext2fcheck?skin=bootstrap', 'token', 'code' );
 
-ok(
-    $res->[2]->[0] =~
+    ok(
+        $res->[2]->[0] =~
 qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="one-time-code" />%,
-    'Found EXTCODE input'
-) or print STDERR Dumper( $res->[2]->[0] );
-count(1);
+        'Found EXTCODE input'
+    ) or print STDERR Dumper( $res->[2]->[0] );
 
-$query =~ s/code=/code=A1b2C0/;
-ok(
-    $res = $op->_post(
-        '/ext2fcheck',
-        IO::String->new($query),
-        length => length($query),
-        accept => 'text/html',
-        cookie => "lemonldappdata=$pdata",
+    $query =~ s/code=/code=A1b2C0/;
+    ok(
+        $res = $op->_post(
+            '/ext2fcheck',
+            IO::String->new($query),
+            length => length($query),
+            accept => 'text/html',
+            cookie => "lemonldappdata=$pdata",
 
-    ),
-    'Post code'
-);
-count(1);
+        ),
+        'Post code'
+    );
 
-# We now should be logged in, but lost the original URL
-expectRedirection( $res, "http://auth.op.com/oauth2" );
-my $id = expectCookie($res);
+    # We now should be logged in, but lost the original URL
+    expectRedirection( $res, "http://auth.op.com/oauth2" );
+    my $id = expectCookie($res);
 
-ok(
-    $res = $op->_get(
-        '/oauth2',
-        accept => 'text/html',
-        cookie => "lemonldap=$id; lemonldappdata=$pdata",
-    ),
-    'Authorization request to RP1'
-);
-count(1);
+    ok(
+        $res = $op->_get(
+            '/oauth2',
+            accept => 'text/html',
+            cookie => "lemonldap=$id; lemonldappdata=$pdata",
+        ),
+        'Authorization request to RP1'
+    );
 
-# We should be redirected to RP2
-expectRedirection( $res, qr#^http://rp2.example.com/# );
+    # We should be redirected to RP2
+    expectRedirection( $res, qr#^http://rp2.example.com/# );
+};
+
+subtest "Request RP1, wait for timeout, complete login" => sub {
+
+    Time::Fake->reset;
+
+    # Request for RP1
+    my $authrequest1 = buildForm( {
+            scope         => "openid",
+            response_type => "code",
+            client_id     => "rpid",
+            redirect_uri  => "http://rp1.example.com/",
+        }
+    );
+    ok(
+        $res = $op->_get(
+            '/oauth2/authorize',
+            accept => 'text/html',
+            query  => $authrequest1
+        ),
+        'Authorization request to RP1'
+    );
+
+    my $pdata = expectCookie( $res, 'lemonldappdata' );
+    my ( $host, $url, $query ) =
+      expectForm( $res, '#', undef, 'user', 'password' );
+    $query =~ s/user=/user=dwho/;
+    $query =~ s/password=/password=dwho/;
+
+    # Login to OP
+    ok(
+        $res = $op->_post(
+            '/oauth2/authorize',
+            IO::String->new($query),
+            query  => $authrequest1,
+            accept => 'text/html',
+            length => length($query),
+            cookie => "lemonldappdata=$pdata",
+
+        ),
+        'Authorization request to RP2'
+    );
+
+    $pdata = expectCookie( $res, 'lemonldappdata' );
+
+    # Process second factor
+    ( $host, $url, $query ) =
+      expectForm( $res, undef, '/ext2fcheck?skin=bootstrap', 'token', 'code' );
+
+    ok(
+        $res->[2]->[0] =~
+qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="one-time-code" />%,
+        'Found EXTCODE input'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+
+    $query =~ s/code=/code=A1b2C0/;
+
+    # Wait long enough for the issuersTimeout to expire
+    Time::Fake->offset("+10m");
+
+    ok(
+        $res = $op->_post(
+            '/ext2fcheck',
+            IO::String->new($query),
+            length => length($query),
+            accept => 'text/html',
+            cookie => "lemonldappdata=$pdata",
+
+        ),
+        'Post code'
+    );
+    $pdata = expectCookie( $res, 'lemonldappdata' );
+
+    # We now should be logged in, but lost the original URL
+    expectRedirection( $res, "http://auth.op.com/oauth2" );
+    my $id = expectCookie($res);
+
+    ok(
+        $res = $op->_get(
+            '/oauth2',
+            accept => 'text/html',
+            cookie => "lemonldap=$id; lemonldappdata=$pdata",
+        ),
+        'Authorization request to RP1'
+    );
+    expectPortalError( $res, 82 );
+    $pdata = expectCookie( $res, 'lemonldappdata' );
+    ok( !$pdata, "pdata was cleared" );
+
+};
 
 clean_sessions();
-done_testing( count() );
+done_testing();
 
 sub op {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',
+                sfLoginTimeout                  => "1800",
+                issuersTimeout                  => "300",
                 portal                          => 'http://auth.op.com/',
                 authentication                  => 'Demo',
                 userDB                          => 'Same',

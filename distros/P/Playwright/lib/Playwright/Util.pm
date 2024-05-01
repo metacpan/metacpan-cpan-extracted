@@ -1,5 +1,5 @@
 package Playwright::Util;
-$Playwright::Util::VERSION = '1.401';
+$Playwright::Util::VERSION = '1.431';
 use strict;
 use warnings;
 
@@ -16,6 +16,8 @@ use POSIX();
 
 no warnings 'experimental';
 use feature qw{signatures};
+
+use constant IS_WIN => $^O eq 'MSWin32';
 
 sub request ( $method, $url, $host, $port, $ua, %args ) {
     my $fullurl = "http://$host:$port/$url";
@@ -36,8 +38,13 @@ sub request ( $method, $url, $host, $port, $ua, %args ) {
     $request->content( JSON::MaybeXS::encode_json( \%args ) );
     my $response = $ua->request($request);
     my $content  = $response->decoded_content();
-    my $decoded  = JSON::MaybeXS::decode_json($content);
-    my $msg      = $decoded->{message};
+
+    # If we get this kind of response the server failed to come up :(
+    die "playwright server failed to spawn!"
+      if $content =~ m/^Can't connect to/;
+
+    my $decoded = JSON::MaybeXS::decode_json($content);
+    my $msg     = $decoded->{message};
 
     confess($msg) if $decoded->{error};
 
@@ -67,8 +74,9 @@ sub async ($subroutine) {
 sub _child ( $filename, $subroutine ) {
     Sereal::Encoder->encode_to_file( $filename, $subroutine->() );
 
-    # Prevent destructors from firing due to exiting instantly
-    POSIX::_exit(0);
+    # Prevent destructors from firing due to exiting instantly...unless we are on windows, where they won't.
+    POSIX::_exit(0) unless IS_WIN;
+    exit 0;
 }
 
 sub await ($to_wait) {
@@ -92,7 +100,7 @@ Playwright::Util - Common utility functions for the Playwright module
 
 =head1 VERSION
 
-version 1.401
+version 1.431
 
 =head2 request(STRING method, STRING url, STRING host, INTEGER port, LWP::UserAgent ua, HASH args) = HASH
 

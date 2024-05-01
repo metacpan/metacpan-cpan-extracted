@@ -323,7 +323,7 @@ ok( $res->[2]->[0] =~ m%<td scope="row">_session_kind</td>%,
 count(17);
 
 my %attributes = map /<td scope="row">(.+)?<\/td>/g, $res->[2]->[0];
-ok( keys %attributes == 34, 'Found 34 attributes' )
+ok( keys %attributes == ( $ENV{LLNG_HASHED_SESSION_STORE} ? 35 : 34), 'Found 34 attributes' )
   or print STDERR ( keys %attributes < 34 )
   ? "Missing attributes -> " . scalar keys(%attributes) . "\n"
   : "Too much attributes -> " . scalar keys(%attributes) . "\n";

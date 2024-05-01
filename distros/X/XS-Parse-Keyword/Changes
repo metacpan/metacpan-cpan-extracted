@@ -1,5 +1,10 @@
 Revision history for XS-Parse-Keyword
 
+0.42    2024-04-30
+        [BUGFIXES]
+         * Don't crash on zero-argument calls to list-associative wrapper
+           functions (thanks aquanight) (RT153244)
+
 0.41    2024-04-25
         [BUGFIXES]
          * Remmeber to EXTEND the stack in list-associative operator wrapper

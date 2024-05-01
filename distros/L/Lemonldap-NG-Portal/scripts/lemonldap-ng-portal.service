@@ -1,0 +1,10 @@
+[Unit]
+Description=Cron job for Lemonldap::NG portal
+After=network.target
+
+[Service]
+User=__APACHEUSER__
+ExecStart=__BINDIR__/purgeCentralCache
+
+[Install]
+WantedBy=multi-user.target

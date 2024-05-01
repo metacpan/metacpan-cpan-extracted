@@ -1,0 +1,29 @@
+0.005   2024-04-03  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Sah-Schema{s,Bundle}-* following rename of
+          Sah-Schema{s,Bundle} (for visual clarity and consistency with
+          naming of other bundles).
+
+
+0.004   2024-01-09  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild with Dist::Zilla::Plugin::Sah::Schemas 0.033 to add
+          missing dependencies.
+
+
+0.003   2024-01-09  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild with Dist::Zilla::Plugin::Sah::Schemas 0.032 to add
+          missing dependency to required Sah filter modules.
+
+
+0.002   2024-01-09  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak main module's Abstract.
+
+
+0.001   2024-01-09  Released-By: PERLANCAR
+
+        - First release.

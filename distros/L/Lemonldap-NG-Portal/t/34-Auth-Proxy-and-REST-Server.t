@@ -88,25 +88,32 @@ expectRedirection( $res, 'http://auth.sp.com' );
 $spId = expectCookie($res);
 
 # Test other REST queries
-switch ('issuer');
 
 # Session content
-ok( $res = $issuer->_get("/sessions/global/$idpId"), 'Session content' );
-expectOK($res);
-ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-  or print STDERR $@;
-ok( $res->{_session_id} eq $idpId, ' Good ID' )
-  or explain( $res, "_session_id => $idpId" );
-count(3);
+ok(
+    getSession($idpId)->data->{_session_id} eq
+      ( $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($idpId) : $idpId ),
+    ' Good ID'
+) or explain( $res, "_session_id => $idpId" );
+count(1);
 
 # Session key
-ok( $res = $issuer->_get("/sessions/global/$idpId/[_session_id,uid]"),
-    'Some session keys' );
+ok(
+    $res = $issuer->_get(
+            "/sessions/global/"
+          . ( $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($idpId) : $idpId )
+          . "/[_session_id,uid]"
+    ),
+    'Some session keys'
+);
 expectOK($res);
 ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
   or print STDERR $@;
-ok( $res->{_session_id} eq $idpId, ' Good ID' )
-  or explain( $res, "_session_id => $idpId" );
+ok(
+    $res->{_session_id} eq
+      ( $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($idpId) : $idpId ),
+    ' Good ID'
+) or explain( $res, "_session_id => $idpId" );
 ok( $res->{uid} eq 'dwho', ' Uid is dwho' ) or explain( $res, 'uid => dwho' );
 count(4);
 
@@ -125,21 +132,33 @@ ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
 my $newId = $res->{session}->{_session_id};
 
 # Verify a key
-ok( $res = $issuer->_get("/sessions/global/$newId/uid"), 'Verify uid' );
-ok( $res->[2]->[0] eq 'zz',                              ' Uid is good' );
+ok(
+    $res = $issuer->_get(
+            "/sessions/global/"
+          . ( $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($newId) : $newId )
+          . "/uid"
+    ),
+    'Verify uid'
+);
+ok( $res->[2]->[0] eq 'zz', ' Uid is good' );
 count(4);
 
 # Update a key
 ok(
-    $res = $issuer->app->(
-        {
-            HTTP_ACCEPT            => 'application/json',
-            HTTP_ACCEPT_LANGUAGE   => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
-            HTTP_HOST              => 'auth.idp.com',
-            PATH_INFO              => "/sessions/global/$newId",
-            REMOTE_ADDR            => '127.0.0.1',
-            REQUEST_METHOD         => 'PUT',
-            REQUEST_URI            => "/sessions/global/$newId",
+    $res = $issuer->app->( {
+            HTTP_ACCEPT          => 'application/json',
+            HTTP_ACCEPT_LANGUAGE => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
+            HTTP_HOST            => 'auth.idp.com',
+            PATH_INFO            => "/sessions/global/"
+              . (
+                $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($newId) : $newId
+              ),
+            REMOTE_ADDR    => '127.0.0.1',
+            REQUEST_METHOD => 'PUT',
+            REQUEST_URI    => "/sessions/global/"
+              . (
+                $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($newId) : $newId
+              ),
             SCRIPT_NAME            => '',
             SERVER_NAME            => 'auth.example.com',
             SERVER_PORT            => '80',
@@ -159,15 +178,21 @@ ok( $res->{result} == 1, ' Result is 1' );
 count(3);
 
 # Verify new key
-ok( $res = $issuer->_get("/sessions/global/$newId/cn"), 'Verify cn' );
-ok( $res->[2]->[0] eq 'CN',                             ' CN is good' );
+ok(
+    $res = $issuer->_get(
+            "/sessions/global/"
+          . ( $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($newId) : $newId )
+          . "/cn"
+    ),
+    'Verify cn'
+);
+ok( $res->[2]->[0] eq 'CN', ' CN is good' );
 count(2);
 
 use_ok('Lemonldap::NG::Common::Apache::Session::REST');
 ok(
     $res =
-      Lemonldap::NG::Common::Apache::Session::REST->get_key_from_all_sessions(
-        {
+      Lemonldap::NG::Common::Apache::Session::REST->get_key_from_all_sessions( {
             baseUrl => 'http://auth.idp.com/sessions/global/',
         }
       ),
@@ -216,8 +241,7 @@ if ( ok( ref($res) eq 'HASH', ' Result is an hash' ) ) {
 count(2);
 
 ok(
-    $res = Lemonldap::NG::Common::Apache::Session::REST->searchOn(
-        {
+    $res = Lemonldap::NG::Common::Apache::Session::REST->searchOn( {
             baseUrl => 'http://auth.idp.com/sessions/global/'
         },
         'uid', 'dwho'
@@ -244,19 +268,24 @@ count(3);
 
 # Del new session
 ok(
-    $res = $issuer->app->(
-        {
+    $res = $issuer->app->( {
             HTTP_ACCEPT          => 'application/json',
             HTTP_ACCEPT_LANGUAGE => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
             HTTP_HOST            => 'auth.idp.com',
-            PATH_INFO            => "/sessions/global/$newId",
-            REMOTE_ADDR          => '127.0.0.1',
-            REQUEST_METHOD       => 'DELETE',
-            REQUEST_URI          => "/sessions/global/$newId",
-            SCRIPT_NAME          => '',
-            SERVER_NAME          => 'auth.example.com',
-            SERVER_PORT          => '80',
-            SERVER_PROTOCOL      => 'HTTP/1.1',
+            PATH_INFO            => "/sessions/global/"
+              . (
+                $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($newId) : $newId
+              ),
+            REMOTE_ADDR    => '127.0.0.1',
+            REQUEST_METHOD => 'DELETE',
+            REQUEST_URI    => "/sessions/global/"
+              . (
+                $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($newId) : $newId
+              ),
+            SCRIPT_NAME     => '',
+            SERVER_NAME     => 'auth.example.com',
+            SERVER_PORT     => '80',
+            SERVER_PROTOCOL => 'HTTP/1.1',
         }
     ),
     'Delete new session'
@@ -268,13 +297,18 @@ ok( $res->{result} == 1, ' Result is 1' );
 count(3);
 
 # Verify that session is deleted
-ok( $res = $issuer->_get("/sessions/global/$newId/cn"),
-    'New session is deleted' );
+ok(
+    $res = $issuer->_get(
+            "/sessions/global/"
+          . ( $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($newId) : $newId )
+          . "/cn"
+    ),
+    'New session is deleted'
+);
 ok( $res->[0] == 400, ' Session does not exist' );
 count(2);
 
 # Logout
-switch ('sp');
 ok(
     $res = $sp->_get(
         '/',
@@ -302,8 +336,7 @@ done_testing( count() );
 
 # Redefine LWP methods for tests
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel          => $debug,
                 domain            => 'idp.com',
@@ -318,8 +351,7 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel         => $debug,
                 domain           => 'sp.com',

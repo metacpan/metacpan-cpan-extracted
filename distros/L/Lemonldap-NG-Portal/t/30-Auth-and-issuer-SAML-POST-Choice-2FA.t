@@ -43,7 +43,13 @@ LWP::Protocol::PSGI->register(
 );
 
 SKIP: {
-    eval "use Lasso";
+    unless (
+        eval
+'use Lasso; (Lasso::check_version( 2, 5, 1, Lasso::Constants::CHECK_VERSION_NUMERIC) )? 1 : 0'
+      )
+    {
+        skip 'Lasso not found or too old';
+    }
     if ($@) {
         skip 'Lasso not found';
     }
@@ -119,7 +125,6 @@ SKIP: {
             'SAMLResponse' );
 
         # Post SAML response to SP
-        switch ('sp');
         ok(
             $res = $sp->_post(
                 $url, IO::String->new($s),
@@ -156,15 +161,11 @@ SKIP: {
         expectAuthenticatedAs( $res, 'fa@badwolf.org@idp' );
 
         # Verify UTF-8
-        ok( $res = $sp->_get("/sessions/global/$spId"), 'Get UTF-8' );
-        expectOK($res);
-        ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-          or print STDERR $@;
-        ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
+        ok( getSession($spId)->data->{cn} eq 'Frédéric Accents',
+            'UTF-8 values' )
           or explain( $res, 'cn => Frédéric Accents' );
 
         # Logout initiated by IDP
-        switch ('issuer');
         ok(
             $res = $issuer->_get(
                 '/',
@@ -196,7 +197,6 @@ m#img src="http://auth.idp.com(/saml/relaySingleLogoutSOAP)\?(relay=.*?)"#s,
             "http://auth.idp.com/static/common/icons/ok.png" );
 
         # Test if logout is done
-        switch ('sp');
         ok(
             $res = $sp->_get(
                 '/', cookie => "lemonldap=$spId"
@@ -266,7 +266,7 @@ sub sp {
                 authentication    => 'Choice',
                 userDB            => 'Same',
                 authChoiceModules => {
-                    '1_SAML' => 'SAML;SAML;Null;;;',
+                    '1_SAML' => 'SAML;SAML;Null;;;{}',
                 },
                 userDB                            => 'Same',
                 ext2fActivation                   => 1,
@@ -289,6 +289,7 @@ sub sp {
                         samlIDPMetaDataOptionsSignSSOMessage => 1,
                         samlIDPMetaDataOptionsSignSLOMessage => 1,
                         samlIDPMetaDataOptionsCheckSSOMessageSignature => 1,
+                        samlIDPMetaDataOptionsSignatureMethod => "RSA_SHA256",
                         samlIDPMetaDataOptionsCheckSLOMessageSignature => 1,
                         samlIDPMetaDataOptionsForceUTF8                => 1,
                     }

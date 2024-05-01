@@ -82,7 +82,6 @@ SKIP: {
         qr#http://auth.idp.com(/openidserver/?)\?(openid.*)$# );
 
     # Follow redirection do IdP
-    switch ('issuer');
     ok( $res = $issuer->_get( $uri, query => $query, accept => 'text/html' ),
         'Follow redirection to IdP' );
     expectOK($res);
@@ -131,7 +130,6 @@ SKIP: {
         qr#http://auth.idp.com(/openidserver/?)\?(openid.*)$# );
 
     # Follow redirection do IdP
-    switch ('issuer');
     ok( $res = $issuer->_get( $uri, query => $query, accept => 'text/html' ),
         'Follow redirection to IdP' );
     expectOK($res);
@@ -165,7 +163,6 @@ SKIP: {
     ($query) = expectRedirection( $res, qr#^http://auth.sp.com/?\?(.*)# );
 
     # Push redirection to SP
-    switch ('sp');
     ok( $res = $sp->_get( '/', query => $query, accept => 'text/html' ),
         'Follow redirection to SP' );
     my $spId = expectCookie($res);

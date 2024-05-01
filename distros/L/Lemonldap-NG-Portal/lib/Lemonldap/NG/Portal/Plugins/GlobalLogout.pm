@@ -4,6 +4,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 use Time::Local;
+use Lemonldap::NG::Common::Session 'id2storage';
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_ERROR
@@ -12,7 +13,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.19.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -24,7 +25,7 @@ use constant beforeLogout => 'run';
 
 # INITIALIZATION
 has rule => ( is => 'rw', default => sub { 0 } );
-has ott  => (
+has ott => (
     is      => 'rw',
     lazy    => 1,
     default => sub {
@@ -120,6 +121,10 @@ sub globalLogout {
     if ( $req->param('all') ) {
         if ( my $token = $req->param('token') ) {
             if ( $token = $self->ott->getToken($token) ) {
+                my $storeId =
+                  $self->conf->{hashedSessionStore}
+                  ? id2storage( $req->{userData}->{_session_id} )
+                  : $req->{userData}->{_session_id};
 
                 # Read active sessions from token
                 my $sessions = eval { from_json( $token->{sessions} ) };
@@ -134,13 +139,21 @@ sub globalLogout {
                   $req->{userData}->{ $self->{conf}->{whatToTrace} };
                 if ( $req_user eq $user ) {
                     foreach (@$sessions) {
-                        unless ( $as = $self->p->getApacheSession( $_->{id} ) )
+                        unless (
+
+                            # searchOn() returns sessions indexed by their
+                            # storage ID, then it is required to set hashStore
+                            # to 0
+                            $as = $self->p->getApacheSession(
+                                $_->{id}, hashStore => 0,
+                            )
+                          )
                         {
                             $self->userLogger->info(
                                 "GlobalLogout: session $_->{id} expired");
                             next;
                         }
-                        unless ( $req->{userData}->{_session_id} eq $_->{id} ) {
+                        unless ( $storeId eq $_->{id} ) {
                             $self->userLogger->info(
                                 "Remove \"$user\" session: $_->{id}");
                             $as->remove;
@@ -244,12 +257,20 @@ sub removeOtherActiveSessions {
     my $count = 0;
     my $as;
 
+    my $storeId =
+      $self->conf->{hashedSessionStore}
+      ? id2storage( $req->{userData}->{_session_id} )
+      : $req->{userData}->{_session_id};
     foreach (@$sessions) {
-        unless ( $as = $self->p->getApacheSession( $_->{id} ) ) {
+
+        # searchOn() returns sessions indexed by their storage ID, then
+        # it is required to set hashStore to 0
+        unless ( $as = $self->p->getApacheSession( $_->{id}, hashStore => 0, ) )
+        {
             $self->userLogger->info("GlobalLogout: session $_->{id} expired");
             next;
         }
-        unless ( $req->{userData}->{_session_id} eq $_->{id} ) {
+        unless ( $storeId eq $_->{id} ) {
             $self->userLogger->info(
 "Remove \"$req->{userData}->{ $self->conf->{whatToTrace} }\" session: $_->{id}"
             );

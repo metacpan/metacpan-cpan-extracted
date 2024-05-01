@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SESSIONNOTGRANTED
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.19.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -76,7 +76,7 @@ sub run {
                       . $req->{sessionInfo}->{ $self->conf->{whatToTrace} }
                       . '" was not granted to open session (rule ->'
                       . "$rule)" );
-                $req->urldc( $self->conf->{portal} );
+                $req->urldc( $req->portal );
                 return $req->authResult(PE_SESSIONNOTGRANTED);
             }
             else {
@@ -85,7 +85,7 @@ sub run {
                       . '" was not granted to open session (rule -> '
                       . $self->conf->{grantSessionRules}->{$_}
                       . ")" );
-                $req->urldc( $self->conf->{portal} );
+                $req->urldc( $req->portal );
                 return $req->authResult(PE_SESSIONNOTGRANTED);
             }
         }

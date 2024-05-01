@@ -9,8 +9,7 @@ BEGIN {
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel              => 'error',
             authentication        => 'Demo',
@@ -19,8 +18,11 @@ my $client = LLNG::Manager::Test->new(
             brutForceProtection   => 0,
             portalMainLogo        => 'common/logos/logo_llng_old.png',
             customPlugins         => "t::HistoryPlugin",
-            sessionDataToRemember =>
-              { uid => 'identity', _auth => 'AuthModule' },
+            sessionDataToRemember => {
+                '1_uid'     => 'identity',
+                _auth   => 'AuthModule',
+               '0_cn'  => 'Name',
+            },
         }
     }
 );
@@ -139,13 +141,15 @@ my @ccv1 = ( $res->[2]->[0] =~ /<td>dwho<\/td>/gs );
 my @ccv2 = ( $res->[2]->[0] =~ /<td>Demo<\/td>/gs );
 my @ccv3 = ( $res->[2]->[0] =~ /<td>en<\/td>/gs );
 my @ccv4 = ( $res->[2]->[0] =~ /<td>1<\/td>/gs );
+my @ccv5 = ( $res->[2]->[0] =~ /<td>Doctor Who<\/td>\s*<td>dwho<\/td>/gs);
 
 # History with 5 entries and 10 custom values
 ok( @c == 5,  ' -> Five entries found' );
 ok( @cf == 2, "  -> Two 'failedLogin' entries found" );
 is( @ccv1 + @ccv2 + @ccv3, 15, "Custom value entries found" );
 is( @ccv4,                 0,  "Hidden history field is missing" );
-count(4);
+is( @ccv5, 5, "Found Name before UID as specified by Prefix" );
+count(5);
 
 # Check psession content
 my $psession = getPSession('dwho');

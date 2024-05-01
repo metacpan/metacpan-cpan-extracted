@@ -21,7 +21,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -194,7 +194,8 @@ sub storeBrowser {
 
                 # Cookie available 30 days by default
                 $req->addCookie(
-                    $self->p->cookie(
+                    $self->p->genCookie(
+                        $req,
                         name    => $self->cookieName,
                         value   => $ps->id,
                         max_age => $self->timeout,
@@ -267,8 +268,9 @@ sub getTrustedBrowserSessionFromReq {
 }
 
 sub getTrustedBrowserSession {
-    my ( $self, $cid ) = @_;
+    my ( $self, $cid, $raw ) = @_;
     my $ps = Lemonldap::NG::Common::Session->new(
+        hashStore            => $raw ? 0 : $self->{conf}->{hashedSessionStore},
         storageModule        => $self->conf->{globalStorage},
         storageModuleOptions => $self->conf->{globalStorageOptions},
         kind                 => "SSO",
@@ -402,7 +404,8 @@ sub removeCookie {
     my ( $self, $req ) = @_;
 
     $req->addCookie(
-        $self->p->cookie(
+        $self->p->genCookie(
+            $req,
             name    => $self->cookieName,
             value   => 0,
             expires => 'Wed, 21 Oct 2015 00:00:00 GMT',
@@ -418,8 +421,10 @@ sub removeExistingSessions {
     my $sessions =
       $self->module->searchOn( $self->moduleOpts, '_session_uid', $uid );
 
+    # searchOn() returns sessions indexed by their storage ID, then
+    # it is required to use hashed ID
     foreach ( keys %{ $sessions || {} } ) {
-        if ( my $ps = $self->getTrustedBrowserSession($_) ) {
+        if ( my $ps = $self->getTrustedBrowserSession($_, 1) ) {
 
             # If this is a StayConnected session, remove it
             $ps->remove if $ps->{data}->{_connectedSince};
@@ -442,6 +447,7 @@ sub newConnectionSession {
     }
 
     return Lemonldap::NG::Common::Session->new(
+        hashStore            => $self->{conf}->{hashedSessionStore},
         storageModule        => $self->conf->{globalStorage},
         storageModuleOptions => $self->conf->{globalStorageOptions},
         kind                 => "SSO",
@@ -488,7 +494,8 @@ sub checkBrowserReturn {
         $req->sessionInfo($sessionInfo);
 
         $req->sessionInfo->{_trustedBrowser} = 1;
-        $req->sessionInfo->{_stayConnectedSession} = $state->{_stayConnectedSession};
+        $req->sessionInfo->{_stayConnectedSession} =
+          $state->{_stayConnectedSession};
         my $authn_level_from_trusted = $state->{_trustedAuthnLevel};
         my $authn_level_from_auth    = $sessionInfo->{authenticationLevel};
         my $new_authn_level =

@@ -25,7 +25,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.19.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -460,6 +460,9 @@ sub extractFormInfo {
         # TODO: call authLogout instead of duplicating SLO
         $req->steps( [ @{ $self->p->beforeLogout }, 'deleteSession' ] );
 
+        # Don't fail on "beforeLogout" errors
+        $req->data->{nofail} = 1;
+
         # Check SAML Message
         my ( $request, $response, $method, $relaystate, $artifact ) =
           $self->checkMessage( $req, $url, $request_method, $content_type,
@@ -545,7 +548,7 @@ sub extractFormInfo {
             }
 
             if (    $req->urldc
-                and $self->conf->{portal} !~ /$req->{urldc}\/?/ )
+                and $req->portal !~ /$req->{urldc}\/?/ )
             {
                 $req->steps( [] );
                 $req->user('TODO');
@@ -917,7 +920,7 @@ sub extractFormInfo {
             $req->pdata->{_url} = encode_base64( $req->urldc, '' );
         }
         my $disco_url = $self->conf->{samlDiscoveryProtocolURL};
-        my $portal    = $self->conf->{portal};
+        my $portal    = $req->portal;
         $disco_url .= ( $disco_url =~ /\?/ ? '&' : '?' )
           . build_urlencoded(
             entityID      => $self->getMetaDataURL( 'samlEntityID', 0, 1 ),
@@ -958,7 +961,7 @@ sub extractFormInfo {
 
         # IDP list
         my @list       = ();
-        my $portalPath = $self->conf->{portal};
+        my $portalPath = $req->portal;
 
         foreach ( keys %{ $self->idpList } ) {
             my $idpName = $self->{idpList}->{$_}->{name};

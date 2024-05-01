@@ -1,19 +1,20 @@
 ---
 abstract: 'module to export functions for spamcup program'
 author:
-  - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
+  - 'Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   Perl::Tidy::Sweetened: '1.18'
   Pod::Tidy: '0.10'
   Test::Exception: '0.43'
+  Test::Kwalitee: '1.28'
   Test::More: '0'
   Test::TempDir::Tiny: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,69 +31,69 @@ no_index:
 provides:
   App::SpamcupNG:
     file: lib/App/SpamcupNG.pm
-    version: '0.017'
+    version: '0.018'
   App::SpamcupNG::Error:
     file: lib/App/SpamcupNG/Error.pm
-    version: '0.017'
+    version: '0.018'
   App::SpamcupNG::Error::Bounce:
     file: lib/App/SpamcupNG/Error/Bounce.pm
-    version: '0.017'
+    version: '0.018'
   App::SpamcupNG::Error::Factory:
     file: lib/App/SpamcupNG/Error/Factory.pm
-    version: '0.017'
+    version: '0.018'
   App::SpamcupNG::Error::LoginFailed:
     file: lib/App/SpamcupNG/Error/LoginFailed.pm
-    version: '0.017'
+    version: '0.018'
   App::SpamcupNG::Error::Mailhost:
     file: lib/App/SpamcupNG/Error/Mailhost.pm
-    version: '0.017'
+    version: '0.018'
   App::SpamcupNG::HTMLParse:
     file: lib/App/SpamcupNG/HTMLParse.pm
-    version: '0.017'
+    version: '0.018'
   App::SpamcupNG::Summary:
     file: lib/App/SpamcupNG/Summary.pm
-    version: '0.017'
+    version: '0.018'
   App::SpamcupNG::Summary::Receiver:
     file: lib/App/SpamcupNG/Summary/Receiver.pm
-    version: '0.017'
+    version: '0.018'
   App::SpamcupNG::Summary::Recorder:
     file: lib/App/SpamcupNG/Summary/Recorder.pm
-    version: '0.017'
+    version: '0.018'
   App::SpamcupNG::UserAgent:
     file: lib/App/SpamcupNG/UserAgent.pm
-    version: '0.017'
+    version: '0.018'
   App::SpamcupNG::Warning:
     file: lib/App/SpamcupNG/Warning.pm
-    version: '0.017'
+    version: '0.018'
   App::SpamcupNG::Warning::Factory:
     file: lib/App/SpamcupNG/Warning/Factory.pm
-    version: '0.017'
+    version: '0.018'
   App::SpamcupNG::Warning::Yum:
     file: lib/App/SpamcupNG/Warning/Yum.pm
-    version: '0.017'
+    version: '0.018'
 requires:
   Class::Accessor: '0.51'
-  DBD::SQLite: '1.70'
+  DBD::SQLite: '1.72'
   DBI: '1.643'
-  DateTime: '1.55'
-  HTML::Form: '6.07'
+  DateTime: '1.59'
+  HTML::Form: '6.11'
   HTML::TreeBuilder::XPath: '0.14'
-  HTTP::CookieJar::LWP: '0.012'
+  HTTP::CookieJar::LWP: '0.014'
   HTTP::Cookies: '6.01'
-  HTTP::Request: '6.36'
-  HTTP::Request::Common: '0'
-  LWP::Protocol::https: '6.10'
-  LWP::UserAgent: '6.60'
-  Log::Log4perl: '1.54'
+  HTTP::Request: '6.44'
+  HTTP::Request::Common: '6.44'
+  LWP::Protocol::https: '6.11'
+  LWP::UserAgent: '6.72'
+  Log::Log4perl: '1.57'
   Mozilla::PublicSuffix: v1.0.6
   Set::Tiny: '0.04'
-  YAML::XS: '0.62'
+  YAML::XS: '0.88'
   perl: '5.014004'
 resources:
   bugtracker: https://github.com/glasswalk3r/App-SpamcupNG/issues
   homepage: https://github.com/glasswalk3r/App-SpamcupNG
   repository: https://github.com/glasswalk3r/App-SpamcupNG.git
-version: '0.017'
+version: '0.018'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -110,19 +111,19 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Starter/GatherDir'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Starter/MetaYAML'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Starter/MetaJSON'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Starter/PodSyntaxTests'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Starter/Test::ReportPrereqs'
@@ -151,19 +152,19 @@ x_Dist_Zilla:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Starter/MakeMaker'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Starter/Manifest'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Starter/PruneCruft'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Starter/ManifestSkip'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -174,23 +175,23 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Starter/TestRelease'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Starter/ConfirmRelease'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Starter/UploadToCPAN'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Starter/MetaConfig'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: '@Starter/MetaNoIndex'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -199,7 +200,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.030'
+              version: '6.031'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -207,18 +208,18 @@ x_Dist_Zilla:
           inherit_version: 1
           meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@Starter/MetaProvides::Package'
       version: '2.004003'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Starter/ShareDir'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Starter/ExecDir'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -227,7 +228,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-              version: '6.030'
+              version: '6.031'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -235,7 +236,7 @@ x_Dist_Zilla:
           inherit_version: 1
           meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: MetaProvides::Package
       version: '2.004003'
@@ -246,7 +247,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CPANFile
       name: CPANFile
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -254,7 +255,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -262,15 +263,15 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee
       config:
@@ -286,56 +287,56 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-      version: '6.030'
+      version: '6.031'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
-    version: '6.030'
+    version: '6.031'
 x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: GPL-3.0-only

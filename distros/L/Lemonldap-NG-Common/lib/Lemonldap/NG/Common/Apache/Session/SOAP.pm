@@ -8,7 +8,7 @@ package Lemonldap::NG::Common::Apache::Session::SOAP;
 use strict;
 use SOAP::Lite;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.19.0';
 
 #parameter proxy Url of SOAP service
 #parameter proxyOptions SOAP::Lite options
@@ -74,7 +74,7 @@ sub STORE {
     my $value = shift;
 
     $self->{data}->{$key} = $value;
-    $self->{modified} = 1;
+    $self->{modified} = 1 unless $key eq '_session_id';
     return $value;
 }
 

@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use JSON;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.19.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -34,8 +34,13 @@ sub run {
         $req->userData(
             { _session_id => $id, $self->conf->{whatToTrace} => $info->{uid} }
         );
+
+        # searchOn() returns sessions indexed by their storage ID, then
+        # it is required to set hashStore to 0
+        $req->data->{hashStore} = 0;
         $req->id($id);
         $req->user( $info->{uid} );
+        $req->userData( $sessions->{$id} );
         my $res;
         eval { $res = $self->p->refresh($req); };
         if ($@) {

@@ -1,8 +1,9 @@
 package App::SpamcupNG::Error;
 use strict;
 use warnings;
+use Carp qw(confess);
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 =head1 NAME
 
@@ -38,8 +39,8 @@ sub new {
     my ( $class, $message_ref, $is_fatal ) = @_;
     $is_fatal //= 0;
 
-    die 'message must be an non empty array reference'
-        unless ( ( ref($message_ref) eq 'ARRAY' )
+    confess 'message must be an non empty array reference'
+      unless ( ( ref($message_ref) eq 'ARRAY' )
         and ( scalar( @{$message_ref} ) > 0 ) );
 
     for ( my $i = 0 ; $i < scalar( @{$message_ref} ) ; $i++ ) {
@@ -80,12 +81,12 @@ sub is_fatal {
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2018 of Alceu Rodrigues de Freitas Junior,
-E<lt>arfreitas@cpan.orgE<gt>
+E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 This file is part of App-SpamcupNG distribution.
 

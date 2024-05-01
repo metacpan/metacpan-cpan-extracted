@@ -49,7 +49,6 @@ SKIP: {
         'SAMLRequest' );
 
     # Push SAML request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_post(
             $url,
@@ -85,7 +84,6 @@ SKIP: {
         'SAMLResponse' );
 
     # Post SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($s),
@@ -103,7 +101,6 @@ SKIP: {
     expectOK($res);
 
     # Logout from IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             '/',
@@ -126,7 +123,6 @@ SKIP: {
     expectReject($res);
 
     # Logout initiated by SP
-    switch ('sp');
     ok(
         $res = $sp->_get(
             '/',
@@ -141,7 +137,6 @@ SKIP: {
         'SAMLRequest' );
 
     # Push SAML logout request to IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_post(
             $url,

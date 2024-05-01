@@ -1,0 +1,10 @@
+[Unit]
+Description=Cron job for Lemonldap::NG handler
+After=network.target
+
+[Service]
+User=__APACHEUSER__
+ExecStart=__BINDIR__/purgeLocalCache
+
+[Install]
+WantedBy=multi-user.target

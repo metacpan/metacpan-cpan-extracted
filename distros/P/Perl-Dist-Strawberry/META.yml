@@ -27,6 +27,7 @@ build_requires:
   Pod::Usage: '0'
   Portable::Dist: '1.06'
   Storable: '0'
+  Syntax::Keyword::Try: '0'
   Template: '0'
   Test::More: '0.86'
   Text::Diff: '0'
@@ -50,7 +51,7 @@ no_index:
 provides:
   Perl::Dist::Strawberry:
     file: lib/Perl/Dist/Strawberry.pm
-    version: '4.023'
+    version: '4.024'
   Perl::Dist::Strawberry::Step:
     file: lib/Perl/Dist/Strawberry/Step.pm
   Perl::Dist::Strawberry::Step::BinaryToolsAndLibs:
@@ -96,5 +97,5 @@ resources:
   homepage: http://strawberryperl.com/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/StrawberryPerl/Perl-Dist-Strawberry
-version: '4.023'
+version: '4.024'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

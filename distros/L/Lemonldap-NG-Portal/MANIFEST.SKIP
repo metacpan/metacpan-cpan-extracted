@@ -3,7 +3,8 @@
 cpanfile
 ^.git/.*
 ^.github/
-^.gitignore
+(^|/).gitignore$
+(^|/)tags$
 ^Makefile$
 ^MANIFEST.bak
 ^MYMETA.*
@@ -12,3 +13,5 @@ cpanfile
 ^pm_to_blib
 ^\.prove
 ^\.proverc
+.bak$
+^t/sessions/tmp

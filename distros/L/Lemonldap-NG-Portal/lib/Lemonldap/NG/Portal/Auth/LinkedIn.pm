@@ -8,7 +8,7 @@ use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_REDIRECT);
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.19.0';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -84,7 +84,7 @@ sub extractFormInfo {
     my $nonce = time;
 
     # Build redirect_uri
-    my $callback_url = $self->conf->{portal};
+    my $callback_url = $req->portal;
 
     # Check return values
     my $error = $req->param("error");

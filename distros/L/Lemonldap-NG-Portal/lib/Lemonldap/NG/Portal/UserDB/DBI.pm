@@ -9,9 +9,12 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-extends 'Lemonldap::NG::Portal::Lib::DBI';
+extends qw(
+  Lemonldap::NG::Portal::Main::UserDB
+  Lemonldap::NG::Portal::Lib::DBI
+);
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.19.0';
 
 # PROPERTIES
 
@@ -99,7 +102,8 @@ sub findUser {
         $self->logger->debug("Demo UserDB random rank: $rank");
         $self->userLogger->info(
             "FindUser: DBI UserDB returns $results->[$rank]->[0]");
-        $req->data->{findUser} = $results->[$rank]->[0];
+        $req->data->{findUser}    = $results->[$rank]->[0];
+        $req->data->{findUserAll} = map { $_->[0] } @$results;
         return PE_OK;
     }
 
@@ -117,11 +121,6 @@ sub setSessionInfo {
         $req->{sessionInfo}->{$var} = $req->data->{dbientry}->{$attr}
           if ( defined $req->data->{dbientry}->{$attr} );
     }
-
-    return PE_OK;
-}
-
-sub setGroups {
 
     return PE_OK;
 }

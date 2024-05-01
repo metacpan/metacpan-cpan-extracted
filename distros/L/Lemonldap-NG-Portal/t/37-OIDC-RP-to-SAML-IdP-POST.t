@@ -101,7 +101,6 @@ SKIP: {
         qr#http://auth.sp.com(/oauth2/authorize)\?(.*)$# );
 
     # Push request to Proxy
-    switch ('sp');
     ok(
         $res = $sp->_get(
             $url,
@@ -117,7 +116,6 @@ SKIP: {
         'SAMLRequest' );
 
     # Post SAML request to IdP
-    switch ('idp');
     ok(
         $res = $idp->_post(
             $url,
@@ -155,7 +153,6 @@ SKIP: {
     my $idpId = expectCookie($res);
 
     # Post SAML response
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($query),
@@ -195,7 +192,6 @@ SKIP: {
     ($query) = expectRedirection( $res, qr#http://auth.rp.com/*\?(.*)$# );
 
     # Follow redirection to RP
-    switch ('rp');
     ok( $res = $rp->_get( '/', query => $query, accept => 'text/html' ),
         'Follow redirection to RP' );
     my $rpId = expectCookie($res);
@@ -215,7 +211,6 @@ SKIP: {
     );
 
     # Push logout request to proxy
-    switch ('sp');
     ok(
         $res = $sp->_get(
             $url,
@@ -239,7 +234,6 @@ SKIP: {
       expectForm( $res, 'auth.idp.com', '/saml/singleLogout', 'SAMLRequest' );
 
     # Push logout to SAML IdP
-    switch ('idp');
     ok(
         $res = $idp->_post(
             $url, IO::String->new($query),
@@ -256,7 +250,6 @@ SKIP: {
     is( $removedCookie, 0, "SSO cookie removed" );
 
     # Push logout to SAML SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($query),

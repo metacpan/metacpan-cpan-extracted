@@ -16,7 +16,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 );
 use Lemonldap::NG::Common::Util qw/display2F/;
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.19.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::SecondFactor
@@ -86,7 +86,7 @@ sub verify {
         return PE_BADOTP;
     }
 
-    my $r = $self->verifyCode(
+    my ($r, $range) = $self->verifyCode(
         $self->conf->{totp2fInterval},
         $self->conf->{totp2fRange},
         $self->conf->{totp2fDigits},
@@ -95,6 +95,7 @@ sub verify {
     return PE_ERROR if $r == -1;
 
     if ($r) {
+        $self->userLogger->info("Codes match at range $range");
         $self->userLogger->info( "User $uid authenticated with 2F device: "
               . display2F($_2fDevice) );
         return PE_OK;

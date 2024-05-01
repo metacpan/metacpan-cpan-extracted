@@ -78,7 +78,6 @@ qr%<a href="http://auth.sp.com\?cancel=1" class="btn btn-primary" role="button">
 count(1);
 
 # Query IdP
-switch ('issuer');
 ok(
     $res = $issuer->_get(
         '/cas/login',

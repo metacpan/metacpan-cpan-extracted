@@ -125,7 +125,6 @@ qr%<input name="code" value="" type="text" class="form-control" id="extcode" trp
         'SAMLResponse' );
 
     # Post SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($s),
@@ -253,7 +252,6 @@ qr%<input name="code" value="" type="text" class="form-control" id="extcode" trp
         'SAMLResponse' );
 
     # Post SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($s),

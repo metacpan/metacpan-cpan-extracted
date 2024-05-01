@@ -118,7 +118,7 @@ qr%<a href="http://auth.sp.com\?cancel=1" class="btn btn-primary" role="button">
     # Found CAS idp logo and display name
     ok(
         $res->[2]->[0] =~
-qr%<img src="http://auth.sp.com/static/common/icons/sfa_manager.png" class="mr-2" alt="idp4" title="My_tooltip" />%,
+qr%<img src="/static/common/icons/sfa_manager.png" class="mr-2" alt="idp4" title="My_tooltip" />%,
         'Found CAS idp logo and tooltip'
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( $res->[2]->[0] =~ qr%CAS1%, 'Found CAS idp display name' )

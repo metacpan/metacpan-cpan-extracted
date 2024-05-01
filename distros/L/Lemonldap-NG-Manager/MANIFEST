@@ -20,6 +20,7 @@ lib/Lemonldap/NG/Manager/Attributes.pm
 lib/Lemonldap/NG/Manager/Build.pm
 lib/Lemonldap/NG/Manager/Build/Attributes.pm
 lib/Lemonldap/NG/Manager/Build/CTrees.pm
+lib/Lemonldap/NG/Manager/Build/OpenApi.pm
 lib/Lemonldap/NG/Manager/Build/PortalConstants.pm
 lib/Lemonldap/NG/Manager/Build/Tree.pm
 lib/Lemonldap/NG/Manager/Cli.pm
@@ -121,6 +122,7 @@ site/htdocs/static/forms/casSrvMetaDataNodeContainer.html
 site/htdocs/static/forms/catAndAppList.html
 site/htdocs/static/forms/cmbModule.html
 site/htdocs/static/forms/cmbModuleContainer.html
+site/htdocs/static/forms/displayOidcMetadata.html
 site/htdocs/static/forms/doubleHash.html
 site/htdocs/static/forms/file.html
 site/htdocs/static/forms/grant.html

@@ -106,8 +106,10 @@ WriteMakefile(
         FILES => 't/lmConf*'
     },
     MAN1PODS => {
-        'scripts/convertConfig'         => 'blib/man1/convertConfig.1p',
-        'scripts/convertSessions'       => 'blib/man1/convertSessions.1p',
+        'scripts/convertConfig'               => 'blib/man1/convertConfig.1p',
+        'scripts/convertSessions'             => 'blib/man1/convertSessions.1p',
+        'scripts/convertToHashSessionStorage' =>
+          'blib/man1/convertToHashSessionStorage.1p',
         'scripts/encryptTotpSecrets'    => 'blib/man1/encryptTotpSecrets.1p',
         'scripts/lemonldap-ng-cli'      => 'blib/man1/lemonldap-ng-cli.1p',
         'scripts/lemonldap-ng-sessions' => 'blib/man1/lemonldap-ng-sessions.1p',

@@ -1,6 +1,7 @@
 package App::SpamcupNG::Error::Factory;
 use strict;
 use warnings;
+use Carp qw(confess);
 use Exporter 'import';
 
 use App::SpamcupNG::Error;
@@ -8,7 +9,7 @@ use App::SpamcupNG::Error::Mailhost;
 use App::SpamcupNG::Error::Bounce;
 use App::SpamcupNG::Error::LoginFailed;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 =head1 NAME
 
@@ -57,21 +58,21 @@ sub create_error {
     my ( $message_ref, $is_fatal ) = @_;
     $is_fatal //= 0;
 
-    die 'message must be an no empty array reference'
-        unless ( ( ref($message_ref) eq 'ARRAY' )
+    confess 'message must be an no empty array reference'
+      unless ( ( ref($message_ref) eq 'ARRAY' )
         and ( scalar( @{$message_ref} ) > 0 ) );
 
     return App::SpamcupNG::Error::Mailhost->new($message_ref)
-        if ( $message_ref->[0] =~ $mailhost_regex );
+      if ( $message_ref->[0] =~ $mailhost_regex );
 
     return App::SpamcupNG::Error::Bounce->new( $message_ref, 1 )
-        if ( $message_ref->[0] =~ $bounce_regex );
+      if ( $message_ref->[0] =~ $bounce_regex );
 
     return App::SpamcupNG::Error::LoginFailed->new($message_ref)
-        if ( $message_ref->[0] =~ $login_failed_regex );
+      if ( $message_ref->[0] =~ $login_failed_regex );
 
     return App::SpamcupNG::Error->new( $message_ref, $is_fatal )
-        if ($is_fatal);
+      if ($is_fatal);
 
     foreach my $regex (@fatal_errors) {
         if ( $message_ref->[0] =~ $regex ) {
@@ -85,12 +86,12 @@ sub create_error {
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2018 of Alceu Rodrigues de Freitas Junior,
-E<lt>arfreitas@cpan.orgE<gt>
+E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 This file is part of App-SpamcupNG distribution.
 
@@ -109,4 +110,3 @@ App-SpamcupNG. If not, see <http://www.gnu.org/licenses/>.
 =cut
 
 1;
-

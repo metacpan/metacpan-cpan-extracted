@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 17;
+my $maintests = 15;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 
@@ -36,7 +36,6 @@ SKIP: {
     $sp     = register( 'sp',     \&sp );
 
     # Simple authentication on IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_post(
             '/', IO::String->new('user=russian&password=russian'),
@@ -72,7 +71,6 @@ SKIP: {
     my $s = "SAMLResponse=$1";
 
     # Post SAML response to SP
-    switch ('sp');
     ok(
         $res = $sp->_post(
             $url, IO::String->new($s),
@@ -91,15 +89,10 @@ SKIP: {
     expectAuthenticatedAs( $res, 'ru@badwolf.org@idp' );
 
     # Verify UTF-8
-    ok( $res = $sp->_get("/sessions/global/$spId"), 'Get UTF-8' );
-    expectOK($res);
-    ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-      or print STDERR $@;
-    ok( $res->{cn} eq 'Русский', 'UTF-8 values' )
+    ok( getSession($spId)->data->{cn} eq 'Русский', 'UTF-8 values' )
       or explain( $res, 'cn => Frédéric Accents' );
 
     # Logout initiated by IdP
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             '/',
@@ -122,14 +115,12 @@ m#iframe src="http://auth.sp.com(/saml/proxySingleLogout)\?(SAMLRequest=.*?)"#,
     my $removedCookie = expectCookie($res);
     is( $removedCookie, 0, "SSO cookie removed" );
 
-    switch ('sp');
     ok( $res = $sp->_get( $url, query => $query, accept => 'text/html' ),
         'Query SP for iframe' );
     ( $url, $query ) = expectRedirection( $res,
         qr#http://auth.idp.com(/saml/singleLogoutReturn)\?(SAMLResponse=.*)# );
 
     # Push SAML logout response to IdP
-    switch ('issuer');
     ok( $res = $issuer->_get( $url, query => $query, accept => 'text/html' ),
         'Push SAML response to IdP' );
     expectRedirection( $res, 'http://auth.idp.com/static/common/icons/ok.png' );
@@ -142,7 +133,6 @@ m#iframe src="http://auth.sp.com(/saml/proxySingleLogout)\?(SAMLRequest=.*?)"#,
         'Content-Security-Policy does not contain a frame-ancestors' );
 
     # Test if logout is done
-    switch ('issuer');
     ok(
         $res = $issuer->_get(
             '/', cookie => "lemonldap=$idpId",
@@ -151,7 +141,6 @@ m#iframe src="http://auth.sp.com(/saml/proxySingleLogout)\?(SAMLRequest=.*?)"#,
     );
     expectReject($res);
 
-    switch ('sp');
     ok(
         $res = $sp->_get(
             '/',
@@ -169,8 +158,7 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
@@ -215,8 +203,7 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',

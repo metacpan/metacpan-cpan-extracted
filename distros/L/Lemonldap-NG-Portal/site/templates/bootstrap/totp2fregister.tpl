@@ -11,8 +11,8 @@
         <div class="col-md-6 text-center">
           <div >
             <p>&#x2460; <span trspan="totpQrCode"></span></p>
-            <canvas id="qr"></canvas>
-
+            <p><a class="otpauth-url" href=""><canvas id="qr"></canvas></a></p>
+            <p><span trspan="totpOrTouch"></span></p>
             <p><span trspan="totpSecretKey"></span></p>
             <tt id="secret"></tt>
           </div>

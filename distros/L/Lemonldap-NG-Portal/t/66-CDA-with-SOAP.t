@@ -24,7 +24,6 @@ LWP::Protocol::PSGI->register(
         my $url = $1;
         my $res;
         my $s = $req->content;
-        switch ('portal');
         ok(
             $res = $client->_post(
                 $url,
@@ -42,7 +41,6 @@ LWP::Protocol::PSGI->register(
           or explain( $res->[1], 'Content-Type => application/xml' );
         pass(' @ END OF SOAP REQUEST @');
         count(4);
-        switch ('app');
         return $res;
     }
 );
@@ -103,7 +101,6 @@ SKIP: {
 
     my ( $cli, $app );
     &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-    switch ('app');
     $app = register(
         'app',
         sub {

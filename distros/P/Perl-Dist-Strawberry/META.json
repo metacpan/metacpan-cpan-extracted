@@ -46,6 +46,7 @@
             "Pod::Usage" : "0",
             "Portable::Dist" : "1.06",
             "Storable" : "0",
+            "Syntax::Keyword::Try" : "0",
             "Template" : "0",
             "Test::More" : "0.86",
             "Text::Diff" : "0",
@@ -71,7 +72,7 @@
    "provides" : {
       "Perl::Dist::Strawberry" : {
          "file" : "lib/Perl/Dist/Strawberry.pm",
-         "version" : "4.023"
+         "version" : "4.024"
       },
       "Perl::Dist::Strawberry::Step" : {
          "file" : "lib/Perl/Dist/Strawberry/Step.pm"
@@ -140,6 +141,6 @@
       "x_IRC" : "irc://irc.perl.org/#win32",
       "x_MailingList" : "http://groups.google.com/group/perl.win32.vanilla"
    },
-   "version" : "4.023",
+   "version" : "4.024",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }
