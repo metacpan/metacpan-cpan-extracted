@@ -10,6 +10,23 @@ sure you change the first line.
 
 =cut
 
+=head2 send_text_frame
+
+Send a text frame.
+
+Expects a Unicode Perl text string as the first parameter - this will be
+encoded to UTF-8 and sent to the client.
+
+=head2 send_binary_frame
+
+Send a binary data frame.
+
+Expects the raw binary data bytes as the first parameter.
+
+=head2 write_frame
+
+Sends one or more frames to the client.
+
 =head1 INHERITED METHODS
 
 =over 4

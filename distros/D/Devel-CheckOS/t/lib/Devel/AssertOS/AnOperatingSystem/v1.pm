@@ -1,5 +1,3 @@
-# $Id: v1.pm,v 1.2 2007/10/18 13:31:25 drhyde Exp $
-
 package Devel::AssertOS::AnOperatingSystem::v1;
 
 use Devel::CheckOS qw(die_unsupported);

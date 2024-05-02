@@ -13,7 +13,10 @@ BEGIN {
     use_ok 'Getopt::Long::DescriptivePod';
 }
 
-my $extra_space 
+my $extra_space_left
+    = $Getopt::Long::Descriptive::VERSION >= 0.113 ? q{   }
+    :                                                q{};
+my $extra_space_right
     = $Getopt::Long::Descriptive::VERSION >= 0.100 ? q{}
     : $Getopt::Long::Descriptive::VERSION >= 0.099 ? q{  }
     :                                                q{ };
@@ -70,9 +73,9 @@ before1
 before2
 
  my-program [-v] [long options...] <some-arg>
-  $represent_v  ${extra_space}print extra stuff
+  ${extra_space_left}$represent_v  ${extra_space_right}print extra stuff
 
-  $represent_h  ${extra_space}print usage message and exit
+  ${extra_space_left}$represent_h  ${extra_space_right}print usage message and exit
 
 after1
 after2

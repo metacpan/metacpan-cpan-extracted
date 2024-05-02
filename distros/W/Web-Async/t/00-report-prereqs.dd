@@ -28,7 +28,8 @@ do { my $x = {
                                       'Myriad::Class' => '0',
                                       'POSIX' => '0',
                                       'Ryu::Async' => '0',
-                                      'Time::Moment' => '0'
+                                      'Time::Moment' => '0',
+                                      'Unicode::UTF8' => '0'
                                     }
                     },
        'test' => {

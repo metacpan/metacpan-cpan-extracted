@@ -10,7 +10,7 @@ use File::Spec;
 
 use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS %OS_ALIASES);
 
-our $VERSION = '1.96';
+our $VERSION = '2.00';
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(
@@ -196,18 +196,13 @@ sub die_unsupported { die("OS unsupported\n"); }
 
 =head3 list_platforms
 
-When called in list context,
-return a list of all the platforms for which the corresponding
+Return a list of all the platforms for which the corresponding
 Devel::AssertOS::* module is available.  This includes both OSes and OS
 families, and both those bundled with this module and any third-party
 add-ons you have installed.
 
-In scalar context, returns a hashref keyed by platform with the filename
-of the most recent version of the supporting module that is available to you.
-This behaviour is deprecated.
-
-Unfortunately, on some platforms this list may have file case
-broken.  eg, some platforms might return 'freebsd' instead of 'FreeBSD'.
+Unfortunately, on some platforms this list may have platform names'
+case broken, eg you might see 'freebsd' instead of 'FreeBSD'.
 This is because they have case-insensitive filesystems so things
 should Just Work anyway.
 
@@ -221,13 +216,8 @@ my $re_AssertOS = qr/$case_flag ^AssertOS$/x;
 my $re_Alias    = qr/$case_flag ^Alias\b/x;
 
 sub list_platforms {
-    # sort by mtime, so oldest last. This was necessary so that if a module
-    # appears twice in @INC we pick the newer one but that functionality is
-    # no longer needed. We do need to de-dupe the list though
-    my @modules = sort {
-        (stat($a->{file}))[9] <=> (stat($b->{file}))[9]
-    } grep {
-        $_->{module} !~ $re_Alias
+    my @modules = sort keys %{ {map { $_ => 1 } grep {
+        $_ !~ $re_Alias
     } map {
         my (undef, $dir_part, $file_part) = File::Spec->splitpath($_);
         $file_part =~ s/\.pm$//;
@@ -240,32 +230,19 @@ sub list_platforms {
             splice @dirs, 0, $i + 1;
             last;
         }
-        {
-            module => join('::', @dirs, $file_part),
-            file   => File::Spec->canonpath($_)
-        }
+        join('::', @dirs, $file_part);
     } _find_pm_files_in_dirs(
         grep { -d }
         map { File::Spec->catdir($_, qw(Devel AssertOS)) }
         @INC
-    );
+    )}};
 
-    my %modules = map {
-        $_->{module} => $_->{file}
-    } @modules;
-
-    if(wantarray()) {
-        return sort keys %modules;
-    } else {
-        warn("Calling list_platforms in scalar context and getting back a reference is deprecated and will go away some time after April 2024. To disable this warning set \$Devel::CheckOS::NoDeprecationWarnings::Context to a true value.\n") unless($Devel::CheckOS::NoDeprecationWarnings::Context);
-        return \%modules;
-    }
+    return @modules;
 }
 
 =head3 list_family_members
 
 Takes the name of an OS 'family' and returns a list of all its members.
-In list context, you get a list, in scalar context you get an arrayref.
 
 If called on something that isn't a family, you get an empty list (or
 a ref to an empty array).
@@ -279,16 +256,10 @@ sub list_family_members {
     # this will die if it's the wrong OS, but the module is loaded ...
     eval qq{use Devel::AssertOS::$family};
     # ... so we can now query it
-    my @members = eval qq{
+    return eval qq{
         no strict 'refs';
         &{"Devel::AssertOS::${family}::matches"}()
     };
-    if(wantarray()) {
-        return @members;
-    } else {
-        warn("Calling list_family_members in scalar context and getting back a reference is deprecated and will go away some time after April 2024. To disable this warning set \$Devel::CheckOS::NoDeprecationWarnings::Context to a true value.\n") unless($Devel::CheckOS::NoDeprecationWarnings::Context);
-        return \@members;
-    }
 }
 
 =head3 register_alias
@@ -354,13 +325,9 @@ open source endeavours by buying me something from my wishlist:
 Version 1.90 made all matches case-insensitive. This is a change in behaviour, but
 if it breaks your code then your code was already broken, you just didn't know it.
 
-=head1 DEPRECATIONS
-
-At some point after April 2024 the C<list_family_members> and C<list_platforms>
-functions will stop being sensitive to whether they are called in list context or
-not, and will always return a list. From now until then calling them in non-list
-context will emit a warning. You can turn that off by setting
-C<$Devel::CheckOS::NoDeprecationWarnings::Context> to a true value.
+As of version 2.00 the list_* functions always return plain old lists. Calling them
+in scalar context was deprecated and has emitted warnings for over 2 years, since
+version 1.90.
 
 =head1 SEE ALSO
 
@@ -414,7 +381,7 @@ L<git://github.com/DrHyde/perl-modules-Devel-CheckOS.git>
 
 =head1 COPYRIGHT and LICENCE
 
-Copyright 2023 David Cantrell
+Copyright 2024 David Cantrell
 
 This software is free-as-in-speech software, and may be used, distributed, and modified under the terms of either the GNU General Public Licence version 2 or the Artistic Licence. It's up to you which one you use. The full text of the licences can be found in the files GPL2.txt and ARTISTIC.txt, respectively.
 

@@ -21,7 +21,8 @@ my %WriteMakefileArgs = (
     "Myriad::Class" => 0,
     "POSIX" => 0,
     "Ryu::Async" => 0,
-    "Time::Moment" => 0
+    "Time::Moment" => 0,
+    "Unicode::UTF8" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::CheckDeps" => "0.010",
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,7 +51,8 @@ my %FallbackPrereqs = (
   "Ryu::Async" => 0,
   "Test::CheckDeps" => "0.010",
   "Test::More" => "0.94",
-  "Time::Moment" => 0
+  "Time::Moment" => 0,
+  "Unicode::UTF8" => 0
 );
 
 

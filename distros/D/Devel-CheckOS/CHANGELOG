@@ -1,6 +1,13 @@
+2.00    2024-05-01
+
+- list_* no longer have special behaviour when called in scalar context. This has
+  been deprecated since version 1.90;
+
+- Add Devel::AssertOS::MacOSX::v14 (Sonoma)
+
 1.96    2023-02-04
 
-- Add Devel::AssertOS::MacOSX::v13
+- Add Devel::AssertOS::MacOSX::v13 (Ventura)
 
 - Add Devel::AssertOS::OSFeatures::Systemd
 

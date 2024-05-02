@@ -1,0 +1,187 @@
+Math::NLopt
+
+NLopt <https://github.com/stevengj/nlopt> is a
+
+  library for nonlinear local and global optimization, for functions
+  with and without gradient information. It is designed as a simple,
+  unified interface and packaging of several free/open-source
+  nonlinear optimization libraries.
+
+Math::NLopt is a Perl binding to NLopt. It uses the Alien::NLopt module
+to find or install a Perl local instance of the NLopt library.
+
+This version interfaces to Perl using native Perl arrays. A version
+which uses PDL ndarrays will be forthcoming.
+
+The main documentation for NLopt may be found at
+<https://nlopt.readthedocs.io/>; this documentation focuses on the Perl
+specific implementation, which is more Perlish than the C API (and is
+very similar to the Python one).
+
+  Perl Interface
+
+The Perl interface closely tracks the object oriented interface of
+NLopt, but uses methods rather than subroutine calls, e.g. translate the
+C
+
+   result = nlopt_<method>( opt, ... );
+
+into
+
+  $result = $opt->method( ... );
+
+However, the Perl API *in general* returns results directly, whereas the
+C interface returns a success/failure code and transfers data to and
+from a routine via its parameters. The Perl API, apart from that for the
+objective and constraint methods, uses parameters solely as input data
+for the methods. For example, the C API for starting the optimization
+process is
+
+   nlopt_result nlopt_optimize(nlopt_opt opt, double *x, double *opt_f);
+
+where x is used for both passing in the initial model parameters as well
+as retrieving their final values. The final value of the optimization
+function is stored in opt_f. A code specifying the success or failure of
+the process is returned.
+
+The Perl interface (similar to the Python and C+ versions) is
+
+   \@final = $opt->optimize( \@initial_pars );
+   $opt_f = $opt->last_optimum_value;
+   $result_code = $opt->last_optimize_result;
+
+The Perl API will throw exceptions on failures, similar to the behavior
+of the C++ and Python API's. That behavior will be tunable in future
+releases.
+
+  Constants
+
+Math::NLopt defines constants for the optimization algorithms, result
+codes, and utilities.
+
+The algorithm constants have the same names as the NLopt constants, and
+may be imported individually by name or en-masse with the ':algorithms'
+tag:
+
+  use Math::NLopt 'NLOPT_LD_MMA';
+  use Math::NLopt ':algorithms';
+
+Importing result codes is similar:
+
+  use Math::NLopt 'NLOPT_FORCED_STOP';
+  use Math::NLopt ':results';
+
+As are the utility subroutines:
+
+  use Math::NLopt 'algorithm_from_string';
+  use Math::NLopt ':utils';
+
+  Callbacks
+
+While NLopt performs the optimization of the objective function, it
+requires callback subroutines which return the value of the objective
+function or non-linear constraints. Such callback subroutines have a
+required calling signature documented below. The user can provide their
+own data structure containing additional information which will be
+passed to the callbacks, or they can access that information from
+closures.
+
+   Objective Functions
+
+Objective functions callbacks are registered via either
+
+  $opt->set_min_objective( \&func, ?$data );
+  $opt->set_max_objective( \&func, ?$data );
+
+where $data is an optional structure passed to the callback which can be
+used for any purpose.
+
+The objective function has the signature
+
+  $value = sub ( \@params, \@gradient, $data ) { ... }
+
+It returns is the value of the optimization function for the passed set
+parameters, @params.
+
+if \@gradient is not "undef", it must be filled in by the by the
+objective function.
+
+$data is the structure registered with the callback. It will be "undef"
+if none was provided.
+
+  Non-linear Constraints
+
+Nonlinear constraint callbacks are registered via either of
+
+  $opt->add_equality_constraint( \&func, ?$data, ?$tol = 0 );
+  $opt->add_inequality_constraint( \&func, ?$data, ?$tol = 0 );
+
+where $data is an optional structure passed to the callback which can be
+used for any purpose, and $tol is a tolerance. Pass "undef" for $data if
+a tolerance is required but $data is not.
+
+The callbacks have the same signature as the objective callbacks.
+
+   Vector-valued Constraints
+
+Vector-valued constraint callbacks are registered via either of
+
+  $opt->add_equality_mconstraint( \&func, $m, ?$data, ?\@tol );
+  $opt->add_inequality_mconstraint( \&func, $m, ?$data, ?\@tol );
+
+where $m is the length of the vector, $data is an optional structure
+passed on to the callback function, and @tol is an optional array of
+length $m containing the tolerance for each component of the vector
+
+Vector valued constraints callbacks have the signature
+
+  sub ( \@result, \@params, \@gradient, $data ) { ... }
+
+The $m length vector of constraints should be stored in "\@result". If
+"\@gradient" is not "undef", it is a *$n x $m* length array which should
+be filled by the callback.
+
+$data is the optional structure passed to the callback.
+
+   Preconditioned Objectives
+
+These are registered via one of
+
+  $opt->set_precond_min_objective( \&func, \&precond, ?$data);
+  $opt->set_precond_max_objective( \&func, \&precond, ?$data);
+
+"\&func" has the same signature as before (see "Objective Functions"),
+and $data is as before.
+
+The "\&precond" fallback has this signature:
+
+   sub (\@x, \@v, \@vpre, $data) {...}
+
+"\@x", "\@v", and "\@vpre" are arrays of length $n. "\@x", "\@v" are
+input and "\@vpre" should be filled in by the routine.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2024 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

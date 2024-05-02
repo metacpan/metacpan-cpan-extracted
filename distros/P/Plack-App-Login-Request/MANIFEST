@@ -1,6 +1,7 @@
 Changes
 CONCEPT
 examples/plack_app_login_request.pl
+images/plack_app_login_request.png
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

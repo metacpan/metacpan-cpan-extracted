@@ -1,5 +1,11 @@
 
 Revision history for Web-Async
 
+0.002     2024-05-02 03:52:14+08:00 Asia/Singapore
+    [New features]
+
+    - better websocket protocol compatibility with other clients (mostly thanks to
+    Autobahn testing)
+
 0.001     2024-04-24 00:49:13+08:00 Asia/Singapore
     Initial version for websocket + per-message compression support

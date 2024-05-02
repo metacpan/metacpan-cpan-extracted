@@ -129,7 +129,7 @@ in the first place.
 
 =head1 COPYRIGHT and LICENCE
 
-Copyright 2023 David Cantrell
+Copyright 2024 David Cantrell
 
 This documentation is free-as-in-speech.  It may be used,
 distributed and modified under the terms of the Creative Commons

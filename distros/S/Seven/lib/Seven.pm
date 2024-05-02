@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = 0.02;
+our $VERSION = 0.04;
 
 our @FAKE;
 
@@ -32,7 +32,7 @@ sub import {
 	{
 		no strict 'refs';
 		*{"${caller}::luck"}  = sub {
-			print "It's the seventh day and not 128 boats, still a few hours left for that to be increased... though\n";
+			print q|It's the fifthteenth day in another hospital prison, this time I am fully aware and all around me are also, pretty pointless really but we are slowly climbing the ladder with invisibility. The world dictatorship will fall, they are just clinging onto power now.|;
 		};
 	}
 }
@@ -47,7 +47,7 @@ Seven - The great new Seven!
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 

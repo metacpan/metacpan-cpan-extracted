@@ -1,0 +1,27 @@
+Changes
+england.rss
+ignore.txt
+lib/Feed/Data/BBC.pm
+lib/Feed/Data/BBC/Africa.pm
+lib/Feed/Data/BBC/Asia.pm
+lib/Feed/Data/BBC/Base.pm
+lib/Feed/Data/BBC/England.pm
+lib/Feed/Data/BBC/Europe.pm
+lib/Feed/Data/BBC/LatinAmerica.pm
+lib/Feed/Data/BBC/MiddleEast.pm
+lib/Feed/Data/BBC/NorthernIreland.pm
+lib/Feed/Data/BBC/Scotland.pm
+lib/Feed/Data/BBC/UsAndCanada.pm
+lib/Feed/Data/BBC/Wales.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-odea.t
+t/england.rss
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

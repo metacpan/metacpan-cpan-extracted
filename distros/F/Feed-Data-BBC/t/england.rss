@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns="http://purl.org/rss/1.0/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <channel rdf:about="Feed::Data">
+    <description>Feed::Data</description>
+    <title>Feed::Data</title>
+    <link>Feed::Data</link>
+    <items>
+      <rdf:Seq>
+        <rdf:li rdf:resource="https://www.bbc.co.uk/news/uk-england-london-68941125"/>
+        <rdf:li rdf:resource="https://www.bbc.com/news/articles/cnke2y8l9g2o"/>
+        <rdf:li rdf:resource="https://www.bbc.co.uk/news/uk-england-hampshire-68928464"/>
+        <rdf:li rdf:resource="https://www.bbc.co.uk/news/uk-england-lincolnshire-68931806"/>
+        <rdf:li rdf:resource="https://www.bbc.com/news/articles/cy0lp3k849yo"/>
+        <rdf:li rdf:resource="https://www.bbc.com/news/articles/cn0v6727vr9o"/>
+        <rdf:li rdf:resource="https://www.bbc.com/news/articles/cxe93ppp3jvo"/>
+        <rdf:li rdf:resource="https://www.bbc.com/news/articles/c2x3k2zgnjro"/>
+        <rdf:li rdf:resource="https://www.bbc.com/news/articles/crgy7e5qlnmo"/>
+        <rdf:li rdf:resource="https://www.bbc.co.uk/news/uk-england-berkshire-68927899"/>
+        <rdf:li rdf:resource="https://www.bbc.co.uk/news/uk-england-london-68899651"/>
+        <rdf:li rdf:resource="https://www.bbc.co.uk/news/uk-england-derbyshire-68899179"/>
+        <rdf:li rdf:resource="https://www.bbc.co.uk/news/uk-england-manchester-68937492"/>
+        <rdf:li rdf:resource="https://www.bbc.co.uk/news/uk-england-somerset-68934647"/>
+        <rdf:li rdf:resource="https://www.bbc.com/news/articles/ce9rqn32q5jo"/>
+        <rdf:li rdf:resource="https://www.bbc.co.uk/news/uk-england-northamptonshire-68930864"/>
+        <rdf:li rdf:resource="https://www.bbc.co.uk/news/world-europe-jersey-68922948"/>
+        <rdf:li rdf:resource="https://www.bbc.co.uk/news/uk-england-nottinghamshire-68928786"/>
+        <rdf:li rdf:resource="https://www.bbc.co.uk/news/uk-england-humber-68938838"/>
+        <rdf:li rdf:resource="https://www.bbc.com/news/articles/cm54j9zrmpxo"/>
+        <rdf:li rdf:resource="https://www.bbc.co.uk/news/uk-england-suffolk-68935343"/>
+        <rdf:li rdf:resource="https://www.bbc.co.uk/news/uk-england-somerset-68934654"/>
+        <rdf:li rdf:resource="https://www.bbc.co.uk/news/business-68903985"/>
+        <rdf:li rdf:resource="https://www.bbc.com/sport/snooker/articles/cprgyzqlqy3o"/>
+        <rdf:li rdf:resource="https://www.bbc.com/sport/football/articles/c3gx8z3j5dyo"/>
+        <rdf:li rdf:resource="https://www.bbc.co.uk/sport/football/68935956"/>
+        <rdf:li rdf:resource="https://www.bbc.com/sport/rugby-union/articles/c1vwke023deo"/>
+        <rdf:li rdf:resource="https://www.bbc.com/sport/cricket/articles/cn0rzggp1y1o"/>
+      </rdf:Seq>
+    </items>
+  </channel>
+  <item rdf:about="https://www.bbc.co.uk/news/uk-england-london-68941125">
+    <link>https://www.bbc.co.uk/news/uk-england-london-68941125</link>
+    <title>Man due in court over sword attack that killed boy</title>
+    <description>Marcus Arduini Monzo is charged with the murder of 14-year-old Daniel Anjorin in Hainault.</description>
+  </item>
+  <item rdf:about="https://www.bbc.com/news/articles/cnke2y8l9g2o">
+    <link>https://www.bbc.com/news/articles/cnke2y8l9g2o</link>
+    <title>Girl who took own life moved to UK 'because of Harry Potter'</title>
+    <description>Her dad says she "loved learning" and a detention "disproportionately weighed on her mind".</description>
+  </item>
+  <item rdf:about="https://www.bbc.co.uk/news/uk-england-hampshire-68928464">
+    <link>https://www.bbc.co.uk/news/uk-england-hampshire-68928464</link>
+    <title>Deliveroo rider who bit off customer's thumb seen delivering again</title>
+    <description>Jenniffer Rocha is filmed delivering food despite being convicted for biting off a customer's thumb.</description>
+  </item>
+  <item rdf:about="https://www.bbc.co.uk/news/uk-england-lincolnshire-68931806">
+    <link>https://www.bbc.co.uk/news/uk-england-lincolnshire-68931806</link>
+    <title>'Incredible' couple in 80s still fostering babies</title>
+    <description>Margaret and Robert Isdale have cared for more than 150 babies and they have no plans to stop.</description>
+  </item>
+  <item rdf:about="https://www.bbc.com/news/articles/cy0lp3k849yo">
+    <link>https://www.bbc.com/news/articles/cy0lp3k849yo</link>
+    <title>Legacy inquiry: Second funerals for identified bodies</title>
+    <description>Several families say DNA tests on their loved ones have confirmed their identities.</description>
+  </item>
+  <item rdf:about="https://www.bbc.com/news/articles/cn0v6727vr9o">
+    <link>https://www.bbc.com/news/articles/cn0v6727vr9o</link>
+    <title>'Sex predator coach abused my karate dream'</title>
+    <description>A victim of jailed karate instructor Andrew Sherry says he was manipulated and abused by the coach.</description>
+  </item>
+  <item rdf:about="https://www.bbc.com/news/articles/cxe93ppp3jvo">
+    <link>https://www.bbc.com/news/articles/cxe93ppp3jvo</link>
+    <title>TikTok star's mum to keep daughter's name alive</title>
+    <description>Leah Smith's mother says her memory will live on in a charity to help families dealing with cancer.</description>
+  </item>
+  <item rdf:about="https://www.bbc.com/news/articles/c2x3k2zgnjro">
+    <link>https://www.bbc.com/news/articles/c2x3k2zgnjro</link>
+    <title>Girl killed by food delivery driver 'had big dreams'</title>
+    <description>The driver, who had no business insurance, dropped off a takeaway before returning to the scene.</description>
+  </item>
+  <item rdf:about="https://www.bbc.com/news/articles/crgy7e5qlnmo">
+    <link>https://www.bbc.com/news/articles/crgy7e5qlnmo</link>
+    <title>Buildings damaged in overnight lightning strikes</title>
+    <description>The roofs of a care home and university building in West Sussex are damaged by lightning strikes.</description>
+  </item>
+  <item rdf:about="https://www.bbc.co.uk/news/uk-england-berkshire-68927899">
+    <link>https://www.bbc.co.uk/news/uk-england-berkshire-68927899</link>
+    <title>Thames swimming race cancelled over sewage fears</title>
+    <description>Organisers say they are "unable to find any satisfactory way" that using the river would be safe.</description>
+  </item>
+  <item rdf:about="https://www.bbc.co.uk/news/uk-england-london-68899651">
+    <link>https://www.bbc.co.uk/news/uk-england-london-68899651</link>
+    <title>Rats and sewage in prison unbearable - volunteer</title>
+    <description>A former chaplain at HMP Wandsworth describes conditions as "unbearable" amid a "smell of despair".</description>
+  </item>
+  <item rdf:about="https://www.bbc.co.uk/news/uk-england-derbyshire-68899179">
+    <link>https://www.bbc.co.uk/news/uk-england-derbyshire-68899179</link>
+    <title>Newlyweds adopt kitten found trapped at wedding</title>
+    <description>The couple thought the kitten's mews was squeaky pipework at their wedding venue.</description>
+  </item>
+  <item rdf:about="https://www.bbc.co.uk/news/uk-england-manchester-68937492">
+    <link>https://www.bbc.co.uk/news/uk-england-manchester-68937492</link>
+    <title>Fans' dismay as Co-op Live arena cancels show again</title>
+    <description>Manchester's troubled new venue is criticised for postponing its opening concert at the last minute.</description>
+  </item>
+  <item rdf:about="https://www.bbc.co.uk/news/uk-england-somerset-68934647">
+    <link>https://www.bbc.co.uk/news/uk-england-somerset-68934647</link>
+    <title>In pictures: Crowds celebrate May Day</title>
+    <description>Crowds gather to mark the beginning of Summer with worship and Morris dancing.</description>
+  </item>
+  <item rdf:about="https://www.bbc.com/news/articles/ce9rqn32q5jo">
+    <link>https://www.bbc.com/news/articles/ce9rqn32q5jo</link>
+    <title>Prisoner meets son, 14, he last saw as a baby</title>
+    <description>Thomas White's family have been fighting for the meeting for more than a decade. </description>
+  </item>
+  <item rdf:about="https://www.bbc.co.uk/news/uk-england-northamptonshire-68930864">
+    <link>https://www.bbc.co.uk/news/uk-england-northamptonshire-68930864</link>
+    <title>'I quit my job to search for my missing dog'</title>
+    <description>Jo Bean says the hunt for her five-year-old lurcher Rosie has taken over her life.</description>
+  </item>
+  <item rdf:about="https://www.bbc.co.uk/news/world-europe-jersey-68922948">
+    <link>https://www.bbc.co.uk/news/world-europe-jersey-68922948</link>
+    <title>Concerns raised about the future of Jersey Zoo</title>
+    <description>Former staff are among those criticising the running of the zoo started by Gerald Durrell in 1959.</description>
+  </item>
+  <item rdf:about="https://www.bbc.co.uk/news/uk-england-nottinghamshire-68928786">
+    <link>https://www.bbc.co.uk/news/uk-england-nottinghamshire-68928786</link>
+    <title>Runners pay surprise visit to terminally ill mum</title>
+    <description>The runners called by the home of Monica Williams, 86, who is receiving end-of-life care.</description>
+  </item>
+  <item rdf:about="https://www.bbc.co.uk/news/uk-england-humber-68938838">
+    <link>https://www.bbc.co.uk/news/uk-england-humber-68938838</link>
+    <title>School choir sings on top of church tower</title>
+    <description>Primary school children celebrated the first of May by singing on top of Hull Minster</description>
+  </item>
+  <item rdf:about="https://www.bbc.com/news/articles/cm54j9zrmpxo">
+    <link>https://www.bbc.com/news/articles/cm54j9zrmpxo</link>
+    <title>Aerial video shows new cruise ship's arrival home</title>
+    <description>Cunard's newest cruise ship Queen Anne was greeted into Southampton as people lined the shore.</description>
+  </item>
+  <item rdf:about="https://www.bbc.co.uk/news/uk-england-suffolk-68935343">
+    <link>https://www.bbc.co.uk/news/uk-england-suffolk-68935343</link>
+    <title>'It feels like a fairytale' - Ipswich fans celebrate</title>
+    <description>Ipswich Town held on for a 2-1 win over Coventry that leaves them needing a point to go up.</description>
+  </item>
+  <item rdf:about="https://www.bbc.co.uk/news/uk-england-somerset-68934654">
+    <link>https://www.bbc.co.uk/news/uk-england-somerset-68934654</link>
+    <title>Four peregrine falcon chicks hatch at cathedral</title>
+    <description>Four peregrine falcon chicks are being cared for by their mother on top of a cathedral.</description>
+  </item>
+  <item rdf:about="https://www.bbc.co.uk/news/business-68903985">
+    <link>https://www.bbc.co.uk/news/business-68903985</link>
+    <title>The school friends who built a beauty empire</title>
+    <description>Charlotte Tiplady and Elliot Barton explain how together they built up their Tatti Lashes beauty empire from Liverpool.</description>
+  </item>
+  <item rdf:about="https://www.bbc.com/sport/snooker/articles/cprgyzqlqy3o">
+    <link>https://www.bbc.com/sport/snooker/articles/cprgyzqlqy3o</link>
+    <title>O'Sullivan &amp; Trump suffer shock quarter-final defeats</title>
+    <description>Seven-time champion Ronnie O’Sullivan and Judd Trump both suffer shock defeats in the quarter-finals of the World Championship at the Crucible Theatre in Sheffield.</description>
+  </item>
+  <item rdf:about="https://www.bbc.com/sport/football/articles/c3gx8z3j5dyo">
+    <link>https://www.bbc.com/sport/football/articles/c3gx8z3j5dyo</link>
+    <title>Chelsea's title race is done - Hayes</title>
+    <description>Chelsea manager Emma Hayes believes the race for the Women's Super League title is "done" after her side were beaten 4-3 at Liverpool on Wednesday.</description>
+  </item>
+  <item rdf:about="https://www.bbc.co.uk/sport/football/68935956">
+    <link>https://www.bbc.co.uk/sport/football/68935956</link>
+    <title>Villa still prioritising top-four finish over Europe</title>
+    <description>Unai Emery says securing a top-four Premier League finish remains Aston Villa's priority but will not distract his team from their Europa Conference League semi-final.</description>
+  </item>
+  <item rdf:about="https://www.bbc.com/sport/rugby-union/articles/c1vwke023deo">
+    <link>https://www.bbc.com/sport/rugby-union/articles/c1vwke023deo</link>
+    <title>Red Roses to face New Zealand at Twickenham</title>
+    <description>England will host world champions New Zealand at Twickenham Stadium in September in preparation for October's WXV 1 tournament.</description>
+  </item>
+  <item rdf:about="https://www.bbc.com/sport/cricket/articles/cn0rzggp1y1o">
+    <link>https://www.bbc.com/sport/cricket/articles/cn0rzggp1y1o</link>
+    <title>Scrivens' century lifts Sunrisers to top spot</title>
+    <description>Sunrisers top the Rachael Heyhoe Flint Trophy table after defeating Central Sparks by five wickets at Kidderminster.</description>
+  </item>
+</rdf:RDF>

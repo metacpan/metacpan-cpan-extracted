@@ -3,21 +3,21 @@ require 5.008;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'PREREQ_PM' => {
-                   'English' => 0,
-                   'Test::Differences' => 0,
-                   'Test::Exception' => 0,
-                   'Test::More' => 0,
-                   'Carp' => 0,
-                   'Params::Validate' => 0,
-                   'Sub::Exporter' => 0,
-                   'Getopt::Long::Descriptive' => 0,
-                   'Test::NoWarnings' => 0
-                 },
-  'INSTALLDIRS' => 'site',
-  'VERSION_FROM' => 'lib/Getopt/Long/DescriptivePod.pm',
-  'PL_FILES' => {},
   'EXE_FILES' => [],
-  'NAME' => 'Getopt::Long::DescriptivePod'
+  'VERSION_FROM' => 'lib/Getopt/Long/DescriptivePod.pm',
+  'NAME' => 'Getopt::Long::DescriptivePod',
+  'PL_FILES' => {},
+  'INSTALLDIRS' => 'site',
+  'PREREQ_PM' => {
+                   'Test::Differences' => 0,
+                   'Test::More' => 0,
+                   'Sub::Exporter' => 0,
+                   'Test::Exception' => 0,
+                   'Getopt::Long::Descriptive' => 0,
+                   'Test::NoWarnings' => 0,
+                   'Params::Validate' => 0,
+                   'English' => 0,
+                   'Carp' => 0
+                 }
 )
 ;

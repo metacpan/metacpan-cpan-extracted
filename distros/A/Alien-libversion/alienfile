@@ -1,0 +1,37 @@
+use alienfile;
+ 
+probe [ 'pkg-config --exists libversion' ];
+ 
+share {
+
+  my $libversion_ver = '3.0.3';
+ 
+  start_url "https://github.com/repology/libversion/archive/$libversion_ver/libversion-$libversion_ver.tar.gz";
+ 
+  download [ 'wget %{.meta.start_url}' ];
+
+  plugin 'Download' => (
+    filter => qr/^libversion-[0-9\.]+\.tar\.gz$/,
+    version => qr/^libversion-([0-9\.]+)\.tar\.gz$/,
+  );
+ 
+  plugin 'Extract' => 'tar.gz';
+ 
+  plugin 'Build::CMake';
+  build [
+    [ '%{cmake}',
+        @{ meta->prop->{plugin_build_cmake}->{args} },
+        '%{.install.extract}'
+    ],
+    '%{make}',
+    '%{make} install',
+    '%{make} test'
+  ];
+
+};
+ 
+gather [
+  [ 'pkg-config --modversion libversion', \'%{.runtime.version}' ],
+  [ 'pkg-config --cflags     libversion', \'%{.runtime.cflags}'  ],
+  [ 'pkg-config --libs       libversion', \'%{.runtime.libs}'    ],
+];

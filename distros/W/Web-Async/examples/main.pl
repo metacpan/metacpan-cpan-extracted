@@ -10,7 +10,7 @@ binmode STDERR, ':encoding(UTF-8)';
 my $loop = IO::Async::Loop->new;
 $loop->add(
     my $srv = Web::Async::WebSocket::Server->new(
-        port => 7777,
+        port => 9001,
         on_handshake_failure => async sub ($client, $stream, @) {
             my $txt = <<'HTML';
 <!DOCTYPE html>
@@ -56,11 +56,13 @@ HTML
 $srv->incoming_client->each(sub ($client, @) {
     $log->infof('Client: %s', "$client");
     $client->incoming_frame->map(async sub ($frame, @) {
-        $log->infof('Frame: %s', $frame->payload);
-        await $client->write_frame(
-            type    => 'text',
-            payload => $frame->payload
-        );
+        $log->tracef('Frame %d with payload %d bytes', $frame->opcode, length $frame->payload);
+        if($frame->opcode == 1) {
+            await $client->write_frame(
+                type    => 'text',
+                payload => $frame->payload
+            );
+        }
     })->resolve->retain;
 });
 $loop->run;

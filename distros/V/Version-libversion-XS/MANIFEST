@@ -1,0 +1,17 @@
+Changes
+INSTALL.md
+lib/Version/libversion/XS.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/10-compare-test.t
+t/11-compare-test.t
+t/20-compare-fuzzer.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+XS.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
