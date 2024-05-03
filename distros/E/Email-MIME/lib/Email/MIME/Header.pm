@@ -1,6 +1,6 @@
 use v5.12.0;
 use warnings;
-package Email::MIME::Header 1.953;
+package Email::MIME::Header 1.954;
 # ABSTRACT: the header of a MIME message
 
 use parent 'Email::Simple::Header';
@@ -143,7 +143,7 @@ Email::MIME::Header - the header of a MIME message
 
 =head1 VERSION
 
-version 1.953
+version 1.954
 
 =head1 DESCRIPTION
 
@@ -182,13 +182,13 @@ C<header_str_set> method.
 
 =head1 PERL VERSION
 
-This library should run on perls released even a long time ago.  It should work
-on any version of perl released in the last five years.
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 AUTHORS
 

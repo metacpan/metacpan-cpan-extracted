@@ -3,13 +3,13 @@ package Net::DNS::Parameters;
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2023-11-08)
+##	(last updated 2024-04-09)
 ##
 ################################################
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Parameters.pm 1945 2023-11-22 08:02:31Z willem $)[2];
+our $VERSION = (qw$Id: Parameters.pm 1972 2024-04-21 08:13:19Z willem $)[2];
 
 use integer;
 use Carp;
@@ -193,7 +193,7 @@ our %rcodebyname = @rcodebyname;
 # Registry: DNS EDNS0 Option Codes (OPT)
 my @ednsoptionbyname = (
 	LLQ		 => 1,					# RFC8764
-	UL		 => 2,					# http://files.dns-sd.org/draft-sekar-dns-ul.txt
+	'UPDATE-LEASE'	 => 2,					# RFC-ietf-dnssd-update-lease-08
 	NSID		 => 3,					# RFC5001
 	DAU		 => 5,					# RFC6975
 	DHU		 => 6,					# RFC6975
@@ -208,6 +208,7 @@ my @ednsoptionbyname = (
 	'EXTENDED-ERROR' => 15,					# RFC8914
 	'CLIENT-TAG'	 => 16,					# draft-bellis-dnsop-edns-tags
 	'SERVER-TAG'	 => 17,					# draft-bellis-dnsop-edns-tags
+	'REPORT-CHANNEL' => 18,					# RFC-ietf-dnsop-dns-error-reporting-08
 	'UMBRELLA-IDENT' => 20292,				# https://developer.cisco.com/docs/cloud-security/#!integrating-network-devic
 	DEVICEID	 => 26946,				# https://developer.cisco.com/docs/cloud-security/#!network-devices-getting-s
 	);

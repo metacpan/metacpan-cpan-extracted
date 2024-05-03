@@ -11,7 +11,7 @@ our $VERSION = '1.0';
 
 sub os_is { $Config{ivsize} == 4 }
 
-sub expn { "Your perl was built with support 32 bit integers" }
+sub expn { "Your perl was built with support for 32 bit integers" }
 
 Devel::CheckOS::die_unsupported() unless(os_is());
 

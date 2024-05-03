@@ -22,9 +22,9 @@ inverse and encode Perl data structures into OTLP binary data. It is used
 most notably by L<OpenTelemetry::Exporter::OTLP> to encode the data it sends
 when using a binary encoding.
 
-Importing this module will import all the classes generated from the v1.0.0
+Importing this module will import all the classes generated from the v1.2.0
 OTLP language-independent interface type definitions available at
-L<the OTLP specification repository|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0>.
+L<the OTLP specification repository|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0>.
 
 These classes are generated using L<Google::ProtocolBuffers::Dynamic>
 internally, so please consult the documentation of that distribution
@@ -48,7 +48,7 @@ The list of classes was automatically generated with the following snippet:
             s/::V1::[^:]+::/::V1::/;
             try {
                 $_->new;
-                say "=item L<$_|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/$path#L$fragment>\n";
+                say "=item L<$_|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/$path#L$fragment>\n";
             }
             catch ($e) {
                 warn "$_ did not work: $e";
@@ -64,81 +64,81 @@ meanings.
 
 =over
 
-=item L<OpenTelemetry::Proto::Collector::Logs::V1::ExportLogsServiceRequest|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/logs/v1/logs_service.proto#L36>
+=item L<OpenTelemetry::Proto::Collector::Logs::V1::ExportLogsServiceRequest|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/collector/logs/v1/logs_service.proto#L36>
 
-=item L<OpenTelemetry::Proto::Collector::Logs::V1::ExportLogsServiceResponse|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/logs/v1/logs_service.proto#L45>
+=item L<OpenTelemetry::Proto::Collector::Logs::V1::ExportLogsServiceResponse|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/collector/logs/v1/logs_service.proto#L45>
 
-=item L<OpenTelemetry::Proto::Collector::Logs::V1::ExportLogsPartialSuccess|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/logs/v1/logs_service.proto#L64>
+=item L<OpenTelemetry::Proto::Collector::Logs::V1::ExportLogsPartialSuccess|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/collector/logs/v1/logs_service.proto#L64>
 
-=item L<OpenTelemetry::Proto::Collector::Metrics::V1::ExportMetricsServiceRequest|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/metrics/v1/metrics_service.proto#L36>
+=item L<OpenTelemetry::Proto::Collector::Metrics::V1::ExportMetricsServiceRequest|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/collector/metrics/v1/metrics_service.proto#L36>
 
-=item L<OpenTelemetry::Proto::Collector::Metrics::V1::ExportMetricsServiceResponse|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/metrics/v1/metrics_service.proto#L45>
+=item L<OpenTelemetry::Proto::Collector::Metrics::V1::ExportMetricsServiceResponse|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/collector/metrics/v1/metrics_service.proto#L45>
 
-=item L<OpenTelemetry::Proto::Collector::Metrics::V1::ExportMetricsPartialSuccess|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/metrics/v1/metrics_service.proto#L64>
+=item L<OpenTelemetry::Proto::Collector::Metrics::V1::ExportMetricsPartialSuccess|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/collector/metrics/v1/metrics_service.proto#L64>
 
-=item L<OpenTelemetry::Proto::Collector::Trace::V1::ExportTraceServiceRequest|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/trace/v1/trace_service.proto#L36>
+=item L<OpenTelemetry::Proto::Collector::Trace::V1::ExportTraceServiceRequest|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/collector/trace/v1/trace_service.proto#L36>
 
-=item L<OpenTelemetry::Proto::Collector::Trace::V1::ExportTraceServiceResponse|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/trace/v1/trace_service.proto#L45>
+=item L<OpenTelemetry::Proto::Collector::Trace::V1::ExportTraceServiceResponse|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/collector/trace/v1/trace_service.proto#L45>
 
-=item L<OpenTelemetry::Proto::Collector::Trace::V1::ExportTracePartialSuccess|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/trace/v1/trace_service.proto#L64>
+=item L<OpenTelemetry::Proto::Collector::Trace::V1::ExportTracePartialSuccess|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/collector/trace/v1/trace_service.proto#L64>
 
-=item L<OpenTelemetry::Proto::Common::V1::AnyValue|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/common/v1/common.proto#L28>
+=item L<OpenTelemetry::Proto::Common::V1::AnyValue|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/common/v1/common.proto#L28>
 
-=item L<OpenTelemetry::Proto::Common::V1::ArrayValue|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/common/v1/common.proto#L44>
+=item L<OpenTelemetry::Proto::Common::V1::ArrayValue|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/common/v1/common.proto#L44>
 
-=item L<OpenTelemetry::Proto::Common::V1::KeyValueList|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/common/v1/common.proto#L54>
+=item L<OpenTelemetry::Proto::Common::V1::KeyValueList|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/common/v1/common.proto#L54>
 
-=item L<OpenTelemetry::Proto::Common::V1::KeyValue|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/common/v1/common.proto#L64>
+=item L<OpenTelemetry::Proto::Common::V1::KeyValue|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/common/v1/common.proto#L64>
 
-=item L<OpenTelemetry::Proto::Common::V1::InstrumentationScope|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/common/v1/common.proto#L71>
+=item L<OpenTelemetry::Proto::Common::V1::InstrumentationScope|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/common/v1/common.proto#L71>
 
-=item L<OpenTelemetry::Proto::Logs::V1::LogsData|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/logs/v1/logs.proto#L38>
+=item L<OpenTelemetry::Proto::Logs::V1::LogsData|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/logs/v1/logs.proto#L38>
 
-=item L<OpenTelemetry::Proto::Logs::V1::ResourceLogs|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/logs/v1/logs.proto#L48>
+=item L<OpenTelemetry::Proto::Logs::V1::ResourceLogs|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/logs/v1/logs.proto#L48>
 
-=item L<OpenTelemetry::Proto::Logs::V1::ScopeLogs|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/logs/v1/logs.proto#L64>
+=item L<OpenTelemetry::Proto::Logs::V1::ScopeLogs|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/logs/v1/logs.proto#L67>
 
-=item L<OpenTelemetry::Proto::Logs::V1::LogRecord|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/logs/v1/logs.proto#L126>
+=item L<OpenTelemetry::Proto::Logs::V1::LogRecord|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/logs/v1/logs.proto#L134>
 
-=item L<OpenTelemetry::Proto::Metrics::V1::MetricsData|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L38>
+=item L<OpenTelemetry::Proto::Metrics::V1::MetricsData|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/metrics/v1/metrics.proto#L38>
 
-=item L<OpenTelemetry::Proto::Metrics::V1::ResourceMetrics|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L48>
+=item L<OpenTelemetry::Proto::Metrics::V1::ResourceMetrics|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/metrics/v1/metrics.proto#L48>
 
-=item L<OpenTelemetry::Proto::Metrics::V1::ScopeMetrics|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L64>
+=item L<OpenTelemetry::Proto::Metrics::V1::ScopeMetrics|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/metrics/v1/metrics.proto#L67>
 
-=item L<OpenTelemetry::Proto::Metrics::V1::Metric|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L162>
+=item L<OpenTelemetry::Proto::Metrics::V1::Metric|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/metrics/v1/metrics.proto#L168>
 
-=item L<OpenTelemetry::Proto::Metrics::V1::Gauge|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L196>
+=item L<OpenTelemetry::Proto::Metrics::V1::Gauge|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/metrics/v1/metrics.proto#L211>
 
-=item L<OpenTelemetry::Proto::Metrics::V1::Sum|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L202>
+=item L<OpenTelemetry::Proto::Metrics::V1::Sum|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/metrics/v1/metrics.proto#L217>
 
-=item L<OpenTelemetry::Proto::Metrics::V1::Histogram|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L215>
+=item L<OpenTelemetry::Proto::Metrics::V1::Histogram|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/metrics/v1/metrics.proto#L230>
 
-=item L<OpenTelemetry::Proto::Metrics::V1::ExponentialHistogram|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L225>
+=item L<OpenTelemetry::Proto::Metrics::V1::ExponentialHistogram|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/metrics/v1/metrics.proto#L240>
 
-=item L<OpenTelemetry::Proto::Metrics::V1::Summary|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L239>
+=item L<OpenTelemetry::Proto::Metrics::V1::Summary|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/metrics/v1/metrics.proto#L254>
 
-=item L<OpenTelemetry::Proto::Metrics::V1::NumberDataPoint|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L336>
+=item L<OpenTelemetry::Proto::Metrics::V1::NumberDataPoint|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/metrics/v1/metrics.proto#L351>
 
-=item L<OpenTelemetry::Proto::Metrics::V1::HistogramDataPoint|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L384>
+=item L<OpenTelemetry::Proto::Metrics::V1::HistogramDataPoint|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/metrics/v1/metrics.proto#L399>
 
-=item L<OpenTelemetry::Proto::Metrics::V1::ExponentialHistogramDataPoint|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L465>
+=item L<OpenTelemetry::Proto::Metrics::V1::ExponentialHistogramDataPoint|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/metrics/v1/metrics.proto#L480>
 
-=item L<OpenTelemetry::Proto::Metrics::V1::SummaryDataPoint|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L578>
+=item L<OpenTelemetry::Proto::Metrics::V1::SummaryDataPoint|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/metrics/v1/metrics.proto#L593>
 
-=item L<OpenTelemetry::Proto::Metrics::V1::Exemplar|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L645>
+=item L<OpenTelemetry::Proto::Metrics::V1::Exemplar|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/metrics/v1/metrics.proto#L660>
 
-=item L<OpenTelemetry::Proto::Resource::V1::Resource|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/resource/v1/resource.proto#L28>
+=item L<OpenTelemetry::Proto::Resource::V1::Resource|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/resource/v1/resource.proto#L28>
 
-=item L<OpenTelemetry::Proto::Trace::V1::TracesData|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/trace/v1/trace.proto#L38>
+=item L<OpenTelemetry::Proto::Trace::V1::TracesData|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/trace/v1/trace.proto#L38>
 
-=item L<OpenTelemetry::Proto::Trace::V1::ResourceSpans|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/trace/v1/trace.proto#L48>
+=item L<OpenTelemetry::Proto::Trace::V1::ResourceSpans|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/trace/v1/trace.proto#L48>
 
-=item L<OpenTelemetry::Proto::Trace::V1::ScopeSpans|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/trace/v1/trace.proto#L64>
+=item L<OpenTelemetry::Proto::Trace::V1::ScopeSpans|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/trace/v1/trace.proto#L67>
 
-=item L<OpenTelemetry::Proto::Trace::V1::Span|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/trace/v1/trace.proto#L80>
+=item L<OpenTelemetry::Proto::Trace::V1::Span|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/trace/v1/trace.proto#L86>
 
-=item L<OpenTelemetry::Proto::Trace::V1::Status|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/trace/v1/trace.proto#L256>
+=item L<OpenTelemetry::Proto::Trace::V1::Status|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0/opentelemetry/proto/trace/v1/trace.proto#L304>
 
 =back
 

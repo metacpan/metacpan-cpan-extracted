@@ -1,4 +1,4 @@
-package Data::Transfigure::Schema 1.01;
+package Data::Transfigure::Schema 1.03;
 use v5.26;
 use warnings;
 

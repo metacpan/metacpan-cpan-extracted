@@ -1,5 +1,10 @@
 Revision history for Dancer2-Plugin-OpenTelemetry
 
+0.002     2024-05-02 21:51:02+01:00 Europe/London
+
+    * Fixed an issue where spans were set to error in the case of 4XX
+      responses, which goes agains the specification. Tom Judge++
+
 0.001     2023-12-04 23:23:37+00:00 Europe/London
 
     First version.

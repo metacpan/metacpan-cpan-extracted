@@ -2,12 +2,12 @@
 abstract: 'Assert that your Perl files compile OK.'
 author:
   - 'Evan Giles <egiles@cpan.org>'
-build_requires: {}
+build_requires:
+  Test::More: '1.3'
 configure_requires:
   Module::Build: '0.38'
-  version: '0.77'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,10 +16,10 @@ name: Test-Compile
 provides:
   Test::Compile:
     file: lib/Test/Compile.pm
-    version: v3.3.1
+    version: v3.3.2
   Test::Compile::Internal:
     file: lib/Test/Compile/Internal.pm
-    version: v3.3.1
+    version: v3.3.2
 requires:
   Exporter: '5.68'
   parent: '0.225'
@@ -27,5 +27,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: http://github.com/egiles/test-compile
-version: v3.3.1
+version: v3.3.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

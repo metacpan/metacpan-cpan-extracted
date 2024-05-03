@@ -1,5 +1,10 @@
 Revision history for Mojolicious-Plugin-OpenTelemetry
 
+0.002     2024-05-02 13:44:26+01:00 Europe/London
+
+    * Fixed an issue where spans were set to error in the case
+      of 4XX responses, which goes agains the specification.
+
 0.001     2023-12-03 16:51:34+00:00 Europe/London
 
     First version.

@@ -2,7 +2,7 @@ package Net::DNS::RR::NSEC;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: NSEC.pm 1945 2023-11-22 08:02:31Z willem $)[2];
+our $VERSION = (qw$Id: NSEC.pm 1972 2024-04-21 08:13:19Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -20,10 +20,10 @@ use Net::DNS::Parameters qw(:type);
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my ( $self, $data, $offset, @opaque ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	my $limit = $offset + $self->{rdlength};
-	( $self->{nxtdname}, $offset ) = Net::DNS::DomainName->decode( $data, $offset, @opaque );
+	( $self->{nxtdname}, $offset ) = Net::DNS::DomainName->decode( $data, $offset );
 	$self->{typebm} = substr $$data, $offset, $limit - $offset;
 	return;
 }
@@ -334,7 +334,7 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC4034|https://tools.ietf.org/html/rfc4034>
-L<RFC9077|https://tools.ietf.org/html/rfc9077>
+L<RFC4034(4)|https://iana.org/go/rfc4034#section-4>
+L<RFC9077|https://iana.org/go/rfc9077>
 
 =cut

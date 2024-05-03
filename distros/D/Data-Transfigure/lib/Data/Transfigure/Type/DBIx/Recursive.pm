@@ -1,4 +1,4 @@
-package Data::Transfigure::Type::DBIx::Recursive 1.01;
+package Data::Transfigure::Type::DBIx::Recursive 1.03;
 use v5.26;
 use warnings;
 
@@ -59,7 +59,7 @@ Mark Tyrrell C<< <mark@tyrrminal.dev> >>
 
 =head1 LICENSE
 
-Copyright (c) 2023 Mark Tyrrell
+Copyright (c) 2024 Mark Tyrrell
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

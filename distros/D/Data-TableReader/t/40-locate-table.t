@@ -43,6 +43,9 @@ subtest basic => sub {
 	ok( $ex->find_table, 'found table' ) or diag explain \@messages;
 	is_deeply( $ex->col_map, $ex->fields, 'col map' );
 	is_deeply( $ex->field_map, { name => 0, address => 1, city => 2, state => 3, zip => 4 }, 'field map' );
+	is( $ex->table_search_results->{found}, $ex->table_search_results->{candidates}[0], 'search results' );
+	is( $ex->table_search_results->{found}{row_idx}, 0, 'found row_idx' );
+	is( $ex->table_search_results->{found}{dataset_idx}, 0, 'found dataset_idx' );
 	ok( my $i= $ex->iterator, 'iterator' );
 	is_deeply( $i->(), { name => 'Someone', address => '123 Long St', city => 'Somewhere', state => 'OH', zip => '45678' }, 'first row' );
 	is_deeply( $i->(), { name => 'Another', address => '01 Main St', city => 'Elsewhere', state => 'OH', zip => '45678' }, 'third row' );

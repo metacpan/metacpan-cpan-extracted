@@ -1,4 +1,4 @@
-package Data::Transfigure::Predicate 1.01;
+package Data::Transfigure::Predicate 1.03;
 use v5.26;
 use warnings;
 
@@ -12,7 +12,7 @@ Data::Transfigure::Type - a transfigurator that filters based on a predicate fun
 
 =head1 DESCRIPTION
 
-C<Data::Transfigure::Predicate> is a transfigurator that uses a predicate predicate
+C<Data::Transfigure::Predicate> is a transfigurator that uses a predicate
 function to determine whether it applies. This allows extrinsic logic to be 
 applied to select appropriate transfigurators.
 
@@ -91,7 +91,7 @@ Mark Tyrrell C<< <mark@tyrrminal.dev> >>
 
 =head1 LICENSE
 
-Copyright (c) 2023 Mark Tyrrell
+Copyright (c) 2024 Mark Tyrrell
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

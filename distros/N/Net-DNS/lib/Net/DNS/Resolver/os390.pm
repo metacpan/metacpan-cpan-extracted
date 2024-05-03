@@ -2,7 +2,7 @@ package Net::DNS::Resolver::os390;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: os390.pm 1856 2021-12-02 14:36:25Z willem $)[2];
+our $VERSION = (qw$Id: os390.pm 1972 2024-04-21 08:13:19Z willem $)[2];
 
 
 =head1 NAME
@@ -15,7 +15,8 @@ Net::DNS::Resolver::os390 - IBM OS/390 resolver class
 use base qw(Net::DNS::Resolver::Base);
 use IO::File;
 
-local $ENV{PATH} = join ':', grep {$_} qw(/bin /usr/bin), $ENV{PATH};
+my $path = $ENV{PATH};
+local $ENV{PATH} = join ':', grep {$_} qw(/bin /usr/bin), $path;
 my $sysname = eval {`sysvar SYSNAME 2>/dev/null`} || '';
 chomp $sysname;
 
@@ -35,9 +36,9 @@ my @dataset = (				## plausible places to seek resolver configuration
 	);
 
 
+my $homedir = $ENV{HOME};
 my $dotfile = '.resolv.conf';
-my @dotpath = grep {$_} $ENV{HOME}, '.';
-my @dotfile = grep { -f $_ && -o _ } map {"$_/$dotfile"} @dotpath;
+my @dotfile = grep { -f $_ && -o _ } map {"$_/$dotfile"} grep {$_} $homedir, '.';
 
 
 my %option = (				## map MVS config option names
@@ -51,7 +52,7 @@ my %option = (				## map MVS config option names
 sub _init {
 	my $defaults = shift->_defaults;
 	my %stop;
-	local $ENV{PATH} = join ':', grep {$_} qw(/bin /usr/bin), $ENV{PATH};
+	local $ENV{PATH} = join ':', grep {$_} qw(/bin /usr/bin), $path;
 
 	foreach my $dataset ( Net::DNS::Resolver::Base::_untaint( grep {$_} @dataset ) ) {
 		eval {

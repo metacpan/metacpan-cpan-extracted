@@ -2,7 +2,7 @@ package Net::DNS::RR::SVCB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SVCB.pm 1967 2024-02-15 09:02:37Z willem $)[2];
+our $VERSION = (qw$Id: SVCB.pm 1970 2024-03-22 01:51:29Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -38,7 +38,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $self, $data, $offset ) = @_;
 
 	my $limit = $self->{rdlength};
-	my $rdata = substr $$data, $offset, $limit;
+	my $rdata = $self->{rdata} = substr $$data, $offset, $limit;
 	$self->{SvcPriority} = unpack 'n', $rdata;
 	( $self->{TargetName}, $offset ) = Net::DNS::DomainName->decode( \$rdata, 2 );
 
@@ -50,10 +50,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 		push @$params, ( $key, substr $rdata, $start, $size );
 		$offset = $next;
 	}
-	unless ( $offset == $limit ) {
-		$self->{corrupt} = substr $rdata, $offset;
-		die $self->type . ': corrupt RDATA';
-	}
+	die $self->type . ': corrupt RDATA' unless $offset == $limit;
 	return;
 }
 
@@ -61,6 +58,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
+	return $self->{rdata} if $self->{rdata};
 	my @packed = pack 'n a*', $self->{SvcPriority}, $self->{TargetName}->encode;
 	my $params = $self->{SvcParams} || [];
 	my @params = @$params;
@@ -69,7 +67,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 		my $val = shift @params;
 		push @packed, pack( 'n2a*', $key, length($val), $val );
 	}
-	return join '', @packed, grep {defined} $self->{corrupt};
+	return join '', @packed;
 }
 
 
@@ -94,16 +92,17 @@ sub _format_rdata {			## format rdata portion of RR string.
 	while (@params) {
 		my $key = shift @params;
 		my $val = shift @params;
-		push @rdata, "\n";
-		push @rdata, "; key$key=...\n" if $key > 25;
-		push @rdata, unpack 'H4H4',    pack( 'n2', $key, length $val );
-		push @rdata, split /(\S{32})/, unpack 'H*', $val;
+		push @rdata, "\n", unpack 'H4H4', pack( 'n2', $key, length $val );
+		my ( $hex, @hex ) = grep {length} split /(\S{32})/, unpack 'H*', $val;
+		push @rdata, $hex, $key < 16 ? () : "\t; key$key\n", @hex;
 		$length += 4 + length $val;
 	}
-	if ( $self->{corrupt} ) {
-		my @hex = split /(\S{32})/, unpack 'H*', $self->{corrupt};
-		push @rdata, "\n", shift(@hex), "\t; corrupt RDATA\n", @hex;
-		$length += length $self->{corrupt};
+	if ( $self->{rdata} ) {
+		if ( my $corrupt = substr $self->{rdata}, $length ) {
+			my ( $hex, @hex ) = grep {length} split /(\S{32})/, unpack 'H*', $corrupt;
+			push @rdata, "\n", $hex, "\t; corrupt RDATA\n", @hex;
+			$length += length $corrupt;
+		}
 	}
 	return ( "\\# $length", @rdata );
 }
@@ -287,9 +286,10 @@ sub AUTOLOAD {				## Dynamic constructor/accessor methods
 		delete $svcparams{$key} unless defined $arg;
 		die( $self->type . qq[: duplicate SvcParam "key$key"] ) if defined $svcparams{$key};
 		die( $self->type . qq[: invalid SvcParam "key$key"] )	if $key > 65534;
-		$svcparams{$key}   = Net::DNS::Text->new("$arg")->raw if defined $arg;
+		die( $self->type . qq[: unexpected "key$key" value] )	if scalar @argument;
+		delete $self->{rdata};
+		$svcparams{$key} = Net::DNS::Text->new("$arg")->raw if defined $arg;
 		$self->{SvcParams} = [map { ( $_, $svcparams{$_} ) } sort { $a <=> $b } keys %svcparams];
-		die( $self->type . qq[: unexpected number of values for "key$key"] ) if scalar @argument;
 	} else {
 		die( $self->type . qq[: no value specified for "key$key"] ) unless defined wantarray;
 	}
@@ -407,7 +407,7 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC9460|https://tools.ietf.org/html/rfc9460>
+L<RFC9460|https://www.iana.org/go/rfc9460>
 
 L<Service Parameter Keys|https://www.iana.org/assignments/dns-svcb>
 

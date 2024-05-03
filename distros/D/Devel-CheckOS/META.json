@@ -57,6 +57,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Devel-CheckOS"
       }
    },
-   "version" : "2.00",
+   "version" : "2.01",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

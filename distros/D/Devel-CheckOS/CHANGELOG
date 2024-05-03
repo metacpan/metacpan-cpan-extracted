@@ -1,3 +1,7 @@
+2.01    2024-05-02
+
+- Fix typos in docoumentation
+
 2.00    2024-05-01
 
 - list_* no longer have special behaviour when called in scalar context. This has

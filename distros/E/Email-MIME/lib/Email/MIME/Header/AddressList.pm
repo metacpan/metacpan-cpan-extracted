@@ -1,6 +1,6 @@
 # Copyright (c) 2016-2017 by Pali <pali@cpan.org>
 
-package Email::MIME::Header::AddressList 1.953;
+package Email::MIME::Header::AddressList 1.954;
 
 # ABSTRACT: MIME support for list of Email::Address::XS objects
 
@@ -333,7 +333,7 @@ Email::MIME::Header::AddressList - MIME support for list of Email::Address::XS o
 
 =head1 VERSION
 
-version 1.953
+version 1.954
 
 =head1 SYNOPSIS
 
@@ -464,13 +464,13 @@ group and array reference of L<Email::Address::XS|Email::Address::XS> objects.
 
 =head1 PERL VERSION
 
-This library should run on perls released even a long time ago.  It should work
-on any version of perl released in the last five years.
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 SEE ALSO
 

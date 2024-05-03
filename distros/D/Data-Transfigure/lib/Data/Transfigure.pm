@@ -1,4 +1,4 @@
-package Data::Transfigure 1.01;
+package Data::Transfigure 1.03;
 use v5.26;
 use warnings;
 
@@ -118,6 +118,14 @@ snake_case
 =item * L<Data::Transfigure::HashKeys::CapitalizedIDSuffix>
 a transfigurator that converts "Id" at the end of hash keys (as results from 
 lowerCamelCase conversion) to "ID"
+
+=item * L<Data::Transfigure::HashFilter::Undef>
+a transfigurator that removes key/value pairs where the value is undefined and
+the key matches a certain pattern
+
+=item * L<Data::Transfigure::Tree::Merge>
+a transfigurator that expands marked hash keys' HashRef values into the enclosing
+hash, overwriting common keys
 
 =back
 

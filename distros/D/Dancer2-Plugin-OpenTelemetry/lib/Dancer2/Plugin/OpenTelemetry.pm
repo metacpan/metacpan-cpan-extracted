@@ -1,7 +1,7 @@
 package Dancer2::Plugin::OpenTelemetry;
 # ABSTRACT: Use OpenTelemetry in your Dancer2 app
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use strict;
 use warnings;
@@ -109,10 +109,17 @@ sub BUILD ( $plugin, @ ) {
                 return unless my $context
                     = delete $plugin->app->request->env->{+BACKGROUND};
 
-                my $code  = $res->status;
-                my $error = $code >= 400 && $code < 600;
-                otel_span_from_context
-                    ->set_status( $error ? SPAN_STATUS_ERROR : SPAN_STATUS_OK )
+                my $span = otel_span_from_context;
+                my $code = $res->status;
+
+                if ($code < 400) {
+                    $span->set_status(SPAN_STATUS_OK );
+                }
+                elsif ($code >= 500) {
+                    $span->set_status(SPAN_STATUS_ERROR);
+                }
+
+                $span
                     ->set_attribute( 'http.response.status_code' => $code )
                     ->end;
 

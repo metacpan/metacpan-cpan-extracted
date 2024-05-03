@@ -15,8 +15,8 @@ OpenTelemetry::Exporter::OTLP::Encoder::Protobuf - A Protobuf encoder for the OT
 
 This is an encoder class used by L<OpenTelemetry::Exporter::OTLP> when using
 the "http/protobuf" protocol. It encodes telemetry data as a Protobuf binary
-blob complying with the 1.0.0 version of
-L<the OTLP specification|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0>.
+blob complying with the 1.2.0 version of
+L<the OTLP specification|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0>.
 
 This encoder uses L<OpenTelemetry::Proto> to encode data, which means it will
 require the availability of L<Google::ProtocolBuffers::Dynamic> to work. Please
@@ -64,7 +64,7 @@ For this encoder, this is equal to "application/x-protobuf".
 
 =item L<OpenTelemetry::Exporter::OTLP>
 
-=item L<The OTLP specification|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0>
+=item L<The OTLP specification|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0>
 
 =back
 

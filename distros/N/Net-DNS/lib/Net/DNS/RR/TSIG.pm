@@ -2,7 +2,7 @@ package Net::DNS::RR::TSIG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: TSIG.pm 1909 2023-03-23 11:36:16Z willem $)[2];
+our $VERSION = (qw$Id: TSIG.pm 1972 2024-04-21 08:13:19Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -424,7 +424,6 @@ sub vrfyerrstr { return shift->error; }
 ########################################
 
 {
-	# source: http://www.iana.org/assignments/tsig-algorithm-names
 	my @algbyname = (
 		'HMAC-MD5.SIG-ALG.REG.INT' => 157,		# numbers are from ISC BIND keygen
 		'HMAC-SHA1'		   => 161,		# and not blessed by IANA
@@ -804,8 +803,8 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC8945|https://tools.ietf.org/html/rfc8945>
+L<RFC8945|https://iana.org/go/rfc8945>
 
-L<TSIG Algorithm Names|http://www.iana.org/assignments/tsig-algorithm-names>
+L<TSIG Algorithm Names|https://iana.org/assignments/tsig-algorithm-names>
 
 =cut

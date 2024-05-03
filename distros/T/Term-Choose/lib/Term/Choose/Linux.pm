@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.764';
+our $VERSION = '1.765';
 
 use Term::Choose::Constants qw( :all );
 use Term::Choose::Screen    qw( hide_cursor show_cursor normal );
@@ -247,10 +247,10 @@ sub __get_cursor_row {
                         $ry = _getc_wrapper( 0 );
                     }
                     if ( $ry eq ';' ) {
-                        my $curs_x = ''; # unused
+                        #my $curs_x = ''; # unused
                         my $rx = _getc_wrapper( 0 );
                         while ( $rx =~ m/^[0-9]$/ ) {
-                            $curs_x .= $rx;
+                            #$curs_x .= $rx;
                             $rx = _getc_wrapper( 0 );
                         }
                         if ( $rx eq 'R' ) {

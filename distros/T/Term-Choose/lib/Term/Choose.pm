@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.764';
+our $VERSION = '1.765';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -803,11 +803,16 @@ sub __prepare_footer_line {
 
 sub __set_cell {
     my ( $self, $list_idx ) = @_;
-    LOOP: for my $i ( 0 .. $#{$self->{rc2idx}} ) {
-        for my $j ( 0 .. $#{$self->{rc2idx}[$i]} ) {
-            if ( $list_idx == $self->{rc2idx}[$i][$j] ) {
-                $self->{pos} = [ $i, $j ];
-                last LOOP;
+    if ( $self->{current_layout} == 2 ) {
+        $self->{pos} = [ $list_idx, 0 ];
+    }
+    else {
+        LOOP: for my $i ( 0 .. $#{$self->{rc2idx}} ) {
+            for my $j ( 0 .. $#{$self->{rc2idx}[$i]} ) {
+                if ( $list_idx == $self->{rc2idx}[$i][$j] ) {
+                    $self->{pos} = [ $i, $j ];
+                    last LOOP;
+                }
             }
         }
     }
@@ -1275,7 +1280,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.764
+Version 1.765
 
 =cut
 

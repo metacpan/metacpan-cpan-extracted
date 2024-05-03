@@ -107,6 +107,12 @@ SEE ALSO
     Check::Socket
         Check socket functionality.
 
+    Test2::Require::Fork
+        Skip a test file unless the system supports forking
+
+    Test2::Require::RealFork
+        Skip a test file unless the system supports true forking
+
 REPOSITORY
     <https://github.com/michal-josef-spacek/Check-Fork>
 
@@ -116,10 +122,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2021-2022 Michal Josef Špaček
+    © 2021-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

@@ -13,7 +13,7 @@ use Mojo::UserAgent;
 use Mojo::URL;
 use Mojo::Util 'html_unescape';
 
-our $VERSION = '2.07'; # VERSION
+our $VERSION = '2.08'; # VERSION
 
 has translation => 'NIV';
 has reference   => Bible::Reference->new( bible => 'Protestant' );
@@ -352,6 +352,9 @@ sub parse ( $self, $html ) {
     $html =~ s/([A-z])(<i>)/$1 $2/g;   # fix missing spaces before <i> (error in source HTML)
     $html =~ s/([a-z])([A-Z])/$1 $2/g; # fix missing spaces from collapsed words (error in source HTML)
 
+    # hack: add back in any missing spaces after some punctuation
+    $html =~ s/([a-z])([:;,!?])([A-Za-z])/$1$2 $3/g;
+
     return $html;
 }
 
@@ -373,7 +376,7 @@ Bible::OBML::Gateway - Bible Gateway content conversion to Open Bible Markup Lan
 
 =head1 VERSION
 
-version 2.07
+version 2.08
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-OBML-Gateway/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-OBML-Gateway/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-OBML-Gateway/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-OBML-Gateway)

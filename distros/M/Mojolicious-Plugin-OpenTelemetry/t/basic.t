@@ -64,6 +64,10 @@ get '/async' => sub ( $c, @ ) {
     });
 };
 
+get '/status/:code' => sub ( $c, @ ) {
+    $c->render( text => 'OK', status => $c->stash('code') );
+};
+
 get '/error' => sub ( $c, @ ) {
     die 'oops';
 };
@@ -203,6 +207,37 @@ subtest Error => sub {
             'http.response.status_code' => 500,
         ],
         end => [],
+    ];
+};
+
+subtest 'Response codes' => sub {
+    $tst->get_ok('/status/400')
+        ->status_is(400);
+
+    is $span->{otel}, {
+        attributes => {
+            'client.address'           => '127.0.0.1',
+            'client.port'              => T,
+            'http.request.method'      => 'GET',
+            'http.route'               => '/status/:code',
+            'network.protocol.version' => '1.1',
+            'server.address'           => '127.0.0.1',
+            'server.port'              => T,
+            'url.path'                 => '/status/400',
+            'url.scheme'               => U,
+            'user_agent.original'      => 'Mojolicious (Perl)',
+        },
+        kind => SPAN_KIND_SERVER,
+        name => 'GET /status/:code',
+        parent => D, # FIXME: cannot use an object check on 5.32?
+      # parent => object {
+      #     prop isa => 'OpenTelemetry::Context';
+      # },
+    };
+
+    span_calls [
+        set_attribute    => [ 'http.response.status_code', 400 ],
+        end              => [],
     ];
 };
 

@@ -15,8 +15,8 @@ OpenTelemetry::Exporter::OTLP::Encoder::JSON - A JSON encoder for the OTLP expor
 
 This is an encoder class used by L<OpenTelemetry::Exporter::OTLP> when using
 the "http/json" protocol. It encodes telemetry data as a JSON string
-complying with the 1.0.0 version of
-L<the OTLP specification|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0>.
+complying with the 1.2.0 version of
+L<the OTLP specification|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0>.
 
 This encoder uses L<JSON::MaybeXS> to find a suitable JSON encoder. Please
 refer to the documentation of that module for details on how you can control
@@ -63,7 +63,7 @@ For this encoder, this is equal to "application/json".
 
 =item L<OpenTelemetry::Exporter::OTLP>
 
-=item L<The OTLP specification|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0>
+=item L<The OTLP specification|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.2.0>
 
 =back
 

@@ -176,7 +176,7 @@ Module::Generic::Array - An Array Manipulation Object Class
 
 =head1 VERSION
 
-    v2.0.2
+    v2.1.0
 
 =head1 DESCRIPTION
 
@@ -200,7 +200,7 @@ It takes an optional hash of options:
 
 =over 4
 
-=item I<start_from>
+=item * C<start_from>
 
 If true, the offset values will start from the number provided and not 0, as it is the case by default.
 
@@ -693,13 +693,51 @@ This works better if you intend to store some objects in the array, and C<undef>
 
 =head2 grep
 
+    # returns a regular list
+    my( @list ) = $a->grep( 'something' );
+    my( @list ) = $a->grep( qr/something/ );
+    my( @list ) = $a->grep(sub
+    {
+        /^something$/i;
+    });
+    # returns an array object in scalar context
+    my $list = $a->grep( 'something' );
+    my $list = $a->grep( qr/something/ );
+    my $list = $a->grep(sub
+    {
+        /^something$/i;
+    });
+    # or
+    my $list = $a->grep(sub
+    {
+        my( $val, $index ) = @_;
+        $val =~ /^something$/i && $index > 2;
+    });
+    # get all the elements NOT matching
+    my $list = $a->grep( 'something', 0 );
+    my $list = $a->grep( qr/something/, 0 );
+    my $list = $a->grep(sub
+    {
+        /^something$/i;
+    }, 0);
+
 Provided with some data, and this will do a grep on the array.
 
-If the data provided is a code reference or a reference to a subroutine, the code reference will be called for each array entry, and C<$_> will also be available for each entry.
+If the data provided is a code reference or a reference to a subroutine, the code reference will be called for each array entry, and C<$_> will also be available for each entry. The code reference is passed 2 arguments:
+
+=over 4
+
+=item 1. The current value of the array
+
+=item 2. The index in the array (starting from C<0>)
+
+=back
 
 If the data is a regular expression, each array entry is tested against it.
 
-It returns a list of matches found in ilst context and a new L<Module::Generic::Array> in scalar context.
+It takes an optional boolean value, and if false (default), it returns all the entry matching, and if true, it returns all the entry B<not> matching.
+
+It returns a list of matches found in list context and a new L<Module::Generic::Array> in scalar context.
 
 =head2 has
 

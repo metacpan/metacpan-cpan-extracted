@@ -2,7 +2,7 @@ package Net::DNS::RR::MG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: MG.pm 1910 2023-03-30 19:16:30Z willem $)[2];
+our $VERSION = (qw$Id: MG.pm 1972 2024-04-21 08:13:19Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -118,6 +118,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC1035(3.3.6)|https://tools.ietf.org/html/rfc1035>
+L<RFC1035(3.3.6)|https://iana.org/go/rfc1035#section-3.3.6>
 
 =cut

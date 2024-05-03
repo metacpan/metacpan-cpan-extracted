@@ -7,7 +7,7 @@ use Error::Pure::Utils qw(clean);
 use Tags::HTML::Login::Access;
 use Tags::Output::Structure;
 use Test::MockObject;
-use Test::More 'tests' => 11;
+use Test::More 'tests' => 12;
 use Test::NoWarnings;
 
 # Test.
@@ -348,7 +348,76 @@ is_deeply(
 
 		['e', 'form'],
 	],
-	'Default login form with register url.',
+	'Default login form with logo image.',
+);
+
+# Test.
+$tags = Tags::Output::Structure->new;
+$obj = Tags::HTML::Login::Access->new(
+	'tags' => $tags,
+	'tags_after' => [
+		['b', 'b'],
+		['d', 'Bold'],
+		['e', 'b'],
+	],
+);
+$obj->process;
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['b', 'form'],
+		['a', 'class', 'form-login'],
+		['a', 'method', 'post'],
+
+		['b', 'fieldset'],
+		['b', 'legend'],
+		['d', 'Login'],
+		['e', 'legend'],
+
+		['b', 'p'],
+		['b', 'label'],
+		['a', 'for', 'username'],
+		['e', 'label'],
+		['d', 'User name'],
+		['b', 'input'],
+		['a', 'type', 'text'],
+		['a', 'name', 'username'],
+		['a', 'id', 'username'],
+		['a', 'autofocus', 'autofocus'],
+		['e', 'input'],
+		['e', 'p'],
+
+		['b', 'p'],
+		['b', 'label'],
+		['a', 'for', 'password'],
+		['d', 'Password'],
+		['e', 'label'],
+		['b', 'input'],
+		['a', 'type', 'password'],
+		['a', 'name', 'password'],
+		['a', 'id', 'password'],
+		['e', 'input'],
+		['e', 'p'],
+
+		['b', 'p'],
+		['b', 'button'],
+		['a', 'type', 'submit'],
+		['a', 'name', 'login'],
+		['a', 'value', 'login'],
+		['d', 'Login'],
+		['e', 'button'],
+		['e', 'p'],
+
+		['b', 'b'],
+		['d', 'Bold'],
+		['e', 'b'],
+
+		['e', 'fieldset'],
+
+		['e', 'form'],
+	],
+	'Default login form with Tags code after form.',
 );
 
 # Test.

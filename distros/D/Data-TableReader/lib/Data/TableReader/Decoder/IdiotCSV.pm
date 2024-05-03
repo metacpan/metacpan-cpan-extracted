@@ -7,7 +7,7 @@ use Log::Any '$log';
 extends 'Data::TableReader::Decoder::CSV';
 
 # ABSTRACT: Access rows of a badly formatted comma-delimited text file
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 
 sub _build_parser {
@@ -36,7 +36,7 @@ Data::TableReader::Decoder::IdiotCSV - Access rows of a badly formatted comma-de
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 DESCRIPTION
 

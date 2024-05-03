@@ -20,28 +20,28 @@ no_index:
 provides:
   CPAN::Changes:
     file: lib/CPAN/Changes.pm
-    version: '0.500003'
+    version: '0.500004'
   CPAN::Changes::Entry:
     file: lib/CPAN/Changes/Entry.pm
-    version: '0.500003'
+    version: '0.500004'
   CPAN::Changes::Group:
     file: lib/CPAN/Changes/Group.pm
-    version: '0.500003'
+    version: '0.500004'
   CPAN::Changes::HasEntries:
     file: lib/CPAN/Changes/HasEntries.pm
-    version: '0.500003'
+    version: '0.500004'
   CPAN::Changes::Parser:
     file: lib/CPAN/Changes/Parser.pm
-    version: '0.500003'
+    version: '0.500004'
   CPAN::Changes::Release:
     file: lib/CPAN/Changes/Release.pm
-    version: '0.500003'
+    version: '0.500004'
   CPAN::Changes::Spec:
     file: lib/CPAN/Changes/Spec.pod
-    version: '0.500003'
+    version: '0.500004'
   Test::CPAN::Changes:
     file: lib/Test/CPAN/Changes.pm
-    version: '0.500003'
+    version: '0.500004'
 requires:
   Module::Runtime: '0'
   Moo: '1.006000'
@@ -53,6 +53,6 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Changes
   license: http://dev.perl.org/licenses/
   repository: https://github.com/metacpan/CPAN-Changes.git
-version: '0.500003'
+version: '0.500004'
 x_authority: cpan:BRICAS
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

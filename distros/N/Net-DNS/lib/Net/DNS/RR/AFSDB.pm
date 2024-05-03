@@ -2,7 +2,7 @@ package Net::DNS::RR::AFSDB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: AFSDB.pm 1945 2023-11-22 08:02:31Z willem $)[2];
+our $VERSION = (qw$Id: AFSDB.pm 1972 2024-04-21 08:13:19Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -138,7 +138,7 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC1183(1)|https://tools.ietf.org/html/rfc1183>
-L<RFC5864|https://tools.ietf.org/html/rfc5864>
+L<RFC1183(1)|https://iana.org/go/rfc1183#section-1>
+L<RFC5864|https://iana.org/go/rfc5864>
 
 =cut

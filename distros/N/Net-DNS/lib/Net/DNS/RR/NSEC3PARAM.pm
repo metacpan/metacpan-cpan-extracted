@@ -2,7 +2,7 @@ package Net::DNS::RR::NSEC3PARAM;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: NSEC3PARAM.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: NSEC3PARAM.pm 1972 2024-04-21 08:13:19Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -199,6 +199,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC5155|https://tools.ietf.org/html/rfc5155>
+L<RFC5155(4)|https://iana.org/go/rfc5155#section-4>
 
 =cut

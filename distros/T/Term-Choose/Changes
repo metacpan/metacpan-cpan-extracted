@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.765   2024-05-02
+    - If the current layout is 2, bypass the loops in '__set_cell'.
+
 1.764   2024-04-20
     - Code refactoring.
 

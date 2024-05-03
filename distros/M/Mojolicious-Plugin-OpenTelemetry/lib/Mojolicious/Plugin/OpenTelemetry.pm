@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::OpenTelemetry;
 # ABSTRACT: An OpenTelemetry integration for Mojolicious
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
@@ -80,10 +80,18 @@ sub register ( $, $app, $config, @ ) {
 
             $promise->then( sub {
                 my $code  = $tx->res->code;
-                my $error = $code >= 400 && $code < 600;
+
+                # The status of server spans must be left unset if the
+                # response is a 4XX error
+                # See https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#status
+                if ( $code < 400 ) {
+                    $span->set_status(SPAN_STATUS_OK);
+                }
+                elsif ( $code >= 500 ) {
+                    $span->set_status(SPAN_STATUS_ERROR);
+                }
 
                 $span
-                    ->set_status( $error ? SPAN_STATUS_ERROR : SPAN_STATUS_OK )
                     ->set_attribute( 'http.response.status_code' => $code )
                     ->end;
             })->wait;

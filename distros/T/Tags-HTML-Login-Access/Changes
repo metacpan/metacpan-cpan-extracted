@@ -1,3 +1,8 @@
+0.10 2024-05-02T13:38:41+02:00
+ - Add 'tags_after' parameter.
+ - Fix test message.
+ - Improve plack example in doc.
+
 0.09 2024-04-29T13:23:21+02:00
  - Add links to doc.
  - Fix typo in doc.

@@ -14,8 +14,6 @@ METHODS
 
     Constructor.
 
-    Returns instance of object.
-
     *       "author"
 
             Author string to HTML head.
@@ -152,11 +150,19 @@ METHODS
                      'preserved' => ['pre', 'style'],
              );
 
+    *       "tags_after"
+
+            Reference to array with Tags code to use after form.
+
+            Default value is undef.
+
     *       "title"
 
             Page title.
 
             Default value is 'Login page'.
+
+    Returns instance of object.
 
   "call"
      my $psgi_ar = $obj->call($env);
@@ -312,10 +318,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2023 Michal Josef Špaček
+    © 2023-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

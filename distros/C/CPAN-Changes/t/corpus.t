@@ -40,7 +40,7 @@ my $parser = CPAN::Changes::Parser->new(version_like => qr/\{\{\s*\$NEXT\s*\}\}/
 
 for my $log (@ARGV ? @ARGV : glob('corpus/dists/*.changes')) {
   my $content = do {
-    open my $fh, '<', $log
+    open my $fh, '<:raw', $log
       or die "can't read $log: $!";
     local $/;
     <$fh>;

@@ -1,5 +1,8 @@
 Revision history for perl module CPAN::Changes
 
+0.500004 - 2024-05-02
+  - fix tests on Windows
+
 0.500003 - 2024-02-22
   - fix calling ->name on an unnamed group
   - fix ->set_changes call on groups

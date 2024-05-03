@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.35.5
+## Version v0.36.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2024/04/27
+## Modified 2024/04/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.35.5';
+    our $VERSION     = 'v0.36.0';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -2698,6 +2698,15 @@ sub _is_number
 {
     return(0) if( scalar( @_ < 2 ) );
     return(0) if( !defined( $_[1] ) || !length( $_[1] ) );
+    if( my $isok = Scalar::Util::looks_like_number( $_[1] ) )
+    {
+        return(1);
+    }
+    # If the hexadecimal value is a string, it will return false, so we use regular expression.
+    elsif( $_[1] =~ /^0x[0-9A-F]+$/i )
+    {
+        return(1);
+    }
     $_[0]->_load_class( 'Regexp::Common' ) || return( $_[0]->pass_error );
     no warnings 'once';
     return( $_[1] =~ /^$Regexp::Common::RE{num}{real}$/ );
@@ -9141,7 +9150,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.35.5
+    v0.36.0
 
 =head1 DESCRIPTION
 

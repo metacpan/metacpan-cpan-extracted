@@ -2,7 +2,7 @@ package Net::DNS::RR::DNSKEY;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DNSKEY.pm 1910 2023-03-30 19:16:30Z willem $)[2];
+our $VERSION = (qw$Id: DNSKEY.pm 1972 2024-04-21 08:13:19Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -41,7 +41,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 	my @rdata = @{$self}{qw(flags protocol algorithm)};
 	if ( my $keybin = $self->keybin ) {
-		$self->_annotation( 'Key ID =', $self->keytag );
+		$self->_annotation( 'keytag', $self->keytag );
 		return $self->SUPER::_format_rdata() unless BASE64;
 		push @rdata, split /\s+/, MIME::Base64::encode($keybin);
 	} else {
@@ -240,6 +240,8 @@ sub keytag {
 		'ECDSAP384SHA384'    => 14,			# [RFC6605]
 		'ED25519'	     => 15,			# [RFC8080]
 		'ED448'		     => 16,			# [RFC8080]
+		'SM2SM3'	     => 17,			# [RFC-cuiling-dnsop-sm2-alg-15]
+		'ECC-GOST12'	     => 23,			# [RFC-makarenko-gost2012-dnssec-05]
 
 		'INDIRECT'   => 252,				# [RFC4034]
 		'PRIVATEDNS' => 253,				# [RFC4034]
@@ -431,10 +433,10 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC4034|https://tools.ietf.org/html/rfc4034>
+L<RFC4034(2)|https://iana.org/go/rfc4034#section-2>
 
-L<DNSKEY Flags|http://www.iana.org/assignments/dnskey-flags>
+L<DNSKEY Flags|https://www.iana.org/assignments/dnskey-flags>
 
-L<Algorithm Numbers|http://www.iana.org/assignments/dns-sec-alg-numbers>
+L<Algorithm Numbers|https://iana.org/assignments/dns-sec-alg-numbers>
 
 =cut

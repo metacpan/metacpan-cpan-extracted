@@ -13,6 +13,7 @@ lib/Data/Transfigure.pm
 lib/Data/Transfigure/Constants.pm
 lib/Data/Transfigure/Default.pm
 lib/Data/Transfigure/Default/ToString.pm
+lib/Data/Transfigure/HashFilter/Undef.pm
 lib/Data/Transfigure/HashKeys/CamelCase.pm
 lib/Data/Transfigure/HashKeys/CapitalizedIDSuffix.pm
 lib/Data/Transfigure/HashKeys/SnakeCase.pm
@@ -21,6 +22,7 @@ lib/Data/Transfigure/Position.pm
 lib/Data/Transfigure/Predicate.pm
 lib/Data/Transfigure/Schema.pm
 lib/Data/Transfigure/Tree.pm
+lib/Data/Transfigure/Tree/Merge.pm
 lib/Data/Transfigure/Type.pm
 lib/Data/Transfigure/Type/DBIx.pm
 lib/Data/Transfigure/Type/DBIx/Recursive.pm
@@ -50,6 +52,8 @@ t/40-tree.t
 t/41-tree-id.t
 t/42-tree-compound.t
 t/43-tree-lowercamel.t
+t/44-tree-filterundef.t
+t/45-tree-merge.t
 t/50-transform.t
 t/51-transform-predicate.t
 t/lib/MyApp/Schema.pm

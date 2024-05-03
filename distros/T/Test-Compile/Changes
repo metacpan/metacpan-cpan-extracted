@@ -1,5 +1,9 @@
 Revision history for Perl extension Test-Compile
 
+v3.3.2	  2024-05-03
+    - Require a newer version of Test::More (fix CPAN testing failure?)
+    - Don't add an unnecassary "./" to the start of filepaths (CPAN-RT 151090)
+
 v3.3.1	  2023-07-17
     - Fix 'silent, no taint' mode (which doesn't cause the compile to fail)
 

@@ -1,7 +1,7 @@
 package OpenTelemetry::Proto;
 # ABSTRACT: foo
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use experimental 'signatures';
 
@@ -22,6 +22,9 @@ my $share = do {
 #     find . -name "*.proto" | while read proto; do
 #        protoc --experimental_allow_proto3_optional -Iproto -o "$( echo ${proto%%.proto}.pb | sed -re 's/^\.\/proto/share/' )" $proto;
 #     done
+#
+# The order of the list below is important! They are compiled
+# in order because later ones depend on earlier ones.
 for my $proto (qw(
     opentelemetry/proto/common/v1/common.pb
     opentelemetry/proto/resource/v1/resource.pb

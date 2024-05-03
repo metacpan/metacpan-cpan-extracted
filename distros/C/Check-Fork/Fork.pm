@@ -10,7 +10,7 @@ use Readonly;
 our $ERROR_MESSAGE;
 Readonly::Array our @EXPORT_OK => qw(check_fork $ERROR_MESSAGE);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub check_fork {
 	my ($config_hr, $os) = @_;
@@ -176,6 +176,14 @@ L<Readonly>.
 
 Check socket functionality.
 
+=item L<Test2::Require::Fork>
+
+Skip a test file unless the system supports forking
+
+=item L<Test2::Require::RealFork>
+
+Skip a test file unless the system supports true forking
+
 =back
 
 =head1 REPOSITORY
@@ -190,12 +198,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2022 Michal Josef Špaček
+© 2021-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

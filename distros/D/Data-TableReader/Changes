@@ -1,3 +1,9 @@
+Version 0.021 - 2024-05-02
+ - Use ->table_search_results->{...}{row} instead of {row_idx}
+ - Allow initializing TableReader 'fields' attribute with Field objects
+   (had only been allowing strings and hashrefs)
+ - Decoder::Mock now correctly handles empty tables (no rows)
+
 Version 0.020 - 2024-04-30
  - Rename on_validation_fail -> on_validation_error
    The action codes are the same, but the callback has different arguments.

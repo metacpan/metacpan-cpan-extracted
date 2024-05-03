@@ -54,7 +54,7 @@
 
 char *p;
 char errorstring[10000];
-char kh[1000];
+char kh[2048];
 
 char* u2fclib_getError(void) {
     return errorstring;
@@ -183,7 +183,7 @@ char* u2fclib_verifyRegistration(void* ctx, char* buf, char** pk) {
     }
     memcpy(pk, u2fs_get_registration_publicKey(reg_result), U2FS_PUBLIC_KEY_LEN);
 
-    strncpy(kh, u2fs_get_registration_keyHandle(reg_result), 1000);
+    strncpy(kh, u2fs_get_registration_keyHandle(reg_result), 2048);
     return kh;
 
 }

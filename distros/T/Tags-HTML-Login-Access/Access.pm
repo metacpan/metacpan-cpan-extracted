@@ -7,13 +7,14 @@ use warnings;
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use List::Util 1.33 qw(none);
+use Mo::utils 0.06 qw(check_array);
 use Mo::utils::Language 0.05 qw(check_language_639_2);
 use Readonly;
 use Tags::HTML::Messages;
 
 Readonly::Array our @FORM_METHODS => qw(post get);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Constructor.
 sub new {
@@ -22,7 +23,7 @@ sub new {
 	# Create object.
 	my ($object_params_ar, $other_params_ar) = split_params(
 		['css_access', 'form_method', 'lang', 'logo_image_url', 'register_url',
-		'text', 'width'], @params);
+		'tags_after', 'text', 'width'], @params);
 	my $self = $class->SUPER::new(@{$other_params_ar});
 
 	# CSS style for access box.
@@ -39,6 +40,9 @@ sub new {
 
 	# Register URL.
 	$self->{'register_url'} = undef;
+
+	# Tags code after form.
+	$self->{'tags_after'} = [];
 
 	# Language texts.
 	$self->{'text'} = {
@@ -75,6 +79,8 @@ sub new {
 	if (! exists $self->{'text'}->{$self->{'lang'}}) {
 		err "Texts for language '$self->{'lang'}' doesn't exist.";
 	}
+
+	check_array($self, 'tags_after');
 
 	$self->{'_tags_messages'} = Tags::HTML::Messages->new(
 		'css' => $self->{'css'},
@@ -158,6 +164,8 @@ sub _process {
 			['d', $self->_text('register')],
 			['e', 'a'],
 		) : (),
+
+		@{$self->{'tags_after'}},
 
 		['e', 'fieldset'],
 	);
@@ -335,6 +343,12 @@ Default value is undef.
 L<Tags::Output> object.
 
 Default value is undef.
+
+=item * C<tags_after>
+
+Reference to array with L<Tags> code which will be placed after form.
+
+Default value is [].
 
 =item * C<text>
 
@@ -526,14 +540,14 @@ Returns undef.
          'tags' => $tags,
          'register_url' => '/register',
  );
- $login->process_css;
  my $app = Plack::App::Tags::HTML->new(
          'component' => 'Tags::HTML::Container',
          'data' => [sub {
-                 my $self = shift;
                  $login->process_css;
                  $login->process;
-                 return;
+         }],
+         'data_prepare' => [sub {
+                 $login->process_css;
          }],
          'css' => $css,
          'tags' => $tags,
@@ -556,6 +570,7 @@ Returns undef.
 L<Class::Utils>,
 L<Error::Pure>,
 L<List::Util>,
+L<Mo::utils>,
 L<Mo::utils::Language>,
 L<Readonly>,
 L<Tags::HTML>,
@@ -593,6 +608,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

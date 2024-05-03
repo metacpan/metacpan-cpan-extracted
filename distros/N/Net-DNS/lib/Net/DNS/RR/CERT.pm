@@ -2,7 +2,7 @@ package Net::DNS::RR::CERT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: CERT.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: CERT.pm 1972 2024-04-21 08:13:19Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -141,6 +141,8 @@ sub tag { return &keytag; }					# uncoverable pod
 		'ECDSAP384SHA384'    => 14,			# [RFC6605]
 		'ED25519'	     => 15,			# [RFC8080]
 		'ED448'		     => 16,			# [RFC8080]
+		'SM2SM3'	     => 17,			# [RFC-cuiling-dnsop-sm2-alg-15]
+		'ECC-GOST12'	     => 23,			# [RFC-makarenko-gost2012-dnssec-05]
 
 		'INDIRECT'   => 252,				# [RFC4034]
 		'PRIVATEDNS' => 253,				# [RFC4034]
@@ -262,8 +264,8 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC4398|https://tools.ietf.org/html/rfc4398>
+L<RFC4398|https://iana.org/go/rfc4398>
 
-L<Algorithm Numbers|http://www.iana.org/assignments/dns-sec-alg-numbers>
+L<Algorithm Numbers|https://iana.org/assignments/dns-sec-alg-numbers>
 
 =cut

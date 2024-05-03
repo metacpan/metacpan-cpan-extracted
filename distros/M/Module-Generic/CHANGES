@@ -1,5 +1,10 @@
 Revision history for Perl module Module::Generic
 
+v0.36.0 2024-05-03T07:04:54+0900
+    - Corrected Module::Generic::Array documentation
+    - Added the 'invert' option to method grep() in Module::Generic::Array
+    - Improved support method _is_number
+
 v0.35.5 2024-04-27T08:48:40+0900
     - Minor correction in Module::Generic::File to better handle file:// URIs.
 

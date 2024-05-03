@@ -50,35 +50,35 @@ my %META = (
   provides => {
     'CPAN::Changes' => {
       file => 'lib/CPAN/Changes.pm',
-      version => '0.500003',
+      version => '0.500004',
     },
     'CPAN::Changes::Entry' => {
       file => 'lib/CPAN/Changes/Entry.pm',
-      version => '0.500003',
+      version => '0.500004',
     },
     'CPAN::Changes::Group' => {
       file => 'lib/CPAN/Changes/Group.pm',
-      version => '0.500003',
+      version => '0.500004',
     },
     'CPAN::Changes::HasEntries' => {
       file => 'lib/CPAN/Changes/HasEntries.pm',
-      version => '0.500003',
+      version => '0.500004',
     },
     'CPAN::Changes::Parser' => {
       file => 'lib/CPAN/Changes/Parser.pm',
-      version => '0.500003',
+      version => '0.500004',
     },
     'CPAN::Changes::Release' => {
       file => 'lib/CPAN/Changes/Release.pm',
-      version => '0.500003',
+      version => '0.500004',
     },
     'CPAN::Changes::Spec' => {
       file => 'lib/CPAN/Changes/Spec.pod',
-      version => '0.500003',
+      version => '0.500004',
     },
     'Test::CPAN::Changes' => {
       file => 'lib/Test/CPAN/Changes.pm',
-      version => '0.500003',
+      version => '0.500004',
     },
   },
 );

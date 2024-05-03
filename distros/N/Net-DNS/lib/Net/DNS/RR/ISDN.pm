@@ -2,7 +2,7 @@ package Net::DNS::RR::ISDN;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: ISDN.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: ISDN.pm 1972 2024-04-21 08:13:19Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -150,6 +150,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC1183(3.2)|https://tools.ietf.org/html/rfc1183>
+L<RFC1183(3.2)|https://iana.org/go/rfc1183#section-3.2>
 
 =cut

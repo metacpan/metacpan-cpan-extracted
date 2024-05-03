@@ -30,7 +30,7 @@ no_index:
 provides:
   Mojolicious::Plugin::OpenTelemetry:
     file: lib/Mojolicious/Plugin/OpenTelemetry.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Feature::Compat::Try: '0'
   Mojolicious: '0'
@@ -40,7 +40,7 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jjatria/mojolicious-plugin-opentelemetry/issues
   repository: git://github.com/jjatria/mojolicious-plugin-opentelemetry.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -217,7 +217,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.002'
           tag_format: '%v'
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:

@@ -59,7 +59,7 @@ my $span_mock = mock 'Local::Span' => add => [
     trace_state           => sub { shift->{context}->trace_state },
 ];
 
-is decode_json(CLASS->new->encode([
+my $encoded = CLASS->new->encode([
     Local::Span->new(
         scope    => $a_scope,
         name     => 'A-A',
@@ -80,7 +80,11 @@ is decode_json(CLASS->new->encode([
         name     => 'B-B',
         resource => $b_resource,
     ),
-])), {
+]);
+
+like $encoded, qr/"message":"[^"]*?"/, "Status description is a string";
+
+is decode_json($encoded), {
     resourceSpans => array {
         prop size => 2;
         all_items {

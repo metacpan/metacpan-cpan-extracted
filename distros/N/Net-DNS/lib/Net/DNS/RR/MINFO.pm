@@ -2,7 +2,7 @@ package Net::DNS::RR::MINFO;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: MINFO.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: MINFO.pm 1972 2024-04-21 08:13:19Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -19,10 +19,9 @@ use Net::DNS::Mailbox;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my ( $self, @argument ) = @_;
-	my ( $data, $offset, @opaque ) = @argument;
+	my ( $self, $data, $offset, @opaque ) = @_;
 
-	( $self->{rmailbx}, $offset ) = Net::DNS::Mailbox1035->decode(@argument);
+	( $self->{rmailbx}, $offset ) = Net::DNS::Mailbox1035->decode( $data, $offset, @opaque );
 	( $self->{emailbx}, $offset ) = Net::DNS::Mailbox1035->decode( $data, $offset, @opaque );
 	return;
 }
@@ -148,6 +147,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC1035(3.3.7)|https://tools.ietf.org/html/rfc1035>
+L<RFC1035(3.3.7)|https://iana.org/go/rfc1035#section-3.3.7>
 
 =cut

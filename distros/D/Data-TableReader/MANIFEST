@@ -22,6 +22,7 @@ lib/Data/TableReader/Field.pm
 lib/Data/TableReader/Iterator.pm
 t/01-env-check.t
 t/05-field.t
+t/09-decoder-mock.t
 t/10-decoder-csv.t
 t/11-decoder-tsv.t
 t/12-decoder-idiot-csv.t

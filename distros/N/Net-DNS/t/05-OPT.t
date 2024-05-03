@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-OPT.t 1934 2023-08-25 12:14:08Z willem $	-*-perl-*-
+# $Id: 05-OPT.t 1969 2024-03-07 16:29:36Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -9,7 +9,6 @@ use TestToolkit;
 
 use Net::DNS;
 use Net::DNS::Parameters;
-local $Net::DNS::Parameters::ednsoptionbyval{65023} = 'REPORT-CHANNEL';	   ## experimental/private use
 
 use constant UTIL => scalar eval { require Scalar::Util; Scalar::Util->can('isdual') };	   ## no critic
 
@@ -105,7 +104,7 @@ my @testcase = (
 	["EXTENDED-ERROR" => ( "INFO-CODE" => 0, "EXTRA-TEXT" => '{"JSON":"EXAMPLE"}' )],
 	["EXTENDED-ERROR" => ( "INFO-CODE" => 0, "EXTRA-TEXT" => '{JSON: unparsable}' )],
 	["EXTENDED-ERROR" => ( "INFO-CODE" => 123 )],
-	["65023"	  => {"BASE16" => "076578616d706c6500"}],
+	["REPORT-CHANNEL" => ( "AGENT-DOMAIN" => "example." )],
 	);
 
 foreach (@testcase) {

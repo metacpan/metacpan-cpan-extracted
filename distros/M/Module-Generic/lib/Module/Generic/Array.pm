@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Array.pm
-## Version v2.0.2
+## Version v2.1.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2023/09/24
+## Modified 2024/04/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -35,7 +35,7 @@ BEGIN
     $DEBUG  = 0;
     $ERRORS = {};
     $RETURN = {};
-    our $VERSION = 'v2.0.2';
+    our $VERSION = 'v2.1.0';
 };
 
 use strict;
@@ -509,17 +509,19 @@ sub grep
 {
     my $self = CORE::shift( @_ );
     my $expr = CORE::shift( @_ );
+    my $invert = ( @_ ? CORE::shift( @_ ) : 0 );
     my $ref;
+    my $i = -1;
     if( ref( $expr ) eq 'CODE' )
     {
-        $ref = [CORE::grep( $expr->( $_ ), @$self )];
+        $ref = ( $invert ? [CORE::grep( !$expr->( $_, ++$i ), @$self )] : [CORE::grep( $expr->( $_, ++$i ), @$self )] );
     }
     else
     {
         $expr = ref( $expr ) eq 'Regexp'
             ? $expr
             : qr/\Q$expr\E/;
-        $ref = [ CORE::grep( $_ =~ /$expr/, @$self ) ];
+        $ref = ( $invert ? [ CORE::grep( $_ !~ /$expr/, @$self ) ] : [ CORE::grep( $_ =~ /$expr/, @$self ) ] );
     }
     if( Want::want( 'LIST' ) )
     {

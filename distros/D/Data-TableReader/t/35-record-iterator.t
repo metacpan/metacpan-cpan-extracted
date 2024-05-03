@@ -67,7 +67,7 @@ subtest record_class_array => sub {
 			],
 			fields => [
 				'a',
-				{ name => 'b', array => 1 },
+				Data::TableReader::Field->new(name => 'b', array => 1),
 				'c',
 				{ name => 'd', required => 0 },
 			],

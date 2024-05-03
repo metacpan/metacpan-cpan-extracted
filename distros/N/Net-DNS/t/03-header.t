@@ -1,10 +1,10 @@
 #!/usr/bin/perl
-# $Id: 03-header.t 1953 2023-12-24 09:03:14Z willem $
+# $Id: 03-header.t 1970 2024-03-22 01:51:29Z willem $
 #
 
 use strict;
 use warnings;
-use Test::More tests => 75;
+use Test::More tests => 79;
 use TestToolkit;
 
 use Net::DNS::Packet;
@@ -98,6 +98,7 @@ SKIP: {
 	skip( 'EDNS header extensions not supported', 10 ) unless $edns->isa('Net::DNS::RR::OPT');
 
 	toggle( $header, 'do', 0, 1, 0, 1 );
+	toggle( $header, 'co', 0, 1, 0, 1 );
 	toggle( $header, 'rcode', qw(BADVERS BADMODE BADNAME FORMERR NOERROR) );
 
 	my $packet = Net::DNS::Packet->new();			# empty EDNS size solicitation

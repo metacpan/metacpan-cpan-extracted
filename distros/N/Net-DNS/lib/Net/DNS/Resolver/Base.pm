@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Base;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Base.pm 1965 2024-02-14 09:19:32Z willem $)[2];
+our $VERSION = (qw$Id: Base.pm 1969 2024-03-07 16:29:36Z willem $)[2];
 
 
 #
@@ -45,7 +45,13 @@ use Carp;
 use IO::File;
 use IO::Select;
 use IO::Socket;
-use Socket qw( AI_NUMERICHOST IPPROTO_UDP );
+
+use Socket;
+{
+	no strict 'subs';		## no critic ProhibitNoStrict
+	use constant AI_NUMERICHOST => Socket::AI_NUMERICHOST;
+	use constant IPPROTO_UDP    => Socket::IPPROTO_UDP;
+}
 
 use Net::DNS::RR;
 use Net::DNS::Packet;

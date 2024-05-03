@@ -2,7 +2,7 @@ package Net::DNS::RR::TXT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: TXT.pm 1911 2023-04-17 12:30:59Z willem $)[2];
+our $VERSION = (qw$Id: TXT.pm 1972 2024-04-21 08:13:19Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -24,15 +24,14 @@ use Net::DNS::Text;
 sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $self, $data, $offset ) = @_;
 
-	my $limit = $offset + $self->{rdlength};
-	my $text;
-	my $txtdata = $self->{txtdata} = [];
-	while ( $offset < $limit ) {
-		( $text, $offset ) = Net::DNS::Text->decode( $data, $offset );
-		push @$txtdata, $text;
+	my $limit = $self->{rdlength};
+	my $rdata = substr $$data, $offset, $limit;
+	my $array = $self->{txtdata} = [];
+	my $index = 0;
+	while ( $index < $limit ) {
+		( my $text, $index ) = Net::DNS::Text->decode( \$rdata, $index );
+		push @$array, $text;
 	}
-
-	croak('corrupt TXT data') unless $offset == $limit;	# more or less FUBAR
 	return;
 }
 
@@ -158,7 +157,7 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC1035(3.3.14)|https://tools.ietf.org/html/rfc1035>
-L<RFC3629|https://tools.ietf.org/html/rfc3629>
+L<RFC1035(3.3.14)|https://iana.org/go/rfc1035#section-3.3.14>
+L<RFC3629|https://iana.org/go/rfc3629>
 
 =cut

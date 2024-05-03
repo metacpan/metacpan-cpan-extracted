@@ -12,12 +12,14 @@ my $build = Module::Build->new (
     license  => 'perl',
     configure_requires => {
         'Module::Build' => 0.38,
-        'version'       => 0.77
     },
     requires => {
-        'perl'          => '5.10.0',
-        'parent'        => '0.225',
-        'Exporter'      => '5.68',
+        'perl'     => '5.10.0',
+        'parent'   => '0.225',
+        'Exporter' => '5.68',
+    },
+    test_requires => {
+        'Test::More'  => 1.3
     },
     create_makefile_pl => 'traditional',
     meta_merge     => {

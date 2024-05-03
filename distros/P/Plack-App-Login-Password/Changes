@@ -1,3 +1,8 @@
+0.03 2024-05-02T15:25:55+02:00
+ - Add tags_after() accessor.
+ - Improve doc.
+ - Update copyright years.
+
 0.02 2023-06-27T02:02:44+02:00
  - Add support of autofocus.
  - Add support of login process.

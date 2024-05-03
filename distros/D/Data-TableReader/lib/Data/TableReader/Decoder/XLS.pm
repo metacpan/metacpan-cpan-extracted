@@ -11,7 +11,7 @@ sub default_xls_module {
 }
 
 # ABSTRACT: Access sheets/rows of a Microsoft Excel '97 workbook
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 
 sub _build_workbook {
@@ -42,7 +42,7 @@ Data::TableReader::Decoder::XLS - Access sheets/rows of a Microsoft Excel '97 wo
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 DESCRIPTION
 

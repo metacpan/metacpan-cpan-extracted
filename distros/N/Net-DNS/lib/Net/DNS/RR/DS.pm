@@ -2,7 +2,7 @@ package Net::DNS::RR::DS;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DS.pm 1957 2024-01-10 14:54:10Z willem $)[2];
+our $VERSION = (qw$Id: DS.pm 1972 2024-04-21 08:13:19Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -22,9 +22,10 @@ use constant BABBLE => defined eval { require Digest::BubbleBabble };
 eval { require Digest::SHA };		## optional for simple Net::DNS RR
 
 my %digest = (
-	'1' => scalar( eval { Digest::SHA->new(1) } ),
-	'2' => scalar( eval { Digest::SHA->new(256) } ),
-	'4' => scalar( eval { Digest::SHA->new(384) } ),
+	'1' => ['Digest::SHA', 1],
+	'2' => ['Digest::SHA', 256],
+	'4' => ['Digest::SHA', 384],
+	'6' => ['Net::DNS::SEC::Digest::SM3'],
 	);
 
 
@@ -144,12 +145,15 @@ sub create {
 		keytag	  => $keyrr->keytag
 		);
 
-	my $hash = $digest{$self->digtype};
+	my $spec = $digest{$self->digtype};
+	my $hash = eval {
+		my ( $object, @param ) = @$spec;
+		$object->new(@param);
+	};
 	croak join ' ', 'digtype', $self->digtype('MNEMONIC'), 'not supported' unless $hash;
-	my $clone = $hash->clone;
-	$clone->add( $keyrr->{owner}->canonical );
-	$clone->add( $keyrr->_encode_rdata );
-	$self->digestbin( $clone->digest );
+	$hash->add( $keyrr->{owner}->canonical );
+	$hash->add( $keyrr->_encode_rdata );
+	$self->digestbin( $hash->digest );
 
 	return $self;
 }
@@ -166,15 +170,15 @@ sub verify {
 
 {
 	my @digestbyname = (
-		'SHA-1'		  => 1,				# [RFC3658]
-		'SHA-256'	  => 2,				# [RFC4509]
-		'GOST-R-34.11-94' => 3,				# [RFC5933]
-		'SHA-384'	  => 4,				# [RFC6605]
+		'SHA-1'		    => 1,			# [RFC3658]
+		'SHA-256'	    => 2,			# [RFC4509]
+		'GOST-R-34.11-94'   => 3,			# [RFC5933]
+		'SHA-384'	    => 4,			# [RFC6605]
+		'GOST-R-34.11-2012' => 5,			# [RFC-makarenko-gost2012-dnssec-05]
+		'SM3'		    => 6,			# [RFC-cuiling-dnsop-sm2-alg-15]
 		);
 
-	my @digestalias = (
-		'SHA'	 => 1,
-		);
+	my @digestalias = ( 'SHA' => 1 );
 
 	my %digestbyval = reverse @digestbyname;
 
@@ -217,6 +221,8 @@ sub verify {
 		'ECDSAP384SHA384'    => 14,			# [RFC6605]
 		'ED25519'	     => 15,			# [RFC8080]
 		'ED448'		     => 16,			# [RFC8080]
+		'SM2SM3'	     => 17,			# [RFC-cuiling-dnsop-sm2-alg-15]
+		'ECC-GOST12'	     => 23,			# [RFC-makarenko-gost2012-dnssec-05]
 
 		'INDIRECT'   => 252,				# [RFC4034]
 		'PRIVATEDNS' => 253,				# [RFC4034]
@@ -390,10 +396,10 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-L<RFC4034|https://tools.ietf.org/html/rfc4034>
+L<RFC4034(5)|https://iana.org/go/rfc4034#section-5>
 
-L<Digest Types|http://www.iana.org/assignments/ds-rr-types>
+L<Digest Types|https://iana.org/assignments/ds-rr-types>
 
-L<Algorithm Numbers|http://www.iana.org/assignments/dns-sec-alg-numbers>
+L<Algorithm Numbers|https://iana.org/assignments/dns-sec-alg-numbers>
 
 =cut

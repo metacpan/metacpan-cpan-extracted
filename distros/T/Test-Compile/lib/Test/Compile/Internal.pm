@@ -3,7 +3,7 @@ package Test::Compile::Internal;
 use warnings;
 use strict;
 
-use version; our $VERSION = version->declare("v3.3.1");
+use version; our $VERSION = version->declare("v3.3.2");
 use File::Find;
 use File::Spec;
 use Test::Builder;
@@ -387,10 +387,14 @@ sub _perl_file_compiles {
 sub _default_locations {
     my ($self, @dirs) = @_;
 
+    my $blib = -e 'blib';
     my @locations = ();
-    my $prefix = -e 'blib' ? "blib" : ".";
+
     for my $dir ( @dirs ) {
-        my $location = File::Spec->catfile($prefix, $dir);
+        my $location = File::Spec->catfile($dir);
+        if ( $blib ) {
+            $location = File::Spec->catfile('blib', $dir);
+        }
         if ( -e $location ) {
             push @locations, $location;
         }

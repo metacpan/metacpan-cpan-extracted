@@ -1,4 +1,15 @@
-$Id: Changes 1968 2024-02-15 11:42:31Z willem $                       -*-text-*-
+$Id: Changes 1977 2024-05-02 09:55:06Z willem $                       -*-text-*-
+
+
+**** 1.45 May 2, 2024
+
+	Resync with IANA DNS Parameters registry.
+	Resync with IANA DNSSEC Algorithm Numbers registry.
+	Resync with IANA DS Digest Algorithms registry.
+	Add support for EDNS CO flag.
+
+Fix rt.cpan.org #152756
+	Net::DNS::Resolver::UNIX creates $ENV{PATH} key if one doesn't exist
 
 
 **** 1.44 Feb 15, 2024

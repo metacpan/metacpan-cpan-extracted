@@ -1,5 +1,9 @@
 Revision history for Perl extension Crypt::U2F::Server.
 
+0.46  Thu May 02 14:16:31 2024 (GMT +2)
+    - Patch https://rt.cpan.org/Ticket/Display.html?id=150508
+      Fixes potential buffer overflow
+
 0.45  Sat May 04 14:59:57 2019 (GMT +2)
 	- Fix refcount warning when multiples instances of the
 	  Crypt::U2F::Server::Simple object are created (RT#129435).

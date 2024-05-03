@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 19;
+plan tests => 21;
 
 my @module_files = (
     'Data/Transfigure.pm',
     'Data/Transfigure/Constants.pm',
     'Data/Transfigure/Default.pm',
     'Data/Transfigure/Default/ToString.pm',
+    'Data/Transfigure/HashFilter/Undef.pm',
     'Data/Transfigure/HashKeys/CamelCase.pm',
     'Data/Transfigure/HashKeys/CapitalizedIDSuffix.pm',
     'Data/Transfigure/HashKeys/SnakeCase.pm',
@@ -21,6 +22,7 @@ my @module_files = (
     'Data/Transfigure/Predicate.pm',
     'Data/Transfigure/Schema.pm',
     'Data/Transfigure/Tree.pm',
+    'Data/Transfigure/Tree/Merge.pm',
     'Data/Transfigure/Type.pm',
     'Data/Transfigure/Type/DBIx.pm',
     'Data/Transfigure/Type/DBIx/Recursive.pm',

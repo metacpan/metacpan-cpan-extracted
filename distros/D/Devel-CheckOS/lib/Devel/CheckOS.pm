@@ -10,7 +10,7 @@ use File::Spec;
 
 use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS %OS_ALIASES);
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(
@@ -244,8 +244,7 @@ sub list_platforms {
 
 Takes the name of an OS 'family' and returns a list of all its members.
 
-If called on something that isn't a family, you get an empty list (or
-a ref to an empty array).
+If called on something that isn't a family, you get an empty list.
 
 =cut
 

@@ -1,3 +1,9 @@
+0.05 2024-05-02T12:49:32+02:00
+ - Add is_with_diag() to test.
+ - Add related modules to SEE ALSO section in doc.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.04 2022-12-08T00:12:06+01:00
  - Add diag output to real test.
 

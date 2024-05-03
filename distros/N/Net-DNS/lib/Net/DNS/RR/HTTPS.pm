@@ -2,7 +2,7 @@ package Net::DNS::RR::HTTPS;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: HTTPS.pm 1945 2023-11-22 08:02:31Z willem $)[2];
+our $VERSION = (qw$Id: HTTPS.pm 1972 2024-04-21 08:13:19Z willem $)[2];
 
 use base qw(Net::DNS::RR::SVCB);
 
@@ -76,6 +76,6 @@ DEALINGS IN THE SOFTWARE.
 L<perl> L<Net::DNS> L<Net::DNS::RR>
 L<Net::DNS::RR::SVCB>
 
-L<RFC9460|https://tools.ietf.org/html/rfc9460>
+L<RFC9460(9)|https://iana.org/go/rfc9460#section-9>
 
 =cut

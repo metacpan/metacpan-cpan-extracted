@@ -81,6 +81,11 @@ package Local::App {
         }
     };
 
+    get '/status/:code' => sub {
+        status params->{code};
+        'OK';
+    };
+
     get '/error' => sub { die 'oops' };
 }
 
@@ -253,6 +258,39 @@ subtest 'With placeholder' => sub {
     span_calls [
         set_status    => [ SPAN_STATUS_OK ],
         set_attribute => [ 'http.response.status_code', 200 ],
+        end           => [],
+    ], 'Expected calls on span';
+};
+
+subtest 'Response code' => sub {
+    is $test->request( GET '/status/400' ), object {
+        call code            => 400;
+        call decoded_content => 'OK';
+    }, 'Request OK';
+
+    is $span->{otel}, {
+        attributes => {
+            'client.address'           => '127.0.0.1',
+            'client.port'              => DNE,
+            'http.request.method'      => 'GET',
+            'http.route'               => '/status/:code',
+            'network.protocol.version' => '1.1',
+            'server.address'           => 'localhost',
+            'server.port'              => DNE,
+            'url.path'                 => '/status/400',
+            'url.scheme'               => 'http',
+            'user_agent.original'      => DNE,
+        },
+        kind => SPAN_KIND_SERVER,
+        name => 'GET /status/:code',
+        parent => D, # FIXME: can't use object check in 5.32
+      # parent => object {
+      #     prop isa => 'OpenTelemetry::Context';
+      # },
+    }, 'Span created as expected';
+
+    span_calls [
+        set_attribute => [ 'http.response.status_code', 400 ],
         end           => [],
     ], 'Expected calls on span';
 };
