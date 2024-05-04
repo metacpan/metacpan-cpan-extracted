@@ -99,7 +99,7 @@ is( My::Test::No::Sub::Class->new( {} )->b, undef, "standalone class" );
 {
     no warnings 'once';
     is( *My::Test::No::Sub::wrap_hash{CODE},
-        undef, "stopping import of wrap_hash works" );
+        undef, 'stopping import of wrap_hash works' );
 }
 
 {
@@ -117,6 +117,13 @@ isa_ok(
     '-class => -caller'
 );
 
+ref_ok( *My::Test::ClassName::wrapit{CODE}, 'CODE', "standalone class" );
+isa_ok(
+    My::Test::ClassName::wrapit(),
+    ['My::Test::ClassName::wrapit'],
+    '-class => -target'
+);
+
 SKIP: {
     skip( ":lvalue support requires perl 5.16 or later" )
       unless $HAS_LVALUE;
@@ -129,5 +136,14 @@ SKIP: {
 
     is( $My::Import::Default::LValue::meta->{-lvalue}, 1, "lvalue" );
 }
+
+subtest '-into' => sub {
+    ok( lives { Hash::Wrap->import( {-as => 'wrapit',
+                                     -into => 'My::Import::Target',
+                                     -class => '-target'} ) },
+        'construct' );
+    ref_ok( *My::Import::Target::wrapit{CODE}, 'CODE', 'found constructor' );
+    isa_ok( My::Import::Target::wrapit({}), ['My::Import::Target::wrapit'], 'class' );
+};
 
 done_testing;

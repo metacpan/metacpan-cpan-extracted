@@ -7,8 +7,8 @@ use FileHandle;
 use FindBin qw($Bin);
 use lib "$Bin/../blib/lib","$Bin/../blib/arch","$Bin/../lib";
 use constant FONT=>"$Bin/test_data/Generic.ttf";
-use constant IMAGE_TESTS => 7;
-use Test::More tests => 14;
+use constant IMAGE_TESTS => 8;
+use Test::More tests => IMAGE_TESTS + 7;
 use IO::Dir;
 
 use_ok('GD',':DEFAULT',':cmp');
@@ -247,6 +247,18 @@ sub test7 {
   return $im;
 }
 
+sub test8 {
+    my $im = test4();
+    $im = $im->copyRotate90();
+    $im = $im->copyFlipHorizontal();
+    $im = $im->copyTranspose();
+    $im->rotate180();
+    $im->flipVertical();
+    $im = $im->copyReverseTranspose();
+    $im = $im->copyFlipVertical();
+    return $im;
+}
+
 sub run_image_regression_tests {
     my $default_image_type = 'gd2';
     if (!GD::Image->can("newFromGd2") || GD::LIBGD_VERSION() >= 2.0302) {
@@ -302,10 +314,13 @@ sub run_round_trip_test {
 }
 
 sub catch_libgd_error {
-    diag("ignore corrupt png error messages...");
+  diag("ignore corrupt png error messages...");
+  SKIP: {
+    skip "No PNG support", 2 unless defined &GD::Image::newFromPng;
     my $image = eval { GD::Image->newFromPng("test_data/images/corrupt.png") };
     is($image, undef);
     ok($@, 'caught corrupt png');
+  }
 }
 
 sub test_cve2019_6977 {

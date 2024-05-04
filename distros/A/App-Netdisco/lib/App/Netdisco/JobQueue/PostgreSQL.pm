@@ -336,14 +336,14 @@ sub jq_insert {
   my $jobs = shift;
   $jobs = [$jobs] if ref [] ne ref $jobs;
 
-  # bit of a hack for heroku hosting to avoid DB overload
-  return true if setting('defanged_admin') ne 'admin';
-
   my $happy = false;
   try {
     schema(vars->{'tenant'})->txn_do(sub {
       if (scalar @$jobs == 1 and defined $jobs->[0]->{device} and
           scalar grep {$_ eq $jobs->[0]->{action}} @{ setting('_inline_actions') || [] }) {
+
+          # bit of a hack for heroku hosting to avoid DB overload
+          return true if setting('defanged_admin') ne 'admin';
 
           my $spec = $jobs->[0];
           my $row = undef;

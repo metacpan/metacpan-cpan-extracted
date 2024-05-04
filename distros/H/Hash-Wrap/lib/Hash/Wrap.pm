@@ -11,7 +11,7 @@ use warnings;
 
 use Scalar::Util;
 use Digest::MD5;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 our @EXPORT = qw[ wrap_hash ];
 
@@ -136,7 +136,6 @@ sub _can {
 
 sub import {
     shift;
-    my $caller = caller;
 
     my @imports = @_;
     push @imports, @EXPORT unless @imports;
@@ -168,8 +167,11 @@ sub import {
 
         $DEBUG = $ENV{HASH_WRAP_DEBUG} // delete $args->{-debug};
 
+        # -as may be explicitly 'undef' to indicate use in a standalone class
         $args->{-as} = 'wrap_hash' unless exists $args->{-as};
         my $name = delete $args->{-as};
+
+        my $target = delete $args->{-into} // caller;
 
         if ( defined $name ) {
 
@@ -196,15 +198,15 @@ sub import {
         if ( $args->{-base} ) {
             _croak( "don't use -as => -return with -base" )
               if $args->{-as_return};
-            $args->{-class} = $caller;
+            $args->{-class} = $target;
             $args->{-new}   = 1 unless !!$args->{-new};
-            _build_class( $caller, $name, $args );
+            _build_class( $target, $name, $args );
         }
 
         else {
-            _build_class( $caller, $name, $args );
+            _build_class( $target, $name, $args );
             if ( defined $name ) {
-                my $sub = _build_constructor( $caller, $name, $args );
+                my $sub = _build_constructor( $target, $name, $args );
                 push @return, $sub if $args->{-as_return};
             }
         }
@@ -226,7 +228,7 @@ sub import {
 }
 
 sub _build_class {
-    my ( $caller, $name, $attr ) = @_;
+    my ( $target, $name, $attr ) = @_;
 
     # in case we're called inside a recursion and the recurse count
     # has hit zero, default behavior is no recurse, so remove it so
@@ -249,10 +251,10 @@ sub _build_class {
           Digest::MD5::md5_hex( @class );
     }
 
-    elsif ( $attr->{-class} eq '-caller' ) {
-        _croak( "can't set -class => '-caller' if -as is not a plain string" )
+    elsif ( $attr->{-class} eq '-target' || $attr->{-class} eq '-caller' ) {
+        _croak( "can't set -class => '@{[ $attr->{-class} ]}' if '-as' is not a plain string" )
           if ref $name;
-        $attr->{-class} = $caller . '::' . $name;
+        $attr->{-class} = $target . '::' . $name;
     }
 
     my $class = $attr->{-class};
@@ -729,7 +731,7 @@ Hash::Wrap - create on-the-fly objects from hashes
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 SYNOPSIS
 
@@ -858,7 +860,7 @@ except via the imported constructor subroutine:
 or, if you want it to reflect the current package, try this:
 
   package Foo;
-  use Hash::Wrap { -class => '-caller', -as => 'wrapit' };
+  use Hash::Wrap { -class => '-target', -as => 'wrapit' };
 
   my $h = wrapit { a => 1 };
   $h->isa( 'Foo::wrapit' );  # returns true
@@ -967,6 +969,16 @@ However,
    refaddr( $wrap->{a} ) != refaddr( $hash{a} );
    refaddr( $wrap->{a} ) == refaddr( $wrap->a );
 
+=head3 Importing into an alternative package
+
+Normally the constructor is installed into the package importing C<Hash::Wrap>.
+The C<-into> option can change that:
+
+   package This::Package;
+   use Hash::Wrap { -into => 'Other::Package' };
+
+will install B<Other::Package::wrap_hash>.
+
 =head1 OPTIONS
 
 B<Hash::Wrap> works at import time.  To modify its behavior pass it
@@ -1063,6 +1075,11 @@ which attributes are allowed, I<in addition to existing attributes>.
 The attribute's values are not locked.  Note that this locks the
 underlying hash.
 
+=item C<-into> => I<package name>
+
+The name of the package in which to install the constructor.  By default
+it's that of the caller.
+
 =back
 
 =head2 Accessors
@@ -1139,11 +1156,12 @@ A class with the given name will be created and new objects will be
 blessed into the specified class by the constructor subroutine.  The
 new class will not have a constructor method.
 
-If I<class name> is the string C<-caller>, then the class name is
-set to the fully qualified name of the constructor, e.g.
+If I<class name> is the string C<-target> (or, deprecated,
+C<-caller>), then the class name is set to the fully qualified name of
+the constructor, e.g.
 
   package Foo;
-  use Hash::Wrap { -class => '-caller', -as => 'wrap_it' };
+  use Hash::Wrap { -class => '-target', -as => 'wrap_it' };
 
 results in a class name of C<Foo::wrap_it>.
 

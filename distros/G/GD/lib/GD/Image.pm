@@ -5,7 +5,7 @@ use strict;
 use GD;
 use Symbol 'gensym','qualify_to_ref';
 use vars '$VERSION';
-$VERSION = '2.79';
+$VERSION = '2.81';
 
 =head1 NAME
 
@@ -118,17 +118,25 @@ sub new {
       return $pack->$method($_[0]);
     } elsif (-f $_[0] and $_[0] =~ /\.gd$/) {
       my $type = 'Gd';
-      my $method = "newFrom${type}Data";
+      return unless my $fh = $pack->_make_filehandle($_[0]);
+      my $method = "newFrom${type}";
       return unless $pack->can($method);
-      return $pack->$method($_[0]);
+      return $pack->$method($fh);
     } elsif (-f $_[0] and $_[0] =~ /\.gd2$/) {
       my $type = 'Gd2';
-      my $method = "newFrom${type}Data";
+      return unless my $fh = $pack->_make_filehandle($_[0]);
+      my $method = "newFrom${type}";
       return unless $pack->can($method);
-      return $pack->$method($_[0]);
+      return $pack->$method($fh);
     } elsif (-f $_[0] and $_[0] =~ /\.wbmp$/) {
-      my $type = 'Wbmp';
-      my $method = "newFrom${type}Data";
+      my $type = 'WBMP';
+      return unless my $fh = $pack->_make_filehandle($_[0]);
+      my $method = "newFrom${type}";
+      return unless $pack->can($method);
+      return $pack->$method($fh);
+    } elsif (-f $_[0] and $_[0] =~ /\.xpm$/) {
+      my $type = 'Xpm';
+      my $method = "newFrom${type}";
       return unless $pack->can($method);
       return $pack->$method($_[0]);
     }
@@ -138,7 +146,11 @@ sub new {
     return unless my $type = _image_type($magic);
     seek($fh,0,0);
     my $method = "newFrom${type}";
-    return $pack->$method($fh);
+    if ($type eq 'Xpm') {
+      return $pack->$method($_[0]);
+    } else {
+      return $pack->$method($fh);
+    }
   }
   return $pack->_new(@_);
 }

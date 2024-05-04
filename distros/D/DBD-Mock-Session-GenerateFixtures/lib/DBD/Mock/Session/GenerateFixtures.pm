@@ -17,7 +17,7 @@ use File::Spec;
 use Readonly;
 use Data::Walk;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 our $override;
 my $JSON_OBJ = Cpanel::JSON::XS->new()->utf8->pretty();
@@ -761,6 +761,14 @@ Writes the current results to the fixture file if override flag is set.
 =head2 _set_hashref_response($sth, $retval)
 
 Sets the response for hash references fetched from the database.
+
+=head1 Support
+
+Bugs should be reported via the CPAN bug tracker at
+
+https://rt.cpan.org/Public/Bug/Report.html?Queue=DBD-Mock-Session-GenerateFixtures
+
+For other issues, contact the author.
 
 =head1 REPOSITORY
 

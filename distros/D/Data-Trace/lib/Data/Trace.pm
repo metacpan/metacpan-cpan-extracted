@@ -7,9 +7,13 @@ use warnings;
 use FindBin();
 use lib $FindBin::RealBin;
 
-use Data::Tie::Watch;     # Tie::Watch copy.
-use Data::DPath;          # All refs in a struct.
-use Carp qw(longmess);    # Stack trace.
+use Data::Tie::Watch;    # Tie::Watch copy.
+use Data::DPath;         # All refs in a struct.
+use Carp();
+use Storable();
+use feature qw( say );
+
+our @TIED_NODES;
 
 =head1 NAME
 
@@ -17,7 +21,7 @@ Data::Trace - Trace when a data structure gets updated.
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 
@@ -41,6 +45,22 @@ its been changed, but this module is without Moose support.
 
 =head1 SUBROUTINES/METHODS
 
+=cut
+
+sub import {
+    my $orig = \&Storable::dclone;
+
+    no warnings "redefine";
+
+    *Storable::dclone = sub ($) {
+        my @nodes = __PACKAGE__->_UnTieNodes();
+        my $data  = $orig->( @_ );
+        __PACKAGE__->_TieNodes( \@nodes );
+
+        $data;
+    };
+}
+
 =head2 Trace
 
  Data::Trace->Trace( \$scalar );
@@ -51,31 +71,102 @@ its been changed, but this module is without Moose support.
 =cut
 
 sub Trace {
+    shift->_TieNodes( @_ );
+}
+
+sub _TieNodes {
     my ( $self, $data ) = @_;
 
     if ( not ref $data ) {
         die "Error: data must be a reference!";
     }
 
-    my @nodes = grep { ref } Data::DPath->match( $data, "//" );
+    @TIED_NODES = grep { ref } Data::DPath->match( $data, "//" );
 
-    for my $node ( @nodes ) {
+    my %args = $self->_DefineWatchArgs();
 
-        # print "Tying: $node\n";
-        Data::Tie::Watch->new(
+    for my $node ( @TIED_NODES ) {
+        $node = Data::Tie::Watch->new(
             -variable => $node,
-            -store    => sub {
-                my ( $self, $v ) = @_;
-                $self->Store( $v );
-                print "Storing here:" . longmess();
-            },
-            -delete    => sub {
-                my ( $self, $v ) = @_;
-                $self->Store( $v );
-                print "Deleting here:" . longmess();
-            },
+            %args,
         );
     }
+
+    \@TIED_NODES;
+}
+
+sub _UnTieNodes {
+    my ( $self ) = @_;
+    return if not @TIED_NODES;
+
+    for my $node ( @TIED_NODES ) {
+        $node->Unwatch();
+    }
+
+    splice @TIED_NODES;
+}
+
+sub _DefineWatchArgs {
+    my @methods = qw(
+      store
+      clear
+      delete
+      extend
+      pop
+      push
+      shift
+      splice
+      unshift
+    );
+
+    my %args;
+
+    for my $name ( @methods ) {
+        $args{"-$name"} = sub {
+            my ( $_self, @_args ) = @_;
+            my $method = ucfirst $name;
+            __PACKAGE__->_Trace( "\U$name\Eing here" );
+            $_self->$method( @_args );
+        };
+    }
+
+    %args;
+}
+
+sub _Trace {
+    my ( $class, $message ) = @_;
+    $message //= '';
+
+    $Carp::MaxArgNums = -1;
+
+    say for "$message:", map { "\t$_" }
+      grep {
+        !m{
+                ^ \s* (?:
+                      Class::MOP
+                    | [\w_:]+ :: _wrapped_ \w+
+                    | $class
+                    | Data::Tie::Watch::callback
+                    | Mojolicious
+                    | Mojo
+                    | Try::Tiny
+                    | eval
+                ) \b
+
+                |
+
+                (?:
+                      Try/Tiny
+                    | Mojolicious
+                    | Mojolicious/Controller
+                )
+                \.pm \s+ line
+
+            }x
+      }
+      map { s/^\s+//r }
+      split /\n/,
+      Carp::longmess( $class );
 }
 
 =head1 AUTHOR

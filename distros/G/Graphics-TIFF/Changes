@@ -1,5 +1,8 @@
 Revision history for Perl extension Graphics::TIFF.
 
+21  Sat, 4 May 2024 00:00 +0000
+        - Removed unused variables. Thanks to Petr Pisar for the patch.
+
 20  Wed, 7 Jun 2023 00:00 +0000
         - Add TIFFTAG_XPOSITION and TIFFTAG_YPOSITION
           Closes RT #148337 (t/1.t fails with ImageMagick-7.1.1.8: Failed test 'tiffcmp')

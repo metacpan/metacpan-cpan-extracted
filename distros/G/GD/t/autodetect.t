@@ -43,16 +43,21 @@ SKIP: {
 }
 SKIP: {
   skip "No HEIF support", 1 unless defined &GD::Image::newFromHeif;
-  my $heif = GD::Image->new("t/test_data/tile.heif");
-  ok defined($heif), "heif detected";
+  my $heif;
+  eval { $heif = GD::Image->new("t/test_data/tile.heif") };
+  if (!$heif and $@ =~ /gdImageCreateFromHeif error/) {
+    ok 1, "Warning: heif support disabled in libgd";
+  } else {
+    ok defined($heif), "heif detected";
+  }
 }
 SKIP: {
   skip "No WEBP support", 1 unless defined &GD::Image::newFromWebp;
   my $webp = GD::Image->new("t/test_data/tile.webp");
   ok defined($webp), "webp detected";
-  }
+}
 SKIP: {
-  skip "No WBMP support", 1 unless defined &GD::Image::newFromWbmp;
+  skip "No WBMP support", 1 unless defined &GD::Image::newFromWBMP;
   my $wbmp = GD::Image->new("t/test_data/tile.wbmp");
   ok defined($wbmp), "wbmp detected";
 }

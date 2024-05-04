@@ -1,5 +1,15 @@
 Revision history for Hash-Wrap
 
+1.02      2024-05-03 13:21:48-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * new option '-into', allowing installation of the constructor in
+      a package other than that of the caller's.
+
+    * the '-class' option now prefers '-target' over '-caller',
+      but still accepts the latter.
+
 1.01      2024-03-01 10:48:51-05:00 America/New_York
 
   [TESTS]

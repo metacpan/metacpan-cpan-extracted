@@ -1,5 +1,7 @@
+Changes
 DBD-Mock-Session-GenerateFixtures-0.01.tar.gz
 DBD-Mock-Session-GenerateFixtures-0.02.tar.gz
+DBD-Mock-Session-GenerateFixtures-0.03.tar.gz
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm

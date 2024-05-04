@@ -286,7 +286,7 @@ tiff_GetField (tif, tag)
                 uint64_t        *aui;
                 float           f;
                 float           *af;
-                int             vector_length, nvals;
+                int             nvals;
         PPCODE:
 /* See http://www.libtiff.org/man/TIFFGetField.3t.html */
                 switch (tag) {
@@ -409,7 +409,6 @@ tiff_GetFieldDefaulted (tif, tag)
                 uint32_t        ui32;
                 uint64_t        *aui;
                 float           f;
-                int             vector_length;
         PPCODE:
                 switch (tag) {
                     /* byte single uint8 */

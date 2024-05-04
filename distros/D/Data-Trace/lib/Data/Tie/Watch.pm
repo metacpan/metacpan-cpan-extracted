@@ -130,7 +130,7 @@ arrays and hashes.  When the watchpoint is created the parallel shadow
 variable is initialized with the watched variable's contents, and when
 the watchpoint is deleted the shadow variable is copied to the original
 variable.  Thus, changes made during the watch process are not lost.
-Shadowing is on my default.  If you disable shadowing any changes made
+Shadowing is on by default.  If you disable shadowing any changes made
 to an array or hash are lost when the watchpoint is deleted.
 
 Specify any of the following relevant callback parameters, in the

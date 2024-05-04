@@ -254,7 +254,7 @@ if( defined($options) )
   $RAQM      = $options =~ m/RAQM/i;
   $HEIF      = $options =~ m/HEIF/i;
   $AVIF      = $options =~ m/AVIF/i;
-  $BMP       = $options =~ m/WINDOWS_BMP/i;
+  $BMP       = $options =~ m/WINDOWS_BMP/i || $options =~ m/\WBMP\W/;
   $GIFANIM   = $GIF && $options =~ m/GIFANIM/i;
   $VERSION_33= $options =~ m/VERSION_33/i; # i.e. 2.0.33 or higher
   $UNCLOSEDPOLY  = $options =~ m/UNCLOSEDPOLY/i;
@@ -603,8 +603,9 @@ sub try_to_autoconfigure {
         $features .= ' GD_HEIF' if $private =~ / libheif/;
         $features .= ' GD_AVIF' if $private =~ / libavif/;
       } else {
+        warn "gdlib.pc not found, guessing the features.\n";
         $features = 'GD_GIF GD_OPENPOLYGON GD_ZLIB GD_PNG GD_FREETYPE GD_FONTCONFIG GD_JPEG GD_XPM GD_TIFF GD_WEBP';
-        #$features .= 'GD_WEBP' if $version ge '2.3.0';;
+        #$features .= 'GD_WEBP' if $version ge '2.3.0';
         $features .= ' GD_AVIF' if $version ge '2.3.2';
         $features .= ' GD_HEIF' if $version ge '2.3.3' and $^O ne 'darwin';
       }
@@ -668,6 +669,13 @@ sub try_to_autoconfigure {
             || ($release == 2 && $major == 3 && $minor >= 3))) {
       $HEIF = 1;
     }
+  } else {
+    my ($release, $major, $minor) = $version =~ /^(\d+)\.(\d+)\.(\d+)/;
+    $options     .= " GD_UNCLOSEDPOLY GD_FTCIRCLE VERSION_33"
+      if defined($minor)
+      && ($release > 2
+          || ($release == 2 && $major > 0)
+          || ($release == 2 && $major == 0 && $minor >= 33));
   }
 
   if ($config) {

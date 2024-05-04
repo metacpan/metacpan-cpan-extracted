@@ -1,5 +1,5 @@
 ---
-abstract: ~
+abstract: 'This distribution generates fixtures for DBD-Mock-Session module'
 author:
   - 'Dragos Trif <drd.trif@gmail.com>'
 build_requires:
@@ -35,4 +35,5 @@ requires:
   Sub::Override: '0.10'
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.03
+  repository: https://github.com/DragosTrif/DBD-Fixtures
+version: 0.04

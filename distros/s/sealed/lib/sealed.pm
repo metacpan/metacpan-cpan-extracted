@@ -20,7 +20,7 @@ our $VERSION;
 our $DEBUG;
 
 BEGIN {
-  our $VERSION = qv(6.0.5);
+  our $VERSION = qv(6.0.6);
   XSLoader::load("sealed", $VERSION);
 }
 
@@ -91,7 +91,7 @@ sub tweak ($\@\@\@$$\%) {
           my $padix = $gv->padix;
           _padname_add($cv_obj->PADLIST, $padix);
           my (undef, @p)         = $cv_obj->PADLIST->ARRAY;
-          $pads = [ map $_->object_2svref, @p ];
+          $pads = [ map defined ? $_->object_2svref : $_, @p ];
           $$pads[--$idx][$padix] = $method;
           $$pads[$idx][$targ]   .= ":compiled";
         }

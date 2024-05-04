@@ -1,6 +1,9 @@
 use inc::Module::Install;
 
 name 'DBD-Mock-Session-GenerateFixtures';
+abstract 'This distribution generates fixtures for DBD-Mock-Session module';
+repository 'https://github.com/DragosTrif/DBD-Fixtures';
+
 all_from 'lib/DBD/Mock/Session/GenerateFixtures.pm';
 version_from 'lib/DBD/Mock/Session/GenerateFixtures.pm';
 
