@@ -364,7 +364,6 @@ sub __add_where_stmt {
     my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $bu_stmt_types = [ @{$sf->{d}{stmt_types}} ];
     $sf->{d}{stmt_types} = [ 'Select' ]; # to see what is happening
-    my $table = $data->[$idx_tbl]{table};
     my $qt_table = $data->[$idx_tbl]{qt_table};
     my $qt_columns = $data->[$idx_tbl]{qt_columns};
     my $tmp_sql = {};
@@ -386,7 +385,6 @@ sub __parentheses {
     my ( $sf, $sql, $data ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my @idx_changed_tables;
     my $old_idx_tbl = 0;
 

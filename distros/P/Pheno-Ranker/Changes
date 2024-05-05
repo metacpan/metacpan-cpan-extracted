@@ -1,8 +1,16 @@
 Revision history for Perl distribution Pheno-Ranker
 
-0.08 2024-XX-XXT00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+0.09 2024-05-04T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
- - Added UTF-8 support in csv2pheno-ranker
+ - Enhanced the csv2pheno-ranker's guessing mechanism for array fields; now evaluates all rows instead of just the first one
+ - New module added: lib/Pheno/Ranker/Graph.pm
+ - Introduced a new command-line option '--cytoscape-json' to generate graphs compatible with Cytoscape
+ - Added a new option '--graph-stats' to compute basic statistics using the Graph CPAN module
+ - Updated cpanfile to include the Graph module
+
+0.08 2024-04-24T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Added Unicode support to csv2pheno-ranker
  - Introduced --array-separator option in csv2pheno-ranker with default '\|'
  - Fixed option --age to be used with BFF/PXF formats only
 
@@ -17,7 +25,6 @@ Revision history for Perl distribution Pheno-Ranker
 
  - Renamed --primary-key to --primary-key-name and --set-primary-key to --generate-primary-key
    in csv2pheno_ranker for clarity
- - Updated docs
  - Changed from perl:5.36-bullseye to perl:stable-bullseye in Dockerfile
  - Excluded 'NA', 'NaN', undef, {}, and [] from coverage_stats counts
  - Froze a few modules in requirements.txt

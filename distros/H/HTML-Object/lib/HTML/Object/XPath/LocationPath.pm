@@ -35,10 +35,10 @@ sub new
 sub as_string
 {
     my $self = shift( @_ );
-    my $string;
+    my $string = '';
     for( my $i = 0; $i < @$self; $i++ )
     {
-        $string .= $self->[ $i ]->as_string;
+        $string .= ( $self->[ $i ]->as_string // '' );
         $string .= '/' if( $self->[ $i + 1 ] );
     }
     return( $string );
@@ -63,10 +63,6 @@ sub evaluate
     # context _MUST_ be a single node
     my $context = shift( @_ );
     die( "No context" ) unless( $context );
-    if( $self->debug )
-    {
-        my( $p, $f, $l ) = caller;
-    }
     
     # I _think_ this is how it should work :)
     my $nodeset = $self->new_nodeset();
@@ -94,7 +90,6 @@ sub push
     my $self = shift( @_ );
     if( $self->debug )
     {
-        my( $p, $f, $l ) = caller;
         for( @_ )
         {
             if( ref( $_ ) eq ref( $self ) )

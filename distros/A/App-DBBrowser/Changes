@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.410  2024-05-04
+        - Derived table/Cte: bugfix in 'choose_query'.
+        - Bugfix in 'Operators.pm'.
+        - Refactoring and cleanup.
+        - SQLite does not have the operators ANY and ALL.
+        - Term::Choose minimum version 1.765.
+
 2.409  2024-04-28
         - SQLite plugin: new option to set the busy timeout.
         - SQLite: Renamed and modified the user defined scalar function 'truncate'.

@@ -43,7 +43,7 @@ sub __choose_drop_item {
         my $info = $sf->{d}{db_string};
         my $prompt = sprintf 'No user %ss.', $type;
         #my $prompt = sprintf 'No %ss.', $type;
-        my $table = $tc->choose(
+        $tc->choose(
             [ undef ],
             { info => $info, prompt => $prompt, undef => '<<' }
         );

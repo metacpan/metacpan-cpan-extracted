@@ -133,6 +133,7 @@ sub dispatchEvent
         $event->currentTarget( $node );
         $node->handleEvent( $event ) || do
         {
+            warn( "Error handling event: ", $node->error ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
         };
         if( $can_cancel && $event->cancelled )
         {
@@ -158,6 +159,7 @@ sub dispatchEvent
         $event->currentTarget( $node );
         $node->handleEvent( $event ) || do
         {
+            warn( "Error handling event: ", $node->error ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
         };
         if( $can_cancel && $event->cancelled )
         {
@@ -263,7 +265,7 @@ sub handleEvent
             #     message => "The handler for the event listener of type '$type' is not a code reference.",
             #     class => 'HTML::Object::TypeError',
             # }) );
-            warnings::warn( "Warning only: the handler for the event listener of type '$type' is not a code reference.\n" ) if( warnings::enabled( 'HTML::Object' ) );
+            warn( "Warning only: the handler for the event listener of type '$type' is not a code reference." ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
             next;
         }
         local $_ = $self;

@@ -1,0 +1,6 @@
+// Optional trailing commas
+
+[
+    [ 1, 2, 3, ] 
+    { color:red, align:left, }
+]

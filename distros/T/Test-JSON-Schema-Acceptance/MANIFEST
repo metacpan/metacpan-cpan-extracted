@@ -152,6 +152,7 @@ share/tests/draft-next/oneOf.json
 share/tests/draft-next/optional/anchor.json
 share/tests/draft-next/optional/bignum.json
 share/tests/draft-next/optional/dependencies-compatibility.json
+share/tests/draft-next/optional/dynamicRef.json
 share/tests/draft-next/optional/ecmascript-regex.json
 share/tests/draft-next/optional/float-overflow.json
 share/tests/draft-next/optional/format-assertion.json
@@ -313,6 +314,7 @@ share/tests/draft2020-12/optional/anchor.json
 share/tests/draft2020-12/optional/bignum.json
 share/tests/draft2020-12/optional/cross-draft.json
 share/tests/draft2020-12/optional/dependencies-compatibility.json
+share/tests/draft2020-12/optional/dynamicRef.json
 share/tests/draft2020-12/optional/ecmascript-regex.json
 share/tests/draft2020-12/optional/float-overflow.json
 share/tests/draft2020-12/optional/format-assertion.json

@@ -211,7 +211,7 @@ sub baseURI : lvalue { return( shift->_set_get_callback({
         return( $self->new_null ) if( !$root );
         return( $self->new_null ) if( !$root->can( 'uri' ) );
         return( $root->uri ) if( $root->uri );
-        my $nodes = $self->find( 'base' );
+        my $nodes = $self->findNode( 'base' );
         return( $self->new_null ) if( $nodes->is_empty );
         my $node = $nodes->first;
         return( $self->new_null ) if( !$node );
@@ -226,12 +226,12 @@ sub baseURI : lvalue { return( shift->_set_get_callback({
         my $uri  = shift( @_ );
         my $root = $self->root;
         return( $self->new_null ) if( !$root );
-        my $nodes = $root->find( 'base' );
+        my $nodes = $root->findNode( 'base' );
         my $base;
         if( $nodes->is_empty )
         {
             $base = $root->createElement( 'base' ) || return( $self->error( $root->pass_error ) );
-            my $head = $root->find( 'head' )->first ||
+            my $head = $root->findNode( 'head' )->first ||
                 return( $self->error( "No base uri can be set, because there is no head element in this document." ) );
             $head->appendChild( $base );
         }
@@ -352,6 +352,7 @@ sub compareDocumentPosition
         }
         else
         {
+            # Nodes share the same parent, and thus are siblings
         }
     }
     elsif( defined( $parent_pos ) )
@@ -365,6 +366,7 @@ sub compareDocumentPosition
     # Otherwise neither our parent or the other's parent is in either lineage
     else
     {
+        # Neither our parent, nor the other's parent is in either lineage.
     }
     
     if( $lineage->intersection( $lineage2 )->is_empty &&
@@ -374,6 +376,7 @@ sub compareDocumentPosition
     }
     else
     {
+        # Our lineage or the other or both lineages intersect
     }
     # Check for the other node in:
     # 1) ancestor
@@ -515,7 +518,17 @@ sub contains
 
 # Takes a selector; or
 # Element object
-sub find
+# We alias find to findNode(), because find(9 get redefined by HTML::Object::XQuery and
+# we need internally to continue to rely on this method
+sub find { return( shift->findNode( @_ ) ); }
+
+sub find_xpath
+{
+    my( $self, $path ) = @_;
+    return( $self->xp->find( $path, $self ) );
+}
+
+sub findNode
 {
     my $self = shift( @_ );
     my $this = shift( @_ );
@@ -593,12 +606,6 @@ sub find
         }
     }
     return( $results );
-}
-
-sub find_xpath
-{
-    my( $self, $path ) = @_;
-    return( $self->xp->find( $path, $self ) );
 }
 
 sub findnodes
@@ -1760,13 +1767,17 @@ See L<HTML::Object::EventTarget/dispatchEvent> for more information.
 
 =head2 find
 
-Provided with an node object or a selector and this will search throughout the current node hierarchy using the XPath expression provided.
-
-It returns an L<array object|Module::Generic::Array> of the nodes found.
+This is an alias for L</findNode>
 
 =head2 find_xpath
 
 Provided with an XPath expression and this will perform a search using the current node as the context.
+
+=head2 findNode
+
+Provided with an node object or a selector and this will search throughout the current node hierarchy using the XPath expression provided.
+
+It returns an L<array object|Module::Generic::Array> of the nodes found.
 
 =head2 findnodes
 

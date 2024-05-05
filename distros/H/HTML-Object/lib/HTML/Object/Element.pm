@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Element.pm
-## Version v0.2.8
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.2.9
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/25
-## Modified 2024/04/20
+## Modified 2024/04/30
 ## All rights reserved
 ## 
 ## 
@@ -34,7 +34,7 @@ BEGIN
     our $LOOK_LIKE_HTML = qr/^[[:blank:]\h]*\<\w+.*?\>/;
     our $LOOK_LIKE_IT_HAS_HTML = qr/\<\w+.*?\>/;
     our $ATTRIBUTE_NAME_RE = qr/\w[\w\-]*/;
-    our $VERSION = 'v0.2.8';
+    our $VERSION = 'v0.2.9';
 };
 
 use strict;
@@ -394,7 +394,6 @@ sub attr
 
 sub attributes { return( shift->reset(@_)->_set_get_hash_as_mix_object( 'attr', @_ ) ); }
 
-# sub attributes_sequence { return( shift->_set_get_array_as_object( 'attr_seq', @_ ) ); }
 sub attributes_sequence
 {
     my $self = shift( @_ );
@@ -510,6 +509,7 @@ sub delete
     $self->delete_content;
     $self->detach;
     %$self = ();
+    return;
 }
 
 # Note: HTML::Element compatibility
@@ -619,7 +619,7 @@ sub dump
 
 sub eid { return( shift->{eid} ); }
 
-# Returns self, but is overriden in HTML::Object::Result
+# Returns self, but is overriden in HTML::Object::Collection
 # See <https://api.jquery.com/end/#end>
 sub end { return( shift( @_ ) ); }
 
@@ -1118,6 +1118,8 @@ sub new_text
     return( $e );
 }
 
+# TODO: next()
+
 # Note: HTML::Element compatibility
 sub normalize_content
 {
@@ -1131,7 +1133,7 @@ sub normalize_content
             ( defined( $_ ) && $self->_is_a( $_ => 'HTML::Object::Space' ) && defined( $prev ) && $self->_is_a( $prev => 'HTML::Object::Space' ) ) )
         {
             $prev->value->append( $_->value );
-            next;
+            return(1);
         }
         $prev = $_;
         $new->push( $_ );
@@ -1139,8 +1141,6 @@ sub normalize_content
     $self->children( $new );
     return( $self );
 }
-
-# TODO: next()
 
 sub offset { return( shift->reset(@_)->_set_get_number_as_object( 'offset', @_ ) ); }
 
@@ -1283,7 +1283,6 @@ sub right
     return( $self->new_array ) if( !defined( $pos ) || $offset < $pos );
     return( $self->new_array ) if( $kids->length == 1 );
     # my $results = $kids->offset( $pos + 1, ( $offset - $pos ) );
-    # return( $results );
     return( $kids->offset( $pos + 1, ( $offset - $pos ) ) );
 }
 
@@ -1647,7 +1646,7 @@ HTML::Object::Element - HTML Element Object
 
 =head1 VERSION
 
-    v0.2.8
+    v0.2.9
 
 =head1 DESCRIPTION
 

@@ -37,7 +37,7 @@
    "provides" : {
       "Carp::Object" : {
          "file" : "lib/Carp/Object.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "url" : "https://github.com/damil/Carp-Object"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

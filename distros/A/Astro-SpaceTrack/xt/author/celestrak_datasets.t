@@ -24,14 +24,7 @@ my %got = parse_string( $rslt->content(), source => 'celestrak' );
 
 my $st = Astro::SpaceTrack->new();
 
-(undef, my $names) = $st->names( 'celestrak' );
-my %expect;
-foreach (@$names) {
-    $expect{$_->[1]} = {
-	name => $_->[0],
-	ignore => 0,
-    };
-}
+my %expect = %{ $st->__catalog( 'celestrak' ) };
 
 =begin comment
 
@@ -59,27 +52,28 @@ $expect{'2019-006'} = {
 };
 
 # Removed October 23, 2008
-
 $expect{'usa-193-debris'} = {
     name => 'USA 193 Debris',
     note => 'Not actually provided as a fetchable data set.',
     ignore => 1,
 };
 
-=end comment
-
-=cut
-
+# Keys relocated to Astro::SpaceTrack April 26 2024.
 $expect{'2012-044'} = {
     name => 'BREEZE-M R/B Breakup (2012-044C)',
     note => 'Fetchable as of November 16 2021, but not on web page',
     ignore => 1,
 };
 
+# Removed April 26 2024
 if ($expect{sts}) {
     $expect{sts}{note} = 'Only available when a mission is in progress.';
     $expect{sts}{ignore} = 1;	# What it says.
 }
+
+=end comment
+
+=cut
 
 foreach my $key (sort keys %expect) {
     if ($expect{$key}{ignore}) {
@@ -161,11 +155,12 @@ sub parse_string {
 	my $href = $anchor->attr( 'href' )
 	    or next;
 
-	# Exclude pre-launch data sets, which are ephemeral.
+	# Exclude pre-launch and post-deployment data sets, which are
+	# ephemeral.
 	my $parent = $anchor->parent();
 	my @sibs = $parent->content_list();
 	not ref $sibs[0]
-	    and $sibs[0] =~ m/ \b pre-launch \b /smxi
+	    and $sibs[0] =~ m/ \b (?: pre-launch | post-deployment ) \b /smxi
 	    and next;
 
 	if ( $href =~ m/ \b (?: sup- )? gp\.php \b /smx ) {

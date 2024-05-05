@@ -105,7 +105,7 @@ sub write_json {
     my $file      = $arg->{filepath};
     my $json_data = $arg->{data};
 
-    # Note that canonical DOES not match the order of nsort from Sort:.Naturally
+    # Note that canonical DOES not match the order of nsort from Sort::Naturally
     my $json = JSON::XS->new->utf8->canonical->pretty->encode($json_data);
     path($file)->spew($json);
     return 1;

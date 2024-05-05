@@ -1,0 +1,6 @@
+// Multi-Line (Block) Comments
+
+/* This is an RJSON file */
+[ one two /* a comment */ three ] /* This is an array of numbers with a comment inside. */
+/* Thanks for
+   viewing! */

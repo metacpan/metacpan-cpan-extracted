@@ -124,7 +124,7 @@ sub detach_db {
     if ( ! %$attached_db ) {
         my $info = $sf->{d}{db_string};
         my $prompt = 'No attached databases.';
-        my $table = $tc->choose(
+        $tc->choose(
             [ undef ],
             { info => $info, prompt => $prompt, undef => '<<' }
         );

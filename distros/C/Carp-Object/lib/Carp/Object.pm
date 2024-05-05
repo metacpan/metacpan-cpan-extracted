@@ -7,7 +7,7 @@ use Devel::StackTrace;
 use Module::Load qw/load/;
 use Clone        qw/clone/;
 
-our $VERSION = 1.01;
+our $VERSION = 1.02;
 
 my %export_groups = (carp => [qw/carp croak confess/],
                      all  => [qw/carp croak confess cluck/],  );
@@ -25,7 +25,7 @@ sub new {
   # class for stack traces
   $self->{stacktrace_class} = delete $args{stacktrace_class} // 'Devel::StackTrace';
 
-  # if there is a 'clan' argument, compute a frame filter -- see L<Devel::StackFrame/frame_filter>
+  # if there is a 'clan' argument, compute a frame filter -- see L<Devel::StackTrace/frame_filter>
   if (my $clan = delete $args{clan}) {
     not $args{frame_filter} or $class->new->croak("can't have arg 'clan' if arg 'frame_filter' is present");
     $args{frame_filter} = sub {my $raw_frame_ref = shift;
@@ -44,7 +44,7 @@ sub new {
   $args{ignore_class} = $ignore_class;
 
   # remaining args will be passed to Devel::StackTrace->new
-  $args{message} //= ''; # to avoid the 'Trace begun' string from StackFrame::Frame::as_string
+  $args{message} //= ''; # to avoid the 'Trace begun' string from StackTrace::Frame::as_string
   $args{indent}  //= 1;
   $self->{stacktrace_args} = \%args;
 
@@ -84,7 +84,7 @@ sub msg {
 
   # complete the original $errstr with frame descriptions
   if (my $first_frame = shift @frames) {
-    my $p    = $self->{display_frame_param};                   # see L<Devel::StackFrame/as_string>
+    my $p    = $self->{display_frame_param};                   # see L<Devel::StackTrace/as_string>
     $errstr .= $self->{display_frame}->($first_frame, 1, $p);  # 1 means "is first"
     $errstr .= $self->{display_frame}->($_, undef, $p)  foreach @frames;
   }
@@ -309,8 +309,8 @@ with an object-oriented implementation that offers more tuning options,
 and also supports errors raised as Exception objects.
 
 Unlike L<Carp> or L<Carp::Clan>, where the presentation of stack frames is hard-coded, 
-here it is delegated to L<Devel::StackFrame>. This means that clients can also
-take advantage of options in L<Devel::StackFrame> to tune the output -- or even replace it by
+here it is delegated to L<Devel::StackTrace>. This means that clients can also
+take advantage of options in L<Devel::StackTrace> to tune the output -- or even replace it by
 another class.
 
 Clients can choose between the object-oriented API, presented in the next chapter,
@@ -466,7 +466,7 @@ Local name for the last imported function.
 Names of imported functions will be prefixed by this string.
 
 
-=item C<-prefix>
+=item C<-suffix>
 
   use Carp::Object qw/carp croak/, {-suffix => '_CO'};
   ...

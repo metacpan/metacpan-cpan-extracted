@@ -29,7 +29,6 @@ sub commit_sql {
     my $dbh = $sf->{d}{dbh};
     my $waiting = 'DB work ... ';
     my $stmt_type = $sf->{d}{stmt_types}[-1];
-    my $rows_to_execute = [];
     my $count_affected;
     if ( $stmt_type eq 'Insert' ) {
         if ( ! @{$sql->{insert_args}} ) {

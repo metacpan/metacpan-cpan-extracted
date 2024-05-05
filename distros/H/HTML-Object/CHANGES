@@ -1,5 +1,12 @@
 Revision history for Perl module HTML::Object
 
+v0.5.0 2024-05-04T20:56:57+0900
+    - Added method various class function in HTML::Object::XQuery for the special package XQuery
+    - Changed method name new_collection() to new_collection_elements() in HTML::Object::DOM::Element
+    - Updated HTML::Object::DOM::Document, HTML::Object::DOM::Element::FieldSet and HTML::Object::DOM::Element::Form to use new_collection_elements
+    - Fixed minor error in method normalize_content in HTML::Object::Element
+    - Renamed method find() to findNode() in HTML::Object::DOM::Node to prevent it from being overriden by HTML::Object::XQuery and aliased find() to findNode()
+
 v0.4.0 2024-04-27T16:18:36+0900
     - Minor improvement and some correction to method html() in HTML::Object::XQuery
     - Added missing method text() in HTML::Object::XQuery

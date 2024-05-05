@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object.pm
-## Version v0.4.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.5.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/20
-## Modified 2024/04/20
+## Modified 2024/04/27
 ## All rights reserved
 ## 
 ## 
@@ -34,7 +34,7 @@ BEGIN
     use JSON;
     use Module::Generic::File qw( file );
     use Scalar::Util ();
-    our $VERSION = 'v0.4.0';
+    our $VERSION = 'v0.5.0';
     our $DICT = {};
     our $LINK_ELEMENTS = {};
     our $FATAL_ERROR = 0;
@@ -90,7 +90,8 @@ sub import
             $_[$i] eq 'debug_file' ||
             $_[$i] eq 'fatal_error' ||
             $_[$i] eq 'global_dom' ||
-            $_[$i] eq 'try_catch' )
+            $_[$i] eq 'try_catch' ||
+            $_[$i] eq 'xquery' )
         {
             $hash->{ $_[$i] } = $_[$i+1];
             CORE::splice( @_, $i, 2 );
@@ -119,15 +120,18 @@ sub import
         Nice::Try->export_to_level( 1, @_ );
     }
     
-    if( $hash->{global_dom} )
+    if( $hash->{global_dom} || $hash->{xquery} )
     {
         Filter::Util::Call::filter_add( bless( $hash => ( ref( $class ) || $class ) ) );
         require HTML::Object::XQuery;
         HTML::Object::XQuery->export_to_level( 1, @_ );
-        # Same as Firefox, Chrome or Safari do: default dom for blank page
-        our $GLOBAL_DOM = __PACKAGE__->new( debug => $hash->{debug} )->parse( <<EOT );
+        if( $hash->{global_dom} )
+        {
+            # Same as Firefox, Chrome or Safari do: default dom for blank page
+            our $GLOBAL_DOM = __PACKAGE__->new( debug => $hash->{debug} )->parse( <<EOT );
 <html><head></head><body></body></html>
 EOT
+        }
     }
 }
 
@@ -158,6 +162,15 @@ sub filter
         {
             "xq("
         }gexs;
+        if( $self->{xquery} )
+        {
+            s{
+                (?<!\\)\$\.([a-zA-Z]+)
+            }
+            {
+                "xQuery->$1"
+            }gexs;
+        }
     }
     if( $self->{debug_file} )
     {
@@ -331,7 +344,7 @@ sub add_space
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     my $parent = $self->current_parent;
-    my $e = $self->new_space( $opts ) || return;
+    my $e = $self->new_space( $opts ) || return( $self->pass_error );
     $parent->children->push( $e );
     return( $e );
 }
@@ -727,18 +740,22 @@ sub post_process
         return(1) if( $e->isa( 'HTML::Object::Closing' ) || $e->tag->substr( 0, 1 ) eq '_' );
         if( $e->is_empty && $e->children->length )
         {
+            # It should be empty, but has some children
         }
         elsif( $e->is_empty && !$e->attributes->exists( '/' ) )
         {
+            # Is empty, but does not end with />
         }
         elsif( !$e->is_empty && !$e->is_closed )
         {
             my $def = $self->get_definition( $e->tag );
             if( !$def->{is_empty} )
             {
+                # Is an enclosing tag, but it has not been closed
             }
             else
             {
+                # Is an empty (void) tag, but it did not end with /
             }
         }
         $self->post_process( $e ) if( !$e->is_empty );
@@ -861,7 +878,18 @@ or, using the HTML DOM implementation same as the Web API:
     my $p = HTML::Object::DOM->new;
     my $doc = $p->parse_data( $some_html ) || die( $p->error, "\n" );
     $('div.inner')->after( "<p>Test</p>" );
-    
+
+You can also enable access to L<xQuery> class functions with the C<$.> prefix, like jQuery, by passing the C<xquery> option:
+
+    use HTML::Object::DOM xquery => 1;
+    # or
+    # use HTML::Object::DOM global_dom => 1, xquery => 1;
+    $.each( $array_ref, sub
+    {
+        my( $index, $value ) = @_;
+        # Do something
+    });
+
     # returns an HTML::Object::DOM::Collection
     my $divs = $doc->getElementsByTagName( 'div' );
     my $new = $doc->createElement( 'div' );
@@ -875,7 +903,7 @@ To enable fatal error and also implement try-catch (using L<Nice::Try>) :
 
 =head1 VERSION
 
-    v0.4.0
+    v0.5.0
 
 =head1 DESCRIPTION
 

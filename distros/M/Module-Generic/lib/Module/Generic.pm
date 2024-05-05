@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.36.0
+## Version v0.37.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2024/04/29
+## Modified 2024/05/03
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.36.0';
+    our $VERSION     = 'v0.37.0';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -6725,32 +6725,36 @@ sub __create_class
     {
         my $type2func =
         {
-        array       => '_set_get_array',
-        array_as_object => '_set_get_array_as_object',
-        boolean     => '_set_get_boolean',
-        class       => '_set_get_class',
-        class_array => '_set_get_class_array',
-        code        => '_set_get_code',
-        datetime    => '_set_get_datetime',
-        decimal     => '_set_get_number',
-        file        => '_set_get_file',
-        float       => '_set_get_number',
-        glob        => '_set_get_glob',
-        hash        => '_set_get_hash',
-        hash_as_object => '_set_get_hash_as_mix_object',
-        integer     => '_set_get_number',
-        ip          => '_set_get_ip',
-        long        => '_set_get_number',
-        number      => '_set_get_number',
-        object      => '_set_get_object',
-        object_array => '_set_get_object_array',
+        array               => '_set_get_array',
+        # Alias for 'array_as_object'
+        array_object        => '_set_get_array_as_object',
+        array_as_object     => '_set_get_array_as_object',
+        boolean             => '_set_get_boolean',
+        class               => '_set_get_class',
+        class_array         => '_set_get_class_array',
+        class_array_object  => '_set_get_class_array_object',
+        code                => '_set_get_code',
+        datetime            => '_set_get_datetime',
+        decimal             => '_set_get_number',
+        file                => '_set_get_file',
+        float               => '_set_get_number',
+        glob                => '_set_get_glob',
+        hash                => '_set_get_hash',
+        hash_as_object      => '_set_get_hash_as_mix_object',
+        integer             => '_set_get_number',
+        ip                  => '_set_get_ip',
+        long                => '_set_get_number',
+        number              => '_set_get_number',
+        object              => '_set_get_object',
+        object_no_init      => '_set_get_object_without_init',
+        object_array        => '_set_get_object_array',
         object_array_object => '_set_get_object_array_object',
-        scalar      => '_set_get_scalar',
-        scalar_as_object => '_set_get_scalar_as_object',
-        scalar_or_object => '_set_get_scalar_or_object',
-        uri         => '_set_get_uri',
-        uuid        => '_set_get_uuid',
-        version     => '_set_get_version',
+        scalar              => '_set_get_scalar',
+        scalar_as_object    => '_set_get_scalar_as_object',
+        scalar_or_object    => '_set_get_scalar_or_object',
+        uri                 => '_set_get_uri',
+        uuid                => '_set_get_uuid',
+        version             => '_set_get_version',
         };
         # Alias
         $type2func->{string} = $type2func->{scalar};
@@ -6788,48 +6792,65 @@ EOT
             {
                 if( !defined( $def->{ $f } ) )
                 {
-                    warn( "Warning only: _set_get_class was called from package $pack at line $line in file $file, but the type provided has value 'undef', so we are skipping this field \"$f\" in the creation of our virtual class.\n" );
+                    warn( "Warning only: _set_get_class was called from package ${pack} at line ${line} in file ${file}, but the type provided has value 'undef', so we are skipping this field \"${f}\" in the creation of our virtual class.\n" );
                     next;
                 }
                 $info = { type => $def->{ $f } };
             }
-            else
+            elsif( ref( $def->{ $f } ) eq 'HASH' )
             {
                 $info = $def->{ $f };
+                if( !CORE::exists( $info->{type} ) ||
+                    !CORE::length( $info->{type} // '' ) )
+                {
+                    warn( "Warning only: _set_get_class was called from package ${pack} at line ${line} in file ${file}, but the hash reference provided for this field \"${f}\" does not contain the property \"type\".\n" );
+                    next;
+                }
+            }
+            else
+            {
+                warn( "Warning only: _set_get_class was called from package ${pack} at line ${line} in file ${file}, but the type provided for this field \"${f}\" is unsupported: '", overload::StrVal( $def->{ $f } ), "'" );
+                next;
             }
             my $type = lc( $info->{type} );
             # Convenience
             $info->{class} = $info->{package} if( $info->{package} && !length( $info->{class} ) );
-            if( !CORE::exists( $type2func->{ $type } ) )
+            if( !defined( $type ) )
             {
-                warn( "Warning only: _set_get_class was called from package $pack at line $line in file $file, but the type provided \"$type\" is unknown to us, so we are skipping this field \"$f\" in the creation of our virtual class.\n" . ( $type eq 'url' ? qq{Maybe you meant to use "uri" instead of "url" ?\n} : '' ) );
+                warn( "_set_get_class was called from package  ${pack} at line ${line} in file ${file}, but the type provided is undefined for this field \"${f}\".\n" );
+                next;
+            }
+            elsif( !CORE::exists( $type2func->{ $type } ) )
+            {
+                warn( "Warning only: _set_get_class was called from package ${pack} at line ${line} in file ${file}, but the type provided \"${type}\" is unknown to us, so we are skipping this field \"${f}\" in the creation of our virtual class.\n" . ( $type eq 'url' ? qq{Maybe you meant to use "uri" instead of "url" ?\n} : '' ) );
                 next;
             }
             my $func = $type2func->{ $type };
             if( $type eq 'object' || 
+                $type eq 'object_no_init' || 
                 $type eq 'scalar_or_object' || 
                 $type eq 'object_array_object' ||
                 $type eq 'object_array' )
             {
                 if( !$info->{class} && !$info->{package} )
                 {
-                    warn( "Warning only: _set_get_class was called from package $pack at line $line in file $file, and class \"$class\" field \"$f\" is to require an object, but no object class name was provided. Use the \"class\" or \"package\" property parameter. So we are skipping this field \"$f\" in the creation of our virtual class.\n" );
+                    warn( "Warning only: _set_get_class was called from package ${pack} at line ${line} in file ${file}, and class \"${class}\" field \"${f}\" is to require an object, but no object class name was provided. Use the \"class\" or \"package\" property parameter. So we are skipping this field \"${f}\" in the creation of our virtual class.\n" );
                     next;
                 }
                 my $this_class = $info->{class} || $info->{package};
-                CORE::push( @$code_lines, "sub $f { return( shift->${func}( '$f', '$this_class', \@_ ) ); }" );
+                CORE::push( @$code_lines, "sub $f { return( shift->${func}( '${f}', '${this_class}', \@_ ) ); }" );
             }
             elsif( $type eq 'class' || $type eq 'class_array' || $type eq 'class_array_object' )
             {
                 my $this_def = $info->{definition} // $info->{def};
                 if( !CORE::exists( $info->{definition} ) && !CORE::exists( $info->{def} ) )
                 {
-                    warn( "Warning only: No dynamic class fields definition was provided for this field \"$f\". Skipping this field.\n" );
+                    warn( "Warning only: No dynamic class fields definition was provided for this field \"${f}\". Skipping this field.\n" );
                     next;
                 }
                 elsif( ref( $this_def ) ne 'HASH' )
                 {
-                    warn( "Warning only: I was expecting a fields definition hash reference for dynamic class field \"$f\", but instead got '$this_def'. Skipping this field.\n" );
+                    warn( "Warning only: I was expecting a fields definition hash reference for dynamic class field \"${f}\", but instead got '${this_def}'. Skipping this field.\n" );
                     next;
                 }
                 # my $d = Data::Dumper->new( [ $this_def ] );
@@ -6840,17 +6861,17 @@ EOT
                 # $d->Sortkeys( 1 );
                 # my $hash_str = $d->Dump;
                 my $hash_str = Data::Dump::dump( $this_def );
-                CORE::push( @$code_lines, "sub $f { return( shift->${func}( '$f', $hash_str, \@_ ) ); }" );
+                CORE::push( @$code_lines, "sub ${f} { return( shift->${func}( '${f}', ${hash_str}, \@_ ) ); }" );
             }
             elsif( $type eq 'version' && ( exists( $info->{def} ) || exists( $info->{definition} ) ) )
             {
                 my $this_def = $info->{definition} // $info->{def};
                 my $hash_str = Data::Dump::dump( $this_def );
-                CORE::push( @$code_lines, "sub $f { return( shift->${func}( '$f', $hash_str, \@_ ) ); }" );
+                CORE::push( @$code_lines, "sub ${f} { return( shift->${func}( '${f}', ${hash_str}, \@_ ) ); }" );
             }
             else
             {
-                CORE::push( @$code_lines, "sub $f { return( shift->${func}( '$f', \@_ ) ); }" );
+                CORE::push( @$code_lines, "sub ${f} { return( shift->${func}( '${f}', \@_ ) ); }" );
             }
         }
         CORE::push( @$code_lines, "sub _fields { return( shift->_set_get_array_as_object( '_fields', \@_ ) ); }" );
@@ -7312,7 +7333,7 @@ sub _get_symbol
     '@' => 'ARRAY',
     '%' => 'HASH',
     '&' => 'CODE',
-    ''  => 'IO',
+    '*' => 'GLOB',
     };
     my( $sigil, $type );
     if( exists( $map->{ substr( $var, 0, 1 ) } ) )
@@ -7322,7 +7343,8 @@ sub _get_symbol
     }
     else
     {
-        $type = $map->{ '' };
+        # $type = $map->{ '' };
+        return( $self->error( "Unsupported variable ${var}. You can only set array, hash, scalar, code or glob" ) );
     }
     
     if( !exists( $ns->{ $var } ) )
@@ -7330,7 +7352,7 @@ sub _get_symbol
         return( wantarray ? () : undef );
     }
     my $glob = \$ns->{ $var };
-    if( Scalar::Util::reftype( $glob ) eq 'GLOB' )
+    if( ( Scalar::Util::reftype( $glob ) // '' ) eq 'GLOB' )
     {
         return( *{$glob}{$type} );
     }
@@ -7451,7 +7473,7 @@ sub _has_symbol
     }
     return(0) if( !exists( $ns->{ $var } ) );
     my $glob = \$ns->{ $var };
-    if( Scalar::Util::reftype( $glob ) eq 'GLOB' )
+    if( ( Scalar::Util::reftype( $glob ) // '' ) eq 'GLOB' )
     {
         if( $type eq 'SCALAR' )
         {
@@ -7556,7 +7578,7 @@ sub _is_empty
     return(1) if( !@_ );
     return(1) if( !defined( $_[0] ) );
     if( (
-            Scalar::Util::reftype( $_[0] ) eq 'SCALAR' && 
+            ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'SCALAR' && 
             !CORE::length( ${$_[0]} // '' )
         ) || 
         (
@@ -7566,12 +7588,12 @@ sub _is_empty
     {
         return(1);
     }
-    elsif( Scalar::Util::reftype( $_[0] ) eq 'ARRAY' &&
+    elsif( ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'ARRAY' &&
         !scalar( @{$_[0]} ) )
     {
         return(1);
     }
-    elsif( Scalar::Util::reftype( $_[0] ) eq 'HASH' &&
+    elsif( ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'HASH' &&
         Scalar::Util::blessed( $_[0] ) && 
         $_[0]->can( 'is_empty' ) && 
         ( $_[0]->is_empty ? 1 : 0 ) )
@@ -7641,7 +7663,7 @@ sub _list_symbols
     {
         return( grep
         {
-            Scalar::Util::reftype( \$ns->{ $_ } ) ne 'GLOB' ||
+            ( Scalar::Util::reftype( \$ns->{ $_ } ) // '' ) ne 'GLOB' ||
             defined( *{ $ns->{ $_ } }{CODE} )
         } keys( %$ns ) );
     }
@@ -7649,7 +7671,7 @@ sub _list_symbols
     {
         return( grep
         {
-            Scalar::Util::reftype( \$ns->{ $_ } ) eq 'GLOB' &&
+            ( Scalar::Util::reftype( \$ns->{ $_ } ) // '' ) eq 'GLOB' &&
             defined( ${*{ $ns->{ $_ } }{SCALAR}} )
         } keys( %$ns ) );
     }
@@ -7657,7 +7679,7 @@ sub _list_symbols
     {
         return( grep
         {
-            Scalar::Util::reftype( \$ns->{ $_ } ) eq 'GLOB' &&
+            ( Scalar::Util::reftype( \$ns->{ $_ } ) // '' ) eq 'GLOB' &&
             defined( *{$ns->{ $_ }}{ $type} )
         } keys( %$ns ) );
     }
@@ -8642,7 +8664,7 @@ sub _set_symbol
     if( CORE::exists( $opts->{value} ) &&
         defined( $opts->{value} ) )
     {
-        my $refval = Scalar::Util::reftype( $opts->{value} );
+        my $refval = ( Scalar::Util::reftype( $opts->{value} ) // '' );
         if( $type eq 'SCALAR' &&
             ( $refval eq 'HASH' || $refval eq 'ARRAY' || $refval eq 'CODE' ) )
         {
@@ -8775,6 +8797,198 @@ sub THAW
         }
     }
     CORE::return( $new );
+}
+
+# NOTE: class function
+# Used internally also in Module::Generic::Exception
+sub UNIVERSAL::create_class
+{
+    my $class = shift( @_ );
+    my $self = __PACKAGE__;
+    return( $self->error( "No class name was provided." ) ) if( $self->_is_empty( $class ) );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $parent = $opts->{extends} || $self;
+    my $parents = $self->_is_array( $parent ) ? $parent : [$parent];
+    my $meths = CORE::delete( $opts->{method} ) // CORE::delete( $opts->{methods} );
+    if( $self->_is_class_loaded( $class ) )
+    {
+        unless( scalar( grep( ( $_ // '' ) eq $parent, @{"${class}::ISA"} ) ) )
+        {
+            no strict 'refs';
+            unshift( @{"${class}::ISA"}, $parent );
+        }
+        return( $class );
+    }
+    my $map =
+    {
+    array               => '_set_get_array',
+    # Alias for 'array_as_object'
+    array_object        => '_set_get_array_as_object',
+    array_as_object     => '_set_get_array_as_object',
+    boolean             => '_set_get_boolean',
+    class               => '_set_get_class',
+    class_array         => '_set_get_class_array',
+    class_array_object  => '_set_get_class_array_object',
+    code                => '_set_get_code',
+    datetime            => '_set_get_datetime',
+    decimal             => '_set_get_number',
+    file                => '_set_get_file',
+    float               => '_set_get_number',
+    glob                => '_set_get_glob',
+    hash                => '_set_get_hash',
+    hash_as_object      => '_set_get_hash_as_mix_object',
+    integer             => '_set_get_number',
+    ip                  => '_set_get_ip',
+    long                => '_set_get_number',
+    number              => '_set_get_number',
+    object              => '_set_get_object',
+    object_no_init      => '_set_get_object_without_init',
+    object_array        => '_set_get_object_array',
+    object_array_object => '_set_get_object_array_object',
+    scalar              => '_set_get_scalar',
+    scalar_as_object    => '_set_get_scalar_as_object',
+    scalar_or_object    => '_set_get_scalar_or_object',
+    uri                 => '_set_get_uri',
+    uuid                => '_set_get_uuid',
+    version             => '_set_get_version',
+    };
+    my $prefix_class = '';
+    local $" = ' ';
+    my $perl = <<EOT;
+package ${class};
+BEGIN
+{
+    use strict;
+    use warnings;
+    use vars qw( \@ISA );
+EOT
+    # The user has declared a list of methods that use Module::Generic, 
+    # but Module::Generic is not among the parents
+    # Technically, we do not really need to add it, since we are obviously already loaded
+    # but this is in an abondance of concern of clean code rather than efficiency.
+    if( ref( $meths // '' ) eq 'HASH' && 
+        scalar( keys( %$meths ) ) &&
+        !scalar( grep( ( $_ // '' ) eq $self, @$parents ) ) )
+    {
+        $prefix_class = ( ref( $self ) || $self ) . '::';
+        $perl .= <<EOT;
+    use Module::Generic;
+EOT
+    }
+    foreach my $c ( @$parents )
+    {
+        if( $self->_is_class_loadable( $c ) )
+        {
+            $perl .= <<EOT;
+    use $c;
+EOT
+        }
+    }
+    $perl .= <<EOT;
+    our \@ISA = qw( @$parents );
+};
+
+use strict;
+use warnings;
+
+EOT
+
+    if( ref( $meths // '' ) eq 'HASH' )
+    {
+        my $code_lines = [];
+        foreach my $meth ( sort( keys( %$meths ) ) )
+        {
+            my $info = $meths->{ $meth };
+            my $def = {};
+            if( ref( $info ) eq 'HASH' )
+            {
+                $def = $info;
+                if( !CORE::exists( $info->{type} ) ||
+                    !CORE::length( $info->{type} // '' ) )
+                {
+                    return( $self->error( "No type provided for class '${class}' and method '${meth}'." ) );
+                }
+            }
+            elsif( !ref( $info // '' ) ||
+                   ( ref( $info ) && $self->_can_overload( $info => '""' ) ) )
+            {
+                if( !defined( $info ) )
+                {
+                    return( $self->error( "The type provided for class '${class}' and method '${meth}' has an undefined value." ) );
+                }
+                $def->{type} = $info;
+            }
+            else
+            {
+                return( $self->error( "The type provided for class '${class}' and method '${meth}' is unsupported: '", overload::StrVal( $info ), "'" ) );
+            }
+            my $type = lc( $def->{type} );
+            $info->{class} = $info->{package} if( $info->{package} && !length( $info->{class} ) );
+            if( !defined( $type ) )
+            {
+                return( $self->error( "No type is defined for this class '${class}' and method '${meth}'" ) );
+            }
+            elsif( !CORE::exists( $map->{ $type } ) )
+            {
+                return( $self->error( "Unsupported method type '${type}' for class '${class}' and method '${meth}'" ) );
+            }
+            my $func = $prefix_class . $map->{ $type };
+            if( $type eq 'object' || 
+                $type eq 'object_no_init' || 
+                $type eq 'scalar_or_object' || 
+                $type eq 'object_array_object' ||
+                $type eq 'object_array' )
+            {
+                if( !$info->{class} && !$info->{package} )
+                {
+                    return( $self->error( "A class '${class}' with method '${meth}' of type '${type}', but no class or package specified." ) );
+                }
+                my $this_class = $info->{class} || $info->{package};
+                CORE::push( @$code_lines, "sub ${meth} { return( shift->${func}( '${meth}', '${this_class}', \@_ ) ); }" );
+            }
+            elsif( $type eq 'class' || $type eq 'class_array' || $type eq 'class_array_object' )
+            {
+                my $this_def = $info->{definition} // $info->{def};
+                if( !CORE::exists( $info->{definition} ) && !CORE::exists( $info->{def} ) )
+                {
+                    return( $self->error( "No dynamic class fields definition was provided for this class '${class}' with method \"${meth}\" and type '${type}'." ) );
+                }
+                elsif( ref( $this_def ) ne 'HASH' )
+                {
+                    return( $self->error( "I was expecting a fields definition hash reference for dynamic class in class '${class}' with method \"${meth}\", but instead got '${this_def}'." ) );
+                }
+                my $hash_str = Data::Dump::dump( $this_def );
+                CORE::push( @$code_lines, "sub ${meth} { return( shift->${func}( '${meth}', ${hash_str}, \@_ ) ); }" );
+            }
+            elsif( $type eq 'version' && ( exists( $info->{def} ) || exists( $info->{definition} ) ) )
+            {
+                my $this_def = $info->{definition} // $info->{def};
+                my $hash_str = Data::Dump::dump( $this_def );
+                CORE::push( @$code_lines, "sub ${meth} { return( shift->${func}( '${meth}', ${hash_str}, \@_ ) ); }" );
+            }
+            else
+            {
+                CORE::push( @$code_lines, "sub ${meth} { return( shift->${func}( '${meth}', \@_ ) ); }" );
+            }
+        }
+        $perl .= join( "\n\n", @$code_lines );
+    }
+    $perl .= <<EOT;
+
+
+sub TO_JSON { return( shift->${prefix_class}as_hash ); }
+
+1;
+
+EOT
+    # try-catch
+    local $@;
+    my $rc = eval( $perl );
+    if( $@ )
+    {
+        return( $self->error( "Unable to instantiate class ${class}: $@" ) );
+    }
+    return( $class );
 }
 
 sub VERBOSE
@@ -9148,9 +9362,48 @@ Module::Generic - Generic Module to inherit from
         }, @_ ) );
     }
 
+Quick way to create a class with feature-rich methods
+
+    create_class My::Package extends => 'Other::Package';
+    # or, maybe
+    create_class My::Package extends => 'Other::Package', method =>
+    {
+        since => 'datetime',
+        uri => 'uri',
+        tags => 'array_object',
+        meta => 'hash',
+        active => 'boolean',
+        callback => 'code',
+        config => 'file',
+        allowed_from => 'ip',
+        total => 'number',
+        id => 'uuid',
+        version => 'version',
+        filehandle => 'glob',
+        object => { type => 'object', class => 'Some::Class' },
+        customer => 
+        {
+            type => 'class',
+            def =>
+            {
+                id => 'uuid',
+                since => 'datetime',
+                name => 'scalar_as_object',
+                age => 'decimal',
+            }
+        }
+    };
+    my $obj = My::Package->new;
+    my $cust = $obj->customer(
+        name => 'John Doe',
+        age => 32,
+        since => 'now',
+    );
+    $obj->customer->id( '44d9a3ab-32e2-4c46-b6c9-8b307f273d47' );
+
 =head1 VERSION
 
-    v0.36.0
+    v0.37.0
 
 =head1 DESCRIPTION
 
@@ -12055,6 +12308,298 @@ For L<CBOR|CBOR::XS>, it is recommended to use the option C<allow_sharing> to en
     my $cbor = CBOR::XS->new->allow_sharing;
 
 Also, if you use the option C<allow_tags> with L<JSON>, then all of those modules will work too, since this option enables support for the C<FREEZE> and C<THAW> methods.
+
+=head1 CLASS FUNCTIONS
+
+=head2 create_class
+
+    create_class My::Package extends => 'Other::Package';
+    create_class My::Package extends => 'Other::Package', method =>
+    {
+        since => 'datetime',
+        uri => 'uri',
+        tags => 'array_object',
+        meta => 'hash',
+        active => 'boolean',
+        callback => 'code',
+        config => 'file',
+        allowed_from => 'ip',
+        total => 'number',
+        id => 'uuid',
+        version => 'version',
+        filehandle => 'glob',
+        object => { type => 'object', class => 'Some::Class' },
+        customer => 
+        {
+            type => 'class',
+            def =>
+            {
+                id => 'uuid',
+                since => 'datetime',
+                name => 'scalar_as_object',
+                age => 'decimal',
+            }
+        }
+    };
+
+Provided with a class name and an optional hash or hash reference of options, and this will create that class possibly with the requested methods.
+
+Supported options are:
+
+=over 4
+
+=item * C<extends>
+
+This represents a parent class to inherit from. If none is provided, it will inherit from L<Module::Generic> by default.
+
+=item * C<method> or C<methods>
+
+An hash reference of method name to their definition, which may be either a string representing a method C<type>, or an hash reference, including a C<type> property.
+
+Possible method types supported are:
+
+=over 8
+
+=item * C<array>
+
+Will use the method L</_set_get_array>
+
+=item * C<array_as_object>
+
+Will use the method L</_set_get_array_as_object>
+
+=item * C<boolean>
+
+Will use the method L</_set_get_boolean>
+
+=item * C<class>
+
+    create_class My::Class method =>
+    {
+        # Will automatically create, when needed, a class My::Class::Customer
+        # with the following methods:
+        customer => 
+        {
+            type => 'class',
+            def =>
+            {
+                id => 'uuid',
+                since => 'datetime',
+                name => 'scalar_as_object',
+                age => 'decimal',
+            }
+        }
+    };
+    # Then, you could use it like this:
+    my $obj = My::Class->new;
+    my $cust = $obj->customer(
+        # A Module::Generic::Scalar object
+        name => 'John Doe',
+        id => 'c47e1113-8336-4437-ba20-54f8cd0afb18',
+        # A DateTime object
+        since => 'now',
+        # A Module::Generic::Number object
+        age => 32,
+    );
+    say $obj->name, " is ", $obj->age, " years old.";
+
+Will use the method L</_set_get_class> that dynamically creates object classes based on the method name it is called upon.
+
+For this C<type>, you will also need to provide 1 other property:
+
+=over 12
+
+=item 1. C<def> or C<definition>
+
+An hash reference used for the definition of this dynamic class.
+
+=back
+
+See also C<class_array> and C<>
+
+=item * C<class_array>
+
+Will use the method L</_set_get_class_array> to return a conventional perl array of specified object class.
+
+For this C<type>, you will also need to provide 1 other property:
+
+=over 12
+
+=item 1. C<def> or C<definition>
+
+An hash reference used for the definition of this dynamic class.
+
+=back
+
+=item * C<class_array_object>
+
+Will use the method L</_set_get_class_array_object> to return an L<object array|Module::Generic::Array> of specified object class.
+
+For this C<type>, you will also need to provide 1 other property:
+
+=over 12
+
+=item 1. C<def> or C<definition>
+
+An hash reference used for the definition of this dynamic class.
+
+=back
+
+=item * C<code>
+
+Will use the method L</_set_get_code>
+
+=item * C<datetime>
+
+Will use the method L</_set_get_datetime>
+
+=item * C<decimal>
+
+Will use the method L</_set_get_number>
+
+=item * C<file>
+
+Will use the method L</_set_get_file>
+
+=item * C<float>
+
+Will use the method L</_set_get_number>
+
+=item * C<glob>
+
+Will use the method L</_set_get_glob>
+
+=item * C<hash>
+
+Will use the method L</_set_get_hash>
+
+=item * C<hash_as_object>
+
+Will use the method L</_set_get_hash_as_mix_object>
+
+=item * C<integer>
+
+Will use the method L</_set_get_number>
+
+=item * C<ip>
+
+Will use the method L</_set_get_ip>
+
+=item * C<long>
+
+Will use the method L</_set_get_number>
+
+=item * C<number>
+
+Will use the method L</_set_get_number>
+
+=item * C<object>
+
+Will use the method L</_set_get_object>
+
+This means that if the method is chained, it will instantiate automatically a new object, if none is set yet. If you want to B<not> automatically instantiate an object, use the type C<object_no_init> instead.
+
+For this C<type>, you will also need to provide 1 other property:
+
+=over 12
+
+=item 1. C<class> or C<packages>
+
+An hash reference used for the definition of this dynamic class.
+
+=back
+
+=item * C<object_array>
+
+Will use the method L</_set_get_object_array>
+
+For this C<type>, you will also need to provide 1 other property:
+
+=over 12
+
+=item 1. C<class> or C<packages>
+
+An hash reference used for the definition of this dynamic class.
+
+=back
+
+=item * C<object_array_object>
+
+Will use the method L</_set_get_object_array_object>
+
+For this C<type>, you will also need to provide 1 other property:
+
+=over 12
+
+=item 1. C<class> or C<packages>
+
+An hash reference used for the definition of this dynamic class.
+
+=back
+
+=item * C<object_no_init>
+
+Will use the method L</_set_get_object_without_init>
+
+This means that if the method is chained, instead of instantiating automatically a new object, it will return instead L<Module::Generic::Null>. If you want to automatically instantiate an object, use the type C<object>
+
+For this C<type>, you will also need to provide 1 other property:
+
+=over 12
+
+=item 1. C<class> or C<packages>
+
+An hash reference used for the definition of this dynamic class.
+
+=back
+
+=item * C<scalar>
+
+Will use the method L</_set_get_scalar>
+
+=item * C<scalar_as_object>
+
+Will use the method L</_set_get_scalar_as_object>
+
+=item * C<scalar_or_object>
+
+Will use the method L</_set_get_scalar_or_object>
+
+For this C<type>, you will also need to provide 1 other property:
+
+=over 12
+
+=item 1. C<class> or C<packages>
+
+An hash reference used for the definition of this dynamic class.
+
+=back
+
+=item * C<uri>
+
+Will use the method L</_set_get_uri>
+
+=item * C<uuid>
+
+Will use the method L</_set_get_uuid>
+
+=item * C<version>
+
+Will use the method L</_set_get_version>
+
+For this C<type>, you will also need to provide 1 other property:
+
+=over 12
+
+=item 1. C<def> or C<definition>
+
+An hash reference used for the definition of this dynamic class.
+
+=back
+
+=back
+
+=back
 
 =head1 SEE ALSO
 

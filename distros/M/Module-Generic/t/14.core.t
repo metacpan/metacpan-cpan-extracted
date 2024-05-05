@@ -673,6 +673,53 @@ subtest "symbols" => sub
     is_deeply( \@all => $expect, '_list_symbols' );
 };
 
+subtest 'create_class' => sub
+{
+    # local $Module::Generic::DEBUG = 12;
+    my $rv = create_class My::Package;
+    # diag( "create returned '", ( $rv // 'undef' ), "'" );
+    # diag( "Error creating class My::Package: ", Module::Generic->error ) if( !$rv );
+    ok( Module::Generic->_is_class_loaded( 'My::Package' ), 'clcreate_classass' );
+    my $me = My::Package->new;
+    isa_ok( $me => 'Module::Generic', 'parent is Module::Generic' );
+    $rv = create_class Other::Package extends => 'My::Package';
+    diag( "Error creating class Other::Package: ", Module::Generic->error ) if( !$rv );
+    ok( Module::Generic->_is_class_loaded( 'Other::Package' ), 'create_class inheritance' );
+    my $me2 = Other::Package->new;
+    isa_ok( $me2 => 'My::Package', 'parent is My::Package' );
+    create_class Customer::Package extends => 'Other::Package', method =>
+    {
+        active          => 'boolean',
+        allowed_from    => 'ip',
+        callback        => 'code',
+        config          => 'file',
+        filehandle      => 'glob',
+        id              => 'uuid',
+        meta            => 'hash',
+        object          => { class => 'Some::Class', type => 'object_no_init' },
+        since           => 'datetime',
+        tags            => 'array_object',
+        total           => 'number',
+        uri             => 'uri',
+        version         => 'version',
+    };
+    my $me3 = Customer::Package->new;
+    isa_ok( $me2 => 'Other::Package', 'parent is Other::Package' );
+    can_ok( 'Customer::Package', 'active' );
+    can_ok( 'Customer::Package', 'allowed_from' );
+    can_ok( 'Customer::Package', 'callback' );
+    can_ok( 'Customer::Package', 'config' );
+    can_ok( 'Customer::Package', 'filehandle' );
+    can_ok( 'Customer::Package', 'id' );
+    can_ok( 'Customer::Package', 'meta' );
+    can_ok( 'Customer::Package', 'object' );
+    can_ok( 'Customer::Package', 'since' );
+    can_ok( 'Customer::Package', 'tags' );
+    can_ok( 'Customer::Package', 'total' );
+    can_ok( 'Customer::Package', 'uri' );
+    can_ok( 'Customer::Package', 'version' );
+};
+
 done_testing();
 
 # NOTE: Fake class MyObject

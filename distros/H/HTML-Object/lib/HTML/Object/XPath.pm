@@ -111,8 +111,6 @@ sub find
     # $parsed_path is an HTML:: Object::XPath::Expr object
     # $results could be a HTML::Object::XPath::NodeSet or something else like HTML::Object::XPath::Number
     my $results = $parsed_path->evaluate( $context );
-    # if( $results->isa( 'HTML::Object::XPath::NodeSet') )
-    # if( $self->isa_nodeset( $results ) ) 
     if( $self->_is_a( $results, 'HTML::Object::XPath::NodeSet' ) )
     {
         return( $results->sort->remove_duplicates );
@@ -139,8 +137,6 @@ sub findnodes
     {
         return( wantarray() ? $self->new_nodeset( $results ) : $results );
     }
-    #{ return wantarray ? ($results) : $results; } # result should be SCALAR
-    #{ return wantarray ? () : HTML::Object::XPath::NodeSet->new();   }
 }
 
 sub findnodes_as_string
@@ -297,10 +293,6 @@ sub _analyze
     # Array object
     my $tokens = shift( @_ );
     # lexical analysis
-    if( $self->debug )
-    {
-        my( $p, $f, $l ) = caller;
-    }
     return( $self->_expr( $tokens ) );
 }
 
@@ -335,10 +327,6 @@ sub _expr
 {
     my( $self, $tokens ) = @_;
     # $tokens are an array object of xpath expression token
-#     if( $self->debug )
-#     {
-#         my( $p, $f, $l ) = caller;
-#     }
     # Returning an HTML::Object::XPath::Expr object
     return( $self->_expr_or( $tokens ) );
 }
@@ -400,7 +388,6 @@ sub _expr_equality
 sub _expr_filter
 {
     my( $self, $tokens ) = @_;
-    
     
     my $expr = $self->_expr_primary( $tokens );
     while( $self->_match( $tokens, qr/\[/ ) )
@@ -466,10 +453,6 @@ sub _expr_or
 
         $or_expr->set_rhs( $rhs );
         $expr = $or_expr;
-    }
-    if( $self->debug )
-    {
-        my( $p, $f, $l ) = caller;
     }
     return( $expr );
 }
@@ -599,7 +582,7 @@ sub _expr_relational
         $rel_expr->set_rhs( $rhs );
         $expr = $rel_expr;
     }
-    return $expr;
+    return( $expr );
 }
 
 sub _expr_unary
@@ -718,10 +701,6 @@ sub _match
     # Enabling this debugging section will take a lot more time, because of the 
     # $tokens->length that creates a new Module::Generic::Number every time
     # and _match gets called a lot
-#     if( $self->debug )
-#     {
-#         my( $p, $f, $l ) = caller;
-#     }
     $self->{_curr_match} = '';
     return(0) unless( $self->{_tokpos} < scalar( @$tokens ) );
     # return(0) unless( $self->{_tokpos} < $tokens->length );
@@ -793,6 +772,7 @@ sub _parse
     return( $CACHE->{ $context } ) if( $CACHE->{ $context } );
 
     # my $tokens = $self->_tokenize( $path ) || return( $self->pass_error );
+    # Get an Module::Generic::Array object in return
     my $tokens = $self->_tokenize( $path );
 
     $self->{_tokpos} = 0;
@@ -810,10 +790,6 @@ sub _parse
  
     $CACHE->{ $context } = $tree;
     
-    if( $self->debug )
-    {
-        my( $p, $f, $l ) = caller;
-    }
     return( $tree );
 }
 
@@ -1143,7 +1119,6 @@ sub _tokenize
         die "Query:\n", "$path\n", $marker, "^^^\n", "Invalid query somewhere around here (I think)\n";
         # return( $self->error( "Query:\n", "$path\n", $marker, "^^^\n", "Invalid query somewhere around here (I think)" ) );
     }
-    # return( \@tokens );
     return( $tokens );
 }
 

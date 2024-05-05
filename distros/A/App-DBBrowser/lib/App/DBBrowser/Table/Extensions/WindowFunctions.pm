@@ -5,8 +5,7 @@ use warnings;
 use strict;
 use 5.014;
 
-use Term::Choose         qw();
-use Term::Form::ReadLine qw();
+use Term::Choose qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Table::Extensions;
@@ -74,10 +73,8 @@ sub __get_win_func_stmt {
 sub window_function {
     my ( $sf, $sql, $clause, $qt_cols, $opt ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $driver = $sf->{i}{driver};
     my $count_all = 'COUNT*';
     my $count_all_regex = quotemeta $count_all;
     my @win_func_aggr = ( 'AVG', 'COUNT', $count_all, 'MAX', 'MIN', 'SUM' );
@@ -477,7 +474,6 @@ sub __add_frame_start_or_end {
     my ( $sf, $sql, $clause, $frame_clause_data, $info, $pos ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my ( @frame_point_types, $prompt );
     if ( $pos eq 'frame_start' ) {
         @frame_point_types = ( 'UNBOUNDED PRECEDING', 'n PRECEDING', 'CURRENT ROW', 'n FOLLOWING' );

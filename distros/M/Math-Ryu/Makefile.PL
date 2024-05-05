@@ -31,7 +31,7 @@ my $out = `$mycc -o have_uint128_t.exe -x c have_uint128_t.in 2>&1`;
 unless(-e 'have_uint128_t.exe') {
   print "  The __uint128_t type is unavailable\n";
   if($Config::Config{nvsize} != 8) {
-    print "  We are unable to continue for this type of NV ($Config::Config{nvtype})\n";
+    print "  We are unable to continue for this perl configuration ($Config::Config{archname}).\n";
     exit 0;
   }
 }

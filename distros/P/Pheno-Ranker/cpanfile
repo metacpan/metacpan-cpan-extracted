@@ -12,6 +12,7 @@ requires 'Math::CDF';
 requires 'Statistics::Descriptive';
 requires 'JSON::Validator';
 requires 'File::ShareDir::ProjectDistDir';
+requires 'Graph';
 
 # t
 requires 'Test::Exception';

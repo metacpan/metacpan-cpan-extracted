@@ -5,6 +5,46 @@ use strict;
 use Config;
 
 BEGIN {
+  # In this BEGIN{} block we check for the presence of a
+  # perl bug that can set the POK flag when it should not.
+  use B qw(svref_2object);
+
+  if($] < 5.035010) {
+    my %flags;
+    {
+      no strict 'refs';
+      for my $flag (qw(
+        SVf_IOK
+        SVf_NOK
+        SVf_POK
+        SVp_IOK
+        SVp_NOK
+        SVp_POK
+                )) {
+        if (defined &{'B::'.$flag}) {
+          $flags{$flag} = &{'B::'.$flag};
+        }
+      }
+    }
+
+    my $test_nv = 1.3;
+    my $buggery = "$test_nv";
+    my $flags = B::svref_2object(\$test_nv)->FLAGS;
+    my $fstr = join ' ', sort grep $flags & $flags{$_}, keys %flags;
+
+    if($fstr =~ /SVf_POK/) {
+      $Math::Ryu::PV_NV_BUG = 1;
+    }
+    else {
+      $Math::Ryu::PV_NV_BUG = 0;
+    }
+  } # close if{} block
+  else {
+    $Math::Ryu::PV_NV_BUG = 0;
+  }
+};  # close BEGIN{} block
+
+BEGIN {
   if($Config{nvsize} == 8)               { $::max_dig = 17 }
   elsif($Config{nvtype} eq '__float128') { $::max_dig = 36 }
   elsif(defined($Config{longdblkind})
@@ -13,6 +53,7 @@ BEGIN {
 
 };  # close BEGIN{} block
 
+use constant PV_NV_BUG   => $Math::Ryu::PV_NV_BUG;
 use constant IVSIZE      => $Config{ivsize};
 use constant MAX_DEC_DIG => $::max_dig; # set in second BEGIN{} block
 use constant RYU_MAX_INT => $Config{ivsize} == 4 ? 4294967295
@@ -24,7 +65,7 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 DynaLoader::bootstrap Math::Ryu $VERSION;
 
@@ -223,7 +264,10 @@ sub spanyf {
   # printed, given the same argument(s).
   my $ret = '';
   for my $arg (@_) {
-    if(ryu_lln($arg)) {
+    if(PV_NV_BUG && _SvPOK($arg) && ryu_SvNOK($arg) && !_SvIOKp($arg)) {
+      $ret .= nv2s($arg);
+    }
+    elsif(ryu_lln($arg)) {
       if(_SvPOK($arg) || ryu_SvIOK($arg)) { $ret .= "$arg" }
       else {
         # At this point we know that $arg looks like a number

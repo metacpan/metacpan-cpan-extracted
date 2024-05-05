@@ -1,3 +1,18 @@
+0.165		2024-05-04	T. R. Wyant
+    Space Track options in celestrak() are now fatal.
+
+    Mike McCants removes his RCS data file. The corresponding mccants()
+    catalog is documented as 404, and to be removed 2024-11-01 unless it
+    shows back up in the interim. The corresponding test is now TODO.
+
+    Track changes in Kelso data set names. He renamed the data sets for
+    the Chinese and Russian ASAT test debris. The old names are retained
+    as synonyms. The data supporting the synonyms etc got refactired
+    from the test into Astro::SpaceTrack so I could display the notes in
+    names->( 'celestrak' )
+
+    Kelso dropped Iridium status April 26 2024.
+
 0.164		2024-01-31	T. R. Wyant
     Deprecate iridium_status() and associated attributes
 

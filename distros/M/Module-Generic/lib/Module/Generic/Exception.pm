@@ -381,6 +381,16 @@ sub THAW
 
 sub TO_JSON { return( shift->as_string ); }
 
+sub UNIVERSAL::exception
+{
+    my $class = shift( @_ );
+    my $me = __PACKAGE__;
+    my $opts = $me->_get_args_as_hash( @_ );
+    $opts->{extends} //= $me;
+    my $rv = $class->create_class( %$opts ) || die( Module::Generic->error );
+    return( $rv );
+}
+
 1;
 # NOTE: POD
 __END__
@@ -669,6 +679,28 @@ Set or get the L<Devel::StackTrace> object used to provide a full stack trace of
 =head2 type
 
 Set or get the error type. It returns the current value.
+
+=head1 CLASS FUNCTIONS
+
+=head2 exception
+
+    exception My::Exception;
+    # or
+    exception Other::Exception extends => 'My::Exception';
+    die My::Exception->new( "Something bad has happened" );
+    say Other::Exception->error( "Another bad thing has happened" );
+
+This class function takes a package name, and creates an exception class based on that package.
+
+The following options are also available:
+
+=over 4
+
+=item * C<extends>
+
+This takes a package name as value and will serve as the parent class
+
+=back
 
 =head1 SERIALISATION
 

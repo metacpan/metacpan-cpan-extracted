@@ -572,6 +572,7 @@ sub remap_hash {
     my $self   = $arg->{self};
     my $nodes  = $self->{nodes};
     my $edges  = $self->{edges};
+    my $format = $self->{format};
     my $out_hash;
 
     # Do some pruning excluded / included
@@ -605,14 +606,15 @@ sub remap_hash {
     #  *** IMPORTANT ***
     # - phenotypicFeatures.featureType.id => BFF
     # - phenotypicFeatures.type.id        => PXF
-    my $id_correspondence           = $self->{id_correspondence};
+    my $id_correspondence = $self->{id_correspondence};
 
     # Load values for the for loop
     my $exclude_properties_regex_qr = $self->{exclude_properties_regex_qr};
     my $misc_regex_qr = qr/1900-01-01|NA0000|P999Y|P9999Y|phenopacket_id/;
 
     # Pre-compile a list of fixed scalar values to exclude into a hash for quick lookup
-    my %exclude_values = map { $_ => 1 } ('NA', 'NaN', 'Fake', 'None:No matching concept');
+    my %exclude_values =
+      map { $_ => 1 } ( 'NA', 'NaN', 'Fake', 'None:No matching concept' );
 
     # Now we proceed for each key
     for my $key ( keys %{$hash} ) {
@@ -634,7 +636,9 @@ sub remap_hash {
 
         # The user can turn on age related values
         next
-          if ( $key =~ m/\.age(?!nt)|onset/i && !$self->{age} );    # $self->{age} [0|1]
+          if ( ( $format eq 'PXF' || $format eq 'BFF' )
+            && $key =~ m/\.age(?!nt)|onset/i
+            && !$self->{age} );    # $self->{age} [0|1]
 
         # Load values
         my $val = $hash->{$key};

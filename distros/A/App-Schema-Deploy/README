@@ -2,9 +2,13 @@ NAME
     schema-deploy - Script to deploy Schema.
 
 SYNOPSIS
-     schema-deploy [-h] [-p password] [-u user] [-v schema_version] [--version] dsn schema_module
+     schema-deploy [-d] [-h] [-p password] [-u user] [-v schema_version] [--version] dsn schema_module
 
 ARGUMENTS
+    *       "-d"
+
+            Drop tables before deploy.
+
     *       "-h"
 
             Print help.
@@ -50,10 +54,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2022 Michal Josef Špaček
+    © 2022-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

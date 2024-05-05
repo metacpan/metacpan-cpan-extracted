@@ -1,3 +1,8 @@
+0.04 2024-05-04T12:02:57+02:00
+ - Improve error handling.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.03 2022-10-04T20:30:39+02:00
  - Add -d option for drop tables.
 

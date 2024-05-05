@@ -1,5 +1,11 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.024     2024-05-04 23:51:50Z
+        - no longer include the local git sha in the result output, when
+          testing with a local data directory
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/57617f254a6734d5c64fa86fd3b08e8799970b25...dd9599a5238abe76d13fab37857265a3be3a01ea
+
 1.023     2024-04-13 19:25:31Z
         - include git location in generated results files when using a custom
           test directory

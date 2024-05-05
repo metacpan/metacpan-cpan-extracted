@@ -1,0 +1,10 @@
+// Multiline Strings
+
+[
+    "Strings can \
+span multiple lines."
+
+    'They can either \
+single, double, or backtick \
+quotes.'
+]

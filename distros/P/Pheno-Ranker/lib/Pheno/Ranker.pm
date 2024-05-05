@@ -16,6 +16,7 @@ use List::Util qw(all);
 use Pheno::Ranker::IO;
 use Pheno::Ranker::Align;
 use Pheno::Ranker::Stats;
+use Pheno::Ranker::Graph;
 
 use Exporter 'import';
 our @EXPORT_OK = qw($VERSION write_json);
@@ -26,7 +27,7 @@ $SIG{__DIE__}  = sub { die BOLD RED "Error: ", @_ };
 
 # Global variables:
 $Data::Dumper::Sortkeys = 1;
-our $VERSION   = '0.08';
+our $VERSION   = '0.09';
 our $share_dir = dist_dir('Pheno-Ranker');
 
 # Set developoent mode
@@ -106,7 +107,7 @@ sub _set_additional_config {
       ? qr/$self->{exclude_properties_regex}/
       : undef;                                                                # setter
     $self->{array_terms}    = $config->{array_terms} // ['foo'];              # setter (TBV)
-    $self->{array_regex}    = $config->{array_regex} // '^([^:]+):(\d+)';       # setter (TBV)
+    $self->{array_regex}    = $config->{array_regex} // '^([^:]+):(\d+)';     # setter (TBV)
     $self->{array_regex_qr} = qr/$self->{array_regex}/;                       # setter (TBV)
     $self->{array_terms_regex_str} =
       '^(' . join( '|', map { "\Q$_\E" } @{ $self->{array_terms} } ) . '):';   # setter (TBV)
@@ -212,7 +213,7 @@ has 'cli' => (
 
 # Miscellanea atributes here
 has [
-    qw/target_file weights_file out_file include_hpo_ascendants align align_basename export export_basename log verbose age/
+    qw/target_file weights_file out_file include_hpo_ascendants align align_basename export export_basename log verbose age cytoscape_json graph_stats/
 ] => ( is => 'ro' );
 
 has [qw /append_prefixes reference_files patients_of_interest/] =>
@@ -264,22 +265,25 @@ sub run {
     #print Dumper $self and die;
 
     # Load variables
-    my $reference_files        = $self->{reference_files};
-    my $target_file            = $self->{target_file};
-    my $weights_file           = $self->{weights_file};
-    my $export                 = $self->{export};
-    my $export_basename        = $self->{export_basename};
-    my $include_hpo_ascendants = $self->{include_hpo_ascendants};
-    my $hpo_file               = $self->{hpo_file};
-    my $align                  = $self->{align};
-    my $align_basename         = $self->{align_basename};
-    my $out_file               = $self->{out_file};
-    my $cohort_files           = $self->{cohort_files};
-    my $append_prefixes        = $self->{append_prefixes};
-    my $primary_key            = $self->{primary_key};
-    my $poi                    = $self->{patients_of_interest};
-    my $poi_out_dir            = $self->{poi_out_dir};
-    my $cli                    = $self->{cli};
+    my $reference_files          = $self->{reference_files};
+    my $target_file              = $self->{target_file};
+    my $weights_file             = $self->{weights_file};
+    my $export                   = $self->{export};
+    my $export_basename          = $self->{export_basename};
+    my $include_hpo_ascendants   = $self->{include_hpo_ascendants};
+    my $hpo_file                 = $self->{hpo_file};
+    my $align                    = $self->{align};
+    my $align_basename           = $self->{align_basename};
+    my $out_file                 = $self->{out_file};
+    my $cytoscape_json           = $self->{cytoscape_json};
+    my $graph_stats              = $self->{graph_stats};
+    my $cohort_files             = $self->{cohort_files};
+    my $append_prefixes          = $self->{append_prefixes};
+    my $primary_key              = $self->{primary_key};
+    my $poi                      = $self->{patients_of_interest};
+    my $poi_out_dir              = $self->{poi_out_dir};
+    my $cli                      = $self->{cli};
+    my $similarity_metric_cohort = $self->{similarity_metric_cohort};
 
     # die if --align dir does not exist
     my $align_dir = defined $align ? dirname($align) : '.';
@@ -415,6 +419,26 @@ sub run {
     # Perform cohort comparison
     cohort_comparison( $ref_binary_hash, $self ) unless $target_file;
 
+    # Create and write Cytoscape JSON if requested
+    my $graph = matrix2graph(
+        {
+            matrix      => $out_file,
+            json        => $cytoscape_json,
+            graph_stats => 1,
+            verbose     => $self->{verbose}
+        }
+    ) if $cytoscape_json;
+
+    # Produce and write stats for graph
+    cytoscape2graph(
+        {
+            graph   => $graph,
+            output  => $graph_stats,
+            metric  => $similarity_metric_cohort,
+            verbose => $self->{verbose}
+        }
+    ) if defined $graph_stats;
+
     # Perform patient-to-cohort comparison and rank if (-t)
     if ($target_file) {
 
@@ -471,7 +495,7 @@ sub run {
         # Print Ranked results to STDOUT only if CLI
         say join "\n", @$results_rank if $cli;
 
-        # Write txt (
+        # Write txt
         write_array2txt( { filepath => $out_file, data => $results_rank } );
 
         # Write TXT for alignment (ALWAYS!!)

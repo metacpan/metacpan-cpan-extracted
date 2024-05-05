@@ -1,0 +1,16 @@
+[
+"foo"
+"fo\uo"
+"fo\u2o"
+"fo\u20o"
+"fo\u201o"
+"fo\u2019o"
+ fo\u2019o
+"fo\u2019ao"
+"fo\uoooooo"
+"fo\u0ooooo"
+"fo\u00oooo"
+"fo\u002ooo"
+"fo\u2019oo"
+"fo\u2019ao"
+]

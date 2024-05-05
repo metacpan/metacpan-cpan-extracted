@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/XQuery.pm
-## Version v0.3.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.4.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/01
-## Modified 2024/04/20
+## Modified 2024/04/27
 ## All rights reserved
 ## 
 ## 
@@ -20,7 +20,7 @@ BEGIN
     use vars qw( @EXPORT $DEBUG $VERSION );
     our @EXPORT = qw( xq );
     our $DEBUG = 0;
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.4.0';
 };
 
 use strict;
@@ -29,6 +29,476 @@ use warnings;
 {
     no warnings 'once';
     *xq = \&HTML::Object::DOM::Element::xq;
+}
+
+# NOTE: xQuery class
+package xQuery;
+BEGIN
+{
+    use strict;
+    use warnings;
+    use parent qw( Module::Generic );
+};
+use strict;
+use warnings;
+
+{
+    no warnings 'once';
+    # NOTE: clearQueue
+    *clearQueue = \&HTML::Object::DOM::Element::clearQueue;
+    # NOTE: contains
+    *contains = \&HTML::Object::DOM::Element::contains;
+}
+
+sub data
+{
+    my $self = shift( @_ );
+    my $elem = shift( @_ ) || return( $self->error( "No element was provided to set/get data on it." ) );
+    return( $self->error( "Element value provided is not an HTML::Object::DOM::Element" ) ) if( !$self->_is_a( $elem => 'HTML::Object::DOM::Element' ) );
+    my $rv = $elem->data( @_ );
+    return( $self->pass_error( $elem->error ) ) if( !defined( $rv ) && $elem->error );
+    return( $rv );
+}
+
+{
+    no warnings 'once';
+    # NOTE: dequeue
+    *dequeue = \&HTML::Object::DOM::Element::dequeue;
+}
+
+sub each
+{
+    my $self = shift( @_ );
+    my( $data, $cb ) = @_;
+    my $obj;
+    if( $self->_is_array( $data ) )
+    {
+        $obj = $self->new_array( $data );
+    }
+    elsif( $self->_is_hash( $data ) )
+    {
+        $obj = $self->new_hash( $data );
+    }
+    else
+    {
+        return( $self->error( "Unsupported data type (", overload::StrVal( $data // 'undef' ), ")" ) );
+    }
+    return( $self->error( "Callback value provided is not a code reference." ) ) if( !$self->_is_code( $cb ) );
+    return( $obj->each($cb) );
+}
+
+sub extend
+{
+    my $self = shift( @_ );
+    my $deep = 0;
+    if( scalar( @_ ) && !$self->_is_hash( $_[0] ) )
+    {
+        my $bool = shift( @_ );
+        $deep = $bool ? 1 : 0;
+    }
+    # Clean up the arguments
+    my @args = ();
+    for( my $i = 0; $i < scalar( @_ ); $i++ )
+    {
+        if( $self->_is_hash( $_[$i] ) )
+        {
+            push( @args, $_[$i] );
+        }
+    }
+    return( {} ) if( !scalar( @args ) );
+    return( { map( %$_, @args ) } ) unless( $deep );
+    # Credits: Hash::Merge::Simple
+    my $merge;
+    $merge = sub
+    {
+        my( $left, @right ) = @_;
+        return( $left ) unless( @right );
+        return( $merge->( $left, $merge->( @right ) ) ) if( @right > 1 );
+        my( $right ) = @right;
+        my $merged = { %$left };
+        foreach my $key ( keys( %$right ) )
+        {
+            my( $hr, $hl ) = map{ ref( $_->{ $key } ) eq 'HASH' } $right, $left;
+            # Both hash have the same key pointing to an hash
+            if( $hr and $hl )
+            {
+                $merged->{ $key } = $merge->( $left->{ $key }, $right->{ $key } );
+            }
+            else
+            {
+                $merged->{ $key } = $right->{ $key };
+            }
+        }
+        return( $merged );
+    };
+    return( $merge->( @args ) );
+}
+
+sub grep
+{
+    my $self = shift( @_ );
+    my( $ref, $cb, $invert ) = @_;
+    return( $self->error( "Value provided is not an array reference." ) ) if( !$self->_is_array( $ref ) );
+    return( $self->error( "Callback value provided is not a code reference." ) ) if( !$self->_is_code( $cb ) );
+    $invert //= 0;
+    $ref = $self->new_array( $ref );
+    return( $ref->grep( $cb, $invert ) );
+}
+
+sub inArray
+{
+    my $self = shift( @_ );
+    my( $val, $array, $fromIndex ) = @_;
+    return( $self->error( "Array value provided is not an array." ) ) if( !$self->_is_array( $array ) );
+    return( $self->error( "fromIndex value provided is not an integer." ) ) if( defined( $fromIndex ) && !$self->_is_integer( $fromIndex ) );
+    $fromIndex //= 0;
+    my $isRe = ( ref( $val ) eq 'Regexp' ? 1 : 0 );
+    for( my $i = 0; $i < scalar( @$array ); $i++ )
+    {
+        next unless( $i >= $fromIndex );
+        if( $isRe )
+        {
+            return( $i ) if( $array->[$i] =~ /$val/ );
+        }
+        else
+        {
+            return( $i ) if( $array->[$i] eq $val );
+        }
+    }
+    return(-1);
+}
+
+sub isArray { return( shift->_is_array( @_ ) ); }
+
+sub isEmptyObject
+{
+    my $self = shift( @_ );
+    my $this = shift( @_ );
+    return(0) if( !$self->_is_hash( $this, 'strict' ) );
+    return( scalar( keys( %$this ) ) ? 0 : 1 );
+}
+
+sub isFunction
+{
+    my $self = shift( @_ );
+    my $this = shift( @_ );
+    return(0) if( $self->_is_empty( $this ) );
+    return(1) if( $self->_is_code( $this ) );
+    my $pkg = caller;
+    if( $self->_has_symbol( $pkg => "\&${this}" ) &&
+        defined( &{"${pkg}\::${this}"} ) )
+    {
+        return(1);
+    }
+    return(0);
+}
+
+sub isNumeric { return( shift->_is_number( @_ ) ); }
+
+sub isPlainObject { return( shift->_is_hash( shift( @_ ), 'strict' ) ); }
+
+sub isWindow { return( shift->_is_a( shift( @_ ) => 'HTML::Object::DOM::Window' ) ); }
+
+sub makeArray
+{
+    my $self = shift( @_ );
+    my $ref = shift( @_ );
+    if( $self->_is_a( $ref => 'HTML::Object::Collection' ) )
+    {
+        $ref = $ref->children;
+    }
+    return( $self->error( "Value provided is not an array reference or an array object." ) ) if( !$self->_is_array( $ref ) );
+    my $new = [];
+    @$new = @$ref;
+    return( $new );
+}
+
+sub map
+{
+    my $self = shift( @_ );
+    my $ref  = shift( @_ ) || return( $self->error( "No data was provided." ) );
+    my $code = shift( @_ ) || return( $self->error( "No code reference was provided." ) );
+    return( $self->error( "I was expecting a code reference, but instead I was provided with this: \"", overload::StrVal( $code ), "\"." ) ) if( ref( $code ) ne 'CODE' );
+    my $type;
+    if( $self->_is_array( $ref ) )
+    {
+        $type = 'array';
+    }
+    elsif( $self->_is_hash( $ref => 'strict' ) )
+    {
+        $type = 'hash';
+    }
+    my $new = $self->new_array;
+    local $@;
+    if( defined( $type ) )
+    {
+        my $each = sub
+        {
+            if( $type eq 'hash' )
+            {
+                return( CORE::each( %$ref ) );
+            }
+            else
+            {
+                return( CORE::each( @$ref ) );
+            }
+        };
+
+        # We use a callback, because perl does not accept: each( $type eq 'array' ? @$ref : %$ref )
+        while( my( $key, $value ) = $each->() )
+        {
+            # try-catch
+            my @rv = eval
+            {
+                $code->( $value, $key );
+            };
+            if( $@ )
+            {
+                warn( "An error occured while executing callback for key ${key}: $@" ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
+                next;
+            }
+            # User returned an empty array or undef
+            if( !scalar( @rv ) || ( scalar( @rv ) == 1 && !defined( $rv[0] ) ) )
+            {
+                next;
+            }
+            if( scalar( @rv ) == 1 )
+            {
+                # User returned an array reference, such as:
+                # my @rv = $.map( $array, sub{ return( [1, 2, 3] ) } );
+                if( $self->_is_array( $rv[0] ) )
+                {
+                    $new->push( @{$rv[0]} );
+                }
+                else
+                {
+                    # warn( "Warning only: value returned from the \$.map callback for key ${key} did not return either undef or an array reference: ", join( ', ', map( overload::StrVal( $_ // 'undef' ), @rv ) ) ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
+                    $new->push( $rv[0] );
+                }
+            }
+            # User returned an array of more than 1 item, such as:
+            # my @rv = $.map( $array, sub{ return( 1, 2, 3 ) } );
+            else
+            {
+                $new->push( @rv );
+            }
+        }
+        return( $new );
+    }
+    else
+    {
+        return( $self->error( "The data provided is neither an array reference, an array object or an hash reference." ) );
+    }
+}
+
+sub merge
+{
+    my $self = shift( @_ );
+    my( $first, $second ) = @_;
+    return( $self->error( "First value provided is not an array reference." ) ) if( !$self->_is_array( $first ) );
+    return( $self->error( "Second value provided is not an array reference." ) ) if( !$self->_is_array( $second ) );
+    CORE::push( @$first, @$second );
+    return( $first );
+}
+
+sub noop { return }
+
+sub now
+{
+    my $self = shift( @_ );
+    $self->_load_class( 'DateTime' ) || return( $self->pass_error );
+    $self->_load_class( 'DateTime::Format::Strptime' ) || return( $self->pass_error );
+    my $fmt = DateTime::Format::Strptime->new(
+        pattern => '%s',
+    );
+    my $dt = DateTime->now(
+        formatter => $fmt,
+    );
+    return( $dt );
+}
+
+sub parseHTML
+{
+    my( $self, $str ) = @_;
+    my $res = $self->new_array;
+    return( $res ) if( $self->_is_empty( $str ) );
+    my $parser = HTML::Object::DOM->new( debug => $self->debug );
+    my $doc = $parser->parse_data( "$str" ) ||
+        return( $self->pass_error( $parser->error ) );
+    $res->push( $doc->children->list );
+    return( $res );
+}
+
+sub parseJSON
+{
+    my( $self, $str ) = @_;
+    return( $self->error( "No JSON data was provided to parse" ) ) if( $self->_is_empty( $str ) );
+    my $j = $self->new_json( allow_tags => 0 );
+    # try-catch
+    local $@;
+    my $rv = eval
+    {
+        return( $j->decode( "$str" ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "An error occurred while parsing ", CORE::length( "$str" ), " bytes of JSON data: $@" ) );
+    }
+    return( $rv );
+}
+
+sub parseXML
+{
+    my( $self, $str ) = @_;
+    return( $self->error( "No XML data was provided to parse" ) ) if( $self->_is_empty( $str ) );
+    if( !$self->_load_class( 'XML::LibXML' ) )
+    {
+        return( $self->pass_error );
+    }
+    # try-catch
+    local $@;
+    my $doc = eval
+    {
+        XML::LibXML->load_xml( string => $str );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error while parsing XML data with XML::LibXML: $@" ) );
+    }
+    return( $doc );
+}
+
+# NOTE: $.proxy() is deprecated
+# <https://api.jquery.com/jQuery.proxy/>
+
+# NOTE: $.queue() is unsupported as it has no meaning under perl
+# <https://api.jquery.com/jQuery.queue/>
+
+sub removeData
+{
+    my $self = shift( @_ );
+    my $elem = shift( @_ ) || return( $self->error( "No element was provided." ) );
+    return( $self->error( "Element object provided is not an HTML::Object::DOM::Element" ) ) if( !$self->_is_a( $elem => 'HTML::Object::DOM::Element' ) );
+    $elem->removeData( scalar( @_ ) ? @_ : () );
+    return( $self->pass_error( $elem->error ) ) if( $elem->error );
+    return;
+}
+
+# NOTE: support() is not supported
+# <https://api.jquery.com/jQuery.support/>
+
+sub trim
+{
+    my $self = shift( @_ );
+    my $this = shift( @_ );
+    return( $this ) if( $self->_is_empty( $this ) );
+    if( ref( $this ) &&
+        !$self->_can_overload( $this => '""' ) )
+    {
+        return( $self->error( "Value provided is not a string nor a stringifyable object." ) );
+    }
+    my $str = "$this";
+    $str =~ s/^[[:blank:]\h\v]+|[[:blank:]\h\v]+$//gs;
+    return( $str );
+}
+
+sub type
+{
+    my $self = shift( @_ );
+    my $this = shift( @_ );
+    if( !defined( $this ) )
+    {
+        return( 'undef' );
+    }
+    elsif( $self->_is_hash( $this => 'strict' ) )
+    {
+        return( 'hash' );
+    }
+    elsif( $self->_is_array( $this ) )
+    {
+        return( 'array' );
+    }
+    elsif( $self->_is_a( $this => [qw( DateTime Module::Generic::DateTime )] ) )
+    {
+        return( 'date' );
+    }
+    elsif( $self->_is_a( $this => [qw( Module::Generic::Boolean JSON::PP::Boolean )] ) )
+    {
+        return( 'boolean' );
+    }
+    elsif( $self->_is_a( $this => 'Regexp' ) )
+    {
+        return( 'regexp' );
+    }
+    elsif( $self->_is_a( $this => [qw( Module::Generic::Exception Error Throwable::Error )] ) )
+    {
+        return( 'error' );
+    }
+    elsif( $self->_is_number( $this ) )
+    {
+        return( 'number' );
+    }
+    else
+    {
+        return( 'string' );
+    }
+}
+
+sub unique
+{
+    my $self = shift( @_ );
+    my $arr  = shift( @_ ) || return( $self->error( "No array was provided to make unique." ) );
+    return( $self->error( "Value provided is not an array reference or an array object." ) ) if( !$self->_is_array( $arr ) );
+    my $res = $self->new_array( $arr )->unique;
+    return( $res );
+}
+
+sub uniqueSort
+{
+    my $self = shift( @_ );
+    my $new = $self->unique( @_ ) || return( $self->pass_error );
+    return( $new ) if( $new->is_empty );
+    my $root = $new->first->getRootNode;
+    # <https://stackoverflow.com/questions/63575333/javascript-replacement-of-sourceindex-in-chromium-browsers>
+    # <https://developer.mozilla.org/en-US/docs/Web/API/Document/all>
+    # <https://johnresig.com/blog/comparing-document-position/#postcomment>
+    # Compare Position - MIT Licensed, John Resig
+    # function comparePosition(a, b)
+    # {
+    #     return a.compareDocumentPosition
+    #         ? a.compareDocumentPosition(b)
+    #         : a.contains
+    #             ? ( a != b && a.contains(b) && 16 ) + 
+    #               ( a != b && b.contains(a) && 8 ) + 
+    #               ( a.sourceIndex >= 0 && b.sourceIndex >= 0
+    #                   ? ( a.sourceIndex < b.sourceIndex && 4 ) + ( a.sourceIndex > b.sourceIndex && 2 )
+    #                   : 1
+    #               ) + 0
+    #             : 0;
+    # }
+    my $all = $root->querySelectorAll('*');
+    for( my $i = 0; $i < scalar( @$all ); $i++ )
+    {
+        my $e = $all->[$i];
+        $e->sourceIndex( $i );
+    }
+    $new = $new->sort(sub
+    {
+        my( $a, $b ) = @_;
+        return(
+            $a->can( 'compareDocumentPosition' )
+                ? $a->compareDocumentPosition( $b )
+                : $a->can( 'contains' )
+                    ? ( $a !=$ b && $a->contains($b) && 16 ) + 
+                      ( $a != $b && $b->contains($a) && 8 ) + 
+                      ( ( $a->sourceIndex // -1 ) >= 0 && ( $b->sourceIndex // -1 ) >= 0
+                          ? ( $a->sourceIndex < $b->sourceIndex && 4 ) + ( $a->sourceIndex > $b->sourceIndex && 2 )
+                          : 1
+                      ) + 0
+                    : 0
+        );
+    });
+    return( $new );
 }
 
 # NOTE: HTML::Object::DOM::Element class
@@ -61,6 +531,8 @@ BEGIN
     our $LOOK_LIKE_HTML = qr/^[[:blank:]\h\v]*\<\w+.*?\>/;
 };
 
+use strict;
+use warnings;
 no warnings 'redefine';
 
 # Takes a selector (e.g. '.some-class'); or
@@ -841,6 +1313,8 @@ sub attr
 
 sub before { return( shift->_before_after( @_, { action => 'before' } ) ); }
 
+sub clearQueue { return( $_[0] ) }
+
 # Takes a selector; or
 # a selector and an HTML::Object::DOM::Element as a context; or
 # a HTML::Object::DOM::Element object
@@ -904,6 +1378,75 @@ sub closest
         return( $process->( $parent ) );
     };
     $process->( $self );
+    return( $collection );
+}
+
+sub contains
+{
+    my $self = shift( @_ );
+    my( $container, $contained );
+    if( scalar( @_ ) > 1 )
+    {
+        return( $self->error( "Wrong number of argument: \$el->contains( \$container, \$contained )" ) ) if( scalar( @_ ) > 2 );
+        ( $container, $contained ) = @_;
+    }
+    elsif( scalar( @_ ) )
+    {
+        $container = $self;
+        $contained = shift( @_ );
+    }
+    elsif( !ref( $self ) && scalar( @_ ) < 2 )
+    {
+        return( $self->error( "You need to provide 2 arguments when using contains() as a class function: xQuery->contains( \$container, \$contained )" ) );
+    }
+    else
+    {
+        return( $self->error( "No contained object provided to check." ) );
+    }
+    # We need an object to access certain methods
+    my $this = ref( $self ) ? $self : HTML::Object::DOM->new;
+    return( $self->error( "Container value provided is undefined." ) ) if( !defined( $container ) );
+    return( $self->error( "Contained value provided is undefined." ) ) if( !defined( $contained ) );
+    return( $this->false ) if( $this->_is_a( $contained => [qw( HTML::Object::DOM::Text HTML::Object::DOM::Comment )] ) );
+    return( $self->error( "Container object provided is not an HTML::Object::DOM::Element" ) ) if( !$this->_is_a( $container => 'HTML::Object::DOM::Element' ) );
+    return( $self->error( "Contained object provided is not an HTML::Object::DOM::Element" ) ) if( !$this->_is_a( $contained => 'HTML::Object::DOM::Element' ) );
+    my $crawl;
+    my $seen = {};
+    $crawl = sub
+    {
+        my $kids = shift( @_ );
+        my $grand_kids = $this->new_array;
+        for( my $i = 0; $i < scalar( @$kids ); $i++ )
+        {
+            my $e = $kids->[$i];
+            # Avoid recursion
+            next if( ++$seen->{ $e->eid } > 1 );
+            next unless( $this->_is_a( $e => 'HTML::Object::DOM::Element' ) );
+            return( $this->true ) if( $e == $contained );
+            $grand_kids->push( $e->children->list ) if( !$e->children->is_empty );
+        }
+        return( $this->false ) if( $grand_kids->is_empty );
+        return( $crawl->( $grand_kids ) );
+    };
+    return( $crawl->( $container->children ) );
+}
+
+sub contents
+{
+    my $self = shift( @_ );
+    my $collection = $self->new_collection;
+    my $children = $collection->children;
+    if( $self->isa_collection )
+    {
+        $self->children->foreach(sub
+        {
+            $children->push( $_->children->list );
+        });
+    }
+    else
+    {
+        $children->push( $self->children->list );
+    }
     return( $collection );
 }
 
@@ -1155,42 +1698,55 @@ sub data
     {
         $elem = $self->children->first;
     }
-    elsif( $self->tag->substr( 0, 1 ) )
+    # elsif( $self->tag->substr( 0, 1 ) eq '_' )
+    elsif( !$self->_is_a( $self => 'HTML::Object::DOM::Element' ) )
     {
-        return( $self->error( "You can only call the data method on html elements." ) );
+        return( $self->error( "You can only call the data method on HTML elements." ) );
     }
     else
     {
         $elem = $self;
     }
     
-    my $attr = $self->attributes;
     if( $self->_is_hash( $this ) )
     {
+        my $changed = 0;
         $this = $self->new_hash( $this )->each(sub
         {
             my( $k, $v ) = @_;
             # Remove leading and trailing spaces if this is not a reference
             $v =~ s/^[[:blank:]\h]+|[[:blank:]\h]+$//g if( !ref( $v ) );
-            $attr->set( 'data-' . $k, $v );
+            # $attr->set( 'data-' . $k, $v );
+            if( $elem->setAttribute( 'data-' . $k, $v ) )
+            {
+                $changed++;
+            }
         });
-        $elem->reset(1);
+        $elem->reset(1) if( $changed );
         return( $elem );
     }
-    elsif( defined( $this ) && defined( $val ) )
+    elsif( defined( $this ) && scalar( @_ ) > 1 )
     {
+        # From jQuery documentation: "undefined is not recognized as a data value. Calls such as .data( "name", undefined ) will return the jQuery object that it was called on, allowing for chaining."
+        return( $self ) if( !defined( $val ) );
         return( $self->error( "I was provided data name '$this', but I was expcting a regular string." ) ) if( ref( $this ) && ( !overload::Overloaded( $this ) || ( overload::Overloaded( $this ) && !overload::Method( $this, '""' ) ) ) );
-        $attr->set( 'data-' . $this => $val );
-        $elem->reset(1);
+        # $attr->set( 'data-' . $this => $val );
+        if( $elem->setAttribute( 'data-' . $this => $val ) )
+        {
+            $elem->reset(1);
+        }
         return( $elem );
     }
-    elsif( defined( $this ) && !defined( $val ) )
+    elsif( defined( $this ) && scalar( @_ ) == 1 )
     {
-        return( $attr->get( $this ) );
+        # return( $attr->get( $this ) );
+        return( $elem->getAttribute( 'data-' . $this ) );
     }
     else
     {
+        $self->_load_class( 'Module::Generic::Dynamic' ) || return( $self->pass_error );
         my $ref = {};
+        my $attr = $elem->attributes;
         $attr->each(sub
         {
             my( $k, $v ) = @_;
@@ -1199,9 +1755,31 @@ sub data
                 $ref->{ substr( $k, 5 ) } = $v;
             }
         });
-        return( Module::Generic::Dynamic->new( $ref ) );
+        my $obj = Module::Generic::Dynamic->new( $ref ) ||
+            return( $self->pass_error( Module::Generic::Dynamic->error ) );
+        return( $obj );
     }
 }
+
+sub debug
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $val = $self->SUPER::debug( @_ );
+        if( $self->isa_collection )
+        {
+            $self->children->foreach(sub
+            {
+                $_->debug( $val );
+            });
+        }
+        return( $val );
+    }
+    return( $self->SUPER::debug );
+}
+
+sub dequeue { return( $_[0] ) }
 
 # TODO: Instead of adding this method, maybe we should change the one in HTML::Object::DOM::Element to have it return $self instead of $parent, because otherwise there is no difference
 sub detach
@@ -1214,7 +1792,7 @@ sub detach
         {
             my $e = shift( @_ );
             my $parent = $e->parent;
-            return( 1 ) if( !$parent );
+            return(1) if( !$parent );
             my $pos = $parent->children->pos( $e );
             $parent->children->splice( $pos, 1 );
             $e->parent( undef() );
@@ -1290,7 +1868,7 @@ sub filter
 {
     my $self = shift( @_ );
     my $this = shift( @_ );
-    my $collection = $self->new_collection;
+    my $collection = $self->new_collection( end => $self );
     return( $collection ) if( !defined( $this ) );
     if( !ref( $this ) || 
         ( ref( $this ) && 
@@ -1303,9 +1881,15 @@ sub filter
         {
             $self->children->foreach(sub
             {
-                if( $_->matches( $xpath ) )
+                # $_->debug( $self->debug ); 
+                if( $_->tag->substr( 0, 1 ) ne '_' &&
+                    $_->matches( $xpath ) )
                 {
                     $collection->children->push( $_ );
+                }
+                else
+                {
+                    # No match
                 }
             });
         }
@@ -1318,7 +1902,7 @@ sub filter
     {
         if( $self->isa_collection )
         {
-            $self->for(sub
+            $self->children->for(sub
             {
                 my( $i, $e ) = @_;
                 local $_ = $e;
@@ -1402,7 +1986,7 @@ sub find
                     {
                         $collection->children->push( $child );
                         # We've added this child. Move to next child.
-                        return( 1 );
+                        return(1);
                     }
                 });
                 if( $child->children->length > 0 )
@@ -1506,9 +2090,37 @@ sub first
     }
 }
 
-# Originally, in jQuery, this returns the underlying DOM element, but here, in perl context,
-# this does not mean much, and we return our own object.
-sub get { return( $_[0] ); }
+# <https://api.jquery.com/get/>
+sub get
+{
+    my $self = shift( @_ );
+    my $idx = shift( @_ );
+    if( $self->isa_collection )
+    {
+        if( defined( $idx ) )
+        {
+            return( $self->error( "Index value provided is not an integer." ) ) if( !$self->_is_integer( $idx ) );
+            return( $self->children->[ $idx ] );
+        }
+        else
+        {
+            my $arr = $self->new_array;
+            $arr->push( $self->children->list );
+            return( $arr );
+        }
+    }
+    else
+    {
+        if( defined( $idx ) )
+        {
+            return( $self );
+        }
+        else
+        {
+            return( $self->new_array( $self ) );
+        }
+    }
+}
 
 sub getDataJson
 {
@@ -2179,6 +2791,8 @@ sub is
     }
 }
 
+sub isArray { return( shift->_is_array( @_ ) ); }
+
 sub isa_collection
 {
     my $self = shift( @_ );
@@ -2485,6 +3099,8 @@ sub new_attribute
     return( $e );
 }
 
+sub new_parser { HTML::Object::DOM->new }
+
 sub new_collection
 {
     my $self = shift( @_ );
@@ -2496,8 +3112,6 @@ sub new_collection
     return( $e );
 }
 
-sub new_parser { HTML::Object::DOM->new }
-
 sub new_root
 {
     my $self = shift( @_ );
@@ -2506,6 +3120,23 @@ sub new_root
     my $e = HTML::Object::DOM::Root->new( $opts ) ||
         return( $self->pass_error( HTML::Object::DOM::Root->error ) );
     return( $e );
+}
+
+sub normalize_content
+{
+    my $self = shift( @_ );
+    if( $self->isa_collection )
+    {
+        $self->children->foreach(sub
+        {
+            $_->normalize_content;
+        });
+        return( $self );
+    }
+    else
+    {
+        $self->SUPER::normalize_content;
+    }
 }
 
 # Takes a selector expression; or
@@ -2850,6 +3481,9 @@ sub promise
     # return( $deferred->promise() );
 }
 
+# NOTE: queue is not implemented
+# <https://api.jquery.com/queue/>
+
 sub rank { return( shift->_set_get_number_as_object( 'rank', @_ ) ); }
 
 # <https://api.jquery.com/remove/>
@@ -2859,19 +3493,26 @@ sub remove
     my $self = shift( @_ );
     if( $self->isa_collection )
     {
-        my $deleted = $self->children->foreach(sub{ $_->delete });
+        $self->children->foreach(sub
+        {
+            my $e = shift( @_ );
+            my $pos = $e->pos;
+            my $parent = $e->parent;
+            $e->delete;
+        });
     }
     # xpath provided
     elsif( @_ )
     {
         my $xpath = $self->_xpath_value( shift( @_ ) ) || return;
-        return( $self->find( $xpath )->remove );
+        $self->find( $xpath )->remove;
     }
     # Equivalent to delete
     else
     {
-        return( $self->delete );
+        $self->delete;
     }
+    return( $self );
 }
 
 sub removeAttr
@@ -2966,6 +3607,73 @@ sub removeClass
         $process->( $self );
     }
     return( $self );
+}
+
+sub removeData
+{
+    my $self = shift( @_ );
+    my $elem;
+    if( $self->isa_collection )
+    {
+        $elem = $self->children->first;
+    }
+    elsif( !$self->_is_a( $self => 'HTML::Object::DOM::Element' ) )
+    {
+        return( $self->error( "You can only call the removeData() method on html elements." ) );
+    }
+    else
+    {
+        $elem = $self;
+    }
+    
+    my $keys;
+    # If no @_ is provided this is undef and it is ok, we would remove all data attributes then
+    if( @_ )
+    {
+        my $this = shift( @_ );
+        if( $self->_is_empty( $this ) )
+        {
+            return( $self->error( "Data name value provided is empty. If you want to remove all data attributes, simply call removeData() without argument." ) );
+        }
+        elsif( !ref( $this ) ||
+               ( ref( $this ) && $self->_can_overload( $this => '""' ) ) )
+        {
+            $this = "$this";
+            if( CORE::index( $this, ' ' ) != -1 )
+            {
+                $keys = [CORE::split( /[[:blank:]\h]+/, $this )];
+            }
+            else
+            {
+                $keys = [$this];
+            }
+        }
+        elsif( $self->_is_array( $this ) )
+        {
+            $keys = $this;
+        }
+        else
+        {
+            return( $self->error( "Data name value to remove is unsupported. You can only provide a string, a space-separated string of names, or an array reference." ) );
+        }
+    }
+    else
+    {
+        $keys = $elem->attributes_sequence;
+    }
+
+    my $changed = 0;
+    foreach my $k ( @$keys )
+    {
+        if( $elem->hasAttribute( 'data-' . $k ) )
+        {
+            $elem->removeAttribute( 'data-' . $k );
+            $changed++;
+        }
+    }
+    $elem->reset(1) if( $changed );
+    # Return undef
+    return;
 }
 
 # Takes html string, array of elements, an element (including a collection object) or a code reference
@@ -3170,6 +3878,11 @@ sub show
         $self->reset(1);
     }
 }
+
+# This is here and although it has been deprecated, so that $.uniqueSort() works
+# <https://stackoverflow.com/questions/63575333/javascript-replacement-of-sourceindex-in-chromium-browsers>
+# <https://developer.mozilla.org/en-US/docs/Web/API/Document/all>
+sub sourceIndex : lvalue { return( shift->_set_get_lvalue( 'sourceIndex', @_ ) ); }
 
 sub string_value 
 {
@@ -3452,6 +4165,140 @@ sub to_number { return( HTML::Object::DOM::Number->new( shift->getValue ) ); }
 
 sub toString { return( shift->as_xml( @_ ) ); }
 
+sub uniqueSort
+{
+    my $self = shift( @_ );
+    my $collection = $self->new_collection;
+    if( $self->isa_collection )
+    {
+        my $elems = xQuery->uniqueSort( $self->children ) ||
+            return( $self->pass_error( xQuery->error ) );
+        $collection->children->push( $elems->list );
+    }
+    else
+    {
+        $collection->children->push( $self );
+    }
+    return( $collection );
+}
+
+sub wrap
+{
+    my $self = shift( @_ );
+    my @args = @_;
+    my( $this, $more ) = @args;
+    return( $self->error( "Nothing was provided to wrap elements." ) ) if( !$this );
+    my( $wrapper, $elems, $is_code );
+    # "When you pass a collection object containing more than one element, or a selector matching more than one element, the first element will be used."
+    if( $self->_is_a( $this => 'HTML::Object::Collection' ) )
+    {
+        return( $self->error( "Collection provided as wrapper is actually empty!" ) ) if( $this->children->is_empty );
+        $wrapper = $this->children->first;
+        return( $self->error( "The first element of the collection provided did not yield an element object." ) ) if( !$self->_is_a( $wrapper => 'HTML::Object::DOM::Element' ) );
+    }
+    elsif( $self->_is_a( $this => 'HTML::Object::DOM::Element' ) )
+    {
+        $wrapper = $this;
+    }
+    elsif( $self->_is_code( $this ) )
+    {
+        $is_code = 1;
+        $wrapper = $this;
+    }
+    # selector, html to parse
+    else
+    {
+        my $tmp = xq( @args ) || return( $self->pass_error );
+        return( $self->error( "Selector or HTML provided as wrapper did not yield any wrapping element." ) ) if( $tmp->children->is_empty );
+        $wrapper = $tmp->children->first ||
+            return( $self->error( "Collection returned from selector or HTML provided is empty." ) );
+        return( $self->error( "Collection returned from selector or HTML provided did not yield an element object." ) ) if( !$self->_is_a( $wrapper => 'HTML::Object::DOM::Element' ) );
+    }
+
+    if( $self->isa_collection )
+    {
+        $elems = $self->children;
+    }
+    else
+    {
+        $elems = $self->new_array( $self );
+    }
+
+    my $find_nested;
+    $find_nested = sub
+    {
+        my( $el, $kids ) = @_;
+        my $n = $kids->length;
+        if( !$n )
+        {
+            return( $el );
+        }
+        elsif( $n == 1 )
+        {
+            return( $find_nested->( $kids->[0] => $kids->[0]->children ) );
+        }
+        else
+        {
+            return( '' );
+        }
+    };
+
+    local $@;
+    for( my $i = 0; $i < scalar( @$elems ); $i++ )
+    {
+        my $e = $elems->[$i];
+        my $parent = $e->parent;
+        my $pos = $parent->children->pos( $e );
+        return( $self->error( "Unable to find element No $i position in its parent." ) ) if( !defined( $pos ) );
+        my $wrap;
+        if( $is_code )
+        {
+            # try-catch
+            my $rv = eval
+            {
+                local $_ = $e;
+                $wrapper->( $i );
+            };
+            if( $@ )
+            {
+                return( $self->error( "An error occurred executing the wrapper callback code reference for element at offset $i: $@" ) );
+            }
+            my $thingy;
+            if( $self->_is_a( $rv => 'HTML::Object::Collection' ) )
+            {
+                return( $self->error( "Collection provided as wrapper is actually empty!" ) ) if( $rv->children->is_empty );
+                $thingy = $rv->children->first;
+                return( $self->error( "The first element of the collection provided did not yield an element object." ) ) if( !$self->_is_a( $thingy => 'HTML::Object::DOM::Element' ) );
+            }
+            elsif( $self->_is_a( $rv => 'HTML::Object::DOM::Element' ) )
+            {
+                $thingy = $rv;
+            }
+            # selector, html to parse
+            else
+            {
+                my $tmp = xq( $rv, ( defined( $more ) ? $more : () ) ) || return( $self->pass_error );
+                return( $self->error( "Selector or HTML returned from callback as wrapper did not yield any wrapping element." ) ) if( $tmp->children->is_empty );
+                $thingy = $tmp->children->first ||
+                    return( $self->error( "Collection returned from selector or HTML provided is empty." ) );
+                return( $self->error( "Collection returned from selector or HTML provided did not yield an element object." ) ) if( !$self->_is_a( $thingy => 'HTML::Object::DOM::Element' ) );
+            }
+            $wrap = $thingy->clone;
+        }
+        else
+        {
+            $wrap = $wrapper->clone;
+        }
+        my $nested = $find_nested->( $wrap => $wrap->children );
+        # $e->detach;
+        $wrap->parent( $parent );
+        $parent->children->splice( $pos, 1, $wrap );
+        $nested->children->set( $e );
+        $e->parent( $nested );
+    }
+    return( $self );
+}
+
 sub xp
 {
     my $self = shift( @_ );
@@ -3470,12 +4317,44 @@ sub xp
 # xq();
 sub xq
 {
-    my( $this, $more ) = @_;
-    print( STDERR __PACKAGE__, "::xq: Argument provided is a reference ? ", ( ref( $this ) ? 'yes -> ' . ref( $this ) : 'no' ), "\n" ) if( $HTML::Object::XQuery::DEBUG >= 4 );
+    my( @args ) = @_;
+    # Check if this might be all some HTML::Object::DOM::Element objects passed to form a collection
+    my $is_all_objects = 1;
+    no warnings 'once';
+    my $opts = 
+    {
+        xq_debug => $HTML::Object::xQuery::DEBUG,
+    };
+    if( scalar( @args ) > 1 &&
+        defined( $args[-1] ) &&
+        ref( $args[-1] ) eq 'HASH' && 
+        CORE::exists( $args[-1]->{xq_debug} ) )
+    {
+        $opts = CORE::pop( @args );
+    }
+    # A dummy accessor
+    my $self = HTML::Object::DOM::Element->new( debug => $opts->{xq_debug} );
+    # We check if xq was not called with a bunch of HTML::Object::DOM::Element objects, such as:
+    # $(@elements) or maybe xq(@elements), which would return a new collection.
+    for( my $i = 0; $i < scalar( @args ); $i++ )
+    {
+        unless( $self->_is_a( $args[$i] => 'HTML::Object::DOM::Element' ) )
+        {
+            $is_all_objects = 0;
+            last;
+        }
+    }
+    # Shortcut
+    if( $is_all_objects )
+    {
+        my $collection = $self->new_collection( debug => $opts->{xq_debug} );
+        $collection->children->set( @args );
+        return( $collection );
+    }
+    my( $this, $more ) = @args;
     # e.g. $('<div />', { id => 'pouec', class => 'hello' });
     if( $this =~ /^$LOOK_LIKE_HTML/ )
     {
-        print( STDERR __PACKAGE__, "::xq: Argument provided looks like ", CORE::length( $this ), " bytes of HTML, parsing it.\n" ) if( $HTML::Object::XQuery::DEBUG >= 4 );
         my $p = HTML::Object::DOM->new;
         $this = "$this";
         # We trim the string, so that leading and trailing space do not get counted
@@ -3488,7 +4367,6 @@ sub xq
         # $doc is a HTML::Object::DOM::Document, which is not suitable, so we change it to a
         # collection object
         my $collection = $doc->new_collection;
-        print( STDERR __PACKAGE__, "::xq: Pushing ", $doc->children->length, " elements found into our new collection.\n" ) if( $HTML::Object::XQuery::DEBUG >= 4 );
         $collection->children( $doc->children );
         if( $doc->children->length == 1 )
         {
@@ -3516,9 +4394,16 @@ sub xq
         }
         return( $collection );
     }
+    # Hmmm, I wanted to support $.parseXML and consequently allow $($xmlDoc), but our interface is really just tailored for HTML::Object::Element and not for XML::libXML, so all of the HTML::Object::XQuery methods would not work.
+    # elsif( $self->_is_a( $this => 'XML::LibXML::Node' ) )
+    # {
+    #     my $collection = $self->new_collection;
+    #     my @childnodes = $this->childNodes;
+    #     $collection->children->push( @childNodes );
+    #     return( $collection );
+    # }
     elsif( ( !ref( $this ) || ( overload::Overloaded( $this ) && overload::Method( $this, '""' ) ) ) && CORE::index( "$this", "\n" ) == -1 )
     {
-        print( STDERR __PACKAGE__, "::xq: Argument provided '$this' looks like a selector, searching for it.\n" ) if( $HTML::Object::XQuery::DEBUG >= 4 );
         # e.g. $('div')
         if( !defined( $more ) )
         {
@@ -3683,6 +4568,8 @@ sub _append_prepend_to
 {
     my $self = shift( @_ );
     my $this = shift( @_ ) || return( $self->error( "No target was provided to insert element." ) );
+    # For example: $sel->appendTo( 'body', $doc );
+    my $context = shift( @_ ) if( $self->_is_a( $_[0] => 'HTML::Object::DOM::Element' ) );
     my $opts = $self->_get_args_as_hash( @_ );
     if( !exists( $opts->{action} ) )
     {
@@ -3692,7 +4579,7 @@ sub _append_prepend_to
         $opts->{action} = ( $caller =~ /^(append|prepend)(?:To|_to)$/ )[0];
     }
     return( $self->error( "Invalid value for argument \"action\": '$opts->{action}'" ) ) if( $opts->{action} !~ /^(append|prepend)$/ );
-    my $a;
+    my( $src, $dst );
     # A collection to be returned if there is more than 1 target
     my $collection = $self->new_collection;
     if( !ref( $this ) )
@@ -3701,26 +4588,39 @@ sub _append_prepend_to
         {
             my $p = $self->new_parser;
             $this = $p->parse_data( $this ) || return( $self->pass_error( $p->error ) );
-            $a = $self->new_array( [ $this ] );
+            $dst = $self->new_array( [ $this ] );
         }
         # otherwise this has to be a selector
         # TODO: Need to correct this and adjust the object used as a base for the find
         # since $self could very well be a dynamically created dom object
         else
         {
-            $this = $self->find( $this ) || return;
-            $a = $self->new_array( [ $this ] );
+            if( !defined( $context ) &&
+                defined( $HTML::Object::DOM::GLOBAL_DOM ) )
+            {
+                $context = $HTML::Object::DOM::GLOBAL_DOM;
+            }
+            elsif( !defined( $context ) &&
+                $self->isa_collection &&
+                !$self->children->is_empty )
+            {
+                $context = $self->children->first->getRootNode;
+            }
+            $this = defined( $context ) ? $context->find( $this ) : $self->find( $this );
+            return( $self->pass_error ) unless( $this );
+            # $dst = $self->new_array( [ $this ] );
+            $dst = $this->children;
         }
     }
     elsif( $self->_is_array( $this ) )
     {
         # Make sure this is a Module::Generic::Array object
-        $a = $self->new_array( $this );
+        $dst = $self->new_array( $this );
     }
     elsif( $self->_is_object( $this ) )
     {
         return( $self->error( "Object provided '$this' (", overload::StrVal( $this ), ") is not an HTML::Object::DOM::Element object." ) ) if( !$this->isa( 'HTML::Object::DOM::Element' ) );
-        $a = $self->new_array( [ $this ] );
+        $dst = $self->new_array( [ $this ] );
     }
     else
     {
@@ -3730,81 +4630,70 @@ sub _append_prepend_to
     # If the content to be inserted is a collection, we loop through it, duplicate each element and insert them
     if( $self->isa_collection )
     {
-        $a->foreach(sub
+        $src = $self->children;
+    }
+    else
+    {
+        $src = $self->new_array( $self );
+    }
+
+    # If the target is just one element, we do not duplicate them, but simply move them
+    if( $dst->length == 1 )
+    {
+        my $elem = $dst->first;
+        my $parent = $elem->parent;
+        return( 1 ) if( !$parent );
+        $elem->reset(1);
+        my $pos = $parent->children->pos( $elem );
+        return( $self->error( "Found a parent for tag \"", $elem->tag, "\", but somehow I could not find its position among its children elements." ) ) if( !defined( $pos ) );
+        $src->foreach(sub
+        {
+            my $e = shift( @_ );
+            # Making sure the content element is detached from its original parent
+            $e->detach;
+            $e->parent( $elem );
+            $e->reset(1);
+            if( $opts->{action} CORE::eq 'prepend' )
+            {
+                $elem->children->unshift( $e );
+            }
+            elsif( $opts->{action} CORE::eq 'append' )
+            {
+                $elem->children->push( $e );
+            }
+            $collection->children->push( $e );
+        });
+    }
+    # However, if the target contain multiple element, we clone the content element
+    else
+    {
+        $dst->foreach(sub
         {
             my $elem = $_;
             my $parent = $elem->parent;
-            return( 1 ) if( !$parent );
+            return(1) if( !$parent );
+            $elem->reset(1);
             my $pos = $parent->children->pos( $elem );
             warn( "Found a parent for tag \"", $elem->tag, "\", but somehow I could not find its position among its children elements.\n" ) if( !defined( $pos ) );
-            return( 1 ) if( !defined( $pos ) );
-            $self->children->foreach(sub
+            return(1) if( !defined( $pos ) );
+            $src->foreach(sub
             {
                 my $e = shift( @_ );
                 # Making sure the content element is detached from its original parent
                 my $clone = $e->detach->clone;
                 $clone->parent( $elem );
                 $clone->reset(1);
-                if( $opts->{action} CORE::eq 'before' )
+                if( $opts->{action} CORE::eq 'prepend' )
                 {
-                    $parent->children->splice( $pos, 0, $clone );
+                    $elem->children->unshift( $clone );
                 }
-                elsif( $opts->{action} CORE::eq 'after' )
+                elsif( $opts->{action} CORE::eq 'append' )
                 {
-                    $parent->children->splice( $pos + 1, 0, $clone );
+                    $elem->children->push( $clone );
                 }
                 $collection->children->push( $clone );
             });
         });
-    }
-    else
-    {
-        # If the target is just one element, we do not duplicate them, but simply move them
-        if( $a->length == 1 )
-        {
-            my $elem = $a->first;
-            my $parent = $elem->parent;
-            return( 1 ) if( !$parent );
-            $elem->reset(1);
-            my $pos = $parent->children->pos( $elem );
-            return( $self->error( "Found a parent for tag \"", $elem->tag, "\", but somehow I could not find its position among its children elements." ) ) if( !defined( $pos ) );
-            $self->detach;
-            $self->parent( $elem );
-            if( $opts->{action} CORE::eq 'before' )
-            {
-                $parent->children->splice( $pos, 0, $self );
-            }
-            elsif( $opts->{action} CORE::eq 'after' )
-            {
-                $parent->children->splice( $pos + 1, 0, $self );
-            }
-            $collection->children->push( $self );
-        }
-        # However, if the target contain multiple element, we clone the content element
-        else
-        {
-            $a->foreach(sub
-            {
-                my $elem = $_;
-                my $parent = $elem->parent;
-                return( 1 ) if( !$parent );
-                $elem->reset(1);
-                my $pos = $parent->children->pos( $elem );
-                warn( "Found a parent for tag \"", $elem->tag, "\", but somehow I could not find its position among its children elements.\n" ) if( !defined( $pos ) );
-                return( 1 ) if( !defined( $pos ) );
-                my $clone = $self->detach->clone;
-                $clone->parent( $elem );
-                if( $opts->{action} CORE::eq 'before' )
-                {
-                    $parent->children->splice( $pos, 0, $clone );
-                }
-                elsif( $opts->{action} CORE::eq 'after' )
-                {
-                    $parent->children->splice( $pos + 1, 0, $clone );
-                }
-                $collection->children->push( $clone );
-            });
-        }
     }
     return( $collection );
 }

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Document.pm
-## Version v0.2.2
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.3
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2023/05/07
+## Modified 2024/04/30
 ## All rights reserved
 ## 
 ## 
@@ -21,7 +21,7 @@ BEGIN
     use HTML::Object::ErrorEvent;
     use Scalar::Util ();
     use Want;
-    our $VERSION = 'v0.2.2';
+    our $VERSION = 'v0.2.3';
 };
 
 use strict;
@@ -163,7 +163,7 @@ sub characterSet : lvalue
 {
     my $self = shift( @_ );
     # Get an Module::Generic::Array object
-    my $results = $self->find( 'meta' ) || return( $self->pass_error );
+    my $results = $self->findNode( 'meta' ) || return( $self->pass_error );
     require Module::Generic::HeaderValue;
     foreach my $e ( $results->list )
     {
@@ -215,7 +215,7 @@ sub compatMode : lvalue { return; }
 sub contentType
 {
     my $self = shift( @_ );
-    my $results = $self->find( 'meta' ) || return( $self->pass_error );
+    my $results = $self->findNode( 'meta' ) || return( $self->pass_error );
     require Module::Generic::HeaderValue;
     my $default = 'text/html';
     foreach my $e ( $results->list )
@@ -437,8 +437,8 @@ sub elementsFromPoint { return; }
 sub embeds
 {
     my $self = shift( @_ );
-    my $results = $self->find( 'embed' ) || return( $self->pass_error );
-    return( $self->new_collection( $results ) );
+    my $results = $self->findNode( 'embed' ) || return( $self->pass_error );
+    return( $self->new_collection_elements( $results ) );
 }
 
 sub enableStyleSheetsForSet { return; }
@@ -475,8 +475,8 @@ sub fonts { return; }
 sub forms
 {
     my $self = shift( @_ );
-    my $results = $self->find( 'form' ) || return( $self->pass_error );
-    return( $self->new_collection( $results ) );
+    my $results = $self->findNode( 'form' ) || return( $self->pass_error );
+    return( $self->new_collection_elements( $results ) );
 }
 
 sub fullscreenElement : lvalue { return; }
@@ -512,7 +512,8 @@ sub getElementById
             if( my $found = $crawl->( $this ) )
             {
                 $e = $found;
-                return;
+                # last
+                return(0);
             }
             return(1);
         });
@@ -551,7 +552,7 @@ sub hasStorageAccess { return; }
 sub head : lvalue
 {
     my $self = shift( @_ );
-    my $results = $self->find( 'head' ) || return( $self->pass_error );
+    my $results = $self->findNode( 'head' ) || return( $self->pass_error );
     my $head = $results->first;
     if( !$head && want( 'OBJECT' ) )
     {
@@ -568,8 +569,8 @@ sub hidden : lvalue { return; }
 sub images : lvalue
 {
     my $self = shift( @_ );
-    my $results = $self->find( 'img' ) || return( $self->pass_error );
-    return( $self->new_collection( $results ) );
+    my $results = $self->findNode( 'img' ) || return( $self->pass_error );
+    return( $self->new_collection_elements( $results ) );
 }
 
 # Note: property implementation read-only
@@ -601,7 +602,7 @@ sub lastModified : lvalue { return( shift->_set_get_datetime( '_last_modified' )
 sub links : lvalue
 {
     my $self = shift( @_ );
-    my $results = $self->find( 'a' ) || return( $self->pass_error );
+    my $results = $self->findNode( 'a' ) || return( $self->pass_error );
     return( $results );
 }
 
@@ -687,7 +688,7 @@ sub pictureInPictureElement : lvalue { return( shift->_set_get_object_lvalue( 'p
 sub pictureInPictureEnabled : lvalue { return( shift->_set_get_boolean( 'pictureinpictureenabled', @_ ) ); }
 
 # Note: property read-only plugins
-sub plugins { return( shift->new_collection ); }
+sub plugins { return( shift->new_collection_elements ); }
 
 sub pointerLockElement : lvalue { return( shift->_set_get_object_lvalue( 'pointerlockelement', 'HTML::Object::DOM::Element', @_ ) ); }
 
@@ -799,7 +800,7 @@ sub requestStorageAccess { return; }
 sub scripts : lvalue
 {
     my $self = shift( @_ );
-    my $results = $self->find( 'script' ) || return( $self->pass_error );
+    my $results = $self->findNode( 'script' ) || return( $self->pass_error );
     return( $results );
 }
 
@@ -812,8 +813,8 @@ sub string_value { return; }
 sub styleSheets : lvalue
 {
     my $self = shift( @_ );
-    my $list = $self->find( 'link[rel="stylesheet"]' ) || return( $self->pass_error );
-    my $results2 = $self->find( 'stylesheet' ) || return( $self->pass_error );
+    my $list = $self->findNode( 'link[rel="stylesheet"]' ) || return( $self->pass_error );
+    my $results2 = $self->findNode( 'stylesheet' ) || return( $self->pass_error );
     $list->merge( $results2 );
     return( $list );
 }
@@ -825,7 +826,7 @@ sub title : lvalue { return( shift->_set_get_callback({
     get => sub
     {
         my $self = shift( @_ );
-        my $results = $self->find( 'title' ) || die( $self->error );
+        my $results = $self->findNode( 'title' ) || die( $self->error );
         return if( $results->is_empty );
         return( $results->first->text );
     },
@@ -833,11 +834,11 @@ sub title : lvalue { return( shift->_set_get_callback({
     {
         my $self = shift( @_ );
         my $arg  = shift( @_ );
-        my $results = $self->find( 'title' ) || die( $self->error );
+        my $results = $self->findNode( 'title' ) || die( $self->error );
         my $e;
         if( $results->is_empty )
         {
-            my $head_results = $self->find( 'head' ) || die( $self->error );
+            my $head_results = $self->findNode( 'head' ) || die( $self->error );
             if( $head_results->is_empty )
             {
                 die( "Could not find the <head> tag to set as parent of the missing <title>. Something is seriously wrong." );
@@ -1021,7 +1022,7 @@ HTML::Object::DOM::Document - HTML Object DOM Document Class
 
 =head1 VERSION
 
-    v0.2.2
+    v0.2.3
 
 =head1 DESCRIPTION
 
@@ -1442,7 +1443,7 @@ or you can use L<HTML::Object::XQuery/find> with a xpath selector, such as:
 
     use HTML::Object::XQuery; # Load jQuery style query functions
     # $doc is the HTML::Object::Document returned by HTML::Object->parse
-    my $collection = $doc->find( 'link[rel="https://example.org/css/main.css"]' ) ||
+    my $collection = $doc->findNode( 'link[rel="https://example.org/css/main.css"]' ) ||
         die( $doc->error );
     $collection->children->foreach(sub
     {

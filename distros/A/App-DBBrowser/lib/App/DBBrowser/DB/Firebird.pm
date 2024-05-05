@@ -121,42 +121,42 @@ sub get_db_handle {
 sub get_databases {
     my ( $sf ) = @_;
     return \@ARGV if @ARGV;
-    my $Firebird_databases = catfile $sf->{i}{app_dir}, 'Firebird_databases.json';
+    my $file_firebird_dbs = catfile $sf->{i}{app_dir}, 'Firebird_databases.json';
     my $ax = App::DBBrowser::Auxil->new( {}, {}, {} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $saved_databases = $ax->read_json( $Firebird_databases ) // [];
+    my $saved_databases = $ax->read_json( $file_firebird_dbs ) // [];
     my $databases = [ @$saved_databases ];
     if ( ! $sf->{i}{search} && @$databases ) {
         return $databases;
     }
     my @pre = ( undef );
     my ( $confirm, $add, $remove ) = ( '  Confirm', '- Add', '- Remove' );
-    my $any_change = 0;
+    my $changed = 0;
 
     while ( 1 ) {
-        my $info = 'Databases: ' . join( ', ', @$databases );
+        my $info = join( "\n", 'Databases: ', @$databases, '' );
         # Choose
         my $choice = $tc->choose(
             [ @pre, $confirm, $add, $remove ],
             { %{$sf->{i}{lyt_v}}, info => $info, undef => '  <=' }
         );
         $ax->print_sql_info( $info );
-        my $changed = 0;
         if ( ! defined $choice ) {
             return $saved_databases;
         }
         elsif ( $choice eq $confirm ) {
-            $ax->write_json( $Firebird_databases, $databases );
+            $ax->write_json( $file_firebird_dbs, $databases );
             return $databases;
         }
         elsif ( $choice eq $add ) {
             my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
             my $new = $tu->choose_a_file( {
                 file_type => 'Database',
-                prompt_file_dir => 'Choose the database directory:' }
+                prompt_file_dir => 'Choose the database location:' }
             );
             if ( length $new ) {
                 $databases = [ uniq sort( @$databases, $new ) ];
+                $changed++;
             }
         }
         elsif ( $choice eq $remove ) {
@@ -165,6 +165,7 @@ sub get_databases {
             my $idx = $tc->choose( [ @pre, @$databases ], { info => $info, index => 1, layout => 2 } );
             if ( $idx ) {
                 splice( @$databases, $idx - @pre, 1 );
+                $changed++;
             }
         }
     }

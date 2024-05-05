@@ -1,0 +1,10 @@
+// No commas or quotes for array values
+[
+    [
+    milk
+    eggs
+    beer
+    ]
+
+    [milk eggs beer]
+]

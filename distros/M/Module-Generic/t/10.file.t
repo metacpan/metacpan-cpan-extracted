@@ -590,8 +590,12 @@ EOT
             diag( "Failed to create mmap: ", $mapfile->error ) if( $DEBUG );
             skip( 'failed to create mmap', 4 );
         }
-        $var3 = 'Hello Jack';
-        substr( $var3, 0, 5 ) = 'Good bye';
+        # <https://stackoverflow.com/questions/53671315/how-to-properly-write-to-a-file-using-filemap>
+        {
+            no warnings;
+            $var3 = 'Hello Jack';
+            substr( $var3, 0, 5 ) = 'Good bye';
+        }
         $var3 =~ s/Jack/John/;
         my $content3 = $filemap->load;
         is( $var3, $content3, 'mmap variable value with File::Map' );

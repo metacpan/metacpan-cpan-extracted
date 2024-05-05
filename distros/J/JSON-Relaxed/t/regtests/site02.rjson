@@ -1,0 +1,7 @@
+// No commas or quotes for object pairs
+
+{
+    color: blue
+    number: 12
+    band: Beatles
+}

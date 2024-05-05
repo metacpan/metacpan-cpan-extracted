@@ -33,7 +33,6 @@ sub new {
 
 sub get_content {
     my ( $sf, $sql, $source, $goto_filter ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cs = App::DBBrowser::GetContent::Source->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cp = App::DBBrowser::GetContent::Parse->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -273,7 +272,7 @@ sub get_content {
                     $goto_filter = 0;
 
                     FILTER: while ( 1 ) {
-                        my $ok = $cf->input_filter( $sql, $source );
+                        my $ok = $cf->input_filter( $sql );
                         if ( ! $ok ) {
                             if ( $source->{saved_book} ) {
                                 next PARSE;

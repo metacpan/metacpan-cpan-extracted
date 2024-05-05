@@ -6,6 +6,7 @@ cpanfile
 Dockerfile
 lib/Pheno/Ranker.pm
 lib/Pheno/Ranker/Align.pm
+lib/Pheno/Ranker/Graph.pm
 lib/Pheno/Ranker/IO.pm
 lib/Pheno/Ranker/Stats.pm
 LICENSE
@@ -31,6 +32,9 @@ t/example_config_ref.yaml
 t/example_ref.json
 t/export.glob_hash.json
 t/export.ref_binary_hash.json
+t/graph.json
+t/graph.t
+t/graph_stats.txt
 t/individuals.json
 t/individuals_random_100.json
 t/individuals_random_100_ontologies.json

@@ -206,10 +206,9 @@ sub function_with_one_col {
         }
         elsif ( $driver eq 'Oracle' ) {
             my ( $column_type ) = @$args;
-            return "TRUNC((CAST($col AT TIME ZONE 'UTC' AS DATE) - DATE '1970-01-01') * 86400)"                          if $column_type eq 'TIMESTAMP_TZ';
-            return "TRUNC((CAST(FROM_TZ($col,SESSIONTIMEZONE) AT TIME ZONE 'UTC' AS DATE) - DATE '1970-01-01') * 86400)" if $column_type eq 'TIMESTAMP';
-            return "TRUNC((CAST(FROM_TZ(CAST($col AS TIMESTAMP),SESSIONTIMEZONE) AT TIME ZONE 'UTC' AS DATE) - DATE '1970-01-01') * 86400)"; # DATE
-            #return "TRUNC(($col - date '1970-01-01') * 86400)"; # no timezone
+            return "TRUNC((CAST($col AT TIME ZONE 'UTC' AS DATE) - DATE '1970-01-01') * 86400)"                                              if $column_type eq 'TIMESTAMP_TZ';
+            return "TRUNC((CAST(FROM_TZ($col,SESSIONTIMEZONE) AT TIME ZONE 'UTC' AS DATE) - DATE '1970-01-01') * 86400)"                     if $column_type eq 'TIMESTAMP';
+            return "TRUNC((CAST(FROM_TZ(CAST($col AS TIMESTAMP),SESSIONTIMEZONE) AT TIME ZONE 'UTC' AS DATE) - DATE '1970-01-01') * 86400)";                   # DATE
         }
     }
     else {
@@ -249,7 +248,7 @@ sub coalesce {
 
 sub epoch_to_date {
     my ( $sf, $col, $interval ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    #my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $driver = $sf->{i}{driver};
     if ( $driver eq 'SQLite' ) {
         return "DATE($col/$interval,'unixepoch','localtime')";
@@ -259,7 +258,6 @@ sub epoch_to_date {
     }
     elsif ( $driver eq 'Pg' ) {
         return "TO_TIMESTAMP(${col}::bigint/$interval)::date";
-        #return "TO_CHAR(TO_TIMESTAMP(${col}::bigint/$interval) at time zone 'UTC','yyyy-mm-dd')"; # without timezone
     }
     elsif ( $driver eq 'Firebird' ) {
         #my $firebird_major_version = $ax->major_server_version();
@@ -281,14 +279,13 @@ sub epoch_to_date {
     }
     elsif ( $driver eq 'Oracle' ) {
         return "TO_CHAR((TIMESTAMP '1970-01-01 00:00:00 UTC' + $col/$interval * INTERVAL '1' SECOND) AT TIME ZONE SESSIONTIMEZONE,'YYYY-MM-DD')";
-        #return "TO_DATE('1970-01-01','YYYY-MM-DD') + NUMTODSINTERVAL($col/$interval,'SECOND')"; # no timezone
     }
 }
 
 
 sub epoch_to_timestamp {
     my ( $sf, $col, $interval ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    #my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $driver = $sf->{i}{driver};
     if ( $driver eq 'Pg' ) {
         return "TO_TIMESTAMP(${col}::bigint)::timestamptz"              if $interval == 1;
@@ -319,7 +316,7 @@ sub epoch_to_timestamp {
 
 sub epoch_to_datetime {
     my ( $sf, $col, $interval ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    #my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $driver = $sf->{i}{driver};
     if ( $driver eq 'SQLite' ) {
         return "DATETIME($col,'unixepoch','localtime')"                       if $interval == 1;
@@ -335,21 +332,6 @@ sub epoch_to_datetime {
         return "TO_CHAR(TO_TIMESTAMP(${col}::bigint)::timestamp,'yyyy-mm-dd hh24:mi:ss')"                 if $interval == 1;
         return "TO_CHAR(TO_TIMESTAMP(${col}::bigint/$interval.0)::timestamp,'yyyy-mm-dd hh24:mi:ss.ff3')" if $interval == 1_000;
         return "TO_CHAR(TO_TIMESTAMP(${col}::bigint/$interval.0)::timestamp,'yyyy-mm-dd hh24:mi:ss.ff6')";
-        #if ( $interval == 1 ) {
-        #    return "TO_CHAR(TO_TIMESTAMP(${col}::bigint)::timestamp,'yyyy-mm-dd hh24:mi:ss')";
-        #    #return "TO_CHAR(TO_TIMESTAMP(${col}::bigint) at time zone 'UTC','yyyy-mm-dd hh24:mi:ss')"; # without timezone
-        #    #return "TO_CHAR(TO_TIMESTAMP(${col}::bigint) at time zone 'UTC','yyyy-mm-dd hh24:mi:ss')"; # without timezone
-        #}
-        #elsif ( $interval == 1_000 ) {
-        #    return "TO_CHAR(TO_TIMESTAMP(${col}::bigint/$interval.0)::timestamp,'yyyy-mm-dd hh24:mi:ss.ff3')";
-        #    #return "TO_CHAR(TO_TIMESTAMP(${col}::bigint/$interval.0) at time zone current_setting('timezone'),'yyyy-mm-dd hh24:mi:ss.ff3')";
-        #    #return "TO_CHAR(TO_TIMESTAMP(${col}::bigint/$interval.0) at time zone 'UTC','yyyy-mm-dd hh24:mi:ss.ff3')"; # without timezone
-        #}
-        #else {
-        #    return "TO_CHAR(TO_TIMESTAMP(${col}::bigint/$interval.0)::timestamp,'yyyy-mm-dd hh24:mi:ss.ff6')";
-        #    #return "TO_CHAR(TO_TIMESTAMP(${col}::bigint/$interval.0) at time zone current_setting('timezone'),'yyyy-mm-dd hh24:mi:ss.ff6')";
-        #    #return "TO_CHAR(TO_TIMESTAMP(${col}::bigint/$interval.0) at time zone 'UTC','yyyy-mm-dd hh24:mi:ss.ff6')"; # without timezone
-        #}
     }
     elsif ( $driver eq 'Firebird' ) {
         #my $firebird_major_version = $ax->major_server_version();
@@ -380,21 +362,6 @@ sub epoch_to_datetime {
         return "TO_CHAR((TIMESTAMP '1970-01-01 00:00:00 UTC' + $col * INTERVAL '1' SECOND) AT TIME ZONE SESSIONTIMEZONE,'YYYY-MM-DD HH24:MI:SS')"                if $interval == 1;
         return "TO_CHAR((TIMESTAMP '1970-01-01 00:00:00 UTC' + $col/$interval * INTERVAL '1' SECOND) AT TIME ZONE SESSIONTIMEZONE,'YYYY-MM-DD HH24:MI:SS.FF3')"  if $interval == 1_000;
         return "TO_CHAR((TIMESTAMP '1970-01-01 00:00:00 UTC' + $col/$interval * INTERVAL '1' SECOND) AT TIME ZONE SESSIONTIMEZONE,'YYYY-MM-DD HH24:MI:SS.FF6')";
-        #if ( $interval == 1 ) {
-        #    return "(TIMESTAMP '1970-01-01 00:00:00 UTC' + $col * INTERVAL '1' SECOND) AT TIME ZONE SESSIONTIMEZONE";
-        #    #return "TO_CHAR((TIMESTAMP '1970-01-01 00:00:00 UTC' + $col * INTERVAL '1' SECOND) AT TIME ZONE SESSIONTIMEZONE,'YYYY-MM-DD HH24:MI:SS')";
-        #    #return "TO_CHAR((TIMESTAMP '1970-01-01 00:00:00 UTC' + NUMTODSINTERVAL($col,'SECOND')) AT TIME ZONE SESSIONTIMEZONE,'YYYY-MM-DD HH24:MI:SS')"
-        #    #return "TO_CHAR(TO_TIMESTAMP('19700101000000','YYYYMMDDHH24MISS')+NUMTODSINTERVAL($col,'SECOND'),'YYYY-MM-DD HH24:MI:SS')"; # no timezone
-        #}
-        ##elsif ( $interval == 1_000 ) {
-        ##    #return "TO_CHAR((TIMESTAMP '1970-01-01 00:00:00 UTC' + $col/$interval * INTERVAL '1' SECOND) AT TIME ZONE SESSIONTIMEZONE,'YYYY-MM-DD HH24:MI:SS.FF3')";
-        ##    #return "TO_CHAR(TO_TIMESTAMP('19700101000000','YYYYMMDDHH24MISS')+NUMTODSINTERVAL($col/$interval,'SECOND'),'YYYY-MM-DD HH24:MI:SS.FF3')"; # no timezone
-        ##}
-        #else {
-        #    return "(TIMESTAMP '1970-01-01 00:00:00 UTC' + $col/$interval * INTERVAL '1' SECOND) AT TIME ZONE SESSIONTIMEZONE";
-        #    #return "TO_CHAR((TIMESTAMP '1970-01-01 00:00:00 UTC' + $col/$interval * INTERVAL '1' SECOND) AT TIME ZONE SESSIONTIMEZONE,'YYYY-MM-DD HH24:MI:SS.FF6')";
-        #    #return "TO_CHAR(TO_TIMESTAMP('19700101000000','YYYYMMDDHH24MISS')+NUMTODSINTERVAL($col/$interval,'SECOND'),'YYYY-MM-DD HH24:MI:SS.FF6')"; # no timezone
-        #}
     }
 }
 

@@ -1,15 +1,85 @@
-JSON::Relaxed
+Revision history for JSON-Relaxed
 
-Version: 0.051
+0.090
 
-IMPORTANT NOTICE: TAKEOVER
+	- Redesign/recode.
+	- Rename from_json to decode_json and parse to decode.
+	  Keep old names as aliases.
+	- Throw exceptions in case of error (when using new api).
+	- Improved error messages, with error location info.
+	- All user documentation in JSON::Relaxed, error documentation in
+	  JSON::Relaxed::ErrorCodes.
+	- Add JSON::Relaxed::new as short for JSON::Relaxed;:Parser::new.
+	- Make commas between array elements optional.
+	- Disallow leading commas in a list (spec).
+	- Allow backticks for string quotes (spec).
+	- Improve detection of string join (ext).
+	- Add test suite for regression tests.
+	- Handle Unicode surrogates.
+	- Handle extended escape sequences (ext).
 
-    New maintainer will continue development provided it is possible
-    to raise the minimal perl version to 5.26.
+0.062	2024-04-03
 
-    This version if JSON::Relaxed has no functional changes from 0.05
-    but only adds the 5.26 requirement. If users depend on this module
-    to be functional on ancient versions of perl the takeover will be
-    cancelled, the old version requirement restored, and a new module
-    (different name) will be released for future development.
+	- Add object oriented accessors to error codes.
+	- Add options to from_json and RJSON::Relaxed::Parser->new.
+	- Use Test::More instead of Test::Most, 
+	- Remove t/test-lib.pm (not used and identical to t/lib.pm).
+	- Remove t/lib.pm (not used).
+	- Fix issue #2.
+	- Fix escaped newlines not terminating // comments.
 
+0.061	2024-03-14
+
+	- Add \uXXXXX escapes in strings. (Issue #3)
+	- Allow strings to be joined when separated with \ \n (ext).
+	- Rename test.t to 01_test.t.
+	- Add more tests.
+	- Docs and layout changes.
+
+0.060	2024-03-13
+
+	- Import from CPAN, BackPAN, and reconstruct history.
+	- Updated Changes. Removed history from POD.
+	- Removed lib/JSON/Relaxed.pod, LICENSE and Build.PL.
+	- Modernized Makefile.PL.
+	- Basic layout changes, fix indentations, remove excessive
+	- Empty lines and trailing spaces.
+	- Replace README by README.md.
+
+0.052	2024-03-19
+
+	- Takeover release.
+	- Increase minimum perl requirement to v5.26.
+	- No functional changes.
+
+0.05	2016-04-30 Miko O'Sullivan <miko@idocs.com>
+
+	- Fixed bug: Test::Most was not added to the prerequisite list. No
+      	  changes to the functionality of the module itself.
+
+0.04	2016-04-28 Miko O'Sullivan <miko@idocs.com>
+
+	- Fixed bug in which end of line did not terminate some line
+          comments.
+	- Minor cleanups of documentation.
+	- Cleaned up test.pl.
+
+0.03	2014-12-06 Miko O'Sullivan <miko@idocs.com>
+
+	- Modified test for parse_chars to normalize newlines.
+	  Apparently the way Perl on Windows handles newline is
+	  different than what I expected, but as long as it's
+	  recognizing newlines and|or carriage returns then the test
+	  should pass.
+
+0.02	2014-12-03 Miko O'Sullivan <miko@idocs.com>
+
+	- Fixed test.t so that it can load lib.pm when it runs.
+	- Added $parser->extra_tokens_ok(). Removed error code
+          invalid-structure-opening-string and allowed that error to
+	  fall through to multiple-structures.
+	- Cleaned up documentation.
+
+0.01	2014-11-30 Miko O'Sullivan <miko@idocs.com>
+
+	- Initial version.

@@ -36,7 +36,14 @@ like($str, qr/\d\.0$/, "nv2s() returns a number when handed a scalar reference")
 
 $str = '6.5rubbish';
 cmp_ok(n2s($str), 'eq', '6.5', "n2s('6.5 rubbish') handled as expected");
-cmp_ok(n2s('hello world'), 'eq', '0.0', "n2s('hello world') returns 0.0");
+
+my $test = 'hello world' + 0;
+# $test is an IV on old perls, but an NV from about 5.12.0 onwards.
+# We must therefore taylor the next test to cater for both possibilities.
+my $expected = '0.0';              # Assume $test is an NV.
+$expected = 0 if ryu_SvIOK($test); # Make correction if $test is an IV.
+
+cmp_ok(n2s('hello world'), 'eq', $expected, "n2s('hello world') returns $expected");
 
 my $newstr = spanyf($str);
 cmp_ok($newstr, 'eq', '6.5rubbish', "string is still assessed by spanyf() as '6.5rubbish'");
@@ -48,6 +55,12 @@ $str = '9' x 5000;
 $nv = $str + 0;
 
 cmp_ok(spanyf($nv, ' ', $str), 'eq', "inf $str", "conforms to usual perl practice");
+
+if($Config{ivsize} == 8) {
+  $str = '-9223372036854775808';
+  my $dis = $str + 1.23;
+  cmp_ok(spanyf($str + 0), 'eq', '-9223372036854775808', "('$str' + 0) is treated as IV");
+}
 
 $str = spanyf(-9223372036854775810);
 

@@ -233,10 +233,6 @@ sub axis_child
 {
     my $self = shift( @_ );
     my( $context, $results ) = @_;
-    if( $self->debug )
-    {
-        my( $p, $f, $l ) = caller;
-    }
     my $children = $context->getChildNodes;
     
     foreach my $node ( @{$context->getChildNodes} )
@@ -264,6 +260,7 @@ sub axis_descendant
         }
         else
         {
+            # Node failed the test.
         }
         unshift( @stack, $node->getChildNodes );
     }
@@ -419,10 +416,6 @@ sub evaluate
     for( my $i = 1; $i <= $from->size; $i++ )
     {
         $self->{pp}->_set_context_pos( $i );
-        if( $self->debug )
-        {
-            my $this_node = $from->get_node( $i );
-        }
         $initial_nodeset->append( $self->evaluate_node( $from->get_node( $i ) ) );
     }
     

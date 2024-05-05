@@ -188,6 +188,22 @@ sub chomp
 
 sub clone { CORE::return( $_[0]->new( [ @{$_[0]} ] ) ); }
 
+sub concat
+{
+    my $self = CORE::shift( @_ );
+    my $new = $self->clone;
+    for( my $i = 0; $i < scalar( @_ ); $i++ )
+    {
+        if( !defined( $_[$i] ) ||
+            ( Scalar::Util::reftype( $_[$i] ) // '' ) ne 'ARRAY' )
+        {
+            next;
+        }
+        $new->push( @{$_[$i]} );
+    }
+    return( $new );
+}
+
 sub contains { CORE::return( CORE::shift->exists( @_ ) ); }
 
 sub delete

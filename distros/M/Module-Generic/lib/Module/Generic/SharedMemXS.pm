@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMemXS.pm
-## Version v0.2.1
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.2.2
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 1970/01/01
-## Modified 2024/04/26
+## Modified 2024/05/03
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -109,7 +109,7 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
 };
 
 use strict;
@@ -556,7 +556,8 @@ sub read
     my $size;
     $size = int( $_[2] ) if( scalar( @_ ) > 2 );
     # Optional length parameter for non-reference data only
-    $size //= int( $self->size || SHM_BUFSIZ );
+    $size //= ( $self->size || SHM_BUFSIZ );
+    $size = int( $size );
     my $id = $shm->id;
     return( $self->error( "No shared memory id! Have you opened it first?" ) ) if( !length( $id ) );
     my $buffer;
@@ -570,7 +571,18 @@ sub read
     {
         return( $self->error( "Error with \$shm->read: $@" ) );
     }
-    return( $self->error( "Error reading from shared memory: $!" ) ) if( !defined( $buffer ) );
+    
+    if( !defined( $buffer ) )
+    {
+        if( $! =~ /Invalid argument/ )
+        {
+            return( $self->error( "Invalid argument used to read from shared memory. Size used was '$size' (", overload::StrVal( $size // 'undef' ), ")" ) );
+        }
+        else
+        {
+            return( $self->error( "Error reading from shared memory: $!" ) );
+        }
+    }
     
     my $packing = $self->_packing_method;
     # NOTE: Get rid of nulls end padded only for CBOR::XS, but not for Sereal and Storable who know how to handle them
@@ -1428,7 +1440,7 @@ Module::Generic::SharedMemXS - Shared Memory Manipulation with XS API
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.2
 
 =head1 DESCRIPTION
 

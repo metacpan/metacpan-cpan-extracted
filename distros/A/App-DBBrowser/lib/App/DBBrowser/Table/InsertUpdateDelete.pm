@@ -74,7 +74,7 @@ sub table_write_access {
         if ( $stmt_type eq 'Insert' ) {
             my $ok = $sf->__build_insert_stmt( $sql );
             if ( $ok ) {
-                $ok = $cs->commit_sql( $sql );
+                $cs->commit_sql( $sql );
             }
             next STMT_TYPE;
         }
@@ -116,7 +116,7 @@ sub table_write_access {
                 $sb->where( $sql );
             }
             elsif ( $custom eq $cu{'commit'} ) {
-                my $ok = $cs->commit_sql( $sql );
+                $cs->commit_sql( $sql );
                 next STMT_TYPE;
             }
             else {
@@ -158,7 +158,6 @@ sub __insert_into_stmt_columns {
     if ( $sf->__first_column_is_autoincrement( $sql ) ) {
         shift @cols;
     }
-    my $bu_cols = [ @cols ];
     my $prompt = "Select columns to fill:";
     my $info = $sql->{table} . "\n";
     my $idxs = $tu->choose_a_subset(

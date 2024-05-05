@@ -30,15 +30,21 @@ sub new {
 
 sub __session_history {
     my ( $sf ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     # Print history:
+    my $quoted_literal = $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ?
+          qr/ (?<!') ' (?: [^'\\] | \\' | \\\\ )* ' (?!') /x
+        : qr/ (?<!') ' (?: [^']   | ''         )* ' (?!') /x;
+
+    my $iqc = $sf->{d}{identifier_quote_char};
+    my $quoted_identifier = qr/ $iqc (?: [^$iqc] | $iqc$iqc )+ $iqc /x;
+    $quoted_identifier = qr/ $quoted_identifier (?: \. $quoted_identifier ){0,2} /x;
+
+    my $split_rx = qr/ ( $quoted_identifier | $quoted_literal ) /x;
     my $print_history = [];
 
     for my $stmt ( @{$sf->{d}{table_print_history}} ) {
         $stmt =~ s/\s+\z//;
-        my $iqc = $sf->{d}{identifier_quote_char};
-        # literal quote char: ' is hardcoded if `quote` is called without the $data_type argument.
-        $stmt = join '', map { s/\s+/ /g if ! /^[$iqc']/; $_ } split /($iqc(?:[^$iqc]|$iqc$iqc)+$iqc|(?<!')'(?:[^']|'')*'(?!'))/, $stmt;
+        $stmt = join '', map { ! /^[$iqc']/ and s/\s+/ /g; $_ } split $split_rx, $stmt;
         if ( $sf->{caller} eq 'cte' ) {
             # nested ctes not allowed
             $stmt =~ s/^WITH\s.+\)\s(SELECT\s.+)\z/$1/;
@@ -146,6 +152,7 @@ sub __choose_query {
                 $readline_history = [];
             }
             else {
+                $idx -= @$saved_subqueries;
                 $selected_stmt = ( @$subquery_history, @$print_history )[$idx];
                 $readline_history = [];
             }
@@ -326,7 +333,6 @@ sub __add_subqueries {
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my ( $subquery_history, $print_history ) = $sf->__session_history();
-    my $used = [];
     my $readline = '  Read-Line';
     my @pre = ( undef, $sf->{i}{_confirm}, $readline );
     my @bu;
@@ -407,7 +413,6 @@ sub __edit_subqueries {
         return;
     }
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $indexes = [];
     my @pre = ( undef );
     my $info = $sf->{d}{db_string};
     my $prompt = 'Edit Subquery:';
@@ -459,14 +464,11 @@ sub __edit_subqueries {
 
 
 sub __remove_subqueries {
-    my ( $sf, $saved_subqueries, $top_lines ) = @_;
+    my ( $sf, $saved_subqueries ) = @_;
     if ( ! @$saved_subqueries ) {
         return;
     }
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my @indexes;
-    my @to_remove;
     my $old_idx = 0;
 
     REMOVE: while ( 1 ) {
@@ -489,7 +491,7 @@ sub __remove_subqueries {
             $old_idx = $idx;
         }
        $idx -= @pre;
-        my @tmp_prompt = ( $prompt, '' );
+        my @tmp_prompt = ( '' );
         push @tmp_prompt, line_fold(
             'Name: ' . $saved_subqueries->[$idx]{name}, get_term_width(),
             { init_tab => '', subseq_tab => ' ' x length( 'Name: ' ), join => 0 }
@@ -498,6 +500,7 @@ sub __remove_subqueries {
             'Stmt: ' . $saved_subqueries->[$idx]{stmt}, get_term_width(),
             { init_tab => '', subseq_tab => ' ' x length( 'Stmt: ' ), join => 0 }
         );
+        push @tmp_prompt, '', $prompt;
         my $ok = $tc->choose(
             [ undef, 'YES' ],
             { info => $info, prompt => join( "\n", @tmp_prompt ), undef => 'NO' }

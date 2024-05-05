@@ -60,6 +60,7 @@ sub text : lvalue { return( shift->_set_get_callback({
                 }
                 else
                 {
+                    # Title text does not look like it contains HTML.
                 }
                 CORE::delete( $self->{_initial_text} );
             }

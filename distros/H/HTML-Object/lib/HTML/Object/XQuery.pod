@@ -12,7 +12,7 @@ HTML::Object::XQuery - HTML XQuery Extension
 
 =head1 VERSION
 
-    v0.3.0
+    v0.4.0
 
 =head1 DESCRIPTION
 
@@ -873,6 +873,87 @@ L<https://api.jquery.com/closest/>
 
 Comparison operator between objects
 
+=head2 contains
+
+    $el->contains( $other_element ); # returns true or false
+    $el->contains( $container, $other_element );
+
+If 2 arguments are provided, the first one is the DOM element, a.k.a. the C<container>, that may contain the other element, and the second is the DOM element, a.k.a. the C<contained>, that may be contained by (a descendant of) the other element.
+
+If only 1 argument is provided, the C<container> is the current element, and it checks to see if the DOM element provided, a.k.a. the C<contained>, is a descendant of the current element.
+
+The C<contains()> method returns true (1) if the C<contained> element is a descendant of the C<container> element, whether it is a direct child or nested more deeply. Otherwise, it returns false (0). Only L<element nodes|HTML::Object::DOM::Element> are supported; if the C<contained> element is a L<text|HTML::Object::DOM::Text> or L<comment node|HTML::Object::DOM::Comment>, C<contains()> will return false (0).
+
+If an error occurred, it sets an L<error object|HTML::Object::Exception> and returns C<undef> in scalar context, or an empty list in list context.
+
+Example:
+
+    $el->contains( $document->documentElement, $document->body ); # true
+    $el->contains( $document->body, $document->documentElement ); # false
+
+=head2 contents
+
+Get the children of each element in the set of matched elements, including L<text|HTML::Object::DOM::Text>, L<space|HTML::Object::DOM::Space> and L<comment|HTML::Object::DOM::Comment> nodes.
+
+Given an object that represents a set of DOM elements, the C<.contents()> method allows us to search through the immediate children of these elements in the DOM tree and construct a new object from the matching elements.
+
+Under jQuery, the C<.contents()> and C<.children()> methods are similar, except that the former includes text nodes and comment nodes as well as HTML elements in the resulting jQuery object. However, under L<HTML::Object>, both are identical and they both return all children including, text, space and comment elements.
+
+Example:
+
+    <div class="container">
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
+        do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        <br><br>
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco
+        laboris nisi ut aliquip ex ea commodo consequat.
+        <br><br>
+        Duis aute irure dolor in reprehenderit in voluptate velit
+        esse cillum dolore eu fugiat nulla pariatur.
+    </div>
+
+    use HTML::Object::DOM::Node; # import TEXT_NODE
+    $('.container')
+        ->contents()
+        ->filter(sub
+        {
+            return $_->nodeType == TEXT_NODE;
+            # or
+            # return $_->nodeType == 3;
+        })
+        ->wrap( "<p></p>" )
+        # Revert back to $('.container')
+        ->end()
+        ->filter( "br" )
+        ->remove();
+
+would become:
+
+    <div class="container">
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
+        do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco
+        laboris nisi ut aliquip ex ea commodo consequat.</p>
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit
+        esse cillum dolore eu fugiat nulla pariatur.</p>
+    </div>
+
+Another example:
+
+    <p>Hello <a href="https://johnresig.com/">John</a>, how are you doing?</p>
+ 
+    $('p')
+        ->contents()
+        ->filter(sub
+        {
+            return( $_->nodeType !== 1 );
+        })
+        ->wrap( '<b></b>' );
+
+would yield something like:
+
+B<Hello> L<John|https://johnresig.com/>B<, how are you doing?>
+
 =head2 css
 
 Takes a property name; or an array reference of one or more css properties; or a property name and a value; or a property name and a function; or an hash reference of property name-value pairs
@@ -897,11 +978,25 @@ If the data provided is an hash reference, each key-value pair will be added as 
 
 If only a name is provided, with no value, this will return the corresponding value.
 
+For example:
+
+    $('body')->data( "foo", 52 );
+    $('body')->data( "bar", { isManual => $true } );
+    $('body')->data( { baz: [ 1, 2, 3 ] } );
+    $('body')->data( "foo" ); # 52
+    $('body')->data(); # { foo: 52, bar => { isManual => true }, baz => [ 1, 2, 3 ] }
+
+Unlike the jQuery equivalent, this method affects directly the attributes of the elements.
+
+Under jQuery, using data only sets the data for the given element without creating the related attributes.
+
 L<https://api.jquery.com/data/>
 
 =head2 detach
 
 Detach the current element or the collection of elements and return the current object.
+
+Detach concretely means remove the element or elements from its parent and set the C<parent> value for each element to C<undef>
 
 L<https://api.jquery.com/detach/>
 
@@ -928,6 +1023,43 @@ L<https://api.jquery.com/empty/>
 =head2 end
 
 Sets or gets an L<HTML::Object::DOM::Element> object.
+
+This is useful to get back to a given element context.
+
+For example, given this HTML chunk:
+
+    <ul class="first">
+        <li class="foo">list item 1</li>
+        <li>list item 2</li>
+        <li class="bar">list item 3</li>
+    </ul>
+    <ul class="second">
+        <li class="foo">list item 1</li>
+        <li>list item 2</li>
+        <li class="bar">list item 3</li>
+    </ul>
+
+    $('ul.first')
+        ->find( '.foo' )
+        ->css( 'background-color', 'red' )
+        ->end()
+    ->find( '.bar' )
+    ->css( 'background-color', 'green' );
+
+This chain searches for items with the class C<foo> within the first list only and turns their backgrounds red. Then C<end()> returns the object to its state before the call to L<find()|/find>, so the second L<find()|/find> looks for '.bar' inside C<< <ul class="first"> >>, not just inside that list's C<< <li class="foo"> >>, and turns the matching elements' backgrounds green. The net result is that items 1 and 3 of the first list have a colored background, and none of the items from the second list do.
+
+Another example:
+
+    <p><span>Hello</span>, how are you?</p>
+
+Selects all paragraphs, finds span elements inside these, and reverts the selection back to the paragraphs.
+
+    $('p')
+        ->find( "span" )
+        ->end()
+        ->css( 'border', '2px red solid' );
+
+This would result in having the entire paragraph block with a red square line enclosing.
 
 L<https://api.jquery.com/end/>
 
@@ -1001,9 +1133,61 @@ L<https://api.jquery.com/first/>
 
 =head2 get
 
-Returns the current element.
+There are 2 possibilities: the element is a collection or not.
 
-Originally, in jQuery, this returns the underlying DOM element, but here, in perl context, this does not mean much, and we return our own object.
+=over 4
+
+=item 1. If this is a L<collection|HTML::DOM::Collection>:
+
+If an integer representing an array index is provided, this retrieves the element at the given offset.
+
+If no integer is provided, this returns all the collection elements and returns a new L<array object|Module::Generic::Array>
+
+=item 2. If this is an L<element object|HTML::Object::DOM::Element>:
+
+This returns the current object, irrespective of any index value provided, since it is the only one available.
+
+=back
+
+The C<.get()> method grants access to the DOM nodes underlying each L<collection object|HTML::Object::Collection>. If the value of index is out of bounds, such as being less than the negative number of elements or equal to or greater than the number of elements, it returns C<undef>, just like when accessing a regular perl array would. 
+
+For example:
+
+    <ul>
+        <li id="foo">foo</li>
+        <li id="bar">bar</li>
+    </ul>
+
+With an index specified, C<.get( $index )> retrieves a single element:
+
+    $('li')->get(0);
+
+Since the index is zero-based, the first list item is returned, i.e.:
+
+    <li id="foo">foo<</li>
+
+A negative index is counted from the end of the matched set, thus in this example it would return the last item in the list:
+
+    $('li')->get(-1);
+
+This would return:
+
+    <li id="bar">bar</li>
+
+    say $('li')->get(-1)->nodeName; # li
+
+When no C<index> is provided, this returns an L<array object|Module::Generic::Array>:
+
+    <ul>
+        <li id="foo">foo</li>
+        <li id="bar">bar</li>
+    </ul>
+
+    $('li')->get();
+
+All of the matched DOM nodes are returned by this call, contained in an L<array object|Module::Generic::Array>:
+
+    [<li id="foo">foo</li>, <li id="bar">bar</li>]
 
 L<https://api.jquery.com/get/>
 
@@ -1595,6 +1779,12 @@ See L<https://api.jquery.com/is/>
 
 Returns true if the current element is a L<HTML::Object::Collection> object, or false otherwise.
 
+=head2 isArray
+
+C<isArray()> returns a boolean indicating whether the value provided is an array.
+
+See L<https://api.jquery.com/jQuery.isArray/>
+
 =head2 length
 
 Returns the number of children if the current element is a collection, or 1 if the current element is an element.
@@ -1909,6 +2099,86 @@ Returns a new L<HTML::Object::DOM::Number> object by passing it the current node
 
 Returns the current node value as L</as_xml>
 
+=head2 uniqueSort
+
+The C<uniqueSort()> function searches through an L<xQuery|HTML::Object::XQuery> object, sorting it in document order, and removing any duplicate nodes. A node is considered a duplicate if it is the exact same node as one already in the xQuery object; two different nodes with identical attributes are not considered to be duplicates. This method only works on xQuery objects consisting of DOM elements.
+
+For example:
+
+    <div>There are 6 divs in this document.</div>
+    <div></div>
+    <div class="dup"></div>
+    <div class="dup"></div>
+    <div class="dup"></div>
+    <div></div>
+
+    my $divs = $('div')->get();
+    # Add 3 elements of class dup too (they are divs)
+    $divs = $divs->concat( $('.dup')->get() );
+
+    # Create a jQuery object from `divs`.
+    my $elems = $($divs);
+    say "Pre-uniqueSort there are " . $elems->length . " elements in the collection.";
+    # Pre-uniqueSort there are 9 elements in the collection.
+    $elems = $elems->uniqueSort();
+    say "Post-uniqueSort there are " . $elems->length . " elements in the collection.";
+    # Post-uniqueSort there are 6 elements in the collection.
+
+L<https://api.jquery.com/uniqueSort/>
+
+=head2 wrap
+
+Wrap an HTML structure around each element in the set of matched elements.
+
+It takes either a wrapping element or a code reference serving as a callback.
+
+A wrapping element is either a selector, element, HTML string, or L<collection object|HTML::Object::Collection> specifying the structure to wrap around the matched elements. When you pass a L<collection object|HTML::Object::Collection> containing more than one element, or a selector matching more than one element, the first element will be used.
+
+A callback code reference returns the HTML content, a selector or L<collection object|HTML::Object::Collection> to wrap around the matched elements. The callback receives the index position of the element in the set as an argument. Within the function, this refers to the current element in the set.
+The value returned by the callback will be cloned before it is used.
+
+The C<wrap()> method can take any string or object that could be passed to the C<$()> factory function (also accessible as C<xk()> to specify a DOM structure. This structure may be nested several levels deep, but should contain only one inmost element. A copy of this structure will be wrapped around each of the elements in the set of matched elements. This method returns the original set of elements for chaining purposes.
+
+For example:
+
+    <div class="container">
+        <div class="inner">Hello</div>
+        <div class="inner">Goodbye</div>
+    </div>
+
+    $('.inner')->wrap( '<div class="new"></div>' );
+
+The new C<< <div> >> element is created on the fly and added to the DOM. The result is a new C<< <div> >> wrapped around each matched element:
+
+    <div class="container">
+        <div class="new">
+            <div class="inner">Hello</div>
+        </div>
+        <div class="new">
+            <div class="inner">Goodbye</div>
+        </div>
+    </div>
+
+The second version of this method allows us to instead specify a callback code reference. This callback code reference will be called once for every matched element; it should return a L<DOM element|HTML::Object::DOM::Element>, L<collection object|HTML::Object::Collection>, or HTML snippet in which to wrap the corresponding element. For example:
+
+    $('.inner')->wrap(sub
+    {
+        return( '<div class="' . $_->text() . '"></div>' );
+    });
+
+This will cause each C<< <div> >> to have a class corresponding to the text it wraps:
+
+    <div class="container">
+        <div class="Hello">
+            <div class="inner">Hello</div>
+        </div>
+        <div class="Goodbye">
+            <div class="inner">Goodbye</div>
+        </div>
+    </div>
+
+L<https://api.jquery.com/wrap/#wrap-wrappingElement>
+
 =head2 xp
 
 Returns an already instantiated L<XML::XPathEngine> object, or instantiate one and returns it.
@@ -1921,6 +2191,916 @@ Ref: <https://api.jquery.com/Types/#jQuery>
     xq( '<div />', { id => 'Pouec', class => 'Hello' } );
     xq( '<html><head><title>Hello world</title></head><body>Hello!</body></html>' );
     xq();
+
+=head1 CLASS FUNCTIONS
+
+=head2 clearQueue
+
+Does not do anything. Returns the current object for chaining.
+
+L<https://api.jquery.com/clearQueue/>
+
+=head2 data
+
+Store arbitrary data associated with the specified element and/or return the value that was set.
+
+It takes, the L<element object|HTML::Object::DOM::Element>, they key and an optional value.
+
+    xQuery->data( $document->body, "foo", 52 );
+    xQuery->data( $document->body, "bar", "test" );
+
+or
+
+    use HTML::Object xquery => 1;
+    $.data( $document->body, "foo", 52 );
+    $.data( $document->body, "bar", "test" );
+
+In accessor mode:
+
+    say( xQuery->data( $document->body, "foo" ) );
+    say( xQuery->data( $document->body ) );
+
+The above lines alert the data values that were set on the body element. If nothing was set on that element, an empty string is returned.
+
+=head2 dequeue
+
+Does not do anything. Returns the current object for chaining.
+
+L<https://api.jquery.com/dequeue/>
+
+=head2 each
+
+Quoting from L<jQuery documentation|>:
+
+A generic iterator function, which can be used to seamlessly iterate over both hash reference and array references. Arrays and array-like objects with a length property (such as a function's arguments object) are iterated by numeric index, from 0 to length-1. Other objects are iterated via their named properties.
+
+If the value is an array reference, the callback will be called for each element of the array, and passing it two arguments: the index value (0-based), and the value.
+
+For example:
+
+    $.each([ 52, 97 ], sub
+    {
+        my( $index, $value ) = @_;
+        say( $index . ': ' . $value );
+    });
+
+This produces two messages:
+
+    0: 52
+    1: 97
+
+If the value is an hash reference, the callback will be called for each element of the hash keys, and passing it two arguments: the current key and its value.
+
+For example:
+
+    my $ref = {
+        flammable => "inflammable",
+        duh => "no duh"
+    };
+    $.each( $ref, sub
+    {
+        my( $key, $value ) = @_;
+        say( $key . ': ' . $value );
+    });
+
+Once again, this produces two messages:
+
+    flammable: inflammable
+    duh: no duh
+
+We can break the $.each() loop at a particular iteration by making the callback function return 0 (false). Simply returning C<undef> will not work. Returning non-false is the same as a continue statement in a for loop; it will skip immediately to the next iteration.
+
+For example:
+
+    my $arr = [ "one", "two", "three", "four", "five" ];
+    jQuery.each( $arr, sub
+    {
+        my( $i, $val ) = @_;
+        $( '#' . $val )->text( 'Mine is ' . val . '.' );
+
+        # Will stop running after "three"
+        return( $val ne 'three' ? 1 : 0 );
+    });
+
+L<https://api.jquery.com/jQuery.each/>
+
+=head2 extend
+
+Merge the contents of two or more hash reference together into the first hash reference.
+
+When two or more hash reference arguments are supplied to C<$.extend()>, properties from all of the hash reference are added to the target hash reference. Arguments that are C<undef> are ignored.
+
+Keep in mind that the target hash reference (first argument) will be modified, and will also be returned from C<$.extend()>. If, however, you want to preserve both of the original hash references, you can do so by passing an empty hash reference as the target:
+
+    my $ref = $.extend({}, $hash1, $hash2);
+
+The merge performed by C<$.extend()> is not recursive by default; if a property of the first obhash referenceject is itself an hash reference or an array reference, it will be completely overwritten by a property with the same key in the second or subsequent hash reference. The values are not merged. This can be seen in the example below by examining the value of C<banana>. However, by passing C<true> (1) for the first function argument, hash references will be recursively merged.
+
+In jQuery, passing C<false> for the first argument is not supported, but in our version, it is.
+
+On a C<deep> extend, data will be cloned using L<Clone>
+
+Returns an hash reference upon success, or upon error, sets an L<error object|HTML::Object::Exception> and returns C<undef> in scalar context and an empty list in list context.
+
+Example:
+
+Merge two objects, modifying the first.
+
+    my $hash1 = 
+    {
+        apple => 0,
+        banana => { weight => 52, price => 100 },
+        cherry => 97,
+    };
+    my $hash2 = 
+    {
+        banana => { price => 200 },
+        durian => 100,
+    };
+
+    # Merge $hash2 into $hash1
+    $.extend( $hash1, $hash2 );
+
+This would become:
+
+    {
+        apple => 0,
+        banana => { price => 200 },
+        cherry => 97,
+        durian => 100,
+    }
+
+Merge two objects recursively, modifying the first.
+
+    my $hash1 = 
+    {
+        apple => 0,
+        banana => { weight => 52, price => 100 },
+        cherry => 97,
+    };
+    my $hash2 = 
+    {
+        banana => { price => 200 },
+        durian => 100,
+    };
+    
+    // Merge object2 into object1, recursively
+    $.extend( $true, $hash1, $hash2 );
+
+This would become:
+
+    {
+        apple => 0,
+        banana => { price => 200, weight => 52 },
+        cherry => 97,
+        durian => 100,
+    }
+
+Merge defaults and options, without modifying the defaults. This is a common plugin development pattern.
+
+    my $defaults = { validate => 0, limit => 5, name => "foo" };
+    my $options = { validate => 1, name => "bar" };
+    
+    # Merge defaults and options, without modifying defaults
+    my $settings = $.extend( {}, $defaults, $options );
+
+This would become:
+
+    # $defaults (unchanged):
+    { limit => 5, name => "foo", validate => 0 }
+    # $options (unchanged):
+    { name => "bar", validate => 1 }
+    # resulting $settings:
+    { limit => 5, name => "bar", validate => 1 }
+
+L<https://api.jquery.com/jQuery.extend/>
+
+=head2 grep
+
+    my $array2 = $.grep( $array => 'something' );
+    my $array2 = $.grep( $array => qr/something/ );
+    my $array2 = $.grep( $array => sub
+    {
+        /^something$/
+    });
+    # or
+    my $list = $.grep( $array => sub
+    {
+        my( $val, $index ) = @_;
+        $val =~ /^something$/i && $index > 2;
+    });
+    # Returns the elements not matching by passing a false value as the last argument
+    my $array2 = $.grep( $array => 'something', 1 );
+    my $array2 = $.grep( $array => qr/something/, 1 );
+    my $array2 = $.grep( $array => sub
+    {
+        /^something$/
+    }, 1);
+
+Of course, you could as easily create an L<array object|Module::Generic::Array>, and use the L<grep method|Module::Generic::Array/grep> directly, such as:
+
+    use Module::Generic::Array;
+    my $a = Module::Generic::Array->new( [qw( cat dog something camel )] );
+    # returns an array object in scalar context
+    my $list = $a->grep( 'something' );
+    my $list = $a->grep( qr/something/ );
+    my $list = $a->grep(sub
+    {
+        /^something$/i
+    });
+    # or
+    my $list = $a->grep(sub
+    {
+        my( $val, $index ) = @_;
+        $val =~ /^something$/i && $index > 2;
+    });
+    # get all the elements NOT matching
+    my $list = $a->grep( 'something', 0 );
+    my $list = $a->grep( qr/something/, 0 );
+    my $list = $a->grep(sub
+    {
+        /^something$/i
+    }, 0);
+
+Finds the elements of an array which satisfy a filter function. The original array is not affected.
+
+It takes 2 to 3 arguments:
+
+=over 4
+
+=item 1. C<array>
+
+The array-like object to search through.
+
+=item 2. C<callback>
+
+The code reference to process each item against. The first argument to the function is the item, and the second argument is the index. The function should return a boolean value.
+
+=item 3. C<invert> (optional)
+
+If C<invert> is false (0), or not provided, then the function returns an L<array object|Module::Generic::Array> consisting of all elements for which C<callback> returns true. If C<invert> is true, then the function returns an L<array object|Module::Generic::Array> consisting of all elements for which C<callback> returns false.
+
+Example:
+
+Filters the original array of numbers leaving that are not 5 and have an index greater than 4. Then it removes all 9s.
+
+    my $arr = [ 1, 9, 3, 8, 6, 1, 5, 9, 4, 7, 3, 8, 6, 9, 1 ];
+    my $arr2 = xQuery->grep( $arr, sub
+    {
+        my( $n, $i ) = @_;
+        return( $n != 5 && $i > 4 );
+    });
+    # yields: 1, 9, 4, 7, 3, 8, 6, 9, 1
+
+    my $arr2 = xQuery->grep( $arr, sub
+    {
+        my( $a ) = @_;
+        return( $a != 9 );
+    });
+    # yields: 1, 4, 7, 3, 8, 6, 1
+
+Filter an array of numbers to include only numbers bigger then zero:
+
+    my $arr2 = $.grep( [ 0, 1, 2 ], sub
+    {
+        my( $n, $i ) = @_;
+        return( $n > 0 );
+    });
+    # yields: 1, 2
+
+=back
+
+L<https://api.jquery.com/jQuery.grep/>
+
+=head2 inArray
+
+Search for a specified value within an array and return its index (or -1 if not found).
+
+It takes 2 to 3 arguments:
+
+=over 4
+
+=item 1. C<value>
+
+The value to search for.
+
+This can be a string, or a regular expression object.
+
+=item 2. C<array>
+
+An array through which to search.
+
+=item 3. C<fromIndex>
+
+The index of the array at which to begin the search. The default is 0, which will search the whole array.
+
+=back
+
+The C<$.inArray()> method is similar to L<index()|perlfunc/index> method in that it returns C<-1> when it does not find a match. If the first element within the array matches value, C<$.inArray()> returns C<0>.
+
+Because C<0> is construed as equal to false (i.e. 0 == false, but 0 !== false), to check for the presence of value within array, you need to check if it is not equal to (or greater than) C<-1>.
+
+Contrary to the jQuery original function, and due to Perl's nature, the comparison between values is B<not> strict. The following will return C<2> (not C<-1> as it would in jQuery) because a number is being searched in an array of strings, and perl converts it automatically:
+
+    $.inArray( 5 + 5, [ "8", "9", "10", 10 . '' ] );
+
+For example:
+
+    my $arr = [ 4, "Pete", 8, "John" ];
+
+    say '"John" found at ', xQuery->inArray( "John", $arr );
+    # yields: "John" found at 3
+    say '4 found at ', xQuery->inArray( 4, $arr );
+    # yields: 4 found at 0
+    say '"Karl" not found, so ', xQuery->inArray( "Karl", $arr );
+    # yields: "Karl" not found, so -1
+    say '"Pete" is in the array, but not at or after index 2, so ', xQuery->inArray( "Pete", $arr, 2 );
+    # yields: "Pete" is in the array, but not at or after index 2, so -1
+
+L<https://api.jquery.com/jQuery.inArray/>
+
+=head2 isArray
+
+Determine whether the argument is an array.
+
+C<$.isArray()> takes a value and returns true if the value is an array reference or even an array object, and false otherwise.
+
+For example:
+
+    $.isArray([]);
+    # yields a true value
+
+L<https://api.jquery.com/jQuery.isArray/>
+
+=head2 isEmptyObject
+
+Check to see if an hash reference (a.k.a. C<object> in JavaScript) is empty (contains no properties).
+
+The argument should always be a plain hash reference, and not a blessed hash. To determine if an hash reference is a plain hash reference, use C<$.isPlainObject()>
+
+For example:
+
+    jQuery->isEmptyObject({}); # true
+    jQuery->isEmptyObject({ foo => "bar" }); # false
+
+L<https://api.jquery.com/jQuery.isEmptyObject/>
+
+=head2 isFunction
+
+Determines if its argument is callable as a function, meaning it is either a function name, or a code reference.
+
+For example:
+
+    sub stub {}
+    my $objs = [
+        sub{},
+        { x => 15, y => 20 },
+        undef,
+        'stub',
+        'sub',
+    ];
+
+    xQuery->each( $objs, sub
+    {
+        my $i = shift( @_ );
+        my $isFunc = xQuery->isFunction( $objs->[$i] );
+        say "xQuery->isFunction( \$objs->[$i] ) = ", ( $isFunc ? 'true' : 'false' );
+    });
+
+This would yield:
+
+    xQuery->isFunction( $objs->[0] ) = true
+    xQuery->isFunction( $objs->[1] ) = false
+    xQuery->isFunction( $objs->[2] ) = false
+    xQuery->isFunction( $objs->[3] ) = true
+    xQuery->isFunction( $objs->[4] ) = false
+
+L<https://api.jquery.com/jQuery.isFunction/>
+
+=head2 isNumeric
+
+Determines whether its argument represents a number.
+
+The C<$.isNumeric()> method checks whether its argument represents a numeric value. If so, it returns true. Otherwise it returns false. The argument can be of any type.
+
+For example:
+
+    # true (numeric)
+    $.isNumeric( "-10" );
+    $.isNumeric( "0" );
+    $.isNumeric( 0xFF );
+    $.isNumeric( "0xFF" );
+    $.isNumeric( "8e5" );
+    $.isNumeric( "3.1415" );
+    $.isNumeric( +10 );
+    $.isNumeric( 0144 );
+    # Yes, under perl, nan and Inf are considered a number. Don't believe me? Try:
+    # perl -MScalar::Util=looks_like_number -lE 'say looks_like_number("nan")'
+    $.isNumeric( NaN );
+    $.isNumeric( Inf );
+     
+    # false (non-numeric)
+    $.isNumeric( "-0x42" );
+    $.isNumeric( "7.2acdgs" );
+    $.isNumeric( "" );
+    $.isNumeric( {} );
+    $.isNumeric( true );
+    $.isNumeric( undef );
+
+L<https://api.jquery.com/jQuery.isNumeric/>
+
+=head2 isPlainObject
+
+Check to see if an object is a plain hash reference, and not a blessed one.
+
+For example:
+
+    xQuery->isPlainObject({}) # true
+    xQuery->isPlainObject( "test" ) # false
+
+L<https://api.jquery.com/jQuery.isPlainObject/>
+
+=head2 isWindow
+
+Determine whether the argument is a L<window|HTML::Object::DOM::Window>.
+
+Normally, this is used, under jQuery to determine if it is operating against a browser window (such as the current window or an iframe). However, since this is perl, this is merely used to determine if the given value is a L<window object|HTML::Object::DOM::Window> or not.
+
+For example:
+
+    my $window = HTML::Object::DOM::Window->new;
+    $.isWindow( $window ); # true
+
+L<https://api.jquery.com/jQuery.isWindow/>
+
+=head2 makeArray
+
+Many methods, both in xQuery and in L<HTML::Object::XQuery> class in general, return objects that are array-like. For example, the xQuery (jQuery) factory function C<$()> returns an L<array object|Module::Generic::Array> that has many of the properties of an array.
+
+Note that after the conversion, any special features the array object had (such as the L<xQuery|HTML::Object::XQuery> methods in our example) will no longer be present. The object is now a plain array reference.
+
+For example:
+
+    <!DOCTYPE html>
+    <html lang="en-GB">
+        <head>
+            <meta charset="utf-8" />
+            <title></title>
+        </head>
+        <body>
+            <div>First</div>
+            <div>Second</div>
+            <div>Third</div>
+            <div>Fourth</div>
+        </body>
+    </html>
+
+    my $elems = $('div');
+    my $arr = xQuery->makeArray( $elems );
+    my $arr2 = $arr->reverse();
+    $(arr2)->appendTo( $document->body );
+
+This would yield:
+
+    Fourth
+    Third
+    Second
+    First
+
+=head2 map
+
+Translate all items in an array reference or hash reference to a new L<array object|Module::Generic::Array> of items that is returned.
+
+It takes an array reference or an hash reference and a code reference as a callback.
+
+The callback will be called for each item in the array reference and 2 arguments will be passed:
+
+=over 4
+
+=item 1. current value
+
+=item 2. position in the array reference for array reference, or the current hash key for hash reference
+
+=back
+
+The callback can return:
+
+=over 4
+
+=item * the translated value, which will be mapped to the resulting array
+
+    $.map( $array, sub
+    {
+        return( $one_value );
+    });
+
+=item * C<undef>, to remove the item
+
+    $.map( $array, sub
+    {
+        return;
+        # or
+        return( undef );
+    });
+
+=item * an array or an array reference of values, which will be flattened into the full array
+
+    $.map( $array, sub
+    {
+        return( [1, 2, 3] );
+    });
+    # same
+    $.map( $array, sub
+    {
+        return( 1, 2, 3 );
+    });
+
+=back
+
+Do not alter the array reference or hash reference provided while running C<$.map>, or it might lead to unpredictable results. See L<perl each manual section|perlfunc/each> for more details.
+
+Example:
+
+Using C<$.map()> to change the values of an array reference:
+
+    my $arr = [ "a", "b", "c", "d", "e" ];
+    say join( ", ", @$arr );
+    
+This would yield:
+
+    a, b, c, d, e
+
+    # or you can also use $.map
+    $arr = xQuery->map( $arr, sub
+    {
+        my( $n, $i ) = @_;
+        return( uc( $n ) . $i );
+    });
+    say join( ", ", @$arr );
+
+This would yield:
+
+    A0, B1, C2, D3, E4
+    
+    $arr = $.map( $arr, sub
+    {
+        my( $a ) = @_;
+        return( $a . $a );
+    });
+    say join( ", ", @$arr );
+
+This would yield:
+
+    A0A0, B1B1, C2C2, D3D3, E4E4
+
+Map the original array to a new one and add 4 to each value:
+
+    $arr = $.map( [ 0, 1, 2 ], sub
+    {
+        my( $n ) = @_;
+        return( $n + 4 );
+    });
+    say join( ", ", @$arr );
+
+The resulting array reference would be:
+
+    4, 5, 6
+
+Map the original array to a new one, adding 1 to each value if it is bigger then zero and removing it if not:
+
+    $arr = $.map( [ 0, 1, 2 ], sub
+    {
+        my( $n ) = @_;
+        return( $n > 0 ? $n + 1 : undef );
+    });
+    say join( ", ", @$arr );
+
+The resulting array reference would be:
+
+    2, 3
+
+Map the original array to a new one; each element is added with its original value and the value plus one:
+
+    $arr = $.map( [ 0, 1, 2 ], sub
+    {
+        my( $n ) = @_;
+        return( [ $n, $n + 1 ] );
+        # You can also return as a list
+        # return( $n, $n + 1 );
+    });
+    say join( ", ", @$arr );
+
+The resulting array reference would be:
+
+    0, 1, 1, 2, 2, 3
+
+Map the original hash reference to a new array reference and double each value:
+
+    my $dimensions = { width => 10, height => 15, length => 20 };
+    $arr = $.map( $dimensions, sub
+    {
+        my( $value, $key ) = @_;
+        return( $value * 2 );
+    });
+    say join( ", ", @$arr );
+
+The resulting array reference would be:
+
+    [20, 30, 40]
+
+However, the problem in this example, is that, because the order in which the hash reference keys are processed, is not guaranteed by perl, the order of the values of the resulting array reference may also vary.
+
+If the order is important to you, you might want to consider using L<Tie::IxHash> as mentioned in this L<perl FAQ|https://perldoc.perl.org/perlfaq4#How-can-I-make-my-hash-remember-the-order-I-put-elements-into-it?>
+
+    use Tie::IxHash;
+    
+    tie my %dimensions, 'Tie::IxHash';
+    %dimensions = ( width => 10, height => 15, length => 20 );
+    $arr = $.map( \%dimensions, sub
+    {
+        my( $value, $key ) = @_;
+        return( $value * 2 );
+    });
+    say join( ", ", @$arr );
+
+The resulting array reference would always B<predictably> be:
+
+    [20, 30, 40]
+
+Map an hash reference's keys to an array:
+
+    my $dimensions = { width => 10, height => 15, length => 20 };
+    my $keys = $.map( $dimensions, sub
+    {
+        my( $value, $key ) = @_;
+        return( $key );
+    });
+    say join( ", ", @$keys );
+
+The resulting array reference would be:
+
+    ["width", "height", "length"]
+
+Augment the resulting array by returning an array inside the function:
+
+    my $array = [ 0, 1, 52, 97 ];
+    $array = $.map( $array, sub
+    {
+        my( $a, $index ) = @_;
+        return( [ $a - 45, $index ] );
+        # You can also return as a list
+        # return( $a - 45, $index );
+    });
+    say join( ", ", @$array );
+
+The resulting array reference would be:
+
+    [ -45, 0, -44, 1, 7, 2, 52, 3]
+
+L<https://api.jquery.com/jQuery.map/>
+
+See also L<https://api.jquery.com/map/> for the other C<map> method used directly on a xquery object, such as:
+
+    $('div')->map(sub
+    {
+        # something
+    });
+
+More details on this method upper in the L</METHODS> section.
+
+=head2 merge
+
+Merge the contents of two arrays together into the first array and returns the first array reference modified.
+
+The C<$.merge()> operation forms an array reference that contains all elements from the two array references. The orders of items in the arrays are preserved, with items from the second array appended. The C<$.merge()> function is destructive. It alters the length and numeric index properties of the first object to include items from the second.
+
+If you need the original first array, make a copy of it before calling C<$.merge()>. Fortunately, C<$.merge()> itself can be used for this duplication:
+
+    my $newArray = $.merge([], $oldArray);
+
+This shortcut creates a new, empty array and merges the contents of C<$oldArray> into it, effectively cloning the array.
+
+Examples:
+
+Merges two arrays, altering the first argument:
+
+    $.merge( [ 0, 1, 2 ], [ 2, 3, 4 ] );
+
+This yields:
+
+    [ 0, 1, 2, 2, 3, 4 ]
+
+Merges two arrays, altering the first argument.
+
+    $.merge( [ 3, 2, 1 ], [ 4, 3, 2 ] );
+
+This yields:
+
+[ 3, 2, 1, 4, 3, 2 ]
+
+Merges two arrays, but uses a copy, so the original is not altered:
+
+    my $first  = [ "a", "b", "c" ];
+    my $second = [ "d", "e", "f" ];
+    $.merge( $.merge( [], $first ), $second );
+
+This yields:
+
+    [ "a", "b", "c", "d", "e", "f" ]
+
+L<https://api.jquery.com/jQuery.merge/>
+
+=head2 noop
+
+An empty function that returns C<undef> in scalar context or an empty list in list context.
+
+You can use this empty function when you wish to pass around a function that will do nothing.
+
+L<https://api.jquery.com/jQuery.noop/>
+
+=head2 now
+
+Return a L<DateTime object|DateTime> representing the current time and that stringifies to the number of seconds since epoch, resulting into the equivalent of L<perlfunc/time>
+
+Under jQuery, this is an alias for C<Date.now()>
+
+    my $time = $.now();
+    say $time; # 1714619232
+    say $time->epoch; # 1714619232
+    say $time->iso8601; # 2024-05-02T03:07:12
+
+L<https://api.jquery.com/jQuery.now/>
+
+=head2 parseHTML
+
+Parses a string and returns an L<array object|Module::Generic::Array> of  L<nodesHTML::Object::DOM::Element>. In jQuery, this parses a string into an array of DOM nodes.
+
+This method render all trailing or leading text (even if they are just whitespaces). To prevent trailing and leading whitespaces from being converted to L<space nodes|HTML::Object::DOM::Space> you can pass the HTML string through L<jQuery.trim|/trim>.
+
+Under jQuery, this method takes 3 parameters (HTML string, a context document, and C<keepScripts>), but since the last 2 have no bearing under perl, this method only takes a single argument: an HTML string.
+
+For example:
+
+    my $str = "hello, <b>my name is</b> xQuery.";
+    my $html = $.parseHTML( $str );
+    my $nodeNames = [];
+
+    # Gather the parsed HTML's node names
+    $.each( $html, sub
+    {
+        my( $i, $el ) = @_;
+        $nodeNames->[$i] = el->nodeName;
+    }) || die( $xQuery::ERROR );
+    
+    say $nodeNames->join( ', ' );
+
+This yields:
+
+    #text, B, #text
+
+L<https://api.jquery.com/jQuery.parseHTML/>
+
+=head2 parseJSON
+
+Takes a well-formed JSON string and returns the resulting value, which could be a string, a number, a boolean, an array reference or an hash reference.
+
+Passing in a malformed JSON string results in an error being returned, which can be retrieved with C<$xQuery::ERROR>. For example, the following are all invalid JSON strings:
+
+=over 4
+
+=item * "{test: 1}" (test does not have double quotes around it).
+
+=item * "{'test': 1}" ('test' is using single quotes instead of double quotes).
+
+=item * "'test'" ('test' is using single quotes instead of double quotes).
+
+=item * ".1" (a number must start with a digit; "0.1" would be valid).
+
+=item * "undefined" (undefined cannot be represented in a JSON string; null, however, can be).
+
+=item * "NaN" (NaN cannot be represented in a JSON string; direct representation of Infinity is also not permitted).
+
+=back
+
+The JSON standard does not permit "control characters" such as a tab or newline. An example like C<< $.parseJSON( '{ "testing":"1\t2\n3" }' ) >> will result in an error, because the JSON parser converts the string's tab and newline escapes into literal tab and newline; doubling the backslashes like "1\\t2\\n3" yields expected results. This problem is often seen when injecting JSON into a JavaScript file from a server-side language such as PHP.
+
+For details on the JSON format, see https://json.org/.
+
+For example:
+
+    my $ref = $.parseJSON( '{ "name": "John" }' );
+    say( $ref->{name} eq 'John' );
+
+L<https://api.jquery.com/jQuery.parseJSON/>
+
+=head2 parseXML
+
+Parses a string into an L<XML document|XML::LibXML::Document> and returns it.
+
+This requires the module L<XML::LibXML> to be installed.
+
+C<xQuery.parseXML> uses L<XML::LibXML> to create a valid L<XML document|XML::LibXML::Document>. This document is returned, and this is all. Unlike the jQuery interface, B<you cannot pass> this object to L<HTML::Object::XQuery>, such as:
+
+    my $doc = $.parseXML( $str ) || die( $xQuery::ERROR );
+    my $xml = $($doc);
+    my $title = $xml->find( 'title' );
+
+Maybe in the future, I will implement it.
+
+L<https://api.jquery.com/jQuery.parseXML/>
+
+=head2 proxy
+
+This method is deprecated in jQuery
+
+=head2 queue
+
+This method is unsupported with no meaning under perl.
+
+=head2 removeData
+
+Remove a previously-stored piece of data and returns C<undef> in scalar context and an empty list in list context.
+
+This C<$.removeData()> method takes an L<element object|HTML::Object::DOM::Element> and a name, and removes values that were previously set using C<$.data()>. When called with the name of a key, C<$.removeData()> deletes that particular value; when called with no arguments, all values are removed.
+
+For example:
+
+    my $div = $('<div />');
+    say $div->data( 'test1' );
+    $.data( $div, 'test1', 'VALUE-1' );
+    $.data( $div, 'test2', 'VALUE-2' );
+    say $.data( $div, 'test1' );
+    $.removeData( $div, 'test1' );
+    say $.data( $div, 'test1' );
+    say $.data( $div, 'test2' );
+
+This would yield:
+
+    undef
+    VALUE-1
+    undef
+    VALUE-2
+
+=head2 trim
+
+Remove the whitespace from the beginning and end of a string provided.
+
+The C<$.trim()> function removes all newlines, spaces (including non-breaking spaces), and tabs from the beginning and end of the supplied string. If these whitespace characters occur in the middle of the string, they are preserved.
+
+For example:
+
+    my $str = "         lots of spaces before and after         ";
+    say "'", $.trim($str), "'";
+
+This yields:
+
+    'lots of spaces before and after'
+
+=head2 type
+
+Determine the data type of a value, i.e.:
+
+=over 4
+
+=item * C<undef> for undefined
+
+=item * C<hash> for hash reference
+
+=item * C<array> for array reference
+
+=item * C<number> for number
+
+=item * C<boolean> for boolean objects, such as L<Module::Generic::Boolean>, L<JSON::PP::Boolean>
+
+=item * C<date> for L<DateTime objects|DateTime>
+
+=item * C<error> for L<Module::Generic::Exception>, L<Error>, L<Throwable::Error>
+
+=item * C<regexp> for C<Regexp> object, such as C<qr/test/>
+
+=item * C<string> for anything else.
+
+=back
+
+L<https://api.jquery.com/jQuery.type/>
+
+=head2 unique
+
+Sorts an array of DOM elements, in place, with the duplicates removed. Note that, unlike its jQuery counterpart, this does work on any value, not just arrays of DOM elements.
+
+It returns a new L<array object|Module::Generic::Array> of unique elements.
+
+L<https://api.jquery.com/jQuery.unique/>
+
+=head2 uniqueSort
+
+The C<$.uniqueSort()> function searches through an array or an array-like object of L<DOM elements|HTML::Object::DOM::Element>, sorting the array or array object, and removing any duplicate nodes. A node is considered a duplicate if it is the exact same node as one already in the input; two different nodes with identical attributes are not considered to be duplicates. This function only works on regular arrays or L<array objects|Module::Generic::Array> of L<DOM elements|HTML::Object::DOM::Element>, not on strings or numbers.
+
+It returns a new L<array object|Module::Generic::Array> of unique and sorted elements. The results are always returned in document order.
+
+This uses L<John Resig algorithm|https://johnresig.com/blog/comparing-document-position/> for sorting document nodes.
+
+L<https://api.jquery.com/jQuery.uniqueSort/>
 
 =head1 PRIVATE METHODS
 
@@ -1935,6 +3115,7 @@ selector; or
 element object; or
 array of objects; or
 collection
+
 "If there is more than one target element, however, cloned copies of the inserted element will be created for each target except the last, and that new set (the original element plus clones) is returned."
 
 Called by L</append_to> and L</prepend_to> to do the heavy work.

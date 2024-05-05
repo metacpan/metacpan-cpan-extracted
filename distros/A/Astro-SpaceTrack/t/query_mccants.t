@@ -128,6 +128,7 @@ SKIP: {
 }
 
 SKIP: {
+    local $TODO = '404 2024-04-27';
 
     is_success_or_skip( $st, qw{ mccants rcs }, 'Get McCants-format RCS data', 2 );
 

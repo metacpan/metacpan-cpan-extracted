@@ -31,12 +31,12 @@ use base 'Exporter';
 
 our @EXPORT = qw(calendar);
 our @EXPORT_OK = qw(date_span);
-our $VERSION = '2.0.3';
+our $VERSION = '2.1.0';
 
 use Time::Local;
 use Carp;
 
-eval 'use DateTime';
+eval "use DateTime";
 my $dt = ! $@;
 $dt = 0 if $ENV{CAL_SIMPLE_NO_DT};
 
@@ -230,10 +230,9 @@ A simple C<cal> replacement would therefore look like this:
   my @months = qw(January February March April May June July August
                   September October November December);
 
-  my $mon = shift || (localtime)[4] + 1;
-  my $yr  = shift || (localtime)[5] + 1900;
-  my $sd  = shift;
-  $ds = 1 unless defined $sd;
+  my $mon = shift // (localtime)[4] + 1;
+  my $yr  = shift // (localtime)[5] + 1900;
+  my $sd  = shift // 1;
 
   my @month = calendar($mon, $yr, $sd);
   print "\n$months[$mon -1] $yr\n\n";

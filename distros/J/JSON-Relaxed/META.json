@@ -1,7 +1,7 @@
 {
-   "abstract" : "JSON::Relaxed -- An extension of JSON that allows for better human-readability.",
+   "abstract" : "An extension of JSON that allows for better human-readability",
    "author" : [
-      "Johan Vromans <jv@span.org>"
+      "Johan Vromans <jv@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
@@ -17,6 +17,12 @@
       "directory" : [
          "t",
          "inc"
+      ],
+      "package" : [
+         "JSON::Relaxed::Parser::Token",
+         "JSON::Relaxed::Parser::String",
+         "JSON::Relaxed::Parser::String::Quoted",
+         "JSON::Relaxed::Parser::String::Unquoted"
       ]
    },
    "prereqs" : {
@@ -27,17 +33,56 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "7.54"
          }
       },
       "runtime" : {
          "requires" : {
-            "Test::More" : "0",
+            "ExtUtils::MakeMaker" : "7.54",
+            "Object::Pad" : "0.8",
             "perl" : "5.026000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::LoadLines" : "1",
+            "FileHandle" : "0",
+            "JSON::PP" : "4",
+            "Object::Pad" : "0.8",
+            "Test::More" : "0"
          }
       }
    },
+   "provides" : {
+      "JSON::Relaxed" : {
+         "file" : "lib/JSON/Relaxed.pm",
+         "version" : "0.091"
+      },
+      "JSON::Relaxed::ErrorCodes" : {
+         "file" : "lib/JSON/Relaxed/ErrorCodes.pm",
+         "version" : "0.091"
+      },
+      "JSON::Relaxed::Parser" : {
+         "file" : "lib/JSON/Relaxed/Parser.pm",
+         "version" : "0.091"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.052",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "jv@cpan.org",
+         "web" : "https://github.com/sciurius/perl-JSON-Relaxed/issues"
+      },
+      "homepage" : "https://github.com/sciurius/perl-JSON-Relaxed",
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sciurius/perl-JSON-Relaxed.git",
+         "web" : "https://github.com/sciurius/perl-JSON-Relaxed"
+      }
+   },
+   "version" : "0.091",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

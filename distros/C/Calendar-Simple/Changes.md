@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] 2024-05-04
+
+### Changed
+
+- Require Perl 5.10 (for // in `pcal`)
+- Better variable names in `pcal`
+- Better argument handling logic in `pcal`
+
+### Fixed
+
+- Fixed bug in example code (thanks exzr8u92)
+
 ## [2.0.3] 2023-08-01
 
 ### Added

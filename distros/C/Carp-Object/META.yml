@@ -16,7 +16,7 @@ name: Carp-Object
 provides:
   Carp::Object:
     file: lib/Carp/Object.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   Clone: '0'
   Devel::StackTrace: '0'
@@ -27,5 +27,5 @@ resources:
   bugtracker: https://github.com/damil/Carp-Object/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Carp-Object
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

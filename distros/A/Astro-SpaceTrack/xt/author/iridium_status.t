@@ -9,6 +9,8 @@ use Test::More 0.96;	# Because of subtest().
 use lib qw{ inc };
 use My::Module::Test ();
 
+plan skip_all	=> 'Kelso dropped Iridium status 2024-04-26';
+
 my $space_track_skip = My::Module::Test::__spacetrack_skip(
     envir	=> 1,
     no_prompt	=> My::Module::Test->NO_SPACE_TRACK_ACCOUNT(),

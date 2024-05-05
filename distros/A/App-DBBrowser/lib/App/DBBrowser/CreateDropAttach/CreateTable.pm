@@ -480,7 +480,7 @@ sub __edit_column_types {
     # Fill_form
     my $filled_form = $tf->fill_form(
         $fields,
-        { info => $info, prompt => 'Column data types:', read_only => $read_only, skip_items => qr/^\Q$skip\E\z/,
+        { info => $info, prompt => 'Column data types:', read_only => $read_only,
           confirm => $sf->{i}{confirm}, back => $sf->{i}{back} . '   ' }
     );
     $ax->print_sql_info( $info );
@@ -548,7 +548,6 @@ sub __create {
 
 sub __insert_data {
     my ( $sf, $sql ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     require App::DBBrowser::Table::CommitWriteSQL;
     my $cs = App::DBBrowser::Table::CommitWriteSQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $commit_ok = $cs->commit_sql( $sql );

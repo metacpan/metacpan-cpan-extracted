@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.022-8-gaeeeb7f
+package Test::JSON::Schema::Acceptance; # git description: v1.023-4-g9fc421b
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators
 
-our $VERSION = '1.023';
+our $VERSION = '1.024';
 
 use 5.020;
 use Moo;
@@ -492,11 +492,13 @@ sub _build_results_text ($self) {
   push @lines, _pad('specification version:', $self->specification//'unknown');
 
   if ($test_dir ne $orig_dir) {
+    my $local;
     if ($orig_dir->subsumes($test_dir)) {
       $test_dir = '<base test directory>/'.substr($test_dir, length($orig_dir)+1);
     }
     elsif (Path::Tiny->cwd->subsumes($test_dir)) {
       $test_dir = $test_dir->relative;
+      $local = 1;
     }
     push @lines, _pad('using custom test directory:', $test_dir);
 
@@ -504,7 +506,7 @@ sub _build_results_text ($self) {
       my $git  = Git::Wrapper->new($test_dir);
       my @ref = $git->describe({ all => 1, long => 1, always => 1 });
       push @lines, _pad('at ref:', $ref[0]);
-    };
+    } if not $local;
   }
   push @lines, _pad('optional tests included:', $self->include_optional ? 'yes' : 'no');
   push @lines, map _pad('skipping directory:', $_), $self->skip_dir->@*;
@@ -540,7 +542,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 SYNOPSIS
 

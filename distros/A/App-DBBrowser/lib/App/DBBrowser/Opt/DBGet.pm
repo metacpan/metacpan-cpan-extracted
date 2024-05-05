@@ -115,7 +115,7 @@ sub enabled_env_vars {
     my $env_vars = $plui->env_variables();
     my $enabled_env_vars = {};
     for my $env_var ( @$env_vars ) {
-        $enabled_env_vars->{$env_var} = $db_opt->{$db//''}{$env_var} // $db_opt->{$sf->{i}{plugin}}{$env_var};
+        $enabled_env_vars->{$env_var} = $db_opt->{$db//''}{$env_var} // $db_opt->{$plugin}{$env_var};
     }
     return $enabled_env_vars;
 }

@@ -27,7 +27,7 @@ exit;
 
 sub process_csv {
 
-    my $VERSION   = '0.06';
+    my $VERSION   = '0.08';
     my $array_sep = '\|';
 
     # Reading arguments
@@ -88,7 +88,6 @@ use Data::Dumper;
 use Path::Tiny;
 use File::Basename;
 use File::Spec::Functions qw(catdir catfile);
-use Scalar::Util qw(looks_like_number);
 use YAML::XS qw(LoadFile DumpFile);
 use JSON::XS;
 use Text::CSV_XS;
@@ -191,7 +190,7 @@ sub read_csv {
     # START READING CSV #
     #####################
 
-    my ( @rows, %array, %non_array, %numeric );
+    my ( @rows, %array, %non_array );
     my $count = 1;
     say "Start reading <$input>" if $self->{verbose};
     while ( my $row = $csv->getline($fh) ) {
@@ -208,31 +207,13 @@ sub read_csv {
         @data{@$headers} = @$row;
 
         # *** IMPORTANT ***
-        # In some cases we can have arrays and in others nope
-        # To solve it:
-        # a) A posteriori we re-format all array fields to be arrays for each row
-        # b) If the first row was not an array then we don't split by array <==== USED
+        # Columns can consist of arrays or strings
+        # Here we load all as strings and we re-format array fields a posteriori
 
-        # Check fields ONCE!!!!
-        if ( $count == 1 ) {
-            for my $key ( keys %data ) {
+        for my $key ( keys %data ) {
 
-                # Check numeric (0/1) 073123 -- NON-USED
-                $numeric{$key} = looks_like_number( $data{$key} ) ? 1 : 0;
-
-                # Check array/non-array
-                if ( $data{$key} =~ $array_sep_qr ) {
-                    $array{$key} = 1;
-                }
-                else {
-                    $non_array{$key} = 1;
-                }
-            }
-        }
-
-        # Split array fields (comma-separated values) into an array_ref
-        for my $key ( keys %array ) {
-            $data{$key} = [ split /$array_sep/, $data{$key} ];
+            # Check array/non-array based on regex
+            $array{$key}++ if $data{$key} =~ $array_sep_qr;
         }
 
         push @rows, \%data;
@@ -245,7 +226,30 @@ sub read_csv {
     # END READING CSV #
     ###################
 
-    return ( \@rows, \%array, \%non_array );
+    # Load array/non-array
+    my @array = keys %array;
+
+    # Filter the original array to exclude elements found in the @array
+    my @non_array = grep { !$array{$_} } @$headers;
+
+    # Re-arrange array variables
+    split_array_fields( \@rows, \@array, $array_sep );
+
+    return ( \@rows, \@array, \@non_array );
+}
+
+sub split_array_fields {
+
+    my ( $rows, $array, $array_sep ) = @_;
+
+    # Split array fields (comma-separated values) into an array_ref
+    # Modify the original data structure directly
+    for my $row (@$rows) {
+        for my $key (@$array) {
+            $row->{$key} = [ split /$array_sep/, $row->{$key} ];
+        }
+    }
+    return 1;
 }
 
 sub create_config {
@@ -253,18 +257,22 @@ sub create_config {
     my ( $self, $array, $non_array ) = @_;
     my $primary_key_name = $self->{primary_key_name};
 
-    my @arrays     = sort keys %$array;
-    my @non_arrays = sort keys %$non_array;
+    my @arrays     = sort @$array;
+    my @non_arrays = sort @$non_array;
+
+    # Convert arrays to hashes for quick look up
+    my %arrays_hash     = map { $_ => 1 } @arrays;
+    my %non_arrays_hash = map { $_ => 1 } @non_arrays;
 
     # Set primary key
     if ( defined $primary_key_name ) {
         die "Primary-key <$primary_key_name> not found\n"
-          unless ( exists $array->{$primary_key_name}
-            || exists $non_array->{$primary_key_name} );
+          unless ( exists $arrays_hash{$primary_key_name}
+            || exists $non_arrays_hash{$primary_key_name} );
     }
 
     else {
-        $primary_key_name = exists $non_array->{id} ? 'id' : $non_arrays[0];
+        $primary_key_name = exists $non_arrays_hash{id} ? 'id' : $non_arrays[0];
     }
 
     # Default for non-arrays

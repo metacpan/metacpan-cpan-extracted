@@ -1002,7 +1002,7 @@ sub new_closing
     return( $e );
 }
 
-sub new_collection
+sub new_collection_elements
 {
     my $self = shift( @_ );
     $self->_load_class( 'HTML::Object::DOM::Collection' ) || return( $self->pass_error );
@@ -1368,7 +1368,7 @@ sub querySelector
     
     foreach my $sel ( @sels )
     {
-        my $results = $self->find( $sel, { root => '.' } ) || 
+        my $results = $self->findNode( $sel, { root => '.' } ) || 
             return( $self->pass_error({ class => 'HTML::Object::SyntaxError' }) );
         return( $results->first ) if( !$results->is_empty );
     }
@@ -1388,7 +1388,7 @@ sub querySelectorAll
     my $results = $self->new_array;
     foreach my $sel ( @sels )
     {
-        my $elems = $self->find( $sel, { root => './' } ) ||
+        my $elems = $self->findNode( $sel, { root => './' } ) ||
             return( $self->pass_error({ class => 'HTML::Object::SyntaxError' }) );
         $results->push( $elems->list ) if( !$elems->is_empty );
     }
@@ -2836,6 +2836,8 @@ Inserting an element and text
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/after>
 
+=for Pod::Coverage ajax
+
 =head2 append
 
 Inserts a set of L<element|HTML::Object::Element> objects or HTML strings after the last child of the L<element|HTML::Object::Element>.
@@ -2899,6 +2901,8 @@ This does nothing.
 Normally, under JavaScript, this would remove keyboard focus from the currently focused element.
 
 See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/blur> for more information.
+
+=for Pod::Coverage clearQueue
 
 =head2 click
 
@@ -2967,6 +2971,8 @@ Returns true or false value indicating whether or not an element is a descendant
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/contains>
 
+=for Pod::Coverage contents
+
 =for css
 
 =for css_cache_check
@@ -2974,6 +2980,8 @@ See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node
 =for css_cache_store
 
 =for data
+
+=for Pod::Coverage dequeue
 
 =head2 dispatchEvent
 
@@ -3072,6 +3080,8 @@ Retrieves the value of the attribute with the specified namespace and name from 
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttributeNS>
 
+=for Pod::Coverage getDataJson
+
 =head2 getElementsByClassName
 
 Provided with a space-delimited list of classes, or a list of classes, and this returns an L<array object|Module::Generic::Array> that contains all descendants of the current element that possess the list of classes given in the parameter.
@@ -3150,6 +3160,8 @@ See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Elem
 Provided with a space-separated string of tag names, or an array reference of tag names or a list of tag names, and this will return an L<array object|Module::Generic::Array> of descendant elements matching those tag names.
 
 This is a non-standard method, courtesy of L<John Resig|https://johnresig.com/blog/comparing-document-position/#postcomment>
+
+=for Pod::Coverage getJSON
 
 =for getLocalName
 
@@ -3346,6 +3358,8 @@ See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node
 
 =for isa_element
 
+=for Pod::Coverage isArray
+
 =head2 isDefaultNamespace
 
 Accepts a namespace URI as an argument and returns a boolean value with a value of true if the namespace is the default namespace on the given element or false if not.
@@ -3427,7 +3441,9 @@ Returns a new L<HTML::Object::DOM::Closing> object, passing it whatever argument
 
 If an error occurred, this returns C<undef> and sets an L<error|Module::Generic/error>
 
-=head2 new_collection
+=for Pod::Coverage new_collection
+
+=head2 new_collection_elements
 
 Returns a new L<HTML::Object::DOM::Collection> object, passing it whatever arguments were provided and return the newly instantiated object.
 
@@ -3728,6 +3744,8 @@ See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node
 
 =for removeClass
 
+=for Pod::Coverage removeData
+
 =head2 removeEventListener
 
 Removes an event listener from the element. This is inherited from L<HTML::Object::EventTarget>
@@ -3858,6 +3876,8 @@ Normally, under JavaScript, this would show a popover element by adding it to th
 
 See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/showPopover> for more information.
 
+=for Pod::Coverage sourceIndex
+
 =for string_value
 
 =for tagname
@@ -3908,6 +3928,10 @@ Returns a string representation for this element.
 =head2 to_number
 
 Returns a L<HTML::Object::DOM::Number> object representing the text value of this element.
+
+=for Pod::Coverage uniqueSort
+
+=for Pod::Coverage wrap
 
 =for xq
 

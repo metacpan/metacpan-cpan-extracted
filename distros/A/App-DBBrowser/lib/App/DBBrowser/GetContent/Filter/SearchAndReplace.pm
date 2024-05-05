@@ -84,7 +84,7 @@ sub search_and_replace {
         }
         my $choice = $menu->[$idx];
         if ( $choice eq $hidden ) {
-            $sf->__saved_search_and_replace( $sql );
+            $sf->__saved_search_and_replace();
             $saved = $ax->read_json( $sf->{i}{f_search_and_replace} ) // {};
             $available = [ sort { $a cmp $b } keys %$saved  ];
             next ADD_SEARCH_AND_REPLACE;
@@ -144,12 +144,11 @@ sub search_and_replace {
         }
         elsif ( $choice eq $add ) {
             my $prompt = 'Build s///;';
-            my $separator_key = ' ';
-            my $skip_regex = qr/^\Q${separator_key}\E\z/;
+            my $skip = ' ';
             my $fields = [];
             for my $nr ( 1 .. 5 ) {
                 push @$fields,
-                    [ $separator_key,       ],
+                    [ $skip ],
                     [ $nr . ' Pattern',     ],
                     [ $nr . ' Replacement', ],
                     [ $nr . ' Modifiers',   ];
@@ -161,8 +160,7 @@ sub search_and_replace {
                 # Fill_form
                 my $form = $tf->fill_form(
                     $fields,
-                    { info => $info, prompt => $prompt, confirm => $sf->{i}{confirm},
-                      back => $back, skip_items => $skip_regex }
+                    { info => $info, prompt => $prompt, confirm => $sf->{i}{confirm}, back => $back }
                 );
                 if ( ! defined $form ) {
                     next ADD_SEARCH_AND_REPLACE;
@@ -320,11 +318,9 @@ sub _stringified_sr_group {
 
 
 sub __saved_search_and_replace {
-    my ( $sf, $sql ) = @_;
+    my ( $sf ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $separator_key = ' ';
-    my $skip_regex = qr/^\Q${separator_key}\E\z/;
     my $saved = $ax->read_json( $sf->{i}{f_search_and_replace} ) // {};
     my $save_data = 0;
     my $old_idx_history = 0;
@@ -374,12 +370,11 @@ sub __add_saved {
     my ( $sf, $saved ) = @_;
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $separator_key = ' ';
-    my $skip_regex = qr/^\Q${separator_key}\E\z/;
+    my $skip = ' ';
     my $fields = [];
     for my $nr ( 1 .. 9 ) {
         push @$fields,
-            [ $separator_key,       ],
+            [ $skip ],
             [ $nr . ' Pattern',     ],
             [ $nr . ' Replacement', ],
             [ $nr . ' Modifiers',   ];
@@ -390,8 +385,7 @@ sub __add_saved {
         # Fill_form
         my $form = $tf->fill_form(
             $fields,
-            { prompt => $prompt, skip_items => $skip_regex,
-              confirm => '  ' . $sf->{i}{confirm}, back => '  ' . $sf->{i}{back} . '   ' }
+            { prompt => $prompt, confirm => '  ' . $sf->{i}{confirm}, back => '  ' . $sf->{i}{back} . '   ' }
         );
         if ( ! defined $form ) {
             return;
@@ -480,11 +474,10 @@ sub __edit_saved {
         return;
     }
     my $name = $menu->[$idx] =~ s/^- //r;
-    my $separator_key = ' ';
-    my $skip_regex = qr/^\Q${separator_key}\E\z/;
+    my $skip = ' ';
     my $sr_group = $saved->{$name};
     my $fields = [
-        [ $separator_key   ],
+        [ $skip ],
         [ '  Pattern',     ],
         [ '  Replacement', ],
         [ '  Modifiers',   ]
@@ -493,11 +486,11 @@ sub __edit_saved {
     for my $sr_single ( @$sr_group ) {
         $c++;
         push @$fields,
-            [ $separator_key ],
+            [ $skip ],
             [ $c . ' Pattern',     $sr_single->{pattern}     ],
             [ $c . ' Replacement', $sr_single->{replacement} ],
             [ $c . ' Modifiers',   $sr_single->{modifiers}   ],
-            [ $separator_key ],
+            [ $skip ],
             [ '  Pattern',     ],
             [ '  Replacement', ],
             [ '  Modifiers',   ];
@@ -518,8 +511,8 @@ sub __edit_saved {
     # Fill_form
     my $form = $tf->fill_form(
         $fields,
-        { prompt => "Edit \"$new_name\":", info => $info, skip_items => $skip_regex,
-            confirm => '  ' . $sf->{i}{confirm}, back => '  ' . $sf->{i}{back} . '   ' }
+        { prompt => "Edit \"$new_name\":", info => $info, confirm => '  ' . $sf->{i}{confirm},
+          back => '  ' . $sf->{i}{back} . '   ' }
     );
     if ( ! defined $form ) {
         return;

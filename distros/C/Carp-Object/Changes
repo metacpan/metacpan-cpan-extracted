@@ -1,4 +1,7 @@
 Revision history for Carp-Object
 
+1.02     04.05.2024
+  - Fix typos in module name of Devel::StackTrace (Michal Josef Špaček++)
+
 1.01     28.04.2024
   - initial version

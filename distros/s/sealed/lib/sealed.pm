@@ -20,7 +20,7 @@ our $VERSION;
 our $DEBUG;
 
 BEGIN {
-  our $VERSION = qv(6.0.6);
+  our $VERSION = qv(7.0.1);
   XSLoader::load("sealed", $VERSION);
 }
 
@@ -75,9 +75,7 @@ sub tweak ($\@\@\@$$\%) {
         my $method               = $class->can($method_name)
           or die __PACKAGE__ . ": invalid lookup: $class->$method_name - did you forget to 'use $class' first?";
         # replace $methop
-        $old_pad                 = B::cv_pad($cv_obj);
-        $gv                      = B::GVOP->new($gv_op->name, $gv_op->flags, ref($gv_op) eq "B::PADOP" ? *tweak : $method);
-        B::cv_pad($old_pad);
+        $gv                      = new($gv_op->name, $gv_op->flags, ref($gv_op) eq "B::PADOP" ? *tweak : $method, $cv_obj->PADLIST);
         $gv->next($methop->next);
         $gv->sibparent($methop->sibparent);
         $op->next($gv);
@@ -89,7 +87,7 @@ sub tweak ($\@\@\@$$\%) {
           # so we answer the prayer by resetting $$pads[--$idx][$gv->padix], which
           # has the correct semantics (for $method) under assignment.
           my $padix = $gv->padix;
-          _padname_add($cv_obj->PADLIST, $padix);
+          #_padname_add($cv_obj->PADLIST, $padix);
           my (undef, @p)         = $cv_obj->PADLIST->ARRAY;
           $pads = [ map defined ? $_->object_2svref : $_, @p ];
           $$pads[--$idx][$padix] = $method;

@@ -5,7 +5,7 @@ my $build = Module::Build->new(
   dist_author        => 'Dave Cross <dave@mag-sol.com>',
   module_name        => 'Calendar::Simple',
   requires           => {
-    perl                  => '5.6.0',
+    perl                  => '5.10.0',
     Carp                  => 0,
     'Time::Local'         => 0,
     Config                => 0,
@@ -27,11 +27,11 @@ my $build = Module::Build->new(
     resources => {
       repository => {
         type => 'git',
-        url => 'https://github.com/davorg/calendar-simple.git',
-        web => 'https://github.com/davorg/calendar-simple',
+        url => 'https://github.com/davorg-cpan/calendar-simple.git',
+        web => 'https://github.com/davorg-cpan/calendar-simple',
       },
       bugtracker => {
-        web => 'https://github.com/davorg/calendar-simple/issues',
+        web => 'https://github.com/davorg-cpan/calendar-simple/issues',
       },
     },
   },

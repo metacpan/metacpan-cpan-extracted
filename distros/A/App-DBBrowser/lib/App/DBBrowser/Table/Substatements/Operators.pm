@@ -25,14 +25,18 @@ sub new {
 }
 
 
-sub choose_and_add_operator {
+sub add_operator_and_value {
     my ( $sf, $sql, $clause, $stmt, $qt_col ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @operators = @{$sf->{o}{G}{operators}};
-    if ( $sf->{i}{driver} =~ /(?:Firebird|Informix)\z/ ) {
+    if ( $sf->{i}{driver} eq 'SQLite' ) {
+        @operators = grep { ! /^(?:ANY|ALL)\z/ } @operators;
+    }
+    elsif ( $sf->{i}{driver} =~ /(?:Firebird|Informix)\z/ ) {
         @operators = uniq map { s/(?<=REGEXP)_i\z//; $_ } @operators;
     }
+    my $bu_stmt = $sql->{$stmt};
 
     OPERATOR: while( 1 ) {
         my $operator;
@@ -49,23 +53,25 @@ sub choose_and_add_operator {
             );
             $ax->print_sql_info( $info );
             if ( ! defined $operator ) {
+                $sql->{$stmt} = $bu_stmt;
                 return;
             }
         }
         $operator =~ s/^\s+|\s+\z//g;
-        my $bu_stmt = $sql->{$stmt};
         $ax->print_sql_info( $ax->get_sql_info( $sql ) );
         if ( $operator =~ /REGEXP(_i)?\z/ ) {
             $sql->{$stmt} =~ s/ (?: (?<=\() | \s ) \Q$qt_col\E \z //x;
             my $do_not_match_regexp = $operator =~ /^NOT/ ? 1 : 0;
-            my $case_sensitive      = $operator =~ /REGEXP_i\z/ ? 0 : 1;
+            my $case_sensitive = $operator =~ /REGEXP_i\z/ ? 0 : 1;
             my $regex_op;
             if ( ! eval {
                 $regex_op = $sf->_regexp( $qt_col, $do_not_match_regexp, $case_sensitive );
                 1 }
             ) {
                 $ax->print_error_message( $@ );
-                next OPERATOR;
+                $sql->{$stmt} = $bu_stmt;
+                next OPERATOR if @operators > 1;
+                return;
             }
             $regex_op =~ s/^\s// if $sql->{$stmt} =~ /\(\z/;
             $sql->{$stmt} .= $regex_op;
@@ -82,7 +88,8 @@ sub choose_and_add_operator {
             );
             $ax->print_sql_info( $info );
             if ( ! defined $operator ) {
-                next OPERATOR;
+                next OPERATOR if @operators > 1;
+                return;
             }
             $sql->{$stmt} .= ' ' . $operator;
         }
@@ -90,14 +97,21 @@ sub choose_and_add_operator {
             $sql->{$stmt} .= ' ' . $operator;
         }
         $ax->print_sql_info( $ax->get_sql_info( $sql ) );
-        return $operator;
+        my $ok = $sf->read_and_add_value( $sql, $clause, $stmt, $qt_col, $operator );
+        if ( $ok ) {
+            return 1;
+        }
+        else {
+            $sql->{$stmt} = $bu_stmt;
+            next OPERATOR if @operators > 1;
+            return;
+        }
     }
 }
 
 
 sub read_and_add_value {
     my ( $sf, $sql, $clause, $stmt, $qt_col, $operator ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $is_numeric;
     if ( ! length $sql->{data_types}{$qt_col} || ( $sql->{data_types}{$qt_col} >= 2 && $sql->{data_types}{$qt_col} <= 8 ) ) {
@@ -107,37 +121,38 @@ sub read_and_add_value {
         return 1;
     }
     elsif ( $operator =~ /^(?:NOT\s)?IN\z/ ) {
+        my $bu_stmt = $sql->{$stmt};
         $sql->{$stmt} .= ' (';
-        my $prev_value;
-        my @bu;
+        my @args;
 
         IN: while ( 1 ) {
             # Readline
             my $value = $ext->value( $sql, $clause, {}, $operator, { is_numeric => $is_numeric } );
             if ( ! defined $value ) {
-                if ( @bu ) {
-                    $sql->{$stmt} = pop @bu;
-                    next IN;
-                }
-                return;
-            }
-            if ( $value eq "''" ) {
-                if ( ! @bu ) {
+                if ( ! @args ) {
+                    $sql->{$stmt} = $bu_stmt;
                     return;
                 }
-                if ( @bu == 1 && $prev_value =~ /^\s*\((.+)\)\s*\z/ ) {
-                    # with one subquery as argument:
-                    # remove parenthesis around the subquery
-                    # because IN (( sq )) not alowed
-                    $sql->{$stmt} = $bu[0] . $1;
+                pop @args;
+                $sql->{$stmt} = $bu_stmt . ' ('  . join ',', @args;
+                next IN;
+            }
+            if ( ! length $value || $value eq "''" ) {
+                if ( ! @args ) {
+                    $sql->{$stmt} = $bu_stmt;
+                    return;
+                }
+                if ( @args == 1 && $args[0] =~ /^\s*\((.+)\)\s*\z/ ) {
+                    # if the only argument is a subquery:
+                    # remove the parenthesis around the subquery
+                    # because "IN ((subquery))" is not alowed
+                    $sql->{$stmt} = $bu_stmt . ' (' . $1;
                 }
                 $sql->{$stmt} .= ')';
                 return 1;
             }
-            $prev_value = $value;
-            push @bu, $sql->{$stmt};
-            my $col_sep = @bu == 1 ? '' : ',';
-            $sql->{$stmt} .= $col_sep . $value;
+            push @args, $value;
+            $sql->{$stmt} = $bu_stmt . ' ('  . join ',', @args;
         }
     }
     elsif ( $operator =~ /^(?:NOT\s)?BETWEEN\z/ ) {
@@ -146,10 +161,12 @@ sub read_and_add_value {
         if ( ! defined $value_1 ) {
             return;
         }
+        my $bu_stmt = $sql->{$stmt};
         $sql->{$stmt} .= ' ' . $value_1 . ' AND';
         # Readline
         my $value_2 = $ext->value( $sql, $clause, {}, $operator, { is_numeric => $is_numeric } );
         if ( ! defined $value_2 ) {
+            $sql->{$stmt} = $bu_stmt;
             return;
         }
         $sql->{$stmt} .= ' ' . $value_2;

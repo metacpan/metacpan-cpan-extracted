@@ -29,7 +29,7 @@ sub new {
 
 
 sub input_filter {
-    my ( $sf, $sql, $source ) = @_;
+    my ( $sf, $sql ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $confirm       = '     OK';
     my $back          = '     <<';
@@ -59,7 +59,6 @@ sub input_filter {
 
     FILTER: while ( 1 ) {
         my $skip = ' ';
-        my $regex = qr/^\Q$skip\E\z/;
         my $menu = [
             undef,          $choose_rows,   $range_rows,   $row_groups,
             $confirm,       $choose_cols,   $skip,         $skip,
@@ -74,7 +73,7 @@ sub input_filter {
         my $idx = $tc->choose(
             $menu,
             { info => $info, prompt => 'Filter:', layout => 0, order => 0, max_cols => $max_cols, index => 1,
-              default => $old_idx, undef => $back, skip_items => $regex, busy_string => $working }
+              default => $old_idx, undef => $back, busy_string => $working }
         );
         $sf->__print_busy_string( $working );
         if ( ! $idx ) {
@@ -194,7 +193,6 @@ sub __choose_columns {
     my $aoa = $sql->{insert_args};
     my $is_empty = $sf->__search_empty_cols( $aoa );
     my $header = $sf->__prepare_header( $aoa, $is_empty );
-    my $row_count = @$aoa;
     my $col_count = @{$aoa->[0]};
     my $non_empty_cols = [];
     for my $col_idx ( 0 .. $col_count - 1 ) {
@@ -224,7 +222,6 @@ sub __choose_columns {
 sub __choose_rows {
     my ( $sf, $sql, $filter_str, $working ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $aoa = $sql->{insert_args};
     my @pre = ( undef, $sf->{i}{ok} );
     my $stringified_rows = [];
@@ -503,7 +500,6 @@ sub __split_column {
     my $back = $sf->{i}{back} . ' ' x 3;
     $prompt = "Split column \"$header->[$idx]\"";
     $info = $sf->__get_filter_info( $sql, $filter_str );
-    my $c;
     # Fill_form
     my $form = $tf->fill_form(
         $fields,
@@ -525,9 +521,9 @@ sub __split_column {
         else {
             @split_col = split /$pattern/, $col;
         }
-        for my $c ( @split_col ) {
-            $c =~ s/^$left_trim//   if length $left_trim;
-            $c =~ s/$right_trim\z// if length $right_trim;
+        for ( @split_col ) {
+            $_ =~ s/^$left_trim//   if length $left_trim;
+            $_ =~ s/$right_trim\z// if length $right_trim;
         }
         splice @$row, $idx, 0, @split_col;
     }
@@ -788,11 +784,9 @@ sub __empty_to_null {
 
 sub __search_empty_cols {
     my ( $sf, $aoa ) = @_;
-    my $row_count = @$aoa;
-    my $col_count = @{$aoa->[0]};
     my $is_empty ;
-    COL: for my $col_idx ( 0 .. $col_count - 1 ) {
-        for my $row_idx ( 0 .. $row_count - 1 ) {
+    COL: for my $col_idx ( 0 .. $#$aoa ) {
+        for my $row_idx ( 0 .. $#{$aoa->[0]} ) {
             if ( length $aoa->[$row_idx][$col_idx] ) {
                 $is_empty->[$col_idx] = 0;
                 next COL;
@@ -806,10 +800,8 @@ sub __search_empty_cols {
 
 sub __prepare_header {
     my ( $sf, $aoa, $is_empty ) = @_;
-    my $row_count = @$aoa;
-    my $col_count = @{$aoa->[0]};
     my $header = [];
-    for my $col_idx ( 0 .. $col_count - 1 ) {
+    for my $col_idx ( 0 .. $#{$aoa->[0]} ) {
         if ( $is_empty->[$col_idx] ) {
             $header->[$col_idx] = '--';
         }

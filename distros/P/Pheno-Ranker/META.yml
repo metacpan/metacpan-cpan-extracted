@@ -31,6 +31,7 @@ no_index:
 requires:
   Data::Fake: '0.006'
   File::ShareDir::ProjectDistDir: '1.000009'
+  Graph: '0.9727'
   Hash::Fold: '0'
   JSON::Validator: '5.14'
   JSON::XS: '4.03'
@@ -50,6 +51,6 @@ resources:
   homepage: https://github.com/CNAG-Biomedical-Informatics/pheno-ranker
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/CNAG-Biomedical-Informatics/pheno-ranker.git
-version: '0.08'
+version: '0.09'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

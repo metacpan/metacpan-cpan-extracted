@@ -1,5 +1,13 @@
 Revision history for Perl module Module::Generic
 
+v0.37.0 2024-05-04T20:31:24+0900
+    - Minor adjustment to Module::Generic::SharedMemXS
+    - Minor adjustment to t/12.sharedmem.t
+    - Added class function 'create_class' in Module::Generic to easily enable the creation of perl classes
+    - Improved method __create_class in Module::Generic
+    - Added class function 'exception' in Module::Generic::Exception
+    - Added method concat() in Module::Generic::Array
+
 v0.36.0 2024-05-03T07:04:54+0900
     - Corrected Module::Generic::Array documentation
     - Added the 'invert' option to method grep() in Module::Generic::Array

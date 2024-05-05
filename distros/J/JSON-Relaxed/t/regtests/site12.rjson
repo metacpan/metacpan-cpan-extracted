@@ -1,0 +1,28 @@
+// Example RJSON and Equivalent JSON for ambiguous value cases
+
+[
+    // Notice that the key is a string but the value is a number
+    {1:1}
+    {"1": 1} 
+
+    // Now the value is a string
+    {1:'1'}
+    {"1":"1"}
+
+    // More examples of this.
+    { true:true }
+    { "true":true }
+
+    { true:'true' }
+    { "true":"true" }
+
+    { null:null }
+    { "null":null }
+
+    { null:'null' }
+    { "null":"null" }
+
+    // Not advised, but no quotes are needed when escaping reserved characters (spaces, etc).
+    hello\:worldly\,world
+    "hello:worldly,world"
+]

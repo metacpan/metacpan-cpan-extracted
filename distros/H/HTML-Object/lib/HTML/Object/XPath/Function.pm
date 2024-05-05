@@ -490,6 +490,7 @@ sub _execute
 {
     my $self = shift( @_ );
     my( $name, $node, @params ) = @_;
+    return( $self->error( "No function name was provided to execute." ) ) if( !$name );
     $name =~ s/-/_/g;
     no strict 'refs';
     return( $self->$name( $node, @params ) );
