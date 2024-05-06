@@ -172,6 +172,12 @@ ioctl(fd, request, arg)
 #define IO_FD_CTIME ctime=buf.st_ctim.tv_sec+buf.st_ctim.tv_nsec*1e-9;
 #endif
 
+#if defined(IO_FD_OS_DARWIN)
+#define DEV_FMT "%d"
+#else
+#define DEV_FMT "%lld"
+#endif
+
 
 void
 stat(target)
@@ -246,7 +252,8 @@ stat(target)
             // Handle signed value
                                         //int32     uint64    uint64
             if(sizeof(IV)<sizeof(buf.st_dev)){
-              sprintf(scratch,"%lld", buf.st_dev);
+              //sprintf(scratch,"%lld", buf.st_dev);
+              sprintf(scratch, DEV_FMT, buf.st_dev);
               tmp = newSVpv(scratch,0);
             }
             else{
@@ -256,7 +263,8 @@ stat(target)
           else {
             // Handle unsigned value
             if(sizeof(UV)<sizeof(buf.st_dev)){
-              sprintf(scratch,"%llu", buf.st_dev);
+              //sprintf(scratch,"%llu", buf.st_dev);
+              sprintf(scratch, DEV_FMT, buf.st_dev);
               tmp = newSVpv(scratch,0);
             }
             else{
@@ -284,7 +292,8 @@ stat(target)
           // ==== st_nlink
           if(sizeof(UV)<sizeof(buf.st_nlink)){
             // We know we are longer than 32 bits
-              sprintf(scratch,"%llu", buf.st_nlink);
+              //sprintf(scratch,"%llu", buf.st_nlink);
+              sprintf(scratch, DEV_FMT, buf.st_nlink);
               tmp = newSVpv(scratch,0);
           }
           else{
@@ -306,7 +315,8 @@ stat(target)
             // Handle signed value
                                         //int32     uint64    uint64
             if(sizeof(IV)<sizeof(buf.st_rdev)){
-              sprintf(scratch,"%lld", buf.st_rdev);
+              //sprintf(scratch,"%lld", buf.st_rdev);
+              sprintf(scratch, DEV_FMT, buf.st_rdev);
               tmp = newSVpv(scratch,0);
             }
             else{
@@ -316,7 +326,8 @@ stat(target)
           else {
             // Handle unsigned value
             if(sizeof(UV)<sizeof(buf.st_rdev)){
-              sprintf(scratch,"%llu", buf.st_rdev);
+              //sprintf(scratch,"%llu", buf.st_rdev);
+              sprintf(scratch,DEV_FMT, buf.st_rdev);
               tmp = newSVpv(scratch,0);
             }
             else{

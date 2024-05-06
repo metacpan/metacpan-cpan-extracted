@@ -1,42 +1,34 @@
 package ExtUtils::Builder::MakeMaker;
-$ExtUtils::Builder::MakeMaker::VERSION = '0.005';
+$ExtUtils::Builder::MakeMaker::VERSION = '0.006';
 use strict;
 use warnings;
 
 our @ISA;
 
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.68;
 use ExtUtils::Builder::Planner;
 use ExtUtils::Config::MakeMaker;
 
 sub import {
 	my ($class, @args) = @_;
-	if (!MM->isa('ExtUtils::Builder::MakeMaker')) {
+	if (!MM->isa(__PACKAGE__)) {
 		@ISA = @MM::ISA;
-		@MM::ISA = qw/ExtUtils::Builder::MakeMaker/;
+		@MM::ISA = __PACKAGE__;
 		splice @ExtUtils::MakeMaker::Overridable, -1, 0, 'make_plans';
 	}
 	return;
 }
 
-my $escape_command = $^O eq 'MSWin32'
-	? sub {
-		my (undef, @args) = @_;
-		require Win32::ShellQuote;
-		Win32::ShellQuote::quote_cmd(@args);
-	}
-	: sub {
-		my ($maker, @elements) = @_;
-		return join ' ', map { (my $temp = m{[^\w/\$().-]} ? $maker->quote_literal($_) : $_) =~ s/\n/\\\n\t/g; $temp } @elements;
-	}
-;
+my $escape_command = sub {
+	my ($maker, $elements) = @_;
+	return join ' ', map { (my $temp = m{[^\w/\$().-]} ? $maker->quote_literal($_) : $_) =~ s/\n/\\\n\t/g; $temp } @{$elements};
+};
 
 my %double_colon = map { $_ => 1 } qw/all pure_all subdirs config dynamic static clean distdir test install/;
 my $make_entry = sub {
 	my ($maker, $target, $dependencies, $actions) = @_;
-	my @commands = map { $maker->$escape_command(@{$_}) } map { $_->to_command(perl => '$(ABSPERLRUN)') } @{$actions};
-	my $quote_dep = $maker->can('quote_dep') || sub { $_[1] };
-	my @dependencies = map { $maker->$quote_dep($_) } @{$dependencies};
+	my @commands = map { $maker->$escape_command($_) } map { $_->to_command(perl => '$(ABSPERLRUN)') } @{$actions};
+	my @dependencies = map { $maker->quote_dep($_) } @{$dependencies};
 	my $colon = $double_colon{$target} ? '::' : ':';
 	return join "\n\t", join(' ', $target, $colon, @dependencies), @commands;
 };
@@ -52,11 +44,17 @@ sub postamble {
 	$planner->add_delegate('dist_name', sub { $maker->{DIST_NAME} });
 	$planner->add_delegate('dist_version', sub { $maker->{VERSION} });
 	$planner->add_delegate('pureperl_only', sub { $maker->{PUREPERL_ONLY} });
-	$planner->add_delegate('release_status', sub { $maker->{VERSION} =~ /_/ ? 'unstable' : 'stable' });
+	$planner->add_delegate('perl_path', sub { $maker->{ABSPERLRUN} });
+	$planner->add_delegate('uninst', sub { $maker->{UNINST} });
+	$planner->add_delegate('meta', sub { CPAN::Meta->load_file('META.json') });
+	$planner->add_delegate('release_status', sub { CPAN::Meta->load_file('META.json')->release_status });
 
 	$maker->make_plans($planner, %args) if $maker->can('make_plans');
 	for my $file (glob 'planner/*.pl') {
-		$planner->new_scope->run_dsl($file);
+		my $inner = $planner->new_scope;
+		$inner->add_delegate('self', sub { $inner });
+		$inner->add_delegate('outer', sub { $planner });
+		$inner->run_dsl($file);
 	}
 
 	my $plan = $planner->materialize;
@@ -86,7 +84,7 @@ ExtUtils::Builder::MakeMaker - A MakeMaker consumer for ExtUtils::Builder Plan o
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

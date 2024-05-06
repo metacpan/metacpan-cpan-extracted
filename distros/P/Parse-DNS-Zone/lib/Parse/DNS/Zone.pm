@@ -1,8 +1,7 @@
 #!/usr/bin/perl
 # Parse::DNS::Zone - DNS Zone File Parser
 #
-# Copyright (c) 2009-2011, 2013, 2015 - Olof Johansson <olof@cpan.org>
-# All rights reserved.
+# Copyright (c) 2009-2021 - Olof Johansson <olof@cpan.org>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
@@ -54,11 +53,16 @@ RFC 1034:
 
 Parse::DNS::Zone does not support $GENERATE in this version.
 
+Additionally, use of time unit suffixes (e.g. using 1d instead of
+86400 or 1m30s instead of 90, etc), as supported by Bind9 and nsd et
+al is supported in TTLs and the time fields of a SOA record (as
+of version 0.70).
+
 =cut
 
 use 5.010;
 package Parse::DNS::Zone;
-our $VERSION = '0.60';
+our $VERSION = '0.70';
 use warnings;
 use strict;
 use File::Basename;
@@ -182,7 +186,7 @@ you're in list context, or the first RR if you're in scalar
 context.
 
 The $field is the particular component of the resource record to
-return.  It defaults to 'val', which is the actual value of the
+return. It defaults to 'rdata', which is the actual value of the
 record. Other possibilities are 'class' (e.g. "IN") and 'ttl'.
 
 =cut
@@ -204,7 +208,7 @@ sub get_rdata {
 	                               (!($name=~/\.$/)));
 
 	return $self->{zone}{lc $name}{lc $rr}{lc $field}[$n] if defined $n;
-	return @{$self->{zone}{lc $name}{lc $rr}{lc $field}} if wantarray;
+	return @{$self->{zone}{lc $name}{lc $rr}{lc $field} // []} if wantarray;
 	return $self->{zone}{lc $name}{lc $rr}{lc $field}[0];
 }
 
@@ -409,6 +413,40 @@ sub _load_zonefile {
 	return do { local $/; <$zonefh> }; # slurp
 }
 
+sub _parse_time_unit {
+	my $string = shift;
+
+	my $time_units_regex = qr/^
+		(?: (?=\d+(?: w|d|h|m|s))
+		(\d+w)? (\d+d)? (\d+h)? (\d+m)? (\d+s)? ) | (\d+)
+	$/xi;
+	my @parts = ($string =~ $time_units_regex);
+
+	my %multi_for_unit = (
+		s => 1,
+		m => 60,
+		h => 3600,
+		d => 86400,
+		w => 604800,
+	);
+
+	my $seconds = 0;
+
+	for my $part (@parts) {
+		next unless $part;
+		my ($value, $unit) = $part =~ /^(\d+)(\D+)?$/;
+		$unit = 's' unless $unit;
+		$unit = lc($unit);
+		# this should never happen as the %multi_for_unit hash
+		# includes all units the regex parses, just extra safety.
+		die "BUG: known unit '$unit' is unhandled"
+			unless exists $multi_for_unit{$unit};
+		$seconds += $value * $multi_for_unit{$unit};
+	}
+
+	return $seconds;
+}
+
 # Is used internally to parse a zone from a filename. will do some
 # recursion for the $include, so a procedural implementation is needed
 sub _parse_zone {
@@ -425,7 +463,8 @@ sub _parse_zone {
 
 	my ($def_class, $def_ttl);
 	if ($opts{included}) {
-		($def_class, $def_ttl) = @{\%opts}{qw(default_class default_ttl)};
+		($def_class, $def_ttl) = @{\%opts}{qw(default_class
+		                                      default_ttl)};
 
 	}
 	my $zonepath = $self->{basepath};
@@ -434,13 +473,23 @@ sub _parse_zone {
 	my $prev;
 	my %zone;
 
+	my $time_units_regex = qr/
+		(?:
+			(?=\d+(?: w|d|h|m|s))
+			(?: \d+w)? (?: \d+d)? (?: \d+h)? (?: \d+m)? (?: \d+s)?
+		) | \d+
+	/ix;
+
 	my $zentry = qr/^
 		(\S+)\s+ # name
-		(
-			(?: (?: IN | CH | HS ) \s+ \d+ \s+ ) |
-			(?: \d+ \s+ (?: IN | CH | HS ) \s+ ) |
-			(?: (?: IN | CH | HS ) \s+ ) |
-			(?: \d+ \s+ ) |
+		(?:
+			(
+				(?: (?: IN | CH | HS ) \s+ $time_units_regex ) |
+				(?: $time_units_regex \s+ (?: IN | CH | HS ) ) |
+				(?: (?: IN | CH | HS ) ) |
+				(?: $time_units_regex )
+			)
+			\s+
 		)? # <ttl> <class> or <class> <ttl>
 		(\S+)\s+ # type
 		(.*) # rdata
@@ -494,7 +543,10 @@ sub _parse_zone {
 		}
 
 		$origin = $1, next if(/^\$ORIGIN ([\w\-\.]+)\s*$/i);
-		$def_ttl = $1, next if(/^\$TTL (\d+)\s*$/i);
+		if(/^\$TTL (\S+)\s*$/i) {
+			$def_ttl = _parse_time_unit($1);
+			next;
+		}
 		if(/^\$INCLUDE (\S+)(?: (\S+))?\s*(?:;.*)?$/i) {
 			my $subo=defined $2?$2:$origin;
 
@@ -522,11 +574,11 @@ sub _parse_zone {
 		$rdata =~ s/\s+$//g;
 
 		my($ttl, $class);
-		if(defined $ttlclass) {
-			($ttl) = $ttlclass=~/(\d+)/o;
-			($class) = $ttlclass=~/(CH|IN|HS)/io;
+		if(defined $ttlclass && $ttlclass ne '') {
+			($ttl) = $ttlclass=~/($time_units_regex)/;
+			($class) = $ttlclass=~/(CH|IN|HS)/i;
 
-			$ttlclass=~s/\d+//;
+			$ttlclass=~s/$time_units_regex//;
 			$ttlclass=~s/(?:CH|IN|HS)//;
 			$ttlclass=~s/\s//g;
 			if($ttlclass) {
@@ -535,7 +587,7 @@ sub _parse_zone {
 			}
 		}
 
-		$ttl = defined $ttl ? $ttl : $def_ttl;
+		$ttl = defined $ttl ? _parse_time_unit($ttl) : $def_ttl;
 		$class = defined $class ? $class : $def_class;
 		$def_class = $class;
 
@@ -601,15 +653,15 @@ sub _parse_soa {
 	my $self = shift;
 	my $soa_rd = get_rdata($self, (name=>"$self->{origin}", rr=>'SOA'));
 	my($mname,$rname,$serial,$refresh,$retry,$expire,$minimum)=
-		$soa_rd=~/^(\S+) (\S+) (\d+) (\d+) (\d+) (\d+) (\d+)\s*$/;
+		$soa_rd=~/^(\S+) (\S+) (\d+) (\S+) (\S+) (\S+) (\S+)\s*$/;
 
 	$self->{soa}{mname}=$mname;
 	$self->{soa}{rname}=$rname;
 	$self->{soa}{serial}=$serial;
-	$self->{soa}{refresh}=$refresh;
-	$self->{soa}{retry}=$retry;
-	$self->{soa}{expire}=$expire;
-	$self->{soa}{minimum}=$minimum;
+	$self->{soa}{refresh}=_parse_time_unit($refresh);
+	$self->{soa}{retry}=_parse_time_unit($retry);
+	$self->{soa}{expire}=_parse_time_unit($expire);
+	$self->{soa}{minimum}=_parse_time_unit($minimum);
 }
 
 1;
@@ -626,9 +678,7 @@ this is the I<preferred> place to report issues.
 
 =head1 COPYRIGHT
 
- Copyright (c) 2009-2011, 2013, 2015 - Olof Johansson <olof@cpan.org>
-
-All rights reserved.
+ Copyright (c) 2009-2021 - Olof Johansson <olof@cpan.org>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

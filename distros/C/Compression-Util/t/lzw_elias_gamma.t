@@ -14,8 +14,8 @@ foreach my $file (__FILE__) {
         <$fh>;
     };
 
-    my $enc = lzw_compress($str, undef, \&elias_gamma_encode);
-    my $dec = lzw_decompress($enc, undef, \&elias_gamma_decode);
+    my $enc = lzw_compress($str, \&elias_gamma_encode);
+    my $dec = lzw_decompress($enc, \&elias_gamma_decode);
 
     is($str, $dec);
 }

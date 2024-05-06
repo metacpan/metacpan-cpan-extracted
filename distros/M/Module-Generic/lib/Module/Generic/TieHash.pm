@@ -433,7 +433,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2020-2023 DEGUEST Pte. Ltd.
+Copyright (c) 2020-2024 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

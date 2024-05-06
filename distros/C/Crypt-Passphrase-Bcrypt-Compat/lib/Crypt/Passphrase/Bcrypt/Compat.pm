@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Bcrypt::Compat;
-$Crypt::Passphrase::Bcrypt::Compat::VERSION = '0.002';
+$Crypt::Passphrase::Bcrypt::Compat::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -13,13 +13,13 @@ sub new {
 }
 
 sub accepts_hash {
-	my ($hash) = @_;
+	my ($self, $hash) = @_;
 	return $hash =~ /^\$2a?\$/;
 }
 
 sub verify_password {
 	my ($class, $password, $hash) = @_;
-	return bcrypt($password, $hash) eq $hash;
+	$class->secure_compare(bcrypt($password, $hash), $hash);
 }
 
 1;
@@ -38,7 +38,7 @@ Crypt::Passphrase::Bcrypt::Compat - A bcrypt validator for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 

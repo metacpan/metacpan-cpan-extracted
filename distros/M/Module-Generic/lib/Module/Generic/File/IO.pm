@@ -726,7 +726,7 @@ L<IO::Handle>, L<IO::File>, L<IO::Seekable>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2022 DEGUEST Pte. Ltd.
+Copyright(c) 2022-2024 DEGUEST Pte. Ltd.
 
 All rights reserved.
 

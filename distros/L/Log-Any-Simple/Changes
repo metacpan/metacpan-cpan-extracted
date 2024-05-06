@@ -1,4 +1,14 @@
 Revision history for Perl distribution Log-Any-Functions
 
+0.03 - 2024-05-05
+
+ - Improvement to the documentation.
+
+0.02 - 2024-05-05
+
+ - Improvement to the POD syntax for the documentation.
+ - Allow to configure the logging from the command line (similar to
+   Log::Log4perl::CommandLine). Useful for tests or very simple programs.
+
 0.01 - 2024-04-24
  - Initial release

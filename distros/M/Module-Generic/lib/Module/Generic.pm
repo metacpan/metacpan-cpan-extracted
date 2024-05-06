@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.37.0
+## Version v0.37.1
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2024/05/03
+## Modified 2024/05/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.37.0';
+    our $VERSION     = 'v0.37.1';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -9403,7 +9403,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v0.37.0
+    v0.37.1
 
 =head1 DESCRIPTION
 
@@ -12613,7 +12613,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2000-2020 DEGUEST Pte. Ltd.
+Copyright (c) 2000-2024 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

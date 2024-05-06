@@ -38,5 +38,5 @@ requires:
 resources:
   bugtracker: https://github.com/mkende/perl_log_any_simple/issues
   repository: https://github.com/mkende/perl_log_any_simple
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

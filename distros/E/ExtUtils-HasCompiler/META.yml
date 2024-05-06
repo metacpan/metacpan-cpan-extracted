@@ -23,7 +23,7 @@ name: ExtUtils-HasCompiler
 provides:
   ExtUtils::HasCompiler:
     file: lib/ExtUtils/HasCompiler.pm
-    version: '0.024'
+    version: '0.025'
 requires:
   Carp: '0'
   DynaLoader: '0'
@@ -39,7 +39,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/extutils-hascompiler/issues
   repository: git://github.com/Leont/extutils-hascompiler.git
-version: '0.024'
+version: '0.025'
 x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

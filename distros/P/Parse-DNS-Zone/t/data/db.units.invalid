@@ -1,0 +1,15 @@
+$TTL 1h
+$ORIGIN example.com.
+
+; SOA and A are valid
+example.com. 3600 IN SOA ns1.example.com. hostmaster.example.com. 1 2 3 4 5
+@ 3600 NS ns.example.com.
+
+; ns is invalid, as it doesn't end with a unit suffix
+ns 3h30 A 127.0.0.1
+
+; www is invalid, as it contains an invalid unit
+www 3h30x A 127.0.0.1
+
+; ldap is valid
+ldap 3600 A 127.0.0.1

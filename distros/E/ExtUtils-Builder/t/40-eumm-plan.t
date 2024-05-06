@@ -37,7 +37,7 @@ WriteMakefile(
 sub MY::make_plans {
 	my ($self, $planner, $config) = @_;
 	my $action1 = ExtUtils::Builder::Action::Command->new(command => [%s, 'very_unlikely_name']);
-	my $action2 = ExtUtils::Builder::Action::Code->new(code => 'open my $fh, ">", "other_unlikely_name"');
+	my $action2 = ExtUtils::Builder::Action::Code->new(code => 'open my $fh, "\\x{3e}", "other_unlikely_name"');
 	$planner->create_node(target => 'foo', actions => [ $action1, $action2 ]);
 	$planner->create_node(target => 'pure_all', dependencies => [ 'foo' ], phony => 1);
 }

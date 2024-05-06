@@ -1,5 +1,5 @@
 This archive contains the distribution Crypt-Passphrase-Bcrypt-Compat,
-version 0.002:
+version 0.004:
 
   A bcrypt validator for Crypt::Passphrase
 

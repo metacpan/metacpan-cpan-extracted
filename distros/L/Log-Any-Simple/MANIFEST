@@ -13,6 +13,7 @@ t/300-import-fail.t
 t/400-stack-trace.t
 t/500-option-die_at.t
 t/500-option-prefix.t
+t/500-option_from_argv.t
 t/600-formatter.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,8 @@
 Revision history for ExtUtils-HasCompiler
 
+0.025     2024-05-05 14:13:28+02:00 Europe/Brussels
+          - Skip static test on dynamic perls
+
 0.024     2024-04-11 14:43:48+02:00 Europe/Brussels
           - Make temporary dir absolute
 

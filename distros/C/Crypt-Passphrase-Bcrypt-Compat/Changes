@@ -1,5 +1,12 @@
 Revision history for Crypt-Passphrase-Bcrypt-Compat
 
+0.004     2024-05-05 21:02:45+02:00 Europe/Brussels
+          - Fix typo in secure_compare
+          - Fix tests to test the right module
+
+0.003     2024-05-05 20:57:34+02:00 Europe/Brussels
+          - Correct argument passing to accepts_hash
+
 0.002     2024-04-08 16:33:08+02:00 Europe/Brussels
           - Fix incorrect abstract
 

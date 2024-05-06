@@ -13,7 +13,7 @@ WriteMakefile (
 	VERSION_FROM => 'lib/Parse/DNS/Zone.pm',
 	SIGN => 1,
 
-	MIN_PERL_VERSION => 5.010,
+	MIN_PERL_VERSION => 5.014,
 
 	PREREQ_PM => {
 		'Test::More' => 0,
@@ -34,4 +34,3 @@ WriteMakefile (
 		},
 	},
 );
-

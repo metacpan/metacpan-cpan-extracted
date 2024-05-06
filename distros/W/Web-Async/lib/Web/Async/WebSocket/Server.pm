@@ -1,7 +1,7 @@
 package Web::Async::WebSocket::Server;
 use Myriad::Class extends => 'IO::Async::Notifier';
 
-our $VERSION = '0.002'; ## VERSION
+our $VERSION = '0.003'; ## VERSION
 ## AUTHORITY
 
 =head1 NAME

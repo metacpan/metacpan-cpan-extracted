@@ -737,7 +737,7 @@ L<Module::Generic::Cookies>, L<Text::PO>. L<WebSocket::Extension>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021 DEGUEST Pte. Ltd.
+Copyright(c) 2021-2024 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 

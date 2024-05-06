@@ -18,8 +18,8 @@ foreach my $file (__FILE__, $^X) {
         <$fh>;
     };
 
-    my $enc = lzw_compress($str, undef, \&elias_omega_encode);
-    my $dec = lzw_decompress($enc, undef, \&elias_omega_decode);
+    my $enc = lzw_compress($str, \&elias_omega_encode);
+    my $dec = lzw_decompress($enc, \&elias_omega_decode);
 
     say "Original size  : ", length($str);
     say "Compressed size: ", length($enc);

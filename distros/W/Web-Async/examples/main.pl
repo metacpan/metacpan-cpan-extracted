@@ -18,7 +18,7 @@ $loop->add(
  <body>
   ws test
   <script type="module">
-const ws = new WebSocket('ws://localhost:7777/api');
+const ws = new WebSocket(`ws://${new URL(window.location.href).host}/api`);
 ws.addEventListener('message', (msg) => {
     console.debug('Websocket message: ', msg);
 });
@@ -33,7 +33,7 @@ ws.addEventListener('open', (evt) => {
         const len = 3 + parseInt(Math.random() * 100);
         let str = '';
         for(let i = 0; i < len; ++i) {
-            str = str + String.fromCodePoint(32 + parseInt(Math.random() * 65502));
+            str = str + String.fromCodePoint(32 + parseInt(Math.random() * 60502));
         }
         data[str] = Math.random();
         await ws.send(JSON.stringify(data));

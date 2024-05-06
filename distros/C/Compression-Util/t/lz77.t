@@ -4,7 +4,7 @@ use 5.036;
 use Test::More;
 use Compression::Util qw(:all);
 
-plan tests => 1;
+plan tests => 4;
 
 foreach my $file (__FILE__) {
 
@@ -14,8 +14,19 @@ foreach my $file (__FILE__) {
         <$fh>;
     };
 
-    my $enc = lz77_compress($str);
-    my $dec = lz77_decompress($enc);
+    {    # regular
+        my $enc = lz77_compress($str);
+        my $dec = lz77_decompress($enc);
 
-    is($str, $dec);
+        ok(length($enc) < length($str));
+        is($str, $dec);
+    }
+
+    {    # symbolic
+        my $enc = lz77_compress_symbolic($str);
+        my $dec = lz77_decompress_symbolic($enc);
+
+        ok(length($enc) < length($str));
+        is($str, symbols2string($dec));
+    }
 }

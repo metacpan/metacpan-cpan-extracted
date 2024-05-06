@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-04-12'; # DATE
+our $DATE = '2024-05-06'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240412.0'; # VERSION
+our $VERSION = '20240506.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
@@ -14,40 +14,33 @@ use Acme::CPANAuthors::Register (
     'DJERIUS' => '',
     'BRIANDFOY' => '',
     'DAVECROSS' => '',
-    'HANJE' => '',
     'ARISTOTLE' => '',
     'CORION' => '',
-    'ANTONOV' => '',
-    'ARTHAS' => '',
-    'ATOY' => '',
-    'BLIAKO' => '',
-    'BOD' => '',
-    'CHRISARG' => '',
-    'DERIV' => '',
-    'DILLANBH' => '',
-    'GENE' => '',
-    'GTERMARS' => '',
-    'HAUKEX' => '',
-    'HAX' => '',
-    'HERNAN' => '',
-    'JKEENAN' => '',
-    'JONASBN' => '',
-    'JV' => '',
-    'KTAT' => '',
     'MATHIAS' => '',
-    'PETDANCE' => '',
-    'SIDNEY' => '',
-    'TRIZEN' => '',
-    'TULAMILI' => '',
-    'UTASHIRO' => '',
     'GBROWN' => '',
+    'GDT' => '',
+    'LNATION' => '',
+    'BIGPRESH' => '',
+    'CAPOEIRAB' => '',
+    'CROMEDOME' => '',
+    'DAMI' => '',
+    'EGOR' => '',
+    'HIGHTOWE' => '',
     'ISHIGAKI' => '',
+    'JFORGET' => '',
     'JMATES' => '',
     'LEONT' => '',
-    'LNATION' => '',
+    'MGUBIN' => '',
     'MYSOCIETY' => '',
     'PHILIPPE' => '',
+    'RSPIER' => '',
+    'SPWHITTON' => '',
+    'TEAM' => '',
+    'TIMKA' => '',
     'TYRRMINAL' => '',
+    'UXYZAB' => '',
+    'VNEALV' => '',
+    'WATERKIP' => '',
 );
 
 
@@ -66,56 +59,49 @@ Acme::CPANAuthors::CPAN::Streaks::MonthlyDistributions::Current - Authors with o
 
 =head1 VERSION
 
-This document describes version 20240412.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-04-12.
+This document describes version 20240506.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-05-06.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-04-12, produced by L<cpan-streaks>):
+Current standings (as of 2024-05-06, produced by L<cpan-streaks>):
 
   +-----------+-----+------------+-------------+
   | author    | len | start_date | status      |
   +-----------+-----+------------+-------------+
-  | PERLANCAR | 117 | 2014-08    | ongoing     |
-  | SKIM      |  14 | 2023-03    | ongoing     |
-  | DJERIUS   |   5 | 2023-12    | ongoing     |
-  | BRIANDFOY |   3 | 2024-02    | ongoing     |
-  | DAVECROSS |   3 | 2024-02    | ongoing     |
-  | HANJE     |   2 | 2024-02    | might-break |
-  | ARISTOTLE |   2 | 2024-03    | ongoing     |
-  | CORION    |   2 | 2024-03    | ongoing     |
-  | ANTONOV   |   1 | 2024-03    | might-break |
-  | ARTHAS    |   1 | 2024-03    | might-break |
-  | ATOY      |   1 | 2024-03    | might-break |
-  | BLIAKO    |   1 | 2024-03    | might-break |
-  | BOD       |   1 | 2024-03    | might-break |
-  | CHRISARG  |   1 | 2024-03    | might-break |
-  | DERIV     |   1 | 2024-03    | might-break |
-  | DILLANBH  |   1 | 2024-03    | might-break |
-  | GENE      |   1 | 2024-03    | might-break |
-  | GTERMARS  |   1 | 2024-03    | might-break |
-  | HAUKEX    |   1 | 2024-03    | might-break |
-  | HAX       |   1 | 2024-03    | might-break |
-  | HERNAN    |   1 | 2024-03    | might-break |
-  | JKEENAN   |   1 | 2024-03    | might-break |
-  | JONASBN   |   1 | 2024-03    | might-break |
-  | JV        |   1 | 2024-03    | might-break |
-  | KTAT      |   1 | 2024-03    | might-break |
-  | MATHIAS   |   1 | 2024-03    | might-break |
-  | PETDANCE  |   1 | 2024-03    | might-break |
-  | SIDNEY    |   1 | 2024-03    | might-break |
-  | TRIZEN    |   1 | 2024-03    | might-break |
-  | TULAMILI  |   1 | 2024-03    | might-break |
-  | UTASHIRO  |   1 | 2024-03    | might-break |
-  | GBROWN    |   1 | 2024-04    | ongoing     |
-  | ISHIGAKI  |   1 | 2024-04    | ongoing     |
-  | JMATES    |   1 | 2024-04    | ongoing     |
-  | LEONT     |   1 | 2024-04    | ongoing     |
-  | LNATION   |   1 | 2024-04    | ongoing     |
-  | MYSOCIETY |   1 | 2024-04    | ongoing     |
-  | PHILIPPE  |   1 | 2024-04    | ongoing     |
-  | TYRRMINAL |   1 | 2024-04    | ongoing     |
+  | PERLANCAR | 118 | 2014-08    | ongoing     |
+  | SKIM      |  15 | 2023-03    | ongoing     |
+  | DJERIUS   |   6 | 2023-12    | ongoing     |
+  | BRIANDFOY |   3 | 2024-02    | might-break |
+  | DAVECROSS |   3 | 2024-02    | might-break |
+  | ARISTOTLE |   2 | 2024-03    | might-break |
+  | CORION    |   2 | 2024-03    | might-break |
+  | MATHIAS   |   2 | 2024-03    | might-break |
+  | GBROWN    |   2 | 2024-04    | ongoing     |
+  | GDT       |   2 | 2024-04    | ongoing     |
+  | LNATION   |   2 | 2024-04    | ongoing     |
+  | BIGPRESH  |   1 | 2024-04    | might-break |
+  | CAPOEIRAB |   1 | 2024-04    | might-break |
+  | CROMEDOME |   1 | 2024-04    | might-break |
+  | DAMI      |   1 | 2024-04    | might-break |
+  | EGOR      |   1 | 2024-04    | might-break |
+  | HIGHTOWE  |   1 | 2024-04    | might-break |
+  | ISHIGAKI  |   1 | 2024-04    | might-break |
+  | JFORGET   |   1 | 2024-04    | might-break |
+  | JMATES    |   1 | 2024-04    | might-break |
+  | LEONT     |   1 | 2024-04    | might-break |
+  | MGUBIN    |   1 | 2024-04    | might-break |
+  | MYSOCIETY |   1 | 2024-04    | might-break |
+  | PHILIPPE  |   1 | 2024-04    | might-break |
+  | RSPIER    |   1 | 2024-04    | might-break |
+  | SPWHITTON |   1 | 2024-04    | might-break |
+  | TEAM      |   1 | 2024-04    | might-break |
+  | TIMKA     |   1 | 2024-04    | might-break |
+  | TYRRMINAL |   1 | 2024-04    | might-break |
+  | UXYZAB    |   1 | 2024-04    | might-break |
+  | VNEALV    |   1 | 2024-04    | might-break |
+  | WATERKIP  |   1 | 2024-04    | might-break |
   +-----------+-----+------------+-------------+
 
 =head1 HOMEPAGE

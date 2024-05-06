@@ -5,6 +5,7 @@ use warnings;
 
 use Test::More;
 use Test::Compile::Internal;
+use File::Spec;
 
 my $internal = Test::Compile::Internal->new();
 my @locations;
@@ -33,7 +34,8 @@ if ( -e 'blib' ) {
     @locations = $internal->_default_locations("lib");
 
     # Then
-    is($locations[0], "blib/lib", "prefer to look in blib if it's available");
+    my $expected = File::Spec->catfile("blib", "lib");
+    is($locations[0], $expected, "prefer to look in blib if it's available");
 }
 
 

@@ -1,5 +1,10 @@
 Revision history for Perl module Module::Generic
 
+v0.37.1 2024-05-05T13:17:55+0900
+    - Corrected a bug leading to an exhaust of memory in method format() of Module::Generic::Number
+    - Addressed decoding issue of data returned by POSIX::localconv(), such as currency sign in Module::Generic::Number
+    - Implemented the 'grouping' option in method format of Module::Generic::Number
+
 v0.37.0 2024-05-04T20:31:24+0900
     - Minor adjustment to Module::Generic::SharedMemXS
     - Minor adjustment to t/12.sharedmem.t

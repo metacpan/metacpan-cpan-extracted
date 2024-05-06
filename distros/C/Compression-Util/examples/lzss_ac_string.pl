@@ -18,8 +18,8 @@ foreach my $file (__FILE__, $^X) {
         <$fh>;
     };
 
-    my $enc = lzss_compress($str, undef, \&create_ac_entry);
-    my $dec = lzss_decompress($enc, undef, \&decode_ac_entry);
+    my $enc = lzss_compress($str, \&create_ac_entry);
+    my $dec = lzss_decompress($enc, \&decode_ac_entry);
 
     say "Original size  : ", length($str);
     say "Compressed size: ", length($enc);

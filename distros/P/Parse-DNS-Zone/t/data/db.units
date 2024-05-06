@@ -1,0 +1,56 @@
+$TTL   1h
+
+example.com.               IN   SOA       ns1.example.com. hostmaster.example.com. (
+                                              1234567890   ; Serial
+                                              1d12h30m     ; Refresh
+                                              3600s      ; Retry
+                                              14d      ; Expire
+                                              1h  )   ; Negative Cache TTL
+
+@                               NS        ns1.example.com.
+@                               NS        ns2.example.com.
+@                               A         127.0.0.1
+@                               MX        10 mail1.example.com.
+@                               MX        20 mail2.example.com.
+;@                              TXT       "commented out rr"
+
+ns1                             A         127.0.0.1
+ns2                             A         127.0.0.2
+mail1                           A         127.0.0.1
+mail2                           A         127.0.0.3
+
+test                            A         192.168.0.1
+                                AAAA      ::1
+test-cname                      CNAME     test-a
+test-reccname                   CNAME     test-cname
+
+$INCLUDE db.include
+
+test-dupes                      A         127.0.0.1
+test-dupes                      A         127.0.0.2
+test-dupes                      A         127.0.0.3
+
+test-class                 IN   A         127.0.0.1
+test-ttl             400        A         127.0.0.1
+test-ttlclass        400   IN   A         127.0.0.1
+test-ttlclassr       IN   400   A         127.0.0.1
+test-ttlunit         1H         A         127.0.0.1
+
+test-origapp                    CNAME     test
+
+nsapptr                         NSAP-PTR  foo.
+
+test-trailing-whitespace        TXT       foo
+test-trailing-whitespace2       TXT       foo ; comment
+
+test-txt-quoted                 TXT       "foo bar ; baz"
+test-txt-quoted-escaped         TXT       "foo b\a\r\ \;\ \b\a\z"
+
+; DKIM test cases, to verify handling offf quoting and escpaing
+dk-singleline                   TXT       "v=DKIM1\; descr=singleline\; fizz=buzz\;" ; Single line domain key
+dk-singleline2                  TXT       v=DKIM1\;descr=singleline\;fizz=buzz\; ; Single line domain key
+dk-singleline3                  TXT       "v=DKIM1; descr=singleline; fizz=buzz;" ; Single line domain key
+dk-multiline                    TXT       (             ; Begin multi-line
+                                           v=DKIM1
+                                           descr=multiline
+                                           foo=bar ) ; End multi-line

@@ -5,7 +5,7 @@ use 5.036;
 use Test::More;
 use Compression::Util qw(:all);
 
-plan tests => 1;
+plan tests => 2;
 
 foreach my $file (__FILE__) {
 
@@ -18,6 +18,7 @@ foreach my $file (__FILE__) {
     my $enc = bz2_compress_symbolic([map { ord($_) } $str =~ /(\X)/g]);
     my $dec = bz2_decompress_symbolic($enc);
 
+    ok(length($enc) < length($str));
     is($str, join('', map { chr($_) } @$dec));
 }
 

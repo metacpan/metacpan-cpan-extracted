@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use Test::More tests => 50;
+use Test::More;
 
 BEGIN { use_ok('Parse::DNS::Zone') }
 
@@ -21,6 +21,7 @@ my %zone_simple = (
 		ns2 => [qw/A/],
 		mail1 => [qw/A/],
 		mail2 => [qw/A/],
+		nsapptr => [qw/NSAP-PTR/],
 		'test' => [qw/A AAAA/],
 		'test-cname' => [qw/CNAME/],
 		'test-reccname' => [qw/CNAME/],
@@ -273,6 +274,36 @@ is(
 	"Quoted rdata with unescaped ;"
 );
 
+is(
+	$zone->get_rdata(name=>'nsapptr', rr=>'NSAP-PTR'),
+	'foo.',
+	"RTYPE with hyphen"
+);
+
+is_deeply(
+	[$zone->get_rdata(name=>'noexists', rr=>'A')],
+	[],
+	'looking up rdata for non-existing name (wantarray)',
+);
+
+is(
+	$zone->get_rdata(name=>'noexists', rr=>'A'),
+	undef,
+	'looking up rdata for non-existing name',
+);
+
+is_deeply(
+	[$zone->get_rdata(name=>'ns1', rr=>'SOA')],
+	[],
+	'looking up rdata for non-existing rtype (wantarray)',
+);
+
+is(
+	$zone->get_rdata(name=>'ns1', rr=>'SOA'),
+	undef,
+	'looking up rdata for non-existing rtype',
+);
+
 $zone = Parse::DNS::Zone->new(
 	zonefile=>$zone_simple{file},
 	origin=>$zone_simple{origin},
@@ -291,3 +322,38 @@ ok(
 	)},
 	'Should be possible to load zones without $TTL',
 );
+
+$zone = Parse::DNS::Zone->new(
+	zonefile 	=> 't/data/db.units',
+	origin 		=> 'example.com.',
+);
+
+is($zone->get_serial, 1234567890, "SOA serial");
+is($zone->get_refresh, 131400, "SOA refresh");
+is($zone->get_retry, 3600, "SOA retry");
+is($zone->get_expire, 1209600, "SOA expire");
+is($zone->get_minimum, 3600, "SOA minimum");
+
+is(
+	$zone->get_rdata(name=>'test-ttlunit', rr=>'A', field=>'ttl'),
+	'3600', 'Extract ttl data from rr'
+);
+
+$zone = Parse::DNS::Zone->new(
+	zonefile 	=> 't/data/db.units.invalid',
+	origin 		=> 'example.com.',
+);
+
+is(
+	$zone->get_rdata(name=>'@', rr=>'NS'), 'ns.example.com.',
+	"extract valid RR from zone with invalid records"
+);
+
+is($zone->get_rdata(name=>'ns', rr=>'A'), undef,
+   'invalid record (mixes units with unit less)');
+is($zone->get_rdata(name=>'www', rr=>'A'), undef,
+   'invalid record (uses invalid unit)');
+is($zone->get_rdata(name=>'ldap', rr=>'A'), '127.0.0.1',
+   'valid record after invalid records');
+
+done_testing;

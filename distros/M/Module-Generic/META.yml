@@ -49,6 +49,7 @@ requires:
   File::Glob: '0'
   File::MMagic: '1.30'
   File::Spec: '3.73'
+  I18N::Langinfo: '0.21'
   IO::Dir: '1.41'
   IO::File: '1.41'
   IO::Scalar: '2.113'
@@ -78,5 +79,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Module-Generic/issues
   repository: https://gitlab.com/jackdeguest/Module-Generic
-version: v0.37.0
+version: v0.37.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

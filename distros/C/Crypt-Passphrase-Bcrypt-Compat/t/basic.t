@@ -6,9 +6,9 @@ use warnings;
 use Test::More;
 
 use Crypt::Eksblowfish::Bcrypt qw/bcrypt en_base64/;
-use Crypt::Passphrase::Bcrypt;
+use Crypt::Passphrase::Bcrypt::Compat;
 
-my $passphrase = Crypt::Passphrase::Bcrypt->new;
+my $passphrase = Crypt::Passphrase::Bcrypt::Compat->new;
 
 my $password = 'password';
 my $salt = "\0" x 16;

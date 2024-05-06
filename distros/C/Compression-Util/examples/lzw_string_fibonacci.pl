@@ -18,8 +18,8 @@ foreach my $file (__FILE__, $^X) {
         <$fh>;
     };
 
-    my $enc = lzw_compress($str, undef, \&fibonacci_encode);
-    my $dec = lzw_decompress($enc, undef, \&fibonacci_decode);
+    my $enc = lzw_compress($str, \&fibonacci_encode);
+    my $dec = lzw_decompress($enc, \&fibonacci_decode);
 
     say "Original size  : ", length($str);
     say "Compressed size: ", length($enc);

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Number.pm
-## Version v2.1.0
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v2.1.1
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2023/09/05
+## Modified 2024/05/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -104,7 +104,7 @@ BEGIN
     # double floats.  To be safe, we cap at 2**53; use Math::BigFloat
     # instead for larger numbers.
     use constant MAX_INT => 2**53;
-    our( $VERSION ) = 'v2.1.0';
+    our( $VERSION ) = 'v2.1.1';
 };
 
 # use strict;
@@ -402,76 +402,76 @@ zu_ZA   => [qw( zu_ZA.UTF-8 zu_ZA.ISO-8859-1 zu_ZA.ISO8859-1 )],
 
 $DEFAULT =
 {
-# The local currency symbol.
-currency_symbol     => '€',
-# The decimal point character, except for currency values, cannot be an empty string
-decimal_point       => '.',
-# The number of digits after the decimal point in the local style for currency values.
-frac_digits         => 2,
-# The sizes of the groups of digits, except for currency values. unpack( "C*", $grouping ) will give the number
-grouping            => (CORE::chr(3) x 2),
-# The standardized international currency symbol.
-int_curr_symbol     => '€',
-# The number of digits after the decimal point in an international-style currency value.
-int_frac_digits     => 2,
-# Same as n_cs_precedes, but for internationally formatted monetary quantities.
-int_n_cs_precedes   => '',
-# Same as n_sep_by_space, but for internationally formatted monetary quantities.
-int_n_sep_by_space  => '',
-# Same as n_sign_posn, but for internationally formatted monetary quantities.
-int_n_sign_posn     => 1,
-# Same as p_cs_precedes, but for internationally formatted monetary quantities.
-int_p_cs_precedes   => 1,
-# Same as p_sep_by_space, but for internationally formatted monetary quantities.
-int_p_sep_by_space  => 0,
-# Same as p_sign_posn, but for internationally formatted monetary quantities.
-int_p_sign_posn     => 1,
-# The decimal point character for currency values.
-mon_decimal_point   => '.',
-# Like grouping but for currency values.
-mon_grouping        => (CORE::chr(3) x 2),
-# The separator for digit groups in currency values.
-mon_thousands_sep   => ',',
-# Like p_cs_precedes but for negative values.
-n_cs_precedes       => 1,
-# Like p_sep_by_space but for negative values.
-n_sep_by_space      => 0,
-# Like p_sign_posn but for negative currency values.
-n_sign_posn         => 1,
-# The character used to denote negative currency values, usually a minus sign.
-negative_sign       => '-',
-# 1 if the currency symbol precedes the currency value for nonnegative values, 0 if it follows.
-p_cs_precedes       => 1,
-# 1 if a space is inserted between the currency symbol and the currency value for nonnegative values, 0 otherwise.
-p_sep_by_space      => 0,
-# The location of the positive_sign with respect to a nonnegative quantity and the currency_symbol, coded as follows:
-# 0    Parentheses around the entire string.
-# 1    Before the string.
-# 2    After the string.
-# 3    Just before currency_symbol.
-# 4    Just after currency_symbol.
-p_sign_posn         => 1,
-# The character used to denote nonnegative currency values, usually the empty string.
-positive_sign       => '',
-# The separator between groups of digits before the decimal point, except for currency values
-thousands_sep       => ',',
+    # The local currency symbol.
+    currency_symbol     => '€',
+    # The decimal point character, except for currency values, cannot be an empty string
+    decimal_point       => '.',
+    # The number of digits after the decimal point in the local style for currency values.
+    frac_digits         => 2,
+    # The sizes of the groups of digits, except for currency values. unpack( "C*", $grouping ) will give the number
+    grouping            => (CORE::chr(3) x 2),
+    # The standardized international currency symbol.
+    int_curr_symbol     => '€',
+    # The number of digits after the decimal point in an international-style currency value.
+    int_frac_digits     => 2,
+    # Same as n_cs_precedes, but for internationally formatted monetary quantities.
+    int_n_cs_precedes   => '',
+    # Same as n_sep_by_space, but for internationally formatted monetary quantities.
+    int_n_sep_by_space  => '',
+    # Same as n_sign_posn, but for internationally formatted monetary quantities.
+    int_n_sign_posn     => 1,
+    # Same as p_cs_precedes, but for internationally formatted monetary quantities.
+    int_p_cs_precedes   => 1,
+    # Same as p_sep_by_space, but for internationally formatted monetary quantities.
+    int_p_sep_by_space  => 0,
+    # Same as p_sign_posn, but for internationally formatted monetary quantities.
+    int_p_sign_posn     => 1,
+    # The decimal point character for currency values.
+    mon_decimal_point   => '.',
+    # Like grouping but for currency values.
+    mon_grouping        => (CORE::chr(3) x 2),
+    # The separator for digit groups in currency values.
+    mon_thousands_sep   => ',',
+    # Like p_cs_precedes but for negative values.
+    n_cs_precedes       => 1,
+    # Like p_sep_by_space but for negative values.
+    n_sep_by_space      => 0,
+    # Like p_sign_posn but for negative currency values.
+    n_sign_posn         => 1,
+    # The character used to denote negative currency values, usually a minus sign.
+    negative_sign       => '-',
+    # 1 if the currency symbol precedes the currency value for nonnegative values, 0 if it follows.
+    p_cs_precedes       => 1,
+    # 1 if a space is inserted between the currency symbol and the currency value for nonnegative values, 0 otherwise.
+    p_sep_by_space      => 0,
+    # The location of the positive_sign with respect to a nonnegative quantity and the currency_symbol, coded as follows:
+    # 0    Parentheses around the entire string.
+    # 1    Before the string.
+    # 2    After the string.
+    # 3    Just before currency_symbol.
+    # 4    Just after currency_symbol.
+    p_sign_posn         => 1,
+    # The character used to denote nonnegative currency values, usually the empty string.
+    positive_sign       => '',
+    # The separator between groups of digits before the decimal point, except for currency values
+    thousands_sep       => ',',
 };
 
 my $map =
 {
-decimal             => [qw( decimal_point mon_decimal_point )],
-grouping            => [qw( grouping mon_grouping )],
-position_neg        => [qw( n_sign_posn int_n_sign_posn )],
-position_pos        => [qw( n_sign_posn int_p_sign_posn )],
-precede             => [qw( p_cs_precedes int_p_cs_precedes )],
-precede_neg         => [qw( n_cs_precedes int_n_cs_precedes )],
-precision           => [qw( frac_digits int_frac_digits )],
-sign_neg            => [qw( negative_sign )],
-sign_pos            => [qw( positive_sign )],
-space_pos           => [qw( p_sep_by_space int_p_sep_by_space )],
-space_neg           => [qw( n_sep_by_space int_n_sep_by_space )],
-symbol              => [qw( currency_symbol int_curr_symbol )],
-thousand            => [qw( thousands_sep mon_thousands_sep )],
+    decimal             => [qw( decimal_point mon_decimal_point )],
+    grouping            => [qw( grouping mon_grouping )],
+    position_neg        => [qw( n_sign_posn int_n_sign_posn )],
+    position_pos        => [qw( n_sign_posn int_p_sign_posn )],
+    precede             => [qw( p_cs_precedes int_p_cs_precedes )],
+    precede_neg         => [qw( n_cs_precedes int_n_cs_precedes )],
+    precision           => [qw( frac_digits int_frac_digits )],
+    sign_neg            => [qw( negative_sign )],
+    sign_pos            => [qw( positive_sign )],
+    space_pos           => [qw( p_sep_by_space int_p_sep_by_space )],
+    space_neg           => [qw( n_sep_by_space int_n_sep_by_space )],
+    symbol              => [qw( currency_symbol int_curr_symbol )],
+    thousand            => [qw( thousands_sep mon_thousands_sep )],
 };
 
 # This serves 2 purposes:
@@ -481,23 +481,23 @@ thousand            => [qw( thousands_sep mon_thousands_sep )],
 # So here we use this hash reference of numeric properties to ensure the option parameters are set to a numeric value (0) when they are empty.
 my $numerics = 
 {
-grouping => 0,
-frac_digits => 0,
-int_frac_digits => 0,
-int_n_cs_precedes => 0,
-int_p_cs_precedes => 0,
-int_n_sep_by_space => 0,
-int_p_sep_by_space => 0,
-int_n_sign_posn => 1,
-int_p_sign_posn => 1,
-mon_grouping => 0,
-n_cs_precedes => 0,
-n_sep_by_space => 0,
-n_sign_posn => 1,
-p_cs_precedes => 0,
-p_sep_by_space => 0,
-# Position of positive sign. 1 = before (0 = parentheses)
-p_sign_posn => 1,
+    grouping            => 0,
+    frac_digits         => 0,
+    int_frac_digits     => 0,
+    int_n_cs_precedes   => 0,
+    int_p_cs_precedes   => 0,
+    int_n_sep_by_space  => 0,
+    int_p_sep_by_space  => 0,
+    int_n_sign_posn     => 1,
+    int_p_sign_posn     => 1,
+    mon_grouping        => 0,
+    n_cs_precedes       => 0,
+    n_sep_by_space      => 0,
+    n_sign_posn         => 1,
+    p_cs_precedes       => 0,
+    p_sep_by_space      => 0,
+    # Position of positive sign. 1 = before (0 = parentheses)
+    p_sign_posn         => 1,
 };
 
 sub init
@@ -517,6 +517,7 @@ sub init
     $self->{lang} = '';
     $self->{default} = $DEFAULT;
     $self->{decimal_fill}   = 0;
+    $self->{encoding}       = 'utf-8';
     $self->{neg_format}     = '-x';
     $self->{kilo_suffix}    = 'K';
     $self->{mega_suffix}    = 'M';
@@ -582,9 +583,32 @@ sub init
         if( my $loc = eval{ $try_locale->( $self->{lang} ) } )
         {
             my $lconv = POSIX::localeconv();
+            # Encode and I18N::Langinfo are both core modules since before perl 5.26.1, which is our minimum requirement
+            $self->_load_class( 'Encode' ) || return( $self->pass_error );
+            $self->_load_class( 'I18N::Langinfo' ) || return( $self->pass_error );
+            my $encoding = eval
+            {
+                Encode::resolve_alias( I18N::Langinfo::langinfo( I18N::Langinfo::CODESET() ) );
+            } || 'utf-8';
+            if( $@ )
+            {
+                warn( "Error trying to resolve alias for POSIX::localeconv codeset: $@" ) if( $self->_is_warnings_enabled );
+            }
+            $self->encoding( $encoding );
             # Set back the LC_ALL to what it was, because we do not want to disturb the user environment
             POSIX::setlocale( &POSIX::LC_ALL, $curr_locale );
-            $default = $lconv if( $lconv && scalar( keys( %$lconv ) ) );
+            if( $lconv && scalar( keys( %$lconv ) ) )
+            {
+                my @grouping = unpack("C*", $lconv->{grouping});
+                $lconv->{grouping} = $grouping[0];
+                @grouping = unpack("C*", $lconv->{mon_grouping});
+                $lconv->{mon_grouping} = $grouping[0];
+                $default = $lconv;
+                if( my $decoded = $self->decode_lconv( $default ) )
+                {
+                    $default = $decoded;
+                }
+            }
         }
         elsif( $@ )
         {
@@ -595,14 +619,32 @@ sub init
             return( $self->error( "Language \"$self->{lang}\" is not supported by your system." ) );
         }
     }
-#     elsif( $curr_locale && 
-#            $curr_locale ne 'C' && 
-#            $curr_locale ne 'POSIX' && 
-#            ( my $lconv = POSIX::localeconv() ) )
-#     {
     elsif( $curr_locale && ( my $lconv = POSIX::localeconv() ) )
     {
-        $default = $lconv if( scalar( keys( %$lconv ) ) );
+        # Encode and I18N::Langinfo are both core modules since before perl 5.26.1, which is our minimum requirement
+        $self->_load_class( 'Encode' ) || return( $self->pass_error );
+        $self->_load_class( 'I18N::Langinfo' ) || return( $self->pass_error );
+        my $encoding = eval
+        {
+            Encode::resolve_alias( I18N::Langinfo::langinfo( I18N::Langinfo::CODESET() ) );
+        } || 'utf-8';
+        if( $@ )
+        {
+            warn( "Error trying to resolve alias for POSIX::localeconv codeset: $@" ) if( $self->_is_warnings_enabled );
+        }
+        $self->encoding( $encoding );
+        if( scalar( keys( %$lconv ) ) )
+        {
+            my @grouping = unpack("C*", $lconv->{grouping});
+            $lconv->{grouping} = $grouping[0];
+            @grouping = unpack("C*", $lconv->{mon_grouping});
+            $lconv->{mon_grouping} = $grouping[0];
+            $default = $lconv;
+            if( my $decoded = $self->decode_lconv( $default ) )
+            {
+                $default = $decoded;
+            }
+        }
         # To simulate running on Windows
 #         my $fail = [qw(
 # frac_digits
@@ -798,7 +840,38 @@ sub decimal { return( shift->_set_get_prop( 'decimal', @_ ) ); }
 
 sub decimal_fill { return( shift->_set_get_prop( 'decimal_fill', @_ ) ); }
 
+sub decode_lconv
+{
+    my $self = shift( @_ );
+    my $ref = shift( @_ );
+    return( $self->error( "Value provided is not an hash reference." ) ) if( !$self->_is_hash( $ref => 'strict' ) );
+    my $encoding = $self->encoding || 'utf-8';
+
+    foreach my $prop ( keys( %$ref ) )
+    {
+        my $v = $ref->{ $prop };
+        next if( utf8::is_utf8( $v ) || $self->_is_empty( $v ) );
+        my $rv = eval
+        {
+            return( Encode::decode(
+                $encoding,
+                $v,
+                Encode::FB_CROAK()
+            ) );
+        };
+        if( $@ )
+        {
+            warn( "Error trying to decode POSIX::localeconv property ${prop} and language $self->{lang}: $@" ) if( $self->_is_warnings_enabled );
+            next;
+        }
+        $ref->{ $prop } = $rv;
+    }
+    return( $ref );
+};
+
 sub default { return( shift->_set_get_hash_as_mix_object( 'default', @_ ) ); }
+
+sub encoding { return( shift->_set_get_scalar( 'encoding', @_ ) ); }
 
 sub exp { return( shift->_func( 'exp' ) ); }
 
@@ -814,29 +887,16 @@ sub format
     my $number  = $self->{_number};
     # If value provided was undefined, we leave it undefined, otherwise we would be at risk of returning 0, and 0 is very different from undefined
     return( $number ) if( !defined( $number ) );
-#     my $fmt = $self->_get_formatter;
-#     try
-#     {
-#         # Amazingly enough, when a precision > 0 is provided, format_number will discard it if the number, before formatting, did not have decimals... Then, what is the point of formatting a number then?
-#         # To circumvent this, we provide the precision along with the "add trailing zeros" parameter expected by Number::Format
-#         # return( $fmt->format_number( $num, $precision, 1 ) );
-#         my $res = $fmt->format_number( "$num", $precision, 1 );
-#         return if( !defined( $res ) );
-#         require Module::Generic::Scalar;
-#         return( Module::Generic::Scalar->new( $res ) );
-#     }
-#     catch( $e )
-#     {
-#         return( $self->error( "Error formatting number \"$num\": $e" ) );
-#     }
     $precision //= $opts->{precision} // $self->precision;
     my $thousands_sep = $opts->{thousand} // $self->thousand;
     my $decimal_point = $opts->{decimal} // $self->decimal;
     my $trailing_zeroes = $opts->{decimal_fill} // $self->decimal_fill // 1;
-    for( $precision, $thousands_sep, $decimal_point, $trailing_zeroes )
+    my $grouping = $opts->{grouping} // $self->grouping // 3;
+    for( $precision, $thousands_sep, $decimal_point, $trailing_zeroes, $grouping )
     {
         $_ = $_->scalar if( $self->_can( $_ => 'scalar' ) );
     }
+    $grouping = 3 unless( $self->_is_integer( $grouping ) );
 
     # Taken from Number::Format. Credit to William R. Ward
     # Handle negative numbers
@@ -859,7 +919,7 @@ sub format
     my $decimal;
 
     # Note: In perl 5.6 and up, string representation of a number
-    # automagically includes the locale decimal point.  This way we
+    # automagically includes the locale decimal point. This way we
     # will detect the decimal part correctly as long as the decimal
     # point is 1 character.
     if( CORE::length( $integer ) < CORE::length( $number ) )
@@ -876,13 +936,17 @@ sub format
 
     # Add the commas (or whatever is in thousands_sep). If thousands_sep is the empty 
     # string, do nothing.
-    if( $thousands_sep )
+    if( $thousands_sep && $grouping > 0 )
     {
         # Add leading 0's so length($integer) is divisible by 3
-        $integer = '0' x ( 3 - ( CORE::length( $integer ) % 3 ) ) . $integer;
+        $integer = '0' x ( $grouping - ( CORE::length( $integer ) % $grouping ) ) . $integer;
 
         # Split $integer into groups of 3 characters and insert commas
-        $integer = CORE::join( $thousands_sep, CORE::grep{ $_ ne '' } CORE::split( /(...)/, $integer ) );
+        # $integer = CORE::join( $thousands_sep, CORE::grep{ $_ ne '' } CORE::split( /(...)/, $integer ) );
+        $integer = CORE::join( $thousands_sep, CORE::grep{ $_ ne '' } CORE::split( /(.{$grouping})/, $integer ) );
+        # Taken from perllocale:
+        # Grouping goes from right to left (low to high digits).
+        # 1 while $integer =~ s/(\d)(\d{$grouping}($|$thousands_sep))/$1$thousands_sep$2/;
 
         # Strip off leading zeroes and optional thousands separator
         $integer =~ s/^0+(?:\Q$thousands_sep\E)?//;
@@ -919,7 +983,7 @@ sub format_bytes
 
     # Taken from Number::Format. Credit to William R. Ward
     # Set default for precision.  Test using defined because it may be 0.
-    $opts->{precision} //= $self->precision // 2;
+    $opts->{precision} //= $self->precision->scalar // 2;
     $opts->{mode} ||= 'traditional';
     my( $ksuff, $msuff, $gsuff );
     if( $opts->{mode} =~ /^iec(60027)?$/i )
@@ -1012,46 +1076,22 @@ sub format_money
 {
     my $self = shift( @_ );
     my( $precision, $curr_symbol ) = @_;
-    $precision = $self->precision if( !defined( $precision ) || !CORE::length( "$precision" ) || $precision !~ /^\d+$/ );
-    $curr_symbol = $self->currency if( !defined( $curr_symbol ) || !CORE::length( "$curr_symbol" ) );
+    $precision = $self->precision->scalar if( !defined( $precision ) || !CORE::length( "$precision" ) || $precision !~ /^\d+$/ );
+    $curr_symbol = $self->currency->scalar if( !defined( $curr_symbol ) || !CORE::length( "$curr_symbol" ) );
     # no overloading;
     my $number = $self->{_number};
     # See comment in format() method
     return( $number ) if( !defined( $number ) );
-#     my $fmt = $self->_get_formatter;
-#     try
-#     {
-#         # Even though the Number::Format instantiated is set with a currency symbol, 
-#         # Number::Format will not respect it, and revert to USD if nothing was provided as argument
-#         # This highlights that Number::Format is designed to be used more for exporting function rather than object methods
-#         # $self->message( 3, "Passing Number = '$num', precision = '$precision', currency symbol = '$currency_symbol'." );
-#         my $res = $fmt->format_price( "$num", "$precision", "$currency_symbol" );
-#         return if( !defined( $res ) );
-#         require Module::Generic::Scalar;
-#         return( Module::Generic::Scalar->new( $res ) );
-#     }
-#     catch( $e )
-#     {
-#         return( $self->error( "Error formatting number \"$num\": $e" ) );
-#     }
-    # Determine what the monetary symbol should be
-#     $curr_symbol = $self->{int_curr_symbol}
-#         if (!defined($curr_symbol) || lc($curr_symbol) eq "int_curr_symbol");
-#     $curr_symbol = $self->{currency_symbol}
-#         if (!defined($curr_symbol) || lc($curr_symbol) eq "currency_symbol");
-#     $curr_symbol = "" unless defined($curr_symbol);
-
-    # Determine which value to use for frac digits
-#     my $frac_digits = ( $curr_symbol eq $self->{int_curr_symbol} ?
-#                        $self->{int_frac_digits} : $self->{frac_digits});
 
     # Taken from Number::Format. Credit to William R. Ward
-    my $frac_digits = $self->precision;
+    my $frac_digits = $self->precision->scalar;
 
     # Determine precision for decimal portion
-    $precision = $frac_digits          unless( defined( $precision ) );
-    # $precision = $self->decimal_digits unless( defined( $precision ) ); # fallback
-    $precision = 2                     unless( defined( $precision ) ); # default
+    $precision = $frac_digits unless( defined( $precision ) );
+    # fallback
+    # $precision = $self->decimal_digits unless( defined( $precision ) );
+    # default
+    $precision = 2 unless( defined( $precision ) );
 
     # Determine sign and absolute value
     my $sign = $number <=> 0;
@@ -1064,8 +1104,10 @@ sub format_money
     return( $self->pass_error ) if( !defined( $number ) );
 
     # Now we make sure the decimal part has enough zeroes
-    my $decimal_point = $self->decimal;
-    my( $integer, $decimal ) = CORE::split( /\Q$decimal_point\E/, $number, 2 );
+    my $decimal_point = $self->decimal->scalar;
+    my( $integer, $decimal ) = CORE::split( /\Q$decimal_point\E/, "$number", 2 );
+    $decimal //= '';
+    # $decimal = '0' x $precision if( !$decimal && $precision );
     $decimal = '0' x $precision unless( $decimal );
     $decimal .= '0' x ( $precision - CORE::length( $decimal ) );
 
@@ -1182,7 +1224,7 @@ sub format_negative
     # my $number  = $self->{_number};
     # See comment in format() method
     # return( $number ) if( !defined( $number ) );
-    my $format = shift( @_ ) // $self->neg_format;
+    my $format = shift( @_ ) // $self->neg_format->scalar;
     my $new = $self->format || return( $self->pass_error );
     $number = "$new";
     if( CORE::index( $format, 'x' ) == -1 )
@@ -1210,28 +1252,17 @@ sub format_picture
     my $number  = $self->{_number};
     # See comment in format() method
     return( $num ) if( !defined( $number ) );
-#     my $fmt = $self->_get_formatter;
-#     try
-#     {
-#         my $res = $fmt->format_picture( "$num", @_ );
-#         return if( !defined( $res ) );
-#         require Module::Generic::Scalar;
-#         return( Module::Generic::Scalar->new( $res ) );
-#     }
-#     catch( $e )
-#     {
-#         return( $self->error( "Error formatting number \"$num\": $e" ) );
-#     }
 
     # Taken from Number::Format. Credit to William R. Ward
     $picture //= $opts->{picture};
     return( $self->error( "No picture was provided to format number." ) ) if( !CORE::defined( $picture ) || !CORE::length( "$picture" ) );
     
     # Handle negative numbers
-    my( $neg_prefix ) = $self->neg_format =~ /^([^x]+)/;
+    my $neg_format = $self->neg_format->scalar;
+    my( $neg_prefix ) = $neg_format =~ /^([^x]+)/;
     my( $pic_prefix ) = $picture =~ /^([^\#]+)/;
-    my $neg_pic = $self->neg_format;
-    ( my $pos_pic = $self->neg_format ) =~ s/[^x\s]/ /g;
+    my $neg_pic = $neg_format;
+    ( my $pos_pic = $neg_format ) =~ s/[^x\s]/ /g;
     ( my $pos_prefix = $neg_prefix ) =~ s/[^x\s]/ /g;
     $neg_pic =~ s/x/$picture/;
     $pos_pic =~ s/x/$picture/;
@@ -1241,7 +1272,7 @@ sub format_picture
     my $sign_prefix = $sign < 0 ? $neg_prefix : $pos_prefix;
     
     # Split up the picture and return error if there is more than one $decimal_point
-    my $decimal_point = $self->decimal;
+    my $decimal_point = $self->decimal->scalar;
     my( $pic_int, $pic_dec, @cruft ) = CORE::split( /\Q$decimal_point\E/, $picture );
     $pic_int = '' unless( defined( $pic_int ) );
     $pic_dec = '' unless( defined( $pic_dec ) );
@@ -1306,11 +1337,12 @@ sub format_picture
     # For each character in the integer part of the picture (moving right
     # to left this time), replace '#' signs with digits from the number,
     # or spaces if we've run out of numbers.
+    my $thousand = $self->thousand->scalar;
     while( $char = CORE::pop( @pic_int ) )
     {
         $char = CORE::pop( @num_int ) if( $char eq '#' );
         if( !defined( $char ) ||
-            $char eq $self->thousands && 
+            $char eq $thousand && 
             $#num_int < 0 )
         {
             $char = ' ';
@@ -1581,7 +1613,7 @@ sub unformat
     }
 
     # Regular expression for detecting decimal point
-    my $decimal_point = $self->decimal;
+    my $decimal_point = $self->decimal->scalar;
     my $pt = qr/\Q$decimal_point\E/;
 
     # Detect if it ends with one of the kilo / mega / giga suffixes.
@@ -1597,7 +1629,7 @@ sub unformat
 
     # It's negative if the first non-digit character is a -
     my $sign = $formatted =~ /^\D*-/ ? -1 : 1;
-    my $neg_format = $self->neg_format;
+    my $neg_format = $self->neg_format->scalar;
     my( $before_re, $after_re ) = CORE::split( /x/, $neg_format, 2 );
     $sign = -1 if( $formatted =~ /\Q$before_re\E(.+)\Q$after_re\E/ );
 
@@ -1627,7 +1659,7 @@ sub unformat
 sub _format_negative
 {
     my( $self, $number, $format ) = @_;
-    $format //= $self->neg_format;
+    $format //= $self->neg_format->scalar;
     if( CORE::index( $format, 'x' ) == -1 )
     {
         return( $self->error( "Letter x must be present in picture in format_negative()" ) );

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Action::Primitive;
-$ExtUtils::Builder::Action::Primitive::VERSION = '0.005';
+$ExtUtils::Builder::Action::Primitive::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -26,7 +26,7 @@ ExtUtils::Builder::Action::Primitive - A base role for primitive action classes
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 

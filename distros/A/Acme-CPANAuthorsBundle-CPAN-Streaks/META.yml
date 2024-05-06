@@ -19,61 +19,61 @@ name: Acme-CPANAuthorsBundle-CPAN-Streaks
 provides:
   Acme::CPANAuthors::CPAN::Streaks::DailyDistributions::AllTime:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/DailyDistributions/AllTime.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthors::CPAN::Streaks::DailyDistributions::Current:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/DailyDistributions/Current.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthors::CPAN::Streaks::DailyNewDistributions::AllTime:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/DailyNewDistributions/AllTime.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthors::CPAN::Streaks::DailyNewDistributions::Current:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/DailyNewDistributions/Current.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthors::CPAN::Streaks::DailyReleases::AllTime:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/DailyReleases/AllTime.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthors::CPAN::Streaks::DailyReleases::Current:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/DailyReleases/Current.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthors::CPAN::Streaks::MonthlyDistributions::AllTime:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/MonthlyDistributions/AllTime.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthors::CPAN::Streaks::MonthlyDistributions::Current:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/MonthlyDistributions/Current.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::AllTime:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/MonthlyNewDistributions/AllTime.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::Current:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/MonthlyNewDistributions/Current.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthors::CPAN::Streaks::MonthlyReleases::AllTime:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/MonthlyReleases/AllTime.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthors::CPAN::Streaks::MonthlyReleases::Current:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/MonthlyReleases/Current.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions::AllTime:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/WeeklyDistributions/AllTime.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions::Current:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/WeeklyDistributions/Current.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthors::CPAN::Streaks::WeeklyNewDistributions::AllTime:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/WeeklyNewDistributions/AllTime.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthors::CPAN::Streaks::WeeklyNewDistributions::Current:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/WeeklyNewDistributions/Current.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthors::CPAN::Streaks::WeeklyReleases::AllTime:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/WeeklyReleases/AllTime.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthors::CPAN::Streaks::WeeklyReleases::Current:
     file: lib/Acme/CPANAuthors/CPAN/Streaks/WeeklyReleases/Current.pm
-    version: '20240412.0'
+    version: '20240506.0'
   Acme::CPANAuthorsBundle::CPAN::Streaks:
     file: lib/Acme/CPANAuthorsBundle/CPAN/Streaks.pm
-    version: '20240412.0'
+    version: '20240506.0'
 requires:
   Acme::CPANAuthors::Register: '0'
   strict: '0'
@@ -82,7 +82,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANAuthorsBundle-CPAN-Streaks
   homepage: https://metacpan.org/release/Acme-CPANAuthorsBundle-CPAN-Streaks
   repository: git://github.com/perlancar/perl-Acme-CPANAuthorsBundle-CPAN-Streaks.git
-version: '20240412.0'
+version: '20240506.0'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

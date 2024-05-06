@@ -19,13 +19,13 @@ getopts('d', \my %opts);
 
 sub compress ($fh, $out_fh) {
     while (read($fh, (my $chunk), CHUNK_SIZE)) {
-        lzw_compress($chunk, $out_fh);
+        print $out_fh lzw_compress($chunk);
     }
 }
 
 sub decompress ($fh, $out_fh) {
     while (!eof($fh)) {
-        lzw_decompress($fh, $out_fh);
+        print $out_fh lzw_decompress($fh);
     }
 }
 

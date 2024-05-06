@@ -1,5 +1,15 @@
 Changes in Parse::DNS::Zone
 
+0.70 2024-05-05
+- Bump minium Perl version to 5.14, as we use the /r regexp flag.
+- Fix crash bug for get_rdata, when asking about non existing
+  names/rdata in list context
+- Improvements to test suite
+- Add support for TTL values with time-unit suffixes as
+  supported by Bind9, nsd et al (supported added by Alexander
+  Hartmaier)
+- Convert README to markdown.
+
 0.60 2016-11-11
 - Handle backslash escaped comment characters. Patch by Daniel
   Donckers

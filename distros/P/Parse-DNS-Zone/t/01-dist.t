@@ -8,7 +8,6 @@ BEGIN {
 	} else {
 		Test::Distribution->import(
 			only => [qw(
-				description
 				prereq
 				pod
 				podcover

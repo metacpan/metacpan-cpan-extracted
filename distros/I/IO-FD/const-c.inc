@@ -33,7 +33,7 @@ constant (pTHX_ const char *name, STRLEN len) {
      Regenerate these constant functions by feeding this entire source file to
      perl -x
 
-#!/Users/drclaw/perl5/perlbrew/perls/perl-5.36.0/bin/perl -w
+#!/Users/drclaw/perl5/perlbrew/perls/perl-5.36.3/bin/perl -w
 use ExtUtils::Constant qw (constant_types C_constant XS_constant);
 
 my $types = {map {($_, 1)} qw()};

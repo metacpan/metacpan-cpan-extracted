@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Profile::Perl;
-$ExtUtils::Builder::Profile::Perl::VERSION = '0.002';
+$ExtUtils::Builder::Profile::Perl::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -28,6 +28,8 @@ sub process_compiler {
 
 my $rpath_regex = qr/ ( (?<! \w ) (?: -Wl,-R | -Wl,-rpath | -R\ ? ) \S+ ) /x;
 
+my %needs_relinking = map { $_ => 1 } qw/MSWin32 cygwin aix VMS/;
+
 sub process_linker {
 	my ($class, $linker, $opts) = @_;
 	my $config = delete $opts->{config};
@@ -39,13 +41,14 @@ sub process_linker {
 			return ($from, $to, %opts);
 		});
 	}
-	if ($linker->type eq 'executable' or $linker->type eq 'shared-library') {
-		if (_get_var($config, $opts, 'osname') eq 'MSWin32') {
-			$linker->add_argument(_get_var($config, $opts, 'libperl'));
+	my $os = _get_var($config, $opts, 'osname');
+	if ($linker->type eq 'executable' or $linker->type eq 'shared-library' or ($linker->type eq 'loadable-object' and $needs_relinking{$os})) {
+		if ($os eq 'MSWin32') {
+			$linker->add_argument(value => _split_var($config, $opts, 'libperl'));
 		}
 		else {
 			my ($libperl, $libext, $so) = map { _get_var($config, $opts, $_) } qw/libperl lib_ext so/;
-			my ($lib) = $libperl =~ / \A (?:lib)? ( perl \w* ) (?: \. $so | $libext) \b /msx;
+			my ($lib) = $libperl =~ / \A (?:lib)? ( \w* perl \w* ) (?: \. $so | $libext) \b /msx;
 			$linker->add_libraries([$lib]);
 		}
 
@@ -62,6 +65,8 @@ sub process_linker {
 
 1;
 
+# ABSTRACT: A profile for compiling and linking against perl
+
 __END__
 
 =pod
@@ -70,11 +75,21 @@ __END__
 
 =head1 NAME
 
-ExtUtils::Builder::Profile::Perl
+ExtUtils::Builder::Profile::Perl - A profile for compiling and linking against perl
 
 =head1 VERSION
 
-version 0.002
+version 0.003
+
+=head1 SYNOPSIS
+
+ $planner->load_module('ExtUtils::Builder::AutoDetect::C',
+    profile => '@Perl',
+ );
+
+=head1 DESCRIPTION
+
+This is a profile for compiling against perl, whether you're compiling an XS extension or embedding it into your application.
 
 =head1 AUTHOR
 

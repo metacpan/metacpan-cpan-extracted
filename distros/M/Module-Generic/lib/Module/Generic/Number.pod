@@ -6,7 +6,7 @@ Module::Generic::Number - Number Manipulation Object Class
 
 =head1 SYNOPSIS
 
-    my $n = Module::Generic::Number->new( 10 );
+    my $n = Module::Generic::Number->new(10);
     # or
     my $n = Module::Generic::Number->new( 10, 
     {
@@ -25,6 +25,8 @@ Module::Generic::Number - Number Manipulation Object Class
     my $n = Module::Generic::Number->new( 10, 
     {
         lang => 'fr_FR',
+        # or
+        # locale => 'fr_FR',
     });
     # this would set the decimal separator to ',', the thousand separator to ' ', and precede to 0 (false).
     print( "Number is: $n\n" );
@@ -33,7 +35,7 @@ Module::Generic::Number - Number Manipulation Object Class
     $n ** 2 # 100
     # and all other operators work
 
-    my $n_neg = Module::Generic::Number->new( -10 );
+    my $n_neg = Module::Generic::Number->new(-10);
     $n_neg->abs # 10
     $n->atan # 1.47112767430373
     $n->atan2(2) # 1.37340076694502
@@ -100,7 +102,7 @@ Module::Generic::Number - Number Manipulation Object Class
 
 =head1 VERSION
 
-    v2.1.0
+    v2.1.1
 
 =head1 DESCRIPTION
 
@@ -140,7 +142,7 @@ Would yield C<10> as a L<Module::Generic::Number> object, so the results possibl
 
 Operators also works on the infinity object:
 
-    my $inf = Module::Generic::Infinity->ne( -Inf );
+    my $inf = Module::Generic::Infinity->ne(-Inf);
     $inf *= -1 # Yields a new infinity object with value Inf
 
 Those are just basic arithmetics wrapped in object to enable object oriented interface and chaining. It does not do anything special and rely on perl and L<POSIX> for computation, depending on the function.
@@ -183,7 +185,7 @@ Uses the standard default format properties, except for precede which we set to 
 
     $n->format # € 1.000,00
 
-When no I<lang> is provided, it uses the default language set in the system to retrieve the number formatting properties.
+When no C<lang> is provided, it uses the default language set in the system to retrieve the number formatting properties.
 
 Any of those properties can be overriden by specifying its value when creating an object.
 
@@ -304,7 +306,7 @@ Returns a clone of the current object, keeping its original formatting propertie
 
 It can take an optional number that will be used
 
-    my $n = Moduke::Generic::Number->new( 1000 );
+    my $n = Moduke::Generic::Number->new(1000);
     # $n is no 1000 with thousand separator set to "","", etc
     my $n2 = $n->clone( 2020 );
     # Same properties as $n, but now the number is 2020 instead of 1000 and this is a new object
@@ -327,9 +329,23 @@ Sets or gets the decimal separator to be used for formatting the number object
 
 Boolean. Sets or gets whether to pad the decimal with zeroes. This is used in conjonction with L</precision>
 
+=head2 decode_lconv
+
+Provided with an hash reference that came from L<POSIX::localeconv|POSIX/localeconv>, and this will ensure all its non-utf8 values set are properly decoded.
+
+This is especially true for the property C<currency_symbol>
+
+It returns the hash reference upon success, and upon error, it sets an L<error object|Module::Generic::Exception> and return C<undef> in scalar context, or an empty list in list context.
+
 =head2 default
 
 Sets the dictionary (hash reference) of property-value pairs used for the number object formatting.
+
+=head2 encoding
+
+Sets or gets the encoding of the data provided by L<localeconv|POSIX/localeconv>
+
+There is no reason for you to set or change this value. It is rather meant to be retrieved and is set automatically once the language has been set for this object.
 
 =head2 exp
 
@@ -765,13 +781,15 @@ L<Module::Generic::Scalar>, L<Module::Generic::Array>, L<Module::Generic::Boolea
 
 L<Math::BigInt>
 
+L<POSIX/localeconv>, L<perllocale/"The localeconv function">
+
 =head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2000-2020 DEGUEST Pte. Ltd.
+Copyright (c) 2000-2024 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

@@ -19,13 +19,13 @@ getopts('d', \my %opts);
 
 sub compress ($fh, $out_fh) {
     while (read($fh, (my $chunk), CHUNK_SIZE)) {
-        print $out_fh mrl_compress([unpack('C*', $chunk)]);
+        print $out_fh mrl_compress_symbolic(string2symbols($chunk));
     }
 }
 
 sub decompress ($fh, $out_fh) {
     while (!eof($fh)) {
-        print $out_fh pack('C*', @{mrl_decompress($fh)});
+        print $out_fh symbols2string(mrl_decompress_symbolic($fh));
     }
 }
 

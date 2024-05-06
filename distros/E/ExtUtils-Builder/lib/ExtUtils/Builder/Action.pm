@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Action;
-$ExtUtils::Builder::Action::VERSION = '0.005';
+$ExtUtils::Builder::Action::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ ExtUtils::Builder::Action - The ExtUtils::Builder Action role
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

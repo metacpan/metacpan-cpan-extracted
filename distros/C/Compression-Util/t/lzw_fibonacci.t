@@ -4,7 +4,7 @@ use 5.036;
 use Test::More;
 use Compression::Util qw(:all);
 
-plan tests => 1;
+plan tests => 2;
 
 foreach my $file (__FILE__) {
 
@@ -14,8 +14,9 @@ foreach my $file (__FILE__) {
         <$fh>;
     };
 
-    my $enc = lzw_compress($str, undef, \&fibonacci_encode);
-    my $dec = lzw_decompress($enc, undef, \&fibonacci_decode);
+    my $enc = lzw_compress($str, \&fibonacci_encode);
+    my $dec = lzw_decompress($enc, \&fibonacci_decode);
 
+    ok(length($enc) < length($str));
     is($str, $dec);
 }

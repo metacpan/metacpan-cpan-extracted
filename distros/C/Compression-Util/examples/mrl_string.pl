@@ -18,8 +18,8 @@ foreach my $file (__FILE__, $^X) {
         <$fh>;
     };
 
-    my $enc = mrl_compress($str);
-    my $dec = pack('C*', @{mrl_decompress($enc)});
+    my $enc = mrl_compress_symbolic($str);
+    my $dec = symbols2string(mrl_decompress_symbolic($enc));
 
     say "Original size  : ", length($str);
     say "Compressed size: ", length($enc);

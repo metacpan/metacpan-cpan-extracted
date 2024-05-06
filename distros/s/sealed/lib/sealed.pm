@@ -20,7 +20,7 @@ our $VERSION;
 our $DEBUG;
 
 BEGIN {
-  our $VERSION = qv(7.0.1);
+  our $VERSION = qv(7.0.2);
   XSLoader::load("sealed", $VERSION);
 }
 
@@ -87,7 +87,6 @@ sub tweak ($\@\@\@$$\%) {
           # so we answer the prayer by resetting $$pads[--$idx][$gv->padix], which
           # has the correct semantics (for $method) under assignment.
           my $padix = $gv->padix;
-          #_padname_add($cv_obj->PADLIST, $padix);
           my (undef, @p)         = $cv_obj->PADLIST->ARRAY;
           $pads = [ map defined ? $_->object_2svref : $_, @p ];
           $$pads[--$idx][$padix] = $method;

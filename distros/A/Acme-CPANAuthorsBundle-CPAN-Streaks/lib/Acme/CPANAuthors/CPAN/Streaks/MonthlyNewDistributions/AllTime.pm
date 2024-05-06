@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-04-12'; # DATE
+our $DATE = '2024-05-06'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240412.0'; # VERSION
+our $VERSION = '20240506.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
@@ -26,9 +26,9 @@ use Acme::CPANAuthors::Register (
     'FAYLAND' => '',
     'PLICEASE' => '',
     'NUFFIN' => '',
+    'SKIM' => '',
     'MSCHWERN' => '',
     'MIYAGAWA' => '',
-    'SKIM' => '',
     'SIMON' => '',
     'KAZEBURO' => '',
     'JHTHORSEN' => '',
@@ -138,6 +138,7 @@ use Acme::CPANAuthors::Register (
     'UTASHIRO' => '',
     'BRTASTIC' => '',
     'TIMLEGGE' => '',
+    'DJERIUS' => '',
 );
 
 
@@ -156,18 +157,18 @@ Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::AllTime - Authors wit
 
 =head1 VERSION
 
-This document describes version 20240412.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-04-12.
+This document describes version 20240506.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-05-06.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-04-12, produced by L<cpan-streaks>, only streaks with length of at least 6 are included):
+Current standings (as of 2024-05-06, produced by L<cpan-streaks>, only streaks with length of at least 6 are included):
 
   +-----------+-----+------------+----------+---------+
   | author    | len | start_date | end_date | status  |
   +-----------+-----+------------+----------+---------+
-  | PERLANCAR | 117 | 2014-08    |          | ongoing |
+  | PERLANCAR | 118 | 2014-08    |          | ongoing |
   | MGV       |  53 | 2014-01    | 2018-05  | broken  |
   | KENTNL    |  46 | 2013-01    | 2016-10  | broken  |
   | ETHER     |  36 | 2013-01    | 2015-12  | broken  |
@@ -187,10 +188,10 @@ Current standings (as of 2024-04-12, produced by L<cpan-streaks>, only streaks w
   | PLICEASE  |  16 | 2015-01    | 2016-04  | broken  |
   | NUFFIN    |  15 | 2007-12    | 2009-02  | broken  |
   | SHARYANTO |  15 | 2013-07    | 2014-09  | broken  |
+  | SKIM      |  15 | 2023-03    |          | ongoing |
   | MSCHWERN  |  14 | 2000-11    | 2001-12  | broken  |
   | ADAMK     |  14 | 2008-12    | 2010-01  | broken  |
   | MIYAGAWA  |  14 | 2009-02    | 2010-03  | broken  |
-  | SKIM      |  14 | 2023-03    |          | ongoing |
   | SIMON     |  13 | 2003-08    | 2004-08  | broken  |
   | KAZEBURO  |  13 | 2012-04    | 2013-04  | broken  |
   | PLICEASE  |  13 | 2012-12    | 2013-12  | broken  |
@@ -376,6 +377,7 @@ Current standings (as of 2024-04-12, produced by L<cpan-streaks>, only streaks w
   | UTASHIRO  |   6 | 2022-04    | 2022-09  | broken  |
   | BRTASTIC  |   6 | 2022-08    | 2023-01  | broken  |
   | TIMLEGGE  |   6 | 2023-06    | 2023-11  | broken  |
+  | DJERIUS   |   6 | 2023-12    |          | ongoing |
   +-----------+-----+------------+----------+---------+
 
 =head1 HOMEPAGE

@@ -133,7 +133,7 @@ pack_kevent(ident,filter,flags,fflags,data,udata, ...)
 		e->flags=flags;
 		e->fflags=fflags;
 		e->data=data;
-		e->udata=SvRV(udata);
+		e->udata=(uint64_t)SvRV(udata);
 		SvCUR_set(RETVAL,sizeof(KEVENT_S));
 		SvPOK_on(RETVAL);
 		//Pack
