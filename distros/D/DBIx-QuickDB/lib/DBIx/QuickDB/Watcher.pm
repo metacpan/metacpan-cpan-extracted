@@ -2,10 +2,10 @@ package DBIx::QuickDB::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.000029';
+our $VERSION = '0.000031';
 
-use POSIX();
 use Carp qw/croak/;
+use POSIX qw/:sys_wait_h/;
 use Time::HiRes qw/sleep time/;
 use Scalar::Util qw/weaken/;
 
@@ -15,10 +15,12 @@ use DBIx::QuickDB::Util::HashBase qw{
     <watcher_pid
     <master_pid
     <log_file
-    <detached
 
     <stopped
     <eliminated
+    <detached
+
+    <delete_data
 };
 
 sub init {
@@ -26,11 +28,11 @@ sub init {
 
     $self->{+MASTER_PID} ||= $$;
 
-    weaken($self->{+DB});
-
     $self->{+LOG_FILE} = $self->{+DB}->gen_log;
 
     $self->start();
+
+    weaken($self->{+DB}) if $self->{+MASTER_PID} == $$;
 }
 
 sub start {
@@ -65,7 +67,115 @@ sub start {
     print $wh "$$\n";
 
     # In watcher now
-    $self->watch($wh);
+    eval { $self->watch($wh); 1 } or POSIX::_exit(1);
+    POSIX::_exit(0);
+}
+
+sub watch {
+    my $self = shift;
+    my ($wh) = @_;
+
+    $0 = 'db-quick-watcher';
+
+    my $blah;
+    close(STDIN);
+    open(STDIN, '<', \$blah) or warn "$!";
+
+    my $kill = 0;
+    local $SIG{TERM} = sub { $kill = 'TERM' };
+    local $SIG{INT}  = sub { $kill = 'INT' };
+
+    local $SIG{HUP} = sub {
+        close(STDOUT);
+        open(STDOUT, '>', \$blah) or warn "$!";
+        close(STDERR);
+        open(STDERR, '>', \$blah) or warn "$!";
+    };
+
+    my $start_pid = $$;
+    my $pid = $self->spawn();
+    print $wh "$pid\n";
+    close($wh);
+
+    while (!$kill) {
+        sleep 0.1;
+
+        next if kill(0, $self->{+MASTER_PID});
+        $kill = 'TERM';
+    }
+
+    unless (eval { $self->_watcher_terminate($kill); 1 }) {
+        my $err = $@;
+        eval { warn $@ };
+        POSIX::_exit(1);
+    }
+
+    POSIX::_exit(0);
+}
+
+sub spawn {
+    my $self = shift;
+
+    croak "Extra spawn" if $self->{+SERVER_PID};
+
+    my $db   = $self->{+DB};
+    my $args = $self->{+ARGS} || [];
+
+    my $init_pid = $$;
+    my ($pid, $log_file) = $db->run_command([$db->start_command, @$args], {no_wait => 1, log_file => $self->{+LOG_FILE}});
+    $self->{+SERVER_PID} = $pid;
+    $self->{+LOG_FILE}   = $log_file;
+
+    return $pid;
+}
+
+sub _watcher_terminate {
+    my $self = shift;
+    my ($sig) = @_;
+
+    $self->_watcher_kill();
+
+    $self->{+DB}->cleanup() if $sig && $sig eq 'TERM';
+}
+
+sub _watcher_kill {
+    my $self = shift;
+
+    my $db = $self->{+DB};
+
+    my $pid = $self->{+SERVER_PID} or die "No server pid";
+    kill($db->stop_sig, $pid) or die "Could not send kill signal";
+
+    my ($check, $exit, $killed);
+    my $start = time;
+    until ($check) {
+        local $?;
+        my $delta = time - $start;
+
+        if ($delta >= 4) {
+            if ($killed) {
+                my $delta2 = time - $killed;
+                next unless $delta2 >= 1;
+            }
+
+            warn "Server taking too long to shut down, sending SIGKILL";
+            $killed = time;
+            kill('KILL', $pid);
+
+            last if $delta > 8;
+        }
+
+        $check = waitpid($pid, WNOHANG);
+        $exit = $?;
+
+        sleep 0.1;
+    }
+
+    die "PID refused to exit" unless $check;
+    die "Something else reaped our process" if $check < 0;
+    die "Reaped the wrong process '$check' instead of '$pid'" if $pid != $check;
+
+    return;
 }
 
 sub stop {
@@ -104,90 +214,12 @@ sub wait {
     }
 }
 
-sub watch {
-    my $self = shift;
-    my ($wh) = @_;
-
-    $0 = 'db-quick-watcher';
-
-    local $SIG{TERM} = sub { $self->_do_eliminate(); POSIX::_exit(0) };
-    local $SIG{INT}  = sub { $self->_do_stop();      POSIX::_exit(0) };
-    local $SIG{HUP}  = sub { $self->{+DETACHED} = 1 };
-
-    my $pid = $self->spawn();
-    print $wh "$pid\n";
-    close($wh);
-
-    while (1) {
-        sleep 1;
-        next if kill(0, $self->{+MASTER_PID});
-
-        $self->_do_eliminate();
-        POSIX::_exit(0);
-    }
-
-    POSIX::_exit(0) if $self->{+DETACHED};
-    die "Scope Leak";
-}
-
-sub _do_stop {
-    my $self = shift;
-
-    my $db = $self->{+DB};
-    my $pid = $self->{+SERVER_PID} or return;
-
-    if (kill($db->stop_sig, $pid)) {
-        my $check = waitpid($pid, 0);
-        my $exit = $?;
-        return if $self->{+DETACHED};
-        if ($exit || $check ne $pid) {
-            my $sig = $exit & 127;
-            $exit = ($exit >> 8);
-            warn "Server had bad exit: Pid: $pid, Check: $check, Exit: $exit, Sig: $sig";
-            if (my $log_file = $self->{+LOG_FILE}) {
-                if(open(my $fh, '<', $log_file)) {
-                    print STDERR <$fh>;
-                }
-                else {
-                    warn "Could not open log file: $!";
-                }
-            }
-        }
-    }
-    else {
-        return if $self->{+DETACHED};
-        warn "Could not signal server to exit";
-    }
-}
-
-sub _do_eliminate {
-    my $self = shift;
-    my $db = $self->{+DB};
-    $self->_do_stop;
-    $db->cleanup if $db->should_cleanup;
-}
-
-sub spawn {
-    my $self = shift;
-
-    croak "Extra spawn" if $self->{+SERVER_PID};
-
-    my $db   = $self->{+DB};
-    my $args = $self->{+ARGS} || [];
-
-    my ($pid, $log_file) = $db->run_command([$db->start_command, @$args], {no_wait => 1, log_file => $self->{+LOG_FILE}});
-    $self->{+SERVER_PID} = $pid;
-    $self->{+LOG_FILE}   = $log_file;
-
-    return $pid;
-}
-
 sub DESTROY {
     my $self = shift;
 
     if ($self->{+MASTER_PID} == $$) {
-        $self->detach();
-        $self->eliminate();
+        $self->eliminate;
+        $self->wait;
     }
     else {
         unlink($self->{+LOG_FILE}) if $self->{+LOG_FILE};
@@ -204,7 +236,7 @@ __END__
 
 =head1 NAME
 
-DBIx::QuickDB::Watcher - Daemon that sits between main process and mysqld
+DBIx::QuickDB::Watcher - Daemon that sits between main process and the server.
 
 =head1 DESCRIPTION
 
@@ -227,7 +259,7 @@ etc.
 
 This will stop the server, but keep the data dir intact.
 
-=item SIGTERM - Stop the server, delete the data (if requested)
+=item SIGTERM - Stop the server, delete the data
 
 This will stop the server, and if the instance is supposed to be cleaned up
 then the data dir will be deleted.

@@ -1,6 +1,6 @@
-use Test2::V0 -target => DBIx::QuickDB::Driver::MySQL;
-use Test2::Require::Module 'DBD::MariaDB';
+use Test2::V0 -target => DBIx::QuickDB::Driver::MariaDB;
 use Test2::Tools::QuickDB;
+use Carp::Always;
 
 my @ENV_VARS;
 
@@ -21,17 +21,10 @@ BEGIN {
     $ENV{$_} = 'fake' for @ENV_VARS;
 }
 
-skipall_unless_can_db('MySQL');
-
-{
-    local $@;
-    eval { require DBD::mysql };
-    no warnings qw/redefine once/;
-    *DBD::mysql::dr::connect = sub { die "Should not be using me!" };
-}
+skipall_unless_can_db('MariaDB');
 
 subtest use_it => sub {
-    my $db = get_db db => {driver => 'MySQL', dbd_driver => 'DBD::MariaDB', load_sql => [quickdb => 't/schema/mysql.sql']};
+    my $db = get_db db => {driver => 'MariaDB', load_sql => [quickdb => 't/schema/mariadb.sql']};
     isa_ok($db, [$CLASS], "Got a database of the right type");
 
     is(get_db_or_skipall('db'), exact_ref($db), "Cached the instance by name");
@@ -79,7 +72,7 @@ subtest use_it => sub {
 };
 
 subtest cleanup => sub {
-    my $db = get_db {driver => 'MySQL', dbd_driver => 'DBD::MariaDB', load_sql => [quickdb => 't/schema/mysql.sql']};
+    my $db = get_db {driver => 'MariaDB', load_sql => [quickdb => 't/schema/mariadb.sql']};
     my $dir = $db->dir;
     my $pid = $db->watcher->server_pid;
 
@@ -104,14 +97,18 @@ subtest cleanup => sub {
 };
 
 subtest viable => sub {
-    my ($v, $why) = $CLASS->viable({mysqld => 'a fake path', bootstrap => 1});
-    ok(!$v, "Not viable without a valid mysqld");
+    no warnings 'redefine';
+    *DBIx::QuickDB::Driver::MariaDB::server_bin = sub() { undef };
+    *DBIx::QuickDB::Driver::MariaDB::client_bin = sub() { undef };
 
-    ($v, $why) = $CLASS->viable({mysqld => 'a fake path', autostart => 1});
-    ok(!$v, "Not viable without a valid mysqld");
+    my ($v, $why) = $CLASS->viable({bootstrap => 1});
+    ok(!$v, "Not viable without a valid mariadbd");
 
-    ($v, $why) = $CLASS->viable({mysql => 'a fake path', load_sql => 1});
-    ok(!$v, "Not viable without a valid mysql");
+    ($v, $why) = $CLASS->viable({autostart => 1});
+    ok(!$v, "Not viable without a valid mariadbd");
+
+    ($v, $why) = $CLASS->viable({load_sql => 1});
+    ok(!$v, "Not viable without a valid mariadb");
 };
 
 ok(!(grep { $ENV{$_} ne 'fake' } @ENV_VARS), "All DBI/driver specific env vars were restored");

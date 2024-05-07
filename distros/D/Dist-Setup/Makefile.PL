@@ -57,6 +57,11 @@ sub MY::postamble {
 
   # Solaris has a weird (?) make that does not support our `export` statements.
   push @postamble, <<"MAKE_FRAGMENT" unless $^O eq 'solaris';
+ALL_PM := \$(shell find lib -name "*.pm")
+ALL_EXE := script/perl_dist_setup
+
+.PHONY: distupload cover critic rawcritic tidy spelling alltest clean clean_coverdb pod2html exe
+
 distupload: distcheck disttest
 \t\$(MAKE) tardist
 \tcpan-upload --directory Dist-Setup \$(DISTVNAME).tar\$(SUFFIX)
@@ -72,7 +77,7 @@ rawcritic:
 \tperlcritic lib script
 
 tidy:
-\tperltidy -b -bext='/' \$(shell find lib -name "*.pm") script/perl_dist_setup
+\tperltidy -b -bext='/' \$(ALL_PM) \$(ALL_EXE)
 
 spelling: export EXTENDED_TESTING = 1
 spelling:
@@ -81,10 +86,40 @@ spelling:
 alltest: export EXTENDED_TESTING = 1
 alltest: test
 
-clean:: clean_coverdb
+clean:: clean_coverdb clean_build clean_pod2html
 
 clean_coverdb:
 \trm -fr cover_db
+
+clean_build:
+\trm -fr build
+
+clean_pod2html:
+\trm -fr pod2html
+
+PM_HTML := \$(patsubst %.pm, pod2html/%.html, \$(ALL_PM))
+EXE_HTML := \$(patsubst %, pod2html/%.html, \$(ALL_EXE))
+pod2html: \$(PM_HTML) \$(EXE_HTML)
+
+\$(PM_HTML): pod2html/%.html: %.pm
+\tmkdir -p \$(shell dirname \$@)
+\tpod2html --infile \$< --outfile \$@
+
+\$(EXE_HTML): pod2html/%.html: %
+\tmkdir -p \$(shell dirname \$@)
+\tpod2html --infile \$< --outfile \$@
+
+EXE_EXE := \$(patsubst %, build/%\$(EXE_EXT), \$(ALL_EXE))
+
+exe: export PAR_VERBATIM=1
+exe: build \$(EXE_EXE)
+
+build:
+\tmkdir -p build
+
+\$(EXE_EXE): build/%\$(EXE_EXT): %
+\tpp -o \$@ -cd build/pp.cache -I lib -F "PodStrip=.*\\bDist/Setup\\b(*COMMIT)(*FAIL)|.*" \$<
+
 MAKE_FRAGMENT
 
   push @postamble, File::ShareDir::Install::postamble($self);
@@ -99,6 +134,7 @@ MAKE_FRAGMENT
 
 sub postamble {
   return <<"MAKE_FRAGMENT";
+.PHONY: tidytest
 tidy: tidytest
 tidytest:
 \tperltidy -b -bext='/' \$(shell find data/t -name "*.t")

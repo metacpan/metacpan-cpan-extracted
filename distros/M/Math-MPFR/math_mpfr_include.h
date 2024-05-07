@@ -405,8 +405,9 @@ typedef _Decimal128 D128;
 #if NVSIZE == 8
 #define MATH_MPFR_MAX_DIG 17
 #define NVSIZE_BITS 53
-#define MATH_MPFR_NV_MAX 1.7976931348623157e+308
-#define MATH_MPFR_NORMAL_MIN 2.2250738585072014e-308
+#define MATH_MPFR_NV_MAX 0x1.fffffffffffffp+1023 /* 32-bit Windows perl-5.39.7 has a problem with *
+                                                  * evaluating the decimal form of this value.    */
+#define MATH_MPFR_NORMAL_MIN 0x1p-1022
 
 # if defined(MPFR_HAVE_BENDIAN)                /* big endian architecture - defined by Makefile.PL */
 

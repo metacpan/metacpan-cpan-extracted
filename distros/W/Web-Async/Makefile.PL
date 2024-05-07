@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "Ryu::Async" => 0,
     "Time::Moment" => 0,
     "URI" => 0,
+    "URI::ws" => 0,
     "Unicode::UTF8" => 0
   },
   "TEST_REQUIRES" => {
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::CheckDeps" => "0.010",
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,6 +55,7 @@ my %FallbackPrereqs = (
   "Test::More" => "0.94",
   "Time::Moment" => 0,
   "URI" => 0,
+  "URI::ws" => 0,
   "Unicode::UTF8" => 0
 );
 

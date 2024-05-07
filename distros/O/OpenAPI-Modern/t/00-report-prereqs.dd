@@ -67,15 +67,21 @@ do { my $x = {
                                       'utf8' => '0'
                                     },
                       'suggests' => {
+                                      'Catalyst::Request' => '0',
+                                      'Catalyst::Response' => '0',
                                       'Class::XSAccessor' => '0',
                                       'Cpanel::JSON::XS' => '0',
                                       'HTTP::Headers::Fast' => '0.21',
                                       'HTTP::Headers::Fast::XS' => '0',
                                       'HTTP::Message::PSGI' => '0',
+                                      'HTTP::Request' => '0',
+                                      'HTTP::Response' => '0',
+                                      'HTTP::Status' => '0',
                                       'Plack::Request' => '0',
                                       'Plack::Response' => '0',
                                       'Ref::Util::XS' => '0',
-                                      'Type::Tiny::XS' => '0'
+                                      'Type::Tiny::XS' => '0',
+                                      'URI' => '0'
                                     }
                     },
        'test' => {
@@ -84,9 +90,6 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'File::Spec' => '0',
-                                   'HTTP::Request' => '0',
-                                   'HTTP::Response' => '0',
-                                   'HTTP::Status' => '0',
                                    'JSON::Schema::Modern' => '0.578',
                                    'Module::Metadata' => '0',
                                    'Mojolicious' => '0',
@@ -100,7 +103,6 @@ do { my $x = {
                                    'Test::More' => '0.96',
                                    'Test::Needs' => '0',
                                    'Test::Warnings' => '0.033',
-                                   'URI' => '0',
                                    'YAML::PP' => '0.005',
                                    'lib' => '0',
                                    'open' => '0',

@@ -14,7 +14,7 @@ use File::Spec::Functions 'abs2rel', 'catfile';
 use Template;
 use Time::localtime;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 our %conf;  # to be shared with the Eval::Safe object.
 my $tt;
@@ -44,6 +44,7 @@ sub setup {
 
   $conf{auto}{date}{year} = localtime->year() + 1900;  ## no critic (ProhibitMagicNumbers)
   $conf{dist_name} //= $conf{name} =~ s/::/-/gr;
+  $conf{dist_package} //= $conf{name} =~ s/::/\//gr;  # Undocumented for now, used only by the `make exe` target
   $conf{base_package} //= 'lib/'.($conf{name} =~ s{::}{/}gr).'.pm';
   $conf{footer_marker} = $footer_marker;
   $conf{short_min_perl_version} =

@@ -23,8 +23,7 @@ BEGIN {
   # optional in the cpanfile and we skip the test if it’s not installed.
   eval 'use CPAN::Common::Index::Mux::Ordered';  ## no critic (ProhibitStringyEval, RequireCheckingReturnValueOfEval)
   if ($EVAL_ERROR) {
-    my $msg = 'CPAN::Common::Index::Mux::Ordered required to validate the CPAN file';
-    skip_all($msg);
+    skip_all('CPAN::Common::Index::Mux::Ordered required to validate the CPAN file');
   }
 }
 

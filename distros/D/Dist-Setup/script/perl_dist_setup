@@ -101,6 +101,22 @@ exists following the syntax documented in the
 L<cpan-upload|https://metacpan.org/dist/CPAN-Uploader/view/bin/cpan-upload>
 manual provides these values.
 
+=item - exe
+
+Converts each of the scripts specified by C<exe_files> in the F<dist_setup.conf>
+file into a self-extracting executable using C<pp> from L<PAR::Packer>. This is
+quite experimental and lack many configuration options that might be needed for
+advanced usages. In particular this will not work if the programs relies on a
+shared folder (as specified by the C<data_dir> option). The programs are written
+in the F<build> directory.
+
+=item - pod2html
+
+Converts the POD documentation embedded in all the F<.pm> files under F<lib/>
+as well as in all the scripts specified by C<exe_files> in the
+F<dist_setup.conf> file into HTML. The output files are written in the
+F<pod2html> directory in the project folder.
+
 =item - rawcritic
 
 Execute your code through C<perlcritic> directly, without the violation grouping

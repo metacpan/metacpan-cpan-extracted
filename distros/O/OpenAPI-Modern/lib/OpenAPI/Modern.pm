@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.062-7-g2d75f60
+package OpenAPI::Modern; # git description: v0.063-17-ga04e812
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.063';
+our $VERSION = '0.064';
 
 use 5.020;
 use utf8;
@@ -19,7 +19,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Carp 'croak';
 use Safe::Isa;
 use Ref::Util qw(is_plain_hashref is_plain_arrayref is_ref);
-use List::Util 'first';
+use List::Util qw(first pairs);
 use Scalar::Util 'looks_like_number';
 use Feature::Compat::Try;
 use Encode 2.89 ();
@@ -383,7 +383,10 @@ sub find_path ($self, $options, $state = {}) {
   }
 
   # path_template from request URI
-  if (not $path_template and $options->{request} and my $uri_path = $options->{request}->url->path) {
+  if (not $path_template and $options->{request}) {
+    my $uri_path = $options->{request}->url->path->to_string;
+    $uri_path = '/' if not length $uri_path;
+
     my $schema = $self->openapi_document->schema;
 
     # sorting (ascii-wise) gives us the desired results that concrete path components sort ahead of
@@ -598,7 +601,7 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
   return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1 }, $header_obj, \ $headers->header($header_name))
     if exists $header_obj->{content};
 
-  # RFC9112§5.1-3: "The field line value does not include that leading or trailing whitespace: OWS
+  # RFC9112 §5.1-3: "The field line value does not include that leading or trailing whitespace: OWS
   # occurring before the first non-whitespace octet of the field line value, or after the last
   # non-whitespace octet of the field line value, is excluded by parsers when extracting the field
   # line value from a field line."
@@ -606,7 +609,7 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
 
   my $types = $self->_type_in_schema($header_obj->{schema}, { %$state, schema_path => jsonp($state->{schema_path}, 'schema') });
 
-  # RFC9112§5.3-1: "A recipient MAY combine multiple field lines within a field section that have
+  # RFC9112 §5.3-1: "A recipient MAY combine multiple field lines within a field section that have
   # the same field name into one field line, without changing the semantics of the message, by
   # appending each subsequent field line value to the initial field line value in order, separated
   # by a comma (",") and optional whitespace (OWS, defined in Section 5.6.3). For consistency, use
@@ -811,52 +814,66 @@ sub _evaluate_subschema ($self, $dataref, $schema, $state) {
 # results may be unsatisfactory if not a valid HTTP request.
 sub _convert_request ($request) {
   return $request if $request->isa('Mojo::Message::Request');
+
+  my $req = Mojo::Message::Request->new;
+
   if ($request->isa('HTTP::Request')) {
-    my $req = Mojo::Message::Request->new;
-    # we could call $req->fix_headers here to add a missing Content-Length, but proper requests from
-    # the network should always have it set.
     $req->parse($request->as_string);
-    warn 'parse error when converting HTTP::Request' if not $req->is_finished;
-    return $req;
   }
-  elsif ($request->isa('Plack::Request')) {
-    my $req = Mojo::Message::Request->new->parse($request->env);
-    my $body = $request->content;
+  elsif ($request->isa('Plack::Request') or $request->isa('Catalyst::Request')) {
+    $req->parse($request->env);
+
+    my $plack_request = $request->isa('Plack::Request') ? $request
+      : do { +require Plack::Request; Plack::Request->new($request->env) };
+
+    my $body = $plack_request->content;
     $req->parse($body) if length $body;
-    warn 'parse error when converting Plack::Request' if not $req->is_finished;
+
     # Plack is unable to distinguish between %2F and /, so the raw (undecoded) uri can be passed
     # here. see PSGI::FAQ
     $req->url(Mojo::URL->new($request->env->{REQUEST_URI})) if exists $request->env->{REQUEST_URI};
-    return $req;
+  }
+  else {
+    croak 'unknown type '.ref($request);
   }
 
-  croak 'unknown type '.ref($request);
+  # we could call $req->fix_headers here to add a missing Content-Length, but proper requests from
+  # the network should always have it set.
+
+  warn 'parse error when converting '.ref($request) if not $req->is_finished;
+  return $req;
 }
 
 # results may be unsatisfactory if not a valid HTTP response.
 sub _convert_response ($response) {
   return $response if $response->isa('Mojo::Message::Response');
+
+  my $res = Mojo::Message::Response->new;
+
   if ($response->isa('HTTP::Response')) {
-    my $res = Mojo::Message::Response->new;
     $res->parse($response->as_string);
-    # we could call $res->fix_headers here to add a missing Content-Length, but proper requests from
-    # the network should always have it set.
     warn 'parse error when converting HTTP::Response' if not $res->is_finished;
-    return $res;
   }
   elsif ($response->isa('Plack::Response')) {
-    my $res = Mojo::Message::Response->new;
     $res->code($response->status);
-    my @headers = $response->headers->psgi_flatten->@*;
-    while (my ($name, $value) = splice(@headers, 0, 2)) {
-      $res->headers->header($name, $value);
-    }
+    $res->headers->add(@$_) foreach pairs $response->headers->psgi_flatten_without_sort->@*;
     my $body = $response->body;
     $res->body($body) if length $body;
-    return $res;
+  }
+  elsif ($response->isa('Catalyst::Response')) {
+    $res->code($response->status);
+    $res->headers->add(@$_) foreach pairs $response->headers->flatten;
+    my $body = $response->body;
+    $res->body($body) if length $body;
+  }
+  else {
+    croak 'unknown type '.ref($response);
   }
 
-  croak 'unknown type '.ref($response);
+  # we could call $res->fix_headers here to add a missing Content-Length, but proper responses from
+  # the network should always have it set.
+
+  return $res;
 }
 
 # callback hook for Sereal::Decoder
@@ -882,7 +899,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.063
+version 0.064
 
 =head1 SYNOPSIS
 
@@ -1072,7 +1089,7 @@ The L<JSON::Schema::Modern> object to use for all URI resolution and JSON Schema
     },
   );
 
-Validates an L<HTTP::Request>, L<Plack::Request> or L<Mojo::Message::Request>
+Validates an L<HTTP::Request>, L<Plack::Request>, L<Catalyst::Request> or L<Mojo::Message::Request>
 object against the corresponding OpenAPI v3.1 document, returning a
 L<JSON::Schema::Modern::Result> object.
 
@@ -1092,7 +1109,7 @@ to improve performance.
     },
   );
 
-Validates an L<HTTP::Response>, L<Plack::Response> or L<Mojo::Message::Response>
+Validates an L<HTTP::Response>, L<Plack::Response>, L<Catalyst::Response> or L<Mojo::Message::Response>
 object against the corresponding OpenAPI v3.1 document, returning a
 L<JSON::Schema::Modern::Result> object.
 

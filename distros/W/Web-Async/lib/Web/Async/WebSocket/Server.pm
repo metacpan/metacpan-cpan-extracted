@@ -1,7 +1,7 @@
 package Web::Async::WebSocket::Server;
 use Myriad::Class extends => 'IO::Async::Notifier';
 
-our $VERSION = '0.003'; ## VERSION
+our $VERSION = '0.004'; ## VERSION
 ## AUTHORITY
 
 =head1 NAME
@@ -29,6 +29,7 @@ field $disconnecting_client : reader : param = undef;
 field $closing_client : reader : param = undef;
 field $active_client : reader { +{ } }
 
+field $handshake : reader : param = undef;
 field $on_handshake_failure : reader : param = undef;
 
 field $listening : reader = undef;
@@ -36,6 +37,7 @@ field $listening : reader = undef;
 method configure (%args) {
     $port = delete $args{port} if exists $args{port};
     $on_handshake_failure = delete $args{on_handshake_failure} if exists $args{on_handshake_failure};
+    $handshake = delete $args{handshake} if exists $args{handshake};
     return $self->next::method(%args);
 }
 
@@ -65,8 +67,9 @@ method on_stream ($listener, $stream, @) {
     );
     $self->add_child(
         my $client = Web::Async::WebSocket::Server::Connection->new(
-            stream => $stream,
-            ryu    => $ryu,
+            stream               => $stream,
+            ryu                  => $ryu,
+            handshake            => $handshake,
             on_handshake_failure => $on_handshake_failure,
         )
     );

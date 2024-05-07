@@ -54,6 +54,7 @@
             "Ryu::Async" : "0",
             "Time::Moment" : "0",
             "URI" : "0",
+            "URI::ws" : "0",
             "Unicode::UTF8" : "0"
          }
       },
@@ -74,19 +75,19 @@
    "provides" : {
       "Web::Async" : {
          "file" : "lib/Web/Async.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Web::Async::WebSocket::Frame" : {
          "file" : "lib/Web/Async/WebSocket/Frame.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Web::Async::WebSocket::Server" : {
          "file" : "lib/Web/Async/WebSocket/Server.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Web::Async::WebSocket::Server::Connection" : {
          "file" : "lib/Web/Async/WebSocket/Server/Connection.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -101,7 +102,7 @@
          "web" : "https://github.com/team-at-cpan/Web-Async"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Tom Molesworth <tom@audioboundary.com>"

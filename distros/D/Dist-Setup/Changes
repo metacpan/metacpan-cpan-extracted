@@ -1,5 +1,13 @@
 Revision history for perl distribution Dist-Setup
 
+0.15 - 2024-05-06
+
+ - Fix a typo in the template dist_setup.conf file.
+ - Disable the ValuesAndExpressions::ProhibitNoisyQuotes perlcritic policy.
+ - Add a pod2html make target to convert the POD documentation into HTML.
+ - Process HTML files in the spelling test (but ignore the pod2html dir).
+ - Add an exe make target to generate packed executables with pp (experimental).
+
 0.14 - 2024-04-15
 
  - Allow to specify the type of runners to use for the GitHub CI actions.

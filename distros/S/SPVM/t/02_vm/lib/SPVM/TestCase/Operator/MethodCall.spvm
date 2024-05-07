@@ -1,5 +1,5 @@
 class TestCase::Operator::MethodCall {
-  interface TestCase::InterfaceType;
+  interface TestCase::Interface::Type;
   
   use TestCase::Simple;
   use TestCase::SimpleChild;
@@ -16,7 +16,8 @@ class TestCase::Operator::MethodCall {
   use Fn;
   use Array;
   use Point;
-
+  use TestCase::Interface::OptionalArgument;
+  
   # Use keyword name as method name
   static method int : int () {
     
@@ -1187,6 +1188,31 @@ class TestCase::Operator::MethodCall {
       }
     }
     
+    # Interface optional argument
+    {
+      my $anon = (TestCase::Interface::OptionalArgument)method : int ($value : int = 2) {
+        return $value;
+      };
+      
+      {
+        my $ret = $anon->();
+        
+        unless ($ret == 2) {
+          warn $ret;
+          return 0;
+        }
+      }
+      
+      {
+        my $ret = $anon->(3);
+        
+        unless ($ret == 3) {
+          warn $ret;
+          return 0;
+        }
+      }
+    }
+    
     return 1;
   }
   
@@ -1688,17 +1714,17 @@ class TestCase::Operator::MethodCall {
   static method call_interface_method_exception : int () {
     {
       my $self = new TestCase::Operator::MethodCall;
-      my $interface = (TestCase::InterfaceType)$self;
+      my $interface = (TestCase::Interface::Type)$self;
       
       eval { $interface->to_string; }
       
-      unless (Fn->contains($@, "The implementation of the \"to_string\" method in the \"TestCase::InterfaceType\" interface is not found.")) {
+      unless (Fn->contains($@, "The implementation of the \"to_string\" method in the \"TestCase::Interface::Type\" interface is not found.")) {
         return 0;
       }
     }
     
     {
-      my $interface = (TestCase::InterfaceType)undef;
+      my $interface = (TestCase::Interface::Type)undef;
       
       eval { $interface->to_string; }
       

@@ -870,7 +870,7 @@ YAML
 
   TODO: {
     local $TODO = 'mojo will strip the content body when parsing a stringified request that lacks Content-Length'
-      if $::TYPE eq 'lwp' or $::TYPE eq 'plack';
+      if $::TYPE eq 'lwp' or $::TYPE eq 'plack' or $::TYPE eq 'catalyst';
 
     $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ], 'éclair');
     remove_header($request, 'Content-Length');
@@ -1170,6 +1170,23 @@ YAML
       ],
     },
     'unknown content type can still be evaluated if */* is an acceptable media-type',
+  );
+
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'a/b' ], '0');
+  cmp_deeply(
+    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content */* schema minLength)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content */* schema minLength)))->to_string,
+          error => 'length is less than 10',
+        },
+      ],
+    },
+    '"false" body is still seen',
   );
 
 
@@ -1663,7 +1680,8 @@ YAML
       MultipleValuesAsString => ' two  ',
       MultipleValuesAsString => 'three  ',
     ]);
-  local $TODO = 'HTTP::Message::to_psgi fetches all headers as a single concatenated string' if $::TYPE eq 'plack';
+  local $TODO = 'HTTP::Message::to_psgi fetches all headers as a single concatenated string'
+    if $::TYPE eq 'plack' or $::TYPE eq 'catalyst';
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     { valid => true },
@@ -1677,6 +1695,28 @@ YAML
     { valid => true },
     'headers can be parsed into an array in order to test multiple values without sorting',
   );
+
+  $request = request('GET', 'http://example.com/foo', [
+    MultipleValuesAsArray => '  one',
+    MultipleValuesAsArray => ' one ',
+    MultipleValuesAsArray => ' three ',
+  ]);
+  cmp_deeply(
+    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/header/MultipleValuesAsArray',
+          keywordLocation => jsonp('/paths', '/foo', qw(get parameters 2 schema uniqueItems)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo', qw(get parameters 2 schema uniqueItems)))->to_string,
+          error => 'items at indices 0 and 1 are not unique',
+        },
+      ],
+    },
+    'headers that appear more than once are parsed into an array',
+  );
+
 
   $request = request('GET', 'http://example.com/foo', [
       MultipleValuesAsObjectExplodeFalse => ' R, 100 ',
@@ -1876,14 +1916,14 @@ YAML
 
   my $result;
   cmp_deeply(
-    ($result = $openapi->validate_request(request($_, 'https://example.com/foo', [], 'content')))->TO_JSON,
+    ($result = $openapi->validate_request(request($_, 'http://example.com/foo', [], 'content')))->TO_JSON,
     {
       valid => false,
       errors => [
         {
           instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo), lc),
-          absoluteKeywordLocation => $doc_uri->clone->scheme('https')->fragment(jsonp(qw(/paths /foo), lc))->to_string,
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo), lc))->to_string,
           error => 'unspecified body is present in '.$_.' request',
         },
       ],
@@ -1892,18 +1932,18 @@ YAML
   ) foreach qw(GET HEAD);
 
   cmp_deeply(
-    ($result = $openapi->validate_request(request('POST', 'https://example.com/foo', [], 'content')))->TO_JSON,
+    ($result = $openapi->validate_request(request('POST', 'http://example.com/foo', [], 'content')))->TO_JSON,
     { valid => true },
     'no errors from POST with body',
   );
 
 SKIP: {
   # "Bad Content-Length: maybe client disconnect? (1 bytes remaining)"
-  skip 'plack dies on this input', 3 if $::TYPE eq 'plack';
+  skip 'plack dies on this input', 3 if $::TYPE eq 'plack' or $::TYPE eq 'catalyst';
   cmp_deeply(
     ($result = do {
       my $x = allow_patterns(qr/^parse error when converting HTTP::Request/) if $::TYPE eq 'lwp';
-      $openapi->validate_request(request($_, 'https://example.com/foo', [ 'Content-Length' => 1]));
+      $openapi->validate_request(request($_, 'http://example.com/foo', [ 'Content-Length' => 1]));
     })->TO_JSON,
     {
       valid => false,
@@ -1911,7 +1951,7 @@ SKIP: {
         {
           instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo), lc),
-          absoluteKeywordLocation => $doc_uri->clone->scheme('https')->fragment(jsonp(qw(/paths /foo), lc))->to_string,
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo), lc))->to_string,
           error => 'unspecified body is present in '.$_.' request',
         },
       ],
@@ -1922,7 +1962,7 @@ SKIP: {
   cmp_deeply(
     ($result = do {
       my $x = allow_patterns(qr/^parse error when converting HTTP::Request/) if $::TYPE eq 'lwp';
-      $openapi->validate_request(request('POST', 'https://example.com/foo', [ 'Content-Length' => 1]));
+      $openapi->validate_request(request('POST', 'http://example.com/foo', [ 'Content-Length' => 1]));
     })->TO_JSON,
     { valid => true },
     'no errors from POST with Content-Length',

@@ -1,6 +1,12 @@
 
 Revision history for Web-Async
 
+0.004     2024-05-07 01:34:49+08:00 Asia/Singapore
+    [New features]
+
+    - provide the ability to check connection details before accepting websocket connection
+    ("handshake" parameter)
+
 0.003     2024-05-06 08:59:07+08:00 Asia/Singapore
     [New features]
 

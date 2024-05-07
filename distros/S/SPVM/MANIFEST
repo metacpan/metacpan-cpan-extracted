@@ -710,6 +710,7 @@ t/02_vm/08_module/IntList.t
 t/02_vm/08_module/List.t
 t/02_vm/08_module/Long.t
 t/02_vm/08_module/LongList.t
+t/02_vm/08_module/Native/Argument.t
 t/02_vm/08_module/Native/BasicType.t
 t/02_vm/08_module/Native/Compiler.t
 t/02_vm/08_module/Native/MethodCall.t
@@ -728,6 +729,7 @@ t/02_vm/09_stdio/stdio.t
 t/02_vm/10_thread_safe/thread_safe.t
 t/02_vm/99_extra/examples.t
 t/02_vm/99_extra/issue_507.t
+t/02_vm/99_extra/issue_515.t
 t/02_vm/99_extra/issues.t
 t/02_vm/99_extra/version.t
 t/02_vm/lib/SPVM/4foo.spvm
@@ -755,11 +757,17 @@ t/02_vm/lib/SPVM/TestCase/Inheritance.spvm
 t/02_vm/lib/SPVM/TestCase/InitStatement.spvm
 t/02_vm/lib/SPVM/TestCase/InlineExpansion.spvm
 t/02_vm/lib/SPVM/TestCase/Interface.spvm
-t/02_vm/lib/SPVM/TestCase/InterfaceNoRequiredMethod.spvm
+t/02_vm/lib/SPVM/TestCase/Interface/NoRequiredMethod.spvm
+t/02_vm/lib/SPVM/TestCase/Interface/OptionalArgument.spvm
+t/02_vm/lib/SPVM/TestCase/Interface/Point.spvm
+t/02_vm/lib/SPVM/TestCase/Interface/Type.spvm
 t/02_vm/lib/SPVM/TestCase/InterfaceNoRequiredMethodTest.spvm
-t/02_vm/lib/SPVM/TestCase/InterfaceType.spvm
 t/02_vm/lib/SPVM/TestCase/Issues/Issue507/MyClass1.spvm
 t/02_vm/lib/SPVM/TestCase/Issues/Issue507/MyClass2.spvm
+t/02_vm/lib/SPVM/TestCase/Issues/Issue515.spvm
+t/02_vm/lib/SPVM/TestCase/Issues/Issue515/Regex.spvm
+t/02_vm/lib/SPVM/TestCase/Issues/Issue515/Regex/Match.spvm
+t/02_vm/lib/SPVM/TestCase/Issues/Issue515/Regex/Replacer.spvm
 t/02_vm/lib/SPVM/TestCase/LineDirective.spvm
 t/02_vm/lib/SPVM/TestCase/LINEN.spvm
 t/02_vm/lib/SPVM/TestCase/LINER.spvm
@@ -805,6 +813,7 @@ t/02_vm/lib/SPVM/TestCase/Module/List.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Long.spvm
 t/02_vm/lib/SPVM/TestCase/Module/LongList.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Mutex.spvm
+t/02_vm/lib/SPVM/TestCase/Module/Native/Argument.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Native/BasicType.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Native/Compiler.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Native/MethodCall.spvm
@@ -911,7 +920,6 @@ t/02_vm/lib/SPVM/TestCase/Pointer.spvm
 t/02_vm/lib/SPVM/TestCase/PointerChild.spvm
 t/02_vm/lib/SPVM/TestCase/PointerEmpty.spvm
 t/02_vm/lib/SPVM/TestCase/PointForTest.spvm
-t/02_vm/lib/SPVM/TestCase/PointInterface.spvm
 t/02_vm/lib/SPVM/TestCase/Precedence.spvm
 t/02_vm/lib/SPVM/TestCase/PrecompileClassAttribute.spvm
 t/02_vm/lib/SPVM/TestCase/Private.spvm

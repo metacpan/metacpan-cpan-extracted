@@ -9,9 +9,6 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Safe::Isa;
 use List::Util 'pairs';
-use HTTP::Request;
-use HTTP::Response;
-use HTTP::Status ();
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 use Test2::API 'context_do';
@@ -31,15 +28,18 @@ use YAML::PP 0.005;
 # 'mojo': classes of type Mojo::URL, Mojo::Headers, Mojo::Message::Request, Mojo::Message::Response
 # 'lwp': classes of type URI, HTTP::Headers, HTTP::Request, HTTP::Response
 # 'plack': classes of type Plack::Request, Plack::Response
-our @TYPES = qw(mojo lwp plack);
+# 'catalyst': classes of type Catalyst::Request, Catalyst::Response
+our @TYPES = qw(mojo lwp plack catalyst);
 our $TYPE;
 
 # Note: if you want your query parameters or uri fragment to be normalized, set them afterwards
-sub request ($method, $uri_string, $headers = [], $body_content = '') {
+sub request ($method, $uri_string, $headers = [], $body_content = undef) {
   die '$TYPE is not set' if not defined $TYPE;
 
   my $req;
-  if ($TYPE eq 'lwp' or $TYPE eq 'plack') {
+  if ($TYPE eq 'lwp' or $TYPE eq 'plack' or $TYPE eq 'catalyst') {
+    test_needs('HTTP::Request', 'URI');
+
     my $uri = URI->new($uri_string);
     my $host = $uri->$_call_if_can('host');
     $req = HTTP::Request->new($method => $uri, [], $body_content);
@@ -48,10 +48,29 @@ sub request ($method, $uri_string, $headers = [], $body_content = '') {
       if defined $body_content and not defined $req->headers->header('Content-Length')
         and not defined $req->headers->header('Transfer-Encoding');
     $req->protocol('HTTP/1.1'); # required, but not added by HTTP::Request constructor
+
+    if ($TYPE eq 'plack' or $TYPE eq 'catalyst') {
+      test_needs('Plack::Request', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
+      $req = Plack::Request->new($req->to_psgi);
+
+      # Plack is unable to distinguish between %2F and /, so the raw (undecoded) uri can be passed
+      # here. see PSGI::FAQ
+      $req->env->{REQUEST_URI} = $uri . '';
+      $req->env->{'psgi.url_scheme'} = $uri->scheme;
+    }
+
+    if ($TYPE eq 'catalyst') {
+      test_needs('Catalyst::Request', 'Catalyst::Log');
+      $req = Catalyst::Request->new(
+        _log => Catalyst::Log->new,
+        method => $method,
+        uri => $uri,
+        env => $req->env, # $req was Plack::Request
+      );
+    }
   }
   elsif ($TYPE eq 'mojo') {
     my $uri = Mojo::URL->new($uri_string);
-    my $host = $uri->host;
     $req = Mojo::Message::Request->new(method => $method, url => Mojo::URL->new($uri_string));
     $req->headers->add(@$_) foreach pairs @$headers;
     $req->body($body_content) if defined $body_content;
@@ -63,33 +82,24 @@ sub request ($method, $uri_string, $headers = [], $body_content = '') {
     die '$TYPE '.$TYPE.' not supported';
   }
 
-  if ($TYPE eq 'plack') {
-    test_needs('Plack::Request', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
-    my $uri = $req->uri;
-    $req = Plack::Request->new($req->to_psgi);
-
-    # Plack is unable to distinguish between %2F and /, so the raw (undecoded) uri can be passed
-    # here. see PSGI::FAQ
-    $req->env->{REQUEST_URI} = $uri . '';
-  }
-
   return $req;
 }
 
-sub response ($code, $headers = [], $body_content = '') {
+sub response ($code, $headers = [], $body_content = undef) {
   die '$TYPE is not set' if not defined $TYPE;
 
   my $res;
   if ($TYPE eq 'lwp') {
-    $res = HTTP::Response->new($code, HTTP::Status::status_message($code), @$headers ? $headers : (), length $body_content ? $body_content : ());
+    test_needs('HTTP::Response', 'HTTP::Status');
+
+    $res = HTTP::Response->new($code, HTTP::Status::status_message($code), $headers, $body_content);
     $res->protocol('HTTP/1.1'); # not added by HTTP::Response constructor
-    $res->headers->header('Content-Length' => length($body_content))
-      if defined $body_content and not defined $res->headers->header('Content-Length')
+    $res->headers->header('Content-Length' => length($body_content)//0)
+      if not defined $res->headers->header('Content-Length')
         and not defined $res->headers->header('Transfer-Encoding');
   }
   elsif ($TYPE eq 'mojo') {
     $res = Mojo::Message::Response->new(code => $code);
-    $res->message($res->default_message);
     $res->headers->add(@$_) foreach pairs @$headers;
     $res->body($body_content) if defined $body_content;
 
@@ -99,7 +109,15 @@ sub response ($code, $headers = [], $body_content = '') {
   elsif ($TYPE eq 'plack') {
     test_needs('Plack::Response', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
     $res = Plack::Response->new($code, $headers, $body_content);
-    $res->headers->header('Content-Length' => length($body_content))
+    $res->headers->header('Content-Length' => length $body_content)
+      if defined $body_content and not defined $res->headers->header('Content-Length')
+        and not defined $res->headers->header('Transfer-Encoding');
+  }
+  elsif ($TYPE eq 'catalyst') {
+    test_needs('Catalyst::Response');
+    $res = Catalyst::Response->new(status => $code, body => $body_content);
+    $res->headers->push_header(@$_) foreach pairs @$headers;
+    $res->headers->header('Content-Length' => length $body_content)
       if defined $body_content and not defined $res->headers->header('Content-Length')
         and not defined $res->headers->header('Transfer-Encoding');
   }
@@ -114,7 +132,7 @@ sub uri ($uri_string, @path_parts) {
   die '$TYPE is not set' if not defined $TYPE;
 
   my $uri;
-  if ($TYPE eq 'lwp' or $TYPE eq 'plack') {
+  if ($TYPE eq 'lwp' or $TYPE eq 'plack' or $TYPE eq 'catalyst') {
     $uri = URI->new($uri_string);
     $uri->path_segments(@path_parts) if @path_parts;
   }
@@ -140,10 +158,11 @@ sub query_params ($request, $pairs) {
   elsif ($TYPE eq 'mojo') {
     $request->url->query->pairs($pairs);
   }
-  elsif ($TYPE eq 'plack') {
+  elsif ($TYPE eq 'plack' or $TYPE eq 'catalyst') {
     # this is the encoded query string portion of the URI
     $request->env->{QUERY_STRING} = Mojo::Parameters->new->pairs($pairs)->to_string;
     $request->env->{REQUEST_URI} .= '?' . $request->env->{QUERY_STRING};
+    # $request->_clear_parameters if $TYPE eq 'catalyst';  # might need this later
   }
   else {
     die '$TYPE '.$TYPE.' not supported';
@@ -161,9 +180,9 @@ sub remove_header ($message, $header_name) {
   elsif ($TYPE eq 'mojo') {
     $message->headers->remove($header_name);
   }
-  elsif ($TYPE eq 'plack') {
+  elsif ($TYPE eq 'plack' or $TYPE eq 'catalyst') {
     $message->headers->remove_header($header_name);
-    delete $message->env->{uc $header_name =~ s/-/_/r} if $message->isa('Plack::Request');
+    delete $message->env->{uc $header_name =~ s/-/_/r} if $message->can('env');
   }
   else {
     die '$TYPE '.$TYPE.' not supported';

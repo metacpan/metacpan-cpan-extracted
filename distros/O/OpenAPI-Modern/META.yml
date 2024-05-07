@@ -4,9 +4,6 @@ author:
   - 'Karen Etheridge <ether@cpan.org>'
 build_requires:
   File::Spec: '0'
-  HTTP::Request: '0'
-  HTTP::Response: '0'
-  HTTP::Status: '0'
   JSON::Schema::Modern: '0.578'
   Module::Metadata: '0'
   Mojolicious: '0'
@@ -20,7 +17,6 @@ build_requires:
   Test::More: '0.96'
   Test::Needs: '0'
   Test::Warnings: '0.033'
-  URI: '0'
   YAML::PP: '0.005'
   lib: '0'
   open: '0'
@@ -58,13 +54,13 @@ no_index:
 provides:
   JSON::Schema::Modern::Document::OpenAPI:
     file: lib/JSON/Schema/Modern/Document/OpenAPI.pm
-    version: '0.063'
+    version: '0.064'
   JSON::Schema::Modern::Vocabulary::OpenAPI:
     file: lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm
-    version: '0.063'
+    version: '0.064'
   OpenAPI::Modern:
     file: lib/OpenAPI/Modern.pm
-    version: '0.063'
+    version: '0.064'
 requires:
   Carp: '0'
   Encode: '2.89'
@@ -99,10 +95,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/OpenAPI-Modern/issues
   homepage: https://github.com/karenetheridge/OpenAPI-Modern
   repository: https://github.com/karenetheridge/OpenAPI-Modern.git
-version: '0.063'
+version: '0.064'
 x_Dist_Zilla:
   perl:
-    version: '5.039009'
+    version: '5.039010'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeRelease
@@ -605,7 +601,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20240320'
+          Module::CoreList: '5.20240420'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -769,7 +765,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.063
+          tag: v0.064
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -955,7 +951,7 @@ x_Dist_Zilla:
       is_trial: 0
     version: '6.031'
 x_authority: cpan:ETHER
-x_generated_by_perl: v5.39.9
+x_generated_by_perl: v5.39.10
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

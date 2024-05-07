@@ -19,6 +19,7 @@ sub import {
 	$PRO{keyword}($caller, 'conditional', sub {
 		my ($name, %conditional) = @_;
 		my ($meta, $class, $data) = (Rope->get_meta($caller), 'Struct::Conditional');
+
 		if ($meta->{properties}->{$name}) {
 			if ($meta->{properties}->{$name}->{conditional}) {
 				Rope->clear_property($caller, $name);
@@ -32,6 +33,7 @@ sub import {
 			require $pkg . '.pm';
 			$data = $_[1]->[1];
 		}
+		
 		$caller->property($name,
 			value => sub { shift; $class->new()->compile($data || \%conditional, @_, 1) },
 			conditional => 1
@@ -49,7 +51,7 @@ Rope::Conditional - Rope conditional properties
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 

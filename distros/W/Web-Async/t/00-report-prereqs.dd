@@ -30,6 +30,7 @@ do { my $x = {
                                       'Ryu::Async' => '0',
                                       'Time::Moment' => '0',
                                       'URI' => '0',
+                                      'URI::ws' => '0',
                                       'Unicode::UTF8' => '0'
                                     }
                     },

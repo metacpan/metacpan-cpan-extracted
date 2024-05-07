@@ -16,16 +16,16 @@ name: Data-Trace
 provides:
   Data::Tie::Watch:
     file: lib/Data/Tie/Watch.pm
-    version: '1.302'
+    version: v1.302.1
   Data::Trace:
     file: lib/Data/Trace.pm
-    version: '0.15'
+    version: '0.16'
 requires:
   Data::DPath: '0.58'
-  perl: '5.006'
+  perl: '5.012'
 resources:
   bugtracker: https://github.com/poti1/data-trace/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/poti1/data-trace
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

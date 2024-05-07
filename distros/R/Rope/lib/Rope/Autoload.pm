@@ -17,7 +17,7 @@ BEGIN {
 
 sub import {
 	my ($pkg, $caller) = (shift, scalar(caller));
-	$PRO{keyword}($caller, 'DESTROY', sub {}) unless ($caller->can('DESTROY'));
+	$PRO{keyword}($caller, 'DESTROY', sub {}) unless ($caller->CORE::can('DESTROY'));
 	$PRO{keyword}($caller, 'AUTOLOAD', sub :lvalue {
 		my $self = shift;
 		my $classname =  ref $self;
@@ -39,7 +39,7 @@ Rope::Autoload - Rope Autoload!
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 

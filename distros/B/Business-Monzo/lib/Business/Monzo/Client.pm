@@ -188,22 +188,24 @@ sub _api_request {
         $tx = $self->_ua->$method( $path => { %headers } );
     }
 
-    if ( $tx->success ) {
-        carp( "RES: " . Dumper $tx->res->json )
+    my $res = $tx->result;
+
+    if ( $res->is_success ) {
+        carp( "RES: " . Dumper $res->json )
             if $ENV{MONZO_DEBUG};
 
-        return $tx->res->json;
+        return $res->json;
     }
     else {
-        my $error = $tx->error;
+        my $error = $res->message;
 
         carp( "ERROR: " . Dumper $error )
             if $ENV{MONZO_DEBUG};
 
         Business::Monzo::Exception->throw({
-            message  => $error->{message},
-            code     => $error->{code},
-            response => $tx->res->body,
+            message  => $error,
+            code     => $res->code,
+            response => $error,
         });
     }
 }

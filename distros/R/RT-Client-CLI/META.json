@@ -4,7 +4,7 @@
       "Best Practical Solutions, LLC"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
@@ -86,14 +86,14 @@
          "web" : "https://github.com/bestpractical/rt-client-cli"
       }
    },
-   "version" : "5.0.5",
+   "version" : "5.0.6",
    "x_contributors" : [
       "Alex Vandiver <alexmv@bestpractical.com>",
       "sunnavy <sunnavy@bestpractical.com>",
       "Thomas Sibley <trs@bestpractical.com>",
       "Todd Wade <todd@bestpractical.com>"
    ],
-   "x_generated_by_perl" : "v5.38.0",
+   "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "GPL-2.0-only",
    "x_static_install" : 1

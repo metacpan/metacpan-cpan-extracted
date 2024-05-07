@@ -21,6 +21,7 @@ sub init {
 	) for keys %{$self->{properties}};
 	$self->compile();
 	delete $self->{properties}->{ROPE_init};
+	$self;
 }
 
 sub compile {
@@ -54,9 +55,11 @@ sub set_value {
 			}
 		}
 	}
-	if ($spec->{type}) {
+	if ($spec->{type} && defined $value) {
 		$value = eval {
-			 $spec->{type}->($value);
+			$spec->{coerce_type} 
+				? $spec->{type}->coerce($value)
+				: $spec->{type}->($value);
 		};
 		if ($@) {
 			my @caller = caller(1);

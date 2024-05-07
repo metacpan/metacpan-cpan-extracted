@@ -5,6 +5,7 @@ MPFR.pod
 grisu3.c
 grisu3.h
 math_mpfr_include.h
+math_mpfr_unused.h
 MPFR.xs
 README
 CHANGES
@@ -39,6 +40,7 @@ t/bessel.t
 t/buildopt.t
 t/bytes.t
 t/cmp_uj_sj.t
+t/compound.t
 t/constants.t
 t/D64_LD.t
 t/decimal64_conv.t

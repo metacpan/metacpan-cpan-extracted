@@ -52,3 +52,6 @@ minimum_regex_length_to_complain_about = 30
 # Let’s assume the reader knows how to write regex.
 [-RegularExpressions::RequireDotMatchAnything]
 [-RegularExpressions::RequireLineBoundaryMatching]
+
+# The ',' syntax is nicer than q{,} in my opinion.
+[-ValuesAndExpressions::ProhibitNoisyQuotes]

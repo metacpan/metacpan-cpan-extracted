@@ -6,7 +6,7 @@ use utf8;
 
 package JSON::Relaxed::Parser;
 
-our $VERSION = "0.091";
+our $VERSION = "0.092";
 
 class JSON::Relaxed::Parser;
 
@@ -17,9 +17,16 @@ field @tokens;			# string as tokens
 
 # Instance properties.
 field $extra_tokens_ok	   :mutator :param = undef;
+
+# Signal error with exceptions.
 field $croak_on_error	   :mutator :param = 1;
 field $croak_on_error_internal;
+
+# Enforce strictness to official standard.
 field $strict		   :mutator :param = 0;
+
+# Extension: a.b:c -> a:{b:c}
+field $combined_keys	   :mutator :param = 0;
 
 # Error indicators.
 field $err_id		    :accessor;
@@ -29,6 +36,17 @@ field $err_pos		    :accessor;
 method decode( $str ) {
 
     $croak_on_error_internal = $croak_on_error;
+    $self->_decode($str);
+}
+
+# Legacy.
+method parse( $str ) {
+    $croak_on_error_internal = 0;
+    $self->_decode($str);
+}
+
+method _decode( $str ) {
+
     $data = $str;
     return $self->error('missing-input')
       unless defined $data && length $data;
@@ -43,12 +61,6 @@ method decode( $str ) {
     return $self->error('empty-input') unless @tokens;
 
     $self->structure( top => 1 );
-}
-
-# Legacy.
-method parse( $str ) {
-    $croak_on_error_internal = 0;
-    $self->decode($str);
 }
 
 ################ Character classifiers ################
@@ -90,24 +102,32 @@ method parse_chars( $source = undef ) {
 
     $data = $source if $source;	# for debugging
 
-    @pretoks = split( m< (
-			   \\u[[:xdigit:]]{4}
-		       |   \\u\{[[:xdigit:]]+\}
-		       |   \\[^u]		# escaped char
-		       |   \n		# faster
-		       |   //		# line comment
-			   [^\n]* \n
-		       |   /\*		# comment start
-			   .*? \*/
-		       |   /\*		# comment start
-#		       |   $p_reserved	# reserved chars
-		       |   [,:{}\[\]]   # faster
-		       |   "(?:\\.|.)*?"    # "string"
-		       |   `(?:\\.|.)*?`    # `string`
-		       |   '(?:\\.|.)*?'    # 'string'
-		       |   ['"`]	# stringquote
-		       |   \s+		# whitespace
-		       ) >sox, $data );
+    # \u escape (4 hexits)
+    my @p = ( qq<\\\\u[[:xdigit:]]{4}> );
+
+    # Any escaped char (strict mode).
+    if ( $strict ) {
+	push( @p, qq<\\.> );
+    }
+
+    # Otherwise, match \u{ ... } also.
+    else {
+	push( @p, qq<\\\\u\\{[[:xdigit:]]+\\}>, qq<\\\\[^u]> ); # escaped char
+    }
+    push( @p, $p_newlines,
+	  qq< // [^\\n]* \\n >, # line comment
+	  qq< /\\* .*? \\*/ >, 	# comment start
+	  qq< /\\* >,		# comment start
+          qq< $p_reserved >,	# reserved chars
+	  qq< "(?:\\\\.|.)*?" >,    # "string"
+	  qq< `(?:\\\\.|.)*?` >,   # `string`
+	  qq< '(?:\\\\.|.)*?' >,   # 'string'
+	  qq< $p_quotes >,	# stringquote
+	  qq< \\s+ > );		# whitespace
+
+    my $p = join( "|", @p );
+
+    @pretoks = split( m< ( $p ) >sox, $data );
 
     # Remove empty strings.
     @pretoks = grep { length($_) } @pretoks;
@@ -138,7 +158,7 @@ method tokenize( $pretoks = undef ) {
 	}
 
 	if ( $pretok eq "\\\n" ) {
-	    $glue++;
+	    $glue++ if $glue;
 	    $uq_open = 0;
 	    $offset += length($pretok);
 	    next;
@@ -154,7 +174,7 @@ method tokenize( $pretoks = undef ) {
 		$self->addtok( JSON::Relaxed::Parser::String::Quoted->new
 			       ( quote => $quote, content => $content),
 			       'Q', $offset );
-		$glue = 1;
+		$glue = 1 unless $strict;
 	    }
 	    $offset += length($pretok);
 	    $uq_open = 0;
@@ -251,7 +271,7 @@ method structure( %opts ) {
     # If this is the outer structure, then no tokens should remain.
     if ( $opts{top}
 	 && @tokens
-	 && !$extra_tokens_ok
+	 && ( $strict || !$extra_tokens_ok )
 	 && !$self->is_error
        ) {
 	return $self->error( 'multiple-structures', $tokens[0] );
@@ -313,7 +333,7 @@ method build_hash() {
 
 	    # Set key using string.
 	    $key = $this->as_perl( always_string => 1 );
-	    $rv->{$key} = undef;
+	    $self->set_value( $rv, $key );
 
 	    my $next = $tokens[0];
 	    # If anything follows the string.
@@ -343,7 +363,7 @@ method build_hash() {
 	    }
 
 	    # Set key and value in return hash.
-	    $rv->{$key} = $value;
+	    $self->set_value( $rv, $key, $value );
 	}
 
 	# Anything else is an error.
@@ -379,6 +399,23 @@ method get_value() {
     return $self->error('unexpected-token-after-colon', $this );
 }
 
+method set_value ( $rv, $key, $value = undef ) {
+    return $rv->{$key} = $value
+      unless $combined_keys && !$strict && $key =~ /.\../s;
+
+    my @keys = split(/\./, $key );
+    my $c = \$rv;
+    for ( @keys ) {
+	if ( /^[+-]?\d+$/ ) {
+	    $c = \( $$c->[$_] );
+	}
+	else {
+	    $c = \( $$c->{$_} );
+	}
+    }
+    $$c = $value;
+}
+
 method build_array() {
 
     my $rv = [];
@@ -392,8 +429,8 @@ method build_array() {
 	return $rv if $t eq ']';
 
 	# Comma: if we get to a comma at this point, and we have
-	# content, do nothing with it.
-	if ( $t eq ',' && @$rv ) {
+	# content, do nothing with it in strict mode. Ignore otherwise.
+	if ( $t eq ',' && (!$strict || @$rv) ) {
 	}
 
 	# Opening brace of hash or array.

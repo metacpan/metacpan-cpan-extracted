@@ -3,7 +3,6 @@ Changes
 META.yml
 README.md
 Makefile.PL
-t/01_test.t
 t/10_uescape.t
 t/20_stringcont.t
 t/30_comment.t

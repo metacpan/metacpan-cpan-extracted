@@ -62,6 +62,8 @@ It is fully compliant to the [RelaxedJSON.org](https://www.relaxedjson.org/speci
 
 # EXTENSIONS
 
+Extensions can be disabled with the `strict` option.
+
 - Hash keys without values
 
     JSON::Relaxed supports object keys without a specified value.
@@ -109,7 +111,7 @@ It is exported by default.
 
 Optionally an additional hash with options can be passed
 to change the behaviour of the parser.
-See [Object-oriented parsing](https://metacpan.org/pod/JSON::Relaxed::Parser#Object-oriented-parsing)
+See [Object-oriented parsing](https://metacpan.org/pod/JSON::Relaxed#OBJECT-ORIENTED-PARSING)
 in JSON::Relaxed::Parser.
 
     $structure = decode_rjson( $rjson, %options );
@@ -126,7 +128,7 @@ Then call the parser's `decode` method, passing in the RJSON string:
 
     $structure = $parser->decode($rjson);
 
-For more details, see [Object-oriented parsing](https://metacpan.org/pod/JSON::Relaxed::Parser#Object-oriented-parsing) in JSON::Relaxed::Parser.
+For more details, see [Object-oriented parsing](https://metacpan.org/pod/JSON::Relaxed#OBJECT-ORIENTED-PARSING) in JSON::Relaxed::Parser.
 
 # ERROR HANDLING
 

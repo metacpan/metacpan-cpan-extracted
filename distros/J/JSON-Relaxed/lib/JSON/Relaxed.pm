@@ -128,6 +128,26 @@ This eliminates the need to use L<surrogates|https://unicode.org/faq/utf_bom.htm
 
     \uD834\uDD0E
 
+=item Combined hash keys (requires C<combined_keys> option)
+
+Hash keys that contain periods are considered subkeys, e.g.
+
+    foo.bar: blech
+
+is equivalent to
+
+    foo: {
+        bar: blech
+    }
+
+=item Garbage after JSON structure (requires C<extra_tokens_ok> option)
+
+Normally, parsing will fail unless the input contains exactly one
+valid JSON structure, i.e. a string, a hash or an array.
+
+With C<extra_tokens_ok> the first JSON structure is parsed and the
+rest is ignored.
+
 =back
 
 =head1 SUBROUTINES
@@ -195,7 +215,7 @@ Default value is false, enabling JSON::Relaxed extensions.
 When set to a true value, allows (and ignores) trailing information
 after the first complete JSON structure.
 
-Disabled by default.
+Disabled by default, overruled by C<strict>,
 
 =item croak_on_error
 
@@ -204,6 +224,13 @@ Disabled by default in legacy mode, enabled otherwise.
 Causes parsing error to be signalled with an exception.
 
 See L</"ERROR HANDLING">.
+
+=item combined_keys
+
+Multiple hash keys can be combined with periods.
+E.g. C<foo.bar:blech> is equivalent to C<foo:{bar:blech}>.
+
+Disabled by default, overruled by C<strict>.
 
 =back
 
@@ -219,42 +246,32 @@ This is the same as decode, but also enables legacy mode.
 
 =head2 err_id
 
-Fetches the error id of the last error, if any.
-
-Error ids are simple short strings, like C<"multiple-structures">.
-
-For a full list, see L<JSON::Relaxed::ErrorCodes>.
-
 =head2 err_pos
-
-Fetches the text position in the JSON string where the error occured.
-Returns -1 if this information is not available.
 
 =head2 err_msg
 
-Fetches the text of the last error message, if any.
+Fetches the error information for the last error, if any.
+
+Error ids are simple short strings, like C<"multiple-structures">.
+
+C<err_pos> fetches the text position in the JSON string where the
+error occured. Returns -1 if this information is not available.
+
+C<err_msg> Fetches the text of the last error message.
 
 For a full list, see L<JSON::Relaxed::ErrorCodes>.
 
+=head2 strict
+
 =head2 croak_on_error
-
-Enables/disables exceptions on parse errors.
-
-Note that the value must be assigned to:
-
-    $parser->croak_on_error = 1;	# enable
 
 =head2 extra_tokens_ok
 
-Note that the value must be assigned to:
+=head2 combined_keys
 
-    $parser->extra_tokens_ok = 0;	# disable
+Sets options.
 
-=head2 strict
-
-Enables/disables strict conformance to the official specification,
-
-Note that the value must be assigned to:
+Note that the value must be assigned to, e.g.
 
     $parser->strict = 1;	# enable
 

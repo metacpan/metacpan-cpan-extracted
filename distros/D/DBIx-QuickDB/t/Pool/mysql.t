@@ -2,8 +2,6 @@ use Test2::V0;
 use Test2::Tools::QuickDB;
 use File::Spec;
 
-use Test2::Require::Module 'DBD::mysql';
-
 my @ENV_VARS;
 
 # Contaminate the ENV vars to make sure things work even when these are all
@@ -25,15 +23,7 @@ BEGIN {
 
 skipall_unless_can_db('MySQL');
 
-{
-    local $@;
-    eval { require DBD::MariaDB };
-    no warnings qw/once redefine/;
-    *DBD::MariaDB::dr::connect = sub { die "Should not be using me!" };
-}
-
 sub DRIVER() { 'MySQL' }
-sub DBD_DRIVER() { 'DBD::mysql' }
 
 my $file = __FILE__;
 $file =~ s/mysql\.t$/Pool.pm/;

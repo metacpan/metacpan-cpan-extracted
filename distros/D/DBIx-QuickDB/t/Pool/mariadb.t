@@ -23,17 +23,9 @@ BEGIN {
     $ENV{$_} = 'fake' for @ENV_VARS;
 }
 
-skipall_unless_can_db('MySQL');
+skipall_unless_can_db('MariaDB');
 
-{
-    local $@;
-    eval { require DBD::mysql };
-    no warnings qw/redefine once/;
-    *DBD::mysql::dr::connect = sub { die "Should not be using me!" };
-}
-
-sub DRIVER() { 'MySQL' }
-sub DBD_DRIVER() { 'DBD::MariaDB' }
+sub DRIVER() { 'MariaDB' }
 
 my $file = __FILE__;
 $file =~ s/mariadb\.t$/Pool.pm/;

@@ -3,12 +3,15 @@
 Business::Monzo - Perl library for interacting with the Monzo API
 (https://api.monzo.com)
 
-[![Build Status](https://travis-ci.org/leejo/business-monzo.svg?branch=master)](https://travis-ci.org/leejo/business-monzo?branch=master)
-[![Coverage Status](https://coveralls.io/repos/leejo/business-monzo/badge.png?branch=master)](https://coveralls.io/r/leejo/business-monzo?branch=master)
+<div>
+
+    <a href='https://travis-ci.org/leejo/business-monzo?branch=master'><img src='https://travis-ci.org/leejo/business-monzo.svg?branch=master' alt='Build Status' /></a>
+    <a href='https://coveralls.io/r/leejo/business-monzo?branch=master'><img src='https://coveralls.io/repos/leejo/business-monzo/badge.png?branch=master' alt='Coverage Status' /></a>
+</div>
 
 # VERSION
 
-0.12
+0.13
 
 # DESCRIPTION
 
@@ -152,14 +155,14 @@ the Monzo API documentation. For example: limit=100.
 
     $monzo->transactions( %query_params );
 
-Get a list of transactions. Will return a list of [Business::Monzo::Transaction](https://metacpan.org/pod/Business::Monzo::Transaction)
+Get a list of transactions. Will return a list of [Business::Monzo::Transaction](https://metacpan.org/pod/Business%3A%3AMonzo%3A%3ATransaction)
 objects. Note you must supply an account\_id in the params hash;
 
 ## balance
 
     my $Balance = $monzo->balance( account_id => $account_id );
 
-Get an account balance Returns a [Business::Monzo::Balance](https://metacpan.org/pod/Business::Monzo::Balance) object.
+Get an account balance Returns a [Business::Monzo::Balance](https://metacpan.org/pod/Business%3A%3AMonzo%3A%3ABalance) object.
 
 ## transaction
 
@@ -168,7 +171,7 @@ Get an account balance Returns a [Business::Monzo::Balance](https://metacpan.org
         expand => 'merchant'
     );
 
-Get a transaction. Will return a [Business::Monzo::Transaction](https://metacpan.org/pod/Business::Monzo::Transaction) object
+Get a transaction. Will return a [Business::Monzo::Transaction](https://metacpan.org/pod/Business%3A%3AMonzo%3A%3ATransaction) object
 
 ## accounts
 
@@ -176,14 +179,14 @@ Get a transaction. Will return a [Business::Monzo::Transaction](https://metacpan
     $monzo->accounts( account_type => "uk_prepaid" );   # prepaid accounts
     $monzo->accounts( account_type => "uk_retail" );    # current accounts
 
-Get a list of accounts. Will return a list of [Business::Monzo::Account](https://metacpan.org/pod/Business::Monzo::Account)
+Get a list of accounts. Will return a list of [Business::Monzo::Account](https://metacpan.org/pod/Business%3A%3AMonzo%3A%3AAccount)
 objects
 
 ## pots
 
     $monzo->pots;
 
-Get a list of pots. Will return a list of [Business::Monzo::Pot](https://metacpan.org/pod/Business::Monzo::Pot)
+Get a list of pots. Will return a list of [Business::Monzo::Pot](https://metacpan.org/pod/Business%3A%3AMonzo%3A%3APot)
 objects
 
 # PAGINATION
@@ -221,15 +224,15 @@ more examples.
 
 # SEE ALSO
 
-[Business::Monzo::Account](https://metacpan.org/pod/Business::Monzo::Account)
+[Business::Monzo::Account](https://metacpan.org/pod/Business%3A%3AMonzo%3A%3AAccount)
 
-[Business::Monzo::Attachment](https://metacpan.org/pod/Business::Monzo::Attachment)
+[Business::Monzo::Attachment](https://metacpan.org/pod/Business%3A%3AMonzo%3A%3AAttachment)
 
-[Business::Monzo::Balance](https://metacpan.org/pod/Business::Monzo::Balance)
+[Business::Monzo::Balance](https://metacpan.org/pod/Business%3A%3AMonzo%3A%3ABalance)
 
-[Business::Monzo::Transaction](https://metacpan.org/pod/Business::Monzo::Transaction)
+[Business::Monzo::Transaction](https://metacpan.org/pod/Business%3A%3AMonzo%3A%3ATransaction)
 
-[Business::Monzo::Webhook](https://metacpan.org/pod/Business::Monzo::Webhook)
+[Business::Monzo::Webhook](https://metacpan.org/pod/Business%3A%3AMonzo%3A%3AWebhook)
 
 # AUTHOR
 

@@ -1,5 +1,8 @@
 Revision history for RT-Client-CLI
 
+5.0.6 2024-05-06
+ - Fix typo
+
 5.0.5 2023-10-19
  - Remove trailing / from mailgate url examples
 

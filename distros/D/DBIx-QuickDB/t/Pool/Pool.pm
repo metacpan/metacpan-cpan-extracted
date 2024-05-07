@@ -87,7 +87,8 @@ ok(!-e "$dir.lock", "Deleted the lock when expiring cache");
 $base = db($driver);
 my $stamp = check_cloned(QDB_POOL->{databases}->{$driver}->{db});
 
-isa_ok($base, ['DBIx::QuickDB::Driver', "DBIx::QuickDB::Driver::$driver"], "Got the database");
+my $real_base = $driver eq 'MySQL' ? 'MySQL::Base' : $driver;
+isa_ok($base, ['DBIx::QuickDB::Driver', "DBIx::QuickDB::Driver::$real_base"], "Got the database");
 
 my $called = 0;
 our $foo_sum = "a";

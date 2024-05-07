@@ -78,7 +78,7 @@
             "XML::Parser" : "0",
             "overload" : "0",
             "parent" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       }
    },
@@ -93,6 +93,6 @@
          "web" : "https://github.com/david-dick/firefox-marionette"
       }
    },
-   "version" : "1.56",
+   "version" : "1.57",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

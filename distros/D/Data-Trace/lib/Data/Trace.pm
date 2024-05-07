@@ -1,5 +1,11 @@
 package Data::Trace;
 
+=head1 NAME
+
+Data::Trace - Trace when a data structure gets updated.
+
+=cut
+
 use 5.006;
 use strict;
 use warnings;
@@ -10,18 +16,11 @@ use lib $FindBin::RealBin;
 use Data::Tie::Watch;    # Tie::Watch copy.
 use Data::DPath;         # All refs in a struct.
 use Carp();
-use Storable();
+use parent  qw( Exporter );
 use feature qw( say );
 
-our @TIED_NODES;
-
-=head1 NAME
-
-Data::Trace - Trace when a data structure gets updated.
-
-=cut
-
-our $VERSION = '0.15';
+our @EXPORT  = qw( Trace );
+our $VERSION = '0.16';
 
 =head1 SYNOPSIS
 
@@ -29,8 +28,10 @@ our $VERSION = '0.15';
 
     my $data = {a => [0, {complex => 1}]};
     sub BadCall{ $data->{a}[0] = 1 }
-    Data::Trace->Trace($data);
+    Trace($data);
     BadCall();  # Shows strack trace of where data was changed.
+
+=cut
 
 =head1 DESCRIPTION
 
@@ -43,71 +44,67 @@ alteration to data structures which should be treated as read-only.
 Probably can also create a variable as read-only in Moose and see where
 its been changed, but this module is without Moose support.
 
-=head1 SUBROUTINES/METHODS
-
 =cut
 
-sub import {
-    my $orig = \&Storable::dclone;
-
-    no warnings "redefine";
-
-    *Storable::dclone = sub ($) {
-        my @nodes = __PACKAGE__->_UnTieNodes();
-        my $data  = $orig->( @_ );
-        __PACKAGE__->_TieNodes( \@nodes );
-
-        $data;
-    };
-}
+=head1 SUBROUTINES/METHODS
 
 =head2 Trace
 
- Data::Trace->Trace( \$scalar );
- Data::Trace->Trace( \@array );
- Data::Trace->Trace( \@hash );
- Data::Trace->Trace( $complex_data );
+ Trace( \$scalar );
+ Trace( \@array );
+ Trace( \@hash );
+ Trace( $complex_data );
 
 =cut
 
 sub Trace {
-    shift->_TieNodes( @_ );
+    __PACKAGE__->_TieNodes( @_ );
 }
 
 sub _TieNodes {
-    my ( $self, $data ) = @_;
+    my ( $class, $data, @args ) = @_;
 
     if ( not ref $data ) {
         die "Error: data must be a reference!";
     }
 
-    @TIED_NODES = grep { ref } Data::DPath->match( $data, "//" );
+    my @refs    = grep { ref } Data::DPath->match( $data, "//" );
+    my %watches = $class->_BuildWatcherMethods();
+    my @nodes;
 
-    my %args = $self->_DefineWatchArgs();
-
-    for my $node ( @TIED_NODES ) {
-        $node = Data::Tie::Watch->new(
-            -variable => $node,
-            %args,
-        );
+    for my $ref ( @refs ) {
+        push @nodes,
+          Data::Tie::Watch->new(
+            -variable => $ref,
+            %watches,
+            @args,
+          );
     }
 
-    \@TIED_NODES;
+    @nodes;
 }
 
-sub _UnTieNodes {
-    my ( $self ) = @_;
-    return if not @TIED_NODES;
+sub _BuildWatcherMethods {
+    my ( $class ) = @_;
+    my %args;
 
-    for my $node ( @TIED_NODES ) {
-        $node->Unwatch();
+    for my $name ( $class->_DefineMethodNames() ) {
+        my $method = ucfirst $name;
+        $args{"-$name"} = sub {
+            my ( $_self, @_args ) = @_;
+            my $_args =
+              join ", ",
+              map { defined() ? qq("$_") : "undef" } @_args;
+            __PACKAGE__->_Trace( "\U$name\E( $_args ):" );
+            $_self->$method( @_args );
+        };
     }
 
-    splice @TIED_NODES;
+    %args;
 }
 
-sub _DefineWatchArgs {
-    my @methods = qw(
+sub _DefineMethodNames {
+    qw(
       store
       clear
       delete
@@ -118,28 +115,18 @@ sub _DefineWatchArgs {
       splice
       unshift
     );
-
-    my %args;
-
-    for my $name ( @methods ) {
-        $args{"-$name"} = sub {
-            my ( $_self, @_args ) = @_;
-            my $method = ucfirst $name;
-            __PACKAGE__->_Trace( "\U$name\Eing here" );
-            $_self->$method( @_args );
-        };
-    }
-
-    %args;
 }
 
 sub _Trace {
     my ( $class, $message ) = @_;
     $message //= '';
 
-    $Carp::MaxArgNums = -1;
+    local $Carp::MaxArgNums = -1;
 
-    say for "$message:", map { "\t$_" }
+    say "";
+    say $message;
+
+    say for map { "\t$_" }
       grep {
         !m{
                 ^ \s* (?:
@@ -164,7 +151,7 @@ sub _Trace {
 
             }x
       }
-      map { s/^\s+//r }
+      map { s/ ^ \s+ //xr }
       split /\n/,
       Carp::longmess( $class );
 }
@@ -190,16 +177,14 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Data::Trace
 
-
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by Tim Potapov.
+This software is Copyright (c) 2024 by Tim Potapov.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
 
-
 =cut
 
-1;    # End of Data::Trace
+1;

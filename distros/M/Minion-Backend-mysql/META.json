@@ -56,7 +56,7 @@
    "provides" : {
       "Minion::Backend::mysql" : {
          "file" : "lib/Minion/Backend/mysql.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#mojo"
    },
-   "version" : "1.004",
+   "version" : "1.005",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "a-leelan <40534142+a-leelan@users.noreply.github.com>",
@@ -84,6 +84,7 @@
       "Larry Leszczynski <larryl@emailplus.org>",
       "Olaf Alders <olaf@wundersolutions.com>",
       "Paul Cochrane <paul@liekut.de>",
+      "Peter Joh <peter.joh@grantstreet.com>",
       "Sergey Andreev <40195653+saintserge@users.noreply.github.com>",
       "Zoffix Znet <cpan@zoffix.com>"
    ],

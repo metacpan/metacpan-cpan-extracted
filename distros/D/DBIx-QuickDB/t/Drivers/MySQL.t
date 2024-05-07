@@ -1,5 +1,4 @@
 use Test2::V0 -target => DBIx::QuickDB::Driver::MySQL;
-use Test2::Require::Module 'DBD::mysql';
 use Test2::Tools::QuickDB;
 
 my @ENV_VARS;
@@ -23,16 +22,9 @@ BEGIN {
 
 skipall_unless_can_db('MySQL');
 
-{
-    local $@;
-    eval { require DBD::MariaDB };
-    no warnings qw/once redefine/;
-    *DBD::MariaDB::dr::connect = sub { die "Should not be using me!" };
-}
-
 subtest use_it => sub {
-    my $db = get_db db => {driver => 'MySQL', dbd_driver => 'DBD::mysql', load_sql => [quickdb => 't/schema/mysql.sql']};
-    isa_ok($db, [$CLASS], "Got a database of the right type");
+    my $db = get_db db => {driver => 'MySQL', load_sql => [quickdb => 't/schema/mysql.sql']};
+    isa_ok($db, ['DBIx::QuickDB::Driver::MySQL::Base'], "Got a database of the right type");
 
     is(get_db_or_skipall('db'), exact_ref($db), "Cached the instance by name");
 
@@ -79,7 +71,7 @@ subtest use_it => sub {
 };
 
 subtest cleanup => sub {
-    my $db = get_db {driver => 'MySQL', dbd_driver => 'DBD::mysql', load_sql => [quickdb => 't/schema/mysql.sql']};
+    my $db = get_db {driver => 'MySQL', load_sql => [quickdb => 't/schema/mysql.sql']};
     my $dir = $db->dir;
     my $pid = $db->watcher->server_pid;
 
@@ -104,13 +96,19 @@ subtest cleanup => sub {
 };
 
 subtest viable => sub {
-    my ($v, $why) = $CLASS->viable({mysqld => 'a fake path', bootstrap => 1});
+    no warnings 'redefine';
+    *DBIx::QuickDB::Driver::MariaDB::server_bin = sub() { undef };
+    *DBIx::QuickDB::Driver::MariaDB::client_bin = sub() { undef };
+    *DBIx::QuickDB::Driver::Percona::server_bin = sub() { undef };
+    *DBIx::QuickDB::Driver::Percona::client_bin = sub() { undef };
+
+    my ($v, $why) = $CLASS->viable({bootstrap => 1});
     ok(!$v, "Not viable without a valid mysqld");
 
-    ($v, $why) = $CLASS->viable({mysqld => 'a fake path', autostart => 1});
+    ($v, $why) = $CLASS->viable({autostart => 1});
     ok(!$v, "Not viable without a valid mysqld");
 
-    ($v, $why) = $CLASS->viable({mysql => 'a fake path', load_sql => 1});
+    ($v, $why) = $CLASS->viable({load_sql => 1});
     ok(!$v, "Not viable without a valid mysql");
 };
 

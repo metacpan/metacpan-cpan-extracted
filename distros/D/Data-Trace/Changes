@@ -1,5 +1,8 @@
 Revision history for Data-Trace
 
+0.16    2024-05-07 - Added tests for Data::Tie::Watch
+                     Added -clone => 0 option.
+                     Resolved segmentation fault issue.
 0.15    2024-05-03 - More trace filtering.
 0.14    2024-05-03 - Using carp filtering.
 0.13    2024-04-29 - Fixes in upload.

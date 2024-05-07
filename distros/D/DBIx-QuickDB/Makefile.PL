@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.012000",
   "NAME" => "DBIx::QuickDB",
   "PREREQ_PM" => {
+    "Capture::Tiny" => "0.20",
     "Carp" => 0,
     "Digest::SHA" => 0,
     "Fcntl" => 0,
@@ -35,12 +36,9 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => 0,
     "parent" => 0
   },
-  "TEST_REQUIRES" => {
-    "Capture::Tiny" => "0.20"
-  },
-  "VERSION" => "0.000029",
+  "VERSION" => "0.000031",
   "test" => {
-    "TESTS" => "t/*.t t/Drivers/*.t t/Pool/*.t t/Tools/*.t"
+    "TESTS" => "t/*.t t/Drivers/*.t t/Pool/*.t t/QuickDB/*.t t/Tools/*.t"
   }
 );
 

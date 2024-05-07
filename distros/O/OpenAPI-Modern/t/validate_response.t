@@ -41,16 +41,17 @@ paths:
           description: foo
 YAML
 
+  test_needs 'HTTP::Request', 'HTTP::Response';
   cmp_deeply(
     (my $result = $openapi->validate_response(HTTP::Response->new(404),
-      { request => my $request = HTTP::Request->new(GET => 'http://example.com/', [ Host => 'example.com' ]) }))->TO_JSON,
+      { request => HTTP::Request->new(GET => 'http://example.com/', [ Host => 'example.com' ]) }))->TO_JSON,
     {
       valid => false,
       errors => [
         {
           instanceLocation => '/request',
           keywordLocation => '',
-          absoluteKeywordLocation => $doc_uri->clone->scheme('http')->to_string,
+          absoluteKeywordLocation => $doc_uri->clone->to_string,
           error => 'Bad request start-line',
         },
       ],
@@ -332,6 +333,51 @@ paths:
       responses:
         default:
           description: foo
+          headers:
+            MultipleValuesAsArray:
+              schema:
+                type: array
+                uniqueItems: true
+                minItems: 3
+                maxItems: 3
+                items:
+                  enum: [one, two, three]
+          content:
+            '*/*':
+              schema: {}
+YAML
+
+  my $response = response(404, [
+    MultipleValuesAsArray => '  one',
+    MultipleValuesAsArray => ' one ',
+    MultipleValuesAsArray => ' three ',
+  ]);
+  cmp_deeply(
+    ($result = $openapi->validate_response($response, { path_template => '/foo', path_captures => {}, method => 'get' }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response/header/MultipleValuesAsArray',
+          keywordLocation => jsonp('/paths', '/foo', qw(get responses default headers MultipleValuesAsArray schema uniqueItems)),
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp('/paths', '/foo', qw(get responses default headers MultipleValuesAsArray schema uniqueItems)))->to_string,
+          error => 'items at indices 0 and 1 are not unique',
+        },
+      ],
+    },
+    'headers that appear more than once are parsed into an array',
+  );
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => '/api',
+    openapi_schema => $yamlpp->load_string(<<YAML));
+$openapi_preamble
+paths:
+  /foo:
+    get:
+      responses:
+        default:
+          description: foo
 YAML
 
   cmp_deeply(
@@ -399,7 +445,7 @@ YAML
     'missing Content-Type does not cause an exception',
   );
 
-  my $response = response(200, [ 'Content-Type' => 'application/json' ], 'null');
+  $response = response(200, [ 'Content-Type' => 'application/json' ], 'null');
   remove_header($response, 'Content-Length');
 
   cmp_deeply(
@@ -586,7 +632,7 @@ YAML
     ($result = do {
       my $x = allow_patterns(qr/^parse error when converting HTTP::Response/) if $::TYPE eq 'lwp';
       $openapi->validate_response(
-        response(400, [ 'Content-Length' => 1, 'Content-Type' => 'text/plain' ], ''), # Content-Length lies!
+        response(400, [ 'Content-Length' => 12, 'Content-Type' => 'text/plain' ], ''), # Content-Length lies!
           { path_template => '/foo', method => 'post' });
     })->TO_JSON,
     {
@@ -603,9 +649,26 @@ YAML
     'missing body (with a lying Content-Length) does not cause an exception, but is detectable',
   );
 
+  cmp_deeply(
+    ($result = $openapi->validate_response(
+      response(400, [ 'Content-Type' => 'text/plain' ], '0'), { path_template => '/foo', method => 'post' }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response/body',
+          keywordLocation => jsonp(qw(/paths /foo post responses default content text/plain schema minLength)),
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post responses default content text/plain schema minLength)))->to_string,
+          error => 'length is less than 10',
+        },
+      ],
+    },
+    '"false" body is still seen',
+  );
+
+
   $response = response(400, [ 'Content-Type' => 'text/plain' ], 'éclair');
   remove_header($response, 'Content-Length');
-
 
   cmp_deeply(
     ($result = do {

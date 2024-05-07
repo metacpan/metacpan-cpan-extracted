@@ -1,5 +1,8 @@
 Revision history for Business-Monzo
 
+0.13     2024-05-05
+        - Support changes in Mojo::UserAgent
+
 0.12     2018-03-01
         - Documentation for pagination support plus example script (GH #1)
         - Added support for pots (GH #9, many thanks to devi4nt)

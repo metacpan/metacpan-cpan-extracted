@@ -1086,11 +1086,17 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     $rop = exp($op2 * log($op1)) rounded to the direction $rnd
     with the precision of $rop.
 
+   $inex = Rmpfr_compound ($rop, $op1, $op2, $rnd); # New in 4.3.0
+   $inex = Rmpfr_compound_si($rop, $op1, $si, $rnd); # New in 4.2.0
+    $rop = ($op1 + 1) ** 3rd_arg, rounded according to $rnd, to the
+    precision of $rop. However, there are special cases:
+     $rop is set to NaN when $op1 < -1;
+     $rop is set to 1 when $op1 is NaN and $op2 is 0;
+     $rop is set to +Inf when $op1 is -1 and $op2 < 0;
+     $rop is set to +0   when $op1 is -1 and $op2 > 0.
+     The other special cases follow the 'Rmpfr_pow' rules on
+     (1 + OP1, OP2).
 
-   $inex = Rmpfr_compound_si($rop, $op, $si, $rnd);
-    $rop = ($op + 1) ** $si, rounded according to $rnd, to the
-    precision of $rop.
-    When $si is 0 and $op is NaN or is >= -1, $rop is set to 1.
 
    $inex = Rmpfr_neg($rop, $op, $rnd);
     Set $rop to -$op rounded in the direction $rnd. Just
@@ -2462,7 +2468,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
           decimal string)
 
      << >> <<= >>= (These just increase/decrease the exponent by the
-                    value of the given "shift" argument)
+                    value of the given "shift" argument. Negative
+                    values for the 'shift' argument are allowed - in
+                    which case the shift value is multiplied by -1
+                    and the direction of the shift is reversed.)
 
      = (The copy has the same precision as the copied object.)
 

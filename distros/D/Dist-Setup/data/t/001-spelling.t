@@ -42,6 +42,7 @@ my @base_cmd = (
 # all cases, it would not handle POD content). so we are passing manually the
 # options to the "context" filters underlying the perl mode.
 my %lang_filter = (
+  html => ['--mode=sgml'],
   markdown => ['--mode=markdown'],
   perl => [
     '--mode=none', '--add-filter=url',
@@ -74,7 +75,8 @@ sub interactive_check {
 
 sub wanted {
   # We should do something more generic to not recurse in Git sub-modules.
-  $File::Find::prune = 1 if -d && m/^ (?: blib | third_party | \..+ ) $/x;
+  $File::Find::prune = 1
+      if -d && m/^ (?: blib | third_party | pod2html | build | cover_db | nytprof | \..+ ) $/x;
   return unless -f;
 
   my $type;
@@ -82,6 +84,8 @@ sub wanted {
     $type = 'perl';
   } elsif (m/\.md$/) {
     $type = 'markdown';
+  } elsif (m/\.html$/) {
+    $type = 'html';
   } else {
     return;
   }

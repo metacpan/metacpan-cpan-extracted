@@ -37,7 +37,9 @@ is( $p->parse( ' "\u{1d10e}" ' ),    "\x{1d10e}", "\\u{1d10e}" );
 
 # Boundaries.
 is( $p->parse( q{\u002} ),         "u002",      "\\u002" );
+diag($p->err_msg) if $p->is_error;
 is( $p->parse( q{"\u002"} ),         "u002",      "\\u002" );
+diag($p->err_msg) if $p->is_error;
 is( $p->parse( q{"\u002f"} ),       "/",         "\\u002f" );
 is( $p->parse( q{"\uD834"} ),       "\x{D834}",  "\\uD834" );
 is( $p->parse( q{"\uD834\uDD0E"} ), "\x{1d10e}", "\\uD834\\uDD0E" );

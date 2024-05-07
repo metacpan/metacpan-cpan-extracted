@@ -103,15 +103,21 @@
             "utf8" : "0"
          },
          "suggests" : {
+            "Catalyst::Request" : "0",
+            "Catalyst::Response" : "0",
             "Class::XSAccessor" : "0",
             "Cpanel::JSON::XS" : "0",
             "HTTP::Headers::Fast" : "0.21",
             "HTTP::Headers::Fast::XS" : "0",
             "HTTP::Message::PSGI" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
+            "HTTP::Status" : "0",
             "Plack::Request" : "0",
             "Plack::Response" : "0",
             "Ref::Util::XS" : "0",
-            "Type::Tiny::XS" : "0"
+            "Type::Tiny::XS" : "0",
+            "URI" : "0"
          }
       },
       "test" : {
@@ -120,9 +126,6 @@
          },
          "requires" : {
             "File::Spec" : "0",
-            "HTTP::Request" : "0",
-            "HTTP::Response" : "0",
-            "HTTP::Status" : "0",
             "JSON::Schema::Modern" : "0.578",
             "Module::Metadata" : "0",
             "Mojolicious" : "0",
@@ -136,7 +139,6 @@
             "Test::More" : "0.96",
             "Test::Needs" : "0",
             "Test::Warnings" : "0.033",
-            "URI" : "0",
             "YAML::PP" : "0.005",
             "lib" : "0",
             "open" : "0",
@@ -226,15 +228,15 @@
    "provides" : {
       "JSON::Schema::Modern::Document::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Document/OpenAPI.pm",
-         "version" : "0.063"
+         "version" : "0.064"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm",
-         "version" : "0.063"
+         "version" : "0.064"
       },
       "OpenAPI::Modern" : {
          "file" : "lib/OpenAPI/Modern.pm",
-         "version" : "0.063"
+         "version" : "0.064"
       }
    },
    "release_status" : "stable",
@@ -249,10 +251,10 @@
          "web" : "https://github.com/karenetheridge/OpenAPI-Modern"
       }
    },
-   "version" : "0.063",
+   "version" : "0.064",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.039009"
+         "version" : "5.039010"
       },
       "plugins" : [
          {
@@ -907,7 +909,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20240320"
+                  "Module::CoreList" : "5.20240420"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1125,7 +1127,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.063",
+                  "tag" : "v0.064",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1377,7 +1379,7 @@
       }
    },
    "x_authority" : "cpan:ETHER",
-   "x_generated_by_perl" : "v5.39.9",
+   "x_generated_by_perl" : "v5.39.10",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1,

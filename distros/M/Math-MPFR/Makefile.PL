@@ -210,7 +210,7 @@ unless($skip_msvc) {
     }
 
     # If have_f128.exe does not exist, we assume that the __float128
-    # type is unavailable, and that __float128  supportis therefore
+    # type is unavailable, and that __float128  support is therefore
     # impossible. The messages written to 'save_config.txt' should
     # confirm the correctness of this assessment.
 
@@ -412,6 +412,15 @@ for(@ARGV) {
 #       It is, however, currently needed on at
 #       least some quadmath Cygwin builds.
 #             Jan 8 2018.
+#       If the quadmath library cannot be found
+#       then EU::MM should remove that link -
+#       so no big deal ... right ?
+#       But then there's (eg):
+#       https://www.cpantesters.org/report/7bc0f088-0b21-11ef-a9cc-b541ccdb2386
+#       where the link cannot be resolved, yet
+#       it does NOT get removed. WTF ??
+#       Apparently EU::MM can locate the library
+#       but the build process cannot.
 
 my %options = (
   NAME         => 'Math::MPFR',

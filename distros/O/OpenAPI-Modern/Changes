@@ -1,5 +1,13 @@
 Revision history for OpenAPI-Modern
 
+0.064     2024-05-07 00:14:00Z
+          - fix: requests with an empty URI path (e.g. "https://example.com?foo=1")
+            now match path "/".
+          - fix: preserve all headers of the same name when validating a
+            Plack::Response object
+          - support added for validation of Catalyst::Request and
+            Catalyst::Response objects
+
 0.063     2024-04-27 22:26:47Z
           - the url scheme of absoluteKeywordLocations in errors is now taken
             from the incoming request, rather than always being "https"

@@ -14,7 +14,7 @@ BEGIN {
 		monkey_patch => sub {
 			my ($caller, $meta, $build) = @_;
 			for my $key (keys %{$meta}) {
-				$caller->can($key) || $PRO{keyword}($caller, $key, $PRO{monkey_patch_sub}($key));
+				$caller->CORE::can($key) || $PRO{keyword}($caller, $key, $PRO{monkey_patch_sub}($key));
 				if ($build) {
 					for (qw/predicate clearer/) {
 						if ($meta->{$key}->{$_}) {
@@ -69,7 +69,7 @@ Rope::Monkey - Rope Monkey Patching
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 

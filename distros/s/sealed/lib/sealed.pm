@@ -20,7 +20,7 @@ our $VERSION;
 our $DEBUG;
 
 BEGIN {
-  our $VERSION = qv(7.0.2);
+  our $VERSION = qv(7.0.5);
   XSLoader::load("sealed", $VERSION);
 }
 
@@ -206,7 +206,6 @@ For example, any "branching" done in the target method's argument
 stack, eg by using the '?:' ternary operator, will break this logic
 (pushmark ops are processed linearly, by $op->next walking, in tweak()).
 
-Also, :Sealed subs currently aren't reentrant without a custom patch to Perl's pad.c, so don't do that.
 
 =head2 Compiling perl v5.30+ for functional mod_perl2 w/ithreads and httpd 2.4.x w/event mpm
 

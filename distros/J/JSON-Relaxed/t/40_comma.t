@@ -1,9 +1,10 @@
 #! perl
 
 use v5.26;
+use strict;
 
-use Test::More tests => 4;
-use JSON::Relaxed 0.063;
+use Test::More tests => 5;
+use JSON::Relaxed::Parser;
 note("JSON::Relaxed version $JSON::Relaxed::VERSION\n");
 
 # Spec say: Commas are optional between objects pairs and array items.
@@ -40,8 +41,13 @@ my $json = <<'EOD';
  tasks: [ {name:exercise completed:false} {name:eat completed:true} ]
 }
 EOD
-$p = JSON::Relaxed::Parser->new;
+$p = JSON::Relaxed::Parser->new( strict => 1 );
 $p->croak_on_error = 0;
 $res = $p->parse($json);
 ok( !defined($res), "no leading comma" );
 like($p->err_msg, qr/unexpected token in array/, "leading comma error" );
+
+$p->strict = 0;
+$res = $p->parse($json);
+is_deeply( $res, $xp, "leading comma (no strict)" );
+diag($p->err_msg) if $p->is_error;

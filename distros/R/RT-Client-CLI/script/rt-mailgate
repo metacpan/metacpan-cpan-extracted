@@ -3,7 +3,7 @@
 #
 # COPYRIGHT:
 #
-# This software is Copyright (c) 1996-2023 Best Practical Solutions, LLC
+# This software is Copyright (c) 1996-2024 Best Practical Solutions, LLC
 #                                          <sales@bestpractical.com>
 #
 # (Except where explicitly superseded by other copyright notices)
@@ -151,7 +151,7 @@ sub get_useragent {
     my $self = shift;
     my $opts = shift;
     my $ua   = LWP::UserAgent->new();
-    $ua->agent("rt-mailgate/5.0.5 ");
+    $ua->agent("rt-mailgate/5.0.6 ");
     $ua->cookie_jar( { file => $opts->{'jar'} } ) if $opts->{'jar'};
 
     $ua->ssl_opts( verify_hostname => $opts->{'verify-ssl'}, SSL_verify_mode => $opts->{'verify-ssl'} );
@@ -328,7 +328,7 @@ Usual invocation (from MTA):
 
 =item C<--action>
 
-Specifies what happens to email sent to this alias.  The avaliable basic
+Specifies what happens to email sent to this alias.  The available basic
 actions are: C<correspond>, C<comment>.  Additional actions, such as
 C<take> or C<resolve>, may be available depending on your local
 C<@MailPlugins> configuration.
@@ -372,7 +372,7 @@ This flag tells the mail gateway to trust all SSL certificates,
 regardless of if their hostname matches the certificate, and regardless
 of CA.  This is required if you have a self-signed certificate, or some
 other certificate which is not traceable back to an certificate your
-system ultimitely trusts.
+system ultimately trusts.
 
 =item C<--extension> OPTIONAL
 

@@ -8,7 +8,7 @@ Data::Trace - Trace when a data structure gets updated.
 
     my $data = {a => [0, {complex => 1}]};
     sub BadCall{ $data->{a}[0] = 1 }
-    Data::Trace->Trace($data);
+    Trace($data);
     BadCall();  # Shows strack trace of where data was changed.
 
 # DESCRIPTION
@@ -26,10 +26,10 @@ its been changed, but this module is without Moose support.
 
 ## Trace
 
-    Data::Trace->Trace( \$scalar );
-    Data::Trace->Trace( \@array );
-    Data::Trace->Trace( \@hash );
-    Data::Trace->Trace( $complex_data );
+    Trace( \$scalar );
+    Trace( \@array );
+    Trace( \@hash );
+    Trace( $complex_data );
 
 # AUTHOR
 
@@ -54,7 +54,7 @@ You can find documentation for this module with the perldoc command.
 
 # LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by Tim Potapov.
+This software is Copyright (c) 2024 by Tim Potapov.
 
 This is free software, licensed under:
 

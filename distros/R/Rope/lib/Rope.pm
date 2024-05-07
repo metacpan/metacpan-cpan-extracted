@@ -1,7 +1,7 @@
 package Rope;
 
 use 5.006; use strict; use warnings;
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 use Rope::Object;
 my (%META, %PRO);
 our @ISA;
@@ -28,8 +28,8 @@ BEGIN {
 						if ( !$ref ) {
 							$props{properties}->{$pred =~ m/^\d+$/ ? "$prep$prop" : $pred} = {
 								value => $_ eq 'predicate' 
-									? sub { return defined $META{initialised}{$caller}{${$self}->{identifier}}->{$prop} ? 1 : 0 }
-									: sub { $META{initialised}{$caller}{${$self}->{identifier}}->{$prop} = undef }
+									? sub { return defined $META{initialised}{$caller}{${$self}->{identifier}}->{$prop} ? 1 : '' }
+									: sub { $META{initialised}{$caller}{${$self}->{identifier}}->{$prop} = undef; 1; }
 							};
 						} elsif ($ref eq 'CODE') {
 							$props{properties}->{"$prep$prop"} = {
@@ -228,11 +228,21 @@ BEGIN {
 					$merge->{name} = $initial->{name};
 					$merge->{locked} = $initial->{locked};
 					for my $prop (keys %{$initial->{properties}}) {
-						$initial->{properties}->{$prop}->{index} = ++$merge->{keys};
+						$merge->{properties}->{$prop}->{index} = ++$merge->{keys};
+						my $modifier;
 						for (qw/before around after/) {
-							unshift @{$merge->{properties}->{$prop}->{$_}}, @{$initial->{properties}->{$prop}->{$_}} if $initial->{properties}->{$prop}->{$_};
+							if ($initial->{properties}->{$prop}->{$_}) {
+								$modifier = 1;
+								unshift @{$merge->{properties}->{$prop}->{$_}}, @{$initial->{properties}->{$prop}->{$_}} 
+							}
 						}
-						if ($merge->{properties}->{$prop}) {
+						next if $modifier;
+						next if grep { $META{$with}->{properties}->{$prop}->{$_} } qw/before around after/;
+						use Data::Dumper;
+						warn Dumper $modifier;
+						warn Dumper $merge->{properties}->{$prop};
+						warn Dumper $prop;
+						if (scalar keys %{$merge->{properties}->{$prop}} > 1) {
 							if ($merge->{properties}->{writeable}) {
 								$merge->{properties}->{$prop} = $initial->{properties}->{$prop};
 							} elsif ($merge->{properties}->{configurable}) {
@@ -355,7 +365,7 @@ BEGIN {
 		new => sub {
 			my ($caller) = shift;
 			return sub {
-				my ($class, %params) = @_;
+				my ($class, %params) = (shift, scalar @_ == 1 ? %{$_[0]} : @_);
 				my $self = \{
 					prototype => {},
 					identifier => $META{initialised}{$caller}{identifier}++
@@ -380,7 +390,6 @@ BEGIN {
 						};
 					}
 				}
-
 				for ( sort { $build->{properties}->{$a}->{index} <=> $build->{properties}->{$b}->{index} } keys %{ $build->{properties} } ) {
 					if ( !defined $build->{properties}->{$_}->{value} && defined $build->{properties}->{$_}->{builder}) {
 						my $builder = $build->{properties}->{$_}->{builder};
@@ -409,8 +418,8 @@ sub import {
 			keys => 0
 		};
 	}
-
-	$PRO{keyword}($caller, '(bool', sub { scalar keys %{${$_[0]}->{prototype}}; });
+	$PRO{keyword}($caller, 'can', sub { ref $_[0] and ($_[0]->{$_[1]} || $META{$caller}->{properties}->{$_[1]}) || $_[0]->CORE::can($_[1]) });
+	$PRO{keyword}($caller, '(bool', sub { 1; });
 	$PRO{keyword}($caller, '((', sub { });
 	$PRO{keyword}($caller, '(%{}', sub {
 		${$_[0]}->{prototype};
@@ -545,7 +554,7 @@ Rope - Tied objects
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 
