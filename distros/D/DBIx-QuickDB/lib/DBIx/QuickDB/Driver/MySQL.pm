@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000031';
+our $VERSION = '0.000032';
 
 use Carp qw/confess croak/;
 use Scalar::Util qw/reftype blessed/;
@@ -95,6 +95,10 @@ DBIx::QuickDB::Driver::MySQL - MySQL driver for DBIx::QuickDB.
 
 MySQL driver for L<DBIx::QuickDB>.
 
+This will automatically pick L<DBIx::QuickDB::Driver::MariaDB> or
+L<DBIx::QuickDB::Driver::Percona> depending on which provider your MySQL was
+built by.
+
 =head1 SYNOPSIS
 
 See L<DBIx::QuickDB>.
@@ -108,9 +112,7 @@ See L<DBIx::QuickDB>.
 Should be either L<DBD::mysql> or L<DBD::MariaDB>. If not specified then
 DBD::MariaDB is preferred with a fallback to DBD::MySQL.
 
-=item mysqld_provider => $PROVIDER
-
-Should be either 'mariadb' or 'percona'. Will auto-detect when possible.
+=back
 
 =head1 ENVIRONMENT VARIABLES
 

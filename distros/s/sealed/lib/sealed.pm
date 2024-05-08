@@ -20,7 +20,7 @@ our $VERSION;
 our $DEBUG;
 
 BEGIN {
-  our $VERSION = qv(7.0.5);
+  our $VERSION = qv(7.0.6);
   XSLoader::load("sealed", $VERSION);
 }
 
@@ -73,7 +73,7 @@ sub tweak ($\@\@\@$$\%) {
         warn __PACKAGE__, ": compiling $class->$method_name lookup.\n"
           if $DEBUG;
         my $method               = $class->can($method_name)
-          or die __PACKAGE__ . ": invalid lookup: $class->$method_name - did you forget to 'use $class' first?";
+          or die __PACKAGE__ . ": invalid lookup: $class->$method_name - did you forget to 'use $class' first?\n";
         # replace $methop
         $gv                      = new($gv_op->name, $gv_op->flags, ref($gv_op) eq "B::PADOP" ? *tweak : $method, $cv_obj->PADLIST);
         $gv->next($methop->next);
@@ -131,6 +131,7 @@ sub MODIFY_CODE_ATTRIBUTES {
       $op->dump if defined $DEBUG and $DEBUG eq 'dump';
 
       if ($op->name eq "pushmark") {
+        no warnings 'uninitialized';
 	$tweaked                += eval {tweak $op, @lexical_varnames, @pads, @op_stack, $cv_obj, $pad_names, %processed_op};
         warn __PACKAGE__ . ": tweak() aborted: $@" if $@;
       }

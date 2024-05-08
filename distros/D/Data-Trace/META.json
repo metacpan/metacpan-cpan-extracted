@@ -38,7 +38,7 @@
       },
       "Data::Trace" : {
          "file" : "lib/Data/Trace.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "url" : "https://github.com/poti1/data-trace"
       }
    },
-   "version" : "0.16",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

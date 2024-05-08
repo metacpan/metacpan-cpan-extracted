@@ -1,103 +1,56 @@
-liblinux-info-perl (1.5) trusty; urgency=low
-  * Bug fixes for custom Linux kernels in openvz
-  simfs from openvz containers was added as a valid file system. Fixed
-    how meminfo information was being tested: instead of checking what
-    memory information the kernel should return, validating if the data
-    was correctly parsed, since we have no control of what is available
-    by the kernel. Refactored the tests to include more information.
-    Properly testing the interface of Linux::Info::MemStats. Added the
-    method get_more() to Linux::Info::MemStats to parse everything from
-    /proc/meminfo instead of what it considers as valid. 
-  * Fixed disk usage test
-  The default class was missing the XFS filesystem as a valid type.
-    Refactored the test a bit to be more clear on the result when
-    things fails. 
-  * Small updates for release 
-  * Merge pull request #3 from iamb/couple-bugfixes
-  Couple bugfixes 
-  * Linux::Info::DiskUsage: localize $_
-  using readline as was previously done uses the global $_ which can
-    cause problems for programs using this module. 
-  * Linux::Info::DiskUsage: fix info without indoes
-  fixes a bug where all usage info was only added of 'has_inodes' was
-    true. 
-  * Fixes on documentation and release management
-  Added documentation. Lowered requirements on standard modules to be
-    able to support perl 5.8.9 Fixed
-    https://github.com/glasswalk3r/Linux-Info/issues/2 on Pod Improved
-    messages during unit testing 
-  * Fixed introduced bug while maintaining dist.ini (again) 
-  * Fixed introduced bug while maintaining dist.ini 
-  * Added full control of Dist::Zilla configuration
-  Removed using @Basic to explicit declare the plugins required. That
-    was required to avoid complaints from GatherDir when trying to
-    maintain a cpanfile copy from the build process in the repository.
-    Also, a good opportunity do disable plugins that were not required
-    at all. 
-  * Revert "removed for testing"
-  This reverts commit 070810937f527ad12bb688d7de3635c9cabd612d. 
-  * removed for testing 
-  * Enhanced Pod and error messages
-  Due a new issue opened (#2) on Github, included more details on
-    Linux::Info Pod and more descriptive error messages Included basic
-    testing for Linux::Info::Compilation and Linux::Info that were
-    missing too 
-  * Test improvement due reported error
-  Due the following report at
-    http://www.cpantesters.org/cpan/report/9bf4f64a-e358-11e6-8701-efd0
-    9b0a6f8c, some modification were added in order to make the test
-    more robusts and recover more information about the system were it
-    failed. 
-  * Incremented version to a correct number (previous 0.9, 1.0 is the
-    next one expected by CPAN) 
-  * Improving Kwalitee 
-  * Added Perl::Critic validations Fixed some errors Replaced
-    Dist::Zilla::Plugin::PkgVersion by
-    Dist::Zilla::Plugin::OurPkgVersion 
-  * Improving Kwalitee by creating a list of provided modules defined
-    in META.yml. 
-  * Small fixes for Ubuntu DEB package 
-  * Big changes Replaced YAML::Syck with YAML::LibYAML since the former
-    is not being maintained anymore and it's not available on Ubuntu
-    LTS 14.04 Replaced usage of df program in Linux::Info::DiskUsage
-    with Filesys::Df Updated and added more tests to
-    Linux::Info::DiskUsage Linux::Info::DiskUsage now provides inode
-    information as well (optional) 
-  * Trying to fix issues with Debian package control files 
-  * Using automatic Changelog creation based on Debian standards 
-  * Added one more author dependency 
-  * manually added dependencies there is no examples in the t directory
-    (only sample data) 
-  * Renamed the examples subdirectory under t directory to avoid
-    warnings from debuild Updated the debian/changelog manually 
-  * Added necessary files to build DEB packages of distribution for
-    Ubuntu LTS Added MANIFEST.SKIP to not include those files in to the
-    CPAN tarball Upgrade de version for next release 
-  * Downgraded minimum version requires to match Ubuntu Trusty
-    available packages versions 
-  * Added more information to dist.ini 
-  * Added Dist::Zilla goodies 
-  * Merge pull request #1 from chorny/master
-  Display repository URL on MetaCPAN 
-  * repository for META.* 
-  * Moved to Dist::Zilla Updates to enable usage of Dist::Zilla for
-    automation Included control of minimum Perl version 
-  * Merge branch 'master' of github.com:glasswalk3r/Linux-Info 
-  * Changes due differences on /proc/cpuinfo for ARM processors Added a
-    new attribute called "model" and respective getter Modified the
-    tests for two attributes that were generating errors for ARM
-    processors. Now those two are conditionally tested. 
-  * Improving Kwalitee 
-  * Improvements for Sysinfo Added additional debugging for testing
-    regarding reading the flags field of /proc/cpuinfo Added the
-    attribute multithread to the SysInfo class Using Hash::Util to
-    control de attributes that are part of the class 
-  * Incremented version for new CPAN release 
-  * Improved style for GNU GPL 
-  * Improved style Include also some useful links 
-  * Initial README.md 
-  * Initial release 
-  * Initial commit 
+liblinux-info-perl () trusty; urgency=low
+  * fix: typo (#9) 
+  * Bugfix/diskstatus format (#8)
+  * feat: GitHub Actions config
+  * doc: tests status badge
+  * chore: updating contact email
+  * chore: add docs about format
+  * chore: Perltidy error files
+  * feat: getter for total fields read
+  * refactor: extended unit tests
+  * feat: fields validation
+  * feat: fetches mainline kernel version
+  This should be available on Ubuntu like distros.
+  * feat: kernel release module
+  * fix: cannot use Dist::Zilla
+  * fix: YAML syntax
+  * fix: missing requirements
+  * fix: missing requirements
+  * fix: parsing newer format of diskstats
+  * feat: incomplete testing of new fields
+  * fix: added missing Pod
+  Also toke the change to review the Pod structure to leave
+    documentation right before the methods code.
+  * chore: bumped version requirements
+  * chore: required
+  * chore: upgrading dependencies
+  * doc: added Pod
+  * doc: required Pod
+  * feat: sample output
+  * fix: forcing version
+  * fix: forcing sudo
+  * fix: forcing sudo
+  * chore: requirement upgrade
+  * refactor: best practices
+  * refactor: only what is required
+  * feat: SSD statistics parsing
+  * refactor: better names
+  * refactor: define parsing method during new()
+  * feat: class to manage diskstats options
+  * feat: finished Options
+  * fix: missing optional config
+  * chore: updated due Options
+  * fix: missing block sizes values
+  * chore: replaced hash with Options
+  * chore: cleanup
+  * feat: _parse_disk_stats method
+  Also refactored shifting fields for code reuse.
+  * refactor: _shift_fields can be a sub
+  * refactor: _backwards_fields to reduce code
+  * feat: _parse_partitions method
+  * feat: tests for non-legacy fields
+  * refactor: cleanup
+  * chore: preparing release 
 
- -- Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>  Sat,  2 Mar 2019 14:03:15 +0000
+ -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Tue,  7 May 2024 19:08:44 +0000
 

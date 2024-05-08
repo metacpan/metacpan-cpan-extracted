@@ -20,7 +20,7 @@ use parent  qw( Exporter );
 use feature qw( say );
 
 our @EXPORT  = qw( Trace );
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 =head1 SYNOPSIS
 
@@ -173,9 +173,16 @@ Consider adding an option to have a warn message anytime a structure is FETCHed.
 
 =head1 SUPPORT
 
-You can find documentation for this module with the perldoc command.
+You can find documentation for this module
+with the perldoc command.
 
     perldoc Data::Trace
+
+You can also look for information at:
+
+L<https://metacpan.org/pod/Data::Trace>
+
+L<https://github.com/poti1/data-trace>
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -187,4 +194,4 @@ This is free software, licensed under:
 
 =cut
 
-1;
+"\x{1f42a}\x{1f977}"

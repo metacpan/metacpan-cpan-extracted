@@ -26,13 +26,13 @@ use Term::ReadLine;
 use Term::ANSIColor qw( colored );
 use PadWalker       qw( peek_our  peek_my );
 use Scalar::Util    qw( blessed reftype );
-use Class::Tiny     qw( term attr debug );
-use re              qw( eval );                # For debug.
+use Class::Tiny     qw( term attr debug levels_up );
+use re              qw( eval );                        # For debug.
 use feature         qw( say );
 use parent          qw( Exporter );
 use subs            qw( uniq );
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 our @EXPORT  = qw( run repl d np p );
 our %PEEKS;
 
@@ -59,9 +59,14 @@ Same, but with some variables to play with:
 
     perl -MRuntime::Debugger -E 'my $str1 = "Func"; our $str2 = "Func2"; my @arr1 = "arr-1"; our @arr2 = "arr-2"; my %hash1 = qw(hash 1); our %hash2 = qw(hash 2); my $coderef = sub { "code-ref: @_" }; {package My; sub Func{"My-Func"} sub Func2{"My-Func2"}} my $obj = bless {}, "My"; repl; say $@'
 
-Test command:
+From another script/function:
 
-    RUNTIME_DEBUGGER_DEBUG=2 perl -Ilib/ -MRuntime::Debugger -E 'my @a = 1..2; my %h = qw( a 11 b 22 ); my $v = 222; my $o = bless {a => 11}, "A"; my $ar = \@a; my $hr = \%h; use warnings FATAL => "all"; eval{ say qr<$hr-\>{b}> }; say "222"'
+    my $var_to_find = 111;
+
+    sub other {
+        use Runtime::Debugger;
+        repl( levels_up => 1 );
+    }
 
 =cut
 
@@ -330,7 +335,7 @@ Might be replaced with something like this:
 
  say ${$PEEKS{'$var'}}
 
-This transformation would normally be down
+This transformation would normally be done
 seamlessly and hidden from the user.
 
 =head4 Eval
@@ -401,10 +406,24 @@ CODE
 
 Works like eval, but without L<the lossy bug|/Lossy undef Variable>
 
+repl (
+    history_file => "$ENV{HOME}/.runtime_debugger.info",
+    debug        => $ENV{RUNTIME_DEBUGGER_DEBUG} // 0,
+    levels_up    => 0,
+);
+
+Can specify the level at which to perform an eval
+in relation to the level of this function call:
+
+ levels_up => 0,  # Default
+ levels_up => 1,  # One scope/level above this.
+                  # Useful for scripts using this.
+ levels_up => -1, # One level below for internals.
+
 =cut
 
 sub repl {
-    my $repl = __PACKAGE__->_init;
+    my $repl = __PACKAGE__->_init( @_ );
 
     local $@;
     eval {    # Catch loop exit.
@@ -419,7 +438,7 @@ sub repl {
 # Initialize
 
 sub _init {
-    my ( $class ) = @_;
+    my ( $class, %args ) = @_;
 
     # Setup the terminal.
     my $term    = Term::ReadLine->new( $class );
@@ -439,6 +458,8 @@ sub _init {
         term         => $term,
         attr         => $attribs,
         debug        => $ENV{RUNTIME_DEBUGGER_DEBUG} // 0,
+        levels_up    => 0,
+        %args,
     }, $class;
 
     # https://metacpan.org/pod/Term::ReadLine::Gnu#Custom-Completion
@@ -480,8 +501,8 @@ sub _set_peeks {
     # CAUTION: avoid having the same name for a lexical and global
     # variable since the last variable declared would "win".
 
-    my $levels =
-      $self->_calc_scope;    # How many levels until at "$repl=" or main.
+    # How many levels until at "$repl=" or main.
+    my $levels   = $self->_calc_scope;
     my $peek_our = peek_our( $levels );
     my $peek_my  = peek_my( $levels );
 
@@ -514,6 +535,9 @@ sub _calc_scope {
     # Find the first scope level outside
     # this package.
     1 while ( ( $caller = caller( ++$scope ) ), $caller and $caller eq $pkg );
+
+    $scope += $self->levels_up;
+
     say "scope: $scope" if $self->debug;
 
     $scope;
@@ -1479,6 +1503,10 @@ sub _show_error {
 Internal use.
 
 =head3 debug
+
+Internal use.
+
+=head3 levels_up
 
 Internal use.
 

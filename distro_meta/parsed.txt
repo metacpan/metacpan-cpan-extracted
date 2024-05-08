@@ -91899,3 +91899,15 @@ B/BP/BPS/RT-Client-CLI-5.0.6.tar.gz
 K/KI/KIMOTO/SPVM-0.990005.tar.gz
 T/TE/TEAM/Web-Async-0.004.tar.gz
 M/MA/MAMAWE/WebService-IdoitAPI-0.4.3.tar.gz
+P/PL/PLICEASE/Alien-cue-0.01.tar.gz
+U/UT/UTASHIRO/App-Greple-subst-2.34.tar.gz
+T/TI/TIMKA/Data-Trace-0.18.tar.gz
+E/EX/EXODIST/DBIx-QuickDB-0.000032.tar.gz
+G/GS/GSG/Dist-Zilla-PluginBundle-Author-GSG-v0.5.4.tar.gz
+J/JV/JV/HarfBuzz-Shaper-0.027.tar.gz
+P/PE/PERLANCAR/HashData-Color-PantoneToCMYK-0.001.tar.gz
+A/AR/ARFREITAS/Linux-Info-2.0.tar.gz
+J/JO/JOESUF/sealed-v7.0.6.tar.gz
+L/LN/LNATION/Rope-0.27.tar.gz
+T/TI/TIMKA/Runtime-Debugger-0.19.tar.gz
+T/TE/TEODESIAN/URI-Shortener-1.001.tar.gz

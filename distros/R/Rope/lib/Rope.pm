@@ -1,7 +1,7 @@
 package Rope;
 
 use 5.006; use strict; use warnings;
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 use Rope::Object;
 my (%META, %PRO);
 our @ISA;
@@ -238,10 +238,6 @@ BEGIN {
 						}
 						next if $modifier;
 						next if grep { $META{$with}->{properties}->{$prop}->{$_} } qw/before around after/;
-						use Data::Dumper;
-						warn Dumper $modifier;
-						warn Dumper $merge->{properties}->{$prop};
-						warn Dumper $prop;
 						if (scalar keys %{$merge->{properties}->{$prop}} > 1) {
 							if ($merge->{properties}->{writeable}) {
 								$merge->{properties}->{$prop} = $initial->{properties}->{$prop};
@@ -464,6 +460,25 @@ sub new {
 	return $PRO{new}($name)($name, %params);
 }
 
+sub from_array {
+	my ($pkg, $data, $meta) = @_;
+
+	$meta ||= {};
+	$meta->{name} ||= 'Rope::Anonymous' . $META{ANONYMOUS}++;
+	my $len = scalar @{$data};
+	for (my $i = 0; $i < $len; $i++) {
+		my ($key, $value) = ($data->[$i++], $data->[$i]);
+		$meta->{properties}->{$key} = {
+			value => $value,
+			writeable => 1,
+			enumerable => 1
+		};
+	}
+
+	return $pkg->new($meta)->new();
+}
+
+
 sub from_data {
 	my ($pkg, $data, $meta) = @_;
 
@@ -479,6 +494,40 @@ sub from_data {
 	}
 
 	return $pkg->new($meta)->new();
+}
+
+
+sub from_nested_array {
+	my ($pkg, $data, $meta) = @_;
+
+	$data = $PRO{clone}($data);
+	for (my $i = 0; $i < scalar @{$data}; $i++) {
+		my ($key, $value) = ($data->[$i++], $data->[$i]);
+		my $ref = ref $value;
+		if ($ref eq 'ARRAY') {
+			if ((ref($value->[-1]) || "") eq 'HASH' && $value->[-1]->{ROPE_scope} eq 'ARRAY') {
+				pop @{$value};
+				next;
+			}
+			elsif (ref $value->[0]) {
+				for (my $x = 0; $x < scalar @{$value}; $x++) {
+					my ($val) = ($value->[$x]);
+					my $rref = ref($val); # || "";
+					if ($rref eq 'ARRAY') {
+						$val = $pkg->from_nested_array(
+							$val,
+							$meta
+						);
+						$value->[$x] = $val;
+					}
+				}
+			} else {
+				$data->[$i] = $pkg->from_nested_array($value, $meta);
+			}
+		}
+	}
+
+	return $pkg->from_array($data, $meta);
 }
 
 sub from_nested_data {
@@ -554,7 +603,7 @@ Rope - Tied objects
 
 =head1 VERSION
 
-Version 0.26
+Version 0.27
 
 =cut
 
@@ -995,6 +1044,57 @@ Initialise a Rope object from a nested perl hash struct.
 	$obj->three->[0]->a;
 
 NOTE: this generates an object definition per array item so in many cases it is better you define your object definitions yourself and then write the relevant logic to initialise them. I will eventually look into perhaps itterating all items finding all unique keys and then initialiasing, that will just take a bit more time though.
+
+=head2 from_array
+
+Initialise a Rope object from a ordered perl array struct.
+
+	my $obj = Rope::Object->from_array([
+		one => 1,
+		two => {
+			a => 1,
+			b => 2
+		},
+		three => [
+			{
+				a => 1,
+				b => 2	
+			}
+		]
+	], { use => 'Rope::Monkey' });
+
+	...
+
+	$obj->one;
+	$obj->two->{a};
+	$obj->three->[0]->{a};
+
+
+=head2 from_nested_array
+
+Initialise a Rope object from a nested perl array struct.
+
+	my $obj = Rope::Object->from_nested_array([
+		one => 1,
+		two => [
+			a => 1,
+			b => 2
+		],
+		three => [
+			[
+				a => 1,
+				b => 2	
+			]
+		],
+		four => [qw/one two three/, { ROPE_scope => 'ARRAY' }]
+	}, { use => 'Rope::Autoload' });
+
+	...
+
+	$obj->one;
+	$obj->two->a;
+	$obj->three->[0]->a;
+
 
 =head1 OBJECT CLASS DEFINITION
 

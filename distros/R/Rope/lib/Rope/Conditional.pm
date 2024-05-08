@@ -51,7 +51,7 @@ Rope::Conditional - Rope conditional properties
 
 =head1 VERSION
 
-Version 0.26
+Version 0.27
 
 =cut
 

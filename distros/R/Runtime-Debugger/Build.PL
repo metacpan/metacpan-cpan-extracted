@@ -28,6 +28,7 @@ my $class = Module::Build->subclass(
         }
     },
 );
+$class->ACTION_readme();
 
 my $builder = $class->new(
     module_name        => 'Runtime::Debugger',
@@ -48,7 +49,13 @@ my $builder = $class->new(
         'Class::Tiny'         => '1.008',
         'Data::Printer'       => '1.002001',
     },
-    add_to_cleanup => [ 'Runtime-Debugger-*', 'build_dir/', 'MANIFEST*.bak' ],
+    add_to_cleanup => [
+        'Runtime-Debugger-*',
+        'build_dir/',
+        'MANIFEST*.bak',
+        'README*',
+        'blib/',
+    ],
     meta_merge     => {
         resources => {
             bugtracker => 'https://github.com/poti1/runtime-debugger/issues',

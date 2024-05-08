@@ -1,5 +1,4 @@
-HarfBuzz::Shaper
-================
+# HarfBuzz::Shaper
 
 HarfBuzz::Shaper is a perl module that provides access to a small
 subset of the native HarfBuzz library.
@@ -10,18 +9,18 @@ complex languages like Devanagari.
 This module is intended to be used with module L<Text::Layout>. Feel
 free to (ab)use it for other purposes.
 
-INSTALLATION
+## INSTALLATION
 
 Please read document INSTALL first.
 
 To install this module type the following:
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+    perl Makefile.PL
+    make
+    make test
+    make install
 
-SUPPORT AND DOCUMENTATION
+## SUPPORT AND DOCUMENTATION
 
 Development of this module takes place on GitHub:
 https://github.com/sciurius/perl-HarfBuzz-Shaper.
@@ -35,7 +34,7 @@ GitHub.
 
 HarfBuzz website and documentation: https://harfbuzz.github.io/index.html.
 
-COPYRIGHT AND LICENCE
+## COPYRIGHT AND LICENCE
 
 Copyright (C) 2020 by Johan Vromans
 

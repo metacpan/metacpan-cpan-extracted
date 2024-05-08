@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MySQL::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.000031';
+our $VERSION = '0.000032';
 
 use Carp qw/confess croak/;
 use IPC::Cmd qw/can_run/;
@@ -332,40 +332,15 @@ __END__
 
 =head1 NAME
 
-DBIx::QuickDB::Driver::MySQL - MySQL driver for DBIx::QuickDB.
+DBIx::QuickDB::Driver::MySQL::Base - Base class for all MySQL drivers.
 
 =head1 DESCRIPTION
 
-MySQL driver for L<DBIx::QuickDB>.
+Base class for all MySQL drivers.
 
 =head1 SYNOPSIS
 
 See L<DBIx::QuickDB>.
-
-=head1 MYSQL SPECIFIC OPTIONS
-
-=over 4
-
-=item dbd_driver => $DRIVER
-
-Should be either L<DBD::mysql> or L<DBD::MariaDB>. If not specified then
-DBD::MariaDB is preferred with a fallback to DBD::MySQL.
-
-=item mysqld_provider => $PROVIDER
-
-Should be either 'mariadb' or 'percona'. Will auto-detect when possible.
-
-=head1 ENVIRONMENT VARIABLES
-
-=head2 QDB_MYSQL_SSL_FIPS
-
-Set to 1 to enable, 0 to disable or enter any string accepted by the
-C<ssl_fips_mode> mysqld config option. If this environment variable is not
-defined then the C<ssl_fips_mode> option will not be included in the generated
-config file at all by default.
-
-This is mainly used to allow this dists test suite to pass on systems where
-FIPS is required and enforced.
 
 =head1 SOURCE
 

@@ -64,7 +64,8 @@ my %args = (
 my $hb_include;
 my $hb_src = "hb_src/harfbuzz/harfbuzz.cc";
 
-if ( check_lib( lib      => "harfbuzz",
+if ( !$ENV{HB_PRIVATE}
+     && check_lib( lib      => "harfbuzz",
 		header   => "harfbuzz/hb.h",
 		function => <<EOF )
 /* Need at least 1.7.7 */
@@ -126,7 +127,7 @@ sub MY::postamble {
     my $cxx = $ENV{CXX} || "c++";
     return <<EOF;
 \$(MYEXTLIB) : $hb_src
-	$cxx -c -std=c++11 -o \$\@ -DHB_NO_MT \$(CCCDLFLAGS) \$<
+	$cxx -c -std=c++11 -fno-exceptions -o \$\@ -DHB_NO_MT \$(CCCDLFLAGS) \$<
 
 EOF
 }

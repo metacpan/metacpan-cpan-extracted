@@ -37,7 +37,7 @@
    "provides" : {
       "Runtime::Debugger" : {
          "file" : "lib/Runtime/Debugger.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
@@ -46,12 +46,12 @@
          "web" : "https://github.com/poti1/runtime-debugger/issues"
       },
       "license" : [
-         "http://opensource.org/licenses/artistic-license-2.0.php"
+         "http://www.perlfoundation.org/artistic_license_2_0"
       ],
       "repository" : {
          "url" : "https://github.com/poti1/runtime-debugger"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

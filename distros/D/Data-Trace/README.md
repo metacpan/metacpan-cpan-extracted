@@ -48,9 +48,16 @@ Consider adding an option to have a warn message anytime a structure is FETCHed.
 
 # SUPPORT
 
-You can find documentation for this module with the perldoc command.
+You can find documentation for this module
+with the perldoc command.
 
     perldoc Data::Trace
+
+You can also look for information at:
+
+[https://metacpan.org/pod/Data::Trace](https://metacpan.org/pod/Data::Trace)
+
+[https://github.com/poti1/data-trace](https://github.com/poti1/data-trace)
 
 # LICENSE AND COPYRIGHT
 

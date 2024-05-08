@@ -5,10 +5,17 @@ use Carp qw(croak);
 use POSIX 1.15;
 use Hash::Util qw(lock_keys);
 use base 'Class::Accessor';
-our $VERSION = '1.5'; # VERSION
+use Devel::CheckOS 2.01 qw(os_is);
 
-my @_attribs =
-  qw(raw_time hostname domain kernel release version mem swap pcpucount tcpucount interfaces arch proc_arch cpu_flags uptime idletime model);
+our $VERSION = '2.0'; # VERSION
+
+my @_attribs = (
+    'raw_time',  'hostname',  'domain',     'kernel',
+    'release',   'version',   'mem',        'swap',
+    'pcpucount', 'tcpucount', 'interfaces', 'arch',
+    'proc_arch', 'cpu_flags', 'uptime',     'idletime',
+    'model',     'mainline_version',
+);
 
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(@_attribs);
@@ -105,7 +112,7 @@ model - the processor name
 
 C<pcpucount> and C<tcpucount> are really easy to understand. Both values
 are collected from C</proc/cpuinfo>. C<pcpucount> is the number of physical
-CPUs, counted by C<physical id>. C<tcpucount> is just the total number 
+CPUs, counted by C<physical id>. C<tcpucount> is just the total number
 counted by C<processor>.
 
 All attributes are read-only. Their corresponding value can will be returned upon invocation of their respective "get_" method.
@@ -180,11 +187,11 @@ L<Hash::Util>
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 of Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+This software is copyright (c) 2015 of Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 This file is part of Linux Info project.
 
@@ -202,6 +209,22 @@ You should have received a copy of the GNU General Public License
 along with Linux Info.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
+
+sub _mainline {
+    my $self = shift;
+
+    if ( os_is('Linux::Ubuntu') ) {
+        my $source = '/proc/version_signature';
+        open( my $in, '<', $source ) or confess("Cannot read $source: $!");
+        my $raw = <$in>;
+        close($in) or confess("Cannot close $source: $!");
+        my @pieces = split( /\s/, $raw );
+        $self->{mainline_version} = $pieces[-1];
+    }
+    else {
+        $self->{mainline_version} = undef;
+    }
+}
 
 sub new {
 
@@ -262,16 +285,13 @@ sub _set {
     $self->_set_cpuinfo;
 
     foreach my $attrib (@_attribs) {
-
         if ( defined( $self->{attrib} ) ) {
-
             $self->{$attrib} =~ s/\t+/ /g;
             $self->{$attrib} =~ s/\s+/ /g;
-
         }
-
     }
 
+    $self->_mainline();
 }
 
 sub is_multithread {

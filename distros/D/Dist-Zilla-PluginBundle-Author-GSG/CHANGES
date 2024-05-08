@@ -1,6 +1,12 @@
 Changelog for Dist-Zilla-PluginBundle-Author-GSG
 
-v0.5.3 2023-11-27T16:30:51
+v0.5.4 2024-05-07T17:18:58
+ - Pull request #24: SM-4834 - Add force update target (Andrew Hewus Fresh)
+ - Name target `make forceupdate` (Andrew Hewus Fresh)
+ - Update LICENSE and README (Andrew Hewus Fresh)
+ - Adjust the `make update` target to force updates (Andrew Hewus Fresh)
+
+v0.5.3 2023-11-27T16:30:13
  - Update README (Andrew Hewus Fresh)
  - Pull request #22: Patch - SM-4514 - Make strict an author test (Andrew
    Hewus Fresh)

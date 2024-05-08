@@ -34,9 +34,14 @@ Same, but with some variables to play with:
 
     perl -MRuntime::Debugger -E 'my $str1 = "Func"; our $str2 = "Func2"; my @arr1 = "arr-1"; our @arr2 = "arr-2"; my %hash1 = qw(hash 1); our %hash2 = qw(hash 2); my $coderef = sub { "code-ref: @_" }; {package My; sub Func{"My-Func"} sub Func2{"My-Func2"}} my $obj = bless {}, "My"; repl; say $@'
 
-Test command:
+From another script/function:
 
-    RUNTIME_DEBUGGER_DEBUG=2 perl -Ilib/ -MRuntime::Debugger -E 'my @a = 1..2; my %h = qw( a 11 b 22 ); my $v = 222; my $o = bless {a => 11}, "A"; my $ar = \@a; my $hr = \%h; use warnings FATAL => "all"; eval{ say qr<$hr-\>{b}> }; say "222"'
+    my $var_to_find = 111;
+
+    sub other {
+        use Runtime::Debugger;
+        repl( levels_up => 1 );
+    }
 
 # DESCRIPTION
 
@@ -295,7 +300,7 @@ Might be replaced with something like this:
 
     say ${$PEEKS{'$var'}}
 
-This transformation would normally be down
+This transformation would normally be done
 seamlessly and hidden from the user.
 
 #### Eval
@@ -335,6 +340,20 @@ time has limits. [See also](#lossy-undef-variable)
 ## repl
 
 Works like eval, but without [the lossy bug](#lossy-undef-variable)
+
+repl (
+    history\_file => "$ENV{HOME}/.runtime\_debugger.info",
+    debug        => $ENV{RUNTIME\_DEBUGGER\_DEBUG} // 0,
+    levels\_up    => 0,
+);
+
+Can specify the level at which to perform an eval
+in relation to the level of this function call:
+
+    levels_up => 0,  # Default
+    levels_up => 1,  # One scope/level above this.
+                     # Useful for scripts using this.
+    levels_up => -1, # One level below for internals.
 
 ## \_apply\_peeks
 
@@ -447,6 +466,10 @@ provide a unique function.
 Internal use.
 
 ### debug
+
+Internal use.
+
+### levels\_up
 
 Internal use.
 

@@ -4,7 +4,7 @@ package MyTest;
 
 use 5.006;
 use strict;
-use Test::More tests => 3246;
+use Test::More tests => 3294;
 use Runtime::Debugger;
 use feature qw( say );
 
@@ -17,17 +17,17 @@ $ENV{RUNTIME_DEBUGGER_DEBUG} = 0;
     sub get { "got method" }
 }
 
-sub run_suite {
-    $Term::ReadLine::Gnu::has_been_initialized = 0;
+my $s_outer = "ref scalar";
+my @a_outer = ( "ref", "array" );
+my %h_outer = ( ref => "hash" );
 
+sub run_suite {
     my $s  = 777;
     my $ar = [ 1, 2 ];
     my $hr = { a => 1, b => 2 };
     my %h  = ( a => 1, b => 2 );
     my @a  = ( 1, 2 );
     my $o  = bless { cat => 5 }, "A";
-
-    my $repl = Runtime::Debugger->_init;
 
     my @cases = (
 
@@ -3157,10 +3157,63 @@ sub run_suite {
             },
         },
 
+        # levels_up.
+        {
+            name     => "levels_up scalar",
+            input    => '$s_outer',
+            args     => { levels_up => 1 },
+            expected => {
+                apply_peeks => '${$Runtime::Debugger::PEEKS{qq(\$s_outer)}}',
+                eval_result => "ref scalar",
+                vars_after  => sub {
+                    is $s_outer, "ref scalar", shift;
+                },
+            },
+        },
+        {
+            name     => "levels_up array",
+            input    => '"@a_outer"',
+            args     => { levels_up => 1 },
+            expected => {
+                apply_peeks => '"@{$Runtime::Debugger::PEEKS{qq(\@a_outer)}}"',
+                eval_result => "ref array",
+                vars_after  => sub {
+                    is_deeply \@a_outer, [ "ref", "array", ], shift;
+                },
+            },
+        },
+        {
+            name     => "levels_up array index",
+            input    => '$a_outer[1]',
+            args     => { levels_up => 1 },
+            expected => {
+                apply_peeks => '${$Runtime::Debugger::PEEKS{qq(\@a_outer)}}[1]',
+                eval_result => "array",
+                vars_after  => sub {
+                    is_deeply \@a_outer, [ "ref", "array" ], shift;
+                },
+            },
+        },
+        {
+            name     => "levels_up hash",
+            input    => '$h_outer{ref}',
+            args     => { levels_up => 1 },
+            expected => {
+                apply_peeks =>
+                  '${$Runtime::Debugger::PEEKS{qq(\%h_outer)}}{ref}',
+                eval_result => "hash",
+                vars_after  => sub {
+                    is_deeply \%h_outer, { ref => "hash" }, shift;
+                },
+            },
+        },
     );
 
     for my $case ( @cases ) {
         pass( "--- $case->{name} ---" );
+
+        $Term::ReadLine::Gnu::has_been_initialized = 0;
+        my $repl = Runtime::Debugger->_init( %{ $case->{args} } );
 
         # Check if peek data is properly applied.
         my $applied = $repl->_apply_peeks( $case->{input} );
@@ -3241,5 +3294,4 @@ sub {
     run_suite();
   }
   ->();
-
 

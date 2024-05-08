@@ -1,0 +1,12 @@
+Revision history for URI-Shorten
+
+1.001 2024-05-07 TEODESIAN
+    - Correct a couple of POD boo-boos
+
+1.000 2024-05-07 TEODESIAN
+    - Rework to use Crypt::PRNG based algorithm
+    - Protect against collissions
+    - Provide sane defaults
+
+0.001 2024-05-07 TEODESIAN
+    - First release to CPAN

@@ -15,6 +15,7 @@ META.json			Module JSON meta-data (added by MakeMaker)
 META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/00-load.t
+t/001-odea.t
 t/01-odea.t
 t/02-extend.t
 t/03-lib-extend.t
@@ -46,6 +47,11 @@ t/28-factory-chain.t
 t/29-chain-factory.t
 t/30-chain-factory-chain-factory.t
 t/31-conditional.t
+t/32-from_data.t
+t/33-from_nested_data.t
+t/34-ordered-conditional.t
+t/35-from_array.t
+t/36-from_nested_array.t
 t/lib/Custom.pm
 t/lib/One.pm
 t/lib/Role.pm

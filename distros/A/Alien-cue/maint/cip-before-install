@@ -1,0 +1,3 @@
+#!/bin/sh
+
+cip exec dzil-cpanm -n Alien::Build::Plugin::Download::GitHub

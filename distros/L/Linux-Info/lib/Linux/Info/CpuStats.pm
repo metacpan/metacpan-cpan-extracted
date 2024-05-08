@@ -2,8 +2,9 @@ package Linux::Info::CpuStats;
 use strict;
 use warnings;
 use Carp qw(croak);
-use YAML::XS 0.41;
-our $VERSION = '1.5'; # VERSION
+use YAML::XS 0.88;
+
+our $VERSION = '2.0'; # VERSION
 
 =head1 NAME
 
@@ -112,11 +113,11 @@ L<Linux::Info>
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 of Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+This software is copyright (c) 2015 of Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
 
 This file is part of Linux Info project.
 
@@ -137,7 +138,7 @@ along with Linux Info.  If not, see <http://www.gnu.org/licenses/>.
 
 sub new {
     my $class = shift;
-    my $opts = ref( $_[0] ) ? shift : {@_};
+    my $opts  = ref( $_[0] ) ? shift : {@_};
 
     my %self = (
         files => {

@@ -1,14 +1,25 @@
 use strict;
 use warnings;
-use Test::More tests => 23;
+use Test::More tests => 25;
 use Scalar::Util qw(looks_like_number);
+use Devel::CheckOS 2.01 qw(os_is);
 
 BEGIN { use_ok('Linux::Info::SysInfo') }
 
-my $obj = new_ok('Linux::Info::SysInfo');
-my @sysinfo =
-  qw(get_raw_time get_hostname get_domain get_kernel get_release get_version get_mem get_swap get_pcpucount get_tcpucount get_interfaces get_arch get_proc_arch get_cpu_flags get_uptime get_idletime is_multithread get_model);
-can_ok( $obj, @sysinfo );
+my $obj     = new_ok('Linux::Info::SysInfo');
+my @methods = (
+    'get_raw_time',   'get_hostname',
+    'get_domain',     'get_kernel',
+    'get_release',    'get_version',
+    'get_mem',        'get_swap',
+    'get_pcpucount',  'get_tcpucount',
+    'get_interfaces', 'get_arch',
+    'get_proc_arch',  'get_cpu_flags',
+    'get_uptime',     'get_idletime',
+    'is_multithread', 'get_model',
+    'get_mainline_version',
+);
+can_ok( $obj, @methods );
 
 my @pf = qw(
   /proc/sys/kernel/hostname
@@ -33,13 +44,26 @@ like( $obj->is_multithread, qr/^[01]$/, 'multithread is boolean' );
 note( 'Processor model is "' . $obj->get_model . '"' );
 like( $obj->get_model, qr/\w+/, 'get_model returns some text' );
 
-foreach my $method (
-    qw(get_hostname get_domain get_kernel get_release get_version get_mem get_swap get_arch get_uptime get_idletime)
-  )
-{
+my @string_methods = (
+    'get_hostname', 'get_domain', 'get_kernel', 'get_release',
+    'get_version',  'get_mem',    'get_swap',   'get_arch',
+    'get_uptime',   'get_idletime',
+);
 
+foreach my $method (@string_methods) {
     like( $obj->$method, qr/\w+/, "$method returns a string" );
+}
 
+ok(
+    check_mainline_version( $obj->get_mainline_version ),
+    'get_mainline_version can fetch a valid value'
+);
+
+SKIP: {
+    skip 'Not available on Linux distributions not based on Ubuntu', 1
+      unless ( os_is('Linux::Ubuntu') );
+    ok( $obj->get_mainline_version(),
+        'get_mainline_version returns a defined value on Ubuntu-like distros' );
 }
 
 note(
@@ -48,7 +72,7 @@ note(
 
 SKIP: {
 
-    skip "ARM processors have a different interface on /proc/cpuinfo", 2
+    skip 'ARM processors have a different interface on /proc/cpuinfo', 2
       if ( $obj->get_model =~ /arm/i );
     ok(
         looks_like_number( $obj->get_proc_arch ),
@@ -61,10 +85,8 @@ SKIP: {
 }
 
 foreach my $method (qw(get_pcpucount get_tcpucount )) {
-
     ok( looks_like_number( $obj->$method ), "$method returns a number" )
       or diag( explain( check_cpuinfo() ) );
-
 }
 
 is( ref( $obj->get_interfaces ),
@@ -76,28 +98,27 @@ my $obj2 = Linux::Info::SysInfo->new( { raw_time => 1 } );
 note('Testing times returned by instance with raw_time attribute set to true');
 
 foreach my $method (qw(get_uptime get_idletime)) {
-
     ok( looks_like_number( $obj2->$method ), "$method returns a number" );
-
 }
 
 sub check_cpuinfo {
-
     note('Looks like /proc/cpuinfo is missing the "flags" field');
     note(
 'Detect issues with flags field as http://www.cpantesters.org/cpan/report/743cb560-6092-11e5-b084-8fcd0b3facc5'
     );
 
     my $file = '/proc/cpuinfo';
-
     local $/ = undef;
-
     open( my $in, '<', $file ) or die "cannot read $file: $!";
-
     my $all_lines = <$in>;
-
     close($in);
-
     return \$all_lines;
+}
 
+sub check_mainline_version {
+    my $value = shift;
+
+    # undef is valid
+    return 1 unless ($value);
+    return ( $value =~ /[\w\.\-]+/ );
 }

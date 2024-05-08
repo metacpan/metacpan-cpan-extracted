@@ -1,0 +1,40 @@
+---
+abstract: "Shorten URIs so that you don't have to rely on external services"
+author:
+  - 'George S. Baugh <george@troglodyne.net>'
+build_requires:
+  Capture::Tiny: '0'
+  FindBin::libs: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: URI-Shortener
+provides:
+  URI::Shortener:
+    file: lib/URI/Shortener.pm
+    version: '1.001'
+requires:
+  Carp::Always: '0'
+  Crypt::PRNG: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  File::Touch: '0'
+  List::Util: '1.33'
+  POSIX: '0'
+  perl: v5.12.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Troglodyne-Internet-Widgets/URI-Shorten/issues
+  homepage: https://github.com/Troglodyne-Internet-Widgets/URI-Shorten
+  repository: https://github.com/Troglodyne-Internet-Widgets/URI-Shorten.git
+version: '1.001'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

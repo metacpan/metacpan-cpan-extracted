@@ -1,0 +1,31 @@
+use alienfile;
+
+plugin 'Probe::CommandLine' => (
+  command => 'cue',
+  args    => [ 'version' ],
+  match   => qr/cue version/,
+  version => qr/cue version ([0-9\.]+)/,
+);
+
+share {
+
+  requires 'Alien::Go';
+
+  plugin 'Download::GitHub' => (
+    github_user => 'cue-lang',
+    github_repo => 'cue',
+    prefer => sub {
+      my($build, $res) = @_;
+      return {
+        type => 'list',
+        list => [grep { $_->{version} !~ /alpha/ } @{ $res->{list} }],
+      };
+    },
+  );
+
+  build [
+    'env GOPATH=%{.install.prefix} go install ./cmd/cue',
+    'env GOPATH=%{.install.prefix} go clean -modcache',
+  ];
+
+};

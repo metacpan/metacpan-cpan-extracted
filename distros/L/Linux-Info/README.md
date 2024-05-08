@@ -1,6 +1,15 @@
+[![Unit Tests](https://github.com/glasswalk3r/Linux-Info/actions/workflows/unit-test.yml/badge.svg)](https://github.com/glasswalk3r/Linux-Info/actions/workflows/unit-test.yml)
+
 # Linux-Info
 
 API in Perl to recover information about the running Linux OS
+
+## WARNING
+
+The version 2.0 and beyond brakes compatibility with the
+`Linux::Info::DiskStats module` in previous versions.
+
+Be sure to read the related documentation to avoid issues when upgrading.
 
 ## DESCRIPTION
 
@@ -60,7 +69,7 @@ the `cpanfile` included to take care of the dependencies without installing
 ## COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2015 of Alceu Rodrigues de Freitas
-Junior, <arfreitas@cpan.org>
+Junior, <glasswalk3r@yahoo.com.br>
 
 This file is part of Linux Info project.
 

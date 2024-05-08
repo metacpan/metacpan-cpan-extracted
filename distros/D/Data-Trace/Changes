@@ -1,5 +1,7 @@
 Revision history for Data-Trace
 
+0.18    2024-05-08 - Install fix.
+0.17    2024-05-08 - Updated pod.
 0.16    2024-05-07 - Added tests for Data::Tie::Watch
                      Added -clone => 0 option.
                      Resolved segmentation fault issue.

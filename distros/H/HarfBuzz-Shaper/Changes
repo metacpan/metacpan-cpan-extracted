@@ -1,5 +1,9 @@
 Revision history for HarfBuzz::Shaper.
 
+0.027 2024-05-07
+
+    - Bump included harfuzz to 8.4.0.
+
 0.026 2022-01-07
 
     - Add get_font_extents method.
