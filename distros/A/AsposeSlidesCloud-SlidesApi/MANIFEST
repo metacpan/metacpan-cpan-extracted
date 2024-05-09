@@ -121,9 +121,11 @@ lib/AsposeSlidesCloud/Object/LineFormat.pm
 lib/AsposeSlidesCloud/Object/LineToPathSegment.pm
 lib/AsposeSlidesCloud/Object/Literals.pm
 lib/AsposeSlidesCloud/Object/LuminanceEffect.pm
+lib/AsposeSlidesCloud/Object/MarkdownExportOptions.pm
 lib/AsposeSlidesCloud/Object/MasterSlide.pm
 lib/AsposeSlidesCloud/Object/MasterSlides.pm
 lib/AsposeSlidesCloud/Object/MathElement.pm
+lib/AsposeSlidesCloud/Object/MathFormat.pm
 lib/AsposeSlidesCloud/Object/MathParagraph.pm
 lib/AsposeSlidesCloud/Object/MatrixElement.pm
 lib/AsposeSlidesCloud/Object/Merge.pm

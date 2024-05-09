@@ -1,3 +1,15 @@
+3.10 2024-05-08
+
+	- Catch fatal errors from the Net::ACME2 module.
+	- Improve pound configuration parser.
+	- New options to the pound source: "--comment". "--type",
+	and "--listener".  The "--comment" option instructs the
+	program to issue certificates for hostnames marked by
+	a specific pragmatic comment.  The "--type" option
+	instructs it to process hostnames defined within listeners
+	of a particular type ("http" or "https").  Finally,
+	"--listener" selects listener by its tag.
+
 3.09 2023-01-22
 
 	- New domain source: pound.

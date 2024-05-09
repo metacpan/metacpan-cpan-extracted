@@ -7,7 +7,7 @@ use Error::Pure::Utils qw(clean);
 use Tags::HTML::Login::Access;
 use Tags::Output::Structure;
 use Test::MockObject;
-use Test::More 'tests' => 11;
+use Test::More 'tests' => 15;
 use Test::NoWarnings;
 
 # Test.
@@ -22,6 +22,40 @@ $obj = Tags::HTML::Login::Access->new(
 	'tags' => Tags::Output::Structure->new,
 );
 isa_ok($obj, 'Tags::HTML::Login::Access');
+
+# Test.
+eval {
+	Tags::HTML::Login::Access->new(
+		'css' => Test::MockObject->new,
+		'tags' => Tags::Output::Structure->new,
+	);
+};
+is(
+	$EVAL_ERROR,
+	"Parameter 'css' must be a 'CSS::Struct::Output::*' class.\n",
+	"Bad 'CSS::Struct::Output' instance.",
+);
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Login::Access->new(
+		'lang' => 'xxx',
+	);
+};
+is($EVAL_ERROR, "Parameter 'lang' doesn't contain valid ISO 639-2 code.\n",
+	"Parameter 'lang' doesn't contain valid ISO 639-2 code.");
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Login::Access->new(
+		'form_method' => 'foo',
+	);
+};
+is($EVAL_ERROR, "Parameter 'form_method' has bad value.\n",
+	"Parameter 'form_method' has bad value.");
+clean();
 
 # Test.
 eval {
@@ -52,25 +86,11 @@ clean();
 # Test.
 eval {
 	Tags::HTML::Login::Access->new(
-		'css' => Test::MockObject->new,
-		'tags' => Tags::Output::Structure->new,
+		'tags_after' => 'bad',
 	);
 };
-is(
-	$EVAL_ERROR,
-	"Parameter 'css' must be a 'CSS::Struct::Output::*' class.\n",
-	"Bad 'CSS::Struct::Output' instance.",
-);
-clean();
-
-# Test.
-eval {
-	Tags::HTML::Login::Access->new(
-		'form_method' => 'foo',
-	);
-};
-is($EVAL_ERROR, "Parameter 'form_method' has bad value.\n",
-	"Parameter 'form_method' has bad value.");
+is($EVAL_ERROR, "Parameter 'tags_after' must be a array.\n",
+	"Parameter 'tags_after' must be a array.");
 clean();
 
 # Test.
@@ -106,9 +126,29 @@ clean();
 # Test.
 eval {
 	Tags::HTML::Login::Access->new(
-		'lang' => 'xxx',
+		'width' => 'foo',
 	);
 };
-is($EVAL_ERROR, "Parameter 'lang' doesn't contain valid ISO 639-2 code.\n",
-	"Parameter 'lang' doesn't contain valid ISO 639-2 code.");
+is($EVAL_ERROR, "Parameter 'width' doesn't contain number.\n",
+	"Parameter 'width' doesn't contain number (foo).");
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Login::Access->new(
+		'width' => '123',
+	);
+};
+is($EVAL_ERROR, "Parameter 'width' doesn't contain unit.\n",
+	"Parameter 'width' doesn't contain unit (123).");
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Login::Access->new(
+		'width' => '123xx',
+	);
+};
+is($EVAL_ERROR, "Parameter 'width' contain bad unit.\n",
+	"Parameter 'width' contain bad unit (123xx).");
 clean();

@@ -1,5 +1,15 @@
 Revision history for Path-Tiny
 
+0.146     2024-05-08 08:27:52-04:00 America/New_York
+
+    - No changes from 0.145-TRIAL
+
+0.145     2024-05-01 22:26:26-04:00 America/New_York (TRIAL RELEASE)
+
+    [Changes]
+
+    - Improved error message spewing to a file in a non-existent directory.
+
 0.144     2022-12-01 11:36:19-05:00 America/New_York
 
     - No changes from 0.143-TRIAL

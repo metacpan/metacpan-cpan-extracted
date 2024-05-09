@@ -27,6 +27,11 @@ You may want to check out Aspose free [Powerpoint to PDF](https://products.aspos
 **Web:** HTML/HTML5
 **Other:** MPEG4, SWF (export whole presentations)
 
+## Enhancements in Version 24.4
+
+* Added **DownloadMathPortion** and **SaveMathPortion** methods to convert math portions to math markup formats (MathML or LaTeX). See [documentation](https://docs.aspose.cloud/slides/export-a-math-formula/) for more info. **DownloadPortionAsMathML** and **SavePortionAsMathML** methods are deprecated and will be removed after 24.6.
+* Added **Marker** property to **DataPoint** class.
+
 ## Enhancements in Version 24.3
 
 * Added Markdown (**Md**) to the list of allowed export formats.

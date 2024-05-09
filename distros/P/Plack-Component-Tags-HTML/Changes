@@ -1,3 +1,6 @@
+0.18 2024-05-08T13:56:27+02:00
+ - Add 'html_lang' accessor.
+
 0.17 2024-04-21T08:10:03+02:00
  - Move inicialization of page begin to better place after actions phase.
    It's possible to implement _process_actions without inheritance of it.

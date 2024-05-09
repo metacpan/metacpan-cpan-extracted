@@ -1,4 +1,4 @@
-package URI::Shortener 1.001;
+package URI::Shortener 1.003;
 
 #ABSTRACT: Shorten URIs so that you don't have to rely on external services
 
@@ -58,9 +58,6 @@ sub cipher {
 }
 
 
-# Like with any substitution cipher, reversal is trivial when the domain is known.
-# But, if we have to fetch the URI anyways, we may as well just store the cipher for reversal (aka the "god algorithm").
-# This allows us the useful feature of being able to use many URI prefixes.
 my $smash=0;
 sub shorten {
     my ( $self, $uri ) = @_;
@@ -92,7 +89,7 @@ sub shorten {
     }
 
     my $qq = "INSERT INTO uris (uri,created,prefix_id) VALUES (?,?,(SELECT id FROM prefix WHERE prefix=?))";
-    $self->_dbh()->do( $qq, undef, $uri, time(), $self->{prefix} ) or die $self->dbh()->errstr;
+    $self->_dbh()->do( $qq, undef, $uri, time(), $self->{prefix} ) or die $self->_dbh()->errstr;
     goto \&shorten;
 }
 
@@ -112,7 +109,7 @@ sub lengthen {
 
 sub prune_before {
     my ( $self, $when ) = @_;
-    $self->_dbh()->do( "DELETE FROM uris WHERE created < ?", undef, $when ) or die $self->dbh()->errstr;
+    $self->_dbh()->do( "DELETE FROM uris WHERE created < ?", undef, $when ) or die $self->_dbh()->errstr;
     return 1;
 }
 
@@ -155,7 +152,7 @@ URI::Shortener - Shorten URIs so that you don't have to rely on external service
 
 =head1 VERSION
 
-version 1.001
+version 1.003
 
 =head1 SYNOPSIS
 
@@ -188,7 +185,18 @@ Provides utility methods so that you can:
 
 3) Store a creation time so you can prune the database later.
 
-We use sqlite for persistence.
+We use sqlite for persistence with WALmode on, so it should be safe to use in a preforking multiple worker situation.
+
+=head2 WHY?
+
+URI shorteners are typically used for media requiring fixed-width content, such as text email.
+They are also useful for being easy to say in phonetic alphabets.
+
+On the other hand, they're also an unavoidable mechanism to implement user tracking, such as is commonly done by social networking applications.
+Similarly, they are the backbone of many phishing spam campaigns.
+
+You could also use this to build a site (or make portions of it) resistant to indexing due to random URIs.
+This is common practice for "unlisted" posts sent by mailing lists which want some degree of exclusivity without resorting fully to a paywall.
 
 =head2 ALGORITHM
 
@@ -238,21 +246,34 @@ My expectation is that it will not work at all with it, but this could be patche
 
 =head2 $class->new(%options)
 
-See SYNOPSIS for supported options.
+=over 4
 
-We strip trailing slash(es) from the prefix.
+=item C<dbname>
 
-The 'dbfile' you pass will be created automatically for you if possible.
-Otherwise we will croak the first time you run shorten() or lengthen().
+Name of the database to use.  Since we use sqlite, this is a filename.
 
-length controls the length of the minified path component.
-Defaulted to 12 when not a member of the natural numbers.
+=item C<prefix>
 
-domain is by default a..zA..Z as a string.
+URI prefix of shortened output.  Trailing slashes will be stripped.  Example: https://big.hugs/go/
 
-This is obviously an n Choose k situation, which means the default number of URIs possible is:
+=item C<length>
 
-558,383,307,300
+Length of the minified path component. Defaulted to 12 when not a member of the natural numbers.
+
+=item C<domain>
+
+Input domain string. Shortened path components are a char within this string. By default a..zA..Z.
+
+=item C<seed>
+
+Starting seed of the PRNG.
+
+=back
+
+This is obviously an "N Choose K" situation (n possible chars from 'domain' in 'length' slots).
+The default number of URIs possible is:
+
+    558,383,307,300
 
 Which I should hope is more than enough for most use cases.
 
@@ -264,11 +285,11 @@ Wrapper around Crypt::PRNG::string_from().
 
 Uses the passed seed + id as the seed, and builds string_from via the domain passed to the constructor.
 
-=head2 shorten($uri)
+=head2 shorten( STRING $uri)
 
 Transform original URI into a shortened one.
 
-=head2 lengthen($uri)
+=head2 lengthen( STRING $uri)
 
 Transform shortened URI into it's original.
 

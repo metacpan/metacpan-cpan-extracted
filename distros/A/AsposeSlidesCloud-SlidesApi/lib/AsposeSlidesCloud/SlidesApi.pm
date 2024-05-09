@@ -9047,8 +9047,8 @@ sub delete_paragraphs {
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index (must refer to a picture frame). (required)
-# @param string $password Document password. (required)
-# @param string $folder Document folder. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
 # @param string $storage Presentation storage. (optional)
 {
     my $params = {
@@ -9070,12 +9070,12 @@ sub delete_paragraphs {
     'password' => {
         data_type => 'string',
         description => 'Document password.',
-        required => '1',
+        required => '0',
     },
     'folder' => {
         data_type => 'string',
         description => 'Document folder.',
-        required => '1',
+        required => '0',
     },
     'storage' => {
         data_type => 'string',
@@ -9109,16 +9109,6 @@ sub delete_picture_cropped_areas {
       croak("Missing the required parameter 'shape_index' when calling delete_picture_cropped_areas");
     }
 
-    # verify the required parameter 'password' is set
-    unless (exists $args{'password'} && defined $args{'password'} && $args{'password'}) {
-      croak("Missing the required parameter 'password' when calling delete_picture_cropped_areas");
-    }
-
-    # verify the required parameter 'folder' is set
-    unless (exists $args{'folder'} && defined $args{'folder'} && $args{'folder'}) {
-      croak("Missing the required parameter 'folder' when calling delete_picture_cropped_areas");
-    }
-
     # parse inputs
     my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/pictureCroppedAreas';
 
@@ -9132,7 +9122,7 @@ sub delete_picture_cropped_areas {
     if ($_header_accept) {
         $header_params->{'Accept'} = $_header_accept;
     }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
@@ -14994,6 +14984,199 @@ sub download_images_online {
     if ( exists $args{'document'} && $args{'document'}) {
         push(@$files, $args{'document'});
     }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# download_math_portion
+#
+# Convert Mathematical Text to MathML Format
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param int $portion_index Portion index. (required)
+# @param string $format Format. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'portion_index' => {
+        data_type => 'int',
+        description => 'Portion index.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Format.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'download_math_portion' } = { 
+    	summary => 'Convert Mathematical Text to MathML Format',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub download_math_portion {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling download_math_portion");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling download_math_portion");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling download_math_portion");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling download_math_portion");
+    }
+
+    # verify the required parameter 'portion_index' is set
+    unless (exists $args{'portion_index'} && defined $args{'portion_index'}) {
+      croak("Missing the required parameter 'portion_index' when calling download_math_portion");
+    }
+
+    # verify the required parameter 'format' is set
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling download_math_portion");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'MathML', 'LaTeX' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}/{format}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'portion_index'}) {
+        my $_base_variable = "{" . "portionIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'portion_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'format'}) {
+        my $_base_variable = "{" . "format" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'format'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -28339,6 +28522,211 @@ sub replace_text_formatting_online {
     }
     my $_response_object = $self->{api_client}->deserialize('File', $response);
     return $_response_object;
+}
+
+#
+# save_math_portion
+#
+# Convert Mathematical Text to MathML Format and saves result to the storage
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param int $portion_index Portion index. (required)
+# @param string $format Format. (required)
+# @param string $out_path Path to save result. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'portion_index' => {
+        data_type => 'int',
+        description => 'Portion index.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Format.',
+        required => '1',
+    },
+    'out_path' => {
+        data_type => 'string',
+        description => 'Path to save result.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'save_math_portion' } = { 
+    	summary => 'Convert Mathematical Text to MathML Format and saves result to the storage',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub save_math_portion {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling save_math_portion");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling save_math_portion");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling save_math_portion");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling save_math_portion");
+    }
+
+    # verify the required parameter 'portion_index' is set
+    unless (exists $args{'portion_index'} && defined $args{'portion_index'}) {
+      croak("Missing the required parameter 'portion_index' when calling save_math_portion");
+    }
+
+    # verify the required parameter 'format' is set
+    unless (exists $args{'format'} && defined $args{'format'} && $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling save_math_portion");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'MathML', 'LaTeX' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
+    # verify the required parameter 'out_path' is set
+    unless (exists $args{'out_path'} && defined $args{'out_path'} && $args{'out_path'}) {
+      croak("Missing the required parameter 'out_path' when calling save_math_portion");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}/{format}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'out_path'} && defined $args{'out_path'}) {
+        $query_params->{'outPath'} = $self->{api_client}->to_query_value($args{'out_path'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'portion_index'}) {
+        my $_base_variable = "{" . "portionIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'portion_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'format'}) {
+        my $_base_variable = "{" . "format" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'format'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    return;
 }
 
 #

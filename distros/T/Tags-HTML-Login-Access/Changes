@@ -1,3 +1,9 @@
+0.11 2024-05-09T10:55:33+02:00
+ - Add ERROR to doc for 'tags_after' parameter.
+ - Add check for 'width' parameter if it's CSS unit.
+ - Add constructor tests.
+ - Fix test dependencies.
+
 0.10 2024-05-02T13:38:41+02:00
  - Add 'tags_after' parameter.
  - Fix test message.

@@ -23,7 +23,7 @@ requires 'Error::Pure' => 0;
 requires 'Mo::utils' => 0.01;
 requires 'Mo::utils::CSS' => 0.06;
 requires 'Scalar::Util' => 0;
-requires 'Tags::HTML' => 0.06;
+requires 'Tags::HTML' => 0.10;
 requires 'Unicode::UTF8' => 0;
 requires 'perl' => '5.8.0';
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Tags-HTML-Tree/issues';
@@ -39,7 +39,7 @@ test_requires 'Test::NoWarnings' => 0;
 test_requires 'Tree' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.02';
+version '0.03';
 
 # Run.
 WriteAll();

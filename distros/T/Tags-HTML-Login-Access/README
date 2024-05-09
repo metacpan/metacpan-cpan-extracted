@@ -111,6 +111,18 @@ ERRORS
      new():
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
+             From Mo::utils::check_array():
+                     Parameter 'tags_after' must be a array.
+                             Value: %s
+                             Reference: %s
+             From Mo::utils::CSS::check_css_unit():
+                     Parameter 'width' doesn't contain number.
+                             Value: %s
+                     Parameter 'width' doesn't contain unit.
+                             Value: %s
+                     Parameter 'width' contain bad unit.
+                             Unit: %s
+                             Value: %s
              From Mo::utils::Language::check_language_639_2():
                      Parameter 'lang' doesn't contain valid ISO 639-2 code.
                              Codeset: %s
@@ -266,8 +278,8 @@ EXAMPLE2
      # Output screenshot is in images/ directory.
 
 DEPENDENCIES
-    Class::Utils, Error::Pure, List::Util, Mo::utils, Mo::utils::Language,
-    Readonly, Tags::HTML, Tags::HTML::Messages.
+    Class::Utils, Error::Pure, List::Util, Mo::utils, Mo::utils::CSS,
+    Mo::utils::Language, Readonly, Tags::HTML, Tags::HTML::Messages.
 
 SEE ALSO
     Tags::HTML::Login::Button
@@ -290,5 +302,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.10
+    0.11
 

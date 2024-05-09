@@ -5,7 +5,7 @@ use warnings;
 package Path::Tiny;
 # ABSTRACT: File path utility
 
-our $VERSION = '0.144';
+our $VERSION = '0.146';
 
 # Dependencies
 use Config;
@@ -2140,7 +2140,14 @@ sub spew {
     my $resolved_path = $self->_resolve_symlinks;
     my $temp          = $resolved_path->_replacment_path;
 
-    my $fh   = $temp->filehandle( { exclusive => 1, locked => 1 }, ">", $binmode );
+    my $fh;
+    my $ok = eval { $fh = $temp->filehandle( { exclusive => 1, locked => 1 }, ">", $binmode ); 1 };
+    if (!$ok) {
+        my $msg = ref($@) eq 'Path::Tiny::Error'
+            ? "error opening temp file '$@->{file}' for atomic write: $@->{err}"
+            : "error opening temp file for atomic write: $@";
+        $self->_throw('spew', $self->[PATH], $msg);
+    }
     print( {$fh} map { ref eq 'ARRAY' ? @$_ : $_ } @data) or self->_throw('print', $temp->[PATH]);
     close $fh or $self->_throw( 'close', $temp->[PATH] );
 
@@ -2438,7 +2445,7 @@ Path::Tiny - File path utility
 
 =head1 VERSION
 
-version 0.144
+version 0.146
 
 =head1 SYNOPSIS
 

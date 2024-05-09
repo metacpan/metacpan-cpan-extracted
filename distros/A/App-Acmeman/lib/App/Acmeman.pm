@@ -25,7 +25,7 @@ use Text::ParseWords;
 use App::Acmeman::Log qw(:all :sysexits);
 use feature 'state';
 
-our $VERSION = '3.09';
+our $VERSION = '3.10';
 
 my $progdescr = "manages ACME certificates";
 
@@ -401,7 +401,7 @@ sub domain_cert_expires {
 		$in = "today";
 	    }
 	    debug(2, "$crt expires on $expiry, $in");
-	    if ($now + $self->cf->get(qw(core time-delta)) < $ts) {
+	    if ($now + $self->cf->get(qw(core time-delta)) <= $ts) {
 		return 0;
 	    } else {
 		debug(2, "will renew $crt (expires on $expiry, $in)");
@@ -564,9 +564,14 @@ sub register_domain_certificate {
 	$acme->accept_challenge($challenge);
 
 	my $ret;
-	while (($ret = $acme->poll_authorization($authz)) eq 'pending') {
-	    sleep 1
-	}
+	do {
+	    $ret = eval { $acme->poll_authorization($authz) };
+	    if ($@) {
+		error("$domain: $@");
+		return 0;
+	    }
+	} while ($ret eq 'pending');
+
 	if ($ret ne 'valid') {
 	    my $text = "authorization $ret";
 	    if (my ($ch) = grep { $_->type() eq 'http-01' } $authz->challenges()) {

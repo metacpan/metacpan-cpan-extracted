@@ -36,7 +36,7 @@ requires:
   Mo::utils: 0.01
   Mo::utils::CSS: 0.06
   Scalar::Util: 0
-  Tags::HTML: 0.06
+  Tags::HTML: 0.1
   Unicode::UTF8: 0
   perl: 5.8.0
 resources:
@@ -44,4 +44,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-Tree
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-Tree
-version: '0.02'
+version: '0.03'

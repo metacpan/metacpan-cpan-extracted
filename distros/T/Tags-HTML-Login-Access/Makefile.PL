@@ -22,6 +22,7 @@ requires 'Class::Utils' => 0;
 requires 'Error::Pure' => 0;
 requires 'List::Util' => 1.33;
 requires 'Mo::utils' => 0.06;
+requires 'Mo::utils::CSS' => 0.06;
 requires 'Mo::utils::Language' => 0.05;
 requires 'Readonly' => 0;
 requires 'Tags::HTML' => 0;
@@ -30,12 +31,15 @@ resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Tags-HTML-Logi
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Tags-HTML-Login-Access';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Tags-HTML-Login-Access';
 test_requires 'CSS::Struct::Output::Structure' => 0;
+test_requires 'Data::Message::Simple' => 0.04;
+test_requires 'English' => 0;
+test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Tags::Output::Structure' => 0;
 test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.10';
+version '0.11';
 
 # Run.
 WriteAll();

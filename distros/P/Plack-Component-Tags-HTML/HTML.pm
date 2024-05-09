@@ -8,14 +8,14 @@ use CSS::Struct::Output::Raw;
 use Encode qw(encode);
 use Error::Pure qw(err);
 use Plack::Util::Accessor qw(author content_type css css_init css_src encoding
-	favicon flag_begin flag_end generator psgi_app script_js script_js_src
-	status_code title tags);
+	favicon flag_begin flag_end generator html_lang psgi_app script_js
+	script_js_src status_code title tags);
 use Scalar::Util qw(blessed);
 use Tags::HTML::Page::Begin;
 use Tags::HTML::Page::End;
 use Tags::Output::Raw;
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 sub call {
 	my ($self, $env) = @_;
@@ -34,6 +34,7 @@ sub call {
 			'charset' => $self->encoding,
 			'favicon' => $self->favicon,
 			'generator' => $self->generator,
+			'html_lang' => $self->html_lang,
 			'lang' => {
 				'title' => $self->title,
 			},
@@ -125,6 +126,10 @@ sub _prepare_app {
 
 	if (! $self->content_type) {
 		$self->content_type('text/html; charset='.$self->encoding);
+	}
+
+	if (! $self->html_lang) {
+		$self->html_lang('en');
 	}
 
 	if (! $self->status_code) {
@@ -295,6 +300,11 @@ Default value is 1.
 
 Generator string to HTML head.
 Default value is undef.
+
+=head2 C<html_lang>
+
+HTML element language.
+Default value is 'en'.
 
 =head2 C<psgi_app>
 
@@ -537,6 +547,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.17
+0.18
 
 =cut

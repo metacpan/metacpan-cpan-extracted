@@ -15,10 +15,11 @@ BEGIN { use_ok('Archive::Tar::Wrapper') }
 umask(0);
 my $arch = Archive::Tar::Wrapper->new();
 
-note('Is GNU tar? ' . $arch->is_gnu);
-note('Is BSD tar? ' . $arch->is_bsd);
-note( 'Version information: ' . $arch->{version_info} );
-note( $arch->{tar_error_msg} ) if (defined($arch->{tar_error_msg}));
+diag('Is GNU tar? ' . $arch->is_gnu);
+diag('Is BSD tar? ' . $arch->is_bsd);
+diag( 'Version information: ' . $arch->{version_info} );
+diag( 'tar error: ' . $arch->{tar_error_msg} )
+    if (defined($arch->{tar_error_msg}));
 
 ok( $arch->read( File::Spec->catfile( TARDIR, 'foo.tgz' ) ),
     'can open the compressed tar file' );

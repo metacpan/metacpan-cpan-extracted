@@ -10,6 +10,7 @@ use Mac::OSA::Dialog::Tiny qw/all/;
 prototyped (
 	title => '',
 	message => '',
+	image => '',
 	buttons => []
 );
 

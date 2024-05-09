@@ -9,23 +9,9 @@ use List::Util 1.33 qw(none);
 use Locale::Language;
 use Readonly;
 
-Readonly::Array our @EXPORT_OK => qw(check_language check_language_639_1 check_language_639_2);
+Readonly::Array our @EXPORT_OK => qw(check_language_639_1 check_language_639_2);
 
-our $VERSION = 0.07;
-
-sub check_language {
-	my ($self, $key) = @_;
-
-	_check_key($self, $key) && return;
-
-	if (none { $_ eq $self->{$key} } all_language_codes()) {
-		err "Parameter '".$key."' doesn't contain valid ISO 639-1 code.",
-			'Value', $self->{$key},
-		;
-	}
-
-	return;
-}
+our $VERSION = 0.08;
 
 sub check_language_639_1 {
 	my ($self, $key) = @_;
@@ -98,19 +84,6 @@ Mo language utilities for checking of data objects.
 
 =head1 SUBROUTINES
 
-=head2 C<check_language>
-
- check_language($self, $key);
-
-B<It is deprecated, use other checks.>
-
-I<Since version 0.01. Described functionality since version 0.04.>
-
-Check parameter defined by C<$key> if it's ISO 639-1 language code and if language exists.
-Value could be undefined.
-
-Returns undef.
-
 =head2 C<check_language_639_1>
 
  check_language_639_1($self, $key);
@@ -135,10 +108,6 @@ Returns undef.
 
 =head1 ERRORS
 
- check_language():
-         Parameter '%s' doesn't contain valid ISO 639-1 code.
-                 Value: %s
-
  check_language_639_1():
          Parameter '%s' doesn't contain valid ISO 639-1 code.
                  Codeset: %s
@@ -150,49 +119,6 @@ Returns undef.
                  Value: %s
 
 =head1 EXAMPLE1
-
-=for comment filename=check_language_ok.pl
-
- use strict;
- use warnings;
-
- use Mo::utils::Language qw(check_language);
-
- my $self = {
-         'key' => 'en',
- };
- check_language($self, 'key');
-
- # Print out.
- print "ok\n";
-
- # Output:
- # ok
-
-=head1 EXAMPLE2
-
-=for comment filename=check_language_fail.pl
-
- use strict;
- use warnings;
-
- use Error::Pure;
- use Mo::utils::Language qw(check_language);
-
- $Error::Pure::TYPE = 'Error';
-
- my $self = {
-         'key' => 'xx',
- };
- check_language($self, 'key');
-
- # Print out.
- print "ok\n";
-
- # Output like:
- # #Error [...utils.pm:?] Parameter 'key' doesn't contain valid ISO 639-1 code.
-
-=head1 EXAMPLE3
 
 =for comment filename=check_language_639_1_ok.pl
 
@@ -212,7 +138,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE4
+=head1 EXAMPLE2
 
 =for comment filename=check_language_639_1_fail.pl
 
@@ -235,7 +161,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' doesn't contain valid ISO 639-1 code.
 
-=head1 EXAMPLE5
+=head1 EXAMPLE3
 
 =for comment filename=check_language_639_2_ok.pl
 
@@ -255,7 +181,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE6
+=head1 EXAMPLE4
 
 =for comment filename=check_language_639_2_fail.pl
 
@@ -322,6 +248,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

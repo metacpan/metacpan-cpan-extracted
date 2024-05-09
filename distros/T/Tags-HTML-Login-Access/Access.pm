@@ -8,13 +8,14 @@ use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use List::Util 1.33 qw(none);
 use Mo::utils 0.06 qw(check_array);
+use Mo::utils::CSS 0.06 qw(check_css_unit);
 use Mo::utils::Language 0.05 qw(check_language_639_2);
 use Readonly;
 use Tags::HTML::Messages;
 
 Readonly::Array our @FORM_METHODS => qw(post get);
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 # Constructor.
 sub new {
@@ -81,6 +82,8 @@ sub new {
 	}
 
 	check_array($self, 'tags_after');
+
+	check_css_unit($self, 'width');
 
 	$self->{'_tags_messages'} = Tags::HTML::Messages->new(
 		'css' => $self->{'css'},
@@ -397,6 +400,18 @@ Returns undef.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+         From Mo::utils::check_array():
+                 Parameter 'tags_after' must be a array.
+                         Value: %s
+                         Reference: %s
+         From Mo::utils::CSS::check_css_unit():
+                 Parameter 'width' doesn't contain number.
+                         Value: %s
+                 Parameter 'width' doesn't contain unit.
+                         Value: %s
+                 Parameter 'width' contain bad unit.
+                         Unit: %s
+                         Value: %s
          From Mo::utils::Language::check_language_639_2():
                  Parameter 'lang' doesn't contain valid ISO 639-2 code.
                          Codeset: %s
@@ -571,6 +586,7 @@ L<Class::Utils>,
 L<Error::Pure>,
 L<List::Util>,
 L<Mo::utils>,
+L<Mo::utils::CSS>,
 L<Mo::utils::Language>,
 L<Readonly>,
 L<Tags::HTML>,
@@ -608,6 +624,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

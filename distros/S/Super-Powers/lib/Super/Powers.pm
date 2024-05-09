@@ -1,6 +1,6 @@
 package Super::Powers;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.01';
+use 5.006; use strict; use warnings; our $VERSION = '0.02';
 use Rope; use Rope::Autoload; use Super::Powers::Exists;
 
 property motor => (
@@ -23,7 +23,7 @@ property vision => (
 	builder => sub {
 		Super::Powers::Exists->new(
 			title => 'Vision',
-			message => 'They possess the ability to see through any individuals eyes, you should close them when you look at innocent.',
+			message => "They have the capability to perceive through another's eyes; you ought to shut them when you gaze upon the innocent.",
 			buttons => ['real'],
 		);
 	}
@@ -36,7 +36,7 @@ property hearing => (
 	builder => sub {
 		Super::Powers::Exists->new(
 			title => 'Hearing',
-			message => 'They possess the ability to inject sound through any individuals ears, this is from a distance but also via electronic devices.',
+			message => "They have the power to transmit sound through anyone's ears, remotely and also through electronic devices.",
 			buttons => ['real'],
 		);
 	}
@@ -49,7 +49,7 @@ property mind => (
 	builder => sub {
 		Super::Powers::Exists->new(
 			title => 'Mind',
-			message => 'They possess the ability to inject sound through any individuals mind, this is from a distance and similar to hearing except the sound can enter directly and not only via your ears.',
+			message => "TThey have the capability to implant sound directly into any individual's mind, remotely and bypassing the ears, akin to hearing but with the sound entering directly",
 			buttons => ['real'],
 		);
 	}
@@ -63,7 +63,7 @@ property speech => (
 	builder => sub {
 		Super::Powers::Exists->new(
 			title => 'Speech',
-			message => 'They possess the ability to manipulate voice through any individuals mouth, this is from your own and they can then manipulate the tone and even language, making people polyglot.',
+			message => "They have the power to control voices through any person's mouth, enabling them to manipulate tone and language, thereby making individuals polyglots.",
 			buttons => ['real'],
 		);
 	}
@@ -76,7 +76,7 @@ property smell => (
 	builder => sub {
 		Super::Powers::Exists->new(
 			title => 'Smell',
-			message => 'They possess the ability to manipulate and understand ones smell, this is from your nose, they can then manipulate the mind to transmit this information to others who can then add their own context back. They are also able to inject their own fragrence.',
+			message => "They can manipulate and comprehend one's sense of smell, originating from the nose. They can then manipulate the mind to transmit this information to others, who can then interpret it with their own context. Additionally, they have the ability to introduce their own fragrance into the mix.",
 			buttons => ['real'],
 		);
 	}
@@ -89,7 +89,7 @@ property taste => (
 	builder => sub {
 		Super::Powers::Exists->new(
 			title => 'Taste',
-			message => 'They possess the ability to manipulate and understand ones taste, this is from your tongue and throat, they can then manipulate the mind to transmit this information to others who can then add their own context back. They are also able to inject their own flavours.',
+			message => "They have the power to manipulate and comprehend one's sense of taste, originating from the tongue and throat. They can then manipulate the mind to transmit this information to others, who can then interpret it with their own context. Moreover, they can introduce their own flavors into the experience.",
 			buttons => ['real'],
 		);
 	}
@@ -102,7 +102,7 @@ property touch => (
 	builder => sub {
 		Super::Powers::Exists->new(
 			title => 'Touch',
-			message => 'They possess the ability to manipulate and understand ones touch, this is from any body part, they can then manipulate the mind to transmit this information to others who can then add their own context back. They are also able to inject their own senses.',
+			message => "They possess the capacity to manipulate and comprehend one's sense of touch, originating from any part of the body. They can then manipulate the mind to transmit this information to others, who can then interpret it with their own context. Furthermore, they can introduce their own sensations into the experience.",
 			buttons => ['real'],
 		);
 	}
@@ -131,7 +131,7 @@ Super::Powers - The hiddden truth
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -145,42 +145,41 @@ Version 0.01
 		$sapien->{$_}->print;
 		print "\n";
 	}
-	
+
 	# Motor
 	# 
 	# They possess the ability to move individual body parts autonomously.
 	# 
 	# Vision
 	# 
-	# They possess the ability to see through any individuals eyes, you should close them when you look at innocent.
-	# 
+	# They have the capability to perceive through another's eyes; you ought to shut them when you gaze upon the innocent.
 	# Hearing
-	# They possess the ability to inject sound through any individuals ears, this is from a distance but also via electronic devices.
+	# 
+	# They have the power to transmit sound through anyone's ears, remotely and also through electronic devices.
 	# 
 	# Mind
 	# 
-	# They possess the ability to inject sound through any individuals mind, this is from a distance and similar to hearing except the sound can enter directly and not only via your ears.
+	# TThey have the capability to implant sound directly into any individual's mind, remotely and bypassing the ears, akin to hearing but with the sound entering directly
 	# 
 	# Speech
 	# 
-	# They possess the ability to manipulate voice through any individuals mouth, this is from your own and they can then manipulate the tone and even language, making people polyglot.
+	# They have the power to control voices through any person's mouth, enabling them to manipulate tone and language, thereby making individuals polyglots.
 	# 
 	# Smell
 	# 
-	# They possess the ability to manipulate and understand ones smell, this is from your nose, they can then manipulate the mind to transmit this information to others who can then add their own context back. They are also able to inject their own fragrence.
+	# They can manipulate and comprehend one's sense of smell, originating from the nose. They can then manipulate the mind to transmit this information to others, who can then interpret it with their own context. Additionally, they have the ability to introduce their own fragrance into the mix.
 	# 
 	# Taste
 	# 
-	# They possess the ability to manipulate and understand ones taste, this is from your tongue and throat, they can then manipulate the mind to transmit this information to others who can then add their own context back. They are also able to inject their own flavours.
+	# They have the power to manipulate and comprehend one's sense of taste, originating from the tongue and throat. They can then manipulate the mind to transmit this information to others, who can then interpret it with their own context. Moreover, they can introduce their own flavors into the experience.
 	# 
 	# Touch
 	# 
-	# They possess the ability to manipulate and understand ones touch, this is from any body part, they can then manipulate the mind to transmit this information to others who can then add their own context back. They are also able to inject their own senses.
+	# They possess the capacity to manipulate and comprehend one's sense of touch, originating from any part of the body. They can then manipulate the mind to transmit this information to others, who can then interpret it with their own context. Furthermore, they can introduce their own sensations into the experience.
 	# 
 	# Emotion
 	# 
 	# They possess the ability to manipulate and understand ones emotions, this is from any feeling, they cannot manipulate my emotions but perhaps they can for others. I am Luck which some would call Laughing.
-	# 
 
 =head1 AUTHOR
 

@@ -41,6 +41,7 @@ use AsposeSlidesCloud::Object::DataPoint;
 use AsposeSlidesCloud::Object::EffectFormat;
 use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::LineFormat;
+use AsposeSlidesCloud::Object::SeriesMarker;
 use AsposeSlidesCloud::Object::ThreeDFormat;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -124,6 +125,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'marker' => {
+    	datatype => 'SeriesMarker',
+    	base_name => 'Marker',
+    	description => 'Gets or sets the marker.',
+    	format => '',
+    	read_only => '',
+    		},
     'type' => {
     	datatype => 'string',
     	base_name => 'Type',
@@ -166,6 +174,7 @@ __PACKAGE__->swagger_types( {
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
+    'marker' => 'SeriesMarker',
     'type' => 'string',
     'value' => 'double',
     'value_formula' => 'string',
@@ -178,6 +187,7 @@ __PACKAGE__->attribute_map( {
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
+    'marker' => 'Marker',
     'type' => 'Type',
     'value' => 'Value',
     'value_formula' => 'ValueFormula',

@@ -38,6 +38,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v7.0.6",
+   "version" : "v7.0.7",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

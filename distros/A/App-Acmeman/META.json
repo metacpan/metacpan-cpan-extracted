@@ -62,7 +62,7 @@
    "provides" : {
       "App::Acmeman" : {
          "file" : "lib/App/Acmeman.pm",
-         "version" : "3.09"
+         "version" : "3.10"
       },
       "App::Acmeman::Apache::Layout" : {
          "file" : "lib/App/Acmeman/Apache/Layout.pm"
@@ -119,6 +119,6 @@
          "web" : "http://git.gnu.org.ua/cgit/acmeman.git/"
       }
    },
-   "version" : "3.09",
+   "version" : "3.10",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -18,7 +18,7 @@ use IPC::Open3;
 use Symbol 'gensym';
 use Carp;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 my $logger = get_logger();
 
 =pod

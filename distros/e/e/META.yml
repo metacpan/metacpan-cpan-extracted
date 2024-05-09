@@ -1,0 +1,27 @@
+---
+abstract: 'The great new e!'
+author:
+  - 'Tim Potapov <tim.potapov@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: e
+provides:
+  e:
+    file: lib/e.pm
+    version: '0.01'
+requires:
+  perl: '5.012'
+resources:
+  bugtracker: https://github.com/poti1/e/issues
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: https://github.com/poti1/e
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

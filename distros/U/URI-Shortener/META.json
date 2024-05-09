@@ -63,7 +63,7 @@
    "provides" : {
       "URI::Shortener" : {
          "file" : "lib/URI/Shortener.pm",
-         "version" : "1.001"
+         "version" : "1.003"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/Troglodyne-Internet-Widgets/URI-Shorten"
       }
    },
-   "version" : "1.001",
+   "version" : "1.003",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }

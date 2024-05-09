@@ -280,17 +280,13 @@ B<pound>.
 
 =over 4
 
-=item 1. Prepare the B<pound> HTTP listener for serving ACME challenges.
-
-Add the B<ACME> directive to the B<ListenHTTP> section of your F</etc/pound.cfg>
-file.  Its argument is a directory on local file system where ACME challenge
-files will be stored.  Make sure that this directory is the
-F<.well-known/acme-challenge> subdirectory of the B<rootdir> in your
+=item 1. Add the B<ACME> directive to the B<ListenHTTP> section of your
+F</etc/pound.cfg> file.  Its argument is a directory on local file system
+where ACME challenge files will be stored.  Make sure that this directory
+is the F<.well-known/acme-challenge> subdirectory of the B<rootdir> in your
 B<acmeman> configuration file.
 
-=item 2
-
-In the same B<ListenHTTP> section, define hostnames which will obtain
+=item 2. In the same B<ListenHTTP> section, define hostnames which will obtain
 ACME certificates.  Make sure to use B<Host> statements with exact string
 matching algorithm.  If serving several host names, use the B<Match OR> block.
 
@@ -299,24 +295,23 @@ matching algorithm.  If serving several host names, use the B<Match OR> block.
 After these two steps, your listener section will look like:
 
     ListenHTTP
-        Address 0.0.0.0
-        Port 80
-        ACME "/var/lib/pound/acme/.well-known/acme-challenge"
+	Address 0.0.0.0
+	Port 80
+	ACME "/var/lib/pound/acme/.well-known/acme-challenge"
 	Service
 	    Match OR
 		Host "www.example.org"
 		Host "example.org"
 	    End
-            ...
-        End
+	    ...
+	End
     End
 
 =over 4
 
-=item 3. Configure B<acmeman>.
-
-Use the B<pound> source and make sure B<rootdir> is synchronized with
-the B<ACME> statement in F<pound.cfg>, as described in point 1.  E.g.:
+=item 3. Configure B<acmeman>.  Use the B<pound> source and make sure
+B<rootdir> is synchronized with the B<ACME> statement in F<pound.cfg>, as
+described in point 1.  E.g.:
 
     [core]
 	source = pound
@@ -481,6 +476,8 @@ files as described in section B<apache>. One argument is allowed. If supplied,
 it defines the apache configuration layout. Allowed values are: B<debian>,
 B<slackware>, B<suse> and B<rh> (for Red Hat). Without arguments, the layout
 will be autodetected.
+
+The B<pound> source gathers host names from B<pound> configuration file.
 
 The B<file> source reads domain names from one or more disk files. A
 mandatory argument specifies the name of the directory where the files
@@ -825,12 +822,85 @@ from the input files will form the list of its alternative names.
 =head2 pound
 
     [core]
-	source = pound [FILE]
+	source = pound [--config=FILE] [--host=HOST] \
+		       [--type=http|https] [--listener=NAME] \
+		       [--comment=TEXT]
 
 Domain names will be read from I<FILE> or, if it is not supplied, from
-the default B<pound> configuration file F</etc/pound.cfg>.  The module
-scans the B<ListenHTTP> section where the B<ACME> directive is used and
-extracts the domain names from the B<Host> statements in its services.
+the default B<pound> configuration file F</etc/pound.cfg>.  By default,
+the module will scan B<ListenHTTP> sections that have B<ACME> directive
+set and will extract domain names from B<Host> statements in its services.
+
+The B<--type> and B<--listener> options modify this behavior.  The B<--type>
+option instructs B<pound> which type of listeners to scan.  Setting it to
+B<http> means scanning only B<ListenHTTP> listeners (the default) and
+setting it to B<https> means scanning B<ListenHTTPS> listeners.  To
+enable scanning both types of listeners, use B<--type=http --type=https>.
+When scanning B<ListenHTTPS>, the module collects all domain names that
+appear as arguments to B<Host> statements.
+
+If B<--listener> option is used, module will scan only the named listener.
+To select multiple listeners, use several B<--listener> options.
+
+The B<--comment> option defines a text, which, when appearing at the
+start of a comment line, enables host name collection.  Such I<pragmatical>
+comments may appear anywhere within listener and service sections and their
+scope is limited by the corresponding section.  When this option is used,
+host collection is disabled by default.  For example, assuming
+B<--comment=acme>, the following configuration snippet (with irrelevant
+statements replaced by ellipses) will result in issuing certificate for
+C<example.org> and C<www.example.org>:
+
+  ListenerHTTP
+     # acme
+     Service
+	Host -exact "example.org"
+	...
+     End
+
+     Service
+	Host -exact "www.example.org"
+	...
+     End
+  End
+
+In contrast, when processing the following snippet, B<acmeman> will issue
+certificate for C<example.org> only:
+
+  ListenerHTTP
+     Service
+	# acme
+	Host -exact "example.org"
+	...
+     End
+
+     Service
+	Host -exact "www.example.org"
+	...
+     End
+  End
+
+Furthermore, using B<no-I<TEXT>> at the start of a comment cancels
+the effect of the previous pragmatic comment.  This can be used for
+better control of host selection:
+
+  ListenerHTTP
+     Service
+	Match OR
+	   # acme
+	   Host -exact "example.org"
+	   Host -exact "www.example.org"
+	   # no-acme
+	   Host -exact "test.example.org"
+	 End
+	 ...
+     End
+  End
+
+
+If the B<--host> (B<-h>) option is used, only one certificate will be
+issued. The I<HOST> will be used as its B<CN>. All the domain names read
+from the input files will form the list of its alternative names.
 
 Notice the limitations of this module:
 
@@ -843,14 +913,14 @@ cope with it.  When declaring multiple hosts, always use the B<Match OR>
 section, like this:
 
     Match OR
-	Host "host1"
-	Host "host2"
-	Host "host3"
+	Host -exact "host1"
+	Host -exact "host2"
+	Host -exact "host3"
     End
 
 =item 2. These B<Host> statements (or the enclosing B<Match OR> section)
 must be declared in the B<Service> sections located under the B<ListenHTTP>
-section.  Global B<Service> sections are not scanned.
+or B<ListenHTTPS> sections.  Global B<Service> sections are not scanned.
 
 =back
 
@@ -954,5 +1024,5 @@ GPLv3+: GNU GPL version 3 or later, see L<http://gnu.org/licenses/gpl.html>
 
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
-    
+
 =cut

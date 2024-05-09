@@ -19,7 +19,7 @@ name: URI-Shortener
 provides:
   URI::Shortener:
     file: lib/URI/Shortener.pm
-    version: '1.001'
+    version: '1.003'
 requires:
   Carp::Always: '0'
   Crypt::PRNG: '0'
@@ -35,6 +35,6 @@ resources:
   bugtracker: https://github.com/Troglodyne-Internet-Widgets/URI-Shorten/issues
   homepage: https://github.com/Troglodyne-Internet-Widgets/URI-Shorten
   repository: https://github.com/Troglodyne-Internet-Widgets/URI-Shorten.git
-version: '1.001'
+version: '1.003'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
