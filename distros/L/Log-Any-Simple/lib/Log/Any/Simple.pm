@@ -12,7 +12,7 @@ use Log::Any::Adapter;
 use Readonly;
 use Sub::Util 'set_subname';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 Readonly::Scalar my $DIE_AT_DEFAULT => numeric_level('fatal');
 Readonly::Scalar my $DIE_AT_KEY => 'Log::Any::Simple/die_at';

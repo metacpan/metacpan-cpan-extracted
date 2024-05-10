@@ -1,4 +1,4 @@
-package Net::Eboks;
+package Net::Eboks; 
 
 use 5.010;
 use strict;
@@ -16,7 +16,7 @@ use IO::Lambda qw(:all);
 use IO::Lambda::HTTP qw(http_request);
 use Crypt::OpenSSL::RSA;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 sub new
 {
@@ -28,6 +28,7 @@ sub new
 		type       => 'P',
 		datetime   => DateTime->now->strftime('%Y-%m-%d %H:%M:%SZ'),
 		root       => 'rest.e-boks.dk',
+		mailapp    => '/mobile/1/xml.svc/en-gb',
 		deviceid   => 'DEADBEEF-1337-1337-1337-900000000002',
 
 		nonce      => '',
@@ -35,13 +36,18 @@ sub new
 		response   => "3a1a51f235a8bd6bbc29b2caef986a1aeb77018d60ffdad9c5e31117e7b6ead3", # XXX
 		uid        => undef,
 		uname      => undef,
+		share_id   => '0',
 		conn_cache => LWP::ConnCache->new,
+
+		from       => $ENV{MAILFROM} // 'noreply@e-boks.dk',
 
 		%opts,
 	}, $class;
 
 	return $self;
 }
+
+sub set { $_[0]->{$_[1]} = $_[2] }
 
 sub response
 {
@@ -173,7 +179,7 @@ XML
 
 	my $login = HTTP::Request->new(
 		'PUT',
-		'https://' . $self->{root} . '/mobile/1/xml.svc/en-gb/session',
+		'https://' . $self->{root} . $self->{mailapp} . '/session',
 		[
 			'Content-Type'         => 'application/xml',
 			'Content-Length'       => length($content),
@@ -198,12 +204,11 @@ XML
 	};
 }
 
-sub session_activate
+sub public_key
 {
-	my ($self, $ticket) = @_;
 
 # 	openssl rsa -in id_rsa -outform PEM -pubout -out id_rsa.pub
-	my $pubkey = join '', grep {!/^--/} split /\n/, <<'PUB';
+	return join '', grep {!/^--/} split /\n/, <<'PUB';
 -----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2VUahnbWKIY4rn8jEthY
 9M2BoMIHoNQlY4YUL9pV+MpSKyy9MjVKV6h8ERnj+1wxUJDR3ZJimYnvcruGqlSR
@@ -214,7 +219,13 @@ IEfbbzX/rK30FFVurFG0JAE9T7z7b0S5RkGFx4GgKGRoFRd8HE+UptBa4JyvmvA3
 MQIDAQAB
 -----END PUBLIC KEY-----
 PUB
+}
 
+sub session_activate
+{
+	my ($self, $ticket) = @_;
+
+	my $pubkey  = $self->public_key;
 	my $authstr = join(',', map { "$_=\"$self->{$_}\"" } qw(deviceid nonce sessionid response));
 	my $content = <<XML;
 <?xml version="1.0" encoding="utf-8"?>
@@ -226,7 +237,7 @@ XML
 
 	my $login = HTTP::Request->new(
 		'PUT',
-		'https://' . $self->{root} . "/mobile/1/xml.svc/en-gb/$self->{uid}/0/session/activate",
+		'https://' . $self->{root} . $self->{mailapp} . "/$self->{uid}/0/session/activate",
 		[
 			'Content-Type'         => 'application/xml',
 			'Content-Length'       => length($content),
@@ -251,7 +262,7 @@ sub get
 	my $authstr = join(',', map { "$_=\"$self->{$_}\"" } qw(deviceid nonce sessionid response));
 	my $get = HTTP::Request->new(
 		'GET',
-		'https://' . $self->{root} . '/' . $path,
+		'https://' . $self->{root} . $self->{mailapp} . '/' . $path,
 		[
 			'X-EBOKS-AUTHENTICATE' => $authstr,
 			'Accept'               => '*/*',
@@ -290,19 +301,28 @@ sub xmlget
 
 sub folders
 {
+	my ($self, $share_id) = @_;
+	return undef unless $self->{uid};
+	$share_id //= $self->{share_id};
+	$self-> xmlget("$self->{uid}/$share_id/mail/folders", ['FolderInfo']);
+}
+
+sub shares
+{
 	my $self = shift;
 	return undef unless $self->{uid};
-	$self-> xmlget("/mobile/1/xml.svc/en-gb/$self->{uid}/0/mail/folders", ['FolderInfo']);
+	$self-> xmlget("$self->{uid}/0/shares?listType=active", ['Share']);
 }
 
 sub messages
 {
-	my ($self, $folder_id, $offset, $limit) = @_;
+	my ($self, $share_id, $folder_id, $offset, $limit) = @_;
 	return undef unless $self->{uid};
+	$share_id //= $self->{share_id};
 	$limit  //= 1;
 	$offset //= 0;
 	$self-> xmlget(
-		"/mobile/1/xml.svc/en-gb/$self->{uid}/0/mail/folder/$folder_id?skip=$offset&take=$limit", 
+		"$self->{uid}/$share_id/mail/folder/$folder_id?skip=$offset&take=$limit", 
 		[ qw(Messages 0 MessageInfo) ],
 		KeyAttr => 'id'
 	);
@@ -310,10 +330,11 @@ sub messages
 
 sub message
 {
-	my ($self, $folder_id, $message_id) = @_;
+	my ($self, $share_id, $folder_id, $message_id) = @_;
 	return undef unless $self->{uid};
+	$share_id //= $self->{share_id};
 	$self-> xmlget(
-		"/mobile/1/xml.svc/en-gb/$self->{uid}/0/mail/folder/$folder_id/message/$message_id",
+		"$self->{uid}/$share_id/mail/folder/$folder_id/message/$message_id",
 		[],
 		KeyAttr => 'id'
 	);
@@ -321,9 +342,11 @@ sub message
 
 sub content
 {
-	my ( $self, $folder_id, $content_id ) = @_;
+	my ( $self, $share_id, $folder_id, $content_id ) = @_;
+	return undef unless $self->{uid};
+	$share_id //= $self->{share_id};
 	return 
-		$self-> get( "/mobile/1/xml.svc/en-gb/$self->{uid}/0/mail/folder/$folder_id/message/$content_id/content" ), sub {
+		$self-> get( "$self->{uid}/$share_id/mail/folder/$folder_id/message/$content_id/content" ), sub {
 			$self-> response( 0, @_ )
 		};
 }
@@ -399,7 +422,7 @@ sub assemble_mail
 	$received = $date->strftime('%a, %d %b %Y %H:%M:%S %z');
 
 	my $mail = MIME::Entity->build(
-		From          => $opt{from}    // ( safe_encode('MIME-Q', $sender) . ' <noreply@e-boks.dk>' ) ,
+		From          => $opt{from}    // ( safe_encode('MIME-Q', $sender) . " <$self->{from}>" ) ,
 		To            => $opt{to}      // ( safe_encode('MIME-Q', $self->{uname}) . ' <' . ( $ENV{USER} // 'you' ) . '@localhost>' ),
 		Subject       => $opt{subject} // safe_encode('MIME-Header', $msg->{name}),
 		Data          => $opt{data}    // encode('utf-8', "Mail from $sender"),
@@ -407,6 +430,7 @@ sub assemble_mail
 		Charset       => 'utf-8',
 		Encoding      => 'quoted-printable',
 		'X-Net-Eboks' => "v/$VERSION",
+		'X-Net-Eboks-ShareId' => $opt{share_id} // '0',
 	);
 
 	my @attachments;
@@ -463,9 +487,9 @@ sub fetch_request
 sub fetch_message_and_attachments
 {
 	my ($self, $message ) = @_;
-
+	
 	return lambda {
-		context $self-> fetch_request( $self->message( $message->{folderId}, $message->{id} ) );
+		context $self-> fetch_request( $self->message( $message->{shareId}, $message->{folderId}, $message->{id} ) );
 	tail {
 		my ($xml, $error) = @_;
 		return ($xml, $error) unless defined $xml;
@@ -474,56 +498,56 @@ sub fetch_message_and_attachments
 		my @attachments = keys %$attachments;
 		my %opt = ( 
 			message     => $xml,
+			share_id    => $message->{shareId},
 			attachments => {},
 		);
 
-		context $self-> fetch_request( $self-> content( $message->{folderId}, $message->{id} ));
+		context $self-> fetch_request( $self-> content( $message->{shareId}, $message->{folderId}, $message->{id} ));
 	tail {
 		my ($body, $error) = @_;
 		return ($body, $error) unless defined $body;
 		$opt{body} = $body;
 	
 		my $att_id = shift @attachments or return \%opt;
-		context $self-> fetch_request( $self-> content( $message->{folderId}, $att_id ));
+		context $self-> fetch_request( $self-> content( $message->{shareId}, $message->{folderId}, $att_id ));
 	tail {
 		my ($att_body, $error) = @_;
 		return ($att_body, $error) unless defined $att_body;
 
 		$opt{attachments}->{$att_id} = $att_body;
 		$att_id = shift @attachments or return \%opt;
-		context $self-> fetch_request( $self-> content( $message->{folderId}, $att_id ));
+		context $self-> fetch_request( $self-> content( $message->{shareId}, $message->{folderId}, $att_id ));
 		again;
 	}}}};
 }
 
 sub list_all_messages
 {
-	my ( $self, $folder_id ) = @_;
+	my ( $self, $share_id, $folder_id ) = @_;
 
 	my $offset = 0;
 	my $limit  = 1000;
+	$share_id //= $self->{share_id};
 
 	my %ret;
 
 	return lambda {
-		context $self-> fetch_request( $self-> messages( $folder_id, $offset, $limit ));
+		context $self-> fetch_request( $self-> messages( $share_id, $folder_id, $offset, $limit ));
 	tail {
 		my ($xml, $error) = @_;
 		return ($xml, $error) unless $xml;
 
+		$_->{shareId} = $share_id for values %$xml;
 		%ret = ( %ret, %$xml );
-		#delete $ret{0}; # generates 500 server error
 		return \%ret if keys(%$xml) < $limit;
 
 		$offset += $limit;
-		context $self-> fetch_request( $self-> messages( $folder_id, $offset, $limit ));
+		context $self-> fetch_request( $self-> messages( $share_id, $folder_id, $offset, $limit ));
 		again;
 	}};
 }
 
 1;
-
-__DATA__
 
 =pod
 

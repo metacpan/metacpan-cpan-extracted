@@ -4,16 +4,18 @@ use 5.022;
 use strict;
 use warnings;
 
+use lib '/usr/local/lib/perl5';
+
 use App::PTP;
 
-our $VERSION = $App::PTP::VERSION;
+our $VERSION = $App::PTP::VERSION;  ## no critic (ProhibitComplexVersion, RequireConstantVersion)
 
 App::PTP::Run(\*STDIN, \*STDOUT, \*STDERR, \@ARGV);
 exit 0;
 
 # PODNAME: ptp
 # ABSTRACT: An expressive Pipelining Text Processor
- 
+
 __DATA__
 
 =pod
@@ -115,10 +117,10 @@ All options are case sensitive and can be abbreviated down to uniqueness.
 However, it is recommended to use only the variants that are documented here, in
 case options are introduced in the future that render some abbreviations
 ambiguous. Unless specified otherwise, the arguments to all the options are
-mendatory (for brevity they are usually documented only on the short form of the
-options, but they are mendatory for the long form too).
+mandatory (for brevity they are usually documented only on the short form of the
+options, but they are mandatory for the long form too).
 
-The program expects fourd different kinds of arguments (all described below).
+The program expects four different kinds of arguments (all described below).
 They can be mixed in any order that you want. However, for some of these
 arguments the order is actually meaningful (e.g. the commands are applied in the
 order in which they are specified):
@@ -133,7 +135,7 @@ on each input files. The commands are all executed, in the order in which they
 are specified on the command line, and applied to all input files.
 
 =item * L</PROGRAM BEHAVIOR> options, set global options for the program. These
-flags can appear multiple times on the command line, but only the last occurence
+flags can appear multiple times on the command line, but only the last occurrence
 will be used. To avoid mistakes, the program will stop with an error when some
 of these flags are specified more than once.
 
@@ -150,7 +152,7 @@ needed.
 Input files can be specified anywhere on the command line. They will be
 processed in the order in which they appear but their position relative to other
 arguments is ignored. Any command line argument that does not start with a B<->
-is considered to be a filename (unless it is an argument to a preceeding flag).
+is considered to be a filename (unless it is an argument to a preceding flag).
 
 A single B<-> alone indicates that the standard input will be processed, this
 can be mixed with reading other files. If no input files at all are specified
@@ -178,9 +180,9 @@ description of the affected commands.
 
 =item B<--g> I<pattern>, B<--grep>
 
-Filter each input to keep only the lines that match the given regular 
+Filter each input to keep only the lines that match the given regular
 expression. That expression cannot have delimiters (e.g. /foo/) so, if you
-want to pass options to the regex, you need to use the group syntex (e.g.
+want to pass options to the regex, you need to use the group syntax (e.g.
 (?i)foo).
 
 If you use parenthesis, you probably want to enclose the expression in single
@@ -195,7 +197,7 @@ B<-V> and the pattern can be interpreted as an exact string with B<-Q>.
 =item B<-s> I<pattern> I<subst>, B<--substitute>
 
 Replace all matches of the given regular expression by the given substitution
-pattern on each line of the input. The substitution string is evaluated like a 
+pattern on each line of the input. The substitution string is evaluated like a
 Perl string, so it can contain references to capture group in the regular
 expression using the B<$1>, B<$2>, etc. syntax.
 
@@ -314,7 +316,7 @@ The markers of the lines that are kept are not changed.
 =item B<--gu>, B<--global-unique>
 
 Remove duplicate lines in the file, even if they are not consecutive. The first
-occurence of each line is kept.
+occurrence of each line is kept.
 
 The markers of the lines that are kept are not changed.
 
@@ -356,7 +358,7 @@ After this operation, no line has a marker set (they were all deleted).
 
 =item B<--delete-before>
 
-Delete all the lines immediately preceeding a line whose marker is set. The
+Delete all the lines immediately preceding a line whose marker is set. The
 markers of the lines that are not deleted are not changed.
 
 =item B<--delete-after>
@@ -414,7 +416,7 @@ The separator itself is not kept in the content of the fields.
 The notion of what constitute a field is defined by the B<-F> flag described
 below in L</PIPELINE MODES>. The default will try to split on both tabs and
 comma. When the fields are pasted together, tabs are added between each fields
-but this can be overriden with the B<-P> flag.
+but this can be overridden with the B<-P> flag.
 
 The value of the B<-F> flag is also affected by the B<-Q> and B<-I> flags.
 
@@ -495,7 +497,7 @@ If I<filename> is a single B<->, then write to the standard output.
 
 Note that the I<filename> is actually evaluated as a quoted Perl string, so it
 can contain variables from the Perl environment. This behavior can be
-deactivated by the B<-Q> flag, to have the B<filename> be used as-is (in 
+deactivated by the B<-Q> flag, to have the B<filename> be used as-is (in
 particular, you probably want to use this flag on platform where file-names use
 back-slash characters '\').
 
@@ -516,7 +518,7 @@ pass of interpretation. That pass cannot be deactivated.
 
 The options in this section modify globally the behavior of the program. They
 can be specified anywhere on the command line with the same effect. Most of them
-can appear multiple time on the command line but only the last occurence is
+can appear multiple time on the command line but only the last occurrence is
 taken into account. To help find possible problem causes, for some of these
 options, specifying them multiple times will generate an error.
 
@@ -550,7 +552,7 @@ This cannot be used when reading from the standard input.
 
 Allow to specify directories instead of files on the command line. The entire
 content of the specified directories will be processed, as if all the files had
-been mentionned on the command line.
+been mentioned on the command line.
 
 =item B<--input-filter> I<code>
 
@@ -562,7 +564,7 @@ the default B<$_> variable. You can view this option in action in the
 L</EXAMPLES> sections
 
 This option applies only of files recursively expended from a directory passed
-on the command line. It does not apply on files that are explicitely listed. In
+on the command line. It does not apply on files that are explicitly listed. In
 particular, this option does not apply on files that are expended by a shell
 glob. It derives that this option is useless unless B<-R> is specified too.
 
@@ -592,10 +594,10 @@ transformed into an "\r\n" (CRLF) sequence.
 =item B<--eol>, B<--preserve-input-separator>
 
 Keep the input separators in the content of each line. It is then your
-responsability to preserve (or to change) this separator when the files are
+responsibility to preserve (or to change) this separator when the files are
 processed.
 
-Setting this flag also sets the B<--output-separator> to the empty string. This can be overriden if needed by passing that flag after the B<--eol> one
+Setting this flag also sets the B<--output-separator> to the empty string. This can be overridden if needed by passing that flag after the B<--eol> one
 (this would result in each line having their initial end of line separator plus
 the one specified for the output (unless the initial one is removed during the
 processing).
@@ -660,7 +662,7 @@ protects the rest of the program from that code. The code still has access to
 the rest of the system. This mode is approximately 30 times slower than the
 default.
 
-When passed a value of I<2> or more, the container additionaly tries to prevent
+When passed a value of I<2> or more, the container additionally tries to prevent
 the user code from any interaction with the rest of the system (outside of the
 content of the files passed to the program). However, no claim is made that this
 is actually secure (and it most certainly is not).
@@ -680,7 +682,7 @@ cancelled by another option.
 =item B<-I>, B<--case-insensitive>
 
 Make the regular expressions used for the B<--grep> and B<--substitute> commands
-be case-insensitive by default (this can still be overidden in a given regular
+be case-insensitive by default (this can still be overridden in a given regular
 expression with the B<(?-i)> flag).
 
 This does not apply to regular expressions evaluated through the B<--perl>
@@ -689,14 +691,14 @@ command.
 =item B<-S>, B<--case-sensitive>
 
 Make the regular expressions used for the B<--grep> and B<--substitute> commands
-be case-sensitive by default (this can still be overidden in a given regular
+be case-sensitive by default (this can still be overridden in a given regular
 expression with the B<(?i)> flag).
 
 This is the default mode unless B<--case-insensitive> is specified.
 
 =item B<-Q>, B<--quote-regexp>
 
-Quote the regular expressions passed to the B<--grep> and B<--substitute> 
+Quote the regular expressions passed to the B<--grep> and B<--substitute>
 commands so that all (possibly) special characters are treated like normal
 characters. In practice this means that the matching done by these commands
 will be a simple text matching. Also disable variable interpolation for the
@@ -777,6 +779,30 @@ all the lines of the input are joined into a single line. In that case, the
 B<--transpose> command becomes equivalent to the B<--pivot> one.
 
 =back
+
+=item B<--sq> I<character>, B<--single-quote-replacement>
+
+Define a character or a string which, if present in any of the commands that
+accept Perl code as argument, will be replaced by a single quote character
+(C<'>) before the command is passed to Perl.
+
+This is useful to work around limitations of shell escaping.
+
+=item B<--dq> I<character>, B<--double-quote-replacement>
+
+Define a character or a string which, if present in any of the commands that
+accept Perl code as argument, will be replaced by a double quote character
+(C<">) before the command is passed to Perl.
+
+This is useful to work around limitations of shell escaping.
+
+=item B<--ds> I<character>, B<--dollar-sigil-replacement>
+
+Define a character or a string which, if present in any of the commands that
+accept Perl code as argument, will be replaced by a dollar character (C<$>)
+before the command is passed to Perl.
+
+This is useful to work around limitations of shell escaping.
 
 =item B<--re> I<engine>, B<--regex-engine>
 
@@ -911,7 +937,7 @@ files:
   ptp file1 file2 file3
 
 This example is similar to the built-in B<--nl> commands. It replaces each line
-with the output of the B<sprintf> fonction which, here, will prefix the line
+with the output of the B<sprintf> function which, here, will prefix the line
 number to each line.
 
 That example also demonstrates that a variable can be re-used across the lines
@@ -957,7 +983,7 @@ the first line of each file, and B<--pivot> joins the two lines of each file
 
   ptp dir -R --input-filter '/\.(c|h|cc)$/' -g '^\s*//' --lc --pfn --pivot
 
-Find all the occurences of a given regex in a file and print them, one per line.
+Find all the occurrences of a given regex in a file and print them, one per line.
 The regex can contain capture groups (using parenthesis). In that case only the
 content of the capture group is kept:
 

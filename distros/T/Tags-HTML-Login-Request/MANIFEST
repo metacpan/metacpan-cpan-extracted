@@ -23,5 +23,6 @@ Request.pm
 SIGNATURE
 t/Tags-HTML-Login-Request/01-use.t
 t/Tags-HTML-Login-Request/02-version.t
+t/Tags-HTML-Login-Request/03-new.t
 xt/Tags-HTML-Login-Request/01-pod_coverage.t
 xt/Tags-HTML-Login-Request/02-pod.t

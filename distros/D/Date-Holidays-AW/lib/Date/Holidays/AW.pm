@@ -1,5 +1,5 @@
 package Date::Holidays::AW;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -148,7 +148,7 @@ my %EASTER_BASED = (
         en  => 'Second day of easter',
     },
     'ascension' => {
-        d   => 40,
+        d   => 39,
         pap => 'Dia di Asuncion',
         nl  => 'Hemelvaartsdag',
         en  => 'Ascension day',
@@ -285,7 +285,7 @@ Date::Holidays::AW - Aruba's official holidays
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

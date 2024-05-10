@@ -21,10 +21,6 @@ ok( lives { $q->a }, 'use Hash::Wrap;' ) or note $@;
     use Hash::Wrap ();
 }
 
-like(
-    dies { P2::wrap_hash() },
-    qr{undefined subroutine.*at t/import.t}i,
-    q[don't export]
-);
+like( dies { P2::wrap_hash() }, qr{undefined subroutine.*at t/import.t}i, q[don't export] );
 
 done_testing;

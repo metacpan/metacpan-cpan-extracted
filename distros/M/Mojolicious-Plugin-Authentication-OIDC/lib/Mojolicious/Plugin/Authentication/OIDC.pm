@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::Authentication::OIDC 0.01;
+package Mojolicious::Plugin::Authentication::OIDC 0.02;
 use v5.26;
 use warnings;
 
@@ -79,6 +79,8 @@ Readonly::Hash my %DEFAULT_PARAMS => (
   get_token => sub ($c) {$c->session('token')},
   get_user  => sub ($token) {$token},
   get_roles => sub ($user, $token) {$user ? [] : undef},
+
+  role_map => undef,
 );
 Readonly::Hash my %DEFAULT_CONSTANTS => (
   scope         => 'openid',
@@ -89,7 +91,7 @@ Readonly::Hash my %DEFAULT_CONSTANTS => (
 =head1 METHODS
 
 L<Mojolicious::Plugin::Authentication::OIDC> inherits all methods from
-L<Mojolicious::Plugin> and imeplements the following new ones
+L<Mojolicious::Plugin> and implements the following new ones
 
 =head2 register( \%params )
 
@@ -191,6 +193,14 @@ Given a C<user> instance (produced by L</get_user>) and a decoded authorization
 token as arguments, returns an ArrayRef of roles pertaining to that user.
 
 Default: returns an empty ArrayRef
+
+=head4 role_map (%map)
+
+B<Optional>
+
+A mapping of external roles (e.g., from Authorization Server) to internal roles
+used by the application's authorization framework. If this option is specified,
+roles not present in its keys are deleted, all others will be mapped.
 
 =head4 on_login ( $controller, $user )
 
@@ -294,10 +304,13 @@ sub register($self, $app, $params) {
       try {
         $token = $c->_oidc_token;
         $user  = $c->current_user;
+        my @roles = $conf{get_roles}->($user, $token)->@*;
+        @roles = grep {defined} map {$conf{role_map}->{$_}} @roles if (defined($conf{role_map}));
+        return [@roles];
       } catch ($e) {
         return undef
       }
-      return $conf{get_roles}->($user, $token);
+      return undef;
     }
   );
 

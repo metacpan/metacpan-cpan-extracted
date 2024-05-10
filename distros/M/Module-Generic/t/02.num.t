@@ -59,22 +59,26 @@ $lconv = $Module::Generic::Number::DEFAULT if( !$curr_locale );
 #         )];
 #         @$lconv{ @$fail } = ( -1 ) x scalar( @$fail );
 # POSIX::setlocale( &POSIX::LC_ALL, $prev_locale );
-my( $sep_space, $tho_sep, $dec_sep, $n );
+my( $sep_space, $tho_sep, $dec_sep, $grouping, $n );
 if( !scalar( keys( %$lconv ) ) || [split(/\./, $curr_locale)]->[0] eq 'C' )
 {
     diag( "No locale could be found for language \"", ( $ENV{LANG} // '' ), "\"" );
     $tho_sep = ',';
     $dec_sep = '.';
-    $n = Module::Generic::Number->new( 10, precision => 2, thousand => $tho_sep, decimal => $dec_sep, debug => $DEBUG );
+    $grouping = 3;
+    $n = Module::Generic::Number->new( 10, precision => 2, thousand => $tho_sep, decimal => $dec_sep, grouping => $grouping, debug => $DEBUG );
 }
 else
 {
-    $tho_sep = CORE::length( $lconv->{thousands_sep} )
+    $tho_sep = CORE::length( $lconv->{thousands_sep} // '' )
         ? $lconv->{thousands_sep} 
         : $lconv->{mon_thousands_sep};
-    $dec_sep = CORE::length( $lconv->{decimal_point} )
+    $dec_sep = CORE::length( $lconv->{decimal_point} // '' )
         ? $lconv->{decimal_point}
         : $lconv->{mon_decimal_point};
+    $grouping = CORE::length( $lconv->{grouping} // '' )
+        ? [unpack( "C*", $lconv->{grouping} )]->[0]
+        : [unpack( "C*", $lconv->{mon_grouping} )]->[0];
     $n = Module::Generic::Number->new( 10, precision => 2, debug => $DEBUG );
 }
 $sep_space = int( $lconv->{p_sep_by_space} // 0 ) > 0 ? qr/[[:blank:]\h]+/ : '';
@@ -227,6 +231,7 @@ is( $n2->decimal, $dec_sep, "Decimal separator -> '" . ( defined( $dec_sep ) ? $
 # diag( "\$tho_sep is defined? ", defined( $tho_sep ) ? 'yes' : 'no' );
 # diag( "\$n2->thousand is defined? ", defined( $n2->thousand ) ? 'yes' : 'no' );
 is( ( $n2->thousand // '' ), ( $tho_sep // '' ), "Thousand separator -> '" . ( defined( $tho_sep ) ? $tho_sep : 'undef' ) . "'" );
+is( ( $n2->grouping // '' ), ( $grouping // '' ), "Grouping digit -> '" . ( defined( $grouping ) ? $grouping : 'undef' ) . "'" );
 is( $n2->precision, 2, "Precision -> '2'" );
 is( $n2->currency, '€', "Currency symbol -> '€'" );
 isa_ok( $n2->currency, 'Module::Generic::Scalar', 'Returns property as string object' );

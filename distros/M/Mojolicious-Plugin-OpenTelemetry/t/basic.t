@@ -102,7 +102,6 @@ subtest 'Static URL' => sub {
     };
 
     span_calls [
-        set_status    => [ SPAN_STATUS_OK ],
         set_attribute => [ 'http.response.status_code', 200 ],
         end           => [],
     ];
@@ -135,7 +134,6 @@ subtest 'Async' => sub {
     };
 
     span_calls [
-        set_status    => [ SPAN_STATUS_OK ],
         set_attribute => [ 'http.response.status_code', 200 ],
         end           => [],
     ];
@@ -168,7 +166,6 @@ subtest 'With placeholder' => sub {
     };
 
     span_calls [
-        set_status    => [ SPAN_STATUS_OK ],
         set_attribute => [ 'http.response.status_code', 200 ],
         end           => [],
     ];

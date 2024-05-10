@@ -7,11 +7,9 @@ use 5.01000;
 use strict;
 use warnings;
 
-## no critic(ValuesAndExpressions::ProhibitAccessOfPrivateData)
-
 use Scalar::Util;
 use Digest::MD5;
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 our @EXPORT = qw[ wrap_hash ];
 
@@ -48,8 +46,7 @@ sub _find_symbol {
 
     return $$candidate
       if defined $candidate
-      && 2 ==
-      grep { defined $_->[0] && defined $_->[1] ? $_->[0] eq $_->[1] : 1 }
+      && 2 == grep { defined $_->[0] && defined $_->[1] ? $_->[0] eq $_->[1] : 1 }
       [ $reftype->[0], Scalar::Util::reftype $candidate ],
       [ $reftype->[1], Scalar::Util::reftype $$candidate ];
 
@@ -113,7 +110,7 @@ sub _can {
     my ( $self, $key, $CLASS ) = @_;
 
     my $class = Scalar::Util::blessed( $self );
-    return if !defined $class;
+    return () if !defined $class;
 
     if ( !exists $self->{$key} ) {
 
@@ -123,18 +120,18 @@ sub _can {
             my $method = "${class}::$key";
             return *{$method}{CODE};
         }
-        return;
+        return ();
     }
 
     my $method = "${class}::$key";
 
-    ## no critic (ProhibitNoStrict)
+    ## no critic (ProhibitNoStrict Subroutines::ProtectPrivateSubs)
     no strict 'refs';
     return *{$method}{CODE}
       || Hash::Wrap::_generate_accessor( $CLASS, $class, $key );
 }
 
-sub import {
+sub import {    ## no critic(Subroutines::ProhibitExcessComplexity)
     shift;
 
     my @imports = @_;
@@ -145,24 +142,21 @@ sub import {
     for my $args ( @imports ) {
         if ( !ref $args ) {
             _croak( "$args is not exported by ", __PACKAGE__ )
-              unless grep { /$args/ } @EXPORT;
+              unless grep { /$args/ } @EXPORT;    ## no critic (BuiltinFunctions::ProhibitBooleanGrep)
 
             $args = { -as => $args };
         }
 
         elsif ( 'HASH' ne ref $args ) {
-            _croak(
-                "argument to ",
-                __PACKAGE__,
-                "::import must be string or hash"
-            ) unless grep { /$args/ } @EXPORT;
+            _croak( 'argument to ', __PACKAGE__, '::import must be string or hash' )
+              unless grep { /$args/ } @EXPORT;    ## no critic (BuiltinFunctions::ProhibitBooleanGrep)
         }
         else {
             # make a copy as it gets modified later on
             $args = {%$args};
         }
 
-        _croak( "cannot mix -base and -class" )
+        _croak( 'cannot mix -base and -class' )
           if !!$args->{-base} && exists $args->{-class};
 
         $DEBUG = $ENV{HASH_WRAP_DEBUG} // delete $args->{-debug};
@@ -176,9 +170,7 @@ sub import {
         if ( defined $name ) {
 
             if ( defined( my $reftype = Scalar::Util::reftype( $name ) ) ) {
-                _croak(
-                    "-as must be undefined or a string or a reference to a scalar"
-                  )
+                _croak( '-as must be undefined or a string or a reference to a scalar' )
                   if $reftype ne 'SCALAR'
                   && $reftype ne 'VSTRING'
                   && $reftype ne 'REF'
@@ -196,10 +188,10 @@ sub import {
         }
 
         if ( $args->{-base} ) {
-            _croak( "don't use -as => -return with -base" )
+            _croak( q{don't use -as => -return with -base} )
               if $args->{-as_return};
             $args->{-class} = $target;
-            $args->{-new}   = 1 unless !!$args->{-new};
+            $args->{-new}   = 1 if !exists $args->{-new};
             _build_class( $target, $name, $args );
         }
 
@@ -219,15 +211,14 @@ sub import {
         };
 
         if ( keys %$args ) {
-            _croak( "unknown options passed to ",
-                __PACKAGE__, "::import: ", join( ', ', keys %$args ) );
+            _croak( 'unknown options passed to ', __PACKAGE__, '::import: ', join( ', ', keys %$args ) );
         }
     }
 
     return @return;
 }
 
-sub _build_class {
+sub _build_class {    ## no critic(Subroutines::ProhibitExcessComplexity)
     my ( $target, $name, $attr ) = @_;
 
     # in case we're called inside a recursion and the recurse count
@@ -235,26 +226,26 @@ sub _build_class {
     # the attr signature computed below isn't contaminated by a
     # useless -recurse => 0 attribute.
     if ( exists $attr->{-recurse} ) {
-        _croak( "-recurse must be a number" )
+        _croak( '-recurse must be a number' )
           unless Scalar::Util::looks_like_number( $attr->{-recurse} );
         delete $attr->{-recurse} if $attr->{-recurse} == 0;
     }
 
     if ( !defined $attr->{-class} ) {
 
+        ## no critic (BuiltinFunctions::ProhibitComplexMappings)
         my @class = map {
             ( my $key = $_ ) =~ s/-//;
-            ( $key, defined $attr->{$_} ? $attr->{$_} : "<undef>" )
+            ( $key, defined $attr->{$_} ? $attr->{$_} : '<undef>' )
         } sort keys %$attr;
 
-        $attr->{-class} = join '::', 'Hash::Wrap::Class',
-          Digest::MD5::md5_hex( @class );
+        $attr->{-class} = join q{::}, 'Hash::Wrap::Class', Digest::MD5::md5_hex( @class );
     }
 
     elsif ( $attr->{-class} eq '-target' || $attr->{-class} eq '-caller' ) {
         _croak( "can't set -class => '@{[ $attr->{-class} ]}' if '-as' is not a plain string" )
           if ref $name;
-        $attr->{-class} = $target . '::' . $name;
+        $attr->{-class} = $target . q{::} . $name;
     }
 
     my $class = $attr->{-class};
@@ -266,21 +257,21 @@ sub _build_class {
     my @BODY;
     my %dict = (
         class                 => $class,
-        signature             => '',
+        signature             => q{},
         body                  => \@BODY,
-        autoload_attr         => '',
+        autoload_attr         => q{},
         validate_inline       => 'exists $self->{\<<KEY>>}',
         validate_method       => 'exists $self->{$key}',
         set                   => '$self->{q[\<<KEY>>]} = $_[0] if @_;',
         return_value          => '$self->{q[\<<KEY>>]}',
-        recursion_constructor => '',
-        meta => [ map { ( qq[q($_) => q($attr->{$_}),] ) } keys %$attr ],
-        predicate_template => '',
+        recursion_constructor => q{},
+        meta                  => [ map { ( qq[q($_) => q($attr->{$_}),] ) } keys %$attr ],
+        predicate_template    => q{},
     );
 
     if ( $attr->{-lvalue} ) {
         if ( $] lt '5.016000' ) {
-            _croak( "lvalue accessors require Perl 5.16 or later" )
+            _croak( 'lvalue accessors require Perl 5.16 or later' )
               if $attr->{-lvalue} < 0;
         }
         else {
@@ -326,11 +317,10 @@ END
         $dict{quoted_key} = 'q[\<<KEY>>]';
         $dict{hash_value} = '$self->{<<QUOTED_KEY>>}';
 
-        $dict{recurse_wrap_hash}
-          = '$<<CLASS>>::recurse_into_hash->( <<HASH_VALUE>> )';
+        $dict{recurse_wrap_hash} = '$<<CLASS>>::recurse_into_hash->( <<HASH_VALUE>> )';
 
         $dict{return_value} = <<'END';
-return 'HASH' eq (Scalar::Util::reftype( <<HASH_VALUE>> ) // '')
+ 'HASH' eq (Scalar::Util::reftype( <<HASH_VALUE>> ) // q{})
         && ! Scalar::Util::blessed( <<HASH_VALUE>> )
       ? <<WRAP_HASH_ENTRY>>
       : <<HASH_VALUE>>;
@@ -342,12 +332,12 @@ END
                  do { Hash::Util::unlock_ref_value( $self, <<QUOTED_KEY>> );
                       <<HASH_VALUE>> = <<RECURSE_WRAP_HASH>>;
                       Hash::Util::lock_ref_value( $self, <<QUOTED_KEY>> );
+                      <<HASH_VALUE>>;
                     }
 END
             }
             else {
-                $dict{wrap_hash_entry}
-                  = '<<HASH_VALUE>> = <<RECURSE_WRAP_HASH>>';
+                $dict{wrap_hash_entry} = '<<HASH_VALUE>> = <<RECURSE_WRAP_HASH>>';
             }
 
         }
@@ -373,10 +363,7 @@ our $setup_recurse_into_hash = sub {
 $recurse_into_hash = $setup_recurse_into_hash;
 END
 
-        my %attr = (
-            %$attr,
-            -recurse => --$attr->{-recurse} < 0 ? -1 : $attr->{-recurse},
-        );
+        my %attr = ( %$attr, -recurse => --$attr->{-recurse} < 0 ? -1 : $attr->{-recurse}, );
         delete @attr{qw( -as_scalar_ref -class -base -as )};
         $closures{'$attr'} = \%attr;
     }
@@ -391,7 +378,7 @@ our $predicate_template = q[
   sub has_\<<KEY>> {
     my $self = shift;
 
-    Hash::Wrap::_croak_class_method( $self, "has_\<<KEY>>" )
+    Hash::Wrap::_croak_class_method( $self, 'has_\<<KEY>>' )
         unless Scalar::Util::blessed( $self );
 
    return exists $self->{\<<KEY>>};
@@ -428,10 +415,10 @@ our $accessor_template = q[
   sub \<<KEY>> <<SIGNATURE>> {
     my $self = shift;
 
-    Hash::Wrap::_croak_class_method( $self, "\<<KEY>>" )
+    Hash::Wrap::_croak_class_method( $self, '\<<KEY>>' )
         unless Scalar::Util::blessed( $self );
 
-    Hash::Wrap::_croak_object_method( $self, "\<<KEY>>" )
+    Hash::Wrap::_croak_object_method( $self, '\<<KEY>>' )
         unless ( <<VALIDATE_INLINE>> );
 
    <<SET>>
@@ -460,19 +447,18 @@ sub can {
 1;
 END
 
-    _compile_from_tpl( \$class_template, \%dict,
-        keys %closures ? \%closures : () )
+    _compile_from_tpl( \$class_template, \%dict, keys %closures ? \%closures : () )
       or _croak_about_code( \$class_template, "class $class" );
 
     if ( !!$attr->{-new} ) {
-        my $name = $attr->{-new} =~ PerlIdentifier ? $1 : 'new';
-        _build_constructor( $class, $name, { %$attr, -as_method => 1 } );
+        my $lname = $attr->{-new} =~ PerlIdentifier ? $1 : 'new';
+        _build_constructor( $class, $lname, { %$attr, -as_method => 1 } );
     }
 
     if ( $attr->{-methods} ) {
 
         my $methods = $attr->{-methods};
-        _croak( "-methods option value must be a hashref" )
+        _croak( '-methods option value must be a hashref' )
           unless 'HASH' eq ref $methods;
 
         for my $mth ( keys %$methods ) {
@@ -491,11 +477,11 @@ END
 
     push @CARP_NOT, $class;
     $rentry->{accessor_template}
-      = _find_symbol( $class, "accessor_template", [ "SCALAR", undef ] );
+      = _find_symbol( $class, 'accessor_template', [ 'SCALAR', undef ] );
 
     if ( $attr->{-predicate} ) {
         $rentry->{predicate_template}
-          = _find_symbol( $class, "predicate_template", [ "SCALAR", undef ] );
+          = _find_symbol( $class, 'predicate_template', [ 'SCALAR', undef ] );
     }
 
     $rentry->{validate} = _find_symbol( $class, 'validate', [ 'REF', 'CODE' ] );
@@ -511,7 +497,7 @@ sub _build_constructor {
     # closure for user provided clone sub
     my %closures;
 
-    _croak( "cannot mix -copy and -clone" )
+    _croak( 'cannot mix -copy and -clone' )
       if exists $args->{-copy} && exists $args->{-clone};
 
     my @USE;
@@ -534,7 +520,7 @@ sub _build_constructor {
 
     my @copy = (
         'Hash::Wrap::_croak(q{the argument to <<PACKAGE>>::<<CONSTRUCTOR_NAME>> must not be an object})',
-        '  if Scalar::Util::blessed( $hash );'
+        '  if Scalar::Util::blessed( $hash );',
     );
 
     if ( $args->{-copy} ) {
@@ -550,7 +536,7 @@ sub _build_constructor {
                 'state $clone = $CLOSURES->{clone};',
                 '$hash = $clone->($hash);',
                 'Hash::Wrap::_croak(q{the custom clone routine for <<PACKAGE>> returned an object instead of a plain hash})',
-                '  if Scalar::Util::blessed( $hash );'
+                '  if Scalar::Util::blessed( $hash );',
             );
         }
         else {
@@ -569,13 +555,11 @@ sub _build_constructor {
         elsif ( defined $args->{-lockkeys} ) {
 
             if ( 'ARRAY' eq ref $args->{-lockkeys} ) {
-                _croak(
-                    "-lockkeys: attribute name ($_) is not a valid Perl identifier"
-                ) for grep { $_ !~ PerlIdentifier } @{ $args->{-lockkeys} };
+                _croak( "-lockkeys: attribute name ($_) is not a valid Perl identifier" )
+                  for grep { $_ !~ PerlIdentifier } @{ $args->{-lockkeys} };
 
                 push @USE, q[use Hash::Util ();];
-                'Hash::Util::lock_keys_plus(%$hash, qw{ '
-                  . join( ' ', @{ $args->{-lockkeys} } ) . ' });';
+                'Hash::Util::lock_keys_plus(%$hash, qw{ ' . join( q{ }, @{ $args->{-lockkeys} } ) . ' });';
             }
             elsif ( $args->{-lockkeys} ) {
                 push @USE, q[use Hash::Util ();];
@@ -587,12 +571,12 @@ sub _build_constructor {
     # return the constructor sub from the factory and don't insert the
     # name into the package namespace
     if ( $args->{-as_scalar_ref} || $args->{-as_return} ) {
-        $dict{package_return_value} = '';
-        $dict{constructor_name}     = '';
+        $dict{package_return_value} = q{};
+        $dict{constructor_name}     = q{};
     }
 
     #<<< no tidy
-    my $code = q[
+    my $code = <<'ENDCODE';
     package <<PACKAGE>>;
 
     <<USE>>
@@ -612,11 +596,10 @@ sub _build_constructor {
     }
     <<PACKAGE_RETURN_VALUE>>
 
-    ];
+ENDCODE
     #>>>
 
-    my $result
-      = _compile_from_tpl( \$code, \%dict, keys %closures ? \%closures : () )
+    my $result = _compile_from_tpl( \$code, \%dict, keys %closures ? \%closures : () )
       || _croak_about_code( \$code, "constructor (as $name) subroutine" );
 
     # caller asked for a coderef to be stuffed into a scalar
@@ -655,9 +638,9 @@ sub _compile_from_tpl {
     _interpolate( $code, $dict );
 
     if ( $DEBUG ) {
-        my $code = $$code;
-        _line_number_code( \$code );
-        print STDERR $code;
+        my $lcode = $$code;
+        _line_number_code( \$lcode );
+        print STDERR $lcode;    ## no critic (InputOutput::RequireCheckedSyscalls)
     }
 
     _clean_eval( $code, exists $dict->{closures} ? $closures : () );
@@ -666,13 +649,14 @@ sub _compile_from_tpl {
 
 # eval in a clean lexical space.
 sub _clean_eval {
-    ## no critic (ProhibitStringyEval)
+    ## no critic (ProhibitStringyEval ErrorHandling::RequireCheckingReturnValueOfEval )
     if ( @_ > 1 ) {
+        ## no critic (Variables::ProhibitUnusedVarsStricter)
         my $CLOSURES = $_[1];
-        eval( ${ $_[0] } );    ## no critic (ProhibitStringyEval)
+        eval( ${ $_[0] } );
     }
     else {
-        eval( ${ $_[0] } );    ## no critic (ProhibitStringyEval)
+        eval( ${ $_[0] } );
     }
 
 }
@@ -700,7 +684,7 @@ sub _interpolate {
                     $v;
                     }
                     else {
-                        '';
+                        q{};
                     }
                 }
               }gex;
@@ -731,7 +715,7 @@ Hash::Wrap - create on-the-fly objects from hashes
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 SYNOPSIS
 
@@ -1354,7 +1338,7 @@ Here's a comparison of this module and others on CPAN.
 
 =over
 
-=item L<Hash::Wrap> (this module)
+=item B<Hash::Wrap> (this module)
 
 =over
 
@@ -1389,8 +1373,7 @@ whether its value is defined
 
 =item L<Object::Result>
 
-As you might expect from a
-L<DCONWAY|https://metacpan.org/author/DCONWAY> module, this does just
+As you might expect from a DCONWAY module, this does just
 about everything you'd like.  It has a very heavy set of dependencies.
 
 =item L<Hash::AsObject>
@@ -1534,7 +1517,7 @@ is done globally, so all objects are affected.
 
 =over
 
-=item * minimal non-core dependencies (L<Exporter::Shiny>
+=item * minimal non-core dependencies (L<Exporter::Shiny>)
 
 =item * uses L<Class::XSAccessor> if available
 
@@ -1577,7 +1560,7 @@ for existing keys in hash.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-hash-wrap@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Wrap
+Please report any bugs or feature requests to bug-hash-wrap@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Wrap>
 
 =head2 Source
 

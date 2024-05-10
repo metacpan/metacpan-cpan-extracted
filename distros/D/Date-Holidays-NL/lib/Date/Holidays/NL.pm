@@ -1,5 +1,5 @@
 package Date::Holidays::NL;
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -117,7 +117,7 @@ my %EASTER_BASED = (
         en  => 'Second day of easter',
     },
     'ascension' => {
-        d   => 40,
+        d   => 39,
         nl  => 'Hemelvaartsdag',
         en  => 'Ascension day',
     },
@@ -153,7 +153,7 @@ sub holidays {
         my $holiday = $FIXED_DATES{$_};
 
         if (my $int = $holiday->{interval}) {
-            if (!$args{gov}) {
+            unless ($args{gov} && $holiday->{gov}) {
                 next if $year % $int != 0;
             }
         }
@@ -265,7 +265,7 @@ Date::Holidays::NL - The Netherlands official holidays
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -322,7 +322,7 @@ Similar API to the other functions, returns an hashref for the year.
 
 =over
 
-=item https://wetten.overheid.nl/BWBR0002448/2010-10-10
+=item L<https://wetten.overheid.nl/BWBR0002448/2010-10-10>
 
 =back
 

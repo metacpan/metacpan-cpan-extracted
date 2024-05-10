@@ -20,3 +20,4 @@ pod_coverage:
     - Perl::Critic::Policy::Plicease::ProhibitUnicodeDigitInRegexp
     - Perl::Critic::Policy::Plicease::ProhibitLeadingZeros
     - Perl::Critic::Policy::Plicease::ProhibitSpecificModules
+    - Perl::Critic::Policy::Plicease::ProhibitSignaturesAndAtUnderscore

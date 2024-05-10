@@ -1,5 +1,10 @@
 Revision history for Date-Holidays-NL
 
+0.008     2024-05-09 12:17:16Z
+
+    * Minor house keeping
+    * Fix Ascention day
+
 0.007     2022-08-12 18:41:43Z
 
     * Fix small POD error

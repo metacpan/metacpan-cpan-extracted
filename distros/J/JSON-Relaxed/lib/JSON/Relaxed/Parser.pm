@@ -6,7 +6,7 @@ use utf8;
 
 package JSON::Relaxed::Parser;
 
-our $VERSION = "0.092";
+our $VERSION = "0.093";
 
 class JSON::Relaxed::Parser;
 
@@ -26,7 +26,13 @@ field $croak_on_error_internal;
 field $strict		   :mutator :param = 0;
 
 # Extension: a.b:c -> a:{b:c}
-field $combined_keys	   :mutator :param = 0;
+field $combined_keys	   :mutator :param = 1;
+
+# Extension: a:b -> {a:b} (if outer)
+field $implied_outer_hash  :mutator :param = 1;
+
+# Extension: = as :, and optional before {
+field $prp		    :mutator :param = 0;
 
 # Error indicators.
 field $err_id		    :accessor;
@@ -114,16 +120,25 @@ method parse_chars( $source = undef ) {
     else {
 	push( @p, qq<\\\\u\\{[[:xdigit:]]+\\}>, qq<\\\\[^u]> ); # escaped char
     }
+
+    if ( $prp && !$strict ) {
+	# Add = to the reserved characters
+        $p_reserved = q<[,=:{}\[\]]>;
+	# Massage # comments into // comments without affecting position.
+        $data =~ s/^(\s*)#.(.*)$/$1\/\/$2/gm;
+        $data =~ s/^(\s*)#$/$1 /gm;
+    }
+
     push( @p, $p_newlines,
-	  qq< // [^\\n]* \\n >, # line comment
-	  qq< /\\* .*? \\*/ >, 	# comment start
-	  qq< /\\* >,		# comment start
-          qq< $p_reserved >,	# reserved chars
-	  qq< "(?:\\\\.|.)*?" >,    # "string"
-	  qq< `(?:\\\\.|.)*?` >,   # `string`
-	  qq< '(?:\\\\.|.)*?' >,   # 'string'
-	  qq< $p_quotes >,	# stringquote
-	  qq< \\s+ > );		# whitespace
+	  qq< // [^\\n]* \\n >,	  # line comment
+	  qq< /\\* .*? \\*/ >,	  # comment start
+	  qq< /\\* >,		  # comment start
+          qq< $p_reserved >,	  # reserved chars
+	  qq< "(?:\\\\.|.)*?" >,  # "string"
+	  qq< `(?:\\\\.|.)*?` >,  # `string`
+	  qq< '(?:\\\\.|.)*?' >,  # 'string'
+	  qq< $p_quotes >,	  # stringquote
+	  qq< \\s+ > );		  # whitespace
 
     my $p = join( "|", @p );
 
@@ -239,7 +254,8 @@ method tokens() { \@tokens }
 method addtok( $tok, $typ, $off ) {
 
     push( @tokens,
-	  JSON::Relaxed::Parser::Token->new( token  => $tok,
+	  JSON::Relaxed::Parser::Token->new( parent => $self,
+					     token  => $tok,
 					     type   => $typ,
 					     offset => $off ) );
 }
@@ -248,6 +264,17 @@ method addtok( $tok, $typ, $off ) {
 method structure( %opts ) {
 
     @tokens = @{$opts{tokens}} if $opts{tokens}; # for debugging
+
+    if ( ($implied_outer_hash || $prp) && !$strict ) {
+	# Note that = can only occur with $prp.
+	if ( @tokens > 2 && $tokens[0]->is_string
+	     && $tokens[1]->token =~ /[:={]/ ) {
+	    $self->addtok( '}', 'C', $tokens[-1]->offset );
+	    $self->addtok( '{', 'C', $tokens[0]->offset );
+	    unshift( @tokens, pop(@tokens ));
+	}
+    }
+
     my $this = shift(@tokens) // return;
     my $rv;
 
@@ -342,14 +369,24 @@ method build_hash() {
 	    # A comma or closing brace is acceptable after a string.
 	    next if $next->token eq ',' || $next->token eq '}';
 
-	    # If next token is a colon then it should be followed by a value.
-	    if ( $next->token eq ':' ) {
+	    # If next token is a colon or equals then it should be followed by a value.
+	    # Note that = can only occur with $prp.
+	    if ( $next->token =~ /^[:=]$/ ) {
 		# Step past the colon.
 		shift(@tokens);
 
 		# If at end of token array, exit loop.
 		last unless @tokens;
 
+		# Get hash value.
+		$value = $self->get_value;
+
+		# If there is a global error, return undef.
+		return undef if $self->is_error;
+	    }
+
+	    # Extension (prp): Implied colon.
+	    elsif ( $prp && $next->token eq '{' ) {
 		# Get hash value.
 		$value = $self->get_value;
 
@@ -401,7 +438,7 @@ method get_value() {
 
 method set_value ( $rv, $key, $value = undef ) {
     return $rv->{$key} = $value
-      unless $combined_keys && !$strict && $key =~ /.\../s;
+      unless ($prp || $combined_keys) && !$strict && $key =~ /.\../s;
 
     my @keys = split(/\./, $key );
     my $c = \$rv;
@@ -481,6 +518,7 @@ method is_comment_opener( $pretok ) {
 
 class JSON::Relaxed::Parser::Token :isa(JSON::Relaxed::Parser);
 
+field $parent :accessor :param;
 field $token  :accessor :param;
 field $type   :accessor :param;
 field $offset :accessor :param;
@@ -530,38 +568,45 @@ our @ISA = qw(JSON::Relaxed::Parser);
 
 sub new {
     my ( $pkg, %opts ) = @_;
-    my $self = bless { %opts } => $pkg;
+    my $self = bless [] => $pkg;
+    push( @$self,
+	  delete(%opts{parent}),
+	  delete(%opts{token}),
+	  delete(%opts{type}),
+	  delete(%opts{offset}),
+    );
     $self;
 }
 
-sub token  { $_[0]->{token}  }
-sub type   { $_[0]->{type}   }
-sub offset { $_[0]->{offset} }
+sub parent { $_[0]->[0] }
+sub token  { $_[0]->[1]  }
+sub type   { $_[0]->[2]   }
+sub offset { $_[0]->[3] }
 
-sub is_string { $_[0]->{type} =~ /[QUN]/  }
-sub is_list_opener { $_[0]->{type} eq 'C' && $_[0]->{token} =~ /[{\[]/ }
+sub is_string { $_[0]->[2] =~ /[QUN]/  }
+sub is_list_opener { $_[0]->[2] eq 'C' && $_[0]->[1] =~ /[{\[]/ }
 sub as_perl {	# for values
-    return shift->{token}->as_perl(@_);
+    return shift->[1]->as_perl(@_);
 }
 
 sub _data_printer {	# for DDP
     my ( $self, $ddp ) = @_;
     my $res = "Token(";
     if ( $self->is_string ) {
-	$res .= $self->{token}->_data_printer($ddp);
+	$res .= $self->[1]->_data_printer($ddp);
     }
     else {
-	$res .= "\"".$self->{token}."\"";
+	$res .= "\"".$self->[1]."\"";
     }
-    $res .= ", " . $self->{type};
-    $res . ", " . $self->{offset} . ")";
+    $res .= ", " . $self->[2];
+    $res . ", " . $self->[3] . ")";
 }
 
 sub as_string {		# for messages
     if ( $_[0]->is_string ) {
-	return '"' . ($_[0]->{token}->content =~ s/"/\\"/gr) . '"';
+	return '"' . ($_[0]->[1]->content =~ s/"/\\"/gr) . '"';
     }
-    "\"" . $_[0]->{token} . "\"";
+    "\"" . $_[0]->[1] . "\"";
 }
 
 =cut

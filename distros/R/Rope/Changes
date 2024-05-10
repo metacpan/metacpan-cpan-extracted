@@ -68,3 +68,11 @@ Revision history for Rope
 	- Adds from_array which allows you to instantiate a Rope object from a perl array.
 	- Adds from_nested_array which allows you to instantiate a Rope object from a perl nested array.
 
+0.28	2024-05-09
+	- Adds INITIALISE and INITIALISED so you can extend and validate the Rope object, they're basically before and after hooks around 'new'.
+
+0.29	2024-05-09
+	- fIXES INTIALISE and INITIALISED to work as functions. They are not added to the final rope object.
+
+0.31	2024-05-10
+	- Allow the use of an arrayref to set multiple properties.

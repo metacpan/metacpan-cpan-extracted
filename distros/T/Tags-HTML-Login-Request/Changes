@@ -1,2 +1,6 @@
+0.02 2024-05-09T18:39:14+02:00
+ - Add check for 'width' parameter if it's CSS unit.
+ - Add constructor tests.
+
 0.01 2024-04-29T13:21:57+02:00
  - First version.

@@ -23,6 +23,8 @@ use strict;
 use warnings;
 
 my $o = MyObject->new(
+    choice => 'yes',
+    choice2 => 'no',
     name => 'id',
     total => 12,
     type => 'attribute',
@@ -35,6 +37,8 @@ isa_ok( $o, 'MyObject', 'new' );
 my $hash = $o->as_hash;
 diag( "as_hash results in: ", $o->dump( $hash ) ) if( $DEBUG );
 my $expect_hash = {
+    choice => 'yes',
+    choice2 => 'no',
     name => 'id',
     total => 12,
     type => 'attribute',
@@ -320,6 +324,15 @@ is( $o->datetime, $now2, 'lvalue->set( $value )' );
 isnt( $now3, $now );
 # diag( "Is ", overload::StrVal( $now ), " same as ", overload::StrVal( $now3 ) );
 # ok( $now3 ne $now );
+
+is( $o->choice, 'yes', 'enum' );
+is( $o->choice2, 'no', 'enum setup using hash reference' );
+$o->choice = 'no';
+is( $o->choice, 'no', 'enum as lvalue' );
+diag( "Attempting at setting an invalid value for enum type." ) if( $DEBUG );
+my $rv = $o->choice( 'hello' );
+is( $rv => undef, 'enum with bad valud returns error' );
+ok( $o->error->message =~ /^Invalid value/, 'enum with invalid value error message' );
 
 diag( "Testing for error returning data type instead of undef" ) if( $DEBUG );
 subtest "want error" => sub
@@ -662,7 +675,7 @@ subtest "symbols" => sub
 #     require Data::Pretty;
 #     diag( Data::Pretty::dump( [sort( @all )] ) );
     my $expect = [qw(
-        array array_object as_hash callback can clone created
+        array array_object as_hash callback can choice choice2 clone created
         datetime debug deserialise error error_handler fatal
         file hash id init io ip isa metadata name new
         new_array new_file new_hash new_number new_scalar
@@ -746,6 +759,15 @@ sub array { return( shift->_set_get_array( 'array', @_ ) ); }
 sub array_object : lvalue { return( shift->_set_get_array_as_object( 'array_object', @_ ) ); }
 
 sub callback : lvalue { return( shift->_set_get_code( 'callback', @_ ) ); }
+
+sub choice : lvalue { return( shift->_set_get_enum( 'choice', [qw( yes no )], @_ ) ); }
+
+sub choice2 : lvalue { return( shift->_set_get_enum({
+    field   => 'choice2',
+    allowed => [qw( yes no )],
+    # case insensitive
+    case    => 0,
+}, @_ ) ); }
 
 sub created : lvalue { return( shift->_set_get_datetime( 'created', @_ ) ); }
 

@@ -1,5 +1,9 @@
 Revision history for Date-Holidays-CW
 
+0.004     2024-05-09 12:14:07Z
+
+    * Fix Ascention day
+
 0.003     2024-03-19 21:03:44Z
 
     * Another POD fix

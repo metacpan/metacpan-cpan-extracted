@@ -49,14 +49,22 @@ WriteMakefile(
     clean => { FILES => 'Dist-Setup-*' },
 );
 
+# These platforms (usually) have GNU Make by default so the syntax that we use
+# for our custom targets below will work (especially to export environment
+# variables).
+# On other platforms, we disable the custom parts of our Makefile generation, as
+# the generated Makefile would otherwise not parse correctly.
+sub supported_platform {
+  return $^O =~ m/^(?:linux|cygwin|MSWin32)$/;
+}
+
 sub MY::postamble {
   my ($self) = @_;
 
   my @postamble;
   push @postamble, ::postamble() if *::postamble{CODE};
 
-  # Solaris has a weird (?) make that does not support our `export` statements.
-  push @postamble, <<"MAKE_FRAGMENT" unless $^O eq 'solaris';
+  push @postamble, <<"MAKE_FRAGMENT" if supported_platform();
 ALL_PM := \$(shell find lib -name "*.pm")
 ALL_EXE := script/perl_dist_setup
 

@@ -49,4 +49,4 @@ your enconding to UTF-8, otherwise you may see weird things.
 
 # SEE ALSO
 
-- https://wetten.overheid.nl/BWBR0002448/2010-10-10
+- [https://wetten.overheid.nl/BWBR0002448/2010-10-10](https://wetten.overheid.nl/BWBR0002448/2010-10-10)

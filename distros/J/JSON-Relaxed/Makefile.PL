@@ -10,7 +10,7 @@ use ExtUtils::MakeMaker 7.54;
 my $version = MM->parse_version('lib/JSON/Relaxed/Parser.pm');
 
 # For binaries/scripts.
-my @bins; # = qw( prog );
+my @bins = qw( rrjson );
 
 my %makemaker =
   ( 'ExtUtils::MakeMaker' => 7.54 );
@@ -29,9 +29,9 @@ my %w =
   MIN_PERL_VERSION    => '5.026000',
 
   @bins == 0 ? () : (
-    EXE_FILES         => [ map { "script/$_" } @bins ],
+    EXE_FILES         => [ map { "scripts/$_" } @bins ],
     PL_FILES          => {
-			   'script/pp.PL' => [ map { "script/$_" } @bins ]
+			   'scripts/pp.PL' => [ map { "scripts/$_" } @bins ]
 			 },
   ),
 

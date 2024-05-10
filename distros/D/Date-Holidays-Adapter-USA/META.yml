@@ -20,6 +20,7 @@ meta-spec:
 name: Date-Holidays-Adapter-USA
 requires:
   Date::Holidays::Adapter: '0'
+  Date::Holidays::USA: '0'
   base: '0'
   perl: '5.006'
   strict: '0'
@@ -27,7 +28,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Date-Holidays-Adapter-USA
   repository: https://github.com/ology/Date-Holidays-Adapter-USA.git
-version: '0.0101'
+version: '0.0102'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

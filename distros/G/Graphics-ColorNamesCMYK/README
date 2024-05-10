@@ -1,0 +1,72 @@
+NAME
+    Graphics::ColorNamesCMYK - Define CMYK values for common color names
+
+VERSION
+    This document describes version 0.002 of Graphics::ColorNamesCMYK (from
+    Perl distribution Graphics-ColorNamesCMYK), released on 2024-05-06.
+
+DESCRIPTION
+    Graphics::ColorNamesCMYK is the CMYK counterpart of
+    Graphics::ColorNamesLite (and thus, Graphics::ColorNames). Modules under
+    "Graphics::ColorNamesLite::*" are only required to provide a package
+    variable called $NAMES_CMYK_TABLE which must contain a hashref mapping
+    of color names and CMYK values. A CMYK value is a 4-byte integer (e.g.
+    0x64000000 for pure cyan) and not a hexdigit string (e.g. "64000000").
+    Each byte represent a C/M/Y/K value from 0-100.
+
+    Another package variable is optional: $NAMES_SUMMARIES_TABLE. It must
+    contain a hashref mapping of color names to a short description string,
+    e.g. "A darker red used for blah".
+
+    No inheritance, no functional or OO interface is provided.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Graphics-ColorNamesCMYK>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Graphics-ColorNamesCMYK>.
+
+SEE ALSO
+    Graphics::ColorNamesLite
+
+    Graphics::ColorNames
+
+    Bencher::ScenarioBundle::Graphics::ColorNames
+
+    "Graphics::ColorNamesCMYK::*" modules
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Graphics-ColorNamesCM
+    YK>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

@@ -1,5 +1,5 @@
-generated with:              Test::JSON::Schema::Acceptance 1.023
-with commit:                 57617f254a6734d5c64fa86fd3b08e8799970b25 (23.2.0-39-g57617f2)
+generated with:              Test::JSON::Schema::Acceptance 1.024
+with commit:                 dd9599a5238abe76d13fab37857265a3be3a01ea (23.2.0-72-gdd9599a)
 from repository:             git://github.com/json-schema-org/JSON-Schema-Test-Suite.git
 specification version:       draft2020-12
 optional tests included:     yes
@@ -7,7 +7,7 @@ skipping directory:          optional/format
 
 filename                                  pass  todo-fail  fail
 ---------------------------------------------------------------
-additionalProperties.json                   16          0     0
+additionalProperties.json                   21          0     0
 allOf.json                                  30          0     0
 anchor.json                                  4          4     0
 anyOf.json                                  18          0     0
@@ -19,7 +19,7 @@ default.json                                 7          0     0
 defs.json                                    1          1     0
 dependentRequired.json                      20          0     0
 dependentSchemas.json                       20          0     0
-dynamicRef.json                             21         19     0
+dynamicRef.json                             22         20     0
 enum.json                                   45          0     0
 exclusiveMaximum.json                        4          0     0
 exclusiveMinimum.json                        4          0     0
@@ -50,13 +50,14 @@ refRemote.json                              15         16     0
 required.json                               16          0     0
 type.json                                   80          0     0
 unevaluatedItems.json                       26         40     0
-unevaluatedProperties.json                  58         61     0
+unevaluatedProperties.json                  60         62     0
 uniqueItems.json                            69          0     0
 vocabulary.json                              2          3     0
 optional/anchor.json                         2          2     0
 optional/bignum.json                         9          0     0
 optional/cross-draft.json                    0          1     0
 optional/dependencies-compatibility.json    22         14     0
+optional/dynamicRef.json                     1          1     0
 optional/ecmascript-regex.json              61         14     0
 optional/float-overflow.json                 1          0     0
 optional/format-assertion.json               2          2     0
@@ -66,4 +67,4 @@ optional/non-bmp-regex.json                 12          0     0
 optional/refOfUnknownKeyword.json            6          0     0
 optional/unknownKeyword.json                 2          1     0
 ---------------------------------------------------------------
-TOTAL                                     1198        194     0
+TOTAL                                     1207        197     0

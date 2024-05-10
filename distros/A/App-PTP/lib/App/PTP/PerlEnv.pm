@@ -1,7 +1,7 @@
 # This package is the one that provides the symbol accessible to the user
 # supplied Perl code. The global variables are manipulated and set by the
 # App::PTP::Commands package.
- 
+
 package App::PTP::PerlEnv;
 
 use 5.022;
@@ -9,6 +9,8 @@ use strict;
 use warnings;
 
 use Exporter 'import';
+
+our $VERSION = '0.01';
 
 my @all_symbols = qw($f $F $n $N $m $. @m $I ss pf spf $PerlEnv_LOADED);
 our @EXPORT = ();
@@ -37,13 +39,13 @@ sub ss ($;$$) {
   substr($str, $start, $len) // '';
 }
 
-sub pf($@) {
+sub pf ($@) {
   my ($format, @args) = @_;
   # print "format=${format} args=(".join(', ', @args).")\n";
   $_ = sprintf $format, @args;
 }
 
-sub spf($@) {
+sub spf ($@) {
   my ($format, @args) = @_;
   # print "format=${format} args=(".join(', ', @args).")\n";
   sprintf $format, @args;

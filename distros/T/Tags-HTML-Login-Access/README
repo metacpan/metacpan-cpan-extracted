@@ -219,8 +219,8 @@ EXAMPLE1
      #     </legend>
      #     <p>
      #       <label for="username">
+     #         User name
      #       </label>
-     #       User name
      #       <input type="text" name="username" id="username" autofocus="autofocus">
      #       </input>
      #     </p>
@@ -302,5 +302,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.11
+    0.12
 

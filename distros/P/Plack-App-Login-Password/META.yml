@@ -12,6 +12,7 @@ build_requires:
   Tags::Output::Indent: 0
   Test::More: 0
   Test::NoWarnings: 0
+  Unicode::UTF8: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
@@ -35,11 +36,11 @@ requires:
   Plack::Session: 0
   Plack::Util::Accessor: 0
   Tags::HTML::Container: 0
-  Tags::HTML::Login::Access: 0.1
+  Tags::HTML::Login::Access: 0.12
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Plack-App-Login-Password/issues
   homepage: https://github.com/michal-josef-spacek/Plack-App-Login-Password
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-App-Login-Password
-version: '0.03'
+version: '0.05'

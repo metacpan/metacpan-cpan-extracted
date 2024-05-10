@@ -1,7 +1,7 @@
 package Rope;
 
 use 5.006; use strict; use warnings;
-our $VERSION = '0.27';
+our $VERSION = '0.31';
 use Rope::Object;
 my (%META, %PRO);
 our @ISA;
@@ -15,6 +15,7 @@ BEGIN {
 		},
 		scope => sub {
 			my ($caller, $self, %props) = @_;
+			delete $props{properties}{$_} for qw/INITIALISE INITIALISED/;
 			for my $prop (keys %{$props{properties}}) {
 				if ($props{properties}{$prop}{value} && ref $props{properties}{$prop}{value} eq 'CODE') {
 					my $cb = $props{properties}{$prop}{value};
@@ -169,11 +170,14 @@ BEGIN {
 							value => $options 
 						};
 					}
-					$PRO{set_prop}(
-						$caller,
-						$prop,
-						%{$options}
-					);
+
+					for (ref $prop ? @{$prop} : ($prop)) {
+						$PRO{set_prop}(
+							$caller,
+							$_,
+							%{$options}
+						)
+					};
 				}
 			};
 		},
@@ -185,11 +189,13 @@ BEGIN {
 				if (scalar @options % 2) {
 					$prop = shift @options;
 				}
-				$PRO{set_prop}(
-					$caller,
-					$prop,
-					@options
-				);
+				for (ref $prop ? @{$prop} : ($prop)) {
+					$PRO{set_prop}(
+						$caller,
+						$_,
+						@options
+					);
+				}
 			};
 		},
 		prototyped => sub {
@@ -199,15 +205,17 @@ BEGIN {
 				my (@proto) = @_;
 				while (@proto) {
 					my ($prop, $value) = (shift @proto, shift @proto);
-					$PRO{set_prop}(
-						$caller,
-						$prop,
-						enumerable => 1,
-						writeable => 1,
-						configurable => 1,
-						initable => 1,
-						value => $value
-					);
+					for (ref $prop ? @{$prop} : ($prop)) {
+						$PRO{set_prop}(
+							$caller,
+							$_,
+							enumerable => 1,
+							writeable => 1,
+							configurable => 1,
+							initable => 1,
+							value => $value
+						);
+					}
 				}
 			}
 		},
@@ -392,9 +400,15 @@ BEGIN {
 						$build->{properties}->{$_}->{value} = ref $builder ? $builder->($build) : $caller->$builder($build);
 					}
 				}
+				exists $build->{properties}->{INITIALISE} 
+					? $build->{properties}->{INITIALISE}->{value}->($self, $build, \%params)
+					: $self->can('INITIALISE') && $self->INITIALISE($build, \%params);
 				tie %{${$self}->{prototype}}, 'Rope::Object', $PRO{scope}($caller, $self, %{$build});
 				$META{initialised}{$caller}->{${$self}->{identifier}} = $self;
 				$self->{ROPE_init}->();
+				exists $build->{properties}->{INITIALISED} 
+					? $build->{properties}->{INITIALISED}->{value}->($self, \%params)
+					: $self->can('INITIALISED') && $self->INITIALISED(\%params); 
 				return $self;
 			};
 		}
@@ -496,7 +510,6 @@ sub from_data {
 	return $pkg->new($meta)->new();
 }
 
-
 sub from_nested_array {
 	my ($pkg, $data, $meta) = @_;
 
@@ -574,7 +587,9 @@ sub set_meta {
 	$PRO{requires}($name)(ref $meta->{requires} eq 'ARRAY' ? @{$meta->{requires}} : keys %{$meta->{requires}}) if ($meta->{requires});
 	$PRO{extends}($name)(@{$meta->{extends}}) if ($meta->{extends});
 	$PRO{with}($name)(@{$meta->{with}}) if ($meta->{with});
-	$PRO{properties}($name)(ref $meta->{properties} eq 'ARRAY' ? @{$meta->{properties}} : %{$meta->{properties}}) if ($meta->{properties})
+	$PRO{properties}($name)(ref $meta->{properties} eq 'ARRAY' ? @{$meta->{properties}} : %{$meta->{properties}}) if ($meta->{properties});
+	$PRO{keyword}($name, 'INITIALISE', $meta->{INITIALISE}) if $meta->{INITIALISE};
+	$PRO{keyword}($name, 'INITIALISED', $meta->{INITIALISED}) if $meta->{INITIALISED};
 }
 
 sub clear_meta {
@@ -603,7 +618,7 @@ Rope - Tied objects
 
 =head1 VERSION
 
-Version 0.27
+Version 0.31
 
 =cut
 
@@ -618,7 +633,6 @@ Version 0.27
 		loops => 1,
 		hitches => 10,
 		...
-
 	);
 
 	properties (
@@ -657,7 +671,6 @@ Version 0.27
 	say $k->{loops}; # 6;
 
 	$k->{add_loops} = 5; # errors
-
 
 =head1 DESCRIPTION
 
@@ -732,6 +745,7 @@ Extends the current object definition with a single new property
 		}
 	);
 
+	property [qw/a b c/] => ( ... );
 
 =head2 properties
 
@@ -746,6 +760,7 @@ Extends the current object definition with multiple new properties
 			enumerable => 1,
 			required => 1
 		},
+		[qw/a b c/] => { ... }
 		...
 	);
 
@@ -754,7 +769,8 @@ Extends the current object definition with multiple new properties
 Extends the current object definition with multiple new properties where initable, writable and enumerable are all set to a true value.
 
 	prototyped (
-		two => 10
+		three => 10
+		[qw/a b c/] => 211
 		...
 	);
 
@@ -762,14 +778,14 @@ Extends the current object definition with multiple new properties where initabl
 
 Extends the current object definition with a new property that acts as a function. A function has initable, writeable, enumerable and configurable all set to false so it cannot be changed/set once the object is instantiated.
 
-	function three => sub {
+	function four => sub {
 		my ($self, $param) = @_;
 		...
 	};
 
 NOTE: traditional sub routines work and should be inherited also.	
 
-	sub three {
+	sub four {
 		my ($self, $param) = @_;
 		...
 	}
@@ -937,6 +953,48 @@ Along with class definitions you can also generate object using Rope itself, the
 
 	$knot->{loops};
 	$with->loops;
+
+
+=head2 INITIALISE
+
+An before hook into new, the Rope META structure is passed as a param and can be validated and extended from within the sub routine.
+	
+	my $knot = Rope->new({
+		name => 'Knot',
+		properties => [
+			loops => 1,
+		],
+		INITIALISE => sub {
+			$_[1]->{properties}->{hitches} = {
+				type => Int,
+				value => 10,
+				initable => 0,
+				configurable => 0,
+			};
+			$_[1]->{properties}->{add_loops} => sub {
+				my ($self, $loop) = @_;
+				$self->{loops} += $loop;
+			};
+		}
+	});
+
+=head2 INITIALISED
+
+An after hook into new, the initialised Rope is passed as $self and can be validated and extended from within the sub routine.
+	
+	my $knot = Rope->new({
+		name => 'Knot',
+		properties => [
+			loops => 1,
+		],
+		INITIALISED => sub {
+			$_[0]->{hitches} = 10;
+			$_[0]->{add_loops} = sub {
+				my ($self, $loop) = @_;
+				$self->{loops} += $loop;
+			};
+		}
+	});
 
 =head2 destroy
 

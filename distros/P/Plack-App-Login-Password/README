@@ -75,6 +75,12 @@ METHODS
 
             Default value is 'Plack::App::Login; Version: __VERSION__'.
 
+    *       "lang"
+
+            Language in ISO 639-2 code.
+
+            Default value is undef.
+
     *       "login_cb"
 
             Callback for main login. Arguments for callback are: $env,
@@ -153,6 +159,18 @@ METHODS
     *       "tags_after"
 
             Reference to array with Tags code to use after form.
+
+            Default value is undef.
+
+    *       "text"
+
+            Hash reference with keys defined language in ISO 639-2 code and
+            value with hash reference with texts.
+
+            Required keys are 'login', 'password_label', 'username_label'
+            and 'submit'.
+
+            See more in Tags::HTML::Login::Access.
 
             Default value is undef.
 
@@ -278,8 +296,9 @@ EXAMPLE
      #               Login
      #             </legend>
      #             <p>
-     #               <label for="username" />
-     #               User name
+     #               <label for="username">
+     #                 User name
+     #               </label>
      #               <input type="text" name="username" id="username" />
      #             </p>
      #             <p>
@@ -299,6 +318,8 @@ EXAMPLE
      #     </div>
      #   </body>
      # </html>
+
+     # Output screenshot is in images/ directory.
 
 DEPENDENCIES
     Plack::Component::Tags::HTML, Plack::Request, Plack::Response,
@@ -323,5 +344,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.05
 

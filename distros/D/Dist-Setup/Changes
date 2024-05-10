@@ -1,5 +1,12 @@
 Revision history for perl distribution Dist-Setup
 
+0.16 - 2024-05-09
+
+ - Disable our custom make targets on platforms that are not know to have
+   GNU Make.
+ - Add a way to pass the HARNESS_OPTIONS variable used for the `make test`
+   target.
+
 0.15 - 2024-05-06
 
  - Fix a typo in the template dist_setup.conf file.

@@ -1,0 +1,122 @@
+# NAME
+
+Linux::Landlock - A higher level interface to the Linux Landlock API
+
+# DESCRIPTION
+
+Landlock is a sandboxing feature specific to Linux that allows a process to
+restrict its own access to the file system.
+Since the restrictions are set at runtime, from within the process itself,
+you can take into account dynamic information, like log or file system spool
+locations defined in your current configuration.
+
+Once set, restrictions cannot be undone and they are inherited by all future
+child processes.
+
+This module provides an object-oriented interface to the Linux Landlock API.
+It uses the lower-level interface provided by [Linux::Landlock::Direct](https://metacpan.org/pod/Linux%3A%3ALandlock%3A%3ADirect).
+
+See [https://docs.kernel.org/userspace-api/landlock.html](https://docs.kernel.org/userspace-api/landlock.html) for more information
+about Landlock.
+
+# SYNOPSIS
+
+      use Linux::Landlock;
+
+      my $ruleset = Linux::Landlock->new();
+      $ruleset->add_path_rule('/etc/fstab', qw(read_file));
+      $ruleset->add_net_rule(22222, qw(bind_tcp));
+      $ruleset->apply();
+
+      print -r '/etc/fstab' ? "allowed\n" : "not allowed\n"; # allowed ...
+      IO::File->new('/etc/fstab', 'r') and print "succeeded: $!\n"; # ... and opening works
+      print -r '/etc/passwd' ? "allowed\n" : "not allowed\n"; # allowed ...
+      IO::File->new('/etc/passwd', 'r') or print "failed\n"; # ... but opening fails because of Landlock
+
+      system('/usr/bin/cat /etc/fstab') and print "failed: $!\n"; # this fails, because we cannot execute cat
+
+      IO::Socket::INET->new(LocalPort => 33333, Proto => 'tcp') or print "failed: $!\n"; # failed
+      IO::Socket::INET->new(LocalPort => 22222, Proto => 'tcp') and print "succeeded\n"; # succeeded
+
+# METHODS
+
+- apply()
+
+    Apply the ruleset to the current process and all future children. Dies on error.
+
+- get\_abi\_version()
+
+    Int, returns the ABI version of the Landlock kernel module. Can be called as a static method.
+    A version < 1 means that Landlock is not available.
+
+- add\_path\_beneath\_rule($path, @allowed)
+
+    Add a rule to the ruleset that allows the specified access to the given path.
+    `$path` can be a file or a directory. `@allowed` is a list of access rights to allow.
+
+    Possible access rights are:
+
+        execute
+        write_file
+        read_file
+        read_dir
+        remove_dir
+        remove_file
+        make_char
+        make_dir
+        make_reg
+        make_sock
+        make_fifo
+        make_block
+        make_sym
+        refer
+        truncate
+
+    See  [https://docs.kernel.org/userspace-api/landlock.html](https://docs.kernel.org/userspace-api/landlock.html) for all possible access rights.
+
+- add\_net\_port\_rule($port, @allowed)
+
+    Add a rule to the ruleset that allows the specified access to the given port.
+    `$port` is allowed port, `@allowed` is a list of allowed operations.
+
+    Possible operations are:
+
+        bind_tcp
+        connect_tcp
+
+- allow\_perl\_inc\_access()
+
+    A convenience method that adds rules to allow reading files and directories in
+    all directories in `@INC`.
+
+- new(\[handled\_fs\_actions => \\@fs\_actions, handled\_net\_actions => \\@net\_actions\])
+
+    Create a new [Linux::Landlock](https://metacpan.org/pod/Linux%3A%3ALandlock) instance.
+
+    `handled_fs_actions` and `handled_net_actions` restrict the set of actions that
+    can be used in rules and that will be prevented if not allowed by any rule.
+
+    By default, all actions supported by the kernel and known to this module are covered.
+    This should usually not be changed.
+
+# LIMITATIONS
+
+This module requires a Linux system supporting the Landlock functionality. As of
+2024, this is the case for almost all distributions, however, the version of the
+available Landlock ABI varies.
+
+Notably, the `TRUNCATE` access right is only supported by the kernel since ABI
+version 3 (kernel version 6.2 or newer, unless backported).
+
+Network functionality is only available since ABI version 4.
+
+# AUTHOR
+
+Marc Ballarin, <ballarin.marc@gmx.de>
+
+# COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Marc Ballarin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

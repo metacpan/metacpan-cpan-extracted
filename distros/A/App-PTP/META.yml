@@ -3,10 +3,14 @@ abstract: 'An expressive Pipelining Text Processor'
 author:
   - 'Mathias Kende <mathias@cpan.org>'
 build_requires:
-  Benchmark: '0'
+  ExtUtils::MakeMaker: '0'
+  Readonly: '0'
+  Test2::V0: '0'
+  Test::CPANfile: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+  perl: v5.22.0
 dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -18,8 +22,9 @@ no_index:
   directory:
     - t
     - inc
-  namespace:
-    - App::PTP
+    - local
+    - vendor
+    - t
 requires:
   Cwd: '0'
   Data::Dumper: '0'
@@ -29,11 +34,12 @@ requires:
   Getopt::Long: '0'
   List::Util: '0'
   Pod::Usage: '0'
+  Readonly: '0'
   Safe: '0'
   Scalar::Util: '0'
   perl: '5.022'
 resources:
   bugtracker: https://github.com/mkende/ptp/issues
   repository: https://github.com/mkende/ptp
-version: '1.11'
+version: '1.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

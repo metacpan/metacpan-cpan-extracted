@@ -49,7 +49,7 @@ Rope::Type - Rope chained properties
 
 =head1 VERSION
 
-Version 0.27
+Version 0.31
 
 =cut
 

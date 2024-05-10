@@ -1,0 +1,7 @@
+-pt=2
+-sbt=2
+-l=120
+-ce
+-nbbc
+-cbl=else,elsif,catch,finally
+-cbo=0

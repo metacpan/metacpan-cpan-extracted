@@ -1,5 +1,11 @@
 Revision history for Mojolicious-Plugin-OpenTelemetry
 
+0.003     2024-05-09 17:59:53+01:00 Europe/London
+
+    * Spans are no longer automatically marked as OK by this
+      instrumentation. This is inline with the specification.
+      The documentation has been updated to reflect this.
+
 0.002     2024-05-02 13:44:26+01:00 Europe/London
 
     * Fixed an issue where spans were set to error in the case

@@ -62,7 +62,7 @@
    "provides" : {
       "Dancer2::Plugin::OpenTelemetry" : {
          "file" : "lib/Dancer2/Plugin/OpenTelemetry.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -76,7 +76,7 @@
          "web" : "https://github.com/jjatria/dancer2-plugin-opentelemetry"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"
@@ -307,7 +307,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.002",
+                  "tag" : "0.003",
                   "tag_format" : "%v",
                   "tag_message" : ""
                },

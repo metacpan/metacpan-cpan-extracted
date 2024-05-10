@@ -50,14 +50,22 @@ WriteMakefile(
     clean => { FILES => '[% dist_name %]-*' },
 );
 
+# These platforms (usually) have GNU Make by default so the syntax that we use
+# for our custom targets below will work (especially to export environment
+# variables).
+# On other platforms, we disable the custom parts of our Makefile generation, as
+# the generated Makefile would otherwise not parse correctly.
+sub supported_platform {
+  return $^O =~ m/^(?:linux|cygwin|MSWin32)$/;
+}
+
 sub MY::postamble {
   my ($self) = @_;
 
   my @postamble;
   push @postamble, ::postamble() if *::postamble{CODE};
 
-  # Solaris has a weird (?) make that does not support our `export` statements.
-  push @postamble, <<"MAKE_FRAGMENT" unless $^O eq 'solaris';
+  push @postamble, <<"MAKE_FRAGMENT" if supported_platform();
 ALL_PM := \$(shell find lib -name "*.pm")
 ALL_EXE :=[% IF exe_files %][% FOREACH f IN exe_files %] [% f %][% END %][% END %]
 
@@ -84,7 +92,9 @@ spelling: export EXTENDED_TESTING = 1
 spelling:
 \t\$(PERLRUN) t/001-spelling.t --interactive
 
-alltest: export EXTENDED_TESTING = 1
+[% IF test_harness_options %]test: export HARNESS_OPTIONS = [% test_harness_options %]
+
+[% END %]alltest: export EXTENDED_TESTING = 1
 alltest: test
 
 clean:: clean_coverdb clean_build clean_pod2html

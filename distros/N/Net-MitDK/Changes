@@ -1,3 +1,6 @@
+0.06  - 9 May 2024
+	fix for provate-only login
+
 0.05  - 15 Apr 2024
 	nemid auth method is phased out, use mitid instead.
 	Document anti-CORS measures.

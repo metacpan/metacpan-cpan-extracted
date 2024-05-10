@@ -1,9 +1,15 @@
 Revision history for Perl module Module::Generic
 
+v0.37.2 2024-05-09T21:40:22+0900
+    - Added method _set_get_enum in Module::Generic
+    - Corrected unit test in t/10.file.t
+    - Enabled catching fatal error in _set_get_callback() in Module::Generic
+
 v0.37.1 2024-05-05T13:17:55+0900
     - Corrected a bug leading to an exhaust of memory in method format() of Module::Generic::Number
     - Addressed decoding issue of data returned by POSIX::localconv(), such as currency sign in Module::Generic::Number
     - Implemented the 'grouping' option in method format of Module::Generic::Number
+    - Added method link() to Module::Generic::File
 
 v0.37.0 2024-05-04T20:31:24+0900
     - Minor adjustment to Module::Generic::SharedMemXS

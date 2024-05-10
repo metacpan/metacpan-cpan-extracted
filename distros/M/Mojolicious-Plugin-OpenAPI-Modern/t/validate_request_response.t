@@ -32,7 +32,7 @@ my $openapi_preamble = {
 };
 
 my $abs_uri = sub ($t) {
-  Mojo::URL->new->host($t->tx->req->headers->host)->scheme('https');
+  Mojo::URL->new->host($t->tx->req->headers->host)->scheme('http');
 };
 
 subtest 'validate_request helper' => sub {

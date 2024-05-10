@@ -89,7 +89,7 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "Mojolicious-Plugin-OpenAPI-Modern",
-      "dist_version" => "0.009",
+      "dist_version" => "0.010",
       "license" => "perl",
       "module_name" => "Mojolicious::Plugin::OpenAPI::Modern",
       "recursive_test_files" => 1,
@@ -99,7 +99,7 @@ EOW
         "JSON::Schema::Modern::Document::OpenAPI" => "0.024",
         "Mojo::Base" => 0,
         "Mojo::JSON" => 0,
-        "OpenAPI::Modern" => "0.055",
+        "OpenAPI::Modern" => "0.063",
         "Path::Tiny" => 0,
         "Safe::Isa" => 0,
         "YAML::PP" => 0,

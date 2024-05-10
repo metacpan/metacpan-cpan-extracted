@@ -44,7 +44,6 @@ ok( $rv, 'chmod' );
 is( $tmpdir->finfo->mode, 0700, 'chmod' );
 ok( $tmpdir->is_empty, 'is_empty' );
 is( $tmpdir->code, 200, 'code' );
-$tmpdir->cleanup(1);
 
 # Theoretical move since the file does not yet exist
 diag( "Moving file $f to $tmpdir" ) if( $DEBUG );
@@ -54,10 +53,10 @@ my $f2 = $f->move( $tmpdir ) || do
     diag( $f->error ) if( $DEBUG );
 };
 isa_ok( $f2, 'Module::Generic::File', 'moved object class' );
-my $expected_location = Cwd::abs_path( File::Spec->catpath( $f->volume, $tmpdir, $f->basename ) );
+my $expected_location = Cwd::abs_path( File::Spec->catpath( $f->volume, "$tmpdir", $f->basename ) );
 if( !defined( $expected_location ) )
 {
-    diag( "Error at line " . __LINE__ . " with Cwd::abs_path: $!" );
+    diag( "Error at line " . __LINE__ . " with Cwd::abs_path for file '$f' and tmpdir '$tmpdir': $!" );
 }
 is( "$f2", $expected_location, 'moved file new path' );
 if( $expected_location eq "$f2" )
@@ -82,6 +81,7 @@ if( $expected_location eq "$f2" )
     is( $files->first, "$f2", 'directory content as absolute files path' );
     ok( $tmpdir->resolve->contains( $f2 ), 'contains' );
 }
+$tmpdir->cleanup(1);
 
 my $mydir = tempdir({debug => $DEBUG, cleanup => 1});
 my $dircopy = $mydir;

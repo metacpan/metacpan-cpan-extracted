@@ -69,6 +69,7 @@ acceptance_tests(
           'ref to then',
           'ref to else',
           'ref with absolute-path-reference',
+          '$ref with $recursiveAnchor',
         ] },
       { file => ['unknownKeyword.json', 'optional/unknownKeyword.json'], group_description => '$id inside an unknown keyword is not a real identifier', test_description => 'type matches second anyOf, which has a real schema in it' },
       { file => 'optional/anchor.json', '$anchor inside an enum is not a real identifier', 'exact match to enum, and type matches' },

@@ -20,6 +20,8 @@ is($easter, 'Pasku Grandi', 'Easter is "guessed" correctly in Papiamento');
 $easter = is_holiday(2020, 4, 12, lang => 'en');
 is($easter, 'Easter', 'Easter is "guessed" correctly in English');
 
+my $asuncion = is_holiday(2024,5,9, lang => 'pap');
+is($asuncion, 'Dia di Asuncion', "39 days, not 40");
 
 is(is_holiday(2023, 5, 1), "Dia di Labor/Dia di Obrero", "Labor day");
 is(is_holiday(2023, 10, 2), "Dia di Pais K\x{00f2}rsou", "Day of the country");

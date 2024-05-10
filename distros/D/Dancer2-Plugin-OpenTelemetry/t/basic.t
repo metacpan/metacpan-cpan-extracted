@@ -119,7 +119,6 @@ subtest 'Static URL' => sub {
     }, 'Span created as expected';
 
     span_calls [
-        set_status    => [ SPAN_STATUS_OK ],
         set_attribute => [ 'http.response.status_code', 200 ],
         end           => [],
     ], 'Expected calls on span';
@@ -153,7 +152,6 @@ subtest 'Forward' => sub {
     }, 'Span created as expected';
 
     span_calls [
-        set_status    => [ SPAN_STATUS_OK ],
         set_attribute => [ 'http.response.status_code', 200 ],
         end           => [],
     ], 'Expected calls on span';
@@ -187,7 +185,6 @@ subtest 'Pass' => sub {
     }, 'Span created as expected';
 
     span_calls [
-        set_status    => [ SPAN_STATUS_OK ],
         set_attribute => [ 'http.response.status_code', 200 ],
         end           => [],
     ], 'Expected calls on span';
@@ -223,7 +220,6 @@ subtest 'Async' => sub {
     }, 'Span created as expected';
 
     span_calls [
-        set_status    => [ SPAN_STATUS_OK ],
         set_attribute => [ 'http.response.status_code', 200 ],
         end           => [],
     ], 'Expected calls on span';
@@ -256,7 +252,6 @@ subtest 'With placeholder' => sub {
     }, 'Span created as expected';
 
     span_calls [
-        set_status    => [ SPAN_STATUS_OK ],
         set_attribute => [ 'http.response.status_code', 200 ],
         end           => [],
     ], 'Expected calls on span';

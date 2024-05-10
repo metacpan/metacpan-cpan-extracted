@@ -1,5 +1,8 @@
 Revision history for Perl-Critic-Plicease
 
+0.06      2024-05-09 11:08:43 -0600
+  - (ProhibitSignaturesAndAtUnderscore) Added new policy (gh#6)
+
 0.05      2024-02-10 05:49:37 -0700
   - (ProhibitSpecificModules) Added new policy (gh#5)
   - Bump required Perl to 5.10.1 (gh#5)

@@ -52,6 +52,9 @@ t/33-from_nested_data.t
 t/34-ordered-conditional.t
 t/35-from_array.t
 t/36-from_nested_array.t
+t/37-initialise.t
+t/38-initialised.t
+t/39-array_property.t
 t/lib/Custom.pm
 t/lib/One.pm
 t/lib/Role.pm

@@ -73,6 +73,9 @@ sub set_alpha {
     my $alpha = 0+shift;
 
     croak "alpha must be a real between >=0 and <=1" unless $alpha >= 0 and $alpha <= 1;
+
+    $this->[2] = $alpha;
+
     my $arg = int ( (1/$alpha)*2-1 ); # pretty sure... gah, algebra
 
     $this->[TAG] = "LAG($arg)";
@@ -103,7 +106,12 @@ sub insert {
             $P = ($a[0]+$a[1])/$c;
         }
 
-        if( defined $L->[0] ) {
+        if( not defined $L->[0] ) {
+
+            $L->[0] = $P;
+
+        } else {
+
             # adapt alpha {{{
             if( $length and defined($filter) ) {
                 my $d = abs($P-$filter);
@@ -161,8 +169,6 @@ sub insert {
             $L->[2] = defined($O->[2]) ? (1 - $alpha)*$O->[2] - (1 - $alpha)*$L->[1] + $O->[1] : $O->[1];
             $L->[3] = defined($O->[3]) ? (1 - $alpha)*$O->[3] - (1 - $alpha)*$L->[2] + $O->[2] : $O->[2];
 
-        } else {
-            $L->[0] = $P;
         }
     }
 

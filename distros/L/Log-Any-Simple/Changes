@@ -1,5 +1,10 @@
 Revision history for Perl distribution Log-Any-Functions
 
+0.04 - 2024-05-09
+
+ - Require a relatively recent version of Log::Any, to avoid some bug in older
+   versions.
+
 0.03 - 2024-05-05
 
  - Improvement to the documentation.
@@ -11,4 +16,5 @@ Revision history for Perl distribution Log-Any-Functions
    Log::Log4perl::CommandLine). Useful for tests or very simple programs.
 
 0.01 - 2024-04-24
+
  - Initial release

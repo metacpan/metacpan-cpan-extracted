@@ -27,14 +27,9 @@ subtest 'existing attrs only' => sub {
 
         like( dies { $hash{c} = 1 }, qr{access .* t/lockkeys.t}, 'hash' );
 
-        like(
-            dies { $obj->{c} = 1 },
-            qr{access .* t/lockkeys.t},
-            'object hash'
-        );
+        like( dies { $obj->{c} = 1 }, qr{access .* t/lockkeys.t}, 'object hash' );
 
-        like( dies { $obj->c( 2 ) },
-            qr{locate object method .* t/lockkeys.t}, 'accessor' );
+        like( dies { $obj->c( 2 ) }, qr{locate object method .* t/lockkeys.t}, 'accessor' );
     };
 };
 
@@ -66,20 +61,11 @@ subtest 'extra attrs' => sub {
 
     subtest 'non-allowed attribute' => sub {
 
-        like(
-            dies { $hash{c} = 1 },
-            qr{access .* t/lockkeys.t},
-            'hash is locked'
-        );
+        like( dies { $hash{c} = 1 }, qr{access .* t/lockkeys.t}, 'hash is locked' );
 
-        like(
-            dies { $obj->{c} = 1 },
-            qr{access .* t/lockkeys.t},
-            'object hash is locked'
-        );
+        like( dies { $obj->{c} = 1 }, qr{access .* t/lockkeys.t}, 'object hash is locked' );
 
-        like( dies { $obj->c( 2 ) },
-            qr{locate object method .* t/lockkeys.t}, 'accessor' );
+        like( dies { $obj->c( 2 ) }, qr{locate object method .* t/lockkeys.t}, 'accessor' );
     };
 };
 

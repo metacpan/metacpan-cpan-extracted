@@ -44,7 +44,7 @@ DESCRIPTION
 
 METHODS
     Mojolicious::Plugin::Authentication::OIDC inherits all methods from
-    Mojolicious::Plugin and imeplements the following new ones
+    Mojolicious::Plugin and implements the following new ones
 
   register( \%params )
     Register plugin in Mojolicious application, including registering
@@ -144,6 +144,14 @@ METHODS
     pertaining to that user.
 
     Default: returns an empty ArrayRef
+
+   role_map (%map)
+    Optional
+
+    A mapping of external roles (e.g., from Authorization Server) to
+    internal roles used by the application's authorization framework. If
+    this option is specified, roles not present in its keys are deleted, all
+    others will be mapped.
 
    on_login ( $controller, $user )
     Optional

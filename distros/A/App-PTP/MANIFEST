@@ -1,3 +1,5 @@
+Changes
+cpanfile
 lib/App/PTP.pm
 lib/App/PTP/Args.pm
 lib/App/PTP/Commands.pm
@@ -9,7 +11,8 @@ Makefile.PL
 MANIFEST
 script/ptp
 t/000-load.t
-t/001-pod.t
+t/001-cpanfile.t
+t/001-podsyntax.t
 t/002-cmd-args.t
 t/003-benchmarks.t
 t/100-options-fix-final-separator.t
@@ -28,12 +31,14 @@ t/208-command-shell.t
 t/209-command-file-name.t
 t/210-command-uniq.t
 t/300-perlenv.t
+t/400-mode-quote-replacement.t
 t/999-examples.t
 t/data/default_data.txt
 t/data/default_small.txt
 t/data/encoding_iso_8859_15.txt
 t/data/encoding_utf8.txt
 t/data/module.pm
+t/data/one_line.txt
 t/data/simple_no_final_separator.txt
 t/data/simple_with_final_separator.txt
 t/data/src/fake.cc

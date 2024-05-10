@@ -7,6 +7,8 @@ package JSON::Relaxed;
 
 use JSON::Relaxed::Parser; our $VERSION = $JSON::Relaxed::Parser::VERSION;
 
+=encoding UTF-8
+
 =head1 NAME
 
 JSON::Relaxed -- An extension of JSON that allows for better human-readability
@@ -64,7 +66,7 @@ JSON::Relaxed is a lightweight parser and serializer for RJSON.
 It is fully compliant to the
 L<RelaxedJSON.org|https://www.relaxedjson.org/specification> specification.
 
-It does, however, have some additional extensions to make it even more
+It does, however, have some additional extensions to make it really
 relaxed.
 
 =head1 LEGACY MODE
@@ -81,19 +83,21 @@ For compatibility C<parse> is kept as a synonym for C<decode>.
 When called by one of the old names, JSON::Relaxed will operate in
 legacy mode. This changes the way errors are handled.
 
-=head1 EXTENSIONS
+=head1 REALLY RELAXED EXTENSIONS
 
-Extensions are enabled unless the option C<strict> is set.
+Extensions are disabled if option C<strict> is set.
+Otherwise, most extensions are enabled by default.
+Some extensions need an additional option setting.
 
-=over 4
-
-=item Leading commas in lists are allowed
+=head2 Leading commas in lists
 
 For example,
 
     [ , 1 ]
 
-=item Hash keys without values
+Enabled by default, overruled by C<strict>.
+
+=head2 Hash keys without values
 
 JSON::Relaxed supports object keys without a specified value.
 In that case the hash element is simply assigned the undefined value.
@@ -102,33 +106,42 @@ In the following example, a is assigned 1, and b is assigned undef:
 
     { a:1, b }
 
-=item String continuation
+Enabled by default, overruled by C<strict>.
 
-Long strings can be split over multiple lines by putting a backslash
-at the end of the line:
+=head2 String continuation
 
-    "this is a " \
-    "long string"
+Long strings can be aesthetically split over multiple lines by putting
+a backslash at the end of the line:
+
+      "this is a " \
+      "long string"
 
 Note that this is different from
 
-    "this is a \
+      "this is a \
     long string"
 
-which B<embeds> the newline into the string.
+which B<embeds> the newline into the string, and requires continuation
+lines to start at the beginning of the line to prevent unwanted spaces.
 
-=item Extended Unicode escapes
+Enabled by default, overruled by C<strict>.
+
+=head2 Extended Unicode escapes
 
 Unicode escapes in strings may contain an arbitrary number of hexadecimal
 digits enclosed in braces:
 
     \u{1d10e}
 
-This eliminates the need to use L<surrogates|https://unicode.org/faq/utf_bom.html#utf16-2> to obtain the same character:
+This eliminates the need to use
+L<surrogates|https://unicode.org/faq/utf_bom.html#utf16-2>
+to obtain the same character:
 
     \uD834\uDD0E
 
-=item Combined hash keys (requires C<combined_keys> option)
+Enabled by default, overruled by C<strict>.
+
+=head2 Combined hash keys
 
 Hash keys that contain periods are considered subkeys, e.g.
 
@@ -140,7 +153,26 @@ is equivalent to
         bar: blech
     }
 
-=item Garbage after JSON structure (requires C<extra_tokens_ok> option)
+Requires C<combined_keys> or C<prp> option. Overruled by C<strict>.
+
+=head2 Implied outer hash
+
+If the JSON looks like a hash, i.e. a string (key) followed by a
+C<:>, the outer C<{> and C<}> are implied.
+
+For example:
+
+    foo : bar
+
+is equivalent to:
+
+    { foo : bar }
+
+Requires C<implied_outer_hash> or C<prp> option. Overruled by C<strict>.
+
+=head2 Garbage after JSON structure
+
+Requires C<extra_tokens_ok> option. Overruled by C<strict>.
 
 Normally, parsing will fail unless the input contains exactly one
 valid JSON structure, i.e. a string, a hash or an array.
@@ -148,7 +180,67 @@ valid JSON structure, i.e. a string, a hash or an array.
 With C<extra_tokens_ok> the first JSON structure is parsed and the
 rest is ignored.
 
-=back
+=head2 PRP extensions
+
+Requires C<prp> option. Overruled by C<strict>.
+
+Enables some specific extensions:
+
+The equal sign C<=> can be used as an alternative to C<:> (colon).
+
+Colon (and equal sign) is optional between a key and its hash value.
+
+Single-line comments may start with C<#>.
+
+For example:
+
+    # This is a sample PRP extended Really Relaxed JSON.
+    pdf.formats {
+      title.footer = [ "%{copyright}" "" "%{page}" ]
+      first.footer = [ "%{copyright}" "" "" ]
+    }
+
+This is equivalent to Really Relaxed JSON:
+
+    // This is a sample Really Relaxed JSON.
+    pdf.formats: {
+      title.footer: [ "%{copyright}" "" "%{page}" ]
+      first.footer: [ "%{copyright}" "" "" ]
+    }
+
+And Relaxed JSON:
+
+    // This is a sample Relaxed JSON.
+    {
+      pdf: {
+        formats: {
+          title: {
+            footer: [ "%{copyright}" "" "%{page}" ]
+          }
+          first: {
+            footer: [ "%{copyright}" "" "" ]
+          }
+        }
+      }
+    }
+
+And JSON:
+
+    {
+      "pdf" : {
+        "formats" : {
+          "title" : {
+            "footer" : [ "%{copyright}", "", "%{page}" ]
+          }
+        },
+        "first" : {
+          "footer" : [ "%{copyright}", "", "" ]
+          }
+        }
+      }
+    }
+
+You decide what is easiest to write ☺.
 
 =head1 SUBROUTINES
 
@@ -210,13 +302,6 @@ L<RelaxedJSON.org|https://www.relaxedjson.org/specification> specification.
 
 Default value is false, enabling JSON::Relaxed extensions.
 
-=item extra_tokens_ok
-
-When set to a true value, allows (and ignores) trailing information
-after the first complete JSON structure.
-
-Disabled by default, overruled by C<strict>,
-
 =item croak_on_error
 
 Disabled by default in legacy mode, enabled otherwise.
@@ -225,12 +310,16 @@ Causes parsing error to be signalled with an exception.
 
 See L</"ERROR HANDLING">.
 
+=item extra_tokens_ok
+
 =item combined_keys
 
-Multiple hash keys can be combined with periods.
-E.g. C<foo.bar:blech> is equivalent to C<foo:{bar:blech}>.
+=item implied_outer_hash
 
-Disabled by default, overruled by C<strict>.
+=item prp
+
+Enables/disables some of the extensions described
+L<above|/REALLY RELAXED EXTENSIONS">.
 
 =back
 
@@ -269,7 +358,11 @@ For a full list, see L<JSON::Relaxed::ErrorCodes>.
 
 =head2 combined_keys
 
-Sets options.
+=head2 implied_outer_hash
+
+=head2 prp
+
+Sets/resets options.
 
 Note that the value must be assigned to, e.g.
 

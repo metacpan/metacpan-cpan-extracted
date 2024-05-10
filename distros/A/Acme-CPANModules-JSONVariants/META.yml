@@ -19,7 +19,7 @@ name: Acme-CPANModules-JSONVariants
 provides:
   Acme::CPANModules::JSONVariants:
     file: lib/Acme/CPANModules/JSONVariants.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Acme::CPANModulesUtil::Misc: '0'
   strict: '0'
@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-JSONVariants
   homepage: https://metacpan.org/release/Acme-CPANModules-JSONVariants
   repository: git://github.com/perlancar/perl-Acme-CPANModules-JSONVariants.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

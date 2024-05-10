@@ -29,8 +29,7 @@ subtest 'functionality' => sub {
     ref_ok( $func, 'CODE', 'we got a code ref!' );
 
     # check that we can reuse $func
-    ok( lives { Hash::Wrap->import( { -as => \$func } ) },
-        'reuse non-empty scalar' )
+    ok( lives { Hash::Wrap->import( { -as => \$func } ) }, 'reuse non-empty scalar' )
       or note $@;
 
 };

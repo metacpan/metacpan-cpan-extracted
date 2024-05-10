@@ -14,7 +14,7 @@ use File::Spec::Functions 'abs2rel', 'catfile';
 use Template;
 use Time::localtime;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 our %conf;  # to be shared with the Eval::Safe object.
 my $tt;

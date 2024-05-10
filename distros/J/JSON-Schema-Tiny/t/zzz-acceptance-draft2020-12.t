@@ -51,6 +51,7 @@ acceptance_tests(
           unevaluatedItems.json
           unevaluatedProperties.json
           vocabulary.json
+          optional/dynamicRef.json
           optional/format-assertion.json
         ) ] },
       { file => 'defs.json', group_description => [ 'valid definition', 'validate definition against metaschema' ] },

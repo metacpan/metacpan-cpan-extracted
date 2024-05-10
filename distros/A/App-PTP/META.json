@@ -16,22 +16,32 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
-      ],
-      "namespace" : [
-         "App::PTP"
+         "inc",
+         "local",
+         "vendor",
+         "t"
       ]
    },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Benchmark" : "0",
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "perl" : "v5.22.0"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Devel::Cover" : "0"
+         },
+         "suggests" : {
+            "CPAN::Uploader" : "0",
+            "Dist::Setup" : "0",
+            "PAR::Packer" : "0"
          }
       },
       "runtime" : {
@@ -44,6 +54,7 @@
             "Getopt::Long" : "0",
             "List::Util" : "0",
             "Pod::Usage" : "0",
+            "Readonly" : "0",
             "Safe" : "0",
             "Scalar::Util" : "0",
             "perl" : "5.022"
@@ -57,8 +68,21 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Common::Index::Mux::Ordered" : "0",
+            "Test::Pod" : "1.22"
+         },
+         "requires" : {
+            "Readonly" : "0",
+            "Test2::V0" : "0",
+            "Test::CPANfile" : "0",
+            "Test::More" : "0"
+         },
          "suggests" : {
-            "Test::Pod" : "1.22",
+            "Benchmark" : "0",
+            "IPC::Run3" : "0",
+            "Perl::Tidy" : "20220613",
+            "Test2::Tools::PerlCritic" : "0",
             "Time::HiRes" : "0"
          }
       }
@@ -73,6 +97,6 @@
          "web" : "https://github.com/mkende/ptp"
       }
    },
-   "version" : "1.11",
+   "version" : "1.13",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

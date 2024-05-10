@@ -8,7 +8,7 @@ use PPIx::Regexp;
 use base qw( Perl::Critic::Policy );
 
 # ABSTRACT: Prohibit non-ASCII \d in regular expressions
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 use constant DESC => 'Using non-ASCII \d';
@@ -61,7 +61,7 @@ Perl::Critic::Policy::Plicease::ProhibitUnicodeDigitInRegexp - Prohibit non-ASCI
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

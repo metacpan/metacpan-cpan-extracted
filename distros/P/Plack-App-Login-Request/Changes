@@ -1,3 +1,8 @@
+0.03 2024-05-09T18:53:33+02:00
+ - Add lang() and text() accessor for translations.
+ - Add tests for errors.
+ - Remove obsolete accessors from doc.
+
 0.02 2024-05-01T19:00:47+02:00
  - Add image to doc.
 

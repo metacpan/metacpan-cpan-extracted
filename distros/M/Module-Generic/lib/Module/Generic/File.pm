@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.8.2
+## Version v0.8.3
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2024/04/27
+## Modified 2024/05/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.8.2';
+    our $VERSION = 'v0.8.3';
 };
 
 use strict;
@@ -1882,6 +1882,40 @@ sub lines
         }
     }
     return( $a );
+}
+
+sub link
+{
+    my $self = shift( @_ );
+    # perlport: "link (RISC OS) Not implemented"
+    return( $self ) if( $^O =~ /^(riscos)$/i );
+    my $this = shift( @_ );
+    return( $self->error( "No target for hard link was provided." ) ) if( !defined( $this ) || !CORE::length( $this ) );
+    unless( $self->_is_object( $this ) && $self->_is_a( $this => 'Module::Generic::File' )  )
+    {
+        if( ref( $this ) && !overload::Method( $this, '""' ) )
+        {
+            return( $self->error( "I was expecting a string or a stringifyable object, but instead I got '$this'." ) );
+        }
+        $this = $self->new( "$this", { os => $self->{os} } ) || return( $self->pass_error );
+    }
+
+    return( $self->error( "There is already a file at \"${this}\"." ) ) if( $this->exists );
+    my $file = $self->filepath;
+    my $dest = $this->filepath;
+    my $rv;
+    # try-catch
+    local $@;
+    eval
+    {
+        $rv = CORE::symlink( $file, $dest );
+    };
+    if( $@ )
+    {
+        return( $self->error( "An unexpected error has occurred while trying to create a hard link from \"${file}\" to \"${dest}\": $@" ) );
+    }
+    return( $self->error( "Unable to create hard link from \"${file}\" to \"${dest}\": $!" ) ) if( !$rv );
+    return( $self );
 }
 
 sub load
@@ -4557,7 +4591,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.8.2
+    v0.8.3
 
 =head1 DESCRIPTION
 
@@ -4572,23 +4606,23 @@ This will instantiate an object that is used to access other key methods. It tak
 
 =over 4
 
-=item I<autoflush>
+=item * C<autoflush>
 
 Enables or disables autoflush. Takes a boolean value and defaults to true.
 
-=item I<auto_remove>
+=item * C<auto_remove>
 
 Takes a boolean value. Automatically removes the temporary directory or file when the objects is cleaned up by perl.
 
-=item I<base_dir>
+=item * C<base_dir>
 
 Sets the base directory for this file. If none is provided, it will attempt to get the current working directory, and if it cannot find it, most likely because it has been removed while your perl script was running, then it will try to C<chdir> to the system temporary directory, and if that, too, fails, it will set an L<error|Module::Generic/error> return C<undef>
 
-=item I<base_file>
+=item * C<base_file>
 
 Sets the base file for this file, i.e. the reference file frm which the base directory will be derived, if not already specified.
 
-=item I<collapse>
+=item * C<collapse>
 
 Enables or disables the collapsing of dots in the file path.
 
@@ -4596,7 +4630,7 @@ This will attempt to resolve and remove the dots to provide an absolute file pat
 
 C</../a/b/../c/./d.html> would become C</a/c/d.html>
 
-=item I<globbing>
+=item * C<globbing>
 
 Boolean value, by default set to the value of the package variable C<$GLOBBING>, which itself is false by default.
 
@@ -4608,23 +4642,23 @@ This is useful when you have filename with meta characters in their file path, l
 
 See also L</globbing> to change the parameter for the current object, and also the L</glob> and L</resolve>
 
-=item I<max_recursion>
+=item * C<max_recursion>
 
 Sets the maximum recursion allowed. Defaults to 12.
 
 Its value is used in L</mkpath> and L</resolve>
 
-=item I<os>
+=item * C<os>
 
 If provided, this will tell L<Module::Generic::File> to treat this new file as belonging to the specified operating system. This makes it possible to manipulate files or directories as if under a different system than the one you are currently using.
 
 Look also at L</as> to change a file to make it suitable for a different OS, such as C<Mac>, C<Win32>, C<dos>, C<Linux>, etc.
 
-=item I<resolved>
+=item * C<resolved>
 
 A boolean flag which states whether this file has been resolved already or not.
 
-=item I<type>
+=item * C<type>
 
 The type of file this is. Either a file or a directory.
 
@@ -4799,7 +4833,7 @@ If a value is provided, it will set the code, but if no value is provided it wil
 
 In line with section 5.2.4 of the rfc 33986, this will flaten (i.e. remove) any dots there may be in the element file path.
 
-It takes an optional list or hash reference of parameters, including I<separator> which is used a directory separator. If not provided, it will revert to the default value for the current system.
+It takes an optional list or hash reference of parameters, including C<separator> which is used a directory separator. If not provided, it will revert to the default value for the current system.
 
 =head2 contains
 
@@ -5012,7 +5046,7 @@ This is an alias for L</filename>
 
 Assuming the current object represents an existing directory, this takes an optional hash or hash reference of options followed by a code reference. This is used as a callback with the module L<File::Find/find>
 
-The callback can also be provided with the I<callback> option.
+The callback can also be provided with the C<callback> option.
 
 It returns whatever L<File::Find/find> returns or undef and sets an exception object if an error occurred.
 
@@ -5314,11 +5348,11 @@ It takes a list or an hash reference of optional parameters:
 
 =over 4
 
-=item I<recurse>
+=item * C<recurse>
 
 If true, this method will traverse the directories within recursively.
 
-=item I<follow_link>
+=item * C<follow_link>
 
 If true, the symbolic link will be resolved and followed.
 
@@ -5358,17 +5392,17 @@ This uses L<Module::Generic::Finfo/size>
 
 Provided with a callback as a subroutine reference or anonymous subroutine, and this will call the callback passing it each line of the file.
 
-If the callback returns C<undef>, this will terminate the browsing of each line, unless the option I<auto_next> is set. See below.
+If the callback returns C<undef>, this will terminate the browsing of each line, unless the option C<auto_next> is set. See below.
 
 It takes some optional arguments as follow:
 
 =over 4
 
-=item I<chomp> boolean
+=item * C<chomp> boolean
 
 If true, each line will be L<perlfunc/chomp>'ed before being passed to the callback.
 
-=item I<auto_next> boolean
+=item * C<auto_next> boolean
 
 If true, this will ignore the return value from the callback and will move on to the next line.
 
@@ -5388,7 +5422,7 @@ Also the additional following parameters are recognised:
 
 =over 4
 
-=item I<chomp>
+=item * C<chomp>
 
     # will perform a regular chomp
     my $array = $f->lines( chomp => 1 );
@@ -5408,7 +5442,7 @@ If a regular expression is provided, it will be used to weed out end of line car
 
 Otherwise, if you merely provide a true value, such as C<1>, then, by default, this will use L<perlfunc/chomp> and remove the trailing new line based on the value of C<$/>.
 
-If the value of I<chomp> is C<windows> or C<macos> (i.e. MacOS v9, the old one) or C<unix>, then this will set a local value of C<$/> to the corresponding line feed and carriage return sequence, typically C<\r\n> for Windows and C<\r> for MacOS and C<\n> for unix and then call L<perlfunc/chomp>. This is very fast, but will remove only the specific sequence. This means if you have a line such as:
+If the value of C<chomp> is C<windows> or C<macos> (i.e. MacOS v9, the old one) or C<unix>, then this will set a local value of C<$/> to the corresponding line feed and carriage return sequence, typically C<\r\n> for Windows and C<\r> for MacOS and C<\n> for unix and then call L<perlfunc/chomp>. This is very fast, but will remove only the specific sequence. This means if you have a line such as:
 
     Double whammy\r
 
@@ -5443,6 +5477,22 @@ Alternatively you can provide more than one os by separating them with a pipe (C
 Supported os names are: aix, amigaos, beos, darwin, dos, freebsd, linux, netbsd, openbsd, mac, macos, macosx, mswin32, os390, os400, riscos, solaris, sunos, symbian, unix, vms, windows, and win32
 
 =back
+
+=head2 link
+
+    my $source->link( '/some/where/here.txt' );
+    # Now /some/where/here.txt is a hard link to $source file
+    # or alternatively:
+    my $target = '/some/where/here.txt';
+    my $original_source = $source->link( $target );
+
+Provided with a file path or an L<Module::Generic::File> object, and this will call L<perlfunc/link> to create a hard link from the current object file to that file.
+
+On the following operating system not supported by perl, this will merely return the current object itself: RISC OS
+
+This returns the current object upon success and undef and sets an exception object if an error occurred.
+
+See also L</symlink>
 
 =head2 load
 
@@ -5500,23 +5550,23 @@ It takes either a numeric argument representing the flag bitwise, or a list or h
 
 =over 4
 
-=item I<exclusive>
+=item * C<exclusive>
 
 This will add the bit of C<Fcntl::LOCK_EX>
 
-=item I<shared>
+=item * C<shared>
 
 This will add the bit of C<Fcntl::LOCK_SH>
 
-=item I<non_blocking> or I<nb>
+=item * C<non_blocking> or C<nb>
 
 This will add the bit of C<Fcntl::LOCK_NB>
 
-=item I<unlock>
+=item * C<unlock>
 
 This will add the bit of C<Fcntl::LOCK_UN>
 
-=item I<timeout>
+=item * C<timeout>
 
 Takes an integer used to set an alarm for the lock. If a lock cannot be obtained before the timeout, an error is returned.
 
@@ -5552,19 +5602,19 @@ For each path fragments, this will call the callback and provide it with an hash
 
 =over 4
 
-=item I<dir>
+=item * C<dir>
 
 The current path fragment as a regular string
 
-=item I<parent>
+=item * C<parent>
 
 The current parent full path as a string
 
-=item I<path>
+=item * C<path>
 
 The current full path as a regular string
 
-=item I<volume>
+=item * C<volume>
 
 On Windows, this would contain the volume name as a string.
 
@@ -5670,17 +5720,17 @@ The options parameters are:
 
 =over 4
 
-=item 1. I<variable>
+=item 1. C<variable>
 
 A variable that will be tied to the file object.
 
-=item 2. I<size>
+=item 2. C<size>
 
 The maximum size of the variable allocated in the mmap'ed file. If this not provided, then the size will be derived from the size of the variable, or if the variable is not defined or empty, it will use the package global variable C<$DEFAULT_MMAP_SIZE>, which is set to 10Kb (10240 bytes) by default.
 
 For those with a perl version lower than C<5.16.0>, be careful that if you use more than the size allocated, this will raise an error with L<File::Map>. With L<PerlIO> there is no such restriction.
 
-=item 3. I<mode>
+=item 3. C<mode>
 
 The mode in which to mmap open the file. Possible modes are the same as with L<open|perlfunc/open>, however, C<mmap> will not work if you chose a mode like: >, +>, >> or +>>, thus if you want to mmap the file in read only, use < and if you want read-write, use +<. You can also use letters, such as C<r> for read-only and C<r+> for read-write.
 
@@ -5724,21 +5774,21 @@ Possible options are:
 
 =over 4
 
-=item I<autoflush>
+=item * C<autoflush>
 
 Takes a boolean value
 
-=item I<binmode>
+=item * C<binmode>
 
 The binmode value, with or without the semi colon before, such as C<utf8> or C<binary>
 
-=item I<lock>
+=item * C<lock>
 
 If true, this will set a lock based on the mode in which to open the file.
 
 For example, opening the file in write or append mode, will lead to an exclusive lock while opening the file in read mode will lead to a shared lock.
 
-=item I<truncate>
+=item * C<truncate>
 
 If true, this will truncate the file after opening it.
 
@@ -5842,17 +5892,17 @@ The parameter supported are:
 
 =over 4
 
-=item I<glob>
+=item * C<glob>
 
 A boolean, which, if true, will use L<perlfunc/glob> to resolve any meta characters.
 
 If glob is turned on and the glob results into an empty string, implying nothing was found, then this will set an L<error|Module::Generic/error> with code C<404> and return C<undef>.
 
-If no I<glob> parameter is provided, this reverts to the I<globbing> property of the object set upon instantiation.
+If no C<glob> parameter is provided, this reverts to the C<globbing> property of the object set upon instantiation.
 
-See L</glob> for more information and L</new> for the I<globbing> object property.
+See L</glob> for more information and L</new> for the C<globbing> object property.
 
-=item I<recurse>
+=item * C<recurse>
 
 If true, this will have resolve perform recursively.
 
@@ -5904,7 +5954,7 @@ Option parameters are:
 
 =over 4
 
-=item I<follow_link>
+=item * C<follow_link>
 
 If true, links will be followed in calculating the size of a directory. This defaults to false.
 
@@ -5940,7 +5990,7 @@ This does the reverse of L</join> and will return an array object (L<Module::Gen
     my $frags = $f->split;
     # Returns ['', 'some', 'where', 'in', 'time.txt']
 
-It can take an optional hash or hash reference of parameters. The only one currently supported is I<remove_leading_sep>, which, if true, will skip the first entry of the array:
+It can take an optional hash or hash reference of parameters. The only one currently supported is C<remove_leading_sep>, which, if true, will skip the first entry of the array:
 
     my $frags = $f->split( remove_leading_sep => 1 );
     # Returns ['some', 'where', 'in', 'time.txt']
@@ -5963,11 +6013,11 @@ This returns a filehandle object referencing C<STDERR>. It takes an optional has
 
 =over 4
 
-=item I<autoflush>
+=item * C<autoflush>
 
 This takes a boolean value. If true, auto flushing will be enabled on this filehandle, otherwise, if false, it will be disabled.
 
-=item I<binmode>
+=item * C<binmode>
 
 This takes the same value as you would provide to L<perlfunc/binmode>
 
@@ -5991,11 +6041,11 @@ This returns a filehandle object referencing C<STDIN>. It takes an optional hash
 
 =over 4
 
-=item I<autoflush>
+=item * C<autoflush>
 
 This takes a boolean value. If true, auto flushing will be enabled on this filehandle, otherwise, if false, it will be disabled.
 
-=item I<binmode>
+=item * C<binmode>
 
 This takes the same value as you would provide to L<perlfunc/binmode>
 
@@ -6019,11 +6069,11 @@ This returns a filehandle object referencing C<STDOUT>. It takes an optional has
 
 =over 4
 
-=item I<autoflush>
+=item * C<autoflush>
 
 This takes a boolean value. If true, auto flushing will be enabled on this filehandle, otherwise, if false, it will be disabled.
 
-=item I<binmode>
+=item * C<binmode>
 
 This takes the same value as you would provide to L<perlfunc/binmode>
 
@@ -6043,11 +6093,19 @@ Or you can also call it from another C<Module::Generic::File> object:
 
 =head2 symlink
 
-Provided with a file path or an L<Module::Generic::File> object, and this will call L<perlfunc/symlink> to create a symbolic link.
+    my $source->symlink( '/some/where/here.txt' );
+    # Now /some/where/here.txt is a symbolic link to $source file
+    # or alternatively:
+    my $target = '/some/where/here.txt';
+    my $original_source = $source->symlink( $target );
+
+Provided with a file path or an L<Module::Generic::File> object, and this will call L<perlfunc/symlink> to create a symbolic link from the current object file to that file.
 
 On the following operating system not supported by perl, this will merely return the current object itself: Win32 and RISC OS
 
 This returns the current object upon success and undef and sets an exception object if an error occurred.
+
+See also L</link>
 
 =head2 sync
 
@@ -6079,33 +6137,33 @@ It takes an optional list or hash reference of parameters:
 
 =over 4
 
-=item I<cleanup>
+=item * C<cleanup>
 
 Takes a boolean value.
 
 If true, this will enable the auto-remove feature of the directory object. See L</auto_remove>
 
-See also I<unlink>
+See also C<unlink>
 
-=item I<dir>
+=item * C<dir>
 
 Takes a string representing an existing directory.
 
 If provided, this will instruct this method to create the temporary directory below this directory.
 
-=item I<tmpdir>
+=item * C<tmpdir>
 
 Takes a boolean value.
 
 If true, the temporary directory will be created below the system wide temporary directory. This system temporary directory is taken from L<File::Spec/tmpdir>
 
-=item I<unlink>
+=item * C<unlink>
 
 Takes a boolean value.
 
 If true, this will enable the auto-remove feature of the directory object. See L</auto_remove>
 
-See also I<cleanup>
+See also C<cleanup>
 
 =back
 
@@ -6379,15 +6437,15 @@ It takes the following optional parameters:
 
 =over 4
 
-=item I<dry_run>
+=item * C<dry_run>
 
 If true, this will only pretend to remove the files recursively. This is useful for testing without actually removing anything.
 
-=item I<keep_root>
+=item * C<keep_root>
 
 If true, then L</rmtree> will keep the directory and remove all of its content. If false, it will also remove the directory itself on top of its content. Defaults to false.
 
-=item I<max_files>
+=item * C<max_files>
 
 Set the maximum numberof file beyond which this function will refuse to perform.
 
@@ -6433,41 +6491,41 @@ It takes the following optional parameters:
 
 =over 4
 
-=item I<cleanup>
+=item * C<cleanup>
 
 If true, this will enable the auto-remove option of the object. See L</auto_remove>
 
-See also I<unlink> which is an alias.
+See also C<unlink> which is an alias.
 
-=item I<dir>
+=item * C<dir>
 
 A directory path to be used to create the temporary file within.
 
-This parameter takes precedence over I<tmpdir>
+This parameter takes precedence over C<tmpdir>
 
-=item I<mode>
+=item * C<mode>
 
 This is the mode used to open this temporary file. It is used as arguement to L</open>
 
-=item I<open>
+=item * C<open>
 
 If true, the temporary file will be opened. It defaults to false.
 
-=item I<suffix> or I<extension>
+=item * C<suffix> or C<extension>
 
 A suffix to add to the temporary file including leading dot, such as C<.txt>. You can also specify the extension without any leading dot, such as C<txt>
 
-=item I<tmpdir>
+=item * C<tmpdir>
 
 The path or object of a directory within which to create the temporary file.
 
-See also I<dir>
+See also C<dir>
 
-=item I<unlink>
+=item * C<unlink>
 
 If true, this will enable the auto-remove option of the object. See L</auto_remove>
 
-See also I<cleanup> which is an alias.
+See also C<cleanup> which is an alias.
 
 =back
 

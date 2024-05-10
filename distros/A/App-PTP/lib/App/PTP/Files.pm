@@ -10,9 +10,10 @@ use warnings;
 use Data::Dumper;
 use Exporter 'import';
 
+our $VERSION = '0.01';
+
 # Every public function used by the main code is exported by default.
-our @EXPORT = 
-    qw(init_global_output close_global_output read_input write_output);
+our @EXPORT = qw(init_global_output close_global_output read_input write_output);
 our @EXPORT_OK = qw(write_side_output read_side_input write_handle);
 
 # The reference to this variable is used in the input list to specify that the
@@ -34,9 +35,8 @@ sub init_global_output {
       print "All output is going to: $options->{output}\n";
     }
     my $mode = $options->{append} ? '>>' : '>';
-    open ($global_output_fh, "${mode}:encoding($options->{output_encoding})",
-          $options->{output})
-      or die "Cannot open output file '$options->{output}': $!.\n";
+    open($global_output_fh, "${mode}:encoding($options->{output_encoding})", $options->{output})
+        or die "Cannot open output file '$options->{output}': $!.\n";
   } elsif (not $options->{in_place}) {
     print "All output is going to STDOUT.\n" if $options->{debug_mode};
     $global_output_fh = $stdout;
@@ -59,10 +59,10 @@ sub close_global_output {
 # elements. The first one is an array-ref with all the lines of the file and the
 # second one is a variable indicating if the last line of the file had a final
 # separator.
-# This method uses the value of the `$intput_separator` global option.
+# This method uses the value of the `$input_separator` global option.
 sub read_handle {
   my ($handle, $options) = @_;
-  local $/ = undef; # enable slurp mode;
+  local $/ = undef;  # enable slurp mode;
   my $content = <$handle>;
   if (not defined $content) {
     if ($@) {
@@ -75,9 +75,9 @@ sub read_handle {
   }
   my @content;
   if ($options->{preserve_eol}) {
-    @content = $content =~ /\G(.*?(?n:$options->{input_separator}))/gcms;
+    @content = $content =~ /\G ( .*? (?n: $options->{input_separator} ))/xgcms;
   } else {
-    @content = $content =~ /\G(.*?)(?n:$options->{input_separator})/gcms;
+    @content = $content =~ /\G (.*?) (?n: $options->{input_separator} )/xgcms;
   }
   my $missing_final_separator = 0;
   if ((pos($content) // 0) < length($content)) {
@@ -93,8 +93,8 @@ sub read_handle {
 sub read_file {
   my ($path, $options) = @_;
   print "Reading file: ${path}\n" if $options->{debug_mode};
-  open (my $fh, "<:encoding($options->{input_encoding})", $path)
-    or die "Cannot open file '$path': $!.\n";
+  open(my $fh, "<:encoding($options->{input_encoding})", $path)
+      or die "Cannot open file '$path': $!.\n";
   my @data = read_handle($fh, $options);
   close($fh) or die "Cannot close the file '$path': $!.\n";
   return @data;
@@ -119,7 +119,7 @@ sub read_input {
     if ($input == \$stdin_marker) {
       return read_stdin($options, $stdin);
     } else {
-      die "Should not happen (".Dumper($input).")\n";
+      die 'Should not happen ('.Dumper($input).")\n";
     }
   }
   return read_file($input, $options);
@@ -140,9 +140,9 @@ sub write_handle {
 sub write_file {
   my ($file_name, $content, $missing_final_separator, $append, $options) = @_;
   my $m = $append ? '>>' : '>';
-  print "Outputing result to: ${m}${file_name}\n" if $options->{debug_mode};
-  open (my $out_fh, "${m}:encoding($options->{output_encoding})", $file_name)
-    or die "Cannot open output file '${file_name}': $!.\n";
+  print "Outputting result to: ${m}${file_name}\n" if $options->{debug_mode};
+  open(my $out_fh, "${m}:encoding($options->{output_encoding})", $file_name)
+      or die "Cannot open output file '${file_name}': $!.\n";
   write_handle($out_fh, $content, $missing_final_separator, $options);
   close $out_fh or die "Cannot close output file '${file_name}': $!.\n";
 }
@@ -153,24 +153,24 @@ sub write_output {
   if ($options->{in_place}) {
     write_file($file_name, $content, $missing_final_separator, 0, $options);
   } else {
-    write_handle($global_output_fh, $content, $missing_final_separator,
-                 $options);
+    write_handle($global_output_fh, $content, $missing_final_separator, $options);
   }
 }
 
-# These two methodes are used by commands which read or write to side input/
+# These two methods are used by commands which read or write to side input/
 # output files. The difference is that they expect a '-' in the given filename
 # instead of the #stdin_marker, when referring to the standard input (or
 # output).
 my %known_side_output;
+
 sub write_side_output {
   my ($file_name, $content, $missing_final_separator, $options) = @_;
-  print "Outputing side result to: ${file_name}\n" if $options->{debug_mode};
+  print "Outputting side result to: ${file_name}\n" if $options->{debug_mode};
   if ($file_name eq '-') {
     write_handle(\*STDOUT, $content, $missing_final_separator, $options);
   } else {
     write_file($file_name, $content, $missing_final_separator,
-               $known_side_output{$file_name}++, $options);
+      $known_side_output{$file_name}++, $options);
   }
 }
 

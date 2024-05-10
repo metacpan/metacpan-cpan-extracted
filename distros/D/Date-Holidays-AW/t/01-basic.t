@@ -27,6 +27,10 @@ $easter = is_holiday(2020,4,12, lang => 'de');
 is($easter, 'Pasco Grandi', "Found easter in Papiamento language by default");
 
 
+my $asuncion = is_holiday(2024,5,9, lang => 'pap');
+is($asuncion, 'Dia di Asuncion', "39 days, not 40");
+
+
 ok(!is_holiday(1979, 11, 8), "My birthday isn't a holiday");
 
 # Royal stuff, this changes based on who has the throne and Sunday, Saturday,

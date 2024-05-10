@@ -1,11 +1,22 @@
+# DO NOT EDIT! This file is written by perl_setup_dist.
+# If needed, you can add content at the end of the file.
+
 #!/usr/bin/perl
 
 use strict;
 use warnings;
-use Test::More;
+use Test2::V0;
 
-plan tests => 1;
+our $VERSION = 0.01;
 
-use_ok('App::PTP');
+BEGIN {
+  ok(eval 'use App::PTP; 1', 'use App::PTP');  ## no critic (ProhibitStringyEval, RequireCheckingReturnValueOfEval)
+}
+{
+  no warnings 'once';  ## no critic (ProhibitNoWarnings)
+  note("Testing App::PTP $App::PTP::VERSION, Perl $], $^X");
+}
 
-diag("Testing App::Ptp $App::PTP::VERSION, Perl $], $^X, $ENV{SHELL}");
+done_testing;
+
+# End of the template. You can add custom content below this line.

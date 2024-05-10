@@ -4,7 +4,7 @@
       "Paul Miller <jettero@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "ATR",
       "bollinger",
@@ -62,6 +62,6 @@
          "url" : "http://github.com/jettero/stockmonkey"
       }
    },
-   "version" : "2.9409",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "2.9410",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

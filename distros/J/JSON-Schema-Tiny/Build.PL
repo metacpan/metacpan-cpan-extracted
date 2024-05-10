@@ -89,7 +89,7 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "JSON-Schema-Tiny",
-      "dist_version" => "0.023",
+      "dist_version" => "0.024",
       "license" => "perl",
       "module_name" => "JSON::Schema::Tiny",
       "recursive_test_files" => 1,

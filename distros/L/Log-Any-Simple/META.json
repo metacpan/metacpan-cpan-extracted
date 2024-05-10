@@ -46,12 +46,14 @@
             "Devel::Cover" : "0"
          },
          "suggests" : {
-            "CPAN::Uploader" : "0"
+            "CPAN::Uploader" : "0",
+            "Dist::Setup" : "0",
+            "PAR::Packer" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Log::Any" : "0",
+            "Log::Any" : "1.711",
             "Readonly" : "0",
             "perl" : "5.022"
          }
@@ -84,6 +86,6 @@
          "web" : "https://github.com/mkende/perl_log_any_simple"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

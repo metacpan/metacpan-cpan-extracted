@@ -44,7 +44,7 @@ Controllers may get information about the logged in user via the
 # METHODS
 
 [Mojolicious::Plugin::Authentication::OIDC](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AAuthentication%3A%3AOIDC) inherits all methods from
-[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious%3A%3APlugin) and imeplements the following new ones
+[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious%3A%3APlugin) and implements the following new ones
 
 ## register( \\%params )
 
@@ -145,6 +145,14 @@ Given a `user` instance (produced by ["get\_user"](#get_user)) and a decoded aut
 token as arguments, returns an ArrayRef of roles pertaining to that user.
 
 Default: returns an empty ArrayRef
+
+#### role\_map (%map)
+
+**Optional**
+
+A mapping of external roles (e.g., from Authorization Server) to internal roles
+used by the application's authorization framework. If this option is specified,
+roles not present in its keys are deleted, all others will be mapped.
 
 #### on\_login ( $controller, $user )
 

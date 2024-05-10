@@ -7,12 +7,12 @@ use warnings;
 use Plack::Request;
 use Plack::Response;
 use Plack::Session;
-use Plack::Util::Accessor qw(generator login_request_cb logo_image_url message_cb
-	redirect_login redirect_error title);
+use Plack::Util::Accessor qw(generator lang login_request_cb logo_image_url
+	message_cb redirect_login redirect_error text title);
 use Tags::HTML::Container;
 use Tags::HTML::Login::Request;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub _css {
 	my $self = shift;
@@ -77,7 +77,13 @@ sub _prepare_app {
 	# Tags helper for login button.
 	$self->{'_tags_login_request'} = Tags::HTML::Login::Request->new(
 		%p,
+		defined $self->lang ? (
+			'lang' => $self->lang,
+		) : (),
 		'logo_image_url' => $self->logo_image_url,
+		defined $self->text ? (
+			'text' => $self->text,
+		) : (),
 	);
 	$self->{'_tags_container'} = Tags::HTML::Container->new(%p);
 
@@ -218,17 +224,11 @@ HTML generator string.
 
 Default value is 'Plack::App::Login; Version: __VERSION__'.
 
-=item * C<login_link>
+=item * C<lang>
 
-Login link.
+Language in ISO 639-2 code.
 
-Default value is 'login'.
-
-=item * C<login_title>
-
-Login title.
-
-Default value is 'LOGIN'.
+Default value is undef.
 
 =item * C<psgi_app>
 
@@ -266,6 +266,16 @@ Default value is
          'no_simple' => ['script', 'textarea'],
          'preserved' => ['pre', 'style'],
  );
+
+=item * C<text>
+
+Hash reference with keys defined language in ISO 639-2 code and value with hash reference with texts.
+
+Required keys are 'login_request', 'email_label' and 'submit'.
+
+See more in L<Tags::HTML::Login::Request>.
+
+Default value is undef.
 
 =item * C<title>
 
@@ -526,6 +536,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

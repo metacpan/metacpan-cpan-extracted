@@ -79,8 +79,8 @@ print $tags->flush."\n";
 #     </legend>
 #     <p>
 #       <label for="username">
+#         User name
 #       </label>
-#       User name
 #       <input type="text" name="username" id="username" autofocus="autofocus">
 #       </input>
 #     </p>

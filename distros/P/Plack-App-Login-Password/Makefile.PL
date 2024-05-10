@@ -24,7 +24,7 @@ requires 'Plack::Response' => 0;
 requires 'Plack::Session' => 0;
 requires 'Plack::Util::Accessor' => 0;
 requires 'Tags::HTML::Container' => 0;
-requires 'Tags::HTML::Login::Access' => 0.10;
+requires 'Tags::HTML::Login::Access' => 0.12;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Plack-App-Login-Password/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Plack-App-Login-Password';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Plack-App-Login-Password';
@@ -36,8 +36,9 @@ test_requires 'Plack::Test' => 0;
 test_requires 'Tags::Output::Indent' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
+test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.03';
+version '0.05';
 
 # Run.
 WriteAll();

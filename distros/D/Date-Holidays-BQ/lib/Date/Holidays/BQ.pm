@@ -1,5 +1,5 @@
 package Date::Holidays::BQ;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -125,14 +125,14 @@ my %FIXED_DATES = (
     xmas => {
         m   => 12,
         d   => 25,
-        pap => 'Pasco di Nacemento',
+        pap => 'Pasku di Nacemento',
         nl  => 'Kerst',
         en  => 'Christmas',
     },
     boxing => {
         m   => 12,
         d   => 26,
-        pap => 'Di dos dia di Pasco di Nacemento',
+        pap => 'Di dos dia di Pasku di Nacemento',
         nl  => 'Tweede kerstdag',
         en  => 'Boxing day',
     },
@@ -164,8 +164,8 @@ my %EASTER_BASED = (
         en  => 'Second day of easter',
     },
     ascension => {
-        d   => 40,
-        pap => 'Dia di asuncion',
+        d   => 39,
+        pap => 'Dia di Asuncion',
         nl  => 'Hemelvaartsdag',
         en  => 'Ascension day',
     },
@@ -179,7 +179,7 @@ my %EASTER_BASED = (
         d   => 50,
         pap => "Dia dos di Pentek\x{00f2}ste",
         nl  => 'Tweede pinksterdag',
-        en  => 'pentecost',
+        en  => 'Pentecost',
         gov => 1,
     },
 );
@@ -317,7 +317,7 @@ Date::Holidays::BQ - Bonaire's official holidays
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -372,7 +372,7 @@ your enconding to UTF-8, otherwise you may see weird things.
 
 =over
 
-=item https://wetten.overheid.nl/BWBR0002448/2010-10-10
+=item L<https://wetten.overheid.nl/BWBR0002448/2010-10-10>
 
 =back
 

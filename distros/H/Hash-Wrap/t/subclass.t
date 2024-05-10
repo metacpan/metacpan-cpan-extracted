@@ -37,11 +37,7 @@ SKIP: {
 
         is( $obj->fries, 40, "new accessor" );
 
-        like(
-            dies { $obj->cakes },
-            qr/can't locate object method.*subclass.t/i,
-            "bad element"
-        );
+        like( dies { $obj->cakes }, qr/can't locate object method.*subclass.t/i, "bad element" );
 
     }
 }

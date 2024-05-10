@@ -1,5 +1,6 @@
 Changes
 examples/login_password_psgi.pl
+images/login_password_psgi.png
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

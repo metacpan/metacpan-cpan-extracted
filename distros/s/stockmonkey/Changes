@@ -1,3 +1,7 @@
+2.9310: Sun Jun 10 2018
+   - fixed bug found by Robert Urban where the LaguerreFilter filter
+     set_days/set_alpha was not working
+
 2.9309: Sun Jun 10 2018
    - fix division by zero bugs in SM/Stochastic; side note:
      What is the correct computation of K and D when H==L or L=0? We can't really know.

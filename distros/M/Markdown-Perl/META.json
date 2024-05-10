@@ -18,7 +18,8 @@
          "t",
          "inc",
          "local",
-         "vendor"
+         "vendor",
+         "t"
       ]
    },
    "prereqs" : {
@@ -39,6 +40,8 @@
             "Devel::NYTProf" : "0"
          },
          "suggests" : {
+            "CPAN::Uploader" : "0",
+            "Dist::Setup" : "0",
             "PAR::Packer" : "0"
          }
       },
@@ -54,6 +57,7 @@
       },
       "test" : {
          "recommends" : {
+            "CPAN::Common::Index::Mux::Ordered" : "0",
             "Test::Pod" : "1.22"
          },
          "requires" : {
@@ -81,6 +85,6 @@
          "web" : "https://github.com/mkende/pmarkdown"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

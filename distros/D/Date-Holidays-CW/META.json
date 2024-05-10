@@ -68,7 +68,7 @@
    "provides" : {
       "Date::Holidays::CW" : {
          "file" : "lib/Date/Holidays/CW.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://gitlab.com/waterkip/p5-date-holidays-cw"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_contributors" : [
       "Wesley Schwengle <waterkip@cpan.org>"
    ],

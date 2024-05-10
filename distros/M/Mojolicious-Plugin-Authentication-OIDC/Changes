@@ -1,4 +1,7 @@
 Revision history for perl distribution Mojolicious::Plugin::Authentication::OIDC
 
+0.02      2024-05-09T11:57:28-05:00
+  - Add role_map functionality
+
 0.01      2024-04-25T13:18:14-05:00
   - First public release

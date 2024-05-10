@@ -1,0 +1,27 @@
+## name Bad1
+## failures 1
+## cut
+
+use experimental qw( signatures );
+
+sub foo ($a, $b) {
+  my @x = @_;
+}
+
+## name Bad2
+## failures 1
+## cut
+
+use experimental qw( signatures );
+
+sub foo ($a) {
+  my $x = $_[0];
+}
+
+## name Prototype
+## failures 0
+## cut
+
+sub foo ($$) {
+  my @x = @_;
+}

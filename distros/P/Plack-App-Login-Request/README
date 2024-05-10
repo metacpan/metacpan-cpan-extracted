@@ -77,17 +77,11 @@ METHODS
 
             Default value is 'Plack::App::Login; Version: __VERSION__'.
 
-    *       "login_link"
+    *       "lang"
 
-            Login link.
+            Language in ISO 639-2 code.
 
-            Default value is 'login'.
-
-    *       "login_title"
-
-            Login title.
-
-            Default value is 'LOGIN'.
+            Default value is undef.
 
     *       "psgi_app"
 
@@ -125,6 +119,17 @@ METHODS
                      'no_simple' => ['script', 'textarea'],
                      'preserved' => ['pre', 'style'],
              );
+
+    *       "text"
+
+            Hash reference with keys defined language in ISO 639-2 code and
+            value with hash reference with texts.
+
+            Required keys are 'login_request', 'email_label' and 'submit'.
+
+            See more in Tags::HTML::Login::Request.
+
+            Default value is undef.
 
     *       "title"
 
@@ -353,5 +358,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

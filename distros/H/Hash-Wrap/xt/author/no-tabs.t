@@ -26,6 +26,7 @@ my @files = (
     't/methods.t',
     't/predicate.t',
     't/recurse.t',
+    't/regressions/bad01.t',
     't/subclass.t',
     't/undef.t'
 );

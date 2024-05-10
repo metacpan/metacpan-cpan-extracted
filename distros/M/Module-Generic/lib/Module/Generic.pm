@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.37.1
+## Version v0.37.2
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2024/05/05
+## Modified 2024/05/09
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.37.1';
+    our $VERSION     = 'v0.37.2';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -254,6 +254,7 @@ sub _set_get_class_array;
 sub _set_get_class_array_object;
 sub _set_get_code;
 sub _set_get_datetime;
+sub _set_get_enum;
 sub _set_get_file;
 sub _set_get_glob;
 sub _set_get_hash;
@@ -3560,15 +3561,18 @@ sub _set_get_callback : lvalue
     
     if( CORE::defined( $args ) && scalar( @$args ) )
     {
+        # try-catch
+        local $@;
         local $_ = $context;
         if( $context->{list} )
         {
-            @rv = $setter->( $self, @$args );
+            eval{ @rv = $setter->( $self, @$args ) };
         }
         else
         {
-            $rv[0] = $setter->( $self, @$args );
+            eval{ $rv[0] = $setter->( $self, @$args ) };
         }
+        $self->error( $@ ) if( $@ );
         
         
         if( ( !scalar( @rv ) || ( scalar( @rv ) == 1 && !defined( $rv[0] ) ) ) && 
@@ -3623,15 +3627,18 @@ sub _set_get_callback : lvalue
         }
     }
     
+    # try-catch
+    local $@;
     local $_ = $context;
     if( $context->{list} )
     {
-        @rv = $getter->( $self );
+        eval{ @rv = $getter->( $self ) };
     }
     else
     {
-        $rv[0] = $getter->( $self );
+        eval{ $rv[0] = $getter->( $self ) };
     }
+    $self->error( $@ ) if( $@ );
     
     if( !scalar( @rv ) && 
         ( my $has_error = $self->error ) )
@@ -8586,6 +8593,94 @@ sub _set_get_datetime : lvalue
     }, @_ ) );
 }
 PERL
+    # NOTE: _set_get_enum
+    _set_get_enum => <<'PERL',
+sub _set_get_enum : lvalue
+{
+    my $self  = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $class = ref( $self ) || $self;
+    my( $field, $allowed );
+    my $case_sensitive = 1;
+    if( scalar( @_ ) && 
+        ref( $_[0] // '' ) eq 'HASH' )
+    {
+        my $def = shift( @_ );
+        if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) )
+        {
+            $field = CORE::delete( $def->{field} );
+        }
+        else
+        {
+            warn( "No 'field' parameter provided in calling _set_get_datetime\n" ) if( $self->_warnings_is_enabled );
+        }
+        if( CORE::exists( $def->{allowed} ) && defined( $def->{allowed} ) && CORE::length( $def->{allowed} ) )
+        {
+            $allowed = CORE::delete( $def->{allowed} );
+        }
+        else
+        {
+            die( "No 'allowed' parameter provided in calling _set_get_enum" );
+        }
+        # It could be defined, but empty (''), or set to a positive (1) or false value (0)
+        if( CORE::exists( $def->{case} ) && defined( $def->{case} ) )
+        {
+            $case_sensitive = CORE::delete( $def->{case} ) ? 1 : 0;
+        }
+    }
+    elsif( scalar( @_ ) >= 2 )
+    {
+        ( $field, $allowed ) = splice( @_, 0, 2 );
+    }
+    else
+    {
+        die( "Error calling _set_get_enum. Either call _set_get_enum with an hash reference, such as \$self->_set_get_enum({ field => \$my_field, allowed => [qw( value1 value2 )] }), or by passing it as 2 arguments, such as \$self->_set_get_enum( \$my_field, \$allowed_array_reference )" );
+    }
+
+    if( !$self->_is_array( $allowed ) )
+    {
+        die( "Property value 'allowed' provided (", overload::StrVal( $allowed ), ") is not an array reference." );
+    }
+
+    return( $self->_set_get_callback({
+        get => sub
+        {
+            my $self = shift( @_ );
+            # So that a call to this field will not trigger an error: "Can't call method "xxx" on an undefined value"
+            if( !defined( $data->{ $field } ) || !CORE::length( $data->{ $field } ) )
+            {
+                return;
+            }
+            return( $data->{ $field } );
+        },
+        set => sub
+        {
+            my $self = shift( @_ );
+            my $arg = shift( @_ );
+            if( defined( $arg ) )
+            {
+                my $is_ok = $case_sensitive
+                    ? scalar( grep( $_ eq ( $arg // '' ), @$allowed ) )
+                    : scalar( grep( /^\Q$arg\E/i, @$allowed ) );
+                return( $self->error( "Invalid value '", overload::StrVal( $arg // '' ), "'" ) ) if( !$is_ok );
+                return( $data->{ $field } = $arg );
+            }
+            else
+            {
+                $data->{ $field } = undef;
+            }
+
+            # So that a call to this field will not trigger an error: "Can't call method "xxx" on an undefined value"
+            if( !$data->{ $field } )
+            {
+                return;
+            }
+            return( $data->{ $field } );
+        }
+    }, @_ ) );
+}
+PERL
     # NOTE: _set_symbol
     _set_symbol => <<'PERL',
 # $o->_set_symbol(
@@ -9403,7 +9498,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v0.37.1
+    v0.37.2
 
 =head1 DESCRIPTION
 
@@ -11555,6 +11650,41 @@ Even if there is no value set, and this method is called in chain, it returns a 
     $object->created->iso8601
 
 Of course, the value of C<iso8601> will be empty since this is a fake method produced by L<Module::Generic::Null>. The return value of a method should always be checked.
+
+=head2 _set_get_enum
+
+    sub choice { return( shift->_set_get_enum( 'choice', [qw( yes no )], @_ ) ); }
+    # or
+    sub choice : lvalue { return( shift->_set_get_enum({
+        field   => 'choice',
+        allowed => [qw( yes no )],
+        # case insensitive
+        case    => 0,
+    }, @_ ) ); }
+
+This support method handles C<enum> values, i.e. a list of allowed values that can be set.
+
+It takes either a C<field> name, and an array of C<allowed> values; or an hash reference with the following supported options:
+
+=over 4
+
+=item * C<allowed>
+
+An array reference of allowed values.
+
+=item * C<case>
+
+A boolean value as to whether the value received should be compared in a case sensitive (true) or case insensitive (false) way against the allowed value.
+
+Thus, if true, an hypothetical value C<yes> would match against the C<allowed> values C<['yes', 'no']>, but would fail if that value were C<YES>
+
+Default is true.
+
+=item * C<field>
+
+The field name.
+
+=back
 
 =head2 _set_get_file
 

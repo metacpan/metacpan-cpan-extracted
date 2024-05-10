@@ -1,5 +1,12 @@
 Revision history for Hash-Wrap
 
+1.03      2024-05-09 15:25:05-04:00 America/New_York
+
+  [BUG FIX]
+
+      * incorrect value was returned first time an object at a lower
+        level was returned for an immutable, recursive, copied wrapper.
+
 1.02      2024-05-03 13:21:48-04:00 America/New_York
 
   [ENHANCEMENT]

@@ -80,6 +80,6 @@
          "web" : "https://github.com/mkende/perl_dist_setup"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

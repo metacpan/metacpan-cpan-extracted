@@ -1,3 +1,10 @@
+0.05 2024-05-10T10:31:29+02:00
+ - Add image for example in doc.
+ - Fix of label for username.
+
+0.04 2024-05-09T13:07:06+02:00
+ - Add lang() and text() accessor for translations.
+
 0.03 2024-05-02T15:25:55+02:00
  - Add tags_after() accessor.
  - Improve doc.

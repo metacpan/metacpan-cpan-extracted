@@ -7,11 +7,18 @@ no warnings 'experimental::smartmatch';
 
 use App::PTP::Args;
 use App::PTP::Commands qw(do_perl do_grep do_substitute do_sort);
-use Benchmark qw(:hireswallclock :all);
+use English;
 use Test::More;
 
 if ($ENV{HARNESS_ACTIVE}) {
   plan skip_all => 'Benchmarks need to be run explicitly.';
+}
+
+BEGIN {
+  eval 'use Benchmark qw(:hireswallclock :all)';
+  if ($EVAL_ERROR) {
+    skip_all('TheBenchmark module is required');
+  }
 }
 
 my $content_size = 5000;

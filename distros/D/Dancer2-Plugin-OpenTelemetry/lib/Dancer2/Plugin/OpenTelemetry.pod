@@ -170,11 +170,20 @@ C<500>.
 =back
 
 The span will be unconditionally L<ended|OpenTelemetry::Trace::Span/end> after
-the request has been handled, and the
-L<status will be set|OpenTelemetry::Trace::Span/set_status> to either an
-L<OK status|OpenTelemetry::Constants/SPAN_STATUS_OK> if no errors were found,
-or to an L<error status|OpenTelemetry::Constants/SPAN_STATUS_ERROR> otherwise.
-In the latter case, an error description will also be set if possible.
+the action has completed, and the
+L<status will be set|OpenTelemetry::Trace::Span/set_status> to an
+L<error status|OpenTelemetry::Constants/SPAN_STATUS_ERROR> if the response
+result in a server error (any HTTP status greater than or equal to 500).
+
+If an exception is raised during the execution of the action, this will be
+caught and the description of the error status will be based on the message
+in that exception (otherwise no description will be set). The description
+will contain the first line of the exception body, minus any trailing
+markers of where the error took place, with the aim to make it safe to be
+exposed without leaking too much internal information.
+
+Any exceptions caught by this integration will be re-thrown to be handled
+downstream.
 
 =head2 Internal redirects
 

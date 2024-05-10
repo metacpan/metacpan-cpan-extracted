@@ -1,0 +1,47 @@
+Revision history for Perl distribution App-PTP
+
+1.13 - 2024-05-09
+ - Make the program be easier to install from CPAN.
+
+1.12 - 2024-02-16
+ - Use perl_dist_setup to setup the distribution
+ - Add --sq, --dq, and --ds modes to help work with shell escaping.
+
+1.11 - 2024-01-21
+ - Remove usage of deprecated given/when keywords
+
+1.10 - 2020-06-18
+ - Fix the --grep command ignoring the -V switch
+ - Fix required Perl in Makefile.PL
+
+1.09 - 2019-09-13
+ - Add a --global-unique command
+ - Improve the --uniq command
+
+1.08 - 2019-09-08
+ - Various bug fixes
+
+1.07 - 2019-09-07
+ - Fix a 5.022 compatibility bug
+
+1.06 - 2019-09-07
+ - Add an -M option to load Perl modules
+
+1.05 - 2019-09-07
+ - Add --shell command
+ - Add --eat command
+ - Improve the README file
+ - Add the -O0 option
+
+1.04 - 2019-04-28
+ - Add --anti-pivot command
+ - Fix --unique command
+
+1.03 - 2019-04-21
+ - Fix --tee under Windows
+
+1.02 - 2019-04-20
+ - Various bug fixes
+
+1.01 - 2019-04-20
+ - Initial release

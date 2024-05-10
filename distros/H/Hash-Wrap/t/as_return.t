@@ -6,10 +6,8 @@ require Hash::Wrap;
 my @func;
 ok(
     lives {
-        @func = Hash::Wrap->import(
-            { -as => '-return', -class => 'A1' },
-            { -as => '-return', -class => 'A2' },
-        );
+        @func = Hash::Wrap->import( { -as => '-return', -class => 'A1' },
+            { -as => '-return', -class => 'A2' }, );
     },
     'constructor'
 ) or note $@;

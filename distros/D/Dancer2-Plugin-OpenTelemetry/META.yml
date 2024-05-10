@@ -29,7 +29,7 @@ no_index:
 provides:
   Dancer2::Plugin::OpenTelemetry:
     file: lib/Dancer2/Plugin/OpenTelemetry.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Dancer2: '0'
   OpenTelemetry: '0.019'
@@ -37,7 +37,7 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jjatria/dancer2-plugin-opentelemetry/issues
   repository: git://github.com/jjatria/dancer2-plugin-opentelemetry.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -214,7 +214,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.002'
+          tag: '0.003'
           tag_format: '%v'
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:

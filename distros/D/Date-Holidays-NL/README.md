@@ -51,4 +51,4 @@ Similar API to the other functions, returns an hashref for the year.
 
 # SEE ALSO
 
-- https://wetten.overheid.nl/BWBR0002448/2010-10-10
+- [https://wetten.overheid.nl/BWBR0002448/2010-10-10](https://wetten.overheid.nl/BWBR0002448/2010-10-10)

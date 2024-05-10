@@ -56,15 +56,15 @@
    "provides" : {
       "JSON::Relaxed" : {
          "file" : "lib/JSON/Relaxed.pm",
-         "version" : "0.092"
+         "version" : "0.093"
       },
       "JSON::Relaxed::ErrorCodes" : {
          "file" : "lib/JSON/Relaxed/ErrorCodes.pm",
-         "version" : "0.092"
+         "version" : "0.093"
       },
       "JSON::Relaxed::Parser" : {
          "file" : "lib/JSON/Relaxed/Parser.pm",
-         "version" : "0.092"
+         "version" : "0.093"
       }
    },
    "release_status" : "stable",
@@ -83,6 +83,6 @@
          "web" : "https://github.com/sciurius/perl-JSON-Relaxed"
       }
    },
-   "version" : "0.092",
+   "version" : "0.093",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

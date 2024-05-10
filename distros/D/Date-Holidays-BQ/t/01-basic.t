@@ -37,6 +37,8 @@ is($easter, 'Pasku Grandi', "Found easter in Papiamento language by default");
 
 is(is_holiday(2022, 2, 27), "Prome dia di Carnaval", "First day of carnaval");
 
+my $asuncion = is_holiday(2024,5,9, lang => 'pap');
+is($asuncion, 'Dia di Asuncion', "39 days, not 40");
 
 ok(!is_holiday(1979, 11, 8), "My birthday isn't a holiday");
 

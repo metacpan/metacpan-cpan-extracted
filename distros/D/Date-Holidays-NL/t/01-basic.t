@@ -25,6 +25,8 @@ is(is_holiday(2020, 4, 12, lang => 'en'),
 
 ok(is_holiday(2020, 6, 1), "Pentecost is a holiday based on Easter");
 
+ok(is_holiday(2024,5,9), "Hemelvaartsdag is op de 40ste, dus 39 dagen na..");
+
 ok(!is_holiday(1979, 11, 8), "My birthday isn't a holiday");
 
 # Royal stuff, this changes based on who has the throne and Sunday, Saturday,

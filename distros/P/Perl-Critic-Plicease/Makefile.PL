@@ -48,10 +48,11 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME"             => "Perl::Critic::Plicease",
   "PM"               => {
-    "lib/Perl/Critic/Plicease.pm"                                     => "\$(INST_LIB)/Perl/Critic/Plicease.pm",
-    "lib/Perl/Critic/Policy/Plicease/ProhibitLeadingZeros.pm"         => "\$(INST_LIB)/Perl/Critic/Policy/Plicease/ProhibitLeadingZeros.pm",
-    "lib/Perl/Critic/Policy/Plicease/ProhibitSpecificModules.pm"      => "\$(INST_LIB)/Perl/Critic/Policy/Plicease/ProhibitSpecificModules.pm",
-    "lib/Perl/Critic/Policy/Plicease/ProhibitUnicodeDigitInRegexp.pm" => "\$(INST_LIB)/Perl/Critic/Policy/Plicease/ProhibitUnicodeDigitInRegexp.pm"
+    "lib/Perl/Critic/Plicease.pm"                                          => "\$(INST_LIB)/Perl/Critic/Plicease.pm",
+    "lib/Perl/Critic/Policy/Plicease/ProhibitLeadingZeros.pm"              => "\$(INST_LIB)/Perl/Critic/Policy/Plicease/ProhibitLeadingZeros.pm",
+    "lib/Perl/Critic/Policy/Plicease/ProhibitSignaturesAndAtUnderscore.pm" => "\$(INST_LIB)/Perl/Critic/Policy/Plicease/ProhibitSignaturesAndAtUnderscore.pm",
+    "lib/Perl/Critic/Policy/Plicease/ProhibitSpecificModules.pm"           => "\$(INST_LIB)/Perl/Critic/Policy/Plicease/ProhibitSpecificModules.pm",
+    "lib/Perl/Critic/Policy/Plicease/ProhibitUnicodeDigitInRegexp.pm"      => "\$(INST_LIB)/Perl/Critic/Policy/Plicease/ProhibitUnicodeDigitInRegexp.pm"
   },
   "PREREQ_PM" => {
     "PPIx::Regexp"         => 0,
@@ -62,7 +63,7 @@ my %WriteMakefileArgs = (
     "Test2::V0"                  => "0.000121",
     "Test::Perl::Critic::Policy" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test"    => {
     "TESTS" => "t/*.t"
   }

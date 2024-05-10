@@ -126,7 +126,7 @@
          "web" : "https://github.com/uperl/Perl-Critic-Plicease"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Ville Skytt\u00e4 (SCOP)"

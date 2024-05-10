@@ -124,46 +124,22 @@ subtest '-copy -recurse' => sub {
         isnt( $wrap, exact_ref( \%hash ), 'refaddr($wrap) != refaddr($hash)' );
 
         note 'hash at level 1 still shared with original';
-        is(
-            $wrap->{a},
-            exact_ref( $hash{a} ),
-            'refaddr($wrap->{a}) == refaddr($hash{a})'
-        );
+        is( $wrap->{a}, exact_ref( $hash{a} ), 'refaddr($wrap->{a}) == refaddr($hash{a})' );
 
     };
 
     subtest 'use of method for level 1 creates copy' => sub {
-        isnt(
-            $wrap->a,
-            exact_ref( $hash{a} ),
-            'refaddr($wrap->a) != refaddr($hash{a})'
-        );
-        is(
-            $wrap->a,
-            exact_ref( $wrap->{a} ),
-            'refaddr($wrap->a) == refaddr($wrap->{a})'
-        );
+        isnt( $wrap->a, exact_ref( $hash{a} ), 'refaddr($wrap->a) != refaddr($hash{a})' );
+        is( $wrap->a, exact_ref( $wrap->{a} ), 'refaddr($wrap->a) == refaddr($wrap->{a})' );
 
         note 'hash at level 2 still shared with original';
-        is(
-            $wrap->a->{b},
-            exact_ref( $hash{a}{b} ),
-            'refaddr($wrap->a->{b}) == refaddr($hash{a}{b})'
-        );
+        is( $wrap->a->{b}, exact_ref( $hash{a}{b} ), 'refaddr($wrap->a->{b}) == refaddr($hash{a}{b})' );
 
     };
 
     subtest 'use of method for level 2 creates copy' => sub {
-        isnt(
-            $wrap->a->b,
-            exact_ref( $hash{a}{b} ),
-            'refaddr($wrap->a->b) != refaddr($hash{a}{b})'
-        );
-        is(
-            $wrap->a->b,
-            exact_ref( $wrap->{a}{b} ),
-            'refaddr($wrap->a->b) == refaddr($wrap->{a}{b}})'
-        );
+        isnt( $wrap->a->b, exact_ref( $hash{a}{b} ), 'refaddr($wrap->a->b) != refaddr($hash{a}{b})' );
+        is( $wrap->a->b, exact_ref( $wrap->{a}{b} ), 'refaddr($wrap->a->b) == refaddr($wrap->{a}{b}})' );
 
         note 'hash at level 3 still shared with original';
         is(
@@ -202,46 +178,22 @@ subtest '-copy -recurse -immutable' => sub {
         isnt( $wrap, exact_ref( \%hash ), 'refaddr($wrap) != refaddr($hash)' );
 
         note 'hash at level 1 still shared with original';
-        is(
-            $wrap->{a},
-            exact_ref( $hash{a} ),
-            'refaddr($wrap->{a}) == refaddr($hash{a})'
-        );
+        is( $wrap->{a}, exact_ref( $hash{a} ), 'refaddr($wrap->{a}) == refaddr($hash{a})' );
 
     };
 
     subtest 'use of method for level 1 creates copy' => sub {
-        isnt(
-            $wrap->a,
-            exact_ref( $hash{a} ),
-            'refaddr($wrap->a) != refaddr($hash{a})'
-        );
-        is(
-            $wrap->a,
-            exact_ref( $wrap->{a} ),
-            'refaddr($wrap->a) == refaddr($wrap->{a})'
-        );
+        isnt( $wrap->a, exact_ref( $hash{a} ), 'refaddr($wrap->a) != refaddr($hash{a})' );
+        is( $wrap->a, exact_ref( $wrap->{a} ), 'refaddr($wrap->a) == refaddr($wrap->{a})' );
 
         note 'hash at level 2 still shared with original';
-        is(
-            $wrap->a->{b},
-            exact_ref( $hash{a}{b} ),
-            'refaddr($wrap->a->{b}) == refaddr($hash{a}{b})'
-        );
+        is( $wrap->a->{b}, exact_ref( $hash{a}{b} ), 'refaddr($wrap->a->{b}) == refaddr($hash{a}{b})' );
 
     };
 
     subtest 'use of method for level 2 creates copy' => sub {
-        isnt(
-            $wrap->a->b,
-            exact_ref( $hash{a}{b} ),
-            'refaddr($wrap->a->b) != refaddr($hash{a}{b})'
-        );
-        is(
-            $wrap->a->b,
-            exact_ref( $wrap->{a}{b} ),
-            'refaddr($wrap->a->b) == refaddr($wrap->{a}{b}})'
-        );
+        isnt( $wrap->a->b, exact_ref( $hash{a}{b} ), 'refaddr($wrap->a->b) != refaddr($hash{a}{b})' );
+        is( $wrap->a->b, exact_ref( $wrap->{a}{b} ), 'refaddr($wrap->a->b) == refaddr($wrap->{a}{b}})' );
 
         note 'hash at level 3 still shared with original';
         is(
@@ -288,46 +240,22 @@ subtest '-copy -recurse -immutable on immutable hash' => sub {
         isnt( $wrap, exact_ref( \%hash ), 'refaddr($wrap) != refaddr($hash)' );
 
         note 'hash at level 1 still shared with original';
-        is(
-            $wrap->{a},
-            exact_ref( $hash{a} ),
-            'refaddr($wrap->{a}) == refaddr($hash{a})'
-        );
+        is( $wrap->{a}, exact_ref( $hash{a} ), 'refaddr($wrap->{a}) == refaddr($hash{a})' );
 
     };
 
     subtest 'use of method for level 1 creates copy' => sub {
-        isnt(
-            $wrap->a,
-            exact_ref( $hash{a} ),
-            'refaddr($wrap->a) != refaddr($hash{a})'
-        );
-        is(
-            $wrap->a,
-            exact_ref( $wrap->{a} ),
-            'refaddr($wrap->a) == refaddr($wrap->{a})'
-        );
+        isnt( $wrap->a, exact_ref( $hash{a} ), 'refaddr($wrap->a) != refaddr($hash{a})' );
+        is( $wrap->a, exact_ref( $wrap->{a} ), 'refaddr($wrap->a) == refaddr($wrap->{a})' );
 
         note 'hash at level 2 still shared with original';
-        is(
-            $wrap->a->{b},
-            exact_ref( $hash{a}{b} ),
-            'refaddr($wrap->a->{b}) == refaddr($hash{a}{b})'
-        );
+        is( $wrap->a->{b}, exact_ref( $hash{a}{b} ), 'refaddr($wrap->a->{b}) == refaddr($hash{a}{b})' );
 
     };
 
     subtest 'use of method for level 2 creates copy' => sub {
-        isnt(
-            $wrap->a->b,
-            exact_ref( $hash{a}{b} ),
-            'refaddr($wrap->a->b) != refaddr($hash{a}{b})'
-        );
-        is(
-            $wrap->a->b,
-            exact_ref( $wrap->{a}{b} ),
-            'refaddr($wrap->a->b) == refaddr($wrap->{a}{b}})'
-        );
+        isnt( $wrap->a->b, exact_ref( $hash{a}{b} ), 'refaddr($wrap->a->b) != refaddr($hash{a}{b})' );
+        is( $wrap->a->b, exact_ref( $wrap->{a}{b} ), 'refaddr($wrap->a->b) == refaddr($wrap->{a}{b}})' );
 
     };
 

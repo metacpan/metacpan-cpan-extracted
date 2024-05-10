@@ -25,7 +25,7 @@ resources:
   bugtracker: https://github.com/uperl/Perl-Critic-Plicease/issues
   homepage: https://metacpan.org/pod/Perl::Critic::Plicease
   repository: git://github.com/uperl/Perl-Critic-Plicease.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Ville Skyttä (SCOP)'

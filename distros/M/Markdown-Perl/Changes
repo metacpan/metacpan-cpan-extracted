@@ -1,5 +1,10 @@
 Revision history for pmarkdown and the Markdown::Perl module.
 
+1.04 - 2024-05-09
+
+ - Remove our custom make targets on platforms that don’t have GNU Make to
+   avoid parse failures.
+
 1.03 - 2024-04-10
 
  - Disable hard line breaks using two spaces in our default syntax because they

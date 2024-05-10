@@ -28,11 +28,7 @@ subtest 'default' => sub {
     is( $obj->c, 3, 'retrieve value added through hash' );
 
     delete $obj->{c};
-    like(
-        dies { $obj->c },
-        qr/locate object method/,
-        'retrieve deleted attribute'
-    );
+    like( dies { $obj->c }, qr/locate object method/, 'retrieve deleted attribute' );
 
     $obj->a( 22 );
     is( $obj->a,  22, 'setter' );

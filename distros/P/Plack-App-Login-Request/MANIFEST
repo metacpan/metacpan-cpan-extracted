@@ -22,5 +22,6 @@ Request.pm
 SIGNATURE
 t/Plack-App-Login-Request/01-use.t
 t/Plack-App-Login-Request/02-version.t
+t/Plack-App-Login-Request/03-prepare_app_errors.t
 xt/Plack-App-Login-Request/01-pod_coverage.t
 xt/Plack-App-Login-Request/02-pod.t
