@@ -5,8 +5,9 @@ use Carp;
 
 { #<<< A non-indenting brace to contain all lexical variables
 
-our $VERSION = '20240202';
+our $VERSION = '20240511';
 use English qw( -no_match_vars );
+use Scalar::Util 'refaddr';
 use Perl::Tidy::VerticalAligner::Alignment;
 use Perl::Tidy::VerticalAligner::Line;
 
@@ -49,15 +50,17 @@ use constant SPACE        => q{ };
 #                 sub _flush_group_lines
 # CODE SECTION 6: Pad Signed Number Columns
 #                 sub pad_signed_number_columns
-# CODE SECTION 7: Output Step A
+# CODE SECTION 7: Pad Wide Equals Columns
+#                 sub pad_wide_equals_columns
+# CODE SECTION 8: Output Step A
 #                 sub valign_output_step_A
-# CODE SECTION 8: Output Step B
+# CODE SECTION 9: Output Step B
 #                 sub valign_output_step_B
-# CODE SECTION 9: Output Step C
+# CODE SECTION 10: Output Step C
 #                 sub valign_output_step_C
-# CODE SECTION 10: Output Step D
+# CODE SECTION 11: Output Step D
 #                 sub valign_output_step_D
-# CODE SECTION 11: Summary
+# CODE SECTION 12: Summary
 #                 sub report_anything_unusual
 
 ##################################################################
@@ -220,12 +223,14 @@ my (
     $rOpts_tabs,
     $rOpts_entab_leading_whitespace,
     $rOpts_fixed_position_side_comment,
+    $rOpts_maximum_line_length,
     $rOpts_minimum_space_to_comment,
     $rOpts_valign_code,
     $rOpts_valign_block_comments,
     $rOpts_valign_side_comments,
     $rOpts_valign_signed_numbers,
     $rOpts_valign_signed_numbers_limit,
+    $rOpts_valign_wide_equals,
 
     $require_tabs,
 
@@ -292,6 +297,7 @@ sub check_options {
     $rOpts_fixed_position_side_comment =
       $rOpts->{'fixed-position-side-comment'};
 
+    $rOpts_maximum_line_length      = $rOpts->{'maximum-line-length'};
     $rOpts_minimum_space_to_comment = $rOpts->{'minimum-space-to-comment'};
     $rOpts_valign_code              = $rOpts->{'valign-code'};
     $rOpts_valign_block_comments    = $rOpts->{'valign-block-comments'};
@@ -299,6 +305,7 @@ sub check_options {
     $rOpts_valign_signed_numbers    = $rOpts->{'valign-signed-numbers'};
     $rOpts_valign_signed_numbers_limit =
       $rOpts->{'valign-signed-numbers-limit'};
+    $rOpts_valign_wide_equals = $rOpts->{'valign-wide-equals'};
 
     return;
 } ## end sub check_options
@@ -849,9 +856,7 @@ sub valign_input {
 
         # VSN PATCH for a single number, part 1.
         my $is_numeric =
-          (      $jmax == 0
-              && $rOpts_valign_signed_numbers
-              && $rpatterns->[0] eq 'n,' );
+          $rOpts_valign_signed_numbers && $rpatterns->[0] eq 'n,';
 
         if (   !$is_numeric
             && @{$rgroup_lines}
@@ -886,8 +891,10 @@ sub valign_input {
         }
 
         # just write this line directly if no current group, no side comment,
-        # and no space recovery is needed.
+        # and no space recovery is needed,
+        # and not numeric - VSN PATCH for a single number, part 4.
         if (   !@{$rgroup_lines}
+            && !$is_numeric
             && !get_recoverable_spaces($indentation) )
         {
 
@@ -1779,7 +1786,11 @@ sub _flush_group_lines {
     pad_signed_number_columns($rgroup_lines)
       if ($rOpts_valign_signed_numbers);
 
-    # STEP 7: Output the lines.
+    # STEP 7: pad wide equals
+    pad_wide_equals_columns($rgroup_lines)
+      if ($rOpts_valign_wide_equals);
+
+    # STEP 8: Output the lines.
     # All lines in this group have the same leading spacing and maximum line
     # length
     my $group_leader_length       = $rgroup_lines->[0]->{'leading_space_count'};
@@ -1995,11 +2006,23 @@ EOM
                 # There are no matching tokens, so now check side comments.
                 # Programming note: accessing arrays with index -1 is
                 # risky in Perl, but we have verified there is at least one
-                # line in the group and that there is at least one field.
+                # line in the group and that there is at least one field,
                 my $prev_comment =
                   $rall_lines->[ $jline - 1 ]->{'rfields'}->[-1];
                 my $side_comment = $new_line->{'rfields'}->[-1];
-                end_rgroup(-1) if ( !$side_comment || !$prev_comment );
+
+                # do not end group if both lines have side comments
+                if ( !$side_comment || !$prev_comment ) {
+
+                    # Otherwise - VSN PATCH for a single number:
+                    # - do not end group if numeric and no side comment, or
+                    # - end if !numeric or side comment
+                    my $pat        = $new_line->{'rpatterns'}->[0];
+                    my $is_numeric = $rOpts_valign_signed_numbers
+                      && ( $pat eq 'n,'
+                        || $pat eq 'n,b' );
+                    end_rgroup(-1) if ( !$is_numeric || $side_comment );
+                }
             }
             else {
                 ##ok: continue
@@ -2128,7 +2151,14 @@ sub two_line_pad {
         foreach my $i ( 0 .. $imax_min ) {
             my $pat   = $rpatterns->[$i];
             my $pat_m = $rpatterns_m->[$i];
-            if ( $pat ne $pat_m ) { $patterns_match = 0; last }
+
+            # VSN PATCH: allow numbers to match quotes
+            if ( $pat_m ne $pat && length($pat_m) eq length($pat) ) {
+                $pat   =~ tr/n/Q/;
+                $pat_m =~ tr/n/Q/;
+            }
+
+            if ( $pat ne $pat_m ) { $patterns_match = 0; last; }
         }
     }
 
@@ -3378,11 +3408,17 @@ sub match_line_pairs {
                     my $pat   = $rpatterns->[$i];
                     my $pat_m = $rpatterns_m->[$i];
 
+                    # VSN PATCH: allow numbers to match quotes
+                    if ( $pat_m ne $pat ) {
+                        $pat   =~ tr/n/Q/;
+                        $pat_m =~ tr/n/Q/;
+                    }
+
                     # If patterns don't match, we have to be careful...
                     if ( $pat_m ne $pat ) {
                         my $pad =
                           $rfield_lengths->[$i] - $rfield_lengths_m->[$i];
-                        my ( $match_code, $rmsg ) = compare_patterns(
+                        my $match_code = compare_patterns(
                             {
                                 group_level => $group_level,
                                 tok         => $tok,
@@ -3549,7 +3585,7 @@ sub compare_patterns {
       && $return_code
       && print {*STDOUT} "no match because $GoToMsg\n";
 
-    return ( $return_code, \$GoToMsg );
+    return $return_code;
 
 } ## end sub compare_patterns
 
@@ -3659,7 +3695,7 @@ sub get_line_token_info {
         # handle no levels
         my $rtoken_patterns = {};
         my $rtoken_indexes  = {};
-        my @levs            = sort keys %saw_level;
+        my @levs            = sort { $a <=> $b } keys %saw_level;
         if ( !defined($lev_min) ) {
             $lev_min                     = -1;
             $lev_max                     = -1;
@@ -4243,7 +4279,13 @@ sub Dump_tree_groups {
             else {
                 $jfirst_bad = $j unless defined($jfirst_bad);
             }
-            if ( $rpatterns_0->[$j] ne $rpatterns_1->[$j] ) {
+            my $pat_0 = $rpatterns_0->[$j];
+            my $pat_1 = $rpatterns_1->[$j];
+            if ( $pat_0 ne $pat_1 && length($pat_0) eq length($pat_1) ) {
+                $pat_0 =~ tr/n/Q/;
+                $pat_1 =~ tr/n/Q/;
+            }
+            if ( $pat_0 ne $pat_1 ) {
 
                 # Flag this as a marginal match since patterns differ.
                 # Normally, we will not allow just two lines to match if
@@ -4819,9 +4861,12 @@ my %is_opening_token;
 
 BEGIN {
 
-    # These leading patterns can match a signed number
-    # here 'Q' can be a number, 'b'=blank, '}'=one of )]}
-    my @q = ( 'Q,', 'Q,b', 'Qb', 'Qb}', 'Qb},', 'Q},', 'Q};' );
+    # PATTERNS: A pattern is basically the concatenation of all token types in
+    # the field, with keywords converted to their actual text.  The formatter
+    # has changed things like 'print' to 'priNt' so that all 'n's are numbers.
+    # The following patterns 'n' can match a signed number of interest.
+    # Thus 'n'=a signed or unsigned number, 'b'=a space, '}'=one of ) ] }
+    my @q = ( 'n,', 'n,b', 'nb', 'nb}', 'nb},', 'n},', 'n};' );
 
     @is_leading_sign_pattern{@q} = (1) x scalar(@q);
 
@@ -4835,24 +4880,43 @@ BEGIN {
     @is_opening_token{@q} = (1) x scalar(@q);
 }
 
+sub min_max_median {
+    my ($rvalues) = @_;
+
+    # Given:  $rvalues = ref to an array of numbers
+    # Return: the min, max, and median
+    my $num = @{$rvalues};
+    return unless ($num);
+
+    my @sorted = sort { $a <=> $b } @{$rvalues};
+
+    my $min  = $sorted[0];
+    my $max  = $sorted[-1];
+    my $imid = int $num / 2;
+    my $median =
+        @sorted % 2
+      ? $sorted[$imid]
+      : ( $sorted[ $imid - 1 ] + $sorted[$imid] ) / 2;
+
+    return ( $min, $max, $median );
+} ## end sub min_max_median
+
 sub end_signed_number_column {
-    my ( $rgroup_lines, $rcol_hash, $ix_last, $ending_alignment ) = @_;
+    my ( $rgroup_lines, $rcol_hash, $ix_last ) = @_;
 
     # Finish formatting a column of unsigned numbers
     # Given:
     #   $rgroup_lines - the current vertical aligment group of lines
     #   $rcol_hash    - a hash of information about this vertical column
     #   $ix_last      - index of the last line of this vertical column
-    #   $ending_alignment - true if this ends a vertical alignment col
     # Task:
     #   If this is a mixture of signed and unsigned numbers, then add a
     #   single space before the unsigned numbers to improve appearance.
     return unless ($rcol_hash);
-    my $jcol               = $rcol_hash->{jcol};
-    my $unsigned           = $rcol_hash->{unsigned_count};
-    my $signed             = $rcol_hash->{signed_count};
-    my $starting_alignment = $rcol_hash->{starting_alignment};
-    my $rsigned_lines      = $rcol_hash->{rsigned_lines};
+    my $jcol          = $rcol_hash->{jcol};
+    my $unsigned      = $rcol_hash->{unsigned_count};
+    my $signed        = $rcol_hash->{signed_count};
+    my $rsigned_lines = $rcol_hash->{rsigned_lines};
 
     if ( !$signed && $unsigned ) {
         DEVEL_MODE
@@ -4883,20 +4947,24 @@ EOM
         return;
     }
 
-    # Form groups of unsigned numbers from the list of signed numbers.  Exclude
-    # groups with more than about 20 consecutive numbers.  Little visual
-    # improvement is gained by padding more than this, and this avoids large
-    # numbers of differences in a file when a single line is changed.
+    #-----------------------------------------------------------------
+    # Form groups of unsigned numbers from the list of signed numbers.
+    #-----------------------------------------------------------------
     my @unsigned_subgroups;
-    my $ix_u             = $rsigned_lines->[0];
     my $ix_last_negative = $ix_first - 1;
+    my %is_signed;
     foreach my $ix ( @{$rsigned_lines} ) {
+        $is_signed{$ix} = 1;
         my $Nu = $ix - $ix_last_negative - 1;
         if ( $Nu > 0 && $Nu <= $rOpts_valign_signed_numbers_limit ) {
             push @unsigned_subgroups, [ $ix_last_negative + 1, $ix - 1 ];
         }
         $ix_last_negative = $ix;
     }
+
+    # Exclude groups with more than about 20 consecutive numbers.  Little
+    # visual improvement is gained by padding more than this, and this avoids
+    # large numbers of differences in a file when a single line is changed.
     my $Nu = $ix_last - $ix_last_negative;
     if ( $Nu > 0 && $Nu <= $rOpts_valign_signed_numbers_limit ) {
         push @unsigned_subgroups, [ $ix_last_negative + 1, $ix_last ];
@@ -4904,11 +4972,148 @@ EOM
 
     if ( !@unsigned_subgroups ) { return }    # shouldn't happen
 
-    # Compute available space for each line
+    #--------------------------------------------
+    # Find number lengths for irregularity checks
+    #--------------------------------------------
+    # Padding signed numbers looks best when the numbers, excluding signs,
+    # all have about the same length. When the lengths are irregular, with
+    # mostly longer unsigned numbers, it doesn't look good to do this. So
+    # we need to filter out these bad-looking cases.
+
+    # The 'field_lengths' are unreliable because they may include some
+    # arbitrary trailing text; see 'substr.t' So we must look for the end of
+    # the number at a space, comma, or closing container token. Note that these
+    # lengths include the length of any signs.
+    my @len_unsigned;
+    my @len_signed;
+    my @lengths;
+    foreach my $ix ( $ix_first .. $ix_last ) {
+        my $line   = $rgroup_lines->[$ix];
+        my $rfield = $line->{'rfields'};
+        my $str    = substr( $rfield->[$jcol], $pos_start_number );
+        if ( $str =~ /^([^\s\,\)\]\}]*)/ ) { $str = $1 }
+        my $len = length($str);
+        if   ( $is_signed{$ix} ) { push @len_signed,   $len }
+        else                     { push @len_unsigned, $len }
+        push @lengths, [ $len, $ix ];
+    }
+
+    my ( $min_unsigned_length, $max_unsigned_length, $median_unsigned_length )
+      = min_max_median( \@len_unsigned );
+    my ( $min_signed_length, $max_signed_length, $median_signed_length ) =
+      min_max_median( \@len_signed );
+
+    # Skip padding if no signed numbers exceed unsigned numbers in length
+    if ( $max_signed_length <= $min_unsigned_length ) {
+        return;
+    }
+
+    # If max signed length is greatest - all unsigned values can be padded
+    elsif ( $max_signed_length > $max_unsigned_length ) {
+
+        # Example:
+        #    %wind_dir = (
+        #        'n'  => [  1,  0 ],
+        #        'ne' => [  1,  1 ],
+        #        'e'  => [  0,  1 ],
+        #        'se' => [ -1,  1 ],
+        #        's'  => [ -1,  0 ],
+        #        'sw' => [ -1, -1 ],
+        #        'w'  => [  0, -1 ],
+        #        'nw' => [  1, -1 ],
+        #        ''   => [  0,  0 ],
+        #    );
+
+        # This is the ideal case - ok to continue and pad
+    }
+
+    # intermediate case: some signed numbers cannot be padded ...
+    else {
+
+        # We have to take a closer look.
+        # Here is an example which looks bad if we do padding like this:
+        #    my %hash = (
+        #        X0 => -12867.098241163,
+        #        X1 =>  2.31694338671684,       # unsigned w/   excess>0
+        #        X2 => 0.0597726714860419,      # max length => excess=0
+        #        Y0 =>  30043.1335503155,       # unsigned w/   excess>0
+        #        Y1 => 0.0525784981597044,      # max length => excess=0
+        #        Y2 => -2.32447131600783,
+        #    );
+
+        # To decide what looks okay, we count 'good' and 'bad' line interfaces:
+        #    X0 - X1 = good (X0 is signed and X1 can move)
+        #    X1 - X2 = bad  (x1 can move but x2 cannot)
+        #    X2 - Y0 = bad  (x2 cannot move but Y0 can move)
+        #    Y0 - Y1 = bad  (Y0 can move but Y1 cannot move)
+        #    Y1 - Y2 = bad  (Y1 cannot move and Y2 is signed)
+        # Result: 4 bad interfaces and 1 good => so we will skip this
+        my $good_count = 0;
+        my $bad_count  = 0;
+        foreach my $item (@lengths) {
+            $item->[0] = $max_unsigned_length - $item->[0];
+        }
+        my $item0 = shift @lengths;
+        my ( $excess, $ix ) = @{$item0};
+        my $immobile_count = $excess ? 0 : 1;
+        foreach my $item (@lengths) {
+            my $excess_m = $excess;
+            my $ix_m     = $ix;
+            ( $excess, $ix ) = @{$item};
+            if ( !$excess ) { $immobile_count++ }
+
+            if ( $is_signed{$ix_m} ) {
+
+                # signed-unsigned interface
+                if ( !$is_signed{$ix} ) {
+                    if   ($excess) { $good_count++ }
+                    else           { $bad_count++ }
+                }
+
+                # signed-signed: ok, not good or bad
+            }
+            else {
+
+                # unsigned-signed interface
+                if ( $is_signed{$ix} ) {
+                    if   ($excess_m) { $good_count++ }
+                    else             { $bad_count++ }
+                }
+
+                # unsigned-unsigned: bad if different
+                else {
+                    if ( $excess_m xor $excess ) {
+                        $bad_count++;
+                    }
+                }
+            }
+        }
+
+        # Filter 1: skip if more interfaces are 'bad' than 'good'
+        if ( $bad_count > $good_count ) {
+            return;
+        }
+
+        # Filter 2: skip in a table with multiple 'bad' interfaces and where
+        # 'most' of the unsigned lengths are shorter than the signed lengths.
+        # Using the median value makes this insensitive to small changes.
+        if (   $median_unsigned_length >= $median_signed_length
+            && $bad_count > 1
+            && $immobile_count > 1 )
+        {
+            return;
+        }
+
+        # Anything that gets past these filters should look ok if padded
+    }
+
+    #---------------------------------------------
+    # Compute actual available space for each line
+    #---------------------------------------------
     my %excess_space;
+    my $movable_count = 0;
     foreach my $item (@unsigned_subgroups) {
         my ( $ix_min, $ix_max ) = @{$item};
-        my $num = $ix_max - $ix_min + 1;
         foreach my $ix ( $ix_min .. $ix_max ) {
             my $line                = $rgroup_lines->[$ix];
             my $leading_space_count = $line->{'leading_space_count'};
@@ -4926,10 +5131,15 @@ EOM
                 $jcol == 0
               ? $leading_space_count
               : $alignments[ $jcol - 1 ]->{'column'};
-            my $avail = $col - $col_start;
-            $excess_space{$ix} = $avail - $rfield_lengths->[$jcol];
+            my $avail        = $col - $col_start;
+            my $field_length = $rfield_lengths->[$jcol];
+            my $excess       = $avail - $field_length;
+            $excess_space{$ix} = $excess;
+            if ( $excess > 0 ) { $movable_count++ }
         }
     }
+
+    return unless ($movable_count);
 
     # Count the number of signed-unsigned interfaces that would change
     # if we do the padding
@@ -4940,15 +5150,20 @@ EOM
         $Nc++ if ( $excess_space{$ix_max} > 0 && $ix_max != $ix_last );
     }
 
+    #--------------------------------------------------------------------
+    # Sparsity check:
     # Give up if the number of interface changes will be below the cutoff
+    #--------------------------------------------------------------------
     if ( $unsigned > $Nc * $rOpts_valign_signed_numbers_limit ) {
         return;
     }
 
-    # Go ahead and insert an extra space before the unsigned numbers
-    # if space is available
+    #------------------------------------------------------------------------
+    # Insert an extra space before the unsigned numbers if space is available
+    #------------------------------------------------------------------------
     foreach my $item (@unsigned_subgroups) {
         my ( $ix_min, $ix_max ) = @{$item};
+
         foreach my $ix ( $ix_min .. $ix_max ) {
             next if ( $excess_space{$ix} <= 0 );
             my $line           = $rgroup_lines->[$ix];
@@ -5026,19 +5241,16 @@ sub split_field {
     my ( $pat1, $field, $pattern ) = @_;
 
     # Given;
-    #   $pat1    = first part of a pattern before a 'Q'
+    #   $pat1    = first part of a pattern before a numeric type 'n'
     #   $field   = corresponding text field
     #   $pattern = full pattern
     # Return:
-    #   $pos_start_number = positiion in $field where the Q should start
+    #   $pos_start_number = positiion in $field where the number should start
     #                     = 0 if cannot find
     #   $char_end_part1 = the character preceding $pos_start_number
     #   $ch_opening     = the preceding opening container character, if any
 
     # We have to find where the possible number starts in this field.
-    # This is a tricky operation because we are flying a little blind here,
-    # without the help of the original tokenization. The main danger would
-    # be to fall into some kind of quoted text which tricks the logic.
     # The safe thing to do is return @fail if anything does not look right.
 
     my $pos_start_number = 0;
@@ -5046,11 +5258,11 @@ sub split_field {
     my $ch_opening       = EMPTY_STRING;
     my @fail             = ( $pos_start_number, $char_end_part1, $ch_opening );
 
-    # Be sure there is just one 'Q' in the pattern. Multiple Q terms can occur
-    # when fields are joined, but since we are jumping into the middle of a
-    # field it is safest not to try to handle them.
-    my $Q_count = ( $pattern =~ tr/Q/Q/ );
-    if ( $Q_count && $Q_count > 1 ) {
+    # Be sure there is just 'n' in the pattern. Multiple terms can occur
+    # when fields are joined, but since we are jumping into the middle
+    # of a field it is safest not to try to handle them.
+    my $n_count = ( $pattern =~ tr/n/n/ );
+    if ( $n_count && $n_count > 1 ) {
         return @fail;
     }
 
@@ -5160,7 +5372,7 @@ sub field_matches_end_pattern {
     my $next_char   = substr( $pat2, 1, 1 );
     my $field2_trim = EMPTY_STRING;
 
-    # if pattern is one of: 'Q,', 'Q,b'
+    # if pattern is one of: 'n,', 'n,b'
     if ( $next_char eq ',' ) {
         my $icomma = index( $field2, ',' );
         if ( $icomma >= 0 ) {
@@ -5168,7 +5380,7 @@ sub field_matches_end_pattern {
         }
     }
 
-    # if pattern is one of: 'Qb', 'Qb}', 'Qb},'
+    # if pattern is one of: 'nb', 'nb}', 'nb},'
     elsif ( $next_char eq 'b' ) {
         my $ispace = index( $field2, SPACE );
         if ( $ispace >= 0 ) {
@@ -5176,7 +5388,7 @@ sub field_matches_end_pattern {
         }
     }
 
-    # if pattern is one of 'Q},', 'Q};'
+    # if pattern is one of 'n},', 'n};'
     elsif ( $next_char eq '}' ) {
         if ( $field2 =~ /^([^\)\}\]]+)/ ) {
             $field2_trim = $1;
@@ -5234,13 +5446,11 @@ sub pad_signed_number_columns {
     # which have been broken into patterns which are convenient for the
     # vertical aligner, but we no longer have the original tokenization
     # which would have indicated the precise bounds of numbers.  So we
-    # have to procede very carefully with lots of checks.
-
-    # A current limitation is that lines with just a single column of numbers
-    # cannot be processed because the vertical aligner does not currently form
-    # them them into groups (since they are otherwise already aligned). This
-    # situation is rare, but could be fixed with a future coding change
-    # upstream.
+    # have to procede very carefully with lots of checks. There are
+    # more checks than really necessary now because originally numbers
+    # and quotes were both indicated with pattern 'Q'. But now numbers are
+    # uniquely marked as pattern 'n', so there is less risk of an error.
+    # The extra checks take very little time so they are retained.
 
     return unless ($rOpts_valign_signed_numbers);
 
@@ -5258,11 +5468,10 @@ sub pad_signed_number_columns {
         $jmax = $line->{'jmax'};
         my $jmax_change = $jmax ne $jmax_last;
 
-        my @alignments     = @{ $line->{'ralignments'} };
-        my $rfields        = $line->{'rfields'};
-        my $rfield_lengths = $line->{'rfield_lengthss'};
-        my $rpatterns      = $line->{'rpatterns'};
-        my $rtokens        = $line->{'rtokens'};
+        my @alignments = @{ $line->{'ralignments'} };
+        my $rfields    = $line->{'rfields'};
+        my $rpatterns  = $line->{'rpatterns'};
+        my $rtokens    = $line->{'rtokens'};
 
         #-----------------------------------------------
         # Check for a reduction in the number of columns
@@ -5279,15 +5488,13 @@ sub pad_signed_number_columns {
                     && $rcol_hash->{unsigned_count} )
                 {
                     end_signed_number_column( $rgroup_lines, $rcol_hash,
-                        $ix_line - 1, 1 );
+                        $ix_line - 1 );
                 }
                 delete $column_info{$jcol};
             }
 
             # Try to keep the end data column running; test case 'rfc.in'
             # The last item in a list will still need a trailing comma.
-            # VSN PATCH for a single number, part 3: change >= to >=0 and
-            # check for a leading digit
             my $jcol = $jmax - 1;
             if ( $jcol >= 0 && $column_info{$jcol} ) {
                 my $alignment = $alignments[$jcol];
@@ -5316,13 +5523,11 @@ sub pad_signed_number_columns {
             #-----------------------------------------
             # Decide if this is a new alignment column
             #-----------------------------------------
-            my $is_new_alignment = $jcol >= $jmax_last;
-            my $alignment        = $alignments[$jcol];
-            my $old_col          = $columns[$jcol];
-            my $col              = $alignment->{column};
+            my $alignment = $alignments[$jcol];
+            my $old_col   = $columns[$jcol];
+            my $col       = $alignment->{column};
             $columns[$jcol] = $col;
             if ( defined($old_col) && $old_col != $col ) {
-                $is_new_alignment = 1;
                 foreach my $jcol_old ( keys %column_info ) {
                     next if ( $jcol_old < $jcol );
                     my $rcol_hash = $column_info{$jcol_old};
@@ -5330,7 +5535,7 @@ sub pad_signed_number_columns {
                         && $rcol_hash->{unsigned_count} )
                     {
                         end_signed_number_column( $rgroup_lines, $rcol_hash,
-                            $ix_line - 1, 1 );
+                            $ix_line - 1 );
                     }
                     delete $column_info{$jcol_old};
                 }
@@ -5339,14 +5544,11 @@ sub pad_signed_number_columns {
             # A new padded sign column can only start at an alignment change
             my $rcol_hash = $column_info{$jcol};
 
-            #----------------------------------------------------------------
-            # Examine this field, looking for for signed and unsigned numbers
-            #----------------------------------------------------------------
+            #------------------------------------------------------------
+            # Examine this field, looking for signed and unsigned numbers
+            #------------------------------------------------------------
             my $field   = $rfields->[$jcol];
             my $pattern = $rpatterns->[$jcol];
-
-            # VSN PATCH for single number part 2
-            if ( $pattern eq 'n,' ) { $pattern = 'Q,' }
 
             my $is_signed_number   = 0;
             my $is_unsigned_number = 0;
@@ -5365,11 +5567,11 @@ sub pad_signed_number_columns {
 
             if ( $field_ok && $pattern ) {
 
-                # Split the pattern at the first 'Q' (a quote or number):
-                # $pat1 = pattern before the 'Q' (if any)
-                # $pat2 = pattern starting at the 'Q'
+                # Split the pattern at the first 'n'
+                # $pat1 = pattern before the 'n' (if any)
+                # $pat2 = pattern starting at the 'n'
                 my ( $pat1, $pat2 );
-                my $posq = index( $pattern, 'Q' );
+                my $posq = index( $pattern, 'n' );
                 if ( $posq < 0 ) {
                     $field_ok = 0;
                 }
@@ -5467,10 +5669,8 @@ sub pad_signed_number_columns {
                     if (   $rcol_hash->{signed_count}
                         && $rcol_hash->{unsigned_count} )
                     {
-                        end_signed_number_column(
-                            $rgroup_lines, $rcol_hash,
-                            $ix_line - 1,  $is_new_alignment
-                        );
+                        end_signed_number_column( $rgroup_lines, $rcol_hash,
+                            $ix_line - 1 );
                     }
                     delete $column_info{$jcol};
                     $rcol_hash = undef;
@@ -5478,10 +5678,9 @@ sub pad_signed_number_columns {
             }
 
             if (DEBUG_VSN) {
-                if ( !$is_new_alignment ) { $is_new_alignment = 0 }
                 my $exists = defined($rcol_hash);
                 print
-"VSN: line=$ix_line change=$jmax_change jcol=$jcol field=$field new ok?=$is_new_alignment exists?=$exists unsigned?=$is_unsigned_number signed?=$is_signed_number\n";
+"VSN: line=$ix_line change=$jmax_change jcol=$jcol field=$field exists?=$exists unsigned?=$is_unsigned_number signed?=$is_signed_number\n";
             }
 
             #---------------------------------------
@@ -5493,15 +5692,14 @@ sub pad_signed_number_columns {
 
                 my $rsigned_lines = $is_signed_number ? [$ix_line] : [];
                 $column_info{$jcol} = {
-                    unsigned_count     => $is_unsigned_number,
-                    signed_count       => $is_signed_number,
-                    pos_start_number   => $pos_start_number,
-                    char_end_part1     => $char_end_part1,
-                    ix_first           => $ix_line,
-                    col                => $col,
-                    jcol               => $jcol,
-                    rsigned_lines      => $rsigned_lines,
-                    starting_alignment => $is_new_alignment,
+                    unsigned_count   => $is_unsigned_number,
+                    signed_count     => $is_signed_number,
+                    pos_start_number => $pos_start_number,
+                    char_end_part1   => $char_end_part1,
+                    ix_first         => $ix_line,
+                    col              => $col,
+                    jcol             => $jcol,
+                    rsigned_lines    => $rsigned_lines,
                 };
             }
 
@@ -5524,14 +5722,367 @@ sub pad_signed_number_columns {
     foreach my $jcol ( keys %column_info ) {
         my $rcol_hash = $column_info{$jcol};
         if ( $rcol_hash->{signed_count} && $rcol_hash->{unsigned_count} ) {
-            end_signed_number_column( $rgroup_lines, $rcol_hash, $ix_line, 1 );
+            end_signed_number_column( $rgroup_lines, $rcol_hash, $ix_line );
         }
     }
     return;
 } ## end sub pad_signed_number_columns
 
+#########################################
+# CODE SECTION 7: Pad Wide Equals Columns
+#########################################
+
+use constant DEBUG_WEC => 0;
+
+sub end_wide_equals_column {
+    my ( $rgroup_lines, $rcol_hash, $ix_last ) = @_;
+
+    # Finish formatting a column of wide equals
+    # Given:
+    #   $rgroup_lines - the current vertical aligment group of lines
+    #   $rcol_hash    - a hash of information about this vertical column
+    #   $ix_last      - index of the last line of this vertical column
+
+    return unless ($rcol_hash);
+    my $jcol      = $rcol_hash->{jcol};
+    my $col       = $rcol_hash->{col};
+    my $min_width = $rcol_hash->{min_width};
+    my $max_width = $rcol_hash->{max_width};
+    my $rwidths   = $rcol_hash->{rwidths};
+    my $ix_first  = $rcol_hash->{ix_first};
+
+    # check for skipped lines, shouldn't happen
+    my $nlines = $ix_last - $ix_first + 1;
+    my $num    = @{$rwidths};
+    if ( $num != $nlines ) {
+        my $line    = $rgroup_lines->[$ix_last];
+        my $rfields = $line->{'rfields'};
+        my $text    = join EMPTY_STRING, @{$rfields};
+        DEVEL_MODE && Fault(<<EOM);
+We seem to have miscounted lines, please check:
+nlines=$nlines
+num saved=$num
+min width=$min_width
+max width=$max_width
+j=$jcol
+ix_first=$ix_first
+ix_last=$ix_last
+text=$text
+EOM
+        return;
+    }
+
+    #------------------------------------------------------
+    # loop over all lines of this vertical alignment column
+    #------------------------------------------------------
+
+    my (
+        $current_alignment, $starting_colp,
+        $current_line,      @previous_linked_lines
+    );
+    foreach my $item ( @{$rwidths} ) {
+        my ( $ix, $width ) = @{$item};
+        my $line = $rgroup_lines->[$ix];
+
+        # add leading spaces to the shorter equality tokens to get
+        # vertical alignment of the '=' signs
+        my $jmax  = $line->{'jmax'};
+        my $jcolp = $jcol + 1;
+
+        my @alignments = @{ $line->{'ralignments'} };
+        my $alignment  = $alignments[$jcolp];
+        my $colp       = $alignment->{column};
+
+        #------------------------------------------------------------
+        # Transfer column width changes between equivalent alignments
+        #------------------------------------------------------------
+
+        # This step keeps alignments to the right correct in case the
+        # alignment object changes but the actual alignment col does not.
+        # It is extremely rare for this to occur. Issue c353.
+
+        # nothing to do if no more real alignments on right
+        if ( $jcolp >= $jmax - 1 ) {
+            $current_alignment     = undef;
+            $current_line          = undef;
+            @previous_linked_lines = ();
+        }
+
+        # handle new rhs alignment
+        elsif ( !$current_alignment ) {
+            $current_alignment     = $alignment;
+            $current_line          = $line;
+            $starting_colp         = $colp;
+            @previous_linked_lines = ();
+        }
+
+        # handle change in existing alignment
+        elsif ( refaddr($alignment) != refaddr($current_alignment) ) {
+
+            # change rhs alignment column - new vertical group on right
+            if ( $starting_colp != $colp ) {
+                $starting_colp         = $colp;
+                @previous_linked_lines = ();
+            }
+            else {
+
+                # Same starting alignment col on right, but different alignment
+                # object. See if we must increase width of this new alignment
+                # object.
+                my $current_colp = $current_alignment->{column};
+                if ( $current_colp > $colp ) {
+                    my $excess = $current_colp - $colp;
+                    my $padding_available =
+                      $line->get_available_space_on_right();
+                    if ( $excess <= $padding_available ) {
+                        $line->increase_field_width( $jcolp, $excess );
+                        $colp = $alignment->{column};
+                    }
+                }
+
+                # remember the previous line in case we have to go back and
+                # increasse its width
+                push @previous_linked_lines, $current_line;
+            }
+            $current_alignment = $alignment;
+            $current_line      = $line;
+        }
+        else {
+            # continuing with same alignment
+        }
+
+        #-----------------------
+        # add any needed padding
+        #-----------------------
+        my $pad = $max_width - $width;
+        if ( $pad > 0 ) {
+
+            my $rfields        = $line->{'rfields'};
+            my $rfield_lengths = $line->{'rfield_lengths'};
+
+            my $lenp   = $rfield_lengths->[$jcolp];
+            my $avail  = $colp - $col;
+            my $excess = $lenp + $pad - $avail;
+
+            if ( $excess > 0 ) {
+
+                my $padding_available = $line->get_available_space_on_right();
+                if ( $excess <= $padding_available ) {
+                    $line->increase_field_width( $jcolp, $excess );
+
+                    # Increase space of any previous linked lines
+                    foreach my $line_prev (@previous_linked_lines) {
+                        $padding_available =
+                          $line_prev->get_available_space_on_right();
+                        if ( $excess <= $padding_available ) {
+                            $line_prev->increase_field_width( $jcolp, $excess );
+                        }
+                        else {
+                            last;
+                        }
+                    }
+                }
+                else {
+                    $pad = 0;
+                }
+
+            }
+
+            # Add spaces
+            $rfields->[$jcolp] = ( SPACE x $pad ) . $rfields->[$jcolp];
+            $rfield_lengths->[$jcolp] += $pad;
+        }
+    }
+    return;
+} ## end sub end_wide_equals_column
+
+sub pad_wide_equals_columns {
+    my ($rgroup_lines) = @_;
+
+    # Given:
+    #   $rgroup_lines = the current vertical alignment group of lines
+    # Task:
+    #   Look for columns of aligned equals tokens, some of which may be
+    #   things like '-=', '&&=', etc.  Increase the field length of the
+    #   previous field by 1 or 2 spaces where necessary and possible so
+    #   that alignment of all '=' occurs.  For example, given
+
+    #       $j    /= 2;
+    #       $pow2 = $pow2 * $pow2;
+
+    # In this case we want to add a leading space '=' term to get
+    #       $j    /= 2;
+    #       $pow2  = $pow2 * $pow2;
+
+    # The logic here is somewhat similar to sub pad_signed_number_columns
+
+    return unless ($rOpts_valign_wide_equals);
+
+    my %column_info;
+    my @columns;
+
+    #----------------
+    # loop over lines
+    #----------------
+    my $ix_line = -1;
+    my $jmax    = -1;
+    foreach my $line ( @{$rgroup_lines} ) {
+        $ix_line++;
+        my $jmax_last = $jmax;
+        $jmax = $line->{'jmax'};
+        my $jmax_change = $jmax ne $jmax_last;
+
+        my @alignments = @{ $line->{'ralignments'} };
+        my $rfields    = $line->{'rfields'};
+        my $rtokens    = $line->{'rtokens'};
+
+        #-----------------------------------------------
+        # Check for a reduction in the number of columns
+        #-----------------------------------------------
+        if ( $jmax < $jmax_last ) {
+
+            foreach my $jcol ( keys %column_info ) {
+
+                # end any stranded columns on the right
+                next if ( $jcol < $jmax );
+                my $rcol_hash = $column_info{$jcol};
+                next unless ($rcol_hash);
+                if ( $rcol_hash->{max_width} > $rcol_hash->{min_width} ) {
+                    end_wide_equals_column( $rgroup_lines, $rcol_hash,
+                        $ix_line - 1 );
+                }
+                delete $column_info{$jcol};
+            }
+        }
+
+        #--------------------------------------------------
+        # Loop over fields except last field (side comment)
+        #--------------------------------------------------
+        for my $jcol ( 0 .. $jmax - 1 ) {
+
+            #-----------------------------------------
+            # Decide if this is a new alignment column
+            #-----------------------------------------
+            my $alignment = $alignments[$jcol];
+            my $old_col   = $columns[$jcol];
+            my $col       = $alignment->{column};
+            $columns[$jcol] = $col;
+            if ( defined($old_col) && $old_col != $col ) {
+                foreach my $jcol_old ( keys %column_info ) {
+                    next if ( $jcol_old < $jcol );
+                    my $rcol_hash = $column_info{$jcol_old};
+                    if ( $rcol_hash->{max_width} > $rcol_hash->{min_width} ) {
+                        end_wide_equals_column( $rgroup_lines, $rcol_hash,
+                            $ix_line - 1 );
+                    }
+                    delete $column_info{$jcol_old};
+                }
+            }
+
+            # A new wide equals column can only start at an alignment change
+            my $rcol_hash = $column_info{$jcol};
+
+            #------------------------------------------------------
+            # Examine this field, looking for equals or wide equals
+            #------------------------------------------------------
+            my $field_next = $rfields->[ $jcol + 1 ];
+            my $token      = $rtokens->[$jcol];
+
+            # See if this is an equals alignment group;
+            # indicated by alignment token of '=' followed by a digit
+            my $len_equals_symbol = 0;
+            if (   length($token) > 1
+                && substr( $token, 0, 1 ) eq '='
+                && $is_digit_char{ substr( $token, 1, 1 ) } )
+            {
+
+                # find the actual equality symbol which starts the next field
+                # i.e. '=' or '**=' or '-=' etc. We just need its length.
+                my $pos = index( $field_next, '=' );
+                if ( $pos >= 0 && $pos <= 2 ) {
+                    $len_equals_symbol = $pos + 1;
+                }
+            }
+
+            # if a column has not started..
+            if ( !$rcol_hash ) {
+
+                # give up if this is cannot start a new column
+                next if ( !$len_equals_symbol );
+
+                # otherwise continue on to start a new column
+
+            }
+
+            # if a column has been started...
+            else {
+
+                # and this cannot be added to it
+                if ( !$len_equals_symbol || $rcol_hash->{col} ne $col ) {
+
+                    # then end the current column and start over
+                    if ( $rcol_hash->{max_width} > $rcol_hash->{min_width} ) {
+                        end_wide_equals_column( $rgroup_lines, $rcol_hash,
+                            $ix_line - 1 );
+                    }
+                    delete $column_info{$jcol};
+                    $rcol_hash = undef;
+                }
+            }
+
+            if (DEBUG_WEC) {
+                my $exists = defined($rcol_hash);
+                print
+"WEA: line=$ix_line change=$jmax_change jcol=$jcol field=$field_next exists?=$exists equals?=$len_equals_symbol\n";
+            }
+
+            #---------------------------------------
+            # Either start a new column, if possible
+            #---------------------------------------
+            if ( !defined($rcol_hash) ) {
+
+                next if ( !$len_equals_symbol );
+
+                $column_info{$jcol} = {
+                    ix_first  => $ix_line,
+                    col       => $col,
+                    jcol      => $jcol,
+                    min_width => $len_equals_symbol,
+                    max_width => $len_equals_symbol,
+                    rwidths   => [ [ $ix_line, $len_equals_symbol ] ],
+                };
+            }
+
+            #------------------------------
+            # or extend the existing column
+            #------------------------------
+            else {
+                if ( $len_equals_symbol > $rcol_hash->{max_width} ) {
+                    $rcol_hash->{max_width} = $len_equals_symbol;
+                }
+                if ( $len_equals_symbol < $rcol_hash->{min_width} ) {
+                    $rcol_hash->{min_width} = $len_equals_symbol;
+                }
+                push @{ $rcol_hash->{rwidths} },
+                  [ $ix_line, $len_equals_symbol ];
+            }
+        }
+    }
+
+    #-------------------------------------
+    # Loop to finish any remaining columns
+    #-------------------------------------
+    foreach my $jcol ( keys %column_info ) {
+        my $rcol_hash = $column_info{$jcol};
+        if ( $rcol_hash->{max_width} > $rcol_hash->{min_width} ) {
+            end_wide_equals_column( $rgroup_lines, $rcol_hash, $ix_line );
+        }
+    }
+    return;
+} ## end sub pad_wide_equals_columns
+
 ###############################
-# CODE SECTION 7: Output Step A
+# CODE SECTION 8: Output Step A
 ###############################
 
 sub valign_output_step_A {
@@ -5709,7 +6260,7 @@ sub get_output_line_number {
 } ## end sub get_output_line_number
 
 ###############################
-# CODE SECTION 8: Output Step B
+# CODE SECTION 9: Output Step B
 ###############################
 
 {    ## closure for sub valign_output_step_B
@@ -5820,8 +6371,7 @@ sub get_output_line_number {
         my $level_end                 = $rinput->{level_end};
         my $maximum_line_length       = $rinput->{maximum_line_length};
 
-        my ( $open_or_close, $opening_flag, $closing_flag, $seqno, $valid,
-            $seqno_beg, $seqno_end );
+        my ( $open_or_close, $seqno_beg );
         if ($rvertical_tightness_flags) {
 
             $open_or_close = $rvertical_tightness_flags->{_vt_type};
@@ -6046,7 +6596,7 @@ sub get_output_line_number {
             }
         }
         return ( $str, $str_length, $leading_string, $leading_string_length,
-            $leading_space_count, $level, $maximum_line_length, );
+            $leading_space_count, $level, $maximum_line_length );
 
     } ## end sub handle_cached_line
 
@@ -6229,9 +6779,9 @@ sub get_output_line_number {
     } ## end sub valign_output_step_B
 }
 
-###############################
-# CODE SECTION 9: Output Step C
-###############################
+################################
+# CODE SECTION 10: Output Step C
+################################
 
 {    ## closure for sub valign_output_step_C
 
@@ -6364,7 +6914,7 @@ sub get_output_line_number {
 }
 
 ###############################
-# CODE SECTION 10: Output Step D
+# CODE SECTION 11: Output Step D
 ###############################
 
 sub add_leading_tabs {
@@ -6485,7 +7035,7 @@ sub valign_output_step_D {
 } ## end sub valign_output_step_D
 
 ##########################
-# CODE SECTION 11: Summary
+# CODE SECTION 12: Summary
 ##########################
 
 sub report_anything_unusual {

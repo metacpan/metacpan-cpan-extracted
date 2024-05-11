@@ -30,7 +30,7 @@ property unprotected_read => (
 	configurable => 1,
 	enumerable => 1,	
 	type => Bool,
-	value => 1
+	value => 0
 );
 
 property headers => (
@@ -51,6 +51,10 @@ property rows => (
 	type => ArrayRef,
 	value => [],
 );
+
+function total_rows => sub {
+	return scalar @{$_[0]->rows};
+};
 
 function hmac => sub {
 	my ($self, $data) = @_;
@@ -127,6 +131,59 @@ function write => sub {
 	seek $gfh, 0, 2;
 	print $gfh $file_hmac . "\n";
 	close $gfh;
+};
+
+function add_row => sub {
+	my ($self, $columns) = @_;
+	my @cols;
+	for (my $i = 0; $i < scalar @{$columns}; $i++) {
+		push @cols, Salus::Row::Column->new({
+			header => $self->headers->[$i],
+			value => $columns->[$i]
+		});
+	}
+	push @{$self->rows}, Salus::Row->new(
+		columns => \@cols
+	);
+};
+
+function add_row_hash => sub {
+	my ($self, $columns) = (shift, ref $_[0] ? $_[0] : {@_});
+	my @cols;
+	for my $header (@{$self->headers}) {
+		push @cols, Salus::Row::Column->new({
+			header => $header,
+			value => $columns->{$header->label} || $columns->{$header->name}
+		});
+	}
+	push @{$self->rows}, Salus::Row->new(
+		columns => \@cols
+	);
+};
+
+function get_row => sub {
+	my ($self, $row) = @_;
+	return $self->rows->[$row];
+};
+
+function get_row_col => sub {
+	my ($self, $row, $col) = @_;
+	$self->get_row($row)->get_col($col);
+};
+
+function set_row_col => sub {
+	my ($self, $row, $col, $value) = @_;
+	$self->get_row($row)->set_col($col, $value);
+};
+
+function delete_row => sub {
+	my ($self, $row) = @_;
+	splice @{ $self->rows }, $row, 1;
+};
+
+function delete_row_col => sub {
+	my ($self, $row, $col) = @_;
+	$self->get_row($row)->delete_col($col);
 };
 
 1;

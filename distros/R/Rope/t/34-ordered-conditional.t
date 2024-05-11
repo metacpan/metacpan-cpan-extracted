@@ -1,6 +1,17 @@
 use Test::More;
 use lib '.';
 
+BEGIN {
+    eval {
+        require Struct::JSON::Ordered;
+        Struct::JSON::Ordered->new();
+        1;
+    } or do {
+        plan skip_all => "Struct::JSON::Ordered is not available";
+    };
+}
+
+
 {
 	package Custom;
 

@@ -7,12 +7,15 @@ use warnings;
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use List::Util qw(none);
+use Mo::utils::CSS 0.06 qw(check_css_unit);
+use Mo::utils::Language 0.05 qw(check_language_639_2);
 use Readonly;
 use Tags::HTML::Messages;
 
 Readonly::Array our @FORM_METHODS => qw(post get);
+Readonly::Array our @TEXT_KEYS => qw(change_password old_password_label password1_label password2_label submit);
 
-our $VERSION = 0.05;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -54,9 +57,10 @@ sub new {
 		err "Parameter 'form_method' has bad value.";
 	}
 
-	# TODO Check lang.
+	# Check lang.
+	check_language_639_2($self, 'lang');
 
-	# Check text for lang
+	# Check text.
 	if (! defined $self->{'text'}) {
 		err "Parameter 'text' is required.";
 	}
@@ -66,6 +70,16 @@ sub new {
 	if (! exists $self->{'text'}->{$self->{'lang'}}) {
 		err "Texts for language '$self->{'lang'}' doesn't exist.";
 	}
+	if (@TEXT_KEYS != keys %{$self->{'text'}->{$self->{'lang'}}}) {
+		err "Number of texts isn't same as expected.";
+	}
+	foreach my $req_text_key (@TEXT_KEYS) {
+		if (! exists $self->{'text'}->{$self->{'lang'}}->{$req_text_key}) {
+			err "Text for lang '$self->{'lang'}' and key '$req_text_key' doesn't exist.";
+		}
+	}
+
+	check_css_unit($self, 'width');
 
 	$self->{'_tags_messages'} = Tags::HTML::Messages->new(
 		'css' => $self->{'css'},
@@ -257,10 +271,6 @@ sub _process_css {
 sub _text {
 	my ($self, $key) = @_;
 
-	if (! exists $self->{'text'}->{$self->{'lang'}}->{$key}) {
-		err "Text for lang '$self->{'lang'}' and key '$key' doesn't exist.";
-	}
-
 	return $self->{'text'}->{$self->{'lang'}}->{$key};
 }
 
@@ -283,10 +293,20 @@ Tags::HTML::ChangePassword - Tags helper for change password.
 
  my $obj = Tags::HTML::ChangePassword->new(%params);
  $obj->cleanup;
- $obj->prepare($message_types_hr);
  $obj->init($messages_ar);
+ $obj->prepare($message_types_hr);
  $obj->process;
  $obj->process_css;
+
+=head1 DESCRIPTION
+
+L<Tags> helper to print HTML page of form for changing of password.
+
+The page contains optional logo, fields for old and new password and button to
+process workflow. All texts on the page are translatable.
+
+This helper is created for usage in L<Plack::App::ChangePassword> plack
+application which is full application for changing of password.
 
 =head1 METHODS
 
@@ -300,7 +320,7 @@ Constructor.
 
 =item * C<css>
 
-'CSS::Struct::Output' object for L<process_css> processing.
+L<CSS::Struct::Output> object for L<process_css> processing.
 
 Default value is undef.
 
@@ -326,7 +346,7 @@ Default value is 'eng'.
 
 =item * C<tags>
 
-'Tags::Output' object.
+L<Tags::Output> object.
 
 Default value is undef.
 
@@ -385,7 +405,7 @@ Returns undef.
 
  $obj->process;
 
-Process Tags structure for register form.
+Process L<Tags> structure for change password form.
 
 Returns undef.
 
@@ -393,7 +413,7 @@ Returns undef.
 
  $obj->process_css;
 
-Process CSS::Struct structure for register form.
+Process L<CSS::Struct> structure for change password form.
 
 Returns undef.
 
@@ -402,9 +422,22 @@ Returns undef.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+         From Mo::utils::CSS::check_css_unit():
+                 Parameter 'width' doesn't contain number.
+                         Value: %s
+                 Parameter 'width' doesn't contain unit.
+                         Value: %s
+                 Parameter 'width' contain bad unit.
+                         Unit: %s
+                         Value: %s
+         From Mo::utils::Language::check_language_639_2():
+                 Parameter 'lang' doesn't contain valid ISO 639-2 code.
+                         Codeset: %s
+                         Value: %s
          From Tags::HTML::new():
                  Parameter 'css' must be a 'CSS::Struct::Output::*' class.
                  Parameter 'tags' must be a 'Tags::Output::*' class.
+         Text for lang '%s' and key '%s' doesn't exist.
 
  init():
          No messages to init.
@@ -416,7 +449,6 @@ Returns undef.
          From Tags::HTML::process():
                  Parameter 'tags' isn't defined.
          Bad message data object.
-         Text for lang '%s' and key '%s' doesn't exist.
 
  process_css():
          From Tags::HTML::process_css():
@@ -442,7 +474,7 @@ Returns undef.
          'tags' => $tags,
  );
 
- # Process login button.
+ # Process change password form.
  $obj->process_css;
  $obj->process;
 
@@ -509,8 +541,8 @@ Returns undef.
  #     </legend>
  #     <p>
  #       <label for="old_password">
+ #         Old password
  #       </label>
- #       Old password
  #       <input type="password" name="old_password" id="old_password" autofocus=
  #         "autofocus">
  #       </input>
@@ -555,16 +587,16 @@ Returns undef.
          'xml' => 1,
          'preserved' => ['style'],
  );
- my $register = Tags::HTML::ChangePassword->new(
+ my $change_password = Tags::HTML::ChangePassword->new(
          'css' => $css,
          'tags' => $tags,
  );
- $register->process_css;
+ $change_password->process_css;
  my $app = Plack::App::Tags::HTML->new(
          'component' => 'Tags::HTML::Container',
          'data' => [sub {
                  my $self = shift;
-                 $register->process;
+                 $change_password->process;
                  return;
          }],
          'css' => $css,
@@ -587,6 +619,8 @@ Returns undef.
 L<Class::Utils>,
 L<Error::Pure>,
 L<List::Util>,
+L<Mo::utils::CSS>,
+L<Mo::utils::Language>,
 L<Readonly>,
 L<Tags::HTML>,
 L<Tags::HTML::Messages>.
@@ -627,6 +661,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.07
 
 =cut

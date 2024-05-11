@@ -85,6 +85,12 @@ METHODS
             Default value is 'Plack::App::ChangePassword; Version:
             __VERSION__'.
 
+    *       "lang"
+
+            Language in ISO 639-2 code.
+
+            Default value is undef.
+
     *       "message_cb"
 
             Callback to process message from application. Arguments for
@@ -140,6 +146,18 @@ METHODS
                      'no_simple' => ['script', 'textarea'],
                      'preserved' => ['pre', 'style'],
              );
+
+    *       "text"
+
+            Hash reference with keys defined language in ISO 639-2 code and
+            value with hash reference with texts.
+
+            Required keys are 'change_password', 'old_password_label',
+            'password1_label', 'password2_label' and 'submit'.
+
+            See more in Tags::HTML::ChangePassword.
+
+            Default value is undef.
 
     *       "title"
 
@@ -248,6 +266,12 @@ EXAMPLE
      # .form-change-password .messages {
      #      text-align: center;
      # }
+     # .error {
+     #      color: red;
+     # }
+     # .info {
+     #      color: blue;
+     # }
      # .container {
      #      display: flex;
      #      align-items: center;
@@ -325,5 +349,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

@@ -3,13 +3,11 @@ abstract: 'Tags helper for change password.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
-  CSS::Struct::Output::Raw: 0
   CSS::Struct::Output::Structure: 0
   Data::Message::Simple: 0
   English: 0
   Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
-  Tags::Output::Raw: 0
   Tags::Output::Structure: 0
   Test::MockObject: 0
   Test::More: 0
@@ -34,6 +32,8 @@ requires:
   Class::Utils: 0
   Error::Pure: 0
   List::Util: 1.33
+  Mo::utils::CSS: 0.06
+  Mo::utils::Language: 0.05
   Readonly: 0
   Tags::HTML: 0.08
   Tags::HTML::Messages: 0.09
@@ -43,4 +43,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-ChangePassword
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-ChangePassword
-version: '0.05'
+version: '0.07'

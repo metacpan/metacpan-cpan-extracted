@@ -2,4 +2,6 @@ Revision history for Salus
 
 0.01    Date/time
         First version, released on an unsuspecting world.
-
+0.02	2024-05-10
+	- Adds add_row, add_row_hash, get_row, get_row_col, set_row_col, delete_row and  delete_row_col to Salus::Table
+	- Adds get_col, set_col and delete_col to Salus::Row

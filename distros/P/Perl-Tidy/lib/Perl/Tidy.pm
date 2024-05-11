@@ -131,13 +131,15 @@ BEGIN {
     # then the Release version must be bumped, and it is probably past time for
     # a release anyway.
 
-    $VERSION = '20240202';
+    $VERSION = '20240511';
 } ## end BEGIN
 
 sub DESTROY {
+    my $self = shift;
 
     # required to avoid call to AUTOLOAD in some versions of perl
-}
+    return;
+} ## end sub DESTROY
 
 sub AUTOLOAD {
 
@@ -217,7 +219,6 @@ sub streamhandle {
             if ( $mode =~ /[rR]/ ) {
 
                 # RT#97159; part 1 of 2: updated to use 'can'
-                ##if ( $ref eq 'IO::File' || defined &{ $ref . "::getline" } ) {
                 if ( $ref->can('getline') ) {
                     $New = sub { $filename };
                 }
@@ -237,7 +238,6 @@ EOM
             if ( $mode =~ /[wW]/ ) {
 
                 # RT#97159; part 2 of 2: updated to use 'can'
-                ##if ( $ref eq 'IO::File' || defined &{ $ref . "::print" } ) {
                 if ( $ref->can('print') ) {
                     $New = sub { $filename };
                 }
@@ -926,6 +926,7 @@ EOM
         dump-block-summary
         dump-unusual-variables
         dump-mixed-call-parens
+        dump-mismatched-args
         )
       )
     {
@@ -1094,7 +1095,7 @@ EOM
     }
 
     my $logfile_header = make_logfile_header( $rOpts, $config_file,
-        $rraw_options, $Windows_type, $readable_options, );
+        $rraw_options, $Windows_type, $readable_options );
 
     # Store some values needed by lower level routines
     $self->[_diagnostics_object_] = $diagnostics_object;
@@ -1160,7 +1161,7 @@ sub make_file_extension {
     my ( $self, $extension, $default ) = @_;
 
     # '$extension' is the first choice (usually a user entry)
-    # '$default'   is a backup extension
+    # '$default'   is an optional backup extension
 
     $extension = EMPTY_STRING unless defined($extension);
     $extension =~ s/^\s+//;
@@ -3126,9 +3127,9 @@ sub line_diff {
 
     my ( $s1, $s2 ) = @_;
 
-    # Given two strings, return
-    # $diff_marker = a string with carat (^) symbols indicating differences
-    # $pos1 = character position of first difference; pos1=-1 if no difference
+    # Given two strings, Return
+    #  $diff_marker = a string with carat (^) symbols indicating differences
+    #  $pos1 = character position of first difference; pos1=-1 if no difference
 
     # Form exclusive or of the strings, which has null characters where strings
     # have same common characters so non-null characters indicate character
@@ -3151,7 +3152,7 @@ sub line_diff {
             last;
         }
     }
-    return wantarray ? ( $diff_marker, $pos1 ) : $diff_marker;
+    return ( $diff_marker, $pos1 );
 } ## end sub line_diff
 
 sub compare_string_buffers {
@@ -3347,7 +3348,6 @@ sub generate_options {
     my %expansion       = ();
     my %option_category = ();
     my %option_range    = ();
-    my $rexpansion      = \%expansion;
     my %integer_option_range;
 
     # names of categories in manual
@@ -3402,7 +3402,7 @@ sub generate_options {
         $option_category{$long_name} = $category_name[$category];
         if ($short_name) {
             if ( $expansion{$short_name} ) {
-                my $existing_name = $expansion{$short_name}[0];
+                my $existing_name = $expansion{$short_name}->[0];
                 Die(
 "redefining abbreviation $short_name for $long_name; already used for $existing_name\n"
                 );
@@ -3412,7 +3412,7 @@ sub generate_options {
                 my $nshort_name = 'n' . $short_name;
                 my $nolong_name = 'no' . $long_name;
                 if ( $expansion{$nshort_name} ) {
-                    my $existing_name = $expansion{$nshort_name}[0];
+                    my $existing_name = $expansion{$nshort_name}->[0];
                     Die(
 "attempting to redefine abbreviation $nshort_name for $nolong_name; already used for $existing_name\n"
                     );
@@ -3485,6 +3485,7 @@ sub generate_options {
     ########################################
     $add_option->( 'continuation-indentation',             'ci',    '=i' );
     $add_option->( 'extended-continuation-indentation',    'xci',   '!' );
+    $add_option->( 'minimize-continuation-indentation',    'mci',   '!' );
     $add_option->( 'line-up-parentheses',                  'lp',    '!' );
     $add_option->( 'extended-line-up-parentheses',         'xlp',   '!' );
     $add_option->( 'line-up-parentheses-exclusion-list',   'lpxl',  '=s' );
@@ -3547,6 +3548,7 @@ sub generate_options {
     $add_option->( 'valign-if-unless',                          'viu',   '!' );
     $add_option->( 'valign-signed-numbers',                     'vsn',   '!' );
     $add_option->( 'valign-signed-numbers-limit',               'vsnl',  '=i' );
+    $add_option->( 'valign-wide-equals',                        'vwe',   '!' );
     $add_option->( 'extended-block-tightness',                  'xbt',   '!' );
     $add_option->( 'extended-block-tightness-list',             'xbtl',  '=s' );
 
@@ -3714,6 +3716,18 @@ sub generate_options {
     $add_option->( 'want-call-parens',             'wcp',  '=s' );
     $add_option->( 'nowant-call-parens',           'nwcp', '=s' );
 
+    $add_option->( 'warn-mismatched-args',                  'wma',   '!' );
+    $add_option->( 'warn-mismatched-arg-types',             'wmat',  '=s' );
+    $add_option->( 'warn-mismatched-arg-undercount-cutoff', 'wmauc', '=i' );
+    $add_option->( 'warn-mismatched-arg-overcount-cutoff',  'wmaoc', '=i' );
+    $add_option->( 'warn-mismatched-arg-exclusion-list',    'wmaxl', '=s' );
+
+    $add_option->( 'add-interbracket-arrows',       'aia', '!' );
+    $add_option->( 'delete-interbracket-arrows',    'dia', '!' );
+    $add_option->( 'warn-interbracket-arrows',      'wia', '!' );
+    $add_option->( 'interbracket-arrow-style',      'ias', '=s' );
+    $add_option->( 'interbracket-arrow-complexity', 'iac', '=i' );
+
     ########################################
     $category = 13;    # Debugging
     ########################################
@@ -3725,6 +3739,7 @@ sub generate_options {
     $add_option->( 'dump-defaults',                   'ddf',   '!' );
     $add_option->( 'dump-integer-option-range',       'dior',  '!' );
     $add_option->( 'dump-long-names',                 'dln',   '!' );
+    $add_option->( 'dump-mismatched-args',            'dma',   '!' );
     $add_option->( 'dump-mixed-call-parens',          'dmcp',  '!' );
     $add_option->( 'dump-options',                    'dop',   '!' );
     $add_option->( 'dump-profile',                    'dpro',  '!' );
@@ -3827,17 +3842,20 @@ sub generate_options {
       noextended-continuation-indentation
       cuddled-break-option=1
       delete-old-newlines
+      delete-repeated-commas
       delete-semicolons
       dump-block-minimum-lines=20
       dump-block-types=sub
       extended-syntax
       encode-output-strings
+      file-size-order
       function-paren-vertical-alignment
       fuzzy-line-length
       hanging-side-comments
       indent-block-comments
       indent-columns=4
       integer-range-check=2
+      interbracket-arrow-complexity=1
       iterations=1
       keep-old-blank-lines=1
       keyword-paren-inner-tightness=1
@@ -3853,6 +3871,8 @@ sub generate_options {
       maximum-unexpected-errors=0
       memoize
       minimum-space-to-comment=4
+      warn-mismatched-arg-undercount-cutoff=4
+      warn-mismatched-arg-overcount-cutoff=1
       nobrace-left-and-indent
       nocuddled-else
       nodelete-old-whitespace
@@ -3879,6 +3899,7 @@ sub generate_options {
       valign-code
       valign-block-comments
       valign-side-comments
+      valign-signed-numbers
       valign-signed-numbers-limit=20
       short-concatenation-item-length=8
       space-for-semicolon
@@ -3994,6 +4015,7 @@ sub generate_options {
         'entab-leading-whitespace'                  => [ 0, undef ],
         'fixed-position-side-comment'               => [ 0, undef ],
         'indent-columns'                            => [ 0, undef ],
+        'interbracket-arrow-complexity'             => [ 0, 2 ],
         'integer-range-check'                       => [ 0, 3 ],
         'iterations'                                => [ 0, undef ],
         'keep-old-blank-lines'                      => [ 0, 2 ],
@@ -4009,6 +4031,8 @@ sub generate_options {
         'maximum-line-length'                       => [ 0, undef ],
         'maximum-unexpected-errors'                 => [ 0, undef ],
         'minimum-space-to-comment'                  => [ 0, undef ],
+        'warn-mismatched-arg-undercount-cutoff'     => [ 0, undef ],
+        'warn-mismatched-arg-overcount-cutoff'      => [ 0, undef ],
         'one-line-block-nesting'                    => [ 0, 1 ],
         'one-line-block-semicolons'                 => [ 0, 2 ],
         'paren-tightness'                           => [ 0, 2 ],
@@ -4034,7 +4058,7 @@ sub generate_options {
             my $key = $1;
             my $def = $2;
             if ( defined( $integer_option_range{$key} ) ) {
-                $integer_option_range{$key}[2] = $def;
+                $integer_option_range{$key}->[2] = $def;
             }
         }
     }
@@ -4055,7 +4079,7 @@ sub generate_options {
         if ( defined( $integer_option_range{$key} )
             && @{ $integer_option_range{$key} } < 3 )
         {
-            $integer_option_range{$key}[2] = undef;
+            $integer_option_range{$key}->[2] = undef;
         }
     }
 
@@ -4332,7 +4356,7 @@ q(wbb=% + - * / x != == >= <= =~ !~ < > | & = **= += *= &= <<= &&= -= /= |= >>= 
     # Uncomment next line to dump all expansions for debugging:
     # dump_short_names(\%expansion);
     return ( \@option_string, \@defaults, \%expansion, \%option_category,
-        \%option_range, \%integer_option_range, );
+        \%option_range, \%integer_option_range );
 
 } ## end sub generate_options
 
@@ -4398,7 +4422,7 @@ sub _process_command_line {
     else { $glc = undef }
 
     my ( $roption_string, $rdefaults, $rexpansion,
-        $roption_category, $roption_range, $rinteger_option_range, )
+        $roption_category, $roption_range, $rinteger_option_range )
       = generate_options();
 
     #--------------------------------------------------------------
@@ -4463,7 +4487,7 @@ sub _process_command_line {
                 }
             }
             if ( !-e $config_file ) {
-                Warn(
+                Die(
                     "cannot find file given with -pro=$config_file: $OS_ERROR\n"
                 );
                 $config_file = EMPTY_STRING;
@@ -4505,6 +4529,19 @@ sub _process_command_line {
         }
     }
 
+    # The above commands processed before disambiguation and then Exited.  So
+    # we need to check below to see if the user entered something like
+    # '-dump-t' or '-he'. This will slip past here and not get processed.
+    my %early_exit_commands = (
+        'help'                      => 'h',
+        'version'                   => 'v',
+        'dump-defaults'             => 'ddf',
+        'dump-integer-option-range' => 'dior',
+        'dump-long-names'           => 'dln',
+        'dump-short-names'          => 'dsn',
+        'dump-token-types'          => 'dtt',
+    );
+
     if ( $saw_dump_profile && $saw_ignore_profile ) {
         Warn("No profile to dump because of -npro\n");
         Exit(1);
@@ -4545,8 +4582,9 @@ EOM
         if ($config_file) {
             $rconfig_string = stream_slurp($config_file);
             if ( !defined($rconfig_string) ) {
-                ${$rconfig_file_chatter} .=
-                  "# $config_file exists but cannot be opened\n";
+                Die(
+"exiting because profile '$config_file' could not be opened\n"
+                );
             }
         }
 
@@ -4603,28 +4641,43 @@ EOM
                 # Undo any options which cause premature exit.  They are not
                 # appropriate for a config file, and it could be hard to
                 # diagnose the cause of the premature exit.
+
+                # These are options include dump switches of the form
+                # '--dump-xxx-xxx!'.
+                my @dump_commands =
+                  grep { /^(dump-.*)!$/ } @{$roption_string};
+                foreach (@dump_commands) { s/!$// }
+
+                # Here is a current list of these @dump_commands:
+                #  dump-block-summary
+                #  dump-cuddled-block-list
+                #  dump-defaults
+                #  dump-integer-option-range
+                #  dump-long-names
+                #  dump-mismatched-args
+                #  dump-mixed-call-parens
+                #  dump-options
+                #  dump-profile
+                #  dump-short-names
+                #  dump-token-types
+                #  dump-unusual-variables
+                #  dump-want-left-space
+                #  dump-want-right-space
+
+                # The following two dump configuration parameters which
+                # take =i or =s would still be allowed:
+                #  dump-block-minimum-lines',        'dbl',   '=i' );
+                #  dump-block-types',                'dbt',   '=s' );
+
                 foreach (
+                    @dump_commands,
                     qw{
-                    dump-cuddled-block-list
-                    dump-defaults
-                    dump-integer-option_range
-                    dump-long-names
-                    dump-options
-                    dump-profile
-                    dump-short-names
-                    dump-token-types
-                    dump-want-left-space
-                    dump-want-right-space
-                    dump-block-summary
-                    dump-unusual-variables
-                    dump-mixed-call-parens
                     help
                     stylesheet
                     version
                     }
                   )
                 {
-
                     if ( defined( $Opts{$_} ) ) {
                         delete $Opts{$_};
                         Warn("ignoring --$_ in config file: $config_file\n");
@@ -4642,6 +4695,16 @@ EOM
     local $SIG{'__WARN__'} = sub { Warn( $_[0] ) };
     if ( !GetOptions( \%Opts, @{$roption_string} ) ) {
         Die("Error on command line; for help try 'perltidy -h'\n");
+    }
+
+    # Catch ambiguous entries which should have exited above (c333)
+    foreach my $long_name ( keys %early_exit_commands ) {
+        if ( $Opts{$long_name} ) {
+            my $short_name = $early_exit_commands{$long_name};
+            Die(<<EOM);
+Ambigiguos entry; please enter '--$long_name' or '-$short_name'
+EOM
+        }
     }
 
     # reset Getopt::Long configuration back to its previous value
@@ -5479,7 +5542,7 @@ sub Win_Config_Locs {
     # 9x/Me box.  Contributed by: Yves Orton.
 
     my ( $rpending_complaint, $os ) = @_;
-    if ( !$os ) { $os = Win_OS_Type(); }
+    if ( !$os ) { $os = Win_OS_Type($rpending_complaint) }
 
     return unless $os;
 
@@ -5504,7 +5567,7 @@ sub Win_Config_Locs {
 "I dont know a sensible place to look for config files on an $os system.\n";
         return;
     }
-    return wantarray ? ( $os, $system, $allusers ) : $os;
+    return ( $os, $system, $allusers );
 } ## end sub Win_Config_Locs
 
 sub dump_config_file {

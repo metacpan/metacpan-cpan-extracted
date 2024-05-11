@@ -35,6 +35,7 @@
       <li><a href="#Breaking-Before-or-After-Operators">Breaking Before or After Operators</a></li>
       <li><a href="#Controlling-List-Formatting">Controlling List Formatting</a></li>
       <li><a href="#Adding-and-Deleting-Commas">Adding and Deleting Commas</a></li>
+      <li><a href="#Adding-and-Deleting-Interbracket-Arrows">Adding and Deleting Interbracket Arrows</a></li>
       <li><a href="#Missing-Else-Blocks">Missing Else Blocks</a></li>
       <li><a href="#Retaining-or-Ignoring-Existing-Line-Breaks">Retaining or Ignoring Existing Line Breaks</a></li>
       <li><a href="#Blank-Line-Control">Blank Line Control</a></li>
@@ -619,6 +620,26 @@
                     SeaGreen1 Yellow1 IndianRed1 IndianRed2 Tan1 Tan4
                 )
               )</code></pre>
+
+</dd>
+<dt id="mci---minimize-continuation-indentation"><b>-mci</b>, <b>--minimize-continuation-indentation</b></dt>
+<dd>
+
+<p>This flag allows perltidy to remove continuation indentation in some special cases where it is not really unnecessary. For a simple example, the default formatting for the following snippet is:</p>
+
+<pre><code>        # perltidy -nmci
+        $self-&gt;blurt( &quot;Error: No INPUT definition for type &#39;$type&#39;, typekind &#39;&quot;
+              . $type-&gt;xstype
+              . &quot;&#39; found&quot; );</code></pre>
+
+<p>The second and third lines are one level deep in a container, and are also statement continuations, so they get indented by the sum of the <b>-i</b> value and the <b>-ci</b> value. If this flag is set, the indentation is reduced by <b>-ci</b> spaces, giving</p>
+
+<pre><code>        # perltidy -mci
+        $self-&gt;blurt( &quot;Error: No INPUT definition for type &#39;$type&#39;, typekind &#39;&quot;
+            . $type-&gt;xstype
+            . &quot;&#39; found&quot; );</code></pre>
+
+<p>This flag is currently off by default, but it could become the default in a future version.</p>
 
 </dd>
 <dt id="sil-n---starting-indentation-level-n"><b>-sil=n</b> <b>--starting-indentation-level=n</b></dt>
@@ -2941,7 +2962,7 @@
 <dt id="drc---delete-repeated-commas"><b>-drc</b>, <b>--delete-repeated-commas</b></dt>
 <dd>
 
-<p>Repeated commas in a list are undesirable and can be removed with this flag. For example, given this list with a repeated comma</p>
+<p>This option causes repeated commas to be removed. For example, given this list with a repeated comma</p>
 
 <pre><code>      ignoreSpec( $file, &quot;file&quot;,, \%spec, \%Rspec );</code></pre>
 
@@ -2950,7 +2971,28 @@
 <pre><code>      # perltidy -drc:
       ignoreSpec( $file, &quot;file&quot;, \%spec, \%Rspec );</code></pre>
 
-<p>Since the default is not to add or delete commas, this feature is off by default and must be requested.</p>
+<p>This parameter also deletes repeated fat commas, &#39;=&gt;&#39;. The complete list of actions taken when this flag is set are as follows:</p>
+
+<ul>
+
+<li><p>Repeated commas like &#39;,,&#39; are removed with a warning.</p>
+
+</li>
+<li><p>Repeated fat commas like &#39;=&gt; =&gt;&#39; are removed with a warning.</p>
+
+</li>
+<li><p>The combination &#39;=&gt;,&#39; produces a warning but is not changed (it is likely an error but only its author would know how to fix it).</p>
+
+</li>
+<li><p>The remaining combination &#39;,=&gt;&#39; (sometimes called a &#39;winking fat comma&#39;) is ignored by this parameter.</p>
+
+</li>
+<li><p>These warnings are only output if the <b>--warning-output</b>, or <b>-w</b>, flag is set.</p>
+
+</li>
+</ul>
+
+<p>This option is on by default. Use <b>-ndrc</b> to turn it off.</p>
 
 </dd>
 <dt id="want-trailing-commas-s-or--wtc-s---add-trailing-commas-or--atc-and---delete-trailing-commas-or--dtc"><b>--want-trailing-commas=s</b> or <b>-wtc=s</b>, <b>--add-trailing-commas</b> or <b>-atc</b>, and <b>--delete-trailing-commas</b> or <b>-dtc</b></dt>
@@ -3101,6 +3143,130 @@
 
 </dd>
 </dl>
+
+<h2 id="Adding-and-Deleting-Interbracket-Arrows">Adding and Deleting Interbracket Arrows</h2>
+
+<p>In the following expression, the arrow operator &#39;-&gt;&#39; between the closing and opening brackets of hash keys and array indexes are optional:</p>
+
+<pre><code>   return $self-&gt;{&#39;commandline&#39;}-&gt;{&#39;arg_list&#39;}-&gt;[0]-&gt;[0]-&gt;{&#39;hostgroups&#39;};</code></pre>
+
+<p>These will be called <b>interbracket arrows</b> here, for lack of a better term. Perltidy will not change them by default, but they can be added or removed with the following parameters.</p>
+
+<dl>
+
+<dt id="dia---delete-interbracket-arrows"><b>-dia</b>, <b>--delete-interbracket-arrows</b></dt>
+<dd>
+
+<p>This parameter deletes interbracket arrows. Applied to the above example we have</p>
+
+<pre><code>    # perltidy -dia
+    return $self-&gt;{&#39;commandline&#39;}{&#39;arg_list&#39;}[0][0]{&#39;hostgroups&#39;};</code></pre>
+
+<p>By default this applies to all interbracket arrows, but selective deletion is possible with controls described below.</p>
+
+</dd>
+<dt id="aia---add-interbracket-arrows"><b>-aia</b>, <b>--add-interbracket-arrows</b></dt>
+<dd>
+
+<p>This parameter adds interbracket arrows. Applied to the line of code above, we get back the original line.</p>
+
+<pre><code>    # perltidy -aia
+    return $self-&gt;{&#39;commandline&#39;}-&gt;{&#39;arg_list&#39;}-&gt;[0]-&gt;[0]-&gt;{&#39;hostgroups&#39;};</code></pre>
+
+<p>Selective changes can be made with controls described below.</p>
+
+</dd>
+<dt id="ias-s---interbracket-arrow-style-s"><b>-ias=s</b>, <b>--interbracket-arrow-style=s</b></dt>
+<dd>
+
+<p>By default the <b>-add-</b> and <b>-delete-</b> parameters apply to all interbracket arrows.</p>
+
+<p>An optional style can be specified with this parameter string <b>s</b>. In that case the parameters <b>--add-interbracket-arrows</b> and <b>--delete-interbracket-arrows</b> only apply where they would bring the formatting into agreement with the specified style. They may both be used in a single run if a mixed style is specified since there is no conflict.</p>
+
+<p>The style string <b>s</b> gives a graphical description of the desired style. It lists up to four possible pairs of bracket types with an optional arrow between them. For example:</p>
+
+<pre><code>   -ias=&#39;][   }-&gt;{&#39;</code></pre>
+
+<p>This means no arrows are wanted between &#39;][&#39; but arrows should be between &#39;}{&#39;. And it means that the unlisted pairs &#39;]{&#39; and &#39;}[&#39; should remain unchanged, either with or without arrows.</p>
+
+<p>In this particular example, if the parameter <b>--delete-interbracket-arrows</b> is used, then only arrows like &#39;]-&gt;[&#39; will be deleted, since they are the only ones which disagree with the style.</p>
+
+<p>And likewise, if <b>--add-interbracket-arrows</b> is used, then arrows will only be inserted between brackets like &#39;}{&#39; to bring the formatting into conformity with the style in this example.</p>
+
+<p>Spaces in the string <b>s</b> are optional. They are ignored when the expression is parsed.</p>
+
+<p>The style corresponding to all possible arrows is</p>
+
+<pre><code>      -ias=&#39;]-&gt;[ ]-&gt;{ }-&gt;[ }-&gt;{&#39;</code></pre>
+
+<p>For convenience, this may also be requested with <b>-ias=1</b> or <b>-ias=&#39;*&#39;</b>.</p>
+
+<p>The style corresponding to no interbracket arrows is</p>
+
+<pre><code>      -ias=&#39;]  [ ]  { }  [ }  {&#39;</code></pre>
+
+<p>which may also be requested with <b>-ias=0</b>.</p>
+
+</dd>
+<dt id="wia---warn-interbracket-arrows"><b>-wia</b>, <b>--warn-interbracket-arrows</b></dt>
+<dd>
+
+<p>If this parameter is set, then a message is written to the error file in the following cases:</p>
+
+<ul>
+
+<li><p>If an arrow is added or deleted by an add or delete command.</p>
+
+</li>
+<li><p>If a style is defined and an arrow would have been added or deleted if requested. So for example, the command</p>
+
+<pre><code>   perltidy -wia -ias=&#39;][&#39;</code></pre>
+
+<p>will show where a file has arrows like ]-&gt;[&#39; since they do not match the style, but no changes will be made because the delete command <b>-dia</b> has not been given. And</p>
+
+<pre><code>   perltidy -wia -ias=0</code></pre>
+
+<p>will warn if any arrows exist, since the flag -ias=0 means that no arrows are wanted.</p>
+
+</li>
+</ul>
+
+</dd>
+<dt id="iac-n---interbracket-arrow-complexity-n"><b>-iac=n</b>, <b>--interbracket-arrow-complexity=n</b></dt>
+<dd>
+
+<p>This parameter makes it possible to skip adding or deleting arrows following a container which is complex in some sense. Three levels of complexity can be specified with the integer <b>n</b>, as follows:</p>
+
+<pre><code>   n=0   the contents of the left container must be a single thing (token)
+   n=1   the left container must not contain other containers [DEFAULT]
+   n=2   the left container may contain anything</code></pre>
+
+<p>Some examples:</p>
+
+<pre><code>    # Container                complexity
+    {&#39;commandline&#39;}            0 single token         OK by default
+    { $type . $name }          1 multiple tokens      OK by default
+    [ $plot{&#39;x-axis&#39;} - 1 ]    2 contains a container SKIPPED by default</code></pre>
+
+<p>So, with the default complexity level of 1, an arrow could be added or deleted following the first two of these containers but not the third.</p>
+
+</dd>
+</dl>
+
+<p><b>Some points to consider</b> when working with these parameters are:</p>
+
+<ul>
+
+<li><p>There are no known bugs, but this is a relatively new feature. So please carefully check file differences and run tests when interbracket arrows are added or removed.</p>
+
+</li>
+<li><p>For some unusual spacing parameters, it could take an extra iteration for the spaces between brackets to reach their final state after arrows are added or deleted.</p>
+
+</li>
+<li><p>Any comments between brackets will prevent the adding and deleting of arrows.</p>
+
+</li>
+</ul>
 
 <h2 id="Missing-Else-Blocks">Missing Else Blocks</h2>
 
@@ -3438,9 +3604,9 @@
 <dt id="bbs---blanks-before-subs"><b>-bbs</b>, <b>--blanks-before-subs</b></dt>
 <dd>
 
-<p>For compatibility with previous versions, <b>-bbs</b> or <b>--blanks-before-subs</b> is equivalent to <i>-blbp=1</i> and <i>-blbs=1</i>.</p>
+<p>For compatibility with previous versions, <b>-bbs</b> or <b>--blanks-before-subs</b> is equivalent to <b>-blbp=1</b> and <b>-blbs=1</b>.</p>
 
-<p>Likewise, <b>-nbbs</b> or <b>--noblanks-before-subs</b> is equivalent to <i>-blbp=0</i> and <i>-blbs=0</i>.</p>
+<p>Likewise, <b>-nbbs</b> or <b>--noblanks-before-subs</b> is equivalent to <b>-blbp=0</b> and <b>-blbs=0</b>.</p>
 
 </dd>
 <dt id="bbb---blanks-before-blocks"><b>-bbb</b>, <b>--blanks-before-blocks</b></dt>
@@ -3996,7 +4162,7 @@
         [  10.9,        10.9,             11 ],
     );</code></pre>
 
-<p>The current default alignment is strict left justification:</p>
+<p>The default is <b>-vsn</b>. This can be turned off to get is strict left justification:</p>
 
 <pre><code>    # perltidy -nvsn
     my @correct = (
@@ -4006,8 +4172,6 @@
         [ -123456.001, -80.080,          0 ],
         [ 10.9,        10.9,             11 ],
     );</code></pre>
-
-<p>In a future release <b>-vsn</b> will become the default.</p>
 
 <p>Some points regarding <b>-vsn</b> are:</p>
 
@@ -4019,10 +4183,37 @@
 <li><p>This option is mainly limited to lists of comma-separated numbers. For multiline lists of numbers, having trailing commas can sometimes improve the results. If missing, perltidy can add them for example with parameters <b>-wtc=b -atc</b>. See <a href="#Adding-and-Deleting-Commas">&quot;Adding and Deleting Commas&quot;</a>.</p>
 
 </li>
-<li><p>This option has a control parameter <b>--valign-signed-number-limit=N</b>, or <b>-vsnl=N</b>. This value controls formatting of very long columns of numbers and should not normally need to be changed. To see its purpose, consider a very long column of just unsigned numbers, say 1000 lines. If we add a single negative number, it is undesirable to move all of the other numbers over by one space. This would create many lines of file differences but not really improve the appearance when a local section of the table was viewed. The number <b>N</b> avoids this problem by not adding extra indentation to a run of more than <b>N</b> lines of unsigned numbers. The default value, <b>N=20</b>, is set to be a number of lines for which the ends of a long column of unsigned numbers are not normally both in view.</p>
+<li><p>This option has a control parameter <b>--valign-signed-number-limit=N</b>, or <b>-vsnl=N</b>. This value controls formatting of very long columns of numbers and should not normally need to be changed. To see its purpose, consider a very long column of just unsigned numbers, say 1000 lines. If we add a single negative number, it is undesirable to move all of the other numbers over by one space. This could create many lines of file differences but not really improve the appearance when a local section of the table was viewed. The number <b>N</b> avoids this problem by not adding extra indentation to a run of more than <b>N</b> lines of unsigned numbers. The default value, <b>N=20</b>, is set to be a number of lines for which the ends of a long column of unsigned numbers are not normally both in view.</p>
 
 </li>
 </ul>
+
+</dd>
+<dt id="Aligning-assignment-operators-with---valign-wide-equals-or--vwe"><b>Aligning assignment operators with --valign-wide-equals or -vwe</b></dt>
+<dd>
+
+<p>The following assignment operators are aligned independently by default:</p>
+
+<pre><code>      = **= += *= &amp;= &lt;&lt;= &amp;&amp;= -= /= |= &gt;&gt;= ||= //= .= %= ^= x=</code></pre>
+
+<p>Setting <b>--valign-wide-equals</b>, or <b>-vwe</b>, causes them to be vertically aligned together with the trailing <b>=</b> all aligned. For example, here is the default formatting for some code with several of these operators:</p>
+
+<pre><code>            $str .= SPACE x $total_pad_count;
+            $str_len += $total_pad_count;
+            $total_pad_count = 0;
+            $str .= $rfields-&gt;[$j];
+            $str_len += $rfield_lengths-&gt;[$j];</code></pre>
+
+<p>And here is the same code formatted with <b>-vme</b>:</p>
+
+<pre><code>            # perltidy -vme
+            $str             .= SPACE x $total_pad_count;
+            $str_len         += $total_pad_count;
+            $total_pad_count  = 0;
+            $str             .= $rfields-&gt;[$j];
+            $str_len         += $rfield_lengths-&gt;[$j];</code></pre>
+
+<p>This option was added for issue git #135 and can improve readability, but it is off by default to avoid changing existing formatting.</p>
 
 </dd>
 </dl>
@@ -4292,7 +4483,7 @@
 
 <p><b>--no-timestamp</b> or <b>-nts</b> will eliminate any time stamps in output files to prevent differences in dates from causing test installation scripts to fail. There are just a couple of places where timestamps normally occur. One is in the headers of html files, and another is when the <b>-cscw</b> option is selected. The default is to allow timestamps (<b>--timestamp</b> or <b>-ts</b>).</p>
 
-<p><b>--file-size-order</b> or <b>-fso</b> will cause files to be processed in order of increasing size, when multiple files are being processed. This is useful during program development, when large numbers of files with varying sizes are processed, because it can reduce virtual memory usage.</p>
+<p><b>--file-size-order</b> or <b>-fso</b> will cause files to be processed in order of increasing size, when multiple files are being processed. This is particularly useful during program development, when large numbers of files with varying sizes are processed, because it can reduce virtual memory usage. This is the default and can be deactivated with <b>-nfso</b>.</p>
 
 <p><b>--maximum-file-size-mb=n</b> or <b>-maxfs=n</b> specifies the maximum file size in megabytes that perltidy will attempt to format. This parameter is provided to avoid causing system problems by accidentally attempting to format an extremely large data file. Most perl scripts are less than about 2 MB in size. The integer <b>n</b> has a default value of 10, so perltidy will skip formatting files which have a size greater than 10 MB. The command to increase the limit to 20 MB for example would be</p>
 
@@ -4345,7 +4536,19 @@
 
 <h2 id="Analyzing-Code">Analyzing Code</h2>
 
-<p>Perltidy reports any obvious issues that are found during formatting, such as unbalanced braces. But several parameters are available for making certain additional checks for issues which might be of interest to a programmer.</p>
+<p>Perltidy reports any obvious issues that are found during formatting, such as unbalanced braces. But several parameters are available for making certain additional checks for issues which might be of interest to a programmer. These parameters fall into two categories as indicated by their prefix, <b>--dump-</b> or <b>--warn-</b>:</p>
+
+<ul>
+
+<li><p>The <b>--dump-</b> parameters read a file, write information to the standard output, and then exit without doing any formatting.</p>
+
+</li>
+<li><p>The <b>--warn-</b> parameters, on the other hand, cause perltidy to function normally but issue warnings to the error output when certain conditions are encountered.</p>
+
+</li>
+</ul>
+
+<p>Some of these have associated control parameters.</p>
 
 <dl>
 
@@ -4371,7 +4574,7 @@
 
 <p>This feature was developed to help identify complex sections of code as an aid in refactoring. The McCabe complexity measure follows the definition used by Perl::Critic. By default the table contains these values for subroutines, but the user may request them for any or all blocks of code or packages. For blocks which are loops nested within loops, a postfix &#39;+&#39; to the <code>type</code> is added to indicate possible code complexity. Although the table does not otherwise indicate which blocks are nested in other blocks, this can be determined by computing and comparing the block ending line numbers.</p>
 
-<p>For subroutines, the number of call arguments (args) is listed in parentheses in the <code>type</code> column. For example, <code>sub(9)</code> indicates a sub with 9 args. Subroutines whose arg count cannot easily be determined are indicated as <code>sub(*)</code>. The count does not include a leading variable named <b>$self</b> or <b>$class</b>.</p>
+<p>For subroutines, the number of call arguments (args) is listed in parentheses in the <code>type</code> column. For example, <code>sub(9)</code> indicates a sub with 9 args. Subroutines whose arg count cannot easily be determined are indicated as <code>sub(*)</code>. The count includes any leading object passed in a method call (such as <b>$self</b>).</p>
 
 <p>By default the table lists subroutines with more than 20 <code>code_lines</code>, but this can be changed with the following two parameters:</p>
 
@@ -4452,7 +4655,7 @@
 <dt id="r:-reused-variable-name"><b>r: reused variable name</b></dt>
 <dd>
 
-<p>These are variables which are re-declared in the scope of a variable with the identical name. This can be confusing (perhaps not when the code is first written, but possibly later during maintenance work). This issue can be avoided by renaming one of the conflicting variables. Note that this is similar to the <b>Perl::Critic</b> policy <b>Variables::ProhibitReusedNames</b>.</p>
+<p>These are variables which are re-declared in the scope of a variable with the identical name. This can be confusing, perhaps not when the code is first written, but possibly later during maintenance work. For example, this can make it difficult to locate the correct variable with an editor when changes are being made. This issue can be avoided by renaming one of the conflicting variables. Note that this is similar to the <b>Perl::Critic</b> policy <b>Variables::ProhibitReusedNames</b>.</p>
 
 </dd>
 <dt id="s:-sigil-change-but-reused-bareword"><b>s: sigil change but reused bareword</b></dt>
@@ -4480,13 +4683,15 @@
 <dt id="u:-unused-variables"><b>u: unused variables</b></dt>
 <dd>
 
-<p>These are variables which are declared with a <code>my</code> and not referenced again within their scope. Calling them <b>unused</b> is convenient but not really accurate; this is a &quot;gray area&quot; for a program. There are many reasons for having such variables. For example, they might occur in a list of values provided by another routine or data structure, and therefore must be listed, even though they might not be referenced again. Or they might be defined for possible future program development, clarity or debugging. <b>But</b> sometimes they can occur due to being orphaned by a coding change, due to a misspelling, or by having an unintentional preceding <code>my</code>. So it is worth reviewing them, especially for new code. Here is an example of an unused variable in a script located with this method:</p>
+<p>These are variables which are declared with a <code>my</code> and not referenced again within their scope. Calling them <b>unused</b> is convenient but not really accurate; this is a &quot;gray area&quot; for a program. There are some good reasons for having such variables. For example, they might occur in a list of values provided by another routine or data structure, and therefore must be listed, even though they might not be referenced again. Having such variables can make them immediately available for future development and debugging, and can be beneficial for program clarity.</p>
+
+<p><b>But</b> sometimes they can occur due to being orphaned by a coding change, due to a misspelling, or by having an unintentional preceding <code>my</code>. So it is worth reviewing them, especially for new code. Here is an example of an unused variable in a script located with this method:</p>
 
 <pre><code>   BEGIN { my $string = &quot;&quot; }
    ...
    $string .= &quot;ok&quot;;</code></pre>
 
-<p>This looks nice at first glance, but the scope of the <code>my</code> declaration is limited to the surrounding braces, so it is not the same variable as the other <code>$string</code> and must therefore be reported as unused. This problem would have also been caught by perl if the author had used <code>strict</code>.</p>
+<p>This looks nice at first glance, but the scope of the <code>my</code> declaration is limited to the surrounding braces, so it is not the same variable as the other <code>$string</code> and must therefore be reported as unused. This particular problem would have also been caught by perl if the author had used <code>strict</code>.</p>
 
 </dd>
 </dl>
@@ -4569,6 +4774,116 @@
 <pre><code>    open( IN, &quot;&lt;&quot;, $infile ) || die(&quot;cannot open $infile:$!\n&quot;);</code></pre>
 
 <p>Otherwise, the <code>||</code> will operate on <code>$infile</code> rather than the return value of <code>open</code>.</p>
+
+</dd>
+<dt id="Use---dump-mismatched-args-to-find-function-calls-with-args-not-matching-sub-declarations"><b>Use --dump-mismatched-args to find function calls with args not matching sub declarations</b></dt>
+<dd>
+
+<p>The parameter <b>--dump-mismatched-args</b>, or <b>-dma</b>, causes perltidy to examine the definitions of subroutines in a file, and calls to those subs, and report certain differences. Like all <b>--dump</b> commands, it writes its report to standard output and exits immediately. For example</p>
+
+<pre><code>    perltidy -dma somefile.pl &gt;results.txt</code></pre>
+
+<p>Four types of issues are reported, types <b>a</b>, <b>o</b>, <b>u</b>, and <b>i</b>:</p>
+
+<dl>
+
+<dt id="a:-calls-made-to-a-sub-both-with-and-without-the-arrow-operator"><b>a:</b> calls made to a sub both with and without the <b>arrow</b> operator</dt>
+<dd>
+
+<p>For example the following two lines would be reported as a mismatch:</p>
+
+<pre><code>     Fault();</code></pre>
+
+<p>and</p>
+
+<pre><code>     $self-&gt;Fault();</code></pre>
+
+<p>This may or may not be an error, but it is worth checking. It might become an error in the future if sub <code>Fault</code> starts to access <code>$self</code>.</p>
+
+</dd>
+<dt id="o:-overcount-:-the-number-of-call-args-exceeds-the-expected-number"><b>o:</b> (<b>overcount</b>): the number of call args exceeds the expected number.</dt>
+<dd>
+
+</dd>
+<dt id="u:-undercount-:-the-number-of-call-args-is-less-than-the-expected-number"><b>u:</b> (<b>undercount</b>): the number of call args is less than the expected number.</dt>
+<dd>
+
+<p>For example</p>
+
+<pre><code>     sub gnab_gib {
+         my $self=shift;
+         my ($v1,$v2)=@_;
+         ...
+     }
+
+     $self-&gt;gnab_gib(42);</code></pre>
+
+<p>In this case, the sub is expecting a total of three args (<code>$self</code>, <code>$v1</code>, and <code>$v2</code>) but only receives two (<code>$self</code> and <code>42</code>), so an undercount is reported. This is not necessarily an error because the sub may allow for this possibility, but it is worth checking. The simple static processing done by perltidy cannot determine which sub args are optional.</p>
+
+</dd>
+<dt id="i:-indeterminate:-a-specific-number-of-expected-args-for-a-sub-could-not-be-determined-but-it-is-called-with-a-specific-number.-This-issue-is-reported-for-the---dump--option-but-not-the---warn--option"><b>i:</b> <b>indeterminate:</b> a specific number of expected args for a sub could not be determined, but it is called with a specific number. This issue is reported for the <b>--dump-</b> option but not the <b>--warn-</b> option.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<p><b>Notes and Limitations:</b></p>
+
+<ul>
+
+<li><p>This option works best for subs which unpack call args in an orderly manner near the beginning of the sub from <code>@_</code> and/or with <code>shift</code> operations. If individual elements of the @_ array are directly accessed then the number of sub args is considered indeterminate.</p>
+
+</li>
+<li><p>Sub calls made without parentheses around the args are not checked.</p>
+
+</li>
+<li><p>Anonymous subs and lexical subs (introduced with <code>my</code>) are not checked.</p>
+
+</li>
+<li><p>Only calls which appear to be to subs defined within the file being processed are checked. But note that a file may contain multiple packages.</p>
+
+</li>
+</ul>
+
+</dd>
+<dt id="Use---warn-mismatched-args-to-produce-a-warning-for-function-calls-with-args-not-matching-sub-declarations"><b>Use --warn-mismatched-args to produce a warning for function calls with args not matching sub declarations</b>.</dt>
+<dd>
+
+<p>This is similar to the <b>-dump</b> parameter described above except that any mismatches are reported in the error file and otherwise formatting continues normally. Thus</p>
+
+<pre><code>    perltidy -wma somefile.pl</code></pre>
+
+<p>Several companion controls are available to avoid unwanted error messages:</p>
+
+<ul>
+
+<li><p><b>--warn-mismatched-arg-types=s</b>, or <b>-wmat=s</b>, can be used to select specific tests, type <b>a</b> (arrow test) or <b>o</b> (overcounts) or <b>u</b> (undercounts). All checks may be requested with <b>-wmat=&#39;*&#39;</b> or <b>-wmat=1</b>. This is the default.</p>
+
+<p>To restrict the check to a specific warning type, set the string equal to the letter of that warning, any <b>a</b>, <b>o</b>, or <b>u</b>. For example</p>
+
+<pre><code>   perltidy -wmat=&#39;a o&#39; somefile.pl</code></pre>
+
+<p>will format <i>somefile.pl</i> and report any arrow-type mismatches and overcount mismatches, but will skip undercount mismatches.</p>
+
+</li>
+<li><p><b>--warn-mismatched-arg-exclusion-list</b>, or <b>-wmaxl=string</b>, can be given to skip the warning checks for a list of subroutine names, entered as a quoted string of space- or comma-separated names. All subs with those names will be skipped, regardless of package.</p>
+
+</li>
+<li><p><b>--warn-mismatched-arg-undercount-cutoff=n</b>, or <b>-wmauc=n</b>, can be used to avoid <b>undercount</b> warnings when the expected number of args is less than <b>n</b>. Please note that this number <b>n</b> is the number of args from the point of view of the sub definition, so an object like <code>$self</code> passed with an arrow operator counts as one arg.</p>
+
+<p>The default value is <b>n=4</b>. This has been found to allow most programs to pass without warnings, but it should be reduced if possible for better error checking. The minimum possible value of <b>n</b> needed to avoid triggering an error for a program can be determined by running with <b>-wma -wmauc=0</b>. If there are undercount errors, a note at the bottom of the error output indicates the value of <b>n</b> required to avoid reporting them.</p>
+
+</li>
+<li><p><b>--warn-mismatched-arg-overcount-cutoff=n</b>, or <b>-wmaoc=n</b>, can be used to avoid <b>overcount</b> warnings when the expected number of args is less than <b>n</b>. The default value is <b>n=1</b>. This avoids warning messages for subroutines which are dummy placeholders for possible expansion.</p>
+
+</li>
+</ul>
+
+<p>To illustrate these controls,</p>
+
+<pre><code>   perltidy -wma -wmat=&#39;o u&#39; -wmaxl=&#39;new old&#39; -wmauc=2 somefile.pl</code></pre>
+
+<p>means format <i>somefile.pl</i> as usual and check for mismatched overcounts and undercounts but not arrows. Skip checking for any sub named <code>new</code> or <code>old</code>, and only warn of undercounts for subs expecting more than 2 args.</p>
 
 </dd>
 </dl>
@@ -4788,25 +5103,26 @@
 
 <p>The following list shows all short parameter names which allow a prefix &#39;n&#39; to produce the negated form:</p>
 
-<pre><code> D      ame    anl    asbl   asc    ast    asu    atc    atnl   aws
- b      baa    baao   bar    bbao   bbb    bbc    bbs    bl     bli
- boa    boc    bok    bol    bom    bos    bot    cblx   ce     conv
- cpb    cs     csc    cscb   cscw   dac    dbc    dbs    dcbl   dcsc
- ddf    dior   dln    dmcp   dnl    dop    dp     dpro   drc    dsc
- dsm    dsn    dtc    dtt    duv    dwic   dwls   dwrs   dws    eos
- f      fpva   frm    fs     fso    gcs    hbc    hbcm   hbco   hbh
- hbhh   hbi    hbj    hbk    hbm    hbn    hbp    hbpd   hbpu   hbq
- hbs    hbsc   hbv    hbw    hent   hic    hicm   hico   hih    hihh
- hii    hij    hik    him    hin    hip    hipd   hipu   hiq    his
- hisc   hiv    hiw    hsc    html   ibc    icb    icp    iob    ipc
- isbc   iscl   kgb    kgbd   kgbi   kis    lal    log    lop    lp
- lsl    mem    nib    ohbr   okw    ola    olc    oll    olq    opr
- opt    osbc   osbr   otr    ple    pod    pvl    q      sac    sbc
- sbl    scbb   schb   scp    scsb   sct    se     sfp    sfs    skp
- sob    sobb   sohb   sop    sosb   sot    ssc    st     sts    t
- tac    tbc    toc    tp     tqw    trp    ts     tsc    tso    vbc
- vc     viu    vmll   vsc    vsn    w      wfc    wme    wn     x
- xbt    xci    xlp    xs</code></pre>
+<pre><code> D      aia    ame    anl    asbl   asc    ast    asu    atc    atnl
+ aws    b      baa    baao   bar    bbao   bbb    bbc    bbs    bl
+ bli    boa    boc    bok    bol    bom    bos    bot    cblx   ce
+ conv   cpb    cs     csc    cscb   cscw   dac    dbc    dbs    dcbl
+ dcsc   ddf    dia    dior   dln    dma    dmcp   dnl    dop    dp
+ dpro   drc    dsc    dsm    dsn    dtc    dtt    duv    dwic   dwls
+ dwrs   dws    eos    f      fpva   frm    fs     fso    gcs    hbc
+ hbcm   hbco   hbh    hbhh   hbi    hbj    hbk    hbm    hbn    hbp
+ hbpd   hbpu   hbq    hbs    hbsc   hbv    hbw    hent   hic    hicm
+ hico   hih    hihh   hii    hij    hik    him    hin    hip    hipd
+ hipu   hiq    his    hisc   hiv    hiw    hsc    html   ibc    icb
+ icp    iob    ipc    isbc   iscl   kgb    kgbd   kgbi   kis    lal
+ log    lop    lp     lsl    mci    mem    nib    ohbr   okw    ola
+ olc    oll    olq    opr    opt    osbc   osbr   otr    ple    pod
+ pvl    q      sac    sbc    sbl    scbb   schb   scp    scsb   sct
+ se     sfp    sfs    skp    sob    sobb   sohb   sop    sosb   sot
+ ssc    st     sts    t      tac    tbc    toc    tp     tqw    trp
+ ts     tsc    tso    vbc    vc     viu    vmll   vsc    vsn    vwe
+ w      wfc    wia    wma    wme    wn     x      xbt    xci    xlp
+ xs</code></pre>
 
 <p>Equivalently, the prefix &#39;no&#39; or &#39;no-&#39; on the corresponding long names may be used.</p>
 
@@ -4884,7 +5200,7 @@
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>This man page documents perltidy version 20240202</p>
+<p>This man page documents perltidy version 20240511</p>
 
 <h1 id="BUG-REPORTS">BUG REPORTS</h1>
 

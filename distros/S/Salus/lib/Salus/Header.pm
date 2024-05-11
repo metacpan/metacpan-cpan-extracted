@@ -31,5 +31,4 @@ property label => (
 	type => Str
 );
 
-
 1;

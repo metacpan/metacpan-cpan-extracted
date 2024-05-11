@@ -1,3 +1,21 @@
+0.07 2024-05-10T12:37:10+02:00
+ - Regen output image of plack app example without my browser extensions.
+
+0.06 2024-05-10T12:22:18+02:00
+ - Add check for 'width' parameter if it's CSS unit.
+ - Add check for text translations. Move error from process() to
+   constructor.
+ - Add checking of language.
+ - Add description to doc.
+ - Add links to doc.
+ - Fix doc typos.
+ - Fix output in example.
+ - Improve test of rich constructor.
+ - Regen output image of plack app example.
+ - Remove Tags::Output::Raw and CSS::Struct::Output::Raw from tests.
+ - Sort methods in SYNOPSIS section in doc.
+ - Use Test::MockObject in tests for bad instances.
+
 0.05 2024-03-08T09:38:04+01:00
  - Add tests for process_css().
  - Fix minimal dependency for Tags::HTML to 0.08 (thanks Andreas J. König,

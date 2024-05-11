@@ -31,6 +31,6 @@ requires:
 resources:
   bugtracker: https://github.com/mballarin/perl-linux-landlock/issues
   repository: https://github.com/mballarin/perl-linux-landlock.git
-version: '0.3'
+version: '0.4'
 x_osname: linux
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

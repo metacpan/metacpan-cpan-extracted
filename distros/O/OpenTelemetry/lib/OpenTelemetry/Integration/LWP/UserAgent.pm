@@ -1,7 +1,7 @@
 package OpenTelemetry::Integration::LWP::UserAgent;
 # ABSTRACT: OpenTelemetry integration for LWP::UserAgent
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 use strict;
 use warnings;
@@ -12,7 +12,7 @@ use Class::Method::Modifiers 'install_modifier';
 use Feature::Compat::Try;
 use Syntax::Keyword::Dynamically;
 use List::Util 'none';
-use OpenTelemetry::Constants qw( SPAN_KIND_CLIENT SPAN_STATUS_ERROR SPAN_STATUS_OK );
+use OpenTelemetry::Constants qw( SPAN_KIND_CLIENT SPAN_STATUS_ERROR );
 use OpenTelemetry::Context;
 use OpenTelemetry::Trace;
 use OpenTelemetry;
@@ -83,9 +83,6 @@ sub install ( $class, %config ) {
                 'url.full'                 => "$uri", # redacted
                 'user_agent.original'      => $self->agent,
 
-                # This does not include auto-generated headers
-                # Capturing those would require to hook into the
-                # handle's write_request method
                 get_headers(
                     $self->default_headers,
                     \@wanted_request_headers,
@@ -98,10 +95,6 @@ sub install ( $class, %config ) {
                     'http.request.header'
                 ),
 
-                # Request body can be generated with a data_callback
-                # parameter, in which case we don't set this attribute
-                # Setting it would likely involve us hooking into the
-                # handle's write_body method
                 $length ? ( 'http.request.body.size' => $length ) : (),
             },
         );
@@ -128,12 +121,8 @@ sub install ( $class, %config ) {
             $span->set_attribute( 'http.response.body.size' => $length )
                 if defined $length;
 
-            if ( $response->is_success ) {
-                $span->set_status( SPAN_STATUS_OK );
-            }
-            else {
-                $span->set_status( SPAN_STATUS_ERROR, $response->code );
-            }
+            $span->set_status( SPAN_STATUS_ERROR, $response->code )
+                unless $response->is_success;
 
             $span->set_attribute(
                 get_headers(

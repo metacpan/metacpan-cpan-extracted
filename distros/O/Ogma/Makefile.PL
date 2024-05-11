@@ -17,7 +17,9 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-	'Rope' => 0.26
+	'Rope' => 0.26,
+	'JSON' => 0,
+	'Coerce::Types::Standard' => 0.000008,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Ogma-*' },

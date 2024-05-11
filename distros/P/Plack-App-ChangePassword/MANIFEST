@@ -23,5 +23,6 @@ SIGNATURE
 t/Plack-App-ChangePassword/01-use.t
 t/Plack-App-ChangePassword/02-version.t
 t/Plack-App-ChangePassword/03-general.t
+t/Plack-App-ChangePassword/04-prepare_app_errors.t
 xt/Plack-App-ChangePassword/01-pod_coverage.t
 xt/Plack-App-ChangePassword/02-pod.t

@@ -10,6 +10,7 @@ build_requires:
   Tags::Output::Indent: 0
   Test::More: 0
   Test::NoWarnings: 0
+  Unicode::UTF8: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
@@ -32,7 +33,7 @@ requires:
   Plack::Response: 0
   Plack::Session: 0
   Plack::Util::Accessor: 0
-  Tags::HTML::ChangePassword: 0.02
+  Tags::HTML::ChangePassword: 0.06
   Tags::HTML::Container: 0
   perl: 5.8.0
 resources:
@@ -40,4 +41,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Plack-App-ChangePassword
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-App-ChangePassword
-version: '0.03'
+version: '0.04'

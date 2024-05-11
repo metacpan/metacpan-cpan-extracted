@@ -91960,3 +91960,15 @@ L/LN/LNATION/Salus-0.01.tar.gz
 C/CO/COLINK/SVG-Estimate-1.02.tar.gz
 S/SK/SKIM/Tags-HTML-Login-Access-0.12.tar.gz
 S/SK/SKIM/Tags-HTML-Login-Request-0.02.tar.gz
+P/PE/PERLANCAR/Bencher-ScenarioBundle-Algorithm-Diff-0.003.tar.gz
+M/MB/MBALLARIN/Linux-Landlock-0.4.tar.gz
+L/LN/LNATION/Ogma-0.03.tar.gz
+J/JJ/JJATRIA/OpenTelemetry-0.021.tar.gz
+S/SH/SHANCOCK/Perl-Tidy-20240511.tar.gz
+S/SK/SKIM/Plack-App-ChangePassword-0.04.tar.gz
+M/MI/MIYAGAWA/Plack-Middleware-Deflater-0.13.tar.gz
+P/PL/PLICEASE/Plack-Middleware-Zstandard-0.02.tar.gz
+L/LN/LNATION/Rope-0.33.tar.gz
+L/LN/LNATION/Salus-0.02.tar.gz
+S/SK/SKIM/Tags-HTML-ChangePassword-0.07.tar.gz
+S/SK/SKIM/Tags-HTML-Navigation-Grid-0.02.tar.gz

@@ -19,7 +19,9 @@ no_index:
     - t
     - inc
 requires:
+  Coerce::Types::Standard: '0.000008'
+  JSON: '0'
   Rope: '0.26'
   perl: '5.006'
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

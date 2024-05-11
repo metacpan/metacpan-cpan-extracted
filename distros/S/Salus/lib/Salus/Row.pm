@@ -22,4 +22,19 @@ function as_array => sub {
 	} @{$self->columns}];
 };
 
+function get_col => sub {
+	my ($self, $col) = @_;
+	return $self->columns->[$col];
+};
+
+function set_col => sub {
+	my ($self, $col, $value) = @_;
+	$self->get_col($col)->value = $value;
+};
+
+function delete_col => sub {
+	my ($self, $col) = @_;
+	$self->get_col($col)->value = '';
+};
+
 1;

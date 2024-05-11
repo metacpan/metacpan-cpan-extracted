@@ -21,7 +21,7 @@ See L<https://docs.kernel.org/userspace-api/landlock.html> for more information 
     my $ruleset_fd = ll_create_ruleset();
     opendir my $dir, '/tmp';
     # allow read and write access to files in /tmp, truncate is typically also needed, depending on the open call
-    ll_add_rule($ruleset_fd,
+    ll_add_path_beneath_rule($ruleset_fd,
         $LANDLOCK_RULE{PATH_BENEATH},
         $LANDLOCK_ACCESS_FS{READ_FILE} | $LANDLOCK_ACCESS_FS{WRITE} | $LANDLOCK_ACCESS_FS{TRUNCATE},
         $dir,
@@ -69,6 +69,8 @@ accesses, C<$parent> is the filesystem object the rule applies to.
 It can be either a Perl file handle or a bare file descriptor and point to either a directory
 or a file.
 
+If access rights are not supported by the running kernel, they are silently ignored.
+
 =item ll_add_net_port_rule($ruleset_fd, $allowed_access, $port)
 
 Add a rule of type C<NET_PORT> to the ruleset. C<$allowed_access> is a bitmask of allowed
@@ -76,15 +78,17 @@ accesses, C<$port> is the port the rule applies to.
 
 This requires an ABI version of at least 4.
 
+If access rights are not supported by the running kernel, they are silently ignored.
+
 =item ll_all_fs_access_supported()
 
-Returns a list of all file system access rights that are known to this module and supported
-by the running kernel. The list is unsorted.
+Returns a bitmask of all file system access rights that are known to this module and supported
+by the running kernel.
 
 =item ll_all_net_access_supported()
 
-Returns a list of all network access rights that are known to this module and supported
-by the running kernel. The list is empty if the ABI version is less than 4.
+Returns a bitmask of all network access rights that are known to this module and supported
+by the running kernel.
 
 =item ll_restrict_self($ruleset_fd)
 
@@ -164,11 +168,11 @@ ensure that the rules are applied in each thread.
 use strict;
 use warnings;
 use Exporter 'import';
-use List::Util qw(reduce);
-use Config;
-use POSIX qw();
+use List::Util                qw(reduce);
+use POSIX                     qw();
+use Linux::Landlock::Syscalls qw(NR);
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 # adapted from linux/landlock.ph, architecture independent consts
 my $LANDLOCK_CREATE_RULESET_VERSION = (1 << 0);
 our %LANDLOCK_ACCESS_FS = (
@@ -226,7 +230,6 @@ my %MAX_FS_SUPPORTED = (
     2  => $LANDLOCK_ACCESS_FS{REFER},
     3  => $LANDLOCK_ACCESS_FS{TRUNCATE},
 );
-
 my %MAX_NET_SUPPORTED = (
     -1 => 0,
     1  => 0,
@@ -235,52 +238,30 @@ my %MAX_NET_SUPPORTED = (
     4  => $LANDLOCK_ACCESS_NET{CONNECT_TCP},
 );
 
-my %SYS;
-my $abi_version;
-
-sub _nr {
-    my ($name) = @_;
-
-    if (!%SYS && (eval { require 'syscall.ph'; 1 } || eval { require 'sys/syscall.ph'; 1 })) {
-        %SYS = (
-            landlock_create_ruleset => &SYS_landlock_create_ruleset,
-            landlock_add_rule       => &SYS_landlock_add_rule,
-            landlock_restrict_self  => &SYS_landlock_restrict_self,
-            prctl                   => &SYS_prctl,
-        );
-    } elsif (!%SYS) {
-        my $arch = $Config{archname};
-        if ($arch =~ /x86_64|arm/) {
-            %SYS = (
-                landlock_create_ruleset => 444,
-                landlock_add_rule       => 445,
-                landlock_restrict_self  => 446,
-                prctl                   => $arch =~ /arm/ ? 172 : 157,
-            );
-        } else {
-            die <<"MSG";
-Could not load header files and got no hardcoded syscall numbers for '$arch'.
-Either generate headers via 'h2ph' or add the syscall numbers for your architecture to the module.
-MSG
-        }
-    }
-    return $SYS{$name};
-}
+my ($abi_version, $fs_access_supported, $net_port_supported);
 
 sub ll_all_fs_access_supported {
-    my $version = ll_get_abi_version();
-    $version = 3 if $version > 3;
-    return grep { $_ <= $MAX_FS_SUPPORTED{$version} } values %LANDLOCK_ACCESS_FS;
+    if (!defined $fs_access_supported) {
+        my $version = ll_get_abi_version();
+        $version             = 3 if $version > 3;
+        $fs_access_supported = reduce { $a | $b } 0,
+          grep { $_ <= $MAX_FS_SUPPORTED{$version} } values %LANDLOCK_ACCESS_FS;
+    }
+    return $fs_access_supported;
 }
 
 sub ll_all_net_access_supported {
-    my $version = ll_get_abi_version();
-    $version = 4 if $version > 4;
-    return grep { $_ <= $MAX_NET_SUPPORTED{$version} } values %LANDLOCK_ACCESS_NET;
+    if (!defined $net_port_supported) {
+        my $version = ll_get_abi_version();
+        $version = 4 if $version > 4;
+        $net_port_supported =
+          reduce { $a | $b } 0, grep { $_ <= $MAX_NET_SUPPORTED{$version} } values %LANDLOCK_ACCESS_NET;
+    }
+    return $net_port_supported;
 }
 
 sub ll_get_abi_version {
-    $abi_version = syscall(_nr('landlock_create_ruleset'), undef, 0, $LANDLOCK_CREATE_RULESET_VERSION);
+    $abi_version = syscall(NR('landlock_create_ruleset'), undef, 0, $LANDLOCK_CREATE_RULESET_VERSION);
     return $abi_version;
 }
 
@@ -305,7 +286,7 @@ sub ll_create_ruleset {
     if (ll_get_abi_version >= 4) {
         $allowed .= pack('Q', reduce { $a | $b } 0, @$net_actions);
     }
-    my $fd = syscall(_nr('landlock_create_ruleset'), $allowed, length $allowed, 0);
+    my $fd = syscall(NR('landlock_create_ruleset'), $allowed, length $allowed, 0);
     if ($fd >= 0) {
         return $fd;
     } else {
@@ -316,28 +297,34 @@ sub ll_create_ruleset {
 sub ll_add_path_beneath_rule {
     my ($ruleset_fd, $allowed_access, $parent) = @_;
 
-    my $fd = ref $parent ? fileno $parent : $parent;
-    my $result =
-      syscall(_nr('landlock_add_rule'), $ruleset_fd, $LANDLOCK_RULE{PATH_BENEATH}, pack('Ql', $allowed_access, $fd), 0);
+    my $fd     = ref $parent ? fileno $parent : $parent;
+    my $result = syscall(
+        NR('landlock_add_rule'), $ruleset_fd,
+        $LANDLOCK_RULE{PATH_BENEATH},
+        pack('Ql', $allowed_access & ll_all_fs_access_supported, $fd), 0
+    );
     return ($result == 0) ? 1 : undef;
 }
 
 sub ll_add_net_port_rule {
     my ($ruleset_fd, $allowed_access, $port) = @_;
 
-    my $result =
-      syscall(_nr('landlock_add_rule'), $ruleset_fd, $LANDLOCK_RULE{NET_PORT}, pack('QQ', $allowed_access, $port), 0);
+    my $result = syscall(
+        NR('landlock_add_rule'), $ruleset_fd,
+        $LANDLOCK_RULE{NET_PORT},
+        pack('QQ', $allowed_access & ll_all_net_access_supported, $port), 0
+    );
     return ($result == 0) ? 1 : undef;
 }
 
 sub set_no_new_privs {
     my $PR_SET_NO_NEW_PRIVS = 38;
-    return (syscall(_nr('prctl'), $PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) == 0) ? 1 : undef;
+    return (syscall(NR('prctl'), $PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) == 0) ? 1 : undef;
 }
 
 sub ll_restrict_self {
     my ($ruleset_fd) = @_;
-    return (syscall(_nr('landlock_restrict_self'), $ruleset_fd, 0) == 0) ? 1 : undef;
+    return (syscall(NR('landlock_restrict_self'), $ruleset_fd, 0) == 0) ? 1 : undef;
 }
 
 1;

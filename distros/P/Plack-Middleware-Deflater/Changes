@@ -1,5 +1,8 @@
 Revision history for Perl extension Plack::Middleware::Deflater
 
+0.13  2024-05-10 14:50:50 PDT
+        - Do not clobber existing Content-Encoding from the inner app #17 (plicease)
+
 0.12  Thu Sep 12 11:31:07 JST 2013
         - add plack.skip-deflater flag for skip all Deflater features
 

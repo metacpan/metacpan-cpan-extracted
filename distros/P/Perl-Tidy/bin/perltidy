@@ -803,6 +803,30 @@ improve indentation of some multi-line qw lists as shown below.
                 )
               )
 
+=item B<-mci>, B<--minimize-continuation-indentation>
+
+This flag allows perltidy to remove continuation indentation in some
+special cases where it is not really unnecessary. For a simple example,
+the default formatting for the following snippet is:
+
+        # perltidy -nmci
+        $self->blurt( "Error: No INPUT definition for type '$type', typekind '"
+              . $type->xstype
+              . "' found" );
+
+The second and third lines are one level deep in a container, and are also
+statement continuations, so they get indented by the sum of the B<-i>
+value and the B<-ci> value.  If this flag is set, the indentation is reduced by
+B<-ci> spaces, giving
+
+        # perltidy -mci
+        $self->blurt( "Error: No INPUT definition for type '$type', typekind '"
+            . $type->xstype
+            . "' found" );
+
+This flag is currently off by default, but it could become the default in a
+future version.
+
 =item B<-sil=n> B<--starting-indentation-level=n>
 
 By default, perltidy examines the input file and tries to determine the
@@ -3697,7 +3721,7 @@ Here is an example.
 
 =item B<-drc>,  B<--delete-repeated-commas>
 
-Repeated commas in a list are undesirable and can be removed with this flag.
+This option causes repeated commas to be removed.
 For example, given this list with a repeated comma
 
       ignoreSpec( $file, "file",, \%spec, \%Rspec );
@@ -3707,8 +3731,36 @@ we can remove it with -drc
       # perltidy -drc:
       ignoreSpec( $file, "file", \%spec, \%Rspec );
 
-Since the default is not to add or delete commas, this feature is off by default and must be requested.
+This parameter also deletes repeated fat commas, '=>'. The complete list of
+actions taken when this flag is set are as follows:
 
+=over 4
+
+=item *
+
+Repeated commas like ',,' are removed with a warning.
+
+=item *
+Repeated fat commas like '=> =>' are removed with a warning.
+
+=item *
+
+The combination '=>,' produces a warning but is not changed (it is
+likely an error but only its author would know how to fix it).
+
+=item *
+
+The remaining combination ',=>' (sometimes called a 'winking fat comma') is
+ignored by this parameter.
+
+=item *
+
+These warnings are only output if the B<--warning-output>, or B<-w>, flag is
+set.
+
+=back
+
+This option is on by default.  Use B<-ndrc> to turn it off.
 
 =item B<--want-trailing-commas=s> or B<-wtc=s>, B<--add-trailing-commas> or B<-atc>, and B<--delete-trailing-commas> or B<-dtc>
 
@@ -3901,6 +3953,155 @@ commas are removed.
 
 =back
 
+=head2 Adding and Deleting Interbracket Arrows
+
+In the following expression, the arrow operator '->' between the closing and
+opening brackets of hash keys and array indexes are optional:
+
+   return $self->{'commandline'}->{'arg_list'}->[0]->[0]->{'hostgroups'};
+
+These will be called B<interbracket arrows> here, for lack of a better term.
+Perltidy will not change them by default, but they can be added or removed with
+the following parameters.
+
+=over 4
+
+=item B<-dia>,  B<--delete-interbracket-arrows>
+
+This parameter deletes interbracket arrows. Applied to the above example we have
+
+    # perltidy -dia
+    return $self->{'commandline'}{'arg_list'}[0][0]{'hostgroups'};
+
+By default this applies to all interbracket arrows, but selective deletion is possible
+with controls described below.
+
+=item B<-aia>,  B<--add-interbracket-arrows>
+
+This parameter adds interbracket arrows. Applied to the line of code above, we
+get back the original line.
+
+    # perltidy -aia
+    return $self->{'commandline'}->{'arg_list'}->[0]->[0]->{'hostgroups'};
+
+Selective changes can be made with controls described below.
+
+=item B<-ias=s>,  B<--interbracket-arrow-style=s>
+
+By default the B<-add-> and B<-delete-> parameters apply to all interbracket
+arrows.
+
+An optional style can be specified with this parameter string B<s>. In that
+case the parameters B<--add-interbracket-arrows> and
+B<--delete-interbracket-arrows> only apply where they would bring the
+formatting into agreement with the specified style. They may both be used in a
+single run if a mixed style is specified since there is no conflict.
+
+The style string B<s> gives a graphical description of the desired style. It
+lists up to four possible pairs of bracket types with an optional
+arrow between them.  For example:
+
+   -ias='][   }->{'
+
+This means no arrows are wanted between '][' but arrows should be between '}{'.
+And it means that the unlisted pairs ']{' and '}[' should remain unchanged,
+either with or without arrows.
+
+In this particular example, if the parameter B<--delete-interbracket-arrows> is
+used, then only arrows like ']->[' will be deleted, since they
+are the only ones which disagree with the style.
+
+And likewise, if B<--add-interbracket-arrows> is used, then arrows will
+only be inserted between brackets like '}{' to bring the formatting into
+conformity with the style in this example.
+
+Spaces in the string B<s> are optional.  They are ignored when the
+expression is parsed.
+
+The style corresponding to all possible arrows is
+
+      -ias=']->[ ]->{ }->[ }->{'
+
+For convenience, this may also be requested with B<-ias=1> or B<-ias='*'>.
+
+The style corresponding to no interbracket arrows is
+
+      -ias=']  [ ]  { }  [ }  {'
+
+which may also be requested with B<-ias=0>.
+
+=item B<-wia>,  B<--warn-interbracket-arrows>
+
+If this parameter is set, then a message is written to the error file in the
+following cases:
+
+=over 4
+
+=item *
+
+If an arrow is added or deleted by an add or delete command.
+
+=item *
+
+If a style is defined and an arrow would have been added or deleted if requested.
+So for example, the command
+
+   perltidy -wia -ias=']['
+
+will show where a file has arrows like ]->[' since they do not match the style,
+but no changes will be made because the delete command B<-dia> has not been
+given. And
+
+   perltidy -wia -ias=0
+
+will warn if any arrows exist, since the flag -ias=0 means that no arrows
+are wanted.
+
+=back
+
+=item B<-iac=n>,  B<--interbracket-arrow-complexity=n>
+
+This parameter makes it possible to skip adding or deleting arrows following a
+container which is complex in some sense. Three levels of complexity can be
+specified with the integer B<n>, as follows:
+
+   n=0   the contents of the left container must be a single thing (token)
+   n=1   the left container must not contain other containers [DEFAULT]
+   n=2   the left container may contain anything
+
+Some examples:
+
+    # Container                complexity
+    {'commandline'}            0 single token         OK by default
+    { $type . $name }          1 multiple tokens      OK by default
+    [ $plot{'x-axis'} - 1 ]    2 contains a container SKIPPED by default
+
+So, with the default complexity level of 1, an arrow could be added or deleted
+following the first two of these containers but not the third.
+
+=back
+
+B<Some points to consider> when working with these parameters are:
+
+=over 4
+
+=item *
+
+There are no known bugs, but this is a relatively new feature. So please
+carefully check file differences and run tests when interbracket arrows are
+added or removed.
+
+=item *
+
+For some unusual spacing parameters, it could take an extra iteration for
+the spaces between brackets to reach their final state after arrows are
+added or deleted.
+
+=item *
+
+Any comments between brackets will prevent the adding and deleting of arrows.
+
+=back
 
 =head2 Missing Else Blocks
 
@@ -4301,10 +4502,10 @@ for the previous item B<-blbs=n>.
 =item B<-bbs>,  B<--blanks-before-subs>
 
 For compatibility with previous versions, B<-bbs> or B<--blanks-before-subs>
-is equivalent to F<-blbp=1> and F<-blbs=1>.
+is equivalent to B<-blbp=1> and B<-blbs=1>.
 
 Likewise, B<-nbbs> or B<--noblanks-before-subs>
-is equivalent to F<-blbp=0> and F<-blbs=0>.
+is equivalent to B<-blbp=0> and B<-blbs=0>.
 
 =item B<-bbb>,  B<--blanks-before-blocks>
 
@@ -5031,7 +5232,8 @@ values to have leading signs placed in their own column. For example:
         [  10.9,        10.9,             11 ],
     );
 
-The current default alignment is strict left justification:
+The default is B<-vsn>.  This can be turned off to get is strict left
+justification:
 
     # perltidy -nvsn
     my @correct = (
@@ -5041,8 +5243,6 @@ The current default alignment is strict left justification:
         [ -123456.001, -80.080,          0 ],
         [ 10.9,        10.9,             11 ],
     );
-
-In a future release B<-vsn> will become the default.
 
 Some points regarding B<-vsn> are:
 
@@ -5065,7 +5265,7 @@ B<-vsnl=N>. This value controls formatting of very long columns of numbers and
 should not normally need to be changed.  To see its purpose, consider a very
 long column of just unsigned numbers, say 1000 lines. If we add a single
 negative number, it is undesirable to move all of the other numbers over by one
-space. This would create many lines of file differences but not really improve
+space. This could create many lines of file differences but not really improve
 the appearance when a local section of the table was viewed. The number B<N>
 avoids this problem by not adding extra indentation to a run of more than B<N>
 lines of unsigned numbers.  The default value, B<N=20>, is set to be a number
@@ -5073,6 +5273,34 @@ of lines for which the ends of a long column of unsigned numbers are not
 normally both in view.
 
 =back
+
+=item B<Aligning assignment operators with --valign-wide-equals or -vwe>
+
+The following assignment operators are aligned independently by default:
+
+      = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x=
+
+Setting B<--valign-wide-equals>, or B<-vwe>, causes them to be vertically
+aligned together with the trailing B<=> all aligned. For example, here
+is the default formatting for some code with several of these operators:
+
+            $str .= SPACE x $total_pad_count;
+            $str_len += $total_pad_count;
+            $total_pad_count = 0;
+            $str .= $rfields->[$j];
+            $str_len += $rfield_lengths->[$j];
+
+And here is the same code formatted with B<-vme>:
+
+            # perltidy -vme
+            $str             .= SPACE x $total_pad_count;
+            $str_len         += $total_pad_count;
+            $total_pad_count  = 0;
+            $str             .= $rfields->[$j];
+            $str_len         += $rfield_lengths->[$j];
+
+This option was added for issue git #135 and can improve readability, but it is
+off by default to avoid changing existing formatting.
 
 =back
 
@@ -5441,9 +5669,10 @@ html files, and another is when the B<-cscw> option is selected. The default is
 to allow timestamps (B<--timestamp> or B<-ts>).
 
 B<--file-size-order> or B<-fso> will cause files to be processed in order of
-increasing size, when multiple files are being processed.  This is useful
-during program development, when large numbers of files with varying sizes are
-processed, because it can reduce virtual memory usage.
+increasing size, when multiple files are being processed.  This is particularly
+useful during program development, when large numbers of files with varying
+sizes are processed, because it can reduce virtual memory usage. This is
+the default and can be deactivated with B<-nfso>.
 
 B<--maximum-file-size-mb=n> or B<-maxfs=n> specifies the maximum file size in
 megabytes that perltidy will attempt to format. This parameter is provided to
@@ -5519,7 +5748,24 @@ perltidy development.
 
 Perltidy reports any obvious issues that are found during formatting, such as
 unbalanced braces. But several parameters are available for making certain
-additional checks for issues which might be of interest to a programmer.
+additional checks for issues which might be of interest to a programmer.  These
+parameters fall into two categories as indicated by their prefix, B<--dump-> or
+B<--warn->:
+
+=over 4
+
+=item *
+The B<--dump-> parameters read a file, write information to the standard output,
+and then exit without doing any formatting.
+
+=item *
+The B<--warn-> parameters, on the other hand, cause perltidy to function
+normally but issue warnings to the error output when certain conditions are
+encountered.
+
+=back
+
+Some of these have associated control parameters.
 
 =over 4
 
@@ -5560,8 +5806,8 @@ determined by computing and comparing the block ending line numbers.
 For subroutines, the number of call arguments (args) is listed in parentheses
 in the C<type> column. For example, C<sub(9)> indicates a sub with 9 args.
 Subroutines whose arg count cannot easily be determined are indicated
-as C<sub(*)>.  The count does not include a leading variable named
-B<$self> or B<$class>.
+as C<sub(*)>.  The count includes any leading object passed in a method
+call (such as B<$self>).
 
 By default the table lists subroutines with more than 20 C<code_lines>, but
 this can be changed with the following two parameters:
@@ -5663,9 +5909,11 @@ in the output with one of the letters, B<r>, B<s>, B<p>, and B<u> as follows:
 =item B<r: reused variable name>
 
 These are variables which are re-declared in the scope of a variable with the
-identical name.  This can be confusing (perhaps not when the code is first
-written, but possibly later during maintenance work). This issue can be
-avoided by renaming one of the conflicting variables. Note that this is
+identical name.  This can be confusing, perhaps not when the code is first
+written, but possibly later during maintenance work. For example, this
+can make it difficult to locate the correct variable with an editor when
+changes are being made. This issue can be avoided by renaming one of the
+conflicting variables. Note that this is
 similar to the B<Perl::Critic> policy B<Variables::ProhibitReusedNames>.
 
 =item B<s: sigil change but reused bareword>
@@ -5700,15 +5948,17 @@ block braces in order avoid warnings at temporary package changes.
 
 These are variables which are declared with a C<my> and not referenced again
 within their scope.  Calling them B<unused> is convenient but not really
-accurate; this is a "gray area" for a program. There are many reasons for
+accurate; this is a "gray area" for a program. There are some good reasons for
 having such variables.  For example, they might occur in a list of values
 provided by another routine or data structure, and therefore must be listed,
-even though they might not be referenced again. Or they might be defined for
-possible future program development, clarity or debugging.  B<But> sometimes
-they can occur due to being orphaned by a coding change, due to a misspelling,
-or by having an unintentional preceding C<my>.  So it is worth reviewing them,
-especially for new code.  Here is an example of an unused variable in a script
-located with this method:
+even though they might not be referenced again.  Having such variables can make
+them immediately available for future development and debugging, and can be
+beneficial for program clarity.
+
+B<But> sometimes they can occur due to being orphaned by a coding
+change, due to a misspelling, or by having an unintentional preceding
+C<my>.  So it is worth reviewing them, especially for new code.  Here is
+an example of an unused variable in a script located with this method:
 
    BEGIN { my $string = "" }
    ...
@@ -5716,8 +5966,8 @@ located with this method:
 
 This looks nice at first glance, but the scope of the C<my> declaration is
 limited to the surrounding braces, so it is not the same variable as the other
-C<$string> and must therefore be reported as unused.  This problem would have
-also been caught by perl if the author had used C<strict>.
+C<$string> and must therefore be reported as unused.  This particular problem
+would have also been caught by perl if the author had used C<strict>.
 
 =back
 
@@ -5840,6 +6090,136 @@ removed, then C<||> must be changed to C<or>:
 
 Otherwise, the C<||> will operate on C<$infile> rather than the return value of
 C<open>.
+
+=item B<Use --dump-mismatched-args to find function calls with args not matching sub declarations>
+
+The parameter B<--dump-mismatched-args>, or B<-dma>, causes perltidy to
+examine the definitions of subroutines in a file, and calls to those subs,
+and report certain differences.  Like all B<--dump> commands, it
+writes its report to standard output and exits immediately.  For example
+
+    perltidy -dma somefile.pl >results.txt
+
+Four types of issues are reported, types B<a>, B<o>, B<u>, and B<i>:
+
+=over 4
+
+=item B<a:> calls made to a sub both with and without the B<arrow> operator
+
+For example the following two lines would be reported as a mismatch:
+
+     Fault();
+
+and
+
+     $self->Fault();
+
+This may or may not be an error, but it is worth checking. It might become an
+error in the future if sub C<Fault> starts to access C<$self>.
+
+=item B<o:> (B<overcount>): the number of call args exceeds the expected number.
+
+=item B<u:> (B<undercount>): the number of call args is less than the expected number.
+
+For example
+
+     sub gnab_gib {
+         my $self=shift;
+         my ($v1,$v2)=@_;
+         ...
+     }
+
+     $self->gnab_gib(42);
+
+In this case, the sub is expecting a total of three args (C<$self>, C<$v1>, and
+C<$v2>) but only receives two (C<$self> and C<42>), so an undercount is
+reported.  This is not necessarily an error because the sub may allow for this
+possibility, but it is worth checking.  The simple static processing done by perltidy cannot determine which sub args are optional.
+
+=item B<i:> B<indeterminate:> a specific number of expected args for a sub could not be determined, but it is called with a specific number. This issue is reported for the B<--dump-> option but not the B<--warn-> option.
+
+=back
+
+B<Notes and Limitations:>
+
+=over 4
+
+=item *
+This option works best for subs which unpack call args in an orderly
+manner near the beginning of the sub from C<@_> and/or with C<shift>
+operations.  If individual elements of the @_ array are directly
+accessed then the number of sub args is considered indeterminate.
+
+=item *
+Sub calls made without parentheses around the args are not checked.
+
+=item *
+Anonymous subs and lexical subs (introduced with C<my>) are not checked.
+
+=item *
+Only calls which appear to be to subs defined within the file being
+processed are checked. But note that a file may contain multiple packages.
+
+=back
+
+=item B<Use --warn-mismatched-args to produce a warning for function calls with
+args not matching sub declarations>.
+
+This is similar to the B<-dump> parameter described above except that any
+mismatches are reported in the error file and otherwise formatting continues
+normally.  Thus
+
+    perltidy -wma somefile.pl
+
+Several companion controls are available to avoid unwanted error messages:
+
+=over 4
+
+=item *
+B<--warn-mismatched-arg-types=s>, or B<-wmat=s>, can be used to
+select specific tests, type B<a> (arrow test) or B<o> (overcounts) or B<u> (undercounts). All checks may be requested with B<-wmat='*'> or B<-wmat=1>. This is the default.
+
+To restrict the check to a specific warning type, set the string equal to the letter of that warning, any B<a>, B<o>, or B<u>.  For example
+
+   perltidy -wmat='a o' somefile.pl
+
+will format F<somefile.pl> and report any arrow-type mismatches and overcount mismatches, but will skip undercount mismatches.
+
+=item *
+B<--warn-mismatched-arg-exclusion-list>, or B<-wmaxl=string>, can be given to
+skip the warning checks for a list of subroutine names, entered as a quoted
+string of space- or comma-separated names. All subs with those names will be
+skipped, regardless of package.
+
+=item *
+B<--warn-mismatched-arg-undercount-cutoff=n>, or B<-wmauc=n>, can be used to
+avoid B<undercount> warnings when the expected number of args is less than B<n>.
+Please note that this number B<n> is the number of args from the point of
+view of the sub definition, so an object like C<$self> passed with an arrow
+operator counts as one arg.
+
+The default value is B<n=4>. This has been found to allow most programs to
+pass without warnings, but it should be reduced if possible for better error
+checking.  The minimum possible value of B<n> needed to avoid triggering an
+error for a program can be determined by running with B<-wma -wmauc=0>.  If
+there are undercount errors, a note at the bottom of the error output
+indicates the value of B<n> required to avoid reporting them.
+
+=item *
+B<--warn-mismatched-arg-overcount-cutoff=n>, or B<-wmaoc=n>, can be used to
+avoid B<overcount> warnings when the expected number of args is less than B<n>.
+The default value is B<n=1>. This avoids warning messages for subroutines
+which are dummy placeholders for possible expansion.
+
+=back
+
+To illustrate these controls,
+
+   perltidy -wma -wmat='o u' -wmaxl='new old' -wmauc=2 somefile.pl
+
+means format F<somefile.pl> as usual and check for mismatched overcounts and
+undercounts but not arrows. Skip checking for any sub named C<new> or C<old>,
+and only warn of undercounts for subs expecting more than 2 args.
 
 =back
 
@@ -6148,25 +6528,26 @@ dot is added, and the backup file will be F<somefile.pl~>  .
 The following list shows all short parameter names which allow a prefix
 'n' to produce the negated form:
 
- D      ame    anl    asbl   asc    ast    asu    atc    atnl   aws
- b      baa    baao   bar    bbao   bbb    bbc    bbs    bl     bli
- boa    boc    bok    bol    bom    bos    bot    cblx   ce     conv
- cpb    cs     csc    cscb   cscw   dac    dbc    dbs    dcbl   dcsc
- ddf    dior   dln    dmcp   dnl    dop    dp     dpro   drc    dsc
- dsm    dsn    dtc    dtt    duv    dwic   dwls   dwrs   dws    eos
- f      fpva   frm    fs     fso    gcs    hbc    hbcm   hbco   hbh
- hbhh   hbi    hbj    hbk    hbm    hbn    hbp    hbpd   hbpu   hbq
- hbs    hbsc   hbv    hbw    hent   hic    hicm   hico   hih    hihh
- hii    hij    hik    him    hin    hip    hipd   hipu   hiq    his
- hisc   hiv    hiw    hsc    html   ibc    icb    icp    iob    ipc
- isbc   iscl   kgb    kgbd   kgbi   kis    lal    log    lop    lp
- lsl    mem    nib    ohbr   okw    ola    olc    oll    olq    opr
- opt    osbc   osbr   otr    ple    pod    pvl    q      sac    sbc
- sbl    scbb   schb   scp    scsb   sct    se     sfp    sfs    skp
- sob    sobb   sohb   sop    sosb   sot    ssc    st     sts    t
- tac    tbc    toc    tp     tqw    trp    ts     tsc    tso    vbc
- vc     viu    vmll   vsc    vsn    w      wfc    wme    wn     x
- xbt    xci    xlp    xs
+ D      aia    ame    anl    asbl   asc    ast    asu    atc    atnl
+ aws    b      baa    baao   bar    bbao   bbb    bbc    bbs    bl
+ bli    boa    boc    bok    bol    bom    bos    bot    cblx   ce
+ conv   cpb    cs     csc    cscb   cscw   dac    dbc    dbs    dcbl
+ dcsc   ddf    dia    dior   dln    dma    dmcp   dnl    dop    dp
+ dpro   drc    dsc    dsm    dsn    dtc    dtt    duv    dwic   dwls
+ dwrs   dws    eos    f      fpva   frm    fs     fso    gcs    hbc
+ hbcm   hbco   hbh    hbhh   hbi    hbj    hbk    hbm    hbn    hbp
+ hbpd   hbpu   hbq    hbs    hbsc   hbv    hbw    hent   hic    hicm
+ hico   hih    hihh   hii    hij    hik    him    hin    hip    hipd
+ hipu   hiq    his    hisc   hiv    hiw    hsc    html   ibc    icb
+ icp    iob    ipc    isbc   iscl   kgb    kgbd   kgbi   kis    lal
+ log    lop    lp     lsl    mci    mem    nib    ohbr   okw    ola
+ olc    oll    olq    opr    opt    osbc   osbr   otr    ple    pod
+ pvl    q      sac    sbc    sbl    scbb   schb   scp    scsb   sct
+ se     sfp    sfs    skp    sob    sobb   sohb   sop    sosb   sot
+ ssc    st     sts    t      tac    tbc    toc    tp     tqw    trp
+ ts     tsc    tso    vbc    vc     viu    vmll   vsc    vsn    vwe
+ w      wfc    wia    wma    wme    wn     x      xbt    xci    xlp
+ xs
 
 Equivalently, the prefix 'no' or 'no-' on the corresponding long names may be
 used.
@@ -6265,7 +6646,7 @@ The perltidy binary uses the Perl::Tidy module and is installed when that module
 
 =head1 VERSION
 
-This man page documents perltidy version 20240202
+This man page documents perltidy version 20240511
 
 =head1 BUG REPORTS
 

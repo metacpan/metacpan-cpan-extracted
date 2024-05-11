@@ -3,12 +3,12 @@ package Salus;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Salus::Header;
 use Salus::Table;
 
-our (%PRO, %META);
+my (%PRO, %META);
 BEGIN {
 	%PRO = (
 		keyword => sub {
@@ -90,7 +90,7 @@ Salus - The great new Salus!
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 

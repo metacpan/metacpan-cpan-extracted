@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 lib/Linux/Landlock/Direct.pm
+lib/Linux/Landlock/Syscalls.pm
 lib/Linux/Landlock.pm
 t/01_direct_fs.t
 t/02_direct_net.t

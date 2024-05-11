@@ -63,7 +63,7 @@ Rope::Type - Rope with Type::Tiny
 
 =head1 VERSION
 
-Version 0.31
+Version 0.33
 
 =cut
 

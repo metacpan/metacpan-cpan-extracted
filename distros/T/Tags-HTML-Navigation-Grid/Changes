@@ -1,0 +1,8 @@
+0.02 2024-05-11T00:43:23+02:00
+ - Add DESCRIPTION section to doc.
+ - Add link over image and title.
+ - Add links to other modules to doc.
+ - Fix DEPENDENCIES section in doc.
+
+0.01 2024-05-10T20:52:00+02:00
+ - First version.

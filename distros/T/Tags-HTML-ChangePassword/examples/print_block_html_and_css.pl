@@ -15,7 +15,7 @@ my $obj = Tags::HTML::ChangePassword->new(
         'tags' => $tags,
 );
 
-# Process login button.
+# Process change password form.
 $obj->process_css;
 $obj->process;
 
@@ -82,8 +82,8 @@ print $tags->flush."\n";
 #     </legend>
 #     <p>
 #       <label for="old_password">
+#         Old password
 #       </label>
-#       Old password
 #       <input type="password" name="old_password" id="old_password" autofocus=
 #         "autofocus">
 #       </input>

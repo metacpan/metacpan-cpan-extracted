@@ -1,0 +1,14 @@
+0.003   2024-05-06  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename dist Bencher-Scenario{s,Bundle}-* to be more consistent
+          with others.
+
+
+0.002   2023-01-18  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Bencher-Scenarios-Algorithm{,-}Diff.
+
+
+0.001   2017-07-29  Released-By: PERLANCAR
+
+        - First release.

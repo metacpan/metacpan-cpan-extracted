@@ -1,10 +1,12 @@
 NAME
+
     Plack::Middleware::Deflater - Compress response body with Gzip or
     Deflate
 
 SYNOPSIS
-      use Plack::Builder;
 
+      use Plack::Builder;
+    
       builder {
         enable sub {
             my $app = shift;
@@ -30,50 +32,62 @@ SYNOPSIS
       };
 
 DESCRIPTION
-    Plack::Middleware::Deflater is a middleware to encode your response body
-    in gzip or deflate, based on "Accept-Encoding" HTTP request header. It
-    would save the bandwidth a little bit but should increase the Plack
+
+    Plack::Middleware::Deflater is a middleware to encode your response
+    body in gzip or deflate, based on Accept-Encoding HTTP request header.
+    It would save the bandwidth a little bit but should increase the Plack
     server load, so ideally you should handle this on the frontend reverse
     proxy servers.
 
-    This middleware removes "Content-Length" and streams encoded content,
+    This middleware removes Content-Length and streams encoded content,
     which means the server should support HTTP/1.1 chunked response or
     downgrade to HTTP/1.0 and closes the connection.
 
 CONFIGURATIONS
-    content_type
-          content_type => 'text/html',
-          content_type => [ 'text/html', 'text/css', 'text/javascript', 'application/javascript', 'application/x-javascript' ]
 
-        Content-Type header to apply deflater. if content-type is not
-        defined, Deflater will try to deflate all contents.
+    content_type
+
+        content_type => 'text/html',
+        content_type => [ 'text/html', 'text/css', 'text/javascript', 'application/javascript', 'application/x-javascript' ]
+
+      Content-Type header to apply deflater. if content-type is not
+      defined, Deflater will try to deflate all contents.
 
     vary_user_agent
-          vary_user_agent => 1
 
-        Add "User-Agent" to Vary header.
+        vary_user_agent => 1
+
+      Add "User-Agent" to Vary header.
 
 ENVIRONMENT VALUE
+
     psgix.no-compress
-        Do not apply deflater
+
+      Do not apply deflater
 
     psgix.compress-only-text/html
-        Apply deflater only if content_type is "text/html"
+
+      Apply deflater only if content_type is "text/html"
 
     plack.skip-deflater
-        Skip all Deflater features
 
-  Compare psgix.no-compress with plack.skip-deflater
+      Skip all Deflater features
+
+ Compare psgix.no-compress with plack.skip-deflater
+
     If no-compress is true, PM::Deflater skips gzip or deflate. But adds
     Vary: Accept-Encoding and Vary: User-Agent header. skip-deflater forces
     to skip all PM::Deflater feature, doesn't allow to add Vary header.
 
 LICENSE
+
     This software is licensed under the same terms as Perl itself.
 
 AUTHOR
+
     Tatsuhiko Miyagawa
 
 SEE ALSO
-    Plack, <http://httpd.apache.org/docs/2.2/en/mod/mod_deflate.html>
+
+    Plack, http://httpd.apache.org/docs/2.2/en/mod/mod_deflate.html
 

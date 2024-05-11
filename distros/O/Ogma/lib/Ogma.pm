@@ -1,6 +1,6 @@
 package Ogma;
 
-use 5.006; use strict; use warnings; use Rope;our $VERSION = '0.01';
+use 5.006; use strict; use warnings; use Rope;our $VERSION = '0.03';
 our (%PRO, %OPTIONS);
 
 BEGIN {
@@ -99,7 +99,7 @@ Ogma - Command Line Applications via Rope
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
@@ -140,13 +140,11 @@ Version 0.01
 
 	1;
 
-
 ....
 
 	Time::Tracker->run('help');
 
 	Time::Tracker->run('t=1715069487', 'e=1', 'history=[{"one":"two", ...}]');
-
 
 =head1 AUTHOR
 

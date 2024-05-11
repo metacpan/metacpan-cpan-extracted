@@ -4,15 +4,15 @@ use base qw(Plack::Component::Tags::HTML);
 use strict;
 use warnings;
 
-use Plack::Util::Accessor qw(change_password_cb generator message_cb redirect_change_password
-	redirect_error title);
+use Plack::Util::Accessor qw(change_password_cb generator lang message_cb
+	redirect_change_password redirect_error text title);
 use Plack::Request;
 use Plack::Response;
 use Plack::Session;
 use Tags::HTML::ChangePassword;
 use Tags::HTML::Container;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub _css {
 	my ($self, $env) = @_;
@@ -53,7 +53,14 @@ sub _prepare_app {
 		'css' => $self->css,
 		'tags' => $self->tags,
 	);
-	$self->{'_tags_change_password'} = Tags::HTML::ChangePassword->new(%p);
+	$self->{'_tags_change_password'} = Tags::HTML::ChangePassword->new(%p,
+		defined $self->lang ? (
+			'lang' => $self->lang,
+		) : (),
+		defined $self->text ? (
+			'text' => $self->text,
+		) : (),
+	);
 	$self->{'_tags_change_password'}->prepare({
 		'info' => 'blue',
 		'error' => 'red',
@@ -238,6 +245,12 @@ HTML generator string.
 
 Default value is 'Plack::App::ChangePassword; Version: __VERSION__'.
 
+=item * C<lang>
+
+Language in ISO 639-2 code.
+
+Default value is undef.
+
 =item * C<message_cb>
 
 Callback to process message from application.
@@ -294,6 +307,16 @@ Default value is
          'no_simple' => ['script', 'textarea'],
          'preserved' => ['pre', 'style'],
  );
+
+=item * C<text>
+
+Hash reference with keys defined language in ISO 639-2 code and value with hash reference with texts.
+
+Required keys are 'change_password', 'old_password_label', 'password1_label', 'password2_label' and 'submit'.
+
+See more in L<Tags::HTML::ChangePassword>.
+
+Default value is undef.
 
 =item * C<title>
 
@@ -517,6 +540,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

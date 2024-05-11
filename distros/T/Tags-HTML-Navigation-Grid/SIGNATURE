@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 f5f25c4464dbf16e89605faccdb9b9358c6c37949b3e69d3e633c5f353daf5df Changes
+SHA256 bfd8f5a18ebb1984d34cc0b51c345b4462802055ed68cc0e276c33617a487f88 Grid.pm
+SHA256 e9721661dbfb60dadebf3cd197cbc00239895aa73fb3431e19490cfad301cf99 LICENSE
+SHA256 ca464b3d0d2d26993b33ffb852240b3e38dfbd95dee82fcb2c3c7dd7f4717aee MANIFEST
+SHA256 13fd0cddcb8c10ab277291a3cd62b1a7af49f7d58b98b28318de0da89389d0e0 META.yml
+SHA256 865855750f36438809c9ce32ea19ae1cb7c231a18aecc9010511c104c40bb734 Makefile.PL
+SHA256 2df94c172fbf0721b6106b8e561c6362220cdf3f859bb8123bf8aad663a5fea5 README
+SHA256 09059ab05b2628b0ccec8e2ea14dbe90beddaa356f5c23379d4c987eba65e0a9 examples/plack_app_nav_grid.pl
+SHA256 1ee103eadf5903f1b219d0bae829f21137517f0286c6b0999d201fbc91db24a7 examples/print_grid_html_and_css.pl
+SHA256 4b687a8e194b1c581be7bc1ef9119f8740213c6b583129ce898dd404452c68cb images/plack_app_nav_grid.png
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 03cf462e606711f20fa4bb42f20bb8efd9ac61e077e25b1c65cef34beea5a86e t/Tags-HTML-Navigation-Grid/01-use.t
+SHA256 f719496a4870c165bd69589e1674a316c196ce38a48fc3c665854d18a6093b44 t/Tags-HTML-Navigation-Grid/02-version.t
+SHA256 251ad53bf0efcb11c75dbdc2bf105c22684b85afab24c21daa2ccd188f1681eb t/Tags-HTML-Navigation-Grid/03-new.t
+SHA256 6d85494a896366c532711f0858456bdc80ccdb34cda3dbdf1706cd7cb6acd478 t/Tags-HTML-Navigation-Grid/04-cleanup.t
+SHA256 7f91b2c8e77a5f572f17312b83b48f832a900d0fc9171b4c719788cd88aabae6 t/Tags-HTML-Navigation-Grid/05-init.t
+SHA256 1f3074e44a06be294d73bbdf6f83fc61e58968f77b46b9ec75262f43ee476f45 t/Tags-HTML-Navigation-Grid/06-prepare.t
+SHA256 4ce123cdc4bf23d9e3bc5e885f725f9eb20341e9060f640a0bd1cac36a70a028 t/Tags-HTML-Navigation-Grid/07-process.t
+SHA256 0f95842892433f3f6fbb2663ecfbb39f6f13f432cff9d7adeac0f4e65104fe51 t/Tags-HTML-Navigation-Grid/08-process_css.t
+SHA256 f51e488c568cede9e1fa015d39f2c6c52b538ef6a2ec2a74c66f3099b64db5e6 xt/Tags-HTML-Navigation-Grid/01-pod_coverage.t
+SHA256 fac29ff97fad4676698a8a8b77b4ed2db4f74555063de8461fa4db15b08bc0e0 xt/Tags-HTML-Navigation-Grid/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEbhzVZugfHqSVNvE7YSp92FNcjtAFAmY+ow0ACgkQYSp92FNc
+jtCvrgv9HX1EmGHkK6J623nLGrw/3N3PRBNhawBwcGCodEPAt3i8yM/3Oid7+R7v
+HnZI4kSZU+Te+H2h/Pc1V12KVN/8l9hcZfGK4l+US/EcMUFLUWJ3thpv+x1xVLky
+7Xzah7EGGQI5cvLdXoeQY7jxi6lO5nvc4/BysfjnsxvzYGD/MDLZtqTg+Mj0E6Zp
+g/YB5/DKhtdUYAzI3XGdgL5E552lfHYvaF8AzbOxmruKsw/rGPpqm5DbVWCgQde/
+k1J0niONo2CFXSGHVc5qXw3MHoWufte0CU/GZPrWOQNxA1rGI2mF+j66ka8ozKXA
+kjaHk74klUda1Dej9WWyxgAjSkchfNcBI4bVkh/BweJ3hMipsMO/itXfDQyYEfIp
+uwtip35ytK2P0U+lSfeeRgXi4OhGDR/njly/yIjdoPnBJHTMwiHmCHmP7vuQhCiM
+DEcQPedNQ2Y9Har/PTKxsHyaqUyRU2Br0htIcUXAXHAW9fMWLeKxlXSt5NIvwoJW
+9r+xubmq
+=JZL2
+-----END PGP SIGNATURE-----

@@ -39,7 +39,7 @@ Rope::Autoload - Rope Autoload!
 
 =head1 VERSION
 
-Version 0.31
+Version 0.33
 
 =cut
 

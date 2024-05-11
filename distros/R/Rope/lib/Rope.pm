@@ -1,7 +1,7 @@
 package Rope;
 
 use 5.006; use strict; use warnings;
-our $VERSION = '0.31';
+our $VERSION = '0.33';
 use Rope::Object;
 my (%META, %PRO);
 our @ISA;
@@ -430,6 +430,7 @@ sub import {
 	}
 	$PRO{keyword}($caller, 'can', sub { ref $_[0] and ($_[0]->{$_[1]} || $META{$caller}->{properties}->{$_[1]}) || $_[0]->CORE::can($_[1]) });
 	$PRO{keyword}($caller, '(bool', sub { 1; });
+	$PRO{keyword}($caller, '(eq', sub { $_[1]; });
 	$PRO{keyword}($caller, '((', sub { });
 	$PRO{keyword}($caller, '(%{}', sub {
 		${$_[0]}->{prototype};
@@ -618,7 +619,7 @@ Rope - Tied objects
 
 =head1 VERSION
 
-Version 0.31
+Version 0.33
 
 =cut
 
@@ -769,7 +770,7 @@ Extends the current object definition with multiple new properties
 Extends the current object definition with multiple new properties where initable, writable and enumerable are all set to a true value.
 
 	prototyped (
-		three => 10
+		three => 10,
 		[qw/a b c/] => 211
 		...
 	);

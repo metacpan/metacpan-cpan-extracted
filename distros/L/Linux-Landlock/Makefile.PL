@@ -17,7 +17,7 @@ WriteMakefile(
         'Exporter'   => 0,
         'Config'     => 0,
     },
-    VERSION       => '0.3',
+    VERSION       => '0.4',
     TEST_REQUIRES => {
         'Test::Exception'  => 0,
         'Test::More'       => 0,
