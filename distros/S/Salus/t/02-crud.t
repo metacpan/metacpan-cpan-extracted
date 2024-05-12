@@ -32,7 +32,7 @@ my $data = [1, 'Robert', 'Joseph', 32];
 
 $odea->add_row($data);
 
-is($odea->total_rows, 1);
+is($odea->count, 1);
 
 is_deeply($odea->rows->[0]->as_array, $data);
 
@@ -50,7 +50,7 @@ is($odea->get_row_col(0, 2)->value, 'Muse');
 
 ok($odea->delete_row(0));
 
-is($odea->total_rows, 0);
+is($odea->count, 0);
 
 my $hash_data = {
 	ID => 1, 
@@ -61,7 +61,7 @@ my $hash_data = {
 
 $odea->add_row_hash($hash_data);
 
-is($odea->total_rows, 1);
+is($odea->count, 1);
 
 is_deeply($odea->rows->[0]->as_array, $data);
 
@@ -79,6 +79,6 @@ is($odea->get_row_col(0, 2)->value, 'Muse');
 
 ok($odea->delete_row(0));
 
-is($odea->total_rows, 0);
+is($odea->count, 0);
 
 done_testing();

@@ -3,7 +3,7 @@ package Salus;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.07';
 
 use Salus::Header;
 use Salus::Table;
@@ -83,14 +83,13 @@ sub new {
 
 __END__;
 
-
 =head1 NAME
 
 Salus - The great new Salus!
 
 =head1 VERSION
 
-Version 0.02
+Version 0.07
 
 =cut
 
@@ -128,6 +127,32 @@ Version 0.02
 	$unethical->read();
 
 	$unethical->write('t/test2.csv');
+
+=head1 METHODS
+
+=cut
+
+=head2 new
+
+	my $salus = Salus->new({
+		headers => [
+			{
+				name => 'id',
+				label => 'ID'
+			},
+			...
+		]
+	});
+
+	$salus->add_rows([
+		[1, 'Robert', 'Invisible', 32],
+		[2, 'Jack', 'Joy', 33],
+		[3, 'Pluto', 'Hades', 34]
+	]);
+
+	$salus->combine('t/test.csv', 'id');
+
+	$salus->get_row(2)->as_array;
 
 =head1 AUTHOR
 

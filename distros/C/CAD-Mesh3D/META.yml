@@ -19,7 +19,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 keywords:
   - 3D
   - CAD
@@ -37,10 +37,10 @@ no_index:
 provides:
   CAD::Mesh3D:
     file: lib/CAD/Mesh3D.pm
-    version: '0.006001'
+    version: '0.006002'
   CAD::Mesh3D::STL:
     file: lib/CAD/Mesh3D/STL.pm
-    version: '0.006001'
+    version: '0.006002'
 requires:
   CAD::Format::STL: v0.2.1
   Carp: '0'
@@ -52,5 +52,5 @@ requires:
 resources:
   bugtracker: https://github.com/pryrt/CAD-Mesh3D/issues
   repository: https://github.com/pryrt/CAD-Mesh3D.git
-version: '0.006001'
+version: '0.006002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

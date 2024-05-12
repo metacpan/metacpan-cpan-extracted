@@ -279,8 +279,8 @@ sub extract ($in_fh, $output_file, $defined_output_file) {
 
         if ($block_type == 0) {
             say STDERR "\n:: Extracting block of type 0";
-            read_bit_lsb($in_fh, \$buffer) for (1 .. (length($buffer) % 8));    # pad to a byte
-            $chunk = extract_block_type_0($in_fh, \$buffer);
+            $buffer = '';                                       # pad to a byte
+            $chunk  = extract_block_type_0($in_fh, \$buffer);
             $search_window .= $chunk;
         }
         elsif ($block_type == 1) {

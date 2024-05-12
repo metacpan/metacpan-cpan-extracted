@@ -32,19 +32,22 @@
       },
       "runtime" : {
          "requires" : {
+            "JSON" : "0",
+            "Rope" : "0.34",
+            "Term::Size" : "0.211",
+            "Term::Table" : "0.018",
+            "Text::CSV_XS" : "1.54",
+            "Type::Tiny" : "2.004000",
             "perl" : "5.006"
          }
       },
       "test" : {
          "requires" : {
-            "Rope" : "0.30",
-            "Test::More" : "0",
-            "Text::CSV_XS" : "1.54",
-            "Type::Tiny" : "2.004000"
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

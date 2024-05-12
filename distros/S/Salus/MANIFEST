@@ -1,6 +1,8 @@
+bin/salus
 Changes
 ignore.txt
 lib/Salus.pm
+lib/Salus/Command.pm
 lib/Salus/Header.pm
 lib/Salus/Row.pm
 lib/Salus/Row/Column.pm
@@ -11,6 +13,7 @@ README
 t/00-load.t
 t/01-odea.t
 t/02-crud.t
+t/lib/RA.pm
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

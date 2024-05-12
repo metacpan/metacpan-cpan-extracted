@@ -929,7 +929,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 333 "ufunc.pd"
+#line 332 "ufunc.pd"
 
 =head2 avgover
 
@@ -986,7 +986,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 333 "ufunc.pd"
+#line 332 "ufunc.pd"
 
 =head2 cavgover
 
@@ -1043,7 +1043,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 333 "ufunc.pd"
+#line 332 "ufunc.pd"
 
 =head2 davgover
 
@@ -1101,7 +1101,7 @@ for ways of masking NaNs.
 
 
 
-#line 333 "ufunc.pd"
+#line 332 "ufunc.pd"
 
 =head2 minover
 
@@ -1145,7 +1145,7 @@ for ways of masking NaNs.
 
 
 
-#line 333 "ufunc.pd"
+#line 332 "ufunc.pd"
 
 =head2 minover_ind
 
@@ -1193,7 +1193,7 @@ for ways of masking NaNs.
 
 
 
-#line 438 "ufunc.pd"
+#line 437 "ufunc.pd"
 sub PDL::minimum_n_ind {
   my ($a, $c, $m_size) = @_;
   $m_size //= ref($c) ? $c->dim(0) : $c; # back-compat with pre-2.077
@@ -1211,7 +1211,7 @@ sub PDL::minimum_n_ind {
 
 
 
-#line 333 "ufunc.pd"
+#line 332 "ufunc.pd"
 
 =head2 minover_n_ind
 
@@ -1269,7 +1269,7 @@ for ways of masking NaNs.
 
 
 
-#line 333 "ufunc.pd"
+#line 332 "ufunc.pd"
 
 =head2 maxover
 
@@ -1313,7 +1313,7 @@ for ways of masking NaNs.
 
 
 
-#line 333 "ufunc.pd"
+#line 332 "ufunc.pd"
 
 =head2 maxover_ind
 
@@ -1361,7 +1361,7 @@ for ways of masking NaNs.
 
 
 
-#line 438 "ufunc.pd"
+#line 437 "ufunc.pd"
 sub PDL::maximum_n_ind {
   my ($a, $c, $m_size) = @_;
   $m_size //= ref($c) ? $c->dim(0) : $c; # back-compat with pre-2.077
@@ -1379,7 +1379,7 @@ sub PDL::maximum_n_ind {
 
 
 
-#line 333 "ufunc.pd"
+#line 332 "ufunc.pd"
 
 =head2 maxover_n_ind
 
@@ -1430,7 +1430,7 @@ since they will not contain any bad values.
 
 
 
-#line 333 "ufunc.pd"
+#line 332 "ufunc.pd"
 
 =head2 minmaxover
 
@@ -1442,7 +1442,7 @@ Synonym for L</minmaximum>.
 
 *PDL::minmaxover = *minmaxover = \&PDL::minmaximum;
 
-#line 570 "ufunc.pd"
+#line 569 "ufunc.pd"
 
 =head2 avg
 
@@ -1469,7 +1469,7 @@ sub PDL::avg {
 	$tmp;
 }
 
-#line 570 "ufunc.pd"
+#line 569 "ufunc.pd"
 
 =head2 sum
 
@@ -1496,7 +1496,7 @@ sub PDL::sum {
 	$tmp;
 }
 
-#line 570 "ufunc.pd"
+#line 569 "ufunc.pd"
 
 =head2 prod
 
@@ -1523,7 +1523,7 @@ sub PDL::prod {
 	$tmp;
 }
 
-#line 570 "ufunc.pd"
+#line 569 "ufunc.pd"
 
 =head2 davg
 
@@ -1550,7 +1550,7 @@ sub PDL::davg {
 	$tmp;
 }
 
-#line 570 "ufunc.pd"
+#line 569 "ufunc.pd"
 
 =head2 dsum
 
@@ -1577,7 +1577,7 @@ sub PDL::dsum {
 	$tmp;
 }
 
-#line 570 "ufunc.pd"
+#line 569 "ufunc.pd"
 
 =head2 dprod
 
@@ -1604,7 +1604,7 @@ sub PDL::dprod {
 	$tmp;
 }
 
-#line 570 "ufunc.pd"
+#line 569 "ufunc.pd"
 
 =head2 zcheck
 
@@ -1631,7 +1631,7 @@ sub PDL::zcheck {
 	$tmp;
 }
 
-#line 570 "ufunc.pd"
+#line 569 "ufunc.pd"
 
 =head2 and
 
@@ -1658,7 +1658,7 @@ sub PDL::and {
 	$tmp;
 }
 
-#line 570 "ufunc.pd"
+#line 569 "ufunc.pd"
 
 =head2 band
 
@@ -1685,7 +1685,7 @@ sub PDL::band {
 	$tmp;
 }
 
-#line 570 "ufunc.pd"
+#line 569 "ufunc.pd"
 
 =head2 or
 
@@ -1712,7 +1712,7 @@ sub PDL::or {
 	$tmp;
 }
 
-#line 570 "ufunc.pd"
+#line 569 "ufunc.pd"
 
 =head2 bor
 
@@ -1739,7 +1739,7 @@ sub PDL::bor {
 	$tmp;
 }
 
-#line 570 "ufunc.pd"
+#line 569 "ufunc.pd"
 
 =head2 min
 
@@ -1766,7 +1766,7 @@ sub PDL::min {
 	$tmp;
 }
 
-#line 570 "ufunc.pd"
+#line 569 "ufunc.pd"
 
 =head2 max
 
@@ -1793,7 +1793,7 @@ sub PDL::max {
 	$tmp;
 }
 
-#line 570 "ufunc.pd"
+#line 569 "ufunc.pd"
 
 =head2 median
 
@@ -1820,7 +1820,7 @@ sub PDL::median {
 	$tmp;
 }
 
-#line 570 "ufunc.pd"
+#line 569 "ufunc.pd"
 
 =head2 mode
 
@@ -1847,7 +1847,7 @@ sub PDL::mode {
 	$tmp;
 }
 
-#line 570 "ufunc.pd"
+#line 569 "ufunc.pd"
 
 =head2 oddmedian
 
@@ -1874,7 +1874,7 @@ sub PDL::oddmedian {
 	$tmp;
 }
 
-#line 600 "ufunc.pd"
+#line 599 "ufunc.pd"
 
 =head2 any
 
@@ -2186,7 +2186,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 957 "ufunc.pd"
+#line 956 "ufunc.pd"
 
 =head2 pct
 
@@ -2209,7 +2209,7 @@ sub PDL::pct {
 	$tmp;
 }
 
-#line 957 "ufunc.pd"
+#line 956 "ufunc.pd"
 
 =head2 oddpct
 
@@ -2395,7 +2395,7 @@ for L</qsortvec>.
 
 
 
-#line 1206 "ufunc.pd"
+#line 1205 "ufunc.pd"
 
 =head1 AUTHOR
 

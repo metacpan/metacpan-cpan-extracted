@@ -5,3 +5,14 @@ Revision history for Salus
 0.02	2024-05-10
 	- Adds add_row, add_row_hash, get_row, get_row_col, set_row_col, delete_row and  delete_row_col to Salus::Table
 	- Adds get_col, set_col and delete_col to Salus::Row
+0.05	2024-05-11
+	- Adds search and sort to Salus::Table
+	- Extends Salus::Command with these feature plus some colour as requested by invisible things.
+0.06	2024-05-12
+	- Adds find method that returns the a row index for the first match.
+	- Adds aggregations - count, min, max, sum, mean, median and mode.
+	- Expose row INDEX to Salus::Command for 'all' and 'search' commands
+0.07	2024-05-12
+	- Adds combine method to merge multiple csvs of the same class
+	- Fix error handling in Salus::Command.
+

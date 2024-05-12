@@ -112,8 +112,20 @@ The encoding of file-handles must be set to `:raw`.
 **Compression::Util** provides the following package variables:
 
 ```perl
-    $Compression::Util::VERBOSE = 0;           # true to enable verbose/debug mode
-    $Compression::Util::LZ_MAX_CHAIN_LEN = 32; # how many recent positions to remember for each match
+    $Compression::Util::VERBOSE = 0;            # true to enable verbose/debug mode
+    $Compression::Util::LZ_MAX_CHAIN_LEN = 32;  # how many recent positions to remember for each match in LZSS/LZ77 encoding
+
+    $Compression::Util::LZSS_MIN_LEN = 4;       # minimum match length in LZSS encoding
+    $Compression::Util::LZSS_MAX_LEN = 258;     # maximum match length in LZSS encoding
+
+    $Compression::Util::LZ77_MIN_LEN = 4;       # minimum match length in LZ77 encoding (symbolic only)
+    $Compression::Util::LZ77_MAX_LEN = 255;     # maximum match length in LZ77 encoding
+```
+
+The package variables can also be imported as:
+
+```perl
+    use Compression::Util qw($LZ_MAX_CHAIN_LEN);
 ```
 
 ## $LZ\_MAX\_CHAIN\_LEN
@@ -1090,7 +1102,9 @@ The function returns three values: `$literals`, which is an array-ref of uncompr
 
 The function `lz77_encode_symbolic()` accepts an array-ref of arbitrarily large non-negative integers as input.
 
-Lengths are limited to `255`. The output can be decoded with `lz77_decode()` and `lz77_encode_symbolic()`, respectively.
+Lengths are limited to `255`, but can changed by modifying the \`$Compression::Util::LZ77\_MAX\_LEN\` variable.
+
+The output can be decoded with `lz77_decode()` and `lz77_decode_symbolic()`, respectively.
 
 ## lz77\_decode / lz77\_decode\_symbolic
 

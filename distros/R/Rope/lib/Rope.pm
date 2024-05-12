@@ -1,7 +1,7 @@
 package Rope;
 
 use 5.006; use strict; use warnings;
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 use Rope::Object;
 my (%META, %PRO);
 our @ISA;
@@ -15,7 +15,6 @@ BEGIN {
 		},
 		scope => sub {
 			my ($caller, $self, %props) = @_;
-			delete $props{properties}{$_} for qw/INITIALISE INITIALISED/;
 			for my $prop (keys %{$props{properties}}) {
 				if ($props{properties}{$prop}{value} && ref $props{properties}{$prop}{value} eq 'CODE') {
 					my $cb = $props{properties}{$prop}{value};
@@ -406,8 +405,9 @@ BEGIN {
 				tie %{${$self}->{prototype}}, 'Rope::Object', $PRO{scope}($caller, $self, %{$build});
 				$META{initialised}{$caller}->{${$self}->{identifier}} = $self;
 				$self->{ROPE_init}->();
+
 				exists $build->{properties}->{INITIALISED} 
-					? $build->{properties}->{INITIALISED}->{value}->($self, \%params)
+					? $build->{properties}->{INITIALISED}->{value}->(\%params)
 					: $self->can('INITIALISED') && $self->INITIALISED(\%params); 
 				return $self;
 			};
@@ -619,7 +619,7 @@ Rope - Tied objects
 
 =head1 VERSION
 
-Version 0.33
+Version 0.34
 
 =cut
 

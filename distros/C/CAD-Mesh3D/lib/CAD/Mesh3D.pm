@@ -5,7 +5,7 @@ use Carp;
 use 5.010;  # M::V::R requires 5.010, so might as well make use of the defined-or // notation :-)
 use Math::Vector::Real 0.18;
 use CAD::Format::STL qw//;
-our $VERSION = '0.006001';
+our $VERSION = '0.006002';
 
 =head1 NAME
 
@@ -159,8 +159,8 @@ sub createQuadrangleFacets {
 
  my $v = createVertex(1,2,3);
  my $x = getx($v); # 1
- my $y = getx($v); # 2
- my $z = getx($v); # 3
+ my $y = gety($v); # 2
+ my $z = getz($v); # 3
 
 Grabs the individual x, y, or z coordinate from a vertex
 
@@ -250,8 +250,8 @@ sub addToMesh {
  use CAD::Mesh3D qw/:math/;
 
 Most of the math on the three-dimensional B<Vertexes> are handled by
-L<Math::Matrix::Real>; all the matrix methods will work on B<Vertexes>,
-as documented for L<Math::Matrix::Real>.
+L<Math::Vector::Real>; all the vector methods will work on B<Vertexes>,
+as documented for L<Math::Vector::Real>.
 However, three-dimensional math can take some special functions that
 aren't included in the generic matrix library. CAD::Mesh3D implements
 a few of these special-purpose functions for you.
@@ -274,6 +274,8 @@ the vector has a magnitude of 1.0.
 sub CAD::Mesh3D::Vertex::unitDelta {
     # TODO = argument checking
     my ($beg, $end) = @_;
+    #my $del = $end - $beg;
+    #return $del->versor();
     my $dx = $end->[XCOORD] - $beg->[XCOORD];
     my $dy = $end->[YCOORD] - $beg->[YCOORD];
     my $dz = $end->[ZCOORD] - $beg->[ZCOORD];
@@ -506,16 +508,17 @@ Peter C. Jones C<E<lt>petercj AT cpan DOT orgE<gt>>
 
 =begin html
 
+<a href="https://metacpan.org/pod/CAD::Mesh3D"><img src="https://img.shields.io/cpan/v/CAD-Mesh3D.svg?colorB=00CC00" alt="" title="metacpan"></a>
 <a href="https://github.com/pryrt/CAD-Mesh3D/issues"><img src="https://img.shields.io/github/issues/pryrt/CAD-Mesh3D.svg" alt="issues" title="issues"></a>
+<a href="https://github.com/pryrt/CAD-Mesh3D/actions/"><img src="https://github.com/pryrt/CAD-Mesh3D/actions/workflows/perl-ci.yml/badge.svg" alt="github ci status" title="github ci status"></a>
 <a href="https://ci.appveyor.com/project/pryrt/CAD-Mesh3D"><img src="https://ci.appveyor.com/api/projects/status/bc5jt6b2bjmpig5x?svg=true" alt="appveyor build status" title="appveyor build status"></a>
-<a href="https://travis-ci.org/pryrt/CAD-Mesh3D"><img src="https://travis-ci.org/pryrt/CAD-Mesh3D.svg?branch=master" alt="travis build status" title="travis build status"></a>
 <a href='https://coveralls.io/github/pryrt/CAD-Mesh3D?branch=master'><img src='https://coveralls.io/repos/github/pryrt/CAD-Mesh3D/badge.svg?branch=master' alt='Coverage Status' title='Coverage Status' /></a>
 
 =end html
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017,2018,2019,2020,2021 Peter C. Jones
+Copyright (C) 2017,2018,2019,2020,2021,2024 Peter C. Jones
 
 =head1 LICENSE
 

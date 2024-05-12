@@ -17,7 +17,7 @@ Rope::Autoload - Rope Roles!
 
 =head1 VERSION
 
-Version 0.33
+Version 0.34
 
 =cut
 

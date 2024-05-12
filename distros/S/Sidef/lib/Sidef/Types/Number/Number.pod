@@ -3385,6 +3385,14 @@ Aliases: I<fibonacci_mod>, I<fibonaccimod>
 
 =cut
 
+=head2 fibonorial
+
+    fibonorial(n)
+
+Returns the product of first C<n> nonzero Fibonacci numbers C<F(1), ..., F(n)>.
+
+=cut
+
 =head2 flip
 
     n.flip(base=10)
@@ -4187,6 +4195,8 @@ Aliases: I<is_absolute_euler_psp>
 
 Returns true if C<n> is an abundant number, else false.
 
+    say 20.by { .is_abundant }  #=> OEIS: A005101
+
 An abundant number is smaller than the sum of its positive proper divisors.
 
 =cut
@@ -4941,6 +4951,18 @@ Returns true if C<n> is a power of some prime.
 
 =cut
 
+=head2 is_primitive_abundant
+
+    n.is_primitive_abundant
+
+Returns true if C<n> is a primitive abundant number, else false.
+
+    say 20.by { .is_primitive_abundant }    #=> OEIS: A091191
+
+A primitive abundant number is an abundant number having no abundant proper divisor.
+
+=cut
+
 =head2 is_primitive_root
 
     n.is_primitive_root(m)
@@ -4998,6 +5020,8 @@ Aliases: I<is_provable_prime>
     n.is_psp(bases...)
 
 Returns true if C<n> is a Fermat pseudoprime to the provided bases.
+
+Each base must be coprime to C<n>.
 
 Aliases: I<is_fermat_psp>, I<is_pseudoprime>, I<is_fermat_pseudoprime>
 
@@ -5118,7 +5142,9 @@ Returns true when C<n> is smooth over the prime factors of C<k>.
 
     n.is_strong_psp(bases...)
 
-Return true if C<n> is a strong pseudoprime.
+Return true if C<n> is a strong Fermat pseudoprime to the given bases.
+
+Each base must be coprime to C<n>.
 
 Aliases: I<miller_rabin>, I<is_strong_fermat_psp>, I<is_strong_pseudoprime>, I<is_strong_fermat_pseudoprime>
 

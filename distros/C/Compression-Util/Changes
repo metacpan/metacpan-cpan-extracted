@@ -1,5 +1,18 @@
 Revision history for Compression-Util
 
+0.07    2024-05-12
+
+        - Use the value of `$LZ_MAX_CHAIN_LEN` in `lz77_encode_symbolic()` as well.
+        - Added the following package variables:
+
+            $Compression::Util::LZSS_MIN_LEN
+            $Compression::Util::LZSS_MAX_LEN
+            $Compression::Util::LZ77_MIN_LEN
+            $Compression::Util::LZ77_MAX_LEN
+
+        ...which control the minimum and maximum lenght of a match in LZSS/lZ77 encoding.
+        - Added support for exporting package variables with `use Compression::Util qw($PACKAGE_VARIABLE)`.
+
 0.06    2024-05-05
 
         [ADDITIONS]
@@ -10,7 +23,7 @@ Revision history for Compression-Util
         [IMPROVEMENTS]
 
         - Much faster algorithm in lzss_encode() for large enough strings.
-        - Much better compression ratios achived by `lzss_encode()`.
+        - Much better compression ratios achived by lzss_encode().
         - Extended lzss_compress() to accept an additional optional argument, specifying the LZSS encoding method.
 
         [CHANGES]

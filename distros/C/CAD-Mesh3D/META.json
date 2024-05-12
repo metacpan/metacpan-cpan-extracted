@@ -4,7 +4,7 @@
       "Peter C. Jones <petercj AT cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "3D",
       "CAD",
@@ -67,11 +67,11 @@
    "provides" : {
       "CAD::Mesh3D" : {
          "file" : "lib/CAD/Mesh3D.pm",
-         "version" : "0.006001"
+         "version" : "0.006002"
       },
       "CAD::Mesh3D::STL" : {
          "file" : "lib/CAD/Mesh3D/STL.pm",
-         "version" : "0.006001"
+         "version" : "0.006002"
       }
    },
    "release_status" : "stable",
@@ -86,6 +86,6 @@
          "web" : "https://github.com/pryrt/CAD-Mesh3D"
       }
    },
-   "version" : "0.006001",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.006002",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -16,7 +16,7 @@ use 5.010;
         'CAD::Format::STL'      => v0.2.1,
     },
     'realclean'     => {
-        FILES => 'cover_db LICENSE.pod README.pod MYMETA.json.lock lib/CAD/Format',
+        FILES => 'cover_db LICENSE.pod README.pod MYMETA.json.lock lib/CAD/Format MANIFEST.bak',
     },
     'META_MERGE'    => {            # EUMM 6.46
         'meta-spec' => {
@@ -113,7 +113,7 @@ sub MY::postamble {
     return <<'POSTAMBLE';
 TEST_D = $(ABSPERLRUN) -MExtUtils::Command -e test_d --
 
-MY_COPYRIGHT = Copyright (C) 2017,2018,2019,2020,2021 Peter C. Jones
+MY_COPYRIGHT = Copyright (C) 2017,2018,2019,2020,2021,2024 Peter C. Jones
 
 testcover :: lib/CAD/Mesh3D.pm
 	$(NOECHO) cover -test -report html

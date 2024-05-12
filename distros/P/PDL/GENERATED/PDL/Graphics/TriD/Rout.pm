@@ -3,7 +3,7 @@
 #
 package PDL::Graphics::TriD::Rout;
 
-our @EXPORT_OK = qw(combcoords repulse attract vrmlcoordsvert contour_segments_internal );
+our @EXPORT_OK = qw(combcoords repulse attract vrmlcoordsvert );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -186,77 +186,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+
+
 #line 214 "rout.pd"
-
-=head2 contour_segments
-
-=for ref
-
-This is the interface for the pp routine contour_segments_internal
-- it takes 3 ndarrays as input
-
-C<$c> is a contour value (or a list of contour values)
-
-C<$data> is an [m,n] array of values at each point
-
-C<$points> is a list of [3,m,n] points, it should be a grid
-monotonically increasing with m and n.
-
-contour_segments returns a reference to a Perl array of
-line segments associated with each value of C<$c>.  It does not (yet) handle
-missing data values.
-
-=over 4
-
-=item Algorithm
-
-The data array represents samples of some field observed on the surface described
-by points.  For each contour value we look for intersections on the line segments
-joining points of the data.  When an intersection is found we look to the adjoining
-line segments for the other end(s) of the line segment(s).  So suppose we find an
-intersection on an x-segment.  We first look down to the left y-segment, then to the
-right y-segment and finally across to the next x-segment.  Once we find one in a
-box (two on a point) we can quit because there can only be one.  After we are done
-with a given x-segment, we look to the leftover possibilities for the adjoining y-segment.
-Thus the contours are built as a collection of line segments rather than a set of closed
-polygons.
-
-=back
-
-=cut
-
-sub PDL::Graphics::TriD::Contours::contour_segments {
-	my($this,$c,$data,$points) = @_;
-# pre compute space for output of pp routine
-  my $segdim = ($data->getdim(0)-1)*($data->getdim(1)-1)*4;
-  my $segs = zeroes(3,$segdim,$c->nelem);
-  my $cnt = zeroes($c->nelem);
-  contour_segments_internal($c,$data,$points,$segs,$cnt);
-  $this->{Points} = pdl->null;
-  my $pcnt=0;
-  my $ncnt;
-  for(my $i=0; $i<$c->nelem; $i++){
-	   $ncnt = $cnt->slice("($i)");
-      next if($ncnt==-1);
-		$pcnt = $pcnt+$ncnt;
-		$this->{ContourSegCnt}[$i] =  $pcnt;
-		$pcnt=$pcnt+1;
-		$this->{Points} = $this->{Points}->append($segs->slice(":,0:$ncnt,($i)")->transpose);
-	}
-	$this->{Points} = $this->{Points}->transpose;
-
-}
-#line 250 "Rout.pm"
-
-*contour_segments_internal = \&PDL::contour_segments_internal;
-
-
-
-
-
-
-
-#line 396 "rout.pd"
 
 =head1 AUTHOR
 
@@ -269,7 +201,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 273 "Rout.pm"
+#line 205 "Rout.pm"
 
 # Exit with OK status
 

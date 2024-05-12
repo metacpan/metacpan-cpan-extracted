@@ -4,10 +4,7 @@ author:
   - 'LNATION <email@lnation.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Rope: '0.30'
   Test::More: '0'
-  Text::CSV_XS: '1.54'
-  Type::Tiny: '2.004000'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -22,6 +19,12 @@ no_index:
     - t
     - inc
 requires:
+  JSON: '0'
+  Rope: '0.34'
+  Term::Size: '0.211'
+  Term::Table: '0.018'
+  Text::CSV_XS: '1.54'
+  Type::Tiny: '2.004000'
   perl: '5.006'
-version: '0.02'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

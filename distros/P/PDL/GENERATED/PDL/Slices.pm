@@ -3,7 +3,7 @@
 #
 package PDL::Slices;
 
-our @EXPORT_OK = qw(index index1d index2d indexND indexNDb rangeb rld rle rlevec rldvec rleseq rldseq rleND rldND _clump_int xchg mv using lags splitdim rotate broadcastI unbroadcast dice dice_axis slice diagonal );
+our @EXPORT_OK = qw(index index1d index2d indexND indexNDb rangeb rld rle rlevec rldvec rleseq rldseq rleND rldND _clump_int xchg mv using meshgrid lags splitdim rotate broadcastI unbroadcast dice dice_axis slice diagonal );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -349,7 +349,7 @@ index2d barfs if either of the index values are bad.
 
 
 
-#line 231 "slices.pd"
+#line 230 "slices.pd"
 
 =head2 indexNDb
 
@@ -400,7 +400,7 @@ sub PDL::indexND {
 
 *PDL::indexNDb = \&PDL::indexND;
 
-#line 283 "slices.pd"
+#line 282 "slices.pd"
 sub PDL::range {
   my($source,$ind,$sz,$bound) = @_;
 
@@ -753,7 +753,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1041 "slices.pd"
+#line 1040 "slices.pd"
 sub PDL::rld {
   my ($x,$y) = @_;
   my ($c,$sm) = @_ == 3 ? ($_[2], $_[2]->dim(0)) : (PDL->null, $x->sumover->max->sclr);
@@ -823,7 +823,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1082 "slices.pd"
+#line 1081 "slices.pd"
 sub PDL::rle {
   my $c = shift;
   my ($x,$y) = @_==2 ? @_ : (null,null);
@@ -911,7 +911,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1208 "slices.pd"
+#line 1206 "slices.pd"
 sub PDL::rldvec {
   my ($a,$b,$c) = @_;
   ($c,my $sm) = defined($c) ? ($c,$c->dim(1)) : (PDL->null,$a->sumover->max->sclr);
@@ -994,7 +994,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1281 "slices.pd"
+#line 1279 "slices.pd"
 sub PDL::rldseq {
   my ($a,$b,$c) = @_;
   ($c,my $sm) = defined($c) ? ($c,$c->dim(1)) : (PDL->null,$a->sumover->max->sclr);
@@ -1009,7 +1009,7 @@ sub PDL::rldseq {
 
 
 
-#line 1316 "slices.pd"
+#line 1314 "slices.pd"
 
 =head2 rleND
 
@@ -1136,7 +1136,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1475 "slices.pd"
+#line 1473 "slices.pd"
 
 =head2 reorder
 
@@ -1299,13 +1299,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1648 "slices.pd"
+#line 1646 "slices.pd"
 
 =head2 using
 
 =for ref
 
-Returns array of column numbers requested
+Returns list of columns requested
 
 =for usage
 
@@ -1329,7 +1329,37 @@ sub PDL::using {
   }
   @ind;
 }
-#line 1333 "Slices.pm"
+
+=head2 meshgrid
+
+=for ref
+
+Returns list of given 1-D vectors, but each expanded to match dims using
+L<PDL::Core/dummy>.
+
+=for usage
+
+  meshgrid($vec1, $vec2, $vec3);
+
+=for example
+
+  print map $_->info, meshgrid(xvals(3), xvals(4), xvals(2));
+  # PDL: Double D [3,4,2] PDL: Double D [3,4,2] PDL: Double D [3,4,2]
+
+=cut
+
+*meshgrid = \&PDL::meshgrid;
+sub PDL::meshgrid {
+  barf "meshgrid: only 1-dimensional inputs" if grep $_->ndims != 1, @_;
+  return @_ if @_ == 1;
+  my @dims = map $_->dims, @_;
+  my @out;
+  for my $ind (0..$#_) {
+    push @out, $_[$ind]->slice(join ',', map $_==$ind ? '' : "*$dims[$_]", 0..$#_);
+  }
+  @out;
+}
+#line 1363 "Slices.pm"
 
 
 =head2 lags
@@ -1516,7 +1546,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1975 "slices.pd"
+#line 1996 "slices.pd"
 
 =head2 dice
 
@@ -1666,7 +1696,7 @@ sub PDL::dice_axis {
   return $self->mv($axis,0)->index1d($ix)->mv(0,$axis);
 }
 *dice_axis = \&PDL::dice_axis;
-#line 1670 "Slices.pm"
+#line 1700 "Slices.pm"
 
 
 =head2 slice
@@ -1841,7 +1871,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2294 "slices.pd"
+#line 2315 "slices.pd"
 sub PDL::slice {
     my ($source, @others) = @_;
     for my $i(0..$#others) {
@@ -1877,7 +1907,7 @@ sub PDL::slice {
     PDL::_slice_int($source,my $o=$source->initialize,\@others);
     $o;
 }
-#line 1881 "Slices.pm"
+#line 1911 "Slices.pm"
 
 *slice = \&PDL::slice;
 
@@ -1947,9 +1977,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2514 "slices.pd"
+#line 2535 "slices.pd"
 sub PDL::diagonal { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
-#line 1953 "Slices.pm"
+#line 1983 "Slices.pm"
 
 *diagonal = \&PDL::diagonal;
 
@@ -1959,7 +1989,7 @@ sub PDL::diagonal { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
 
 
 
-#line 2564 "slices.pd"
+#line 2585 "slices.pd"
 
 =head1 BUGS
 
@@ -1984,7 +2014,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 1988 "Slices.pm"
+#line 2018 "Slices.pm"
 
 # Exit with OK status
 

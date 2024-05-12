@@ -133,7 +133,13 @@ pack_kevent(ident,filter,flags,fflags,data,udata, ...)
 		e->flags=flags;
 		e->fflags=fflags;
 		e->data=data;
+#if defined(IO_FD_OS_DARWIN)
 		e->udata=(uint64_t)SvRV(udata);
+#endif
+#if defined(IO_FD_OS_BSD)
+		e->udata=(void *)SvRV(udata);
+#endif
+
 		SvCUR_set(RETVAL,sizeof(KEVENT_S));
 		SvPOK_on(RETVAL);
 		//Pack

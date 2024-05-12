@@ -8,10 +8,15 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 our $VERBOSE = 0;        # verbose mode
 
-our $LZ_MAX_CHAIN_LEN = 32;    # how many recent positions to remember in LZ parsing
+our $LZ_MAX_CHAIN_LEN = 32;     # how many recent positions to remember in LZ parsing
+our $LZSS_MIN_LEN     = 4;      # minmum match length in LZSS
+our $LZSS_MAX_LEN     = 258;    # maximum match length in LZSS
+
+our $LZ77_MIN_LEN = 4;          # LZ77 minimum match length (symbolic only)
+our $LZ77_MAX_LEN = 255;        # LZ77 maximum match length
 
 # Arithmetic Coding settings
 use constant BITS         => 32;
@@ -151,7 +156,7 @@ our %EXPORT_TAGS = (
     ]
 );
 
-our @EXPORT_OK = (@{$EXPORT_TAGS{'all'}});
+our @EXPORT_OK = (@{$EXPORT_TAGS{'all'}}, '$VERBOSE', '$LZ_MAX_CHAIN_LEN', '$LZSS_MIN_LEN', '$LZSS_MAX_LEN', '$LZ77_MIN_LEN', '$LZ77_MAX_LEN');
 our @EXPORT;
 
 ##########################
@@ -2166,9 +2171,9 @@ sub lz77_encode_symbolic ($symbols) {
     my $la  = 0;
     my $end = $#$symbols;
 
-    my $min_len       = 4;      # minimum match length
-    my $max_len       = 255;    # maximum match length
-    my $max_chain_len = 32;     # how many recent positions to keep track of
+    my $min_len       = $LZ77_MIN_LEN;        # minimum match length
+    my $max_len       = $LZ77_MAX_LEN;        # maximum match length
+    my $max_chain_len = $LZ_MAX_CHAIN_LEN;    # how many recent positions to keep track of
 
     my (@literals, @distances, @lengths, %table);
 
@@ -2281,6 +2286,8 @@ sub lz77_encode ($str) {
     my @chars  = split(//, $str);
     my $end    = $#chars;
 
+    my $max_len = $LZ77_MAX_LEN;    # maximum match length
+
     my (@literals, @distances, @lengths);
 
     while ($la <= $end) {
@@ -2291,7 +2298,7 @@ sub lz77_encode ($str) {
         my $tmp;
         my $token = $chars[$la];
 
-        while (    $n <= 255
+        while (    $n <= $max_len
                and $la + $n <= $end
                and ($tmp = rindex($prefix, $token, $p)) >= 0) {
             $p = $tmp;
@@ -2324,8 +2331,8 @@ sub lzss_encode ($str) {
     my @symbols = unpack('C*', $str);
     my $end     = $#symbols;
 
-    my $min_len       = 4;                    # minimum match length
-    my $max_len       = 258;                  # maximum match length
+    my $min_len       = $LZSS_MIN_LEN;        # minimum match length
+    my $max_len       = $LZSS_MAX_LEN;        # maximum match length
     my $max_chain_len = $LZ_MAX_CHAIN_LEN;    # how many recent positions to keep track of
 
     my (@literals, @distances, @lengths, %table);
@@ -2426,8 +2433,8 @@ sub lzss_encode_fast($str) {
     my @symbols = unpack('C*', $str);
     my $end     = $#symbols;
 
-    my $min_len = 4;      # minimum match length
-    my $max_len = 258;    # maximum match length
+    my $min_len = $LZSS_MIN_LEN;    # minimum match length
+    my $max_len = $LZSS_MAX_LEN;    # maximum match length
 
     my (@literals, @distances, @lengths, %table);
 
@@ -2786,8 +2793,18 @@ The encoding of file-handles must be set to C<:raw>.
 
 B<Compression::Util> provides the following package variables:
 
-    $Compression::Util::VERBOSE = 0;           # true to enable verbose/debug mode
-    $Compression::Util::LZ_MAX_CHAIN_LEN = 32; # how many recent positions to remember for each match
+    $Compression::Util::VERBOSE = 0;            # true to enable verbose/debug mode
+    $Compression::Util::LZ_MAX_CHAIN_LEN = 32;  # how many recent positions to remember for each match in LZSS/LZ77 encoding
+
+    $Compression::Util::LZSS_MIN_LEN = 4;       # minimum match length in LZSS encoding
+    $Compression::Util::LZSS_MAX_LEN = 258;     # maximum match length in LZSS encoding
+
+    $Compression::Util::LZ77_MIN_LEN = 4;       # minimum match length in LZ77 encoding (symbolic only)
+    $Compression::Util::LZ77_MAX_LEN = 255;     # maximum match length in LZ77 encoding
+
+The package variables can also be imported as:
+
+    use Compression::Util qw($LZ_MAX_CHAIN_LEN);
 
 =head2 $LZ_MAX_CHAIN_LEN
 
@@ -3607,7 +3624,9 @@ The function returns three values: C<$literals>, which is an array-ref of uncomp
 
 The function C<lz77_encode_symbolic()> accepts an array-ref of arbitrarily large non-negative integers as input.
 
-Lengths are limited to C<255>. The output can be decoded with C<lz77_decode()> and C<lz77_encode_symbolic()>, respectively.
+Lengths are limited to C<255>, but can changed by modifying the `$Compression::Util::LZ77_MAX_LEN` variable.
+
+The output can be decoded with C<lz77_decode()> and C<lz77_decode_symbolic()>, respectively.
 
 =head2 lz77_decode / lz77_decode_symbolic
 

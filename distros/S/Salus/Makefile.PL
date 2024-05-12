@@ -10,18 +10,20 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Salus.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.006',
+    EXE_FILES        => [ 'bin/salus' ],
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
-	'Text::CSV_XS' => '1.54',
-	'Type::Tiny' => '2.004000',
-	'Rope' => '0.30'
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+	'Text::CSV_XS' => '1.54',
+	'Type::Tiny' => '2.004000',
+	'Rope' => '0.34',
+	'JSON' => '0',
+	'Term::Size' => '0.211',
+	'Term::Table' => '0.018'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Salus-*' },

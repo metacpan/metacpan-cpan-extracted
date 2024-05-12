@@ -1,0 +1,29 @@
+use alienfile;
+
+# idiomatic way to make sure we always install/update?
+probe [ q{ sh -c 'exit 127' } ];
+ 
+share {
+  start_url 'https://install.python-poetry.org';
+  plugin 'Download';
+  plugin 'Extract::File';
+
+  build [
+    [ # https://github.com/python-poetry/install.python-poetry.org/issues/24
+      # https://github.com/python-poetry/install.python-poetry.org/issues/52
+      q{ sed -i -e 's/symlinks=False/symlinks=True/' \
+           %{alien.install.extract}/install-poetry.py } ],
+
+    # poetry is not relocateable as it heads files with an absolute shebang
+    # so install direct to the sharedir for Alien::poetry
+    [ q{ POETRY_HOME=%{alien.runtime.prefix} \
+           python3 %{alien.install.extract}/install-poetry.py } ],
+
+    # then copy back to blib so that .packlist gets files, and
+    # allows use of File::ShareDir to locate binary cross-platform
+    [ q{ cp -a %{alien.runtime.prefix}/{bin,venv,VERSION} \
+               %{alien.install.prefix}/ } ],
+  ];
+};
+
+# vim: set ft=perl:

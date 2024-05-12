@@ -146,7 +146,8 @@ package Sidef::Deparse::Perl {
         $opts{header} .= <<"HEADER";
 
 use utf8;
-use ${\($] <= 5.026 ? $] : 5.026)};
+use strict;
+use feature qw(state unicode_strings unicode_eval evalbytes);
 local \$| = 1;   # autoflush
 
 HEADER
@@ -503,7 +504,7 @@ HEADER
     sub _dump_array {
         my ($self, $ref, $array) = @_;
         $self->load_mod($ref);
-        'bless([' . join(',', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array}) . "], '${ref}')";
+        'bless([' . join(',', grep { $_ ne '' } map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array}) . "], '${ref}')";
     }
 
     sub _dump_indices {
@@ -1363,7 +1364,6 @@ HEADER
             $code = 'while(1)' . $self->deparse_block_with_scope($obj->{block});
         }
         elsif ($ref eq 'Sidef::Types::Block::Given') {
-            $self->top_add(q{no warnings 'experimental::smartmatch';});
 
             my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
 
@@ -1761,7 +1761,6 @@ HEADER
 
                     # !~ and ~~ methods
                     if ($method eq '~~' or $method eq '!~') {
-                        $self->top_add(q{no warnings 'experimental::smartmatch';});
                         $code =
                             'do{my$bool=Sidef::Object::Object::smartmatch(do{'
                           . $code

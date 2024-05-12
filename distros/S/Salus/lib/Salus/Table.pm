@@ -52,7 +52,7 @@ property rows => (
 	value => [],
 );
 
-function total_rows => sub {
+function count => sub {
 	return scalar @{$_[0]->rows};
 };
 
@@ -62,7 +62,7 @@ function hmac => sub {
 };
 
 function read => sub {
-	my ($self, $file) = @_;
+	my ($self, $file, $read) = @_;
 	$file ||= $self->file;
 	my $csv = Text::CSV_XS->new ({ binary => 1, auto_diag => 1 });
 	open my $fh, "<:encoding(utf8)", $file or die "${file}: $!";
@@ -102,7 +102,29 @@ function read => sub {
 		$line++;
     	}
 	close $fh;
+
+	return \@rows if $read;
+
 	$self->rows = \@rows;
+};
+
+function combine => sub {
+	my ($self, $file, $primary) = @_;
+	
+	my $rows = $self->read($file, 1);
+
+	ROW:
+	for my $row (@{$rows}) {
+		for my $r (@{$self->rows}) {
+			if ($r->get_col($primary)->value =~ $row->get_col($primary)->value) {
+				for (@{$row->columns}) {
+					$r->get_col($_->header->index)->value = $_->value;
+				}
+				next ROW;
+			}
+		}
+		push @{$self->rows}, $row;
+	}
 };
 
 function write => sub {
@@ -147,6 +169,22 @@ function add_row => sub {
 	);
 };
 
+function add_rows => sub {
+	my ($self, $rows) = @_;
+	for my $columns (@{$rows}) {
+		my @cols;
+		for (my $i = 0; $i < scalar @{$columns}; $i++) {
+			push @cols, Salus::Row::Column->new({
+				header => $self->headers->[$i],
+				value => $columns->[$i]
+			});
+		}
+		push @{$self->rows}, Salus::Row->new(
+			columns => \@cols
+		);
+	}
+};
+
 function add_row_hash => sub {
 	my ($self, $columns) = (shift, ref $_[0] ? $_[0] : {@_});
 	my @cols;
@@ -171,6 +209,14 @@ function get_row_col => sub {
 	$self->get_row($row)->get_col($col);
 };
 
+function set_row => sub {
+	my ($self, $row, $cols) = @_;
+	$row = $self->get_row($row);
+	for (my $i = 0; $i < scalar @{$cols}; $i++) {
+		$row->set_col($i, $cols->[$i] // "");
+	}
+};
+
 function set_row_col => sub {
 	my ($self, $row, $col, $value) = @_;
 	$self->get_row($row)->set_col($col, $value);
@@ -186,4 +232,142 @@ function delete_row_col => sub {
 	$self->get_row($row)->delete_col($col);
 };
 
+function sort => sub {
+	my ($self, $col, $order, $return) = @_;
+	$col = $self->find_column_index($col);
+	my @rows = $order eq 'asc'
+		? sort { $a->get_col($col)->value cmp $b->get_col($col)->value } @{$self->rows}
+		: sort { $b->get_col($col)->value cmp $a->get_col($col)->value } @{$self->rows};
+	$self->rows = \@rows unless $return;
+	return \@rows;
+};
+
+function search => sub {
+	my ($self, $col, $search) = @_;
+	$col = $self->find_column_index($col);
+	my ($i, @indexes) = (0);
+	my @rows = grep {
+		if ( $_->get_col($col)->value =~ m/$search/i ) {
+			push @indexes, $i++;
+			return $_;
+		}
+		$i++;
+		return ();
+	} @{$self->rows};
+	return (\@rows, \@indexes);
+};
+
+function find => sub {
+	my ($self, $col, $search) = @_;
+	$col = $self->find_column_index($col);
+	my ($i, $found) = (0, undef);
+	for ( @{$self->rows} ) {
+		if ($_->get_col($col)->value =~ m/$search/i) {
+			$found = $i;
+			last;
+		}
+		$i++;
+	}
+	return $found;
+};
+
+function find_column_index => sub {
+	my ($self, $col) = @_;
+	if ($col !~ m/^\d+$/) {
+		for (@{$self->headers}) {
+			if ($_->name =~ m/^($col)$/) {
+				$col = $_->index;
+			}
+		}
+	}
+	return $col;
+};
+
+function sum => sub {
+	my ($self, $col) = @_;
+	$col = $self->find_column_index($col);
+	my $sum = 0;
+	for (@{$self->rows}) {
+		my $c = $_->get_col($col);
+		if ($c->value !~ m/^\d+$/) {
+			die "Cannot sum column as it has non numeric values";
+		}
+		$sum += $c->value;
+	}
+	return $sum;
+};
+
+function mean => sub {
+	my ($self, $col) = @_;
+	my $sum = $self->sum($col);
+	return $sum / scalar @{$self->rows};
+};
+
+function median => sub {
+	my ($self, $col, $as_row) = @_;
+	$col = $self->find_column_index($col);
+	my $rows = $self->sort($col, 'asc', 1);
+	my $median = int(scalar @{$rows} / 2);
+	if ($median % 2 != 0) {
+		$median += 1;
+	}
+	return $as_row ? $rows->[$median - 1] : $rows->[$median - 1]->get_col($col)->value;
+};
+
+function mode => sub {
+	my ($self, $col) = @_;
+	$col = $self->find_column_index($col);
+	my %map;
+	$map{$_->get_col($col)->value}++ for (@{$self->rows});
+	my ($key, $mode) = ('', 0);
+	for my $k (keys %map) {
+		if ($map{$k} > $mode) {
+			$key = $k;
+			$mode = $map{$k};
+		}
+	}
+	return ($key, $mode);
+};
+
+function min => sub {
+	my ($self, $col, $as_row) = @_;
+	$col = $self->find_column_index($col);
+	my $rows = $self->sort($col, 'asc', 1);
+	return $as_row ? $rows->[0] : $rows->[0]->get_col($col)->value;
+};
+
+function max => sub {
+	my ($self, $col, $as_row) = @_;
+	$col = $self->find_column_index($col);
+	my $rows = $self->sort($col, 'desc', 1);
+	return $as_row ? $rows->[0] : $rows->[0]->get_col($col)->value;
+};
+
+function headers_as_array => sub {
+	my ($self) = @_;
+	my @array = map {
+		$_->{label} || $_->{name}
+	} @{$self->headers};
+	return \@array;
+};
+
+function headers_stringify => sub {
+	my ($self) = @_;
+	my @array = map {
+		$_->{label} ? sprintf("%s (%s) (%s)", $_->{label}, $_->{name}, $_->{index}) : sptrintf("%s (%s)", $_->{name}, $_->{index})
+	} @{$self->headers};
+	return \@array;
+};
+
+function merge => sub {
+	my ($self, $one, $two) = @_;
+
+	return $two if (!$one);
+
+	return $one;
+};
+
 1;
+
+__END__
+

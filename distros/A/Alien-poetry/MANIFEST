@@ -1,0 +1,11 @@
+_alien/state.json
+Alien-poetry-1.000000/META.json
+Alien-poetry-1.000000/META.yml
+alienfile
+contrib/macos-cached.txt
+lib/Alien/poetry.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

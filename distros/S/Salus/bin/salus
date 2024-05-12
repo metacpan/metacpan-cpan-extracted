@@ -1,0 +1,70 @@
+#!usr/bin/perl
+use lib 'lib';
+use Salus::Command;
+
+my %map;
+for (@ARGV) {
+	my ($key, $value) = split("\=", $_, 2);
+	$map{$key} = $value;
+}
+
+Salus::Command->new(\%map)->run;
+
+__END__
+
+=head1 NAME
+ 
+salus - salus
+ 
+=head1 USAGE
+ 
+        lnation:High lnation$ salus lib=t/lib class=RA
+ 
+=cut
+
+=head2 Options
+
+	Welcome to the command line interface for Salus
+
+	The following are commands that can be used to manipulate a Salus CSV
+
+	+ Headers
+		print the headers of the csv - headers
+	+ Read File
+		read a salus csv file - read $filepath $unprotected
+	+ Add Row
+		add a new row, the delimeter is a space not wrapped in quotations - add $one $two $three
+	+ All
+		print all rows - all $include_index
+	+ Get Row
+		retrieve a row by index and print it to the terminal - get $index
+	+ Get Row Column
+		retrieve a column by row and column index and print it to the terminal - get_col $row $col
+	+ Set Row
+		set an existing row by index or name - set \$index
+	+ Set Row Column
+		set a columns value by row and column index or name - set_col $row $col
+	+ Delete Row
+		delete a row by index - delete $row
+	+ Delete Row
+		delete a column by row index and column index or name - delete $row $col
+	+ Write File
+		write data to a file - write $filepath
+	+ Sort
+		reorder the rows by column index or name - sort $col $dir
+	+ Search
+		search all rows by column value and print any matches to the terminal - search $col $search $include_index
+	+ Find
+		find a row index by column value and print it to the terminal - find $col $search
+	+ Aggregations
+		the following aggregations are available - count - min - max - sum - mean - median - mode - min $column $table
+	+ Exit
+		to exit you can either use - CTRL C - or type - exit
+	+ Help
+		print all available commands - help
+
+=cut
+
+1;
+
+

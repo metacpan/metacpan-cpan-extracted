@@ -24,6 +24,13 @@ function as_array => sub {
 
 function get_col => sub {
 	my ($self, $col) = @_;
+	if ($col !~ m/^\d+$/) {
+		for (@{$self->columns}) {
+			if ($_->header->name =~ m/^($col)$/) {
+				$col = $_->header->index;
+			}
+		}
+	}
 	return $self->columns->[$col];
 };
 

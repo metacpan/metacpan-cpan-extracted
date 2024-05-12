@@ -1,4 +1,8 @@
 Revision history for Perl extension IO::FD.
+v0.3.9 2024-05-05
+  [fixes]
+    - Attempt to fix failing compilation on experimental routines (BSD)
+
 v0.3.8 2024-05-05
   [fixes]
     - Fix failing compilation on experimental routines
