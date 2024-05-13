@@ -13,7 +13,7 @@ use Moo;
 
 use experimental 'signatures';
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use namespace::clean;
 
@@ -191,7 +191,7 @@ CXC::Number::Sequence - Numerical Sequence Generation
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

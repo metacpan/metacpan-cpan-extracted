@@ -6,21 +6,26 @@ use Test::More;
 use IO::File;
 use File::Basename;
 use Linux::Landlock::Direct qw(:functions :constants set_no_new_privs);
+use Config;
 
 my $base        = dirname(__FILE__) . '/data';
 my $abi_version = ll_get_abi_version();
+print STDERR
+  "Landlock ABI version: $abi_version, archname: $Config{archname}, 64bitint: @{[$Config{use64bitint} ? 1:0 ]}\n";
 if ($abi_version < 0) {
     ok(!defined ll_create_fs_ruleset(), "ruleset created");
 } else {
     ok($abi_version > 0,                          "Landlock available, ABI version $abi_version");
     ok(scalar ll_all_fs_access_supported() >= 13, "plausible list");
-    my $ruleset_fd = ll_create_fs_ruleset();
+    my $ruleset_fd = ll_create_fs_ruleset()
+      or BAIL_OUT("ruleset creation failed: $!");
     ok($ruleset_fd > 0, "ruleset created");
     opendir(my $dh, $base) or BAIL_OUT("$!");
     my $writable_fh = IO::File->new("$base/b", 'r');
+    # (1 << 60) is not a valid value
     ok(
         ll_add_path_beneath_rule(
-            $ruleset_fd, $LANDLOCK_ACCESS_FS{READ_FILE} | $LANDLOCK_ACCESS_FS{WRITE_FILE} | (1<<60), $writable_fh
+            $ruleset_fd, $LANDLOCK_ACCESS_FS{READ_FILE} | $LANDLOCK_ACCESS_FS{WRITE_FILE} | (1 << 60), $writable_fh
         ),
         'rule added'
     );

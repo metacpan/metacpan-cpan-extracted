@@ -22,7 +22,7 @@ use enum qw( BITMASK: MIN MAX SOFT_MIN SOFT_MAX CENTER NELEM SPACING RANGEW ALIG
 
 use Moo;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 extends 'CXC::Number::Sequence';
 
@@ -404,7 +404,7 @@ CXC::Number::Sequence::Linear - Numeric Sequence with Equal Spacing
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

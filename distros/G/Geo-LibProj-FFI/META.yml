@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,58 +20,58 @@ name: Geo-LibProj-FFI
 provides:
   Geo::LibProj::FFI:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
   Geo::LibProj::FFI::PJ_COORD:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
   Geo::LibProj::FFI::PJ_ENU:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
   Geo::LibProj::FFI::PJ_GEOD:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
   Geo::LibProj::FFI::PJ_GRID_INFO:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
   Geo::LibProj::FFI::PJ_INFO:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
   Geo::LibProj::FFI::PJ_INIT_INFO:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
   Geo::LibProj::FFI::PJ_LP:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
   Geo::LibProj::FFI::PJ_LPZ:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
   Geo::LibProj::FFI::PJ_LPZT:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
   Geo::LibProj::FFI::PJ_OPK:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
   Geo::LibProj::FFI::PJ_PROJ_INFO:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
   Geo::LibProj::FFI::PJ_UV:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
   Geo::LibProj::FFI::PJ_UVW:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
   Geo::LibProj::FFI::PJ_UVWT:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
   Geo::LibProj::FFI::PJ_XY:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
   Geo::LibProj::FFI::PJ_XYZ:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
   Geo::LibProj::FFI::PJ_XYZT:
     file: lib/Geo/LibProj/FFI.pm
-    version: '0.06'
+    version: '1.00'
 requires:
   Alien::proj: '1.07'
   Convert::Binary::C: '0.04'
@@ -82,7 +82,7 @@ requires:
 resources:
   bugtracker: https://github.com/johannessen/proj-perl-ffi/issues
   repository: https://github.com/johannessen/proj-perl-ffi.git
-version: '0.06'
-x_generated_by_perl: v5.38.0
+version: '1.00'
+x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

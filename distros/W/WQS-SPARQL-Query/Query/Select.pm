@@ -6,6 +6,8 @@ use warnings;
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 
+our $VERSION = 0.02;
+
 sub new {
 	my ($class, @params) = @_;
 
@@ -60,12 +62,9 @@ sub _property {
 	my $property_wdt;
 	if ($property_key =~ m/^P\d+$/ms) {
 		$property_wdt = 'wdt:'.$property_key;
-	} elsif ($property_key =~ m/^(P\d+)\/(P\d+\*?)$/ms) {
-		$property_wdt = 'wdt:'.$1.'/wdt:'.$2;
 	} else {
-		err "Property doesn't supported.",
-			'property_key', $property_key,
-		;
+		my ($p1, $p2) = ($property_key =~ m/^(P\d+)\/(P\d+\*?)$/ms);
+		$property_wdt = 'wdt:'.$p1.'/wdt:'.$p2;
 	}
 
 	return $property_wdt;
@@ -201,12 +200,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2023 Michal Josef Špaček
+© 2020-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

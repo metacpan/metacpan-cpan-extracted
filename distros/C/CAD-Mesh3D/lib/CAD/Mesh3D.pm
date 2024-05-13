@@ -5,7 +5,7 @@ use Carp;
 use 5.010;  # M::V::R requires 5.010, so might as well make use of the defined-or // notation :-)
 use Math::Vector::Real 0.18;
 use CAD::Format::STL qw//;
-our $VERSION = '0.006002';
+our $VERSION = '0.006003';
 
 =head1 NAME
 

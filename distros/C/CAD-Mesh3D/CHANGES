@@ -1,12 +1,21 @@
 Revision history for Perl distribution Win32-Mechanize-NotepadPlusPlus
 
+v0.006003 2024-May-12
+    - Update test suite for "formatstl_load.t":
+      The non-seekable test doesn't work on netbsd,
+      nor on armv7l-linux, so change it to only run
+      on mswin (part of #14)
+    - Update test suite for "STL-unpatched.t":
+      Only needed on MSWin32. (Noticed failure
+      during cygwin testing on v0.006002)
+
 v0.006002 2024-May-11
     - Update test suite for OpenBSD: doesn't need to cover
-      the non-seekable in "STL-unpatched.t" (part of #14)
+      the non-seekable in "formatstl_load.t" (part of #14)
 
 v0.006001 2021-Nov-25
     - Update test suite again for FreeBSD: doesn't need to cover
-      "STL-unpatched.t" (#13)
+      "formatstl_load.t" (#13)
     - Fix MANIFEST.SKIP to not bundle the .github folder in the
       distribution
 

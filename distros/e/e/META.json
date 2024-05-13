@@ -1,5 +1,5 @@
 {
-   "abstract" : "The great new e!",
+   "abstract" : "Unleash the power of e!",
    "author" : [
       "Tim Potapov <tim.potapov@gmail.com>"
    ],
@@ -21,7 +21,14 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.012"
+            "Data::Printer" : "0",
+            "Data::Trace" : "0.19",
+            "Mojolicious" : "0",
+            "Runtime::Debugger" : "0.19",
+            "Sub::Util" : "0",
+            "Tiny::Prof" : "0",
+            "YAML::XS" : "0",
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -33,7 +40,7 @@
    "provides" : {
       "e" : {
          "file" : "lib/e.pm",
-         "version" : "0.01"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -48,6 +55,6 @@
          "url" : "https://github.com/poti1/e"
       }
    },
-   "version" : "0.01",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

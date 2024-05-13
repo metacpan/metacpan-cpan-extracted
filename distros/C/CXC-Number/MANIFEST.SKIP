@@ -1,9 +1,13 @@
-^.hg
-^cover_db/
-^blib
 ^Build$
-_build_params
+^Makefile$
+^CXC-Number
+~$
+^blib/
+^pm_to_blib
+^.hg
 ^MYMETA
+^cover_db/
+^_build_params
 \.orig$
 ^dev
 ^local

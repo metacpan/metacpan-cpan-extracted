@@ -7,7 +7,7 @@ use warnings;
 use v5.28;
 use experimental 'signatures';
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 # ABSTRACT: sequence utilities
 
@@ -167,6 +167,7 @@ sub buildargs_factory {
                 next unless $key == ( $attrs_set & $key );
                 $validate->();
             }
+            $attrs = { $attrs->%* };
         }
 
         local $_ = wrap_attrs_ro( $attrs );
@@ -228,7 +229,7 @@ CXC::Number::Sequence::Utils - Utilities for CXC::Number::Sequence generators
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

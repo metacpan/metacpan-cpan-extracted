@@ -1,7 +1,5 @@
-_alien/state.json
-Alien-poetry-1.000000/META.json
-Alien-poetry-1.000000/META.yml
 alienfile
+Changes
 contrib/macos-cached.txt
 lib/Alien/poetry.pm
 LICENSE

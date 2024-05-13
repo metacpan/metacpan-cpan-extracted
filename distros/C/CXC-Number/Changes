@@ -1,5 +1,11 @@
 Revision history for CXC-Number
 
+0.13      2024-05-12 16:00:28-04:00 America/New_York
+
+  [BUGFIX]
+
+    * update to work with changed API in Hash::Wrap >= 1.0
+
 0.12      2023-04-10 13:42:39-04:00 America/New_York
 
   [BUGFIX]

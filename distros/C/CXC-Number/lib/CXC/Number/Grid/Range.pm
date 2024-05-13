@@ -9,7 +9,7 @@ use experimental 'signatures';
 
 use namespace::clean;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use overload
   fallback => 0,
@@ -142,7 +142,7 @@ CXC::Number::Grid::Range - Helper class to track Ranges
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 DESCRIPTION
 

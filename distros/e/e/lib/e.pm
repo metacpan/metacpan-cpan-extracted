@@ -1,105 +1,295 @@
 package e;
 
+=head1 LOGO
+
+                __                __             __
+   __  ______  / /__  ____ ______/ /_  ___  ____/ /
+  / / / / __ \/ / _ \/ __ `/ ___/ __ \/ _ \/ __  /
+ / /_/ / / / / /  __/ /_/ (__  ) / / /  __/ /_/ /
+ \__,_/_/ /_/_/\___/\__,_/____/_/ /_/\___/\__,_/
+
+=cut
+
 use 5.006;
 use strict;
 use warnings;
 
 =head1 NAME
 
-e - The great new e!
-
-=head1 VERSION
-
-Version 0.01
+e - Unleash the power of e!
 
 =cut
 
-our $VERSION = '0.01';
-
+our $VERSION = 1.03;
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
+Convert a data structure to json:
 
-Perhaps a little code snippet.
+    perl -Me -e 'say j { a => [ 1..3] }'
 
-    use e;
+Convert a data structure to yaml:
 
-    my $foo = e->new();
-    ...
+    perl -Me -e 'say yml { a => [ 1..3] }'
 
-=head1 EXPORT
+Pretty print a data structure:
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+    perl -Me -e 'p { a => [ 1..3] }'
 
-=head1 SUBROUTINES/METHODS
+Data dump a data structure:
 
-=head2 function1
+    perl -Me -e 'd { a => [ 1..3] }'
+
+Devel::Peek dump a data structure:
+
+    perl -Me -e 'dd { a => [ 1..3] }'
+
+Add a trace marker:
+
+    perl -Me -e 'dd {'
+    perl -Me -e 'sub f1 { trace } sub f2 { f1 } f2'
+
+Watch a reference for changes:
+
+    perl -Me -e 'my $v = {}; sub f1 { watcg( $v ) } sub f2 { f1; $v->{a} = 1 } f2'
+
+Launch the Runtime::Debugger:
+
+    perl -Me -e 'repl'
+
+Invoke the Tiny::Prof:
+
+    perl -Me -e 'prof'
+
+=head1 SUBROUTINES
+
+=head2 monkey_patch
+
+insert subroutines into the symbol table.
+
+Extracted from Mojo::Util for performance.
+
+Can be updated once this issue is resolved:
+L<https://github.com/mojolicious/mojo/pull/2173>
 
 =cut
 
-sub function1 {
+sub monkey_patch {
+    my ( $class, %patch ) = @_;
+
+    require Sub::Util;    # Can omit set_subname, but it makes traces nicer.
+    no strict "refs";
+
+    for ( keys %patch ) {
+        *{"${class}::$_"} =
+          Sub::Util::set_subname( "${class}::$_", $patch{$_} );
+    }
 }
 
-=head2 function2
+=head2 import
+
+Inserts commands into caller's namespace.
 
 =cut
 
-sub function2 {
+sub import {
+    monkey_patch(
+        ~~ caller(),
+
+        ######################################
+        #          Investigation
+        ######################################
+
+        # Debugging.
+        repl => sub {
+            require Runtime::Debugger;
+            Runtime::Debugger->VERSION( 0.19 )
+              ;    # Since not using "use MODULE VERSION".
+            Runtime::Debugger::repl(
+                levels_up => 1,
+                @_,
+            );
+        },
+
+        # Tracing.
+        trace => sub {    # Stack or var trace.
+            require Data::Trace;
+            Data::Trace->VERSION( 0.19 )
+              ;           # Since not using "use MODULE VERSION".
+            Data::Trace::Trace( @_ );
+        },
+
+        # Alias for trace.
+        watch => sub {    # Stack or var trace.
+            require Data::Trace;
+            Data::Trace->VERSION( 0.19 )
+              ;           # Since not using "use MODULE VERSION".
+            Data::Trace::Trace( @_ );
+        },
+
+
+        # Benchmark/timing.
+        n => sub (&@) {
+            require Benchmark;
+            Benchmark->import( ':hireswallclock' );
+            print STDERR "\n";
+            print STDERR Benchmark::timestr(
+                Benchmark::timeit( $_[1] // 1, $_[0] ) );
+            print STDERR "\n";
+        },
+
+        # Profiling.
+        prof => sub {
+            require Tiny::Prof;
+            Tiny::Prof->run(
+                Name => 'Test',
+                @_,
+            );
+        },
+
+        ######################################
+        #         Format Conversions
+        ######################################
+
+        # Json.
+        j => sub {
+            require Mojo::JSON;
+            Mojo::JSON::j( @_ );
+        },
+
+        # XML/HTML.
+        x => sub {
+            require Mojo::DOM;
+            Mojo::DOM->new( @_ );
+        },
+
+        # YAML.
+        yml => sub {
+            my ( $thing ) = @_;
+            require YAML::XS;
+            ref $thing
+              ? YAML::XS::Dump( $thing )
+              : YAML::XS::Load( $thing );
+        },
+
+        ######################################
+        #          Enhanced Types
+        ######################################
+
+        # String Object.
+        b => sub {
+            require Mojo::ByteStream;
+            Mojo::ByteStream::b( @_ );
+        },
+
+        # Array Object.
+        c => sub {
+            require Mojo::Collection;
+            Mojo::Collection::c( @_ );
+        },
+
+        ######################################
+        #         Files Convenience
+        ######################################
+
+        # File Object.
+        f => sub {
+            require Mojo::File;
+            Mojo::File::path( @_ );
+        },
+
+        ######################################
+        #             Output
+        ######################################
+
+        # Print.
+        say => sub {
+            print @_ ? @_ : $_;
+            print "\n";
+        },
+
+        # Pretty Print.
+        p => sub {
+            require Data::Printer;
+            Data::Printer->import( use_prototypes => 0 );
+            p( @_ );
+        },
+        np => sub {
+            require Data::Printer;
+            Data::Printer->import( use_prototypes => 0 );
+            np( @_ );
+        },
+
+        # Dumper.
+        d => sub {
+            require Mojo::Util;
+            print Mojo::Util::dumper( @_ );
+        },
+
+        # Dump C stuctures.
+        dd => sub {
+            require Devel::Peek;
+            Devel::Peek::Dump( @_ );
+        },
+
+        ######################################
+        #           Web Related
+        ######################################
+
+        # GET request.
+        g => sub {
+            require Mojo::UserAgent;
+            my $UA = Mojo::UserAgent->new;
+            $UA->max_redirects( 10 ) unless defined $ENV{MOJO_MAX_REDIRECTS};
+            $UA->proxy->detect       unless defined $ENV{MOJO_PROXY};
+            $UA->get( @_ )->result;
+        },
+
+        # URL.
+        l => sub {
+            require Mojo::URL;
+            Mojo::URL->new( @_ );
+        },
+
+        ######################################
+        #         Package Building
+        ######################################
+
+        monkey_patch => \&monkey_patch,
+
+    );
 }
 
 =head1 AUTHOR
 
-tim Potapov, C<< <tim.potapov[AT]gmail.com> >>
+Tim Potapov, C<< <tim.potapov[AT]gmail.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-e at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=e>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
+Please report any bugs or feature requests to
+L<https://github.com/poti1/e/issues>.
 
 =head1 SUPPORT
 
-You can find documentation for this module with the perldoc command.
+You can find documentation for this module
+with the perldoc command.
 
     perldoc e
 
-
 You can also look for information at:
 
-=over 4
+L<https://metacpan.org/pod/e>
 
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=e>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/e>
-
-=item * Search CPAN
-
-L<https://metacpan.org/release/e>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
+L<https://github.com/poti1/e>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2024 by tim Potapov.
+This software is Copyright (c) 2024 by Tim Potapov.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
 
-
 =cut
 
-1; # End of e
+"\x{1f42a}\x{1f977}"

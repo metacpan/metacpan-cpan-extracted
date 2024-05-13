@@ -2,7 +2,7 @@ use v5.14;
 use warnings;
 
 # ABSTRACT: Foreign function interface to PROJ coordinate transformation software
-package Geo::LibProj::FFI 0.06;
+package Geo::LibProj::FFI 1.00;
 
 
 use Alien::proj 1.07;
@@ -214,37 +214,37 @@ $ffi->custom_type( 'PJ_PRIME_MERIDIANS' => {
 
 # Geodetic, mostly spatiotemporal coordinate types
 {
-	package Geo::LibProj::FFI::PJ_XYZT 0.06;
+	package Geo::LibProj::FFI::PJ_XYZT 1.00;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ x y z t }) }
-	package Geo::LibProj::FFI::PJ_UVWT 0.06;
+	package Geo::LibProj::FFI::PJ_UVWT 1.00;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ u v w t })->uvwt }
-	package Geo::LibProj::FFI::PJ_LPZT 0.06;
+	package Geo::LibProj::FFI::PJ_LPZT 1.00;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ lam phi z t }) }
-	package Geo::LibProj::FFI::PJ_OPK 0.06;
+	package Geo::LibProj::FFI::PJ_OPK 1.00;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ o p k 0 }) }
 	# Rotations: omega, phi, kappa
-	package Geo::LibProj::FFI::PJ_ENU 0.06;
+	package Geo::LibProj::FFI::PJ_ENU 1.00;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ e n u 0 }) }
 	# East, North, Up
-	package Geo::LibProj::FFI::PJ_GEOD 0.06;
+	package Geo::LibProj::FFI::PJ_GEOD 1.00;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ s a1 a2 0 }) }
 	# Geodesic length, fwd azi, rev azi
 }
 
 # Classic proj.4 pair/triplet types - moved into the PJ_ name space
 {
-	package Geo::LibProj::FFI::PJ_UV 0.06;
+	package Geo::LibProj::FFI::PJ_UV 1.00;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ u v 0 0 })->uv }
-	package Geo::LibProj::FFI::PJ_XY 0.06;
+	package Geo::LibProj::FFI::PJ_XY 1.00;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ x y 0 0 }) }
-	package Geo::LibProj::FFI::PJ_LP 0.06;
+	package Geo::LibProj::FFI::PJ_LP 1.00;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ lam phi 0 0 }) }
 	
-	package Geo::LibProj::FFI::PJ_XYZ 0.06;
+	package Geo::LibProj::FFI::PJ_XYZ 1.00;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ x y z 0 }) }
-	package Geo::LibProj::FFI::PJ_UVW 0.06;
+	package Geo::LibProj::FFI::PJ_UVW 1.00;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ u v w 0 })->uvw }
-	package Geo::LibProj::FFI::PJ_LPZ 0.06;
+	package Geo::LibProj::FFI::PJ_LPZ 1.00;
 	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ lam phi z 0 }) }
 }
 
@@ -256,7 +256,7 @@ $ffi->custom_type( 'PJ_PRIME_MERIDIANS' => {
 	# FFI::Platypus. Workaround: Use a Record with some additional Perl
 	# glue. The performance may not be perfect, but seems satisfactory.
 	
-	package Geo::LibProj::FFI::PJ_COORD 0.06;
+	package Geo::LibProj::FFI::PJ_COORD 1.00;
 	use FFI::Platypus::Record;
 	record_layout_1(qw{ double[4] v });
 	# First and foremost, it really is "just 4 numbers in a vector"
@@ -381,7 +381,7 @@ $ffi->type('record(Geo::LibProj::FFI::PJ_COORD)' => 'PJ_COORD');
 
 
 {
-	package Geo::LibProj::FFI::PJ_INFO 0.06;
+	package Geo::LibProj::FFI::PJ_INFO 1.00;
 	use FFI::Platypus::Record;
 	record_layout_1(
 		int    => 'major',       # Major release number
@@ -400,7 +400,7 @@ $ffi->type('record(Geo::LibProj::FFI::PJ_COORD)' => 'PJ_COORD');
 $ffi->type('record(Geo::LibProj::FFI::PJ_INFO)' => 'PJ_INFO');
 
 {
-	package Geo::LibProj::FFI::PJ_PROJ_INFO 0.06;
+	package Geo::LibProj::FFI::PJ_PROJ_INFO 1.00;
 	use FFI::Platypus::Record;
 	record_layout_1(
 		string => 'id',           # Name of the projection in question
@@ -413,7 +413,7 @@ $ffi->type('record(Geo::LibProj::FFI::PJ_INFO)' => 'PJ_INFO');
 $ffi->type('record(Geo::LibProj::FFI::PJ_PROJ_INFO)' => 'PJ_PROJ_INFO');
 
 {
-	package Geo::LibProj::FFI::PJ_GRID_INFO 0.06;
+	package Geo::LibProj::FFI::PJ_GRID_INFO 1.00;
 	use FFI::Platypus::Record;
 	record_layout_1(
 		'string(32)'  => 'gridname_NUL',         # name of grid
@@ -433,7 +433,7 @@ $ffi->type('record(Geo::LibProj::FFI::PJ_PROJ_INFO)' => 'PJ_PROJ_INFO');
 $ffi->type('record(Geo::LibProj::FFI::PJ_GRID_INFO)' => 'PJ_GRID_INFO');
 
 {
-	package Geo::LibProj::FFI::PJ_INIT_INFO 0.06;
+	package Geo::LibProj::FFI::PJ_INIT_INFO 1.00;
 	use FFI::Platypus::Record;
 	record_layout_1(
 		'string(32)'  => 'name_NUL',        # name of init file
@@ -579,7 +579,7 @@ Geo::LibProj::FFI - Foreign function interface to PROJ coordinate transformation
 
 =head1 VERSION
 
-version 0.06
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -613,7 +613,14 @@ L<C function reference|https://proj.org/development/reference/functions.html>
 for further documentation. You should be able to use those
 S<C functions> as if they were Perl.
 
-This module is functional, but incomplete.
+L<Geo::LibProj::FFI> offers a large portion of the most commonly
+used PROJ functions, but more could be added later.
+If you need a function that isn't yet available in this module,
+please open a GitHub issue with a description of your use case.
+
+This module was originally written for PROJ S<version 8>.
+It works with PROJ versions as old as 6.2.0, and up to and
+including the most recent version.
 
 =head1 FUNCTIONS
 
@@ -845,24 +852,6 @@ Please see the
 L<PROJ data type reference|https://proj.org/development/reference/datatypes.html>
 for further documentation.
 
-=head1 BUGS AND LIMITATIONS
-
-PROJ makes heavy use of S<C C<union>> pass-by-value, which is
-unsupported by L<FFI::Platypus>. In earlier versions of this module,
-the workaround for working with C<PJ_COORD> values was quite slow.
-This performance issue has been addressed as of S<version 0.03.>
-
-Some implementation details of the glue this module provides
-may change in future, for example to better match the API or to
-increase performance. Should you decide to
-use this module in production, it would be wise to watch the
-L<GitHub project|https://github.com/johannessen/proj-perl-ffi>
-for changes, at least until the version has reached 1.00.
-
-This module is designed to be used with PROJ S<version 8>.
-PROJ versions as far back as 6.2.0 should work as well;
-please report any issues.
-
 =head1 SEE ALSO
 
 =over
@@ -870,6 +859,8 @@ please report any issues.
 =item * L<Geo::LibProj::cs2cs>
 
 =item * L<Geo::Proj4>
+
+=item * L<PDL::GIS::Proj>
 
 =item * PROJ C API Reference:
 L<Data types|https://proj.org/development/reference/datatypes.html>,
@@ -890,14 +881,11 @@ and the module author didn't design the API.
 
 =head1 AUTHOR
 
-Arne Johannessen <ajnn@cpan.org>
-
-If you contact me by email, please make sure you include the word
-"Perl" in your subject header to help beat the spam filters.
+Arne Johannessen (L<AJNN|https://metacpan.org/author/AJNN>)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021-2023 by Arne Johannessen.
+This software is Copyright (c) 2021-2024 by Arne Johannessen.
 
 This is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0 or (at your option) the same terms

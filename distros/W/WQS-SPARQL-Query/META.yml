@@ -33,4 +33,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/WQS-SPARQL-Query
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/WQS-SPARQL-Query
-version: '0.01'
+version: '0.02'

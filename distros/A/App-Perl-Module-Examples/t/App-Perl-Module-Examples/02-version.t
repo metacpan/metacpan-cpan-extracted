@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($App::Perl::Module::Examples::VERSION, 0.02, 'Version.');
+is($App::Perl::Module::Examples::VERSION, 0.03, 'Version.');

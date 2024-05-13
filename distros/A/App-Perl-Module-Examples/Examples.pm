@@ -10,7 +10,7 @@ use Getopt::Std;
 use IO::Barf qw(barf);
 use Pod::Example qw(get sections);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -183,12 +183,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2012-2023 Michal Josef Špaček
+© 2012-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

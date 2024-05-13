@@ -3,20 +3,18 @@ verbose = 9
 
 exclude = Freenode
 
-
-
 [-BuiltinFunctions::RequireBlockGrep]
 [-BuiltinFunctions::RequireBlockMap]
 [-CodeLayout::ProhibitParensWithBuiltins]
 [-ControlStructures::ProhibitPostfixControls]
 [-ControlStructures::ProhibitUnlessBlocks]
+[-Documentation::PodSpelling]
 [-Documentation::RequirePodAtEnd]
 [-Documentation::RequirePodSections]
 [-Documentation::ProhibitUnbalancedParens]
 [-ErrorHandling::RequireCarping]
 [-InputOutput::RequireBriefOpen]
 [-NamingConventions::Capitalization]
-[-Documentation::PodSpelling]
 [-References::ProhibitDoubleSigils]
 [-RegularExpressions::RequireDotMatchAnything]
 [-RegularExpressions::RequireExtendedFormatting]
@@ -31,11 +29,11 @@ exclude = Freenode
 [-TestingAndDebugging::RequireUseWarnings]
 [-TryTiny::RequireUse]
 [-ValuesAndExpressions::ProhibitAccessOfPrivateData]
+[-ValuesAndExpressions::ProhibitConstantPragma]
 [-ValuesAndExpressions::ProhibitFiletest_f]
+[-ValuesAndExpressions::ProhibitMagicNumbers]
 [-ValuesAndExpressions::ProhibitMixedBooleanOperators]
 [-ValuesAndExpressions::ProhibitVersionStrings]
-[-ValuesAndExpressions::ProhibitConstantPragma]
-[-ValuesAndExpressions::ProhibitMagicNumbers]
 [-ValuesAndExpressions::RequireInterpolationOfMetachars]
 [-ValuesAndExpressions::RequireNumericVersion]
 [-Variables::ProhibitPunctuationVars]

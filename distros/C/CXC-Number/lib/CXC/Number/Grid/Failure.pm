@@ -9,7 +9,7 @@ use experimental 'signatures';
 use parent 'Exporter::Tiny';
 use custom::failures ();
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 our @EXPORT_OK;
 BEGIN {
@@ -44,7 +44,7 @@ CXC::Number::Grid::Failure - CXC::Number::Sequence Exceptions
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 INTERNALS
 

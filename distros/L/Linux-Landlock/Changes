@@ -1,0 +1,22 @@
+0.5   2024-05-12T13:32:00+02:00
+    - emulate pack('Q', ...) on Perls without 64-bit integers
+    - add some diagnostic output to tests
+
+0.4   2024-05-11T01:04:45+02:00
+    - rework syscall handling
+    - mask out unsupported access bits to provide "best effort" sandboxing if unknown
+      access bits are used, e.g. when running on older kernels
+    - do not bail out in tests if functionality is not supported
+    - change ll_all_fs_access_supported and ll_all_net_access_supported to return bitmasks
+
+0.3   2024-05-10T00:39:49+02:00
+    - rename Linux::Landlock::Ruleset to Linux::Landlock
+
+0.2    2024-05-09T23:43:52+02:00
+
+    - some packaging and metadata fixes
+    - add tests for network actions on kernels without support
+
+0.1   2024-05-09T22:10:40+02:00
+
+    - initial release

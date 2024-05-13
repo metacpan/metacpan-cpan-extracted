@@ -1,5 +1,5 @@
 ---
-abstract: 'The great new e!'
+abstract: 'Unleash the power of e!'
 author:
   - 'Tim Potapov <tim.potapov@gmail.com>'
 build_requires:
@@ -16,12 +16,19 @@ name: e
 provides:
   e:
     file: lib/e.pm
-    version: '0.01'
+    version: '1.03'
 requires:
-  perl: '5.012'
+  Data::Printer: '0'
+  Data::Trace: '0.19'
+  Mojolicious: '0'
+  Runtime::Debugger: '0.19'
+  Sub::Util: '0'
+  Tiny::Prof: '0'
+  YAML::XS: '0'
+  perl: '5.016'
 resources:
   bugtracker: https://github.com/poti1/e/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/poti1/e
-version: '0.01'
+version: '1.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

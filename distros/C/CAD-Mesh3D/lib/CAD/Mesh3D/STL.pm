@@ -5,7 +5,7 @@ use Carp;
 use 5.010;  # M::V::R requires 5.010, so might as well make use of the defined-or // notation :-)
 use CAD::Format::STL qw//;
 use CAD::Mesh3D qw/:create/;
-our $VERSION = '0.006002'; # auto-populated from CAD::Mesh3D
+our $VERSION = '0.006003'; # auto-populated from CAD::Mesh3D
 
 # start by deciding which formatter to use
 our $STL_FORMATTER;

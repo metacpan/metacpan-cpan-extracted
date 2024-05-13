@@ -1,4 +1,4 @@
-use 5.010;      # v5.8 equired for in-memory files; v5.10 required for named backreferences and // in the commented-note() calls
+use 5.010;      # v5.8 required for in-memory files; v5.10 required for named backreferences and // in the commented-note() calls
 use strict;
 use warnings;
 use Test::More;
@@ -7,12 +7,8 @@ use version 0.77;
 use FindBin;
 use lib "$FindBin::Bin/unpatched";
 BEGIN {
-    if( $^O eq 'linux' ) {
-        # want linux to pretend it is windows, to get full coverage of patched/unpatched
-        #   it will _work_ on linux, but isn't required
-        $ENV{CAD_MESH3D_OVERRIDE_OS} = 'MSWin32';
-    } elsif ( $^O ne 'MSWin32' and $^O ne 'cygwin' ) {
-        # if it's not windows and not linux, then we don't need this
+    if ( $^O ne 'MSWin32' ) {
+        # if it's not windows, then we don't need this
         plan skip_all => 'Unpatched test not needed except on Windows';
     }
 }

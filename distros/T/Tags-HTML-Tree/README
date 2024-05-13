@@ -11,6 +11,12 @@ SYNOPSIS
      $obj->process;
      $obj->process_css;
 
+DESCRIPTION
+    Tags helper to print HTML page of tree structure defined by Tree
+    instance.
+
+    The page contains clickable tree with usage of Javascript code.
+
 METHODS
   "new"
      my $obj = Tags::HTML::Tree->new(%params);
@@ -423,5 +429,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

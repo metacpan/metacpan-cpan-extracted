@@ -21,7 +21,7 @@ use Safe::Isa;
 
 use Moo;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use constant GridObject   => InstanceOf [ ( __PACKAGE__ ) ];
 use constant IncludeArray => ArrayRef [ Enum [ 0, 1 ] ];
@@ -1195,7 +1195,7 @@ CXC::Number::Grid - A class representing a one dimensional numeric grid
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

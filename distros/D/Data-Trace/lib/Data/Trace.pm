@@ -20,16 +20,27 @@ use parent  qw( Exporter );
 use feature qw( say );
 
 our @EXPORT  = qw( Trace );
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 =head1 SYNOPSIS
+
+Variable change trace:
 
     use Data::Trace;
 
     my $data = {a => [0, {complex => 1}]};
+
     sub BadCall{ $data->{a}[0] = 1 }
+
     Trace($data);
-    BadCall();  # Shows strack trace of where data was changed.
+
+    BadCall();  # Shows stack trace of where data was changed.
+
+Stack trace:
+    
+    use Data::Trace;
+    Trace();    # 1 level.
+    Trace(5);   # 5 levels.
 
 =cut
 
@@ -50,26 +61,72 @@ its been changed, but this module is without Moose support.
 
 =head2 Trace
 
- Trace( \$scalar );
- Trace( \@array );
- Trace( \@hash );
- Trace( $complex_data );
+Watch a reference for changes:
+
+ Trace( \$scalar, @OPTIONS );
+ Trace( \@array , @OPTIONS );
+ Trace( \@hash , @OPTIONS );
+ Trace( $complex_data , @OPTIONS );
+
+Just a stack trace with no watching:
+
+ Trace( @OPTIONS );
+
+Options 
+
+ -clone => 0, # Disable auto tying after a Storable dclone. 
 
 =cut
 
 sub Trace {
-    __PACKAGE__->_TieNodes( @_ );
+    my %args   = __PACKAGE__->_ProcessArgs( @_ );
+    my $method = $args{-var} ? "_TieNodes" : "_Trace";
+    __PACKAGE__->$method( %args );
+}
+
+=head2 _ProcessArgs
+
+    Allows calling Trace like:
+    Trace() and Trace(-levels => 1) to
+    mean the same.
+
+=cut
+
+sub _ProcessArgs {
+    my ( $class, @raw_args ) = @_;
+    my %args;
+
+    while ( my $arg = shift @raw_args ) {
+        if ( $arg =~ / ^ - /x ) {
+            $args{ $arg } = shift @raw_args;
+        }
+        elsif ( ref $arg ) {
+            $args{ -var } = $arg;
+        }
+        elsif ( $arg =~ / ^ \d+ $ /x ) {
+            $args{ -levels } = $arg;
+        }
+        else {
+            die "_ProcessArgs: Invalid arg: $arg";
+        }
+    }
+
+    $args{-levels}  //= ($args{-var} ? 3 : 1);
+    $args{-message} //= "HERE:";
+
+    %args;
 }
 
 sub _TieNodes {
-    my ( $class, $data, @args ) = @_;
+    my ( $class, %args ) = @_;
 
-    if ( not ref $data ) {
-        die "Error: data must be a reference!";
+    my $var = delete $args{-var} // '';
+    if ( not ref $var ) {
+        die "Error: trace data must be a reference!";
     }
 
-    my @refs    = grep { ref } Data::DPath->match( $data, "//" );
-    my %watches = $class->_BuildWatcherMethods();
+    my @refs    = grep { ref } Data::DPath->match( $var, "//" );
+    my %watches = $class->_BuildWatcherMethods( %args );
     my @nodes;
 
     for my $ref ( @refs ) {
@@ -77,7 +134,7 @@ sub _TieNodes {
           Data::Tie::Watch->new(
             -variable => $ref,
             %watches,
-            @args,
+            %args,
           );
     }
 
@@ -85,22 +142,25 @@ sub _TieNodes {
 }
 
 sub _BuildWatcherMethods {
-    my ( $class ) = @_;
-    my %args;
+    my ( $class, %args ) = @_;
+    my %watches;
 
     for my $name ( $class->_DefineMethodNames() ) {
         my $method = ucfirst $name;
-        $args{"-$name"} = sub {
+        $watches{"-$name"} = sub {
             my ( $_self, @_args ) = @_;
             my $_args =
               join ", ",
               map { defined() ? qq("$_") : "undef" } @_args;
-            __PACKAGE__->_Trace( "\U$name\E( $_args ):" );
+            __PACKAGE__->_Trace(
+                %args,
+                -message => "\U$name\E( $_args ):",
+            );
             $_self->$method( @_args );
         };
     }
 
-    %args;
+    %watches;
 }
 
 sub _DefineMethodNames {
@@ -118,42 +178,72 @@ sub _DefineMethodNames {
 }
 
 sub _Trace {
-    my ( $class, $message ) = @_;
-    $message //= '';
+    my ( $class, %args ) = @_;
+    my @lines;
+    my $counter;
+
+    # Collect a max amount of lines.
+    for my $line ( $class->_TraceRawish() ) {
+        push @lines, $line;
+        last if ++$counter >= $args{-levels};
+    }
+
+    my ($first,@rest) = @lines;
+
+    # Prepend the message.
+    # and prefix to additional lines.
+    require Time::Moment;
+    my $time = Time::Moment->now->strftime( "%Y/%m/%d-%T%3f" );
+    @lines = (
+        "[$time] $args{-message} $first",
+        map { " |- $_" } @rest,
+    );
+
+    # Add an extra line for visibility.
+    unshift @lines, "" if @lines > 1;
+
+    # Return the output.
+    my $output = join "\n", @lines;
+    return $output if defined wantarray;
+
+    # Or send to STDOUT.
+    say $output;
+}
+
+sub _TraceRawish {
+    my ( $class ) = @_;
 
     local $Carp::MaxArgNums = -1;
 
-    say "";
-    say $message;
-
-    say for map { "\t$_" }
-      grep {
+    # Stack trace while ignoring specific packages.
+    grep {
         !m{
-                ^ \s* (?:
-                      Class::MOP
-                    | [\w_:]+ :: _wrapped_ \w+
-                    | $class
-                    | Data::Tie::Watch::callback
-                    | Mojolicious
-                    | Mojo
-                    | Try::Tiny
-                    | eval
-                ) \b
 
-                |
+            ^ \s* (?:
+                  $class
+                | [\w_:]+ :: _wrapped_ \w+
+                | Data::Tie::Watch::callback
+                | Mojolicious
+                | Class::MOP
+                | Try::Tiny
+                | Mojo
+                | eval
+            ) \b
 
-                (?:
-                      Try/Tiny
-                    | Mojolicious
-                    | Mojolicious/Controller
-                )
-                \.pm \s+ line
+            |
 
-            }x
-      }
-      map { s/ ^ \s+ //xr }
-      split /\n/,
-      Carp::longmess( $class );
+            (?:
+                  Mojolicious/Controller
+                | Mojolicious
+                | Try/Tiny
+            )
+            \.pm \s+ line
+
+        }x
+    }
+    map { s/ ^ \s+ //xr }
+    split /\n/,
+    Carp::longmess( $class );
 }
 
 =head1 AUTHOR

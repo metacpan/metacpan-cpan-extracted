@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -69,15 +69,12 @@
             "Dist::Zilla::Plugin::Test::NoBreakpoints" : "0",
             "Dist::Zilla::Plugin::Test::NoTabs" : "0",
             "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
-            "Dist::Zilla::Plugin::Test::Perl::Critic::Freenode" : "0",
             "Dist::Zilla::Plugin::Test::PodSpelling" : "0",
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
             "Dist::Zilla::Plugin::Test::TrailingSpace" : "0",
-            "Dist::Zilla::Plugin::Test::UnusedVars" : "0",
             "Dist::Zilla::Plugin::Test::Version" : "0",
             "Dist::Zilla::PluginBundle::Basic" : "0",
             "Dist::Zilla::PluginBundle::Filter" : "0",
-            "Perl::Critic::Freenode" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Weaver::Plugin::StopWords" : "0",
             "Pod::Weaver::Section::Contributors" : "0",
@@ -96,7 +93,6 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Spelling" : "0.12",
             "Test::TrailingSpace" : "0.0203",
-            "Test::Vars" : "0.015",
             "Test::Version" : "1",
             "aliased" : "0"
          }
@@ -149,75 +145,75 @@
    "provides" : {
       "CXC::Number" : {
          "file" : "lib/CXC/Number.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "CXC::Number::Grid" : {
          "file" : "lib/CXC/Number/Grid.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "CXC::Number::Grid::Failure" : {
          "file" : "lib/CXC/Number/Grid/Failure.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "CXC::Number::Grid::Range" : {
          "file" : "lib/CXC/Number/Grid/Range.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "CXC::Number::Grid::Role::BigNum" : {
          "file" : "lib/CXC/Number/Grid/Role/BigNum.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "CXC::Number::Grid::Role::PDL" : {
          "file" : "lib/CXC/Number/Grid/Role/PDL.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "CXC::Number::Grid::Tree" : {
          "file" : "lib/CXC/Number/Grid/Tree.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "CXC::Number::Grid::Types" : {
          "file" : "lib/CXC/Number/Grid/Types.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "CXC::Number::Sequence" : {
          "file" : "lib/CXC/Number/Sequence.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "CXC::Number::Sequence::Failure" : {
          "file" : "lib/CXC/Number/Sequence/Failure.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "CXC::Number::Sequence::Fixed" : {
          "file" : "lib/CXC/Number/Sequence/Fixed.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "CXC::Number::Sequence::Linear" : {
          "file" : "lib/CXC/Number/Sequence/Linear.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "CXC::Number::Sequence::Ratio" : {
          "file" : "lib/CXC/Number/Sequence/Ratio.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "CXC::Number::Sequence::Role::BigNum" : {
          "file" : "lib/CXC/Number/Sequence/Role/BigNum.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "CXC::Number::Sequence::Role::PDL" : {
          "file" : "lib/CXC/Number/Sequence/Role/PDL.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "CXC::Number::Sequence::Types" : {
          "file" : "lib/CXC/Number/Sequence/Types.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "CXC::Number::Sequence::Utils" : {
          "file" : "lib/CXC/Number/Sequence/Utils.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "CXC::Number::Types" : {
          "file" : "lib/CXC/Number/Types.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -232,9 +228,9 @@
          "web" : "https://gitlab.com/djerius/cxc-number"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_generated_by_perl" : "v5.28.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

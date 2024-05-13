@@ -1,3 +1,7 @@
+0.04 2024-05-12T11:57:31+02:00
+ - Add DESCRIPTION section to doc.
+ - Move Tree.pm file to lib/Tags/HTML/Tree.pm file in dist.
+
 0.03 2024-05-08T13:40:03+02:00
  - Fix minimal dependency for Tags::HTML. Because of script_js().
 

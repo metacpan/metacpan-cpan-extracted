@@ -1,5 +1,13 @@
 Revision history for Geo::LibProj::FFI
 
+1.00  2024-05-12
+
+ - Documentation update: Future major changes are no longer expected for this
+   module. The version number is incremented to reflect that the interface is
+   now considered stable.
+
+ - No functional changes.
+
 0.06  2023-12-05
 
  - Fix compatibility with Perl v5.26 and older. (GH #3)

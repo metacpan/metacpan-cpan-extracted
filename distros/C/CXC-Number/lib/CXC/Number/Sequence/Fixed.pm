@@ -6,7 +6,7 @@ use v5.28;
 
 use Moo;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use namespace::clean;
 
@@ -39,7 +39,7 @@ CXC::Number::Sequence::Fixed - CXC::Number::Sequence with arbitrary values
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

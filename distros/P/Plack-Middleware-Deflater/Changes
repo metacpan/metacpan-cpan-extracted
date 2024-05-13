@@ -1,5 +1,8 @@
 Revision history for Perl extension Plack::Middleware::Deflater
 
+0.14  2024-05-12 12:08:29 PDT
+        - remove .bak file #18 (skaji)
+
 0.13  2024-05-10 14:50:50 PDT
         - Do not clobber existing Content-Encoding from the inner app #17 (plicease)
 

@@ -38,7 +38,7 @@ extends 'CXC::Number::Sequence';
 
 use namespace::clean;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 my sub nelem {
     my ( $ratio, $w0, $Dr ) = @_;
@@ -317,7 +317,7 @@ CXC::Number::Sequence::Ratio - Numeric Sequence with Relative Fractional Spacing
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

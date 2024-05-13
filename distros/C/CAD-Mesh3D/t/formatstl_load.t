@@ -122,7 +122,7 @@ foreach my $file ( 'files/cube.stl' ) {
 
 # STDIN filehandle: non-seekable without explicit mode
 SKIP: {
-  skip "OpenBSD appears to allow seeking in STDIN!", 1 if $^O eq 'openbsd';
+  skip "Some non-Win OS appear to allow seeking in STDIN!", 1 if $^O ne 'MSWin32';
   my $stl = CAD::Mesh3D::FormatSTL->new or BAIL_OUT("->new() failed in line __".__LINE__."__");
   throws_ok { $stl->load(\*STDIN); } qr/non-seekable/, 'load(\*STDIN): non-seekable';
 }

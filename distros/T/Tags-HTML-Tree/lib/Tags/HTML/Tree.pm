@@ -12,7 +12,7 @@ use Mo::utils::CSS 0.06 qw(check_css_class check_css_unit);
 use Scalar::Util qw(blessed);
 use Unicode::UTF8 qw(decode_utf8);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -200,6 +200,12 @@ Tags::HTML::Tree - Tags helper for Tree.
  $obj->prepare;
  $obj->process;
  $obj->process_css;
+
+=head1 DESCRIPTION
+
+L<Tags> helper to print HTML page of tree structure defined by L<Tree> instance.
+
+The page contains clickable tree with usage of Javascript code.
 
 =head1 METHODS
 
@@ -653,6 +659,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

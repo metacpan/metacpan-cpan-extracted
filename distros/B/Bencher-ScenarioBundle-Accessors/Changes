@@ -1,0 +1,104 @@
+0.151   2024-05-06  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename dist Bencher-Scenario{s,Bundle}-* to be consistent with
+          others.
+
+
+0.150   2021-08-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Remove participant: Evo::Class (non-working code).
+
+        - Add participant: Object::Pad.
+
+        - Show charts in sample benchmark results.
+
+
+0.14    2017-01-25  Released-By: PERLANCAR
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.13    2016-11-26  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Force version of Perl::Examples::Accessors::EvoClass to 0.11 to
+	  force Evo::Class minimum version.
+
+
+0.12    2016-11-25  Released-By: PERLANCAR
+
+        - Add participants: Object::Tiny, Object::Tiny::{XS,RW,RW::XS}, Moos,
+          Moops, Class::Struct, Evo::Class.
+
+
+0.11    2016-09-29  Released-By: PERLANCAR
+
+	- Add participant: Mojo::Base::XS.
+
+	- Set expected result for getter.
+
+
+0.10    2016-09-09  Released-By: PERLANCAR
+
+	- [ux] Include generator modules in scenario so their versions can
+	  be shown in the sample benchmark produced by
+	  PWP:Bencher::Scenario.
+
+
+0.09    2016-09-09  Released-By: PERLANCAR
+
+        - Add participant: Class::Tiny.
+
+        - [build] Rebuild to update participant module versions, especially
+          optimize the manual accessors a bit.
+
+
+0.08    2016-06-26  Released-By: PERLANCAR
+
+	- Add participant: Simple::Accessor.
+
+
+0.07    2016-06-23  Released-By: PERLANCAR
+
+        - No functional changes.
+
+        - [build] Rebuild with newer Bencher for nicer output.
+
+
+0.06    2016-04-14  Released-By: PERLANCAR
+
+	- Add participants: Mojo::Base, Object::Simple.
+
+
+0.05    2016-04-14  Released-By: PERLANCAR
+
+	- Add participant: Class::InsideOut.
+
+
+0.04    2016-03-31  Released-By: PERLANCAR
+
+	- Rename scenario Accessors::{Read,Get}, Accessors::{Write,Set}.
+
+	- Mention Benchmark::Perl::Formance &
+	  Benchmark::Perl::Formance::Plugin::Accessors*.
+
+
+0.03    2016-03-30  Released-By: PERLANCAR
+
+	- Compare read/write accessors with raw array/hash access.
+
+
+0.02    2016-03-29  Released-By: PERLANCAR
+
+	- Accessor::Construction: Include result size to show the object
+	  size.
+
+
+0.01    2016-03-29  Released-By: PERLANCAR
+
+        - First release.

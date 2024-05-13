@@ -2,10 +2,12 @@ Build.PL
 Changes
 lib/e.pm
 MANIFEST			This list of files
+MANIFEST.SKIP
 META.json
 META.yml
 README.md
 t/00-load.t
+t/01-simple.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

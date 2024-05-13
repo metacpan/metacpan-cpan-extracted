@@ -6,7 +6,7 @@ use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Math::BigInt upgrade => 'Math::BigFloat';
 use Math::BigFloat;
@@ -85,7 +85,7 @@ CXC::Number::Grid::Types - Type::Tiny types for CXC::Number::Grid
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 TYPES
 

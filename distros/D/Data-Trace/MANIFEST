@@ -12,4 +12,3 @@ t/01-usage-simple.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-xt/boilerplate.t

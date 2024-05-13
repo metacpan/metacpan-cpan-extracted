@@ -6,7 +6,7 @@ use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use parent 'Tree::Range::RB';
 
@@ -192,8 +192,7 @@ sub to_grid ( $self ) {
 
 
 
-sub snap_overlaid ( $self, $layer, $snap_to, $snap_dist )
-{    ## no critic(Subroutines::ProhibitManyArgs)
+sub snap_overlaid ( $self, $layer, $snap_to, $snap_dist ) {    ## no critic(Subroutines::ProhibitManyArgs)
 
     return if $snap_dist == 0;
 
@@ -214,8 +213,7 @@ sub snap_overlaid ( $self, $layer, $snap_to, $snap_dist )
 
 
 
-sub _snap_overlaid_edges ( $self, $layer, $snap_to, $snap_dist, $scan_direction )
-{    ## no critic(Subroutines::ProhibitManyArgs)
+sub _snap_overlaid_edges ( $self, $layer, $snap_to, $snap_dist, $scan_direction ) {    ## no critic(Subroutines::ProhibitManyArgs)
 
     require CXC::Number::Grid::Range;
 
@@ -331,7 +329,7 @@ CXC::Number::Grid::Tree - A Tree representing a Grid
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 DESCRIPTION
 

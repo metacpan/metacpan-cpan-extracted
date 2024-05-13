@@ -170,9 +170,9 @@ use warnings;
 use Exporter 'import';
 use List::Util                qw(reduce);
 use POSIX                     qw();
-use Linux::Landlock::Syscalls qw(NR);
+use Linux::Landlock::Syscalls qw(NR Q_pack);
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 # adapted from linux/landlock.ph, architecture independent consts
 my $LANDLOCK_CREATE_RULESET_VERSION = (1 << 0);
 our %LANDLOCK_ACCESS_FS = (
@@ -282,9 +282,9 @@ sub ll_create_net_ruleset {
 sub ll_create_ruleset {
     my ($fs_actions, $net_actions) = @_;
 
-    my $allowed = pack('Q', reduce { $a | $b } 0, @$fs_actions);
+    my $allowed = Q_pack(reduce { $a | $b } 0, @$fs_actions);
     if (ll_get_abi_version >= 4) {
-        $allowed .= pack('Q', reduce { $a | $b } 0, @$net_actions);
+        $allowed .= Q_pack(reduce { $a | $b } 0, @$net_actions);
     }
     my $fd = syscall(NR('landlock_create_ruleset'), $allowed, length $allowed, 0);
     if ($fd >= 0) {
@@ -301,7 +301,7 @@ sub ll_add_path_beneath_rule {
     my $result = syscall(
         NR('landlock_add_rule'), $ruleset_fd,
         $LANDLOCK_RULE{PATH_BENEATH},
-        pack('Ql', $allowed_access & ll_all_fs_access_supported, $fd), 0
+        Q_pack($allowed_access & ll_all_fs_access_supported) . pack('l', $fd), 0
     );
     return ($result == 0) ? 1 : undef;
 }
@@ -312,7 +312,7 @@ sub ll_add_net_port_rule {
     my $result = syscall(
         NR('landlock_add_rule'), $ruleset_fd,
         $LANDLOCK_RULE{NET_PORT},
-        pack('QQ', $allowed_access & ll_all_net_access_supported, $port), 0
+        Q_pack($allowed_access & ll_all_net_access_supported) . Q_pack($port), 0
     );
     return ($result == 0) ? 1 : undef;
 }

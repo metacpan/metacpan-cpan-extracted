@@ -1,3 +1,7 @@
+0.002003  2024-05-12 11:56:39-07:00 America/Los_Angeles
+
+    - Fix issue where duplicate UUIDs could be generated after forking
+
 0.002002  2024-04-25 12:16:42+01:00 Europe/Lisbon
 
     - Fix a debian issue (#2)

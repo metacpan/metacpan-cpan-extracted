@@ -4,12 +4,23 @@ Data::Trace - Trace when a data structure gets updated.
 
 # SYNOPSIS
 
+Variable change trace:
+
     use Data::Trace;
 
     my $data = {a => [0, {complex => 1}]};
+
     sub BadCall{ $data->{a}[0] = 1 }
+
     Trace($data);
-    BadCall();  # Shows strack trace of where data was changed.
+
+    BadCall();  # Shows stack trace of where data was changed.
+
+Stack trace:
+
+    use Data::Trace;
+    Trace();    # 1 level.
+    Trace(5);   # 5 levels.
 
 # DESCRIPTION
 
@@ -26,10 +37,26 @@ its been changed, but this module is without Moose support.
 
 ## Trace
 
-    Trace( \$scalar );
-    Trace( \@array );
-    Trace( \@hash );
-    Trace( $complex_data );
+Watch a reference for changes:
+
+    Trace( \$scalar, @OPTIONS );
+    Trace( \@array , @OPTIONS );
+    Trace( \@hash , @OPTIONS );
+    Trace( $complex_data , @OPTIONS );
+
+Just a stack trace with no watching:
+
+    Trace( @OPTIONS );
+
+Options 
+
+    -clone => 0, # Disable auto tying after a Storable dclone. 
+
+## \_ProcessArgs
+
+    Allows calling Trace like:
+    Trace() and Trace(-levels => 1) to
+    mean the same.
 
 # AUTHOR
 

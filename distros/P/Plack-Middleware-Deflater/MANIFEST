@@ -9,7 +9,6 @@ README
 cpanfile
 dist.ini
 lib/Plack/Middleware/Deflater.pm
-lib/Plack/Middleware/Deflater.pm.bak
 t/00_compile.t
 t/author-pod-syntax.t
 t/content_type.t

@@ -1,68 +1,94 @@
+# LOGO
+
+                   __                __             __
+      __  ______  / /__  ____ ______/ /_  ___  ____/ /
+     / / / / __ \/ / _ \/ __ `/ ___/ __ \/ _ \/ __  /
+    / /_/ / / / / /  __/ /_/ (__  ) / / /  __/ /_/ /
+    \__,_/_/ /_/_/\___/\__,_/____/_/ /_/\___/\__,_/
+
 # NAME
 
-e - The great new e!
-
-# VERSION
-
-Version 0.01
+e - Unleash the power of e!
 
 # SYNOPSIS
 
-Quick summary of what the module does.
+Convert a data structure to json:
 
-Perhaps a little code snippet.
+    perl -Me -e 'say j { a => [ 1..3] }'
 
-    use e;
+Convert a data structure to yaml:
 
-    my $foo = e->new();
-    ...
+    perl -Me -e 'say yml { a => [ 1..3] }'
 
-# EXPORT
+Pretty print a data structure:
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+    perl -Me -e 'p { a => [ 1..3] }'
 
-# SUBROUTINES/METHODS
+Data dump a data structure:
 
-## function1
+    perl -Me -e 'd { a => [ 1..3] }'
 
-## function2
+Devel::Peek dump a data structure:
+
+    perl -Me -e 'dd { a => [ 1..3] }'
+
+Add a trace marker:
+
+    perl -Me -e 'dd {'
+    perl -Me -e 'sub f1 { trace } sub f2 { f1 } f2'
+
+Watch a reference for changes:
+
+    perl -Me -e 'my $v = {}; sub f1 { watcg( $v ) } sub f2 { f1; $v->{a} = 1 } f2'
+
+Launch the Runtime::Debugger:
+
+    perl -Me -e 'repl'
+
+Invoke the Tiny::Prof:
+
+    perl -Me -e 'prof'
+
+# SUBROUTINES
+
+## monkey\_patch
+
+insert subroutines into the symbol table.
+
+Extracted from Mojo::Util for performance.
+
+Can be updated once this issue is resolved:
+[https://github.com/mojolicious/mojo/pull/2173](https://github.com/mojolicious/mojo/pull/2173)
+
+## import
+
+Inserts commands into caller's namespace.
 
 # AUTHOR
 
-tim Potapov, `<tim.potapov[AT]gmail.com>`
+Tim Potapov, `<tim.potapov[AT]gmail.com>`
 
 # BUGS
 
-Please report any bugs or feature requests to `bug-e at rt.cpan.org`, or through
-the web interface at [https://rt.cpan.org/NoAuth/ReportBug.html?Queue=e](https://rt.cpan.org/NoAuth/ReportBug.html?Queue=e).  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to
+[https://github.com/poti1/e/issues](https://github.com/poti1/e/issues).
 
 # SUPPORT
 
-You can find documentation for this module with the perldoc command.
+You can find documentation for this module
+with the perldoc command.
 
     perldoc e
 
 You can also look for information at:
 
-- RT: CPAN's request tracker (report bugs here)
+[https://metacpan.org/pod/e](https://metacpan.org/pod/e)
 
-    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=e](https://rt.cpan.org/NoAuth/Bugs.html?Dist=e)
-
-- CPAN Ratings
-
-    [https://cpanratings.perl.org/d/e](https://cpanratings.perl.org/d/e)
-
-- Search CPAN
-
-    [https://metacpan.org/release/e](https://metacpan.org/release/e)
-
-# ACKNOWLEDGEMENTS
+[https://github.com/poti1/e](https://github.com/poti1/e)
 
 # LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2024 by tim Potapov.
+This software is Copyright (c) 2024 by Tim Potapov.
 
 This is free software, licensed under:
 
