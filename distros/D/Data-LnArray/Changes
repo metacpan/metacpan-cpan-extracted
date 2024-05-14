@@ -3,3 +3,5 @@ Revision history for Data-LnArray
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.04    2024-05-13
+	- Adds get and set methods

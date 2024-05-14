@@ -1,9 +1,9 @@
 package ExtUtils::Builder::Linker;
-$ExtUtils::Builder::Linker::VERSION = '0.003';
+$ExtUtils::Builder::Linker::VERSION = '0.004';
 use base qw/ExtUtils::Builder::ArgumentCollector ExtUtils::Builder::Binary/;
 
 use ExtUtils::Builder::Action::Command;
-use ExtUtils::Builder::Action::Code;
+use ExtUtils::Builder::Action::Function;
 use ExtUtils::Builder::Node;
 
 use Carp ();
@@ -137,7 +137,7 @@ ExtUtils::Builder::Linker
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 METHODS
 

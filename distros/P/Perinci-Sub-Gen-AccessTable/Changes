@@ -1,3 +1,10 @@
+0.594   2024-05-14  Released-By: PERLANCAR; Urgency: medium
+
+        - Clarify code & documentation.
+
+        - Remove remaining 'use experimental "smartmatch"'.
+
+
 0.593   2023-07-09  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

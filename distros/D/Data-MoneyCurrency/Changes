@@ -1,5 +1,12 @@
 Revision history for Data-MoneyCurrency
 
+0.27    Mon May 13 21:24:03 CEST 2024
+        - ZWG not ZIG
+
+0.26    Mon May 13 17:57:33 CEST 2024
+        - ZW uses the ZIG
+          https://en.wikipedia.org/wiki/Zimbabwe_Gold
+
 0.25
         - HR now uses EUR
         

@@ -16,9 +16,9 @@ use Perinci::Sub::Util qw(err);
 #use String::Trim::More qw(trim_blank_lines);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-09'; # DATE
+our $DATE = '2024-05-14'; # DATE
 our $DIST = 'Perinci-Sub-Gen-AccessTable'; # DIST
-our $VERSION = '0.593'; # VERSION
+our $VERSION = '0.594'; # VERSION
 
 our @EXPORT_OK = qw(gen_read_table_func);
 
@@ -782,34 +782,35 @@ sub _gen_func {
             }
         }
 
-        for ('before_parse_query') {
-            last unless $hooks->{$_};
-            $hookargs{_stage} = $_;
-            my $hres = $hooks->{$_}->(%hookargs);
+        for my $hookname ('before_parse_query') {
+            last unless $hooks->{$hookname};
+            local $hookargs{_stage} = $hookname;
+            my $hres = $hooks->{$hookname}->(%hookargs);
             return $hres if ref($hres);
         }
         my $query;
-        {
+      PARSE_QUERY: {
             my $res = __parse_query($table_def, $opts, $func_meta, \%args);
-            for ('after_parse_query') {
-                $hookargs{_parse_res} = $res;
-                last unless $hooks->{$_};
-                $hookargs{_stage} = $_;
-                my $hres = $hooks->{$_}->(%hookargs);
+            $hookargs{_parse_res} = $res;
+            for my $hookname ('after_parse_query') {
+                last unless $hooks->{$hookname};
+                local $hookargs{_stage} = $hookname;
+                my $hres = $hooks->{$hookname}->(%hookargs);
                 return $hres if ref($hres);
             }
             return $res unless $res->[0] == 200;
             $query = $res->[2];
-        }
+        } # PARSE_QUERY
 
         # retrieve data
         my $data;
         my $metadata = {};
-        for ('before_fetch_data') {
-            $hookargs{_query} = $query;
-            last unless $hooks->{$_};
-            $hookargs{_stage} = $_;
-            my $hres = $hooks->{$_}->(%hookargs);
+        $hookargs{_query} = $query;
+
+        for my $hookname ('before_fetch_data') {
+            last unless $hooks->{$hookname};
+            $hookargs{_stage} = $hookname;
+            my $hres = $hooks->{$hookname}->(%hookargs);
             return $hres if ref($hres);
         }
         if (ref($table_data) =~ /\ATableData::/) {
@@ -836,11 +837,12 @@ sub _gen_func {
             # this should be impossible, already checked earlier
             die "BUG: 'data' from table data function is not an array";
         }
-        for ('after_fetch_data') {
-            $hookargs{_data} = $data;
-            last unless $hooks->{$_};
-            $hookargs{_stage} = $_;
-            my $hres = $hooks->{$_}->(%hookargs);
+        $hookargs{_data} = $data;
+
+        for my $hookname ('after_fetch_data') {
+            last unless $hooks->{$hookname};
+            $hookargs{_stage} = $hookname;
+            my $hres = $hooks->{$hookname}->(%hookargs);
             return $hres if ref($hres);
         }
 
@@ -1101,7 +1103,6 @@ sub _gen_func {
         }
 
         use warnings;
-        use experimental 'smartmatch';
 
         # perform paging
         log_trace("(read_table_func) Paging ...");
@@ -1140,12 +1141,12 @@ sub _gen_func {
         my $res = [200, "OK", \@r, $resmeta];
 
         $resmeta->{'table.fields'} = $query->{requested_fields};
+        $hookargs{_func_res} = $res;
 
-        for ('before_return') {
-            $hookargs{_func_res} = $res;
-            last unless $hooks->{$_};
-            $hookargs{_stage} = $_;
-            my $hres = $hooks->{$_}->(%hookargs);
+        for my $hookname ('before_return') {
+            last unless $hooks->{$hookname};
+            $hookargs{_stage} = $hookname;
+            my $hres = $hooks->{$hookname}->(%hookargs);
             return $hres if ref($hres);
         }
 
@@ -1502,18 +1503,29 @@ _
             description => <<'_',
 
 You can instruct the generated function to execute codes in various stages by
-using hooks. Currently available hooks are: `before_parse_query`,
-`after_parse_query`, `before_fetch_data`, `after_fetch_data`, `before_return`.
+using hooks. Currently available hooks are (in execution order):
+
+- before_parse_query
+- after_parse_query
+- before_fetch_data
+- after_fetch_data
+- before_return
+
 Hooks will be passed the function arguments as well as one or more additional
-ones. All hooks will get `_stage` (name of stage) and `_func_res` (function
-arguments, but as hash reference so you can modify it). `after_parse_query` and
-later hooks will also get `_parse_res` (parse result). `before_fetch_data` and
-later will also get `_query`. `after_fetch_data` and later will also get
-`_data`. `before_return` will also get `_func_res` (the enveloped response to be
-returned to user).
+ones.
+
+- All hooks will get `_stage` (name of stage) and `_func_args` (function
+  arguments, but as hash reference so you can modify it).
+- `after_parse_query` and later hooks will also get `_parse_res` (parse
+  enveloped result)
+- `before_fetch_data` and later will also get `_query` (parsed query, which is
+  just the payload a.k.a. third element of `_parse_res`).
+- `after_fetch_data` and later will also get `_data`.
+- `before_return` will also get `_func_res` (the enveloped response to be
+  returned to user).
 
 Hook should return nothing or a false value on success. It can abort execution
-of the generated function if it returns an envelope response (an array). On that
+of the generated function if it returns an envelope response (an array). In that
 case, the function will return with this return value.
 
 _
@@ -1709,7 +1721,7 @@ Perinci::Sub::Gen::AccessTable - Generate function (and its metadata) to read ta
 
 =head1 VERSION
 
-This document describes version 0.593 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2023-07-09.
+This document describes version 0.594 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2024-05-14.
 
 =head1 SYNOPSIS
 
@@ -2056,18 +2068,45 @@ Extra metadata properties for the generated function metadata.
 Supply hooks.
 
 You can instruct the generated function to execute codes in various stages by
-using hooks. Currently available hooks are: C<before_parse_query>,
-C<after_parse_query>, C<before_fetch_data>, C<after_fetch_data>, C<before_return>.
+using hooks. Currently available hooks are (in execution order):
+
+=over
+
+=item * before_parse_query
+
+=item * after_parse_query
+
+=item * before_fetch_data
+
+=item * after_fetch_data
+
+=item * before_return
+
+=back
+
 Hooks will be passed the function arguments as well as one or more additional
-ones. All hooks will get C<_stage> (name of stage) and C<_func_res> (function
-arguments, but as hash reference so you can modify it). C<after_parse_query> and
-later hooks will also get C<_parse_res> (parse result). C<before_fetch_data> and
-later will also get C<_query>. C<after_fetch_data> and later will also get
-C<_data>. C<before_return> will also get C<_func_res> (the enveloped response to be
+ones.
+
+=over
+
+=item * All hooks will get C<_stage> (name of stage) and C<_func_args> (function
+arguments, but as hash reference so you can modify it).
+
+=item * C<after_parse_query> and later hooks will also get C<_parse_res> (parse
+enveloped result)
+
+=item * C<before_fetch_data> and later will also get C<_query> (parsed query, which is
+just the payload a.k.a. third element of C<_parse_res>).
+
+=item * C<after_fetch_data> and later will also get C<_data>.
+
+=item * C<before_return> will also get C<_func_res> (the enveloped response to be
 returned to user).
 
+=back
+
 Hook should return nothing or a false value on success. It can abort execution
-of the generated function if it returns an envelope response (an array). On that
+of the generated function if it returns an envelope response (an array). In that
 case, the function will return with this return value.
 
 =item * B<install> => I<bool> (default: 1)
@@ -2271,7 +2310,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

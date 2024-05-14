@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::PE::GCC;
-$ExtUtils::Builder::Linker::PE::GCC::VERSION = '0.003';
+$ExtUtils::Builder::Linker::PE::GCC::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -10,6 +10,7 @@ use File::Basename ();
 sub _init {
 	my ($self, %args) = @_;
 	$args{ld} ||= ['gcc'];
+	$args{export} ||= 'all';
 	$self->ExtUtils::Builder::Linker::Unixy::_init(%args);
 	$self->ExtUtils::Builder::Linker::COFF::_init(%args);
 	return;
@@ -28,7 +29,7 @@ sub linker_flags {
 	}
 
 	if ($self->export eq 'all') {
-		push @ret, $self->new_arguments(ranking => 85, value => ['-Wl,--export-all-symbols']);
+		push @ret, $self->new_argument(ranking => 85, value => ['-Wl,--export-all-symbols']);
 	}
 	elsif ($self->export eq 'some') {
 		my $export_file = $opts{export_file} || ($opts{basename} || File::Basename::basename($to)) . '.def';
@@ -51,7 +52,7 @@ ExtUtils::Builder::Linker::PE::GCC
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

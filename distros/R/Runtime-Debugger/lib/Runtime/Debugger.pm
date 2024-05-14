@@ -32,7 +32,7 @@ use feature         qw( say );
 use parent          qw( Exporter );
 use subs            qw( uniq );
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 our @EXPORT  = qw( run repl d np p );
 our %PEEKS;
 
@@ -441,6 +441,7 @@ sub _init {
     my ( $class, %args ) = @_;
 
     # Setup the terminal.
+    $Term::ReadLine::Gnu::has_been_initialized = 0;
     my $term    = Term::ReadLine->new( $class );
     my $attribs = $term->Attribs;
     $term->ornaments( 0 );    # Remove underline from terminal.

@@ -1,5 +1,11 @@
 Revision history for Runtime-Debugger
 
+=================
+0.20 - 2024-05-14
+=================
+
+Can be called multiple times.
+
 ====
 0.19
 ====

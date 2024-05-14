@@ -29,6 +29,7 @@ lib/TableDataRole/Munge/Filter.pm
 lib/TableDataRole/Munge/GroupRows.pm
 lib/TableDataRole/Munge/MungeColumns.pm
 lib/TableDataRole/Munge/Reverse.pm
+lib/TableDataRole/Munge/SerializeRef.pm
 lib/TableDataRole/Source/AOA.pm
 lib/TableDataRole/Source/AOH.pm
 lib/TableDataRole/Source/CSVInDATA.pm

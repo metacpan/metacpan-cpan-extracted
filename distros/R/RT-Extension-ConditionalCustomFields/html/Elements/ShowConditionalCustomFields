@@ -4,8 +4,7 @@
 %       my @condition_vals = ref($condition_val) eq 'ARRAY' ? @$condition_val : ($condition_val);
 <script type="text/javascript">
 jQuery(function() {
-%       my $condition_cf = RT::CustomField->new($session{CurrentUser});
-%       $condition_cf->Load($condition->{CF});
+%       my $condition_cf = $Object->LoadCustomFieldByIdentifier($condition->{CF});
 %       if ($condition_cf->id) {
 %           if ($ParentSelector eq 'id') {
     var condition_selector = '<% '#CF-' . $condition_cf->id . '-ShowRow' |n%>';

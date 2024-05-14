@@ -3,6 +3,7 @@ abstract: 'Perl extension for Package URL (aka "purl")'
 author:
   - 'Giuseppe Di Terlizzi <gdt@cpan.org>'
 build_requires:
+  CPAN::DistnameInfo: '0'
   ExtUtils::MakeMaker: '0'
   JSON::PP: '0'
   Test::More: '0'
@@ -21,10 +22,11 @@ no_index:
     - inc
 requires:
   JSON::PP: '0'
+  List::Util: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/giterlizzi/perl-URI-PackageURL/issues
   repository: git://github.com/giterlizzi/perl-URI-PackageURL
-version: '2.11'
+version: '2.20'
 x_purl: pkg:cpan/GDT/URI-PackageURL
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

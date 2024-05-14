@@ -1,5 +1,5 @@
 package CPAN::Meta::Prereqs::Filter;
-$CPAN::Meta::Prereqs::Filter::VERSION = '0.006';
+$CPAN::Meta::Prereqs::Filter::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -111,7 +111,7 @@ CPAN::Meta::Prereqs::Filter - Filtering various things out of CPAN::Meta::Prereq
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

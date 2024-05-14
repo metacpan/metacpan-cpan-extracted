@@ -4,9 +4,9 @@ use strict 'subs', 'vars';
 use Regexp::Pattern::Perl::Module ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-03-06'; # DATE
+our $DATE = '2024-05-13'; # DATE
 our $DIST = 'Module-Load-Util'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -46,7 +46,15 @@ sub _load_module {
     my $module = shift;
 
     my $do_load = defined $opts->{load} ? $opts->{load} : 1;
-    return $module unless $do_load;
+
+    unless ($do_load) {
+        if ($opts->{ns_prefix}) {
+            $module = $opts->{ns_prefix} . ($opts->{ns_prefix} =~ /::\z/ ? '' : '::') . $module;
+        } elsif ($opts->{ns_prefixes} && @{ $opts->{ns_prefixes} }) {
+            $module = $opts->{ns_prefixes}[0] . ($opts->{ns_prefixes}[0] =~ /::\z/ ? '' : '::') . $module;
+        }
+        return $module;
+    }
 
     my @ns_prefixes = $opts->{ns_prefixes} ? @{$opts->{ns_prefixes}} :
         defined($opts->{ns_prefix}) ? ($opts->{ns_prefix}) : ('');
@@ -107,6 +115,7 @@ sub instantiate_class_with_optional_args {
     $opts->{import} = 0;
     $opts->{target_package} = caller(0);
     my $res = load_module_with_optional_args($opts, $class_with_optional_args);
+    #use DD; print "Options: "; dd $opts; print "Result: "; dd $res;
     my $class = $res->{module};
     my $args  = $res->{args};
 
@@ -173,7 +182,7 @@ Module::Load::Util - Some utility routines related to module loading
 
 =head1 VERSION
 
-This document describes version 0.011 of Module::Load::Util (from Perl distribution Module-Load-Util), released on 2024-03-06.
+This document describes version 0.012 of Module::Load::Util (from Perl distribution Module-Load-Util), released on 2024-05-13.
 
 =head1 SYNOPSIS
 

@@ -20,7 +20,7 @@ e - Unleash the power of e!
 
 =cut
 
-our $VERSION = 1.03;
+our $VERSION = '1.04';
 
 =head1 SYNOPSIS
 
@@ -78,7 +78,7 @@ sub monkey_patch {
     my ( $class, %patch ) = @_;
 
     require Sub::Util;    # Can omit set_subname, but it makes traces nicer.
-    no strict "refs";
+    no strict 'refs';
 
     for ( keys %patch ) {
         *{"${class}::$_"} =
@@ -103,7 +103,7 @@ sub import {
         # Debugging.
         repl => sub {
             require Runtime::Debugger;
-            Runtime::Debugger->VERSION( 0.19 )
+            Runtime::Debugger->VERSION( '0.20' )
               ;    # Since not using "use MODULE VERSION".
             Runtime::Debugger::repl(
                 levels_up => 1,
@@ -114,7 +114,7 @@ sub import {
         # Tracing.
         trace => sub {    # Stack or var trace.
             require Data::Trace;
-            Data::Trace->VERSION( 0.19 )
+            Data::Trace->VERSION( '0.19' )
               ;           # Since not using "use MODULE VERSION".
             Data::Trace::Trace( @_ );
         },
@@ -122,7 +122,7 @@ sub import {
         # Alias for trace.
         watch => sub {    # Stack or var trace.
             require Data::Trace;
-            Data::Trace->VERSION( 0.19 )
+            Data::Trace->VERSION( '0.19' )
               ;           # Since not using "use MODULE VERSION".
             Data::Trace::Trace( @_ );
         },

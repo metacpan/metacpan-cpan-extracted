@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/OpenCageData/perl5-Data-MoneyCurrency.svg?branch=master)](https://travis-ci.org/OpenCageData/perl5-Data-MoneyCurrency)
+[![Build Status](https://github.com/OpenCageData/perl5-Data-MoneyCurrency/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenCageData/perl5-Data-MoneyCurrency/actions/workflows/ci.yml)
 [![CPAN](https://img.shields.io/cpan/v/Data-MoneyCurrency.svg?style=flat-square)](https://metacpan.org/pod/Data::MoneyCurrency)
-[![Twitter Follow](https://img.shields.io/twitter/follow/OpenCage?label=Follow%20OpenCage&style=social)](https://twitter.com/opencage)
+![Mastodon Follow](https://img.shields.io/mastodon/follow/109287663468501769?domain=https%3A%2F%2Fen.osm.town%2F&style=social)
 
 # Data::MoneyCurrency
 

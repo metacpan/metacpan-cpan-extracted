@@ -1,7 +1,6 @@
 %   my $condition = $CustomField->ConditionedBy;
 %   if ($condition) {
-%       my $condition_cf = RT::CustomField->new($session{CurrentUser});
-%       $condition_cf->Load($condition->{CF});
+%       my $condition_cf = $Object->LoadCustomFieldByIdentifier($condition->{CF});
 %       if ($condition_cf->id) {
 %           my $condition_val = $condition->{vals} || '';
 %           my @condition_vals = ref($condition_val) eq 'ARRAY' ? @$condition_val : ($condition_val);
@@ -35,7 +34,7 @@ jQuery(function() {
 %    }
 %           if ($condition_cf->RenderType eq 'Dropdown') {
     waitForElm('.dropdown.CF-<% $condition_cf->id %>-Edit').then((elm) => {
-        jQuery(condition_selector).trigger('change');
+        jQuery(condition_selector).triggerHandler('change');
     });
 %           }
 %           if ($condition_cf->Type eq 'HTML') {
@@ -49,7 +48,7 @@ jQuery(function() {
 %           if ($condition_cf->Type eq 'HTML') {
                 condition_cke.fire('change');
 %    } else {
-                jQuery(condition_selector).trigger('change');
+                jQuery(condition_selector).triggerHandler('change');
 %    }
             }
         });
@@ -76,21 +75,21 @@ jQuery(function() {
         if (condition_met) {
             if (jQuery('#'+cf_id).length) {
                 jQuery('#'+cf_id).closest('<% $ParentSelector %>').show();
-                jQuery('#'+cf_id).closest('<% $ParentSelector %>').trigger('show');
+                jQuery('#'+cf_id).closest('<% $ParentSelector %>').triggerHandler('show');
             } else {
                 jQuery('input[name="'+cf_id+'"], textarea[name="'+cf_id+'"]').closest('<% $ParentSelector %>').show();
-                jQuery('input[name="'+cf_id+'"]').first().trigger('show');
-                jQuery('textarea[name="'+cf_id+'"]').trigger('show');
+                jQuery('input[name="'+cf_id+'"]').first().triggerHandler('show');
+                jQuery('textarea[name="'+cf_id+'"]').triggerHandler('show');
             }
         }
         else {
             if (jQuery('#'+cf_id).length) {
                 jQuery('#'+cf_id).closest('<% $ParentSelector %>').hide();
-                jQuery('#'+cf_id).closest('<% $ParentSelector %>').trigger('hide');
+                jQuery('#'+cf_id).closest('<% $ParentSelector %>').triggerHandler('hide');
             } else {
                 jQuery('input[name="'+cf_id+'"], textarea[name="'+cf_id+'"]').closest('<% $ParentSelector %>').hide();
-                jQuery('input[name="'+cf_id+'"]').first().trigger('hide');
-                jQuery('textarea[name="'+cf_id+'"]').trigger('hide');
+                jQuery('input[name="'+cf_id+'"]').first().triggerHandler('hide');
+                jQuery('textarea[name="'+cf_id+'"]').triggerHandler('hide');
             }
         }
     });
@@ -100,11 +99,11 @@ jQuery(function() {
         cf_id = cf_id.replace(/:/g,'\\:');
         if (jQuery('#'+cf_id).length) {
             jQuery('#'+cf_id).closest('<% $ParentSelector %>').hide();
-            jQuery('#'+cf_id).closest('<% $ParentSelector %>').trigger('hide');
+            jQuery('#'+cf_id).closest('<% $ParentSelector %>').triggerHandler('hide');
         } else {
             jQuery('input[name="'+cf_id+'"], textarea[name="'+cf_id+'"]').closest('<% $ParentSelector %>').hide();
-            jQuery('input[name="'+cf_id+'"]').first().trigger('hide');
-            jQuery('textarea[name="'+cf_id+'"]').trigger('hide');
+            jQuery('input[name="'+cf_id+'"]').first().triggerHandler('hide');
+            jQuery('textarea[name="'+cf_id+'"]').triggerHandler('hide');
         }
     });
 
@@ -120,31 +119,31 @@ jQuery(function() {
         if (condition_met) {
             if (jQuery('#'+cf_id).length) {
                 jQuery('#'+cf_id).closest('<% $ParentSelector %>').show();
-                jQuery('#'+cf_id).closest('<% $ParentSelector %>').trigger('show');
+                jQuery('#'+cf_id).closest('<% $ParentSelector %>').triggerHandler('show');
             } else {
                 jQuery('input[name="'+cf_id+'"], textarea[name="'+cf_id+'"]').closest('<% $ParentSelector %>').show();
-                jQuery('input[name="'+cf_id+'"]').first().trigger('show');
-                jQuery('textarea[name="'+cf_id+'"]').trigger('show');
+                jQuery('input[name="'+cf_id+'"]').first().triggerHandler('show');
+                jQuery('textarea[name="'+cf_id+'"]').triggerHandler('show');
             }
         }
         else {
             if (jQuery('#'+cf_id).length) {
                 jQuery('#'+cf_id).closest('<% $ParentSelector %>').hide();
-                jQuery('#'+cf_id).closest('<% $ParentSelector %>').trigger('hide');
+                jQuery('#'+cf_id).closest('<% $ParentSelector %>').triggerHandler('hide');
             } else {
                 jQuery('input[name="'+cf_id+'"], textarea[name="'+cf_id+'"]').closest('<% $ParentSelector %>').hide();
-                jQuery('input[name="'+cf_id+'"]').first().trigger('hide');
-                jQuery('textarea[name="'+cf_id+'"]').trigger('hide');
+                jQuery('input[name="'+cf_id+'"]').first().triggerHandler('hide');
+                jQuery('textarea[name="'+cf_id+'"]').triggerHandler('hide');
             }
         }
     });
 %           if ($condition_cf->RenderType eq 'List') {
-    jQuery(condition_selector).first().trigger('change');
+    jQuery(condition_selector).first().triggerHandler('change');
 %           } else {
 %           if ($condition_cf->Type eq 'HTML') {
     condition_cke.fire('change');
 %           } else {
-    jQuery(condition_selector).trigger('change');
+    jQuery(condition_selector).triggerHandler('change');
 %           }
 %           }
 %           if ($condition_cf->Type eq 'HTML') {

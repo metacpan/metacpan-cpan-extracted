@@ -5,15 +5,15 @@ use strict;
 use utf8;
 use warnings;
 
-use Carp;
+use Carp                  ();
 use Exporter              qw(import);
 use URI::PackageURL::Util qw(purl_to_urls);
 
-use constant PURL_DEBUG => $ENV{PURL_DEBUG};
+use constant DEBUG => $ENV{PURL_DEBUG};
 
 use overload '""' => 'to_string', fallback => 1;
 
-our $VERSION = '2.11';
+our $VERSION = '2.20';
 our @EXPORT  = qw(encode_purl decode_purl);
 
 my $PURL_REGEXP = qr{^pkg:[A-Za-z\\.\\-\\+][A-Za-z0-9\\.\\-\\+]*/.+};
@@ -49,27 +49,35 @@ sub new {
         Carp::croak "Invalid Package URL: '$qualifier' is not a valid qualifier" if ($qualifier =~ /\%/);
     }
 
+
+    # A PyPI package name must be lowercased and underscore "_" replaced with a dash "-".
     $name =~ s/_/-/g if $type eq 'pypi';
 
     if ($type eq 'cpan') {
 
-        # CPAN Author name is MUST be uppercased
+        # To refer to a CPAN distribution name, the "namespace" MUST be present. In this
+        # case, the "namespace" is the CPAN id of the author/publisher. It MUST be
+        # written uppercase, followed by the distribution name in the "name" component. A
+        # distribution name may NEVER contain the string "::".
+
+        # To refer to a CPAN module, the "namespace" MUST be absent. The module name MAY
+        # contain zero or more "::" strings, and the module name MUST NOT contain a "-"
+
         $namespace = uc $namespace if ($namespace);
 
         if (($namespace && $name) && $namespace =~ /\:/) {
-            Carp::carp "Invalid Package URL: CPAN 'namespace' must have the distribution author";
+            Carp::croak "Invalid Package URL: CPAN 'namespace' component must have the distribution author";
         }
 
         if (($namespace && $name) && $name =~ /\:/) {
-            Carp::carp "Invalid Package URL: CPAN 'name' must have the distribution name";
+            Carp::croak "Invalid Package URL: CPAN 'name' component must have the distribution name";
         }
 
         if (!$namespace && $name =~ /\-/) {
-            Carp::carp "Invalid Package URL: CPAN 'name' must have the module name";
+            Carp::croak "Invalid Package URL: CPAN 'name' component must have the module name";
         }
 
     }
-
 
     if ($type eq 'swift') {
         Carp::croak "Invalid Package URL: Swift 'version' is required"   unless defined $version;
@@ -110,9 +118,9 @@ sub new {
 
     if ($type eq 'huggingface') {
 
-  # The version is the model revision Git commit hash. It is case insensitive and must be lowercased in the package URL.
+        # The version is the model revision Git commit hash. It is case insensitive and
+        # must be lowercased in the package URL.
         $version = lc $version;
-
     }
 
     my $self = {
@@ -170,7 +178,7 @@ sub from_string {
     my @s1 = split('#', $string);
 
     if ($s1[1]) {
-        $s1[1] =~ s{(^\/|\/$)}{};
+        $s1[1] =~ s/(^\/|\/$)//;
         my @subpath = map { _url_decode($_) } grep { $_ ne '' && $_ ne '.' && $_ ne '..' } split /\//, $s1[1];
         $components{subpath} = join '/', @subpath;
     }
@@ -222,7 +230,7 @@ sub from_string {
     #     The left side lowercased is the type
     #     The right side is the remainder
 
-    $s3[1] =~ s{(^\/|\/$)}{};
+    $s3[1] =~ s/(^\/|\/$)//;
     my @s4 = split('/', $s3[1], 2);
     $components{type} = lc $s4[0];
 
@@ -260,7 +268,7 @@ sub from_string {
         $components{namespace} = join '/', map { _url_decode($_) } @s6;
     }
 
-    if (PURL_DEBUG) {
+    if (DEBUG) {
         say STDERR "-- S1: @s1";
         say STDERR "-- S2: @s2";
         say STDERR "-- S3: @s3";
@@ -304,7 +312,10 @@ sub to_string {
     }
 
     # Subpath
-    push @purl, ('#', $self->subpath) if ($self->subpath);
+    if ($self->subpath) {
+        my @subpath = map { _url_encode($_) } split '/', $self->subpath;
+        push @purl, ('#', join('/', @subpath));
+    }
 
     return join '', @purl;
 
@@ -367,21 +378,21 @@ URI::PackageURL - Perl extension for Package URL (aka "purl")
     type      => cpan,
     namespace => 'GDT',
     name      => 'URI-PackageURL',
-    version   => '2.11'
+    version   => '2.20'
   );
   
-  say $purl; # pkg:cpan/GDT/URI-PackageURL@2.11
+  say $purl; # pkg:cpan/GDT/URI-PackageURL@2.20
 
   # Parse Package URL string
-  $purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.11');
+  $purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.20');
 
   # exported functions
 
-  $purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.11');
+  $purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.20');
   say $purl->type;  # cpan
 
-  $purl_string = encode_purl(type => cpan, name => 'URI::PackageURL', version => '2.11');
-  say $purl_string; # pkg:cpan/URI::PackageURL@2.11
+  $purl_string = encode_purl(type => cpan, name => 'URI::PackageURL', version => '2.20');
+  say $purl_string; # pkg:cpan/URI::PackageURL@2.20
 
 =head1 DESCRIPTION
 
@@ -425,6 +436,59 @@ Optional.
 
 =back
 
+=head2 CPAN PURL TYPE
+
+C<cpan> is an official "purl" type (L<https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst>)
+
+=over
+
+=item * The default repository is C<https://www.cpan.org/>.
+
+=item * The C<namespace>:
+
+=over
+
+=item * To refer to a CPAN distribution name, the C<namespace> MUST be present.
+In this case, the namespace is the CPAN id of the author/publisher.
+It MUST be written uppercase, followed by the distribution name in the name component.
+A distribution name may NEVER contain the string C<::>.
+
+=item * To refer to a CPAN module, the C<namespace> MUST be absent.
+The module name MAY contain zero or more C<::> strings, and the module name MUST NOT contain a C<->
+
+=back
+
+=item * The C<name> is the module or distribution name and is case sensitive.
+
+=item * The C<version> is the module or distribution version.
+
+=item * Optional qualifiers may include:
+
+=over
+
+=item * C<repository_url>: CPAN/MetaCPAN/BackPAN/DarkPAN repository base URL (default is https://www.cpan.org)
+
+=item * C<download_url>: URL of package or distribution
+
+=item * C<vcs_url>: extra URL for a package version control system
+
+=item * C<ext>: file extension (default is tar.gz)
+
+=back
+
+=back
+
+=head3 Examples
+
+    pkg:cpan/Perl::Version@1.013
+    pkg:cpan/DROLSKY/DateTime@1.55
+    pkg:cpan/DateTime@1.55
+    pkg:cpan/GDT/URI-PackageURL
+    pkg:cpan/LWP::UserAgent
+    pkg:cpan/OALDERS/libwww-perl@6.76
+    pkg:cpan/URI
+
+
 =head2 FUNCTIONAL INTERFACE
 
 They are exported by default:
@@ -437,7 +501,7 @@ Converts the given Package URL components to "purl" string. Croaks on error.
 
 This function call is functionally identical to:
 
-   $purl_string = URI::PackageURL->new(%purl_components)->to_string;
+    $purl_string = URI::PackageURL->new(%purl_components)->to_string;
 
 =item $purl_components = decode_purl($purl_string);
 
@@ -445,7 +509,7 @@ Converts the given "purl" string to Package URL components. Croaks on error.
 
 This function call is functionally identical to:
 
-   $purl = URI::PackageURL->from_string($purl_string);
+    $purl = URI::PackageURL->from_string($purl_string);
 
 =back
 
@@ -497,7 +561,7 @@ Helper method for JSON modules (L<JSON>, L<JSON::PP>, L<JSON::XS>, L<Mojo::JSON>
 
     use Mojo::JSON qw(encode_json);
 
-    say encode_json($purl);  # {"name":"URI-PackageURL","namespace":"GDT","qualifiers":null,"subpath":null,"type":"cpan","version":"2.11"}
+    say encode_json($purl);  # {"name":"URI-PackageURL","namespace":"GDT","qualifiers":null,"subpath":null,"type":"cpan","version":"2.20"}
 
 =item $purl = URI::PackageURL->from_string($purl_string);
 

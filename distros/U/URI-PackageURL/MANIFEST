@@ -1,11 +1,17 @@
 bin/purl-tool
+bin/vers-tool
 Changes
 examples/cpan-dist-download-and-test.sh
 examples/rpm-to-purl.sh
+examples/version-comparators.pl
 INSTALL.md
 lib/URI/PackageURL.pm
 lib/URI/PackageURL/App.pm
 lib/URI/PackageURL/Util.pm
+lib/URI/VersionRange.pm
+lib/URI/VersionRange/App.pm
+lib/URI/VersionRange/Constraint.pm
+lib/URI/VersionRange/Version.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -15,6 +21,8 @@ t/10-encode.t
 t/20-decode.t
 t/30-util.t
 t/40-cli.t
+t/50-version-range.t
+t/90-cpan-distname-info.t
 t/99-official-purl-test-suite.t
 t/manifest.t
 t/pod-coverage.t

@@ -45,11 +45,11 @@ __END__
 
 =head1 NAME
 
-Rope::Type - Rope chained properties
+Rope::Chain - Rope chained properties
 
 =head1 VERSION
 
-Version 0.34
+Version 0.35
 
 =cut
 

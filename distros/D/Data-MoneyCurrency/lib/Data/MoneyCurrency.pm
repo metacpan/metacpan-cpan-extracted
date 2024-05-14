@@ -1,6 +1,6 @@
 # ABSTRACT: Get information for different currencies
 package Data::MoneyCurrency;
-$Data::MoneyCurrency::VERSION = '0.25';
+$Data::MoneyCurrency::VERSION = '0.27';
 use strict;
 use warnings;
 use utf8;
@@ -335,11 +335,13 @@ my $rh_currencies_for_country = {
     vu   => ['vuv'],
     wf   => ['xpf'],
     ws   => ['wst'],
+    xc   => ['eur'],    
     xk   => ['eur'],
     ye   => ['yer'],
     yt   => ['eur'],
     za   => ['zar'],
-    zm   => ['zmk']
+    zm   => ['zmk'],
+    zw   => ['zwg'],
 };
 
 
@@ -371,7 +373,7 @@ Data::MoneyCurrency - Get information for different currencies
 
 =head1 VERSION
 
-version 0.25
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -452,7 +454,7 @@ edf <cpan@opencagedata.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by OpenCage GmbH.
+This software is copyright (c) 2024 by OpenCage GmbH.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

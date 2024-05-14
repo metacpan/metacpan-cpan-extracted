@@ -74,7 +74,7 @@ Rope::Factory - Rope factory properties
 
 =head1 VERSION
 
-Version 0.34
+Version 0.35
 
 =cut
 

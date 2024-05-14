@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::Mach::GCC;
-$ExtUtils::Builder::Linker::Mach::GCC::VERSION = '0.003';
+$ExtUtils::Builder::Linker::Mach::GCC::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -45,7 +45,7 @@ ExtUtils::Builder::Linker::Mach::GCC
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

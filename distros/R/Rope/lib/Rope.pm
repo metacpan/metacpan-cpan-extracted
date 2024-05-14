@@ -1,7 +1,7 @@
 package Rope;
 
 use 5.006; use strict; use warnings;
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 use Rope::Object;
 my (%META, %PRO);
 our @ISA;
@@ -89,6 +89,10 @@ BEGIN {
 						return $stack[-1]->(@params);
 					};
 				}
+				my $handles = $props{properties}{$prop}{handles};
+				if ($handles) {
+					$props{handles} = {%{ $props{handles} || {} }, map { $_ => $prop } keys %{$handles}};
+				}
 			}
 			return \%props;
 		},
@@ -103,7 +107,7 @@ BEGIN {
 		set_prop => sub {
 			my ($caller, $prop, %options) = @_;
 			if (exists $META{$caller}{properties}{$prop}) {
-				defined $options{$_} && do { $META{$caller}{properties}{$prop}{$_} = $options{$_} } for qw/builder trigger delete_trigger/;
+				defined $options{$_} && do { $META{$caller}{properties}{$prop}{$_} = $options{$_} } for qw/builder trigger delete_trigger handles handles_via/;
 				if ($META{$caller}{properties}{$prop}{writeable}) {
 					$META{$caller}{properties}{$prop}{value} = $options{value} if exists $options{value};
 					$META{$caller}{properties}{$prop}{class} = $caller;
@@ -159,7 +163,7 @@ BEGIN {
 					my ($prop, $options) = (shift @properties, shift @properties);
 					my $ref = ref $options;					
 					if (!$ref || $ref ne 'HASH' || ! grep { defined $options->{$_} } 
-						qw/initable writeable builder enumerable configurable trigger clearer predicate delete_trigger value/
+						qw/initable writeable builder enumerable configurable trigger clearer predicate delete_trigger value handles_via handles/
 					) {
 						$options = {
 							initable => 1,
@@ -619,7 +623,7 @@ Rope - Tied objects
 
 =head1 VERSION
 
-Version 0.34
+Version 0.35
 
 =cut
 
@@ -730,6 +734,14 @@ A clearer allows you to define an accessor to clear a property (set it to undef)
 =head2 index
 
 The index property/key expects an integer, if you do not set then this integer it's automatically generated and associated to the property. You will only want to set this is you always want to have a property last when itterating
+
+=head2 handles_via
+
+See L<Rope::Handles::Hash>.
+
+=head2 handles
+
+See L<Rope::Handles::Array>.
 
 =head1 KEYWORDS
 

@@ -2,7 +2,7 @@ package Data::LnArray;
 use strict;
 no warnings;
 use base 'Import::Export';
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our %EX = (
         arr => [qw/all/],
@@ -17,6 +17,17 @@ sub new {
 	bless [@_], __PACKAGE__;
 }
 
+sub get {
+	my ($self, $index) = @_;
+	return $self->[$index];
+}
+
+sub set {
+	my ($self, $index, $val) = @_;
+	$self->[$index] = $val;
+	return $self;
+}
+
 sub length {
 	my ($self) = shift;
 
@@ -25,8 +36,6 @@ sub length {
 
 sub retrieve {
 	my ($self) = shift;
-
-	# probably is not going to work
 	return @{$self};
 }
 
@@ -380,7 +389,7 @@ Data::LnArray - The great new Data::LnArray!
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -411,6 +420,18 @@ Shorthand for generating a new Data::LnArray Object.
 
 
 =head1 SUBROUTINES/METHODS
+
+=head2 get
+
+Returns the value of the passed index
+
+	$foo->get(0);
+
+=head2 set
+
+Sets the value of the passed index.
+
+	$foo->set(0, 'patience');
 
 =head2 length
 

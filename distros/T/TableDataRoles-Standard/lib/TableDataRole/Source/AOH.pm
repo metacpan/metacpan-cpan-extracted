@@ -7,9 +7,9 @@ use warnings;
 use Role::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-15'; # DATE
+our $DATE = '2024-05-14'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 with 'TableDataRole::Spec::Basic';
 
@@ -17,6 +17,7 @@ sub new {
     my ($class, %args) = @_;
 
     my $aoh = delete $args{aoh} or die "Please specify 'aoh' argument";
+    my $column_names = delete $args{column_names};
     die "Unknown argument(s): ". join(", ", sort keys %args)
         if keys %args;
 
@@ -24,18 +25,24 @@ sub new {
         aoh => $aoh,
         pos => 0,
         # buffer => undef,
-        # column_names => undef,
+        column_names => $column_names,
         # column_idxs  => undef,
     };
 
-    $self->{column_names} = [];
-    $self->{column_idxs} = {};
-    if (@$aoh) {
-        my $row = $aoh->[0];
-        my $i = -1;
-        for (sort keys %$row) {
-            push @{ $self->{column_names} }, $_;
-            $self->{column_idxs}{$_} = ++$i;
+    if ($self->{column_names}) {
+        $self->{column_idxs} = { map { ($self->{column_names}[$_] => $_) }
+                                 0 .. $#{ $self->{column_names} }
+                             };
+    } else {
+        $self->{column_names} = [];
+        $self->{column_idxs} = {};
+        if (@$aoh) {
+            my $row = $aoh->[0];
+            my $i = -1;
+            for (sort keys %$row) {
+                push @{ $self->{column_names} }, $_;
+                $self->{column_idxs}{$_} = ++$i;
+            }
         }
     }
 
@@ -112,7 +119,7 @@ TableDataRole::Source::AOH - Get table data from an array of hashes
 
 =head1 VERSION
 
-This document describes version 0.023 of TableDataRole::Source::AOH (from Perl distribution TableDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.025 of TableDataRole::Source::AOH (from Perl distribution TableDataRoles-Standard), released on 2024-05-14.
 
 =head1 SYNOPSIS
 

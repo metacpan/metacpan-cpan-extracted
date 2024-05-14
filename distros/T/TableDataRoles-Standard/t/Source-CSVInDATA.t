@@ -27,4 +27,14 @@ $t->reset_iterator;
 is_deeply($t->get_next_row_hashref , {number=>1, en_name=>"one", id_name=>"satu"});
 is($t->get_row_count, 5);
 
+$t = TableData::Test::Source::CSVInDATA->new;
+is($t->as_csv, <<_);
+number,en_name,id_name
+1,one,satu
+2,two,dua
+3,three,tiga
+4,four,empat
+5,five,lima
+_
+
 done_testing;

@@ -50,7 +50,7 @@
    "provides" : {
       "Module::Load::Util" : {
          "file" : "lib/Module/Load/Util.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "web" : "https://github.com/perlancar/perl-Module-Load-Util"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

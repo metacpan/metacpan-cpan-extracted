@@ -22,6 +22,7 @@ lib/Mojo/Asset.pm
 lib/Mojo/Asset/File.pm
 lib/Mojo/Asset/Memory.pm
 lib/Mojo/Base.pm
+lib/Mojo/BaseUtil.pm
 lib/Mojo/ByteStream.pm
 lib/Mojo/Cache.pm
 lib/Mojo/Collection.pm
@@ -170,6 +171,7 @@ script/mojo
 script/morbo
 t/mojo/asset.t
 t/mojo/base.t
+t/mojo/base_util.t
 t/mojo/bytestream.t
 t/mojo/cache.t
 t/mojo/certs/bad.crt

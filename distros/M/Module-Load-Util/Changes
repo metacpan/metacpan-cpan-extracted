@@ -1,3 +1,8 @@
+0.012   2024-05-13  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Return prefixed module even though we didn't load it.
+
+
 0.011   2024-03-06  Released-By: PERLANCAR; Urgency: medium
 
         - Fix a couple of bugs.

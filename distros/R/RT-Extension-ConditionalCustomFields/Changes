@@ -1,5 +1,10 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+1.15 2024-05-13
+ - Fix conflict with bootsrap collapse
+ - Replace trigger() by triggerHandler() also for change events
+ - Fix errors when user has no right on CFs but on queue
+
 1.14 2023-11-09
  - Fix unneeded patches for RT up to 5.0.5.
 

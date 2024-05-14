@@ -5,6 +5,8 @@ lib/Rope/Autoload.pm
 lib/Rope/Chain.pm
 lib/Rope/Conditional.pm
 lib/Rope/Factory.pm
+lib/Rope/Handles/Array.pm
+lib/Rope/Handles/Hash.pm
 lib/Rope/Monkey.pm
 lib/Rope/Object.pm
 lib/Rope/Role.pm
@@ -55,6 +57,14 @@ t/36-from_nested_array.t
 t/37-initialise.t
 t/38-initialised.t
 t/39-array_property.t
+t/40-trait.t
+t/41-get_hash.t
+t/42-set_hash.t
+t/43-assign.t
+t/44-each.t
+t/45-freeze.t
+t/46-keys-and-values.t
+t/47-delete.t
 t/lib/Custom.pm
 t/lib/One.pm
 t/lib/Role.pm

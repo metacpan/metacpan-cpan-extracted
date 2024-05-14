@@ -29,6 +29,13 @@ BEGIN {
 							$caller->can($pred) || $PRO{keyword}($caller, $pred, $PRO{monkey_patch_sub}($pred));
 						}
 					}
+					for my $handle (keys %{$meta->{$key}->{handles}}) {
+						$PRO{keyword}($caller, $handle, sub { 
+							my ($self) = shift;
+							my $meth = $meta->{$key}->{handles}->{$handle};
+							$self->{$key}->$meth(@_);
+						});
+					}
 				}
 			}
 		},
@@ -69,7 +76,7 @@ Rope::Monkey - Rope Monkey Patching
 
 =head1 VERSION
 
-Version 0.34
+Version 0.35
 
 =cut
 

@@ -2,8 +2,8 @@ NAME
     Module::Load::Util - Some utility routines related to module loading
 
 VERSION
-    This document describes version 0.011 of Module::Load::Util (from Perl
-    distribution Module-Load-Util), released on 2024-03-06.
+    This document describes version 0.012 of Module::Load::Util (from Perl
+    distribution Module-Load-Util), released on 2024-05-13.
 
 SYNOPSIS
      use Module::Load::Util qw(

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Profile::Perl;
-$ExtUtils::Builder::Profile::Perl::VERSION = '0.003';
+$ExtUtils::Builder::Profile::Perl::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ sub process_linker {
 	if ($linker->export eq 'some') {
 		$linker->add_option_filter(sub {
 			my ($self, $from, $to, %opts) = @_;
-			$opts{dl_name} ||= $opts{module_name};
+			$opts{dl_name} ||= $opts{module_name} if $opts{module_name};
 			return ($from, $to, %opts);
 		});
 	}
@@ -79,7 +79,7 @@ ExtUtils::Builder::Profile::Perl - A profile for compiling and linking against p
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

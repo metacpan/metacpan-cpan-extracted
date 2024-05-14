@@ -69,7 +69,14 @@ sub set_value {
 			die sprintf("Cannot set property (%s) in object (%s) failed type validation on line %s file %s: %s", $key, $self->{name}, $caller[2], $caller[1], $@);
 		}
 	}
-	$spec->{value} = $value;
+
+	if ($spec->{handles_via}) {
+		eval "require $spec->{handles_via}";
+		my $href = ref $value;
+		$spec->{value} = $spec->{handles_via}->new($href eq 'ARRAY' ? @{$value} : $href eq 'HASH' ? %{$value} : $value);
+	} else {
+		$spec->{value} = $value;
+	}
 	if ($spec->{required} && ! defined $spec->{value}) {
 		die sprintf "Required property (%s) in object (%s) not set", $key, $self->{name};
 	}
@@ -120,7 +127,7 @@ sub STORE {
  
 sub FETCH {
         my ($self, $key) = @_;
-        my $k = $self->{properties}->{$key};
+        my $k = $self->{properties}->{$key} || $self->{handles}->{$key} && $self->{properties}->{$self->{handles}->{$key}};
 	return undef unless defined $k->{value};
 	if ($k->{private}) {
 		my $priv = $self->private_names;
@@ -128,6 +135,7 @@ sub FETCH {
 			die "Cannot access Object ($self->{name}) property ($key) as it is private";
 		}
 	}
+	
 	if (!$k->{writeable} && !$k->{configurable} && (ref($k->{value}) || '') eq 'CODE') {
 		if ($k->{before} || $k->{after} || $k->{around}) {
 			return sub {
@@ -148,6 +156,14 @@ sub FETCH {
 			};
 		}
 	}
+	
+	if ($self->{handles}->{$key} && !$self->{properties}->{ROPE_init}) {
+		my $meth = $k->{handles}->{$key};
+		if ($k->{value}) {
+			return sub { $k->{value}->$meth(@_) };
+		}
+	}
+
         return $k->{value};
 }
  

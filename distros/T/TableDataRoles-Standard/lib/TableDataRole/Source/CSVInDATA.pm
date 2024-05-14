@@ -7,9 +7,9 @@ use warnings;
 use Role::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-15'; # DATE
+our $DATE = '2024-05-14'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 with 'TableDataRole::Spec::Basic';
 with 'TableDataRole::Source::CSVInFile';
@@ -22,6 +22,12 @@ around new => sub {
 
     no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
     my $fh = \*{"$class\::DATA"};
+
+    if (defined ${"$class\::_TableData_fhpos_data_begin_cache"}) {
+        seek $fh, ${"$class\::_TableData_fhpos_data_begin_cache"}, 0;
+    } else {
+        ${"$class\::_TableData_fhpos_data_begin_cache"} = tell $fh;
+    }
 
     my $obj = $orig->(@_, filehandle => $fh);
 };
@@ -41,7 +47,7 @@ TableDataRole::Source::CSVInDATA - Role to access table data from CSV in DATA se
 
 =head1 VERSION
 
-This document describes version 0.023 of TableDataRole::Source::CSVInDATA (from Perl distribution TableDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.025 of TableDataRole::Source::CSVInDATA (from Perl distribution TableDataRoles-Standard), released on 2024-05-14.
 
 =head1 DESCRIPTION
 

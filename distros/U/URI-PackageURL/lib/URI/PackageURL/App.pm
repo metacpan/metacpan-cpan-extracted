@@ -5,15 +5,15 @@ use strict;
 use warnings;
 use utf8;
 
-use Getopt::Long qw( GetOptionsFromArray :config gnu_compat );
-use Pod::Usage;
-use Carp;
-use JSON::PP;
-use Data::Dumper;
+use Getopt::Long qw(GetOptionsFromArray :config gnu_compat);
+use Pod::Usage   qw(pod2usage);
+use Carp         ();
+use JSON::PP     ();
+use Data::Dumper ();
 
-use URI::PackageURL;
+use URI::PackageURL ();
 
-our $VERSION = '2.11';
+our $VERSION = '2.20';
 
 sub cli_error {
     my ($error) = @_;
@@ -65,7 +65,7 @@ $progname version $URI::PackageURL::VERSION
 
 Copyright 2022-2024, Giuseppe Di Terlizzi <gdt\@cpan.org>
 
-This program is part of the URI::PackageURL distribution and is free software;
+This program is part of the "URI-PackageURL" distribution and is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.
 
 Complete documentation for $progname can be found using 'man $progname'
@@ -212,17 +212,17 @@ __END__
 
 =head1 NAME
 
-URI::PackageURL::CLI - URL::PackageURL (purl) Command Line Interface
+URI::PackageURL::App - URL::PackageURL (purl) Command Line Interface
 
 =head1 SYNOPSIS
 
-    use URI::PackageURL::CLI qw(run);
+    use URI::PackageURL::App qw(run);
 
     run(\@ARGV);
 
 =head1 DESCRIPTION
 
-URI::PackageURL::CLI "Command Line Interface" helper module for C<purl-tool(1)>.
+URI::PackageURL::App "Command Line Interface" helper module for C<purl-tool(1)>.
 
 =over
 

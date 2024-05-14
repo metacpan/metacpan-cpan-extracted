@@ -1,4 +1,11 @@
-Revision history for URI::PackageURL.
+Change history for URI-PackageURL
+
+2.20 2024-05-13
+    - Added support for the official "cpan" PURL type specification (giterlizzi/perl-URI-PackageURL#8)
+    - Added "Version Range" (vers) support (giterlizzi/perl-URI-PackageURL#12)
+    - Added "URI::VersionRange::Version::cpan" version comparator for "cpan" scheme
+    - Added "vers-tool(1)"
+    - FIX Apply percent-encoding in "subpath" in "to_string" method
 
 2.11 2024-04-19
     - Improved the cpan PURL type to be compatible with the 'PURL-TYPES' specification

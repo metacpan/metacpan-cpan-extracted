@@ -57,7 +57,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Waffle';
-our $VERSION  = '9.36';
+our $VERSION  = '9.37';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -760,12 +760,6 @@ The L<Mojolicious> distribution includes a few files with different licenses tha
 
 Licensed under the CC-SA License, Version 4.0 L<http://creativecommons.org/licenses/by-sa/4.0>.
 
-=head2 jQuery
-
-  Copyright (C) jQuery Foundation.
-
-Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
-
 =head2 highlight.js
 
   Copyright (C) 2006, Ivan Sagalaev.
@@ -1086,6 +1080,8 @@ Nic Sandfield
 Nils Diewald
 
 Oleg Zhelo
+
+Oliver Kurz
 
 Olivier Mengue
 

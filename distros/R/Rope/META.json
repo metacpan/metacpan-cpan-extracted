@@ -35,6 +35,7 @@
       "runtime" : {
          "requires" : {
             "Coerce::Types::Standard" : "0.000008",
+            "Data::LnArray" : "0.04",
             "Factory::Sub" : "0.06",
             "Struct::Conditional" : "1.01",
             "Want" : "0",
@@ -48,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.34",
+   "version" : "0.35",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

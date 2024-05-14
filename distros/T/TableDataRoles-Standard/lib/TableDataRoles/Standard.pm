@@ -3,9 +3,9 @@
 package TableDataRoles::Standard;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-15'; # DATE
+our $DATE = '2024-05-14'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 1;
 # ABSTRACT: Standard set of roles for TableData
@@ -22,7 +22,7 @@ TableDataRoles::Standard - Standard set of roles for TableData
 
 =head1 VERSION
 
-This document describes version 0.023 of TableDataRoles::Standard (from Perl distribution TableDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.025 of TableDataRoles::Standard (from Perl distribution TableDataRoles-Standard), released on 2024-05-14.
 
 =head1 HOMEPAGE
 

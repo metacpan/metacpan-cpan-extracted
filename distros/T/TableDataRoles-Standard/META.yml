@@ -23,107 +23,111 @@ name: TableDataRoles-Standard
 provides:
   TableData::AOA:
     file: lib/TableData/AOA.pm
-    version: '0.023'
+    version: '0.025'
   TableData::AOH:
     file: lib/TableData/AOH.pm
-    version: '0.023'
+    version: '0.025'
   TableData::DBI:
     file: lib/TableData/DBI.pm
-    version: '0.023'
+    version: '0.025'
   TableData::Munge::Concat:
     file: lib/TableData/Munge/Concat.pm
-    version: '0.023'
+    version: '0.025'
   TableData::Munge::Filter:
     file: lib/TableData/Munge/Filter.pm
-    version: '0.023'
+    version: '0.025'
   TableData::Munge::GroupRows:
     file: lib/TableData/Munge/GroupRows.pm
-    version: '0.023'
+    version: '0.025'
   TableData::Munge::MungeColumns:
     file: lib/TableData/Munge/MungeColumns.pm
-    version: '0.023'
+    version: '0.025'
   TableData::Munge::Reverse:
     file: lib/TableData/Munge/Reverse.pm
-    version: '0.023'
+    version: '0.025'
   TableData::Sample::DeNiro:
     file: lib/TableData/Sample/DeNiro.pm
-    version: '0.023'
+    version: '0.025'
   TableData::Test::Source::AOA:
     file: lib/TableData/Test/Source/AOA.pm
-    version: '0.023'
+    version: '0.025'
   TableData::Test::Source::AOH:
     file: lib/TableData/Test/Source/AOH.pm
-    version: '0.023'
+    version: '0.025'
   TableData::Test::Source::CSVInDATA:
     file: lib/TableData/Test/Source/CSVInDATA.pm
-    version: '0.023'
+    version: '0.025'
   TableData::Test::Source::CSVInFile:
     file: lib/TableData/Test/Source/CSVInFile.pm
-    version: '0.023'
+    version: '0.025'
   TableData::Test::Source::CSVInFile::Select:
     file: lib/TableData/Test/Source/CSVInFile/Select.pm
-    version: '0.023'
+    version: '0.025'
   TableData::Test::Source::CSVInFiles:
     file: lib/TableData/Test/Source/CSVInFiles.pm
-    version: '0.023'
+    version: '0.025'
   TableData::Test::Source::DBI:
     file: lib/TableData/Test/Source/DBI.pm
-    version: '0.023'
+    version: '0.025'
   TableData::Test::Source::Iterator:
     file: lib/TableData/Test/Source/Iterator.pm
-    version: '0.023'
+    version: '0.025'
   TableDataRole::Munge::Concat:
     file: lib/TableDataRole/Munge/Concat.pm
-    version: '0.023'
+    version: '0.025'
   TableDataRole::Munge::Filter:
     file: lib/TableDataRole/Munge/Filter.pm
-    version: '0.023'
+    version: '0.025'
   TableDataRole::Munge::GroupRows:
     file: lib/TableDataRole/Munge/GroupRows.pm
-    version: '0.023'
+    version: '0.025'
   TableDataRole::Munge::MungeColumns:
     file: lib/TableDataRole/Munge/MungeColumns.pm
-    version: '0.023'
+    version: '0.025'
   TableDataRole::Munge::Reverse:
     file: lib/TableDataRole/Munge/Reverse.pm
-    version: '0.023'
+    version: '0.025'
+  TableDataRole::Munge::SerializeRef:
+    file: lib/TableDataRole/Munge/SerializeRef.pm
+    version: '0.025'
   TableDataRole::Source::AOA:
     file: lib/TableDataRole/Source/AOA.pm
-    version: '0.023'
+    version: '0.025'
   TableDataRole::Source::AOH:
     file: lib/TableDataRole/Source/AOH.pm
-    version: '0.023'
+    version: '0.025'
   TableDataRole::Source::CSVInDATA:
     file: lib/TableDataRole/Source/CSVInDATA.pm
-    version: '0.023'
+    version: '0.025'
   TableDataRole::Source::CSVInFile:
     file: lib/TableDataRole/Source/CSVInFile.pm
-    version: '0.023'
+    version: '0.025'
   TableDataRole::Source::CSVInFiles:
     file: lib/TableDataRole/Source/CSVInFiles.pm
-    version: '0.023'
+    version: '0.025'
   TableDataRole::Source::DBI:
     file: lib/TableDataRole/Source/DBI.pm
-    version: '0.023'
+    version: '0.025'
   TableDataRole::Source::Iterator:
     file: lib/TableDataRole/Source/Iterator.pm
-    version: '0.023'
+    version: '0.025'
   TableDataRole::Util::CSV:
     file: lib/TableDataRole/Util/CSV.pm
-    version: '0.023'
+    version: '0.025'
   TableDataRole::Util::GetRowByPos:
     file: lib/TableDataRole/Util/GetRowByPos.pm
-    version: '0.023'
+    version: '0.025'
   TableDataRoles::Standard:
     file: lib/TableDataRoles/Standard.pm
-    version: '0.023'
+    version: '0.025'
 requires:
   Class::Method::Modifiers: '0'
   DBI: '0'
   File::Basename: '0'
   File::ShareDir: '0'
+  JSON::MaybeXS: '0'
   Log::ger: '0.038'
-  Module::Load::Util: '0.009'
+  Module::Load::Util: '0.011'
   Role::Tiny: '0'
   Role::Tiny::With: '0'
   TableDataRole::Spec::Basic: v0.2.5
@@ -137,7 +141,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TableDataRoles-Standard
   homepage: https://metacpan.org/release/TableDataRoles-Standard
   repository: git://github.com/perlancar/perl-TableDataRoles-Standard.git
-version: '0.023'
+version: '0.025'
 x_Dist_Zilla:
   perl:
     version: '5.038002'
@@ -423,7 +427,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
-              version: '0.01'
+              version: '0.021'
             -
               class: Pod::Weaver::Plugin::EnsureUniqueSections
               name: '@Author::PERLANCAR/EnsureUniqueSections'

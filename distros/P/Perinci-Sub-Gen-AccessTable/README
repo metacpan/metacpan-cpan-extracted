@@ -3,9 +3,9 @@ NAME
     read table data
 
 VERSION
-    This document describes version 0.593 of Perinci::Sub::Gen::AccessTable
+    This document describes version 0.594 of Perinci::Sub::Gen::AccessTable
     (from Perl distribution Perinci-Sub-Gen-AccessTable), released on
-    2023-07-09.
+    2024-05-14.
 
 SYNOPSIS
     In list_countries.pl:
@@ -358,21 +358,41 @@ FUNCTIONS
         Supply hooks.
 
         You can instruct the generated function to execute codes in various
-        stages by using hooks. Currently available hooks are:
-        "before_parse_query", "after_parse_query", "before_fetch_data",
-        "after_fetch_data", "before_return". Hooks will be passed the
-        function arguments as well as one or more additional ones. All hooks
-        will get "_stage" (name of stage) and "_func_res" (function
-        arguments, but as hash reference so you can modify it).
-        "after_parse_query" and later hooks will also get "_parse_res"
-        (parse result). "before_fetch_data" and later will also get
-        "_query". "after_fetch_data" and later will also get "_data".
-        "before_return" will also get "_func_res" (the enveloped response to
-        be returned to user).
+        stages by using hooks. Currently available hooks are (in execution
+        order):
+
+        *   before_parse_query
+
+        *   after_parse_query
+
+        *   before_fetch_data
+
+        *   after_fetch_data
+
+        *   before_return
+
+        Hooks will be passed the function arguments as well as one or more
+        additional ones.
+
+        *   All hooks will get "_stage" (name of stage) and "_func_args"
+            (function arguments, but as hash reference so you can modify
+            it).
+
+        *   "after_parse_query" and later hooks will also get "_parse_res"
+            (parse enveloped result)
+
+        *   "before_fetch_data" and later will also get "_query" (parsed
+            query, which is just the payload a.k.a. third element of
+            "_parse_res").
+
+        *   "after_fetch_data" and later will also get "_data".
+
+        *   "before_return" will also get "_func_res" (the enveloped
+            response to be returned to user).
 
         Hook should return nothing or a false value on success. It can abort
         execution of the generated function if it returns an envelope
-        response (an array). On that case, the function will return with
+        response (an array). In that case, the function will return with
         this return value.
 
     *   install => *bool* (default: 1)
@@ -574,8 +594,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016,
-    2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2023, 2022, 2020, 2019, 2018, 2017,
+    2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

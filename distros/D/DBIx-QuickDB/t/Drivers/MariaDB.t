@@ -1,6 +1,5 @@
 use Test2::V0 -target => DBIx::QuickDB::Driver::MariaDB;
 use Test2::Tools::QuickDB;
-use Carp::Always;
 
 my @ENV_VARS;
 

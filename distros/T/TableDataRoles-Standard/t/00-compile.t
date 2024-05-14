@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 32 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 33 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'TableData/AOA.pm',
@@ -31,6 +31,7 @@ my @module_files = (
     'TableDataRole/Munge/GroupRows.pm',
     'TableDataRole/Munge/MungeColumns.pm',
     'TableDataRole/Munge/Reverse.pm',
+    'TableDataRole/Munge/SerializeRef.pm',
     'TableDataRole/Source/AOA.pm',
     'TableDataRole/Source/AOH.pm',
     'TableDataRole/Source/CSVInDATA.pm',

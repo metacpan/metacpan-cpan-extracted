@@ -25,7 +25,7 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/gibus/RT-Extension-ConditionalCustomFields
-version: '1.14'
+version: '1.15'
 x_module_install_rtx_version: '0.43'
 x_requires_rt: 4.2.0
 x_rt_too_new: 5.1.0

@@ -1,0 +1,96 @@
+#! perl
+
+use strict;
+use warnings;
+
+use CPAN::Meta;
+use CPAN::Meta::Prereqs::Filter;
+use Getopt::Long;
+
+GetOptions(\my %opts, qw/json only_missing|only-missing|missing omit_core|omit-core=s author versions/) or return 2;
+my ($metafile) = grep { -f $_ } qw/MYMETA.json MYMETA.yml META.json META.yml/ or die 'Could not find any META file';
+my $meta = CPAN::Meta->load_file($metafile);
+
+my $prereqs = CPAN::Meta::Prereqs::Filter::filter_prereqs($meta->effective_prereqs, %opts);
+
+if (!$opts{json}) {
+	my @phases = qw/build test configure runtime/;
+	push @phases, 'develop' if $opts{author};
+
+	my $reqs = $prereqs->merged_requirements(\@phases);
+	$reqs->clear_requirement('perl');
+
+	my @modules = sort { lc $a cmp lc $b } $reqs->required_modules;
+	if ($opts{versions}) {
+		printf"%s = %s\n", $_, $reqs->requirements_for_module($_) for @modules;
+	}
+	else {
+		print "$_\n" for @modules;
+	}
+}
+else {
+	require JSON::PP;
+	print JSON::PP->new->ascii->canonical->pretty->encode($prereqs->as_string_hash);
+}
+
+# PODNAME: perl-listdeps
+# ABSTRACT: List dependencies in the META file
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+perl-listdeps - List dependencies in the META file
+
+=head1 VERSION
+
+version 0.007
+
+=head1 SYNOPSIS
+
+ perl-listdeps [--versions] [--json] [--missing] [--omit-core=<version>]
+
+=head1 DESCRIPTION
+
+List all dependencies of this distribution as listed in the metafile. By default it prints just a list of module names. It takes the following options:
+
+=over 4
+
+=item * versions
+
+Print the required versions along with the modules.
+
+=item * json
+
+Output the dependencies in JSON format
+
+=item * missing
+
+List only modules whose requirement isn't met.
+
+=item * author
+
+Include development-time dependencies.
+
+=item * omit-core=<perl-version>
+
+Exclude any prerequisites that are provided by that specific perl version.
+
+=back
+
+=head1 AUTHOR
+
+Leon Timmermans <leont@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Leon Timmermans.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

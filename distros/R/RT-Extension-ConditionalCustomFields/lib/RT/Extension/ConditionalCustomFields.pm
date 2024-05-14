@@ -4,7 +4,7 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::ConditionalCustomFields;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 =encoding utf8
 
@@ -263,8 +263,7 @@ sub ConditionedBy {
     # Convert DateTime from UTC to Current User Timezone
     my $conditioned_by = $attr->Content;
     if ($conditioned_by && $conditioned_by->{CF}) {
-        my $cf = RT::CustomField->new($self->CurrentUser);
-        $cf->Load($conditioned_by->{CF});
+        my $cf = $self->ContextObject->LoadCustomFieldByIdentifier($conditioned_by->{CF});
         if ($cf->id && $cf->Type eq 'DateTime') {
             my $value = $conditioned_by->{vals} || '';
             my @values = ref($value) eq 'ARRAY' ? @$value : ($value);
@@ -309,8 +308,7 @@ my $old_MatchPattern = RT::CustomField->can("MatchPattern");
         if ($mason) {
             my %mason_args = @{$mason->current_args};
             if ($mason_args{ARGSRef}) {
-                my $condition_cf = RT::CustomField->new($self->CurrentUser);
-                $condition_cf->Load($conditioned_by->{CF});
+                my $condition_cf = $self->ContextObject->LoadCustomFieldByIdentifier($conditioned_by->{CF});
                 if ($condition_cf->id) {
                     my $condition_grouping = $condition_cf->_findGrouping($self->ContextObject);
                     $condition_grouping =~ s/\W//g if $condition_grouping;

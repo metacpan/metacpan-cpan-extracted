@@ -10,19 +10,19 @@ use URI::PackageURL;
 # OO-interface
 
 # Encode components in PackageURL string
-$purl = URI::PackageURL->new(type => cpan, namespace => 'GDT', name => 'URI-PackageURL', version => '2.11');
+$purl = URI::PackageURL->new(type => cpan, namespace => 'GDT', name => 'URI-PackageURL', version => '2.20');
 
-say $purl; # pkg:cpan/GDT/URI-PackageURL@2.11
+say $purl; # pkg:cpan/GDT/URI-PackageURL@2.20
 
 # Parse PackageURL string
-$purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.11');
+$purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.20');
 
 # exported functions
 
-$purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.11');
+$purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.20');
 say $purl->type;  # cpan
 
-$purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI::PackageURL', version => '2.11');
+$purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI::PackageURL', version => '2.20');
 ```
 
 
@@ -31,14 +31,14 @@ $purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI::Packa
 Inspect and export "purl" string in various formats (JSON, YAML, Data::Dumper, ENV):
 
 ```console
-$ purl-tool pkg:cpan/GDT/URI-PackageURL@2.11 --json | jq
+$ purl-tool pkg:cpan/GDT/URI-PackageURL@2.20 --json | jq
 {
   "name": "URI-PackageURL",
   "namespace": "GDT",
   "qualifiers": {},
   "subpath": null,
   "type": "cpan",
-  "version": "2.11"
+  "version": "2.20"
 }
 ```
 
@@ -46,7 +46,7 @@ $ purl-tool pkg:cpan/GDT/URI-PackageURL@2.11 --json | jq
 Download package using "purl" string:
 
 ```console
-$ wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.11 --download-url)
+$ wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.20 --download-url)
 ```
 
 
@@ -57,7 +57,7 @@ Use "purl" string in your shell-scripts:
 
 set -e 
 
-PURL="pkg:cpan/GDT/URI-PackageURL@2.11"
+PURL="pkg:cpan/GDT/URI-PackageURL@2.20"
 
 eval $(purl-tool "$PURL" --env)
 
@@ -79,7 +79,7 @@ Create on-the-fly a "purl" string:
 $ purl-tool --type cpan \
             --namespace GDT \
             --name URI-PackageURL \
-            --version 2.11
+            --version 2.20
 ```
 
 
