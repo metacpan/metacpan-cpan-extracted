@@ -2,7 +2,7 @@
 # Copyright © 2021-2023 CVE-Client Authors <https://hacktivis.me/git/cve-client/>
 # SPDX-License-Identifier: AGPL-3.0-only
 package App::CveClient;
-our $VERSION = 'v1.0.5';
+our $VERSION = 'v1.1.0';
 
 use warnings;
 use strict;
@@ -20,10 +20,10 @@ sub print_cve {
 		die "Error ($object->{'error'}): $object->{'message'}\n";
 	}
 
-	if ($object->{'dataVersion'} == "5.0") {
-		print_cve50($object, $cve_id, $format);
+	if ($object->{'dataVersion'} =~ /5\./) {
+		print_cve5($object, $cve_id, $format);
 	} elsif ($object->{'data_version'} == "4.0") {
-		print_cve40($object, $cve_id, $format);
+		print_cve4($object, $cve_id, $format);
 	} else {
 		print STDERR "Error: unknown CVE format:\n";
 		print STDERR "- data_version: ", $object->{'data_version'}, "\n"
@@ -34,7 +34,7 @@ sub print_cve {
 }
 
 # https://github.com/CVEProject/cve-schema/blob/master/schema/v5.0/
-sub print_cve50 {
+sub print_cve5 {
 	my ($object, $cve_id, $format) = @_;
 
 	if ($object->{'cveMetadata'}->{'cveId'} ne $cve_id) {
@@ -70,9 +70,6 @@ sub print_cve50 {
 				print "Notice: unhandled metrics (CVSS) data\n";
 			}
 		}
-	} else {
-		print STDERR
-"Warning: No CVE metrics (CVSS) could be found! (as required by the spec)\n";
 	}
 
 	print "\n";
@@ -104,7 +101,7 @@ sub print_cve50 {
 }
 
 # https://github.com/CVEProject/cve-schema/blob/master/schema/v4.0/
-sub print_cve40 {
+sub print_cve4 {
 	my ($object, $cve_id, $format) = @_;
 
 	if ($object->{'CVE_data_meta'}->{'ID'} ne $cve_id) {

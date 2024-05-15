@@ -16,7 +16,7 @@ Format::Util::Strings - Miscellaneous routines to do with manipulating strings
 
 =cut
 
-our $VERSION = '0.17';    ## VERSION
+our $VERSION = '0.18';    ## VERSION
 
 =head1 SYNOPSIS
 

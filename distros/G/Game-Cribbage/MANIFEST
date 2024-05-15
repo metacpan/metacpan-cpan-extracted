@@ -1,0 +1,36 @@
+Changes
+ignore.txt
+lib/Game/Cribbage.pm
+lib/Game/Cribbage/Board.pm
+lib/Game/Cribbage/Deck.pm
+lib/Game/Cribbage/Deck/Card.pm
+lib/Game/Cribbage/Error.pm
+lib/Game/Cribbage/Hands.pm
+lib/Game/Cribbage/Play.pm
+lib/Game/Cribbage/Play/Card.pm
+lib/Game/Cribbage/Play/Score.pm
+lib/Game/Cribbage/Player.pm
+lib/Game/Cribbage/Player/Hand.pm
+lib/Game/Cribbage/Round.pm
+lib/Game/Cribbage/Round/Score.pm
+lib/Game/Cribbage/Rounds.pm
+lib/Game/Cribbage/Score.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-card.t
+t/02-deck.t
+t/03-player.t
+t/04-board.t
+t/05-round.t
+t/06-rounds.t
+t/07-player_hand_basic.t
+t/08-player_hand_score.t
+t/09-fixed_play.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

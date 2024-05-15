@@ -1,5 +1,9 @@
 Revision history for Format-Util
 
+0.18      2024-05-15 09:43:57+00:00 UTC
+
+    - Add XRP to precision.yml
+
 0.17      2022-10-18 01:38:02+00:00 UTC
     - Add tUSDT
 

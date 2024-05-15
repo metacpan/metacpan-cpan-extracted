@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "artistic_2",
   "NAME" => "Date::RangeParser::EN",
   "PREREQ_PM" => {
-    "Date::Manip" => 0,
+    "Date::Manip" => "!= 6.49",
     "DateTime" => 0,
     "strict" => 0,
     "utf8" => 0,
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "base" => 0
   },
-  "VERSION" => "v1.0.1",
+  "VERSION" => "v1.1.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Date::Manip" => 0,
+  "Date::Manip" => "!= 6.49",
   "DateTime" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,

@@ -9,5 +9,8 @@ README.md
 t/cve_schema50.CVE-2022-24903.json
 t/cve_schema50.CVE-2022-24903.txt
 t/cve_schema50.t
+t/cve_schema51.CVE-2024-4761.json
+t/cve_schema51.CVE-2024-4761.txt
+t/cve_schema51.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -9,9 +9,9 @@ use DateTime;
 our $DATE_EXTRACT_MODULE = $ENV{PERL_DATE_EXTRACT_MODULE} // "Date::Extract";
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-03-06'; # DATE
+our $DATE = '2024-05-15'; # DATE
 our $DIST = 'SortKey-date_in_text'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 sub meta {
     return {
@@ -59,7 +59,8 @@ sub gen_keygen {
     sub {
         no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
-        my $dt = $code_parse->($_[0]);
+        my $arg = @_ ? $_[0] : $_;
+        my $dt = $code_parse->($arg);
         return '' unless $dt;
         "$dt";
     };
@@ -80,7 +81,7 @@ SortKey::date_in_text - Date found in text as sort key
 
 =head1 VERSION
 
-This document describes version 0.001 of SortKey::date_in_text (from Perl distribution SortKey-date_in_text), released on 2024-03-06.
+This document describes version 0.002 of SortKey::date_in_text (from Perl distribution SortKey-date_in_text), released on 2024-05-15.
 
 =head1 DESCRIPTION
 

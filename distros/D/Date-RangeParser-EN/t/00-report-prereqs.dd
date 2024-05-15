@@ -14,7 +14,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Date::Manip' => '0',
+                                      'Date::Manip' => '!= 6.49',
                                       'DateTime' => '0',
                                       'strict' => '0',
                                       'utf8' => '0',

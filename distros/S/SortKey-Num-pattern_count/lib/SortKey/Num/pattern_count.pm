@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-23'; # DATE
+our $DATE = '2024-05-15'; # DATE
 our $DIST = 'SortKey-Num-pattern_count'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 sub meta {
     return +{
@@ -34,7 +34,7 @@ sub gen_keygen {
     my $re = $args{pattern} ? $args{pattern} : qr/\Q$args{string}\E/;
 
     sub {
-        my $str = shift;
+        my $str = @_ ? shift : $_;
         my $count = 0;
         $count++ while $str =~ /$re/g;
         $count;
@@ -56,7 +56,7 @@ SortKey::Num::pattern_count - Number of occurrences of string/regexp pattern as 
 
 =head1 VERSION
 
-This document describes version 0.001 of SortKey::Num::pattern_count (from Perl distribution SortKey-Num-pattern_count), released on 2024-01-23.
+This document describes version 0.002 of SortKey::Num::pattern_count (from Perl distribution SortKey-Num-pattern_count), released on 2024-05-15.
 
 =head1 SYNOPSIS
 

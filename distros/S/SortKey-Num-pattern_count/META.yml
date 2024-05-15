@@ -19,7 +19,7 @@ name: SortKey-Num-pattern_count
 provides:
   SortKey::Num::pattern_count:
     file: lib/SortKey/Num/pattern_count.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   perl: '5.010001'
   strict: '0'
@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=SortKey-Num-pattern_count
   homepage: https://metacpan.org/release/SortKey-Num-pattern_count
   repository: git://github.com/perlancar/perl-SortKey-Num-pattern_count.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'
@@ -322,7 +322,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
-              version: '0.01'
+              version: '0.021'
             -
               class: Pod::Weaver::Plugin::EnsureUniqueSections
               name: '@Author::PERLANCAR/EnsureUniqueSections'
@@ -440,6 +440,14 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
+      version: '6.031'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: x_spec
+      name: DevelopX_spec
       version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode

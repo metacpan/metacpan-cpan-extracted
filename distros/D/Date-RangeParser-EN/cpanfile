@@ -1,7 +1,7 @@
 requires 'strict';
 requires 'warnings';
 requires 'utf8';
-requires 'Date::Manip';
+requires 'Date::Manip', '!= 6.49';
 requires 'DateTime';
 
 on test => sub {

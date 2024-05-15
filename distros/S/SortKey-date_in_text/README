@@ -2,8 +2,8 @@ NAME
     SortKey::date_in_text - Date found in text as sort key
 
 VERSION
-    This document describes version 0.001 of SortKey::date_in_text (from
-    Perl distribution SortKey-date_in_text), released on 2024-03-06.
+    This document describes version 0.002 of SortKey::date_in_text (from
+    Perl distribution SortKey-date_in_text), released on 2024-05-15.
 
 DESCRIPTION
     The generated keygen will extract date found in text (by default

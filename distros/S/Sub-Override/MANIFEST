@@ -1,11 +1,11 @@
 Changes
 lib/Sub/Override.pm
 Makefile.PL
-MANIFEST
-META.yml			Module meta-data (added by MakeMaker)
+MANIFEST			This list of files
 README
 README.md
 t/override.t
 xt/pod-coverage.t
 xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

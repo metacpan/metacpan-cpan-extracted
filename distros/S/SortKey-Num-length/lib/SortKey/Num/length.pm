@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-23'; # DATE
+our $DATE = '2024-05-15'; # DATE
 our $DIST = 'SortKey-Num-length'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 sub meta {
     return +{
@@ -38,7 +38,7 @@ SortKey::Num::length - String length as sort key
 
 =head1 VERSION
 
-This document describes version 0.002 of SortKey::Num::length (from Perl distribution SortKey-Num-length), released on 2024-01-23.
+This document describes version 0.003 of SortKey::Num::length (from Perl distribution SortKey-Num-length), released on 2024-05-15.
 
 =head1 SYNOPSIS
 

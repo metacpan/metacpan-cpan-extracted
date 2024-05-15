@@ -1,5 +1,12 @@
 Revision history for MIDI-Util
 
+0.1301 2024-05-14 15:02:21
+    - Improve documentation.
+
+0.1300 2024-05-14 14:02:57
+    - Add the get_milliseconds() and score2events() functions.
+    - Fix documentation.
+
 0.1201 2023-05-17 11:41:22
     - Make the soundfont optional for play_timidity().
     - Improve documentation.

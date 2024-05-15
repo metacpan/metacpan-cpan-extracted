@@ -21,7 +21,7 @@ requires:
 resources:
   bugtracker: https://github.com/ssimms/pdfapi2/issues
   repository: git://github.com/ssimms/pdfapi2.git
-version: '2.045'
+version: '2.046'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: LGPL-2.1

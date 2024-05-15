@@ -1,3 +1,9 @@
+0.002   2024-05-15  Released-By: PERLANCAR; Urgency: medium
+
+        - Follow SortKey 0.2.0 (sort key generator must accept argument
+          from @_ or $_).
+
+
 0.001   2024-01-23  Released-By: PERLANCAR
 
         - First release.

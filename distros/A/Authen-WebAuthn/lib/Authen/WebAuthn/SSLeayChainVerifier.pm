@@ -1,8 +1,9 @@
 package Authen::WebAuthn::SSLeayChainVerifier;
-$Authen::WebAuthn::SSLeayChainVerifier::VERSION = '0.002';
+$Authen::WebAuthn::SSLeayChainVerifier::VERSION = '0.003';
 use warnings;
 use strict;
-use Net::SSLeay 1.86_08;
+use Net::SSLeay 1.88;
+Net::SSLeay::initialize();
 
 our $verification_time;
 

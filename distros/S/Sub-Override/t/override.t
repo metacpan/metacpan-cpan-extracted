@@ -1,8 +1,7 @@
-#!/usr/local/bin/perl -w
 use strict;
+use warnings;
 
-#use Test::More 'no_plan';
-use Test::More tests => 33;
+use Test::More tests => 37;
 use Test::Fatal;
 
 my $CLASS;
@@ -126,7 +125,7 @@ is( Foo::bar(), 'original value',
     sub foo {23}
     sub bar {42}
 
-    my $override = Sub::Override->new( 'foo', sub {42} );
+    my $override = $CLASS->new( 'foo', sub {42} );
     $override->replace( 'bar', sub {'barbar'} );
     main::is( foo(), 42,
         'Not fully qualifying a sub name will assume the current package' );
@@ -143,6 +142,7 @@ can_ok( $override, 'wrap' );
 
     package TempWrap;
     sub foo {23}
+    sub bar ($$) {$_[0] + $_[1]}
 
     my $override = $CLASS->new;
 
@@ -157,4 +157,16 @@ can_ok( $override, 'wrap' );
 
     $override->restore('foo');
     main::is( foo(1), 23, '... and we can restore a wrapped subroutine' );
+
+    main::ok( $override->wrap( 'bar',
+        sub {
+            my ($orig, @args) = @_;
+            return $args[0] == 4 && $args[1] == 2 ? 42 : $orig->(@args);
+        }
+    ), '... and we should be able to successfully wrap a prototyped subroutine' );
+    main::is( bar(5,2),  7,  '... and wrapped prototyped sub bar conditionally returns original value' );
+    main::is( bar(4,2),  42, '... and wrapped prototyped sub bar conditionally returns override value' );
+
+    $override->restore('bar');
+    main::is( bar(4,2), 6, '... and we can restore a wrapped subroutine' );
 }

@@ -4,7 +4,7 @@ Sub::Override - Perl extension for easily overriding subroutines
 
 # VERSION
 
-0.10
+0.11
 
 # SYNOPSIS
 
@@ -93,8 +93,8 @@ when testing how code behaves with multiple conditions.
 
 There may be times when you want to 'conditionally' replace a subroutine - for
 example, to override the original subroutine only if certain args are passed.
-For this you can specify 'wrap' instead of 'replace'. Wrap is identical to
-replace, except the original subroutine is passed as the first arg to your
+For this you can specify `wrap` instead of `replace`. `wrap` is identical to
+`replace`, except the original subroutine is passed as the first arg to your
 new subroutine. You can call the original sub via 'shift->(@\_)':
 
     $override->wrap('Some::sub',
@@ -179,6 +179,13 @@ This method will `croak` if the subroutine to be replaced does not exist.
 Restores the previous behavior of the subroutine.  This will happen
 automatically if the `Sub::Override` object falls out of scope.
 
+## wrap
+
+    $sub->wrap($sub_name, $sub_body);
+
+Temporarily wraps a subroutine with another subroutine. The original subroutine
+is passed as the first arg to the new subroutine.
+
 # EXPORT
 
 None by default.
@@ -186,7 +193,7 @@ None by default.
 # CAVEATS
 
 If you need to override the same sub several times do not create a new
-`Sub::Override` object, but instead always reuse the existing one and call 
+`Sub::Override` object, but instead always reuse the existing one and call
 `replace` on it. Creating a new object to override the same sub will result
 in weird behavior.
 
@@ -197,7 +204,6 @@ in weird behavior.
     # Do not do this either!
     my $sub = Sub::Override->new( 'Foo::bar' => sub { 'first' } );
     $sub = Sub::Override->new( 'Foo::bar' => sub { 'second' } );
-    
 
 Both of those usages could result in of your subs being lost, depending
 on the order in which you restore them.

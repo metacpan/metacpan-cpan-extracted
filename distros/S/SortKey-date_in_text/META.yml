@@ -19,7 +19,7 @@ name: SortKey-date_in_text
 provides:
   SortKey::date_in_text:
     file: lib/SortKey/date_in_text.pm
-    version: '0.001'
+    version: '0.002'
 recommends:
   Date::Extract::ID: '0'
   DateTime::Format::Alami::EN: '0.13'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=SortKey-date_in_text
   homepage: https://metacpan.org/release/SortKey-date_in_text
   repository: git://github.com/perlancar/perl-SortKey-date_in_text.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'
@@ -438,6 +438,14 @@ x_Dist_Zilla:
           phase: runtime
           type: recommends
       name: RuntimeRecommends
+      version: '6.031'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: x_spec
+      name: DevelopX_spec
       version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode

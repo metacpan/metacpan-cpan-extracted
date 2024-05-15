@@ -20,4 +20,10 @@ sub all{
   $self->_request(method => 'GET', url => $self->_class_url, param => \%p);
 }
 
+sub statement_urls{
+  my $self = shift;
+
+  $self->_request(method => 'POST', url => $self->_instance_url . '/statement_urls');
+}
+
 1;

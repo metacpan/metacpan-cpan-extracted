@@ -32,8 +32,8 @@ use feature         qw( say );
 use parent          qw( Exporter );
 use subs            qw( uniq );
 
-our $VERSION = '0.20';
-our @EXPORT  = qw( run repl d np p );
+our $VERSION = '0.22';
+our @EXPORT  = qw( run repl d dd np p );
 our %PEEKS;
 
 =head1 NAME
@@ -994,8 +994,7 @@ sub _complete {
     return $self->_complete_h( @_ ) if $line =~ / ^ \s* h \w* $ /x;
 
     # Dump/Print command - space afterwards.
-    return $self->_complete_d( @_ ) if $line =~ / ^ \s* d $ /x;
-    return $self->_complete_p( @_ ) if $line =~ / ^ \s* p $ /x;
+    return $self->_complete_pd( @_ ) if $line =~ / ^ \s* (?: p | dd? ) $ /x;
 
     # Method call or coderef - append "(".
     return $self->_complete_arrow( "$1", "$2", @_ )
@@ -1032,20 +1031,15 @@ sub _complete_h {
     );
 }
 
-sub _complete_d {
+sub _complete_pd {
     my $self = shift;
     my ( $text, $line, $start, $end ) = @_;
     $self->_dump_args( @_ ) if $self->debug >= 2;
 
-    $self->_match( words => ["d"] );
-}
-
-sub _complete_p {
-    my $self = shift;
-    my ( $text, $line, $start, $end ) = @_;
-    $self->_dump_args( @_ ) if $self->debug >= 2;
-
-    $self->_match( words => ["p"] );
+    $self->_match(
+        words   => [ "d", "dd", "p" ],
+        partial => $text,
+    );
 }
 
 sub _complete_arrow {
@@ -1233,6 +1227,7 @@ sub _define_commands {
         "hist",    # Changed in _step to $repl->hist().
         "p",       # From Data::Printer and exporting it.
         "d",       # Exporting it.
+        "dd",      # Exporting it.
         "q",       # Used in _step to stop the repl.
     );
 }
@@ -1263,10 +1258,12 @@ sub _define_help {
  $class $version
 
  <TAB>      - Show options.
+ <Up/Down>  - Scroll history.
  help       - Show this help section.
  hist [N=5] - Show last N commands.
- d DATA     - Data dumper.
  p DATA     - Data printer (colored).
+ d DATA     - Data dumper.
+ dd DATA    - Internals dumper.
  q          - Quit debugger.
 HELP
 }
@@ -1424,6 +1421,23 @@ sub d {
 
     return $d->Dump if wantarray;
     print $d->Dump;
+}
+
+=head2 dd
+
+Devel::Peek::Dump.
+
+You can use "dd" to see the inner contents
+of a structure/variable.
+
+ dd @var
+ dd [1..3]
+
+=cut
+
+sub dd {
+    require Devel::Peek;
+    Devel::Peek::Dump( @_ );
 }
 
 =head2 p

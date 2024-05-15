@@ -179,6 +179,7 @@ price:
   XCD: 2
   XOF: 0
   XPF: 0
+  XRP: 6
   YER: 2
   ZAR: 2
   ZMW: 2
@@ -364,6 +365,7 @@ amount:
   XCD: 2
   XOF: 2
   XPF: 2
+  XRP: 6
   YER: 2
   ZAR: 2
   ZMW: 2

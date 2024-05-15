@@ -7,9 +7,9 @@ use warnings;
 use Text::Levenshtein::XS;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-24'; # DATE
+our $DATE = '2024-05-15'; # DATE
 our $DIST = 'SortKey-Num-similarity'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 sub meta {
     return +{
@@ -25,10 +25,13 @@ sub gen_keygen {
     my %args = @_;
 
     my $reverse = $args{reverse};
+    my $string = $args{string};
+    my $lc_string = lc $string;
     my $ci = $args{ci};
 
     sub {
-        $args{ci} ? Text::Levenshtein::XS::distance(lc($args{string}), lc($_[0])) : Text::Levenshtein::XS::distance($args{string}, $_[0]);
+        my $arg = @_ ? shift : $_;
+        $ci ? Text::Levenshtein::XS::distance($lc_string, lc($arg)) : Text::Levenshtein::XS::distance($string, $arg);
     };
 }
 
@@ -47,7 +50,7 @@ SortKey::Num::similarity - Similarity to a reference string as sort key
 
 =head1 VERSION
 
-This document describes version 0.001 of SortKey::Num::similarity (from Perl distribution SortKey-Num-similarity), released on 2024-01-24.
+This document describes version 0.002 of SortKey::Num::similarity (from Perl distribution SortKey-Num-similarity), released on 2024-05-15.
 
 =head1 SYNOPSIS
 

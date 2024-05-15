@@ -11,7 +11,7 @@ package MyTest;
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 73;
+use Test::More tests => 75;
 use Runtime::Debugger;
 use Term::ANSIColor qw( colorstrip );
 use feature         qw( say );
@@ -86,14 +86,14 @@ sub _define_expected_vars {
     my ( $_repl ) = @_;
 
     {
-        commands              => [ 'd', 'help', 'hist', 'p', 'q' ],
+        commands              => [ 'd', 'dd', 'help', 'hist', 'p', 'q' ],
         commands_and_vars_all => [
             '$my_array',     '$my_arrayref', '$my_coderef', '$my_hash',
             '$my_hashref',   '$my_obj',      '$my_str',     '$our_array',
             '$our_arrayref', '$our_coderef', '$our_hash',   '$our_hashref',
             '$our_obj',      '$our_str',     '$repl',       '%my_hash',
             '%our_hash',     '@my_array',    '@my_hash',    '@our_array',
-            '@our_hash',     'd',            'help',        'hist',
+            '@our_hash',     'd', 'dd',            'help',        'hist',
             'p',             'q',
         ],
         debug        => 0,
@@ -143,10 +143,12 @@ sub _define_help_stdout {
         ' Runtime::Debugger 0.01',
         '',
         ' <TAB>      - Show options.',
+        ' <Up/Down>  - Scroll history.',
         ' help       - Show this help section.',
         ' hist [N=5] - Show last N commands.',
-        ' d DATA     - Data dumper.',
         ' p DATA     - Data printer (colored).',
+        ' d DATA     - Data dumper.',
+        ' dd DATA    - Internals dumper.',
         ' q          - Quit debugger.',
         ''
     ]
@@ -296,7 +298,8 @@ sub _define_test_cases {
             name             => 'Dump TAB complete: "d<TAB>"',
             input            => 'd' . $TAB,
             expected_results => {
-                line   => 'd ',
+                line   => 'd',
+                comp => [ 'd', 'dd' ],
                 stdout => [],
             },
         },
@@ -305,7 +308,27 @@ sub _define_test_cases {
             input            => 'd' . $TAB . $TAB,
             expected_results => {
                 comp   => $_repl->{vars_all},
-                line   => 'd ',
+                line   => 'd',
+                comp => [ 'd', 'dd' ],
+                stdout => [],
+            },
+        },
+        
+        # Devel::Peek Dump.
+        {
+            name             => 'Devel::Peek Dump TAB complete: "d<TAB>"',
+            input            => 'dd' . $TAB,
+            expected_results => {
+                line   => 'dd ',
+                stdout => [],
+            },
+        },
+        {
+            name             => 'Devel::Peek Dump TAB complete: "d<TAB><TAB"',
+            input            => 'dd' . $TAB . $TAB,
+            expected_results => {
+                comp   => $_repl->{vars_all},
+                line   => 'dd ',
                 stdout => [],
             },
         },

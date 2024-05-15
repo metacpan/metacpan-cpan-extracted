@@ -3,9 +3,9 @@ NAME
     processed food division (old, pre-RBA version)
 
 VERSION
-    This document describes version 0.020 of
+    This document describes version 0.021 of
     App::BPOMUtils::Table::FoodCategory (from Perl distribution
-    App-BPOMUtils-Table-FoodCategory), released on 2023-09-23.
+    App-BPOMUtils-Table-FoodCategory), released on 2024-05-15.
 
 DESCRIPTION
     This distribution contains the following CLIs:
@@ -17,6 +17,8 @@ DESCRIPTION
     *   bpom-list-food-categories-old
 
     *   bpom-list-food-categories-rba
+
+    *   bpomfc
 
 FUNCTIONS
   bpom_list_food_categories_old
@@ -390,7 +392,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2023 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

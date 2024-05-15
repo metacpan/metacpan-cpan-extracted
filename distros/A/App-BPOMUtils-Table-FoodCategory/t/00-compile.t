@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/BPOMUtils/Table/FoodCategory.pm',
@@ -17,7 +17,8 @@ my @scripts = (
     'script/bpom-daftar-kategori-pangan-lama',
     'script/bpom-daftar-kategori-pangan-rba',
     'script/bpom-list-food-categories-old',
-    'script/bpom-list-food-categories-rba'
+    'script/bpom-list-food-categories-rba',
+    'script/bpomfc'
 );
 
 # no fake home requested

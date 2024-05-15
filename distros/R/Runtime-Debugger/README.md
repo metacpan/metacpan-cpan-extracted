@@ -435,6 +435,16 @@ can show a simple or complex data structure.
     d 123
     d [1, 2, 3]
 
+## dd
+
+Devel::Peek::Dump.
+
+You can use "dd" to see the inner contents
+of a structure/variable.
+
+    dd @var
+    dd [1..3]
+
 ## p
 
 Data::Printer::p

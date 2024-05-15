@@ -3,12 +3,13 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI Utilities
 
-our $VERSION = '0.1201';
+our $VERSION = '0.1301';
 
 use strict;
 use warnings;
 
 use File::Slurper qw(write_text);
+use List::Util qw(first);
 use MIDI ();
 use MIDI::Simple ();
 use Music::Tempo qw(bpm_to_ms);
@@ -25,6 +26,8 @@ our @EXPORT = qw(
     ticks
     timidity_conf
     play_timidity
+    get_milliseconds
+    score2events
 );
 
 use constant TICKS => 96;
@@ -260,7 +263,7 @@ sub play_timidity {
     my @cmd;
     if ($soundfont) {
         $config ||= 'timidity-midi-util.cfg';
-        timidity_conf($soundfont, $config) if $soundfont;
+        timidity_conf($soundfont, $config);
         @cmd = ('timidity', '-c', $config, $midi);
     }
     else {
@@ -268,6 +271,19 @@ sub play_timidity {
     }
     $score->write_score($midi);
     system(@cmd) == 0 or die "system(@cmd) failed: $?";
+}
+
+
+sub get_milliseconds {
+    my ($score) = @_;
+    my $tempo = first { $_->[0] eq 'set_tempo' } @{ $score->{Score} };
+    return $tempo->[2] / ${ $score->{Tempo} };
+}
+
+
+sub score2events {
+    my ($score) = @_;
+    return MIDI::Score::score_r_to_events_r($score->{Score});
 }
 
 1;
@@ -284,7 +300,7 @@ MIDI::Util - MIDI Utilities
 
 =head1 VERSION
 
-version 0.1201
+version 0.1301
 
 =head1 SYNOPSIS
 
@@ -299,6 +315,8 @@ version 0.1201
     ticks
     timidity_conf
     play_timidity
+    get_milliseconds
+    score2events
   );
 
   my $dump = midi_dump('length'); # volume, etc.
@@ -327,6 +345,10 @@ version 0.1201
   # Or you can just play the score:
   play_timidity($score, 'some.mid');
 
+  my $ms = get_milliseconds($score);
+
+  my $events = score2events($score);
+
 =head1 DESCRIPTION
 
 C<MIDI::Util> comprises handy MIDI utilities.
@@ -338,7 +360,6 @@ Nothing is exported by default.
 =head2 setup_score
 
   $score = setup_score;  # Use defaults
-
   $score = setup_score(  # Override defaults
     lead_in   => $beats,
     volume    => $volume,
@@ -366,7 +387,6 @@ Named parameters and defaults:
 =head2 set_chan_patch
 
   set_chan_patch( $score, $channel );  # Just set the channel
-
   set_chan_patch( $score, $channel, $patch );
 
 Set the MIDI channel and patch.
@@ -385,10 +405,10 @@ Return a hash or array reference of the following L<MIDI>,
 L<MIDI::Simple>, and L<MIDI::Event> internal lists:
 
   Hashes:
-    Volume
-    Length
-    TICKS
-    Note
+    volume
+    length
+    ticks
+    note
     note2number
     number2note
     patch2number
@@ -396,11 +416,11 @@ L<MIDI::Simple>, and L<MIDI::Event> internal lists:
     notenum2percussion
     percussion2notenum
   Arrays:
-    All_events
-    MIDI_events
-    Meta_events
-    Text_events
-    Nontext_meta_events
+    all_events
+    midi_events
+    meta_events
+    text_events
+    nontext_meta_events
 
 =head2 reverse_dump
 
@@ -447,9 +467,9 @@ Return the B<score> ticks.
   $timidity_conf = timidity_conf($soundfont);
   timidity_conf($soundfont, $config_file);
 
-A suggested timidity.cfg paragraph to allow you to use this soundfont
-in timidity. If a B<config_file> is given, the timidity configuration
-is written to that file.
+A suggested timidity.cfg paragraph to allow you to use the given
+soundfont in timidity. If a B<config_file> is given, the timidity
+configuration is written to that file.
 
 =head2 play_timidity
 
@@ -463,13 +483,28 @@ used for the timidity configuration. If not, C<timidity-midi-util.cfg>
 is used. If a soundfont is not given, a timidity configuration file is
 not rendered and used.
 
+=head2 get_milliseconds
+
+  get_milliseconds($score_obj);
+
+Calculate the milliseconds of a tick given a B<score>, with tempo and
+ticks.
+
+=head2 score2events
+
+  score2events($score_obj);
+
+Return the B<score> as array reference of events.
+
 =head1 SEE ALSO
 
-The F<t/01-functions.t> test file and F<eg/*> in this distribution
+The F<t/01-functions.t> test file and F<eg/*> examples in this distribution.
 
 L<Exporter>
 
 L<File::Slurper>
+
+L<List::Util>
 
 L<MIDI>
 
@@ -483,7 +518,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2023 by Gene Boggs.
+This software is copyright (c) 2019-2024 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

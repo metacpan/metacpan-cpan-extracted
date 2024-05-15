@@ -27,7 +27,7 @@
             "Test::Pod::Coverage" : "1.08"
          },
          "x_spec" : {
-            "SortKey" : "v0.1.0"
+            "SortKey" : "v0.2.0"
          }
       },
       "runtime" : {
@@ -50,7 +50,7 @@
    "provides" : {
       "SortKey::Num::similarity" : {
          "file" : "lib/SortKey/Num/similarity.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "web" : "https://github.com/perlancar/perl-SortKey-Num-similarity"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -437,7 +437,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
                         "name" : "@Author::PERLANCAR/AppendPrepend",
-                        "version" : "0.01"
+                        "version" : "0.021"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::EnsureUniqueSections",

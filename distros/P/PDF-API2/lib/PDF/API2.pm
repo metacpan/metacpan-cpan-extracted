@@ -3,7 +3,7 @@ package PDF::API2;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.045'; # VERSION
+our $VERSION = '2.046'; # VERSION
 
 use Carp;
 use Encode qw(:all);

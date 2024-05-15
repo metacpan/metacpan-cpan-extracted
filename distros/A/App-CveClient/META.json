@@ -57,6 +57,6 @@
          "web" : "https://hacktivis.me/git/cve-client/"
       }
    },
-   "version" : "v1.0.5",
+   "version" : "v1.1.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

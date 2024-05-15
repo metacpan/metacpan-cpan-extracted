@@ -1,7 +1,7 @@
 ---
 abstract: 'Miscellaneous routines to do with manipulating with strings and numbers!'
 author:
-  - 'DERIV <DERIV@cpan.org>'
+  - 'binary.com <BINARY@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
@@ -16,7 +16,7 @@ configure_requires:
   ExtUtils::MakeMaker: '7.64'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,13 +32,13 @@ no_index:
 provides:
   Format::Util:
     file: lib/Format/Util.pm
-    version: '0.17'
+    version: '0.18'
   Format::Util::Numbers:
     file: lib/Format/Util/Numbers.pm
-    version: '0.17'
+    version: '0.18'
   Format::Util::Strings:
     file: lib/Format/Util/Strings.pm
-    version: '0.17'
+    version: '0.18'
 requires:
   Carp: '0'
   Encode: '0'
@@ -57,13 +57,14 @@ resources:
   bugtracker: https://github.com/binary-com/perl-Format-Util/issues
   homepage: https://github.com/binary-com/perl-Format-Util
   repository: https://github.com/binary-com/perl-Format-Util.git
-version: '0.17'
+version: '0.18'
 x_authority: cpan:DERIV
 x_contributors:
   - 'Raunak Kathuria <raunakkathuria@gmail.com>'
+  - 'tanvir-deriv <tanvir@deriv.com>'
   - 'Jean-Yves Sireau <jy@binary.com>'
-  - 'chylli-binary <chylli@binary.com>'
   - 'Rakesh Kumar Shardiwal <rakesh.shardiwal@gmail.com>'
+  - 'Chylli <chylli@binary.com>'
   - 'Reginaldo Costa <regcostajr@gmail.com>'
   - 'Tee Shuwn Yuan <shuwnyuan@binary.com>'
   - 'Tom Molesworth <tom@binary.com>'
@@ -76,6 +77,7 @@ x_contributors:
   - 'Zak B. Elep <zakame@zakame.net>'
   - 'amin roosta <amin.roosta@outlook.com>'
   - 'chengyang-binary <chengyang@binary.com>'
+  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
   - 'Chylli <chylli.email@gmail.com>'
   - 'Jun Bon <junbon@binary.com>'
   - 'Kirill Sysoev <55120154+kirill-binary@users.noreply.github.com>'

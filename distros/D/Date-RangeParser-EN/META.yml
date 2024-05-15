@@ -22,9 +22,9 @@ name: Date-RangeParser-EN
 provides:
   Date::RangeParser::EN:
     file: lib/Date/RangeParser/EN.pm
-    version: v1.0.1
+    version: v1.1.0
 requires:
-  Date::Manip: '0'
+  Date::Manip: '!= 6.49'
   DateTime: '0'
   strict: '0'
   utf8: '0'
@@ -32,8 +32,8 @@ requires:
 resources:
   bugtracker: https://github.com/mjaquilina/Date-RangeParser-EN/issues
   repository: git://github.com/mjaquilina/Date-RangeParser-EN.git
-version: v1.0.1
-x_generated_by_perl: v5.38.0
+version: v1.1.0
+x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0
 x_static_install: 1

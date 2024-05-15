@@ -1,5 +1,5 @@
 package Authen::WebAuthn::Test;
-$Authen::WebAuthn::Test::VERSION = '0.002';
+$Authen::WebAuthn::Test::VERSION = '0.003';
 use Mouse;
 use CBOR::XS;
 use MIME::Base64 qw(encode_base64url decode_base64url);

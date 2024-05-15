@@ -2,9 +2,9 @@
 package SortKey;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-02-14'; # DATE
+our $DATE = '2024-05-15'; # DATE
 our $DIST = 'SortKey'; # DIST
-our $VERSION = '0.1.1'; # VERSION
+our $VERSION = '0.2.0'; # VERSION
 
 1;
 # ABSTRACT: Reusable sort key generators
@@ -25,7 +25,7 @@ SortKey - Reusable sort key generators
 
 =head1 VERSION
 
-This document describes version 0.1.1 of SortKey (from Perl distribution SortKey), released on 2024-02-14.
+This document describes version 0.2.0 of SortKey (from Perl distribution SortKey), released on 2024-05-15.
 
 =head1 SYNOPSIS
 
@@ -66,8 +66,8 @@ B<EXPERIMENTAL. SPEC MIGHT STILL CHANGE.>
 =head1 Glossary
 
 A B<sort key generator> is a subroutine that accepts an item and converts it to
-a string/numeric key. The key then can be compared using C<< <=> >> or C<cmp>
-operator.
+a string/numeric key. The key then can be compared using the standard C<< <=> >>
+or C<cmp> operator.
 
 A B<SortKey::*> module is a module that can return a sort key generator.
 
@@ -91,7 +91,19 @@ A B<SortKey::*> module is a module that can return a sort key generator.
 
  sub gen_keygen {
      my %args = @_;
+
      ...
+     return sub {
+
+         # since one of the main usages is with Sort::Key, and Sort::Key does
+         # not pass the argument to @_ but sets $_. So a sort key generator
+         # subroutine must check if argument is passed and if not then use $_ as
+         # the argument.
+         my $arg = @_ ? $_[0] : $_;
+
+         # convert $arg to key
+         ...
+     };
  }
 
  1;

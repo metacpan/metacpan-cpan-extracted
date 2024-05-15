@@ -12,9 +12,9 @@ my $payjp = Net::Payjp->new(api_key => 'api_key');
 
 isa_ok($payjp->term, 'Net::Payjp::Term');
 can_ok($payjp->term, qw(retrieve all));
-ok(!$payjp->transfer->can('create'));
-ok(!$payjp->transfer->can('save'));
-ok(!$payjp->transfer->can('delete'));
+ok(!$payjp->term->can('create'));
+ok(!$payjp->term->can('save'));
+ok(!$payjp->term->can('delete'));
 
 $Mock_resp->mock( content => sub { '{"object":"list"}' } );
 $Mock_resp->mock( code => sub {200}  );

@@ -13,7 +13,7 @@ Authen::WebAuthn - A library to add Web Authentication support to server applica
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -125,7 +125,7 @@ Token Binding, you can omit this parameter.
 
 If the authenticator response contains an attestation, C<validate_registration> will
 attempt to chain it to a trusted root certificate.
-You need to explicitely specify which certificates to trust if your authenticator provides an attestation.
+You need to explicitly specify which certificates to trust if your authenticator provides an attestation.
 
 If you requested "none" as an attestation format while initiating the registration flow, there is no need to provide any trust anchors.
 
@@ -305,7 +305,7 @@ Maxime Besson <mbesson@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Maxime Besson.
+This software is copyright (c) 2024 by Maxime Besson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

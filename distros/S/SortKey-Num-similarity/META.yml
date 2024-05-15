@@ -19,7 +19,7 @@ name: SortKey-Num-similarity
 provides:
   SortKey::Num::similarity:
     file: lib/SortKey/Num/similarity.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Text::Levenshtein::XS: '0'
   perl: '5.010001'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=SortKey-Num-similarity
   homepage: https://metacpan.org/release/SortKey-Num-similarity
   repository: git://github.com/perlancar/perl-SortKey-Num-similarity.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'
@@ -323,7 +323,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
-              version: '0.01'
+              version: '0.021'
             -
               class: Pod::Weaver::Plugin::EnsureUniqueSections
               name: '@Author::PERLANCAR/EnsureUniqueSections'

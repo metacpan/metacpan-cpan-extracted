@@ -19,12 +19,12 @@ name: SortKey
 provides:
   SortKey:
     file: lib/SortKey.pm
-    version: v0.1.1
+    version: v0.2.0
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=SortKey
   homepage: https://metacpan.org/release/SortKey
   repository: git://github.com/perlancar/perl-SortKey.git
-version: 0.1.1
+version: 0.2.0
 x_Dist_Zilla:
   perl:
     version: '5.038002'

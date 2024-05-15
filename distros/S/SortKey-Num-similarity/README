@@ -2,8 +2,8 @@ NAME
     SortKey::Num::similarity - Similarity to a reference string as sort key
 
 VERSION
-    This document describes version 0.001 of SortKey::Num::similarity (from
-    Perl distribution SortKey-Num-similarity), released on 2024-01-24.
+    This document describes version 0.002 of SortKey::Num::similarity (from
+    Perl distribution SortKey-Num-similarity), released on 2024-05-15.
 
 SYNOPSIS
     Use with Sort::Key:

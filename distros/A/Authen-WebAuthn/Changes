@@ -1,0 +1,14 @@
+Revision history for Authen-WebAuthn
+ 
+0.003 2023-11-09
+  - Update Crypt::OpenSSL::X509::Extension and Net::SSLeay dependancies
+  - Make sure Net::SSLeay is initialized before use
+
+0.002 2023-11-09
+  - Supported attestation types: none, packed, fido-u2f
+  - Mandatory attestation trust chain validation
+
+0.001 2022-01-21
+  - initial release
+  - Authentication and registration without attestation
+  - ECC/RSA keys supported

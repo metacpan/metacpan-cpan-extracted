@@ -3,7 +3,9 @@ package Sub::Override;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+use Sub::Prototype qw(set_prototype);
+
+our $VERSION = '0.11';
 
 my $_croak = sub {
     local *__ANON__ = '__ANON__croak';
@@ -56,9 +58,12 @@ sub new {
     return $self;
 }
 
-# because override() was a better name and this is what it should have been
-# called.
-*override = *replace{CODE};
+{
+    no warnings 'once';
+    # because override() was a better name and this is what it should have been
+    # called.
+    *override = *replace{CODE};
+}
 
 sub replace {
     my ( $self, $sub_to_replace, $new_sub ) = @_;
@@ -80,8 +85,11 @@ sub wrap {
     {
         no strict 'refs';
         $self->{$sub_to_replace} ||= *$sub_to_replace{CODE};
+        my $code =  sub { unshift @_, $self->{$sub_to_replace}; goto &$new_sub };
+        my $prototype = prototype($self->{$sub_to_replace});
+        set_prototype($code, $prototype) if defined $prototype;
         no warnings 'redefine';
-        *$sub_to_replace = sub { $new_sub->( $self->{$sub_to_replace}, @_ ) };
+        *$sub_to_replace = $code;
     }
     return $self;
 }
@@ -123,7 +131,7 @@ Sub::Override - Perl extension for easily overriding subroutines
 
 =head1 VERSION
 
-0.10
+0.11
 
 =head1 SYNOPSIS
 
@@ -212,8 +220,8 @@ when testing how code behaves with multiple conditions.
 
 There may be times when you want to 'conditionally' replace a subroutine - for
 example, to override the original subroutine only if certain args are passed.
-For this you can specify 'wrap' instead of 'replace'. Wrap is identical to
-replace, except the original subroutine is passed as the first arg to your
+For this you can specify C<wrap> instead of C<replace>. C<wrap> is identical to
+C<replace>, except the original subroutine is passed as the first arg to your
 new subroutine. You can call the original sub via 'shift->(@_)':
 
   $override->wrap('Some::sub',
@@ -291,8 +299,6 @@ This method will C<croak> if the subroutine to be replaced does not exist.
 
 C<override> is an alternate name for C<replace>.  They are the same method.
 
-=cut
-
 =head2 restore
 
  $sub->restore($sub_name);
@@ -300,7 +306,12 @@ C<override> is an alternate name for C<replace>.  They are the same method.
 Restores the previous behavior of the subroutine.  This will happen
 automatically if the C<Sub::Override> object falls out of scope.
 
-=cut
+=head2 wrap
+
+ $sub->wrap($sub_name, $sub_body);
+
+Temporarily wraps a subroutine with another subroutine. The original subroutine
+is passed as the first arg to the new subroutine.
 
 =head1 EXPORT
 
@@ -309,7 +320,7 @@ None by default.
 =head1 CAVEATS
 
 If you need to override the same sub several times do not create a new
-C<Sub::Override> object, but instead always reuse the existing one and call 
+C<Sub::Override> object, but instead always reuse the existing one and call
 C<replace> on it. Creating a new object to override the same sub will result
 in weird behavior.
 
@@ -320,7 +331,7 @@ in weird behavior.
  # Do not do this either!
  my $sub = Sub::Override->new( 'Foo::bar' => sub { 'first' } );
  $sub = Sub::Override->new( 'Foo::bar' => sub { 'second' } );
- 
+
 Both of those usages could result in of your subs being lost, depending
 on the order in which you restore them.
 

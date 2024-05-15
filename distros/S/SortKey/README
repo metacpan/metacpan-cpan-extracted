@@ -5,8 +5,8 @@ SPECIFICATION VERSION
     0.1
 
 VERSION
-    This document describes version 0.1.1 of SortKey (from Perl distribution
-    SortKey), released on 2024-02-14.
+    This document describes version 0.2.0 of SortKey (from Perl distribution
+    SortKey), released on 2024-05-15.
 
 SYNOPSIS
     Basic use with sort():
@@ -44,8 +44,8 @@ DESCRIPTION
 
 Glossary
     A sort key generator is a subroutine that accepts an item and converts
-    it to a string/numeric key. The key then can be compared using "<=>" or
-    "cmp" operator.
+    it to a string/numeric key. The key then can be compared using the
+    standard "<=>" or "cmp" operator.
 
     A SortKey::* module is a module that can return a sort key generator.
 
@@ -68,7 +68,19 @@ Glossary
 
      sub gen_keygen {
          my %args = @_;
+
          ...
+         return sub {
+
+             # since one of the main usages is with Sort::Key, and Sort::Key does
+             # not pass the argument to @_ but sets $_. So a sort key generator
+             # subroutine must check if argument is passed and if not then use $_ as
+             # the argument.
+             my $arg = @_ ? $_[0] : $_;
+
+             # convert $arg to key
+             ...
+         };
      }
 
      1;

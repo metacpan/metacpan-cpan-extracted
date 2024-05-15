@@ -34,12 +34,31 @@ Devel::Peek dump a data structure:
 
 Add a trace marker:
 
-    perl -Me -e 'dd {'
     perl -Me -e 'sub f1 { trace } sub f2 { f1 } f2'
 
 Watch a reference for changes:
 
-    perl -Me -e 'my $v = {}; sub f1 { watcg( $v ) } sub f2 { f1; $v->{a} = 1 } f2'
+    perl -Me -e 'my $v = {}; sub f1 { watch( $v ) } sub f2 { f1; $v->{a} = 1 } f2'
+
+    perl -Me -e '
+        package A {
+            use e;
+            my %h = ( aaa => 111 );
+
+            watch(\%h);
+
+            sub f1 {
+                $h{b} = 1;
+            }
+
+            sub f2 {
+                f1();
+                delete $h{aaa};
+            }
+        }
+
+        A::f2();
+    '
 
 Launch the Runtime::Debugger:
 

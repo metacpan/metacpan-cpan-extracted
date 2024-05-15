@@ -2,8 +2,8 @@ NAME
     SortKey::Num::length - String length as sort key
 
 VERSION
-    This document describes version 0.002 of SortKey::Num::length (from Perl
-    distribution SortKey-Num-length), released on 2024-01-23.
+    This document describes version 0.003 of SortKey::Num::length (from Perl
+    distribution SortKey-Num-length), released on 2024-05-15.
 
 SYNOPSIS
      use Sort::Key qw(nkeysort);

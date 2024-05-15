@@ -1,6 +1,23 @@
 Changelog for Date-RangeParser-EN
 
-v1.0.1 2024-04-19T16:50:33
+v1.1.0 2024-05-14T18:30:32
+ - Update README (Andrew Hewus Fresh)
+ - Update Makefile (Andrew Hewus Fresh)
+ - Pull request #3: SM-4835 (James Hammer)
+ - Carve around Date::Manip bug regarding the complete fields provided
+   (James Hammer)
+ - SM-4835 Move last or past weekday logic to the top and deal with times
+   as we always do (James Hammer)
+ - SM-4835 Add deprecation warning when DM5 is being used (James Hammer)
+ - SM-4835 Add pluralization to weekdays test (James Hammer)
+ - SM-4835 Refrain from re-scoping incomplete arrayref (James Hammer)
+ - SM-4835 Add support for last or past NUMBER weekdays ago with times
+   (James Hammer)
+ - SM-4835 Fix indentation in POD (James Hammer)
+ - SM-4835 Add support for both 'inf' and 'infinity' DateTime objects
+   (James Hammer)
+
+v1.0.1 2024-04-19T16:50:04
  - Update README (Andrew Hewus Fresh)
  - Pull request #2: SM-4807 (James Hammer)
  - SM-4807 Add POD for new features (James Hammer)

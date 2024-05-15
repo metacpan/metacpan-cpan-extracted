@@ -2,19 +2,24 @@
 
 use strict;
 use warnings;
-
-BEGIN {
-    $Date::Manip::Backend = 'DM5';
-}
-
-use Date::Manip;
 use Test::More;
 
 plan skip_all => 'DM5 support is not testable as of Date::Manip v6.00 and before v6.14'
     unless $Date::Manip::VERSION lt '6.00'
         or $Date::Manip::VERSION ge '6.14';
 
-use Date::RangeParser::EN;
+BEGIN {
+    my $initial_warnings = "";
+    $Date::Manip::Backend = 'DM5';
+    {
+        local $SIG{__WARN__} = sub{$initial_warnings .= $_[0]};
+        require Date::Manip;
+        require Date::RangeParser::EN;
+    }
+
+    like $initial_warnings, qr/Date::Manip::DM5 is deprecated/, "Found Date::Manip deprication warning";
+    like $initial_warnings, qr/DM5 backend will be deprecated/, "Found Date::RangeParser::EN deprication warning";
+}
 
 sub is_forcedate($) {
     my ($expected) = @_;

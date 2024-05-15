@@ -3,9 +3,9 @@ NAME
     pattern as sort key
 
 VERSION
-    This document describes version 0.001 of SortKey::Num::pattern_count
+    This document describes version 0.002 of SortKey::Num::pattern_count
     (from Perl distribution SortKey-Num-pattern_count), released on
-    2024-01-23.
+    2024-05-15.
 
 SYNOPSIS
      use Sort::Key qw(nkeysort);

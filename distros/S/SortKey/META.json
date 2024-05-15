@@ -39,7 +39,7 @@
    "provides" : {
       "SortKey" : {
          "file" : "lib/SortKey.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -54,7 +54,7 @@
          "web" : "https://github.com/perlancar/perl-SortKey"
       }
    },
-   "version" : "0.1.1",
+   "version" : "0.2.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

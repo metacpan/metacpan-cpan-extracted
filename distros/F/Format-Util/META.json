@@ -1,10 +1,10 @@
 {
    "abstract" : "Miscellaneous routines to do with manipulating with strings and numbers!",
    "author" : [
-      "DERIV <DERIV@cpan.org>"
+      "binary.com <BINARY@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -89,15 +89,15 @@
    "provides" : {
       "Format::Util" : {
          "file" : "lib/Format/Util.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Format::Util::Numbers" : {
          "file" : "lib/Format/Util/Numbers.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Format::Util::Strings" : {
          "file" : "lib/Format/Util/Strings.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -112,13 +112,14 @@
          "web" : "https://github.com/binary-com/perl-Format-Util"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "Raunak Kathuria <raunakkathuria@gmail.com>",
+      "tanvir-deriv <tanvir@deriv.com>",
       "Jean-Yves Sireau <jy@binary.com>",
-      "chylli-binary <chylli@binary.com>",
       "Rakesh Kumar Shardiwal <rakesh.shardiwal@gmail.com>",
+      "Chylli <chylli@binary.com>",
       "Reginaldo Costa <regcostajr@gmail.com>",
       "Tee Shuwn Yuan <shuwnyuan@binary.com>",
       "Tom Molesworth <tom@binary.com>",
@@ -131,6 +132,7 @@
       "Zak B. Elep <zakame@zakame.net>",
       "amin roosta <amin.roosta@outlook.com>",
       "chengyang-binary <chengyang@binary.com>",
+      "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
       "Chylli <chylli.email@gmail.com>",
       "Jun Bon <junbon@binary.com>",
       "Kirill Sysoev <55120154+kirill-binary@users.noreply.github.com>",
@@ -142,7 +144,7 @@
       "weisheng-binary <39893981+weisheng-binary@users.noreply.github.com>"
    ],
    "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

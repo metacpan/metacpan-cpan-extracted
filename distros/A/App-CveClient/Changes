@@ -1,3 +1,6 @@
+v1.1.0 - 2024-05-14
+	* Add support for CVE Schema 5.1
+
 v1.0.5 - 2023-10-14
 	* MANIFEST.SKIP: Ignore unpacked distribution
 	* Fix VERSION
