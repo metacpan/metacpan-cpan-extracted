@@ -42,6 +42,17 @@ for my $which (1..2) {
         ok(!$t->has_item_at_pos(3));
         dies_ok { $t->get_item_at_pos(3) };
     };
+
+    # test reopen
+
+    if ($which == 2) {
+        close $tempfh;
+        $t = ArrayData::Test::Source::LinesInFile->new(filename => $tempfile);
+
+        subtest "$subtestname reopen" => sub {
+            is_deeply($t->get_next_item, "one");
+        };
+    }
 }
 
 done_testing;

@@ -9,6 +9,8 @@ use Rope::Autoload;
 use Game::Cribbage::Play::Card;
 use Game::Cribbage::Play::Score;
 use Game::Cribbage::Error;
+use ntheory qw/forcomb vecsum/;
+
 
 property [qw/id next_to_play/] => (
 	initable => 1,
@@ -144,7 +146,6 @@ function calculate_pair => sub {
 
 function calculate_run => sub {
 	my ($self, $score, $card) = @_; 
-
 	my @cards = map { $_->card } @{$self->cards};
 	my @values = map { $_->run_value } (@cards, $card);
 	my $length = scalar @values - 1;

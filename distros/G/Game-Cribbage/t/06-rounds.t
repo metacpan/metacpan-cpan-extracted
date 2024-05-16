@@ -5,6 +5,8 @@ use Game::Cribbage::Rounds;
 
 my $board = Game::Cribbage::Board->new();
 
+$board->build_deck();
+
 $board->add_player(name => 'Robert');
 $board->add_player(name => 'Luck');
 

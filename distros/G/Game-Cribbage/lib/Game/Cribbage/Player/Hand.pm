@@ -102,11 +102,12 @@ function add_crib_card => sub {
 
 function calculate_score => sub {
 	my ($self) = @_;
-	my @cards = (@{$self->cards}, $self->starter);
-	$self->score = Game::Cribbage::Score->new(_with_starter => 1, _cards => \@cards);
+	my $starter = $self->starter ? 1 : 0;
+	my @cards = (@{$self->cards}, ($starter ? $self->starter : ()));
+	$self->score = Game::Cribbage::Score->new(_with_starter => $starter, _cards => \@cards);
 	if ($self->crib && scalar @{$self->crib}) {
-		@cards = (@{$self->crib}, $self->starter);
-		$self->crib_score = Game::Cribbage::Score->new(_with_starter => 1, _cards => \@cards);
+		@cards = (@{$self->crib}, ($starter ? $self->starter : ()));
+		$self->crib_score = Game::Cribbage::Score->new(_with_starter => $starter, _cards => \@cards);
 	}
 	return $self->score->total_score + ($self->crib_score ? $self->crib_score->total_score : 0);
 };

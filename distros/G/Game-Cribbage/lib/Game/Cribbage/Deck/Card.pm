@@ -51,6 +51,11 @@ function run_value => sub {
 	return $card_run_to_value_map{$self->{symbol}} || $self->{symbol};
 };
 
+function suit_symbol => sub {
+	my ($self) = @_;
+	return $card_suit_to_symbol{$self->{suit}};
+};
+
 function ui_stringify => sub {
 	my ($self) = @_;
 	return sprintf "%s %s", $card_suit_to_symbol{$self->{suit}}, $self->{symbol};

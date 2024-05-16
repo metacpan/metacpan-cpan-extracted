@@ -30,8 +30,9 @@ my $builder = $class->new(
         'Test::More' => '0',
     },
     requires => {
-        'perl'        => '5.014',
-        'Data::DPath' => '0.58',
+        'perl'         => '5.014',
+        'Data::DPath'  => '0.58',
+        'Time::Moment' => '0.44',
     },
     add_to_cleanup => [
         'Data-Trace-*',

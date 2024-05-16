@@ -32,6 +32,7 @@ static const int DBI_SQL_NUMERIC    = SQL_NUMERIC;
 static const int DBI_SQL_DECIMAL    = SQL_DECIMAL;
 static const int DBI_SQL_INTEGER    = SQL_INTEGER;
 static const int DBI_SQL_SMALLINT   = SQL_SMALLINT;
+static const int DBI_SQL_BIGINT     = SQL_BIGINT;
 static const int DBI_SQL_FLOAT      = SQL_FLOAT;
 static const int DBI_SQL_REAL       = SQL_REAL;
 static const int DBI_SQL_DOUBLE     = SQL_DOUBLE;
@@ -43,6 +44,7 @@ static const int DBI_SQL_TYPE_TIME  = SQL_TYPE_TIME;
 static const int DBI_SQL_TYPE_DATE  = SQL_TYPE_DATE;
 static const int DBI_SQL_ARRAY      = SQL_ARRAY;
 static const int DBI_SQL_BLOB       = SQL_BLOB;
+static const int DBI_SQL_BOOLEAN    = SQL_BOOLEAN;
 
 /* conflicts */
 
@@ -51,6 +53,7 @@ static const int DBI_SQL_BLOB       = SQL_BLOB;
 #undef  SQL_DECIMAL
 #undef  SQL_INTEGER
 #undef  SQL_SMALLINT
+#undef  SQL_BIGINT
 #undef  SQL_FLOAT
 #undef  SQL_REAL
 #undef  SQL_DOUBLE
@@ -131,7 +134,7 @@ do {                                            \
 #define DPB_FILL_STRING_LEN(dpb, code, string, len) \
 do {                                                \
     if ( len > 255 )                                \
-        croak("DPB string too long (%d)", len);     \
+        croak("DPB string too long (%ld)", (size_t) len);     \
     *dpb++ = code;                                  \
     *dpb++ = len;                                   \
     strncpy(dpb, string, (size_t) len);             \

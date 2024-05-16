@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License
 along with Chart.  If not, see <http://www.gnu.org/licenses/>.
 
 
+Version 274, May 2024
+    - Yahoo data download further change to crumb, from Brian Sammon
+
 Version 273, April 2024
     - Yahoo data download need bigger Net::HTTP MaxLineLength,
       set it to unlimited, as reported by Brian Sammon

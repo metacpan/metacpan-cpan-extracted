@@ -32,4 +32,7 @@ is_deeply($t->get_item_at_pos(4), [five=>"lima"]);
 ok(!$t->has_item_at_pos(5));
 dies_ok { $t->get_item_at_pos(5) };
 
+$t = HashData::Test::Source::LinesInDATA->new;
+is_deeply($t->get_next_item, [one=>"satu"]);
+
 done_testing;

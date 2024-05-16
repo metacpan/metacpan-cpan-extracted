@@ -71,7 +71,13 @@ typedef __int32 int32_t; /* Sereal specific change, see csnappy_decompress.c(271
 #endif
 
 #else
-#include <stdint.h>
+
+#if defined(__SUNPRO_C) || defined(_AIX)
+# include <inttypes.h>
+#else
+# include <stdint.h>
+#endif
+
 #endif
 
 #ifdef _GNU_SOURCE
@@ -117,10 +123,12 @@ Albert Lee
 #define __LITTLE_ENDIAN	1234
 #define __BYTE_ORDER	LITTLE_ENDIAN
 
-#elif defined(__GLIBC__) || defined(__ANDROID__) || defined(__CYGWIN__)
+#elif defined(_AIX)
 
-#include <endian.h>
-#include <byteswap.h>
+#include <sys/machine.h>
+#define __LITTLE_ENDIAN LITTLE_ENDIAN
+#define __BIG_ENDIAN BIG_ENDIAN
+#define __BYTE_ORDER __BIG_ENDIAN
 
 #elif defined(__APPLE__)
 
@@ -153,6 +161,13 @@ Albert Lee
 #define __LITTLE_ENDIAN _LITTLE_ENDIAN
 #define __BIG_ENDIAN _BIG_ENDIAN
 
+#elif defined(__MINGW32__)
+#include <sys/param.h>
+#define __BYTE_ORDER BYTE_ORDER
+#define __LITTLE_ENDIAN LITTLE_ENDIAN
+#define __BIG_ENDIAN BIG_ENDIAN
+
+
 #elif defined(__sun)
 
 #include <sys/byteorder.h>
@@ -166,12 +181,6 @@ Albert Lee
 #else
 #define __BYTE_ORDER __BIG_ENDIAN
 #endif
-
-#elif defined(__MINGW32__)
-#include <sys/param.h>
-#define __BYTE_ORDER BYTE_ORDER
-#define __LITTLE_ENDIAN LITTLE_ENDIAN
-#define __BIG_ENDIAN BIG_ENDIAN
 
 #elif defined(__hpux)
 
@@ -205,6 +214,11 @@ Albert Lee
 
 #define __SNAPPY_STRICT_ALIGN
 
+#elif defined(__GNUC__) || defined(__ANDROID__) || defined(__CYGWIN__)
+
+#include <endian.h>
+#include <byteswap.h>
+
 #endif
 
 #ifndef bswap_16
@@ -237,14 +251,23 @@ Albert Lee
 /* Potentially unaligned loads and stores. */
 
 #if defined(__i386__) || defined(__x86_64__) || defined(__powerpc__)
+#if defined(__GNUC__)
+typedef uint16_t my_uint16_t __attribute__((aligned(1)));
+typedef uint32_t my_uint32_t __attribute__((aligned(1)));
+typedef uint64_t my_uint64_t __attribute__((aligned(1)));
+#else
+typedef uint16_t my_uint16_t;
+typedef uint32_t my_uint32_t;
+typedef uint64_t my_uint64_t;
+#endif
 
-#define UNALIGNED_LOAD16(_p) (*(const uint16_t*)(_p))
-#define UNALIGNED_LOAD32(_p) (*(const uint32_t*)(_p))
-#define UNALIGNED_LOAD64(_p) (*(const uint64_t*)(_p))
+#define UNALIGNED_LOAD16(_p) (*(const my_uint16_t*)(_p))
+#define UNALIGNED_LOAD32(_p) (*(const my_uint32_t*)(_p))
+#define UNALIGNED_LOAD64(_p) (*(const my_uint64_t*)(_p))
 
-#define UNALIGNED_STORE16(_p, _val) (*(uint16_t*)(_p) = (_val))
-#define UNALIGNED_STORE32(_p, _val) (*(uint32_t*)(_p) = (_val))
-#define UNALIGNED_STORE64(_p, _val) (*(uint64_t*)(_p) = (_val))
+#define UNALIGNED_STORE16(_p, _val) (*(my_uint16_t*)(_p) = (_val))
+#define UNALIGNED_STORE32(_p, _val) (*(my_uint32_t*)(_p) = (_val))
+#define UNALIGNED_STORE64(_p, _val) (*(my_uint64_t*)(_p) = (_val))
 
 #elif defined(__arm__) && \
 	!defined(__ARM_ARCH_4__) && \

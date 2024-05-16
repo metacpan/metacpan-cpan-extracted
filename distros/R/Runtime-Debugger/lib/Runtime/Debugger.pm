@@ -32,7 +32,7 @@ use feature         qw( say );
 use parent          qw( Exporter );
 use subs            qw( uniq );
 
-our $VERSION = '0.22';
+our $VERSION = '1.02';
 our @EXPORT  = qw( run repl d dd np p );
 our %PEEKS;
 
@@ -1257,14 +1257,14 @@ sub _define_help {
 
  $class $version
 
- <TAB>      - Show options.
- <Up/Down>  - Scroll history.
- help       - Show this help section.
- hist [N=5] - Show last N commands.
- p DATA     - Data printer (colored).
- d DATA     - Data dumper.
- dd DATA    - Internals dumper.
- q          - Quit debugger.
+ <TAB>          - Show options.
+ <Up/Down>      - Scroll history.
+ help           - Show this section.
+ hist [N=5]     - Show last N commands.
+ p DATA         - Data printer (colored).
+ d DATA         - Data dumper.
+ dd DATA, [N=3] - Dump internals (with depth).
+ q              - Quit debugger.
 HELP
 }
 

@@ -58,55 +58,55 @@
    "provides" : {
       "HashData::Array" : {
          "file" : "lib/HashData/Array.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "HashData::DBI" : {
          "file" : "lib/HashData/DBI.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "HashData::Hash" : {
          "file" : "lib/HashData/Hash.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "HashData::Sample::DeNiro" : {
          "file" : "lib/HashData/Sample/DeNiro.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "HashData::Test::Source::Array" : {
          "file" : "lib/HashData/Test/Source/Array.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "HashData::Test::Source::DBI" : {
          "file" : "lib/HashData/Test/Source/DBI.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "HashData::Test::Source::Hash" : {
          "file" : "lib/HashData/Test/Source/Hash.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "HashData::Test::Source::LinesInDATA" : {
          "file" : "lib/HashData/Test/Source/LinesInDATA.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "HashDataRole::Source::Array" : {
          "file" : "lib/HashDataRole/Source/Array.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "HashDataRole::Source::DBI" : {
          "file" : "lib/HashDataRole/Source/DBI.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "HashDataRole::Source::Hash" : {
          "file" : "lib/HashDataRole/Source/Hash.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "HashDataRole::Source::LinesInDATA" : {
          "file" : "lib/HashDataRole/Source/LinesInDATA.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "HashDataRoles::Standard" : {
          "file" : "lib/HashDataRoles/Standard.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -121,7 +121,7 @@
          "web" : "https://github.com/perlancar/perl-HashDataRoles-Standard"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -488,7 +488,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
                         "name" : "@Author::PERLANCAR/AppendPrepend",
-                        "version" : "0.01"
+                        "version" : "0.021"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::EnsureUniqueSections",

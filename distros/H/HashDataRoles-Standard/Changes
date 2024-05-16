@@ -1,3 +1,9 @@
+0.004   2024-05-06  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Source::LinesInData role didn't save the original DATA's
+          beginning position.
+
+
 0.003   2024-01-15  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfixes] Fixes for HashDataRole::Source::LinesInDATA,

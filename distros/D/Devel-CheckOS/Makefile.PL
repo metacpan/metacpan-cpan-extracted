@@ -15,7 +15,7 @@ use Devel::CheckOS;
 my @dont_care = Devel::CheckOS::list_family_members('Unix');
    @dont_care = Devel::CheckOS::list_family_members('MicrosoftWindows');
 
-my(@OSes, @notOSes, @extrafiles) = ();
+my(@OSes, @notOSes) = ();
 if($ENV{AUTOMATED_TESTING}) {
     print "I will now ask you some questions to make sure I've detected your\n";
     print "system correctly.  Most platforms will be detected several times.\n";
@@ -29,31 +29,28 @@ if($ENV{AUTOMATED_TESTING}) {
     if(@notOSes) { # user told us we got it wrong
         foreach my $os (@notOSes) {
             (my $filename_os = $os) =~ s/::/-/g;
-            push @extrafiles, File::Spec->catfile('t', "XX-autodetected-$^O-as-$filename_os.t");
-            open(FAIL, '>'.$extrafiles[-1]) ||
-                die("Couldn't write ".$extrafiles[-1].": $!\n");
-            print FAIL 'print "1..1\\nnot ok 1\\n"';
-            close(FAIL);
+            my $test_file = File::Spec->catfile('t', "XX-autodetected-$^O-as-$filename_os.t");
+            open(my $fh, '>', $test_file) || die("Couldn't write ".$test_file.": $!\n");
+            print $fh 'print "1..1\\nnot ok 1\\n"';
+            close($fh);
         }
     }
     if(!@notOSes && !@OSes) { # didn't detect anything!
-        push @extrafiles, File::Spec->catfile('t', "XX-autodetected-$^O-as-nothing.t");
-        open(FAIL, '>'.$extrafiles[-1]) ||
-            die("Couldn't write ".$extrafiles[-1].": $!\n");
-        print FAIL 'print "1..1\\nnot ok 1\\n"';
-        close(FAIL);
+        my $test_file = File::Spec->catfile('t', "XX-autodetected-$^O-as-nothing.t");
+        open(my $fh, '>', $test_file) || die("Couldn't write ".$test_file.": $!\n");
+        print $fh 'print "1..1\\nnot ok 1\\n"';
+        close($fh);
     }
     if(@OSes) {
         foreach my $os (@OSes) {
             (my $filename_os = $os) =~ s/::/-/g;
-            push @extrafiles, File::Spec->catfile('t', "XX-autodetected-$^O-as-$filename_os.t");
-            open(PASS, '>'.$extrafiles[-1]) ||
-                die("Couldn't write ".$extrafiles[-1].": $!\n");
-            print PASS qq{
+            my $test_file = File::Spec->catfile('t', "XX-autodetected-$^O-as-$filename_os.t");
+            open(my $fh, '>', $test_file) || die("Couldn't write ".$test_file.": $!\n");
+            print $fh qq{
                 use Devel::AssertOS::$os;
                 print "1..1\\n";print "ok 1\\n";
             };
-            close(PASS);
+            close($fh);
         }
     }
 }
@@ -87,7 +84,7 @@ WriteMakefile(
     EXE_FILES    => [qw(
         bin/use-devel-assertos
     )],
-    clean         => { FILES => join(' ', @extrafiles) }
+    clean         => { FILES => 't/XX*' }
 );
 
 sub findOSes {
@@ -121,7 +118,6 @@ sub findOSes {
             }
             goto ASK;
         } else {
-            print "Eek!\n";
             push @notOSes, $prompt_modname;
         }
     }

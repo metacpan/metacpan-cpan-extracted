@@ -8,9 +8,9 @@ use Role::Tiny::With;
 with 'ArrayDataRole::Source::Iterator';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-15'; # DATE
+our $DATE = '2024-05-06'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 sub new {
     my ($class, %args) = @_;
@@ -44,7 +44,7 @@ ArrayData::Test::Source::Iterator - A test ArrayData module
 
 =head1 VERSION
 
-This document describes version 0.009 of ArrayData::Test::Source::Iterator (from Perl distribution ArrayDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.010 of ArrayData::Test::Source::Iterator (from Perl distribution ArrayDataRoles-Standard), released on 2024-05-06.
 
 =head1 SYNOPSIS
 

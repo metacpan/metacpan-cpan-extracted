@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Package;
 # ABSTRACT: A package data object (02packages.details entry)
-$MetaCPAN::Client::Package::VERSION = '2.031001';
+$MetaCPAN::Client::Package::VERSION = '2.032000';
 use Moo;
 
 with 'MetaCPAN::Client::Role::Entity';
@@ -43,7 +43,7 @@ MetaCPAN::Client::Package - A package data object (02packages.details entry)
 
 =head1 VERSION
 
-version 2.031001
+version 2.032000
 
 =head1 SYNOPSIS
 

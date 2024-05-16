@@ -270,7 +270,7 @@ sub Unwatch {
     }
     elsif ( $type =~ /ARRAY/ ) {
         untie @$var;
-        @$var = @$copy if $shadow;
+        @$var = @$copy if $shadow && $copy;
     }
     elsif ( $type =~ /HASH/ ) {
         untie %$var;
@@ -387,7 +387,7 @@ sub Destroy   { undef %{ $_[0] } }
 sub Exists    { exists $_[0]->{-ptr}->[ $_[1] ] }
 sub Extend    { }
 sub Fetch     { $_[0]->{-ptr}->[ $_[1] ] }
-sub Fetchsize { scalar @{ $_[0]->{-ptr} } }
+sub Fetchsize { scalar @{ $_[0]->{-ptr} // [] } }
 sub Pop       { pop @{ $_[0]->{-ptr} } }
 sub Push      { push @{ $_[0]->{-ptr} }, @_[ 1 .. $#_ ] }
 sub Shift     { shift @{ $_[0]->{-ptr} } }

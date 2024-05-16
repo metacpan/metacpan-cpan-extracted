@@ -8,7 +8,7 @@ configure_requires:
   Devel::CheckLib: '0'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,4 +23,5 @@ requires:
   XSLoader: '0'
 resources:
   repository: http://github.com/gray/compress-snappy
-version: '0.24'
+version: '0.25'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

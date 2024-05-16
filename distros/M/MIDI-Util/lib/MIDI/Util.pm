@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI Utilities
 
-our $VERSION = '0.1301';
+our $VERSION = '0.1302';
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our @EXPORT = qw(
     ticks
     timidity_conf
     play_timidity
-    get_milliseconds
+    get_microseconds
     score2events
 );
 
@@ -274,7 +274,7 @@ sub play_timidity {
 }
 
 
-sub get_milliseconds {
+sub get_microseconds {
     my ($score) = @_;
     my $tempo = first { $_->[0] eq 'set_tempo' } @{ $score->{Score} };
     return $tempo->[2] / ${ $score->{Tempo} };
@@ -300,7 +300,7 @@ MIDI::Util - MIDI Utilities
 
 =head1 VERSION
 
-version 0.1301
+version 0.1302
 
 =head1 SYNOPSIS
 
@@ -315,7 +315,7 @@ version 0.1301
     ticks
     timidity_conf
     play_timidity
-    get_milliseconds
+    get_microseconds
     score2events
   );
 
@@ -345,7 +345,7 @@ version 0.1301
   # Or you can just play the score:
   play_timidity($score, 'some.mid');
 
-  my $ms = get_milliseconds($score);
+  my $ms = get_microseconds($score);
 
   my $events = score2events($score);
 
@@ -483,11 +483,11 @@ used for the timidity configuration. If not, C<timidity-midi-util.cfg>
 is used. If a soundfont is not given, a timidity configuration file is
 not rendered and used.
 
-=head2 get_milliseconds
+=head2 get_microseconds
 
-  get_milliseconds($score_obj);
+  get_microseconds($score_obj);
 
-Calculate the milliseconds of a tick given a B<score>, with tempo and
+Calculate the microseconds of a tick given a B<score>, with tempo and
 ticks.
 
 =head2 score2events

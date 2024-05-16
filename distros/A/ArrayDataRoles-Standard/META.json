@@ -58,63 +58,63 @@
    "provides" : {
       "ArrayData::Array" : {
          "file" : "lib/ArrayData/Array.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "ArrayData::DBI" : {
          "file" : "lib/ArrayData/DBI.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "ArrayData::LinesInFile" : {
          "file" : "lib/ArrayData/LinesInFile.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "ArrayData::Sample::DeNiro" : {
          "file" : "lib/ArrayData/Sample/DeNiro.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "ArrayData::Test::Source::Array" : {
          "file" : "lib/ArrayData/Test/Source/Array.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "ArrayData::Test::Source::DBI" : {
          "file" : "lib/ArrayData/Test/Source/DBI.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "ArrayData::Test::Source::Iterator" : {
          "file" : "lib/ArrayData/Test/Source/Iterator.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "ArrayData::Test::Source::LinesInDATA" : {
          "file" : "lib/ArrayData/Test/Source/LinesInDATA.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "ArrayData::Test::Source::LinesInFile" : {
          "file" : "lib/ArrayData/Test/Source/LinesInFile.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "ArrayDataRole::Source::Array" : {
          "file" : "lib/ArrayDataRole/Source/Array.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "ArrayDataRole::Source::DBI" : {
          "file" : "lib/ArrayDataRole/Source/DBI.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "ArrayDataRole::Source::Iterator" : {
          "file" : "lib/ArrayDataRole/Source/Iterator.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "ArrayDataRole::Source::LinesInDATA" : {
          "file" : "lib/ArrayDataRole/Source/LinesInDATA.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "ArrayDataRole::Source::LinesInFile" : {
          "file" : "lib/ArrayDataRole/Source/LinesInFile.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "ArrayDataRoles::Standard" : {
          "file" : "lib/ArrayDataRoles/Standard.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -129,7 +129,7 @@
          "web" : "https://github.com/perlancar/perl-ArrayDataRoles-Standard"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -496,7 +496,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
                         "name" : "@Author::PERLANCAR/AppendPrepend",
-                        "version" : "0.01"
+                        "version" : "0.021"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::EnsureUniqueSections",

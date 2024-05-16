@@ -3,9 +3,9 @@ package ArrayDataRoles::Standard;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-15'; # DATE
+our $DATE = '2024-05-06'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 1;
 # ABSTRACT: Standard set of roles for ArrayData
@@ -22,7 +22,7 @@ ArrayDataRoles::Standard - Standard set of roles for ArrayData
 
 =head1 VERSION
 
-This document describes version 0.009 of ArrayDataRoles::Standard (from Perl distribution ArrayDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.010 of ArrayDataRoles::Standard (from Perl distribution ArrayDataRoles-Standard), released on 2024-05-06.
 
 =head1 HOMEPAGE
 

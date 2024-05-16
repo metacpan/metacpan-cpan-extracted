@@ -142,14 +142,14 @@ sub _define_help_stdout {
         '',
         ' Runtime::Debugger 0.01',
         '',
-        ' <TAB>      - Show options.',
-        ' <Up/Down>  - Scroll history.',
-        ' help       - Show this help section.',
-        ' hist [N=5] - Show last N commands.',
-        ' p DATA     - Data printer (colored).',
-        ' d DATA     - Data dumper.',
-        ' dd DATA    - Internals dumper.',
-        ' q          - Quit debugger.',
+        ' <TAB>          - Show options.',
+        ' <Up/Down>      - Scroll history.',
+        ' help           - Show this section.',
+        ' hist [N=5]     - Show last N commands.',
+        ' p DATA         - Data printer (colored).',
+        ' d DATA         - Data dumper.',
+        ' dd DATA, [N=3] - Dump internals (with depth).',
+        ' q              - Quit debugger.',
         ''
     ]
 }

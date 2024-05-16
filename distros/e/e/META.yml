@@ -1,5 +1,5 @@
 ---
-abstract: 'Unleash the power of e!'
+abstract: 'beastmode unleashed'
 author:
   - 'Tim Potapov <tim.potapov@gmail.com>'
 build_requires:
@@ -16,12 +16,13 @@ name: e
 provides:
   e:
     file: lib/e.pm
-    version: '1.05'
+    version: '1.07'
 requires:
+  App::Pod: '0.36'
   Data::Printer: '0'
-  Data::Trace: '0.19'
+  Data::Trace: '1.01'
   Mojolicious: '0'
-  Runtime::Debugger: '0.20'
+  Runtime::Debugger: '1.01'
   Sub::Util: '0'
   Tiny::Prof: '0'
   YAML::XS: '0'
@@ -30,5 +31,5 @@ resources:
   bugtracker: https://github.com/poti1/e/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/poti1/e
-version: '1.05'
+version: '1.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

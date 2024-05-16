@@ -18,7 +18,7 @@ WebService::UK::Parliament::Treaties - Query the UK Parliament Treaties API
 
 =head1 VERSION
 
-Version 0.04
+Version 1.00
 
 =cut
 

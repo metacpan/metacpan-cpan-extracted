@@ -61,6 +61,7 @@ function reset_hands => sub {
 
 function next_hands => sub {
 	my ($self, $game, %args) = @_;
+	$game->shuffle();
 	my $hands = Game::Cribbage::Hands->new(_game => $game, %args);
 	$self->current_hands = $hands;
 	push @{$self->history}, $hands;
@@ -220,10 +221,10 @@ function cannot_play_a_card => sub {
 };
 
 function next_play => sub {
-	my ($self) = @_;
-	my $score = $self->current_hands->next_play();
+	my ($self, $game) = @_;
+	my $score = $self->current_hands->next_play($game);
 	if (ref $score && $score->score) {
-		my $hand = $score->player->player;
+		my $hand = ref $score->player ? $score->player->player : $score->player;
 		$self->score->$hand->{last} = $self->score->$hand->{current};
 		$self->score->$hand->{current} += $score->score;
 		push @{$self->current_hands->$hand->play_scored}, $score;

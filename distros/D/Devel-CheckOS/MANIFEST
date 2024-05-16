@@ -128,5 +128,7 @@ lib/Devel/AssertOS/HWCapabilities/Int32.pm
 lib/Devel/AssertOS/MacOSX/v13.pm
 lib/Devel/AssertOS/OSFeatures/Systemd.pm
 lib/Devel/AssertOS/MacOSX/v14.pm
+lib/Devel/AssertOS/OSFeatures/Release.pm
+t/os-release.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

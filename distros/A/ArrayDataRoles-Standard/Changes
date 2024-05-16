@@ -1,3 +1,9 @@
+0.010   2024-05-06  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Source::LinesInDATA role didn't record the original
+          position for subsequent instances.
+
+
 0.009   2024-01-15  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

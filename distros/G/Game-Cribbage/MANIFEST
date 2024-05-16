@@ -1,3 +1,4 @@
+bin/cribbage
 Changes
 ignore.txt
 lib/Game/Cribbage.pm

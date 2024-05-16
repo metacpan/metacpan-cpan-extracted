@@ -5,9 +5,9 @@ use Role::Tiny::With;
 with 'HashDataRole::Spec::Basic';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-15'; # DATE
+our $DATE = '2024-05-06'; # DATE
 our $DIST = 'HashDataRoles-Standard'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 sub new {
     no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
@@ -15,7 +15,13 @@ sub new {
     my ($class, %args) = @_;
 
     my $fh = \*{"$class\::DATA"};
-    my $fhpos_data_begin = tell $fh;
+    my $fhpos_data_begin;
+    if (defined ${"$class\::_HashData_fhpos_data_begin_cache"}) {
+        $fhpos_data_begin = ${"$class\::_HashData_fhpos_data_begin_cache"};
+        seek $fh, $fhpos_data_begin, 0;
+    } else {
+        $fhpos_data_begin = ${"$class\::_HashData_fhpos_data_begin_cache"} = tell $fh;
+    }
 
     bless {
         fh => $fh,
@@ -175,7 +181,7 @@ HashDataRole::Source::LinesInDATA - Role to access hash data from DATA section, 
 
 =head1 VERSION
 
-This document describes version 0.003 of HashDataRole::Source::LinesInDATA (from Perl distribution HashDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.004 of HashDataRole::Source::LinesInDATA (from Perl distribution HashDataRoles-Standard), released on 2024-05-06.
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,271 @@
+#!/usr/bin/env perl
+### before: #!@PERL@
+
+use strict;
+use warnings;
+
+### after: use lib qw(@RT_LIB_PATH@);
+use lib qw(/opt/rt5/local/lib /opt/rt5/lib);
+
+use Getopt::Long;
+my %opt;
+GetOptions( \%opt, 'help|h', 'type|t=s', 'update|u', 'insert|i', 'insert-update', 'force|f', 'debug|d', 'mdy', 'dmy', 'config|c=s', 'run-scrips', 'article-class=s' );
+my $file = shift @ARGV;
+my $additional_args = shift @ARGV;
+
+require Pod::Usage;
+
+if ( $additional_args ){
+    Pod::Usage::pod2usage( "Multiple file names provided. Re-run with only one filename." );
+    exit;
+}
+
+if ( $opt{help} || !$file ) {
+    Pod::Usage::pod2usage( { verbose => 2 } );
+    exit;
+}
+
+unless ( ( $opt{type} // '' ) =~ /^(?:user|ticket|transaction|article)$/ ) {
+    Pod::Usage::pod2usage( "Invalid type provided, should be one of user/ticket/transaction/article" );
+    exit;
+}
+
+if ($opt{mdy} and $opt{dmy}) {
+    Pod::Usage::pod2usage("Only one of --mdy or --dmy can be provided");
+    exit;
+}
+
+if ($opt{type} eq 'article' and !$opt{'article-class'}) {
+    Pod::Usage::pod2usage("--article-class is required for article type");
+    exit;
+}
+
+$opt{insert} ||= 1 unless $opt{update} || $opt{'insert-update'};
+
+use RT;
+use RT::Interface::CLI qw(GetCurrentUser);
+
+if ($opt{config}) {
+    die "Can't find configuration file $opt{config}" unless -f $opt{config};
+    no warnings 'redefine';
+    require RT::Config;
+    my $old = \&RT::Config::Configs;
+    *RT::Config::Configs = sub { return ($opt{config}, $old->(@_)) };
+}
+
+RT->LoadConfig();
+RT->Config->Set( LogToSTDERR => $opt{debug} ? 'debug' : 'warning' );
+RT->Config->Set( DateDayBeforeMonth => 1 ) if $opt{dmy};
+RT->Config->Set( DateDayBeforeMonth => 0 ) if $opt{mdy};
+RT->Config->Set( AutoCreateNonExternalUsers => 0 );
+RT->Init();
+
+RT::Logger->add_callback(
+    sub {
+        my %p = @_;
+        return $p{message} unless $RT::Extension::Import::CSV::CurrentRow && $RT::Extension::Import::CSV::CurrentLine;
+
+        my $row_line = "[row $RT::Extension::Import::CSV::CurrentRow, line $RT::Extension::Import::CSV::CurrentLine]";
+
+        # append the create message with the custom field values
+        # we need to be able to output the values without modifying $ticket->Create itself.
+        if ( $p{level} eq 'info' && $p{message} =~ /^Ticket \d+ created in queue/ ) {
+            no warnings 'once';
+            return "$row_line $p{message}. $RT::Extension::Import::CSV::UniqueFields";
+        }
+
+        return "$row_line $p{message}";
+    }
+);
+
+use Test::MockTime;
+require RT::Extension::Import::CSV;
+
+my $current_user;
+
+if ( ( $opt{type} eq 'transaction' ) && ( my $name = RT->Config->Get('TransactionsImportActor') ) ) {
+    $current_user = RT::CurrentUser->new( RT->SystemUser );
+    $current_user->Load($name);
+    unless ( $current_user->Id ) {
+        RT->Logger->error("Couldn't find user $name");
+        exit(1);
+    }
+}
+else {
+    $current_user = GetCurrentUser();
+    unless ( $current_user->Id ) {
+        RT->Logger->error("No RT user found. Please consult your RT administrator.");
+        exit(1);
+    }
+}
+
+my $timezone = $current_user->UserObj->Timezone;
+
+if ( !$timezone || $timezone ne 'UTC' ) {
+    my ( $ret, $msg ) = $current_user->UserObj->SetTimezone('UTC');
+    if ( !$ret ) {
+        RT->Logger->error("Failed to temporarily set current user's timezone to UTC: $msg");
+        exit(1);
+    }
+}
+
+{
+    use RT::Transaction;
+    no warnings 'redefine';
+    my $orig_create = \&RT::Transaction::Create;
+    *RT::Transaction::Create = sub {
+        my $self = shift;
+        return $self->$orig_create( @_, $opt{'run-scrips'} ? () : ( ActivateScrips => 0 ) );
+    };
+}
+
+{
+    use RT::Record;
+    no warnings 'redefine';
+    *RT::Record::AddCustomFieldDefaultValues = sub { return 1 };
+}
+
+my ( $created, $updated, $skipped, $skipped_ref ) = RT::Extension::Import::CSV->run(
+    CurrentUser  => $current_user,
+    File         => $file,
+    Type         => $opt{type},
+    Update       => $opt{update},
+    Insert       => $opt{insert},
+    InsertUpdate => $opt{'insert-update'},
+    Force        => $opt{force},
+    ArticleClass => $opt{'article-class'},
+);
+
+print <<"EOF";
+created: $created
+updated: $updated
+skipped: $skipped
+EOF
+
+# Write out skipped CSV data to a new file if we have any
+if ( $skipped_ref ){
+    my $filename = $file;
+    $filename =~ s/\.[a-z]{3}$//i;  # remove file extension, if present
+    $filename .= "_skipped.csv";
+
+    my $csv_out = Text::CSV_XS->new(
+        {
+            binary      => 1,
+            sep_char    => ';',
+            quote_char  => '`',
+            escape_char => '`',
+            always_quote => 1,
+            eol => $/,
+            %{ RT->Config->Get('CSVOptions') || {} },
+        }
+    );
+
+    if ( scalar @$skipped_ref && open (my $fh, ">:encoding(utf8)", $filename) ){
+
+        foreach my $item ( @$skipped_ref ){
+            $csv_out->print($fh, $item);
+        }
+        close $fh or RT::Logger->error("Unable to close file $filename: $!");
+        print "\nSkipped rows written to file $filename\n";
+    }
+    elsif ( scalar @$skipped_ref ){
+        RT::Logger->error("Unable to create file $filename: $!");
+    }
+}
+
+if ( !$timezone || $timezone ne 'UTC' ) {
+    my ( $ret, $msg ) = $current_user->UserObj->SetTimezone( $timezone );
+    if ( !$ret ) {
+        RT->Logger->error( "Failed to set current user's timezone back: $msg" );
+    }
+}
+
+__END__
+
+=head1 NAME
+
+rt-extension-csv-importer - Import data into RT
+
+=head1 SYNOPSIS
+
+    rt-extension-csv-importer --config /path/to/config.pm --type user /path/to/user-data.csv
+    rt-extension-csv-importer --config /path/to/config.pm --type ticket /path/to/ticket-data.csv
+    rt-extension-csv-importer --config /path/to/config.pm --type ticket --update /path/to/ticket-data.csv
+    rt-extension-csv-importer --config /path/to/config.pm --type transaction /path/to/transaction-data.csv
+    rt-extension-csv-importer --config /path/to/config.pm --type article --article-class 'VM-Assessment' /path/to/article-data.csv
+
+=head1 DESCRIPTION
+
+This script will import/update RT from data in a CSV and other types of
+delimted files. See L<RT::Extension::Import::CSV> for configuration.
+
+=head1 OPTIONS
+
+=over
+
+=item C<--config> I<file> or C<-c> I<file>
+
+Provides an explicit extra configuration file which is loaded before any
+other configuration files.  This is useful to provide per-import settings.
+F<RT_SiteConfig.pm> should B<not> contain settings for options with hashes
+that may get merged with per-import settings.
+
+=item C<--type> I<user|ticket|transaction|article> or C<-t> I<user|ticket|transaction|article>
+
+Specify which type of data shall be imported. This is required.
+
+=item C<--article-class> I<article class name>
+
+Specify the article class. Required when type is article.
+
+=item C<--update>
+
+Without this option, existing tickets (as determined by matching
+defined values) are left untouched.  With this option
+provided, records will be updated based on their values in the CSV.
+If an existing ticket is not found, the entry is skipped. Use the
+C<--insert-update> option to create new tickets when they are not
+found.
+
+=item C<--insert>
+
+By default, if C<TicketsImportUniqueCFs> is not set, the script will
+refuse to create tickets. Using this flag to create tickets in
+that case.
+
+It's enabled automatically if C<--update> or C<--insert-update>
+are not specified.
+
+=item C<--insert-update>
+
+This option will update a ticket if found or insert (create) a new
+ticket if not found.
+
+=item C<--force>
+
+By default, tickets containing not-existing users will be skipped; with this
+flag, they will be created without those users.
+
+This also allows the script to continue processing even if errors are found
+when parsing the CSV file.
+
+=item C<--run-scrips>
+
+When importing transactions, the default behavior is to deactivate scrips
+on transaction creation. Use this flag to allow RT to run scrips
+accordingly.
+
+This flag only affects transaction import; scrips are always run for
+all other import types.
+
+=item C<--mdy>, C<--dmy>
+
+Force RT to parse dates as C<mm/dd/yy> or C<dd/mm/yy>, respectively.  In
+the absence of this option, RT will default to the C<DateDayBeforeMonth>
+setting, which defaults to C<dd/mm/yy>.
+
+=item C<--debug>
+
+Provide verbose output to STDERR during the import.
+
+=back

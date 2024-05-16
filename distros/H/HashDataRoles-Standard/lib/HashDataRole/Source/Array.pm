@@ -8,9 +8,9 @@ with 'HashDataRole::Spec::Basic';
 with 'Role::TinyCommons::Collection::GetItemByPos'; # bonus
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-15'; # DATE
+our $DATE = '2024-05-06'; # DATE
 our $DIST = 'HashDataRoles-Standard'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 sub new {
     my ($class, %args) = @_;
@@ -112,7 +112,7 @@ HashDataRole::Source::Array - Get hash data from a Perl array
 
 =head1 VERSION
 
-This document describes version 0.003 of HashDataRole::Source::Array (from Perl distribution HashDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.004 of HashDataRole::Source::Array (from Perl distribution HashDataRoles-Standard), released on 2024-05-06.
 
 =head1 SYNOPSIS
 

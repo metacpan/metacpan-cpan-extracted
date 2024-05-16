@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Sun Mar 10 18:02:02 2024
 # Last Modified By: 
-# Last Modified On: Thu May  9 11:45:14 2024
-# Update Count    : 52
+# Last Modified On: Wed May 15 12:45:20 2024
+# Update Count    : 93
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -23,11 +23,12 @@ my ($my_name, $my_version) = qw( rrjson 0.02 );
 use Getopt::Long 2.13;
 
 # Command line options.
-my $mode = "json";
+my $mode = "rrjson";
 my $execute;			# direct JSON from command line
 
 # Parser options.
 my $strict;
+my $pretty = 1;
 my $prp;
 my $combined_keys;
 my $implied_outer_hash;
@@ -37,6 +38,8 @@ my $extra_tokens_ok;
 my $verbose = 1;		# verbose processing
 
 # Development options (not shown with -help).
+my $pretoks = 0;
+my $tokens = 0;
 my $debug = 0;			# debugging
 my $trace = 0;			# trace (show process)
 my $test = 0;			# test mode.
@@ -55,6 +58,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use JSON::Relaxed;
 use File::LoadLines;
+use Encode qw(decode_utf8);
 binmode STDOUT => ':utf8';
 binmode STDERR => ':utf8';
 
@@ -66,11 +70,13 @@ my $parser = JSON::Relaxed::Parser->new
     defined($croak_on_error) ? ( croak_on_error => $croak_on_error ) : (),
     defined($extra_tokens_ok) ? ( extra_tokens_ok => $extra_tokens_ok ) : (),
     defined($prp) ? ( prp => $prp ) : (),
+    defined($pretty) ? ( pretty => $pretty ) : (),
+    booleans => 1,				# force default
     );
 
-if ( $verbose ) {
+if ( $verbose > 1 ) {
     my @opts;
-    for ( qw( strict prp implied_outer_hash croak_on_error extra_tokens_ok ) ) {
+    for ( qw( strict pretty prp combined_keys implied_outer_hash croak_on_error extra_tokens_ok booleans ) ) {
 	push( @opts, $_ ) if $parser->$_;
     }
     if ( @opts ) {
@@ -83,7 +89,7 @@ for my $file ( @ARGV ) {
 
     my $json;
     if ( $execute ) {
-	$json = $file;
+	$json = decode_utf8($file);
     }
     else {
 	my $opts = { split => 0, fail => "soft" };
@@ -91,14 +97,59 @@ for my $file ( @ARGV ) {
 	die( "$file: $opts->{error}\n") if $opts->{error};
     }
 
-    my $data = $parser->decode($json);
+    my $data;
+    if ( $pretoks || $tokens ) {
+	$parser->croak_on_error = 0;
+	$parser->data = $json;
+	$parser->pretokenize;
+	if ( $pretoks ) {
+	    my $pretoks = $parser->pretoks;
+	    dumper( $pretoks, as => "Pretoks" );
+	}
+	$parser->tokenize;
+	if ( $tokens && !$parser->is_error ) {
+	    my $tokens = $parser->tokens;
+	    dumper( $tokens, as => "Tokens" );
+	}
+	$data = $parser->structure unless $parser->is_error;
+    }
+    else {
+	$data = $parser->decode($json);
+    }
+
     if ( $parser->is_error ) {
-	warn( $execute ? "$file: JSON error: " : "", $parser->err_msg, "\n" );
+	warn( $execute ? "$file: JSON error: " : "",
+	      "[", $parser->err_id, "] ", $parser->err_msg, "\n" );
 	next;
     }
 
-    if ( $mode eq "dump" ) {
-	my %opts = ( fulldump => 1 );
+    if ( $mode eq "dump" || $mode eq "dumper" ) {
+	dumper($data);
+    }
+
+    elsif ( $mode eq "rrjson" ) {
+	print $parser->encode( data => $data );
+	print "\n" unless $pretty;
+    }
+    elsif ( $mode eq "json_xs" ) {
+	require JSON::XS;
+	print ( JSON::XS->new->canonical->utf8(0)->pretty($pretty)->encode($data) );
+    }
+
+    else {			# default JSON
+	require JSON::PP;
+	print ( JSON::PP->new->canonical->utf8(0)->pretty($pretty)
+		->boolean_values([JSON::Boolean->new(from=>"false"),
+				  JSON::Boolean->new(from=>"true")])
+		->convert_blessed->encode($data) );
+    }
+}
+
+################ Subroutines ################
+
+sub dumper($data, %opts) {
+    if ( $mode eq "dump" || %opts ) {
+	my %opts = ( %opts );
 	require Data::Printer;
 	if ( -t STDOUT ) {
 	    Data::Printer::p( $data, %opts );
@@ -120,16 +171,6 @@ for my $file ( @ARGV ) {
 	require Data::Dumper;
 	print( Data::Dumper->Dump( [$data] ) );
     }
-
-    elsif ( $mode eq "json_xs" ) {
-	require JSON::XS;
-	print ( JSON::XS->new->canonical->utf8(0)->pretty->encode($data) );
-    }
-
-    else {			# default JSON
-	require JSON::PP;
-	print ( JSON::PP->new->canonical->utf8(0)->pretty->encode($data) );
-    }
 }
 
 ################ Subroutines ################
@@ -140,6 +181,7 @@ sub app_options() {
 
     # Process options, if any.
     if ( !GetOptions(
+		     'rrjson'		    => sub { $mode = "rrjson" },
 		     'json|json_pp'	    => sub { $mode = "json" },
 		     'json_xs'		    => sub { $mode = "json_xs" },
 		     'dump'		    => sub { $mode = "dump" },
@@ -151,6 +193,9 @@ sub app_options() {
 		     'implied_outer_hash!'  => \$implied_outer_hash,
 		     'croak_on_error!'	    => \$croak_on_error,
 		     'extra_tokens_ok!'	    => \$extra_tokens_ok,
+		     'pretty!'		    => \$pretty,
+		     'pretoks+'		    => \$pretoks,
+		     'tokens+'		    => \$tokens,
 		     'ident'		    => \$ident,
 		     'verbose+'		    => \$verbose,
 		     'quiet'		    => sub { $verbose = 0 },
@@ -177,8 +222,10 @@ Usage: $0 [options] [file ...]
   Inputs
    --execute -e		args are JSON, not filenames
   Output modes
+   --rrjson		pretty printed RRJSON output (default)
    --json		JSON output (default)
    --json_xs		JSON_XS output
+   --no-pretty		compact (non-pretty) output
    --dump		dump structure (Data::Printer)
    --dumper		dump structure (Data::Dumper)
   Parser options

@@ -19,7 +19,7 @@ BEGIN {
   *can = \&UNIVERSAL::can;
 }
 
-our $VERSION = '1.23.22'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.23'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = qw();
 our %EXPORT_TAGS =
   (
@@ -431,8 +431,9 @@ sub _pdltype_sub {
   return sub { return $pdltype if (!@_); convert(@_,$pdltype); };
 }
 foreach my $pdltype (map {$_->{convertfunc}} values %PDL::Types::typehash) {
+  no strict 'refs';
   #qw(byte short ushort long longlong indx float double)
-  eval "*${pdltype} = _pdltype_sub(PDL::${pdltype}());";
+  *$pdltype = _pdltype_sub("PDL::${pdltype}"->());
 }
 
 ## $dimpdl = $obj->dimpdl()
@@ -720,7 +721,8 @@ sub _setbad_sub {
 
 ## $obj = $obj->setnantobad()
 foreach my $badsub (qw(setnantobad setbadtonan setbadtoval setvaltobad)) {
-  eval "*${badsub} = _setbad_sub(PDL->can('$badsub'));";
+  no strict 'refs';
+  *$badsub = _setbad_sub(PDL->can($badsub));
 }
 
 ##--------------------------------------------------------------
@@ -1096,11 +1098,13 @@ foreach my $ufunc (
 		   qw(and or band bor),
 		  )
   {
-    eval "*${ufunc}over = _ufuncsub('${ufunc}over', PDL::CCS::Ufunc->can('ccs_accum_${ufunc}'))";
+    no strict 'refs';
+    *{"${ufunc}over"} = _ufuncsub("${ufunc}over", PDL::CCS::Ufunc->can("ccs_accum_${ufunc}"));
   }
 foreach my $ufunc (qw(maximum minimum average))
   {
-    eval "*${ufunc} = _ufuncsub('${ufunc}', PDL::CCS::Ufunc->can('ccs_accum_${ufunc}'))";
+    no strict 'refs';
+    *$ufunc = _ufuncsub($ufunc, PDL::CCS::Ufunc->can("ccs_accum_${ufunc}"));
   }
 
 *nbadover  = _ufuncsub('nbadover',  PDL::CCS::Ufunc->can('ccs_accum_nbad'), 1);
@@ -1261,7 +1265,8 @@ sub _unary_op {
 
 foreach my $unop (qw(bitnot sqrt abs sin cos not exp log log10))
   {
-    eval "*${unop} = _unary_op('${unop}',PDL->can('${unop}'));";
+    no strict 'refs';
+    *$unop = _unary_op($unop,PDL->can($unop));
   }
 
 ##--------------------------------------------------------------
@@ -1709,7 +1714,8 @@ foreach my $binop (
 		   qw(gt ge lt le eq ne spaceship),
 		  )
   {
-    eval "*${binop} = *${binop}_mia = _ccsnd_binary_op_mia('${binop}',PDL->can('${binop}'));";
+    no strict 'refs';
+    *$binop = *{"${binop}_mia"} = _ccsnd_binary_op_mia($binop,PDL->can($binop));
     die(__PACKAGE__, ": could not define binary operation $binop: $@") if ($@);
   }
 
@@ -1721,7 +1727,8 @@ foreach my $intop (
 		  )
   {
     my $deftype = PDL->can($intop)->(PDL->pdl(0),PDL->pdl(0),0)->type->ioname;
-    eval "*${intop} = *${intop}_mia = _ccsnd_binary_op_mia('${intop}',PDL->can('${intop}'),PDL::${deftype}());";
+    no strict 'refs';
+    *$intop = *{"${intop}_mia"} = _ccsnd_binary_op_mia($intop,PDL->can($intop),"PDL::${deftype}"->());
     die(__PACKAGE__, ": could not define integer operation $intop: $@") if ($@);
   }
 
@@ -3328,7 +3335,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head2 Copyright Policy
 
-Copyright (C) 2007-2022, Bryan Jurish. All rights reserved.
+Copyright (C) 2007-2024, Bryan Jurish. All rights reserved.
 
 This package is free software, and entirely without warranty.
 You may redistribute it and/or modify it under the same terms

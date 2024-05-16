@@ -2,9 +2,9 @@
 package HashDataRoles::Standard;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-15'; # DATE
+our $DATE = '2024-05-06'; # DATE
 our $DIST = 'HashDataRoles-Standard'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Standard set of roles for HashData
@@ -21,7 +21,7 @@ HashDataRoles::Standard - Standard set of roles for HashData
 
 =head1 VERSION
 
-This document describes version 0.003 of HashDataRoles::Standard (from Perl distribution HashDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.004 of HashDataRoles::Standard (from Perl distribution HashDataRoles-Standard), released on 2024-05-06.
 
 =head1 HOMEPAGE
 

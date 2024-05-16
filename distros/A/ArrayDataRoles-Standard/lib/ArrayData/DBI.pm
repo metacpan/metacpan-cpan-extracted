@@ -7,9 +7,9 @@ use Role::Tiny::With;
 with 'ArrayDataRole::Source::DBI';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-15'; # DATE
+our $DATE = '2024-05-06'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 1;
 # ABSTRACT: Get array data from DBI
@@ -26,7 +26,7 @@ ArrayData::DBI - Get array data from DBI
 
 =head1 VERSION
 
-This document describes version 0.009 of ArrayData::DBI (from Perl distribution ArrayDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.010 of ArrayData::DBI (from Perl distribution ArrayDataRoles-Standard), released on 2024-05-06.
 
 =head1 SYNOPSIS
 

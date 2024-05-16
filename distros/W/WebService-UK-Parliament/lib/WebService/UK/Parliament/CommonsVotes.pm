@@ -18,7 +18,7 @@ WebService::UK::Parliament::CommonsVotes - Query the UK Parliament Commons Vo AP
 
 =head1 VERSION
 
-Version 0.04
+Version 1.00
 
 =cut
 

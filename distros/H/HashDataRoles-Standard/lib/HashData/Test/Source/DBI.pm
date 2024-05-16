@@ -2,9 +2,9 @@
 package HashData::Test::Source::DBI;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-15'; # DATE
+our $DATE = '2024-05-06'; # DATE
 our $DIST = 'HashDataRoles-Standard'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use alias::module 'HashData::DBI';
 
@@ -23,7 +23,7 @@ HashData::Test::Source::DBI - Alias package for HashData::DBI
 
 =head1 VERSION
 
-This document describes version 0.003 of HashData::Test::Source::DBI (from Perl distribution HashDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.004 of HashData::Test::Source::DBI (from Perl distribution HashDataRoles-Standard), released on 2024-05-06.
 
 =head1 HOMEPAGE
 

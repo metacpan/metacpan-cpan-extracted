@@ -12,7 +12,7 @@ note("JSON::Relaxed version $JSON::Relaxed::VERSION\n");
 
 my $json = <<'EOD';
 {
-    "empty"  : 1.0, // 
+    "empty"  : "1.0", // 
 }
 EOD
 my $p = JSON::Relaxed::Parser->new;
@@ -25,7 +25,7 @@ diag($p->err_msg) if $p->is_error;
 
 $json = <<'EOD';
 {
-    "empty"  : 1.0,
+    "empty"  : "1.0",
 // blah\
 }
 EOD

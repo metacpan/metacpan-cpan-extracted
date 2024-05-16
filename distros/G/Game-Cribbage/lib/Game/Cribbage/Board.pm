@@ -250,7 +250,7 @@ function cannot_play => sub {
 
 function next_play => sub {
 	my ($self) = @_;
-	$self->rounds->current_round->next_play();
+	$self->rounds->current_round->next_play($self);
 };
 
 function end_play => sub {

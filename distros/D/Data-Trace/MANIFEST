@@ -8,7 +8,8 @@ META.json
 META.yml
 README.md
 t/00-load.t
-t/01-usage-simple.t
+t/02-tie-watch.t
+t/03-data-trace.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

@@ -109,7 +109,7 @@ my @test = (
 		}
 	},
 );
-use Data::Dumper;
+
 use Game::Cribbage::Board;
 use Game::Cribbage::Deck::Card;
 
@@ -203,7 +203,7 @@ for my $data (@test) {
 	ok($board->cannot_play($player2), 'Confirm that player2 cannot play a card and switch current_player to player1 to check their cards');
 	ok($board->cannot_play($player1), 'Confirm that player1 cannot play a card');
 
-	ok($board->next_play(), 'Both players still have cards so start another PLAY');
+	ok($board->next_play($board), 'Both players still have cards so start another PLAY');
 
 	is_deeply($board->score->player1, { current => 3, last => 2}, 'Confirm that player1 now has three points adding 1 point for the "go"');
 	is_deeply($board->score->player2, { current => 0, last => 0 }, 'Confirm that player2 still has 0 points');
@@ -232,7 +232,7 @@ for my $data (@test) {
 	ok($board->cannot_play($player1), 'Confirm that player1 cannot play a card');
 	ok($board->cannot_play($player2), 'Confirm that player2 cannot play a card, they have no cards left at this point');
 
-	ok($board->next_play(), 'player1 still has cards so start a new play');
+	ok($board->next_play($board), 'player1 still has cards so start a new play');
 
 	is_deeply($board->score->player1, { current => 3, last => 2 }, 'Confirm that player1 still has 3 points');
 	is_deeply($board->score->player2, { current => 1, last => 0 }, 'Confirm that player2 now has 1 point for getting the go');

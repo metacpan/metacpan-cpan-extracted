@@ -6,9 +6,9 @@ use Role::Tiny::With;
 with 'ArrayDataRole::Spec::Basic';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-15'; # DATE
+our $DATE = '2024-05-06'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 sub new {
     no strict 'refs'; ## no critic: TestingAndDebugging::RequireUseStrict
@@ -16,7 +16,13 @@ sub new {
     my $class = shift;
 
     my $fh = \*{"$class\::DATA"};
-    my $fhpos_data_begin = tell $fh;
+    my $fhpos_data_begin;
+    if (defined ${"$class\::_ArrayData_fhpos_data_begin_cache"}) {
+        $fhpos_data_begin = ${"$class\::_ArrayData_fhpos_data_begin_cache"};
+        seek $fh, $fhpos_data_begin, 0;
+    } else {
+        $fhpos_data_begin = ${"$class\::_ArrayData_fhpos_data_begin_cache"} = tell $fh;
+    }
 
     bless {
         fh => $fh,
@@ -96,7 +102,7 @@ ArrayDataRole::Source::LinesInDATA - Role to access array data from DATA section
 
 =head1 VERSION
 
-This document describes version 0.009 of ArrayDataRole::Source::LinesInDATA (from Perl distribution ArrayDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.010 of ArrayDataRole::Source::LinesInDATA (from Perl distribution ArrayDataRoles-Standard), released on 2024-05-06.
 
 =head1 DESCRIPTION
 

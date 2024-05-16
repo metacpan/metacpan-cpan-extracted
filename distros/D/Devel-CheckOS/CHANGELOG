@@ -1,3 +1,8 @@
+2.02    2024-05-15
+
+- Read /etc/os-release to detect Ubuntu instead of shelling out to `lsb_release`
+    there will be further updates in the future to do the same on other Linux distros
+
 2.01    2024-05-02
 
 - Fix typos in docoumentation

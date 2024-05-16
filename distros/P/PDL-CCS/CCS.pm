@@ -15,7 +15,7 @@ use PDL::CCS::Nd;
 use PDL::CCS::IO::FastRaw;
 use strict;
 
-our $VERSION = '1.23.22'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.23'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (
@@ -185,7 +185,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head2 Copyright Policy
 
-Copyright (C) 2005-2022 by Bryan Jurish. All rights reserved.
+Copyright (C) 2005-2024 by Bryan Jurish. All rights reserved.
 
 This package is free software, and entirely without warranty.
 You may redistribute it and/or modify it under the same terms

@@ -6,7 +6,7 @@ use warnings;
 use Exporter qw(import);
 use XSLoader;
 
-our $VERSION    = '0.24';
+our $VERSION    = '0.25';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -102,52 +102,13 @@ compression modules available on CPAN.  These are the results on a MacBook
 
 =head1 SEE ALSO
 
-L<http://code.google.com/p/snappy/>
+L<http://google.github.io/snappy/>
 
 L<https://github.com/zeevt/csnappy>
 
-=head1 REQUESTS AND BUGS
-
-Please report any bugs or feature requests to
-L<http://rt.cpan.org/Public/Bug/Report.html?Queue=Compress-Snappy>.  I will
-be notified, and then you'll automatically be notified of progress on your
-bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Compress::Snappy
-
-You can also look for information at:
-
-=over
-
-=item * GitHub Source Repository
-
-L<http://github.com/gray/compress-snappy>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Compress-Snappy>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Compress-Snappy>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=Compress-Snappy>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Compress-Snappy/>
-
-=back
-
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2015 gray <gray at cpan.org>, all rights reserved.
+Copyright (c) 2011 gray <gray at cpan.org>, all rights reserved.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

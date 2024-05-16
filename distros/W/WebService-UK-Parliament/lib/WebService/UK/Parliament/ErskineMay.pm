@@ -18,7 +18,7 @@ WebService::UK::Parliament::ErskineMay - Query the UK Parliament Erskine Ma API
 
 =head1 VERSION
 
-Version 0.04
+Version 1.00
 
 =cut
 

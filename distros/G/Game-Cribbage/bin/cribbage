@@ -1,0 +1,7 @@
+#!usr/bin/perl
+
+use lib 'lib';
+
+use Game::Cribbage;
+
+Game::Cribbage->new()->start();

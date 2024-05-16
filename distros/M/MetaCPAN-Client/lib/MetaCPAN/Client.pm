@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client;
 # ABSTRACT: A comprehensive, DWIM-featured client to the MetaCPAN API
-$MetaCPAN::Client::VERSION = '2.031001';
+$MetaCPAN::Client::VERSION = '2.032000';
 use Moo;
 use Carp;
 use Ref::Util qw< is_arrayref is_hashref is_ref >;
@@ -38,6 +38,7 @@ sub BUILDARGS {
 
     $args{'request'} ||= MetaCPAN::Client::Request->new(
         ( ua     => $args{ua}     )x!! $args{ua},
+        ( ua_args => $args{ua_args} )x!! $args{ua_args},
         ( domain => $args{domain} )x!! $args{domain},
         ( debug  => $args{debug}  )x!! $args{debug},
     );
@@ -132,7 +133,7 @@ sub rating {
     is_hashref($args)
         or croak 'rating takes a hash ref as parameter';
 
-    return $self->_search( 'rating', $args, $params );
+    return _empty_result_set('rating');
 }
 
 sub release {
@@ -448,7 +449,7 @@ MetaCPAN::Client - A comprehensive, DWIM-featured client to the MetaCPAN API
 
 =head1 VERSION
 
-version 2.031001
+version 2.032000
 
 =head1 SYNOPSIS
 

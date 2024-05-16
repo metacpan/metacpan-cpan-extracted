@@ -27,4 +27,7 @@ is_deeply($t->get_item_at_pos(4), 5);
 ok(!$t->has_item_at_pos(5));
 dies_ok { $t->get_item_at_pos(5) };
 
+$t = ArrayData::Test::Source::LinesInDATA->new;
+is_deeply($t->get_next_item, 1);
+
 done_testing;

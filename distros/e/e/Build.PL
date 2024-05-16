@@ -13,6 +13,19 @@ my $class = Module::Build->subclass(
             print "Building README\n";
             system "pod2markdown lib/e.pm > README.md";
         }
+        sub ACTION_install {
+            my ($s) = @_;
+            $s->SUPER::ACTION_install;
+
+            local @ARGV = (
+                "e",
+                "-q",
+                "head1=LOGO/Verbatim",
+            );
+            require App::Pod;
+            App::Pod->import;
+            App::Pod->run;
+        }
     },
 );
 $class->ACTION_readme();
@@ -32,14 +45,15 @@ my $builder = $class->new(
     requires => {
         'perl'              => '5.016',
         'Sub::Util'         => '0',
-        'Runtime::Debugger' => '0.20',
-        'Data::Trace'       => '0.19',
+        'Runtime::Debugger' => '1.01',
+        'Data::Trace'       => '1.01',
         'Tiny::Prof'        => '0',
         'Mojolicious'       => '0',
         'YAML::XS'          => '0',
         'Data::Printer'     => '0',
+        'App::Pod'          => '0.36',
     },
-    add_to_cleanup => [ 'e-*', 'MANIFEST*.bak', 'README*', 'blib/', ],
+    add_to_cleanup => [ 'e-*', 'MANIFEST*.bak', 'README*', 'blib/' ],
     meta_merge     => {
         resources => {
             bugtracker => 'https://github.com/poti1/e/issues',

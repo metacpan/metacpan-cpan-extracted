@@ -7,9 +7,9 @@ use warnings;
 use Role::Tiny::With;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-15'; # DATE
+our $DATE = '2024-05-06'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 with 'ArrayDataRole::Source::LinesInDATA';
 
@@ -26,7 +26,7 @@ ArrayData::Sample::DeNiro - List of Robert De Niro's movies, in chronological or
 
 =head1 VERSION
 
-This document describes version 0.009 of ArrayData::Sample::DeNiro (from Perl distribution ArrayDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.010 of ArrayData::Sample::DeNiro (from Perl distribution ArrayDataRoles-Standard), released on 2024-05-06.
 
 =head1 HOMEPAGE
 

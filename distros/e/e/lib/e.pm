@@ -2,12 +2,28 @@ package e;
 
 =head1 LOGO
 
-                __                __             __
-   __  ______  / /__  ____ ______/ /_  ___  ____/ /
-  / / / / __ \/ / _ \/ __ `/ ___/ __ \/ _ \/ __  /
- / /_/ / / / / /  __/ /_/ (__  ) / / /  __/ /_/ /
- \__,_/_/ /_/_/\___/\__,_/____/_/ /_/\___/\__,_/
-
+                  ___====-_  _-====___
+            _--~~~#####// '  ` \\#####~~~--_
+          -~##########// (    ) \\##########~-_
+        -############//  |\^^/|  \\############-
+      _~############//   (O||O)   \\############~_
+     ~#############((     \\//     ))#############~
+    -###############\\    (oo)    //###############-
+   -#################\\  / `' \  //#################-
+  -###################\\/  ()  \//###################-
+ _#/|##########/\######(  (())  )######/\##########|\#_
+ |/ |#/\#/\#/\/  \#/\##|  \()/  |##/\#/  \/\#/\#/\#| \|
+ `  |/  V  V  `   V  )||  |()|  ||(  V   '  V /\  \|  '
+    `   `  `      `  / |  |()|  | \  '      '<||>  '
+                    (  |  |()|  |  )\        /|/
+                   __\ |__|()|__| /__\______/|/
+                  (vvv(vvvv)(vvvv)vvv)______|/
+                  __                __             __
+     __  ______  / /__  ____ ______/ /_  ___  ____/ /
+    / / / / __ \/ / _ \/ __ `/ ___/ __ \/ _ \/ __  /
+   / /_/ / / / / /  __/ /_/ (__  ) / / /  __/ /_/ /
+   \__,_/_/ /_/_/\___/\__,_/____/_/ /_/\___/\__,_/
+  
 =cut
 
 use 5.006;
@@ -16,33 +32,13 @@ use warnings;
 
 =head1 NAME
 
-e - Unleash the power of e!
+e - beastmode unleashed
 
 =cut
 
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
 =head1 SYNOPSIS
-
-Convert a data structure to json:
-
-    perl -Me -e 'say j { a => [ 1..3] }'
-
-Convert a data structure to yaml:
-
-    perl -Me -e 'say yml { a => [ 1..3] }'
-
-Pretty print a data structure:
-
-    perl -Me -e 'p { a => [ 1..3] }'
-
-Data dump a data structure:
-
-    perl -Me -e 'd { a => [ 1..3] }'
-
-Devel::Peek dump a data structure:
-
-    perl -Me -e 'dd { a => [ 1..3] }'
 
 Add a trace marker:
 
@@ -80,15 +76,47 @@ Invoke the Tiny::Prof:
 
     perl -Me -e 'prof'
 
+Convert a data structure to json:
+
+    perl -Me -e 'say j { a => [ 1..3] }'
+
+Convert a data structure to yaml:
+
+    perl -Me -e 'say yml { a => [ 1..3] }'
+
+Pretty print a data structure:
+
+    perl -Me -e 'p { a => [ 1..3] }'
+
+Data dump a data structure:
+
+    perl -Me -e 'd { a => [ 1..3] }'
+
+Devel::Peek dump a data structure:
+
+    perl -Me -e 'dd { a => [ 1..3] }'
+
+=head1 DESCRIPTION
+
+This module imports many features that make
+one-liners and script debugging much faster.
+
+It has been optimized for performance to not
+import all features right away:
+thereby making its startup cost quite low.
+
+=cut
+
 =head1 SUBROUTINES
 
 =head2 monkey_patch
 
-insert subroutines into the symbol table.
+Insert subroutines into the symbol table.
 
 Extracted from Mojo::Util for performance.
 
-Can be updated once this issue is resolved:
+Perhaps can be updated based on the outcome
+of this issue:
 L<https://github.com/mojolicious/mojo/pull/2173>
 
 =cut
@@ -96,7 +124,10 @@ L<https://github.com/mojolicious/mojo/pull/2173>
 sub monkey_patch {
     my ( $class, %patch ) = @_;
 
-    require Sub::Util;    # Can omit set_subname, but it makes traces nicer.
+    # Can be omitted, but it makes traces much
+    # nicer since it adds names to subs.
+    require Sub::Util;
+
     no strict 'refs';
 
     for ( keys %patch ) {
@@ -107,7 +138,8 @@ sub monkey_patch {
 
 =head2 import
 
-Inserts commands into caller's namespace.
+These keys will become function inside of the
+caller's namespace.
 
 =cut
 
@@ -121,9 +153,8 @@ sub import {
 
         # Debugging.
         repl => sub {
+
             require Runtime::Debugger;
-            Runtime::Debugger->VERSION( '0.20' )
-              ;    # Since not using "use MODULE VERSION".
             Runtime::Debugger::repl(
                 levels_up => 1,
                 @_,
@@ -131,18 +162,14 @@ sub import {
         },
 
         # Tracing.
-        trace => sub {    # Stack or var trace.
+        trace => sub {
             require Data::Trace;
-            Data::Trace->VERSION( '0.19' )
-              ;           # Since not using "use MODULE VERSION".
             Data::Trace::Trace( @_ );
         },
 
         # Alias for trace.
-        watch => sub {    # Stack or var trace.
+        watch => sub {
             require Data::Trace;
-            Data::Trace->VERSION( '0.19' )
-              ;           # Since not using "use MODULE VERSION".
             Data::Trace::Trace( @_ );
         },
 

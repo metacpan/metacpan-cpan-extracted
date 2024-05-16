@@ -1,5 +1,8 @@
 Revision history for MIDI-Util
 
+0.1302 2024-05-15 18:58:57
+    - Micro- not milliseconds!
+
 0.1301 2024-05-14 15:02:21
     - Improve documentation.
 

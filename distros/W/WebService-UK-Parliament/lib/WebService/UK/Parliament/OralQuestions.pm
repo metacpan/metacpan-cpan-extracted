@@ -18,7 +18,7 @@ WebService::UK::Parliament::OralQuestions - Query the UK Parliament Oral Qu API
 
 =head1 VERSION
 
-Version 0.04
+Version 1.00
 
 =cut
 

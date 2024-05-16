@@ -30,14 +30,14 @@
             "Data::Dumper" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Basename" : "0",
-            "PDL" : "2.019",
+            "PDL" : "2.082",
             "PDL::VectorValued" : "v1.0.4"
          }
       },
       "runtime" : {
          "requires" : {
             "File::Basename" : "0",
-            "PDL" : "2.019",
+            "PDL" : "2.082",
             "PDL::VectorValued" : "v1.0.4"
          }
       },
@@ -55,6 +55,6 @@
          "web" : "https://github.com/moocow-the-bovine/PDL-CCS"
       }
    },
-   "version" : "v1.23.22",
+   "version" : "v1.23.23",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

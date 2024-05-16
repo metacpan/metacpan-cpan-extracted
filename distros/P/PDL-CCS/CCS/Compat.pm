@@ -12,7 +12,7 @@ use PDL::CCS::Ufunc;
 use PDL::CCS::Ops;
 use strict;
 
-our $VERSION = '1.23.22'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.23'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = ('PDL::Exporter');
 our @ccs_binops = (qw(plus minus mult divide modulo power),
 		   qw(gt ge lt le eq ne spaceship),
@@ -832,7 +832,8 @@ sub ccs_binop_compat_cv {
   return sub { $ccsop->(@_[1,2,3,4]) };
 }
 foreach my $op (@ccs_binops) {
-  eval "*ccs${op}_cv = *PDL::ccs${op}_cv = ccs_binop_compat_cv(\\&PDL::ccs_${op}_vector_mia);";
+  no strict 'refs';
+  *{"ccs${op}_cv"} = *{"PDL::ccs${op}_cv"} = ccs_binop_compat_cv(\&{"PDL::ccs_${op}_vector_mia"});
 }
 *ccsadd_cv = *PDL::ccsadd_cv = \&ccsplus_cv;
 *ccsdiff_cv = *PDL::ccsdiff_cv = \&ccsminus_cv;
@@ -869,7 +870,8 @@ sub ccs_binop_compat_rv {
   };
 }
 foreach my $op (@ccs_binops) {
-  eval "*ccs${op}_rv = *PDL::ccs${op}_rv = ccs_binop_compat_rv(\\&PDL::ccs_${op}_vector_mia);";
+  no strict 'refs';
+  *{"ccs${op}_rv"} = *{"PDL::ccs${op}_rv"} = ccs_binop_compat_rv(\&{"PDL::ccs_${op}_vector_mia"});
 }
 *ccsadd_rv = *PDL::ccsadd_rv = \&ccsplus_rv;
 *ccsdiff_rv = *PDL::ccsdiff_rv = \&ccsminus_rv;
@@ -1010,7 +1012,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head2 Copyright Policy
 
-Copyright (C) 2005-2022, Bryan Jurish. All rights reserved.
+Copyright (C) 2005-2024, Bryan Jurish. All rights reserved.
 
 This package is free software, and entirely without warranty.
 You may redistribute it and/or modify it under the same terms

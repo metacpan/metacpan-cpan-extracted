@@ -16,9 +16,11 @@ my %WriteMakefileArgs = (
     TEST_REQUIRES => {
         'Test::More' => '0',
     },
+    EXE_FILES => [ 'bin/cribbage' ],
     PREREQ_PM => {
         'Rope' => '0.35',
 	'List::Util' => 0,
+	'ntheory' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Game-Cribbage-*' },

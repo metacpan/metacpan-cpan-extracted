@@ -70,8 +70,7 @@ use base 'Class::Singleton';
 # protocol bits.
 #
 use LWP::Protocol::http;
-push @LWP::Protocol::http::EXTRA_SOCK_OPTS,
-  MaxLineLength => 0;
+push @LWP::Protocol::http::EXTRA_SOCK_OPTS, MaxLineLength => 0;
 
 
 sub new {

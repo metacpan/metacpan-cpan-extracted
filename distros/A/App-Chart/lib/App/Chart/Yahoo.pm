@@ -310,9 +310,9 @@ sub latest_parse {
 #
 #     Set-Cookie: B=fab5sl9cqn2rd&b=3&s=i3; expires=Sun, 03-Sep-2018 04:56:13 GMT; path=/; domain=.yahoo.com
 #
-# and contains buried within a megabyte mountain of hideous script
+# and contains buried within 1.5 mbytes of hideous script
 #
-#     "RequestPlugin":{"user":{"age":0,"crumb":"8OyCBPyO4ZS"
+#    <script type="application/json" data-sveltekit-fetched data-url="https://query1.finance.yahoo.com/v1/test/getcrumb?lang=en-US&amp;region=US" data-ttl="59">{"status":200,"statusText":"OK","headers":{},"body":"DKVWQE/ggh4"}</script>
 #
 # Any \u002F or similar is escaped "/" character or similar.
 # The crumb is included in a CSV download query like the following
@@ -693,9 +693,11 @@ sub daily_cookie_parse {
   #   "user":{"crumb":"hdDX\u002FHGsZ0Q",
   # The form prior to about January 2023 was
   #   "CrumbStore":{"crumb":"hdDX\u002FHGsZ0Q"}
+  # The form prior to about May 2024 was
+  #   "RequestPlugin":{"user":{"age":0,"crumb":"8OyCBPyO4ZS"
   #
-  $content =~ /"user":\{[^\}]*"crumb":"([^"]*)"/
-    or die "Yahoo daily data: CrumbStore not found in parse";
+  $content =~ /getcrumb.*?"body":"([^"]*)"/
+    or die "Yahoo daily data: getcrumb not found in parse";
   my $crumb = App::Chart::Yahoo::javascript_string_unquote($1);
 
   # header like

@@ -1,3 +1,7 @@
+v1.23.23 Wed, 15 May 2024 21:51:55 +0200 mohawk2
+	+ PR #8: no strict "refs" instead of string-eval
+	+ PR #9: switch from $PP() to $P()
+
 v1.23.22 Fri, 14 Apr 2023 14:11:53 +0200 mohawk2
 	+ PR #7 from mowhawk2/tweaks: error-handling tweaks & bugfixes for PDL v2.082
 	  - stop passing in outputs in ccs_binop_vector_mia

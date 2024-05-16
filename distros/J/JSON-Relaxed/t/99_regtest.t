@@ -12,11 +12,17 @@ note("JSON::PP version $JSON::PP::VERSION\n");
 -d "t" && chdir("t");
 -d "regtests" && chdir("regtests");
 
-my @files = sort glob("*.rjson");
+my @files = @ARGV;
+@files = sort glob("*.rjson") unless @files;
 
 my $tests = 0;
 my $pp = JSON::PP->new;
-my $p = JSON::Relaxed->new;
+my $p = JSON::Relaxed->new( croak_on_error => 0 );
+
+# So we can compare the boolen values of RJSON and JSON.
+$p->booleans = [qw{F T}];
+$pp->boolean_values(qw(F T));
+
 foreach my $rjsonfile ( @files ) {
 
     # Load the file.
@@ -48,6 +54,7 @@ foreach my $rjsonfile ( @files ) {
     diag( "$jsonfile: " . $opts->{error} ) if $opts->{error};
     my $jsonparsed = eval { $pp->decode($jsondata) };
     diag( "$jsonfile: $@\n") unless defined $jsonparsed;
+
     # Verify.
     is_deeply( $rjsonparsed, $jsonparsed, "$rjsonfile - ok"); $tests++;
 
@@ -55,6 +62,7 @@ foreach my $rjsonfile ( @files ) {
     $rjsonparsed = $p->decode($jsondata);
     diag("$jsonfile  - " . $p->err_msg) unless $jsonparsed;
     is_deeply( $rjsonparsed, $jsonparsed, "$jsonfile  - ok"); $tests++;
+
 }
 
 done_testing($tests);

@@ -18,7 +18,7 @@ WebService::UK::Parliament::WrittenQuestions - Query the UK Parliament Written Q
 
 =head1 VERSION
 
-Version 0.04
+Version 1.00
 
 =cut
 

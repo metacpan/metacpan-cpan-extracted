@@ -23,6 +23,14 @@ property [qw/starter play crib_player crib_complete player1 player2 player3 play
 	enumerable => 1,
 );
 
+property cannot_play => (
+	initable => 1,
+	writeable => 1,
+	configurable => 0,
+	enumerable => 1,
+	value => {}
+);
+
 property play_history => (
 	initable => 1,
 	writeable => 1,
@@ -55,6 +63,11 @@ function add_starter_card => sub {
 			card => $card,
 			flipped => 1
 		);
+		my $hand = ref $player ? $player->player : $player;
+		$self->score->$hand->{last} = $self->score->$hand->{current};
+		$self->score->$hand->{current} += $scored->score;
+		push @{$self->current_hands->$hand->play_scored}, $scored;
+		push @{$self->play->scored}, $scored;
 	}
 
 	for (qw/player1 player2 player3 player4/) {
@@ -136,6 +149,8 @@ function cannot_play_a_card => sub {
 
 	$self->set_next_to_play();
 
+	$self->cannot_play->{$hand} = 1;
+
 	return 1;
 };
 
@@ -198,7 +213,7 @@ function new_play => sub {
 	my ($self) = @_;
 	my $next_to_play = $self->crib_player;
 	if ($self->play) {
-		$next_to_play = $self->parse_next_to_play($self->play->cards->[-1]->player->player);
+		$next_to_play = $self->parse_next_to_play(ref $self->play->cards->[-1]->player ? $self->play->cards->[-1]->player->player : $self->play->cards->[-1]->player);
 	}
 	$self->play = Game::Cribbage::Play->new(
 		next_to_play => $next_to_play
@@ -207,7 +222,7 @@ function new_play => sub {
 };
 
 function next_play => sub {
-	my ($self) = @_;
+	my ($self, $game) = @_;
 
 	# first check whether any players can play on the current 'play'
 	# if they can they must use those cards first.
@@ -234,8 +249,10 @@ function next_play => sub {
 		}
 	}
 
+	$self->cannot_play = {};
+	
 	# now we know cards can't be played confirm we have cards left to Play another 'play'.
-	return $self->end_hands() if !$available_cards;
+	return $game->end_hands() if !$available_cards;
 
 	my $scored;
 

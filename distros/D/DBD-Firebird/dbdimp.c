@@ -2,7 +2,7 @@
 /*
 
    Copyright (c) 2010, 2011  Popa Marius Adrian <mapopa@gmail.com>
-   Copyright (c) 2011, 2012, 2013  Damyan Ivanov <dmn@debian.org>
+   Copyright (c) 2011, 2012, 2013, 2024  Damyan Ivanov <dmn@debian.org>
    Copyright (c) 2010  Mike Pomraning <mjp@pilcrow.madison.wi.us>
    Copyright (c) 1999-2008  Edwin Pratomo
    Portions Copyright (c) 2001-2005  Daniel Ritz
@@ -206,43 +206,44 @@ int ib_error_check(SV *h, ISC_STATUS *status)
 static int ib2sql_type(int ibtype)
 {
     /* Firebird Internal (not external) types */
-    switch(ibtype)
+    switch(ibtype & ~1)
     {
         case SQL_TEXT:
-        case 453:
             return DBI_SQL_CHAR;
 
         case SQL_LONG:
-        case 497:
             return DBI_SQL_INTEGER;  /* integer */
 
         case SQL_SHORT:
-        case 501:
             return DBI_SQL_SMALLINT; /* smallint */
 
         case SQL_FLOAT:
-        case 483:
             return DBI_SQL_FLOAT;
 
         case SQL_DOUBLE:
-        case 481:
             return DBI_SQL_DOUBLE;
 
         case SQL_TIMESTAMP:
-        case 511:
             return DBI_SQL_TIMESTAMP;
 
         case SQL_TYPE_DATE:
-        case 571:
             return DBI_SQL_DATE;
 
         case SQL_TYPE_TIME:
-        case 561:
             return DBI_SQL_TIME;
 
         case SQL_VARYING:
-        case 449:
             return DBI_SQL_VARCHAR;
+
+#ifdef SQL_INT64
+        case SQL_INT64:
+            return DBI_SQL_BIGINT;
+#endif
+
+#ifdef SQL_BOOLEAN
+        case SQL_BOOLEAN:
+            return DBI_SQL_BOOLEAN;
+#endif
     }
     /* else map type into DBI reserved standard range */
     return -9000 - ibtype;
@@ -649,7 +650,7 @@ int dbd_db_STORE_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv, SV *valuesv)
                 if (!ib_commit_transaction(dbh, imp_dbh))
                     return FALSE;
 
-                    DBI_TRACE_imp_xxh(imp_dbh, 3, (DBIc_LOGPIO(imp_dbh), "dbd_db_STORE: commit open transaction\n"));
+                DBI_TRACE_imp_xxh(imp_dbh, 3, (DBIc_LOGPIO(imp_dbh), "dbd_db_STORE: commit open transaction\n"));
             }
         }
 
@@ -1373,6 +1374,13 @@ AV *dbd_st_fetch(SV *sth, imp_sth_t *imp_sth)
              */
             switch (dtype)
             {
+#ifdef SQL_BOOLEAN
+                case SQL_BOOLEAN:
+                    FB_BOOLEAN b = (*((FB_BOOLEAN *) (var->sqldata)));
+                    sv_set_bool(sv, b == FB_TRUE);
+                    break;
+#endif
+
                 case SQL_SHORT:
                     if (var->sqlscale) /* handle NUMERICs */
                     {
@@ -2422,6 +2430,22 @@ static int ib_fill_isqlda(SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 
             break;
         }
+
+        /**********************************************************************/
+#ifdef SQL_BOOLEAN
+        case SQL_BOOLEAN:
+            DBI_TRACE_imp_xxh(imp_sth, 1, (DBIc_LOGPIO(imp_sth), "ib_fill_isqlda: SQL_BOOLEAN\n"));
+
+        {
+            if (!(ivar->sqldata))
+                Newxc(ivar->sqldata, 1, FB_BOOLEAN, ISC_SCHAR);
+
+            bool v = SvTRUE_NN(value);
+            *(FB_BOOLEAN *) (ivar->sqldata) = (v ? FB_TRUE : FB_FALSE);
+
+            break;
+        }
+#endif
 
         /**********************************************************************/
 #ifdef SQL_INT64

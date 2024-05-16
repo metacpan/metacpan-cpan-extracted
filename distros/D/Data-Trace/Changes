@@ -1,6 +1,20 @@
 Revision history for Data-Trace
 
-0.19    2024-05-13 - Can be used for a stack trace alone.
+=================
+1.01 - 2024-05-15
+=================
+
+Added more unit tests.
+Improved stability.
+
+=================
+0.19 - 2024-05-13
+=================
+
+Can be used for a stack trace alone.
+
+=================
+
 0.18    2024-05-08 - Install fix.
 0.17    2024-05-08 - Updated pod.
 0.16    2024-05-07 - Added tests for Data::Tie::Watch

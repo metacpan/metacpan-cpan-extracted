@@ -3,18 +3,21 @@ package Devel::AssertOS::Linux::Ubuntu;
 use Devel::CheckOS;
 use strict;
 use warnings;
+
+use Devel::AssertOS::OSFeatures::Release 'distributor_id';
+
 no warnings 'redefine';
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 sub os_is {
-    Devel::CheckOS::os_is('Linux') &&
-    `lsb_release -i 2>/dev/null` =~ /Ubuntu/
+    my $id = distributor_id;
+    Devel::CheckOS::os_is('Linux') && defined($id) && $id =~ /Ubuntu/;
 }
 
 sub expn { "The operating system is some version of Ubuntu" }
 
-Devel::CheckOS::die_unsupported() unless(os_is());
+Devel::CheckOS::die_unsupported() unless ( os_is() );
 
 =head1 COPYRIGHT and LICENCE
 

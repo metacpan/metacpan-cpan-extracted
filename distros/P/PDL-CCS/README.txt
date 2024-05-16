@@ -37,7 +37,7 @@ AUTHOR
     Bryan Jurish <moocow@cpan.org>
 
 COPYRIGHT
-    Copyright (c) 2005-2022 by Bryan Jurish. All rights reserved.
+    Copyright (c) 2005-2024 by Bryan Jurish. All rights reserved.
 
     This package is free software, and entirely without warranty. You may
     redistribute it and/or modify it under the same terms as Perl itself.

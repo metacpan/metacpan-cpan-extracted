@@ -20,7 +20,7 @@ use parent  qw( Exporter );
 use feature qw( say );
 
 our @EXPORT  = qw( Trace );
-our $VERSION = '0.19';
+our $VERSION = '1.01';
 
 =head1 SYNOPSIS
 
@@ -98,20 +98,20 @@ sub _ProcessArgs {
 
     while ( my $arg = shift @raw_args ) {
         if ( $arg =~ / ^ - /x ) {
-            $args{ $arg } = shift @raw_args;
+            $args{$arg} = shift @raw_args;
         }
         elsif ( ref $arg ) {
-            $args{ -var } = $arg;
+            $args{-var} = $arg;
         }
         elsif ( $arg =~ / ^ \d+ $ /x ) {
-            $args{ -levels } = $arg;
+            $args{-levels} = $arg;
         }
         else {
-            die "_ProcessArgs: Invalid arg: $arg";
+            $args{-message} = $arg;
         }
     }
 
-    $args{-levels}  //= ($args{-var} ? 3 : 1);
+    $args{-levels}  //= ( $args{-var} ? 3 : 1 );
     $args{-message} //= "HERE:";
 
     %args;
@@ -147,15 +147,19 @@ sub _BuildWatcherMethods {
 
     for my $name ( $class->_DefineMethodNames() ) {
         my $method = ucfirst $name;
+
         $watches{"-$name"} = sub {
+
+            # Process arguments.
             my ( $_self, @_args ) = @_;
             my $_args =
               join ", ",
               map { defined() ? qq("$_") : "undef" } @_args;
-            __PACKAGE__->_Trace(
-                %args,
-                -message => "\U$name\E( $_args ):",
-            );
+
+            # Stack trace.
+            $class->_Trace( %args, -message => "\U$name\E( $_args ):" );
+
+            # Run actual method/operation.
             $_self->$method( @_args );
         };
     }
@@ -188,16 +192,13 @@ sub _Trace {
         last if ++$counter >= $args{-levels};
     }
 
-    my ($first,@rest) = @lines;
+    my ( $first, @rest ) = @lines;
 
     # Prepend the message.
     # and prefix to additional lines.
     require Time::Moment;
     my $time = Time::Moment->now->strftime( "%Y/%m/%d-%T%3f" );
-    @lines = (
-        "[$time] $args{-message} $first",
-        map { " |- $_" } @rest,
-    );
+    @lines = ( "[$time] $args{-message} $first", map { " |- $_" } @rest, );
 
     # Add an extra line for visibility.
     unshift @lines, "" if @lines > 1;
@@ -240,10 +241,10 @@ sub _TraceRawish {
             \.pm \s+ line
 
         }x
-    }
-    map { s/ ^ \s+ //xr }
-    split /\n/,
-    Carp::longmess( $class );
+      }
+      map { s/ ^ \s+ //xr }
+      split /\n/,
+      Carp::longmess( $class );
 }
 
 =head1 AUTHOR

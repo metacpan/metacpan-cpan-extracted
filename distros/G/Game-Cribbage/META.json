@@ -34,6 +34,7 @@
          "requires" : {
             "List::Util" : "0",
             "Rope" : "0.35",
+            "ntheory" : "0",
             "perl" : "5.006"
          }
       },
@@ -44,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

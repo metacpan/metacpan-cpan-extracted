@@ -22,9 +22,9 @@ use warnings;
 use Role::Tiny::With;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-15'; # DATE
+our $DATE = '2024-05-06'; # DATE
 our $DIST = 'HashDataRoles-Standard'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 with 'HashDataRole::Source::LinesInDATA';
 with 'HashDataRole::Sample::DeNiro';
@@ -42,7 +42,7 @@ HashDataRole::Sample::DeNiro - Movies of Robert De Niro with their year
 
 =head1 VERSION
 
-This document describes version 0.003 of HashDataRole::Sample::DeNiro (from Perl distribution HashDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.004 of HashDataRole::Sample::DeNiro (from Perl distribution HashDataRoles-Standard), released on 2024-05-06.
 
 =head1 HOMEPAGE
 
