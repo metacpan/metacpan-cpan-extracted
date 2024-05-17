@@ -2,14 +2,14 @@ package Tk::AppWindow::Ext::Balloon;
 
 =head1 NAME
 
-Tk::AppWindow::Ext::Balloon - Adding ballon functionality
+Tk::AppWindow::Ext::Balloon - Adding balloon functionality
 
 =cut
 
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.01";
+$VERSION="0.03";
 use Tk;
 require Tk::Balloon;
 
@@ -82,10 +82,12 @@ Unknown. If you find any, please contact the author.
 
 =item L<Tk::AppWindow::BaseClasses::Extension>
 
+=item L<Tk::Balloon>
 
 =back
 
 =cut
 
 1;
+
 

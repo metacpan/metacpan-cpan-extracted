@@ -111,6 +111,6 @@ OSM: {
 		@locations = $geocoderlist->geocode('Portland, USA');
 
 		ok(scalar(@locations) == $count);
-		is($locations[0]->{'geocoder'}, undef, 'Verify subsequent reads are cached');
+		is($locations[0]->{'geocoder'}, 'cache', 'Verify subsequent reads are cached');
 	}
 }

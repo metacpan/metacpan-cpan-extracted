@@ -5,7 +5,7 @@ use warnings;
 
 use Markdown::Perl;
 
-our $VERSION = '1.04';  # Remember to also set the Markdown::Perl version.
+our $VERSION = '1.05';  # Remember to also set the Markdown::Perl version.
 
 1;
 

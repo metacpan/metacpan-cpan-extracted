@@ -17,6 +17,7 @@ my $class = Module::Build->subclass(
             my ($s) = @_;
             $s->SUPER::ACTION_install;
 
+            # Display logo/image.
             local @ARGV = (
                 "e",
                 "-q",
@@ -45,8 +46,8 @@ my $builder = $class->new(
     requires => {
         'perl'              => '5.016',
         'Sub::Util'         => '0',
-        'Runtime::Debugger' => '1.01',
-        'Data::Trace'       => '1.01',
+        'Runtime::Debugger' => '1.02',
+        'Data::Trace'       => '1.02',
         'Tiny::Prof'        => '0',
         'Mojolicious'       => '0',
         'YAML::XS'          => '0',

@@ -7,7 +7,8 @@ use warnings;
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use List::Util 1.33 qw(none);
-use Mo::utils::CSS qw(check_css_unit);
+use Mo::utils 0.01 qw(check_required);
+use Mo::utils::CSS 0.06 qw(check_css_class check_css_unit);
 use Readonly;
 
 Readonly::Array our @HORIZ_ALIGN => qw(center left right);
@@ -20,7 +21,7 @@ Readonly::Hash our %VERT_CONV => (
 	'top' => 'flex-start',
 );
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 sub new {
 	my ($class, @params) = @_;
@@ -48,23 +49,22 @@ sub new {
 	# Process params.
 	set_params($self, @{$object_params_ar});
 
-	if (! defined $self->{'horiz_align'}) {
-		err "Parameter 'horiz_align' is required.";
-	}
+	check_required($self, 'horiz_align');
 	if (none { $self->{'horiz_align'} eq $_ } @HORIZ_ALIGN) {
 		err "Parameter 'horiz_align' have a bad value.",
 			'Value', $self->{'horiz_align'},
 		;
 	}
 
-	if (! defined $self->{'vert_align'}) {
-		err "Parameter 'vert_align' is required.";
-	}
+	check_required($self, 'vert_align');
 	if (none { $self->{'vert_align'} eq $_ } @VERT_ALIGN) {
 		err "Parameter 'vert_align' have a bad value.",
 			'Value', $self->{'vert_align'},
 		;
 	}
+
+	check_css_class($self, 'css_container');
+	check_css_class($self, 'css_inner');
 
 	check_css_unit($self, 'height');
 	check_css_unit($self, 'padding');
@@ -285,7 +285,19 @@ Returns undef.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
-         from Mo::utils::CSS::check_css_unit():
+         From Mo::utils::check_required():
+                 Parameter 'horiz_align' is required.
+                 Parameter 'vert_align' is required.
+         From Mo::utils::CSS::check_css_class():
+                 Parameter 'css_container' has bad CSS class name.
+                         Value: %s
+                 Parameter 'css_container' has bad CSS class name (number on begin).
+                         Value: %s
+                 Parameter 'css_inner' has bad CSS class name.
+                         Value: %s
+                 Parameter 'css_inner' has bad CSS class name (number on begin).
+                         Value: %s
+         From Mo::utils::CSS::check_css_unit():
                  Parameter 'height' doesn't contain number.
                          Value: %s
                  Parameter 'height' doesn't contain unit.
@@ -303,10 +315,8 @@ Returns undef.
          From Tags::HTML::new():
                  Parameter 'css' must be a 'CSS::Struct::Output::*' class.
                  Parameter 'tags' must be a 'Tags::Output::*' class.
-         Parameter 'horiz_align' is required.
          Parameter 'horiz_align' have a bad value.
                  Value: %s
-         Parameter 'vert_align' is required.
          Parameter 'vert_align' have a bad value.
                  Value: %s
 
@@ -417,6 +427,7 @@ Returns undef.
 L<Class::Utils>,
 L<Error::Pure>,
 L<List::Util>,
+L<Mo::utils>,
 L<Mo::utils::CSS>,
 L<Readonly>,
 L<Tags::HTML>,
@@ -439,6 +450,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

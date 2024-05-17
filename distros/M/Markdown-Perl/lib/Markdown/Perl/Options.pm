@@ -8,7 +8,7 @@ use feature ':5.24';
 use Carp;
 use English;
 use Exporter 'import';
-use List::Util 'any', 'pairs';
+use List::Util 'any', 'all', 'pairs';
 
 our $VERSION = '0.01';
 
@@ -555,9 +555,18 @@ _make_option(
 
 =head3 B<inline_delimiters> I<(map)>
 
-TODO: document
-TODO: provide a way to add entries to this option without redefining it entirely
-(when used on the command line).
+This option provides a map from delimiter symbols to the matching HTML tags.
+This option should be passed as a comma-separated list of C<delimiter=tag_name>
+values. For example, the original Markdown syntax map could be specified as
+C<*=em,**=strong,_=em,__=strong>. The delimiters can only be made of a single
+unicode character or of twice the same unicode character. The values should be
+either HTML tag names (for example C<em>, C<strong>, etc.) or they can be
+arbitrary HTML class names, prefixed by a single dot (C<.>). In the latter case
+the delimiters will be used to insert a C<E<lt>spanE<gt>> element, with the
+given class.
+
+When using the programmatic interface, this map can be passed directly as a
+hash-reference, with the same content as described above.
 
 =cut
 
@@ -565,6 +574,14 @@ sub _delimiters_map {
   return sub {
     my %m = ref $_[0] eq 'HASH' ? %{$_[0]} : map { split(/=/, $_, 2) } split(/,/, $_[0]);
     # TODO: validate the keys and values of m.
+    if (!all { m/^(.)\1?$/ } keys %m) {
+      $err_str = sprintf 'keys must be a single character, optionally repeated once';
+      return;
+    }
+    if (!all { m/^\.?[a-z][-_a-z0-9]*$/i } values %m) {
+      $err_str = sprintf 'values must be a valid HTML tag or class names';
+      return;
+    }
     return \%m if %m;
     return {"\N{NULL}" => 'p'}  # this can’t trigger but the code fails with an empty map otherwise.
   };
@@ -580,6 +597,12 @@ _make_option(
     '~~' => 'del',
   },
   _delimiters_map,
+  markdown => {
+    '*' => 'em',
+    '**' => 'strong',
+    '_' => 'em',
+    '__' => 'strong',
+  },
   cmark => {
     '*' => 'em',
     '**' => 'strong',

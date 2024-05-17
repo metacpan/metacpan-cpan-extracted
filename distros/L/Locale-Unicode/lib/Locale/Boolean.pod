@@ -1,0 +1,107 @@
+=encoding utf8
+
+=head1 NAME
+
+Locale::Unicode::Boolean - Boolean Representation Class
+
+=head1 SYNOPSIS
+
+    my $bool = Locale::Unicode::Boolean->true;
+    # or
+    my $bool = Locale::Unicode::Boolean::true;
+    # Now I have a Locale::Unicode::Boolean object
+
+    # Returns 1
+    if( $bool )
+    {
+        # Do something
+    }
+
+    my $hash =
+    {
+        name => 'John Doe',
+        active => $bool,
+    };
+    # Converting to json
+    print( JSON->new->encode( $hash ), "\n" );
+    # Would result in
+    {
+        name: "Jogn Doe",
+        active: true
+    }
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+This a class/package to represent boolean value and make sure they are recognised interchangeably as perl boolean, i.e. 1 or 0, or as L<JSON> bool, i.e. C<true> or C<false>
+
+The code is taken and adapted from part of L<JSON> module.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+Provided with a true, or false value, and this instantiate a new C<Locale::Unicode::Boolean> object and returns it.
+
+=head1 METHODS
+
+=head2 clone
+
+Returns a new object with the boolean value of the current object.
+
+=head2 true
+
+This returns a perl true value i.e. 1 or C<true> when added into L<JSON>
+
+=head2 false
+
+This returns a perl false value i.e. 0 or C<false> when added into L<JSON>
+
+=head2 is_bool
+
+Provided with a value and this returns true if it is a L<Locale::Unicode::Boolean> object
+
+=head2 is_true
+
+Provided with a value and this returns true if it is a L<Locale::Unicode::Boolean> object and this is true.
+
+=head2 is_false
+
+Provided with a value and this returns true if it is a L<Locale::Unicode::Boolean> object and this is false.
+
+=head2 TO_JSON
+
+This is called by L<JSON> to transform an object into json data format.
+
+It returns C<\1> if true, or C<\0> otherwise. Those values are understood by L<JSON> and transcoded accordingly.
+
+=head1 SERIALISATION
+
+=for Pod::Coverage FREEZE
+
+=for Pod::Coverage STORABLE_freeze
+
+=for Pod::Coverage STORABLE_thaw
+
+=for Pod::Coverage THAW
+
+=for Pod::Coverage TO_JSON
+
+Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2024 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

@@ -28,6 +28,7 @@ no_index:
     - vendor
     - t
 requires:
+  Encode::Locale: '0'
   List::MoreUtils: '0'
   List::Util: '1.45'
   Readonly: '0'
@@ -37,5 +38,5 @@ requires:
 resources:
   bugtracker: https://github.com/mkende/pmarkdown/issues
   repository: https://github.com/mkende/pmarkdown
-version: '1.04'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

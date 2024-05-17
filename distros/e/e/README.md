@@ -108,8 +108,89 @@ of this issue:
 
 ## import
 
-These keys will become function inside of the
-caller's namespace.
+## repl
+
+Add a breakpoint to code.
+
+Basically inserts a Read Evaluate Print Loop.
+
+Enable to analyze code in the process.
+
+## trace
+
+Show a stack trace.
+
+    trace( $depth=1 )
+
+## watch
+
+Watch a reference for changes.
+
+    watch( $ref, $depth=3 )
+
+## prof
+
+Profile the code from this point on.
+
+    my $obj = prof;
+    ...
+    # $obj goes out of scope and builds results.
+
+## j
+
+JSON Parser.
+
+## x
+
+XML parser.
+
+## yml
+
+YAML parser.
+
+## b
+
+Work with strings.
+
+## c
+
+Work with arrays.
+
+## f
+
+Work with files.
+
+## say
+
+Print with newline.
+
+## p
+
+Pretty data printer.
+
+## np
+
+Return pretty printer data.
+
+## d
+
+Data dumper.
+
+## dd
+
+Internal data dumper.
+
+## g
+
+Perform a get request.
+
+## l
+
+Work with URLs.
+
+## pod
+
+Work with perl pod.
 
 # AUTHOR
 

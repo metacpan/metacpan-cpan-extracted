@@ -43,6 +43,7 @@
          "requires" : {
             "Test::Deep" : "0",
             "Test::Most" : "0",
+            "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
             "Test::Number::Delta" : "0"
          }
@@ -60,6 +61,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-List"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

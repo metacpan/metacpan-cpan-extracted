@@ -2,7 +2,7 @@ package Tk::AppWindow;
 
 =head1 NAME
 
-Tk::AppWindow - an application framework based on Tk
+Tk::AppWindow - An application framework based on Tk
 
 =cut
 
@@ -10,18 +10,21 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.03";
 
 use base qw(Tk::Derived Tk::MainWindow);
 Construct Tk::Widget 'AppWindow';
 
-use Config;
 use File::Basename;
 require Tk::AppWindow::BaseClasses::Callback;
 require Tk::YAMessage;
 require Tk::PNG;
 use Module::Load::Conditional('check_install', 'can_load');
 $Module::Load::Conditional::VERBOSE = 1;
+
+use Config;
+my $mswin = 0;
+$mswin = 1 if $Config{'osname'} eq 'MSWin32';
 
 =head1 SYNOPSIS
 
@@ -103,6 +106,11 @@ in 'Foo::Bar::Plugins'.
 
 Only available at create time.
 
+=item Switch: B<-savegeometry>
+
+Default value 0. Saves the geometry on quit and loads it on start. Only works
+if the extension B<ConfigFolder> is loaded.
+
 =item Switch: B<-verbose>
 
 Default value is 0.
@@ -153,7 +161,6 @@ sub Populate {
 	$self->{EXTENSIONS} = {};
 	$self->{EXTLOADORDER} = [];
 	$self->{NAMESPACE} = $namespace;
-	$self->{OSNAME} = $Config{'osname'};
 	$self->{WORKSPACE} = $self;
 	$self->{VERBOSE} = 0;
 
@@ -199,7 +206,7 @@ sub Populate {
 		-logerrorcall => ['CALLBACK', undef, undef, $logcall], 
 		-logwarningcall => ['CALLBACK', undef, undef, $logcall], 
 		-logo => ['PASSIVE', undef, undef, Tk::findINC('Tk/AppWindow/aw_logo.png')],
-		-savegeometry => ['PASSIVE', undef, undef, 1],
+		-savegeometry => ['PASSIVE', undef, undef, 0],
 		@$pre,
 		DEFAULT => ['SELF'],
 	);
@@ -282,14 +289,23 @@ sub CanQuit {
 sub CmdQuit {
 	my $self = shift;
 	my $quit = 1;
-	my $plgs = $self->{EXTENSIONS};
-	for (keys %$plgs) {
-		$quit = 0 unless $plgs->{$_}->CanQuit;
+	my $exts = $self->{EXTENSIONS};
+	for (keys %$exts) {
+		$quit = 0 unless $exts->{$_}->CanQuit;
 	}
 	$quit = 0 unless $self->CanQuit;
 	if ($quit) {
-		for (keys %$plgs) {
-			$plgs->{$_}->Quit;
+		#saving geometry
+		if ($self->configGet('-savegeometry')) {
+			my $cf = $self->extGet('ConfigFolder');
+			if (defined $cf) {
+				my $geometry = $self->geometry;
+				$cf->saveList('geometry', "aw geometry", $geometry);
+			}
+		}
+		#quitting extensions
+		for (keys %$exts) {
+			$exts->{$_}->Quit;
 		}
 		$self->destroy;
 	} 
@@ -677,7 +693,7 @@ Returns the correct file separator for your operating system.
 
 sub fileSeparator {
 	my $self = shift;
-	return '\\' if $self->OSName eq 'MSWin32';
+	return '\\' if $mswin;
 	return '/'
 }
 
@@ -779,14 +795,26 @@ sub OnConfigure {
 	$self->{'cfid'} = $id;
 }
 
-=item B<OSName>
+=item B<openURL>I<($file_or_web)>
 
-Returns the name of the operating system you are running.
+Opens I<$file_or_web> in the default application of your desktop.
+
+Please provide 'https://' or whatever protocol in front if it is on the web.
 
 =cut
 
-sub OSName {
-	return $_[0]->{OSNAME}
+sub openURL {
+	my ($self, $url) = @_;
+	print "is web $url\n" if $url =~ /^[A-Za-z]+:\/\//;
+	if ($mswin) {
+		if ($url =~ /^[A-Za-z]+:\/\//) { #is a web document
+			system("explorer \"$url\"");
+		} else {
+			system("\"$url\"");
+		}
+	} else {
+		system("xdg-open \"$url\"");
+	}
 }
 
 =item B<popDialog>I<($title, $message, $icon, @buttons)>
@@ -807,7 +835,7 @@ sub popDialog {
 		-buttons => \@buttons,
 		-defaultbutton => $buttons[0],
 	);
-	my $img = $self->getArt($icon, 32); 
+	my $img = $self->getArt($icon, 48); 
 	$q->Label(-image => $img)->pack(-side => 'left', @padding) if defined $img;
 	$q->Label(
 		-anchor => 'w',
@@ -833,9 +861,8 @@ sub popEntry {
 	my $q = $self->YADialog(
 		-title => $title,
 		-buttons => [qw(Ok Cancel)],
-		-defaultbutton => 'Ok',
 	);
-	$q->Label(-image => $self->getArt($icon, 32))->pack(-side => 'left', @padding);
+	$q->Label(-image => $self->getArt($icon, 48))->pack(-side => 'left', @padding);
 	my $f = $q->Frame->pack(-side => 'left', @padding);
 	$f->Label(
 		-anchor => 'w',
@@ -843,6 +870,10 @@ sub popEntry {
 	)->pack(-fill => 'x', -padx => 2, -pady => 2);
 	my $e = $f->Entry->pack(-fill => 'x', -padx => 2, -pady => 2);
 	$e->insert('end', $value) if defined $value;
+	$e->focus;
+	$e->bind('<Return>', sub { 
+		$q->{PRESSED} = 'Ok' 
+	});
 	
 	my $result;
 	my $answer = $q->Show(-popover => $self);
@@ -862,7 +893,7 @@ Pops up a message box with a close button.
 sub popMessage {
 	my ($self, $text, $icon, $size) = @_;
 	$icon = 'dialog-information' unless defined $icon;
-	$size = 32 unless defined $size;
+	$size = 48 unless defined $size;
 	my $m = $self->YAMessage(
 		-title => 'Message',
 		-text => $text,
@@ -880,10 +911,20 @@ sub popTest {
 sub PostConfig {
 	my $self = shift;
 	delete $self->{ARGS};
+
+	#set logo
 	my $lgf = $self->cget('-logo');
 	if ((defined $lgf) and (-e $lgf)) {
 		my $logo = $self->Photo(-file => $lgf, -format => 'PNG');
 		$self->iconimage($logo);
+	}
+	#set geometry
+	if ($self->configGet('-savegeometry')) {
+		my $cf = $self->extGet('ConfigFolder');
+		if (defined $cf) {
+			my ($g) = $cf->loadList('geometry', 'aw geometry');
+			$self->geometry($g) if defined $g;
+		}
 	}
 	my $pc = $self->{POSTCONFIG};
 	for (@$pc) { $_->execute }
@@ -997,6 +1038,11 @@ Unknown. Probably plenty. If you find any, please contact the author.
 
 1;
 __END__
+
+
+
+
+
 
 
 

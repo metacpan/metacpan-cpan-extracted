@@ -13,7 +13,7 @@ my $abi_version = ll_get_abi_version();
 print STDERR
   "Landlock ABI version: $abi_version, archname: $Config{archname}, 64bitint: @{[$Config{use64bitint} ? 1:0 ]}\n";
 if ($abi_version < 0) {
-    ok(!defined ll_create_fs_ruleset(), "ruleset created");
+    ok(!defined ll_create_fs_ruleset(), "no support");
 } else {
     ok($abi_version > 0,                          "Landlock available, ABI version $abi_version");
     ok(scalar ll_all_fs_access_supported() >= 13, "plausible list");
@@ -22,14 +22,24 @@ if ($abi_version < 0) {
     ok($ruleset_fd > 0, "ruleset created");
     opendir(my $dh, $base) or BAIL_OUT("$!");
     my $writable_fh = IO::File->new("$base/b", 'r');
-    # (1 << 60) is not a valid value
-    ok(
+    # (1 << 60) is not a valid value, $LANDLOCK_ACCESS_FS{TRUNCATE} is only valid for ABI version 3+
+    my $expected = $LANDLOCK_ACCESS_FS{READ_FILE} | $LANDLOCK_ACCESS_FS{WRITE_FILE} |
+      ($abi_version >= 3 && $LANDLOCK_ACCESS_FS{TRUNCATE});
+    is(
         ll_add_path_beneath_rule(
-            $ruleset_fd, $LANDLOCK_ACCESS_FS{READ_FILE} | $LANDLOCK_ACCESS_FS{WRITE_FILE} | (1 << 60), $writable_fh
+            $ruleset_fd,
+            $LANDLOCK_ACCESS_FS{READ_FILE} | $LANDLOCK_ACCESS_FS{WRITE_FILE} | $LANDLOCK_ACCESS_FS{TRUNCATE} |
+              (1 << 60),
+            $writable_fh
         ),
+        $expected,
         'rule added'
     );
-    ok(ll_add_path_beneath_rule($ruleset_fd, $LANDLOCK_ACCESS_FS{READ_FILE}, $dh), 'rule added');
+    is(
+        ll_add_path_beneath_rule($ruleset_fd, $LANDLOCK_ACCESS_FS{READ_FILE}, $dh),
+        $LANDLOCK_ACCESS_FS{READ_FILE},
+        'rule added'
+    );
     $writable_fh->close();
     ok(!defined ll_add_path_beneath_rule(fileno(*STDIN), $LANDLOCK_ACCESS_FS{READ_FILE}, $dh),
         "attempt to add rule to wrong fd: $!");

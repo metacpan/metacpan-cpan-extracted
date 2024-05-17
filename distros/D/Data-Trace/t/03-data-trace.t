@@ -18,12 +18,30 @@ pass "data-trace start";
 my $test_scalar;
 my @test_array;
 my %test_hash;
+my $test_complex;
 my $clone;
 
+sub _define_complex_base_value {
+    {
+        authors => [
+            {
+                first => 'Charles',
+                last  => 'Dickens',
+            },
+            {
+                first => 'George',
+                last  => 'Eliot',
+            },
+        ],
+        poets => [ 'Robert Frost', 'William Blake', ],
+    };
+}
+
 sub _reset_vars {
-    $test_scalar = 'test_scalar';
-    @test_array  = ( 'test', 'array' );
-    %test_hash   = ( test => 'hash' );
+    $test_scalar  = 'test_scalar';
+    @test_array   = ( 'test', 'array' );
+    %test_hash    = ( test => 'hash' );
+    $test_complex = _define_complex_base_value();
     undef $clone;
 }
 _reset_vars();
@@ -39,6 +57,10 @@ sub _define_regex {
     my $anon_lines = qr{
         \n \s+ \|- \s+ main::__ANON__\b .+
         \n \s+ \|- \s+ main::__ANON__\b .+
+    }x;
+    my $anon_coderef_lines = qr{
+        \n \s+ \|- \s+ main::__ANON__\b .+
+        \n \s+ \|- \s+ main::_dummy_run_coderef\b .+
     }x;
     my $_build_trace = sub {
         my ( $ref, $method, @values ) = @_;
@@ -58,6 +80,7 @@ sub _define_regex {
     my $scalar_store_mod = $_build_trace->( "Scalar", "STORE", "scalar3" );
     my $scalar_clone_store =
       $_build_trace->( "Scalar", "STORE", "cloned_scalar" );
+    my $scalar_store_firstname = $_build_trace->( "Scalar", "STORE", "Charly" );
 
     # Array.
     my $array_store = $_build_trace->( "Array", "STORE", 1, "array2" );
@@ -72,6 +95,8 @@ sub _define_regex {
       $_build_trace->( "Hash", "STORE", "test", "cloned_hash" );
     my $hash_delete = $_build_trace->( "Hash", "DELETE", "test" );
     my $hash_clear  = $_build_trace->( "Hash", "CLEAR" );
+    my $hash_store_firstname =
+      $_build_trace->( "Hash", "STORE", "first", "Charly" );
 
     # Actual patterns to use.
     {
@@ -106,12 +131,17 @@ sub _define_regex {
                 \n $scalar_store $anon_lines
                 $
             }x,
+            firstname  => qr{ ^ \n $scalar_store_firstname $anon_lines $ }x,
+            firstname1 => qr{ ^ $scalar_store_firstname $ }x,
+            coderef_firstname =>
+              qr{ ^ \n $scalar_store_firstname $anon_coderef_lines $ }x,
         },
 
         array => {
             basic1 => qr{ ^ $array_store $ }x,
             basic  => qr{ ^ \n $array_store $anon_lines $ }x,
             pop    => qr{ ^ \n $array_pop $anon_lines $ }x,
+            clear  => qr{ ^ \n $array_clear $anon_lines $ }x,
             clone1 => qr{ ^ $array_clone_store \n $array_store $ }x,
             clone  => qr{
                 ^
@@ -135,11 +165,30 @@ sub _define_regex {
                 \n $hash_store $anon_lines
                 $
             }x,
+            firstname  => qr{ ^ \n $hash_store_firstname $anon_lines $ }x,
+            firstname1 => qr{ ^ $hash_store_firstname $ }x,
+            coderef_firstname =>
+              qr{ ^ \n $hash_store_firstname $anon_coderef_lines $ }x,
         },
 
     };
 }
 my $regex = _define_regex();
+
+sub _dummy_run_coderef {    # To provide another scope.
+    my ( $coderef ) = @_;
+    $coderef->();
+}
+
+sub _dummy_update_firstname {
+    sub {
+        _dummy_run_coderef(
+            sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            }
+        );
+    };
+}
 
 # Only stack trace.
 sub _define_cases_stack_trace {
@@ -992,6 +1041,237 @@ sub _define_cases_hash_no_clone_old {
     )
 }
 
+# Complex
+sub _define_cases_complex {
+    (
+
+        # Full.
+        {
+            name     => "complex - watch full - no change",
+            args     => sub { [$test_complex] },
+            expected => {
+                stdout   => $regex->{empty},
+                variable => $test_complex,
+                value    => _define_complex_base_value(),
+            },
+        },
+        {
+            name    => "complex - watch full - firstname",
+            args    => sub { [$test_complex] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{hash}{firstname},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+        {
+            name    => "complex - watch full - firstname 1",
+            args    => sub { [ $test_complex, 1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{hash}{firstname1},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+
+        # Partial.
+        {
+            name     => "complex - watch partial - no change",
+            args     => sub { [ $test_complex->{authors} ] },
+            expected => {
+                stdout   => $regex->{empty},
+                variable => $test_complex,
+                value    => _define_complex_base_value(),
+            },
+        },
+        {
+            name    => "complex - watch partial - firstname",
+            args    => sub { [ $test_complex->{authors} ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{hash}{firstname},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+        {
+            name    => "complex - watch partial - firstname 1",
+            args    => sub { [ $test_complex->{authors}, 1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{hash}{firstname1},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+
+        # Single node.
+        {
+            name     => "complex - watch single - no change",
+            args     => sub { [ \$test_complex->{authors}[0]{first} ] },
+            expected => {
+                stdout   => $regex->{empty},
+                variable => $test_complex,
+                value    => _define_complex_base_value(),
+            },
+        },
+        {
+            name    => "complex - watch single - firstname",
+            args    => sub { [ \$test_complex->{authors}[0]{first} ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{scalar}{firstname},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+        {
+            name    => "complex - watch single - firstname 1",
+            args    => sub { [ \$test_complex->{authors}[0]{first}, 1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{scalar}{firstname1},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+    )
+}
+
+# Location
+sub _define_cases_other_location {
+    (
+
+        # Full.
+        {
+            name     => "location - watch full - firstname",
+            args     => sub { [$test_complex] },
+            actions  => _dummy_update_firstname(),
+            expected => {
+                stdout   => $regex->{hash}{coderef_firstname},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+        {
+            name     => "location - watch full - firstname 1",
+            args     => sub { [ $test_complex, 1 ] },
+            actions  => _dummy_update_firstname(),
+            expected => {
+                stdout   => $regex->{hash}{firstname1},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+
+        # Partial.
+        {
+            name     => "location - watch partial - firstname",
+            args     => sub { [ $test_complex->{authors} ] },
+            actions  => _dummy_update_firstname(),
+            expected => {
+                stdout   => $regex->{hash}{coderef_firstname},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+        {
+            name     => "location - watch partial - firstname 1",
+            args     => sub { [ $test_complex->{authors}, 1 ] },
+            actions  => _dummy_update_firstname(),
+            expected => {
+                stdout   => $regex->{hash}{firstname1},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+
+        # Single node.
+        {
+            name     => "location - watch single - firstname",
+            args     => sub { [ \$test_complex->{authors}[0]{first} ] },
+            actions  => _dummy_update_firstname(),
+            expected => {
+                stdout   => $regex->{scalar}{coderef_firstname},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+        {
+            name     => "location - watch single - firstname 1",
+            args     => sub { [ \$test_complex->{authors}[0]{first}, 1 ] },
+            actions  => _dummy_update_firstname(),
+            expected => {
+                stdout   => $regex->{scalar}{firstname1},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+    )
+}
+
 my @cases = (
 
     # User Errors
@@ -1013,6 +1293,12 @@ my @cases = (
     _define_cases_hash_clone(),
     _define_cases_hash_no_clone(),
     _define_cases_hash_element(),
+
+    # Complex
+    _define_cases_complex(),
+
+    # Location
+    _define_cases_other_location(),
 
 );
 
@@ -1069,21 +1355,28 @@ sub _test_tie {
     }
 
     # Check STDOUT.
-    if ( $case->{expected}{stdout} ) {
-        like(
-            $stdout,
-            $case->{expected}{stdout},
-            "$case->{name} - action stdout",
-        );
+    if ( exists $case->{expected}{stdout} ) {
+        my $expected = $case->{expected}{stdout};
+
+        ok defined( $expected ), "$case->{name} - expected stdout is defined";
+
+        if ( ref( $expected ) ne "Regexp" ) {
+            $expected = qr{ ^ $expected $ }x;
+            say "make regexp";
+        }
+        like( $stdout, $expected, "$case->{name} - action stdout", );
     }
 
     # Check for variable values afterwards.
     if ( $case->{expected}{variable} ) {
-        is_deeply(
-            $case->{expected}{variable},
-            $case->{expected}{value},
-            "$case->{name} - value",
-        );
+        my $var = $case->{expected}{variable};
+        my $val = $case->{expected}{value};
+
+        for ( $var, $val ) {
+            $_ = $_->() if ref() eq "CODE";
+        }
+
+        is_deeply( $var, $val, "$case->{name} - value", );
     }
 
     # Check for clone values afterwards (if any).
@@ -1129,6 +1422,7 @@ sub _test_trace_only {
         "$case->{name} - return_ret",
     );
 }
+
 
 ###########################################
 #               Test It

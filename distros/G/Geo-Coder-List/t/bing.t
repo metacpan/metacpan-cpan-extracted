@@ -13,7 +13,7 @@ BEGIN {
 
 BING: {
 	SKIP: {
-		skip 'Test requires Internet access', 14 unless(-e 't/online.enabled');
+		skip('Test requires Internet access', 14) unless(-e 't/online.enabled');
 
 		eval {
 			require Geo::Coder::Bing;

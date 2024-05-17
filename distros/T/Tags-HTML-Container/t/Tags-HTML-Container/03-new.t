@@ -7,7 +7,7 @@ use Error::Pure::Utils qw(clean err_msg);
 use Tags::HTML::Container;
 use Tags::Output::Structure;
 use Test::MockObject;
-use Test::More 'tests' => 14;
+use Test::More 'tests' => 18;
 use Test::NoWarnings;
 
 # Test.
@@ -20,6 +20,58 @@ $obj = Tags::HTML::Container->new(
 	'tags' => Tags::Output::Structure->new,
 );
 isa_ok($obj, 'Tags::HTML::Container');
+
+# Test.
+eval {
+	Tags::HTML::Container->new(
+		'css_container' => '@foo',
+	);
+};
+is(
+	$EVAL_ERROR,
+	"Parameter 'css_container' has bad CSS class name.\n",
+	'Parameter \'css_container\' has bad CSS class name (@bad).',
+);
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Container->new(
+		'css_container' => '1foo',
+	);
+};
+is(
+	$EVAL_ERROR,
+	"Parameter 'css_container' has bad CSS class name (number on begin).\n",
+	"Parameter 'css_container' has bad CSS class name (number on begin) (1foo).",
+);
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Container->new(
+		'css_inner' => '@foo',
+	);
+};
+is(
+	$EVAL_ERROR,
+	"Parameter 'css_inner' has bad CSS class name.\n",
+	"Parameter 'css_inner' has bad CSS class name (\@bad).",
+);
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Container->new(
+		'css_inner' => '1foo',
+	);
+};
+is(
+	$EVAL_ERROR,
+	"Parameter 'css_inner' has bad CSS class name (number on begin).\n",
+	"Parameter 'css_inner' has bad CSS class name (number on begin) (1foo).",
+);
+clean();
 
 # Test.
 eval {

@@ -9,7 +9,7 @@ Tk::AppWindow::Baseclasses::SidePanel - Basic functionality for extensions assoc
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.03";
 use Tk;
 require Tk::YANoteBook;
 
@@ -49,6 +49,7 @@ sub new {
 	$self->{TABSIDE} = 'top';
 	$self->{LASTSIZE} = {};
 	$self->{ICONSIZE} = 32;
+	$self->{INITIALSIZES} = {};
 	$self->addPostConfig('CreateNoteBook', $self);
 	return $self;
 }
@@ -59,17 +60,18 @@ sub new {
 
 =over 4
 
-=item B<addPage>I<($name, $image, $text, $statustext)>
+=item B<addPage>I<($name, $image, $text, $statustext, $initialsize)>
 
 Adds a page to the notebook.
 
 =cut
 
 sub addPage {
-	my ($self, $name, $image, $text, $statustext) = @_;
+	my ($self, $name, $image, $text, $statustext, $initialsize) = @_;
 	$text = $name, unless defined $text;
-#	my $orient = 'Horizontal';
-#	$orient = 'Vertical' if ($self->Tabside eq 'left') or ($self->Tabside eq 'right');
+
+	$initialsize = 200 unless defined $initialsize;
+	$self->{INITIALSIZES}->{$name} = $initialsize;
 	
 	my $nb = $self->nbGet;
 
@@ -78,13 +80,6 @@ sub addPage {
 	my $icon;
 	if (defined $art) {
 		$icon = $art->GetIcon($image, $self->IconSize);
-#		my @copt = (-orient => $orient);
-#		if ($orient eq 'Vertical') {
-#			push @copt, -textside => 'bottom'
-#		} else {
-#			push @copt, -textside => 'right'
-#		}
-#		$icon = $art->CreateCompound(@copt, -text => $text, -image => $img);
 		
 	}
 	@opt = (-titleimg => $icon) if defined $icon;
@@ -92,8 +87,8 @@ sub addPage {
 	my $page = $nb->addPage($name, @opt);
 
 	my $balloon = $self->extGet('Balloon');
-	my $l = $nb->getTab($name)->Subwidget('Label');
 	if (defined $balloon) {
+		my $l = $nb->getTab($name)->Subwidget('Label');
 		$balloon->Attach($l, -statusmsg => $statustext) if defined $statustext;
 		$balloon->Attach($l, -balloonmsg => $text) if defined $text;
 	}
@@ -127,6 +122,7 @@ Deletes a page from the notebook.
 sub deletePage {
 	my ($self, $name) = @_;
 	$self->nbGet->deletePage($name);
+	delete $self->{INITIALSIZES}->{$name}
 }
 
 =item B<IconSize>I<(?$size?)>
@@ -179,9 +175,11 @@ sub nbMaximize {
 # 		print "saved size $width, $height\n";
 	} else {
 		if (($ts eq 'top') or ($ts eq 'bottom')) {
-			$height = $nb->height + $offset + $pf->reqheight;
+			$height = 150;
+#			$height = $nb->height + $offset + $pf->reqheight;
 		} else {
-			$width = $nb->width + $offset + $pf->reqwidth;
+			$width = 300;
+#			$width = $nb->width + $offset + $pf->reqwidth;
 		}
 # 		print "orignal size $width, $height\n";
 	}
@@ -319,6 +317,7 @@ Unknown. If you find any, please contact the author.
 
 1;
 __END__
+
 
 
 

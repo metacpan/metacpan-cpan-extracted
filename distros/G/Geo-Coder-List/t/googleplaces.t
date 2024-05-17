@@ -58,7 +58,7 @@ GOOGLEPLACES: {
 			ok(!defined($geocoderlist->geocode('')));
 		} else {
 			diag('Set GMAP_KEY to enable more tests');
-			skip 'GMAP_KEY not set', 16;
+			skip 'GMAP_KEY not set', 14;
 		}
 	}
 }

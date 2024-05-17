@@ -16,6 +16,8 @@ BEGIN {
 
 UA: {
 	SKIP: {
+		skip('Test requires Internet access', 8) unless(-e 't/online.enabled');
+
 		# Don't use require_ok as it could legitimately fail
 		eval {
 			require Geo::Coder::CA;

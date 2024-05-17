@@ -65,7 +65,7 @@ POSTCODES: {
 		ok(ref($location) eq 'HASH');
 		delta_within($location->{geometry}{location}{lat}, 51.33, 1e-2);
 		delta_within($location->{geometry}{location}{lng}, 1.42, 1e-2);
-		is($location->{'geocoder'}, undef, 'Verify subsequent reads are cached');
+		is($location->{'geocoder'}, 'cache', 'Verify subsequent reads are cached');
 
 		$location = $geocoderlist->geocode('Plumstead, London, England');
 		ok(defined($location));

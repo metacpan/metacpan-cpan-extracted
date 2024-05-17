@@ -1,5 +1,8 @@
 Revision history for perl module Net::RDAP:
 
+0.23 - 2024-05-16
+  - fix an issue when reading cached responses
+
 0.22 - 2024-03-18
   - add TO_JSON() method to Net::RDAP::Base so all RDAP objects can be reserialized back into JSON (see https://github.com/gbxyz/perl-net-rdap/issues/3).
 

@@ -1,3 +1,17 @@
+#package MyLabel;
+#
+#use strict;
+#use warnings;
+#
+#use base qw(Tk::Derived Tk::Label);
+#Construct Tk::Widget 'PluginsForm';
+#
+#sub Apply {
+#	print "Apply\n";
+#}
+#
+#package main;
+
 package Tk::AppWindow::Ext::TestPlugin;
 
 use strict;
@@ -65,6 +79,13 @@ sub Quitter {
 	$self->{QUITTER} = $val;
 }
 
+sub SettingsPage {
+	my $self = shift;
+	return (
+		External1 => ['MyLabel', -text => "External1"],
+	)
+}
+
 sub Value {
 	my $self = shift;
 	if (@_) { $self->{VALUE} = shift	}
@@ -72,3 +93,5 @@ sub Value {
 }
 
 1;
+
+

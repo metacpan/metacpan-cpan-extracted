@@ -40,12 +40,12 @@ t/opencage.t
 t/osm.t
 t/ovi.t
 t/pod-cm.t
+t/pod-snippets.t
 t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
 t/postcodes.t
 t/rand.t
-t/snippets.t
 t/ua.t
 t/unused.t
 t/us.t

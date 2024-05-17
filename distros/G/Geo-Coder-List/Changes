@@ -1,5 +1,13 @@
 Revision history for Geo-Coder-List
 
+0.33	Thu May 16 09:28:54 EDT 2024
+	Fix test count in t/googleplaces.t
+	Don't test t/ua.t when network testing disabled
+	Use Test::Needs
+	Error if there's something wrong in the cache
+	Looks like Geo::Coder::US::Census sometimes says it's worked when it hasn't
+	Set the geocoder to 'cache' rather than undef for cached items
+
 0.32	Sat Oct  7 10:07:45 EDT 2023
 	Set "geocoder" to "cached" when the values have been retrieved from the L2 cache
 

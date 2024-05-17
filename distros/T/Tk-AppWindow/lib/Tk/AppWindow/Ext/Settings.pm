@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Tk;
 use vars qw($VERSION);
-$VERSION="0.01";
+$VERSION="0.03";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -126,6 +126,8 @@ sub CmdSettings {
 	);
 	
 	my $f;
+	my $nb;
+	my %externals = ();
 	my $b = $m->Subwidget('buttonframe')->Button(
 		-text => 'Apply',
 		-command => sub {
@@ -141,6 +143,12 @@ sub CmdSettings {
 			}
 			$self->ReConfigureAll;
 			$self->SaveSettings(@save);
+			if (defined $nb) {
+				for (keys %externals) {
+					my $w = $externals{$_};
+					$w->Apply if $w->can('Apply');
+				}
+			}
 		}
 	);
 
@@ -165,7 +173,7 @@ sub CmdSettings {
 			}
 		},
 	)->pack(-expand => 1, -fill => 'both');
-	my $nb = $f->createForm;
+	$nb = $f->createForm;
 	if (defined $nb) {
 		my @pages = $self->GetSettingsPages;
 		while (@pages) {
@@ -173,7 +181,7 @@ sub CmdSettings {
 			my $opt = shift @pages;
 			my $class = shift @$opt;
 			my $page = $nb->add($title, -label => $title);
-			$page->$class(@$opt)->pack(-fill => 'both', -expand => 1);
+			$externals{$title} = $page->$class(@$opt)->pack(-fill => 'both', -expand => 1);
 		}
 	}
 	$f->put($self->GetUserOptions);
@@ -194,9 +202,7 @@ sub GetUserOptions {
 			shift @options;
 			next;
 		}
-		if ($key eq '*end') {
-			next;
-		}
+		next if (($key eq '*end') or ($key eq '*column') or ($key eq '*expand'));
 		shift @options;
 		$usopt{$key} = $self->configGet($key);
 	}
@@ -229,9 +235,7 @@ sub LoadSettings {
 			shift @temp;
 			next;
 		}
-		if ($key eq '*end') {
-			next;
-		}
+		next if (($key eq '*end') or ($key eq '*column') or ($key eq '*expand'));
 		shift @temp;
 		$useroptions{$key} = 1;
 	}
@@ -322,6 +326,10 @@ Unknown. If you find any, please contact the author.
 =cut
 
 1;
+
+
+
+
 
 
 

@@ -134,7 +134,7 @@ LIST: {
 		ok(ref($location) eq 'HASH');
 		delta_within($location->{geometry}{location}{lat}, 41.1, 1e-1);
 		delta_within($location->{geometry}{location}{lng}, -85.06, 1e-1);
-		is($location->{'geocoder'}, undef, 'Verify subsequent scalar reads are cached');
+		is($location->{'geocoder'}, 'cache', 'Verify subsequent scalar reads are cached');
 
 		@locations = $geocoderlist->geocode({ location => 'Allen, Indiana, USA' });
 		ok(scalar(@locations) == $count);
@@ -142,7 +142,7 @@ LIST: {
 		ok(ref($location) eq 'HASH');
 		delta_within($location->{geometry}{location}{lat}, 41.1, 1e-1);
 		delta_within($location->{geometry}{location}{lng}, -85.06, 1e-1);
-		is($location->{'geocoder'}, undef, 'Verify subsequent list reads are cached');
+		is($location->{'geocoder'}, 'cache', 'Verify subsequent list reads are cached');
 
 		$location = $geocoderlist->geocode('Ramsgate, Kent, England');
 		ok(defined($location));

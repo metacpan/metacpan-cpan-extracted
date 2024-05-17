@@ -13,6 +13,9 @@ $VERSION="0.02";
 
 use File::Path qw(make_path);
 use Config;
+my $mswin = 0;
+$mswin = 1 if $Config{'osname'} eq 'MSWin32';
+
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -72,7 +75,7 @@ Prepends the config folder location to $file and returns it.
 
 sub confFileName {
 	my ($self, $file) = @_;
-	if ($self->OSName eq 'MSWin32') {
+	if ($mswin) {
 		return $self->ConfigFolder . "\\$file"
 	} else {
 		return $self->ConfigFolder . "/$file"
@@ -297,6 +300,7 @@ Unknown. If you find any, please contact the author.
 =cut
 
 1;
+
 
 
 

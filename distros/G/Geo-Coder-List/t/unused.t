@@ -4,15 +4,17 @@ use strict;
 use warnings;
 use Test::Most;
 
-unless($ENV{RELEASE_TESTING}) {
-	plan(skip_all => "Author tests not required for installation");
-}
-
-eval 'use warnings::unused -global';
-if($@ || ($warnings::unused::VERSION < 0.04)) {
-	plan(skip_all => 'warnings::unused >= 0.04 needed for testing');
+if($ENV{AUTHOR_TESTING}) {
+	eval {
+		eval 'use warnings::unused 0.04';
+	};
+	if($@) {
+		plan(skip_all => 'warnings::unused needed for test for unused variables');
+	} else {
+		use_ok('Geo::Coder::List');
+		new_ok('Geo::Coder::List');
+		plan(tests => 2);
+	}
 } else {
-	use_ok('Geo::Coder::List');
-	new_ok('Geo::Coder::List');
-	plan tests => 2;
+	plan(skip_all => 'Author tests not required for installation');
 }

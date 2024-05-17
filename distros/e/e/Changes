@@ -1,6 +1,19 @@
 Revision history for e
 
 =================
+1.09 - 2024-05-16
+=================
+
+Updated pod to include methods.
+
+=================
+1.08 - 2024-05-16
+=================
+
+Increased repl, trace versions.
+Added key: pod.
+
+=================
 1.07 - 2024-05-15
 =================
 

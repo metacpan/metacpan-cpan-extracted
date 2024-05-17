@@ -656,7 +656,7 @@ sub apply_delimiters {
   splice @{$delimiters}, $open_index + 1, $close_index - $open_index - 1;
 
   # And now we rebuild our own tree around the new one.
-  my $len = min($o{len}, $c{len}, 2);
+  my $len = min($o{len}, $c{len}, max_delim_length($that, $o{delim}));
   my $styled_node = new_style($styled_tree, tag => delim_to_html_tag($that, $o{delim} x $len));
   my $style_start = $o{index};
   my $style_length = 2;
@@ -718,6 +718,16 @@ sub delim_characters {
   # change).
   my @c = map { substr $_, 0, 1 } keys %{$that->get_inline_delimiters()};
   return join('', uniq @c);
+}
+
+# Returns the max defined delim
+sub max_delim_length {
+  my ($that, $delim) = @_;
+  # TODO: memo-ize this function
+  # We assume that the $delim is in the map because it reached this point and
+  # also that the map can contains only delimiters not repeated or repeated
+  # once.
+  return exists $that->get_inline_delimiters()->{$delim x 2} ? 2 : 1;
 }
 
 sub create_extended_autolinks {

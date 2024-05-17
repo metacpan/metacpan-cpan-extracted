@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Tk;
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.03";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -151,9 +151,8 @@ my %types = (
 	menu_separator => \&ConfMenuSeparator,
 );
 
-sub Configure {
+sub MenuStack {
 	my $self = shift;
-	my $w = $self->GetAppWindow;
 	my $stack = [];
 	my @menuitems = @_;
 	my $count = 0;
@@ -171,12 +170,18 @@ sub Configure {
 			warn "undefined menu type $type"
 		}
 		$count ++;
-		if ($count > 10000) {
+		if ($count > 1000) {
 			warn "Invalid menupath: " . $item[0];
 			$keeploop = 0;
 		}
 	}
 	$self->CheckStackForImages($stack);
+	return $stack
+}
+
+sub Configure {
+	my $self = shift;
+	my $w = $self->GetAppWindow;
 	my $menu = $w->cget('-menu');
 	unless (defined $menu) {
 		$menu = $w->Menu;
@@ -184,12 +189,8 @@ sub Configure {
 	} else {
 		$menu->delete(0, 'end');
 	}
+	my $stack = $self->MenuStack(@_);
 	$self->FillMenu($menu, $stack);
-# 	my $menu =$w->Menu(
-# 		-menuitems => $stack,
-# 	);
-# 	my $g = $w->geometry;
-# 	$w->geometry($g);
 }
 
 sub ConfGetCommand {
@@ -670,6 +671,7 @@ Unknown. If you find any, please contact the author.
 =cut
 
 1;
+
 
 
 

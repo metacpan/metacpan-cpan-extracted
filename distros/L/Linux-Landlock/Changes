@@ -1,3 +1,7 @@
+0.6   2024-05-16T23:04:17+02:00
+    - deal gracefully with missing Landlock support and unknown syscall numbers
+    - return the actually applied access bits instead of just 1
+
 0.5   2024-05-12T13:32:00+02:00
     - emulate pack('Q', ...) on Perls without 64-bit integers
     - add some diagnostic output to tests

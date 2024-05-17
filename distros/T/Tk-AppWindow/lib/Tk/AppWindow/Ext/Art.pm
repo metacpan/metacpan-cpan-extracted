@@ -10,8 +10,10 @@ Tk::AppWindow::Ext::Art - Use icon libraries quick & easy
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.03";
 use Config;
+my $mswin = 0;
+$mswin = 1 if $Config{'osname'} eq 'MSWin32';
 my $osname = $Config{'osname'};
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
@@ -43,7 +45,7 @@ my %photoext = (
 );
 
 my @defaulticonpath = ();
-if ($osname eq 'MSWin32') {
+if ($mswin) {
 	push @defaulticonpath, $ENV{ALLUSERSPROFILE} . '\Icons'
 } else {
 	my $modname = 'Image::LibRSVG';
@@ -53,7 +55,13 @@ if ($osname eq 'MSWin32') {
 			push @extensions, '.svg';
 		}
 	}
-	push @defaulticonpath, $ENV{HOME} . '/.local/share/icons', '/usr/share/icons','/usr/local/share/icons';
+	my $local = $ENV{HOME} . '/.local/share/icons';
+	push @defaulticonpath,  $local if -e $local;
+	my $xdgpath = $ENV{XDG_DATA_DIRS};
+	my @xdgdirs = split /\:/, $xdgpath;
+	for (@xdgdirs) {
+		push @defaulticonpath, $_
+	}
 }
 
 my @iconpath = ();
@@ -892,6 +900,8 @@ Unknown. If you find any, please contact the author.
 =cut
 
 1;
+
+
 
 
 

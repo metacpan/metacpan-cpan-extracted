@@ -1,3 +1,9 @@
+0.08 2024-05-17T10:09:16+02:00
+ - Add check for CSS classes.
+ - Add explicit version of Mo::utils::CSS to code.
+ - Check for required values move to Mo::utils.
+ - Fix typo in doc.
+
 0.07 2024-04-21T12:13:54+02:00
  - Add 'padding' parameter.
  - Add check for unit in 'height' parameter.

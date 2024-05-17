@@ -1,5 +1,19 @@
 Revision history for pmarkdown and the Markdown::Perl module.
 
+1.05 - 2024-05-14
+
+ [Improve the inline_delimiters option]
+ - Document the option.
+ - Set the correct value for the original markdown syntax.
+ - Support the case where a delimiter does not have a repeated variant.
+ - Validate the value of the option.
+ - Allow to pass a class name to insert an HTML <span>, rather than a
+   specific tag.
+
+ [Other changes]
+ - Decode the command line argument strings according to the current locale and
+   decode/encode the standard input/output if we are connected to a tty.
+
 1.04 - 2024-05-09
 
  - Remove our custom make targets on platforms that don’t have GNU Make to

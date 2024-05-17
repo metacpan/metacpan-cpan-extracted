@@ -52,7 +52,7 @@ sub Populate {
 	my $pane = $lf->Scrolled('Pane',
 		-height => 200,
 		-scrollbars => 'oe',
-		-sticky => 'ns',
+		-sticky => 'nsew',
 	)->pack(-expand => 1, -fill => 'both');
 	for (@avail) {
 		my $plug = $_;
@@ -126,5 +126,6 @@ Unknown. If you find any, please contact the author.
 =cut
 
 1;
+
 
 

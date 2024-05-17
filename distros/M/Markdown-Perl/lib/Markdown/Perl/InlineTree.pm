@@ -682,8 +682,13 @@ sub render_node_html {
     }
   } elsif ($n->{type} eq 'style') {
     my $content = $n->{subtree}->render_html();
-    my $tag = $n->{tag};
-    return $acc."<${tag}>${content}</${tag}>";
+    if ($n->{tag} =~ m/^\.(.*)$/) {
+      my $class = $1;
+      return $acc."<span class=\"${class}\">${content}</span>";
+    } else {
+      my $tag = $n->{tag};
+      return $acc."<${tag}>${content}</${tag}>";
+    }
   } else {
     confess 'Unexpected node type in render_node_html: '.$n->{type};
   }

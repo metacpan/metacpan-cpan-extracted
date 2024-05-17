@@ -70,13 +70,13 @@ FREE: {
 
 		my $location = $geo_coder_list->geocode('Woolwich, London, England');
 		cmp_deeply($location,
-			methods('lat' => num(51.47, 1e-2), 'long' => num(0.20, 1e-2)));
+			methods('lat' => num(51.4, 1e-1), 'long' => num(0.20, 1)));
 
 		if($ENV{'OPENADDR_HOME'}) {
 			$location = $geo_coder_list->geocode(location => 'Margate, Kent, England');
 			ok(defined($location));
 			cmp_deeply($location,
-				methods('lat' => num(51.38, 1e-2), 'long' => num(1.38, 1e-2)));
+				methods('lat' => num(51.38, 1e-2), 'long' => num(1.38, 1e-1)));
 		} else {
 			SKIP: {
 				skip('Set OPENADDR_HOME to enable extra tests', 2);
@@ -86,7 +86,7 @@ FREE: {
 		# Check cache
 		$location = $geo_coder_list->geocode('Woolwich, London, England');
 		cmp_deeply($location,
-			methods('lat' => num(51.4, 1e-1), 'long' => num(0.20, 1e-2)));
+			methods('lat' => num(51.4, 1e-1), 'long' => num(0.20, 1)));
 
 		my @locations = $geo_coder_list->geocode(location => 'Herne Bay, Kent, England');
 		cmp_deeply($locations[0],

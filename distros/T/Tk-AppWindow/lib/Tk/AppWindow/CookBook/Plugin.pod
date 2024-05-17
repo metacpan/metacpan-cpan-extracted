@@ -14,12 +14,15 @@ Tk::AppWindow::CookBook::Plugin - Write your own plugin
 
 =head1 AN ABSTRACT PLUGIN
 
- package Tk::AppWindow::Plugins::Abstract;
+ package My::NameSpace::Plugins::Abstract;
  
  use strict;
  use warnings;
  
  use base qw( Tk::AppWindow::BaseClasses::Plugin );
+ #or
+ #use base qw( Tk::AppWindow::BaseClasses::PluginJobs );
+ use Tk::MyExtraOrdinaryWidget;
  
  #The description section of your pod is shown in the plugins dialog.
  
@@ -33,10 +36,15 @@ Tk::AppWindow::CookBook::Plugin - Write your own plugin
     my $class = shift;
     my $self = $class->SUPER::new(@_, 'RequiredExtension');
     return undef unless defined $self;
- 
+    
+    #Create your Tk stuff;
+    $self->{'widg'} = $self->ExtraOrdinaryWidget->pack;
+    
+    #hook to a command
     $self->cmdHookBefore('command1', 'Hook1', $self);
     $self->cmdHookAfter('command1', 'Hook2', $self);
 
+    #hook to a config variable
     $self->configHookBefore('-configvariable', 'Hook3', $self);
     $self->configHookAfter('-configvariable', 'Hook4', $self);
  
@@ -46,12 +54,35 @@ Tk::AppWindow::CookBook::Plugin - Write your own plugin
  sub Hook1 {
  	my $self = shift;
  	print "before command1\n"
+ 	
+ 	#sometimes you want to keep the parameters for use in Hook2
+ 	$self->{'safe_param'} = [@_];
+ 	
+ 	#when there is no parameter but you know it concerns a document
+ 	$self->{'safe_param'} = [$self->extGet('CoditMDI)->docSelected];
+ 	
+   #use passed on parameters
+   my ($first, $second) = @_;
+ 
+   #do your thing
+   
  	return @_
  }
  
  sub Hook2 {
  	my $self = shift;
  	print "after command1\n"
+   
+   #use passed on parameters
+   my ($first, $second) = @_;
+   
+   #if you have saved parameters 
+   my $param = $self->{'safe_param'};
+   delete $self->{'safe_param} #important!
+   my ($first, $second) = @$param;
+   
+   #do your thing
+
  	return @_
  }
  
@@ -73,7 +104,8 @@ Tk::AppWindow::CookBook::Plugin - Write your own plugin
     $self->cmdUnhookAfter('command1', 'Hook2', $self);
     $self->configUnhookBefore('configvariable', 'Hook3', $self);
     $self->configUnhookAfter('configvariable', 'Hook4', $self);
-    return 1
+    $self->{'widg'}->destroy;
+    return $self->SUPER::Unload;
  }
 
 =head1 AUTHOR
@@ -93,6 +125,7 @@ Hans Jeuken (hanje at cpan dot org)
 =back
 
 =cut
+
 
 
 

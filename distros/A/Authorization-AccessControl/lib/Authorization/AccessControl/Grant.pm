@@ -1,4 +1,4 @@
-package Authorization::AccessControl::Grant 0.01;
+package Authorization::AccessControl::Grant 0.03;
 use v5.26;
 use warnings;
 

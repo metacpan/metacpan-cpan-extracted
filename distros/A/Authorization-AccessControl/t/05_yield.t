@@ -33,4 +33,13 @@ acl->request->with_action('read')->with_resource('Post')->with_get_attrs(sub($ob
   ->denied(sub() {push($r->@*, 'd')});
 is($r, ['d'], 'yield with incorrect dynamic attributes');
 
+my $post = {id => 7, deleted_at => undef};
+ok(
+  !dies {
+    acl->request->with_resource('Post')->with_action('delete')->with_attributes({own => true})->yield(sub() {$post})
+      ->granted(sub($obj) {$obj->{deleted_at} = '2024-05-09T12:34:56'})
+  },
+  "ensure yielded value isn't getting marked read-only"
+);
+
 done_testing;

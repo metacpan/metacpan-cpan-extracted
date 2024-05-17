@@ -66,7 +66,8 @@ Adds $name to the document list.
 
 sub Add {
 	my ($self, $name) = @_;
-	$self->Subwidget('NAVTREE')->entryAdd($name);
+	my $t = $self->Subwidget('NAVTREE');
+	$t->entryAdd($name);
 }
 
 sub CreateDocumentList {
@@ -203,6 +204,7 @@ Unknown. If you find any, please contact the author.
 =cut
 
 1;
+
 
 
 

@@ -17,7 +17,7 @@ use Scalar::Util 'blessed';
 
 use parent 'Markdown::Perl::Options';
 
-our $VERSION = '1.04';  # Remember to also set the App::pmarkdown version.
+our $VERSION = '1.05';  # Remember to also set the App::pmarkdown version.
 
 our @EXPORT_OK = qw(convert set_options);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);

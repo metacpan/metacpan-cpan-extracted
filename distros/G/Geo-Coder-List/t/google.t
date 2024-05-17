@@ -51,7 +51,7 @@ GOOGLE: {
 			ok(ref($location) eq 'HASH');
 			delta_within($location->{geometry}{location}{lat}, 38.99, 1e-1);
 			delta_within($location->{geometry}{location}{lng}, -77.02, 1e-1);
-			is($location->{'geocoder'}, undef, 'Verify subsequent reads are cached');
+			is($location->{'geocoder'}, 'cache', 'Verify subsequent reads are cached');
 
 			# $location = $geocoderlist->geocode('Plugh Hospice, Rochester, Earth');
 			# ok(!defined($location));

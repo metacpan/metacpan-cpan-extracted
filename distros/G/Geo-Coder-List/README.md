@@ -68,7 +68,7 @@ and OpenStreetMap for other places:
     }
 
     # It is also possible to limit the number of enquires used by a particular encoder
-    $geo_coderlist->push({ geocoder => Geo::Coder::GooglePlaces->new(key => '1234'), limit => 100) });
+    $geo_coderlist->push({ geocoder => Geo::Coder::GooglePlaces->new(key => '1234', limit => 100) });
 
 ## geocode
 
@@ -153,6 +153,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2016-2023 Nigel Horne.
+Copyright 2016-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2

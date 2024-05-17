@@ -1,11 +1,25 @@
 Revision history for Perl extension Tk::AppWindow.
 
+0.03
+	- Countless small fixes and improvements.
+	- Removed the WebBrowser extension. What it tried to accomplish is done much easier and more elegant.
+	- Added openURL method to Tk::AppWindow
+	- Added -noplugins option to Plugins extension
+	- Option -plugins now exclusively loads specified plugins
+	- Added PluginJobs base class
+	- Added docFUllList, historyDisabled method to MDI extension
+	- Added extension Daemons and made MDI use it
+	- Removed dependencies for Tk::GtkSettings and Image::LibRSVG. They are now recommendations.
+
 0.02 Wed Feb 28 2024
 	- first version for cpan.
 	
 0.01  Sun Dec 19 23:09:57 2021
 	- original version; created by h2xs 1.23 with options
 		-X -n Tk::AppWindow
+
+
+
 
 
 

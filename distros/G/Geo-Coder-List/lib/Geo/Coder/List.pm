@@ -19,11 +19,11 @@ Geo::Coder::List - Call many Geo-Coders
 
 =head1 VERSION
 
-Version 0.32
+Version 0.33
 
 =cut
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 our %locations;	# L1 cache, always used
 
 =head1 SYNOPSIS
@@ -74,7 +74,7 @@ sub new {
 		return bless { %{$class}, %args }, ref($class);
 	}
 
-	return bless { debug => DEBUG, %args, geo_coders => [] }, $class;
+	return bless { debug => DEBUG, geo_coders => [], %args }, $class;
 }
 
 =head2 push
@@ -104,7 +104,7 @@ and OpenStreetMap for other places:
     }
 
     # It is also possible to limit the number of enquires used by a particular encoder
-    $geo_coderlist->push({ geocoder => Geo::Coder::GooglePlaces->new(key => '1234'), limit => 100) });
+    $geo_coderlist->push({ geocoder => Geo::Coder::GooglePlaces->new(key => '1234', limit => 100) });
 
 =cut
 
@@ -162,12 +162,12 @@ sub geocode {
 			$rc = $rc->[0];
 		}
 		if(ref($rc) eq 'HASH') {
-			delete $rc->{'geocoder'};
+			$rc->{'geocoder'} = 'cache';
 			my $log = {
 				line => $call_details[2],
 				location => $location,
 				timetaken => 0,
-				gecoder => 'cached',
+				gecoder => 'cache',
 				wantarray => 0,
 				result => $rc
 			};
@@ -183,20 +183,23 @@ sub geocode {
 				if(ref($_) eq 'HASH') {
 					if(defined($_->{geometry}{location}{lat})) {
 						$allempty = 0;
-						delete $_->{'geocoder'};
+						$_->{'geocoder'} = 'cache';
 					} else {
 						delete $_->{'geometry'};
 					}
 				} elsif(ref($_) eq 'Geo::Location::Point') {
 					$allempty = 0;
-					delete $_->{'geocoder'};
+					$_->{'geocoder'} = 'cache';
+				} else {
+					print STDERR Data::Dumper->new([\@rc])->Dump();
+					Carp::croak(ref($self), " '$location': unexpected item in the cache");
 				}
 			}
 			my $log = {
 				line => $call_details[2],
 				location => $location,
 				timetaken => 0,
-				gecoder => 'cached',
+				gecoder => 'cache',
 				wantarray => wantarray,
 				result => \@rc
 			};
@@ -209,7 +212,7 @@ sub geocode {
 		}
 	}
 
-	my $error;
+	# my $error;
 
 	ENCODER: foreach my $g(@{$self->{geocoders}}) {
 		my $geocoder = $g;
@@ -254,10 +257,24 @@ sub geocode {
 			};
 			CORE::push @{$self->{'log'}}, $log;
 			Carp::carp(ref($geocoder), " '$location': $@");
-			$error = $@;
+			# $error = $@;
 			next ENCODER;
 		}
 		$timetaken = Time::HiRes::time() - $timetaken;
+		if((ref($geocoder) eq 'Geo::Coder::US::Census') &&
+		   !(defined($rc[0]->{result}{addressMatches}[0]->{coordinates}{y}))) {
+		   	# Looks like Geo::Coder::US::Census sometimes says it's worked when it hasn't
+			my $log = {
+				line => $call_details[2],
+				location => $location,
+				timetaken => $timetaken,
+				geocoder => 'Geo::Coder::US::Census',
+				wantarray => wantarray,
+				result => 'not found',
+			};
+			CORE::push @{$self->{'log'}}, $log;
+			next ENCODER;
+		}
 		if((scalar(@rc) == 0) ||
 		   ((ref($rc[0]) eq 'HASH') && (scalar(keys %{$rc[0]}) == 0)) ||
 		   ((ref($rc[0]) eq 'ARRAY') && (scalar(keys %{$rc[0][0]}) == 0))) {
@@ -278,7 +295,7 @@ sub geocode {
 				# FIXME: should consider all locations in the array
 				$l = $l->[0];
 			}
-			if(!defined($l)) {
+			if((!defined($l)) || ($l eq '')) {
 				my $log = {
 					line => $call_details[2],
 					location => $location,
@@ -290,6 +307,7 @@ sub geocode {
 				CORE::push @{$self->{'log'}}, $log;
 				next ENCODER;
 			}
+			$l->{'geocoder'} = ref($geocoder);
 			print ref($geocoder), ': ',
 				Data::Dumper->new([\$l])->Dump() if($self->{'debug'} >= 2);
 			last if(ref($l) eq 'Geo::Location::Point');
@@ -315,18 +333,22 @@ sub geocode {
 						# ($lat, $long) = $l->{'lat', 'lon'};
 						$lat = $l->{lat};
 						$long = $l->{lon};
+						$l->{'debug'} = __LINE__;
 					} elsif($l->{BestLocation}) {
 						# Bing
 						$lat = $l->{BestLocation}->{Coordinates}->{Latitude};
 						$long = $l->{BestLocation}->{Coordinates}->{Longitude};
+						$l->{'debug'} = __LINE__;
 					} elsif($l->{point}) {
 						# Bing
 						$lat = $l->{point}->{coordinates}[0];
 						$long = $l->{point}->{coordinates}[1];
+						$l->{'debug'} = __LINE__;
 					} elsif($l->{latt}) {
 						# geocoder.ca
 						$lat = $l->{latt};
 						$long = $l->{longt};
+						$l->{'debug'} = __LINE__;
 					} elsif($l->{latitude}) {
 						# postcodes.io
 						# Geo::Coder::Free
@@ -335,38 +357,48 @@ sub geocode {
 						if(my $type = $l->{'local_type'}) {
 							$l->{'type'} = lcfirst($type);	# e.g. village
 						}
+						$l->{'debug'} = __LINE__;
 					} elsif($l->{'properties'}{'geoLatitude'}) {
 						# ovi
 						$lat = $l->{properties}{geoLatitude};
 						$long = $l->{properties}{geoLongitude};
+						$l->{'debug'} = __LINE__;
 					} elsif($l->{'results'}[0]->{'geometry'}) {
 						if($l->{'results'}[0]->{'geometry'}->{'location'}) {
 							# DataScienceToolkit
 							$lat = $l->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
 							$long = $l->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
+							$l->{'debug'} = __LINE__;
 						} else {
 							# OpenCage
 							$lat = $l->{'results'}[0]->{'geometry'}->{'lat'};
 							$long = $l->{'results'}[0]->{'geometry'}->{'lng'};
+							$l->{'debug'} = __LINE__;
 						}
 					} elsif($l->{'RESULTS'}) {
 						# GeoCodeFarm
 						$lat = $l->{'RESULTS'}[0]{'COORDINATES'}{'latitude'};
 						$long = $l->{'RESULTS'}[0]{'COORDINATES'}{'longitude'};
+						$l->{'debug'} = __LINE__;
 					} elsif(defined($l->{result}{addressMatches}[0]->{coordinates}{y})) {
 						# US Census
 						# This would have been nice, but it doesn't compile
 						# ($lat, $long) = $l->{result}{addressMatches}[0]->{coordinates}{y, x};
 						$lat = $l->{result}{addressMatches}[0]->{coordinates}{y};
 						$long = $l->{result}{addressMatches}[0]->{coordinates}{x};
+						$l->{'debug'} = __LINE__;
 					} elsif($l->{lat}) {
 						# Geo::GeoNames
 						$lat = $l->{lat};
 						$long = $l->{lng};
+						$l->{'debug'} = __LINE__;
 					} elsif($l->{features}) {
 						# Geo::Coder::Mapbox
 						$lat = $l->{features}[0]->{center}[1];
 						$long = $l->{features}[0]->{center}[0];
+						$l->{'debug'} = __LINE__;
+					} else {
+						$l->{'debug'} = __LINE__;
 					}
 
 					if(defined($lat) && defined($long)) {
@@ -402,8 +434,17 @@ sub geocode {
 
 		if(scalar(@rc)) {
 			print 'Number of matches from ', ref($geocoder), ': ', scalar(@rc), "\n" if($self->{'debug'});
+			$Data::Dumper::Maxdepth = 10;
 			print Data::Dumper->new([\@rc])->Dump() if($self->{'debug'} >= 2);
 			if(defined($rc[0])) {	# check it's not an empty hash
+				if(defined($rc[0]->{'long'}) && !defined($rc[0]->{'lng'})) {
+					$rc[0]->{'lng'} = $rc[0]->{'long'};
+				}
+				if((!defined($rc[0]->{lat})) || (!defined($rc[0]->{lng}))) {
+					# ::diag(Data::Dumper->new([\@rc])->Dump());
+					warn Data::Dumper->new([\@rc])->Dump();
+					Carp::croak("BUG: '$location': HASH exists but is not sensible");
+				}
 				if(wantarray) {
 					$self->_cache($location, \@rc);
 					return @rc;
@@ -765,7 +806,7 @@ L<https://metacpan.org/release/Geo-Coder-List>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2023 Nigel Horne.
+Copyright 2016-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

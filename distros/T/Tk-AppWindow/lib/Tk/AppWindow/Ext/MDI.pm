@@ -11,7 +11,7 @@ use warnings;
 use Carp;
 
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.03";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -21,6 +21,10 @@ use File::stat;
 use Time::localtime;
 require Tk::YAMessage;
 require Tk::YANoteBook;
+
+use Config;
+my $mswin = 0;
+$mswin = 1 if $Config{'osname'} eq 'MSWin32';
 
 =head1 SYNOPSIS
 
@@ -47,6 +51,8 @@ to open multiple documents at one time.
 You should define a content handler based on the abstract
 baseclass L<Tk::AppWindow::BaseClasses::ContentManager>. See also there.
 
+This extension will also load the extensions B<ConfigFolder> and B<Daemons>.
+
 =head1 CONFIG VARIABLES
 
 =over 4
@@ -61,6 +67,11 @@ This base class is a valid Tk widget.
 
 The possible options to pass on to the contentmanager.
 These will also become options to the main application.
+
+=item Switch: B<-diskmonitorinterval>
+
+Default value 100. This means every 100 cycles of the B<Daemons> extension. Specifies the interval for
+monitoring the disk status of documents. 
 
 =item Switch: B<-filetypes>
 
@@ -81,11 +92,10 @@ Default value 16
 
 Maximum size of the document tab in the document bar.
 
-=item Switch: B<-monitorinterval>
+=item Switch: B<-modifiedmonitorinterval>
 
-Default value 3 seconds. Specifies the interval for
-the monitor cycle. This cycle monitors loaded files
-for changes on disk and modified status.
+Default value 25. This means every 25 cycles of the B<Daemons> extension. Specifies the interval for
+monitoring the modified status of documents. 
 
 =item Switch: B<-readonly>
 
@@ -99,6 +109,11 @@ The following commands are defined.
 
 =over 4
 
+=item B<deferred_open>
+
+Takes a document name that is in deferred state as parameter and creates a new content handler for it.
+Returns a boolean indicating the succesfull load of its content.
+
 =item B<doc_close>
 
 Takes a document name as parameter and closes it.
@@ -107,15 +122,20 @@ Returns a boolean for succes or failure.
 
 =item B<doc_new>
 
-Takes a document name as parameter and creates a new content handler for it.
-If no parameter is specified and Untitled document is created.
+Takes a document name as parameter and creates a new document.
+If no parameter is specified an Untitled document is created.
 Returns a boolean for succes or failure.
 
 =item B<doc_open>
 
-Takes a filename name as parameter and opens it.
+Takes a filename as parameter and opens it in deferred state.
 If no parameter is specified a file dialog is issued.
 Returns a boolean for succes or failure.
+
+=item B<doc_rename>
+
+Takes two document names as parameters and renames the first one to
+the second one in the interface.
 
 =item B<doc_save>
 
@@ -155,13 +175,14 @@ sub new {
 	my $class = shift;
 	my $self = $class->SUPER::new(@_);
 
-	$self->Require( qw[ConfigFolder] );
+	$self->Require( qw[ConfigFolder Daemons] );
 
 	$self->{CMOPTIONS} = {};
 	$self->{DEFERRED} = {};
 	$self->{DOCS} = {};
 	$self->{FORCECLOSE} = 0;
 	$self->{HISTORY} = [];
+	$self->{HISTORYDISABLED} = 0;
 	$self->{INTERFACE} = undef;
 	$self->{MONITOR} = {};
 	$self->{SELECTDISABLED} = 0;
@@ -178,17 +199,20 @@ sub new {
 	$self->addPreConfig(@preconfig,
 		-contentmanagerclass => ['PASSIVE', undef, undef, 'Wx::Perl::FrameWorks::BaseClasses::ContentManager'],
 		-contentmanageroptions => ['PASSIVE', undef, undef, $cmo],
+		-diskmonitorinterval => ['PASSIVE', undef, undef, 100], #times 10 ms
 		-maxhistory => ['PASSIVE', undef, undef, 12],
 		-filetypes => ['PASSIVE', undef, undef, "All files|*"],
 		-historymenupath => ['PASSIVE', undef, undef, 'File::Open recent'],
 		-maxtablength => ['PASSIVE', undef, undef, 16],
-		-monitorinterval => ['PASSIVE', undef, undef, 3], #seconds
+		-modifiedmonitorinterval => ['PASSIVE', undef, undef, 25], #times 10 ms
 		-readonly => ['PASSIVE', undef, undef, 0],
 	);
 	$self->cmdConfig(
+		deferred_open => ['deferredOpen', $self],
 		doc_close => ['CmdDocClose', $self],
 		doc_new => ['CmdDocNew', $self],
 		doc_open => ['CmdDocOpen', $self],
+		doc_rename => ['docRename', $self],
 		doc_save => ['CmdDocSave', $self],
 		doc_save_as => ['CmdDocSaveAs', $self],
 		$self->CommandDocSaveAll,
@@ -231,6 +255,7 @@ sub CmdDocClose {
 	}
 	$self->log("Closed '$name'") if $close;
 	$self->logWarning("Failed closing '$name'") unless $close;
+	$close = $name if $close;
 	return $close
 }
 
@@ -242,32 +267,32 @@ sub CmdDocNew {
 	$self->interfaceAdd($name);
 
 	$self->cmdExecute('doc_select', $name);
-	return 1;
+	return $name;
 }
 
 sub CmdDocOpen {
 	my ($self, $file) = @_;
 	unless (defined($file)) {
 		my @op = ();
-		@op = (-popover => 'mainwindow') unless $self->OSName eq 'MSWin32';
+		@op = (-popover => 'mainwindow') unless $mswin;
 		my $sel = $self->docSelected;
 		push @op, -initialdir => dirname($sel) if defined $sel;
 		$file = $self->getOpenFile(@op);
 	}
 	if (defined $file) {
+		$file = File::Spec->rel2abs($file);
 		if ($self->docExists($file)) {
 			$self->cmdExecute('doc_select', $file);
-			return 1
+			return $file
 		}
-		my $file = File::Spec->rel2abs($file);
 		if ($self->cmdExecute('doc_new', $file)) {
 			$self->historyRemove($file);
 			$self->cmdExecute('doc_select', $file);
 			$self->log("Opened '$file'");
+			return $file;
 		}
-		return 1
 	}
- 	return 0
+ 	return ''
 }
 
 sub CmdDocSave {
@@ -282,9 +307,11 @@ sub CmdDocSave {
 	if (defined $doc) {
 		unless ($name =~ /^Untitled/) {
 			if ($doc->Save($name)) {
-				$self->log("Saved '$name'");
 				$self->monitorUpdate($name);
-				return 1
+				$self->log("Saved '$name'");
+				my $nav = $self->extGet('Navigator');
+				$nav->EntrySaved($name) if defined $nav; 
+				return $name
 			} else {
 				$self->logWarning("Failed saving '$name'");
 				return 0
@@ -306,21 +333,21 @@ sub CmdDocSaveAs {
 	my $doc = $self->docGet($name);
 	if (defined $doc) {
 		my @op = (-initialdir => dirname($name));
-		push @op, -popover => 'mainwindow' unless $self->OSName eq 'MSWin32';
+		push @op, -popover => 'mainwindow' unless $mswin;
 		my $file = $self->getSaveFile(@op,);
 		if (defined $file) {
 			$file = File::Spec->rel2abs($file);
 			if ($doc->Save($file)) {
 				$self->log("Saved '$file'");
-				$self->docRename($name, $file);
-				return 1
+				$self->cmdExecute('doc_rename', $name, $file);
+				return $file
 			} else {
 				$self->logWarning("Failed saving '$file'");
-				return 0
+				return ''
 			}
 		}
 	}
-	return 0
+	return ''
 }
 
 sub CmdDocSaveAll {
@@ -328,7 +355,7 @@ sub CmdDocSaveAll {
 	my @list = $self->docList;
 	my $succes = 1;
 	for (@list) {
-		$succes = 0 unless $self->cmdExecute('doc_save', $_)
+		$succes = '' unless $self->cmdExecute('doc_save', $_)
 	}
 	return $succes
 }
@@ -421,7 +448,7 @@ sub CreateInterface {
 	my $self = shift;
 	$self->{INTERFACE} = $self->WorkSpace->YANoteBook(
 		-selecttabcall => ['cmdExecute', $self, 'doc_select'],
-		-closetabcall => ['CmdDocClose', $self],
+		-closetabcall => ['cmdExecute', $self, 'doc_close'],
 	)->pack(-expand => 1, -fill => 'both');
 }
 
@@ -453,6 +480,18 @@ sub deferredExists {
 	return exists $self->{DEFERRED}->{$name}
 }
 
+=item B<deferredList>
+
+Returns a list of deferred documents.
+
+=cut
+
+sub deferredList {
+	my $self = shift;
+	my $d = $self->{DEFERRED};
+	return keys %$d
+}
+
 =item B<deferredOpen>I<($name)>
 
 This method is called when you access the document for the first time.
@@ -465,7 +504,7 @@ sub deferredOpen {
 	croak 'Name not defined' unless defined $name;
 	my $doc = $self->CreateContentHandler($name);
 	my $flag = 1;
-	$flag = 0 unless (-e $name) and ($doc->Load($name));
+	$flag = '' unless (-e $name) and ($doc->Load($name));
 	my $options = $self->deferredOptions($name);
 	$self->after(20, sub {
 		for (keys %$options) {
@@ -479,6 +518,7 @@ sub deferredOpen {
 	} else {
 		$self->logWarning("Failed loading $name");
 	}
+	$flag = $name if $flag;
 	return $flag
 }
 
@@ -522,7 +562,7 @@ sub docClose {
 	if ($self->deferredExists($name)) {
 		$self->historyAdd($name);
 		$self->deferredRemove($name);
-		return 1
+		return $name
 	}
 	my $doc = $self->docGet($name);
 	if ($doc->Close) {
@@ -537,7 +577,7 @@ sub docClose {
 			$self->docSelected(undef);
 		}
 		$doc->destroy;
-		return 1
+		return $name
 	}
 	return 0
 }
@@ -611,8 +651,20 @@ and always reset it back to 0 when you're done.
 
 sub docForceClose {
 	my $self = shift;
-	if (@_) { $self->{FORCECLOSE} = shift }
+	$self->{FORCECLOSE} = shift if @_;
 	return $self->{FORCECLOSE}
+}
+
+
+=item B<docFullList>
+
+Returns a list of all documents, loaded and deferred.
+
+=cut
+
+sub docFullList {
+	my $self = shift;
+	return $self->docList, $self->deferredList;
 }
 
 =item B<docGet>I<($name)>
@@ -624,7 +676,7 @@ Returns the content manager object for $name.
 sub docGet {
 	my ($self, $name) = @_;
 	croak 'Name not defined' unless defined $name;
-	$self->deferredOpen($name) if $self->deferredExists($name);
+	$self->cmdExecute('deferred_open', $name) if $self->deferredExists($name);
 	return $self->{DOCS}->{$name}
 }
 
@@ -638,6 +690,32 @@ sub docList {
 	my $self = shift;
 	my $dochash = $self->{DOCS};
 	return keys %$dochash;
+}
+
+=item B<docListDisplayed>
+
+Returns a list of documents currently visible in the tabs bar.
+
+=cut
+
+sub docListDisplayed {
+	my $self = shift;
+	my $interface = $self->extGet('CoditMDI')->Interface;
+	my $disp = $interface->{DISPLAYED};
+	return @$disp
+}
+
+=item B<docListUnDisplayed>
+
+Returns a list of documents currently not visible in the tabs bar.
+
+=cut
+
+sub docListUnDisplayed {
+	my $self = shift;
+	my $interface = $self->extGet('CoditMDI')->Interface;
+	my $undisp = $interface->{UNDISPLAYED};
+	return @$undisp
 }
 
 =item B<docModified>I<($name)>
@@ -688,7 +766,7 @@ sub docSelect {
 	my ($self, $name) = @_;
 	croak 'Name not defined' unless defined $name;
 	return if $self->selectDisabled;
-	$self->deferredOpen($name) if $self->deferredExists($name);
+	$self->cmdExecute('deferred_open', $name) if $self->deferredExists($name);
 	$self->docSelected($name);
 	$self->interfaceSelect($name);
 	$self->docGet($name)->doSelect;
@@ -741,7 +819,6 @@ sub docUntitled {
 sub DoPostConfig {
 	my $self = shift;
 	$self->CreateInterface;
-	$self->monitorCycleStart;
 }
 
 =item B<historyAdd>I<($name)>
@@ -751,6 +828,7 @@ sub DoPostConfig {
 sub historyAdd {
 	my ($self, $filename) = @_;
 	croak 'Name not defined' unless defined $filename;
+	return if $self->historyDisabled;
 	if (defined($filename) and (-e $filename)) {
 		my $hist = $self->{HISTORY};
 		unshift @$hist, $filename;
@@ -760,6 +838,17 @@ sub historyAdd {
 		pop @$hist if ($siz > $self->configGet('-maxhistory'));
 	}
 }
+
+=item B<historyDisabled>I<($name)>
+
+=cut
+
+sub historyDisabled {
+	my $self = shift;
+	$self->{HISTORYDISABLED} = shift if @_;
+	return $self->{HISTORYDISABLED}
+}
+	
 
 =item B<historyLoad>
 
@@ -794,6 +883,7 @@ opened.
 sub historyRemove {
 	my ($self, $file) = @_;
 	croak 'Name not defined' unless defined $file;
+	return if $self->historyDisabled;
 	my $h = $self->{HISTORY};
 	my ($index) = grep { $h->[$_] eq $file } (0 .. @$h-1);
 	splice @$h, $index, 1 if defined $index;
@@ -856,7 +946,34 @@ sub interfaceAdd {
 
 	#add to navigator
 	my $navigator = $self->extGet('Navigator');
-	$navigator->Add($name) if defined $navigator;
+	if (defined $navigator) {
+		$navigator->Add($name) if defined $navigator;
+		$self->interfaceCollapse;
+	}
+}
+
+=item B<interfaceCollapse>
+
+Collapses all folder trees in the document tree except the path of the selected entry, if extension Navigator is loaded.
+
+=cut
+
+sub interfaceCollapse {
+	my $self = shift;
+	my $t = $self->Subwidget('NAVTREE');
+	$t->collapseAll if defined $t;
+}
+
+=item B<interfaceExpand>
+
+Opens all folder trees in the document tree, if extension Navigator is loaded.
+
+=cut
+
+sub interfaceExpand {
+	my $self = shift;
+	my $t = $self->Subwidget('NAVTREE');
+	$t->expandAll if defined $t;
 }
 
 =item B<interfaceRemove>I<($name, ?$flag?)>
@@ -979,49 +1096,23 @@ if $name is an existing file.
 sub monitorAdd {
 	my ($self, $name) = @_;
 	croak 'Name not defined' unless defined $name;
+
+	my $dem = $self->extGet('Daemons');
+	my $di = $self->configGet('-diskmonitorinterval');
+	my $mi = $self->configGet('-modifiedmonitorinterval');
+
+	$dem->jobAdd("$name-disk", $di, 'monitorDisk', $self, $name);
+	$dem->jobAdd("$name-modified", $mi, 'monitorModified', $self, $name);
 	my $hash = $self->{MONITOR};
-#	print "adding $name, ";
 	my $modified = $self->docModified($name);
 	my $stamp;
 	$stamp = ctime(stat($name)->mtime) if -e $name;
-#	print "$modified, $stamp";
 	$hash->{$name} = {
 		modified => $modified,
 		timestamp => $stamp,
 	}
 }
 
-=item B<monitorCycle>
-
-This method is called every time the monitor interval times out.
-It will check all monitored files for changes on disk and checks
-if they should be marked ad modified or saved in the navigator.
-
-=cut
-
-sub monitorCycle {
-	my $self = shift;
-	my @list = $self->monitorList;
-	for (@list) {
-		my $name = $_;
-		$self->monitorDisk($name);
-		$self->monitorModified($name);
-	}
-	$self->monitorCycleStart;
-}
-
-=item B<monitorCycleStart>
-
-Starts the timer for B<monitorCycle>. The value of the
-timer is specified in the B<-monitorinterval> option.
-
-=cut
-
-sub monitorCycleStart {
-	my $self = shift;
-	my $interval = $self->configGet('-monitorinterval') * 1000;
-	$self->after($interval, ['monitorCycle', $self]);
-}
 
 =item B<monitorDisk>I<($name)>
 
@@ -1033,6 +1124,7 @@ Launches a dialog for reload or ignore if so.
 sub monitorDisk {
 	my ($self, $name) = @_;
 	croak 'Name not defined' unless defined $name;
+#	print "monitorDisk $name\n";
 	return unless -e $name;
 	my $stamp = $self->{MONITOR}->{$name}->{'timestamp'};
 	my $docstamp = ctime(stat($name)->mtime);
@@ -1070,6 +1162,7 @@ and updates the navigator.
 sub monitorModified {
 	my ($self, $name) = @_;
 	croak 'Name not defined' unless defined $name;
+#	print "monitorModified $name\n";
 	my $mod = $self->{MONITOR}->{$name}->{'modified'};
 	my $docmod = $self->docModified($name);
 	my $nav = $self->extGet('Navigator');
@@ -1092,6 +1185,9 @@ Removes $name from the hash of monitored documents.
 sub monitorRemove {
 	my ($self, $name) = @_;
 	croak 'Name not defined' unless defined $name;
+	my $dem = $self->extGet('Daemons');
+	$dem->jobRemove("$name-disk");
+	$dem->jobRemove("$name-modified");
 	delete $self->{MONITOR}->{$name};
 }
 
@@ -1134,7 +1230,7 @@ no document can be selected. Use with care.
 
 sub selectDisabled {
 	my $self = shift;
-	if (@_) { $self->{SELECTDISABLED} = shift }
+	$self->{SELECTDISABLED} = shift if @_;
 	return $self->{SELECTDISABLED}
 }
 
@@ -1206,6 +1302,21 @@ Unknown. If you find any, please contact the author.
 =cut
 
 1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

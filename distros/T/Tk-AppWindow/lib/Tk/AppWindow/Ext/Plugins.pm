@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.03";
 use Tk;
 use Pod::Usage;
 use File::Basename;
@@ -42,19 +42,16 @@ This extension will load the extension B<ConfigFolder> if it is not loaded alrea
 
 =over 4
 
-=item Switch: B<-availableplugs>
 
-If you set this list, only the specified plugins can be loaded by the 
-end user. If you do not set this option, there is no restriction to what
-plugins are available to the end user, except for blocked plugins.
+=item Switch: B<-noplugins>
 
-=item Switch: B<-blockedplugs>
-
-List of plugins that are blocked from the end user.
+Boolean flag, no plugins will be loaded at startup.  The list of plugins in the config file will
+be ignored if this option is set. Default value 0.
 
 =item Switch: B<-plugins>
 
-List of plugins that will be loaded at startup, factory settings.
+List of plugins that will be loaded at startup. The list of plugins in the config file will
+be ignored if this option is set.
 
 =back
 
@@ -76,9 +73,8 @@ sub new {
 	$self->{PLUGINS} = {};
 	$self->Require('ConfigFolder');
 	$self->addPreConfig(
-		-availableplugs => ['PASSIVE', undef, undef, undef],
-		-blockedplugs => ['PASSIVE', undef, undef, []],
-		-plugins => ['PASSIVE', undef, undef, []],
+		-noplugins => ['PASSIVE', undef, undef, 0],
+		-plugins => ['PASSIVE'],
 	);
 
 	$self->addPostConfig('DoPostConfig', $self);
@@ -100,29 +96,21 @@ sub new {
 sub AvailablePlugins {
 	my $self = shift;
 
-	my $ap = $self->configGet('-availableplugs');
-	return sort @$ap if defined $ap;
-	my $bp = $self->configGet('-blockedplugs');
-	my %blocked = ();
-	for ($bp) { $blocked{$_} = 1 }
+	my $space = $self->NameSpace;
+	unless (defined $space) {
+		croak "You must set the '-namespace' option";
+		return ();
+	}
 
-	my @namespaces = ( 'Tk::AppWindow' );
-	my $additional = $self->NameSpace;
-	push @namespaces, $additional if defined $additional;
-
-
+	$space =~ s/\:\:/\//;
 	my %plugins = ();
-	for (@namespaces) {
-		my $space = $_;
-		$space =~ s/\:\:/\//;
-		for (@INC) {
-			my $dir = "$_/$space/Plugins";
-			if ((-e $dir) and (-d $dir)) {
-				my @pm = <$dir/*.pm>;
-				for (@pm) {
-					my $plugin =  basename($_, '.pm');
-					$plugins{$plugin} = 1 unless exists $blocked{$plugin};
-				}
+	for (@INC) {
+		my $dir = "$_/$space/Plugins";
+		if ((-e $dir) and (-d $dir)) {
+			my @pm = <$dir/*.pm>;
+			for (@pm) {
+				my $plugin =  basename($_, '.pm');
+				$plugins{$plugin} = 1;
 			}
 		}
 	}
@@ -155,20 +143,23 @@ sub ConfigureBars {
 
 sub DoPostConfig {
 	my $self = shift;
-	my $file = $self->configGet('-configfolder') . '/plugins';
-	if (-e $file) {
-		if (open OFILE, "<", $file) {
-			while (<OFILE>) {
-				my $plug = $_;
-				chomp($plug);
-				$self->plugLoad($plug);
-			}
-			close OFILE;
-		}
-	} else {
-		my $plugins = $self->configGet('-plugins');
+	return if $self->configGet('-noplugins');
+	my $plugins = $self->configGet('-plugins');
+	if (defined $plugins) {
 		for (@$plugins) {
 			$self->plugLoad($_);
+		}
+	} else {
+		my $file = $self->configGet('-configfolder') . '/plugins';
+		if (-e $file) {
+			if (open OFILE, "<", $file) {
+				while (<OFILE>) {
+					my $plug = $_;
+					chomp($plug);
+					$self->plugLoad($plug);
+				}
+				close OFILE;
+			}
 		}
 	}
 }
@@ -362,10 +353,12 @@ sub ToolItems {
 sub Quit {
 	my $self = shift;
 	my @plugs = $self->plugList;
-	my $file = $self->configGet('-configfolder') . '/plugins';
-	if (open OFILE, ">", $file) {
-		for (@plugs) { print OFILE "$_\n" }
-		close OFILE;
+	unless ($self->configGet('-noplugins') or (defined $self->configGet('-plugins'))) {
+		my $file = $self->configGet('-configfolder') . '/plugins';
+		if (open OFILE, ">", $file) {
+			for (@plugs) { print OFILE "$_\n" }
+			close OFILE;
+		}
 	}
 	for (@plugs) {
 		$self->plugGet($_)->Quit
@@ -397,6 +390,9 @@ Unknown. Probably plenty. If you find any, please contact the author.
 =cut
 
 1;
+
+
+
 
 
 

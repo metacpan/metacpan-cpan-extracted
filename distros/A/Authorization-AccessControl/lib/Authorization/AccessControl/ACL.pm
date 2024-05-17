@@ -1,4 +1,4 @@
-package Authorization::AccessControl::ACL 0.01;
+package Authorization::AccessControl::ACL 0.03;
 use v5.26;
 use warnings;
 
@@ -37,7 +37,8 @@ sub hook($self, $type, $sub) {
 
 sub clone($self) {
   my $clone = __PACKAGE__->new();
-  push($clone->{_grants}->@*, $self->{_grants}->@*);
+  push($clone->{_grants}->@*,      $self->{_grants}->@*);
+  push($clone->{_hooks}->{$_}->@*, $self->{_hooks}->{$_}->@*) foreach (keys($self->{_hooks}->%*));
   return $clone;
 }
 
@@ -140,9 +141,9 @@ L<Authorization::AccessControl/acl>
 
   $acl->clone()
 
-Creates a new ACL instance pre-populated with the cloned object's grants. Once
-cloned, the two instances are entirely unrelated and changes to one will not be
-reflected in the other.
+Creates a new ACL instance pre-populated with the cloned object's grants and 
+hooks. Once cloned, the two instances are entirely unrelated and changes to one 
+will not be reflected in the other.
 
 N.B. contextual L<role|/role> is not taken into account when cloning:
 

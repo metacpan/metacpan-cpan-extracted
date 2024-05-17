@@ -23,8 +23,9 @@ if($ENV{AUTHOR_TESTING}) {
 my $test_requires = {
 	'Test::Deep' => 0,
 	'Test::Most' => 0,
-	'Test::Number::Delta' => 0,	# Always needed since used in free.t
+	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
+	'Test::Number::Delta' => 0,	# Always needed since used in free.t
 };
 
 if($online_tests) {

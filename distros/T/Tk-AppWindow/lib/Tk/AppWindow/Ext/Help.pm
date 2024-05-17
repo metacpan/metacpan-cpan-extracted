@@ -9,11 +9,12 @@ Tk::AppWindow::Ext::Help - about box and help facilities
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.03";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
 use Tk;
+use File::Basename;
 require Tk::YADialog;
 require Tk::NoteBook;
 require Tk::ROText;
@@ -51,7 +52,7 @@ Point to your help file.
 
 =item Switch: B<-helptype>
 
-Can be B<pod> or B<html>. Default value is B<pod>.
+Can be B<pod>, B<html> or B<pdf>. Default value is B<pod>.
 
 =back
 
@@ -77,7 +78,6 @@ sub new {
 	my $class = shift;
 	my $self = $class->SUPER::new(@_);
 
-	$self->Require('WebBrowser');
 	$self->addPreConfig(
 		-aboutinfo => ['PASSIVE', undef, undef, {
 			version => $VERSION,
@@ -86,8 +86,7 @@ sub new {
 			http => 'www.nowhere.com',
 			email => 'nobody@nowhere.com',
 		}],
-		-helptype => ['PASSIVE', undef, undef, 'pod'],
-		-helpfile => ['PASSIVE', undef, undef, Tk::findINC('Tk/AppWindow.pm')],
+		-helpfile => ['PASSIVE'],
 	);
 
 	$self->cmdConfig(
@@ -153,7 +152,7 @@ sub CmdAbout {
 		my $fg = $url->cget('-foreground');
 		$url->bind('<Enter>', sub { $url->configure(-foreground => 'blue') });
 		$url->bind('<Leave>', sub { $url->configure(-foreground => $fg) });
-		$url->bind('<Button-1>', sub { $self->cmdExecute('browser_open', $url->cget('-text')) });
+		$url->bind('<Button-1>', sub { $self->openURL($url->cget('-text')) });
 		$row ++;
 	}
 	if (exists $inf->{license}) {
@@ -166,12 +165,11 @@ sub CmdAbout {
 
 sub CmdHelp {
 	my $self = shift;
-	my $type = $self->configGet('-helptype');
 	my $file = $self->configGet('-helpfile');
-	if ($type eq 'pod') {
+	if ($file =~ /\.pod$/) { #is pod
 		my $w = $self->GetAppWindow;
 		my $db = $w->YADialog(
-			-buttons => ['Ok'],
+			-buttons => ['Close'],
 			-title => 'Help',
 		);
 		$db->configure(-command => sub { $db->destroy });
@@ -180,10 +178,8 @@ sub CmdHelp {
 			-scrollbars => 'oe',
 		)->pack(-expand => 1, -fill => 'both');
 		$db->Show(-popover => $w);
-	} elsif ($type eq 'html') {
-		$self->cmdExecute('browser_open', $file)
 	} else {
-		warn "Unknown help type: $type"
+		$self->openURL($file);
 	}
 }
 
@@ -230,5 +226,7 @@ Unknown. If you find any, please contact the author.
 
 
 1;
+
+
 
 

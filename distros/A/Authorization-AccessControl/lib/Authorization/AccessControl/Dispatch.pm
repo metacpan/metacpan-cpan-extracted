@@ -1,4 +1,4 @@
-package Authorization::AccessControl::Dispatch 0.01;
+package Authorization::AccessControl::Dispatch 0.03;
 use v5.26;
 use warnings;
 
@@ -16,12 +16,12 @@ sub new($class, %params) {
 
   die("Unsupported params: ", join(', ', keys(%params))) if (keys(%params));
 
-  Readonly::Scalar my $data => {
+  Readonly::Hash1 my %data => (
     _granted => $granted,
     _entity  => $entity,
-  };
+  );
 
-  bless($data, $class);
+  bless(\%data, $class);
 }
 
 sub granted($self, $sub) {

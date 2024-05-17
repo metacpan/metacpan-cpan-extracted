@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(check_angle check_array check_array_object
 	check_number_range check_regexp check_required check_string check_string_begin
 	check_strings);
 
-our $VERSION = 0.26;
+our $VERSION = 0.27;
 
 sub check_angle {
 	my ($self, $key) = @_;
@@ -542,7 +542,7 @@ Returns undef.
 
 I<Since version 0.17.>
 
-Check parameter defined by C<$key> via regular expression defined by c<$regexp>.
+Check parameter defined by C<$key> via regular expression defined by C<$regexp>.
 
 Put error if check isn't ok.
 
@@ -1569,6 +1569,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.26
+0.27
 
 =cut

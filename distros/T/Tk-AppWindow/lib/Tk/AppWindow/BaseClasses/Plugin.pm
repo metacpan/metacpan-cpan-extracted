@@ -9,7 +9,7 @@ Tk::AppWindow::BaseClasses::Plugin - Baseclass for all plugins.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.03";
 use vars '$AUTOLOAD';
 
 =head1 SYNOPSIS
@@ -18,7 +18,7 @@ use vars '$AUTOLOAD';
  my $plug = Tk::AppWindow::BaseClasses::Plugin->new($frame);
 
  #This is what you should do
- package Tk::AppWindow::Plugins::MyPlugin
+ package My::App::Path::Plugins::MyPlugin
  use base(Tk::AppWindow::BaseClasses::Plugin);
  sub new {
     my $class = shift;
@@ -168,6 +168,7 @@ Unknown. If you find any, please contact the author.
 
 1;
 __END__
+
 
 
 

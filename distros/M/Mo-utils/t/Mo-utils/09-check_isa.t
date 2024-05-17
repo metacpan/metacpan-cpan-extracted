@@ -9,7 +9,31 @@ use Test::More 'tests' => 8;
 use Test::NoWarnings;
 
 # Test.
+my $mock = Test::MockObject->new;
+$mock->fake_module('Foo',
+	'new' => sub { return bless {}, 'Foo'; },
+);
+my $foo = Foo->new;
 my $self = {
+	'key' => $foo,
+};
+my $ret = check_isa($self, 'key', 'Foo');
+is($ret, undef, 'Right object is present.');
+
+# Test.
+$self = {
+	'key' => undef,
+};
+$ret = check_isa($self, 'key', 'Foo');
+is($ret, undef, "Value is undefined, that's ok.");
+
+# Test.
+$self = {};
+$ret = check_isa($self, 'key', 'Foo');
+is($ret, undef, 'Right not exist key.');
+
+# Test.
+$self = {
 	'key' => 'foo',
 };
 eval {
@@ -66,7 +90,7 @@ is_deeply(
 clean();
 
 # Test.
-my $mock = Test::MockObject->new;
+$mock = Test::MockObject->new;
 $mock->fake_module('Bar',
 	'new' => sub { return bless $self, 'Bar'; },
 );
@@ -88,27 +112,3 @@ is_deeply(
 	"Parameter 'key' must be a 'Foo' object (is another object)."
 );
 clean();
-
-# Test.
-$mock = Test::MockObject->new;
-$mock->fake_module('Foo',
-	'new' => sub { return bless $self, 'Foo'; },
-);
-my $foo = Foo->new;
-$self = {
-	'key' => $foo,
-};
-my $ret = check_isa($self, 'key', 'Foo');
-is($ret, undef, 'Right object is present.');
-
-# Test.
-$self = {
-	'key' => undef,
-};
-$ret = check_isa($self, 'key', 'Foo');
-is($ret, undef, "Value is undefined, that's ok.");
-
-# Test.
-$self = {};
-$ret = check_isa($self, 'key', 'Foo');
-is($ret, undef, 'Right not exist key.');
