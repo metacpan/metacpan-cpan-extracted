@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2014, 2024 Kevin Ryde
 
 # This file is part of Glib-Ex-ObjectBits.
 #
@@ -28,7 +28,7 @@ use Exporter;
 our @ISA = ('Exporter');
 our @EXPORT_OK = qw(set_property_maybe);
 
-our $VERSION = 16;
+our $VERSION = 17;
 
 sub set_property_maybe {
   my $object = shift;
@@ -121,7 +121,7 @@ L<http://user42.tuxfamily.org/glib-ex-objectbits/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2014 Kevin Ryde
+Copyright 2010, 2011, 2012, 2014, 2024 Kevin Ryde
 
 Glib-Ex-ObjectBits is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

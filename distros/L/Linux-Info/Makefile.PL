@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Class::Accessor" => "0.51",
-    "Devel::CheckOS" => "2.01",
+    "Devel::CheckOS" => "2.02",
     "Filesys::Df" => "0.92",
     "Hash::Util" => 0,
     "POSIX" => "1.15",
@@ -34,6 +34,7 @@ my %WriteMakefileArgs = (
     "parent" => 0
   },
   "TEST_REQUIRES" => {
+    "Devel::CheckOS" => "2.02",
     "Exporter" => 0,
     "File::Temp" => 0,
     "Scalar::Util" => 0,
@@ -41,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => "0.35",
     "lib" => 0
   },
-  "VERSION" => "2.0",
+  "VERSION" => "2.01",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +52,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Class::Accessor" => "0.51",
-  "Devel::CheckOS" => "2.01",
+  "Devel::CheckOS" => "2.02",
   "Exporter" => 0,
   "File::Temp" => 0,
   "Filesys::Df" => "0.92",

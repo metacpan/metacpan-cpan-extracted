@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 Kevin Ryde
 
 # This file is part of Glib-Ex-ObjectBits.
 #
@@ -23,7 +23,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile
-  (NAME         => 'Glib-Ex-ObjectBits',
+  (NAME         => 'Glib::Ex::ObjectBits',
    ABSTRACT     => 'Helpers for Glib objects.',
    VERSION_FROM => 'lib/Glib/Ex/SignalIds.pm',
    AUTHOR       => 'Kevin Ryde <user42_kevin@yahoo.com.au>',
@@ -45,15 +45,15 @@ WriteMakefile
      { homepage => 'http://user42.tuxfamily.org/glib-ex-objectbits/index.html',
        license  => 'http://www.gnu.org/licenses/gpl.html',
      },
-     no_index => { directory=>['devel'] },
+     no_index => { directory=>['devel','xt'] },
 
-     optional_features =>
-     { maximum_tests =>
-       { description => 'Have "make test" do as much as possible.',
-         requires => {
-                      # 3.002 to traverse tied() obj
-                      'Test::Weaken' => '3.002',
-                     },
+     prereqs =>
+     { test =>
+       { suggests =>
+         {
+          # 3.002 to traverse tied() obj
+          'Test::Weaken' => '3.002',
+         },
        },
      },
    },
@@ -65,7 +65,7 @@ WriteMakefile
    #   'Glib::Ex::SignalIds',
    #   'Glib::Ex::SourceIds',
    #   'Glib::Ex::TieProperties',
-   # 
+   #
    #   # Pod::Coverage 0.21 knows SCALAR()
    #   # ,also_private=>[qr/^SCALAR$$/]
    # ],

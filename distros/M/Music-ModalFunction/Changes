@@ -1,7 +1,13 @@
 Revision history for Music-ModalFunction
 
-0.0409 2024-03-06 06:05:13
+0.0501 2024-05-17 22:45:32
+    - Add scales pivot tests.
+    - Improve documentation.
+
+0.0500 2024-05-17 15:49:58
     - Add the eg/common program.
+    - Add non-modal scale processing.
+    - Improve documentation.
 
 0.0408 2024-01-25 11:28:21
     - Improve documentation more!

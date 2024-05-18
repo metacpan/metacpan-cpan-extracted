@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Data::Compare" : "1.29",
             "File::Basename" : "2.85",
             "File::Path" : "2.18",
             "File::Spec" : "3.84",
@@ -62,6 +63,6 @@
          "web" : "https://github.com/haje61/Tk-AppWindow"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

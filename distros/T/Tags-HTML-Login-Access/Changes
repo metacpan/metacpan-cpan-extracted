@@ -1,3 +1,6 @@
+0.13 2024-05-18T09:39:23+02:00
+ - Update to Mo::utils::CSS@0.07.
+
 0.12 2024-05-09T15:26:24+02:00
  - Fix placing of username in label element.
 

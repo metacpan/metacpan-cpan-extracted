@@ -7,7 +7,7 @@ use warnings;
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use List::Util qw(none);
-use Mo::utils::CSS 0.06 qw(check_css_unit);
+use Mo::utils::CSS 0.07 qw(check_css_unit);
 use Mo::utils::Language 0.05 qw(check_language_639_2);
 use Readonly;
 use Tags::HTML::Messages;
@@ -15,7 +15,7 @@ use Tags::HTML::Messages;
 Readonly::Array our @FORM_METHODS => qw(post get);
 Readonly::Array our @TEXT_KEYS => qw(change_password old_password_label password1_label password2_label submit);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -352,10 +352,10 @@ Default value is undef.
 
 =item * C<text>
 
-Hash reference with keys defined language in ISO 639-3 code and value with hash
+Hash reference with keys defined language in ISO 639-2 code and value with hash
 reference with texts.
 
-Required keys are 'login', 'password_label', 'username_label' and 'submit'.
+Required keys are 'change_password', 'old_password_label', 'password1_label', 'password2_label' and 'submit'.
 
 Default value is:
 
@@ -423,9 +423,9 @@ Returns undef.
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
          From Mo::utils::CSS::check_css_unit():
-                 Parameter 'width' doesn't contain number.
+                 Parameter 'width' doesn't contain unit number.
                          Value: %s
-                 Parameter 'width' doesn't contain unit.
+                 Parameter 'width' doesn't contain unit name.
                          Value: %s
                  Parameter 'width' contain bad unit.
                          Unit: %s
@@ -661,6 +661,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

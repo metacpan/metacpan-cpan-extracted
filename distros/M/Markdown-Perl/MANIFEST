@@ -38,6 +38,7 @@ t/400-opt-multi_lines_setext_headings.t
 t/400-opt-render_naked_paragraphs.t
 t/400-opt-two_spaces_hard_line_breaks.t
 t/400-opt-use_fenced_code_blocks.t
+t/500-hooks-resolve_link_ref.t
 t/800-bugs.t
 t/801-fuzzing.t
 t/900-cmark-test-suite.t

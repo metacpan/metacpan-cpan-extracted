@@ -6,8 +6,8 @@ use warnings;
 use Error::Pure qw(err);
 use List::Util 1.33 qw(none);
 use Mo qw(build is);
-use Mo::utils qw(check_bool check_number);
-use Mo::utils::CSS qw(check_css_class);
+use Mo::utils 0.26 qw(check_bool check_number);
+use Mo::utils::CSS 0.02 qw(check_css_class);
 use Readonly;
 use Scalar::Util qw(looks_like_number);
 
@@ -16,7 +16,7 @@ Readonly::Array our @TYPES => qw(button checkbox color date datetime-local
 	submit tel text time url week);
 Readonly::Array our @STEP_TYPES => qw(date datetime-local month number range time week);
 
-our $VERSION = 0.15;
+our $VERSION = 0.16;
 
 has autofocus => (
 	is => 'ro',
@@ -591,6 +591,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.15
+0.16
 
 =cut

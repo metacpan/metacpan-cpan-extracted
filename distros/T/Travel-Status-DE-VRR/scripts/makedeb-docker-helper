@@ -8,8 +8,8 @@ export APT_LISTCHANGES_FRONTEND=none
 apt-get update
 apt-get -y install \
 	apt-file dh-make-perl libmodule-build-perl \
-	libclass-accessor-perl libexception-class-perl libfile-slurp-perl \
-	libwww-perl libxml-libxml-perl \
+	libclass-accessor-perl libdatetime-perl libexception-class-perl \
+	libfile-slurp-perl libwww-perl libxml-libxml-perl \
 	libtest-compile-perl libtest-pod-perl \
 	libtest-fatal-perl libtest-simple-perl
 

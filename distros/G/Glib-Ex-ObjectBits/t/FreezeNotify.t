@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011, 2012 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2024 Kevin Ryde
 
 # This file is part of Glib-Ex-ObjectBits.
 #
@@ -63,7 +63,7 @@ MyTestHelpers::glib_gtk_versions();
 
 # version number
 {
-  my $want_version = 16;
+  my $want_version = 17;
   is ($Glib::Ex::FreezeNotify::VERSION, $want_version,
       'VERSION variable');
   is (Glib::Ex::FreezeNotify->VERSION, $want_version,

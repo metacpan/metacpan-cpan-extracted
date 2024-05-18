@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2014 Kevin Ryde
 
 # This file is part of Glib-Ex-ObjectBits.
 #
@@ -24,6 +24,7 @@ use Test::More;
 BEGIN {
   eval { require Gtk2 }
     or plan skip_all => "due to Gtk2 not available -- $@";
+  Gtk2->disable_setlocale;  # leave LC_NUMERIC alone for version nums
   Gtk2->init_check
     or plan skip_all => 'due to no DISPLAY available';
 }

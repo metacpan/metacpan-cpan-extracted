@@ -4,33 +4,22 @@
       "Kevin Ryde <user42_kevin@yahoo.com.au>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.141170",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Glib-Ex-ObjectBits",
    "no_index" : {
       "directory" : [
          "t",
          "inc",
-         "devel"
+         "devel",
+         "xt"
       ]
-   },
-   "optional_features" : {
-      "maximum_tests" : {
-         "description" : "Have \"make test\" do as much as possible.",
-         "prereqs" : {
-            "runtime" : {
-               "requires" : {
-                  "Test::Weaken" : "3.002"
-               }
-            }
-         }
-      }
    },
    "prereqs" : {
       "build" : {
@@ -59,5 +48,6 @@
          "http://www.gnu.org/licenses/gpl.html"
       ]
    },
-   "version" : "16"
+   "version" : 17,
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

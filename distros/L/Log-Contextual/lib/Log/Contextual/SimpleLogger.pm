@@ -1,58 +1,57 @@
 package Log::Contextual::SimpleLogger;
-$Log::Contextual::SimpleLogger::VERSION = '0.008001';
-# ABSTRACT: Super simple logger made for playing with Log::Contextual
-
 use strict;
 use warnings;
 
+our $VERSION = '0.009000';
+
 {
-   for my $name (qw( trace debug info warn error fatal )) {
+  for my $name (qw( trace debug info warn error fatal )) {
 
-      no strict 'refs';
+    no strict 'refs';
 
-      *{$name} = sub {
-         my $self = shift;
+    *{$name} = sub {
+      my $self = shift;
 
-         $self->_log($name, @_)
-           if ($self->{$name});
-      };
+      $self->_log($name, @_)
+        if ($self->{$name});
+    };
 
-      *{"is_$name"} = sub {
-         my $self = shift;
-         return $self->{$name};
-      };
-   }
+    *{"is_$name"} = sub {
+      my $self = shift;
+      return $self->{$name};
+    };
+  }
 }
 
 sub new {
-   my ($class, $args) = @_;
-   my $self = bless {}, $class;
+  my ($class, $args) = @_;
+  my $self = bless {}, $class;
 
-   $self->{$_} = 1 for @{$args->{levels}};
-   $self->{coderef} = $args->{coderef} || sub { print STDERR @_ };
+  $self->{$_} = 1 for @{$args->{levels}};
+  $self->{coderef} = $args->{coderef} || sub { print STDERR @_ };
 
-   if (my $upto = $args->{levels_upto}) {
+  if (my $upto = $args->{levels_upto}) {
 
-      my @levels = (qw( trace debug info warn error fatal ));
-      my $i      = 0;
-      for (@levels) {
-         last if $upto eq $_;
-         $i++
-      }
-      for ($i .. $#levels) {
-         $self->{$levels[$_]} = 1
-      }
+    my @levels = (qw( trace debug info warn error fatal ));
+    my $i      = 0;
+    for (@levels) {
+      last if $upto eq $_;
+      $i++
+    }
+    for ($i .. $#levels) {
+      $self->{$levels[$_]} = 1
+    }
 
-   }
-   return $self;
+  }
+  return $self;
 }
 
 sub _log {
-   my $self    = shift;
-   my $level   = shift;
-   my $message = join("\n", @_);
-   $message .= "\n" unless $message =~ /\n$/;
-   $self->{coderef}->(sprintf("[%s] %s", $level, $message));
+  my $self    = shift;
+  my $level   = shift;
+  my $message = join("\n", @_);
+  $message .= "\n" unless $message =~ /\n$/;
+  $self->{coderef}->(sprintf("[%s] %s", $level, $message));
 }
 
 1;
@@ -63,13 +62,15 @@ __END__
 
 =encoding UTF-8
 
+=for :stopwords Arthur Axel "fREW" Schmidt
+
 =head1 NAME
 
 Log::Contextual::SimpleLogger - Super simple logger made for playing with Log::Contextual
 
 =head1 VERSION
 
-version 0.008001
+version 0.009000
 
 =head1 SYNOPSIS
 
@@ -115,7 +116,7 @@ or
 Creates a new SimpleLogger object with the passed levels enabled and optionally
 a C<CodeRef> may be passed to modify how the logs are output/stored.
 
-C<levels_upto> enables all the levels upto and including the level passed.
+C<levels_upto> enables all the levels up to and including the level passed.
 
 Levels may contain:
 
@@ -194,13 +195,22 @@ level is enabled.
 
  say q{fatal'ing} if $l->is_fatal;
 
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/haarg/Log-Contextual/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 =head1 AUTHOR
 
 Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

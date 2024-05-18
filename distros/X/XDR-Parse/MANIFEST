@@ -1,0 +1,13 @@
+bin/xdr-parse
+CHANGES
+cpanfile
+lib/XDR/Parse.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-parse.t
+t/data/01-parse.x
+xdr.yp
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

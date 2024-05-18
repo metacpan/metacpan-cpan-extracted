@@ -1,3 +1,6 @@
+0.03 2024-05-18T09:37:00+02:00
+ - Update to Mo::utils::CSS@0.07.
+
 0.02 2024-05-09T18:39:14+02:00
  - Add check for 'width' parameter if it's CSS unit.
  - Add constructor tests.

@@ -1,6 +1,7 @@
 package BaseLogger;
 
-use base 'Log::Contextual';
+use Log::Contextual ();
+BEGIN { our @ISA = qw(Log::Contextual); }
 use Log::Contextual::SimpleLogger;
 
 my $logger = DumbLogger2->new;

@@ -40,8 +40,8 @@ $self = {
 eval {
 	check_css_unit($self, 'key');
 };
-is($EVAL_ERROR, "Parameter 'key' doesn't contain number.\n",
-	"Parameter 'key' doesn't contain number.");
+is($EVAL_ERROR, "Parameter 'key' doesn't contain unit number.\n",
+	"Parameter 'key' doesn't contain unit number.");
 my $err_msg_hr = err_msg_hr();
 is($err_msg_hr->{'Value'}, 'foo', 'Test error parameter (Value: foo).');
 clean();
@@ -53,8 +53,8 @@ $self = {
 eval {
 	check_css_unit($self, 'key');
 };
-is($EVAL_ERROR, "Parameter 'key' doesn't contain unit.\n",
-	"Parameter 'key' doesn't contain unit.");
+is($EVAL_ERROR, "Parameter 'key' doesn't contain unit name.\n",
+	"Parameter 'key' doesn't contain unit name.");
 $err_msg_hr = err_msg_hr();
 is($err_msg_hr->{'Value'}, '123', 'Test error parameter (Value: 123).');
 clean();
@@ -80,8 +80,8 @@ $self = {
 eval {
 	check_css_unit($self, 'key');
 };
-is($EVAL_ERROR, "Parameter 'key' doesn't contain number.\n",
-	"Parameter 'key' doesn't contain number.");
+is($EVAL_ERROR, "Parameter 'key' doesn't contain unit number.\n",
+	"Parameter 'key' doesn't contain unit number (.em).");
 $err_msg_hr = err_msg_hr();
 is($err_msg_hr->{'Value'}, '.em', 'Test error parameter (Value: .em).');
 clean();

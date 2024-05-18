@@ -8,7 +8,7 @@ use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use List::Util 1.33 qw(none);
 use Mo::utils 0.01 qw(check_required);
-use Mo::utils::CSS 0.06 qw(check_css_class check_css_unit);
+use Mo::utils::CSS 0.07 qw(check_css_class check_css_unit);
 use Readonly;
 
 Readonly::Array our @HORIZ_ALIGN => qw(center left right);
@@ -21,7 +21,7 @@ Readonly::Hash our %VERT_CONV => (
 	'top' => 'flex-start',
 );
 
-our $VERSION = 0.08;
+our $VERSION = 0.10;
 
 sub new {
 	my ($class, @params) = @_;
@@ -298,16 +298,16 @@ Returns undef.
                  Parameter 'css_inner' has bad CSS class name (number on begin).
                          Value: %s
          From Mo::utils::CSS::check_css_unit():
-                 Parameter 'height' doesn't contain number.
+                 Parameter 'height' doesn't contain unit number.
                          Value: %s
-                 Parameter 'height' doesn't contain unit.
+                 Parameter 'height' doesn't contain unit name.
                          Value: %s
                  Parameter 'height' contain bad unit.
                          Unit: %s
                          Value: %s
-                 Parameter 'padding' doesn't contain number.
+                 Parameter 'padding' doesn't contain unit number.
                          Value: %s
-                 Parameter 'padding' doesn't contain unit.
+                 Parameter 'padding' doesn't contain unit name.
                          Value: %s
                  Parameter 'padding' contain bad unit.
                          Unit: %s
@@ -450,6 +450,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.10
 
 =cut

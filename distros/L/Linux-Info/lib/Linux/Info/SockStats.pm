@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '2.0'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 =head1 NAME
 

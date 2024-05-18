@@ -124,7 +124,7 @@ build:
 \tmkdir -p build
 
 \$(EXE_EXE): build/%\$(EXE_EXT): %
-\tpp -o \$@ -cd build/pp.cache -I lib -F "PodStrip=.*\\bMarkdown/Perl\\b(*COMMIT)(*FAIL)|.*" \$<
+\tpp -o \$@ -cd build/pp.cache -c -I lib -F "PodStrip=.*\\bMarkdown/Perl\\b(*COMMIT)(*FAIL)|.*" \$<
 
 MAKE_FRAGMENT
 

@@ -1,5 +1,12 @@
 Revision history for Log-Contextual
 
+0.009000  2024-05-15
+  - drop dependency on Exporter::Declare
+  - add the importing package as an argument when calling subclass methods
+    rather than expecting them to use caller
+  - various packaging tweaks and improvements
+  - Documentation fixes and formatting improvements
+
 0.008001  2018-01-19 09:14:55-08:00 America/Los_Angeles
  - Ensure new slog functions are exportable (Thanks Dan Book!)
 

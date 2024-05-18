@@ -22,6 +22,18 @@ Simple Perl script, which have two subroutines and there is error inside.
 Error output via L<Error::Pure> is to console and with ANSI colors.
 Output formatter is placed in L<Error::Pure::Output::ANSIColor/err_bt_pretty>.
 
+Environment set of output formatter
+
+ on bash
+ export ERROR_PURE_TYPE=ANSIColor::AllError
+
+ on tcsh
+ setenv ERROR_PURE_TYPE ANSIColor::AllError
+
+Alternative way is add formatter to code
+
+ $Error::Pure::TYPE = 'ANSIColor::AllError';
+
 Perl script
 
  #!/usr/bin/env perl
@@ -47,12 +59,12 @@ Perl script
          ;
  }
 
- first("Hellow world");
+ first("Hello world");
 
 Output to stderr
 
  ERROR: This is error
- Context: Hellow world
+ Context: Hello world
  main  err     /home/skim/data/gitprac/lang/perl/perl/MODULES/Error-Pure/ex19.pl  19
  main  second  /home/skim/data/gitprac/lang/perl/perl/MODULES/Error-Pure/ex19.pl  11
  main  first   /home/skim/data/gitprac/lang/perl/perl/MODULES/Error-Pure/ex19.pl  24
@@ -64,5 +76,93 @@ Output is in ANSI colors, you could look to image
 <a href="https://raw.githubusercontent.com/michal-josef-spacek/Error-Pure/master/images/basic_example.png">
   <img src="https://raw.githubusercontent.com/michal-josef-spacek/Error-Pure/master/images/basic_example.png" alt="Basic example" width="300px" height="300px" />
 </a>
+
+=end html
+
+=head1 Capture error
+
+The sama example as previous with capturing of error and print all information
+which we have. About fetching of information look to L<Error::Pure::Utils>.
+
+Perl script
+
+ #!/usr/bin/env perl
+
+ use strict;
+ use warnings;
+
+ use Data::Printer;
+ use English;
+ use Error::Pure qw(err);
+ use Error::Pure::Utils qw(err_get);
+
+ sub first {
+         my $text = shift;
+
+         second($text);
+
+         return;
+ }
+
+ sub second {
+         my $text = shift;
+
+         err 'This is error',
+                 'Context', $text,
+         ;
+ }
+
+ eval {
+         first("Hello world");
+ };
+ if ($EVAL_ERROR) {
+         print 'EVAL_ERROR: '.$EVAL_ERROR."\n";
+         my @errors = err_get();
+         p @errors;
+ }
+
+Output
+
+ EVAL_ERROR: This is error
+ 
+ [
+     [0] {
+             msg     [
+                 [0] "This is error",
+                 [1] "Context",
+                 [2] "Hello world"
+             ],
+             stack   [
+                 [0] {
+                         args    "('This is error', 'Context', 'Hello world')",
+                         class   "main",
+                         line    22,
+                         prog    "/home/skim/err.pl",
+                         sub     "err"
+                     },
+                 [1] {
+                         args    "('Hello world')",
+                         class   "main",
+                         line    14,
+                         prog    "/home/skim/err.pl",
+                         sub     "second"
+                     },
+                 [2] {
+                         args    "('Hello world')",
+                         class   "main",
+                         line    28,
+                         prog    "/home/skim/err.pl",
+                         sub     "first"
+                     },
+                 [3] {
+                         args    "",
+                         class   "main",
+                         line    27,
+                         prog    "/home/skim/err.pl",
+                         sub     "eval {...}"
+                     }
+             ]
+         }
+ ]
 
 =cut

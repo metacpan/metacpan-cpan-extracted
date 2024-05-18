@@ -4,8 +4,8 @@ Because `libarchive` contains a large number of functions (400+ as of this writi
 and because maintaining individual function bindings is tedious and error-prone;
 development for `Archive-Libarchive` uses code generation to generate bindings and
 documentation for most methods.  Only the methods that require Perl wrappers, or need
-type subtle type conversions are implemented manually.  Files that are generated
-automatically should have a comment indicating that they should not be updated directly.
+subtle type conversions are implemented manually.  Files that are generated automatically
+should have a comment indicating that they should not be updated directly.
 
 To keep things consistent and reliable, we maintain a reference build of the oldest
 and most recently supported versions of `libarchive` in a docker image. This means that

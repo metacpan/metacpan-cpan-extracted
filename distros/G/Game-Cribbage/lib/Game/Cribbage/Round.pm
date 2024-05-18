@@ -75,7 +75,7 @@ function end_hands => sub {
 		$self->score->$hand->{last} = $self->score->$hand->{current};
 		$self->score->$hand->{current} += $scored->{$hand};
 	}
-	$self->next_hands($game);
+	$self->next_hands($game, crib_player => $self->next_crib_player($game));
 };
 
 function add_player_card_by_index => sub {
@@ -137,6 +137,18 @@ function get_crib_player => sub {
 		}
 	}
 	return $player;
+};
+
+function next_crib_player => sub {
+	my ($self, $game) = @_;
+	my $current = $self->get_crib_player($game);
+	my $next;
+	if (scalar @{$game->players} == $current->number) {
+		$next = 'player1';
+	} else {
+		$next = 'player' . ($current->number + 1);
+	}
+	return $next;
 };
 
 function crib_player_id => sub {
@@ -236,7 +248,7 @@ function end_play => sub {
 	my ($self) = @_;
 	my $score = $self->current_hands->end_play();
 	if (ref $score && $score->score) {
-		my $hand = $score->player->player;
+		my $hand = ref $score->player ? $score->player->player : $score->player;
 		$self->score->$hand->{last} = $self->score->$hand->{current};
 		$self->score->$hand->{current} += $score->score;
 		push @{$self->current_hands->$hand->play_scored}, $score;

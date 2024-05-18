@@ -9,7 +9,7 @@ Tk::AppWindow::Baseclasses::SidePanel - Basic functionality for extensions assoc
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.03";
+$VERSION="0.04";
 use Tk;
 require Tk::YANoteBook;
 
@@ -90,7 +90,6 @@ sub addPage {
 	if (defined $balloon) {
 		my $l = $nb->getTab($name)->Subwidget('Label');
 		$balloon->Attach($l, -statusmsg => $statustext) if defined $statustext;
-		$balloon->Attach($l, -balloonmsg => $text) if defined $text;
 	}
 	$self->after(500, sub { $nb->UpdateTabs });
 

@@ -1,6 +1,6 @@
 # efa-m - Commandline Public Transit Departure Monitor
 
-efa-m is a commandline client and Perl module for EFA public transit departure
+**efa-m** is a commandline client and Perl module for EFA public transit departure
 interfaces such as [efa.vrr.de](https://efa.vrr.de/vrr/XSLT_DM_REQUEST). See
 the [Travel::Status::DE::VRR
 homepage](https://finalrewind.org/projects/Travel-Status-DE-VRR/) for details.

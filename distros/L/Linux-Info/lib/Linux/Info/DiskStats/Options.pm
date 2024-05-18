@@ -10,7 +10,7 @@ use Set::Tiny 0.04;
 
 use Linux::Info::KernelRelease;
 
-our $VERSION = '2.0'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 my @_attribs = (
     'init_file',            'source_file',

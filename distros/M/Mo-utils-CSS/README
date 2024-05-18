@@ -2,9 +2,10 @@ NAME
     Mo::utils::CSS - Mo CSS utilities.
 
 SYNOPSIS
-     use Mo::utils::CSS qw(check_array_css_color check_css_class check_css_color check_css_unit);
+     use Mo::utils::CSS qw(check_array_css_color check_css_border check_css_class check_css_color check_css_unit);
 
      check_array_css_color($self, $key);
+     check_css_border($self, $key);
      check_css_class($self, $key);
      check_css_color($self, $key);
      check_css_unit($self, $key);
@@ -20,6 +21,18 @@ SUBROUTINES
 
     Check parameter defined by $key which is reference to array. Check if
     all values are CSS colors.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_css_border"
+     check_css_border($self, $key);
+
+    *Since version 0.07.*
+
+    Check parameter defined by $key if it's CSS border. Value could be
+    undefined.
 
     Put error if check isn't ok.
 
@@ -52,7 +65,7 @@ SUBROUTINES
   "check_css_unit"
      check_css_unit($self, $key);
 
-    *Since version 0.01. Described functionality since version 0.04.*
+    *Since version 0.01. Described functionality since version 0.07.*
 
     Check parameter defined by $key if it's CSS unit. Value could be
     undefined.
@@ -73,6 +86,26 @@ ERRORS
                      Value: %s
                      Reference: %s
 
+     check_css_border()
+             Parameter '%s' contain bad unit.
+                     Unit: %s
+                     Value: %s
+             Parameter '%s' doesn't contain unit name.
+                     Value: %s
+             Parameter '%s' doesn't contain unit number.
+                     Value: %s
+             Parameter '%s' has bad rgb color (bad hex number).
+                     Value: %s
+             Parameter '%s' has bad rgb color (bad length).
+                     Value: %s
+             Parameter '%s' has bad color name.
+                     Value: %s
+             Parameter '%s' hasn't border style.
+                     Value: %s
+             Parameter '%s' must be a array.
+                     Value: %s
+                     Reference: %s
+
      check_css_class():
              Parameter '%s' has bad CSS class name.
                      Value: %s
@@ -88,12 +121,12 @@ ERRORS
                      Value: %s
 
      check_css_unit():
-             Parameter '%s' doesn't contain number.
-                     Value: %s
-             Parameter '%s' doesn't contain unit.
-                     Value: %s
              Parameter '%s' contain bad unit.
                      Unit: %s
+                     Value: %s
+             Parameter '%s' doesn't contain unit name.
+                     Value: %s
+             Parameter '%s' doesn't contain unit number.
                      Value: %s
 
 EXAMPLE1
@@ -142,6 +175,43 @@ EXAMPLE3
      use strict;
      use warnings;
 
+     use Mo::utils::CSS qw(check_css_border);
+
+     my $self = {
+             'key' => '1px solid red',
+     };
+     check_css_border($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE4
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::CSS qw(check_css_border);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'bad',
+     };
+     check_css_border($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' has bad border style.
+
+EXAMPLE5
+     use strict;
+     use warnings;
+
      use Mo::utils::CSS qw(check_css_class);
 
      my $self = {
@@ -155,7 +225,7 @@ EXAMPLE3
      # Output:
      # ok
 
-EXAMPLE4
+EXAMPLE6
      use strict;
      use warnings;
 
@@ -175,7 +245,7 @@ EXAMPLE4
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' has bad CSS class name (number of begin).
 
-EXAMPLE5
+EXAMPLE7
      use strict;
      use warnings;
 
@@ -192,7 +262,7 @@ EXAMPLE5
      # Output:
      # ok
 
-EXAMPLE6
+EXAMPLE8
      use strict;
      use warnings;
 
@@ -212,7 +282,7 @@ EXAMPLE6
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' has bad color name.
 
-EXAMPLE7
+EXAMPLE9
      use strict;
      use warnings;
 
@@ -229,7 +299,7 @@ EXAMPLE7
      # Output:
      # ok
 
-EXAMPLE8
+EXAMPLE10
      use strict;
      use warnings;
 
@@ -247,7 +317,7 @@ EXAMPLE8
      print "ok\n";
 
      # Output like:
-     # #Error [...utils.pm:?] Parameter 'key' doesn't contain unit.
+     # #Error [...utils.pm:?] Parameter 'key' doesn't contain unit name.
 
 DEPENDENCIES
     Error::Pure, Exporter, Graphics::ColorNames::CSS, List::Util, Mo::utils,
@@ -279,5 +349,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.08
 

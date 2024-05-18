@@ -1,0 +1,16 @@
+This archive contains the distribution XDR-Parse:
+
+   Transform textual XDR (eXternal Data Representation) specifications
+   into an AST (Abstract Syntax Tree)
+
+
+This software is copyrighted; see the LICENSE file.
+
+
+To install this module, run the following commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

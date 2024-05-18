@@ -4,7 +4,7 @@ use warnings;
 use Time::HiRes 1.9725;
 use constant NUMBER => qr/^-{0,1}\d+(?:\.\d+){0,1}\z/;
 
-our $VERSION = '2.0'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 =head1 NAME
 

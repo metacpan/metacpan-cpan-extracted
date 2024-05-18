@@ -1,6 +1,8 @@
 package Log::Contextual::Role::Router;
-$Log::Contextual::Role::Router::VERSION = '0.008001';
-# ABSTRACT: Abstract interface between loggers and logging code blocks
+use strict;
+use warnings;
+
+our $VERSION = '0.009000';
 
 use Moo::Role;
 
@@ -16,13 +18,15 @@ __END__
 
 =encoding UTF-8
 
+=for :stopwords Arthur Axel "fREW" Schmidt
+
 =head1 NAME
 
 Log::Contextual::Role::Router - Abstract interface between loggers and logging code blocks
 
 =head1 VERSION
 
-version 0.008001
+version 0.009000
 
 =head1 SYNOPSIS
 
@@ -179,8 +183,8 @@ This is the name of the log level associated with the log event.
 
 =item message_sub
 
-This is the message generating code block associated with the log event passed as a subref. If
-the logger accepts the log request the router should execute the subref to create
+This is the message generating code block associated with the log event passed as a code reference. If
+the logger accepts the log request the router should execute the code reference to create
 the log message and then pass the message as a string to the logger.
 
 =item message_args
@@ -193,13 +197,22 @@ as well.
 
 =back
 
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/haarg/Log-Contextual/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 =head1 AUTHOR
 
 Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

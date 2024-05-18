@@ -3,7 +3,7 @@
 
 requires "Carp" => "0";
 requires "Class::Accessor" => "0.51";
-requires "Devel::CheckOS" => "2.01";
+requires "Devel::CheckOS" => "2.02";
 requires "Filesys::Df" => "0.92";
 requires "Hash::Util" => "0";
 requires "POSIX" => "1.15";
@@ -16,6 +16,7 @@ requires "parent" => "0";
 requires "perl" => "5.008009";
 
 on 'test' => sub {
+  requires "Devel::CheckOS" => "2.02";
   requires "Exporter" => "0";
   requires "File::Temp" => "0";
   requires "Scalar::Util" => "0";

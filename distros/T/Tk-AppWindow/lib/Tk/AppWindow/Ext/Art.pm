@@ -10,7 +10,7 @@ Tk::AppWindow::Ext::Art - Use icon libraries quick & easy
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.03";
+$VERSION="0.05";
 use Config;
 my $mswin = 0;
 $mswin = 1 if $Config{'osname'} eq 'MSWin32';
@@ -58,9 +58,11 @@ if ($mswin) {
 	my $local = $ENV{HOME} . '/.local/share/icons';
 	push @defaulticonpath,  $local if -e $local;
 	my $xdgpath = $ENV{XDG_DATA_DIRS};
-	my @xdgdirs = split /\:/, $xdgpath;
-	for (@xdgdirs) {
-		push @defaulticonpath, $_
+	if (defined $xdgpath) {
+		my @xdgdirs = split /\:/, $xdgpath;
+		for (@xdgdirs) {
+			push @defaulticonpath, "$_/icons";
+		}
 	}
 }
 
@@ -547,7 +549,8 @@ sub DoPostConfig {
 	unless (exists $self->{THEMES}->{$theme}) {
 		for ($self->AvailableThemes) {
 			my $test = $self->{THEMES}->{$_};
-			if ($test->{'path'} =~ /$theme$/) {
+			my $path = $test->{'path'};
+			if ($path =~ /$theme$/) {
 				$theme = $_;
 				$self->configPut(-icontheme => $theme);
 				last;

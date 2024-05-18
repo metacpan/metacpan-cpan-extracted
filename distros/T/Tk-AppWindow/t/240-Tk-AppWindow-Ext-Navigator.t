@@ -19,6 +19,7 @@ createapp(
 	-extensions => [qw[Art Balloon MenuBar ToolBar StatusBar MDI Navigator]],
 	-configfolder => 't/settings',
 	-contentmanagerclass => 'TestTextManager',
+#	-icontheme => 'Bloom',
 );
 
 my $ext;

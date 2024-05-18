@@ -1,4 +1,4 @@
-# Copyright 2009, 2010, 2011, 2012, 2014 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2014, 2024 Kevin Ryde
 
 # This file is part of Glib-Ex-ObjectBits.
 #
@@ -27,7 +27,7 @@ our @EXPORT_OK = qw(accumulator_first
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-our $VERSION = 16;
+our $VERSION = 17;
 
 sub accumulator_first {
   my ($hint, $acc, $ret) = @_;
@@ -134,7 +134,7 @@ L<http://user42.tuxfamily.org/glib-ex-objectbits/index.html>
 
 =head1 LICENSE
 
-Copyright 2009, 2010, 2011, 2012, 2014 Kevin Ryde
+Copyright 2009, 2010, 2011, 2012, 2014, 2024 Kevin Ryde
 
 Glib-Ex-ObjectBits is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::Navigator - Navigate opened documents and files
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.04";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -72,7 +72,7 @@ sub Add {
 
 sub CreateDocumentList {
 	my $self = shift;
-	my $page = $self->extGet('NavigatorPanel')->addPage('Documents', 'document-open', 'Document list');
+	my $page = $self->extGet('NavigatorPanel')->addPage('Documents', 'document-open', undef, 'Document list');
 
 	my $dt = $page->DocumentTree(
 		-entryselect => ['SelectDocument', $self],

@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Array::Diff" : "0",
             "List::Util" : "0",
             "Rope" : "0.35",
             "ntheory" : "0",
@@ -45,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.05",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

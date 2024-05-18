@@ -3,12 +3,14 @@
   use Moose::Role;
 
   has "query" => (
-    is => "rw",
-    isa => "HashRef",
+    is            => "rw",
+    isa           => "HashRef",
     documentation => {
       encode_func => undef,
-      required => undef,
-      merge_hash_instead => 1,
+      required    => undef,
+
+      # This is nonsense:
+      #merge_hash_instead => 1,
     }
   );
 
@@ -16,11 +18,11 @@
     my $orig = shift;
     my $self = shift;
 
-    if(@_) {
+    if (@_) {
       $self->$orig(@_);
-      return($self);
+      return ($self);
     }
-    return($self->$orig);
+    return ( $self->$orig );
   };
 
-1;
+  1;

@@ -2,12 +2,14 @@
   package OpenSearch::Parameters::URL::version;
   use Moose::Role;
 
+  # Documents version number. Not the same as the Body version number which
+  # determins weather the response should contain the document version number and is bool
   has "version" => (
-    is => "rw",
-    isa => "Bool",
+    is            => "rw",
+    isa           => "Int",
     documentation => {
-      encode_func => "encode_bool",
-      required => undef,
+      encode_func => undef,
+      required    => undef,
     }
   );
 
@@ -15,11 +17,11 @@
     my $orig = shift;
     my $self = shift;
 
-    if(@_) {
+    if (@_) {
       $self->$orig(@_);
-      return($self);
+      return ($self);
     }
-    return($self->$orig);
+    return ( $self->$orig );
   };
 
-1;
+  1;

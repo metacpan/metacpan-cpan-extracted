@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Error::Pure::Utils::VERSION, 0.33, 'Version.');
+is($Error::Pure::Utils::VERSION, 0.34, 'Version.');

@@ -1,0 +1,251 @@
+NAME
+    Tags::HTML::DefinitionList - Tags helper for definition list.
+
+SYNOPSIS
+     use Tags::HTML::DefinitionList;
+
+     my $obj = Tags::HTML::DefinitionList->new(%params);
+     $obj->cleanup;
+     $obj->init($definition_list_ar);
+     $obj->prepare($definition_list_ar);
+     $obj->process;
+     $obj->process_css;
+
+METHODS
+  "new"
+     my $obj = Tags::HTML::DefinitionList->new(%params);
+
+    Constructor.
+
+    *       "border"
+
+            Border of definition list.
+
+            Default value is undef.
+
+    *       "color"
+
+            Definition key color.
+
+            Default value is 'black'.
+
+    *       "css"
+
+            'CSS::Struct::Output' object for process_css processing.
+
+            Default value is undef.
+
+    *       "css_class"
+
+            CSS class for main box.
+
+            Default value is 'dl'.
+
+    *       "dd_left_padding"
+
+            Left padding after term.
+
+            Default value is '110px'.
+
+    *       "dt_sep"
+
+            Definition term separator.
+
+            Default value is ':'.
+
+    *       "dt_width"
+
+            Definition term width.
+
+            Default value is '100px'.
+
+    *       "tags"
+
+            'Tags::Output' object.
+
+            Default value is undef.
+
+  "cleanup"
+     $obj->cleanup;
+
+    Cleanup Tags::HTML object for definition list.
+
+    Returns undef.
+
+  "init"
+     $obj->init($definition_list_ar);
+
+    Initialize Tags::HTML object (in page run) for definition list with
+    structure defined in $definition_list_ar variable. Variable is reference
+    to array with arrays, which contains key and value.
+
+    Returns undef.
+
+  "prepare"
+     $obj->prepare($definition_list_ar);
+
+    Prepare Tags::HTML object (in page preparation) for definition list with
+    structure defined in $definition_list_ar variable. Variable is reference
+    to array with arrays, which contains key and value.
+
+    Returns undef.
+
+  "process"
+     $obj->process;
+
+    Process Tags structure for defintion list.
+
+    Returns undef.
+
+  "process_css"
+     $obj->process_css;
+
+    Process CSS::Struct structure for output.
+
+    Returns undef.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+             From Mo::utils::CSS::check_css_border():
+                     Parameter 'border' contain bad unit.
+                             Unit: %s
+                             Value: %s
+                     Parameter 'border' doesn't contain unit name.
+                             Value: %s
+                     Parameter 'border' doesn't contain unit number.
+                             Value: %s
+                     Parameter 'border' has bad rgb color (bad hex number).
+                             Value: %s
+                     Parameter 'border' has bad rgb color (bad length).
+                             Value: %s
+                     Parameter 'border' has bad color name.
+                             Value: %s
+                     Parameter 'border' hasn't border style.
+                             Value: %s
+                     Parameter 'border' must be a array.
+                             Value: %s
+                             Reference: %s
+             From Mo::utils::CSS::check_css_class():
+                     Parameter 'css_class' has bad CSS class name.
+                             Value: %s
+                     Parameter 'css_class' has bad CSS class name (number on begin).
+                             Value: %s
+             From Mo::utils::CSS::check_css_unit():
+                     Parameter 'dd_left_padding' doesn't contain number.
+                             Value: %s
+                     Parameter 'dd_left_padding' doesn't contain unit.
+                             Value: %s
+                     Parameter 'dd_left_padding' contain bad unit.
+                             Unit: %s
+                             Value: %s
+                     Parameter 'dt_width' doesn't contain number.
+                             Value: %s
+                     Parameter 'dt_width' doesn't contain unit.
+                             Value: %s
+                     Parameter 'dt_width' contain bad unit.
+                             Unit: %s
+                             Value: %s
+             From Tags::HTML::new():
+                     Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+                     Parameter 'tags' must be a 'Tags::Output::*' class.
+
+     init():
+             Definition list must be a reference to array.
+
+     prepare():
+             Definition list must be a reference to array.
+
+     process():
+             From Tags::HTML::process():
+                     Parameter 'tags' isn't defined.
+
+     process_css():
+             From Tags::HTML::process_css():
+                     Parameter 'css' isn't defined.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Tags::HTML::DefinitionList;
+     use Tags::Output::Indent;
+
+     # Object.
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new;
+     my $obj = Tags::HTML::DefinitionList->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+
+     $obj->init([
+             ['cze' => 'Czech'],
+             ['eng' => 'English'],
+     ]);
+
+     # Process container with text.
+     $obj->process;
+     $obj->process_css;
+
+     # Print out.
+     print $tags->flush;
+     print "\n\n";
+     print $css->flush;
+
+     # Output:
+     # <dl class="dl">
+     #   <dt>
+     #     cze
+     #   </dt>
+     #   <dd>
+     #     Czech
+     #   </dd>
+     #   <dt>
+     #     eng
+     #   </dt>
+     #   <dd>
+     #     English
+     #   </dd>
+     # </dl>
+     # 
+     # .dl {
+     #         padding: 0.5em;
+     # }
+     # .dl dt {
+     #         float: left;
+     #         clear: left;
+     #         width: 100px;
+     #         text-align: right;
+     #         font-weight: bold;
+     #         color: black;
+     # }
+     # .dl dt:after {
+     #         content: ":";
+     # }
+     # .dl dd {
+     #         margin: 0 0 0 110px;
+     #         padding: 0 0 0.5em 0;
+     # }
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, Mo::utils::CSS, Tags::HTML,
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-HTML-DefinitionList>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023-2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

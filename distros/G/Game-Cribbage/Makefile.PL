@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
         'Rope' => '0.35',
 	'List::Util' => 0,
 	'ntheory' => 0,
+	'Array::Diff' => 0
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Game-Cribbage-*' },

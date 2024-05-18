@@ -1,43 +1,42 @@
 package Log::Contextual::TeeLogger;
-$Log::Contextual::TeeLogger::VERSION = '0.008001';
-# ABSTRACT: Output to more than one logger
-
 use strict;
 use warnings;
 
+our $VERSION = '0.009000';
+
 {
-   for my $name (qw( trace debug info warn error fatal )) {
+  for my $name (qw( trace debug info warn error fatal )) {
 
-      no strict 'refs';
+    no strict 'refs';
 
-      *{$name} = sub {
-         my $self = shift;
+    *{$name} = sub {
+      my $self = shift;
 
-         foreach my $logger (@{$self->{loggers}}) {
-            $logger->$name(@_);
-         }
-      };
+      foreach my $logger (@{$self->{loggers}}) {
+        $logger->$name(@_);
+      }
+    };
 
-      my $is_name = "is_${name}";
+    my $is_name = "is_${name}";
 
-      *{$is_name} = sub {
-         my $self = shift;
-         foreach my $logger (@{$self->{loggers}}) {
-            return 1 if $logger->$is_name(@_);
-         }
-         return 0;
-      };
-   }
+    *{$is_name} = sub {
+      my $self = shift;
+      foreach my $logger (@{$self->{loggers}}) {
+        return 1 if $logger->$is_name(@_);
+      }
+      return 0;
+    };
+  }
 }
 
 sub new {
-   my ($class, $args) = @_;
-   my $self = bless {}, $class;
+  my ($class, $args) = @_;
+  my $self = bless {}, $class;
 
-   ref($self->{loggers} = $args->{loggers}) eq 'ARRAY'
-     or die "No loggers passed to tee logger";
+  ref($self->{loggers} = $args->{loggers}) eq 'ARRAY'
+    or die "No loggers passed to tee logger";
 
-   return $self;
+  return $self;
 }
 
 1;
@@ -48,13 +47,15 @@ __END__
 
 =encoding UTF-8
 
+=for :stopwords Arthur Axel "fREW" Schmidt
+
 =head1 NAME
 
 Log::Contextual::TeeLogger - Output to more than one logger
 
 =head1 VERSION
 
-version 0.008001
+version 0.009000
 
 =head1 SYNOPSIS
 
@@ -175,13 +176,22 @@ level is enabled.
 
  say q{fatal'ing} if $l->is_fatal;
 
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/haarg/Log-Contextual/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 =head1 AUTHOR
 
 Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,12 @@
+liblinux-info-perl (2.01) trusty; urgency=low
+  * Bugfix/non ubuntu failure (#11)
+  * fix: useless verification
+  * fix: missing distro
+  * Attempt o enable multiple Linux distros
+  * refactor: shorter name 
+
+ -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Fri, 17 May 2024 15:47:56 +0000
+
 liblinux-info-perl () trusty; urgency=low
   * fix: typo (#9) 
   * Bugfix/diskstatus format (#8)

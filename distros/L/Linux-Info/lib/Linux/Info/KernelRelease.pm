@@ -4,7 +4,7 @@ use warnings;
 use Carp qw(confess carp);
 use parent 'Class::Accessor';
 
-our $VERSION = '2.0'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 my @_attribs = qw(raw mainline_version abi_bump flavour major minor patch);
 

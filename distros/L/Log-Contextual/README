@@ -2,7 +2,7 @@ NAME
     Log::Contextual - Simple logging interface with a contextual log
 
 VERSION
-    version 0.008001
+    version 0.009000
 
 SYNOPSIS
      use Log::Contextual qw( :log :dlog set_logger with_logger );
@@ -187,7 +187,7 @@ SETTING DEFAULT IMPORT OPTIONS
 
      package MyApp::Log::Contextual;
 
-     use base 'Log::Contextual';
+     use parent 'Log::Contextual';
 
      use Log::Log4perl ':easy';
      Log::Log4perl->easy_init($DEBUG)
@@ -279,7 +279,7 @@ FUNCTIONS
        @_
      }
 
-    Note that the function returns it's arguments. This can be used in a
+    Note that the function returns its arguments. This can be used in a
     number of ways, but often it's convenient just for partial inspection of
     passthrough data
 
@@ -553,21 +553,46 @@ EXCEPTIONS AND ERROR HANDLING
 
     "Log::Dispatchouli" implements "log_fatal" using "die" ( via Carp )
 
-CONTRIBUTORS
-    kentnl - Kent Fredric <kentfredric@gmail.com>
-
-    triddle - Tyler Riddle <t.riddle@shadowcat.co.uk>
-
-    voj - Jakob Voß <voss@gbv.de>
-
 DESIGNER
     mst - Matt S. Trout <mst@shadowcat.co.uk>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/haarg/Log-Contextual/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+CONTRIBUTORS
+    *   Christian Walde <walde.christian@gmail.com>
+
+    *   Dan Book <grinnz@grinnz.com>
+
+    *   Florian Schlichtin <fsfs@debian.org>
+
+    *   Graham Knop <haarg@haarg.org>
+
+    *   Jakob Voss <voss@gbv.de>
+
+    *   Karen Etheridge <ether@cpan.org>
+
+    *   Kent Fredric <kentfredric@gmail.com>
+
+    *   Matt S Trout <mst@shadowcat.co.uk>
+
+    *   Peter Rabbitson <ribasushi@cpan.org>
+
+    *   Philippe Bruhat (BooK) <book@cpan.org>
+
+    *   Tyler Riddle <t.riddle@shadowcat.co.uk>
+
+    *   Wes Malone <wes@mitsi.com>
 
 AUTHOR
     Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
+    This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

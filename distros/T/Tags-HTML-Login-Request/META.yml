@@ -31,7 +31,7 @@ requires:
   Class::Utils: 0
   Error::Pure: 0
   List::Util: 1.33
-  Mo::utils::CSS: 0.06
+  Mo::utils::CSS: 0.07
   Mo::utils::Language: 0.05
   Readonly: 0
   Tags::HTML: 0
@@ -42,4 +42,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-Login-Request
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-Login-Request
-version: '0.02'
+version: '0.03'

@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::Help - about box and help facilities
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.03";
+$VERSION="0.04";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -166,20 +166,22 @@ sub CmdAbout {
 sub CmdHelp {
 	my $self = shift;
 	my $file = $self->configGet('-helpfile');
-	if ($file =~ /\.pod$/) { #is pod
-		my $w = $self->GetAppWindow;
-		my $db = $w->YADialog(
-			-buttons => ['Close'],
-			-title => 'Help',
-		);
-		$db->configure(-command => sub { $db->destroy });
-		my $pod = $db->PodText( 
-			-file => $file,
-			-scrollbars => 'oe',
-		)->pack(-expand => 1, -fill => 'both');
-		$db->Show(-popover => $w);
-	} else {
-		$self->openURL($file);
+	if (defined $file) {
+		if ($file =~ /\.pod$/) { #is pod
+			my $w = $self->GetAppWindow;
+			my $db = $w->YADialog(
+				-buttons => ['Close'],
+				-title => 'Help',
+			);
+			$db->configure(-command => sub { $db->destroy });
+			my $pod = $db->PodText( 
+				-file => $file,
+				-scrollbars => 'oe',
+			)->pack(-expand => 1, -fill => 'both');
+			$db->Show(-popover => $w);
+		} else {
+			$self->openURL($file);
+		}
 	}
 }
 

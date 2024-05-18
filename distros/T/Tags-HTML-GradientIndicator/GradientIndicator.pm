@@ -5,9 +5,9 @@ use warnings;
 
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
-use Mo::utils::CSS qw(check_css_unit);
+use Mo::utils::CSS 0.07 qw(check_css_unit);
 
-our $VERSION = 0.03;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -188,16 +188,16 @@ Returns undef.
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
          From Mo::utils::CSS::check_css_unit():
-                 Parameter 'height' doesn't contain number.
+                 Parameter 'height' doesn't contain unit number.
                          Value: %s
-                 Parameter 'height' doesn't contain unit.
+                 Parameter 'height' doesn't contain unit name.
                          Value: %s
                  Parameter 'height' contain bad unit.
                          Unit: %s
                          Value: %s
-                 Parameter 'width' doesn't contain number.
+                 Parameter 'width' doesn't contain unit number.
                          Value: %s
-                 Parameter 'width' doesn't contain unit.
+                 Parameter 'width' doesn't contain unit name.
                          Value: %s
                  Parameter 'width' contain bad unit.
                          Unit: %s
@@ -331,6 +331,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.05
 
 =cut

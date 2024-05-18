@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2024 Kevin Ryde
 
 # This file is part of Glib-Ex-ObjectBits.
 #
@@ -29,7 +29,7 @@ BEGIN { MyTestHelpers::nowarnings() }
 use Glib::Ex::ObjectBits 'set_property_maybe';
 
 {
-  my $want_version = 16;
+  my $want_version = 17;
   is ($Glib::Ex::ObjectBits::VERSION, $want_version, 'VERSION variable');
   is (Glib::Ex::ObjectBits->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Glib::Ex::ObjectBits->VERSION($want_version); 1 },

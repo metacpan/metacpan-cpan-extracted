@@ -1,5 +1,5 @@
 {#hide from metacpan
-	package Job;
+	package BackgroundJob;
 	
 	use strict;
 	use warnings;
@@ -48,7 +48,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.03";
+$VERSION="0.04";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -164,7 +164,7 @@ sub jobAdd {
 		return
 	}
 	
-	my $new = new Job($interval, @call);
+	my $new = new BackgroundJob($interval, @call);
 	my $jobs = $self->_jobs;
 	if (exists $jobs->{$name}) {
 		croak "Job $name already exists";

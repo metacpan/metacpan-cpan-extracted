@@ -1,5 +1,8 @@
 Revision history for Music-Chord-Progression-Transform
 
+0.0304 2024-05-17 21:25:09
+    - Improve the eg/transform* programs.
+
 0.0303 2023-02-15 18:11:22
     - Clean-up tests.
     - Improve documentation a bit.

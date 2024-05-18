@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Inspect musical modal functions
 
-our $VERSION = '0.0409';
+our $VERSION = '0.0501';
 
 use strictures 2;
 use AI::Prolog ();
@@ -20,6 +20,12 @@ has [qw(chord_note chord mode_note mode mode_function mode_roman key_note key ke
 );
 
 has verbose => (
+    is      => 'ro',
+    isa     => sub { croak "$_[0] is not a boolean" unless $_[0] =~ /^[01]$/ },
+    default => sub { 0 },
+);
+
+has use_scales => (
     is      => 'ro',
     isa     => sub { croak "$_[0] is not a boolean" unless $_[0] =~ /^[01]$/ },
     default => sub { 0 },
@@ -58,7 +64,7 @@ sub _build__modes {
             { chord => 'maj', roman => 'r_IV',  function => 'subdominant' },
             { chord => 'maj', roman => 'r_V',   function => 'dominant' },
             { chord => 'min', roman => 'r_vi',  function => 'submediant' },
-            { chord => 'dim', roman => 'r_vii', function => 'leading_tone' }
+            { chord => 'dim', roman => 'r_vii', function => 'leading_tone' },
         ],
         dorian => [
             { chord => 'min', roman => 'r_i',   function => 'tonic' },
@@ -67,7 +73,7 @@ sub _build__modes {
             { chord => 'maj', roman => 'r_IV',  function => 'subdominant' },
             { chord => 'min', roman => 'r_v',   function => 'dominant' },
             { chord => 'dim', roman => 'r_vi',  function => 'submediant' },
-            { chord => 'maj', roman => 'r_VII', function => 'subtonic' }
+            { chord => 'maj', roman => 'r_VII', function => 'subtonic' },
         ],
         phrygian => [
             { chord => 'min', roman => 'r_i',   function => 'tonic' },
@@ -76,7 +82,7 @@ sub _build__modes {
             { chord => 'min', roman => 'r_iv',  function => 'subdominant' },
             { chord => 'dim', roman => 'r_v',   function => 'dominant' },
             { chord => 'maj', roman => 'r_VI',  function => 'submediant' },
-            { chord => 'min', roman => 'r_vii', function => 'subtonic' }
+            { chord => 'min', roman => 'r_vii', function => 'subtonic' },
         ],
         lydian => [
             { chord => 'maj', roman => 'r_I',   function => 'tonic' },
@@ -85,7 +91,7 @@ sub _build__modes {
             { chord => 'dim', roman => 'r_iv',  function => 'subdominant' },
             { chord => 'maj', roman => 'r_V',   function => 'dominant' },
             { chord => 'min', roman => 'r_vi',  function => 'submediant' },
-            { chord => 'min', roman => 'r_vii', function => 'leading_tone' }
+            { chord => 'min', roman => 'r_vii', function => 'leading_tone' },
         ],
         mixolydian => [
             { chord => 'maj', roman => 'r_I',   function => 'tonic' },
@@ -94,7 +100,7 @@ sub _build__modes {
             { chord => 'maj', roman => 'r_IV',  function => 'subdominant' },
             { chord => 'min', roman => 'r_v',   function => 'dominant' },
             { chord => 'min', roman => 'r_vi',  function => 'submediant' },
-            { chord => 'maj', roman => 'r_VII', function => 'subtonic' }
+            { chord => 'maj', roman => 'r_VII', function => 'subtonic' },
         ],
         aeolian => [
             { chord => 'min', roman => 'r_i',   function => 'tonic' },
@@ -103,7 +109,7 @@ sub _build__modes {
             { chord => 'min', roman => 'r_iv',  function => 'subdominant' },
             { chord => 'min', roman => 'r_v',   function => 'dominant' },
             { chord => 'maj', roman => 'r_VI',  function => 'submediant' },
-            { chord => 'maj', roman => 'r_VII', function => 'subtonic' }
+            { chord => 'maj', roman => 'r_VII', function => 'subtonic' },
         ],
         locrian => [
             { chord => 'dim', roman => 'r_i',   function => 'tonic' },
@@ -112,8 +118,74 @@ sub _build__modes {
             { chord => 'min', roman => 'r_iv',  function => 'subdominant' },
             { chord => 'maj', roman => 'r_V',   function => 'dominant' },
             { chord => 'maj', roman => 'r_VI',  function => 'submediant' },
-            { chord => 'min', roman => 'r_vii', function => 'subtonic' }
-        ]
+            { chord => 'min', roman => 'r_vii', function => 'subtonic' },
+        ],
+    }
+}
+
+has _scales => (
+    is => 'lazy',
+);
+sub _build__scales {
+    return {
+        harmonic_minor => [
+            { chord => 'min', roman => 'r_i',   function => 'tonic' },
+            { chord => 'dim', roman => 'r_ii',  function => 'supertonic' },
+            { chord => 'aug', roman => 'r_III', function => 'mediant' },
+            { chord => 'min', roman => 'r_iv',  function => 'subdominant' },
+            { chord => 'maj', roman => 'r_V',   function => 'dominant' },
+            { chord => 'maj', roman => 'r_VI',  function => 'submediant' },
+            { chord => 'dim', roman => 'r_vii', function => 'subtonic' },
+        ],
+        melodic_minor => [
+            { chord => 'min', roman => 'r_i',   function => 'tonic' },
+            { chord => 'min', roman => 'r_ii',  function => 'supertonic' },
+            { chord => 'aug', roman => 'r_III', function => 'mediant' },
+            { chord => 'maj', roman => 'r_IV',  function => 'subdominant' },
+            { chord => 'maj', roman => 'r_V',   function => 'dominant' },
+            { chord => 'dim', roman => 'r_vi',  function => 'submediant' },
+            { chord => 'dim', roman => 'r_vii', function => 'subtonic' },
+        ],
+        pentatonic => [
+            { chord => 'maj', roman => 'r_I',   function => 'tonic' },
+            { chord => 'min', roman => 'r_ii',  function => 'supertonic' },
+            { chord => 'min', roman => 'r_iii', function => 'mediant' },
+            { chord => 'maj', roman => 'r_IV',  function => 'subdominant' },
+            { chord => 'min', roman => 'r_vi',  function => 'submediant' },
+        ],
+        pentatonic_minor => [
+            { chord => 'min', roman => 'r_i',   function => 'tonic' },
+            { chord => 'dim', roman => 'r_ii',  function => 'supertonic' },
+            { chord => 'min', roman => 'r_iv',  function => 'subdominant' },
+            { chord => 'min', roman => 'r_v',   function => 'dominant' },
+            { chord => 'maj', roman => 'r_VI',  function => 'submediant' },
+        ],
+        blues => [
+            { chord => 'min',  roman => 'r_i',   function => 'tonic' },
+            { chord => 'maj',  roman => 'r_III', function => 'supertonic' },
+            { chord => 'sus4', roman => 'r_IV',  function => 'subdominant' },
+            { chord => 'maj',  roman => 'r_bV',  function => 'flat5' },
+            { chord => 'min',  roman => 'r_v',   function => 'dominant' },
+            { chord => 'sus4', roman => 'r_VII', function => 'leading_tone' },
+        ],
+        diminished => [
+            { chord => 'maj', roman => 'r_I',    function => 'tonic' },
+            { chord => 'dim', roman => 'r_bII',  function => 'flat2' },
+            { chord => 'maj', roman => 'r_bIII', function => 'flat3' },
+            { chord => 'dim', roman => 'r_iii',  function => 'mediant' },
+            { chord => 'maj', roman => 'r_bV',   function => 'flat5' },
+            { chord => 'dim', roman => 'r_v',    function => 'dominant' },
+            { chord => 'maj', roman => 'r_VI',   function => 'submediant' },
+            { chord => 'dim', roman => 'r_vii',  function => 'leading_tone' },
+        ],
+        augmented => [
+            { chord => 'aug', roman => 'r_I',    function => 'tonic' },
+            { chord => 'aug', roman => 'r_bIII', function => 'flat3' },
+            { chord => 'maj', roman => 'r_III',  function => 'mediant' },
+            { chord => 'maj', roman => 'r_V',    function => 'dominant' },
+            { chord => 'maj', roman => 'r_VI',   function => 'submediant' },
+            { chord => 'aug', roman => 'r_VII',  function => 'leading_tone' },
+        ],
     }
 }
 
@@ -127,15 +199,17 @@ sub _build__database {
     my @chromatic = get_scale_notes('c', 'chromatic', 0, 'b');
     my $database = '';
 
+    my $list = $self->use_scales ? $self->_scales : $self->_modes;
+
     # build a prolog fact for each base note
     for my $base (@chromatic) {
         my ($mode_base) = map { lc } midi_format($base);
 
-        # consider each mode's properties
-        for my $mode (sort keys %{ $self->_modes }) {
-            # get the 7 notes of the base note mode
-            my @notes = get_scale_notes($base, $mode);
-            warn "Basics: $base $mode [@notes]\n" if $self->verbose;
+        # consider each mode or scale properties
+        for my $j (sort keys %$list) {
+            # get the notes of the base note mode or scale
+            my @notes = get_scale_notes($base, $j);
+#            warn "Basics: $base $j [@notes]\n" if $self->verbose;
 
             my @pitches; # notes suitable for the prolog database
 
@@ -146,16 +220,25 @@ sub _build__database {
                 push @pitches, map { lc } midi_format($n->format('isobase'));
             }
 
-            my $i = 0; # increment for each of 7 diatonic modes
+            my $i = 0; # increment for each diatonic modes or scales
 
             for my $pitch (@pitches) {
-                # get the properties of the given mode
-                my $chord    = $self->_modes->{$mode}[$i]{chord};
-                my $function = $self->_modes->{$mode}[$i]{function};
-                my $roman    = $self->_modes->{$mode}[$i]{roman};
+                # get the properties of the given mode or scale
+                my ($chord, $function, $roman);
+                if ($self->use_scales) {
+                    $chord    = $self->_scales->{$j}[$i]{chord};
+                    $function = $self->_scales->{$j}[$i]{function};
+                    $roman    = $self->_scales->{$j}[$i]{roman};
+                }
+                else {
+                    $chord    = $self->_modes->{$j}[$i]{chord};
+                    $function = $self->_modes->{$j}[$i]{function};
+                    $roman    = $self->_modes->{$j}[$i]{roman};
+                }
 
                 # append to the database of facts
-                $database .= "chord_key($pitch, $chord, $mode_base, $mode, $function, $roman).\n";
+                $database .= "chord_key($pitch, $chord, $mode_base, $j, $function, $roman).\n"
+                    if $chord && $function && $roman;
 
                 $i++;
             }
@@ -163,7 +246,6 @@ sub _build__database {
     }
     # append the prolog rules
     $database .= <<'RULES';
-% Can a chord in one key function in a second?
 pivot_chord_keys(ChordNote, Chord, Key1Note, Key1, Key1Function, Key1Roman, Key2Note, Key2, Key2Function, Key2Roman) :-
     % bind the chord to the function of the first key
     chord_key(ChordNote, Chord, Key1Note, Key1, Key1Function, Key1Roman),
@@ -172,13 +254,12 @@ pivot_chord_keys(ChordNote, Chord, Key1Note, Key1, Key1Function, Key1Roman, Key2
     % the functions cannot be the same
     Key1Function \= Key2Function.
 
-% TODO
 roman_key(Mode, ModeRoman, Key, KeyRoman) :-
     chord_key(_, _, _, Mode, ModeFunction, ModeRoman),
     chord_key(_, _, _, Key, KeyFunction, KeyRoman),
     ModeFunction \= KeyFunction.
 RULES
-    warn "Database: $database\n" if $self->verbose;
+#    warn "Database: $database\n" if $self->verbose;
 
     return $database;
 }
@@ -244,6 +325,7 @@ sub _querydb {
     my @return;
 
     while (my $result = $self->_prolog->results) {
+#warn __PACKAGE__,' L',__LINE__,' ',,"R: @$result\n";
         if ($self->hash_results) {
             my %result;
             @result{ @{ $self->$attr } } = @$result;
@@ -271,7 +353,7 @@ Music::ModalFunction - Inspect musical modal functions
 
 =head1 VERSION
 
-version 0.0409
+version 0.0501
 
 =head1 SYNOPSIS
 
@@ -320,10 +402,22 @@ version 0.0409
   #  ... ]
   # Inspecting all the results, we see that the answers are D Dorian, D Ionian, and D Mixolydian.
 
+  # compare non-modal scales
+  $m = Music::ModalFunction->new(
+      mode_note  => 'c',
+      mode       => 'diminished',
+      key_note   => 'c',
+      key        => 'harmonic_minor',
+      use_scales => 1,
+  );
+  $results = $m->pivot_chord_keys;
+  # [ 'pivot_chord_keys', 'd', 'dim', 'c', 'diminished', 'flat2', 'r_bII', 'c', 'harmonic_minor', 'supertonic', 'r_ii' ],
+  # [ 'pivot_chord_keys', 'b', 'dim', 'c', 'diminished', 'leading_tone', 'r_vii', 'c', 'harmonic_minor', 'subtonic', 'r_vii' ],
+
 =head1 DESCRIPTION
 
 C<Music::ModalFunction> allows querying of a musical database of
-Prolog facts and rules that bind notes, chords, modes, keys and
+Prolog facts and rules that bind notes, chords, modes/scales, keys and
 diatonic functionality. In this database, the facts are all called
 C<chord_key> and the rules are C<pivot_chord_keys> and C<roman_key>.
 
@@ -339,9 +433,9 @@ The essential question is, "Can a chord in one key function in a
 second?" Any parts of this open-ended question may be unbound, thereby
 resulting in all possible truths.
 
-nb: The names "mode" and "key" below, are both used to mean "mode 1"
-and "mode 2" respectively. But for some reason I chose to use "key"
-even though that is confusing. Argh! :|
+nb: The names "mode" (and "scale"), and "key" below, are both used to
+mean modes (or scales) 1 and 2, respectively. But for some reason I
+chose to use "key" even though that is confusing. Argh! :|
 
 =head1 ATTRIBUTES
 
@@ -392,6 +486,17 @@ C<r_I>, C<r_ii>, C<r_iii>, C<r_IV>, C<r_V>, C<r_vi>, or C<r_vii>
 Return the query results as a list of named hash references.
 
 Default: C<0>
+
+=head2 use_scales
+
+Use alternative scales instead of modes.
+
+Default: C<0>
+
+=head2 scales
+
+C<augmented>, C<blues>, C<diminished>, C<harmonic_minor>,
+C<melodic_minor>, C<pentatonic>, or C<pentatonic_minor>
 
 =head2 verbose
 

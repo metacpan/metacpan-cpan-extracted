@@ -6,7 +6,7 @@ use 5.010;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 Travel::Status::DE::EFA::Result->mk_ro_accessors(
 	qw(countdown datetime delay destination is_cancelled info key line lineref
@@ -136,7 +136,7 @@ departure received by Travel::Status::DE::EFA
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 DESCRIPTION
 

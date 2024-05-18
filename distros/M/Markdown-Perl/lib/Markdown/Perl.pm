@@ -9,17 +9,19 @@ use Carp;
 use English;
 use Exporter 'import';
 use Hash::Util 'lock_keys';
+use List::Util 'none';
 use List::MoreUtils 'pairwise';
 use Markdown::Perl::BlockParser;
 use Markdown::Perl::Inlines;
 use Markdown::Perl::HTML 'html_escape', 'decode_entities';
+use Readonly;
 use Scalar::Util 'blessed';
 
 use parent 'Markdown::Perl::Options';
 
-our $VERSION = '1.05';  # Remember to also set the App::pmarkdown version.
+our $VERSION = '1.06';  # Remember to also set the App::pmarkdown version.
 
-our @EXPORT_OK = qw(convert set_options);
+our @EXPORT_OK = qw(convert set_options set_mode set_hooks);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 sub new {
@@ -28,7 +30,8 @@ sub new {
   my $this = $class->SUPER::new(
     mode => undef,
     options => {},
-    local_options => {});
+    local_options => {},
+    hooks => {});
   $this->SUPER::set_options(options => @options);
   lock_keys(%{$this});
 
@@ -44,6 +47,24 @@ sub set_options {
 sub set_mode {
   my ($this, $mode) = &_get_this_and_args;  ## no critic (ProhibitAmpersandSigils)
   $this->SUPER::set_mode(options => $mode);
+  return;
+}
+
+Readonly::Array my @VALID_HOOKS => qw(resolve_link_ref);
+
+sub set_hooks {
+  my ($this, %hooks) = &_get_this_and_args;  ## no critic (ProhibitAmpersandSigils)
+  while (my ($k, $v) = each %hooks) {
+    if (none { $_ eq $k } @VALID_HOOKS) {
+      croak "Invalid hook name: ${k}";
+    } elsif (!defined $v) {
+      delete $this->{hooks}{$k};
+    } elsif (ref $v ne 'CODE') {
+      carp 'Hook target must be a CODE reference';
+    } else {
+      $this->{hooks}{$k} = $v;
+    }
+  }
   return;
 }
 
@@ -279,6 +300,29 @@ version does B<not> apply to any objects created through a call to new().
 Converts the given $md string into HTML. The input string must be a decoded
 Unicode string (or an ASCII string) and the output is similarly a decoded
 Unicode string.
+
+=head2 set_hooks
+
+  $pmarkdown->set_hooks(hook_name => sub { ... }, ...);
+  Markdown::Perl::set_hooks(hook_name => sub { ... }, ...);
+
+Registers hooks to be called during the processing of a Markdown document. Each
+hook must point to a code reference. You can remove a hook by passing C<undef>
+as the value associated with a hook.
+
+There is currently a single hook:
+
+=over 4
+
+=item *
+
+C<resolve_link_ref>: this hook will receive a single string an argument,
+containing the label of a link reference in case where there was no matching
+link definition in the document and it must returns either C<undef> or a
+hash-reference containing a C<target> key, pointing to the link destination and
+optionally a C<title> key containing the title of the key.
+
+=back
 
 =head1 AUTHOR
 

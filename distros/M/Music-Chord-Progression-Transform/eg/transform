@@ -4,7 +4,7 @@ use warnings;
 
 use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util Music-Chord-Progression-Transform); # local author libs
 
-use MIDI::Util qw(setup_score);
+use MIDI::Util qw(setup_score midi_format);
 use Music::Chord::Progression::Transform ();
 
 my $bpm        = shift || 100;
@@ -12,12 +12,14 @@ my $note       = shift || 'C';
 my $octave     = shift || 4;
 my $quality    = shift || '';
 my $transforms = shift || 'L,R,P,R,S'; # giving an integer = random
+my $dura       = shift || 'wn';
 
 if ($transforms !~ /^\d+$/) {
     $transforms = [ split /,/, $transforms ];
 }
 
 my $transform = Music::Chord::Progression::Transform->new(
+#    format        => 'ISO',
     base_note     => $note,
     base_octave   => $octave,
     chord_quality => $quality,
@@ -28,6 +30,9 @@ my ($generated) = $transform->generate;
 
 my $score = setup_score(bpm => $bpm);
 
-$score->n('wn', @$_) for @$generated;
+for my $pitch (@$generated) {
+    my @pitch = $transform->format eq 'midinum' ? @$pitch : midi_format(@$pitch);
+    $score->n($dura, @pitch);
+}
 
 $score->write_score("$0.mid");

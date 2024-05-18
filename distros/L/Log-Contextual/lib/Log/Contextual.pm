@@ -1,281 +1,347 @@
 package Log::Contextual;
-$Log::Contextual::VERSION = '0.008001';
-# ABSTRACT: Simple logging interface with a contextual log
-
 use strict;
 use warnings;
 
-my @levels = qw(debug trace warn info error fatal);
+our $VERSION = '0.009000';
 
-use Exporter::Declare;
-use Exporter::Declare::Export::Generator;
 use Data::Dumper::Concise;
-use Scalar::Util 'blessed';
 
 use B qw(svref_2object);
 
 sub stash_name {
-   my ($coderef) = @_;
-   ref $coderef or return;
-   my $cv = B::svref_2object($coderef);
-   $cv->isa('B::CV') or return;
+  my ($coderef) = @_;
+  ref $coderef or return;
+  my $cv = B::svref_2object($coderef);
+  $cv->isa('B::CV') or return;
 
-   # bail out if GV is undefined
-   $cv->GV->isa('B::SPECIAL') and return;
+  # bail out if GV is undefined
+  $cv->GV->isa('B::SPECIAL') and return;
 
-   return $cv->GV->STASH->NAME;
+  return $cv->GV->STASH->NAME;
 }
 
-my @dlog = (
-   (map "Dlog_$_", @levels),
-   (map "DlogS_$_",  @levels),
-   (map "Dslog_$_",  @levels),
-   (map "DslogS_$_", @levels));
-
-my @log = (
-   (map "log_$_", @levels),
-   (map "logS_$_",  @levels),
-   (map "slog_$_",  @levels),
-   (map "slogS_$_", @levels));
-
-sub _maybe_export {
-   my ($spec, $target, $name, $new_code) = @_;
-
-   no strict 'refs';
-   if (defined &{"${target}::${name}"}) {
-      my $code = \&{"${target}::${name}"};
-
-      # this will warn
-      $spec->add_export("&$name", $new_code)
-        unless (stash_name($code) eq __PACKAGE__);
-   } else {
-      $spec->add_export("&$name", $new_code)
-   }
-}
-
-eval {
-   require Log::Log4perl;
-   die if $Log::Log4perl::VERSION < 1.29;
-   Log::Log4perl->wrapper_register(__PACKAGE__)
+eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+  require Log::Log4perl;
+  die if $Log::Log4perl::VERSION < 1.29;
+  Log::Log4perl->wrapper_register(__PACKAGE__)
 };
 
-# ____ is because tags must have at least one export and we don't want to
-# export anything but the levels selected
-sub ____ { }
-
-exports('____', @dlog, @log, qw( set_logger with_logger has_logger ));
-
-export_tag dlog => ('____');
-export_tag log  => ('____');
-import_arguments qw(logger package_logger default_logger);
-
 sub router {
-   our $Router_Instance ||= do {
-      require Log::Contextual::Router;
-      Log::Contextual::Router->new
-     }
+  our $Router_Instance ||= do {
+    require Log::Contextual::Router;
+    Log::Contextual::Router->new
+  }
 }
 
 sub default_import {
-   my ($class) = shift;
+  my ($class) = shift;
 
-   die 'Log::Contextual does not have a default import list';
-
-   ()
+  die 'Log::Contextual does not have a default import list';
 }
 
+my @all_levels = qw(debug trace warn info error fatal);
+
 sub arg_logger         { $_[1] }
-sub arg_levels         { $_[1] || [qw(debug trace warn info error fatal)] }
+sub arg_levels         { $_[1] || [@all_levels] }
 sub arg_package_logger { $_[1] }
 sub arg_default_logger { $_[1] }
 
-sub before_import {
-   my ($class, $importer, $spec) = @_;
-   my $router      = $class->router;
-   my $exports     = $spec->exports;
-   my %router_args = (
-      exporter  => $class,
-      target    => $importer,
-      arguments => $spec->argument_info
-   );
-
-   my @tags = $class->default_import($spec)
-     if $spec->config->{default};
-
-   for (@tags) {
-      die "only tags are supported for defaults at this time"
-        unless $_ =~ /^:(.*)$/;
-
-      $spec->config->{$1} = 1;
-   }
-
-   $router->before_import(%router_args);
-
-   if ($exports->{'&set_logger'}) {
-      die ref($router) . " does not support set_logger()"
-        unless $router->does('Log::Contextual::Role::Router::SetLogger');
-
-      _maybe_export($spec, $importer, 'set_logger',
-         sub { $router->set_logger(@_) },
-      );
-   }
-
-   if ($exports->{'&with_logger'}) {
-      die ref($router) . " does not support with_logger()"
-        unless $router->does('Log::Contextual::Role::Router::WithLogger');
-
-      _maybe_export($spec, $importer, 'with_logger',
-         sub { $router->with_logger(@_) },
-      );
-   }
-
-   if ($exports->{'&has_logger'}) {
-      die ref($router) . " does not support has_logger()"
-        unless $router->does('Log::Contextual::Role::Router::HasLogger');
-
-      _maybe_export($spec, $importer, 'has_logger',
-         sub { $router->has_logger(@_) },
-      );
-   }
-
-   my @levels = @{$class->arg_levels($spec->config->{levels})};
-   for my $level (@levels) {
-      my %base =
-        (exporter => $class, caller_level => 1, message_level => $level);
-      my %exports;
-      if ($spec->config->{log} || $exports->{"&log_$level"}) {
-         $exports{log_} = sub (&@) {
-            my ($code, @args) = @_;
-            $router->handle_log_request(
-               %base,
-               caller_package => scalar(caller),
-               message_sub    => $code,
-               message_args   => \@args,
-            );
-            return @args;
-         };
-      }
-      if ($spec->config->{log} || $exports->{"&slog_$level"}) {
-         $exports{slog_} = sub {
-            my ($text, @args) = @_;
-            $router->handle_log_request(
-               %base,
-               caller_package => scalar(caller),
-               message_text   => $text,
-               message_args   => \@args,
-            );
-            return @args;
-         };
-      }
-      if ($spec->config->{log} || $exports->{"&logS_$level"}) {
-         $exports{logS_} = sub (&@) {
-            my ($code, @args) = @_;
-            $router->handle_log_request(
-               %base,
-               caller_package => scalar(caller),
-               message_sub    => $code,
-               message_args   => \@args,
-            );
-            return $args[0];
-         };
-      }
-      if ($spec->config->{log} || $exports->{"&slogS_$level"}) {
-         $exports{slogS_} = sub {
-            my ($text, @args) = @_;
-            $router->handle_log_request(
-               %base,
-               caller_package => scalar(caller),
-               message_text   => $text,
-               message_args   => \@args,
-            );
-            return $args[0];
-         };
-      }
-      if ($spec->config->{dlog} || $exports->{"&Dlog_$level"}) {
-         $exports{Dlog_} = sub (&@) {
-            my ($code, @args) = @_;
-            my $wrapped = sub {
-               local $_ = (@_ ? Data::Dumper::Concise::Dumper @_ : '()');
-               &$code;
-            };
-            $router->handle_log_request(
-               %base,
-               caller_package => scalar(caller),
-               message_sub    => $wrapped,
-               message_args   => \@args,
-            );
-            return @args;
-         };
-      }
-      if ($spec->config->{dlog} || $exports->{"&Dslog_$level"}) {
-         $exports{Dslog_} = sub {
-            my ($text, @args) = @_;
-            my $wrapped = sub {
-               $text . (@_ ? Data::Dumper::Concise::Dumper @_ : '()');
-            };
-            $router->handle_log_request(
-               %base,
-               caller_package => scalar(caller),
-               message_sub    => $wrapped,
-               message_args   => \@args,
-            );
-            return @args;
-         };
-      }
-      if ($spec->config->{dlog} || $exports->{"&DlogS_$level"}) {
-         $exports{DlogS_} = sub (&$) {
-            my ($code, $ref) = @_;
-            my $wrapped = sub {
-               local $_ = Data::Dumper::Concise::Dumper($_[0]);
-               &$code;
-            };
-            $router->handle_log_request(
-               %base,
-               caller_package => scalar(caller),
-               message_sub    => $wrapped,
-               message_args   => [$ref],
-            );
-            return $ref;
-         };
-      }
-      if ($spec->config->{dlog} || $exports->{"&DslogS_$level"}) {
-         $exports{DslogS_} = sub {
-            my ($text, $ref) = @_;
-            my $wrapped = sub {
-               $text . Data::Dumper::Concise::Dumper($_[0]);
-            };
-            $router->handle_log_request(
-               %base,
-               caller_package => scalar(caller),
-               message_sub    => $wrapped,
-               message_args   => [$ref],
-            );
-            return $ref;
-         };
-      }
-      _maybe_export($spec, $importer, $_ . $level, $exports{$_})
-        for keys %exports;
-   }
+my %exports;
+for my $level (@all_levels) {
+  $exports{$_.'_'.$level} = { type => $_, level => $level }
+    for qw(Dlog DlogS Dslog DslogS);
+  $exports{$_.'_'.$level} = { type => $_, level => $level }
+    for qw(log logS slog slogS);
 }
 
-sub after_import {
-   my ($class, $importer, $spec) = @_;
-   my %router_args = (
-      exporter  => $class,
-      target    => $importer,
-      arguments => $spec->argument_info
-   );
-   $class->router->after_import(%router_args);
+$exports{$_} = {}
+  for qw( set_logger with_logger has_logger );
+my %import_arguments = map +($_ => $_), qw(logger package_logger default_logger levels);
+my %allowed_tags = map +($_ => $_), qw(log dlog);
+
+sub import {
+  my ($class, @args) = @_;
+  my $target = caller;
+  my %options;
+  my @tags;
+  my @imports;
+
+  @args = qw(:default)
+    if !@args;
+
+  while (@args) {
+    my $arg = shift @args;
+    if ($arg =~ /\A[-:](.*)/s) {
+      my $name = $1;
+      if ($import_arguments{$name}) {
+        my $option_args = shift @args;
+        $options{$name} = $option_args;
+      }
+      elsif ($name eq 'default') {
+        my @tag_args = ref $args[0] ? shift @args : ();
+        push @args, map +($_ => @tag_args), $class->default_import;
+      }
+      elsif (defined $allowed_tags{$name}) {
+        my $tag_args = ref $args[0] ? shift @args : undef;
+        push @tags, { tag => $name, args => $tag_args };
+      }
+      else {
+        die "Invalid argument $arg!";
+      }
+    }
+    else {
+      $arg =~ s/\A&//;
+      my $export_config = $exports{$arg}
+        or die "Invalid import $arg!";
+
+      my $import_args = ref $args[0] ? shift @args : undef;
+      push @imports, { import => $arg, args => $import_args, %$export_config };
+    }
+  }
+
+  my @levels = @{$class->arg_levels($options{levels})};
+
+  for my $tag (@tags) {
+    my @want
+      = $tag->{tag} eq 'log' ? qw(log logS slog slogS)
+      : $tag->{tag} eq 'dlog' ? qw(Dlog DlogS Dslog DslogS)
+      : die "Invalid tag $tag->{tag}";
+
+    for my $want (@want) {
+      push @imports, map +{
+        import => "${want}_$_",
+        args => $tag->{args},
+        type => $want,
+        level => $_
+      }, @levels;
+    }
+  }
+
+  my %router_args = (
+    exporter  => $class,
+    target    => $target,
+    arguments => \%options,
+  );
+  my $router = $class->router;
+  # wrapped in an extra sub so that caller levels match what they were when
+  # using Exporter::Declare
+  sub { $router->before_import(%router_args) }->();
+
+  for my $import (@imports) {
+    $class->_maybe_export($target, $import, $router);
+  }
+
+  sub { $router->after_import(%router_args) }->();
+}
+
+sub _maybe_export {
+  my ($class, $target, $import, $router) = @_;
+
+  my $name = $import->{import};
+  my $import_args = $import->{args} || {};
+
+  my $as = $import_args->{-as};
+  my $prefix = $import_args->{-prefix};
+  my $suffix = $import_args->{-suffix};
+
+  my $target_name = defined $as ? $as : (
+    (defined $prefix ? $prefix : '')
+    . $name
+    . (defined $suffix ? $suffix : '')
+  );
+  my $full_target = "${target}::${target_name}";
+
+  my $method = '_gen_' . ($import->{type} || $name);
+  my $level = $import->{level};
+
+  my $sub = $class->$method($router, defined $level ? $level : ());
+
+  no strict 'refs';
+  if (defined &$full_target) {
+    return
+      if stash_name(\&full_target) eq __PACKAGE__;
+
+    # reexport will warn
+  }
+  *$full_target = $sub;
+}
+
+sub _gen_set_logger { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+  my ($class, $router) = @_;
+  die ref($router) . " does not support set_logger()"
+    unless $router->does('Log::Contextual::Role::Router::SetLogger');
+
+  sub { $router->set_logger(@_) },
+}
+
+sub _gen_with_logger { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+  my ($class, $router) = @_;
+  die ref($router) . " does not support with_logger()"
+    unless $router->does('Log::Contextual::Role::Router::WithLogger');
+
+  sub { $router->with_logger(@_) },
+}
+
+sub _gen_has_logger { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+  my ($class, $router) = @_;
+  die ref($router) . " does not support has_logger()"
+    unless $router->does('Log::Contextual::Role::Router::HasLogger');
+
+  sub { $router->has_logger(@_) },
+}
+
+sub _gen_log { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+  my ($class, $router, $level) = @_;
+
+  sub (&@) {
+    my ($code, @args) = @_;
+    $router->handle_log_request(
+      exporter       => $class,
+      caller_level   => 1,
+      message_level  => $level,
+      caller_package => scalar(caller),
+      message_sub    => $code,
+      message_args   => \@args,
+    );
+    return @args;
+  };
+}
+
+sub _gen_slog { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+  my ($class, $router, $level) = @_;
+  sub {
+    my ($text, @args) = @_;
+    $router->handle_log_request(
+      exporter       => $class,
+      caller_level   => 1,
+      message_level  => $level,
+      caller_package => scalar(caller),
+      message_text   => $text,
+      message_args   => \@args,
+    );
+    return @args;
+  };
+}
+
+sub _gen_logS { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+  my ($class, $router, $level) = @_;
+  sub (&@) {
+    my ($code, @args) = @_;
+    $router->handle_log_request(
+      exporter       => $class,
+      caller_level   => 1,
+      message_level  => $level,
+      caller_package => scalar(caller),
+      message_sub    => $code,
+      message_args   => \@args,
+    );
+    return $args[0];
+  };
+}
+
+sub _gen_slogS { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+  my ($class, $router, $level) = @_;
+  sub {
+    my ($text, @args) = @_;
+    $router->handle_log_request(
+      exporter       => $class,
+      caller_level   => 1,
+      message_level  => $level,
+      caller_package => scalar(caller),
+      message_text   => $text,
+      message_args   => \@args,
+    );
+    return $args[0];
+  };
+}
+
+
+sub _gen_Dlog { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+  my ($class, $router, $level) = @_;
+  sub (&@) {
+    my ($code, @args) = @_;
+    my $wrapped = sub {
+      local $_ = (@_ ? Data::Dumper::Concise::Dumper @_ : '()');
+      &$code;
+    };
+    $router->handle_log_request(
+      exporter       => $class,
+      caller_level   => 1,
+      message_level  => $level,
+      caller_package => scalar(caller),
+      message_sub    => $wrapped,
+      message_args   => \@args,
+    );
+    return @args;
+  };
+}
+
+sub _gen_Dslog { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+  my ($class, $router, $level) = @_;
+  sub {
+    my ($text, @args) = @_;
+    my $wrapped = sub {
+      $text . (@_ ? Data::Dumper::Concise::Dumper @_ : '()');
+    };
+    $router->handle_log_request(
+      exporter       => $class,
+      caller_level   => 1,
+      message_level  => $level,
+      caller_package => scalar(caller),
+      message_sub    => $wrapped,
+      message_args   => \@args,
+    );
+    return @args;
+  };
+}
+
+sub _gen_DlogS { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+  my ($class, $router, $level) = @_;
+  sub (&$) {
+    my ($code, $ref) = @_;
+    my $wrapped = sub {
+      local $_ = Data::Dumper::Concise::Dumper($_[0]);
+      &$code;
+    };
+    $router->handle_log_request(
+      exporter       => $class,
+      caller_level   => 1,
+      message_level  => $level,
+      caller_package => scalar(caller),
+      message_sub    => $wrapped,
+      message_args   => [$ref],
+    );
+    return $ref;
+  };
+}
+
+sub _gen_DslogS { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+  my ($class, $router, $level) = @_;
+  sub {
+    my ($text, $ref) = @_;
+    my $wrapped = sub {
+      $text . Data::Dumper::Concise::Dumper($_[0]);
+    };
+    $router->handle_log_request(
+      exporter       => $class,
+      caller_level   => 1,
+      message_level  => $level,
+      caller_package => scalar(caller),
+      message_sub    => $wrapped,
+      message_args   => [$ref],
+    );
+    return $ref;
+  };
 }
 
 for (qw(set with)) {
-   no strict 'refs';
-   my $sub = "${_}_logger";
-   *{"Log::Contextual::$sub"} = sub {
-      die "$sub is no longer a direct sub in Log::Contextual.  "
-        . 'Note that this feature was never tested nor documented.  '
-        . "Please fix your code to import $sub instead of trying to use it directly"
-     }
+  no strict 'refs';
+  my $sub = "${_}_logger";
+  *{"Log::Contextual::$sub"} = sub {
+    die "$sub is no longer a direct sub in Log::Contextual.  "
+      . 'Note that this feature was never tested nor documented.  '
+      . "Please fix your code to import $sub instead of trying to use it directly";
+  }
 }
 
 1;
@@ -286,13 +352,15 @@ __END__
 
 =encoding UTF-8
 
+=for :stopwords Arthur Axel "fREW" Schmidt Scalable passthrough
+
 =head1 NAME
 
 Log::Contextual - Simple logging interface with a contextual log
 
 =head1 VERSION
 
-version 0.008001
+version 0.009000
 
 =head1 SYNOPSIS
 
@@ -484,7 +552,7 @@ own C<Log::Contextual> subclass as follows:
 
  package MyApp::Log::Contextual;
 
- use base 'Log::Contextual';
+ use parent 'Log::Contextual';
 
  use Log::Log4perl ':easy';
  Log::Log4perl->easy_init($DEBUG)
@@ -581,7 +649,7 @@ is called on the underlying C<$logger> object.  The basic pattern is:
    @_
  }
 
-Note that the function returns it's arguments.  This can be used in a number of
+Note that the function returns its arguments.  This can be used in a number of
 ways, but often it's convenient just for partial inspection of passthrough data
 
  my @friends = log_trace {
@@ -886,17 +954,74 @@ C<Log::Dispatch> doesn't support implementing C<log_fatal> L<at all|/-levels>
 
 C<Log::Dispatchouli> implements C<log_fatal> using C<die> ( via Carp )
 
-=head1 CONTRIBUTORS
-
-kentnl - Kent Fredric <kentfredric@gmail.com>
-
-triddle - Tyler Riddle <t.riddle@shadowcat.co.uk>
-
-voj - Jakob Voß <voss@gbv.de>
-
 =head1 DESIGNER
 
 mst - Matt S. Trout <mst@shadowcat.co.uk>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/haarg/Log-Contextual/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 CONTRIBUTORS
+
+=for stopwords Christian Walde Dan Book Florian Schlichtin Graham Knop Jakob Voss Karen Etheridge Kent Fredric Matt S Trout Peter Rabbitson Philippe Bruhat (BooK) Tyler Riddle Wes Malone
+
+=over 4
+
+=item *
+
+Christian Walde <walde.christian@gmail.com>
+
+=item *
+
+Dan Book <grinnz@grinnz.com>
+
+=item *
+
+Florian Schlichtin <fsfs@debian.org>
+
+=item *
+
+Graham Knop <haarg@haarg.org>
+
+=item *
+
+Jakob Voss <voss@gbv.de>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Kent Fredric <kentfredric@gmail.com>
+
+=item *
+
+Matt S Trout <mst@shadowcat.co.uk>
+
+=item *
+
+Peter Rabbitson <ribasushi@cpan.org>
+
+=item *
+
+Philippe Bruhat (BooK) <book@cpan.org>
+
+=item *
+
+Tyler Riddle <t.riddle@shadowcat.co.uk>
+
+=item *
+
+Wes Malone <wes@mitsi.com>
+
+=back
 
 =head1 AUTHOR
 
@@ -904,7 +1029,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -6,10 +6,11 @@ use feature qw(signatures);
 use MooseX::Singleton;
 use Mojo::UserAgent;
 use Mojo::URL;
+use Data::Dumper;
 
 with 'OpenSearch::Helper';
 
-use Data::Dumper;
+# This is a singleton class. We only want one instance of this class.
 
 has 'user'           => ( is => 'rw', isa => 'Str', required => 0 );    # Not really required since we can use Cert-Auth
 has 'pass'           => ( is => 'rw', isa => 'Str', required => 0 );    # Not really required since we can use Cert-Auth
@@ -18,6 +19,10 @@ has 'client_key'     => ( is => 'rw', isa => 'Str', required => 0 );    # Dunno 
 has 'hosts'          => ( is => 'rw', isa => 'ArrayRef[Str]', required => 1 );
 has 'secure'         => ( is => 'rw', isa => 'Str',           required => 1 );
 has 'allow_insecure' => ( is => 'rw', isa => 'Str',           required => 0, default => sub { 0; } );
+
+# Clean attributes after each request. This is a bit of a hack. We should probably use a
+# new instance of the class for each request.
+has 'clear_attrs' => ( is => 'rw', isa => 'Bool', required => 0, default => sub { 0; } );
 
 # If one host is down, we put it here. Dont know yet how to test if a host is back up again
 has 'disabled_hosts' => ( is => 'rw', isa => 'ArrayRef[Str]', default => sub { []; } );

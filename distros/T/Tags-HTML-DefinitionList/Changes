@@ -1,0 +1,10 @@
+0.02 2024-05-17T18:53:43+02:00
+ - Add check for 'border' parameter.
+ - Add check for 'css_class' parameter.
+ - Add constructor tests.
+ - Add documentation.
+ - Improve subroutine argument namess for init() and prepare().
+ - Remove 'lang' parameter. Not used.
+
+0.01 2024-04-27T13:21:44+02:00
+ - First version.

@@ -152,8 +152,8 @@ eval {
 		'width' => 'foo',
 	);
 };
-is($EVAL_ERROR, "Parameter 'width' doesn't contain number.\n",
-	"Parameter 'width' doesn't contain number (foo).");
+is($EVAL_ERROR, "Parameter 'width' doesn't contain unit number.\n",
+	"Parameter 'width' doesn't contain unit number (foo).");
 clean();
 
 # Test.
@@ -162,8 +162,8 @@ eval {
 		'width' => '123',
 	);
 };
-is($EVAL_ERROR, "Parameter 'width' doesn't contain unit.\n",
-	"Parameter 'width' doesn't contain unit (123).");
+is($EVAL_ERROR, "Parameter 'width' doesn't contain unit name.\n",
+	"Parameter 'width' doesn't contain unit name (123).");
 clean();
 
 # Test.

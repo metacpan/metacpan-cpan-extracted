@@ -7,10 +7,10 @@ use Data::HTML::Element::Utils qw(check_data check_data_type);
 use Error::Pure qw(err);
 use List::Util 1.33 qw(none);
 use Mo qw(build is);
-use Mo::utils qw(check_array check_bool check_number);
-use Mo::utils::CSS qw(check_css_class);
+use Mo::utils 0.26 qw(check_array check_bool check_number);
+use Mo::utils::CSS 0.02 qw(check_css_class);
 
-our $VERSION = 0.15;
+our $VERSION = 0.16;
 
 has css_class => (
 	is => 'ro',
@@ -308,6 +308,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.15
+0.16
 
 =cut

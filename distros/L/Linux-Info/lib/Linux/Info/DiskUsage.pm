@@ -6,7 +6,7 @@ use Set::Tiny 0.04;
 use Filesys::Df 0.92;
 use Hash::Util 'lock_keys';
 
-our $VERSION = '2.0'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 =head1 NAME
 

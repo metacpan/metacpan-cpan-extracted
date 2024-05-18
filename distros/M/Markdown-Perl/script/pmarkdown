@@ -5,6 +5,8 @@ use strict;
 use warnings;
 use utf8;
 
+use lib '/usr/local/lib/perl5';  # To be used together with the cpanm command given in the README.md file.
+
 use Encode;
 use Encode::Locale 'decode_argv';
 use English;

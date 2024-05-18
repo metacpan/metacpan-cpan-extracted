@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Show common cords and notes between two modes.
+# Show common chords and notes between two modes.
 
 use strict;
 use warnings;
@@ -13,15 +13,18 @@ my $pitch1 = shift || 'c';
 my $scale1 = shift || 'ionian';
 my $pitch2 = shift || 'd';
 my $scale2 = shift || 'ionian';
+my $scales = shift // 0;
 
 my $cn = Music::Chord::Note->new;
 
 my $m = Music::ModalFunction->new(
+#    verbose      => 1,
     mode_note    => $pitch1,
     mode         => $scale1,
     key_note     => $pitch2,
     key          => $scale2,
     hash_results => 1,
+    $scales ? (use_scales => 1) : (),
 );
 my $results = $m->pivot_chord_keys;
 

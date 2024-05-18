@@ -1,6 +1,6 @@
 package Game::Cribbage;
 
-our $VERSION = "0.05";
+our $VERSION = "0.08";
 
 use Rope;
 use Rope::Autoload;
@@ -83,16 +83,68 @@ sub init_draw {
 
 			my $hands = $self->board->get_hands;
 			unless (grep { !$_->{used} } @{$hands->player2->cards}, @{$hands->player1->cards}) {
-				$self->board->end_hands();
+				eval {
+					$self->end_hands();
+				};
+				if ($@) {
+					while (1) {
+						print $@;
+					}
+				}
 				return $self->init_draw(1);
 			}
 
 			if (scalar keys %{$self->board->rounds->current_round->current_hands->cannot_play} == 2) {
 				eval { $self->board->next_play(); };
+				if ($@) {
+					while (1) {
+						print $@;
+					}
+				}
 			}
 		}
 	}
 	$self->winner($winner);
+	<STDIN>
+}
+
+sub end_hands {
+	my ($self) = @_;
+
+	$self->board->end_play();
+		
+	my $hands = $self->board->get_hands;
+
+	$self->board->end_hands();
+
+	$self->crib_set = 0;
+
+	$self->clear_screen();
+
+	my $last = $self->board->rounds->current_round->history->[-2];
+	my $player1_score = $last->player1->score->total_score;
+	my $player2_score = $last->player2->score->total_score;
+	my $crib_player = $self->dealer ? $self->board->players->[-1]->name : 'Bot';
+	my $crib_score = $last->{$self->dealer ? 'player2' : 'player1'}->crib_score->total_score;
+
+	$self->print_header(sprintf "Bot scored: %s - %s scored: %s - %s crib scored: %s",
+		$player1_score,
+		$self->board->players->[-1]->name,
+		$player2_score,
+		$crib_player,
+		$crib_score
+	);
+
+	$self->draw_scores();
+
+	$self->render_player_cards($hands->player1->cards, 3, 20, 1);
+
+	$self->render_player_cards($hands->{$hands->crib_player}->crib, 15, 20, 1);
+
+	$self->render_player_cards($hands->player2->cards, 26, 20, 1);
+
+	$self->print_footer(q|Press enter to continue|);
+
 	<STDIN>
 }
 
@@ -129,7 +181,7 @@ sub play_hand {
 
 	$self->render_run_play();
 
-	$self->render_player_cards($hands->player2->cards, 20);
+	$self->render_player_cards($hands->player2->cards, 26, 20);
 
 	$self->print_footer(q|Pick a card: |);
 
@@ -137,7 +189,7 @@ sub play_hand {
 
 	chomp($number);
 
-	if ($number eq 'go') {
+	if ($number =~ m/go/i) {
 		my @can = $self->board->cannot_play('player2');
 		if (scalar @can && ref $can[0]) {
 			return;
@@ -211,7 +263,7 @@ sub split_cards {
 
 	$self->render_card($low, 27, 45);
 
-	$self->set_crib_player($dealer ? 'player2' : 'player1');
+	$self->board->set_crib_player($dealer ? 'player2' : 'player1');
 
 	$self->print_footer(q|Press enter to continue|);
 
@@ -237,7 +289,7 @@ sub discard_cards {
 
 	$self->render_opponent_cards(6);
 
-	$self->render_player_cards($hands->player2->cards, 5);
+	$self->render_player_cards($hands->player2->cards, 26, 5);
 
 	$self->print_footer(q|Discard cards: |);
 
@@ -245,10 +297,9 @@ sub discard_cards {
 
 	chomp($cards_index);
 
-	my @cards = map { 
+	my @cards = map {
 		$self->board->get_card('player2', $_ - 1);
-	} split " ", $cards_index;
-
+	} grep { $_ =~ m/^\d+$/ && $_ <= 6 } split " ", $cards_index;
 
 	unless (scalar @cards == 2) {
 		$self->discard_cards();
@@ -273,7 +324,7 @@ sub starter {
 	if ($self->dealer) {
 		my $card = $self->board->deck->get(int(rand(39)));	
 		$self->starter_card = $card;
-		$self->add_starter_card('player1', $card);
+		$self->board->add_starter_card('player1', $card);
 		return;
 	}
 
@@ -295,22 +346,9 @@ sub starter {
 
 	my $card = $self->board->deck->get($number);
 	$self->starter_card = $card;
-	my $scored = $self->add_starter_card('player2', $card);
+	my $scored = $self->board->add_starter_card('player2', $card);
 	return;
 }
-
-
-=pod
-		┌─────────┐
-		│.2. . . .│
-		│. . . . .│
-		│. . . . .│
-		│. . ♥ . .│
-		│. . . . .│
-		│. . . . .│
-		│. . . .2.│
-		└─────────┘	
-=cut
 
 sub render_card {
 	my ($self, $card, $row, $col) = @_;
@@ -369,18 +407,18 @@ sub render_opponent_cards {
 }
 
 sub render_player_cards {
-	my ($self, $cards, $left) = @_;
+	my ($self, $cards, $top, $left, $all) = @_;
 	my $i = 1;
 	for (@{$cards}) {
-		if ($_->{used}) {
+		if (!$all && $_->{used}) {
 			$i++;
 			next;
 		}
 		$left += 11;
-		$self->set_cursor_vertical(26);
+		$self->set_cursor_vertical($top);
 		$self->set_cursor_horizontal($left + 5);
 		$self->say($i++);
-		$self->render_card($_, 27, $left);
+		$self->render_card($_, $top + 1, $left);
 	}
 }
 
@@ -605,13 +643,15 @@ Game::Cribbage - Cribbage game engine
 
 =head1 VERSION
 
-Version 0.05
+Version 0.08
 
 =cut
 
 =head1 SYNOPSIS
 
 	lnation:High lnation$ cribbage
+	
+=for html <img style="width:500px" src="https://raw.githubusercontent.com/ThisUsedToBeAnEmail/Game-Cribbage/main/test.png" title="img-tag, local-dist" alt="Inlineimage" />
 
 	...
 

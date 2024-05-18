@@ -17,6 +17,7 @@ And a lot more.
 
 Following Perl modules must be installed:
 
+    * Data::Compare
     * File::Basename
     * File::Path
     * File::Spec

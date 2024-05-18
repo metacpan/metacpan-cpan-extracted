@@ -6,7 +6,6 @@ use feature qw(signatures);
 use Data::Dumper;
 use OpenSearch::Remote::Info;
 
-sub info { shift; return(OpenSearch::Remote::Info->new(@_) ); }
-
+sub info { shift; return ( OpenSearch::Remote::Info->new(@_) ); }
 
 1;

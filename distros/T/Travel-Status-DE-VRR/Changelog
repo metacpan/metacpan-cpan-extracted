@@ -1,3 +1,10 @@
+Travel::Status::DE::VRR 2.01 - Fri May 17 2024
+
+    * efa-m: Deprecate --efa-url in favour of --service. It is still supported,
+      just not documented anymore.
+    * EFA: Add new_p constructor for asynchronous operation with promises
+    * EFA: Add static get_service function
+
 Travel::Status::DE::VRR 2.00 - Sun Dec 03 2023
 
     * New dependency: DateTime

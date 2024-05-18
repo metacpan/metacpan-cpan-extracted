@@ -8,7 +8,7 @@ use experimental qw( signatures );
 use parent qw( Archive::Libarchive::ArchiveRead );
 
 # ABSTRACT: Libarchive disk read class
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 my $ffi = Archive::Libarchive::Lib->ffi;
 
@@ -38,7 +38,7 @@ Archive::Libarchive::DiskRead - Libarchive disk read class
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

@@ -29,11 +29,11 @@ no_index:
 requires:
   Class::Utils: 0.02
   Error::Pure: 0.07
-  Mo::utils::CSS: 0.04
+  Mo::utils::CSS: 0.07
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Tags-HTML-GradientIndicator/issues
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-GradientIndicator
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-GradientIndicator
-version: '0.03'
+version: '0.05'

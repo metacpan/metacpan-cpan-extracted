@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -16,6 +16,140 @@ use Travel::Status::DE::EFA::Stop;
 use LWP::UserAgent;
 use XML::LibXML;
 
+my %efa_instance = (
+	BSVG => {
+		url  => 'https://bsvg.efa.de/bsvagstd/XML_DM_REQUEST',
+		name => 'Braunschweiger Verkehrs-GmbH',
+	},
+	DING => {
+		url  => 'https://www.ding.eu/ding3/XSLT_DM_REQUEST',
+		name => 'Donau-Iller Nahverkehrsverbund',
+	},
+	KVV => {
+		url  => 'https://projekte.kvv-efa.de/sl3-alone/XSLT_DM_REQUEST',
+		name => 'Karlsruher Verkehrsverbund',
+	},
+	LinzAG => {
+		url      => 'https://www.linzag.at/static/XSLT_DM_REQUEST',
+		name     => 'Linz AG',
+		encoding => 'iso-8859-15',
+	},
+	MVV => {
+		url  => 'https://efa.mvv-muenchen.de/mobile/XSLT_DM_REQUEST',
+		name => 'Münchner Verkehrs- und Tarifverbund',
+	},
+	NVBW => {
+		url  => 'https://www.efa-bw.de/nvbw/XSLT_DM_REQUEST',
+		name => 'Nahverkehrsgesellschaft Baden-Württemberg',
+	},
+	VAG => {
+		url  => 'https://efa.vagfr.de/vagfr3/XSLT_DM_REQUEST',
+		name => 'Freiburger Verkehrs AG',
+	},
+	VGN => {
+		url  => 'https://efa.vgn.de/vgnExt_oeffi/XML_DM_REQUEST',
+		name => 'Verkehrsverbund Grossraum Nuernberg',
+	},
+
+	# HTTPS: certificate verification fails
+	VMV => {
+		url  => 'http://efa.vmv-mbh.de/vmv/XML_DM_REQUEST',
+		name => 'Verkehrsgesellschaft Mecklenburg-Vorpommern',
+	},
+	VRN => {
+		url  => 'https://www.vrn.de/mngvrn//XML_DM_REQUEST',
+		name => 'Verkehrsverbund Rhein-Neckar',
+	},
+	VRR => {
+		url  => 'https://efa.vrr.de/vrr/XSLT_DM_REQUEST',
+		name => 'Verkehrsverbund Rhein-Ruhr',
+	},
+	VRR2 => {
+		url  => 'https://app.vrr.de/standard/XML_DM_REQUEST',
+		name => 'Verkehrsverbund Rhein-Ruhr (alternative)',
+	},
+	VRR3 => {
+		url  => 'https://efa.vrr.de/rbgstd3/XML_DM_REQUEST',
+		name => 'Verkehrsverbund Rhein-Ruhr (alternative alternative)',
+	},
+	VVO => {
+		url  => 'https://efa.vvo-online.de/VMSSL3/XSLT_DM_REQUEST',
+		name => 'Verkehrsverbund Oberelbe',
+	},
+	VVS => {
+		url  => 'https://www2.vvs.de/vvs/XSLT_DM_REQUEST',
+		name => 'Verkehrsverbund Stuttgart',
+	},
+
+);
+
+sub new_p {
+	my ( $class, %opt ) = @_;
+	my $promise = $opt{promise}->new;
+
+	my $self;
+
+	eval { $self = $class->new( %opt, async => 1 ); };
+	if ($@) {
+		return $promise->reject($@);
+	}
+
+	$self->{promise} = $opt{promise};
+
+	$self->{ua}->post_p( $self->{efa_url} => form => $self->{post} )->then(
+		sub {
+			my ($tx) = @_;
+			if ( my $err = $tx->error ) {
+				$promise->reject(
+"POST $self->{efa_url} returned HTTP $err->{code} $err->{message}"
+				);
+				return;
+			}
+			my $content = $tx->res->body;
+
+			if ( $opt{efa_encoding} ) {
+				$self->{xml} = encode( $opt{efa_encoding}, $content );
+			}
+			else {
+				$self->{xml} = $content;
+			}
+
+			if ( not $self->{xml} ) {
+
+				# LibXML doesn't like empty documents
+				$promise->reject('Server returned nothing (empty result)');
+				return;
+			}
+
+			$self->{tree} = XML::LibXML->load_xml(
+				string => $self->{xml},
+			);
+
+			if ( $self->{developer_mode} ) {
+				say $self->{tree}->toString(1);
+			}
+
+			$self->check_for_ambiguous();
+
+			if ( $self->{errstr} ) {
+				$promise->reject( $self->{errstr} );
+				return;
+			}
+
+			$promise->resolve($self);
+			return;
+		}
+	)->catch(
+		sub {
+			my ($err) = @_;
+			$promise->reject($err);
+			return;
+		}
+	)->wait;
+
+	return $promise;
+}
+
 sub new {
 	my ( $class, %opt ) = @_;
 
@@ -24,7 +158,6 @@ sub new {
 		delete $opt{timeout};
 	}
 
-	my $ua  = LWP::UserAgent->new(%opt);
 	my @now = localtime( time() );
 
 	my @time = @now[ 2, 1 ];
@@ -39,8 +172,12 @@ sub new {
 		confess('type must be stop, stopID, address, or poi');
 	}
 
+	if ( $opt{service} and exists $efa_instance{ $opt{service} } ) {
+		$opt{efa_url} = $efa_instance{ $opt{service} }{url};
+	}
+
 	if ( not $opt{efa_url} ) {
-		confess('efa_url is mandatory');
+		confess('service or efa_url must be specified');
 	}
 
 	## no critic (RegularExpressions::ProhibitUnusedCapture)
@@ -105,6 +242,8 @@ sub new {
 			useRealtime            => '1',
 		},
 		developer_mode => $opt{developer_mode},
+		efa_url        => $opt{efa_url},
+		service        => $opt{service},
 	};
 
 	if ( $opt{place} ) {
@@ -121,9 +260,20 @@ sub new {
 
 	bless( $self, $class );
 
-	$ua->env_proxy;
+	if ( $opt{user_agent} ) {
+		$self->{ua} = $opt{user_agent};
+	}
+	else {
+		my %lwp_options = %{ $opt{lwp_options} // { timeout => 10 } };
+		$self->{ua} = LWP::UserAgent->new(%lwp_options);
+		$self->{ua}->env_proxy;
+	}
 
-	my $response = $ua->post( $opt{efa_url}, $self->{post} );
+	if ( $opt{async} ) {
+		return $self;
+	}
+
+	my $response = $self->{ua}->post( $self->{efa_url}, $self->{post} );
 
 	if ( $response->is_error ) {
 		$self->{errstr} = $response->status_line;
@@ -553,89 +703,14 @@ sub results {
 
 # static
 sub get_efa_urls {
+	return map {
+		{ %{ $efa_instance{$_} }, shortname => $_ }
+	} sort keys %efa_instance;
+}
 
-	# sorted lexically by shortname
-	return (
-		{
-			url       => 'https://bsvg.efa.de/bsvagstd/XML_DM_REQUEST',
-			name      => 'Braunschweiger Verkehrs-GmbH',
-			shortname => 'BSVG',
-		},
-		{
-			url       => 'https://www.ding.eu/ding3/XSLT_DM_REQUEST',
-			name      => 'Donau-Iller Nahverkehrsverbund',
-			shortname => 'DING',
-		},
-		{
-			url  => 'https://projekte.kvv-efa.de/sl3-alone/XSLT_DM_REQUEST',
-			name => 'Karlsruher Verkehrsverbund',
-			shortname => 'KVV',
-		},
-		{
-			url       => 'https://www.linzag.at/static/XSLT_DM_REQUEST',
-			name      => 'Linz AG',
-			shortname => 'LinzAG',
-			encoding  => 'iso-8859-15',
-		},
-		{
-			url       => 'https://efa.mvv-muenchen.de/mobile/XSLT_DM_REQUEST',
-			name      => 'Münchner Verkehrs- und Tarifverbund',
-			shortname => 'MVV',
-		},
-		{
-			url       => 'https://www.efa-bw.de/nvbw/XSLT_DM_REQUEST',
-			name      => 'Nahverkehrsgesellschaft Baden-Württemberg',
-			shortname => 'NVBW',
-		},
-		{
-			url       => 'https://efa.vagfr.de/vagfr3/XSLT_DM_REQUEST',
-			name      => 'Freiburger Verkehrs AG',
-			shortname => 'VAG',
-		},
-		{
-			url       => 'https://efa.vgn.de/vgnExt_oeffi/XML_DM_REQUEST',
-			name      => 'Verkehrsverbund Grossraum Nuernberg',
-			shortname => 'VGN',
-		},
-
-		# HTTPS: certificate verification fails
-		{
-			url       => 'http://efa.vmv-mbh.de/vmv/XML_DM_REQUEST',
-			name      => 'Verkehrsgesellschaft Mecklenburg-Vorpommern',
-			shortname => 'VMV',
-		},
-		{
-			url       => 'https://www.vrn.de/mngvrn//XML_DM_REQUEST',
-			name      => 'Verkehrsverbund Rhein-Neckar',
-			shortname => 'VRN',
-		},
-		{
-			url       => 'https://efa.vrr.de/vrr/XSLT_DM_REQUEST',
-			name      => 'Verkehrsverbund Rhein-Ruhr',
-			shortname => 'VRR',
-		},
-		{
-			url       => 'https://app.vrr.de/standard/XML_DM_REQUEST',
-			name      => 'Verkehrsverbund Rhein-Ruhr (alternative)',
-			shortname => 'VRR2',
-		},
-		{
-			url       => 'https://efa.vrr.de/rbgstd3/XML_DM_REQUEST',
-			name      => 'Verkehrsverbund Rhein-Ruhr (alternative alternative)',
-			shortname => 'VRR3',
-		},
-		{
-			url       => 'https://efa.vvo-online.de/VMSSL3/XSLT_DM_REQUEST',
-			name      => 'Verkehrsverbund Oberelbe',
-			shortname => 'VVO',
-		},
-		{
-			url       => 'https://www2.vvs.de/vvs/XSLT_DM_REQUEST',
-			name      => 'Verkehrsverbund Stuttgart',
-			shortname => 'VVS',
-		},
-
-	);
+sub get_service {
+	my ($service) = @_;
+	return $efa_instance{$service};
 }
 
 1;
@@ -665,7 +740,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 DESCRIPTION
 
@@ -731,6 +806,26 @@ Default: 10 seconds. Set to 0 or a negative value to disable it.
 
 =back
 
+=item my $status_p = Travel::Status::DE::EFA->new_p(I<%opt>)
+
+Returns a promise that resolves into a Travel::Status::DE::EFA instance
+($status) on success and rejects with an error message on failure. In addition
+to the arguments of B<new>, the following mandatory arguments must be set.
+
+=over
+
+=item B<promise> => I<promises module>
+
+Promises implementation to use for internal promises as well as B<new_p> return
+value. Recommended: Mojo::Promise(3pm).
+
+=item B<user_agent> => I<user agent>
+
+User agent instance to use for asynchronous requests. The object must implement
+a B<post_p> function. Recommended: Mojo::UserAgent(3pm).
+
+=back
+
 =item $status->errstr
 
 In case of an HTTP request or EFA error, returns a string describing it. If
@@ -778,6 +873,11 @@ the following elements.
 =item B<encoding>: Server-side encoding override for B<efa_encoding> (optional)
 
 =back
+
+=item Travel::Status::DE::EFA::service(I<$service>)
+
+Returns a hashref describing the service I<$service>, or undef if it is not
+known. See B<get_efa_urls> for the hashref layout.
 
 =back
 

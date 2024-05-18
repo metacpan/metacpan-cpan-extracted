@@ -23,12 +23,15 @@ subtest defaults => sub {
     is_deeply [sort keys %{ $obj->_modes }],
         [qw(aeolian dorian ionian locrian lydian mixolydian phrygian)],
         '_modes';
+    is_deeply [sort keys %{ $obj->_scales }],
+        [qw(augmented blues diminished harmonic_minor melodic_minor pentatonic pentatonic_minor)],
+        '_scales';
     ok length($obj->_database), '_database';
     my @got = $obj->_database =~ /\n/g;
-    is scalar(@got), 602, '_database';
+    is scalar(@got), 600, '_database';
 };
 
-subtest chord_key => sub {
+subtest mode_chord_key => sub {
     my $obj = new_ok 'Music::ModalFunction' => [
         chord_note   => 'd',
         chord        => 'maj',
@@ -63,7 +66,70 @@ subtest chord_key => sub {
     is scalar(@$got), $expect, 'chord_key';
 };
 
-subtest pivot_chord_keys => sub {
+
+subtest scale_chord_key => sub {
+    my $obj = new_ok 'Music::ModalFunction' => [
+        chord_note   => 'd',
+        chord        => 'maj',
+        key_function => 'dominant',
+        use_scales   => 1,
+    ];
+    my $got = $obj->chord_key;
+    my $expect = [
+        [ 'chord_key', 'd', 'maj', 'g', 'augmented', 'dominant', 'r_V' ],
+        [ 'chord_key', 'd', 'maj', 'g', 'harmonic_minor', 'dominant', 'r_V' ],
+        [ 'chord_key', 'd', 'maj', 'g', 'melodic_minor', 'dominant', 'r_V' ],
+    ];
+    is_deeply $got, $expect, 'chord_key';
+
+    $obj = new_ok 'Music::ModalFunction' => [
+        chord_note   => 'd',
+        chord        => 'maj',
+        key_function => 'dominant',
+        hash_results => 1,
+        use_scales   => 1,
+    ];
+    $got = $obj->chord_key;
+    $expect = [
+        {
+            chord => 'maj',
+            chord_note => 'd',
+            key => 'augmented',
+            key_function => 'dominant',
+            key_note => 'g',
+            key_roman => 'r_V',
+            method => 'chord_key',
+        }, {
+            chord => 'maj',
+            chord_note => 'd',
+            key => 'harmonic_minor',
+            key_function => 'dominant',
+            key_note => 'g',
+            key_roman => 'r_V',
+            method => 'chord_key',
+        }, {
+            chord => 'maj',
+            chord_note => 'd',
+            key => 'melodic_minor',
+            key_function => 'dominant',
+            key_note => 'g',
+            key_roman => 'r_V',
+            method => 'chord_key',
+        },
+    ];
+    is_deeply $got, $expect, 'chord_key';
+
+    $obj = new_ok 'Music::ModalFunction' => [
+        chord_note => 'g',
+        chord      => 'maj',
+        use_scales => 1,
+    ];
+    $got = $obj->chord_key;
+    $expect = 15;
+    is scalar(@$got), $expect, 'chord_key';
+};
+
+subtest mode_pivot_chord_keys => sub {
     my $obj = new_ok 'Music::ModalFunction' => [
         chord_note   => 'g',
         chord        => 'maj',
@@ -128,6 +194,156 @@ subtest pivot_chord_keys => sub {
     $expect = 0;
     is scalar(@$got), $expect, 'pivot_chord_keys';
 };
+
+subtest scale_pivot_chord_keys => sub {
+    my $obj = new_ok 'Music::ModalFunction' => [
+        chord_note   => 'g',
+        chord        => 'maj',
+        mode_note    => 'c',
+        key_function => 'subdominant',
+        use_scales   => 1,
+    ];
+    my $got = $obj->pivot_chord_keys;
+    my $expect = [
+        [ 'pivot_chord_keys', 'g', 'maj', 'c', 'augmented', 'dominant', 'r_V', 'c', 'pentatonic', 'subdominant', 'r_IV' ],
+        [ 'pivot_chord_keys', 'g', 'maj', 'c', 'augmented', 'dominant', 'r_V', 'd', 'melodic_minor', 'subdominant', 'r_IV' ],
+        [ 'pivot_chord_keys', 'g', 'maj', 'c', 'harmonic_minor', 'dominant', 'r_V', 'c', 'pentatonic', 'subdominant', 'r_IV' ],
+        [ 'pivot_chord_keys', 'g', 'maj', 'c', 'harmonic_minor', 'dominant', 'r_V', 'd', 'melodic_minor', 'subdominant', 'r_IV' ],
+        [ 'pivot_chord_keys', 'g', 'maj', 'c', 'melodic_minor', 'dominant', 'r_V', 'c', 'pentatonic', 'subdominant', 'r_IV' ],
+        [ 'pivot_chord_keys', 'g', 'maj', 'c', 'melodic_minor', 'dominant', 'r_V', 'd', 'melodic_minor', 'subdominant', 'r_IV' ],
+    ];
+    is_deeply $got, $expect, 'pivot_chord_keys';
+
+    $obj = new_ok 'Music::ModalFunction' => [
+        chord_note   => 'g',
+        chord        => 'maj',
+        mode_note    => 'c',
+        key_function => 'subdominant',
+        hash_results => 1,
+        use_scales   => 1,
+    ];
+    $got = $obj->pivot_chord_keys;
+    $expect = [
+      {
+        chord => 'maj',
+        chord_note => 'g',
+        key => 'pentatonic',
+        key_function => 'subdominant',
+        key_note => 'c',
+        key_roman => 'r_IV',
+        method => 'pivot_chord_keys',
+        mode => 'augmented',
+        mode_function => 'dominant',
+        mode_note => 'c',
+        mode_roman => 'r_V',
+      }, {
+        chord => 'maj',
+        chord_note => 'g',
+        key => 'melodic_minor',
+        key_function => 'subdominant',
+        key_note => 'd',
+        key_roman => 'r_IV',
+        method => 'pivot_chord_keys',
+        mode => 'augmented',
+        mode_function => 'dominant',
+        mode_note => 'c',
+        mode_roman => 'r_V',
+      }, {
+        chord => 'maj',
+        chord_note => 'g',
+        key => 'pentatonic',
+        key_function => 'subdominant',
+        key_note => 'c',
+        key_roman => 'r_IV',
+        method => 'pivot_chord_keys',
+        mode => 'harmonic_minor',
+        mode_function => 'dominant',
+        mode_note => 'c',
+        mode_roman => 'r_V',
+      }, {
+        chord => 'maj',
+        chord_note => 'g',
+        key => 'melodic_minor',
+        key_function => 'subdominant',
+        key_note => 'd',
+        key_roman => 'r_IV',
+        method => 'pivot_chord_keys',
+        mode => 'harmonic_minor',
+        mode_function => 'dominant',
+        mode_note => 'c',
+        mode_roman => 'r_V',
+      }, {
+        chord => 'maj',
+        chord_note => 'g',
+        key => 'pentatonic',
+        key_function => 'subdominant',
+        key_note => 'c',
+        key_roman => 'r_IV',
+        method => 'pivot_chord_keys',
+        mode => 'melodic_minor',
+        mode_function => 'dominant',
+        mode_note => 'c',
+        mode_roman => 'r_V',
+      }, {
+        chord => 'maj',
+        chord_note => 'g',
+        key => 'melodic_minor',
+        key_function => 'subdominant',
+        key_note => 'd',
+        key_roman => 'r_IV',
+        method => 'pivot_chord_keys',
+        mode => 'melodic_minor',
+        mode_function => 'dominant',
+        mode_note => 'c',
+        mode_roman => 'r_V',
+      },
+    ];
+    is_deeply $got, $expect, 'pivot_chord_keys';
+
+    $obj = new_ok 'Music::ModalFunction' => [
+        chord_note => 'g',
+        chord      => 'maj',
+        key        => 'diminished',
+        use_scales => 1,
+    ];
+    $got = $obj->pivot_chord_keys;
+    $expect = 52;
+    is scalar(@$got), $expect, 'pivot_chord_keys';
+
+    $obj = Music::ModalFunction->new(
+        mode_note  => 'c',
+        mode       => 'diminished',
+        key_note   => 'a',
+        key        => 'diminished',
+        use_scales => 1,
+    );
+    $got = $obj->pivot_chord_keys;
+    $expect = 8;
+    is scalar(@$got), $expect, 'pivot_chord_keys';
+
+    $obj = Music::ModalFunction->new(
+        mode_note  => 'c',
+        mode       => 'diminished',
+        key_note   => 'gb',
+        key        => 'diminished',
+        use_scales => 1,
+    );
+    $got = $obj->pivot_chord_keys;
+    $expect = 0;
+    is scalar(@$got), $expect, 'pivot_chord_keys';
+
+    $obj = Music::ModalFunction->new(
+        mode_note  => 'c',
+        mode       => 'diminished',
+        key_note   => 'c',
+        key        => 'harmonic_minor',
+        use_scales => 1,
+    );
+    $got = $obj->pivot_chord_keys;
+    $expect = 2;
+    is scalar(@$got), $expect, 'pivot_chord_keys';
+};
+
 
 subtest roman_key => sub {
     my $obj = new_ok 'Music::ModalFunction' => [

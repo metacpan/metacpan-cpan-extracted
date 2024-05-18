@@ -1,9 +1,8 @@
 package Log::Contextual::WarnLogger;
-$Log::Contextual::WarnLogger::VERSION = '0.008001';
-# ABSTRACT: logger for libraries using Log::Contextual
-
 use strict;
 use warnings;
+
+our $VERSION = '0.009000';
 
 use Carp 'croak';
 
@@ -12,107 +11,107 @@ my @default_levels = qw( trace debug info warn error fatal );
 # generate subs to handle the default levels
 # anything else will have to be handled by AUTOLOAD at runtime
 {
-   for my $level (@default_levels) {
+  for my $level (@default_levels) {
 
-      no strict 'refs';
+    no strict 'refs';
 
-      my $is_name = "is_$level";
-      *{$level} = sub {
-         my $self = shift;
+    my $is_name = "is_$level";
+    *{$level} = sub {
+      my $self = shift;
 
-         $self->_log($level, @_)
-           if $self->$is_name;
-      };
+      $self->_log($level, @_)
+        if $self->$is_name;
+    };
 
-      *{$is_name} = sub {
-         my $self = shift;
-         return 1 if $ENV{$self->{env_prefix} . '_' . uc $level};
-         my $upto = $ENV{$self->{env_prefix} . '_UPTO'};
-         return unless $upto;
-         $upto = lc $upto;
+    *{$is_name} = sub {
+      my $self = shift;
+      return 1 if $ENV{$self->{env_prefix} . '_' . uc $level};
+      my $upto = $ENV{$self->{env_prefix} . '_UPTO'};
+      return unless $upto;
+      $upto = lc $upto;
 
-         return $self->{level_num}{$level} >= $self->{level_num}{$upto};
-      };
-   }
+      return $self->{level_num}{$level} >= $self->{level_num}{$upto};
+    };
+  }
 }
 
 our $AUTOLOAD;
 
 sub AUTOLOAD {
-   my $self = $_[0];
+  my $self = $_[0];
 
-   (my $name = our $AUTOLOAD) =~ s/.*:://;
-   return if $name eq 'DESTROY';
+  (my $name = our $AUTOLOAD) =~ s/.*:://;
+  return if $name eq 'DESTROY';
 
-   # extract the log level from the sub name
-   my ($is, $level) = $name =~ m/^(is_)?(.+)$/;
-   my $is_name = "is_$level";
+  # extract the log level from the sub name
+  my ($is, $level) = $name =~ m/^(is_)?(.+)$/;
+  my $is_name = "is_$level";
 
-   no strict 'refs';
-   *{$level} = sub {
-      my $self = shift;
+  no strict 'refs';
+  *{$level} = sub {
+    my $self = shift;
 
-      $self->_log($level, @_)
-        if $self->$is_name;
-   };
+    $self->_log($level, @_)
+      if $self->$is_name;
+  };
 
-   *{$is_name} = sub {
-      my $self = shift;
+  *{$is_name} = sub {
+    my $self = shift;
 
-      my $prefix_field = $self->{env_prefix} . '_' . uc $level;
-      return 1 if $ENV{$prefix_field};
+    my $prefix_field = $self->{env_prefix} . '_' . uc $level;
+    return 1 if $ENV{$prefix_field};
 
-      # don't log if the variable specifically says not to
-      return 0 if defined $ENV{$prefix_field} and not $ENV{$prefix_field};
+    # don't log if the variable specifically says not to
+    return 0 if defined $ENV{$prefix_field} and not $ENV{$prefix_field};
 
-      my $upto_field = $self->{env_prefix} . '_UPTO';
-      my $upto       = $ENV{$upto_field};
+    my $upto_field = $self->{env_prefix} . '_UPTO';
+    my $upto       = $ENV{$upto_field};
 
-      if ($upto) {
-         $upto = lc $upto;
+    if ($upto) {
+      $upto = lc $upto;
 
-         croak "Unrecognized log level '$upto' in \$ENV{$upto_field}"
-           if not defined $self->{level_num}{$upto};
+      croak "Unrecognized log level '$upto' in \$ENV{$upto_field}"
+        if not defined $self->{level_num}{$upto};
 
-         return $self->{level_num}{$level} >= $self->{level_num}{$upto};
-      }
+      return $self->{level_num}{$level} >= $self->{level_num}{$upto};
+    }
 
-      # if we don't recognize this level and nothing says otherwise, log!
-      return 1 if not $self->{custom_levels};
-   };
-   goto &$AUTOLOAD;
+    # if we don't recognize this level and nothing says otherwise, log!
+    return 1 if not $self->{custom_levels};
+  };
+  goto &$AUTOLOAD;
 }
 
 sub new {
-   my ($class, $args) = @_;
+  my ($class, $args) = @_;
 
-   my $levels = $args->{levels};
-   croak 'invalid levels specification: must be non-empty arrayref'
-     if defined $levels and (ref $levels ne 'ARRAY' or !@$levels);
+  my $levels = $args->{levels};
+  croak 'invalid levels specification: must be non-empty arrayref'
+    if defined $levels and (ref $levels ne 'ARRAY' or !@$levels);
 
-   my $custom_levels = defined $levels;
-   $levels ||= [@default_levels];
+  my $custom_levels = defined $levels;
+  $levels ||= [@default_levels];
 
-   my %level_num;
-   @level_num{@$levels} = (0 .. $#{$levels});
+  my %level_num;
+  @level_num{@$levels} = (0 .. $#{$levels});
 
-   my $self = bless {
-      levels        => $levels,
-      level_num     => \%level_num,
-      custom_levels => $custom_levels,
-   }, $class;
+  my $self = bless {
+    levels        => $levels,
+    level_num     => \%level_num,
+    custom_levels => $custom_levels,
+  }, $class;
 
-   $self->{env_prefix} = $args->{env_prefix}
-     or die 'no env_prefix passed to Log::Contextual::WarnLogger->new';
-   return $self;
+  $self->{env_prefix} = $args->{env_prefix}
+    or die 'no env_prefix passed to Log::Contextual::WarnLogger->new';
+  return $self;
 }
 
 sub _log {
-   my $self    = shift;
-   my $level   = shift;
-   my $message = join("\n", @_);
-   $message .= "\n" unless $message =~ /\n$/;
-   warn "[$level] $message";
+  my $self    = shift;
+  my $level   = shift;
+  my $message = join("\n", @_);
+  $message .= "\n" unless $message =~ /\n$/;
+  warn "[$level] $message";
 }
 
 1;
@@ -123,13 +122,15 @@ __END__
 
 =encoding UTF-8
 
+=for :stopwords Arthur Axel "fREW" Schmidt
+
 =head1 NAME
 
 Log::Contextual::WarnLogger - logger for libraries using Log::Contextual
 
 =head1 VERSION
 
-version 0.008001
+version 0.009000
 
 =head1 SYNOPSIS
 
@@ -283,13 +284,22 @@ environment variable is enabled.
 If different levels are specified, appropriate is_$level functions work as you
 would expect.
 
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/haarg/Log-Contextual/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 =head1 AUTHOR
 
 Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

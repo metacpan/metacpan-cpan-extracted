@@ -254,12 +254,12 @@ for my $data (@test) {
 	is($board->rounds->current_round->history->[0]->player1->score->total_score, 8, 'player1 - 3 x 15 + 1 pair = 8 points');
 	is($board->rounds->current_round->history->[0]->player2->score->total_score, 8, 'player2 - 1 pair + 1 three of a kind = 8 points');
 
-	ok(1, 'player1 gets the crib');
+	ok(1, 'player2 gets the crib');
 
-#	is($board->rounds->current_round->history->[0]->player2->crib_score->total_score, 9, 'player2 - 2 x 15 + 1 run of four and a nob = 9 points');
+	is($board->rounds->current_round->history->[0]->player2->crib_score->total_score, 9, 'player2 - 2 x 15 + 1 run of four and a nob = 9 points');
 
-#	is_deeply($board->score->player1, {current => 12, last => 4}, 'Confirm that player1 now has a total score of 12, 4 + 8');
-#	is_deeply($board->score->player2, {current => 18, last => 1}, 'Confirm that player2 now has a total score of 9, 1 + 8 + 9');
+	is_deeply($board->score->player1, {current => 12, last => 4}, 'Confirm that player1 now has a total score of 12, 4 + 8');
+	is_deeply($board->score->player2, {current => 18, last => 1}, 'Confirm that player2 now has a total score of 9, 1 + 8 + 9');
 
 =pod
 	my $hand = Game::Cribbage::Player::Hand->new(

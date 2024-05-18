@@ -3,6 +3,7 @@ abstract: 'API in Perl to recover information about the running Linux OS'
 author:
   - 'Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>'
 build_requires:
+  Devel::CheckOS: '2.02'
   Exporter: '0'
   File::Temp: '0'
   Scalar::Util: '0'
@@ -26,56 +27,56 @@ no_index:
 provides:
   Linux::Info:
     file: lib/Linux/Info.pm
-    version: '2.0'
+    version: '2.01'
   Linux::Info::Compilation:
     file: lib/Linux/Info/Compilation.pm
-    version: '2.0'
+    version: '2.01'
   Linux::Info::CpuStats:
     file: lib/Linux/Info/CpuStats.pm
-    version: '2.0'
+    version: '2.01'
   Linux::Info::DiskStats:
     file: lib/Linux/Info/DiskStats.pm
-    version: '2.0'
+    version: '2.01'
   Linux::Info::DiskStats::Options:
     file: lib/Linux/Info/DiskStats/Options.pm
-    version: '2.0'
+    version: '2.01'
   Linux::Info::DiskUsage:
     file: lib/Linux/Info/DiskUsage.pm
-    version: '2.0'
+    version: '2.01'
   Linux::Info::FileStats:
     file: lib/Linux/Info/FileStats.pm
-    version: '2.0'
+    version: '2.01'
   Linux::Info::KernelRelease:
     file: lib/Linux/Info/KernelRelease.pm
-    version: '2.0'
+    version: '2.01'
   Linux::Info::LoadAVG:
     file: lib/Linux/Info/LoadAVG.pm
-    version: '2.0'
+    version: '2.01'
   Linux::Info::MemStats:
     file: lib/Linux/Info/MemStats.pm
-    version: '2.0'
+    version: '2.01'
   Linux::Info::NetStats:
     file: lib/Linux/Info/NetStats.pm
-    version: '2.0'
+    version: '2.01'
   Linux::Info::PgSwStats:
     file: lib/Linux/Info/PgSwStats.pm
-    version: '2.0'
+    version: '2.01'
   Linux::Info::ProcStats:
     file: lib/Linux/Info/ProcStats.pm
-    version: '2.0'
+    version: '2.01'
   Linux::Info::Processes:
     file: lib/Linux/Info/Processes.pm
-    version: '2.0'
+    version: '2.01'
   Linux::Info::SockStats:
     file: lib/Linux/Info/SockStats.pm
-    version: '2.0'
+    version: '2.01'
   Linux::Info::SysInfo:
     file: lib/Linux/Info/SysInfo.pm
-    version: '2.0'
+    version: '2.01'
 requires:
   Carp: '0'
   Class::Accessor: '0.51'
-  Devel::CheckOS: '2.01'
+  Devel::CheckOS: '2.02'
   Filesys::Df: '0.92'
   Hash::Util: '0'
   POSIX: '1.15'
@@ -89,7 +90,7 @@ requires:
 resources:
   bugtracker: https://github.com/glasswalk3r/Linux-Info/issues
   repository: https://github.com/glasswalk3r/Linux-Info.git
-version: '2.0'
-x_generated_by_perl: v5.38.0
+version: '2.01'
+x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: GPL-3.0-only

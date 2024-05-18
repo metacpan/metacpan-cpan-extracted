@@ -191,11 +191,11 @@ eval {
 is_deeply(
 	\@error,
 	[
-		"Parameter 'height' doesn't contain number.",
+		"Parameter 'height' doesn't contain unit number.",
 		'Value',
 		'bad',
 	],
-	"Parameter 'height' doesn't contain number.",
+	"Parameter 'height' doesn't contain unit number.",
 );
 clean();
 
@@ -209,11 +209,11 @@ eval {
 is_deeply(
 	\@error,
 	[
-		"Parameter 'height' doesn't contain unit.",
+		"Parameter 'height' doesn't contain unit name.",
 		'Value',
 		'100',
 	],
-	"Parameter 'height' doesn't contain unit.",
+	"Parameter 'height' doesn't contain unit name.",
 );
 clean();
 

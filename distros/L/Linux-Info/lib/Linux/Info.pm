@@ -6,7 +6,7 @@ use POSIX qw(strftime);
 use UNIVERSAL;
 use Linux::Info::Compilation;
 
-our $VERSION = '2.0'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 =head1 NAME
 

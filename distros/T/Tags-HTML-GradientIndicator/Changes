@@ -1,3 +1,10 @@
+0.05 2024-05-18T09:32:59+02:00
+ - Add explicit version of Mo::utils::CSS to code.
+ - Fix ERRORS section in doc.
+
+0.04 2024-05-18T09:06:01+02:00
+ - Update to Mo::utils::CSS@0.07.
+
 0.03 2024-03-27T17:18:08+01:00
  - API Change: Change 'height' and 'width' parameters to CSS unit.
  - Remove obsolete module use in test.

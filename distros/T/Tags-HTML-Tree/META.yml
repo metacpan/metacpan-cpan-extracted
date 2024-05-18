@@ -34,7 +34,7 @@ requires:
   English: 0
   Error::Pure: 0
   Mo::utils: 0.01
-  Mo::utils::CSS: 0.06
+  Mo::utils::CSS: 0.07
   Scalar::Util: 0
   Tags::HTML: 0.1
   Unicode::UTF8: 0
@@ -44,4 +44,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-Tree
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-Tree
-version: '0.04'
+version: '0.05'

@@ -1,3 +1,10 @@
+0.34 2024-05-17T16:59:44+02:00
+ [Common]
+ - Add another use case to Intent doc.
+ - Add missing =end html to Intent doc.
+ - Add setting of formatter to Intent doc.
+ - Fix typo in doc.
+
 0.33 2024-01-10T00:16:59+01:00
  [Common]
  - Fix Intent doc.

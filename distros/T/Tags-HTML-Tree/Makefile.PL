@@ -15,13 +15,13 @@ author_requires 'Test::Pod' => 0;
 author_requires 'Test::Pod::Coverage' => 0;
 license 'bsd';
 name 'Tags-HTML-Tree';
-readme_from 'Tree.pm';
+readme_from 'lib/Tags/HTML/Tree.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0;
 requires 'English' => 0;
 requires 'Error::Pure' => 0;
 requires 'Mo::utils' => 0.01;
-requires 'Mo::utils::CSS' => 0.06;
+requires 'Mo::utils::CSS' => 0.07;
 requires 'Scalar::Util' => 0;
 requires 'Tags::HTML' => 0.10;
 requires 'Unicode::UTF8' => 0;
@@ -39,7 +39,7 @@ test_requires 'Test::NoWarnings' => 0;
 test_requires 'Tree' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

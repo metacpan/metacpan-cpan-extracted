@@ -18,7 +18,7 @@ use OpenSearch::Remote::Info;
 # Filter
 use OpenSearch::Filter::Source;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 # Base singleton
 has 'base' => (
@@ -36,6 +36,7 @@ sub BUILD( $self, $args ) {
     secure         => $args->{secure}         // 0,
     allow_insecure => $args->{allow_insecure} // 1,
     pool_count     => $args->{pool_count}     // 1,
+    clear_attrs    => $args->{clear_attrs}    // 0,
   ) );
 }
 
@@ -61,15 +62,134 @@ __END__
 
 =head1 NAME
 
-OpenSearch - It's new $module
+C<OpenSearch> - A Perl client for OpenSearch (https://opensearch.org/)
 
 =head1 SYNOPSIS
 
+    use strict;
+    use warnings;
     use OpenSearch;
+
+    my $opensearch = OpenSearch->new(
+      user => 'admin',
+      pass => 'admin',
+      hosts => ['http://localhost:9200'],
+      secure => 0,
+      allow_insecure => 1,
+    );
+
+    my $s = $self->search(
+      index => 'my_index',
+      query => {
+        bool => {
+          must => [ { range => { '@timestamp' => { gte => 'now-1d' } } } ],
+        }
+      }
+    );
+
+    # Blocking
+    my $response = $s->execute; 
+    # Non Blocking - Returns a Mojo::Promise;
+    my $promise = $s->execute_p->then(...)->catch(...);
+
+    # OR you can do it like this:
+    my $response = $s->search
+      ->index('my_index')
+      ->query({ 
+        bool => { 
+          must => [ { range => { '@timestamp' => { gte => 'now-1d' } } } ] 
+        } 
+      }
+    )->execute;
 
 =head1 DESCRIPTION
 
-OpenSearch is ...
+This module is a Perl client for OpenSearch (https://opensearch.org/).
+It currently only supports a small subset of the OpenSearch API.
+
+=head1 ATTRIBUTES
+
+=head2 user
+
+The username to use for authentication
+
+=head2 pass
+
+The password to use for authentication
+
+=head2 hosts
+
+An arrayref of hosts to connect to
+
+=head2 secure
+
+Boolean to indicate if the connection should be secure (https)
+
+=head2 allow_insecure
+
+Boolean to indicate if insecure connections are allowed
+
+=head2 pool_count
+
+The number of connections to pool
+
+=head2 clear_attrs
+
+Boolean to indicate if attributes should be cleared after a request.
+By default this is set to false. Usualy all attributes are cached in
+the class instance and will be reused for the next request. Switch
+this to 1 if you want to clear all attributes after a request. Another
+possibility is to create a new instance of the class for each request.
+
+=head1 METHODS
+
+=head2 cluster
+
+returns a new OpenSearch::Cluster object
+
+  my $cluster = $opensearch->cluster;
+
+=head2 cluster_allocation
+
+returns a new OpenSearch::Cluster::Allocation object
+
+  my $cluster = $opensearch->cluster_allocation;
+
+=head2 cluster_health
+
+returns a new OpenSearch::Cluster::Health object
+
+  my $cluster = $opensearch->cluster_health;
+
+=head2 cluster_settings
+
+returns a new OpenSearch::Cluster::Settings object
+
+  my $cluster = $opensearch->cluster_settings;
+
+=head2 cluster_stats
+
+returns a new OpenSearch::Cluster::Stats object
+
+  my $cluster = $opensearch->cluster_stats;
+
+=head2 remote
+
+returns a new OpenSearch::Remote object
+
+  my $remote = $opensearch->remote;
+
+=head2 remote_info
+
+returns a new OpenSearch::Remote::Info object
+
+  my $remote = $opensearch->remote_info;
+
+=head2 search
+
+returns a new OpenSearch::Search object
+
+  my $search = $opensearch->search;
 
 =head1 LICENSE
 

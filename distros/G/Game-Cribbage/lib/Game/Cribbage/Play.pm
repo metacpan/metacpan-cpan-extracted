@@ -115,6 +115,8 @@ function force_card => sub {
 function end_play => sub {
 	my ($self) = @_;
 
+	return unless $self->cards->[0];
+
 	my $score = Game::Cribbage::Play::Score->new(
 		player => $self->cards->[-1]->player,
 		card => $self->cards->[-1],

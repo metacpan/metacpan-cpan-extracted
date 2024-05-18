@@ -24,7 +24,7 @@ property scored => (
 		pair => 2,
 		three_of_a_kind => 6,
 		four_of_a_kind => 12,
-		run => [4, 5],
+		run => [3, 4, 5],
 		four_flush => 4,
 		five_flush => 5,
 		nobs => 1
@@ -93,7 +93,7 @@ function calculate_run => sub {
         		}
 		} @values, $n;
 	}
-
+	
 	if ($map{five}) {
 		$self->run = $map{five};
 	} elsif ($map{four}) {

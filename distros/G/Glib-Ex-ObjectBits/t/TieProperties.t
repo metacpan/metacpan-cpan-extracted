@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010, 2011, 2012 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2024 Kevin Ryde
 
 # This file is part of Glib-Ex-ObjectBits.
 #
@@ -84,7 +84,7 @@ my %want_props = ('myprop-one' => 1,
 
 my $gobject_has_properties = defined ((Glib::Object->list_properties)[0]);
 
-my $want_version = 16;
+my $want_version = 17;
 {
   is ($Glib::Ex::TieProperties::VERSION, $want_version,
       'VERSION variable');
@@ -145,12 +145,16 @@ diag "using tie()";
   ok (! eval { $h{'nosuchproperty'} = 1; 1 },
       'store nosuchproperty, error');
   {
+    # In the past, writing to a read-only property was a warning.
+    # Circa Glib 2.78.3 this is "critical".
+    # Trap both ways here.
     my $handler_called = 0;
     my $handler = sub { $handler_called++ };
-    my $handler_id = Glib::Log->set_handler ('GLib-GObject',
-                                             ['warning'], $handler);
+    my $handler_id = Glib::Log->set_handler
+      ('GLib-GObject', ['warning','critical'], $handler);
     $h{'readonly-float'} = 1.25;
-    is ($handler_called, 1, 'store readonly-float, g_log warning');
+    is ($handler_called, 1, 
+        'store readonly-float provokes g_log warning or error');
     Glib::Log->remove_handler ('GLib-GObject', $handler_id);
   }
 

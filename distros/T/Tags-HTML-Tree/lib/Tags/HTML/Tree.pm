@@ -8,11 +8,11 @@ use Class::Utils qw(set_params split_params);
 use English;
 use Error::Pure qw(err);
 use Mo::utils 0.01 qw(check_required);
-use Mo::utils::CSS 0.06 qw(check_css_class check_css_unit);
+use Mo::utils::CSS 0.07 qw(check_css_class check_css_unit);
 use Scalar::Util qw(blessed);
 use Unicode::UTF8 qw(decode_utf8);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -286,6 +286,21 @@ Returns undef.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+         From Mo::utils::check_required():
+                 Parameter '%s' is required.
+         From Mo::utils::CSS::check_css_class():
+                 Parameter 'css_class' has bad CSS class name.
+                         Value: %s
+                 Parameter 'css_class' has bad CSS class name (number on begin).
+                         Value: %s
+         From Mo::utils::CSS::check_css_unit():
+                 Parameter 'indent' contain bad unit.
+                         Unit: %s
+                         Value: %s
+                 Parameter 'indent' doesn't contain unit name.
+                         Value: %s
+                 Parameter 'indent' doesn't contain unit number.
+                         Value: %s
          From Tags::HTML::new():
                  Parameter 'tags' must be a 'Tags::Output::*' class.
          Parameter 'css_class' is required.
@@ -659,6 +674,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

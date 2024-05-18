@@ -15,7 +15,7 @@ use Archive::Libarchive::EntryLinkResolver;
 use parent qw( Exporter );
 
 # ABSTRACT: Modern Perl bindings to libarchive
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 my $ffi = Archive::Libarchive::Lib->ffi;
@@ -87,7 +87,7 @@ Archive::Libarchive - Modern Perl bindings to libarchive
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

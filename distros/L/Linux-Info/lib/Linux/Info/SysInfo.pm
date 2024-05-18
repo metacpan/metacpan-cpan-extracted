@@ -7,7 +7,7 @@ use Hash::Util qw(lock_keys);
 use base 'Class::Accessor';
 use Devel::CheckOS 2.01 qw(os_is);
 
-our $VERSION = '2.0'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 my @_attribs = (
     'raw_time',  'hostname',  'domain',     'kernel',

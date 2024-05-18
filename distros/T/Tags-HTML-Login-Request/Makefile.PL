@@ -21,7 +21,7 @@ recursive_author_tests('xt');
 requires 'Class::Utils' => 0;
 requires 'Error::Pure' => 0;
 requires 'List::Util' => 1.33;
-requires 'Mo::utils::CSS' => 0.06;
+requires 'Mo::utils::CSS' => 0.07;
 requires 'Mo::utils::Language' => 0.05;
 requires 'Readonly' => 0;
 requires 'Tags::HTML' => 0;
@@ -37,7 +37,7 @@ test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.02';
+version '0.03';
 
 # Run.
 WriteAll();

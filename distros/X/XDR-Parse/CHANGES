@@ -1,0 +1,19 @@
+-----
+
+0.1.2   2024-05-18
+    [Fixed]
+        * POD encoding error regarding non-ascii character
+        * Fix 'use warnings' as indicated by CPANTS
+        * Fix '=head1 LICENSE' as indicated by CPANTS
+        * Add README as reported by CPANTS
+        * Remove second (and incorrect) '=head1 VERSION'
+        * Invoke 'bin/xdr-parse' using the current Perl
+
+0.1.1   2024-05-17
+    [Fixed]
+        * Add missing 'pmfilter' script
+        * Prevent re-generation of Parse.pm on installation from dist
+        * Add CHANGES file
+
+0.1.0   2024-05-17
+    Initial release

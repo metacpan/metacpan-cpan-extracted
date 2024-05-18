@@ -1,3 +1,10 @@
+0.10 2024-05-18T09:41:50+02:00
+ - Fix ERRORS section in doc.
+ - Fix explicit version of Mo::utils::CSS in code.
+
+0.09 2024-05-18T09:02:01+02:00
+ - Update to Mo::utils::CSS@0.07.
+
 0.08 2024-05-17T10:09:16+02:00
  - Add check for CSS classes.
  - Add explicit version of Mo::utils::CSS to code.

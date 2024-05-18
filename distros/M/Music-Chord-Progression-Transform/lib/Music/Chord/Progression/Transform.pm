@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate transformed chord progressions
 
-our $VERSION = '0.0303';
+our $VERSION = '0.0304';
 
 use Moo;
 use strictures 2;
@@ -321,7 +321,7 @@ Music::Chord::Progression::Transform - Generate transformed chord progressions
 
 =head1 VERSION
 
-version 0.0303
+version 0.0304
 
 =head1 SYNOPSIS
 
@@ -517,7 +517,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Gene Boggs.
+This software is Copyright (c) 2023-2024 by Gene Boggs.
 
 This is free software, licensed under:
 

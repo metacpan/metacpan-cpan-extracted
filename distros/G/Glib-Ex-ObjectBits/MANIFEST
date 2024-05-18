@@ -55,5 +55,6 @@ xtools/my-manifest.sh
 xtools/my-pc.sh
 xtools/my-tags.sh
 xtools/my-wunused.sh
+xtools/my_pod2html
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,55 @@
+{
+   "abstract" : "Parse XDR (eXternal Data Representation) definitions into an AST (Abstract Syntax Tree)",
+   "author" : [
+      "Erik Huelsmann"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "XDR-Parse",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.09"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Parse::Yapp" : "1.21",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ehuelsmann/XDR-Parse.git",
+         "web" : "https://github.com/ehuelsmann/XDR-Parse"
+      }
+   },
+   "version" : "v0.1.2",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

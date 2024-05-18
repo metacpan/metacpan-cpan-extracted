@@ -7,6 +7,7 @@ $mwclass = 'Tk::AppWindow';
 my @iconpath = ('t/Themes');
 require Tk::NoteBook;
 require Tk::LabFrame;
+use Module::Load::Conditional('check_install', 'can_load');
 
 use Config;
 my $osname = $Config{'osname'};
@@ -189,8 +190,12 @@ for (sort keys %pages) {
 	for ('png_1', 'png_2') {
 		&CreateImgTests($_, $size);
 	}
-	unless ($osname eq 'MSWin32') {
-		&CreateImgTests('svg_1', $size);
+	my $modname = 'Image::LibRSVG';
+	my $inst = check_install(module => $modname);
+	if (defined $inst) {
+		if (can_load(modules => {$modname => $inst->{'version'}})){
+			&CreateImgTests('svg_1', $size);
+		}
 	}
 }
 

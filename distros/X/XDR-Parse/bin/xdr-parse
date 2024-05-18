@@ -1,0 +1,10 @@
+#!/usr/bin/env perl
+
+use lib '.';
+use XDR::Parse;
+use JSON::PP;
+
+my $json = JSON::PP->new;
+
+my $p = XDR::Parse->new;
+print $json->encode( $p->parse( \*STDIN ) );

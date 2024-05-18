@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::Most;
-use Devel::CheckOS 2.01 qw(os_is);
+
 use constant CLASS     => 'Linux::Info::KernelRelease';
 use constant TEST_DESC => 'works for instance without mainline version';
 
@@ -16,13 +16,9 @@ my $instance =
   CLASS->new( '6.5.0-28-generic', 'Ubuntu 6.5.0-28.29~22.04.1-generic 6.5.13' );
 isa_ok( $instance, CLASS );
 
-if ( os_is('Linux::Ubuntu') ) {
-    cmp_ok( $instance->get_patch, '>=', 0,
-        'get_patch returns the expected value' );
-}
-else {
-    is( $instance->get_patch, 0, 'get_major returns the expected value' );
-}
+cmp_ok( $instance->get_patch, '>=', 0,
+    'get_patch returns the expected value with mainline information' )
+  or diag( explain($instance) );
 
 my $other =
   CLASS->new( '6.5.0-28-generic', 'Ubuntu 6.5.0-28.29~22.04.1-generic 6.5.12' );
@@ -62,5 +58,10 @@ is( $other->get_minor, 6, 'get_minor ' . TEST_DESC );
 is( $other->get_patch, 0, 'get_patch ' . TEST_DESC );
 is( $other->get_mainline_version, '6.6.0',
     'get_mainline_version ' . TEST_DESC );
+
+my $without_mainline = CLASS->new('6.5.0-28-generic');
+is( $without_mainline->get_patch,
+    0, 'get_patch returns the expected value without mainline information' )
+  or diag( explain($without_mainline) );
 
 done_testing;

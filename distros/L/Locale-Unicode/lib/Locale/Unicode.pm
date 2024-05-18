@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## HTML Object - ~/lib/Locale/Unicode.pm
-## Version v0.1.0
+## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
+## Version v0.1.1
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2024/05/11
+## Modified 2024/05/18
 ## All rights reserved
 ## 
 ## 
@@ -304,7 +304,7 @@ BEGIN
     )?
     /xi;
     our $PROP_TO_SUB = {};
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 use strict;
@@ -3343,7 +3343,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -3355,7 +3355,7 @@ For your convenience, summary of key elements of the standard can be found in th
 
 It is lightweight and fast with no dependency outside of L<Scalar::Util> and L<Want>. It requires perl C<v5.10> minimum to operate.
 
-The objects stringifies, and once its string value is computed, it is cached and re-used until it is changed. Thus repetitive call to L<as_string|/as_string> or to stringification does not incur any speed penalty by recomputing what has not changed.
+The object stringifies, and once its string value is computed, it is cached and re-used until it is changed. Thus repetitive call to L<as_string|/as_string> or to stringification does not incur any speed penalty by recomputing what has not changed.
 
 =head1 CONSTRUCTOR
 
@@ -3422,8 +3422,6 @@ This is a Unicode Dictionary Break Exclusion Identifier that specifies scripts t
 Sets or gets the Unicode extension C<dx>
 
 See also L<dx|/dx>
-
-This specifies scripts to be excluded from dictionary-based text break.
 
 =head2 ca
 
@@ -8399,6 +8397,8 @@ L<BCP47|https://www.rfc-editor.org/rfc/bcp/bcp47.txt>
 L<RFC6067 on the Unicode extensions|https://datatracker.ietf.org/doc/html/rfc6067>
 
 L<RFC6497 on the transformation extension|https://datatracker.ietf.org/doc/html/rfc6497>
+
+L<Unicode::Collate>
 
 =head1 COPYRIGHT & LICENSE
 

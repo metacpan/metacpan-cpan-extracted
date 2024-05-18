@@ -1,6 +1,15 @@
 Revision history for Perl extension Tk::AppWindow.
 
-0.03
+0.05 Sat May 18 2024
+	-fixed failing tests of Art
+	-fixed undefined variable error in Art
+
+0.04 Fri May 17 2024
+	- Fixed indexing error for CPAN
+	- Added missing prerequisite to Makefile.PL and README.md
+	- Fixed bug in extensions Art, Help and Navigator and in base class SidePanel.
+
+0.03 Thu May 16 2024
 	- Countless small fixes and improvements.
 	- Removed the WebBrowser extension. What it tried to accomplish is done much easier and more elegant.
 	- Added openURL method to Tk::AppWindow
@@ -17,9 +26,3 @@ Revision history for Perl extension Tk::AppWindow.
 0.01  Sun Dec 19 23:09:57 2021
 	- original version; created by h2xs 1.23 with options
 		-X -n Tk::AppWindow
-
-
-
-
-
-

@@ -1,6 +1,6 @@
 package Super::Powers;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.02';
+use 5.006; use strict; use warnings; our $VERSION = '0.03';
 use Rope; use Rope::Autoload; use Super::Powers::Exists;
 
 property motor => (
@@ -23,7 +23,7 @@ property vision => (
 	builder => sub {
 		Super::Powers::Exists->new(
 			title => 'Vision',
-			message => "They have the capability to perceive through another's eyes; you ought to shut them when you gaze upon the innocent.",
+			message => "They have the capability to see through another's eyes; you ought to shut them when you gaze upon the innocent.",
 			buttons => ['real'],
 		);
 	}
@@ -49,7 +49,7 @@ property mind => (
 	builder => sub {
 		Super::Powers::Exists->new(
 			title => 'Mind',
-			message => "TThey have the capability to implant sound directly into any individual's mind, remotely and bypassing the ears, akin to hearing but with the sound entering directly",
+			message => "They have the capability to implant sound directly into any individual's mind, remotely and bypassing the ears, akin to hearing but with the sound entering directly",
 			buttons => ['real'],
 		);
 	}
@@ -63,7 +63,7 @@ property speech => (
 	builder => sub {
 		Super::Powers::Exists->new(
 			title => 'Speech',
-			message => "They have the power to control voices through any person's mouth, enabling them to manipulate tone and language, thereby making individuals polyglots.",
+			message => "They have the power to control tone through any person's mouth, enabling them to manipulate tone and language, thereby making individuals polyglots.",
 			buttons => ['real'],
 		);
 	}
@@ -131,7 +131,7 @@ Super::Powers - The hiddden truth
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -152,18 +152,19 @@ Version 0.02
 	# 
 	# Vision
 	# 
-	# They have the capability to perceive through another's eyes; you ought to shut them when you gaze upon the innocent.
+	# They have the capability to see through another's eyes; you ought to shut them when you gaze upon the innocent.
+	#
 	# Hearing
 	# 
 	# They have the power to transmit sound through anyone's ears, remotely and also through electronic devices.
 	# 
 	# Mind
 	# 
-	# TThey have the capability to implant sound directly into any individual's mind, remotely and bypassing the ears, akin to hearing but with the sound entering directly
+	# They have the capability to implant sound directly into any individual's mind, remotely and bypassing the ears, akin to hearing but with the sound entering directly
 	# 
 	# Speech
 	# 
-	# They have the power to control voices through any person's mouth, enabling them to manipulate tone and language, thereby making individuals polyglots.
+	# They have the power to control tone through any person's mouth, enabling them to manipulate tone and language, thereby making individuals polyglots.
 	# 
 	# Smell
 	# 

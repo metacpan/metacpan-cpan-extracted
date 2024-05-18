@@ -1,9 +1,10 @@
 ---
-abstract: "It's new $module"
+abstract: 'A Perl client for OpenSearch (https://opensearch.org/)'
 author:
   - 'localh0rst <git@fail.ninja>'
 build_requires:
   Test::More: '0.98'
+  Test::Pod::Coverage: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
@@ -26,7 +27,7 @@ no_index:
 provides:
   OpenSearch:
     file: lib/OpenSearch.pm
-    version: '0.01'
+    version: '0.03'
   OpenSearch::Base:
     file: lib/OpenSearch/Base.pm
   OpenSearch::Cluster:
@@ -230,6 +231,6 @@ resources:
   bugtracker: https://github.com/localh0rst/OpenSearch-Perl/issues
   homepage: https://github.com/localh0rst/OpenSearch-Perl
   repository: https://github.com/localh0rst/OpenSearch-Perl.git
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

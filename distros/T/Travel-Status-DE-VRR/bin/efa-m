@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -13,14 +13,15 @@ use Getopt::Long qw(:config no_ignore_case bundling);
 use List::Util   qw(first max none);
 use Travel::Status::DE::EFA;
 
-my $efa_url = 'https://efa.vrr.de/vrr/XSLT_DM_REQUEST';
+my $service = 'VRR';
+my $efa_url;
 my $efa_encoding;
 my ( $date,        $time, $input_type, $list_lines, $offset, $relative_times );
 my ( $full_routes, $filter_via );
 my ( $timeout,     $developer_mode );
 my ( @grep_lines,  @grep_platforms, @grep_mots );
 my ( %edata,       @edata_pre );
-my ( $list_services, $service, $discover_and_print, $discover );
+my ( $list_services, $discover_and_print, $discover );
 my $efa;
 
 @ARGV = map { decode( 'UTF-8', $_ ) } @ARGV;
@@ -88,9 +89,11 @@ if ($filter_via) {
 	$full_routes = 1;
 }
 
-if ($service) {
-	my $service_ref = first { lc( $_->{shortname} ) eq lc($service) }
-	  Travel::Status::DE::EFA::get_efa_urls();
+if ($efa_url) {
+	$service = undef;
+}
+elsif ($service) {
+	my $service_ref = Travel::Status::DE::EFA::get_service($service);
 	if ( not $service_ref ) {
 		printf STDERR (
 			"Error: Unknown service '%s'. See 'efa-m --list' for a "
@@ -99,16 +102,17 @@ if ($service) {
 		);
 		exit 1;
 	}
-	$efa_url      = $service_ref->{url};
 	$efa_encoding = $service_ref->{encoding};
+	$efa_url      = undef;
 }
 
-sub new_efa_by_url {
-	my ($url) = @_;
+sub new_efa {
+	my ( $s, $u ) = @_;
 	my $res = Travel::Status::DE::EFA->new(
+		service        => $s,
+		efa_url        => $u,
 		date           => $date,
 		developer_mode => $developer_mode,
-		efa_url        => $url,
 		efa_encoding   => $efa_encoding,
 		full_routes    => $full_routes,
 		place          => $place,
@@ -371,7 +375,7 @@ sub show_results {
 
 if ( $discover or $discover_and_print ) {
 	for my $service_ref ( Travel::Status::DE::EFA::get_efa_urls() ) {
-		$efa = new_efa_by_url( $service_ref->{url} );
+		$efa = new_efa( $service_ref->{shortname} );
 		if ( $efa and not $efa->errstr ) {
 			if ($discover_and_print) {
 				last;
@@ -388,7 +392,7 @@ if ( $discover or $discover_and_print ) {
 	}
 }
 
-$efa = new_efa_by_url($efa_url);
+$efa = new_efa( $service, $efa_url );
 
 if ( my $err = $efa->errstr ) {
 	say STDERR "Request error: ${err}";
@@ -426,7 +430,7 @@ B<efa-m> [B<-Lr>] [B<-d> I<dd.mm.yyyy>] [B<-t> I<hh:mm>]
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 DESCRIPTION
 
@@ -570,13 +574,6 @@ B<--list> option for a list of services.
 =item B<-t>, B<--time> I<hh:mm>
 
 Show departures starting at I<time> instead of now.
-
-=item B<-u>, B<--efa-url> I<url>
-
-URL to the EFA entry point, defaults to
-L<http://efa.vrr.de/vrr/XSLT_DM_REQUEST>.  Depending on your location, some
-I<url>s may contain more specific data than others.  See
-Travel::Status::DE::EFA(3pm) and the B<--list> option for alternatives.
 
 =item B<--timeout> I<seconds>
 

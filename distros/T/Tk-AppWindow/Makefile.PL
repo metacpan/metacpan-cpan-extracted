@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 my %prereq = (
+	'Data::Compare'         => '1.29',
 	'File::Basename'				    => '2.85',
 	'File::Path'						     => '2.18',
 	'File::Spec'						     => '3.84',

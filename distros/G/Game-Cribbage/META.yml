@@ -19,9 +19,10 @@ no_index:
     - t
     - inc
 requires:
+  Array::Diff: '0'
   List::Util: '0'
   Rope: '0.35'
   ntheory: '0'
   perl: '5.006'
-version: '0.05'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

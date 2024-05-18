@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2014, 2024 Kevin Ryde
 
 # This file is part of Glib-Ex-ObjectBits.
 #
@@ -30,7 +30,7 @@ our @EXPORT_OK = qw(to_display
                     to_display_default
                     to_description);
 
-our $VERSION = 16;
+our $VERSION = 17;
 
 sub to_display {
   my ($enum_class, $nick) = @_;
@@ -259,7 +259,7 @@ L<http://user42.tuxfamily.org/glib-ex-objectbits/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2014 Kevin Ryde
+Copyright 2010, 2011, 2012, 2014, 2024 Kevin Ryde
 
 Glib-Ex-ObjectBits is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

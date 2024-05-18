@@ -107,5 +107,6 @@ lib/OpenSearch/Search.pm
 lib/README.md
 minil.toml
 t/00_compile.t
+t/01_pod_coverage.t
 META.yml
 MANIFEST

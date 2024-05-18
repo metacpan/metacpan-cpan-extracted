@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011, 2012, 2014 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2016, 2024 Kevin Ryde
 
 # This file is part of Glib-Ex-ObjectBits.
 #
@@ -24,7 +24,7 @@ use Glib;
 use Scalar::Util;
 use Devel::GlobalDestruction 'in_global_destruction';
 
-our $VERSION = 16;
+our $VERSION = 17;
 
 sub new {
   my ($class, $object, @ids) = @_;
@@ -62,9 +62,7 @@ sub ids {
 
 sub disconnect {
   my ($self) = @_;
-
-  my $object = $self->[0];
-  if (! $object) { return; }  # target object already destroyed
+  my $object = $self->[0] || return;  # target object already destroyed
 
   while (@$self > 1) {
     my $id = pop @$self;
@@ -99,7 +97,7 @@ Glib::Ex::SignalIds -- hold connected Glib signal handler IDs
 
 =head1 DESCRIPTION
 
-C<Glib::Ex::SignalIds> holds a set of signal handler connection IDs
+C<Glib::Ex::SignalIds> holds a set of Glib signal handler connection IDs
 (integers) and the object they're on.  When the SignalIds is destroyed it
 disconnects those IDs.
 
@@ -175,7 +173,7 @@ avoids warnings like
 
 Objects are destroyed in an unspecified order during global destruction so
 it can happen that the target is already gone.  Perl is about to exit anyway
-so disconnecting handlers is not necessary.  (See L<perlobj/Global
+so disconnecting handlers should be unnecessary.  (See L<perlobj/Global
 Destruction>.)
 
 =head1 FUNCTIONS
@@ -244,7 +242,7 @@ L<http://user42.tuxfamily.org/glib-ex-objectbits/index.html>
 
 =head1 LICENSE
 
-Copyright 2008, 2009, 2010, 2011, 2012, 2014 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2016, 2024 Kevin Ryde
 
 Glib-Ex-ObjectBits is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

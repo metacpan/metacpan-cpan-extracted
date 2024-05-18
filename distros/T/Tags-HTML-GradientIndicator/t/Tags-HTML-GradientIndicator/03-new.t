@@ -71,8 +71,8 @@ eval {
 };
 is(
 	$EVAL_ERROR,
-	"Parameter 'height' doesn't contain number.\n",
-	"Parameter 'height' doesn't contain number (foo).",
+	"Parameter 'height' doesn't contain unit number.\n",
+	"Parameter 'height' doesn't contain unit number (foo).",
 );
 clean();
 
@@ -85,8 +85,8 @@ eval {
 };
 is(
 	$EVAL_ERROR,
-	"Parameter 'height' doesn't contain unit.\n",
-	"Parameter 'height' doesn't contain unit (123).",
+	"Parameter 'height' doesn't contain unit name.\n",
+	"Parameter 'height' doesn't contain unit name (123).",
 );
 clean();
 
@@ -113,8 +113,8 @@ eval {
 };
 is(
 	$EVAL_ERROR,
-	"Parameter 'width' doesn't contain number.\n",
-	"Parameter 'width' doesn't contain number (foo).",
+	"Parameter 'width' doesn't contain unit number.\n",
+	"Parameter 'width' doesn't contain unit number (foo).",
 );
 clean();
 
@@ -127,8 +127,8 @@ eval {
 };
 is(
 	$EVAL_ERROR,
-	"Parameter 'width' doesn't contain unit.\n",
-	"Parameter 'width' doesn't contain unit (123).",
+	"Parameter 'width' doesn't contain unit name.\n",
+	"Parameter 'width' doesn't contain unit name (123).",
 );
 clean();
 

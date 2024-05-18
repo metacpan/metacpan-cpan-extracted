@@ -22,11 +22,12 @@ use Music::MelodicDevice::Transposition ();
 
 my %opt = (
     repeat     => 1,
-    max        => 4,
+    max        => undef,
     bpm        => 100,
     note       => 'G',
     octave     => 4,
     quality    => '',
+    duration   => 'wn',
     transforms => 'O,PRL,R,L,R,L,R', # mostly diatonic. integer = random
     bass       => 1,
     verbose    => 1,
@@ -38,6 +39,7 @@ GetOptions(\%opt,
     'note=s',
     'octave=i',
     'quality=s',
+    'duration=s',
     'transforms=s',
     'bass!',
     'verbose',
@@ -45,6 +47,10 @@ GetOptions(\%opt,
 
 if ($opt{transforms} !~ /^\d+$/) {
     $opt{transforms} = [ split /,/, $opt{transforms} ];
+    $opt{max} ||= $opt{transforms}->@*;
+}
+else {
+    $opt{max} ||= $opt{transforms};
 }
 
 my @bass; # collected by top()
@@ -64,8 +70,8 @@ sub bottom {
     my $md = Music::MelodicDevice::Transposition->new;
     my $transposed = $md->transpose(-24, \@bass);
 
-    for my $note (@$transposed) {
-        $score->n('wn', $note);
+    for my $pitch (@$transposed) {
+        $score->n($opt{duration}, $pitch);
     }
 }
 
@@ -88,7 +94,7 @@ sub top {
             $j++;
 
             # add a midi formatted whole note to the score
-            $score->n('wn', @$chord);
+            $score->n($opt{duration}, @$chord);
 
             # select the lowest note of the final chord for the bass
             if ($i >= $opt{repeat} && $j >= @$generated) {

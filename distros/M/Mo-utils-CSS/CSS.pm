@@ -6,16 +6,20 @@ use warnings;
 
 use Error::Pure qw(err);
 use Graphics::ColorNames::CSS;
-use List::Util 1.33 qw(none);
+use List::Util 1.33 qw(any none);
 use Mo::utils 0.06 qw(check_array);
 use Readonly;
 
-Readonly::Array our @EXPORT_OK => qw(check_array_css_color check_css_class check_css_color check_css_unit);
+Readonly::Array our @EXPORT_OK => qw(check_array_css_color check_css_border
+	check_css_class check_css_color check_css_unit);
 Readonly::Array our @ABSOLUTE_LENGTHS => qw(cm mm in px pt pc);
+Readonly::Array our @BORDER_GLOBAL => qw(inherit initial revert revert-layer unset);
+Readonly::Array our @BORDER_STYLES => qw(none hidden dotted dashed solid double groove ridge inset outset);
+Readonly::Array our @BORDER_WIDTHS => qw(thin medium thick);
 Readonly::Array our @RELATIVE_LENGTHS => qw(em ex ch rem vw vh vmin vmax %);
 Readonly::Array our @COLOR_FUNC => qw(rgb rgba hsl hsla);
 
-our $VERSION = 0.06;
+our $VERSION = 0.08;
 
 sub check_array_css_color {
 	my ($self, $key) = @_;
@@ -28,6 +32,47 @@ sub check_array_css_color {
 
 	foreach my $css_color (@{$self->{$key}}) {
 		_check_color($css_color, $key);
+	}
+
+	return;
+}
+
+sub check_css_border {
+	my ($self, $key) = @_;
+
+	_check_key($self, $key) && return;
+
+	# Global values.
+	if (any { $self->{$key} eq $_ } @BORDER_GLOBAL) {
+		return;
+	}
+
+	my @parts = split m/\s+/ms, $self->{$key}, 3;
+	if (@parts == 1) {
+		_check_border_style($self->{$key}, $key);
+	} elsif (@parts == 2) {
+
+		# Border style on first place.
+		if (any { $parts[0] eq $_ } @BORDER_STYLES) {
+			_check_color($parts[1], $key, $self->{$key});
+
+		# Border style on second place.
+		} elsif (any { $parts[1] eq $_ } @BORDER_STYLES) {
+			if (none { $parts[0] eq $_ } @BORDER_WIDTHS) {
+				_check_unit($parts[0], $key, $self->{$key});
+			}
+
+		} else {
+			err "Parameter '$key' hasn't border style.",
+				'Value', $self->{$key},
+			;
+		}
+	} else {
+		if (none { $parts[0] eq $_ } @BORDER_WIDTHS) {
+			_check_unit($parts[0], $key, $self->{$key});
+		}
+		_check_border_style($parts[1], $key, $self->{$key});
+		_check_color($parts[2], $key, $self->{$key});
 	}
 
 	return;
@@ -66,35 +111,34 @@ sub check_css_unit {
 
 	_check_key($self, $key) && return;
 
-	my $value = $self->{$key};
-	my ($num, $unit) = $value =~ m/^(\d*\.?\d+)([^\d]*)$/ms;
-	if (! $num) {
-		err "Parameter '$key' doesn't contain number.",
-			'Value', $value,
-		;
-	}
-	if (! $unit) {
-		err "Parameter '$key' doesn't contain unit.",
-			'Value', $value,
-		;
-	}
-	if (none { $_ eq $unit } (@ABSOLUTE_LENGTHS, @RELATIVE_LENGTHS)) {
-		err "Parameter '$key' contain bad unit.",
-			'Unit', $unit,
-			'Value', $value,
+	_check_unit($self->{$key}, $key);
+
+	return;
+}
+
+sub _check_alpha {
+	my ($value, $key, $args_ar, $func, $error_value) = @_;
+
+	my $alpha = $args_ar->[3];
+	if ($alpha !~ m/^[\d\.]+$/ms || $alpha > 1) {
+		err "Parameter '$key' has bad $func alpha.",
+			'Value', $error_value,
 		;
 	}
 
 	return;
 }
 
-sub _check_alpha {
-	my ($value, $key, $args_ar, $func) = @_;
+sub _check_border_style {
+	my ($value, $key, $error_value) = @_;
 
-	my $alpha = $args_ar->[3];
-	if ($alpha !~ m/^[\d\.]+$/ms || $alpha > 1) {
-		err "Parameter '$key' has bad $func alpha.",
-			'Value', $value,
+	if (! defined $error_value) {
+		$error_value = $value;
+	}
+
+	if (none { $value eq $_ } @BORDER_STYLES) {
+		err "Parameter '$key' has bad border style.",
+			'Value', $error_value,
 		;
 	}
 
@@ -102,7 +146,11 @@ sub _check_alpha {
 }
 
 sub _check_color {
-	my ($value, $key) = @_;
+	my ($value, $key, $error_value) = @_;
+
+	if (! defined $error_value) {
+		$error_value = $value;
+	}
 
 	my $funcs = join '|', @COLOR_FUNC;
 	if ($value =~ m/^#(.*)$/ms) {
@@ -110,12 +158,12 @@ sub _check_color {
 		if (length $rgb == 3 || length $rgb == 6 || length $rgb == 8) {
 			if ($rgb !~ m/^[0-9A-Fa-f]+$/ms) {
 				err "Parameter '$key' has bad rgb color (bad hex number).",
-					'Value', $value,
+					'Value', $error_value,
 				;
 			}
 		} else {
 			err "Parameter '$key' has bad rgb color (bad length).",
-				'Value', $value,
+				'Value', $error_value,
 			;
 		}
 	} elsif ($value =~ m/^($funcs)\((.*)\)$/ms) {
@@ -125,40 +173,40 @@ sub _check_color {
 		if ($func eq 'rgb') {
 			if (@args != 3) {
 				err "Parameter '$key' has bad rgb color (bad number of arguments).",
-					'Value', $value,
+					'Value', $error_value,
 				;
 			}
-			_check_colors($value, $key, \@args, $func);
+			_check_colors($value, $key, \@args, $func, $error_value);
 		} elsif ($func eq 'rgba') {
 			if (@args != 4) {
 				err "Parameter '$key' has bad rgba color (bad number of arguments).",
-					'Value', $value,
+					'Value', $error_value,
 				;
 			}
-			_check_colors($value, $key, \@args, $func);
-			_check_alpha($value, $key, \@args, $func);
+			_check_colors($value, $key, \@args, $func, $error_value);
+			_check_alpha($value, $key, \@args, $func, $error_value);
 		} elsif ($func eq 'hsl') {
 			if (@args != 3) {
 				err "Parameter '$key' has bad hsl color (bad number of arguments).",
-					'Value', $value,
+					'Value', $error_value,
 				;
 			}
-			_check_degree($value, $key, \@args, $func);
-			_check_percent($value, $key, \@args, $func);
+			_check_degree($value, $key, \@args, $func, $error_value);
+			_check_percent($value, $key, \@args, $func, $error_value);
 		} else {
 			if (@args != 4) {
 				err "Parameter '$key' has bad hsla color (bad number of arguments).",
-					'Value', $value,
+					'Value', $error_value,
 				;
 			}
-			_check_degree($value, $key, \@args, $func);
-			_check_percent($value, $key, \@args, $func);
-			_check_alpha($value, $key, \@args, $func);
+			_check_degree($value, $key, \@args, $func, $error_value);
+			_check_percent($value, $key, \@args, $func, $error_value);
+			_check_alpha($value, $key, \@args, $func, $error_value);
 		}
 	} else {
 		if (none { $value eq $_ } keys %{Graphics::ColorNames::CSS->NamesRgbTable}) {
 			err "Parameter '$key' has bad color name.",
-				'Value', $value,
+				'Value', $error_value,
 			;
 		}
 	}
@@ -167,12 +215,12 @@ sub _check_color {
 }
 
 sub _check_colors {
-	my ($value, $key, $args_ar, $func) = @_;
+	my ($value, $key, $args_ar, $func, $error_value) = @_;
 
 	foreach my $i (@{$args_ar}[0 .. 2]) {
 		if ($i !~ m/^\d+$/ms || $i > 255) {
 			err "Parameter '$key' has bad $func color (bad number).",
-				'Value', $value,
+				'Value', $error_value,
 			;
 		}
 	}
@@ -181,12 +229,12 @@ sub _check_colors {
 }
 
 sub _check_degree {
-	my ($value, $key, $args_ar, $func) = @_;
+	my ($value, $key, $args_ar, $func, $error_value) = @_;
 
 	my $angle = $args_ar->[0];
 	if ($angle !~ m/^\d+$/ms || $angle > 360) {
 		err "Parameter '$key' has bad $func degree.",
-			'Value', $value,
+			'Value', $error_value,
 		;
 	}
 
@@ -204,7 +252,7 @@ sub _check_key {
 }
 
 sub _check_percent {
-	my ($value, $key, $args_ar, $func) = @_;
+	my ($value, $key, $args_ar, $func, $error_value) = @_;
 
 	foreach my $i (@{$args_ar}[1 .. 2]) {
 
@@ -214,22 +262,50 @@ sub _check_percent {
 			my $p = $2;
 			if (! $p) {
 				err "Parameter '$key' has bad $func percent (missing %).",
-					'Value', $value,
+					'Value', $error_value,
 				;
 			}
 		# Check percent number.
 		} else {
 			err "Parameter '$key' has bad $func percent.",
-				'Value', $value,
+				'Value', $error_value,
 			;
 		}
 
 		# Check percent value.
 		if ($i > 100) {
 			err "Parameter '$key' has bad $func percent.",
-				'Value', $value,
+				'Value', $error_value,
 			;
 		}
+	}
+
+	return;
+}
+
+sub _check_unit {
+	my ($value, $key, $error_value) = @_;
+
+	if (! defined $error_value) {
+		$error_value = $value;
+	}
+
+	my ($num, $unit) = $value =~ m/^(\d*\.?\d+)([^\d]*)$/ms;
+	if (! $num) {
+		err "Parameter '$key' doesn't contain unit number.",
+			'Value', $error_value,
+		;
+	}
+	if (! $unit) {
+		err "Parameter '$key' doesn't contain unit name.",
+			'Value', $error_value,
+		;
+	}
+	if (none { $_ eq $unit } (@ABSOLUTE_LENGTHS, @RELATIVE_LENGTHS)) {
+		err "Parameter '$key' contain bad unit.",
+			'Unit', $unit,
+			'Value', $error_value,
+		;
 	}
 
 	return;
@@ -249,9 +325,10 @@ Mo::utils::CSS - Mo CSS utilities.
 
 =head1 SYNOPSIS
 
- use Mo::utils::CSS qw(check_array_css_color check_css_class check_css_color check_css_unit);
+ use Mo::utils::CSS qw(check_array_css_color check_css_border check_css_class check_css_color check_css_unit);
 
  check_array_css_color($self, $key);
+ check_css_border($self, $key);
  check_css_class($self, $key);
  check_css_color($self, $key);
  check_css_unit($self, $key);
@@ -270,6 +347,19 @@ I<Since version 0.03.>
 
 Check parameter defined by C<$key> which is reference to array.
 Check if all values are CSS colors.
+
+Put error if check isn't ok.
+
+Returns undef.
+
+=head2 C<check_css_border>
+
+ check_css_border($self, $key);
+
+I<Since version 0.07.>
+
+Check parameter defined by C<$key> if it's CSS border.
+Value could be undefined.
 
 Put error if check isn't ok.
 
@@ -305,7 +395,7 @@ Returns undef.
 
  check_css_unit($self, $key);
 
-I<Since version 0.01. Described functionality since version 0.04.>
+I<Since version 0.01. Described functionality since version 0.07.>
 
 Check parameter defined by C<$key> if it's CSS unit.
 Value could be undefined.
@@ -327,6 +417,26 @@ Returns undef.
                  Value: %s
                  Reference: %s
 
+ check_css_border()
+         Parameter '%s' contain bad unit.
+                 Unit: %s
+                 Value: %s
+         Parameter '%s' doesn't contain unit name.
+                 Value: %s
+         Parameter '%s' doesn't contain unit number.
+                 Value: %s
+         Parameter '%s' has bad rgb color (bad hex number).
+                 Value: %s
+         Parameter '%s' has bad rgb color (bad length).
+                 Value: %s
+         Parameter '%s' has bad color name.
+                 Value: %s
+         Parameter '%s' hasn't border style.
+                 Value: %s
+         Parameter '%s' must be a array.
+                 Value: %s
+                 Reference: %s
+
  check_css_class():
          Parameter '%s' has bad CSS class name.
                  Value: %s
@@ -342,12 +452,12 @@ Returns undef.
                  Value: %s
 
  check_css_unit():
-         Parameter '%s' doesn't contain number.
-                 Value: %s
-         Parameter '%s' doesn't contain unit.
-                 Value: %s
          Parameter '%s' contain bad unit.
                  Unit: %s
+                 Value: %s
+         Parameter '%s' doesn't contain unit name.
+                 Value: %s
+         Parameter '%s' doesn't contain unit number.
                  Value: %s
 
 =head1 EXAMPLE1
@@ -400,6 +510,49 @@ Returns undef.
 
 =head1 EXAMPLE3
 
+=for comment filename=check_css_border_ok.pl
+
+ use strict;
+ use warnings;
+
+ use Mo::utils::CSS qw(check_css_border);
+
+ my $self = {
+         'key' => '1px solid red',
+ };
+ check_css_border($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE4
+
+=for comment filename=check_css_border_fail.pl
+
+ use strict;
+ use warnings;
+
+ use Error::Pure;
+ use Mo::utils::CSS qw(check_css_border);
+
+ $Error::Pure::TYPE = 'Error';
+
+ my $self = {
+         'key' => 'bad',
+ };
+ check_css_border($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [...utils.pm:?] Parameter 'key' has bad border style.
+
+=head1 EXAMPLE5
+
 =for comment filename=check_css_class_ok.pl
 
  use strict;
@@ -418,7 +571,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE4
+=head1 EXAMPLE6
 
 =for comment filename=check_css_class_fail.pl
 
@@ -441,7 +594,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' has bad CSS class name (number of begin).
 
-=head1 EXAMPLE5
+=head1 EXAMPLE7
 
 =for comment filename=check_css_color_ok.pl
 
@@ -461,7 +614,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE6
+=head1 EXAMPLE8
 
 =for comment filename=check_css_color_fail.pl
 
@@ -484,7 +637,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' has bad color name.
 
-=head1 EXAMPLE7
+=head1 EXAMPLE9
 
 =for comment filename=check_css_unit_ok.pl
 
@@ -504,7 +657,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE8
+=head1 EXAMPLE10
 
 =for comment filename=check_css_unit_fail.pl
 
@@ -525,7 +678,7 @@ Returns undef.
  print "ok\n";
 
  # Output like:
- # #Error [...utils.pm:?] Parameter 'key' doesn't contain unit.
+ # #Error [...utils.pm:?] Parameter 'key' doesn't contain unit name.
 
 =head1 DEPENDENCIES
 
@@ -576,6 +729,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.08
 
 =cut

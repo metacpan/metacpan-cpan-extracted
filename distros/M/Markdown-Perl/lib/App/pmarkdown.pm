@@ -5,7 +5,7 @@ use warnings;
 
 use Markdown::Perl;
 
-our $VERSION = '1.05';  # Remember to also set the Markdown::Perl version.
+our $VERSION = '1.06';  # Remember to also set the Markdown::Perl version.
 
 1;
 
@@ -22,7 +22,7 @@ App::pmarkdown
 =head1 SYNOPSIS
 
 This package is only here to reserve the C<App::pmarkdown> name to simplify the
-installation of the L<pmarkdown> markdown processor.
+installation of the L<pmarkdown> program.
 
 The documentation for the markdown processor is in the L<pmarkdown> page. It’s
 implementation is based on the L<Markdown::Perl> library that can be used
