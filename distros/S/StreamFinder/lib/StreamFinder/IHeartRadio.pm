@@ -590,7 +590,13 @@ TRYIT:
 		$self->{'imageurl'} = ($html =~ s#\"imageUrl\"\:\"([^\"]+)\"##s) ? $1 : '';
 		$self->{'iconurl'} = $self->{'imageurl'};
 		$self->{'total'} = $self->{'cnt'};
-		print STDERR "\n--SUCCESS2: ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."\n--STREAMS=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
+		if ($DEBUG) {
+			foreach my $i (sort keys %{$self}) {
+				print STDERR "--KEY=$i= VAL=".$self->{$i}."=\n";
+			}
+			print STDERR "-SUCCESS2: 1st stream=".$self->{'Url'}."=\n";
+		}
+
 		$self->_log($url);
 
 		bless $self, $class;   #BLESS IT!
@@ -688,9 +694,13 @@ INNER:  while ($streamhtml =~ s#(${streampattern}_stream)\"\s*\:\s*\"([^\"]+)\"#
 		}
 	}
 	$self->{'Url'} = ($self->{'total'} > 0) ? $self->{'streams'}->[0] : '';
-	print STDERR "-(all)count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}."= GENRE=".$self->{'genre'}."=\n"  if ($DEBUG);
-	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
-			if ($DEBUG && $self->{'cnt'} > 0);
+	if ($DEBUG) {
+		foreach my $i (sort keys %{$self}) {
+			print STDERR "--KEY=$i= VAL=".$self->{$i}."=\n";
+		}
+		print STDERR "-SUCCESS: 1st stream=".$self->{'Url'}."=\n";
+	}
+
 	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!

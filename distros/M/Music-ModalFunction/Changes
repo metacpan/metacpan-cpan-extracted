@@ -1,5 +1,17 @@
 Revision history for Music-ModalFunction
 
+0.0504 2024-05-18 04:41:05
+    - Fix abstract.
+    - Fix the case of a diminished Roman.
+    - Improve documentation.
+
+0.0503 2024-05-18 04:07:09
+    - Improve documentation.
+    - Clean code a bit.
+
+0.0502 2024-05-18 03:39:03
+    - Fix 'b' flat instead of 'f' in docs.
+
 0.0501 2024-05-17 22:45:32
     - Add scales pivot tests.
     - Improve documentation.

@@ -2,6 +2,7 @@ use strictures 2;
 use 5.020;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -48,7 +49,7 @@ my $result = $js->evaluate(
 
 is($result->output_format, 'basic', 'Result object gets the output_format from the evaluator');
 
-cmp_deeply(
+cmp_result(
   $result->TO_JSON,
   {
     valid => false,
@@ -199,7 +200,7 @@ cmp_deeply(
 );
 
 $result->output_format('flag');
-cmp_deeply(
+cmp_result(
   $result->TO_JSON,
   {
     valid => false,
@@ -208,7 +209,7 @@ cmp_deeply(
 );
 
 $result->output_format('terse');
-cmp_deeply(
+cmp_result(
   $result->TO_JSON,
   {
     valid => false,
@@ -320,7 +321,7 @@ $js = JSON::Schema::Modern->new(validate_formats => 1);
     { format => 'date-time'},
   );
 
-  cmp_deeply(
+  cmp_result(
     $result->TO_JSON,
     {
       valid => false,
@@ -336,7 +337,7 @@ $js = JSON::Schema::Modern->new(validate_formats => 1);
   );
 
   $result->output_format('terse');
-  cmp_deeply(
+  cmp_result(
     $result->TO_JSON,
     {
       valid => false,
@@ -349,7 +350,7 @@ $js = JSON::Schema::Modern->new(validate_formats => 1);
 subtest 'strict_basic' => sub {
   # see "JSON pointer escaping" in t/errors.t
 
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern->new(specification_version => 'draft2019-09', output_format => 'strict_basic')->evaluate(
       { '{}' => { 'my~tilde/slash-property' => 1 } },
       {
@@ -444,7 +445,7 @@ subtest 'AND two result objects together' => sub {
     )
   } 0..3;
 
-  cmp_deeply(
+  cmp_result(
     (my $one_true = $results[0] & $results[1]),
     all(
       methods(valid => bool(0)),
@@ -468,7 +469,7 @@ subtest 'AND two result objects together' => sub {
     'ANDing true and false results = invalid, but errors and annotations both preserved',
   );
 
-  cmp_deeply(
+  cmp_result(
     (my $both_true = $results[1] & $results[3]),
     all(
       methods(valid => bool(1)),
@@ -488,7 +489,7 @@ subtest 'AND two result objects together' => sub {
     'ANDing two true results = valid',
   );
 
-  cmp_deeply(
+  cmp_result(
     (my $both_false = $results[0] & $results[2]),
     all(
       methods(valid => bool(0)),
@@ -535,7 +536,7 @@ subtest annotations => sub {
     ],
   );
 
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern::Result->new(%args)->TO_JSON,
     {
       valid => true,
@@ -550,7 +551,7 @@ subtest annotations => sub {
     'by default, annotations are included in the formatted output',
   );
 
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern::Result->new(%args, formatted_annotations => 0)->TO_JSON,
     { valid => true },
     'but inclusion can be disabled',

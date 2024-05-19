@@ -3,7 +3,7 @@ package PDF::API2::Resource::Font::CoreFont::georgiabolditalic;
 use strict;
 use warnings;
 
-our $VERSION = '2.046'; # VERSION
+our $VERSION = '2.047'; # VERSION
 
 sub data { return {
     'fontname' => 'Georgia,BoldItalic',

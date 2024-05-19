@@ -130,7 +130,8 @@ DESCRIPTION
     blogger.com videos (StreamFinder::Blogger), ugetube.com videos
     (StreamFinder::BrandNewTube), brighteon.com videos
     (StreamFinder::Brighteon), castbox.fm podcasts (StreamFinder::Castbox),
-    iheart.com (aka iheartradio.com) radio stations and podcasts
+    theepochtimes.com/epochtv videos (StreamFinder::EpochTV), iheart.com
+    (aka iheartradio.com) radio stations and podcasts
     (StreamFinder::IHeartRadio), www.internet-radio.com radio stations
     (StreamFinder::InternetRadio), onlineradiobox.com radio stations
     (StreamFinder::OnlineRadiobox), odysee.com videos

@@ -67,6 +67,7 @@ do { my $x = {
                                       'Sub::Install' => '0',
                                       'Types::Common::Numeric' => '0',
                                       'Types::Standard' => '1.016003',
+                                      'autovivification' => '0',
                                       'constant' => '0',
                                       'experimental' => '0.026',
                                       'if' => '0',

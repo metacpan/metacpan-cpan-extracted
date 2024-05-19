@@ -1,5 +1,5 @@
 ---
-abstract: 'Inspect musical modal functions'
+abstract: 'Query for modal and scalar musical functions'
 author:
   - 'Gene Boggs <gene@cpan.org>'
 build_requires:
@@ -33,7 +33,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-ModalFunction
   repository: https://github.com/ology/Music-ModalFunction.git
-version: '0.0501'
+version: '0.0504'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

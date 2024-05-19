@@ -4,13 +4,14 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.583';
+our $VERSION = '0.584';
 
 use 5.020;
 use Moo;
 use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -120,13 +121,21 @@ sub __entity_index ($self, $entity) {
   return undef;
 }
 
-sub _add_entity_location {
-  $_[0]->__entity_type->($_[2]); # verify string
-  $_[0]->_entities->{$_[1]} = $_[0]->__entity_index($_[2]); # store integer-mapped value
+sub _add_entity_location ($self, $location, $entity) {
+  $self->__entity_type->($entity); # verify string
+  $self->_entities->{$location} = $self->__entity_index($entity); # store integer-mapped value
 }
-sub get_entity_at_location {
-  return '' if not exists $_[0]->_entities->{$_[1]};
-  ($_[0]->__entities)[ $_[0]->_entities->{$_[1]} ] // die "missing mapping for ", $_[0]->_entities->{$_[1]};
+
+sub get_entity_at_location ($self, $location) {
+  return '' if not exists $self->_entities->{$location};
+  ($self->__entities)[ $self->_entities->{$location} ] // die "missing mapping for ", $self->_entities->{$location};
+}
+
+# note: not sorted
+sub get_entity_locations ($self, $entity) {
+  $self->__entity_type->($entity); # verify string
+  my $index = $self->__entity_index($entity);
+  grep $self->{_entities}{$_} == $index, keys $self->{_entities}->%*;
 }
 
 around _add_resources => sub {
@@ -248,7 +257,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.583
+version 0.584
 
 =head1 SYNOPSIS
 
@@ -318,7 +327,7 @@ errors halt the parsing process.) Documents with errors cannot be evaluated.
 
 =head1 METHODS
 
-=for Pod::Coverage FOREIGNBUILDARGS BUILDARGS BUILD THAW traverse has_errors path_to_resource resource_pairs get_entity_at_location
+=for Pod::Coverage FOREIGNBUILDARGS BUILDARGS BUILD THAW traverse has_errors path_to_resource resource_pairs get_entity_at_location get_entity_locations
 
 =head2 path_to_canonical_uri
 

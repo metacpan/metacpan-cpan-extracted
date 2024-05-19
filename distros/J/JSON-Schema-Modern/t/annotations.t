@@ -2,6 +2,7 @@ use strictures 2;
 use 5.020;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -50,7 +51,7 @@ subtest 'allOf' => sub {
     'evaluation of the allOf keyword fails',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     my $new_state = {
       %$state,
@@ -85,7 +86,7 @@ subtest 'allOf' => sub {
     'evaluation of the allOf keyword succeeds',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     {
       %$new_state,
@@ -101,7 +102,7 @@ subtest 'allOf' => sub {
     'passing allOf: state is correct after evaluating',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(1, $pass_schema, { collect_annotations => 0 })->TO_JSON,
     { valid => true },
     'annotation collection can be turned off in evaluate()',
@@ -112,7 +113,7 @@ subtest 'allOf' => sub {
   {
     my $js = JSON::Schema::Modern->new;
     ok(!$js->collect_annotations, 'collect_annotations defaults to false');
-    cmp_deeply(
+    cmp_result(
       $js->evaluate(1, $pass_schema, { collect_annotations => 1 })->TO_JSON,
       {
         valid => true,
@@ -150,7 +151,7 @@ subtest 'oneOf' => sub {
     'evaluation of the oneOf keyword fails',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     my $new_state = {
       %$state,
@@ -190,7 +191,7 @@ subtest 'oneOf' => sub {
     'evaluation of the oneOf keyword succeeds',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     {
       %$new_state,
@@ -224,7 +225,7 @@ subtest 'not' => sub {
     'evaluation of the not keyword fails',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     my $new_state = {
       %$state,
@@ -257,7 +258,7 @@ subtest 'not' => sub {
     'evaluation of the not keyword fails',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     $new_state = {
       %$state,
@@ -283,7 +284,7 @@ subtest 'not' => sub {
     'evaluation of the not keyword succeeds',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     {
       %$new_state,
@@ -293,7 +294,7 @@ subtest 'not' => sub {
     'passing not: state is correct after evaluating',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       {
@@ -329,7 +330,7 @@ subtest 'prefixItems' => sub {
     'no items means that "prefixItems" succeeds',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     my $new_state = {
       %$state,
@@ -352,7 +353,7 @@ subtest 'prefixItems' => sub {
     'one item',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     {
       %$state,
@@ -384,7 +385,7 @@ subtest 'prefixItems' => sub {
     'two items, one failing',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     {
       %$state,
@@ -431,7 +432,7 @@ subtest 'schema-items' => sub {
     'no items means that "items" succeeds',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     my $new_state = {
       %$state,
@@ -454,7 +455,7 @@ subtest 'schema-items' => sub {
     'one item',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     {
       %$state,
@@ -486,7 +487,7 @@ subtest 'schema-items' => sub {
     'two items, one failing',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     {
       %$state,
@@ -533,7 +534,7 @@ subtest 'additionalItems' => sub {
     'no items means that "additionalItems" succeeds',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     my $new_state = {
       %$state,
@@ -556,7 +557,7 @@ subtest 'additionalItems' => sub {
     'one item',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     {
       %$state,
@@ -581,7 +582,7 @@ subtest 'properties' => sub {
     'no items means that "properties" succeeds',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     my $new_state = {
       %$state,
@@ -610,7 +611,7 @@ subtest 'properties' => sub {
     'one property',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     {
       %$state,
@@ -646,7 +647,7 @@ subtest 'properties' => sub {
     'two properties, one failing',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     {
       %$state,
@@ -693,7 +694,7 @@ subtest 'patternProperties' => sub {
     'no items means that "patternProperties" succeeds',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     my $new_state = {
       %$state,
@@ -722,7 +723,7 @@ subtest 'patternProperties' => sub {
     'one property',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     {
       %$state,
@@ -758,7 +759,7 @@ subtest 'patternProperties' => sub {
     'two properties, one failing',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     {
       %$state,
@@ -805,7 +806,7 @@ subtest 'additionalProperties' => sub {
     'no items means that "additionalProperties" succeeds',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     my $new_state = {
       %$state,
@@ -828,7 +829,7 @@ subtest 'additionalProperties' => sub {
     'one property',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     {
       %$state,
@@ -863,7 +864,7 @@ subtest 'additionalProperties' => sub {
     'two properties, one failing',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     {
       %$state,
@@ -910,7 +911,7 @@ subtest 'unevaluatedProperties' => sub {
     'no items means that "unevaluatedProperties" succeeds',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     my $new_state = {
       %$state,
@@ -933,7 +934,7 @@ subtest 'unevaluatedProperties' => sub {
     'one property',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     {
       %$state,
@@ -968,7 +969,7 @@ subtest 'unevaluatedProperties' => sub {
     'two properties, one failing',
   );
 
-  cmp_deeply(
+  cmp_result(
     $state,
     {
       %$state,
@@ -1005,7 +1006,7 @@ subtest 'unevaluatedProperties' => sub {
 subtest 'collect_annotations and unevaluated keywords' => sub {
   my $js = JSON::Schema::Modern->new(collect_annotations => 0);
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       [ 1 ],
       my $schema = {
@@ -1018,7 +1019,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
     'when "collect_annotations" is explicitly set to false, unevaluatedItems can still be used (valid result, no annotations in result)',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       [ 1, 2 ],
       $schema,
@@ -1043,7 +1044,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
     'when "collect_annotations" is explicitly set to false, unevaluatedItems can still be used (invalid result)',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       $schema = {
@@ -1055,7 +1056,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
     { valid => true },
     'when "collect_annotations" is explicitly set to false, unevaluatedProperties can still be used (valid result, no annotations)',
   );
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1, bar => 2 },
       $schema,
@@ -1080,7 +1081,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
     'when "collect_annotations" is explicitly set to false, unevaluatedProperties can still be used (invalid result)',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       {
         item => [ 1 ],
@@ -1097,7 +1098,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
     'when "collect_annotations" is explicitly set to false, unevaluatedProperties still be used, even in other documents (valid result)',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       {
         item => [ 1, 2 ],
@@ -1145,7 +1146,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
 
   $js = JSON::Schema::Modern->new(collect_annotations => 1);
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       [ 1 ],
       {
@@ -1166,7 +1167,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
     'when "collect_annotations" is set to true, unevaluatedItems works, and annotations are returned',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       {
@@ -1194,7 +1195,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
 
   $js = JSON::Schema::Modern->new;
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       [ 1 ],
       {
@@ -1209,7 +1210,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
     'when "collect_annotations" is not set, unevaluatedItems still works, but annotations are not returned',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       {
@@ -1224,7 +1225,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
     'when "collect_annotations" is not set, unevaluatedProperties still works, but annotations are not returned',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       {
         item => [ 1 ],
@@ -1247,19 +1248,19 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
 
   my $doc_properties = $js->add_schema('properties.json', { properties => { foo => true } });
 
-  cmp_deeply(
+  cmp_result(
     $js->_get_resource('prefixItems.json')->{configs},
     {},
     'items.json does not need collect_annotations => 1 to evaluate itself',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->_get_resource('properties.json')->{configs},
     {},
     'properties.json does not need collect_annotations => 1 to evaluate itself',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       {
         item => [ 1 ],
@@ -1306,7 +1307,7 @@ subtest 'annotate unknown keywords' => sub {
     blip => [ 1, 2, 3 ],
   };
 
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern->new->evaluate(
       $data,
       $schema,
@@ -1317,7 +1318,7 @@ subtest 'annotate unknown keywords' => sub {
     'no annotations even when collect_annotations is false',
   );
 
-  cmp_deeply(
+  cmp_result(
     (my $result = JSON::Schema::Modern->new(collect_annotations => 1)->evaluate(
       $data,
       $schema,
@@ -1365,7 +1366,7 @@ subtest 'annotate unknown keywords' => sub {
     'unknown keywords are collected as annotations',
   );
 
-  cmp_deeply(
+  cmp_result(
     [ $result->annotations ],
     [
       methods(keyword => 'items', unknown => bool(0)),
@@ -1379,7 +1380,7 @@ subtest 'annotate unknown keywords' => sub {
     '"unknown" keyword is set on the annotation objects for unknown keywords',
   );
 
-  cmp_deeply(
+  cmp_result(
     $result = JSON::Schema::Modern->new(specification_version => 'draft2019-09', collect_annotations => 1)
         ->evaluate(
       $data,
@@ -1418,7 +1419,7 @@ subtest 'annotate unknown keywords' => sub {
 };
 
 subtest 'items + additionalItems, prefixItems + items' => sub {
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern->new(specification_version => 'draft2019-09', collect_annotations => 1)
         ->evaluate(
       [ 1, 2, 3 ],
@@ -1441,7 +1442,7 @@ subtest 'items + additionalItems, prefixItems + items' => sub {
     'schema-based items + additionalItems',
   );
 
-  cmp_deeply(
+  cmp_result(
     my $result = JSON::Schema::Modern->new(collect_annotations => 1)->evaluate(
       [ 1, 2, 3 ],
       {

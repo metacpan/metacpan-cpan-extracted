@@ -51,52 +51,52 @@ no_index:
 provides:
   JSON::Schema::Modern:
     file: lib/JSON/Schema/Modern.pm
-    version: '0.583'
+    version: '0.584'
   JSON::Schema::Modern::Annotation:
     file: lib/JSON/Schema/Modern/Annotation.pm
-    version: '0.583'
+    version: '0.584'
   JSON::Schema::Modern::Document:
     file: lib/JSON/Schema/Modern/Document.pm
-    version: '0.583'
+    version: '0.584'
   JSON::Schema::Modern::Error:
     file: lib/JSON/Schema/Modern/Error.pm
-    version: '0.583'
+    version: '0.584'
   JSON::Schema::Modern::Result:
     file: lib/JSON/Schema/Modern/Result.pm
-    version: '0.583'
+    version: '0.584'
   JSON::Schema::Modern::ResultNode:
     file: lib/JSON/Schema/Modern/ResultNode.pm
-    version: '0.583'
+    version: '0.584'
   JSON::Schema::Modern::Utilities:
     file: lib/JSON/Schema/Modern/Utilities.pm
-    version: '0.583'
+    version: '0.584'
   JSON::Schema::Modern::Vocabulary:
     file: lib/JSON/Schema/Modern/Vocabulary.pm
-    version: '0.583'
+    version: '0.584'
   JSON::Schema::Modern::Vocabulary::Applicator:
     file: lib/JSON/Schema/Modern/Vocabulary/Applicator.pm
-    version: '0.583'
+    version: '0.584'
   JSON::Schema::Modern::Vocabulary::Content:
     file: lib/JSON/Schema/Modern/Vocabulary/Content.pm
-    version: '0.583'
+    version: '0.584'
   JSON::Schema::Modern::Vocabulary::Core:
     file: lib/JSON/Schema/Modern/Vocabulary/Core.pm
-    version: '0.583'
+    version: '0.584'
   JSON::Schema::Modern::Vocabulary::FormatAnnotation:
     file: lib/JSON/Schema/Modern/Vocabulary/FormatAnnotation.pm
-    version: '0.583'
+    version: '0.584'
   JSON::Schema::Modern::Vocabulary::FormatAssertion:
     file: lib/JSON/Schema/Modern/Vocabulary/FormatAssertion.pm
-    version: '0.583'
+    version: '0.584'
   JSON::Schema::Modern::Vocabulary::MetaData:
     file: lib/JSON/Schema/Modern/Vocabulary/MetaData.pm
-    version: '0.583'
+    version: '0.584'
   JSON::Schema::Modern::Vocabulary::Unevaluated:
     file: lib/JSON/Schema/Modern/Vocabulary/Unevaluated.pm
-    version: '0.583'
+    version: '0.584'
   JSON::Schema::Modern::Vocabulary::Validation:
     file: lib/JSON/Schema/Modern/Vocabulary/Validation.pm
-    version: '0.583'
+    version: '0.584'
 requires:
   B: '0'
   Carp: '0'
@@ -125,6 +125,7 @@ requires:
   Sub::Install: '0'
   Types::Common::Numeric: '0'
   Types::Standard: '1.016003'
+  autovivification: '0'
   constant: '0'
   experimental: '0.026'
   if: '0'
@@ -140,10 +141,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Modern/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Modern
   repository: https://github.com/karenetheridge/JSON-Schema-Modern.git
-version: '0.583'
+version: '0.584'
 x_Dist_Zilla:
   perl:
-    version: '5.039009'
+    version: '5.039010'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeRelease
@@ -576,7 +577,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.43.2
+          git_version: 2.44.0
           include_authors: 0
           include_releaser: 1
           order_by: commits
@@ -643,7 +644,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20240320'
+          Module::CoreList: '5.20240420'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -668,7 +669,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.43.2
+          git_version: 2.44.0
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.049'
@@ -676,7 +677,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.43.2
+          git_version: 2.44.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -684,7 +685,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.43.2
+          git_version: 2.44.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -710,7 +711,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.43.2
+          git_version: 2.44.0
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.049'
@@ -794,7 +795,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.43.2
+          git_version: 2.44.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -807,11 +808,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.583
+          tag: v0.584
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.43.2
+          git_version: 2.44.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -848,7 +849,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.43.2
+          git_version: 2.44.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -870,7 +871,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.43.2
+          git_version: 2.44.0
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.049'
@@ -1020,7 +1021,7 @@ x_authority: cpan:ETHER
 x_breaks:
   JSON::Schema::Modern::Document::OpenAPI: '< 0.055'
   JSON::Schema::Modern::Vocabulary::OpenAPI: '< 0.017'
-x_generated_by_perl: v5.39.9
+x_generated_by_perl: v5.39.10
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

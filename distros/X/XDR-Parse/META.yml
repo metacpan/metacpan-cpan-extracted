@@ -23,5 +23,5 @@ requires:
   perl: v5.14.0
 resources:
   repository: git://github.com/ehuelsmann/XDR-Parse.git
-version: v0.1.2
+version: v0.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

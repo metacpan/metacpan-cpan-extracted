@@ -2,6 +2,7 @@ use strictures 2;
 use 5.020;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -28,7 +29,7 @@ is(
 
 is(
   exception {
-    cmp_deeply(
+    cmp_result(
       $js->evaluate_json_string('blargh', {})->TO_JSON,
       {
         valid => false,
@@ -40,10 +41,8 @@ is(
           },
         ],
       },
-      'result object serializes correctly',
       'evaluating bad json data returns false, with error',
     );
-
   },
   undef,
   'no exceptions in evaluate_json_string on bad json',

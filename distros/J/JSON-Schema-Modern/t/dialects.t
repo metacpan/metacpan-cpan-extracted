@@ -2,6 +2,7 @@ use strictures 2;
 use 5.020;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -16,7 +17,7 @@ use Helper;
 my $js = JSON::Schema::Modern->new(short_circuit => 0, validate_formats => 1);
 
 subtest 'invalid use of the $schema keyword' => sub {
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       1,
       {
@@ -39,7 +40,7 @@ subtest 'invalid use of the $schema keyword' => sub {
     '$schema can only appear at the root of a schema, when there is no canonical URI',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       1,
       {
@@ -64,7 +65,7 @@ subtest 'invalid use of the $schema keyword' => sub {
     '$schema can only appear where the canonical URI has no fragment, when there is a canonical URI',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       1,
       {
@@ -93,12 +94,12 @@ subtest 'invalid use of the $schema keyword' => sub {
 };
 
 subtest 'defaults without a $schema keyword' => sub {
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(1, true)->TO_JSON,
     { valid => true },
     'boolean schema: no $id, no $schema',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{''},
     superhashof({
       specification_version => 'draft2020-12',
@@ -107,7 +108,7 @@ subtest 'defaults without a $schema keyword' => sub {
     'boolean schema: defaults to draft2020-12 without a $schema keyword',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       { unevaluatedProperties => false },
@@ -129,7 +130,7 @@ subtest 'defaults without a $schema keyword' => sub {
     },
     'object schema: no $id, no $schema',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{''},
     superhashof({
       specification_version => 'draft2020-12',
@@ -139,7 +140,7 @@ subtest 'defaults without a $schema keyword' => sub {
     'object schema: defaults to draft2020-12 without a $schema keyword',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       1,
       { '$defs' => { foo => { not => 'invalid subschema' } } },
@@ -158,7 +159,7 @@ subtest 'defaults without a $schema keyword' => sub {
   );
 
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       {
@@ -185,7 +186,7 @@ subtest 'defaults without a $schema keyword' => sub {
     },
     'object schema: $id, no $schema',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{'https://id-no-schema1'},
     superhashof({
       specification_version => 'draft2020-12',
@@ -198,12 +199,12 @@ subtest 'defaults without a $schema keyword' => sub {
 
   my $js = JSON::Schema::Modern->new(short_circuit => 0, specification_version => 'draft7');
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(1, true)->TO_JSON,
     { valid => true },
     'boolean schema: no $id, no $schema',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{''},
     superhashof({
       specification_version => 'draft7',
@@ -212,7 +213,7 @@ subtest 'defaults without a $schema keyword' => sub {
     'boolean schema: specification_version overridden',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       { unevaluatedProperties => 'not a schema' },
@@ -221,7 +222,7 @@ subtest 'defaults without a $schema keyword' => sub {
     'object schema: no $id, no $schema, specification version overridden, other keywords are ignored during traversal',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       { unevaluatedProperties => false },
@@ -229,7 +230,7 @@ subtest 'defaults without a $schema keyword' => sub {
     { valid => true },
     'object schema: no $id, no $schema, specification version overridden, other keywords are ignored during evaluation',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{''},
     superhashof({
       specification_version => 'draft7',
@@ -240,7 +241,7 @@ subtest 'defaults without a $schema keyword' => sub {
   );
 
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       {
@@ -252,7 +253,7 @@ subtest 'defaults without a $schema keyword' => sub {
     'object schema: $id, no $schema, unrecognized+invalid keywords are ignored during traversal',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       {
@@ -263,7 +264,7 @@ subtest 'defaults without a $schema keyword' => sub {
     { valid => true },
     'object schema: $id, no $schema',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{'https://id-no-schema3'},
     superhashof({
       specification_version => 'draft7',
@@ -275,7 +276,7 @@ subtest 'defaults without a $schema keyword' => sub {
 };
 
 subtest 'behaviour with a $schema keyword' => sub {
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       {
@@ -287,7 +288,7 @@ subtest 'behaviour with a $schema keyword' => sub {
     'object schema: no $id, has $schema, unrecognized+invalid keywords are ignored during traversal',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       {
@@ -298,7 +299,7 @@ subtest 'behaviour with a $schema keyword' => sub {
     { valid => true },
     'object schema: no $id, has $schema, unrecognized keywords are ignored during evaluation',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{''},
     superhashof({
       specification_version => 'draft7',
@@ -308,7 +309,7 @@ subtest 'behaviour with a $schema keyword' => sub {
     'semantics can be changed to another draft version',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       {
@@ -319,7 +320,7 @@ subtest 'behaviour with a $schema keyword' => sub {
     { valid => true },
     'schema is accepted with $schema without an empty fragment',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{''},
     superhashof({
       specification_version => 'draft7',
@@ -329,7 +330,7 @@ subtest 'behaviour with a $schema keyword' => sub {
     '..and is still recognized as draft7',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       {
@@ -342,7 +343,7 @@ subtest 'behaviour with a $schema keyword' => sub {
     '$id and $schema, unrecognized+invalid keywords are ignored during traversal',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       {
@@ -354,7 +355,7 @@ subtest 'behaviour with a $schema keyword' => sub {
     { valid => true },
     '$id and $schema',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{'https://id-and-schema2'},
     superhashof({
       specification_version => 'draft7',
@@ -367,7 +368,7 @@ subtest 'behaviour with a $schema keyword' => sub {
 
   my $js = JSON::Schema::Modern->new(short_circuit => 0, specification_version => 'draft2019-09');
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       {
@@ -379,7 +380,7 @@ subtest 'behaviour with a $schema keyword' => sub {
     'no $id, specification version overridden twice; unrecognized+invalid keywords are ignored during traversal',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       {
@@ -390,7 +391,7 @@ subtest 'behaviour with a $schema keyword' => sub {
     { valid => true },
     'no $id, specification version overridden twice, other keywords are ignored during evaluation',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{''},
     superhashof({
       specification_version => 'draft7',
@@ -401,7 +402,7 @@ subtest 'behaviour with a $schema keyword' => sub {
   );
 
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       {
@@ -414,7 +415,7 @@ subtest 'behaviour with a $schema keyword' => sub {
     'no $id, specification version overridden twice; unrecognized+invalid keywords are ignored during traversal',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1 },
       {
@@ -426,7 +427,7 @@ subtest 'behaviour with a $schema keyword' => sub {
     { valid => true },
     'no $id, specification version overridden twice, other keywords are ignored during evaluation',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{''},
     superhashof({
       specification_version => 'draft7',
@@ -438,7 +439,7 @@ subtest 'behaviour with a $schema keyword' => sub {
 };
 
 subtest 'setting or changing schema semantics in a single document' => sub {
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       1,
       {
@@ -460,7 +461,7 @@ subtest 'setting or changing schema semantics in a single document' => sub {
 subtest 'changing schema semantics across documents' => sub {
   my $expected = [ re(qr!^\Qno-longer-supported "dependencies" keyword present (at location "https://iam.draft2019-09.com")!) ];
   $expected = superbagof(@$expected) if not $ENV{AUTHOR_TESTING};
-  cmp_deeply(
+  cmp_result(
     [ warnings {
       $js->add_schema({
         '$id' => 'https://iam.draft2019-09.com',
@@ -483,7 +484,7 @@ subtest 'changing schema semantics across documents' => sub {
     unevaluatedProperties => false, # this should be ignored
   });
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate({ foo => 'hi' }, 'https://iam.draft2019-09.com')->TO_JSON,
     {
       valid => false,
@@ -540,7 +541,7 @@ subtest 'changing schema semantics across documents' => sub {
     },
     'switching between specification versions is acceptable when crossing document boundaries',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{'https://iam.draft2019-09.com'},
     superhashof({
       specification_version => 'draft2019-09',
@@ -549,7 +550,7 @@ subtest 'changing schema semantics across documents' => sub {
     }),
     'resources for top level schema',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{'https://iam.draft7.com'},
     superhashof({
       specification_version => 'draft7',
@@ -571,7 +572,7 @@ subtest 'changing schema semantics across documents' => sub {
     additionalProperties => { format => 'ipv4' },
     unevaluatedProperties => false, # this should be ignored
   });
-  cmp_deeply(
+  cmp_result(
     [ warnings {
       $js->add_schema({
         '$id' => 'https://iam.draft2020-12-2.com',
@@ -585,7 +586,7 @@ subtest 'changing schema semantics across documents' => sub {
     'no unexpected warnings',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate({ foo => 'hi' }, 'https://iam.draft7-2.com')->TO_JSON,
     {
       valid => false,
@@ -648,7 +649,7 @@ subtest 'changing schema semantics across documents' => sub {
     },
     'switching between specification versions is acceptable when crossing document boundaries',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{'https://iam.draft7-2.com'},
     superhashof({
       specification_version => 'draft7',
@@ -657,7 +658,7 @@ subtest 'changing schema semantics across documents' => sub {
     }),
     'resources for top level schema',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{'https://iam.draft2020-12-2.com'},
     superhashof({
       specification_version => 'draft2020-12',
@@ -670,7 +671,7 @@ subtest 'changing schema semantics across documents' => sub {
 
 subtest 'changing schema semantics within documents' => sub {
   allow_warnings(1);
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 'hi' },
       {
@@ -754,7 +755,7 @@ subtest 'changing schema semantics within documents' => sub {
   );
   allow_warnings(0);
 
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{'https://iam.draft2019-09-3.com'},
     superhashof({
       specification_version => 'draft2019-09',
@@ -763,7 +764,7 @@ subtest 'changing schema semantics within documents' => sub {
     }),
     'resources for top level schema',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{'https://iam.draft7-3.com'},
     superhashof({
       specification_version => 'draft7',
@@ -774,7 +775,7 @@ subtest 'changing schema semantics within documents' => sub {
   );
 
   allow_warnings(1);
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 'hi' },
       {
@@ -857,7 +858,7 @@ subtest 'changing schema semantics within documents' => sub {
     'switching between specification versions is acceptable within a document, draft7 -> draf2020-12',
   );
   allow_warnings(0);
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{'https://iam.draft7-4.com'},
     superhashof({
       specification_version => 'draft7',
@@ -866,7 +867,7 @@ subtest 'changing schema semantics within documents' => sub {
     }),
     'resources for top level schema',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{'https://iam.draft2020-12-4.com'},
     superhashof({
       specification_version => 'draft2020-12',
@@ -880,7 +881,7 @@ subtest 'changing schema semantics within documents' => sub {
 undef $js;
 
 subtest '$vocabulary' => sub {
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern->new->evaluate(
       1,
       {
@@ -913,7 +914,7 @@ subtest '$vocabulary' => sub {
     '$vocabulary syntax checks',
   );
 
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern->new->evaluate(
       1,
       {
@@ -935,7 +936,7 @@ subtest '$vocabulary' => sub {
     '$vocabulary location check - resource root',
   );
 
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern->new->evaluate(
       1,
       {
@@ -951,7 +952,7 @@ subtest '$vocabulary' => sub {
 
 
   my $js = JSON::Schema::Modern->new;
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       1,
       {
@@ -966,7 +967,7 @@ subtest '$vocabulary' => sub {
     'successfully evaluated a metaschema that specifies vocabularies',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{'http://mymetaschema'},
     {
       canonical_uri => str('http://mymetaschema'),
@@ -984,7 +985,7 @@ subtest '$vocabulary' => sub {
 
   ok($js->evaluate(1, { '$schema' => 'http://mymetaschema' }), '..but once we use the schema as a metaschema,');
 
-  cmp_deeply(
+  cmp_result(
     $js->{_metaschema_vocabulary_classes}{'http://mymetaschema'},
     [
       'draft2020-12',
@@ -1001,13 +1002,13 @@ subtest 'standard metaschemas' => sub {
   my $js = JSON::Schema::Modern->new;
   my ($draft202012_metaschema) = $js->get('https://json-schema.org/draft/2020-12/schema');
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate($draft202012_metaschema, 'https://json-schema.org/draft/2020-12/schema')->TO_JSON,
     { valid => true },
     'main metaschema evaluated against its own URI',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate($draft202012_metaschema, $draft202012_metaschema)->TO_JSON,
     { valid => true },
     'main metaschema evaluated against its own content',
@@ -1015,13 +1016,13 @@ subtest 'standard metaschemas' => sub {
 
   my ($draft202012_core_metaschema) = $js->get('https://json-schema.org/draft/2020-12/meta/core');
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate($draft202012_core_metaschema, 'https://json-schema.org/draft/2020-12/schema')->TO_JSON,
     { valid => true },
     'core metaschema evaluated against the main metaschema URI',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate($draft202012_core_metaschema, $draft202012_core_metaschema)->TO_JSON,
     { valid => true },
     'core metaschema evaluated against its own content',
@@ -1042,7 +1043,7 @@ subtest 'custom metaschemas, without custom vocabularies' => sub {
   is($metaschema_document->_get_resource($metaschema->{'$id'})->{specification_version}, 'draft2019-09',
     'specification version detected from standard metaschema URI');
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(false, 'http://localhost:1234/my-meta-schema')->TO_JSON,
     {
       valid => false,
@@ -1060,7 +1061,7 @@ subtest 'custom metaschemas, without custom vocabularies' => sub {
 
   # the evaluation of $recursiveAnchor in the schema proves that the proper specification version
   # was detected via the $schema keyword
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { allOf => [ false ] },
       'http://localhost:1234/my-meta-schema',
@@ -1103,13 +1104,13 @@ subtest 'custom metaschemas, without custom vocabularies' => sub {
     'custom metaschema recurses to standard metaschema',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate({ allOf => [ {} ] }, 'http://localhost:1234/my-meta-schema')->TO_JSON,
     { valid => true },
     'objects are acceptable schemas to this metaschema',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       1,
       {
@@ -1120,7 +1121,7 @@ subtest 'custom metaschemas, without custom vocabularies' => sub {
     { valid => true },
     'metaschemas without $vocabulary can still be used in the $schema keyword',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{'https://localhost:1234/my-schema'},
     superhashof({
       specification_version => 'draft2019-09',
@@ -1134,7 +1135,7 @@ subtest 'custom metaschemas, without custom vocabularies' => sub {
 subtest 'custom metaschemas, with custom vocabularies' => sub {
   my $js = JSON::Schema::Modern->new;
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(1, { '$schema' => 'https://unknown/metaschema' })->TO_JSON,
     {
       valid => false,
@@ -1156,7 +1157,7 @@ subtest 'custom metaschemas, with custom vocabularies' => sub {
       '$vocabulary' => { 'https://json-schema.org/draft/2020-12/vocab/core' => true },
     },
   });
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(1, { '$schema' => 'https://metaschema/with/misplaced/vocabulary/keyword/subschema' })->TO_JSON,
     {
       valid => false,
@@ -1180,7 +1181,7 @@ subtest 'custom metaschemas, with custom vocabularies' => sub {
 
   $js->add_schema('https://metaschema/with/no/id',
     { '$vocabulary' => { 'https://json-schema.org/draft/2020-12/vocab/core' => true } });
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(1, { '$schema' => 'https://metaschema/with/no/id' })->TO_JSON,
     {
       valid => false,
@@ -1211,7 +1212,7 @@ subtest 'custom metaschemas, with custom vocabularies' => sub {
       'https://unknown2' => false,
     },
   });
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(1, { '$schema' => 'https://metaschema/with/wrong/spec' })->TO_JSON,
     {
       valid => false,
@@ -1242,7 +1243,7 @@ subtest 'custom metaschemas, with custom vocabularies' => sub {
     '$id' => 'https://metaschema/missing/vocabs',
     '$vocabulary' => {},
   });
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(1, { '$schema' => 'https://metaschema/missing/vocabs' })->TO_JSON,
     {
       valid => false,
@@ -1269,7 +1270,7 @@ subtest 'custom metaschemas, with custom vocabularies' => sub {
       'https://json-schema.org/draft/2020-12/vocab/applicator' => true,
     },
   });
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(1, { '$schema' => 'https://metaschema/missing/core' })->TO_JSON,
     {
       valid => false,
@@ -1299,7 +1300,7 @@ subtest 'custom metaschemas, with custom vocabularies' => sub {
       # note: no validation!
     },
   });
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       1,
       {
@@ -1311,7 +1312,7 @@ subtest 'custom metaschemas, with custom vocabularies' => sub {
     { valid => true },
     'validation succeeds because "minimum" never gets run',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{$id},
     {
       canonical_uri => str($id),
@@ -1349,7 +1350,7 @@ subtest 'custom vocabulary classes with add_vocabulary()' => sub {
     'vocabulary class must implement some subs',
   );
 
-  cmp_deeply(
+  cmp_result(
     [ warnings {
       like(
         exception { $js->add_vocabulary('MyVocabulary::BadVocabularySub1') },
@@ -1380,7 +1381,7 @@ subtest 'custom vocabulary classes with add_vocabulary()' => sub {
     'added a vocabulary sub',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->{_vocabulary_classes},
     superhashof({ 'https://vocabulary/with/bad/evaluation/order' => [ 'draft2020-12', 'MyVocabulary::BadEvaluationOrder' ] }),
     'vocabulary was successfully added',
@@ -1394,7 +1395,7 @@ subtest 'custom vocabulary classes with add_vocabulary()' => sub {
       'https://vocabulary/with/bad/evaluation/order' => true,
     },
   });
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(1, { '$schema' => 'https://my/first/metaschema' })->TO_JSON,
     {
       valid => false,
@@ -1429,7 +1430,7 @@ subtest 'custom vocabulary classes with add_vocabulary()' => sub {
     },
   });
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       'bloop',
       {
@@ -1457,7 +1458,7 @@ subtest '$schema points to a boolean schema' => sub {
   my $js = JSON::Schema::Modern->new;
   $js->add_schema('https://my_boolean_schema' => true);
 
-  cmp_deeply(
+  cmp_result(
     my $result = $js->evaluate(
       1,
       {

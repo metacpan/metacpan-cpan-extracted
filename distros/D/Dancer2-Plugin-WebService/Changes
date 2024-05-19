@@ -1,3 +1,15 @@
+4.5.0  2024-05-17
+
+  - Corrections at accepting utf8 user data
+
+4.4.9  2024-04-15
+
+  - Rewrite the the funtions that accepting and returning user data
+
+4.4.8  2024-03-03
+
+  - Changes at the creation of the login token
+
 4.4.7  2023-11-27
 
   - UTF-8 improvements at human and perl formats

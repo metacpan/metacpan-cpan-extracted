@@ -5,7 +5,7 @@ use base 'PDF::API2::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '2.046'; # VERSION
+our $VERSION = '2.047'; # VERSION
 
 use Carp;
 use Compress::Zlib ();

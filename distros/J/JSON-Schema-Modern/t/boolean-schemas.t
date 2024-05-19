@@ -2,6 +2,7 @@ use strictures 2;
 use 5.020;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -31,7 +32,7 @@ foreach my $test (@tests) {
       my $result = $js->evaluate($data, $test->{schema});
       ok(!($result xor $test->{valid}), json_sprintf('schema: %s evaluates to: %s', $test->{schema}, $test->{valid}));
 
-      cmp_deeply(
+      cmp_result(
         $result->TO_JSON,
         {
           valid => $test->{valid},
@@ -45,7 +46,7 @@ foreach my $test (@tests) {
   );
 }
 
-cmp_deeply(
+cmp_result(
   $js->evaluate('hello', [])->TO_JSON,
   {
     valid => false,
@@ -62,7 +63,7 @@ cmp_deeply(
 
 $js = JSON::Schema::Modern->new(scalarref_booleans => 1);
 
-cmp_deeply(
+cmp_result(
   $js->evaluate('hello', \0)->TO_JSON,
   {
     valid => false,

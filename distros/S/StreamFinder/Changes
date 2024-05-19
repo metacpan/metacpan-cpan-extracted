@@ -640,3 +640,8 @@ Revision history for StreamFinder
         URL.
         - docs - Remove StreamFinder::Google (removed in v2.30) from supported 
         podcast list.
+2.32    
+        - Welcome epochtimes.com/epochtv videos by adding 
+        StreamFinder::EpochTV.  Site was previously supported by youtube-dl, 
+        but was often missing some metadata & often returned wrong HLS stream 
+        quality, particularly for users with limited bandwidth.

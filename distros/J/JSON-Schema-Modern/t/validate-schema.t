@@ -2,6 +2,7 @@ use strictures 2;
 use 5.020;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -14,7 +15,7 @@ use Helper;
 
 my $js = JSON::Schema::Modern->new;
 
-cmp_deeply(
+cmp_result(
   $js->validate_schema({ type => 'bloop' })->TO_JSON,
   {
     valid => false,
@@ -30,7 +31,7 @@ cmp_deeply(
   'validate_schema on simple schema with no $schema keyword',
 );
 
-cmp_deeply(
+cmp_result(
   $js->validate_schema({
     '$schema' => 'https://json-schema.org/draft/2019-09/schema',
     type => 'bloop',
@@ -51,7 +52,7 @@ cmp_deeply(
 
 $js->add_schema('http://example.com/myschema', { '$id' => 'http://example.com/myschema', type => 'boolean' });
 
-cmp_deeply(
+cmp_result(
   $js->validate_schema({
     '$schema' => 'http://example.com/myschema',
     type => 'bloop',

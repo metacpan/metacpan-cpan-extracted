@@ -20,7 +20,7 @@ use parent  qw( Exporter );
 use feature qw( say );
 
 our @EXPORT  = qw( Trace );
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ Variable change trace:
     BadCall();  # Shows stack trace of where data was changed.
 
 Stack trace:
-    
+
     use Data::Trace;
     Trace();    # 1 level.
     Trace(5);   # 5 levels.
@@ -72,9 +72,24 @@ Just a stack trace with no watching:
 
  Trace( @OPTIONS );
 
-Options 
+Options:
 
- -clone => 0, # Disable auto tying after a Storable dclone. 
+ -clone => 0,    # Disable auto tying after a Storable dclone.
+
+ -var => REF,    # Variable to watch.
+ REF             # Same as passing a reference.
+
+ -levels => NUM  # How many scope levels to show.
+ NUM             # Same as passing a decimal.
+
+ -raw => 1,      # Include Internal call like Moose,
+                 # and Class::MOP in a trace.
+ -NUM            # Same as passing negative number.
+
+ -message => STR # Message to use for a normal (non-
+                 # tie stack trace).
+ STR             # Same as passing anything else.
+
 
 =cut
 
@@ -97,14 +112,15 @@ sub _ProcessArgs {
     my %args;
 
     while ( my $arg = shift @raw_args ) {
-        if ( $arg =~ / ^ - /x ) {
+        if ( $arg =~ / ^ - [a-zA-Z_-] /x ) {
             $args{$arg} = shift @raw_args;
         }
         elsif ( ref $arg ) {
             $args{-var} = $arg;
         }
-        elsif ( $arg =~ / ^ \d+ $ /x ) {
-            $args{-levels} = $arg;
+        elsif ( $arg =~ / ^ (-)? (\d+) $ /x ) {
+            $args{-levels} = "$2";
+            $args{-raw}    = 1 if $1;
         }
         else {
             $args{-message} = $arg;
@@ -113,6 +129,7 @@ sub _ProcessArgs {
 
     $args{-levels}  //= ( $args{-var} ? 3 : 1 );
     $args{-message} //= "HERE:";
+    $args{-raw}     //= 0;
 
     %args;
 }
@@ -185,9 +202,13 @@ sub _Trace {
     my ( $class, %args ) = @_;
     my @lines;
     my $counter;
+    my @trace = $class->_TraceRaw();
+    if ( not $args{-raw} ) {
+        @trace = $class->_FilterOutInternals( @trace );
+    }
 
     # Collect a max amount of lines.
-    for my $line ( $class->_TraceRawish() ) {
+    for my $line ( @trace ) {
         push @lines, $line;
         last if ++$counter >= $args{-levels};
     }
@@ -211,10 +232,18 @@ sub _Trace {
     say $output;
 }
 
-sub _TraceRawish {
+sub _TraceRaw {
     my ( $class ) = @_;
 
     local $Carp::MaxArgNums = -1;
+
+    map { s/ ^ \s+ //xr }
+      split /\n/,
+      Carp::longmess( $class );
+}
+
+sub _FilterOutInternals {
+    my ( $class, @trace_lines ) = @_;
 
     # Stack trace while ignoring specific packages.
     grep {
@@ -241,10 +270,7 @@ sub _TraceRawish {
             \.pm \s+ line
 
         }x
-      }
-      map { s/ ^ \s+ //xr }
-      split /\n/,
-      Carp::longmess( $class );
+    } @trace_lines;
 }
 
 =head1 AUTHOR

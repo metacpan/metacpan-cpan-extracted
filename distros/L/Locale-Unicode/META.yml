@@ -3,6 +3,7 @@ abstract: 'Unicode Locale Identifier compliant with BCP47 and CLDR'
 author:
   - 'Jacques Deguest (jack@deguest.jp)'
 build_requires:
+  DateTime::Locale: '0'
   ExtUtils::MakeMaker: '0'
   Test::More: '1.302120'
   Test::Pod: '1.52'
@@ -32,5 +33,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Locale-Unicode/issues
   repository: https://gitlab.com/jackdeguest/Locale-Unicode
-version: v0.1.1
+version: v0.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

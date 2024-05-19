@@ -1,5 +1,8 @@
 Revision history for Perl module Locale::Unicode
 
+v0.1.2 2024-05-19T09:14:26+0900
+    - More oversight corrected
+
 v0.1.1 2024-05-18T13:40:37+0900
     - Added DateTime::Locale to test requirements
     - Fixed some documentation typos.

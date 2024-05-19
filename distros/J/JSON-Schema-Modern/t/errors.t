@@ -2,6 +2,7 @@ use strictures 2;
 use 5.020;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -19,7 +20,7 @@ subtest 'multiple types' => sub {
   ok(!$result, 'type returned false');
   is($result->error_count, 1, 'got error count');
 
-  cmp_deeply(
+  cmp_result(
     [ $result->errors ],
     [
       all(
@@ -35,7 +36,7 @@ subtest 'multiple types' => sub {
     'correct error generated from type',
   );
 
-  cmp_deeply(
+  cmp_result(
     $result->TO_JSON,
     {
       valid => false,
@@ -52,7 +53,7 @@ subtest 'multiple types' => sub {
 };
 
 subtest 'multipleOf' => sub {
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(3, { multipleOf => 2 })->TO_JSON,
     {
       valid => false,
@@ -69,7 +70,7 @@ subtest 'multipleOf' => sub {
 };
 
 subtest 'uniqueItems' => sub {
-  cmp_deeply(
+  cmp_result(
     $js->evaluate([qw(a b c d c)], { uniqueItems => true })->TO_JSON,
     {
       valid => false,
@@ -86,7 +87,7 @@ subtest 'uniqueItems' => sub {
 };
 
 subtest 'allOf, not, and false schema' => sub {
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       my $data = 1,
       my $schema = { allOf => [ true, false, { not => { not => false } } ] },
@@ -114,7 +115,7 @@ subtest 'allOf, not, and false schema' => sub {
     'correct errors with locations; did not collect errors inside "not"',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js_short->evaluate($data, $schema)->TO_JSON,
     {
       valid => false,
@@ -136,7 +137,7 @@ subtest 'allOf, not, and false schema' => sub {
 };
 
 subtest 'anyOf keeps all errors for false paths when invalid, discards errors for false paths when valid' => sub {
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       my $data = 1,
       my $schema = { anyOf => [ false, false ] },
@@ -164,13 +165,13 @@ subtest 'anyOf keeps all errors for false paths when invalid, discards errors fo
     'correct errors with locations; did not collect errors inside "not"',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js_short->evaluate($data, $schema)->TO_JSON,
     $result,
     'short-circuited results contain the same errors (short-circuiting not possible)',
   );
 
-  cmp_deeply(
+  cmp_result(
     $result = $js->evaluate(1, { anyOf => [ false, true ], not => true })->TO_JSON,
     {
       valid => false,
@@ -185,7 +186,7 @@ subtest 'anyOf keeps all errors for false paths when invalid, discards errors fo
     'did not collect errors from failure paths from successful anyOf',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(1, { anyOf => [ false, true ] })->TO_JSON,
     { valid => true },
     'no errors collected for true validation',
@@ -239,7 +240,7 @@ subtest 'applicators with non-boolean subschemas, discarding intermediary errors
 #   /items FAILS (across all instances)
 # entire schema FAILS
 
-  cmp_deeply(
+  cmp_result(
     $result->TO_JSON,
     {
       valid => false,
@@ -295,7 +296,7 @@ subtest 'applicators with non-boolean subschemas, discarding intermediary errors
     'collected all errors from subschemas for failing branches only (passing branches discard errors)',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js_short->evaluate($data, $schema)->TO_JSON,
     {
       valid => false,
@@ -366,7 +367,7 @@ subtest 'applicators with non-boolean subschemas, discarding intermediary errors
 #   /contains has at least 1 match; it PASSES
 # entire schema FAILS
 
-  cmp_deeply(
+  cmp_result(
     $result->TO_JSON,
     {
       valid => false,
@@ -392,7 +393,7 @@ subtest 'applicators with non-boolean subschemas, discarding intermediary errors
     'collected all errors from subschemas for failing branches only (passing branches discard errors)',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js_short->evaluate($data, $schema)->TO_JSON,
     {
       valid => false,
@@ -439,7 +440,7 @@ subtest 'errors with $refs' => sub {
   # /items/properties/x/$ref (mydef) /minimum
   # /items/properties/x/maximum
 
-  cmp_deeply(
+  cmp_result(
     $result->TO_JSON,
     {
       valid => false,
@@ -512,7 +513,7 @@ subtest 'errors with $refs' => sub {
 };
 
 subtest 'const and enum' => sub {
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => { a => { b => { c => { d => 1 } } } } },
       {
@@ -556,7 +557,7 @@ subtest 'const and enum' => sub {
 };
 
 subtest 'exceptions' => sub {
-  cmp_deeply(
+  cmp_result(
     (my $result = $js->evaluate_json_string('[ 1, 2, 3, whargarbl ]', true))->TO_JSON,
     {
       valid => false,
@@ -572,7 +573,7 @@ subtest 'exceptions' => sub {
   );
   ok($result->exception, 'exception flag is true on the result');
 
-  cmp_deeply(
+  cmp_result(
     ($result = $js->evaluate(
       { x => 'hello' },
       {
@@ -601,7 +602,7 @@ subtest 'exceptions' => sub {
   );
   ok($result->exception, 'exception flag is true on the result');
 
-  cmp_deeply(
+  cmp_result(
     ($result = $js->evaluate(
       1,
       {
@@ -632,7 +633,7 @@ subtest 'exceptions' => sub {
 };
 
 subtest 'errors after crossing multiple $refs using $id and $anchor' => sub {
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       1,
       {
@@ -724,7 +725,7 @@ subtest 'errors after crossing multiple $refs using $id and $anchor' => sub {
     'errors have correct absolute keyword location via $ref',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       1,
       {
@@ -764,7 +765,7 @@ subtest 'errors after crossing multiple $refs using $id and $anchor' => sub {
 };
 
 subtest 'unresolvable $ref to a local resource' => sub {
-  cmp_deeply(
+  cmp_result(
     (my $result = $js->evaluate(
       1,
       {
@@ -797,7 +798,7 @@ subtest 'unresolvable $ref to a remote resource' => sub {
   # new evaluator, with no resources remembered
   my $js = JSON::Schema::Modern->new;
 
-  cmp_deeply(
+  cmp_result(
     (my $result = $js->evaluate(
       1,
       {
@@ -829,7 +830,7 @@ subtest 'unresolvable $ref to a remote resource' => sub {
 };
 
 subtest 'unresolvable $ref to plain-name fragment' => sub {
-  cmp_deeply(
+  cmp_result(
     (my $result = $js->evaluate(1, { '$ref' => '#nowhere' }))->TO_JSON,
     {
       valid => false,
@@ -847,7 +848,7 @@ subtest 'unresolvable $ref to plain-name fragment' => sub {
 };
 
 subtest 'abort due to a schema error' => sub {
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       1,
       {
@@ -873,7 +874,7 @@ subtest 'abort due to a schema error' => sub {
 };
 
 subtest 'sorted property names' => sub {
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { foo => 1, bar => 1, baz => 1, hello => 1 },
       {
@@ -924,7 +925,7 @@ subtest 'sorted property names' => sub {
 };
 
 subtest 'bad regex in schema' => sub {
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       {
         my_pattern => 'foo',
@@ -968,7 +969,7 @@ subtest 'bad regex in schema' => sub {
     'bad "pattern" and "patternProperties" regexes are properly noted in error',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { my_runtime_pattern => 'foo' },
       $schema = {
@@ -994,7 +995,7 @@ subtest 'bad regex in schema' => sub {
   no warnings 'once';
   *IsFoo = sub { "0066\n006F\n" }; # accepts 'f', 'o'
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { my_runtime_pattern => 'foo' },
       $schema,
@@ -1007,7 +1008,7 @@ subtest 'bad regex in schema' => sub {
 };
 
 subtest 'JSON pointer escaping' => sub {
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { '{}' => { 'my~tilde/slash-property' => 1 } },
       my $schema = {
@@ -1087,7 +1088,7 @@ subtest 'JSON pointer escaping' => sub {
     'JSON pointers are properly escaped; URIs doubly so',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { '{}' => { 'my~tilde/slash-property' => 1 } },
       $schema->{'$defs'}{mydef},
@@ -1105,7 +1106,7 @@ subtest 'JSON pointer escaping' => sub {
     'absoluteKeywordLocation is omitted when paths are the same, not counting uri encoding',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { '{}' => { 'my~tilde/slash-property' => 1 } },
       {
@@ -1139,7 +1140,7 @@ subtest 'JSON pointer escaping' => sub {
 };
 
 subtest 'absoluteKeywordLocation' => sub {
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern->new(max_traversal_depth => 1)->evaluate(
       [ [ 1 ] ],
       { items => { '$ref' => '#' } },
@@ -1158,7 +1159,7 @@ subtest 'absoluteKeywordLocation' => sub {
     'absoluteKeywordLocation is included when different from instanceLocation, even when empty',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(1, { '$ref' => '#does_not_exist' })->TO_JSON,
     {
       valid => false,
@@ -1174,7 +1175,7 @@ subtest 'absoluteKeywordLocation' => sub {
   );
 
   $js->add_schema(false);
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(1, '#')->TO_JSON,
     {
       valid => false,
@@ -1189,7 +1190,7 @@ subtest 'absoluteKeywordLocation' => sub {
     'absoluteKeywordLocation is never "#"',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       1,
       my $schema = {
@@ -1252,7 +1253,7 @@ subtest 'absoluteKeywordLocation' => sub {
 
   $schema->{'$id'} = '#my_anchor';
   $schema->{allOf}[2]{'$id'} = '#my_anchor2';
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern->new(specification_version => 'draft7')->evaluate(1, $schema)->TO_JSON,
     {
       valid => false,
@@ -1292,7 +1293,7 @@ subtest 'absoluteKeywordLocation' => sub {
 };
 
 subtest dependentRequired => sub {
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(1, { dependentRequired => { foo => [ 1 ] } })->TO_JSON,
     {
       valid => false,
@@ -1328,7 +1329,7 @@ subtest 'evaluate in the middle of a document' => sub {
     },
   });
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       {
         bar => ['not a string'],
@@ -1354,7 +1355,7 @@ subtest 'evaluate in the middle of a document' => sub {
     'provided evaluation uri does not exist',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       {
         bar => ['not a string'],
@@ -1388,7 +1389,7 @@ subtest 'evaluate in the middle of a document' => sub {
 };
 
 subtest 'numbers in output' => sub {
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       5,
       {
@@ -1434,7 +1435,7 @@ subtest 'numbers in output' => sub {
 };
 
 subtest 'effective_base_uri' => sub {
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       5,
       {
@@ -1469,7 +1470,7 @@ subtest 'effective_base_uri' => sub {
 };
 
 subtest 'recommended_response' => sub {
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern::Result->new(valid => 1)->recommended_response,
     undef,
     'recommended_response is not defined when there are no errors',
@@ -1488,7 +1489,7 @@ subtest 'recommended_response' => sub {
     },
   );
 
-  cmp_deeply(
+  cmp_result(
     $result->recommended_response,
     [ 400, q{'/foo': value is smaller than 5} ],
     'recommended_response uses the first error in the result',
@@ -1496,7 +1497,7 @@ subtest 'recommended_response' => sub {
 
   my $result2 = $js->evaluate(1, { '$ref' => '#/$defs/does_not_exist' });
 
-  cmp_deeply(
+  cmp_result(
     $result2->recommended_response,
     [ 500, 'Internal Server Error' ],
     'recommended_response indicates an exception occurred',
@@ -1519,7 +1520,7 @@ subtest 'recommended_response' => sub {
     ],
   );
 
-  cmp_deeply(
+  cmp_result(
     $result3->recommended_response,
     [ 401, 'Unauthorized' ],
     'recommended_response uses the one from the error that is explicitly set',

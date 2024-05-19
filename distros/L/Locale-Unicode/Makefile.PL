@@ -35,6 +35,7 @@ my %WriteMakefileArgs = (
     TEST_REQUIRES =>
     {
         'lib'           => '0.63',
+        'DateTime::Locale' => 0,
         # Released 2017-11-30
         'Test::More'    => '1.302120',
         'Test::Pod'     => '1.52',

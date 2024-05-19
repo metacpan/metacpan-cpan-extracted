@@ -2,6 +2,7 @@ use strictures 2;
 use 5.020;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -42,7 +43,7 @@ subtest 'specification aliases' => sub {
 };
 
 subtest '$ref and older specification versions' => sub {
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern->new->evaluate(
       true,
       {
@@ -65,7 +66,7 @@ subtest '$ref and older specification versions' => sub {
 };
 
 subtest '<= draft7: $ref in combination with any other keyword causes the other keywords to be ignored' => sub {
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern->new(
       specification_version => 'draft7',
     )->evaluate(
@@ -86,7 +87,7 @@ subtest '<= draft7: $ref in combination with any other keyword causes the other 
 };
 
 subtest '$ref adjacent to a path used in a $ref' => sub {
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern->new(specification_version => 'draft7')->evaluate(
       true,
       {
@@ -118,7 +119,7 @@ subtest '$ref adjacent to a path used in a $ref' => sub {
 };
 
 subtest '$defs support' => sub {
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern->new(specification_version => 'draft7')->evaluate(
       1,
       my $schema = {
@@ -139,7 +140,7 @@ subtest '$defs support' => sub {
     '$defs is not recognized in <= draft7',
   );
 
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern->new(specification_version => 'draft2019-09')->evaluate(1, $schema)->TO_JSON,
     {
       valid => false,
@@ -158,7 +159,7 @@ subtest '$defs support' => sub {
 subtest 'definitions support' => sub {
   my $schema;
   my @warnings = warnings {
-    cmp_deeply(
+    cmp_result(
       JSON::Schema::Modern->new(specification_version => 'draft2019-09')->evaluate(
         1,
         $schema = {
@@ -179,13 +180,13 @@ subtest 'definitions support' => sub {
       'definitions is not recognized in >= draft2019-09',
     );
   };
-  cmp_deeply(
+  cmp_result(
     \@warnings,
     [ re(qr/^no-longer-supported "definitions" keyword present/) ],
     'warned when using no-longer-supported keyword',
   );
 
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern->new(specification_version => 'draft7')->evaluate(1, $schema)->TO_JSON,
     {
       valid => false,
@@ -205,7 +206,7 @@ subtest 'dependencies, dependentRequired, dependentSchemas' => sub {
   my $js = JSON::Schema::Modern->new(specification_version => 'draft2019-09');
   my $dependencies_schema;
   my @warnings = warnings {
-    cmp_deeply(
+    cmp_result(
       $js->evaluate(
         { alpha => 1, beta => 2 },
         $dependencies_schema = {
@@ -219,13 +220,13 @@ subtest 'dependencies, dependentRequired, dependentSchemas' => sub {
       'dependencies is not recognized in >= draft2019-09',
     );
   };
-  cmp_deeply(
+  cmp_result(
     \@warnings,
     [ re(qr/^no-longer-supported "dependencies" keyword present/) ],
     'warned when using no-longer-supported keyword',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { alpha => 1, beta => 2 },
       my $dependentRequired_schema = {
@@ -252,7 +253,7 @@ subtest 'dependencies, dependentRequired, dependentSchemas' => sub {
     'dependentRequired is supported in >= draft2019-09',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { alpha => 1, beta => 2 },
       my $dependentSchemas_schema = {
@@ -280,7 +281,7 @@ subtest 'dependencies, dependentRequired, dependentSchemas' => sub {
   );
 
   $js = JSON::Schema::Modern->new(specification_version => 'draft7');
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { alpha => 1, beta => 2 },
       $dependencies_schema,
@@ -308,7 +309,7 @@ subtest 'dependencies, dependentRequired, dependentSchemas' => sub {
     'dependencies is supported in <= draft7',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { alpha => 1, beta => 2 },
       $dependentRequired_schema,
@@ -317,7 +318,7 @@ subtest 'dependencies, dependentRequired, dependentSchemas' => sub {
     'dependentRequired is not recognized in <= draft7',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       { alpha => 1, beta => 2 },
       $dependentSchemas_schema,
@@ -329,7 +330,7 @@ subtest 'dependencies, dependentRequired, dependentSchemas' => sub {
 
 subtest 'prefixItems, items and additionalItems' => sub {
   my $js = JSON::Schema::Modern->new;
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       [ 1, 2 ],
       {
@@ -365,7 +366,7 @@ subtest 'prefixItems, items and additionalItems' => sub {
     'prefixitems+items works when specification_version >= draft2020-12',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       [ 1 ],
       {
@@ -386,7 +387,7 @@ subtest 'prefixItems, items and additionalItems' => sub {
   );
 
   my @warnings = warnings {
-    cmp_deeply(
+    cmp_result(
       $js->evaluate(
         [ 1 ],
         { additionalItems => false },
@@ -395,13 +396,13 @@ subtest 'prefixItems, items and additionalItems' => sub {
       'additionalitems not recognized when specification_version >= draft2020-12',
     );
   };
-  cmp_deeply(
+  cmp_result(
     \@warnings,
     [ re(qr/^no-longer-supported "additionalItems" keyword present/) ],
     'warned when using no-longer-supported keyword',
   );
 
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Modern->new(specification_version => 'draft2019-09')->evaluate(
       [ 1 ],
       { prefixItems => [ { maximum => 0 } ] }
@@ -410,7 +411,7 @@ subtest 'prefixItems, items and additionalItems' => sub {
     'prefixitems not supported when specification_version specifies other than draft2020-12',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       [ 1, 2, 3 ],
       {
@@ -432,7 +433,7 @@ subtest 'prefixItems, items and additionalItems' => sub {
   );
 
   @warnings = warnings {
-    cmp_deeply(
+    cmp_result(
       $js->evaluate(
         [ 1, 2, 3 ],
         {
@@ -458,13 +459,13 @@ subtest 'prefixItems, items and additionalItems' => sub {
       'prefixItems + additionalItems',
     );
   };
-  cmp_deeply(
+  cmp_result(
     \@warnings,
     [ re(qr/^no-longer-supported "additionalItems" keyword present/) ],
     'warned when using no-longer-supported keyword',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(
       [ 1, 2, 3 ],
       {
@@ -506,7 +507,7 @@ subtest 'prefixItems, items and additionalItems' => sub {
   );
 
   @warnings = warnings {
-    cmp_deeply(
+    cmp_result(
       $js->evaluate(
         [ 1, 2, 3 ],
         {
@@ -532,14 +533,14 @@ subtest 'prefixItems, items and additionalItems' => sub {
       'schema-based items + additionalItems, failure case',
     );
   };
-  cmp_deeply(
+  cmp_result(
     \@warnings,
     [ re(qr/^no-longer-supported "additionalItems" keyword present/) ],
     'warned when using no-longer-supported keyword',
   );
 
   @warnings = warnings {
-    cmp_deeply(
+    cmp_result(
       $js->evaluate(
         [ 1, 2, 3 ],
         {
@@ -551,7 +552,7 @@ subtest 'prefixItems, items and additionalItems' => sub {
       'schema-based items + additionalItems, passing case',
     );
   };
-  cmp_deeply(
+  cmp_result(
     \@warnings,
     [ re(qr/^no-longer-supported "additionalItems" keyword present/) ],
     'warned when using no-longer-supported keyword',

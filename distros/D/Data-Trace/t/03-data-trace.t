@@ -62,16 +62,31 @@ sub _define_regex {
         \n \s+ \|- \s+ main::__ANON__\b .+
         \n \s+ \|- \s+ main::_dummy_run_coderef\b .+
     }x;
+    my $anon_raw_lines = qr{
+        \n \s+ \|- \s+ Data::Trace::_Trace\b .+
+        \n \s+ \|- \s+ Data::Trace::__ANON__\b .+
+    }x;
     my $_build_trace = sub {
         my ( $ref, $method, @values ) = @_;
         my $args =
           join ', \s+',
           map { qq("$_") } @values;
 
+        my $is_tie = qr{
+            ^
+            (?: Scalar | Array | Hash )
+            $
+        }x;
+
+        my $sub =
+          ( $ref =~ /$is_tie/ )
+          ? qr{ ::${ref}::$method \( }x
+          : qr{ $ref }x;
+
         return qr {
             $timestamp \s+
             $method\( \s* $args \s* \): .+
-            ::${ref}::$method\( .+
+            $sub .+
         }x;
     };
 
@@ -81,6 +96,8 @@ sub _define_regex {
     my $scalar_clone_store =
       $_build_trace->( "Scalar", "STORE", "cloned_scalar" );
     my $scalar_store_firstname = $_build_trace->( "Scalar", "STORE", "Charly" );
+    my $scalar_store_firstname_raw =
+      $_build_trace->( "Data::Trace", "STORE", "Charly" );
 
     # Array.
     my $array_store = $_build_trace->( "Array", "STORE", 1, "array2" );
@@ -97,6 +114,8 @@ sub _define_regex {
     my $hash_clear  = $_build_trace->( "Hash", "CLEAR" );
     my $hash_store_firstname =
       $_build_trace->( "Hash", "STORE", "first", "Charly" );
+    my $hash_store_firstname_raw =
+      $_build_trace->( "Data::Trace", "STORE", "first", "Charly" );
 
     # Actual patterns to use.
     {
@@ -135,6 +154,9 @@ sub _define_regex {
             firstname1 => qr{ ^ $scalar_store_firstname $ }x,
             coderef_firstname =>
               qr{ ^ \n $scalar_store_firstname $anon_coderef_lines $ }x,
+            firstname_raw =>
+              qr{ ^ \n $scalar_store_firstname_raw $anon_raw_lines $ }x,
+            firstname_raw1 => qr{ ^ $scalar_store_firstname_raw $ }x,
         },
 
         array => {
@@ -165,8 +187,11 @@ sub _define_regex {
                 \n $hash_store $anon_lines
                 $
             }x,
-            firstname  => qr{ ^ \n $hash_store_firstname $anon_lines $ }x,
-            firstname1 => qr{ ^ $hash_store_firstname $ }x,
+            firstname     => qr{ ^ \n $hash_store_firstname $anon_lines $ }x,
+            firstname1    => qr{ ^ $hash_store_firstname $ }x,
+            firstname_raw =>
+              qr{ ^ \n $hash_store_firstname_raw $anon_raw_lines $ }x,
+            firstname_raw1    => qr{ ^ $hash_store_firstname_raw $ }x,
             coderef_firstname =>
               qr{ ^ \n $hash_store_firstname $anon_coderef_lines $ }x,
         },
@@ -1272,6 +1297,405 @@ sub _define_cases_other_location {
     )
 }
 
+# Raw
+sub _define_cases_raw {
+    (
+
+        # Full.
+        # -NUM
+        {
+            name     => "raw -3 - watch full - no change",
+            args     => sub { [ $test_complex, -3 ] },
+            expected => {
+                stdout   => $regex->{empty},
+                variable => $test_complex,
+                value    => _define_complex_base_value(),
+            },
+        },
+        {
+            name    => "raw -3 - watch full - firstname",
+            args    => sub { [ $test_complex, -3 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{hash}{firstname_raw},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+        {
+            name    => "raw -1 - watch full - firstname",
+            args    => sub { [ $test_complex, -1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{hash}{firstname_raw1},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+
+        # -NUM -raw 1
+        {
+            name     => "raw -3 -raw - watch full - no change",
+            args     => sub { [ $test_complex, -3, -raw, 1 ] },
+            expected => {
+                stdout   => $regex->{empty},
+                variable => $test_complex,
+                value    => _define_complex_base_value(),
+            },
+        },
+        {
+            name    => "raw -3 -raw - watch full - firstname",
+            args    => sub { [ $test_complex, -3, -raw, 1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{hash}{firstname_raw},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+        {
+            name    => "raw -1 -raw - watch full - firstname",
+            args    => sub { [ $test_complex, -1, -raw, 1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{hash}{firstname_raw1},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+
+        # NUM -raw 1
+        {
+            name     => "raw 3 -raw - watch full - no change",
+            args     => sub { [ $test_complex, 3, -raw, 1 ] },
+            expected => {
+                stdout   => $regex->{empty},
+                variable => $test_complex,
+                value    => _define_complex_base_value(),
+            },
+        },
+        {
+            name    => "raw 3 -raw - watch full - firstname",
+            args    => sub { [ $test_complex, 3, -raw, 1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{hash}{firstname_raw},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+        {
+            name    => "raw 1 -raw - watch full - firstname",
+            args    => sub { [ $test_complex, 1, -raw, 1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{hash}{firstname_raw1},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+
+        # Partial.
+        # -NUM
+        {
+            name     => "raw -3 - watch partial - no change",
+            args     => sub { [ $test_complex->{authors}, -3 ] },
+            expected => {
+                stdout   => $regex->{empty},
+                variable => $test_complex,
+                value    => _define_complex_base_value(),
+            },
+        },
+        {
+            name    => "raw -3 - watch partial - firstname",
+            args    => sub { [ $test_complex->{authors}, -3 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{hash}{firstname_raw},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+        {
+            name    => "raw -1 - watch partial - firstname 1",
+            args    => sub { [ $test_complex->{authors}, -1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{hash}{firstname_raw1},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+
+        # -NUM -raw 1
+        {
+            name     => "raw -3 -raw - watch partial - no change",
+            args     => sub { [ $test_complex->{authors}, -3, -raw, 1 ] },
+            expected => {
+                stdout   => $regex->{empty},
+                variable => $test_complex,
+                value    => _define_complex_base_value(),
+            },
+        },
+        {
+            name    => "raw -3 -raw - watch partial - firstname",
+            args    => sub { [ $test_complex->{authors}, -3, -raw, 1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{hash}{firstname_raw},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+        {
+            name    => "raw -1 -raw - watch partial - firstname 1",
+            args    => sub { [ $test_complex->{authors}, -1, -raw, 1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{hash}{firstname_raw1},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+
+        # NUM -raw 1
+        {
+            name     => "raw 3 -raw - watch partial - no change",
+            args     => sub { [ $test_complex->{authors}, 3, -raw, 1 ] },
+            expected => {
+                stdout   => $regex->{empty},
+                variable => $test_complex,
+                value    => _define_complex_base_value(),
+            },
+        },
+        {
+            name    => "raw 3 -raw - watch partial - firstname",
+            args    => sub { [ $test_complex->{authors}, 3, -raw, 1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{hash}{firstname_raw},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+        {
+            name    => "raw 1 -raw - watch partial - firstname 1",
+            args    => sub { [ $test_complex->{authors}, 1, -raw, 1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{hash}{firstname_raw1},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+
+        # Single node.
+        # -NUM
+        {
+            name     => "raw -3 - watch single - no change",
+            args     => sub { [ \$test_complex->{authors}[0]{first}, -3 ] },
+            expected => {
+                stdout   => $regex->{empty},
+                variable => $test_complex,
+                value    => _define_complex_base_value(),
+            },
+        },
+        {
+            name    => "raw -3 - watch single - firstname",
+            args    => sub { [ \$test_complex->{authors}[0]{first}, -3 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{scalar}{firstname_raw},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+        {
+            name    => "raw -1 - watch single - firstname",
+            args    => sub { [ \$test_complex->{authors}[0]{first}, -1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{scalar}{firstname_raw1},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+
+        # -NUM -raw 1
+        {
+            name => "raw -3 -raw - watch single - no change",
+            args =>
+              sub { [ \$test_complex->{authors}[0]{first}, -3, -raw, 1 ] },
+            expected => {
+                stdout   => $regex->{empty},
+                variable => $test_complex,
+                value    => _define_complex_base_value(),
+            },
+        },
+        {
+            name => "raw -3 -raw - watch single - firstname",
+            args =>
+              sub { [ \$test_complex->{authors}[0]{first}, -3, -raw, 1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{scalar}{firstname_raw},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+        {
+            name => "raw -1 -raw - watch single - firstname",
+            args =>
+              sub { [ \$test_complex->{authors}[0]{first}, -1, -raw, 1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{scalar}{firstname_raw1},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+
+        # NUM -raw 1
+        {
+            name => "raw 3 -raw - watch single - no change",
+            args => sub { [ \$test_complex->{authors}[0]{first}, 3, -raw, 1 ] },
+            expected => {
+                stdout   => $regex->{empty},
+                variable => $test_complex,
+                value    => _define_complex_base_value(),
+            },
+        },
+        {
+            name => "raw 3 -raw - watch single - firstname",
+            args => sub { [ \$test_complex->{authors}[0]{first}, 3, -raw, 1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{scalar}{firstname_raw},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+        {
+            name => "raw 1 -raw - watch single - firstname",
+            args => sub { [ \$test_complex->{authors}[0]{first}, 1, -raw, 1 ] },
+            actions => sub {
+                $test_complex->{authors}[0]{first} = 'Charly';
+            },
+            expected => {
+                stdout   => $regex->{scalar}{firstname_raw1},
+                variable => sub { $test_complex },
+                value    => sub {
+                    my $val = _define_complex_base_value();
+                    $val->{authors}[0]{first} = "Charly";
+                    $val;
+                },
+            },
+        },
+    )
+}
+
 my @cases = (
 
     # User Errors
@@ -1300,6 +1724,8 @@ my @cases = (
     # Location
     _define_cases_other_location(),
 
+    # Raw
+    _define_cases_raw(),
 );
 
 ###########################################

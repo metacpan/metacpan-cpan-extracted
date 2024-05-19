@@ -1,6 +1,7 @@
 use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -20,13 +21,13 @@ my %vocabularies = unpairs(JSON::Schema::Modern->new->__all_metaschema_vocabular
 subtest 'load cached metaschema' => sub {
   my $js = JSON::Schema::Modern->new;
 
-  cmp_deeply(
+  cmp_result(
     $js->_get_resource(METASCHEMA),
     undef,
     'this resource is not yet known',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->_get_or_load_resource(METASCHEMA),
     my $resource = +{
       canonical_uri => str(METASCHEMA),
@@ -49,7 +50,7 @@ subtest 'load cached metaschema' => sub {
     'loaded metaschema from sharedir cache',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->_get_resource(METASCHEMA),
     $resource,
     'this resource is now in the resource index',
@@ -58,7 +59,7 @@ subtest 'load cached metaschema' => sub {
 
 subtest 'resource collision with cached metaschema' => sub {
   my $js = JSON::Schema::Modern->new;
-  cmp_deeply(
+  cmp_result(
     $js->evaluate(1, { '$id' => METASCHEMA })->TO_JSON,
     {
       valid => false,

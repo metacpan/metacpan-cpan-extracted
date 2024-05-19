@@ -40,4 +40,4 @@ for my $result (@$results) {
 }
 
 @notes = uniq @notes;
-print "Notes: @notes\n";
+print "Notes in common:\n\t@notes\n";

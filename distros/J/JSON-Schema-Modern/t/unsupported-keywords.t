@@ -2,6 +2,7 @@ use strictures 2;
 use 5.020;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -35,7 +36,7 @@ foreach my $index (0 .. $#warnings) {
   note "\n", $spec_version;
   my $js = JSON::Schema::Modern->new(specification_version => $spec_version);
   foreach my $keyword (@$removed_keywords) {
-    cmp_deeply(
+    cmp_result(
       [ warnings { ok($js->evaluate(true, { $keyword => $schemas{$keyword} }), 'schema with "'.$keyword.'" still validates in '.$spec_version) } ],
       superbagof(re($strings{$keyword})),
       'warned for "'.$keyword.'" in '.$spec_version,
@@ -49,7 +50,7 @@ foreach my $index (0 .. $#warnings) {
     local $SIG{__WARN__} = sub {
       warn @_ if $_[0] =~ /^no-longer-supported "$keyword" keyword present/;
     };
-    cmp_deeply(
+    cmp_result(
       [ warnings { ok($js->evaluate(true, { $keyword => $schemas{$keyword} }), 'schema with "'.$keyword.'" validates in '.$spec_version) } ],
       [],
       'did not warn for "'.$keyword.'" in '.$spec_version,

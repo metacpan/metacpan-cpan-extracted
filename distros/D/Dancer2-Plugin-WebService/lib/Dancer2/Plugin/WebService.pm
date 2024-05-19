@@ -5,60 +5,47 @@
 # Joan Ntzougani, ✞
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.4.7';
+our	$VERSION = '4.5.0';
 use	strict;
 use	warnings;
 use Encode;
 use	Dancer2::Plugin;
 use	Storable;
 use Cpanel::JSON::XS;
-use	XML::Hash::XS; $XML::Hash::XS::canonical=0;    $XML::Hash::XS::utf8=1;  $XML::Hash::XS::doc=0;  $XML::Hash::XS::root='root'; $XML::Hash::XS::encoding='utf-8'; $XML::Hash::XS::indent=2; $XML::Hash::XS::xml_decl=0;
-use YAML::XS;      # user posted yaml text -> hash
-use YAML::Syck;    $YAML::Syck::ImplicitUnicode=1;  # hash -> reply yaml text
+use	XML::Hash::XS; $XML::Hash::XS::canonical=0;    $XML::Hash::XS::utf8=0; $XML::Hash::XS::doc=0; $XML::Hash::XS::root='root'; $XML::Hash::XS::encoding='utf-8'; $XML::Hash::XS::indent=2; $XML::Hash::XS::xml_decl=0;
+use YAML::Syck;    $YAML::Syck::ImplicitTyping=0;  $YAML::Syck::ImplicitTyping=0;
 use	Data::Dumper;  $Data::Dumper::Trailingcomma=0; $Data::Dumper::Indent=2; $Data::Dumper::Terse=1; $Data::Dumper::Deepcopy=1; $Data::Dumper::Purity=1; $Data::Dumper::Sortkeys=0;
 
 if ($^O=~/(?i)MSWin/) {warn "Operating system is not supported\n"; exit 1}
 
 my $JSON = Cpanel::JSON::XS->new;
-$JSON->space_before(0);
-$JSON->canonical(0);
-$JSON->allow_tags(1);
-$JSON->allow_unknown(0);
-$JSON->pretty(0);
-$JSON->indent(0);
-$JSON->space_after(1);
-$JSON->max_size(0);
-$JSON->relaxed(0);
-$JSON->shrink(0);
-$JSON->allow_nonref(0);
-$JSON->allow_blessed(1);
-$JSON->convert_blessed(1);
-$JSON->max_depth(1024);
+$JSON->utf8(0); $JSON->pretty(0); $JSON->indent(0); $JSON->max_size(0); $JSON->space_before(0); $JSON->space_after(1); $JSON->relaxed(0); $JSON->canonical(0); $JSON->allow_tags(1); $JSON->allow_unknown(0); $JSON->shrink(0); $JSON->allow_nonref(0); $JSON->allow_blessed(0); $JSON->convert_blessed(0); $JSON->max_depth(1024);
 
 my $dir;
 my %Handler;
-my %TokenDB = ();
+my %TokenDB;
+my @keys;
 my %Formats = (json=>'application/json', xml=>'application/xml', yaml=>'application/yaml', perl=>'text/plain', human=>'text/plain');
 my $fmt_rgx = eval 'qr/^('. join('|', sort keys %Formats) .')$/';
 
-has error           => (is=>'rw', lazy=>1, default     => 0);
-has sort            => (is=>'rw', lazy=>1, default     => 0);
-has pretty          => (is=>'rw', lazy=>1, default     => 1);
-has route_name      => (is=>'rw', lazy=>1, default     => '');
-has ClientIP        => (is=>'rw', lazy=>1, default     => '');
-has reply_text      => (is=>'rw', lazy=>1, default     => '');
-has auth_method     => (is=>'rw', lazy=>1, default     => '');
-has auth_command    => (is=>'rw', lazy=>1, default     => '');
-has auth_config     => (is=>'rw', lazy=>1, default     => sub{ {} });
-has data            => (is=>'rw', lazy=>1, default     => sub{ {} }); # user posted data as hash
-has Format          => (is=>'rw', lazy=>1, default     => sub{ {from => undef, to => undef} });
-has Session_timeout => (is=>'ro', lazy=>0, from_config => 'Session idle timeout',default=> sub{ 3600 }, isa => sub {unless ( $_[0]=~/^\d+$/ ) {warn "Session idle timeout \"$_[0]\" It is not a number\n"; exit 1}} );
-has rules           => (is=>'ro', lazy=>0, from_config => 'Allowed hosts',       default=> sub{ ['127.*', '192.168.*', '172.16.*'] });
-has rules_compiled  => (is=>'ro', lazy=>0, default     => sub {my $array = [@{$_[0]->rules}]; for (@{$array}) { s/([^?*]+)/\Q$1\E/g; s|\?|.|g; s|\*+|.*?|g; $_ = qr/^$_$/i } $array});
-has dir_session     => (is=>'ro', lazy=>0, default     => sub {my $D = exists $_[0]->config->{'Session directory'} ? $_[0]->config->{'Session directory'}."/$_[0]->{app}->{name}" : "$_[0]->{app}->{config}->{appdir}/session"; $D=~s|/+|/|g; my @MD = split /(?:\\|\/)+/, $D; my $i; for ($i=$#MD; $i>=0; $i--) { last if -d join '/', @MD[0..$i] } for (my $j=$i+1; $j<=$#MD; $j++) { unless (mkdir join '/', @MD[0 .. $j]) {warn "Could not create the session directory \"$D\" because $!\n"; exit 1} } $D} );
-has rm              => (is=>'ro', lazy=>0, default     => sub{foreach (qw[/usr/bin /bin /usr/sbin /sbin]) {return "$_/rm" if -f "$_/rm" && -x "$_/rm" } warn "Could not found utility rm\n"; exit 1});
+has error           => (is=>'rw', lazy=>1, default    => 0);
+has sort            => (is=>'rw', lazy=>1, default    => 0);
+has pretty          => (is=>'rw', lazy=>1, default    => 1);
+has route_name      => (is=>'rw', lazy=>1, default    => '');
+has ClientIP        => (is=>'rw', lazy=>1, default    => '');
+has reply_text      => (is=>'rw', lazy=>1, default    => '');
+has auth_method     => (is=>'rw', lazy=>1, default    => '');
+has auth_command    => (is=>'rw', lazy=>1, default    => '');
+has auth_config     => (is=>'rw', lazy=>1, default    => sub{ {} });
+has data            => (is=>'rw', lazy=>1, default    => sub{ {} }); # user posted data as hash
+has Format          => (is=>'rw', lazy=>1, default    => sub{ {from => undef, to => undef} });
+has Session_timeout => (is=>'ro', lazy=>0, from_config=> 'Session idle timeout',default=> sub{ 3600 }, isa => sub {unless ( $_[0]=~/^\d+$/ ) {warn "Session idle timeout \"$_[0]\" It is not a number\n"; exit 1}} );
+has rules           => (is=>'ro', lazy=>0, from_config=> 'Allowed hosts',       default=> sub{ ['127.*', '192.168.*', '172.16.*'] });
+has rules_compiled  => (is=>'ro', lazy=>0, default    => sub {my $array = [@{$_[0]->rules}]; for (@{$array}) { s/([^?*]+)/\Q$1\E/g; s|\?|.|g; s|\*+|.*?|g; $_ = qr/^$_$/i } $array});
+has dir_session     => (is=>'ro', lazy=>0, default    => sub {my $D = exists $_[0]->config->{'Session directory'} ? $_[0]->config->{'Session directory'}."/$_[0]->{app}->{name}" : "$_[0]->{app}->{config}->{appdir}/session"; $D=~s|/+|/|g; my @MD = split /(?:\\|\/)+/, $D; my $i; for ($i=$#MD; $i>=0; $i--) { last if -d join '/', @MD[0..$i] } for (my $j=$i+1; $j<=$#MD; $j++) { unless (mkdir join '/', @MD[0 .. $j]) {warn "Could not create the session directory \"$D\" because $!\n"; exit 1} } $D} );
+has rm              => (is=>'ro', lazy=>0, default    => sub{foreach (qw[/usr/bin /bin /usr/sbin /sbin]) {return "$_/rm" if -f "$_/rm" && -x "$_/rm" } warn "Could not found utility rm\n"; exit 1});
 
-# Recursive walker of complex Perl Data Structures
+# Recursive walker of complex and custon Data Structures
 %Handler=(
 SCALAR => sub { $Handler{WALKER}->(${$_[0]}, $_[1], @{$_[2]} )},
 ARRAY  => sub { $Handler{WALKER}->($_, $_[1], @{$_[2]}) for @{$_[0]} },
@@ -118,7 +105,7 @@ $app->config->{content_type}         = $Formats{ $plg->config->{'Default format'
 
 delete $plg->config->{'Authentication methods'};
 
-  # Check the active auth method if there are protected routes
+  # Check if there are protected routes
   foreach (keys %{$plg->config->{Routes}}) {
 
     if ((exists $plg->config->{Routes}->{$_}->{Protected}) && ($plg->config->{Routes}->{$_}->{Protected}=~/(?i)[y1t]/)) {
@@ -144,16 +131,16 @@ delete $plg->config->{'Authentication methods'};
     }
   }
 
-print 'Start time              : ', scalar localtime $^T ,"\n";
-print "Main PID                : $$\n";
-print 'Run as user             : ', (getpwuid($>))[0] ,"\n";
-print 'Authorization method    : ', $plg->auth_method ,"\n";
-print 'Session directory       : ', $plg->dir_session ,"\n";
-print 'Session idle timeout    : ', $plg->Session_timeout ," sec\n";
-print "Module auth dir scripts : $module_dir\n";
-print "version Perl            : $^V\n";
-print "version Dancer2         : $Dancer2::VERSION\n";
-print "version WebService      : $VERSION\n";
+print 'Start time                : ', scalar localtime $^T ,"\n";
+print "Main PID                  : $$\n";
+print 'Run as user               : ', (getpwuid($>))[0] ,"\n";
+print 'Authorization method      : ', $plg->auth_method ,"\n";
+print 'Session directory         : ', $plg->dir_session ,"\n";
+print 'Session idle timeout      : ', $plg->Session_timeout ," sec\n";
+print "Authorization scripts dir : $module_dir\n";
+print "version Perl              : $^V\n";
+print "version Dancer2           : $Dancer2::VERSION\n";
+print "version WebService        : $VERSION\n";
 
 # Restore the valid sessions, and delete the expired ones
 opendir DIR, $plg->dir_session or die "Could not list session directory $plg->{dir_session} because $!\n";
@@ -164,7 +151,7 @@ opendir DIR, $plg->dir_session or die "Could not list session directory $plg->{d
     my $lastaccess = ${ Storable::retrieve "$plg->{dir_session}/$token/control/lastaccess" };
 
       if (time - $lastaccess > $plg->Session_timeout) {
-      print "Delete expired session: $token\n";
+      print "Delete expired session    : $token\n";
       system $plg->rm, '-rf', "$plg->{dir_session}/$token"
       }
       else {
@@ -172,20 +159,21 @@ opendir DIR, $plg->dir_session or die "Could not list session directory $plg->{d
       @{$TokenDB{$token}->{control}}{qw/lastaccess username groups/} = ($lastaccess, ${Storable::retrieve "$plg->{dir_session}/$token/control/username"}, ${Storable::retrieve "$plg->{dir_session}/$token/control/groups"});
       opendir __TOKEN, "$plg->{dir_session}/$token/data" or die "Could not read session directory $plg->{dir_session}/$token/data because $!\n";
 
-				foreach my $record (grep ! /^\.+$/, readdir __TOKEN) {
-				$TokenDB{$token}->{data}->{$record} = Storable::retrieve "$plg->{dir_session}/$token/data/$record";
-				$TokenDB{$token}->{data}->{$record} = ${ $TokenDB{$token}->{data}->{$record} } if 'SCALAR' eq ref $TokenDB{$token}->{data}->{$record}
-				}
+        foreach my $record (grep ! /^\.{1,2}$/, readdir __TOKEN) {
+        $record = Encode::decode('utf8', $record);
+        $TokenDB{$token}->{data}->{$record} = Storable::retrieve "$plg->{dir_session}/$token/data/$record";
+        $TokenDB{$token}->{data}->{$record} = ${ $TokenDB{$token}->{data}->{$record} } if 'SCALAR' eq ref $TokenDB{$token}->{data}->{$record}
+        }
 
-			close __TOKEN;
-			print "Restore session : $token (". scalar(keys %{$TokenDB{$token}->{data}}) ." records)\n"
-			}
-		}
-		else {
-		print "Delete corrupt session: $token\n";
-		system $plg->rm,'-rf',"$plg->{dir_session}/$token"
-		}
-	}
+      close __TOKEN;
+      print "Restore session           : $token (". scalar(keys %{$TokenDB{$token}->{data}}) ." records)\n"
+      }
+    }
+    else {
+    print "Delete corrupt session    : $token\n";
+    system $plg->rm,'-rf',"$plg->{dir_session}/$token"
+    }
+  }
 
 closedir DIR;
 
@@ -213,8 +201,15 @@ closedir DIR;
         $plg->Format->{$_} = $app->request->query_parameters->{$_}
         }
         else {
-        $plg->Format->{to} = $plg->config->{'Default format'};
-        $app->halt($plg->reply('error'=>"Format parameter $_ ( ".$app->request->query_parameters->{$_}.' ) is not one of the :'. join(', ',keys %Formats)))
+
+          if    ( $app->request->query_parameters->{$_} eq 'jsn' ) { $plg->Format->{$_} = 'json' }
+          elsif ( $app->request->query_parameters->{$_} eq 'yml' ) { $plg->Format->{$_} = 'yaml' }
+          elsif ( $app->request->query_parameters->{$_} eq 'txt' ) { $plg->Format->{$_} = 'human'}
+          elsif ( $app->request->query_parameters->{$_} eq 'text') { $plg->Format->{$_} = 'human'}
+          else  {
+          $plg->Format->{to} = $plg->config->{'Default format'};
+          $app->halt($plg->reply('error'=>"Format parameter $_ ( ".$app->request->query_parameters->{$_}.' ) is not one of the : '. join(', ',keys %Formats)))
+          }
         }
       }
       else {
@@ -233,37 +228,37 @@ closedir DIR;
   # Convert the posted data string, to hash $plg->data
   $plg->data({});
 
-    if ($app->request->body) {
+      if ($app->request->body) {
 
-      eval  {
+        eval {
 
-      if    ($plg->Format->{from} eq 'json')  { $JSON->utf8(1); $plg->data( $JSON->decode($app->request->body)         ) }
-      elsif ($plg->Format->{from} eq 'xml')   {                 $plg->data( XML::Hash::XS::xml2hash $app->request->body) }
-      elsif ($plg->Format->{from} eq 'yaml')  {                 $plg->data( YAML::XS::Load          $app->request->body) }
-      elsif ($plg->Format->{from} eq 'perl')  {                 $plg->data( eval                    $app->request->body) }
-      elsif ($plg->Format->{from} eq 'human') { my $ref={};
+          if    ('json'  eq $plg->Format->{from}) { $plg->data(           $JSON->decode($app->request->body) ) }
+          elsif ('xml'   eq $plg->Format->{from}) { $plg->data( XML::Hash::XS::xml2hash $app->request->body  ) }
+          elsif ('yaml'  eq $plg->Format->{from}) { $plg->data( YAML::Syck::Load        $app->request->body  ) }
+          elsif ('perl'  eq $plg->Format->{from}) { $plg->data( eval                    $app->request->body  ) }
+          elsif ('human' eq $plg->Format->{from}) { my $ref={};
 
-          foreach (split /\v+/, $app->request->body) {
-          my @array = split /\s*(?:=|\:|-->|->|\|)+\s*/, $_;
-          next unless @array;
+            foreach (split /\v+/, $app->request->body) {
+            my @array = split /\s*(?:=|\:|-->|->|\|)+\s*/, $_;
+            next unless @array;
 
-            if ($#array==0) {
-            $ref->{data}->{default} = $array[0]
+              if ($#array==0) {
+              $ref->{data}->{default} = $array[0]
+              }
+              else {
+              $ref->{data}->{$array[0]} = join ',', @array[1 .. $#array]
+              }
             }
-            else {
-            $ref->{data}->{$array[0]} = join ',', @array[1 .. $#array]
-            }
+
+          $plg->data($ref)
           }
-
-        $plg->data( $ref )
-        }
-      };
+        };
 
 			if ($@) {
 			$@ =~s/[\s\v\h]+/ /g;
 			$app->halt($plg->reply('error'=>'Data parsing as '.$plg->Format->{from}." failed because $@"))
-			}
-		}
+      }
+    }
 
     # Do not proceed if the posted data are not hash
     if ('HASH' ne ref $plg->{data}) {
@@ -392,16 +387,8 @@ closedir DIR;
   $app->add_route(
   regexp => '/logout',
   method => $_,
-  code   => sub {
-
-    if (exists $TokenDB{$plg->data->{token}}) {
-    delete $TokenDB{$plg->data->{token}};
-    system $plg->rm,'-rf',$plg->dir_session.'/'.$plg->data->{token}
-    }
-
-  $plg->data({});
-  $plg->reply()
-  }) foreach 'post','put';
+  code   => sub { $dir = $plg->dir_session.'/'.$plg->data->{token}; delete $TokenDB{$plg->data->{token}}; system $plg->rm,'-rf', $dir if -d $dir; $plg->data({}); $plg->reply() }
+  ) foreach 'post','put';
 
 
 	# Authentication
@@ -449,7 +436,7 @@ closedir DIR;
 			}
 		}
 
-		# The external auth scripts expect at least the two arguments
+		# The external authorization scripts expect at least the two arguments
 		#
 		#	1) username as hex string (for avoiding shell attacks)
 		#	2) password as hex string
@@ -478,12 +465,12 @@ closedir DIR;
 
 	# Create the token and session dir
 	open  URANDOM__, '<', '/dev/urandom' or die "\nCould not read device /dev/urandom\n";
-	read  URANDOM__, my $j, 10;
+	read  URANDOM__, my $i, 12;
 	close URANDOM__;
-	$plg->data->{token} = time.'-'.unpack 'h*',$j;
-	my $i=0;
-	do { $j = sprintf $plg->data->{token}.'-%02d', $i++ } while ( -e $plg->dir_session ."/$j" );
-	$plg->data->{token}=$j;
+	$plg->data->{token} = time.'-'.unpack 'h*',$i;
+	$i=0;
+	while ( -e $plg->dir_session .'/'. $plg->data->{token} .'-'. $i++ ) {}
+	$plg->data->{token} .= '-'. (--$i);
 
 		foreach ("$plg->{dir_session}/$plg->{data}->{token}", "$plg->{dir_session}/$plg->{data}->{token}/control", "$plg->{dir_session}/$plg->{data}->{token}/data") {
 
@@ -510,57 +497,6 @@ closedir DIR;
 
 
 
-#	Convert $_[0] hash ref to sting as $plg->reply_text
-#	format of "reply_text" is depended from "to" : json xml yaml perl human
-#
-#	$plg->__HASH_TO_STRING( $hash_reference )
-#	print $plg->{error} ? $plg->{error} : $plg->{reply_text};
-
-sub __HASH_TO_STRING
-{
-my $plg=shift;
-$plg->reply_text('');
-
-	eval {
-
-		if ($plg->Format->{to} eq 'json') {
-		$JSON->canonical($plg->sort);
-
-			if ($plg->pretty) {
-      $JSON->pretty(1); $JSON->space_after(1) } else {
-			$JSON->pretty(0); $JSON->space_after(0)
-			}
-
-    $JSON->utf8(0);
-    $plg->{reply_text} = Encode::decode_utf8 $JSON->encode($_[0])
-		}
-		elsif ($plg->Format->{to} eq 'xml') {
-		$XML::Hash::XS::canonical=$plg->sort;
-		$XML::Hash::XS::indent=$plg->pretty;
-		$plg->{reply_text} = XML::Hash::XS::hash2xml $_[0]
-		}
-		elsif ($plg->Format->{to} eq 'yaml') {
-		$YAML::Syck::SortKey=$plg->sort;
-    $plg->{reply_text} = YAML::Syck::Dump $_[0]
-		}
-		elsif ($plg->Format->{to} eq 'perl') {
-		$Data::Dumper::Indent=$plg->pretty;
-		$Data::Dumper::Sortkeys=$plg->sort;
-		$plg->{reply_text} = Encode::decode_utf8 Data::Dumper::Dumper $_[0]
-		}
-		elsif ($plg->Format->{to} eq 'human') {
-		$Handler{WALKER}->($_[0], sub {my $val=shift; $val =~s/^\s*(.*?)\s*$/$1/; $plg->{reply_text} .= join('.', @_) ." = $val\n"});
-		$plg->{reply_text} = Encode::decode_utf8 $plg->{reply_text}
-		}
-	};
-
-	if ($@) {
-	$@=~s/[\v\h]+/ /g;
-	$plg->error("hash to string convertion failed because $@");
-	$plg->reply_text('')
-	}
-}
-
 
 
 #	Returns a string formated as : json, xml, yaml, perl or human
@@ -572,7 +508,7 @@ $plg->reply_text('');
 #
 sub reply :PluginKeyword
 {
-my $plg = shift;
+my $plg=shift;
 
 	if (@_) {
 
@@ -601,22 +537,72 @@ $plg->dsl->halt( $plg->reply_text )
 }
 
 
+#	Convert $_[0] hash ref to sting as $plg->reply_text
+#	format of "reply_text" is depended from "to" : json xml yaml perl human
+#
+#	$plg->__HASH_TO_STRING( $hash_reference )
+#	print $plg->{error} ? $plg->{error} : $plg->{reply_text};
 
-#  Return all or the selected posted keys/values
+sub __HASH_TO_STRING
+{
+my $plg=shift;
+$plg->reply_text('');
+
+	eval {
+
+		if ($plg->Format->{to} eq 'json') {
+		$JSON->canonical($plg->sort);
+
+			if ($plg->pretty) {
+      $JSON->pretty(1); $JSON->space_after(1) } else {
+			$JSON->pretty(0); $JSON->space_after(0)
+			}
+
+    $plg->{reply_text} = Encode::decode 'utf8', $JSON->encode($_[0])
+		}
+		elsif ($plg->Format->{to} eq 'xml') {
+		$XML::Hash::XS::canonical = $plg->sort;
+    $XML::Hash::XS::indent    = $plg->pretty ? 2 : 0;
+		$plg->{reply_text} = Encode::decode 'utf8', XML::Hash::XS::hash2xml $_[0]
+		}
+		elsif ($plg->Format->{to} eq 'yaml') {
+    $YAML::Syck::SortKey=$plg->sort;
+    $plg->{reply_text} = Encode::decode 'utf8', YAML::Syck::Dump $_[0]
+		}
+		elsif ($plg->Format->{to} eq 'perl') {
+		$Data::Dumper::Indent=$plg->pretty;
+		$Data::Dumper::Sortkeys=$plg->sort;
+		$plg->{reply_text} = Encode::decode_utf8 Data::Dumper::Dumper $_[0]
+		}
+		elsif ($plg->Format->{to} eq 'human') {
+		$Handler{WALKER}->($_[0], sub {my $val=shift; $val =~s/^\s*(.*?)\s*$/$1/; $plg->{reply_text} .= join('.', @_) ." = $val\n"});
+		$plg->{reply_text} = Encode::decode_utf8 $plg->{reply_text}
+		}
+	};
+
+	if ($@) {
+	$@=~s/[\v\h]+/ /g;
+	$plg->error("hash to string convertion failed because $@");
+	$plg->reply_text('')
+	}
+}
+
+
+#  Returns as hash all/selected  posted  keys/values that are stored at $plg->data
 #
-#	 PostData();              # all                posted keys/values
-#	 PostData('k1', 'k2');    # hash with selected posted keys/values
+#	 UserData();              # all                posted keys/values
+#	 UserData('k1', 'k2');    # hash with selected posted keys/values
 #
-sub PostData :PluginKeyword
+sub UserData :PluginKeyword
 {
 my $plg=shift;
 
 	if (@_) {
 
 		if ('HASH' eq ref $plg->data) {
-		%{$plg->data}{grep exists $plg->data->{$_}, @_}
+    %{$plg->data}{grep exists $plg->data->{$_}, @_}
 		}
-		elsif ('ARRAY' eq ref $plg->data) {
+		elsif ('ARRAY' eq ref $plg->data) {    
 		my %hash;
 		@hash{@_} = 1;
 		grep exists $hash{$_}, @{$plg->data}
@@ -646,8 +632,8 @@ my $plg=shift;
 
 #	Retrieves stored session data
 #
-#	my %data = SessionGet( 'k1', 'k2', ...);	# return a hash of the selected keys
-#	my %data = SessionGet();					# return a hash of all keys
+#	my %data = SessionGet();                  # return a hash of all keys
+#	my %data = SessionGet( 'k1', 'k2', ...);  # return a hash of the selected keys
 
 sub SessionGet :PluginKeyword
 {
@@ -659,62 +645,62 @@ my $plg	= shift;
 	}
 
 	if (0 == scalar @_) {
-	%{$TokenDB{$plg->data->{token}}->{data}} # all
+	map { Encode::encode('utf8',$_) , $TokenDB{$plg->data->{token}}->{data}->{$_}} keys %{$TokenDB{$plg->data->{token}}->{data}} # all
 	}
 	elsif ((1 == scalar @_)) {
 
 		if ('ARRAY' eq ref $_[0]) {
 		# At new Perl versions hash slice  %{$TokenDB{$plg->data->{token}}->{data}}{@{$_[0]}}
-		map {$_ , $TokenDB{$plg->data->{token}}->{data}->{$_}} @{$_[0]}
+    map {$_ , $TokenDB{$plg->data->{token}}->{data}->{Encode::decode('utf8',$_)}} @{$_[0]}
 		}
 		else {
-		$_[0] , $TokenDB{$plg->data->{token}}->{data}->{$_[0]}	# one record
+		$_[0] , $TokenDB{$plg->data->{token}}->{data}->{Encode::decode('utf8',$_[0])}    	# one record
 		}
 	}
-	else {	
-	map {$_ , $TokenDB{$plg->data->{token}}->{data}->{$_}} @_
+	else {
+	map {$_ , $TokenDB{$plg->data->{token}}->{data}->{Encode::decode('utf8',$_)}} @_
 	}
 }
 
 
 #   Set session data
-#   Session data are not volatile like the user data.
-#   They are persistent between requests
+#   Session data are not volatile like the posted by user
+#   They are persistent between requests until the user logout or its session get expired
+#   Returns a list of the stored keys
 #
 #   SessionSet(  new1 => 'foo1', new2 => 'foo2'  ); 
 #   SessionSet( {new1 => 'foo1', new2 => 'foo2'} );
 
 sub SessionSet :PluginKeyword
 {
-my $plg = shift;
+my $plg=shift;
 
 	unless ((exists $plg->data->{token}) && (exists $TokenDB{$plg->data->{token}})) {
 	$plg->error('You need a vaild token via login for using session data');
-	$plg->dsl->halt($plg->reply)
+	$plg->reply
 	}
 
-my @keys;
 @_ = %{$_[0]} if (1 == @_) && ('HASH' eq ref $_[0]);
+@keys=();
 
-	for (my($i,$j)=(0,1); $i < scalar(@_) - (scalar(@_) % 2); $i+=2,$j+=2) {
-	push @keys, $_[$i];
+	for (my ($k,$v)=(0,1); $k<$#_-(@_ % 2); $k+=2,$v+=2) {
+  push @keys, $_[$k];
+  $_[$k] = Encode::decode 'utf8', $_[$k];
+	$TokenDB{$plg->data->{token}}->{data}->{$_[$k]} = $_[$v];
 
-	$TokenDB{$plg->data->{token}}->{data}->{$_[$i]} = $_[$j];
-	my $data = ref $_[$j] ? $_[$j] : \$_[$j];
-
-		unless ( Storable::lock_store $data, "$plg->{dir_session}/$plg->{data}->{token}/data/$_[$i]" ) {
-		$plg->error("Could not store session data $_[$i] because $!");
-		$plg->dsl->halt(plg->reply)
+		unless ( Storable::lock_store  ref $_[$v] ? $_[$v] : \$_[$v],  "$plg->{dir_session}/$plg->{data}->{token}/data/$_[$k]" ) {
+		$plg->error("Could not store session key $_[$k] because $!");
+		$plg->reply
 		}
 	}
 
-'stored keys', \@keys
+@keys
 }
 
 
 
-#	Delete session data (not sessions)
-#	It never deletes the built in records : lastaccess, username`
+#	Deletes all or the specified session keys
+# Retuns a list of the deleted keys
 #
 #		SessionDel( 'k1', 'k2', ... );    # delete only the selected keys
 #		SessionDel();                     # delete all keys
@@ -729,29 +715,33 @@ my $plg	= shift;
 	}
 
 $dir = $plg->dir_session.'/'.$plg->data->{token};
-my @keys;
+@keys=();
 
-	if (@_) {
-	@_ = @{$_[0]} if (1 == @_) && ('ARRAY' eq ref $_[0]);
+  if (@_) {
+  @_ = @{$_[0]} if (1 == @_) && ('ARRAY' eq ref $_[0]);
 
-		foreach (@_) {
+    foreach (@_) {
+    $_ = Encode::decode 'utf8', $_;
 
-			if (exists $TokenDB{$plg->data->{token}}->{data}->{$_}) {
-			push @keys,$_;
-			delete $TokenDB{$plg->data->{token}}->{data}->{$_};
-			unlink "$dir/data/$_"
-			}
-		}
-	}
-	else {
+      if (exists $TokenDB{$plg->data->{token}}->{data}->{$_}) {
+      delete $TokenDB{$plg->data->{token}}->{data}->{$_};
+      $_ = Encode::encode 'utf8', $_;
+      print STDERR "\ndelete : $_\n";
+      push @keys, $_;
+      unlink "$dir/data/$_" if -f "$dir/data/$_"
+      }
+    }
+  }
+  else {
 		foreach (keys %{$TokenDB{$plg->data->{token}}->{data}}) {
-		push @keys,$_;
-		delete $TokenDB{$plg->data->{token}}->{data}->{$_};
-		unlink "$dir/data/$_"
+    delete $TokenDB{$plg->data->{token}}->{data}->{$_};
+    $_ = Encode::encode 'utf8', $_;
+    push @keys, $_;
+    unlink "$dir/data/$_" if -f "$dir/data/$_"
 		}
-	}
+  }
 
-'deleted keys', \@keys
+@keys
 }
 
 1
@@ -768,7 +758,7 @@ Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, 
 
 =head1 VERSION
 
-version 4.4.7
+version 4.5.0
 
 =head2 SYNOPSIS
 
@@ -776,35 +766,35 @@ The replies have the extra key B<error> . At success B<error> is 0 , while at fa
 
 The posted keys can be placed as url parameters if wanted
 
-=head2 Route examples
-
-  POST login           {"username":"joe", "password":"souvlaki"}
-  POST login?username=joe&password=souvlaki
-  POST ViewKeysAll
-  POST ViewKeysSome    {"k1":"v1"}
-  POST ProtectStore    {"token":"2d85b82b158e", "k1":"v1", "k2":"v2"}
-  POST ProtectDelete   {"token":"2d85b82b158e"}
-  POST ProtectRead     {"token":"2d85b82b158e"}
-  POST logout          {"token":"2d85b82b158e"}
-
-=head2 Code
+=head2 Application code example
 
   package MyApi;
   use     Dancer2;
   use     Dancer2::Plugin::WebService;
 
-  post '/ViewKeysAll'    => sub { reply   PostData };
-  post '/ViewKeysSome'   => sub { reply   PostData('k1','k2') };
-  any  '/r3'             => sub { my %H = PostData('k1'); reply 'foo'=> $H{k1} };
-  get  '/r1'             => sub { reply  'k1'=>'v1','k2'=>'v2' };
-  get  '/r2'             => sub { reply {'k1'=>'v1','k2'=>'v2'}};
-  get  '/error'          => sub { reply  'k1', 'v1', 'error', 'oups' };
-  any  '/ProtectStore'   => sub { reply SessionSet('s1'=>'sv1', 's2'=>'v1') };
-  post '/ProtectdDelete' => sub { reply SessionDel('s1', 's2') };
-  any  '/ProtectRead'    => sub { reply SessionGet('s1', 's2') };
+  post '/ViewPosteData'  => sub { reply   UserData                             };
+  post '/ViewPosteSome'  => sub { reply   UserData('k1','k2')                  };
+  any  '/r3'             => sub { my %H = UserData('k1'); reply 'foo'=> $H{k1} };
+  get  '/r1'             => sub { reply  'k1'=>'v1','k2'=>'v2'                 };
+  get  '/r2'             => sub { reply {'k1'=>'v1','k2'=>'v2'}                };
+  get  '/error'          => sub { reply  'k1', 'v1', 'error', 'oups'           };
+  any  '/SessionStore'   => sub { reply   SessionSet('s1'=>'sv1', 's2'=>'v1')  };
+  post '/SessiondDelete' => sub { reply   SessionDel('s1', 's2')               };
+  any  '/SessionRead'    => sub { reply   SessionGet('s1', 's2')               };
   dance;
 
-=head2 Control output : sort, pretty, to, from
+=head2 Route examples
+
+  POST login           {"username":"joe", "password":"souvlaki"}
+  POST login?username=joe&password=souvlaki
+  POST ViewPosteData
+  POST ViewPosteSome   {"k1":"v1"}
+  POST SessionStore    {"token":"2d85b82b158e", "k1":"v1", "k2":"v2"}
+  POST SessionDelete   {"token":"2d85b82b158e"}
+  POST SessionRead     {"token":"2d85b82b158e"}
+  POST logout          {"token":"2d85b82b158e"}
+
+=head2 Format and control the output : sort, pretty, to, from
 
 You can use the B<to>, B<from>, B<sort>, B<pretty>  parameters to change the input/output format
 
@@ -814,11 +804,11 @@ I<pretty> if false, the data are returned as one line compacted. The default is 
 
 I<from> , I<to> define the input/output format. You can mix input/output formats independently. Supported formats are 
 
-  json
+  json or jsn
+  yaml or yml
   xml
-  yaml
   perl
-  human
+  human or text or txt
 
 I<from> default is the I<config.yml> property
 
@@ -832,8 +822,10 @@ I<from> default is the I<config.yml> property
   GET  /SomeRoute?to=perl&sort=true&pretty=false
   POST /SomeRoute?to=xml&sort=true'      {"k1":"v1"}
   POST /SomeRoute?to=yaml'               {"k1":"v1"}
+  POST /SomeRoute?to=yml'                {"k1":"v1"}
   POST /SomeRoute?to=perl'               {"k1":"v1"}
   POST /SomeRoute?from=json;to=human'    {"k1":"v1"}
+  POST /SomeRoute?from=jsn;to=human'     {"k1":"v1"}
   POST /SomeRoute?from=xml;to=human'     <Data><k1>v1</k1></Data>
   POST /SomeRoute?from=xml;to=yaml'      <Data><k1>v1</k1></Data>
 
@@ -855,7 +847,7 @@ I<Built in routes>
 
 Your routes can be either B<public> or B<protected>
 
-B<public> are the routes that anyone can use without B<login> , Τhey do not support sessions / persistent data. You can access the posted data using the method B<PostData>
+B<public> are the routes that anyone can use without B<login> , Τhey do not support sessions / persistent data. You can access the posted data using the method B<UserData>
 
 B<protected> are the routes that you must provide a token, returned by the login route.
 At B<protected> routes you can  I<read>, I<write>, I<delete> persistent data using the  methods B<SessionGet> , B<SessionSet> , B<SessionDel>
@@ -929,16 +921,16 @@ WebService methods for your main Dancer2 code
 
 The posted data can be anything; hashes, lists, scalars
 
-  curl -X POST 0:/   -d  '{ "k1":"v1", "k2":"v2", "k3":"v3" }'
-  curl -X POST 0:/   -d  '[ "k1", "k2", "k3", "k4" ]'
+  curl -X POST ... -d  '{ "k1":"v1", "k2":"v2", "k3":"v3" }'
+  curl -X POST ... -d  '[ "k1", "k2", "k3", "k4" ]'
 
-=head3 PostData
+=head3 UserData
 
 Get the posted data
 
-             PostData               Everything posted
-  my %hash = PostData('k2','k4');   Only some keys  of a hash
-  my @list = PostData('k2','k4');   Only some items of a list
+             UserData               Everything is posted
+  my %hash = UserData('k2','k4');   Only some keys  of a hash
+  my @list = UserData('k2','k4');   Only some items of a list
 
 =head3 reply
 
@@ -950,6 +942,21 @@ This should be the last route's statement
   reply( { k1 => 'v1', ... } ) anything you want
   reply   'k1'                 The specific key and its value of the posted data 
 
+=head3 SessionSet
+
+Store non volatile session persistent data. I<login is required>
+Session data are not volatile like normal the user posted data.
+They are persistent between requests until the user logout or its session get expired.
+Returns a list of the sored keys.
+You must pass your data as hash or hash reference.
+
+  SessionSet(   'rec1' => 'v1', 'rec2' => 'v2', ...   );
+  SessionSet( { 'rec1' => 'v1', 'rec2' => 'v2', ... } );
+
+  or at your Dancer2 application
+
+  get  '/SomeRoute' => sub { reply "session keys" => [ SessionSet( 'k1'=>'v1', 'k2'=>'v2' ) ] };
+
 =head3 SessionGet
 
 Read session persistent data. I<login is required>
@@ -957,22 +964,6 @@ Read session persistent data. I<login is required>
   my %data = SessionGet;                     returns a hash of all keys 
   my %data = SessionGet( 'k1', 'k2', ...  ); returns a hash of the selected keys
   my %data = SessionGet(['k1', 'k2', ... ]); returns a hash of the selected keys
-
-=head3 SessionSet
-
-Store non volatile session persistent data. I<login is required>
-
-You must pass your data as key / value pairs
-
-  SessionSet(   'rec1' => 'v1', 'rec2' => 'v2', ...   );
-  SessionSet( { 'rec1' => 'v1', 'rec2' => 'v2', ... } );
-
-It returns a document of the stored keys, your can use the url  to=... modifier e.g.
-
-  {
-  "error" : 0,
-  "stored keys" : [ "rec1", "rec2" ]
-  }
 
 =head3 SessionDel
 
@@ -1004,7 +995,7 @@ This make sense if you just want to give anyone the ability for persistent data
 
 At production enviroments, probably you want to use an external auth script e.g for the native "Linux native" authentication
 
-  MODULE_INSTALL_DIR/AuthScripts/linux.sh
+  MODULE_INSTALL_DIR/AuthScripts/Linux_native_authentication.sh
 
 The protected routes, at  config.yml  have   Protected:true and their required groups e.g.  Groups:[grp1,grp2 ...]
 
@@ -1027,9 +1018,11 @@ A sample route definition. Plese mention the \/ path separator
         Protected : true
         Groups    : [ ]
 
-It is easy to write your own scripts for Active Directory, LDAP, facebook integration or whatever.
+It is easy to write your own scripts for LDAP, Active Directory, OAuth, etc
 
-If the Command needs sudo, you must add the user running the WebService to sudoers
+If the Command needs sudo, you must add the user running the WebService to sudoers e.g
+
+  dendrodb ALL=(ALL:ALL) NOPASSWD: /usr/share/perl5/site_perl/Dancer2/Plugin/AuthScripts/Linux_native_authentication.sh
 
 Please read the AUTHENTICATION_SCRIPTS for the details
 
@@ -1068,7 +1061,7 @@ A sample I<config.yml> is the following.
 
       - Name      : Linux native
         Active    : false
-        Command   : MODULE_INSTALL_DIR/AuthScripts/linux.sh
+        Command   : MODULE_INSTALL_DIR/AuthScripts/Linux_native_authentication.sh
         Arguments : [ ]
         Use sudo  : true
 
@@ -1143,7 +1136,7 @@ George Bouras <george.mpouras@yandex.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by George Bouras.
+This software is copyright (c) 2024 by George Bouras.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

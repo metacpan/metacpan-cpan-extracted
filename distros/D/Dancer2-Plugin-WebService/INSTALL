@@ -16,7 +16,6 @@ Modules to install from cpan
 
   cpanm XML::Hash::XS
   cpanm Cpanel::JSON::XS
-  cpanm YAML::XS
   cpanm YAML::Syck
   cpanm Moo
   cpanm ExtUtils::Config
@@ -78,7 +77,7 @@ If you are running the service as user dancer, and want to want to use an authen
 give the appropriate privileges	using the sudoers e.g
 vi /etc/sudoers
 
-  dancer ALL=(ALL:ALL) NOPASSWD: /usr/share/perl5/site_perl/Dancer2/Plugin/AuthScripts/linux.sh
+  dancer ALL=(ALL:ALL) NOPASSWD: /usr/share/perl5/site_perl/Dancer2/Plugin/AuthScripts/Linux_native_authentication.sh
 
 quick view the Dancer2::Plugin::WebService documentation as web page
 install darkhttpd (once)

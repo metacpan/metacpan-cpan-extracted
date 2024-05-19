@@ -12,7 +12,7 @@ use warnings;
 use Carp;
 use Scalar::Util qw( reftype weaken );
 
-our $VERSION = '1.302.1';
+our $VERSION = '1.302.2';
 our %METHODS;
 
 =head1 SYNOPSIS

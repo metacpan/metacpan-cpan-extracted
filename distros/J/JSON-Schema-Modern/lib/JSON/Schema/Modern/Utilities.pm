@@ -4,12 +4,13 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.583';
+our $VERSION = '0.584';
 
 use 5.020;
 use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -126,7 +127,7 @@ sub is_bignum ($value) {
 # compares two arbitrary data payloads for equality, as per
 # https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.2.2
 # if provided with a state hashref with a 'path' key, any differences are recorded within
-sub is_equal ($x, $y, $state = undef) {
+sub is_equal ($x, $y, $state = {}) {
   $state->{path} //= '';
 
   my @types = map get_type($_), $x, $y;
@@ -227,6 +228,8 @@ sub canonical_uri ($state, @extra_path) {
 # - exception (set by abort())
 # - recommended_response
 # - depth
+# returns defined-false, so callers can use 'return;' to differentiate between
+# failed-with-no-error from failed-with-error.
 sub E ($state, $error_string, @args) {
   croak 'E called in void context' if not defined wantarray;
 
@@ -390,7 +393,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.583
+version 0.584
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker::CPANfile;
 use ExtUtils::Manifest;
 
-my $VERSION = '0.1.2';
+my $VERSION = '0.2.0';
 
 WriteMakefile(
     ABSTRACT          => 'Parse XDR (eXternal Data Representation) definitions into an AST (Abstract Syntax Tree)',
@@ -29,7 +29,7 @@ sub postamble {
 pm: lib/XDR/Parse.pm
 	$(NOECHO) $(NOOP)
 
-lib/XDR/Parse.pm: xdr.yp Makefile
+lib/XDR/Parse.pm: xdr.yp Makefile.PL
 	yapp -o Parse.out -m XDR::Parse xdr.yp
 	./pmfilter $(VERSION) < Parse.out > $@
 	@rm Parse.out

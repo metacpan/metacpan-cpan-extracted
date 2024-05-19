@@ -2,6 +2,7 @@ use strictures 2;
 use 5.020;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -13,7 +14,7 @@ use Helper;
 
 my $js = JSON::Schema::Modern->new(max_traversal_depth => 6);
 
-cmp_deeply(
+cmp_result(
   $js->evaluate(
     [ [ [ [ [ 1 ] ] ] ] ],
     {
@@ -34,7 +35,7 @@ cmp_deeply(
   'evaluation is halted when traversal gets too deep',
 );
 
-cmp_deeply(
+cmp_result(
   $js->evaluate(
     1,
     {
@@ -63,7 +64,7 @@ cmp_deeply(
   'evaluation is halted when an instance location is evaluated against the same schema location a second time',
 );
 
-cmp_deeply(
+cmp_result(
   $js->evaluate(
     { foo => 1 },
     {
@@ -79,7 +80,7 @@ cmp_deeply(
   'the seen counter does not confuse URI paths and fragments: /properties/foo vs #/properties/foo',
 );
 
-cmp_deeply(
+cmp_result(
   $js->evaluate(
     { foo => 1 },
     {

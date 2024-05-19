@@ -1,0 +1,35 @@
+Native Linux authentication
+Accepts two arguments
+
+	1st) hex packed username e.g 6a6f65                      produced as    echo -n joe          | xxd -ps
+	2nd) hex packed password e.g 536f6d6550617373776f7264    produced as    echo -n SomePassword | xxd -ps
+
+	./Linux_native_authentication 6a6f65 536f6d6550617373776f7264
+
+It prints two lines
+
+	1st)  0 for succesfull login or a message of why the login was failed
+	2nd)  A comma delimited group list, the user is member
+
+e.g for success
+
+	0
+	joe,ftp,log,storage
+
+or at failure
+
+	Wrong password
+	-
+
+If you run this script as a non privilidge user you must add the user to sudoers e.g.
+visudo
+
+	# Defaults    requiretty
+
+	dancer ALL=NOPASSWD: /usr/share/perl5/site_perl/Dancer2/Plugin/AuthScripts/Linux_native_authentication.sh
+
+
+George Mpouras, george.mpouras@yandex.com, Athens Greece
+ 7 Jun 2016  Initial version
+ 9 Jul 2019  Clean up the code
+22 Feb 2024  Support for yescrypt

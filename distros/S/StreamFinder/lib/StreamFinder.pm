@@ -134,6 +134,7 @@ blogger.com videos (L<StreamFinder::Blogger>),
 ugetube.com videos (L<StreamFinder::BrandNewTube>), 
 brighteon.com videos (L<StreamFinder::Brighteon>), 
 castbox.fm podcasts (L<StreamFinder::Castbox>), 
+theepochtimes.com/epochtv videos (L<StreamFinder::EpochTV>), 
 iheart.com (aka iheartradio.com) radio stations and podcasts 
 (L<StreamFinder::IHeartRadio>), 
 www.internet-radio.com radio stations (L<StreamFinder::InternetRadio>), 
@@ -144,7 +145,7 @@ podcastaddict.com podcasts (L<StreamFinder::PodcastAddict>) (DEPRECIATED),
 podchaser.com podcasts (L<StreamFinder::Podchaser>), 
 radio.net radio stations (L<StreamFinder::RadioNet>), 
 rcast.net radio stations (L<StreamFinder::Rcast>), 
-rumble.com videos (L<StreamFinder::Rumble>),
+rumble.com videos (L<StreamFinder::Rumble>), 
 sermonaudio.com sermons: audio and video (L<StreamFinder::SermonAudio>), 
 soundcloud.com (non-paywalled) songs (L<StreamFinder::SoundCloud>) 
 (DEPRECIATED), spreaker.com podcasts (L<StreamFinder::Spreaker>), 
@@ -550,14 +551,14 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '2.31';
+our $VERSION = '2.32';
 our $DEBUG = 0;
 
 require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
-my @supported_mods = (qw(Anystream Apple Bitchute Blogger BrandNewTube Brighteon Castbox  
+my @supported_mods = (qw(Anystream Apple Bitchute Blogger BrandNewTube Brighteon Castbox EpochTV 
 		Google IHeartRadio InternetRadio Odysee OnlineRadiobox Podbean PodcastAddict Podchaser 
 		RadioNet Rcast Rumble SermonAudio SoundCloud	Spreaker	Tunein Vimeo Youtube Zeno Subsplash));
 
@@ -662,6 +663,9 @@ sub new
 	} elsif ($url =~ m#\bsubsplash\.# && $useit{'Subsplash'}) {
 		eval { require 'StreamFinder/Subsplash.pm'; $haveit = 1; };
 		return new StreamFinder::Subsplash($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\btheepochtimes\.# && $useit{'EpochTV'}) {
+		eval { require 'StreamFinder/EpochTV.pm'; $haveit = 1; };
+		return new StreamFinder::EpochTV($url, @args)  if ($haveit);
 	} elsif ($useit{'Youtube'}) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
 		eval { require 'StreamFinder/Youtube.pm'; $haveit = 1; };
 		if ($haveit) {

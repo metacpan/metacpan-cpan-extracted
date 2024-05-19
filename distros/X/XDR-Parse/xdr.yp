@@ -30,28 +30,34 @@ typeDef:
     'typedef' declaration ';'       {
                   +{ def => 'typedef',
                      name => delete $_[2]->{name},
-                     declaration => $_[2],
+                     definition => $_[2],
                      comments => $_[1]->{comments},
                      location => $_[1]->{location},
                      trailing_comments => $_[3]->{comments} } }
     | 'enum' IDENT enumBody ';'     {
                   +{ def => 'enum',
                      name => $_[2],
-                     declaration => $_[3],
+                     definition => {
+                         type => { spec => 'enum', declaration => $_[3] }
+                     },
                      comments => $_[1]->{comments},
                      location => $_[1]->{location},
                      trailing_comments => $_[4]->{comments} } }
     | 'struct' IDENT structBody ';' {
                   +{ def => 'struct',
                      name => $_[2],
-                     declaration => $_[3],
+                     definition => {
+                         type => { spec => 'struct', declaration => $_[3] }
+                     },
                      comments => delete $_[1]->{comments},
                      location => $_[1]->{location},
                      trailing_comments => $_[4]->{comments} } }
     | 'union' IDENT switch ';'   {
                   +{ def => 'union',
                      name => $_[2],
-                     switch => $_[3],
+                     definition => {
+                         type => { spec => 'union', declaration => $_[3] }
+                     },
                      comments => $_[1]->{comments},
                      location => $_[1]->{location},
                      trailing_comments => $_[4]->{comments} } }
@@ -80,7 +86,7 @@ constantDef:
 
 switch:
     'switch' '(' declaration ')' '{' caseBody '}' {
-                  +{ descriminator => {
+                  +{ discriminator => {
                         declaration => $_[3],
                         comments => $_[2]->{comments},
                         trailing_comments => $_[4]->{comments}
@@ -121,7 +127,7 @@ caseClause:
 defaultClause:
     'default' ':' declaration ';'    {
             # What to do with comments on the ':'?
-            +{ declaration => $_[4],
+            +{ declaration => $_[3],
                comments => $_[1]->{comments},
                location => $_[1]->{location},
                trailing_comments => $_[4]->{comments} } }
@@ -261,12 +267,12 @@ declaration:
                location => $_[1]->{location} } }
    | typeSpecifier '*' IDENT           {
             +{ name => $_[3],
-               type => { spec => 'named', name => $_[1] },
+               type => $_[1],
                pointer => 1,
                comments => delete $_[1]->{comments},
                location => $_[1]->{location} } }
    | 'void'                            {
-            +{ type => $_[1],
+            +{ type => { spec => 'primitive', name => $_[1] },
                comments => delete $_[1]->{comments},
                location => $_[1]->{location} } }
 ;
@@ -486,9 +492,9 @@ the node's hash:
 
 =head3 Type declarations
 
-Top level nodes with a C<def> key valued C<typedef>, C<enum>, C<struct> or C<union>
-define types of the named language construct. These nodes share the following keys,
-in addition to the keys shared by all nodes:
+Top level nodes with a C<def> key valued C<typedef>, C<enum>, C<struct> or
+C<union> define types of the named language construct. These nodes share the
+following keys, in addition to the keys shared by all nodes:
 
 =over 8
 
@@ -496,10 +502,12 @@ in addition to the keys shared by all nodes:
 
 Name of the type being defined.
 
-=item * declaration
+=item * definition
 
-The nodes making up the definition of the type. The content of the declaration
-is detailed in the sections below.
+The node making up the definition of the type, holding a C<type> node with
+two keys, C<spec> and C<declaration>. The value of the C<spec> key is one of
+C<enum>, C<struct> or C<union>. The elements are specified by the content of
+the C<declaration> key.
 
 =back
 
@@ -510,25 +518,25 @@ This node is a 'declaration' node as documented in the section
 
 =head4 'enum' declarations
 
-This node has a single key
-C<elements>: an array of nodes with C<name> and C<value> keys, one for
-each value defined in the enum type.
+The C<declaration> node of C<enum> definitions has a single key (C<elements>):
+an array of nodes with C<name> and C<value> keys, one for each value defined
+in the enum type.
 
 =head4 'struct' declarations
 
-This node has a single key
-C<fields>: an array of nodes with C<name> and C<type> keys describing the
-fields of the struct type. For more details on the C<type> node, see below.
+Th C<declaration> node of C<struct> definitions has a single key (C<fields>):
+an array of nodes with C<name> and C<type> keys describing the fields of the
+struct type. For more details on the C<type> node, see below.
 
 =head4 'union' declarations
 
-This node has a single key
-C<switch>: itself a node which contains a C<handlers> and a C<descriminator>
-key.  The descriminator node has a C<name> and a C<type> key; the C<handlers>
-node contains one or two keys: C<cases> and optionally C<default>.  C<cases>
-is an array of nodes defining the fields of the union; each element consists
-of three keys: C<value>, C<name> and <declaration>. C<value> is the value
-associated with the descriminator, to indicate the current definition.
+The C<declaration> node of C<union> definitions has a single key (C<switch>):
+itself a node which contains a C<handlers> and a C<discriminator> key.  The
+discriminator node has a C<name> and a C<type> key; the C<handlers> node
+contains one or two keys: C<cases> and optionally C<default>.  C<cases> is an
+array of nodes defining the fields of the union; each element consists of
+three keys: C<value>, C<name> and <declaration>. C<value> is the value
+associated with the discriminator, to indicate the current definition.
 C<name> is the name of the field. C<declaration> contains the type declaration
 for the field.
 

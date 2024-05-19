@@ -13,7 +13,7 @@ use warnings;
 
 use base 'PDF::API2::Basic::PDF::Dict';
 
-our $VERSION = '2.046'; # VERSION
+our $VERSION = '2.047'; # VERSION
 
 use PDF::API2::Basic::PDF::Array;
 use PDF::API2::Basic::PDF::Dict;
@@ -139,8 +139,8 @@ sub add_page {
         $previous_page = $top->{' last_page'};
         unless (defined $previous_page) {
             $previous_page = $top->find_page($top->{'Count'}->val() - 1);
-            $top->{' last_page'} = $page;
         }
+        $top->{' last_page'} = $page;
     }
     else {
         $page_number = $top->{'Count'}->val() + $page_number + 1 if $page_number < 0;

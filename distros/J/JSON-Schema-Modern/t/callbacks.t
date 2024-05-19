@@ -1,6 +1,7 @@
 use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -41,7 +42,7 @@ subtest 'evaluation callbacks' => sub {
     },
   );
   ok($result, 'evaluation was successful');
-  cmp_deeply(
+  cmp_result(
     \@used_ref_at,
     bag(
       '/0',
@@ -61,7 +62,7 @@ subtest 'evaluation callbacks' => sub {
     $config,
   );
   ok(!$result, 'evaluation was not successful');
-  cmp_deeply(
+  cmp_result(
     \@used_ref_at,
     [],
     'no callbacks on failure: innermost $ref failed, so all other $refs failed too',
@@ -94,7 +95,7 @@ subtest 'evaluation callbacks' => sub {
   );
   ok($result, 'evaluation was successful');
 
-  cmp_deeply(
+  cmp_result(
     \@used_ref_at,
     bag(
       '/0',
@@ -129,7 +130,7 @@ subtest 'callbacks for keywords without eval subs' => sub {
   );
   ok($result, 'evaluation was successful');
 
-  cmp_deeply(
+  cmp_result(
     \%keywords,
     { map +($_ => 1), qw($anchor $comment $defs $dynamicAnchor if then else $schema $vocabulary) },
     'callbacks are triggered for keywords even when they lack evaluation subs',
@@ -154,7 +155,7 @@ subtest 'callbacks that produce errors' => sub {
       },
     },
   );
-  cmp_deeply(
+  cmp_result(
     $result->TO_JSON,
     {
       valid => false,
@@ -185,7 +186,7 @@ subtest 'callbacks that produce errors' => sub {
   );
 
   $result = $js->evaluate($data, $schema, { %$configs, short_circuit => 1 });
-  cmp_deeply(
+  cmp_result(
     $result->TO_JSON,
     {
       valid => false,

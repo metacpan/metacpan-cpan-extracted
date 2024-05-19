@@ -48,9 +48,23 @@ Just a stack trace with no watching:
 
     Trace( @OPTIONS );
 
-Options 
+Options:
 
-    -clone => 0, # Disable auto tying after a Storable dclone. 
+    -clone => 0,    # Disable auto tying after a Storable dclone.
+
+    -var => REF,    # Variable to watch.
+    REF             # Same as passing a reference.
+
+    -levels => NUM  # How many scope levels to show.
+    NUM             # Same as passing a decimal.
+
+    -raw => 1,      # Include Internal call like Moose,
+                    # and Class::MOP in a trace.
+    -NUM            # Same as passing negative number.
+
+    -message => STR # Message to use for a normal (non-
+                    # tie stack trace).
+    STR             # Same as passing anything else.
 
 ## \_ProcessArgs
 

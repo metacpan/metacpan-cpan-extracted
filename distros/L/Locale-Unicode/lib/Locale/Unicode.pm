@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2024/05/18
+## Modified 2024/05/19
 ## All rights reserved
 ## 
 ## 
@@ -304,7 +304,7 @@ BEGIN
     )?
     /xi;
     our $PROP_TO_SUB = {};
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
 
 use strict;
@@ -3322,7 +3322,7 @@ Locale::Unicode - Unicode Locale Identifier compliant with BCP47 and CLDR
 
     use Locale::Unicode;
     my $locale = Locale::Unicode->new( 'ja-Kana-t-it' ) ||
-        die( Locale::Unicode->error, "\n" );
+        die( Locale::Unicode->error );
     say $locale; # ja-Kana-t-it
 
     # Some undefined locale in Cyrillic script
@@ -3343,7 +3343,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 
