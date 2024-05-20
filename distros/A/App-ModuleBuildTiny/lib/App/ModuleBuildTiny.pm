@@ -2,7 +2,7 @@ package App::ModuleBuildTiny;
 
 use 5.014;
 use warnings;
-our $VERSION = '0.043';
+our $VERSION = '0.044';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -113,6 +113,12 @@ sub bump_versions {
 	$app->rewrite_versions($new_version, is_trial => $trial);
 }
 
+sub insert_options {
+	my ($opts, $config) = @_;
+	$opts->{add_repository} = !!$config->{auto_repo};
+	$opts->{add_bugtracker} = !!$config->{auto_tracker};
+}
+
 sub regenerate {
 	my ($files, $config, %opts) = @_;
 	my %files = map { $_ => 1 } @{$files};
@@ -124,6 +130,7 @@ sub regenerate {
 		push @dirty, 'Changes';
 	}
 
+	insert_options(\%opts, $config);
 	my $dist = App::ModuleBuildTiny::Dist->new(%opts, regenerate => \%files);
 	my @generated = grep { $files{$_} } $dist->files;
 	for my $filename (@generated) {
@@ -169,6 +176,8 @@ my @config_items = (
 	[ 'auto_git'     , 'Do you want mbtiny to automatically handle git for you?', 'yn', !!1 ],
 	[ 'auto_bump'    , 'Do you want mbtiny to automatically bump on regenerate for you?', 'yn', !!1 ],
 	[ 'auto_scan'    , 'Do you want mbtiny to automatically scan dependencies for you?', 'yn', !!1 ],
+	[ 'auto_repo'    , 'Do you want mbtiny to automatically add a repository link to the metadata', 'yn', !!1 ],
+	[ 'auto_tracker' , 'Do you want mbtiny to automatically add a bugtracker link to the metadata', 'yn', !!1 ],
 );
 
 sub ask {
@@ -258,15 +267,18 @@ my %actions = (
 		my @arguments = @_;
 		GetOptionsFromArray(\@arguments, \my %opts, qw/trial verbose!/) or return 2;
 		my $dist = App::ModuleBuildTiny::Dist->new(%opts);
+		insert_options(\%opts, get_config);
 		die "Trial mismatch" if $opts{trial} && $dist->release_status ne 'testing';
 		$dist->preflight_check(%opts);
-		printf "tar czf %s.tar.gz %s\n", $dist->fullname, join ' ', $dist->files if $opts{verbose};
-		$dist->write_tarball($dist->fullname);
+		my $filename = $dist->archivename;
+		printf "tar czf %s %s\n", $filename, join ' ', $dist->files if $opts{verbose};
+		$dist->write_tarball($filename);
 		return 0;
 	},
 	distdir => sub {
 		my @arguments = @_;
 		GetOptionsFromArray(\@arguments, \my %opts, qw/trial verbose!/) or return 2;
+		insert_options(\%opts, get_config);
 		my $dist = App::ModuleBuildTiny::Dist->new(%opts);
 		$dist->write_dir($dist->fullname, $opts{verbose});
 		return 0;
@@ -277,20 +289,21 @@ my %actions = (
 		GetOptionsFromArray(\@arguments, 'release!' => \$RELEASE_TESTING, 'author!' => \$AUTHOR_TESTING, 'automated!' => \$AUTOMATED_TESTING,
 			'extended!' => \$EXTENDED_TESTING, 'non-interactive!' => \$NONINTERACTIVE_TESTING, 'jobs|j=i' => \my $jobs, 'inc|I=s@' => \my @inc)
 			or return 2;
-		my @tests;
-		push @tests, 't' if -e 't';
-		push @tests, extra_tests();
-		my $dist = App::ModuleBuildTiny::Dist->new;
+		insert_options(\my %opts, get_config);
+		my $dist = App::ModuleBuildTiny::Dist->new(%opts);
 		my @args;
 		push @args, '-j', $jobs if defined $jobs;
 		push @args, map {; '-I', rel2abs($_) } @inc;
-		return $dist->run(commands => [ [ 'prove', '-br', @args, @tests ] ], build => 1, verbose => 1);
+		push @args, 't' if -e 't';
+		push @args, extra_tests();
+		return $dist->run(commands => [ [ 'prove', '-br', @args ] ], build => 1, verbose => 1);
 	},
 	upload => sub {
 		my @arguments = @_;
 		my $config = get_config;
 		my %opts = $config->{auto_git} ? (tag => 1, push => '') : ();
 		GetOptionsFromArray(\@arguments, \%opts, qw/trial config=s silent tag! push:s nopush|no-push/) or return 2;
+		insert_options(\%opts, get_config);
 
 		my $dist = App::ModuleBuildTiny::Dist->new;
 		$dist->preflight_check(%opts);
@@ -331,19 +344,22 @@ my %actions = (
 		my @arguments = @_;
 		die "No arguments given to run\n" if not @arguments;
 		GetOptionsFromArray(\@arguments, 'build!' => \(my $build = 1)) or return 2;
-		my $dist = App::ModuleBuildTiny::Dist->new();
+		insert_options(\my %opts, get_config);
+		my $dist = App::ModuleBuildTiny::Dist->new(%opts);
 		return $dist->run(commands => [ \@arguments ], build => $build, verbose => 1);
 	},
 	shell => sub {
 		my @arguments = @_;
 		GetOptionsFromArray(\@arguments, 'build!' => \my $build) or return 2;
-		my $dist = App::ModuleBuildTiny::Dist->new();
+		insert_options(\my %opts, get_config);
+		my $dist = App::ModuleBuildTiny::Dist->new(%opts);
 		return $dist->run(commands => [ [ $SHELL ] ], build => $build, verbose => 0);
 	},
 	listdeps => sub {
 		my @arguments = @_;
 		GetOptionsFromArray(\@arguments, \my %opts, qw/json only_missing|only-missing|missing omit_core|omit-core=s author versions/) or return 2;
-		my $dist = App::ModuleBuildTiny::Dist->new;
+		insert_options(\%opts, get_config);
+		my $dist = App::ModuleBuildTiny::Dist->new(%opts);
 
 		require CPAN::Meta::Prereqs::Filter;
 		my $prereqs = CPAN::Meta::Prereqs::Filter::filter_prereqs($dist->meta->effective_prereqs, %opts);
@@ -389,7 +405,8 @@ my %actions = (
 		my @arguments = @_;
 		my %opts = (sanitize => 1);
 		GetOptionsFromArray(\@arguments, \%opts, qw/omit_core|omit-core=s sanitize! omit=s@/) or return 2;
-		my $dist = App::ModuleBuildTiny::Dist->new(regenerate => { 'META.json' => 1 });
+		insert_options(\%opts, get_config);
+		my $dist = App::ModuleBuildTiny::Dist->new(%opts, regenerate => { 'META.json' => 1 });
 		my $prereqs = $dist->scan_prereqs(%opts);
 		write_json('prereqs.json', $prereqs->as_string_hash);
 		return 0;

@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -339,12 +339,15 @@ sub show_results {
 		}
 		elsif ( $d->occupancy ) {
 			if ( $d->occupancy eq 'MANY_SEATS' ) {
-				$output_line[3] = '_';
+				$output_line[3] = '.';
 			}
 			elsif ( $d->occupancy eq 'FEW_SEATS' ) {
-				$output_line[3] = '*';
+				$output_line[3] = 'o';
 			}
 			elsif ( $d->occupancy eq 'STANDING_ONLY' ) {
+				$output_line[3] = '*';
+			}
+			elsif ( $d->occupancy eq 'FULL' ) {
 				$output_line[3] = '!';
 			}
 			else {
@@ -430,7 +433,7 @@ B<efa-m> [B<-Lr>] [B<-d> I<dd.mm.yyyy>] [B<-t> I<hh:mm>]
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 DESCRIPTION
 
@@ -448,7 +451,7 @@ For each departure, it shows
 
 =item * line,
 
-=item * expected occupation (from _ to !, if available), and
+=item * expected occupation (range . o * !, if available), and
 
 =item * destination.
 

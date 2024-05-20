@@ -1,5 +1,22 @@
 Revision history for Synth-Config
 
+0.0052 2024-05-19 12:35:14
+    - Improve documentation.
+    - Improve the eg/patch-visualizer.pl program.
+    - The patch_name is no longer a necessary graphviz() argument.
+
+0.0051 2024-05-19 11:38:27
+    - Add missing tests for import_yaml() and graphviz().
+
+0.0050 2024-05-19 10:54:52
+    - Improve documentation.
+
+0.0049 2024-05-19 10:30:14
+    - Add a real-world example of a patch I need to save: eg/Maths.yaml.
+    - Add the import_yaml() method.
+    - Add the graphviz() method.
+    - Simplify eg/patch-visualizer.pl.
+
 0.0048 2024-04-13 10:44:44
     - Improve eg/synth-config-cli.pl.
     - Fix the return value of recall_specs().

@@ -6,7 +6,7 @@ use 5.010;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 Travel::Status::DE::EFA::Result->mk_ro_accessors(
 	qw(countdown datetime delay destination is_cancelled info key line lineref
@@ -136,7 +136,7 @@ departure received by Travel::Status::DE::EFA
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 DESCRIPTION
 
@@ -213,8 +213,8 @@ Returns the "mode of transport", for instance "zug", "s-bahn", "tram" or
 Returns expected occupancy, if available, undef otherwise.
 
 Occupancy values are passed from the backend as-is. Known values are
-"MANY_SEATS" (low occupation), "FEW_SEATS" (high occupation), and
-"STANDING_ONLY" (very high occupation).
+"MANY_SEATS" (low occupation), "FEW_SEATS" (high occupation),
+"STANDING_ONLY" (very high occupation), and "FULL" (boarding not advised).
 
 =item $departure->platform
 

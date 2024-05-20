@@ -1,3 +1,10 @@
+Travel::Status::DE::VRR 2.02 - Sun May 19 2024
+    * EFA->new: Deprecate "efa_url" option. Use "service" instead.
+      "efa_url" is still supported, just not documented anymore.
+    * EFA->new: Request departures in Europe/Berlin by default rather than
+      using the system time zone. Fixes EFA operation on machines using UTC.
+    * efa-m: Support "FULL" occupancy; change indicators from _ * ! to . o * !
+
 Travel::Status::DE::VRR 2.01 - Fri May 17 2024
 
     * efa-m: Deprecate --efa-url in favour of --service. It is still supported,

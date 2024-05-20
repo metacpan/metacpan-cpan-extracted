@@ -8,7 +8,7 @@ Tk::DocumentTree - ITree based document list
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -68,6 +68,11 @@ An entry is untracked when it does not exist as a file.
 
 =over 4
 
+=item Switch: B<-contextmenu>
+
+Specify menuitems for a menu that pops on Button-3.
+By default it has entries for collapseAll and expandAll,
+
 =item Switch: B<-diriconcall>
 
 Callback for obtaining the dir icon. By default it is set
@@ -119,9 +124,15 @@ sub Populate {
 		-expand => 1, 
 		-fill => 'both',
 	);
+	$tree->bind('<Button-3>' => [$self, 'lmPost', Ev('X'), Ev('Y')]);
 
+	my (@contextmenu) = (
+		['command' => 'Collapse All', -command => ['collapseAll', $self]],
+		['command' => 'Expand All', -command => ['expandAll', $self]],
+	);
 	$self->ConfigSpecs(
 		-background => ['SELF', 'DESCENDANTS'],
+		-contextmenu => ['PASSIVE', undef, undef, \@contextmenu],
 		-diriconcall => ['CALLBACK', undef, undef, ['DefaultDirIcon', $self]],
 		-entryselect => ['CALLBACK', undef, undef, sub {}],
 		-fileiconcall => ['CALLBACK', undef, undef, ['DefaultFileIcon', $self]],
@@ -195,7 +206,7 @@ sub Add {
 				} else {
 					for (@peers) {
 						my $peer = $_;
-						if ($self->IsDir($peer) or $self->isUntracked($peer)) { #weed through the untracked and ddirectory section of the list
+						if ($self->IsDir($peer) or $self->isUntracked($peer)) { #weed through the untracked and directory section of the list
 						} elsif ($name lt $peer) {
 							push @op, -before => $peer;
 							last;
@@ -213,14 +224,18 @@ sub Add {
 	}
 }
 
-sub CreatePathBar {
-	return $_[0]->Label(
-		-anchor => 'w',
-	)->pack(
-		-fill => 'x',
-		-padx => 2,
-		-pady => 2,
-	)
+sub collapse {
+	my ($self, $entry) = @_;
+	$entry = '' unless defined $entry;
+
+	my @children = $self->infoChildren($entry);
+	for (@children) {
+		if ($self->infoChildren($_)) {
+			$self->collapse($_);
+		}
+		$self->close($_);
+		$self->update;
+	}
 }
 
 =item B<collapseAll>
@@ -231,20 +246,21 @@ path leading to the currently selected entry.
 =cut
 
 sub collapseAll {
-	my ($self, $entry) = @_;
-	$entry = '' unless defined $entry;
-	my $collapsed = 1;
-	my @children = $self->infoChildren($entry);
+	my $self = shift;
 	my ($sel) = $self->infoSelection;
-	for (@children) {
-		if ($self->infoChildren($_)) {
-			$collapsed = $self->collapseAll($_) 
-		} else {
-			$collapsed = '' if $_ eq $sel
-		}
-	}
-	$self->close($entry) unless ($entry eq '') or (not $collapsed);
-	return $collapsed
+	$self->collapse;
+	$self->update;
+	$self->entryShow($self->GetFileName($sel)) if defined $sel;
+}
+
+sub CreatePathBar {
+	return $_[0]->Label(
+		-anchor => 'w',
+	)->pack(
+		-fill => 'x',
+		-padx => 2,
+		-pady => 2,
+	)
 }
 
 sub DefaultDirIcon {
@@ -385,6 +401,25 @@ sub entrySelect {
 	my ($self, $entry) = @_;
 
 	my $sep = $self->cget('-separator');
+	my $sel = $entry;
+	$sel =~ s/^$sep// unless $Config{osname} eq 'MSWin32';
+	$sel = $self->StripPath($sel);
+
+	$self->entryShow($entry);
+	$self->selectionClear;
+	$self->anchorClear;
+	$self->selectionSet($sel);
+}
+
+=item B<entryShow>I<($filename)>
+
+Expands the parth to $filename so it becomes visible.
+
+=cut
+
+sub entryShow {
+	my ($self, $entry) = @_;
+	my $sep = $self->cget('-separator');
 	$entry =~ s/^$sep// unless $Config{osname} eq 'MSWin32';
 	$entry = $self->StripPath($entry);
 	my $parent = $self->infoParent($entry);
@@ -392,9 +427,7 @@ sub entrySelect {
 		$self->open($parent);
 		$parent = $self->infoParent($parent);
 	}
-	$self->selectionClear;
-	$self->anchorClear;
-	$self->selectionSet($entry);
+	$self->see($entry);
 }
 
 =item B<expandAll>
@@ -409,10 +442,10 @@ sub expandAll {
 	my @children = $self->infoChildren($entry);
 	for (@children) {
 		if ($self->infoChildren($_)) {
-			$self->expandAll($_) 
+			$self->open($_);
+			$self->expandAll($_);
 		}
 	}
-	$self->open($entry) unless $entry eq '';
 }
 
 =item B<fileList>
@@ -590,6 +623,31 @@ sub ItemList {
 		}
 	}
 	return @$list;
+}
+
+sub lmPost {
+	my $self = shift;
+	my ($x, $y) = $self->pointerxy;
+	my $items = $self->cget('-contextmenu');
+	if (@$items) {
+		my $menu = $self->Menu(
+			-menuitems => $items,
+			-tearoff => 0,
+		);
+		$menu->bind('<Leave>', [$self, 'lmUnpost']);
+		$self->{'l_menu'} = $menu;
+		$menu->post($x - 2, $y - 2);
+	}
+}
+
+sub lmUnpost {
+	my $self = shift;
+	my $menu = $self->{'l_menu'};
+	if (defined $menu) {
+		delete $self->{'l_menu'};
+		$menu->unpost;
+		$menu->destroy;
+	}
 }
 
 sub PathCompare {

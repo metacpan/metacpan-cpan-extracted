@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -158,11 +158,6 @@ sub new {
 		delete $opt{timeout};
 	}
 
-	my @now = localtime( time() );
-
-	my @time = @now[ 2, 1 ];
-	my @date = ( $now[3], $now[4] + 1, $now[5] + 1900 );
-
 	if ( not( $opt{name} ) ) {
 		confess('You must specify a name');
 	}
@@ -174,11 +169,14 @@ sub new {
 
 	if ( $opt{service} and exists $efa_instance{ $opt{service} } ) {
 		$opt{efa_url} = $efa_instance{ $opt{service} }{url};
+		$opt{time_zone} //= $efa_instance{ $opt{service} }{time_zone};
 	}
 
 	if ( not $opt{efa_url} ) {
 		confess('service or efa_url must be specified');
 	}
+	my $dt = $opt{datetime}
+	  // DateTime->now( time_zone => $opt{time_zone} // 'Europe/Berlin' );
 
 	## no critic (RegularExpressions::ProhibitUnusedCapture)
 	## no critic (Variables::ProhibitPunctuationVars)
@@ -186,7 +184,10 @@ sub new {
 	if (    $opt{time}
 		and $opt{time} =~ m{ ^ (?<hour> \d\d? ) : (?<minute> \d\d ) $ }x )
 	{
-		@time = @+{qw{hour minute}};
+		$dt->set(
+			hour   => $+{hour},
+			minute => $+{minute}
+		);
 	}
 	elsif ( $opt{time} ) {
 		confess('Invalid time specified');
@@ -199,10 +200,17 @@ sub new {
 	  )
 	{
 		if ( $+{year} ) {
-			@date = @+{qw{day month year}};
+			$dt->set(
+				day   => $+{day},
+				month => $+{month},
+				year  => $+{year}
+			);
 		}
 		else {
-			@date[ 0, 1 ] = @+{qw{day month}};
+			$dt->set(
+				day   => $+{day},
+				month => $+{month}
+			);
 		}
 	}
 	elsif ( $opt{date} ) {
@@ -214,17 +222,17 @@ sub new {
 			command                => q{},
 			deleteAssignedStops_dm => '1',
 			help                   => 'Hilfe',
-			itdDateDay             => $date[0],
-			itdDateMonth           => $date[1],
-			itdDateYear            => $date[2],
+			itdDateDay             => $dt->day,
+			itdDateMonth           => $dt->month,
+			itdDateYear            => $dt->year,
 			itdLPxx_id_dm          => ':dm',
 			itdLPxx_mapState_dm    => q{},
 			itdLPxx_mdvMap2_dm     => q{},
 			itdLPxx_mdvMap_dm      => '3406199:401077:NAV3',
 			itdLPxx_transpCompany  => 'vrr',
 			itdLPxx_view           => q{},
-			itdTimeHour            => $time[0],
-			itdTimeMinute          => $time[1],
+			itdTimeHour            => $dt->hour,
+			itdTimeMinute          => $dt->minute,
 			language               => 'de',
 			mode                   => 'direct',
 			nameInfo_dm            => 'invalid',
@@ -740,7 +748,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 DESCRIPTION
 
@@ -756,17 +764,17 @@ It reports all upcoming tram/bus/train departures at a given place.
 =item my $status = Travel::Status::DE::EFA->new(I<%opt>)
 
 Requests the departures as specified by I<opts> and returns a new
-Travel::Status::DE::EFA object.  B<efa_url> and B<name> are
+Travel::Status::DE::EFA object.  B<service> and B<name> are
 mandatory.  Dies if the wrong I<opts> were passed.
 
 Arguments:
 
 =over
 
-=item B<efa_url> => I<url>
+=item B<service> => I<name>
 
-URL to the EFA service. See C<< efa-m --list >> for known URLs.
-If you found a URL not listed there, please notify
+EFA service. See C<< efa-m --list >> for known services.
+If you found a service not listed there, please notify
 E<lt>derf+efa@finalrewind.orgE<gt>.
 
 =item B<place> => I<place>
@@ -781,6 +789,11 @@ B<stop> (stop/station name).
 =item B<name> => I<name>
 
 address / poi / stop name to list departures for.
+
+=item B<datetime> => I<DateTime object>
+
+Request departures for the date/time specified by I<DateTime object>.
+Default: now.
 
 =item B<efa_encoding> => I<encoding>
 

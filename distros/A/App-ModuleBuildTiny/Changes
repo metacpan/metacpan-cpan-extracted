@@ -1,5 +1,8 @@
 Revision history for App-ModuleBuildTiny
 
+0.044     2024-05-19 15:58:03+0200
+          - Add support for automatic resources
+
 0.043     2023-10-19 20:38:08+0200
           - Add options to not write build files
 

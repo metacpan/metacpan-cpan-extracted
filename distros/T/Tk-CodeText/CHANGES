@@ -1,5 +1,9 @@
 Tk::CodeText module changes log
 
+19 may 2024
+	Update to version 0.50
+	Fixed save method in XText
+
 23 apr 2024
 	Update to version 0.49
 	Fixed bug with mouse button release
@@ -24,7 +28,6 @@ Tk::CodeText module changes log
 	Update to version 0.46
 	Focus now goes to the find entry when the search and replace frame appears
 	Removed <FocusIn> and <FocusOut> bindings. I thought they made sense, they don't.
-
 
 01 Oct 2023
 	Update to version 0.45
@@ -115,6 +118,7 @@ Tk::CodeText module changes log
 
 02 February 2003
 	First alpha version 0.1
+
 
 
 

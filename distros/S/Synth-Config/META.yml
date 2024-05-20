@@ -22,16 +22,19 @@ meta-spec:
 name: Synth-Config
 requires:
   Carp: '0'
+  GraphViz2: '0'
+  List::Util: '0'
   Mojo::JSON: '0'
   Mojo::SQLite: '2.000'
   Moo: '2'
+  YAML: '0'
   namespace::clean: '0'
   perl: '5.006'
   strictures: '2'
 resources:
   homepage: https://github.com/ology/Synth-Config
   repository: https://github.com/ology/Synth-Config.git
-version: '0.0048'
+version: '0.0052'
 x_Dist_Zilla:
   perl:
     version: '5.032001'
@@ -213,6 +216,7 @@ x_Dist_Zilla:
           spell_cmd: 'aspell list'
           stopwords:
             - dbname
+            - graphviz
             - num
           wordlist: Pod::Wordlist
       name: Test::PodSpelling

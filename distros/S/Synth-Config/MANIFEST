@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/Maths.yaml
 eg/Modular.yaml
 eg/patch-visualizer.pl
 eg/public/css/fontawesome.css

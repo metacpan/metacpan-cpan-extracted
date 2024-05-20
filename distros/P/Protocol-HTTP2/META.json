@@ -4,7 +4,7 @@
       "Vladimir Lettiev <thecrux@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.7",
+   "generated_by" : "Minilla/v3.1.21",
    "license" : [
       "perl_5"
    ],
@@ -63,7 +63,7 @@
    "provides" : {
       "Protocol::HTTP2" : {
          "file" : "lib/Protocol/HTTP2.pm",
-         "version" : "1.10"
+         "version" : "1.11"
       },
       "Protocol::HTTP2::Client" : {
          "file" : "lib/Protocol/HTTP2/Client.pm"
@@ -142,18 +142,21 @@
       },
       "homepage" : "https://github.com/vlet/p5-Protocol-HTTP2",
       "repository" : {
-         "url" : "git://github.com/vlet/p5-Protocol-HTTP2.git",
+         "type" : "git",
+         "url" : "https://github.com/vlet/p5-Protocol-HTTP2.git",
          "web" : "https://github.com/vlet/p5-Protocol-HTTP2"
       }
    },
-   "version" : "1.10",
+   "version" : "1.11",
    "x_contributors" : [
       "Daniil Bondarev <bondarev@amazon.com>",
       "Felipe Gasper <felipe@felipegasper.com>",
       "Junho Choi <junho@cloudflare.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
-      "gregor herrmann <gregoa@debian.org>"
+      "Olivier Gayot <olivier.gayot@canonical.com>",
+      "gregor herrmann <gregoa@debian.org>",
+      "yoshikazusawa <883514+yoshikazusawa@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

@@ -19,10 +19,12 @@ END {
 use_ok 'Synth::Config';
 
 my $model = 'Moog Matriarch';
+my $first = 'Simple 001';
+my $initial;
 
 my $obj = new_ok 'Synth::Config' => [
-  model   => $model,
-  dbname  => 'test.db',
+  model  => $model,
+  dbname => 'test.db',
 #  verbose => 1,
 ];
 
@@ -31,12 +33,22 @@ subtest defaults => sub {
   is $obj->verbose, 0, 'verbose';
 };
 
+subtest yaml => sub {
+  my $got = $obj->import_yaml(
+    file    => 'eg/Modular.yaml',
+    patches => [ $first ],
+  );
+  is @$got, 1, 'import_yaml';
+  $initial = $obj->recall_all;
+  is @$initial, 4, 'recall_all';
+};
+
 subtest settings => sub {
   my $name   = 'Test setting!';
   my $expect = {
     name       => $name,
-    group      => 'filter',
-    parameter  => 'cutoff',
+    group      => 'foo',
+    parameter  => 'bar',
     control    => 'knob',
     bottom     => 20,
     top        => 20_000,
@@ -96,10 +108,10 @@ subtest settings => sub {
   is_deeply $settings, [ $setting2 ], 'search_settings';
   # recall names
   my $names = $obj->recall_names;
-  is_deeply $names, [ $name ], 'recall_names';
+  is_deeply $names, [ $first, $name ], 'recall_names';
   # recall all for model
   $settings = $obj->recall_all;
-  is_deeply $settings, [ $setting, $setting2 ], 'recall_all';
+  is_deeply $settings, [ @$initial, $setting, $setting2 ], 'recall_all';
   # remove a setting
   $obj->remove_setting(id => $id);
   $settings = $obj->search_settings(name => $name);
@@ -107,6 +119,15 @@ subtest settings => sub {
   $obj->remove_settings(name => $name);
   $settings = $obj->search_settings(name => $name);
   is_deeply $settings, [], 'remove_settings';
+};
+
+subtest graphviz => sub {
+  my $got = $obj->graphviz(
+    settings   => $initial,
+    model_name => $model,
+    patch_name => $first,
+  );
+  isa_ok $got, 'GraphViz2';
 };
 
 subtest specs => sub {

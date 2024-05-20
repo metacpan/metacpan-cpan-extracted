@@ -7,7 +7,7 @@ Tk::XText - Extended Text widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.48';
+$VERSION = '0.50';
 use strict;
 use warnings;
 use Carp;
@@ -963,14 +963,21 @@ sub saveExport {
 		warn "cannot open $file";
 		return 0
 	};
-	my $index = '1.0';
-	while ($self->compare($index,'<','end')) {
-		my $end = $self->index("$index lineend + 1c");
-		my $line = $self->get($index,$end);
+	my $last = $self->linenumber('end - 1c');
+	my $end = $self->index('end - 1c');
+	for (1 .. $last) {
+		my $linestart = "$_.0";
+
+		my $lineend = $self->index("$linestart lineend + 1c");
+		$lineend = $end if $self->compare($end,'<',$lineend);
+
+		my $line = $self->get($linestart, $lineend);
 		print OUTFILE $line;
-		$index = $end;
 	}
 	close OUTFILE;
+#	my $text = $self->get('1.0', 'end - 1c');
+#	print OUTFILE $text;
+#	close OUTFILE;
 	return 1
 }
 
@@ -1216,6 +1223,8 @@ Unknown. If you find any, please contact the author.
 1;
 
 __END__
+
+
 
 
 

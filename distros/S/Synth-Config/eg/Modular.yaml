@@ -2,6 +2,7 @@ model: 'Modular'
 patches:
   - patch: 'Simple 000'
     settings:
+      # VCO
       - group: 'oscillator'
         parameter: 'out'
         control: 'patch'
@@ -17,6 +18,7 @@ patches:
         control: 'switch'
         value: 'square'
         unit: ''
+      # MIX
       - group: 'mixer'
         parameter: 'stereo-out'
         control: 'patch'
@@ -24,11 +26,13 @@ patches:
         param_to: 'stereo-in'
   - patch: 'Simple 001'
     settings:
+      # SEQ
       - group: 'sequencer / midi'
         parameter: 'cv-out'
         control: 'patch'
         group_to: 'oscillator'
         param_to: 'mod-in'
+      # VCO
       - group: 'oscillator'
         parameter: 'out'
         control: 'patch'
@@ -39,6 +43,7 @@ patches:
         control: 'knob'
         value: 8
         unit: "'"
+      # MIX
       - group: 'mixer'
         parameter: 'stereo-out'
         control: 'patch'
@@ -46,11 +51,13 @@ patches:
         param_to: 'stereo-in'
   - patch: 'Simple 002'
     settings:
+      # SEQ
       - group: 'sequencer'
         parameter: 'cv-out'
         control: 'patch'
         group_to: 'oscillator'
         param_to: 'mod-in'
+      # VCO
       - group: 'oscillator'
         parameter: 'out'
         control: 'patch'
@@ -61,11 +68,13 @@ patches:
         control: 'knob'
         value: 8
         unit: "'"
+      # VCF
       - group: 'filter'
         parameter: 'out'
         control: 'patch'
         group_to: 'mixer'
         param_to: 'in'
+      # MIX
       - group: 'mixer'
         parameter: 'stereo-out'
         control: 'patch'
@@ -73,11 +82,13 @@ patches:
         param_to: 'stereo-in'
   - patch: 'Simple 003'
     settings:
+      # SEQ
       - group: 'sequencer'
         parameter: 'cv-out'
         control: 'patch'
         group_to: 'oscillator'
         param_to: 'mod-in'
+      # VCO
       - group: 'oscillator'
         parameter: 'out'
         control: 'patch'
@@ -88,6 +99,7 @@ patches:
         control: 'knob'
         value: 8
         unit: "'"
+      # LFO
       - group: 'lfo'
         parameter: 'out'
         control: 'patch'
@@ -98,6 +110,7 @@ patches:
         control: 'patch'
         group_to: 'mixer'
         param_to: 'in'
+      # MIX
       - group: 'mixer'
         parameter: 'stereo-out'
         control: 'patch'
@@ -105,6 +118,7 @@ patches:
         param_to: 'stereo-in'
   - patch: 'Simple 004'
     settings:
+      # SEQ
       - group: 'sequencer'
         parameter: 'cv-out'
         control: 'patch'
@@ -115,6 +129,7 @@ patches:
         control: 'patch'
         group_to: 'envelope'
         param_to: 'gate-in'
+      # ENV
       - group: 'envelope'
         parameter: 'env-out'
         control: 'patch'
@@ -124,22 +139,23 @@ patches:
         parameter: 'attack'
         control: 'slider'
         value: 2
-        unit: "%"
+        unit: '%'
       - group: 'envelope'
         parameter: 'decay'
         control: 'slider'
         value: 4
-        unit: "%"
+        unit: '%'
       - group: 'envelope'
         parameter: 'sustain'
         control: 'slider'
         value: 9
-        unit: "%"
+        unit: '%'
       - group: 'envelope'
         parameter: 'release'
         control: 'slider'
         value: 8.5
-        unit: "%"
+        unit: '%'
+      # VCO
       - group: 'oscillator'
         parameter: 'out'
         control: 'patch'
@@ -150,6 +166,7 @@ patches:
         control: 'knob'
         value: 8
         unit: "'"
+      # VCA
       - group: 'amplifier'
         parameter: 'out'
         control: 'patch'
@@ -159,7 +176,8 @@ patches:
         parameter: 'gain'
         control: 'knob'
         value: 40
-        unit: "%"
+        unit: '%'
+      # MIX
       - group: 'mixer'
         parameter: 'stereo-out'
         control: 'patch'
@@ -169,7 +187,7 @@ patches:
         parameter: 'volume'
         control: 'slider'
         value: 80
-        unit: "%"
+        unit: '%'
   - patch: 'Simple 005'
     settings:
       - group: 'SEQ'

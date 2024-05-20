@@ -1,0 +1,148 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use App::Codit;
+use Getopt::Long;
+use File::Spec;
+
+sub getItems;
+
+my $help = 0;
+my $session;
+my $settings;
+my $syntax;
+my $iconpath;
+my $icontheme;
+my $noplugins = 0;
+my $plugins;
+my $version = 0;
+
+my $helpstring = 'Usage:
+  codit [options] [files]
+
+Options:
+  -c or -config
+  config folder to use.
+
+  -h or -help:
+  show this message.
+
+  -i or -iconpath:
+  path to the folders where icons are located. Items separated with \':\'.
+
+  -t or -icontheme:
+  icon library to load.
+
+  -P or -noplugins:
+  Launch without any plugins loaded.
+
+  -p or -plugins
+  Launch with exclusively these plugins loaded. Items separated with \':\'.
+
+  -s or -session:
+  loads a session at startup. Plugin Sessions must be loaded for this.
+  
+  -y or -syntax:
+  default syntax to use.
+
+  -v or -version:
+  show version.
+';
+
+GetOptions(
+	#help
+	'h' => \$help,
+	'help' => \$help,
+	#session
+	's=s' => \$session,
+	'session=s' => \$session,
+	#configfolder
+	'c=s' => \$settings,
+	'config=s' => \$settings,
+	#syntax
+	'syntax=s' => \$syntax,
+	'y=s' => \$syntax,
+	#iconpath
+	'iconpath=s' => \$iconpath,
+	'i=s' => \$iconpath,
+	#icontheme
+	'icontheme' => \$icontheme,
+	't=s' => \$icontheme,
+	#noplugins
+	'P' => \$noplugins,
+	'noplugins' => \$noplugins,
+	#plugins
+	'plugins=s' => \$plugins,
+	'p=s' => \$plugins,
+	#version
+	'v' => \$version,
+	'version' => \$version,
+) or die $helpstring;
+
+if ($help) {
+	print $helpstring;
+	exit;
+}
+
+if ($version) {
+	print "Codit version ", App::Codit->VERSION, "\n";
+	exit;
+}
+
+my @options = (-noplugins => $noplugins);
+push @options, -configfolder => $settings if defined $settings;
+push @options, -contentsyntax => $syntax if defined $syntax;
+push @options, -iconpath => getItems($iconpath) if defined $iconpath;
+push @options, -icontheme => $icontheme if defined $icontheme;
+push @options, -plugins => getItems($plugins) if defined $plugins;
+
+my $codit = App::Codit->new(@options);
+
+$codit->addPostConfig(sub {
+	my $mdi = $codit->extGet('CoditMDI');
+
+	if (defined $session) {
+		my $s = $codit->extGet('Plugins')->plugGet('Sessions');
+		$s->sessionOpen($session) if defined $s;
+	}
+
+	if (@ARGV) {
+		$mdi->silentMode(1);
+	
+		for (@ARGV) {
+			my $file = File::Spec->rel2abs($_);
+			unless (-e $file) {
+				warn "File $_ does not exit";
+				next;
+			}
+			if (-d $file) {
+				warn "'$file' is a folder";
+				next;
+			}
+			$codit->cmdExecute('doc_open', $file);
+		}
+	
+		$mdi->silentMode(0);
+		$mdi->docSelectFirst;
+	}
+});
+
+$codit->geometry('800x600+100+100');
+
+$codit->MainLoop;
+
+sub getItems {
+	my $path = shift;
+	my @list = split(/\;/, $path);
+	return \@list
+}
+
+
+
+
+
+
+
+
+

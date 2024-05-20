@@ -92112,3 +92112,17 @@ G/GE/GENE/Music-ModalFunction-0.0504.tar.gz
 S/SS/SSIMMS/PDF-API2-2.047.tar.gz
 T/TU/TURNERJW/StreamFinder-2.32.tar.gz
 E/EH/EHUELS/XDR-Parse-0.2.0.tar.gz
+H/HA/HANJE/App-Codit-0.01.tar.gz
+L/LE/LEONT/App-ModuleBuildTiny-0.044.tar.gz
+H/HA/HANJE/Tk-AppWindow-0.06.tar.gz
+P/PE/PERLANCAR/Bencher-ScenarioBundle-Log-Any-0.101.tar.gz
+D/DA/DAM/DBD-Firebird-1.37.tar.gz
+D/DC/DCANTRELL/Devel-CheckOS-2.03.tar.gz
+H/HA/HANJE/Tk-CodeText-0.50.tar.gz
+C/CR/CRUX/Protocol-HTTP2-1.11.tar.gz
+G/GL/GLBRUNE/Sim-OPT-0.731.tar.gz
+K/KI/KIMOTO/SPVM-IO-0.213.tar.gz
+G/GE/GENE/Synth-Config-0.0052.tar.gz
+L/LE/LEONT/Thread-CSP-0.014.tar.gz
+H/HA/HANJE/Tk-DocumentTree-0.07.tar.gz
+D/DE/DERF/Travel-Status-DE-VRR-2.02.tar.gz

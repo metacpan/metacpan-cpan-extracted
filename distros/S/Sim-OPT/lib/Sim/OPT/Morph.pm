@@ -47,7 +47,7 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes @weighttransforms
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.157'; # our $VERSION = '';
+$VERSION = '0.161'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model for simulation programs.';
 
 ################################################# MORPH
@@ -5514,8 +5514,6 @@ sub genchange
 	$countmorphing, $todo, $names_ref, $nums_ref, $newcontents_ref,
 	$filecontents_ref, $newfilecontents_ref, $launchline, $menus_ref, $countinstance ) = @_;
 
-
-
 	my @applytype = @$applytype_ref;
 
 	my @menus = @$menus_ref;
@@ -5530,12 +5528,13 @@ sub genchange
 
 	sub read_gen
 	{
-		my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file,
-			$countmorphing, $todo, $names_ref, $nums_ref, $newcontents_ref,
-			$filecontents_ref, $newfilecontents_ref, $launchline, $fullfilepath, $new_fullfilepath, $filequestions_ref ) = @_;
+		my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file, $countmorphing, $todo, $names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref, $launchline, $fullfilepath, $new_fullfilepath, $filequestions_ref ) = @_;
 		my @filequestions = @$filequestions_ref;
 		my $countunique = 1;
 		my $countfile = 0;
+
+		my @applytype = @$applytype_ref;
+
 		foreach my $filequests ( @filequestions )
 		{
 			my @truequests = @$filequests;
@@ -5554,10 +5553,6 @@ sub genchange
 			my @passrows = @filerows;
 			close FULLFILEPATH;
 			@{ $plaincontents[ $countfile ] } = @filerows;
-
-
-
-
 
 			my $countro = 0;
 			foreach my $row ( @filerows )
@@ -5824,7 +5819,7 @@ sub genchange
 		return (  \%names, \%nums, \%newcontents, \@newfilecontents, \@plaincontents, \@filecontents );
 	}
 
-	if ( ( $todo eq "read_gen" ) or ( $todo eq "vary" ) )
+	if ( ( $todo eq "read_gen" ) or ( $todo eq "vary" ) or ( $applytype[$countop][0] eq "genchange" ) )
 	{
 		( $names_ref, $nums_ref, $newcontents_ref, $newfilecontents_ref, $plaincontents_ref, $filecontents_ref ) =
 		read_gen( $to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file,
@@ -5837,6 +5832,7 @@ sub genchange
 		@plaincontents = @$plaincontents_ref;
 		@filecontents = @$filecontents_ref;
 	}
+
 	sub read_gen_constraints
 	{
 		my ( $constrainfiles_ref, $names_ref, $newcontents_ref ) = @_;

@@ -1,5 +1,10 @@
 Revision history for Perl extension Tk::DocumentTree.
 
+0.07  Sun May 19, 2024
+	- fixed collapseAll and epxandAll methods.
+	- added method entryShow
+	- added context menu for collapseAll and expandAll. with a -contextmenu option.
+
 0.06  Sat Apr 20 11 2024
 	- Added collapseAll and expandAll methods.
 

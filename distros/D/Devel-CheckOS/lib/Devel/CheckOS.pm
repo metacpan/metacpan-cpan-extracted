@@ -10,7 +10,7 @@ use File::Spec;
 
 use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS %OS_ALIASES);
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(

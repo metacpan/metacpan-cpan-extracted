@@ -1,0 +1,55 @@
+{
+   "abstract" : "IDE for and in Perl",
+   "author" : [
+      "Hans Jeuken <hanje at cpan dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-Codit",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Path" : "2.18",
+            "File::Spec" : "3.75",
+            "Test::Tk" : "3.03",
+            "Tk" : "804.023",
+            "Tk::AppWindow" : "0.06",
+            "Tk::CodeText" : "0.50",
+            "Tk::FileBrowser" : "0.03"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/haje61/App-Codit.git",
+         "web" : "https://github.com/haje61/App-Codit"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

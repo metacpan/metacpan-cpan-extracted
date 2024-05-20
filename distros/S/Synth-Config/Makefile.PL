@@ -18,9 +18,12 @@ my %WriteMakefileArgs = (
   "NAME" => "Synth::Config",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "GraphViz2" => 0,
+    "List::Util" => 0,
     "Mojo::JSON" => 0,
     "Mojo::SQLite" => "2.000",
     "Moo" => 2,
+    "YAML" => 0,
     "namespace::clean" => 0,
     "strictures" => 2
   },
@@ -32,7 +35,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0048",
+  "VERSION" => "0.0052",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,12 +45,15 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "File::Spec" => 0,
+  "GraphViz2" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "List::Util" => 0,
   "Mojo::JSON" => 0,
   "Mojo::SQLite" => "2.000",
   "Moo" => 2,
   "Test::More" => "0.88",
+  "YAML" => 0,
   "namespace::clean" => 0,
   "strict" => 0,
   "strictures" => 2,

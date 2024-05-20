@@ -3,13 +3,16 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Synthesizer settings librarian
 
-our $VERSION = '0.0048';
+our $VERSION = '0.0052';
 
 use Moo;
 use strictures 2;
 use Carp qw(croak);
+use GraphViz2 ();
+use List::Util qw(first);
 use Mojo::JSON qw(from_json to_json);
 use Mojo::SQLite ();
+use YAML qw(Load LoadFile);
 use namespace::clean;
 
 
@@ -294,6 +297,109 @@ sub remove_spec {
   );
 }
 
+
+sub import_yaml {
+  my ($self, %options) = @_;
+
+  die 'Invalid settings file'
+    if $options{file} && !-e $options{file};
+
+  my $config = $options{file}
+    ? LoadFile($options{file})
+    : Load($options{string});
+
+  my $list = $options{patches} && @{ $options{patches} }
+    ? $options{patches}
+    : [ map { $_->{patch} } @{ $config->{patches} } ];
+
+  for my $patch_name (@$list) {
+    my $settings = $self->search_settings(name => $patch_name);
+
+    if ($settings && @$settings) {
+      print "Removing $patch_name setting from ", $self->model, "\n"
+          if $self->verbose;
+      $self->remove_settings(name => $patch_name);
+    }
+
+    for my $patch (@{ $config->{patches} }) {
+      my $name = $patch->{patch};
+      next unless first { $_ eq $name } @$list;
+      for my $set (@{ $patch->{settings} }) {
+        my $group = $set->{group};
+        print "Adding $name $group setting to ", $self->model, "\n"
+          if $self->verbose;
+        $self->make_setting(name => $name, %$set);
+      }
+    }
+  }
+
+  return $list;
+}
+
+
+sub graphviz {
+  my ($self, %options) = @_;
+
+  die 'Model not given' unless $options{model_name};
+
+  $options{render}    ||= 0;
+  $options{path}      ||= '.';
+  $options{extension} ||= 'png';
+  $options{shape}     ||= 'oval';
+  $options{color}     ||= 'grey';
+
+  my $g = GraphViz2->new(
+    global => { directed => 1 },
+    node   => { shape => $options{shape} },
+    edge   => { color => $options{color} },
+  );
+  my (%edges, %sets, %labels);
+
+  my $patch_name = '';
+  # collect settings by group
+  for my $set (@{ $options{settings} }) {
+    my $from = $set->{group};
+    $patch_name = $set->{name};
+    push @{ $sets{$from} }, $set;
+  }
+
+  # accumulate parameter = value lines
+  for my $from (keys %sets) {
+    my @label = ($from);
+    for my $group ($sets{$from}->@*) {
+      next if $group->{control} eq 'patch';
+      my $label = "$group->{parameter} = $group->{value}$group->{unit}";
+      push @label, $label;
+    }
+    $labels{$from} = join "\n", @label;
+  }
+
+  # add patch edges
+  for my $set (@{ $options{settings} }) {
+    next if $set->{control} ne 'patch';
+    my ($from, $to, $param, $param_to) = @$set{qw(group group_to parameter param_to)};
+    my $key = "$from $param to $to $param_to";
+    my $label = "$param to $param_to";
+    $from = $labels{$from};
+    $to = $labels{$to} if exists $labels{$to};
+    $g->add_edge(
+      from  => $from,
+      to    => $to,
+      label => $label,
+    ) unless $edges{$key}++;
+  }
+
+  if ($options{render}) {
+    # save the file
+    (my $model = $options{model_name}) =~ s/\W/_/g;
+    (my $patch = $patch_name) =~ s/\W/_/g;
+    my $filename = "$options{path}/$model-$patch.$options{extension}";
+    $g->run(format => $options{extension}, output_file => $filename);
+  }
+
+  return $g;
+}
+
 1;
 
 __END__
@@ -308,32 +414,48 @@ Synth::Config - Synthesizer settings librarian
 
 =head1 VERSION
 
-version 0.0048
+version 0.0052
 
 =head1 SYNOPSIS
 
   use Synth::Config ();
 
-  my $model = 'Moog Matriarch';
+  my $model = 'Modular';
+  my $synth = Synth::Config->new(model => $model, verbose => 1);
 
-  my $synth = Synth::Config->new(model => $model);
+  # populate the database with patch settings from a YAML file or string
+  my $patches = $synth->import_yaml(
+      file    => "$model.yaml", # or string => ...
+      patches => ['Simple 001', 'Simple 002' ],
+  );
 
-  my $name = 'My favorite setting';
-
-  my $id1 = $synth->make_setting(name => $name, group => 'filter', etc => '...');
-  my $id2 = $synth->make_setting(name => $name, group => 'sequencer', etc => '...');
+  # populate the database with individual settings
+  my $patch = 'My favorite setting';
+  my $id1 = $synth->make_setting(name => $patch, group => 'filter', etc => '...');
+  my $id2 = $synth->make_setting(name => $patch, group => 'sequencer', etc => '...');
 
   my $setting = $synth->recall_setting(id => $id1);
-  # { id => 1, group => 'filter' }
+  # { id => 1, group => 'filter', etc => '...' }
 
   # update the group key
   $synth->make_setting(id => $id1, group => 'envelope');
 
-  my $settings = $synth->search_settings(name => $name);
+  my $settings = $synth->search_settings(name => $patch);
   # [ { id => 1, group => 'envelope', etc => '...' }, { id => 2, group => 'sequencer', etc => '...' } ]
 
   $settings = $synth->search_settings(group => 'sequencer');
   # [ { id => 2, group => 'sequencer', etc => '...' } ]
+
+  my $g = $synth->graphviz(
+    settings   => $settings,
+    model_name => $model,
+  );
+  # or
+  $synth->graphviz(
+    settings   => $settings,
+    model_name => $model,
+    render     => 1,
+  );
 
   my $models = $synth->recall_models;
   # [ 'moog_matriarch' ]
@@ -362,9 +484,9 @@ version 0.0048
 
   # remove stuff!
   $synth->remove_spec;
-  $synth->remove_setting(id => $id1);     # remove a particular setting
-  $synth->remove_settings(name => $name); # remove all setting sharing the same name
-  $synth->remove_model(model => $model);  # remove the entire model
+  $synth->remove_setting(id => $id1);      # remove a particular setting
+  $synth->remove_settings(name => $patch); # remove all settings sharing the same name
+  $synth->remove_model(model => $model);   # remove the entire model
 
 =head1 DESCRIPTION
 
@@ -521,9 +643,41 @@ Return the model configuration specification for the given B<id>.
 Remove the database table for the current object model configuration
 specification.
 
+=head2 import_yaml
+
+Add the settings in a L<YAML> file or string, to the database and
+return the setting (patch) name.
+
+Import a specific set of B<patches> in the settings, by providing them
+in the B<options>.
+
+Option defaults:
+
+  file    = undef
+  string  = undef
+  patches = undef
+
+=head2 graphviz
+
+  $g = $synth->graphviz(%options);
+
+Visualize a patch of B<settings> with the L<GraphViz2> module.
+
+Option defaults:
+
+  render     = 0
+  path       = .
+  model_name = model
+  patch_name = patch
+  extension  = png
+  shape      = oval
+  color      = grey
+
 =head1 SEE ALSO
 
 The F<t/01-methods.t> and the F<eg/*.pl> files in this distribution
+
+L<GraphViz2>
 
 L<Moo>
 

@@ -2,6 +2,8 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#define NEED_mg_findext
+#include "ppport.h"
 
 #include "channel.h"
 #include "mthread.h"

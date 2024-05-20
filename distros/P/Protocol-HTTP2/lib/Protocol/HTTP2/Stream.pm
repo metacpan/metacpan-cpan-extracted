@@ -362,7 +362,7 @@ sub stream_send_blocked {
     my ( $self, $stream_id ) = @_;
     my $s = $self->{streams}->{$stream_id} or return undef;
 
-    if ( length( $s->{blocked_data} )
+    if ( defined( $s->{blocked_data} ) && length( $s->{blocked_data} )
         && $self->stream_fcw_send($stream_id) > 0 )
     {
         $self->send_data($stream_id);
@@ -398,7 +398,7 @@ sub stream_reprio {
 
     if ($exclusive) {
 
-        # move all siblings to childs
+        # move all siblings to children
         for my $sid ( keys %$s ) {
             next
               if $s->{$sid}->{stream_dep} != $stream_dep

@@ -11,7 +11,7 @@ use warnings;
 use Carp;
 
 use vars qw($VERSION);
-$VERSION="0.03";
+$VERSION="0.06";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -948,7 +948,7 @@ sub interfaceAdd {
 	my $navigator = $self->extGet('Navigator');
 	if (defined $navigator) {
 		$navigator->Add($name) if defined $navigator;
-		$self->interfaceCollapse;
+#		$self->interfaceCollapse;
 	}
 }
 
@@ -1043,6 +1043,20 @@ sub interfaceSelect {
 	#select on  navigator
 	my $navigator = $self->extGet('Navigator');
 	$navigator->SelectEntry($name) if defined $navigator;
+}
+
+=item B<interfaceShow>I<($name)>
+
+Makes I<$name> visible in the Navigator.
+
+=cut
+
+sub interfaceShow {
+	my ($self, $name) = @_;
+	croak 'Name not defined' unless defined $name;
+
+	my $t = $self->Subwidget('NAVTREE');
+	$t->entryShow($name) if defined $t;
 }
 
 =item B<MenuItems>
@@ -1241,6 +1255,46 @@ sub setTitle {
 	$self->configPut(-title => $appname) unless defined $name;
 }
 
+
+=item B<silentMode>I<($flag)>
+
+Takes a boolean as parameter. When silentMode is on the document bar will not update,
+document history and select are disabled. This will speed up things when you open
+multiple documents at once.
+
+=cut
+
+sub silentMode {
+	my ($self, $flag) = @_;
+	unless (defined $flag) {
+		croak "You must specify a boolean flag";
+		return
+	}
+	my $if = $self->Interface;
+	if ($flag) {
+		$self->{'autoupdate'} = $if->autoupdate;
+		$if->autoupdate(0);
+
+		$self->{'historydisabled'} = $self->historyDisabled;
+		$self->historyDisabled(1);
+
+		$self->{'selectdisabled'} = $self->selectDisabled;
+		$self->selectDisabled(1);
+
+	} else {
+		my $a = $self->{'autoupdate'};
+		$if->autoupdate($a) if defined $a;
+		delete $self->{'autoupdate'};
+
+		my $h = $self->{'historydisabled'};
+		$self->historyDisabled($h) if defined $h;
+		delete $self->{'historydisabled'};
+
+		my $d = $self->{'selectdisabled'};
+		$self->selectDisabled($d) if defined $d;
+		delete $self->{'selectdisabled'};
+	}
+}
 
 =item B<ToolItems>
 

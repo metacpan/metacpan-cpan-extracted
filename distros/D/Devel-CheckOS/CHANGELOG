@@ -1,3 +1,9 @@
+2.03    2024-05-19
+
+- Temporarily skip os-release tests because they don't work on Redhat. The fix is
+  already in branch more-os-release. Only the Linux::Ubuntu module uses
+  /etc/os-release right now, and that passes in CI.
+
 2.02    2024-05-15
 
 - Read /etc/os-release to detect Ubuntu instead of shelling out to `lsb_release`

@@ -24,5 +24,6 @@ Gene
 Synth
 dbname
 gene
+graphviz
 lib
 num
