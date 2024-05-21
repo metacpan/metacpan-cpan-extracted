@@ -19,6 +19,7 @@ WriteMakefile(
 		'DBD::XMLSimple' => 0.07,
 		'File::Spec' => 0,
 		'FindBin' => 0,
+		'Test::Carp' => 0,
 		'Test::Compile' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,

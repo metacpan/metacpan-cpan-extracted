@@ -1,0 +1,200 @@
+t/04-test.t .. 
+ok 1 - use KatoTest;
+# Subtest: new
+    1..48
+    ok 1 - my $obj = KatoTest->new({curae => 'geras', geras => 'penthos'})
+    ok 2 - $obj = KatoTest->new(curae => 'geras', geras => 'penthos')
+    ok 3 - An object of class 'KatoTest' isa 'KatoTest'
+    ok 4 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 5 - $obj = KatoTest->new({ aporia => { test => [] }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 6 - $obj = KatoTest->new({ aporia => { test => 'curae' }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 7 - $obj = KatoTest->new({ aporia => { test => undef }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 8 - $obj = KatoTest->new({ aporia => [], phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 9 - $obj = KatoTest->new({ aporia => 'gaudia', phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 10 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ [] ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 11 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ 'phobos' ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 12 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ undef ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 13 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 14 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 15 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => {}, curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 16 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => 'algea', curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 17 - $obj = KatoTest->new({aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos'})
+    ok 18 - $obj = KatoTest->new(aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos')
+    ok 19 - $obj->curae
+    ok 20 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ [], 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 21 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ \1, 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 22 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ undef, 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 23 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', [] ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 24 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 'thanatos' ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 25 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', undef ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 26 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 27 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => {}, thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 28 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => 'gaudia', thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 29 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => [] }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 30 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 'penthos' }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 31 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => undef }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 32 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => [], penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 33 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => 'curae', penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 34 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => [], nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 35 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => \1, nosoi => 10, hypnos => 'algea', geras => 'penthos' })
+    ok 36 - $obj = KatoTest->new({aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', hypnos => 'algea', geras => 'penthos'})
+    ok 37 - $obj = KatoTest->new(aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', hypnos => 'algea', geras => 'penthos')
+    ok 38 - $obj->nosoi
+    ok 39 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => [], hypnos => 'algea', geras => 'penthos' })
+    ok 40 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 'phobos', hypnos => 'algea', geras => 'penthos' })
+    ok 41 - $obj = KatoTest->new({aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, geras => 'penthos'})
+    ok 42 - $obj = KatoTest->new(aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, geras => 'penthos')
+    ok 43 - $obj->hypnos
+    ok 44 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => [], geras => 'penthos' })
+    ok 45 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => \1, geras => 'penthos' })
+    ok 46 - $obj = KatoTest->new({aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea'})
+    ok 47 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => [] })
+    ok 48 - $obj = KatoTest->new({ aporia => { test => 10 }, phobos => [ { 'test' => 'test' } ], curae => 'geras', gaudia => [ 'thanatos', 10 ], thanatos => { 'gaudia' => 10 }, penthos => 'curae', nosoi => 10, hypnos => 'algea', geras => \1 })
+ok 2 - new
+# Subtest: has curae
+    1..2
+    ok 1 - my $obj = KatoTest->new({curae => 'geras', geras => 'penthos'})
+    ok 2 - KatoTest->can('curae')
+ok 3 - has curae
+# Subtest: has penthos
+    1..7
+    ok 1 - my $obj = KatoTest->new({curae => 'geras', geras => 'penthos'})
+    ok 2 - KatoTest->can('penthos')
+    ok 3 - $obj->penthos
+    ok 4 - $obj->penthos('phobos')
+    ok 5 - $obj->penthos([])
+    ok 6 - $obj->penthos(\1)
+    ok 7 - $obj->penthos
+ok 4 - has penthos
+# Subtest: has phobos
+    1..12
+    ok 1 - my $obj = KatoTest->new({curae => 'geras', geras => 'penthos'})
+    ok 2 - KatoTest->can('phobos')
+    ok 3 - $obj->phobos
+    ok 4 - $obj->phobos([ { 'test' => 'test' } ])
+    ok 5 - $obj->phobos([ [] ])
+    ok 6 - $obj->phobos([ 'hypnos' ])
+    ok 7 - $obj->phobos([ undef ])
+    ok 8 - $obj->phobos([])
+    ok 9 - $obj->phobos([ { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' }, { 'test' => 'test' } ])
+    ok 10 - $obj->phobos({})
+    ok 11 - $obj->phobos('limos')
+    ok 12 - $obj->phobos
+ok 5 - has phobos
+# Subtest: has aporia
+    1..10
+    ok 1 - my $obj = KatoTest->new({curae => 'geras', geras => 'penthos'})
+    ok 2 - KatoTest->can('aporia')
+    ok 3 - $obj->aporia
+    ok 4 - $obj->aporia({ test => 10 })
+    ok 5 - $obj->aporia({ test => [] })
+    ok 6 - $obj->aporia({ test => 'limos' })
+    ok 7 - $obj->aporia({ test => undef })
+    ok 8 - $obj->aporia([])
+    ok 9 - $obj->aporia('geras')
+    ok 10 - $obj->aporia
+ok 6 - has aporia
+# Subtest: has thanatos
+    1..10
+    ok 1 - my $obj = KatoTest->new({curae => 'geras', geras => 'penthos'})
+    ok 2 - KatoTest->can('thanatos')
+    ok 3 - $obj->thanatos
+    ok 4 - $obj->thanatos({ 'geras' => 10 })
+    ok 5 - $obj->thanatos({ 'geras' => [] })
+    ok 6 - $obj->thanatos({ 'geras' => 'thanatos' })
+    ok 7 - $obj->thanatos({ 'geras' => undef })
+    ok 8 - $obj->thanatos([])
+    ok 9 - $obj->thanatos('nosoi')
+    ok 10 - $obj->thanatos
+ok 7 - has thanatos
+# Subtest: has gaudia
+    1..14
+    ok 1 - my $obj = KatoTest->new({curae => 'geras', geras => 'penthos'})
+    ok 2 - KatoTest->can('gaudia')
+    ok 3 - $obj->gaudia
+    ok 4 - $obj->gaudia([ 'geras', 10 ])
+    ok 5 - $obj->gaudia([ [], 10 ])
+    ok 6 - $obj->gaudia([ \1, 10 ])
+    ok 7 - $obj->gaudia([ undef, 10 ])
+    ok 8 - $obj->gaudia([ 'geras', [] ])
+    ok 9 - $obj->gaudia([ 'geras', 'hypnos' ])
+    ok 10 - $obj->gaudia([ 'geras', undef ])
+    ok 11 - $obj->gaudia([])
+    ok 12 - $obj->gaudia({})
+    ok 13 - $obj->gaudia('aporia')
+    ok 14 - $obj->gaudia
+ok 8 - has gaudia
+# Subtest: has nosoi
+    1..6
+    ok 1 - my $obj = KatoTest->new({curae => 'geras', geras => 'penthos'})
+    ok 2 - KatoTest->can('nosoi')
+    ok 3 - $obj->nosoi(10)
+    ok 4 - $obj->nosoi([])
+    ok 5 - $obj->nosoi('hypnos')
+    ok 6 - $obj->nosoi
+ok 9 - has nosoi
+# Subtest: clear_nosoi
+    1..5
+    ok 1 - my $obj = KatoTest->new({curae => 'geras', geras => 'penthos'})
+    ok 2 - KatoTest->can('clear_nosoi')
+    ok 3 - $obj->nosoi(10)
+    ok 4 - $obj->clear_nosoi
+    ok 5 - $obj->nosoi
+ok 10 - clear_nosoi
+# Subtest: has hypnos
+    1..6
+    ok 1 - my $obj = KatoTest->new({curae => 'geras', geras => 'penthos'})
+    ok 2 - KatoTest->can('hypnos')
+    ok 3 - $obj->hypnos('gaudia')
+    ok 4 - $obj->hypnos([])
+    ok 5 - $obj->hypnos(\1)
+    ok 6 - $obj->hypnos
+ok 11 - has hypnos
+# Subtest: has_hypnos
+    1..6
+    ok 1 - my $obj = KatoTest->new({curae => 'geras', geras => 'penthos'})
+    ok 2 - KatoTest->can('has_hypnos')
+    ok 3 - do{ delete $obj->{hypnos}; 1;}
+    not ok 4 - $obj->has_hypnos
+    ok 5 - $obj->hypnos('hypnos')
+    ok 6 - $obj->has_hypnos
+not ok 12 - has_hypnos
+# Subtest: clear_hypnos
+    1..5
+    ok 1 - my $obj = KatoTest->new({curae => 'geras', geras => 'penthos'})
+    ok 2 - KatoTest->can('clear_hypnos')
+    ok 3 - $obj->hypnos('limos')
+    ok 4 - $obj->clear_hypnos
+    ok 5 - $obj->hypnos
+ok 13 - clear_hypnos
+# Subtest: has geras
+    1..6
+    ok 1 - my $obj = KatoTest->new({curae => 'geras', geras => 'penthos'})
+    ok 2 - KatoTest->can('geras')
+    ok 3 - $obj->geras('gaudia')
+    ok 4 - $obj->geras([])
+    ok 5 - $obj->geras(\1)
+    ok 6 - $obj->geras
+ok 14 - has geras
+# Subtest: limos
+    1..8
+    ok 1 - my $obj = KatoTest->new({curae => 'geras', geras => 'penthos'})
+    ok 2 - KatoTest->can('limos')
+    ok 3 - $obj->limos([])
+    ok 4 - $obj->limos(\1)
+    ok 5 - $obj->penthos(2) && $obj->nosoi(2) && $obj->curae(5)
+    ok 6 - $obj->limos("yay")
+    ok 7 - $obj->penthos(5)
+    ok 8 - $obj->limos("yay")
+ok 15 - limos
+1..15
+Dubious, test returned 1 (wstat 256, 0x100)
+Failed 1/15 subtests 
+
+Test Summary Report
+-------------------
+t/04-test.t (Wstat: 256 Tests: 15 Failed: 1)
+  Failed test:  12
+  Non-zero exit status: 1
+Files=1, Tests=15,  0 wallclock secs ( 0.01 usr  0.00 sys +  0.30 cusr  0.01 csys =  0.32 CPU)
+Result: FAIL

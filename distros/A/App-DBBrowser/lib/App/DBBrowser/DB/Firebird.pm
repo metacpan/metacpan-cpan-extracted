@@ -145,12 +145,14 @@ sub get_databases {
             return $saved_databases;
         }
         elsif ( $choice eq $confirm ) {
-            $ax->write_json( $file_firebird_dbs, $databases );
+            if ( $changed ) {
+                $ax->write_json( $file_firebird_dbs, $databases );
+            }
             return $databases;
         }
         elsif ( $choice eq $add ) {
             my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
-            my $new = $tu->choose_a_file( {
+            my $new = $tu->choose_a_file( { ##
                 file_type => 'Database',
                 prompt_file_dir => 'Choose the database location:' }
             );

@@ -8,6 +8,8 @@ App::Codit::Plugins::SearchReplace - plugin for App::Codit
 
 use strict;
 use warnings;
+use vars qw( $VERSION );
+$VERSION = 0.03;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 require Tk::LabFrame;
@@ -540,7 +542,7 @@ sub Unload {
 	$self->extGet('ToolPanel')->deletePage('SearchReplace');
 	my $id = $self->{REFRESHID};
 	$self->afterCancel($id) if defined $id;
-	return 1
+	return $self->SUPER::Unload
 }
 
 =head1 LICENSE

@@ -80,13 +80,65 @@ Displays the version number on the command line and exits.
 
 * You can specify a list of items by separating them with a ':'.
 
+=head1 TROUBLESHOOTING
+
+Just hoping you never need this.
+
+=head2 General troubleshooting
+
+If you encounter problems and error messages using Codit here are some general troubleshooting steps:
+
+=over 4
+
+=item Use the -config command line option to point to a new, preferably fresh settingsfolder.
+
+=item Use the -noplugins command line option to launch Codit without any plugins loaded.
+
+=item Use the -plugins command line option to launch Codit with only the plugins loaded you specify here.
+
+=back
+
+=head2 No icons
+
+If Codit launches without any icons do one or more of the following:
+
+=over 4
+
+=item Check if your icon theme is based on scalable vectors. Install Icons::LibRSVG if so. See also the Readme.md that comes with this distribution.
+
+=item Locate where your icons are located on your system and use the -iconpath command line option to point there.
+
+=item Select an icon library by using the -icontheme command line option.
+
+=back
+
+=head2 Session will not load
+
+Sometimes it happens that a session file gets corrupted. You solve it like this:
+
+=over 4
+
+=item Launch the session manager. Menu->Session->Manage sessions.
+
+=item Remove the affected session.
+
+=item Rebuild it from scratch.
+
+=back
+
+Sorry, that is all we have to offer.
+
+=head3 Report a bug
+
+If all fails you are welcome to open a ticket here: L<https://github.com/haje61/App-Codit/issues>.
+
 =cut
 
 use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.01";
+$VERSION="0.03";
 use Tk;
 require App::Codit::CodeTextManager;
 

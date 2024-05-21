@@ -39,11 +39,11 @@ subtest 'build_has' => sub {
 	);
 	can_ok( $obj, 'build_has' );
 	eval { $obj->build_has( [] ) };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->build_has([])} );
-	eval { $obj->build_has('penthos') };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_has('penthos')} );
+	eval { $obj->build_has('algea') };
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->build_has('algea')} );
 };
 subtest 'build_accessor_predicate' => sub {
 	plan tests => 6;
@@ -51,29 +51,29 @@ subtest 'build_accessor_predicate' => sub {
 		q{my $obj = Hades::Realm::Moose->new({})}
 	);
 	can_ok( $obj, 'build_accessor_predicate' );
-	eval { $obj->build_accessor_predicate( [], 'phobos' ) };
+	eval { $obj->build_accessor_predicate( [], 'penthos' ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_predicate([], 'phobos')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->build_accessor_predicate([], 'penthos')}
 	);
-	eval { $obj->build_accessor_predicate( \1, 'phobos' ) };
+	eval { $obj->build_accessor_predicate( \1, 'penthos' ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_predicate(\1, 'phobos')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->build_accessor_predicate(\1, 'penthos')}
 	);
-	eval { $obj->build_accessor_predicate( 'algea', [] ) };
+	eval { $obj->build_accessor_predicate( 'hypnos', [] ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_predicate('algea', [])}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->build_accessor_predicate('hypnos', [])}
 	);
-	eval { $obj->build_accessor_predicate( 'algea', \1 ) };
+	eval { $obj->build_accessor_predicate( 'hypnos', \1 ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_predicate('algea', \1)}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->build_accessor_predicate('hypnos', \1)}
 	);
 };
 subtest 'build_accessor_clearer' => sub {
@@ -82,29 +82,29 @@ subtest 'build_accessor_clearer' => sub {
 		q{my $obj = Hades::Realm::Moose->new({})}
 	);
 	can_ok( $obj, 'build_accessor_clearer' );
-	eval { $obj->build_accessor_clearer( [], 'limos' ) };
+	eval { $obj->build_accessor_clearer( [], 'aporia' ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_clearer([], 'limos')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->build_accessor_clearer([], 'aporia')}
 	);
-	eval { $obj->build_accessor_clearer( \1, 'limos' ) };
+	eval { $obj->build_accessor_clearer( \1, 'aporia' ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_clearer(\1, 'limos')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->build_accessor_clearer(\1, 'aporia')}
 	);
-	eval { $obj->build_accessor_clearer( 'hypnos', [] ) };
+	eval { $obj->build_accessor_clearer( 'thanatos', [] ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_clearer('hypnos', [])}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->build_accessor_clearer('thanatos', [])}
 	);
-	eval { $obj->build_accessor_clearer( 'hypnos', \1 ) };
+	eval { $obj->build_accessor_clearer( 'thanatos', \1 ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_clearer('hypnos', \1)}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->build_accessor_clearer('thanatos', \1)}
 	);
 };
 subtest 'build_accessor_builder' => sub {
@@ -113,29 +113,29 @@ subtest 'build_accessor_builder' => sub {
 		q{my $obj = Hades::Realm::Moose->new({})}
 	);
 	can_ok( $obj, 'build_accessor_builder' );
-	eval { $obj->build_accessor_builder( [], 'algea' ) };
+	eval { $obj->build_accessor_builder( [], 'aporia' ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_builder([], 'algea')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->build_accessor_builder([], 'aporia')}
 	);
-	eval { $obj->build_accessor_builder( \1, 'algea' ) };
+	eval { $obj->build_accessor_builder( \1, 'aporia' ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_builder(\1, 'algea')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->build_accessor_builder(\1, 'aporia')}
 	);
-	eval { $obj->build_accessor_builder( 'penthos', [] ) };
+	eval { $obj->build_accessor_builder( 'phobos', [] ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_builder('penthos', [])}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->build_accessor_builder('phobos', [])}
 	);
-	eval { $obj->build_accessor_builder( 'penthos', \1 ) };
+	eval { $obj->build_accessor_builder( 'phobos', \1 ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_builder('penthos', \1)}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->build_accessor_builder('phobos', \1)}
 	);
 };
 done_testing();

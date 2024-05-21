@@ -8,11 +8,14 @@ App::Codit::Plugins::PodViewer - plugin for App::Codit
 
 use strict;
 use warnings;
+use vars qw( $VERSION );
+$VERSION = 0.03;
 
-use base qw( Tk::AppWindow::BaseClasses::PluginJobs );
+use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
 require Tk::NoteBook;
 require Tk::Pod::Text;
+use Tk;
 
 =head1 DESCRIPTION
 
@@ -36,15 +39,34 @@ sub new {
 
 	$self->{DOCS} = {};
 	$self->{MODIFIEDSAVE} = {};
-	$self->interval(1000);
+	$self->{ACTIVEDELAY} = 300;
+	$self->cmdHookAfter('modified', 'activate', $self);
 	$self->cmdHookAfter('doc_close', 'docCloseAfter', $self);
 	$self->cmdHookBefore('doc_close', 'docBefore', $self);
 	$self->cmdConfig(
 		flip_pod => ['FlipPod', $self],
 	);
-	$self->jobStart('PodViewer', 'RefreshCycle', $self);
 	return $self;
 }
+
+sub activate {
+	my $self = shift;
+	my ($name) = @_;
+	$name = $self->extGet('CoditMDI')->docSelected unless defined $name;
+	my $id = $self->{'active_id'};
+	$self->afterCancel($id) if defined $id;
+	return @_ unless (defined $name) and $name;
+	return @_ unless exists $self->{DOCS}->{$name};
+	$self->{'active_id'} = $self->after($self->activeDelay, ['Refresh', $self, $name]);
+	return @_;
+}
+
+sub activeDelay {
+	my $self = shift;
+	$self->{ACTIVEDELAY} = shift if @_;
+	return $self->{ACTIVEDELAY}
+}
+
 
 sub docCloseAfter {
 	my ($self, $result) = @_;
@@ -178,8 +200,8 @@ sub PodRemove {
 	my $d = $docs->{$name};
 	return unless defined $d;
 	my ($pod, $adj, $podframe) = @$d;
-	$adj->destroy if defined $adj;
-	$podframe->destroy if defined $podframe;
+	$adj->destroy if (defined $adj) and Exists($adj);
+	$podframe->destroy if (defined $podframe) and Exists($podframe);
 	delete $docs->{$name};
 	delete $self->{MODIFIEDSAVE}->{$name};
 }
@@ -196,26 +218,6 @@ sub Refresh {
 	$self->configPut(-title => $title);
 }
 
-sub RefreshCycle {
-	my $self = shift;
-	my $mdi = $self->extGet('CoditMDI');
-	my $name = $mdi->docSelected;
-	my $docs = $self->{DOCS};
-	if (defined $name) {
-		if (exists $docs->{$name}) {
-			my $widg = $mdi->docGet($name)->CWidg;
-			my $em = $widg->editModified;
-			my $modified = $self->{MODIFIEDSAVE}->{$name};
-			if (defined $modified) {
-				$self->Refresh($name) if $em ne $modified
-			} else {
-				$self->Refresh($name)
-			}
-			$self->{MODIFIEDSAVE}->{$name} = $em;
-		}
-	}
-}
-
 sub ToolItems {
 	return (
 		[	'tool_separator',],
@@ -230,12 +232,14 @@ sub Quit {
 
 sub Unload {
 	my $self = shift;
-	$self->SUPER::Unload;
 	my @pods = $self->PodList;
 	for (@pods) { $self->PodRemove($_) }
 	unlink $self->PodFile;
+	$self->cmdUnhookAfter('modified', 'activate', $self);
+	$self->cmdUnhookAfter('doc_close', 'docCloseAfter', $self);
+	$self->cmdUnhookBefore('doc_close', 'docBefore', $self);
 	$self->cmdRemove('flip_pod');
-	return 1
+	return $self->SUPER::Unload
 }
 
 =head1 LICENSE

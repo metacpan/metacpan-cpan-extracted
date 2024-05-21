@@ -56,9 +56,9 @@ sub function_with_one_col {
     elsif ( $func eq 'DATEADD' ) {
         my ( $amount, $unit ) = @$args;
         return                                         if ! defined $amount || ! defined $unit;
-        return "DATETIME($col,'$amount $unit')"        if $driver eq 'SQLite';
+        return "DATETIME($col,$amount || ' $unit')"    if $driver eq 'SQLite';
         return "DATE_ADD($col,INTERVAL $amount $unit)" if $driver =~ /^(?:mysql|MariaDB)\z/;
-        return "$col + INTERVAL '$amount $unit'"       if $driver eq 'Pg';
+        return "$col + $amount * INTERVAL '1 $unit'"   if $driver eq 'Pg';
         return "ADD_${unit}S($col,$amount)"            if $driver eq 'DB2';
         return "$col + $amount UNITS $unit"            if $driver eq 'Informix';
         return "DATEADD($unit,$amount,$col)";

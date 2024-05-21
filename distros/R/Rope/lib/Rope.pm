@@ -1,7 +1,7 @@
 package Rope;
 
 use 5.006; use strict; use warnings;
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 use Rope::Object;
 my (%META, %PRO);
 our @ISA;
@@ -380,6 +380,7 @@ BEGIN {
 				$self = bless $self, $caller;
 				my $build = $PRO{clone}($META{$caller});
 				for (keys %params) {
+					next if $_ =~ m/^_/;
 					if ($build->{properties}->{$_}) {
 						if ($build->{properties}->{$_}->{initable}) {
 							$build->{properties}->{$_}->{value} = $params{$_};
@@ -623,7 +624,7 @@ Rope - Tied objects
 
 =head1 VERSION
 
-Version 0.35
+Version 0.36
 
 =cut
 

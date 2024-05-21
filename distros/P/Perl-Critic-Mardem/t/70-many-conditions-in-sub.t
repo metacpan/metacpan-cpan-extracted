@@ -7,7 +7,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 use Readonly;
 use Perl::Critic;
@@ -135,7 +135,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/subroutine\s"my_test"\s.+\scondition\scount\s[(]2[)]/aaixmso,
+    like $desc, qr/subroutine\s"my_test"\s.+\scondition\scount\s[(]2[)]/ixmso,
         'violation description correct with value 2';
 }
 
@@ -378,10 +378,10 @@ Markus Demml, mardem@cpan.com
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2022, Markus Demml
+Copyright (c) 2024, Markus Demml
 
-This library is free software; you can redistribute it and/or modify it 
-under the same terms as the Perl 5 programming language system itself. 
+This library is free software; you can redistribute it and/or modify it
+under the same terms as the Perl 5 programming language system itself.
 The full text of this license can be found in the LICENSE file included
 with this module.
 

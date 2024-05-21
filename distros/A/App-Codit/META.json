@@ -50,6 +50,6 @@
          "web" : "https://github.com/haje61/App-Codit"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

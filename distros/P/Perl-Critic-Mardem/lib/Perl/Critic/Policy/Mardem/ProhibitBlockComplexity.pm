@@ -7,11 +7,11 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 use Readonly;
 
-use Perl::Critic::Utils qw{ :severities :data_conversion :classification };
+use Perl::Critic::Utils         qw{ :severities :data_conversion :classification };
 use Perl::Critic::Utils::McCabe qw{ calculate_mccabe_of_main };
 
 use Perl::Critic::Mardem::Util qw( search_for_block_keyword );
@@ -127,7 +127,7 @@ Markus Demml, mardem@cpan.com
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2022, Markus Demml
+Copyright (c) 2024, Markus Demml
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as the Perl 5 programming language system itself.

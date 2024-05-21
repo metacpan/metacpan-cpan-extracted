@@ -241,9 +241,9 @@ sub col_function {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $driver = $sf->{i}{driver};
-    my $rx_only_func        = join( '|', $now, $rand );
-    my $rx_multi_col_func   = join( '|', $concat, $coalesce );
-    my $rx_to_format_func   = join( '|', $to_char, $to_date, $to_timestamp, $to_timestamp_tz, $to_number, $strftime, $date_format, $format, $str_to_date );
+    my $rx_func_only        = join( '|', $now, $rand );
+    my $rx_func_multi_col   = join( '|', $concat, $coalesce );
+    my $rx_func_to_format   = join( '|', $to_char, $to_date, $to_timestamp, $to_timestamp_tz, $to_number, $strftime, $date_format, $format, $str_to_date );
     my $hidden = 'Scalar functions:';
     my $info = $ax->get_sql_info( $sql );
     my $old_idx_cat = 1;
@@ -304,10 +304,10 @@ sub col_function {
             my $func = $menu->[$idx_func] =~ s/^-\s//r;
             push @{$r_data->{nested_func}}, $func;
             my $function_stmt;
-            if ( $func =~ /^(?:$rx_only_func)\z/ ) {
+            if ( $func =~ /^(?:$rx_func_only)\z/ ) {
                 $function_stmt =  $sf->__func_with_no_col( $func );
             }
-            elsif ( $func =~ /^(?:$rx_multi_col_func)\z/ ) {
+            elsif ( $func =~ /^(?:$rx_func_multi_col)\z/ ) {
                 my $chosen_cols = $sf->__choose_columns( $sql, $clause, $info, $qt_cols, $r_data );
                 if ( ! defined $chosen_cols ) {
                     if ( @{$r_data->{nested_func}} == 1 ) {
@@ -345,7 +345,7 @@ sub col_function {
                             { prompt => 'Data type: ', history => [ sort qw(VARCHAR CHAR TEXT INT DECIMAL DATE DATETIME TIME TIMESTAMP) ], unquote => 1 },
                         ];
                     }
-                    elsif ( $func =~ /^(?:$rx_to_format_func)\z/ ) {
+                    elsif ( $func =~ /^(?:$rx_func_to_format)\z/ ) {
                         $args_data = [
                             { prompt => 'Format: ', history => $sf->__format_history( $func ) },
                         ];
@@ -492,7 +492,7 @@ sub __func_with_one_col {
               is_numeric => $arg_data->{is_numeric} }
         );
         #last if ! defined $arg; ##
-        if ( ! length $arg || $arg eq "''" ) { ##
+        if ( ! length $arg || $arg eq "''" ) {
             if ( $func eq $replace && @$args == 1 ) {
                 # replacement_string: an empty string is a valid argument
                 $arg = '';

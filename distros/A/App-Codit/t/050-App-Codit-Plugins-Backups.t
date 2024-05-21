@@ -4,7 +4,7 @@ use warnings;
 use Tk;
 
 use Test::Tk;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use File::Spec;
 $mwclass = 'App::Codit';
 #$quitdelay = 2500;
@@ -18,10 +18,21 @@ createapp(
 	-configfolder => File::Spec->rel2abs('t/settings'),
 );
 
+my $pext;
+if (defined $app) {
+	$pext = $app->extGet('Plugins');
+}
 push @tests, (
 	[ sub { 
-		return $app->extGet('Plugins')->plugExists('Backups') 
+		return $pext->plugExists('Backups') 
 	}, 1, 'Plugin Backups loaded' ],
+	[ sub {
+		pause(100);
+		$pext->plugUnload('Backups');
+		my $b = $pext->plugGet('Backups');
+		return defined $b 
+#		return $pext->plugExists('Backups') 
+	}, '', 'Plugin Backups unloaded' ],
 );
 
 starttesting;

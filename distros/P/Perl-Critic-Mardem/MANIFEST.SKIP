@@ -3,10 +3,14 @@ ignore.txt
 .gitattributes
 .includepath
 .project
+.settings/
+.idea/
 
 .git/
 
 _dev/
+Perl-Critic-Mardem/
+Perl-Critic-Mardem-Src/
 
 Makefile
 Makefile.old
@@ -25,3 +29,5 @@ pod2htm*.tmp
 pm_to_blib
 Perl-Critic-Mardem-*
 Perl-Critic-Mardem-*.tar.gz
+_Deparsed_XSubs.pm
+MANIFEST.bak

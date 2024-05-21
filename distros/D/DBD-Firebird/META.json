@@ -54,6 +54,6 @@
          "url" : "https://github.com/mariuz/perl-dbd-firebird"
       }
    },
-   "version" : "1.37",
+   "version" : "1.38",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

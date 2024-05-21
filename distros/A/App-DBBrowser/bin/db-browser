@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.014;
-our $VERSION = '2.410';
+our $VERSION = '2.411';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.410
+Version 2.411
 
 =head1 SYNOPSIS
 
@@ -238,9 +238,52 @@ Choosing one of the tables leads to the I<SQL Menu>.
 
 I<Derived> is available if enabled in L</Extensions>.
 
+Enter a subquery and use it as a table.
+
+By selecting the I<Read-Line> menu entry, the user is asked for the query.
+
+If stored statements are available, it is also possible to select one of those statements instead of entering a query.
+
+Previously entered queries and the last statements printed with I<Print TABLE> are stored temporarily.
+
+Statements can be saved permanently in the submenu, which opens by selecting the prompt line in the I<Subquery> menu
+(I<Choose:>).
+
 =head3 Cte
 
 Common table expression, available if enabled in L</Extensions>.
+
+=over
+
+=item New Cte
+
+The user is asked for the CTE query and the CTE name. The syntax of the CTE name is:
+
+    [RECURSIVE] cte_name [(col_name [, col_name] ...)]
+
+Some database types build recursive CTEs without the C<RECURSIVE> keyword.
+
+By selecting the I<Read-Line> menu entry, the user can enter the query.
+
+If stored statements are available, it is also possible to select one of those statements instead of entering a query.
+
+Previously entered queries and the last statements printed with I<Print TABLE> are stored temporarily.
+
+Statements can be saved permanently in the submenu, which opens by selecting the prompt line in the I<CTE> menu
+(I<Choose:>).
+
+=item Available Ctes
+
+Select from the available ctes.
+
+=item Reset
+
+Removes ctes. In Join and Union: ctes that are used directly or indirectly are retained when I<Reset> pressed.
+
+Don't use the I<Reset> button when in a CTE special tables such as subqueries or functions are joined with an implicit
+join.
+
+=back
 
 =head3 Join
 
@@ -676,35 +719,7 @@ Add menu entries to menus:
 
 =item Derived Table
 
-Enter a subquery and use it as a table.
-
-By selecting the I<Read-Line> menu entry, the user is asked for the query.
-
-If stored statements are available, it is also possible to select one of those statements instead of entering a query.
-
-Previously entered queries and the last statements printed with I<Print TABLE> are stored temporarily.
-
-Statements can be saved permanently in the submenu, which opens by selecting the prompt line in the I<Subquery> menu
-(I<Choose:>).
-
 =item Cte
-
-The user is asked for the CTE query and the CTE name. The syntax of the CTE name is:
-
-    [RECURSIVE] cte_name [(col_name [, col_name] ...)]
-
-Some database types build recursive CTEs without the C<RECURSIVE> keyword.
-
-By selecting the I<Read-Line> menu entry, the user can enter the query.
-
-If stored statements are available, it is also possible to select one of those statements instead of entering a query.
-
-Previously entered queries and the last statements printed with I<Print TABLE> are stored temporarily.
-
-Statements can be saved permanently in the submenu, which opens by selecting the prompt line in the I<CTE> menu
-(I<Choose:>).
-
-Certain uses of CTEs are not supported.
 
 =item Join
 

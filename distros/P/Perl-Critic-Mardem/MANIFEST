@@ -4,12 +4,17 @@ lib/Perl/Critic/Mardem.pm
 lib/Perl/Critic/Mardem/Util.pm
 lib/Perl/Critic/Policy/Mardem/ProhibitBlockComplexity.pm
 lib/Perl/Critic/Policy/Mardem/ProhibitConditionComplexity.pm
+lib/Perl/Critic/Policy/Mardem/ProhibitFileSize.pm
 lib/Perl/Critic/Policy/Mardem/ProhibitLargeBlock.pm
+lib/Perl/Critic/Policy/Mardem/ProhibitLargeFile.pm
 lib/Perl/Critic/Policy/Mardem/ProhibitLargeSub.pm
 lib/Perl/Critic/Policy/Mardem/ProhibitManyConditionsInSub.pm
 lib/Perl/Critic/Policy/Mardem/ProhibitReturnBooleanAsInt.pm
 LICENSE
 MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
 README
 README.md
 t/10-rquire.t
@@ -20,9 +25,9 @@ t/50-large-sub.t
 t/60-large-block.t
 t/70-many-conditions-in-sub.t
 t/80-boolean-as-int.t
+t/90-large-file.t
+t/95-file-size.t
+t/test_data/Some-Script.pl
 xt/10-manifest.t
 xt/80-pod.t
 xt/90-pod-coverage.t
-META.yml
-META.json
-MANIFEST.SKIP

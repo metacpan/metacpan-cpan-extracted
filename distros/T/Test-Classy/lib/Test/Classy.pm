@@ -5,8 +5,9 @@ use warnings;
 use Test::More ();
 use Test::Classy::Util;
 use Sub::Install qw( install_sub );
+use Class::Inspector;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 my @tests;
 my $caller = caller;
@@ -32,7 +33,7 @@ install_sub({
   into => $caller,
   code => sub ($) {
     my $moniker = shift;
-    unless ($moniker->can('import')) {
+    unless (Class::Inspector->loaded($moniker)) {
       eval "require $moniker" or die $@;
     }
     push @tests, $moniker;
@@ -73,8 +74,6 @@ install_sub({
 
 sub _look_for_tests {
   my @queue = @_;
-
-  require Class::Inspector;
 
   unless (@queue) {
     @queue = grep { $_ ne 'main' }

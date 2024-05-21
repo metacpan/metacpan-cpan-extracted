@@ -1,0 +1,8 @@
+Changes
+lib/Tk/DynaMouseWheelBind.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/Tk-DynaMouseWheelBind.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

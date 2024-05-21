@@ -15,6 +15,7 @@ t/comment-spelling.t
 t/csv.t
 t/eof.t
 t/eol.t
+t/error.t
 t/lib/Database/test1.pm
 t/lib/Database/test2.pm
 t/lib/Database/test3.pm

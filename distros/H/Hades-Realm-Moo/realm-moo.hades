@@ -2,7 +2,7 @@ lib lib
 tlib t
 author LNATION
 email email@lnation.org
-version 0.06
+version 0.07
 Hades::Realm::Moo base Hades::Realm::OO {
 	abstract { Hades realm for Moo }
 	synopsis {

@@ -4,7 +4,7 @@ use strict;
 use FindBin qw($Bin);
 
 use lib 't/lib';
-use Test::Most tests => 11;
+use Test::Most tests => 12;
 
 use_ok('Database::test1');
 
@@ -37,3 +37,12 @@ if($ENV{'TEST_VERBOSE'}) {
 }
 
 cmp_ok(scalar(@rc), '==', 3, 'selectall_hashref returns all entries');
+
+my $entry = $test1->entry(number => 2);
+
+if($ENV{'TEST_VERBOSE'}) {
+	use Data::Dumper;
+	diag(Data::Dumper->new([\@rc])->Dump());
+}
+
+cmp_ok($entry, 'eq', 'two', 'look up a key');

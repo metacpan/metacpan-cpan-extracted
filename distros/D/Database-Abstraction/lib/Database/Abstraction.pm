@@ -25,6 +25,7 @@ Database::Abstraction - database abstraction layer
 #	new(database => 'redis://servername');
 # TODO:	Add a "key" property, defaulting to "entry", which would be the name of the key
 # TODO:	The maximum number to return should be tuneable (as a LIMIT)
+# TODO:	Investigate XML::Hash
 
 use warnings;
 use strict;
@@ -39,15 +40,15 @@ use File::Temp;
 use Carp;
 
 our %defaults;
-use constant	MAX_SLURP_SIZE => 16 * 1024;	# CSV files <= than this size are read into memory
+use constant	DEFAULT_MAX_SLURP_SIZE => 16 * 1024;	# CSV files <= than this size are read into memory
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -123,6 +124,7 @@ Arguments:
 cache => place to store results;
 cache_duration => how long to store results in the cache (default is 1 hour);
 directory => where the database file is held
+max_slurp_size => CSV/PSV files smaller than this are held in RAM (default is 16K)
 
 If the arguments are not set, tries to take from class level defaults.
 
@@ -167,7 +169,13 @@ sub new {
 		# no_entry => $args{'no_entry'} || 0,
 	# }, $class;
 	# Reseen keys take precedence, so defaults come first
-	return bless { no_entry => 0, cache_duration => '1 hour', %defaults, %args }, $class;
+	return bless {
+		no_entry => 0,
+		cache_duration => '1 hour',
+		max_slurp_size => DEFAULT_MAX_SLURP_SIZE,
+		%defaults,
+		%args
+	}, $class;
 }
 
 =head2	set_logger
@@ -332,7 +340,7 @@ sub _open {
 			# $self->{'data'} = Text::CSV::Slurp->load(file => $slurp_file, %options);
 
 			# FIXME: Text::xSV::Slurp can't cope well with quotes in field contents
-			if((-s $slurp_file) <= MAX_SLURP_SIZE) {
+			if((-s $slurp_file) <= $self->{'max_slurp_size'}) {
 				require Text::xSV::Slurp;
 				Text::xSV::Slurp->import();
 
@@ -382,7 +390,7 @@ sub _open {
 				$dbh->func($table, 'XML', $slurp_file, 'xmlsimple_import');
 			} else {
 				# throw Error(-file => "$dir/$table");
-				croak("Can't file a $table database in $dir");
+				croak("Can't find a $table database in $dir");
 			}
 			$self->{'type'} = 'XML';
 		}
@@ -398,12 +406,16 @@ sub _open {
 =head2	selectall_hashref
 
 Returns a reference to an array of hash references of all the data meeting
-the given criteria
+the given criteria.
+
+Note that since this returns an array ref,
+optimisations such as "LIMIT 1" will not be used.
 
 =cut
 
 sub selectall_hashref {
 	my $self = shift;
+
 	my @rc = $self->selectall_hash(@_);
 	return \@rc;
 }
@@ -457,22 +469,21 @@ sub selectall_hash {
 			my @call_details = caller(0);
 			# throw Error::Simple("$query: value for $c1 is not defined in call from " .
 				# $call_details[2] . ' of ' . $call_details[1]);
-			croak("$query: value for $c1 is not defined in call from ",
+			Carp::croak("$query: value for $c1 is not defined in call from ",
 				$call_details[2], ' of ', $call_details[1]);
 		}
+
+		my $keyword;
 		if($done_where) {
-			if($arg =~ /\@/) {
-				$query .= " AND $c1 LIKE ?";
-			} else {
-				$query .= " AND $c1 = ?";
-			}
+			$keyword = 'AND';
 		} else {
-			if($arg =~ /\@/) {
-				$query .= " WHERE $c1 LIKE ?";
-			} else {
-				$query .= " WHERE $c1 = ?";
-			}
+			$keyword = 'WHERE';
 			$done_where = 1;
+		}
+		if($arg =~ /\@/) {
+			$query .= " $keyword $c1 LIKE ?";
+		} else {
+			$query .= " $keyword $c1 = ?";
 		}
 		push @query_args, $arg;
 	}
@@ -549,7 +560,7 @@ sub fetchrow_hashref {
 	my $self = shift;
 	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	my $table = $self->{'table'} || ref($self);
+	my $table = $params{'table'} || $self->{'table'} || ref($self);
 	$table =~ s/.*:://;
 
 	$self->_open() if(!$self->{$table});
@@ -575,21 +586,33 @@ sub fetchrow_hashref {
 	my @query_args;
 	foreach my $c1(sort keys(%params)) {	# sort so that the key is always the same
 		if(my $arg = $params{$c1}) {
+			my $keyword;
+
+				if(ref($arg)) {
+					if($self->{'logger'}) {
+						$self->{'logger'}->fatal("selectall_hash $query: argument is not a string");
+					}
+					# throw Error::Simple("$query: argument is not a string: " . ref($arg));
+					croak("$query: argument is not a string: ", ref($arg));
+				}
 			if($done_where) {
-				if($arg =~ /\@/) {
-					$query .= " AND $c1 LIKE ?";
-				} else {
-					$query .= " AND $c1 = ?";
-				}
+				$keyword = 'AND';
 			} else {
-				if($arg =~ /\@/) {
-					$query .= " WHERE $c1 LIKE ?";
-				} else {
-					$query .= " WHERE $c1 = ?";
-				}
+				$keyword = 'WHERE';
 				$done_where = 1;
 			}
+			if($arg =~ /\@/) {
+				$query .= " $keyword $c1 LIKE ?";
+			} else {
+				$query .= " $keyword $c1 = ?";
+			}
 			push @query_args, $arg;
+		} elsif(!defined($arg)) {
+			my @call_details = caller(0);
+			# throw Error::Simple("$query: value for $c1 is not defined in call from " .
+				# $call_details[2] . ' of ' . $call_details[1]);
+			Carp::croak("$query: value for $c1 is not defined in call from ",
+				$call_details[2], ' of ', $call_details[1]);
 		}
 	}
 	# $query .= ' ORDER BY entry LIMIT 1';
@@ -699,7 +722,7 @@ If the database has a column called "entry" you can do a quick lookup with
 
     my $value = $foo->column('123');	# where "column" is the value you're after
 
-Set distinct to 1 if you're after a unique list.
+Set distinct or unique to 1 if you're after a unique list.
 
 =cut
 
@@ -732,7 +755,7 @@ sub AUTOLOAD {
 
 	my $query;
 	my $done_where = 0;
-	my $distinct = delete($params{'distinct'});
+	my $distinct = delete($params{'distinct'}) || delete($params{'unique'});
 
 	if(wantarray && !$distinct) {
 		if(((scalar keys %params) == 0) && (my $data = $self->{'data'})) {
@@ -795,9 +818,8 @@ sub AUTOLOAD {
 				}
 			} else {
 				# It's keyed, but we're not querying off it
-				die scalar keys %params;	# I don't think this code can be reached - let's verify that
 				my ($key, $value) = %params;
-				while(my $row = (values %{$data})) {
+				foreach my $row (values %{$data}) {
 					if(($row->{$key} eq $value) && (my $rc = $row->{$column})) {
 						if($self->{'logger'}) {
 							if(defined($rc)) {

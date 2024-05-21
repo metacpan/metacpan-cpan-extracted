@@ -1,4 +1,4 @@
-package Tk::AppWindow::Plugins::Console;
+package App::Codit::Plugins::Console;
 
 =head1 NAME
 
@@ -8,6 +8,8 @@ App::Codit::Plugins::Console - plugin for App::Codit
 
 use strict;
 use warnings;
+use vars qw( $VERSION );
+$VERSION = 0.03;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -25,6 +27,11 @@ sub new {
 	return undef unless defined $self;
 	
 	return $self;
+}
+
+sub Unload {
+	my $self = shift;
+	return $self->SUPER::Unload
 }
 
 =head1 LICENSE

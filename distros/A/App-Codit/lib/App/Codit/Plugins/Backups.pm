@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw( $VERSION );
-$VERSION = 0.01;
+$VERSION = 0.03;
 
 use File::Basename;
 use File::Path qw(make_path);
@@ -210,11 +210,14 @@ sub Quit {
 
 sub Unload {
 	my $self = shift;
-	$self->SUPER::Unload;
 	$self->cmdUnhookBefore('deferred_open', 'openDocBefore', $self);
 	$self->cmdUnhookAfter('doc_close', 'closeDocAfter', $self);
 	$self->cmdUnhookBefore('doc_rename', 'docRenameBefore', $self);
 	$self->cmdUnhookAfter('doc_save', 'saveDocAfter', $self);
+	# TODO Change this after new version of Tk::AppWindow
+	#return $self->SUPER::Unload;
+	$self->SUPER::Unload;
+	return 1
 }
 
 =head1 LICENSE

@@ -7,12 +7,12 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 use Test2::V0;
 use Test2::Tools::Exception qw/lives/;
 
-plan 'tests' => 8;
+plan 'tests' => 10;
 
 ok( lives {
         require Perl::Critic::Mardem;
@@ -25,22 +25,32 @@ ok( lives {
 );
 
 ok( lives {
-        require Perl::Critic::Policy::Mardem::ProhibitConditionComplexity;
-    }
-);
-
-ok( lives {
         require Perl::Critic::Policy::Mardem::ProhibitBlockComplexity;
     }
 );
 
 ok( lives {
-        require Perl::Critic::Policy::Mardem::ProhibitLargeSub;
+        require Perl::Critic::Policy::Mardem::ProhibitConditionComplexity;
+    }
+);
+
+ok( lives {
+        require Perl::Critic::Policy::Mardem::ProhibitFileSize;
     }
 );
 
 ok( lives {
         require Perl::Critic::Policy::Mardem::ProhibitLargeBlock;
+    }
+);
+
+ok( lives {
+        require Perl::Critic::Policy::Mardem::ProhibitLargeFile;
+    }
+);
+
+ok( lives {
+        require Perl::Critic::Policy::Mardem::ProhibitLargeSub;
     }
 );
 
@@ -82,7 +92,7 @@ Markus Demml, mardem@cpan.com
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2022, Markus Demml
+Copyright (c) 2024, Markus Demml
 
 This library is free software; you can redistribute it and/or modify it 
 under the same terms as the Perl 5 programming language system itself. 

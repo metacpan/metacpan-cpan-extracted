@@ -7,7 +7,7 @@
 #             ANY CHANGE MADE HERE WILL BE LOST !
 #
 ####################################################################
-package XDR::Parse v0.2.0;
+package XDR::Parse v0.3.0;
 use vars qw ( @ISA );
 use strict;
 
@@ -29,124 +29,123 @@ sub new {
 [
 	{#State 0
 		ACTIONS => {
-			"enum" => 8,
-			"struct" => 9,
-			"union" => 5,
-			'PASSTHROUGH' => 1,
-			'PREPROC' => 11,
+			'PREPROC' => 5,
+			"enum" => 11,
+			'PASSTHROUGH' => 12,
+			"union" => 8,
+			"const" => 2,
 			"typedef" => 3,
-			"const" => 10
+			"struct" => 4
 		},
 		GOTOS => {
-			'definitions' => 6,
-			'constantDef' => 2,
-			'definition' => 7,
-			'typeDef' => 12,
-			'specification' => 4
+			'definition' => 6,
+			'specification' => 1,
+			'constantDef' => 9,
+			'definitions' => 7,
+			'typeDef' => 10
 		}
 	},
 	{#State 1
-		DEFAULT => -5
+		ACTIONS => {
+			'' => 13
+		}
 	},
 	{#State 2
-		DEFAULT => -8
+		ACTIONS => {
+			'IDENT' => 14
+		}
 	},
 	{#State 3
 		ACTIONS => {
-			"long" => 28,
-			"quadruple" => 29,
-			"int" => 31,
-			"float" => 30,
-			"union" => 27,
-			"char" => 24,
-			"double" => 23,
-			'IDENT' => 26,
-			"unsigned" => 21,
-			"opaque" => 22,
-			"string" => 20,
+			'IDENT' => 22,
+			"union" => 23,
+			"opaque" => 25,
+			"bool" => 26,
+			"quadruple" => 15,
 			"struct" => 17,
-			"void" => 19,
-			"hyper" => 16,
-			"bool" => 15,
-			"short" => 13,
-			"enum" => 14
+			"string" => 16,
+			"int" => 18,
+			"unsigned" => 19,
+			"void" => 20,
+			"enum" => 32,
+			"short" => 33,
+			"long" => 27,
+			"hyper" => 29,
+			"char" => 28,
+			"float" => 30,
+			"double" => 31
 		},
 		GOTOS => {
-			'declaration' => 25,
-			'typeSpecifier' => 18
+			'declaration' => 24,
+			'typeSpecifier' => 21
 		}
 	},
 	{#State 4
 		ACTIONS => {
-			'' => 32
+			'IDENT' => 34
 		}
 	},
 	{#State 5
-		ACTIONS => {
-			'IDENT' => 33
-		}
+		DEFAULT => -6
 	},
 	{#State 6
 		ACTIONS => {
-			'TRAILING_COMMENT' => 34
-		},
-		DEFAULT => -1
-	},
-	{#State 7
-		ACTIONS => {
-			"const" => 10,
-			'PREPROC' => 11,
-			"union" => 5,
-			"struct" => 9,
+			"const" => 2,
 			"typedef" => 3,
-			'PASSTHROUGH' => 1,
-			"enum" => 8
+			"struct" => 4,
+			'PREPROC' => 5,
+			"union" => 8,
+			'PASSTHROUGH' => 12,
+			"enum" => 11
 		},
 		DEFAULT => -3,
 		GOTOS => {
-			'typeDef' => 12,
-			'definition' => 7,
+			'definition' => 6,
+			'constantDef' => 9,
 			'definitions' => 35,
-			'constantDef' => 2
+			'typeDef' => 10
 		}
+	},
+	{#State 7
+		ACTIONS => {
+			'TRAILING_COMMENT' => 36
+		},
+		DEFAULT => -1
 	},
 	{#State 8
-		ACTIONS => {
-			'IDENT' => 36
-		}
-	},
-	{#State 9
 		ACTIONS => {
 			'IDENT' => 37
 		}
 	},
+	{#State 9
+		DEFAULT => -8
+	},
 	{#State 10
+		DEFAULT => -7
+	},
+	{#State 11
 		ACTIONS => {
 			'IDENT' => 38
 		}
 	},
-	{#State 11
-		DEFAULT => -6
-	},
 	{#State 12
-		DEFAULT => -7
+		DEFAULT => -5
 	},
 	{#State 13
-		DEFAULT => -34
+		DEFAULT => 0
 	},
 	{#State 14
 		ACTIONS => {
-			"{" => 39
-		},
-		GOTOS => {
-			'enumBody' => 40
+			"=" => 39
 		}
 	},
 	{#State 15
-		DEFAULT => -43
+		DEFAULT => -42
 	},
 	{#State 16
-		DEFAULT => -38
+		ACTIONS => {
+			'IDENT' => 40
+		}
 	},
 	{#State 17
 		ACTIONS => {
@@ -157,288 +156,293 @@ sub new {
 		}
 	},
 	{#State 18
-		ACTIONS => {
-			'IDENT' => 43,
-			"*" => 44
-		}
+		DEFAULT => -30
 	},
 	{#State 19
-		DEFAULT => -60
+		ACTIONS => {
+			"int" => 47,
+			"long" => 43,
+			"short" => 46,
+			"char" => 44,
+			"hyper" => 45
+		}
 	},
 	{#State 20
-		ACTIONS => {
-			'IDENT' => 45
-		}
+		DEFAULT => -60
 	},
 	{#State 21
 		ACTIONS => {
-			"int" => 49,
-			"long" => 48,
-			"hyper" => 46,
-			"char" => 50,
-			"short" => 47
+			'IDENT' => 48,
+			"*" => 49
 		}
 	},
 	{#State 22
-		ACTIONS => {
-			'IDENT' => 51
-		}
+		DEFAULT => -47
 	},
 	{#State 23
-		DEFAULT => -41
+		ACTIONS => {
+			"switch" => 50
+		},
+		GOTOS => {
+			'switch' => 51
+		}
 	},
 	{#State 24
-		DEFAULT => -32
-	},
-	{#State 25
 		ACTIONS => {
 			";" => 52
 		}
 	},
-	{#State 26
-		DEFAULT => -47
-	},
-	{#State 27
+	{#State 25
 		ACTIONS => {
-			"switch" => 53
-		},
-		GOTOS => {
-			'switch' => 54
+			'IDENT' => 53
 		}
 	},
-	{#State 28
+	{#State 26
+		DEFAULT => -43
+	},
+	{#State 27
 		DEFAULT => -36
 	},
+	{#State 28
+		DEFAULT => -32
+	},
 	{#State 29
-		DEFAULT => -42
+		DEFAULT => -38
 	},
 	{#State 30
 		DEFAULT => -40
 	},
 	{#State 31
-		DEFAULT => -30
+		DEFAULT => -41
 	},
 	{#State 32
-		DEFAULT => 0
-	},
-	{#State 33
 		ACTIONS => {
-			"switch" => 53
+			"{" => 54
 		},
 		GOTOS => {
-			'switch' => 55
+			'enumBody' => 55
 		}
 	},
+	{#State 33
+		DEFAULT => -34
+	},
 	{#State 34
-		DEFAULT => -2
+		ACTIONS => {
+			"{" => 41
+		},
+		GOTOS => {
+			'structBody' => 56
+		}
 	},
 	{#State 35
 		DEFAULT => -4
 	},
 	{#State 36
-		ACTIONS => {
-			"{" => 39
-		},
-		GOTOS => {
-			'enumBody' => 56
-		}
+		DEFAULT => -2
 	},
 	{#State 37
 		ACTIONS => {
-			"{" => 41
+			"switch" => 50
 		},
 		GOTOS => {
-			'structBody' => 57
+			'switch' => 57
 		}
 	},
 	{#State 38
 		ACTIONS => {
-			"=" => 58
+			"{" => 54
+		},
+		GOTOS => {
+			'enumBody' => 58
 		}
 	},
 	{#State 39
 		ACTIONS => {
+			'CONST' => 59,
 			'IDENT' => 60
-		},
-		GOTOS => {
-			'enumItems' => 61,
-			'enumItem' => 59
 		}
 	},
 	{#State 40
-		DEFAULT => -44
+		ACTIONS => {
+			"<" => 61
+		}
 	},
 	{#State 41
 		ACTIONS => {
-			"enum" => 14,
-			"short" => 13,
-			"bool" => 15,
-			"hyper" => 16,
-			"struct" => 17,
-			"void" => 19,
-			"string" => 20,
-			"unsigned" => 21,
-			"opaque" => 22,
-			"double" => 23,
-			"char" => 24,
-			'IDENT' => 26,
-			"union" => 27,
-			"long" => 28,
-			"int" => 31,
-			"quadruple" => 29,
-			"float" => 30
+			"short" => 33,
+			"enum" => 32,
+			"float" => 30,
+			"double" => 31,
+			"hyper" => 29,
+			"char" => 28,
+			"long" => 27,
+			"bool" => 26,
+			"opaque" => 25,
+			'IDENT' => 22,
+			"union" => 23,
+			"void" => 20,
+			"int" => 18,
+			"unsigned" => 19,
+			"quadruple" => 15,
+			"string" => 16,
+			"struct" => 17
 		},
 		GOTOS => {
-			'structItem' => 63,
-			'typeSpecifier' => 18,
-			'structItems' => 64,
-			'declaration' => 62
+			'structItem' => 64,
+			'declaration' => 62,
+			'typeSpecifier' => 21,
+			'structItems' => 63
 		}
 	},
 	{#State 42
 		DEFAULT => -45
 	},
 	{#State 43
+		DEFAULT => -37
+	},
+	{#State 44
+		DEFAULT => -33
+	},
+	{#State 45
+		DEFAULT => -39
+	},
+	{#State 46
+		DEFAULT => -35
+	},
+	{#State 47
+		DEFAULT => -31
+	},
+	{#State 48
 		ACTIONS => {
 			"<" => 65,
 			"[" => 66
 		},
 		DEFAULT => -50
 	},
-	{#State 44
+	{#State 49
 		ACTIONS => {
 			'IDENT' => 67
 		}
 	},
-	{#State 45
-		ACTIONS => {
-			"<" => 68
-		}
-	},
-	{#State 46
-		DEFAULT => -39
-	},
-	{#State 47
-		DEFAULT => -35
-	},
-	{#State 48
-		DEFAULT => -37
-	},
-	{#State 49
-		DEFAULT => -31
-	},
 	{#State 50
-		DEFAULT => -33
+		ACTIONS => {
+			"(" => 68
+		}
 	},
 	{#State 51
-		ACTIONS => {
-			"[" => 70,
-			"<" => 69
-		}
+		DEFAULT => -46
 	},
 	{#State 52
 		DEFAULT => -9
 	},
 	{#State 53
 		ACTIONS => {
-			"(" => 71
+			"[" => 69,
+			"<" => 70
 		}
 	},
 	{#State 54
-		DEFAULT => -46
+		ACTIONS => {
+			'IDENT' => 73
+		},
+		GOTOS => {
+			'enumItem' => 71,
+			'enumItems' => 72
+		}
 	},
 	{#State 55
-		ACTIONS => {
-			";" => 72
-		}
+		DEFAULT => -44
 	},
 	{#State 56
-		ACTIONS => {
-			";" => 73
-		}
-	},
-	{#State 57
 		ACTIONS => {
 			";" => 74
 		}
 	},
+	{#State 57
+		ACTIONS => {
+			";" => 75
+		}
+	},
 	{#State 58
 		ACTIONS => {
-			'IDENT' => 75,
-			'CONST' => 76
+			";" => 76
 		}
 	},
 	{#State 59
 		ACTIONS => {
-			"," => 77
-		},
-		DEFAULT => -27
+			";" => 77
+		}
 	},
 	{#State 60
 		ACTIONS => {
-			"=" => 78
+			";" => 78
 		}
 	},
 	{#State 61
 		ACTIONS => {
-			"}" => 79
+			'CONST' => 80,
+			'IDENT' => 79,
+			">" => 81
+		},
+		GOTOS => {
+			'value' => 82
 		}
 	},
 	{#State 62
 		ACTIONS => {
-			";" => 80
+			";" => 83
 		}
 	},
 	{#State 63
 		ACTIONS => {
-			"void" => 19,
-			"struct" => 17,
-			"string" => 20,
-			"short" => 13,
-			"enum" => 14,
-			"hyper" => 16,
-			"bool" => 15,
-			"union" => 27,
-			"float" => 30,
-			"quadruple" => 29,
-			"int" => 31,
-			"long" => 28,
-			"opaque" => 22,
-			"unsigned" => 21,
-			'IDENT' => 26,
-			"double" => 23,
-			"char" => 24
-		},
-		DEFAULT => -23,
-		GOTOS => {
-			'typeSpecifier' => 18,
-			'structItem' => 63,
-			'structItems' => 81,
-			'declaration' => 62
+			"}" => 84
 		}
 	},
 	{#State 64
 		ACTIONS => {
-			"}" => 82
+			"bool" => 26,
+			"opaque" => 25,
+			"union" => 23,
+			'IDENT' => 22,
+			"void" => 20,
+			"unsigned" => 19,
+			"int" => 18,
+			"struct" => 17,
+			"string" => 16,
+			"quadruple" => 15,
+			"short" => 33,
+			"enum" => 32,
+			"double" => 31,
+			"float" => 30,
+			"char" => 28,
+			"hyper" => 29,
+			"long" => 27
+		},
+		DEFAULT => -23,
+		GOTOS => {
+			'structItems' => 85,
+			'typeSpecifier' => 21,
+			'declaration' => 62,
+			'structItem' => 64
 		}
 	},
 	{#State 65
 		ACTIONS => {
-			'CONST' => 86,
-			">" => 85,
-			'IDENT' => 84
+			">" => 87,
+			'IDENT' => 79,
+			'CONST' => 80
 		},
 		GOTOS => {
-			'value' => 83
+			'value' => 86
 		}
 	},
 	{#State 66
 		ACTIONS => {
-			'IDENT' => 84,
-			'CONST' => 86
+			'IDENT' => 79,
+			'CONST' => 80
 		},
 		GOTOS => {
-			'value' => 87
+			'value' => 88
 		}
 	},
 	{#State 67
@@ -446,19 +450,33 @@ sub new {
 	},
 	{#State 68
 		ACTIONS => {
-			'IDENT' => 84,
-			'CONST' => 86,
-			">" => 89
+			"short" => 33,
+			"enum" => 32,
+			"char" => 28,
+			"hyper" => 29,
+			"float" => 30,
+			"double" => 31,
+			"long" => 27,
+			"opaque" => 25,
+			"bool" => 26,
+			"union" => 23,
+			'IDENT' => 22,
+			"void" => 20,
+			"quadruple" => 15,
+			"struct" => 17,
+			"string" => 16,
+			"int" => 18,
+			"unsigned" => 19
 		},
 		GOTOS => {
-			'value' => 88
+			'typeSpecifier' => 21,
+			'declaration' => 89
 		}
 	},
 	{#State 69
 		ACTIONS => {
-			'IDENT' => 84,
-			">" => 91,
-			'CONST' => 86
+			'CONST' => 80,
+			'IDENT' => 79
 		},
 		GOTOS => {
 			'value' => 90
@@ -466,186 +484,169 @@ sub new {
 	},
 	{#State 70
 		ACTIONS => {
-			'IDENT' => 84,
-			'CONST' => 86
+			'CONST' => 80,
+			'IDENT' => 79,
+			">" => 92
 		},
 		GOTOS => {
-			'value' => 92
+			'value' => 91
 		}
 	},
 	{#State 71
 		ACTIONS => {
-			"unsigned" => 21,
-			"opaque" => 22,
-			"char" => 24,
-			"double" => 23,
-			'IDENT' => 26,
-			"union" => 27,
-			"long" => 28,
-			"float" => 30,
-			"quadruple" => 29,
-			"int" => 31,
-			"short" => 13,
-			"enum" => 14,
-			"hyper" => 16,
-			"bool" => 15,
-			"struct" => 17,
-			"void" => 19,
-			"string" => 20
+			"," => 93
 		},
-		GOTOS => {
-			'declaration' => 93,
-			'typeSpecifier' => 18
-		}
+		DEFAULT => -27
 	},
 	{#State 72
-		DEFAULT => -12
+		ACTIONS => {
+			"}" => 94
+		}
 	},
 	{#State 73
-		DEFAULT => -10
+		ACTIONS => {
+			"=" => 95
+		}
 	},
 	{#State 74
 		DEFAULT => -11
 	},
 	{#State 75
-		ACTIONS => {
-			";" => 94
-		}
+		DEFAULT => -12
 	},
 	{#State 76
-		ACTIONS => {
-			";" => 95
-		}
+		DEFAULT => -10
 	},
 	{#State 77
-		ACTIONS => {
-			'IDENT' => 60
-		},
-		GOTOS => {
-			'enumItems' => 96,
-			'enumItem' => 59
-		}
+		DEFAULT => -13
 	},
 	{#State 78
-		ACTIONS => {
-			'IDENT' => 84,
-			'CONST' => 86
-		},
-		GOTOS => {
-			'value' => 97
-		}
+		DEFAULT => -14
 	},
 	{#State 79
-		DEFAULT => -26
-	},
-	{#State 80
-		DEFAULT => -25
-	},
-	{#State 81
-		DEFAULT => -24
-	},
-	{#State 82
-		DEFAULT => -22
-	},
-	{#State 83
-		ACTIONS => {
-			">" => 98
-		}
-	},
-	{#State 84
 		DEFAULT => -49
 	},
-	{#State 85
-		DEFAULT => -52
-	},
-	{#State 86
+	{#State 80
 		DEFAULT => -48
 	},
-	{#State 87
+	{#State 81
+		DEFAULT => -57
+	},
+	{#State 82
 		ACTIONS => {
-			"]" => 99
+			">" => 96
 		}
+	},
+	{#State 83
+		DEFAULT => -25
+	},
+	{#State 84
+		DEFAULT => -22
+	},
+	{#State 85
+		DEFAULT => -24
+	},
+	{#State 86
+		ACTIONS => {
+			">" => 97
+		}
+	},
+	{#State 87
+		DEFAULT => -52
 	},
 	{#State 88
 		ACTIONS => {
-			">" => 100
+			"]" => 98
 		}
 	},
 	{#State 89
-		DEFAULT => -57
+		ACTIONS => {
+			")" => 99
+		}
 	},
 	{#State 90
+		ACTIONS => {
+			"]" => 100
+		}
+	},
+	{#State 91
 		ACTIONS => {
 			">" => 101
 		}
 	},
-	{#State 91
-		DEFAULT => -55
-	},
 	{#State 92
-		ACTIONS => {
-			"]" => 102
-		}
+		DEFAULT => -55
 	},
 	{#State 93
 		ACTIONS => {
-			")" => 103
+			'IDENT' => 73
+		},
+		GOTOS => {
+			'enumItem' => 71,
+			'enumItems' => 102
 		}
 	},
 	{#State 94
-		DEFAULT => -14
+		DEFAULT => -26
 	},
 	{#State 95
-		DEFAULT => -13
+		ACTIONS => {
+			'IDENT' => 79,
+			'CONST' => 80
+		},
+		GOTOS => {
+			'value' => 103
+		}
 	},
 	{#State 96
-		DEFAULT => -28
+		DEFAULT => -58
 	},
 	{#State 97
-		DEFAULT => -29
-	},
-	{#State 98
 		DEFAULT => -53
 	},
-	{#State 99
+	{#State 98
 		DEFAULT => -51
 	},
+	{#State 99
+		ACTIONS => {
+			"{" => 104
+		}
+	},
 	{#State 100
-		DEFAULT => -58
+		DEFAULT => -54
 	},
 	{#State 101
 		DEFAULT => -56
 	},
 	{#State 102
-		DEFAULT => -54
+		DEFAULT => -28
 	},
 	{#State 103
-		ACTIONS => {
-			"{" => 104
-		}
+		DEFAULT => -29
 	},
 	{#State 104
 		ACTIONS => {
-			"case" => 105
+			"case" => 108
 		},
 		GOTOS => {
 			'caseClauses' => 107,
-			'caseBody' => 106,
-			'caseClause' => 108
+			'caseClause' => 106,
+			'caseBody' => 105
 		}
 	},
 	{#State 105
 		ACTIONS => {
-			'CONST' => 86,
-			'IDENT' => 84
-		},
-		GOTOS => {
-			'value' => 109
+			"}" => 109
 		}
 	},
 	{#State 106
 		ACTIONS => {
-			"}" => 110
+			"case" => 108
+		},
+		DEFAULT => -18,
+		GOTOS => {
+			'caseClause' => 106,
+			'caseClauses' => 110
 		}
 	},
 	{#State 107
@@ -659,81 +660,80 @@ sub new {
 	},
 	{#State 108
 		ACTIONS => {
-			"case" => 105
+			'CONST' => 80,
+			'IDENT' => 79
 		},
-		DEFAULT => -18,
 		GOTOS => {
-			'caseClause' => 108,
-			'caseClauses' => 113
+			'value' => 113
 		}
 	},
 	{#State 109
-		ACTIONS => {
-			":" => 114
-		}
+		DEFAULT => -15
 	},
 	{#State 110
-		DEFAULT => -15
+		DEFAULT => -19
 	},
 	{#State 111
 		ACTIONS => {
-			":" => 115
+			":" => 114
 		}
 	},
 	{#State 112
 		DEFAULT => -17
 	},
 	{#State 113
-		DEFAULT => -19
+		ACTIONS => {
+			":" => 115
+		}
 	},
 	{#State 114
 		ACTIONS => {
-			"long" => 28,
+			"enum" => 32,
+			"short" => 33,
+			"long" => 27,
+			"double" => 31,
 			"float" => 30,
-			"int" => 31,
-			"quadruple" => 29,
-			"union" => 27,
-			"double" => 23,
-			"char" => 24,
-			'IDENT' => 26,
-			"unsigned" => 21,
-			"opaque" => 22,
-			"string" => 20,
+			"char" => 28,
+			"hyper" => 29,
+			"union" => 23,
+			'IDENT' => 22,
+			"bool" => 26,
+			"opaque" => 25,
+			"unsigned" => 19,
+			"int" => 18,
+			"string" => 16,
 			"struct" => 17,
-			"void" => 19,
-			"bool" => 15,
-			"hyper" => 16,
-			"enum" => 14,
-			"short" => 13
+			"quadruple" => 15,
+			"void" => 20
 		},
 		GOTOS => {
-			'declaration' => 116,
-			'typeSpecifier' => 18
+			'typeSpecifier' => 21,
+			'declaration' => 116
 		}
 	},
 	{#State 115
 		ACTIONS => {
-			"struct" => 17,
-			"void" => 19,
-			"string" => 20,
-			"short" => 13,
-			"enum" => 14,
-			"bool" => 15,
-			"hyper" => 16,
-			"union" => 27,
-			"long" => 28,
+			"long" => 27,
+			"hyper" => 29,
+			"char" => 28,
 			"float" => 30,
-			"quadruple" => 29,
-			"int" => 31,
-			"unsigned" => 21,
-			"opaque" => 22,
-			"double" => 23,
-			"char" => 24,
-			'IDENT' => 26
+			"double" => 31,
+			"enum" => 32,
+			"short" => 33,
+			"quadruple" => 15,
+			"string" => 16,
+			"struct" => 17,
+			"int" => 18,
+			"unsigned" => 19,
+			"void" => 20,
+			'IDENT' => 22,
+			"union" => 23,
+			"opaque" => 25,
+			"bool" => 26
 		},
 		GOTOS => {
-			'typeSpecifier' => 18,
-			'declaration' => 117
+			'declaration' => 117,
+			'typeSpecifier' => 21
 		}
 	},
 	{#State 116
@@ -747,10 +747,10 @@ sub new {
 		}
 	},
 	{#State 118
-		DEFAULT => -20
+		DEFAULT => -21
 	},
 	{#State 119
-		DEFAULT => -21
+		DEFAULT => -20
 	}
 ],
                                   yyrules  =>
@@ -885,11 +885,12 @@ sub
 #line 88 "xdr.yp"
 {
                   +{ discriminator => {
+                        name => delete $_[3]->{name},
                         declaration => $_[3],
                         comments => $_[2]->{comments},
                         trailing_comments => $_[4]->{comments}
                      },
-                     handlers => {
+                     members => {
                         cases => $_[6]->{clauses},
                         default => $_[6]->{default},
                         comments => $_[5]->{comments},
@@ -903,31 +904,31 @@ sub
 	[#Rule 16
 		 'caseBody', 1,
 sub
-#line 107 "xdr.yp"
+#line 108 "xdr.yp"
 { +{ clauses => $_[1] } }
 	],
 	[#Rule 17
 		 'caseBody', 2,
 sub
-#line 108 "xdr.yp"
+#line 109 "xdr.yp"
 { +{ clauses => $_[1], default => $_[2] } }
 	],
 	[#Rule 18
 		 'caseClauses', 1,
 sub
-#line 112 "xdr.yp"
+#line 113 "xdr.yp"
 { [ $_[1] ] }
 	],
 	[#Rule 19
 		 'caseClauses', 2,
 sub
-#line 113 "xdr.yp"
+#line 114 "xdr.yp"
 { unshift @{ $_[2] }, $_[1]; $_[2] }
 	],
 	[#Rule 20
 		 'caseClause', 5,
 sub
-#line 117 "xdr.yp"
+#line 118 "xdr.yp"
 {
             $_[2]->{trailing_comments} = $_[3]->{comments};
             +{ value => $_[2],
@@ -940,10 +941,11 @@ sub
 	[#Rule 21
 		 'defaultClause', 4,
 sub
-#line 128 "xdr.yp"
+#line 129 "xdr.yp"
 {
             # What to do with comments on the ':'?
-            +{ declaration => $_[3],
+            +{ name => delete $_[3]->{name},
+               declaration => $_[3],
                comments => $_[1]->{comments},
                location => $_[1]->{location},
                trailing_comments => $_[4]->{comments} } }
@@ -951,8 +953,8 @@ sub
 	[#Rule 22
 		 'structBody', 3,
 sub
-#line 137 "xdr.yp"
-{ +{ fields => $_[2],
+#line 139 "xdr.yp"
+{ +{ members => $_[2],
                                      comments => $_[1]->{comments},
                                      location => $_[1]->{location},
                                      trailing_comments => $_[3]->{comments} } }
@@ -960,27 +962,28 @@ sub
 	[#Rule 23
 		 'structItems', 1,
 sub
-#line 144 "xdr.yp"
+#line 146 "xdr.yp"
 { [ $_[1] ] }
 	],
 	[#Rule 24
 		 'structItems', 2,
 sub
-#line 145 "xdr.yp"
+#line 147 "xdr.yp"
 { unshift @{ $_[2] }, $_[1]; $_[2] }
 	],
 	[#Rule 25
 		 'structItem', 2,
 sub
-#line 149 "xdr.yp"
+#line 151 "xdr.yp"
 {
-            +{ %{ $_[1] },
+            +{ name => delete $_[1]->{name},
+               declaration => $_[1],
                trailing_comments => $_[2]->{comments} } }
 	],
 	[#Rule 26
 		 'enumBody', 3,
 sub
-#line 155 "xdr.yp"
+#line 158 "xdr.yp"
 { +{ elements => $_[2],
                                      comments => $_[1]->{comments},
                                      location => $_[1]->{location},
@@ -989,20 +992,20 @@ sub
 	[#Rule 27
 		 'enumItems', 1,
 sub
-#line 162 "xdr.yp"
+#line 165 "xdr.yp"
 { [ $_[1] ] }
 	],
 	[#Rule 28
 		 'enumItems', 3,
 sub
-#line 163 "xdr.yp"
+#line 166 "xdr.yp"
 { $_[1]->{trailing_comments} = $_[2]->{comments};
                                   unshift @{ $_[3] }, $_[1]; $_[3] }
 	],
 	[#Rule 29
 		 'enumItem', 3,
 sub
-#line 168 "xdr.yp"
+#line 171 "xdr.yp"
 {
         # What to do with comments on the '=' sign?
         $_[1]->{trailing_comments} = $_[2]->{comments};
@@ -1014,109 +1017,109 @@ sub
 	[#Rule 30
 		 'typeSpecifier', 1,
 sub
-#line 178 "xdr.yp"
+#line 181 "xdr.yp"
 { +{ spec => 'primitive', name => 'int', unsigned => 0, comments => delete $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 31
 		 'typeSpecifier', 2,
 sub
-#line 179 "xdr.yp"
+#line 182 "xdr.yp"
 { +{ spec => 'primitive', name => 'int', unsigned => 1, comments => delete $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 32
 		 'typeSpecifier', 1,
 sub
-#line 180 "xdr.yp"
+#line 183 "xdr.yp"
 { +{ spec => 'primitive', name => 'char', unsigned => 0, comments => delete $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 33
 		 'typeSpecifier', 2,
 sub
-#line 181 "xdr.yp"
+#line 184 "xdr.yp"
 { +{ spec => 'primitive', name => 'char', unsigned => 1, comments => delete $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 34
 		 'typeSpecifier', 1,
 sub
-#line 182 "xdr.yp"
+#line 185 "xdr.yp"
 { +{ spec => 'primitive', name => 'short', unsigned => 0, comments => delete $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 35
 		 'typeSpecifier', 2,
 sub
-#line 183 "xdr.yp"
+#line 186 "xdr.yp"
 { +{ spec => 'primitive', name => 'short', unsigned => 1, comments => delete $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 36
 		 'typeSpecifier', 1,
 sub
-#line 184 "xdr.yp"
+#line 187 "xdr.yp"
 { +{ spec => 'primitive', name => 'long', unsigned => 0, comments => delete $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 37
 		 'typeSpecifier', 2,
 sub
-#line 185 "xdr.yp"
+#line 188 "xdr.yp"
 { +{ spec => 'primitive', name => 'long', unsigned => 1, comments => delete $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 38
 		 'typeSpecifier', 1,
 sub
-#line 186 "xdr.yp"
+#line 189 "xdr.yp"
 { +{ spec => 'primitive', name => 'hyper', unsigned => 0, comments => delete $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 39
 		 'typeSpecifier', 2,
 sub
-#line 187 "xdr.yp"
+#line 190 "xdr.yp"
 { +{ spec => 'primitive', name => 'hyper', unsigned => 1, comments => delete $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 40
 		 'typeSpecifier', 1,
 sub
-#line 188 "xdr.yp"
+#line 191 "xdr.yp"
 { +{ spec => 'primitive', name => 'float', comments => delete $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 41
 		 'typeSpecifier', 1,
 sub
-#line 189 "xdr.yp"
+#line 192 "xdr.yp"
 { +{ spec => 'primitive', name => 'double', comments => delete $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 42
 		 'typeSpecifier', 1,
 sub
-#line 190 "xdr.yp"
+#line 193 "xdr.yp"
 { +{ spec => 'primitive', name => 'quadruple', comments => delete $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 43
 		 'typeSpecifier', 1,
 sub
-#line 191 "xdr.yp"
+#line 194 "xdr.yp"
 { +{ spec => 'primitive', name => 'bool', comments => delete $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 44
 		 'typeSpecifier', 2,
 sub
-#line 192 "xdr.yp"
+#line 195 "xdr.yp"
 { +{ spec => 'enum', declaration => $_[2], comments => $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 45
 		 'typeSpecifier', 2,
 sub
-#line 193 "xdr.yp"
+#line 196 "xdr.yp"
 { +{ spec => 'struct', declaration => $_[2], comments => $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 46
 		 'typeSpecifier', 2,
 sub
-#line 194 "xdr.yp"
+#line 197 "xdr.yp"
 { +{ spec => 'union', declaration => $_[2], comments => $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 47
 		 'typeSpecifier', 1,
 sub
-#line 195 "xdr.yp"
+#line 198 "xdr.yp"
 { +{ spec => 'named', name => $_[1], comments => delete $_[1]->{comments}, location => $_[1]->{location} } }
 	],
 	[#Rule 48
@@ -1128,7 +1131,7 @@ sub
 	[#Rule 50
 		 'declaration', 2,
 sub
-#line 204 "xdr.yp"
+#line 207 "xdr.yp"
 {
             +{ name => $_[2],
                type => $_[1],
@@ -1138,7 +1141,7 @@ sub
 	[#Rule 51
 		 'declaration', 5,
 sub
-#line 209 "xdr.yp"
+#line 212 "xdr.yp"
 {
             +{ name => $_[2],
                type => $_[1],
@@ -1151,7 +1154,7 @@ sub
 	[#Rule 52
 		 'declaration', 4,
 sub
-#line 217 "xdr.yp"
+#line 220 "xdr.yp"
 {
             +{ name => $_[2],
                type => $_[1],
@@ -1164,7 +1167,7 @@ sub
 	[#Rule 53
 		 'declaration', 5,
 sub
-#line 225 "xdr.yp"
+#line 228 "xdr.yp"
 {
             +{ name => $_[2],
                type => $_[1],
@@ -1177,7 +1180,7 @@ sub
 	[#Rule 54
 		 'declaration', 5,
 sub
-#line 233 "xdr.yp"
+#line 236 "xdr.yp"
 {
             +{ name => $_[2],
                type => { spec => 'primitive', name => $_[1] },
@@ -1189,7 +1192,7 @@ sub
 	[#Rule 55
 		 'declaration', 4,
 sub
-#line 240 "xdr.yp"
+#line 243 "xdr.yp"
 {
             +{ name => $_[2],
                type => { spec => 'primitive', name => $_[1] },
@@ -1201,7 +1204,7 @@ sub
 	[#Rule 56
 		 'declaration', 5,
 sub
-#line 247 "xdr.yp"
+#line 250 "xdr.yp"
 {
             +{ name => $_[2],
                type => { spec => 'primitive', name => $_[1] },
@@ -1213,7 +1216,7 @@ sub
 	[#Rule 57
 		 'declaration', 4,
 sub
-#line 254 "xdr.yp"
+#line 257 "xdr.yp"
 {
             +{ name => $_[2],
                type => { spec => 'primitive', name => $_[1] },
@@ -1225,7 +1228,7 @@ sub
 	[#Rule 58
 		 'declaration', 5,
 sub
-#line 261 "xdr.yp"
+#line 264 "xdr.yp"
 {
             +{ name => $_[2],
                type => { spec => 'primitive', name => $_[1] },
@@ -1237,7 +1240,7 @@ sub
 	[#Rule 59
 		 'declaration', 3,
 sub
-#line 268 "xdr.yp"
+#line 271 "xdr.yp"
 {
             +{ name => $_[3],
                type => $_[1],
@@ -1248,7 +1251,7 @@ sub
 	[#Rule 60
 		 'declaration', 1,
 sub
-#line 274 "xdr.yp"
+#line 277 "xdr.yp"
 {
             +{ type => { spec => 'primitive', name => $_[1] },
                comments => delete $_[1]->{comments},
@@ -1259,7 +1262,7 @@ sub
     bless($self,$class);
 }
 
-#line 281 "xdr.yp"
+#line 284 "xdr.yp"
 
 
 
@@ -1340,7 +1343,7 @@ sub _Lexer {
           location => $token_start
       });
     }
-    elsif ($yydata->{INPUT} =~ s/^(-?\d+|0x\d+)(?=\b|$)//) {
+    elsif ($yydata->{INPUT} =~ s/^(-?\d+|0x[0-9a-f]+)(?=\b|$)//i) {
       $yydata->{COLNO} += length($&);
       return ('CONST', {
           content => $1,
@@ -1379,7 +1382,7 @@ sub parse {
 
 =head1 NAME
 
-XDR::Parse - Creation of an AST of an XDR specification
+XDR::Parse - Creation of an AST of an XDR specification (RFC4506)
 
 =head1 SYNOPSIS
 
@@ -1391,13 +1394,17 @@ XDR::Parse - Creation of an AST of an XDR specification
 
 =head1 VERSION
 
-0.2.0
+0.3.0
 
 =head1 DESCRIPTION
 
 This module contains a parser for the XDR (eXternal Data Representation)
-language.  The result is an abstract syntax tree (AST) which can be used
-for further processing.
+language as defined in RFC4506.  The result is an abstract syntax tree
+(AST) which can be used for further processing.
+
+This module extends the supported integer types with C<char>, C<short> and
+C<long>, all of which seem to be supported by C<rpcgen>, the tool consuming
+XDR to generate remote applications.
 
 =head2 AST
 
@@ -1467,8 +1474,9 @@ the node's hash:
 
 =item * C<numeric>
 
-  const my_const = 0x123;
-  const my_other_const = 123;
+  const my_const = 0x123;     # hexadecimal
+  const my_other_const = 123; # decimal
+  const my_third_const = 012; # octal
 
 =item * C<symbolic>
 
@@ -1510,21 +1518,21 @@ in the enum type.
 
 =head4 'struct' declarations
 
-Th C<declaration> node of C<struct> definitions has a single key (C<fields>):
-an array of nodes with C<name> and C<type> keys describing the fields of the
-struct type. For more details on the C<type> node, see below.
+Th C<declaration> node of C<struct> definitions has a single key (C<members>):
+an array of nodes with C<name> and C<declaration> keys describing the members
+of the struct type. For more details on the C<type> node, see below.
 
 =head4 'union' declarations
 
 The C<declaration> node of C<union> definitions has a single key (C<switch>):
-itself a node which contains a C<handlers> and a C<discriminator> key.  The
-discriminator node has a C<name> and a C<type> key; the C<handlers> node
+itself a node which contains a C<members> and a C<discriminator> key.  The
+discriminator node has a C<name> and a C<type> key; the C<members> node
 contains one or two keys: C<cases> and optionally C<default>.  C<cases> is an
-array of nodes defining the fields of the union; each element consists of
+array of nodes defining the members of the union; each element consists of
 three keys: C<value>, C<name> and <declaration>. C<value> is the value
 associated with the discriminator, to indicate the current definition.
-C<name> is the name of the field. C<declaration> contains the type declaration
-for the field.
+C<name> is the name of the member. C<declaration> contains the type declaration
+for the member.
 
 =head4 'declaration' nodes
 
@@ -1605,7 +1613,7 @@ Defines an inline union through the type's C<declaration> key.
 =back
 
 The node in the C<declaration> key of the inline C<enum>, C<struct> and C<union>
-fields follow the same pattern as documented in the respective sections on
+members follow the same pattern as documented in the respective sections on
 declarations above.
 
 =head1 METHODS

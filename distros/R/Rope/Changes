@@ -76,3 +76,6 @@ Revision history for Rope
 
 0.31	2024-05-10
 	- Allow the use of an arrayref to set multiple properties.
+
+0.36	2024-05-20
+	- Adds Rope::Handles::String, Rope::Handles::Number, Rope::Handles::Counter and Rope::Handles::Bool

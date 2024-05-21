@@ -31,6 +31,12 @@ sub delete {
 	return $self;
 }
 
+sub clear {
+	my ($self) = @_;
+	%{$self} = ();
+	return $self;
+}
+
 sub assign {
 	my ($self, @data) = @_;
 
@@ -81,11 +87,11 @@ __END__
 
 =head1 NAME
 
-Rope::Handles::Hash - Rope handles hash
+Rope::Handles::Hash - Rope handles hashes
 
 =head1 VERSION
 
-Version 0.35
+Version 0.36
 
 =cut
 
@@ -113,6 +119,33 @@ Version 0.35
 	);
 
 	...
+
+=head1 METHODS
+
+=head2 length
+
+=head2 get
+
+=head2 set
+
+=head2 delete
+
+=head2 clear
+
+=head2 assign
+
+=head2 each
+
+=head2 entries
+
+=head2 keys
+
+=head2 values
+
+=head2 freeze
+
+=head2 unfreeze
+
 
 =head1 AUTHOR
 

@@ -49,43 +49,54 @@
    "provides" : {
       "Perl::Critic::Mardem" : {
          "file" : "lib/Perl/Critic/Mardem.pm",
-         "version" : "0.02"
+         "version" : "0.05"
       },
       "Perl::Critic::Mardem::Util" : {
          "file" : "lib/Perl/Critic/Mardem/Util.pm",
-         "version" : "0.02"
+         "version" : "0.05"
       },
       "Perl::Critic::Policy::Mardem::ProhibitBlockComplexity" : {
          "file" : "lib/Perl/Critic/Policy/Mardem/ProhibitBlockComplexity.pm",
-         "version" : "0.02"
+         "version" : "0.05"
       },
       "Perl::Critic::Policy::Mardem::ProhibitConditionComplexity" : {
          "file" : "lib/Perl/Critic/Policy/Mardem/ProhibitConditionComplexity.pm",
-         "version" : "0.02"
+         "version" : "0.05"
+      },
+      "Perl::Critic::Policy::Mardem::ProhibitFileSize" : {
+         "file" : "lib/Perl/Critic/Policy/Mardem/ProhibitFileSize.pm",
+         "version" : "0.05"
       },
       "Perl::Critic::Policy::Mardem::ProhibitLargeBlock" : {
          "file" : "lib/Perl/Critic/Policy/Mardem/ProhibitLargeBlock.pm",
-         "version" : "0.02"
+         "version" : "0.05"
+      },
+      "Perl::Critic::Policy::Mardem::ProhibitLargeFile" : {
+         "file" : "lib/Perl/Critic/Policy/Mardem/ProhibitLargeFile.pm",
+         "version" : "0.05"
       },
       "Perl::Critic::Policy::Mardem::ProhibitLargeSub" : {
          "file" : "lib/Perl/Critic/Policy/Mardem/ProhibitLargeSub.pm",
-         "version" : "0.02"
+         "version" : "0.05"
       },
       "Perl::Critic::Policy::Mardem::ProhibitManyConditionsInSub" : {
          "file" : "lib/Perl/Critic/Policy/Mardem/ProhibitManyConditionsInSub.pm",
-         "version" : "0.02"
+         "version" : "0.05"
       },
       "Perl::Critic::Policy::Mardem::ProhibitReturnBooleanAsInt" : {
          "file" : "lib/Perl/Critic/Policy/Mardem/ProhibitReturnBooleanAsInt.pm",
-         "version" : "0.02"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "git://github.com/mardem1/perl-critic-mardem.git"
+      }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.08"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

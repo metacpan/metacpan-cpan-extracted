@@ -10,11 +10,11 @@ __END__
 
 =head1 NAME
 
-Rope::Handles::Array - Rope handles array
+Rope::Handles::Array - Rope handles arrays
 
 =head1 VERSION
 
-Version 0.35
+Version 0.36
 
 =cut
 
@@ -42,6 +42,8 @@ Version 0.35
 	);
 
 	...
+
+See L<Data::LnArray> for documentation
 
 =head1 AUTHOR
 

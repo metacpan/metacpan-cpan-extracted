@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.411  2024-05-20
+        - Bugfix aliases in 'order_by'.
+        - Pg and SQLite: bugfix in 'dateadd'.
+        - Bugfix window functions arguments.
+        - 'group_concat': add 'order by' if available.
+        - Update cte.
+
 2.410  2024-05-04
         - Derived table/Cte: bugfix in 'choose_query'.
         - Bugfix in 'Operators.pm'.

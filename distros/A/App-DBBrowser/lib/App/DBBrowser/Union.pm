@@ -38,9 +38,9 @@ sub union_tables {
     }
     my $data = [];
     my $used_tables = [];
-    #my $added_ctes = [];
     my $sql = {};
     $ax->reset_sql( $sql );
+    $sql->{ctes} = [ @{$sf->{d}{cte_history}} ];
     my $old_idx_tbl = 0;
 
     TABLE: while ( 1 ) {
@@ -58,7 +58,6 @@ sub union_tables {
         my $used = ' (used)';
         my @tmp_tables;
         for my $table ( @$tables ) {
-        #for my $table ( @$tables, @$added_ctes ) {
             if ( any { $_ eq $table } @$used_tables ) {
                 push @tmp_tables, '- ' . $table . $used;
             }
@@ -80,12 +79,8 @@ sub union_tables {
         if ( ! defined $idx_tbl || ! defined $menu->[$idx_tbl] ) {
             if ( @$used_tables ) {
                 $old_idx_tbl = 0;
-                my $removed_table = pop @$used_tables;
+                pop @$used_tables;
                 pop @$data;
-                if ( @{$sql->{ctes}} && $removed_table eq $sql->{ctes}[-1]{table} ) {
-                    pop @{$sql->{ctes}};
-                    #pop @$added_ctes;
-                }
                 next TABLE;
             }
             return;
@@ -129,41 +124,26 @@ sub union_tables {
         elsif ( $table eq $cte_table ) {
             my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
-            $table = $sq->prepare_and_add_cte( $sql );
+            $table = $sq->choose_cte( $sql );
             if ( ! defined $table ) {
                 next TABLE;
             }
             $qt_table = $table;
-            #push @$added_ctes, $table;
         }
         else {
             $table =~ s/^-\s//;
             $table =~ s/\Q$used\E\z//;
             $qt_table = $ax->quote_table( $sf->{d}{tables_info}{$table} );
-            #if ( exists $sf->{d}{tables_info}{$table} ) {
-            #    $qt_table = $ax->quote_table( $sf->{d}{tables_info}{$table} );
-            #}
-            #else {
-            #    $qt_table = $table; #  $added_ctes
-            #}
         }
         my $operator;
         if ( @$data ) {
             $operator = $sf->__set_operator( $sql, $table );
             if ( ! $operator ) {
-                if ( @{$sql->{ctes}} && $table eq $sql->{ctes}[-1]{table} ) {
-                    pop @{$sql->{ctes}};
-                    #pop @$added_ctes;
-                }
                 next TABLE;
             }
         }
         my $ok = $sf->__choose_table_columns( $sql, $data, $table, $qt_table, $operator ); ##
         if ( ! $ok ) {
-            if ( @{$sql->{ctes}} && $table eq $sql->{ctes}[-1]{table} ) {
-                pop @{$sql->{ctes}};
-                #pop @$added_ctes;
-            }
             next TABLE;
         }
         push @$used_tables, $table;
@@ -258,18 +238,26 @@ sub __choose_table_columns {
         }
         elsif ( $choices[0] eq $sf->{i}{menu_addition} ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            my $bu_sql = $ax->clone_data( $sql );
             $sql->{columns} = [ @$qt_columns  ];
-            my $complex_col = $ext->column( $sql, 'Union' );
-            $sql->{columns} = [];
+            $sql->{selected_cols} = [ @{$data->[$idx]{chosen_qt_cols}} ];
+            $sql->{alias} = $ax->clone_data( $data->[$idx]{qt_alias} );
+            my $complex_col = $ext->column( $sql, 'select' );
+            $sql = $bu_sql;
             if ( ! defined $complex_col ) {
                 next COLUMNS;
             }
-            my $default = 'col_' . ( @{$data->[$idx]{chosen_qt_cols}} + 1 );
-            my $alias = $ax->alias( $sql, 'select_complex_col', $complex_col, $default );
-            push @bu, $ax->clone_data( $data->[$idx] );
-            push @{$data->[$idx]{chosen_qt_cols}}, $complex_col;
-            $data->[$idx]{qt_alias}{$complex_col} = $ax->quote_alias( $alias );
-         }
+            elsif ( ref( $complex_col ) eq 'HASH' ) {
+                $data->[$idx]{qt_alias} = $complex_col;
+            }
+            else {
+                my $default = 'col_' . ( @{$data->[$idx]{chosen_qt_cols}} + 1 );
+                my $alias = $ax->alias( $sql, 'select_complex_col', $complex_col, $default );
+                push @bu, $ax->clone_data( $data->[$idx] );
+                push @{$data->[$idx]{chosen_qt_cols}}, $complex_col;
+                $data->[$idx]{qt_alias}{$complex_col} = $ax->quote_alias( $alias );
+            }
+        }
         else {
             push @bu, $ax->clone_data( $data->[$idx] );
             push @{$data->[$idx]{chosen_qt_cols}}, @choices;

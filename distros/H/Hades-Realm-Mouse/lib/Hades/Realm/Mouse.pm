@@ -2,7 +2,7 @@ package Hades::Realm::Mouse;
 use strict;
 use warnings;
 use base qw/Hades::Realm::OO/;
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
@@ -140,8 +140,8 @@ Quick summary of what the module does:
 			Kosmos { 
 				[curae penthos] :t(Int) :d(2) :pr :c :r
 				geras $nosoi :t(Int) :d(5) {
-					if (£penthos == $nosoi) {
-						return £curae;
+					if (Â£penthos == $nosoi) {
+						return Â£curae;
 					}
 				}
 			}
@@ -183,7 +183,7 @@ Quick summary of what the module does:
 			$nosoi = defined $nosoi ? $nosoi : 'undef';
 			die qq{Int: invalid value $nosoi for variable \$nosoi in method geras};
 		}
-		if ( £penthos == $nosoi ) { return £curae; }
+		if ( Â£penthos == $nosoi ) { return Â£curae; }
 	}
 
 	1;

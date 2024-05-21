@@ -1,6 +1,21 @@
 Revision history for Perl-Critic-Mardem
 ========================================
 
+0.05 2024-05-20
+
+    * new feature ProhibitLargeFile
+    * new feature ProhibitFileSize
+
+0.04 2022-05-24
+
+    * removed all regex /aa (also in tests) to support perl 5.10 and 5.12
+
+0.03 2022-05-23
+
+    * fixed backslash to forward slash in build.pl Thanks to Slaven Rezić (SREZIC) for reporting (RT ID #142880)
+    * changed name in readme
+    * fixed line endings of Perl-Files to LF
+
 0.02 2022-05-22
 
     * removed regex /aa to support perl 5.10 and 5.12

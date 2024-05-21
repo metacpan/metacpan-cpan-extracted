@@ -31,7 +31,7 @@ sub new {
         $sf->{join_types} = [ 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'FULL JOIN', 'CROSS JOIN' ];
     }
     $sf->{d}{stmt_types} = [ 'Join' ];
-    $sf->{join_info} = '  INFO';
+    $sf->{join_info} = '  Info';
     $sf->{derived_table} = '  Derived';
     $sf->{cte_table} = '  Cte';
     bless $sf, $class;
@@ -50,15 +50,16 @@ sub join_tables {
         $tables = [ @{$sf->{d}{user_table_keys}} ];
     }
     my ( $sql, $data );
+    my $old_idx = 0;
 
     MASTER: while ( 1 ) {
         $sql = {};
         $ax->reset_sql( $sql );
+        $sql->{ctes} = [ @{$sf->{d}{cte_history}} ];
         $data = {
             used_tables => [],
             aliases => [],
             default_alias => 'a',
-            added_ctes => [],
         };
         my $join_info = $sf->{join_info};
         my $derived_table = $sf->{derived_table};
@@ -68,17 +69,25 @@ sub join_tables {
         push @choices, $cte_table     if $sf->{o}{enable}{j_cte};
         push @choices, $join_info;
         my @pre = ( undef );
+        my $menu = [ @pre, @choices ];
         my $info = $ax->get_sql_info( $sql );
-        # Choose
-        my $master = $tc->choose(
-            [ @pre, @choices ],
-            { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Choose MAIN table:' }
+        my $idx = $tc->choose(
+            $menu,
+            { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Choose MAIN table:', index => 1, default => $old_idx }
         );
         $ax->print_sql_info( $info );
-        if ( ! defined $master ) {
+        if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return;
         }
-        elsif ( $master eq $join_info ) {
+        if ( $sf->{o}{G}{menu_memory} ) {
+            if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                $old_idx = 0;
+                next TABLE;
+            }
+            $old_idx = $idx;
+        }
+        my $master = $menu->[$idx];
+        if ( $master eq $join_info ) {
             $sf->__get_join_info();
             $sf->__print_join_info();
             next MASTER;
@@ -96,22 +105,15 @@ sub join_tables {
         elsif ( $master eq $cte_table ) {
             require App::DBBrowser::Subqueries;
             my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            $master = $sq->prepare_and_add_cte( $sql );
+            $master = $sq->choose_cte( $sql );
             if ( ! defined $master ) {
                 next MASTER;
             }
             $qt_master = $master;
-            push @{$data->{added_ctes}}, $master;
         }
         else {
             $master =~ s/^-\s//;
             $qt_master = $ax->quote_table( $sf->{d}{tables_info}{$master} );
-            #if ( exists $sf->{d}{tables_info}{$master} ) {
-                $qt_master = $ax->quote_table( $sf->{d}{tables_info}{$master} );
-            #}
-            #else {
-            #    $qt_master = $master;
-            #}
         }
         push @{$data->{used_tables}}, $master;
         $data->{default_alias} = 'a';
@@ -137,9 +139,6 @@ sub join_tables {
             $ax->print_sql_info( $info );
             if ( ! defined $join_type ) {
                 if ( @bu ) {
-                    if ( @{$sql->{ctes}} && $data->{used_tables}[-1] eq $sql->{ctes}[-1]{table} ) {
-                        pop @{$sql->{ctes}};
-                    }
                     pop @{$sql->{join_data}};
                     $data = pop @bu;
                     next JOIN_TYPE;
@@ -267,22 +266,16 @@ sub __add_slave_with_join_condition {
         elsif ( $slave eq $cte_table ) {
             require App::DBBrowser::Subqueries;
             my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            $slave = $sq->prepare_and_add_cte( $sql );
+            $slave = $sq->choose_cte( $sql );
             if ( ! defined $slave ) {
                 next SLAVE;
             }
             $qt_slave = $slave;
-            push @{$data->{added_ctes}}, $slave;
         }
         else {
             $slave =~ s/^-\s//;
             $slave =~ s/\Q$used\E\z//;
-            if ( exists $sf->{d}{tables_info}{$slave} ) {
-                $qt_slave = $ax->quote_table( $sf->{d}{tables_info}{$slave} );
-            }
-            else {
-                $qt_slave = $slave; # self join cte
-            }
+            $qt_slave = $ax->quote_table( $sf->{d}{tables_info}{$slave} );
         }
         push @{$data->{used_tables}}, $slave;
         # Alias
@@ -291,9 +284,6 @@ sub __add_slave_with_join_condition {
         push @{$data->{aliases}}, [ $slave, $slave_alias ];
         ( $data->{col_names}{$slave}, undef ) = $ax->column_names_and_types( $qt_slave . " " . $ax->quote_alias( $slave_alias ), $sql->{ctes} );
         if ( ! defined $data->{col_names}{$slave} ) {
-            if ( @{$sql->{ctes}} && $slave eq $sql->{ctes}[-1]{table} ) {
-                pop @{$sql->{ctes}};
-            }
             $sql->{join_data}[-1] = { join_type => $sql->{join_data}[-1]{join_type} };
             delete @{$data}{ keys %$data };
             # copy by key, so that $data still refers to the original hash:
@@ -305,9 +295,6 @@ sub __add_slave_with_join_condition {
         if ( $sql->{join_data}[-1]{join_type} ne 'CROSS JOIN' ) {
             my $ok = $sf->__add_join_condition( $sql, $data, $slave, $slave_alias );
             if ( ! $ok ) {
-                if ( @{$sql->{ctes}} && $slave eq $sql->{ctes}[-1]{table} ) {
-                    pop @{$sql->{ctes}};
-                }
                 $sql->{join_data}[-1] = { join_type => $sql->{join_data}[-1]{join_type} };
                 delete @{$data}{ keys %$data };
                 # copy by key, so that $data still refers to the original hash:

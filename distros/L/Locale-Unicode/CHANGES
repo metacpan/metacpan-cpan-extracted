@@ -1,5 +1,9 @@
 Revision history for Perl module Locale::Unicode
 
+v0.1.3 2024-05-21T10:24:31+0900
+    - Documentation improvements.
+    - Correcting on minor bug in method 'as_string'
+
 v0.1.2 2024-05-19T09:14:26+0900
     - More oversight corrected
 

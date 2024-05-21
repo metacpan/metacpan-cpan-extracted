@@ -107,7 +107,7 @@ sub argument {
     my $ext_express = $sf->{o}{enable}{extended_args};
     my $extensions = [];
     if ( $ext_express ) {
-        $extensions = [ $sf->{const}, $sf->{subquery}, $sf->{scalar_func}, $sf->{case}, $sf->{math}, $sf->{col} ];
+        $extensions = [ $sf->{const}, $sf->{subquery}, $sf->{scalar_func}, $sf->{case}, $sf->{math}, $sf->{col} ]; ##
     }
     else {
         $extensions = [ $sf->{const} ];
@@ -196,7 +196,10 @@ sub __choose_extension {
                 return if @$extensions = 1;
                 next EXTENSION;
             }
+            # return if ! length $value; ##
             if ( $opt->{is_numeric} ) {
+                #  1 numeric
+                # -1 unkown
                 return $ax->quote_constant( $value );
             }
             else {

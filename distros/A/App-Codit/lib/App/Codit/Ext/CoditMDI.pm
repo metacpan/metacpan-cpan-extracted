@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.01";
+$VERSION="0.02";
 
 use base qw( Tk::AppWindow::Ext::MDI );
 
@@ -152,10 +152,11 @@ sub contentModified {
 	return @_;
 }
 
-sub DoPostConfig {
-	my $self = shift;
-	$self->SUPER::DoPostConfig;
-#	$self->cmdExecute('doc_new');
+sub CreateContentHandler {
+	my ($self, $name) = @_;
+	my $h = $self->SUPER::CreateContentHandler($name);
+	$h->Name($name);
+	return $h;
 }
 
 sub disposeUntitled {

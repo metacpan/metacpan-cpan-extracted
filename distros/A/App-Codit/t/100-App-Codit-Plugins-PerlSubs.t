@@ -4,9 +4,10 @@ use warnings;
 use Tk;
 
 use Test::Tk;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use File::Spec;
 $mwclass = 'App::Codit';
+$delay = 800;
 #$quitdelay = 2500;
 
 BEGIN { use_ok('App::Codit::Plugins::PerlSubs') };
@@ -18,10 +19,21 @@ createapp(
 	-configfolder => File::Spec->rel2abs('t/settings'),
 );
 
+my $pext;
+if (defined $app) {
+	$pext = $app->extGet('Plugins');
+}
 push @tests, (
 	[ sub { 
-		return $app->extGet('Plugins')->plugExists('PerlSubs') 
+		return $pext->plugExists('PerlSubs') 
 	}, 1, 'Plugin PerlSubs loaded' ],
+	[ sub {
+		pause(100);
+		$pext->plugUnload('PerlSubs');
+		my $b = $pext->plugGet('PerlSubs');
+		return defined $b 
+#		return $pext->plugExists('PerlSubs') 
+	}, '', 'Plugin PerlSubs unloaded' ],
 );
 
 starttesting;

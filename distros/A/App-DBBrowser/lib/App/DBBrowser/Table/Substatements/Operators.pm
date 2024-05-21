@@ -36,6 +36,9 @@ sub add_operator_and_value {
     elsif ( $sf->{i}{driver} =~ /(?:Firebird|Informix)\z/ ) {
         @operators = uniq map { s/(?<=REGEXP)_i\z//; $_ } @operators;
     }
+    elsif ( $sf->{i}{driver} eq 'ODBC' ) {
+        @operators = grep { ! /REGEXP/ } @operators;
+    }
     my $bu_stmt = $sql->{$stmt};
 
     OPERATOR: while( 1 ) {
@@ -60,20 +63,17 @@ sub add_operator_and_value {
         $operator =~ s/^\s+|\s+\z//g;
         $ax->print_sql_info( $ax->get_sql_info( $sql ) );
         if ( $operator =~ /REGEXP(_i)?\z/ ) {
-            $sql->{$stmt} =~ s/ (?: (?<=\() | \s ) \Q$qt_col\E \z //x;
             my $do_not_match_regexp = $operator =~ /^NOT/ ? 1 : 0;
             my $case_sensitive = $operator =~ /REGEXP_i\z/ ? 0 : 1;
-            my $regex_op;
-            if ( ! eval {
-                $regex_op = $sf->_regexp( $qt_col, $do_not_match_regexp, $case_sensitive );
-                1 }
-            ) {
-                $ax->print_error_message( $@ );
-                $sql->{$stmt} = $bu_stmt;
+            my $regex_op = $sf->_regexp( $qt_col, $do_not_match_regexp, $case_sensitive );
+            if ( ! $regex_op ) {
                 next OPERATOR if @operators > 1;
                 return;
             }
-            $regex_op =~ s/^\s// if $sql->{$stmt} =~ /\(\z/;
+            $sql->{$stmt} =~ s/ (?: (?<=\() | \s ) \Q$qt_col\E \z //x;
+            if ( $sql->{$stmt} =~ /\(\z/ ) {
+                $regex_op =~ s/^\s//;
+            }
             $sql->{$stmt} .= $regex_op;
         }
         elsif ( $operator =~ /^(?:ALL|ANY)\z/) {
@@ -112,11 +112,9 @@ sub add_operator_and_value {
 
 sub read_and_add_value {
     my ( $sf, $sql, $clause, $stmt, $qt_col, $operator ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $is_numeric;
-    if ( ! length $sql->{data_types}{$qt_col} || ( $sql->{data_types}{$qt_col} >= 2 && $sql->{data_types}{$qt_col} <= 8 ) ) {
-        $is_numeric = 1;
-    }
+    my $is_numeric = $ax->column_type_is_numeric( $sql, $qt_col );
     if ( $operator =~ /^IS\s(?:NOT\s)?NULL\z/ ) {
         return 1;
     }
@@ -259,6 +257,8 @@ sub _regexp {
         }
     }
     elsif ( $driver eq 'Informix' ) {
+        # Wildcard characters: *, ?, [...], [^...]
+        # \ removes the special significance of the next character
         if ( $do_not_match ) {
             return " $col NOT MATCHES ? ";
         }

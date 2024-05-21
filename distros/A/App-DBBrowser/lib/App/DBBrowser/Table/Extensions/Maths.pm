@@ -33,14 +33,14 @@ sub maths {
     my $menu = [ @pre, @$qt_cols ];
     my $info = $opt->{info} // $ax->get_sql_info( $sql );
     my $items = [];
-    my $prompt = $opt->{prompt} // 'Math:';
+    my $prompt = 'Math:';
     my @bu;
 
     CHOICE: while ( 1 ) {
         my $fill_string = join( ' ', @$items, '?' );
         $fill_string =~ s/\(\s/(/g;
         $fill_string =~ s/\s\)/)/g;
-        my $tmp_info = $info . "\n" . $fill_string;
+        my $tmp_info = $info . "\n" . ( length $opt->{prompt} ? $opt->{prompt} . "\n" : '' ) . $fill_string;
         # Choose
         my $idx = $tc->choose(
             $menu,

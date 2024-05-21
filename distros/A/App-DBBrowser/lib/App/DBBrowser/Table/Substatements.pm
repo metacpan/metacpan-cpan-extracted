@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.014;
 
-use List::MoreUtils qw( any );
+use List::MoreUtils qw( any uniq );
 
 use Term::Choose       qw();
 use Term::Choose::Util qw();
@@ -268,7 +268,7 @@ sub where {
     my $clause = 'where';
     my $substmt_type = "WHERE";
     my $items = [ @{$sql->{columns}} ];
-    my $ret = $sf->__add_condition( $sql, $clause, $substmt_type, $items );
+    my $ret = $sf->add_condition( $sql, $clause, $substmt_type, $items );
     return $ret;
 }
 
@@ -361,7 +361,7 @@ sub having {
     my $clause = 'having';
     my $substmt_type = "HAVING";
     my $items = [ map( '@' . $_, @{$sql->{aggr_cols}} ), @{$sf->{i}{avail_aggr}} ];
-    my $ret = $sf->__add_condition( $sql, $clause, $substmt_type, $items );
+    my $ret = $sf->add_condition( $sql, $clause, $substmt_type, $items );
     return $ret;
 }
 
@@ -382,20 +382,16 @@ sub order_by {
     else {
         @tmp_cols = @{$sql->{columns}};
     }
-    my ( @cols, @aliases );
-    my %count;
-    for my $col ( @tmp_cols, @{$sql->{selected_cols}}) {
-        next if ++$count{$col} > 1;
+    my ( @selected_cols_no_alias, @aliases );
+    for my $col ( @{$sql->{selected_cols}} ) {
         if ( length $sql->{alias}{$col} ) {
             push @aliases, $sql->{alias}{$col};
         }
         else {
-            push @cols, $col;
+            push @selected_cols_no_alias, $col;
         }
     }
-    if ( @aliases ) {
-        push @cols, @aliases;
-    }
+    my @cols = uniq @tmp_cols, @selected_cols_no_alias, @aliases;
     my @bu = @{$sql->{bu_order_by}//[]};
     $sql->{order_by_stmt} = pop ( @bu ) // "ORDER BY";
 
@@ -554,7 +550,7 @@ sub limit_offset {
 }
 
 
-sub __add_condition {
+sub add_condition {
     my ( $sf, $sql, $clause, $substmt_type, $items ) = @_;
     # when-clause: $clause != $substmt_type
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -565,7 +561,7 @@ sub __add_condition {
     my $stmt;
     if ( $substmt_type =~ /^\s*(WHEN)\z/i ) {
         $stmt = lc( $1 ) . '_stmt';
-        $sql->{$stmt} = $substmt_type . " ";
+        $sql->{$stmt} = $substmt_type;
     }
     else {
         $stmt = lc( $substmt_type ) . '_stmt';
@@ -733,58 +729,45 @@ sub get_prepared_aggr_func {
             last COLUMN;
         }
         if ( $aggr =~ /^$sf->{i}{group_concat}\z/ ) {
-            if ( $sf->{i}{driver} eq 'Pg' ) {
-                # Pg, STRING_AGG: separator mandatory
-                $prepared_aggr .= "${qt_col}::text,',')";
+            my $sep = ',';
+            if ( $sf->{i}{driver} eq 'SQLite' ) {
+                if ( $is_distinct ) {
+                    # https://sqlite.org/forum/info/221c2926f5e6f155
+                    # SQLite: GROUP_CONCAT with DISTINCT and custom seperator does not work
+                    # default separator is ','
+                    $prepared_aggr .= "$qt_col)";
+                }
+                else {
+                    $prepared_aggr .= "$qt_col,'$sep')";
+                }
+            }
+            elsif ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+                $prepared_aggr .= "$qt_col ORDER BY $qt_col SEPARATOR '$sep')";
+            }
+            elsif ( $sf->{i}{driver} eq 'Pg' ) {
+                # Pg, STRING_AGG:
+                # separator mandatory
+                # expects text type as argument
+                # with DISTINCT the STRING_AGG col and the ORDER BY col must be identical
+                $prepared_aggr .= "${qt_col}::text,'$sep' ORDER BY ${qt_col}::text)";
+            }
+            elsif ( $sf->{i}{driver} eq 'Firebird' ) {
+                $prepared_aggr .= "$qt_col,'$sep')";
             }
             elsif ( $sf->{i}{driver} =~ /^(?:DB2|Oracle)\z/ ) {
-                # DB2, LISTAGG: no default separator
-                $prepared_aggr .= "$qt_col,',')";
+                if ( $is_distinct ) {
+                    # DB2 codes: error code -214 - error caused by:
+                    # DISTINCT is specified in the SELECT clause, and a column name or sort-key-expression in the
+                    # ORDER BY clause cannot be matched exactly with a column name or expression in the select list.
+                    $prepared_aggr .= "$qt_col,'$sep')";
+                }
+                else {
+                    $prepared_aggr .= "$qt_col,'$sep') WITHIN GROUP (ORDER BY $qt_col)";
+                }
             }
             else {
-                # https://sqlite.org/forum/info/221c2926f5e6f155
-                # SQLite: GROUP_CONCAT with DISTINCT and custom seperator does not work
                 $prepared_aggr .= "$qt_col)";
             }
-            #my $sep = ',';
-            #if ( $sf->{i}{driver} eq 'SQLite' ) {
-            #    if ( $is_distinct ) {
-            #        # https://sqlite.org/forum/info/221c2926f5e6f155
-            #        # SQLite: GROUP_CONCAT with DISTINCT and custom seperator does not work
-            #        # default separator is ','
-            #        $prepared_aggr .= "$qt_col)";
-            #    }
-            #    else {
-            #        $prepared_aggr .= "$qt_col,'$sep')";
-            #    }
-            #}
-            #elsif ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
-            #    $prepared_aggr .= "$qt_col ORDER BY $qt_col SEPARATOR '$sep')";
-            #}
-            #elsif ( $sf->{i}{driver} eq 'Pg' ) {
-            #    # Pg, STRING_AGG:
-            #    # separator mandatory
-            #    # expects text type as argument
-            #    # with DISTINCT the STRING_AGG col and the ORDER BY col must be identical
-            #    $prepared_aggr .= "${qt_col}::text,'$sep' ORDER BY ${qt_col}::text)";
-            #}
-            #elsif ( $sf->{i}{driver} eq 'Firebird' ) {
-            #    $prepared_aggr .= "$qt_col,'$sep')";
-            #}
-            #elsif ( $sf->{i}{driver} =~ /^(?:DB2|Oracle)\z/ ) {
-            #    if ( $is_distinct ) {
-            #        # DB2 codes: error code -214 - error caused by:
-            #        # DISTINCT is specified in the SELECT clause, and a column name or sort-key-expression in the
-            #        # ORDER BY clause cannot be matched exactly with a column name or expression in the select list.
-            #        $prepared_aggr .= "$qt_col,'$sep')";
-            #    }
-            #    else {
-            #        $prepared_aggr .= "$qt_col,'$sep') WITHIN GROUP (ORDER BY $qt_col)";
-            #    }
-            #}
-            #else {
-            #    return;
-            #}
         }
         else {
             $prepared_aggr .= "$qt_col)";

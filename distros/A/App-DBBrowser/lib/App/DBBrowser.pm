@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.410';
+our $VERSION = '2.411';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -416,7 +416,7 @@ sub run {
                 $sf->{d}{tables_info} = $tables_info;
                 $sf->{d}{user_table_keys} = $user_table_keys;
                 $sf->{d}{sys_table_keys} = $sys_table_keys;
-                $sf->{d}{cte_history} = []; ##
+                $sf->{d}{cte_history} = [];
                 my $old_idx_tbl = 1;
 
                 TABLE: while ( 1 ) {
@@ -451,7 +451,7 @@ sub run {
                             $table = $menu_table->[$idx_tbl];
                         }
                         if ( ! defined $table ) {
-                            $sf->{d}{cte_history} = []; ##
+                            $sf->{d}{cte_history} = [];
                             next SCHEMA         if @schemas                > 1;
                             $dbh->disconnect();
                             next DATABASE       if @databases              > 1;
@@ -523,7 +523,7 @@ sub run {
                     }
                     elsif ( $table eq $derived_table ) {
                         $sf->{d}{table_origin} = 'drived';
-                        if ( ! eval { ( $qt_table ) = $sf->__derived_table( $sql ); 1 } ) {
+                        if ( ! eval { ( $qt_table, $ctes ) = $sf->__derived_table( $sql ); 1 } ) {
                             $ax->print_error_message( $@ );
                             next TABLE;
                         }
@@ -596,17 +596,15 @@ sub __derived_table {
     require App::DBBrowser::Subqueries;
     my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $sf->{d}{stmt_types} = [ 'Select' ];
+    $sql->{ctes} = [ @{$sf->{d}{cte_history}} ];
     $ax->print_sql_info( $ax->get_sql_info( $sql ) );
-    my ( $qt_table, $ctes );
+    my $qt_table;
     if ( $sf->{d}{table_origin} eq 'cte' ) {
-        $sql->{ctes} = [ @{$sf->{d}{cte_history}} ];
-        my $table = $sq->prepare_and_add_cte( $sql );
+        my $table = $sq->choose_cte( $sql );
         if ( ! defined $table ) {
             return;
         }
-        $sf->{d}{cte_history} = [ @{$sql->{ctes}} ];
         $qt_table = $table;
-        $ctes = $sql->{ctes};
     }
     else {
         my $table = $sq->subquery( $sql );
@@ -618,7 +616,7 @@ sub __derived_table {
         my $alias = $ax->alias( $sql, 'derived_table', $qt_table, 'd1' );
         $qt_table .= " " . $ax->quote_alias( $alias );
     }
-    return $qt_table, $ctes;
+    return $qt_table, $sql->{ctes};
 }
 
 
@@ -639,7 +637,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.410
+Version 2.411
 
 =head1 DESCRIPTION
 

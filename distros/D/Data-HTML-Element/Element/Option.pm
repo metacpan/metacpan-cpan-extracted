@@ -10,7 +10,7 @@ use Mo qw(build is);
 use Mo::utils 0.26 qw(check_array check_bool check_number);
 use Mo::utils::CSS 0.02 qw(check_css_class);
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 has css_class => (
 	is => 'ro',
@@ -308,6 +308,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.16
+0.17
 
 =cut

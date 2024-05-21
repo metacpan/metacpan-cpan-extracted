@@ -27,6 +27,31 @@ sub new {
 }
 
 
+sub reset_sql {
+    my ( $sf, $sql ) = @_;
+    # preserve base data: table name, column names and data types:
+    my $backup = {
+        table => $sql->{table} // '',
+        columns => $sql->{columns} // [],
+        data_types => $sql->{data_types} // {},
+        ctes => $sql->{ctes} // [],
+    };
+    # reset/initialize:
+    delete @{$sql}{ keys %$sql }; # not "$sql = {}" so $sql is still pointing to the outer $sql
+    my @string = qw( distinct_stmt set_stmt where_stmt group_by_stmt having_stmt order_by_stmt limit_stmt offset_stmt );
+    my @array  = qw( group_by_cols aggr_cols selected_cols set_args
+                     ct_column_definitions ct_table_constraints ct_table_options
+                     insert_col_names insert_args );
+    my @hash   = qw( alias );
+    @{$sql}{@string} = ( '' ) x  @string;
+    @{$sql}{@array}  = map{ [] } @array;
+    @{$sql}{@hash}   = map{ {} } @hash;
+    for my $y ( keys %$backup ) {
+        $sql->{$y} = $backup->{$y};
+    }
+}
+
+
 sub __stmt_fold {
     my ( $sf, $used_for, $stmt, $indent ) = @_;
     if ( $used_for eq 'print' ) {
@@ -44,6 +69,25 @@ sub __stmt_fold {
 }
 
 
+sub __cte_stmts {
+    my ( $sf, $ctes, $used_for, $indent1 ) = @_;
+    #if ( ! $ctes || ! @$ctes ) {
+    #    return wantarray ? () : '';
+    #}
+    my $with = "WITH";
+    for my $cte ( @$ctes ) {
+        $with .= " RECURSIVE" and last if $cte->{is_recursive};
+    }
+    my @tmp = ( $with );
+    for my $cte ( @$ctes ) {
+        push @tmp, $sf->__stmt_fold( $used_for, sprintf( '%s AS (%s),', $cte->{full_name}, $cte->{query} ), $indent1 );
+    }
+    $tmp[-1] =~ s/,\z//;
+    push @tmp, " ";
+    return join "\n", @tmp;
+}
+
+
 sub get_stmt {
     my ( $sf, $sql, $stmt_type, $used_for ) = @_;
     my $in = ' ' x $sf->{o}{G}{base_indent};
@@ -52,17 +96,12 @@ sub get_stmt {
     my $indent2 = 2;
     my $qt_table = $sql->{table};
     my @tmp;
-    if ( @{$sql->{ctes}//[]} ) { ##
-        push @tmp, "WITH";
-        for my $cte ( @{$sql->{ctes}} ) {
-            push @tmp, $sf->__stmt_fold( $used_for, sprintf( '%s AS (%s),', $cte->{name}, $cte->{query} ), $indent1 );
-        }
-        $tmp[-1] =~ s/,\z//;
-        push @tmp, " ";
+    if ( @{$sql->{ctes}} ) {
+        push @tmp, $sf->__cte_stmts( $sql->{ctes}, $used_for, $indent1 );
     }
     if ( $sql->{case_stmt} ) {
         @tmp = ();
-        # only for print info (it has to be here because 'when' uses the __add_condition method).
+        # only for print info (it has to be here because 'when' uses the add_condition method).
         # When the case expression is completed, it is appended to the corresponding substmt and these case keys are deleted.
         push @tmp, $sf->__stmt_fold( $used_for, $sql->{case_info}, $indent0 ) if $sql->{case_info};
         push @tmp, $sf->__stmt_fold( $used_for, $sql->{case_stmt}, $indent0 );
@@ -125,6 +164,7 @@ sub get_stmt {
         my $select_from;
         if ( $used_for eq 'prepare' ) {
             @tmp = ();
+            # prepare: this stmt is used as table in the select stmt
             # no ctes, they are added in the select stmt
             $select_from = "";
         }
@@ -145,9 +185,9 @@ sub get_stmt {
         }
     }
     elsif ( $stmt_type eq 'Union' ) {
-        #@tmp = ( $sf->__stmt_fold( $used_for, "SELECT * FROM (", $indent0 ) );
         if ( $used_for eq 'prepare' ) {
             @tmp = ();
+            # prepare: this stmt is used as table in the select stmt
             # no ctes, they are added in the select stmt
             push @tmp, $sf->__stmt_fold( $used_for, "(", $indent0 ); ##
         }
@@ -298,6 +338,62 @@ sub get_sql_info {
 }
 
 
+sub sql_limit {
+    my ( $sf, $rows ) = @_;
+    if ( $sf->{i}{driver} =~ /^(?:SQLite|mysql|MariaDB|Pg)\z/ ) {
+        return " LIMIT $rows";
+    }
+    elsif ( $sf->{i}{driver} =~ /^(?:Firebird|DB2|Oracle)\z/ ) {
+        return " FETCH NEXT $rows ROWS ONLY"
+    }
+    else {
+        return "";
+    }
+}
+
+
+sub column_names_and_types {
+    my ( $sf, $qt_table, $ctes ) = @_;
+    # without `LIMIT 0` slower with big tables: mysql, MariaDB and Pg
+    # no difference with SQLite, Firebird, DB2 and Informix
+    my $column_names = [];
+    my $column_types = [];
+    if ( ! eval {
+        my $stmt = '';
+        if ( defined $ctes && @$ctes ) {
+            $stmt = $sf->__cte_stmts( $ctes, 'prepare', 0 );
+        }
+        $stmt .= "SELECT * FROM " . $qt_table . $sf->sql_limit( 0 );
+        my $sth = $sf->{d}{dbh}->prepare( $stmt );
+        if ( $sf->{i}{driver} eq 'SQLite' ) {
+            my $rx_numeric = 'INT|DOUBLE|REAL|NUM|FLOAT|DEC|BOOL|BIT|MONEY';
+            $column_names = [ @{$sth->{NAME}} ];
+            $column_types = [ map { ! $_ || $_ =~ /$rx_numeric/i ? 2 : 1 } @{$sth->{TYPE}} ];
+        }
+        else {
+            $sth->execute();
+            $column_names = [ @{$sth->{NAME}} ];
+            $column_types = [ @{$sth->{TYPE}} ];
+        }
+        1 }
+    ) {
+        $sf->print_error_message( $@ );
+        return;
+    }
+    return $column_names, $column_types;
+}
+
+
+sub column_type_is_numeric {
+    my ( $sf, $sql, $qt_col ) = @_;
+    my $is_numeric = 0;
+    if ( ! length $sql->{data_types}{$qt_col} || ( $sql->{data_types}{$qt_col} >= 2 && $sql->{data_types}{$qt_col} <= 8 ) ) {
+        $is_numeric = 1;
+    }
+    return $is_numeric;
+}
+
+
 sub alias {
     # Aliases mandatory:
     # JOIN talbes
@@ -438,106 +534,50 @@ sub quote_constant {
 sub unquote_constant {
     my ( $sf, $constant ) = @_;
     return if ! defined $constant;
-    $constant =~ s/^'|'\z//g;
-    if ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
-        $constant =~ s/\\(.)/$1/g;
-    }
-    else {
-        $constant =~ s/''/'/g;
-        #$constant =~ s/'(?=(?:'')*(?:[^']|\z))//g;
+    if ( $constant =~ /^'(.*)'\z/ ) {
+        $constant = $1;
+        if ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+            $constant =~ s/\\(.)/$1/g;
+        }
+        else {
+            $constant =~ s/''/'/g;
+            #$constant =~ s/'(?=(?:'')*(?:[^']|\z))//g;
+        }
     }
     return $constant;
 }
 
 
-sub clone_data {
-    my ( $sf, $data ) = @_;
-    require Storable;
-    return Storable::dclone( $data );
-}
-
-
-sub reset_sql {
-    my ( $sf, $sql ) = @_;
-    # preserve base data: table name, column names and data types:
-    my $backup = {
-        table => $sql->{table} // '',
-        columns => $sql->{columns} // [],
-        data_types => $sql->{data_types} // {},
-    };
-    # reset/initialize:
-    delete @{$sql}{ keys %$sql }; # not "$sql = {}" so $sql is still pointing to the outer $sql
-    my @string = qw( distinct_stmt set_stmt where_stmt group_by_stmt having_stmt order_by_stmt limit_stmt offset_stmt );
-    my @array  = qw( group_by_cols aggr_cols selected_cols set_args
-                     ctes
-                     ct_column_definitions ct_table_constraints ct_table_options
-                     insert_col_names insert_args );
-    my @hash   = qw( alias );
-    @{$sql}{@string} = ( '' ) x  @string;
-    @{$sql}{@array}  = map{ [] } @array;
-    @{$sql}{@hash}   = map{ {} } @hash;
-    for my $y ( keys %$backup ) {
-        $sql->{$y} = $backup->{$y};
-    }
-}
-
-
-sub print_error_message {
-    my ( $sf, $message ) = @_;
-    utf8::decode( $message );
-    chomp( $message );
-    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    $tc->choose(
-        [ 'Press ENTER to continue' ],
-        { prompt => $message }
-    );
-}
-
-
-sub sql_limit {
-    my ( $sf, $rows ) = @_;
-    if ( $sf->{i}{driver} =~ /^(?:SQLite|mysql|MariaDB|Pg)\z/ ) {
-        return " LIMIT $rows";
-    }
-    elsif ( $sf->{i}{driver} =~ /^(?:Firebird|DB2|Oracle)\z/ ) {
-        return " FETCH NEXT $rows ROWS ONLY"
+sub regex_quoted_literal {
+    my ( $sf ) = @_;
+    if ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+        return qr/(?<!')'(?:[^\\']|\\'|\\\\)*'(?!')/;
     }
     else {
-        return "";
+        return qr/(?<!')'(?:[^']|'')*'(?!')/;
     }
 }
 
 
-sub column_names_and_types {
-    my ( $sf, $qt_table, $ctes ) = @_;
-    # without `LIMIT 0` slower with big tables: mysql, MariaDB and Pg
-    # no difference with SQLite, Firebird, DB2 and Informix
-    my $column_names = [];
-    my $column_types = [];
-    if ( ! eval {
-        my $stmt = '';
-        if ( defined $ctes && @$ctes ) {
-            $stmt = "WITH " . join ', ', map { sprintf '%s AS (%s)', $_->{name}, $_->{query} } @$ctes;
-            $stmt .= ' ';
-        }
-        $stmt .= "SELECT * FROM " . $qt_table . $sf->sql_limit( 0 );
-        my $sth = $sf->{d}{dbh}->prepare( $stmt );
-        if ( $sf->{i}{driver} eq 'SQLite' ) {
-            my $rx_numeric = 'INT|DOUBLE|REAL|NUM|FLOAT|DEC|BOOL|BIT|MONEY';
-            $column_names = [ @{$sth->{NAME}} ];
-            $column_types = [ map { ! $_ || $_ =~ /$rx_numeric/i ? 2 : 1 } @{$sth->{TYPE}} ];
-        }
-        else {
-            $sth->execute();
-            $column_names = [ @{$sth->{NAME}} ];
-            $column_types = [ @{$sth->{TYPE}} ];
-        }
-        1 }
-    ) {
-        $sf->print_error_message( $@ );
-        return;
-    }
-    return $column_names, $column_types;
+sub regex_quoted_identifier {
+    my ( $sf ) = @_;
+    my $iqc = $sf->{d}{identifier_quote_char};
+    return "$iqc(?:[^$iqc]|$iqc$iqc)+$iqc";
+}
+
+
+sub normalize_space_in_stmt {
+    my ( $sf, $stmt ) = @_;
+    my $quoted_literal = $sf->regex_quoted_literal();
+    my $iqc = $sf->{d}{identifier_quote_char};
+    my $quoted_identifier = $sf->regex_quoted_identifier();
+    my $split_rx = qr/ ( $quoted_identifier | $quoted_literal ) /x;
+    $stmt =~ s/^\s+|\s+\z//g;
+    $stmt = join '', map {
+        if ( ! /^[$iqc']/ ) { s/\s+/ /g; s|\(\s|(|; s|\s\)|)| };
+        $_
+    } split $split_rx, $stmt;
+    return $stmt;
 }
 
 
@@ -564,6 +604,25 @@ sub major_server_version {
       };
     }
     return $major_server_version // 1;
+}
+
+
+sub clone_data {
+    my ( $sf, $data ) = @_;
+    require Storable;
+    return Storable::dclone( $data );
+}
+
+
+sub print_error_message {
+    my ( $sf, $message ) = @_;
+    utf8::decode( $message );
+    chomp( $message );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    $tc->choose(
+        [ 'Press ENTER to continue' ],
+        { prompt => $message }
+    );
 }
 
 

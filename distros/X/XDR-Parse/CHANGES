@@ -1,5 +1,19 @@
 -----
 
+0.3.0   2024-05-20
+    [Breaking]
+        * 'struct' members 'type' description moved into 'declaration' key
+        * 'union' default member's name moved one level up from 'declaration'
+          to match other members
+        * 'union' discriminant's name moved one level up from 'declaration'
+          to match other members
+        * Rename union's 'handlers' key to 'members'
+        * Rename struct's 'fields' key to 'members'
+    [Fixed]
+        * Parsing of hexadecimal constants
+    [Added]
+        * RFC4506 reference and deviations documentation
+
 0.2.0   2024-05-19
     [Breaking]
         * Fixed 'descriminator' -> 'discriminator'

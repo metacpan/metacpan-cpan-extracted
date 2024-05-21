@@ -7,7 +7,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 use Readonly;
 use Perl::Critic;
@@ -161,7 +161,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"if"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso, 'violation description correct with if';
+    like $desc, qr/"if"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso, 'violation description correct with if';
 }
 
 #####
@@ -179,7 +179,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"while"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"while"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with while';
 }
 
@@ -198,7 +198,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"unless"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"unless"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with unless';
 }
 
@@ -217,7 +217,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"until"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"until"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with until';
 }
 
@@ -236,7 +236,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"do"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"do"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with do-while';
 }
 
@@ -255,8 +255,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"for"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
-        'violation description correct with for';
+    like $desc, qr/"for"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso, 'violation description correct with for';
 }
 
 #####
@@ -274,7 +273,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"foreach"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"foreach"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with foreach';
 }
 
@@ -293,7 +292,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"eval"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"eval"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with eval';
 }
 
@@ -311,7 +310,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"sort"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"sort"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with sort';
 }
 
@@ -329,8 +328,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"map"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
-        'violation description correct with map';
+    like $desc, qr/"map"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso, 'violation description correct with map';
 }
 
 #####
@@ -347,7 +345,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"grep"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"grep"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with grep';
 }
 
@@ -366,7 +364,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"BEGIN"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"BEGIN"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with BEGIN';
 }
 
@@ -385,7 +383,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"UNITCHECK"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"UNITCHECK"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with UNITCHECK';
 }
 
@@ -404,7 +402,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"CHECK"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"CHECK"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with CHECK';
 }
 
@@ -423,7 +421,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"INIT"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"INIT"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with INIT';
 }
 
@@ -442,8 +440,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"END"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
-        'violation description correct with END';
+    like $desc, qr/"END"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso, 'violation description correct with END';
 }
 
 #####
@@ -461,7 +458,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"PACKAGE"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"PACKAGE"\scode-block\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with PACKAGE';
 }
 
@@ -509,10 +506,10 @@ Markus Demml, mardem@cpan.com
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2022, Markus Demml
+Copyright (c) 2024, Markus Demml
 
-This library is free software; you can redistribute it and/or modify it 
-under the same terms as the Perl 5 programming language system itself. 
+This library is free software; you can redistribute it and/or modify it
+under the same terms as the Perl 5 programming language system itself.
 The full text of this license can be found in the LICENSE file included
 with this module.
 

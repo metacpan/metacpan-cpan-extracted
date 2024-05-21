@@ -1,4 +1,15 @@
 Revision history for Perl extension App::Codit.
 
+0.03 Mon May 20 2024
+	- Fixed bug in PerlSubs
+	- Improved unloading of plugins
+	- Added website to the about dialog
+
+0.02 Mon May 20 2024
+	- Fixed bug in PodViewer plugin
+	- Made PodViewer and PerlSubs respond to the modified command instead of using background jobs.
+	- Improved testing
+	- ContentHandler is now set to a name upon creation
+
 0.01 Sun May 19 2024
 	- Initial upload to CPAN

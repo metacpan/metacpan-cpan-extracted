@@ -166,7 +166,7 @@ sub __files_in_dir {
         return [];
     }
     if ( ! -d $dir ) {
-        my $message = "Directory '$dir' does not exist.\nThe entry will be removed from history.";
+        my $message = "The directory '$dir' does not exist any more.";
         $ax->print_error_message( $message );
         $sf->__remove_from_history( $dir );
         return [];

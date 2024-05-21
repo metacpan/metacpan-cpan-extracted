@@ -37,10 +37,10 @@ subtest 'build_has' => sub {
 	);
 	can_ok( $obj, 'build_has' );
 	eval { $obj->build_has( [] ) };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->build_has([])} );
-	eval { $obj->build_has('algea') };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_has('algea')} );
+	eval { $obj->build_has('aporia') };
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->build_has('aporia')} );
 };
 done_testing();

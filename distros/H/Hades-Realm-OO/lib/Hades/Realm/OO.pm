@@ -1,13 +1,14 @@
 package Hades::Realm::OO;
 use strict;
 use warnings;
+use Hades::Myths { as_keywords => 1 };
 use base qw/Hades/;
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
 	my $self      = $cls->SUPER::new(%args);
-	my %accessors = ( is_role => {}, meta => {}, current_class => {}, );
+	my %accessors = ( is_role => {}, current_class => {}, meta => {}, );
 	for my $accessor ( keys %accessors ) {
 		my $param
 		    = defined $args{$accessor}
@@ -102,6 +103,14 @@ sub module_generate {
 		    qq{Object: invalid value $mg for variable \$mg in method module_generate};
 	}
 
+	$mg->keyword(
+		'function',
+		CODE        => sub { $self->build_function(@_) },
+		KEYWORDS    => $self->build_function_keywords,
+		POD_TITLE   => 'FUNCTIONS',
+		POD_POD     => 'Call $keyword function',
+		POD_EXAMPLE => "\$obj->\$keyword;\n\n\t\$obj->\$keyword(\$value)"
+	);
 	$mg->keyword(
 		'has',
 		CODE        => sub { $self->build_has(@_) },
@@ -307,6 +316,78 @@ sub build_accessor {
 
 }
 
+sub build_sub {
+	my ( $self, $mg, $name, $meta ) = @_;
+	if ( ( ref($mg) || "" ) =~ m/^(|HASH|ARRAY|SCALAR|CODE|GLOB)$/ ) {
+		$mg = defined $mg ? $mg : 'undef';
+		die
+		    qq{Object: invalid value $mg for variable \$mg in method build_sub};
+	}
+	if ( !defined($name) || ref $name ) {
+		$name = defined $name ? $name : 'undef';
+		die
+		    qq{Str: invalid value $name for variable \$name in method build_sub};
+	}
+	if ( ( ref($meta) || "" ) ne "HASH" ) {
+		$meta = defined $meta ? $meta : 'undef';
+		die
+		    qq{HashRef: invalid value $meta for variable \$meta in method build_sub};
+	}
+
+	return $self->SUPER::build_sub( $mg, $name, $meta )
+	    unless ( $self->can('has_function_keyword')
+		&& $self->has_function_keyword );
+	my $code = $meta->{$name}->{code};
+	$self->debug_step( sprintf( debug_step_31, $name ), $meta->{$name} );
+	my ( $params, $subtype, $params_explanation ) = ( '', '', '' );
+	$subtype .= $self->build_private($name) if $meta->{$name}->{private};
+	if ( $meta->{$name}->{param} ) {
+		for my $param ( @{ $meta->{$name}->{param} } ) {
+			$params_explanation .= ', ' if $params_explanation;
+			$params             .= ', ' . $param;
+			my $pm = $meta->{$name}->{params_map}->{$param};
+			$subtype .= qq|$param = defined $param ? $param : $pm->{default};|
+			    if ( $pm->{default} );
+			$subtype .= $self->build_coerce( $name, $param, $pm->{coerce} );
+			if ( $pm->{type} ) {
+				my $error_message
+				    = ( $pm->{type} !~ m/^(Optional|Any|Item)/
+					? qq|$param = defined $param ? $param : 'undef';|
+					: q|| )
+				    . qq|die qq{$pm->{type}: invalid value $param for variable \\$param in method $name};|;
+				$subtype .= $self->build_type(
+					$name,
+					$pm->{type},
+					$param,
+					$error_message,
+					(   $pm->{type} !~ m/^(Optional|Any|Item)/
+						? qq|! defined($param) \|\||
+						: q||
+					)
+				);
+				$params_explanation .= qq|param $param to be a $pm->{type}|;
+			}
+			else {
+				$params_explanation
+				    .= qq|param $param to be any value including undef|;
+			}
+		}
+	}
+	$meta->{$name}->{params_explanation} = $params_explanation;
+	$code = $self->build_code( $mg, $name,
+		$self->build_sub_code( $name, $params, $subtype, $code ) );
+	$params =~ s/^,\s*//;
+	my $example = qq|\$obj->$name($params)|;
+	$mg->function($name)->code($code)
+	    ->pod(qq|call $name method. Expects $params_explanation.|)
+	    ->example($example)
+	    ->test( $self->build_tests( $name, $meta->{$name} ) );
+	$meta->{$name}->{$_}
+	    && $mg->$_( $self->replace_pe_string( $meta->{$name}->{$_}, $name ) )
+	    for qw/pod example/;
+
+}
+
 sub build_modify {
 	my ( $self, $mg, $name, $meta ) = @_;
 	if ( ( ref($mg) || "" ) =~ m/^(|HASH|ARRAY|SCALAR|CODE|GLOB)$/ ) {
@@ -359,7 +440,9 @@ sub after_class {
 sub unique_types {
 	my ( $self, $type, $unique ) = @_;
 	if ( ref $type eq 'ARRAY' ) {
-		$self->unique_types( $_, $unique ) for @{$type};
+		if ( scalar @{$type} ) {
+			$self->unique_types( $_, $unique ) for @{$type};
+		}
 		return;
 	}
 	if ( !defined($type) || ref $type ) {
@@ -472,6 +555,29 @@ sub build_has {
 			}
 			return $self->{$name};
 		}|;
+
+}
+
+sub build_function_keywords {
+	my ( $self, $keywords ) = @_;
+	$keywords = defined $keywords ? $keywords : [''];
+	if ( !defined($keywords) || ( ref($keywords) || "" ) ne "ARRAY" ) {
+		$keywords = defined $keywords ? $keywords : 'undef';
+		die
+		    qq{ArrayRef: invalid value $keywords for variable \$keywords in method build_function_keywords};
+	}
+	return $keywords;
+}
+
+sub build_function {
+	my ( $self, $meta ) = @_;
+	if ( ( ref($meta) || "" ) ne "HASH" ) {
+		$meta = defined $meta ? $meta : 'undef';
+		die
+		    qq{HashRef: invalid value $meta for variable \$meta in method build_function};
+	}
+
+	return qq(function $meta->{function} => sub $meta->{CODE};);
 
 }
 
@@ -779,6 +885,12 @@ call build_accessor method. Expects param $mg to be a Object, param $name to be 
 
 	$obj->build_accessor($mg, $name, $meta)
 
+=head2 build_sub
+
+call build_sub method. Expects param $mg to be a Object, param $name to be a Str, param $meta to be a HashRef.
+
+	$obj->build_sub($mg, $name, $meta)
+
 =head2 build_modify
 
 call build_modify method. Expects param $mg to be a Object, param $name to be a Str, param $meta to be a HashRef.
@@ -820,6 +932,18 @@ call build_has_keywords method. Expects param $keywords to be a ArrayRef.
 call build_has method. Expects param $meta to be a HashRef.
 
 	$obj->build_has($meta)
+
+=head2 build_function_keywords
+
+call build_function_keywords method. Expects param $keywords to be a ArrayRef.
+
+	$obj->build_function_keywords($keywords)
+
+=head2 build_function
+
+call build_function method. Expects param $meta to be a HashRef.
+
+	$obj->build_function($meta)
 
 =head2 build_extends_keywords
 

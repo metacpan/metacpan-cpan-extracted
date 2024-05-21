@@ -7,13 +7,13 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 use Test::More;
 use English qw( -no_match_vars );
 
-if ( !$ENV{ 'RELEASE_TESTING' } || !$ENV{ 'TEST_AUTHOR' } ) {
-    plan 'skip_all' => 'Author tests not required for installation';
+if ( !$ENV{ 'RELEASE_TESTING' } && !$ENV{ 'TEST_AUTHOR' } ) {
+    plan 'skip_all' => 'Release and Author tests not required for installation';
 }
 else {
     my $min_tcm = 0.9;                          ## no critic (ProhibitMagicNumbers)
@@ -22,7 +22,7 @@ else {
         plan 'skip_all' => "Test::CheckManifest $min_tcm required";
     }
 
-    ok_manifest( { 'filter' => [ qr/ignore[.]txt/aaixmso, qr/[.]gitignore/aaixmso ] } );
+    ok_manifest( { 'filter' => [ qr/ignore[.]txt/ixmso, qr/[.]gitignore/ixmso ] } );
 }
 
 done_testing();
@@ -53,7 +53,7 @@ Markus Demml, mardem@cpan.com
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2022, Markus Demml
+Copyright (c) 2024, Markus Demml
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as the Perl 5 programming language system itself.

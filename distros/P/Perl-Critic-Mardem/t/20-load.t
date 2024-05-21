@@ -7,11 +7,11 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 use Test::More;
 
-plan 'tests' => 8;
+plan 'tests' => 10;
 
 BEGIN {
     my $error_txt = "Bail out!\n";
@@ -22,16 +22,22 @@ BEGIN {
     use_ok( 'Perl::Critic::Mardem::Util' )
         || print $error_txt;
 
-    use_ok( 'Perl::Critic::Policy::Mardem::ProhibitConditionComplexity' )
-        || print $error_txt;
-
     use_ok( 'Perl::Critic::Policy::Mardem::ProhibitBlockComplexity' )
         || print $error_txt;
 
-    use_ok( 'Perl::Critic::Policy::Mardem::ProhibitLargeSub' )
+    use_ok( 'Perl::Critic::Policy::Mardem::ProhibitConditionComplexity' )
+        || print $error_txt;
+
+    use_ok( 'Perl::Critic::Policy::Mardem::ProhibitFileSize' )
         || print $error_txt;
 
     use_ok( 'Perl::Critic::Policy::Mardem::ProhibitLargeBlock' )
+        || print $error_txt;
+
+    use_ok( 'Perl::Critic::Policy::Mardem::ProhibitLargeFile' )
+        || print $error_txt;
+
+    use_ok( 'Perl::Critic::Policy::Mardem::ProhibitLargeSub' )
         || print $error_txt;
 
     use_ok( 'Perl::Critic::Policy::Mardem::ProhibitManyConditionsInSub' )
@@ -42,35 +48,22 @@ BEGIN {
 }
 
 diag(
-    "\nTesting Perl::Critic::Policy::Mardem::ProhibitConditionComplexity $Perl::Critic::Mardem::VERSION, Perl $], $^X"
-);
-
-diag(
-    "\nTesting Perl::Critic::Policy::Mardem::ProhibitConditionComplexity $Perl::Critic::Mardem::Util::VERSION, Perl $], $^X"
-);
-
-diag(
-    "\nTesting Perl::Critic::Policy::Mardem::ProhibitConditionComplexity $Perl::Critic::Policy::Mardem::ProhibitConditionComplexity::VERSION, Perl $], $^X"
-);
-
-diag(
-    "\nTesting Perl::Critic::Policy::Mardem::ProhibitBlockComplexity $Perl::Critic::Policy::Mardem::ProhibitBlockComplexity::VERSION, Perl $], $^X"
-);
-
-diag(
-    "\nTesting Perl::Critic::Policy::Mardem::ProhibitBlockComplexity $Perl::Critic::Policy::Mardem::ProhibitLargeSub::VERSION, Perl $], $^X"
-);
-
-diag(
-    "\nTesting Perl::Critic::Policy::Mardem::ProhibitBlockComplexity $Perl::Critic::Policy::Mardem::ProhibitLargeBlock::VERSION, Perl $], $^X"
-);
-
-diag(
-    "\nTesting Perl::Critic::Policy::Mardem::ProhibitBlockComplexity $Perl::Critic::Policy::Mardem::ProhibitManyConditionsInSub::VERSION, Perl $], $^X"
-);
-
-diag(
-    "\nTesting Perl::Critic::Policy::Mardem::ProhibitBlockComplexity $Perl::Critic::Policy::Mardem::ProhibitReturnBooleanAsInt::VERSION, Perl $], $^X"
+    "\n",
+    "\n --",
+    "\nPerl $], $^X",
+    "\nTesting Perl::Critic::Mardem $Perl::Critic::Mardem::VERSION",
+    "\nTesting Perl::Critic::Mardem::Utily $Perl::Critic::Mardem::Util::VERSION",
+    "\nTesting Perl::Critic::Policy::Mardem::ProhibitBlockComplexity $Perl::Critic::Policy::Mardem::ProhibitBlockComplexity::VERSION",
+    "\nTesting Perl::Critic::Policy::Mardem::ProhibitConditionComplexity $Perl::Critic::Policy::Mardem::ProhibitConditionComplexity::VERSION",
+    "\nTesting Perl::Critic::Policy::Mardem::ProhibitFileSize $Perl::Critic::Policy::Mardem::ProhibitFileSize::VERSION",
+    "\nTesting Perl::Critic::Policy::Mardem::ProhibitLargeBlock $Perl::Critic::Policy::Mardem::ProhibitLargeBlock::VERSION",
+    "\nTesting Perl::Critic::Policy::Mardem::ProhibitLargeFile $Perl::Critic::Policy::Mardem::ProhibitLargeFile::VERSION",
+    "\nTesting Perl::Critic::Policy::Mardem::ProhibitLargeSub $Perl::Critic::Policy::Mardem::ProhibitLargeSub::VERSION",
+    "\nTesting Perl::Critic::Policy::Mardem::ProhibitManyConditionsInSub $Perl::Critic::Policy::Mardem::ProhibitManyConditionsInSub::VERSION",
+    "\nTesting Perl::Critic::Policy::Mardem::ProhibitReturnBooleanAsInt $Perl::Critic::Policy::Mardem::ProhibitReturnBooleanAsInt::VERSION",
+    "\n --",
+    "\n",
+    "\n",
 );
 
 done_testing();
@@ -101,7 +94,7 @@ Markus Demml, mardem@cpan.com
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2022, Markus Demml
+Copyright (c) 2024, Markus Demml
 
 This library is free software; you can redistribute it and/or modify it 
 under the same terms as the Perl 5 programming language system itself. 

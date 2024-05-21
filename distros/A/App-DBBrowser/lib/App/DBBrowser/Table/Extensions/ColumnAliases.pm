@@ -37,7 +37,8 @@ sub column_aliases {
     COLUMN: while ( 1 ) {
         my @menu_cols;
         for my $col ( @{$sql->{selected_cols}} ) {
-            push @menu_cols, $col . ( length $sql->{alias}{$col} ? " as ". $sql->{alias}{$col} : "" );
+            my $normalized_col = $ax->normalize_space_in_stmt( $col );
+            push @menu_cols, $normalized_col . ( length $sql->{alias}{$col} ? " as ". $sql->{alias}{$col} : "" );
         }
         my @pre = ( undef, $sf->{i}{ok} );
         my $menu = [ @pre, @menu_cols ];
@@ -72,10 +73,11 @@ sub column_aliases {
             return { %{$sql->{alias}} };
         }
         my $chosen_col = $sql->{selected_cols}[$idx - @pre];
+        my $prompt = $ax->normalize_space_in_stmt( $chosen_col );
         $info = $ax->get_sql_info( $sql );
         # Readline
         my $alias = $tr->readline(
-            $chosen_col . " as ",
+            $prompt . " as ",
             { info => $info, default => $sql->{alias}{$chosen_col}, history => [ 'a' .. 'z' ] }
         );
         $ax->print_sql_info( $info );

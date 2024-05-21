@@ -4,7 +4,7 @@ Database::Abstraction - database abstraction layer
 
 # VERSION
 
-Version 0.04
+Version 0.08
 
 # SYNOPSIS
 
@@ -30,13 +30,13 @@ You can then access the data using:
     my $row = $foo->fetchrow_hashref(customer_id => 'xyzzy');
     print Data::Dumper->new([$row])->Dump();
 
-CSV files can have empty lines or comment lines starting with '#',
-to make them more readable.
-
 If the table has a column called "entry",
 entries are keyed on that and sorts are based on it.
 To turn that off, pass 'no\_entry' to the constructor, for legacy
 reasons it's enabled by default.
+
+CSV files that are not no\_entry can have empty lines or comment lines starting with '#',
+to make them more readable.
 
 # SUBROUTINES/METHODS
 
@@ -44,7 +44,7 @@ reasons it's enabled by default.
 
 Set some class level defaults.
 
-    MyPackageName::Database::init(directory => '../databases');
+    MyPackageName::Database::init(directory => '../data');
 
 See the documentation for new to see what variables can be set.
 
@@ -63,6 +63,7 @@ Arguments:
 cache => place to store results;
 cache\_duration => how long to store results in the cache (default is 1 hour);
 directory => where the database file is held
+max\_slurp\_size => CSV/PSV files smaller than this are held in RAM (default is 16K)
 
 If the arguments are not set, tries to take from class level defaults.
 
@@ -73,7 +74,10 @@ Pass a class that will be used for logging.
 ## selectall\_hashref
 
 Returns a reference to an array of hash references of all the data meeting
-the given criteria
+the given criteria.
+
+Note that since this returns an array ref,
+optimisations such as "LIMIT 1" will not be used.
 
 ## selectall\_hash
 
@@ -106,7 +110,7 @@ If the database has a column called "entry" you can do a quick lookup with
 
     my $value = $foo->column('123');    # where "column" is the value you're after
 
-Set distinct to 1 if you're after a unique list.
+Set distinct or unique to 1 if you're after a unique list.
 
 # AUTHOR
 

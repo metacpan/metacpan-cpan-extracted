@@ -80,6 +80,11 @@ sub doClear {
 	$_[0]->CWidg->clear
 }
 
+sub doExport {
+	my ($self, $file) = @_;
+	return $self->CWidg->exportSave($file);
+}
+
 sub doLoad {
 	my ($self, $file) = @_;
 	$self->Name($file);

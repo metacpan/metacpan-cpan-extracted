@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.1.2
+## Version v0.1.3
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2024/05/19
+## Modified 2024/05/21
 ## All rights reserved
 ## 
 ## 
@@ -304,7 +304,7 @@ BEGIN
     )?
     /xi;
     our $PROP_TO_SUB = {};
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
 };
 
 use strict;
@@ -467,7 +467,7 @@ sub as_string
     ms  => 'measurement',
     mu  => 'unit',
     nu  => 'number',
-    rg  => 'region',
+    rg  => 'region_override',
     sd  => 'subdivision',
     ss  => 'sentence_break',
     tz  => 'time_zone',
@@ -541,6 +541,7 @@ sub as_string
             $result->{ $prefix } = [] if( !exists( $result->{ $prefix } ) );
             if( exists( $def->{type} ) && $def->{type} eq 'boolean' )
             {
+                # We are explicit about the true value, but it could be ignored and be implicit.
                 push( @{$result->{ $prefix }}, join( '-', $tag, ( $val ? 'true' : 'false' ) ) );
             }
             else
@@ -1296,6 +1297,7 @@ sub _get_args_as_hash
 
 sub INIT
 {
+    # NOTE: $TZ_DICT
     $TZ_DICT =
     {
         adalv => { desc => "Andorra", tz => "Europe/Andorra" },
@@ -2322,6 +2324,7 @@ sub INIT
         zwhre => { desc => "Harare, Zimbabwe", tz => "Africa/Harare" },
     };
 
+    # NOTE: $TZ_NAME2ID
     # This BCP47 timezone database is different from the Olson IANA database in that it keeps old record for reliability and consistency.
     # See <https://github.com/unicode-org/cldr/blob/main/common/bcp47/timezone.xml>
     # <https://www.iana.org/time-zones>
@@ -3343,7 +3346,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 
@@ -3960,12 +3963,142 @@ This serves to set or get the value for a private subtag.
 =head2 region
 
     # current value: fr-FR
-    $locale->region( 'DE' );
-    # Now: fr-DE
+    $locale->region( '150' );
+    # Now: fr-150
 
 Sets or gets the C<region> part of a Unicode locale.
 
-This is normally an ISO3166-1 country code.
+This is a world region represented by a 3-digits code.
+
+Below are the known regions:
+
+=over 4
+
+=item * 001
+
+World
+
+=item * 002
+
+Africa
+
+=item * 003
+
+North America
+
+=item * 005
+
+South America
+
+=item * 009
+
+Oceania
+
+=item * 011
+
+Western Africa
+
+=item * 013
+
+Central America
+
+=item * 014
+
+Eastern Africa
+
+=item * 015
+
+Northern Africa
+
+=item * 017
+
+Middle Africa
+
+=item * 018
+
+Southern Africa
+
+=item * 019
+
+Americas
+
+=item * 021
+
+Northern America
+
+=item * 029
+
+Caribbean
+
+=item * 030
+
+Eastern Asia
+
+=item * 034
+
+Southern Asia
+
+=item * 035
+
+Southeast Asia
+
+=item * 039
+
+Southern Europe
+
+=item * 053
+
+Australasia
+
+=item * 054
+
+Melanesia
+
+=item * 057
+
+Micronesian Region
+
+=item * 061
+
+Polynesia
+
+=item * 142
+
+Asia
+
+=item * 143
+
+Central Asia
+
+=item * 145
+
+Western Asia
+
+=item * 150
+
+Europe
+
+=item * 151
+
+Eastern Europe
+
+=item * 154
+
+Northern Europe
+
+=item * 155
+
+Western Europe
+
+=item * 202
+
+Sub-Saharan Africa
+
+=item * 419
+
+Latin America
+
+=back
 
 =head2 region_override
 
@@ -3974,7 +4107,7 @@ This is normally an ISO3166-1 country code.
     # Now: en-GB-u-rg-uszzzz
     # which is a locale for British English but with region-specific defaults set to US.
 
-This is a Unicode Region Override that specifies an alternate region to use for obtaining certain region-specific default values.
+This is a Unicode Region Override that specifies an alternate C<country code> or C<region> to use for obtaining certain region-specific default values.
 
 Sets or gets the Unicode extension C<rg>.
 
@@ -7674,7 +7807,7 @@ A L<Unicode Variant Identifier|https://unicode.org/reports/tr35/#UnicodeVariantI
 
 =head2 Transform extensions
 
-This is used for transliterations, transcriptions, translations, etc, as per L<RFC6497|https://datatracker.ietf.org/doc/html/rfc6497>>
+This is used for transliterations, transcriptions, translations, etc, as per L<RFC6497|https://datatracker.ietf.org/doc/html/rfc6497>
 
 For example:
 
@@ -8210,7 +8343,7 @@ For example: C<ja-t-de-t0-und-x0-medical>
 
 =head2 Collation Options
 
-L<Parametric settings|https://unicode.org/reports/tr35/tr35-collation.html#Setting_Options> can be specified in language tags or in rule syntax (in the form [keyword value] ). For example, -ks-level2 or [strength 2] will only compare strings based on their primary and secondary weights.
+L<Parametric settings|https://unicode.org/reports/tr35/tr35-collation.html#Setting_Options> can be specified in language tags or in rule syntax (in the form [keyword value] ). For example, C<-ks-level2> or [strength 2] will only compare strings based on their primary and secondary weights.
 
 The options description below is taken from the LDML standard, and reflect how the algorithm works when implemented by web browser, or other runtime environment. This module does not do any of those algorithms. The documentation is only here for your benefit and convenience.
 
@@ -8398,7 +8531,7 @@ L<RFC6067 on the Unicode extensions|https://datatracker.ietf.org/doc/html/rfc606
 
 L<RFC6497 on the transformation extension|https://datatracker.ietf.org/doc/html/rfc6497>
 
-L<Unicode::Collate>
+L<Unicode::Collate>, L<Unicode::Collate::Locale>, L<Unicode::Unihan>
 
 =head1 COPYRIGHT & LICENSE
 

@@ -17,7 +17,7 @@ my $res = $test2->fetchrow_hashref(entry => 'first');
 cmp_ok($res->{'entry'}, 'eq', 'first', 'fetchrow_hashref');
 cmp_ok($res->{'number'}, 'eq', '1st', 'fetchrow_hashref');
 
-my @rc = $test2->entry(distinct => 1);
+my @rc = $test2->entry(unique => 1);
 cmp_ok(scalar(@rc), '==', 3, 'getting all the distinct entries works');
 
 @rc = $test2->entry();
@@ -33,4 +33,4 @@ if($ENV{'TEST_VERBOSE'}) {
 	diag(Data::Dumper->new([\@rc])->Dump());
 }
 
-cmp_ok(scalar(@rc), '==', 3, 'selectall_hashref returns all entries');
+cmp_ok(scalar(@rc), '==', 3, 'selectall_hash returns all entries');

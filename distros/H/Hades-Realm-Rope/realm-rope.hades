@@ -1,0 +1,110 @@
+lib lib
+tlib t
+author LNATION
+email email@lnation.org
+version 0.02
+Hades::Realm::Rope base Hades::Realm::OO {
+	abstract { Hades realm for Moose }
+	synopsis {
+Quick summary of what the module does:
+
+	Hades->run({
+		eval => q|
+			Kosmos { 
+				[curae penthos] :t(Int) :d(2) :p :pr :c :r 
+				geras $nosoi :t(Int) :d(5) { 
+					if (£penthos == $nosoi) {
+						return £curae;
+					}
+				} 
+			}
+		|,
+		realm => 'Rope',
+	});
+
+	... generates ...
+
+	package Kosmos;
+	use strict;
+	use warnings;
+	use Rope;
+	use Rope::Autoload;
+	use Types::Standard qw/Int/;
+	our $VERSION = 0.01;
+
+	property curae => (
+		initable  => 1,
+		writeable => 1,
+		type      => Int,
+		required  => 1,
+		clearer   => "clear_curae",
+		predicate => "has_curae",
+		private   => 1,
+		value     => 2
+	);
+
+	property penthos => (
+		initable  => 1,
+		writeable => 1,
+		type      => Int,
+		required  => 1,
+		clearer   => "clear_penthos",
+		predicate => "has_penthos",
+		private   => 1,
+		value     => 2
+	);
+
+	function geras => sub {
+		my ( $self, $nosoi ) = @_;
+		$nosoi = defined $nosoi ? $nosoi : 5;
+		if ( !defined($nosoi) || ref $nosoi || $nosoi !~ m/^[-+\d]\d*$/ ) {
+			$nosoi = defined $nosoi ? $nosoi : 'undef';
+			die
+			    qq{Int: invalid value $nosoi for variable \$nosoi in method geras};
+		}
+		if ( $self->penthos == $nosoi ) { return $self->curae; }
+	};
+
+	1;
+
+	__END__
+	}
+	build_as_role :a {
+		$res[0]->use(q|Rope::Role|);
+		$res[0]->use(sprintf q|Types::Standard qw/%s/|, join(' ', keys %{£meta->{£current_class}->{types}}));
+	}
+	build_as_class :a {
+		$res[0]->use(q|Rope|);
+		$res[0]->use(q|Rope::Autoload|);
+		$res[0]->use(sprintf q|Types::Standard qw/%s/|, join(' ', keys %{£meta->{£current_class}->{types}}));
+	}
+	build_has $meta :t(HashRef) { 
+		$meta->{is} ||= '"rw"';
+		my $attributes = sprintf "initable => 1, writeable => %s,", $meta->{is} =~ m/^ro$/ ? 0 : 1;
+		$attributes .= sprintf "type => %s,", $meta->{isa} if $meta->{isa};
+		$attributes .= join ', ', map {
+			($meta->{$_} ? (sprintf "%s => %s", $_, $meta->{$_}) : ())
+		} qw/required clearer predicate trigger builder private/;
+		$attributes .= sprintf ", value => %s", $meta->{default} if $meta->{default};
+		my $name = $meta->{has};
+		my $code = qq{
+			property $name => ( $attributes );
+		};
+		return $code;
+	}
+	build_accessor_predicate $name :t(Str) $content :t(Str) {
+		return qq|"has_$name"|;
+	}
+	build_accessor_clearer $name :t(Str) $content :t(Str) {
+		return qq|"clear_$name"|;
+	}
+	build_accessor_builder $name :t(Str) $content :t(Str) {
+		return $content =~ m/^\w\w+$/ ? $content : qq|"_build_$name"|;
+	}
+	build_accessor_default $name :t(Str) $content :t(Str) {
+		return $content;
+	}
+	has_function_keyword {
+		return 1;
+	}
+}

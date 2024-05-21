@@ -6,7 +6,11 @@ lib/Rope/Chain.pm
 lib/Rope/Conditional.pm
 lib/Rope/Factory.pm
 lib/Rope/Handles/Array.pm
+lib/Rope/Handles/Bool.pm
+lib/Rope/Handles/Counter.pm
 lib/Rope/Handles/Hash.pm
+lib/Rope/Handles/Number.pm
+lib/Rope/Handles/String.pm
 lib/Rope/Monkey.pm
 lib/Rope/Object.pm
 lib/Rope/Role.pm
@@ -65,6 +69,10 @@ t/44-each.t
 t/45-freeze.t
 t/46-keys-and-values.t
 t/47-delete.t
+t/48-string.t
+t/49-number.t
+t/50-counter.t
+t/51-bool.t
 t/lib/Custom.pm
 t/lib/One.pm
 t/lib/Role.pm

@@ -4,10 +4,10 @@ use warnings;
 use Tk;
 
 use Test::Tk;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use File::Spec;
 $mwclass = 'App::Codit';
-$quitdelay = 2500;
+#$quitdelay = 2500;
 
 BEGIN { use_ok('App::Codit::Plugins::FileBrowser') };
 
@@ -18,10 +18,21 @@ createapp(
 	-configfolder => File::Spec->rel2abs('t/settings'),
 );
 
+my $pext;
+if (defined $app) {
+	$pext = $app->extGet('Plugins');
+}
 push @tests, (
 	[ sub { 
-		return $app->extGet('Plugins')->plugExists('FileBrowser') 
+		return $pext->plugExists('FileBrowser') 
 	}, 1, 'Plugin FileBrowser loaded' ],
+	[ sub {
+		pause(100);
+		$pext->plugUnload('FileBrowser');
+		my $b = $pext->plugGet('FileBrowser');
+		return defined $b 
+#		return $pext->plugExists('FileBrowser') 
+	}, '', 'Plugin FileBrowser unloaded' ],
 );
 
 starttesting;

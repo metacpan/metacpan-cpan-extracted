@@ -87,11 +87,12 @@ constantDef:
 switch:
     'switch' '(' declaration ')' '{' caseBody '}' {
                   +{ discriminator => {
+                        name => delete $_[3]->{name},
                         declaration => $_[3],
                         comments => $_[2]->{comments},
                         trailing_comments => $_[4]->{comments}
                      },
-                     handlers => {
+                     members => {
                         cases => $_[6]->{clauses},
                         default => $_[6]->{default},
                         comments => $_[5]->{comments},
@@ -127,14 +128,15 @@ caseClause:
 defaultClause:
     'default' ':' declaration ';'    {
             # What to do with comments on the ':'?
-            +{ declaration => $_[3],
+            +{ name => delete $_[3]->{name},
+               declaration => $_[3],
                comments => $_[1]->{comments},
                location => $_[1]->{location},
                trailing_comments => $_[4]->{comments} } }
 ;
 
 structBody:
-    '{' structItems '}'         { +{ fields => $_[2],
+    '{' structItems '}'         { +{ members => $_[2],
                                      comments => $_[1]->{comments},
                                      location => $_[1]->{location},
                                      trailing_comments => $_[3]->{comments} } }
@@ -147,7 +149,8 @@ structItems:
 
 structItem:
     declaration ';'             {
-            +{ %{ $_[1] },
+            +{ name => delete $_[1]->{name},
+               declaration => $_[1],
                trailing_comments => $_[2]->{comments} } }
 ;
 
@@ -358,7 +361,7 @@ sub _Lexer {
           location => $token_start
       });
     }
-    elsif ($yydata->{INPUT} =~ s/^(-?\d+|0x\d+)(?=\b|$)//) {
+    elsif ($yydata->{INPUT} =~ s/^(-?\d+|0x[0-9a-f]+)(?=\b|$)//i) {
       $yydata->{COLNO} += length($&);
       return ('CONST', {
           content => $1,
@@ -397,7 +400,7 @@ sub parse {
 
 =head1 NAME
 
-XDR::Parse - Creation of an AST of an XDR specification
+XDR::Parse - Creation of an AST of an XDR specification (RFC4506)
 
 =head1 SYNOPSIS
 
@@ -410,8 +413,12 @@ XDR::Parse - Creation of an AST of an XDR specification
 =head1 DESCRIPTION
 
 This module contains a parser for the XDR (eXternal Data Representation)
-language.  The result is an abstract syntax tree (AST) which can be used
-for further processing.
+language as defined in RFC4506.  The result is an abstract syntax tree
+(AST) which can be used for further processing.
+
+This module extends the supported integer types with C<char>, C<short> and
+C<long>, all of which seem to be supported by C<rpcgen>, the tool consuming
+XDR to generate remote applications.
 
 =head2 AST
 
@@ -481,8 +488,9 @@ the node's hash:
 
 =item * C<numeric>
 
-  const my_const = 0x123;
-  const my_other_const = 123;
+  const my_const = 0x123;     # hexadecimal
+  const my_other_const = 123; # decimal
+  const my_third_const = 012; # octal
 
 =item * C<symbolic>
 
@@ -524,21 +532,21 @@ in the enum type.
 
 =head4 'struct' declarations
 
-Th C<declaration> node of C<struct> definitions has a single key (C<fields>):
-an array of nodes with C<name> and C<type> keys describing the fields of the
-struct type. For more details on the C<type> node, see below.
+Th C<declaration> node of C<struct> definitions has a single key (C<members>):
+an array of nodes with C<name> and C<declaration> keys describing the members
+of the struct type. For more details on the C<type> node, see below.
 
 =head4 'union' declarations
 
 The C<declaration> node of C<union> definitions has a single key (C<switch>):
-itself a node which contains a C<handlers> and a C<discriminator> key.  The
-discriminator node has a C<name> and a C<type> key; the C<handlers> node
+itself a node which contains a C<members> and a C<discriminator> key.  The
+discriminator node has a C<name> and a C<type> key; the C<members> node
 contains one or two keys: C<cases> and optionally C<default>.  C<cases> is an
-array of nodes defining the fields of the union; each element consists of
+array of nodes defining the members of the union; each element consists of
 three keys: C<value>, C<name> and <declaration>. C<value> is the value
 associated with the discriminator, to indicate the current definition.
-C<name> is the name of the field. C<declaration> contains the type declaration
-for the field.
+C<name> is the name of the member. C<declaration> contains the type declaration
+for the member.
 
 =head4 'declaration' nodes
 
@@ -619,7 +627,7 @@ Defines an inline union through the type's C<declaration> key.
 =back
 
 The node in the C<declaration> key of the inline C<enum>, C<struct> and C<union>
-fields follow the same pattern as documented in the respective sections on
+members follow the same pattern as documented in the respective sections on
 declarations above.
 
 =head1 METHODS

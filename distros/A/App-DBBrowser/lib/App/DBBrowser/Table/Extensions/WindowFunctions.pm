@@ -40,7 +40,7 @@ sub __choose_a_column {
         }
         elsif ( $choice eq $sf->{i}{menu_addition} ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            # clause 'window_function': to avoid window function in window function
+            # from 'window_function': to avoid window function in window function
             my $complex_col = $ext->column(
                 $sql, $clause, {},
                 { from =>'window_function', info => $info }
@@ -58,7 +58,7 @@ sub __choose_a_column {
 sub __get_win_func_stmt {
     my ( $sf, $win_func_data ) = @_;
     my $win_func_stmt = $win_func_data->{func};
-    $win_func_stmt .= sprintf '(%s)', $win_func_data->{col} // '';
+    $win_func_stmt .= sprintf '(%s)', $win_func_data->{args} // '';
     my @win_definition;
     for my $stmt ( qw(partition_by_stmt order_by_stmt frame_clause) ) {
         if ( length $win_func_data->{$stmt} ) {
@@ -75,25 +75,25 @@ sub window_function {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $count_all = 'COUNT*';
-    my $count_all_regex = quotemeta $count_all;
-    my @win_func_aggr = ( 'AVG', 'COUNT', $count_all, 'MAX', 'MIN', 'SUM' );
+    my $func_count_all = 'COUNT*';
+    my $rx_func_count_all = quotemeta $func_count_all;
+    my @win_func_aggr = ( 'AVG', 'COUNT', $func_count_all, 'MAX', 'MIN', 'SUM' );
     my @win_func_rank = ( 'CUME_DIST', 'DENSE_RANK', 'NTILE', 'PERCENT_RANK', 'RANK', 'ROW_NUMBER' );
     my @win_func_value = ( 'FIRST_VALUE', 'LAG', 'LAST_VALUE', 'LEAD', 'NTH_VALUE' );
 
     my @functions = sort( @win_func_aggr, @win_func_rank, @win_func_value );
 
-    my @no_col_func = ( 'CUME_DIST', 'DENSE_RANK', 'PERCENT_RANK', 'RANK', 'ROW_NUMBER' );
-    my $no_col_func_regex = join( '|', map { quotemeta } @no_col_func );
+    my @func_no_col = ( 'CUME_DIST', 'DENSE_RANK', 'PERCENT_RANK', 'RANK', 'ROW_NUMBER' );
+    my $rx_func_no_col = join( '|', map { quotemeta } @func_no_col );
 
-    my @col_is_number_func = ( 'NTILE' );
-    my $col_is_number_func_regex = join( '|', map { quotemeta } @col_is_number_func );
+    my @func_col_is_number = ( 'NTILE' );
+    my $rx_func_col_is_number = join( '|', map { quotemeta } @func_col_is_number );
 
-    my @offset_func = ( 'LAG', 'LEAD', 'NTH_VALUE' );
-    my $offset_func_regex = join( '|', map { quotemeta } @offset_func );
+    my @func_with_offset = ( 'LAG', 'LEAD', 'NTH_VALUE' );
+    my $rx_func_with_offset = join( '|', map { quotemeta } @func_with_offset );
 
-    my @default_value_func = ( 'LAG', 'LEAD' );
-    my $default_value_func_regex = join( '|', map { quotemeta } @default_value_func );
+    my @func_with_offset_and_default = ( 'LAG', 'LEAD' );
+    my $rx_func_with_offset_and_default = join( '|', map { quotemeta } @func_with_offset_and_default );
 
     my $info = $opt->{info} // $ax->get_sql_info( $sql );
     my $win_func_data = {};
@@ -121,65 +121,61 @@ sub window_function {
         }
         if ( $menu->[$idx_wf] eq $hidden ) {
             $ext->enable_extended_arguments( $info );
-            if ( $sf->{o}{enable}{extended_args} ) {
-                $hidden = 'Window functions:*';
-            }
-            else {
-                $hidden = 'Window functions:';
-            }
             next WINDOW_FUNCTION;
         }
         my $func = $functions[$idx_wf-@pre];
         $win_func_data->{func} = $func;
 
         COLUMN: while ( 1 ) {
-            if ( exists $win_func_data->{col} ) {
-                delete $win_func_data->{col};
+            if ( exists $win_func_data->{args} ) {
+                delete $win_func_data->{args};
             }
             my $tmp_info = $info . "\n" . $sf->__get_win_func_stmt( $win_func_data );
-            my $col;
-            if ( $func =~ /^$count_all_regex\z/i ) {
-                $col = '*';
+            my $qt_col;
+            if ( $func =~ /^$rx_func_count_all\z/i ) {
+                $qt_col = '*';
                 $win_func_data->{func} = $func =~ s/\*\z//r;
             }
-            elsif ( $func =~ /^(?:$no_col_func_regex)\z/i ) {
-                $col = '';
+            elsif ( $func =~ /^(?:$rx_func_no_col)\z/i ) {
+                $qt_col = '';
             }
-            elsif ( $func =~ /^(?:$col_is_number_func_regex)\z/i ) {
+            elsif ( $func =~ /^(?:$rx_func_col_is_number)\z/i ) {
                 # Readline
-                $col = $ext->argument( $sql, $clause, { info => $info . "\n" . $func . '(n)', history => undef, prompt => 'n = ' } );
-                if ( ! length $col ) {
+                $qt_col = $ext->argument( $sql, $clause, { info => $info . "\n" . $func . '(n)', history => undef, prompt => 'n = ', is_numeric => 1 } );
+                if ( ! length $qt_col || $qt_col eq "''" ) {
                     next WINDOW_FUNCTION;
                 }
             }
             else {
-                $col = $sf->__choose_a_column( $sql, $clause, $qt_cols, $info, $func );
-                if ( ! defined $col ) {
+                $qt_col = $sf->__choose_a_column( $sql, $clause, $qt_cols, $info, $func );
+                if ( ! defined $qt_col ) {
                     delete $win_func_data->{func};
                     next WINDOW_FUNCTION;
                 }
             }
-            $win_func_data->{col} = $col;
-            if ( $func =~ /^(?:$offset_func_regex)\z/i ) {
+            my $args = $qt_col;
+            $win_func_data->{args} = $args;
+            if ( $func =~ /^(?:$rx_func_with_offset)\z/i ) {
                 $tmp_info = $info . "\n" . $sf->__get_win_func_stmt( $win_func_data );
                 # Readline
-                my $offset = $ext->argument( $sql, $clause, { info => $tmp_info, history => undef, prompt => 'offset: ' } );
-                if ( ! defined $offset ) {
-                    next WINDOW_FUNCTION;
-                }
-                if ( length $offset ) {
-                    $col .= ',' . $offset;
-                    $win_func_data->{col} = $col;
+                my $offset = $ext->argument( $sql, $clause, { info => $tmp_info, history => undef, prompt => 'offset: ', is_numeric => 1 } );
+                #if ( ! defined $offset ) {
+                #    next WINDOW_FUNCTION;
+                #}
+                if ( length $offset && $offset ne "''" ) {
+                    $args .= ',' . $offset;
+                    $win_func_data->{args} = $args;
                     $tmp_info = $info . "\n" . $sf->__get_win_func_stmt( $win_func_data );
-                    if ( $func =~ /^(?:$default_value_func_regex)\z/i ) {
+                    if ( $func =~ /^(?:$rx_func_with_offset_and_default)\z/i ) {
+                        my $is_numeric = $ax->column_type_is_numeric( $sql, $qt_col );
                         # Readline
-                        my $default_value = $ext->argument( $sql, $clause, { info => $tmp_info, history => undef, prompt => 'default: ' } );
-                        if ( ! defined $default_value) {
-                            next WINDOW_FUNCTION;
-                        }
-                        if ( length $default_value ) {
-                            $col .= ',' . $default_value;
-                            $win_func_data->{col} = $col;
+                        my $default_value = $ext->argument( $sql, $clause, { info => $tmp_info, history => undef, prompt => 'default: ', is_numeric => $is_numeric } );
+                        #if ( ! defined $default_value) {
+                        #    next WINDOW_FUNCTION;
+                        #}
+                        if ( length $default_value && $default_value ne "''" ) {
+                            $args .= ',' . $default_value;
+                            $win_func_data->{args} = $args;
                         }
                     }
                 }
@@ -203,7 +199,7 @@ sub window_function {
                         $win_func_data = pop @bu;
                         next WINDOW_DEFINITION;
                     }
-                    if ( $func =~ /^(?:$count_all_regex|$no_col_func_regex)\z/ ) {
+                    if ( $func =~ /^(?:$rx_func_count_all|$rx_func_no_col)\z/ ) {
                         next WINDOW_FUNCTION;
                     }
                     next COLUMN;
@@ -507,8 +503,8 @@ sub __add_frame_start_or_end {
             $frame_clause_data->{$pos} = $point;
             if ( $point =~ /^n / ) {
                 my $tmp_info = $info . "\n" . $sf->__get_frame_clause_stmt( $frame_clause_data );
-                my $offset = $ext->argument( $sql, $clause, { info => $tmp_info, history => undef, prompt => 'n = ' } );
-                if ( ! length $offset ) {
+                my $offset = $ext->argument( $sql, $clause, { info => $tmp_info, history => undef, prompt => 'n = ', is_numeric => 1 } );
+                if ( ! length $offset || $offset eq "''" ) {
                     next FRAME_START;
                 }
                 $point =~ s/^n/$offset/;

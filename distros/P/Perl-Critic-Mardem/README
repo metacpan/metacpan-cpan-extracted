@@ -1,5 +1,5 @@
 
-Mardem-PerlRefactoringSupport
+Perl-Critic-Mardem
 
 DESCRIPTION
 
@@ -22,6 +22,8 @@ ProhibitManyConditionsInSub - subs has many conditionals "if, while, for, ..."
 ProhibitLargeBlock - large code block as statement count "{...}"
 ProhibitBlockComplexity - code block complexity "{...}"
 ProhibitLargeSub - large subs as statement count
+ProhibitLargeFile - large files as line count
+ProhibitFileSize - large files as byte or char count
 
 INSTALLATION
 
@@ -48,7 +50,7 @@ Markus Demml, mardem@cpan.com
 
 LICENSE AND COPYRIGHT
 
-Copyright (c) 2022, Markus Demml
+Copyright (c) 2024, Markus Demml
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as the Perl 5 programming language system itself.

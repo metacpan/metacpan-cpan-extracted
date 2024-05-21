@@ -7,7 +7,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 use Readonly;
 use Perl::Critic;
@@ -144,7 +144,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"if"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso, 'violation description correct with if';
+    like $desc, qr/"if"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso, 'violation description correct with if';
 }
 
 #####
@@ -176,8 +176,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"if"\scondition\s.*\scomplexity\sscore\s[(]3[)]/aaixmso,
-        'description correct mcc value 3 not allowd';
+    like $desc, qr/"if"\scondition\s.*\scomplexity\sscore\s[(]3[)]/ixmso, 'description correct mcc value 3 not allowd';
 }
 
 #####
@@ -209,7 +208,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"unless"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"unless"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with unless';
 }
 
@@ -228,7 +227,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"while"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"while"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with while';
 }
 
@@ -247,7 +246,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"until"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"until"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with until';
 }
 
@@ -266,7 +265,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"while"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"while"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with do-while';
 }
 
@@ -285,7 +284,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"for"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso, 'violation description correct with for';
+    like $desc, qr/"for"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso, 'violation description correct with for';
 }
 
 #####
@@ -306,7 +305,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"elsif"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"elsif"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with elsif';
 }
 
@@ -325,7 +324,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"if"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"if"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with if which includes sub-blocks';
 }
 
@@ -354,7 +353,7 @@ END_OF_STRING
 
     my $desc = _get_description_from_violations( @violations );
 
-    like $desc, qr/"if"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/aaixmso,
+    like $desc, qr/"if"\scondition\s.*\scomplexity\sscore\s[(]\d+[)]/ixmso,
         'violation description correct with posix-if which includes sub-blocks';
 }
 
@@ -400,7 +399,7 @@ Markus Demml, mardem@cpan.com
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2022, Markus Demml
+Copyright (c) 2024, Markus Demml
 
 This library is free software; you can redistribute it and/or modify it 
 under the same terms as the Perl 5 programming language system itself. 

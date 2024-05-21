@@ -8,6 +8,8 @@ App::Codit::Plugins::Sessions - plugin for App::Codit
 
 use strict;
 use warnings;
+use vars qw( $VERSION );
+$VERSION = 0.03;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -339,7 +341,7 @@ sub Unload {
 	$self->sessionCurrent('');
 	$self->cmdUnhookAfter('set_title', 'AdjustTitle', $self);
 	$self->AdjustTitle;
-	return 1
+	return $self->SUPER::Unload
 }
 
 =head1 LICENSE

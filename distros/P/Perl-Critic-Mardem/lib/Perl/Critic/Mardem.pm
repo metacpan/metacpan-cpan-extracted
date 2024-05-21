@@ -7,7 +7,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 1;
 
@@ -21,16 +21,16 @@ __END__
 
 =head1 NAME
 
-Perl::Critic::Mardem - Perl-Critic policies for simple and isolated Refactoring-Support.
+Perl::Critic::Mardem - Perl-Critic policies for isolated Refactoring-Support.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.05
 
 =head1 DESCRIPTION
 
-This Perl-Crictic Policy-Modules should help where to start a safe
-refactoring in old leagacy Perl code.
+This Perl-Critic Policy-Modules should help where to start a safe
+refactoring in old legacy Perl code.
 
 The McCabe complexity check within the standard Perl-Critic Module are a good
 overall starting point see:
@@ -69,6 +69,14 @@ code block complexity "{...}"
 
 large subs as statement count
 
+=head2 L<Perl::Critic::Policy::Mardem::ProhibitLargeFile>
+
+large files as line count
+
+=head2 L<Perl::Critic::Policy::Mardem::ProhibitFileSize>
+
+large files as byte or char count
+
 =head1 AFFILIATION
 
 This module has no functionality, but instead contains documentation for this
@@ -88,7 +96,7 @@ Markus Demml, mardem@cpan.com
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2022, Markus Demml
+Copyright (c) 2024, Markus Demml
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as the Perl 5 programming language system itself.

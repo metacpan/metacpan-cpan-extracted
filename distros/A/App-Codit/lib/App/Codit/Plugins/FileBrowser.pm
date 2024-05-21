@@ -8,6 +8,8 @@ App::Codit::Plugins::FileBrowser - plugin for App::Codit
 
 use strict;
 use warnings;
+use vars qw( $VERSION );
+$VERSION = 0.03;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -87,7 +89,7 @@ sub Unload {
 	my $self = shift;
 	$self->cmdRemove('fb_open');
 	$self->extGet('NavigatorPanel')->deletePage('FileBrowser');
-	return 1
+	return $self->SUPER::Unload
 }
 
 =head1 LICENSE

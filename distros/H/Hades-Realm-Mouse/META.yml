@@ -23,5 +23,5 @@ requires:
   Mouse: '0'
   Type::Tiny: '1.010000'
   perl: '5.006'
-version: 0.06
+version: 0.07
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
