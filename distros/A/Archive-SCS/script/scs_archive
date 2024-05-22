@@ -1,0 +1,275 @@
+#!perl
+
+use v5.38;
+
+use Archive::SCS;
+use Archive::SCS::CityHash qw( cityhash64 cityhash64_hex );
+use Archive::SCS::GameDir;
+use Getopt::Long 2.33 qw( :config gnu_getopt no_bundling no_ignore_case );
+use Path::Tiny;
+use Pod::Usage;
+
+my %opts;
+GetOptions \%opts, qw(
+  extract|x
+  game|g=s
+  help|?
+  list-dirs
+  list-files
+  list-orphans
+  mount|m=s@
+  output|o=s
+  recursive|r
+  verbose|v
+  version
+);
+$opts{help} and pod2usage -verbose => 2;
+pod2usage unless
+  $opts{'list-dirs'} || $opts{'list-files'} || $opts{'list-orphans'}
+  || $opts{extract} || $opts{version};
+
+
+# Discover game install dir
+
+my $game_dir = Archive::SCS::GameDir->new( game => $opts{game} );
+
+
+# Print version info
+
+if ($opts{version}) {
+  say sprintf "Archive::SCS version %s  (Perl %s)",
+    Archive::SCS->VERSION, $^V;
+  eval { say sprintf "%s version %s", $game_dir->game, $game_dir->version };
+  exit;
+}
+
+
+# Mount archives
+
+my @archives = map {
+  $_ =~ /\//
+  ? path($_)
+  : path($_)->absolute($game_dir->path)
+} $opts{mount} ? $opts{mount}->@* : $game_dir->archives;
+
+my $scs = Archive::SCS->new;
+for (@archives) {
+  $opts{verbose} and
+    print STDERR sprintf "%s: ", $_->basename;
+  my $entries = $scs->mount($_)->entries;
+  $opts{verbose} and
+    say STDERR sprintf "mounted, %i entr%s",
+    $entries, ($entries == 1 ? "y" : "ies");
+}
+
+
+# Write listings
+
+$opts{'list-dirs'}    and say for $scs->list_dirs;
+$opts{'list-files'}   and say for $scs->list_files;
+$opts{'list-orphans'} and say for $scs->list_orphans;
+
+$opts{'list-dirs'} || $opts{'list-files'} || $opts{'list-orphans'}
+  and exit;
+
+
+# Prepare list of files to extract
+
+sub is_dir ($scs, $entry) {
+  my @mounts = $scs->entry_mounts($entry);
+  my $mount = $mounts[$#mounts]
+    or die sprintf "%s not found in mounted archives", $entry;
+  my $meta = $mount->entry_meta( cityhash64 $entry );
+  $meta //= $mount->entry_meta( cityhash64_hex $entry );
+  return !! $meta->{is_dir};
+}
+
+my @extracts = grep !/^-$/, @ARGV;
+if (@extracts != @ARGV) {
+  local $/;
+  push @extracts, split /\n/, <STDIN>;
+}
+
+my @list_dirs  = $scs->list_dirs;
+my @list_files = $scs->list_files;
+
+my (@dirs, @files);
+for my $path ( map { s{^/|/$}{}rg } @extracts ) {
+  if ( is_dir($scs, $path) ) {
+    push @dirs, $path;
+    if ($opts{recursive}) {
+      my $path_filter = '';
+      length $path and $path_filter = qr{^\Q$path\E(?:/|$)};
+      push @dirs,  grep /^$path_filter/, @list_dirs;
+      push @files, grep /^$path_filter/, @list_files;
+    }
+  }
+  else {
+    push @files, $path;
+  }
+}
+
+
+# Extract the files
+
+$opts{output} //= '';
+if ($opts{output} eq '-') {
+  say $scs->read_entry($_) for sort @files;
+  exit;
+}
+
+if (length $opts{output}) {
+  chdir path($opts{output})->mkdir or die "$opts{output}: $!";
+}
+
+for my $file (sort @files) {
+  my $path = path $file;
+  $path->parent->mkdir;
+  $path->spew_raw( $scs->read_entry($file) );
+}
+path($_)->mkdir for sort grep !/^$/, @dirs;
+
+$opts{verbose} and
+  say STDERR sprintf "Extracted %i file%s.",
+  (scalar @files), (@files == 1 ? "" : "s");
+
+
+=head1 NAME
+
+scs_archive - Read and extract .scs archive contents
+
+=head1 SYNOPSIS
+
+  # List archive contents
+  scs_archive --list-dirs
+  scs_archive --list-files
+  scs_archive --list-orphans
+
+  # Extract files
+  scs_archive -x def/sign/mileage_targets.sii
+  scs_archive -x -r def/country  def/bank_data.sii
+  scs_archive -x version.sii -o - | grep version
+  scs_archive --list-files | grep wallbert | scs_archive -x -
+
+  # Select a specific game dir to work on
+  scs_archive -g ATS ...
+  scs_archive -g ~/.local/steam/steamapps/...  --version
+  STEAM_LIBRARY=~/.local/steam  scs_archive ...
+
+  # Only work on specific archive files
+  scs_archive -m def.scs ...
+  scs_archive -m def.scs -m dlc_ne.scs -m dlc_ks.scs ...
+  scs_archive -m path/to/file.scs ...
+
+  scs_archive --help
+
+=head1 DESCRIPTION
+
+Read and extract SCS archive contents.
+
+Unless otherwise specified with the C<--mount> option, this tool
+will search for the game install dir inside your Steam library
+and mount every .scs file found in there. If you have more than
+one SCS game installed, you can specify which one to work on
+using the C<--game> option.
+
+Archive contents can be listed using the C<--list-*> commands.
+Some files may not appear in a directory index. Such "orphans"
+can be listed separately. Files, orphans and directories can be
+extracted by using the C<--extract> command.
+
+Note that HashFS version 2 texture objects are not yet implemented.
+Trying to extract those with this tool currently won't yield a
+useful result.
+
+=head1 COMMANDS
+
+=over
+
+=item --extract, -x
+
+Extract the given paths from the mounted archives (including
+subdir contents, if any). If C<-> is given as path, this tool
+will read the list of paths to extract from standard input.
+
+=item --help, -?
+
+Display this manual page.
+
+=item --list-dirs
+
+Write all directory paths in mounted archives to standard output.
+
+=item --list-files
+
+Write all file paths in mounted archives to standard output.
+
+=item --list-orphans
+
+Write the hash of all orphans in
+mounted archives to standard output.
+
+=item --version
+
+Display version information.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item --game, -g
+
+The game install dir to work on. Accepts a full path, the full
+game name, or the abbreviated game name (C<ATS> or C<ETS2>).
+Given a game name, this tool will search several common
+locations for your Steam library. If your Steam library
+is installed in a non-standard location, you can set the
+environment variable C<STEAM_LIBRARY>.
+See L<Archive::SCS::GameDir> for other options.
+
+=item --mount, -m
+
+SCS archive file to mount. May be given multiple times. Accepts
+a full or relative path or a simple filename; the latter will
+be matched to the game install dir, see C<--game>. If not given,
+all the archives in the install dir will be mounted.
+
+=item --output, -o
+
+Any extracted files and directories will be created in the
+specified path. If C<-> is given as path, this tool will write
+to standard output instead of creating files (best used for
+extracting single files only).
+
+=item --recursive, -r
+
+Extract directory contents recursively. If this option is not
+given, extracting a directory will only create the directory
+itself, but not any files inside it.
+
+=item --verbose, -v
+
+Print diagnostic information.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Archive::SCS>
+
+=back
+
+=head1 AUTHOR
+
+L<nautofon|https://github.com/nautofon>
+
+=head1 COPYRIGHT
+
+This software is copyright (c) 2024 by nautofon.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

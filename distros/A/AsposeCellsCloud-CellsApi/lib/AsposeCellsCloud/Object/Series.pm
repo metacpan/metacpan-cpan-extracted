@@ -36,10 +36,15 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 use AsposeCellsCloud::Object::Area;
+use AsposeCellsCloud::Object::DataLabels;
+use AsposeCellsCloud::Object::DropBars;
+use AsposeCellsCloud::Object::ErrorBar;
+use AsposeCellsCloud::Object::LegendEntry;
 use AsposeCellsCloud::Object::Line;
 use AsposeCellsCloud::Object::Link;
 use AsposeCellsCloud::Object::LinkElement;
-use AsposeCellsCloud::Object::Marker; 
+use AsposeCellsCloud::Object::Marker;
+use AsposeCellsCloud::Object::Trendlines; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -122,7 +127,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Encapsulates the object that represents a single data series in a chart.',
                                   class => 'Series',
                                   required => [], # TODO
 }                                 );
@@ -172,7 +177,7 @@ __PACKAGE__->method_documentation({
      	read_only => '',
      		},
      'data_labels' => {
-     	datatype => 'LinkElement',
+     	datatype => 'DataLabels',
      	base_name => 'DataLabels',
      	description => 'Represents the DataLabels object for the specified ASeries.',
      	format => '',
@@ -193,7 +198,7 @@ __PACKAGE__->method_documentation({
      	read_only => '',
      		},
      'down_bars' => {
-     	datatype => 'LinkElement',
+     	datatype => 'DropBars',
      	base_name => 'DownBars',
      	description => 'Returns a  object that represents the down bars on a line chart.                        Applies only to line charts.',
      	format => '',
@@ -305,16 +310,9 @@ __PACKAGE__->method_documentation({
      	read_only => '',
      		},
      'legend_entry' => {
-     	datatype => 'LinkElement',
+     	datatype => 'LegendEntry',
      	base_name => 'LegendEntry',
      	description => 'Gets the legend entry according to this series.',
-     	format => '',
-     	read_only => '',
-     		},
-     'line' => {
-     	datatype => 'Line',
-     	base_name => 'Line',
-     	description => '',
      	format => '',
      	read_only => '',
      		},
@@ -374,13 +372,6 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'shape_properties' => {
-     	datatype => 'LinkElement',
-     	base_name => 'ShapeProperties',
-     	description => 'Gets the  object that holds the visual shape properties of the Series.',
-     	format => '',
-     	read_only => '',
-     		},
      'show_negative_bubbles' => {
      	datatype => 'boolean',
      	base_name => 'ShowNegativeBubbles',
@@ -417,7 +408,7 @@ __PACKAGE__->method_documentation({
      	read_only => '',
      		},
      'trend_lines' => {
-     	datatype => 'LinkElement',
+     	datatype => 'Trendlines',
      	base_name => 'TrendLines',
      	description => 'Returns an object that represents a collection of all the trendlines for the series.',
      	format => '',
@@ -431,7 +422,7 @@ __PACKAGE__->method_documentation({
      	read_only => '',
      		},
      'up_bars' => {
-     	datatype => 'LinkElement',
+     	datatype => 'DropBars',
      	base_name => 'UpBars',
      	description => 'Returns an DropBars object that represents the up bars on a line chart.                        Applies only to line charts.',
      	format => '',
@@ -445,7 +436,7 @@ __PACKAGE__->method_documentation({
      	read_only => '',
      		},
      'x_error_bar' => {
-     	datatype => 'LinkElement',
+     	datatype => 'ErrorBar',
      	base_name => 'XErrorBar',
      	description => 'Represents X direction error bar of the series.',
      	format => '',
@@ -459,7 +450,7 @@ __PACKAGE__->method_documentation({
      	read_only => '',
      		},
      'y_error_bar' => {
-     	datatype => 'LinkElement',
+     	datatype => 'ErrorBar',
      	base_name => 'YErrorBar',
      	description => 'Represents Y direction error bar of the series.',
      	format => '',
@@ -481,10 +472,10 @@ __PACKAGE__->swagger_types( {
     'bubble_scale' => 'int',
     'bubble_sizes' => 'string',
     'count_of_data_values' => 'int',
-    'data_labels' => 'LinkElement',
+    'data_labels' => 'DataLabels',
     'display_name' => 'string',
     'doughnut_hole_size' => 'int',
-    'down_bars' => 'LinkElement',
+    'down_bars' => 'DropBars',
     'drop_lines' => 'Line',
     'explosion' => 'int',
     'first_slice_angle' => 'int',
@@ -500,8 +491,7 @@ __PACKAGE__->swagger_types( {
     'is_auto_split' => 'boolean',
     'is_color_varied' => 'boolean',
     'leader_lines' => 'Line',
-    'legend_entry' => 'LinkElement',
-    'line' => 'Line',
+    'legend_entry' => 'LegendEntry',
     'marker' => 'Marker',
     'name' => 'string',
     'overlap' => 'int',
@@ -510,19 +500,18 @@ __PACKAGE__->swagger_types( {
     'second_plot_size' => 'int',
     'series_lines' => 'Line',
     'shadow' => 'boolean',
-    'shape_properties' => 'LinkElement',
     'show_negative_bubbles' => 'boolean',
     'size_represents' => 'string',
     'smooth' => 'boolean',
     'split_type' => 'string',
     'split_value' => 'double',
-    'trend_lines' => 'LinkElement',
+    'trend_lines' => 'Trendlines',
     'type' => 'string',
-    'up_bars' => 'LinkElement',
+    'up_bars' => 'DropBars',
     'values' => 'string',
-    'x_error_bar' => 'LinkElement',
+    'x_error_bar' => 'ErrorBar',
     'x_values' => 'string',
-    'y_error_bar' => 'LinkElement',
+    'y_error_bar' => 'ErrorBar',
     'link' => 'Link' 
 } );
 
@@ -553,7 +542,6 @@ __PACKAGE__->attribute_map( {
     'is_color_varied' => 'IsColorVaried',
     'leader_lines' => 'LeaderLines',
     'legend_entry' => 'LegendEntry',
-    'line' => 'Line',
     'marker' => 'Marker',
     'name' => 'Name',
     'overlap' => 'Overlap',
@@ -562,7 +550,6 @@ __PACKAGE__->attribute_map( {
     'second_plot_size' => 'SecondPlotSize',
     'series_lines' => 'SeriesLines',
     'shadow' => 'Shadow',
-    'shape_properties' => 'ShapeProperties',
     'show_negative_bubbles' => 'ShowNegativeBubbles',
     'size_represents' => 'SizeRepresents',
     'smooth' => 'Smooth',

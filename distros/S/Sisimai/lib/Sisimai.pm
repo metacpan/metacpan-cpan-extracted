@@ -1,8 +1,8 @@
 package Sisimai;
-use feature ':5.10';
+use v5.26;
 use strict;
 use warnings;
-use version; our $VERSION = version->declare('v5.0.2'); our $PATCHLV = 0;
+use version; our $VERSION = version->declare('v5.0.3'); our $PATCHLV = 0;
 sub version { return substr($VERSION->stringify, 1).($PATCHLV > 0 ? 'p'.$PATCHLV : '') }
 sub libname { 'Sisimai' }
 
@@ -368,7 +368,7 @@ C<version> method returns the version number of Sisimai.
 
 =item L<Sisimai::Fact> - Decoded data object
 
-=item L<https://libsisimai.org/> - Sisimai — Mail Analyzing Interface Library
+=item L<https://libsisimai.org/> - Sisimai - Mail Analyzing Interface Library
 
 =item L<https://tools.ietf.org/html/rfc3463> - RFC3463: Enhanced Mail System Status Codes
 

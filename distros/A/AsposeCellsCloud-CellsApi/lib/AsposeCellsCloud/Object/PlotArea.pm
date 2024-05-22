@@ -38,8 +38,7 @@ use DateTime;
 use AsposeCellsCloud::Object::Area;
 use AsposeCellsCloud::Object::ChartFrame;
 use AsposeCellsCloud::Object::Font;
-use AsposeCellsCloud::Object::Line;
-use AsposeCellsCloud::Object::LinkElement; 
+use AsposeCellsCloud::Object::Line; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -122,7 +121,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Encapsulates the object that represents the plot area in a chart.',
                                   class => 'PlotArea',
                                   required => [], # TODO
 }                                 );
@@ -213,13 +212,6 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'shape_properties' => {
-     	datatype => 'ARRAY[LinkElement]',
-     	base_name => 'ShapeProperties',
-     	description => '',
-     	format => '',
-     	read_only => '',
-     		},
      'width' => {
      	datatype => 'int',
      	base_name => 'Width',
@@ -263,7 +255,6 @@ __PACKAGE__->swagger_types( {
     'is_automatic_size' => 'boolean',
     'is_inner_mode' => 'boolean',
     'shadow' => 'boolean',
-    'shape_properties' => 'ARRAY[LinkElement]',
     'width' => 'int',
     'height' => 'int',
     'x' => 'int',
@@ -283,7 +274,6 @@ __PACKAGE__->attribute_map( {
     'is_automatic_size' => 'IsAutomaticSize',
     'is_inner_mode' => 'IsInnerMode',
     'shadow' => 'Shadow',
-    'shape_properties' => 'ShapeProperties',
     'width' => 'Width',
     'height' => 'Height',
     'x' => 'X',

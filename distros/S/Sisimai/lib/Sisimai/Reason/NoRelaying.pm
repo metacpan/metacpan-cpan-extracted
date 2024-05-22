@@ -1,5 +1,5 @@
 package Sisimai::Reason::NoRelaying;
-use feature ':5.10';
+use v5.26;
 use strict;
 use warnings;
 
@@ -30,6 +30,7 @@ sub match {
         'relay not permitted',
         'relaying denied',  # Sendmail
         'relaying mail to ',
+        'specified domain is not allowed',
         "that domain isn't in my list of allowed rcpthost",
         'this system is not configured to relay mail',
         'unable to relay for',
@@ -109,7 +110,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2018,2020-2023 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018,2020-2023,2024 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

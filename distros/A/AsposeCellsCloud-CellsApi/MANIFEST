@@ -91,7 +91,6 @@ docs/PaginatedSaveOptions.md
 docs/SingleValue.md
 docs/SortKey.md
 docs/SplitResult.md
-docs/SplitResultDocument.md
 docs/Style.md
 docs/StyleFormatCondition.md
 docs/Styles.md
@@ -163,7 +162,6 @@ docs/TxtSaveOptions.md
 docs/XlsbSaveOptions.md
 docs/XlsSaveOptions.md
 docs/XpsSaveOptions.md
-docs/AnalyzeExcelResponse.md
 docs/ArcShapeResponse.md
 docs/AutoFilterResponse.md
 docs/AutoShapeResponse.md
@@ -307,6 +305,7 @@ docs/RenderingFont.md
 docs/RenderingWatermark.md
 docs/LoadData.md
 docs/LoadTo.md
+docs/MergeQueries.md
 docs/PivotColumn.md
 docs/QueryDataSource.md
 docs/QueryTable.md
@@ -317,11 +316,11 @@ docs/PivotFilter.md
 docs/PivotItem.md
 docs/PivotTable.md
 docs/PivotTables.md
+docs/CellValue.md
 docs/CustomParserConfig.md
 docs/Import2DimensionDoubleArrayOption.md
 docs/Import2DimensionIntArrayOption.md
 docs/Import2DimensionStringArrayOption.md
-docs/CellValue.md
 docs/ImportBatchDataOption.md
 docs/ImportCSVDataOption.md
 docs/ImportDoubleArrayOption.md
@@ -403,7 +402,6 @@ docs/Walls.md
 docs/AnalyzedColumnDescription.md
 docs/AnalyzedResult.md
 docs/AnalyzedTableDescription.md
-docs/AnalyzeSuggestion.md
 docs/DiscoverChart.md
 docs/DiscoverPivotTable.md
 docs/ExcelDataStatistics.md
@@ -842,7 +840,6 @@ lib/AsposeCellsCloud/Object/PaginatedSaveOptions.pm
 lib/AsposeCellsCloud/Object/SingleValue.pm
 lib/AsposeCellsCloud/Object/SortKey.pm
 lib/AsposeCellsCloud/Object/SplitResult.pm
-lib/AsposeCellsCloud/Object/SplitResultDocument.pm
 lib/AsposeCellsCloud/Object/Style.pm
 lib/AsposeCellsCloud/Object/StyleFormatCondition.pm
 lib/AsposeCellsCloud/Object/Styles.pm
@@ -914,7 +911,6 @@ lib/AsposeCellsCloud/Object/TxtSaveOptions.pm
 lib/AsposeCellsCloud/Object/XlsbSaveOptions.pm
 lib/AsposeCellsCloud/Object/XlsSaveOptions.pm
 lib/AsposeCellsCloud/Object/XpsSaveOptions.pm
-lib/AsposeCellsCloud/Object/AnalyzeExcelResponse.pm
 lib/AsposeCellsCloud/Object/ArcShapeResponse.pm
 lib/AsposeCellsCloud/Object/AutoFilterResponse.pm
 lib/AsposeCellsCloud/Object/AutoShapeResponse.pm
@@ -1058,6 +1054,7 @@ lib/AsposeCellsCloud/Object/RenderingFont.pm
 lib/AsposeCellsCloud/Object/RenderingWatermark.pm
 lib/AsposeCellsCloud/Object/LoadData.pm
 lib/AsposeCellsCloud/Object/LoadTo.pm
+lib/AsposeCellsCloud/Object/MergeQueries.pm
 lib/AsposeCellsCloud/Object/PivotColumn.pm
 lib/AsposeCellsCloud/Object/QueryDataSource.pm
 lib/AsposeCellsCloud/Object/QueryTable.pm
@@ -1068,11 +1065,11 @@ lib/AsposeCellsCloud/Object/PivotFilter.pm
 lib/AsposeCellsCloud/Object/PivotItem.pm
 lib/AsposeCellsCloud/Object/PivotTable.pm
 lib/AsposeCellsCloud/Object/PivotTables.pm
+lib/AsposeCellsCloud/Object/CellValue.pm
 lib/AsposeCellsCloud/Object/CustomParserConfig.pm
 lib/AsposeCellsCloud/Object/Import2DimensionDoubleArrayOption.pm
 lib/AsposeCellsCloud/Object/Import2DimensionIntArrayOption.pm
 lib/AsposeCellsCloud/Object/Import2DimensionStringArrayOption.pm
-lib/AsposeCellsCloud/Object/CellValue.pm
 lib/AsposeCellsCloud/Object/ImportBatchDataOption.pm
 lib/AsposeCellsCloud/Object/ImportCSVDataOption.pm
 lib/AsposeCellsCloud/Object/ImportDoubleArrayOption.pm
@@ -1154,7 +1151,6 @@ lib/AsposeCellsCloud/Object/Walls.pm
 lib/AsposeCellsCloud/Object/AnalyzedColumnDescription.pm
 lib/AsposeCellsCloud/Object/AnalyzedResult.pm
 lib/AsposeCellsCloud/Object/AnalyzedTableDescription.pm
-lib/AsposeCellsCloud/Object/AnalyzeSuggestion.pm
 lib/AsposeCellsCloud/Object/DiscoverChart.pm
 lib/AsposeCellsCloud/Object/DiscoverPivotTable.pm
 lib/AsposeCellsCloud/Object/ExcelDataStatistics.pm

@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents the result of the file split.',
                                   class => 'SplitResult',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'documents' => {
      	datatype => 'ARRAY[CellsCloudFileInfo]',
      	base_name => 'Documents',
-     	description => '',
+     	description => 'Represents cells cloud file information.',
      	format => '',
      	read_only => '',
      		},    

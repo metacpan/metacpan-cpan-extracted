@@ -1,3 +1,5 @@
+bin/create-modulino
+bin/create-modulino.pl
 bin/modulino
 ChangeLog
 examples/MyScript.pm

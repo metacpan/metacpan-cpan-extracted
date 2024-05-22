@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents a chart, which is a chart created based on data analysis of a table.',
                                   class => 'DiscoverChart',
                                   required => [], # TODO
 }                                 );
@@ -128,42 +128,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => '',
+     	description => 'Represents chart name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'SheetName',
-     	description => '',
+     	description => 'Represents worksheet name which is where the chart is located.',
      	format => '',
      	read_only => '',
      		},
      'title' => {
      	datatype => 'string',
      	base_name => 'Title',
-     	description => '',
+     	description => 'Represents chart title.',
      	format => '',
      	read_only => '',
      		},
      'type' => {
      	datatype => 'string',
      	base_name => 'Type',
-     	description => '',
+     	description => 'Represents chart type.',
      	format => '',
      	read_only => '',
      		},
      'data_range' => {
      	datatype => 'string',
      	base_name => 'DataRange',
-     	description => '',
+     	description => 'Represents chart data range.',
      	format => '',
      	read_only => '',
      		},
      'thumbnail' => {
      	datatype => 'string',
      	base_name => 'Thumbnail',
-     	description => 'Base64String',
+     	description => 'Represents chart thumbnail. Base64String',
      	format => '',
      	read_only => '',
      		},    

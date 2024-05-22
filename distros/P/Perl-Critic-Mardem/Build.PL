@@ -7,8 +7,6 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
-
 use Module::Build;
 
 Module::Build->VERSION( '0.4004' );
@@ -43,14 +41,12 @@ my $builder = Module::Build->new(
         'Perl::Critic::Utils'         => 0,
         'Perl::Critic::Utils::McCabe' => 0,
     },
-    'recommends' => {
-
-    },
-    'add_to_cleanup' => [ 'Perl-Critic-Mardem-*' ],
+    'recommends'     => {},
+    'add_to_cleanup' => [ 'Perl-Critic-Mardem-*', 'MANIFEST*.bak', 'blib/', 'cover_db/' ],
     'meta_merge'     => {
         'resources' => {
-            # 'bugtracker' => 'https://github.com/mardem1/perl-critic-mardem/issues',
-            # 'homepage'   => 'https://github.com/mardem1/perl-critic-mardem',
+            'bugtracker' => 'https://github.com/mardem1/perl-critic-mardem/issues',
+            'homepage'   => 'https://github.com/mardem1/perl-critic-mardem',
             'repository' => 'git://github.com/mardem1/perl-critic-mardem.git',
         },
     },
@@ -61,26 +57,3 @@ $builder->create_build_script();
 __END__
 
 #-----------------------------------------------------------------------------
-
-=pod
-
-=encoding utf8
-
-=head1 NAME
-
-Build.PL
-
-=head1 AUTHOR
-
-Markus Demml, mardem@cpan.com
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright (c) 2024, Markus Demml
-
-This library is free software; you can redistribute it and/or modify it
-under the same terms as the Perl 5 programming language system itself.
-The full text of this license can be found in the LICENSE file included
-with this module.
-
-=cut

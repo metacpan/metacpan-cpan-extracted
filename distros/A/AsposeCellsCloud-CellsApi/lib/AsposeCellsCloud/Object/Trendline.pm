@@ -36,10 +36,11 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 use AsposeCellsCloud::Object::Color;
+use AsposeCellsCloud::Object::DataLabels;
 use AsposeCellsCloud::Object::GradientFill;
+use AsposeCellsCloud::Object::LegendEntry;
 use AsposeCellsCloud::Object::Line;
-use AsposeCellsCloud::Object::Link;
-use AsposeCellsCloud::Object::LinkElement; 
+use AsposeCellsCloud::Object::Link; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -122,7 +123,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents a trendline in a chart.',
                                   class => 'Trendline',
                                   required => [], # TODO
 }                                 );
@@ -144,7 +145,7 @@ __PACKAGE__->method_documentation({
      	read_only => '',
      		},
      'data_labels' => {
-     	datatype => 'LinkElement',
+     	datatype => 'DataLabels',
      	base_name => 'DataLabels',
      	description => 'Represents the DataLabels object for the specified series.',
      	format => '',
@@ -186,7 +187,7 @@ __PACKAGE__->method_documentation({
      	read_only => '',
      		},
      'legend_entry' => {
-     	datatype => 'LinkElement',
+     	datatype => 'LegendEntry',
      	base_name => 'LegendEntry',
      	description => 'Gets the legend entry according to this trendline',
      	format => '',
@@ -358,13 +359,13 @@ __PACKAGE__->method_documentation({
 __PACKAGE__->swagger_types( {
     'link' => 'Link',
     'backward' => 'double',
-    'data_labels' => 'LinkElement',
+    'data_labels' => 'DataLabels',
     'display_equation' => 'boolean',
     'display_r_squared' => 'boolean',
     'forward' => 'double',
     'intercept' => 'double',
     'is_name_auto' => 'boolean',
-    'legend_entry' => 'LinkElement',
+    'legend_entry' => 'LegendEntry',
     'name' => 'string',
     'order' => 'int',
     'period' => 'int',

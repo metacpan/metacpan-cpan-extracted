@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents operate parameter.',
                                   class => 'OperateParameter',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'operate_type' => {
      	datatype => 'string',
      	base_name => 'OperateType',
-     	description => '',
+     	description => 'Represents task operate type.',
      	format => '',
      	read_only => '',
      		},    

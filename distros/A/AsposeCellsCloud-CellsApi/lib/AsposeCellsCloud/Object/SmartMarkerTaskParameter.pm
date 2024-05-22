@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents smart marker task parameter.',
                                   class => 'SmartMarkerTaskParameter',
                                   required => [], # TODO
 }                                 );
@@ -130,42 +130,42 @@ __PACKAGE__->method_documentation({
      'source_workbook' => {
      	datatype => 'FileSource',
      	base_name => 'SourceWorkbook',
-     	description => '',
+     	description => 'Represents data source of task object.',
      	format => '',
      	read_only => '',
      		},
      'destination_workbook' => {
      	datatype => 'FileSource',
      	base_name => 'DestinationWorkbook',
-     	description => '',
+     	description => 'Represents data source of task object.',
      	format => '',
      	read_only => '',
      		},
      'xml_file' => {
      	datatype => 'FileSource',
      	base_name => 'xmlFile',
-     	description => '',
+     	description => 'Represents xml file.',
      	format => '',
      	read_only => '',
      		},
      'data_source' => {
      	datatype => 'DataSource',
      	base_name => 'DataSource',
-     	description => '',
+     	description => 'Represents destination data source.',
      	format => '',
      	read_only => '',
      		},
      'target_data_source' => {
      	datatype => 'DataSource',
      	base_name => 'TargetDataSource',
-     	description => '',
+     	description => 'Represents destination data source.',
      	format => '',
      	read_only => '',
      		},
      'xml_file_data_source' => {
      	datatype => 'DataSource',
      	base_name => 'XMLFileDataSource',
-     	description => '',
+     	description => 'Represents xml file.',
      	format => '',
      	read_only => '',
      		},    

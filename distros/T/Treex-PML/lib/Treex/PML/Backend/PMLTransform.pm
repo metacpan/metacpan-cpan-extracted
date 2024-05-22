@@ -2,7 +2,7 @@ package Treex::PML::Backend::PMLTransform;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.27'; # version template
+  $VERSION='2.28'; # version template
 }
 
 use Treex::PML::Backend::PML qw(open_backend close_backend read write);

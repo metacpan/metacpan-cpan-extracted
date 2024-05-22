@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents that the data column is populated with the specified value.',
                                   class => 'DataColumnFillValue',
                                   required => [], # TODO
 }                                 );
@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'column_index' => {
      	datatype => 'int',
      	base_name => 'ColumnIndex',
-     	description => '',
+     	description => 'Represents specified column index.',
      	format => '',
      	read_only => '',
      		},
      'data_fill_value' => {
      	datatype => 'DataFillValue',
      	base_name => 'DataFillValue',
-     	description => '',
+     	description => 'Represents specified data fill value.',
      	format => '',
      	read_only => '',
      		},    

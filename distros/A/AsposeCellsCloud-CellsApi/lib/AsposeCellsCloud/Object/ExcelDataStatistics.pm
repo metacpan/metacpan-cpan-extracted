@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents Excel data statistics.',
                                   class => 'ExcelDataStatistics',
                                   required => [], # TODO
 }                                 );
@@ -128,27 +128,18 @@ __PACKAGE__->method_documentation({
      'worksheet_data_statistics' => {
      	datatype => 'ARRAY[WorksheetDataStatistics]',
      	base_name => 'WorksheetDataStatistics',
-     	description => '',
-     	format => '',
-     	read_only => '',
-     		},
-     'names_count' => {
-     	datatype => 'int',
-     	base_name => 'NamesCount',
-     	description => '',
+     	description => 'Represents worksheet data statistics list.',
      	format => '',
      	read_only => '',
      		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'worksheet_data_statistics' => 'ARRAY[WorksheetDataStatistics]',
-    'names_count' => 'int' 
+    'worksheet_data_statistics' => 'ARRAY[WorksheetDataStatistics]' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'worksheet_data_statistics' => 'WorksheetDataStatistics',
-    'names_count' => 'NamesCount' 
+    'worksheet_data_statistics' => 'WorksheetDataStatistics' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -122,7 +122,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Summary description for PivotTable.',
                                   class => 'PivotTable',
                                   required => [], # TODO
 }                                 );
@@ -370,7 +370,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => '',
+     	description => 'Represents pivot table name.',
      	format => '',
      	read_only => '',
      		},

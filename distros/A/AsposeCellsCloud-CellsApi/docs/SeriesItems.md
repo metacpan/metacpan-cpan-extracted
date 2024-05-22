@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 **CategoryData** | **string** |  |
 **IsColorVaried** | **boolean** |  |
 **SecondCatergoryData** | **string** |  |
-**SeriesList** | **ARRAY[LinkElement]** |  |
+**SeriesList** | **ARRAY[Series]** |  |
 **link** | **Link** |  |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

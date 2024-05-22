@@ -20,7 +20,6 @@ Name | Type | Description | Notes
 **IsAutomaticSize** | **boolean** |  |
 **IsInnerMode** | **boolean** |  |
 **Shadow** | **boolean** |  |
-**ShapeProperties** | **ARRAY[LinkElement]** |  |
 **Width** | **int** |  |
 **Height** | **int** |  |
 **X** | **int** |  |

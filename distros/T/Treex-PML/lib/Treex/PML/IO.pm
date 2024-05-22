@@ -77,7 +77,7 @@ BEGIN {
       \&File::Which::which
   } || sub {};
 
-  $VERSION = '2.27'; # version template
+  $VERSION = '2.28'; # version template
   @ISA=qw(Exporter);
   @EXPORT_OK = qw($kioclient $kioclient_opts
                   $ssh $ssh_opts

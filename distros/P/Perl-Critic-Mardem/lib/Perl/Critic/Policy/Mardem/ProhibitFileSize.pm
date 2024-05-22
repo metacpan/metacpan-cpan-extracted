@@ -7,7 +7,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Readonly;
 
@@ -108,12 +108,23 @@ __END__
 
 =head1 NAME
 
-Perl::Critic::Policy::Mardem::ProhibitFileSize
+Perl::Critic::Policy::Mardem::ProhibitFileSize - large files as byte or char count
 
 =head1 DESCRIPTION
 
 This Policy checks the Perl-File Size in Bytes or the Content-Length (string)
 if no file given. (more precise the PPI::Document's)
+
+=head1 CONFIGURATION
+
+The maximum acceptable size can be set with the C<size_count_limit>
+configuration item. Any file (or given string) with higher size "count"
+will generate a policy violation. The default is 102400.
+
+An example section for a F<.perlcriticrc>:
+
+  [Mardem::ProhibitFileSize]
+  size_count_limit = 65536
 
 =head1 AFFILIATION
 

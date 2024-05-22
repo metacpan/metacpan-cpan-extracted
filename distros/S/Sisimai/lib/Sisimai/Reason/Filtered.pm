@@ -1,5 +1,5 @@
 package Sisimai::Reason::Filtered;
-use feature ':5.10';
+use v5.26;
 use strict;
 use warnings;
 
@@ -26,6 +26,7 @@ sub match {
         'resolver.rst.notauthorized',   # Microsoft Exchange
         'this account is protected by',
         'user not found',   # Filter on MAIL.RU
+        'user refuses to receive this mail',
         'user reject',
         'we failed to deliver mail because the following address recipient id refuse to receive mail',  # Willcom
         'you have been blocked by the recipient',
@@ -124,7 +125,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2018,2020-2023 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018,2020-2024 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

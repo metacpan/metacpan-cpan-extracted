@@ -63,7 +63,7 @@
          "web" : "https://github.com/ology/Date-Holidays-USA"
       }
    },
-   "version" : "0.0204",
+   "version" : "0.0205",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"

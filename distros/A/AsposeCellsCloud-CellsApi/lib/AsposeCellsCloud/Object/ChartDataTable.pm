@@ -121,7 +121,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents a chart data table.',
                                   class => 'ChartDataTable',
                                   required => [], # TODO
 }                                 );

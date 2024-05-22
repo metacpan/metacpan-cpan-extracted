@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents page break operate parameter.',
                                   class => 'PageBreakOperateParameter',
                                   required => [], # TODO
 }                                 );
@@ -128,42 +128,42 @@ __PACKAGE__->method_documentation({
      'page_break_type' => {
      	datatype => 'string',
      	base_name => 'PageBreakType',
-     	description => '',
+     	description => 'Represents page break type.',
      	format => '',
      	read_only => '',
      		},
      'index' => {
      	datatype => 'int',
      	base_name => 'Index',
-     	description => '',
+     	description => 'Represents page break index.',
      	format => '',
      	read_only => '',
      		},
      'row' => {
      	datatype => 'int',
      	base_name => 'Row',
-     	description => '',
+     	description => 'Represents row index of page break.',
      	format => '',
      	read_only => '',
      		},
      'column' => {
      	datatype => 'int',
      	base_name => 'Column',
-     	description => '',
+     	description => 'Represents column index of page break.',
      	format => '',
      	read_only => '',
      		},
      'start_index' => {
      	datatype => 'int',
      	base_name => 'StartIndex',
-     	description => '',
+     	description => 'Represents start row index of page break.',
      	format => '',
      	read_only => '',
      		},
      'end_index' => {
      	datatype => 'int',
      	base_name => 'EndIndex',
-     	description => '',
+     	description => 'Represents end row index of page break.',
      	format => '',
      	read_only => '',
      		},

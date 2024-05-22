@@ -35,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::ChartPoint;
 use AsposeCellsCloud::Object::Link;
 use AsposeCellsCloud::Object::LinkElement; 
 
@@ -119,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents a collection that contains all the points in one series.',
                                   class => 'ChartPoints',
                                   required => [], # TODO
 }                                 );
@@ -127,7 +128,7 @@ __PACKAGE__->class_documentation({description => '',
 
 __PACKAGE__->method_documentation({
      'chart_point_list' => {
-     	datatype => 'ARRAY[LinkElement]',
+     	datatype => 'ARRAY[ChartPoint]',
      	base_name => 'ChartPointList',
      	description => '',
      	format => '',
@@ -143,7 +144,7 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->swagger_types( {
-    'chart_point_list' => 'ARRAY[LinkElement]',
+    'chart_point_list' => 'ARRAY[ChartPoint]',
     'link' => 'Link' 
 } );
 

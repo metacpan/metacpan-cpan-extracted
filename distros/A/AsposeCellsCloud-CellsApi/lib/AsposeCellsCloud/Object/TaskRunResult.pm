@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents task run result.',
                                   class => 'TaskRunResult',
                                   required => [], # TODO
 }                                 );
@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'description' => {
      	datatype => 'string',
      	base_name => 'Description',
-     	description => '',
+     	description => 'Represents task run result description.',
      	format => '',
      	read_only => '',
      		},
      'out_file_list' => {
      	datatype => 'ARRAY[DataSource]',
      	base_name => 'OutFileList',
-     	description => '',
+     	description => 'Represents out data file list.',
      	format => '',
      	read_only => '',
      		},    

@@ -121,7 +121,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Encapsulates the object that represents a single picture in a spreadsheet.',
                                   class => 'Picture',
                                   required => [], # TODO
 }                                 );

@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents the Shape Response.',
                                   class => 'ShapeResponse',
                                   required => [], # TODO
 }                                 );

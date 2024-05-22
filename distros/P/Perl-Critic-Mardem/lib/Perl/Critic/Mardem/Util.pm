@@ -7,7 +7,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Readonly;
 use List::Util qw( first );
@@ -97,7 +97,7 @@ Perl::Critic::Mardem::Util - Internal Util module!
 =head1 DESCRIPTION
 
 Util module with internal subroutines for the
-L<Perl::Critic::Policy::Mardem>> modules.
+L<Perl::Critic::Policy::Mardem> modules.
 
 =head1 AFFILIATION
 

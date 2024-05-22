@@ -8,14 +8,14 @@ use English qw(-no_match_vars);
 use Data::Dumper;
 use FindBin qw($RealBin $RealScript);
 use Log::Log4perl;
-use JSON::PP     qw(decode_json);
-use List::Util   qw(zip none);
+use JSON qw(decode_json);
+use List::Util qw(zip none);
 use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
 use CLI::Simple::Constants qw(:booleans :chars :log-levels);
-use CLI::Simple::Utils     qw(normalize_options);
+use CLI::Simple::Utils qw(normalize_options);
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.5';
 
 use parent qw(Class::Accessor::Fast Exporter);
 
@@ -91,9 +91,7 @@ sub new {
   $option_specs    //= $OPTION_SPECS;
   $commands        //= $COMMANDS;
 
-  croak 'usage: '
-    . $class
-    . '->new( option_specs => specs, commands => commands, [defaults => default-options)'
+  croak 'usage: ' . $class . '->new( option_specs => specs, commands => commands, [defaults => default-options)'
     if !$option_specs || !$commands;
 
   $default_options //= {};
@@ -247,7 +245,7 @@ __END__
 
 =head1 NAME
 
-CLI::Simple
+CLI::Simple - a framework for creating option driven Perl scripts
 
 =head1 SYNOPIS
 
@@ -260,15 +258,27 @@ CLI::Simple
  
  caller or __PACKAGE__->main();
  
- sub execute { ... }
+ sub execute {
+   my ($self) = @_;
+
+   # retrieve a CLI option   
+   my $file = $self->get_file;
+   ...
+ }
  
- sub list { ... }
+ sub list { 
+   my ($self) = @_
+
+   # retrieve a command argument with name
+   my $file = $self->get_arg(qw(file));
+   ...
+ }
 
  sub main {
   CLI::Simple->new(
-   option_specs    => [ qw( help foo=s ) ],
-   default_options => { foo => 'bar' },
-   extra_options   => [ qw( logger bar ) ],
+   option_specs    => [ qw( help formt=s ) ],
+   default_options => { format => 'json' }, # set some defaults
+   extra_options   => [ qw( content ) ], # non-option, setter/getter
    commands        => { execute => \&execute, list => \&list,  }
  )->run;
 
@@ -293,7 +303,7 @@ I<commands> and I<arguments>.
 
 =item * easily add usage notes
 
-=item * create setter/getters for your script
+=item * automatically create setter/getters for your script
 
 =back
 
@@ -344,6 +354,8 @@ Using C<CLI::Simple> to implement this script looks like this...
    )->run;
  }
 
+ 1;
+
 =head1 METHODS AND SUBROUTINES
 
 =head2 new
@@ -378,7 +390,7 @@ A hash reference that contains the default values for your options.
 =item extra_options
 
 If you want to create additional setters or getters, set
-C<extra_options> to an array variable names.
+C<extra_options> to an array of names.
 
 Example:
 
@@ -530,8 +542,8 @@ C<--help> option, users can access the usage section from the command line.
 =head1 LOGGING
 
 C<CLI::Simple> will enable you to automatically add logging to your
-scrip using a L<Log::Log4perl> logger. You can pass in a C<Log4perl> configuration
-string or let the class instantiat C<Log::Log4perl> in easy mode.
+script using a L<Log::Log4perl> logger. You can pass in a C<Log4perl> configuration
+string or let the class instantiate C<Log::Log4perl> in easy mode.
 
 Do this at the top of your class:
 
@@ -545,14 +557,20 @@ to retrieve the logger.
 
 =over 5
 
+=item How do I execute some startup code before my command runs?
+
+The C<new> constructor will execute an C<init()> method prior to
+returning. Implement your own L</init> function which has all of the
+commands and arguments available to it at that time.
+
 =item Do I need to implement commands?
 
 No, but if you don't you must provide the name of the subroutine that
-will implement your script as the C<default> command.
+will implement your script logic as the C<default> command.
 
   use CLI::Simple;
 
-  sub main {
+  sub do_it {
     my ($cli) = @_;
 
     # do something useful...
@@ -562,7 +580,7 @@ will implement your script as the C<default> command.
     default_option => { foo => 'bar' },
     option_specs   => [ qw(foo=s bar=s) ],
     extra_options  => [ qw(biz buz baz) ],
-    commands       => { default => \&main },
+    commands       => { default => \&do_it },
   );
 
   $cli->run;
@@ -571,7 +589,7 @@ will implement your script as the C<default> command.
 
 No, see above example,
 
-=item How can I use the "modulino pattern"?
+=item How do I turn my class into a script?
 
 I like to implement scripts as a Perl class and use the so-called
 "modulino" pattern popularized by Brian d foy. Essentially you create
@@ -585,20 +603,72 @@ a class that looks something like this:
    ....
  }
 
+ 1;
+
 Using this pattern you can write Perl modules that can also be used as
-a script or test harness.
+a script or test harness for your class.
+
+ package MyScript;
+
+ use strict;
+ use warnings;
+
+ caller or  __PACKAGE__->main();
+
+ sub do_it {
+   my ($cli) = @_;
+
+   # do something useful...
+ }
+
+ sub main {
+
+   my $cli = CLI::Simple->new(
+     default_option => { foo => 'bar' },
+     option_specs   => [ qw(foo=s bar=s) ],
+     extra_options  => [ qw(biz buz baz) ],
+     commands       => { default => \&do_it },
+   );
+
+  exit $cli->run;
+ }
+
+ 1;
 
 To make it easy to use such a module, I've created a C<bash> script that
 calls the module with the arguments passed on the command line.
 
 The script (C<modulino>) is include in this distribution.
 
-Use it to create a symlink to itself that will load your Perl module
-and run your modulino. Running C<modulino> will echo a command you can
-run to create the symlink.
+You can also us the include C<create-modulino.pl> script to create a
+symbolic link to your class that will be executed as if it is a Perl
+script if you've implemented the modulino pattern described above.
 
- >modulino Foo::Bar
- ln -s /usr/local/bin/modulino foo-bar
+  sudo create-modulino.pl Foo::Bar foo-bar
+
+If you do not provide and alias name as the second argument the script
+will create a copy of the C<modulino> script as a normalized name of
+your module but will not create a symbolic link.
+
+The script essentially executes the recipe below.
+
+=over 5
+
+=item 1. Copy the C<modulino> script using a name that convert the
+first letter of the class to lower case and any CamelCased words
+inside the class name to lower case with all words snake caseds.
+Example: C<Module::ScanDeps::FindRequires> becomes:
+C<module_scanDeps_findRequires>.
+
+ sudo cp /usr/local/bin/modulino /usr/local/bin/module_scanDeps_findRequire
+ 
+=item 2. Make sure the new script is executable.
+
+ chmod 0755 module_scanDeps_findRequire
+
+=item 3. Create a symlink with a name of your chosing to the new script.
+
+ sudo ln -s /usr/local/bin/module_scanDeps_findRequire /usr/local/bin/find-requires 
 
 =back
 

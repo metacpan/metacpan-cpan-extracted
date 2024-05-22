@@ -13,7 +13,7 @@ use Exporter qw(import);
 
 our @EXPORT = qw(is_holiday holidays);
 
-our $VERSION = '0.0204';
+our $VERSION = '0.0205';
 
 
 sub new {
@@ -47,38 +47,38 @@ sub us_holidays {
     );
     my %holidays = (
         1 => {
-            1  => "New Year's",
+            1  => "New Year's Day",
             15 => 'Martin Luther King Jr.',
         },
         2 => {
-            14 => "Valentine's",
-            19 => "President's",
+            14 => "Valentine's Day",
+            19 => "President's Day",
         },
         3 => {
-            17 => "St. Patrick's",
+            17 => "St. Patrick's Day",
         },
         4 => {
         },
         5 => {
             5 => 'Cinco de Mayo',
-            $dom{mothers}  => "Mother's",
-            $dom{memorial} => 'Memorial',
+            $dom{mothers}  => "Mother's Day",
+            $dom{memorial} => 'Memorial Day',
         },
         6 => {
-            14 => 'Flag',
-            $dom{fathers} => "Father's",
+            14 => 'Flag Day',
+            $dom{fathers} => "Father's Day",
             19 => 'Juneteenth',
         },
         7 => {
-            4 => 'Independence',
+            4 => 'Independence Day',
         },
         8 => {
         },
         9 => {
-            $dom{labor} => 'Labor',
+            $dom{labor} => 'Labor Day',
         },
         10 => {
-            $dom{columbus} => "Columbus; Indigenous Peoples'",
+            $dom{columbus} => "Columbus; Indigenous Peoples' Day",
             31 => 'Halloween'
         },
         11 => {
@@ -149,7 +149,7 @@ Date::Holidays::USA - Provides United States of America holidays
 
 =head1 VERSION
 
-version 0.0204
+version 0.0205
 
 =head1 SYNOPSIS
 

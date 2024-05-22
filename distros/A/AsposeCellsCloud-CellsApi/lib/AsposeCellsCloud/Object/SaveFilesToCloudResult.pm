@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents save file to cloud result.',
                                   class => 'SaveFilesToCloudResult',
                                   required => [], # TODO
 }                                 );

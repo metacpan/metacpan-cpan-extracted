@@ -2,7 +2,7 @@ package Hades::Realm::Rope;
 use strict;
 use warnings;
 use base qw/Hades::Realm::OO/;
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );

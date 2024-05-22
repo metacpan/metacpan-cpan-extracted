@@ -1,5 +1,5 @@
 package Sisimai::Reason::UserUnknown;
-use feature ':5.10';
+use v5.26;
 use strict;
 use warnings;
 use Sisimai::String;
@@ -65,7 +65,9 @@ sub match {
         'recipient address rejected: invalid user',
         'recipient address rejected: invalid-recipient',
         'recipient address rejected: unknown user',
+        'recipient address rejected: userunknown',
         'recipient does not exist',
+        'recipient is not accepted',
         'recipient is not local',
         'recipient not exist',
         'recipient not found',
@@ -114,6 +116,7 @@ sub match {
         ['no ', ' in name directory'],
         ['non', 'existent user'],
         ['rcpt <', ' does not exist'],
+        ['rcpt (', 't exist '],
         ['recipient ', ' was not found in'],
         ['recipient address rejected: user ', '  does not exist'],
         ['recipient address rejected: user unknown in ', '  table'],
@@ -124,6 +127,7 @@ sub match {
         ['unknown local', 'part'],
         ['user ', ' was not found'],
         ['user ', ' does not exist'],
+        ['user (', ') unknown'],
     ];
 
     return 1 if grep { rindex($argv1, $_) > -1 } @$index;
@@ -235,7 +239,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2023 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

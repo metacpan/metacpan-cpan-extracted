@@ -8,8 +8,8 @@ use AsposeCellsCloud::Object::SingleValue;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Value** | **string** |  |
-**ValueType** | **ValueType** |  |  
+**Value** | **string** | Represents value. |
+**ValueType** | **ValueType** | Represents value type. |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

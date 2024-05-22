@@ -1,5 +1,8 @@
 Revision history for Date-Holidays-Adapter-USA
 
+0.0103 2024-05-21 18:48:29
+    - Fix test.
+
 0.0102 2024-05-09 15:05:29
     - Add the missing Date::Holidays::USA to the dependencies. Derp!
 

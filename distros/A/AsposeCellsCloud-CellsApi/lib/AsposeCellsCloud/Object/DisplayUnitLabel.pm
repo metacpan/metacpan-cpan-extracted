@@ -38,8 +38,7 @@ use DateTime;
 use AsposeCellsCloud::Object::Area;
 use AsposeCellsCloud::Object::ChartFrame;
 use AsposeCellsCloud::Object::Font;
-use AsposeCellsCloud::Object::Line;
-use AsposeCellsCloud::Object::LinkElement; 
+use AsposeCellsCloud::Object::Line; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -122,7 +121,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents the display unit label.',
                                   class => 'DisplayUnitLabel',
                                   required => [], # TODO
 }                                 );
@@ -147,13 +146,6 @@ __PACKAGE__->method_documentation({
      	datatype => 'string',
      	base_name => 'Text',
      	description => 'Gets or sets the text of display unit label.',
-     	format => '',
-     	read_only => '',
-     		},
-     'text_direction' => {
-     	datatype => 'string',
-     	base_name => 'TextDirection',
-     	description => '',
      	format => '',
      	read_only => '',
      		},
@@ -227,13 +219,6 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'shape_properties' => {
-     	datatype => 'ARRAY[LinkElement]',
-     	base_name => 'ShapeProperties',
-     	description => '',
-     	format => '',
-     	read_only => '',
-     		},
      'width' => {
      	datatype => 'int',
      	base_name => 'Width',
@@ -268,7 +253,6 @@ __PACKAGE__->swagger_types( {
     'linked_source' => 'string',
     'rotation_angle' => 'int',
     'text' => 'string',
-    'text_direction' => 'string',
     'text_horizontal_alignment' => 'string',
     'text_vertical_alignment' => 'string',
     'area' => 'Area',
@@ -279,7 +263,6 @@ __PACKAGE__->swagger_types( {
     'is_automatic_size' => 'boolean',
     'is_inner_mode' => 'boolean',
     'shadow' => 'boolean',
-    'shape_properties' => 'ARRAY[LinkElement]',
     'width' => 'int',
     'height' => 'int',
     'x' => 'int',
@@ -290,7 +273,6 @@ __PACKAGE__->attribute_map( {
     'linked_source' => 'LinkedSource',
     'rotation_angle' => 'RotationAngle',
     'text' => 'Text',
-    'text_direction' => 'TextDirection',
     'text_horizontal_alignment' => 'TextHorizontalAlignment',
     'text_vertical_alignment' => 'TextVerticalAlignment',
     'area' => 'Area',
@@ -301,7 +283,6 @@ __PACKAGE__->attribute_map( {
     'is_automatic_size' => 'IsAutomaticSize',
     'is_inner_mode' => 'IsInnerMode',
     'shadow' => 'Shadow',
-    'shape_properties' => 'ShapeProperties',
     'width' => 'Width',
     'height' => 'Height',
     'x' => 'X',

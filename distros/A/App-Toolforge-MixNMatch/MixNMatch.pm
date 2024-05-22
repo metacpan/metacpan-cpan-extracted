@@ -19,7 +19,7 @@ use Unicode::UTF8 qw(encode_utf8);
 Readonly::Scalar our $URI_BASE => 'https://mix-n-match.toolforge.org/';
 Readonly::Scalar our $URI_CATALOG_DETAIL => $URI_BASE.'api.php?query=catalog_details&catalog=%s';
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -273,12 +273,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2022 Michal Josef Špaček
+© 2020-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

@@ -1,0 +1,27 @@
+Changes
+cpanfile
+lib/Archive/SCS.pm
+lib/Archive/SCS/CityHash.pm
+lib/Archive/SCS/DirIndex.pm
+lib/Archive/SCS/GameDir.pm
+lib/Archive/SCS/HashFS.pm
+lib/Archive/SCS/HashFS2.pm
+lib/Archive/SCS/InMemory.pm
+lib/Archive/SCS/Mountable.pm
+lib/Archive/SCS/TObj.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+script/scs_archive
+t/00-compile.t
+t/40-hashfs-roundtrip.t
+t/50-hashfs2.t
+t/60-game-dir.t
+t/61-game-dir-mount.t
+t/70-cli.t
+t/71-cli-multifile.t
+t/72-cli-game.t
+t/lib/TestArchiveSCS.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

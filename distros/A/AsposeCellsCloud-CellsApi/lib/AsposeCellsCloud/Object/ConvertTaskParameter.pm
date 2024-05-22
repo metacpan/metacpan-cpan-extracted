@@ -121,7 +121,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents convert task parameter.',
                                   class => 'ConvertTaskParameter',
                                   required => [], # TODO
 }                                 );
@@ -131,35 +131,35 @@ __PACKAGE__->method_documentation({
      'data_source' => {
      	datatype => 'DataSource',
      	base_name => 'DataSource',
-     	description => '',
+     	description => 'Represents data source of task object.',
      	format => '',
      	read_only => '',
      		},
      'workbook' => {
      	datatype => 'FileSource',
      	base_name => 'Workbook',
-     	description => '',
+     	description => 'Represents data source of task object.',
      	format => '',
      	read_only => '',
      		},
      'destination_file' => {
      	datatype => 'string',
      	base_name => 'DestinationFile',
-     	description => '',
+     	description => 'Represents destination file.',
      	format => '',
      	read_only => '',
      		},
      'region' => {
      	datatype => 'string',
      	base_name => 'Region',
-     	description => '',
+     	description => 'Represents Excel data region.',
      	format => '',
      	read_only => '',
      		},
      'save_options' => {
      	datatype => 'SaveOptions',
      	base_name => 'SaveOptions',
-     	description => '',
+     	description => 'Represents save options.',
      	format => '',
      	read_only => '',
      		},    

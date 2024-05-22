@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents text item collection.',
                                   class => 'TextItems',
                                   required => [], # TODO
 }                                 );
@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'text_item_list' => {
      	datatype => 'ARRAY[TextItem]',
      	base_name => 'TextItemList',
-     	description => '',
+     	description => 'Represents text item collection',
      	format => '',
      	read_only => '',
      		},

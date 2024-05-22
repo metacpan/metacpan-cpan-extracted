@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents single value.',
                                   class => 'SingleValue',
                                   required => [], # TODO
 }                                 );
@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'value' => {
      	datatype => 'string',
      	base_name => 'Value',
-     	description => '',
+     	description => 'Represents value.',
      	format => '',
      	read_only => '',
      		},
      'value_type' => {
      	datatype => 'ValueType',
      	base_name => 'ValueType',
-     	description => '',
+     	description => 'Represents value type.',
      	format => '',
      	read_only => '',
      		},    

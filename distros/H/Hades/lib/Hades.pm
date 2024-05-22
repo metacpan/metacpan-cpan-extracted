@@ -3,7 +3,7 @@ package Hades;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 use Module::Generate;
 use Switch::Again qw/switch/;
 use Hades::Myths { as_keywords => 1 };
@@ -871,9 +871,9 @@ sub build_type {
 					} $sub_code|;
 				return $code;
 			},
-			qr/^(Optional\[(.*)\])$/ => sub {
+			qr/^((Optional|Maybe)\[(.*)\])$/ => sub {
 				my ($val, @matches) = @_;
-				my $sub_code = $self->build_type($name, $matches[1], $value, $error_string);
+				my $sub_code = $self->build_type($name, $matches[2], $value, $error_string);
 				my $code = qq|
 					if (defined $value) { $sub_code
 					}|;
@@ -1161,9 +1161,9 @@ sub build_test_data {
 				} @{$map{_dict_columns}}), q|{}|, q|[]|, $self->_generate_test_string
 			);
 		},
-		qr/^(Optional\[(.*)\])$/ => sub {
+		qr/^((Optional|Maybe)\[(.*)\])$/ => sub {
 			my ($val, @matches) = @_;
-			my @values = $self->build_test_data($matches[1], $name, $required);
+			my @values = $self->build_test_data($matches[2], $name, $required);
 			$values[0] = 'undef' unless $required;
 			return @values;
 		};
@@ -1323,7 +1323,7 @@ Hades - Less is more, more is less!
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
@@ -2067,7 +2067,7 @@ Used in conjunction with Dict and Tuple to specify slots that are optional and m
 
 =head2 Macros
 
-Hades has a concept of macros that allow you to write re-usable code. see L<https://metacpan.org/source/LNATION/Hades-0.21/macro-fh.hades> for an example of how to extend via macros.
+Hades has a concept of macros that allow you to write re-usable code. see L<https://metacpan.org/source/LNATION/Hades-0.22/macro-fh.hades> for an example of how to extend via macros.
 
 	macro {
 		FH [ macro => [qw/read_file write_file/], alias => { read_file => [qw/rf/], write_file => [qw/wf/] } ]

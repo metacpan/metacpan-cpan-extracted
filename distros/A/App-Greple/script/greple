@@ -63,7 +63,7 @@ greple - extensible grep with lexical expression and region control
 =head1 VERSION
 
 
-Version 9.1101
+Version 9.1301
 
 
 =head1 SYNOPSIS
@@ -742,12 +742,15 @@ if ($opt_ansicolor eq '24bit') {
 }
 
 for my $opt (@opt_face) {
-    while ($opt =~ /(?:(?<rm>-)|\+)? (?<s>[^-+]+)/xg) {
+    while ($opt =~ /(?<mk>[-+=]) (?<s>[^-+=]*) | (?<s>[^-+=]+) /xg) {
+	my($mk, $s) = ($+{mk} // '', $+{s});
 	for my $c (@colors) {
-	    if ($+{rm}) {
-		$c =~ s/[\Q$+{s}\E]//g;
+	    if ($mk eq '-') {
+		$c =~ s/[\Q$+{s}\E]//g if $s ne '';
+	    } elsif ($mk eq '=') {
+		$c = $s;
 	    } else {
-		my $spec = $+{s} =~ s/[\Q$c\E]//gr;
+		my $spec = $s =~ s/[\Q$c\E]//gr;
 		$c .= '^' . ${spec} if $spec;
 	    }
 	}
@@ -1221,27 +1224,27 @@ sub grep_data {
 
     my $grep = App::Greple::Grep->new(
 	text         => \$_,
-	filename     => $current_file,
-	pattern      => $pat_holder,
-	regions      => $regions,
-	border       => $border_re,
-	after        => $opt_A,
-	before       => $opt_B,
-	only         => $opt_o,
-	all          => $opt_all,
+	filename     =>  $current_file,
+	pattern      =>  $pat_holder,
+	regions      =>  $regions,
+	border       =>  $border_re,
+	after        =>  $opt_A,
+	before       =>  $opt_B,
+	only         =>  $opt_o,
+	all          =>  $opt_all,
 	block        => \@opt_block,
-	must         => $count_must,
-	need         => $count_need,
-	countcheck   => $count_match_sub,
-	allow        => $count_allow,
-	strict       => $opt_strict,
-	group_match  => $opt_capture_group,
-	region_index => $opt_regioncolor,
+	must         =>  $count_must,
+	need         =>  $count_need,
+	countcheck   =>  $count_match_sub,
+	allow        =>  $count_allow,
+	strict       =>  $opt_strict,
+	group_match  =>  $opt_capture_group,
+	region_index =>  $opt_regioncolor,
 	stat         => \%stat,
-	callback     => @opt_callback ? \@opt_callback : undef,
-	alert_size   => $opt_alert{size},
-	alert_time   => $opt_alert{time},
-	join_blocks  => $opt_join_blocks,
+	callback     => \@opt_callback,
+	alert_size   =>  $opt_alert{size},
+	alert_time   =>  $opt_alert{time},
+	join_blocks  =>  $opt_join_blocks,
     )->run;
     my $matched = $grep->matched;
 
@@ -1712,6 +1715,10 @@ to use direct index, and use relative or named capture group instead.
 For example, if you want to search repeated characters, use
 S<< C<(\w)\g{-1}> >> or S<< C<(?E<lt>cE<gt>\w)\g{c}> >> rather than
 S<< C<(\w)\1> >>.
+
+Extended Bracketed Character Classes (C<(?[...])>) can be used without
+warnings.  See L<perlrecharclass/"Extended Bracketed Character
+Classes">.
 
 =over 7
 
@@ -2433,20 +2440,24 @@ color for each entire line by their commit ids.
 
     git blame ... | greple .+ --uc --us='sub{s/\s.*//r}' --face=E-D
 
-=item B<--face>=[-+]I<effect>
+=item B<--face>=[+-=]I<effect>
 
-Set or unset specified I<effect> for all indexed color specs.  Use
-C<+> (optional) to set, and C<-> to unset.  Effect is a single
-character expressing S (Stand-out), U (Underline), D (Double-struck),
-F (Flash) and such.
+Append, remove or set specified I<effect> for all indexed color specs.
+Use C<+> (optional) to append, C<-> to remove, and C<=> to set.
+Effect is a single character expressing C<S> (Stand-out), C<U>
+(Underline), C<D> (Double-struck), C<F> (Flash) and such.
 
-Next example remove D (double-struck) effect.
+Next example removes D (double-struck) effect.
 
     greple --face -D
 
-Multiple effects can be set/unset at once.
+Multiple effects can be added/removed at once.
 
     greple --face SF-D
+
+Next example clears all existing color specs.
+
+    greple --face =
 
 =back
 
@@ -3237,7 +3248,7 @@ can be implemented both in function and macro.
     use App::Greple::Regions;
     
     my $pod_re = qr{^=\w+(?s:.*?)(?:\Z|^=cut\s*\n)}m;
-    my $comment_re = qr{^(?:[ \t]*#.*\n)+}m;
+    my $comment_re = qr{^(?:\h*#.*\n)+}m;
     
     sub pod {
         match_regions(pattern => $pod_re);

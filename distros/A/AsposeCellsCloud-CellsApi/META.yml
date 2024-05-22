@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 24.4
+    version: 24.5
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Role:
@@ -211,8 +211,6 @@ provides:
     file: lib/AsposeCellsCloud/Object/SortKey.pm
   AsposeCellsCloud::Object::SplitResult:
     file: lib/AsposeCellsCloud/Object/SplitResult.pm
-  AsposeCellsCloud::Object::SplitResultDocument:
-    file: lib/AsposeCellsCloud/Object/SplitResultDocument.pm
   AsposeCellsCloud::Object::Style:
     file: lib/AsposeCellsCloud/Object/Style.pm
   AsposeCellsCloud::Object::StyleFormatCondition:
@@ -355,8 +353,6 @@ provides:
     file: lib/AsposeCellsCloud/Object/XlsSaveOptions.pm
   AsposeCellsCloud::Object::XpsSaveOptions:
     file: lib/AsposeCellsCloud/Object/XpsSaveOptions.pm
-  AsposeCellsCloud::Object::AnalyzeExcelResponse:
-    file: lib/AsposeCellsCloud/Object/AnalyzeExcelResponse.pm
   AsposeCellsCloud::Object::ArcShapeResponse:
     file: lib/AsposeCellsCloud/Object/ArcShapeResponse.pm
   AsposeCellsCloud::Object::AutoFilterResponse:
@@ -643,6 +639,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/LoadData.pm
   AsposeCellsCloud::Object::LoadTo:
     file: lib/AsposeCellsCloud/Object/LoadTo.pm
+  AsposeCellsCloud::Object::MergeQueries:
+    file: lib/AsposeCellsCloud/Object/MergeQueries.pm
   AsposeCellsCloud::Object::PivotColumn:
     file: lib/AsposeCellsCloud/Object/PivotColumn.pm
   AsposeCellsCloud::Object::QueryDataSource:
@@ -663,6 +661,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/PivotTable.pm
   AsposeCellsCloud::Object::PivotTables:
     file: lib/AsposeCellsCloud/Object/PivotTables.pm
+  AsposeCellsCloud::Object::CellValue:
+    file: lib/AsposeCellsCloud/Object/CellValue.pm
   AsposeCellsCloud::Object::CustomParserConfig:
     file: lib/AsposeCellsCloud/Object/CustomParserConfig.pm
   AsposeCellsCloud::Object::Import2DimensionDoubleArrayOption:
@@ -671,8 +671,6 @@ provides:
     file: lib/AsposeCellsCloud/Object/Import2DimensionIntArrayOption.pm
   AsposeCellsCloud::Object::Import2DimensionStringArrayOption:
     file: lib/AsposeCellsCloud/Object/Import2DimensionStringArrayOption.pm
-  AsposeCellsCloud::Object::CellValue:
-    file: lib/AsposeCellsCloud/Object/CellValue.pm
   AsposeCellsCloud::Object::ImportBatchDataOption:
     file: lib/AsposeCellsCloud/Object/ImportBatchDataOption.pm
   AsposeCellsCloud::Object::ImportCSVDataOption:
@@ -835,8 +833,6 @@ provides:
     file: lib/AsposeCellsCloud/Object/AnalyzedResult.pm
   AsposeCellsCloud::Object::AnalyzedTableDescription:
     file: lib/AsposeCellsCloud/Object/AnalyzedTableDescription.pm
-  AsposeCellsCloud::Object::AnalyzeSuggestion:
-    file: lib/AsposeCellsCloud/Object/AnalyzeSuggestion.pm
   AsposeCellsCloud::Object::DiscoverChart:
     file: lib/AsposeCellsCloud/Object/DiscoverChart.pm
   AsposeCellsCloud::Object::DiscoverPivotTable:
@@ -1546,5 +1542,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 24.4
+version: 24.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

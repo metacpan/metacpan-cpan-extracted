@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => '           Encapsulates the object that represents a single worksheet.           ',
                                   class => 'Worksheet',
                                   required => [], # TODO
 }                                 );

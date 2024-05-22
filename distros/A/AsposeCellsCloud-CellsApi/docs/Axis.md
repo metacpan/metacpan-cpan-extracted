@@ -16,7 +16,7 @@ Name | Type | Description | Notes
 **CrossAt** | **double** | Represents the point on the value axis where the category axis crosses it. |
 **CrossType** | **string** | Represents the  on the specified axis where the other axis crosses. |
 **DisplayUnit** | **string** | Represents the unit label for the specified axis. |
-**DisplayUnitLabel** | **LinkElement** | Represents a unit label on an axis in the specified chart.                         Unit labels are useful for charting large values— for example, in the millions or billions. |
+**DisplayUnitLabel** | **DisplayUnitLabel** | Represents a unit label on an axis in the specified chart.                         Unit labels are useful for charting large values— for example, in the millions or billions. |
 **HasMultiLevelLabels** | **boolean** | Indicates whether the labels shall be shown as multi level. |
 **IsAutomaticMajorUnit** | **boolean** | Indicates whether the major unit of the axis is automatically assigned. |
 **IsAutomaticMaxValue** | **boolean** | Indicates whether the max value is automatically assigned. |

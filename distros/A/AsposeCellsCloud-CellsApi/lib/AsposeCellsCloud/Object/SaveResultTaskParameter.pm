@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents save result task parameter.',
                                   class => 'SaveResultTaskParameter',
                                   required => [], # TODO
 }                                 );
@@ -129,14 +129,14 @@ __PACKAGE__->method_documentation({
      'result_source' => {
      	datatype => 'string',
      	base_name => 'ResultSource',
-     	description => '',
+     	description => 'Represents result data source.',
      	format => '',
      	read_only => '',
      		},
      'result_destination' => {
      	datatype => 'ResultDestination',
      	base_name => 'ResultDestination',
-     	description => '',
+     	description => 'Represents result destination data.',
      	format => '',
      	read_only => '',
      		},    

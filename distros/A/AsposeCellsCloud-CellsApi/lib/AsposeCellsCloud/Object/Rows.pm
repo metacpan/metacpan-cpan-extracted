@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Collects the  objects that represent the individual rows in a worksheet.',
                                   class => 'Rows',
                                   required => [], # TODO
 }                                 );

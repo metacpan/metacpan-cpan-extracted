@@ -20,7 +20,8 @@ my $ceil               = 'CEIL';
 my $char_length        = 'CHAR_LENGTH';
 my $coalesce           = 'COALESCE';
 my $concat             = 'CONCAT';
-my $dateadd            = 'DATEADD';
+my $date_add           = 'DATE_ADD';
+my $date_subtract      = 'DATE_SUBTRACT';
 my $date_format        = 'DATE_FORMAT';
 my $day                = 'DAY';
 my $dayofweek          = 'DAYOFWEEK';
@@ -135,7 +136,7 @@ sub __available_functions {
             $char_length        => [  000000 , 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix',  000000  ],
             $instr              => [ 'SQLite',  00000 ,  0000000 ,  00 ,  00000000 , 'DB2', 'Informix', 'Oracle' ],
             $concat             => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $left               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $left               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix',  000000  ],
             $length             => [ 'SQLite',  00000 ,  0000000 ,  00 ,  00000000 ,  000 ,  00000000 , 'Oracle' ], # Pg
             $lengthb            => [  000000 ,  00000 ,  0000000 ,  00 ,  00000000 ,  000 ,  00000000 , 'Oracle' ],
             $locate             => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 ,  000 ,  00000000 ,  000000  ], # DB2
@@ -146,7 +147,7 @@ sub __available_functions {
             $position           => [  000000 , 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2',  00000000 ,  000000  ],
             $replace            => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
             $reverse            => [  000000 , 'mysql', 'MariaDB', 'Pg', 'Firebird',  000 , 'Informix', 'Oracle' ],
-            $right              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $right              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix',  000000  ],
             $rpad               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
             $rtrim              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg',  00000000 , 'DB2', 'Informix', 'Oracle' ],
             $substring          => [  000000 ,  00000 ,  0000000 ,  00 , 'Firebird',  000 ,  00000000 ,  000000  ], # mysql, MariaDB, Pg, DB2, Informix
@@ -170,7 +171,8 @@ sub __available_functions {
             $trunc              => [ 'SQLite',  00000 ,  0000000 , 'Pg', 'Firebird',  000 , 'Informix', 'Oracle' ],
         },
         date => {
-            $dateadd            => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $date_add           => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $date_subtract      => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
             $extract            => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
             $now                => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
             $year               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
@@ -416,7 +418,7 @@ sub col_function {
                             { prompt => 'What: ' },
                         ];
                     }
-                    elsif ( $func eq $dateadd ) {
+                    elsif ( $func =~ /^(?:$date_add|$date_subtract)\z/ ) {
                         $args_data = [
                             { prompt => 'Amount: ', is_numeric => 1 },
                             { prompt => 'Unit: ', history => [ qw(YEAR MONTH DAY HOUR MINUTE SECOND) ], unquote => 1 },
@@ -448,11 +450,11 @@ sub col_function {
                         }
                     }
                     elsif ( $driver eq 'Oracle' ) {
-                        if ( $func =~ /^TO_/ ) {
-                            push @$args_data, { prompt => 'nls_parameter: ' };
-                        }
-                        elsif ( $func eq $to_epoch ) {
+                        if ( $func eq $to_epoch ) {
                             push @$args_data, { prompt => 'Column type: ', history => [ qw(DATE TIMESTAMP TIMESTAMP_TZ) ], unquote => 1 };
+                        }
+                        elsif ( $func =~ /^(?:$rx_func_to_format)\z/ ) {
+                            push @$args_data, { prompt => 'nls_parameter: ' };
                         }
                     }
                     $function_stmt = $sf->__func_with_one_col( $sql, $clause, $info, $func, $chosen_col, $args_data );

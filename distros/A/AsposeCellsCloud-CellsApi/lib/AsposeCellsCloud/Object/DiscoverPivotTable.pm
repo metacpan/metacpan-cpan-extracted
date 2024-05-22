@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents a pivot table, which is a pivot table created based on data analysis of a table.',
                                   class => 'DiscoverPivotTable',
                                   required => [], # TODO
 }                                 );
@@ -128,21 +128,21 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => '',
+     	description => 'Represents pivot table name.',
      	format => '',
      	read_only => '',
      		},
      'title' => {
      	datatype => 'string',
      	base_name => 'Title',
-     	description => '',
+     	description => 'Represents pivot table title.',
      	format => '',
      	read_only => '',
      		},
      'data_range' => {
      	datatype => 'string',
      	base_name => 'DataRange',
-     	description => '',
+     	description => 'Represents pivot table data range.',
      	format => '',
      	read_only => '',
      		},
@@ -170,7 +170,7 @@ __PACKAGE__->method_documentation({
      'thumbnail' => {
      	datatype => 'string',
      	base_name => 'Thumbnail',
-     	description => 'Base64String',
+     	description => 'Represents pivot table thumbnail. Base64String',
      	format => '',
      	read_only => '',
      		},    

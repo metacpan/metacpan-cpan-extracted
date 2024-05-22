@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents the HorizontalPageBreaks Response.',
                                   class => 'HorizontalPageBreaksResponse',
                                   required => [], # TODO
 }                                 );

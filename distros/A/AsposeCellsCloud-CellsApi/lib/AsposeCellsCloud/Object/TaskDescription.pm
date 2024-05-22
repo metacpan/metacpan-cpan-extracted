@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents task description.',
                                   class => 'TaskDescription',
                                   required => [], # TODO
 }                                 );
@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'task_type' => {
      	datatype => 'string',
      	base_name => 'TaskType',
-     	description => '',
+     	description => 'Represents task type.',
      	format => '',
      	read_only => '',
      		},
      'task_parameter' => {
      	datatype => 'TaskParameter',
      	base_name => 'TaskParameter',
-     	description => '',
+     	description => 'Represents task parameter.',
      	format => '',
      	read_only => '',
      		},    

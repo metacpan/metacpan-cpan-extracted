@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents a defined name for a range of cells.',
                                   class => 'Name',
                                   required => [], # TODO
 }                                 );

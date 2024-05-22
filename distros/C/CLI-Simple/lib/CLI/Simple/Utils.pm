@@ -5,14 +5,14 @@ use warnings;
 
 use Carp;
 use Data::Dumper;
-use English  qw(-no_match_chars);
-use JSON::PP qw(decode_json);
+use English qw(-no_match_chars);
+use JSON qw(decode_json);
 
 use parent qw(Exporter);
 
 our @EXPORT_OK = qw( slurp slurp_json dump_json normalize_options);
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.5';
 
 ########################################################################
 sub slurp_json {
@@ -67,7 +67,7 @@ sub dump_json {
 ########################################################################
   my ($obj) = @_;
 
-  return JSON::PP->new->pretty->encode($obj);
+  return JSON->new->pretty->encode($obj);
 }
 
 1;

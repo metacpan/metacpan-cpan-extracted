@@ -7,7 +7,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Readonly;
 
@@ -86,12 +86,23 @@ __END__
 
 =head1 NAME
 
-Perl::Critic::Policy::Mardem::ProhibitLargeFile
+Perl::Critic::Policy::Mardem::ProhibitLargeFile - large files as line count
 
 =head1 DESCRIPTION
 
 This Policy counts the lines within a Perl-File
 (more precise the PPI::Document's)
+
+=head1 CONFIGURATION
+
+The maximum acceptable lines can be set with the C<line_count_limit>
+configuration item. Any file (or given string) with higher line count
+will generate a policy violation. The default is 999.
+
+An example section for a F<.perlcriticrc>:
+
+  [Mardem::ProhibitLargeFile]
+  line_count_limit = 1
 
 =head1 AFFILIATION
 

@@ -1,5 +1,8 @@
 Revision history for Date-Holidays-USA
 
+0.0205 2024-05-21 18:46:27
+    - Add " Day" to holdays that traditionally have "Day" in the name!
+
 0.0204 2024-05-18 20:08:03
     - Mother's Day is on a Sunday, not Monday!
 

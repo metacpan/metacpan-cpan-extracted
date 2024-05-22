@@ -121,7 +121,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => '           Encapsulates the object that represents fill formatting for a shape.           ',
                                   class => 'FillFormat',
                                   required => [], # TODO
 }                                 );

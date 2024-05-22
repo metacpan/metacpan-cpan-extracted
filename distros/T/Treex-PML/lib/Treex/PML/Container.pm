@@ -24,7 +24,7 @@ use strict;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.27'; # version template
+  $VERSION='2.28'; # version template
 }
 use base qw(Treex::PML::Struct);
 
@@ -74,10 +74,20 @@ sub value {
 
 This is an alias for value().
 
+=item $container->set_value($v), $container->set_content($v)
+
+Set the central value of the container.
+
 =cut
+
+sub set_value {
+    my ($self, $value) = @_;
+    return $self->{'#content'} = $value
+}
 
 BEGIN{
 *content = \&value;
+*set_content = \&set_value;
 *get_attribute = \&Treex::PML::Struct::get_member;
 *set_attribute = \&Treex::PML::Struct::set_member;
 }

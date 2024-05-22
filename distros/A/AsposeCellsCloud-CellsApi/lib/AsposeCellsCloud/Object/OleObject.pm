@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents an OleObject in a worksheet.',
                                   class => 'OleObject',
                                   required => [], # TODO
 }                                 );

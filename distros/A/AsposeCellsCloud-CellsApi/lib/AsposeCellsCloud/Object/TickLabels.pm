@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents the tick-mark labels associated with tick marks on a chart axis.',
                                   class => 'TickLabels',
                                   required => [], # TODO
 }                                 );

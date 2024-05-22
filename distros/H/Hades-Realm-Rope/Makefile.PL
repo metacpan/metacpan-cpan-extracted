@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
 	'Moose' => '1.00',
+	'Hades' => '0.22',
 	'Hades::Realm::OO' => '0.07',
 	'Rope' => '0.36'
     },

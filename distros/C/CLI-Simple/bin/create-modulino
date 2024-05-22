@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Which qw(which);
+use File::Copy;
+use File::Basename qw(dirname);
+use Data::Dumper;
+
+########################################################################
+sub create_modulino_name {
+########################################################################
+  my ($module_name) = @_;
+
+  my @module_parts = map {lcfirst} split /::/xsm, $module_name;
+
+  my $modulino_name = join q{-}, @module_parts;
+
+  return $modulino_name;
+}
+
+########################################################################
+sub main {
+########################################################################
+
+  my $path = which 'modulino';
+
+  die "no path to modulino\n"
+    if !$path;
+
+  my $executable_path = dirname $path;
+
+  my $modulino_name = create_modulino_name( shift @ARGV );
+
+  if ( -e "$path/$modulino_name" ) {
+    unlink "$path/$modulino_name";
+  }
+
+  print {*STDERR} Dumper( [ path => $path, modulino => "$path/$modulino_name" ] );
+
+  copy( $path, "$executable_path/$modulino_name" );
+
+  chmod oct('0755'), "$executable_path/$modulino_name";
+
+  my $link_name = shift @ARGV;
+
+  if ($link_name) {
+    symlink "$executable_path/$modulino_name", "$executable_path/$link_name";
+  }
+
+  return 0;
+}
+
+exit main();
+
+1;

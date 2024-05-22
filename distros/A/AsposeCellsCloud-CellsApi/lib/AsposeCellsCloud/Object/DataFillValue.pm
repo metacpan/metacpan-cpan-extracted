@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents that the data is populated with the specified value.',
                                   class => 'DataFillValue',
                                   required => [], # TODO
 }                                 );
@@ -128,35 +128,35 @@ __PACKAGE__->method_documentation({
      'default_boolean' => {
      	datatype => 'boolean',
      	base_name => 'DefaultBoolean',
-     	description => '',
+     	description => 'Represents default bool value. ',
      	format => '',
      	read_only => '',
      		},
      'default_string' => {
      	datatype => 'string',
      	base_name => 'DefaultString',
-     	description => '',
+     	description => 'Represents default string value.             ',
      	format => '',
      	read_only => '',
      		},
      'default_number' => {
      	datatype => 'int',
      	base_name => 'DefaultNumber',
-     	description => '',
+     	description => 'Represents default number value.             ',
      	format => '',
      	read_only => '',
      		},
      'default_double' => {
      	datatype => 'double',
      	base_name => 'DefaultDouble',
-     	description => '',
+     	description => 'Represents default double value.             ',
      	format => '',
      	read_only => '',
      		},
      'default_date' => {
      	datatype => 'string',
      	base_name => 'DefaultDate',
-     	description => '',
+     	description => 'Represents default date value.             ',
      	format => '',
      	read_only => '',
      		},    

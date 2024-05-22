@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents data filling.',
                                   class => 'DataFill',
                                   required => [], # TODO
 }                                 );
@@ -130,21 +130,21 @@ __PACKAGE__->method_documentation({
      'ranges' => {
      	datatype => 'ARRAY[Range]',
      	base_name => 'Ranges',
-     	description => '',
+     	description => 'Represents range of data filling.',
      	format => '',
      	read_only => '',
      		},
      'data_fill_default_value' => {
      	datatype => 'DataFillValue',
      	base_name => 'DataFillDefaultValue',
-     	description => '',
+     	description => 'Represents that the data column is populated with the default value.',
      	format => '',
      	read_only => '',
      		},
      'data_column_fill_value_list' => {
      	datatype => 'ARRAY[DataColumnFillValue]',
      	base_name => 'DataColumnFillValueList',
-     	description => '',
+     	description => 'Represents that the data column is populated with the specified value.',
      	format => '',
      	read_only => '',
      		},    

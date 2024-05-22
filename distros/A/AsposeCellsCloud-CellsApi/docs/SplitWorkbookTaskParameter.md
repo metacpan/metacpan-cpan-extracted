@@ -8,11 +8,11 @@ use AsposeCellsCloud::Object::SplitWorkbookTaskParameter;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Workbook** | **FileSource** |  |
-**DestinationFilePosition** | **FileSource** |  |
-**DataSource** | **DataSource** |  |
-**TargetDataSource** | **DataSource** |  |
-**DestinationFileFormat** | **string** |  |
+**Workbook** | **FileSource** | Represents data source of task object. |
+**DestinationFilePosition** | **FileSource** | Represents data source of task object. |
+**DataSource** | **DataSource** | Represents destination data source. |
+**TargetDataSource** | **DataSource** | Represents destination data source. |
+**DestinationFileFormat** | **string** | Represents destination data file format. |
 **SplitNameRule** | **string** | SheetName /NewGuid |
 **VerticalResolution** | **int** | When destination file format is image , vertical resolution can not be null. |
 **HorizontalResolution** | **int** | When destination file format is image , horizontal resolution can not be null. |  

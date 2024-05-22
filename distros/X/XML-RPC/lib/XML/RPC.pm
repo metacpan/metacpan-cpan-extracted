@@ -78,6 +78,10 @@ This method calls the provides XML-RPC server's method_name with
 This parses an incoming XML-RPC methodCall and call the \&handler subref
 with parameters: $methodName and @parameters.
 
+=head2 $xmlrpc->errstr();
+
+Returns the last HTTP status code (200 when no remote call has happened yet). Can return 999 for some internal errors
+
 =head2 $xmlrpc->xml_in();
 
 Returns the last XML that went in the client.
@@ -173,7 +177,7 @@ use Time::Local;
 use vars qw($VERSION $faultCode);
 no strict 'refs';
 
-$VERSION   = 2.0;
+$VERSION   = 2.1;
 $faultCode = 0;
 
 sub new {
@@ -182,6 +186,7 @@ sub new {
     bless $self, $package;
     $self->{url} = shift;
     $self->{tpp} = XML::TreePP->new(@_);
+    $self->{laststatus} = '200';
     return $self;
 }
 
@@ -221,16 +226,36 @@ sub call {
         $header{'Authorization'} = $self->{authtoken}
     }
 
-    my ( $result, $xml_in ) = $self->{tpp}->parsehttp(
-        POST => $self->{url},
-        $xml_out,
-        \%header,
-    );
+    my ( $result, $xml_in, $httpstatus );
+
+    my $parseok = 0;
+    eval {
+        ( $result, $xml_in, $httpstatus ) = $self->{tpp}->parsehttp(
+            POST => $self->{url},
+            $xml_out,
+            \%header,
+        );
+        $parseok = 1;
+    };
+
+    if(!$parseok) {
+        my $err = $@;
+        $httpstatus = '999';
+        die($err);
+    };
+
+    $self->{laststatus} = $httpstatus;
 
     $self->{xml_in} = $xml_in;
 
     my @data = $self->unparse_response($result);
     return @data == 1 ? $data[0] : @data;
+}
+
+sub errstr {
+    my $self = shift;
+
+    return $self->{laststatus};
 }
 
 sub receive {

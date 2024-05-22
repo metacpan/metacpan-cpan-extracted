@@ -3,14 +3,18 @@ abstract: "Toolforge Mix'n'match tool app."
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  English: 0
   ExtUtils::MakeMaker: 6.59
+  File::Object: 0
+  File::Spec::Functions: 0
   Test::More: 0
   Test::NoWarnings: 0
+  Test::Output: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -42,4 +46,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-Toolforge-MixNMatch
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Toolforge-MixNMatch
-version: '0.05'
+version: '0.06'

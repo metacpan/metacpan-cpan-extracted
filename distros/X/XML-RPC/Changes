@@ -1,5 +1,9 @@
 # XML::RPC Changes
 
+2024/05/21 (2.1)
+    * Implement errstr() that returns the HTTP status code of the last call
+    * Make error handling slightly more robust in certain cases
+
 2022/03/09 (2.0)
     * Implement typecasting
     * Add suggestion that people use Randy Ray's RPC::XML instead for new projects

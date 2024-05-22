@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => '           Encapsulates the object that represents a vertical page break.           ',
                                   class => 'VerticalPageBreak',
                                   required => [], # TODO
 }                                 );

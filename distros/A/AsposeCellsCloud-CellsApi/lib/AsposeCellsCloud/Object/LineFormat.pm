@@ -122,7 +122,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents all setting of the line.',
                                   class => 'LineFormat',
                                   required => [], # TODO
 }                                 );

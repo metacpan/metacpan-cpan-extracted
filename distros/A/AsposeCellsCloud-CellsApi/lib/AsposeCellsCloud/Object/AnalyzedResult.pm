@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents results of analyzed data.',
                                   class => 'AnalyzedResult',
                                   required => [], # TODO
 }                                 );
@@ -129,28 +129,28 @@ __PACKAGE__->method_documentation({
      'filename' => {
      	datatype => 'string',
      	base_name => 'Filename',
-     	description => '',
+     	description => 'Represents the file name of data file.',
      	format => '',
      	read_only => '',
      		},
      'description' => {
      	datatype => 'string',
      	base_name => 'Description',
-     	description => '',
+     	description => 'Represents summary about results of analyzed data.',
      	format => '',
      	read_only => '',
      		},
      'basic_statistics' => {
      	datatype => 'ExcelDataStatistics',
      	base_name => 'BasicStatistics',
-     	description => '',
+     	description => 'Represents Excel data statistics.',
      	format => '',
      	read_only => '',
      		},
      'results' => {
      	datatype => 'ARRAY[AnalyzedTableDescription]',
      	base_name => 'Results',
-     	description => '',
+     	description => 'Represents analyzed table description.',
      	format => '',
      	read_only => '',
      		},

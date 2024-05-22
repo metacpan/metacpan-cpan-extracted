@@ -38,7 +38,8 @@ use DateTime;
 use AsposeCellsCloud::Object::DataItem;
 use AsposeCellsCloud::Object::DataSource;
 use AsposeCellsCloud::Object::FileInfo;
-use AsposeCellsCloud::Object::LoadTo; 
+use AsposeCellsCloud::Object::LoadTo;
+use AsposeCellsCloud::Object::MergeQueries; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -155,6 +156,13 @@ __PACKAGE__->method_documentation({
      	description => 'The specific data object type and name.',
      	format => '',
      	read_only => '',
+     		},
+     'merge_queries' => {
+     	datatype => 'MergeQueries',
+     	base_name => 'MergeQueries',
+     	description => '',
+     	format => '',
+     	read_only => '',
      		},    
 });
 
@@ -162,14 +170,16 @@ __PACKAGE__->swagger_types( {
     'load_to' => 'LoadTo',
     'data_source' => 'DataSource',
     'file_info' => 'FileInfo',
-    'data_item' => 'DataItem' 
+    'data_item' => 'DataItem',
+    'merge_queries' => 'MergeQueries' 
 } );
 
 __PACKAGE__->attribute_map( {
     'load_to' => 'LoadTo',
     'data_source' => 'DataSource',
     'file_info' => 'FileInfo',
-    'data_item' => 'DataItem' 
+    'data_item' => 'DataItem',
+    'merge_queries' => 'MergeQueries' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => '           Represents tile picture as texture.           ',
                                   class => 'TilePicOption',
                                   required => [], # TODO
 }                                 );

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,7 +31,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Object-Remote
   license: http://dev.perl.org/licenses/
-  repository: git://git.shadowcat.co.uk/scpubgit/Object-Remote.git
-version: '0.004001'
+  repository: https://github.com/p5sagit/Object-Remote.git
+version: '0.004003'
 x_authority: cpan:MSTROUT
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

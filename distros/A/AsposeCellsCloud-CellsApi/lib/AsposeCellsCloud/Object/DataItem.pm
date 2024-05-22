@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents data item.',
                                   class => 'DataItem',
                                   required => [], # TODO
 }                                 );
@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'data_item_type' => {
      	datatype => 'string',
      	base_name => 'DataItemType',
-     	description => '',
+     	description => 'Represents data item type.            ',
      	format => '',
      	read_only => '',
      		},
      'value' => {
      	datatype => 'string',
      	base_name => 'Value',
-     	description => '',
+     	description => 'Represents data item value.            ',
      	format => '',
      	read_only => '',
      		},    

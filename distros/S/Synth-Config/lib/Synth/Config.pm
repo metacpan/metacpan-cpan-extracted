@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Synthesizer settings librarian
 
-our $VERSION = '0.0052';
+our $VERSION = '0.0053';
 
 use Moo;
 use strictures 2;
@@ -263,14 +263,13 @@ sub recall_specs {
     . " where model = '" . $self->model . "'"
     . ' order by model,mygroup';
   my $results = $self->_sqlite->query($sql);
-  my @specs;
+  my $set;
   while (my $next = $results->hash) {
-    my $set = from_json($next->{spec});
+    $set = from_json($next->{spec});
     $set->{id} = $next->{id};
     $set->{model} = $next->{model};
-    push @specs, $set;
   }
-  return \@specs;
+  return $set;
 }
 
 
@@ -366,7 +365,7 @@ sub graphviz {
   # accumulate parameter = value lines
   for my $from (keys %sets) {
     my @label = ($from);
-    for my $group ($sets{$from}->@*) {
+    for my $group (@{ $sets{$from} }) {
       next if $group->{control} eq 'patch';
       my $label = "$group->{parameter} = $group->{value}$group->{unit}";
       push @label, $label;
@@ -414,7 +413,7 @@ Synth::Config - Synthesizer settings librarian
 
 =head1 VERSION
 
-version 0.0052
+version 0.0053
 
 =head1 SYNOPSIS
 
@@ -480,7 +479,7 @@ version 0.0052
   my $spec_id = $synth->make_spec(%spec);
   my $spec = $synth->recall_spec(id => $spec_id);
   my $specs = $synth->recall_specs;
-  # [ { order => [ ... ], etc => ... } ]
+  # { order => [ ... ], etc => ... }
 
   # remove stuff!
   $synth->remove_spec;

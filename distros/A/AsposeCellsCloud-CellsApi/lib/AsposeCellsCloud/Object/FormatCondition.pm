@@ -125,7 +125,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents conditional formatting condition.',
                                   class => 'FormatCondition',
                                   required => [], # TODO
 }                                 );

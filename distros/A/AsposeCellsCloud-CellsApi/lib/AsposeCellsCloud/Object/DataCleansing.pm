@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'Data Cleansing',
+__PACKAGE__->class_documentation({description => 'Represents data cleansing.',
                                   class => 'DataCleansing',
                                   required => [], # TODO
 }                                 );
@@ -136,14 +136,14 @@ __PACKAGE__->method_documentation({
      'need_fill_data' => {
      	datatype => 'boolean',
      	base_name => 'NeedFillData',
-     	description => '',
+     	description => 'Represents whether the data needs to be populated.',
      	format => '',
      	read_only => '',
      		},
      'data_fill' => {
      	datatype => 'DataFill',
      	base_name => 'DataFill',
-     	description => '',
+     	description => 'Represents data fill.',
      	format => '',
      	read_only => '',
      		},    

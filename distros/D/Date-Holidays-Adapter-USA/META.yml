@@ -28,7 +28,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Date-Holidays-Adapter-USA
   repository: https://github.com/ology/Date-Holidays-Adapter-USA.git
-version: '0.0102'
+version: '0.0103'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

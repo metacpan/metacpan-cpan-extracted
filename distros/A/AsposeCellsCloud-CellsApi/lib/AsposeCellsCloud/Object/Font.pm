@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => '           Encapsulates the font object used in a spreadsheet.           ',
                                   class => 'Font',
                                   required => [], # TODO
 }                                 );

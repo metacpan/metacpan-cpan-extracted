@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Options for encrypting and access permissions for a PDF document.            PDF/A does not allow security setting.',
                                   class => 'PdfSecurityOptions',
                                   required => [], # TODO
 }                                 );

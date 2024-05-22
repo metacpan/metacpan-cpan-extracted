@@ -121,7 +121,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Encapsulates the object that represents the walls of a 3-D chart.',
                                   class => 'Walls',
                                   required => [], # TODO
 }                                 );

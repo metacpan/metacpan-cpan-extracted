@@ -42,7 +42,7 @@ Name | Type | Description | Notes
 **ManualUpdate** | **boolean** |  |
 **MergeLabels** | **boolean** |  |
 **MissingItemsLimit** | **string** |  |
-**Name** | **string** |  |
+**Name** | **string** | Represents pivot table name. |
 **NullString** | **string** |  |
 **PageFieldOrder** | **string** |  |
 **PageFields** | **ARRAY[PivotField]** |  |

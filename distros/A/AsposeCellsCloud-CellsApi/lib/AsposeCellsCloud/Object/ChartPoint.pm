@@ -123,7 +123,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents a single point in a series in a chart.',
                                   class => 'ChartPoint',
                                   required => [], # TODO
 }                                 );
@@ -186,6 +186,13 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
+     'is_in_secondary_plot' => {
+     	datatype => 'boolean',
+     	base_name => 'IsInSecondaryPlot',
+     	description => 'Gets or sets a value indicates whether this data points is in the second pie or bar on a pie of pie or bar of pie chart.',
+     	format => '',
+     	read_only => '',
+     		},
      'link' => {
      	datatype => 'Link',
      	base_name => 'link',
@@ -204,6 +211,7 @@ __PACKAGE__->swagger_types( {
     'shadow' => 'boolean',
     'x_value' => 'string',
     'y_value' => 'string',
+    'is_in_secondary_plot' => 'boolean',
     'link' => 'Link' 
 } );
 
@@ -216,6 +224,7 @@ __PACKAGE__->attribute_map( {
     'shadow' => 'Shadow',
     'x_value' => 'XValue',
     'y_value' => 'YValue',
+    'is_in_secondary_plot' => 'IsInSecondaryPlot',
     'link' => 'link' 
 } );
 

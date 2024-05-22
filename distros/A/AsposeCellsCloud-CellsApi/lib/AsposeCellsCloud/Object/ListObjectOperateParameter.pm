@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents list object operate parameter.',
                                   class => 'ListObjectOperateParameter',
                                   required => [], # TODO
 }                                 );
@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'list_object' => {
      	datatype => 'ListObject',
      	base_name => 'ListObject',
-     	description => '',
+     	description => 'Represents list object of operate object.',
      	format => '',
      	read_only => '',
      		},

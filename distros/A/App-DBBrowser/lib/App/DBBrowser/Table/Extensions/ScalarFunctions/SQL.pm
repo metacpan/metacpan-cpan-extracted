@@ -53,25 +53,32 @@ sub function_with_one_col {
         my ( $data_type ) = @$args;
         return "CAST($col AS $data_type)";
     }
-    elsif ( $func eq 'DATEADD' ) {
+    elsif ( $func =~ /^DATE_(?:ADD|SUBTRACT)\z/ ) {
         my ( $amount, $unit ) = @$args;
-        return                                         if ! defined $amount || ! defined $unit;
-        return "DATETIME($col,$amount || ' $unit')"    if $driver eq 'SQLite';
-        return "DATE_ADD($col,INTERVAL $amount $unit)" if $driver =~ /^(?:mysql|MariaDB)\z/;
-        return "$col + $amount * INTERVAL '1 $unit'"   if $driver eq 'Pg';
-        return "ADD_${unit}S($col,$amount)"            if $driver eq 'DB2';
-        return "$col + $amount UNITS $unit"            if $driver eq 'Informix';
-        return "DATEADD($unit,$amount,$col)";
+        return if ! defined $amount || ! defined $unit;
+        $unit = uc $unit;
+        my $sign = $func eq 'DATE_ADD' ? '+' : '-';
+        return "DATETIME($col,'$sign' || $amount || ' $unit')" if $driver eq 'SQLite';
+        return "DATE_ADD($col,INTERVAL $sign$amount $unit)"    if $driver =~ /^(?:mysql|MariaDB)\z/;
+        return "$col $sign $amount * INTERVAL '1 $unit'"       if $driver eq 'Pg';
+        return "ADD_${unit}S($col,$sign$amount)"               if $driver eq 'DB2';
+        return "$col $sign $amount UNITS $unit"                if $driver eq 'Informix';
+        if ( $driver eq 'Oracle' ) {
+            return "ADD_MONTHS($col,$sign$amount)" if $unit eq 'MONTH';
+            return "$col $sign $amount * INTERVAL '1' $unit";
+        }
+        return "DATEADD($unit,$sign$amount,$col)";
     }
     elsif ( $func eq 'EXTRACT' ) {
         my ( $field ) = @$args;
+        $field = uc $field;
         if ( $driver eq 'SQLite' ) {
             return "CEILING(strftime('%m',$col)/3.00)" if $field eq 'QUARTER';
             my %map = ( YEAR => '%Y', MONTH => '%m', WEEK => '%W', DAY => '%d', HOUR => '%H', MINUTE => '%M', SECOND => '%S',
                         DAYOFYEAR => '%j', DAYOFWEEK => '%w',
             );
-            if ( $map{ uc( $field ) } ) {
-                $field = "'" . $map{ uc( $field ) } . "'";
+            if ( $map{ $field } ) {
+                $field = "'" . $map{ $field } . "'";
             }
             return "strftime($field,$col)";
         }
@@ -206,6 +213,7 @@ sub function_with_one_col {
         }
         elsif ( $driver eq 'Oracle' ) {
             my ( $column_type ) = @$args;
+            $column_type = uc $column_type // 'DATE';
             return "TRUNC((CAST($col AT TIME ZONE 'UTC' AS DATE) - DATE '1970-01-01') * 86400)"                                              if $column_type eq 'TIMESTAMP_TZ';
             return "TRUNC((CAST(FROM_TZ($col,SESSIONTIMEZONE) AT TIME ZONE 'UTC' AS DATE) - DATE '1970-01-01') * 86400)"                     if $column_type eq 'TIMESTAMP';
             return "TRUNC((CAST(FROM_TZ(CAST($col AS TIMESTAMP),SESSIONTIMEZONE) AT TIME ZONE 'UTC' AS DATE) - DATE '1970-01-01') * 86400)";                   # DATE

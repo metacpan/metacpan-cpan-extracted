@@ -16,18 +16,24 @@ overall starting point see:
 
 but these are for some bigger scans, so these new policies should check (or begin) in smaller chunks:
 
-1. **[ProhibitReturnBooleanAsInt](lib/Perl/Critic/Policy/Mardem/ProhibitReturnBooleanAsInt.pm)** - return boolean as int "return 1;"
-1. **[ProhibitConditionComplexity](lib/Perl/Critic/Policy/Mardem/ProhibitConditionComplexity.pm)** - condition complexity "if/while/for/... (...){}"
-1. **[ProhibitManyConditionsInSub](lib/Perl/Critic/Policy/Mardem/ProhibitManyConditionsInSub.pm)** - subs has many conditionals "if, while, for, ..."
-1. **[ProhibitLargeBlock](lib/Perl/Critic/Policy/Mardem/ProhibitLargeBlock.pm)** - large code block as statement count "{...}"
-1. **[ProhibitBlockComplexity](lib/Perl/Critic/Policy/Mardem/ProhibitBlockComplexity.pm)** - code block complexity "{...}"
-1. **[ProhibitLargeSub](lib/Perl/Critic/Policy/Mardem/ProhibitLargeSub.pm)** - large subs as statement count
-1. **[ProhibitLargeFile](lib/Perl/Critic/Policy/Mardem/ProhibitLargeFile.pm)** - large files as line count
-1. **[ProhibitFileSize](lib/Perl/Critic/Policy/Mardem/ProhibitFileSize.pm)** - large files as byte or char count
+* **[ProhibitReturnBooleanAsInt](lib/Perl/Critic/Policy/Mardem/ProhibitReturnBooleanAsInt.pm)** - return boolean as int "return 1;"
+* **[ProhibitConditionComplexity](lib/Perl/Critic/Policy/Mardem/ProhibitConditionComplexity.pm)** - condition complexity "if/while/for/... (...){}"
+* **[ProhibitManyConditionsInSub](lib/Perl/Critic/Policy/Mardem/ProhibitManyConditionsInSub.pm)** - subs has many conditionals "if, while, for, ..."
+* **[ProhibitLargeBlock](lib/Perl/Critic/Policy/Mardem/ProhibitLargeBlock.pm)** - large code block as statement count "{...}"
+* **[ProhibitBlockComplexity](lib/Perl/Critic/Policy/Mardem/ProhibitBlockComplexity.pm)** - code block complexity "{...}"
+* **[ProhibitLargeSub](lib/Perl/Critic/Policy/Mardem/ProhibitLargeSub.pm)** - large subs as statement count
+* **[ProhibitLargeFile](lib/Perl/Critic/Policy/Mardem/ProhibitLargeFile.pm)** - large files as line count
+* **[ProhibitFileSize](lib/Perl/Critic/Policy/Mardem/ProhibitFileSize.pm)** - large files as byte or char count
 
 ## INSTALLATION
 
-To install this module, run the following commands:
+To install this module via CAPN, run the following commands:
+
+```
+  cpanm Perl::Critic::Mardem
+```
+
+To install this module from source, run the following commands:
 
 ```
   perl Build.PL
@@ -38,13 +44,18 @@ To install this module, run the following commands:
 
 ## SUPPORT AND DOCUMENTATION
 
-Each policy has its own detailed documentation.
+Each policy has its own detailed documentation see
+[Perl::Critic::Mardem](https://metacpan.org/pod/Perl::Critic::Mardem) on MetaCPAN.
 
 ## BUG REPORTS
 
-Please report bugs on GitHub.
+Please report bugs as [GitHub-Issue](https://github.com/mardem1/perl-critic-mardem/issues).
 
-The source code repository can be found at [https://github.com/mardem1/perl-critic-mardem](https://github.com/mardem1/perl-critic-mardem)
+The source code repository can be found on [GitHub](https://github.com/mardem1/perl-critic-mardem).
+
+## CHANGELOG
+
+see [Changes](Changes)
 
 ## AUTHOR
 

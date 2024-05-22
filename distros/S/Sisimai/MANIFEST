@@ -165,6 +165,7 @@ set-of-emails/maildir/bsd/arf-22.eml
 set-of-emails/maildir/bsd/arf-23.eml
 set-of-emails/maildir/bsd/arf-24.eml
 set-of-emails/maildir/bsd/arf-25.eml
+set-of-emails/maildir/bsd/arf-26.eml
 set-of-emails/maildir/bsd/lhost-activehunter-01.eml
 set-of-emails/maildir/bsd/lhost-activehunter-02.eml
 set-of-emails/maildir/bsd/lhost-amavis-01.eml
@@ -666,6 +667,8 @@ set-of-emails/maildir/bsd/rhost-kddi-02.eml
 set-of-emails/maildir/bsd/rhost-microsoft-01.eml
 set-of-emails/maildir/bsd/rhost-microsoft-02.eml
 set-of-emails/maildir/bsd/rhost-microsoft-03.eml
+set-of-emails/maildir/bsd/rhost-microsoft-04.eml
+set-of-emails/maildir/bsd/rhost-microsoft-05.eml
 set-of-emails/maildir/bsd/rhost-mimecast-01.eml
 set-of-emails/maildir/bsd/rhost-mimecast-02.eml
 set-of-emails/maildir/bsd/rhost-nttdocomo-01.eml

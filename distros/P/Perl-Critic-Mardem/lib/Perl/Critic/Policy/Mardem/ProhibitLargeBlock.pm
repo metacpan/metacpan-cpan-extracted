@@ -7,7 +7,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Readonly;
 
@@ -86,7 +86,7 @@ __END__
 
 =head1 NAME
 
-Perl::Critic::Policy::Mardem::ProhibitLargeBlock
+Perl::Critic::Policy::Mardem::ProhibitLargeBlock - large code block as statement count "{...}"
 
 =head1 DESCRIPTION
 

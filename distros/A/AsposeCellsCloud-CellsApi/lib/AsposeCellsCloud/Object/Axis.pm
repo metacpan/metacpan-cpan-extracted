@@ -36,6 +36,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 use AsposeCellsCloud::Object::Area;
+use AsposeCellsCloud::Object::DisplayUnitLabel;
 use AsposeCellsCloud::Object::Line;
 use AsposeCellsCloud::Object::Link;
 use AsposeCellsCloud::Object::LinkElement;
@@ -123,7 +124,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Encapsulates the object that represents an axis of chart.',
                                   class => 'Axis',
                                   required => [], # TODO
 }                                 );
@@ -187,7 +188,7 @@ __PACKAGE__->method_documentation({
      	read_only => '',
      		},
      'display_unit_label' => {
-     	datatype => 'LinkElement',
+     	datatype => 'DisplayUnitLabel',
      	base_name => 'DisplayUnitLabel',
      	description => 'Represents a unit label on an axis in the specified chart.                         Unit labels are useful for charting large values— for example, in the millions or billions.',
      	format => '',
@@ -386,7 +387,7 @@ __PACKAGE__->swagger_types( {
     'cross_at' => 'double',
     'cross_type' => 'string',
     'display_unit' => 'string',
-    'display_unit_label' => 'LinkElement',
+    'display_unit_label' => 'DisplayUnitLabel',
     'has_multi_level_labels' => 'boolean',
     'is_automatic_major_unit' => 'boolean',
     'is_automatic_max_value' => 'boolean',

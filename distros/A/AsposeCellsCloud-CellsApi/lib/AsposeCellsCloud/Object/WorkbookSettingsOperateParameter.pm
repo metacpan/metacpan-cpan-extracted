@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents workbook setting operate parameter.',
                                   class => 'WorkbookSettingsOperateParameter',
                                   required => [], # TODO
 }                                 );
@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'workbook_settings' => {
      	datatype => 'WorkbookSettings',
      	base_name => 'WorkbookSettings',
-     	description => '',
+     	description => 'Represents workbook setting.',
      	format => '',
      	read_only => '',
      		},

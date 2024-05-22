@@ -63,7 +63,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "24.4"
+         "version" : "24.5"
       },    
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
@@ -344,9 +344,6 @@
       "AsposeCellsCloud::Object::SplitResult" : {
          "file" : "lib/AsposeCellsCloud/Object/SplitResult.pm"
       },
-      "AsposeCellsCloud::Object::SplitResultDocument" : {
-         "file" : "lib/AsposeCellsCloud/Object/SplitResultDocument.pm"
-      },
       "AsposeCellsCloud::Object::Style" : {
          "file" : "lib/AsposeCellsCloud/Object/Style.pm"
       },
@@ -559,9 +556,6 @@
       },
       "AsposeCellsCloud::Object::XpsSaveOptions" : {
          "file" : "lib/AsposeCellsCloud/Object/XpsSaveOptions.pm"
-      },
-      "AsposeCellsCloud::Object::AnalyzeExcelResponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/AnalyzeExcelResponse.pm"
       },
       "AsposeCellsCloud::Object::ArcShapeResponse" : {
          "file" : "lib/AsposeCellsCloud/Object/ArcShapeResponse.pm"
@@ -992,6 +986,9 @@
       "AsposeCellsCloud::Object::LoadTo" : {
          "file" : "lib/AsposeCellsCloud/Object/LoadTo.pm"
       },
+      "AsposeCellsCloud::Object::MergeQueries" : {
+         "file" : "lib/AsposeCellsCloud/Object/MergeQueries.pm"
+      },
       "AsposeCellsCloud::Object::PivotColumn" : {
          "file" : "lib/AsposeCellsCloud/Object/PivotColumn.pm"
       },
@@ -1022,6 +1019,9 @@
       "AsposeCellsCloud::Object::PivotTables" : {
          "file" : "lib/AsposeCellsCloud/Object/PivotTables.pm"
       },
+      "AsposeCellsCloud::Object::CellValue" : {
+         "file" : "lib/AsposeCellsCloud/Object/CellValue.pm"
+      },
       "AsposeCellsCloud::Object::CustomParserConfig" : {
          "file" : "lib/AsposeCellsCloud/Object/CustomParserConfig.pm"
       },
@@ -1033,9 +1033,6 @@
       },
       "AsposeCellsCloud::Object::Import2DimensionStringArrayOption" : {
          "file" : "lib/AsposeCellsCloud/Object/Import2DimensionStringArrayOption.pm"
-      },
-      "AsposeCellsCloud::Object::CellValue" : {
-         "file" : "lib/AsposeCellsCloud/Object/CellValue.pm"
       },
       "AsposeCellsCloud::Object::ImportBatchDataOption" : {
          "file" : "lib/AsposeCellsCloud/Object/ImportBatchDataOption.pm"
@@ -1279,9 +1276,6 @@
       },
       "AsposeCellsCloud::Object::AnalyzedTableDescription" : {
          "file" : "lib/AsposeCellsCloud/Object/AnalyzedTableDescription.pm"
-      },
-      "AsposeCellsCloud::Object::AnalyzeSuggestion" : {
-         "file" : "lib/AsposeCellsCloud/Object/AnalyzeSuggestion.pm"
       },
       "AsposeCellsCloud::Object::DiscoverChart" : {
          "file" : "lib/AsposeCellsCloud/Object/DiscoverChart.pm"
@@ -2317,6 +2311,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "24.4",
+   "version" : "24.5",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

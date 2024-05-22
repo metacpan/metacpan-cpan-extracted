@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents a collection of all the  objects in the spreadsheet.',
                                   class => 'Names',
                                   required => [], # TODO
 }                                 );

@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.412  2024-05-21
+        - New scalar function 'date_subtract'.
+        - Oracle: bugfix in 'date_add' and 'to_epoch'.
+        - Oracle does not 'left' and 'right' functions.
+        - Bugfix in scalar function 'extract': uppercase field argument.
+        - Input filter 'join_columns': bugfix undefined column name.
+
 2.411  2024-05-20
         - Bugfix aliases in 'order_by'.
         - Pg and SQLite: bugfix in 'dateadd'.

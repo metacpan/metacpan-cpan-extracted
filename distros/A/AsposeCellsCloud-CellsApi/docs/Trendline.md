@@ -10,13 +10,13 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **link** | **Link** |  |
 **Backward** | **double** | Returns or sets the number of periods (or units on a scatter chart) that the trendline extends backward.                         The number of periods must be greater than or equal to zero.                        If the chart type is column ,the number of periods must be between 0 and 0.5 |
-**DataLabels** | **LinkElement** | Represents the DataLabels object for the specified series. |
+**DataLabels** | **DataLabels** | Represents the DataLabels object for the specified series. |
 **DisplayEquation** | **boolean** | Represents if the equation for the trendline is displayed on the chart (in the same data label as the R-squared value). Setting this property to True automatically turns on data labels. |
 **DisplayRSquared** | **boolean** | Represents if the R-squared value of the trendline is displayed on the chart (in the same data label as the equation). Setting this property to True automatically turns on data labels. |
 **Forward** | **double** | Returns or sets the number of periods (or units on a scatter chart) that the trendline extends forward.                        The number of periods must be greater than or equal to zero. |
 **Intercept** | **double** | Returns or sets the point where the trendline crosses the value axis. |
 **IsNameAuto** | **boolean** | Returns if Microsoft Excel automatically determines the name of the trendline. |
-**LegendEntry** | **LinkElement** | Gets the legend entry according to this trendline |
+**LegendEntry** | **LegendEntry** | Gets the legend entry according to this trendline |
 **Name** | **string** | Returns the name of the trendline. |
 **Order** | **int** | Returns or sets the trendline order (an integer greater than 1) when the trendline type is Polynomial.                         The order must be between 2 and 6. |
 **Period** | **int** | Returns or sets the period for the moving-average trendline. |

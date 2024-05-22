@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'File Information',
+__PACKAGE__->class_documentation({description => 'Represents file information.',
                                   class => 'FileInfo',
                                   required => [], # TODO
 }                                 );
@@ -128,21 +128,21 @@ __PACKAGE__->method_documentation({
      'filename' => {
      	datatype => 'string',
      	base_name => 'Filename',
-     	description => 'Filename. ',
+     	description => 'Represents filename. ',
      	format => '',
      	read_only => '',
      		},
      'file_size' => {
      	datatype => 'int',
      	base_name => 'FileSize',
-     	description => 'File size.',
+     	description => 'Represents file size.',
      	format => '',
      	read_only => '',
      		},
      'file_content' => {
      	datatype => 'string',
      	base_name => 'FileContent',
-     	description => 'File content,  byte to base64 string.',
+     	description => 'Represents file content,  byte to base64 string.',
      	format => '',
      	read_only => '',
      		},    

@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => '           Represents the border of the data bars specified by a conditional formatting rule.           ',
                                   class => 'DataBarBorder',
                                   required => [], # TODO
 }                                 );

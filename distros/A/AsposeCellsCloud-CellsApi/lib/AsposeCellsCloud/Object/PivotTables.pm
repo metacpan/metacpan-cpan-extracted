@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents the collection of all the PivotTable objects on the specified worksheet.',
                                   class => 'PivotTables',
                                   required => [], # TODO
 }                                 );

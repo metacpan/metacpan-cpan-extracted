@@ -2,11 +2,36 @@ package Object::Remote::Logging;
 
 use Moo;
 use Object::Remote::Logging::Logger;
-use Exporter::Declare;
+use Exporter ();
 
 extends 'Log::Contextual';
 
-exports(qw( ____ router arg_levels ));
+our @EXPORT_OK = qw(router arg_levels);
+
+sub import {
+  my $class = shift;
+  my $caller = caller;
+  my @args = ($class);
+
+  our $DID_INIT;
+
+  unless($DID_INIT) {
+    $DID_INIT = 1;
+    init_logging();
+  }
+
+  for my $arg (@_) {
+    if (grep $_ eq $arg, @EXPORT_OK) {
+      no strict 'refs';
+      *{$caller . '::' . $arg} = \&{$arg};
+    }
+    else {
+      push @args, $arg;
+    }
+  }
+  @_ = @args;
+  goto &Log::Contextual::import;
+}
 
 sub router {
   our $Router_Instance ||= do {
@@ -28,19 +53,6 @@ sub arg_levels {
   #most verbose level being first in the list and the
   #most quiet as the last item
   return [qw( trace debug verbose info warn error fatal )];
-}
-
-sub before_import {
-   my ($class, $importer, $spec) = @_;
-   my $router = $class->router;
-   our $DID_INIT;
-
-   unless($DID_INIT) {
-     $DID_INIT = 1;
-     init_logging();
-   }
-
-   $class->SUPER::before_import($importer, $spec);
 }
 
 sub _parse_selections {

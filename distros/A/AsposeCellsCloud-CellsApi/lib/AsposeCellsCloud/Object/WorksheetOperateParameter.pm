@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents worksheet operate parameter.',
                                   class => 'WorksheetOperateParameter',
                                   required => [], # TODO
 }                                 );
@@ -129,14 +129,14 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => '',
+     	description => 'Represents worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_type' => {
      	datatype => 'string',
      	base_name => 'SheetType',
-     	description => '',
+     	description => 'Represents worksheet type.',
      	format => '',
      	read_only => '',
      		},
@@ -150,7 +150,7 @@ __PACKAGE__->method_documentation({
      'moving_request' => {
      	datatype => 'WorksheetMovingRequest',
      	base_name => 'MovingRequest',
-     	description => '',
+     	description => 'Represents move position.',
      	format => '',
      	read_only => '',
      		},

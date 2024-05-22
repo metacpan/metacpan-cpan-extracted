@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents a legend entry in a chart legend.',
                                   class => 'LegendEntry',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->class_documentation({description => '',
 
 __PACKAGE__->method_documentation({
      'auto_scale_font' => {
-     	datatype => 'string',
+     	datatype => 'boolean',
      	base_name => 'AutoScaleFont',
      	description => 'True if the text in the object changes font size when the object size changes.                         The default value is True.',
      	format => '',
@@ -149,7 +149,7 @@ __PACKAGE__->method_documentation({
      	read_only => '',
      		},
      'is_deleted' => {
-     	datatype => 'string',
+     	datatype => 'boolean',
      	base_name => 'IsDeleted',
      	description => 'Gets and sets whether the legend entry is deleted.',
      	format => '',
@@ -165,10 +165,10 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->swagger_types( {
-    'auto_scale_font' => 'string',
+    'auto_scale_font' => 'boolean',
     'background_mode' => 'string',
     'font' => 'Font',
-    'is_deleted' => 'string',
+    'is_deleted' => 'boolean',
     'link' => 'Link' 
 } );
 

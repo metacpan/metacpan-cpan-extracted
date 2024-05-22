@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => '           Represents a field in a PivotTable report.           ',
                                   class => 'PivotField',
                                   required => [], # TODO
 }                                 );

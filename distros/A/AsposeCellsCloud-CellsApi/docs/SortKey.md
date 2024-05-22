@@ -8,8 +8,8 @@ use AsposeCellsCloud::Object::SortKey;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Key** | **int** |  |
-**SortOrder** | **string** |  |
+**Key** | **int** | Represents the key of sorting. |
+**SortOrder** | **string** | Represents the order of sorting. |
 **CustomList** | **ARRAY[string]** |  |
 **Order** | **string** | Indicates the order of sorting. |
 **Index** | **int** | Gets the sorted column index(absolute position, column A is 0, B is 1, ...). |

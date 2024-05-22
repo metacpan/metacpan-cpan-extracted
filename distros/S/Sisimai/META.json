@@ -48,7 +48,7 @@
             "Module::Load" : "0.32",
             "Time::Local" : "1.19",
             "Time::Piece" : "1.29",
-            "perl" : "5.010001"
+            "perl" : "v5.26.0"
          }
       },
       "test" : {
@@ -60,7 +60,7 @@
    "provides" : {
       "Sisimai" : {
          "file" : "lib/Sisimai.pm",
-         "version" : "v5.0.2"
+         "version" : "v5.0.3"
       },
       "Sisimai::ARF" : {
          "file" : "lib/Sisimai/ARF.pm"
@@ -454,6 +454,9 @@
       },
       "Sisimai::Time" : {
          "file" : "lib/Sisimai/Time.pm"
+      },
+      "Sisimai::Xe" : {
+         "file" : "lib/Sisimai/Xe.pm"
       }
    },
    "release_status" : "stable",
@@ -467,7 +470,7 @@
          "web" : "https://github.com/sisimai/p5-sisimai"
       }
    },
-   "version" : "v5.0.2",
+   "version" : "v5.0.3",
    "x_contributors" : [
       "0xcdcdcdcd <0xcdcdcdcd@gmail.com>",
       "Adrian Yee <adrian@gt.net>",

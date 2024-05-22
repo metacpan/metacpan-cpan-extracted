@@ -123,7 +123,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents the text options.',
                                   class => 'TextOptions',
                                   required => [], # TODO
 }                                 );
@@ -133,42 +133,42 @@ __PACKAGE__->method_documentation({
      'fill' => {
      	datatype => 'FillFormat',
      	base_name => 'Fill',
-     	description => '',
+     	description => 'Represents fill format.',
      	format => '',
      	read_only => '',
      		},
      'kerning' => {
      	datatype => 'double',
      	base_name => 'Kerning',
-     	description => '',
+     	description => 'Represents kerning.',
      	format => '',
      	read_only => '',
      		},
      'outline' => {
      	datatype => 'LineFormat',
      	base_name => 'Outline',
-     	description => '',
+     	description => 'Represents outline format.',
      	format => '',
      	read_only => '',
      		},
      'shadow' => {
      	datatype => 'ShadowEffect',
      	base_name => 'Shadow',
-     	description => '',
+     	description => 'Represents shadow effect.',
      	format => '',
      	read_only => '',
      		},
      'spacing' => {
      	datatype => 'double',
      	base_name => 'Spacing',
-     	description => '',
+     	description => 'Represents spacing.',
      	format => '',
      	read_only => '',
      		},
      'underline_color' => {
      	datatype => 'CellsColor',
      	base_name => 'UnderlineColor',
-     	description => '',
+     	description => 'Represents under line color.',
      	format => '',
      	read_only => '',
      		},

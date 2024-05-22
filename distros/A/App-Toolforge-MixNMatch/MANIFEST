@@ -23,5 +23,6 @@ SIGNATURE
 t/App-Toolforge-MixNMatch/01-use.t
 t/App-Toolforge-MixNMatch/02-version.t
 t/App-Toolforge-MixNMatch/03-new.t
+t/App-Toolforge-MixNMatch/04-run.t
 xt/App-Toolforge-MixNMatch/01-pod_coverage.t
 xt/App-Toolforge-MixNMatch/02-pod.t

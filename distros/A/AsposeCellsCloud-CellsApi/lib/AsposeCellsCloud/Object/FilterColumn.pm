@@ -123,7 +123,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => '           Represents a filter for a single column. The Filter object is a member of the Filters collection           ',
                                   class => 'FilterColumn',
                                   required => [], # TODO
 }                                 );

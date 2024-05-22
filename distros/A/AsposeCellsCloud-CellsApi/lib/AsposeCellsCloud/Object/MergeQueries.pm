@@ -1,7 +1,6 @@
-
 =begin comment
 
-Copyright (c) 2021 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -22,12 +21,9 @@ SOFTWARE.
 
 =end comment
 
-=cut        
-        
-        
+=cut
 
-package AsposeCellsCloud::Object::CellsError;
-
+package AsposeCellsCloud::Object::MergeQueries;
 
 require 5.6.0;
 use strict;
@@ -39,9 +35,10 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::DataItem;
+use AsposeCellsCloud::Object::DataSource;
+use AsposeCellsCloud::Object::FileInfo; 
 
-        
-use AsposeCellsCloud::Object::ErrorDetails;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -57,12 +54,12 @@ sub new {
     my ($class, %args) = @_; 
 
 	my $self = bless {}, $class;
-	
+
 	foreach my $attribute (keys %{$class->attribute_map}) {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+
 	return $self;
 }  
 
@@ -100,11 +97,10 @@ sub from_hash {
         } elsif (exists $hash->{$_json_attribute}) { #hash(model), primitive, datetime
             $self->{$_key} = $self->_deserialize($_type, $hash->{$_json_attribute});
         } else {
-        	$log->debugf("Warning: %s (%s) does not exist in input hash
-", $_key, $_json_attribute);
+        	$log->debugf("Warning: %s (%s) does not exist in input hash\n", $_key, $_json_attribute);
         }
     }
-  
+
     return $self;
 }
 
@@ -112,7 +108,7 @@ sub from_hash {
 sub _deserialize {
     my ($self, $type, $data) = @_;
     $log->debugf("deserializing %s with %s",Dumper($data), $type);
-        
+
     if ($type eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
@@ -123,62 +119,104 @@ sub _deserialize {
     }
 }
 
-        
 
-__PACKAGE__->class_documentation({description => 'Error',
-		class => 'CellsError',
-		required => [], # TODO
-});
+__PACKAGE__->class_documentation({description => 'Represents merge quesies.',
+                                  class => 'MergeQueries',
+                                  required => [], # TODO
+}                                 );
+
 
 __PACKAGE__->method_documentation({
-	'code' => {
-		datatype => 'string',
-		base_name => 'Code',
-		description => 'Code             ',
-		format => '',
-		read_only => '',
-			},
-
-	'message' => {
-		datatype => 'string',
-		base_name => 'Message',
-		description => 'Message             ',
-		format => '',
-		read_only => '',
-			},
-
-	'description' => {
-		datatype => 'string',
-		base_name => 'Description',
-		description => 'Description             ',
-		format => '',
-		read_only => '',
-			},
-
-	'inner_error' => {
-		datatype => 'ErrorDetails',
-		base_name => 'InnerError',
-		description => 'Inner Error             ',
-		format => '',
-		read_only => '',
-			},
-
+     'data_source_a' => {
+     	datatype => 'DataSource',
+     	base_name => 'DataSourceA',
+     	description => 'Indicates the source of the mount data.',
+     	format => '',
+     	read_only => '',
+     		},
+     'file_info_a' => {
+     	datatype => 'FileInfo',
+     	base_name => 'FileInfoA',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'data_item_a' => {
+     	datatype => 'DataItem',
+     	base_name => 'DataItemA',
+     	description => 'Represents data item.',
+     	format => '',
+     	read_only => '',
+     		},
+     'data_a_index_field' => {
+     	datatype => 'string',
+     	base_name => 'DataAIndexField',
+     	description => 'Represents index field  of DataA',
+     	format => '',
+     	read_only => '',
+     		},
+     'data_source_b' => {
+     	datatype => 'DataSource',
+     	base_name => 'DataSourceB',
+     	description => 'Indicates the source of the mount data.',
+     	format => '',
+     	read_only => '',
+     		},
+     'file_info_b' => {
+     	datatype => 'FileInfo',
+     	base_name => 'FileInfoB',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'data_item_b' => {
+     	datatype => 'DataItem',
+     	base_name => 'DataItemB',
+     	description => 'Represents data item.',
+     	format => '',
+     	read_only => '',
+     		},
+     'data_b_index_field' => {
+     	datatype => 'string',
+     	base_name => 'DataBIndexField',
+     	description => 'Represents index field  of DataB',
+     	format => '',
+     	read_only => '',
+     		},
+     'join_type' => {
+     	datatype => 'string',
+     	base_name => 'JoinType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},    
 });
 
 __PACKAGE__->swagger_types( {
-'code' => 'string',
-'message' => 'string',
-'description' => 'string',
-'inner_error' => 'ErrorDetails',
-});
+    'data_source_a' => 'DataSource',
+    'file_info_a' => 'FileInfo',
+    'data_item_a' => 'DataItem',
+    'data_a_index_field' => 'string',
+    'data_source_b' => 'DataSource',
+    'file_info_b' => 'FileInfo',
+    'data_item_b' => 'DataItem',
+    'data_b_index_field' => 'string',
+    'join_type' => 'string' 
+} );
 
 __PACKAGE__->attribute_map( {
-'code' => 'Code',
-'message' => 'Message',
-'description' => 'Description',
-'inner_error' => 'InnerError',
-});
+    'data_source_a' => 'DataSourceA',
+    'file_info_a' => 'FileInfoA',
+    'data_item_a' => 'DataItemA',
+    'data_a_index_field' => 'DataAIndexField',
+    'data_source_b' => 'DataSourceB',
+    'file_info_b' => 'FileInfoB',
+    'data_item_b' => 'DataItemB',
+    'data_b_index_field' => 'DataBIndexField',
+    'join_type' => 'JoinType' 
+} );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});
+
 
 1;

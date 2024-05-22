@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents a check box object in a worksheet.',
                                   class => 'CheckBox',
                                   required => [], # TODO
 }                                 );

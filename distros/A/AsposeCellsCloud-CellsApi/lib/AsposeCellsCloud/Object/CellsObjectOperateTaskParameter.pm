@@ -122,7 +122,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents cells object operate task parameter.',
                                   class => 'CellsObjectOperateTaskParameter',
                                   required => [], # TODO
 }                                 );
@@ -132,28 +132,28 @@ __PACKAGE__->method_documentation({
      'operate_object' => {
      	datatype => 'OperateObject',
      	base_name => 'OperateObject',
-     	description => '',
+     	description => 'Represents object operate.',
      	format => '',
      	read_only => '',
      		},
      'operate_parameter' => {
      	datatype => 'OperateParameter',
      	base_name => 'OperateParameter',
-     	description => '',
+     	description => 'Represents operate parameter.',
      	format => '',
      	read_only => '',
      		},
-     'destinatio_data_source' => {
+     'destination_data_source' => {
      	datatype => 'DataSource',
-     	base_name => 'DestinatioDataSource',
-     	description => '',
+     	base_name => 'DestinationDataSource',
+     	description => 'Represents destination data source.',
      	format => '',
      	read_only => '',
      		},
      'destination_workbook' => {
      	datatype => 'FileSource',
      	base_name => 'DestinationWorkbook',
-     	description => '',
+     	description => 'Represents destination data source.',
      	format => '',
      	read_only => '',
      		},    
@@ -162,14 +162,14 @@ __PACKAGE__->method_documentation({
 __PACKAGE__->swagger_types( {
     'operate_object' => 'OperateObject',
     'operate_parameter' => 'OperateParameter',
-    'destinatio_data_source' => 'DataSource',
+    'destination_data_source' => 'DataSource',
     'destination_workbook' => 'FileSource' 
 } );
 
 __PACKAGE__->attribute_map( {
     'operate_object' => 'OperateObject',
     'operate_parameter' => 'OperateParameter',
-    'destinatio_data_source' => 'DestinatioDataSource',
+    'destination_data_source' => 'DestinationDataSource',
     'destination_workbook' => 'DestinationWorkbook' 
 } );
 

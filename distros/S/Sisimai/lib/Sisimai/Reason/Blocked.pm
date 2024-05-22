@@ -1,5 +1,5 @@
 package Sisimai::Reason::Blocked;
-use feature ':5.10';
+use v5.26;
 use strict;
 use warnings;
 use Sisimai::String;
@@ -68,6 +68,7 @@ sub match {
         'we do not accept mail from dynamic ips',   # @mail.ru
         'you are not allowed to connect',
         'you are sending spam',
+        'your ip address is listed in the rbl',
         'your network is temporary blacklisted',
         'your server requires confirmation',
     ];

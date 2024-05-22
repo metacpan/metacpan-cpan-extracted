@@ -26,7 +26,7 @@ no_index:
 provides:
   Sisimai:
     file: lib/Sisimai.pm
-    version: v5.0.2
+    version: v5.0.3
   Sisimai::ARF:
     file: lib/Sisimai/ARF.pm
   Sisimai::Address:
@@ -289,18 +289,20 @@ provides:
     file: lib/Sisimai/String.pm
   Sisimai::Time:
     file: lib/Sisimai/Time.pm
+  Sisimai::Xe:
+    file: lib/Sisimai/Xe.pm
 requires:
   Class::Accessor::Lite: '0.05'
   JSON: '2.90'
   Module::Load: '0.32'
   Time::Local: '1.19'
   Time::Piece: '1.29'
-  perl: '5.010001'
+  perl: v5.26.0
 resources:
   bugtracker: https://github.com/sisimai/p5-sisimai/issues
   homepage: https://libsisimai.org/
   repository: git://github.com/sisimai/p5-sisimai.git
-version: v5.0.2
+version: v5.0.3
 x_contributors:
   - '0xcdcdcdcd <0xcdcdcdcd@gmail.com>'
   - 'Adrian Yee <adrian@gt.net>'

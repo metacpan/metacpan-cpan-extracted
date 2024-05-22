@@ -9,7 +9,7 @@ use_ok 'Date::Holidays::USA';
 my $dh = new_ok 'Date::Holidays::USA';
 
 my $got = $dh->is_holiday(2024, 1, 1);
-is $got, "New Year's", 'is_holiday';
+is $got, "New Year's Day", 'is_holiday';
 
 $got = $dh->holidays(2024);
 is $got->{'0331'}, 'Easter', 'holidays';

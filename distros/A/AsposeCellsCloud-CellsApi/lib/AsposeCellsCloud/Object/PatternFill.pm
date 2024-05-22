@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => '           Encapsulates the object that represents pattern fill format           ',
                                   class => 'PatternFill',
                                   required => [], # TODO
 }                                 );

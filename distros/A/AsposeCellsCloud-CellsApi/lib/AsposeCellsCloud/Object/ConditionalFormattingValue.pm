@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => '           Describes the values of the interpolation points in a gradient scale, dataBar or iconSet.           ',
                                   class => 'ConditionalFormattingValue',
                                   required => [], # TODO
 }                                 );

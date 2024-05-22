@@ -36,7 +36,8 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 use AsposeCellsCloud::Object::Link;
-use AsposeCellsCloud::Object::LinkElement; 
+use AsposeCellsCloud::Object::LinkElement;
+use AsposeCellsCloud::Object::Series; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -148,7 +149,7 @@ __PACKAGE__->method_documentation({
      	read_only => '',
      		},
      'series_list' => {
-     	datatype => 'ARRAY[LinkElement]',
+     	datatype => 'ARRAY[Series]',
      	base_name => 'SeriesList',
      	description => '',
      	format => '',
@@ -167,7 +168,7 @@ __PACKAGE__->swagger_types( {
     'category_data' => 'string',
     'is_color_varied' => 'boolean',
     'second_catergory_data' => 'string',
-    'series_list' => 'ARRAY[LinkElement]',
+    'series_list' => 'ARRAY[Series]',
     'link' => 'Link' 
 } );
 

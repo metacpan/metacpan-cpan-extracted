@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents result destination.',
                                   class => 'ResultDestination',
                                   required => [], # TODO
 }                                 );
@@ -128,21 +128,21 @@ __PACKAGE__->method_documentation({
      'destination_type' => {
      	datatype => 'string',
      	base_name => 'DestinationType',
-     	description => '',
+     	description => 'Represents destination data type.',
      	format => '',
      	read_only => '',
      		},
      'input_file' => {
      	datatype => 'string',
      	base_name => 'InputFile',
-     	description => '',
+     	description => 'Represents input file.',
      	format => '',
      	read_only => '',
      		},
      'output_file' => {
      	datatype => 'string',
      	base_name => 'OutputFile',
-     	description => '',
+     	description => 'Represents output file.',
      	format => '',
      	read_only => '',
      		},    

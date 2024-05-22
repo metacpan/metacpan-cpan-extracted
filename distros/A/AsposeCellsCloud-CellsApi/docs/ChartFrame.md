@@ -16,7 +16,6 @@ Name | Type | Description | Notes
 **IsAutomaticSize** | **boolean** | Indicates whether the chart frame is automatic sized.  |
 **IsInnerMode** | **boolean** | Indicates whether the size of the plot area size includes the tick marks, and the axis labels.            False specifies that the size shall determine the size of the plot area, the tick marks, and the axis labels.  |
 **Shadow** | **boolean** | True if the frame has a shadow.  |
-**ShapeProperties** | **ARRAY[LinkElement]** | Gets the  object.  |
 **Width** | **int** | Gets or sets the width of frame in units of 1/4000 of the chart area.  |
 **Height** | **int** | Gets or sets the height of frame in units of 1/4000 of the chart area.  |
 **X** | **int** | Gets or sets the x coordinate of the upper left corner in units of 1/4000 of the chart area.  |

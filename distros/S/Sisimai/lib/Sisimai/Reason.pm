@@ -1,5 +1,5 @@
 package Sisimai::Reason;
-use feature ':5.10';
+use v5.26;
 use strict;
 use warnings;
 
@@ -270,7 +270,7 @@ is C<5.6.*>.
 
 =item - 8 bit data in message header
 
-=item - Too many “Received” headers
+=item - Too many "Received" headers
 
 =item - Invalid MIME headers
 
@@ -525,7 +525,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2023 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

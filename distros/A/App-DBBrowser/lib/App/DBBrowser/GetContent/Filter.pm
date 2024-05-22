@@ -681,7 +681,7 @@ sub __join_columns {
     my $join_char = '';
     my $prompt;
     if ( @$chosen_idxs == 1 ) {
-        $prompt = 'Edit cells of ' . $aoa->[0][$chosen_idxs->[0]] . ':';
+        $prompt = 'Edit cells of ' . ( $aoa->[0][$chosen_idxs->[0]] // '--' ) . ':';
     }
     else {
         $prompt = 'Edit cells of joined columns:';

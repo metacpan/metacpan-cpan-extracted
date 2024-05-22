@@ -24,8 +24,17 @@ if [ "$pgm" = "modulino" ]; then
         echo ln -s $(which modulino) ${bindir}/$(echo $filename | perl -ne 's/\//-/g; print lc')
     fi
 else  
-    MODULINO_PATH=$(basename $0 | perl -ne 'chomp; printf "%s.pm", join "/", map { ucfirst $_ } split /-/;')
-    MODULINO=$(basename $0 | perl -ne 'chomp; print join "::", map { ucfirst $_ } split /-/;')
+    REALPATH=$(which realpath)
+    REALPATH=${REALPATH:-readlink -f}
+
+    path=$(basename $($REALPATH $0))
+
+    if ! [ "$path" = "modulino" ]; then
+       pgm=$(basename $($REALPATH $0))
+    fi
+   
+    MODULINO_PATH=$(echo $pgm | perl -ne 'chomp; printf "%s.pm", join "/", map { ucfirst $_ } split /-/;')
+    MODULINO=$(echo $pgm | perl -ne 'chomp; print join "::", map { ucfirst $_ } split /-/;')
     
     MODULINO_RUN=$(perl -M$MODULINO -e 'print $INC{"'$MODULINO_PATH'"}';)
     

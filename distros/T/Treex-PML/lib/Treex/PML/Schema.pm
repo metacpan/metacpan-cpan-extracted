@@ -13,7 +13,7 @@ use Treex::PML::Schema::Constants;
 use Treex::PML::Resource::URI;
 
 BEGIN {
-  our $VERSION = '2.27'; # version template
+  our $VERSION = '2.28'; # version template
   require Exporter;
   import Exporter qw(import);
   our @EXPORT = (

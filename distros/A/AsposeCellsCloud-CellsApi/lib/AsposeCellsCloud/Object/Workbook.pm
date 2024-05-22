@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => '           Represents a root object to create an Excel spreadsheet.           ',
                                   class => 'Workbook',
                                   required => [], # TODO
 }                                 );

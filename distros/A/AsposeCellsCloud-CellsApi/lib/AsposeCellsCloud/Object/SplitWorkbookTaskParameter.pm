@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents split workbook task parameter.',
                                   class => 'SplitWorkbookTaskParameter',
                                   required => [], # TODO
 }                                 );
@@ -130,35 +130,35 @@ __PACKAGE__->method_documentation({
      'workbook' => {
      	datatype => 'FileSource',
      	base_name => 'Workbook',
-     	description => '',
+     	description => 'Represents data source of task object.',
      	format => '',
      	read_only => '',
      		},
      'destination_file_position' => {
      	datatype => 'FileSource',
      	base_name => 'DestinationFilePosition',
-     	description => '',
+     	description => 'Represents data source of task object.',
      	format => '',
      	read_only => '',
      		},
      'data_source' => {
      	datatype => 'DataSource',
      	base_name => 'DataSource',
-     	description => '',
+     	description => 'Represents destination data source.',
      	format => '',
      	read_only => '',
      		},
      'target_data_source' => {
      	datatype => 'DataSource',
      	base_name => 'TargetDataSource',
-     	description => '',
+     	description => 'Represents destination data source.',
      	format => '',
      	read_only => '',
      		},
      'destination_file_format' => {
      	datatype => 'string',
      	base_name => 'DestinationFileFormat',
-     	description => '',
+     	description => 'Represents destination data file format.',
      	format => '',
      	read_only => '',
      		},

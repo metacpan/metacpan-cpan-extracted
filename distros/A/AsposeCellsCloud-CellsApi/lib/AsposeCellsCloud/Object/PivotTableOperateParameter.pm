@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents pivot table operate parameter.',
                                   class => 'PivotTableOperateParameter',
                                   required => [], # TODO
 }                                 );
@@ -128,56 +128,56 @@ __PACKAGE__->method_documentation({
      'source_data' => {
      	datatype => 'string',
      	base_name => 'SourceData',
-     	description => '',
+     	description => 'Represents source data of pivot table.',
      	format => '',
      	read_only => '',
      		},
      'dest_cell_name' => {
      	datatype => 'string',
      	base_name => 'DestCellName',
-     	description => '',
+     	description => 'Represents start cell name of the pivot table.',
      	format => '',
      	read_only => '',
      		},
      'table_name' => {
      	datatype => 'string',
      	base_name => 'TableName',
-     	description => '',
+     	description => 'Represents table name of pivot table.',
      	format => '',
      	read_only => '',
      		},
      'use_same_source' => {
      	datatype => 'boolean',
      	base_name => 'UseSameSource',
-     	description => '',
+     	description => 'Represents whether the same source is used.',
      	format => '',
      	read_only => '',
      		},
      'pivot_table_index' => {
      	datatype => 'int',
      	base_name => 'PivotTableIndex',
-     	description => '',
+     	description => 'Represents pivot table index.',
      	format => '',
      	read_only => '',
      		},
      'pivot_field_rows' => {
      	datatype => 'ARRAY[int?]',
      	base_name => 'PivotFieldRows',
-     	description => '',
+     	description => 'Represents pivot row fields.',
      	format => '',
      	read_only => '',
      		},
      'pivot_field_columns' => {
      	datatype => 'ARRAY[int?]',
      	base_name => 'PivotFieldColumns',
-     	description => '',
+     	description => 'Represents pivot column fields.',
      	format => '',
      	read_only => '',
      		},
      'pivot_field_data' => {
      	datatype => 'ARRAY[int?]',
      	base_name => 'PivotFieldData',
-     	description => '',
+     	description => 'Represents pivot data field.',
      	format => '',
      	read_only => '',
      		},

@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents operate object.',
                                   class => 'OperateObject',
                                   required => [], # TODO
 }                                 );
@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'operate_object_type' => {
      	datatype => 'string',
      	base_name => 'OperateObjectType',
-     	description => '',
+     	description => 'Represents operate object type.',
      	format => '',
      	read_only => '',
      		},
      'position' => {
      	datatype => 'OperateObjectPosition',
      	base_name => 'Position',
-     	description => '',
+     	description => 'Represents position of operate object.',
      	format => '',
      	read_only => '',
      		},    

@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => '           Represents the marker in a line chart, scatter chart, or radar chart.           ',
                                   class => 'Marker',
                                   required => [], # TODO
 }                                 );
@@ -129,28 +129,28 @@ __PACKAGE__->method_documentation({
      'border' => {
      	datatype => 'Line',
      	base_name => 'Border',
-     	description => 'Gets the border.',
+     	description => 'Gets the border. ',
      	format => '',
      	read_only => '',
      		},
      'area' => {
      	datatype => 'Area',
      	base_name => 'Area',
-     	description => 'Gets the area.',
+     	description => 'Gets the area. ',
      	format => '',
      	read_only => '',
      		},
      'marker_size' => {
      	datatype => 'int',
      	base_name => 'MarkerSize',
-     	description => 'Represents the marker size in unit of points. Applies to line chart, scatter chart, or radar chart.',
+     	description => 'Represents the marker size in unit of points. Applies to line chart, scatter chart, or radar chart. ',
      	format => '',
      	read_only => '',
      		},
      'marker_style' => {
      	datatype => 'string',
      	base_name => 'MarkerStyle',
-     	description => 'Represents the marker style. Applies to line chart, scatter chart, or radar chart.',
+     	description => 'Represents the marker style. Applies to line chart, scatter chart, or radar chart. ',
      	format => '',
      	read_only => '',
      		},    

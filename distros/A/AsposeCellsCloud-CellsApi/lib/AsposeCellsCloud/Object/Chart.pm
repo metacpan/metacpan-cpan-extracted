@@ -35,8 +35,16 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::Axis;
+use AsposeCellsCloud::Object::ChartArea;
+use AsposeCellsCloud::Object::ChartDataTable;
+use AsposeCellsCloud::Object::Floor;
+use AsposeCellsCloud::Object::Legend;
 use AsposeCellsCloud::Object::Link;
-use AsposeCellsCloud::Object::LinkElement; 
+use AsposeCellsCloud::Object::LinkElement;
+use AsposeCellsCloud::Object::PlotArea;
+use AsposeCellsCloud::Object::SeriesItems;
+use AsposeCellsCloud::Object::Walls; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -119,7 +127,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Encapsulates the object that represents a single Excel chart.',
                                   class => 'Chart',
                                   required => [], # TODO
 }                                 );
@@ -134,28 +142,28 @@ __PACKAGE__->method_documentation({
      	read_only => '',
      		},
      'back_wall' => {
-     	datatype => 'LinkElement',
+     	datatype => 'Walls',
      	base_name => 'BackWall',
      	description => 'Returns a  object that represents the back wall of a 3-D chart.',
      	format => '',
      	read_only => '',
      		},
      'category_axis' => {
-     	datatype => 'LinkElement',
+     	datatype => 'Axis',
      	base_name => 'CategoryAxis',
      	description => 'Gets the chart`s X axis.',
      	format => '',
      	read_only => '',
      		},
      'chart_area' => {
-     	datatype => 'LinkElement',
+     	datatype => 'ChartArea',
      	base_name => 'ChartArea',
      	description => 'Gets the chart area in the worksheet.',
      	format => '',
      	read_only => '',
      		},
      'chart_data_table' => {
-     	datatype => 'LinkElement',
+     	datatype => 'ChartDataTable',
      	base_name => 'ChartDataTable',
      	description => 'Represents the chart data table.',
      	format => '',
@@ -190,7 +198,7 @@ __PACKAGE__->method_documentation({
      	read_only => '',
      		},
      'floor' => {
-     	datatype => 'LinkElement',
+     	datatype => 'Floor',
      	base_name => 'Floor',
      	description => 'Returns a  object that represents the walls of a 3-D chart.',
      	format => '',
@@ -239,7 +247,7 @@ __PACKAGE__->method_documentation({
      	read_only => '',
      		},
      'legend' => {
-     	datatype => 'LinkElement',
+     	datatype => 'Legend',
      	base_name => 'Legend',
      	description => 'Gets the chart legend.',
      	format => '',
@@ -248,12 +256,12 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => '',
+     	description => 'Represents chart name.',
      	format => '',
      	read_only => '',
      		},
      'n_series' => {
-     	datatype => 'LinkElement',
+     	datatype => 'SeriesItems',
      	base_name => 'NSeries',
      	description => 'Gets a  collection representing the data series in the chart.',
      	format => '',
@@ -288,7 +296,7 @@ __PACKAGE__->method_documentation({
      	read_only => '',
      		},
      'plot_area' => {
-     	datatype => 'LinkElement',
+     	datatype => 'PlotArea',
      	base_name => 'PlotArea',
      	description => 'Gets the chart`s plot area which includes axis tick labels.',
      	format => '',
@@ -395,19 +403,19 @@ __PACKAGE__->method_documentation({
      'title' => {
      	datatype => 'LinkElement',
      	base_name => 'Title',
-     	description => '',
+     	description => 'Represents chart title.',
      	format => '',
      	read_only => '',
      		},
      'type' => {
      	datatype => 'string',
      	base_name => 'Type',
-     	description => '',
+     	description => 'Represents chart type.',
      	format => '',
      	read_only => '',
      		},
      'value_axis' => {
-     	datatype => 'LinkElement',
+     	datatype => 'Axis',
      	base_name => 'ValueAxis',
      	description => 'Gets the chart`s Y axis.',
      	format => '',
@@ -438,29 +446,29 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'auto_scaling' => 'boolean',
-    'back_wall' => 'LinkElement',
-    'category_axis' => 'LinkElement',
-    'chart_area' => 'LinkElement',
-    'chart_data_table' => 'LinkElement',
+    'back_wall' => 'Walls',
+    'category_axis' => 'Axis',
+    'chart_area' => 'ChartArea',
+    'chart_data_table' => 'ChartDataTable',
     'chart_object' => 'LinkElement',
     'depth_percent' => 'int',
     'elevation' => 'int',
     'first_slice_angle' => 'int',
-    'floor' => 'LinkElement',
+    'floor' => 'Floor',
     'gap_depth' => 'int',
     'gap_width' => 'int',
     'height_percent' => 'int',
     'hide_pivot_field_buttons' => 'boolean',
     'is3_d' => 'boolean',
     'is_rectangular_cornered' => 'boolean',
-    'legend' => 'LinkElement',
+    'legend' => 'Legend',
     'name' => 'string',
-    'n_series' => 'LinkElement',
+    'n_series' => 'SeriesItems',
     'page_setup' => 'LinkElement',
     'perspective' => 'int',
     'pivot_source' => 'string',
     'placement' => 'string',
-    'plot_area' => 'LinkElement',
+    'plot_area' => 'PlotArea',
     'plot_empty_cells_type' => 'string',
     'plot_visible_cells' => 'boolean',
     'print_size' => 'string',
@@ -477,7 +485,7 @@ __PACKAGE__->swagger_types( {
     'style' => 'int',
     'title' => 'LinkElement',
     'type' => 'string',
-    'value_axis' => 'LinkElement',
+    'value_axis' => 'Axis',
     'walls' => 'LinkElement',
     'walls_and_gridlines2_d' => 'boolean',
     'link' => 'Link' 

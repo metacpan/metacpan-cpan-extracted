@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents text item.',
                                   class => 'TextItem',
                                   required => [], # TODO
 }                                 );
@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'text' => {
      	datatype => 'string',
      	base_name => 'Text',
-     	description => '',
+     	description => 'Represents text content.',
      	format => '',
      	read_only => '',
      		},

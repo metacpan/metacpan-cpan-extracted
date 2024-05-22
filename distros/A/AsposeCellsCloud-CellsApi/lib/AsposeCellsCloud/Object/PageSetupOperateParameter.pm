@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents page setup operate parameter.',
                                   class => 'PageSetupOperateParameter',
                                   required => [], # TODO
 }                                 );
@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'page_setup' => {
      	datatype => 'PageSetup',
      	base_name => 'PageSetup',
-     	description => '',
+     	description => 'Represents worksheet page setup.',
      	format => '',
      	read_only => '',
      		},

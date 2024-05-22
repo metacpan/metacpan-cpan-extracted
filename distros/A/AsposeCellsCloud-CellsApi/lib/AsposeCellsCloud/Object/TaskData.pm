@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents task data.',
                                   class => 'TaskData',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'tasks' => {
      	datatype => 'ARRAY[TaskDescription]',
      	base_name => 'Tasks',
-     	description => '',
+     	description => 'Represents task description list.',
      	format => '',
      	read_only => '',
      		},    

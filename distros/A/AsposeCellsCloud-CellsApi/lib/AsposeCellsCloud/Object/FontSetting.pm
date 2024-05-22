@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => '           Represents a range of characters within the cell text.           ',
                                   class => 'FontSetting',
                                   required => [], # TODO
 }                                 );

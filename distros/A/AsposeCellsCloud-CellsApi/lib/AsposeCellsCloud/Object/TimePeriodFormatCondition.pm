@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents time period format condition.',
                                   class => 'TimePeriodFormatCondition',
                                   required => [], # TODO
 }                                 );

@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents operate object position.',
                                   class => 'OperateObjectPosition',
                                   required => [], # TODO
 }                                 );
@@ -129,49 +129,49 @@ __PACKAGE__->method_documentation({
      'data_source' => {
      	datatype => 'DataSource',
      	base_name => 'DataSource',
-     	description => '',
+     	description => 'Represents data source of operate object.',
      	format => '',
      	read_only => '',
      		},
      'workbook' => {
      	datatype => 'FileSource',
      	base_name => 'Workbook',
-     	description => '',
+     	description => 'Represents data source of operate object.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'SheetName',
-     	description => '',
+     	description => 'Represents worksheet name of operate object.',
      	format => '',
      	read_only => '',
      		},
      'chart_index' => {
      	datatype => 'int',
      	base_name => 'ChartIndex',
-     	description => '',
+     	description => 'Represents chart index of operate object.',
      	format => '',
      	read_only => '',
      		},
      'shape_index' => {
      	datatype => 'int',
      	base_name => 'ShapeIndex',
-     	description => '',
+     	description => 'Represents shape index of operate object.',
      	format => '',
      	read_only => '',
      		},
      'cell_name' => {
      	datatype => 'string',
      	base_name => 'CellName',
-     	description => '',
+     	description => 'Represents cell name of operate object.',
      	format => '',
      	read_only => '',
      		},
      'list_object_index' => {
      	datatype => 'int',
      	base_name => 'ListObjectIndex',
-     	description => '',
+     	description => 'Represents list object index of operate object.',
      	format => '',
      	read_only => '',
      		},    

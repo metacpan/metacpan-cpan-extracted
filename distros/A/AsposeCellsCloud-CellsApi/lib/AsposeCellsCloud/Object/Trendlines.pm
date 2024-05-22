@@ -36,7 +36,8 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 use AsposeCellsCloud::Object::Link;
-use AsposeCellsCloud::Object::LinkElement; 
+use AsposeCellsCloud::Object::LinkElement;
+use AsposeCellsCloud::Object::Trendline; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -119,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents a collection of all the  objects for the specified data series.',
                                   class => 'Trendlines',
                                   required => [], # TODO
 }                                 );
@@ -127,7 +128,7 @@ __PACKAGE__->class_documentation({description => '',
 
 __PACKAGE__->method_documentation({
      'trendline_list' => {
-     	datatype => 'ARRAY[LinkElement]',
+     	datatype => 'ARRAY[Trendline]',
      	base_name => 'TrendlineList',
      	description => '',
      	format => '',
@@ -143,7 +144,7 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->swagger_types( {
-    'trendline_list' => 'ARRAY[LinkElement]',
+    'trendline_list' => 'ARRAY[Trendline]',
     'link' => 'Link' 
 } );
 

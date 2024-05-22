@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents data deduplication region.',
                                   class => 'DeduplicationRegion',
                                   required => [], # TODO
 }                                 );
@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'ranges' => {
      	datatype => 'ARRAY[Range]',
      	base_name => 'Ranges',
-     	description => '',
+     	description => 'Represents data range.',
      	format => '',
      	read_only => '',
      		},
      'worksheet_name_list' => {
      	datatype => 'ARRAY[string]',
      	base_name => 'WorksheetNameList',
-     	description => '',
+     	description => 'Represents worksheet name list.',
      	format => '',
      	read_only => '',
      		},    

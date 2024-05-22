@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents sort key.',
                                   class => 'SortKey',
                                   required => [], # TODO
 }                                 );
@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'key' => {
      	datatype => 'int',
      	base_name => 'Key',
-     	description => '',
+     	description => 'Represents the key of sorting.',
      	format => '',
      	read_only => '',
      		},
      'sort_order' => {
      	datatype => 'string',
      	base_name => 'SortOrder',
-     	description => '',
+     	description => 'Represents the order of sorting.',
      	format => '',
      	read_only => '',
      		},

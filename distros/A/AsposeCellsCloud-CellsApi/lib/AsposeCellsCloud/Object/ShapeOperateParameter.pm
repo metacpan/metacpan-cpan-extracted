@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents shape operate parameter.',
                                   class => 'ShapeOperateParameter',
                                   required => [], # TODO
 }                                 );
@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'shape' => {
      	datatype => 'Shape',
      	base_name => 'Shape',
-     	description => '',
+     	description => 'Represents shape object.',
      	format => '',
      	read_only => '',
      		},

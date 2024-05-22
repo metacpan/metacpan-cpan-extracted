@@ -11,7 +11,6 @@ Name | Type | Description | Notes
 **LinkedSource** | **string** |  |
 **RotationAngle** | **int** |  |
 **Text** | **string** | Gets or sets the text of display unit label. |
-**TextDirection** | **string** |  |
 **TextHorizontalAlignment** | **string** |  |
 **TextVerticalAlignment** | **string** |  |
 **Area** | **Area** |  |
@@ -22,7 +21,6 @@ Name | Type | Description | Notes
 **IsAutomaticSize** | **boolean** |  |
 **IsInnerMode** | **boolean** |  |
 **Shadow** | **boolean** |  |
-**ShapeProperties** | **ARRAY[LinkElement]** |  |
 **Width** | **int** |  |
 **Height** | **int** |  |
 **X** | **int** |  |

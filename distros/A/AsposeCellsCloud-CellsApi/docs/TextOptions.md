@@ -8,12 +8,12 @@ use AsposeCellsCloud::Object::TextOptions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Fill** | **FillFormat** |  |
-**Kerning** | **double** |  |
-**Outline** | **LineFormat** |  |
-**Shadow** | **ShadowEffect** |  |
-**Spacing** | **double** |  |
-**UnderlineColor** | **CellsColor** |  |
+**Fill** | **FillFormat** | Represents fill format. |
+**Kerning** | **double** | Represents kerning. |
+**Outline** | **LineFormat** | Represents outline format. |
+**Shadow** | **ShadowEffect** | Represents shadow effect. |
+**Spacing** | **double** | Represents spacing. |
+**UnderlineColor** | **CellsColor** | Represents under line color. |
 **Color** | **Color** |  |
 **DoubleSize** | **double** |  |
 **IsBold** | **boolean** |  |

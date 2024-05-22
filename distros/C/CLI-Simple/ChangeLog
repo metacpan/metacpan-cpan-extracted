@@ -1,3 +1,29 @@
+Tue May 21 16:43:42 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.0.5]:
+	* VERSION: bump
+	* src/main/perl/bin/create-modulino.pl.in
+	- use GetOptions to pass options
+	- use INSTALLSITESCRIPT, DESTDIR to install modulino
+
+Tue May 21 09:33:40 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.0.4]:
+	* VERSION: bump
+	* src/main/perl/bin/create-modulino.pl.in: new
+	* cpan/buildspec.yml: add above to build
+	* src/main/includes/perl-bin.inc: likewise, +x
+	* src/main/bash/bin/modulino.sh.in
+	- use realpath/readlink to allow alias names
+	* src/main/perl/lib/CLI/Simple.pm.in
+	- use JSON, not JSON::PP
+	- pod fixes, better explanation of modulinos
+	* src/main/perl/lib/CLI/Simple/Utils.pm.in
+	- use JSON, not JSON::PP
+	* autotools/ax_requirements_check.m4: update requirements
+	* cpan/requires: likewise
+        * requires.txt: likewise
+
 Sun Dec 10 16:46:14 2023  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.0.3]:
@@ -7,7 +33,7 @@ Sun Dec 10 16:46:14 2023  Rob Lauer  <rlauer6@comcast.net>
 	* src/main/bash/bin/modulino.sh.in
 	- use -, not _ for separator
 	- use perl, not tr
-	
+
 Sat Nov 18 08:26:26 2023  Rob Lauer  <rlauer6@comcast.net>
 
 	[dependencies]:

@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents data source.',
                                   class => 'DataSource',
                                   required => [], # TODO
 }                                 );
@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'data_source_type' => {
      	datatype => 'string',
      	base_name => 'DataSourceType',
-     	description => '',
+     	description => 'Represents data source type.',
      	format => '',
      	read_only => '',
      		},
      'data_path' => {
      	datatype => 'string',
      	base_name => 'DataPath',
-     	description => '',
+     	description => 'Represents data path.',
      	format => '',
      	read_only => '',
      		},    

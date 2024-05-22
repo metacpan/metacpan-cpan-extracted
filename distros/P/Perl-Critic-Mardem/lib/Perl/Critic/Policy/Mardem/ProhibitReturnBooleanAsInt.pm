@@ -7,7 +7,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Readonly;
 use Perl::Critic::Utils qw( is_hash_key $SEVERITY_MEDIUM );
@@ -83,7 +83,7 @@ __END__
 
 =head1 NAME
 
-Perl::Critic::Policy::Mardem::ProhibitReturnBooleanAsInt
+Perl::Critic::Policy::Mardem::ProhibitReturnBooleanAsInt - return boolean as int "return 1;"
 
 =head1 DESCRIPTION
 

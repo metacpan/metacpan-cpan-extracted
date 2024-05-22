@@ -5,7 +5,7 @@ greple - extensible grep with lexical expression and region control
 
 # VERSION
 
-Version 9.1101
+Version 9.1301
 
 # SYNOPSIS
 
@@ -346,6 +346,10 @@ to use direct index, and use relative or named capture group instead.
 For example, if you want to search repeated characters, use
 `(\w)\g{-1}` or `(?<c>\w)\g{c}` rather than
 `(\w)\1`.
+
+Extended Bracketed Character Classes (`(?[...])`) can be used without
+warnings.  See ["Extended Bracketed Character
+Classes" in perlrecharclass](https://metacpan.org/pod/perlrecharclass#Extended-Bracketed-Character-Classes).
 
 - **-e** _pattern_, **--and**=_pattern_
 
@@ -1027,20 +1031,24 @@ If you don't want these conversion, use `-E` (or `--re`) option.
 
         git blame ... | greple .+ --uc --us='sub{s/\s.*//r}' --face=E-D
 
-- **--face**=\[-+\]_effect_
+- **--face**=\[+-=\]_effect_
 
-    Set or unset specified _effect_ for all indexed color specs.  Use
-    `+` (optional) to set, and `-` to unset.  Effect is a single
-    character expressing S (Stand-out), U (Underline), D (Double-struck),
-    F (Flash) and such.
+    Append, remove or set specified _effect_ for all indexed color specs.
+    Use `+` (optional) to append, `-` to remove, and `=` to set.
+    Effect is a single character expressing `S` (Stand-out), `U`
+    (Underline), `D` (Double-struck), `F` (Flash) and such.
 
-    Next example remove D (double-struck) effect.
+    Next example removes D (double-struck) effect.
 
         greple --face -D
 
-    Multiple effects can be set/unset at once.
+    Multiple effects can be added/removed at once.
 
         greple --face SF-D
+
+    Next example clears all existing color specs.
+
+        greple --face =
 
 ## BLOCKS
 
@@ -1737,7 +1745,7 @@ can be implemented both in function and macro.
     use App::Greple::Regions;
     
     my $pod_re = qr{^=\w+(?s:.*?)(?:\Z|^=cut\s*\n)}m;
-    my $comment_re = qr{^(?:[ \t]*#.*\n)+}m;
+    my $comment_re = qr{^(?:\h*#.*\n)+}m;
     
     sub pod {
         match_regions(pattern => $pod_re);

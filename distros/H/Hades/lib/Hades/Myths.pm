@@ -2,7 +2,7 @@ package Hades::Myths;
 use strict;
 use warnings;
 use POSIX qw/locale_h/;
-our $VERSION = 0.21;
+our $VERSION = 0.22;
 our ($STASH);
 
 sub new {

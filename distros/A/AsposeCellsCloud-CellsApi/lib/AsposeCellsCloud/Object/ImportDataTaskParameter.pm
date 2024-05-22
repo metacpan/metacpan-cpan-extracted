@@ -121,7 +121,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents import data task parameter.',
                                   class => 'ImportDataTaskParameter',
                                   required => [], # TODO
 }                                 );
@@ -131,35 +131,35 @@ __PACKAGE__->method_documentation({
      'data_source' => {
      	datatype => 'DataSource',
      	base_name => 'DataSource',
-     	description => '',
+     	description => 'Represents data source of task object.',
      	format => '',
      	read_only => '',
      		},
      'workbook' => {
      	datatype => 'FileSource',
      	base_name => 'Workbook',
-     	description => '',
+     	description => 'Represents data source of task object.',
      	format => '',
      	read_only => '',
      		},
      'import_option' => {
      	datatype => 'ImportOption',
      	base_name => 'ImportOption',
-     	description => '',
+     	description => 'Represents import option.',
      	format => '',
      	read_only => '',
      		},
      'target_data_source' => {
      	datatype => 'DataSource',
      	base_name => 'TargetDataSource',
-     	description => '',
+     	description => 'Represents destination data source.',
      	format => '',
      	read_only => '',
      		},
      'destination_workbook' => {
      	datatype => 'FileSource',
      	base_name => 'DestinationWorkbook',
-     	description => '',
+     	description => 'Represents destination data source.',
      	format => '',
      	read_only => '',
      		},    

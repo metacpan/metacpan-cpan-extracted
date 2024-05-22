@@ -1,6 +1,11 @@
 Revision history for Perl-Critic-Mardem
 ========================================
 
+0.06 2024-05-21
+
+    * fixed documentation
+    * some maintenance changes
+
 0.05 2024-05-20
 
     * new feature ProhibitLargeFile

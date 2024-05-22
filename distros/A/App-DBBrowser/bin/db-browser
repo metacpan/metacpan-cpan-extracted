@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.014;
-our $VERSION = '2.411';
+our $VERSION = '2.412';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.411
+Version 2.412
 
 =head1 SYNOPSIS
 
@@ -819,8 +819,6 @@ of the scalar function menu.
 
 C<DATEADD>, C<EXTRACT> and some other functions: use the keys C<Up-Arrow> and C<Down-Arrow> to choose one of the
 predefined fields (in C<Value> if the extended arguments are enabled).
-
-To subtract from a date, use C<DATEADD> with a negative amount.
 
 C<TO_EPOCH> and C<Oracle>: the argument I<Column type> can be any of the following: I<DATE>, I<TIMESTAMP> or
 I<TIMESTAMP_TZ>. If the column type is I<DATE> or I<TIMESTAMP> the session timezone is used as timezone.

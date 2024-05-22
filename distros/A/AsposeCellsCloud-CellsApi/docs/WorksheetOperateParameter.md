@@ -8,10 +8,10 @@ use AsposeCellsCloud::Object::WorksheetOperateParameter;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Name** | **string** |  |
-**SheetType** | **string** |  |
+**Name** | **string** | Represents worksheet name. |
+**SheetType** | **string** | Represents worksheet type. |
 **NewName** | **string** | rename worksheet name |
-**MovingRequest** | **WorksheetMovingRequest** |  |
+**MovingRequest** | **WorksheetMovingRequest** | Represents move position. |
 **OperateType** | **string** |  |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

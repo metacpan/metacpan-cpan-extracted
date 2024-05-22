@@ -7,7 +7,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 1;
 
@@ -25,7 +25,7 @@ Perl::Critic::Mardem - Perl-Critic policies for isolated Refactoring-Support.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 DESCRIPTION
 
@@ -45,37 +45,37 @@ overall starting point see:
 
 but these are for some bigger scans, so these new policies should check (or begin) in smaller chunks:
 
-=head2 L<Perl::Critic::Policy::Mardem::ProhibitReturnBooleanAsInt>
+=head2 L<Perl::Critic::Policy::Mardem::ProhibitBlockComplexity>
 
-return boolean as int "return 1;"
+code block complexity "{...}"
 
 =head2 L<Perl::Critic::Policy::Mardem::ProhibitConditionComplexity>
 
 condition complexity "if/while/for/... (...){}"
 
-=head2 L<Perl::Critic::Policy::Mardem::ProhibitManyConditionsInSub>
+=head2 L<Perl::Critic::Policy::Mardem::ProhibitFileSize>
 
-subs has many conditionals "if, while, for, ..."
+large files as byte or char count
 
 =head2 L<Perl::Critic::Policy::Mardem::ProhibitLargeBlock>
 
 large code block as statement count "{...}"
 
-=head2 L<Perl::Critic::Policy::Mardem::ProhibitBlockComplexity>
+=head2 L<Perl::Critic::Policy::Mardem::ProhibitLargeFile>
 
-code block complexity "{...}"
+large files as line count
 
 =head2 L<Perl::Critic::Policy::Mardem::ProhibitLargeSub>
 
 large subs as statement count
 
-=head2 L<Perl::Critic::Policy::Mardem::ProhibitLargeFile>
+=head2 L<Perl::Critic::Policy::Mardem::ProhibitManyConditionsInSub>
 
-large files as line count
+subs has many conditionals "if, while, for, ..."
 
-=head2 L<Perl::Critic::Policy::Mardem::ProhibitFileSize>
+=head2 L<Perl::Critic::Policy::Mardem::ProhibitReturnBooleanAsInt>
 
-large files as byte or char count
+return boolean as int "return 1;"
 
 =head1 AFFILIATION
 
