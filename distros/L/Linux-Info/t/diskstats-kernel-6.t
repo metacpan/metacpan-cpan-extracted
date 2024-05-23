@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::Most tests => 504;
+use Test::Most 0.38;
 use Regexp::Common;
 use Linux::Info::DiskStats::Options;
 
@@ -8,6 +8,8 @@ use constant KERNEL_INFO => 'kernel major version >= 6';
 
 use lib './t/lib';
 use Helpers qw(total_lines tests_set_desc);
+
+plan tests => 504;
 
 require_ok('Linux::Info::DiskStats');
 

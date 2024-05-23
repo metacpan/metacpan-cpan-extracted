@@ -1,12 +1,14 @@
 use strictures 1;
 use Test::More;
 use Sys::Hostname;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 
 $ENV{OBJECT_REMOTE_TEST_LOGGER} = 1;
 
 use Object::Remote::Logging qw(:log router arg_levels);
 use Object::Remote::Logging::Logger;
-require 't/lib/ORFeedbackLogger.pm';
+use ORFeedbackLogger;
 
 my $level_names = [qw(test1 test2 test3 test4 test5)];
 my $logger = Object::Remote::Logging::Logger->new(

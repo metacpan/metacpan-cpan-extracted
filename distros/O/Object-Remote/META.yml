@@ -20,7 +20,7 @@ no_index:
 requires:
   Class::C3: '0'
   Devel::GlobalDestruction: '0'
-  Future: '0.29'
+  Future: '0.49'
   JSON::PP: '0'
   Log::Contextual: '0.005'
   MRO::Compat: '0'
@@ -32,6 +32,6 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Object-Remote
   license: http://dev.perl.org/licenses/
   repository: https://github.com/p5sagit/Object-Remote.git
-version: '0.004003'
+version: '0.004004'
 x_authority: cpan:MSTROUT
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

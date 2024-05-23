@@ -1,6 +1,8 @@
 use strictures 1;
 use Test::More;
 use Sys::Hostname;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 
 $ENV{OBJECT_REMOTE_TEST_LOGGER} = 1;
 
@@ -19,7 +21,7 @@ $router->_remote_metadata({ router => undef, connection_id => 'TestConnectionId'
 isa_ok($router, 'Object::Remote::Logging::Router');
 ok($router->does('Log::Contextual::Role::Router'), 'Router does router role');
 
-require 't/lib/ORFeedbackLogger.pm';
+require ORFeedbackLogger;
 my $logger = ORFeedbackLogger->new(level_names => [qw( test1 test2 )], min_level => 'test1');
 
 my $selector = sub { $logger };

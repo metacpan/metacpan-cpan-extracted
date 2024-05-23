@@ -1,0 +1,9 @@
+0.002   2024-05-10  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename dist from HashData-Color-PantoneToCMYK to
+          HashData-ColorCode-CMYK-Pantone for consistency.
+
+
+0.001   2021-05-21  Released-By: PERLANCAR
+
+        - First release.

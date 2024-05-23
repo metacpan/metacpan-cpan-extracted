@@ -1,3 +1,26 @@
-Detect different types of MS Windows
+Detect different types of MS Windows;
+Detect old Linux distros without using os-release
+  https://github.com/cfengine/core/blob/4f5e8dd65c4eccd69bc6fe603343233fe1a1f577/libenv/sysinfo.c#L1287
+Detect versions of OSes and distros;
+Detect other init systems than just systemd;
+Detect musl vs glibc
+Detect busybox
 
 use-devel-assertos should not add itself twice (update, if run a second time)
+
+to detect openrc:
+
+Gianni says: @DrHyde@fosstodon.org for openrc, you probably get /sbin/openrc-run, and a few lines mentioning /sbin/openrc in /etc/inittab, like:
+    si::sysinit:/sbin/openrc sysinit
+    rc::bootwait:/sbin/openrc boot
+    l0u:0:wait:/sbin/telinit u
+    l0:0:wait:/sbin/openrc shutdown
+    l0s:0:wait:/sbin/halt.sh
+    l1:1:wait:/sbin/openrc single
+    l2:2:wait:/sbin/openrc nonetwork
+    l3:3:wait:/sbin/openrc default
+    l4:4:wait:/sbin/openrc default
+    l5:5:wait:/sbin/openrc default
+    l6u:6:wait:/sbin/telinit u
+    l6:6:wait:/sbin/openrc reboot
+    l6r:6:wait:/sbin/reboot -dkn

@@ -4,12 +4,32 @@ use warnings;
 use English;
 use Error::Pure::Utils qw(clean);
 use Tags::HTML::Image;
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 7;
 use Test::NoWarnings;
 
 # Test.
 my $obj = Tags::HTML::Image->new;
 isa_ok($obj, 'Tags::HTML::Image');
+
+# Test.
+eval {
+	Tags::HTML::Image->new(
+		'css_class' => '1bad',
+	);
+};
+is($EVAL_ERROR, "Parameter 'css_class' has bad CSS class name (number on begin).\n",
+	"Parameter 'css_class' has bad CSS class name (number on begin) (1bad).");
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Image->new(
+		'css_class' => '@bad',
+	);
+};
+is($EVAL_ERROR, "Parameter 'css_class' has bad CSS class name.\n",
+	"Parameter 'css_class' has bad CSS class name (\@bad).");
+clean();
 
 # Test.
 eval {

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 25;
+use Test::More tests => 24;
 use Scalar::Util qw(looks_like_number);
 use Devel::CheckOS 2.01 qw(os_is);
 
@@ -8,16 +8,16 @@ BEGIN { use_ok('Linux::Info::SysInfo') }
 
 my $obj     = new_ok('Linux::Info::SysInfo');
 my @methods = (
-    'get_raw_time',   'get_hostname',
-    'get_domain',     'get_kernel',
-    'get_release',    'get_version',
-    'get_mem',        'get_swap',
-    'get_pcpucount',  'get_tcpucount',
-    'get_interfaces', 'get_arch',
-    'get_proc_arch',  'get_cpu_flags',
-    'get_uptime',     'get_idletime',
-    'is_multithread', 'get_model',
-    'get_mainline_version',
+    'get_raw_time',    'get_hostname',
+    'get_domain',      'get_kernel',
+    'get_release',     'get_version',
+    'get_mem',         'get_swap',
+    'get_pcpucount',   'get_tcpucount',
+    'get_interfaces',  'get_arch',
+    'get_proc_arch',   'get_cpu_flags',
+    'get_uptime',      'get_idletime',
+    'is_multithread',  'get_model',
+    'has_multithread', 'get_detailed_kernel',
 );
 can_ok( $obj, @methods );
 
@@ -54,17 +54,8 @@ foreach my $method (@string_methods) {
     like( $obj->$method, qr/\w+/, "$method returns a string" );
 }
 
-ok(
-    check_mainline_version( $obj->get_mainline_version ),
-    'get_mainline_version can fetch a valid value'
-);
-
-SKIP: {
-    skip 'Not available on Linux distributions not based on Ubuntu', 1
-      unless ( os_is('Linux::Ubuntu') );
-    ok( $obj->get_mainline_version(),
-        'get_mainline_version returns a defined value on Ubuntu-like distros' );
-}
+my $kernel = $obj->get_detailed_kernel;
+isa_ok( $kernel, 'Linux::Info::KernelRelease' );
 
 note(
 'tests implemented due report http://www.cpantesters.org/cpan/report/9ae1c364-7671-11e5-aad0-c5a10b3facc5'

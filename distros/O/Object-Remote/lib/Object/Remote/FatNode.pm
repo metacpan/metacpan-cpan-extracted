@@ -29,6 +29,7 @@ my $command = qq(
   -mObject::Remote
   -mObject::Remote::Connector::STDIO
   -mFuture
+  -mFuture::PP
   -mMRO::Compat
   -mClass::C3
   -mClass::C3::next

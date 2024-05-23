@@ -5,7 +5,7 @@ use Devel::AssertOS qw[Linux];
 use strict;
 use warnings;
 
-use 5.008009;
+use 5.012000;
 
 use ExtUtils::MakeMaker;
 
@@ -17,12 +17,13 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Linux-Info",
   "LICENSE" => "gpl",
-  "MIN_PERL_VERSION" => "5.008009",
+  "MIN_PERL_VERSION" => "5.012000",
   "NAME" => "Linux::Info",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Class::Accessor" => "0.51",
-    "Devel::CheckOS" => "2.02",
+    "Class::XSAccessor" => "1.19",
+    "Data::Dumper" => 0,
+    "File::Spec" => 0,
     "Filesys::Df" => "0.92",
     "Hash::Util" => 0,
     "POSIX" => "1.15",
@@ -38,11 +39,15 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "File::Temp" => 0,
     "Scalar::Util" => 0,
+    "Test::Kwalitee" => "1.28",
     "Test::More" => 0,
-    "Test::Most" => "0.35",
+    "Test::Most" => "0.38",
+    "Test::Perl::Critic" => "1.04",
+    "Test::Pod" => "1.52",
+    "Test::Pod::Coverage" => "1.10",
     "lib" => 0
   },
-  "VERSION" => "2.01",
+  "VERSION" => "2.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,9 +56,11 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Class::Accessor" => "0.51",
+  "Class::XSAccessor" => "1.19",
+  "Data::Dumper" => 0,
   "Devel::CheckOS" => "2.02",
   "Exporter" => 0,
+  "File::Spec" => 0,
   "File::Temp" => 0,
   "Filesys::Df" => "0.92",
   "Hash::Util" => 0,
@@ -61,8 +68,12 @@ my %FallbackPrereqs = (
   "Regexp::Common" => "2017060201",
   "Scalar::Util" => 0,
   "Set::Tiny" => "0.04",
+  "Test::Kwalitee" => "1.28",
   "Test::More" => 0,
-  "Test::Most" => "0.35",
+  "Test::Most" => "0.38",
+  "Test::Perl::Critic" => "1.04",
+  "Test::Pod" => "1.52",
+  "Test::Pod::Coverage" => "1.10",
   "Time::HiRes" => "1.9764",
   "YAML::XS" => "0.88",
   "lib" => 0,

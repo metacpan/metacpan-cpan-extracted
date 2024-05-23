@@ -5,11 +5,16 @@ use strict;
 use warnings;
 no warnings 'redefine';
 
-our $VERSION = '1.0';
+use Devel::CheckOS::Helpers::LinuxOSrelease 'distributor_id';
+
+our $VERSION = '1.1';
 
 sub os_is {
+    my $id = distributor_id;
+
     Devel::CheckOS::os_is('Linux') &&
-    `lsb_release -i 2>/dev/null` =~ /Devuan/
+    defined($id) &&
+    $id eq 'devuan';
 }
 
 sub expn { "The operating system is Devuan" }

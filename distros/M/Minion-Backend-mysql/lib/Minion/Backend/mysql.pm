@@ -15,7 +15,7 @@ use Time::Piece ();
 has 'mysql';
 has 'no_txn' => sub { 0 };
 
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 
 # The dequeue system has a couple limitations:
 # 1. There is no way to directly notify a sleeping worker of an incoming
@@ -1192,7 +1192,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 
@@ -1822,7 +1822,7 @@ DROP INDEX id ON minion_jobs;
 CREATE UNIQUE INDEX id ON minion_jobs(id);
 
 -- 16 up
-CREATE INDEX minion_jobs_state_finished_idx ON minion_jobs (state, finished) ALGORITHM=INPLACE LOCK=NONE;
+CREATE INDEX minion_jobs_state_finished_idx ON minion_jobs (state, finished) ALGORITHM=INPLACE LOCK=SHARED;
 
 -- 16 down
 DROP INDEX minion_jobs_state_finished_idx ON minion_jobs;

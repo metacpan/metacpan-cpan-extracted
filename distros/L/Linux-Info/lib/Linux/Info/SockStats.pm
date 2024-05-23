@@ -3,11 +3,76 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.11'; # VERSION
+# ABSTRACT: Collect linux socket statistics.
+
+
+sub new {
+    my $class = shift;
+    my $opts  = ref( $_[0] ) ? shift : {@_};
+
+    my %self = (
+        files => {
+            path     => '/proc',
+            sockstat => 'net/sockstat',
+        }
+    );
+
+    foreach my $file ( keys %{ $opts->{files} } ) {
+        $self{files}{$file} = $opts->{files}->{$file};
+    }
+
+    return bless \%self, $class;
+}
+
+sub get {
+    my $self  = shift;
+    my $class = ref $self;
+    my $file  = $self->{files};
+    my %socks = ();
+
+    my $filename =
+      $file->{path} ? "$file->{path}/$file->{sockstat}" : $file->{sockstat};
+    open my $fh, '<', $filename
+      or croak "$class: unable to open $filename ($!)";
+
+    while ( my $line = <$fh> ) {
+        if ( $line =~ /sockets: used (\d+)/ ) {
+            $socks{used} = $1;
+        }
+        elsif ( $line =~ /TCP: inuse (\d+)/ ) {
+            $socks{tcp} = $1;
+        }
+        elsif ( $line =~ /UDP: inuse (\d+)/ ) {
+            $socks{udp} = $1;
+        }
+        elsif ( $line =~ /RAW: inuse (\d+)/ ) {
+            $socks{raw} = $1;
+        }
+        elsif ( $line =~ /FRAG: inuse (\d+)/ ) {
+            $socks{ipfrag} = $1;
+        }
+    }
+
+    close($fh);
+    return \%socks;
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 Linux::Info::SockStats - Collect linux socket statistics.
+
+=head1 VERSION
+
+version 2.11
 
 =head1 SYNOPSIS
 
@@ -76,78 +141,14 @@ L<Linux::Info>
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
+Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 of Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
+This software is Copyright (c) 2015 by Alceu Rodrigues de Freitas Junior.
 
-This file is part of Linux Info project.
+This is free software, licensed under:
 
-Linux-Info is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Linux-Info is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Linux Info.  If not, see <http://www.gnu.org/licenses/>.
+  The GNU General Public License, Version 3, June 2007
 
 =cut
-
-sub new {
-    my $class = shift;
-    my $opts  = ref( $_[0] ) ? shift : {@_};
-
-    my %self = (
-        files => {
-            path     => '/proc',
-            sockstat => 'net/sockstat',
-        }
-    );
-
-    foreach my $file ( keys %{ $opts->{files} } ) {
-        $self{files}{$file} = $opts->{files}->{$file};
-    }
-
-    return bless \%self, $class;
-}
-
-sub get {
-    my $self  = shift;
-    my $class = ref $self;
-    my $file  = $self->{files};
-    my %socks = ();
-
-    my $filename =
-      $file->{path} ? "$file->{path}/$file->{sockstat}" : $file->{sockstat};
-    open my $fh, '<', $filename
-      or croak "$class: unable to open $filename ($!)";
-
-    while ( my $line = <$fh> ) {
-        if ( $line =~ /sockets: used (\d+)/ ) {
-            $socks{used} = $1;
-        }
-        elsif ( $line =~ /TCP: inuse (\d+)/ ) {
-            $socks{tcp} = $1;
-        }
-        elsif ( $line =~ /UDP: inuse (\d+)/ ) {
-            $socks{udp} = $1;
-        }
-        elsif ( $line =~ /RAW: inuse (\d+)/ ) {
-            $socks{raw} = $1;
-        }
-        elsif ( $line =~ /FRAG: inuse (\d+)/ ) {
-            $socks{ipfrag} = $1;
-        }
-    }
-
-    close($fh);
-    return \%socks;
-}
-
-1;

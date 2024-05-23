@@ -1,7 +1,7 @@
 package Rope;
 
 use 5.006; use strict; use warnings;
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 use Rope::Object;
 my (%META, %PRO);
 our @ISA;
@@ -614,6 +614,12 @@ sub clear_property {
 	delete $META{$name}{properties}{$prop};
 }
 
+sub set_property {
+	my ($self, $name, $prop, $property) = @_;
+	$META{$name}{properties}{$prop} = $property;
+}
+
+
 1;
 
 __END__
@@ -624,7 +630,7 @@ Rope - Tied objects
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =cut
 

@@ -1,4 +1,105 @@
-liblinux-info-perl (2.01) trusty; urgency=low
+liblinux-info-perl (2.11) trusty; urgency=low
+  * fix: configure GitHub Actions to ignore tags
+  At each tag creation and pushed after branches merging, the GHA is
+    being executed again, without any need. 
+
+ -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Wed, 22 May 2024 15:01:29 +0000
+
+liblinux-info-perl () trusty; urgency=low
+  * Feature/improved kernel release (#12)
+  * refactor: keep filename pattern
+  * refactor: replaced Class::Accessor with Class::XSAccessor
+  * refactor: check multithread support
+  * feat: more kernel info
+  * feat: RedHat parser
+  * fix: Class::XSAccessor is faster
+  * refactor: no need of test ordering
+  * fix: new KernelRelease interface
+  * feat: distribution handling
+  * feat: distribution handling
+  * fix: requires perl 5.12 due readdir
+  * fix: missing version declaration
+  * fix: conditional definition of sources
+  * feat: Factory completed
+  * fix: Test::Most version
+  * fix: missing validations
+  * fix: added missing validations
+  * feat: OSRelease subclasses
+  The cache is required to avoid parsing the file again in the
+    subclasses initialization.
+  * fix: Distribution validation broke other classes
+  - classes were missing the "name" key - classes were using
+    "distro_id" instead of the expected "id"
+  * feat: has_custom method
+  Finder should has a method invoked instead checking data structure
+    returned by it's method to now if the release information is from
+    /etc/os-release or any other custom file.
+  * fix: cannot fetch source from class
+  * doc: added missing Pod
+  * refactor: common attributes
+  * feat: new os-release classes
+  * refactor: better encapsulation
+  * fix: confusing parse options
+  * fix: missing new attributes
+  * fix: Debian issues
+  * fix: missing VERSION
+  * refactor: PodWeaver to reduce boilterplate Pod
+  * doc: references to Linux::Distribution
+  * doc: missing info
+  * refactor: less code
+  * feat: Amazon Linux
+  * refactor: need to test os-release based distros
+  * feat: Amazon and RedHat support
+  * feat: CloudLinux support
+  * chore: cleanup
+  * feat: CentOS Stream support
+  * fix: skip empty lines
+  * feat: CentOS support
+  * feat: Alpine Linux support
+  * fix: missing Pod
+  * chore: added TODO
+  * fix: previous merge
+  * refactor: standard package naming
+  Also removed deprecated the method because that will be taken care by
+    a factory.
+  * chore: version upgrade
+  * refactor: package naming standard
+  * refactor: new classes names
+  * refactor: packing name standard
+  * refactor: new name
+  * chore: deprecated
+  * fix: due new classes introduced
+  * refactor: due new classes introduced
+  * fix: due interface changes
+  * fix: allow unknown properties
+  * feat: KernelSource introduction
+  Introduced to decouple KernelRelease instances from the actual file
+    they retrieve their information.
+  * fix: wrong content
+  * fix: wrong content
+  * fix: wrong path on /proc
+  * fix: wrong validation
+  * refactor: unnecessary data
+  * feat: RedHat kernel info
+  * refactor: more flexible version parsing
+  * fix: missing patch
+  * refactor: not needed
+  * feat: Rocky Linux kernel
+  * fix: wrong logic to handle info source
+  * fix: missing Pod
+  * refactor: code reuse
+  * fix: missing implemented classes
+  * fix: cache abusing
+  * fix: missing arguments
+  * fix: missing test requirements
+  * refactor: better feedback
+  * doc: required
+  * refactor: forcing integers
+  * feat: Alpine Linux support to kernel parsing 
+
+ -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Wed, 22 May 2024 14:50:20 +0000
+
+liblinux-info-perl () trusty; urgency=low
   * Bugfix/non ubuntu failure (#11)
   * fix: useless verification
   * fix: missing distro

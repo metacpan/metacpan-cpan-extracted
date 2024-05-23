@@ -13,7 +13,9 @@ Be sure to read the related documentation to avoid issues when upgrading.
 
 ## DESCRIPTION
 
-`Linux::Info` is a fork from [Sys::Statistics::Linux](https://metacpan.org/pod/Sys::Statistics::Linux) distribution.
+`Linux::Info` is a fork from
+[Sys::Statistics::Linux](https://metacpan.org/pod/Sys::Statistics::Linux)
+distribution.
 
 `Linux::Info` is a front-end module to gather different linux
 system information like processor workload, memory usage, network and
@@ -21,7 +23,12 @@ disk statistics and a lot more. Refer the documentation of the
 distribution modules to get more information about all possible
 statistics.
 
-By obvious reasons, this distribution will run only at Linux O.S.
+Since version 2.1, `Linux::Info` also aggregates the functionality of the
+[Linux::Distribution](https://metacpan.org/pod/Linux::Distribution)
+distribution, even with some code shared between both of them, although
+the API is very different.
+
+By obvious reasons, this distribution will run only at Linux distributions.
 
 ## MOTIVATION
 

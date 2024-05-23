@@ -1,8 +1,10 @@
 use strict;
 use warnings;
-use Test::Most tests => 128;
+use Test::Most 0.38;
 use Regexp::Common;
 use Linux::Info::DiskStats::Options;
+
+plan tests => 128;
 
 use constant KERNEL_INFO => 'kernel major version >= 6';
 

@@ -1,19 +1,17 @@
 use warnings;
 use strict;
 use Test::More;
-use Devel::AssertOS::OSFeatures::Release 'distributor_id';
+use Devel::CheckOS qw(os_is);
+use Devel::CheckOS::Helpers::LinuxOSrelease 'distributor_id';
 
-my $total_tests = 3;
-plan tests => $total_tests;
-
-SKIP: {
-    skip "Temporarily skipping all because they only work when ID's value is not quoted", 3;
-    skip 'Not a Linux distribution', $total_tests unless ( $^O eq 'linux' );
-    skip "Your Linux doesn't have an /etc/os-release file", $total_tests unless (-r '/etc/os-release');
-    my $id = distributor_id();
-    ok( $id, 'can fetch the distribution ID' )
-      or BAIL_OUT('No use to keep testing with ID = undef');
-    like $id, qr/^\w+$/, 'ID looks like a string';
-    my $copy = ucfirst( lc $id );
-    is( $id, $copy, 'ID is returned with first character in uppercase' );
+Devel::CheckOS::Helpers::LinuxOSrelease::_set_file('t/etc-os-release/ubuntu');
+is( distributor_id, 'ubuntu', "can fetch the distribution ID when it's not quoted" );
+{
+    local $^O = 'linux';
+    ok(os_is('Linux::Ubuntu'), "... detected Ubuntu");
 }
+
+Devel::CheckOS::Helpers::LinuxOSrelease::_set_file('t/etc-os-release/opensuse-tumbleweed');
+is( distributor_id, 'opensuse-tumbleweed', "can fetch the ID when is it quoted");
+
+done_testing;

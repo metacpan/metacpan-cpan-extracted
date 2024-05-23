@@ -1,5 +1,7 @@
 use strictures 1;
 use Test::More;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 
 $ENV{OBJECT_REMOTE_TEST_LOGGER} = 1;
 
@@ -25,7 +27,7 @@ my %parsed_selections = Object::Remote::Logging::_parse_selections($selections_s
 my $selections_match = { '*' => 1, 'Acme::Matt::Daemon' => 1, 'Acme::POE::Knee' => 0 };
 is_deeply(\%parsed_selections, $selections_match, 'Selections parsed successfully' );
 
-require 't/lib/ORFeedbackLogger.pm';
+require ORFeedbackLogger;
 my $logger = ORFeedbackLogger->new(level_names => $levels, min_level => 'trace');
 isa_ok($logger, 'ORFeedbackLogger');
 $router->connect($logger);

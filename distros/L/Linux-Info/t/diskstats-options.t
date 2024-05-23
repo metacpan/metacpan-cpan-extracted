@@ -1,8 +1,10 @@
 use warnings;
 use strict;
-use Test::Most tests => 27;
+use Test::Most 0.38;
 use File::Temp qw(tempfile);
 use Set::Tiny 0.04;
+
+plan tests => 27;
 
 require_ok('Linux::Info::DiskStats::Options');
 

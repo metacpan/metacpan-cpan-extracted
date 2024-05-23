@@ -6,11 +6,160 @@ use POSIX qw(strftime);
 use UNIVERSAL;
 use Linux::Info::Compilation;
 
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.11'; # VERSION
+
+# ABSTRACT: API in Perl to recover information about the running Linux OS
+
+
+sub new {
+    my $class = shift;
+    my $self  = bless { obj => {} }, $class;
+
+    my @options = qw(
+      CpuStats  ProcStats
+      MemStats  PgSwStats NetStats
+      SockStats DiskStats DiskUsage
+      LoadAVG   FileStats Processes
+    );
+
+    foreach my $opt (@options) {
+
+        # backward compatibility
+        $self->{opts}->{$opt} = 0;
+        $self->{maps}->{$opt} = $opt;
+
+        # new style
+        my $lcopt = lc($opt);
+        $self->{opts}->{$lcopt} = 0;
+        $self->{maps}->{$lcopt} = $opt;
+    }
+
+    $self->set(@_) if @_;
+    return $self;
+}
+
+
+sub set {
+    my $self  = shift;
+    my $class = ref $self;
+    my $args  = ref( $_[0] ) eq 'HASH' ? shift : {@_};
+    my $opts  = $self->{opts};
+    my $obj   = $self->{obj};
+    my $maps  = $self->{maps};
+
+    confess 'Linux::Info::SysInfo cannot be instantiated from Linux::Info'
+      if ( exists( $args->{sysinfo} ) );
+
+    foreach my $opt ( keys( %{$args} ) ) {
+
+        confess "invalid delta option '$opt'"
+          unless ( exists( $opts->{$opt} ) );
+
+        if ( ref( $args->{$opt} ) ) {
+            $opts->{$opt} = delete $args->{$opt}->{init} || 1;
+        }
+        elsif ( $args->{$opt} !~ qr/^[012]\z/ ) {
+            confess "invalid value for '$opt'";
+        }
+        else {
+            $opts->{$opt} = $args->{$opt};
+        }
+
+        if ( $opts->{$opt} ) {
+            my $package = $class . '::' . $maps->{$opt};
+
+            # require module - require know which modules are loaded
+            # and doesn't load a module twice.
+            my $require = $package;
+            $require =~ s/::/\//g;
+            $require .= '.pm';
+            require $require;
+
+            if ( !$obj->{$opt} ) {
+                if ( ref( $args->{$opt} ) ) {
+                    $obj->{$opt} = $package->new( %{ $args->{$opt} } );
+                }
+                else {
+                    $obj->{$opt} = $package->new();
+                }
+            }
+
+            # get initial statistics if the function init() exists
+            # and the option is set to 1
+            if ( $opts->{$opt} == 1 && UNIVERSAL::can( $package, 'init' ) ) {
+                $obj->{$opt}->init();
+            }
+
+        }
+        elsif ( exists $obj->{$opt} ) {
+            delete $obj->{$opt};
+        }
+    }
+}
+
+
+sub get {
+    my ( $self, $time ) = @_;
+    sleep $time if $time;
+    my %stat = ();
+
+    foreach my $opt ( keys %{ $self->{opts} } ) {
+        if ( $self->{opts}->{$opt} ) {
+            $stat{$opt} = $self->{obj}->{$opt}->get();
+            if ( $opt eq 'netstats' ) {
+                $stat{netinfo} = $self->{obj}->{$opt}->get_raw();
+            }
+        }
+    }
+
+    return Linux::Info::Compilation->new( \%stat );
+}
+
+
+sub init {
+    my $self  = shift;
+    my $class = ref $self;
+
+    foreach my $opt ( keys %{ $self->{opts} } ) {
+        if ( $self->{opts}->{$opt} > 0
+            && UNIVERSAL::can( ref( $self->{obj}->{$opt} ), 'init' ) )
+        {
+            $self->{obj}->{$opt}->init();
+        }
+    }
+}
+
+
+sub settime {
+    my $self   = shift;
+    my $format = @_ ? shift : '%Y-%m-%d %H:%M:%S';
+    $self->{timeformat} = $format;
+}
+
+
+sub gettime {
+    my $self = shift;
+    $self->settime(@_) unless $self->{timeformat};
+    my $tm = strftime( $self->{timeformat}, localtime );
+    return wantarray ? split /\s+/, $tm : $tm;
+}
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 Linux::Info - API in Perl to recover information about the running Linux OS
+
+=head1 VERSION
+
+version 2.11
 
 =head1 SYNOPSIS
 
@@ -260,34 +409,6 @@ It's possible to call C<new()> with a hash reference of options.
     );
 
     my $lxs = Linux::Info->new(\%options);
-=cut
-
-sub new {
-    my $class = shift;
-    my $self  = bless { obj => {} }, $class;
-
-    my @options = qw(
-      CpuStats  ProcStats
-      MemStats  PgSwStats NetStats
-      SockStats DiskStats DiskUsage
-      LoadAVG   FileStats Processes
-    );
-
-    foreach my $opt (@options) {
-
-        # backward compatibility
-        $self->{opts}->{$opt} = 0;
-        $self->{maps}->{$opt} = $opt;
-
-        # new style
-        my $lcopt = lc($opt);
-        $self->{opts}->{$lcopt} = 0;
-        $self->{maps}->{$lcopt} = $opt;
-    }
-
-    $self->set(@_) if @_;
-    return $self;
-}
 
 =head2 set()
 
@@ -310,65 +431,6 @@ It's possible to call C<set()> with a hash reference of options.
     );
 
     $lxs->set(\%options);
-=cut
-
-sub set {
-    my $self  = shift;
-    my $class = ref $self;
-    my $args  = ref( $_[0] ) eq 'HASH' ? shift : {@_};
-    my $opts  = $self->{opts};
-    my $obj   = $self->{obj};
-    my $maps  = $self->{maps};
-
-    confess 'Linux::Info::SysInfo cannot be instantiated from Linux::Info'
-      if ( exists( $args->{sysinfo} ) );
-
-    foreach my $opt ( keys( %{$args} ) ) {
-
-        confess "invalid delta option '$opt'"
-          unless ( exists( $opts->{$opt} ) );
-
-        if ( ref( $args->{$opt} ) ) {
-            $opts->{$opt} = delete $args->{$opt}->{init} || 1;
-        }
-        elsif ( $args->{$opt} !~ qr/^[012]\z/ ) {
-            confess "invalid value for '$opt'";
-        }
-        else {
-            $opts->{$opt} = $args->{$opt};
-        }
-
-        if ( $opts->{$opt} ) {
-            my $package = $class . '::' . $maps->{$opt};
-
-            # require module - require know which modules are loaded
-            # and doesn't load a module twice.
-            my $require = $package;
-            $require =~ s/::/\//g;
-            $require .= '.pm';
-            require $require;
-
-            if ( !$obj->{$opt} ) {
-                if ( ref( $args->{$opt} ) ) {
-                    $obj->{$opt} = $package->new( %{ $args->{$opt} } );
-                }
-                else {
-                    $obj->{$opt} = $package->new();
-                }
-            }
-
-            # get initial statistics if the function init() exists
-            # and the option is set to 1
-            if ( $opts->{$opt} == 1 && UNIVERSAL::can( $package, 'init' ) ) {
-                $obj->{$opt}->init();
-            }
-
-        }
-        elsif ( exists $obj->{$opt} ) {
-            delete $obj->{$opt};
-        }
-    }
-}
 
 =head2 get()
 
@@ -392,25 +454,6 @@ Now the statistcs are available with
     $stat->{cpustats}
 
 Take a look to the documentation of L<Linux::Info::Compilation> for more information.
-
-=cut
-
-sub get {
-    my ( $self, $time ) = @_;
-    sleep $time if $time;
-    my %stat = ();
-
-    foreach my $opt ( keys %{ $self->{opts} } ) {
-        if ( $self->{opts}->{$opt} ) {
-            $stat{$opt} = $self->{obj}->{$opt}->get();
-            if ( $opt eq 'netstats' ) {
-                $stat{netinfo} = $self->{obj}->{$opt}->get_raw();
-            }
-        }
-    }
-
-    return Linux::Info::Compilation->new( \%stat );
-}
 
 =head2 init()
 
@@ -456,21 +499,6 @@ workload to the screen then you can use something like this:
             $time, @{$cpu->{cpu}}{@order};
     }
 
-=cut
-
-sub init {
-    my $self  = shift;
-    my $class = ref $self;
-
-    foreach my $opt ( keys %{ $self->{opts} } ) {
-        if ( $self->{opts}->{$opt} > 0
-            && UNIVERSAL::can( ref( $self->{obj}->{$opt} ), 'init' ) )
-        {
-            $self->{obj}->{$opt}->init();
-        }
-    }
-}
-
 =head2 settime()
 
 Call C<settime()> to define a POSIX formatted time stamp, generated with
@@ -480,14 +508,6 @@ localtime().
 
 To get more information about the formats take a look at C<strftime()> of
 POSIX.pm or the manpage C<strftime(3)>.
-
-=cut
-
-sub settime {
-    my $self   = shift;
-    my $format = @_ ? shift : '%Y-%m-%d %H:%M:%S';
-    $self->{timeformat} = $format;
-}
 
 =head2 gettime()
 
@@ -505,14 +525,6 @@ Or
 Or
 
     my ($date, $time) = $lxs->gettime('%Y/%m/%d %H:%M:%S');
-=cut
-
-sub gettime {
-    my $self = shift;
-    $self->settime(@_) unless $self->{timeformat};
-    my $tm = strftime( $self->{timeformat}, localtime );
-    return wantarray ? split /\s+/, $tm : $tm;
-}
 
 =head1 EXAMPLES
 
@@ -589,27 +601,14 @@ The project website at L<https://github.com/glasswalk3r/Linux-Info>.
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
+Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 of Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
+This software is Copyright (c) 2015 by Alceu Rodrigues de Freitas Junior.
 
-This file is part of Linux Info project.
+This is free software, licensed under:
 
-Linux Info is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Linux Info is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Linux Info.  If not, see <http://www.gnu.org/licenses/>.
+  The GNU General Public License, Version 3, June 2007
 
 =cut
-
-1;

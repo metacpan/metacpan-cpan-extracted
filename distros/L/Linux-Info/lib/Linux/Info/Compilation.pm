@@ -3,229 +3,10 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.11'; # VERSION
 
-=head1 NAME
+# ABSTRACT: Statistics compilation.
 
-Linux::Info::Compilation - Statistics compilation.
-
-=head1 SYNOPSIS
-
-    use Linux::Info;
-
-    my $lxs  = Linux::Info->new( loadavg => 1 );
-    my $stat = $lxs->get;
-
-    foreach my $key ($stat->loadavg) {
-        print $key, " ", $stat->loadavg($key), "\n";
-    }
-
-    # or
-
-    use Linux::Info::LoadAVG;
-    use Linux::Info::Compilation;
-
-    my $lxs  = Linux::Info::LoadAVG->new();
-    my $load = $lxs->get;
-    my $stat = Linux::Info::Compilation->new({ loadavg => $load });
-
-    foreach my $key ($stat->loadavg) {
-        print $key, " ", $stat->loadavg($key), "\n";
-    }
-
-    # or
-
-    foreach my $key ($stat->loadavg) {
-        print $key, " ", $stat->loadavg->{$key}, "\n";
-    }
-
-=head1 DESCRIPTION
-
-This module provides different methods to access and filter the statistics compilation.
-
-=head1 METHODS
-
-=head2 new()
-
-Create a new C<Linux::Info::Compilation> object. This creator is only useful if you
-don't call C<get()> of C<Linux::Info>. You can create a new object with:
-
-    my $lxs  = Linux::Info::LoadAVG->new();
-    my $load = $lxs->get;
-    my $stat = Linux::Info::Compilation->new({ loadavg => $load });
-
-=head2 Statistic methods
-
-=over
-
-=item sysinfo()
-
-=item cpustats()
-
-=item procstats()
-
-=item memstats()
-
-=item pgswstats()
-
-=item netstats()
-
-=item netinfo()
-
-C<netinfo()> provides raw data - no deltas.
-
-=item sockstats()
-
-=item diskstats()
-
-=item diskusage()
-
-=item loadavg()
-
-=item filestats()
-
-=item processes()
-
-=back
-
-All methods returns the statistics as a hash reference in scalar context. In list all methods
-returns the first level keys of the statistics. Example:
-
-    my $net  = $stat->netstats;                 # netstats as a hash reference
-    my @dev  = $stat->netstats;                 # the devices eth0, eth1, ...
-    my $eth0 = $stat->netstats('eth0');         # eth0 statistics as a hash reference
-    my @keys = $stat->netstats('eth0');         # the statistic keys
-    my @vals = $stat->netstats('eth0', @keys);  # the values for the passed device and @keys
-    my $val  = $stat->netstats('eth0', $key);   # the value for the passed device and key
-
-Sorted ...
-
-    my @dev  = sort $stat->netstats;
-    my @keys = sort $stat->netstats('eth0');
-
-=head2 pstop()
-
-This method is looking for top processes and returns a sorted list of PIDs as an array or
-array reference depending on the context. It expected two values: a key name and the number
-of top processes to return.
-
-As example you want to get the top 5 processes with the highest cpu usage:
-
-    my @top5 = $stat->pstop( ttime => 5 );
-    # or as a reference
-    my $top5 = $stat->pstop( ttime => 5 );
-
-If you want to get all processes:
-
-    my @top_all = $stat->pstop( ttime => $FALSE );
-    # or just
-    my @top_all = $stat->pstop( 'ttime' );
-
-=head2 search(), psfind()
-
-Both methods provides a simple scan engine to find special statistics. Both methods except a filter
-as a hash reference. It's possible to pass the statistics as second argument if the data is not stored
-in the object.
-
-The method C<search()> scans for statistics and rebuilds the hash tree until that keys that matched
-your filter and returns the hits as a hash reference.
-
-    my $hits = $stat->search({
-        processes => {
-            cmd   => qr/\[su\]/,
-            owner => qr/root/
-        },
-        cpustats => {
-            idle   => 'lt:10',
-            iowait => 'gt:10'
-        },
-        diskusage => {
-            '/dev/sda1' => {
-                usageper => 'gt:80'
-            }
-        }
-    });
-
-This would return the following matches:
-
-    * processes with the command "[su]"
-    * processes with the owner "root"
-    * all cpu where "idle" is less than 50
-    * all cpu where "iowait" is grather than 10
-    * only disk '/dev/sda1' if "usageper" is grather than 80
-
-The method C<psfind()> scans for processes only and returns a array reference with all process
-IDs that matched the filter. Example:
-
-    my $pids = $stat->psfind({ cmd => qr/init/, owner => 'eq:apache' });
-
-This would return the following process ids:
-
-    * processes that matched the command "init"
-    * processes with the owner "apache"
-
-There are different match operators available:
-
-    gt  -  grather than
-    lt  -  less than
-    eq  -  is equal
-    ne  -  is not equal
-
-Notation examples:
-
-    gt:50
-    lt:50
-    eq:50
-    ne:50
-
-Both argumnents have to be set as a hash reference.
-
-Note: the operators < > = ! are not available any more. It's possible that in further releases
-could be different changes for C<search()> and C<psfind()>. So please take a look to the
-documentation if you use it.
-
-=head1 EXPORTS
-
-Nothing.
-
-=head1 SEE ALSO
-
-=over
-
-=item *
-
-B<proc(5)>
-
-=item *
-
-L<Linux::Info>
-
-=back
-
-=head1 AUTHOR
-
-Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 of Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
-
-This file is part of Linux Info project.
-
-Linux-Info is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Linux-Info is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Linux Info.  If not, see <http://www.gnu.org/licenses/>.
-
-=cut
 
 # Creating the statistics accessors
 BEGIN {
@@ -434,3 +215,224 @@ sub _compare {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Linux::Info::Compilation - Statistics compilation.
+
+=head1 VERSION
+
+version 2.11
+
+=head1 SYNOPSIS
+
+    use Linux::Info;
+
+    my $lxs  = Linux::Info->new( loadavg => 1 );
+    my $stat = $lxs->get;
+
+    foreach my $key ($stat->loadavg) {
+        print $key, " ", $stat->loadavg($key), "\n";
+    }
+
+    # or
+
+    use Linux::Info::LoadAVG;
+    use Linux::Info::Compilation;
+
+    my $lxs  = Linux::Info::LoadAVG->new();
+    my $load = $lxs->get;
+    my $stat = Linux::Info::Compilation->new({ loadavg => $load });
+
+    foreach my $key ($stat->loadavg) {
+        print $key, " ", $stat->loadavg($key), "\n";
+    }
+
+    # or
+
+    foreach my $key ($stat->loadavg) {
+        print $key, " ", $stat->loadavg->{$key}, "\n";
+    }
+
+=head1 DESCRIPTION
+
+This module provides different methods to access and filter the statistics compilation.
+
+=head1 METHODS
+
+=head2 new()
+
+Create a new C<Linux::Info::Compilation> object. This creator is only useful if you
+don't call C<get()> of C<Linux::Info>. You can create a new object with:
+
+    my $lxs  = Linux::Info::LoadAVG->new();
+    my $load = $lxs->get;
+    my $stat = Linux::Info::Compilation->new({ loadavg => $load });
+
+=head2 Statistic methods
+
+=over
+
+=item sysinfo()
+
+=item cpustats()
+
+=item procstats()
+
+=item memstats()
+
+=item pgswstats()
+
+=item netstats()
+
+=item netinfo()
+
+C<netinfo()> provides raw data - no deltas.
+
+=item sockstats()
+
+=item diskstats()
+
+=item diskusage()
+
+=item loadavg()
+
+=item filestats()
+
+=item processes()
+
+=back
+
+All methods returns the statistics as a hash reference in scalar context. In list all methods
+returns the first level keys of the statistics. Example:
+
+    my $net  = $stat->netstats;                 # netstats as a hash reference
+    my @dev  = $stat->netstats;                 # the devices eth0, eth1, ...
+    my $eth0 = $stat->netstats('eth0');         # eth0 statistics as a hash reference
+    my @keys = $stat->netstats('eth0');         # the statistic keys
+    my @vals = $stat->netstats('eth0', @keys);  # the values for the passed device and @keys
+    my $val  = $stat->netstats('eth0', $key);   # the value for the passed device and key
+
+Sorted ...
+
+    my @dev  = sort $stat->netstats;
+    my @keys = sort $stat->netstats('eth0');
+
+=head2 pstop()
+
+This method is looking for top processes and returns a sorted list of PIDs as an array or
+array reference depending on the context. It expected two values: a key name and the number
+of top processes to return.
+
+As example you want to get the top 5 processes with the highest cpu usage:
+
+    my @top5 = $stat->pstop( ttime => 5 );
+    # or as a reference
+    my $top5 = $stat->pstop( ttime => 5 );
+
+If you want to get all processes:
+
+    my @top_all = $stat->pstop( ttime => $FALSE );
+    # or just
+    my @top_all = $stat->pstop( 'ttime' );
+
+=head2 search(), psfind()
+
+Both methods provides a simple scan engine to find special statistics. Both methods except a filter
+as a hash reference. It's possible to pass the statistics as second argument if the data is not stored
+in the object.
+
+The method C<search()> scans for statistics and rebuilds the hash tree until that keys that matched
+your filter and returns the hits as a hash reference.
+
+    my $hits = $stat->search({
+        processes => {
+            cmd   => qr/\[su\]/,
+            owner => qr/root/
+        },
+        cpustats => {
+            idle   => 'lt:10',
+            iowait => 'gt:10'
+        },
+        diskusage => {
+            '/dev/sda1' => {
+                usageper => 'gt:80'
+            }
+        }
+    });
+
+This would return the following matches:
+
+    * processes with the command "[su]"
+    * processes with the owner "root"
+    * all cpu where "idle" is less than 50
+    * all cpu where "iowait" is grather than 10
+    * only disk '/dev/sda1' if "usageper" is grather than 80
+
+The method C<psfind()> scans for processes only and returns a array reference with all process
+IDs that matched the filter. Example:
+
+    my $pids = $stat->psfind({ cmd => qr/init/, owner => 'eq:apache' });
+
+This would return the following process ids:
+
+    * processes that matched the command "init"
+    * processes with the owner "apache"
+
+There are different match operators available:
+
+    gt  -  grather than
+    lt  -  less than
+    eq  -  is equal
+    ne  -  is not equal
+
+Notation examples:
+
+    gt:50
+    lt:50
+    eq:50
+    ne:50
+
+Both argumnents have to be set as a hash reference.
+
+Note: the operators < > = ! are not available any more. It's possible that in further releases
+could be different changes for C<search()> and C<psfind()>. So please take a look to the
+documentation if you use it.
+
+=head1 EXPORTS
+
+Nothing.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+B<proc(5)>
+
+=item *
+
+L<Linux::Info>
+
+=back
+
+=head1 AUTHOR
+
+Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by Alceu Rodrigues de Freitas Junior.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

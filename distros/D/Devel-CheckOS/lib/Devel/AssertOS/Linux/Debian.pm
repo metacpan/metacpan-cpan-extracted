@@ -7,11 +7,11 @@ no warnings 'redefine';
 
 our $VERSION = '1.2';
 
-sub matches { map { "Linux::$_" } qw(Raspbian Ubuntu RealDebian UnknownDebianLike Devuan) }
+sub matches { map { "Linux::$_" } qw(Raspbian Ubuntu RealDebian UnknownDebianLike Devuan Elementary) }
 
 sub os_is { Devel::CheckOS::os_is(matches()) }
 
-sub expn { "The operating system is some derivative of Debian Linux (see Linux::RealDebian for *actual* Debian Linux)" }
+sub expn { "The distribution is some derivative of Debian Linux (see Linux::RealDebian for *actual* Debian Linux)" }
 
 Devel::CheckOS::die_unsupported() unless(os_is());
 

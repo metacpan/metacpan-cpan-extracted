@@ -1,0 +1,6 @@
+NAME=NixOS
+ID=nixos
+VERSION="16.09pre85639.453086a (Flounder)"
+VERSION_ID="16.09pre85639.453086a"
+PRETTY_NAME="NixOS 16.09pre85639.453086a (Flounder)"
+HOME_URL="http://nixos.org/"

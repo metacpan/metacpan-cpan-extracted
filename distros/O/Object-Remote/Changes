@@ -1,5 +1,9 @@
 Revision history for Object-Remote
 
+0.004004 - 2024-05-23
+  - fix Future::PP not being available when needed on remote side
+  - fix tests to work without . in @INC
+
 0.004003 - 2024-05-21
   - update git repository in metadata
 

@@ -10,7 +10,7 @@ use File::Spec;
 
 use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS %OS_ALIASES);
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(
@@ -133,7 +133,11 @@ sub os_is {
 
         die("Devel::CheckOS: $target isn't a legal OS name\n")
             unless($target =~ /^\w+(::\w+)*$/);
-        eval "use Devel::AssertOS::$target";
+
+        $@ = undef;
+        if(! "Devel::AssertOS::$target"->can('os_is')) {
+            eval "use Devel::AssertOS::$target";
+        }
         if(!$@) {
             no strict 'refs';
             $rval = 1 if(&{"Devel::AssertOS::${target}::os_is"}());
@@ -376,6 +380,9 @@ Thanks to Graham Knop for fixing a build bug on perl 5.8.
 
 Thanks to Alceu Rodrigues de Freitas Junior for improving Ubuntu detection
 and providing a way to detect a lot more Linux variants.
+
+Thanks to Leos Stejskal for https://github.com/stejskalleos/os_release from
+which I got many sample /etc/os-release files.
 
 =head1 SOURCE CODE REPOSITORY
 

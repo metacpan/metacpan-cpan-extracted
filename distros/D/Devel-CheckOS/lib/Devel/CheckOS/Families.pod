@@ -36,21 +36,29 @@ and user groups.  Permissions may not be supported on all filesystems.
 This includes both ordinary Linux and Android. Plain old Linux will
 match 'Linux'. Android will match both that and 'Android'.
 
+A word of warning - there are a vast number of Linux derivatives, and
+I will never detect every single one of them. Most Linux derivatives
+will only match 'Linux'.
+
 =head1 THE Linux::Debian FAMILY
 
-Up until version 1.84 this wasn't a family, and would match any platform
-which claimed to be Debian via C<lsb_release -i> or on which a file called
-C</etc/debian_version> existed. That meant that as well as matching real
-Debian, it would also match Ubuntu, Raspbian, and so on. As of version 1.85
-C<Linux::Debian> has become a family of all the Debian-based Linuxes. If
+C<Linux::Debian> is the family of all the Debian-based Linuxes. If
 you want to test which particular family member you're on then look at
 C<list_family_members("Linux::Debian")> to see what's available.
 
-NB the difference between C<Linux::RealDebian> (which uses C<lsb_release>
+Note the difference between C<Linux::RealDebian> (which uses C</etc/os-release>
 for identification) and C<Linux::UnknownDebianLike> (which uses the
 existence of C</etc/debian_version> for identification). In particular
-beware that some *very* old Debians don't have C<lsb_release> available
+beware that some *very* old Debians don't have C</etc/os-release> available
 and so will be detected as C<Linux::UnknownDebianLike>.
+
+It is likely that C<Linux::Ubuntu> will in the future turn into a family.
+
+=head1 THE Linux::Redhat and Linux::SUSE FAMILIES
+
+Both Redhat and SUSE come in multiple flavours, some commercial and
+some open-source. In particular note that Oracle Linux is a Redhat
+derivative.
 
 =head1 THE MicrosoftWindows FAMILY
 

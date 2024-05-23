@@ -15,6 +15,7 @@ lib/Rope/Monkey.pm
 lib/Rope/Object.pm
 lib/Rope/Role.pm
 lib/Rope/Type.pm
+lib/Rope/Variant.pm
 Makefile.PL
 MANIFEST			This list of files
 META.json			Module JSON meta-data (added by MakeMaker)
@@ -73,6 +74,8 @@ t/48-string.t
 t/49-number.t
 t/50-counter.t
 t/51-bool.t
+t/52-variant.t
+t/53-variant-alias.t
 t/lib/Custom.pm
 t/lib/One.pm
 t/lib/Role.pm

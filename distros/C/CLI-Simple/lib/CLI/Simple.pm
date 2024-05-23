@@ -15,7 +15,7 @@ use Pod::Usage;
 use CLI::Simple::Constants qw(:booleans :chars :log-levels);
 use CLI::Simple::Utils qw(normalize_options);
 
-our $VERSION = '0.0.5';
+our $VERSION = '0.0.6';
 
 use parent qw(Class::Accessor::Fast Exporter);
 

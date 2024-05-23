@@ -1,3 +1,10 @@
+Wed May 22 07:37:11 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.0.6]:
+	* VERSION: bump
+	* requires: List::Util 1.56
+	* autotools/ax_requirements_check.m4: likewise
+
 Tue May 21 16:43:42 2024  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.0.5]:

@@ -3,27 +3,139 @@ use warnings;
 use strict;
 use Hash::Util qw(lock_keys);
 use Carp       qw(confess);
-use parent 'Class::Accessor';
-
 use Regexp::Common 2017060201;
 use Set::Tiny 0.04;
+use Class::XSAccessor getters => {
+    get_init_file            => 'init_file',
+    get_source_file          => 'source_file',
+    get_backwards_compatible => 'backwards_compatible',
+    get_global_block_size    => 'global_block_size',
+    get_block_sizes          => 'block_sizes',
+    get_current_kernel       => 'current_kernel'
+};
 
 use Linux::Info::KernelRelease;
 
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.11'; # VERSION
 
-my @_attribs = (
-    'init_file',            'source_file',
-    'backwards_compatible', 'global_block_size',
-    'block_sizes',          'current_kernel'
-);
+# ABSTRACT: Configuration for Linux::Info::DiskStats instances.
 
-__PACKAGE__->follow_best_practice;
-__PACKAGE__->mk_ro_accessors(@_attribs);
+
+sub new {
+    my ( $class, $opts_ref ) = @_;
+    my $self = {
+        global_block_size => undef,
+        block_sizes       => undef,
+        source_file       => undef,
+        init_file         => undef,
+        current_kernel    => undef,
+    };
+
+    if ( defined($opts_ref) ) {
+        confess 'The options reference must be a hash reference'
+          unless ( ref $opts_ref eq 'HASH' );
+    }
+
+    my $valid_keys = Set::Tiny->new(
+        (
+            'init_file',            'source_file',
+            'backwards_compatible', 'global_block_size',
+            'block_sizes',          'current_kernel'
+        )
+    );
+
+    foreach my $key ( keys %{$opts_ref} ) {
+        confess "The key $key in the hash reference is not valid"
+          unless ( $valid_keys->has($key) );
+    }
+
+    if ( ( exists $opts_ref->{backwards_compatible} )
+        and defined( $opts_ref->{backwards_compatible} ) )
+    {
+        $self->{backwards_compatible} = $opts_ref->{backwards_compatible};
+    }
+    else {
+        $self->{backwards_compatible} = 1;
+    }
+
+    if ( $self->{backwards_compatible} ) {
+        confess
+'Must setup global_block_size or block_sizes unless backwards_compatible is disabled'
+          unless ( ( exists $opts_ref->{global_block_size} )
+            or ( exists $opts_ref->{block_sizes} ) );
+
+        my $int_regex = qr/^$RE{num}->{int}$/;
+
+        if ( exists $opts_ref->{global_block_size} ) {
+            confess 'global_block_size must have an integer as value'
+              unless ( ( defined( $opts_ref->{global_block_size} ) )
+                and ( $opts_ref->{global_block_size} =~ $int_regex ) );
+
+            $self->{global_block_size} = $opts_ref->{global_block_size};
+        }
+
+        if ( exists $opts_ref->{block_sizes} ) {
+            confess 'block_sizes must be a hash reference'
+              unless ( ( defined $opts_ref->{block_sizes} )
+                and ( ref $opts_ref->{block_sizes} eq 'HASH' ) );
+
+            confess 'block_sizes must have at least one disk'
+              unless ( ( scalar( keys %{ $opts_ref->{block_sizes} } ) ) > 0 );
+
+            foreach my $disk ( keys %{ $opts_ref->{block_sizes} } ) {
+                confess 'block size must be an integer'
+                  unless ( $opts_ref->{block_sizes}->{$disk} =~ $int_regex );
+                $opts_ref->{block_sizes}->{$disk} =
+                  $opts_ref->{block_sizes}->{$disk};
+            }
+        }
+
+    }
+
+    my @files_to_test = qw(init_file source_file);
+
+    foreach my $source_file (@files_to_test) {
+        if (    ( exists $opts_ref->{$source_file} )
+            and ( defined $opts_ref->{$source_file} ) )
+        {
+            confess 'the source file '
+              . $opts_ref->{$source_file}
+              . ' does not exist'
+              unless ( -r $opts_ref->{$source_file} );
+
+            $self->{$source_file} = $opts_ref->{$source_file};
+        }
+    }
+
+    if (    ( exists $opts_ref->{current_kernel} )
+        and ( defined $opts_ref->{current_kernel} ) )
+    {
+        $self->{current_kernel} =
+          Linux::Info::KernelRelease->new( $opts_ref->{current_kernel} );
+    }
+
+    bless $self, $class;
+    lock_keys( %{$self} );
+    return $self;
+}
+
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 Linux::Info::DiskStats::Options - Configuration for Linux::Info::DiskStats instances.
+
+=head1 VERSION
+
+version 2.11
 
 =head1 SYNOPSIS
 
@@ -105,100 +217,6 @@ Regarding block sizes, you must choose one key or the other if
 C<backwards_compatible> is true. If both are absent, instances will C<die>
 during creation by invoking C<new>.
 
-=cut
-
-sub new {
-    my ( $class, $opts_ref ) = @_;
-    my $self = {
-        global_block_size => undef,
-        block_sizes       => undef,
-        source_file       => undef,
-        init_file         => undef,
-        current_kernel    => undef,
-    };
-
-    if ( defined($opts_ref) ) {
-        confess 'The options reference must be a hash reference'
-          unless ( ref $opts_ref eq 'HASH' );
-    }
-
-    my $valid_keys = Set::Tiny->new(@_attribs);
-
-    foreach my $key ( keys %{$opts_ref} ) {
-        confess "The key $key in the hash reference is not valid"
-          unless ( $valid_keys->has($key) );
-    }
-
-    if ( ( exists $opts_ref->{backwards_compatible} )
-        and defined( $opts_ref->{backwards_compatible} ) )
-    {
-        $self->{backwards_compatible} = $opts_ref->{backwards_compatible};
-    }
-    else {
-        $self->{backwards_compatible} = 1;
-    }
-
-    if ( $self->{backwards_compatible} ) {
-        confess
-'Must setup global_block_size or block_sizes unless backwards_compatible is disabled'
-          unless ( ( exists $opts_ref->{global_block_size} )
-            or ( exists $opts_ref->{block_sizes} ) );
-
-        my $int_regex = qr/^$RE{num}->{int}$/;
-
-        if ( exists $opts_ref->{global_block_size} ) {
-            confess 'global_block_size must have an integer as value'
-              unless ( ( defined( $opts_ref->{global_block_size} ) )
-                and ( $opts_ref->{global_block_size} =~ $int_regex ) );
-
-            $self->{global_block_size} = $opts_ref->{global_block_size};
-        }
-
-        if ( exists $opts_ref->{block_sizes} ) {
-            confess 'block_sizes must be a hash reference'
-              unless ( ( defined $opts_ref->{block_sizes} )
-                and ( ref $opts_ref->{block_sizes} eq 'HASH' ) );
-
-            confess 'block_sizes must have at least one disk'
-              unless ( ( scalar( keys %{ $opts_ref->{block_sizes} } ) ) > 0 );
-
-            foreach my $disk ( keys %{ $opts_ref->{block_sizes} } ) {
-                confess 'block size must be an integer'
-                  unless ( $opts_ref->{block_sizes}->{$disk} =~ $int_regex );
-                $opts_ref->{block_sizes}->{$disk} =
-                  $opts_ref->{block_sizes}->{$disk};
-            }
-        }
-
-    }
-
-    my @files_to_test = qw(init_file source_file);
-
-    foreach my $source_file (@files_to_test) {
-        if (    ( exists $opts_ref->{$source_file} )
-            and ( defined $opts_ref->{$source_file} ) )
-        {
-            confess 'the source file '
-              . $opts_ref->{$source_file}
-              . ' does not exist'
-              unless ( -r $opts_ref->{$source_file} );
-
-            $self->{$source_file} = $opts_ref->{$source_file};
-        }
-    }
-
-    if (    ( exists $opts_ref->{current_kernel} )
-        and ( defined $opts_ref->{current_kernel} ) )
-    {
-        $self->{current_kernel} =
-          Linux::Info::KernelRelease->new( $opts_ref->{current_kernel} );
-    }
-
-    bless $self, $class;
-    lock_keys( %{$self} );
-    return $self;
-}
-
 =head2 get_init_file
 
 Getter for the C<init_file> attribute.
@@ -235,8 +253,6 @@ Getter for the C<current_kernel> attribute.
 
 It will return C<undef> if the property wasn't defined.
 
-=cut
-
 =head1 SEE ALSO
 
 =over
@@ -253,28 +269,14 @@ L<Linux::Info::KernelRelease>
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
+Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 of Alceu Rodrigues de Freitas Junior,
-E<lt>glasswalk3r@yahoo.com.brE<gt>
+This software is Copyright (c) 2015 by Alceu Rodrigues de Freitas Junior.
 
-This file is part of Linux Info project.
+This is free software, licensed under:
 
-Linux-Info is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Linux-Info is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Linux Info. If not, see <http://www.gnu.org/licenses/>.
+  The GNU General Public License, Version 3, June 2007
 
 =cut
-
-1;

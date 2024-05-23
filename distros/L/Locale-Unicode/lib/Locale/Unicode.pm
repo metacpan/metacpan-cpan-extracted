@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.1.3
+## Version v0.1.4
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2024/05/21
+## Modified 2024/05/23
 ## All rights reserved
 ## 
 ## 
@@ -304,7 +304,7 @@ BEGIN
     )?
     /xi;
     our $PROP_TO_SUB = {};
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.1.4';
 };
 
 use strict;
@@ -595,6 +595,13 @@ sub calendar { return( shift->reset(@_)->_set_get( 'calendar', @_ ) ); }
 # u-cf
 sub cf { return( shift->cu_format( @_ ) ); }
 
+sub clone
+{
+    my $self = shift( @_ );
+    my $new = $self->new( "$self" ) || return( $self->pass_error );
+    return( $new );
+}
+
 # u-co
 sub co { return( shift->collation( @_ ) ); }
 
@@ -619,7 +626,8 @@ sub colCaseLevel { return( shift->reset(@_)->_set_get({
 # u-kf
 sub colCaseFirst { return( shift->reset(@_)->_set_get({
     field => 'col_case_first',
-    type => 'boolean',
+    # lower, upper, undef
+    regexp => qr/[[:alnum:]]+/,
 }, @_ ) ); }
 
 # u-co
@@ -1232,7 +1240,7 @@ sub _set_get
                 return( $self->error( "Invalid value provided for \"${field}\": ${val}" ) );
             }
             elsif( defined( $type ) &&
-                $type eq 'boolean' )
+                   $type eq 'boolean' )
             {
                 $val = lc( $val );
                 if( $val =~ /^(?:yes|no)$/ )
@@ -3346,7 +3354,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.1.3
+    v0.1.4
 
 =head1 DESCRIPTION
 
@@ -3447,6 +3455,12 @@ See the section on L</"BCP47 EXTENSIONS"> for the proper values.
 
 This is an alias for L</cu_format>
 
+=head2 clone
+
+Clones the current object and returns the newly instantiated copy.
+
+If an error occurs, this sets an L<exception object|Locale::Unicode::Exception> and returns C<undef> in scalar context, and an empty list in list context.
+
 =head2 co
 
     my $locale = Locale::Unicode->new( 'de' );
@@ -3490,7 +3504,13 @@ See L</"Collation Options"> for more information.
 
 =head2 colCaseFirst
 
+    $locale->colCaseFirst( undef ); # false (default)
+    $locale->colCaseFirst( 'upper' );
+    $locale->colCaseFirst( 'lower' );
+
 Sets or gets the Unicode extension C<kf>
+
+See L</"Collation Options"> for more information.
 
 =head2 colCaseLevel
 
@@ -8387,7 +8407,7 @@ Possible L<values|https://github.com/unicode-org/cldr/blob/5ae2965c8afed18f89f54
 
 Sets collation parameter key for ordering by case.
 
-If set to upper, causes upper case to sort before lower case. If set to lower, causes lower case to sort before upper case.
+If set to C<upper>, causes upper case to sort before lower case. If set to C<lower>, causes lower case to sort before upper case.
 
 Possible L<values|https://github.com/unicode-org/cldr/blob/5ae2965c8afed18f89f54195db72205aa5b6fc3a/common/bcp47/collation.xml#L49> are: C<upper>, C<lower>, C<false> (default) or C<no>
 
@@ -8530,6 +8550,8 @@ L<BCP47|https://www.rfc-editor.org/rfc/bcp/bcp47.txt>
 L<RFC6067 on the Unicode extensions|https://datatracker.ietf.org/doc/html/rfc6067>
 
 L<RFC6497 on the transformation extension|https://datatracker.ietf.org/doc/html/rfc6497>
+
+See L<HTML::Object::Locale> for an implementation of Web API class L<Intl.Locale|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale>
 
 L<Unicode::Collate>, L<Unicode::Collate::Locale>, L<Unicode::Unihan>
 

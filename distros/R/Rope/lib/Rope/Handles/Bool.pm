@@ -28,7 +28,7 @@ Rope::Handles::Bool - Rope handles booleans
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =cut
 

@@ -1,3 +1,7 @@
+2.04    2024-05-22
+
+- Add detection for a load of Linux distributions
+
 2.03    2024-05-19
 
 - Temporarily skip os-release tests because they don't work on Redhat. The fix is

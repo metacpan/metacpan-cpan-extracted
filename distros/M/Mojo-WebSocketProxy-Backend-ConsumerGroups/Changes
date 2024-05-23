@@ -1,20 +1,24 @@
 Revision History for ConsumerGroups
 
-0.06      2024-03-28 06:16:44+00:00 UTC
-        Allow timeout to be extended vs published deadline
+0.07      2024-05-22 10:10:38+00:00 UTC
 
+0.07      2024-05-21 12:30:18+00:00 UTC
+          Allow send method to be replaced with a hook
 
-0.05    2023-11-07 07:54:26+00:00 UTC
-        Pass log context to redis streams message
+0.06      2024-03-28 11:52:48+00:00 UTC
+          Allow timeout to be extended vs published deadline
 
-0.04    2023-08-28 11:13:42+00:00 UTC
-        new feature for logging trace
+0.05      2023-11-07 07:54:26+00:00 UTC
+          Pass log context to redis streams message
 
-0.03    2023-08-18 04:18:42+00:00 UTC
-        other changes
+0.04      2023-08-28 11:13:42+00:00 UTC
+          new feature for logging trace
+
+0.03      2023-08-18 04:18:42+00:00 UTC
+          other changes
 
 0.02      2023-02-23 04:18:42+00:00 UTC
-        Rename msg_group to category
+          Rename msg_group to category
 
-0.01    2022-04-26 19:12:18:01+00:00 UTC
-        Extract Mojo::WebSocketProxy::Backend::ConsumerGroups from Mojo::WebSocketProxy package.
+0.01      2022-04-26 19:12:18:01+00:00 UTC
+          Extract Mojo::WebSocketProxy::Backend::ConsumerGroups from Mojo::WebSocketProxy package.

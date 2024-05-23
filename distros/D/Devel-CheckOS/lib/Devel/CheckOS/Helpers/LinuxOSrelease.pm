@@ -1,9 +1,11 @@
-package Devel::AssertOS::OSFeatures::Release;
+package Devel::CheckOS::Helpers::LinuxOSrelease;
 
 use strict;
 use warnings;
-use File::Spec;
 use parent 'Exporter';
+
+use Cwd;
+use File::Spec;
 
 our $VERSION   = '1.0';
 our @EXPORT_OK = qw(distributor_id);
@@ -12,11 +14,11 @@ our @EXPORT_OK = qw(distributor_id);
 
 =head1 NAME
 
-Devel::AssertOS::OSFeatures::Release - functions to manipulate os-release file
+Devel::CheckOS::Helpers::LinuxOSrelease - functions to deal with /etc/os-release file
 
 =head1 SYNOPSIS
 
-    use Devel::AssertOS::OSFeatures::Release 'distributor_id';
+    use Devel::CheckOS::Helpers::LinuxOSrelease 'distributor_id';
     my $id = distributor_id;
 
 =head1 DESCRIPTION
@@ -51,25 +53,23 @@ specified above.
 
 =cut
 
-sub distributor_id {
-    my $filename  = 'os-release';
-    my $file_path = File::Spec->catfile( ( '', 'etc' ), $filename );
-    my $regex     = qr/^ID\=(\w+)/;
-    my $dist_id   = undef;
+my $file_path = File::Spec->catfile('', 'etc', 'os-release');
 
+sub _set_file { $file_path = File::Spec->catfile(getcwd, @_); }
+
+sub distributor_id {
     if ( -r $file_path ) {
         open my $in, '<', $file_path or die "Cannot read $file_path: $!";
         while (<$in>) {
             chomp;
-            if ( $_ =~ $regex ) {
-                $dist_id = ucfirst(lc $1) if (defined($1));
-                last;
+            if ( $_ =~ /^ID=["']?(.+?)(["']|$)/ ) {
+                return $1;
             }
         }
         close($in) or die "Cannot close $file_path: $!";
     }
 
-    return $dist_id;
+    return undef;
 }
 
 =head1 COPYRIGHT and LICENCE

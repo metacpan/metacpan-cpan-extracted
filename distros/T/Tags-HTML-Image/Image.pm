@@ -6,9 +6,10 @@ use warnings;
 
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
+use Mo::utils::CSS 0.02 qw(check_css_class);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -47,6 +48,8 @@ sub new {
 
 	# Process params.
 	set_params($self, @{$object_params_ar});
+
+	check_css_class($self, 'css_class');
 
 	# Check callback codes.
 	$self->_check_callback('img_comment_cb');
@@ -413,6 +416,11 @@ Returns undef.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+         From Mo::utils::CSS::check_css_class():
+                 Parameter 'css_class' has bad CSS class name.
+                         Value: %s
+                 Parameter 'css_class' has bad CSS class name (number on begin).
+                         Value: %s
          From Tags::HTML::new():
                  Parameter 'css' must be a 'CSS::Struct::Output::*' class.
                  Parameter 'tags' must be a 'Tags::Output::*' class.
@@ -620,6 +628,7 @@ Returns undef.
 
 L<Class::Utils>,
 L<Error::Pure>,
+L<Mo::utils::CSS>,
 L<Scalar::Util>,
 L<Tags::HTML>.
 
@@ -641,6 +650,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

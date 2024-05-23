@@ -18,7 +18,7 @@ use parent qw(Mojo::WebSocketProxy::Backend);
 
 no indirect;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 __PACKAGE__->register_type('consumer_groups');
 
@@ -88,6 +88,7 @@ sub call_rpc {
     my $before_get_rpc_response_hooks = delete($req_storage->{before_get_rpc_response}) || [];
     my $after_got_rpc_response_hooks  = delete($req_storage->{after_got_rpc_response})  || [];
     my $before_call_hooks             = delete($req_storage->{before_call})             || [];
+    my $send_func                     = delete($req_storage->{send_func})               || (sub { $c->send(@_); });
     my $rpc_failure_cb                = delete($req_storage->{rpc_failure_cb});
     my $rpc_timeout_extend_offset     = delete($req_storage->{rpc_timeout_extend_offset});
     my $rpc_timeout_extend_percentage = delete($req_storage->{rpc_timeout_extend_percentage});
@@ -134,13 +135,13 @@ sub call_rpc {
 
                 return Future->done if $block_response;
                 $api_response = $c->wsp_error($msg_type, 'CallError', 'Sorry, an error occurred while processing your request.');
-                $c->send({json => $api_response}, $req_storage);
+                $send_func->({json => $api_response}, $req_storage);
                 return Future->done;
             }
 
             $api_response = $rpc_response_cb->($result->result);
             return Future->done if $block_response || !$api_response;
-            $c->send({json => $api_response}, $req_storage);
+            $send_func->({json => $api_response}, $req_storage);
 
             return Future->done;
         }
@@ -165,7 +166,7 @@ sub call_rpc {
 
             return Future->done if $block_response || !$api_response;
 
-            $c->send({json => $api_response}, $req_storage);
+            $send_func->({json => $api_response}, $req_storage);
         })->retain;
 
     return;
@@ -306,7 +307,7 @@ Mojo::WebSocketProxy::Backend::ConsumerGroups - Class for communication with bac
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 

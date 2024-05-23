@@ -5,14 +5,19 @@ use strict;
 use warnings;
 no warnings 'redefine';
 
-our $VERSION = '1.0';
+use Devel::CheckOS::Helpers::LinuxOSrelease 'distributor_id';
+
+our $VERSION = '1.1';
 
 sub os_is {
+    my $id = distributor_id;
+
     Devel::CheckOS::os_is('Linux') &&
-    `lsb_release -i 2>/dev/null` =~ /Debian/
+    defined($id) &&
+    $id eq 'debian';
 }
 
-sub expn { "The operating system is real Debian, recent enough to have \`lsb_release\`, and not some Debian derivative" }
+sub expn { "The Linux distribution is real Debian, recent enough to have \`/etc/os-release\`, and not some Debian derivative" }
 
 Devel::CheckOS::die_unsupported() unless(os_is());
 

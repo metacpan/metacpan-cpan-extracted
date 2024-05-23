@@ -6,11 +6,127 @@ use Set::Tiny 0.04;
 use Filesys::Df 0.92;
 use Hash::Util 'lock_keys';
 
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.11'; # VERSION
+
+# ABSTRACT: Collect linux disk usage.
+
+
+sub new {
+    my ( $class, $opts_ref, $has_inode ) = @_;
+    my $valids_ref = Linux::Info::DiskUsage->default_fs;
+
+    if ( defined($opts_ref) ) {
+        croak 'Additional file system names must be given as an array reference'
+          unless ( ref($opts_ref) eq 'ARRAY' );
+
+        foreach my $type ( @{$opts_ref} ) {
+            push( @{$valids_ref}, $type );
+        }
+
+    }
+    my %self = (
+        fstypes   => Set::Tiny->new( @{$valids_ref} ),
+        has_inode => $has_inode || 0
+    );
+    my $self = bless \%self, $class;
+    return lock_keys( %{$self} );
+}
+
+
+sub get {
+    my $self          = shift;
+    my $mount_entries = $self->_read;
+    my %disk_usage;
+
+    foreach my $entry ( @{$mount_entries} ) {
+        my $ref  = df( $entry->[1] );
+        my %info = (
+            total      => $ref->{user_blocks} || '-',
+            usage      => $ref->{used}        || '-',
+            mountpoint => $entry->[1]         || '-',
+            free       => $ref->{bfree}       || '-',
+            usageper   => $ref->{per}         || '-'
+        );
+
+        if ( $self->{has_inode} ) {
+            my @inode_keys = (qw(files ffree favail fused fper));
+            if ( exists( $ref->{files} ) ) {
+                foreach my $key (@inode_keys) {
+                    $info{$key} = $ref->{$key};
+                }
+            }
+            else {
+                foreach my $key (@inode_keys) {
+                    $info{$key} = '-';
+                }
+            }
+        }
+
+        $disk_usage{ $entry->[0] } = \%info;
+    }
+    return \%disk_usage;
+}
+
+
+sub default_fs {
+    return [qw(devtmpfs tmpfs ext2 ext3 ext4 fuseblk xfs)];
+}
+
+sub _is_valid {
+    my ( $self, $fs_type ) = @_;
+    croak 'file system type must be defined' unless ( defined($fs_type) );
+    return $self->{fstypes}->has($fs_type);
+}
+
+# strongly based on Linux::Proc::Mounts module, but much more restricted
+# in terms of information accepted and provided
+sub _read {
+    my $self = shift;
+    my $mnt  = "/proc";
+    croak "$mnt is not a proc filesystem"
+      unless -d $mnt and ( stat _ )[12] == 0;
+    my $file = "$mnt/mounts";
+    open my $fh, '<', $file
+      or croak "Unable to open '$file': $!";
+    my @entries;
+
+    while ( local $_ = <$fh> ) {
+        chomp;
+        my @entry = split;
+
+        if ( @entry != 6 ) {
+            warn "invalid number of entries in $file line $.";
+            next;
+        }
+
+        $#entry = 3;    # ignore the two dummy values at the end
+        s/\\([0-7]{1,3})/chr oct $1/g for @entry;
+
+        # fs_spec and fs_file are returned as an entry
+        push( @entries, [ $entry[0], $entry[1] ] )
+          if $self->_is_valid( $entry[2] );
+    }
+
+    close($file);
+    return \@entries;
+}
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 Linux::Info::DiskUsage - Collect linux disk usage.
+
+=head1 VERSION
+
+version 2.11
 
 =head1 SYNOPSIS
 
@@ -100,29 +216,6 @@ extended options from it. This might change in future implementations, but for
 now you need to create an instance from Linux::Info::DiskUsage directly from
 C<new>.
 
-=cut
-
-sub new {
-    my ( $class, $opts_ref, $has_inode ) = @_;
-    my $valids_ref = Linux::Info::DiskUsage->default_fs;
-
-    if ( defined($opts_ref) ) {
-        croak 'Additional file system names must be given as an array reference'
-          unless ( ref($opts_ref) eq 'ARRAY' );
-
-        foreach my $type ( @{$opts_ref} ) {
-            push( @{$valids_ref}, $type );
-        }
-
-    }
-    my %self = (
-        fstypes   => Set::Tiny->new( @{$valids_ref} ),
-        has_inode => $has_inode || 0
-    );
-    my $self = bless \%self, $class;
-    return lock_keys( %{$self} );
-}
-
 =head2 get()
 
 Call C<get()> to get the statistics. C<get()> returns the statistics as a hash
@@ -133,93 +226,12 @@ reference.
 The hash reference will have keys and values as described in
 B<DISK USAGE INFORMATIONS> section.
 
-=cut
-
-sub get {
-    my $self          = shift;
-    my $mount_entries = $self->_read;
-    my %disk_usage;
-
-    foreach my $entry ( @{$mount_entries} ) {
-        my $ref  = df( $entry->[1] );
-        my %info = (
-            total      => $ref->{user_blocks} || '-',
-            usage      => $ref->{used}        || '-',
-            mountpoint => $entry->[1]         || '-',
-            free       => $ref->{bfree}       || '-',
-            usageper   => $ref->{per}         || '-'
-        );
-
-        if ( $self->{has_inode} ) {
-            my @inode_keys = (qw(files ffree favail fused fper));
-            if ( exists( $ref->{files} ) ) {
-                foreach my $key (@inode_keys) {
-                    $info{$key} = $ref->{$key};
-                }
-            }
-            else {
-                foreach my $key (@inode_keys) {
-                    $info{$key} = '-';
-                }
-            }
-        }
-
-        $disk_usage{ $entry->[0] } = \%info;
-    }
-    return \%disk_usage;
-}
-
 =head2 default_fs
 
 Returns and array reference with the file systems that are mounted and will have
 their storage space checked by default.
 
 This method can be invoke both directly from the class and from instances of it.
-
-=cut
-
-sub default_fs {
-    return [qw(devtmpfs tmpfs ext2 ext3 ext4 fuseblk xfs)];
-}
-
-sub _is_valid {
-    my ( $self, $fs_type ) = @_;
-    croak 'file system type must be defined' unless ( defined($fs_type) );
-    return $self->{fstypes}->has($fs_type);
-}
-
-# strongly based on Linux::Proc::Mounts module, but much more restricted
-# in terms of information accepted and provided
-sub _read {
-    my $self = shift;
-    my $mnt  = "/proc";
-    croak "$mnt is not a proc filesystem"
-      unless -d $mnt and ( stat _ )[12] == 0;
-    my $file = "$mnt/mounts";
-    open my $fh, '<', $file
-      or croak "Unable to open '$file': $!";
-    my @entries;
-
-    while ( local $_ = <$fh> ) {
-        chomp;
-        my @entry = split;
-
-        if ( @entry != 6 ) {
-            warn "invalid number of entries in $file line $.";
-            next;
-        }
-
-        $#entry = 3;    # ignore the two dummy values at the end
-        s/\\([0-7]{1,3})/chr oct $1/g for @entry;
-
-        # fs_spec and fs_file are returned as an entry
-        push( @entries, [ $entry[0], $entry[1] ] )
-          if $self->_is_valid( $entry[2] );
-    }
-
-    close($file);
-    return \@entries;
-}
 
 =head1 EXPORTS
 
@@ -249,28 +261,14 @@ L<Linux::Info>
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>.
+Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 of Alceu Rodrigues de Freitas Junior,
-E<lt>glasswalk3r@yahoo.com.brE<gt>.
+This software is Copyright (c) 2015 by Alceu Rodrigues de Freitas Junior.
 
-This file is part of Linux Info project.
+This is free software, licensed under:
 
-Linux-Info is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Linux-Info is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Linux Info.  If not, see <http://www.gnu.org/licenses/>.
+  The GNU General Public License, Version 3, June 2007
 
 =cut
-
-1;

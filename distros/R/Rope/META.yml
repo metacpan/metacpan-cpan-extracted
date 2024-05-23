@@ -22,10 +22,11 @@ no_index:
     - inc
 requires:
   Coerce::Types::Standard: '0.000008'
+  Combine::Keys: '0.09'
   Data::LnArray: '0.04'
   Factory::Sub: '0.06'
   Struct::Conditional: '1.01'
   Want: '0'
   perl: '5.018'
-version: '0.36'
+version: '0.37'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

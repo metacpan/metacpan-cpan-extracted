@@ -5,14 +5,19 @@ use strict;
 use warnings;
 no warnings 'redefine';
 
-our $VERSION = '1.0';
+use Devel::CheckOS::Helpers::LinuxOSrelease 'distributor_id';
+
+our $VERSION = '1.1';
 
 sub os_is {
+    my $id = distributor_id;
+
     Devel::CheckOS::os_is('Linux') &&
-    `lsb_release -i 2>/dev/null` =~ /Raspbian/
+    defined($id) &&
+    $id eq 'raspbian';
 }
 
-sub expn { "The operating system is some version of Raspbian" }
+sub expn { "The Linux distribution is some version of Raspbian" }
 
 Devel::CheckOS::die_unsupported() unless(os_is());
 

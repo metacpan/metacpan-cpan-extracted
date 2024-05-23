@@ -9,121 +9,12 @@ use Hash::Util qw(lock_keys);
 use Linux::Info::SysInfo;
 use Linux::Info::KernelRelease;
 
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.11'; # VERSION
 
 use constant SPACES_REGEX => qr/\s+/;
 
-=head1 NAME
+# ABSTRACT: Collect Linux disks statistics.
 
-Linux::Info::DiskStats - Collect Linux disks statistics.
-
-=head1 SYNOPSIS
-
-    use Linux::Info::DiskStats;
-
-    my $config = Linux::Info::DiskStats::Options->new({backwards_compatibility => 0});
-    my $lxs = Linux::Info::DiskStats->new($config);
-    $lxs->init;
-    sleep 1;
-    my $stat = $lxs->get;
-
-Or
-
-    my $config = Linux::Info::DiskStats::Options->new({backwards_compatibility => 1,
-                                                       global_block_size => 4096});
-    my $lxs = Linux::Info::DiskStats->new($config);
-    $lxs->init;
-    my $stat = $lxs->get;
-
-=head1 DESCRIPTION
-
-C<Linux::Info::DiskStats> gathers disk statistics from the virtual F</proc>
-filesystem (procfs).
-
-For more information read the documentation of the front-end module
-L<Linux::Info>.
-
-=head1 DISK STATISTICS
-
-The disk statics will depend on the kernel version that is running in the host.
-See the L<Linux::Info::DiskStats/"SEE ALSO"> section for more details on that.
-
-Also, this module produces two types of statistics:
-
-=over
-
-=item *
-
-Backwards compatible with C<Linux::Info> versions 1.5 and lower.
-
-=item *
-
-New fields since version 1.6 and higher. These fields are also incompatible
-with those produced by L<Sys::Statistics::Linux>.
-
-=back
-
-=head2 Backwards compatible fields
-
-Those fields are generated from F</proc/diskstats> or F</proc/partitions>,
-depending on the kernel version.
-
-Not necessarily those fields will have a direct correlation with the fields
-on the F</proc> directory, some of them are basically calculations and
-others are not even statistics (C<major> and C<minor>).
-
-These fields are kept only to provide compatibility, but it is
-B<highly recommended> to not use compatibility mode since some statistics won't
-be exposed and you can always execute the calculations yourself with that set.
-
-=over
-
-=item *
-
-major: The mayor number of the disk
-
-=item *
-
-minor: The minor number of the disk
-
-=item *
-
-rdreq: Number of read requests that were made to physical disk per second.
-
-=item *
-
-rdbyt: Number of bytes that were read from physical disk per second.
-
-=item *
-
-wrtreq: Number of write requests that were made to physical disk per second.
-
-=item *
-
-wrtbyt: Number of bytes that were written to physical disk per second.
-
-=item *
-
-ttreq: Total number of requests were made from/to physical disk per second.
-
-=item *
-
-ttbyt: Total number of bytes transmitted from/to physical disk per second.
-
-=back
-
-=head2 The "new" fields
-
-Actually, those fields are not really new: they are the almost exact
-representation of those available on the respective F</proc> file, with small
-differences in the fields naming in this module in order to make it easier to
-type in.
-
-These are the fields you want to use, if possible. It is also possible to have
-the calculated fields by using the module
-L<Linux::Info::DiskStats::Calculated>.
-
-=cut
 
 sub _block_size {
     my ( $self, $device_name ) = @_;
@@ -334,17 +225,6 @@ sub _parse_partitions {
     return \%stats;
 }
 
-=head1 METHODS
-
-=head2 new
-
-Call C<new> to create a new object.
-
-    my $lxs = Linux::Info::DiskStats->new($opts);
-
-Where C<$opts> is a L<Linux::Info::DiskStats::Options>.
-
-=cut
 
 sub new {
     my ( $class, $opts ) = @_;
@@ -364,9 +244,7 @@ sub new {
         $self->{current} = $opts->get_current_kernel;
     }
     else {
-        $self->{current} =
-          Linux::Info::KernelRelease->new(
-            Linux::Info::SysInfo->new->get_release );
+        $self->{current} = Linux::Info::SysInfo->new->get_basic_kernel;
     }
 
     $self->{backwards_compatible} = $opts->get_backwards_compatible;
@@ -382,8 +260,11 @@ sub new {
     unless ( defined $self->{source_file} ) {
 
         # not a real value, but should be enough accurate
-        if ( $self->{current} <
-            Linux::Info::KernelRelease->new('2.4.20-0-generic') )
+        if (
+            $self->{current} < Linux::Info::KernelRelease->new(
+                { release => '2.4.20-0-generic' }
+            )
+          )
         {
             $self->{source_file}  = '/proc/partitions';
             $self->{parse_method} = \&_parse_partitions;
@@ -409,13 +290,6 @@ sub new {
     return $self;
 }
 
-=head2 init
-
-Call C<init> to initialize the statistics.
-
-    $lxs->init;
-
-=cut
 
 sub init {
     my $self = shift;
@@ -433,13 +307,6 @@ sub init {
     return 1;
 }
 
-=head2 get
-
-Call C<get> to get the statistics. C<get()> returns the statistics as a hash reference.
-
-    my $stat = $lxs->get;
-
-=cut
 
 sub get {
     my $self  = shift;
@@ -459,11 +326,6 @@ sub get {
     return $self->{stats};
 }
 
-=head2 raw
-
-Get raw values, retuned as an hash reference.
-
-=cut
 
 sub raw {
     my $self = shift;
@@ -520,17 +382,165 @@ sub _deltas {
     }
 }
 
-=head2 fields_read
-
-Returns an integer telling the number of fields process in each line from the
-source file.
-
-=cut
 
 sub fields_read() {
     my $self = shift;
     return $self->{fields};
 }
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Linux::Info::DiskStats - Collect Linux disks statistics.
+
+=head1 VERSION
+
+version 2.11
+
+=head1 SYNOPSIS
+
+    use Linux::Info::DiskStats;
+
+    my $config = Linux::Info::DiskStats::Options->new({backwards_compatibility => 0});
+    my $lxs = Linux::Info::DiskStats->new($config);
+    $lxs->init;
+    sleep 1;
+    my $stat = $lxs->get;
+
+Or
+
+    my $config = Linux::Info::DiskStats::Options->new({backwards_compatibility => 1,
+                                                       global_block_size => 4096});
+    my $lxs = Linux::Info::DiskStats->new($config);
+    $lxs->init;
+    my $stat = $lxs->get;
+
+=head1 DESCRIPTION
+
+C<Linux::Info::DiskStats> gathers disk statistics from the virtual F</proc>
+filesystem (procfs).
+
+For more information read the documentation of the front-end module
+L<Linux::Info>.
+
+=head1 DISK STATISTICS
+
+The disk statics will depend on the kernel version that is running in the host.
+See the L<Linux::Info::DiskStats/"SEE ALSO"> section for more details on that.
+
+Also, this module produces two types of statistics:
+
+=over
+
+=item *
+
+Backwards compatible with C<Linux::Info> versions 1.5 and lower.
+
+=item *
+
+New fields since version 1.6 and higher. These fields are also incompatible
+with those produced by L<Sys::Statistics::Linux>.
+
+=back
+
+=head2 Backwards compatible fields
+
+Those fields are generated from F</proc/diskstats> or F</proc/partitions>,
+depending on the kernel version.
+
+Not necessarily those fields will have a direct correlation with the fields
+on the F</proc> directory, some of them are basically calculations and
+others are not even statistics (C<major> and C<minor>).
+
+These fields are kept only to provide compatibility, but it is
+B<highly recommended> to not use compatibility mode since some statistics won't
+be exposed and you can always execute the calculations yourself with that set.
+
+=over
+
+=item *
+
+major: The mayor number of the disk
+
+=item *
+
+minor: The minor number of the disk
+
+=item *
+
+rdreq: Number of read requests that were made to physical disk per second.
+
+=item *
+
+rdbyt: Number of bytes that were read from physical disk per second.
+
+=item *
+
+wrtreq: Number of write requests that were made to physical disk per second.
+
+=item *
+
+wrtbyt: Number of bytes that were written to physical disk per second.
+
+=item *
+
+ttreq: Total number of requests were made from/to physical disk per second.
+
+=item *
+
+ttbyt: Total number of bytes transmitted from/to physical disk per second.
+
+=back
+
+=head2 The "new" fields
+
+Actually, those fields are not really new: they are the almost exact
+representation of those available on the respective F</proc> file, with small
+differences in the fields naming in this module in order to make it easier to
+type in.
+
+These are the fields you want to use, if possible. It is also possible to have
+the calculated fields by using the module
+L<Linux::Info::DiskStats::Calculated>.
+
+=head1 METHODS
+
+=head2 new
+
+Call C<new> to create a new object.
+
+    my $lxs = Linux::Info::DiskStats->new($opts);
+
+Where C<$opts> is a L<Linux::Info::DiskStats::Options>.
+
+=head2 init
+
+Call C<init> to initialize the statistics.
+
+    $lxs->init;
+
+=head2 get
+
+Call C<get> to get the statistics. C<get()> returns the statistics as a hash reference.
+
+    my $stat = $lxs->get;
+
+=head2 raw
+
+Get raw values, retuned as an hash reference.
+
+=head2 fields_read
+
+Returns an integer telling the number of fields process in each line from the
+source file.
 
 =head1 EXPORTS
 
@@ -560,28 +570,14 @@ L<Linux::Info>
 
 =head1 AUTHOR
 
-Alceu Rodrigues de Freitas Junior, E<lt>glasswalk3r@yahoo.com.brE<gt>
+Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 of Alceu Rodrigues de Freitas Junior,
-E<lt>glasswalk3r@yahoo.com.brE<gt>
+This software is Copyright (c) 2015 by Alceu Rodrigues de Freitas Junior.
 
-This file is part of Linux Info project.
+This is free software, licensed under:
 
-Linux-Info is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Linux-Info is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Linux Info. If not, see <http://www.gnu.org/licenses/>.
+  The GNU General Public License, Version 3, June 2007
 
 =cut
-
-1;

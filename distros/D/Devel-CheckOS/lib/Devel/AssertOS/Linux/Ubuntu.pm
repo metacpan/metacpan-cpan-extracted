@@ -4,18 +4,18 @@ use Devel::CheckOS;
 use strict;
 use warnings;
 
-use Devel::AssertOS::OSFeatures::Release 'distributor_id';
+use Devel::CheckOS::Helpers::LinuxOSrelease 'distributor_id';
 
 no warnings 'redefine';
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
 sub os_is {
     my $id = distributor_id;
-    Devel::CheckOS::os_is('Linux') && defined($id) && $id =~ /Ubuntu/;
+    Devel::CheckOS::os_is('Linux') && defined($id) && $id eq 'ubuntu';
 }
 
-sub expn { "The operating system is some version of Ubuntu" }
+sub expn { "The Linux distribution is some version of Ubuntu" }
 
 Devel::CheckOS::die_unsupported() unless ( os_is() );
 

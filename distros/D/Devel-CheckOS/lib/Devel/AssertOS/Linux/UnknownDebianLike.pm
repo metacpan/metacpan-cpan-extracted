@@ -18,7 +18,7 @@ sub os_is {
     Devel::CheckOS::os_isnt(grep { $_ !~ /UnknownDebianLike/ } Devel::AssertOS::Linux::Debian::matches())
 }
 
-sub expn { "The operating system is some derivative of Debian, or possibly a very old version of real Debian" }
+sub expn { "The Linux distribution is some derivative of Debian that we don't know any more details about, or possibly a very old version of real Debian" }
 
 Devel::CheckOS::die_unsupported() unless(os_is());
 

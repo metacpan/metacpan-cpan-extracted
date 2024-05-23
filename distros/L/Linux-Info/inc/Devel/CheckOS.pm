@@ -11,7 +11,7 @@ use File::Spec;
 
 use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS %OS_ALIASES);
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(
@@ -374,6 +374,9 @@ Thanks to Dale Evans for Debian detection, a bunch of Mac OS X specific version
 detection modules, and perl 5.6 support.
 
 Thanks to Graham Knop for fixing a build bug on perl 5.8.
+
+Thanks to Alceu Rodrigues de Freitas Junior for improving Ubuntu detection
+and providing a way to detect a lot more Linux variants.
 
 =head1 SOURCE CODE REPOSITORY
 

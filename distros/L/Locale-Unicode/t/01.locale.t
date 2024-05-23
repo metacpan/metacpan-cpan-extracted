@@ -128,8 +128,10 @@ my $codes = DateTime::Locale->codes;
 diag( "Found ", scalar( @$codes ), " locales." ) if( $DEBUG );
 foreach my $code ( @$codes )
 {
+    $code = 'und' if( $code eq 'root' );
     $re = Locale::Unicode->matches( $code );
-    ok( ( defined( $re ) && scalar( keys( %$re ) ) ), $code );
+    diag( "Failed matching for locale '", ( $code // 'undef' ), "'" ) if( !defined( $re ) || ref( $re ) ne 'HASH' );
+    ok( ( defined( $re ) && ref( $re ) eq 'HASH' && scalar( keys( %$re ) ) ), $code );
 }
 
 my @tests = (
@@ -510,6 +512,36 @@ subtest 'tz_ functions' => sub
     };
     is_deeply( $info => $expected, 'tz_info' );
     is( Locale::Unicode->tz_name2id( 'Australia/Canberra' ), 'ausyd', 'tz_name2id' );
+};
+
+subtest 'colCaseFirst' => sub
+{
+    my @tests = (
+        {
+            test => 'fr-Latn-FR-u-kf-upper',
+            expects => 'upper',
+        },
+        {
+            test => 'en-Latn-US',
+            opts => { colCaseFirst => 'lower' },
+            expects => 'lower',
+        },
+    );
+    
+    foreach my $def ( @tests )
+    {
+        my $l = Locale::Unicode->new( $def->{test}, ( exists( $def->{opts} ) ? ( %{$def->{opts}} ) : () ) );
+        isa_ok( $l => 'Locale::Unicode' );
+        SKIP:
+        {
+            if( !defined( $l ) )
+            {
+                skip( "Failed instantiating object for test locale '$def->{test}': " . Locale::Unicode->error, 1 );
+            }
+            diag( "Locale for '$def->{test}' stringifies to '$l'" ) if( $DEBUG );
+            is( $l->colCaseFirst, $def->{expects}, "colCaseFirst for '$def->{test}' -> '$def->{expects}'" );
+        };
+    }
 };
 
 done_testing();
