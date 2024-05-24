@@ -34,7 +34,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.10';
+our $VERSION = '1.14';
 
 =head1 SYNOPSIS
 
@@ -193,6 +193,12 @@ Data dumper.
 
 Internal data dumper.
 
+=head2 dye
+
+Color a string.
+
+    say dye( "HEY", "RED" );
+
 =head2 g
 
 Perform a get request.
@@ -232,7 +238,6 @@ sub import {
 
         # Debugging.
         repl => sub {
-
             require Runtime::Debugger;
             Runtime::Debugger::repl(
                 levels_up => 1,
@@ -336,12 +341,24 @@ sub import {
         # Pretty Print.
         p => sub {
             require Data::Printer;
-            Data::Printer->import( use_prototypes => 0 );
+            Data::Printer->import(
+                use_prototypes => 0,
+                show_dualvar   => "off",
+                hash_separator => " => ",
+                end_separator  => 1,
+                show_refcount  => 1,
+            );
             p( @_ );
         },
         np => sub {
             require Data::Printer;
-            Data::Printer->import( use_prototypes => 0 );
+            Data::Printer->import(
+                use_prototypes => 0,
+                show_dualvar   => "off",
+                hash_separator => " => ",
+                end_separator  => 1,
+                show_refcount  => 1,
+            );
             np( @_ );
         },
 
@@ -355,6 +372,12 @@ sub import {
         dd => sub {
             require Devel::Peek;
             Devel::Peek::Dump( @_ );
+        },
+
+        # Color.
+        dye => sub {
+            require Term::ANSIColor;
+            Term::ANSIColor::colored( @_ );
         },
 
         ######################################

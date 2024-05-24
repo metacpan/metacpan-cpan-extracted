@@ -13,7 +13,7 @@ package StorageDisplay::Data::Elem;
 # ABSTRACT: Handle something that will be displayed and can be linked
 # from/to as a tree for StorageDisplay
 
-our $VERSION = '2.05'; # VERSION
+our $VERSION = '2.06'; # VERSION
 
 use Moose;
 use namespace::sweep;
@@ -245,7 +245,7 @@ StorageDisplay::Data::Elem - Handle something that will be displayed and can be 
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 AUTHOR
 

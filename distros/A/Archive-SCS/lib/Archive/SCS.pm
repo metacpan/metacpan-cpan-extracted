@@ -2,7 +2,7 @@ use v5.38;
 use feature 'class';
 no warnings 'experimental::class';
 
-class Archive::SCS 0.02;
+class Archive::SCS 0.03;
 
 use Archive::SCS::CityHash qw(cityhash64 cityhash64_hex cityhash64_as_hex);
 use Carp 'croak';
@@ -159,7 +159,8 @@ Archive::SCS - SCS archive controller
 
 =head1 DESCRIPTION
 
-Handles SCS archive files. Allows mounting of multiple files and
+Handles the union file system used by SCS archive files.
+Allows mounting of multiple files and
 performs lookups in all of them using the SCS hash algorithm.
 
 Note that this software currently requires L<String::CityHash
@@ -172,38 +173,68 @@ which is only available on BackPAN.
 
   @formats = $scs->formats;
 
+Returns the list of currently active formats.
+See C<set_formats()>.
+
 =head2 list_dirs
 
   @directories = $scs->list_dirs;
+
+Returns an ordered list of all directory paths in currently
+mounted archives. The root directory, represented by an empty
+string, is currently omitted from the list.
+
+Paths are returned without a leading C</> because that's the
+way they are stored internally. This is subject to change,
+but the output of C<list_dirs()> will always be good to use
+as path for C<read_entry()>.
 
 =head2 list_files
 
   @files = $scs->list_files;
 
+Returns an ordered list of all file paths in currently mounted
+archives.
+
+Paths are returned without a leading C</> because that's the
+way they are stored internally. This is subject to change,
+but the output of C<list_dirs()> will always be good to use
+as path for C<read_entry()>.
+
 =head2 list_orphans
 
   @orphan_hashes = $scs->list_orphans;
+
+Returns a list of hash values for
+orphans in currently mounted archives.
 
 Some file formats allow files (or subdirs) without a directory entry.
 These files may be accessed directly using their hash value. This
 software refers to such files as orphans. For example, the following
 orphans are known to exist in 1.49.3.14:
 
-  05c075dc23d8d177 # in core.scs
-  0eeaffbe65995414 # in base.scs + core.scs
+  05c075dc23d8d177 # in core.scs, 'def/achievements.sii'
+  0eeaffbe65995414 # in base.scs + core.scs, 'ui/desktop_demo.sii'
   0fb3a3294f8ac99c # in base_cfg.scs
   2a794836b65afe88 # in base.scs
-  34f7048e2d3b04b6 # in core.scs
-  507dcc5fb3fb6443 # in core.scs
-  83a9902d7733b94d # in core.scs
+  34f7048e2d3b04b6 # in core.scs, 'def/online_economy_data.sii'
+  507dcc5fb3fb6443 # in core.scs, 'def/online_data.sii'
+  83a9902d7733b94d # in core.scs, 'def/mod_manager_data.sii'
   88a1194cb25b253c # in core.scs, 'ui/desktop_standalone_demo.sii'
-  c09356068ea66aac # in core.scs
+  c09356068ea66aac # in core.scs, 'def/world/building_scheme_core_scs.sii'
   d9d3d2a218c69f3d # in base.scs
-  e773fb1407c8468d # in core.scs
+  e773fb1407c8468d # in core.scs, 'def/world/building_model_core_scs.sii'
 
 =head2 mount
 
   $archive = $scs->mount($pathname);
+  $archive = $scs->mount($mountable);
+
+Adds the given SCS archive to the currently mounted archives.
+Returns an L<Archive::SCS::Mountable> object. If a file system
+path is given as argument, the object will be created by
+attempting to load the given archive with the currently active
+formats. See C<set_formats()>.
 
 =head2 read_entry
 
@@ -217,19 +248,32 @@ value, hex-encoded in network byte order as a 16-byte scalar PV.
 
   $scs = $scs->set_formats(qw[ HashFS Zip ]);
 
+Sets the list of currently active formats. All formats must be
+in the C<Archive::SCS> namespace. By default, the list includes
+all formats implemented in this distribution, which currently
+are the following:
+
+=over
+
+=item * L<Archive::SCS::HashFS>
+
+=item * L<Archive::SCS::HashFS2>
+
+=back
+
 =head2 unmount
 
   $archive = $scs->unmount($pathname);
+  $archive = $scs->mount($mountable);
+
+Removes the given SCS archive from currently mounted archives.
+Returns the archive's L<Archive::SCS::Mountable> object.
 
 =head1 SEE ALSO
 
 =over
 
 =item * L<Archive::SCS::GameDir>
-
-=item * L<Archive::SCS::HashFS>
-
-=item * L<Archive::SCS::HashFS2>
 
 =back
 

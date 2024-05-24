@@ -38,7 +38,7 @@ no warnings;
 
 our @EXPORT = qw( newretrieve newreport get_files );
 
-$VERSION = '0.115';
+$VERSION = '0.119';
 $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results.';
 
 #########################################################################################
@@ -199,44 +199,6 @@ sub newretrieve
       sub retrieve_temperatures_results
       {
         my ( $result, $resfile, $shortresfile, $thisto, $retrdata_ref, $reporttitle, $themereport, $counttheme, $countreport, $retfile ) = @_;
-
-#        my $printthis =
-#"cd $thisto/cfg
-#res -file $resfile -mode script<<YYY
-#
-#3
-#$retrdata[0]
-#$retrdata[1]
-#$retrdata[2]
-#c
-#g
-#a
-#a
-#-
-#b
-#a
-#-
-#b
-#e
-#-
-#b
-#f
-#-
-#>
-#$retfile
-#$retfile
-#!
-#-
-#-
-#-
-#-
-#-
-#-
-#-
-#-
-#YYY
-#";
-
 
 my $printthis =
 "cd $thisto/cfg
@@ -430,6 +392,72 @@ $what
 -
 $howmuch
 m
+-
+-
+-
+-
+TTT
+";
+        }
+        else
+        {
+          say $tee "THERE ALREADY IS A RETFILE!";
+        }
+      }
+      elsif ( $themereport eq "surfflow" ) # flow through surface
+      {
+        unless (-e "$retfile")
+        {
+          $printthis =
+"cd $thisto/cfg
+res -file $resfile -mode script<<TTT
+
+3
+$retrdata[0]
+$retrdata[1]
+$retrdata[2]
+d
+>
+$retfile
+$retfile
+i
+b
+b
+$what
+-
+-
+-
+-
+TTT
+";
+        }
+        else
+        {
+          say $tee "THERE ALREADY IS A RETFILE!";
+        }
+      }
+      elsif ( $themereport eq "surftemps" ) # temps at inside face of surface
+      {
+        unless (-e "$retfile")
+        {
+          $printthis =
+"cd $thisto/cfg
+res -file $resfile -mode script<<TTT
+
+3
+$retrdata[0]
+$retrdata[1]
+$retrdata[2]
+d
+>
+$retfile
+$retfile
+b
+b
+i
+-
+$what
+y
 -
 -
 -
@@ -764,9 +792,8 @@ TTT
                   {
                     say $tee "#Retrieving results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep for tool $tooltype. Instance $countinstance: going to write $retfile.\ ";
 
-                    if ( $themereport eq "temps" )
+                    if ( ( $themereport eq "temps" ) or ( $themereport eq "surftemps" ) )
                     {
-
                        retrieve_temperatures_results( $result, $resfile, $shortresfile, $thisto, \@retrdata, $reporttitle, $themereport, $counttheme, $countreport, $retfile );
                     }
                     elsif ( $themereport eq "comfort"  )
@@ -774,7 +801,7 @@ TTT
            					{
                       retrieve_comfort_results( $result, $resfile, $shortresfile, $thisto, \@retrdata, $reporttitle, $themereport, $counttheme, $countreport, $retfile );
                     }
-                    elsif ( ( ( $themereport eq "loads" ) or ( $themereport eq "tempsstats"  ) or  ( $themereport eq "dhs"  ) ) )
+                    elsif ( ( ( $themereport eq "loads" ) or ( $themereport eq "tempsstats"  ) or  ( $themereport eq "dhs"  ) or ( $themereport eq "surfflow"  )) )
                     {
                       say $tee "IN NEWRETRIEVE \$result $result, \$resfile $resfile, $shortresfile. \@retrdata @retrdata, \$reporttitle $reporttitle, \$themereport $themereport, \$counttheme $counttheme, \$countrep$shortresfile, ort $countreport, \$retfile $retfile, \$semaphorego1 $semaphorego1, \$semaphorego2 $semaphorego2, \$semaphorestop1 $semaphorestop1, \$semaphorestop2 $semaphorestop2, \$textpattern $textpattern, \$afterlines $afterlines, \$howmuch $howmuch, \$where $where, \$what $what";
                       retrieve_stats_results( $result, $resfile, $shortresfile, $thisto, \@retrdata, $reporttitle, $themereport, $counttheme,

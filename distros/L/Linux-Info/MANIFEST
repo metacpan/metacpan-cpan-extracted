@@ -27,6 +27,7 @@ lib/Linux/Info/DiskStats.pm
 lib/Linux/Info/DiskStats/Options.pm
 lib/Linux/Info/DiskUsage.pm
 lib/Linux/Info/Distribution.pm
+lib/Linux/Info/Distribution/BasicInfo.pm
 lib/Linux/Info/Distribution/Custom.pm
 lib/Linux/Info/Distribution/Custom/Amazon.pm
 lib/Linux/Info/Distribution/Custom/CentOS.pm

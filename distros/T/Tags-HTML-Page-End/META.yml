@@ -6,15 +6,15 @@ build_requires:
   English: 0
   Error::Pure::Utils: 0.22
   ExtUtils::MakeMaker: 6.36
-  Tags::Output::Raw: 0
   Tags::Output::Structure: 0
+  Test::MockObject: 0
   Test::More: 0
   Test::NoWarnings: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,4 +34,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-Page-End
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-Page-End
-version: '0.05'
+version: '0.06'

@@ -80,5 +80,8 @@ Revision history for Rope
 0.36	2024-05-20
 	- Adds Rope::Handles::String, Rope::Handles::Number, Rope::Handles::Counter and Rope::Handles::Bool
 
-0.37	2024-05-20
+0.37	2024-05-22
 	- Adds Rope::Variant.
+
+0.38	2024-05-23
+	- Adds Rope::Lazier.

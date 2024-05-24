@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Synthesizer settings librarian
 
-our $VERSION = '0.0053';
+our $VERSION = '0.0055';
 
 use Moo;
 use strictures 2;
@@ -107,7 +107,7 @@ sub make_setting {
 
 sub recall_setting {
   my ($self, %args) = @_;
-  my $id = delete $args{id};
+  my $id = $args{id};
   croak 'No id given' unless $id;
   my $result = $self->_sqlite->select(
     $self->model,
@@ -195,7 +195,7 @@ sub recall_names {
 
 sub remove_setting {
   my ($self, %args) = @_;
-  my $id = delete $args{id};
+  my $id = $args{id};
   croak 'No id given' unless $id;
   $self->_sqlite->delete(
     $self->model,
@@ -206,11 +206,11 @@ sub remove_setting {
 
 sub remove_settings {
   my ($self, %args) = @_;
-  my $name = delete $args{name};
-  croak 'No name given' unless $name;
+  my $name = $args{name};
+  my $where = $name ? { name => $name } : {};
   $self->_sqlite->delete(
     $self->model,
-    { name => $name }
+    $where
   );
 }
 
@@ -413,7 +413,7 @@ Synth::Config - Synthesizer settings librarian
 
 =head1 VERSION
 
-version 0.0053
+version 0.0055
 
 =head1 SYNOPSIS
 
@@ -424,8 +424,8 @@ version 0.0053
 
   # populate the database with patch settings from a YAML file or string
   my $patches = $synth->import_yaml(
-      file    => "$model.yaml", # or string => ...
-      patches => ['Simple 001', 'Simple 002' ],
+      file    => "$model.yaml", # or string => '...' # one or the other is required
+      patches => ['Simple 001', 'Simple 002' ],      # optional
   );
 
   # populate the database with individual settings
@@ -482,7 +482,7 @@ version 0.0053
   # { order => [ ... ], etc => ... }
 
   # remove stuff!
-  $synth->remove_spec;
+  $synth->remove_spec;                     # remove the current model specification
   $synth->remove_setting(id => $id1);      # remove a particular setting
   $synth->remove_settings(name => $patch); # remove all settings sharing the same name
   $synth->remove_model(model => $model);   # remove the entire model
@@ -568,8 +568,8 @@ Return the parameters of a setting for the given B<id>.
 =head2 search_settings
 
   my $settings = $synth->search_settings(
-    some_setting    => $valu2,
-    another_setting => $value2,
+    some_setting    => $val1,
+    another_setting => $val2,
   );
 
 Return all the settings given a search query.
@@ -589,9 +589,9 @@ specified a synth B<model> in the constructor.
 
 =head2 recall_names
 
-  my $names = $synth->recall_names;
+  my $settings = $synth->recall_names;
 
-Return all the setting names.
+Return all the setting names for the current model.
 
 =head2 remove_setting
 
@@ -601,9 +601,11 @@ Remove a setting given an B<id>.
 
 =head2 remove_settings
 
+  $synth->remove_settings; # all model settings
   $synth->remove_settings(name => $name);
 
-Remove all settings for a given B<name>.
+Remove all settings of the current model, or for given B<name>d
+setting.
 
 =head2 remove_model
 
@@ -664,10 +666,10 @@ Visualize a patch of B<settings> with the L<GraphViz2> module.
 
 Option defaults:
 
+  model_name = undef (required)
+  settings   = undef (required)
   render     = 0
   path       = .
-  model_name = model
-  patch_name = patch
   extension  = png
   shape      = oval
   color      = grey

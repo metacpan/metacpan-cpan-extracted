@@ -9,7 +9,7 @@ App::Codit::Plugins::PodViewer - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.03;
+$VERSION = 0.04;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -208,6 +208,7 @@ sub PodRemove {
 
 sub Refresh {
 	my ($self, $name) = @_;
+	delete $self->{'active_id'};
 	my $mdi = $self->extGet('CoditMDI');
 	my $widg = $mdi->docGet($name)->CWidg;
 	my $file = $self->PodFile;
@@ -235,6 +236,8 @@ sub Unload {
 	my @pods = $self->PodList;
 	for (@pods) { $self->PodRemove($_) }
 	unlink $self->PodFile;
+	my $id = $self->{'active_id'};
+	$self->afterCancel($id) if defined $id;
 	$self->cmdUnhookAfter('modified', 'activate', $self);
 	$self->cmdUnhookAfter('doc_close', 'docCloseAfter', $self);
 	$self->cmdUnhookBefore('doc_close', 'docBefore', $self);

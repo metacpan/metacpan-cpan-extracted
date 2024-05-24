@@ -112,6 +112,14 @@ sub create_table {
         if ( ! $ok ) {
             return;
         }
+        if ( ! @{$sql->{insert_args}[0]} ) {
+            # Choose
+            $tc->choose(
+                [ 'No columns!' ],
+                { prompt => 'Continue with ENTER', keep => 1 }
+            );
+            return;
+        }
         my $tablename_default = '';
 
         GET_TABLE_NAME: while ( 1 ) {

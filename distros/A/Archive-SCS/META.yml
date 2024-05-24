@@ -4,8 +4,6 @@ author:
   - 'nautofon <nautofon@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Feature::Compat::Defer: '0'
-  Feature::Compat::Try: '0'
   IPC::Run3: '0'
 configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
@@ -24,40 +22,40 @@ no_index:
 provides:
   Archive::SCS:
     file: lib/Archive/SCS.pm
-    version: '0.02'
+    version: '0.03'
   Archive::SCS::CityHash:
     file: lib/Archive/SCS/CityHash.pm
-    version: '0.02'
+    version: '0.03'
   Archive::SCS::DirIndex:
     file: lib/Archive/SCS/DirIndex.pm
-    version: '0.02'
+    version: '0.03'
   Archive::SCS::GameDir:
     file: lib/Archive/SCS/GameDir.pm
-    version: '0.02'
+    version: '0.03'
   Archive::SCS::HashFS:
     file: lib/Archive/SCS/HashFS.pm
-    version: '0.02'
+    version: '0.03'
   Archive::SCS::HashFS2:
     file: lib/Archive/SCS/HashFS2.pm
-    version: '0.02'
+    version: '0.03'
   Archive::SCS::InMemory:
     file: lib/Archive/SCS/InMemory.pm
-    version: '0.02'
+    version: '0.03'
   Archive::SCS::Mountable:
     file: lib/Archive/SCS/Mountable.pm
-    version: '0.02'
+    version: '0.03'
   Archive::SCS::TObj:
     file: lib/Archive/SCS/TObj.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Compress::Raw::Zlib: '2.048'
   List::Util: '1.45'
   Path::Tiny: '0.119'
   String::CityHash: '0.06'
-  perl: '5.038'
+  perl: '5.039002'
 resources:
   bugtracker: https://forum.scssoft.com/viewtopic.php?t=330746
   homepage: https://forum.scssoft.com/viewtopic.php?t=330746
   repository: git://github.com/nautofon/Archive-SCS.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

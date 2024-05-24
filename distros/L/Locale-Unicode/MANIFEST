@@ -1,4 +1,5 @@
 CHANGES
+CONTRIBUTING.md
 lib/Locale/Boolean.pod
 lib/Locale/Exception.pod
 lib/Locale/Unicode.pm

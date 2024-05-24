@@ -1,8 +1,17 @@
 Revision history for Synth-Config
 
+0.0055 2024-05-23 20:44:47
+    - Allow removal of all model settings at once.
+    - Improve documentation.
+    - Split imorting and visualizing into seperate eg/ programs.
+
+0.0054 2024-05-23 18:44:40
+    - Improve documentation.
+
 0.0053 2024-05-21 20:52:50
     - Make recall_specs() return a hashref, not an array ref.
     - No post-derefs please.
+    - Fix-up the eg/synth-config-cli.pl program.
 
 0.0052 2024-05-19 12:35:14
     - Improve documentation.

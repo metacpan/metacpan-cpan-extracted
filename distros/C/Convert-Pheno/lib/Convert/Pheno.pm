@@ -21,7 +21,7 @@ use Convert::Pheno::IO::CSVHandler;
 use Convert::Pheno::IO::FileIO;
 use Convert::Pheno::SQLite;
 use Convert::Pheno::Mapping;
-use Convert::Pheno::CSV qw(do_bff2csv do_pxf2csv);
+use Convert::Pheno::CSV;
 use Convert::Pheno::RDF qw(do_bff2jsonld do_pxf2jsonld);
 use Convert::Pheno::OMOP;
 use Convert::Pheno::PXF;
@@ -42,8 +42,12 @@ $SIG{__WARN__} = sub { warn "Warn: ", @_ };
 $SIG{__DIE__}  = sub { die "Error: ", @_ };
 
 # Global variables:
-our $VERSION   = '0.19';
+our $VERSION   = '0.20';
 our $share_dir = dist_dir('Convert-Pheno');
+
+# SQLite database
+my @all_sqlites = qw(ncit icd10 ohdsi cdisc omim hpo);
+my @non_ohdsi_sqlites = qw(ncit icd10 cdisc omim hpo);
 
 ############################################
 # Start declaring attributes for the class #
@@ -157,6 +161,14 @@ has [qw /data method/] => ( is => 'rw' );
 # End declaring attributes for the class #
 ##########################################
 
+sub BUILD {
+
+    # BUILD: is an instance method that is called after the object has been constructed but before it is returned to the caller.
+    # BUILDARGS is a class method that is responsible for processing the arguments passed to the constructor (new) and returning a hash reference of attributes that will be used to initialize the object.
+    my $self = shift;
+    $self->{databases} = $self->{ohdsi_db} ? \@all_sqlites : \@non_ohdsi_sqlites;
+}
+
 # NB: In general, we'll only display terms that exist and have content
 
 #############
@@ -206,7 +218,6 @@ sub bff2jsonld {
     return array_dispatcher(shift);
 }
 
-
 ################
 ################
 #  REDCAP2BFF  #
@@ -218,23 +229,26 @@ sub redcap2bff {
     my $self = shift;
 
     # Read and load data from REDCap export
-    my $data = read_csv( { in => $self->{in_file}, sep => undef } );
-    my ( $data_redcap_dict, $data_mapping_file ) =
-      read_redcap_dict_and_mapping_file(
+    my $data             = read_csv( { in => $self->{in_file}, sep =>  $self->{sep} } );
+    my $data_redcap_dict = read_redcap_dict_file(
         {
-            redcap_dictionary    => $self->{redcap_dictionary},
+            redcap_dictionary => $self->{redcap_dictionary},
+        }
+    );
+    my $data_mapping_file = read_mapping_file(
+        {
             mapping_file         => $self->{mapping_file},
             self_validate_schema => $self->{self_validate_schema},
             schema_file          => $self->{schema_file}
         }
-      );
+    );
 
     # Load data in $self
     $self->{data}              = $data;                 # Dynamically adding attributes (setter)
     $self->{data_redcap_dict}  = $data_redcap_dict;     # Dynamically adding attributes (setter)
     $self->{data_mapping_file} = $data_mapping_file;    # Dynamically adding attributes (setter)
-    $self->{metaData}          = get_metaData($self);
-    $self->{convertPheno}      = get_info($self);
+    $self->{metaData}          = get_metaData($self);   # Dynamically adding attributes (setter)
+    $self->{convertPheno}      = get_info($self);       # Dynamically adding attributes (setter)
 
     # array_dispatcher will deal with JSON arrays
     return $self->array_dispatcher;
@@ -521,15 +535,18 @@ sub cdisc2bff {
     my $hash = xml2hash $str, attr => '-', text => '~';
     my $data = cdisc2redcap($hash);
 
-    my ( $data_redcap_dict, $data_mapping_file ) =
-      read_redcap_dict_and_mapping_file(
+    my $data_redcap_dict = read_redcap_dict_file(
         {
-            redcap_dictionary    => $self->{redcap_dictionary},
+            redcap_dictionary => $self->{redcap_dictionary},
+        }
+    );
+    my $data_mapping_file = read_mapping_file(
+        {
             mapping_file         => $self->{mapping_file},
             self_validate_schema => $self->{self_validate_schema},
             schema_file          => $self->{schema_file}
         }
-      );
+    );
 
     # Load data in $self
     $self->{data}              = $data;                 # Dynamically adding attributes (setter)
@@ -573,6 +590,62 @@ sub pxf2bff {
 
     # <array_dispatcher> will deal with JSON arrays
     return array_dispatcher(shift);
+}
+
+#############
+#############
+#  CSV2BFF  #
+#############
+#############
+
+sub csv2bff {
+
+    my $self = shift;
+
+    # Read and load data from CSV
+    my $data             = read_csv( { in => $self->{in_file}, sep =>  $self->{sep} } );
+
+    # Read and load mapping file
+    my $data_mapping_file = read_mapping_file(
+        {
+            mapping_file         => $self->{mapping_file},
+            self_validate_schema => $self->{self_validate_schema},
+            schema_file          => $self->{schema_file}
+        }
+    );
+
+    # Load data in $self
+    $self->{data}              = $data;                 # Dynamically adding attributes (setter)
+    $self->{data_mapping_file} = $data_mapping_file;    # Dynamically adding attributes (setter)
+    $self->{metaData}          = get_metaData($self);   # Dynamically adding attributes (setter)
+    $self->{convertPheno}      = get_info($self);       # Dynamically adding attributes (setter)
+
+    # array_dispatcher will deal with JSON arrays
+    return $self->array_dispatcher;
+}
+
+#############
+#############
+#  CSV2PXF  #
+#############
+#############
+
+sub csv2pxf {
+
+    my $self = shift;
+
+    # First iteration: csv2bff
+    $self->{method} = 'csv2bff';    # setter - we have to change the value of attr {method}
+    my $bff = csv2bff($self);       # array
+
+    # Preparing for second iteration: bff2pxf
+    $self->{method}      = 'bff2pxf';    # setter
+    $self->{data}        = $bff;         # setter
+    $self->{in_textfile} = 0;            # setter
+
+    # Run second iteration
+    return $self->array_dispatcher;
+
 }
 
 #############
@@ -623,7 +696,7 @@ sub array_dispatcher {
 
     # Load the input data as Perl data structure
     my $in_data =
-      ( $self->{in_textfile} && $self->{method} !~ m/^(redcap2|omop2|cdisc2)/ )
+      ( $self->{in_textfile} && $self->{method} !~ m/^(redcap2|omop2|cdisc2|csv)/ )
       ? io_yaml_or_json( { filepath => $self->{in_file}, mode => 'read' } )
       : $self->{data};
 
@@ -632,13 +705,15 @@ sub array_dispatcher {
         redcap2bff => \&do_redcap2bff,
         cdisc2bff  => \&do_cdisc2bff,
         omop2bff   => \&do_omop2bff,
+        csv2bff    => \&do_csv2bff,
+        csv2pxf    => \&do_csv2pxf,
         bff2pxf    => \&do_bff2pxf,
         bff2csv    => \&do_bff2csv,
         bff2jsonf  => \&do_bff2csv,      # Not a typo, is the same as above
-        bff2jsonld => \&do_bff2jsonld,      
+        bff2jsonld => \&do_bff2jsonld,
         pxf2bff    => \&do_pxf2bff,
         pxf2csv    => \&do_pxf2csv,
-        pxf2jsonf  => \&do_pxf2csv,     # Not a typo, is the same as above
+        pxf2jsonf  => \&do_pxf2csv,      # Not a typo, is the same as above
         pxf2jsonld => \&do_pxf2jsonld
     );
 

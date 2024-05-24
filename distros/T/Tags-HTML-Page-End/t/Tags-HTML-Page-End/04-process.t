@@ -4,9 +4,9 @@ use warnings;
 use English;
 use Error::Pure::Utils qw(clean);
 use Tags::HTML::Page::End;
+use Tags::Output::Structure;
 use Test::More 'tests' => 3;
 use Test::NoWarnings;
-use Tags::Output::Structure;
 
 # Test.
 my $tags = Tags::Output::Structure->new;

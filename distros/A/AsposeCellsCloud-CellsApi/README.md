@@ -22,13 +22,13 @@ Enhance your Perl applications with the [Aspose.Cells Cloud](https://products.as
 
 
 
-## Feature & Enhancements in Version 24.5
+## Feature & Enhancements in Version 24.5.1
 
 Full list of issues covering all changes in this release:
 
 - Add merge queries method for loading data of data transformation.
 - Optimize chart data model.
-- Update obtaining access token address.
+
 
 ## Support file format
 

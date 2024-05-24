@@ -197,8 +197,8 @@ sub call_api {
 
     my $_url = $self->{config}{base_url}."/" .$self->{config}{api_version} . $resource_path;
     if($get_token){
-       # $_url = $self->{config}{base_url} . $resource_path;
-       $_url = "https://id.aspose.cloud" . $resource_path;
+       $_url = $self->{config}{base_url} . $resource_path;
+    #    $_url = "https://id.aspose.cloud" . $resource_path;
     }
 
     # build query 

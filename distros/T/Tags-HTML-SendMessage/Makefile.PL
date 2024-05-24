@@ -24,15 +24,15 @@ requires 'perl' => '5.8.0';
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Tags-HTML-SendMessage/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Tags-HTML-SendMessage';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Tags-HTML-SendMessage';
-test_requires 'CSS::Struct::Output::Raw' => 0;
+test_requires 'CSS::Struct::Output::Structure' => 0;
 test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0.22;
-test_requires 'Tags::Output::Raw' => 0;
 test_requires 'Tags::Output::Structure' => 0;
+test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.09';
+version '0.10';
 
 # Run.
 WriteAll();

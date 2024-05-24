@@ -4,7 +4,7 @@ use warnings;
 use Carp qw(croak);
 use YAML::XS 0.88;
 
-our $VERSION = '2.11'; # VERSION
+our $VERSION = '2.12'; # VERSION
 
 # ABSTRACT: Collect linux cpu statistics.
 
@@ -158,7 +158,7 @@ Linux::Info::CpuStats - Collect linux cpu statistics.
 
 =head1 VERSION
 
-version 2.11
+version 2.12
 
 =head1 SYNOPSIS
 

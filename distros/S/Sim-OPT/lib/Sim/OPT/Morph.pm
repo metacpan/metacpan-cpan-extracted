@@ -44,10 +44,10 @@ calc_newctl checkfile constrain_controls read_controls read_control_constraints 
 apply_flowcontrol_changes constrain_obstructions read_obstructions read_obs_constraints apply_obs_constraints
 vary_net read_net apply_node_changes readobsfile obs_modify
 decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rotate3d fixlength purifydata
-gatherseparators supercleanarray modish $max_processes @weighttransforms
+gatherseparators supercleanarray modish $max_processes @weighttransforms rebuildconstr
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.161'; # our $VERSION = '';
+$VERSION = '0.163'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model for simulation programs.';
 
 ################################################# MORPH
@@ -878,6 +878,7 @@ sub morph
 				my $reassign_construction = $vals{$countmorphing}{$countvar}{reassign_construction};
 				my $change_thickness = $vals{$countmorphing}{$countvar}{change_thickness};
 				my $recalculateish = $vals{$countmorphing}{$countvar}{recalculateish};
+				my $rebuildconstr = $vals{$countmorphing}{$countvar}{rebuildconstr};
 				my @recalculatenet = @{ $vals{$countmorphing}{$countvar}{recalculatenet} };
 				my $obs_modify = $vals{$countmorphing}{$countvar}{obs_modify};
 				my $netcomponentchange = $vals{$countmorphing}{$countvar}{netcomponentchange};
@@ -1352,6 +1353,13 @@ sub morph
 														$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 												}
 
+												if ( defined( $rebuildconstr->[$countop] ) and ( $action eq "rebuildconstr" ) )
+												{
+													rebuildconstr
+													( $to, $stepsvar, $countop,
+														$countstep, \@applytype, $rebuildconstr, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+												}
+
 												if ( defined( $daylightcalc->[$countop] )  and ( $action eq "daylightcalc" ) )
 												{
 													daylightcalc
@@ -1542,6 +1550,13 @@ sub morph
 																recalculateish
 																( $to, $stepsvar, $countop,
 																	$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
+															}
+
+															if ( defined( $rebuildconstr->[$countop] ) and ( $action eq "rebuildconstr" ) )
+															{   say $tee "FOR $to CALLED \$rebuildconstr EX-POST " . dump( $rebuildconstr );
+																rebuildconstr
+																( $to, $stepsvar, $countop,
+																	$countstep, \@applytype, $rebuildconstr, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
 															}
 
 															if ( defined( $daylightcalc->[$countop] )  and ( $action eq "daylightcalc" ) )
@@ -3472,6 +3487,58 @@ YYY
 	print $tee "#Updating the insolation calculations for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 } #END SUB RECALCULATEISH
+
+
+
+sub rebuildconstr
+{
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $rebuildconstr_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
+
+	my @applytype = @$applytype_ref;	my $zone_letter = $applytype[$countop][3];
+	my $rebuildconstr = $rebuildconstr_ref->[ $countop ];
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
+	my @zone_letters = @{ $rebuildconstr }; say $tee "ZONE LETTERS: " . dump( @zone_letters ) ;
+
+	$launchline = " -file $to/cfg/$fileconfig -mode script";
+
+	say $tee "Updating the construction solutions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+
+	foreach my $zone_letter ( @zone_letters )
+  {
+	  my $printthis =
+"cd $to/cfg/
+prj -file $fileconfig -mode script<<YYY
+m
+c
+b
+$zone_letter
+b
+a
+>
+a
+y
+y
+
+-
+-
+-
+-
+-
+YYY
+";
+	  unless ($exeonfiles eq "n")
+	  {
+      print `$printthis`;
+	  }
+	}
+
+
+	print $tee "#Updating the construction solutions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
+$printthis";
+} #END SUB REBUILDCONSTR
 
 
 sub ifempty
@@ -5524,18 +5591,18 @@ sub genchange
 	my $this_cycledata = $genchange->[$countop];
 	my @filequestions = @{ $this_cycledata->[1] };
 	my ( @plaincontents, @filecontents, @newfilecontents );
-	my ( %names, %nums, %newcontents );
+        my ( %names, %nums, %newcontents );
 
-	sub read_gen
+        sub read_gen
 	{
-		my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file, $countmorphing, $todo, $names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref, $launchline, $fullfilepath, $new_fullfilepath, $filequestions_ref ) = @_;
-		my @filequestions = @$filequestions_ref;
-		my $countunique = 1;
-		my $countfile = 0;
+                my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file, $countmorphing, $todo, $names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref, $launchline, $fullfilepath, $new_fullfilepath, $filequestions_ref ) = @_;
+                my @filequestions = @$filequestions_ref;
+                my $countunique = 1;
+                my $countfile = 0;
 
-		my @applytype = @$applytype_ref;
+                my @applytype = @$applytype_ref;
 
-		foreach my $filequests ( @filequestions )
+                foreach my $filequests ( @filequestions )
 		{
 			my @truequests = @$filequests;
 			my $constrainfiles_ref = shift( @truequest );
@@ -5543,11 +5610,11 @@ sub genchange
 			my $thisfile = shift( @truequests );
 			$thisfile =~ /\.(\d+)?/ ;
 			$afterdot = $1 ;
-			say $tee "AFTERDOT:\ $afterdot";
+			#say $tee "AFTERDOT:\ $afterdot";
 			my $fullfilepath = $to . $thisfile ;
 			my $new_fullfilepath = $fullfilepath . ".$afterdot" ;
 
-			say $tee "fullfilepath: $fullfilepath";
+			#say $tee "fullfilepath: $fullfilepath";
 			open( FULLFILEPATH, "$fullfilepath" ) or die ( "$!" );
 			my @filerows = <FULLFILEPATH>;
 			my @passrows = @filerows;
@@ -6043,21 +6110,22 @@ sub genchange
 
 			unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 			{
-				say $tee "cp -f $fullfilepath $oldfile";
-				`cp -f $fullfilepath $oldfile` ;
-				say $tee "cp -f $newfile $fullfilepath";
-				`cp -f $newfile $fullfilepath` ;
-				say $tee "cp -f $newfile $newfile_";
-				`cp -f $newfile $newfile_` ;
+				say $tee "mv -f $fullfilepath $oldfile";
+				`mv -f $fullfilepath $oldfile` ;
+				#say $tee "cp -f $newfile $newfile_";
+				#`cp -f $newfile $newfile_` ;
+				say $tee "mv -f $newfile $fullfilepath";
+				`mv -f $newfile $fullfilepath` ;
 			}
 			else
 			{
 				say $tee "xcopy  /e /c /r /y $fullfilepath $oldfile";
 				`xcopy  /e /c /r /y $fullfilepath $oldfile`  or die ("$!") ;
-				say $tee "xcopy  /e /c /r /y $newfile $fullfilepath";
-				`xcopy  /e /c /r /y $newfile $fullfilepath` or die $! ;
 				say $tee "xcopy  /e /c /r /y $newfile $newfile_";
 				`xcopy  /e /c /r /y $newfile $newfile_` or die $! ;
+				say $tee "xcopy  /e /c /r /y $newfile $fullfilepath";
+				`xcopy  /e /c /r /y $newfile $fullfilepath` or die $! ;
+
 			}
 			$countfile++;
 		}

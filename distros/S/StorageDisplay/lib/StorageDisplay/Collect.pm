@@ -18,7 +18,7 @@ package StorageDisplay::Collect;
 # ABSTRACT: modules required to collect data.
 # No dependencies (but perl itself and its basic modules)
 
-our $VERSION = '2.05'; # VERSION
+our $VERSION = '2.06'; # VERSION
 
 
 sub collectors {
@@ -713,7 +713,17 @@ use StorageDisplay::Collect::JSON;
 sub lsblkjson2perl {
     my $self = shift;
     my $json = shift;
-    return StorageDisplay::Collect::JSON::jsonarray2perlhash($json, 'blockdevices', 'kname');
+    my $res;
+    eval {
+	$res = StorageDisplay::Collect::JSON::jsonarray2perlhash($json, 'blockdevices', 'kname');
+    };
+    if ($@) {
+	# workaround a 2.37.2 util-linux bug
+	print STDERR "Oops, trying to workaround a 2.37.2 linux-util bug in lsblk\n";
+	$json =~ s/":, /":null, /g;
+	$res = StorageDisplay::Collect::JSON::jsonarray2perlhash($json, 'blockdevices', 'kname');
+    }
+    return $res;
 }
 
 sub collect {
@@ -1160,10 +1170,25 @@ sub collect {
     #close $dh;
     #$fs->{flatfull} = StorageDisplay::Collect::JSON::jsonarray2perlhash(join("",@json), 'filesystems', 'id');
 
-    $dh=$self->open_cmd_pipe_root(qw(findmnt --all --output-all --json --bytes));
-    my @json=<$dh>;
-    close $dh;
-    my $data = StorageDisplay::Collect::JSON::decode_json(join("",@json))->{"filesystems"}->[0];
+    my $data;
+    eval {
+	$dh=$self->open_cmd_pipe_root(qw(findmnt --all --output-all --json --bytes));
+	my @json=<$dh>;
+	close $dh;
+	$data = StorageDisplay::Collect::JSON::decode_json(join("",@json))->{"filesystems"}->[0];
+    };
+    if ($@) {
+	# workaround a 2.37.2 linux-util bug
+	print STDERR "Oops, trying to workaround a 2.37.2 linux-util bug in findmnt\n";
+	$dh=$self->open_cmd_pipe_root(qw(findmnt --all --json --bytes --output),
+	    "AVAIL,FREQ,FSROOT,FSTYPE,FS-OPTIONS,ID,LABEL,MAJ:MIN,OPTIONS,"
+	    ."OPT-FIELDS,PARENT,PARTLABEL,PARTUUID,PASSNO,PROPAGATION,SIZE,SOURCE,TARGET,"
+	    ."TID,USED,USE%,UUID,VFS-OPTIONS");
+	my @json=<$dh>;
+	close $dh;
+	$data = StorageDisplay::Collect::JSON::decode_json(join("",@json))->{"filesystems"}->[0];
+    }
+
     my $rec;
     $rec = sub {
 	my $node = shift;
@@ -2059,7 +2084,7 @@ StorageDisplay::Collect - modules required to collect data.
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 Main class, allows one to register collectors and run them
 (through the collect method)

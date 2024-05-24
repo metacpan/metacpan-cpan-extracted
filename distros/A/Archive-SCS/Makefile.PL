@@ -46,10 +46,13 @@ WriteMakefile(
       },
     },
   },
-  MIN_PERL_VERSION => '5.038',
+  MIN_PERL_VERSION => '5.039002',
   NAME => 'Archive::SCS',
   NO_MYMETA => 1,
-  VERSION => '0.02',
+  VERSION => '0.03',
+  dist => {
+    TARFLAGS => '--format=ustar -c -v -f', # avoid PaxHeader in tarball
+  },
   test => {
     RECURSIVE_TEST_FILES => 1,
   },

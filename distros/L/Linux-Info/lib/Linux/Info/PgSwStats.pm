@@ -5,7 +5,7 @@ use Carp qw(croak);
 use Time::HiRes 1.9725;
 use YAML::XS 0.88;
 
-our $VERSION = '2.11'; # VERSION
+our $VERSION = '2.12'; # VERSION
 
 # ABSTRACT:  Collect linux paging and swapping statistics.
 
@@ -165,7 +165,7 @@ Linux::Info::PgSwStats - Collect linux paging and swapping statistics.
 
 =head1 VERSION
 
-version 2.11
+version 2.12
 
 =head1 SYNOPSIS
 

@@ -9,7 +9,7 @@ use Linux::Info::KernelRelease::RedHat;
 use Linux::Info::KernelRelease::Rocky;
 use Linux::Info::KernelRelease::Ubuntu;
 
-our $VERSION = '2.11'; # VERSION
+our $VERSION = '2.12'; # VERSION
 
 # ABSTRACT: Factory class to create instances of Linux::Info::KernelRelease and subclasses
 
@@ -45,7 +45,7 @@ Linux::Info::KernelFactory - Factory class to create instances of Linux::Info::K
 
 =head1 VERSION
 
-version 2.11
+version 2.12
 
 =head1 SYNOPSIS
 

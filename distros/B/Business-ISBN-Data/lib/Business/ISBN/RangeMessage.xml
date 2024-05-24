@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>6ab7fffc-e8fa-4aa8-8945-26429f11df0c</MessageSerialNumber>
-  <MessageDate>Thu, 9 May 2024 04:41:10 BST</MessageDate>
+  <MessageSerialNumber>2cd8d843-bb15-45c7-9972-15996004b0ab</MessageSerialNumber>
+  <MessageDate>Thu, 23 May 2024 15:26:49 BST</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -2357,8 +2357,12 @@
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>1000000-4999999</Range>
+          <Range>1000000-4799999</Range>
           <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>4800000-4999999</Range>
+          <Length>5</Length>
         </Rule>
         <Rule>
           <Range>5000000-7999999</Range>
@@ -4565,19 +4569,19 @@
       <Agency>Morocco</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-2999999</Range>
+          <Range>0000000-2799999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>3000000-4299999</Range>
+          <Range>2800000-4299999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>4300000-4999999</Range>
+          <Range>4300000-4799999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>5000000-7999999</Range>
+          <Range>4800000-7999999</Range>
           <Length>3</Length>
         </Rule>
         <Rule>

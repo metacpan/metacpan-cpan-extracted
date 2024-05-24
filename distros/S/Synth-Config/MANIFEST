@@ -10,7 +10,8 @@ README.md
 dist.ini
 eg/Maths.yaml
 eg/Modular.yaml
-eg/patch-visualizer.pl
+eg/patch-import.pl
+eg/patch-visualize.pl
 eg/public/css/fontawesome.css
 eg/public/css/solid.css
 eg/public/settings/initial.set

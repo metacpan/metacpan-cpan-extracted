@@ -1,5 +1,8 @@
 Revision history for Perl module Locale::Unicode
 
+v0.1.5 2024-05-24T11:06:59+0900
+    - Added global variable $EXPLICIT_BOOLEAN affecting the rendering of stringification of objects
+
 v0.1.4 2024-05-23T14:14:14+0900
     - Corrected the method 'colCaseFirst' (kf) incorrectly previously treated as only boolean.
     - Updated the documentation.

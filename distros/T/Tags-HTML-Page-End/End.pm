@@ -4,7 +4,7 @@ use base qw(Tags::HTML);
 use strict;
 use warnings;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -92,6 +92,8 @@ Returns undef.
                  Parameter 'tags' isn't defined.
 
 =head1 EXAMPLE
+
+=for comment filename=page_example.pl
 
  use strict;
  use warnings;
@@ -183,12 +185,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020-2022
+© 2020-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

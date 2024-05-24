@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.413  2024-05-23
+        Bugfix import: don't check for emptiness of the first row if the file is a text file.
+
 2.412  2024-05-21
         - New scalar function 'date_subtract'.
         - Oracle: bugfix in 'date_add' and 'to_epoch'.

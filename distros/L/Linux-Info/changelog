@@ -1,9 +1,22 @@
-liblinux-info-perl (2.11) trusty; urgency=low
-  * fix: configure GitHub Actions to ignore tags
+liblinux-info-perl (2.12) trusty; urgency=low
+  * Bugfix/sysinfo scalar (#17)
+  * fix: wrong definition of parameters
+  When the distribution based on /etc/os-release wasn't the ones that
+    are supported were wrongly waiting for a hash as parameter.
+  In other cases, a file path was expected.
+  Linux::Info::Distribution::BasicInfo class was introduced to fix
+    that.
+  * fix: typo
+  Thanks to https://github.com/michal-josef-spacek for spotting the
+    typo!
+  * fix: wrong abstract format
+  * chore: version bump
+  * chore: new test requirements 
+  * fix: configure GitHub Actions to ignore tags (#13)
   At each tag creation and pushed after branches merging, the GHA is
     being executed again, without any need. 
 
- -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Wed, 22 May 2024 15:01:29 +0000
+ -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Fri, 24 May 2024 01:10:24 +0000
 
 liblinux-info-perl () trusty; urgency=low
   * Feature/improved kernel release (#12)

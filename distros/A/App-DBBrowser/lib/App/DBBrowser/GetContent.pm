@@ -239,7 +239,7 @@ sub get_content {
                             if ( ! $parse_ok ) {
                                 next FILE;
                             }
-                            if ( ! @{$sql->{insert_args}} || ! @{$sql->{insert_args}[0]} ) {
+                            if ( ! @{$sql->{insert_args}} ) {
                                 $tc->choose(
                                     [ 'Press ENTER' ],
                                     { prompt => 'Empty File!' }

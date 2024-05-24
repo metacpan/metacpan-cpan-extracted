@@ -38,7 +38,7 @@ sub new {
 
 sub _groups {
     my $groups = [
-        { name => 'group_plugins',      text => "- Plugins"   },
+        { name => 'group_plugins',      text => "  Plugins"   },
         { name => 'group_database',     text => "- DB Settings"  },
         { name => 'group_extensions',   text => "- Extensions"   },
         { name => 'group_sql_settings', text => "- SQL Settings" },

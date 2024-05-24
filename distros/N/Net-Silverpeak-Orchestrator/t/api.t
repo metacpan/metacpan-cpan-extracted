@@ -25,10 +25,16 @@ END {
         if defined $orchestrator;
 }
 
-like($orchestrator->get_version, qr/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/,
+my $version = $orchestrator->get_version;
+like($version, qr/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/,
     'get_version ok');
 
 is($orchestrator->_is_version_93, D(), '_is_version_93 ok');
+diag 'running against a version ' . (
+    $orchestrator->_is_version_93
+    ? '>= 9.3'
+    : '< 9.3')
+    . " Orchestrator: $version";
 
 like (
     dies {
@@ -251,6 +257,18 @@ SKIP: {
             etc();
         },
         'get_interface_state ok');
+
+    is($orchestrator->get_appliance_ipsla_configs($test_appliance->{id}),
+        hash {
+            etc();
+        },
+        'get_appliance_ipsla_configs ok');
+
+    is($orchestrator->get_appliance_ipsla_states($test_appliance->{id}),
+        hash {
+            etc();
+        },
+        'get_appliance_ipsla_states ok');
 
     is($orchestrator->list_applianceids_by_templategroupname(
         $ENV{NET_SILVERPEAK_ORCHESTRATOR_POLICY}),

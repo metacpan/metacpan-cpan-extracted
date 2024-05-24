@@ -44,7 +44,6 @@ my $synth = Synth::Config->new(model => $opts{model});
 my ($spec_id, $specs);
 if ($opts{specs}) {
     die 'Specs file does not exist' unless -e $opts{specs};
-    my $specs = {};
     unless ($specs = do $opts{specs}) {
         die "Couldn't parse $opts{specs}: $@" if $@;
         die "Couldn't do $opts{specs}: $!"    unless defined $specs;

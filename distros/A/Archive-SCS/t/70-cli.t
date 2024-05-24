@@ -1,10 +1,11 @@
 #!perl
 use v5.36;
 use lib 'lib', 't/lib';
+use feature 'defer';
+no warnings 'experimental::defer';
 no warnings 'experimental::builtin';
 use builtin 'trim';
 
-use Feature::Compat::Defer;
 use List::Util 1.33 'any';
 use Path::Tiny 0.119;
 use Test::More;

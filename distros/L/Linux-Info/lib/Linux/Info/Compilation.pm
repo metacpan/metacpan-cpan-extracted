@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '2.11'; # VERSION
+our $VERSION = '2.12'; # VERSION
 
 # ABSTRACT: Statistics compilation.
 
@@ -228,7 +228,7 @@ Linux::Info::Compilation - Statistics compilation.
 
 =head1 VERSION
 
-version 2.11
+version 2.12
 
 =head1 SYNOPSIS
 

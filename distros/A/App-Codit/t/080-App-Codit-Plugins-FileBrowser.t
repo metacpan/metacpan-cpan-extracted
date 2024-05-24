@@ -6,8 +6,11 @@ use Tk;
 use Test::Tk;
 use Test::More tests => 5;
 use File::Spec;
+use Config;
+my $mswin = $Config{'osname'} eq 'MSWin32';
 $mwclass = 'App::Codit';
-#$quitdelay = 2500;
+
+$quitdelay = 1000 if $mswin;
 
 BEGIN { use_ok('App::Codit::Plugins::FileBrowser') };
 

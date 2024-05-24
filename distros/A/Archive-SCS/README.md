@@ -18,13 +18,13 @@ This software is designed for Unix-y systems, i.e. Linux / Mac.
 ### More information
 
 CPAN distribution:
-https://metacpan.org/dist/Archive-SCS
+<https://metacpan.org/dist/Archive-SCS>
 
 Source repository:
-https://github.com/nautofon/Archive-SCS
+<https://github.com/nautofon/Archive-SCS>
 
 Discussion thread on the SCS forum:
-https://forum.scssoft.com/viewtopic.php?t=330746
+<https://forum.scssoft.com/viewtopic.php?t=330746>
 
 ### Installation
 
@@ -41,8 +41,8 @@ for example using [Perlbrew](https://perlbrew.pl/) like this:
 
 ```sh
 \curl -L https://install.perlbrew.pl | bash
-perlbrew install -j 5 --64int stable
-perlbrew switch stable
+perlbrew install -j 5 --64int perl-5.39.10
+perlbrew switch perl-5.39.10
 
 perlbrew install-cpanm
 ```
@@ -53,6 +53,7 @@ The recommended way to install Perl modules is from CPAN by using a
 management tool like [cpanminus](https://metacpan.org/pod/App::cpanminus).
 Among other things, it will install all dependencies automatically.
 
+However, there is an exception:
 Currently, Archive::SCS requires a specific version range of the
 [String::CityHash](https://metacpan.org/release/ALEXBIO/String-CityHash-0.10/view/lib/String/CityHash.pm)
 module, which is only available from BackPAN. Suitable versions

@@ -2,12 +2,17 @@ use warnings;
 use strict;
 use Test::More;
 
+use Linux::Info::Distribution::BasicInfo;
+
 my $class = 'Linux::Info::Distribution::Custom::RedHat';
 require_ok($class);
 can_ok( $class, qw(get_type is_enterprise get_codename) );
 
 my $instance = $class->new(
-    { id => 'redhat', file_to_parse => 't/samples/redhat_version' } );
+    Linux::Info::Distribution::BasicInfo->new(
+        'redhat', 't/samples/redhat_version'
+    )
+);
 ok( $instance, 'new method works' );
 isa_ok( $instance, 'Linux::Info::Distribution::Custom' );
 
@@ -17,6 +22,7 @@ my @fixtures = (
     [ 'get_codename',   'Maipo' ],
     [ 'get_version',    'release 7.2, codename Maipo' ],
     [ 'get_version_id', '7.2' ],
+    [ 'get_id',         'redhat' ],
 );
 
 foreach my $fixture (@fixtures) {

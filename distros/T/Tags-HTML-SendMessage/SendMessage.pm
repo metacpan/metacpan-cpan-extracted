@@ -17,7 +17,7 @@ Readonly::Hash my %LANG => (
 	'send' => 'Send question',
 );
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Constructor.
 sub new {
@@ -228,6 +228,8 @@ Returns undef.
 
 =head1 EXAMPLE1
 
+=for comment filename=send_message.pl
+
  use strict;
  use warnings;
 
@@ -264,11 +266,11 @@ Returns undef.
 
  # Output:
  # <!DOCTYPE html>
- # <html>
+ # <html lang="en">
  #   <head>
  #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
- #     <meta charset="UTF-8" />
  #     <meta name="generator" content="Tags::HTML::SendMessage EXAMPLE1" />
+ #     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
  #     <title>
  #       Page title
  #     </title>
@@ -330,12 +332,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020
+© Michal Josef Špaček 2020-2024
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

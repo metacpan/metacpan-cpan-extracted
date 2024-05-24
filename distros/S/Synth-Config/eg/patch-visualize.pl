@@ -7,14 +7,12 @@ use Synth::Config ();
 use Getopt::Long qw(GetOptions);
 
 my %opt = (
-    model  => undef, # e.g. 'Modular'
-    patch  => undef, # e.g. 'Simple 001'
-    config => undef, # n.b. set below if not given
+    model => undef, # e.g. 'Modular'
+    patch => undef, # e.g. 'Simple 001'
 );
 GetOptions(\%opt,
     'model=s',
     'patch=s@',
-    'config=s',
 );
 
 my $model = $opt{model};
@@ -22,20 +20,14 @@ my $model = $opt{model};
 die "Usage: perl $0 --model='Modular' [--patch='Simple 001' --patch='Simple 002']\n"
     unless $model;
 
-$opt{config} ||= "eg/$model.yaml";
-die "Invalid model config\n" unless -e $opt{config};
-
 my $synth = Synth::Config->new(
     model => $model,
 #    verbose => 1,
 );
 
-my $patches = $synth->import_yaml(
-    file => $opt{config},
-    defined $opt{patch} ? (patches => $opt{patch}) : (),
-);
+my @patches = $opt{patch} ? $opt{patch}->@* : $synth->recall_names;
 
-for my $patch_name (@$patches) {
+for my $patch_name (@patches) {
     my $settings = $synth->search_settings(name => $patch_name);
     $synth->graphviz(
         settings   => $settings,

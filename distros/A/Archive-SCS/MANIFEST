@@ -22,6 +22,7 @@ t/61-game-dir-mount.t
 t/70-cli.t
 t/71-cli-multifile.t
 t/72-cli-game.t
+t/73-cli-stdin.t
 t/lib/TestArchiveSCS.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

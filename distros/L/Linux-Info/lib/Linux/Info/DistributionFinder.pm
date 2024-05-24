@@ -4,13 +4,16 @@ use warnings;
 use strict;
 use Hash::Util qw(lock_hash);
 use Carp       qw(confess);
-use Class::XSAccessor setters => { set_config_dir => 'config_dir', };
+use Class::XSAccessor
+  setters           => { set_config_dir => 'config_dir', },
+  exists_predicates => { has_custom     => 'custom_source' };
 use File::Spec;
 use constant DEFAULT_CONFIG_DIR => '/etc';
 
 use Linux::Info::Distribution::OSRelease;
+use Linux::Info::Distribution::BasicInfo;
 
-our $VERSION = '2.11'; # VERSION
+our $VERSION = '2.12'; # VERSION
 
 # ABSTRACT: class to search for candidate files
 
@@ -53,9 +56,9 @@ sub new {
     my $class      = shift;
     my $keep_cache = shift || 0;
     my $self       = {
-        config_dir   => DEFAULT_CONFIG_DIR,
-        release_info => undef,
-        keep_cache   => $keep_cache
+        config_dir  => DEFAULT_CONFIG_DIR,
+        distro_info => undef,
+        keep_cache  => $keep_cache,
     };
     bless $self, $class;
     return $self;
@@ -89,7 +92,6 @@ sub _config_dir {
     return \@candidates;
 }
 
-# TODO: should return a well known data structure
 sub _search_release_file {
     my $self           = shift;
     my $candidates_ref = $self->_config_dir;
@@ -98,10 +100,9 @@ sub _search_release_file {
         my $file_path = $self->{config_dir} . '/' . $thing;
 
         if ( ( exists $release_files{$thing} ) and ( -f $file_path ) ) {
-            $self->{release_info} = {
-                id            => ( lc $release_files{$thing} ),
-                file_to_parse => ($file_path),
-            };
+            $self->{distro_info} = Linux::Info::Distribution::BasicInfo->new(
+                ( lc $release_files{$thing} ), $file_path, );
+
             last;
         }
     }
@@ -109,49 +110,44 @@ sub _search_release_file {
 
 
 sub search_distro {
-    my $self       = shift;
-    my $os_release = shift || Linux::Info::Distribution::OSRelease->new;
+    my ( $self, $os_release ) = @_;
+
+    # Linux::Info::Distribution::OSRelease
 
     if ( $self->{keep_cache} ) {
-        return $self->{release_info} if ( defined( $self->{release_info} ) );
+        return $self->{distro_info} if ( defined( $self->{distro_info} ) );
     }
     else {
-        $self->{release_info} = undef;
+        $self->{distro_info} = undef;
     }
 
     if ( $self->{config_dir} eq DEFAULT_CONFIG_DIR ) {
-        if ( -r $os_release->get_source ) {
-            $self->{release_info} = $os_release->parse;
+        my $data_ref;
+
+        if ( ( defined $os_release ) and ( -r $os_release->get_source ) ) {
+            $data_ref = $os_release->parse;
         }
-        else {
-            $self->_search_release_file;
+        elsif ( -r Linux::Info::Distribution::OSRelease::DEFAULT_FILE ) {
+            $os_release = Linux::Info::Distribution::OSRelease->new;
+            $data_ref   = $os_release->parse;
         }
+
+        $self->{distro_info} =
+          Linux::Info::Distribution::BasicInfo->new( $data_ref->{id},
+            $os_release->get_source );
     }
     else {
         $self->_search_release_file;
+        $self->{custom_source} = 1;
     }
 
-    return $self->{release_info};
+    return $self->{distro_info};
 }
 
 
 sub has_distro_info {
     my $self = shift;
-    return ( defined( $self->{release_info} ) ) ? 1 : 0;
-}
-
-
-sub has_custom {
-    my $self = shift;
-
-    if (    ( defined( $self->{release_info} ) )
-        and ( exists $self->{release_info}->{file_to_parse} )
-        and ( defined $self->{release_info}->{file_to_parse} ) )
-    {
-        return 1;
-    }
-
-    return 0;
+    return ( defined( $self->{distro_info} ) ) ? 1 : 0;
 }
 
 
@@ -169,7 +165,7 @@ Linux::Info::DistributionFinder - class to search for candidate files
 
 =head1 VERSION
 
-version 2.11
+version 2.12
 
 =head2 SYNOPSIS
 
@@ -236,7 +232,8 @@ Otherwise, returns "false" (0).
 =head2 has_custom
 
 Returns "true" (1) if the instance has cached distribution information
-retrieved from a custom file.
+retrieved from a custom file, in other words, not in the expected format of
+F</etc/os-release>.
 
 Otherwise, returns "false" (0).
 

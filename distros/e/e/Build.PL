@@ -54,7 +54,7 @@ my $builder = $class->new(
         'Data::Printer'     => '0',
         'App::Pod'          => '0.36',
     },
-    add_to_cleanup => [ 'e-*', 'MANIFEST*.bak', 'README*', 'blib/' ],
+    add_to_cleanup => [ 'e-*', 'MANIFEST*.bak', 'blib/' ],
     meta_merge     => {
         resources => {
             bugtracker => 'https://github.com/poti1/e/issues',

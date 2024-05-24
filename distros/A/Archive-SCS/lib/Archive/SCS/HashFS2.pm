@@ -1,8 +1,8 @@
-use v5.38;
+use v5.39.2;
 use feature 'class';
 no warnings 'experimental::class';
 
-class Archive::SCS::HashFS2 0.02
+class Archive::SCS::HashFS2 0.03
   :isa( Archive::SCS::Mountable );
 
 use Archive::SCS::CityHash qw(
@@ -233,9 +233,9 @@ method read_entry ($hash) {
     my $status = $zlib->inflate( \(my $raw = $data), \$data );
 
     $status == Z_OK || $status == Z_STREAM_END
-      or do{ warnings::warnif io =>
+      or warnings::warnif io =>
       sprintf "%s: Inflation failed: %s (%i)",
-      $file->basename, $zlib->msg // "", $status; use XXX; YYY $entry;};
+      $file->basename, $zlib->msg // "", $status;
 
     $zlib->inflateReset;
 

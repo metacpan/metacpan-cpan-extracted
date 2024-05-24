@@ -1,8 +1,8 @@
-use v5.38;
+use v5.39.2;
 use feature 'class';
 no warnings 'experimental::class';
 
-class Archive::SCS::InMemory 0.02
+class Archive::SCS::InMemory 0.03
   :isa( Archive::SCS::Mountable );
 
 use Archive::SCS::CityHash 'cityhash64';

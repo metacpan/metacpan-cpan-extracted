@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Codit.
 
+0.04 Thu May 23 2024
+	- Fixed bug in plugins PerlSubs and PodViewer
+	- improved testing for windows
+
 0.03 Mon May 20 2024
 	- Fixed bug in PerlSubs
 	- Improved unloading of plugins

@@ -9,7 +9,7 @@ use Class::XSAccessor getters => {
     get_distro_info => 'distro_info',
 };
 
-our $VERSION = '2.11'; # VERSION
+our $VERSION = '2.12'; # VERSION
 
 # ABSTRACT: a subclass of Linux::Info::KernelRelease specific to parse RedHat kernel information
 
@@ -53,7 +53,7 @@ Linux::Info::KernelRelease::RedHat - a subclass of Linux::Info::KernelRelease sp
 
 =head1 VERSION
 
-version 2.11
+version 2.12
 
 =head1 METHODS
 

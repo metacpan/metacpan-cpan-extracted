@@ -10,6 +10,7 @@ use strict;
 use warnings;
 use vars qw( $VERSION );
 $VERSION = 0.03;
+use Tk;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 require Tk::HList;
@@ -46,7 +47,6 @@ sub new {
 	$self->{CURDOC} = 0;
 	$self->{MODLEVEL} = 0;
 	
-	my @columns = ('Sub', 'Line');
 	my $hlist = $page->Scrolled('HList',
 		-browsecmd => ['Select', $self],
 		-columns => 2,
@@ -55,7 +55,7 @@ sub new {
 	)->pack(-expand => 1, -fill => 'both');
 	$self->{HLIST} = $hlist;
 	my $count = 0;
-	for (@columns) {
+	for ('Sub', 'Line') {
 		my $header = $hlist->Frame;
 		$header->Label(-text => $_)->pack(-side => 'left');
 		$hlist->headerCreate($count, -itemtype => 'window', -widget => $header);
@@ -119,6 +119,7 @@ sub NewDocument {
 
 sub RefreshList {
 	my ($self, $select) = @_;
+	delete $self->{'active_id'};
 	$select = 1 unless defined $select;
 	my $name = $self->{NAME};
 
@@ -173,6 +174,8 @@ sub Select {
 
 sub Unload {
 	my $self = shift;
+	my $id = $self->{'active_id'};
+	$self->afterCancel($id) if defined $id;
 	$self->extGet('NavigatorPanel')->deletePage('PerlSubs');
 	$self->cmdUnhookAfter('modified', 'activate', $self);
 	$self->cmdUnhookAfter('doc_select', 'NewDocument', $self);

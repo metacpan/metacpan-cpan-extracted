@@ -19,7 +19,7 @@ use Convert::Pheno::SQLite;
 binmode STDOUT, ':encoding(utf-8)';
 use Exporter 'import';
 our @EXPORT =
-  qw(map_ethnicity map_ontology dotify_and_coerce_number iso8601_time _map2iso8601 map_reference_range map_age_range map2redcap_dict map2ohdsi convert2boolean find_age randStr map_operator_concept_id map_info_field map_omop_visit_occurrence dot_date2iso remap_mapping_hash_term validate_format get_metaData get_info);
+  qw(map_ontology_term dotify_and_coerce_number iso8601_time _map2iso8601 map_reference_range map_reference_range_csv map_age_range map2redcap_dict map2ohdsi convert2boolean find_age randStr map_operator_concept_id map_info_field map_omop_visit_occurrence dot_date2iso validate_format get_metaData get_info);
 
 use constant DEVEL_MODE => 0;
 
@@ -32,16 +32,7 @@ my %seen = ();
 #############################
 #############################
 
-sub map_ethnicity {
-
-    my $str       = shift;
-    my %ethnicity = ( map { $_ => 'NCIT:C41261' } ( 'caucasian', 'white' ) );
-
-# 1, Caucasian | 2, Hispanic | 3, Asian | 4, African/African-American | 5, Indigenous American | 6, Mixed | 9, Other";
-    return { id => $ethnicity{ lc($str) }, label => $str };
-}
-
-sub map_ontology {
+sub map_ontology_term {
 
     # Most of the execution time goes to this subroutine
     # We will adopt two estragies to gain speed:
@@ -50,43 +41,52 @@ sub map_ontology {
 
     #return { id => 'dummy', label => 'dummy' } # test speed
 
+    # We will return quickly when nothing has to be done
+    my $query = $_[0]->{query};
+
+    # If the ontology term is an object we assume it comes
+    # from "terminology" prperty in the mapping file
+    return $query if ref $query eq 'HASH';
+
     # Checking for existance in %seen
-    my $tmp_query = $_[0]->{query};
-    say "Skipping searching for <$tmp_query> as it already exists"
-      if DEVEL_MODE && exists $seen{$tmp_query};
+    say "Skipping searching for <$query> as it already exists"
+      if DEVEL_MODE && exists $seen{$query};
 
     # return if terms has already been searched and exists
     # Not a big fan of global stuff...
     #  ¯\_(ツ)_/¯
     # Premature return
-    return $seen{$tmp_query} if exists $seen{$tmp_query};    # global
-
-    say "searching for <$tmp_query>" if DEVEL_MODE;
+    return $seen{$query} if exists $seen{$query};    # global
 
     # return something if we know 'a priori' that the query won't exist
-    #return { id => 'NCIT:NA000', label => $tmp_query } if $tmp_query =~ m/xx/;
+    #return { id => 'NCIT:NA000', label => $query } if $query =~ m/xx/;
 
     # Ok, now it's time to start the subroutine
     my $arg                       = shift;
     my $column                    = $arg->{column};
     my $ontology                  = $arg->{ontology};
     my $self                      = $arg->{self};
+    my $databases                 = $self->{databases};
     my $search                    = $self->{search};
     my $print_hidden_labels       = $self->{print_hidden_labels};
     my $text_similarity_method    = $self->{text_similarity_method};
     my $min_text_similarity_score = $self->{min_text_similarity_score};
 
+    # DEVEL_MODE
+    say "searching for query <$query> in ontology <$ontology>" if DEVEL_MODE;
+
     # Die if user wants OHDSI w/o flag -ohdsi-db
     die
-"Could not find the concept_id:<$tmp_query> in the provided <CONCEPT> table.\nPlease use the flag <--ohdsi-db> to enable searching at Athena-OHDSI database\n"
+"Could not find the concept_id:<$query> in the provided <CONCEPT> table.\nPlease use the flag <--ohdsi-db> to enable searching at Athena-OHDSI database\n"
       if ( $ontology eq 'ohdsi' && !$self->{ohdsi_db} );
 
     # Perform query
-    my ( $id, $label ) = get_ontology(
+    my ( $id, $label ) = get_ontology_terms(
         {
             sth_column_ref            => $self->{sth}{$ontology}{$column},
-            query                     => $tmp_query,
+            query                     => $query,
             ontology                  => $ontology,
+            databases                 => $databases,
             column                    => $column,
             search                    => $search,
             text_similarity_method    => $text_similarity_method,
@@ -95,11 +95,11 @@ sub map_ontology {
     );
 
     # Add result to global %seen
-    $seen{$tmp_query} = { id => $id, label => $label };    # global
+    $seen{$query} = { id => $id, label => $label };    # global
 
 # id and label come from <db> _label is the original string (can change on partial matches)
     return $print_hidden_labels
-      ? { id => $id, label => $label, _label => $tmp_query }
+      ? { id => $id, label => $label, _label => $query }
       : { id => $id, label => $label };
 }
 
@@ -157,6 +157,12 @@ sub map_reference_range {
     }
 
     return $hashref;
+}
+
+sub map_reference_range_csv {
+    my ( $unit, $range ) = @_;
+    $range->{unit} = $unit;
+    return $range;
 }
 
 sub map_age_range {
@@ -229,7 +235,7 @@ sub map2ohdsi {
     ######################
 
     else {
-        $data = map_ontology(
+        $data = map_ontology_term(
             {
                 query    => $concept_id,
                 column   => 'concept_id',
@@ -433,24 +439,6 @@ sub is_multidimensional {
     return ref shift ? 1 : 0;
 }
 
-sub remap_mapping_hash_term {
-
-    my ( $mapping_file_data, $term ) = @_;
-    my %hash_out = map {
-            $_ => exists $mapping_file_data->{$term}{$_}
-          ? $mapping_file_data->{$term}{$_}
-          : undef
-    } (qw/fields dictionary mapping selector/);
-    $hash_out{ontology} =
-      exists $mapping_file_data->{$term}{ontology}
-      ? $mapping_file_data->{$term}{ontology}
-      : $mapping_file_data->{project}{ontology};
-    $hash_out{routesOfAdministration} =
-      $mapping_file_data->{$term}{routesOfAdministration}
-      if $term eq 'treatments';
-    return \%hash_out;
-}
-
 sub validate_format {
 
     my ( $data, $format ) = @_;
@@ -477,8 +465,7 @@ sub get_info {
     my $os = $^O;
     chomp(
         my $ncpuhost =
-          lc($os) eq 'darwin'
-          || lc($os) eq 'freebsd' ? qx{/usr/sbin/sysctl -n hw.ncpu}
+          lc($os) eq 'darwin' || lc($os) eq 'freebsd' ? qx{sysctl -n hw.ncpu}
         : $os eq 'MSWin32' ? qx{wmic cpu get NumberOfLogicalProcessors}
         :                    qx{/usr/bin/nproc} // 1
     );

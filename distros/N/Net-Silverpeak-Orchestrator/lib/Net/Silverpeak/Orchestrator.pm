@@ -1,5 +1,5 @@
 package Net::Silverpeak::Orchestrator;
-$Net::Silverpeak::Orchestrator::VERSION = '0.012000';
+$Net::Silverpeak::Orchestrator::VERSION = '0.013000';
 # ABSTRACT: Silverpeak Orchestrator REST API client library
 
 use 5.024;
@@ -318,6 +318,26 @@ sub get_interface_labels_by_type ($self) {
 }
 
 
+sub get_appliance_ipsla_configs ($self, $id) {
+    my $res = $self->_is_version_93
+        ? $self->get("/gms/rest/ipsla/config/managers?nePk=$id")
+        : $self->get("/gms/rest/ipsla/config/managers/$id");
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
+sub get_appliance_ipsla_states ($self, $id) {
+    my $res = $self->_is_version_93
+        ? $self->get("/gms/rest/ipsla/state/managers?nePk=$id")
+        : $self->get("/gms/rest/ipsla/state/managers/$id");
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
 sub list_template_applianceassociations($self) {
     my $res = $self->get('/gms/rest/template/applianceAssociation');
     $self->_error_handler($res)
@@ -535,7 +555,7 @@ Net::Silverpeak::Orchestrator - Silverpeak Orchestrator REST API client library
 
 =head1 VERSION
 
-version 0.012000
+version 0.013000
 
 =head1 SYNOPSIS
 
@@ -693,6 +713,18 @@ Returns a hashref containing the interface state.
 =head2 get_interface_labels_by_type
 
 Returns a hashref containing the interface labels indexed by LAN/WAN and their id.
+
+=head2 get_appliance_ipsla_configs
+
+Takes an appliance id.
+
+Returns a hashref containing all IP SLA configurations.
+
+=head2 get_appliance_ipsla_states
+
+Takes an appliance id.
+
+Returns a hashref containing all IP SLA states.
 
 =head2 list_template_applianceassociations
 

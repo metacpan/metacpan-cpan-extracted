@@ -11,6 +11,7 @@ lib/Rope/Handles/Counter.pm
 lib/Rope/Handles/Hash.pm
 lib/Rope/Handles/Number.pm
 lib/Rope/Handles/String.pm
+lib/Rope/Lazier.pm
 lib/Rope/Monkey.pm
 lib/Rope/Object.pm
 lib/Rope/Role.pm
@@ -76,6 +77,7 @@ t/50-counter.t
 t/51-bool.t
 t/52-variant.t
 t/53-variant-alias.t
+t/54-lazier.t
 t/lib/Custom.pm
 t/lib/One.pm
 t/lib/Role.pm

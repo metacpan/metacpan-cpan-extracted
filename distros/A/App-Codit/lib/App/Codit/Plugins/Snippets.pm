@@ -9,7 +9,7 @@ App::Codit::Plugins::Snippets - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.03;
+$VERSION = 0.04;
 
 use Carp;
 
@@ -90,8 +90,10 @@ sub new {
 		-text => 'Create',
 		-command => ['snippetCreate', $self],
 	)->pack(@padding, -fill => 'x');
-	my $text = $sf->Scrolled('XText',
-		-font => $self->configGet('-contentfont'),
+	my @to = ();
+	my $font = $self->configGet('-contentfont');
+	push @to, -font => $font if $font ne '';
+	my $text = $sf->Scrolled('XText', @to,
 		-scrollbars => 'osoe',
 		-tabs => '8m',
 		-wrap => 'none',

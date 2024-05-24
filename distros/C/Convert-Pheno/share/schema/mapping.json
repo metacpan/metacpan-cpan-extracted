@@ -6,16 +6,8 @@
   "type": "object",
   "required": [
     "project",
-    "diseases",
-    "ethnicity",
-    "exposures",
     "id",
-    "info",
-    "interventionsOrProcedures",
-    "measures",
-    "phenotypicFeatures",
-    "sex",
-    "treatments"
+    "sex"
   ],
   "properties": {
     "project": {
@@ -24,7 +16,8 @@
         "id",
         "source",
         "ontology",
-        "version"
+        "version",
+        "baselineFieldsToPropagate"
       ],
       "properties": {
         "id": {
@@ -34,7 +27,8 @@
           "type": "string",
           "enum": [
             "redcap",
-            "cdisc-odm"
+            "cdisc-odm",
+            "csv"
           ]
         },
         "ontology": {
@@ -45,6 +39,9 @@
         },
         "description": {
           "$ref": "#/$defs/stringField"
+        },
+        "baselineFieldsToPropagate": {
+          "$ref": "#/$defs/arrayField"
         }
       }
     },
@@ -52,7 +49,7 @@
       "$ref": "#/$defs/objectField"
     },
     "ethnicity": {
-      "$ref": "#/$defs/stringField"
+      "$ref": "#/$defs/objectField"
     },
     "exposures": {
       "$ref": "#/$defs/objectField"
@@ -82,7 +79,7 @@
       "$ref": "#/$defs/objectField"
     },
     "sex": {
-      "$ref": "#/$defs/stringField"
+      "$ref": "#/$defs/objectField"
     },
     "treatments": {
       "$ref": "#/$defs/objectField"
@@ -94,10 +91,14 @@
       "additionalProperties": false,
       "properties": {
         "fields": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/$defs/arrayField"
+            }
+          ]
         },
         "dictionary": {
           "type": "object",
@@ -111,10 +112,28 @@
             "type": "object"
           }
         },
-        "routesOfAdministration": {
-          "type": "array",
-          "items": {
-            "type": "string"
+        "routeOfAdministration": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "oral",
+              "rectal",
+              "intravenous",
+              "intramuscular",
+              "subcutaneous",
+              "inhalation",
+              "topical",
+              "transdermal",
+              "sublingual",
+              "buccal",
+              "intranasal",
+              "ocular",
+              "otic",
+              "vaginal",
+              "intrathecal",
+              "epidural"
+            ]
           }
         },
         "ontology": {
@@ -132,6 +151,110 @@
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "terminology": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^\\w[^:]+:.+$"
+              },
+              "label": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "label"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "assignTermIdFromHeader": {
+          "$ref": "#/$defs/arrayField"
+        },
+        "drugDose": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "duration": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "drugUnit": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "durationUnit": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "bodySite": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "dateOfProcedure": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "ageOfOnset": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "familyHistory": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "unit": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "referenceRange": {
+                "type": "object",
+                "properties": {
+                  "low": {
+                    "type": "number"
+                  },
+                  "high": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "low",
+                  "high"
+                ]
+              },
+              "procedureCodeLabel": {
+                "$ref": "#/$defs/stringField"
+              }
+            },
+            "required": [
+              "label",
+              "referenceRange"
+            ]
+          }
         }
       },
       "required": [
@@ -142,7 +265,10 @@
       "type": "string"
     },
     "arrayField": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   }
 }

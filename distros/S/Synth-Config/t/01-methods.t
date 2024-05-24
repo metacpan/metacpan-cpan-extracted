@@ -57,25 +57,25 @@ subtest settings => sub {
     is_default => 0,
   };
   # make an initial setting
-  my $id = $obj->make_setting(%$expect);
-  ok $id, "make_setting (id: $id)";
+  my $id1 = $obj->make_setting(%$expect);
+  ok $id1, "make_setting (id: $id1)";
   # recall that setting
-  my $setting = $obj->recall_setting(id => $id);
-  $expect->{id} = $id;
+  my $setting = $obj->recall_setting(id => $id1);
+  $expect->{id} = $id1;
   is_deeply $setting, $expect, 'recall_setting';
   # update a single field in the setting
-  my $got = $obj->make_setting(id => $id, is_default => 1);
-  is $got, $id, 'make_setting update';
+  my $got = $obj->make_setting(id => $id1, is_default => 1);
+  is $got, $id1, 'make_setting update';
   # recall that same setting
-  $setting = $obj->recall_setting(id => $id);
+  $setting = $obj->recall_setting(id => $id1);
   is keys(%$setting), keys(%$expect), 'recall_setting';
   # check the updated field
   ok $setting->{is_default}, 'is_default';
   # undef a single field in the setting
-  $got = $obj->make_setting(id => $id, is_default => undef);
-  is $got, $id, 'make_setting undef update';
+  $got = $obj->make_setting(id => $id1, is_default => undef);
+  is $got, $id1, 'make_setting undef update';
   # recall that same setting
-  $setting = $obj->recall_setting(id => $id);
+  $setting = $obj->recall_setting(id => $id1);
   # check the updated field
   ok !$setting->{is_default}, 'is_default';
   # search the settings for a particular key
@@ -93,7 +93,7 @@ subtest settings => sub {
   };
   # make a second setting
   my $id2 = $obj->make_setting(%$expect);
-  is $id2, $id + 1, "make_setting (id: $id2)";
+  is $id2, $id1 + 1, "make_setting (id: $id2)";
   # recall that setting
   my $setting2 = $obj->recall_setting(id => $id2);
   $expect->{id} = $id2;
@@ -112,11 +112,23 @@ subtest settings => sub {
   # recall all for model
   $settings = $obj->recall_all;
   is_deeply $settings, [ @$initial, $setting, $setting2 ], 'recall_all';
-  # remove a setting
-  $obj->remove_setting(id => $id);
+  # make a third setting
+  $expect = {
+    name       => 'Foo',
+    group      => 'foo',
+    parameter  => 'output',
+    control    => 'patch',
+    group_to   => 'modulation',
+    param_to   => 'bar',
+  };
+  my $id3 = $obj->make_setting(%$expect);
+  is $id3, $id2 + 1, "make_setting (id: $id3)";
+  # remove settings
+  $obj->remove_setting(id => $id1);
   $settings = $obj->search_settings(name => $name);
   is_deeply $settings, [ $setting2 ], 'remove_setting';
   $obj->remove_settings(name => $name);
+  $obj->remove_settings;
   $settings = $obj->search_settings(name => $name);
   is_deeply $settings, [], 'remove_settings';
 };

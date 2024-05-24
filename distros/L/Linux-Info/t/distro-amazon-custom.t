@@ -2,10 +2,15 @@ use warnings;
 use strict;
 use Test::More;
 
+use Linux::Info::Distribution::BasicInfo;
+
 my $class = 'Linux::Info::Distribution::Custom::Amazon';
 require_ok($class);
-my $instance =
-  $class->new( { id => 'amazon', file_to_parse => 't/samples/custom/amazon' } );
+my $instance = $class->new(
+    Linux::Info::Distribution::BasicInfo->new(
+        'amazon', 't/samples/custom/amazon'
+    )
+);
 ok( $instance, 'new method works' );
 isa_ok( $instance, 'Linux::Info::Distribution::Custom' );
 

@@ -1,3 +1,11 @@
+0.10 2024-05-23T13:10:52+02:00
+ - Add tests.
+ - Fix test dependencies.
+ - Regen example in doc output.
+ - Rename example file name to better name.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.09 2020-09-16T21:45:15+02:00
  - Badly set 0.08 version, update and fix.
 

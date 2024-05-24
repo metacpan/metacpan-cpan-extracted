@@ -9,6 +9,7 @@ lib/Convert/Pheno.pm
 lib/Convert/Pheno/BFF.pm
 lib/Convert/Pheno/CDISC.pm
 lib/Convert/Pheno/CSV.pm
+lib/Convert/Pheno/Default.pm
 lib/Convert/Pheno/IO/CSVHandler.pm
 lib/Convert/Pheno/IO/FileIO.pm
 lib/Convert/Pheno/Mapping.pm
@@ -41,11 +42,14 @@ t/bff2pxf/in/README
 t/bff2pxf/out/pxf.json
 t/cdisc2bff/in/cdisc_odm_data.xml
 t/cdisc2bff/in/cdisc_odm_dictionary.csv
-t/cdisc2bff/in/cdisc_odm_mapping.yaml
 t/cdisc2bff/in/README
 t/cdisc2bff/out/individuals.json
 t/cdisc2pxf/out/pxf.json
 t/cli.t
+t/csv2bff/in/csv_data.csv
+t/csv2bff/in/csv_mapping.yaml
+t/csv2bff/out/individuals.json
+t/csv2pxf/out/pxf.json
 t/mapping.t
 t/module.t
 t/omop2bff/in/CONCEPT.csv

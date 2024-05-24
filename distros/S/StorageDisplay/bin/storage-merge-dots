@@ -15,7 +15,7 @@ use strict;
 use warnings;
 
 
-our $VERSION = '2.05'; # VERSION
+our $VERSION = '2.06'; # VERSION
 
 
 use StorageDisplay;
@@ -363,7 +363,7 @@ storage-merge-dots - merge dot files created by storage2dot, adding inter links 
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 

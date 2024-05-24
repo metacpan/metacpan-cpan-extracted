@@ -1,5 +1,5 @@
 Changes
-examples/ex1.pl
+examples/send_message.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -20,5 +20,7 @@ SendMessage.pm
 SIGNATURE
 t/Tags-HTML-SendMessage/01-use.t
 t/Tags-HTML-SendMessage/02-version.t
+t/Tags-HTML-SendMessage/03-new.t
+t/Tags-HTML-SendMessage/04-process.t
 xt/Tags-HTML-SendMessage/01-pod_coverage.t
 xt/Tags-HTML-SendMessage/02-pod.t

@@ -1,5 +1,14 @@
 Revision history for Date-Holidays-Adapter-USA
 
+0.0106 2024-05-23 18:16:14
+    - Re-add mistakenly removed Adapter dep. Oops.
+
+0.0105 2024-05-23 18:13:26
+    - No. Specify the dependency version.
+
+0.0104 2024-05-23 18:08:37
+    - Appease the tester gods...
+
 0.0103 2024-05-21 18:48:29
     - Fix test.
 

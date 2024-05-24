@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.1.4
+## Version v0.1.5
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2024/05/23
+## Modified 2024/05/24
 ## All rights reserved
 ## 
 ## 
@@ -23,6 +23,7 @@ BEGIN
         $LOCALE_EXTENSIONS_RE $LOCALE_TRANSFORM_PARAMETERS_RE
         $TZ_DICT $TZ_NAME2ID
         $PROP_TO_SUB
+        $EXPLICIT_BOOLEAN
     );
     use overload (
         '""'    => 'as_string',
@@ -304,7 +305,9 @@ BEGIN
     )?
     /xi;
     our $PROP_TO_SUB = {};
-    our $VERSION = 'v0.1.4';
+    # False, by default
+    our $EXPLICIT_BOOLEAN = 0;
+    our $VERSION = 'v0.1.5';
 };
 
 use strict;
@@ -542,7 +545,8 @@ sub as_string
             if( exists( $def->{type} ) && $def->{type} eq 'boolean' )
             {
                 # We are explicit about the true value, but it could be ignored and be implicit.
-                push( @{$result->{ $prefix }}, join( '-', $tag, ( $val ? 'true' : 'false' ) ) );
+                # push( @{$result->{ $prefix }}, join( '-', $tag, ( $val ? 'true' : 'false' ) ) );
+                push( @{$result->{ $prefix }}, ( $EXPLICIT_BOOLEAN ? join( '-', $tag, ( $val ? 'true' : 'false' ) ) : ( $val ? $tag : join( '-', $tag, 'false' ) ) ) );
             }
             else
             {
@@ -585,12 +589,12 @@ sub as_string
 }
 
 # u-dx
-sub break_exclusion { return( shift->reset(@_)->_set_get( 'break_exclusion', @_ ) ); }
+sub break_exclusion { return( shift->reset(@_)->_set_get_prop( 'break_exclusion', @_ ) ); }
 
 # u-ca
 sub ca { return( shift->calendar( @_ ) ); }
 
-sub calendar { return( shift->reset(@_)->_set_get( 'calendar', @_ ) ); }
+sub calendar { return( shift->reset(@_)->_set_get_prop( 'calendar', @_ ) ); }
 
 # u-cf
 sub cf { return( shift->cu_format( @_ ) ); }
@@ -606,38 +610,38 @@ sub clone
 sub co { return( shift->collation( @_ ) ); }
 
 # u-ka
-sub colAlternate { return( shift->reset(@_)->_set_get({
+sub colAlternate { return( shift->reset(@_)->_set_get_prop({
     field => 'col_alternate',
     regexp => qr/[[:alnum:]][[:alnum:]\-]+/,
 }, @_ ) ); }
 
 # u-kb
-sub colBackwards { return( shift->reset(@_)->_set_get({
+sub colBackwards { return( shift->reset(@_)->_set_get_prop({
     field => 'col_backwards',
     type => 'boolean',
 }, @_ ) ); }
 
 # u-kc
-sub colCaseLevel { return( shift->reset(@_)->_set_get({
+sub colCaseLevel { return( shift->reset(@_)->_set_get_prop({
     field => 'col_case_level',
     type => 'boolean',
 }, @_ ) ); }
 
 # u-kf
-sub colCaseFirst { return( shift->reset(@_)->_set_get({
+sub colCaseFirst { return( shift->reset(@_)->_set_get_prop({
     field => 'col_case_first',
     # lower, upper, undef
     regexp => qr/[[:alnum:]]+/,
 }, @_ ) ); }
 
 # u-co
-sub collation { return( shift->reset(@_)->_set_get({
+sub collation { return( shift->reset(@_)->_set_get_prop({
     field => 'collation',
     regexp => qr/[[:alnum:]]+/,
 }, @_ ) ); }
 
 # u-kh
-sub colHiraganaQuaternary { return( shift->reset(@_)->_set_get({
+sub colHiraganaQuaternary { return( shift->reset(@_)->_set_get_prop({
     field => 'col_hiragana_quaternary',
     type => 'boolean',
 }, @_ ) ); }
@@ -645,37 +649,37 @@ sub colHiraganaQuaternary { return( shift->reset(@_)->_set_get({
 sub colNormalisation { return( shift->colNormalization( @_ ) ); }
 
 # u-kk
-sub colNormalization { return( shift->reset(@_)->_set_get({
+sub colNormalization { return( shift->reset(@_)->_set_get_prop({
     field => 'col_normalisation',
     type => 'boolean',
 }, @_ ) ); }
 
 # u-kn
-sub colNumeric { return( shift->reset(@_)->_set_get({
+sub colNumeric { return( shift->reset(@_)->_set_get_prop({
     field => 'col_numeric',
     type => 'boolean',
 }, @_ ) ); }
 
 # u-kr
-sub colReorder { return( shift->reset(@_)->_set_get({
+sub colReorder { return( shift->reset(@_)->_set_get_prop({
     field => 'col_reorder',
     regexp => qr/[[:alnum:]][[:alnum:]\-]+/,
 }, @_ ) ); }
 
 # u-ks
-sub colStrength { return( shift->reset(@_)->_set_get({
+sub colStrength { return( shift->reset(@_)->_set_get_prop({
     field => 'col_strength',
     regexp => qr/[[:alnum:]][[:alnum:]\-]+/,
 }, @_ ) ); }
 
 # u-kv
-sub colValue { return( shift->reset(@_)->_set_get({
+sub colValue { return( shift->reset(@_)->_set_get_prop({
     field => 'col_value',
     regexp => qr/[[:alnum:]]+/,
 }, @_ ) ); }
 
 # u-vt
-sub colVariableTop { return( shift->reset(@_)->_set_get({
+sub colVariableTop { return( shift->reset(@_)->_set_get_prop({
     field => 'col_variable_top',
     regexp => qr/[[:alnum:]]+/,
 }, @_ ) ); }
@@ -716,34 +720,34 @@ sub core
     return( join( '-', @locale_parts ) );
 }
 
-sub country_code { return( shift->reset(@_)->_set_get( 'country_code', @_ ) ); }
+sub country_code { return( shift->reset(@_)->_set_get_prop( 'country_code', @_ ) ); }
 
 # u-cf
-sub cu_format { return( shift->reset(@_)->_set_get( 'cu_format', @_ ) ); }
+sub cu_format { return( shift->reset(@_)->_set_get_prop( 'cu_format', @_ ) ); }
 
 # u-cu
-sub cu { return( shift->reset(@_)->_set_get( 'currency', @_ ) ); }
+sub cu { return( shift->reset(@_)->_set_get_prop( 'currency', @_ ) ); }
 
 # u-cu
-sub currency { return( shift->reset(@_)->_set_get( 'currency', @_ ) ); }
+sub currency { return( shift->reset(@_)->_set_get_prop( 'currency', @_ ) ); }
 
 # t-d0
-sub d0 { return( shift->reset(@_)->_set_get( 'destination', @_ ) ); }
+sub d0 { return( shift->reset(@_)->_set_get_prop( 'destination', @_ ) ); }
 
 # t-d0
-sub dest { return( shift->reset(@_)->_set_get( 'destination', @_ ) ); }
+sub dest { return( shift->reset(@_)->_set_get_prop( 'destination', @_ ) ); }
 
 # t-d0
-sub destination { return( shift->reset(@_)->_set_get( 'destination', @_ ) ); }
+sub destination { return( shift->reset(@_)->_set_get_prop( 'destination', @_ ) ); }
 
 # u-dx
-sub dx { return( shift->reset(@_)->_set_get( 'break_exclusion', @_ ) ); }
+sub dx { return( shift->reset(@_)->_set_get_prop( 'break_exclusion', @_ ) ); }
 
 # u-em
-sub em { return( shift->reset(@_)->_set_get( 'emoji', @_ ) ); }
+sub em { return( shift->reset(@_)->_set_get_prop( 'emoji', @_ ) ); }
 
 # u-em
-sub emoji { return( shift->reset(@_)->_set_get( 'emoji', @_ ) ); }
+sub emoji { return( shift->reset(@_)->_set_get_prop( 'emoji', @_ ) ); }
 
 sub error
 {
@@ -762,34 +766,34 @@ sub error
     return( ref( $self ) ? $self->{error} : $ERROR );
 }
 
-sub false { return( $Locale::Unicode::false ); }
+sub false { return( $Locale::Unicode::Boolean::false ); }
 
 # u-fw
-sub first_day { return( shift->reset(@_)->_set_get( 'first_day', @_ ) ); }
+sub first_day { return( shift->reset(@_)->_set_get_prop( 'first_day', @_ ) ); }
 
 # u-fw
-sub fw { return( shift->reset(@_)->_set_get( 'first_day', @_ ) ); }
+sub fw { return( shift->reset(@_)->_set_get_prop( 'first_day', @_ ) ); }
 
 # t-h0
-sub h0 { return( shift->reset(@_)->_set_get( 'hybrid', @_ ) ); }
+sub h0 { return( shift->reset(@_)->_set_get_prop( 'hybrid', @_ ) ); }
 
 # u-hc
-sub hc { return( shift->reset(@_)->_set_get( 'hour_cycle', @_ ) ); }
+sub hc { return( shift->reset(@_)->_set_get_prop( 'hour_cycle', @_ ) ); }
 
 # u-hc
-sub hour_cycle { return( shift->reset(@_)->_set_get( 'hour_cycle', @_ ) ); }
+sub hour_cycle { return( shift->reset(@_)->_set_get_prop( 'hour_cycle', @_ ) ); }
 
 # t-h0
-sub hybrid { return( shift->reset(@_)->_set_get( 'hybrid', @_ ) ); }
+sub hybrid { return( shift->reset(@_)->_set_get_prop( 'hybrid', @_ ) ); }
 
 # t-i0
-sub i0 { return( shift->reset(@_)->_set_get( 'input', @_ ) ); }
+sub i0 { return( shift->reset(@_)->_set_get_prop( 'input', @_ ) ); }
 
 # t-i0
-sub input { return( shift->reset(@_)->_set_get( 'input', @_ ) ); }
+sub input { return( shift->reset(@_)->_set_get_prop( 'input', @_ ) ); }
 
 # t-k0
-sub k0 { return( shift->reset(@_)->_set_get( 'keyboard', @_ ) ); }
+sub k0 { return( shift->reset(@_)->_set_get_prop( 'keyboard', @_ ) ); }
 
 # u-ka
 sub ka { return( shift->colAlternate( @_ ) ); }
@@ -801,7 +805,7 @@ sub kb { return( shift->colBackwards( @_ ) ); }
 sub kc { return( shift->colCaseLevel( @_ ) ); }
 
 # t-k0
-sub keyboard { return( shift->reset(@_)->_set_get( 'keyboard', @_ ) ); }
+sub keyboard { return( shift->reset(@_)->_set_get_prop( 'keyboard', @_ ) ); }
 
 # u-kf
 sub kf { return( shift->colCaseFirst( @_ ) ); }
@@ -824,23 +828,23 @@ sub ks { return( shift->colStrength( @_ ) ); }
 # u-kv
 sub kv { return( shift->colValue( @_ ) ); }
 
-sub lang { return( shift->reset(@_)->_set_get( 'locale', @_ ) ); }
+sub lang { return( shift->reset(@_)->_set_get_prop( 'locale', @_ ) ); }
 
 # u-lb
-sub lb { return( shift->reset(@_)->_set_get( 'line_break', @_ ) ); }
+sub lb { return( shift->reset(@_)->_set_get_prop( 'line_break', @_ ) ); }
 
 # u-lb
-sub line_break { return( shift->reset(@_)->_set_get( 'line_break', @_ ) ); }
+sub line_break { return( shift->reset(@_)->_set_get_prop( 'line_break', @_ ) ); }
 
 # u-lw
-sub line_break_word { return( shift->reset(@_)->_set_get( 'line_break_word', @_ ) ); }
+sub line_break_word { return( shift->reset(@_)->_set_get_prop( 'line_break_word', @_ ) ); }
 
-sub locale { return( shift->reset(@_)->_set_get( 'locale', @_ ) ); }
+sub locale { return( shift->reset(@_)->_set_get_prop( 'locale', @_ ) ); }
 
-sub locale3 { return( shift->reset(@_)->_set_get( 'locale3', @_ ) ); }
+sub locale3 { return( shift->reset(@_)->_set_get_prop( 'locale3', @_ ) ); }
 
 # u-lw
-sub lw { return( shift->reset(@_)->_set_get( 'line_break_word', @_ ) ); }
+sub lw { return( shift->reset(@_)->_set_get_prop( 'line_break_word', @_ ) ); }
 
 # t-m0
 sub m0 { return( shift->mechanism( @_ ) ); }
@@ -866,10 +870,10 @@ sub matches
 }
 
 # u-ms
-sub measurement { return( shift->reset(@_)->_set_get( 'measurement', @_ ) ); }
+sub measurement { return( shift->reset(@_)->_set_get_prop( 'measurement', @_ ) ); }
 
 # t-m0
-sub mechanism { return( shift->reset(@_)->_set_get( 'mechanism', @_ ) ); }
+sub mechanism { return( shift->reset(@_)->_set_get_prop( 'mechanism', @_ ) ); }
 
 # u-ms
 sub ms { return( shift->measurement( @_ ) ); }
@@ -881,7 +885,7 @@ sub mu { return( shift->unit( @_ ) ); }
 sub nu { return( shift->number( @_ ) ); }
 
 # u-nu
-sub number { return( shift->reset(@_)->_set_get( 'number', @_ ) ); }
+sub number { return( shift->reset(@_)->_set_get_prop( 'number', @_ ) ); }
 
 sub parse
 {
@@ -1036,12 +1040,12 @@ sub pass_error
 }
 
 # x-something
-sub private { return( shift->reset(@_)->_set_get( 'private', @_ ) ); }
+sub private { return( shift->reset(@_)->_set_get_prop( 'private', @_ ) ); }
 
-sub region { return( shift->reset(@_)->_set_get( 'region', @_ ) ); }
+sub region { return( shift->reset(@_)->_set_get_prop( 'region', @_ ) ); }
 
 # u-rg
-sub region_override { return( shift->reset(@_)->_set_get( 'region_override', @_ ) ); }
+sub region_override { return( shift->reset(@_)->_set_get_prop( 'region_override', @_ ) ); }
 
 # u-rg
 sub rg { return( shift->region_override( @_ ) ); }
@@ -1059,16 +1063,16 @@ sub reset
 # t-s0
 sub s0 { return( shift->source( @_ ) ); }
 
-sub script { return( shift->reset(@_)->_set_get( 'script', @_ ) ); }
+sub script { return( shift->reset(@_)->_set_get_prop( 'script', @_ ) ); }
 
 # u-ss
-sub sentence_break { return( shift->reset(@_)->_set_get( 'sentence_break', @_ ) ); }
+sub sentence_break { return( shift->reset(@_)->_set_get_prop( 'sentence_break', @_ ) ); }
 
 # u-kv
 sub shiftedGroup { return( shift->colValue( @_ ) ); }
 
 # t-s0
-sub source { return( shift->reset(@_)->_set_get( 'source', @_ ) ); }
+sub source { return( shift->reset(@_)->_set_get_prop( 'source', @_ ) ); }
 
 # u-sd
 sub sd { return( shift->subdivision( @_ ) ); }
@@ -1077,19 +1081,19 @@ sub sd { return( shift->subdivision( @_ ) ); }
 sub ss { return( shift->sentence_break( @_ ) ); }
 
 # u-sd
-sub subdivision { return( shift->reset(@_)->_set_get( 'subdivision', @_ ) ); }
+sub subdivision { return( shift->reset(@_)->_set_get_prop( 'subdivision', @_ ) ); }
 
 # t-t0
 sub t0 { return( shift->translation( @_ ) ); }
 
 # t-x0
-sub t_private { return( shift->reset(@_)->_set_get( 't_private', @_ ) ); }
+sub t_private { return( shift->reset(@_)->_set_get_prop( 't_private', @_ ) ); }
 
 # u-tz
-sub time_zone { return( shift->reset(@_)->_set_get( 'time_zone', @_ ) ); }
+sub time_zone { return( shift->reset(@_)->_set_get_prop( 'time_zone', @_ ) ); }
 
 # u-tz
-sub timezone { return( shift->reset(@_)->_set_get( 'time_zone', @_ ) ); }
+sub timezone { return( shift->reset(@_)->_set_get_prop( 'time_zone', @_ ) ); }
 
 sub transform
 {
@@ -1114,15 +1118,15 @@ sub transform
 }
 
 # t-und-Latn
-sub transform_locale { return( shift->reset(@_)->_set_get({
+sub transform_locale { return( shift->reset(@_)->_set_get_prop({
     field => 'transform_locale',
     isa => 'Locale::Unicode',
 }, @_ ) ); }
 
 # t-t0
-sub translation { return( shift->reset(@_)->_set_get( 'translation', @_ ) ); }
+sub translation { return( shift->reset(@_)->_set_get_prop( 'translation', @_ ) ); }
 
-sub true { return( $Locale::Unicode::true ); }
+sub true { return( $Locale::Unicode::Boolean::true ); }
 
 # u-tz
 sub tz { return( shift->time_zone( @_ ) ); }
@@ -1185,13 +1189,13 @@ sub tz_name2id
 }
 
 # u-mu
-sub unit { return( shift->reset(@_)->_set_get( 'unit', @_ ) ); }
+sub unit { return( shift->reset(@_)->_set_get_prop( 'unit', @_ ) ); }
 
 # u-va
 sub va { return( shift->variant( @_ ) ); }
 
 # u-va
-sub variant { return( shift->reset(@_)->_set_get( 'variant', @_ ) ); }
+sub variant { return( shift->reset(@_)->_set_get_prop( 'variant', @_ ) ); }
 
 # u-vt
 sub vt { return( shift->colVariableTop( @_ ) ); }
@@ -1199,7 +1203,7 @@ sub vt { return( shift->colVariableTop( @_ ) ); }
 # t-x0
 sub x0 { return( shift->t_private( @_ ) ); }
 
-sub _set_get
+sub _set_get_prop
 {
     my $self = shift( @_ );
     my $field = shift( @_ ) ||
@@ -1243,12 +1247,12 @@ sub _set_get
                    $type eq 'boolean' )
             {
                 $val = lc( $val );
-                if( $val =~ /^(?:yes|no)$/ )
+                if( $val =~ /^(?:yes|no)$/i )
                 {
                     $self->{_bool_types}->{ $field } = 'literal';
                     $val = ( $val eq 'yes' ? $self->true : $self->false );
                 }
-                elsif( $val =~ /^(?:true|false)$/ )
+                elsif( $val =~ /^(?:true|false)$/i )
                 {
                     $self->{_bool_types}->{ $field } = 'logic';
                     $val = ( $val eq 'true' ? $self->true : $self->false );
@@ -3354,7 +3358,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.1.4
+    v0.1.5
 
 =head1 DESCRIPTION
 
@@ -3421,6 +3425,25 @@ It returns the current object upon success, or sets an L<error object|Module::Ge
 Returns the Locale object as a string, based on its latest attributes set.
 
 The string value returned is computed only once and further call to C<as_string> returns a cached value unless changes were made to the Locale attributes.
+
+Boolean values are expressed as C<true> for tue values and C<false> for false values. However, if a value is true for a given C<locale> component, it is not explicitly stated by default, since the LDML specifications indicate, it is true implicitly. If, however, you want the true boolean value to be displayed nevertheless, make sure to set the global variable C<$EXPLICIT_BOOLEAN> to a true value.
+
+For example:
+
+    my $locale = Locale::Unicode->new( 'ko-Kore-KR', {
+        # You can also use 1 or 'yes' as per the specifications
+        colNumeric => 'true',
+        colCaseFirst => 'upper'
+    });
+    say $locale; # ko-Kore-KR-u-kf-upper-kn
+
+    local $EXPLICIT_BOOLEAN = 1;
+    my $locale = Locale::Unicode->new( 'ko-Kore-KR', {
+        # You can also use 1 or 'yes' as per the specifications
+        colNumeric => 'true',
+        colCaseFirst => 'upper'
+    });
+    say $locale; # ko-Kore-KR-u-kf-upper-kn-true
 
 =head2 break_exclusion
 

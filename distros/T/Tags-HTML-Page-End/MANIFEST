@@ -1,6 +1,6 @@
 Changes
 End.pm
-examples/ex1.pl
+examples/page_example.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

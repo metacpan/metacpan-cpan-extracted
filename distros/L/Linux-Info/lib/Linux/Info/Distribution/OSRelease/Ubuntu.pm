@@ -12,7 +12,7 @@ use Class::XSAccessor getters => {
     get_ubuntu_codename    => 'ubuntu_codename',
 };
 
-our $VERSION = '2.11'; # VERSION
+our $VERSION = '2.12'; # VERSION
 
 # ABSTRACT: a subclass of Linux::Info::Distribution::OSRelease
 
@@ -52,7 +52,7 @@ Linux::Info::Distribution::OSRelease::Ubuntu - a subclass of Linux::Info::Distri
 
 =head1 VERSION
 
-version 2.11
+version 2.12
 
 =head1 DESCRIPTION
 

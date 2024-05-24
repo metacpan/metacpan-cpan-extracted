@@ -27,5 +27,5 @@ requires:
   Tk::FileBrowser: '0.03'
 resources:
   repository: git://github.com/haje61/App-Codit.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

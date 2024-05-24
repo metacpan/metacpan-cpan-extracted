@@ -2,19 +2,25 @@ use warnings;
 use strict;
 use Test::More;
 
+use Linux::Info::Distribution::BasicInfo;
+
 my $class = 'Linux::Info::Distribution::Custom::CloudLinux';
 require_ok($class);
 
 my @fixtures = (
     [ 'get_name',     'CloudLinux Server' ],
     [ 'get_version',  '5.11' ],
-    [ 'get_codename', 'Vladislav Volkov' ]
+    [ 'get_codename', 'Vladislav Volkov' ],
+    [ 'get_id',       'CloudLinux' ],
 );
 
 can_ok( $class, map { $_->[0] } @fixtures );
 
 my $instance = $class->new(
-    { id => 'redhat', file_to_parse => 't/samples/custom/cloudlinux' } );
+    Linux::Info::Distribution::BasicInfo->new(
+        'CloudLinux', 't/samples/custom/cloudlinux'
+    )
+);
 ok( $instance, 'new method works' );
 isa_ok( $instance, 'Linux::Info::Distribution::Custom' );
 

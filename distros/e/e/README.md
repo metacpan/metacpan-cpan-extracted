@@ -180,6 +180,12 @@ Data dumper.
 
 Internal data dumper.
 
+## dye
+
+Color a string.
+
+    say dye( "HEY", "RED" );
+
 ## g
 
 Perform a get request.

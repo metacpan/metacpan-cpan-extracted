@@ -188,9 +188,12 @@ useful result.
 
 =item --extract, -x
 
-Extract the given paths from the mounted archives (including
-subdir contents, if any). If C<-> is given as path, this tool
+Extract the given paths from the mounted archives.
+If C<-> is given as path, this tool
 will read the list of paths to extract from standard input.
+
+To extract directory contents, you may wish to also give the
+C<--recursive> option.
 
 =item --help, -?
 
