@@ -1,10 +1,13 @@
 use warnings;
 use strict;
-use Test::More;
+use Test::Most 0.38;
+
+plan tests => 16;
 
 my $class = 'Linux::Info::Distribution::OSRelease';
 require_ok($class);
-can_ok( $class, qw(parse parse_from_file _parse get_source new) );
+can_ok( $class,
+    qw(parse parse_from_file _parse get_source new _handle_missing) );
 isa_ok( $class, 'Linux::Info::Distribution' );
 ok( $class->DEFAULT_FILE, 'DEFAULT_FILE returns a value' );
 is( ref( $class->parse_from_file ), 'HASH', 'class parse call works' );
@@ -35,4 +38,6 @@ is(
 is( $instance->get_id,     'ubuntu', 'get_id works' );
 is( $instance->get_source, $fixture, 'get_source returns the custom value' );
 
-done_testing;
+$fixture = 't/samples/os-releases/raspbian';
+note("Using custom file $fixture to force a failure");
+dies_ok { $class->new($fixture) } "dies due missing fields in $fixture";

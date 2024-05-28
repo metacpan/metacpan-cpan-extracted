@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::UploadToCPAN 6.031;
+package Dist::Zilla::Plugin::UploadToCPAN 6.032;
 # ABSTRACT: upload the dist to CPAN
 
 use Moose;
@@ -58,7 +58,7 @@ use namespace::autoclean;
 
 #pod =attr credentials_stash
 #pod
-#pod This attribute holds the name of a L<PAUSE stash|Dist::Zilla::Stash::PAUSE>
+#pod This attribute holds the name of a L<PAUSE stash|Dist::Zilla::Stash::Login>
 #pod that will contain the credentials to be used for the upload.  By default,
 #pod UploadToCPAN will look for a C<%PAUSE> stash.
 #pod
@@ -72,7 +72,7 @@ has credentials_stash => (
 
 has _credentials_stash_obj => (
   is   => 'ro',
-  isa  => maybe_type( class_type('Dist::Zilla::Stash::PAUSE') ),
+  isa  => maybe_type( role_type('Dist::Zilla::Role::Stash::Login') ),
   lazy => 1,
   init_arg => undef,
   default  => sub { $_[0]->zilla->stash_named( $_[0]->credentials_stash ) },
@@ -285,16 +285,22 @@ has uploader => (
 sub before_release {
   my $self = shift;
 
-  my $problem;
-  try {
-    for my $attr (qw(username password)) {
-      $problem = $attr;
-      die unless length $self->$attr;
-    }
-    undef $problem;
-  };
+  my $sentinel = [];
 
-  $self->log_fatal(['You need to supply a %s', $problem]) if $problem;
+  for my $attr (qw(username password)) {
+    my $value;
+    my $ok = eval { $value = $self->$attr; 1 };
+
+    unless ($ok) {
+      $self->log_fatal([ "Couldn't figure out %s: %s", $attr, $@ ]);
+    }
+
+    unless (length $value) {
+      $self->log_fatal([ "No $attr was provided" ]);
+    }
+  }
+
+  return;
 }
 
 sub release {
@@ -318,7 +324,7 @@ Dist::Zilla::Plugin::UploadToCPAN - upload the dist to CPAN
 
 =head1 VERSION
 
-version 6.031
+version 6.032
 
 =head1 SYNOPSIS
 
@@ -362,7 +368,7 @@ lower the minimum required perl.
 
 =head2 credentials_stash
 
-This attribute holds the name of a L<PAUSE stash|Dist::Zilla::Stash::PAUSE>
+This attribute holds the name of a L<PAUSE stash|Dist::Zilla::Stash::Login>
 that will contain the credentials to be used for the upload.  By default,
 UploadToCPAN will look for a C<%PAUSE> stash.
 
@@ -422,7 +428,7 @@ Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ricardo SIGNES.
+This software is copyright (c) 2024 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

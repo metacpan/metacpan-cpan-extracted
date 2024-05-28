@@ -22,11 +22,12 @@ no_index:
     - inc
 requires:
   Curses: '1.38'
+  ExtUtils::XSpp::Cmd: '0'
   List::MoreUtils: '0.43'
   List::Util: '1.60'
   Term::ANSIColor: '5.01'
   Term::Terminfo: '0.09'
   Text::ANSI::Util: '0.233'
   perl: '5.006'
-version: '0.01'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

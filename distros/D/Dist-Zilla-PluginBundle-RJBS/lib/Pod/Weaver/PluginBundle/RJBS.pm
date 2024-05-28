@@ -1,6 +1,6 @@
-use v5.26.0;
-use warnings;
-package Pod::Weaver::PluginBundle::RJBS 5.025;
+use v5.34.0;
+use Dist::Zilla::Pragmas;
+package Pod::Weaver::PluginBundle::RJBS 5.029;
 # ABSTRACT: RJBS's default Pod::Weaver config
 
 #pod =head1 OVERVIEW
@@ -14,11 +14,9 @@ package Pod::Weaver::PluginBundle::RJBS 5.025;
 #pod =cut
 
 use Pod::Weaver::Config::Assembler;
-sub _exp { Pod::Weaver::Config::Assembler->expand_package($_[0]) }
+sub _exp ($self) { Pod::Weaver::Config::Assembler->expand_package($self) }
 
-sub mvp_bundle_config {
-  my ($self, $arg) = @_;
-
+sub mvp_bundle_config ($self, $arg) {
   my @plugins;
   push @plugins, (
     [ '@RJBS/CorePrep',       _exp('@CorePrep'),        {} ],
@@ -124,9 +122,7 @@ $WINDOW{'no-mercy'} = <<~"END";
   no promise that patches will be accepted to lower the minimum required perl.
   END
 
-sub _perl_window_plugin {
-  my ($self, $name) = @_;
-
+sub _perl_window_plugin ($self, $name) {
   Carp::confess("unknown perl window $name") unless exists $WINDOW{$name};
 
   return [
@@ -153,7 +149,7 @@ Pod::Weaver::PluginBundle::RJBS - RJBS's default Pod::Weaver config
 
 =head1 VERSION
 
-version 5.025
+version 5.029
 
 =head1 OVERVIEW
 
@@ -185,7 +181,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ricardo Signes.
+This software is copyright (c) 2024 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

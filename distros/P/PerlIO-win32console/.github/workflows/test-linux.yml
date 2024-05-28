@@ -1,0 +1,31 @@
+name: test-linux
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+
+jobs:
+  perlio-win32console:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: install dependencies
+        run: |
+            sudo apt-get update ||:
+            sudo apt-get -y install build-essential
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: configure
+        run: |
+          perl Makefile.PL
+      - name: build
+        run: |
+            make -j2
+      - name: test
+        run: |
+            make test

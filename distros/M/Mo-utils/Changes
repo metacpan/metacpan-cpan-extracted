@@ -1,3 +1,9 @@
+0.29 2024-05-27T09:53:09+02:00
+ - Fix typo in doc.
+
+0.28 2024-05-25T11:51:01+02:00
+ - Add check_number_id().
+
 0.27 2024-05-17T09:47:11+02:00
  - Fix typo in doc.
  - Move right tests to begin of tests list in check_isa() tests.

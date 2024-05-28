@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Synthesizer settings librarian
 
-our $VERSION = '0.0055';
+our $VERSION = '0.0056';
 
 use Moo;
 use strictures 2;
@@ -339,8 +339,6 @@ sub import_yaml {
 sub graphviz {
   my ($self, %options) = @_;
 
-  die 'Model not given' unless $options{model_name};
-
   $options{render}    ||= 0;
   $options{path}      ||= '.';
   $options{extension} ||= 'png';
@@ -363,12 +361,13 @@ sub graphviz {
   }
 
   # accumulate parameter = value lines
+  my %seen;
   for my $from (keys %sets) {
     my @label = ($from);
     for my $group (@{ $sets{$from} }) {
       next if $group->{control} eq 'patch';
       my $label = "$group->{parameter} = $group->{value}$group->{unit}";
-      push @label, $label;
+      push @label, $label unless $seen{ "$from $label" }++;
     }
     $labels{$from} = join "\n", @label;
   }
@@ -388,10 +387,11 @@ sub graphviz {
     ) unless $edges{$key}++;
   }
 
+  # save a file
   if ($options{render}) {
-    # save the file
-    (my $model = $options{model_name}) =~ s/\W/_/g;
+    my $model = $self->model;
     (my $patch = $patch_name) =~ s/\W/_/g;
+    # TODO render to data
     my $filename = "$options{path}/$model-$patch.$options{extension}";
     $g->run(format => $options{extension}, output_file => $filename);
   }
@@ -413,7 +413,7 @@ Synth::Config - Synthesizer settings librarian
 
 =head1 VERSION
 
-version 0.0055
+version 0.0056
 
 =head1 SYNOPSIS
 
@@ -445,15 +445,11 @@ version 0.0055
   $settings = $synth->search_settings(group => 'sequencer');
   # [ { id => 2, group => 'sequencer', etc => '...' } ]
 
-  my $g = $synth->graphviz(
-    settings   => $settings,
-    model_name => $model,
-  );
+  my $g = $synth->graphviz(settings => $settings);
   # or
   $synth->graphviz(
-    settings   => $settings,
-    model_name => $model,
-    render     => 1,
+    settings => $settings,
+    render   => 1,
   );
 
   my $models = $synth->recall_models;
@@ -666,13 +662,12 @@ Visualize a patch of B<settings> with the L<GraphViz2> module.
 
 Option defaults:
 
-  model_name = undef (required)
-  settings   = undef (required)
-  render     = 0
-  path       = .
-  extension  = png
-  shape      = oval
-  color      = grey
+  settings  = undef (required)
+  render    = 0
+  path      = .
+  extension = png
+  shape     = oval
+  color     = grey
 
 =head1 SEE ALSO
 

@@ -1,11 +1,13 @@
 package OpenSearch::Remote;
 use strict;
 use warnings;
-use Moose;
 use feature qw(signatures);
+use Moose;
 use Data::Dumper;
 use OpenSearch::Remote::Info;
 
-sub info { shift; return ( OpenSearch::Remote::Info->new(@_) ); }
+sub info( $self, @params ) {
+  return ( OpenSearch::Remote::Info->new(@params)->execute );
+}
 
 1;

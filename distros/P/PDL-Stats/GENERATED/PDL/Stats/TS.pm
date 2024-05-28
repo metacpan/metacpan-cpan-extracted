@@ -56,10 +56,6 @@ my $DEV = ($^O =~ /win/i)? '/png' : '/xs';
 #line 57 "TS.pm"
 
 
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
@@ -150,11 +146,7 @@ sub PDL::acvf {
   $h ||= $self->dim(0) - 1;
   return $self->_acvf($h+1);
 }
-#line 154 "TS.pm"
-#line 155 "TS.pm"
-
-
-
+#line 150 "TS.pm"
 
 
 =head2 diff
@@ -273,10 +265,7 @@ sub PDL::fill_ma {
 
   return $x_filled;
 }
-#line 277 "TS.pm"
-#line 278 "TS.pm"
-
-
+#line 269 "TS.pm"
 
 *_fill_ma = \&PDL::_fill_ma;
 
@@ -549,10 +538,7 @@ sub PDL::pred_ar {
     return $x->append($ext($b->dim(0) : -1));
   }
 }
-#line 553 "TS.pm"
-#line 554 "TS.pm"
-
-
+#line 542 "TS.pm"
 
 *_pred_ar = \&PDL::_pred_ar;
 
@@ -788,13 +774,7 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 792 "TS.pm"
-#line 793 "TS.pm"
-
-
-
-
-
+#line 778 "TS.pm"
 
 # Exit with OK status
 

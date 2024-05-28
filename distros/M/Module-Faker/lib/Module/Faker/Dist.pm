@@ -1,4 +1,4 @@
-package Module::Faker::Dist 0.026;
+package Module::Faker::Dist 0.027;
 # ABSTRACT: a fake CPAN distribution
 
 use v5.20.0;
@@ -415,11 +415,37 @@ sub archive_filename {
 #pod
 #pod =cut
 
+package
+  Module::Faker::Dist::ZipCreator {
+
+  use parent 'Archive::Any::Create::Zip';
+
+  sub add_file {
+    my $self = shift;
+    my($file, $data) = @_;
+
+    my $member = $self->SUPER::add_file($file, $data);
+    $member->unixFileAttributes(0644);
+
+    return $member;
+  }
+}
+
 sub make_archive {
   my ($self, $arg) = @_;
   $arg ||= {};
 
   my $dir = $arg->{dir} || File::Temp::tempdir;
+
+  # This is, admittedly, sort of bananas.  We're doing this because by default,
+  # Archive::Any::Create would make the files a+w.  PAUSE will reject uploaded
+  # archives with files like that, and we want these archives to be useful for
+  # testing PAUSE.
+  local $Archive::Any::Create::Type2Class{zip} = [
+    'Module::Faker::Dist::ZipCreator'
+  ];
+
+  local $INC{'Module/Faker/Dist/ZipCreator.pm'} = 1;
 
   my $archive   = Archive::Any::Create->new;
   my $container = $self->archive_basename;
@@ -803,7 +829,7 @@ Module::Faker::Dist - a fake CPAN distribution
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

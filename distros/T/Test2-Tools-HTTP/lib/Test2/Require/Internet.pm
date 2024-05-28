@@ -2,11 +2,12 @@ package Test2::Require::Internet;
 
 use strict;
 use warnings;
+use 5.014;
 use IO::Socket::INET;
 use parent qw( Test2::Require );
 
 # ABSTRACT: Skip tests if there is no internet access
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 
 sub skip
@@ -48,7 +49,7 @@ Test2::Require::Internet - Skip tests if there is no internet access
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 

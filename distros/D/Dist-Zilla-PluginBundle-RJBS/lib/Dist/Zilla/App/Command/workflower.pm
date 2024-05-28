@@ -1,6 +1,7 @@
-package Dist::Zilla::App::Command::workflower 5.025;
+package Dist::Zilla::App::Command::workflower 5.029;
 # ABSTRACT: install rjbs's usual GitHub Actions workflow
 
+use v5.34.0;
 use Dist::Zilla::Pragmas;
 
 use Dist::Zilla::App -command;
@@ -31,9 +32,7 @@ sub opt_spec {
 
 sub abstract { "install rjbs's usual GitHub Actions workflow" }
 
-sub execute {
-  my ($self, $opt, $arg) = @_;
-
+sub execute ($self, $opt, $arg) {
   my $template = $self->section_data('workflow.yml')->$*;
   my $versions = sprintf '[ %s ]',
                   join q{, }, map {; qq{"$_"} } $self->_perl_versions_to_test;
@@ -66,7 +65,7 @@ sub _perl_versions_to_test ($self) {
 
   my @test = ('devel');
 
-  for (my $i = 36; $i >= 8; $i -= 2) {
+  for (my $i = 38; $i >= 8; $i -= 2) {
     last unless $merged->accepts_module(perl => "v5.$i");
     push @test, "5.$i";
   }
@@ -86,7 +85,7 @@ Dist::Zilla::App::Command::workflower - install rjbs's usual GitHub Actions work
 
 =head1 VERSION
 
-version 5.025
+version 5.029
 
 =head1 SYNOPSIS
 
@@ -115,7 +114,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ricardo Signes.
+This software is copyright (c) 2024 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -143,7 +142,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Check out repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install cpanminus
         run: |
           curl https://cpanmin.us/ > /tmp/cpanm
@@ -155,14 +154,16 @@ jobs:
         # installing via cpanm that could, instead, be installed from apt.  I
         # may do that later, but for now, it's fine! -- rjbs, 2023-01-07
         run: |
-          dzil authordeps --missing | /tmp/cpanm --notest -S
-          dzil listdeps --author --missing | /tmp/cpanm --notest -S
+          dzil authordeps --missing > /tmp/deps-phase-1.txt
+          /tmp/cpanm --notest -S < /tmp/deps-phase-1.txt
+          dzil listdeps --author --missing >> /tmp/deps-phase-2.txt
+          /tmp/cpanm --notest -S < /tmp/deps-phase-2.txt
       - name: Build tarball
         run: |
           dzil build --in Dist-To-Test
           tar zcvf Dist-To-Test.tar.gz Dist-To-Test
       - name: Upload tarball
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Dist-To-Test.tar.gz
           path: Dist-To-Test.tar.gz
@@ -187,7 +188,7 @@ jobs:
 
     steps:
       - name: Download tarball
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: Dist-To-Test.tar.gz
       - name: Extract tarball

@@ -6,14 +6,9 @@ use warnings;
 use DateTime;
 use Error::Pure qw(err);
 use Mo qw(build default is);
-use Mo::utils qw(check_bool check_isa check_length check_number check_required);
+use Mo::utils 0.28 qw(check_isa check_length check_number_id check_required);
 
-our $VERSION = 0.03;
-
-has active => (
-	default => 1,
-	is => 'ro',
-);
+our $VERSION = 0.04;
 
 has id => (
 	is => 'ro',
@@ -34,11 +29,8 @@ has valid_to => (
 sub BUILD {
 	my $self = shift;
 
-	# Check active.
-	check_bool($self, 'active');
-
 	# Check id.
-	check_number($self, 'id');
+	check_number_id($self, 'id');
 
 	# Check role.
 	check_length($self, 'role', '100');
@@ -46,6 +38,7 @@ sub BUILD {
 
 	# Check valid_from.
 	check_isa($self, 'valid_from', 'DateTime');
+	check_required($self, 'valid_from');
 
 	# Check valid_to.
 	check_isa($self, 'valid_to', 'DateTime');
@@ -78,7 +71,6 @@ Data::Login::Role - Data object for login role.
  use Data::Login::Role;
 
  my $obj = Data::Login::Role->new(%params);
- my $action = $obj->action;
  my $id = $obj->id;
  my $role = $obj->role;
  my $valid_from = $obj->valid_from;
@@ -93,14 +85,6 @@ Data::Login::Role - Data object for login role.
 Constructor.
 
 =over 8
-
-=item * C<active>
-
-I<It will be removed in near future.>
-
-Active flag.
-It's boolean.
-Default value is 1.
 
 =item * C<id>
 
@@ -122,7 +106,7 @@ compatibility.>
 
 Date and time of start of use.
 Must be a L<DateTime> object.
-It's optional.
+It's required.
 
 =item * C<valid_to>
 
@@ -133,16 +117,6 @@ It's optional.
 =back
 
 Returns instance of object.
-
-=head2 C<active>
-
- my $active = $obj->active;
-
-I<It will be removed in near future.>
-
-Get active flag.
-
-Returns 0/1.
 
 =head2 C<id>
 
@@ -179,13 +153,12 @@ Returns L<DateTime> object or undef.
 =head1 ERRORS
 
  new():
-         Parameter 'active' must be a bool (0/1).
-                 Value: %s
-         Parameter 'id' must be a number.
+         Parameter 'id' must be a natural number.
                  Value: %s
          Parameter 'role' has length greater than '100'.
                  Value: %s
          Parameter 'role' is required.
+         Parameter 'valid_from' is required.
          Parameter 'valid_from' must be a 'DateTime' object.
                  Value: %s
                  Reference: %s
@@ -257,6 +230,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

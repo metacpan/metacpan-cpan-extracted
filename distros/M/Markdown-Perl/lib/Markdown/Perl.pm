@@ -19,7 +19,7 @@ use Scalar::Util 'blessed';
 
 use parent 'Markdown::Perl::Options';
 
-our $VERSION = '1.06';  # Remember to also set the App::pmarkdown version.
+our $VERSION = '1.07';  # Remember to also set the App::pmarkdown version.
 
 our @EXPORT_OK = qw(convert set_options set_mode set_hooks);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -320,7 +320,9 @@ C<resolve_link_ref>: this hook will receive a single string an argument,
 containing the label of a link reference in case where there was no matching
 link definition in the document and it must returns either C<undef> or a
 hash-reference containing a C<target> key, pointing to the link destination and
-optionally a C<title> key containing the title of the key.
+optionally a C<title> key containing the title of the key. The hash-ref can also
+contain a C<content> key, in which case its value should be a span of HTML which
+will replace whatever would have been used for the link content.
 
 =back
 

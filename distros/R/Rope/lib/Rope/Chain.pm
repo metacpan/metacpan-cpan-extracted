@@ -2,14 +2,10 @@ package Rope::Chain;
 
 my (%PRO);
 
+use Rope::Pro;
+
 BEGIN {
-	%PRO = (
-		keyword => sub {
-			my ($caller, $method, $cb) = @_;
-			no strict 'refs';
-			*{"${caller}::${method}"} = $cb;
-		},
-	);
+	%PRO = Rope::Pro->new();
 }
 
 sub import {
@@ -49,7 +45,7 @@ Rope::Chain - Rope chained properties
 
 =head1 VERSION
 
-Version 0.38
+Version 0.40
 
 =cut
 

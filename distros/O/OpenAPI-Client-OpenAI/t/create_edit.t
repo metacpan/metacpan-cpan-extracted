@@ -19,11 +19,10 @@ my $openai = OpenAPI::Client::OpenAI->new();
 
 my @test_cases = (
     {
-        method => 'createEdit',
+        method => 'createCompletion',
         params => {
-            model       => 'text-davinci-edit-001',
-            input       => 'What day of the wek is it?',
-            instruction => 'Fix the spelling mistakes',
+            model       => 'gpt-3.5-turbo-instruct',
+            prompt      => "Correct the spelling errors in the following text:\n\nWat day of the wek is it?",
             temperature => 0,
         },
         expected_text_re => qr{What day of the week is it\?},
@@ -38,7 +37,7 @@ for my $test (@test_cases) {
     my $response = $tx->res->json;
 
     like( $response->{choices}[0]{text}, $expected_text_re )
-        or diag( Dumper $response );
+            or diag( Dumper $response );
 }
 
 done_testing();

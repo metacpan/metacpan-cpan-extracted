@@ -4,13 +4,14 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.064';
+our $VERSION = '0.065';
 
 use 5.020;
 use Moo;
 use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -191,7 +192,7 @@ sub traverse ($self, $evaluator) {
   # "Templated paths with the same hierarchy but different templated names MUST NOT exist as they
   # are identical."
   my %seen_path;
-  foreach my $path (sort keys $schema->{paths}->%*) {
+  foreach my $path (sort keys(($schema->{paths}//{})->%*)) {
     my %seen_names;
     foreach my $name ($path =~ m!\{([^}]+)\}!g) {
       if (++$seen_names{$name} == 2) {
@@ -385,7 +386,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.064
+version 0.065
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package Game::Cribbage;
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 use Rope;
 use Rope::Autoload;
@@ -57,13 +57,20 @@ sub init_draw {
 	$self->starter_card = undef;
 	$self->dealer = !$self->dealer if $switch;
 
+	my $winner;
+	if ($self->board->score->player1->{current} > 120) {
+		$winner = 'player1';
+	} elsif ($self->board->score->player2->{current} > 120) {
+		$winner = 'player2';
+	}		
+	return $self->winner($winner) if $winner;
+
 	$self->draw_cards();
 
 	$self->discard_cards();
 
 	$self->starter();
 
-	my $winner;
 	while (!$winner) {
 		$self->clear_screen();	
 
@@ -94,7 +101,7 @@ sub init_draw {
 				return $self->init_draw(1);
 			}
 
-			if (scalar keys %{$self->board->rounds->current_round->current_hands->cannot_play} == 2) {
+			if ($self->board->no_player_can_play) {
 				eval { $self->board->next_play(); };
 				if ($@) {
 					while (1) {
@@ -105,7 +112,6 @@ sub init_draw {
 		}
 	}
 	$self->winner($winner);
-	<STDIN>
 }
 
 sub end_hands {
@@ -121,7 +127,7 @@ sub end_hands {
 
 	$self->clear_screen();
 
-	my $last = $self->board->rounds->current_round->history->[-2];
+	my $last = $self->board->last_round_hands();
 	my $player1_score = $last->player1->score->total_score;
 	my $player2_score = $last->player2->score->total_score;
 	my $crib_player = $self->dealer ? $self->board->players->[-1]->name : 'Bot';
@@ -171,7 +177,10 @@ sub play_hand {
 		}
 	}
 
-	if (exists $self->board->rounds->current_round->current_hands->cannot_play->{player2}) {
+	if ($self->board->player_cannot_play('player2')) {
+		if (!$self->board->player_cannot_play('player1')) {
+			$self->board->set_next_to_play('player1');
+		}
 		return;
 	}
 
@@ -579,6 +588,7 @@ sub winner {
 		? sprintf(q|Congratualations %s, you won the game!|, $player->name)
 		: sprintf(q|Unlucky %s, you lost this time!|, $player->name)
 	);
+	<STDIN>
 }
 
 
@@ -643,7 +653,7 @@ Game::Cribbage - Cribbage game engine
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 

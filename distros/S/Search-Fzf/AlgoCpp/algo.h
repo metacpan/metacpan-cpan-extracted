@@ -7,13 +7,9 @@
 #include <regex>
 #include <mutex>
 
-extern "C" {
-#define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
-#include "perlio.h"
-#include "XSUB.h"
-}
+// #include "perlio.h"
 
 #define DEBUG
 #ifdef DEBUG
@@ -26,7 +22,6 @@ extern "C" {
 // #include "pcre++.h"
 // using namespace pcrepp;
 #include "jpcre2.hpp"
-
 typedef jpcre2::select<char> jp;
 #endif
 

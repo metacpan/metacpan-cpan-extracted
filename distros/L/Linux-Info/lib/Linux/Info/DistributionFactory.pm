@@ -21,7 +21,7 @@ use Linux::Info::Distribution::OSRelease::RedHat;
 use Linux::Info::Distribution::OSRelease::Rocky;
 use Linux::Info::Distribution::OSRelease::Ubuntu;
 
-our $VERSION = '2.12'; # VERSION
+our $VERSION = '2.13'; # VERSION
 
 # ABSTRACT: implements a factory for Distribution subclasses
 
@@ -36,6 +36,7 @@ my %os_release_distros = (
     CloudLinux => 'CloudLinux',
     centos     => 'CentOS',
     alpine     => 'Alpine',
+    raspbian   => 'Raspbian',
 );
 lock_hash(%os_release_distros);
 
@@ -110,7 +111,7 @@ Linux::Info::DistributionFactory - implements a factory for Distribution subclas
 
 =head1 VERSION
 
-version 2.12
+version 2.13
 
 =head1 SYNOPSIS
 

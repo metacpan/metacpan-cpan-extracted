@@ -1,5 +1,11 @@
 Revision history for Perl extension OpenSearch
 
+0.90 2024-05-27T13:40:59Z
+
+	Rewrote the API to be more clear. 
+	Should be easier to maintain.
+	Index Endpoints now complete (according to the official Documentation
+
 0.03 2024-05-18T05:23:14Z
 
 	Fixxed missing JSON requirement

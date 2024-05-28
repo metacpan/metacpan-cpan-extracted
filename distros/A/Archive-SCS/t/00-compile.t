@@ -2,8 +2,7 @@
 use strict;
 use warnings;
 use lib 'lib';
-use feature 'try';
-no warnings 'experimental::try';
+use Feature::Compat::Try;
 
 use Test::More;
 

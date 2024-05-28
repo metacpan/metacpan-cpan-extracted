@@ -61,8 +61,8 @@ eval {
 		),
 	);
 };
-is($EVAL_ERROR, "Parameter 'id' must be a number.\n",
-	"Parameter 'id' must be a number.");
+is($EVAL_ERROR, "Parameter 'id' must be a natural number.\n",
+	"Parameter 'id' must be a natural number (bad).");
 clean();
 
 # Test.

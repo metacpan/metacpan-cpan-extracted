@@ -1,0 +1,659 @@
+NAME
+    App::NutrientUtils - Utilities related to nutrients
+
+VERSION
+    This document describes version 0.001 of App::NutrientUtils (from Perl
+    distribution App-NutrientUtils), released on 2024-05-14.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities:
+
+    *   list-nutrients
+
+FUNCTIONS
+  list_nutrients
+    Usage:
+
+     list_nutrients(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List nutrients.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   category => *str*
+
+        Only return records where the 'category' field equals specified
+        value.
+
+    *   category.contains => *str*
+
+        Only return records where the 'category' field contains specified
+        text.
+
+    *   category.in => *array[str]*
+
+        Only return records where the 'category' field is in the specified
+        values.
+
+    *   category.is => *str*
+
+        Only return records where the 'category' field equals specified
+        value.
+
+    *   category.isnt => *str*
+
+        Only return records where the 'category' field does not equal
+        specified value.
+
+    *   category.max => *str*
+
+        Only return records where the 'category' field is less than or equal
+        to specified value.
+
+    *   category.min => *str*
+
+        Only return records where the 'category' field is greater than or
+        equal to specified value.
+
+    *   category.not_contains => *str*
+
+        Only return records where the 'category' field does not contain
+        specified text.
+
+    *   category.not_in => *array[str]*
+
+        Only return records where the 'category' field is not in the
+        specified values.
+
+    *   category.xmax => *str*
+
+        Only return records where the 'category' field is less than
+        specified value.
+
+    *   category.xmin => *str*
+
+        Only return records where the 'category' field is greater than
+        specified value.
+
+    *   default_unit => *str*
+
+        Only return records where the 'default_unit' field equals specified
+        value.
+
+    *   default_unit.contains => *str*
+
+        Only return records where the 'default_unit' field contains
+        specified text.
+
+    *   default_unit.in => *array[str]*
+
+        Only return records where the 'default_unit' field is in the
+        specified values.
+
+    *   default_unit.is => *str*
+
+        Only return records where the 'default_unit' field equals specified
+        value.
+
+    *   default_unit.isnt => *str*
+
+        Only return records where the 'default_unit' field does not equal
+        specified value.
+
+    *   default_unit.max => *str*
+
+        Only return records where the 'default_unit' field is less than or
+        equal to specified value.
+
+    *   default_unit.min => *str*
+
+        Only return records where the 'default_unit' field is greater than
+        or equal to specified value.
+
+    *   default_unit.not_contains => *str*
+
+        Only return records where the 'default_unit' field does not contain
+        specified text.
+
+    *   default_unit.not_in => *array[str]*
+
+        Only return records where the 'default_unit' field is not in the
+        specified values.
+
+    *   default_unit.xmax => *str*
+
+        Only return records where the 'default_unit' field is less than
+        specified value.
+
+    *   default_unit.xmin => *str*
+
+        Only return records where the 'default_unit' field is greater than
+        specified value.
+
+    *   detail => *bool* (default: 0)
+
+        Return array of full records instead of just ID fields.
+
+        By default, only the key (ID) field is returned per result entry.
+
+    *   eng_aliases => *array*
+
+        Only return records where the 'eng_aliases' field equals specified
+        value.
+
+    *   eng_aliases.has => *array[str]*
+
+        Only return records where the 'eng_aliases' field is an array/list
+        which contains specified value.
+
+    *   eng_aliases.is => *array*
+
+        Only return records where the 'eng_aliases' field equals specified
+        value.
+
+    *   eng_aliases.isnt => *array*
+
+        Only return records where the 'eng_aliases' field does not equal
+        specified value.
+
+    *   eng_aliases.lacks => *array[str]*
+
+        Only return records where the 'eng_aliases' field is an array/list
+        which does not contain specified value.
+
+    *   eng_name => *str*
+
+        Only return records where the 'eng_name' field equals specified
+        value.
+
+    *   eng_name.contains => *str*
+
+        Only return records where the 'eng_name' field contains specified
+        text.
+
+    *   eng_name.in => *array[str]*
+
+        Only return records where the 'eng_name' field is in the specified
+        values.
+
+    *   eng_name.is => *str*
+
+        Only return records where the 'eng_name' field equals specified
+        value.
+
+    *   eng_name.isnt => *str*
+
+        Only return records where the 'eng_name' field does not equal
+        specified value.
+
+    *   eng_name.max => *str*
+
+        Only return records where the 'eng_name' field is less than or equal
+        to specified value.
+
+    *   eng_name.min => *str*
+
+        Only return records where the 'eng_name' field is greater than or
+        equal to specified value.
+
+    *   eng_name.not_contains => *str*
+
+        Only return records where the 'eng_name' field does not contain
+        specified text.
+
+    *   eng_name.not_in => *array[str]*
+
+        Only return records where the 'eng_name' field is not in the
+        specified values.
+
+    *   eng_name.xmax => *str*
+
+        Only return records where the 'eng_name' field is less than
+        specified value.
+
+    *   eng_name.xmin => *str*
+
+        Only return records where the 'eng_name' field is greater than
+        specified value.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
+
+    *   fat_soluble => *bool*
+
+        Only return records where the 'fat_soluble' field equals specified
+        value.
+
+    *   fat_soluble.is => *bool*
+
+        Only return records where the 'fat_soluble' field equals specified
+        value.
+
+    *   fat_soluble.isnt => *bool*
+
+        Only return records where the 'fat_soluble' field does not equal
+        specified value.
+
+    *   fat_soluble_note => *str*
+
+        Only return records where the 'fat_soluble_note' field equals
+        specified value.
+
+    *   fat_soluble_note.contains => *str*
+
+        Only return records where the 'fat_soluble_note' field contains
+        specified text.
+
+    *   fat_soluble_note.in => *array[str]*
+
+        Only return records where the 'fat_soluble_note' field is in the
+        specified values.
+
+    *   fat_soluble_note.is => *str*
+
+        Only return records where the 'fat_soluble_note' field equals
+        specified value.
+
+    *   fat_soluble_note.isnt => *str*
+
+        Only return records where the 'fat_soluble_note' field does not
+        equal specified value.
+
+    *   fat_soluble_note.max => *str*
+
+        Only return records where the 'fat_soluble_note' field is less than
+        or equal to specified value.
+
+    *   fat_soluble_note.min => *str*
+
+        Only return records where the 'fat_soluble_note' field is greater
+        than or equal to specified value.
+
+    *   fat_soluble_note.not_contains => *str*
+
+        Only return records where the 'fat_soluble_note' field does not
+        contain specified text.
+
+    *   fat_soluble_note.not_in => *array[str]*
+
+        Only return records where the 'fat_soluble_note' field is not in the
+        specified values.
+
+    *   fat_soluble_note.xmax => *str*
+
+        Only return records where the 'fat_soluble_note' field is less than
+        specified value.
+
+    *   fat_soluble_note.xmin => *str*
+
+        Only return records where the 'fat_soluble_note' field is greater
+        than specified value.
+
+    *   fields => *array[str]*
+
+        Select fields to return.
+
+    *   ind_aliases => *array*
+
+        Only return records where the 'ind_aliases' field equals specified
+        value.
+
+    *   ind_aliases.has => *array[str]*
+
+        Only return records where the 'ind_aliases' field is an array/list
+        which contains specified value.
+
+    *   ind_aliases.is => *array*
+
+        Only return records where the 'ind_aliases' field equals specified
+        value.
+
+    *   ind_aliases.isnt => *array*
+
+        Only return records where the 'ind_aliases' field does not equal
+        specified value.
+
+    *   ind_aliases.lacks => *array[str]*
+
+        Only return records where the 'ind_aliases' field is an array/list
+        which does not contain specified value.
+
+    *   ind_name => *str*
+
+        Only return records where the 'ind_name' field equals specified
+        value.
+
+    *   ind_name.contains => *str*
+
+        Only return records where the 'ind_name' field contains specified
+        text.
+
+    *   ind_name.in => *array[str]*
+
+        Only return records where the 'ind_name' field is in the specified
+        values.
+
+    *   ind_name.is => *str*
+
+        Only return records where the 'ind_name' field equals specified
+        value.
+
+    *   ind_name.isnt => *str*
+
+        Only return records where the 'ind_name' field does not equal
+        specified value.
+
+    *   ind_name.max => *str*
+
+        Only return records where the 'ind_name' field is less than or equal
+        to specified value.
+
+    *   ind_name.min => *str*
+
+        Only return records where the 'ind_name' field is greater than or
+        equal to specified value.
+
+    *   ind_name.not_contains => *str*
+
+        Only return records where the 'ind_name' field does not contain
+        specified text.
+
+    *   ind_name.not_in => *array[str]*
+
+        Only return records where the 'ind_name' field is not in the
+        specified values.
+
+    *   ind_name.xmax => *str*
+
+        Only return records where the 'ind_name' field is less than
+        specified value.
+
+    *   ind_name.xmin => *str*
+
+        Only return records where the 'ind_name' field is greater than
+        specified value.
+
+    *   queries => *array[str]*
+
+        Search.
+
+        This will search all searchable fields with one or more specified
+        queries. Each query can be in the form of "-FOO" (dash prefix
+        notation) to require that the fields do not contain specified
+        string, or "/FOO/" to use regular expression. All queries must match
+        if the "query_boolean" option is set to "and"; only one query should
+        match if the "query_boolean" option is set to "or".
+
+    *   query_boolean => *str* (default: "and")
+
+        Whether records must match all search queries ('and') or just one
+        ('or').
+
+        If set to "and", all queries must match; if set to "or", only one
+        query should match. See the "queries" option for more details on
+        searching.
+
+    *   random => *bool* (default: 0)
+
+        Return records in random order.
+
+    *   result_limit => *int*
+
+        Only return a certain number of records.
+
+    *   result_start => *int* (default: 1)
+
+        Only return starting from the n'th record.
+
+    *   sort => *array[str]*
+
+        Order records according to certain field(s).
+
+        A list of field names separated by comma. Each field can be prefixed
+        with '-' to specify descending order instead of the default
+        ascending.
+
+    *   summary => *str*
+
+        Only return records where the 'summary' field equals specified
+        value.
+
+    *   summary.contains => *str*
+
+        Only return records where the 'summary' field contains specified
+        text.
+
+    *   summary.in => *array[str]*
+
+        Only return records where the 'summary' field is in the specified
+        values.
+
+    *   summary.is => *str*
+
+        Only return records where the 'summary' field equals specified
+        value.
+
+    *   summary.isnt => *str*
+
+        Only return records where the 'summary' field does not equal
+        specified value.
+
+    *   summary.max => *str*
+
+        Only return records where the 'summary' field is less than or equal
+        to specified value.
+
+    *   summary.min => *str*
+
+        Only return records where the 'summary' field is greater than or
+        equal to specified value.
+
+    *   summary.not_contains => *str*
+
+        Only return records where the 'summary' field does not contain
+        specified text.
+
+    *   summary.not_in => *array[str]*
+
+        Only return records where the 'summary' field is not in the
+        specified values.
+
+    *   summary.xmax => *str*
+
+        Only return records where the 'summary' field is less than specified
+        value.
+
+    *   summary.xmin => *str*
+
+        Only return records where the 'summary' field is greater than
+        specified value.
+
+    *   symbol => *str*
+
+        Only return records where the 'symbol' field equals specified value.
+
+    *   symbol.contains => *str*
+
+        Only return records where the 'symbol' field contains specified
+        text.
+
+    *   symbol.in => *array[str]*
+
+        Only return records where the 'symbol' field is in the specified
+        values.
+
+    *   symbol.is => *str*
+
+        Only return records where the 'symbol' field equals specified value.
+
+    *   symbol.isnt => *str*
+
+        Only return records where the 'symbol' field does not equal
+        specified value.
+
+    *   symbol.max => *str*
+
+        Only return records where the 'symbol' field is less than or equal
+        to specified value.
+
+    *   symbol.min => *str*
+
+        Only return records where the 'symbol' field is greater than or
+        equal to specified value.
+
+    *   symbol.not_contains => *str*
+
+        Only return records where the 'symbol' field does not contain
+        specified text.
+
+    *   symbol.not_in => *array[str]*
+
+        Only return records where the 'symbol' field is not in the specified
+        values.
+
+    *   symbol.xmax => *str*
+
+        Only return records where the 'symbol' field is less than specified
+        value.
+
+    *   symbol.xmin => *str*
+
+        Only return records where the 'symbol' field is greater than
+        specified value.
+
+    *   water_soluble => *bool*
+
+        Only return records where the 'water_soluble' field equals specified
+        value.
+
+    *   water_soluble.is => *bool*
+
+        Only return records where the 'water_soluble' field equals specified
+        value.
+
+    *   water_soluble.isnt => *bool*
+
+        Only return records where the 'water_soluble' field does not equal
+        specified value.
+
+    *   water_soluble_note => *str*
+
+        Only return records where the 'water_soluble_note' field equals
+        specified value.
+
+    *   water_soluble_note.contains => *str*
+
+        Only return records where the 'water_soluble_note' field contains
+        specified text.
+
+    *   water_soluble_note.in => *array[str]*
+
+        Only return records where the 'water_soluble_note' field is in the
+        specified values.
+
+    *   water_soluble_note.is => *str*
+
+        Only return records where the 'water_soluble_note' field equals
+        specified value.
+
+    *   water_soluble_note.isnt => *str*
+
+        Only return records where the 'water_soluble_note' field does not
+        equal specified value.
+
+    *   water_soluble_note.max => *str*
+
+        Only return records where the 'water_soluble_note' field is less
+        than or equal to specified value.
+
+    *   water_soluble_note.min => *str*
+
+        Only return records where the 'water_soluble_note' field is greater
+        than or equal to specified value.
+
+    *   water_soluble_note.not_contains => *str*
+
+        Only return records where the 'water_soluble_note' field does not
+        contain specified text.
+
+    *   water_soluble_note.not_in => *array[str]*
+
+        Only return records where the 'water_soluble_note' field is not in
+        the specified values.
+
+    *   water_soluble_note.xmax => *str*
+
+        Only return records where the 'water_soluble_note' field is less
+        than specified value.
+
+    *   water_soluble_note.xmin => *str*
+
+        Only return records where the 'water_soluble_note' field is greater
+        than specified value.
+
+    *   with_field_names => *bool*
+
+        Return field names in each record (as hash/associative array).
+
+        When enabled, function will return each record as hash/associative
+        array (field name => value pairs). Otherwise, function will return
+        each record as list/array (field value, field value, ...).
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-NutrientUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-NutrientUtils>.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-NutrientUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

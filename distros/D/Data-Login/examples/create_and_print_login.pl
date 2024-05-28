@@ -6,6 +6,7 @@ use warnings;
 use Data::HashType;
 use Data::Login;
 use Data::Login::Role;
+use Data::Random::Utils qw(is_valid);
 use DateTime;
 
 my $obj = Data::Login->new(
@@ -23,19 +24,36 @@ my $obj = Data::Login->new(
         'password_hash' => '24ea354ebd9198257b8837fd334ac91663bf52c05658eae3c9e6ad0c87c659c62e43a2e1e5a1e573962da69c523bf1f680c70aedd748cd2b71a6d3dbe42ae972',
         'roles' => [
                 Data::Login::Role->new(
-                        'active' => 1,
                         'id' => 1,
                         'role' => 'Admin',
+                        'valid_from' => DateTime->new(
+                                'day' => 1,
+                                'month' => 1,
+                                'year' => 2024,
+                        ),
                 ),
                 Data::Login::Role->new(
-                        'active' => 1,
                         'id' => 2,
                         'role' => 'User',
+                        'valid_from' => DateTime->new(
+                                'day' => 1,
+                                'month' => 1,
+                                'year' => 2024,
+                        ),
                 ),
                 Data::Login::Role->new(
-                        'active' => 0,
                         'id' => 3,
                         'role' => 'Bad',
+                        'valid_from' => DateTime->new(
+                                'day' => 1,
+                                'month' => 1,
+                                'year' => 2024,
+                        ),
+                        'valid_to' => DateTime->new(
+                                'day' => 1,
+                                'month' => 2,
+                                'year' => 2024,
+                        ),
                 ),
         ],
         'valid_from' => DateTime->new(
@@ -51,7 +69,7 @@ print 'Id: '.$obj->id."\n";
 print 'Login name: '.$obj->login_name."\n";
 print 'Password hash: '.$obj->password_hash."\n";
 print "Active roles:\n";
-print join "\n", map { $_->active ? ' - '.$_->role : () } @{$obj->roles};
+print join "\n", map { is_valid($_) ? ' - '.$_->role : () } @{$obj->roles};
 print "\n";
 print 'Valid from: '.$obj->valid_from->ymd."\n";
 

@@ -1,9 +1,106 @@
 ==================================================
-Changes from 2020-11-14 00:00:00 +0000 to present.
+Changes from 2022-05-25 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 5.0 at 2022-11-14 17:01:07 +0000
+version 5.1 at 2024-05-24 18:18:36 +0000
+----------------------------------------
+
+  Change: c3b622953845aefa0c29f66c2772113d293ded8e
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-05-24 11:17:59 +0000
+
+    Bumping for 5.1 Release
+
+    * Adds better handling of JunOS firewall logs 
+
+  Change: 27c68a921a82b3985a4b5c3d8092684883dcea51
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-05-24 11:12:42 +0000
+
+    Handle JunOS Firewall Logs
+
+    The logs are stamped in a weird manner if they are a part of a
+    load-balancing or fail-over pair. Add a test!
+
+    Add testing on Perl 5.38 
+
+  Change: b396a1e1cc8ef8f363dbe44959282114f81613bb
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-12-09 21:42:46 +0000
+
+    Don't use dzil in the workflow
+
+    * `Dist::Zilla` has a higher Perl requirement than this module so we
+
+    can't use it * Use `Dist::Zilla::Plugin::CPANFile` to create a `cpanfile`
+    in the
+
+    distribution * Copy the `cpanfile` back from the build and check in to git
+    * Replace `cpanm` with `cpm` so we can run tests in the CI/CD 
+
+  Change: 2d523fb77108bf2bc112c71312387f7fe05e4996
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-12-09 21:20:10 +0000
+
+    Test on all the Perls!
+
+    Now that the CI/CD pipeline is passing, let's run tests on all the perls! 
+
+  Change: e5c158147e245751adf4f6de7f7e6f3c712c19a7
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-12-09 21:15:08 +0000
+
+    More tweaks for CI workflows 
+
+  Change: 3f42a6eae7ba94335f0f83d6b314d9a9ebda798c
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-12-09 21:10:30 +0000
+
+    More issues with the workflow 
+
+  Change: 2a263ca1d74390372cd37eabe314d77cdbe858ca
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-12-09 21:05:49 +0000
+
+    Chasing issues in the workflow 
+
+  Change: c0cc69e441737af14d22ce04022af69cb09bf625
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-12-09 20:33:04 +0000
+
+    Install dzil from packages 
+
+  Change: f46aaea8863d94f7afe5fcb39f03ea640bb9370b
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-12-09 20:25:39 +0000
+
+    Hoping to streamline dzil install 
+
+  Change: 249d3fe9c04483fb5ef8eacc930759c31301ed5e
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-12-09 20:19:41 +0000
+
+    Add warnings back 
+
+  Change: c87f5c94cd52f94d90ae1a3c728e2ee8bedb2eb4
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-12-09 20:17:43 +0000
+
+    Update testing workflow to use dzil
+
+    Use `dzil` to run the test suite 
+
+  Change: 242d1ed53499878911ae63ae80feb403921392d9
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-12-09 20:14:04 +0000
+
+    Add a GitHub Action for Testing
+
+    Attempt to enable GitHub Actions to run the test suite. 
+
+----------------------------------------
+version 5.0 at 2022-11-14 04:46:30 +0000
 ----------------------------------------
 
   Change: 6ca871f422f19a4374187a3a78e0066db774fd47
@@ -62,77 +159,6 @@ version 5.0 at 2022-11-14 17:01:07 +0000
     warnings in tests and benchmarks * Document environment variables that
     interact with `Parse::Syslog::Line` 
 
-----------------------------------------
-version 4.7 at 2021-02-25 00:03:01 +0000
-----------------------------------------
-
-  Change: 54fff942c417fdb3c300b3bf08bc584c3d2c972d
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-02-24 16:03:01 +0000
-
-    Stop tests from failing without JSON::MaybeXS
-
-    Prior to this patch, tests were failing on the smoke test infrastructure
-    since `JSON::MaybeXS` is an optional dependency.
-
-    The tests now check for `JSON::MaybeXS` and only load and run the tests if
-    it's present.
-
-    Also adjusted the call of `decode_json()` to use the package path to
-    prevent issues if something else loads `JSON::MaybeXS` without importing
-    the `decode_json()` symbol.
-
-    Release as 4.7 to the CPAN. 
-
-----------------------------------------
-version 4.6 at 2021-02-18 22:40:10 +0000
-----------------------------------------
-
-  Change: 1e2b67a489bd9852e457c614a7eb0a1a1c76027e
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-02-18 14:40:10 +0000
-
-    Tag the 4.6 release 
-
-  Change: 918d12c42851d19c9f9e78c7e2d81fac05eb7fc8
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-02-18 14:25:13 +0000
-
-    Handle weird program names
-
-    In squid3, the syslog ident changed from `squid` to `(squid)` which failed
-    to parse as a `program_name`. Correct this by allowing any character in the
-    first position. 
-
-  Change: ce09b5506e374622e385c89ff40a5915be6d69a5
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-28 20:13:04 +0000
-
-    TravisCIA updated with App::CISetup 
-
-  Change: 921ddbb57cc8f4d4a9b294258c193f3ac9553579
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-21 20:59:00 +0000
-
-    Documentation regenerated for 4.5 release 
-
-  Change: 186d3914f5d0830e84976157f38c48bb9a3e8469
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-21 20:59:00 +0000
-
-    Document and fix parse_syslog_lines()
-
-    This commit fixes the parse_syslog_lines() function and starts the
-    documentation. This function is not exported by default and has no tests. I
-    will be fixing that in future releases while testing the integration into
-    syslog processors. 
-
-  Change: 498a47f898be57eddf1ef7e610a4b81154f764ad
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-20 08:47:31 +0000
-
-    Fix unless conditional for JSON::MaybeXS loading 
-
 =================================================
-Plus 36 releases after 2020-11-14 00:00:00 +0000.
+Plus 37 releases after 2022-05-25 00:00:00 +0000.
 =================================================

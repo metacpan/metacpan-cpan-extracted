@@ -90,9 +90,16 @@ sub STORE {
 		$self->{locked} = $value;
 		return;
 	}
-
 	my $k = $self->{properties}->{$key};
+
 	if ($k) {
+		if ($k->{private}) {
+			my $priv = $self->private_names;
+			if ( $self->current_caller !~ m/^($priv)$/) {
+				die "Cannot access Object ($self->{name}) property ($key) as it is private";
+			}
+		}
+
 		if ($k->{writeable}) {
 			$self->set_value($key, $value, $k);
 		} elsif ($k->{configurable}) {

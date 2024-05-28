@@ -10,6 +10,7 @@ use Packme::Test;
 my $original_string =  [
     'Date      |Description                |Income ', 
     'Robert              |Acock               |32 ', 
+    'Joy                 |Jack                |32 ', 
 ];
 
 my $test = Packme::Test->new(raw_data => join "\n", @{ $original_string });
@@ -25,6 +26,11 @@ is_deeply($test->data, [
 	{
 		'first name' => 'Robert',
 		'last name' => 'Acock',
+		'age' => '32'
+	},
+	{
+		'first name' => 'Joy',
+		'last name' => 'Jack',
 		'age' => '32'
 	}
 ], "data is set");

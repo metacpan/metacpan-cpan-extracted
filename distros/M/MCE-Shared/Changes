@@ -1,6 +1,10 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.887 Fri May 24 19:00:00 EST 2024
+
+  * Improve reaping completed workers in MCE::Hobo.
+
 1.886 Wed Sep 13 18:00:00 EST 2023
 
   * Add Android support. This required moving MCE::Shared::Base::Common

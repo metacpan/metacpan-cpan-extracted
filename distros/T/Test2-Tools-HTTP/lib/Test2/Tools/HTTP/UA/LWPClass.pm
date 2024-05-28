@@ -2,11 +2,12 @@ package Test2::Tools::HTTP::UA::LWPClass;
 
 use strict;
 use warnings;
+use 5.014;
 use URI;
 use parent 'Test2::Tools::HTTP::UA';
 
 # ABSTRACT: Global LWP user agent wrapper for Test2::Tools::HTTP
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 
 my %orig;
@@ -98,7 +99,7 @@ Test2::Tools::HTTP::UA::LWPClass - Global LWP user agent wrapper for Test2::Tool
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 

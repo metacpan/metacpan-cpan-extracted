@@ -1,18 +1,14 @@
 package Rope;
 
 use 5.006; use strict; use warnings;
-our $VERSION = '0.38';
+our $VERSION = '0.40';
 use Rope::Object;
+use Rope::Pro;
 my (%META, %PRO);
 our @ISA;
 
 BEGIN {
-	%PRO = (
-		keyword => sub {
-			my ($caller, $method, $cb) = @_;
-			no strict 'refs';
-			*{"${caller}::${method}"} = $cb;
-		},
+	%PRO = Rope::Pro->new(
 		scope => sub {
 			my ($caller, $self, %props) = @_;
 			for my $prop (keys %{$props{properties}}) {
@@ -135,6 +131,23 @@ BEGIN {
 				shift @_ if $_[0] && $_[0] eq $caller;
 				my (@requires) = @_;
 				$META{$caller}{requires}{$_}++ for (@requires);
+			};
+		},
+		private => sub {
+			my ($caller) = shift;
+			return sub {
+				shift @_ if $_[0] eq $caller;
+				my ($prop, @options) = @_;
+				$prop = shift @options if ( @options > 1 );
+				$PRO{set_prop}(
+					$caller,
+					$prop,
+					value => $options[0],
+					enumerable => 0,
+					writeable => 0,
+					initable => 0,
+					private => 1,
+				);
 			};
 		},
 		function => sub {
@@ -443,7 +456,7 @@ sub import {
 	$PRO{keyword}($caller, $_, $PRO{$_}($caller))
 		for $options->{import} 
 			? @{$options->{import}} 
-			: qw/function property properties prototyped extends with requires before around after locked destroy DESTROY new/;
+			: qw/function property properties prototyped private extends with requires before around after locked destroy DESTROY new/;
 }
 
 sub new {
@@ -630,7 +643,7 @@ Rope - Tied objects
 
 =head1 VERSION
 
-Version 0.38
+Version 0.40
 
 =cut
 
@@ -809,6 +822,15 @@ NOTE: traditional sub routines work and should be inherited also.
 		my ($self, $param) = @_;
 		...
 	}
+
+=head2 private
+
+Extends the current object definition with a new property that is private and only accessible to the current class. A private property has initable, writeable, enumerable and configurable all set to false so it cannot be changed/set once the object is instantiated.
+
+	private five => sub {
+		my ($self, $param) = @_;
+		...
+	};
 
 =head2 extends
 

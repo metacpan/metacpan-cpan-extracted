@@ -1,7 +1,7 @@
 NAME
 
     WebService::Fastly - an interface to most facets of the [Fastly
-    API](https://developer.fastly.com/reference/api).
+    API](https://www.fastly.com/documentation/reference/api/).
 
 SYNOPSIS
 
@@ -17,7 +17,7 @@ DESCRIPTION
     collections of endpoints that allow manipulation of objects related to
     Fastly services and accounts. For the most accurate and up-to-date API
     reference content, visit our [Developer
-    Hub](https://developer.fastly.com/reference/api/)
+    Hub](https://www.fastly.com/documentation/reference/api/)
 
     The version of the API Spec document: 1.0.0
 

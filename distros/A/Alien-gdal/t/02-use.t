@@ -23,6 +23,9 @@ if (!$success) {
    my @bin = Alien::gdal->bin_dir;
    warn "no gdal bin dir found via bin_dir method\n" if not @bin;
    #$bin = Alien::gdal->dist_dir . '/bin';
+   my $datadir = Alien::gdal->data_dir;
+   warn "no gdal data dir found via data_dir method\n" if not $datadir;
+   diag "Data dir: $datadir";
 }
 
 

@@ -4,11 +4,11 @@ use strict;
 use warnings;
 
 use Mo qw(build is);
-use Mo::utils 0.09 qw(check_length check_number check_required);
+use Mo::utils 0.28 qw(check_length check_number_id check_required);
 use Mo::utils::CSS 0.02 qw(check_css_class);
 use Mo::utils::URI qw(check_location);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 has class => (
 	is => 'ro',
@@ -44,7 +44,7 @@ sub BUILD {
 	check_length($self, 'desc', 1000);
 
 	# Check id.
-	check_number($self, 'id');
+	check_number_id($self, 'id');
 
 	# Check image.
 	# XXX check image.
@@ -198,21 +198,26 @@ Returns string.
 
  new():
          From Mo::utils:
-                 Parameter 'class' has bad CSS class name.
-                         Value: %s
-                 Parameter 'class' has bad CSS class name (number on begin).
-                         Value: %s
-                 Parameter 'desc' has length greater than '1000'.
-                         Value: %s
-                 Parameter 'id' must be a number.
-                         Value: %s
-                 Parameter 'image' doesn't contain valid location.
-                         Value: %s
-                 Parameter 'location' doesn't contain valid location.
-                         Value: %s
-                 Parameter 'title' has length greater than '100'.
-                         Value: %s
-                 Parameter 'title' is required.
+                 From Mo::utils::check_number_id():
+                         Parameter 'id' must be a number.
+                                 Value: %s
+                 From Mo::utils::check_length():
+                         Parameter 'desc' has length greater than '1000'.
+                                 Value: %s
+                         Parameter 'title' has length greater than '100'.
+                                 Value: %s
+                 From Mo::utils::check_required():
+                         Parameter 'title' is required.
+                 From Mo::utils::CSS::check_css_class():
+                         Parameter 'class' has bad CSS class name.
+                                 Value: %s
+                         Parameter 'class' has bad CSS class name (number on begin).
+                                 Value: %s
+                 From Mo::utils::URI::check_location():
+                         Parameter 'image' doesn't contain valid location.
+                                 Value: %s
+                         Parameter 'location' doesn't contain valid location.
+                                 Value: %s
 
 =head1 EXAMPLE
 
@@ -273,6 +278,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

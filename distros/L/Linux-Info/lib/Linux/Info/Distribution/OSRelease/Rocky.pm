@@ -17,7 +17,7 @@ use Class::XSAccessor getters => {
     get_redhat_support_product_version => 'redhat_support_product_version',
 };
 
-our $VERSION = '2.12'; # VERSION
+our $VERSION = '2.13'; # VERSION
 
 # ABSTRACT: a subclass of Linux::Info::Distribution::OSRelease
 
@@ -59,14 +59,14 @@ Linux::Info::Distribution::OSRelease::Rocky - a subclass of Linux::Info::Distrib
 
 =head1 VERSION
 
-version 2.12
+version 2.13
 
 =head1 DESCRIPTION
 
 This subclass extends the attributes available on the parent class based on
 what Rocky makes available.
 
-See the methods to check which additional information is avaiable.
+See the methods to check which additional information is available.
 
 =head1 METHODS
 

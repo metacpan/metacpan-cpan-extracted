@@ -11,11 +11,11 @@ use Scalar::Util qw(blessed looks_like_number);
 
 Readonly::Array our @EXPORT_OK => qw(check_angle check_array check_array_object
 	check_array_required check_bool check_code check_isa check_length
-	check_length_fix check_number check_number_min check_number_of_items
-	check_number_range check_regexp check_required check_string check_string_begin
-	check_strings);
+	check_length_fix check_number check_number_id check_number_min
+	check_number_of_items check_number_range check_regexp check_required
+	check_string check_string_begin check_strings);
 
-our $VERSION = 0.27;
+our $VERSION = 0.29;
 
 sub check_angle {
 	my ($self, $key) = @_;
@@ -152,6 +152,20 @@ sub check_number {
 
 	if (! looks_like_number($self->{$key})) {
 		err "Parameter '$key' must be a number.",
+			'Value', $self->{$key},
+		;
+	}
+
+	return;
+}
+
+sub check_number_id {
+	my ($self, $key) = @_;
+
+	_check_key($self, $key) && return;
+
+	if ($self->{$key} !~ m/^\d+$/ms || $self->{$key} == 0) {
+		err "Parameter '$key' must be a natural number.",
 			'Value', $self->{$key},
 		;
 	}
@@ -344,8 +358,8 @@ Mo::utils - Mo utilities.
 
  use Mo::utils qw(check_angle check_array check_array_object check_array_required
          check_bool check_code check_isa check_length check_length_fix check_number
-         check_number_min check_number_of_items check_number_range check_regexp
-         check_required check_string check_string_begin check_strings);
+         check_number_id check_number_min check_number_of_items check_number_range
+         check_regexp check_required check_string check_string_begin check_strings);
 
  check_angle($self, $key);
  check_array($self, $key);
@@ -357,6 +371,7 @@ Mo::utils - Mo utilities.
  check_length($self, $key, $max_length);
  check_length_fix($self, $key, $length);
  check_number($self, $key);
+ check_number_id($self, $key);
  check_number_min($self, $key, $min);
  check_number_of_items($self, $list_method, $item_method, $object_name, $item_name);
  check_number_range($self, $key, $min, $max);
@@ -491,6 +506,19 @@ I<Since version 0.01. Described functionality since version 0.26.>
 
 Check parameter defined by C<$key> which is number (positive or negative) or no.
 Number could be integer, float, exponencial and negative.
+
+Put error if check isn't ok.
+
+Returns undef.
+
+=head2 C<check_number_id>
+
+ check_number_id($self, $key);
+
+I<Since version 0.28.>
+
+Check parameter defined by C<$key> which is number which could be used as id in
+computer systems. This number is a natural number beginning from 1 (1, 2, 3, …).
 
 Put error if check isn't ok.
 
@@ -650,6 +678,10 @@ Returns undef.
 
  check_number():
          Parameter '%s' must be a number.
+                 Value: %s
+
+ check_number_id():
+         Parameter '%s' must be a natural number.
                  Value: %s
 
  check_number_min():
@@ -1134,6 +1166,48 @@ Returns undef.
 
 =head1 EXAMPLE21
 
+=for comment filename=check_number_id_ok.pl
+
+ use strict;
+ use warnings;
+
+ use Mo::utils qw(check_number_id);
+
+ my $self = {
+         'key' => '10',
+ };
+ check_number_id($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE22
+
+=for comment filename=check_number_id_fail.pl
+
+ use strict;
+ use warnings;
+
+ $Error::Pure::TYPE = 'Error';
+
+ use Mo::utils qw(check_number_id);
+
+ my $self = {
+         'key' => 0,
+ };
+ check_number_id($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [...utils.pm:?] Parameter 'key' must be a natural number.
+
+=head1 EXAMPLE23
+
 =for comment filename=check_number_min_ok.pl
 
  use strict;
@@ -1152,7 +1226,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE22
+=head1 EXAMPLE24
 
 =for comment filename=check_number_min_fail.pl
 
@@ -1174,7 +1248,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' must be greater than 11.
 
-=head1 EXAMPLE23
+=head1 EXAMPLE25
 
 =for comment filename=check_number_of_items_ok.pl
 
@@ -1219,7 +1293,7 @@ Returns undef.
  # Output like:
  # ok
 
-=head1 EXAMPLE24
+=head1 EXAMPLE26
 
 =for comment filename=check_number_of_items_fail.pl
 
@@ -1264,7 +1338,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Test for Item 'value1' has multiple values.
 
-=head1 EXAMPLE25
+=head1 EXAMPLE27
 
 =for comment filename=check_number_range_ok.pl
 
@@ -1284,7 +1358,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE26
+=head1 EXAMPLE28
 
 =for comment filename=check_number_range_fail.pl
 
@@ -1306,7 +1380,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' must be a number between 10 and 12.
 
-=head1 EXAMPLE27
+=head1 EXAMPLE29
 
 =for comment filename=check_regexp_ok.pl
 
@@ -1326,7 +1400,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE28
+=head1 EXAMPLE30
 
 =for comment filename=check_regexp_fail.pl
 
@@ -1349,7 +1423,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' does not match the specified regular expression.
 
-=head1 EXAMPLE29
+=head1 EXAMPLE31
 
 =for comment filename=check_required_ok.pl
 
@@ -1369,7 +1443,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE30
+=head1 EXAMPLE32
 
 =for comment filename=check_required_fail.pl
 
@@ -1392,7 +1466,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' is required.
 
-=head1 EXAMPLE31
+=head1 EXAMPLE33
 
 =for comment filename=check_string_ok.pl
 
@@ -1412,7 +1486,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE32
+=head1 EXAMPLE34
 
 =for comment filename=check_string_fail.pl
 
@@ -1435,7 +1509,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' have expected value.
 
-=head1 EXAMPLE33
+=head1 EXAMPLE35
 
 =for comment filename=check_string_begin_ok.pl
 
@@ -1455,7 +1529,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE34
+=head1 EXAMPLE36
 
 =for comment filename=check_string_begin_fail.pl
 
@@ -1478,7 +1552,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' must begin with defined string base.
 
-=head1 EXAMPLE35
+=head1 EXAMPLE37
 
 =for comment filename=check_strings_ok.pl
 
@@ -1498,7 +1572,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE36
+=head1 EXAMPLE38
 
 =for comment filename=check_strings_fail.pl
 
@@ -1569,6 +1643,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.27
+0.29
 
 =cut

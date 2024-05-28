@@ -86,6 +86,6 @@
          "web" : "https://github.com/mkende/pmarkdown"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

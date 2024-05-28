@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.886';
+our $VERSION = '1.887';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -54,6 +54,7 @@ my $_thaw   = MCE::Channel::_get_thaw();
 
 my $_is_MSWin32 = ( $^O eq 'MSWin32' ) ? 1 : 0;
 my $_tid        = ( $INC{'threads.pm'} ) ? threads->tid() : 0;
+my $_yield_secs = ( $^O =~ /mswin|mingw|msys|cygwin/i ) ? 0.015 : 0.008;
 
 sub CLONE {
    $_tid = threads->tid(), &_clear() if $INC{'threads.pm'};
@@ -91,8 +92,9 @@ sub init {
    # max_workers hobo_timeout posix_exit on_start on_finish void_context
    # ---------------------------------------------------------------------
 
-   my $pkg = "$$.$_tid.".( caller eq __PACKAGE__ ? caller(1) : caller );
-   my $mngd = $_MNGD->{$pkg} = ( ref $_[0] eq 'HASH' ) ? shift : { @_ };
+   my $opt = ( ref $_[0] eq 'HASH' ) ? shift : { @_ };
+   my $pkg = "$$.$_tid.".( delete $opt->{caller} || caller() );
+   my $mngd = $_MNGD->{$pkg} = $opt;
 
    @_ = ();
 
@@ -160,9 +162,11 @@ sub mce_async (&;@) {
 }
 
 sub create {
-   my $mngd = $_MNGD->{ "$$.$_tid.".caller() } || do {
+   my $caller = caller();
+
+   my $mngd = $_MNGD->{ "$$.$_tid.$caller" } || do {
       # construct mngd internally on first use unless defined
-      init(); $_MNGD->{ "$$.$_tid.".caller() };
+      init( caller => $caller ); $_MNGD->{ "$$.$_tid.$caller" };
    };
 
    shift if ( $_[0] eq __PACKAGE__ );
@@ -175,7 +179,7 @@ sub create {
    $self->{MGR_ID} = $mngd->{MGR_ID}, $self->{PKG} = $mngd->{PKG};
    $self->{ident } = shift if ( !ref $_[0] && ref $_[1] eq 'CODE' );
 
-   my $func = shift; $func = caller().'::'.$func
+   my $func = shift; $func = $caller.'::'.$func
       if ( !ref $func && length $func && index($func,':') < 0 );
 
    if ( !defined $func ) {
@@ -189,23 +193,23 @@ sub create {
 
    $_DATA->{"$pkg:id"} = 10000 if ( ( my $id = ++$_DATA->{"$pkg:id"} ) >= 2e9 );
 
-   if ( $max_workers || $self->{IGNORE} ) {
-      my $wrk_id; local $!;
-
-      # Reap completed hobo processes.
-      for my $hobo ( $list->vals() ) {
-         $wrk_id = $hobo->{WRK_ID};
-         $list->del($wrk_id), next if $hobo->{REAPED};
-         waitpid($wrk_id, _WNOHANG) or next;
-         _reap_hobo($list->del($wrk_id), 0);
+   # Reap completed hobo processes.
+   if ( $self->{IGNORE} || ($max_workers && $list->len() >= $max_workers) ) {
+      local ($SIG{CHLD}, $!, $?, $_);
+      map {
+         $_ = substr($_, 1); # strip leading 'R'
+         my $hobo = $list->del($_);
+         if ( ! $hobo->{REAPED} ) {
+             waitpid($hobo->{WRK_ID}, 0);
+             _reap_hobo($hobo, 0);
+         }
+         ();
       }
-
-      # Wait for a slot if saturated.
-      if ( $max_workers && $list->len() >= $max_workers ) {
-         my $count = $list->len() - $max_workers + 1;
-         _wait_one($pkg) for 1 .. $count;
-      }
+      $_DATA->{$pkg}->get_done();
    }
+
+   # Wait for a slot if saturated.
+   _wait_one($pkg) if ( $max_workers && $list->len() >= $max_workers );
 
    # ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 
@@ -314,7 +318,8 @@ sub exit {
    }
    elsif ( $wrk_id == $$ ) {
       alarm 0; my ( $exit_status, @res ) = @_; $? = $exit_status || 0;
-      $_DATA->{$pkg}->set('R'.$wrk_id, @res ? $_freeze->(\@res) : '');
+      $_DATA->{$pkg}->set('R'.$wrk_id, @res ? $_freeze->(\@res) : '')
+         unless $self->{IGNORE};
       die "Hobo exited ($?)\n";
       _exit($?); # not reached
    }
@@ -322,7 +327,7 @@ sub exit {
    return $self if $self->{REAPED};
 
    if ( exists $_DATA->{$pkg} ) {
-      sleep 0.015 until $_DATA->{$pkg}->exists('S'.$wrk_id);
+      sleep $_yield_secs until $_DATA->{$pkg}->exists('S'.$wrk_id);
    } else {
       sleep 0.030;
    }
@@ -465,7 +470,7 @@ sub kill {
    if ( $self->{MGR_ID} eq "$$.$_tid" ) {
       return $self if $self->{REAPED};
       if ( exists $_DATA->{$pkg} ) {
-         sleep 0.015 until $_DATA->{$pkg}->exists('S'.$wrk_id);
+         sleep $_yield_secs until $_DATA->{$pkg}->exists('S'.$wrk_id);
       } else {
          sleep 0.030;
       }
@@ -711,7 +716,7 @@ sub _force_reap {
       next if $hobo->{IGNORE};
 
       if ( $hobo->is_running() ) {
-         sleep(0.015), CORE::kill('KILL', $hobo->pid())
+         sleep($_yield_secs), CORE::kill('KILL', $hobo->pid())
             if CORE::kill('ZERO', $hobo->pid());
          $count++;
       }
@@ -737,7 +742,7 @@ sub _quit {
    if ( ! $_SELF->{IGNORE} ) {
       my ( $pkg, $wrk_id ) = ( $_SELF->{PKG}, $_SELF->{WRK_ID} );
       $_DATA->{$pkg}->set('R'.$wrk_id, '');
-   } 
+   }
 
    _exit(0);
 }
@@ -794,7 +799,7 @@ sub _trap {
    if ( ! $_SELF->{IGNORE} ) {
       my ( $pkg, $wrk_id ) = ( $_SELF->{PKG}, $_SELF->{WRK_ID} );
       $_DATA->{$pkg}->set('R'.$wrk_id, '');
-   } 
+   }
 
    _exit($exit_status);
 }
@@ -810,7 +815,7 @@ sub _wait_one {
          $self = $list->del($wrk_id), last if waitpid($wrk_id, _WNOHANG);
       }
       last if $self;
-      sleep 0.030;
+      sleep $_yield_secs;
    }
 
    _reap_hobo($self, 0);
@@ -881,6 +886,17 @@ sub new {
 sub clear  { ${ $_[0] }->clear(); }
 sub exists { ${ $_[0] }->exists($_[1]); }
 sub set    { ${ $_[0] }->set($_[1], $_[2]); }
+
+sub get_done {
+   my ( $self ) = @_;
+   my @ret;
+
+   for my $key (${ $self }->keys) {
+      push @ret, $key if ( substr($key, 0, 1) eq 'R' );
+   }
+
+   return @ret;
+}
 
 sub get {
    my ( $self, $wrk_id, $wait_flag ) = @_;
@@ -969,7 +985,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.886
+This document describes MCE::Hobo version 1.887
 
 =head1 SYNOPSIS
 

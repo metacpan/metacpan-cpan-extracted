@@ -1,3 +1,7 @@
+2.003003 2024-05-27
+
+* Fix CPAN RT #153736 regarding bnok() with large input values.
+
 2.003002 2024-01-05
 
  * Improved interaction between Math::BigInt and the backend libraries.

@@ -14,6 +14,7 @@ lib/Rope/Handles/String.pm
 lib/Rope/Lazier.pm
 lib/Rope/Monkey.pm
 lib/Rope/Object.pm
+lib/Rope/Pro.pm
 lib/Rope/Role.pm
 lib/Rope/Type.pm
 lib/Rope/Variant.pm
@@ -78,6 +79,8 @@ t/51-bool.t
 t/52-variant.t
 t/53-variant-alias.t
 t/54-lazier.t
+t/55-lazier-props.t
+t/56-private-property.t
 t/lib/Custom.pm
 t/lib/One.pm
 t/lib/Role.pm

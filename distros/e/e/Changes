@@ -1,6 +1,19 @@
 Revision history for e
 
 =================
+1.15 - 2024-05-24
+=================
+
+Updated "watch" with -methods option to make it simple to
+watch only specific methods (like "fetch").
+
+=================
+1.14 2024-05-24
+=================
+
+Added dye functions for coloring.
+
+=================
 1.13 2024-05-23
 =================
 

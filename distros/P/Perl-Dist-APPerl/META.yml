@@ -7,6 +7,7 @@ build_requires:
   Test::Pod::LinkCheck::Lite: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.13'
 dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -20,6 +21,7 @@ no_index:
     - inc
 requires:
   File::Path: '2.07'
+  File::ShareDir: '0'
   JSON::PP: '2.0104'
   perl: '5.010'
   version: '0.77'
@@ -27,6 +29,6 @@ resources:
   bugtracker: https://github.com/G4Vi/Perl-Dist-APPerl/issues
   homepage: https://computoid.com/APPerl
   repository: https://github.com/G4Vi/Perl-Dist-APPerl.git
-version: v0.5.0
+version: v0.6.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

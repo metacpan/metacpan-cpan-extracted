@@ -1,0 +1,7 @@
+CONCEPT
+=======
+Data object for message board.
+
+Contain:
+- Main message with author and date.
+- List of comments with author and date.

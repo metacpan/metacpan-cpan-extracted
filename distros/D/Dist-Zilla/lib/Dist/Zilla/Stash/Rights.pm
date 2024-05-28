@@ -1,4 +1,4 @@
-package Dist::Zilla::Stash::Rights 6.031;
+package Dist::Zilla::Stash::Rights 6.032;
 # ABSTRACT: a stash of your default licensing terms
 
 use Moose;
@@ -40,7 +40,7 @@ Dist::Zilla::Stash::Rights - a stash of your default licensing terms
 
 =head1 VERSION
 
-version 6.031
+version 6.032
 
 =head1 PERL VERSION
 
@@ -61,7 +61,7 @@ Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ricardo SIGNES.
+This software is copyright (c) 2024 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

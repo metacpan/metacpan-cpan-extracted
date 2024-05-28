@@ -2,7 +2,7 @@ package Test2::Tools::HTTP;
 
 use strict;
 use warnings;
-use 5.008001;
+use 5.014;
 use LWP::UserAgent;
 use parent qw( Exporter );
 use Test2::API qw( context );
@@ -17,7 +17,7 @@ use Carp ();
 
 our %EXPORT_TAGS = (
   short => [qw(
-    app_add req ua res code message content content_type charset content_length content_length_ok location location_uri tx headers header
+    app_add app_del app_guard req ua res code message content content_type charset content_length content_length_ok location location_uri tx headers header
   )],
 );
 
@@ -34,11 +34,13 @@ our @EXPORT_OK = (
   @{ $EXPORT_TAGS{'short'} },
 );
 
-*ua      = \&http_ua;
-*req     = \&http_request;
-*res     = \&http_response;
-*app_add = \&psgi_app_add;
-*charset = \&http_content_type_charset;
+*ua        = \&http_ua;
+*req       = \&http_request;
+*res       = \&http_response;
+*app_add   = \&psgi_app_add;
+*app_del   = \&psgi_app_del;
+*app_guard = \&psgi_app_guard;
+*charset   = \&http_content_type_charset;
 
 foreach my $short (qw( code message content content_type content_length content_length_ok location location_uri tx header headers ))
 {
@@ -47,7 +49,7 @@ foreach my $short (qw( code message content content_type content_length content_
 }
 
 # ABSTRACT: Test HTTP / PSGI
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 
 my $tx;
@@ -611,7 +613,7 @@ Test2::Tools::HTTP - Test HTTP / PSGI
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -951,14 +953,14 @@ If not provided, the default L<LWP::UserAgent> will call C<env_proxy> and add an
 Add the given PSGI app to the testing environment.  If you provide a URL, then requests to that URL will be intercepted by C<http_request> and routed to the app
 instead of making a real HTTP request via L<LWP::UserAgent>.
 
-=head2 psgi_app_del
+=head2 psgi_app_del [app_del]
 
  psgi_app_del;
  psgi_app_del $url;
 
 Remove the app at the given (or default) URL.
 
-=head2 psgi_app_guard
+=head2 psgi_app_guard [app_guard]
 
  my $guard = psgi_app_guard $app;
  my $guard = psgi_app_guard $url, $app;

@@ -1,4 +1,4 @@
-package Module::Faker::Appendix 0.026;
+package Module::Faker::Appendix 0.027;
 # ABSTRACT: a thing that appends
 
 use v5.20.0;
@@ -30,7 +30,7 @@ Module::Faker::Appendix - a thing that appends
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 PERL VERSION
 

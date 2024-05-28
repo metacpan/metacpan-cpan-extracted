@@ -3,45 +3,44 @@ package Packme::Test;
 use Moo;
 use MooX::Pack;
 
-all seperator => (
+seperator (
 	character => 'x',
 	pack => '|',
-	index => [ 1, 3 ],
 );
 
-line one => (
+line title => (
     key => 'data',
     character => 'A10',
     catch => 1,
 );
 
-line one => (
+line title => (
     name => 'description',
     character => 'A27',
     catch => 1,
 );
 
-line one => (
+line title => (
     name => 'income',
     character => 'A7',
     catch => 1,
 );
 
-line two => (
+line rest => (
     name => 'first name',
     character => 'A20',
     catch => 1,
     index => 4,
 );
 
-line two => (
+line rest => (
     key => 'last name',
     character => 'A20',
     catch => 1,
     index => 0,
 );
 
-line two => (
+line rest => (
     name => 'age',
     character => 'A3',
     catch => 1,

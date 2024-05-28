@@ -5,75 +5,62 @@ use feature qw(signatures);
 use Moose::Role;
 use JSON::XS;
 use Data::Dumper;
+use Carp qw/croak/;
+$Carp::Verbose = 1;
 
 my $functions = {
-  as_is       => sub { my $value = shift; return ($value); },
-  encode_json => sub { my $value = shift; return ( encode_json($value) ); },
-  encode_bool => sub { my $value = shift; return ( defined($value) ? ( $value ? 'true' : 'false' ) : $value ); },
+  as_is        => sub { my $value = shift; return ($value); },
+  encode_json  => sub { my $value = shift; return ( encode_json($value) ); },
+  encode_bool  => sub { my $value = shift; return ( defined($value) ? ( $value ? 'true' : 'false' ) : $value ); },
+  concat_comma => sub { my $value = shift; return ( join( ',', @{$value} ) ); },
 };
 
-sub _build_params( $self, $instance, $params, $type = 'url' ) {
-  my $return = {};
+sub _generate_params( $self, $instance ) {
+  my $parsed = { url => {}, body => {} };
+  my $forced = undef;
 
-  if ( exists( $params->{required} ) && exists( $params->{required}->{$type} ) ) {
+  foreach my $param ( keys( %{ $instance->meta->{attributes} } ) ) {
+    my $value = $instance->$param;
 
-    foreach my $param ( @{ $params->{required}->{$type} } ) {
-      my $value = $instance->$param;
-      my $enc   = $instance->meta->{attributes}->{$param}->{role_attribute}->{documentation}->{encode_func} // 'as_is';
+    # Skip "private" attributes starting with _
+    # TODO: This might conflice with attributes starting with _.
+    #       ie. _source, _source_includes, _source_excludes
+    #       Since these are optional we dont care about them for now.
+    next if ( $param =~ m/^_/ );
+    my $desc = $instance->meta->{attributes}->{$param}->description;
+    my $enc  = $desc->{encode_func} // 'as_is';
+    my $req  = $desc->{required};
+    my $type = $desc->{type};
+    my $fb   = $desc->{forced_body};
 
-      # I think this was nonsense and can be removed
-      my $merge = $instance->meta->{attributes}->{$param}->{role_attribute}->{documentation}->{merge_hash_instead}
-        // undef;
+    # Skipp all other body params if forced_body is already set
+    next if ( $forced && ( $type eq 'body' ) );
 
-      # Die if required param is missing
-      die( "Parameter: " . $param . " is required.\n" ) if !defined($value);
-      die( "Parameter: " . $param . " is required.\n" )
-        if ref($value) eq 'ARRAY' && !scalar( @{$value} );
-      die( "Parameter: " . $param . " is required.\n" )
-        if ref($value) eq 'HASH' && !keys( %{$value} );
+    if ($req) {
+      my $caller = ( caller(4) )[3];
 
-      my $val = $self->_generate_value( $value, $enc );
-      if ($merge) {
-        $return->{ ( keys( %{$val} ) )[0] } = $val->{ ( keys( %{$val} ) )[0] };
-      } else {
-        $return->{$param} = $val if defined($val);
-      }
-
-      $instance->{$param} = undef if $self->clear_attrs;
+      croak( "Parameter: '" . $param . "' is required for " . $caller . ":\n\n" )
+        if ( !defined($value)
+        || ( ref($value) eq 'ARRAY' && !scalar( @{$value} ) )
+        || ( ref($value) eq 'HASH'  && !keys( %{$value} ) ) );
     }
 
-  } elsif ( exists( $params->{optional} ) && exists( $params->{optional}->{$type} ) ) {
-
-    foreach my $param ( @{ $params->{optional}->{$type} } ) {
-      my $value = $instance->$param;
-      my $enc   = $instance->meta->{attributes}->{$param}->{role_attribute}->{documentation}->{encode_func} // 'as_is';
-
-      # The (i named it like this) "query" parameter might have different "top-level"
-      # Keys (i.e. query => {...} or bool => {...} etc. This way we just merge first
-      # (hope that works) key of the hashref)
-      my $merge = $instance->meta->{attributes}->{$param}->{role_attribute}->{documentation}->{merge_hash_instead}
-        // undef;
-
+    if ( $type ne 'path' ) {
       my $val = $self->_generate_value( $value, $enc );
-
-      if ($merge) {
-        $return->{ ( keys( %{$val} ) )[0] } = $val->{ ( keys( %{$val} ) )[0] };
+      if ($fb) {
+        $parsed->{$type} = $val;
       } else {
-        $return->{$param} = $val if defined($val);
+        $parsed->{$type}->{$param} = $val if defined($val);
       }
-
-      $instance->{$param} = undef if $self->clear_attrs;
     }
+
+    $instance->{$param} = undef if $self->clear_attrs;
 
   }
 
-# Clean all remaining attributes that are no direct url parameters handled above. i.e. index which is handled differently
-  if ( $self->clear_attrs ) {
-    $instance->can('index') ? $instance->{index} = undef : ();
-    $instance->can('id')    ? $instance->{id}    = undef : ();
-  }
+  #print Dumper $parsed;
 
-  return ($return);
+  return ($parsed);
 }
 
 sub _generate_value( $self, $value, $encode ) {

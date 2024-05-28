@@ -48,7 +48,7 @@ module-faker - fake up CPAN distributions with Module::Faker
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

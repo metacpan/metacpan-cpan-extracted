@@ -1,6 +1,12 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use 5.020;
+no autovivification warn => qw(fetch store exists delete);
+use if "$]" >= 5.022, experimental => 're_strict';
+no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Path::Tiny;
 use HTTP::Tiny;
 use YAML::PP;

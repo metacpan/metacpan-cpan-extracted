@@ -1,14 +1,14 @@
-use v5.38;
+use v5.28;
+use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
 
-package Archive::SCS::CityHash 0.03;
+package Archive::SCS::CityHash 1.00;
 
 use Exporter 'import';
-use String::CityHash 0.06;
+use XSLoader 0.14;
 
-die "String::CityHash 0.10 or older required" if String::CityHash->VERSION gt '0.10';
-# 0.11 includes a newer version of the hash function that produces different hashes
-
-# https://metacpan.org/release/ALEXBIO/String-CityHash-0.10
+XSLoader::load();
 
 
 BEGIN {
@@ -26,7 +26,7 @@ BEGIN {
 # Input: the original file path as a string
 # Output: the internal format
 sub cityhash64 :prototype($) ($path) {
-  String::CityHash::cityhash64_bits($path)
+  cityhash64_($path)
 }
 
 
@@ -66,3 +66,5 @@ sub cityhash64_as_int :prototype($) ($hash) {
 
 
 # The "internal format" of the hash is currently an 8-byte binary PV.
+
+1;

@@ -2,7 +2,7 @@ package Search::Fzf::AlgoCpp;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 # our %EXPORT_TAGS = ( 'all' => [qw(test)] );
 # our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
 

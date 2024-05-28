@@ -84,10 +84,6 @@ plot the clusters if there are only 2 vars in $data,
 #line 85 "Kmeans.pm"
 
 
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
@@ -129,10 +125,7 @@ sub random_cluster {
   } while (PDL::any $cluster->sumover == 0 );
   return $cluster;
 }
-#line 133 "Kmeans.pm"
-#line 134 "Kmeans.pm"
-
-
+#line 129 "Kmeans.pm"
 
 *_random_cluster = \&PDL::_random_cluster;
 
@@ -335,10 +328,7 @@ sub _d_point2line {
 
   return _d_p2l( $self->mv(0,-1)->dog, $p1->mv(0,-1)->dog, $p2->mv(0,-1)->dog );
 }
-#line 339 "Kmeans.pm"
-#line 340 "Kmeans.pm"
-
-
+#line 332 "Kmeans.pm"
 
 *_d_p2l = \&PDL::_d_p2l;
 
@@ -712,13 +702,7 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 716 "Kmeans.pm"
-#line 717 "Kmeans.pm"
-
-
-
-
-
+#line 706 "Kmeans.pm"
 
 # Exit with OK status
 

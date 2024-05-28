@@ -1,6 +1,6 @@
 use v5.20.0;
 use warnings;
-package Module::Faker::Heavy 0.026;
+package Module::Faker::Heavy 0.027;
 # ABSTRACT: where the fake sausage gets made
 
 use Carp ();
@@ -56,7 +56,7 @@ Module::Faker::Heavy - where the fake sausage gets made
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 PERL VERSION
 

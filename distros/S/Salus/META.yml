@@ -1,5 +1,5 @@
 ---
-abstract: 'The great new Salus!'
+abstract: 'checksummed csvs'
 author:
   - 'LNATION <email@lnation.org>'
 build_requires:
@@ -20,11 +20,12 @@ no_index:
     - inc
 requires:
   JSON: '0'
-  Rope: '0.34'
+  Rope: '0.40'
   Term::Size: '0.211'
   Term::Table: '0.018'
   Text::CSV_XS: '1.54'
+  Text::Diff: '1.45'
   Type::Tiny: '2.004000'
   perl: '5.006'
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

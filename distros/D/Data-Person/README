@@ -1,0 +1,124 @@
+NAME
+    Data::Person - Data object for person.
+
+SYNOPSIS
+     use Data::Person;
+
+     my $obj = Data::Person->new(%params);
+     my $email = $obj->email;
+     my $id = $obj->id;
+     my $name = $obj->name;
+     my $sex = $obj->sex;
+
+METHODS
+  "new"
+     my $obj = Data::Person->new(%params);
+
+    Constructor.
+
+    Returns instance of object.
+
+    *       "email"
+
+            Person's email for external identification. It's optional.
+            Default value is undef.
+
+    *       "id"
+
+            Id of person. It's natural number. It's optional. Default value
+            is undef.
+
+    *       "name"
+
+            Name of person. Length of name is 255. It's optional.
+
+    *       "sex"
+
+            Sex of person. Possible values are: female, male and unknown.
+            It's optional.
+
+  "email"
+     my $email = $obj->email;
+
+    Get person email.
+
+    Returns string.
+
+  "id"
+     my $id = $obj->id;
+
+    Get person id.
+
+    Returns number.
+
+  "name"
+     my $name = $obj->name;
+
+    Get person name.
+
+    Returns string.
+
+  "sex"
+     my $sex = $obj->sex;
+
+    Get person sex.
+
+    Returns string.
+
+ERRORS
+     new():
+             From Mo::utils::check_number_id():
+                     Parameter 'id' must a natural number.
+                             Value: %s
+             Parameter 'name' has length greater than '255'.
+                     Value: %s
+             Parameter 'sex' must be one of defined strings.
+                     String: %s
+                     Possible strings: %s
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::Person;
+     use DateTime;
+     use Unicode::UTF8 qw(decode_utf8 encode_utf8);
+
+     my $obj = Data::Person->new(
+             'email' => 'skim@cpan.org',
+             'id' => 1,
+             'name' => decode_utf8('Michal Josef Špaček'),
+             'sex' => 'male',
+     );
+
+     # Print out.
+     print 'Id: '.$obj->id."\n";
+     print 'Name: '.encode_utf8($obj->name)."\n";
+     print 'Email: '.$obj->email."\n";
+     print 'Sex: '.$obj->sex."\n";
+
+     # Output:
+     # Id: 1
+     # Name: Michal Josef Špaček
+     # Email: skim@cpan.org
+     # Sex: male
+
+DEPENDENCIES
+    Mo, Mo::utils, Mo::utils::Email, Readonly.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-Person>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021-2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

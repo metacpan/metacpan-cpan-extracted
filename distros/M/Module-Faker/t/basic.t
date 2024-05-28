@@ -20,7 +20,6 @@ ok(
   "we got the mostly-auto dist",
 );
 
-
 is((stat("$tmpdir/Mostly-Auto-0.01.tar.gz"))[9], 100, "got mtime set");
 
 subtest "from YAML file" => sub {
@@ -41,6 +40,16 @@ subtest "from struct, with undef version" => sub {
   is($dist->name, 'Some-Dist', "correct dist name");
   is($dist->version, undef, "correct version");
   is($dist->archive_basename, 'Some-Dist-undef', "correct basename");
+};
+
+subtest "from struct, written to a zip" => sub {
+  my $dist = Module::Faker::Dist->new({ name => 'Some-Dist', version => '1.23' });
+
+  # We're not goign to test anything yet, but just make sure that this works,
+  # in case someday Archive::Any::Create is changed in a way that breaks our
+  # hack.
+  my $filename = $dist->make_archive({ dir => $tmpdir });
+  ok(-e $filename, "we wrote the archive");
 };
 
 done_testing;

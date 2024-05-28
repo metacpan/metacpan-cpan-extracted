@@ -10,12 +10,13 @@ use ANSI::Palette qw/bold_16 reset/;
 
 prototyped (
 	info => [qw/
-		title options_title header_title header_description read_title read_desc 
-		add_title add_desc all_title all_desc get_title get_desc get_col_title 
-		get_col_desc set_title set_desc set_col_title set_col_desc delete_title 
-		delete_desc delete_col_title delete_col_desc write_title write_desc 
-		sort_title sort_desc search_title search_desc find_title find_desc
-		agg_title agg_desc exit_title exit_desc help_title help_desc
+		title options_title header_title header_description diff_title diff_desc 
+		read_title read_desc add_title add_desc all_title all_desc get_title 
+		get_desc get_col_title get_col_desc set_title set_desc set_col_title 
+		set_col_desc delete_title delete_desc delete_col_title delete_col_desc 
+		write_title write_desc sort_title sort_desc search_title search_desc 
+		find_title find_desc agg_title agg_desc exit_title exit_desc help_title 
+		help_desc
 	/],
 	title => qq|Welcome to the command line interface for Salus\n|, 
 	options_title => qq|The following are commands that can be used to manipulate a Salus CSV\n|,
@@ -23,6 +24,11 @@ prototyped (
 	header_description => [
 		qq|\tprint the headers of the csv - |,
 		qq|headers|,
+	],
+	diff_title => qq|+ Diff Files|,
+	diff_desc => [
+		qq|\tdiff two salus csv files - |,
+		qq|diff \$filepath1 \$filepath2|
 	],
 	read_title => qq|+ Read File|,
 	read_desc => [
@@ -157,6 +163,12 @@ function help => sub {
 	for (@{ $self->info }) {
 		$self->say($self->$_);
 	}
+};
+
+function diff => sub {
+	my ($self, $file1, $file2) = @_;
+	my $diff = eval { $self->salus->diff_files($file1, $file2); };
+	$self->say($@ ? $@ : $diff);
 };
 
 function read => sub {

@@ -1,3 +1,9 @@
+0.7   2024-05-25T14:38:00+02:00
+     - require Perl 5.22 or newer, since fileno on directory handles
+       is more or less essential for this module
+     - do not allow access to . in allow_perl_inc_access()
+     - skip tests that rely on external binaries if they are not available
+
 0.6   2024-05-16T23:04:17+02:00
     - deal gracefully with missing Landlock support and unknown syscall numbers
     - return the actually applied access bits instead of just 1

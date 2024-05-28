@@ -20,7 +20,7 @@ use parent  qw( Exporter );
 use feature qw( say );
 
 our @EXPORT  = qw( Trace );
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =head1 SYNOPSIS
 
@@ -90,6 +90,8 @@ Options:
                  # tie stack trace).
  STR             # Same as passing anything else.
 
+ -methods => STR   # Monitors only specific methods.
+ -methods => [STR] #
 
 =cut
 
@@ -131,7 +133,39 @@ sub _ProcessArgs {
     $args{-message} //= "HERE:";
     $args{-raw}     //= 0;
 
+    # Normalize methods and check if valid.
+    my $methods = $args{-methods} //= [];
+    if ( !ref( $methods ) ) {
+        $methods = $args{-methods} = [$methods];
+    }
+    my %valid_methods =
+      map { $_ => 1 } $class->_get_valid_methods();
+    @$methods =
+      grep { $valid_methods{$_} }
+      map { lc } @$methods;
+
     %args;
+}
+
+sub _get_valid_methods {
+    qw(
+      clear
+      delete
+      destroy
+      exists
+      extend
+      fetch
+      fetchsize
+      pop
+      push
+      shift
+      splice
+      store
+      storesize
+      unshift
+      firstkey
+      nextkey
+    );
 }
 
 sub _TieNodes {
@@ -162,7 +196,12 @@ sub _BuildWatcherMethods {
     my ( $class, %args ) = @_;
     my %watches;
 
-    for my $name ( $class->_DefineMethodNames() ) {
+    my @methods = $class->_DefineMethodNames();
+    if ( @{ $args{-methods} } ) {
+        @methods = @{ $args{-methods} };
+    }
+
+    for my $name ( @methods ) {
         my $method = ucfirst $name;
 
         $watches{"-$name"} = sub {

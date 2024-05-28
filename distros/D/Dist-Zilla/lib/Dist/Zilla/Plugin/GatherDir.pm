@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::GatherDir 6.031;
+package Dist::Zilla::Plugin::GatherDir 6.032;
 # ABSTRACT: gather all the files in a directory
 
 use Moose;
@@ -50,7 +50,9 @@ use List::Util 1.33 'all';
 #pod
 #pod This is the directory in which to look for files.  If not given, it defaults to
 #pod the dist root -- generally, the place where your F<dist.ini> or other
-#pod configuration file is located.
+#pod configuration file is located.  It may begin with C<~> (or C<~user>)
+#pod to mean your (or some other user's) home directory.  If a relative path,
+#pod it is relative to the dist root.
 #pod
 #pod =cut
 
@@ -259,7 +261,7 @@ Dist::Zilla::Plugin::GatherDir - gather all the files in a directory
 
 =head1 VERSION
 
-version 6.031
+version 6.032
 
 =head1 DESCRIPTION
 
@@ -308,7 +310,9 @@ lower the minimum required perl.
 
 This is the directory in which to look for files.  If not given, it defaults to
 the dist root -- generally, the place where your F<dist.ini> or other
-configuration file is located.
+configuration file is located.  It may begin with C<~> (or C<~user>)
+to mean your (or some other user's) home directory.  If a relative path,
+it is relative to the dist root.
 
 =head2 prefix
 
@@ -356,7 +360,7 @@ Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ricardo SIGNES.
+This software is copyright (c) 2024 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

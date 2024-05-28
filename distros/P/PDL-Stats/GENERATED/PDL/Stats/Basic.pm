@@ -57,10 +57,6 @@ or
 #line 58 "Basic.pm"
 
 
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
@@ -1214,13 +1210,7 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 1218 "Basic.pm"
-#line 1219 "Basic.pm"
-
-
-
-
-
+#line 1214 "Basic.pm"
 
 # Exit with OK status
 

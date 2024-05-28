@@ -1,3 +1,7 @@
+0.08	- 2024-05-27, H.Merijn Brand
+    * Parse META.yml and/or MYMETA.yml id other resources are missing
+    * Fix test on "=1.74" condition
+
 0.07	- 2024-04-28, H.Merijn Brand
     * Use Module::CoreList to up unspecified minimum for core modules
 

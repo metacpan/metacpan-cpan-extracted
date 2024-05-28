@@ -11,7 +11,7 @@ use Class::XSAccessor getters => {
     get_sig_raw  => 'sig_raw',
 };
 
-our $VERSION = '2.12'; # VERSION
+our $VERSION = '2.13'; # VERSION
 
 # ABSTRACT: a subclass of Linux::Info::KernelRelease specific to parse Ubuntu kernel information
 
@@ -65,7 +65,7 @@ Linux::Info::KernelRelease::Ubuntu - a subclass of Linux::Info::KernelRelease sp
 
 =head1 VERSION
 
-version 2.12
+version 2.13
 
 =head1 METHODS
 

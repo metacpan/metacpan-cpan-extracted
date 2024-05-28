@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,18 +26,23 @@ no_index:
 provides:
   Business::Tax::Withholding::JP:
     file: lib/Business/Tax/Withholding/JP.pm
-    version: '0.08'
+    version: '0.93'
 requires:
-  Moose: '0'
-  Time::Piece: '0'
+  Moo: '2.005005'
+  Time::Piece: '1.3401'
+  Time::Seconds: '1.3401'
+  Type::Params: '2.004000'
+  Types::Standard: '2.004000'
+  namespace::clean: '0.27'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/worthmine/Business-Tax-Withholding-JP/issues
   homepage: https://github.com/worthmine/Business-Tax-Withholding-JP
-  repository: git://github.com/worthmine/Business-Tax-Withholding-JP.git
-version: '0.08'
+  repository: https://github.com/worthmine/Business-Tax-Withholding-JP.git
+version: '0.93'
 x_authority: cpan:WORTHMINE
 x_contributors:
+  - 'Yuki Yoshida(worthmine) <2944869+worthmine@users.noreply.github.com>'
   - 'worthmine <worthmine@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

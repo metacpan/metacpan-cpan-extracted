@@ -199,17 +199,6 @@ share {
       plugin 'Cleanse::BuildDir';
     }
     
-    my %runtime_props;
-    foreach my $alien (@alien_deps) {
-      my $libname = $alien;
-      $libname =~ s/^Alien:://;
-      $libname =~ s/::af$//;
-      my $key = "built_with_$libname";
-      $runtime_props{$key}
-        = sprintf "%s %s", $alien->version, $alien->install_type;
-      #Alien::Build->runtime_prop->{$key} = $runtime_props{$key};
-    };
-    
     my @with_args = (
       #https://gdal.org/build_hints.html#cmdoption-arg-GDAL_USE_-Packagename_in_upper_case-BOOL
       @automated_rig_config_args,
@@ -281,7 +270,7 @@ share {
       my $exe_extension = ($on_windows ? '.exe' : '');
       my $sqlite_exe = path ('Alien::sqlite'->dist_dir . "/bin/sqlite3$exe_extension");
       push @with_args, (
-        "-DEXE_SQLITE3=$sqlite_exe",  #  might not be needed now
+        "-DEXE_SQLITE3=$sqlite_exe",
         "-DSQLITE3_LIBRARY=$libfile",
         "-DSQLITE3_INCLUDE_DIR=$sqlite_include",
       );
@@ -365,18 +354,6 @@ share {
       $make_inst_cmd,
       \&patch_rpaths,
     ];
-
-    meta->after_hook( gather_share => sub {
-      my ($build) = @_;
-      $build->log ('+++++++ Setting props ++++++');
-      foreach my $alien_dep (sort keys %runtime_props) {
-        my $prop_name =  sprintf '%%{.runtime.%s}', $alien_dep;
-        #push @props, [$runtime_props{$alien_dep}, \$prop_name];
-        $build->log("Setting runtime prop $prop_name to $runtime_props{$alien_dep}");
-        $build->runtime_prop->{$alien_dep} = $runtime_props{$alien_dep};
-      }
-    });
-
   }
 };
 

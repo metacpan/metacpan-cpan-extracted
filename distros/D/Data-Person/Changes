@@ -1,0 +1,10 @@
+0.03 2024-05-27T10:45:18+02:00
+ - Fix DEPENDENCIES section in doc.
+ - Fix github repository.
+ - Improve doc for email.
+
+0.02 2024-05-25T12:02:26+02:00
+ - Rewrite check for id to Mo::utils::check_number_id().
+
+0.01 2024-04-24T15:45:49+02:00
+ - First version.

@@ -115,6 +115,7 @@ Possible operations are:
 
 A convenience method that adds rules to allow reading files and directories in
 all directories in C<@INC>.
+This will not allow access to ".", even if it is in C<@INC>.
 
 =back
 
@@ -160,7 +161,7 @@ use Linux::Landlock::Direct qw(
   ll_create_net_ruleset
   set_no_new_privs
 );
-our $VERSION = '0.6';
+our $VERSION = '0.7';
 
 sub new {
     my ($class, %args) = @_;
@@ -233,6 +234,7 @@ sub allow_perl_inc_access {
 
     for (@INC) {
         next unless -d $_;
+        next if $_ eq '.';
         $self->add_path_beneath_rule($_, qw(read_file read_dir));
     }
     return 1;

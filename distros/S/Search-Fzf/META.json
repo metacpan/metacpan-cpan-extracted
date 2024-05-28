@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Curses" : "1.38",
+            "ExtUtils::XSpp::Cmd" : "0",
             "List::MoreUtils" : "0.43",
             "List::Util" : "1.60",
             "Term::ANSIColor" : "5.01",
@@ -50,6 +51,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

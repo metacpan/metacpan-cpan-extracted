@@ -75,10 +75,6 @@ Or, play with different distributions with B<plot_distr> :)
 #line 76 "Distr.pm"
 
 
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
@@ -823,9 +819,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1138 "distr.pd"
-
 #line 1139 "distr.pd"
+
+#line 1140 "distr.pd"
 
 =head2 pmf_poisson_factorial
 
@@ -850,10 +846,7 @@ sub PDL::pmf_poisson_factorial {
 		return _pmf_poisson_factorial(@_);
 	}
 }
-#line 854 "Distr.pm"
-#line 855 "Distr.pm"
-
-
+#line 850 "Distr.pm"
 
 *_pmf_poisson_factorial = \&PDL::_pmf_poisson_factorial;
 
@@ -863,9 +856,9 @@ sub PDL::pmf_poisson_factorial {
 
 
 
-#line 1200 "distr.pd"
-
 #line 1201 "distr.pd"
+
+#line 1202 "distr.pd"
 
 =head2 plot_distr
 
@@ -1009,11 +1002,7 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>, David Mert
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 1013 "Distr.pm"
-#line 1014 "Distr.pm"
-
-
-
+#line 1006 "Distr.pm"
 
 # Exit with OK status
 

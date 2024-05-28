@@ -1,0 +1,72 @@
+{
+   "abstract" : "Ruby on Rails flash for Amon2",
+   "author" : [
+      "Yoshimasa Ueno"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Amon2-Plugin-Web-Flash",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.22",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Amon2" : "0",
+            "Amon2::Plugin::Web::HTTPSession" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Amon2::Lite" : "0",
+            "HTML::StickyQuery" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/saltyduck/Amon2-Plugin-Web-Flash/issues"
+      },
+      "homepage" : "https://github.com/saltyduck/Amon2-Plugin-Web-Flash",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/saltyduck/Amon2-Plugin-Web-Flash.git",
+         "web" : "https://github.com/saltyduck/Amon2-Plugin-Web-Flash"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "saltyduck <saltyduck@gmail.com>"
+   ],
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_static_install" : 1
+}
+

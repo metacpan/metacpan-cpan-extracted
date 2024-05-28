@@ -11,6 +11,8 @@ sub hook {
     return { target => 'http://foo' };
   } elsif ($ref eq 'bar') {
     return { target => 'http://bar', title => 'BAR' };
+  } elsif ($ref eq 'baz') {
+    return { target => 'http://baz', content => '<em>baz</em>' };
   }
   return;
 }
@@ -21,6 +23,7 @@ is(convert("[foo][]"), "<p><a href=\"http://foo\">foo</a></p>\n", 'resolved in c
 is(convert("[foo]"), "<p><a href=\"http://foo\">foo</a></p>\n", 'resolved in shortcut link reference');
 
 is(convert("[bar]"), "<p><a href=\"http://bar\" title=\"BAR\">bar</a></p>\n", 'resolved with title');
+is(convert("[text][baz]"), "<p><a href=\"http://baz\"><em>baz</em></a></p>\n", 'resolved with content');
 is(convert("[none]"), "<p>[none]</p>\n", 'not resolved');
 
 is(convert("[foo]\n\n[foo]: http://other"), "<p><a href=\"http://other\">foo</a></p>\n", 'source has precedence');

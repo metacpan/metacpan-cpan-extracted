@@ -3,14 +3,9 @@ use strict;
 use warnings;
 use Want;
 my (%PRO);
-
+use Rope::Pro;
 BEGIN {
-	%PRO = (
-		keyword => sub {
-			my ($caller, $method, $cb) = @_;
-			no strict 'refs';
-			*{"${caller}::${method}"} = $cb;
-		},
+	%PRO = Rope::Pro->new(
 		monkey_patch => sub {
 			my ($caller, $meta, $build) = @_;
 			for my $key (keys %{$meta}) {
@@ -76,7 +71,7 @@ Rope::Monkey - Rope Monkey Patching
 
 =head1 VERSION
 
-Version 0.38
+Version 0.40
 
 =cut
 

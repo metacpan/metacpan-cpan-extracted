@@ -113,21 +113,26 @@ METHODS
 ERRORS
      new():
              From Mo::utils:
-                     Parameter 'class' has bad CSS class name.
-                             Value: %s
-                     Parameter 'class' has bad CSS class name (number on begin).
-                             Value: %s
-                     Parameter 'desc' has length greater than '1000'.
-                             Value: %s
-                     Parameter 'id' must be a number.
-                             Value: %s
-                     Parameter 'image' doesn't contain valid location.
-                             Value: %s
-                     Parameter 'location' doesn't contain valid location.
-                             Value: %s
-                     Parameter 'title' has length greater than '100'.
-                             Value: %s
-                     Parameter 'title' is required.
+                     From Mo::utils::check_number_id():
+                             Parameter 'id' must be a number.
+                                     Value: %s
+                     From Mo::utils::check_length():
+                             Parameter 'desc' has length greater than '1000'.
+                                     Value: %s
+                             Parameter 'title' has length greater than '100'.
+                                     Value: %s
+                     From Mo::utils::check_required():
+                             Parameter 'title' is required.
+                     From Mo::utils::CSS::check_css_class():
+                             Parameter 'class' has bad CSS class name.
+                                     Value: %s
+                             Parameter 'class' has bad CSS class name (number on begin).
+                                     Value: %s
+                     From Mo::utils::URI::check_location():
+                             Parameter 'image' doesn't contain valid location.
+                                     Value: %s
+                             Parameter 'location' doesn't contain valid location.
+                                     Value: %s
 
 EXAMPLE
      use strict;
@@ -177,5 +182,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

@@ -25,7 +25,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.886';
+our $VERSION = '1.887';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -810,7 +810,7 @@ MCE::Shared::Ordhash - An ordered hash class featuring tombstone deletion
 
 =head1 VERSION
 
-This document describes MCE::Shared::Ordhash version 1.886
+This document describes MCE::Shared::Ordhash version 1.887
 
 =head1 DESCRIPTION
 

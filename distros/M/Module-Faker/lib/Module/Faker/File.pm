@@ -1,4 +1,4 @@
-package Module::Faker::File 0.026;
+package Module::Faker::File 0.027;
 # ABSTRACT: a fake file in a fake dist
 
 use v5.20.0;
@@ -25,7 +25,7 @@ Module::Faker::File - a fake file in a fake dist
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 PERL VERSION
 

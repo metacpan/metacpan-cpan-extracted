@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Time::Seconds;
 
-our $VERSION = "0.08";
+our $VERSION = "0.93";
 
 use constant { border => 1000000 };
 
@@ -39,17 +39,19 @@ my %special = (
     until => '2037-12-31',
 );
 
-use Moose;
 use Time::Piece;
 my $t = localtime();
 
-has price => ( is => 'rw', isa => 'Int', default => 0 );
-has amount => ( is => 'rw', isa => 'Int', default => 1 );
-has date => ( is => 'rw', isa => 'Str', default => $t->ymd() );
-has no_wh => ( is => 'ro', isa => 'Bool', default => 0 );
+# rewrite with Type::Tiny
+use Moo;
+use Types::Standard qw( Int Str Bool );
+use Type::Params qw( signature );
+use namespace::clean;
 
-__PACKAGE__->meta->make_immutable;
-no Moose;
+has 'price' => ( is => 'rw', isa => Int, default => 0 );
+has 'amount' => ( is => 'rw', isa => Int, default => 1 );
+has 'date' => ( is => 'rw', isa => Str, default => sub { $t->ymd() } );
+has 'no_wh' => ( is => 'ro', isa => Bool, default => 0 );
 
 sub net {
     my $self = shift;

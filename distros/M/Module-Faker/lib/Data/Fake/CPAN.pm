@@ -1,6 +1,8 @@
-package Data::Fake::CPAN 0.026;
+package Data::Fake::CPAN 0.027;
 use v5.20.0;
 use warnings;
+
+# ABSTRACT: a Data::Fake plugin for CPAN data and distributions
 
 # Back off, man, I'm a scientist.
 use experimental qw(lexical_subs postderef signatures);
@@ -201,7 +203,7 @@ sub fake_prereqs {
   }
 }
 
-package Module::Faker::Blaster::Author 0.026 {
+package Module::Faker::Blaster::Author 0.027 {
   use Moose;
 
   use Data::Fake::Names ();
@@ -487,11 +489,11 @@ __END__
 
 =head1 NAME
 
-Data::Fake::CPAN
+Data::Fake::CPAN - a Data::Fake plugin for CPAN data and distributions
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

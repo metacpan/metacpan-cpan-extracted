@@ -76,6 +76,7 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Path::Tiny' => '0',
+                                   'Redis' => '0',
                                    'RedisDB' => '2.57',
                                    'Test::CheckDeps' => '0.010',
                                    'Test::Deep' => '0',

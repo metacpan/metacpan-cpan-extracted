@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::AutoVersion 6.031;
+package Dist::Zilla::Plugin::AutoVersion 6.032;
 # ABSTRACT: take care of numbering versions so you don't have to
 
 use Moose;
@@ -129,7 +129,7 @@ Dist::Zilla::Plugin::AutoVersion - take care of numbering versions so you don't 
 
 =head1 VERSION
 
-version 6.031
+version 6.032
 
 =head1 DESCRIPTION
 
@@ -189,7 +189,7 @@ Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ricardo SIGNES.
+This software is copyright (c) 2024 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

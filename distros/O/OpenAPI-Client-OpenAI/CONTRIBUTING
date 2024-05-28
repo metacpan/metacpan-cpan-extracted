@@ -1,0 +1,18 @@
+# Contributing Guidelines
+
+Pull requests, bug reports, and all other forms of contribution are welcomed and highly encouraged!
+
+# Development
+
+The latest openapi spec can be found at https://github.com/openai/openai-openapi
+
+# Documentation
+
+When updating the openapi spec in the `share` directory, be sure to run
+`devel/build_docs.pl` to update the documentation.
+
+# Examples
+
+Please continue to add examples to the `examples/` directory. After running
+`devel/build_docs.pl`, any example added there will automatically be linked in
+the documentation at `lib/OpenAPI/Client/OpenAI/Methods.pod`.

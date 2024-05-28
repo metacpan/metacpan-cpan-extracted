@@ -21,7 +21,7 @@ recursive_author_tests('xt');
 requires 'DateTime' => 0;
 requires 'Error::Pure' => 0;
 requires 'Mo' => 0;
-requires 'Mo::utils' => 0.09;
+requires 'Mo::utils' => 0.28;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Data-HashType/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Data-HashType';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Data-HashType';
@@ -32,7 +32,7 @@ test_requires 'File::Object' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.05';
+version '0.06';
 
 # Run.
 WriteAll();

@@ -1,8 +1,10 @@
-use v5.38;
-use feature 'class';
-no warnings 'experimental::class';
+use v5.28;
+use warnings;
+use Object::Pad 0.73;
 
-class Archive::SCS::Mountable 0.03;
+class Archive::SCS::Mountable 1.00;
+
+1;
 
 
 =head1 NAME

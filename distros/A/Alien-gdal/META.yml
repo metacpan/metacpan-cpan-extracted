@@ -13,7 +13,6 @@ build_requires:
   Alien::libtiff: '0'
   Alien::patch: '0'
   Alien::proj: '1.24'
-  Alien::spatialite: '0'
   Alien::sqlite: '1.02'
   Archive::Tar: '0'
   Env::ShellWords: '0.01'
@@ -25,6 +24,7 @@ build_requires:
   IO::Zlib: '0'
   List::Util: '0'
   Mojo::DOM58: '1.00'
+  Mozilla::CA: '0'
   Net::SSLeay: '1.49'
   PkgConfig: '0.19026'
   Sort::Versions: '0'
@@ -53,7 +53,7 @@ configure_requires:
   Sort::Versions: '0'
   parent: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -71,9 +71,9 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-gdal/issues/
   repository: https://github.com/shawnlaffan/perl-alien-gdal
-version: '1.36'
+version: '1.37'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 2.48'
+  generated_by: 'Alien::Build::MM version 2.80'
   requires:
     share:
       Alien::MSYS: '0'
@@ -81,7 +81,6 @@ x_alienfile:
       Alien::geos::af: '0'
       Alien::libtiff: '0'
       Alien::proj: '0'
-      Alien::spatialite: '0'
       Alien::sqlite: '0'
       Archive::Tar: '0'
       Env::ShellWords: '0.01'
@@ -89,6 +88,7 @@ x_alienfile:
       IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
       Mojo::DOM58: '1.00'
+      Mozilla::CA: '0'
       Net::SSLeay: '1.49'
       Sort::Versions: '0'
       URI: '0'

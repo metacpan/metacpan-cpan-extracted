@@ -92,8 +92,15 @@ subtest "Basic Functionality Test" => sub {
             my $msg = parse_syslog_line($test->{string});
             my %expected = %{ $test->{expected} };
             delete $msg->{$_} for @_delete;
-            $expected{content} = $expected{program_raw} . ': ' . $expected{content};
-            $expected{$_} = undef for qw(program_raw program_name program_sub program_pid);
+            $expected{$_} = undef for qw(program_name program_sub program_pid);
+
+            if( $msg->{content} && $expected{program_raw} ) {
+                my $expected_program = $expected{program_raw};
+                my $content = delete $msg->{content};
+                my $expected_content = delete $expected{content};
+                like( $content, qr/\Q$expected_program\E(\s-|:)\s\Q$expected_content\E/, "Content correct" );
+            }
+            undef($expected{program_raw});
 
             is_deeply( $msg, \%expected, "$test->{name} (no extract program)" ) || diag(Dumper $msg);
         }

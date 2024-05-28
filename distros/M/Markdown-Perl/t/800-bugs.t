@@ -14,6 +14,9 @@ todo 'New lines are forbidden in link dest' => sub {
   # not check for new-line inside non-text nodes, inside the span delimited by
   # the outer brackets (like it does if the link destination is not in
   # brackets).
+  # Maybe it’s not a bug, because the CommonMark implementation itself considers
+  # that <foo bar> is an HTML tag (which is probably not the correct way to
+  # parse it, but the spec is unclear).
   is(run("[link](<dest <foo\nbar>>)"), "<p>[link](&lt;dest <foo\nbar>&gt;)</p>\n", 'newline in bracket in bracket in link');
 };
 

@@ -9,7 +9,8 @@ do { my $x = {
                                       'Encode' => '0',
                                       'Test::More' => '0',
                                       'Test::Pod' => '1.41',
-                                      'strict' => '0'
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'runtime' => {
@@ -49,10 +50,8 @@ do { my $x = {
                                       'Pod::Weaver::Section::Contributors' => '0.008',
                                       'Pod::Weaver::Section::GenerateSection' => '0.000',
                                       'Sub::Exporter::ForMethods' => '0',
-                                      'experimental' => '0',
-                                      'perl' => 'v5.26.0',
-                                      'utf8' => '0',
-                                      'warnings' => '0'
+                                      'perl' => 'v5.34.0',
+                                      'utf8' => '0'
                                     }
                     },
        'test' => {
@@ -63,7 +62,8 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'Test::More' => '0.96',
-                                   'strict' => '0'
+                                   'strict' => '0',
+                                   'warnings' => '0'
                                  }
                  }
      };

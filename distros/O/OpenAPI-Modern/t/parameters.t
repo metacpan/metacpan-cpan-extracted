@@ -2,6 +2,7 @@
 use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -246,13 +247,13 @@ subtest 'path parameters' => sub {
       [ map $_->TO_JSON, $state->{errors}->@* ],
       $test->{errors}//[],
       'path '.$name.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
-    ) or note 'got: ', explain([ map $_->TO_JSON, $state->{errors}->@* ]);
+    );
 
     is_equal(
       $parameter_content,
       $test->{content},
       'path '.$name.': '.(defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted'),
-    ) or note 'got: ', explain($parameter_content);
+    );
   }
 };
 
@@ -264,31 +265,16 @@ subtest 'query parameters' => sub {
     # errors => collected from state (expected), defaults to []
     # todo
     {
-      param_obj => { name => 'missing', in => 'query', required => true, schema => false },
-      queries => 'foo=bar',
-      content => undef,
-      errors => [
-        {
-          instanceLocation => '/request/query/missing',
-          keywordLocation => $schema_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/required',
-          error => 'missing query parameter: missing',
-        },
-      ],
+      param_obj => { name => 'reserved', in => 'query', allowEmptyValue => true, schema => false },
+      queries => 'reserved=bloop',
+      content => 'bloop', # parameter is validated as normal
+      errors => [],
     },
     {
       param_obj => { name => 'reserved', in => 'query', allowEmptyValue => true, schema => false },
-      queries => 'empty',
-      content => undef,
-      errors => [
-        {
-          instanceLocation => '/request/query/reserved',
-          keywordLocation => $schema_path.'/allowEmptyValue',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/allowEmptyValue',
-          error => 'allowEmptyValue: true is not yet supported',
-        },
-      ],
-      todo => 'allowEmptyValue not yet supported',
+      queries => 'reserved=',
+      content => undef, # empty parameter is not validated
+      errors => [],
     },
     {
       param_obj => { name => 'missing_encoded_not_required', in => 'query', content => { 'application/json' => { schema => { type => 'object' } } } },
@@ -408,13 +394,13 @@ subtest 'query parameters' => sub {
       [ map $_->TO_JSON, $state->{errors}->@* ],
       $test->{errors}//[],
       'query '.$name.' from '.$test->{queries}.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
-    ) or note 'got: ', explain([ map $_->TO_JSON, $state->{errors}->@* ]);
+    );
 
     is_equal(
       $parameter_content,
       $test->{content},
       'query '.$name.' from '.$test->{queries}.': '.(defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted'),
-    ) or note 'got: ', explain($parameter_content);
+    );
   }
 };
 
@@ -588,13 +574,13 @@ subtest 'header parameters' => sub {
       [ map $_->TO_JSON, $state->{errors}->@* ],
       $test->{errors}//[],
       'header '.$name.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
-    ) or note 'got: ', explain([ map $_->TO_JSON, $state->{errors}->@* ]);
+    );
 
     is_equal(
       $parameter_content,
       $test->{content},
       'header '.$name.': '.(defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted'),
-    ) or note 'got: ', explain($parameter_content);
+    );
   }
 };
 

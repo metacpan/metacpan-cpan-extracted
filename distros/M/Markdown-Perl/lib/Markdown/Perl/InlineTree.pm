@@ -93,6 +93,7 @@ package Markdown::Perl::InlineNode {  ## no critic (ProhibitMultiplePackages)
           unless exists $options{target};
       hashpush %{$this}, target => delete $options{target};
       hashpush %{$this}, title => delete $options{title} if exists $options{title};
+      hashpush %{$this}, content => delete $options{content} if exists $options{content};
       confess 'Unexpected parameters for inline link node: '.join(', ', %options) if keys %options;
     } elsif ($type eq 'style') {
       confess 'Unexpected parameters for inline style node: '.join(', ', %options)
@@ -175,7 +176,7 @@ package Markdown::Perl::InlineNode {  ## no critic (ProhibitMultiplePackages)
   my $text_node = new_text('text content');
   my $code_node = new_code('code content');
   my $link_node = new_link('text content', type=> 'type', target => 'the target'[, title => 'the title']);
-  my $link_node = new_link($subtree_content, type=> 'type', target => 'the target'[, title => 'the title']);
+  my $link_node = new_link($subtree_content, type=> 'type', target => 'the target'[, title => 'the title'][, content => 'override content']);
   my $html_node = new_html('<raw html content>');
   my $style_node = new_literal($subtree_content, 'html_tag');
   my $literal_node = new_literal('literal content');
@@ -663,22 +664,21 @@ sub render_node_html {
   } elsif ($n->{type} eq 'code') {
     return $acc.'<code>'.$n->{content}.'</code>';
   } elsif ($n->{type} eq 'link') {
-    if ($n->{linktype} eq 'autolink') {
-      return $acc.'<a href="'.($n->{target}).'">'.($n->{content}).'</a>';
+    my $title = '';
+    if (exists $n->{title}) {
+      $title = " title=\"$n->{title}\"";
+    }
+    if ($n->{linktype} eq 'link' || $n->{linktype} eq 'autolink') {
+      # $n->{content} can only be set in the case of autolink or through the
+      # resolve_link_ref hook (in which case it takes precedence over whatever
+      # was in the link definition).
+      my $content = exists $n->{content} ? $n->{content} : $n->{subtree}->render_html();
+      return $acc."<a href=\"$n->{target}\"${title}>${content}</a>";
+    } elsif ($n->{linktype} eq 'img') {
+      my $content = $n->{subtree}->to_text();
+      return $acc."<img src=\"$n->{target}\" alt=\"${content}\"${title} />";
     } else {
-      my $title = '';
-      if (exists $n->{title}) {
-        $title = " title=\"$n->{title}\"";
-      }
-      if ($n->{linktype} eq 'link') {
-        my $content = $n->{subtree}->render_html();
-        return $acc."<a href=\"$n->{target}\"${title}>${content}</a>";
-      } elsif ($n->{linktype} eq 'img') {
-        my $content = $n->{subtree}->to_text();
-        return $acc."<img src=\"$n->{target}\" alt=\"${content}\"${title} />";
-      } else {
-        confess 'Unexpected link type in render_node_html: '.$n->{linktype};
-      }
+      confess 'Unexpected link type in render_node_html: '.$n->{linktype};
     }
   } elsif ($n->{type} eq 'style') {
     my $content = $n->{subtree}->render_html();

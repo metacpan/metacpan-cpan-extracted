@@ -1,8 +1,10 @@
-use v5.38;
-use feature 'class';
-no warnings 'experimental::class';
+use v5.32;
+use warnings;
+use Object::Pad 0.73;
 
-class Archive::SCS 0.03;
+class Archive::SCS 1.00;
+
+use stable 0.031 'isa';
 
 use Archive::SCS::CityHash qw(cityhash64 cityhash64_hex cityhash64_as_hex);
 use Carp 'croak';
@@ -142,6 +144,8 @@ method list_orphans () {
   return map { cityhash64_as_hex $_ } uniqstr sort @orphans;
 }
 
+1;
+
 
 =head1 NAME
 
@@ -155,7 +159,7 @@ Archive::SCS - SCS archive controller
 
   my @contents = sort $scs->list_dirs, $scs->list_files;
 
-  say $scs->read_entry('version.txt');
+  say $scs->read_entry('def/env_data.sii');
 
 =head1 DESCRIPTION
 
@@ -163,9 +167,8 @@ Handles the union file system used by SCS archive files.
 Allows mounting of multiple files and
 performs lookups in all of them using the SCS hash algorithm.
 
-Note that this software currently requires L<String::CityHash
-B<version 0.10>|https://metacpan.org/release/ALEXBIO/String-CityHash-0.10/view/lib/String/CityHash.pm>,
-which is only available on BackPAN.
+These modules exist primarily to support the F<scs_archive>
+command-line tool included in this distribution.
 
 =head1 METHODS
 
@@ -198,7 +201,7 @@ archives.
 
 Paths are returned without a leading C</> because that's the
 way they are stored internally. This is subject to change,
-but the output of C<list_dirs()> will always be good to use
+but the output of C<list_files()> will always be good to use
 as path for C<read_entry()>.
 
 =head2 list_orphans
@@ -236,13 +239,27 @@ path is given as argument, the object will be created by
 attempting to load the given archive with the currently active
 formats. See C<set_formats()>.
 
+=head2 new
+
+  $scs = Archive::SCS->new;
+
+Creates a new L<Archive::SCS> object.
+
 =head2 read_entry
 
   $data = $scs->read_entry($pathname);
   $data = $scs->read_entry($hash);
 
+Returns the contents of the given entry. Directories will be
+returned as L<Archive::SCS::DirIndex> objects and S<HashFS v2>
+texture objects as L<Archive::SCS::TObj>.
+
 The argument may be the pathname within the archive or its hash
 value, hex-encoded in network byte order as a 16-byte scalar PV.
+Paths are expected without a leading C</> because that's the
+way they are stored internally. This is subject to change,
+but the output of C<list_files()> will always be good to use
+as path for C<read_entry()>.
 
 =head2 set_formats
 
@@ -287,3 +304,6 @@ This software is copyright (c) 2024 by nautofon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+Includes L<CityHash|https://github.com/google/cityhash> 1.0.3,
+Copyright (c) 2011 Google, Inc. (MIT license)

@@ -2,10 +2,11 @@ package Test2::Tools::HTTP::Apps;
 
 use strict;
 use warnings;
+use 5.014;
 use URI;
 
 # ABSTRACT: App container class for Test2::Tools::HTTP
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 
 {
@@ -103,7 +104,7 @@ Test2::Tools::HTTP::Apps - App container class for Test2::Tools::HTTP
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 

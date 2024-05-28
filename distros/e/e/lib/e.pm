@@ -23,7 +23,7 @@ package e;
     / / / / __ \/ / _ \/ __ `/ ___/ __ \/ _ \/ __  /
    / /_/ / / / / /  __/ /_/ (__  ) / / /  __/ /_/ /
    \__,_/_/ /_/_/\___/\__,_/____/_/ /_/\___/\__,_/
-  
+
 =head1 NAME
 
 e - beastmode unleashed
@@ -34,7 +34,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 =head1 SYNOPSIS
 
@@ -133,21 +133,37 @@ Enable to analyze code in the process.
 
 Show a stack trace.
 
- trace( $depth=1 )
+    trace( $depth=1 )
 
 =head2 watch
 
 Watch a reference for changes.
 
- watch( $ref, $depth=3 )
+    watch( $ref, OPTIONS )
+
+OPTIONS:
+
+    -clone => 0,               # Will not watch cloned objects.
+
+    -methods => "fetch",       # Monitor just this method.
+    -methods => [ "fetch" ],   # Same.
+
+    -levels  => NUM,           # How many scope levels to show.
+    NUM,                       # Same.
+
+    -raw => 1,                 # Include internal calls.
+    -NUM,                      # Same.
+
+    -message => STR,           # Message to display.
+    STR,                       # Same.
 
 =head2 prof
 
 Profile the code from this point on.
 
- my $obj = prof;
- ...
- # $obj goes out of scope and builds results.
+    my $obj = prof;
+    ...
+    # $obj goes out of scope and builds results.
 
 =head2 j
 

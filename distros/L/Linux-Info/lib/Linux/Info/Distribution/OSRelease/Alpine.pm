@@ -6,9 +6,16 @@ use parent 'Linux::Info::Distribution::OSRelease';
 use Hash::Util qw(lock_hash unlock_hash);
 use Class::XSAccessor getters => { get_bug_report_url => 'bug_report_url' };
 
-our $VERSION = '2.12'; # VERSION
+our $VERSION = '2.13'; # VERSION
 # ABSTRACT: a subclass of Linux::Info::Distribution::OSRelease
 
+
+sub _handle_missing {
+    my ( $class, $info_ref ) = @_;
+
+    # WORKAROUND: Alpine doesn't provide that
+    $info_ref->{version} = undef unless ( exists $info_ref->{version} );
+}
 
 sub new {
     my ( $class, $file_path ) = @_;
@@ -35,7 +42,7 @@ Linux::Info::Distribution::OSRelease::Alpine - a subclass of Linux::Info::Distri
 
 =head1 VERSION
 
-version 2.12
+version 2.13
 
 =head1 DESCRIPTION
 

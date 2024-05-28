@@ -5,6 +5,8 @@ META.yml
 Makefile.PL
 README
 dist.ini
+fakenum.pl
 lib/Math/Grid/Coordinates.pm
 t/00-load.t
 t/01-basic.t
+t/02-buildargs.t

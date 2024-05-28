@@ -6,9 +6,9 @@ use warnings;
 use DateTime;
 use Error::Pure qw(err);
 use Mo qw(build is);
-use Mo::utils 0.09 qw(check_isa check_length check_number check_required);
+use Mo::utils 0.28 qw(check_isa check_length check_number_id check_required);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 has id => (
 	is => 'ro',
@@ -30,7 +30,7 @@ sub BUILD {
 	my $self = shift;
 
 	# Check id.
-	check_number($self, 'id');
+	check_number_id($self, 'id');
 
 	# Check hash name.
 	check_required($self, 'name');
@@ -161,7 +161,7 @@ Returns L<DateTime> object or undef.
 
  new():
          From Mo::utils:
-                 Parameter 'id' must be a number.
+                 Parameter 'id' must be a natural number.
                          Value: %s
                  Parameter 'name' has length greater than '50'.
                          Value: %s
@@ -232,6 +232,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

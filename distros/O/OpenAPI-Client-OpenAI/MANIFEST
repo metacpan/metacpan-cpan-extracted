@@ -1,6 +1,13 @@
 Changes
-ignore.txt
+CONTRIBUTING
+devel/build_docs.pl
+examples/chat.pl
+examples/data/englishminstershereford_1_grierson_64kb.mp3
+examples/data/speech.mp3
+examples/transcribe-audio.pl
 lib/OpenAPI/Client/OpenAI.pm
+lib/OpenAPI/Client/OpenAI/Methods.pod
+lib/OpenAPI/Client/OpenAI/Schema.pod
 Makefile.PL
 MANIFEST			This list of files
 README.md
@@ -12,6 +19,7 @@ t/create_edit.t
 t/create_embedding.t
 t/create_image.t
 t/create_moderation.t
+t/list_assistants.t
 t/list_files.t
 t/list_models.t
 t/manifest.t

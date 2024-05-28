@@ -40,12 +40,14 @@ if ($abi_version < 0) {
     $! = 0;
     ok(eval { require Data::Dumper; }, "require Data::Dumper");
 
-    if ($abi_version >= 4) {
+    SKIP: {
+        skip "no network support", if $abi_version < 4;
         ok(defined IO::Socket::INET->new(LocalPort  => 33333, Proto => 'tcp',), "socket created");
         ok(!defined IO::Socket::INET->new(LocalPort => 33334, Proto => 'tcp',), "socket not created: $!");
     }
     for (@INC) {
         next unless -d $_;
+        next if $_ eq '.';
         ok(IO::Dir->new($_), "opendir $_");
     }
     for (qw(/ /var)) {
@@ -54,8 +56,12 @@ if ($abi_version < 0) {
     }
     ok(defined IO::File->new("$base/a", 'r'), "readable: $base/a");
     ok(defined IO::File->new("$base/b", 'r'), "readable: $base/b");
-    is(system("/usr/bin/cat $base/a"),             0, "cat $base/a is allowed...");
-    is(system("/usr/bin/cat $base/a > /dev/null"), 0, "... as is writing to /dev/null");
+    # may not exist in some environments
+    SKIP: {
+        skip "no /usr/bin/cat", unless -x '/usr/bin/cat';
+        is(system("/usr/bin/cat $base/a"), 0, "cat $base/a is allowed...");
+        is(system("/usr/bin/cat $base/a > /dev/null"), 0, "... as is writing to /dev/null");
+    }
 
     my $ruleset2 = Linux::Landlock->new();
     ok($ruleset2->allow_perl_inc_access(), "allow_perl_inc_access");
@@ -66,16 +72,17 @@ if ($abi_version < 0) {
     );
     ok($ruleset2->apply(), "apply ruleset");
     ok(-r "$base/b",       "technically readable: $base/b");
-    # this test would fail if . was added to @INC
-    if (!grep { $_ eq '.' } @INC) {
-        $! = 0;
-        ok(!defined IO::File->new("$base/b", 'r'), "no longer readable: $base/b");
-        ok($!{EACCES},                             "correct error: $!");
-    }
+    $! = 0;
+    ok(!defined IO::File->new("$base/b", 'r'), "no longer readable: $base/b");
+    ok($!{EACCES},                             "correct error: $!");
     ok(defined IO::File->new("$base/a", 'r'), "still readable: $base/a...");
-    is(system("/usr/bin/cat $base/a"), -1, "...but no permission to run cat");
+    SKIP: {
+        skip "no /usr/bin/cat", unless -x '/usr/bin/cat';
+        is(system("/usr/bin/cat $base/a"), -1, "...but no permission to run cat");
+    }
     for (@INC) {
         next unless -d $_;
+        next if $_ eq '.';
         ok(IO::Dir->new($_), "opendir $_");
     }
     my $ruleset_strict = Linux::Landlock->new(die_on_unsupported => 1);

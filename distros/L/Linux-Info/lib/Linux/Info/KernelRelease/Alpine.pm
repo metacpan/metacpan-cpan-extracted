@@ -9,14 +9,12 @@ use Class::XSAccessor getters => {
     get_alpine_patch     => 'alpine_patch'
 };
 
-our $VERSION = '2.12'; # VERSION
+our $VERSION = '2.13'; # VERSION
 
 # ABSTRACT: a subclass of Linux::Info::KernelRelease specific to parse Alpine kernel information
 
 sub _set_proc_ver_regex {
     my $self = shift;
-
-#Linux version 6.6.31-0-lts (buildozer@build-3-19-x86_64) (gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, GNU ld (GNU Binutils) 2.41) #1-Alpine SMP PREEMPT_DYNAMIC Fri, 17 May 2024 12:37:38 +0000
     $self->{proc_regex} =
 qr/^Linux\sversion\s(?<version>\d+\.\d+\.\d+\-\d+\-?lts?)\s\((?<compiled_by>[\w\.\-\@]+)\)\s\(gcc\s\(.*\)\s(?<gcc_version>\d+\.\d+\.\d+)\s\d+,\sGNU\sld\s\(.*\)\s(?<binutils_version>\d+\.\d+)\)\s#\d-Alpine\s(?<type>\w+\s[\w+_]+)\s(?<build_datetime>.*)/;
 }
@@ -62,7 +60,7 @@ Linux::Info::KernelRelease::Alpine - a subclass of Linux::Info::KernelRelease sp
 
 =head1 VERSION
 
-version 2.12
+version 2.13
 
 =head1 METHODS
 

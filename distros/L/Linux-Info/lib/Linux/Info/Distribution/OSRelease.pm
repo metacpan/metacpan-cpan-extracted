@@ -13,7 +13,7 @@ use Class::XSAccessor getters => {
 
 use constant DEFAULT_FILE => '/etc/os-release';
 
-our $VERSION = '2.12'; # VERSION
+our $VERSION = '2.13'; # VERSION
 
 # ABSTRACT: a subclass with data from /etc/os-release file
 
@@ -63,6 +63,9 @@ sub parse_from_file {
 }
 
 
+sub _handle_missing { }
+
+
 sub new {
     my ( $class, $file_path ) = @_;
 
@@ -74,9 +77,7 @@ sub new {
     }
 
     my $info_ref = parse_from_file($file_path);
-
-    # WORKAROUND: Alpine doesn't provide that
-    $info_ref->{version} = undef unless ( exists $info_ref->{version} );
+    $class->_handle_missing( $info_ref, $file_path );
 
     my $self = $class->SUPER::new($info_ref);
     unlock_hash( %{$self} );
@@ -126,7 +127,7 @@ Linux::Info::Distribution::OSRelease - a subclass with data from /etc/os-release
 
 =head1 VERSION
 
-version 2.12
+version 2.13
 
 =head1 SYNOPSIS
 
@@ -153,6 +154,11 @@ class, but most probably will provide more fields.
 This classes provides a parser to retrieve those fields and more from the
 default location or any other provided.
 
+For subclasses that doesn't provide all those fields, it will be required
+to setup some workaround, like setting the key value with C<undef>. In order to
+achieve that, subclasses B<must> override the "private" class method
+C<_handle_missing>.
+
 =head1 METHODS
 
 =head2 parse
@@ -175,6 +181,17 @@ Instance method. Parses a file with the expected format of F</etc/os-release>.
 Class method. Parses a file with the expected format of F</etc/os-release>.
 
 Optionally, accepts a string as the complete path to a file to be parsed.
+
+=head2 _handle_missing
+
+"Private" method that handles missing fields.
+
+It should be overrided by subclasses of this class.
+
+It expects as positional parameter a hash reference with the content returned
+from C<parse> method.
+
+This method returns nothing.
 
 =head2 new
 

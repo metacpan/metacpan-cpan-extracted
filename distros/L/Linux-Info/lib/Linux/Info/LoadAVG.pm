@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '2.12'; # VERSION
+our $VERSION = '2.13'; # VERSION
 
 # ABSTRACT: Collect linux load average statistics.
 
@@ -58,7 +58,7 @@ Linux::Info::LoadAVG - Collect linux load average statistics.
 
 =head1 VERSION
 
-version 2.12
+version 2.13
 
 =head1 SYNOPSIS
 

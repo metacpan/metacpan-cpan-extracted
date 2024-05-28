@@ -61,7 +61,7 @@ if( $opt->regenerate ) {
 }
 else {
     output({color=>'magenta'}, "Please enter log entries newline delimited:");
-    while(my $msg = <>) {
+    while(my $msg = <<>>) {
         chomp($msg);
         generate_test_data({ string => $msg });
     }

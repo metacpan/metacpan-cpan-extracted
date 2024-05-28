@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.063-17-ga04e812
+package OpenAPI::Modern; # git description: v0.064-10-g061d164
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.064';
+our $VERSION = '0.065';
 
 use 5.020;
 use utf8;
@@ -12,6 +12,7 @@ use Moo;
 use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -108,7 +109,7 @@ sub validate_request ($self, $request, $options = {}) {
 
     # PARAMETERS
     # { $in => { $name => 'path-item'|$method } }  as we process each one.
-    my $request_parameters_processed;
+    my $request_parameters_processed = {};
 
     # first, consider parameters at the operation level.
     # parameters at the path-item level are also considered, if not already seen at the operation level
@@ -124,9 +125,12 @@ sub validate_request ($self, $request, $options = {}) {
         my $fc_name = $param_obj->{in} eq 'header' ? fc($param_obj->{name}) : $param_obj->{name};
 
         abort($state, 'duplicate %s parameter "%s"', $param_obj->{in}, $param_obj->{name})
-          if ($request_parameters_processed->{$param_obj->{in}}{$fc_name} // '') eq $section;
-        next if exists $request_parameters_processed->{$param_obj->{in}}{$fc_name};
-        $request_parameters_processed->{$param_obj->{in}}{$fc_name} = $section;
+          if (($request_parameters_processed->{$param_obj->{in}}//{})->{$fc_name} // '') eq $section;
+        next if exists(($request_parameters_processed->{$param_obj->{in}}//{})->{$fc_name});
+        {
+          use autovivification 'store';
+          $request_parameters_processed->{$param_obj->{in}}{$fc_name} = $section;
+        }
 
         $state->{data_path} = jsonp($state->{data_path},
           ((grep $param_obj->{in} eq $_, qw(path query)) ? 'uri' : ()), $param_obj->{in},
@@ -148,7 +152,7 @@ sub validate_request ($self, $request, $options = {}) {
     foreach my $path_name (sort keys $path_captures->%*) {
       abort({ %$state, data_path => jsonp($state->{data_path}, qw(uri path), $path_name) },
           'missing path parameter specification for "%s"', $path_name)
-        if not exists $request_parameters_processed->{path}{$path_name};
+        if not exists(($request_parameters_processed->{path}//{})->{$path_name});
     }
 
     $state->{schema_path} = jsonp($state->{schema_path}, $method);
@@ -315,6 +319,7 @@ sub find_path ($self, $options, $state = {}) {
       ->scheme($options->{request}->url->to_abs->scheme // 'https')
       ->host($options->{request}->headers->host)
     if $options->{request};
+  $state->{annotations} //= [];
   $state->{depth} = 0;
 
   # requests don't have response codes, so if 'error' is set, it is some sort of parsing error
@@ -363,6 +368,8 @@ sub find_path ($self, $options, $state = {}) {
     $options->{method} = lc $method;
   }
 
+  # TODO: support passing $options->{operation_uri}
+
   croak 'at least one of $options->{request}, $options->{method} and $options->{operation_id} must be provided'
     if not $method;
 
@@ -375,11 +382,12 @@ sub find_path ($self, $options, $state = {}) {
 
     # FIXME: follow $ref chain in path-item
     $options->{_path_item} = $path_item;
-    $options->{path_item_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment(jsonp('/paths', $path_template));
     return E({ %$state, data_path => '/request/method', schema_path => jsonp('/paths', $path_template),
         keyword => $method, recommended_response => [ 405, 'Method Not Allowed' ] },
         'missing operation for HTTP method "%s"', $method)
       if not $path_item->{$method};
+
+    $options->{operation_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment(jsonp('/paths', $path_template, $method));
   }
 
   # path_template from request URI
@@ -390,12 +398,13 @@ sub find_path ($self, $options, $state = {}) {
     my $schema = $self->openapi_document->schema;
 
     # sorting (ascii-wise) gives us the desired results that concrete path components sort ahead of
-    # templated components, except when the concrete component is a non-ascii character or matches [|}~].
-    foreach $path_template (sort keys $schema->{paths}->%*) {
+    # templated components, except when the concrete component is a non-ascii character or matches
+    # 0x7c (pipe), 0x7d (close-brace) or 0x7e (tilde)
+    foreach $path_template (sort keys(($schema->{paths}//{})->%*)) {
       # §3.2: "The value for these path parameters MUST NOT contain any unescaped “generic syntax”
       # characters described by [RFC3986]: forward slashes (/), question marks (?), or hashes (#)."
       my $path_pattern = join '',
-        map +(substr($_, 0, 1) eq '{' ? '([^/?#]*)' : quotemeta($_)),
+        map +(substr($_, 0, 1) eq '{' ? '([^/?#]*)' : quotemeta($_)), # { for the editor
         split /(\{[^}]+\})/, $path_template;
 
       # TODO: consider 'servers' fields when matching request URIs: this requires looking at
@@ -407,13 +416,13 @@ sub find_path ($self, $options, $state = {}) {
       # FIXME: follow $ref chain in path-item
       $path_item_path = jsonp('/paths', $path_template);
       $options->{_path_item} = $self->openapi_document->get($path_item_path);
-      $options->{path_item_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment($path_item_path);
       $state->{schema_path} = $path_item_path;
 
       # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
       my @capture_values = map
         Encode::decode('UTF-8', URI::Escape::uri_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_])),
           Encode::FB_CROAK | Encode::LEAVE_SRC), 1 .. $#-;
+      # { for the editor
       my @capture_names = ($path_template =~ m!\{([^/?#}]+)\}!g);
       my %path_captures; @path_captures{@capture_names} = @capture_values;
 
@@ -427,6 +436,7 @@ sub find_path ($self, $options, $state = {}) {
           'missing operation for HTTP method "%s"', $method)
         if not exists $options->{_path_item}{$method};
 
+      $options->{operation_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment($path_item_path.'/'.$method);
       $options->{operation_id} = $options->{_path_item}{$method}{operationId};
       delete $options->{operation_id} if not defined $options->{operation_id};
 
@@ -449,6 +459,7 @@ sub find_path ($self, $options, $state = {}) {
   my $path_item = $self->openapi_document->get($path_item_path);
 
   # note: we aren't doing anything special with escaped slashes. this bit of the spec is hazy.
+  # { for the editor
   my @capture_names = ($path_template =~ m!\{([^}]+)\}!g);
   return E({ %$state, keyword => 'paths', _schema_path_suffix => $path_template },
       'provided path_captures names do not match path template "%s"', $path_template)
@@ -456,9 +467,9 @@ sub find_path ($self, $options, $state = {}) {
       and not is_equal([ sort keys $options->{path_captures}->%* ], [ sort @capture_names ]);
 
   if (not $options->{request}) {
-    $options->@{qw(path_template operation_id _path_item path_item_uri)} =
+    $options->@{qw(path_template operation_id _path_item operation_uri)} =
       ($path_template, $self->openapi_document->schema->{paths}{$path_template}{$method}{operationId},
-      $path_item, Mojo::URL->new($state->{initial_schema_uri})->fragment($path_item_path));
+      $path_item, Mojo::URL->new($state->{initial_schema_uri})->fragment($path_item_path.'/'.$method));
     delete $options->{operation_id} if not defined $options->{operation_id};
     $state->{schema_path} = $path_item_path;
     return 1;
@@ -466,12 +477,13 @@ sub find_path ($self, $options, $state = {}) {
 
   # if we're still here, we were passed path_template in options or we calculated it from
   # operation_id, and now we verify it against path_captures and the request URI.
-  my $uri_path = $options->{request}->url->path;
+  my $uri_path = $options->{request}->url->path->to_string;
+  $uri_path = '/' if not length $uri_path;
 
   # §3.2: "The value for these path parameters MUST NOT contain any unescaped “generic syntax”
   # characters described by [RFC3986]: forward slashes (/), question marks (?), or hashes (#)."
   my $path_pattern = join '',
-    map +(substr($_, 0, 1) eq '{' ? '([^/?#]*)' : quotemeta($_)),
+    map +(substr($_, 0, 1) eq '{' ? '([^/?#]*)' : quotemeta($_)), # { for the editor
     split /(\{[^}]+\})/, $path_template;
 
   return E({ %$state, keyword => 'paths', _schema_path_suffix => $path_template },
@@ -500,7 +512,7 @@ sub find_path ($self, $options, $state = {}) {
   delete $options->{operation_id} if not defined $options->{operation_id};
 
   $options->{_path_item} = $self->openapi_document->get(jsonp('/paths', $path_template));
-  $options->{path_item_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment($path_item_path);
+  $options->{operation_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment($path_item_path.'/'.$method);
   $state->{schema_path} = $path_item_path;
   return 1;
 }
@@ -563,10 +575,15 @@ sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
     return 1;
   }
 
-  # TODO: check 'allowEmptyValue'; difficult to do without access to the raw request string
-
   return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1 }, $param_obj, \ $query_params->{$param_obj->{name}})
     if exists $param_obj->{content};
+
+  # §4.8.12.2: "If `true`, clients MAY pass a zero-length string value in place of parameters that
+  # would otherwise be omitted entirely, which the server SHOULD interpret as the parameter being
+  # unused."
+  return if $param_obj->{allowEmptyValue}
+    and ($param_obj->{style}//'form') eq 'form'
+    and not length($query_params->{$param_obj->{name}});
 
   # TODO: check 'allowReserved'; difficult to do without access to the raw request string
 
@@ -899,7 +916,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.064
+version 0.065
 
 =head1 SYNOPSIS
 
@@ -1142,7 +1159,7 @@ C<path_template>: a string representing the request URI, with placeholders in br
 
 =item *
 
-C<operation_id>: a string corresponding to the L<operationId|https://swagger.io/docs/specification/paths-and-operations/#operationid> at a particular path-template and HTTP location under C</paths>
+C<operation_id>: a string corresponding to the L<operationId|https://learn.openapis.org/specification/paths.html#the-endpoints-list> at a particular path-template and HTTP location under C</paths>
 
 =item *
 
@@ -1168,16 +1185,19 @@ populated if they can be successfully calculated.
 
 In addition, these values are populated in the options hash (when available):
 
-* C<path_item_uri>: a URI indicating the document location of the path-item object for the
+* C<operation_uri>: a URI indicating the document location of the operation object for the
   request, after following any references (usually something under C</paths/>, but may be in another
   document). Use C<< $openapi->evaluator->get($uri) >> to fetch this content (see
   L<JSON::Schema::Modern/get>). Note that this is the same as
-  C<< $openapi->recursive_get(Mojo::URL->new->fragment(JSON::Schema::Modern::Utilities::jsonp('/paths', $options->{path_template}))) >>.
+  C<< $openapi->recursive_get(Mojo::URL->new->fragment(JSON::Schema::Modern::Utilities::jsonp('/paths', $options->{path_template}{$options->{method}}))) >>.
+  (See the documentation for an operation at L<https://learn.openapis.org/specification/paths.html#the-endpoints-list> or in the specification at
+  L<§4.8.10 of the specification|https://spec.openapis.org/oas/v3.1.0#operation-object>.)
 * C<request> (not necessarily what was passed in: this is always a L<Mojo::Message::Request>)
 
-You can find the associated operation object by using either C<path_item_uri> and the HTTP method,
+You can find the associated operation object by using either C<operation_uri>,
 or by calling C<< $openapi->openapi_document->get_operationId_path($operation_id) >>
-(see L<JSON::Schema::Modern::Document::OpenAPI/get_operationId_path>).
+(see L<JSON::Schema::Modern::Document::OpenAPI/get_operationId_path>) (note that the latter will
+be removed in a subsequent release, in order to support operations existing in other documents).
 
 Note that the L<C</servers>|https://spec.openapis.org/oas/v3.1.0#server-object> section of the
 OpenAPI document is not used for path matching at this time, for either scheme and host matching nor

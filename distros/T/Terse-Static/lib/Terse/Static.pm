@@ -1,6 +1,6 @@
 package Terse::Static;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 1;
 
@@ -12,7 +12,7 @@ Terse::Static - Serve static resources
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

@@ -6,19 +6,39 @@ OpenAPI::Client::OpenAI - A client for the OpenAI API
 
     use OpenAPI::Client::OpenAI;
 
-    my $client = OpenAPI::Client::OpenAI->new(); # see ENVIRONMENT VARIABLES
+    # The OPENAI_API_KEY environment variable must be set
+    # See https://platform.openai.com/api-keys and ENVIRONMENT VARIABLES below
+    my $client = OpenAPI::Client::OpenAI->new();
 
-    my $tx = $client->create_completion(...);
+      my $tx = $client->create_completion(
+          {
+              body => {
+                  model       => 'gpt-3.5-turbo-instruct',
+                  prompt      => 'What is the capital of France?'
+                  temperature => 0, # optional, between 0 and 1, with 0 being the least random
+                  max_tokens  => 100, # optional, the maximum number of tokens to generate
+              }
+          }
+      );
 
     my $response_data = $tx->res->json;
 
-    #print Dumper($response_data);
+    print Dumper($response_data);
 
 # DESCRIPTION
 
 OpenAPI::Client::OpenAI is a client for the OpenAI API built on
 top of [OpenAPI::Client](https://metacpan.org/pod/OpenAPI%3A%3AClient). This module automatically handles the API
 key authentication according to the provided environment.
+
+Note that the OpenAI API is a paid service. You will need to sign up for an
+account.
+
+# WARNING
+
+Due to the extremely rapid development of OpenAI's API, this module may may
+not be up-to-date with the latest changes. Further releases of this module may
+break your code if OpenAI changes their API.
 
 # METHODS
 
@@ -35,169 +55,18 @@ Create a new OpenAI API client. The following options can be provided:
     The path to the OpenAPI specification file (YAML). Defaults to the
     "openai.yaml" file in the distribution's "share" directory.
 
-Additional options are passed to the parent class, OpenAPI::Client.
+    You can find the latest version of this file at
+    [https://github.com/openai/openai-openapi](https://github.com/openai/openai-openapi).
 
-## Completions
+    Examples can be found in the `t/` and `examples/` directories of the
+    distribution.
 
-### createCompletion
+Additional options are passed to the parent class, OpenAPI::Client, with the
+exception of the following extra options:
 
-Creates a completion for the provided prompt and parameters.
+Other methods are documented in [OpenAPI::Client::OpenAI::Methods](https://metacpan.org/pod/OpenAPI%3A%3AClient%3A%3AOpenAI%3A%3AMethods).
 
-## Chat Completions
-
-### createChatCompletion
-
-Creates a completion for the chat message.
-
-## Edits
-
-### createEdit
-
-Creates a new edit for the provided input, instruction, and parameters.
-
-## Images
-
-### createImage
-
-Creates an image given a prompt.
-
-### createImageEdit
-
-Creates an edited or extended image given an original image and a prompt.
-
-### createImageVariation
-
-Creates a variation of a given image.
-
-## Embeddings
-
-### createEmbedding
-
-Creates an embedding vector representing the input text.
-
-## Audio
-
-### createTranscription
-
-Transcribes audio into the input language.
-
-### createTranslation
-
-Translates audio into English.
-
-## Search
-
-### createSearch
-
-The search endpoint computes similarity scores between provided query
-and documents. Documents can be passed directly to the API if there are
-no more than 200 of them.
-
-To go beyond the 200 document limit, documents can be processed offline
-and then used for efficient retrieval at query time. When file is set,
-the search endpoint searches over all the documents in the given file
-and returns up to the max\_rerank number of documents. These documents
-will be returned along with their search scores.
-
-The similarity score is a positive score that usually ranges from 0 to
-300 (but can sometimes go higher), where a score above 200 usually means
-the document is semantically similar to the query.
-
-## Files
-
-### listFiles
-
-Returns a list of files that belong to the user's organization.
-
-### createFile
-
-Upload a file that contains document(s) to be used across various
-endpoints/features.
-
-### deleteFile
-
-Delete a file.
-
-### retrieveFile
-
-Returns information about a specific file.
-
-### downloadFile
-
-Returns the contents of the specified file.
-
-## Answers
-
-### createAnswer
-
-Answers the specified question using the provided documents and examples.
-
-The endpoint first searches over provided documents or files to find
-relevant context. The relevant context is combined with the provided
-examples and question to create the prompt for completion.
-
-## Classifications
-
-### createClassification
-
-Classifies the specified query using provided examples.
-
-The endpoint first searches over the labeled examples to select the ones
-most relevant for the particular query. Then, the relevant examples are
-combined with the query to construct a prompt to produce the final label
-via the completions endpoint.
-
-Labeled examples can be provided via an uploaded file, or explicitly
-listed in the request using the examples parameter for quick tests and
-small scale use cases
-
-## Fine-tunes
-
-### createFineTune
-
-Creates a job that fine-tunes a specified model from a given dataset.
-
-Response includes details of the enqueued job including job status and
-the name of the fine-tuned models once complete.
-
-### listFineTunes
-
-List your organization's fine-tuning jobs.
-
-### retrieveFineTune
-
-Gets info about the fine-tune job.
-
-### cancelFineTune
-
-Immediately cancel a fine-tune job.
-
-### listFineTuneEvents
-
-Get fine-grained status updates for a fine-tune job.
-
-## Models
-
-### listModels
-
-Lists the currently available models, and provides basic information
-about each one such as the owner and availability.
-
-### retrieveModel
-
-Retrieves a model instance, providing basic information about the model
-such as the owner and permissioning.
-
-### deleteModel
-
-Delete a fine-tuned model. You must have the Owner role in your
-organization.
-
-## Moderations
-
-### createModeration
-
-Classifies if text violates OpenAI's Content Policy.
+The schema is documented in [OpenAPI::Client::OpenAI::Schema](https://metacpan.org/pod/OpenAPI%3A%3AClient%3A%3AOpenAI%3A%3ASchema).
 
 # ENVIRONMENT VARIABLES
 
@@ -209,15 +78,21 @@ The following environment variables are used by this module:
 
 # SEE ALSO
 
-[OpenAPI::Client](https://metacpan.org/pod/OpenAPI%3A%3AClient)
+[OpenAI::API](https://metacpan.org/pod/OpenAI%3A%3AAPI) - the deprecated precursor to this module.
 
 # AUTHOR
 
 Nelson Ferraz, <nferraz@gmail.com>
 
+# CONTRIBUTORS
+
+- Curtis "Ovid" Poe, https://github.com/Ovid
+- Veesh Goldman, https://github.com/rabbiveesh
+- Graham Knop, https://github.com/haarg
+
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2023 by Nelson Ferraz
+Copyright (C) 2023-2024 by Nelson Ferraz
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

@@ -1,0 +1,13 @@
+MYMETA.*
+Makefile
+*.o
+*.obj
+pm_to_blib
+win32console.o
+win32console.obj
+win32console.c
+win32console.def
+win32console.bs
+blib
+*~
+*.bak

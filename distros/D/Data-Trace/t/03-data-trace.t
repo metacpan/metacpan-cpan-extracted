@@ -98,6 +98,7 @@ sub _define_regex {
     my $scalar_store_firstname = $_build_trace->( "Scalar", "STORE", "Charly" );
     my $scalar_store_firstname_raw =
       $_build_trace->( "Data::Trace", "STORE", "Charly" );
+    my $scalar_fetch = $_build_trace->( "Scalar", "FETCH" );
 
     # Array.
     my $array_store = $_build_trace->( "Array", "STORE", 1, "array2" );
@@ -157,6 +158,8 @@ sub _define_regex {
             firstname_raw =>
               qr{ ^ \n $scalar_store_firstname_raw $anon_raw_lines $ }x,
             firstname_raw1 => qr{ ^ $scalar_store_firstname_raw $ }x,
+            fetch1         => qr{ ^ $scalar_fetch $ }x,
+            fetch          => qr{ ^ \n $scalar_fetch $anon_lines $ }x,
         },
 
         array => {
@@ -1696,6 +1699,61 @@ sub _define_cases_raw {
     )
 }
 
+# Methods
+sub _define_cases_methods {
+    (
+        {
+            name    => "scalar -methods fetch",
+            args    => [ \$test_scalar, -methods => "fetch" ],
+            actions => sub {
+                my $v = $test_scalar;
+            },
+            expected => {
+                stdout   => $regex->{scalar}{fetch},
+                variable => \$test_scalar,
+                value    => \"test_scalar",
+            },
+        },
+        {
+            name    => "scalar -methods [fetch]",
+            args    => [ \$test_scalar, -methods => ["fetch"] ],
+            actions => sub {
+                my $v = $test_scalar;
+            },
+            expected => {
+                stdout   => $regex->{scalar}{fetch},
+                variable => \$test_scalar,
+                value    => \"test_scalar",
+            },
+        },
+        {
+            name    => "scalar -methods fetch lv1",
+            args    => [ \$test_scalar, -methods => "fetch", 1 ],
+            actions => sub {
+                my $v = $test_scalar;
+            },
+            expected => {
+                stdout   => $regex->{scalar}{fetch1},
+                variable => \$test_scalar,
+                value    => \"test_scalar",
+            },
+        },
+        {
+            name    => "scalar -methods [fetch] lv1",
+            args    => [ \$test_scalar, -methods => ["fetch"], 1 ],
+            actions => sub {
+                my $v = $test_scalar;
+            },
+            expected => {
+                stdout   => $regex->{scalar}{fetch1},
+                variable => \$test_scalar,
+                value    => \"test_scalar",
+            },
+        },
+    )
+}
+
+
 my @cases = (
 
     # User Errors
@@ -1726,6 +1784,9 @@ my @cases = (
 
     # Raw
     _define_cases_raw(),
+
+    # Methods.
+    _define_cases_methods(),
 );
 
 ###########################################

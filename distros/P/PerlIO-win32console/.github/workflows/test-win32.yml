@@ -1,0 +1,27 @@
+name: test-win32-mingw64
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+jobs:
+  perlio-win32console:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@v2
+      - name: configure
+        run: |
+           $env:path = "c:\strawberry\c\bin;"+$env:path
+           perl Makefile.PL
+      - name: build
+        run: |
+           $env:path = "c:\strawberry\c\bin;"+$env:path
+           gmake
+      - name: test
+        run: |
+           gmake test

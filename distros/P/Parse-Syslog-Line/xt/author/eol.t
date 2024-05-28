@@ -43,7 +43,8 @@ my @files = (
     't/data/c1352d43776bbf2acfb45344101cd74b.yaml',
     't/data/c65a1749e83c026ab9c37097dc3232be.yaml',
     't/data/e86919071a958d4f24bc13751c2cab47.yaml',
-    't/data/f94cae02dd7ef975df7bfd365109690c.yaml'
+    't/data/f94cae02dd7ef975df7bfd365109690c.yaml',
+    't/data/f9f366cc1bd18536713766bb68d51c77.yaml'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

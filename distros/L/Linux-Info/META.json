@@ -71,159 +71,167 @@
    "provides" : {
       "Linux::Info" : {
          "file" : "lib/Linux/Info.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::Compilation" : {
          "file" : "lib/Linux/Info/Compilation.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::CpuStats" : {
          "file" : "lib/Linux/Info/CpuStats.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::DiskStats" : {
          "file" : "lib/Linux/Info/DiskStats.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::DiskStats::Options" : {
          "file" : "lib/Linux/Info/DiskStats/Options.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::DiskUsage" : {
          "file" : "lib/Linux/Info/DiskUsage.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::Distribution" : {
          "file" : "lib/Linux/Info/Distribution.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::Distribution::BasicInfo" : {
          "file" : "lib/Linux/Info/Distribution/BasicInfo.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::Distribution::Custom" : {
          "file" : "lib/Linux/Info/Distribution/Custom.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::Distribution::Custom::Amazon" : {
          "file" : "lib/Linux/Info/Distribution/Custom/Amazon.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::Distribution::Custom::CentOS" : {
          "file" : "lib/Linux/Info/Distribution/Custom/CentOS.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::Distribution::Custom::CloudLinux" : {
          "file" : "lib/Linux/Info/Distribution/Custom/CloudLinux.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::Distribution::Custom::RedHat" : {
          "file" : "lib/Linux/Info/Distribution/Custom/RedHat.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::Distribution::OSRelease" : {
          "file" : "lib/Linux/Info/Distribution/OSRelease.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::Distribution::OSRelease::Alpine" : {
          "file" : "lib/Linux/Info/Distribution/OSRelease/Alpine.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::Distribution::OSRelease::Amazon" : {
          "file" : "lib/Linux/Info/Distribution/OSRelease/Amazon.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::Distribution::OSRelease::CentOS" : {
          "file" : "lib/Linux/Info/Distribution/OSRelease/CentOS.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::Distribution::OSRelease::Debian" : {
          "file" : "lib/Linux/Info/Distribution/OSRelease/Debian.pm",
-         "version" : "2.12"
+         "version" : "2.13"
+      },
+      "Linux::Info::Distribution::OSRelease::Raspbian" : {
+         "file" : "lib/Linux/Info/Distribution/OSRelease/Raspbian.pm",
+         "version" : "2.13"
       },
       "Linux::Info::Distribution::OSRelease::RedHat" : {
          "file" : "lib/Linux/Info/Distribution/OSRelease/RedHat.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::Distribution::OSRelease::Rocky" : {
          "file" : "lib/Linux/Info/Distribution/OSRelease/Rocky.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::Distribution::OSRelease::Ubuntu" : {
          "file" : "lib/Linux/Info/Distribution/OSRelease/Ubuntu.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::DistributionFactory" : {
          "file" : "lib/Linux/Info/DistributionFactory.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::DistributionFinder" : {
          "file" : "lib/Linux/Info/DistributionFinder.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::FileStats" : {
          "file" : "lib/Linux/Info/FileStats.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::KernelFactory" : {
          "file" : "lib/Linux/Info/KernelFactory.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::KernelRelease" : {
          "file" : "lib/Linux/Info/KernelRelease.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::KernelRelease::Alpine" : {
          "file" : "lib/Linux/Info/KernelRelease/Alpine.pm",
-         "version" : "2.12"
+         "version" : "2.13"
+      },
+      "Linux::Info::KernelRelease::Raspbian" : {
+         "file" : "lib/Linux/Info/KernelRelease/Raspbian.pm",
+         "version" : "2.13"
       },
       "Linux::Info::KernelRelease::RedHat" : {
          "file" : "lib/Linux/Info/KernelRelease/RedHat.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::KernelRelease::Rocky" : {
          "file" : "lib/Linux/Info/KernelRelease/Rocky.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::KernelRelease::Ubuntu" : {
          "file" : "lib/Linux/Info/KernelRelease/Ubuntu.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::KernelSource" : {
          "file" : "lib/Linux/Info/KernelSource.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::LoadAVG" : {
          "file" : "lib/Linux/Info/LoadAVG.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::MemStats" : {
          "file" : "lib/Linux/Info/MemStats.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::NetStats" : {
          "file" : "lib/Linux/Info/NetStats.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::PgSwStats" : {
          "file" : "lib/Linux/Info/PgSwStats.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::ProcStats" : {
          "file" : "lib/Linux/Info/ProcStats.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::Processes" : {
          "file" : "lib/Linux/Info/Processes.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::SockStats" : {
          "file" : "lib/Linux/Info/SockStats.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Linux::Info::SysInfo" : {
          "file" : "lib/Linux/Info/SysInfo.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       }
    },
    "release_status" : "stable",
@@ -237,7 +245,7 @@
          "web" : "https://github.com/glasswalk3r/Linux-Info"
       }
    },
-   "version" : "2.12",
+   "version" : "2.13",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "GPL-3.0-only"

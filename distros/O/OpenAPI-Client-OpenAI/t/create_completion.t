@@ -21,7 +21,7 @@ my @test_cases = (
     {
         method => 'createCompletion',
         params => {
-            model       => 'text-davinci-003',
+            model       => 'gpt-3.5-turbo-instruct',
             prompt      => 'What is the capital of France?',
             max_tokens  => 100,
             temperature => 0,
@@ -31,7 +31,7 @@ my @test_cases = (
     {
         method => 'createCompletion',
         params => {
-            model       => 'text-davinci-003',
+            model       => 'gpt-3.5-turbo-instruct',
             prompt      => 'What is the capital of France?',
             max_tokens  => 100,
             temperature => 0,
@@ -42,7 +42,7 @@ my @test_cases = (
     {
         method => 'createCompletion',
         params => {
-            model       => 'text-davinci-003',
+            model       => 'gpt-3.5-turbo-instruct',
             prompt      => 'What is the capital of France?',
             max_tokens  => 100,
             temperature => 0,

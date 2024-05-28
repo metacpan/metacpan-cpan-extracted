@@ -1,5 +1,8 @@
 Revision history for Synth-Config
 
+0.0056 2024-05-26 22:15:55
+    - Remove model_name from graphviz() required arguments.
+
 0.0055 2024-05-23 20:44:47
     - Allow removal of all model settings at once.
     - Improve documentation.

@@ -26,7 +26,7 @@ no_index:
     - xt
 requires:
   Mo: 0
-  Mo::utils: 0.09
+  Mo::utils: 0.28
   Mo::utils::CSS: 0.02
   Mo::utils::URI: 0
   perl: 5.8.0
@@ -35,4 +35,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Data-Navigation-Item
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-Navigation-Item
-version: '0.01'
+version: '0.02'

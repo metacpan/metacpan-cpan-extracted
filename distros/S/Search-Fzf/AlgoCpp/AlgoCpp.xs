@@ -1,24 +1,13 @@
-/* #ifdef __cplusplus */
-/* extern "C" { */
-/* #include "EXTERN.h" */
-/* #include "perl.h" */
-/* #include "XSUB.h" */
-/* #include "ppport.h" */
-/* } */
-/* #endif */
+extern "C" { 
+#define PERL_NO_GET_CONTEXT
+#include "EXTERN.h"
+#include "XSUB.h" 
+//#include "perl.h"
+} 
 
 /* include your class headers here */
 #include "algo.h"
 
-/* AV* test() { */
-/*     testCFun(); */
-/*     printf("hello world\n"); */
-/*     AV* ret = newAV(); */
-/*     av_push(ret, newSViv(1)); */
-/*     av_push(ret, newSViv(2)); */
-/*     av_push(ret, newSViv(3)); */
-/*     return ret; */
-/* } */
 
 /* We need one MODULE... line to start the actual XS section of the file.
  * The XS++ preprocessor will output its own MODULE and PACKAGE lines */
@@ -32,5 +21,3 @@ MODULE = Search::Fzf::AlgoCpp		PACKAGE = Search::FZF::AlgoCpp
 INCLUDE_COMMAND: $^X -MExtUtils::XSpp::Cmd -e xspp -- algo.xsp
 
 ## list you c function define here
-## AV*
-## test()

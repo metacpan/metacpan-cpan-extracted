@@ -1,0 +1,2883 @@
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Methods - Methods for OpenAI API
+
+=head1 DESCRIPTION
+
+Yes, this isn't perfect. But it's a start. The OpenAI API is complex and and
+the L<OpenAPI::Client> module is a bit opaque at times. We'll add more later.
+
+=head1 METHODS
+
+
+=head2 cancelBatch
+
+Cancels an in-progress batch.
+
+
+=head3 Parameters
+
+
+=head4 batch_id
+
+The ID of the batch to cancel.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 cancelFineTuningJob
+
+Immediately cancel a fine-tune job.
+
+
+=head3 Parameters
+
+
+=head4 fine_tuning_job_id
+
+The ID of the fine-tuning job to cancel.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  ft-AF1WoRqd3aJAHsqc9NY7iL8F
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 cancelRun
+
+Cancels a run that is C<in_progress>.
+
+
+=head3 Parameters
+
+
+=head4 thread_id
+
+The ID of the thread to which this run belongs.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 run_id
+
+The ID of the run to cancel.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 cancelVectorStoreFileBatch
+
+Cancel a vector store file batch. This attempts to cancel the
+processing of files in this batch as soon as possible.
+
+
+=head3 Parameters
+
+
+=head4 vector_store_id
+
+The ID of the vector store that the file batch belongs to.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 batch_id
+
+The ID of the file batch to cancel.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 createAssistant
+
+Create an assistant with a model and instructions.
+
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createBatch
+
+Creates and executes a batch from an uploaded file of requests
+
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createChatCompletion
+
+Creates a model response for the given chat conversation.
+
+=head3 Examples
+
+See the following files in the distribution for examples:
+
+=over 4
+
+=item *	examples/chat.pl
+
+=back
+
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createCompletion
+
+Creates a completion for the provided prompt and parameters.
+
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createEmbedding
+
+Creates an embedding vector representing the input text.
+
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createFile
+
+Upload a file that can be used across various endpoints. Individual
+files can be up to 512 MB, and the size of all files uploaded by one
+organization can be up to 100 GB.
+
+The Assistants API supports files up to 2 million tokens and of
+specific file types. See the L<Assistants Tools
+guide|https://platform.openai.com/docs/assistants/tools> for details.
+
+The Fine-tuning API only supports C<.jsonl> files.
+
+The Batch API only supports C<.jsonl> files up to 100 MB in size.
+
+Please L<contact us|https://help.openai.com/> if you need to increase
+these storage limits.
+
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createFineTuningJob
+
+Creates a fine-tuning job which begins the process of creating a new
+model from a given dataset.
+
+Response includes details of the enqueued job including job status and
+the name of the fine-tuned models once complete.
+
+L<Learn more about
+fine-tuning|https://platform.openai.com/docs/guides/fine-tuning>
+
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createImage
+
+Creates an image given a prompt.
+
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createImageEdit
+
+Creates an edited or extended image given an original image and a
+prompt.
+
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createImageVariation
+
+Creates a variation of a given image.
+
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createMessage
+
+Create a message.
+
+
+=head3 Parameters
+
+
+=head4 thread_id
+
+The ID of the
+L<thread|https://platform.openai.com/docs/api-reference/threads> to
+create a message for.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createModeration
+
+Classifies if text is potentially harmful.
+
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createRun
+
+Create a run.
+
+
+=head3 Parameters
+
+
+=head4 thread_id
+
+The ID of the thread to run.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createSpeech
+
+Generates audio from the input text.
+
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createThread
+
+Create a thread.
+
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createThreadAndRun
+
+Create a thread and run it in one request.
+
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createTranscription
+
+Transcribes audio into the input language.
+
+=head3 Examples
+
+See the following files in the distribution for examples:
+
+=over 4
+
+=item *	examples/transcribe-audio.pl
+
+=back
+
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createTranslation
+
+Translates audio into English.
+
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createVectorStore
+
+Create a vector store.
+
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createVectorStoreFile
+
+Create a vector store file by attaching a
+L<File|https://platform.openai.com/docs/api-reference/files> to a
+L<vector
+store|https://platform.openai.com/docs/api-reference/vector-stores/obje
+ct>.
+
+
+=head3 Parameters
+
+
+=head4 vector_store_id
+
+The ID of the vector store for which to create a File.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  vs_abc123
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 createVectorStoreFileBatch
+
+Create a vector store file batch.
+
+
+=head3 Parameters
+
+
+=head4 vector_store_id
+
+The ID of the vector store for which to create a File Batch.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  vs_abc123
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 deleteAssistant
+
+Delete an assistant.
+
+
+=head3 Parameters
+
+
+=head4 assistant_id
+
+The ID of the assistant to delete.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 deleteFile
+
+Delete a file.
+
+
+=head3 Parameters
+
+
+=head4 file_id
+
+The ID of the file to use for this request.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 deleteMessage
+
+Deletes a message.
+
+
+=head3 Parameters
+
+
+=head4 thread_id
+
+The ID of the thread to which this message belongs.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 message_id
+
+The ID of the message to delete.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 deleteModel
+
+Delete a fine-tuned model. You must have the Owner role in your
+organization to delete a model.
+
+
+=head3 Parameters
+
+
+=head4 model
+
+The model to delete
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  ft:gpt-3.5-turbo:acemeco:suffix:abc123
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 deleteThread
+
+Delete a thread.
+
+
+=head3 Parameters
+
+
+=head4 thread_id
+
+The ID of the thread to delete.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 deleteVectorStore
+
+Delete a vector store.
+
+
+=head3 Parameters
+
+
+=head4 vector_store_id
+
+The ID of the vector store to delete.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 deleteVectorStoreFile
+
+Delete a vector store file. This will remove the file from the vector
+store but the file itself will not be deleted. To delete the file, use
+the L<delete
+file|https://platform.openai.com/docs/api-reference/files/delete>
+endpoint.
+
+
+=head3 Parameters
+
+
+=head4 vector_store_id
+
+The ID of the vector store that the file belongs to.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 file_id
+
+The ID of the file to delete.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 downloadFile
+
+Returns the contents of the specified file.
+
+
+=head3 Parameters
+
+
+=head4 file_id
+
+The ID of the file to use for this request.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 getAssistant
+
+Retrieves an assistant.
+
+
+=head3 Parameters
+
+
+=head4 assistant_id
+
+The ID of the assistant to retrieve.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 getMessage
+
+Retrieve a message.
+
+
+=head3 Parameters
+
+
+=head4 thread_id
+
+The ID of the
+L<thread|https://platform.openai.com/docs/api-reference/threads> to
+which this message belongs.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 message_id
+
+The ID of the message to retrieve.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 getRun
+
+Retrieves a run.
+
+
+=head3 Parameters
+
+
+=head4 thread_id
+
+The ID of the
+L<thread|https://platform.openai.com/docs/api-reference/threads> that
+was run.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 run_id
+
+The ID of the run to retrieve.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 getRunStep
+
+Retrieves a run step.
+
+
+=head3 Parameters
+
+
+=head4 thread_id
+
+The ID of the thread to which the run and run step belongs.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 run_id
+
+The ID of the run to which the run step belongs.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 step_id
+
+The ID of the run step to retrieve.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 getThread
+
+Retrieves a thread.
+
+
+=head3 Parameters
+
+
+=head4 thread_id
+
+The ID of the thread to retrieve.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 getVectorStore
+
+Retrieves a vector store.
+
+
+=head3 Parameters
+
+
+=head4 vector_store_id
+
+The ID of the vector store to retrieve.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 getVectorStoreFile
+
+Retrieves a vector store file.
+
+
+=head3 Parameters
+
+
+=head4 vector_store_id
+
+The ID of the vector store that the file belongs to.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  vs_abc123
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 file_id
+
+The ID of the file being retrieved.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  file-abc123
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 getVectorStoreFileBatch
+
+Retrieves a vector store file batch.
+
+
+=head3 Parameters
+
+
+=head4 vector_store_id
+
+The ID of the vector store that the file batch belongs to.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  vs_abc123
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 batch_id
+
+The ID of the file batch being retrieved.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  vsfb_abc123
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 listAssistants
+
+Returns a list of assistants.
+
+
+=head3 Parameters
+
+
+=head4 limit
+
+A limit on the number of objects to be returned. Limit can range
+between 1 and 100, and the default is 20.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  20
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 order
+
+Sort order by the C timestamp of the objects. C for
+ascending order and C for descending order.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  desc
+
+=item * Example:  N/A
+
+=item * Enum:     asc, desc
+
+=back
+
+
+=head4 after
+
+A cursor for use in pagination. C is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, ending with objIfoo in order to fetch the next
+page of the list.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 before
+
+A cursor for use in pagination. C is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, ending with objIfoo in order to fetch the previous
+page of the list.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 listBatches
+
+List your organization's batches.
+
+
+=head3 Parameters
+
+
+=head4 after
+
+A cursor for use in pagination. C is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, ending with objIfoo in order to fetch the next
+page of the list.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+A limit on the number of objects to be returned. Limit can range
+between 1 and 100, and the default is 20.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  20
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 listFiles
+
+Returns a list of files that belong to the user's organization.
+
+
+=head3 Parameters
+
+
+=head4 purpose
+
+Only return files with the given purpose.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 listFilesInVectorStoreBatch
+
+Returns a list of vector store files in a batch.
+
+
+=head3 Parameters
+
+
+=head4 vector_store_id
+
+The ID of the vector store that the files belong to.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 batch_id
+
+The ID of the file batch that the files belong to.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+A limit on the number of objects to be returned. Limit can range
+between 1 and 100, and the default is 20.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  20
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 order
+
+Sort order by the C timestamp of the objects. C for
+ascending order and C for descending order.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  desc
+
+=item * Example:  N/A
+
+=item * Enum:     asc, desc
+
+=back
+
+
+=head4 after
+
+A cursor for use in pagination. C is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, ending with objIfoo in order to fetch the next
+page of the list.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 before
+
+A cursor for use in pagination. C is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, ending with objIfoo in order to fetch the previous
+page of the list.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 filter
+
+Filter by file status. One of C<in_progress>, C<completed>, C<failed>,
+C<cancelled>.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     in_progress, completed, failed, cancelled
+
+=back
+
+
+
+
+=head2 listFineTuningEvents
+
+Get status updates for a fine-tuning job.
+
+
+=head3 Parameters
+
+
+=head4 fine_tuning_job_id
+
+The ID of the fine-tuning job to get events for.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  ft-AF1WoRqd3aJAHsqc9NY7iL8F
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 after
+
+Identifier for the last event from the previous pagination request.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+Number of events to retrieve.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  20
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 listFineTuningJobCheckpoints
+
+List checkpoints for a fine-tuning job.
+
+
+=head3 Parameters
+
+
+=head4 fine_tuning_job_id
+
+The ID of the fine-tuning job to get checkpoints for.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  ft-AF1WoRqd3aJAHsqc9NY7iL8F
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 after
+
+Identifier for the last checkpoint ID from the previous pagination
+request.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+Number of checkpoints to retrieve.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  10
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 listMessages
+
+Returns a list of messages for a given thread.
+
+
+=head3 Parameters
+
+
+=head4 thread_id
+
+The ID of the
+L<thread|https://platform.openai.com/docs/api-reference/threads> the
+messages belong to.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+A limit on the number of objects to be returned. Limit can range
+between 1 and 100, and the default is 20.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  20
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 order
+
+Sort order by the C timestamp of the objects. C for
+ascending order and C for descending order.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  desc
+
+=item * Example:  N/A
+
+=item * Enum:     asc, desc
+
+=back
+
+
+=head4 after
+
+A cursor for use in pagination. C is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, ending with objIfoo in order to fetch the next
+page of the list.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 before
+
+A cursor for use in pagination. C is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, ending with objIfoo in order to fetch the previous
+page of the list.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 run_id
+
+Filter messages by the run ID that generated them.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 listModels
+
+Lists the currently available models, and provides basic information
+about each one such as the owner and availability.
+
+
+This method does not take any path or URL parameters.
+
+
+=head2 listPaginatedFineTuningJobs
+
+List your organization's fine-tuning jobs
+
+
+=head3 Parameters
+
+
+=head4 after
+
+Identifier for the last job from the previous pagination request.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+Number of fine-tuning jobs to retrieve.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  20
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 listRuns
+
+Returns a list of runs belonging to a thread.
+
+
+=head3 Parameters
+
+
+=head4 thread_id
+
+The ID of the thread the run belongs to.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+A limit on the number of objects to be returned. Limit can range
+between 1 and 100, and the default is 20.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  20
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 order
+
+Sort order by the C timestamp of the objects. C for
+ascending order and C for descending order.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  desc
+
+=item * Example:  N/A
+
+=item * Enum:     asc, desc
+
+=back
+
+
+=head4 after
+
+A cursor for use in pagination. C is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, ending with objIfoo in order to fetch the next
+page of the list.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 before
+
+A cursor for use in pagination. C is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, ending with objIfoo in order to fetch the previous
+page of the list.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 listRunSteps
+
+Returns a list of run steps belonging to a run.
+
+
+=head3 Parameters
+
+
+=head4 thread_id
+
+The ID of the thread the run and run steps belong to.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 run_id
+
+The ID of the run the run steps belong to.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+A limit on the number of objects to be returned. Limit can range
+between 1 and 100, and the default is 20.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  20
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 order
+
+Sort order by the C timestamp of the objects. C for
+ascending order and C for descending order.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  desc
+
+=item * Example:  N/A
+
+=item * Enum:     asc, desc
+
+=back
+
+
+=head4 after
+
+A cursor for use in pagination. C is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, ending with objIfoo in order to fetch the next
+page of the list.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 before
+
+A cursor for use in pagination. C is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, ending with objIfoo in order to fetch the previous
+page of the list.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 listVectorStoreFiles
+
+Returns a list of vector store files.
+
+
+=head3 Parameters
+
+
+=head4 vector_store_id
+
+The ID of the vector store that the files belong to.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+A limit on the number of objects to be returned. Limit can range
+between 1 and 100, and the default is 20.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  20
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 order
+
+Sort order by the C timestamp of the objects. C for
+ascending order and C for descending order.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  desc
+
+=item * Example:  N/A
+
+=item * Enum:     asc, desc
+
+=back
+
+
+=head4 after
+
+A cursor for use in pagination. C is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, ending with objIfoo in order to fetch the next
+page of the list.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 before
+
+A cursor for use in pagination. C is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, ending with objIfoo in order to fetch the previous
+page of the list.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 filter
+
+Filter by file status. One of C<in_progress>, C<completed>, C<failed>,
+C<cancelled>.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     in_progress, completed, failed, cancelled
+
+=back
+
+
+
+
+=head2 listVectorStores
+
+Returns a list of vector stores.
+
+
+=head3 Parameters
+
+
+=head4 limit
+
+A limit on the number of objects to be returned. Limit can range
+between 1 and 100, and the default is 20.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  20
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 order
+
+Sort order by the C timestamp of the objects. C for
+ascending order and C for descending order.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  desc
+
+=item * Example:  N/A
+
+=item * Enum:     asc, desc
+
+=back
+
+
+=head4 after
+
+A cursor for use in pagination. C is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, ending with objIfoo in order to fetch the next
+page of the list.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 before
+
+A cursor for use in pagination. C is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, ending with objIfoo in order to fetch the previous
+page of the list.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 modifyAssistant
+
+Modifies an assistant.
+
+
+=head3 Parameters
+
+
+=head4 assistant_id
+
+The ID of the assistant to modify.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 modifyMessage
+
+Modifies a message.
+
+
+=head3 Parameters
+
+
+=head4 thread_id
+
+The ID of the thread to which this message belongs.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 message_id
+
+The ID of the message to modify.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 modifyRun
+
+Modifies a run.
+
+
+=head3 Parameters
+
+
+=head4 thread_id
+
+The ID of the
+L<thread|https://platform.openai.com/docs/api-reference/threads> that
+was run.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 run_id
+
+The ID of the run to modify.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 modifyThread
+
+Modifies a thread.
+
+
+=head3 Parameters
+
+
+=head4 thread_id
+
+The ID of the thread to modify. Only the C<metadata> can be modified.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 modifyVectorStore
+
+Modifies a vector store.
+
+
+=head3 Parameters
+
+
+=head4 vector_store_id
+
+The ID of the vector store to modify.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 retrieveBatch
+
+Retrieves a batch.
+
+
+=head3 Parameters
+
+
+=head4 batch_id
+
+The ID of the batch to retrieve.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 retrieveFile
+
+Returns information about a specific file.
+
+
+=head3 Parameters
+
+
+=head4 file_id
+
+The ID of the file to use for this request.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 retrieveFineTuningJob
+
+Get info about a fine-tuning job.
+
+L<Learn more about
+fine-tuning|https://platform.openai.com/docs/guides/fine-tuning>
+
+
+=head3 Parameters
+
+
+=head4 fine_tuning_job_id
+
+The ID of the fine-tuning job.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  ft-AF1WoRqd3aJAHsqc9NY7iL8F
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 retrieveModel
+
+Retrieves a model instance, providing basic information about the model
+such as the owner and permissioning.
+
+
+=head3 Parameters
+
+
+=head4 model
+
+The ID of the model to use for this request
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  gpt-3.5-turbo
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 submitToolOuputsToRun
+
+When a run has the C<status: "requires_action"> and
+C<required_action.type> is C<submit_tool_outputs>, this endpoint can be
+used to submit the outputs from the tool calls once they're all
+completed. All outputs must be submitted in a single request.
+
+
+=head3 Parameters
+
+
+=head4 thread_id
+
+The ID of the
+L<thread|https://platform.openai.com/docs/api-reference/threads> to
+which this run belongs.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 run_id
+
+The ID of the run that requires the tool output submission.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2024 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

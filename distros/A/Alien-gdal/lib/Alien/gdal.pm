@@ -11,7 +11,7 @@ use Path::Tiny qw /path/;
 use List::Util qw /uniq/;
 use Alien::proj;
 
-our $VERSION = '1.36';
+our $VERSION = '1.37';
 
 my ($have_geos, $have_proj, $have_spatialite);
 my @have_aliens;
@@ -187,11 +187,19 @@ sub data_dir {
         use PkgConfig;
         my %options;
         if (-d $self->dist_dir . '/lib/pkgconfig') {
-            $options{search_path_override} = [$self->dist_dir . '/lib/pkgconfig'];
+            $options{search_path_override} = [ $self->dist_dir . '/lib/pkgconfig' ];
         }
+        #  we could be living in a homebrew cellar
+        if ($self->install_type('system') and defined $ENV{HOMEBREW_PREFIX}) {
+            my @dylibs = $self->dynamic_libs;
+            if (path ($ENV{HOMEBREW_PREFIX})->subsumes($dylibs[0])) {
+                $options{search_path} = [ "$ENV{HOMEBREW_PREFIX}/lib/pkgconfig" ];
+            }
+        }
+
         my $o = PkgConfig->find('gdal', %options);
         if ($o->errmsg) {
-            warn $o->errmsg;       
+            warn $o->errmsg;
         }
         else {
             $path = $o->get_var('datadir');

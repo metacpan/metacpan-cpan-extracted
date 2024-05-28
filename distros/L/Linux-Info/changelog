@@ -1,4 +1,27 @@
-liblinux-info-perl (2.12) trusty; urgency=low
+liblinux-info-perl (2.13) trusty; urgency=low
+  * chore: bump version (#19) 
+
+ -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Mon, 27 May 2024 07:07:37 +0000
+
+liblinux-info-perl () trusty; urgency=low
+  * add support to Raspbian (Debian GNU Linux on Raspberry) (#18)
+  * fix: typo
+  * refactor: subclasses fixes missing fields
+  * chore: cleanup
+  * feat: making OSRelease more robust
+  The class now delegates to subclasses to "fix" missing fields instead
+    of doing itself.
+  * feat: Raspbian support
+  * fix: type cannot be required
+  * fix: missing
+  * fix: properly validating version_signature
+  Properly testing if version_signature is indeed available insteaf of
+    just adding it.
+  * fix: missing data 
+
+ -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Mon, 27 May 2024 07:00:56 +0000
+
+liblinux-info-perl () trusty; urgency=low
   * Bugfix/sysinfo scalar (#17)
   * fix: wrong definition of parameters
   When the distribution based on /etc/os-release wasn't the ones that

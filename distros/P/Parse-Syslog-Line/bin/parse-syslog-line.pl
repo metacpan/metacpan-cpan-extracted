@@ -80,7 +80,7 @@ parse-syslog-line.pl - Parse a syslog message and display the structured data
 
 =head1 VERSION
 
-version 5.0
+version 5.1
 
 =head1 SYNOPSIS
 

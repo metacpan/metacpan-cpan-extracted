@@ -1,5 +1,23 @@
 Revision history for Dist-Zilla-PluginBundle-RJBS
 
+5.029     2024-05-25 18:29:27-04:00 America/New_York
+        - drop minimum perl version to v5.34.0, so that it can be installed on
+          the current ubuntu-latest with stock perl, to power the "dzil
+          workflower" based workflower setup
+
+5.028     2024-05-25 12:30:42-04:00 America/New_York
+        - eliminate UploadToCPAN::OnePassword in favor of allowing a
+          OnePasswordLogin stash in ~/.dzil/config.ini
+
+5.027     2024-05-25 11:24:43-04:00 America/New_York
+        - move 1Password-reading code into a library
+        - the UploadToCPAN::OnePassword plugin is kind of a gross hack that
+          should get replaced in the future
+
+5.026     2024-05-02 15:31:38-04:00 America/New_York (TRIAL RELEASE)
+        - improve the efficiency of GitHub Actions workflow
+        - add UploadToCPAN::OnePassword, which might be a total disaster
+
 5.025     2023-11-20 19:58:30-05:00 America/New_York
         - There is no longer any reason for "toolchain" perl-window to forbid
           the use of "package NAME VERSION", so it doesn't.  We have reached

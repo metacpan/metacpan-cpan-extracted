@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.11
+    version 0.12
 
 SYNOPSIS
 
@@ -369,14 +369,14 @@ FUNCTIONS
     routed to the app instead of making a real HTTP request via
     LWP::UserAgent.
 
- psgi_app_del
+ psgi_app_del [app_del]
 
      psgi_app_del;
      psgi_app_del $url;
 
     Remove the app at the given (or default) URL.
 
- psgi_app_guard
+ psgi_app_guard [app_guard]
 
      my $guard = psgi_app_guard $app;
      my $guard = psgi_app_guard $url, $app;

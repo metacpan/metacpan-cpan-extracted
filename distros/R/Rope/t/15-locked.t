@@ -108,6 +108,7 @@ my $o = Rope->new({
 	properties => [
 		one => 'kaput',
 		two => {
+			initable => 1,
 			writeable => 0,
 			enumerable => 0,
 			builder => sub {
@@ -174,9 +175,6 @@ $k->locked(0);
 $k->{five} = 'unlocked';
 
 is($k->{five}, 'unlocked');
-
-
-
 
 ok(1);
 

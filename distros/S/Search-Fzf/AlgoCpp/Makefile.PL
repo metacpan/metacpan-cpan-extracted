@@ -33,7 +33,7 @@ WriteMakefile(
     NAME              => 'Search::Fzf::AlgoCpp',
     VERSION_FROM      => 'lib/Search/Fzf/AlgoCpp.pm', # finds $VERSION
     PREREQ_PM         => {
-      'ExtUtils::XSpp' => '0.01',
+      'ExtUtils::XSpp::Cmd' => '0',
     }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Search/Fzf/AlgoCpp.pm', # retrieve abstract from module
@@ -51,16 +51,4 @@ WriteMakefile(
     LDDLFLAGS         => $LDDLFLAGS,
     # macro             => {TESTVAR => MakefileTest,},
 );
-
-# sub MY::postamble {
-#   my $self = shift;
-#
-#   my @ret;
-#   push @ret, <<HERE;
-#
-# show::
-# 	echo "Hello World! \$(TESTVAR)"
-# HERE
-#   return join //, @ret;
-# }
 

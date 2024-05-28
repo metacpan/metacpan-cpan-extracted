@@ -3,7 +3,7 @@ package Packme::Test2;
 use Moo;
 use MooX::Pack;
 
-all seperator => (
+seperator (
 	character => 'x',
 	pack => '|',
 	index => [ 1, 3 ],

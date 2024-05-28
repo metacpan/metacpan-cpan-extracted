@@ -16,12 +16,10 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Math::Grid::Coordinates",
   "PREREQ_PM" => {
-    "List::AllUtils" => 0,
     "Moose" => 0,
-    "Moose::Util::TypeConstraints" => 0,
-    "POSIX" => 0
+    "Moose::Util::TypeConstraints" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -29,10 +27,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "List::AllUtils" => 0,
   "Moose" => 0,
-  "Moose::Util::TypeConstraints" => 0,
-  "POSIX" => 0
+  "Moose::Util::TypeConstraints" => 0
 );
 
 

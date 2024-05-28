@@ -1,9 +1,13 @@
 Revision history for pmarkdown and the Markdown::Perl module.
 
+1.07 - 2024-05-25
+
+ - Allow to specify a link content through the resolve_link_ref hook.
+
 1.06 - 2024-05-17
 
  - Add support for setting processing hooks.
- - Add a hook to resolve unresolved link reference.
+ - Add a hook to resolve otherwise unresolved link references.
 
 1.05 - 2024-05-16
 

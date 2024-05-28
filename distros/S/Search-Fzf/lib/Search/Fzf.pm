@@ -20,7 +20,7 @@ use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
 
 #缺省export 函数fzf
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 @ISA = qw(Exporter);
 @EXPORT = qw(fzf);
 # @EXPORT_OK = qw(fzf);

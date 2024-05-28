@@ -1,9 +1,11 @@
-use v5.39.2;
-use feature 'class';
-no warnings 'experimental::class';
+use v5.32;
+use warnings;
+use Object::Pad 0.73;
 
-class Archive::SCS::HashFS 0.03
+class Archive::SCS::HashFS 1.00
   :isa( Archive::SCS::Mountable );
+
+use stable 0.031 'isa';
 
 use Archive::SCS::CityHash qw(
   cityhash64
@@ -279,6 +281,8 @@ sub create_file ($pathname, $scs) {
   }
   print $fh $_ for map { $entries{$_}->{data} } @entries;
 }
+
+1;
 
 
 =head1 NAME

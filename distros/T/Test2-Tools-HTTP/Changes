@@ -1,5 +1,11 @@
 Revision history for Test2-Tools-HTTP
 
+0.12      2024-05-25 20:46:25 -0600
+  - Added shortcuts for app_del and app_guard (gh#8)
+  - Require Perl 5.14 or better (Plack now also
+    requires 5.12 and IO::Socket::IP requires 5.14;
+    both are required by this module).
+
 0.11      2022-08-31 06:24:35 -0600
   - Fix diagnostic output (gh#7)
 

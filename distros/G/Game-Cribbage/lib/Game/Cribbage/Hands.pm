@@ -63,10 +63,6 @@ function add_starter_card => sub {
 			card => $card,
 			flipped => 1
 		);
-		my $hand = ref $player ? $player->player : $player;
-		$self->score->$hand->{last} = $self->score->$hand->{current};
-		$self->score->$hand->{current} += $scored->score;
-		push @{$self->current_hands->$hand->play_scored}, $scored;
 		push @{$self->play->scored}, $scored;
 	}
 

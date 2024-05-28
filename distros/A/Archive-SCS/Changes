@@ -1,9 +1,19 @@
 Revision history for perl distribution Archive-SCS
 
+1.00 - 2024-05-26
+
+  - Support Perls back to v5.32
+
+  - Drop dependency on the String::CityHash module by including Google's CityHash
+    version 1.03, along with an XS adapter
+
+  - Improve tests and documentation
+
 0.03 - 2024-05-23
 
   - Fix release: tar format, dependencies, minimum Perl version
     (feature 'class' had some bugs in v5.38)
+
   - Improve tests and documentation
 
 0.02 - 2024-05-21

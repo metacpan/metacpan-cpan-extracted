@@ -3,7 +3,7 @@
 package Parse::Syslog::Line;
 
 use v5.14;
-use strict;
+use warnings;
 
 use Carp;
 use Const::Fast;
@@ -17,7 +17,7 @@ use Module::Loaded qw( is_loaded );
 use POSIX          qw( strftime tzset );
 use Ref::Util      qw( is_arrayref );
 
-our $VERSION = '5.0';
+our $VERSION = '5.1';
 
 # Default for Handling Parsing
 our $DateParsing     = 1;
@@ -123,8 +123,8 @@ const my %RE => (
     IPv4            => qr/(?>(?:[0-9]{1,3}\.){3}[0-9]{1,3})/,
     preamble        => qr/^\<(\d+)\>/,
     year            => qr/^(\d{4}) /,
-    date            => qr/^([A-Za-z]{3}\s+[0-9]+\s+[0-9]{1,2}(?:\:[0-9]{2}){1,2})/,
-    date_long => qr/^
+    date            => qr/(?<date>[A-Za-z]{3}\s+[0-9]+\s+[0-9]{1,2}(?:\:[0-9]{2}){1,2})/,
+    date_long => qr/
             (?:[0-9]{4}\s+)?                # Year: Because, Cisco
             ([.*])?                         # Cisco adds a * for no ntp, and a . for configured but out of sync
             [a-zA-Z]{3}\s+[0-9]+            # Date: Jan  1
@@ -135,17 +135,17 @@ const my %RE => (
             (?:\s+[A-Z]{3,4})?              # Timezone, ZZZ or ZZZZ
             (?:\:?)                         # Cisco adds a : after the second timestamp
     /x,
-    date_iso8601    => qr/^(
+    date_iso8601    => qr/(?<date_iso8601>
             [0-9]{4}(?:\-[0-9]{2}){2}        # Date YYYY-MM-DD
             (?:\s|T)                         # Date Separator T or ' '
             [0-9]{2}(?:\:[0-9]{2}){1,2}      # Time HH:MM:SS
             (?:\.(?:[0-9]{3}){1,2})?         # Time: .DDD millisecond or .DDDDDD microsecond resolution
             (?:[Zz]|[+\-][0-9]{2}\:[0-9]{2}) # UTC Offset +DD:MM or 'Z' indicating UTC-0
     )/x,
-    host            => qr/^\s*([^:\s]+)\s+/,
-    cisco_hates_you => qr/^\s*[0-9]*:\s+/,
-    program_raw     => qr/^\s*([^\[][^:]+):\s*/,
-    program_name    => qr/^(.[^\[\(\ ]*)(.*)/,
+    host            => qr/\s*(?<host>[^:\s]+)\s+/,
+    cisco_hates_you => qr/\s*[0-9]*:\s+/,
+    program_raw     => qr/\s*([^\[][^:]+)(?<program_sep>:|\s-)\s+/,
+    program_name    => qr/(.[^\[\(\ ]*)(.*)/,
     program_sub     => qr/(?>\(([^\)]+)\))/,
     program_pid     => qr/(?>\[([^\]]+)\])/,
     program_netapp  => qr/(?>\[([^\]]+)\]:\s*)/,
@@ -230,7 +230,7 @@ sub parse_syslog_line {
 
     #
     # grab the preamble:
-    if( $raw_string =~ s/$RE{preamble}//o ) {
+    if( $raw_string =~ s/^$RE{preamble}//o ) {
         # Cast to integer
         $msg{preamble} = int $1;
 
@@ -246,15 +246,15 @@ sub parse_syslog_line {
     #
     # Handle Date/Time
     my $year;
-    if( $raw_string =~ s/$RE{year}//o ) {
+    if( $raw_string =~ s/^$RE{year}//o ) {
         $year = $1;
     }
-    if( $raw_string =~ s/$RE{date}//o) {
+    if( $raw_string =~ s/^$RE{date}//o) {
         $msg{datetime_raw} = $1;
         $msg{datetime_raw} .= " $year"
             if $year;
     }
-    elsif( $raw_string =~ s/$RE{date_iso8601}//o) {
+    elsif( $raw_string =~ s/^$RE{date_iso8601}//o) {
         $msg{datetime_raw} = $1;
     }
     if( exists $msg{datetime_raw} && length $msg{datetime_raw} ) {
@@ -322,8 +322,8 @@ sub parse_syslog_line {
 
     #
     # Host Information:
-    if( $raw_string =~ s/$RE{host}//o ) {
-        my $hostStr = $1;
+    if( $raw_string =~ s/^$RE{host}//o ) {
+        my $hostStr = $+{host};
         my($ip) = ($hostStr =~ /($RE{IPv4})/o);
         if( defined $ip && length $ip ) {
             $msg{host_raw} = $hostStr;
@@ -336,9 +336,17 @@ sub parse_syslog_line {
             $msg{domain} = $domain;
         }
     }
-    if( $raw_string =~ s/$RE{cisco_hates_you}//o ) {
+    # Check for relayed logs, grab the origin
+    while( $raw_string =~ /^(?:\s*[0-9]+\s+)?(?<any_date>$RE{date_iso8601}|$RE{date})\s+$RE{host}/go ) {
+        $msg{origin} = $+{host};
+        $msg{origin_date} = $+{any_date};
+        $raw_string = substr($raw_string,pos($raw_string));
+    }
+
+    # Find weird cisco dates
+    if( $raw_string =~ s/^$RE{cisco_hates_you}//o ) {
         # Yes, Cisco adds a second timestamp to it's messages, because it hates you.
-        if( $raw_string =~ s/$RE{date_long}//o ) {
+        if( $raw_string =~ s/^$RE{date_long}//o ) {
             # Cisco encodes the status of NTP in the second datestamp, so let's pass it back
             if ( my $ntp = $1 ) {
                 $msg{ntp} = $ntp eq '.' ? 'out of sync'
@@ -353,11 +361,13 @@ sub parse_syslog_line {
 
     #
     # Parse the Program portion
+    my $progsep = ':';
     if( $ExtractProgram ) {
-        if( $raw_string =~ s/$RE{program_raw}//o ) {
+        if( $raw_string =~ s/^$RE{program_raw}//o ) {
+            $progsep = $+{program_sep};
             $msg{program_raw} = $1;
             my $progStr = join ' ', grep {!exists $INT_PRIORITY{$_}} split /\s+/, $msg{program_raw};
-            if( $progStr =~ /$RE{program_name}/o ) {
+            if( $progStr =~ /^$RE{program_name}/o ) {
                 $msg{program_name} = $1;
                 my $remainder      = $2;
                 if ( $remainder ) {
@@ -393,7 +403,7 @@ sub parse_syslog_line {
     # The left overs should be the message
     $msg{content} = $raw_string;
     chomp $msg{content};
-    $msg{message} = defined $msg{program_raw} ? "$msg{program_raw}: $msg{content}" : $msg{content};
+    $msg{message} = defined $msg{program_raw} ? "$msg{program_raw}$progsep $msg{content}" : $msg{content};
 
     # Extract RFC Structured Data
     if( $RFC5424StructuredDataStrict ) {
@@ -584,7 +594,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 =head1 VERSION
 
-version 5.0
+version 5.1
 
 =head1 SYNOPSIS
 

@@ -2,17 +2,11 @@ package Rope::Autoload;
 use strict;
 use warnings;
 use Want;
-
+use Rope::Pro;
 my (%PRO);
 
 BEGIN {
-	%PRO = (
-		keyword => sub {
-			my ($caller, $method, $cb) = @_;
-			no strict 'refs';
-			*{"${caller}::${method}"} = $cb;
-		}
-	);
+	%PRO = Rope::Pro->new;
 }
 
 sub import {
@@ -39,7 +33,7 @@ Rope::Autoload - Rope Autoload!
 
 =head1 VERSION
 
-Version 0.38
+Version 0.40
 
 =cut
 

@@ -11,6 +11,7 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Path::Tiny: '0'
+  Redis: '0'
   RedisDB: '2.57'
   Test::CheckDeps: '0.010'
   Test::Deep: '0'
@@ -30,7 +31,7 @@ configure_requires:
   ExtUtils::MakeMaker: '7.64'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -46,13 +47,13 @@ no_index:
 provides:
   Data::Validate::Sanctions:
     file: lib/Data/Validate/Sanctions.pm
-    version: '0.16'
+    version: '0.17'
   Data::Validate::Sanctions::Fetcher:
     file: lib/Data/Validate/Sanctions/Fetcher.pm
-    version: '0.16'
+    version: '0.17'
   Data::Validate::Sanctions::Redis:
     file: lib/Data/Validate/Sanctions/Redis.pm
-    version: '0.16'
+    version: '0.17'
 requires:
   Carp: '0'
   Clone: '0'
@@ -87,7 +88,7 @@ resources:
   bugtracker: https://github.com/binary-com/perl-Data-Validate-Sanctions/issues
   homepage: https://github.com/binary-com/perl-Data-Validate-Sanctions
   repository: https://github.com/binary-com/perl-Data-Validate-Sanctions.git
-version: '0.16'
+version: '0.17'
 x_authority: cpan:DERIV
 x_contributors:
   - 'Tazeek <tazeek.rakib@gmail.com>'
@@ -101,10 +102,15 @@ x_contributors:
   - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
   - 'Kirill Sysoev <55120154+kirill-binary@users.noreply.github.com>'
   - 'Mahdi Zarei <60599487+mehdi-fs@users.noreply.github.com>'
+  - 'nihal-deriv <105702884+nihal-deriv@users.noreply.github.com>'
   - 'Anthony-Wong <34021543+Anthony-Wong@users.noreply.github.com>'
   - 'Chylli <chylli.email@gmail.com>'
+  - 'chylli-deriv <52912308+chylli-deriv@users.noreply.github.com>'
+  - 'chylli-deriv <chylli@deriv.com>'
   - 'Evgeniy Vostrov <107458551+evgeniy-deriv@users.noreply.github.com>'
+  - 'jafrul-deriv <150781410+jafrul-deriv@users.noreply.github.com>'
   - 'lq <liuqiang1981@gmail.com>'
+  - 'mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>'
   - 'ragheb <91007977+ragheb-deriv@users.noreply.github.com>'
   - 'Zak B. Elep <zakame@zakame.net>'
 x_generated_by_perl: v5.26.2

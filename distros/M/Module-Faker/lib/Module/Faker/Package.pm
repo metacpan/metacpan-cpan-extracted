@@ -1,4 +1,4 @@
-package Module::Faker::Package 0.026;
+package Module::Faker::Package 0.027;
 # ABSTRACT: a faked package in a faked module
 
 use v5.20.0;
@@ -119,7 +119,7 @@ Module::Faker::Package - a faked package in a faked module
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 PERL VERSION
 

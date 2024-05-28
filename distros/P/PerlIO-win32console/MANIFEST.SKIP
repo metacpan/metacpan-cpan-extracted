@@ -1,0 +1,10 @@
+\.o$
+\.obj$
+Makefile$
+win32console\.(o|obj|def|c|bs)
+MYMETA\.
+^pm_to_blib$
+^blib/
+~$
+^\.git/
+MANIFEST\.bak$

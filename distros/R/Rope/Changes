@@ -85,3 +85,11 @@ Revision history for Rope
 
 0.38	2024-05-23
 	- Adds Rope::Lazier.
+
+0.39	2024-05-25
+	- Extends Rope::Lazier with pro(totyped), prop(erty), prop(ertie)s, be(fore), ar(ound), af(ter).
+	- Adds Rope::Pro to reduce duplication of the keyword sub
+
+0.40	2024-05-25
+	- Extends Rope with a private keyword that assists in creating private properties
+	- Extends Rope::Lazier with pri(vate)

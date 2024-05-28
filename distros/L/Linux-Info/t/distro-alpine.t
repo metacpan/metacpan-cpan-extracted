@@ -11,6 +11,7 @@ my @fixtures = (
     [ 'get_version_id',     '3.12.0' ],
     [ 'get_home_url',       'https://alpinelinux.org/' ],
     [ 'get_bug_report_url', 'https://bugs.alpinelinux.org/' ],
+    [ 'get_version',        undef ],
 );
 
 can_ok( $class, map { $_->[0] } @fixtures );

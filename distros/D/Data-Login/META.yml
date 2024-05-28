@@ -3,7 +3,7 @@ abstract: 'Data objects for login.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
-  Data::HashType: 0.04
+  Data::HashType: 0.05
   DateTime: 0
   English: 0
   Error::Pure::Utils: 0
@@ -30,11 +30,11 @@ requires:
   DateTime: 0
   Error::Pure: 0
   Mo: 0
-  Mo::utils: 0.21
+  Mo::utils: 0.28
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Data-Login/issues
   homepage: https://github.com/michal-josef-spacek/Data-Login
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-Login
-version: '0.03'
+version: '0.04'

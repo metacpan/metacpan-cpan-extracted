@@ -12,7 +12,7 @@ use JSON::MaybeUTF8 qw(encode_json_utf8 decode_json_utf8);
 use YAML::XS        qw(DumpFile);
 use Syntax::Keyword::Try;
 
-our $VERSION = '0.16';    # VERSION
+our $VERSION = '0.17';    # VERSION
 
 sub new {
     my ($class, %args) = @_;

@@ -1,5 +1,8 @@
 Revision history for Module-Faker
 
+0.027     2024-05-25 19:27:03-04:00 America/New_York
+        - support creating zipfile archives
+
 0.026     2024-04-28 14:23:57+01:00 Europe/Lisbon
         - add Data::Fake::CPAN for fully automated generation of fakes
 

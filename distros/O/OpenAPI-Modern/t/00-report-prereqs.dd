@@ -57,6 +57,7 @@ do { my $x = {
                                       'Storable' => '0',
                                       'Types::Standard' => '0',
                                       'URI::Escape' => '0',
+                                      'autovivification' => '0',
                                       'constant' => '0',
                                       'experimental' => '0',
                                       'if' => '0',

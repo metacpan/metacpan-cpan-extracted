@@ -21,7 +21,6 @@
        / / / / __ \/ / _ \/ __ `/ ___/ __ \/ _ \/ __  /
       / /_/ / / / / /  __/ /_/ (__  ) / / /  __/ /_/ /
       \__,_/_/ /_/_/\___/\__,_/____/_/ /_/\___/\__,_/
-     
 
 # NAME
 
@@ -126,7 +125,23 @@ Show a stack trace.
 
 Watch a reference for changes.
 
-    watch( $ref, $depth=3 )
+    watch( $ref, OPTIONS )
+
+OPTIONS:
+
+    -clone => 0,               # Will not watch cloned objects.
+
+    -methods => "fetch",       # Monitor just this method.
+    -methods => [ "fetch" ],   # Same.
+
+    -levels  => NUM,           # How many scope levels to show.
+    NUM,                       # Same.
+
+    -raw => 1,                 # Include internal calls.
+    -NUM,                      # Same.
+
+    -message => STR,           # Message to display.
+    STR,                       # Same.
 
 ## prof
 

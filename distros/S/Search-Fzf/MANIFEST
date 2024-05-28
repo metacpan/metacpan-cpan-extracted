@@ -5,7 +5,6 @@ AlgoCpp/algo.h
 AlgoCpp/algo.xsp
 AlgoCpp/jpcre2.hpp
 AlgoCpp/lib/Search/Fzf/AlgoCpp.pm
-AlgoCpp/ppport.h
 AlgoCpp/reader.cc
 AlgoCpp/t/00-load.t
 AlgoCpp/t/01-read.t
@@ -17,7 +16,6 @@ Changes
 MANIFEST
 Makefile.PL
 README
-lib/Search/Fzf/AlgoCpp.pm
 lib/Search/Fzf/Tui.pm
 lib/Search/Fzf.pm
 lib/Search/Fzf.pod

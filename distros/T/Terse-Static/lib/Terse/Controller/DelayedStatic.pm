@@ -26,6 +26,11 @@ sub static_ttf :get(static) :view(static) :delayed :path(static/(.*\.ttf)) :capt
 
 sub static_woff :get(static) :view(static) :delayed :path(static/(.*\.woff2*)) :captured(1) :content_type(application/font-woff) { }
 
+sub static_mov :get(static) :view(static) :delayed :path(static/(.*\.mov*)) :captured(1) :content_type(video/mp4) { }
+
+sub static_mp4 :get(static) :view(static) :delayed :path(static/(.*\.mp4*)) :captured(1) :content_type(video/mp4) { }
+
+
 1;
 
 __END__;
@@ -38,7 +43,7 @@ Terse::Controller::DelayedStatic - Serve delayed static resources controller
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

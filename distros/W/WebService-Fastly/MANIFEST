@@ -94,6 +94,9 @@ docs/Customer.md
 docs/CustomerApi.md
 docs/CustomerResponse.md
 docs/CustomerResponseAllOf.md
+docs/DefaultSettings.md
+docs/DefaultSettingsError.md
+docs/DefaultSettingsResponse.md
 docs/Dictionary.md
 docs/DictionaryApi.md
 docs/DictionaryInfoApi.md
@@ -191,6 +194,7 @@ docs/IamServiceGroupsApi.md
 docs/IamUserGroup.md
 docs/IamUserGroupAllOf.md
 docs/IamUserGroupsApi.md
+docs/ImageOptimizerDefaultSettingsApi.md
 docs/IncludedWithWafActiveRuleItem.md
 docs/IncludedWithWafExclusionItem.md
 docs/IncludedWithWafFirewallVersionItem.md
@@ -854,6 +858,7 @@ lib/WebService/Fastly/IamPermissionsApi.pm
 lib/WebService/Fastly/IamRolesApi.pm
 lib/WebService/Fastly/IamServiceGroupsApi.pm
 lib/WebService/Fastly/IamUserGroupsApi.pm
+lib/WebService/Fastly/ImageOptimizerDefaultSettingsApi.pm
 lib/WebService/Fastly/InvitationsApi.pm
 lib/WebService/Fastly/KvStoreApi.pm
 lib/WebService/Fastly/KvStoreItemApi.pm
@@ -967,6 +972,9 @@ lib/WebService/Fastly/Object/CreateResponseObjectRequest.pm
 lib/WebService/Fastly/Object/Customer.pm
 lib/WebService/Fastly/Object/CustomerResponse.pm
 lib/WebService/Fastly/Object/CustomerResponseAllOf.pm
+lib/WebService/Fastly/Object/DefaultSettings.pm
+lib/WebService/Fastly/Object/DefaultSettingsError.pm
+lib/WebService/Fastly/Object/DefaultSettingsResponse.pm
 lib/WebService/Fastly/Object/Dictionary.pm
 lib/WebService/Fastly/Object/DictionaryInfoResponse.pm
 lib/WebService/Fastly/Object/DictionaryItem.pm

@@ -15,7 +15,7 @@ use Class::XSAccessor getters => {
     get_build_datetime => 'build_datetime',
 };
 
-our $VERSION = '2.12'; # VERSION
+our $VERSION = '2.13'; # VERSION
 
 # ABSTRACT: parses and provide Linux kernel detailed information
 
@@ -42,7 +42,7 @@ sub _parse_proc_ver {
 
     if ( $line =~ $self->{proc_regex} ) {
 
-        my @required = qw(compiled_by gcc_version type build_datetime version);
+        my @required = qw(compiled_by gcc_version build_datetime version);
 
         foreach my $key (@required) {
             confess "Missing '$key' in the regex match groups"
@@ -179,7 +179,7 @@ Linux::Info::KernelRelease - parses and provide Linux kernel detailed informatio
 
 =head1 VERSION
 
-version 2.12
+version 2.13
 
 =head1 SYNOPSIS
 

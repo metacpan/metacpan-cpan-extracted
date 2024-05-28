@@ -248,6 +248,16 @@ function cannot_play => sub {
 	$self->rounds->current_round->cannot_play_a_card($player);
 };
 
+function player_cannot_play => sub {
+	my ($self, $player) = @_;
+	return exists $self->rounds->current_round->current_hands->cannot_play->{$player};
+};
+
+function no_player_can_play => sub {
+	my ($self) = @_;
+	return scalar(keys(%{$self->rounds->current_round->current_hands->cannot_play})) == scalar(@{$self->players});
+};
+
 function next_play => sub {
 	my ($self) = @_;
 	$self->rounds->current_round->next_play($self);
@@ -356,6 +366,11 @@ function next_to_play => sub {
 	$self->rounds->current_round->next_to_play($self);
 };
 
+function set_next_to_play => sub {
+	my ($self, $player) = @_;
+	$self->rounds->current_round->current_hand->splay->next_to_play = $player;
+};
+
 function hand_play_history => sub {
 	my ($self) = @_;
 	$self->rounds->current_round->hand_play_history();
@@ -365,5 +380,11 @@ function reset_hands => sub {
 	my ($self) = @_;
 	$self->rounds->current_round->reset_hands();
 };
+
+function last_round_hands => sub {
+	my ($self) = @_;
+	return $self->rounds->current_round->history->[-2];
+};
+
 
 1;

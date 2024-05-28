@@ -1,27 +1,49 @@
 package Math::Grid::Coordinates;
 
-use Moose;
-use Moose::Util::TypeConstraints;
+use Mojo::Util qw/dumper/;
 
-use List::AllUtils qw/max/;
-use POSIX qw/ceil/;
+use Moo;
+use Scalar::Util qw/looks_like_number/;
+use List::MoreUtils qw/uniq/;
+use Carp;
 
-# number of items
-has [ qw/grid_width grid_height page_width page_height/ ] => ( is => 'rw', isa => 'Int' );
+my $NUM = sub { local $_ = shift; !$_ || (looks_like_number($_) && $_ >= 0) };
 
-has [ qw/page_width page_height/ ] => ( is => 'rw', isa => 'Num' );
+has [ qw/grid_width grid_height/ ] => ( is => 'rwp', isa => sub { local $_ = shift; looks_like_number($_) && int($_) == $_ && $_ > 0 } );
+
+has [ qw/page_width page_height/ ] => ( is => 'rwp', isa => $NUM );
 
 # item size
-has [ qw/item_width item_height/ ] => ( is => 'rw', isa => 'Num' );
 
-# gutter border
-has [ qw/gutter gutter_h gutter_v border border_l border_r border_t border_b/ ] => ( is => 'rw', isa => 'Num' );
+has [ qw/item_width item_height/ ] => ( is => 'rwp', isa => $NUM );
 
-subtype 'Seq', as 'Str', where { /[h,v]/i };
-has arrange => ( is => 'rw', isa => 'Seq', default => sub { 'h' } );
+has [ qw/gutter_h gutter_v border_l border_r border_t border_b/ ] => ( is => 'rwp', isa => $NUM );
 
-# has item_sizes => ( is => 'rw', isa => 'ArrayRef[ArrayRef[Num]]' );
+has "gutter" => (is => 'rwp', isa => $NUM, trigger => sub {
+		     my ($self, $g) = @_;
+		     if (defined $g) { for (qw/gutter_h gutter_v/) { my $set = "_set_$_"; $self->$set($g) } }
+		     if ($self->gutter_v != $self->gutter_h) { carp "Multiple gutters"; return undef }
+		 });
 
+has "border" => (is => 'rwp',
+		 isa => $NUM,
+		 trigger => sub {
+		     my ($self, $b) = @_;
+		     if (defined $b) { for (qw/border_l border_r border_t border_b/) { my $set = "_set_$_"; $self->$set($b) } }
+		     if (1 < scalar uniq map { $self->$_ } qw/border_l border_r border_t border_b/) {
+			 carp "Multiple borders"; return undef
+		     }
+		 });
+
+
+has arrange => ( is => 'rw', isa => sub { !$_ || /^h$/i || /^v$/i } , default => sub { 'h' } );
+
+# grid and page sizes
+# total items and sizes
+# gutter and border as percentage
+
+# 10pw
+# 10iw
 
 around BUILDARGS => sub {
     my $orig  = shift;
@@ -29,29 +51,103 @@ around BUILDARGS => sub {
     my $opts;
 
     if ( !ref $_[0] ) {
-	my %h;
-	@h{qw/grid_width grid_height item_width item_height gutter border/} = grep { /[^a-z]/i } @_;
-
-	($h{arrange}) = (grep { /^[h,v]i/ } @_) || ('h');
-	$h{gutter} ||= 0;
-	$h{border} ||= 0;
-	# return $class->$orig( \%h );
-	$opts = \%h;
-    } else {
-	$opts = shift;
+	return $class->build_simple($orig, @_);
     }
-    $opts->{gutter_h} //= $opts->{gutter} // 0;
-    $opts->{gutter_v} //= $opts->{gutter} // $opts->{gutter_v} // 0;
+    elsif ($_[0]->{page_height} && $_[0]->{page_width}) {
+	return $class->build_from_page($orig, @_);
+    }
+    else {
+	return $class->build_from_grid($orig, @_);
+    }
+};
 
-    $opts->{border_t} //= $opts->{border} // $opts->{gutter_v} // 0;
-    $opts->{border_b} //= $opts->{border_t} // $opts->{border} // $opts->{gutter_v} // 0;
+sub build_simple {
+    my $class = shift;
+    my $orig = shift;
 
-    $opts->{border_l} //= $opts->{border} // $opts->{gutter_h} // 0;
-    $opts->{border_r} //= $opts->{border_l};
+    my %h;
+    my $mode = "grid";
+    if ($_[0] eq 'page' || $_[0] eq 'grid') { $mode = shift @_ }
+    @h{$mode . "_width", $mode . "_height", qw/item_width item_height gutter border/} = grep { /[^a-z]/i } @_;
+    ($h{arrange}) = (grep { /^[h,v]i/ } @_) || ('h');
+
+    my $opts = \%h;
+
+    $opts = _handle_percentages($opts);
+    $opts = _handle_shortcuts($opts);
 
     my $obj = $class->$orig($opts);
     return $obj;
+}
+
+sub _handle_percentages {
+    my $opts = shift;
+    for (grep { (/^gutter/ || /^border/) && ($opts->{$_} || "") =~ /(\d+)([pi])([wh])$/ } keys $opts->%*) {
+	$opts->{$_} =~ /(\d+)([pi])([wh])$/;
+	my $ref = join "_", ($2 eq "p" ? "page" : "item"), ($3 eq "w" ? "width" : "height");
+	croak "$ref not defined yet: cannot calculate $_" unless defined $opts->{$ref};
+	$opts->{$_} = ($1 / 100) * $opts->{$ref};
+    }
+    return $opts;
+}
+
+sub _handle_shortcuts {
+    my $opts = shift;
+
+    for (qw/border_l border_r border_t border_b/) { $opts->{$_} //= $opts->{border} }
+    for (qw/gutter_h gutter_v/) { $opts->{$_} //= $opts->{gutter} }
+    for (qw/gutter gutter_h gutter_v border border_l border_r border_t border_b/) { $opts->{$_} //= 0 }
+
+    return $opts;
+}
+
+sub _handle_conflicts {
+    my $opts = shift;
+    croak "cannot set both page_width and item_width at grid creation stage" if $opts->{page_width} && $opts->{item_width};
+    croak "cannot set both page_height and item_height at grid creation stage" if $opts->{page_height} && $opts->{item_height};
+}
+
+sub build_from_grid {
+    my $class = shift;
+    my $orig = shift;
+    my $opts = shift;
+
+    $opts = _handle_percentages($opts);
+    $opts = _handle_shortcuts($opts);
+
+    $opts->{page_height} = ($opts->{border_t} + $opts->{gutter_v} * ($opts->{grid_height} - 1) + $opts->{item_height} * $opts->{grid_height} + $opts->{border_b});
+    $opts->{page_width}  = ($opts->{border_l} + $opts->{gutter_h} * ($opts->{grid_width}  - 1) + $opts->{item_width}  * $opts->{grid_width} + $opts->{border_r});
+ 
+    return $class->$orig($opts);
+}
+
+sub build_from_page {
+    my $class = shift;
+    my $orig = shift;
+    my $opts = shift;
+
+    $opts = _handle_percentages($opts);
+    $opts = _handle_shortcuts($opts);
+
+    my $avail_v = $opts->{page_height} - ($opts->{border_t} + $opts->{gutter_v} * ($opts->{grid_height} - 1) + $opts->{border_b});
+    my $avail_h = $opts->{page_width}  - ($opts->{border_l} + $opts->{gutter_h} * ($opts->{grid_width}  - 1) + $opts->{border_r});
+
+    # print $avail_h, $avail_v;
+
+    $opts->{item_width}  = $avail_h / $opts->{grid_width};
+    $opts->{item_height} = $avail_v / $opts->{grid_height};
+
+    return $class->$orig($opts);
+}
+
+
+around [ qw/page_width page_height/ ] => sub {
+    my $orig = shift;
+    my $self = shift;
+    croak "Page size can only be set at grid creation" if @_;
+    return $orig->($self, @_);
 };
+
 
 sub total_height {
     my $self = shift;
@@ -87,21 +183,15 @@ sub position {
 
     my ($x, $y) = @_;
     my ($iw, $ih, $gt_h, $gt_v, $bl, $bt) = map { $self->$_ } qw/item_width item_height gutter_h gutter_v border_l border_t/; 
-
+    # print ($x, $y, $iw, $ih, $gt_h, $gt_v, $bl, $bt);
     return (
-	    $bl + $iw * $x + $gt_h * $x,
-	    $bt + $ih * $y + $gt_v * $y
+	    ($bl + $iw * $x + $gt_h * $x),
+	    ($bt + $ih * $y + $gt_v * $y)
 	   )
 }
 
 sub positions {
     my $self = shift;
-    # my ($x1, $y1, $x2, $y2) = @_;
-
-    # for ($x1, $y1) { $_ ||= 0 }; 
-
-    # my ($gw, $gh, $iw, $ih, $gt_h, $gt_v, $bl, $br, $bt, $bb) = map { $self->$_ }
-    # 	qw/grid_width grid_height item_width item_height gutter_h gutter_v border_l border_r border_t border_b/; 
 
     # first assign positions in terms of page coordinates
     my @grid = $self->sequence;
@@ -112,6 +202,25 @@ sub positions {
     } @grid;
 
     return @pos;
+}
+
+sub block {
+    my $self = shift;
+    my ($x, $y, $w, $h) = @_;
+
+    my ($iw, $ih, $gt_h, $gt_v, $bl, $bt) = map { $self->$_ } qw/item_width item_height gutter_h gutter_v border_l border_t/; 
+
+    my ($x_pos, $y_pos) = (
+			   $bl + $iw * $x + $gt_h * $x,
+			   $bt + $ih * $y + $gt_v * $y,
+			  );
+
+    my ($width, $height) = (
+			   $iw * $w + $gt_h * ($w - 1),
+			   $ih * $h + $gt_v * ($h - 1),
+			   );
+
+    return ($x_pos, $y_pos, $width, $height)
 }
 
 sub guides {
@@ -132,13 +241,31 @@ sub guides {
     return @guides;
 }
 
+sub marks {
+    my $self = shift;
+    my $l = shift || 12;
+
+    my @marks = $self->guides;
+
+    for my $m (@marks) {
+	if ($m->[0][0] == $m->[1][0]) {
+	    $m->[0][1] -= $l;
+	    $m->[1][1] += $l;
+	}
+	elsif ($m->[0][1] == $m->[1][1]) {
+	    $m->[0][0] -= $l;
+	    $m->[1][0] += $l;
+	}
+    }
+    return @marks
+}
+
+
 sub calculate {
     my $self = shift;
 
     my $avail_v = $self->page_height - ($self->border_t + $self->gutter_v * ($self->grid_height - 1) + $self->border_b);
     my $avail_h = $self->page_width  - ($self->border_l + $self->gutter_h * ($self->grid_width  - 1) + $self->border_r);
-
-    # print $avail_h, $avail_v;
 
     $self->item_width($avail_h / $self->grid_width);
     $self->item_height($avail_v / $self->grid_height);
@@ -152,7 +279,31 @@ sub numbers {
     return (1..($self->grid_width * $self->grid_height))
 }
 
-__PACKAGE__->meta->make_immutable;
+sub repage {
+    my $self = shift;
+    my $opts = shift;
+    my $prev = $self->to_hash;
+
+    for (grep { !(defined $opts->{$_}) } keys $opts->%*) { delete $prev->{$_} }
+    for (grep {  (defined $opts->{$_}) } keys $opts->%*) { $prev->{$_} = $opts->{$_} }
+
+    my $clone = $self = Math::Grid::Coordinates->new($prev);
+    for (qw/item_height border_r gutter grid_width border_t border_l page_width border page_height gutter_v grid_height gutter_h border_b item_width/) {
+	my $setter = "_set_$_";
+	$self->$setter($clone->$_)
+    }
+    $self->arrange($clone->arrange);
+    return $self;
+}
+
+
+sub to_hash {
+    my $self = shift;
+    my @keys = qw/grid_width grid_height border_r border_b border_t border_l gutter_v gutter_h item_height item_width page_height page_width arrange/;
+    return { map { $_ =>($self->$_ || 0) } @keys };
+    return { $self->%* };
+}
+
 
 1;
 
@@ -160,27 +311,37 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 NAME
 
-Grid - create geometric grids
+Math::Grid::Coordinates - create geometric grids
 
 =head1 SYNOPSYS
 
- use Grid;
+ use Math::Grid::Coordinates;
 
- my $grid = Grid->new($grid_width, $grid_height, $item_width, $item_height, $gutter, $border, $arrangement);
+ my $grid = Math::Grid::Coordinates->new($grid_width, $grid_height, $item_width, $item_height, $gutter, $border, $arrangement);
 
 =head1 DESCRIPTION
 
-Grid creates an array of x-y positions for items of a given height and width arranged in a grid. This is used to create grid layouts on a page, or repeate items on a number of pages of the same size.
+Math::Grid::Coordinates creates an array of x-y positions for items of a given height and width arranged in a grid. This is used to create grid layouts on a page, or repeate items on a number of pages of the same size.
 
 =head1 REQUIRES
 
-L<POSIX> 
+L<Moo> 
 
-L<List::AllUtils> 
+=head1 INITIALIZING THE GRID
 
-L<Moose::Util::TypeConstraints> 
+The grid can be initialized by setting page size, the number of the items and the gutters and borders, like so:
 
-L<Moose> 
+ my $grid = Math::Grid::Coordinates->new({ page_width => 210, page_height => 297, grid_width => 2, grid_height => 3, gutter => 6, border => 12 });
+
+in which case the item size is calculated.
+
+It can also be initialized by setting item size, the number of the items and the gutters and borders, like so:
+
+ my $grid = Math::Grid::Coordinates->new({ item_width => 210, item_height => 297, grid_width => 2, grid_height => 3, gutter => 6, border => 12 });
+
+Gutters and borders can be percentages of page width or height like so:
+
+ my $grid = Math::Grid::Coordinates->new({ item_width => 210, item_height => 297, grid_width => 2, grid_height => 3, gutter => 2pw, border => 4pw });
 
 
 =head1 METHODS
@@ -231,6 +392,18 @@ Returns the sequence of x-y grid item coordinates, with the top left item as ite
  |         |         |         |         |
  +---------+---------+---------+---------+
 
+=head2 position
+
+ $grid->position(0, 0);
+
+Returns the position of item as an array of x and y coordinates.
+
+=head2 block
+
+ $grid->block($x, $y, $width, $height);
+
+Returns the position and size of item as an array of x and y coordinates, and width and height.
+
 =head2 positions
 
  $grid->positions();
@@ -249,17 +422,27 @@ The total height of the grid
 
 The total width of the grid
 
+=head2 calculate
+
+ $grid->calculate();
+
+Calculates item width and height based on page size, borders, gutters and item count
+
+=head2 guides
+
+ $grid->guides();
+
+Returns start and end coordinates of layout guides
+
+=head2 marks
+
+ $grid->marks($length);
+
+Returns start and end coordinates of layout marks (short lines outside page)
+
 =head1 To do
 
 =over 4
-
-=item *
-
-Allow for different vertical and horizontal gutters 
-
-=item *
-
-Allow for different top, bottom, left right borders
 
 =item *
 

@@ -24,11 +24,10 @@ SIGNATURE
 t/Data-Login-Role/01-use.t
 t/Data-Login-Role/02-version.t
 t/Data-Login-Role/03-new.t
-t/Data-Login-Role/04-active.t
-t/Data-Login-Role/05-id.t
-t/Data-Login-Role/06-role.t
-t/Data-Login-Role/07-valid_from.t
-t/Data-Login-Role/08-valid_to.t
+t/Data-Login-Role/04-id.t
+t/Data-Login-Role/05-role.t
+t/Data-Login-Role/06-valid_from.t
+t/Data-Login-Role/07-valid_to.t
 t/Data-Login/01-use.t
 t/Data-Login/02-version.t
 t/Data-Login/03-new.t

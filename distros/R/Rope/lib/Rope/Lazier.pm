@@ -1,15 +1,21 @@
 package Rope::Lazier;
 
 use Types::Standard;
+use Rope::Pro;
 
 my (%PRO);
 
 BEGIN {
-	%PRO = (
-		keyword => sub {
-			my ($caller, $method, $cb) = @_;
-			no strict 'refs';
-			*{"${caller}::${method}"} = $cb;
+	%PRO = Rope::Pro->new(
+		function_map => {
+			pro => 'prototyped',
+			prop => 'property',
+			props => 'properties',
+			fun => 'function',
+			pri => 'private',
+			ar => 'around',
+			af => 'after',
+			be => 'before'
 		},
 		property_map => {
 			v => 'value',
@@ -34,13 +40,21 @@ BEGIN {
 sub import {
 	my ($caller, $pkg, @props) = (scalar caller, @_);
 
-	@props = keys %{$PRO{property_map}} if (! scalar @props);
+	@props = (keys(%{$PRO{property_map}}), keys(%{$PRO{function_map}})) if (! scalar @props);
 
-	for my $p (@props) { 
-		$PRO{keyword}($caller, $p, sub {
-			my ($param) = @_;
-			return ($PRO{property_map}{$p} => ($param // 1));
-		});
+	for my $p (@props) {
+		if ($PRO{property_map}{$p}) { 
+			$PRO{keyword}($caller, $p, sub {
+				my ($param) = @_;
+				return ($PRO{property_map}{$p} => ($param // 1));
+			});
+		} elsif ($PRO{function_map}{$p}) {
+			$PRO{keyword}($caller, $p, sub {
+				my (@params) = @_;
+				my $meth = $PRO{function_map}{$p};
+				$caller->$meth(@params);
+			});
+		}
 	}
 }
 
@@ -54,7 +68,7 @@ Rope::Lazier - Rope done lazier
 
 =head1 VERSION
 
-Version 0.38
+Version 0.40
 
 =cut
 
@@ -63,13 +77,13 @@ Version 0.38
 	package Knot;
 
 	use Rope;
-	use Rope::Lazier qw/v c e t/
+	use Rope::Lazier qw/prop fun v c e t/
 	use Types::Standard qw/Int/;
 	
-	property loops => (v(1), c, t(Int));
-	property [qw/hitches bends/] => (v(10), c, e, t(Int));
+	prop loops => (v(1), c, t(Int));
+	prop [qw/hitches bends/] => (v(10), c, e, t(Int));
 
-	function add_loops => sub {
+	fun add_loops => sub {
 		my ($self, $loop) = @_;
 		$self->{loops} += int->($loop);
 	};
@@ -86,6 +100,48 @@ Version 0.38
 
 
 =head1 Exports
+
+=cut
+
+=head2 pro
+
+prototyped
+
+=cut
+
+=head2 prop
+
+property
+
+=cut
+
+=head2 props
+
+properties
+
+=cut
+
+=head2 fun
+
+function
+
+=cut
+
+=head2 be
+
+before
+
+=cut
+
+=head2 ar
+
+around
+
+=cut
+
+=head2 af
+
+after
 
 =cut
 

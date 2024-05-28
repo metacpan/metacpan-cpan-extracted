@@ -1,0 +1,8 @@
+PRETTY_NAME="Raspbian GNU/Linux trixie/sid"
+NAME="Raspbian GNU/Linux"
+VERSION_CODENAME=trixie
+ID=raspbian
+ID_LIKE=debian
+HOME_URL="http://www.raspbian.org/"
+SUPPORT_URL="http://www.raspbian.org/RaspbianForums"
+BUG_REPORT_URL="http://www.raspbian.org/RaspbianBugs"

@@ -1,9 +1,11 @@
-use v5.39.2;
-use feature 'class';
-no warnings 'experimental::class';
+use v5.32;
+use warnings;
+use Object::Pad 0.73;
 
-class Archive::SCS::InMemory 0.03
+class Archive::SCS::InMemory 1.00
   :isa( Archive::SCS::Mountable );
+
+use stable 0.031 'isa';
 
 use Archive::SCS::CityHash 'cityhash64';
 use Archive::SCS::DirIndex;
@@ -100,6 +102,8 @@ method read_entry ($hash) {
 method entries () {
   keys %entries
 }
+
+1;
 
 
 =head1 NAME

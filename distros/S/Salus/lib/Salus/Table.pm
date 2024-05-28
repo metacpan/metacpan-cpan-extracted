@@ -7,6 +7,7 @@ use Types::Standard qw/Str ArrayRef Bool/;
 use Salus::Row;
 use Salus::Row::Column;
 use Digest::SHA qw/hmac_sha256_hex/;
+use Text::Diff qw//;
 
 property file => (
 	initable => 1,
@@ -52,13 +53,13 @@ property rows => (
 	value => [],
 );
 
-function count => sub {
-	return scalar @{$_[0]->rows};
-};
-
-function hmac => sub {
+private hmac => sub {
 	my ($self, $data) = @_;
 	return hmac_sha256_hex($data, $self->secret ? $self->secret : ());
+};
+
+function count => sub {
+	return scalar @{$_[0]->rows};
 };
 
 function read => sub {
@@ -359,12 +360,9 @@ function headers_stringify => sub {
 	return \@array;
 };
 
-function merge => sub {
-	my ($self, $one, $two) = @_;
-
-	return $two if (!$one);
-
-	return $one;
+function diff_files => sub {
+	my ($self, $file1, $file2) = @_;
+	return Text::Diff::diff $file1, $file2, { STYLE => "Context" };
 };
 
 1;

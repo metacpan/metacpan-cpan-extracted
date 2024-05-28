@@ -32,7 +32,6 @@ my @test_cases = (
                                 id         => ignore(),                 # e.g. ada, babbage, etc.
                                 object     => 'model',
                                 owned_by   => ignore(),
-                                permission => array_each( ignore() ),
                             }
                         )
                     ),

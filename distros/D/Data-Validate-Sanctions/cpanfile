@@ -35,4 +35,5 @@ on test => sub {
     requires 'Class::Unload', '0';
     requires 'Test::RedisServer', '0.23';
     requires 'RedisDB', '2.57';
+    requires 'Redis', '0';
 };

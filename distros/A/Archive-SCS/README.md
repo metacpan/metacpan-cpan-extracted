@@ -1,3 +1,11 @@
+[![build](https://github.com/nautofon/Archive-SCS/actions/workflows/build.yml/badge.svg)](https://github.com/nautofon/Archive-SCS/actions/workflows/build.yml)
+[![coverage](https://coveralls.io/repos/github/nautofon/Archive-SCS/badge.svg?branch=main)](https://coveralls.io/github/nautofon/Archive-SCS?branch=main)
+[![kwalitee](https://cpants.cpanauthors.org/dist/Archive-SCS.svg)](https://cpants.cpanauthors.org/release/NAUTOFON/Archive-SCS)
+[![cpan](https://badge.fury.io/pl/Archive-SCS.svg)](https://metacpan.org/dist/Archive-SCS)
+[![perl 5.32](https://img.shields.io/badge/perl-v5.32+-blue.svg)](https://www.perl.org)
+[![license](https://img.shields.io/cpan/l/Archive-SCS)](https://raw.githubusercontent.com/nautofon/Archive-SCS/main/LICENSE)
+[![discussion](https://img.shields.io/badge/discussion-SCS_forum-e8d78a)](https://forum.scssoft.com/viewtopic.php?t=330746)
+
 ## Archive::SCS
 
 This software is a set of Perl modules to read and write the contents
@@ -30,22 +38,26 @@ Discussion thread on the SCS forum:
 
 #### Installing Perl
 
-Your operating system probably comes with `perl` pre-installed. Even so,
-the general advice these days is to *not* use system `perl`, but rather
-install `perl` yourself into userland. That way you'll not only get the
-latest version, but you'll also avoid interfering with the operating
-system's own use of `perl`.
+Archive::SCS requires Perl v5.32 or later.
 
-Installing and switching to your own `perl` is quite simple,
+Your operating system probably comes with Perl pre-installed. Even so,
+the general advice these days is to *not* use system Perl, but rather
+install Perl yourself into userland. That way you'll not only get the
+latest version, but you'll also avoid interfering with the operating
+system's own use of Perl.
+
+Building and switching to your own local copy of Perl is quite simple,
 for example using [Perlbrew](https://perlbrew.pl/) like this:
 
 ```sh
 \curl -L https://install.perlbrew.pl | bash
-perlbrew install -j 5 --64int perl-5.39.10
-perlbrew switch perl-5.39.10
-
 perlbrew install-cpanm
+
+perlbrew install --64int latest
+perlbrew switch latest
 ```
+
+For other ways to install Perl, see <https://www.perl.org>.
 
 #### Installing Archive::SCS
 
@@ -53,48 +65,33 @@ The recommended way to install Perl modules is from CPAN by using a
 management tool like [cpanminus](https://metacpan.org/pod/App::cpanminus).
 Among other things, it will install all dependencies automatically.
 
-However, there is an exception:
-Currently, Archive::SCS requires a specific version range of the
-[String::CityHash](https://metacpan.org/release/ALEXBIO/String-CityHash-0.10/view/lib/String/CityHash.pm)
-module, which is only available from BackPAN. Suitable versions
-are >= 0.06 and <= 0.10. An easy way to install a version from that
-particular range is to point cpanminus directly to one of the tarballs:
-
-```sh
-cpanm https://cpan.metacpan.org/authors/id/A/AL/ALEXBIO/String-CityHash-0.10.tar.gz
-```
-
-Archive::SCS itself is available on CPAN, so installing it is easy:
-
 ```sh
 cpanm Archive::SCS
 
 scs_archive --version
-scs_archive --extract def/city.sii def/country.sii
-scs_archive --help
 ```
 
 A good way to test your installation is to do a version check.
 That should automatically locate your Steam library and report the
 version of the game currently installed on your system.
+If your Steam library is in a non-standard location, you may need
+to set the `STEAM_LIBRARY` environment variable accordingly.
+
+See the [`scs_archive` man page](https://metacpan.org/dist/Archive-SCS/view/script/scs_archive)
+for further usage instructions.
 
 #### Manual install
 
 As an alternative to using an installation tool like `cpanm`, you
-can perform a manual install, or use this software directly without
-installing it at all. Both options should be considered slightly
+can perform a manual install. This should be considered slightly
 advanced, in part because you'll need to handle all prerequisites
 yourself.
 
 ```sh
-# Manual install
 perl Makefile.PL
 make
 make test
 make install
-
-# Use the tool without installing
-perl -I lib script/scs_archive ...
 ```
 
 For general information on installing Perl modules, see
@@ -116,3 +113,6 @@ Copyright © 2024 [nautofon](https://github.com/nautofon)
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+Includes [CityHash](https://github.com/google/cityhash) 1.0.3,
+Copyright © 2011 Google, Inc. (MIT license)

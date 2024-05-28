@@ -5,7 +5,7 @@ use base 'Terse::View';
 sub build_view {
 	my ($self) = @_;
 	$self->static_directory ||= 'root/static';
-	$self->allowed = 'js|css|png|svg|jpeg|gif|json|html|txt|eot|ttf|woff|woff2';
+	$self->allowed = 'js|css|png|svg|jpeg|gif|json|html|txt|eot|ttf|woff|woff2|mov|mp4';
 	$self->mime = {
 		js => 'application/javascript',
 		css => 'text/css',
@@ -20,6 +20,8 @@ sub build_view {
 		ttf => 'application/font-sfnt',
 		woff => 'application/font-woff',
 		woff2 => 'application/font-woff',
+		mov => 'video/mp4',
+		mp4 => 'video/mp4'
 	};
 	my $path = $0;
 	$path =~ s/[^\/]+$//g;
@@ -58,7 +60,7 @@ Terse::View::Static - Serve static resources view
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

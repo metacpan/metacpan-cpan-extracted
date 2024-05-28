@@ -9,7 +9,7 @@ use Class::XSAccessor getters => {
     get_codename  => 'codename'
 };
 
-our $VERSION = '2.12'; # VERSION
+our $VERSION = '2.13'; # VERSION
 
 # ABSTRACT: a subclass of Linux::Info::Distribution::Custom
 
@@ -54,7 +54,7 @@ Linux::Info::Distribution::Custom::RedHat - a subclass of Linux::Info::Distribut
 
 =head1 VERSION
 
-version 2.12
+version 2.13
 
 =head2 DESCRIPTION
 

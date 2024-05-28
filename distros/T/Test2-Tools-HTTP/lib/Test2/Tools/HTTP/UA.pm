@@ -2,12 +2,13 @@ package Test2::Tools::HTTP::UA;
 
 use strict;
 use warnings;
+use 5.014;
 use Carp ();
 use File::Spec ();
 use Test2::Tools::HTTP::Apps;
 
 # ABSTRACT: User agent wrapper for Test2::Tools::HTTP
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 
 sub _init
@@ -136,7 +137,7 @@ Test2::Tools::HTTP::UA - User agent wrapper for Test2::Tools::HTTP
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 

@@ -30,6 +30,8 @@ salus - salus
 
 	+ Headers
 		print the headers of the csv - headers
+	+ Diff Files
+		diff two salus csv files - diff $filepath1 $filepath2
 	+ Read File
 		read a salus csv file - read $filepath $unprotected
 	+ Add Row

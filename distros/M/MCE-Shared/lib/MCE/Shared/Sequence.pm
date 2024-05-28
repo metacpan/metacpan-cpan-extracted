@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.886';
+our $VERSION = '1.887';
 
 use Scalar::Util qw( looks_like_number );
 use MCE::Shared::Base ();
@@ -71,11 +71,11 @@ sub _reset {
 }
 
 sub _sprintf {
-   my ( $fmt, $arg ) = @_;
+   my $fmt = shift;
    # remove tainted'ness
    ($fmt) = $fmt =~ /(.*)/s;
 
-   return sprintf("$fmt", $arg);
+   return sprintf("$fmt", @_);
 }
 
 ###############################################################################
@@ -229,7 +229,7 @@ MCE::Shared::Sequence - Sequence helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Sequence version 1.886
+This document describes MCE::Shared::Sequence version 1.887
 
 =head1 DESCRIPTION
 

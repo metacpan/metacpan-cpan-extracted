@@ -2,16 +2,11 @@ package Rope::Conditional;
 
 my (%PRO);
 
+use Rope::Pro;
 use Struct::Conditional;
 
 BEGIN {
-	%PRO = (
-		keyword => sub {
-			my ($caller, $method, $cb) = @_;
-			no strict 'refs';
-			*{"${caller}::${method}"} = $cb;
-		}
-	);
+	%PRO = Rope::Pro->new;
 }
 
 sub import {
@@ -51,7 +46,7 @@ Rope::Conditional - Rope conditional properties
 
 =head1 VERSION
 
-Version 0.38
+Version 0.40
 
 =cut
 

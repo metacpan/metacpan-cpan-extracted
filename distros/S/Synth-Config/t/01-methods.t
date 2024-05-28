@@ -136,7 +136,6 @@ subtest settings => sub {
 subtest graphviz => sub {
   my $got = $obj->graphviz(
     settings   => $initial,
-    model_name => $model,
     patch_name => $first,
   );
   isa_ok $got, 'GraphViz2';

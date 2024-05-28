@@ -66,6 +66,9 @@ Options:
                     # tie stack trace).
     STR             # Same as passing anything else.
 
+    -methods => STR   # Monitors only specific methods.
+    -methods => [STR] #
+
 ## \_ProcessArgs
 
     Allows calling Trace like:

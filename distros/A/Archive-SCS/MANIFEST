@@ -1,7 +1,10 @@
 Changes
 cpanfile
+inc/city.cc
+inc/city.h
 lib/Archive/SCS.pm
 lib/Archive/SCS/CityHash.pm
+lib/Archive/SCS/CityHash.xs
 lib/Archive/SCS/DirIndex.pm
 lib/Archive/SCS/GameDir.pm
 lib/Archive/SCS/HashFS.pm
@@ -15,6 +18,7 @@ MANIFEST			This list of files
 README.md
 script/scs_archive
 t/00-compile.t
+t/01-cityhash.t
 t/40-hashfs-roundtrip.t
 t/50-hashfs2.t
 t/60-game-dir.t

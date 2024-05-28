@@ -4,7 +4,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 # VERSION
 
-version 5.0
+version 5.1
 
 # SYNOPSIS
 

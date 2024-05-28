@@ -1,5 +1,5 @@
 {
-   "abstract" : "an interface to most facets of the [Fastly API](https://developer.fastly.com/reference/api).",
+   "abstract" : "an interface to most facets of the [Fastly API](https://www.fastly.com/documentation/reference/api/).",
    "author" : [
       "Fastly Inc., oss@fastly.com"
    ],
@@ -59,7 +59,7 @@
          "web" : "https://github.com/fastly/fastly-perl"
       }
    },
-   "version" : "6.03",
+   "version" : "6.04",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "MIT",

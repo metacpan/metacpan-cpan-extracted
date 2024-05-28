@@ -74,10 +74,6 @@ P-values, where appropriate, are provided if PDL::GSL::CDF is installed.
 #line 75 "GLM.pm"
 
 
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
@@ -109,7 +105,7 @@ Replaces bad values with sample mean. Mean is set to 0 if all obs are bad. Can b
      [
       [      5     3.5       2     3.5]
       [      7       3       7 5.66667]
-     ] 
+     ]
 
   
 
@@ -147,9 +143,9 @@ Replaces bad values with random sample (with replacement) of good observations f
      [  5 BAD   2 BAD]
      [  7   3   7 BAD]
     ]
-    
+
     perldl> p $data->fill_rand
-    
+
     [
      [5 2 2 5]
      [7 3 7 7]
@@ -159,7 +155,7 @@ Replaces bad values with random sample (with replacement) of good observations f
 
 =for bad
 
-The output pdl badflag is cleared. 
+The output pdl badflag is cleared.
   
 
 =cut
@@ -479,7 +475,7 @@ Usage:
     # DV, 2 person's ratings for top-10 box office movies
     # ascending sorted by box office numbers
 
-    perldl> p $y = qsort ceil( random(10, 2)*5 )    
+    perldl> p $y = qsort ceil( random(10, 2)*5 )
     [
      [1 1 2 4 4 4 4 5 5 5]
      [1 2 2 2 3 3 3 3 5 5]
@@ -527,7 +523,7 @@ Usage:
     ]
 
     # df is the same across dv and iv models
- 
+
     F_df    [2 7]
     F_p
     [
@@ -535,7 +531,7 @@ Usage:
      [0.00016967051 0.00064215074]
      [0.00016967051 0.00064215074]
     ]
-    
+
     R2
     [
      [ 0.9162963 0.87756762]
@@ -560,22 +556,22 @@ Usage:
     ]
 
     # our novice modeler realizes at this point that
-    # the 3 models only differ in the scaling of the IV coefficients 
-    
+    # the 3 models only differ in the scaling of the IV coefficients
+
     ss_model
     [
      [ 20.616667  13.075758]
      [ 20.616667  13.075758]
      [ 20.616667  13.075758]
     ]
-    
+
     ss_residual
     [
      [ 1.8833333  1.8242424]
      [ 1.8833333  1.8242424]
      [ 1.8833333  1.8242424]
     ]
-    
+
     ss_total        [22.5 14.9]
     y_pred
     [
@@ -699,7 +695,7 @@ Significance test for the incremental change in R2 when new variable(s) are adde
 
 =for options
 
-Default options (case insensitive): 
+Default options (case insensitive):
 
     CONST   => 1,
 
@@ -743,7 +739,7 @@ Usage:
     R2_change       [0.0085966043 0.00048562549]
     model0  HASH(0x8c10828)
     model1  HASH(0x8c135c8)
-   
+
     # the answer here is no.
 
 =cut
@@ -920,7 +916,7 @@ sub _add_interactions {
       my @i_cm = ();
       for my $o ( 0 .. $raw_ref->[0]->dim(0) - 1 ) {
         my @cell = map { $_($o)->squeeze } @$raw_ref[@v];
-        push @i_cm, join('', @cell); 
+        push @i_cm, join('', @cell);
       }
       my ($inter, $map) = effect_code( \@i_cm );
       push @inter_cm, $inter;
@@ -948,6 +944,7 @@ sub _cell_means {
   my %cm;
   my $i = 0;
   for (@$ivs_ref) {
+    confess "_cell_means passed empty ivs_ref ndarray at pos $i" if $_->isempty;
     my $last = zeroes $_->dim(0);
     my $i_neg = which $_( ,0) == -1;
     ($_tmp = $last($i_neg)) .= 1;
@@ -983,13 +980,13 @@ sub _combinations {
   return sub {
     return @$arr[ @pick = ( 0 .. $num - 1 ) ]
       unless @pick;
-    
+
     my $i = $#pick;
     $i-- until $i < 0 or $pick[$i]++ < @$arr - $num + $i;
     return if $i < 0;
 
     @pick[$i .. $#pick] = $pick[$i] .. $#$arr;
-    
+
     return @$arr[@pick];
   };
 }
@@ -1015,7 +1012,7 @@ Default options (case insensitive):
 Usage:
 
     Some fictional data: recall_w_beer_and_wings.txt
-  
+
     Subject Beer    Wings   Recall
     Alex    1       1       8
     Alex    1       2       9
@@ -1030,51 +1027,51 @@ Usage:
     Brian   2       2       8
     Brian   2       3       14
     ...
-  
+
       # rtable allows text only in 1st row and col
     my ($data, $idv, $subj) = rtable 'recall_w_beer_and_wings.txt';
-  
+
     my ($b, $w, $dv) = $data->dog;
       # subj and IVs can be 1d pdl or @ ref
       # subj must be the first argument
     my %m = $dv->anova_rptd( $subj, $b, $w, {ivnm=>['Beer', 'Wings']} );
-  
+
     print "$_\t$m{$_}\n" for (sort keys %m);
 
-    # Beer # m	
+    # Beer # m
     [
      [ 10.916667  8.9166667]
     ]
-    
-    # Beer # se	
+
+    # Beer # se
     [
      [ 0.4614791  0.4614791]
     ]
-    
-    # Beer ~ Wings # m	
+
+    # Beer ~ Wings # m
     [
      [   10     7]
      [ 10.5  9.25]
      [12.25  10.5]
     ]
-    
-    # Beer ~ Wings # se	
+
+    # Beer ~ Wings # se
     [
      [0.89170561 0.89170561]
      [0.89170561 0.89170561]
      [0.89170561 0.89170561]
     ]
-    
-    # Wings # m	
+
+    # Wings # m
     [
      [   8.5  9.875 11.375]
     ]
-    
-    # Wings # se	
+
+    # Wings # se
     [
      [0.67571978 0.67571978 0.67571978]
     ]
-    
+
     ss_residual	19.0833333333333
     ss_subject	24.8333333333333
     ss_total	133.833333333333
@@ -1103,11 +1100,11 @@ Usage:
     | Wings || err ms	3.65277777777778
     | Wings || err ss	21.9166666666667
 
-For mixed model anova, ie when there are between-subject IVs involved, feed the IVs as above, but specify in BTWN which IVs are between-subject. For example, if we had added age as a between-subject IV in the above example, we would do 
+For mixed model anova, ie when there are between-subject IVs involved, feed the IVs as above, but specify in BTWN which IVs are between-subject. For example, if we had added age as a between-subject IV in the above example, we would do
 
     my %m = $dv->anova_rptd( $subj, $age, $b, $w,
                            { ivnm=>['Age', 'Beer', 'Wings'], btwn=>[0] });
- 
+
 =cut
 
 *anova_rptd = \&PDL::anova_rptd;
@@ -1213,14 +1210,14 @@ sub PDL::anova_rptd {
       elsif (ref $full[$k]) {       # unique error term
         my (@G, $G, $b_G);
         @G = grep { $_ != $k and defined $full[$_] } (0 .. $#full);
-     
+
         next EFFECT
           unless @G;
-    
+
         $G = PDL->null->glue( 1, grep { ref $_ } @full[@G] );
         $G = $G->glue(1, ones $G->dim(0));
         $b_G = $y->ols_t( $G, {CONST=>0} );
-    
+
         if ($k == $#full) {
           $ret{ss_subject}
             = $y->sse(sumover($b_G * $G->transpose)) - $ret{ss_residual};
@@ -1305,7 +1302,7 @@ sub PDL::anova_rptd {
   @ret{ keys %$cm_ref } = values %$cm_ref;
 
   my $highest = join(' ~ ', @{ $opt{IVNM} });
-  $cm_ref->{"# $highest # m"}->plot_means( $cm_ref->{"# $highest # se"}, 
+  $cm_ref->{"# $highest # m"}->plot_means( $cm_ref->{"# $highest # se"},
                                            { %opt, IVNM=>$idv } )
     if $opt{PLOT};
 
@@ -1315,7 +1312,7 @@ sub PDL::anova_rptd {
 sub _add_errors {
   my ($subj, $ivs_ref, $idv, $raw_ivs, $opt) = @_;
 
-  # code (btwn group) subjects. Rutherford (2001) pp 101-102 
+  # code (btwn group) subjects. Rutherford (2001) pp 101-102
 
   my (@grp, %grp_s);
   for my $n (0 .. $subj->nelem - 1) {
@@ -1403,7 +1400,7 @@ sub _fix_rptd_se {
         my @ivs = split / ~ /, $_;
         my $i_ivs = which_id $ivnm, \@ivs;
         my $icollapsed = setops pdl(0 .. $#$ivnm), 'XOR', $i_ivs;
-        
+
         my $collapsed = $icollapsed->nelem?
                           pdl( @$lvls_ref[(list $icollapsed)] )->prodover
                       :   1
@@ -1463,11 +1460,11 @@ Supports BAD value (missing or 'BAD' values result in the corresponding pdl elem
     my ($var_e, $map) = effect_code( \@var );
 
     print $var_e . $var_e->info . "\n";
-    
+
     [
      [ 1  1  1  0  0  0 -1 -1 -1]
      [ 0  0  0  1  1  1 -1 -1 -1]
-    ]    
+    ]
     PDL: Double D [9,2]
 
     print "$_\t$map->{$_}\n" for (sort keys %$map)
@@ -1482,8 +1479,10 @@ sub PDL::effect_code {
   my ($var_ref) = @_;
 
   my ($var, $map_ref) = PDL::Stats::Basic::_array_to_pdl( $var_ref );
-  my $var_e = yvals( float, $var->nelem, $var->max ) == $var;
-  ($_tmp = $var_e(which( $var == $var->max ), )) .= -1;
+  my $var_max = $var->max;
+  confess "effect_code called with only one unique value" if $var_max < 1;
+  my $var_e = yvals( float, $var->nelem, $var_max ) == $var;
+  ($_tmp = $var_e(which( $var == $var_max ), )) .= -1;
   $var_e = $var_e->setbadif( $var->isbad ) if $var->badflag;
 
   return wantarray? ($var_e, $map_ref) : $var_e;
@@ -1533,19 +1532,19 @@ Supports BAD value (missing or 'BAD' values result in the corresponding pdl elem
 
 =for usage
 
-    perldl> $a = sequence(6) > 2      
+    perldl> $a = sequence(6) > 2
     perldl> p $a = $a->effect_code
     [
      [ 1  1  1 -1 -1 -1]
     ]
-    
-    perldl> $b = pdl( qw( 0 1 2 0 1 2 ) )            
+
+    perldl> $b = pdl( qw( 0 1 2 0 1 2 ) )
     perldl> p $b = $b->effect_code
     [
      [ 1  0 -1  1  0 -1]
      [ 0  1 -1  0  1 -1]
     ]
-    
+
     perldl> p $ab = interaction_code( $a, $b )
     [
      [ 1  0 -1 -1 -0  1]
@@ -1571,13 +1570,13 @@ sub PDL::interaction_code {
 
 =for ref
 
-Ordinary least squares regression, aka linear regression. Unlike B<ols_t>, ols is not threadable, but it can handle bad value (by ignoring observations with bad value in dependent or independent variables list-wise) and returns the full model in list context with various stats. 
+Ordinary least squares regression, aka linear regression. Unlike B<ols_t>, ols is not threadable, but it can handle bad value (by ignoring observations with bad value in dependent or independent variables list-wise) and returns the full model in list context with various stats.
 
 IVs ($x) should be pdl dims $y->nelem or $y->nelem x n_iv. Do not supply the constant vector in $x. Intercept is automatically added and returned as LAST of the coeffs if CONST=>1. Returns full model in list context and coeff in scalar context.
 
 =for options
 
-Default options (case insensitive): 
+Default options (case insensitive):
 
     CONST  => 1,
     PLOT   => 0,   # see plot_residuals() for plot options
@@ -1609,9 +1608,9 @@ Usage:
     F_df    [2 7]
     F_p     0.000142834216344756
     R2      0.920314253647587
- 
+
     # coeff  linear     quadratic  constant
- 
+
     b       [0.21212121 0.03030303 0.98181818]
     b_p     [0.32800118 0.20303404 0.039910509]
     b_se    [0.20174693 0.021579989 0.38987581]
@@ -1620,7 +1619,7 @@ Usage:
     ss_residual     1.72121212121212
     ss_total        21.6
     y_pred  [0.98181818  1.2242424  1.5272727  ...  4.6181818  5.3454545]
- 
+
 =cut
 
 *ols = \&PDL::ols;
@@ -1842,7 +1841,7 @@ sub PDL::logistic {
   require PDL::Fit::LM;              # uses PDL::Slatec
 
   my ( $self, $ivs, $opt ) = @_;
-  
+
   $self = $self->squeeze;
     # make compatible w multiple var cases
   $ivs->getndims == 1 and $ivs = $ivs->dummy(1);
@@ -1859,7 +1858,7 @@ sub PDL::logistic {
   $opt{WT} = 1;
 
     # Use lmfit. Fourth input argument is reference to user-defined
-    # copy INITP so we have the original value when needed 
+    # copy INITP so we have the original value when needed
   my ($yfit,$coeff,$cov,$iter)
     = PDL::Fit::LM::lmfit($ivs, $self, $opt{WT}, \&_logistic, $opt{INITP}->copy,
       { Maxiter=>$opt{MAXIT}, Eps=>$opt{EPS} } );
@@ -1890,12 +1889,12 @@ sub PDL::logistic {
     for my $k (0 .. $ivs->dim(1)-1) {
       my @G = grep { $_ != $k } (0 .. $ivs->dim(1)-1);
       my $G = $ivs->dice_axis(1, \@G);
-  
+
       my $init = $opt{INITP}->dice([ @G, $opt{INITP}->dim(0)-1 ])->copy;
       my $y_G
         = PDL::Fit::LM::lmfit( $G, $self, $opt{WT}, \&_logistic, $init,
         { Maxiter=>$opt{MAXIT}, Eps=>$opt{EPS} } );
-  
+
       ($_tmp = $coeff_chisq($k)) .= $self->dm( $y_G ) - $ret{Dm};
     }
   }
@@ -1928,17 +1927,17 @@ sub _logistic {
     # $b and $c are fit parameters slope and intercept
   my $b = $par(0 : $x->dim(1) - 1)->sever;
   my $c = $par(-1)->sever;
-    
+
     # Write function with dependent variable $ym,
     # independent variable $x, and fit parameters as specified above.
-    # Use the .= (dot equals) assignment operator to express the equality 
+    # Use the .= (dot equals) assignment operator to express the equality
     # (not just a plain equals)
   ($_tmp = $ym) .= 1 / ( 1 + exp( -1 * (sumover($b * $x->transpose) + $c) ) );
 
   my (@dy) = map {$dyda -> slice(",($_)") } (0 .. $par->dim(0)-1);
 
-    # Partial derivative of the function with respect to each slope 
-    # fit parameter ($b in this case). Again, note .= assignment 
+    # Partial derivative of the function with respect to each slope
+    # fit parameter ($b in this case). Again, note .= assignment
     # operator (not just "equals")
   ($_tmp = $dy[$_]) .= $x( ,$_) * $ym * (1 - $ym)
     for (0 .. $b->dim(0)-1);
@@ -1949,19 +1948,19 @@ sub _logistic {
 
 sub _logistic_no_intercept {
   my ($x,$par,$ym,$dyda) = @_;
-    
+
   my $b = $par(0 : $x->dim(1) - 1)->sever;
 
     # Write function with dependent variable $ym,
     # independent variable $x, and fit parameters as specified above.
-    # Use the .= (dot equals) assignment operator to express the equality 
+    # Use the .= (dot equals) assignment operator to express the equality
     # (not just a plain equals)
   ($_tmp = $ym) .= 1 / ( 1 + exp( -1 * sumover($b * $x->transpose) ) );
 
   my (@dy) = map {$dyda -> slice(",($_)") } (0 .. $par->dim(0)-1);
 
-    # Partial derivative of the function with respect to each slope 
-    # fit parameter ($b in this case). Again, note .= assignment 
+    # Partial derivative of the function with respect to each slope
+    # fit parameter ($b in this case). Again, note .= assignment
     # operator (not just "equals")
   ($_tmp = $dy[$_]) .= $x( ,$_) * $ym * (1 - $ym)
     for (0 .. $b->dim(0)-1);
@@ -2001,7 +2000,7 @@ Usage:
      [  0.693634  -0.428171   0.125114   0.128145  -0.550879]
      [  0.229202   0.180393  -0.859217     0.4173  0.0503155]
     ]
-    
+
     loadings      # dim var x comp. correlation between variable and component
     [
      [ -0.978489  -0.955601  -0.992316   -0.97901  -0.942421]
@@ -2010,7 +2009,7 @@ Usage:
      [   0.13396 -0.0826915  0.0241629  0.0247483   -0.10639]
      [  0.027153  0.0213708  -0.101789  0.0494365 0.00596076]
     ]
-    
+
     pct_var       # percent variance accounted for by each component
     [0.940384 0.0399209 0.00942842 0.00745963 0.00280691]
 
@@ -2021,7 +2020,7 @@ Plot scores along the first two components,
 =cut
 
 *pca = \&PDL::pca;
-sub PDL::pca { 
+sub PDL::pca {
   my ($self, $opt) = @_;
 
   my %opt = (
@@ -2064,7 +2063,7 @@ sub PDL::pca {
     if $opt{PLOT};
 
   return ( eigenvalue=>$eigval, eigenvector=>$eigvec,
-           pct_var=>$var, loadings=>$loadings ); 
+           pct_var=>$var, loadings=>$loadings );
 }
 
 =head2 pca_sorti
@@ -2090,7 +2089,7 @@ Usage:
     perldl> @$idv = @$idv[list $ind]
 
     perldl> %m = $data->pca
- 
+
     perldl> ($iv, $ic) = $m{loadings}->pca_sorti()
 
     perldl> p "$idv->[$_]\t" . $m{loadings}->($_,$ic)->flat . "\n" for (list $iv)
@@ -2106,7 +2105,7 @@ Usage:
     FAST	[-0.196042 0.71479 -0.471355 0.00460276]
     LARGE	[-0.241994 0.594644 0.634703 -0.00618055]
     BASS	[-0.621213 -0.124918 0.0605367 -0.765184]
-    
+
 =cut
 
 *pca_sorti = \&PDL::pca_sorti;
@@ -2121,9 +2120,9 @@ sub PDL::pca_sorti {
 
   my $ncomp = pdl($opt{NCOMP}, $self->dim(1))->min;
   $self = $self->dice_axis( 1, pdl(0..$ncomp-1) );
-  
+
   my $icomp = $self->transpose->abs->maximum_ind;
- 
+
     # sort between comp
   my $ivar_sort = $icomp->qsorti;
   $self = $self($ivar_sort, )->sever;
@@ -2158,7 +2157,7 @@ Default options (case insensitive):
     DEV   => '/xs',         # open and close dev for plotting if no WIN
                             # defaults to '/png' in Windows
     SIZE  => 640,           # individual square panel size in pixels
-    SYMBL => [0, 4, 7, 11], 
+    SYMBL => [0, 4, 7, 11],
 
 =for usage
 
@@ -2166,7 +2165,7 @@ Usage:
 
       # see anova for mean / se pdl structure
     $mean->plot_means( $se, {IVNM=>['apple', 'bake']} );
-  
+
 Or like this:
 
     $m{'# apple ~ bake # m'}->plot_means;
@@ -2192,7 +2191,7 @@ sub PDL::plot_means {
     WIN   => undef,         # PDL::Graphics::PGPLOT::Window object
     DEV   => $DEV,
     SIZE  => 640,           # individual square panel size in pixels
-    SYMBL => [0, 4, 7, 11], # ref PDL::Graphics::PGPLOT::Window 
+    SYMBL => [0, 4, 7, 11], # ref PDL::Graphics::PGPLOT::Window
   );
   $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
 
@@ -2213,7 +2212,7 @@ sub PDL::plot_means {
     # $iD[1] as separate lines
   my $nx = $self->dim($iD[2]);    # n xpanels
   my $ny = $self->dim($iD[3]);    # n ypanels
-  
+
   my $w = $opt{WIN};
   if (!defined $w) {
     $w = PDL::Graphics::PGPLOT::Window::pgwin(DEV=>$opt{DEV}, NX=>$nx, NY=>$ny,
@@ -2233,10 +2232,10 @@ sub PDL::plot_means {
       $tl = $opt{IVNM}->[$iD[2]] . " $x"        if $self->dim($iD[2]) > 1;
       $tl .= ' ' . $opt{IVNM}->[$iD[3]] . " $y"  if $self->dim($iD[3]) > 1;
       $w->env( 0, $self->dim($iD[0])-1, $min - 2*$range/5, $max + $range/5,
-             { XTitle=>$opt{IVNM}->[$iD[0]], YTitle=>$opt{DVNM}, Title=>$tl,                 PANEL=>$p, AXIS=>['BCNT', 'BCNST'], Border=>1, 
+             { XTitle=>$opt{IVNM}->[$iD[0]], YTitle=>$opt{DVNM}, Title=>$tl,                 PANEL=>$p, AXIS=>['BCNT', 'BCNST'], Border=>1,
               } )
         unless $opt{WIN};
-  
+
       my (@legend, @color);
       for (0 .. $self->dim($iD[1]) - 1) {
         push @legend, $opt{IVNM}->[$iD[1]] . " $_"
@@ -2329,7 +2328,6 @@ sub PDL::plot_residuals {
   return;
 }
 
- 
 =head2 plot_scores
 
 Plots standardized original and PCA transformed scores against two components. (Thank you, Bob MacCallum, for the documentation suggestion that led to this function.)
@@ -2401,7 +2399,6 @@ sub PDL::plot_scores {
   return;
 }
 
- 
 =head2 plot_screes
 
 Scree plot. Plots proportion of variance accounted for by PCA components.
@@ -2427,7 +2424,7 @@ Default options (case insensitive):
 Usage:
 
   # variance should be in descending order
- 
+
   $pca{var}->plot_screes( {ncomp=>16} );
 
 Or, because NCOMP is used so often, it is allowed a shortcut,
@@ -2492,7 +2489,7 @@ PDL::Fit::LM
 
 Cohen, J., Cohen, P., West, S.G., & Aiken, L.S. (2003). Applied Multiple Regression/correlation Analysis for the Behavioral Sciences (3rd ed.). Mahwah, NJ: Lawrence Erlbaum Associates Publishers.
 
-Hosmer, D.W., & Lemeshow, S. (2000). Applied Logistic Regression (2nd ed.). New York, NY: Wiley-Interscience. 
+Hosmer, D.W., & Lemeshow, S. (2000). Applied Logistic Regression (2nd ed.). New York, NY: Wiley-Interscience.
 
 Lorch, R.F., & Myers, J.L. (1990). Regression analyses of repeated measures data in cognitive research. Journal of Experimental Psychology: Learning, Memory, & Cognition, 16, 149-157.
 
@@ -2513,13 +2510,7 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 2517 "GLM.pm"
-#line 2518 "GLM.pm"
-
-
-
-
-
+#line 2514 "GLM.pm"
 
 # Exit with OK status
 

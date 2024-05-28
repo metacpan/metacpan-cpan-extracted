@@ -1,6 +1,6 @@
 ## MCE::Shared for Perl
 
-This document describes MCE::Shared version 1.886.
+This document describes MCE::Shared version 1.887.
 
 ### Description
 
@@ -139,7 +139,7 @@ See also, [MCE::Examples](https://metacpan.org/pod/MCE::Examples).
 
 ### Copyright and Licensing
 
-Copyright (C) 2016-2023 by Mario E. Roy <marioeroy AT gmail DOT com>
+Copyright (C) 2016-2024 by Mario E. Roy <marioeroy AT gmail DOT com>
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself:

@@ -1,0 +1,17 @@
+Revision history for Perl extension Amon2::Plugin::Web::Flash
+
+0.05  2024-05-26 17:55:41 JST
+	-Added flash_keep
+
+0.04  2024-05-26 13:47:33 JST
+	- Remove README form distribution.
+
+0.03  2024-05-26 13:25:34 JST
+	- Just change contributers in META.json
+
+0.02  2024-05-26 12:24:11 JST
+	- Refine docs.
+
+0.01  Sat Jun 28 11:02:40 2014
+        - original version
+

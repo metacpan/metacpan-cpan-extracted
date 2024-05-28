@@ -110,3 +110,5 @@ Revision history for Perl extension B::Keywords.
     ADJUST class field method
 1.26 2023-06-19 18:43 rurban
   - Updated README
+1.27 2024-05-27 12:13 rurban
+  - Add bareword __CLASS__ since 5.39.2

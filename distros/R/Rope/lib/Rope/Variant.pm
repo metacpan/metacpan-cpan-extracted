@@ -3,15 +3,11 @@ package Rope::Variant;
 use strict;
 use warnings;
 use Combine::Keys qw/combine_keys/;
+use Rope::Pro;
 my (%PRO);
 
 BEGIN {
-	%PRO = (
-		keyword => sub {
-			my ($caller, $method, $cb) = @_;
-			no strict 'refs';
-			*{"${caller}::${method}"} = $cb;
-		},
+	%PRO = Rope::Pro->new(
 		find_from_given => sub {
 			my ( $self, $set, $given) = @_;
 			my $ref_given = ref $given;
@@ -123,7 +119,7 @@ Rope::Variant - Rope variant properties
 
 =head1 VERSION
 
-Version 0.38
+Version 0.40
 
 =cut
 

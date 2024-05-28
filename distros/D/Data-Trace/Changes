@@ -1,6 +1,13 @@
 Revision history for Data-Trace
 
 =================
+1.04 - 2024-05-24
+=================
+
+Added -methods option to make it simple to
+watch only specific methods (like "fetch").
+
+=================
 1.03 - 2024-05-18
 =================
 

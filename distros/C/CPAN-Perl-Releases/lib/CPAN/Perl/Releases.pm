@@ -1,5 +1,5 @@
 package CPAN::Perl::Releases;
-$CPAN::Perl::Releases::VERSION = '5.20240427';
+$CPAN::Perl::Releases::VERSION = '5.20240525';
 #ABSTRACT: Mapping Perl releases on CPAN to the location of the tarballs
 
 use strict;
@@ -296,9 +296,6 @@ our $data =
 "5.39.3" => { id => 'WOLFSAGE' },
 "5.39.4" => { id => 'HAARG' },
 "5.39.5" => { id => 'ETHER' },
-"5.34.2" => { id => 'PEVANS' },
-"5.36.2" => { id => 'PEVANS' },
-"5.38.1" => { id => 'PEVANS' },
 "5.34.3" => { id => 'PEVANS' },
 "5.36.3" => { id => 'PEVANS' },
 "5.38.2" => { id => 'PEVANS' },
@@ -307,6 +304,7 @@ our $data =
 "5.39.8" => { id => 'RENEEB' },
 "5.39.9" => { id => 'PEVANS' },
 "5.39.10" => { id => 'PEVANS' },
+"5.40.0-RC1" => { id => 'HAARG' },
 };
 
 sub perl_tarballs {
@@ -376,7 +374,7 @@ CPAN::Perl::Releases - Mapping Perl releases on CPAN to the location of the tarb
 
 =head1 VERSION
 
-version 5.20240427
+version 5.20240525
 
 =head1 SYNOPSIS
 

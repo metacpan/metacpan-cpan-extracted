@@ -20,10 +20,11 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
 	'Text::CSV_XS' => '1.54',
 	'Type::Tiny' => '2.004000',
-	'Rope' => '0.34',
+	'Rope' => '0.40',
 	'JSON' => '0',
 	'Term::Size' => '0.211',
-	'Term::Table' => '0.018'
+	'Term::Table' => '0.018',
+    	'Text::Diff' => '1.45' 
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Salus-*' },

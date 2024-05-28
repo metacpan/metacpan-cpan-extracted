@@ -3,3 +3,11 @@ Revision history for Search-Fzf
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.02    Date/time 2024-05-25
+        Cleaned up some of the code.
+
+0.03    Date/time 2024-05-26
+        Checked the Makefile.PL.
+
+0.04    Date/time 2024-05-26
+        AlgoCpp.pm module conflict.

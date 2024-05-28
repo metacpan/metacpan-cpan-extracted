@@ -1,0 +1,15 @@
+.github/workflows/test-linux.yml
+.github/workflows/test-win32.yml
+.gitignore
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README.md
+readme/demo.png
+t/00_load.t
+t/10_import.t
+win32console.pm
+win32console.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

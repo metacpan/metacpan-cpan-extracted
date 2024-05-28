@@ -3,6 +3,7 @@ use strictures 2;
 use 5.020;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -198,21 +199,49 @@ sub document_result ($document) {
   );
 }
 
+my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new
+  ->allow_nonref(1)
+  ->utf8(0)
+  ->allow_bignum(1)
+  ->allow_blessed(1)
+  ->convert_blessed(1)
+  ->canonical(1)
+  ->pretty(1)
+  ->indent_length(2);
+
 # deep comparison, with strict typing
-sub is_equal ($x, $y, $test_name = undef) {
+sub is_equal ($got, $expected, $test_name = undef) {
   context_do {
     my $ctx = shift;
-    my ($x, $y, $test_name) = @_;
-    my $equal = JSON::Schema::Modern::Utilities::is_equal($x, $y, my $state = {});
+    my ($got, $expected, $test_name) = @_;
+    my $equal = JSON::Schema::Modern::Utilities::is_equal($got, $expected, my $state = {});
     if ($equal) {
       $ctx->pass($test_name);
     }
     else {
       $ctx->fail($test_name);
       $ctx->note('structures differ'.($state->{path} ? ' starting at '.$state->{path} : ''));
+      $ctx->${$ENV{AUTOMATED_TESTING} ? \'diag' : \'note'}("got result:\n".$encoder->encode($got));
     }
     return $equal;
-  } $x, $y, $test_name;
+  } $got, $expected, $test_name;
+}
+
+# deep comparison, with Test::Deep syntax sugar
+sub cmp_result ($got, $expected, $test_name) {
+  context_do {
+    my $ctx = shift;
+    my ($got, $expected, $test_name) = @_;
+    my $equal = Test::Deep::cmp_deeply($got, $expected, $test_name);
+    if ($equal) {
+      $ctx->pass($test_name);
+    }
+    else {
+      $ctx->fail($test_name);
+      $ctx->${$ENV{AUTOMATED_TESTING} ? \'diag' : \'note'}("got result:\n".$encoder->encode($got));
+    }
+    return $equal;
+  } $got, $expected, $test_name;
 }
 
 1;

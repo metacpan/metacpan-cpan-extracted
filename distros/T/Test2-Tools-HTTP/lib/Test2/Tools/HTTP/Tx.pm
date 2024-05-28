@@ -2,11 +2,12 @@ package Test2::Tools::HTTP::Tx;
 
 use strict;
 use warnings;
+use 5.014;
 use Test2::API ();
 use Carp ();
 
 # ABSTRACT: Object representing the last transaction for Test2::Tools::HTTP
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 
 sub req { shift->{req} }
@@ -95,7 +96,7 @@ Test2::Tools::HTTP::Tx - Object representing the last transaction for Test2::Too
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 

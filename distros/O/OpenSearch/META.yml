@@ -1,7 +1,7 @@
 ---
-abstract: 'A Perl client for OpenSearch (https://opensearch.org/)'
+abstract: 'Unofficial Perl client for OpenSearch (https://opensearch.org/)'
 author:
-  - 'localh0rst <git@fail.ninja>'
+  - 'C<OpenSearch> Perl Module was written by Sebastian Grenz, C<< <git at fail.ninja> >>'
 build_requires:
   Test::More: '0.98'
   Test::Pod::Coverage: '0'
@@ -9,7 +9,7 @@ configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
 generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
-license: perl
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -27,203 +27,159 @@ no_index:
 provides:
   OpenSearch:
     file: lib/OpenSearch.pm
-    version: '0.03'
+    version: '0.90'
   OpenSearch::Base:
     file: lib/OpenSearch/Base.pm
   OpenSearch::Cluster:
     file: lib/OpenSearch/Cluster.pm
   OpenSearch::Cluster::Allocation:
     file: lib/OpenSearch/Cluster/Allocation.pm
+  OpenSearch::Cluster::Allocation::Explain:
+    file: lib/OpenSearch/Cluster/Allocation/Explain.pm
   OpenSearch::Cluster::Health:
     file: lib/OpenSearch/Cluster/Health.pm
+  OpenSearch::Cluster::Health::Get:
+    file: lib/OpenSearch/Cluster/Health/Get.pm
   OpenSearch::Cluster::Settings:
     file: lib/OpenSearch/Cluster/Settings.pm
+  OpenSearch::Cluster::Settings::Get:
+    file: lib/OpenSearch/Cluster/Settings/Get.pm
+  OpenSearch::Cluster::Settings::Set:
+    file: lib/OpenSearch/Cluster/Settings/Set.pm
   OpenSearch::Cluster::Stats:
     file: lib/OpenSearch/Cluster/Stats.pm
+  OpenSearch::Cluster::Stats::Get:
+    file: lib/OpenSearch/Cluster/Stats/Get.pm
+  OpenSearch::Document:
+    file: lib/OpenSearch/Document.pm
+  OpenSearch::Document::Index:
+    file: lib/OpenSearch/Document/Index.pm
   OpenSearch::Filter::Nodes:
     file: lib/OpenSearch/Filter/Nodes.pm
   OpenSearch::Filter::Source:
     file: lib/OpenSearch/Filter/Source.pm
   OpenSearch::Helper:
     file: lib/OpenSearch/Helper.pm
-  OpenSearch::MooseTypes:
-    file: lib/OpenSearch/MooseTypes.pm
-  OpenSearch::Parameters::Body::cluster_settings:
-    file: lib/OpenSearch/Parameters/Body/cluster_settings.pm
-  OpenSearch::Parameters::Body::current_node:
-    file: lib/OpenSearch/Parameters/Body/current_node.pm
-  OpenSearch::Parameters::Body::docvalue_fields:
-    file: lib/OpenSearch/Parameters/Body/docvalue_fields.pm
-  OpenSearch::Parameters::Body::explain:
-    file: lib/OpenSearch/Parameters/Body/explain.pm
-  OpenSearch::Parameters::Body::fields:
-    file: lib/OpenSearch/Parameters/Body/fields.pm
-  OpenSearch::Parameters::Body::from:
-    file: lib/OpenSearch/Parameters/Body/from.pm
-  OpenSearch::Parameters::Body::index:
-    file: lib/OpenSearch/Parameters/Body/index.pm
-  OpenSearch::Parameters::Body::indices_boost:
-    file: lib/OpenSearch/Parameters/Body/indices_boost.pm
-  OpenSearch::Parameters::Body::min_score:
-    file: lib/OpenSearch/Parameters/Body/min_score.pm
-  OpenSearch::Parameters::Body::primary:
-    file: lib/OpenSearch/Parameters/Body/primary.pm
-  OpenSearch::Parameters::Body::query:
-    file: lib/OpenSearch/Parameters/Body/query.pm
-  OpenSearch::Parameters::Body::search_after:
-    file: lib/OpenSearch/Parameters/Body/search_after.pm
-  OpenSearch::Parameters::Body::seq_no_primary_term:
-    file: lib/OpenSearch/Parameters/Body/seq_no_primary_term.pm
-  OpenSearch::Parameters::Body::shard:
-    file: lib/OpenSearch/Parameters/Body/shard.pm
-  OpenSearch::Parameters::Body::size:
-    file: lib/OpenSearch/Parameters/Body/size.pm
-  OpenSearch::Parameters::Body::sort:
-    file: lib/OpenSearch/Parameters/Body/sort.pm
-  OpenSearch::Parameters::Body::stats:
-    file: lib/OpenSearch/Parameters/Body/stats.pm
-  OpenSearch::Parameters::Body::terminate_after:
-    file: lib/OpenSearch/Parameters/Body/terminate_after.pm
-  OpenSearch::Parameters::Body::timeout:
-    file: lib/OpenSearch/Parameters/Body/timeout.pm
-  OpenSearch::Parameters::Body::version:
-    file: lib/OpenSearch/Parameters/Body/version.pm
-  OpenSearch::Parameters::ClusterAllocationExplain:
-    file: lib/OpenSearch/Parameters/ClusterAllocationExplain.pm
-  OpenSearch::Parameters::ClusterHealth:
-    file: lib/OpenSearch/Parameters/ClusterHealth.pm
-  OpenSearch::Parameters::ClusterSettings:
-    file: lib/OpenSearch/Parameters/ClusterSettings.pm
-  OpenSearch::Parameters::ClusterStats:
-    file: lib/OpenSearch/Parameters/ClusterStats.pm
-  OpenSearch::Parameters::Path::index:
-    file: lib/OpenSearch/Parameters/Path/index.pm
+  OpenSearch::Index:
+    file: lib/OpenSearch/Index.pm
+  OpenSearch::Index::ClearCache:
+    file: lib/OpenSearch/Index/ClearCache.pm
+  OpenSearch::Index::Clone:
+    file: lib/OpenSearch/Index/Clone.pm
+  OpenSearch::Index::Close:
+    file: lib/OpenSearch/Index/Close.pm
+  OpenSearch::Index::Create:
+    file: lib/OpenSearch/Index/Create.pm
+  OpenSearch::Index::Delete:
+    file: lib/OpenSearch/Index/Delete.pm
+  OpenSearch::Index::DeleteDangling:
+    file: lib/OpenSearch/Index/DeleteDangling.pm
+  OpenSearch::Index::Exists:
+    file: lib/OpenSearch/Index/Exists.pm
+  OpenSearch::Index::ForceMerge:
+    file: lib/OpenSearch/Index/ForceMerge.pm
+  OpenSearch::Index::Get:
+    file: lib/OpenSearch/Index/Get.pm
+  OpenSearch::Index::GetAliases:
+    file: lib/OpenSearch/Index/GetAliases.pm
+  OpenSearch::Index::GetDangling:
+    file: lib/OpenSearch/Index/GetDangling.pm
+  OpenSearch::Index::GetMappings:
+    file: lib/OpenSearch/Index/GetMappings.pm
+  OpenSearch::Index::GetSettings:
+    file: lib/OpenSearch/Index/GetSettings.pm
+  OpenSearch::Index::ImportDangling:
+    file: lib/OpenSearch/Index/ImportDangling.pm
+  OpenSearch::Index::Open:
+    file: lib/OpenSearch/Index/Open.pm
+  OpenSearch::Index::Refresh:
+    file: lib/OpenSearch/Index/Refresh.pm
+  OpenSearch::Index::SetAliases:
+    file: lib/OpenSearch/Index/SetAliases.pm
+  OpenSearch::Index::SetMappings:
+    file: lib/OpenSearch/Index/SetMappings.pm
+  OpenSearch::Index::Shrink:
+    file: lib/OpenSearch/Index/Shrink.pm
+  OpenSearch::Index::Split:
+    file: lib/OpenSearch/Index/Split.pm
+  OpenSearch::Index::Stats:
+    file: lib/OpenSearch/Index/Stats.pm
+  OpenSearch::Index::UpdateSettings:
+    file: lib/OpenSearch/Index/UpdateSettings.pm
+  OpenSearch::Parameters::Cluster::Allocation::Explain:
+    file: lib/OpenSearch/Parameters/Cluster/Allocation/Explain.pm
+  OpenSearch::Parameters::Cluster::Health::Get:
+    file: lib/OpenSearch/Parameters/Cluster/Health/Get.pm
+  OpenSearch::Parameters::Cluster::Settings::Get:
+    file: lib/OpenSearch/Parameters/Cluster/Settings/Get.pm
+  OpenSearch::Parameters::Cluster::Settings::Set:
+    file: lib/OpenSearch/Parameters/Cluster/Settings/Set.pm
+  OpenSearch::Parameters::Cluster::Stats::Get:
+    file: lib/OpenSearch/Parameters/Cluster/Stats/Get.pm
+  OpenSearch::Parameters::Document::Index:
+    file: lib/OpenSearch/Parameters/Document/Index.pm
+  OpenSearch::Parameters::Index::ClearCache:
+    file: lib/OpenSearch/Parameters/Index/ClearCache.pm
+  OpenSearch::Parameters::Index::Clone:
+    file: lib/OpenSearch/Parameters/Index/Clone.pm
+  OpenSearch::Parameters::Index::Close:
+    file: lib/OpenSearch/Parameters/Index/Close.pm
+  OpenSearch::Parameters::Index::Create:
+    file: lib/OpenSearch/Parameters/Index/Create.pm
+  OpenSearch::Parameters::Index::Delete:
+    file: lib/OpenSearch/Parameters/Index/Delete.pm
+  OpenSearch::Parameters::Index::DeleteDangling:
+    file: lib/OpenSearch/Parameters/Index/DeleteDangling.pm
+  OpenSearch::Parameters::Index::Exists:
+    file: lib/OpenSearch/Parameters/Index/Exists.pm
+  OpenSearch::Parameters::Index::ForceMerge:
+    file: lib/OpenSearch/Parameters/Index/ForceMerge.pm
+  OpenSearch::Parameters::Index::Get:
+    file: lib/OpenSearch/Parameters/Index/Get.pm
+  OpenSearch::Parameters::Index::GetDangling:
+    file: lib/OpenSearch/Parameters/Index/GetDangling.pm
+  OpenSearch::Parameters::Index::GetMappings:
+    file: lib/OpenSearch/Parameters/Index/GetMappings.pm
+  OpenSearch::Parameters::Index::GetSettings:
+    file: lib/OpenSearch/Parameters/Index/GetSettings.pm
+  OpenSearch::Parameters::Index::ImportDangling:
+    file: lib/OpenSearch/Parameters/Index/ImportDangling.pm
+  OpenSearch::Parameters::Index::Open:
+    file: lib/OpenSearch/Parameters/Index/Open.pm
+  OpenSearch::Parameters::Index::Refresh:
+    file: lib/OpenSearch/Parameters/Index/Refresh.pm
+  OpenSearch::Parameters::Index::SetAliases:
+    file: lib/OpenSearch/Parameters/Index/SetAliases.pm
+  OpenSearch::Parameters::Index::SetMappings:
+    file: lib/OpenSearch/Parameters/Index/SetMappings.pm
+  OpenSearch::Parameters::Index::Shrink:
+    file: lib/OpenSearch/Parameters/Index/Shrink.pm
+  OpenSearch::Parameters::Index::Split:
+    file: lib/OpenSearch/Parameters/Index/Split.pm
+  OpenSearch::Parameters::Index::Stats:
+    file: lib/OpenSearch/Parameters/Index/Stats.pm
+  OpenSearch::Parameters::Index::UpdateSettings:
+    file: lib/OpenSearch/Parameters/Index/UpdateSettings.pm
   OpenSearch::Parameters::Search:
     file: lib/OpenSearch/Parameters/Search.pm
-  OpenSearch::Parameters::URL::allow_no_indices:
-    file: lib/OpenSearch/Parameters/URL/allow_no_indices.pm
-  OpenSearch::Parameters::URL::allow_partial_search_results:
-    file: lib/OpenSearch/Parameters/URL/allow_partial_search_results.pm
-  OpenSearch::Parameters::URL::analyze_wildcard:
-    file: lib/OpenSearch/Parameters/URL/analyze_wildcard.pm
-  OpenSearch::Parameters::URL::analyzer:
-    file: lib/OpenSearch/Parameters/URL/analyzer.pm
-  OpenSearch::Parameters::URL::awareness_attribute:
-    file: lib/OpenSearch/Parameters/URL/awareness_attribute.pm
-  OpenSearch::Parameters::URL::batched_reduce_size:
-    file: lib/OpenSearch/Parameters/URL/batched_reduce_size.pm
-  OpenSearch::Parameters::URL::cancel_after_time_interval:
-    file: lib/OpenSearch/Parameters/URL/cancel_after_time_interval.pm
-  OpenSearch::Parameters::URL::ccs_minimize_roundtrips:
-    file: lib/OpenSearch/Parameters/URL/ccs_minimize_roundtrips.pm
-  OpenSearch::Parameters::URL::cluster_manager_timeout:
-    file: lib/OpenSearch/Parameters/URL/cluster_manager_timeout.pm
-  OpenSearch::Parameters::URL::default_operator:
-    file: lib/OpenSearch/Parameters/URL/default_operator.pm
-  OpenSearch::Parameters::URL::df:
-    file: lib/OpenSearch/Parameters/URL/df.pm
-  OpenSearch::Parameters::URL::docvalue_fields:
-    file: lib/OpenSearch/Parameters/URL/docvalue_fields.pm
-  OpenSearch::Parameters::URL::expand_wildcards:
-    file: lib/OpenSearch/Parameters/URL/expand_wildcards.pm
-  OpenSearch::Parameters::URL::explain:
-    file: lib/OpenSearch/Parameters/URL/explain.pm
-  OpenSearch::Parameters::URL::flat_settings:
-    file: lib/OpenSearch/Parameters/URL/flat_settings.pm
-  OpenSearch::Parameters::URL::from:
-    file: lib/OpenSearch/Parameters/URL/from.pm
-  OpenSearch::Parameters::URL::ignore_throttled:
-    file: lib/OpenSearch/Parameters/URL/ignore_throttled.pm
-  OpenSearch::Parameters::URL::ignore_unavailable:
-    file: lib/OpenSearch/Parameters/URL/ignore_unavailable.pm
-  OpenSearch::Parameters::URL::include_defaults:
-    file: lib/OpenSearch/Parameters/URL/include_defaults.pm
-  OpenSearch::Parameters::URL::include_disk_info:
-    file: lib/OpenSearch/Parameters/URL/include_disk_info.pm
-  OpenSearch::Parameters::URL::include_yes_decisions:
-    file: lib/OpenSearch/Parameters/URL/include_yes_decisions.pm
-  OpenSearch::Parameters::URL::lenient:
-    file: lib/OpenSearch/Parameters/URL/lenient.pm
-  OpenSearch::Parameters::URL::level:
-    file: lib/OpenSearch/Parameters/URL/level.pm
-  OpenSearch::Parameters::URL::local:
-    file: lib/OpenSearch/Parameters/URL/local.pm
-  OpenSearch::Parameters::URL::max_concurrent_shard_requests:
-    file: lib/OpenSearch/Parameters/URL/max_concurrent_shard_requests.pm
-  OpenSearch::Parameters::URL::nodes:
-    file: lib/OpenSearch/Parameters/URL/nodes.pm
-  OpenSearch::Parameters::URL::pre_filter_shard_size:
-    file: lib/OpenSearch/Parameters/URL/pre_filter_shard_size.pm
-  OpenSearch::Parameters::URL::preference:
-    file: lib/OpenSearch/Parameters/URL/preference.pm
-  OpenSearch::Parameters::URL::q:
-    file: lib/OpenSearch/Parameters/URL/q.pm
-  OpenSearch::Parameters::URL::request_cache:
-    file: lib/OpenSearch/Parameters/URL/request_cache.pm
-  OpenSearch::Parameters::URL::rest_total_hits_as_int:
-    file: lib/OpenSearch/Parameters/URL/rest_total_hits_as_int.pm
-  OpenSearch::Parameters::URL::routing:
-    file: lib/OpenSearch/Parameters/URL/routing.pm
-  OpenSearch::Parameters::URL::scroll:
-    file: lib/OpenSearch/Parameters/URL/scroll.pm
-  OpenSearch::Parameters::URL::search_type:
-    file: lib/OpenSearch/Parameters/URL/search_type.pm
-  OpenSearch::Parameters::URL::seq_no_primary_term:
-    file: lib/OpenSearch/Parameters/URL/seq_no_primary_term.pm
-  OpenSearch::Parameters::URL::size:
-    file: lib/OpenSearch/Parameters/URL/size.pm
-  OpenSearch::Parameters::URL::sort:
-    file: lib/OpenSearch/Parameters/URL/sort.pm
-  OpenSearch::Parameters::URL::stats:
-    file: lib/OpenSearch/Parameters/URL/stats.pm
-  OpenSearch::Parameters::URL::stored_fields:
-    file: lib/OpenSearch/Parameters/URL/stored_fields.pm
-  OpenSearch::Parameters::URL::suggest_field:
-    file: lib/OpenSearch/Parameters/URL/suggest_field.pm
-  OpenSearch::Parameters::URL::suggest_mode:
-    file: lib/OpenSearch/Parameters/URL/suggest_mode.pm
-  OpenSearch::Parameters::URL::suggest_size:
-    file: lib/OpenSearch/Parameters/URL/suggest_size.pm
-  OpenSearch::Parameters::URL::suggest_text:
-    file: lib/OpenSearch/Parameters/URL/suggest_text.pm
-  OpenSearch::Parameters::URL::terminate_after:
-    file: lib/OpenSearch/Parameters/URL/terminate_after.pm
-  OpenSearch::Parameters::URL::timeout:
-    file: lib/OpenSearch/Parameters/URL/timeout.pm
-  OpenSearch::Parameters::URL::track_scores:
-    file: lib/OpenSearch/Parameters/URL/track_scores.pm
-  OpenSearch::Parameters::URL::track_total_hits:
-    file: lib/OpenSearch/Parameters/URL/track_total_hits.pm
-  OpenSearch::Parameters::URL::typed_keys:
-    file: lib/OpenSearch/Parameters/URL/typed_keys.pm
-  OpenSearch::Parameters::URL::version:
-    file: lib/OpenSearch/Parameters/URL/version.pm
-  OpenSearch::Parameters::URL::wait_for_active_shards:
-    file: lib/OpenSearch/Parameters/URL/wait_for_active_shards.pm
-  OpenSearch::Parameters::URL::wait_for_events:
-    file: lib/OpenSearch/Parameters/URL/wait_for_events.pm
-  OpenSearch::Parameters::URL::wait_for_no_initializing_shards:
-    file: lib/OpenSearch/Parameters/URL/wait_for_no_initializing_shards.pm
-  OpenSearch::Parameters::URL::wait_for_no_relocating_shards:
-    file: lib/OpenSearch/Parameters/URL/wait_for_no_relocating_shards.pm
-  OpenSearch::Parameters::URL::wait_for_nodes:
-    file: lib/OpenSearch/Parameters/URL/wait_for_nodes.pm
-  OpenSearch::Parameters::URL::wait_for_status:
-    file: lib/OpenSearch/Parameters/URL/wait_for_status.pm
   OpenSearch::Remote:
     file: lib/OpenSearch/Remote.pm
   OpenSearch::Remote::Info:
     file: lib/OpenSearch/Remote/Info.pm
-  OpenSearch::Scroll:
-    file: lib/OpenSearch/Scroll.pm
+  OpenSearch::Response:
+    file: lib/OpenSearch/Response.pm
   OpenSearch::Search:
     file: lib/OpenSearch/Search.pm
+  OpenSearch::Search::Search:
+    file: lib/OpenSearch/Search/Search.pm
 requires:
   Data::Format::Pretty::JSON: '0'
+  Hash::AsObject: '0'
   IO::Socket::SSL: '0'
   JSON::XS: '0'
   Mojolicious: '0'
   Moose: '0'
+  MooseX::MetaDescription::Meta::Attribute: '0'
   MooseX::Singleton: '0'
   Net::SSLeay: '0'
   perl: '5.008001'
@@ -231,6 +187,9 @@ resources:
   bugtracker: https://github.com/localh0rst/OpenSearch-Perl/issues
   homepage: https://github.com/localh0rst/OpenSearch-Perl
   repository: https://github.com/localh0rst/OpenSearch-Perl.git
-version: '0.03'
+version: '0.90'
+x_contributors:
+  - 'localh0rst <git@fail.ninja>'
+  - 'localh0rst <localh0rst@users.noreply.github.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -2,8 +2,7 @@
 use strict;
 use warnings;
 use lib 'lib', 't/lib';
-use feature 'defer';
-no warnings 'experimental::defer';
+use Feature::Compat::Defer;
 
 use IPC::Run3;
 use Path::Tiny 0.119;

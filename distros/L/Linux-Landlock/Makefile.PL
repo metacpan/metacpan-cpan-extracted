@@ -1,4 +1,4 @@
-use strict;
+use 5.022;
 use warnings;
 use ExtUtils::MakeMaker;
 
@@ -17,7 +17,7 @@ WriteMakefile(
         'Exporter'   => 0,
         'Config'     => 0,
     },
-    VERSION       => '0.6',
+    VERSION       => '0.7',
     TEST_REQUIRES => {
         'Test::Exception'  => 0,
         'Test::More'       => 0,
@@ -25,6 +25,9 @@ WriteMakefile(
         'IO::Dir'          => 0,
         'IO::File'         => 0,
         'IO::Socket::INET' => 0,
+    },
+    dist         => {
+        PREOP => 'pod2text lib/Linux/Landlock.pm > README;pod2markdown lib/Linux/Landlock.pm > README.md;'
     },
     test => {
         TESTS => 't/*.t'

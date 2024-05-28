@@ -177,7 +177,7 @@ use List::Util                qw(reduce);
 use POSIX                     qw();
 use Linux::Landlock::Syscalls qw(NR Q_pack);
 
-our $VERSION = '0.6';
+our $VERSION = '0.7';
 # adapted from linux/landlock.ph, architecture independent consts
 my $LANDLOCK_CREATE_RULESET_VERSION = (1 << 0);
 our %LANDLOCK_ACCESS_FS = (

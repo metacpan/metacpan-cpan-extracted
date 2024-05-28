@@ -6,7 +6,7 @@ use Linux::Info::KernelSource;
 
 use constant CLASS => 'Linux::Info::KernelRelease::Alpine';
 
-# plan tests => 13;
+plan tests => 14;
 
 require_ok(CLASS);
 can_ok( CLASS, ( 'get_binutils_version', 'get_alpine_patch', 'is_lts' ) );
@@ -41,5 +41,3 @@ foreach my $fixture (@fixtures) {
     is( $instance->$method, $fixture->[1], "$method works" )
       or diag( explain($instance) );
 }
-
-done_testing;

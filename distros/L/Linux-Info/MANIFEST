@@ -38,6 +38,7 @@ lib/Linux/Info/Distribution/OSRelease/Alpine.pm
 lib/Linux/Info/Distribution/OSRelease/Amazon.pm
 lib/Linux/Info/Distribution/OSRelease/CentOS.pm
 lib/Linux/Info/Distribution/OSRelease/Debian.pm
+lib/Linux/Info/Distribution/OSRelease/Raspbian.pm
 lib/Linux/Info/Distribution/OSRelease/RedHat.pm
 lib/Linux/Info/Distribution/OSRelease/Rocky.pm
 lib/Linux/Info/Distribution/OSRelease/Ubuntu.pm
@@ -47,6 +48,7 @@ lib/Linux/Info/FileStats.pm
 lib/Linux/Info/KernelFactory.pm
 lib/Linux/Info/KernelRelease.pm
 lib/Linux/Info/KernelRelease/Alpine.pm
+lib/Linux/Info/KernelRelease/Raspbian.pm
 lib/Linux/Info/KernelRelease/RedHat.pm
 lib/Linux/Info/KernelRelease/Rocky.pm
 lib/Linux/Info/KernelRelease/Ubuntu.pm
@@ -91,11 +93,13 @@ t/distro-centos.t
 t/distro-cloudlinux-custom.t
 t/distro-debian.t
 t/distro-finder.t
+t/distro-raspbian.t
 t/distro-redhat-custom.t
 t/distro-redhat.t
 t/distro-rocky.t
 t/distro-ubuntu.t
 t/kernel-release-alpine.t
+t/kernel-release-raspbian.t
 t/kernel-release-redhat.t
 t/kernel-release-rocky.t
 t/kernel-release-ubuntu.t
@@ -115,6 +119,8 @@ t/samples/diskstatus-4.9.0-13.txt
 t/samples/diskstatus-6.1.0-20.txt
 t/samples/kernel/alpine/sys_osrelease
 t/samples/kernel/alpine/version
+t/samples/kernel/raspbian/sys_osrelease
+t/samples/kernel/raspbian/version
 t/samples/kernel/redhat/sys_osrelease
 t/samples/kernel/redhat/version
 t/samples/kernel/rocky/sys_osrelease
@@ -127,6 +133,7 @@ t/samples/os-releases/alpine
 t/samples/os-releases/amazon
 t/samples/os-releases/centos
 t/samples/os-releases/debian
+t/samples/os-releases/raspbian
 t/samples/os-releases/redhat
 t/samples/os-releases/rocky
 t/samples/redhat_version

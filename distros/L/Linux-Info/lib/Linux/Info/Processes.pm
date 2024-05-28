@@ -4,7 +4,7 @@ use warnings;
 use Time::HiRes 1.9725;
 use constant NUMBER => qr/^-{0,1}\d+(?:\.\d+){0,1}\z/;
 
-our $VERSION = '2.12'; # VERSION
+our $VERSION = '2.13'; # VERSION
 # ABSTRACT:  Collect linux process statistics.
 
 
@@ -453,7 +453,7 @@ Linux::Info::Processes - Collect linux process statistics.
 
 =head1 VERSION
 
-version 2.12
+version 2.13
 
 =head1 SYNOPSIS
 

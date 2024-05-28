@@ -1,9 +1,12 @@
-use v5.38;
-use feature 'class';
-no warnings 'experimental::builtin';
-no warnings 'experimental::class';
+use v5.32;
+use warnings;
+use Object::Pad 0.73;
 
-class Archive::SCS::GameDir 0.03;
+class Archive::SCS::GameDir 1.00;
+
+use builtin 'trim';
+use stable 0.031 'isa';
+no warnings 'experimental::builtin';
 
 use Archive::SCS;
 use Carp 'croak';
@@ -67,7 +70,8 @@ method path () {
 }
 
 
-method find ($name //= '') {
+method find ($name = '') {
+  $name //= '';
   if ( length $name ) {
     my $dir = Path::Tiny::path $name;
     if ($dir->child('base.scs')->exists) {
@@ -137,9 +141,11 @@ method version () {
   }
   else {  # < 1.50
     my $scs = $self->mounted('base.scs');
-    return eval { builtin::trim $scs->read_entry('version.txt') };
+    return eval { trim $scs->read_entry('version.txt') };
   }
 }
+
+1;
 
 
 =head1 NAME
@@ -202,24 +208,43 @@ Set the C<STEAM_LIBRARY> environment variable.
 
   @files = $gamedir->archives;
 
+Returns the list of filenames found in the game directory.
+
 =head2 find
 
   $gamedir = $gamedir->find;
   $gamedir = $gamedir->find('ATS');
   $gamedir = $gamedir->find('/path/to/gamedir');
 
+Tries to find the game directory for the given game in the
+current Steam library paths. Will modify the object state.
+Use C<game()> / C<game_short()> / C<path()> to read the result.
+
+If there are multiple game directories in the paths, the search
+stops at the first one found.
+
 =head2 game
 
   $full_name = $gamedir->game;
+
+Returns the full name of the game directory, or C<undef>
+if the search was unsuccessful.
 
 =head2 game_short
 
   $abbreviation = $gamedir->game_short;
 
+Returns an abbreviation for the game name (like C<ATS>),
+or C<undef> if the search was unsuccessful.
+
 =head2 mounted
 
   $scs = $gamedir->mounted;
   $scs = $gamedir->mounted(@files);
+
+Returns a new L<Archive::SCS> object with all files found in
+the game directory already mounted. If a list of filenames is
+given, only those files will be mounted.
 
 =head2 new
 
@@ -227,21 +252,34 @@ Set the C<STEAM_LIBRARY> environment variable.
   $gamedir = Archive::SCS::GameDir->new(game => 'ATS');
   $gamedir = Archive::SCS::GameDir->new(game => '/path/to/gamedir');
 
+Creates a new L<Archive::SCS::GameDir> object.
+Will call C<find()> with the given game as argument.
+
 =head2 path
 
   $path_tiny = $gamedir->path;
+
+Returns a L<Path::Tiny> object for the game directory,
+or C<undef> if the search was unsuccessful.
 
 =head2 library_paths
 
   @steam_paths = $gamedir->library_paths;
 
+Returns the current list of paths to search for the Steam library.
+
 =head2 set_library_paths
 
   $gamedir = $gamedir->set_library_paths(@steam_paths);
 
+Sets the list of paths to search for the Steam library. The Steam
+library is the directory containing the C<steamapps> directory.
+
 =head2 version
 
   $installed_version = $gamedir->version;
+
+Reads the game directory and reports the installed game version.
 
 =head1 AUTHOR
 

@@ -1,0 +1,83 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 4c7797e656b2cad6440561bf2bb488b76dd843358927497638d4a1ea45cd91e4 CONCEPT
+SHA256 7d23c564fb349f6f5073cf99de556ef129a89a45bf2c5c1e55fa2f97fc094a34 Changes
+SHA256 e9721661dbfb60dadebf3cd197cbc00239895aa73fb3431e19490cfad301cf99 LICENSE
+SHA256 c4eb8db1f0c8a28041e5d976a778567e10422fb0fde2f6804aaad9e1d86f4875 MANIFEST
+SHA256 05f4b1137944e500d2a79d05bf64a791035995d853ff8eb6defc101ab6c098f4 META.yml
+SHA256 0c34d3db0d6e9a918915c74766acf1be54999be8aee12a1bb1b491f5bad26eda Makefile.PL
+SHA256 64fe206b5b03517c0f6d66ad40f21f1dd98bc06d868bb2b042866f933ab20ce0 README
+SHA256 8c45f6751d7ad1391f80b646ab1892dbffa9c8e01dd4a7557f98affb1f0c99dd examples/comment.pl
+SHA256 fb4d5d1fea30b93ecf0cef6b7e0109cf52f27a21147ba3768e7ab2de16fd331a examples/fixture.pl
+SHA256 1ca474e7dcf2d12f389332f60b75a428de634a0466989693fd4840a0ce84a39a examples/message_board.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 e19b420ab6f969ffecf7185a12d339bf362b834b4d3f10230045691318d3aa4e lib/Data/Message/Board.pm
+SHA256 4fbf84c56da2924cd8e5282de2a9d26984d866404e17f4843b118a528bf8d7a8 lib/Data/Message/Board/Comment.pm
+SHA256 b9135ae0a651e03ebe2ba244494f66d8f261faa3b35faa8747ea912e888c8f6c lib/Test/Shared/Fixture/Data/Message/Board/Example.pm
+SHA256 cfa48d86469818d9439bab39f98f507dbd7613b5840e5fe0f27862498362628f t/Data-Message-Board-Comment/01-use.t
+SHA256 4cbe412a08972e27b754b4904de7598c2cb5ba78afe4e52b4b897ce6e8ccc29e t/Data-Message-Board-Comment/02-version.t
+SHA256 2f9778e0a41f31da15e6085ae6b24191f4a348982d36c00603b10bc8b20ec343 t/Data-Message-Board-Comment/03-new.t
+SHA256 0f4fb62171bbd00b5d15f33e3ecace705545682896802247b69c6d3b2b0a4d6c t/Data-Message-Board-Comment/04-author.t
+SHA256 2168bd8f00839fcf745dc58ef62f99ba3bef987e67edd5981f36b8e544d2f76e t/Data-Message-Board-Comment/05-date.t
+SHA256 be00570c3f4f29b8bef12e0ca65695f12310de4e2e336cb0bc49dc505937b9b9 t/Data-Message-Board-Comment/06-id.t
+SHA256 846119e08337af3e5fd3699df83a7925c04d56474327706c57e7ecb94893ef9d t/Data-Message-Board-Comment/07-message.t
+SHA256 37ae474a6c71fdeb1252510223778532d9e3b47095a93cebe4db971bd6acb148 t/Data-Message-Board/01-use.t
+SHA256 523f397219cae5341a3d38dbf09fdf376ada30d1758a3c6ed89d03cce4b59961 t/Data-Message-Board/02-version.t
+SHA256 037bec19c7e66d90963d59fada3fc22a0b225e70b82347a6204365e5044db4b3 t/Data-Message-Board/03-new.t
+SHA256 86a187320d6143bf70f0511abb901be152e66f7a7daae946c5744d6432b132c6 t/Data-Message-Board/04-author.t
+SHA256 c24207e8a6426ce5bae7cf15cb6bafb0645734b0dd4e8732859a61cb09945de3 t/Data-Message-Board/05-comments.t
+SHA256 b2cdd4fb0966250cdcb283ce002fc914241d34854285fc812c36da493181b865 t/Data-Message-Board/06-date.t
+SHA256 1efc7527d44ac95c3a2b462b629ab8cfce8ddb54cb6fadbd32f1564084a87e61 t/Data-Message-Board/07-id.t
+SHA256 a2e3896eb59a37d9e3a1cca1f8db59f1ed05a53dac7e5ff670426febc87f0841 t/Data-Message-Board/08-message.t
+SHA256 217b9710836a3359d0b01185be4a4d744d91c2958616a485e190aa2537485bed t/Test-Shared-Fixture-Data-Message-Board-Example/01-use.t
+SHA256 d1eddde8023889a596664a55b2043f201f5118a2029075aab688f49eff5e6a69 t/Test-Shared-Fixture-Data-Message-Board-Example/02-version.t
+SHA256 0e105e51ec5296ef169388c9e865073e652ba18ffd0808974a3a8343bdec3d2c t/Test-Shared-Fixture-Data-Message-Board-Example/03-new.t
+SHA256 a409644a35826b489f49171e352a162a27abbbfe73b531afab99cc511de1f18f t/Test-Shared-Fixture-Data-Message-Board-Example/04-author.t
+SHA256 d5f561fb1cc5a50d74cabd5c8480fab8ccd895dae747be62720fb8004eb55b6a t/Test-Shared-Fixture-Data-Message-Board-Example/05-comments.t
+SHA256 6cdac3d9108baddf6d8d74f86da959373d6f2e10bcf54f9db3e8d463ce9e6132 t/Test-Shared-Fixture-Data-Message-Board-Example/06-date.t
+SHA256 b35df487ec2c0c1378b0135f072992a84cb99d7f56a2c5c5fa9f455c402f4b94 t/Test-Shared-Fixture-Data-Message-Board-Example/07-id.t
+SHA256 dbf9610271f6b3b33dadaaff3c0b0013bebb56e35f678c0e8bf9c0fee5de1cca t/Test-Shared-Fixture-Data-Message-Board-Example/08-message.t
+SHA256 c3b379352a406d979b6c4ee103c139ea363866f8ec3e0777935111271c8f49df xt/Data-Message-Board-Comment/01-pod_coverage.t
+SHA256 7d350a17b134a86bbdeef7244287369c5f3438c3d2b4d857cd154c0043160900 xt/Data-Message-Board-Comment/02-pod.t
+SHA256 52593384a5aded1ef0cbf92a9d87de4fa908f1c023a2ddf484013944c6462f34 xt/Data-Message-Board/01-pod_coverage.t
+SHA256 7223aafa8a5233545a8ba89854530c2904a720f49a5679366a1c44e79aaa69ff xt/Data-Message-Board/02-pod.t
+SHA256 888ad15f2da0acc460898db2d8b58ea6cdb312300722d7895438157e846af03e xt/Test-Shared-Fixture-Data-Message-Board-Example/01-pod_coverage.t
+SHA256 a26f258da89de875c193d94b7416e1b6bb52b2c62ae1fb8611612508a3dbba47 xt/Test-Shared-Fixture-Data-Message-Board-Example/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEbhzVZugfHqSVNvE7YSp92FNcjtAFAmZUz2cACgkQYSp92FNc
+jtBZIQv/SpzWMUuFrEci1Fa6vI9hmdCfaNW8sHYnq0PQMvZq5plPjAcy4/Ul8SUq
+4l/hlwxDKytlkAG/xNB58JvU927Zen2BbIhXqT4Atu3AOCQlnIwLxSIOXgm3p0oJ
+DUteLuIxu/c5o+Czl2Rpye3Vz59TJK+pD91gWP0QUYbt+Gu42/yhfAJodgmACkP9
+8UwhOjG238Y9F/MlvIYLMDg7HRGCBxALUASn7k8c+jLbn+3Teg9doC3ypyDIqE8p
+VebIhQNQi1o7xBsazIJqFHq9rEJOXfYLq142fg+RSaJ9k7pLt6xNG/i+TmZbATog
+acFURsZs7PmW8dcZb+SBqBN/WP00vBC7m2SSUQtyT1FbgXhdxTxhvT2uznqpT9Ax
+QjnRV9RzGorMm3MAQoAc42dXT+nv0/Bcnt+VDVSaB8uM+BI8/K66JRAT3vqJ9W/6
+qrG+ddDfqN4T60kVP3ztNWjutsGkcMHyaS85mCeVV2pKjG0GVI+pn6HxR4kM7ZOK
+t5m5jd7x
+=y/kw
+-----END PGP SIGNATURE-----

@@ -3,6 +3,7 @@ requires   "IO::Socket::SSL";
 requires   "JSON::MaybeXS";
 requires   "Module::CoreList";
 requires   "Text::Wrap";
+requires   "YAML::PP";
 requires   "version";
 
 recommends "HTTP::Tiny"               => "0.083";
@@ -11,7 +12,9 @@ recommends "IO::Socket::SSL"          => "1.35";
 suggests   "HTTP::Tiny"               => "0.088";
 suggests   "IO::Socket::SSL"          => "2.084";
 suggests   "JSON::MaybeXS"            => "1.004005";
+suggests   "Module::CoreList"         => "5.20240320";
 suggests   "Perl::Tidy"               => "20230912";
+suggests   "YAML::PP"                 => "0.38.0";
 suggests   "version"                  => "0.9929";
 
 on "configure" => sub {

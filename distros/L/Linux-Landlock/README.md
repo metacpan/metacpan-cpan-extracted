@@ -6,12 +6,15 @@ Linux::Landlock - A higher level interface to the Linux Landlock API
 
 Landlock is a sandboxing feature specific to Linux that allows a process to
 restrict its own access to the file system.
-Since the restrictions are set at runtime, from within the process itself,
-you can take into account dynamic information, like log or file system spool
-locations defined in your current configuration.
-
 Once set, restrictions cannot be undone and they are inherited by all future
 child processes.
+
+Since the restrictions are set at runtime, from within the process itself,
+you can take into account dynamic information from your configuration.
+For example, a server that is supposed to serve files from a specific directory
+can restrict itself to that directory and its subdirectories to mitigate any bugs
+allowing directory traversal attacks. This is much less intrusive than chroot
+and does not require root privileges.
 
 This module provides an object-oriented interface to the Linux Landlock API.
 It uses the lower-level interface provided by [Linux::Landlock::Direct](https://metacpan.org/pod/Linux%3A%3ALandlock%3A%3ADirect).
@@ -19,11 +22,13 @@ It uses the lower-level interface provided by [Linux::Landlock::Direct](https://
 See [https://docs.kernel.org/userspace-api/landlock.html](https://docs.kernel.org/userspace-api/landlock.html) for more information
 about Landlock.
 
+# METHODS
+
 # SYNOPSIS
 
       use Linux::Landlock;
 
-      my $ruleset = Linux::Landlock->new();
+      my $ruleset = Linux::Landlock->new(); # this can die
       $ruleset->add_path_rule('/etc/fstab', qw(read_file));
       $ruleset->add_net_rule(22222, qw(bind_tcp));
       $ruleset->apply();
@@ -38,7 +43,17 @@ about Landlock.
       IO::Socket::INET->new(LocalPort => 33333, Proto => 'tcp') or print "failed: $!\n"; # failed
       IO::Socket::INET->new(LocalPort => 22222, Proto => 'tcp') and print "succeeded\n"; # succeeded
 
-# METHODS
+- new(\[handled\_fs\_actions => \\@fs\_actions, handled\_net\_actions => \\@net\_actions, die\_on\_unsupported => 1|0\])
+
+    Create a new [Linux::Landlock](https://metacpan.org/pod/Linux%3A%3ALandlock) instance.
+
+    `handled_fs_actions` and `handled_net_actions` restrict the set of actions that can be used in rules and that
+    will be prevented if not allowed by any rule. By default, all actions supported by the kernel and known to this
+    module are covered. This should usually not be changed.
+
+    If `die_on_unsupported` is set to a true value, the module will die if an unsupported access right is requested.
+    Otherwise, access rights will be set on a best-effort basis, as intended by the upstream Landlock API design. This
+    option should usually not be used.
 
 - apply()
 
@@ -74,6 +89,14 @@ about Landlock.
 
     See  [https://docs.kernel.org/userspace-api/landlock.html](https://docs.kernel.org/userspace-api/landlock.html) for all possible access rights.
 
+    This method dies on error. Errors are: non-existing or non-accessible paths and empty rules.
+    If `die_on_unsupported` is used, it will also die if the rules are not supported by the
+    current kernel.
+
+    **Beware**: While the API accepts a path or user space file descriptor, the rule is actually
+    applied to the kernel internal file system object. This means that you will lose access if a
+    path or directory you allowed access to is renamed or replaced.
+
 - add\_net\_port\_rule($port, @allowed)
 
     Add a rule to the ruleset that allows the specified access to the given port.
@@ -88,16 +111,7 @@ about Landlock.
 
     A convenience method that adds rules to allow reading files and directories in
     all directories in `@INC`.
-
-- new(\[handled\_fs\_actions => \\@fs\_actions, handled\_net\_actions => \\@net\_actions\])
-
-    Create a new [Linux::Landlock](https://metacpan.org/pod/Linux%3A%3ALandlock) instance.
-
-    `handled_fs_actions` and `handled_net_actions` restrict the set of actions that
-    can be used in rules and that will be prevented if not allowed by any rule.
-
-    By default, all actions supported by the kernel and known to this module are covered.
-    This should usually not be changed.
+    This will not allow access to ".", even if it is in `@INC`.
 
 # LIMITATIONS
 
@@ -109,6 +123,9 @@ Notably, the `TRUNCATE` access right is only supported by the kernel since ABI
 version 3 (kernel version 6.2 or newer, unless backported).
 
 Network functionality is only available since ABI version 4.
+
+Also keep in mind, that some Perl, or even libc, functions might implicitly rely
+on file system access that could have been restricted by Landlock.
 
 # AUTHOR
 

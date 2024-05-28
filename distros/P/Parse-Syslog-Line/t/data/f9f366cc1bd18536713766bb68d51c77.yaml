@@ -1,0 +1,78 @@
+---
+expected:
+  SDATA:
+    junos@2636.1.1.1.2.143:
+      application: UNKNOWN
+      application-category: N/A
+      application-characteristics: N/A
+      application-risk: -1
+      application-sub-category: N/A
+      bytes-from-client: 96
+      bytes-from-server: 1100
+      connection-tag: 0
+      destination-address: 10.1.1.1
+      destination-port: 53
+      destination-zone-name: destination-zone
+      dst-nat-rule-name: N/A
+      dst-nat-rule-type: N/A
+      dst-vrf-grp: N/A
+      elapsed-time: 5
+      encrypted: No
+      hostname: NA NA
+      nat-connection-tag: 0
+      nat-destination-address: 10.1.1.1
+      nat-destination-port: 53
+      nat-source-address: 192.168.1.1
+      nat-source-port: 5480
+      nested-application: UNKNOWN
+      packet-incoming-interface: reth7.200
+      packets-from-client: 1
+      packets-from-server: 1
+      peer-destination-address: 0.0.0.0
+      peer-destination-port: 0
+      peer-session-id: 0
+      peer-source-address: 0.0.0.0
+      peer-source-port: 0
+      policy-name: my-policy-name
+      protocol-id: 17
+      reason: Closed by junos-alg
+      roles: N/A
+      secure-web-proxy-session-type: NA
+      service-name: junos-dns-udp
+      session-id-32: 235423523
+      source-address: 192.168.1.1
+      source-port: 5480
+      source-zone-name: source-zone
+      src-nat-rule-name: N/A
+      src-nat-rule-type: N/A
+      src-vrf-grp: N/A
+      tunnel-inspection: Off
+      tunnel-inspection-policy-set: root
+      username: N/A
+  content: RT_FLOW_SESSION_CLOSE
+  date: 2024-05-23
+  date_raw: 2024-05-23T03:38:26+00:00
+  datetime_obj: ~
+  datetime_raw: 2024-05-23T03:38:26+00:00
+  datetime_str: 2024-05-23T03:38:26Z
+  domain: ~
+  epoch: 1716435506
+  facility: ~
+  facility_int: ~
+  host: fwvirt-src
+  host_raw: fwvirt-src
+  message: 'RT_FLOW - RT_FLOW_SESSION_CLOSE [junos@2636.1.1.1.2.143 reason="Closed by junos-alg" source-address="192.168.1.1" source-port="5480" destination-address="10.1.1.1" destination-port="53" connection-tag="0" service-name="junos-dns-udp" nat-source-address="192.168.1.1" nat-source-port="5480" nat-destination-address="10.1.1.1" nat-destination-port="53" nat-connection-tag="0" src-nat-rule-type="N/A" src-nat-rule-name="N/A" dst-nat-rule-type="N/A" dst-nat-rule-name="N/A" protocol-id="17" policy-name="my-policy-name" source-zone-name="source-zone" destination-zone-name="destination-zone" session-id-32="235423523" packets-from-client="1" bytes-from-client="96" packets-from-server="1" bytes-from-server="1100" elapsed-time="5" application="UNKNOWN" nested-application="UNKNOWN" username="N/A" roles="N/A" packet-incoming-interface="reth7.200" encrypted="No" application-category="N/A" application-sub-category="N/A" application-risk="-1" application-characteristics="N/A" secure-web-proxy-session-type="NA" peer-session-id="0" peer-source-address="0.0.0.0" peer-source-port="0" peer-destination-address="0.0.0.0" peer-destination-port="0" hostname="NA NA" src-vrf-grp="N/A" dst-vrf-grp="N/A" tunnel-inspection="Off" tunnel-inspection-policy-set="root"]'
+  message_raw: '2024-05-23T03:38:26+00:00 fwvirt-src 1 2024-05-23T03:38:26.264Z fw101-SRX4200 RT_FLOW - RT_FLOW_SESSION_CLOSE [junos@2636.1.1.1.2.143 reason="Closed by junos-alg" source-address="192.168.1.1" source-port="5480" destination-address="10.1.1.1" destination-port="53" connection-tag="0" service-name="junos-dns-udp" nat-source-address="192.168.1.1" nat-source-port="5480" nat-destination-address="10.1.1.1" nat-destination-port="53" nat-connection-tag="0" src-nat-rule-type="N/A" src-nat-rule-name="N/A" dst-nat-rule-type="N/A" dst-nat-rule-name="N/A" protocol-id="17" policy-name="my-policy-name" source-zone-name="source-zone" destination-zone-name="destination-zone" session-id-32="235423523" packets-from-client="1" bytes-from-client="96" packets-from-server="1" bytes-from-server="1100" elapsed-time="5" application="UNKNOWN" nested-application="UNKNOWN" username="N/A" roles="N/A" packet-incoming-interface="reth7.200" encrypted="No" application-category="N/A" application-sub-category="N/A" application-risk="-1" application-characteristics="N/A" secure-web-proxy-session-type="NA" peer-session-id="0" peer-source-address="0.0.0.0" peer-source-port="0" peer-destination-address="0.0.0.0" peer-destination-port="0" hostname="NA NA" src-vrf-grp="N/A" dst-vrf-grp="N/A" tunnel-inspection="Off" tunnel-inspection-policy-set="root"]'
+  offset: Z
+  origin: fw101-SRX4200
+  origin_date: 2024-05-23T03:38:26.264Z
+  preamble: ~
+  priority: ~
+  priority_int: ~
+  program_name: RT_FLOW
+  program_pid: ~
+  program_raw: RT_FLOW
+  program_sub: ~
+  time: 03:38:26
+name: f9f366cc1bd18536713766bb68d51c77
+string: '2024-05-23T03:38:26+00:00 fwvirt-src 1 2024-05-23T03:38:26.264Z fw101-SRX4200 RT_FLOW - RT_FLOW_SESSION_CLOSE [junos@2636.1.1.1.2.143 reason="Closed by junos-alg" source-address="192.168.1.1" source-port="5480" destination-address="10.1.1.1" destination-port="53" connection-tag="0" service-name="junos-dns-udp" nat-source-address="192.168.1.1" nat-source-port="5480" nat-destination-address="10.1.1.1" nat-destination-port="53" nat-connection-tag="0" src-nat-rule-type="N/A" src-nat-rule-name="N/A" dst-nat-rule-type="N/A" dst-nat-rule-name="N/A" protocol-id="17" policy-name="my-policy-name" source-zone-name="source-zone" destination-zone-name="destination-zone" session-id-32="235423523" packets-from-client="1" bytes-from-client="96" packets-from-server="1" bytes-from-server="1100" elapsed-time="5" application="UNKNOWN" nested-application="UNKNOWN" username="N/A" roles="N/A" packet-incoming-interface="reth7.200" encrypted="No" application-category="N/A" application-sub-category="N/A" application-risk="-1" application-characteristics="N/A" secure-web-proxy-session-type="NA" peer-session-id="0" peer-source-address="0.0.0.0" peer-source-port="0" peer-destination-address="0.0.0.0" peer-destination-port="0" hostname="NA NA" src-vrf-grp="N/A" dst-vrf-grp="N/A" tunnel-inspection="Off" tunnel-inspection-policy-set="root"]'

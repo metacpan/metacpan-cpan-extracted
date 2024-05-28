@@ -1,6 +1,8 @@
 #!perl
 
-use v5.38;
+use v5.32;
+use feature 'signatures';
+no warnings 'experimental::signatures';
 
 use Archive::SCS;
 use Archive::SCS::CityHash qw( cityhash64 cityhash64_hex );
