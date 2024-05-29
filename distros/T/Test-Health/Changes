@@ -1,10 +1,42 @@
 ==================================================
-Changes from 2015-12-10 00:00:00 +0000 to present.
+Changes from 2016-04-19 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.003 at 2016-12-09 09:55:39 +0000
+version 0.004 at 2017-04-19 23:01:21 +0000
 ------------------------------------------
+
+  Change: ae9c4d7f765b7ed883e58511a20abd4c7a5f78fa
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-19 20:01:04 +0000
+
+    Incremented version to release to CPAN 
+
+------------------------------------------
+version 0.004 at 2017-04-19 22:58:43 +0000
+------------------------------------------
+
+  Change: 70bb0c6e0d0c1c996d4738903deaf34f9a8266ca
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-19 19:58:43 +0000
+
+    Merge remote-tracking branch 'refs/remotes/origin/master' 
+
+  Change: bca4296ae850dc0b39e19621235459dd60031598
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-19 19:55:48 +0000
+
+    Added a formatter attribute
+
+    Added new attribute to hold a reference to a formatter Added
+    Dist::Zilla::Plugin::CPANFile to the distribution INI Updated the Pod
+    and tests due the addition of the formatter attribute 
+
+  Change: 3df1ff8ed3224e8286570a0d9755fd47db93669e
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2016-12-09 23:02:41 +0000
+
+    Update README.md 
 
   Change: 4370b242bb73e335647254a9cb72e7914e6490f0
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>

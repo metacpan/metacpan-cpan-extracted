@@ -2,48 +2,48 @@ use strict;
 use warnings;
 
 use Log::Contextual::SimpleLogger;
-use Test::More qw(no_plan);
+use Test::More;
 use Log::Contextual qw(:log set_logger);
 
 my ($var1, $var2, $var3);
 my $complex_dispatcher = do {
 
-   my $l1 = Log::Contextual::SimpleLogger->new({
-      levels  => [qw(trace debug info warn error fatal)],
-      coderef => sub { $var1 = shift },
-   });
+  my $l1 = Log::Contextual::SimpleLogger->new({
+    levels  => [qw(trace debug info warn error fatal)],
+    coderef => sub { $var1 = shift },
+  });
 
-   my $l2 = Log::Contextual::SimpleLogger->new({
-      levels  => [qw(trace debug info warn error fatal)],
-      coderef => sub { $var2 = shift },
-   });
+  my $l2 = Log::Contextual::SimpleLogger->new({
+    levels  => [qw(trace debug info warn error fatal)],
+    coderef => sub { $var2 = shift },
+  });
 
-   my $l3 = Log::Contextual::SimpleLogger->new({
-      levels  => [qw(trace debug info warn error fatal)],
-      coderef => sub { $var3 = shift },
-   });
+  my $l3 = Log::Contextual::SimpleLogger->new({
+    levels  => [qw(trace debug info warn error fatal)],
+    coderef => sub { $var3 = shift },
+  });
 
-   my %registry = (
-      -logger => $l3,
-      A1      => {
-         -logger => $l1,
-         lol     => $l2,
-      },
-      A2 => {-logger => $l2},
-   );
+  my %registry = (
+    -logger => $l3,
+    A1      => {
+      -logger => $l1,
+      lol     => $l2,
+    },
+    A2 => {-logger => $l2},
+  );
 
-   sub {
-      my ($package, $info) = @_;
+  sub {
+    my ($package, $info) = @_;
 
-      my $logger = $registry{'-logger'};
-      if (my $r = $registry{$package}) {
-         $logger = $r->{'-logger'} if $r->{'-logger'};
-         my (undef, undef, undef, $sub) = caller($info->{caller_level} + 1);
-         $sub =~ s/^\Q$package\E:://g;
-         $logger = $r->{$sub} if $r->{$sub};
-      }
-      return $logger;
-     }
+    my $logger = $registry{'-logger'};
+    if (my $r = $registry{$package}) {
+      $logger = $r->{'-logger'} if $r->{'-logger'};
+      my (undef, undef, undef, $sub) = caller($info->{caller_level} + 1);
+      $sub =~ s/^\Q$package\E:://g;
+      $logger = $r->{$sub} if $r->{$sub};
+    }
+    return $logger;
+  };
 };
 
 set_logger $complex_dispatcher;
@@ -75,28 +75,30 @@ is($var3, "[debug] 2.var3\n", "global default logger works");
 
 BEGIN {
 
-   package A1;
-   use Log::Contextual ':log';
+  package A1;
+  use Log::Contextual ':log';
 
-   sub lol {
-      log_debug { '1.var2' }
-   }
+  sub lol {
+    log_debug { '1.var2' }
+  }
 
-   sub rofl {
-      log_debug { '1.var1' }
-   }
+  sub rofl {
+    log_debug { '1.var1' }
+  }
 
-   package A2;
-   use Log::Contextual ':log';
+  package A2;
+  use Log::Contextual ':log';
 
-   sub foo {
-      log_debug { '2.var2' }
-   }
+  sub foo {
+    log_debug { '2.var2' }
+  }
 
-   package A3;
-   use Log::Contextual ':log';
+  package A3;
+  use Log::Contextual ':log';
 
-   sub squint {
-      log_debug { '2.var3' }
-   }
+  sub squint {
+    log_debug { '2.var3' }
+  }
 }
+
+done_testing;

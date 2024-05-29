@@ -1,4 +1,4 @@
-package EAI::Wrap 1.913;
+package EAI::Wrap 1.914;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use Data::Dumper qw(Dumper); use File::Copy qw(copy move); use Cwd qw(chdir); use Archive::Extract ();
@@ -39,6 +39,8 @@ sub INIT {
 	my ($homedirnode) = ($execute{homedir} =~ /^.*[\\\/](.*?)$/);
 	print STDOUT "\$execute{homedir}: $execute{homedir}, \$execute{scriptname}: $execute{scriptname}, \$homedirnode: $homedirnode\n";
 	$execute{envraw} = $config{folderEnvironmentMapping}{$homedirnode};
+	my $modulepath = File::Basename::dirname(File::Spec->rel2abs(__FILE__)); # get this module's folder as additional folderEnvironmentMapping.
+	$execute{envraw} = $config{folderEnvironmentMapping}{$modulepath} if !$execute{envraw}; # if nothing found check if modulepath is configured to get envraw from there...
 	if ($execute{envraw}) {
 		$execute{env} = $execute{envraw};
 		readConfigs($execute{envraw}); # read configs again for different environment
@@ -133,9 +135,10 @@ sub openFTPConn ($;$) {
 	my $hostname = $FTP->{remoteHost};
 	$hostname = $FTP->{remoteHost}{$execute{env}} if ref($FTP->{remoteHost}) eq "HASH";
 	if ($enforceConn) {
-		$logger->info("enforced FTP reconnect");
+		$logger->info("enforced FTP connect");
 	} else {
-		return 1 if $process->{successfullyDone} and $process->{successfullyDone} =~ /\QopenFTPConn$hostname/ and $execute{retryBecauseOfError};
+		# don't connect if redo from local file
+		return 1 if $common{task}{redoFile};
 	}
 	# only for set prefix, take username, password, hostkey and privKey from $config{sensitive}{$FTP->{prefix}} (directly or via environment hash)
 	if ($FTP->{prefix}) {
@@ -900,15 +903,14 @@ sub processingEnd {
 				delete($_->{process}{filesProcessed});
 				delete($_->{process}{filenames});
 			}
-			$logger->debug("\%execute =".EAI::Common::dumpFlat(\%execute,1));
 			$logger->info("Retrying in ".$retrySeconds." seconds because of ".($execute{retryBecauseOfError} ? "occurred error" : "planned retry")." until ".$endTime.", next run: ".$nextStartTime);
 			sleep $retrySeconds;
 		}
 	} else {
 		$logger->info("------> finished $execute{scriptname}");
 	}
-	# reset error mail filter..
-	$EAI::Common::alreadySent = 0;
+	# reset error mail filter for planned tasks ..
+	$EAI::Common::alreadySent = 0 unless $execute{retryBecauseOfError};
 	return $execute{processEnd};
 }
 
@@ -1616,10 +1618,6 @@ query used in getAdditionalDBData to retrieve lookup information from DB using E
 
 used for getAdditionalDBData, list of field names to be used as the keys of the returned hash
 
-=item countPercent
-
-percentage of progress in EAI::DB::storeInDB where indicator should be output (e.g. 10 for all 10% of progress). progress indicator is disabled if false.
-
 =item cutoffYr2000
 
 when storing date data with 2 year digits in dumpDataIntoDB/EAI::DB::storeInDB, this is the cutoff where years are interpreted as 19XX (> cutoffYr2000) or 20XX (<= cutoffYr2000)
@@ -1759,10 +1757,6 @@ for EAI::File::writeText: Hash of data fields, that are to be written (in order 
 =item columnskip
 
 for EAI::File::writeText: boolean hash of column names that should be skipped when writing the file ({column1ToSkip => 1, column2ToSkip => 1, ...})
-
-=item countPercent
-
-percentage of progress in EAI::File::readText where indicator should be output (e.g. 10 for all 10% of progress). progress indicator is disabled if false.
 
 =item dontKeepHistory
 
@@ -2086,7 +2080,7 @@ in case a zip archive package is retrieved, the filenames of these packages are 
 
 =item countPercent
 
-percentage for counting File text reading and DB storing, if > 0 on each reaching of the percentage in countPercent a progress is shown (e.g. every 10% if countPercent = 10)
+percentage for counting File text reading and DB storing, if given (greater 0) then on each reaching of the percentage in countPercent a progress is shown (e.g. every 10% if countPercent = 10). Any value >=100 will count ALL lines...
 
 =item data
 

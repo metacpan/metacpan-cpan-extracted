@@ -5,20 +5,19 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Feature::Compat::Try: '0'
-  File::ShareDir::Install: '0'
   File::Slurp: '0'
+  Import::Base: '1.004'
   Markdown::Pod: '0'
   Path::Tiny: '0'
   Perl::Tidy: '20240511'
   Template: '0'
-  Test::Deep: '0'
-  Test::Exception: '0'
-  Test::More: '0'
+  Test::Most: '0'
   Test::RequiresInternet: '0'
   Text::Wrap: '0'
   YAML::XS: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -38,5 +37,5 @@ requires:
 resources:
   bugtracker: https://github.com/nferraz/perl-openapi-client-openai/issues
   repository: https://github.com/nferraz/perl-openapi-client-openai.git
-version: '0.04'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

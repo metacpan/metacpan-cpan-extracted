@@ -123,7 +123,7 @@ __END__
 
 C<OpenSearch::Index> - OpenSearch Index API Endpoints
 
-=head SYNOPSIS
+=head1 SYNOPSIS
 
   use OpenSearch;
 
@@ -134,11 +134,25 @@ C<OpenSearch::Index> - OpenSearch Index API Endpoints
   $api->delete( index => 'my_index' );
   #...
 
-=head DESCRIPTION
+=head1 DESCRIPTION
 
 This module provides an interface to the OpenSearch Index API endpoints.
 If i read the documentation correctly, all endpoints are supported. For
-a list of avaialable parameters see: L<https://opensearch.org/docs/latest/api-reference/index-apis/>
+a list of avaialable parameters see: 
+L<https://opensearch.org/docs/latest/api-reference/index-apis/>
+
+=head1 RETURN VALUES
+
+When the C<async> attribute is set to true:
+
+  my $os = OpenSearch->new(
+    ...
+    async => 1
+  );
+
+all methods return a L<Mojo::Promise> object that will resolve 
+to a L<OpenSearch::Response> object. Otherwise, it will directly return a
+L<OpenSearch::Response> object.
 
 =head1 METHODS
 
@@ -153,8 +167,6 @@ a list of avaialable parameters see: L<https://opensearch.org/docs/latest/api-re
     index => 'my_index',
     timeout => '1m'
   );
-
-Creates a new index.
 
 =item * delete
 

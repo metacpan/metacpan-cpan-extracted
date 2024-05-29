@@ -2,7 +2,7 @@ package Log::Contextual::Router;
 use strict;
 use warnings;
 
-our $VERSION = '0.009000';
+our $VERSION = '0.009001';
 
 use Scalar::Util 'blessed';
 
@@ -116,7 +116,7 @@ sub _set_package_logger_for {
   $_[0]->_package_logger->{$_[1]} = $logger
 }
 
-sub get_loggers {
+sub _get_loggers {
   my ($self, %info) = @_;
   my $package   = $info{caller_package};
   my $log_level = $info{message_level};
@@ -130,7 +130,7 @@ sub get_loggers {
   $info{caller_level}++;
   $logger = $logger->($package, \%info);
 
-  return $logger if $logger ->${\"is_${log_level}"};
+  return $logger if $logger->${\"is_${log_level}"};
   return ();
 }
 
@@ -143,7 +143,7 @@ sub handle_log_request {
 
   $message_info{caller_level}++;
 
-  my @loggers = $self->get_loggers(%message_info)
+  my @loggers = $self->_get_loggers(%message_info)
     or return;
 
   my @log = defined $text ? ($text) : ($generator->(@$args));
@@ -166,7 +166,15 @@ Log::Contextual::Router - Route messages to loggers
 
 =head1 VERSION
 
-version 0.009000
+version 0.009001
+
+=head1 DESCRIPTION
+
+This is the default log router used by L<Log::Contextual>. It fulfills the roles
+L<Log::Contextual::Role::Router>,
+L<Log::Contextual::Role::Router::WithLogger>,
+L<Log::Contextual::Role::Router::HasLogger>, and
+L<Log::Contextual::Role::Router::SetLogger>.
 
 =head1 BUGS
 

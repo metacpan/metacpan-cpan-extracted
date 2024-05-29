@@ -57,54 +57,55 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::Fatal" : "0",
-            "Test::More" : "0.88"
+            "Test::More" : "0.88",
+            "Test::Needs" : "0"
          }
       }
    },
    "provides" : {
       "Log::Contextual" : {
          "file" : "lib/Log/Contextual.pm",
-         "version" : "0.009000"
+         "version" : "0.009001"
       },
       "Log::Contextual::Easy::Default" : {
          "file" : "lib/Log/Contextual/Easy/Default.pm",
-         "version" : "0.009000"
+         "version" : "0.009001"
       },
       "Log::Contextual::Easy::Package" : {
          "file" : "lib/Log/Contextual/Easy/Package.pm",
-         "version" : "0.009000"
+         "version" : "0.009001"
       },
       "Log::Contextual::Role::Router" : {
          "file" : "lib/Log/Contextual/Role/Router.pm",
-         "version" : "0.009000"
+         "version" : "0.009001"
       },
       "Log::Contextual::Role::Router::HasLogger" : {
          "file" : "lib/Log/Contextual/Role/Router/HasLogger.pm",
-         "version" : "0.009000"
+         "version" : "0.009001"
       },
       "Log::Contextual::Role::Router::SetLogger" : {
          "file" : "lib/Log/Contextual/Role/Router/SetLogger.pm",
-         "version" : "0.009000"
+         "version" : "0.009001"
       },
       "Log::Contextual::Role::Router::WithLogger" : {
          "file" : "lib/Log/Contextual/Role/Router/WithLogger.pm",
-         "version" : "0.009000"
+         "version" : "0.009001"
       },
       "Log::Contextual::Router" : {
          "file" : "lib/Log/Contextual/Router.pm",
-         "version" : "0.009000"
+         "version" : "0.009001"
       },
       "Log::Contextual::SimpleLogger" : {
          "file" : "lib/Log/Contextual/SimpleLogger.pm",
-         "version" : "0.009000"
+         "version" : "0.009001"
       },
       "Log::Contextual::TeeLogger" : {
          "file" : "lib/Log/Contextual/TeeLogger.pm",
-         "version" : "0.009000"
+         "version" : "0.009001"
       },
       "Log::Contextual::WarnLogger" : {
          "file" : "lib/Log/Contextual/WarnLogger.pm",
-         "version" : "0.009000"
+         "version" : "0.009001"
       }
    },
    "release_status" : "stable",
@@ -118,7 +119,7 @@
          "web" : "https://github.com/haarg/Log-Contextual"
       }
    },
-   "version" : "0.009000",
+   "version" : "0.009001",
    "x_contributors" : [
       "Christian Walde <walde.christian@gmail.com>",
       "Dan Book <grinnz@grinnz.com>",

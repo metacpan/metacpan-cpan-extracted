@@ -5,8 +5,9 @@ requires 'Moo' => '1.003000';
 requires 'perl' => '5.008001';
 
 on test => sub {
-   requires 'Test::More' => '0.88';
-   requires 'Test::Fatal';
+  requires 'Test::More' => '0.88';
+  requires 'Test::Needs';
+  requires 'Test::Fatal';
 };
 
 on develop => sub {

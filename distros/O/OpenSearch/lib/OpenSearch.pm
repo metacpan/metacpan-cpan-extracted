@@ -12,7 +12,7 @@ use OpenSearch::Search;
 use OpenSearch::Index;
 use OpenSearch::Document;
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 has 'base' => (
   is      => 'rw',
@@ -200,44 +200,67 @@ The path to the client key to use when connecting to the OpenSearch server.
 =head1 CAVEATS
 
 I am not affiliated with OpenSearch. This module is not officially supported by OpenSearch.
-If speed is a concern, you may want to consider using a different module (or maybe language).
-Using 'async' while also using 'max_connections' and 'pool_count' will result in better performance.
 
-Using the following options:
+=head1 PERFORMANCE/BENCHMARK
 
-  async           => 1,
-  pool_count      => 10,
-  max_connections => 50,
+If you need to make a lot of requests to the OpenSearch server, you should consider using
+asynchronous requests in combination with the C<bulk> method of the C<OpenSearch::Document> class.
+For benchmarking purposes, I have included scripts in the example directory.
 
-will result in around 1000 requests per second (on my machine). However, using the following options:
+=over 4
 
-  async           => 0,
-  pool_count      => 10,
-  max_connections => 50,
+=item * C<benchmark-bulk-async.pl>
 
-will result in a maximum of around 200 requests per second (on my machine). This was tested using
+=item * C<benchmark-bulk-sync.pl>
 
-  $os->document->index();
+=item * C<benchmark-index.pl>
 
-with a small test-document:
+=item * C<benchmark-index-async.pl>
 
-  {
-    test    => 'test',
-    test1   => 'test1',
-    nesting => {
-      test  => 'test',
-      test1 => 'test1',
-      test2 => [ 
-        { 
-          wurst => '123' 
-        }, 
-        { 
-          asd => [ 1, 2, 3, 4 ] 
-        } 
-      ]
-    }
-  }
+=back
 
+=head1 BENCHMARK RESULTS
+
+These are the results from my local machine:
+
+C<benchmark-bulk-async.pl> script:
+
+  Pool count: 10
+  Max connections: 50
+  Bulk doc count: 500
+  Count before: 0
+  Count after: 234019
+  Duration: 10.4876799583435
+  Docs per second: 22313.7053122817
+
+C<benchmark-bulk.pl> script:
+
+  Pool count: 10
+  Max connections: 50
+  Bulk doc count: 500
+  Count before: 0
+  Count after: 92699
+  Duration: 10.0426659584045
+  Docs per second: 9230.51711407584
+
+C<benchmark-index.pl> script:
+
+  Pool count: 10
+  Max connections: 50
+  Count before: 0
+  Count after: 1513
+  Duration: 10.0066809654236
+  Docs per second: 151.19898448126
+
+C<benchmark-index-async.pl> script:
+
+  Pool count: 10
+  Max connections: 50
+  Count before: 0
+  Count after: 8614
+  Duration: 10.0460240840912
+  Docs per second: 857.453648119465
+ 
 
 =head1 AUTHOR
 

@@ -10,10 +10,10 @@ sub arg_levels { $_[1] || [qw(lol wut zomg)] }
 sub arg_logger { $_[1] || $logger }
 
 sub router {
-   our $Router_Instance ||= do {
-      require Log::Contextual::Router;
-      Log::Contextual::Router->new
-     }
+  our $Router_Instance ||= do {
+    require Log::Contextual::Router;
+    Log::Contextual::Router->new
+  };
 }
 
 package DumbLogger2;

@@ -1,5 +1,17 @@
 Revision history for OpenAPI-Client-OpenAI
 
+0.06    2024-05-29 08:22 (CEST)
+		- Build bugfix: File::ShareDir::Install needed to be in
+		  CONFIGURE_REQUIRES in the Makefile.PL. Thanks to Slaven Rezić
+		  for the bug report
+        - POD now assumes UTF-8
+
+0.05    2024-05-29 07:16 (CEST)
+        - Added `devel/rebuild` script to make it easier to rebuild the
+          project.
+        - Common test behavior abstracted into t/lib/OpenAITests.pm
+        - Bugfix: rebuilding docs should only list Perl files for examples.
+
 0.04    2024-05-27 16:06 (CEST)
         - Indent HEREDOCS so metacpan doesn't think they're POD
         - Fix bad link in the POD

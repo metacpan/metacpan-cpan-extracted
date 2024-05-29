@@ -13,7 +13,7 @@ use constant DEFAULT_CONFIG_DIR => '/etc';
 use Linux::Info::Distribution::OSRelease;
 use Linux::Info::Distribution::BasicInfo;
 
-our $VERSION = '2.13'; # VERSION
+our $VERSION = '2.15'; # VERSION
 
 # ABSTRACT: class to search for candidate files
 
@@ -102,7 +102,7 @@ sub _search_release_file {
         if ( ( exists $release_files{$thing} ) and ( -f $file_path ) ) {
             $self->{distro_info} = Linux::Info::Distribution::BasicInfo->new(
                 ( lc $release_files{$thing} ), $file_path, );
-
+            $self->{custom_source} = 1;
             last;
         }
     }
@@ -110,9 +110,7 @@ sub _search_release_file {
 
 
 sub search_distro {
-    my ( $self, $os_release ) = @_;
-
-    # Linux::Info::Distribution::OSRelease
+    my $self = shift;
 
     if ( $self->{keep_cache} ) {
         return $self->{distro_info} if ( defined( $self->{distro_info} ) );
@@ -122,24 +120,23 @@ sub search_distro {
     }
 
     if ( $self->{config_dir} eq DEFAULT_CONFIG_DIR ) {
-        my $data_ref;
 
-        if ( ( defined $os_release ) and ( -r $os_release->get_source ) ) {
-            $data_ref = $os_release->parse;
+        if ( -r Linux::Info::Distribution::OSRelease::DEFAULT_FILE ) {
+            $self->{distro_info} = Linux::Info::Distribution::BasicInfo->new(
+                Linux::Info::Distribution::OSRelease->parse_from_file->{id},
+                Linux::Info::Distribution::OSRelease::DEFAULT_FILE,
+            );
         }
-        elsif ( -r Linux::Info::Distribution::OSRelease::DEFAULT_FILE ) {
-            $os_release = Linux::Info::Distribution::OSRelease->new;
-            $data_ref   = $os_release->parse;
+        else {
+            $self->_search_release_file;
         }
-
-        $self->{distro_info} =
-          Linux::Info::Distribution::BasicInfo->new( $data_ref->{id},
-            $os_release->get_source );
     }
     else {
         $self->_search_release_file;
-        $self->{custom_source} = 1;
     }
+
+    confess 'No custom or default source file, impossible to continue'
+      unless ( defined $self->{distro_info} );
 
     return $self->{distro_info};
 }
@@ -165,7 +162,7 @@ Linux::Info::DistributionFinder - class to search for candidate files
 
 =head1 VERSION
 
-version 2.13
+version 2.15
 
 =head2 SYNOPSIS
 

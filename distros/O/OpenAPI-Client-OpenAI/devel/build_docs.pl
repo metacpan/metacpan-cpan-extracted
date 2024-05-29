@@ -80,7 +80,8 @@ sub find_files_containing_string ( $directory, $search_string ) {
     # Define a subroutine to process each file
     my $wanted = sub {
         my $file_path = $_;
-        return unless -f $file_path;    # Only process files
+        return unless -f $file_path;            # Only process files
+        next   unless $file_path =~ /\.pl$/;    # Only process Perl files
 
         # Read the file contents
         my $file_contents = read_file($file_path);
@@ -114,6 +115,8 @@ sub write_schema_pod ( $filename, $schema ) {
 
 sub pod_schema_template () {
     my $template = <<'TEMPLATE' =~ s{^    }{}mgr;
+    =encoding UTF-8
+
     =head1 NAME
 
     OpenAPI::Client::OpenAI::Schema - OpenAI API client Schema
@@ -141,6 +144,8 @@ TEMPLATE
 
 sub pod_method_template () {
     my $template = <<'TEMPLATE' =~ s{^    }{}mgr;
+    =encoding UTF-8
+
     =head1 NAME
 
     OpenAPI::Client::OpenAI::Methods - Methods for OpenAI API

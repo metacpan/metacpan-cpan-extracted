@@ -1,5 +1,5 @@
 ---
-abstract: 'PaperWM-like window management for Sway/i3wm'
+abstract: 'PaperWM-like scrollable tiling window management for Sway/i3wm'
 author:
   - 'Sean Whitton <spwhitton@spwhitton.name>'
 build_requires: {}
@@ -28,7 +28,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://git.spwhitton.name/papersway
-version: '1.000'
+version: '1.001'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: GPL-3.0-only

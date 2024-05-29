@@ -2,7 +2,7 @@ package Log::Contextual::TeeLogger;
 use strict;
 use warnings;
 
-our $VERSION = '0.009000';
+our $VERSION = '0.009001';
 
 {
   for my $name (qw( trace debug info warn error fatal )) {
@@ -55,28 +55,28 @@ Log::Contextual::TeeLogger - Output to more than one logger
 
 =head1 VERSION
 
-version 0.009000
+version 0.009001
 
 =head1 SYNOPSIS
 
- use Log::Contextual::SimpleLogger;
- use Log::Contextual::TeeLogger;
- use Log::Contextual qw( :log ),
-   -logger => Log::Contextual::TeeLogger->new({ loggers => [
-     Log::Contextual::SimpleLogger->new({ levels => [ 'debug' ] }),
-     Log::Contextual::SimpleLogger->new({
-       levels => [ 'info' ],
-       coderef => sub { print @_ },
-     }),
-   ]});
+  use Log::Contextual::SimpleLogger;
+  use Log::Contextual::TeeLogger;
+  use Log::Contextual qw( :log ),
+    -logger => Log::Contextual::TeeLogger->new({ loggers => [
+      Log::Contextual::SimpleLogger->new({ levels => [ 'debug' ] }),
+      Log::Contextual::SimpleLogger->new({
+        levels => [ 'info' ],
+        coderef => sub { print @_ },
+      }),
+    ]});
 
- ## docs below here not yet edited
+  ## docs below here not yet edited
 
- log_info { 'program started' }; # no-op because info is not in levels
- sub foo {
-   log_debug { 'entered foo' };
-   ...
- }
+  log_info { 'program started' }; # no-op because info is not in levels
+  sub foo {
+    log_debug { 'entered foo' };
+    ...
+  }
 
 =head1 DESCRIPTION
 
@@ -91,22 +91,22 @@ L<Log::Dispatchouli>.
 
 Arguments: C<< Dict[ levels => ArrayRef[Str], coderef => Optional[CodeRef] ] $conf >>
 
- my $l = Log::Contextual::SimpleLogger->new({
-   levels => [qw( info warn )],
-   coderef => sub { print @_ }, # the default prints to STDERR
- });
+  my $l = Log::Contextual::SimpleLogger->new({
+    levels => [qw( info warn )],
+    coderef => sub { print @_ }, # the default prints to STDERR
+  });
 
 Creates a new SimpleLogger object with the passed levels enabled and optionally
 a C<CodeRef> may be passed to modify how the logs are output/stored.
 
 Levels may contain:
 
- trace
- debug
- info
- warn
- error
- fatal
+  trace
+  debug
+  info
+  warn
+  error
+  fatal
 
 =head2 $level
 
@@ -114,36 +114,36 @@ Arguments: C<@anything>
 
 All of the following six methods work the same.  The basic pattern is:
 
- sub $level {
-   my $self = shift;
+  sub $level {
+    my $self = shift;
 
-   print STDERR "[$level] " . join qq{\n}, @_;
-      if $self->is_$level;
- }
+    print STDERR "[$level] " . join qq{\n}, @_;
+        if $self->is_$level;
+  }
 
 =head3 trace
 
- $l->trace( 'entered method foo with args ' join q{,}, @args );
+  $l->trace( 'entered method foo with args ' join q{,}, @args );
 
 =head3 debug
 
- $l->debug( 'entered method foo' );
+  $l->debug( 'entered method foo' );
 
 =head3 info
 
- $l->info( 'started process foo' );
+  $l->info( 'started process foo' );
 
 =head3 warn
 
- $l->warn( 'possible misconfiguration at line 10' );
+  $l->warn( 'possible misconfiguration at line 10' );
 
 =head3 error
 
- $l->error( 'non-numeric user input!' );
+  $l->error( 'non-numeric user input!' );
 
 =head3 fatal
 
- $l->fatal( '1 is never equal to 0!' );
+  $l->fatal( '1 is never equal to 0!' );
 
 B<Note:> C<fatal> does not call C<die> for you, see L<Log::Contextual/EXCEPTIONS AND ERROR HANDLING>
 
@@ -154,27 +154,27 @@ level is enabled.
 
 =head3 is_trace
 
- say 'tracing' if $l->is_trace;
+  say 'tracing' if $l->is_trace;
 
 =head3 is_debug
 
- say 'debuging' if $l->is_debug;
+  say 'debuging' if $l->is_debug;
 
 =head3 is_info
 
- say q{info'ing} if $l->is_info;
+  say q{info'ing} if $l->is_info;
 
 =head3 is_warn
 
- say 'warning' if $l->is_warn;
+  say 'warning' if $l->is_warn;
 
 =head3 is_error
 
- say 'erroring' if $l->is_error;
+  say 'erroring' if $l->is_error;
 
 =head3 is_fatal
 
- say q{fatal'ing} if $l->is_fatal;
+  say q{fatal'ing} if $l->is_fatal;
 
 =head1 BUGS
 

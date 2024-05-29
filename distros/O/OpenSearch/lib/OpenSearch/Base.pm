@@ -81,12 +81,14 @@ sub _http_method( $self, $method, $instance, $path = [] ) {
 sub do_request( $self, $method, $url, $body ) {
   my ( $promise, $res );
 
-  $promise = $self->ua->$method( $url => ( ref($body) eq 'HASH' ? 'json' : 'body' ) => $body )->then( sub($tx) {
+  $promise =
+    $self->ua->$method(
+    $url => ( ref($body) eq 'HASH' ? 'json' : ( { 'Content-Type' => 'application/json' } ) ) => $body )
+    ->then( sub($tx) {
     return ( $self->response($tx) );
-
-  } )->catch( sub($error) {
+    } )->catch( sub($error) {
     return ($error);
-  } );
+    } );
 
   return ($promise) if $self->async;
 

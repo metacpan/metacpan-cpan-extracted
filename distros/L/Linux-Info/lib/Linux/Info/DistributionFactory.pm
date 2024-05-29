@@ -21,7 +21,7 @@ use Linux::Info::Distribution::OSRelease::RedHat;
 use Linux::Info::Distribution::OSRelease::Rocky;
 use Linux::Info::Distribution::OSRelease::Ubuntu;
 
-our $VERSION = '2.13'; # VERSION
+our $VERSION = '2.15'; # VERSION
 
 # ABSTRACT: implements a factory for Distribution subclasses
 
@@ -111,7 +111,7 @@ Linux::Info::DistributionFactory - implements a factory for Distribution subclas
 
 =head1 VERSION
 
-version 2.13
+version 2.15
 
 =head1 SYNOPSIS
 

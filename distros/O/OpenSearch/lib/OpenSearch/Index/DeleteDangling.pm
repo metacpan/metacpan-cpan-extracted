@@ -15,7 +15,7 @@ has '_base' => (
 );
 
 sub execute($self) {
-  my $res = $self->_base->_del( $self, [ '_dangling', $self->index_uuid ] );
+  my $res = $self->_base->_delete( $self, [ '_dangling', $self->index_uuid ] );
 }
 
 1;

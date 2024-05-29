@@ -6,8 +6,11 @@ ALSO"); this module provides a few extras:
 
 *   The traversal may be aborted.
 
-*   A container (hash or array) may be revisited if the callback changes
-    it.
+*   A container (hash or array) may be immediately revisited if the
+    callback requests it.
+
+*   An element whose value is a container may be revisited after the
+    container is visited if the callback requests it.
 
 *   User selectable behavior upon detection of a traversal cycle.
 

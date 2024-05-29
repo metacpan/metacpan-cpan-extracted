@@ -9,18 +9,19 @@ use Linux::Info::KernelRelease::RedHat;
 use Linux::Info::KernelRelease::Rocky;
 use Linux::Info::KernelRelease::Ubuntu;
 
-our $VERSION = '2.13'; # VERSION
+our $VERSION = '2.15'; # VERSION
 
 # ABSTRACT: Factory class to create instances of Linux::Info::KernelRelease and subclasses
 
 
 sub create {
-    my $class       = shift;
     my $distro_name = Linux::Info::DistributionFactory->new->distro_name;
     my %map         = (
-        redhat => 'RedHat',
-        rocky  => 'Rocky',
-        ubuntu => 'Ubuntu',
+        redhat   => 'RedHat',
+        rocky    => 'Rocky',
+        ubuntu   => 'Ubuntu',
+        alpine   => 'Alpine',
+        raspbian => 'Raspbian',
     );
 
     if ( exists $map{$distro_name} ) {
@@ -45,7 +46,7 @@ Linux::Info::KernelFactory - Factory class to create instances of Linux::Info::K
 
 =head1 VERSION
 
-version 2.13
+version 2.15
 
 =head1 SYNOPSIS
 

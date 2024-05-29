@@ -2,13 +2,13 @@ package Log::Contextual;
 use strict;
 use warnings;
 
-our $VERSION = '0.009000';
+our $VERSION = '0.009001';
 
 use Data::Dumper::Concise;
 
 use B qw(svref_2object);
 
-sub stash_name {
+sub _stash_name {
   my ($coderef) = @_;
   ref $coderef or return;
   my $cv = B::svref_2object($coderef);
@@ -159,7 +159,7 @@ sub _maybe_export {
   no strict 'refs';
   if (defined &$full_target) {
     return
-      if stash_name(\&full_target) eq __PACKAGE__;
+      if _stash_name(\&full_target) eq __PACKAGE__;
 
     # reexport will warn
   }
@@ -360,53 +360,53 @@ Log::Contextual - Simple logging interface with a contextual log
 
 =head1 VERSION
 
-version 0.009000
+version 0.009001
 
 =head1 SYNOPSIS
 
- use Log::Contextual qw( :log :dlog set_logger with_logger );
- use Log::Contextual::SimpleLogger;
- use Log::Log4perl ':easy';
- Log::Log4perl->easy_init($DEBUG);
+  use Log::Contextual qw( :log :dlog set_logger with_logger );
+  use Log::Contextual::SimpleLogger;
+  use Log::Log4perl ':easy';
+  Log::Log4perl->easy_init($DEBUG);
 
- my $logger  = Log::Log4perl->get_logger;
+  my $logger  = Log::Log4perl->get_logger;
 
- set_logger $logger;
+  set_logger $logger;
 
- log_debug { 'program started' };
+  log_debug { 'program started' };
 
- sub foo {
+  sub foo {
 
-   my $minilogger = Log::Contextual::SimpleLogger->new({
-     levels => [qw( trace debug )]
-   });
+    my $minilogger = Log::Contextual::SimpleLogger->new({
+      levels => [qw( trace debug )]
+    });
 
-   my @args = @_;
+    my @args = @_;
 
-   with_logger $minilogger => sub {
-     log_trace { 'foo entered' };
-     my ($foo, $bar) = Dlog_trace { "params for foo: $_" } @args;
-     # ...
-     slog_trace 'foo left';
-   };
- }
+    with_logger $minilogger => sub {
+      log_trace { 'foo entered' };
+      my ($foo, $bar) = Dlog_trace { "params for foo: $_" } @args;
+      # ...
+      slog_trace 'foo left';
+    };
+  }
 
- foo();
+  foo();
 
 Beginning with version 1.008 L<Log::Dispatchouli> also works out of the box
 with C<Log::Contextual>:
 
- use Log::Contextual qw( :log :dlog set_logger );
- use Log::Dispatchouli;
- my $ld = Log::Dispatchouli->new({
+  use Log::Contextual qw( :log :dlog set_logger );
+  use Log::Dispatchouli;
+  my $ld = Log::Dispatchouli->new({
     ident     => 'slrtbrfst',
     to_stderr => 1,
     debug     => 1,
- });
+  });
 
- set_logger $ld;
+  set_logger $ld;
 
- log_debug { 'program started' };
+  log_debug { 'program started' };
 
 =head1 DESCRIPTION
 
@@ -419,8 +419,8 @@ Major benefits:
 The default logging functions take blocks, so if a log level is disabled, the
 block will not run:
 
- # the following won't run if debug is off
- log_debug { "the new count in the database is " . $rs->count };
+  # the following won't run if debug is off
+  log_debug { "the new count in the database is " . $rs->count };
 
 Similarly, the C<D> prefixed methods only C<Dumper> the input if the level is
 enabled.
@@ -430,7 +430,7 @@ enabled.
 The logging functions return their arguments, so you can stick them in
 the middle of expressions:
 
- for (log_debug { "downloading:\n" . join qq(\n), @_ } @urls) { ... }
+  for (log_debug { "downloading:\n" . join qq(\n), @_ } @urls) { ... }
 
 =item * Generic
 
@@ -466,7 +466,7 @@ This module is certainly not complete, but we will not break the interface
 lightly, so I would say it's safe to use in production code.  The main result
 from that at this point is that doing:
 
- use Log::Contextual;
+  use Log::Contextual;
 
 will die as we do not yet know what the defaults should be.  If it turns out
 that nearly everyone uses the C<:log> tag and C<:dlog> is really rare, we'll
@@ -482,16 +482,16 @@ wide.
 When you import this module you may use C<-logger> as a shortcut for
 L</set_logger>, for example:
 
- use Log::Contextual::SimpleLogger;
- use Log::Contextual qw( :dlog ),
-   -logger => Log::Contextual::SimpleLogger->new({ levels => [qw( debug )] });
+  use Log::Contextual::SimpleLogger;
+  use Log::Contextual qw( :dlog ),
+    -logger => Log::Contextual::SimpleLogger->new({ levels => [qw( debug )] });
 
 sometimes you might want to have the logger handy for other stuff, in which
 case you might try something like the following:
 
- my $var_log;
- BEGIN { $var_log = VarLogger->new }
- use Log::Contextual qw( :dlog ), -logger => $var_log;
+  my $var_log;
+  BEGIN { $var_log = VarLogger->new }
+  use Log::Contextual qw( :dlog ), -logger => $var_log;
 
 =head2 -levels
 
@@ -501,8 +501,8 @@ C<< [qw(debug trace warn info error fatal)] >>, works great for
 L<Log::Log4perl>, but it doesn't support the levels for L<Log::Dispatch>.  But
 supporting those levels is as easy as doing
 
- use Log::Contextual
-   -levels => [qw( debug info notice warning error critical alert emergency )];
+  use Log::Contextual
+    -levels => [qw( debug info notice warning error critical alert emergency )];
 
 =head2 -package_logger
 
@@ -512,12 +512,12 @@ except C<-package_logger> sets the logger for the current package.
 Unlike L</-default_logger>, C<-package_logger> cannot be overridden with
 L</set_logger> or L</with_logger>.
 
- package My::Package;
- use Log::Contextual::SimpleLogger;
- use Log::Contextual qw( :log ),
-   -package_logger => Log::Contextual::WarnLogger->new({
+  package My::Package;
+  use Log::Contextual::SimpleLogger;
+  use Log::Contextual qw( :log ),
+    -package_logger => Log::Contextual::WarnLogger->new({
       env_prefix => 'MY_PACKAGE'
-   });
+    });
 
 If you are interested in using this package for a module you are putting on
 CPAN we recommend L<Log::Contextual::WarnLogger> for your package logger.
@@ -529,51 +529,53 @@ except C<-default_logger> sets the B<default> logger for the current package.
 
 Basically it sets the logger to be used if C<set_logger> is never called; so
 
- package My::Package;
- use Log::Contextual::SimpleLogger;
- use Log::Contextual qw( :log ),
-   -default_logger => Log::Contextual::WarnLogger->new({
+  package My::Package;
+  use Log::Contextual::SimpleLogger;
+  use Log::Contextual qw( :log ),
+    -default_logger => Log::Contextual::WarnLogger->new({
       env_prefix => 'MY_PACKAGE'
-   });
+    });
 
 =head1 SETTING DEFAULT IMPORT OPTIONS
+
+=for Pod::Coverage arg_default_logger default_import arg_package_logger arg_levels arg_logger
 
 Eventually you will get tired of writing the following in every single one of
 your packages:
 
- use Log::Log4perl;
- use Log::Log4perl ':easy';
- BEGIN { Log::Log4perl->easy_init($DEBUG) }
+  use Log::Log4perl;
+  use Log::Log4perl ':easy';
+  BEGIN { Log::Log4perl->easy_init($DEBUG) }
 
- use Log::Contextual -logger => Log::Log4perl->get_logger;
+  use Log::Contextual -logger => Log::Log4perl->get_logger;
 
 You can set any of the import options for your whole project if you define your
 own C<Log::Contextual> subclass as follows:
 
- package MyApp::Log::Contextual;
+  package MyApp::Log::Contextual;
 
- use parent 'Log::Contextual';
+  use parent 'Log::Contextual';
 
- use Log::Log4perl ':easy';
- Log::Log4perl->easy_init($DEBUG)
+  use Log::Log4perl ':easy';
+  Log::Log4perl->easy_init($DEBUG)
 
- sub arg_default_logger { $_[1] || Log::Log4perl->get_logger }
- sub arg_levels { [qw(debug trace warn info error fatal custom_level)] }
- sub default_import { ':log' }
+  sub arg_default_logger { $_[1] || Log::Log4perl->get_logger }
+  sub arg_levels { [qw(debug trace warn info error fatal custom_level)] }
+  sub default_import { ':log' }
 
- # or maybe instead of default_logger
- sub arg_package_logger { $_[1] }
+  # or maybe instead of default_logger
+  sub arg_package_logger { $_[1] }
 
- # and almost definitely not this, which is only here for completeness
- sub arg_logger { $_[1] }
+  # and almost definitely not this, which is only here for completeness
+  sub arg_logger { $_[1] }
 
 Note the C<< $_[1] || >> in C<arg_default_logger>.  All of these methods are
 passed the values passed in from the arguments to the subclass, so you can
 either throw them away, honor them, die on usage, etc.  To be clear,
 if you define your subclass, and someone uses it as follows:
 
- use MyApp::Log::Contextual -default_logger => $foo,
-                            -levels => [qw(bar baz biff)];
+  use MyApp::Log::Contextual -default_logger => $foo,
+                              -levels => [qw(bar baz biff)];
 
 Your C<arg_default_logger> method will get C<$foo> and your C<arg_levels>
 will get C<[qw(bar baz biff)]>;
@@ -583,11 +585,11 @@ use your subclass with no arguments.  The default just dies, but if you'd like
 to change the default to import a tag merely return the tags you'd like to
 import.  So the following will all work:
 
- sub default_import { ':log' }
+  sub default_import { ':log' }
 
- sub default_import { ':dlog' }
+  sub default_import { ':dlog' }
 
- sub default_import { qw(:dlog :log ) }
+  sub default_import { qw(:dlog :log ) }
 
 See L<Log::Contextual::Easy::Default> for an example of a subclass of
 C<Log::Contextual> that makes use of default import options.
@@ -596,8 +598,8 @@ C<Log::Contextual> that makes use of default import options.
 
 =head2 set_logger
 
- my $logger = WarnLogger->new;
- set_logger $logger;
+  my $logger = WarnLogger->new;
+  set_logger $logger;
 
 Arguments: L</LOGGER CODEREF>
 
@@ -609,14 +611,14 @@ more than once.
 
 =head2 with_logger
 
- my $logger = WarnLogger->new;
- with_logger $logger => sub {
+  my $logger = WarnLogger->new;
+  with_logger $logger => sub {
     if (1 == 0) {
-       log_fatal { 'Non Logical Universe Detected' };
+      log_fatal { 'Non Logical Universe Detected' };
     } else {
-       log_info  { 'All is good' };
+      log_info  { 'All is good' };
     }
- };
+  };
 
 Arguments: L</LOGGER CODEREF>, C<CodeRef $to_execute>
 
@@ -626,8 +628,8 @@ C<CodeRef> if needed.
 
 =head2 has_logger
 
- my $logger = WarnLogger->new;
- set_logger $logger unless has_logger;
+  my $logger = WarnLogger->new;
+  set_logger $logger unless has_logger;
 
 Arguments: none
 
@@ -642,20 +644,20 @@ Arguments: C<CodeRef $returning_message, @args>
 C<log_$level> functions all work the same except that a different method
 is called on the underlying C<$logger> object.  The basic pattern is:
 
- sub log_$level (&@) {
-   if ($logger->is_$level) {
-     $logger->$level(shift->(@_));
-   }
-   @_
- }
+  sub log_$level (&@) {
+    if ($logger->is_$level) {
+      $logger->$level(shift->(@_));
+    }
+    @_
+  }
 
 Note that the function returns its arguments.  This can be used in a number of
 ways, but often it's convenient just for partial inspection of passthrough data
 
- my @friends = log_trace {
-   'friends list being generated, data from first friend: ' .
-     Dumper($_[0]->TO_JSON)
- } generate_friend_list();
+  my @friends = log_trace {
+    'friends list being generated, data from first friend: ' .
+      Dumper($_[0]->TO_JSON)
+  } generate_friend_list();
 
 If you want complete inspection of passthrough data, take a look at the
 L</Dlog_$level> functions.
@@ -687,7 +689,7 @@ Mostly the same as L</log_$level>, but expects a string as first argument,
 not a block. Arguments are passed through just the same, but since it's just a
 string, interpolation of arguments into it must be done manually.
 
- my @friends = slog_trace 'friends list being generated.', generate_friend_list();
+  my @friends = slog_trace 'friends list being generated.', generate_friend_list();
 
 =head2 logS_$level
 
@@ -699,9 +701,9 @@ This is really just a special case of the L</log_$level> functions.  It forces
 scalar context when that is what you need.  Other than that it works exactly
 same:
 
- my $friend = logS_trace {
-   'I only have one friend: ' .  Dumper($_[0]->TO_JSON)
- } friend();
+  my $friend = logS_trace {
+    'I only have one friend: ' .  Dumper($_[0]->TO_JSON)
+  } friend();
 
 See also: L</DlogS_$level>.
 
@@ -711,7 +713,7 @@ Mostly the same as L</logS_$level>, but expects a string as first argument,
 not a block. Arguments are passed through just the same, but since it's just a
 string, interpolation of arguments into it must be done manually.
 
- my $friend = slogS_trace 'I only have one friend.', friend();
+  my $friend = slogS_trace 'I only have one friend.', friend();
 
 =head2 Dlog_$level
 
@@ -724,15 +726,15 @@ brethren, except they return what is passed into them and put the stringified
 (with L<Data::Dumper::Concise>) version of their args into C<$_>.  This means
 you can do cool things like the following:
 
- my @nicks = Dlog_debug { "names: $_" } map $_->value, $frew->names->all;
+  my @nicks = Dlog_debug { "names: $_" } map $_->value, $frew->names->all;
 
 and the output might look something like:
 
- names: "fREW"
- "fRIOUX"
- "fROOH"
- "fRUE"
- "fiSMBoC"
+  names: "fREW"
+  "fRIOUX"
+  "fROOH"
+  "fRUE"
+  "fiSMBoC"
 
 Which functions are exported depends on what was passed to L</-levels>.  The
 default (no C<-levels> option passed) would export:
@@ -762,7 +764,7 @@ not a block. Arguments are passed through just the same, but since it's just a
 string, no interpolation point can be used, instead the Dumper output is
 appended.
 
- my @nicks = Dslog_debug "names: ", map $_->value, $frew->names->all;
+  my @nicks = Dslog_debug "names: ", map $_->value, $frew->names->all;
 
 =head2 DlogS_$level
 
@@ -774,8 +776,8 @@ Like L</logS_$level>, these functions are a special case of L</Dlog_$level>.
 They only take a single scalar after the C<$returning_message> instead of
 slurping up (and also setting C<wantarray>) all the C<@args>
 
- my $pals_rs = DlogS_debug { "pals resultset: $_" }
-   $schema->resultset('Pals')->search({ perlers => 1 });
+  my $pals_rs = DlogS_debug { "pals resultset: $_" }
+    $schema->resultset('Pals')->search({ perlers => 1 });
 
 =head2 DslogS_$level
 
@@ -784,8 +786,8 @@ not a block. Arguments are passed through just the same, but since it's just a
 string, no interpolation point can be used, instead the Dumper output is
 appended.
 
- my $pals_rs = DslogS_debug "pals resultset: ",
-   $schema->resultset('Pals')->search({ perlers => 1 });
+  my $pals_rs = DslogS_debug "pals resultset: ",
+    $schema->resultset('Pals')->search({ perlers => 1 });
 
 =head1 LOGGER CODEREF
 
@@ -798,18 +800,18 @@ a hashref to allow for more options in the future.
 Here is a basic example of a logger that exploits C<caller> to reproduce the
 output of C<warn> with a logger:
 
- my @caller_info;
- my $var_log = Log::Contextual::SimpleLogger->new({
+  my @caller_info;
+  my $var_log = Log::Contextual::SimpleLogger->new({
     levels  => [qw(trace debug info warn error fatal)],
     coderef => sub { chomp($_[0]); warn "$_[0] at $caller_info[1] line $caller_info[2].\n" }
- });
- my $warn_faker = sub {
+  });
+  my $warn_faker = sub {
     my ($package, $args) = @_;
     @caller_info = caller($args->{caller_level});
     $var_log
- };
- set_logger($warn_faker);
- log_debug { 'test' };
+  };
+  set_logger($warn_faker);
+  log_debug { 'test' };
 
 The following is an example that uses the information passed to the logger
 coderef.  It sets the global logger to C<$l3>, the logger for the C<A1>
@@ -819,36 +821,36 @@ logger and lastly the logger for the C<A2> package to C<$l2>.
 Note that it increases the caller level as it dispatches based on where
 the caller of the log function, not the log function itself.
 
- my $complex_dispatcher = do {
+  my $complex_dispatcher = do {
 
     my $l1 = ...;
     my $l2 = ...;
     my $l3 = ...;
 
     my %registry = (
-       -logger => $l3,
-       A1 => {
-          -logger => $l1,
-          lol     => $l2,
-       },
-       A2 => { -logger => $l2 },
+      -logger => $l3,
+      A1 => {
+        -logger => $l1,
+        lol     => $l2,
+      },
+      A2 => { -logger => $l2 },
     );
 
     sub {
-       my ( $package, $info ) = @_;
+      my ( $package, $info ) = @_;
 
-       my $logger = $registry{'-logger'};
-       if (my $r = $registry{$package}) {
-          $logger = $r->{'-logger'} if $r->{'-logger'};
-          my (undef, undef, undef, $sub) = caller($info->{caller_level} + 1);
-          $sub =~ s/^\Q$package\E:://g;
-          $logger = $r->{$sub} if $r->{$sub};
-       }
-       return $logger;
+      my $logger = $registry{'-logger'};
+      if (my $r = $registry{$package}) {
+        $logger = $r->{'-logger'} if $r->{'-logger'};
+        my (undef, undef, undef, $sub) = caller($info->{caller_level} + 1);
+        $sub =~ s/^\Q$package\E:://g;
+        $logger = $r->{$sub} if $r->{$sub};
+      }
+      return $logger;
     }
- };
+  };
 
- set_logger $complex_dispatcher;
+  set_logger $complex_dispatcher;
 
 =head1 LOGGER INTERFACE
 
@@ -857,24 +859,26 @@ awesome benefit of the Contextual part, users will often want to make their
 favorite logger work with it.  The following are the methods that should be
 implemented in the logger:
 
- is_trace
- is_debug
- is_info
- is_warn
- is_error
- is_fatal
- trace
- debug
- info
- warn
- error
- fatal
+  is_trace
+  is_debug
+  is_info
+  is_warn
+  is_error
+  is_fatal
+  trace
+  debug
+  info
+  warn
+  error
+  fatal
 
 The first six merely need to return true if that level is enabled.  The latter
 six take the results of whatever the user returned from their coderef and log
 them.  For a basic example see L<Log::Contextual::SimpleLogger>.
 
 =head1 LOG ROUTING
+
+=for Pod::Coverage router
 
 In between the loggers and the log functions is a log router that is responsible for
 finding a logger to handle the log event and passing the log information to the

@@ -124,14 +124,18 @@ can_ok( $loc, 'vt' );
 can_ok( $loc, 'x0' );
 
 my $re;
-my $codes = DateTime::Locale->codes;
-diag( "Found ", scalar( @$codes ), " locales." ) if( $DEBUG );
-foreach my $code ( @$codes )
+# From version 0.90 onward, the method 'codes' is available
+if( $DateTime::Locale::VERSION >= 0.90 )
 {
-    $code = 'und' if( $code eq 'root' );
-    $re = Locale::Unicode->matches( $code );
-    diag( "Failed matching for locale '", ( $code // 'undef' ), "'" ) if( !defined( $re ) || ref( $re ) ne 'HASH' );
-    ok( ( defined( $re ) && ref( $re ) eq 'HASH' && scalar( keys( %$re ) ) ), $code );
+    my $codes = DateTime::Locale->codes;
+    diag( "Found ", scalar( @$codes ), " locales." ) if( $DEBUG );
+    foreach my $code ( @$codes )
+    {
+        $code = 'und' if( $code eq 'root' );
+        $re = Locale::Unicode->matches( $code );
+        diag( "Failed matching for locale '", ( $code // 'undef' ), "'" ) if( !defined( $re ) || ref( $re ) ne 'HASH' );
+        ok( ( defined( $re ) && ref( $re ) eq 'HASH' && scalar( keys( %$re ) ) ), $code );
+    }
 }
 
 my @tests = (

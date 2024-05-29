@@ -1,11 +1,14 @@
 package Linux::Info::Processes;
 use strict;
 use warnings;
+use Carp qw(confess);
 use Time::HiRes 1.9725;
+
 use constant NUMBER => qr/^-{0,1}\d+(?:\.\d+){0,1}\z/;
 
-our $VERSION = '2.13'; # VERSION
-# ABSTRACT:  Collect linux process statistics.
+our $VERSION = '2.15'; # VERSION
+
+# ABSTRACT:  Collect Linux process statistics.
 
 
 our $PAGES_TO_BYTES = 0;
@@ -25,25 +28,37 @@ sub new {
             wchan   => 'wchan',
             fd      => 'fd',
             io      => 'io',
+            limits  => 'limits',
         },
+        enabled => {
+            io     => 0,
+            limits => 0,
+        }
     );
+
+    if ( exists $opts->{enabled} ) {
+        map { $self{enabled}->{$_} = $opts->{enabled}->{$_} }
+          keys( %{ $opts->{enabled} } );
+    }
 
     if ( defined $opts->{pids} ) {
         if ( ref( $opts->{pids} ) ne 'ARRAY' ) {
-            die "the PIDs must be passed as a array reference to new()";
+            confess 'The PIDs must be passed as a array reference to new()';
         }
 
+        my $integer_regex = qr/^\d+\z/;
+
         foreach my $pid ( @{ $opts->{pids} } ) {
-            if ( $pid !~ /^\d+\z/ ) {
-                die "PID '$pid' is not a number";
-            }
+            confess "PID '$pid' is not a integer"
+              unless ( $pid =~ $integer_regex );
         }
 
         $self{pids} = $opts->{pids};
     }
 
-    foreach my $file ( keys %{ $opts->{files} } ) {
-        $self{files}{$file} = $opts->{files}->{$file};
+    if ( exists $opts->{files} ) {
+        map { $self{files}->{$_} = $opts->{files}->{$_} }
+          keys( %{ $opts->{files} } );
     }
 
     if ( $opts->{pages_to_bytes} ) {
@@ -53,17 +68,11 @@ sub new {
     return bless \%self, $class;
 }
 
-sub init {
-    my $self = shift;
-    $self->{init} = $self->_init;
-}
-
 sub get {
     my $self = shift;
 
-    if ( !exists $self->{init} ) {
-        die "there are no initial statistics defined";
-    }
+    confess 'There are no initial statistics defined'
+      unless ( exists $self->{init} );
 
     $self->{stats} = $self->_load;
     $self->_deltas;
@@ -73,15 +82,10 @@ sub get {
 sub raw {
     my $self = shift;
     my $stat = $self->_load;
-
     return $stat;
 }
 
-#
-# private stuff
-#
-
-sub _init {
+sub init {
     my $self  = shift;
     my $file  = $self->{files};
     my $pids  = $self->_get_pids;
@@ -89,54 +93,89 @@ sub _init {
 
     $stats->{time} = Time::HiRes::gettimeofday();
 
+    my @keys =
+      qw (minflt cminflt mayflt cmayflt utime stime cutime cstime sttime);
+
     foreach my $pid (@$pids) {
         my $stat = $self->_get_stat($pid);
 
         if ( defined $stat ) {
-            foreach my $key (
-                qw/minflt cminflt mayflt cmayflt utime stime cutime cstime sttime/
-              )
-            {
+            foreach my $key (@keys) {
                 $stats->{$pid}->{$key} = $stat->{$key};
             }
             $stats->{$pid}->{io} = $self->_get_io($pid);
+
+            foreach my $data (qw(io limits)) {
+                if ( $self->{enabled}->{$data} ) {
+                    my $method = "_get_$data";
+                    $stats->{$pid}->{$data} = $self->$method($pid);
+                }
+            }
         }
     }
-
-    return $stats;
+    $self->{init} = $stats;
 }
 
 sub _load {
     my $self   = shift;
-    my $file   = $self->{files};
     my $uptime = $self->_uptime;
     my $pids   = $self->_get_pids;
-    my $stats  = {};
+    my %stats;
+    $stats{time} = Time::HiRes::gettimeofday();
 
-    $stats->{time} = Time::HiRes::gettimeofday();
+    my @keys = qw(statm stat owner cmdline wchan fd);
 
-  PID: foreach my $pid (@$pids) {
-        foreach my $key (qw/statm stat io owner cmdline wchan fd/) {
+    foreach my $data (qw(io limits)) {
+        if ( $self->{enabled}->{$data} ) {
+            push( @keys, $data );
+        }
+    }
+
+  PID: foreach my $pid ( @{$pids} ) {
+        foreach my $key (@keys) {
             my $method = "_get_$key";
             my $data   = $self->$method($pid);
 
-            if ( !defined $data ) {
-                delete $stats->{$pid};
+            unless ( defined $data ) {
+                delete $stats{$pid};
                 next PID;
             }
 
-            if ( $key eq "statm" || $key eq "stat" ) {
+            if ( ( $key eq 'statm' ) or ( $key eq 'stat' ) ) {
                 for my $x ( keys %$data ) {
-                    $stats->{$pid}->{$x} = $data->{$x};
+                    $stats{$pid}->{$x} = $data->{$x};
                 }
             }
             else {
-                $stats->{$pid}->{$key} = $data;
+                $stats{$pid}->{$key} = $data;
             }
         }
     }
 
-    return $stats;
+    return \%stats;
+}
+
+sub _get_limits {
+    my ( $self, $pid ) = @_;
+    my $file = $self->{files};
+    my %stat;
+    my ( $line, $limit );
+
+    if ( open my $fh, '<', "$file->{path}/$pid/$file->{limits}" ) {
+        while ( $line = <$fh> ) {
+            if ( $line =~
+                /^([Ma-z ]+[a-z]) +(\d+|unlimited) +(\d+|unlimited) +([a-z]*)/ )
+            {
+                $limit = $1;
+                $limit =~ tr/M /m_/;
+                $stat{$limit} = [ $2, $3, $4 ];    #soft hard units
+            }
+        }
+
+        close($fh);
+    }
+
+    return \%stat;
 }
 
 sub _deltas {
@@ -145,12 +184,11 @@ sub _deltas {
     my $lstat  = $self->{stats};
     my $uptime = $self->_uptime;
 
-    if ( !defined $istat->{time} || !defined $lstat->{time} ) {
-        die "not defined key found 'time'";
-    }
+    confess "not defined key found 'time'"
+      unless ( ( defined $istat->{time} ) or ( defined $lstat->{time} ) );
 
     if ( $istat->{time} !~ NUMBER || $lstat->{time} !~ NUMBER ) {
-        die "invalid value for key 'time'";
+        confess "invalid value for key 'time'";
     }
 
     my $time = $lstat->{time} - $istat->{time};
@@ -161,7 +199,7 @@ sub _deltas {
         my $ipid = $istat->{$pid};
         my $lpid = $lstat->{$pid};
 
-    # yeah, what happends if the start time is different... it seems that a new
+    # yeah, what happens if the start time is different... it seems that a new
     # process with the same process-id were created... for this reason I have to
     # check if the start time is equal!
         if ( $ipid && $ipid->{sttime} == $lpid->{sttime} ) {
@@ -169,10 +207,10 @@ sub _deltas {
                 qw(minflt cminflt mayflt cmayflt utime stime cutime cstime))
             {
                 if ( !defined $ipid->{$k} ) {
-                    die "not defined key found '$k'";
+                    confess "not defined key found '$k'";
                 }
                 if ( $ipid->{$k} !~ NUMBER || $lpid->{$k} !~ NUMBER ) {
-                    die "invalid value for key '$k'";
+                    confess "invalid value for key '$k'";
                 }
 
                 $lpid->{$k} -= $ipid->{$k};
@@ -196,7 +234,7 @@ sub _deltas {
                     if (   $ipid->{io}->{$k} !~ NUMBER
                         || $lpid->{io}->{$k} !~ NUMBER )
                     {
-                        die "invalid value for io key '$k'";
+                        confess "invalid value for io key '$k'";
                     }
                     $lpid->{io}->{$k} -= $ipid->{io}->{$k};
                     $ipid->{io}->{$k} += $lpid->{io}->{$k};
@@ -360,10 +398,7 @@ sub _get_wchan {
     my $wchan = <$fh>;
     close $fh;
 
-    if ( !defined $wchan ) {
-        $wchan = defined;
-    }
-
+    $wchan = defined unless ( defined $wchan );
     chomp $wchan;
     return $wchan;
 }
@@ -373,9 +408,14 @@ sub _get_io {
     my $file = $self->{files};
     my %stat = ();
 
+    my $regex = qr/^([a-z_]+):\s+(\d+)/;
+
     if ( open my $fh, '<', "$file->{path}/$pid/$file->{io}" ) {
+
         while ( my $line = <$fh> ) {
-            if ( $line =~ /^([a-z_]+):\s+(\d+)/ ) {
+            chomp $line;
+
+            if ( $line =~ $regex ) {
                 $stat{$1} = $2;
             }
         }
@@ -407,12 +447,10 @@ sub _get_pids {
     my $self = shift;
     my $file = $self->{files};
 
-    if ( $self->{pids} ) {
-        return $self->{pids};
-    }
+    return $self->{pids} if ( $self->{pids} );
 
     opendir my $dh, $file->{path}
-      or die "unable to open directory $file->{path} ($!)";
+      or confess "unable to open directory $file->{path} ($!)";
     my @pids = grep /^\d+\z/, readdir $dh;
     closedir $dh;
     return \@pids;
@@ -424,9 +462,9 @@ sub _uptime {
 
     my $filename =
       $file->{path} ? "$file->{path}/$file->{uptime}" : $file->{uptime};
-    open my $fh, '<', $filename or die "unable to open $filename ($!)";
+    open my $fh, '<', $filename or confess "Unable to read $filename: $!";
     my ( $up, $idle ) = split /\s+/, <$fh>;
-    close($fh);
+    close($fh) or confess "Unable to close $filename: $!";
     return $up;
 }
 
@@ -449,11 +487,11 @@ __END__
 
 =head1 NAME
 
-Linux::Info::Processes - Collect linux process statistics.
+Linux::Info::Processes - Collect Linux process statistics.
 
 =head1 VERSION
 
-version 2.13
+version 2.15
 
 =head1 SYNOPSIS
 
@@ -465,14 +503,6 @@ version 2.13
     $lxs->init;
     sleep 1;
     my $stat = $lxs->get;
-
-=head1 DESCRIPTION
-
-Linux::Info::Processes gathers process information from the virtual
-F</proc> filesystem (procfs).
-
-For more information read the documentation of the front-end module
-L<Linux::Info>.
 
 =head1 PROCESS STATISTICS
 
@@ -512,6 +542,8 @@ Note that if F</etc/passwd> isn't readable, the key owner is set to F<N/a>.
     cmd       -  Command of the process.
     cmdline   -  Command line of the process.
 
+=head2 statm
+
 Generated by F</proc/E<lt>pidE<gt>/statm>. All statistics provides information
 about memory in pages:
 
@@ -523,8 +555,8 @@ about memory in pages:
     lrs       -  Total library size of the process.
     dtp       -  Total size of dirty pages of the process (unused since kernel 2.6).
 
-It's possible to convert pages to bytes or kilobytes. Example - if the pagesize of your
-system is 4kb:
+It's possible to convert pages to bytes or kilobytes. For example, if the
+pagesize of your system is 4kb:
 
     $Linux::Info::Processes::PAGES_TO_BYTES =    0; # pages (default)
     $Linux::Info::Processes::PAGES_TO_BYTES =    4; # convert to kilobytes
@@ -533,17 +565,83 @@ system is 4kb:
     # or with
     Linux::Info::Processes->new(pages_to_bytes => 4096);
 
+=head2 io
+
 Generated by F</proc/E<lt>pidE<gt>/io>.
 
-    rchar                 -  Bytes read from storage (might have been from pagecache).
-    wchar                 -  Bytes written.
-    syscr                 -  Number of read syscalls.
-    syscw                 -  Numner of write syscalls.
-    read_bytes            -  Bytes really fetched from storage layer.
-    write_bytes           -  Bytes sent to the storage layer.
-    cancelled_write_bytes -  Refer to docs.
+Permissions on this file have changed with versions of the kernel, opt out from
+trying to read the file by setting the file to a false value, like:
 
-See Documentation/filesystems/proc.txt for more (from kernel 2.6.20)
+    files => { io => q{} }
+
+=over
+
+=item *
+
+rchar: bytes read from storage (might have been from pagecache).
+
+=item *
+
+wchar: bytes written.
+
+=item *
+
+syscr: number of read syscalls.
+
+=item *
+
+syscw: number of write syscalls.
+
+=item *
+
+read_bytes: bytes really fetched from storage layer.
+
+=item *
+
+write_bytes: bytes sent to the storage layer.
+
+=item *
+
+cancelled_write_bytes: refer to docs.
+
+=back
+
+=head2 limits
+
+Generated by F</proc/E<lt>pidE<gt>/limits>.
+
+Often readable only by self and root, opt in to trying to read the file by
+setting the file to C<limits>, like:
+
+    files => { limits => 'limits' }
+
+An array with (soft_limit, hard_limit, units) is provided for the limits listed.
+
+This may vary between kernels. Some examples are:
+
+=over
+
+=item *
+
+C<max_address_space>: the maximum amount of virtual memory available to the shell.
+
+=item *
+
+C<max_core_file_size>: the maximum size of core files created.
+
+=item *
+
+C<max_processes>: the maximum number of processes available to a single user.
+
+=item *
+
+C<max_open_files>: the maximum number of open file descriptors.
+
+=item *
+
+=back
+
+See Documentation/filesystems/proc.txt for more information.
 
 =head1 METHODS
 
@@ -557,9 +655,9 @@ It's possible to handoff an array reference with a PID list.
 
     my $lxs = Linux::Info::Processes->new(pids => [ 1, 2, 3 ]);
 
-It's also possible to set the path to the proc filesystem.
+It's also possible to set the path to the F<proc> filesystem:
 
-     Linux::Info::Processes->new(
+    my $lxs = Linux::Info::Processes->new(
         files => {
             # This is the default
             path    => '/proc',
@@ -571,8 +669,19 @@ It's also possible to set the path to the proc filesystem.
             wchan   => 'wchan',
             fd      => 'fd',
             io      => 'io',
+            limits  => 'limits',
         }
     );
+
+If you want to enable C<io> and C<limits> information about the
+processes, you need to enabled it explicity:
+
+    my $lxs = Linux::Info::Processes->new(enabled => {
+        io => 1, limits => 1
+    });
+
+Remember that the process executing C<Linux::Info::Processes> requires rights
+to read C<io> and C<limits>.
 
 =head2 init()
 
@@ -582,15 +691,15 @@ Call C<init()> to initialize the statistics.
 
 =head2 get()
 
-Call C<get()> to get the statistics. C<get()> returns the statistics as a hash reference.
+Call C<get()> to get the statistics. C<get()> returns the statistics as a hash
+reference.
 
     my $stat = $lxs->get;
 
-Note:
-
-Processes that were created between the call of init() and get() are returned as well,
-but the keys minflt, cminflt, mayflt, cmayflt, utime, stime, cutime, and cstime are set
-to the value 0.00 because there are no inititial values to calculate the deltas.
+B<Note>: processes that were created between the call of init() and get() are
+returned as well, but the keys minflt, cminflt, mayflt, cmayflt, utime, stime,
+cutime, and cstime are set to the value 0.00 because there are no inititial
+values to calculate the deltas.
 
 =head2 raw()
 

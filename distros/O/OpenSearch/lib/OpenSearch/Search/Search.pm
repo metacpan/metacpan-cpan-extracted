@@ -4,7 +4,7 @@ use warnings;
 use feature qw(signatures);
 use Moose;
 
-with 'OpenSearch::Parameters::Search';
+with 'OpenSearch::Parameters::Search::Search';
 
 has '_base' => (
   is       => 'rw',

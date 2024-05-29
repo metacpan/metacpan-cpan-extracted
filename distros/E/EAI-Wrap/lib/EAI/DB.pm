@@ -1,12 +1,12 @@
-package EAI::DB 1.913;
+package EAI::DB 1.914;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use DBI qw(:sql_types); use DBD::ODBC (); use Data::Dumper qw(Dumper); use Log::Log4perl qw(get_logger);
 
 our @EXPORT = qw(newDBH beginWork commit rollback readFromDB readFromDBHash doInDB storeInDB deleteFromDB updateInDB getConn setConn);
 
-my $dbh; # module static DBI handle, will be dynamic when using OO-Style here
-my $DSN = ""; # module static DSN string, will be dynamic when using OO-Style here
+my $dbh; # current DBI handle
+my $DSN = ""; # current DSN string
 
 # create a new handle for a database connection
 sub newDBH ($$) {
@@ -257,7 +257,7 @@ sub storeInDB ($$;$) {
 						$dataArray[$tgtCol] =~ s/%$// if $dataArray[$tgtCol] =~ /[\d\.]*%$/; # get rid of percent sign
 						# ignore everything that doesn't look like a numeric (also respecting scientific notation (E...)). 
 						# decimal place before comma is optional, at least one decimal digit is needed (but also integers are possible)
-						$dataArray[$tgtCol] = undef if !($dataArray[$tgtCol] =~ /^-*\d*\.?\d+E*[-+]*\d*$/);
+						$dataArray[$tgtCol] = undef if !($dataArray[$tgtCol] =~ /^-*\d*\.?\d+(E[-+])*\d*$/);
 						$dataArray[$tgtCol] = undef if $dataArray[$tgtCol] =~ /^N\/A$/;
 						# smallest possible double for sql server = 1.79E-308
 						$dataArray[$tgtCol] = 0 if abs($dataArray[$tgtCol]) <= 1.79E-308 and abs($dataArray[$tgtCol]) > 0;
@@ -310,7 +310,7 @@ sub storeInDB ($$;$) {
 					# everything else interpreted as string
 					} else {
 						if (length($dataArray[$tgtCol]) > $datasize) {
-							$errorIndicator .= "| content '".$dataArray[$tgtCol]."'too long for field: ".$columns[$dbCol]." (type $datatype) in row $i (0-based), length: ".length($dataArray[$tgtCol]).", defined fieldsize: ".$datasize;
+							$errorIndicator .= "| content '".$dataArray[$tgtCol]."' too long for field: ".$columns[$dbCol]." (type $datatype) in row $i (0-based), length: ".length($dataArray[$tgtCol]).", defined fieldsize: ".$datasize;
 							$severity = 2;
 						}
 						$dataArray[$tgtCol] =~ s/'/''/g; # quote quotes

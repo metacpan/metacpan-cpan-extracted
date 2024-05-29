@@ -9,7 +9,7 @@ use experimental qw(signatures);
 
 $ENV{MOJO_LOG_LEVEL} = 'fatal';
 
-helper(current_user_roles => sub($c) {[qw(admin user)]});
+helper("authn.current_user_roles" => sub($c) {[qw(admin user)]});
 
 # default get_roles implementation using `current_user_roles` helper
 plugin('Authorization::AccessControl');

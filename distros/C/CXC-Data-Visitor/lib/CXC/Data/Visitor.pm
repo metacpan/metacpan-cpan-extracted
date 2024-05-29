@@ -10,7 +10,7 @@ use warnings;
 use feature 'current_sub';
 use experimental 'signatures', 'lexical_subs', 'postderef';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use base 'Exporter::Tiny';
 use Hash::Util 'lock_hash', 'unlock_hash', 'unlock_value';
@@ -25,14 +25,22 @@ use constant {
     CYCLE_TRUNCATE => 'truncate',
 };
 use constant CYCLE_QR => qr /\A die|continue|truncate \z/x;
-use constant { VISIT_CONTAINER => 0b01, VISIT_LEAF      => 0b10, VISIT_ALL                => 0b11 };
-use constant { RESULT_RETURN   => 0,    RESULT_CONTINUE => 1,    RESULT_REVISIT_CONTAINER => 2 };
+use constant { VISIT_CONTAINER => 0b01, VISIT_LEAF => 0b10, VISIT_ALL => 0b11 };
+use constant {
+    RESULT_RETURN            => 0,
+    RESULT_CONTINUE          => 1,
+    RESULT_REVISIT_CONTAINER => 2,
+    RESULT_REVISIT_ELEMENT   => 3,
+};
+
+use constant { PASS_VISIT_ELEMENT => 1, PASS_REVISIT_ELEMENT => 2 };
 
 our %EXPORT_TAGS = (
     funcs     => [qw( visit )],
-    results   => [qw( RESULT_RETURN RESULT_CONTINUE RESULT_REVISIT_CONTAINER )],
+    results   => [qw( RESULT_RETURN RESULT_CONTINUE RESULT_REVISIT_CONTAINER RESULT_REVISIT_ELEMENT )],
     cycles    => [qw( CYCLE_DIE CYCLE_CONTINUE CYCLE_TRUNCATE )],
     visits    => [qw( VISIT_CONTAINER VISIT_LEAF VISIT_ALL )],
+    passes    => [qw( PASS_VISIT_ELEMENT PASS_REVISIT_ELEMENT )],
     constants => [qw( :results :cycles :visits )],
 );
 
@@ -44,7 +52,8 @@ my sub croak {
 }
 
 
-my sub _visit ( $node, $code, $context, $cycle, $visit, $meta ) {    ## no critic (Subroutines::ProhibitManyArgs)
+## no critic (Subroutines::ProhibitManyArgs  Subroutines::ProhibitExcessComplexity)
+my sub _visit ( $node, $code, $context, $cycle, $visit, $meta ) {
 
     my $path          = $meta->{path};
     my $ancestors     = $meta->{ancestors};
@@ -99,20 +108,37 @@ my sub _visit ( $node, $code, $context, $cycle, $visit, $meta ) {    ## no criti
 
             my $is_node = is_plain_refref( $vref );
 
-            my $visit_element = $is_node ? $visit_node : $visit_leaf;
+            my $visit_element   = $is_node ? $visit_node : $visit_leaf;
+            my $revisit_element = !!0;
 
+            $meta{pass} = PASS_VISIT_ELEMENT;
             if ( $visit_element
                 and ( my $result = $code->( $idx, $vref, $context, \%meta ) ) != RESULT_CONTINUE )
             {
                 redo SCAN  if $result == RESULT_REVISIT_CONTAINER;
                 return !!0 if $result == RESULT_RETURN;
+                if ( $result == RESULT_REVISIT_ELEMENT ) {
+                    $revisit_element = !!1;
+                }
+                elsif ( $result != RESULT_CONTINUE ) {
+                    croak( "unknown return value from visit: $result" );
+                }
             }
 
             next unless is_plain_refref( $vref );
 
             my $ref = $vref->$*;
-            __SUB__->( $ref, $code, $context, $cycle, $visit, \%meta ) || return !!0
-              if is_plain_arrayref( $ref ) || is_plain_hashref( $ref );
+            if ( is_plain_arrayref( $ref ) || is_plain_hashref( $ref ) ) {
+                __SUB__->( $ref, $code, $context, $cycle, $visit, \%meta ) || return !!0;
+
+                if ( $revisit_element ) {
+                    $meta{pass} = PASS_REVISIT_ELEMENT;
+                    my $result = $code->( $idx, $vref, $context, \%meta );
+                    return !!0 if $result == RESULT_RETURN;
+                    next       if $result == RESULT_CONTINUE;
+                    croak( "unknown return value from visit: $result" );
+                }
+            }
         }
     }
     croak( "exceeded limit ($meta->{revisit_limit}) on revisiting containers" )
@@ -120,6 +146,33 @@ my sub _visit ( $node, $code, $context, $cycle, $visit, $meta ) {    ## no criti
 
     return !!1;
 }
+## critic (Subroutines::ProhibitManyArgs  Subroutines::ProhibitExcessComplexity)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -420,7 +473,7 @@ CXC::Data::Visitor - Invoke a callback on every element at every level of a data
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -452,8 +505,13 @@ The traversal may be aborted.
 
 =item *
 
-A container (hash or array) may be revisited if the callback changes
-it.
+A container (hash or array) may be immediately revisited if the
+callback requests it.
+
+=item *
+
+An element whose value is a container may be revisited after the container is
+visited if the callback requests it.
 
 =item *
 
@@ -538,7 +596,7 @@ collected metadata. See L</$metadata> below.
 
 B<$callback> will be called as:
 
-  $handle_return = $callback->( $kydx, $vref, $context, $metadata );
+  $handle_return = $callback->( $kydx, $vref, $context, \%metadata );
 
 and should return one of the following (see L</EXPORTS> to import the constants):
 
@@ -562,6 +620,28 @@ To avoid inadvertent infinite loops, a finite number of revisits
 is allowed during a traversal of a container (see L</revisit_limit>).
 Containers with multiple parents are traversed once per parent;
 The limit is reset for each traversal.
+
+=item RESULT_REVISIT_ELEMENT
+
+If the value of this element is a container, it should be revisited
+(by calling L</$callback>) after its value is visited.  This
+allows post-processing results when travelling back up the structure.
+
+During the initial visit
+
+  $metadataa->{pass} & PASS_VISIT_ELEMENT
+
+will be true.  During the followup visit
+
+  $metadata->{pass} & PASS_REVISIT_ELEMENT
+
+will be true and L</$callback> may only return values of
+B<RESULT_RETURN> and B<RESULT_CONTINUE>; any other values will cause
+an exception.
+
+The ordered contents of the L<$metadata{path}> array uniquely
+identify an element, so may be used to track elements using external data
+structures.  Do not depend upon reference addresses remaining constant.
 
 =back
 
@@ -603,6 +683,10 @@ at the current element from B<$struct>.
 An array contains the ancestor containers of the current element.
 
 =back
+
+=item B<pass>
+
+A constant indicating the current visit pass through an element.
 
 =back
 
@@ -707,7 +791,8 @@ The following symbols may be exported:
   visit
   VISIT_CONTAINER VISIT_LEAF VISIT_ALL
   CYCLE_DIE CYCLE_CONTINUE CYCLE_TRUNCATE
-  RESULT_RETURN RESULT_CONTINUE RESULT_REVISIT_CONTAINER
+  RESULT_RETURN RESULT_CONTINUE RESULT_REVISIT_CONTAINER RESULT_REVISIT_ELEMENT
+  PASS_VISIT_ELEMENT PASS_REVISIT_ELEMENT
 
 The available tags and their respective imported symbols are:
 
@@ -719,7 +804,8 @@ Import all symbols.
 
 =item B<results>
 
- RESULT_RETURN RESULT_CONTINUE RESULT_REVISIT_CONTAINER
+ RESULT_RETURN RESULT_CONTINUE
+ RESULT_REVISIT_CONTAINER RESULT_REVISIT_ELEMENT
 
 =item B<cycles>
 
@@ -728,6 +814,10 @@ Import all symbols.
 =item B<visits>
 
  VISIT_CONTAINER VISIT_LEAF VISIT_ALL
+
+=item B<passes>
+
+  PASS_VISIT_ELEMENT PASS_REVISIT_ELEMENT
 
 =item B<constants>
 

@@ -7,7 +7,7 @@ use Pod::Usage;
 use Test::Health::Harness;
 use Test::Health::Email;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 my %opts;
 getopts( 'a:d:t:f:s:h', \%opts );

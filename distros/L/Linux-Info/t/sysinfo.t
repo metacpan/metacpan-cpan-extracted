@@ -33,7 +33,7 @@ my @pf = qw(
 );
 
 foreach my $f (@pf) {
-    if ( !-r $f ) {
+    unless ( -r $f ) {
         plan skip_all => "$f is not readable";
         exit(0);
     }

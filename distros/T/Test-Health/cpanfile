@@ -1,0 +1,31 @@
+requires "Carp" => "0";
+requires "Email::Sender::Transport::SMTP" => "1.300021";
+requires "Email::Stuffer" => "0.012";
+requires "File::Spec" => "0";
+requires "Getopt::Std" => "0";
+requires "Moo" => "2.000002";
+requires "Pod::Usage" => "0";
+requires "TAP::Formatter::HTML" => "0.11";
+requires "TAP::Harness" => "3.30";
+requires "Types::Standard" => "1.000005";
+requires "namespace::clean" => "0.26";
+requires "perl" => "5.008009";
+
+on 'test' => sub {
+  requires "File::Copy" => "0";
+  requires "Moose" => "2.1805";
+  requires "Test::Moose" => "2.1805";
+  requires "Test::Most" => "0.34";
+  requires "Test::TempDir::Tiny" => "0.016";
+  requires "perl" => "5.008009";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "perl" => "5.008009";
+};
+
+on 'develop' => sub {
+  requires "Test::Kwalitee" => "1.21";
+  requires "Test::More" => "0.88";
+};

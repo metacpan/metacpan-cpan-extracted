@@ -1,15 +1,20 @@
 # Contributing Guidelines
 
-Pull requests, bug reports, and all other forms of contribution are welcomed and highly encouraged!
+Pull requests, bug reports, and all other forms of contribution are welcomed
+and highly encouraged!
 
 # Development
 
-The latest openapi spec can be found at https://github.com/openai/openai-openapi
+The latest openapi spec can be found at
+https://github.com/openai/openai-openapi
 
 # Documentation
 
 When updating the openapi spec in the `share` directory, be sure to run
 `devel/build_docs.pl` to update the documentation.
+
+If you prefer, you can run the `bash` script, `devel/rebuild` to cleanly
+rebuild the project after changes are made.
 
 # Examples
 

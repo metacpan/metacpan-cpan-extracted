@@ -1,4 +1,4 @@
-package EAI::File 1.913;
+package EAI::File 1.914;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import);use Text::CSV();use Data::XLSX::Parser();use Spreadsheet::ParseExcel();use Spreadsheet::WriteExcel();use Excel::Writer::XLSX();use Data::Dumper qw(Dumper);use XML::LibXML();use XML::LibXML::Debugging();
@@ -154,7 +154,7 @@ LINE:
 					}
 				}
 				$lineno++;
-				print "EAI::File::readText read $lineno of $lines\r" if $countPercent and ($lineno % (int($lines * ($countPercent / 100)) == 0 ? 1 : int($lines * ($countPercent / 100))) == 0);
+				print "EAI::File::readText read $lineno of $lines\r" if ($countPercent and ($lineno % (int($lines * ($countPercent / 100)) == 0 ? 1 : int($lines * ($countPercent / 100))) == 0)) or $countPercent >= 100;
 				next LINE if $line[0] eq "" and !$lineProcessing;
 				readRow($data,\@line,\@header,\@targetheader,$rawline,$lineProcessing,$fieldProcessing,$thousandsep,$decimalsep,$lineno);
 			}

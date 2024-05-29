@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 use Test::Fatal;
 use Log::Contextual qw(:log);
 
@@ -16,3 +16,5 @@ like(
    qr/with_logger is no longer a direct sub in Log::Contextual/,
    'Log::Contextual::with_logger dies',
 );
+
+done_testing;

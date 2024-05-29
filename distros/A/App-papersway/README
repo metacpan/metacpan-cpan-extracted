@@ -1,9 +1,10 @@
 App::papersway
 --------------
 
-This is an implementation of PaperWM-like window management for Sway/i3wm.
-If you like Sway/i3wm's commitments to stability, avoiding scope creep etc.
-but dislike the window management model, papersway might be of interest.
+This is an implementation of PaperWM-like scrollable tiling window management
+for Sway/i3wm.  If you like Sway/i3wm's commitments to stability, avoiding
+scope creep etc. but dislike the window management model, papersway might be
+of interest.
 
 papersway -- PaperWM-like window management using i3-ipc.
 
@@ -44,7 +45,7 @@ You can also look for information at:
         https://spwhitton.name/tech/code/papersway/
 
     RT, CPAN's bug tracker (please see CONTRIBUTING)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=papersway
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-papersway
 
     MetaCPAN
         https://metacpan.org/release/papersway

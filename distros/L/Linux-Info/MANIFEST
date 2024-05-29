@@ -72,7 +72,6 @@ t/070-sockstats.t
 t/090-diskusage.t
 t/100-loadavg.t
 t/110-filestats.t
-t/120-processes.t
 t/130-search.t
 t/140-psfind.t
 t/150-pstop.t
@@ -106,6 +105,7 @@ t/kernel-release-ubuntu.t
 t/kernel-release.t
 t/lib/Helpers.pm
 t/os-release.t
+t/processes.t
 t/samples/cpuinfo0
 t/samples/cpuinfo1
 t/samples/cpuinfo2

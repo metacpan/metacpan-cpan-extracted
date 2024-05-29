@@ -115,7 +115,7 @@ subtest 'return' => sub {
     is( \@kydx, [ 'a', 'b', ] );
 };
 
-subtest 'revisit' => sub {
+subtest 'revisit container' => sub {
 
     my %hash = myhash;
 
@@ -126,7 +126,7 @@ subtest 'revisit' => sub {
     my ( $completed ) = visit(
         \%hash,
         sub ( $kydx, $vref, $context, $meta ) {
-            push @kydx, $kydx;
+            push @kydx,  $kydx;
             push @value, is_refref( $vref ) ? 'ref' : $$vref;
 
             # manipulate container to test revisit
@@ -140,8 +140,37 @@ subtest 'revisit' => sub {
     );
 
     is( $completed, T(), 'completed' );
-    is( \@kydx, [ 'a', 'b', 'a', 'b', 0 .. 2, 'c', 0 .. 2 ] );
-    is( \@value, [ qw( 1 ref 1 ref 2 3 4 ref 8 9 10 ) ] );
+    is( \@kydx,     [ 'a', 'b', 'a', 'b', 0 .. 2, 'c', 0 .. 2 ] );
+    is( \@value,    [qw( 1 ref 1 ref 2 3 4 ref 8 9 10 )] );
+};
+
+subtest 'revisit element' => sub {
+
+    my %hash = myhash;
+
+    my @kydx;
+    my @value;
+
+    my $visited = 0;
+    my ( $completed ) = visit(
+        \%hash,
+        sub ( $kydx, $vref, $context, $meta ) {
+            push @kydx,  $kydx;
+            push @value, is_refref( $vref ) ? 'ref' : $$vref;
+
+            # manipulate container to test revisit
+            return $kydx eq 'b' && $meta->{pass} == PASS_VISIT_ELEMENT
+              ? RESULT_REVISIT_ELEMENT
+              : RESULT_CONTINUE;
+        },
+    );
+
+    is( $completed, T(), 'completed' );
+
+    is( \@kydx, [ ( 'a' ), ( ( 'b', 0 .. 2, 'b', ), ( 'c', ( 'd', 0 .. 2 ), ( 'e' ), ), ), ], );
+    is( \@value,
+        [ ( 1 ), ( ( ( 'ref', 2, 3, 4, 'ref', ), ( 'ref', ( 'ref', 5, 6, 7 ), ( 8 ), ), ), ), ],
+    );
 };
 
 subtest 'cycle' => sub {

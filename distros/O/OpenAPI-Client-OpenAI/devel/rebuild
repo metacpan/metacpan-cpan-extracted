@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+function show_help() {
+    less <<END
+$(basename "$0") [-?|-h|--help] [-f|--force]
+
+    -? -h --help  Show this help and exit
+    -f --force    Force the rebuild, even if there are uncommitted changes
+
+Attempts to rebuild this project, including running tests and rebuilding the
+documentation. If you have uncommitted changes, this script will refuse to
+run. If you want to force the rebuild, use the -f option.
+END
+}
+
+force=false
+
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+key="$1"
+case $key in
+    -f|--force)
+    force=true
+    shift
+    ;;
+    -?|-h|--help)
+    shift # past argument
+    show_help;
+    exit;
+    ;;
+    *)    # unknown option
+    POSITIONAL+=("$1") # save it in an array for later
+    shift # past argument
+    ;;
+esac
+done
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+set -Eeuo pipefail
+
+# Check for uncommitted changes in the git repository
+if git diff-index --quiet HEAD --; then
+    # No uncommitted changes. Do nothing.
+    echo Rebuilding project
+else
+    # Uncommitted changes found
+    if [ "$force" = true ]; then
+      echo "Uncommitted changes found, but proceeding due to -f flag."
+    else
+      echo "Uncommitted changes found. Use -f to force."
+      exit 1
+    fi
+fi
+
+# Check if Makefile exists in the current directory
+if [ -f Makefile ]; then
+    # Run make realclean
+    make realclean
+    # Check if make realclean was successful
+    if [ $? -eq 0 ]; then
+      echo "make realclean executed successfully."
+    else
+      echo "make realclean failed."
+    fi
+fi
+
+perl Makefile.PL
+
+make
+
+RELEASE_TESTING=1 make test
+
+# Obviously, this builds the documentation
+perl devel/build_docs.pl
+
+# And we rebuild our README.md from the POD
+pod2markdown < lib/OpenAPI/Client/OpenAI.pm > README.md

@@ -64,7 +64,7 @@
    "provides" : {
       "OpenSearch" : {
          "file" : "lib/OpenSearch.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "OpenSearch::Base" : {
          "file" : "lib/OpenSearch/Base.pm"
@@ -72,35 +72,44 @@
       "OpenSearch::Cluster" : {
          "file" : "lib/OpenSearch/Cluster.pm"
       },
-      "OpenSearch::Cluster::Allocation" : {
-         "file" : "lib/OpenSearch/Cluster/Allocation.pm"
+      "OpenSearch::Cluster::AllocationExplain" : {
+         "file" : "lib/OpenSearch/Cluster/AllocationExplain.pm"
       },
-      "OpenSearch::Cluster::Allocation::Explain" : {
-         "file" : "lib/OpenSearch/Cluster/Allocation/Explain.pm"
+      "OpenSearch::Cluster::DelDecommissionAwareness" : {
+         "file" : "lib/OpenSearch/Cluster/DelDecommissionAwareness.pm"
+      },
+      "OpenSearch::Cluster::DelRoutingAwareness" : {
+         "file" : "lib/OpenSearch/Cluster/DelRoutingAwareness.pm"
+      },
+      "OpenSearch::Cluster::GetDecommissionAwareness" : {
+         "file" : "lib/OpenSearch/Cluster/GetDecommissionAwareness.pm"
+      },
+      "OpenSearch::Cluster::GetRoutingAwareness" : {
+         "file" : "lib/OpenSearch/Cluster/GetRoutingAwareness.pm"
+      },
+      "OpenSearch::Cluster::GetSettings" : {
+         "file" : "lib/OpenSearch/Cluster/GetSettings.pm"
       },
       "OpenSearch::Cluster::Health" : {
          "file" : "lib/OpenSearch/Cluster/Health.pm"
       },
-      "OpenSearch::Cluster::Health::Get" : {
-         "file" : "lib/OpenSearch/Cluster/Health/Get.pm"
+      "OpenSearch::Cluster::SetDecommissionAwareness" : {
+         "file" : "lib/OpenSearch/Cluster/SetDecommissionAwareness.pm"
       },
-      "OpenSearch::Cluster::Settings" : {
-         "file" : "lib/OpenSearch/Cluster/Settings.pm"
-      },
-      "OpenSearch::Cluster::Settings::Get" : {
-         "file" : "lib/OpenSearch/Cluster/Settings/Get.pm"
-      },
-      "OpenSearch::Cluster::Settings::Set" : {
-         "file" : "lib/OpenSearch/Cluster/Settings/Set.pm"
+      "OpenSearch::Cluster::SetRoutingAwareness" : {
+         "file" : "lib/OpenSearch/Cluster/SetRoutingAwareness.pm"
       },
       "OpenSearch::Cluster::Stats" : {
          "file" : "lib/OpenSearch/Cluster/Stats.pm"
       },
-      "OpenSearch::Cluster::Stats::Get" : {
-         "file" : "lib/OpenSearch/Cluster/Stats/Get.pm"
+      "OpenSearch::Cluster::UpdateSettings" : {
+         "file" : "lib/OpenSearch/Cluster/UpdateSettings.pm"
       },
       "OpenSearch::Document" : {
          "file" : "lib/OpenSearch/Document.pm"
+      },
+      "OpenSearch::Document::Bulk" : {
+         "file" : "lib/OpenSearch/Document/Bulk.pm"
       },
       "OpenSearch::Document::Index" : {
          "file" : "lib/OpenSearch/Document/Index.pm"
@@ -183,20 +192,38 @@
       "OpenSearch::Index::UpdateSettings" : {
          "file" : "lib/OpenSearch/Index/UpdateSettings.pm"
       },
-      "OpenSearch::Parameters::Cluster::Allocation::Explain" : {
-         "file" : "lib/OpenSearch/Parameters/Cluster/Allocation/Explain.pm"
+      "OpenSearch::Parameters::Cluster::AllocationExplain" : {
+         "file" : "lib/OpenSearch/Parameters/Cluster/AllocationExplain.pm"
       },
-      "OpenSearch::Parameters::Cluster::Health::Get" : {
-         "file" : "lib/OpenSearch/Parameters/Cluster/Health/Get.pm"
+      "OpenSearch::Parameters::Cluster::DelRoutingAwareness" : {
+         "file" : "lib/OpenSearch/Parameters/Cluster/DelRoutingAwareness.pm"
       },
-      "OpenSearch::Parameters::Cluster::Settings::Get" : {
-         "file" : "lib/OpenSearch/Parameters/Cluster/Settings/Get.pm"
+      "OpenSearch::Parameters::Cluster::GetDecommissionAwareness" : {
+         "file" : "lib/OpenSearch/Parameters/Cluster/GetDecommissionAwareness.pm"
       },
-      "OpenSearch::Parameters::Cluster::Settings::Set" : {
-         "file" : "lib/OpenSearch/Parameters/Cluster/Settings/Set.pm"
+      "OpenSearch::Parameters::Cluster::GetRoutingAwareness" : {
+         "file" : "lib/OpenSearch/Parameters/Cluster/GetRoutingAwareness.pm"
       },
-      "OpenSearch::Parameters::Cluster::Stats::Get" : {
-         "file" : "lib/OpenSearch/Parameters/Cluster/Stats/Get.pm"
+      "OpenSearch::Parameters::Cluster::GetSettings" : {
+         "file" : "lib/OpenSearch/Parameters/Cluster/GetSettings.pm"
+      },
+      "OpenSearch::Parameters::Cluster::Health" : {
+         "file" : "lib/OpenSearch/Parameters/Cluster/Health.pm"
+      },
+      "OpenSearch::Parameters::Cluster::SetDecommissionAwareness" : {
+         "file" : "lib/OpenSearch/Parameters/Cluster/SetDecommissionAwareness.pm"
+      },
+      "OpenSearch::Parameters::Cluster::SetRoutingAwareness" : {
+         "file" : "lib/OpenSearch/Parameters/Cluster/SetRoutingAwareness.pm"
+      },
+      "OpenSearch::Parameters::Cluster::Stats" : {
+         "file" : "lib/OpenSearch/Parameters/Cluster/Stats.pm"
+      },
+      "OpenSearch::Parameters::Cluster::UpdateSettings" : {
+         "file" : "lib/OpenSearch/Parameters/Cluster/UpdateSettings.pm"
+      },
+      "OpenSearch::Parameters::Document::Bulk" : {
+         "file" : "lib/OpenSearch/Parameters/Document/Bulk.pm"
       },
       "OpenSearch::Parameters::Document::Index" : {
          "file" : "lib/OpenSearch/Parameters/Document/Index.pm"
@@ -264,8 +291,11 @@
       "OpenSearch::Parameters::Index::UpdateSettings" : {
          "file" : "lib/OpenSearch/Parameters/Index/UpdateSettings.pm"
       },
-      "OpenSearch::Parameters::Search" : {
-         "file" : "lib/OpenSearch/Parameters/Search.pm"
+      "OpenSearch::Parameters::Search::Count" : {
+         "file" : "lib/OpenSearch/Parameters/Search/Count.pm"
+      },
+      "OpenSearch::Parameters::Search::Search" : {
+         "file" : "lib/OpenSearch/Parameters/Search/Search.pm"
       },
       "OpenSearch::Remote" : {
          "file" : "lib/OpenSearch/Remote.pm"
@@ -278,6 +308,9 @@
       },
       "OpenSearch::Search" : {
          "file" : "lib/OpenSearch/Search.pm"
+      },
+      "OpenSearch::Search::Count" : {
+         "file" : "lib/OpenSearch/Search/Count.pm"
       },
       "OpenSearch::Search::Search" : {
          "file" : "lib/OpenSearch/Search/Search.pm"
@@ -295,7 +328,7 @@
          "web" : "https://github.com/localh0rst/OpenSearch-Perl"
       }
    },
-   "version" : "0.90",
+   "version" : "0.91",
    "x_contributors" : [
       "localh0rst <git@fail.ninja>",
       "localh0rst <localh0rst@users.noreply.github.com>"

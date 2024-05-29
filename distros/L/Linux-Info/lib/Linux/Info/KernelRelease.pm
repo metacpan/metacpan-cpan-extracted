@@ -15,7 +15,7 @@ use Class::XSAccessor getters => {
     get_build_datetime => 'build_datetime',
 };
 
-our $VERSION = '2.13'; # VERSION
+our $VERSION = '2.15'; # VERSION
 
 # ABSTRACT: parses and provide Linux kernel detailed information
 
@@ -179,7 +179,7 @@ Linux::Info::KernelRelease - parses and provide Linux kernel detailed informatio
 
 =head1 VERSION
 
-version 2.13
+version 2.15
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,14 @@
 Revision history for Perl extension OpenSearch
 
+0.91 2024-05-28T15:52:39Z
+
+	- Updated Document API to support Bulk inserts (benchmarks better than expected)
+	- Added Benchmark scripts in the examples directory
+	- Cluster Endpoints seems to be complete now (POD missing)
+	- Index Endpoints seems to be complete not (POD missing)
+	- Added some more tests (depending on ENV)
+	- Updated POD in OpenSearch Module
+
 0.90 2024-05-27T13:40:59Z
 
 	Rewrote the API to be more clear. 

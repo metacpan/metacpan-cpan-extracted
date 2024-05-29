@@ -1,5 +1,13 @@
 Revision history for CXC-Data-Visitor
 
+0.04      2024-05-28 21:49:23-04:00 America/New_York
+
+  [ENHANCEMENTS]
+
+     * elements with values that are containers may be revisited after
+       their values are visited (normally an element is visited only
+       once, prior to its value).
+
 0.03      2024-03-25 16:10:08-04:00 America/New_York
 
   [API CHANGE]

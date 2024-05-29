@@ -15,8 +15,7 @@ my %WriteMakefileArgs = (
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.14.0',
     BUILD_REQUIRES   => {
-        'ExtUtils::MakeMaker'     => '0',
-        'File::ShareDir::Install' => '0',
+        'ExtUtils::MakeMaker' => '0',
 
         # Most of these are for devel/build_docs.pl
         'File::Slurp'          => '0',
@@ -29,14 +28,14 @@ my %WriteMakefileArgs = (
         'Template'             => '0',
     },
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '0',
+        'ExtUtils::MakeMaker'     => '0',
+        'File::ShareDir::Install' => '0',
     },
     TEST_REQUIRES => {
-        'Test::More'             => '0',
-        'Test::Deep'             => '0',
-        'Test::Exception'        => '0',
+        'Test::Most'             => '0',
         'Test::RequiresInternet' => '0',
         'Perl::Tidy'             => '20240511',    # not sure where to put this
+        'Import::Base'           => '1.004',
     },
     PREREQ_PM => {
         'File::ShareDir'        => '0',

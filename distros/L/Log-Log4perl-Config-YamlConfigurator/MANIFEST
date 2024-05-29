@@ -1,0 +1,20 @@
+.perlcriticrc
+Changes
+cpanfile
+lib/Log/Log4perl/Config/YamlConfigurator.pm
+lib/Log/Log4perl/Config/YamlConfigurator.pod
+LICENSE
+maint/AuthorExtensions.pl
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/04-pod.t
+t/05-critic.t
+t/container.yml
+t/init.t
+t/init_with_beam_wire.t
+t/logging.yml
+t/unbound_appenders.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

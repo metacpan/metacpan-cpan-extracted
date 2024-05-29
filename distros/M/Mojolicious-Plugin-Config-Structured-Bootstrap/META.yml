@@ -27,10 +27,10 @@ no_index:
 provides:
   Mojolicious::Plugin::Config::Structured::Bootstrap:
     file: lib/Mojolicious/Plugin/Config/Structured/Bootstrap.pm
-    version: '0.01'
+    version: '0.02'
 recommends:
-  Mojolicious::Plugin::Authentication::OIDC: '0.02'
-  Mojolicious::Plugin::Authorization::AccessControl: '0.01'
+  Mojolicious::Plugin::Authentication::OIDC: '0.03'
+  Mojolicious::Plugin::Authorization::AccessControl: '0.02'
   Mojolicious::Plugin::Cron::Scheduler: '0.02'
   Mojolicious::Plugin::Data::Transfigure: '0.01'
   Mojolicious::Plugin::Migration::Sqitch: '0.01'
@@ -52,7 +52,7 @@ requires:
 resources:
   bugtracker: https://github.com/tyrrminal/mojolicious-plugin-config-structured-bootstrap/issues
   repository: https://github.com/tyrrminal/mojolicious-plugin-config-structured-bootstrap.git
-version: '0.01'
+version: '0.02'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: MIT

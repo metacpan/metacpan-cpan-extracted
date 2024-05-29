@@ -2,7 +2,7 @@ package Log::Contextual::WarnLogger;
 use strict;
 use warnings;
 
-our $VERSION = '0.009000';
+our $VERSION = '0.009001';
 
 use Carp 'croak';
 
@@ -130,25 +130,25 @@ Log::Contextual::WarnLogger - logger for libraries using Log::Contextual
 
 =head1 VERSION
 
-version 0.009000
+version 0.009001
 
 =head1 SYNOPSIS
 
- package My::Package;
- use Log::Contextual::WarnLogger;
- use Log::Contextual qw( :log ),
-   -default_logger => Log::Contextual::WarnLogger->new({
+  package My::Package;
+  use Log::Contextual::WarnLogger;
+  use Log::Contextual qw( :log ),
+    -default_logger => Log::Contextual::WarnLogger->new({
       env_prefix => 'MY_PACKAGE',
       levels => [ qw(debug info notice warning error critical alert emergency) ],
-   });
+    });
 
- # warns '[info] program started' if $ENV{MY_PACKAGE_TRACE} is set
- log_info { 'program started' }; # no-op because info is not in levels
- sub foo {
-   # warns '[debug] entered foo' if $ENV{MY_PACKAGE_DEBUG} is set
-   log_debug { 'entered foo' };
-   ...
- }
+  # warns '[info] program started' if $ENV{MY_PACKAGE_TRACE} is set
+  log_info { 'program started' }; # no-op because info is not in levels
+  sub foo {
+    # warns '[debug] entered foo' if $ENV{MY_PACKAGE_DEBUG} is set
+    log_debug { 'entered foo' };
+    ...
+  }
 
 =head1 DESCRIPTION
 
@@ -164,14 +164,14 @@ works.
 
 Arguments: C<< Dict[ env_prefix => Str, levels => List ] $conf >>
 
- my $l = Log::Contextual::WarnLogger->new({ env_prefix => 'BAR' });
+  my $l = Log::Contextual::WarnLogger->new({ env_prefix => 'BAR' });
 
 or:
 
- my $l = Log::Contextual::WarnLogger->new({
-   env_prefix => 'BAR',
-   levels => [ 'level1', 'level2' ],
- });
+  my $l = Log::Contextual::WarnLogger->new({
+    env_prefix => 'BAR',
+    levels => [ 'level1', 'level2' ],
+  });
 
 Creates a new logger object where C<env_prefix> defines what the prefix is for
 the environment variables that will be checked for the log levels.
@@ -197,14 +197,14 @@ The log levels may be customized, but if not defined, these are used:
 For example, if C<env_prefix> is set to C<FREWS_PACKAGE> the following environment
 variables will be used:
 
- FREWS_PACKAGE_UPTO
+  FREWS_PACKAGE_UPTO
 
- FREWS_PACKAGE_TRACE
- FREWS_PACKAGE_DEBUG
- FREWS_PACKAGE_INFO
- FREWS_PACKAGE_WARN
- FREWS_PACKAGE_ERROR
- FREWS_PACKAGE_FATAL
+  FREWS_PACKAGE_TRACE
+  FREWS_PACKAGE_DEBUG
+  FREWS_PACKAGE_INFO
+  FREWS_PACKAGE_WARN
+  FREWS_PACKAGE_ERROR
+  FREWS_PACKAGE_FATAL
 
 Note that C<UPTO> is a convenience variable.  If you set
 C<< FOO_UPTO=TRACE >> it will enable all log levels.  Similarly, if you
@@ -216,36 +216,36 @@ Arguments: C<@anything>
 
 All of the following six methods work the same.  The basic pattern is:
 
- sub $level {
-   my $self = shift;
+  sub $level {
+    my $self = shift;
 
-   warn "[$level] " . join qq{\n}, @_;
+    warn "[$level] " . join qq{\n}, @_;
       if $self->is_$level;
- }
+  }
 
 =head3 trace
 
- $l->trace( 'entered method foo with args ' join q{,}, @args );
+  $l->trace( 'entered method foo with args ' join q{,}, @args );
 
 =head3 debug
 
- $l->debug( 'entered method foo' );
+  $l->debug( 'entered method foo' );
 
 =head3 info
 
- $l->info( 'started process foo' );
+  $l->info( 'started process foo' );
 
 =head3 warn
 
- $l->warn( 'possible misconfiguration at line 10' );
+  $l->warn( 'possible misconfiguration at line 10' );
 
 =head3 error
 
- $l->error( 'non-numeric user input!' );
+  $l->error( 'non-numeric user input!' );
 
 =head3 fatal
 
- $l->fatal( '1 is never equal to 0!' );
+  $l->fatal( '1 is never equal to 0!' );
 
 If different levels are specified, appropriate functions named for your custom
 levels work as you expect.
@@ -259,27 +259,27 @@ environment variable is enabled.
 
 =head3 is_trace
 
- say 'tracing' if $l->is_trace;
+  say 'tracing' if $l->is_trace;
 
 =head3 is_debug
 
- say 'debuging' if $l->is_debug;
+  say 'debuging' if $l->is_debug;
 
 =head3 is_info
 
- say q{info'ing} if $l->is_info;
+  say q{info'ing} if $l->is_info;
 
 =head3 is_warn
 
- say 'warning' if $l->is_warn;
+  say 'warning' if $l->is_warn;
 
 =head3 is_error
 
- say 'erroring' if $l->is_error;
+  say 'erroring' if $l->is_error;
 
 =head3 is_fatal
 
- say q{fatal'ing} if $l->is_fatal;
+  say q{fatal'ing} if $l->is_fatal;
 
 If different levels are specified, appropriate is_$level functions work as you
 would expect.

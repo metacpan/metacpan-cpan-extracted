@@ -1,20 +1,7 @@
 #!perl
 
-use strict;
-use warnings;
-
-use Data::Dumper;
-use JSON;
-
-use Test::More;
-use Test::Deep;
-use Test::RequiresInternet;
-
-use OpenAPI::Client::OpenAI;
-
-if ( !$ENV{OPENAI_API_KEY} ) {
-    plan skip_all => 'This test requires an OPENAI_API_KEY environment variable';
-}
+use lib 't/lib';
+use OpenAITests;
 
 my $openai = OpenAPI::Client::OpenAI->new();
 
@@ -22,25 +9,17 @@ my @test_cases = (
     {
         method            => 'listFiles',
         params            => {},
-        expected_response => noclass(
-            superhashof(
-                {
-                    object => 'list',
-                    data   => array_each(
-                        superhashof(
-                            {
-                                id         => ignore(),
-                                object     => 'file',
-                                bytes      => ignore(),
-                                created_at => ignore(),
-                                filename   => ignore(),
-                                purpose    => ignore(),
-                            }
-                        )
-                    ),
-                }
-            )
-        ),
+        expected_response => noclass( superhashof( {
+            object => 'list',
+            data   => array_each( superhashof( {
+                id         => ignore(),
+                object     => 'file',
+                bytes      => ignore(),
+                created_at => ignore(),
+                filename   => ignore(),
+                purpose    => ignore(),
+            } ) ),
+        } ) ),
     },
 );
 

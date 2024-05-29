@@ -1,4 +1,4 @@
-package EAI::FTP 1.913;
+package EAI::FTP 1.914;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use Net::SFTP::Foreign (); use Net::SFTP::Foreign::Constants qw( SFTP_ERR_LOCAL_UTIME_FAILED ); use Net::FTP (); use Text::Glob qw(match_glob);
@@ -11,8 +11,9 @@ BEGIN {
 
 our @EXPORT = qw(removeFilesOlderX fetchFiles putFile moveTempFile archiveFiles removeFiles login getHandle setHandle);
 
-my $ftp; # module static SFTP handle, will be dynamic when using OO-Style here
-my $RemoteHost = ""; # module static RemoteHost string, will be dynamic when using OO-Style here
+my %ftpHandles; # ftp handle lookup, all connections created are stored here, $RemoteHost is lookup key
+my $ftp; # active SFTP handle
+my $RemoteHost = ""; # active RemoteHost string
 
 # wrappers for different FTP implementations
 
@@ -444,18 +445,25 @@ sub removeFiles ($) {
 sub login ($$;$) {
 	my ($FTP,$setRemoteHost,$enforceConn) = @_;
 	my $logger = get_logger();
-	$setRemoteHost = "" if !defined($setRemoteHost);
-	if ($RemoteHost ne $setRemoteHost or !defined($ftp) or (defined($enforceConn) and $enforceConn)) {
-		$RemoteHost = $setRemoteHost;
-		undef $ftp if defined($ftp); # close ftp connection if open.
-	} else {
-		$logger->debug("ftp connection already open, using $RemoteHost");
-		return 1;
-	}
-	(!$RemoteHost) and do {
-		$logger->error("no existing connection and remote host not set in \$setRemoteHost for new connection");
+	(!$setRemoteHost) and do {
+		$logger->error("remote host not set in \$setRemoteHost");
 		return 0;
 	};
+	$RemoteHost = $setRemoteHost;
+	if (!defined($ftpHandles{$RemoteHost}) or (defined($enforceConn) and $enforceConn)) {
+		$logger->debug((defined($enforceConn) and $enforceConn ? "enforceConn is defined" : "ftp connection doesn't exist").", creating new ftp connection");
+		undef $ftpHandles{$RemoteHost} if defined($ftpHandles{$RemoteHost}); # close ftp connection if open.
+	} else {
+		$logger->info("ftp connection already exists, using handle from \$ftpHandles{'$RemoteHost'}");
+		$ftp = $ftpHandles{$RemoteHost};
+		# checking if existing connection still usable (ftp host may have terminated it)
+		if (_setcwd(undef)) {
+			return 1;
+		} else {
+			$logger->warn("reconnecting because existing connection had a problem: "._error());
+			undef $ftpHandles{$RemoteHost};
+		}
+	}
 	my $maxConnectionTries = $FTP->{maxConnectionTries};
 	# for unstable connections, retry connecting max $maxConnectionTries.
 	my $connectionTries = 0;
@@ -533,36 +541,39 @@ sub login ($$;$) {
 			$ftp = Net::FTP->new($RemoteHost,Debug => $FTP->{FTPdebugLevel}, Port => ($FTP->{port} ? $FTP->{port} : '21'));
 			if (! defined($ftp)) {
 				$logger->error("connection to ".$RemoteHost." failed, reason: $@ $!");
-				undef $ftp;
-				return 0;
-			}
-			$loginSuccess = $ftp->login($FTP->{user},$FTP->{pwd});
-			if (!$loginSuccess) { 
-				$logger->error("login failed, reason: ".$ftp->message);
-				undef $ftp;
-				return 0;
+			} else {
+				$loginSuccess = $ftp->login($FTP->{user},$FTP->{pwd});
+				if (!$loginSuccess) { 
+					$logger->error("login failed, reason: ".$ftp->message);
+					undef $ftp;
+				}
 			}
 			$connectionTries++;
 		} until ($loginSuccess or $connectionTries == $maxConnectionTries);
 		if ($connectionTries == $maxConnectionTries and !$loginSuccess) {
-			$logger->error("connection finally failed after $maxConnectionTries connection tries: ".$ftp->message);
-			undef $ftp;
+			$logger->error("connection finally failed after $maxConnectionTries connection tries");
+			undef $ftp; $ftpHandles{$RemoteHost} = $ftp;
 			return 0;
 		}
-		if (defined($FTP->{type}) and $FTP->{type} eq "A") {
-			if (!$$ftp->ascii()) {
-				$logger->error("can't switch to ascii, reason: ".$ftp->message);
-				undef $ftp;
-				return 0;
+		if (defined($FTP->{type})) {
+			if ($FTP->{type} eq "A") {
+				if (!$ftp->ascii()) {
+					$logger->error("can't switch to ascii, reason: ".$ftp->message);
+					undef $ftp;
+				}
+			} else {
+				if (!$ftp->binary()) {
+					$logger->error("can't switch to binary, reason: ".$ftp->message);
+					undef $ftp;
+				}
 			}
-		} else {
-			if (!$$ftp->binary()) {
-				$logger->error("can't switch to binary, reason: ".$ftp->message);
-				undef $ftp;
+			if (!$ftp) {
+				$ftpHandles{$RemoteHost} = $ftp;
 				return 0;
 			}
 		}
 	}
+	$ftpHandles{$RemoteHost} = $ftp;
 	$logger->info("login successful, ftp connection established");
 	return 1;
 }

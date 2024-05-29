@@ -6,7 +6,7 @@ Mojolicious::Plugin::Authorization::AccessControl - Integrate Authorization::Acc
 
     # in startup
     $app->plugin('Authorization::AccessControl' => {  
-      get_roles => sub($c) { [$c->current_user->roles] }
+      get_roles => sub($c) { [$c->authn->current_user->roles] }
     });
     # static grants
     $app->authz->role('admin')
@@ -18,7 +18,7 @@ Mojolicious::Plugin::Authorization::AccessControl - Integrate Authorization::Acc
     $app->authz->dynamic_attrs(Book => sub($c, $ctx) {
       return {
         book_id => $ctx->id,
-        own     => $ctx->owner_id == $c->current_user->id,
+        own     => $ctx->owner_id == $c->authn->current_user->id,
         deleted => defined($ctx->deleted_at)
       }
     });
@@ -26,7 +26,7 @@ Mojolicious::Plugin::Authorization::AccessControl - Integrate Authorization::Acc
     $app->hook(before_dispatch => sub($c) {
       #dynamic grants specific to current request
       $c->authz->grant(Book => 'delete', { book_id => $_->{book_id} })
-        foreach ($c->model("GrantDelete")->for_user($c->current_user))
+        foreach ($c->model("GrantDelete")->for_user($c->authn->current_user))
     });
 
     # in controller

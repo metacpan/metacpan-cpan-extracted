@@ -8,7 +8,7 @@ use Email::Sender::Transport::SMTP 1.300021;
 use Types::Standard 1.000005 qw(Str);
 use Email::Stuffer 0.012;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 =head1 NAME
 

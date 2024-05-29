@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojolicious::Plugin::Authentication::OIDC
 
+0.03      2024-05-25T17:21:38-05:00
+  - Make helper prefix configurable
+
 0.02      2024-05-09T11:57:28-05:00
   - Add role_map functionality
 

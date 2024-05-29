@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Test-Health,
-version 0.003:
+version 0.004:
 
   Perl API to process tests and send an e-mail report in case of failures
 

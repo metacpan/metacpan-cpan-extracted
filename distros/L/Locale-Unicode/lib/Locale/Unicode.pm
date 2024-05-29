@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.1.5
+## Version v0.1.7
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2024/05/24
+## Modified 2024/05/29
 ## All rights reserved
 ## 
 ## 
@@ -307,7 +307,7 @@ BEGIN
     our $PROP_TO_SUB = {};
     # False, by default
     our $EXPLICIT_BOOLEAN = 0;
-    our $VERSION = 'v0.1.5';
+    our $VERSION = 'v0.1.7';
 };
 
 use strict;
@@ -2985,306 +2985,300 @@ sub THAW
 
 sub TO_JSON { return( shift->as_string ); }
 
+# NOTE: Locale::Unicode::Boolean class
+package Locale::Unicode::Boolean;
+BEGIN
 {
-    # NOTE: Locale::Unicode::Boolean class
-    package
-        Locale::Unicode::Boolean;
-    BEGIN
-    {
-        use strict;
-        use warnings;
-        use vars qw( $VERSION $true $false );
-        use overload
-          "0+"     => sub{ ${$_[0]} },
-          "++"     => sub{ $_[0] = ${$_[0]} + 1 },
-          "--"     => sub{ $_[0] = ${$_[0]} - 1 },
-          fallback => 1;
-        $true  = do{ bless( \( my $dummy = 1 ) => 'Locale::Unicode::Boolean' ) };
-        $false = do{ bless( \( my $dummy = 0 ) => 'Locale::Unicode::Boolean' ) };
-        our $VERSION = 'v0.1.0';
-    };
     use strict;
     use warnings;
+    use vars qw( $VERSION $true $false );
+    use overload
+      "0+"     => sub{ ${$_[0]} },
+      "++"     => sub{ $_[0] = ${$_[0]} + 1 },
+      "--"     => sub{ $_[0] = ${$_[0]} - 1 },
+      fallback => 1;
+    $true  = do{ bless( \( my $dummy = 1 ) => 'Locale::Unicode::Boolean' ) };
+    $false = do{ bless( \( my $dummy = 0 ) => 'Locale::Unicode::Boolean' ) };
+    our $VERSION = 'v0.1.0';
+};
+use strict;
+use warnings;
 
-    sub new
+sub new
+{
+    my $this = shift( @_ );
+    my $self = bless( \( my $dummy = ( $_[0] ? 1 : 0 ) ) => ( ref( $this ) || $this ) );
+}
+
+sub clone
+{
+    my $self = shift( @_ );
+    unless( ref( $self ) )
     {
-        my $this = shift( @_ );
-        my $self = bless( \( my $dummy = ( $_[0] ? 1 : 0 ) ) => ( ref( $this ) || $this ) );
+        die( "clone() must be called with an object." );
     }
+    my $copy = $$self;
+    my $new = bless( \$copy => ref( $self ) );
+    return( $new );
+}
 
-    sub clone
+sub false() { $false }
+
+sub is_bool($) { UNIVERSAL::isa( $_[0], 'Locale::Unicode::Boolean' ) }
+
+sub is_true($) { $_[0] && UNIVERSAL::isa( $_[0], 'Locale::Unicode::Boolean' ) }
+
+sub is_false($) { !$_[0] && UNIVERSAL::isa( $_[0], 'Locale::Unicode::Boolean' ) }
+
+sub true() { $true  }
+
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    CORE::return( [$class, $$self] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $$self );
+}
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+# NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+sub THAW
+{
+    my( $self, undef, @args ) = @_;
+    my( $class, $str );
+    if( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' )
     {
-        my $self = shift( @_ );
-        unless( ref( $self ) )
-        {
-            die( "clone() must be called with an object." );
-        }
-        my $copy = $$self;
-        my $new = bless( \$copy => ref( $self ) );
-        return( $new );
+        ( $class, $str ) = @{$args[0]};
     }
-
-    sub false() { $false }
-
-    sub is_bool($) { UNIVERSAL::isa( $_[0], 'Locale::Unicode::Boolean' ) }
-
-    sub is_true($) { $_[0] && UNIVERSAL::isa( $_[0], 'Locale::Unicode::Boolean' ) }
-
-    sub is_false($) { !$_[0] && UNIVERSAL::isa( $_[0], 'Locale::Unicode::Boolean' ) }
-
-    sub true() { $true  }
-
-    sub FREEZE
+    else
     {
-        my $self = CORE::shift( @_ );
-        my $serialiser = CORE::shift( @_ ) // '';
-        my $class = CORE::ref( $self );
-        # Return an array reference rather than a list so this works with Sereal and CBOR
-        # On or before Sereal version 4.023, Sereal did not support multiple values returned
-        CORE::return( [$class, $$self] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
-        # But Storable want a list with the first element being the serialised element
-        CORE::return( $$self );
+        $class = CORE::ref( $self ) || $self;
+        $str = CORE::shift( @args );
     }
-    
-    sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
-    
-    sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
-    
-    # NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
-    # NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
-    sub THAW
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
     {
-        my( $self, undef, @args ) = @_;
-        my( $class, $str );
-        if( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' )
-        {
-            ( $class, $str ) = @{$args[0]};
-        }
-        else
-        {
-            $class = CORE::ref( $self ) || $self;
-            $str = CORE::shift( @args );
-        }
-        # Storable pattern requires to modify the object it created rather than returning a new one
-        if( CORE::ref( $self ) )
-        {
-            $$self = $str;
-            CORE::return( $self );
-        }
-        else
-        {
-            CORE::return( $class->new( $str ) );
-        }
+        $$self = $str;
+        CORE::return( $self );
     }
-    
-    sub TO_JSON
+    else
     {
-        # JSON does not check that the value is a proper true or false. It stupidly assumes this is a string
-        # The only way to make it understand is to return a scalar ref of 1 or 0
-        # return( $_[0] ? 'true' : 'false' );
-        return( $_[0] ? \1 : \0 );
+        CORE::return( $class->new( $str ) );
     }
 }
 
+sub TO_JSON
 {
-    # NOTE: Locale::Unicode::Exception class
-    package
-        Locale::Unicode::Exception;
-    BEGIN
-    {
-        use strict;
-        use warnings;
-        use vars qw( $VERSION );
-        use overload (
-            '""'    => 'as_string',
-            bool    => sub{ $_[0] },
-            fallback => 1,
-        );
-        our $VERSION = 'v0.1.0';
-    };
+    # JSON does not check that the value is a proper true or false. It stupidly assumes this is a string
+    # The only way to make it understand is to return a scalar ref of 1 or 0
+    # return( $_[0] ? 'true' : 'false' );
+    return( $_[0] ? \1 : \0 );
+}
+
+# NOTE: Locale::Unicode::Exception class
+package Locale::Unicode::Exception;
+BEGIN
+{
     use strict;
     use warnings;
+    use vars qw( $VERSION );
+    use overload (
+        '""'    => 'as_string',
+        bool    => sub{ $_[0] },
+        fallback => 1,
+    );
+    our $VERSION = 'v0.1.0';
+};
+use strict;
+use warnings;
 
-    sub new
+sub new
+{
+    my $this = shift( @_ );
+    my $self = bless( {} => ( ref( $this ) || $this ) );
+    my @info = caller;
+    @$self{ qw( package file line ) } = @info[0..2];
+    my $args = {};
+    if( scalar( @_ ) == 1 )
     {
-        my $this = shift( @_ );
-        my $self = bless( {} => ( ref( $this ) || $this ) );
-        my @info = caller;
-        @$self{ qw( package file line ) } = @info[0..2];
-        my $args = {};
-        if( scalar( @_ ) == 1 )
+        if( ( ref( $_[0] ) || '' ) eq 'HASH' )
         {
-            if( ( ref( $_[0] ) || '' ) eq 'HASH' )
+            $args = shift( @_ );
+            if( $args->{skip_frames} )
             {
-                $args = shift( @_ );
-                if( $args->{skip_frames} )
-                {
-                    @info = caller( int( $args->{skip_frames} ) );
-                    @$self{ qw( package file line ) } = @info[0..2];
-                }
-                $args->{message} ||= '';
-                foreach my $k ( qw( package file line message code type retry_after ) )
-                {
-                    $self->{ $k } = $args->{ $k } if( CORE::exists( $args->{ $k } ) );
-                }
+                @info = caller( int( $args->{skip_frames} ) );
+                @$self{ qw( package file line ) } = @info[0..2];
             }
-            elsif( ref( $_[0] ) && $_[0]->isa( 'Locale::Unicode::Exception' ) )
+            $args->{message} ||= '';
+            foreach my $k ( qw( package file line message code type retry_after ) )
             {
-                my $o = $args->{object} = shift( @_ );
-                $self->{message} = $o->message;
-                $self->{code} = $o->code;
-                $self->{type} = $o->type;
-                $self->{retry_after} = $o->retry_after;
+                $self->{ $k } = $args->{ $k } if( CORE::exists( $args->{ $k } ) );
             }
-            else
-            {
-                die( "Unknown argument provided: '", overload::StrVal( $_[0] ), "'" );
-            }
+        }
+        elsif( ref( $_[0] ) && $_[0]->isa( 'Locale::Unicode::Exception' ) )
+        {
+            my $o = $args->{object} = shift( @_ );
+            $self->{message} = $o->message;
+            $self->{code} = $o->code;
+            $self->{type} = $o->type;
+            $self->{retry_after} = $o->retry_after;
         }
         else
         {
-            $args->{message} = join( '', map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
+            die( "Unknown argument provided: '", overload::StrVal( $_[0] ), "'" );
         }
-        return( $self );
     }
-
-    # This is important as stringification is called by die, so as per the manual page, we need to end with new line
-    # And will add the stack trace
-    sub as_string
+    else
     {
-        no overloading;
-        my $self = shift( @_ );
-        return( $self->{_cache_value} ) if( $self->{_cache_value} && !CORE::length( $self->{_reset} ) );
-        my $str = $self->message;
-        $str = "$str";
-        $str =~ s/\r?\n$//g;
-        $str .= sprintf( " within package %s at line %d in file %s", ( $self->{package} // 'undef' ), ( $self->{line} // 'undef' ), ( $self->{file} // 'undef' ) );
-        $self->{_cache_value} = $str;
-        CORE::delete( $self->{_reset} );
-        return( $str );
+        $args->{message} = join( '', map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
     }
-
-    sub code { return( shift->reset(@_)->_set_get_prop( 'code', @_ ) ); }
-
-    sub file { return( shift->reset(@_)->_set_get_prop( 'file', @_ ) ); }
-
-    sub line { return( shift->reset(@_)->_set_get_prop( 'line', @_ ) ); }
-
-    sub message { return( shift->reset(@_)->_set_get_prop( 'message', @_ ) ); }
-
-    sub package { return( shift->reset(@_)->_set_get_prop( 'package', @_ ) ); }
-
-    # From perlfunc docmentation on "die":
-    # "If LIST was empty or made an empty string, and $@ contains an
-    # object reference that has a "PROPAGATE" method, that method will
-    # be called with additional file and line number parameters. The
-    # return value replaces the value in $@; i.e., as if "$@ = eval {
-    # $@->PROPAGATE(__FILE__, __LINE__) };" were called."
-    sub PROPAGATE
-    {
-        my( $self, $file, $line ) = @_;
-        if( defined( $file ) && defined( $line ) )
-        {
-            my $clone = $self->clone;
-            $clone->file( $file );
-            $clone->line( $line );
-            return( $clone );
-        }
-        return( $self );
-    }
-
-    sub reset
-    {
-        my $self = shift( @_ );
-        if( !CORE::length( $self->{_reset} ) && scalar( @_ ) )
-        {
-            $self->{_reset} = scalar( @_ );
-        }
-        return( $self );
-    }
-
-    sub rethrow 
-    {
-        my $self = shift( @_ );
-        return if( !ref( $self ) );
-        die( $self );
-    }
-
-    sub retry_after { return( shift->_set_get_prop( 'retry_after', @_ ) ); }
-
-    sub throw
-    {
-        my $self = shift( @_ );
-        my $e;
-        if( @_ )
-        {
-            my $msg  = shift( @_ );
-            $e = $self->new({
-                skip_frames => 1,
-                message => $msg,
-            });
-        }
-        else
-        {
-            $e = $self;
-        }
-        die( $e );
-    }
-
-    sub type { return( shift->reset(@_)->_set_get_prop( 'type', @_ ) ); }
-
-    sub _set_get_prop
-    {
-        my $self = shift( @_ );
-        my $prop = shift( @_ ) || die( "No object property was provided." );
-        $self->{ $prop } = shift( @_ ) if( @_ );
-        return( $self->{ $prop } );
-    }
-
-    sub FREEZE
-    {
-        my $self = CORE::shift( @_ );
-        my $serialiser = CORE::shift( @_ ) // '';
-        my $class = CORE::ref( $self );
-        my %hash  = %$self;
-        # Return an array reference rather than a list so this works with Sereal and CBOR
-        # On or before Sereal version 4.023, Sereal did not support multiple values returned
-        CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
-        # But Storable want a list with the first element being the serialised element
-        CORE::return( $class, \%hash );
-    }
-
-    sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
-
-    sub STORABLE_thaw { return( shift->THAW( @_ ) ); }
-
-    # NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
-    # NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
-    sub THAW
-    {
-        my( $self, undef, @args ) = @_;
-        my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
-        my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
-        my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
-        my $new;
-        # Storable pattern requires to modify the object it created rather than returning a new one
-        if( CORE::ref( $self ) )
-        {
-            foreach( CORE::keys( %$hash ) )
-            {
-                $self->{ $_ } = CORE::delete( $hash->{ $_ } );
-            }
-            $new = $self;
-        }
-        else
-        {
-            $new = CORE::bless( $hash => $class );
-        }
-        CORE::return( $new );
-    }
-
-    sub TO_JSON { return( shift->as_string ); }
+    return( $self );
 }
+
+# This is important as stringification is called by die, so as per the manual page, we need to end with new line
+# And will add the stack trace
+sub as_string
+{
+    no overloading;
+    my $self = shift( @_ );
+    return( $self->{_cache_value} ) if( $self->{_cache_value} && !CORE::length( $self->{_reset} ) );
+    my $str = $self->message;
+    $str = "$str";
+    $str =~ s/\r?\n$//g;
+    $str .= sprintf( " within package %s at line %d in file %s", ( $self->{package} // 'undef' ), ( $self->{line} // 'undef' ), ( $self->{file} // 'undef' ) );
+    $self->{_cache_value} = $str;
+    CORE::delete( $self->{_reset} );
+    return( $str );
+}
+
+sub code { return( shift->reset(@_)->_set_get_prop( 'code', @_ ) ); }
+
+sub file { return( shift->reset(@_)->_set_get_prop( 'file', @_ ) ); }
+
+sub line { return( shift->reset(@_)->_set_get_prop( 'line', @_ ) ); }
+
+sub message { return( shift->reset(@_)->_set_get_prop( 'message', @_ ) ); }
+
+sub package { return( shift->reset(@_)->_set_get_prop( 'package', @_ ) ); }
+
+# From perlfunc docmentation on "die":
+# "If LIST was empty or made an empty string, and $@ contains an
+# object reference that has a "PROPAGATE" method, that method will
+# be called with additional file and line number parameters. The
+# return value replaces the value in $@; i.e., as if "$@ = eval {
+# $@->PROPAGATE(__FILE__, __LINE__) };" were called."
+sub PROPAGATE
+{
+    my( $self, $file, $line ) = @_;
+    if( defined( $file ) && defined( $line ) )
+    {
+        my $clone = $self->clone;
+        $clone->file( $file );
+        $clone->line( $line );
+        return( $clone );
+    }
+    return( $self );
+}
+
+sub reset
+{
+    my $self = shift( @_ );
+    if( !CORE::length( $self->{_reset} ) && scalar( @_ ) )
+    {
+        $self->{_reset} = scalar( @_ );
+    }
+    return( $self );
+}
+
+sub rethrow 
+{
+    my $self = shift( @_ );
+    return if( !ref( $self ) );
+    die( $self );
+}
+
+sub retry_after { return( shift->_set_get_prop( 'retry_after', @_ ) ); }
+
+sub throw
+{
+    my $self = shift( @_ );
+    my $e;
+    if( @_ )
+    {
+        my $msg  = shift( @_ );
+        $e = $self->new({
+            skip_frames => 1,
+            message => $msg,
+        });
+    }
+    else
+    {
+        $e = $self;
+    }
+    die( $e );
+}
+
+sub type { return( shift->reset(@_)->_set_get_prop( 'type', @_ ) ); }
+
+sub _set_get_prop
+{
+    my $self = shift( @_ );
+    my $prop = shift( @_ ) || die( "No object property was provided." );
+    $self->{ $prop } = shift( @_ ) if( @_ );
+    return( $self->{ $prop } );
+}
+
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    my %hash  = %$self;
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $class, \%hash );
+}
+
+sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { return( shift->THAW( @_ ) ); }
+
+# NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+# NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+sub THAW
+{
+    my( $self, undef, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::bless( $hash => $class );
+    }
+    CORE::return( $new );
+}
+
+sub TO_JSON { return( shift->as_string ); }
 
 {
     # NOTE: Locale::Unicode::NullObject class
@@ -3358,7 +3352,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.1.5
+    v0.1.7
 
 =head1 DESCRIPTION
 

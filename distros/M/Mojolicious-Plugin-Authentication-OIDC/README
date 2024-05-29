@@ -10,10 +10,10 @@ SYNOPSIS
       });
 
       # in controller
-      say "Hi " . $c->current_user->firstname;
+      say "Hi " . $c->authn->current_user->firstname;
 
       use Array::Utils qw(intersect);
-      if(intersect($c->current_user_roles->@*, qw(admin))) { ... }
+      if(intersect($c->authn->current_user_roles->@*, qw(admin))) { ... }
 
 DESCRIPTION
     Mojolicious plugin for OpenID Connect

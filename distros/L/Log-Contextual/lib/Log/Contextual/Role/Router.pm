@@ -2,7 +2,7 @@ package Log::Contextual::Role::Router;
 use strict;
 use warnings;
 
-our $VERSION = '0.009000';
+our $VERSION = '0.009001';
 
 use Moo::Role;
 
@@ -26,7 +26,7 @@ Log::Contextual::Role::Router - Abstract interface between loggers and logging c
 
 =head1 VERSION
 
-version 0.009000
+version 0.009001
 
 =head1 SYNOPSIS
 
@@ -40,34 +40,34 @@ version 0.009000
   has logger => (is => 'lazy');
 
   sub _build_logger {
-     return Log::Contextual::SimpleLogger->new({ levels_upto => 'debug' });
+    return Log::Contextual::SimpleLogger->new({ levels_upto => 'debug' });
   }
 
   sub before_import {
-     my ($self, %export_info) = @_;
-     my $exporter = $export_info{exporter};
-     my $target = $export_info{target};
-     print STDERR "Package '$target' will import from '$exporter'\n";
+    my ($self, %export_info) = @_;
+    my $exporter = $export_info{exporter};
+    my $target = $export_info{target};
+    print STDERR "Package '$target' will import from '$exporter'\n";
   }
 
   sub after_import {
-     my ($self, %export_info) = @_;
-     my $exporter = $export_info{exporter};
-     my $target = $export_info{target};
-     print STDERR "Package '$target' has imported from '$exporter'\n";
+    my ($self, %export_info) = @_;
+    my $exporter = $export_info{exporter};
+    my $target = $export_info{target};
+    print STDERR "Package '$target' has imported from '$exporter'\n";
   }
 
   sub handle_log_request {
-     my ($self, %message_info) = @_;
-     my $log_code_block = $message_info{message_sub};
-     my $args = $message_info{message_args};
-     my $log_level_name = $message_info{message_level};
-     my $logger = $self->logger;
-     my $is_active = $logger->can("is_${log_level_name}");
+    my ($self, %message_info) = @_;
+    my $log_code_block = $message_info{message_sub};
+    my $args = $message_info{message_args};
+    my $log_level_name = $message_info{message_level};
+    my $logger = $self->logger;
+    my $is_active = $logger->can("is_${log_level_name}");
 
-     return unless defined $is_active && $logger->$is_active;
-     my $log_message = $log_code_block->(@$args);
-     $logger->$log_level_name($log_message);
+    return unless defined $is_active && $logger->$is_active;
+    my $log_message = $log_code_block->(@$args);
+    $logger->$log_level_name($log_message);
   }
 
   package MyApp::Log::Contextual;
@@ -79,7 +79,7 @@ version 0.009000
 
   #This example router is a singleton
   sub router {
-     our $Router ||= MyApp::Log::Router->new
+    our $Router ||= MyApp::Log::Router->new
   }
 
   package main;

@@ -7,7 +7,7 @@ use 5.032;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "PaperWM-like window management for Sway/i3wm",
+  "ABSTRACT" => "PaperWM-like scrollable tiling window management for Sway/i3wm",
   "AUTHOR" => "Sean Whitton <spwhitton\@spwhitton.name>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.000",
+  "VERSION" => "1.001",
   "test" => {
     "TESTS" => "t/*.t"
   }

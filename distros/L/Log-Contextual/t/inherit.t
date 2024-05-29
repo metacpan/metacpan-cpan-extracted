@@ -7,18 +7,18 @@ use Log::Contextual qw(set_logger);
 use Log::Contextual::SimpleLogger;
 
 BEGIN {
-    package MySuperClass;
-    use Log::Contextual qw(:log);
+  package MySuperClass;
+  use Log::Contextual qw(:log);
 }
 
 BEGIN {
-    package MyChildClass;
-    BEGIN { our @ISA = qw(MySuperClass) };
-    use Log::Contextual qw(:log);
+  package MyChildClass;
+  BEGIN { our @ISA = qw(MySuperClass) };
+  use Log::Contextual qw(:log);
 
-    sub do_thing {
-        log_error { "child class log" };
-    }
+  sub do_thing {
+    log_error { "child class log" };
+  }
 }
 
 my $last_log;

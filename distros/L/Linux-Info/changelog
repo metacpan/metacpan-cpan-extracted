@@ -1,7 +1,79 @@
-liblinux-info-perl (2.13) trusty; urgency=low
-  * chore: bump version (#19) 
+liblinux-info-perl (2.15) trusty; urgency=low
+  * Bugfix/os release (#23)
+  * fix: missing newer subclasses
+  * refactor: idiomatic Perl
+  * fix: deprecated test
+  * fix: OSRelease might fail
+  OSRelease won't work as expected in distributions with missing
+    attributes, so it is a bad idea to try to instantiate a new class
+    using the default file location.
+  * fix: deprecated accepting a OSRelease
+  Changed the logic to avoid the same issues with subclasses of
+    OSRelease which contain a customized format of /etc/os-release.
+  * chore: version bump 
 
- -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Mon, 27 May 2024 07:07:37 +0000
+ -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Wed, 29 May 2024 01:08:25 +0000
+
+liblinux-info-perl () trusty; urgency=low
+  * chore: version bump 
+  * fix: deprecated accepting a OSRelease
+  Changed the logic to avoid the same issues with subclasses of
+    OSRelease which contain a customized format of /etc/os-release. 
+  * fix: OSRelease might fail
+  OSRelease won't work as expected in distributions with missing
+    attributes, so it is a bad idea to try to instantiate a new class
+    using the default file location. 
+  * fix: deprecated test 
+  * refactor: idiomatic Perl 
+  * fix: missing newer subclasses 
+  * Feature/rt 86737 limits (#22)
+  * feat: applied the patch as is
+  Also included minor changes, as refactorings and Pod improvements.
+  * refactor: unnecessary numbering
+  * refactor: more readable
+  * refactor: small improvements
+  * feat: testing limits implementation
+  * refactor: useless _init method
+  * feat: explicity enabling data fetching
+  * feat: explicity enabling data fetching
+  * refactor: better performance
+  * refactor: oneliner
+  * chore: version bump 
+  * Revert "Feature/rt 86737 limits (#20)" (#21)
+  This reverts commit efa103181b8023a5aa836ad4d8c38e6ce2b9c4d0. 
+  * Feature/rt 86737 limits (#20)
+  * feat: applied the patch as is
+  Also included minor changes, as refactorings and Pod improvements.
+  * refactor: unnecessary numbering
+  * refactor: more readable
+  * refactor: small improvements
+  * feat: testing limits implementation
+  * refactor: useless _init method
+  * feat: explicity enabling data fetching
+  * feat: explicity enabling data fetching
+  * refactor: better performance
+  * refactor: oneliner 
+
+ -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Wed, 29 May 2024 01:06:00 +0000
+
+liblinux-info-perl () trusty; urgency=low
+  * chore: version bump 
+  * refactor: oneliner 
+  * refactor: better performance 
+  * feat: explicity enabling data fetching 
+  * feat: explicity enabling data fetching 
+  * refactor: useless _init method 
+  * feat: testing limits implementation 
+  * refactor: small improvements 
+  * refactor: more readable 
+  * refactor: unnecessary numbering 
+  * Merge branch 'master' into feature/rt-86737-limits 
+  * chore: bump version (#19) 
+  * Merge branch 'master' into feature/rt-86737-limits 
+  * feat: applied the patch as is
+  Also included minor changes, as refactorings and Pod improvements. 
+
+ -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Tue, 28 May 2024 23:07:52 +0000
 
 liblinux-info-perl () trusty; urgency=low
   * add support to Raspbian (Debian GNU Linux on Raspberry) (#18)

@@ -39,7 +39,6 @@ my @files = (
     't/lib/TestRouter.pm',
     't/log-with-levels.t',
     't/log.t',
-    't/log4perl.conf',
     't/log4perl.t',
     't/package_logger.t',
     't/router_api.t',

@@ -4,7 +4,7 @@
       "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "gpl_3"
    ],
@@ -56,15 +56,15 @@
    "provides" : {
       "Test::Health" : {
          "file" : "lib/Test/Health.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Test::Health::Email" : {
          "file" : "lib/Test/Health/Email.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Test::Health::Harness" : {
          "file" : "lib/Test/Health/Harness.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/glasswalk3r/Test-Health"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

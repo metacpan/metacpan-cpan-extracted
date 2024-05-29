@@ -21,4 +21,13 @@ eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
 
-all_pod_coverage_ok();
+# These are not private, but they are deprecated, so we don't want to test them
+my $ignore = join '|', map {quotemeta} qw(
+    create_chat_completion
+    create_completion
+    create_embedding
+    create_image
+    create_moderation
+    list_models
+);
+all_pod_coverage_ok( { also_private => [qr/^$ignore$/], }, );

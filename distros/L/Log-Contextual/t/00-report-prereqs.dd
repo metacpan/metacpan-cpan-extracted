@@ -42,7 +42,8 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::Fatal' => '0',
-                                   'Test::More' => '0.88'
+                                   'Test::More' => '0.88',
+                                   'Test::Needs' => '0'
                                  }
                  }
      };

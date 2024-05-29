@@ -1,4 +1,7 @@
 Revision history for perl distribution Mojolicious::Plugin::Authorization::AccessControl
 
+0.02      2025-05-28T14:45:08-05:00
+  - Assume use of "authn" authentication helper prefix in defaults
+
 0.01      2024-05-14T17:01:25-05:00
   - First public release

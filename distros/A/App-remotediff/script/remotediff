@@ -2,6 +2,7 @@
 #
 # remotediff - remote diff over rsync
 #
+# 2024.05.28 v1.14 jul : fixed cleanup bug when basename contained dot
 # 2022.11.14 v1.13 jul : bypass test for solaris
 # 2022.11.08 v1.12 jul : fixed cleanup crash bug
 # 2022.11.02 v1.11 jul : fixed rsync --delete
@@ -18,7 +19,7 @@ use File::Temp qw(tempdir);
 use File::Path qw(make_path remove_tree);
 use Cwd qw(abs_path);
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 my $program  = basename($0);
 my $usage    = <<EOF;
 
@@ -61,7 +62,7 @@ if (-d $tmp)
 	opendir(DIR, $tmp) or die "cleanup failed : $!";
 	while(readdir DIR)
 	{
-		remove_tree("$tmp/$_") if ! /^([^\/:]*:)(\/?)(.+)|\.|\.\./;
+		remove_tree("$tmp/$_") if ! /^([^\/:]*:)(\/?)(.+)|^\.$|^\.\.$/; 
 	}
 	closedir(DIR);
 }

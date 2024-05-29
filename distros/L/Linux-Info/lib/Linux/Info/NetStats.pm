@@ -5,7 +5,7 @@ use Carp qw(croak);
 use Time::HiRes 1.9725;
 use YAML::XS 0.88;
 
-our $VERSION = '2.13'; # VERSION
+our $VERSION = '2.15'; # VERSION
 
 # ABSTRACT: Collect linux net statistics.
 
@@ -166,7 +166,7 @@ Linux::Info::NetStats - Collect linux net statistics.
 
 =head1 VERSION
 
-version 2.13
+version 2.15
 
 =head1 SYNOPSIS
 

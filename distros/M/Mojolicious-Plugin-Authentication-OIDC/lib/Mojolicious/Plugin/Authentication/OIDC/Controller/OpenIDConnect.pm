@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::Authentication::OIDC::Controller::OpenIDConnect 0.02;
+package Mojolicious::Plugin::Authentication::OIDC::Controller::OpenIDConnect 0.03;
 use v5.26;
 
 # ABSTRACT: OpenID controller endpoints implementation
@@ -53,47 +53,81 @@ my sub make_app_url($self, $path = '/') {
 }
 
 sub redirect($self) {
-  my $idp_url = Mojo::URL->new($self->_oidc_params->{auth_endpoint});
+  my $oidc_params = $self->app->renderer->get_helper('__oidc_params')->($self);
+  my $idp_url     = Mojo::URL->new($oidc_params->{auth_endpoint});
+
+  my $success_url = $self->param('ref');
+  $self->cookie(oidc_login_redirect => $success_url);
+
   $idp_url->query(
     {
-      client_id     => $self->_oidc_params->{client_id},
-      scope         => $self->_oidc_params->{scope},
-      response_type => $self->_oidc_params->{response_type},
-      redirect_uri  => make_app_url($self, $self->_oidc_params->{login_path}),
+      client_id     => $oidc_params->{client_id},
+      scope         => $oidc_params->{scope},
+      response_type => $oidc_params->{response_type},
+      redirect_uri  => make_app_url($self, $oidc_params->{login_path}),
     }
   );
   $self->redirect_to($idp_url);
 }
 
 sub login($self) {
-  my $code = $self->param('code');
-  my $ua   = Mojo::UserAgent->new();
-  my $url  = Mojo::URL->new($self->_oidc_params->{token_endpoint})
-    ->userinfo(join(':', $self->_oidc_params->{client_id}, $self->_oidc_params->{client_secret}));
+  my $oidc_params = $self->app->renderer->get_helper('__oidc_params')->($self);
+  my $code        = $self->param('code');
+  my $ua          = Mojo::UserAgent->new();
+  my $url =
+    Mojo::URL->new($oidc_params->{token_endpoint})->userinfo(join(':', $oidc_params->{client_id}, $oidc_params->{client_secret}));
+
+  my $success_url = $self->cookie('oidc_login_redirect');
+  $self->cookie(oidc_login_redirect => '', {expires => 1});
 
   my $resp = $ua->post(
     $url => form => {
-      grant_type   => $self->_oidc_params->{grant_type},
+      grant_type   => $oidc_params->{grant_type},
       code         => $code,
-      redirect_uri => make_app_url($self, $self->_oidc_params->{login_path}),
+      redirect_uri => make_app_url($self, $oidc_params->{login_path}),
     }
   );
 
   if ($resp->res->json->{error}) {
-    return $self->_oidc_params->{on_error}->($self, $resp->res->json);
+    return $oidc_params->{on_error}->($self, $resp->res->json);
   } else {
     try {
       my $token = $resp->res->json->{access_token};
       # Decode the token; if it fails, because the key is wrong, or the token
       # is invalid or has been re-encrypted, then we throw it away and call
       # error handler
-      $self->_oidc_token($token);
-      return $self->_oidc_params->{on_success}->($self, $token);
+      $self->app->renderer->get_helper('__oidc_token')->($self, $token);
+      return $oidc_params->{on_success}->($self, $token, $success_url);
     } catch ($e) {
       $self->log->error($e);
-      $self->_oidc_params->{on_error}->($self, $resp->res->json);
+      $oidc_params->{on_error}->($self, $resp->res->json);
     }
   }
+}
+
+sub session($self) {
+  my $return_token = $self->param('t');
+
+  my ($token, $data) = ($self->app->renderer->get_helper('__oidc_token')->($self, undef, 0), {});
+  try {$data = $self->app->renderer->get_helper('__oidc_token')->($self)} catch ($e) {
+  }
+  $data->{token} = $token if ($return_token);
+  $self->render(json => $data);
+}
+
+sub logout($self) {
+  my $oidc_params = $self->app->renderer->get_helper('__oidc_params')->($self);
+  my $idp_url     = Mojo::URL->new($oidc_params->{logout_endpoint});
+
+  my $success_url = $self->param('ref');
+
+  $idp_url->query(
+    {
+      client_id                => $oidc_params->{client_id},
+      post_logout_redirect_uri => $success_url,
+    }
+  );
+  $self->redirect_to($idp_url);
 }
 
 =head1 AUTHOR

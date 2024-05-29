@@ -1,4 +1,4 @@
-package EAI::Common 1.913;
+package EAI::Common 1.914;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import); use EAI::DateUtil; use Data::Dumper qw(Dumper); use Getopt::Long qw(:config no_ignore_case); use Log::Log4perl qw(get_logger); use MIME::Lite (); use Scalar::Util qw(looks_like_number);
@@ -81,7 +81,6 @@ my %hashCheck = (
 		addID => {}, # this hash can be used to additionaly set a constant to given fields: Fieldname => Fieldvalue
 		additionalLookup => "", # query used in getAdditionalDBData to retrieve lookup information from DB using EAI::DB::readFromDBHash
 		additionalLookupKeys => [], # used for getAdditionalDBData, list of field names to be used as the keys of the returned hash
-		countPercent => 0, # percentage of progress in EAI::DB::storeInDB where indicator should be output (e.g. 10 for all 10% of progress). progress indicator is disabled if false.
 		cutoffYr2000 => 60, # when storing date data with 2 year digits in dumpDataIntoDB/EAI::DB::storeInDB, this is the cutoff where years are interpreted as 19XX (> cutoffYr2000) or 20XX (<= cutoffYr2000)
 		columnnames => [], # returned column names from EAI::DB::readFromDB and EAI::DB::readFromDBHash, this is used in writeFileFromDB to pass column information from database to writeText
 		database => "", # database to be used for connecting
@@ -117,7 +116,6 @@ my %hashCheck = (
 		append => 0, # for EAI::File::writeText: boolean to append (1) or overwrite (0 or undefined) to file given in filename
 		columns => {}, # for EAI::File::writeText: Hash of data fields, that are to be written (in order of keys)
 		columnskip => {}, # for EAI::File::writeText: boolean hash of column names that should be skipped when writing the file ({column1ToSkip => 1, column2ToSkip => 1, ...})
-		countPercent => 0, # percentage of progress in EAI::File::readText where indicator should be output (e.g. 10 for all 10% of progress). progress indicator is disabled if false.
 		dontKeepHistory => 1, # if up- or downloaded file should not be moved into historyFolder but be deleted
 		dontMoveIntoHistory => 1, # if up- or downloaded file should not be moved into historyFolder but be kept in homedir
 		emptyOK => 0, # flag to specify whether empty files should not invoke an error message. Also needed to mark an empty file as processed in EAI::Wrap::markProcessed
@@ -198,7 +196,7 @@ my %hashCheck = (
 	process => { # used to pass information within each process (data, additionalLookupData, filenames, hadErrors or commandline parameters starting with interactive) and for additional configurations not suitable for DB, File or FTP (e.g. uploadCMD* and onlyExecFor)
 		additionalLookupData => {}, # additional data retrieved from database with EAI::Wrap::getAdditionalDBData
 		archivefilenames => [], # in case a zip archive package is retrieved, the filenames of these packages are kept here, necessary for cleanup at the end of the process
-		countPercent => 0, # percentage for counting File text reading and DB storing, if > 0 on each reaching of the percentage in countPercent a progress is shown (e.g. every 10% if countPercent = 10)
+		countPercent => 0, # percentage for counting File text reading and DB storing, if given (greater 0) then on each reaching of the percentage in countPercent a progress is shown (e.g. every 10% if countPercent = 10). Any value >=100 will count ALL lines...
 		data => [], # loaded data: array (rows) of hash refs (columns)
 		filenames => [], # names of files that were retrieved and checked to be locally available for that load, can be more than the defined file in File->filename (due to glob spec or zip archive package)
 		filesProcessed => {}, # hash for checking the processed files, necessary for cleanup at the end of the whole task
@@ -299,11 +297,20 @@ sub setupConfigMerge {
 			}
 		}
 	}
-	# fall back to config level prefix defined settings (in lookups subhash) if given/defined
+	# fall back to config level defined settings for prefix (in config subhash "lookups") if given/defined
 	for my $hashName (@commonCoreConfig) {
 		for my $defkey (keys %{$hashCheck{$hashName}}) {
-			if (defined($config{$hashName}{lookups}) and defined($config{$hashName}{lookups}{$common{$hashName}{prefix}}) and defined($config{$hashName}{lookups}{$common{$hashName}{prefix}}{$defkey})) {
-				$config{$hashName}{$defkey} = $config{$hashName}{lookups}{$common{$hashName}{prefix}}{$defkey};
+			if (defined($config{$hashName}{lookups})) {
+				# do this for common config
+				if (defined($config{$hashName}{lookups}{$common{$hashName}{prefix}}) and defined($config{$hashName}{lookups}{$common{$hashName}{prefix}}{$defkey})) {
+					$common{$hashName}{$defkey} = $config{$hashName}{lookups}{$common{$hashName}{prefix}}{$defkey};
+				}
+				# and also for loads
+				for my $i (0..$#loads) {
+					if (defined($config{$hashName}{lookups}{$loads[$i]{$hashName}{prefix}}) and defined($config{$hashName}{lookups}{$loads[$i]{$hashName}{prefix}}{$defkey})) {
+						$loads[$i]{$hashName}{$defkey} = $config{$hashName}{lookups}{$loads[$i]{$hashName}{prefix}}{$defkey};
+					}
+				}
 			}
 		}
 	}
@@ -524,9 +531,8 @@ sub setupLogging {
 	}
 	my $logFolder = $execute{logRootPath};
 	# if logFolder doesn't exist, warn and log to $execute{homedir}.
-	my $noLogFolderErr;
 	if (! -e $logFolder) {
-		$noLogFolderErr = "can't log to logfolder $logFolder (set specially for script with \$config{logRootPath}{$extendedScriptname} or default with \$config{logRootPath}{\"\"}), folder doesn't exist. Setting to $execute{homedir}";
+		print "can't log to logfolder $logFolder (set specially for script with \$config{logRootPath}{$extendedScriptname} or default with \$config{logRootPath}{\"\"}), folder doesn't exist. Setting to $execute{homedir}";
 		$logFolder = $execute{homedir};
 	}
 	$LogFPath = $logFolder."/".$extendedScriptname.".log";
@@ -541,7 +547,6 @@ sub setupLogging {
 		$test->fdopen($testcopy, ">");
 	}
 	my $logger = get_logger();
-	$logger->warn($noLogFolderErr) if $noLogFolderErr; # log later when emergency log folder was set...
 	my $logAppender = Log::Log4perl->appenders()->{"FILE"}->{"appender"} if Log::Log4perl->appenders() and Log::Log4perl->appenders()->{"FILE"};
 	if ($logAppender) {
 		my $logprefix = get_curdate();
@@ -556,9 +561,9 @@ sub setupLogging {
 		}
 	}
 	if ($config{smtpServer}) {
-		# remove explicitly enumerated lookups (1:scriptname.pl, 2:scriptname.pl), the first such entry will be taken here
+		# remove explicitly enumerated lookups (1:scriptname.pl, 2:scriptname.pl) in case they are used for the current script, the first such entry will be taken here
 		for my $lookupKey (reverse sort keys(%{$config{checkLookup}})) {
-			if ($lookupKey =~ /^\d:.*/) {
+			if ($lookupKey =~ /^\d:.*/ and $lookupKey =~ /$execute{scriptname}/) {
 				my $lookupKeyAdd = $lookupKey;
 				$lookupKeyAdd =~ s/^\d://;
 				$config{checkLookup}{$lookupKeyAdd} = $config{checkLookup}{$lookupKey};
@@ -729,15 +734,16 @@ sub sendGeneralMail ($$$$$$;$$$$) {
 }
 
 package Log::Dispatch::Email::LogSender;
- 
+
+use feature 'unicode_strings';
 use Log::Dispatch::Email;
 use base qw( Log::Dispatch::Email );
- 
+
 sub send_email {
 	my $self = shift;
 	my %p    = @_;
 	# catch wide non utf8 characters to avoid die in MIME::Lite
-	eval {decode('UTF-8',$p{message},$Encode::FB_CROAK )} or $p{message} =~ s/[^\x00-\x7f]/?/g;
+	#eval {decode('UTF-8',$p{message},$Encode::FB_CROAK )} or $p{message} =~ s/[^\x00-\x7f]/?/g;
 	my $msg = MIME::Lite->new(
 			From    => $self->{from},
 			To      => ( join ',', @{ $self->{to} } ),

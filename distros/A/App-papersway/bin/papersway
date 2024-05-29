@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # PODNAME: papersway
-# ABSTRACT: PaperWM-like window management for Sway/i3wm
+# ABSTRACT: PaperWM-like scrollable tiling window management for Sway/i3wm
 #
 # Copyright (C) 2019-2024  Sean Whitton <spwhitton@spwhitton.name>
 #
@@ -319,8 +319,7 @@ sub normalise_ws_cols {
     my $ws = $paper_ws{$focused_ws};
     my $floating_focus;
     my $old_cols = $ws->{cols};
-    my $old_i = shift // first { $old_cols->[$_] == $ws->{focused_col} }
-      0..$#$old_cols;
+    my $old_i = shift // focused_col_idx($ws);
     for_each_node {
 	my $node = shift;
 	if ($node->{id} == $focused_ws) {
@@ -332,7 +331,7 @@ sub normalise_ws_cols {
     };
   DONE:
     my $cols = $ws->{cols};
-    my $i = first { $cols->[$_] eq $ws->{focused_col} } 0..$#$cols;
+    my $i = focused_col_idx($ws);
 
     my @cmds;
     my $avail_l = scalar $ws->{off_left}->@*;
@@ -347,7 +346,8 @@ sub normalise_ws_cols {
 	&& $col_rows{$ws->{focused_col}} == 1) {
 	# Attempt to delete the vertically split container by moving the
 	# single window it contains over one of its edges.
-	# We can't always do this.  We assume the default focus_wrapping.
+	# We can't always do this.
+	# Here we may be relying on focus_wrapping=no, but I am not sure.
 	if ($i < $#$cols && !$col_rows{ @$cols[$i+1] }) {
 	    push @cmds, "move right";
 	    delete $col_rows{$ws->{focused_col}};
@@ -461,25 +461,47 @@ sub normalise_ws_cols {
     }
 }
 
+{
+    # Simple class to batch up commands before sending them.
+    # Currently used only within process_msg subroutine.
+    package App::papersway::cmds;
+$App::papersway::cmds::VERSION = '1.001';
+sub new { bless { cmds => [], need_signal => 0 } => shift };
+    sub cmd { my $self = shift; push $self->{cmds}->@*, @_ }
+    sub need_signal { shift->{need_signal}++ }
+    sub run {
+	my $self = shift;
+	my @cmds = $self->{cmds}->@*;
+	if (@cmds) {
+	    main::with_ignored_events { main::cmd(@cmds) };
+	    main::signal_i3status() if $self->{need_signal};
+	    $self->{cmds} = [];
+	}
+	$self->{need_signal} = 0;
+    }
+}
+
 sub process_msg {
     my $cmd = shift;
 
     my $ws = $paper_ws{$focused_ws};
     my $cols = $ws->{cols};
-    my $rows = $col_rows{$ws->{focused_col}};
-    my $i = first { $cols->[$_] == $ws->{focused_col} } 0..$#$cols;
+    my $i = focused_col_idx($ws);
 
+    state $cmds = App::papersway::cmds->new;
     my $mv = sub {
 	my ($j, $move) = @_;
+	my $rows = $col_rows{$ws->{focused_col}};
 	if (@$cols > $j >= 0) {
 	    if ($move) {
-		# This does not trigger any events.
-		cmd(
+		# This command does not actually trigger any events.
+		$cmds->cmd(
 "[con_id=@$cols[$i]] swap container with con_id @$cols[$j]"
 		);
 		@$cols[$i, $j] = @$cols[$j, $i];
 	    } else {
-		cmd($j > $i ? "focus right" : "focus left");
+		$cmds->cmd($j > $i ? "focus right" : "focus left");
+		$ws->{focused_col} = @$cols[$j];
 	    }
 	} elsif ($move && $ws->{monocle}) {
 	    if ($j > $i && $ws->{off_right}->@*) {
@@ -490,15 +512,15 @@ sub process_msg {
 	} elsif ($j == @$cols && $ws->{off_right}->@*) {
 	    my $pushed = shift @$cols;
 	    my $pulled = pop $ws->{off_right}->@*;
-	    my @cmds = show_con($pulled);
+	    $cmds->cmd(show_con($pulled));
 	    push $ws->{off_left}->@*, $pushed;
 
 	    if ($move) {
 		if ($rows || @$cols) {
-		    push @cmds, $rows
-		      ? "move left"
-		      : "swap container with con_id @$cols[-1]";
-		    push @cmds, "focus right";
+		    $cmds->cmd($rows
+			       ? "move left"
+			       : "swap container with con_id @$cols[-1]");
+		    $cmds->cmd("focus right");
 		}
 		if (@$cols) {
 		    my $tem = pop @$cols;
@@ -508,24 +530,24 @@ sub process_msg {
 		}
 	    } else {
 		$ws->{focused_col} = $pulled;
-		push @cmds, "move right" if $rows;
+		$cmds->cmd("move right") if $rows;
 		push @$cols, $pulled;
-		push @cmds, "focus child" if $col_rows{$pulled};
+		$cmds->cmd("focus child") if $col_rows{$pulled};
 	    }
 
-	    with_ignored_events { cmd(@cmds, hide_con($pushed)) };
-	    signal_i3status();
+	    $cmds->cmd(hide_con($pushed));
+	    $cmds->need_signal;
 	} elsif ($j == -1 && $ws->{off_left}->@*) {
 	    my $pushed = pop @$cols;
 	    my $pulled = pop $ws->{off_left}->@*;
-	    my @cmds = show_con($pulled);
+	    $cmds->cmd(show_con($pulled));
 
 	    push $ws->{off_right}->@*, $pushed;
 
 	    if ($move) {
 		if (@$cols) {
-		    push @cmds, "move right" if $rows;
-		    push @cmds, "focus left";
+		    $cmds->cmd("move right") if $rows;
+		    $cmds->cmd("focus left");
 		    my $tem = shift @$cols;
 		    unshift @$cols, $tem, $pulled;
 		} else {
@@ -533,25 +555,27 @@ sub process_msg {
 		}
 	    } else {
 		if ($rows) {
-		    push @cmds, "move left";
+		    $cmds->cmd("move left");
 		} elsif (@$cols) {
-		    push @cmds, "swap container with con_id @$cols[0]";
+		    $cmds->cmd("swap container with con_id @$cols[0]");
 		}
 		$ws->{focused_col} = $pulled;
 		unshift @$cols, $pulled;
-		push @cmds, "focus child" if $col_rows{$pulled};
+		$cmds->cmd("focus child") if $col_rows{$pulled};
 	    }
 
-	    with_ignored_events { cmd(@cmds, hide_con($pushed)) };
-	    signal_i3status();
+	    $cmds->cmd(hide_con($pushed));
+	    $cmds->need_signal;
 	}
-	$ws->{last_dir} = $j > $i ? 1 : -1;
     };
 
     # Command dispatch
 
     if ($cmd =~ /^(focus|move) (left|right)$/) {
-	$mv->($2 eq "right" ? $i+1 : $i-1, $1 eq "move");
+	my ($move, $dir) = ($1, $2);
+	$mv->($dir eq "right" ? $i+1 : $i-1, $move eq "move");
+	$ws->{last_dir} = $dir eq "right" ? 1 : -1;
+	$cmds->run;
     } elsif ($cmd =~ /^cols (incr|decr)$/) {
 	$ws->{ncols} += $1 eq "incr" ? 1 : -1;
 	normalise_ws_cols();
@@ -560,9 +584,26 @@ sub process_msg {
 	# This is meant to be similar to my custom Emacs C-x o.
 	if ($i == 0 || $ws->{last_dir} == -1 && $i < $#$cols) {
 	    $mv->($i+1);
+	    $ws->{last_dir} = 1;
 	} elsif ($i == $#$cols || $ws->{last_dir} == 1) {
 	    $mv->($i-1);
+	    $ws->{last_dir} = -1;
 	}
+	$cmds->run;
+    } elsif ($cmd =~ /^scroll (left|right)$/
+	     && $ws->{"off_$1"}->@* && !$ws->{monocle}) {
+	if ($1 eq "right") {
+	    my $old_i = $i == 0 ? $i : $i-1;
+	    $mv->($i+1), $i++ while $i < $#$cols;
+	    $mv->(scalar @$cols);
+	    $mv->($i-1), $i-- while $i > $old_i;
+	} else {
+	    my $old_i = $i == $#$cols ? $i : $i+1;
+	    $mv->($i-1), $i-- while $i > 0;
+	    $mv->(-1);
+	    $mv->($i+1), $i++ while $i < $old_i;
+	}
+	$cmds->run;
     } elsif ($cmd eq "monocle toggle\n") {
 	unless (ensure_disable_monocle($ws)) {
 	    $ws->{monocle} = -$i-1;
@@ -581,6 +622,7 @@ sub process_msg {
 	});
     } elsif ($cmd =~ /^absorb_expel ?(left|right)?$/) {
 	my $dir = $1 eq "right" ? 1 : -1;
+	my $rows = $col_rows{$ws->{focused_col}};
 	if ($rows > 1) {	# expel
 	    # If the column to the right or left also has rows, we'll just
 	    # move the container into that column instead of expelling it.
@@ -642,7 +684,7 @@ sub process_msg {
 		push @cmds, show_con($ws->{focused_col});
 		push @cmds, "move right"
 		  if $col_rows{ $paper_ws{$focused_ws}{focused_col} };
-		push @cmds, "focus child" if $rows;
+		push @cmds, "focus child" if $col_rows{$ws->{focused_col}};
 	    }
 	    cmd(@cmds);
 	}
@@ -780,6 +822,10 @@ sub ws_name {
 }
 sub ws_num { (split /:/, $_[0])[0] }
 
+sub focused_col_idx {
+    first { $_[0]->{cols}->[$_] == $_[0]->{focused_col} } 0..$#{$_[0]->{cols}}
+}
+
 __END__
 
 =pod
@@ -788,11 +834,11 @@ __END__
 
 =head1 NAME
 
-papersway - PaperWM-like window management for Sway/i3wm
+papersway - PaperWM-like scrollable tiling window management for Sway/i3wm
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 
@@ -800,9 +846,10 @@ B<papersway> [B<--i3status>]
 
 =head1 DESCRIPTION
 
-This is an implementation of PaperWM-like window management for Sway/i3wm.
-If you like Sway/i3wm's commitments to stability, avoiding scope creep etc.
-but dislike the window management model, papersway is an alternative.
+This is an implementation of PaperWM-like scrollable tiling window management
+for Sway/i3wm.  If you like Sway/i3wm's commitments to stability, avoiding
+scope creep etc. but dislike the window management model, papersway is an
+alternative.
 
 =head1 OPTIONS
 
@@ -868,9 +915,9 @@ Here are some sample bindings to get you started.
     bindsym $mod+minus exec papersway-msg cols decr
     bindsym $mod+equal exec papersway-msg cols incr
 
-    bindsym $mod+i exec papersway-msg workspace prev
-    bindsym $mod+o exec papersway-msg workspace next
-    bindsym $mod+Shift+i exec papersway-msg move_workspace prev
+    bindsym $mod+u exec papersway-msg workspace prev
+    bindsym $mod+i exec papersway-msg workspace next
+    bindsym $mod+Shift+u exec papersway-msg move_workspace prev
     bindsym $mod+Shift+i exec papersway-msg move_workspace next
 
     bindsym $mod+c [con_mark=caffeinated] inhibit_idle none; \
@@ -881,13 +928,23 @@ Here are some sample bindings to get you started.
 
 =back
 
-=head2 Incompatibilities
+Delete any bindings you have for the I<split>, I<splith>, I<splitv>,
+I<splitt>, I<layout>, I<focus parent> and I<focus child> commands, to avoid
+confusion (on the parts of both yourself and of papersway).
 
-The current implementation assumes the default configuration values for the
-I<focus_wrapping> and I<workspace_layout> configuration options, so remove any
-customisations you've made to those.  You should also unbind the I<split>
-(and I<splith> etc.), I<layout>, I<focus parent> and I<focus child> commands
-to avoid confusion (on the parts of both yourself and of papersway).
+=head2 Other configuration
+
+=over 4
+
+=item
+
+Set I<focus_wrapping> to I<no>.
+
+=item
+
+Leave I<workspace_layout> with its default value, I<default>.
+
+=back
 
 =head1 SEE ALSO
 

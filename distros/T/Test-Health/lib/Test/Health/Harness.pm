@@ -10,7 +10,7 @@ use Carp;
 use File::Spec;
 use Types::Standard 1.000005 qw(Str Object);
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 =head1 NAME
 

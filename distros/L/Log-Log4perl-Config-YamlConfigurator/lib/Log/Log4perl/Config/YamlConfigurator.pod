@@ -1,0 +1,108 @@
+=pod
+
+=head1 NAME
+
+Log::Log4perl::Config::YamlConfigurator - Reads Log4perl YAML configurations
+
+=head1 SYNOPSIS
+
+  use Log::Log4perl ();
+  use YAML          qw( Load );
+
+  use Log::Log4perl::Config::YamlConfigurator ();
+
+  ( my $text = <<'EOT' ) =~ s/^ {2}//gm;
+    ---
+    rootLogger: INFO, SCREEN
+    category:
+      Foo:
+        Bar:
+          name: DEBUG, SCREEN, FILE
+          Baz: INFO, FILE
+    additivity:
+      Foo:
+        Bar: 0
+    appender:
+      SCREEN: 
+        name: Log::Log4perl::Appender::Screen
+        layout: Log::Log4perl::Layout::SimpleLayout
+      FILE: 
+        name: Log::Log4perl::Appender::File
+        filename: file.log
+        mode: append
+        create_at_logtime: 1
+        layout:
+          name: Log::Log4perl::Layout::PatternLayout::Multiline
+          ConversionPattern: '%d{HH:mm:ss} %-5p [%M{3}, %L] - %m%n'
+      STDERR: 
+        name: Log::Log4perl::Appender::Screen
+        stderr: 1
+        utf8: 1
+        layout: Log::Log4perl::Layout::SimpleLayout
+  EOT
+
+  my $configurator = Log::Log4perl::Config::YamlConfigurator->new(
+    data => Load( $text )
+  );
+
+  # or
+
+  my $configurator = Log::Log4perl::Config::YamlConfigurator->new(
+    text => [ $text ]
+  );
+
+  # calls $configurator->parse implicitly
+  Log::Log4perl->init( $configurator );
+
+  # or
+
+  Log::Log4perl->init( undef, $configurator->parse );
+
+  my $appender = $configurator->create_appender_instance( 'STDERR' );
+
+  # add appender to a given logger object
+  $logger->add_appender( $appender );
+
+=head1 DESCRIPTION
+
+This configurator class is a subclass of
+L<Log::Log4perl::Config::BaseConfigurator> that is able to process Log4perl YAML
+configurations.
+
+=head1 METHODS
+
+=head2 new()
+
+The constructor has one additional optional parameter C<data>. Its value is a
+specific Perl data structure: a HASH reference with the mandatory keys
+C<category>, and C<appender>. Optional keys are C<rootLogger>, C<additivity>,
+and some more. The HASH reference is usually the return value of a
+C<YAML::Load()> function call, if a Log4perl configuration is passed as a YAML
+stream to this function. Alternatively you may use the C<text> parameter to
+pass the Log4perl YAML configuration directly to the constructor.
+
+=head2 parse()
+
+The implementation of this abstract object method fulfills the
+L<Log::Log4perl::Config::BaseConfigurator/Parser-requirements>. It does not
+provide variable substitution functionality yet.
+
+=head2 create_appender_instance()
+
+If you pass an appender name to this object method, it returns a
+L<Log::Log4perl::Appender> object. This even works, if the appender is not
+bound to any logger (see L</SYNOPSIS>). If the appender name is unknown the
+method call dies.
+
+=head1 AUTHOR
+
+Sven Willenbuecher <sven.willenbuecher@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.
+
+=cut

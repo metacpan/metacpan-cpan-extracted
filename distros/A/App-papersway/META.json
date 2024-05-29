@@ -1,5 +1,5 @@
 {
-   "abstract" : "PaperWM-like window management for Sway/i3wm",
+   "abstract" : "PaperWM-like scrollable tiling window management for Sway/i3wm",
    "author" : [
       "Sean Whitton <spwhitton@spwhitton.name>"
    ],
@@ -52,7 +52,7 @@
          "web" : "https://git.spwhitton.name/papersway"
       }
    },
-   "version" : "1.000",
+   "version" : "1.001",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "GPL-3.0-only"

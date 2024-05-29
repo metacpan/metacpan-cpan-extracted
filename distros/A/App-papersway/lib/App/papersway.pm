@@ -1,5 +1,5 @@
 package App::papersway;
-# ABSTRACT: PaperWM-like window management for Sway/i3wm
+# ABSTRACT: PaperWM-like scrollable tiling window management for Sway/i3wm
 #
 # Copyright (C) 2019-2024  Sean Whitton <spwhitton@spwhitton.name>
 #
@@ -15,7 +15,7 @@ package App::papersway;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-$App::papersway::VERSION = '1.000';
+$App::papersway::VERSION = '1.001';
 # Placeholder module.
 
 1;
@@ -28,11 +28,11 @@ __END__
 
 =head1 NAME
 
-App::papersway - PaperWM-like window management for Sway/i3wm
+App::papersway - PaperWM-like scrollable tiling window management for Sway/i3wm
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 AUTHOR
 

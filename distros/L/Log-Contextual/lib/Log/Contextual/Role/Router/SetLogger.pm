@@ -2,7 +2,7 @@ package Log::Contextual::Role::Router::SetLogger;
 use strict;
 use warnings;
 
-our $VERSION = '0.009000';
+our $VERSION = '0.009001';
 
 use Moo::Role;
 
@@ -24,7 +24,15 @@ Log::Contextual::Role::Router::SetLogger - Abstract interface between loggers an
 
 =head1 VERSION
 
-version 0.009000
+version 0.009001
+
+=head1 REQUIRED METHODS
+
+=over
+
+=item set_logger
+
+=back
 
 =head1 BUGS
 

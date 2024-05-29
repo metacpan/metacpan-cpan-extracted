@@ -1,5 +1,11 @@
 Revision history for Perl module Locale::Unicode
 
+v0.1.7 2024-05-29T13:49:30+0900
+    - Skipping test with DateTime::Locale if minimum version is not available
+
+v0.1.6 2024-05-29T13:43:33+0900
+    - Correcting minimum module version required for testing
+
 v0.1.5 2024-05-24T11:06:59+0900
     - Added global variable $EXPLICIT_BOOLEAN affecting the rendering of stringification of objects
 

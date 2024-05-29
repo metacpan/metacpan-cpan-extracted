@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 bin/health_check.pl
+cpanfile
 dist.ini
 lib/Test/Health.pm
 lib/Test/Health/Email.pm

@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::Config::Structured::Bootstrap 0.01;
+package Mojolicious::Plugin::Config::Structured::Bootstrap 0.02;
 use v5.26;
 use warnings;
 
@@ -122,17 +122,6 @@ sub register($self, $app, $app_config) {
   );
 
   $load->(
-    'Authentication::SAML' => sub {
-      {
-        entity_id      => $app->conf->auth->entity_id,
-        metadata_url   => $app->conf->auth->metadata_url,
-        slo_url        => $app->conf->auth->slo_url,
-        sp_signing_key => $app->conf->auth->sp_signing_key
-      }
-    }
-  );
-
-  $load->(
     'Authentication::OIDC' => sub {
       {
         client_secret  => $app->conf->auth->client_secret(1),
@@ -142,6 +131,10 @@ sub register($self, $app, $app_config) {
         make_routes    => 0,
 
         get_token => sub ($c) {
+          if (my $t = $c->cookie('oidc_auth_token')) {
+            $c->cookie(oidc_auth_token => '', {expires => 1});
+            return $t;
+          }
           if (($c->req->headers->authorization // '') =~ /^Bearer (.*)/) {return $1;}
           return undef;
         },
@@ -166,18 +159,9 @@ sub register($self, $app, $app_config) {
           $token->{realm_access}->{roles};
         },
 
-        on_success => sub ($c, $token) {
-          $c->stash(token => $token);
-          my $tpl = <<'      END';
-        <!doctype html>
-        <html>
-          <script type="text/javascript">
-            localStorage.setItem("oidc_auth_token", "<%= $token %>");
-            location.replace("/login/success");
-          </script>
-        </html>
-      END
-          return $c->render(inline => $tpl);
+        on_success => sub ($c, $token, $url) {
+          $c->cookie(oidc_auth_token => $token, {expires => time + 60});
+          $c->redirect_to($url);
         },
         on_login => sub ($c, $u) {
           $u->update({last_login_at    => \["NOW()"]});
@@ -216,7 +200,7 @@ sub register($self, $app, $app_config) {
               return $c->$cb('User not authenticated')  unless (defined($u));
               return $c->$cb('User email not verified') unless ($u->email_verified);
               return $c->$cb()                          unless ($scopes->@*);
-              return $c->$cb() if (intersect($scopes->@*, $c->current_user_roles->@*));
+              return $c->$cb() if (intersect($scopes->@*, $c->authn->current_user_roles->@*));
               return $c->$cb('User not authorized');
             } catch ($e) {
               $e =~ s/( at \/.*)$//;
