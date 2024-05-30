@@ -15,18 +15,18 @@ extern "C" {
 
 #define xo_rotl(x,k) (((x) << (k)) | ((x) >> (64 - (k))))
 
-/* called from boot */
-void xo_srand(pUCXT) {
+void xo_srand(pUCXT, Pid_t pid) {
   U64 n, *xo_s = UCXT.xo_s;
+
+  (void)pid;
 
   xo_s[0] = sm_rand(aUCXT);
   xo_s[1] = sm_rand(aUCXT);
   xo_s[2] = sm_rand(aUCXT);
   xo_s[3] = sm_rand(aUCXT);
 
-  /* stir 8 - 39 times */
-  n = 8 + (sm_rand(aUCXT) >> 59);
-
+  /* stir 16 - 31 times */
+  n = 16 + (sm_rand(aUCXT) >> 60);
   while (n-- > 0)
     (void)xo_rand(aUCXT);
 }

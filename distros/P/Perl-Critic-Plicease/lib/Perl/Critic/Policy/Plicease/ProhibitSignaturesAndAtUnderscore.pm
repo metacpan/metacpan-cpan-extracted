@@ -7,7 +7,7 @@ use Perl::Critic::Utils qw( $SEVERITY_HIGH );
 use base qw( Perl::Critic::Policy );
 
 # ABSTRACT: Prohibit the use of @_ in subroutine using signatures
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 use constant DESC => 'Using @_ in a function with signatures';
@@ -77,7 +77,7 @@ Perl::Critic::Policy::Plicease::ProhibitSignaturesAndAtUnderscore - Prohibit the
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -116,6 +116,8 @@ Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Ville Skyttä (SCOP)
+
+Yoshikazu Sawa (yoshikazusawa)
 
 =head1 COPYRIGHT AND LICENSE
 

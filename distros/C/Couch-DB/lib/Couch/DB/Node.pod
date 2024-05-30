@@ -1,0 +1,153 @@
+=encoding utf8
+
+=head1 NAME
+
+Couch::DB::Node - represent a node in the cluster
+
+=head1 SYNOPSIS
+
+  my $node = $couch->node('node1@127.0.0.1');
+  my $node = $client->node;
+
+  # Internal use only
+  my $node = Couch::DB::Node->new(name => $name, couch => $couch);
+
+=head1 DESCRIPTION
+
+This represents a Node in the database cluster.  When this object is created,
+it may very well be that there is no knowledge about the node yet.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Couch::DB::Node-E<gt>B<new>(%options)
+
+ -Option--Default
+  couch   <required>
+  name    <required>
+
+=over 2
+
+=item couch => C<Couch::DB>-object
+
+=item name => STRING
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<couch>()
+
+=item $obj-E<gt>B<name>()
+
+=back
+
+=head2 Node information
+
+B<All CouchDB API calls> documented below, support %options like C<_delay>
+and C<on_error>.  See L<Couch::DB/Using the CouchDB API>.
+
+=over 4
+
+=item $obj-E<gt>B<config>(%options)
+
+ [CouchDB API "GET /_node/{node-name}/_config", UNTESTED]
+ [CouchDB API "GET /_node/{node-name}/_config/{section}", UNTESTED]
+ [CouchDB API "GET /_node/{node-name}/_config/{section}/{key}", UNTESTED]
+Returns the node configuration.
+
+At least according to the example in the spec, all values are strings.
+So, a boolean will be string "true" or "false".  The API notes that the
+actual type of values is unpredictable.
+
+ -Option --Default
+  key      undef
+  section  undef
+
+=over 2
+
+=item key => STRING
+
+(Requires a section to be specified)
+
+=item section => STRING
+
+=back
+
+example: of config
+
+  # Three times the same.  The last may be the most efficient for the server.
+  my $mode = $node->config->values->{log}{level};
+  my $mode = $node->config(section => 'log')->values->{level};
+  my $mode = $node->config(section => 'log', key => 'level')->values;
+
+=item $obj-E<gt>B<configChange>($section, $key, $value, %options)
+
+ [CouchDB API "PUT /_node/{node-name}/_config/{section}/{key}", UNTESTED]>
+Change one value in the configuration.  Probably, it should be followed by
+a L<configReload()|Couch::DB::Node/"Node information">: changes may not be commited without reload.
+
+You MAY need to convert booleans to string "true" or "false" by hand.
+
+=item $obj-E<gt>B<configDelete>($section, $key, %options)
+
+ [CouchDB API "DELETE /_node/{node-name}/_config/{section}/{key}", UNTESTED]>
+Remove one value in the configuration.  Probably, it should be followed by
+a L<configReload()|Couch::DB::Node/"Node information">: changes may not be commited without reload.
+
+=item $obj-E<gt>B<configReload>(%options)
+
+ [CouchDB API "POST /_node/{node-name}/_config/_reload", UNTESTED]>
+Re-apply the configuration to the node.  This has as side-effect that the
+(changed) configuration of the node will be saved.
+
+=item $obj-E<gt>B<restart>(%options)
+
+ [CouchDB API "POST /_node/{node-name}/_restart", UNTESTED]
+This may help you in a test environment, but should not be used in
+production, according to the API documentation.
+
+=item $obj-E<gt>B<server>(%options)
+
+ [CouchDB API "GET /_node/{node-name}/_system", UNTESTED]
+Presents information about the system of the server where the node
+runs on.
+
+B<Be aware> that the method is called C<server>, not C<system>
+to avoid confusion with the local system and Perl's C<system>
+function.
+
+=item $obj-E<gt>B<software>(%options)
+
+ [CouchDB API "GET /_node/{node-name}/_versions", UNTESTED]
+Get details of some software running the node.
+
+=item $obj-E<gt>B<stats>(%options)
+
+ [CouchDB API "GET /_node/{node-name}/_stats", UNTESTED]
+Collect node statistics.
+
+=back
+
+=head2 Other
+
+=head1 SEE ALSO
+
+This module is part of Couch-DB distribution version 0.001,
+built on May 29, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2024 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

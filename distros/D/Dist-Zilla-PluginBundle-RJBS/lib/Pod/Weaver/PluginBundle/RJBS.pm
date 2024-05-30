@@ -1,6 +1,6 @@
 use v5.34.0;
 use Dist::Zilla::Pragmas;
-package Pod::Weaver::PluginBundle::RJBS 5.029;
+package Pod::Weaver::PluginBundle::RJBS 5.030;
 # ABSTRACT: RJBS's default Pod::Weaver config
 
 #pod =head1 OVERVIEW
@@ -149,7 +149,7 @@ Pod::Weaver::PluginBundle::RJBS - RJBS's default Pod::Weaver config
 
 =head1 VERSION
 
-version 5.029
+version 5.030
 
 =head1 OVERVIEW
 

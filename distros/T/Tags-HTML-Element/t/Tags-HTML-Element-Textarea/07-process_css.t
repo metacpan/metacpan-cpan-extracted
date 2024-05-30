@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 
-use CSS::Struct::Output::Indent;
+use CSS::Struct::Output::Structure;
 use Data::HTML::Element::Textarea;
 use English;
 use Error::Pure::Utils qw(clean);
 use Tags::HTML::Element::Textarea;
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 6;
 use Test::NoWarnings;
 
 # Test.
@@ -17,30 +17,32 @@ my $ret = $obj->process_css;
 is($ret, undef, 'No css mode.');
 
 # Test.
-my $css = CSS::Struct::Output::Indent->new,;
+my $css = CSS::Struct::Output::Structure->new;
 $obj = Tags::HTML::Element::Textarea->new(
 	'css' => $css,
 );
 my $textarea = Data::HTML::Element::Textarea->new;
 $obj->init($textarea);
 $obj->process_css;
-$ret = $css->flush(1);
-my $right_ret = <<'END';
-textarea {
-	width: 100%;
-	padding: 12px 20px;
-	margin: 8px 0;
-	display: inline-block;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-	box-sizing: border-box;
-}
-END
-chomp $right_ret;
-is($ret, $right_ret, "Textarea defaults.");
+my $ret_ar = $css->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['s', 'textarea'],
+		['d', 'width', '100%'],
+		['d', 'padding', '12px 20px'],
+		['d', 'margin', '8px 0'],
+		['d', 'display', 'inline-block'],
+		['d', 'border', '1px solid #ccc'],
+		['d', 'border-radius', '4px'],
+		['d', 'box-sizing', 'border-box'],
+		['e'],
+	],
+	'Get CSS::Struct code (default).',
+);
 
 # Test.
-$css = CSS::Struct::Output::Indent->new,;
+$css = CSS::Struct::Output::Structure->new;
 $obj = Tags::HTML::Element::Textarea->new(
 	'css' => $css,
 );
@@ -49,20 +51,35 @@ $textarea = Data::HTML::Element::Textarea->new(
 );
 $obj->init($textarea);
 $obj->process_css;
-$ret = $css->flush(1);
-$right_ret = <<'END';
-textarea.foo {
-	width: 100%;
-	padding: 12px 20px;
-	margin: 8px 0;
-	display: inline-block;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-	box-sizing: border-box;
-}
-END
-chomp $right_ret;
-is($ret, $right_ret, "Textarea defaults (with CSS class).");
+$ret_ar = $css->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['s', 'textarea.foo'],
+		['d', 'width', '100%'],
+		['d', 'padding', '12px 20px'],
+		['d', 'margin', '8px 0'],
+		['d', 'display', 'inline-block'],
+		['d', 'border', '1px solid #ccc'],
+		['d', 'border-radius', '4px'],
+		['d', 'box-sizing', 'border-box'],
+		['e'],
+	],
+	'Get CSS::Struct code (with CSS class).',
+);
+
+# Test.
+$css = CSS::Struct::Output::Structure->new;
+$obj = Tags::HTML::Element::Textarea->new(
+	'css' => $css,
+);
+$obj->process_css;
+$ret_ar = $css->flush(1);
+is_deeply(
+	$ret_ar,
+	[],
+	'Get CSS::Struct code (without initialization).',
+);
 
 # Test.
 $obj = Tags::HTML::Element::Textarea->new;

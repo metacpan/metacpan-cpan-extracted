@@ -12,6 +12,13 @@ pod_spelling_system:
     - Ville
     - perlcriticrc
 
+# ug macos
+    - Sawa
+    - Yoshikazu
+    - doesn
+    - yoshikazusawa
+    - aren
+
 pod_coverage:
   skip: 0
   # format is "Class#method" or "Class",regex allowed

@@ -2,8 +2,8 @@ NAME
     App::sort_by_sortkey - Sort lines of text by a SortKey module
 
 VERSION
-    This document describes version 0.001 of App::sort_by_sortkey (from Perl
-    distribution App-sort_by_sortkey), released on 2024-03-07.
+    This document describes version 0.002 of App::sort_by_sortkey (from Perl
+    distribution App-sort_by_sortkey), released on 2024-05-15.
 
 FUNCTIONS
   sort_by_sortkey

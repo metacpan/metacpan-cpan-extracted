@@ -1,0 +1,196 @@
+=encoding utf8
+
+=head1 NAME
+
+Couch::DB::Mojolicious - CouchDB backend for Mojolicious
+
+=head1 INHERITANCE
+
+ Couch::DB::Mojolicious
+   is a Couch::DB
+
+=head1 SYNOPSIS
+
+   use Couch::DB::Mojolicious ();
+   my $couch = Couch::DB::Mojolicious->new;
+
+   # From here on: see the Couch::DB base class
+   my $db    = $couch->db('my-db');
+
+=head1 DESCRIPTION
+
+This is the L<Couch::DB|Couch::DB> implementation based on the Mojolicious (=Mojo) event
+framework.  It uses many Mojo specific modules, like Mojo::URL and Mojo::UserAgent.
+
+Extends L<"DESCRIPTION" in Couch::DB|Couch::DB/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Couch::DB|Couch::DB/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Couch::DB|Couch::DB/"Constructors">.
+ 
+=over 4
+
+=item Couch::DB::Mojolicious-E<gt>B<new>(%options)
+
+ -Option  --Defined in     --Default
+  api       Couch::DB        <required>
+  auth      Couch::DB        'BASIC'
+  password  Couch::DB        undef
+  server    Couch::DB        "http://127.0.0.1:5984"
+  to_json   Couch::DB        +{ }
+  to_perl   Couch::DB        +{ }
+  to_query  Couch::DB        +{ }
+  username  Couch::DB        undef
+
+=over 2
+
+=item api => $version
+
+=item auth => 'BASIC'|'COOKIE'
+
+=item password => STRING
+
+=item server => URL
+
+=item to_json => HASH
+
+=item to_perl => HASH
+
+=item to_query => HASH
+
+=item username => STRING
+
+=back
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in Couch::DB|Couch::DB/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<api>()
+
+Inherited, see L<Couch::DB/"Accessors">
+
+=back
+
+=head2 Interface starting points
+
+Extends L<"Interface starting points" in Couch::DB|Couch::DB/"Interface starting points">.
+ 
+=over 4
+
+=item $obj-E<gt>B<cluster>()
+
+Inherited, see L<Couch::DB/"Interface starting points">
+
+=item $obj-E<gt>B<createClient>(%options)
+
+Inherited, see L<Couch::DB/"Interface starting points">
+
+=item $obj-E<gt>B<db>($name, %options)
+
+Inherited, see L<Couch::DB/"Interface starting points">
+
+=item $obj-E<gt>B<node>($name)
+
+Inherited, see L<Couch::DB/"Interface starting points">
+
+=item $obj-E<gt>B<searchAnalyse>(%options)
+
+Inherited, see L<Couch::DB/"Interface starting points">
+
+=back
+
+=head2 Server connections
+
+The C<server> is a Mojo::URL, or will be transformed into one.
+The C<user_agent> is a Mojo::UserAgent.
+
+Extends L<"Server connections" in Couch::DB|Couch::DB/"Server connections">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addClient>($client)
+
+Inherited, see L<Couch::DB/"Server connections">
+
+=item $obj-E<gt>B<call>($method, $path, %options)
+
+Inherited, see L<Couch::DB/"Server connections">
+
+=item $obj-E<gt>B<client>($name)
+
+Inherited, see L<Couch::DB/"Server connections">
+
+=item $obj-E<gt>B<clients>(%options)
+
+Inherited, see L<Couch::DB/"Server connections">
+
+=back
+
+=head2 Conversions
+
+Extends L<"Conversions" in Couch::DB|Couch::DB/"Conversions">.
+ 
+=over 4
+
+=item $obj-E<gt>B<check>($condition, $change, $version, $what)
+
+Inherited, see L<Couch::DB/"Conversions">
+
+=item $obj-E<gt>B<freshUUIDs>($count, %options)
+
+Inherited, see L<Couch::DB/"Conversions">
+
+=item $obj-E<gt>B<jsonText>($json, %options)
+
+Inherited, see L<Couch::DB/"Conversions">
+
+=item $obj-E<gt>B<listToPerl>($set, $type, @data|\@data)
+
+Inherited, see L<Couch::DB/"Conversions">
+
+=item $obj-E<gt>B<requestUUIDs>($count, %options)
+
+Inherited, see L<Couch::DB/"Conversions">
+
+=item $obj-E<gt>B<toJSON>(\%data, $type, @keys)
+
+Inherited, see L<Couch::DB/"Conversions">
+
+=item $obj-E<gt>B<toPerl>(\%data, $type, @keys)
+
+Inherited, see L<Couch::DB/"Conversions">
+
+=item $obj-E<gt>B<toQuery>(\%data, $type, @keys)
+
+Inherited, see L<Couch::DB/"Conversions">
+
+=back
+
+=head2 Other
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in Couch::DB|Couch::DB/"DETAILS">.
+ 
+=head1 SEE ALSO
+
+This module is part of Couch-DB distribution version 0.001,
+built on May 29, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2024 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

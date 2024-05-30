@@ -69,6 +69,7 @@ IV uu_clock(pUCXT, U64 *ret_clock_reg, U16 *ret_clock_seq) {
 #endif
 
   /* state_fd:
+   *  -4  cannot create
    *  -3  untried
    *  -2  symlink
    *  -1  can create
@@ -76,8 +77,15 @@ IV uu_clock(pUCXT, U64 *ret_clock_reg, U16 *ret_clock_seq) {
   */
   if (state_fd == -3) {
 #ifdef HAVE_LSTAT
-    if ((lstat(pathlen.path, &statbuf) == 0) && ((statbuf.st_mode & S_IFMT) == S_IFLNK))
+    if (lstat(pathlen.path, &statbuf) < 0) { /* this covers EINTR too.. ugh */
+      if (errno == ENOENT)
+        state_fd = -1;
+      else
+        state_fd = -4;
+    }
+    else if ((statbuf.st_mode & S_IFMT) == S_IFLNK) {
       state_fd = -2;
+    }
     else {
 #endif
       state_fd = open(pathlen.path, O_RDWR);
@@ -159,6 +167,8 @@ IV uu_clock(pUCXT, U64 *ret_clock_reg, U16 *ret_clock_seq) {
 #endif
         save_umask = umask(0);
         state_fd = open(pathlen.path, O_RDWR|O_CREAT, 0660);
+        if (state_fd < 0)
+          state_fd = -4;
         (void) umask(save_umask);
         if (state_fd >= 0) {
 #ifdef HAVE_LSTAT

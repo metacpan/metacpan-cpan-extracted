@@ -67,7 +67,7 @@
    "provides" : {
       "App::sort_by_sortkey" : {
          "file" : "lib/App/sort_by_sortkey.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -82,7 +82,7 @@
          "web" : "https://github.com/perlancar/perl-App-sort_by_sortkey"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

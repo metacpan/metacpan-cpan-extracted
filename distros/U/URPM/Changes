@@ -1,3 +1,7 @@
+Version 5.225 - 29 May 2022
+
+- Handle i586 -> i686 upgrade
+
 Version 5.224 - 19 December 2022
 
 - Add back support for "foo > 5" syntx in property2name*

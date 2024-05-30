@@ -5,9 +5,9 @@ use Data::HTML::Element::Textarea;
 use English;
 use Error::Pure::Utils qw(clean);
 use Tags::HTML::Element::Textarea;
-use Test::More 'tests' => 6;
-use Test::NoWarnings;
 use Tags::Output::Structure;
+use Test::More 'tests' => 7;
+use Test::NoWarnings;
 
 # Test.
 my $tags = Tags::Output::Structure->new;
@@ -24,7 +24,7 @@ is_deeply(
 		['b', 'textarea'],
 		['e', 'textarea'],
 	],
-	'Input HTML code (textarea).',
+	'Get Tags code (default).',
 );
 
 # Test.
@@ -51,7 +51,7 @@ is_deeply(
 		['a', 'required', 'required'],
 		['e', 'textarea'],
 	],
-	'Input HTML code (textarea with boolean values).',
+	'Get Tags code (textarea with boolean values).',
 );
 
 # Test.
@@ -86,7 +86,7 @@ is_deeply(
 		['d', 'textarea value'],
 		['e', 'textarea'],
 	],
-	'Input HTML code (textarea with attributes and value).',
+	'Get Tags code (textarea with attributes and value).',
 );
 
 # Test.
@@ -133,7 +133,20 @@ is_deeply(
 		['d', 'textarea value'],
 		['e', 'textarea'],
 	],
-	'Input HTML code (textarea with attributes, value and label).',
+	'Get Tags code (textarea with attributes, value and label).',
+);
+
+# Test.
+$tags = Tags::Output::Structure->new;
+$obj = Tags::HTML::Element::Textarea->new(
+	'tags' => $tags,
+);
+$obj->process;
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[],
+	'Get Tags code (without initialization).',
 );
 
 # Test.

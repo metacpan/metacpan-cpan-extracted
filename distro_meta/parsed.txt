@@ -92267,3 +92267,15 @@ B/BP/BPS/RT-Extension-HelpDesk-0.03.tar.gz
 K/KI/KIMOTO/SPVM-IO-0.216.tar.gz
 P/PE/PERLANCAR/TableDataRole-Source-SQLite-0.001.tar.gz
 A/AR/ARFREITAS/Test-Health-0.004.tar.gz
+G/GB/GBROWN/App-htidx-0.01.tar.gz
+G/GB/GBROWN/App-rdapper-0.9.tar.gz
+P/PE/PERLANCAR/App-sort_by_sortkey-0.002.tar.gz
+M/MA/MARKOV/Couch-DB-0.001.tar.gz
+R/RJ/RJBS/Dist-Zilla-PluginBundle-RJBS-5.030.tar.gz
+P/PL/PLICEASE/Perl-Critic-Plicease-0.07.tar.gz
+T/TV/TVIGNAUD/RPM4-0.47.tgz
+P/PE/PERLANCAR/SortKey-Num-similarity_jaccard-0.001.tar.gz
+S/SK/SKIM/Tags-HTML-Element-0.14.tar.gz
+T/TV/TVIGNAUD/URPM-v5.225.tar.gz
+J/JR/JRM/UUID-0.35.tar.gz
+E/EH/EHUELS/XDR-Parse-0.3.1.tar.gz

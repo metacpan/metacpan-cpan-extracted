@@ -55,6 +55,7 @@ t/3unique/v1.t
 t/3unique/v3.t
 t/3unique/v4.t
 t/3unique/v4_fork.t
+t/3unique/v4_prefork.t
 t/3unique/v5.t
 t/3unique/v6.t
 t/3unique/v7.t

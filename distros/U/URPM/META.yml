@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   ExtUtils::PkgConfig: '1.00'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +23,7 @@ no_index:
 provides:
   URPM:
     file: URPM.pm
-    version: v5.224.0
+    version: v5.225.0
   URPM::Resolve:
     file: URPM/Resolve.pm
 requires:
@@ -31,5 +31,5 @@ requires:
   perl: '5.008001'
 resources:
   repository: git://git.mageia.org/software/rpm/perl-URPM/
-version: v5.224
+version: v5.225
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

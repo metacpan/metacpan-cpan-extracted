@@ -1,4 +1,4 @@
 FROM perl:latest
-RUN apt-get update
-RUN cpanm -n App::rdapper
+ENV DEBIAN_FRONTEND=noninteractive
+RUN cpanm -qn App::rdapper
 ENTRYPOINT ["/usr/local/bin/rdapper"]

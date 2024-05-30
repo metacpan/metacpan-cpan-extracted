@@ -1,0 +1,38 @@
+---
+abstract: 'thick CouchDB interface'
+author:
+  - 'Mark Overmeer'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Couch-DB
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime: '0'
+  DateTime::Format::ISO8601: '0'
+  DateTime::Format::Mail: '0'
+  HTTP::Status: '0'
+  JSON: '0'
+  List::Util: '0'
+  Log::Report: '0'
+  MIME::Base64: '0'
+  Mojolicious: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  URI: '0'
+resources:
+  homepage: http://perl.overmeer.net/CPAN/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/markov2/perl5-Couch-DB.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

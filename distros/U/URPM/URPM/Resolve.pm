@@ -176,7 +176,7 @@ sub strict_arch_check_installed {
 	my $n = $pkg->name;
 	defined $installed_arch{$n} or $installed_arch{$n} = get_installed_arch($db, $n);
 	if ($installed_arch{$n} && $installed_arch{$n} ne 'noarch') {
-	    $arch eq $installed_arch{$n} or return;
+	    $arch eq $installed_arch{$n} or $arch =~ /^i.86/ && $installed_arch{$n} =~ /^i.86/ or return;
 	}
     }
     1;
@@ -196,7 +196,7 @@ sub strict_arch_check {
     if ($arch ne 'src' && $arch ne 'noarch') {
 	my $inst_arch = $installed_pkg->arch;
 	if ($inst_arch ne 'noarch') {
-	    $arch eq $inst_arch or return;
+	    $arch eq $inst_arch or $arch =~ /^i.86/ && $inst_arch=~ /^i.86/ or return;
 	}
     }
     1;

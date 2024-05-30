@@ -5,7 +5,7 @@ use warnings;
 use 5.010001;
 
 # ABSTRACT: Some Perl::Critic policies used by Plicease
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Perl::Critic::Plicease - Some Perl::Critic policies used by Plicease
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 
@@ -50,6 +50,8 @@ Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Ville Skyttä (SCOP)
+
+Yoshikazu Sawa (yoshikazusawa)
 
 =head1 COPYRIGHT AND LICENSE
 

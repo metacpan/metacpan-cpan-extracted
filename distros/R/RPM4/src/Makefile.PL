@@ -43,6 +43,7 @@ foreach (qw(
     4.12.90
     4.15.0
     4.18.0
+    4.19.0
     )) {
     my $v = $_;
     my $vobj = version->declare("v$_");

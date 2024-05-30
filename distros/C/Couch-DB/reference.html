@@ -1,0 +1,931 @@
+<html>
+<head>
+  <title>Reference table</title>
+  <meta charset="utf-8" />
+
+  <style>
+    TR.first { margin-top: 4px }
+    TD.api { background: white }
+    TD.api A { text-decoration: none; font-family: monospace }
+    TD.use { font-family: monospace }
+	TD.descr P { margin-bottom: 10px }
+    TH { text-align: left }
+    .count { text-align: right }
+	TABLE#status-explain { padding-left: 3em }
+	TABLE#references { padding: 2ex 3em; }
+  </style>
+</head>
+<body>
+  <h1>Reference table</h1>
+
+  <p>This page is generated when anything in the implementation changes,
+  at least every release.  Sorry for the current ugly presentation: functionality
+  first.</p>
+
+  <h2>Development progress counts</h2>
+
+  <p>The implementation is really new, therefore, not everything is ready and
+  complete.  Below, you find the follow conditions.
+  <table id="status-explain">
+  <tr><td>DONE</td>
+      <td class="count">32</td>
+      <td>Minimally tested.</td></tr>
+  <tr><td>PARTIAL</td>
+      <td class="count">4</td>
+      <td>Minimally tested, not completely implemented.</td></tr>
+  <tr><td>UNTESTED</td>
+      <td class="count">88</td>
+      <td>Implemented but never tried.</td></tr>
+  <tr><td>TODO</td>
+      <td class="count">2</td>
+      <td>Implementation not started.</td></tr>
+  <tr><td>UNSUPPORTED</td>
+      <td class="count">5</td>
+      <td>For some reason, it seems useless to implement this.</td></tr>
+  </table>
+
+  <h2>Reference table</h2>
+
+  <table id="references">
+  <tr><th>API 3.3.3 and official summary</th>
+      <th>impl status</th>
+      <th>Couch::DB use</th></tr>
+
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--">GET /</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$client-&gt;serverInfo(%options)</td></tr>
+  <tr><td class="descr"><p>Returns the welcome message and version information</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_active_tasks">GET /_active_tasks</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$client-&gt;activeTasks(%options)</td></tr>
+  <tr><td class="descr"><p>Obtains a list of the tasks running in the server</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_all_dbs">GET /_all_dbs</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$client-&gt;databaseNames(%options)</td></tr>
+  <tr><td class="descr"><p>Returns a list of all the databases</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_cluster_setup">GET /_cluster_setup</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$cluster-&gt;clusterState(%options)</td></tr>
+  <tr><td class="descr"><p>Return the status of the cluster setup wizard</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#post--_cluster_setup">POST /_cluster_setup</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$cluster-&gt;clusterSetup(%options)</td></tr>
+  <tr><td class="descr"><p>Sets up a node as a single node or as part of a cluster.</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_db_updates">GET /_db_updates</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$client-&gt;dbUpdates()</td></tr>
+  <tr><td class="descr"><p>Return the server changes of databases</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_dbs_info">GET /_dbs_info</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$client-&gt;databaseInfo(%options)</td></tr>
+  <tr><td class="descr"><p>Returns all databases information</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#post--_dbs_info">POST /_dbs_info</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$client-&gt;databaseInfo(%options)</td></tr>
+  <tr><td class="descr"><p>Returns information of a list of the specified databases</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_membership">GET /_membership</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$client-&gt;clusterNodes(%options)</td></tr>
+  <tr><td class="descr"><p>Returns a list of nodes</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_node-node-name">GET /_node/{node-name}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$client-&gt;nodeName($name, %options)</td></tr>
+  <tr><td class="descr"><p>Returns node name</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/configuration.html#get--_node-node-name-_config">GET /_node/{node-name}/_config</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$node-&gt;config(%options)</td></tr>
+  <tr><td class="descr"><p>Obtains a list of the entire server configuration</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/configuration.html#post--_node-node-name-_config-_reload">POST /_node/{node-name}/_config/_reload</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$node-&gt;configReload(%options)</td></tr>
+  <tr><td class="descr"><p>Reload the configuration from disk</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/configuration.html#get--_node-node-name-_config-section">GET /_node/{node-name}/_config/{section}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$node-&gt;config(%options)</td></tr>
+  <tr><td class="descr"><p>Returns all the configuration values for the specified section</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/configuration.html#delete--_node-node-name-_config-section-key">DELETE /_node/{node-name}/_config/{section}/{key}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$node-&gt;configDelete($section, $key, %options)</td></tr>
+  <tr><td class="descr"><p>Removes the current setting</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/configuration.html#get--_node-node-name-_config-section-key">GET /_node/{node-name}/_config/{section}/{key}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$node-&gt;config(%options)</td></tr>
+  <tr><td class="descr"><p>Returns a specific section/configuration value</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/configuration.html#put--_node-node-name-_config-section-key">PUT /_node/{node-name}/_config/{section}/{key}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$node-&gt;configChange($section, $key, $value, %options)</td></tr>
+  <tr><td class="descr"><p>Sets the specified configuration value</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_node-node-name-_prometheus">GET /_node/{node-name}/_prometheus</a></td>
+      <td class="status">UNSUPPORTED</td>
+      <td class="use"></td></tr>
+  <tr><td class="descr"><p>Returns server statistics in prometheus format</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#post--_node-node-name-_restart">POST /_node/{node-name}/_restart</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$node-&gt;restart(%options)</td></tr>
+  <tr><td class="descr"><p>Restarts CouchDB application on a given node</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_node-node-name-_stats">GET /_node/{node-name}/_stats</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$node-&gt;stats(%options)</td></tr>
+  <tr><td class="descr"><p>Returns server statistics</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_node-node-name-_system">GET /_node/{node-name}/_system</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$node-&gt;server(%options)</td></tr>
+  <tr><td class="descr"><p>Returns system-level server statistics</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_node-node-name-_versions">GET /_node/{node-name}/_versions</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$node-&gt;software(%options)</td></tr>
+  <tr><td class="descr"><p>Returns system-level server version informations</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#post--_replicate">POST /_replicate</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$client-&gt;replicate(%options)</td></tr>
+  <tr><td class="descr"><p>Starts or cancels the replication</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_reshard">GET /_reshard</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$cluster-&gt;reshardStatus(%options)</td></tr>
+  <tr><td class="descr"><p>Retrieve summary information about resharding on the cluster</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_reshard-jobs">GET /_reshard/jobs</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$cluster-&gt;reshardJobs(%options)</td></tr>
+  <tr><td class="descr"><p>Retrieve information about all the resharding jobs on the cluster</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#post--_reshard-jobs">POST /_reshard/jobs</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$cluster-&gt;reshardCreate(%options)</td></tr>
+  <tr><td class="descr"><p>Create one or more resharding jobs</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#delete--_reshard-jobs-jobid">DELETE /_reshard/jobs/{jobid}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$cluster-&gt;reshardJobRemove($jobid, %options)</td></tr>
+  <tr><td class="descr"><p>Remove a resharding job</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_reshard-jobs-jobid">GET /_reshard/jobs/{jobid}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$cluster-&gt;reshardJob($jobid, %options)</td></tr>
+  <tr><td class="descr"><p>Retrieve information about a particular resharding job</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_reshard-jobs-jobid-state">GET /_reshard/jobs/{jobid}/state</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$cluster-&gt;reshardJobState($jobid, %options)</td></tr>
+  <tr><td class="descr"><p>Retrieve the state of a single resharding job</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#put--_reshard-jobs-jobid-state">PUT /_reshard/jobs/{jobid}/state</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$cluster-&gt;reshardJobChange($jobid, %options)</td></tr>
+  <tr><td class="descr"><p>Change the state of a resharding job</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_reshard-state">GET /_reshard/state</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$cluster-&gt;reshardStatus(%options)</td></tr>
+  <tr><td class="descr"><p>Retrieve the state of resharding on the cluster</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#put--_reshard-state">PUT /_reshard/state</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$cluster-&gt;resharding(%options)</td></tr>
+  <tr><td class="descr"><p>Change resharding state on the cluster</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_scheduler-docs">GET /_scheduler/docs</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$client-&gt;replicationDocs(%options)</td></tr>
+  <tr><td class="descr"><p>Retrieve information about replication documents from the ``_replicator`` database.</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_scheduler-docs-replicator_db">GET /_scheduler/docs/{replicator_db}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$client-&gt;replicationDocs(%options)</td></tr>
+  <tr><td class="descr"><p>Retrieve information about replication documents from a specific replicator database.</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_scheduler-docs-replicator_db-docid">GET /_scheduler/docs/{replicator_db}/{docid}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$client-&gt;replicationDoc($doc|$docid, %options)</td></tr>
+  <tr><td class="descr"><p>Retrieve information about a particular replication document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_scheduler-jobs">GET /_scheduler/jobs</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$client-&gt;replicationJobs(%options)</td></tr>
+  <tr><td class="descr"><p>Retrieve information about replication jobs</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#post--_search_analyze">POST /_search_analyze</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$couch-&gt;searchAnalyse(%options)</td></tr>
+  <tr><td class="descr"><p>Tests the results of analyzer tokenization</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/authn.html#delete--_session">DELETE /_session</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$client-&gt;logout(%options)</td></tr>
+  <tr><td class="descr"><p>Logout Cookie-based user</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/authn.html#get--_session">GET /_session</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$client-&gt;session(%options)</td></tr>
+  <tr><td class="descr"><p>Returns Cookie-based login user information</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/authn.html#post--_session">POST /_session</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$client-&gt;login(%options)</td></tr>
+  <tr><td class="descr"><p>Authenticates user by Cookie-based user login</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_up">GET /_up</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$client-&gt;serverStatus()</td></tr>
+  <tr><td class="descr"><p>Health check endpoint</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_utils">GET /_utils</a></td>
+      <td class="status">UNSUPPORTED</td>
+      <td class="use"></td></tr>
+  <tr><td class="descr"><p>Redirects to /_utils/</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_utils-">GET /_utils/</a></td>
+      <td class="status">UNSUPPORTED</td>
+      <td class="use"></td></tr>
+  <tr><td class="descr"><p>CouchDB administration interface (Fauxton)</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--_uuids">GET /_uuids</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$couch-&gt;requestUUIDs($count, %options)</td></tr>
+  <tr><td class="descr"><p>Generates a list of UUIDs from the server</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/server/common.html#get--favicon.ico">GET /favicon.ico</a></td>
+      <td class="status">UNSUPPORTED</td>
+      <td class="use"></td></tr>
+  <tr><td class="descr"><p>Returns the site icon</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/common.html#delete--db">DELETE /{db}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$db-&gt;remove(%options)</td></tr>
+  <tr><td class="descr"><p>Deletes an existing database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/common.html#get--db">GET /{db}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$db-&gt;details(%options)</td></tr>
+  <tr><td class="descr"><p>Returns the database information</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/common.html#head--db">HEAD /{db}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$db-&gt;ping(%options)</td></tr>
+  <tr><td class="descr"><p>Checks the database existence</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/common.html#post--db">POST /{db}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$doc-&gt;create(\%data, %options)</td></tr>
+  <tr><td class="descr"><p>Creates a new document with generated ID if _id is not specified</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/common.html#put--db">PUT /{db}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$db-&gt;create(%options)</td></tr>
+  <tr><td class="descr"><p>Creates a new database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#get--db-_all_docs">GET /{db}/_all_docs</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;listDocuments(%options)</td></tr>
+  <tr><td class="descr"><p>Returns a built-in view of all documents in this database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#post--db-_all_docs">POST /{db}/_all_docs</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;listDocuments(%options)</td></tr>
+  <tr><td class="descr"><p>Returns a built-in view of all documents in this database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#post--db-_all_docs-queries">POST /{db}/_all_docs/queries</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;listDocuments(%options)</td></tr>
+  <tr><td class="descr"><p>Returns results for the specified queries</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#post--db-_bulk_docs">POST /{db}/_bulk_docs</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;updateDocuments(\@docs, %options)</td></tr>
+  <tr><td class="descr"><p>Inserts or updates multiple documents in to the database in a single request</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#post--db-_bulk_get">POST /{db}/_bulk_get</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;inspectDocuments(\@docs, %options)</td></tr>
+  <tr><td class="descr"><p>Fetches several documents at the given revisions</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/changes.html#get--db-_changes">GET /{db}/_changes</a></td>
+      <td class="status">TODO</td>
+      <td class="use">$db-&gt;changes(%options)</td></tr>
+  <tr><td class="descr"><p>Returns changes for the given database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/changes.html#post--db-_changes">POST /{db}/_changes</a></td>
+      <td class="status">TODO</td>
+      <td class="use">$db-&gt;changes(%options)</td></tr>
+  <tr><td class="descr"><p>Returns changes for the given database for certain document IDs</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/compact.html#post--db-_compact">POST /{db}/_compact</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$db-&gt;compact(%options)</td></tr>
+  <tr><td class="descr"><p>Starts a compaction for the database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/compact.html#post--db-_compact-ddoc">POST /{db}/_compact/{ddoc}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;compact(%options)</td></tr>
+  <tr><td class="descr"><p>Starts a compaction for all the views in the selected design document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/common.html#copy--db-_design-ddoc">COPY /{db}/_design/{ddoc}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$ddoc-&gt;cloneInto($doc, %options)</td></tr>
+  <tr><td class="descr"><p>Copies the design document</p></td>
+      <td class="status">DONE</td>
+      <td class="use">$ddoc-&gt;appendTo($doc, %options)</td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/common.html#delete--db-_design-ddoc">DELETE /{db}/_design/{ddoc}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$ddoc-&gt;delete(%options)</td></tr>
+  <tr><td class="descr"><p>Deletes the design document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/common.html#get--db-_design-ddoc">GET /{db}/_design/{ddoc}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$ddoc-&gt;get(%options)</td></tr>
+  <tr><td class="descr"><p>Returns the design document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/common.html#head--db-_design-ddoc">HEAD /{db}/_design/{ddoc}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$ddoc-&gt;exists(%option)</td></tr>
+  <tr><td class="descr"><p>Returns bare information in the HTTP Headers for the design document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/common.html#put--db-_design-ddoc">PUT /{db}/_design/{ddoc}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$ddoc-&gt;update(\%data, %options)</td></tr>
+  <tr><td class="descr"><p>Creates a new design document or new version of an existing one</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/common.html#get--db-_design-ddoc-_info">GET /{db}/_design/{ddoc}/_info</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;details(%options)</td></tr>
+  <tr><td class="descr"><p>Returns view index information for the specified design document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/render.html#get--db-_design-ddoc-_list-func-other-ddoc-view">GET /{db}/_design/{ddoc}/_list/{func}/{other-ddoc}/{view}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;list($function, $view, %options)</td></tr>
+  <tr><td class="descr"><p>Executes a list function against the view from other design document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/render.html#post--db-_design-ddoc-_list-func-other-ddoc-view">POST /{db}/_design/{ddoc}/_list/{func}/{other-ddoc}/{view}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;list($function, $view, %options)</td></tr>
+  <tr><td class="descr"><p>Same as GET method for the related endpoint</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/render.html#get--db-_design-ddoc-_list-func-view">GET /{db}/_design/{ddoc}/_list/{func}/{view}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;list($function, $view, %options)</td></tr>
+  <tr><td class="descr"><p>Executes a list function against the view from the same design document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/render.html#post--db-_design-ddoc-_list-func-view">POST /{db}/_design/{ddoc}/_list/{func}/{view}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;list($function, $view, %options)</td></tr>
+  <tr><td class="descr"><p>Same as GET method for the related endpoint</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/rewrites.html#any--db-_design-ddoc-_rewrite-path">ANY /{db}/_design/{ddoc}/_rewrite/{path}</a></td>
+      <td class="status">UNSUPPORTED</td>
+      <td class="use"></td></tr>
+  <tr><td class="descr"><p>Rewrites HTTP request for the specified path by using stored array of routing rules or JavaScript function</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/search.html#get--db-_design-ddoc-_search-index">GET /{db}/_design/{ddoc}/_search/{index}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;indexFind($index, %options)</td></tr>
+  <tr><td class="descr"><p>Returns results for the specified search index</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/search.html#get--db-_design-ddoc-_search_info-index">GET /{db}/_design/{ddoc}/_search_info/{index}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;indexDetails($index, %options)</td></tr>
+  <tr><td class="descr"><p>Returns metadata for the specified search index</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/render.html#get--db-_design-ddoc-_show-func">GET /{db}/_design/{ddoc}/_show/{func}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;show($function, %options)</td></tr>
+  <tr><td class="descr"><p>Executes a show function against null document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/render.html#post--db-_design-ddoc-_show-func">POST /{db}/_design/{ddoc}/_show/{func}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;show($function, %options)</td></tr>
+  <tr><td class="descr"><p>Same as GET method for the related endpoint</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/render.html#get--db-_design-ddoc-_show-func-docid">GET /{db}/_design/{ddoc}/_show/{func}/{docid}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;show($function, %options)</td></tr>
+  <tr><td class="descr"><p>Executes a show function against the specified document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/render.html#post--db-_design-ddoc-_show-func-docid">POST /{db}/_design/{ddoc}/_show/{func}/{docid}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;show($function, %options)</td></tr>
+  <tr><td class="descr"><p>Same as GET method for the related endpoint</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/render.html#post--db-_design-ddoc-_update-func">POST /{db}/_design/{ddoc}/_update/{func}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;applyUpdate($function, %options)</td></tr>
+  <tr><td class="descr"><p>Executes an update function against the null document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/render.html#put--db-_design-ddoc-_update-func-docid">POST /{db}/_design/{ddoc}/_update/{func}/{docid}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;applyUpdate($function, %options)</td></tr>
+  <tr><td class="descr"><p>Executes an update function against the specified document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/views.html#get--db-_design-ddoc-_view-view">GET /{db}/_design/{ddoc}/_view/{view}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$ddoc-&gt;viewFind($view, %options)</td></tr>
+  <tr><td class="descr"><p>Returns results for the specified stored view</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/views.html#post--db-_design-ddoc-_view-view">POST /{db}/_design/{ddoc}/_view/{view}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;viewFind($view, %options)</td></tr>
+  <tr><td class="descr"><p>Returns results for the specified view</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/views.html#post--db-_design-ddoc-_view-view-queries">POST /{db}/_design/{ddoc}/_view/{view}/queries</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;viewFind($view, %options)</td></tr>
+  <tr><td class="descr"><p>Returns results for the specified queries</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/common.html#delete--db-_design-ddoc-attname">DELETE /{db}/_design/{ddoc}/{attname}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$ddoc-&gt;attDelete($name, %options)</td></tr>
+  <tr><td class="descr"><p>Deletes an attachment of a design document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/common.html#get--db-_design-ddoc-attname">GET /{db}/_design/{ddoc}/{attname}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$ddoc-&gt;attLoad($name, %options)</td></tr>
+  <tr><td class="descr"><p>Gets the attachment of a design document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/common.html#head--db-_design-ddoc-attname">HEAD /{db}/_design/{ddoc}/{attname}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$ddoc-&gt;attExists($name, %options)</td></tr>
+  <tr><td class="descr"><p>Returns bare information in the HTTP Headers for the attachment</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/ddoc/common.html#put--db-_design-ddoc-attname">PUT /{db}/_design/{ddoc}/{attname}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$ddoc-&gt;attSave($name, $data, %options)</td></tr>
+  <tr><td class="descr"><p>Adds an attachment of a design document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#get--db-_design_docs">GET /{db}/_design_docs</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;listDesigns()</td></tr>
+  <tr><td class="descr"><p>Returns a built-in view of all design documents in this database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#post--db-_design_docs">POST /{db}/_design_docs</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;listDesigns()</td></tr>
+  <tr><td class="descr"><p>Returns a built-in view of all design documents in this database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/compact.html#post--db-_ensure_full_commit">POST /{db}/_ensure_full_commit</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$db-&gt;ensureFullCommit(%options)</td></tr>
+  <tr><td class="descr"><p>Deprecated endpoint to support CouchDB versions < 3.0 replicators.</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/find.html#post--db-_explain">POST /{db}/_explain</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;findExplain(\%search, %options)</td></tr>
+  <tr><td class="descr"><p>Identify which index is being used by a particular query.</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/find.html#post--db-_find">POST /{db}/_find</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$db-&gt;find([\%search, %options])</td></tr>
+  <tr><td class="descr"><p>Find documents within a given database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/find.html#get--db-_index">GET /{db}/_index</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;listIndexes(%options)</td></tr>
+  <tr><td class="descr"><p>List all indexes.</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/find.html#post--db-_index">POST /{db}/_index</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;createIndex(\%filter, %options)</td></tr>
+  <tr><td class="descr"><p>Create a new index.</p></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;createIndex(\%filter, %options)</td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/find.html#delete--db-_index-designdoc-json-name">DELETE /{db}/_index/{designdoc}/json/{name}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;deleteIndex($index, %options)</td></tr>
+  <tr><td class="descr"><p>Delete an index</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/local.html#copy--db-_local-docid">COPY /{db}/_local/{docid}</a></td>
+      <td class="status">PARTIAL</td>
+      <td class="use">$doc-&gt;cloneInto($doc, %options)</td></tr>
+  <tr><td class="descr"><p>Copies the local document within the same database</p></td>
+      <td class="status">PARTIAL</td>
+      <td class="use">$doc-&gt;appendTo($doc, %options)</td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/local.html#delete--db-_local-docid">DELETE /{db}/_local/{docid}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$doc-&gt;delete(%options)</td></tr>
+  <tr><td class="descr"><p>Deletes the local document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/local.html#get--db-_local-docid">GET /{db}/_local/{docid}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$doc-&gt;get(%options)</td></tr>
+  <tr><td class="descr"><p>Returns the latest revision of the local document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/local.html#put--db-_local-docid">PUT /{db}/_local/{docid}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$doc-&gt;update(\%data, %options)</td></tr>
+  <tr><td class="descr"><p>Inserts a new version of the local document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/local.html#get--db-_local_docs">GET /{db}/_local_docs</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;listDocuments(%options)</td></tr>
+  <tr><td class="descr"><p>Returns a built-in view of all local (non-replicating) documents in this database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/local.html#post--db-_local_docs">POST /{db}/_local_docs</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;listDocuments(%options)</td></tr>
+  <tr><td class="descr"><p>Returns a built-in view of all local (non-replicating) documents in this database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/misc.html#post--db-_missing_revs">POST /{db}/_missing_revs</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;revisionsMissing(\%plan, %options)</td></tr>
+  <tr><td class="descr"><p>By given list of document revisions returns the document revisions that do not exist in the database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/partitioned-dbs.html#post--db-_partition-partition_id-_explain">POST /{db}/_partition/{partition_id}/_explain</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;findExplain(\%search, %options)</td></tr>
+  <tr><td class="descr"><p>Find index that is used with a query</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/partitioned-dbs.html#post--db-_partition-partition_id-_find">POST /{db}/_partition/{partition_id}/_find</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;find([\%search, %options])</td></tr>
+  <tr><td class="descr"><p>Query the partition specified by ``partition_id``</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/partitioned-dbs.html#get--db-_partition-partition">GET /{db}/_partition/{partition}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;details(%options)</td></tr>
+  <tr><td class="descr"><p>Returns document and size info for the given partition</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/partitioned-dbs.html#get--db-_partition-partition-_all_docs">GET /{db}/_partition/{partition}/_all_docs</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;listDocuments(%options)</td></tr>
+  <tr><td class="descr"><p>Return all docs in the specified partition</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/partitioned-dbs.html#get--db-_partition-partition-_design-ddoc-_view-view">GET /{db}/_partition/{partition}/_design/{ddoc}/_view/{view}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$ddoc-&gt;viewFind($view, %options)</td></tr>
+  <tr><td class="descr"><p>Execute a partitioned query</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/misc.html#post--db-_purge">POST /{db}/_purge</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;purgeDocuments(\%plan, %options)</td></tr>
+  <tr><td class="descr"><p>Purges documents entirely from database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/misc.html#get--db-_purged_infos_limit">GET /{db}/_purged_infos_limit</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;purgeRecordsLimit(%options)</td></tr>
+  <tr><td class="descr"><p>Returns the limit of historical purges to store in the database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/misc.html#put--db-_purged_infos_limit">PUT /{db}/_purged_infos_limit</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;purgeRecordsLimitSet($limit, %options)</td></tr>
+  <tr><td class="descr"><p>Sets the limit of historical purges to store in the database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/misc.html#post--db-_revs_diff">POST /{db}/_revs_diff</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;revisionsDiff(\%plan, %options)</td></tr>
+  <tr><td class="descr"><p>By given list of document revisions returns differences between the given revisions and ones that are in the database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/misc.html#get--db-_revs_limit">GET /{db}/_revs_limit</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;revisionLimit(%options)</td></tr>
+  <tr><td class="descr"><p>Returns the limit of historical revisions to store for a single document in the database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/misc.html#put--db-_revs_limit">PUT /{db}/_revs_limit</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;revisionLimitSet($limit, %options)</td></tr>
+  <tr><td class="descr"><p>Sets the limit of historical revisions to store for a single document in the database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/security.html#get--db-_security">GET /{db}/_security</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$db-&gt;userRoles(%options)</td></tr>
+  <tr><td class="descr"><p>Returns the special security object for the database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/security.html#put--db-_security">PUT /{db}/_security</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;userRolesChange(%options)</td></tr>
+  <tr><td class="descr"><p>Sets the special security object for the database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/shard.html#get--db-_shards">GET /{db}/_shards</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$cluster-&gt;shardsForDB($db, %options)</td></tr>
+  <tr><td class="descr"><p>Displays the shard map layout of a database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/shard.html#get--db-_shards-docid">GET /{db}/_shards/{docid}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$cluster-&gt;shardsForDoc($doc, %options)</td></tr>
+  <tr><td class="descr"><p>Returns the specific shard in which a document is stored</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/shard.html#post--db-_sync_shards">POST /{db}/_sync_shards</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$cluster-&gt;syncShards($db, %options)</td></tr>
+  <tr><td class="descr"><p>Trigger a synchronization of all shard replicas in the database</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/database/compact.html#post--db-_view_cleanup">POST /{db}/_view_cleanup</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$db-&gt;purgeUnusedViews(%options)</td></tr>
+  <tr><td class="descr"><p>Removes view files that are not used by any design document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/document/common.html#copy--db-docid">COPY /{db}/{docid}</a></td>
+      <td class="status">PARTIAL</td>
+      <td class="use">$doc-&gt;cloneInto($doc, %options)</td></tr>
+  <tr><td class="descr"><p>Copies the document within the same database</p></td>
+      <td class="status">PARTIAL</td>
+      <td class="use">$doc-&gt;appendTo($doc, %options)</td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/document/common.html#delete--db-docid">DELETE /{db}/{docid}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$doc-&gt;delete(%options)</td></tr>
+  <tr><td class="descr"><p>Deletes the document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/document/common.html#get--db-docid">GET /{db}/{docid}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$doc-&gt;get(%options)</td></tr>
+  <tr><td class="descr"><p>Returns the document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/document/common.html#head--db-docid">HEAD /{db}/{docid}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$doc-&gt;exists(%option)</td></tr>
+  <tr><td class="descr"><p>Returns bare information in the HTTP Headers for the document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/document/common.html#put--db-docid">PUT /{db}/{docid}</a></td>
+      <td class="status">DONE</td>
+      <td class="use">$doc-&gt;update(\%data, %options)</td></tr>
+  <tr><td class="descr"><p>Creates a new document or new version of an existing document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/document/attachments.html#delete--db-docid-attname">DELETE /{db}/{docid}/{attname}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$doc-&gt;attDelete($name, %options)</td></tr>
+  <tr><td class="descr"><p>Deletes an attachment of a document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/document/attachments.html#get--db-docid-attname">GET /{db}/{docid}/{attname}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$doc-&gt;attLoad($name, %options)</td></tr>
+  <tr><td class="descr"><p>Gets the attachment of a document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/document/attachments.html#head--db-docid-attname">HEAD /{db}/{docid}/{attname}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$doc-&gt;attExists($name, %options)</td></tr>
+  <tr><td class="descr"><p>Returns bare information in the HTTP Headers for the attachment</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  <tr class="first">
+      <td class="api"><a href="https://docs.couchdb.org/en/stable/api/document/attachments.html#put--db-docid-attname">PUT /{db}/{docid}/{attname}</a></td>
+      <td class="status">UNTESTED</td>
+      <td class="use">$doc-&gt;attSave($name, $data, %options)</td></tr>
+  <tr><td class="descr"><p>Adds an attachment of a document</p></td>
+      <td class="status"></td>
+      <td class="use"></td></tr>
+  </table>
+</body>
+</html>

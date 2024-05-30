@@ -5,27 +5,30 @@ use Data::HTML::Element::A;
 use English;
 use Error::Pure::Utils qw(clean);
 use Tags::HTML::Element::A;
+use Tags::Output::Structure;
 use Test::More 'tests' => 7;
 use Test::NoWarnings;
-use Tags::Output::Raw;
 
 # Test.
-my $tags = Tags::Output::Raw->new;
+my $tags = Tags::Output::Structure->new;
 my $obj = Tags::HTML::Element::A->new(
 	'tags' => $tags,
 );
 my $anchor = Data::HTML::Element::A->new;
 $obj->init($anchor);
 $obj->process;
-my $ret = $tags->flush(1);
-my $right_ret = <<'END';
-<a></a>
-END
-chomp $right_ret;
-is($ret, $right_ret, "A defaults.");
+my $ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['b', 'a'],
+		['e', 'a'],
+	],
+	'Get Tags code (default).',
+);
 
 # Test.
-$tags = Tags::Output::Raw->new;
+$tags = Tags::Output::Structure->new;
 $obj = Tags::HTML::Element::A->new(
 	'tags' => $tags,
 );
@@ -37,15 +40,22 @@ $anchor = Data::HTML::Element::A->new(
 );
 $obj->init($anchor);
 $obj->process;
-$ret = $tags->flush(1);
-$right_ret = <<'END';
-<a class="foo" id="one" target="_blank">Link</a>
-END
-chomp $right_ret;
-is($ret, $right_ret, "A with CSS class, id and target.");
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['b', 'a'],
+		['a', 'class', 'foo'],
+		['a', 'id', 'one'],
+		['a', 'target', '_blank'],
+		['d', 'Link'],
+		['e', 'a'],
+	],
+	'Get Tags code (with CSS class, id, target and data).',
+);
 
 # Test.
-$tags = Tags::Output::Raw->new;
+$tags = Tags::Output::Structure->new;
 $obj = Tags::HTML::Element::A->new(
 	'tags' => $tags,
 );
@@ -55,15 +65,20 @@ $anchor = Data::HTML::Element::A->new(
 );
 $obj->init($anchor);
 $obj->process;
-$ret = $tags->flush(1);
-$right_ret = <<'END';
-<a href="https://example.com">Link</a>
-END
-chomp $right_ret;
-is($ret, $right_ret, "A with href and content.");
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['b', 'a'],
+		['a', 'href', 'https://example.com'],
+		['d', 'Link'],
+		['e', 'a'],
+	],
+	'Get Tags code (with href and data).',
+);
 
 # Test.
-$tags = Tags::Output::Raw->new;
+$tags = Tags::Output::Structure->new;
 $obj = Tags::HTML::Element::A->new(
 	'tags' => $tags,
 );
@@ -74,22 +89,32 @@ $anchor = Data::HTML::Element::A->new(
 );
 $obj->init($anchor);
 $obj->process;
-$ret = $tags->flush(1);
-$right_ret = <<'END';
-<a href="https://example.com"><span>Link</span></a>
-END
-chomp $right_ret;
-is($ret, $right_ret, "A with href and Tags content.");
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['b', 'a'],
+		['a', 'href', 'https://example.com'],
+		['b', 'span'],
+		['d', 'Link'],
+		['e', 'span'],
+		['e', 'a'],
+	],
+	'Get Tags code (with href and Tags data).',
+);
 
 # Test.
-$tags = Tags::Output::Raw->new;
+$tags = Tags::Output::Structure->new;
 $obj = Tags::HTML::Element::A->new(
 	'tags' => $tags,
 );
 $obj->process;
-$ret = $tags->flush(1);
-$right_ret = '';
-is($ret, $right_ret, "Without initialization.");
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[],
+	'Without initialization.',
+);
 
 # Test.
 $obj = Tags::HTML::Element::A->new;

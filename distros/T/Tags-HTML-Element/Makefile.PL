@@ -25,7 +25,6 @@ requires 'Tags::HTML' => 0.06;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Tags-HTML-Element/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Tags-HTML-Element';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Tags-HTML-Element';
-test_requires 'CSS::Struct::Output::Indent' => 0;
 test_requires 'CSS::Struct::Output::Structure' => 0.03;
 test_requires 'Data::HTML::Element::Button' => 0.10;
 test_requires 'Data::HTML::Element::Form' => 0.10;
@@ -34,13 +33,12 @@ test_requires 'Data::HTML::Element::Select' => 0.14;
 test_requires 'Data::HTML::Element::Textarea' => 0.10;
 test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0;
-test_requires 'Tags::Output::Raw' => 0;
 test_requires 'Tags::Output::Structure' => 0;
 test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.12';
+version '0.14';
 
 # Run.
 WriteAll();

@@ -1,0 +1,8 @@
+
+===== ChangeLog of distribution Couch-DB
+	  All code was made by Mark Overmeer.
+	  Attributes refer to people who made contributions in ideas and bug-reports.
+
+version 0.001: Wed 29 May 18:19:12 CEST 2024
+
+	- initial release, interface complete but mainly untested.

@@ -1,0 +1,186 @@
+=encoding utf8
+
+=head1 NAME
+
+Couch::DB::Cluster - interface for cluster management
+
+=head1 SYNOPSIS
+
+  my $cluster = $couchdb->cluster;
+
+=head1 DESCRIPTION
+
+This modules groups all CouchDB API calls which relate to clustering,
+replication, sharind, and related jobs.  There are too many related
+methods, so they got their own module.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Couch::DB::Cluster-E<gt>B<new>(%options)
+
+ -Option--Default
+  couch   <required>
+
+=over 2
+
+=item couch => C<Couch::DB>-object
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<couch>()
+
+=back
+
+=head2 Managing a Cluster
+
+B<All CouchDB API calls> documented below, support %options like C<_delay>
+and C<on_error>.  See L<Couch::DB/Using the CouchDB API>.
+
+=over 4
+
+=item $obj-E<gt>B<clusterSetup>(%options)
+
+ [CouchDB API "POST /_cluster_setup", since 2.0, UNTESTED]
+Describes the status of this CouchDB instance is in the cluster.
+
+All %options are posted as parameters.  See the API docs.
+
+=item $obj-E<gt>B<clusterState>(%options)
+
+ [CouchDB API "GET /_cluster_setup", since 2.0, UNTESTED]
+Describes the status of this CouchDB instance is in the cluster.
+
+Option C<ensure_dbs_exist>.
+
+=back
+
+=head2 Sharding
+
+=over 4
+
+=item $obj-E<gt>B<reshardCreate>(%options)
+
+ [CouchDB API "POST /_reshard/jobs", since 2.4, UNTESTED]
+Create resharding jobs.
+
+The many %options are passed as parameters.
+
+=item $obj-E<gt>B<reshardJob>($jobid, %options)
+
+ [CouchDB API "GET /_reshard/jobs/{jobid}", since 2.4, UNTESTED]
+Show the resharding activity.
+
+=item $obj-E<gt>B<reshardJobChange>($jobid, %options)
+
+ [CouchDB API "PUT /_reshard/jobs/{jobid}/state", since 2.4, UNTESTED]
+Change the resharding job status.
+
+ -Option--Default
+  reason  undef
+  state   <required>
+
+=over 2
+
+=item reason => STRING
+
+=item state => STRING
+
+Can be C<new>, C<running>, C<stopped>, C<completed>, or C<failed>.
+
+=back
+
+=item $obj-E<gt>B<reshardJobRemove>($jobid, %options)
+
+ [CouchDB API "DELETE /_reshard/jobs/{jobid}", since 2.4, UNTESTED]
+Show the resharding activity.
+
+=item $obj-E<gt>B<reshardJobState>($jobid, %options)
+
+ [CouchDB API "GET /_reshard/jobs/{jobid}/state", since 2.4, UNTESTED]
+Show the resharding job status.
+
+=item $obj-E<gt>B<reshardJobs>(%options)
+
+ [CouchDB API "GET /_reshard/jobs", since 2.4, UNTESTED]
+Show the resharding activity.
+
+=item $obj-E<gt>B<reshardStatus>(%options)
+
+ [CouchDB API "GET /_reshard", since 2.4, UNTESTED] and
+ [CouchDB API "GET /_reshard/state", since 2.4, UNTESTED]
+
+ -Option--Default
+  counts  false
+
+=over 2
+
+=item counts => BOOLEAN
+
+Include the job counts in the result.
+
+=back
+
+=item $obj-E<gt>B<resharding>(%options)
+
+ [CouchDB API "PUT /_reshard/state", since 2.4, UNTESTED]
+Start or stop the resharding process.
+
+ -Option--Default
+  reason  undef
+  state   <required>
+
+=over 2
+
+=item reason => STRING
+
+=item state => STRING
+
+Can be C<stopped> or C<running>.  Stopped state can be resumed into running.
+
+=back
+
+=item $obj-E<gt>B<shardsForDB>($db, %options)
+
+ [CouchDB API "GET /{db}/_shards", since 2.0, UNTESTED]
+Returns the structure of the shared used to store a database.  Pass this
+a $db as M<Couch::DB::Database=object.
+
+=item $obj-E<gt>B<shardsForDoc>($doc, %options)
+
+ [CouchDB API "GET /{db}/_shards/{docid}", since 2.0, UNTESTED]
+Returns the structure of the shared used to store a database.  Pass this
+a $db as L<Couch::DB::Database|Couch::DB::Database>-object.
+
+=item $obj-E<gt>B<syncShards>($db, %options)
+
+ [CouchDB API "POST /{db}/_sync_shards", since 2.3.1, UNTESTED]
+Force (re-)sharding of documents, usually in response to changes in the setup.
+Pass this a $db as L<Couch::DB::Database|Couch::DB::Database>-object.
+
+=back
+
+=head2 Other
+
+=head1 SEE ALSO
+
+This module is part of Couch-DB distribution version 0.001,
+built on May 29, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2024 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

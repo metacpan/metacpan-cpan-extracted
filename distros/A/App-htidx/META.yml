@@ -1,0 +1,36 @@
+---
+abstract: 'generate static HTML directory listings.'
+author:
+  - 'Gavin Brown <gavin.brown@fastmail.uk>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-htidx
+requires:
+  Carp: '0'
+  Cwd: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  File::stat: '0'
+  HTML::Tiny: '0'
+  List::Util: '0'
+  POSIX: '0'
+  constant: '0'
+  feature: '0'
+  open: '0'
+  strict: '0'
+  utf8: '0'
+  vars: '0'
+  warnings: '0'
+version: '0.01'
+x_generated_by_perl: v5.34.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

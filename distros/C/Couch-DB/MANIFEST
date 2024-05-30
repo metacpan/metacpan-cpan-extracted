@@ -1,0 +1,29 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+README.pm
+bin/reference-table
+lib/Couch/DB.pm
+lib/Couch/DB.pod
+lib/Couch/DB/Client.pm
+lib/Couch/DB/Client.pod
+lib/Couch/DB/Cluster.pm
+lib/Couch/DB/Cluster.pod
+lib/Couch/DB/Database.pm
+lib/Couch/DB/Database.pod
+lib/Couch/DB/Document.pm
+lib/Couch/DB/Document.pod
+lib/Couch/DB/Mojolicious.pm
+lib/Couch/DB/Mojolicious.pod
+lib/Couch/DB/Node.pm
+lib/Couch/DB/Node.pod
+lib/Couch/DB/Result.pm
+lib/Couch/DB/Result.pod
+lib/Couch/DB/Util.pm
+lib/Couch/DB/Util.pod
+reference.html
+t/00use.t
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

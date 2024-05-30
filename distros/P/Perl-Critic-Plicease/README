@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.06
+    version 0.07
 
 DESCRIPTION
 
@@ -30,6 +30,8 @@ AUTHOR
     Contributors:
 
     Ville Skyttä (SCOP)
+
+    Yoshikazu Sawa (yoshikazusawa)
 
 COPYRIGHT AND LICENSE
 

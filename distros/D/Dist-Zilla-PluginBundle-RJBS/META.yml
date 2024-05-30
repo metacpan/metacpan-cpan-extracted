@@ -59,7 +59,7 @@ resources:
   bugtracker: https://github.com/rjbs/Dist-Zilla-PluginBundle-RJBS/issues
   homepage: https://github.com/rjbs/Dist-Zilla-PluginBundle-RJBS
   repository: https://github.com/rjbs/Dist-Zilla-PluginBundle-RJBS.git
-version: '5.029'
+version: '5.030'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -175,7 +175,7 @@ x_Dist_Zilla:
           version_by_branch: 1
           version_regexp: (?^:^([0-9]+\.[0-9]+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.44.0
+          git_version: 2.45.1
           repo_root: .
       name: '@RJBS/Git::NextVersion'
       version: '2.049'
@@ -331,7 +331,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.44.0
+          git_version: 2.45.1
           repo_root: .
       name: '@RJBS/@Git/Check'
       version: '2.049'
@@ -349,7 +349,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.44.0
+          git_version: 2.45.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -362,11 +362,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '5.029'
+          tag: '5.030'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.44.0
+          git_version: 2.45.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -380,7 +380,7 @@ x_Dist_Zilla:
             - 'github :'
           remotes_must_exist: 0
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.44.0
+          git_version: 2.45.1
           repo_root: .
       name: '@RJBS/@Git/Push'
       version: '2.049'
@@ -388,7 +388,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.44.0
+          git_version: 2.45.1
           include_authors: 0
           include_releaser: 1
           order_by: name

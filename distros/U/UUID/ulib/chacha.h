@@ -3,7 +3,7 @@
 
 #include "ulib/UUID.h"
 
-void cc_srand(pUCXT);
+void cc_srand(pUCXT, Pid_t pid);
 
 void cc_rand16(pUCXT, U16 *out);
 void cc_rand32(pUCXT, U32 *out);

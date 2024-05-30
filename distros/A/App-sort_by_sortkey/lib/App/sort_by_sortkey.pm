@@ -10,9 +10,9 @@ use AppBase::Sort::File ();
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-03-07'; # DATE
+our $DATE = '2024-05-15'; # DATE
 our $DIST = 'App-sort_by_sortkey'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -65,9 +65,12 @@ MARKDOWN
         AppBase::Sort::File::set_source_arg(\%oc_args);
         $oc_args{_gen_keygen} = sub {
             my $gc_args = shift;
-            Module::Load::Util::call_module_function_with_optional_args(
-                {ns_prefix=>"SortKey", function=>"gen_keygen"},
-                $gc_args->{sortkey_module});
+            (
+                Module::Load::Util::call_module_function_with_optional_args(
+                    {ns_prefix=>"SortKey", function=>"gen_keygen"},
+                    $gc_args->{sortkey_module}),                 # elem0: keygen
+                ($gc_args->{sortkey_module} =~ /\ANum::/ ? 1:0), # elem1: is_numeric?
+            );
         };
         AppBase::Sort::sort_appbase(%oc_args);
     },
@@ -88,7 +91,7 @@ App::sort_by_sortkey - Sort lines of text by a SortKey module
 
 =head1 VERSION
 
-This document describes version 0.001 of App::sort_by_sortkey (from Perl distribution App-sort_by_sortkey), released on 2024-03-07.
+This document describes version 0.002 of App::sort_by_sortkey (from Perl distribution App-sort_by_sortkey), released on 2024-05-15.
 
 =head1 FUNCTIONS
 

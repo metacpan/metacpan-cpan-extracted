@@ -1,5 +1,10 @@
 Revision history for Perl extension UUID.
 
+0.35 Wed May 29 14:40:34 EDT 2024
+  - Reworked persist file handling for speed.
+  - Reworked seeding for front-loading prefork processes.
+    - Thanks again to Christopher Rasch-Olsen Raa.
+
 0.34 Mon Apr 29 21:03:51 EDT 2024
   - Added version 3 and 5 UUIDs.
   - Added deferred persistence, default 0.001 seconds.

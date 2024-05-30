@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::workflower 5.029;
+package Dist::Zilla::App::Command::workflower 5.030;
 # ABSTRACT: install rjbs's usual GitHub Actions workflow
 
 use v5.34.0;
@@ -85,7 +85,7 @@ Dist::Zilla::App::Command::workflower - install rjbs's usual GitHub Actions work
 
 =head1 VERSION
 
-version 5.029
+version 5.030
 
 =head1 SYNOPSIS
 
@@ -208,7 +208,7 @@ jobs:
         run: |
           JUNIT_TEST_FILE="/tmp/test-output.xml" ALLOW_PASSING_TODOS=1 yath test --renderer=Formatter --renderer=JUnit -D
       - name: Publish test report
-        uses: mikepenz/action-junit-report@v3
+        uses: mikepenz/action-junit-report@v4
         if: always() # always run even if the previous step fails
         with:
           check_name: JUnit Report (${{ matrix.perl-version }})

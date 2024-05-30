@@ -5,27 +5,30 @@ use Data::HTML::Element::Option;
 use English;
 use Error::Pure::Utils qw(clean);
 use Tags::HTML::Element::Option;
+use Tags::Output::Structure;
 use Test::More 'tests' => 7;
 use Test::NoWarnings;
-use Tags::Output::Raw;
 
 # Test.
-my $tags = Tags::Output::Raw->new;
+my $tags = Tags::Output::Structure->new;
 my $option = Data::HTML::Element::Option->new;
 my $obj = Tags::HTML::Element::Option->new(
 	'tags' => $tags,
 );
 $obj->init($option);
 $obj->process;
-my $ret = $tags->flush(1);
-my $right_ret = <<'END';
-<option></option>
-END
-chomp $right_ret;
-is($ret, $right_ret, "Option defaults.");
+my $ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['b', 'option'],
+		['e', 'option'],
+	],
+	'Get Tags code (default).',
+);
 
 # Test.
-$tags = Tags::Output::Raw->new;
+$tags = Tags::Output::Structure->new;
 $option = Data::HTML::Element::Option->new(
 	'id' => 'one',
 	'data' => ['Option'],
@@ -35,15 +38,20 @@ $obj = Tags::HTML::Element::Option->new(
 );
 $obj->init($option);
 $obj->process;
-$ret = $tags->flush(1);
-$right_ret = <<'END';
-<option id="one">Option</option>
-END
-chomp $right_ret;
-is($ret, $right_ret, "Option (plain).");
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['b', 'option'],
+		['a', 'id', 'one'],
+		['d', 'Option'],
+		['e', 'option'],
+	],
+	'Get Tags code (with id and plain data).',
+);
 
 # Test.
-$tags = Tags::Output::Raw->new;
+$tags = Tags::Output::Structure->new;
 $option = Data::HTML::Element::Option->new(
 	'id' => 'one',
 	'data' => [['d', 'Option']],
@@ -54,15 +62,20 @@ $obj = Tags::HTML::Element::Option->new(
 );
 $obj->init($option);
 $obj->process;
-$ret = $tags->flush(1);
-$right_ret = <<'END';
-<option id="one">Option</option>
-END
-chomp $right_ret;
-is($ret, $right_ret, "Option (tags).");
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['b', 'option'],
+		['a', 'id', 'one'],
+		['d', 'Option'],
+		['e', 'option'],
+	],
+	'Get Tags code (with id and Tags data).',
+);
 
 # Test.
-$tags = Tags::Output::Raw->new;
+$tags = Tags::Output::Structure->new;
 $option = Data::HTML::Element::Option->new(
 	'id' => 'one',
 	'data' => [sub {
@@ -77,22 +90,30 @@ $obj = Tags::HTML::Element::Option->new(
 );
 $obj->init($option);
 $obj->process;
-$ret = $tags->flush(1);
-$right_ret = <<'END';
-<option id="one">Option</option>
-END
-chomp $right_ret;
-is($ret, $right_ret, "Option (callback).");
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['b', 'option'],
+		['a', 'id', 'one'],
+		['d', 'Option'],
+		['e', 'option'],
+	],
+	'Get Tags code (with id and callback data).',
+);
 
 # Test.
-$tags = Tags::Output::Raw->new;
+$tags = Tags::Output::Structure->new;
 $obj = Tags::HTML::Element::Option->new(
 	'tags' => $tags,
 );
 $obj->process;
-$ret = $tags->flush(1);
-$right_ret = '';
-is($ret, $right_ret, "Without initialization.");
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[],
+	'Get Tags code (without initialization).',
+);
 
 # Test.
 $obj = Tags::HTML::Element::Option->new;
@@ -101,4 +122,3 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'tags' isn't defined.\n", "Parameter 'tags' isn't defined.");
 clean();
-

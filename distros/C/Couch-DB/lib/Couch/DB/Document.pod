@@ -1,0 +1,327 @@
+=encoding utf8
+
+=head1 NAME
+
+Couch::DB::Document - one document as exchanged with a CouchDB server
+
+=head1 SYNOPSIS
+
+  my $doc = $couch->db($dbname)->doc($docid);
+  my $doc = $db->doc->create(\%data);
+  my $doc = $db->doc($id, local => 1);
+
+  my $content = $db->latest;
+
+=head1 DESCRIPTION
+
+This class manages one document, without understanding the payload.  When
+exchanging questions and answers with the server, keys which start with
+an underscore (C<_>) may get added and removed: they should not be visible
+in your data.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Couch::DB::Document-E<gt>B<new>(%options)
+
+ -Option--Default
+  batch   from database
+  db      undef
+  id      undef
+  local   false
+
+=over 2
+
+=item batch => BOOLEAN
+
+For all of the writes which support it, use batch (no wait) writing.  Of course,
+this may cause data to be lost when technical or logical issues emerge while the
+actual writing is done, but is much faster.
+
+=item db => L<Couch::DB::Database|Couch::DB::Database>-object
+
+If this document is database related.
+
+=item id => ID
+
+When you are creating a new document (L<create()|Couch::DB::Document/"Document in the database">), you may leave this open to get
+an id generated.  Otherwise, this parameter is required.
+
+=item local => BOOLEAN
+
+Use a local document: do not replicate it to other instances.  Only limited
+actions are permitted on local documents... probably they do not support
+attachments.
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<batch>()
+
+=item $obj-E<gt>B<couch>()
+
+=item $obj-E<gt>B<db>()
+
+=item $obj-E<gt>B<id>()
+
+=back
+
+=head2 Content
+
+B<Warning:> Where Perl does not support the same data-types as JSON, you need to
+be very careful when addressing fields from this structure.  B<Much better> is
+it to use the provided abstraction methods, which hide those differences.  Those
+also hide changes in the server software, over time.
+
+=over 4
+
+=item $obj-E<gt>B<isDeleted>()
+
+Returns a boolean whether the document is delete.
+
+=item $obj-E<gt>B<isLocal>()
+
+This documents does not get replicated over nodes.
+
+=item $obj-E<gt>B<latest>()
+
+Returns the data of the latest revision of the document, as retreived
+by any former call on this document object.
+
+=item $obj-E<gt>B<rev>()
+
+The latest revision of this document.
+
+=item $obj-E<gt>B<revision>($rev)
+
+Returns the data for document revision $rev, if retreived by a former
+call.
+
+=item $obj-E<gt>B<revisions>()
+
+Returns a sorted list of all known revisions, as retreived by a former
+call.  They are sorted, newest first.
+
+=back
+
+=head2 Document details
+
+These methods usually require a L<get()|Couch::DB::Document/"Document in the database"> with sufficient parameters to
+be useable (they die on unsuffient details).
+
+=over 4
+
+=item $obj-E<gt>B<conflicts>()
+
+Returns a LIST with conflict details.
+
+=item $obj-E<gt>B<deletedConflicts>()
+
+Returns a LIST with deletedConflict details.
+
+=item $obj-E<gt>B<revisionInfo>($revision)
+
+Returns a HASH with information about one $revision only.
+
+=item $obj-E<gt>B<revisionsInfo>()
+
+Returns a HASH with all revisions and their status.
+
+=item $obj-E<gt>B<updateSequence>()
+
+Returns the update sequence code for this document on the current server (local_seq).
+Only useful when you use an explicit C<_client> when you L<get()|Couch::DB::Document/"Document in the database"> the document.
+
+=back
+
+=head2 Document in the database
+
+B<All CouchDB API calls> documented below, support %options like C<_delay>
+and C<on_error>.  See L<Couch::DB/Using the CouchDB API>.
+
+=over 4
+
+=item $obj-E<gt>B<appendTo>($doc, %options)
+
+ [CouchDB API "COPY /{db}/{docid}", PARTIAL]
+ [CouchDB API "COPY /{db}/_local/{docid}", PARTIAL]
+See also L<cloneInto()|Couch::DB::Document/"Document in the database">.
+
+As %options: C<batch> and C<rev>.
+
+example: appending one document into an other
+
+   my $from = $db->doc('from');
+   $from->get or die;
+   my $to   = $db->doc('to');   # does not exist
+   $to->get or die;
+   $from->appendTo($to) or die;
+
+=item $obj-E<gt>B<cloneInto>($doc, %options)
+
+ [CouchDB API "COPY /{db}/{docid}", PARTIAL]
+ [CouchDB API "COPY /{db}/_local/{docid}", PARTIAL]
+See also L<appendTo()|Couch::DB::Document/"Document in the database">.
+
+As %options, C<batch> and C<rev>.
+
+example: cloning one document into a new one
+
+   my $from = $db->doc('from');
+   $from->get or die;
+   my $to   = $db->doc('to');   # does not exist
+   $from->cloneInto($to) or die;
+
+=item $obj-E<gt>B<create>(\%data, %options)
+
+ [CouchDB API "POST /{db}"]
+Save this document for the first time to the database. Your content of the
+document is in %data.  When you pick your own document ids, you can also use
+L<update()|Couch::DB::Document/"Document in the database"> for a first save.
+
+ -Option--Default
+  batch   new(batch)
+
+=over 2
+
+=item batch => BOOLEAN
+
+Do not wait for the write action to be completed.
+
+=back
+
+=item $obj-E<gt>B<delete>(%options)
+
+ [CouchDB API "DELETE /{db}/{docid}"]
+ [CouchDB API "DELETE /{db}/_local/{docid}"]
+Flag the document to be deleted.  A new revision is created, which reflects this.
+Only later, when all replications know it and compaction is run, the document
+versions will disappear.
+
+=item $obj-E<gt>B<exists>(%option)
+
+ [CouchDB API "HEAD /{db}/{docid}"]
+Check whether the document exists.  You may get some useful response headers.
+
+example: 
+
+  if($db->doc($id)->exists) { ... }
+
+=item $obj-E<gt>B<get>(%options)
+
+ [CouchDB API "GET /{db}/{docid}"]
+ [CouchDB API "GET /{db}/_local/{docid}"]
+Retrieve document data and information from the database.  There are a zillion
+of %options to collect additional meta-data.
+
+When no explicit revision (option C<rev>) is given, then the latest
+revision is collected.
+
+Returned is, as usual, whether the database gave a successful response. The data
+received will get merged into this object's attributes.
+
+example: use of get()
+
+  my $game = $db->doc('monopoly');
+  $game->get(latest => 1) or die;
+  my $data = $game->latest;
+
+=item $obj-E<gt>B<update>(\%data, %options)
+
+ [CouchDB API "PUT /{db}/{docid}"]
+ [CouchDB API "PUT /{db}/_local/{docid}"]
+Save a new revision of this document to the database.  If docid is new,
+then it will be created, otherwise a new revision is added.  Your content
+of the document is in %data.
+
+When you want to create a new document, where the servers creates the id, then
+use L<create()|Couch::DB::Document/"Document in the database">.
+
+ -Option--Default
+  batch   new(batch)
+
+=over 2
+
+=item batch => BOOLEAN
+
+Do not wait for the write action to be completed.
+
+=back
+
+=back
+
+=head2 Attachments
+
+=over 4
+
+=item $obj-E<gt>B<attDelete>($name, %options)
+
+ [CouchDB API "DELETE /{db}/{docid}/{attname}", UNTESTED]
+
+=item $obj-E<gt>B<attExists>($name, %options)
+
+ [CouchDB API "HEAD /{db}/{docid}/{attname}", UNTESTED]
+The response is empty, but contains some useful headers.
+
+=item $obj-E<gt>B<attInfo>($name)
+
+Return a structure with meta-data about the attachments.
+
+=item $obj-E<gt>B<attLoad>($name, %options)
+
+ [CouchDB API "GET /{db}/{docid}/{attname}", UNTESTED]
+Load the data of the attachment into this Document.
+
+If the content-type of the attachment is C<application/octet-stream>,
+then you can use the C<Accept-Ranges> header (option C<_header>) to
+select bytes inside the attachement.
+
+=item $obj-E<gt>B<attSave>($name, $data, %options)
+
+ [CouchDB API "PUT /{db}/{docid}/{attname}", UNTESTED]
+
+The data is bytes.
+
+ -Option--Default
+  type    application/octet-stream
+
+=over 2
+
+=item type => IANA-MediaType
+
+For text documents, this may contain a charset like C<text/plain; charset="utf-8">.
+
+=back
+
+=item $obj-E<gt>B<attachment>($name)
+
+Returns the bytes of the named attachment (of course, you need to
+get it first).
+
+=item $obj-E<gt>B<attachments>()
+
+Returns the names of all attachments.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Couch-DB distribution version 0.001,
+built on May 29, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2024 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

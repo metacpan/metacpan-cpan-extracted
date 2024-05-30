@@ -19,7 +19,7 @@ name: App-sort_by_sortkey
 provides:
   App::sort_by_sortkey:
     file: lib/App/sort_by_sortkey.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   AppBase::Sort: '0.004'
   AppBase::Sort::File: '0'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-sort_by_sortkey
   homepage: https://metacpan.org/release/App-sort_by_sortkey
   repository: git://github.com/perlancar/perl-App-sort_by_sortkey.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

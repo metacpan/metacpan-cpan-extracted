@@ -3,7 +3,8 @@ extern "C" {
 #endif
 
 #include "ulib/chacha.h"
-#include "xoshiro.h"
+#include "ulib/splitmix.h"
+#include "ulib/xoshiro.h"
 
 #ifdef __cplusplus
 }
@@ -166,18 +167,13 @@ static U32 cc_refill(pUCXT) {
   return cc->have;
 }
 
-static void cc_srandp(pUCXT, Pid_t pid) {
-  UCXT.cc.pid = pid;
-  cc_srand(aUCXT);
-}
-
-/* API */
-
-void cc_srand(pUCXT) {
+void cc_srand(pUCXT, Pid_t pid) {
   U64     d, n, *cp;
   UCHAR   data[40];
 
-  UCXT.cc.pid = getpid();
+  UCXT.cc.pid = pid;
+  sm_srand(aUCXT, pid);
+  xo_srand(aUCXT, pid);
 
   cp = (U64*)&data;
 
@@ -197,13 +193,15 @@ void cc_srand(pUCXT) {
     cc_rand64(aUCXT, &d);
 }
 
+/* API */
+
 void cc_rand16(pUCXT, U16 *out) {
   cc_st *cc = &UCXT.cc;
   UCHAR *ptr;
   Pid_t pid;
 
   if (cc->pid != (pid = getpid()))
-    cc_srandp(aUCXT, pid);
+    cc_srand(aUCXT, pid);
 
   if (cc->have < 2) cc_refill(aUCXT);
   ptr = cc->buf + CC_BUFSZ - cc->have;
@@ -218,7 +216,7 @@ void cc_rand32(pUCXT, U32 *out) {
   Pid_t pid;
 
   if (cc->pid != (pid = getpid()))
-    cc_srandp(aUCXT, pid);
+    cc_srand(aUCXT, pid);
 
   if (cc->have < 4) cc_refill(aUCXT);
   ptr = cc->buf + CC_BUFSZ - cc->have;
@@ -233,7 +231,7 @@ void cc_rand64(pUCXT, U64 *out) {
   Pid_t pid;
 
   if (cc->pid != (pid = getpid()))
-    cc_srandp(aUCXT, pid);
+    cc_srand(aUCXT, pid);
 
   if (cc->have < 8) cc_refill(aUCXT);
   ptr = cc->buf + CC_BUFSZ - cc->have;
@@ -249,7 +247,7 @@ void cc_rand128(pUCXT, void *out) {
   Pid_t pid;
 
   if (cc->pid != (pid = getpid()))
-    cc_srandp(aUCXT, pid);
+    cc_srand(aUCXT, pid);
 
   if (cc->have < 16) cc_refill(aUCXT);
   ptr = cc->buf + CC_BUFSZ - cc->have;

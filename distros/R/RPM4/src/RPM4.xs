@@ -2219,6 +2219,7 @@ Dep_evr(Dep)
     CHECK_RPMDS_IX(Dep);
     mXPUSHs(newSVpv(rpmdsEVR(Dep), 0));
 
+#ifndef RPM4_19_0
 int
 Dep_nopromote(Dep, sv_nopromote = NULL)
     rpmds Dep
@@ -2231,7 +2232,8 @@ Dep_nopromote(Dep, sv_nopromote = NULL)
     }
     OUTPUT:
     RETVAL
-    
+
+#endif
     
 int
 Dep_add(Dep, name,  sv_sense = NULL, sv_evr = NULL)
@@ -2349,6 +2351,7 @@ Files_init(Files)
 #endif
     rpmfiInit(Files, 0);
         
+#ifndef RPM4_19_0
 void
 Files_initdir(Files)
     rpmfi Files
@@ -2357,6 +2360,8 @@ Files_initdir(Files)
     PRINTF_CALL;
 #endif
     rpmfiInitD(Files, 0);
+
+#endif
 
 int
 Files_next(Files)
@@ -2376,7 +2381,8 @@ Files_hasnext(Files)
     RETVAL = rpmfiNext(Files) > -1;
     OUTPUT:
     RETVAL
-        
+
+#ifndef RPM4_19_0
 int
 Files_nextdir(Files)
     rpmfi Files
@@ -2387,6 +2393,8 @@ Files_nextdir(Files)
     RETVAL = rpmfiNextD(Files);
     OUTPUT:
     RETVAL
+
+#endif
 
 void
 Files_filename(Files)

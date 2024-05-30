@@ -1,12 +1,15 @@
 use ExtUtils::MakeMaker::CPANfile;
 use ExtUtils::Manifest;
 
-my $VERSION = '0.3.0';
+my $VERSION = '0.3.1';
 
 WriteMakefile(
     ABSTRACT          => 'Parse XDR (eXternal Data Representation) definitions into an AST (Abstract Syntax Tree)',
     AUTHOR            => 'Erik Huelsmann',
     LICENSE           => 'perl_5',
+    EXE_FILES         => [
+         'bin/xdr-parse'
+    ],
     META_MERGE        => {
         "meta-spec"      => { version => 2 },
         resources        => {

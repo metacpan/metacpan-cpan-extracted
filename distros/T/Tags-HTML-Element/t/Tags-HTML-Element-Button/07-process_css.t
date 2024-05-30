@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use CSS::Struct::Output::Indent;
+use CSS::Struct::Output::Structure;
 use Data::HTML::Element::Button;
 use English;
 use Error::Pure::Utils qw(clean);
@@ -10,34 +10,36 @@ use Test::More 'tests' => 6;
 use Test::NoWarnings;
 
 # Test.
-my $css = CSS::Struct::Output::Indent->new;
+my $css = CSS::Struct::Output::Structure->new;
 my $obj = Tags::HTML::Element::Button->new(
 	'css' => $css,
 );
 my $button = Data::HTML::Element::Button->new;
 $obj->init($button);
 $obj->process_css;
-my $ret = $css->flush(1);
-my $right_ret = <<'END';
-button {
-	width: 100%;
-	background-color: #4CAF50;
-	color: white;
-	padding: 14px 20px;
-	margin: 8px 0;
-	border: none;
-	border-radius: 4px;
-	cursor: pointer;
-}
-button:hover {
-	background-color: #45a049;
-}
-END
-chomp $right_ret;
-is($ret, $right_ret, "Button defaults.");
+my $ret_ar = $css->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['s', 'button'],
+		['d', 'width', '100%'],
+		['d', 'background-color', '#4CAF50'],
+		['d', 'color', 'white'],
+		['d', 'padding', '14px 20px'],
+		['d', 'margin', '8px 0'],
+		['d', 'border', 'none'],
+		['d', 'border-radius', '4px'],
+		['d', 'cursor', 'pointer'],
+		['e'],
+		['s', 'button:hover'],
+		['d', 'background-color', '#45a049'],
+		['e'],
+	],
+	'Get CSS::Struct code (defaults).',
+);
 
 # Test.
-$css = CSS::Struct::Output::Indent->new,;
+$css = CSS::Struct::Output::Structure->new;
 $obj = Tags::HTML::Element::Button->new(
 	'css' => $css,
 );
@@ -46,41 +48,46 @@ $button = Data::HTML::Element::Button->new(
 );
 $obj->init($button);
 $obj->process_css;
-$ret = $css->flush(1);
-$right_ret = <<'END';
-button.foo {
-	width: 100%;
-	background-color: #4CAF50;
-	color: white;
-	padding: 14px 20px;
-	margin: 8px 0;
-	border: none;
-	border-radius: 4px;
-	cursor: pointer;
-}
-button.foo:hover {
-	background-color: #45a049;
-}
-END
-chomp $right_ret;
-is($ret, $right_ret, "Button defaults (with CSS class).");
+$ret_ar = $css->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['s', 'button.foo'],
+		['d', 'width', '100%'],
+		['d', 'background-color', '#4CAF50'],
+		['d', 'color', 'white'],
+		['d', 'padding', '14px 20px'],
+		['d', 'margin', '8px 0'],
+		['d', 'border', 'none'],
+		['d', 'border-radius', '4px'],
+		['d', 'cursor', 'pointer'],
+		['e'],
+		['s', 'button.foo:hover'],
+		['d', 'background-color', '#45a049'],
+		['e'],
+	],
+	'Get CSS::Struct code (with CSS class).',
+);
 
 # Test.
 $obj = Tags::HTML::Element::Button->new(
 	'no_css' => 1,
 );
-$ret = $obj->process_css;
+my $ret = $obj->process_css;
 is($ret, undef, 'No css mode.');
 
 # Test.
-$css = CSS::Struct::Output::Indent->new;
+$css = CSS::Struct::Output::Structure->new;
 $obj = Tags::HTML::Element::Button->new(
 	'css' => $css,
 );
 $obj->process_css;
-$ret = $css->flush(1);
-$right_ret = '';
-is($ret, $right_ret, "Without initialization.");
+$ret_ar = $css->flush(1);
+is_deeply(
+	$ret_ar,
+	[],
+	'Get CSS::Struct code (without initialization).',
+);
 
 # Test.
 $obj = Tags::HTML::Element::Button->new;

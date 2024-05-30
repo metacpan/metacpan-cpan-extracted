@@ -1,0 +1,512 @@
+=encoding utf8
+
+=head1 NAME
+
+Couch::DB - CouchDB database client
+
+=head1 INHERITANCE
+
+ Couch::DB is extended by
+   Couch::DB::Mojolicious
+
+=head1 SYNOPSIS
+
+   use Couch::DB::Mojolicious ();
+   my $couch   = Couch::DB::Mojolicious->new(api => '3.3.3');
+   my $db      = $couch->db('my-db'); # Couch::DB::Database object
+   my $cluster = $couch->cluster;     # Couch::DB::Cluster object
+   my $client  = $couch->createClient(...);  # Couch::DB::Client
+
+=head1 DESCRIPTION
+
+When this module was written, there were already a large number of
+CouchDB implementations on CPAN.  Still, there was a need for one more.
+This implementation provides a B<thick interface>: a far higher level
+of abstraction than the other modules. This should make your work much,
+much easier.
+
+B<Please read> the L</DETAILS> section, further down, at least once
+before you start!
+
+=head2 Early adopters
+
+B<Be warned> that this module is really new.  The 127 different endpoints
+that the CouchDB 3.3.3 API defines, are grouped and combined.  The result
+is often not tested, and certainly not battle ready.
+
+B<Please help> me fix issues by reporting them.  Bugs will be solved within
+a day.  Please, contribute useful ideas to make the use of the module lighter.
+Together, we can make the quality grow fast.
+
+=head2 Integration with your framework
+
+You need to instantiate an extensions of this class.  At the moment,
+you can pick from:
+
+=over 4
+
+=item * L<Couch::DB::Mojolicious|Couch::DB::Mojolicious>
+
+Implements the client using the Mojolicious framework, using Mojo::URL,
+Mojo::UserAgent, Mojo::IOLoop, and many other.
+
+=back
+
+Other extensions are hopefully added in the future.  Preferrably as part
+of this release so it gets maintained together.  The extensions are not
+too difficult to create and certainly quite small.
+
+=head2 Where can I find what?
+
+The CouchDB API lists all endpoints as URLs.  This library, however,
+creates an Object Oriented interface around these calls: you do not
+see the internals.  Knowing the CouchDB API, it is usually immediately
+clear where to find a certain end-point: C<< /{db} >> will be in
+L<Couch::DB::Database|Couch::DB::Database>.  A major exception is anything what has to
+do with replication and sharding: this is bundled in L<Couch::DB::Cluster|Couch::DB::Cluster>.
+
+Have a look at F<...index...>
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Couch::DB-E<gt>B<new>(%options)
+
+Create a relation with a CouchDB server(cluster).  You should use
+totally separated L<Couch::DB|Couch::DB>-objects for totally separate database
+clusters.  B<Note:> you can only instantiate extensions of this class.
+
+When you do not specify a C<server>-url, but have an environment variable
+C<PERL_COUCH_DB_SERVER>, then server url, username, and password are
+derived from it.
+
+ -Option  --Default
+  api       <required>
+  auth      'BASIC'
+  password  undef
+  server    "http://127.0.0.1:5984"
+  to_json   +{ }
+  to_perl   +{ }
+  to_query  +{ }
+  username  undef
+
+=over 2
+
+=item api => $version
+
+You have to specify the version of the server you expect to answer your
+queries.  L<Couch::DB|Couch::DB> tries to hide differences between your expectations
+and the reality.
+
+The $version can be a string or a version object (see "man version").
+
+=item auth => 'BASIC'|'COOKIE'
+
+Authentication method to be used by default for each client.
+
+=item password => STRING
+
+=item server => URL
+
+The default server to connect to, by URL.  See C<< etc/local.ini[chttpd] >>
+This server will be named 'local'.
+
+You can add more servers using L<addClient()|Couch::DB/"Server connections">.  In such case, you probably
+do not want this default client to be created as well.  To achieve this,
+explicitly set C<server =&gt; undef> here.
+
+=item to_json => HASH
+
+A table with converter name and CODE, to override/add the default PERL to JSON
+object conversions for sending structures.  See L<toJSON()|Couch::DB/"Conversions">.
+
+=item to_perl => HASH
+
+A table with converter name and CODE, to override/add the default JSON to PERL
+object conversions for L<Couch::DB::Result::values()|Couch::DB::Result/"When the document is collected">.  See L<toPerl()|Couch::DB/"Conversions"> and L<listToPerl()|Couch::DB/"Conversions">.
+
+=item to_query => HASH
+
+A table with converter name and CODE, to override/add the default PERL to URL
+QUERY conversions.  Defaults to the json converters.  See L<toQuery()|Couch::DB/"Conversions">.
+
+=item username => STRING
+
+When a C<username> is given, it will be used together with C<auth> and
+C<password> to login to any created client.
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<api>()
+
+Returns the interface version you expect the server runs, as a version
+object.  Differences between reality and expectations are mostly
+automatically resolved.
+
+=back
+
+=head2 Interface starting points
+
+=over 4
+
+=item $obj-E<gt>B<cluster>()
+
+Returns a L<Couch::DB::Cluster|Couch::DB::Cluster>-object, which organizes calls to
+manipulate replication, sharding, and related jobs.  This will always
+return the same object.
+
+=item $obj-E<gt>B<createClient>(%options)
+
+Create a client object which handles a server.  All options are passed
+to L<Couch::DB::Client|Couch::DB::Client>.  The C<couch> parameter is added for you.
+The client will also be added via L<addClient()|Couch::DB/"Server connections">, and is returned.
+
+It may be useful to create to clients to the same server: one with admin
+rights, and one without.  Or clients to different nodes, to create
+fail-over.
+
+=item $obj-E<gt>B<db>($name, %options)
+
+Define a dabase.  The database may not exist yet.  Calling this
+method does nothing with the CouchDB server.
+
+  my $db = $couch->db('authors');
+  $db->ping or $db->create(...);
+
+=item $obj-E<gt>B<node>($name)
+
+Returns a L<Couch::DB::Node|Couch::DB::Node>-object with the $name.  If the object does not
+exist yet, it gets created, otherwise reused.
+
+=item $obj-E<gt>B<searchAnalyse>(%options)
+
+ [CouchDB API "POST /_search_analyze", since 3.0, UNTESTED]
+Check what the build-in Lucene tokenizer(s) will do with your text.
+
+ -Option  --Default
+  analyzer  <required>
+  text      <required>
+
+=over 2
+
+=item analyzer => KIND
+
+=item text => STRING
+
+=back
+
+=back
+
+=head2 Server connections
+
+=over 4
+
+=item $obj-E<gt>B<addClient>($client)
+
+Add a L<Couch::DB::Client|Couch::DB::Client>-object to be used to contact the CouchDB
+cluster.  Returned is the couch object, so these calls are stackable.
+
+=item $obj-E<gt>B<call>($method, $path, %options)
+
+Call some couchDB server, to get work done.  This is the base for any
+interaction with the server.  You should not need to call this yourself,
+because module C<Couch::DB> is a complete implementation.
+
+ -Option   --Default
+  client     undef
+  clients    undef
+  delay      false
+  query      undef
+  send       undef
+  to_values  undef
+
+=over 2
+
+=item client => L<Couch::DB::Client|Couch::DB::Client>
+
+=item clients => ARRAY|$role
+
+Explicitly use only the specified clients (L<Couch::DB::Client|Couch::DB::Client>-objects)
+for the query.  When none are given, then all are used (in order of
+precedence).  When a $role (string) is provided, it is used to select
+a subset of the defined clients.
+
+=item delay => BOOLEAN
+
+ [PARTIAL]
+Do not execute the server call yet, but prepare it only in a way that
+it can be combined with other clients in parallel.
+See L<Couch::DB::Result|Couch::DB::Result> chapter L</DETAILS> about delayed requests.
+
+=item query => HASH
+
+Query parameters for the request.
+
+=item send => HASH
+
+The content to be sent with POST and PUT methods.
+in those cases, even when there is nothing to pass on, simply to be
+explicit about that.
+
+=item to_values => CODE
+
+A function (sub) which transforms the data of the CouchDB answer into useful Perl
+values and objects.  See L<Couch::DB::toPerl()|Couch::DB/"Conversions">.
+
+=back
+
+=item $obj-E<gt>B<client>($name)
+
+Returns the client with the specific $name (which defaults to the server's url).
+
+=item $obj-E<gt>B<clients>(%options)
+
+Returns a LIST with the defined clients; L<Couch::DB::Client|Couch::DB::Client>-objects.
+
+ -Option--Default
+  role    undef
+
+=over 2
+
+=item role => $role
+
+When defined, only return clients which are able to fulfill the
+specific $role.
+
+=back
+
+=back
+
+=head2 Conversions
+
+=over 4
+
+=item $obj-E<gt>B<check>($condition, $change, $version, $what)
+
+If the $condition it true (usually the existence of some parameter), then
+check whether api limitiations apply.
+
+Parameter $change is either C<removed>, C<introduced>, or C<deprecated> (as
+strings).  The C<version> is taken from the CouchDB API documentation.
+The $what describes the element, to be used in error or warning messages.
+
+=item $obj-E<gt>B<freshUUIDs>($count, %options)
+
+ [UNTESTED]
+Returns a $count number of UUIDs in a LIST.  This uses L<requestUUIDs()|Couch::DB/"Conversions"> to get
+a bunch at the same time, for efficiency.  You may get fewer than you want, but
+only when the server is not sending them.
+
+ -Option--Default
+  bulk    50
+
+=over 2
+
+=item bulk => INTEGER
+
+When there are not enough UUIDs in stock, in how large chuncks should we ask for
+more.
+
+=back
+
+=item $obj-E<gt>B<jsonText>($json, %options)
+
+Convert the (complex) $json structure into serialized JSON.  By default, it
+is beautified.
+
+ -Option --Default
+  compact  false
+
+=over 2
+
+=item compact => BOOLEAN
+
+=back
+
+=item $obj-E<gt>B<listToPerl>($set, $type, @data|\@data)
+
+Returns a LIST from all elements in the LIST @data or the ARRAY, each
+converted from JSON to pure Perl according to rule $type.
+
+=item $obj-E<gt>B<requestUUIDs>($count, %options)
+
+ [CouchDB API "GET /_uuids", since 2.0, UNTESTED]
+Returns UUIDs (Universally unique identifiers), when the call was
+successful.  Better use L<freshUUIDs()|Couch::DB/"Conversions">.  It is faster to use Perl
+modules to generate UUIDs.
+
+=item $obj-E<gt>B<toJSON>(\%data, $type, @keys)
+
+Convert the named fields in the %data into a JSON compatible format.
+Fields which do not exist are left alone.
+
+=item $obj-E<gt>B<toPerl>(\%data, $type, @keys)
+
+Convert all fields with @keys in the %data HASH into object
+of $type.  Fields which do not exist are ignored.
+
+As default JSON to Perl translations are currently defined:
+C<abs_uri>, C<epoch>, C<isotime>, C<mailtime>, C<version>, and
+C<node>.
+
+=item $obj-E<gt>B<toQuery>(\%data, $type, @keys)
+
+Convert the named fields in the %data HASH into a Query compatible
+format.  Fields which do not exist are left alone.
+
+=back
+
+=head1 DETAILS
+
+=head2 Thick interface
+
+The CouchDB client interface is based on HTTP.  It is really easy to
+create JSON, and then use a UserAgent to send it to the CouchDB server.
+All other CPAN modules which support CouchDB stick on this level of
+support; not C<Couch::DB>.
+
+When your library is very low-level, your program needs to put effort
+to create an abstraction around it itself.  In case the library offers
+that abstraction, you need to write much less code.
+
+The Perl programming language works with functions, methods, and
+objects, so why would your libary require you to play with URLs?
+So, C<Couch::DB> has the following extra features:
+
+=over 4
+
+=item *
+
+Calls have a functional name, and are grouped into objects: the
+endpoint URL processing is totally abstracted away;
+
+=item *
+
+Define multiple clients at the same time, for automatic fail-over,
+read, write, and permission separation, or parallellism;
+
+=item *
+
+Resolving differences between CouchDB-server instances.  You may
+even run different CouchDB versions on your nodes;
+
+=item *
+
+JSON-types do not match Perl's type concept: this module will
+convert boolean and integer parameters (and more) from Perl to
+JSON and back transparently;
+
+=item *
+
+Offer error handling and event processing on each call;
+
+=item *
+
+Event framework independent (currently only a Mojolicious connector).
+
+=back
+
+=head2 Using the CouchDB API
+
+All methods which are marked with C<< [CouchDB API] >> are, as the name
+says: client calls to some CouchDB server.  Often, this connects to a node
+on your local server, but you can also connect to other servers and even
+multiple servers.
+
+All these API methods return a L<Couch::DB::Result|Couch::DB::Result> object, which can tell
+you how the call worked, and the results.  The resulting object is overloaded
+boolean to produce C<false> in case of an error.  So typically:
+
+  my $couch  = Couch::DB::Mojolicious->new(version => '3.3.3');
+  my $result = $couch->requestUUIDs(100);
+  $result or die;
+
+  my $uuids  = $result->values->{uuids};
+
+This CouchDB library hides the fact that endpoint C</_uuids> has been called.
+It also hides the client (UserAgent) which was used to collect the data.
+
+=head3 Type conversions
+
+With the C<Couch::DB::Result::values()> method, conversions between JSON
+syntax and pure Perl are done.
+
+More importantly: this library also converts parameters from Perl space
+into JSON space.  POST and PUT parameters travel in JSON documents.
+In JSON, a boolean is C<true> and C<false> (without quotes).  In Perl,
+these are C<undef> and C<1> (and many alternatives).  For anything besides
+your own documents, C<Couch::DB> will totally hide these differences
+for you!
+
+=head3 Generic parameters
+
+Each method which is labeled C<< [CouchDB API] >> also accepts a few options
+which are controlling the calling progress.  They are available everywhere,
+hence no-where documented explicitly.  Those options start with an underscore (C<_>)
+or with C<on_> (events).
+
+At the moment, the following %options are supported:
+
+=over 4
+
+=item * C<_delay> BOOLEAN, default C<false>
+
+Do not perform and wait for the actual call, but prepare it to be used in parallel
+querying.  TO BE IMPLEMENTED/DOCUMENTED.
+
+=item * C<_client> $client-object or -name
+
+Use only the specified client (=server) to perform the call.
+
+=item * C<_clients> ARRAY-of-clients or a role
+
+Use any of the specified clients to perform the call.  When not an ARRAY, the
+parameter is a C<role>: select all clients which can perform that role (the
+logged-in user of that client is allowed to perform that task).
+
+=item * C<_headers> HASH
+
+Add headers to the request.  When applicable (for instance, the C<Accept>-header)
+this will overrule the internally calculated defaults.
+
+=back
+
+Besides, at the moment we support the following events:
+
+=over 4
+
+=item * on_error CODE or ARRAY-of-CODE
+
+A CODE (sub) which is called when the interaction with the server has been completed
+without success.  The CODE gets the result object as only parameter.
+
+=item * on_final CODE or ARRAY-of-CODE
+
+A CODE (sub) which is called when the interaction with the server has been completed.
+This may happen much later, when combined with C<_delay>.  The CODE gets the result
+object as only parameter.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Couch-DB distribution version 0.001,
+built on May 29, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2024 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

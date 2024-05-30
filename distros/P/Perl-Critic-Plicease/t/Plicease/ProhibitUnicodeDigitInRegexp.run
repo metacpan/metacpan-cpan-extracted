@@ -4,6 +4,12 @@
 
 /\d/;
 
+## name RexExpWithPosixDigitClass
+## failures 1
+## cut
+
+/[[:digit:]]/;
+
 ## name RexExpSubWithSlashD
 ## failures 1
 ## cut
@@ -18,11 +24,26 @@ use re '/a';
 
 /\d/;
 
+## name GlobalDoesntSaveYouAgain
+## failures 1
+## cut
+
+use re '/a';
+
+/[[:digit:]]/;
+
+
 ## name QuoteLikeRegexpWithSlashD
 ## failures 1
 ## cut
 
 qr/\d//;
+
+## name QuoteLikeRegexpWithPosixDigitClass
+## failures 1
+## cut
+
+qr/[[:digit:]]//;
 
 ## name RegExpWithDifferentDelim
 ## failures 3
@@ -31,6 +52,14 @@ qr/\d//;
 m{\d};
 s!\d!!;
 qr#\d#;
+
+## name RegExpWithDifferentDelim
+## failures 3
+## cut
+
+m{[[:digit:]]};
+s![[:digit:]]!!;
+qr#[[:digit:]]#;
 
 ## name Transliterate
 ## failures 0

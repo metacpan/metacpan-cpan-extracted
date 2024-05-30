@@ -1,0 +1,368 @@
+=encoding utf8
+
+=head1 NAME
+
+Couch::DB::Client - connect to a CouchDB node
+
+=head1 SYNOPSIS
+
+  my $client = Couch::DB::Client->new(couch => $couchdb, ...);
+  $couch->addClient($client);
+
+  my $client = $couch->createClient(...);  # same in one step
+
+  # Even simpler
+  my $couch  = Couch::DB::Mojolicious->new(server => ...);
+  my $client = $couchdb->client('local');   # default client
+
+=head1 DESCRIPTION
+
+Connect to a CouchDB-server which runs a CouchDB-node to host databases.  That
+node may be part of a cluster, which can be managed via L<Couch::DB::Cluster|Couch::DB::Cluster>
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Couch::DB::Client-E<gt>B<new>(%options)
+
+Create the client. Whether it works will show when the first call is made.
+You could try L<serverStatus()|Couch::DB::Client/"Server information"> on application startup.
+
+ -Option    --Default
+  auth        'BASIC'
+  couch       <required>
+  headers     <a few>
+  name        server
+  password    undef
+  server      <required>
+  user_agent  <required>
+  username    undef
+
+=over 2
+
+=item auth => 'BASIC'|'COOKIE'
+
+=item couch => L<Couch::DB|Couch::DB>-object
+
+=item headers => HASH
+
+Some headers are set by default, for instance the 'Accept' header.
+You can overrule them.  The defaults may change.
+
+With this option you can also provide proxy authentication headers, of the form
+C<X-Auth-CouchDB-*>.
+
+=item name => STRING
+
+A good symbolic name for the client may make it more readible.
+Defaults to the location of the server.
+
+=item password => STRING
+
+=item server => URL-object
+
+Pass a URL-object which fits the framework your choose.
+
+=item user_agent => UserAgent-Object
+
+Pass a UserAgent-object which fits the framework your choose.
+
+=item username => STRING
+
+When you specify a C<username>/C<password> here, then C<Basic>
+authentication will be used.  Otherwise, call C<login()> to
+use Cookies.
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<couch>()
+
+Returns the active L<Couch::DB|Couch::DB> object.
+
+=item $obj-E<gt>B<headers>()
+
+Returns a HASH with the default set of headers to be used when contacting
+this client.
+
+=item $obj-E<gt>B<name>()
+
+=item $obj-E<gt>B<server>()
+
+Returns the URL of the server which is addressed by this client.
+
+Which type of object is used, depends on the event framework.  For instance
+a Mojo::URL when using L<Couch::DB::Mojolicious|Couch::DB::Mojolicious>.
+
+=item $obj-E<gt>B<userAgent>()
+
+Returns the user-agent object which connects to the servers.
+
+Which type of object is used, depends on the event framework. for instance
+a Mojo::UserAgent when using L<Couch::DB::Mojolicious|Couch::DB::Mojolicious>.
+
+=back
+
+=head2 Session
+
+=over 4
+
+=item $obj-E<gt>B<hasRole>($role)
+
+ [UNTESTED]
+Return 'true' if (this user logged-in to the server with) this client can perform
+a certain role.
+
+B<It is often> preferred to try a certain action, and then check whether it
+results in a permission error.
+
+=item $obj-E<gt>B<login>(%options)
+
+ [CouchDB API "POST /_session", UNTESTED]
+Get a Cookie: Cookie authentication.
+
+B<TODO>: implement refreshing of the session.
+
+ -Option  --Default
+  next      undef
+  password  <required>
+  username  <required>
+
+=over 2
+
+=item next => URL
+
+When the login was successful, the UserAgent will get redirected to
+the indicated location.
+
+=item password => STRING
+
+=item username => STRING
+
+=back
+
+=item $obj-E<gt>B<logout>(%options)
+
+ [CouchDB API "DELETE /_session", UNTESTED]
+
+=item $obj-E<gt>B<roles>()
+
+ [UNTESTED]
+Returns a LIST of all roles this client can perform.
+
+=item $obj-E<gt>B<session>(%options)
+
+ [CouchDB API "GET /_session", UNTESTED]
+Returns information about the current session, like information about the
+user who is logged-in.  Part of the reply is the "userCtx" (user context)
+which displays the roles of this user, and its name.
+
+ -Option--Default
+  basic   undef
+
+=over 2
+
+=item basic => BOOLEAN
+
+=back
+
+=back
+
+=head2 Server information
+
+B<All CouchDB API calls> documented below, support %options like C<_delay>
+and C<on_error>.  See L<Couch::DB/Using the CouchDB API>.
+
+# These are only for web-interfaces
+# [CouchDB API "GET /favicon.ico", UNSUPPORTED]
+# [CouchDB API "GET /_utils", UNSUPPORTED]
+# [CouchDB API "GET /_utils/", UNSUPPORTED]
+
+=over 4
+
+=item $obj-E<gt>B<activeTasks>(%options)
+
+ [CouchDB API "GET /_active_tasks"]
+Query details about the (maintenance) tasks which are currently running in the
+connected server.  Returns a L<Couch::DB::Result|Couch::DB::Result> object.
+
+=item $obj-E<gt>B<clusterNodes>(%options)
+
+ [CouchDB API "GET /_membership", since 2.0, UNTESTED]
+List all known nodes, and those currently used for the cluster.
+
+=item $obj-E<gt>B<databaseInfo>(%options)
+
+ [CouchDB API "GET /_dbs_info", since 3.2]
+ [CouchDB API "POST /_dbs_info", since 2.2]
+Returns detailed information about the selected database keys, on the
+connected CouchDB instance.  Both the GET and POST alternatives produce
+the same structures.
+
+When both C<keys> and C<search> are missing, then all databases are
+reported.
+
+ -Option--Default
+  names   undef
+  search  undef
+
+=over 2
+
+=item names => ARRAY
+
+When you provide explicit database keys, then only those are displayed.
+The number of keys is limited by the C<max_db_number_for_dbs_info_req>
+configuration parameter, which defaults to 100.
+
+=item search => \%search
+
+Use the filter options described by L<databaseNames()|Couch::DB::Client/"Server information">.
+
+=back
+
+=item $obj-E<gt>B<databaseNames>(%options)
+
+ [CouchDB API "GET /_all_dbs"]
+Returns the selected database names as present on the connected CouchDB
+instance.
+
+ -Option--Default
+  search  undef
+
+=over 2
+
+=item search => \%search
+
+You can specify a name (=key) filter: specify a subset of names to be
+returned.
+
+=back
+
+=item $obj-E<gt>B<dbUpdates>()
+
+ [CouchDB API "GET /_db_updates", since 1.4, UNTESTED]
+Get a feed of database changes, mainly for debugging purposes.
+
+All %options are used as parameters: C<feed> (type),
+C<timeout> (milliseconds!, default 60_000),
+C<heartbeat> (milliseconds, default 60_000), C<since> (sequence ID).
+
+=item $obj-E<gt>B<node>()
+
+Returns the C<Couch::DB::Node> which is run by the connected CouchDB instance.
+This fact is cached.
+
+=item $obj-E<gt>B<nodeName>($name, %options)
+
+ [CouchDB API "GET /_node/{node-name}", UNTESTED]
+The only useful application is with the abstract name C<_local>, which will
+return you the name of the node represented by the CouchDB instance.
+
+=item $obj-E<gt>B<replicate>(%options)
+
+ [CouchDB API "POST /_replicate", UNTESTED]
+Configure replication: configure and stop.
+
+All %options are posted as parameters.
+
+=item $obj-E<gt>B<replicationDoc>($doc|$docid, %options)
+
+ [CouchDB API "GET /_scheduler/docs/{replicator_db}/{docid}", UNTESTED]
+
+ -Option--Default
+  dbname  _replicator
+
+=over 2
+
+=item dbname => NAME
+
+Pass a C<dbname> for the database which contains the replication information.
+
+=back
+
+=item $obj-E<gt>B<replicationDocs>(%options)
+
+ [CouchDB API "GET /_scheduler/docs", UNTESTED]
+ [CouchDB API "GET /_scheduler/docs/{replicator_db}", UNTESTED]
+
+ -Option--Default
+  dbname  _replicator
+
+=over 2
+
+=item dbname => NAME
+
+Pass a C<dbname> for the database which contains the replication information.
+
+=back
+
+=item $obj-E<gt>B<replicationJobs>(%options)
+
+ [CouchDB API "GET /_scheduler/jobs", UNTESTED]
+Returns information about current replication jobs (which preform tasks), on
+this CouchDB server instance.  The results are ordered by replication ID.
+
+The %options can be C<limit> and C<skip>.
+
+=item $obj-E<gt>B<serverInfo>(%options)
+
+ [CouchDB API "GET /"]
+Query details about the server this client is connected to.
+Returns a L<Couch::DB::Result|Couch::DB::Result> object.
+
+ -Option--Default
+  cached  'YES'
+
+=over 2
+
+=item cached => 'YES'|'NEVER'|'RETRY'|'PING'
+
+Reuse the results of the previous ping to the server?  This old request
+might have resulted in a connection error, so the cached data may continue
+to show an error while the problem has disappeared.  With C<RETRY>, the
+cached data will be used when the previous ping was successful.  When C<PING>,
+then the call will be made, but the old successfully retreived information will
+not be lost.
+
+=back
+
+=item $obj-E<gt>B<serverIsUp>()
+
+ [UNTESTED]
+Returns a true value when the server status is "ok".
+
+=item $obj-E<gt>B<serverStatus>()
+
+ [CouchDB API "GET /_up", since 2.0, UNTESTED]
+Probably you want to use L<serverIsUp()|Couch::DB::Client/"Server information">, because this reply contains little
+information.
+
+=item $obj-E<gt>B<version>()
+
+Returns the version of the server software, as version object.
+
+=back
+
+=head2 Other
+
+=head1 SEE ALSO
+
+This module is part of Couch-DB distribution version 0.001,
+built on May 29, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2024 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

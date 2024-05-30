@@ -1,0 +1,243 @@
+=encoding utf8
+
+=head1 NAME
+
+Couch::DB::Result - the reply of a CouchDB server call
+
+=head1 SYNOPSIS
+
+  # Any call to the CouchDB server result in this object.
+  my $result = $couch->call($method, $path, %call_options);
+
+  if($result->isReady) { ... }
+  unless($result)      { ... }   # same
+
+  my $doc = $result->doc;      # Couch::DB::Document
+
+  # It's not always needed to inspect the document
+  if($result->ok)      { ... }
+
+=head1 DESCRIPTION
+
+The result of a call has many faces: it can be a usage error, a server
+issue, empty, paged, or even delayed.  This Result object is able to
+handle them all.  B<Read the DETAILS chapter below, to understand them all.>
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Couch::DB::Result-E<gt>B<new>(%options)
+
+ -Option   --Default
+  couch      <required>
+  on_error   [ ]
+  on_final   [ ]
+  to_values  <keep data>
+
+=over 2
+
+=item couch => L<Couch::DB|Couch::DB>-object
+
+=item on_error => CODE|ARRAY
+
+Called each time when the result CODE changes to be "not a success".
+
+=item on_final => CODE|ARRAY
+
+Called when the Result object has either an error or an success.
+
+=item to_values => CODE
+
+Provide a sub which translates incoming JSON data from the server, into
+pure perl.
+
+=back
+
+=back
+
+=head2 Accessors
+
+Generic accessors, not related to the Result content.
+
+=over 4
+
+=item $obj-E<gt>B<code>()
+
+Returns an HTTP status code (please use HTTP::Status), which reflects
+the condition of the answer.
+
+=item $obj-E<gt>B<codeName>( [$code] )
+
+Return a string which represents the code.  For instance, code 200 will
+produce string "HTTP_OK".
+
+See CouchDB API section 1.1.4: "HTTP Status Codes" for the interpretation
+of the codes.
+
+=item $obj-E<gt>B<couch>()
+
+=item $obj-E<gt>B<isDelayed>()
+
+=item $obj-E<gt>B<isReady>()
+
+=item $obj-E<gt>B<message>()
+
+Returns C<undef>, or a message (string) which explains why the status
+is as it is.
+
+=back
+
+=head2 When the document is collected
+
+=over 4
+
+=item $obj-E<gt>B<answer>(%options)
+
+Returns the received json answer as HASH of raw data.
+
+You can better use the L<values()|Couch::DB::Result/"When the document is collected"> method, which returns the data in a far more
+Perlish way: as Perl booleans, DateTime objects, and so on.
+
+=item $obj-E<gt>B<client>()
+
+Which client L<Couch::DB::Client|Couch::DB::Client> was used in the last action.  Initially,
+none.  When the results are ready, the client is known.
+
+=item $obj-E<gt>B<request>()
+
+=item $obj-E<gt>B<response>()
+
+=item $obj-E<gt>B<values>()
+
+Each CouchDB API call knows whether it passes data types which are
+(potentially) incompatible between JSON and Perl. Those types get
+converted for you for convenience in your main program.
+
+The raw data is returned with L<answer()|Couch::DB::Result/"When the document is collected">.  See L</DETAILS> below.
+
+=back
+
+=head2 When the collecting is delayed
+
+=over 4
+
+=item $obj-E<gt>B<delayPlan>()
+
+Returns the (framework specific) information about actions to be taken to
+collect the document.
+
+=item $obj-E<gt>B<setFinalResult>(\%data, %options)
+
+Fill this Result object with the actual results.
+
+=item $obj-E<gt>B<setResultDelayed>($plan, %options)
+
+When defined, the result document is not yet collected.  The $plan contains
+framework specific information how to realize that in a later stage.
+
+=back
+
+=head2 Other
+
+=over 4
+
+=item $obj-E<gt>B<status>($code, $message)
+
+Set the $code and $message to something else.  Your program should
+probably not do this: it's the library which determines how the result
+needs to be interpreted.
+
+=back
+
+=head1 DETAILS
+
+This Result objects have many faces.  Understand them well, before you start
+programming with L<Couch::DB|Couch::DB>.
+
+=head2 Result is an error
+
+The Result object is overloaded to produce a false value when the command did
+not succeed for any reason.
+
+B<. Example: without error handler>
+
+  my $result = $db->find(...)
+      or die $result->message;
+
+B<. Example: with error handler>
+
+  my $result = $db->find(..., on_error => sub { die } );
+
+=head2 Delay the result
+
+When your website has only the slightest chance on having users, then
+you need to use single server processes shared by many website users.
+Couch::DB implementations will use event-driven programming to make this
+possible, but your own program should be configured to make use of this
+to benefit.
+
+Usually, questions to the database are purely serial.  This is an easy
+case to handle, and totally hidden for you, as user of this module.
+For instance, when you want to query in parallel, you need to prepare
+multiple queries, and then start them at the same time.
+
+B<. Example: prepare a query, delayed>
+
+  my $find1 = $db->find(..., _delay => 1)
+      or die $result->message;  # only preparation errors
+  
+  if($find1->isDelayed) ...;    # true
+  
+  my $result = $find1->run
+      or die $result->message;  # network/server errors
+
+  # TODO
+  my $result = $couch->parallel([$find1, $find2], concurrent => 2);
+
+=head2 Understanding values
+
+To bridge the gap between your program and JSON data received, Couch::DB
+provides templated conversions.  This conversion scheme also attempts to
+hide protocol changes between CouchDB server versions.
+
+  my $result = $couch->client('local')->serverInfo;
+  result or die;
+
+  # Try to avoid this:
+  print $result->answer->{version}; # string
+
+  # Use this instead:
+  print $result->values->{version};  # version object
+
+In some cases, data is added or modified for convenience: to make it
+compatible with the version your program has been written for.  See
+L<Couch::DB::new(api)|Couch::DB/"Constructors">.
+
+=head1 OVERLOADING
+
+=over 4
+
+=item overload: B<bool>
+
+These Return objecs are overloaded to return a false value when there is
+any error.  For delayed collection of data, this status may change after
+this object is initially created.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Couch-DB distribution version 0.001,
+built on May 29, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2024 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

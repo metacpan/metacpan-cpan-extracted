@@ -155,38 +155,32 @@ BOOT:
         UCXT_INIT;
         SV **svp;
 
+        UCXT.cc.pid    = 0;
         UCXT.thread_id = 0;
 
         svp = hv_fetchs(PL_modglobal, "Time::NVtime", 0);
         if (!svp)         croak("Time::HiRes is required");
         if (!SvIOK(*svp)) croak("Time::NVtime isn't a function pointer");
         UCXT.myNVtime = INT2PTR(NV(*)(), SvIV(*svp));
-        /* test
-        {
+        if (0) { /* test */
             (*UCXT.myNVtime)(aTHX);
             printf("The current time is: %" NVff "\n", (*MY_CXT.myNVtime)());
+            exit(0);
         }
-        */
 
         svp = hv_fetchs(PL_modglobal, "Time::U2time", 0);
         if (!svp)         croak("Time::HiRes is required");
         if (!SvIOK(*svp)) croak("Time::U2time isn't a function pointer");
         UCXT.myU2time = INT2PTR(void(*)(pTHX_ UV ret[2]), SvIV(*svp));
-        /* test
-        {
+        if (0) { /* test */
             UV  xx[2];
             (*UCXT.myU2time)(aTHX_ (UV*)&xx);
-            printf("The current seconds are: %u.%06u\n", xx[0], xx[1]);
+            printf("The current seconds are: %" UVuf ".%06" UVuf "\n", xx[0], xx[1]);
+            exit(0);
         }
-        */
 
-        sm_srand(aUCXT); /* in    */
-        xo_srand(aUCXT); /* this  */
-        cc_srand(aUCXT); /* order */
-
-        uu_clock_init(aUCXT); /* after srand */
-
-        uu_gen_init(aUCXT); /* after srand */
+        uu_clock_init(aUCXT);
+        uu_gen_init(aUCXT);
     }
     UMTX_UNLOCK;
 

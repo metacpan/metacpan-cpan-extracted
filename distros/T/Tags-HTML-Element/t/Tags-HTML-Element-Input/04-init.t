@@ -5,15 +5,11 @@ use Data::HTML::Element::Input;
 use English;
 use Error::Pure::Utils qw(clean);
 use Tags::HTML::Element::Input;
-use Tags::Output::Structure;
 use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-my $tags = Tags::Output::Structure->new;
-my $obj = Tags::HTML::Element::Input->new(
-	'tags' => $tags,
-);
+my $obj = Tags::HTML::Element::Input->new;
 eval {
 	$obj->init('bad');
 };

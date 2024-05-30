@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use CSS::Struct::Output::Indent;
+use CSS::Struct::Output::Structure;
 use Data::HTML::Element::A;
 use English;
 use Error::Pure::Utils qw(clean);
@@ -10,35 +10,39 @@ use Test::More 'tests' => 5;
 use Test::NoWarnings;
 
 # Test.
-my $css = CSS::Struct::Output::Indent->new;
+my $css = CSS::Struct::Output::Structure->new;
 my $obj = Tags::HTML::Element::A->new(
 	'css' => $css,
 );
 my $anchor = Data::HTML::Element::A->new;
 $obj->init($anchor);
 $obj->process_css;
-my $ret = $css->flush(1);
-my $right_ret = <<'END';
-END
-chomp $right_ret;
-is($ret, $right_ret, "A defaults.");
+my $ret_ar = $css->flush(1);
+is_deeply(
+	$ret_ar,
+	[],
+	'Get CSS::Struct code (default).',
+);
 
 # Test.
 $obj = Tags::HTML::Element::A->new(
 	'no_css' => 1,
 );
-$ret = $obj->process_css;
+my $ret = $obj->process_css;
 is($ret, undef, 'No css mode.');
 
 # Test.
-$css = CSS::Struct::Output::Indent->new;
+$css = CSS::Struct::Output::Structure->new;
 $obj = Tags::HTML::Element::A->new(
 	'css' => $css,
 );
 $obj->process_css;
-$ret = $css->flush(1);
-$right_ret = '';
-is($ret, $right_ret, "Without initialization.");
+$ret_ar = $css->flush(1);
+is_deeply(
+	$ret_ar,
+	[],
+	'Get CSS::Struct code (default).',
+);
 
 # Test.
 $obj = Tags::HTML::Element::A->new;

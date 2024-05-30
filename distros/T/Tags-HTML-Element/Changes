@@ -1,3 +1,18 @@
+0.14 2024-05-29T22:59:40+02:00
+ - Add test for Option.
+ - Add tests for Select.
+ - Add tests for Textarea.
+ - Remove obsolete code.
+ - Rewrite tests from CSS::Struct::Output::Indent to
+   CSS::Struct::Output::Structure.
+
+0.13 2024-05-29T13:36:14+02:00
+ - Fix test code (trailing ',').
+ - Remove 'tags' setting in tests for init(). Not needed.
+ - Rewrite tests from Tags::Output::Raw to Tags::Output::Structure.
+ - Sort modules in tests.
+ - Sort tests in each constructor test file.
+
 0.12 2024-04-22T12:03:45+02:00
  - Add 'onchange' processing in Select.
 

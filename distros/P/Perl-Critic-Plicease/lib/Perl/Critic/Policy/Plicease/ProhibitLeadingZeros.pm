@@ -7,7 +7,7 @@ use Perl::Critic::Utils;
 use base qw( Perl::Critic::Policy );
 
 # ABSTRACT: Leading zeroes are okay as the first arg to chmod, and other such reasonableness
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 my $DESCRIPTION = q{Integer with leading zeros outside of chmod, mkpath};
@@ -54,7 +54,7 @@ Perl::Critic::Policy::Plicease::ProhibitLeadingZeros - Leading zeroes are okay a
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -131,6 +131,8 @@ Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Ville Skyttä (SCOP)
+
+Yoshikazu Sawa (yoshikazusawa)
 
 =head1 COPYRIGHT AND LICENSE
 

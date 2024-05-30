@@ -3,7 +3,7 @@
 
 #include "ulib/UUID.h"
 
-void xo_srand(pUCXT);
+void xo_srand(pUCXT, Pid_t pid);
 U64  xo_rand(pUCXT);
 
 #endif
