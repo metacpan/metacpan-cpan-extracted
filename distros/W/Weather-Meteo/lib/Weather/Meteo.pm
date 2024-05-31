@@ -6,6 +6,7 @@ use warnings;
 use Carp;
 use JSON::MaybeXS;
 use LWP::UserAgent;
+use Scalar::Util;
 use URI;
 
 use constant FIRST_YEAR => 1940;
@@ -16,11 +17,11 @@ Weather::Meteo - Interface to L<https://open-meteo.com> for historical weather d
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -75,6 +76,9 @@ sub new {
 
     use Geo::Location::Point;
 
+The date argument can be an ISO-8601 formatted date,
+or an object that understands the strftime method.
+
     my $ramsgate = Geo::Location::Point->new({ latitude => 51.34, longitude => 1.42 });
     # Print snowfall at 1AM on Christmas morning in Ramsgate
     $weather = $meteo->weather($ramsgate, '2022-12-25');
@@ -82,18 +86,23 @@ sub new {
 
     print 'Number of cms of snow: ', $snowfall[1], "\n";
 
+    use DateTime;
+    my $dt = DateTime->new(year => 2024, month => 2, day => 1);
+    $weather = $meteo->weather({ location => $ramsgate, date => $dt });
+
 Takes an optional argument, tz, which defaults to 'Europe/London'.
 For that to work set TIMEZONEDB_KEY to be your API key from L<https://timezonedb.com>.
 
 =cut
 
-sub weather {
+sub weather
+{
 	my $self = shift;
 	my %param;
 
 	if(ref($_[0]) eq 'HASH') {
 		%param = %{$_[0]};
-	} elsif((@_ == 2) && (ref($_[0]) =~ /::/) && ($_[0]->can('latitude'))) {
+	} elsif((@_ == 2) && Scalar::Util::blessed($_[0]) && ($_[0]->can('latitude'))) {
 		my $location = $_[0];
 		$param{latitude} = $location->latitude();
 		$param{longitude} = $location->longitude();
@@ -102,7 +111,7 @@ sub weather {
 			$param{'tz'} = $_[0]->tz();
 		}
 	} elsif(ref($_[0])) {
-		Carp::croak('Usage: weather(latitude => $latitude, longitude => $logitude, date => "YYYY-MM-DD" [ , tz = $tz ])');
+		Carp::croak('Usage: weather(latitude => $latitude, longitude => $longitude, date => "YYYY-MM-DD" [ , tz = $tz ])');
 		return;
 	} elsif(@_ % 2 == 0) {
 		%param = @_;
@@ -110,17 +119,23 @@ sub weather {
 
 	my $latitude = $param{latitude};
 	my $longitude = $param{longitude};
+	my $location = $param{'location'};
 	my $date = $param{'date'};
 	my $tz = $param{'tz'} || 'Europe/London';
 
+	if((!defined($latitude)) && defined($location) &&
+	   Scalar::Util::blessed($location) && $location->can('latitude')) {
+		$latitude = $location->latitude();
+		$longitude = $location->longitude();
+	}
 	if(!defined($latitude)) {
-		Carp::croak('Usage: weather(latitude => $latitude, longitude => $logitude, date => "YYYY-MM-DD")');
+		Carp::croak('Usage: weather(latitude => $latitude, longitude => $longitude, date => "YYYY-MM-DD")');
 		return;
 	}
 
-	if($date =~ /^(\d{4})-/) {
-		my $year = $1;
-
+	if(Scalar::Util::blessed($date) && $date->can('strftime')) {
+		$date = $date->strftime('%F');
+	} elsif($date =~ /^(\d{4})-/) {
 		return if($1 < FIRST_YEAR);
 	} else {
 		Carp::carp("'$date' is not a valid date");
@@ -149,13 +164,12 @@ sub weather {
 	my $res = $self->{ua}->get($url);
 
 	if($res->is_error()) {
-		Carp::carp("$url API returned error: ", $res->status_line());
+		Carp::carp(ref($self), ": $url API returned error: ", $res->status_line());
 		return;
 	}
 	# $res->content_type('text/plain');	# May be needed to decode correctly
 
-	my $json = JSON::MaybeXS->new()->utf8();
-	if(my $rc = $json->decode($res->decoded_content())) {
+	if(my $rc = JSON::MaybeXS->new()->utf8()->decode($res->decoded_content())) {
 		if($rc->{'error'}) {
 			# TODO: print error code
 			return;
@@ -189,10 +203,11 @@ You can also set your own User-Agent object:
 
 sub ua {
 	my $self = shift;
+
 	if (@_) {
 		$self->{ua} = shift;
 	}
-	$self->{ua};
+	return $self->{ua}
 }
 
 =head1 AUTHOR
@@ -205,6 +220,12 @@ it under the same terms as Perl itself.
 Lots of thanks to the folks at L<https://open-meteo.com>.
 
 =head1 BUGS
+
+Please report any bugs or feature requests to C<bug-weather-meteo at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Weather-Meteo>.
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
 
 =head1 SEE ALSO
 
@@ -244,7 +265,7 @@ L<http://deps.cpantesters.org/?module=Weather-Meteo>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2023 Nigel Horne.
+Copyright 2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

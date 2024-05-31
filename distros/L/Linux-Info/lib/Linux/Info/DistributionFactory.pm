@@ -4,7 +4,6 @@ use warnings;
 use strict;
 use Hash::Util qw(lock_hash lock_keys);
 use Carp       qw(confess);
-use Data::Dumper;
 
 use Linux::Info::DistributionFinder;
 
@@ -17,11 +16,12 @@ use Linux::Info::Distribution::OSRelease::Alpine;
 use Linux::Info::Distribution::OSRelease::Amazon;
 use Linux::Info::Distribution::OSRelease::CentOS;
 use Linux::Info::Distribution::OSRelease::Debian;
+use Linux::Info::Distribution::OSRelease::Raspbian;
 use Linux::Info::Distribution::OSRelease::RedHat;
 use Linux::Info::Distribution::OSRelease::Rocky;
 use Linux::Info::Distribution::OSRelease::Ubuntu;
 
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.16'; # VERSION
 
 # ABSTRACT: implements a factory for Distribution subclasses
 
@@ -33,7 +33,7 @@ my %os_release_distros = (
     rhel       => 'RedHat',
     amazon     => 'Amazon',
     amzn       => 'Amazon',
-    CloudLinux => 'CloudLinux',
+    cloudlinux => 'CloudLinux',
     centos     => 'CentOS',
     alpine     => 'Alpine',
     raspbian   => 'Raspbian',
@@ -70,7 +70,7 @@ sub create {
     my $info      = $self->{finder}->search_distro;
     my $distro_id = $info->get_distro_id;
 
-    unless ( $self->{finder}->has_custom ) {
+    unless ( $self->{finder}->has_custom_file ) {
         my $base_class = 'Linux::Info::Distribution::OSRelease';
 
         if ( exists $os_release_distros{$distro_id} ) {
@@ -111,7 +111,7 @@ Linux::Info::DistributionFactory - implements a factory for Distribution subclas
 
 =head1 VERSION
 
-version 2.15
+version 2.16
 
 =head1 SYNOPSIS
 
@@ -153,6 +153,10 @@ The first attempt is to use the file F</etc/os-release> to fetch information.
 In this case, if a subclass of L<Linux::INfo::Distribution::OSRelease> is not
 available, this class will be used instead, which means less attributes will
 be available.
+
+Beware that a distribution that uses F</etc/os-release> but doesn't have a
+subclasses of L<Linux::INfo::Distribution::OSRelease> might just break if the
+minimum of fields are not present in the file.
 
 If the file is not available, others will be attempted.
 

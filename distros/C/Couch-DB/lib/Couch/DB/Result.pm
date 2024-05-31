@@ -2,12 +2,12 @@
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
-# SPDX-FileCopyrightText: 2024 Mark Overmeer <mark@open-console.eu>
-# SPDX-License-Identifier: EUPL-1.2-or-later
+# SPDX-FileCopyrightText: 2024 Mark Overmeer <mark@overmeer.net>
+# SPDX-License-Identifier: Artistic-2.0
 
 package Couch::DB::Result;
 use vars '$VERSION';
-$VERSION = '0.001';
+$VERSION = '0.002';
 
 
 use Couch::DB::Util     qw(flat);
@@ -37,13 +37,12 @@ sub init($)
 
 	$self->{CDR_couch}     = delete $args->{couch} or panic;
 	weaken $self->{CDR_couch};
-#use Data::Dumper;
-#warn "RESULT INIT=", Dumper $args;
 
 	$self->{CDR_on_final}  = [ flat delete $args->{on_final} ];
 	$self->{CDR_on_error}  = [ flat delete $args->{on_error} ];
 	$self->{CDR_code}      = HTTP_MULTIPLE_CHOICES;
 	$self->{CDR_to_values} = delete $args->{to_values} || sub { $_[1] };
+	$self->{CDR_next}      = delete $args->{next};
 	$self;
 }
 
@@ -69,11 +68,22 @@ sub message()
 	$self->{CDR_msg} || $default_code_texts{$self->code} || $self->codeName;
 }
 
+
+sub status($$)
+{	my ($self, $code, $msg) = @_;
+	$self->{CDR_code} = $code;
+	$self->{CDR_msg}  = $msg;
+	$self;
+}
+
 #-------------
 
 sub client()    { $_[0]->{CDR_client} }
 sub request()   { $_[0]->{CDR_request} }
 sub response()  { $_[0]->{CDR_response} }
+
+
+sub next()      { $_[0]->{CDR_next} }
 
 
 sub answer(%)
@@ -94,13 +104,29 @@ sub values(@)
 	$self->{CDR_values} ||= $self->{CDR_to_values}->($self, $self->answer);
 }
 
+
+sub nextPage(%)
+{	my ($self, %options) = @_;
+
+	$self->isReady
+		or panic "The results are not available yet, not ready.";
+
+	my $next     = $self->next
+		or panic "This call does not support pagination.";
+
+	$self
+		or error __x"The previous page had an error";
+
+	$self->couch->call($next);
+}
+
 #-------------
 
 sub setFinalResult($%)
 {	my ($self, $data, %args) = @_;
 	my $code = delete $data->{code} || HTTP_OK;
 
-	$self->{CDR_client}   = delete $data->{client} or panic "No client";
+	$self->{CDR_client}   = my $client = delete $data->{client} or panic "No client";
 	weaken $self->{CDR_client};
 
 	$self->{CDR_request}  = delete $data->{request};
@@ -110,8 +136,15 @@ sub setFinalResult($%)
 
 	$_->($self) for @{$self->{CDR_on_final}};
 
-	unless(is_success $code)
+	if(is_success $code)
+	{	if(my $next = $self->next)
+		{	$next->{client}   = $client->name;   # no objects!
+			$next->{bookmark} = $self->answer->{bookmark};
+		}
+	}
+	else
 	{	$_->($self) for @{$self->{CDR_on_error}};
+		#XXX what to do with pagination here?
 	}
 
 	$self;
@@ -128,17 +161,6 @@ sub setResultDelayed($%)
 
 
 sub delayPlan() { $_[0]->{CDR_delayed} }
-
-#-------------
-
-
-sub status($$)
-{	my ($self, $code, $msg) = @_;
-	$self->{CDR_code} = $code;
-	$self->{CDR_msg}  = $msg;
-
-	$self;
-}
 
 #-------------
 

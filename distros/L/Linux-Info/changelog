@@ -1,4 +1,29 @@
-liblinux-info-perl (2.15) trusty; urgency=low
+liblinux-info-perl (2.16) trusty; urgency=low
+  * Bugfix/distro factory (#24)
+  * chore: version bump
+  * feat: Finder handles os-release anywhere
+  * refactor: organizing samples
+  * fix: bugs with Raspbian and CloudLinux
+  * fix: wrong use of length
+  * doc: required update
+  * fix: GHA test requirement
+  * doc: typo
+  * fix: GHA testing requirements
+  * chore: deprecated 
+
+ -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Fri, 31 May 2024 00:53:40 +0000
+
+liblinux-info-perl () trusty; urgency=low
+  * chore: deprecated 
+  * fix: GHA testing requirements 
+  * doc: typo 
+  * fix: GHA test requirement 
+  * doc: required update 
+  * fix: wrong use of length 
+  * fix: bugs with Raspbian and CloudLinux 
+  * refactor: organizing samples 
+  * feat: Finder handles os-release anywhere 
+  * chore: version bump 
   * Bugfix/os release (#23)
   * fix: missing newer subclasses
   * refactor: idiomatic Perl
@@ -12,7 +37,7 @@ liblinux-info-perl (2.15) trusty; urgency=low
     OSRelease which contain a customized format of /etc/os-release.
   * chore: version bump 
 
- -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Wed, 29 May 2024 01:08:25 +0000
+ -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Fri, 31 May 2024 00:48:33 +0000
 
 liblinux-info-perl () trusty; urgency=low
   * chore: version bump 

@@ -9,6 +9,7 @@ README.md
 t/00-load.t
 t/10-compile.t
 t/20-new.t
+t/carp.t
 t/comment-spelling.t
 t/eof.t
 t/eol.t
@@ -24,6 +25,8 @@ t/pod.t
 t/port.t
 t/strict.t
 t/unused.t
+t/vars.t
+t/version.t
 t/weather.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

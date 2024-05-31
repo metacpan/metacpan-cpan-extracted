@@ -10,7 +10,7 @@ isa_ok( $class, 'Linux::Info::Distribution' );
 ok( $class->DEFAULT_FILE, 'DEFAULT_FILE returns a value' );
 is( ref( $class->parse_from_file ), 'HASH', 'class parse call works' );
 
-my $fixture = 't/samples/os-release';
+my $fixture = 't/samples/os-releases/ubuntu';
 note("Using custom file $fixture");
 my $instance = $class->new($fixture);
 ok( $instance, 'can create an instance with a custom file' );

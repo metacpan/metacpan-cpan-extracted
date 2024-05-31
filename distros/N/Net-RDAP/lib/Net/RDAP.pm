@@ -13,6 +13,7 @@ use Net::RDAP::Object::Domain;
 use Net::RDAP::Object::Entity;
 use Net::RDAP::Object::IPNetwork;
 use Net::RDAP::Object::Nameserver;
+use Net::RDAP::Redaction;
 use Net::RDAP::Registry;
 use Net::RDAP::SearchResult;
 use Net::RDAP::Service;
@@ -21,7 +22,7 @@ use vars qw($VERSION);
 use constant DEFAULT_CACHE_TTL => 3600;
 use strict;
 
-$VERSION = 0.23;
+$VERSION = 0.24;
 
 =pod
 
@@ -509,6 +510,12 @@ sub object_from_response {
     elsif ('autnum'     eq $data->{'objectClassName'})  { return Net::RDAP::Object::Autnum->new($data, $url)    }
     elsif ('nameserver' eq $data->{'objectClassName'})  { return Net::RDAP::Object::Nameserver->new($data, $url)}
     elsif ('entity'     eq $data->{'objectClassName'})  { return Net::RDAP::Object::Entity->new($data, $url)    }
+
+    #
+    # 'help' is not a real object type, but Net::RDAP::Service uses the
+    # 'class_override' option to fetch() to ensure we return the right object
+    # type here
+    #
     elsif ('help'       eq $data->{'objectClassName'})  { return Net::RDAP::Help->new($data, $url)              }
 
     #
@@ -719,6 +726,9 @@ Protocol (EPP) and Registration Data Access Protocol (RDAP) Status Mapping
 
 =item * L<https://tools.ietf.org/html/rfc8521> -  Registration Data Access
 Protocol (RDAP) Object Tagging
+
+=item * L<https://tools.ietf.org/html/rfc9537> -  Redacted Fields in the
+Registration Data Access Protocol (RDAP) Response
 
 =back
 

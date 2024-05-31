@@ -2,12 +2,12 @@
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
-# SPDX-FileCopyrightText: 2024 Mark Overmeer <mark@open-console.eu>
-# SPDX-License-Identifier: EUPL-1.2-or-later
+# SPDX-FileCopyrightText: 2024 Mark Overmeer <mark@overmeer.net>
+# SPDX-License-Identifier: Artistic-2.0
 
 package Couch::DB;
 use vars '$VERSION';
-$VERSION = '0.001';
+$VERSION = '0.002';
 
 use version;
 
@@ -155,9 +155,11 @@ sub client($)
 
 
 sub call($$%)
-{	my ($self, $method, $path, %args) = @_;
-	$args{method}   = $method;
-	$args{path}     = $path;
+{	my $self = shift;
+	my %args = @_==1 ? %{$_[0]} : (method => shift, path => shift, @_);
+
+	my $method = $args{method};
+	my $path   = $args{path};
 	$args{query}  ||= {};
 
 	my $headers     = $args{headers} ||= {};
@@ -169,6 +171,9 @@ sub call($$%)
 
     defined $args{send} || ($method ne 'POST' && $method ne 'PUT')
 		or panic "No send in $method $path";
+
+	($method eq 'GET' ? $args{query} : $args{send})->{bookmark} = delete $args{bookmark}
+		if exists $args{bookmark};
 
 	### On this level, we pick a client.  Extensions implement the transport.
 
@@ -190,9 +195,10 @@ sub call($$%)
 
 	my $result  = Couch::DB::Result->new(
 		couch     => $self,
-		to_values => delete $args{to_values},
-		on_errors => delete $args{on_errors},
-		on_final  => delete $args{on_final},
+		to_values => $args{to_values},
+		on_error  => $args{on_error},
+		on_final  => $args{on_final},
+		next      => ($args{paginate} ? \%args : undef),
 	);
 
   CLIENT:

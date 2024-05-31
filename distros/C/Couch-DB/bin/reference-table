@@ -5,7 +5,9 @@ use strict;
 use LWP::UserAgent    ();
 use HTML::TreeBuilder ();
 use File::Slurper     qw(read_text read_lines write_text);
+use URI::Escape       qw(uri_escape);
 use Getopt::Long      qw(GetOptions);
+use HTML::Entities    qw(encode_entities);
 
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
@@ -13,13 +15,18 @@ $Data::Dumper::Indent = 1;
 my $couchdb_api   = 'https://docs.couchdb.org/en/stable';
 my $couchdb_index = "$couchdb_api/http-routingtable.html";
 my $couchdb_cache = '/tmp/couch-cache';
+my $metacpan      = 'https://metacpan.org/dist/Couch-DB/view/';
 
 GetOptions
 	'refresh|r!' => \(my $refresh = 0),
 	;
 
-my %index;    # from the couchdb website
-my %impls;    # from this module
+my %index;         # from the couchdb website
+my %impls_by_call; # from this module
+my %impls_by_use;  # from this module
+
+my %http_order;
+$http_order{$_} = keys %http_order for qw/GET POST PUT COPY DELETE/;
 
 ####
 ###### parse the couchdb api index
@@ -51,17 +58,26 @@ sub fill_index()
 		$call    = 'POST /{db}/_design/{ddoc}/_update/{func}/{docid}'
 			if $call eq 'PUT /{db}/_design/{ddoc}/_update/{func}/{docid}';
 
-		my ($method, $endpoint) = split " ", $call, 2;
+		my ($http_method, $endpoint) = split " ", $call, 2;
 		my $descr = $what->as_text;
 	
 		my %def    = (
-			call     => $call,
-			method   => $method,
-			endpoint => $endpoint,
-			doclink  => "$couchdb_api/$href",
-			descr    => $descr,
+			call        => $call,
+			http_method => $http_method,
+			endpoint    => $endpoint,
+			doclink     => "$couchdb_api/$href",
+			descr       => $descr,
 		);
 		$index{$call} = \%def;
+	}
+
+	# These are only described in notes in 3.3.3
+	foreach my $endpoint ('/{db}/_local_docs/queries', '/{db}/_design_docs/queries')
+	{	my %def = %{$index{'POST /{db}/_all_docs/queries'}};
+		$def{call}     = "POST $endpoint";
+		$def{endpoint} = $endpoint;
+		$def{descr}    = '';
+		$index{"POST $endpoint"} = \%def;
 	}
 
 	warn "Found ", scalar keys %index, " calls in the API docs\n";
@@ -82,7 +98,7 @@ my @modules = (
 	{ file => 'lib/Couch/DB/Node.pm',		base => '$node' },
 );
 
-sub fill_impls()
+sub fill_impls_by_call()
 {
   MODULE:
 	foreach my $module (@modules)
@@ -95,32 +111,39 @@ sub fill_impls()
 			next MODULE;
 		}
 
+		my $manpage  = $metacpan . ($file =~ s/\.pm$/.pod/r);
+
 		foreach my $line (read_lines $file)
 		{	$package = $1
 				if $line =~ m/^package\s+([\w:]+)/;
 
-			$last_use = "$module->{base}-&gt;$1($2)"
+			$last_use = "$module->{base}->$1($2)"
 				if $line =~ m/^=method\s+(\w+)\s*(.*)/;
 
 			my ($call, $status) = $line =~ /\[CouchDB API "([^"]+)".*?(|UNTESTED|TODO|UNSUPPORTED|PARTIAL)\]/
 				or next;
 
-			my ($method, $endpoint) = split " ", $call, 2;
+			my ($http_method, $endpoint) = split " ", $call, 2;
+
+			my $link = $manpage . '#' . uri_escape($last_use =~ s/.*->/\$obj->/r =~ s/\s/-/gr);
+			my $use  = $status eq 'UNSUPPORTED' ? ''
+			  : '<a href="' . $link . '">' . encode_entities($last_use) . '</a>';
 
 			my %impl = (
-				package  => $package,
-				call     => $call,
-				status   => $status || 'DONE',
-				method   => $method,
-				endpoint => $endpoint,
-				use      => ($status eq 'UNSUPPORTED' ? '' : $last_use),
+				package     => $package,
+				call        => $call,
+				status      => $status || 'DONE',
+				http_method => $http_method,
+				endpoint    => $endpoint,
+				use         => $use,
 			);
 
-			push @{$impls{$call}}, \%impl;
+			push @{$impls_by_call{$call}}, \%impl;
+			push @{$impls_by_use{$use}}, \%impl if length $use;
 		}
 	}
 
-	warn "Found ", scalar keys %impls, " calls implemented.\n";
+	warn "Found ", scalar keys %impls_by_call, " calls implemented.\n";
 }
 
 ####
@@ -130,50 +153,24 @@ sub fill_impls()
 fill_index;
 #warn Dumper \%index;
 
-fill_impls;
-#warn Dumper \%impls;
+fill_impls_by_call;
+#warn Dumper \%impls_by_call;
 
-my %methods_counts;
-map $methods_counts{$_->{method}}++, @$_ for values %impls;
-warn Dumper \%methods_counts;
+my %http_method_counts;
+map $http_method_counts{$_->{http_method}}++, @$_ for values %impls_by_call;
+warn Dumper \%http_method_counts;
 
 my %status_counts;
-map $status_counts{$_->{status}}++, @$_ for values %impls;
+map $status_counts{$_->{status}}++, @$_ for values %impls_by_call;
 warn Dumper \%status_counts;
 
-my %mistakes = map +($_ => 1), keys %impls;
+my %mistakes = map +($_ => 1), keys %impls_by_call;
 delete @mistakes{keys %index};
 
-delete $mistakes{"POST /{db}/_design_docs/queries"} or die;   # expected
-delete $mistakes{"POST /{db}/_local_docs/queries"}  or die;    # expected
 warn "Implementation mismatch: $_\n" for sort keys %mistakes;
 
-sub create_index()
-{	print <<__HEADER;
-<html>
-<head>
-  <title>Reference table</title>
-  <meta charset="utf-8" />
-
-  <style>
-    TR.first { margin-top: 4px }
-    TD.api { background: white }
-    TD.api A { text-decoration: none; font-family: monospace }
-    TD.use { font-family: monospace }
-	TD.descr P { margin-bottom: 10px }
-    TH { text-align: left }
-    .count { text-align: right }
-	TABLE#status-explain { padding-left: 3em }
-	TABLE#references { padding: 2ex 3em; }
-  </style>
-</head>
-<body>
-  <h1>Reference table</h1>
-
-  <p>This page is generated when anything in the implementation changes,
-  at least every release.  Sorry for the current ugly presentation: functionality
-  first.</p>
-
+sub progress()
+{	print <<__PROGRESS;
   <h2>Development progress counts</h2>
 
   <p>The implementation is really new, therefore, not everything is ready and
@@ -181,7 +178,7 @@ sub create_index()
   <table id="status-explain">
   <tr><td>DONE</td>
       <td class="count">$status_counts{DONE}</td>
-      <td>Minimally tested.</td></tr>
+      <td>Minimally tested: visual inspection only.</td></tr>
   <tr><td>PARTIAL</td>
       <td class="count">$status_counts{PARTIAL}</td>
       <td>Minimally tested, not completely implemented.</td></tr>
@@ -195,18 +192,25 @@ sub create_index()
       <td class="count">$status_counts{UNSUPPORTED}</td>
       <td>For some reason, it seems useless to implement this.</td></tr>
   </table>
+__PROGRESS
+}
 
-  <h2>Reference table</h2>
+sub cdb2mod()
+{	print <<__HEADER;
+  <h2 name="cdb2mod">CouchDB endpoint &rarr; Couch::DB method</h2>
+  <ul>
+  <li><a href="#mod2cdb">Couch::DB method &rarr; CouchDB endpoint</a></li>
+  </ul>
 
-  <table id="references">
-  <tr><th>API 3.3.3 and official summary</th>
+  <table id="cdb2mod">
+  <tr><th style="width: 50%"><a href="https://docs.couchdb.org/en/stable/">CouchDB API "stable"</a> and official summary</th>
       <th>impl status</th>
       <th>Couch::DB use</th></tr>
 
 __HEADER
 
-	foreach my $index (sort { $a->{endpoint} cmp $b->{endpoint} || $a->{method} cmp $b->{method}} values %index)
-	{	my @impls = @{$impls{$index->{call}} || [ ]};
+	foreach my $index (sort { $a->{endpoint} cmp $b->{endpoint} || $a->{http_method} cmp $b->{http_method}} values %index)
+	{	my @impls = @{$impls_by_call{$index->{call}} || [ ]};
 		@impls <= 2 or die $index->{call};  # CSS descr issue
 
 		my $first = shift @impls || { status => 'MISSING', use => '' };
@@ -218,32 +222,106 @@ __HEADER
       <td class="use">$first->{use}</td></tr>
 __ROW1
 
-		my $sec   = shift @impls || { status => '', use => '' };
+		my $sec   = shift @impls;
 
-		print <<__ROW2;
+		print $sec ? <<__ROW2a : <<__ROW2b;
   <tr><td class="descr"><p>$index->{descr}</p></td>
       <td class="status">$sec->{status}</td>
       <td class="use">$sec->{use}</td></tr>
-__ROW2
-
-=pod
-		while(my $impl = shift @impls)
-		{	print <<__ROWS;
-  <tr><td>&nbsp;</td>
-      <td class="status">$impl->{status}</td>
-      <td class="use">$impl->{use}</td></tr>
-__ROWS
-		}
-=cut
+__ROW2a
+  <tr><td class="descr"><p>$index->{descr}</p></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td></tr>
+__ROW2b
 
 	}
 
 	print <<__FOOTER;
   </table>
-</body>
-</html>
 __FOOTER
 }
 
-create_index();
+
+sub mod2cdb()
+{
+	print <<__HEADER;
+  <h2 name="mod2cdb">Couch::DB method &rarr; CouchDB endpoint</h2>
+  <ul>
+  <li><a href="#cdb2mod">CouchDB endpoint &rarr; Couch::DB method</a></li>
+  </ul>
+
+  <table id="mod2cdb">
+  <tr><th>Couch::DB use</th>
+      <th>impl status</th>
+      <th style="width: 50%"><a href="https://docs.couchdb.org/en/stable/">CouchDB API "stable"</a></th></tr>
+
+__HEADER
+
+	foreach my $use (sort keys %impls_by_use)
+	{	my @calls;
+		foreach my $impl (@{$impls_by_use{$use}})
+		{	my $call = $index{$impl->{call}} or die $impl->{call};
+			$call->{status} = $impl->{status};
+			push @calls, $call;
+		}
+		my ($first, @other) = sort { $http_order{$a->{http_method}} <=> $http_order{$b->{http_method}} } @calls;
+
+		print <<__ROW1;
+  <tr><td class="use">$use</td>
+      <td class="status">$first->{status}</td>
+      <td class="api"><a href="$first->{doclink}">$first->{call}</a></td></tr>
+__ROW1
+
+		print <<__ROW_FOLLOW for @other;
+  <tr><td>&nbsp;</td>
+      <td class="status">$_->{status}</td>
+      <td class="api"><a href="$_->{doclink}">$_->{call}</a></td></tr>
+__ROW_FOLLOW
+	}
+
+	print <<__FOOTER;
+  </table>
+__FOOTER
+}
+
+### COMPOSE THE PAGE
+
+print <<__PAGE_HEADER;
+<!DOCTYPE html>
+<html lang="en-EN">
+<head>
+  <title>Reference table</title>
+  <meta charset="utf-8" />
+
+  <style>
+	BODY      { background: #f4f4f4; margin: 3em 5em }
+    TR.first  { margin-top: 4px }
+	TH        { background: lightgreen; padding: 3px 2ex }
+    TD        { vertical-align: top; padding: 0 2ex }
+    TD.api    { background: white }
+    TD.use    { background: yellow }
+    TD.api  A { text-decoration: none; font-family: monospace }
+    TD.use  A { text-decoration: none; font-family: monospace }
+	TD.descr P { margin: 0 0 10px 0; }
+    TH { text-align: left }
+    .count { text-align: right }
+	TABLE#status-explain { padding-left: 3em }
+  </style>
+</head>
+<body>
+  <h1>Reference tables</h1>
+
+  <p>This page is generated when anything in the implementation changes,
+  at least every release.  Sorry for the current ugly presentation: functionality
+  first.</p>
+__PAGE_HEADER
+
+progress;
+cdb2mod;
+mod2cdb;
+
+print <<__PAGE_FOOTER;
+</body>
+</html>
+__PAGE_FOOTER
 

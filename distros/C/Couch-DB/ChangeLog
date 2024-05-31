@@ -3,6 +3,18 @@
 	  All code was made by Mark Overmeer.
 	  Attributes refer to people who made contributions in ideas and bug-reports.
 
+version 0.002: Fri 31 May 10:27:47 CEST 2024
+
+	Fixes:
+	- include Couch::DB::Design
+	- metacpan HTML of calls.
+
+	Improvements:
+	- implemented pagination with $result->nextPage (untested)
+	- many documentation fixes
+	- make cross-reference page available.
+	- add cross-reference table Couch::DB -> endpoint
+
 version 0.001: Wed 29 May 18:19:12 CEST 2024
 
 	- initial release, interface complete but mainly untested.

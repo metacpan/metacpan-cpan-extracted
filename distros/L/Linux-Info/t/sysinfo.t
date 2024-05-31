@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use Test::More tests => 24;
 use Scalar::Util qw(looks_like_number);
-use Devel::CheckOS 2.01 qw(os_is);
 
 BEGIN { use_ok('Linux::Info::SysInfo') }
 

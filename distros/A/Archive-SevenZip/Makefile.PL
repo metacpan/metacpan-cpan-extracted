@@ -29,7 +29,11 @@ my %module = (
                 web => "https://github.com/Corion/$distlink",
                 url => "git://github.com/Corion/$distlink.git",
                 type => 'git',
-            }
+            },
+            bugtracker  => {
+              web    => "https://github.com/Corion/$distbase/issues",
+            },
+            license    => "https://dev.perl.org/licenses/",
         },
         dynamic_config   => 0, # we promise to keep META.* up-to-date
         x_static_install => 1, # we are pure Perl and don't do anything fancy
@@ -186,9 +190,9 @@ sub pod_section {
         shift @section if $remove_heading;
 
         pop @section
-            while $section[-1] =~ /^\s*$/;
+            while @section and $section[-1] =~ /^\s*$/;
         shift @section
-            while $section[0] =~ /^\s*$/;
+            while @section and $section[0] =~ /^\s*$/;
     };
 
     @section = map { $_ =~ s!^=\w+\s+!!; $_ } @section;
@@ -213,16 +217,14 @@ sub update_file {
     my( $filename, $new_content ) = @_;
     my $content;
     if( -f $filename ) {
-        open my $fh, '<', $filename
+        open my $fh, '<:raw:encoding(UTF-8)', $filename
             or die "Couldn't read '$filename': $!";
-        binmode $fh;
         local $/;
         $content = <$fh>;
     };
 
     if( $content ne $new_content ) {
-        if( open my $fh, '>', $filename ) {
-            binmode $fh;
+        if( open my $fh, '>:raw:encoding(UTF-8)', $filename ) {
             print $fh $new_content;
         } else {
             warn "Couldn't (re)write '$filename': $!";

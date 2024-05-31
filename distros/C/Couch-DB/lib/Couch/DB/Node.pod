@@ -61,6 +61,7 @@ and C<on_error>.  See L<Couch::DB/Using the CouchDB API>.
  [CouchDB API "GET /_node/{node-name}/_config", UNTESTED]
  [CouchDB API "GET /_node/{node-name}/_config/{section}", UNTESTED]
  [CouchDB API "GET /_node/{node-name}/_config/{section}/{key}", UNTESTED]
+
 Returns the node configuration.
 
 At least according to the example in the spec, all values are strings.
@@ -91,6 +92,7 @@ example: of config
 =item $obj-E<gt>B<configChange>($section, $key, $value, %options)
 
  [CouchDB API "PUT /_node/{node-name}/_config/{section}/{key}", UNTESTED]>
+
 Change one value in the configuration.  Probably, it should be followed by
 a L<configReload()|Couch::DB::Node/"Node information">: changes may not be commited without reload.
 
@@ -99,24 +101,28 @@ You MAY need to convert booleans to string "true" or "false" by hand.
 =item $obj-E<gt>B<configDelete>($section, $key, %options)
 
  [CouchDB API "DELETE /_node/{node-name}/_config/{section}/{key}", UNTESTED]>
+
 Remove one value in the configuration.  Probably, it should be followed by
 a L<configReload()|Couch::DB::Node/"Node information">: changes may not be commited without reload.
 
 =item $obj-E<gt>B<configReload>(%options)
 
  [CouchDB API "POST /_node/{node-name}/_config/_reload", UNTESTED]>
+
 Re-apply the configuration to the node.  This has as side-effect that the
 (changed) configuration of the node will be saved.
 
 =item $obj-E<gt>B<restart>(%options)
 
  [CouchDB API "POST /_node/{node-name}/_restart", UNTESTED]
+
 This may help you in a test environment, but should not be used in
 production, according to the API documentation.
 
 =item $obj-E<gt>B<server>(%options)
 
  [CouchDB API "GET /_node/{node-name}/_system", UNTESTED]
+
 Presents information about the system of the server where the node
 runs on.
 
@@ -127,21 +133,21 @@ function.
 =item $obj-E<gt>B<software>(%options)
 
  [CouchDB API "GET /_node/{node-name}/_versions", UNTESTED]
+
 Get details of some software running the node.
 
 =item $obj-E<gt>B<stats>(%options)
 
  [CouchDB API "GET /_node/{node-name}/_stats", UNTESTED]
+
 Collect node statistics.
 
 =back
 
-=head2 Other
-
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.001,
-built on May 29, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.002,
+built on May 31, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

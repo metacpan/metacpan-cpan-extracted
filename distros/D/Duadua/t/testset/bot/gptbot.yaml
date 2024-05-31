@@ -1,0 +1,11 @@
+# Documentation for this bot at https://platform.openai.com/docs/gptbot
+
+- ua: 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; GPTBot/1.0; +https://openai.com/gptbot)'
+  name: GPTBot
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.0'

@@ -25,6 +25,10 @@ This implementation provides a B<thick interface>: a far higher level
 of abstraction than the other modules. This should make your work much,
 much easier.
 
+Also, open F<https://perl.overmeer.net/couch-db/reference.html>
+in a browser window, as useful cross-reference: parameters for CouchDB
+are not documented in this Perl documentation!
+
 B<Please read> the L</DETAILS> section, further down, at least once
 before you start!
 
@@ -65,7 +69,8 @@ clear where to find a certain end-point: C<< /{db} >> will be in
 L<Couch::DB::Database|Couch::DB::Database>.  A major exception is anything what has to
 do with replication and sharding: this is bundled in L<Couch::DB::Cluster|Couch::DB::Cluster>.
 
-Have a look at F<...index...>
+Have a look at F<https://perl.overmeer.net/couch-db/reference.html>.
+Keep that page open in your browser while developing.
 
 =head1 METHODS
 
@@ -116,7 +121,7 @@ This server will be named 'local'.
 
 You can add more servers using L<addClient()|Couch::DB/"Server connections">.  In such case, you probably
 do not want this default client to be created as well.  To achieve this,
-explicitly set C<server =&gt; undef> here.
+explicitly set C<server =E<gt> undef> here.
 
 =item to_json => HASH
 
@@ -190,6 +195,7 @@ exist yet, it gets created, otherwise reused.
 =item $obj-E<gt>B<searchAnalyse>(%options)
 
  [CouchDB API "POST /_search_analyze", since 3.0, UNTESTED]
+
 Check what the build-in Lucene tokenizer(s) will do with your text.
 
  -Option  --Default
@@ -215,21 +221,30 @@ Check what the build-in Lucene tokenizer(s) will do with your text.
 Add a L<Couch::DB::Client|Couch::DB::Client>-object to be used to contact the CouchDB
 cluster.  Returned is the couch object, so these calls are stackable.
 
-=item $obj-E<gt>B<call>($method, $path, %options)
+=item $obj-E<gt>B<call>(\%options|($method, $path, %options))
 
 Call some couchDB server, to get work done.  This is the base for any
-interaction with the server.  You should not need to call this yourself,
-because module C<Couch::DB> is a complete implementation.
+interaction with the server.
 
  -Option   --Default
+  bookmark   undef
   client     undef
   clients    undef
   delay      false
+  method     <required>
+  paginate   false
+  path       <required>
   query      undef
   send       undef
   to_values  undef
 
 =over 2
+
+=item bookmark => STRING
+
+When you magically come up with the same query, and a related
+bookmark (save C<< $result->next >> in the session?), then you
+get a next page.
 
 =item client => L<Couch::DB::Client|Couch::DB::Client>
 
@@ -243,9 +258,23 @@ a subset of the defined clients.
 =item delay => BOOLEAN
 
  [PARTIAL]
+
 Do not execute the server call yet, but prepare it only in a way that
 it can be combined with other clients in parallel.
 See L<Couch::DB::Result|Couch::DB::Result> chapter L</DETAILS> about delayed requests.
+
+=item method => 'GET'|'POST'|...
+
+HTTP transport method.  Positional parameter when a LIST is passed.
+
+=item paginate => BOOLEAN
+
+This call supports pagination via bookmarks.
+This enables the use of L<Couch::DB::Result::nextPage()|Couch::DB::Result/"When the document is collected">.
+
+=item path => $url
+
+HTTP endpoint.  Positional parameter when a LIST is passed.
 
 =item query => HASH
 
@@ -302,6 +331,7 @@ The $what describes the element, to be used in error or warning messages.
 =item $obj-E<gt>B<freshUUIDs>($count, %options)
 
  [UNTESTED]
+
 Returns a $count number of UUIDs in a LIST.  This uses L<requestUUIDs()|Couch::DB/"Conversions"> to get
 a bunch at the same time, for efficiency.  You may get fewer than you want, but
 only when the server is not sending them.
@@ -330,6 +360,8 @@ is beautified.
 
 =item compact => BOOLEAN
 
+Produce compact (no white-space) JSON.
+
 =back
 
 =item $obj-E<gt>B<listToPerl>($set, $type, @data|\@data)
@@ -340,6 +372,7 @@ converted from JSON to pure Perl according to rule $type.
 =item $obj-E<gt>B<requestUUIDs>($count, %options)
 
  [CouchDB API "GET /_uuids", since 2.0, UNTESTED]
+
 Returns UUIDs (Universally unique identifiers), when the call was
 successful.  Better use L<freshUUIDs()|Couch::DB/"Conversions">.  It is faster to use Perl
 modules to generate UUIDs.
@@ -458,22 +491,22 @@ At the moment, the following %options are supported:
 
 =over 4
 
-=item * C<_delay> BOOLEAN, default C<false>
+=item * C<_delay> =E<gt> BOOLEAN, default C<false>
 
 Do not perform and wait for the actual call, but prepare it to be used in parallel
 querying.  TO BE IMPLEMENTED/DOCUMENTED.
 
-=item * C<_client> $client-object or -name
+=item * C<_client> =E<gt> $client-object or -name
 
 Use only the specified client (=server) to perform the call.
 
-=item * C<_clients> ARRAY-of-clients or a role
+=item * C<_clients> =E<gt> ARRAY-of-clients or a role
 
 Use any of the specified clients to perform the call.  When not an ARRAY, the
 parameter is a C<role>: select all clients which can perform that role (the
 logged-in user of that client is allowed to perform that task).
 
-=item * C<_headers> HASH
+=item * C<_headers> =E<gt> HASH
 
 Add headers to the request.  When applicable (for instance, the C<Accept>-header)
 this will overrule the internally calculated defaults.
@@ -484,12 +517,12 @@ Besides, at the moment we support the following events:
 
 =over 4
 
-=item * on_error CODE or ARRAY-of-CODE
+=item * C<on_error> =E<gt> CODE or ARRAY-of-CODE
 
 A CODE (sub) which is called when the interaction with the server has been completed
 without success.  The CODE gets the result object as only parameter.
 
-=item * on_final CODE or ARRAY-of-CODE
+=item * C<on_final> =E<gt> CODE or ARRAY-of-CODE
 
 A CODE (sub) which is called when the interaction with the server has been completed.
 This may happen much later, when combined with C<_delay>.  The CODE gets the result
@@ -499,8 +532,8 @@ object as only parameter.
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.001,
-built on May 29, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.002,
+built on May 31, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

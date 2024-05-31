@@ -115,6 +115,7 @@ t/samples/cpuinfo5
 t/samples/custom/amazon
 t/samples/custom/centos-stream
 t/samples/custom/cloudlinux
+t/samples/custom/redhat
 t/samples/diskstatus-4.9.0-13.txt
 t/samples/diskstatus-6.1.0-20.txt
 t/samples/kernel/alpine/sys_osrelease
@@ -128,7 +129,6 @@ t/samples/kernel/rocky/version
 t/samples/kernel/ubuntu/signature
 t/samples/kernel/ubuntu/sys_osrelease
 t/samples/kernel/ubuntu/version
-t/samples/os-release
 t/samples/os-releases/alpine
 t/samples/os-releases/amazon
 t/samples/os-releases/centos
@@ -136,7 +136,7 @@ t/samples/os-releases/debian
 t/samples/os-releases/raspbian
 t/samples/os-releases/redhat
 t/samples/os-releases/rocky
-t/samples/redhat_version
+t/samples/os-releases/ubuntu
 t/sysinfo.t
 xt/001-pod.t
 xt/002-pod-coverage.t

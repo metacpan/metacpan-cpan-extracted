@@ -7,21 +7,27 @@ Couch::DB::Result - the reply of a CouchDB server call
 =head1 SYNOPSIS
 
   # Any call to the CouchDB server result in this object.
+  # But call() is for internal library use: avoid!
   my $result = $couch->call($method, $path, %call_options);
 
   if($result->isReady) { ... }
-  unless($result)      { ... }   # same
+  if($result)          { ... }   # same
+  $result or die;
 
-  my $doc = $result->doc;      # Couch::DB::Document
+  my $data = $result->answer;    # raw JSON response
+  my $val  = $result->values;    # interpreted response
 
   # It's not always needed to inspect the document
-  if($result->ok)      { ... }
+  if($result->{ok})    { ... }
 
 =head1 DESCRIPTION
 
 The result of a call has many faces: it can be a usage error, a server
 issue, empty, paged, or even delayed.  This Result object is able to
 handle them all.  B<Read the DETAILS chapter below, to understand them all.>
+
+This result objects are pretty heavy: it collects request, response, and much
+more.  So: let them run out-of-scope once you have collected your C<values()>.
 
 =head1 METHODS
 
@@ -33,6 +39,7 @@ handle them all.  B<Read the DETAILS chapter below, to understand them all.>
 
  -Option   --Default
   couch      <required>
+  next       undef
   on_error   [ ]
   on_final   [ ]
   to_values  <keep data>
@@ -40,6 +47,11 @@ handle them all.  B<Read the DETAILS chapter below, to understand them all.>
 =over 2
 
 =item couch => L<Couch::DB|Couch::DB>-object
+
+=item next => HASH
+
+Contains the raw information about the request which produced this result,
+to be used for pagination.
 
 =item on_error => CODE|ARRAY
 
@@ -88,6 +100,12 @@ of the codes.
 Returns C<undef>, or a message (string) which explains why the status
 is as it is.
 
+=item $obj-E<gt>B<status>($code, $message)
+
+Set the $code and $message to something else.  Your program should
+probably not do this: it's the library which determines how the result
+needs to be interpreted.
+
 =back
 
 =head2 When the document is collected
@@ -96,7 +114,8 @@ is as it is.
 
 =item $obj-E<gt>B<answer>(%options)
 
-Returns the received json answer as HASH of raw data.
+When the response was received, this returns the received json answer
+as HASH of raw data: the bare result of the request.
 
 You can better use the L<values()|Couch::DB::Result/"When the document is collected"> method, which returns the data in a far more
 Perlish way: as Perl booleans, DateTime objects, and so on.
@@ -106,9 +125,46 @@ Perlish way: as Perl booleans, DateTime objects, and so on.
 Which client L<Couch::DB::Client|Couch::DB::Client> was used in the last action.  Initially,
 none.  When the results are ready, the client is known.
 
+=item $obj-E<gt>B<next>()
+
+When the call supports pagination, this structure will have captured anything
+you need to know about how to collect the next page.  This structure does not
+contain objects, so can be serialized into a session.
+
+=item $obj-E<gt>B<nextPage>(%options)
+
+[UNTESTED]
+Repeat the request which lead to this result, to receive the next batch
+of answers.  This is only supported by a small set of (search) endpoints.
+This uses the C<bookmark> token. Do not combine it with the C<skip>
+search option (which is probably ignored).
+
+example: paging through result
+
+  my $page1 = $couch->find;
+  my $docs1 = $page1->answer->{docs};
+  my $page2 = $page1->nextPage;
+  my $docs2 = $page2->answer->{docs};
+
+example: paging via a session
+
+  my $page1 = $couch->find;
+  my $docs1 = $page1->answer->{docs};
+  $session->save(next => serialized $page1->next);
+  ...
+  my $next  = deserialize $session->load('next');
+  my $page2 = $couch->call($next);
+  my $docs2 = $page2->answer->{docs};
+
 =item $obj-E<gt>B<request>()
 
+Returns the request (framework specific) object which was used to collect
+the data.
+
 =item $obj-E<gt>B<response>()
+
+When the call was completed, this will return the (framework specific) object
+which contains the response received.
 
 =item $obj-E<gt>B<values>()
 
@@ -137,18 +193,6 @@ Fill this Result object with the actual results.
 
 When defined, the result document is not yet collected.  The $plan contains
 framework specific information how to realize that in a later stage.
-
-=back
-
-=head2 Other
-
-=over 4
-
-=item $obj-E<gt>B<status>($code, $message)
-
-Set the $code and $message to something else.  Your program should
-probably not do this: it's the library which determines how the result
-needs to be interpreted.
 
 =back
 
@@ -230,8 +274,8 @@ this object is initially created.
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.001,
-built on May 29, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.002,
+built on May 31, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

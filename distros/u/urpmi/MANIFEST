@@ -109,6 +109,8 @@ t/data/reconfig.urpmi
 t/data/rpm-buggy/invalid-signature.rpm
 t/data/rpm-buggy/not-a-rpm.rpm
 t/data/rpm-buggy/weird-header.rpm
+t/data/rpm-i586-to-i686/libfoobar-1-1.i586.rpm
+t/data/rpm-i586-to-i686/libfoobar-1-1.i686.rpm
 t/data/rpm-v3/KBackup-1.2.11-1.src.rpm
 t/data/rpm-v3/libtermcap-2.0.8-2.i386.rpm
 t/data/rpm-v3/nls-1.0-2.i386.rpm
@@ -196,6 +198,7 @@ t/data/SPECS/handle-conflict-deps2/c-2.spec
 t/data/SPECS/handle-conflict-deps2/d1-1.spec
 t/data/SPECS/handle-conflict-deps2/d1-2.spec
 t/data/SPECS/handle-conflict-deps2/d2.spec
+t/data/SPECS/i586-to-i686/libfoobar.spec
 t/data/SPECS/kernel-1/kernel-desktop1.spec
 t/data/SPECS/kernel-1/kernel-desktop2.spec
 t/data/SPECS/kernel-1/kernel-desktop3.spec

@@ -2,16 +2,16 @@
 # Copyright (C) YEAR Free Software Foundation, Inc.
 #
 # Translators:
-# Jiří Vírava <appukonrad@gmail.com>, 2014
-# Luděk Janča <joelp@email.cz>, 2021
+# Appukonrad <appukonrad@gmail.com>, 2014
+# Luděk Janča <joelp@email.cz>, 2021,2023
 # fri, 2013-2015,2019-2020,2022
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2022-06-13 18:28+0300\n"
 "PO-Revision-Date: 2013-04-04 14:13+0000\n"
-"Last-Translator: fri, 2013-2015,2019-2020,2022\n"
-"Language-Team: Czech (http://www.transifex.com/MageiaLinux/mageia/language/"
+"Last-Translator: Luděk Janča <joelp@email.cz>, 2021,2023\n"
+"Language-Team: Czech (http://app.transifex.com/MageiaLinux/mageia/language/"
 "cs/)\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -3277,8 +3277,9 @@ msgstr "Grafické rozhraní pro instalaci balíčků RPM"
 
 #: ../polkit/org.mageia.gurpmi2.policy.in.h:1
 msgid "Run Mageia Package Installer"
-msgstr "Spustit instalátor balíčků Mageii"
+msgstr "Spustit instalátor balíčků distribuce Mageia"
 
 #: ../polkit/org.mageia.gurpmi2.policy.in.h:2
 msgid "Authentication is required to run Mageia Package Installer"
-msgstr "Ke spuštění instalátoru balíčků Mageii je vyžadována autentizace"
+msgstr ""
+"Ke spuštění instalátoru balíčků distribuce Mageia je vyžadována autentizace"

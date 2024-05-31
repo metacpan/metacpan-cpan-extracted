@@ -74,10 +74,13 @@ and C<on_error>.  See L<Couch::DB/Using the CouchDB API>.
  [CouchDB API "GET /{db}/_changes", TODO]
  [CouchDB API "POST /{db}/_changes", TODO]
 
+Feed of changes made on this database.
+
 =item $obj-E<gt>B<compact>(%options)
 
  [CouchDB API "POST /{db}/_compact"]
  [CouchDB API "POST /{db}/_compact/{ddoc}", UNTESTED]
+
 Instruct the database files to be compacted.  By default, the data gets
 compacted.
 
@@ -95,6 +98,7 @@ Compact all indexes related to this design document, instead.
 =item $obj-E<gt>B<create>(%options)
 
  [CouchDB API "PUT /{db}"]
+
 Create a new database.  The result object will have code HTTP_CREATED when the
 database is successfully created.  When the database already exists, it
 returns HTTP_PRECONDITION_FAILED and an error in the body.
@@ -122,6 +126,8 @@ Collect information from the database, for instance about its clustering.
 
  [CouchDB API "POST /{db}/_ensure_full_commit", deprecated 3.0.0]
 
+Support for old replicators.
+
 =item $obj-E<gt>B<exists>()
 
 Returns a boolean, whether the database exists already.  This will
@@ -130,12 +136,14 @@ call L<ping()|Couch::DB::Database/"Database information"> and wait for an anwser
 =item $obj-E<gt>B<ping>(%options)
 
  [CouchDB API "HEAD /{db}"]
+
 Check whether the database exists.  You may get some useful response
 headers, but nothing more: the response body is empty.
 
 =item $obj-E<gt>B<purgeDocuments>(\%plan, %options)
 
  [CouchDB API "POST /{db}/_purge", UNTESTED]
+
 Remove selected document revisions from the database.
 
 A deleted document is only marked as being deleted, but exists until
@@ -145,47 +153,57 @@ to give replication a chance to distribute the fact of deletion.
 =item $obj-E<gt>B<purgeRecordsLimit>(%options)
 
  [CouchDB API "GET /{db}/_purged_infos_limit", UNTESTED]
+
 Returns the soft maximum number of records kept about deleting records.
 
 =item $obj-E<gt>B<purgeRecordsLimitSet>($limit, %options)
 
  [CouchDB API "PUT /{db}/_purged_infos_limit", UNTESTED]
+
 Set a new soft limit.  The default is 1000.
 
 =item $obj-E<gt>B<purgeUnusedViews>(%options)
 
  [CouchDB API "POST /{db}/_view_cleanup", UNTESTED]
 
+Removes view files that are not used by any design document.
+
 =item $obj-E<gt>B<remove>(%options)
 
  [CouchDB API "DELETE /{db}"]
+
 Remove the database.
 
 =item $obj-E<gt>B<revisionLimit>(%options)
 
  [CouchDB API "GET /{db}/_revs_limit", UNTESTED]
+
 Returns the soft maximum number of records kept about deleting records.
 
 =item $obj-E<gt>B<revisionLimitSet>($limit, %options)
 
  [CouchDB API "PUT /{db}/_revs_limit", UNTESTED]
+
 Set a new soft limit.  The default is 1000.
 
 =item $obj-E<gt>B<revisionsDiff>(\%plan, %options)
 
  [CouchDB API "POST /{db}/_revs_diff", UNTESTED]
+
 With given a list of document revisions, returns the document revisions
 that do not exist in the database.
 
 =item $obj-E<gt>B<revisionsMissing>(\%plan, %options)
 
  [CouchDB API "POST /{db}/_missing_revs", UNTESTED]
+
 With given a list of document revisions, returns the document revisions
 that do not exist in the database.
 
 =item $obj-E<gt>B<userRoles>(%options)
 
  [CouchDB API "GET /{db}/_security"]
+
 Returns the users who have access to the database, including their roles
 (permissions).
 
@@ -196,6 +214,7 @@ anyway.
 =item $obj-E<gt>B<userRolesChange>(%options)
 
  [CouchDB API "PUT /{db}/_security", UNTESTED]
+
 Returns the users who have access to the database, including their roles
 (permissions).
 
@@ -231,6 +250,8 @@ also call C<Couch::DB::Design::createIndex()>.
 
 =item design => $design|$ddocid
 
+When no design document is specified, then one will be created.
+
 =back
 
 =item $obj-E<gt>B<listDesigns>()
@@ -238,6 +259,7 @@ also call C<Couch::DB::Design::createIndex()>.
  [CouchDB API "GET /{db}/_design_docs", UNTESTED]
  [CouchDB API "POST /{db}/_design_docs", UNTESTED]
  [CouchDB API "POST /{db}/_design_docs/queries", UNTESTED]
+
 Get some design documents.  The search query looks very much like a generic
 view search, but a few parameters are added and missing.
 
@@ -245,17 +267,20 @@ If there are searches, then C<GET> is used, otherwise the C<POST> version.
 The returned structure depends on the searches and the number of searches.
 
  -Option--Default
-  search  []
+  search  [ +{} ]
 
 =over 2
 
 =item search => \%query|ARRAY
+
+One or more search queries to be run.  The default returns all designs.
 
 =back
 
 =item $obj-E<gt>B<listIndexes>(%options)
 
  [CouchDB API "GET /{db}/_index", UNTESTED]
+
 Collect all indexes for the database.
 
 =back
@@ -326,6 +351,7 @@ Explain how the a search will be executed.
 =item $obj-E<gt>B<inspectDocuments>(\@docs, %options)
 
  [CouchDB API "POST /{db}/_bulk_get", UNTESTED]
+
 Return information on multiple documents at the same time.
 
  -Option--Default
@@ -354,7 +380,7 @@ If there are searches, then C<POST> is used, otherwise the C<GET> version.
 The returned structure depends on the searches and the number of searches.
 
 The usual way to use this method with a view, is by calling
-Couch::DB::Design subroutine viewFind.
+L<Couch::DB::Design::viewFind()|Couch::DB::Design/"Views">.
 
  -Option   --Default
   design     undef
@@ -387,6 +413,7 @@ Restrict the search to the named view.  Requires the C<design> document.
 =item $obj-E<gt>B<updateDocuments>(\@docs, %options)
 
  [CouchDB API "POST /{db}/_bulk_docs", UNTESTED]
+
 Insert, update, and delete multiple documents in one go.  This is more efficient
 than saving them one by one.
 
@@ -426,8 +453,8 @@ example: for error handling
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.001,
-built on May 29, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.002,
+built on May 31, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

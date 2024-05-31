@@ -11,19 +11,12 @@ sub new {
     }, $package);
 }
 
-sub help        { $_[0]->fetch('help'                               ) }
-sub domain      { $_[0]->fetch('domain',        $_[1]->name         ) }
-sub ip          { $_[0]->fetch('ip',            $_[1]->prefix       ) }
-sub autnum      { $_[0]->fetch('autnum',        $_[1]->toasplain    ) }
-sub entity      { $_[0]->fetch('entity',        $_[1]->handle       ) }
-sub nameserver  { $_[0]->fetch('nameserver',    $_[1]->name         ) }
-
 sub fetch {
     my ($self, $type, $handle, %params) = @_;
 
     my $uri = dclone($self->base);
 
-    $uri->path_segments(grep { defined } ($uri->path_segments, $type, $handle));
+    $uri->path_segments(grep { defined } $uri->path_segments, $type, $handle);
     $uri->query_form(%params);
 
     my %opt;
@@ -32,9 +25,14 @@ sub fetch {
     return $self->client->fetch($uri, %opt);
 }
 
-sub base    { $_[0]->{'base'}   }
-sub client  { $_[0]->{'client'} }
-
+sub base        { $_[0]->{'base'}   }
+sub client      { $_[0]->{'client'} }
+sub help        { $_[0]->fetch('help'                               ) }
+sub domain      { $_[0]->fetch('domain',        $_[1]->name         ) }
+sub ip          { $_[0]->fetch('ip',            $_[1]->prefix       ) }
+sub autnum      { $_[0]->fetch('autnum',        $_[1]->toasplain    ) }
+sub entity      { $_[0]->fetch('entity',        $_[1]->handle       ) }
+sub nameserver  { $_[0]->fetch('nameserver',    $_[1]->name         ) }
 sub domains     { $_[0]->fetch('domains',       undef, $_[1] => $_[2]) }
 sub nameservers { $_[0]->fetch('nameservers',   undef, $_[1] => $_[2]) }
 sub entities    { $_[0]->fetch('entities',      undef, $_[1] => $_[2]) }

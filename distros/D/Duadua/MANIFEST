@@ -14,6 +14,7 @@ lib/Duadua/Parser/Bot/BingPreview.pm
 lib/Duadua/Parser/Bot/BotMisc.pm
 lib/Duadua/Parser/Bot/Bytespider.pm
 lib/Duadua/Parser/Bot/CentroAdsCrawler.pm
+lib/Duadua/Parser/Bot/ClaudeBot.pm
 lib/Duadua/Parser/Bot/DuckDuckBot.pm
 lib/Duadua/Parser/Bot/FacebookCrawler.pm
 lib/Duadua/Parser/Bot/Fastladder.pm
@@ -89,6 +90,7 @@ t/testset/bot/bot_general.yaml
 t/testset/bot/bot_misc.yaml
 t/testset/bot/bytespider.yaml
 t/testset/bot/centro_ads_crawler.yaml
+t/testset/bot/claudebot.yaml
 t/testset/bot/duckduckbot.yaml
 t/testset/bot/facebookcrawler.yaml
 t/testset/bot/fastladder.yaml
@@ -102,6 +104,7 @@ t/testset/bot/googlebot.yaml
 t/testset/bot/googlebot_ad.yaml
 t/testset/bot/googlebot_misc.yaml
 t/testset/bot/googlebot_mobile.yaml
+t/testset/bot/gptbot.yaml
 t/testset/bot/hatena_bot.yaml
 t/testset/bot/huawei.yaml
 t/testset/bot/inoreader.yaml

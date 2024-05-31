@@ -1,4 +1,4 @@
-use v5.28;
+use v5.32;
 use Config;
 use ExtUtils::MakeMaker::CPANfile;
 use Path::Tiny 0.062;
@@ -65,7 +65,6 @@ WriteMakefile(
       },
     },
   },
-  MIN_PERL_VERSION => '5.032',
   NAME => $main_module,
   NO_MYMETA => 1,
   VERSION => $main_module_version,

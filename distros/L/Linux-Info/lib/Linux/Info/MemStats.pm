@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.16'; # VERSION
 
 # ABSTRACT:  Collect linux memory information.
 
@@ -144,7 +144,7 @@ Linux::Info::MemStats - Collect linux memory information.
 
 =head1 VERSION
 
-version 2.15
+version 2.16
 
 =head1 SYNOPSIS
 

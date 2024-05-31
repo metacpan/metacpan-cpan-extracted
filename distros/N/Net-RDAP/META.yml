@@ -38,11 +38,12 @@ requires:
   Net::DNS::RR::DNSKEY: '0'
   Net::DNS::RR::DS: '0'
   Net::IP: '0'
+  Test::More: '0'
   URI: '0'
   XML::LibXML: '0'
   vCard: '0'
 resources:
   bugtracker: https://github.com/gbxyz/perl-Net-RDAP/issues
   repository: https://github.com/gbxyz/perl-Net-RDAP.git
-version: 0.23
+version: 0.24
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

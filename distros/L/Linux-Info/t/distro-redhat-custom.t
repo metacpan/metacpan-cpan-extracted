@@ -10,7 +10,7 @@ can_ok( $class, qw(get_type is_enterprise get_codename) );
 
 my $instance = $class->new(
     Linux::Info::Distribution::BasicInfo->new(
-        'redhat', 't/samples/redhat_version'
+        'redhat', 't/samples/custom/redhat'
     )
 );
 ok( $instance, 'new method works' );

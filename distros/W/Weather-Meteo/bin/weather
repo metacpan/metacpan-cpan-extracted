@@ -31,18 +31,18 @@ if(!defined($coordinates)) {
 	die "$0: unknown location '$location'";
 }
 
-my $cachedir = $ENV{'CACHEDIR'};
-if($cachedir) {
-	mkdir $cachedir, 0700 if(!-d $cachedir);
-	$cachedir = File::Spec->catfile($cachedir, 'lwp-cache');
+my $cache_dir = $ENV{'CACHE_DIR'};
+if($cache_dir) {
+	mkdir $cache_dir, 0700 if(!-d $cache_dir);
+	$cache_dir = File::Spec->catfile($cache_dir, 'lwp-cache');
 } else {
-	# $cachedir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'lwp');
-	$cachedir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'lwp-cache')
+	# $cache_dir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'lwp');
+	$cache_dir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'lwp-cache')
 }
-if(!-d $cachedir) {
-	mkdir $cachedir, 0700 || die "$cachedir: $!";
+if(!-d $cache_dir) {
+	mkdir $cache_dir, 0700 || die "$cache_dir: $!";
 }
-my $cached_browser = LWP::UserAgent::Cached->new(cache_dir => $cachedir,
+my $cached_browser = LWP::UserAgent::Cached->new(cache_dir => $cache_dir,
 	agent => basename($0),
 	keep_alive => 1,
 	timeout => 30,

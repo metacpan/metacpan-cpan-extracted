@@ -17,6 +17,59 @@ This is also useful at the command line for 1-time use:
 
     $ perl -MTest2::Plugin::UUID path/to/test.t
 
+# CONTROLLING WARNINGS AND BACKENDS
+
+You can turn off backend warnings, and choose your own backend order
+preference:
+
+    use Test2::Plugin::UUID warn => 0, backends => ['UUID', ...];
+
+Or at the command line:
+
+    perl -MTest2::Plugin::UUID=warn,0 path/to/test.t
+
+Or via env vars:
+
+    TEST2_UUID_BACKEND="UUID,Data::UUID::MT" TEST2_UUID_WARN=0 perl path/to/test.t
+
+Normally warnings will be issued if [UUID::Tiny](https://metacpan.org/pod/UUID%3A%3ATiny) or [Data::UUID](https://metacpan.org/pod/Data%3A%3AUUID) are used as
+the first is slow and the second is not suitible for database keys.
+
+# BACKENDS
+
+One of the following modules will be used under the hood, they are listed here
+in order of preference.
+
+- [UUID](https://metacpan.org/pod/UUID) >= 0.35
+
+    When possible this module will use the [UUID](https://metacpan.org/pod/UUID) cpan module, but it must be
+    version 0.35 or greater to avoid a fork related bug. It will generate version 7
+    UUIDs as they are most suitible for database entry.
+
+- [Data::UUID::MT](https://metacpan.org/pod/Data%3A%3AUUID%3A%3AMT)
+
+    [Data::UUID::MT](https://metacpan.org/pod/Data%3A%3AUUID%3A%3AMT) is the second choice for UUID generation. With this module
+    version 4 UUIDs are generated as they are fairly usable in databases.
+
+- [UUID::Tiny](https://metacpan.org/pod/UUID%3A%3ATiny) - slow
+
+    [UUID::Tiny](https://metacpan.org/pod/UUID%3A%3ATiny) is used if the previous 2 are not available. This module is pure
+    perl and thus could be slower than the others. Version 4 UUIDs are generated
+    when this module is used.
+
+    A warning will be issued with this module. You can surpress the warning with
+    either the `$TEST2_UUID_NO_WARN` environment variable. You can also surpress
+    it with the ':nowarn' import argument.
+
+- [Data::UUID](https://metacpan.org/pod/Data%3A%3AUUID) - Not Suitible for Databases
+
+    This is the last resort module. This generates UUIDs fast, but they are of a
+    type/version that is not suitible for database keys.
+
+    A warning will be issued with this module. You can surpress the warning with
+    either the `$TEST2_UUID_NO_WARN` environment variable. You can also surpress
+    it with the ':nowarn' import argument.
+
 # SOURCE
 
 The source code repository for Test2-Plugin-UUID can be found at
@@ -32,7 +85,7 @@ The source code repository for Test2-Plugin-UUID can be found at
 
 # COPYRIGHT
 
-Copyright 2019 Chad Granum <exodist@cpan.org>.
+Copyright Chad Granum <exodist@cpan.org>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

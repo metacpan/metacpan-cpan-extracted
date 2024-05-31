@@ -1,0 +1,406 @@
+=encoding utf8
+
+=head1 NAME
+
+Couch::DB::Design - handle design documents
+
+=head1 INHERITANCE
+
+ Couch::DB::Design
+   is a Couch::DB::Document
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+In CouchDB, design documents provide the main interface for building
+a CouchDB application. The design document defines the views used to
+extract information from CouchDB through one or more views.
+
+Design documents behave just like your own documents, but occupy the
+C<_design/> namespace in your database.  A bunch of the methods are
+therefore exactly the same as the methods in base-class
+L<Couch::DB::Document|Couch::DB::Document>.
+
+Extends L<"DESCRIPTION" in Couch::DB::Document|Couch::DB::Document/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Couch::DB::Document|Couch::DB::Document/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Couch::DB::Document|Couch::DB::Document/"Constructors">.
+ 
+=over 4
+
+=item Couch::DB::Design-E<gt>B<new>(%options)
+
+ -Option--Defined in         --Default
+  batch   Couch::DB::Document  from database
+  db      Couch::DB::Document  undef
+  id      Couch::DB::Document  undef
+  local   Couch::DB::Document  false
+
+=over 2
+
+=item batch => BOOLEAN
+
+=item db => L<Couch::DB::Database|Couch::DB::Database>-object
+
+=item id => ID
+
+=item local => BOOLEAN
+
+=back
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in Couch::DB::Document|Couch::DB::Document/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<batch>()
+
+Inherited, see L<Couch::DB::Document/"Accessors">
+
+=item $obj-E<gt>B<couch>()
+
+Inherited, see L<Couch::DB::Document/"Accessors">
+
+=item $obj-E<gt>B<db>()
+
+Inherited, see L<Couch::DB::Document/"Accessors">
+
+=item $obj-E<gt>B<id>()
+
+Inherited, see L<Couch::DB::Document/"Accessors">
+
+=back
+
+=head2 Content
+
+Extends L<"Content" in Couch::DB::Document|Couch::DB::Document/"Content">.
+ 
+=over 4
+
+=item $obj-E<gt>B<isDeleted>()
+
+Inherited, see L<Couch::DB::Document/"Content">
+
+=item $obj-E<gt>B<isLocal>()
+
+Inherited, see L<Couch::DB::Document/"Content">
+
+=item $obj-E<gt>B<latest>()
+
+Inherited, see L<Couch::DB::Document/"Content">
+
+=item $obj-E<gt>B<rev>()
+
+Inherited, see L<Couch::DB::Document/"Content">
+
+=item $obj-E<gt>B<revision>($rev)
+
+Inherited, see L<Couch::DB::Document/"Content">
+
+=item $obj-E<gt>B<revisions>()
+
+Inherited, see L<Couch::DB::Document/"Content">
+
+=back
+
+=head2 Document details
+
+Extends L<"Document details" in Couch::DB::Document|Couch::DB::Document/"Document details">.
+ 
+=over 4
+
+=item $obj-E<gt>B<conflicts>()
+
+Inherited, see L<Couch::DB::Document/"Document details">
+
+=item $obj-E<gt>B<deletedConflicts>()
+
+Inherited, see L<Couch::DB::Document/"Document details">
+
+=item $obj-E<gt>B<revisionInfo>($revision)
+
+Inherited, see L<Couch::DB::Document/"Document details">
+
+=item $obj-E<gt>B<revisionsInfo>()
+
+Inherited, see L<Couch::DB::Document/"Document details">
+
+=item $obj-E<gt>B<updateSequence>()
+
+Inherited, see L<Couch::DB::Document/"Document details">
+
+=back
+
+=head2 Document in the database
+
+All methods below are inherited from standard documents.  Their call URI
+differs, but their implementation is the same.  On the other hand: they
+add interpretation on fields which do not start with '_'.
+
+Extends L<"Document in the database" in Couch::DB::Document|Couch::DB::Document/"Document in the database">.
+ 
+=over 4
+
+=item $obj-E<gt>B<appendTo>($doc, %options)
+
+ [CouchDB API "COPY /{db}/_design/{ddoc}"]
+
+=item $obj-E<gt>B<cloneInto>($doc, %options)
+
+ [CouchDB API "COPY /{db}/_design/{ddoc}"]
+
+=item $obj-E<gt>B<create>(\%data, %options)
+
+Create a new design document.  Design documents do not use generated ids,
+so: you have to have specified one with L<new(id)|Couch::DB::Document/"Constructors">.  Therefore, this method
+is equivalent to L<update()|Couch::DB::Design/"Document in the database">.
+
+ -Option--Defined in         --Default
+  batch   Couch::DB::Document  new(batch)
+
+=over 2
+
+=item batch => BOOLEAN
+
+=back
+
+=item $obj-E<gt>B<delete>(%options)
+
+ [CouchDB API "DELETE /{db}/_design/{ddoc}"]
+
+=item $obj-E<gt>B<details>(%options)
+
+ [CouchDB API "GET /{db}/_design/{ddoc}/_info", UNTESTED]
+
+Obtains information about the specified design document, including the
+index, index size and current status of the design document and associated
+index information.
+
+=item $obj-E<gt>B<exists>(%option)
+
+ [CouchDB API "HEAD /{db}/_design/{ddoc}"]
+
+Returns the HTTP Headers containing a minimal amount of information about the
+specified design document.
+
+=item $obj-E<gt>B<get>(%options)
+
+ [CouchDB API "GET /{db}/_design/{ddoc}"]
+
+=item $obj-E<gt>B<update>(\%data, %options)
+
+ [CouchDB API "PUT /{db}/_design/{ddoc}"]
+
+Options C<filters>, C<lists>, C<shows>, and C<updates> are HASHes which
+map names to fragments of code written in programming language C<language>
+(usually erlang or javascript).
+
+Options C<lists>, C<show>, and C<rewrites> (query redirection) are
+deprecated since 3.0, and are removed from 4.0.
+
+ -Option--Defined in         --Default
+  batch   Couch::DB::Document  new(batch)
+
+=over 2
+
+=item batch => BOOLEAN
+
+=back
+
+=back
+
+=head2 Attachments
+
+Extends L<"Attachments" in Couch::DB::Document|Couch::DB::Document/"Attachments">.
+ 
+=over 4
+
+=item $obj-E<gt>B<attDelete>($name, %options)
+
+ [CouchDB API "DELETE /{db}/_design/{ddoc}/{attname}" ]
+
+=item $obj-E<gt>B<attExists>($name, %options)
+
+ [CouchDB API "HEAD /{db}/_design/{ddoc}/{attname}"]
+
+=item $obj-E<gt>B<attInfo>($name)
+
+Inherited, see L<Couch::DB::Document/"Attachments">
+
+=item $obj-E<gt>B<attLoad>($name, %options)
+
+ [CouchDB API "GET /{db}/_design/{ddoc}/{attname}" ]
+
+=item $obj-E<gt>B<attSave>($name, $data, %options)
+
+ [CouchDB API "PUT /{db}/_design/{ddoc}/{attname}" ]
+
+ -Option--Defined in         --Default
+  type    Couch::DB::Document  application/octet-stream
+
+=over 2
+
+=item type => IANA-MediaType
+
+=back
+
+=item $obj-E<gt>B<attachment>($name)
+
+Inherited, see L<Couch::DB::Document/"Attachments">
+
+=item $obj-E<gt>B<attachments>()
+
+Inherited, see L<Couch::DB::Document/"Attachments">
+
+=back
+
+=head2 Indexes
+
+=over 4
+
+=item $obj-E<gt>B<createIndex>(\%filter, %options)
+
+ [CouchDB API "POST /{db}/_index", UNTESTED]
+
+Create/confirm an index on the database.  When you like a generated design
+document name, you can use L<Couch::DB::Database::createIndex()|Couch::DB::Database/"Designs and Indexes">.
+
+=item $obj-E<gt>B<deleteIndex>($index, %options)
+
+ [CouchDB API "DELETE /{db}/_index/{designdoc}/json/{name}", UNTESTED]
+
+Remove an index from this design document.
+
+=item $obj-E<gt>B<indexDetails>($index, %options)
+
+ [CouchDB API "GET /{db}/_design/{ddoc}/_search_info/{index}", UNTESTED]
+
+Returns metadata for the specified search index.
+
+=item $obj-E<gt>B<indexFind>($index, %options)
+
+ [CouchDB API "GET /{db}/_design/{ddoc}/_search/{index}", UNTESTED]
+
+Executes a search request against the named $index.
+
+When you have used C<include_docs>, then the documents can be found in
+C<< $result->values->{docs} >>, not C<< {rows} >>.
+
+ -Option--Default
+  search  {}
+
+=over 2
+
+=item search => HASH
+
+The search query.
+
+=back
+
+=back
+
+=head2 Views
+
+=over 4
+
+=item $obj-E<gt>B<viewFind>($view, %options)
+
+ [CouchDB API "GET /{db}/_design/{ddoc}/_view/{view}"]
+ [CouchDB API "POST /{db}/_design/{ddoc}/_view/{view}", UNTESTED]
+ [CouchDB API "POST /{db}/_design/{ddoc}/_view/{view}/queries", UNTESTED]
+ [CouchDB API "GET /{db}/_partition/{partition}/_design/{ddoc}/_view/{view}", UNTESTED]
+
+Executes the specified view function.
+
+This work is handled in L<Couch::DB::Database::listDocuments()|Couch::DB::Database/"Handling documents">.  See that method for
+%options and results.
+
+=back
+
+=head2 Functions
+
+=over 4
+
+=item $obj-E<gt>B<applyUpdate>($function, %options)
+
+ [CouchDB API "POST /{db}/_design/{ddoc}/_update/{func}", UNTESTED]
+ [CouchDB API "POST /{db}/_design/{ddoc}/_update/{func}/{docid}", UNTESTED]
+
+Executes an update function against a document.
+
+ -Option--Default
+  doc     null
+
+=over 2
+
+=item doc => $document|$docid
+
+Run the function on the specified document.  By default, the function is applied to
+a C<null> (missing) document.
+
+=back
+
+=item $obj-E<gt>B<list>($function, $view, %options)
+
+ [CouchDB API "GET /{db}/_design/{ddoc}/_list/{func}/{view}", deprecated 3.0, removed 4.0, UNTESTED]
+ [CouchDB API "POST /{db}/_design/{ddoc}/_list/{func}/{view}", deprecated 3.0, removed 4.0, UNTESTED]
+ [CouchDB API "GET /{db}/_design/{ddoc}/_list/{func}/{other-ddoc}/{view}", deprecated 3.0, removed 4.0, UNTESTED]
+ [CouchDB API "POST /{db}/_design/{ddoc}/_list/{func}/{other-ddoc}/{view}", deprecated 3.0, removed 4.0, UNTESTED]
+
+Executes a list function against the view.
+
+ -Option   --Default
+  view_ddoc  undef
+
+=over 2
+
+=item view_ddoc => $ddoc|$ddocid
+
+When the $view resides in a differen design.
+
+=back
+
+=item $obj-E<gt>B<show>($function, %options)
+
+ [CouchDB API "GET /{db}/_design/{ddoc}/_show/{func}", deprecated 3.0, removed 4.0, UNTESTED]
+ [CouchDB API "POST /{db}/_design/{ddoc}/_show/{func}", deprecated 3.0, removed 4.0, UNTESTED]
+ [CouchDB API "GET /{db}/_design/{ddoc}/_show/{func}/{docid}", deprecated 3.0, removed 4.0, UNTESTED]
+ [CouchDB API "POST /{db}/_design/{ddoc}/_show/{func}/{docid}", deprecated 3.0, removed 4.0, UNTESTED]
+
+Apply show $function on the document.
+
+ -Option--Default
+  doc     null
+
+=over 2
+
+=item doc => $document|$docid
+
+Run the function on the specified document, by default a C<null> document.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Couch-DB distribution version 0.002,
+built on May 31, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2024 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

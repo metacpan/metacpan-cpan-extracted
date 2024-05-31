@@ -15,7 +15,8 @@ $obj->put(
 	['e', 'MAIN'],
 );
 my $ret = $obj->flush;
-is($ret, '<MAIN>data</MAIN>');
+is($ret, '<MAIN>data</MAIN>',
+	'Put and flush element with data (sgml mode).');
 
 # Test.
 $obj->reset;
@@ -25,7 +26,8 @@ $obj->put(
 	['e', 'ELEMENT'],
 );
 $ret = $obj->flush;
-is($ret, '<ELEMENT><ELEMENT2></ELEMENT>');
+is($ret, '<ELEMENT><ELEMENT2></ELEMENT>',
+	'Put and flush nested element (sgml mode).');
 
 # Test.
 $obj = Tags::Output::Raw->new(
@@ -38,7 +40,8 @@ $obj->put(
 	['e', 'MAIN'],
 );
 $ret = $obj->flush;
-is($ret, '<MAIN id="id_value">data</MAIN>');
+is($ret, '<MAIN id="id_value">data</MAIN>',
+	'Put and flush element with key/value attribute and data (sgml mode).');
 
 # Test.
 $obj = Tags::Output::Raw->new(
@@ -51,7 +54,8 @@ $obj->put(
 	['e', 'MAIN'],
 );
 $ret = $obj->flush;
-is($ret, '<MAIN disabled>data</MAIN>');
+is($ret, '<MAIN disabled>data</MAIN>',
+	'Put and flush element with key attribute and data (sgml mode).');
 
 # Test.
 $obj = Tags::Output::Raw->new(
@@ -68,7 +72,8 @@ $obj->put(
 	['e', 'MAIN'],
 );
 $ret = $obj->flush;
-is($ret, '<MAIN id="id_value">data</MAIN><MAIN id="id_value2">data</MAIN>');
+is($ret, '<MAIN id="id_value">data</MAIN><MAIN id="id_value2">data</MAIN>',
+	'Put and flush two elements with key/value attribute and data (sgml mode).');
 
 # Test.
 $obj = Tags::Output::Raw->new(
@@ -80,7 +85,8 @@ $obj->put(
 	['e', 'main'],
 );
 $ret = $obj->flush;
-is($ret, '<main>data</main>');
+is($ret, '<main>data</main>',
+	'Put and flush element with data (xml mode).');
 
 # Test.
 $obj = Tags::Output::Raw->new(
@@ -93,7 +99,8 @@ $obj->put(
 	['e', 'main'],
 );
 $ret = $obj->flush;
-is($ret, '<main id="id_value">data</main>');
+is($ret, '<main id="id_value">data</main>',
+	'Put and flush element with key/value attribute and data (xml mode).');
 
 # Test.
 $obj->reset;
@@ -104,7 +111,8 @@ $obj->put(
 	['e', 'main'],
 );
 $ret = $obj->flush;
-is($ret, '<main id="0">data</main>');
+is($ret, '<main id="0">data</main>',
+	'Put and flush element with key/value attribute and data (xml mode, attribute value is 0).');
 
 # Test.
 $obj = Tags::Output::Raw->new(
@@ -121,7 +129,8 @@ $obj->put(
 	['e', 'main'],
 );
 $ret = $obj->flush;
-is($ret, '<main id="id_value">data</main><main id="id_value2">data</main>');
+is($ret, '<main id="id_value">data</main><main id="id_value2">data</main>',
+	'Put and flush two elements with key/value attribute and data (xml mode).');
 
 # Test.
 my $long_data = 'a' x 1000;
@@ -132,11 +141,8 @@ $obj->put(
 	['e', 'MAIN'],
 );
 $ret = $obj->flush;
-my $right_ret = <<"END";
-<MAIN>$long_data</MAIN>
-END
-chomp $right_ret;
-is($ret, $right_ret);
+is($ret, "<MAIN>$long_data</MAIN>",
+	'Put and flush element with data (xml mode and long data #1).');
 
 # Test.
 $long_data = 'aaaa ' x 1000;
@@ -147,8 +153,5 @@ $obj->put(
 	['e', 'MAIN'],
 );
 $ret = $obj->flush;
-$right_ret = <<"END";
-<MAIN>$long_data</MAIN>
-END
-chomp $right_ret;
-is($ret, $right_ret);
+is($ret, "<MAIN>$long_data</MAIN>",
+	'Put and flush element with data (xml mode and long data #2).');

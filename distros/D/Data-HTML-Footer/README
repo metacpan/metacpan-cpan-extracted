@@ -1,0 +1,172 @@
+NAME
+    Data::HTML::Footer - Data object for HTML footer.
+
+SYNOPSIS
+     use Data::HTML::Footer;
+
+     my $obj = Data::HTML::Footer->new(%params);
+     my $author = $obj->author;
+     my $author_url = $obj->author_url;
+     my $copyright_years = $obj->copyright_years;
+     my $height = $obj->height;
+     my $version = $obj->version;
+     my $version_url = $obj->version_url;
+
+METHODS
+  "new"
+     my $obj = Data::HTML::Footer->new(%params);
+
+    Constructor.
+
+    *       "author"
+
+            Author to present in footer.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "author_url"
+
+            Author absolute or relative URL.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "copyright_years"
+
+            Copyright years.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "version"
+
+            Version of application for present in footer.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "version_url"
+
+            Version absolute or relative URL.
+
+            It's optional.
+
+            Default value is undef.
+
+    Returns instance of object.
+
+  "author"
+     my $author = $obj->author;
+
+    Get author string.
+
+    Returns string.
+
+  "athor_url"
+     my $author_url = $obj->author_url;
+
+    Get author URL.
+
+    Returns string.
+
+  "copyright_years"
+     my $copyright_years = $obj->copyright_years;
+
+    Get copyright years.
+
+    Returns string.
+
+  "height"
+     my $height = $obj->height;
+
+    Get height of HTML footer.
+
+    Returns CSS unit.
+
+  "version"
+     my $version = $obj->version;
+
+    Get version of application.
+
+    Returns string.
+
+  "version_url"
+     my $version_url = $obj->version_url;
+
+    Get version URL.
+
+    Returns string.
+
+ERRORS
+     new():
+             From Mo::utils::CSS::check_css_unit():
+                     Parameter 'height' contain bad unit.
+                             Unit: %s
+                             Value: %s
+                     Parameter 'height' doesn't contain unit name.
+                             Value: %s
+                     Parameter 'height' doesn't contain unit number.
+                             Value: %s
+             From Mo::utils::URI::check_location():
+                     Parameter 'author_url' doesn't contain valid location.
+                             Value: %s
+                     Parameter 'version_url' doesn't contain valid location.
+                             Value: %s
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Data::HTML::Footer;
+
+     my $obj = Data::HTML::Footer->new(
+             'author' => 'John',
+             'author_url' => 'https://example.com',
+             'copyright_years' => '2023-2024',
+             'height' => '40px',
+             'version' => 0.07,
+             'version_url' => '/changes',
+     );
+
+     # Print out.
+     print 'Author: '.$obj->author."\n";
+     print 'Author URL: '.$obj->author_url."\n";
+     print 'Copyright years: '.$obj->copyright_years."\n";
+     print 'Footer height: '.$obj->height."\n";
+     print 'Version: '.$obj->version."\n";
+     print 'Version URL: '.$obj->version_url."\n";
+
+     # Output:
+     # Author: John
+     # Author URL: https://example.com
+     # Copyright years: 2023-2024
+     # Footer height: 40px
+     # Version: 0.07
+     # Version URL: /changes
+
+DEPENDENCIES
+    Mo, Mo::utils::CSS, Mo::utils::URI.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-HTML-Footer>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+
+    cut
+

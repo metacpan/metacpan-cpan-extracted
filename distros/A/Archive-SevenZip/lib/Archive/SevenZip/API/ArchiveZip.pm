@@ -7,7 +7,7 @@ use File::Basename qw(dirname basename);
 use File::Copy;
 use Archive::SevenZip 'AZ_OK';
 
-our $VERSION= '0.19';
+our $VERSION= '0.20';
 
 sub new {
     my( $class, %options )= @_;
@@ -263,7 +263,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2015-2022 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2024 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

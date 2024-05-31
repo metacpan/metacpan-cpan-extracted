@@ -14,6 +14,7 @@ lib/Net/RDAP/Object/Domain.pm
 lib/Net/RDAP/Object/Entity.pm
 lib/Net/RDAP/Object/IPNetwork.pm
 lib/Net/RDAP/Object/Nameserver.pm
+lib/Net/RDAP/Redaction.pm
 lib/Net/RDAP/Registry.pm
 lib/Net/RDAP/Registry/IANARegistry.pm
 lib/Net/RDAP/Registry/IANARegistry/Service.pm
@@ -26,6 +27,8 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md
+t/redacted.json
+t/redaction.t
 t/use.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

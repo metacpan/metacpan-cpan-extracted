@@ -4,19 +4,22 @@
 # Translators:
 # Anssi Hannula <anssi@mandriva.org>, 2007-2009
 # Jani Välimaa <jani.valimaa@gmail.com>, 2009
+# Jani Välimaa, 2022
 # wally <wally@mandriva.org>, 2009
 # Kim Enkovaara <kim.enkovaara@iki.fi>, 2000
+# Kimmo Kujansuu <mrkujansuu@gmail.com>, 2023
 # Matias Griese <mahagr@utu.fi>, 2001-2002
 # Taisto Kuikka <69319@batman.jypoly.fi>, 2003-2004
 # Thomas Backlund <tmb@mandrake.org>, 2002-2005
 # Thomas Backlund <tmb@mandriva.org>, 2005,2009
+# wally <wally@mandriva.org>, 2009
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2022-06-13 18:28+0300\n"
-"PO-Revision-Date: 2020-07-10 16:45+0000\n"
-"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
-"Language-Team: Finnish (http://www.transifex.com/MageiaLinux/mageia/language/"
+"PO-Revision-Date: 2013-04-04 14:13+0000\n"
+"Last-Translator: Kimmo Kujansuu <mrkujansuu@gmail.com>, 2023\n"
+"Language-Team: Finnish (http://app.transifex.com/MageiaLinux/mageia/language/"
 "fi/)\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -52,7 +55,7 @@ msgstr "Valmistellaan..."
 #: ../gurpm/RPMProgressDialog.pm:314
 #, c-format
 msgid "Removing package `%s' ..."
-msgstr ""
+msgstr "Poistetaan paketti '%s'..."
 
 #: ../gurpm/RPMProgressDialog.pm:317
 #, c-format
@@ -262,12 +265,12 @@ msgstr "Paketteja ei määritelty"
 #: ../gurpmi2:47
 #, c-format
 msgid "Must be root"
-msgstr "On oltava pääkäyttäjän oikeudet"
+msgstr "Pääkäyttäjän oikeudet tarvitaan"
 
 #: ../gurpmi2:77
 #, c-format
 msgid "Preparing packages installation..."
-msgstr "Valmistellaan ohjelmistopakettien asennusta..."
+msgstr "Valmistellaan pakettien asennusta..."
 
 #: ../gurpmi2:92 ../urpmi:506
 #, c-format
@@ -476,6 +479,8 @@ msgstr "Suoritetaan urpmi rajoitetussa tilassa..."
 #, c-format
 msgid "While some packages may have been installed, there were failures.\n"
 msgstr ""
+"Vaikka jotkin paketit on saatettu asentaa, niissä oli virheitä.\n"
+"\n"
 
 #: ../urpm.pm:195
 #, c-format
@@ -1007,7 +1012,7 @@ msgstr "Yritetäänkö pakottaa asennus (--force) (k/E)?"
 #: ../urpm/main_loop.pm:593
 #, c-format
 msgid "Packages are up to date"
-msgstr "Paketit ovat ajantasalla"
+msgstr "Paketit ovat ajan tasalla"
 
 #: ../urpm/main_loop.pm:604 ../urpm/parallel.pm:340
 #, c-format
@@ -1071,17 +1076,17 @@ msgstr ""
 #: ../urpm/media.pm:793
 #, c-format
 msgid "ignoring non-free medium `%s'"
-msgstr ""
+msgstr "ohitetaan 'non-free' media '%s'"
 
 #: ../urpm/media.pm:803
 #, c-format
 msgid "un-ignoring non-free medium `%s' b/c nonfree packages are installed"
-msgstr ""
+msgstr "un-ignoring non-free medium `%s' b/c nonfree paketit ovat asennettu"
 
 #: ../urpm/media.pm:807
 #, c-format
 msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
-msgstr ""
+msgstr "un-ignoring tainted medium `%s' b/c tainted paketit ovat asennettu"
 
 #: ../urpm/media.pm:816
 #, c-format
@@ -1089,6 +1094,8 @@ msgid ""
 "un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
 "32-bit EFI"
 msgstr ""
+"un-ignoring 32bit medium `%s' b/c 32-bit paketit ovat asennettu tai "
+"järjestelmä on 32-bit EFI"
 
 #: ../urpm/media.pm:844
 #, c-format
@@ -1374,7 +1381,7 @@ msgstr "Arkkitehtuuri"
 #: ../urpm/msg.pm:229
 #, c-format
 msgid "(recommended)"
-msgstr ""
+msgstr "(suositeltu)"
 
 #: ../urpm/msg.pm:244
 #, c-format
@@ -1429,14 +1436,18 @@ msgid_plural ""
 "%s\n"
 "are now orphaned."
 msgstr[0] ""
+"Seuraava paketti on tarpeeton (orphan):\n"
+"%s"
 msgstr[1] ""
+"Seuraavat paketit ovat tarpeettomia (orphan):\n"
+"%s"
 
 #: ../urpm/orphans.pm:616
 #, c-format
 msgid "You may wish to remove it."
 msgid_plural "You may wish to remove them."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Voit haluta poistaa sen."
+msgstr[1] "Voit haluta poistaa ne."
 
 #: ../urpm/orphans.pm:633
 #, c-format
@@ -1533,7 +1544,7 @@ msgstr "Liitetään %s"
 #: ../urpm/removable.pm:112
 #, c-format
 msgid "unmounting %s"
-msgstr "Irrotetaan %s"
+msgstr "Irroitetaan %s"
 
 #: ../urpm/select.pm:44
 #, c-format
@@ -1562,7 +1573,7 @@ msgstr "Seuraavat paketit sisältävät %s: %s"
 #: ../urpm/select.pm:223
 #, c-format
 msgid "You should use \"-a\" to use all of them"
-msgstr "Käytä valitsinta \"-a\" valitaksesi ne kaikki"
+msgstr "Käytä valitsinta \"-a\" valitaksesi kaikki"
 
 #: ../urpm/select.pm:371
 #, c-format
@@ -1637,12 +1648,12 @@ msgstr "Virheellinen allekirjoitus (%s)"
 #: ../urpm/signature.pm:76
 #, c-format
 msgid "SECURITY: The following package is _NOT_ signed (%s): %s"
-msgstr ""
+msgstr "TIETOTURVA: Seuraava paketti EI ole allekirjoitettu (%s): %s"
 
 #: ../urpm/signature.pm:82
 #, c-format
 msgid "SECURITY: NOT checking package \"%s\" (due to configuration)"
-msgstr ""
+msgstr "TIETOTURVA: EI tarkista pakettia \"%s\" (konfiguraation takia)"
 
 #: ../urpm/signature.pm:101
 #, c-format
@@ -1657,12 +1668,12 @@ msgstr "Puuttuva allekirjoitus (%s)"
 #: ../urpm/signature.pm:106
 #, c-format
 msgid "SECURITY: Medium \"%s\" has no key (%s)!"
-msgstr ""
+msgstr "TIETOTURVA: Keskitaso \"%s\" ei avainta (%s)!"
 
 #: ../urpm/signature.pm:108
 #, c-format
 msgid "Medium without key (%s)"
-msgstr ""
+msgstr "Media ilman avainta (%s)"
 
 #: ../urpm/sys.pm:198
 #, c-format
@@ -1908,7 +1919,7 @@ msgstr ""
 #: ../urpmf:45
 #, c-format
 msgid "  -F<str>        - change field separator (defaults to ':').\n"
-msgstr "  -F<erotin>     - vaihda kenttäerotinta (oletus \":\").\n"
+msgstr "  -F<str>        - vaihda kenttäerotinta (oletus ':').\n"
 
 #: ../urpmf:46
 #, c-format
@@ -2064,7 +2075,7 @@ msgstr "  --sourcerpm    - lähdepaketin nimi.\n"
 #: ../urpmf:75
 #, c-format
 msgid "  --recommends   - recommends tags\n"
-msgstr ""
+msgstr "  --recommends   - suositellut paketit\n"
 
 #: ../urpmf:76
 #, c-format
@@ -2142,6 +2153,7 @@ msgstr "  --auto-orphans - poista tarpeettomat paketit (orphans) kysymättä.\n"
 #, c-format
 msgid "  --no-recommends - do not auto select \"recommended\" packages.\n"
 msgstr ""
+"  --no-recommends - älä valitse \"suositeltuja\" paketteja automaattisesti.\n"
 
 #: ../urpmi:81
 #, c-format
@@ -2216,7 +2228,7 @@ msgstr "  --noclean      - älä poista rpm-paketteja välimuistista.\n"
 msgid ""
 "  --downgrade    - downgrade a package from the version currently installed\n"
 "                   to the previously highest version\n"
-msgstr ""
+msgstr "  --downgrade    - asenna nykyisestä paketista aiempi versio\n"
 
 #: ../urpmi:99
 #, c-format
@@ -2247,6 +2259,7 @@ msgstr ""
 #, c-format
 msgid "  --allow-recommends - auto select \"recommended\" packages.\n"
 msgstr ""
+"  --allow-recommends - valitse \"suositellut\" paketit automaattisesti.\n"
 
 #: ../urpmi:109
 #, c-format
@@ -2628,7 +2641,7 @@ msgstr[1] "Seuraavat tarpeettomat paketit poistetaan."
 #: ../urpmi:599
 #, c-format
 msgid "WARNING: %s option is in use. Some strange problems may happen"
-msgstr ""
+msgstr "VAROITUS: valitsimen %s käyttö voi aiheuttaa odottamattomia ongelmia"
 
 #: ../urpmi:611
 #, c-format
@@ -2666,6 +2679,26 @@ msgid ""
 "\n"
 "and [options] are from\n"
 msgstr ""
+"käyttö: urpmi.addmedia [options] <name> <url>\n"
+"jossa <url> on yksi\n"
+"       [file:/]/<path>\n"
+"       ftp://<login>:<password>@<host>/<path>\n"
+"       ftp://<host>/<path>\n"
+"       http://<host>/<path>\n"
+"       https://<host>/<path>\n"
+"       cdrom://<path>\n"
+"\n"
+"käyttö: urpmi.addmedia [options] --distrib --mirrorlist <url>\n"
+"käyttö: urpmi.addmedia [options] --mirrorlist <url> <name> <relative path>\n"
+"\n"
+"esimerkit:\n"
+"\n"
+"  urpmi.addmedia --distrib --mirrorlist '$MIRRORLIST'\n"
+"  urpmi.addmedia --mirrorlist '$MIRRORLIST' backports media/main/backports\n"
+"  urpmi.addmedia --distrib --zeroconf\n"
+"\n"
+"\n"
+"ja [options] ovat\n"
 
 #: ../urpmi.addmedia:57 ../urpmi.update:34 ../urpmq:71
 #, c-format
@@ -2746,9 +2779,11 @@ msgstr ""
 "  --all-media    - lisää kaikki mediat käytettäessä valitsinta --distrib.\n"
 
 #: ../urpmi.addmedia:79
-#, fuzzy, c-format
+#, c-format
 msgid "  --ignorearch   - with --distrib, add media from incompatible archs\n"
-msgstr "  --ignorearch   - älä tarkista rpm-pakettien arkkitehtuuria.\n"
+msgstr ""
+"  --ignorearch   - lisää yhteensopimattoman arkkitehtuurin media valitsimen "
+"--distrib kanssa\n"
 
 #: ../urpmi.addmedia:80
 #, c-format
@@ -2924,6 +2959,7 @@ msgstr ""
 #, c-format
 msgid "  -a             - select all enabled non-removable media.\n"
 msgstr ""
+"  -a             - valitse kaikki aktivoidut ei-irroitettavat mediat.\n"
 
 #: ../urpmi.update:52
 #, c-format
@@ -3046,7 +3082,7 @@ msgstr ""
 #: ../urpmq:63
 #, c-format
 msgid "  --sources      - print source URLs of selected packages\n"
-msgstr ""
+msgstr "  --sources      - tulosta valittujen pakettien lähdeosoite\n"
 
 #: ../urpmq:65
 #, c-format
@@ -3092,7 +3128,7 @@ msgstr "  --requires     - tulosta riippuvuusmerkinnät (\"Requires\").\n"
 #: ../urpmq:84
 #, c-format
 msgid "  --recommends   - print recommends.\n"
-msgstr ""
+msgstr "  --recommends   - tulosta suositellut paketit.\n"
 
 #: ../urpmq:85
 #, c-format
@@ -3262,8 +3298,8 @@ msgstr "Graafinen ohjelmien asennin"
 
 #: ../polkit/org.mageia.gurpmi2.policy.in.h:1
 msgid "Run Mageia Package Installer"
-msgstr ""
+msgstr "Suorita Mageia pakettien asennin"
 
 #: ../polkit/org.mageia.gurpmi2.policy.in.h:2
 msgid "Authentication is required to run Mageia Package Installer"
-msgstr ""
+msgstr "Autentikointi tarvitaan Mageia pakettien asentimen suorittamiseksi"

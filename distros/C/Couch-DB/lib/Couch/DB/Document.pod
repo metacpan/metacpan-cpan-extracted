@@ -4,6 +4,11 @@
 
 Couch::DB::Document - one document as exchanged with a CouchDB server
 
+=head1 INHERITANCE
+
+ Couch::DB::Document is extended by
+   Couch::DB::Design
+
 =head1 SYNOPSIS
 
   my $doc = $couch->db($dbname)->doc($docid);
@@ -153,8 +158,8 @@ and C<on_error>.  See L<Couch::DB/Using the CouchDB API>.
 
  [CouchDB API "COPY /{db}/{docid}", PARTIAL]
  [CouchDB API "COPY /{db}/_local/{docid}", PARTIAL]
-See also L<cloneInto()|Couch::DB::Document/"Document in the database">.
 
+See also L<cloneInto()|Couch::DB::Document/"Document in the database">.
 As %options: C<batch> and C<rev>.
 
 example: appending one document into an other
@@ -169,6 +174,7 @@ example: appending one document into an other
 
  [CouchDB API "COPY /{db}/{docid}", PARTIAL]
  [CouchDB API "COPY /{db}/_local/{docid}", PARTIAL]
+
 See also L<appendTo()|Couch::DB::Document/"Document in the database">.
 
 As %options, C<batch> and C<rev>.
@@ -183,6 +189,7 @@ example: cloning one document into a new one
 =item $obj-E<gt>B<create>(\%data, %options)
 
  [CouchDB API "POST /{db}"]
+
 Save this document for the first time to the database. Your content of the
 document is in %data.  When you pick your own document ids, you can also use
 L<update()|Couch::DB::Document/"Document in the database"> for a first save.
@@ -202,6 +209,7 @@ Do not wait for the write action to be completed.
 
  [CouchDB API "DELETE /{db}/{docid}"]
  [CouchDB API "DELETE /{db}/_local/{docid}"]
+
 Flag the document to be deleted.  A new revision is created, which reflects this.
 Only later, when all replications know it and compaction is run, the document
 versions will disappear.
@@ -209,6 +217,7 @@ versions will disappear.
 =item $obj-E<gt>B<exists>(%option)
 
  [CouchDB API "HEAD /{db}/{docid}"]
+
 Check whether the document exists.  You may get some useful response headers.
 
 example: 
@@ -219,6 +228,7 @@ example:
 
  [CouchDB API "GET /{db}/{docid}"]
  [CouchDB API "GET /{db}/_local/{docid}"]
+
 Retrieve document data and information from the database.  There are a zillion
 of %options to collect additional meta-data.
 
@@ -238,6 +248,7 @@ example: use of get()
 
  [CouchDB API "PUT /{db}/{docid}"]
  [CouchDB API "PUT /{db}/_local/{docid}"]
+
 Save a new revision of this document to the database.  If docid is new,
 then it will be created, otherwise a new revision is added.  Your content
 of the document is in %data.
@@ -266,6 +277,8 @@ Do not wait for the write action to be completed.
 
  [CouchDB API "DELETE /{db}/{docid}/{attname}", UNTESTED]
 
+Deletes an attachment of this document.
+
 =item $obj-E<gt>B<attExists>($name, %options)
 
  [CouchDB API "HEAD /{db}/{docid}/{attname}", UNTESTED]
@@ -278,6 +291,7 @@ Return a structure with meta-data about the attachments.
 =item $obj-E<gt>B<attLoad>($name, %options)
 
  [CouchDB API "GET /{db}/{docid}/{attname}", UNTESTED]
+
 Load the data of the attachment into this Document.
 
 If the content-type of the attachment is C<application/octet-stream>,
@@ -314,8 +328,8 @@ Returns the names of all attachments.
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.001,
-built on May 29, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.002,
+built on May 31, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

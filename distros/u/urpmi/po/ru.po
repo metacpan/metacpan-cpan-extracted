@@ -6,24 +6,25 @@
 # Alexander Kazancev <kazancas@mandriva.ru>, 2008-2009
 # Aleksey Smirnov <smi@logic.ru>, 2000
 # Alexander Kazancev <kazancas@gmail.com>, 2008
-# AlexL <loginov.alex.valer@gmail.com>, 2019-2020
+# AlexL <loginov.alex.valer@gmail.com>, 2019-2020,2023
 # Alice Lafox <alice@lafox.com.ua>, 2003
 # Alice Lafox <alice@lafox.net>, 2004-2005
 # Анатолий Валерианович <ffox909@mail.ru>, 2014
 # Pavel Maryanov <acid_jack@ukr.net>, 2002-2009
 # Валентин Сайков <saikov.vb@gmail.com>, 2014
+# Victor, 2023
 # Vladimir Choundalov <choundalovvv@point.pwp.ru>, 2001
 # Анатолий Валерианович <ffox909@mail.ru>, 2014
 # Валентин Сайков <saikov.vb@gmail.com>, 2014
 # Виктор, 2022
-# Виктор, 2022-2023
+# Victor, 2022-2023
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2022-06-13 18:28+0300\n"
 "PO-Revision-Date: 2013-04-04 14:13+0000\n"
-"Last-Translator: Виктор, 2022-2023\n"
-"Language-Team: Russian (http://www.transifex.com/MageiaLinux/mageia/language/"
+"Last-Translator: AlexL <loginov.alex.valer@gmail.com>, 2019-2020,2023\n"
+"Language-Team: Russian (http://app.transifex.com/MageiaLinux/mageia/language/"
 "ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -353,7 +354,7 @@ msgstr "Будет загружено %s пакетов."
 #, c-format
 msgid "Proceed with the installation of one package?"
 msgid_plural "Proceed with the installation of the %d packages?"
-msgstr[0] "Продолжить установку %d пакета?"
+msgstr[0] "Продолжить установку одного пакета?"
 msgstr[1] "Продолжить установку %d пакетов?"
 msgstr[2] "Продолжить установку %d пакетов?"
 msgstr[3] "Продолжить установку %d пакетов?"
@@ -696,7 +697,7 @@ msgstr "%s недоступен, выполняется откат до %s"
 #, c-format
 msgid "can not read proxy settings (not enough rights to read %s)"
 msgstr ""
-"не удаётся прочитать параметры прокси-сервера (недостаточно прав, чтобы "
+"не удаётся прочитать настройки прокси-сервера (недостаточно прав, чтобы "
 "прочитать %s)"
 
 #: ../urpm/download.pm:201
@@ -1842,7 +1843,7 @@ msgstr "Нет осиротевших пакетов для удаления"
 msgid "To satisfy dependencies, the following package will be removed"
 msgid_plural ""
 "To satisfy dependencies, the following %d packages will be removed"
-msgstr[0] "Для удовлетворения зависимостей, следующий %d пакет будет удалён"
+msgstr[0] "Для удовлетворения зависимостей, следующий пакет будет удалён"
 msgstr[1] "Для удовлетворения зависимостей, следующие %d пакеты будут удалены"
 msgstr[2] "Для удовлетворения зависимостей, следующие %d пакеты будут удалены"
 msgstr[3] "Для удовлетворения зависимостей, следующие %d пакеты будут удалены"
@@ -1861,9 +1862,9 @@ msgstr[3] "(осиротевшие пакеты)"
 msgid "Remove %d package?"
 msgid_plural "Remove %d packages?"
 msgstr[0] "Удалить %d пакет?"
-msgstr[1] "Удалить %d пакета?"
-msgstr[2] "Удалить %d пакетов?"
-msgstr[3] "Удалить %d пакет?"
+msgstr[1] "Удалить %d пакеты?"
+msgstr[2] "Удалить %d пакеты?"
+msgstr[3] "Удалить %d пакеты?"
 
 #: ../urpme:163
 #, c-format
@@ -2716,6 +2717,27 @@ msgid ""
 "\n"
 "and [options] are from\n"
 msgstr ""
+"Использование: urpmi.addmedia [параметры] <name> <url>,\n"
+"где <url> одно из\n"
+"       [file:/]/<path>\n"
+"       ftp://<login>:<password>@<host>/<path>\n"
+"       ftp://<host>/<path>\n"
+"       http://<host>/<path>\n"
+"       https://<host>/<path>\n"
+"       cdrom://<path>\n"
+"\n"
+"использование: urpmi.addmedia [параметры] --distrib --mirrorlist <url>\n"
+"использование: urpmi.addmedia [параметры] --mirrorlist <url> <name> "
+"<relative path>\n"
+"\n"
+"примеры:\n"
+"\n"
+"  urpmi.addmedia --distrib --mirrorlist '$MIRRORLIST'\n"
+"  urpmi.addmedia --mirrorlist '$MIRRORLIST' backports media/main/backports\n"
+"  urpmi.addmedia --distrib --zeroconf\n"
+"\n"
+"\n"
+"и [параметры] из\n"
 
 #: ../urpmi.addmedia:57 ../urpmi.update:34 ../urpmq:71
 #, c-format
@@ -2800,6 +2822,8 @@ msgstr ""
 #, c-format
 msgid "  --ignorearch   - with --distrib, add media from incompatible archs\n"
 msgstr ""
+"--ignorearch - вместе с --distrib, добавить источник с несовместимыми "
+"архитектурами\n"
 
 #: ../urpmi.addmedia:80
 #, c-format

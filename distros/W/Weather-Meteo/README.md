@@ -4,7 +4,7 @@ Weather::Meteo - Interface to [https://open-meteo.com](https://open-meteo.com) f
 
 # VERSION
 
-Version 0.08
+Version 0.09
 
 # SYNOPSIS
 
@@ -36,12 +36,19 @@ for historical weather data from 1940.
 
     use Geo::Location::Point;
 
+The date argument can be an ISO-8601 formatted date,
+or an object that understands the strftime method.
+
     my $ramsgate = Geo::Location::Point->new({ latitude => 51.34, longitude => 1.42 });
     # Print snowfall at 1AM on Christmas morning in Ramsgate
     $weather = $meteo->weather($ramsgate, '2022-12-25');
     @snowfall = @{$weather->{'hourly'}->{'snowfall'}};
 
     print 'Number of cms of snow: ', $snowfall[1], "\n";
+
+    use DateTime;
+    my $dt = DateTime->new(year => 2024, month => 2, day => 1);
+    $weather = $meteo->weather({ location => $ramsgate, date => $dt });
 
 Takes an optional argument, tz, which defaults to 'Europe/London'.
 For that to work set TIMEZONEDB\_KEY to be your API key from [https://timezonedb.com](https://timezonedb.com).
@@ -72,6 +79,12 @@ it under the same terms as Perl itself.
 Lots of thanks to the folks at [https://open-meteo.com](https://open-meteo.com).
 
 # BUGS
+
+Please report any bugs or feature requests to `bug-weather-meteo at rt.cpan.org`,
+or through the web interface at
+[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Weather-Meteo](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Weather-Meteo).
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
 
 # SEE ALSO
 
@@ -107,6 +120,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2023 Nigel Horne.
+Copyright 2024 Nigel Horne.
 
 This program is released under the following licence: GPL2

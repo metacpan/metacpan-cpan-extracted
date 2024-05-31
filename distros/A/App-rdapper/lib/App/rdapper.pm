@@ -7,7 +7,7 @@ use Net::ASN;
 use Net::DNS::Domain;
 use Net::IP;
 use Net::RDAP::EPPStatusMap;
-use Net::RDAP;
+use Net::RDAP 0.24;
 use Pod::Usage;
 use Term::ANSIColor;
 use Term::Size;
@@ -21,11 +21,12 @@ use constant {
     'ADR_PC'        => 5,
     'ADR_CC'        => 6,
     'INDENT'        => '  ',
+    'IANA_BASE_URL' => 'https://rdap.iana.org/',
 };
 use vars qw($VERSION);
 use strict;
 
-$VERSION = 0.9;
+$VERSION = '1.00';
 
 #
 # global arg variables (note: nopager is now ignored)
@@ -55,6 +56,7 @@ my %funcs = (
     'domain'     => sub { App::rdapper->print_domain(@_) },
     'entity'     => sub { App::rdapper->print_entity(@_) },
     'nameserver' => sub { App::rdapper->print_nameserver(@_) },
+    'help'       => sub { 1 }, # help only contains generic properties
 );
 
 my @role_order = qw(registrant administrative technical billing abuse registrar reseller sponsor proxy notifications noc);
@@ -78,67 +80,78 @@ $Text::Wrap::huge = 'overflow';
 sub main {
     my $package = shift;
 
-	GetOptionsFromArray(\@_, %opts) || $package->show_usage;
+    GetOptionsFromArray(\@_, %opts) || $package->show_usage;
 
     $rdap = Net::RDAP->new(
         'use_cache' => !$bypass,
         'cache_ttl' => 300,
     );
 
-	$object = shift(@_) if (!$object);
+    $object = shift(@_) if (!$object);
 
-	$package->show_usage if ($help || length($object) < 1);
+    $package->show_usage if ($help || length($object) < 1);
 
-	if (!$type) {
-	    if ($object =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/)              { $type = 'ip'      } # v4 address
-	    elsif ($object =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/)  { $type = 'ip'      } # v4 range
-	    elsif ($object =~ /^[0-9a-f:]+$/i)                                  { $type = 'ip'      } # v6 address
-	    elsif ($object =~ /^[0-9a-f:]+\/\d{1,3}$/i)                         { $type = 'ip'      } # v6 range
-	    elsif ($object =~ /^asn?\d+$/i)                                     { $type = 'autnum'  } # ASN
-	    elsif ($object =~ /^(file|https)?:\/\//)                            { $type = 'url'     } # URL
-	    else                                                                { $type = 'domain'  } # domain
-	}
+    if (!$type) {
+        if ($object =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/)              { $type = 'ip'      }
+        elsif ($object =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/)  { $type = 'ip'      }
+        elsif ($object =~ /^[0-9a-f:]+$/i)                                  { $type = 'ip'      }
+        elsif ($object =~ /^[0-9a-f:]+\/\d{1,3}$/i)                         { $type = 'ip'      }
+        elsif ($object =~ /^asn?\d+$/i)                                     { $type = 'autnum'  }
+        elsif ($object =~ /^(file|https)?:\/\//)                            { $type = 'url'     }
+        elsif ($object =~ /^([a-z]{2,}|xn--[a-z0-9\-]+)$/i)                 { $type = 'tld'     }
+        else                                                                { $type = 'domain'  }
+    }
 
     my %args;
-	($args{'user'}, $args{'pass'}) = split(/:/, $auth, 2) if ($auth);
+    ($args{'user'}, $args{'pass'}) = split(/:/, $auth, 2) if ($auth);
 
-	my $response;
-	if ('ip' eq $type) {
-	    $response = $rdap->ip(Net::IP->new($object), %args);
+    my $response;
+    if ('ip' eq $type) {
+        $response = $rdap->ip(Net::IP->new($object), %args);
 
-	    $response = $rdap->fetch($response->domain) if ($reverse);
+        $response = $rdap->fetch($response->domain) if ($reverse);
 
-	} elsif ('autnum' eq $type) {
-	    my $asn = $object;
-	    $asn =~ s/^asn?//ig;
+    } elsif ('autnum' eq $type) {
+        my $asn = $object;
+        $asn =~ s/^asn?//ig;
 
-	    $response = $rdap->autnum(Net::ASN->new($asn), %args);
+        $response = $rdap->autnum(Net::ASN->new($asn), %args);
 
-	} elsif ('domain' eq $type) {
-	    $response = $rdap->domain(Net::DNS::Domain->new($object), %args);
+    } elsif ('domain' eq $type) {
+        $response = $rdap->domain(Net::DNS::Domain->new($object), %args);
 
-	} elsif ('nameserver' eq $type) {
-	    my $url = Net::RDAP::Registry->get_url(Net::DNS::Domain->new($object));
+    } elsif ('nameserver' eq $type) {
+        my $url = Net::RDAP::Registry->get_url(Net::DNS::Domain->new($object));
 
         #
         # munge path
         #
-	    my $path = $url->path;
-	    $path =~ s!/domain/!/nameserver/!;
-	    $url->path($path);
+        my $path = $url->path;
+        $path =~ s!/domain/!/nameserver/!;
+        $url->path($path);
 
-	    $response = $rdap->fetch($url, %args);
+        $response = $rdap->fetch($url, %args);
 
-	} elsif ('entity' eq $type) {
-	    $response = $rdap->entity($object, %args);
+    } elsif ('entity' eq $type) {
+        $response = $rdap->entity($object, %args);
 
-	} elsif ('url' eq $type) {
-	    $response = $rdap->fetch(URI->new($object), %args);
+    } elsif ('tld' eq $type) {
+        $response = $rdap->fetch(URI->new(IANA_BASE_URL.'domain/'.$object), %args);
+        
+    } elsif ('url' eq $type) {
+        my $uri = URI->new($object);
 
-	} else {
-	    $package->error("Unable to handle type '$type'");
+        #
+        # if the path ends with /help then we assume then it's a help query
+        #
+        $args{'class_override'} = 'help' if ('help' eq lc(($uri->path_segments)[-1]));
 
-	}
+        $response = $rdap->fetch($uri, %args);
+
+    } else {
+        $package->error("Unable to handle type '$type'");
+
+    }
 
     $package->display($response, 0);
 }
@@ -146,11 +159,11 @@ sub main {
 sub show_usage {
     my $package = shift;
 
-	pod2usage(
-		'-input' 	=> __FILE__, 
-		'-verbose' 	=> 99,
-		'-sections' => [qw(SYNOPSIS OPTIONS)],
-	);
+    pod2usage(
+        '-input'    => __FILE__, 
+        '-verbose'  => 99,
+        '-sections' => [qw(SYNOPSIS OPTIONS)],
+    );
 }
 
 sub display {
@@ -181,7 +194,7 @@ sub display {
         }
 
     } elsif ($raw) {
-	    $out->print(to_json({%{$object}}));
+        $out->print(to_json({%{$object}}));
 
         return 1;
 
@@ -235,7 +248,7 @@ sub display {
         $package->print_entities($object, $indent);
 
         #
-        # links, remarks and notices unless --short has been passed
+        # links, remarks, notices and redactions, unless --short has been passed
         #
         if (!$short) {
             foreach my $link (grep { 'self' ne $_->rel } $object->links) {
@@ -248,6 +261,18 @@ sub display {
 
             foreach my $notice ($object->notices) {
                 $package->print_remark_or_notice($notice, $indent);
+            }
+
+            my @fields = $object->redactions;
+            if (scalar(@fields) > 0) {
+                $package->print_kv('Redacted Fields', '', $indent);
+                foreach my $field (@fields) {
+                    $out->print(wrap(
+                        (INDENT x ($indent + 1)),
+                        (INDENT x ($indent + 2)),
+                        sprintf("%s %s (reason: %s)\n", b('*'), $field->name, $field->reason)
+                    ));
+                }
             }
         }
 
@@ -351,8 +376,10 @@ sub print_events {
     foreach my $event ($object->events) {
         if ($event->actor) {
             $package->print_kv(ucfirst($event->action), sprintf('%s (by %s)', scalar($event->date), $event->actor), $indent);
+
         } else {
             $package->print_kv(ucfirst($event->action), scalar($event->date), $indent);
+
         }
     }
 }
@@ -535,7 +562,7 @@ App::rdapper - a simple console-based RDAP client.
 
 To install, run:
 
-	cpanm --sudo App::rdapper
+    cpanm --sudo App::rdapper
 
 =head1 RUNNING VIA DOCKER
 
@@ -544,13 +571,13 @@ that can be used to build an image on your local system.
 
 Alternatively, you can pull the L<image from Docker Hub|https://hub.docker.com/r/gbxyz/rdapper>:
 
-	$ docker pull gbxyz/rdapper
+    $ docker pull gbxyz/rdapper
 
-	$ docker run -it gbxyz/rdapper --help
+    $ docker run -it gbxyz/rdapper --help
 
 =head1 SYNOPSIS
 
-    rdapper OBJECT [OPTIONS]
+    rdapper [OPTIONS] OBJECT
 
 =head1 DESCRIPTION
 
@@ -571,6 +598,8 @@ You can pass any internet resource as an argument; this may be:
 =over
 
 =item * a "forward" domain name such as C<example.com>;
+
+=item * a top-level domain such as C<com>;
 
 =item * a "reverse" domain name such as C<168.192.in-addr.arpa>;
 
@@ -612,23 +641,32 @@ you can override this by explicitly setting the C<--type> argument
 to one of : C<ip>, C<autnum>, C<domain>, C<nameserver>, C<entity>
 or C<url>.
 
-If C<--type=url> is used, C<rdapper> will directly fetch the
-specified URL and attempt to process it as an RDAP response.
+=over
 
-If C<--type=entity> is used, C<OBJECT> must be a a string
+=item * If C<--type=url> is used, C<rdapper> will directly fetch the
+specified URL and attempt to process it as an RDAP response. If the URL
+path ends with C</help> then the response will be treated as a "help"
+query response (if you want to see the record for the .help TLD, use
+C<--type=tld help>).
+
+=item * If C<--type=entity> is used, C<OBJECT> must be a a string
 containing a "tagged" handle, such as C<ABC123-EXAMPLE>, as per
 RFC 8521.
+
+=back
 
 =item * C<--help> - display help message.
 
 =item * C<--raw> - print the raw JSON rather than parsing it.
 
-=item * C<--short> - omit remarks, notices, and links.
+=item * C<--short> - omit remarks, notices, links and redactions.
 
 =item * C<--bypass-cache> - disable local cache of RDAP objects.
 
 =item * C<--auth=USER:PASS> - HTTP Basic Authentication credentials
-to be used when accessing the specified resource.
+to be used when accessing the specified resource. This option
+B<SHOULD NOT> be used unless you explicitly specify a URL, otherwise
+your credentials may be sent to servers you aren't expecting them to.
 
 =item * C<--nocolor> - disable ANSI colors in the formatted output.
 

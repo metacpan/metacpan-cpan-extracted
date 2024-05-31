@@ -7,11 +7,16 @@ use XML::LibXML;
 use vars qw($UA $REGISTRY @EXPORT);
 use constant {
     IANA_REGISTRY_URL                   => 'https://www.iana.org/assignments/rdap-json-values/rdap-json-values.xml',
-    RDAP_TYPE_NOTICE_OR_REMARK_TYPE     => 'notice or remark type',     #
-    RDAP_TYPE_STATUS                    => 'status',                    # these values are defined in
-    RDAP_TYPE_ROLE                      => 'role',                      # RFC 7483, section 10.2.
-    RDAP_TYPE_EVENT_ACTION              => 'event action',              #
-    RDAP_TYPE_DOMAIN_VARIANT_RELATION   => 'domain variant relation',   #
+
+    RDAP_TYPE_NOTICE_OR_REMARK_TYPE     => 'notice and remark type',        #
+    RDAP_TYPE_STATUS                    => 'status',                        # these values are defined in
+    RDAP_TYPE_ROLE                      => 'role',                          # RFC 7483, section 10.2.
+    RDAP_TYPE_EVENT_ACTION              => 'event action',                  #
+    RDAP_TYPE_DOMAIN_VARIANT_RELATION   => 'domain variant relation',       #
+
+    RDAP_REDACTED_EXPRESSION_LANGUAGE   => 'redacted expression language',  # these values are defined in
+    RDAP_REDACTED_NAME                  => 'redacted name',                 # RFC 9537
+
     CACHE_TTL                           => 86400,                       # this registry is fairly stable
 };
 use base qw(Exporter);
@@ -26,6 +31,8 @@ our @EXPORT = qw(
     RDAP_TYPE_ROLE
     RDAP_TYPE_EVENT_ACTION
     RDAP_TYPE_DOMAIN_VARIANT_RELATION
+    RDAP_REDACTED_EXPRESSION_LANGUAGE
+    RDAP_REDACTED_NAME
 );
 
 our ($UA, $REGISTRY);
@@ -119,6 +126,8 @@ sub types {
         RDAP_TYPE_ROLE,
         RDAP_TYPE_EVENT_ACTION,
         RDAP_TYPE_DOMAIN_VARIANT_RELATION,
+        RDAP_REDACTED_EXPRESSION_LANGUAGE,
+        RDAP_REDACTED_NAME,
     );
 }
 

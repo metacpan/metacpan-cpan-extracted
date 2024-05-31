@@ -1,3 +1,13 @@
+0.16 2024-05-30T14:13:06+02:00
+ [Tags::Utils::Preserve]
+ - Fix missing arguments in begin() and end() methods.
+ - Fix typo in doc.
+ - Rewrite $tag variable and comments to $element.
+ - Rewrite doc to use of =head2.
+
+ [Tags::Output::Raw]
+ - Add test comments.
+
 0.15 2024-04-08T22:56:02+02:00
  [Common]
  - Add explicit version for usage of List::Util.

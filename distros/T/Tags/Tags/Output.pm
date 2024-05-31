@@ -7,7 +7,7 @@ use Class::Utils qw(set_params);
 use Encode;
 use Error::Pure qw(err);
 
-our $VERSION = 0.15;
+our $VERSION = 0.16;
 
 # Constructor.
 sub new {
@@ -639,6 +639,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.15
+0.16
 
 =cut

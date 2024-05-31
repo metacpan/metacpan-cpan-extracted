@@ -2,12 +2,12 @@
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
-# SPDX-FileCopyrightText: 2024 Mark Overmeer <mark@open-console.eu>
-# SPDX-License-Identifier: EUPL-1.2-or-later
+# SPDX-FileCopyrightText: 2024 Mark Overmeer <mark@overmeer.net>
+# SPDX-License-Identifier: Artistic-2.0
 
 package Couch::DB::Database;
 use vars '$VERSION';
-$VERSION = '0.001';
+$VERSION = '0.002';
 
 
 use Log::Report 'couch-db';
@@ -536,6 +536,7 @@ sub find($%)
 
 	$self->couch->call(POST => "$path/_find",
 		send      => $self->_findPrepare(POST => $search),
+		paginate  => 1,
 		to_values => sub { $self->__findValues(@_) },
 		$self->couch->_resultsConfig(\%args),
 	);
@@ -549,7 +550,9 @@ sub _findPrepare($$)
 
 	$self->couch
 		->toJSON($s, bool => qw/conflicts update stable execution_stats/)
-		->toJSON($s, int  => qw/limit sip r/);
+		->toJSON($s, int  => qw/limit sip r/)
+		#XXX Undocumented when this got deprecated
+		->check(exists $s->{stale}, deprecated => '3.0.0', 'Database find(stale)');
 
 	$s;
 }

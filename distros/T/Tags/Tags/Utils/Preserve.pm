@@ -10,14 +10,14 @@ use Readonly;
 # Constants.
 Readonly::Scalar my $LAST_INDEX => -1;
 
-our $VERSION = 0.15;
+our $VERSION = 0.16;
 
 # Constructor.
 sub new {
 	my ($class, @params) = @_;
 	my $self = bless {}, $class;
 
-	# Preserved tags.
+	# Preserved elements.
 	$self->{'preserved'} = [];
 
 	# Process params.
@@ -30,15 +30,15 @@ sub new {
 	return $self;
 }
 
-# Process for begin of tag.
+# Process for begin of element.
 sub begin {
-	my ($self, $tag) = @_;
+	my ($self, $element) = @_;
 
 	$self->save_previous;
 	if (scalar @{$self->{'preserved'}}
-		&& any { $tag eq $_ } @{$self->{'preserved'}}) {
+		&& any { $element eq $_ } @{$self->{'preserved'}}) {
 
-		push @{$self->{'preserved_stack'}}, $tag;
+		push @{$self->{'preserved_stack'}}, $element;
 		$self->{'preserved_flag'} = 1;
 	}
 
@@ -48,13 +48,13 @@ sub begin {
 		: $self->{'preserved_flag'};
 }
 
-# Process for end of tag.
+# Process for end of element.
 sub end {
-	my ($self, $tag) = @_;
+	my ($self, $element) = @_;
 
 	$self->save_previous;
 	my $stack = $self->{'preserved_stack'};
-	if (scalar @{$stack} && $tag eq $stack->[$LAST_INDEX]) {
+	if (scalar @{$stack} && $element eq $stack->[$LAST_INDEX]) {
 		pop @{$stack};
 		if (! scalar @{$stack}) {
 			$self->{'preserved_flag'} = 0;
@@ -87,7 +87,7 @@ sub reset {
 	# Previsous preserved flag.
 	$self->{'prev_preserved_flag'} = 0;
 
-	# Preserved tag.
+	# Preserved elements.
 	$self->{'preserved_stack'} = [];
 
 	return;
@@ -119,59 +119,83 @@ __END__
  use Tags::Utils::Preserve;
 
  my $obj = Tags::Utils::Preserve->new(%params);
- my $preserved_flag = $obj->begin;
- my ($preserver_flag, $prev_preserved_flag) = $obj->begin;
- my $preserved_flag = $obj->end;
- my ($preserved_flag, $prev_preserved_flag) = $obj->end;
- $obj->get;
+ my $preserved_flag = $obj->begin($element);
+ my ($preserved_flag, $prev_preserved_flag) = $obj->begin($element);
+ my $preserved_flag = $obj->end($element);
+ my ($preserved_flag, $prev_preserved_flag) = $obj->end($element);
+ my $preserved_flag = $obj->get;
+ my ($preserved_flag, $prev_preserved_flag) = $obj->get;
  $obj->reset;
  $obj->save_previous;
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%params)>
+ my $obj = Tags::Utils::Preserve->new(%params);
 
- Constructor.
+Constructor.
 
 =over 8
 
 =item * C<preserved>
 
- Preserved tags.
+Preserved elements.
+
+Default value is [].
 
 =back
 
-=item C<begin()>
+Returns instance of object.
 
- Process for begin of tag.
- Returns preserved flag in scalar context.
- Returns preserved flag and previous preserved flag in array context.
+=head2 C<begin>
 
-=item C<end()>
+ my $preserved_flag = $obj->begin($element);
+ my ($preserved_flag, $prev_preserved_flag) = $obj->begin($element);
 
- Process for end of tag.
- Returns preserved flag in scalar context.
- Returns preserved flag and previous preserved flag in array context.
+Process for begin of element.
 
-=item C<get()>
+Returns preserved flag in scalar context.
 
- Get preserved flag.
- Returns preserved flag in scalar context.
- Returns preserved flag and previous preserved flag in array context.
+Returns preserved flag and previous preserved flag in array context.
 
-=item C<reset()>
+=head2 C<end>
 
- Resets.
- Returns undef.
+ my $preserved_flag = $obj->end($element);
+ my ($preserved_flag, $prev_preserved_flag) = $obj->end($element);
 
-=item C<save_previous()>
+Process for end of element.
 
- Save previous stay.
- Returns undef.
+Returns preserved flag in scalar context.
 
-=back
+Returns preserved flag and previous preserved flag in array context.
+
+=head2 C<get>
+
+ my $preserved_flag = $obj->get;
+ my ($preserved_flag, $prev_preserved_flag) = $obj->get;
+
+Get preserved flag.
+
+Returns preserved flag in scalar context.
+
+Returns preserved flag and previous preserved flag in array context.
+
+=head2 C<reset>
+
+ $obj->reset;
+
+Resets.
+
+Returns undef.
+
+=head2 C<save_previous>
+
+ $obj->save_previous;
+
+Save previous stay.
+
+Returns undef.
 
 =head1 ERRORS
 
@@ -190,41 +214,41 @@ __END__
 
  # Begin element helper.
  sub begin_helper {
-         my ($pr, $tag) = @_;
-         print "TAG: $tag ";
-         my ($pre, $pre_pre) = $pr->begin($tag);
+         my ($pr, $element) = @_;
+         print "ELEMENT: $element ";
+         my ($pre, $pre_pre) = $pr->begin($element);
          print "PRESERVED: $pre PREVIOUS PRESERVED: $pre_pre\n";
  }
  
  # End element helper.
  sub end_helper {
-         my ($pr, $tag) = @_;
-         print "ENDTAG: $tag ";
-         my ($pre, $pre_pre) = $pr->end($tag);
+         my ($pr, $element) = @_;
+         print "ENDELEMENT: $element ";
+         my ($pre, $pre_pre) = $pr->end($element);
          print "PRESERVED: $pre PREVIOUS PRESERVED: $pre_pre\n";
  
  }
  
  # Object.
  my $pr = Tags::Utils::Preserve->new(
-         'preserved' => ['tag']
+         'preserved' => ['element']
  );
  
  # Process.
  begin_helper($pr, 'foo');
- begin_helper($pr, 'tag');
+ begin_helper($pr, 'element');
  begin_helper($pr, 'foo');
  end_helper($pr, 'foo');
- end_helper($pr, 'tag');
+ end_helper($pr, 'element');
  end_helper($pr, 'foo');
 
  # Output:
- # TAG: foo PRESERVED: 0 PREVIOUS PRESERVED: 0
- # TAG: tag PRESERVED: 1 PREVIOUS PRESERVED: 0
- # TAG: foo PRESERVED: 1 PREVIOUS PRESERVED: 1
- # ENDTAG: foo PRESERVED: 1 PREVIOUS PRESERVED: 1
- # ENDTAG: tag PRESERVED: 0 PREVIOUS PRESERVED: 1
- # ENDTAG: foo PRESERVED: 0 PREVIOUS PRESERVED: 0
+ # ELEMENT: foo PRESERVED: 0 PREVIOUS PRESERVED: 0
+ # ELEMENT: element PRESERVED: 1 PREVIOUS PRESERVED: 0
+ # ELEMENT: foo PRESERVED: 1 PREVIOUS PRESERVED: 1
+ # ENDELEMENT: foo PRESERVED: 1 PREVIOUS PRESERVED: 1
+ # ENDELEMENT: element PRESERVED: 0 PREVIOUS PRESERVED: 1
+ # ENDELEMENT: foo PRESERVED: 0 PREVIOUS PRESERVED: 0
 
 =head1 DEPENDENCIES
 
@@ -260,6 +284,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.15
+0.16
 
 =cut

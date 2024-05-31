@@ -176,6 +176,20 @@ sub entities { $_[0]->objects('Net::RDAP::Object::Entity', $_[0]->{'entities'}) 
 
 =pod
 
+=head2 Redactions
+
+    @redactions = $object->redactions;
+
+If the server supports L<RFC 9537|https://www.rfc-editor.org/rfc/rfc9537.html>,
+then this method will return an array of L<Net::RDAP::Redaction> objects
+corresponding to the fields listed in the C<redacted> property of the object.
+
+=cut
+
+sub redactions { $_[0]->objects('Net::RDAP::Redaction', $_[0]->{'redacted'}) }
+
+=pod
+
 =head1 COPYRIGHT
 
 Copyright 2018-2023 CentralNic Ltd, 2024 Gavin Brown. All rights reserved.

@@ -36,6 +36,7 @@
             "JSON::MaybeXS" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
+            "Scalar::Util" : "0",
             "URI" : "0",
             "constant" : "0",
             "perl" : "5.006002"
@@ -47,10 +48,9 @@
             "IPC::System::Simple" : "0",
             "Test::Carp" : "0",
             "Test::Compile" : "0",
-            "Test::LWP::UserAgent" : "0",
             "Test::Most" : "0",
+            "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
-            "TimeZone::TimeZoneDB" : "0",
             "WWW::RT::CPAN" : "0",
             "autodie" : "0"
          }
@@ -70,6 +70,6 @@
          "x_repository" : "https://github.com/nigelhorne/Weather-Meteo"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

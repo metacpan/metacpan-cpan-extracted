@@ -2,12 +2,12 @@
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
-# SPDX-FileCopyrightText: 2024 Mark Overmeer <mark@open-console.eu>
-# SPDX-License-Identifier: EUPL-1.2-or-later
+# SPDX-FileCopyrightText: 2024 Mark Overmeer <mark@overmeer.net>
+# SPDX-License-Identifier: Artistic-2.0
 
 package Couch::DB::Cluster;
 use vars '$VERSION';
-$VERSION = '0.001';
+$VERSION = '0.002';
 
 
 use Couch::DB::Util  qw/flat/;;
@@ -134,7 +134,7 @@ sub reshardJobs(%)
 }
 
 
-sub __reshardCreateValues($$)
+sub __reshardStartValues($$)
 {	my ($result, $data) = @_;
 	my $values = dclone $data;
 	$result->couch->toPerl($_, node => 'node')
@@ -143,17 +143,14 @@ sub __reshardCreateValues($$)
 	$values;
 }
 
-sub reshardCreate(%)
-{	my ($self, %args) = @_;
-	my %config = $self->couch->_resultsConfig(\%args);
-
-	#XXX The spec in CouchDB API doc 3.3.3 lists request param 'node' twice.
+sub reshardStart($%)
+{	my ($self, $create, %args) = @_;
 
 	$self->couch->call(POST => '/_reshard/jobs',
 		introduced => '2.4.0',
-		send       => \%args,
-		to_values  => \&__reshardCreateValues,
-		%config,
+		send       => $create,
+		to_values  => \&__reshardStartValues,
+		$self->couch->_resultsConfig(\%args),
 	);
 }
 
@@ -191,7 +188,6 @@ sub reshardJobRemove($%)
 sub reshardJobState($%)
 {	my ($self, $jobid, %args) = @_;
 
-	#XXX in the 3.3.3 docs, "Request JSON Object" should read "Response ..."
 	$self->couch->call(GET => "/_reshard/job/$jobid/state",
 		introduced => '2.4.0',
 		$self->couch->_resultsConfig(\%args),
@@ -221,13 +217,7 @@ sub __dbshards($$)
 
 	my %values = %$data;
 	my $shards = delete $values{shards} || {};
-
-	my %nodes;
-	foreach my $shard (sort keys %$shards)
-	{	$nodes{$shard} = [ $couch->listToPerl($shard, node => $shards->{$shard}) ];
-	}
-
-	$values{shards} = \%nodes;
+	$values{shards} = [ map +($_ => $couch->listToPerl($_, node => $shards->{$_}) ), keys %$shards ];
 	\%values;
 }
 
@@ -269,7 +259,5 @@ sub syncShards($%)
 		$self->couch->_resultsConfig(\%args),
 	);
 }
-
-#-------------
 
 1;

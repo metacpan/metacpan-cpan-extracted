@@ -4,7 +4,7 @@ require 5.026;
 
 use IO::Handle;
 
-my $VERSION = '0.001';
+my $VERSION = '0.002';
 
 my %prereq =  # also included in t/00use.t
   (	'DateTime'			=> 0
@@ -65,5 +65,6 @@ HTML_PACKAGE    = ../public_html/couch-db/htmlpkg
 
 reference::
 	bin/reference-table >reference.html
+	cp reference.html ../public_html/couch-db/reference.html
 
 __POSTAMBLE

@@ -10,7 +10,7 @@ use Class::XSAccessor getters => {
     get_distro_info  => 'distro_info',
 };
 
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.16'; # VERSION
 
 # ABSTRACT: a subclass of Linux::Info::KernelRelease specific to parse RockyLinux kernel information
 
@@ -55,7 +55,7 @@ Linux::Info::KernelRelease::Rocky - a subclass of Linux::Info::KernelRelease spe
 
 =head1 VERSION
 
-version 2.15
+version 2.16
 
 =head2 new
 

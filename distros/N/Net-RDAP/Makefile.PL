@@ -29,6 +29,7 @@ WriteMakefile(
         'Net::DNS::RR::DNSKEY'      => 0,
         'Net::DNS::RR::DS'          => 0,
         'Net::IP'                   => 0,
+        'Test::More'                => 0,
         'URI'                       => 0,
         'vCard'                     => 0,
         'XML::LibXML'               => 0,

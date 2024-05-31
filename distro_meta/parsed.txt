@@ -92279,3 +92279,17 @@ S/SK/SKIM/Tags-HTML-Element-0.14.tar.gz
 T/TV/TVIGNAUD/URPM-v5.225.tar.gz
 J/JR/JRM/UUID-0.35.tar.gz
 E/EH/EHUELS/XDR-Parse-0.3.1.tar.gz
+G/GB/GBROWN/App-rdapper-1.00.tar.gz
+C/CO/CORION/Archive-SevenZip-0.20.tar.gz
+N/NA/NAUTOFON/Archive-SCS-1.01.tar.gz
+P/PE/PERLANCAR/Complete-Nutrient-0.001.tar.gz
+M/MA/MARKOV/Couch-DB-0.002.tar.gz
+S/SK/SKIM/Data-HTML-Footer-0.01.tar.gz
+B/BA/BAYASHI/Duadua-0.31.tar.gz
+A/AR/ARFREITAS/Linux-Info-2.16.tar.gz
+G/GB/GBROWN/Net-RDAP-0.24.tar.gz
+K/KI/KIMOTO/SPVM-Sys-0.517.tar.gz
+S/SK/SKIM/Tags-0.16.tar.gz
+E/EX/EXODIST/Test2-Plugin-UUID-0.002004.tar.gz
+T/TV/TVIGNAUD/urpmi-v8.132.tgz
+N/NH/NHORNE/Weather-Meteo-0.09.tar.gz

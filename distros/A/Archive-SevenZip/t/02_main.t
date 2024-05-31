@@ -28,10 +28,10 @@ if( ! eval {
     1
 }) {
     diag $@;
-    plan skip_all => "Archive::Zip not installed, skipping compatibility tests", 83;
+    plan skip_all => "Archive::Zip not installed, skipping compatibility tests", 82;
     exit;
    } else {
-       plan tests => 83;
+       plan tests => 82;
    }
 }
 
@@ -68,13 +68,13 @@ foreach my $unix_time (
 
 my $version = Archive::SevenZip->find_7z_executable();
 if( ! $version ) {
-    SKIP: { skip "7z binary not found (not installed?)", 65; }
+    SKIP: { skip "7z binary not found (not installed?)", 64; }
     exit;
 };
 diag "7-zip version $version";
 if( $version <= 9.20) {
   SKIP: {
-    skip "7z version $version does not support renaming", 65;
+    skip "7z version $version does not support renaming", 64;
   }
     exit
 };
@@ -100,25 +100,6 @@ is($numberOfMembers, 0, '->numberofMembers is 0');
 is($status, AZ_OK, '->writeToFileNames ok');
 
 my $zipout;
-SKIP: {
-    skip("No 'unzip' program to test against", 1) unless HAVEUNZIP();
-    if ($^O eq 'MSWin32') {
-        print STDERR
-          "\n# You might see an expected 'zipfile is empty' warning now.\n";
-    }
-    ($status, $zipout) = testZip();
-
-    # STDERR->print("status= $status, out=$zipout\n");
-
-    skip("test zip doesn't work", 1) if $testZipDoesntWork;
-
-    skip("freebsd's unzip doesn't care about empty zips", 1)
-        if $^O eq 'freebsd';
-
-    ok($status == 0 || $status == -1, "unzip -t returns error code=1 for warning on empty");
-}
-
-# unzip -t returns error code=1 for warning on empty
 
 #--------- add a directory
 my $memberName = TESTDIR() . '/';

@@ -5,7 +5,7 @@ use Carp qw(croak);
 use Time::HiRes 1.9725;
 use YAML::XS 0.88;
 
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.16'; # VERSION
 # ABSTRACT: Collect linux process statistics.
 
 
@@ -162,7 +162,7 @@ Linux::Info::ProcStats - Collect linux process statistics.
 
 =head1 VERSION
 
-version 2.15
+version 2.16
 
 =head1 SYNOPSIS
 

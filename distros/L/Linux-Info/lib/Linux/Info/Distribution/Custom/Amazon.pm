@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use parent 'Linux::Info::Distribution::Custom';
 
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.16'; # VERSION
 # ABSTRACT: a subclass of Linux::Info::Distribution::Custom
 
 
@@ -35,7 +35,7 @@ Linux::Info::Distribution::Custom::Amazon - a subclass of Linux::Info::Distribut
 
 =head1 VERSION
 
-version 2.15
+version 2.16
 
 =head1 EXPORTS
 

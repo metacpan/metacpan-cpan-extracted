@@ -6,6 +6,14 @@ use IO::Socket::INET;
 
 my $online_tests;
 
+# Test for broken smokers that don't set AUTOMATED_TESTING
+if(my $reporter = $ENV{'PERL_CPAN_REPORTER_CONFIG'}) {
+	if($reporter =~ /smoker/i) {
+		warn 'AUTOMATED_TESTING added for you';
+		$ENV{'AUTOMATED_TESTING'} = 1;
+	}
+}
+
 if($ENV{AUTHOR_TESTING}) {
 	$online_tests = are_online();
 } else {
@@ -27,6 +35,7 @@ my $test_requires = {
 	'Test::Carp' => 0,
 	'Test::Compile' => 0,
 	'Test::Most' => 0,
+	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
 	'WWW::RT::CPAN' => 0
 };
@@ -35,6 +44,7 @@ if($online_tests) {
 	open(my $enabled, '>', 't/online.enabled') || die "Can't touch t/online.enabled $!";
 	close($enabled) || die "Can't touch t/online.enabled $!";
 	$test_requires->{'Test::LWP::UserAgent'} = 0;
+	$test_requires->{'DateTime'} = 0;
 	if(defined($ENV{'TIMEZONEDB_KEY'})) {
 		$test_requires->{'TimeZone::TimeZoneDB'} = 0;
 	}
@@ -51,6 +61,7 @@ WriteMakefile(
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 	  ? ('LICENSE'=> 'GPL')
 	  : ()),
+	EXE_FILES => [ 'bin/weather' ],
 	PL_FILES	=> {},
 	TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
@@ -59,6 +70,7 @@ WriteMakefile(
 		'JSON::MaybeXS' => 0,
 		'LWP::UserAgent' => 0,
 		'LWP::Protocol::https' => 0,
+		'Scalar::Util' => 0,
 		'URI' => 0,
 	},
 	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -85,16 +97,17 @@ WriteMakefile(
 sub are_online
 {
 	return 0 if($ENV{'NO_NETWORK_TESTING'} || $ENV{'TRAVIS_PERL_VERSION'});
+	# See https://www.cpantesters.org/cpan/report/b38913a6-8e30-11ee-884e-494b6e8775
+	return 0 if($ENV{'AUTOMATED_TESTING'});	# Don't overload the server by default
 	return 0 if(!-t STDIN);
 
-	my $s = IO::Socket::INET->new(
+	if(my $s = IO::Socket::INET->new(
 		PeerAddr => 'open-meteo.com:443',
 		Timeout => 10
-	);
-	if($s) {
-		if($ENV{'PERL_MM_USE_DEFAULT'} || $ENV{'AUTOMATED_TESTING'}) {
+	)) {
+		if($ENV{'PERL_MM_USE_DEFAULT'}) {
 			close($s);
-			return 0;	# Don't overload the server by default
+			return 1;
 		}
 
 		print <<EOF;

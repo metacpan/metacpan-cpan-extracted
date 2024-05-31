@@ -3,7 +3,6 @@
 
 requires "Carp" => "0";
 requires "Class::XSAccessor" => "1.19";
-requires "Data::Dumper" => "0";
 requires "File::Spec" => "0";
 requires "Filesys::Df" => "0.92";
 requires "Hash::Util" => "0";
@@ -17,8 +16,8 @@ requires "parent" => "0";
 requires "perl" => "5.012000";
 
 on 'test' => sub {
-  requires "Devel::CheckOS" => "2.02";
   requires "Exporter" => "0";
+  requires "File::Copy" => "0";
   requires "File::Temp" => "0";
   requires "Scalar::Util" => "0";
   requires "Test::Kwalitee" => "1.28";
@@ -27,6 +26,7 @@ on 'test' => sub {
   requires "Test::Perl::Critic" => "1.04";
   requires "Test::Pod" => "1.52";
   requires "Test::Pod::Coverage" => "1.10";
+  requires "Test::TempDir::Tiny" => "0.018";
   requires "lib" => "0";
   requires "perl" => "5.012000";
 };

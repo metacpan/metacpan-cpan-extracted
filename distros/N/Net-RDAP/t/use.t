@@ -1,9 +1,7 @@
-#!/usr/bin/env perl -w
-# $Id$
+#!/usr/bin/perl
+use Test::More;
 use strict;
-use Test;
-BEGIN { plan tests => 1 }
 
-use Net::RDAP; ok(1);
+require_ok 'Net::RDAP';
 
-exit;
+done_testing;

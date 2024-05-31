@@ -4,7 +4,7 @@ use warnings;
 use Archive::SevenZip;
 use Carp 'croak';
 
-our $VERSION= '0.19';
+our $VERSION= '0.20';
 
 =head1 NAME
 
@@ -99,7 +99,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2015-2022 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2024 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

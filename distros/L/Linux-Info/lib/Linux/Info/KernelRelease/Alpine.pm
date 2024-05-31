@@ -9,7 +9,7 @@ use Class::XSAccessor getters => {
     get_alpine_patch     => 'alpine_patch'
 };
 
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.16'; # VERSION
 
 # ABSTRACT: a subclass of Linux::Info::KernelRelease specific to parse Alpine kernel information
 
@@ -60,7 +60,7 @@ Linux::Info::KernelRelease::Alpine - a subclass of Linux::Info::KernelRelease sp
 
 =head1 VERSION
 
-version 2.15
+version 2.16
 
 =head1 METHODS
 

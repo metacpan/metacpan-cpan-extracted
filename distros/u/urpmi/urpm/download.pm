@@ -44,8 +44,8 @@ sub ftp_http_downloaders() { qw(wget curl prozilla aria2) }
 
 sub available_ftp_http_downloaders() {
     my %binaries = (
+	wget => 'wget',
 	curl => 'curl', 
-	wget => 'wget', 
 	prozilla => 'proz',
 	aria2 => 'aria2c',
     );

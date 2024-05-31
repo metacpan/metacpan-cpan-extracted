@@ -121,7 +121,7 @@ Extends L<"Server connections" in Couch::DB|Couch::DB/"Server connections">.
 
 Inherited, see L<Couch::DB/"Server connections">
 
-=item $obj-E<gt>B<call>($method, $path, %options)
+=item $obj-E<gt>B<call>(\%options|($method, $path, %options))
 
 Inherited, see L<Couch::DB/"Server connections">
 
@@ -183,8 +183,8 @@ Extends L<"DETAILS" in Couch::DB|Couch::DB/"DETAILS">.
  
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.001,
-built on May 29, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.002,
+built on May 31, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

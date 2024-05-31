@@ -140,6 +140,8 @@ information about the entity referenced by `$handle`, which must be
 a string containing a "tagged" handle, such as `ABC123-EXAMPLE`, as
 per [RFC 8521](https://www.rfc-editor.org/rfc/rfc8521.html).
 
+## Determining object existence
+
     $exists = $rdap->exists($object);
 
 This method returns a boolean indicating whether `$object` (which
@@ -174,10 +176,17 @@ server in an HTTP Basic Authorization header field.
 
 ## Performing Searches
 
-RDAP supports a limited search capability, but you need to know in
-advance which RDAP server you want to send the search query to. The
-[Net::RDAP::Service](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AService) class allows you to prepare and submit search
-queries to specific RDAP servers.
+    my $svc = Net::RDAP::Service->new('https://www.example.com/rdap');
+
+    # $result is a Net::RDAP::SearchResult
+    my $result = $svc->domains('name' => 'ex*mple.com');
+
+RDAP supports a limited search capability, but you need to know in advance which
+RDAP server you want to send the search query to.
+
+The [Net::RDAP::Service](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AService) class allows you to prepare and submit search queries
+to specific RDAP servers. For more information, please see the documentation for
+that module.
 
 ## RDAP User Agent
 
@@ -247,6 +256,8 @@ Protocol (EPP) and Registration Data Access Protocol (RDAP) Status Mapping
 - [https://tools.ietf.org/html/rfc8288](https://tools.ietf.org/html/rfc8288) -  Web Linking
 - [https://tools.ietf.org/html/rfc8521](https://tools.ietf.org/html/rfc8521) -  Registration Data Access
 Protocol (RDAP) Object Tagging
+- [https://tools.ietf.org/html/rfc9537](https://tools.ietf.org/html/rfc9537) -  Redacted Fields in the
+Registration Data Access Protocol (RDAP) Response
 
 # COPYRIGHT
 

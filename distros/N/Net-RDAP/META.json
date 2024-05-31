@@ -52,6 +52,7 @@
             "Net::DNS::RR::DNSKEY" : "0",
             "Net::DNS::RR::DS" : "0",
             "Net::IP" : "0",
+            "Test::More" : "0",
             "URI" : "0",
             "XML::LibXML" : "0",
             "vCard" : "0"
@@ -69,6 +70,6 @@
          "web" : "https://github.com/gbxyz/perl-Net-RDAP"
       }
    },
-   "version" : 0.23,
+   "version" : 0.24,
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

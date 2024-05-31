@@ -28,7 +28,7 @@ use Class::XSAccessor
 
 use Linux::Info::KernelFactory;
 
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.16'; # VERSION
 
 my @_attribs = (
     'raw_time',  'hostname',  'domain',     'kernel',
@@ -305,7 +305,7 @@ Linux::Info::SysInfo - Collect linux system information.
 
 =head1 VERSION
 
-version 2.15
+version 2.16
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,23 @@ use Time::Piece; # for strptime
 use File::Basename ();
 use Path::Class ();
 
-our $VERSION= '0.19';
+our $VERSION= '0.20';
+
+=head1 NAME
+
+Archive::SevenZip::Entry - a member of an archive
+
+=head1 SYNOPSIS
+
+  use POSIX 'strftime';
+  for my $entry ( $ar->list ) {
+      print $entry->fileName,"\n";
+      print strftime('%Y-%m-%d %H:%M', gmtime($entry->lastModTime)),"\n";
+      my $content = $entry->slurp();
+      print $content;
+  };
+
+=cut
 
 sub new {
     my( $class, %options) = @_;
@@ -15,9 +31,29 @@ sub new {
     bless \%options => $class
 }
 
+=head1 METHODS
+
+=over 4
+
+=item C<< ->archive >>
+
+  my $ar = $entry->archive();
+
+Returns the containing archive as an L<Archive::SevenZip> object.
+
+=cut
+
 sub archive {
     $_[0]->{_Container}
 }
+
+=item C<< ->fileName >>
+
+  my $fn = $entry->fileName();
+
+Returns the stored path
+
+=cut
 
 sub fileName {
     my( $self ) = @_;
@@ -34,15 +70,40 @@ sub fileName {
     $res
 }
 
+=item C<< ->basename >>
+
+  my $fn = $entry->basename();
+
+Returns the stored filename without a directory
+
+=cut
+
 # Class::Path API
 sub basename {
     Path::Class::file( $_[0]->{Path} )->basename
 }
 
+=item C<< ->components >>
+
+  my @parts = $entry->components();
+
+Returns the stored filename as an array of directory names and the file name
+
+=cut
+
 sub components {
     my $cp = file( $_[0]->{Path} );
     $cp->components()
 }
+
+=item C<< ->lastModTime >>
+
+  my $epoch = $entry->lastModTime();
+  print strftime('%Y-%m-%d %H:%M', $epoch),"\n";
+
+Returns the time of last modification of the stored file as number of seconds
+
+=cut
 
 sub lastModTime {
     (my $dt = $_[0]->{Modified}) =~ s/\.\d+$//;
@@ -65,6 +126,14 @@ sub desiredCompressionMethod {
     $_[0]->{Method}
 }
 
+=item C<< ->uncompressedSize >>
+
+  my $size = $entry->uncompressedSize();
+
+Returns the uncompressed size of the stored file in bytes
+
+=cut
+
 sub uncompressedSize {
     $_[0]->{Size}
 }
@@ -76,13 +145,38 @@ sub dir {
     die "->dir Not implemented";
 }
 
+=item C<< ->open $binmode >>
+
+  my $fh = $entry->open(':raw');
+
+Opens a filehandle for the uncompressed data
+
+=cut
+
 sub open {
     my( $self, $mode, $permissions )= @_;
     $self->archive->openMemberFH( membername => $self->fileName, binmode => $mode );
 }
+
+=item C<< ->fh $binmode >>
+
+  my $fh = $entry->fh(':raw');
+
+Opens a filehandle for the uncompressed data
+
+=cut
+
 { no warnings 'once';
 *fh = \&open; # Archive::Zip API
 }
+
+=item C<< ->slurp %options >>
+
+  my $content = $entry->slurp( iomode => ':raw');
+
+Reads the content
+
+=cut
 
 # Path::Class API
 sub slurp {
@@ -103,6 +197,16 @@ sub slurp {
 
 # Archive::Zip API
 #lastModTime()
+
+=item C<< ->extractToFileNamed $name >>
+
+  $entry->extractToFileNamed( '/tmp/foo.txt' );
+
+Extracts the data
+
+=back
+
+=cut
 
 # Archive::Zip API
 sub extractToFileNamed {
@@ -134,7 +238,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2015-2022 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2024 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

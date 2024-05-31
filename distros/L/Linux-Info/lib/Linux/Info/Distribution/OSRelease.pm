@@ -13,7 +13,7 @@ use Class::XSAccessor getters => {
 
 use constant DEFAULT_FILE => '/etc/os-release';
 
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.16'; # VERSION
 
 # ABSTRACT: a subclass with data from /etc/os-release file
 
@@ -57,7 +57,7 @@ sub parse {
 
 
 sub parse_from_file {
-    return _parse( $_[1] )      if ( length( scalar(@_) ) == 2 );
+    return _parse( $_[1] )      if ( scalar(@_) == 2 );
     return _parse(DEFAULT_FILE) if ( $_[0] eq __PACKAGE__ );
     return _parse( $_[0] );
 }
@@ -127,7 +127,7 @@ Linux::Info::Distribution::OSRelease - a subclass with data from /etc/os-release
 
 =head1 VERSION
 
-version 2.15
+version 2.16
 
 =head1 SYNOPSIS
 
@@ -170,17 +170,21 @@ default one.
 
 Returns a hash reference, with all fields/values retrieve from the file.
 
-The fields, stored as keys, will be forced to be on lowercase.
+The fields, stored as keys, will be forced to be lowercase.
 
 =head2 parse
 
 Instance method. Parses a file with the expected format of F</etc/os-release>.
+
+Returns a hash reference.
 
 =head2 parse_from_file
 
 Class method. Parses a file with the expected format of F</etc/os-release>.
 
 Optionally, accepts a string as the complete path to a file to be parsed.
+
+Returns a hash reference.
 
 =head2 _handle_missing
 
