@@ -20,8 +20,8 @@ $obj = Tags::HTML::Element::Textarea->new;
 eval {
 	$obj->init;
 };
-is($EVAL_ERROR, "Input object must be a 'Data::HTML::Element::Textarea' instance.\n",
-	"Input object must be a 'Data::HTML::Element::Textarea' instance.");
+is($EVAL_ERROR, "Textarea object must be a 'Data::HTML::Element::Textarea' instance.\n",
+	"Textarea object must be a 'Data::HTML::Element::Textarea' instance.");
 clean();
 
 # Test.
@@ -29,8 +29,8 @@ $obj = Tags::HTML::Element::Textarea->new;
 eval {
 	$obj->init(Test::MockObject->new);
 };
-is($EVAL_ERROR, "Input object must be a 'Data::HTML::Element::Textarea' instance.\n",
-	"Input object must be a 'Data::HTML::Element::Textarea' instance.");
+is($EVAL_ERROR, "Textarea object must be a 'Data::HTML::Element::Textarea' instance.\n",
+	"Textarea object must be a 'Data::HTML::Element::Textarea' instance.");
 clean();
 
 # Test.
@@ -38,6 +38,6 @@ $obj = Tags::HTML::Element::Textarea->new;
 eval {
 	$obj->init('bad');
 };
-is($EVAL_ERROR, "Input object must be a 'Data::HTML::Element::Textarea' instance.\n",
-	"Input object must be a 'Data::HTML::Element::Textarea' instance.");
+is($EVAL_ERROR, "Textarea object must be a 'Data::HTML::Element::Textarea' instance.\n",
+	"Textarea object must be a 'Data::HTML::Element::Textarea' instance.");
 clean();

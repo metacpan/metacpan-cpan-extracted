@@ -1,17 +1,17 @@
 # NAME
 
-TimeZone::TimeZoneDB - Interface to [https://timezondb.com](https://timezondb.com) for looking up Timezone data
+TimeZone::TimeZoneDB - Interface to [https://timezonedb.com](https://timezonedb.com) for looking up Timezone data
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # SYNOPSIS
 
-      use TimeZone::TimeZoneDB;
+    use TimeZone::TimeZoneDB;
 
-      my $tzdb = TimeZone::TimeZoneDB->new(key => 'XXXXXXXX');
-      my $tz = $tzdb->get_time_zone({ latitude => 0.1, longitude => 0.2 });
+    my $tzdb = TimeZone::TimeZoneDB->new(key => 'XXXXXXXX');
+    my $tz = $tzdb->get_time_zone({ latitude => 0.1, longitude => 0.2 });
 
 # DESCRIPTION
 
@@ -66,12 +66,18 @@ Lots of thanks to the folks at [https://timezonedb.com](https://timezonedb.com).
 
 # BUGS
 
+Please report any bugs or feature requests to `bug-timezone-timezonedb at rt.cpan.org`,
+or through the web interface at
+[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=TimeZone-TimeZoneDB](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=TimeZone-TimeZoneDB).
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
 # SEE ALSO
 
 TimezoneDB API: [https://timezonedb.com/api](https://timezonedb.com/api)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2023 Nigel Horne.
+Copyright 2023-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2

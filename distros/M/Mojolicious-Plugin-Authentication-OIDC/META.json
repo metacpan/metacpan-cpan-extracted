@@ -63,11 +63,11 @@
    "provides" : {
       "Mojolicious::Plugin::Authentication::OIDC" : {
          "file" : "lib/Mojolicious/Plugin/Authentication/OIDC.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Mojolicious::Plugin::Authentication::OIDC::Controller::OpenIDConnect" : {
          "file" : "lib/Mojolicious/Plugin/Authentication/OIDC/Controller/OpenIDConnect.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -81,7 +81,7 @@
          "web" : "https://github.com/tyrrminal/mojolicious-plugin-authentication-oidc.git"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "MIT"

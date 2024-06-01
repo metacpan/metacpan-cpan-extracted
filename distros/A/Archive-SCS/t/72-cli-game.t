@@ -2,11 +2,14 @@
 use strict;
 use warnings;
 use lib 'lib', 't/lib';
+use blib;
 use Feature::Compat::Defer;
 
 use Path::Tiny 0.119;
 use Test::More;
 use TestArchiveSCS;
+
+can_test_cli() or plan skip_all => 'Cannot test cli';
 
 # Create test dir structure
 

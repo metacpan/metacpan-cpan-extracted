@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use lib map { "$ENV{HOME}/repos/$_/lib" } qw(Synth-Config); # local author libs
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Synth-Config); # local author libs
 use Synth::Config ();
 use Getopt::Long qw(GetOptions);
 
@@ -25,7 +25,7 @@ my $synth = Synth::Config->new(
 #    verbose => 1,
 );
 
-my $patches = $opt{patch} ? $opt{patch}->@* : $synth->recall_names;
+my $patches = $opt{patch} ? $opt{patch}->@* : $synth->recall_setting_names;
 
 for my $patch_name (@$patches) {
     my $settings = $synth->search_settings(name => $patch_name);

@@ -11,16 +11,6 @@ on 'test' => sub {
   requires "IPC::Run3" => "0";
   requires "Feature::Compat::Defer" => "0";
   requires "Feature::Compat::Try" => "0";
-  
-  # It appears that some smoke testers don't follow the CPAN::Meta::Spec,
-  # which demands runtime requirements to be installed for the test
-  # phase. As a workaround, we repeat the runtime requirements here.
-  requires "builtin::Backport" => "0";
-  requires "stable" => "0.031";
-  requires "Compress::Raw::Zlib" => "2.048";
-  requires "List::Util" => "1.45";
-  requires "Object::Pad" => "0.73";
-  requires "Path::Tiny" => "0.119";
 };
 
 on 'configure' => sub {

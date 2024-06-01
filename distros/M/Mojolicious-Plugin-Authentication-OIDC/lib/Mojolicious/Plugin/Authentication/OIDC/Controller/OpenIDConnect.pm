@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::Authentication::OIDC::Controller::OpenIDConnect 0.03;
+package Mojolicious::Plugin::Authentication::OIDC::Controller::OpenIDConnect 0.04;
 use v5.26;
 
 # ABSTRACT: OpenID controller endpoints implementation

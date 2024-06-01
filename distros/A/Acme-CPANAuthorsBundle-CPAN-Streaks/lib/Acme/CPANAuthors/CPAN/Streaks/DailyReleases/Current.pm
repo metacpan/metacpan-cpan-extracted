@@ -4,21 +4,28 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-05-06'; # DATE
+our $DATE = '2024-06-01'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240506.0'; # VERSION
+our $VERSION = '20240601.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
-    'JOESUF' => '',
-    'JDEGUEST' => '',
-    'DDICK' => '',
-    'DRCLAW' => '',
-    'EGILES' => '',
-    'LEONT' => '',
-    'MATHIAS' => '',
-    'OLOF' => '',
-    'TRIZEN' => '',
+    'GBROWN' => '',
+    'SKIM' => '',
+    'EXODIST' => '',
+    'NAUTOFON' => '',
+    'NHORNE' => '',
+    'ARFREITAS' => '',
+    'CORION' => '',
+    'GENE' => '',
+    'HANJE' => '',
+    'KIMOTO' => '',
+    'MARKOV' => '',
+    'REEDFISH' => '',
+    'TANIGUCHI' => '',
+    'TVIGNAUD' => '',
+    'TYRRMINAL' => '',
+    'WORTHMINE' => '',
 );
 
 
@@ -37,27 +44,34 @@ Acme::CPANAuthors::CPAN::Streaks::DailyReleases::Current - Authors with ongoing 
 
 =head1 VERSION
 
-This document describes version 20240506.0 of Acme::CPANAuthors::CPAN::Streaks::DailyReleases::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-05-06.
+This document describes version 20240601.0 of Acme::CPANAuthors::CPAN::Streaks::DailyReleases::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-01.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-05-06, produced by L<cpan-streaks>):
+Current standings (as of 2024-06-01, produced by L<cpan-streaks>):
 
   +-----------+-----+------------+-------------+
   | author    | len | start_date | status      |
   +-----------+-----+------------+-------------+
-  | PERLANCAR |  74 | 2024-02-23 | ongoing     |
-  | JOESUF    |   3 | 2024-05-03 | might-break |
-  | JDEGUEST  |   2 | 2024-05-04 | might-break |
-  | DDICK     |   1 | 2024-05-05 | might-break |
-  | DRCLAW    |   1 | 2024-05-05 | might-break |
-  | EGILES    |   1 | 2024-05-05 | might-break |
-  | LEONT     |   1 | 2024-05-05 | might-break |
-  | MATHIAS   |   1 | 2024-05-05 | might-break |
-  | OLOF      |   1 | 2024-05-05 | might-break |
-  | TRIZEN    |   1 | 2024-05-05 | might-break |
+  | PERLANCAR | 100 | 2024-02-23 | ongoing     |
+  | GBROWN    |   3 | 2024-05-29 | might-break |
+  | SKIM      |   3 | 2024-05-29 | might-break |
+  | EXODIST   |   2 | 2024-05-30 | might-break |
+  | NAUTOFON  |   2 | 2024-05-30 | might-break |
+  | NHORNE    |   2 | 2024-05-30 | might-break |
+  | ARFREITAS |   1 | 2024-05-31 | might-break |
+  | CORION    |   1 | 2024-05-31 | might-break |
+  | GENE      |   1 | 2024-05-31 | might-break |
+  | HANJE     |   1 | 2024-05-31 | might-break |
+  | KIMOTO    |   1 | 2024-05-31 | might-break |
+  | MARKOV    |   1 | 2024-05-31 | might-break |
+  | REEDFISH  |   1 | 2024-05-31 | might-break |
+  | TANIGUCHI |   1 | 2024-05-31 | might-break |
+  | TVIGNAUD  |   1 | 2024-05-31 | might-break |
+  | TYRRMINAL |   1 | 2024-05-31 | might-break |
+  | WORTHMINE |   1 | 2024-05-31 | might-break |
   +-----------+-----+------------+-------------+
 
 =head1 HOMEPAGE

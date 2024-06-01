@@ -26,12 +26,12 @@ use constant {
 use vars qw($VERSION);
 use strict;
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 #
 # global arg variables (note: nopager is now ignored)
 #
-my ($type, $object, $help, $short, $bypass, $auth, $nopager, $raw, $registrar, $nocolor, $reverse);
+my ($type, $object, $help, $short, $bypass, $auth, $nopager, $raw, $registrar, $nocolor, $reverse, $version);
 
 #
 # options spec for Getopt::Long
@@ -48,6 +48,7 @@ my %opts = (
     'registrar'     => \$registrar,
     'nocolor'       => \$nocolor,
     'reverse'       => \$reverse,
+    'version'       => \$version,
 );
 
 my %funcs = (
@@ -91,11 +92,13 @@ sub main {
 
     $package->show_usage if ($help || length($object) < 1);
 
+    $package->show_version if ($version);
+
     if (!$type) {
         if ($object =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/)              { $type = 'ip'      }
         elsif ($object =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/)  { $type = 'ip'      }
-        elsif ($object =~ /^[0-9a-f:]+$/i)                                  { $type = 'ip'      }
-        elsif ($object =~ /^[0-9a-f:]+\/\d{1,3}$/i)                         { $type = 'ip'      }
+        elsif ($object =~ /^[0-9a-f:]+:[0-9a-f:]*$/i)                       { $type = 'ip'      }
+        elsif ($object =~ /^[0-9a-f:]+:[0-9a-f:]*\/\d{1,3}$/i)              { $type = 'ip'      }
         elsif ($object =~ /^asn?\d+$/i)                                     { $type = 'autnum'  }
         elsif ($object =~ /^(file|https)?:\/\//)                            { $type = 'url'     }
         elsif ($object =~ /^([a-z]{2,}|xn--[a-z0-9\-]+)$/i)                 { $type = 'tld'     }
@@ -107,7 +110,11 @@ sub main {
 
     my $response;
     if ('ip' eq $type) {
-        $response = $rdap->ip(Net::IP->new($object), %args);
+        my $ip = Net::IP->new($object);
+
+        $package->error("Invalid IP address '$object'") unless ($ip);
+
+        $response = $rdap->ip($ip, %args);
 
         $response = $rdap->fetch($response->domain) if ($reverse);
 
@@ -164,6 +171,12 @@ sub show_usage {
         '-verbose'  => 99,
         '-sections' => [qw(SYNOPSIS OPTIONS)],
     );
+}
+
+sub show_version {
+    my $package = shift;
+    printf("%s v%s\n", $package, $VERSION);
+    exit;
 }
 
 sub display {
@@ -656,6 +669,8 @@ RFC 8521.
 =back
 
 =item * C<--help> - display help message.
+
+=item * C<--version> - display package and version.
 
 =item * C<--raw> - print the raw JSON rather than parsing it.
 

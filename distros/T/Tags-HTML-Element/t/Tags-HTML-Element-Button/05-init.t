@@ -20,8 +20,8 @@ $obj = Tags::HTML::Element::Button->new;
 eval {
 	$obj->init;
 };
-is($EVAL_ERROR, "Input object must be a 'Data::HTML::Element::Button' instance.\n",
-	"Input object must be a 'Data::HTML::Element::Button' instance.");
+is($EVAL_ERROR, "Button object must be a 'Data::HTML::Element::Button' instance.\n",
+	"Button object must be a 'Data::HTML::Element::Button' instance.");
 clean();
 
 # Test.
@@ -29,8 +29,8 @@ $obj = Tags::HTML::Element::Button->new;
 eval {
 	$obj->init(Test::MockObject->new);
 };
-is($EVAL_ERROR, "Input object must be a 'Data::HTML::Element::Button' instance.\n",
-	"Input object must be a 'Data::HTML::Element::Button' instance.");
+is($EVAL_ERROR, "Button object must be a 'Data::HTML::Element::Button' instance.\n",
+	"Button object must be a 'Data::HTML::Element::Button' instance.");
 clean();
 
 # Test.
@@ -38,6 +38,6 @@ $obj = Tags::HTML::Element::Button->new;
 eval {
 	$obj->init('bad');
 };
-is($EVAL_ERROR, "Input object must be a 'Data::HTML::Element::Button' instance.\n",
-	"Input object must be a 'Data::HTML::Element::Button' instance.");
+is($EVAL_ERROR, "Button object must be a 'Data::HTML::Element::Button' instance.\n",
+	"Button object must be a 'Data::HTML::Element::Button' instance.");
 clean();

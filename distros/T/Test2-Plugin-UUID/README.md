@@ -58,8 +58,8 @@ in order of preference.
     when this module is used.
 
     A warning will be issued with this module. You can surpress the warning with
-    either the `$TEST2_UUID_NO_WARN` environment variable. You can also surpress
-    it with the ':nowarn' import argument.
+    either the `$TEST2_UUID_NO_WARN` environment variable or the `warn => 0`
+    import argument.
 
 - [Data::UUID](https://metacpan.org/pod/Data%3A%3AUUID) - Not Suitible for Databases
 
@@ -67,8 +67,8 @@ in order of preference.
     type/version that is not suitible for database keys.
 
     A warning will be issued with this module. You can surpress the warning with
-    either the `$TEST2_UUID_NO_WARN` environment variable. You can also surpress
-    it with the ':nowarn' import argument.
+    either the `$TEST2_UUID_NO_WARN` environment variable or the `warn => 0`
+    import argument.
 
 # SOURCE
 

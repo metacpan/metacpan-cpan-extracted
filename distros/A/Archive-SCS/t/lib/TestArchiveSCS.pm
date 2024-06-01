@@ -6,6 +6,7 @@ package TestArchiveSCS;
 use Exporter 'import';
 BEGIN {
   our @EXPORT = qw(
+    can_test_cli
     scs_archive
     create_hashfs1
     create_hashfs2
@@ -20,12 +21,27 @@ use Archive::SCS::HashFS;
 use Archive::SCS::HashFS2;
 use Archive::SCS::InMemory;
 
+use Config;
 use Cwd;
 use IPC::Run3;
 use Path::Tiny;
-my @CMD = qw( perl -Ilib script/scs_archive );
+my @CMD = ( $Config{perlpath}, qw[ -Iblib/arch -Iblib/lib -Ilib ]);
+
+# The cli test using a different perl than the harness leads to trouble
+sub can_test_cli {
+  my @run = ( '-MArchive::SCS', '-we', 'print Archive::SCS->VERSION' );
+  my $bin_version = eval { perl_run(@run) } // '';
+  my $versions_ok = $bin_version eq Archive::SCS->VERSION
+    or warn sprintf "Version mismatch (%s/%s on %s)",
+    $bin_version, Archive::SCS->VERSION, $Config{perlpath};
+  $versions_ok
+}
 
 sub scs_archive {
+  perl_run('script/scs_archive', @_);
+}
+
+sub perl_run {
   my $old_dir = getcwd;
   chdir path(__FILE__)->parent->parent->parent;
   if (wantarray) {

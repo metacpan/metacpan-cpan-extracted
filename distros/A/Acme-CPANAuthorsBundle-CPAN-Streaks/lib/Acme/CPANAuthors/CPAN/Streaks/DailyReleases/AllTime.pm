@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-05-06'; # DATE
+our $DATE = '2024-06-01'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240506.0'; # VERSION
+our $VERSION = '20240601.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
@@ -45,13 +45,13 @@ Acme::CPANAuthors::CPAN::Streaks::DailyReleases::AllTime - Authors with all-time
 
 =head1 VERSION
 
-This document describes version 20240506.0 of Acme::CPANAuthors::CPAN::Streaks::DailyReleases::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-05-06.
+This document describes version 20240601.0 of Acme::CPANAuthors::CPAN::Streaks::DailyReleases::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-01.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-05-06, produced by L<cpan-streaks>, only streaks with length of at least 20 are included):
+Current standings (as of 2024-06-01, produced by L<cpan-streaks>, only streaks with length of at least 20 are included):
 
   +-----------+------+------------+------------+---------+
   | author    |  len | start_date | end_date   | status  |
@@ -65,10 +65,10 @@ Current standings (as of 2024-05-06, produced by L<cpan-streaks>, only streaks w
   | NEILB     |  111 | 2014-03-20 | 2014-07-08 | broken  |
   | IVANWILLS |  102 | 2015-05-17 | 2015-08-26 | broken  |
   | KENTNL    |  101 | 2014-07-12 | 2014-10-20 | broken  |
+  | PERLANCAR |  100 | 2024-02-23 |            | ongoing |
   | PERLANCAR |   81 | 2016-12-20 | 2017-03-10 | broken  |
   | ETHER     |   77 | 2014-06-01 | 2014-08-16 | broken  |
   | RENEEB    |   76 | 2018-12-31 | 2019-03-16 | broken  |
-  | PERLANCAR |   74 | 2024-02-23 |            | ongoing |
   | CSSON     |   55 | 2014-12-30 | 2015-02-22 | broken  |
   | INGY      |   47 | 2014-07-21 | 2014-09-05 | broken  |
   | RENEEB    |   44 | 2014-11-27 | 2015-01-09 | broken  |

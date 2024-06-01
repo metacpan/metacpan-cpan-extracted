@@ -33,7 +33,7 @@
          "requires" : {
             "Test2::API" : "1.302165",
             "UUID::Tiny" : "1.04",
-            "perl" : "5.008009"
+            "perl" : "5.010000"
          },
          "suggests" : {
             "Data::UUID" : "1.227",
@@ -44,6 +44,7 @@
       "test" : {
          "requires" : {
             "Test2::Require::Module" : "0.000162",
+            "Test2::Util::Table" : "0.000162",
             "Test2::V0" : "0.000162"
          }
       }
@@ -58,7 +59,7 @@
          "url" : "http://github.com/Test-More/Test2-Plugin-UUID/"
       }
    },
-   "version" : "0.002004",
+   "version" : "0.002007",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

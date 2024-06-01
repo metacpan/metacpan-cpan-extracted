@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use lib 'lib';
+use blib;
 use Feature::Compat::Try;
 
 use Test::More;

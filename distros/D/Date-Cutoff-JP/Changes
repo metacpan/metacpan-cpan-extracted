@@ -1,5 +1,8 @@
 Revision history for Perl extension Date-CutOff-JP
 
+0.08 2024-05-31T10:36:12Z
+    - just migrated to Moo from Moose
+
 0.07 2019-02-15T03:20:32Z
     - just modified before->around
 

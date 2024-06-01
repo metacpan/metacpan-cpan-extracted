@@ -4,81 +4,94 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-05-06'; # DATE
+our $DATE = '2024-06-01'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240506.0'; # VERSION
+our $VERSION = '20240601.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
     'KIMOTO' => '',
     'SKIM' => '',
     'ETHER' => '',
-    'DERF' => '',
     'TYRRMINAL' => '',
     'MATHIAS' => '',
     'ARFREITAS' => '',
-    'BRIANDFOY' => '',
-    'EXODIST' => '',
-    'HMBRAND' => '',
-    'PEVANS' => '',
-    'BPSCHUCK' => '',
-    'GDT' => '',
-    'JJATRIA' => '',
-    'KUERBIS' => '',
-    'SISYPHUS' => '',
     'UTASHIRO' => '',
     'JDEGUEST' => '',
-    'JOESUF' => '',
     'LEONT' => '',
-    'ABBYPAN' => '',
-    'ABELTJE' => '',
-    'ABRAXXA' => '',
-    'BIGPRESH' => '',
-    'CAPOEIRAB' => '',
-    'DCANTRELL' => '',
-    'JV' => '',
-    'MRUEDA' => '',
-    'NERDVANA' => '',
-    'NLNETLABS' => '',
     'OLIVER' => '',
-    'PMQS' => '',
-    'SREZIC' => '',
-    'TEAM' => '',
     'TIMKA' => '',
-    'WYANT' => '',
-    'EGILES' => '',
-    'TRIZEN' => '',
-    'ASPOSE' => '',
-    'BDFOY' => '',
-    'BPS' => '',
-    'BWEST' => '',
-    'CAVAC' => '',
-    'COUDOT' => '',
-    'DAGOLDEN' => '',
-    'DAMI' => '',
-    'DAVECROSS' => '',
-    'DJERIUS' => '',
-    'DVEEDEN' => '',
-    'GBROWN' => '',
-    'GRYPHON' => '',
-    'HAARG' => '',
-    'JRM' => '',
     'LNATION' => '',
-    'MAMAWE' => '',
-    'MJONDET' => '',
-    'OALDERS' => '',
-    'RATCLIFFE' => '',
+    'GENE' => '',
+    'PLICEASE' => '',
+    'MBALLARIN' => '',
+    'DERF' => '',
+    'DERIV' => '',
+    'EHUELS' => '',
+    'HAARG' => '',
+    'HANJE' => '',
+    'NHORNE' => '',
+    'BPSCHUCK' => '',
+    'DAM' => '',
+    'DCANTRELL' => '',
+    'BRIANDFOY' => '',
+    'DART' => '',
+    'LIYAO' => '',
+    'NAUTOFON' => '',
     'RJBS' => '',
+    'WYANT' => '',
+    'ABRAXXA' => '',
+    'AKXLIX' => '',
+    'ASPOSE' => '',
+    'BIGFOOT' => '',
+    'BINARY' => '',
+    'BINGOS' => '',
+    'BLHOTSKY' => '',
+    'CAVAC' => '',
+    'CHOROBA' => '',
+    'CRUX' => '',
+    'FASTLY' => '',
+    'GLBRUNE' => '',
+    'INGY' => '',
+    'ISHIGAKI' => '',
+    'KUERBIS' => '',
+    'MARDEM' => '',
+    'MARIOROY' => '',
+    'MRUEDA' => '',
+    'PREACTION' => '',
+    'SREZIC' => '',
+    'VDANJEAN' => '',
+    'BAYASHI' => '',
+    'BPS' => '',
+    'CORION' => '',
+    'DJERIUS' => '',
+    'ETJ' => '',
+    'EXODIST' => '',
+    'GAHAYES' => '',
+    'GBROWN' => '',
+    'HMBRAND' => '',
+    'JRM' => '',
+    'KALDOR' => '',
+    'LHRST' => '',
+    'LITCHIE' => '',
+    'MARKOV' => '',
+    'OALDERS' => '',
+    'OVID' => '',
+    'PJACKLAM' => '',
+    'QGARNIER' => '',
+    'REEDFISH' => '',
+    'RKAPL' => '',
     'RURBAN' => '',
-    'SCHUBIGER' => '',
-    'SKAJI' => '',
-    'STEFFENW' => '',
-    'TEODESIAN' => '',
-    'UXYZAB' => '',
-    'VOJ' => '',
-    'DDICK' => '',
-    'DRCLAW' => '',
-    'OLOF' => '',
+    'SCESANO' => '',
+    'SLAFFAN' => '',
+    'SPWHITTON' => '',
+    'SVW' => '',
+    'TANIGUCHI' => '',
+    'TINITA' => '',
+    'TONYC' => '',
+    'TVIGNAUD' => '',
+    'WORTHMINE' => '',
+    'YOSHIMASA' => '',
 );
 
 
@@ -97,87 +110,100 @@ Acme::CPANAuthors::CPAN::Streaks::WeeklyReleases::Current - Authors with ongoing
 
 =head1 VERSION
 
-This document describes version 20240506.0 of Acme::CPANAuthors::CPAN::Streaks::WeeklyReleases::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-05-06.
+This document describes version 20240601.0 of Acme::CPANAuthors::CPAN::Streaks::WeeklyReleases::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-01.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-05-06, produced by L<cpan-streaks>):
+Current standings (as of 2024-06-01, produced by L<cpan-streaks>):
 
   +-----------+-----+------------+-------------+
   | author    | len | start_date | status      |
   +-----------+-----+------------+-------------+
-  | PERLANCAR | 507 | 2014-08-24 | ongoing     |
-  | KIMOTO    |  15 | 2024-01-21 | might-break |
-  | SKIM      |  15 | 2024-01-21 | might-break |
-  | ETHER     |  11 | 2024-02-18 | might-break |
-  | DERF      |   6 | 2024-03-24 | might-break |
-  | TYRRMINAL |   6 | 2024-03-24 | might-break |
-  | MATHIAS   |   6 | 2024-03-31 | ongoing     |
-  | ARFREITAS |   4 | 2024-04-07 | might-break |
-  | BRIANDFOY |   4 | 2024-04-07 | might-break |
-  | EXODIST   |   4 | 2024-04-07 | might-break |
-  | HMBRAND   |   4 | 2024-04-07 | might-break |
-  | PEVANS    |   4 | 2024-04-07 | might-break |
-  | BPSCHUCK  |   3 | 2024-04-14 | might-break |
-  | GDT       |   3 | 2024-04-14 | might-break |
-  | JJATRIA   |   3 | 2024-04-14 | might-break |
-  | KUERBIS   |   3 | 2024-04-14 | might-break |
-  | SISYPHUS  |   3 | 2024-04-14 | might-break |
-  | UTASHIRO  |   3 | 2024-04-14 | might-break |
-  | JDEGUEST  |   3 | 2024-04-21 | ongoing     |
-  | JOESUF    |   3 | 2024-04-21 | ongoing     |
-  | LEONT     |   3 | 2024-04-21 | ongoing     |
-  | ABBYPAN   |   2 | 2024-04-21 | might-break |
-  | ABELTJE   |   2 | 2024-04-21 | might-break |
-  | ABRAXXA   |   2 | 2024-04-21 | might-break |
-  | BIGPRESH  |   2 | 2024-04-21 | might-break |
-  | CAPOEIRAB |   2 | 2024-04-21 | might-break |
-  | DCANTRELL |   2 | 2024-04-21 | might-break |
-  | JV        |   2 | 2024-04-21 | might-break |
-  | MRUEDA    |   2 | 2024-04-21 | might-break |
-  | NERDVANA  |   2 | 2024-04-21 | might-break |
-  | NLNETLABS |   2 | 2024-04-21 | might-break |
-  | OLIVER    |   2 | 2024-04-21 | might-break |
-  | PMQS      |   2 | 2024-04-21 | might-break |
-  | SREZIC    |   2 | 2024-04-21 | might-break |
-  | TEAM      |   2 | 2024-04-21 | might-break |
-  | TIMKA     |   2 | 2024-04-21 | might-break |
-  | WYANT     |   2 | 2024-04-21 | might-break |
-  | EGILES    |   2 | 2024-04-28 | ongoing     |
-  | TRIZEN    |   2 | 2024-04-28 | ongoing     |
-  | ASPOSE    |   1 | 2024-04-28 | might-break |
-  | BDFOY     |   1 | 2024-04-28 | might-break |
-  | BPS       |   1 | 2024-04-28 | might-break |
-  | BWEST     |   1 | 2024-04-28 | might-break |
-  | CAVAC     |   1 | 2024-04-28 | might-break |
-  | COUDOT    |   1 | 2024-04-28 | might-break |
-  | DAGOLDEN  |   1 | 2024-04-28 | might-break |
-  | DAMI      |   1 | 2024-04-28 | might-break |
-  | DAVECROSS |   1 | 2024-04-28 | might-break |
-  | DJERIUS   |   1 | 2024-04-28 | might-break |
-  | DVEEDEN   |   1 | 2024-04-28 | might-break |
-  | GBROWN    |   1 | 2024-04-28 | might-break |
-  | GRYPHON   |   1 | 2024-04-28 | might-break |
-  | HAARG     |   1 | 2024-04-28 | might-break |
-  | JRM       |   1 | 2024-04-28 | might-break |
-  | LNATION   |   1 | 2024-04-28 | might-break |
-  | MAMAWE    |   1 | 2024-04-28 | might-break |
-  | MJONDET   |   1 | 2024-04-28 | might-break |
-  | OALDERS   |   1 | 2024-04-28 | might-break |
-  | RATCLIFFE |   1 | 2024-04-28 | might-break |
-  | RJBS      |   1 | 2024-04-28 | might-break |
-  | RURBAN    |   1 | 2024-04-28 | might-break |
-  | SCHUBIGER |   1 | 2024-04-28 | might-break |
-  | SKAJI     |   1 | 2024-04-28 | might-break |
-  | STEFFENW  |   1 | 2024-04-28 | might-break |
-  | TEODESIAN |   1 | 2024-04-28 | might-break |
-  | UXYZAB    |   1 | 2024-04-28 | might-break |
-  | VOJ       |   1 | 2024-04-28 | might-break |
-  | DDICK     |   1 | 2024-05-05 | ongoing     |
-  | DRCLAW    |   1 | 2024-05-05 | ongoing     |
-  | OLOF      |   1 | 2024-05-05 | ongoing     |
+  | PERLANCAR | 510 | 2014-08-24 | ongoing     |
+  | KIMOTO    |  19 | 2024-01-21 | ongoing     |
+  | SKIM      |  19 | 2024-01-21 | ongoing     |
+  | ETHER     |  14 | 2024-02-18 | might-break |
+  | TYRRMINAL |  10 | 2024-03-24 | ongoing     |
+  | MATHIAS   |   8 | 2024-03-31 | might-break |
+  | ARFREITAS |   8 | 2024-04-07 | ongoing     |
+  | UTASHIRO  |   6 | 2024-04-14 | might-break |
+  | JDEGUEST  |   6 | 2024-04-21 | ongoing     |
+  | LEONT     |   5 | 2024-04-21 | might-break |
+  | OLIVER    |   5 | 2024-04-21 | might-break |
+  | TIMKA     |   5 | 2024-04-21 | might-break |
+  | LNATION   |   5 | 2024-04-28 | ongoing     |
+  | GENE      |   4 | 2024-05-05 | ongoing     |
+  | PLICEASE  |   4 | 2024-05-05 | ongoing     |
+  | MBALLARIN |   3 | 2024-05-05 | might-break |
+  | DERF      |   3 | 2024-05-12 | ongoing     |
+  | DERIV     |   3 | 2024-05-12 | ongoing     |
+  | EHUELS    |   3 | 2024-05-12 | ongoing     |
+  | HAARG     |   3 | 2024-05-12 | ongoing     |
+  | HANJE     |   3 | 2024-05-12 | ongoing     |
+  | NHORNE    |   3 | 2024-05-12 | ongoing     |
+  | BPSCHUCK  |   2 | 2024-05-12 | might-break |
+  | DAM       |   2 | 2024-05-12 | might-break |
+  | DCANTRELL |   2 | 2024-05-12 | might-break |
+  | BRIANDFOY |   2 | 2024-05-19 | ongoing     |
+  | DART      |   2 | 2024-05-19 | ongoing     |
+  | LIYAO     |   2 | 2024-05-19 | ongoing     |
+  | NAUTOFON  |   2 | 2024-05-19 | ongoing     |
+  | RJBS      |   2 | 2024-05-19 | ongoing     |
+  | WYANT     |   2 | 2024-05-19 | ongoing     |
+  | ABRAXXA   |   1 | 2024-05-19 | might-break |
+  | AKXLIX    |   1 | 2024-05-19 | might-break |
+  | ASPOSE    |   1 | 2024-05-19 | might-break |
+  | BIGFOOT   |   1 | 2024-05-19 | might-break |
+  | BINARY    |   1 | 2024-05-19 | might-break |
+  | BINGOS    |   1 | 2024-05-19 | might-break |
+  | BLHOTSKY  |   1 | 2024-05-19 | might-break |
+  | CAVAC     |   1 | 2024-05-19 | might-break |
+  | CHOROBA   |   1 | 2024-05-19 | might-break |
+  | CRUX      |   1 | 2024-05-19 | might-break |
+  | FASTLY    |   1 | 2024-05-19 | might-break |
+  | GLBRUNE   |   1 | 2024-05-19 | might-break |
+  | INGY      |   1 | 2024-05-19 | might-break |
+  | ISHIGAKI  |   1 | 2024-05-19 | might-break |
+  | KUERBIS   |   1 | 2024-05-19 | might-break |
+  | MARDEM    |   1 | 2024-05-19 | might-break |
+  | MARIOROY  |   1 | 2024-05-19 | might-break |
+  | MRUEDA    |   1 | 2024-05-19 | might-break |
+  | PREACTION |   1 | 2024-05-19 | might-break |
+  | SREZIC    |   1 | 2024-05-19 | might-break |
+  | VDANJEAN  |   1 | 2024-05-19 | might-break |
+  | BAYASHI   |   1 | 2024-05-26 | ongoing     |
+  | BPS       |   1 | 2024-05-26 | ongoing     |
+  | CORION    |   1 | 2024-05-26 | ongoing     |
+  | DJERIUS   |   1 | 2024-05-26 | ongoing     |
+  | ETJ       |   1 | 2024-05-26 | ongoing     |
+  | EXODIST   |   1 | 2024-05-26 | ongoing     |
+  | GAHAYES   |   1 | 2024-05-26 | ongoing     |
+  | GBROWN    |   1 | 2024-05-26 | ongoing     |
+  | HMBRAND   |   1 | 2024-05-26 | ongoing     |
+  | JRM       |   1 | 2024-05-26 | ongoing     |
+  | KALDOR    |   1 | 2024-05-26 | ongoing     |
+  | LHRST     |   1 | 2024-05-26 | ongoing     |
+  | LITCHIE   |   1 | 2024-05-26 | ongoing     |
+  | MARKOV    |   1 | 2024-05-26 | ongoing     |
+  | OALDERS   |   1 | 2024-05-26 | ongoing     |
+  | OVID      |   1 | 2024-05-26 | ongoing     |
+  | PJACKLAM  |   1 | 2024-05-26 | ongoing     |
+  | QGARNIER  |   1 | 2024-05-26 | ongoing     |
+  | REEDFISH  |   1 | 2024-05-26 | ongoing     |
+  | RKAPL     |   1 | 2024-05-26 | ongoing     |
+  | RURBAN    |   1 | 2024-05-26 | ongoing     |
+  | SCESANO   |   1 | 2024-05-26 | ongoing     |
+  | SLAFFAN   |   1 | 2024-05-26 | ongoing     |
+  | SPWHITTON |   1 | 2024-05-26 | ongoing     |
+  | SVW       |   1 | 2024-05-26 | ongoing     |
+  | TANIGUCHI |   1 | 2024-05-26 | ongoing     |
+  | TINITA    |   1 | 2024-05-26 | ongoing     |
+  | TONYC     |   1 | 2024-05-26 | ongoing     |
+  | TVIGNAUD  |   1 | 2024-05-26 | ongoing     |
+  | WORTHMINE |   1 | 2024-05-26 | ongoing     |
+  | YOSHIMASA |   1 | 2024-05-26 | ongoing     |
   +-----------+-----+------------+-------------+
 
 =head1 HOMEPAGE

@@ -1,5 +1,9 @@
 Revision history for perl distribution Mojolicious::Plugin::Authentication::OIDC
 
+0.04      2024-05-31T11:12:13-05:00
+  - Fix bug preventing user roles from being applied
+  - Fix bug preventing on_activity handler from being called
+
 0.03      2024-05-25T17:21:38-05:00
   - Make helper prefix configurable
 

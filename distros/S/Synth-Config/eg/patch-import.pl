@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use lib map { "$ENV{HOME}/repos/$_/lib" } qw(Synth-Config); # local author libs
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Synth-Config); # local author libs
 use Synth::Config ();
 use Getopt::Long qw(GetOptions);
 

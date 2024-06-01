@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use lib 'lib', 't/lib';
+use blib;
 use Feature::Compat::Defer;
 use builtin 'trim';
 no warnings 'experimental::builtin';
@@ -10,6 +11,8 @@ use List::Util 1.33 'any';
 use Path::Tiny 0.119;
 use Test::More;
 use TestArchiveSCS;
+
+can_test_cli() or plan skip_all => 'Cannot test cli';
 
 # General commands
 

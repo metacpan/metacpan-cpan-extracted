@@ -14,18 +14,18 @@ TimeZone::TimeZoneDB - Interface to L<https://timezonedb.com> for looking up Tim
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
-      use TimeZone::TimeZoneDB;
+    use TimeZone::TimeZoneDB;
 
-      my $tzdb = TimeZone::TimeZoneDB->new(key => 'XXXXXXXX');
-      my $tz = $tzdb->get_time_zone({ latitude => 0.1, longitude => 0.2 });
+    my $tzdb = TimeZone::TimeZoneDB->new(key => 'XXXXXXXX');
+    my $tz = $tzdb->get_time_zone({ latitude => 0.1, longitude => 0.2 });
 
 =head1 DESCRIPTION
 
@@ -95,7 +95,7 @@ sub get_time_zone {
 		$param{latitude} = $location->latitude();
 		$param{longitude} = $location->longitude();
 	} elsif(ref($_[0])) {
-		Carp::croak('Usage: get_time_zone(latitude => $latitude, longitude => $logitude, date => "YYYY-MM-DD")');
+		Carp::carp('Usage: get_time_zone(latitude => $latitude, longitude => $logitude)');
 		return;
 	} elsif(@_ % 2 == 0) {
 		%param = @_;
@@ -104,8 +104,8 @@ sub get_time_zone {
 	my $latitude = $param{latitude};
 	my $longitude = $param{longitude};
 
-	if(!defined($latitude)) {
-		Carp::croak('Usage: get_time_zone(latitude => $latitude, longitude => $logitude)');
+	if((!defined($latitude)) || (!defined($longitude))) {
+		Carp::carp('Usage: get_time_zone(latitude => $latitude, longitude => $logitude)');
 		return;
 	}
 
@@ -131,8 +131,7 @@ sub get_time_zone {
 	}
 	# $res->content_type('text/plain');	# May be needed to decode correctly
 
-	my $json = JSON::MaybeXS->new()->utf8();
-	if(my $rc = $json->decode($res->decoded_content())) {
+	if(my $rc = JSON::MaybeXS->new()->utf8()->decode($res->decoded_content())) {
 		if($rc->{'status'} ne 'OK') {
 			# TODO: print error code
 			return;
@@ -182,13 +181,19 @@ Lots of thanks to the folks at L<https://timezonedb.com>.
 
 =head1 BUGS
 
+Please report any bugs or feature requests to C<bug-timezone-timezonedb at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=TimeZone-TimeZoneDB>.
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
 =head1 SEE ALSO
 
 TimezoneDB API: L<https://timezonedb.com/api>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2023 Nigel Horne.
+Copyright 2023-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

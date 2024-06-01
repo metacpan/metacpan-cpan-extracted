@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use lib 'lib';
+use blib;
 
 use List::Util 1.33 'any';
 use Test::More;

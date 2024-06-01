@@ -1,3 +1,9 @@
+0.15 2024-05-31T14:14:26+02:00
+ - Fix error mesaage for A.
+ - Fix error message for Button.
+ - Fix error message for Textarea.
+ - Fixes in ERRORS sections.
+
 0.14 2024-05-29T22:59:40+02:00
  - Add test for Option.
  - Add tests for Select.

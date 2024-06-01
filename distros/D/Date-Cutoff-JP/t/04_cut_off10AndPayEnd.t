@@ -1,8 +1,6 @@
 use strict;
 use Test::More 0.98 tests => 24;
 
-use lib './lib';
-
 use Date::Cutoff::JP;
 my $dco = Date::Cutoff::JP->new({ cutoff => 10, late => 0, payday => 0 });
 

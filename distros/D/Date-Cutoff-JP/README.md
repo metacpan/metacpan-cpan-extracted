@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/worthmine/Date-Cutoff-JP.svg?branch=master)](https://travis-ci.com/worthmine/Date-Cutoff-JP)
+[![Build Status](https://travis-ci.com/worthmine/Date-Cutoff-JP.svg?branch=main)](https://travis-ci.com/worthmine/Date-Cutoff-JP) [![MetaCPAN Release](https://badge.fury.io/pl/Date-Cutoff-JP.svg)](https://metacpan.org/release/Date-Cutoff-JP)
 # NAME
 
 Date::CutOff::JP - Get the day cutoff and payday for in Japanese timezone
@@ -67,7 +67,7 @@ returns hash value with keys below:
 
 # SEE ALSO
 
-[Calendar::Japanese::Holiday](https://metacpan.org/pod/Calendar::Japanese::Holiday),[Date::DayOfWeek](https://metacpan.org/pod/Date::DayOfWeek)
+[Calendar::Japanese::Holiday](https://metacpan.org/pod/Calendar%3A%3AJapanese%3A%3AHoliday),[Date::DayOfWeek](https://metacpan.org/pod/Date%3A%3ADayOfWeek)
 
 [日本の祝日YAML](https://github.com/holiday-jp/holiday_jp/blob/master/holidays.yml)
 

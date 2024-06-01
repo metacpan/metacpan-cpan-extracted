@@ -4,8 +4,11 @@ use warnings;
 
 use Test::More;
 
+use_ok 'Synth::Config';
+
+my $db_file = 'test.db';
+
 END {
-    my $db_file = 'test.db';
     ok -e $db_file, 'db exists';
     if (-e $db_file) {
         unlink $db_file;
@@ -16,15 +19,13 @@ END {
     done_testing();
 }
 
-use_ok 'Synth::Config';
-
 my $model = 'Moog Matriarch';
 my $first = 'Simple 001';
 my $initial;
 
 my $obj = new_ok 'Synth::Config' => [
   model  => $model,
-  dbname => 'test.db',
+  dbname => $db_file,
 #  verbose => 1,
 ];
 
@@ -39,8 +40,8 @@ subtest yaml => sub {
     patches => [ $first ],
   );
   is @$got, 1, 'import_yaml';
-  $initial = $obj->recall_all;
-  is @$initial, 4, 'recall_all';
+  $initial = $obj->recall_setting_names;
+  is @$initial, 1, 'recall_setting_names';
 };
 
 subtest settings => sub {
@@ -106,12 +107,12 @@ subtest settings => sub {
   # search the settings for two keys
   $settings = $obj->search_settings(group => $expect->{group}, name => $name);
   is_deeply $settings, [ $setting2 ], 'search_settings';
-  # recall names
-  my $names = $obj->recall_names;
-  is_deeply $names, [ $first, $name ], 'recall_names';
+  # recall setting names
+  my $setting_names = $obj->recall_setting_names;
+  is_deeply $setting_names, [ $first, $name ], 'recall_setting_names';
   # recall all for model
-  $settings = $obj->recall_all;
-  is_deeply $settings, [ @$initial, $setting, $setting2 ], 'recall_all';
+  $settings = $obj->recall_settings;
+  isa_ok $settings->[0], 'HASH', 'recall_settings';
   # make a third setting
   $expect = {
     name       => 'Foo',
@@ -128,14 +129,16 @@ subtest settings => sub {
   $settings = $obj->search_settings(name => $name);
   is_deeply $settings, [ $setting2 ], 'remove_setting';
   $obj->remove_settings(name => $name);
+  is_deeply $settings, [ $setting2 ], 'already removed';
   $obj->remove_settings;
-  $settings = $obj->search_settings(name => $name);
-  is_deeply $settings, [], 'remove_settings';
+  $settings = $obj->recall_settings;
+  is_deeply $settings, [], 'recall_settings';
 };
 
 subtest graphviz => sub {
+  my $settings = $obj->search_settings(name => $initial);
   my $got = $obj->graphviz(
-    settings   => $initial,
+    settings   => $settings,
     patch_name => $first,
   );
   isa_ok $got, 'GraphViz2';
@@ -168,6 +171,6 @@ subtest specs => sub {
 subtest cleanup => sub {
   # remove the model
   $obj->remove_model(model => $model);
-  my $settings = eval { $obj->recall_all };
+  my $settings = eval { $obj->recall_setting_names };
   is $settings, undef, 'remove_model';
 };

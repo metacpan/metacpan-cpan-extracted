@@ -41,7 +41,25 @@ ARGUMENTS
 
             AutoCAD DWG file to test.
 
-EXAMPLE
+ENV VARIABLES
+    *   "DWGREAD"
+
+        Env variable to rewrite default 'dwgread' command.
+
+        e.g. "wine dwgread.exe"
+
+    *   "DWGWRITE"
+
+        Env variable to rewrite default 'dwgwrite' command.
+
+        e.g. "wine dwgwrite.exe"
+
+EXAMPLE1
+     test-dwg-libredwg-json __FILE__.dwg
+
+EXAMPLE2
+     DWGREAD="wine dwgread.exe"
+     DWGWRITE="wine dwgwrite.exe"
      test-dwg-libredwg-json __FILE__.dwg
 
 SEE ALSO
@@ -57,10 +75,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2023 Michal Josef Špaček
+    © 2023-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

@@ -47,6 +47,7 @@
             "Test::Carp" : "0",
             "Test::Compile" : "0",
             "Test::Most" : "0",
+            "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
             "WWW::RT::CPAN" : "0",
             "autodie" : "0"
@@ -67,6 +68,6 @@
          "x_repository" : "https://github.com/nigelhorne/TimeZone-TimeZoneDB"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

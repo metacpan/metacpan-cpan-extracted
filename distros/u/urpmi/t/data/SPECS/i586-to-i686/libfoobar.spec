@@ -1,5 +1,5 @@
-# rpmbuild -ba libfoobar.spec --target i586
-# rpmbuild -ba libfoobar.spec --target i686
+# linux32 rpmbuild -ba libfoobar.spec --target i586
+# linux32 rpmbuild -ba libfoobar.spec --target i686
 
 # we could build with -static but then pkg goes up from 8.5kb to 280Kb:
 %global __requires_exclude %{?__requires_exclude:%__requires_exclude|}libc.so
@@ -13,7 +13,8 @@ License: x
 cat > t.c <<EOF
 void main () {}
 EOF
-linux32 gcc -m32 -march=i586 -o t t.c
+#linux32 gcc -m32 -march=i586 -o t t.c
+cc -o t t.c
 
 %install
 mkdir -p %buildroot/%_bindir

@@ -4,20 +4,27 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-05-06'; # DATE
+our $DATE = '2024-06-01'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240506.0'; # VERSION
+our $VERSION = '20240601.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
-    'TYRRMINAL' => '',
-    'GDT' => '',
-    'DAMI' => '',
-    'DJERIUS' => '',
-    'GBROWN' => '',
     'LNATION' => '',
+    'TYRRMINAL' => '',
+    'HANJE' => '',
+    'NAUTOFON' => '',
+    'RJBS' => '',
+    'BRIANDFOY' => '',
+    'DERIV' => '',
+    'GBROWN' => '',
+    'MARKOV' => '',
+    'OVID' => '',
+    'QGARNIER' => '',
     'SKIM' => '',
-    'UXYZAB' => '',
+    'SVW' => '',
+    'TONYC' => '',
+    'YOSHIMASA' => '',
 );
 
 
@@ -36,26 +43,33 @@ Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions::Current - Authors with on
 
 =head1 VERSION
 
-This document describes version 20240506.0 of Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-05-06.
+This document describes version 20240601.0 of Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-01.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-05-06, produced by L<cpan-streaks>):
+Current standings (as of 2024-06-01, produced by L<cpan-streaks>):
 
   +-----------+-----+------------+-------------+
   | author    | len | start_date | status      |
   +-----------+-----+------------+-------------+
-  | PERLANCAR | 507 | 2014-08-24 | ongoing     |
-  | TYRRMINAL |   3 | 2024-04-14 | might-break |
-  | GDT       |   2 | 2024-04-21 | might-break |
-  | DAMI      |   1 | 2024-04-28 | might-break |
-  | DJERIUS   |   1 | 2024-04-28 | might-break |
-  | GBROWN    |   1 | 2024-04-28 | might-break |
-  | LNATION   |   1 | 2024-04-28 | might-break |
-  | SKIM      |   1 | 2024-04-28 | might-break |
-  | UXYZAB    |   1 | 2024-04-28 | might-break |
+  | PERLANCAR | 510 | 2014-08-24 | ongoing     |
+  | LNATION   |   4 | 2024-04-28 | might-break |
+  | TYRRMINAL |   2 | 2024-05-12 | might-break |
+  | HANJE     |   2 | 2024-05-19 | ongoing     |
+  | NAUTOFON  |   1 | 2024-05-19 | might-break |
+  | RJBS      |   1 | 2024-05-19 | might-break |
+  | BRIANDFOY |   1 | 2024-05-26 | ongoing     |
+  | DERIV     |   1 | 2024-05-26 | ongoing     |
+  | GBROWN    |   1 | 2024-05-26 | ongoing     |
+  | MARKOV    |   1 | 2024-05-26 | ongoing     |
+  | OVID      |   1 | 2024-05-26 | ongoing     |
+  | QGARNIER  |   1 | 2024-05-26 | ongoing     |
+  | SKIM      |   1 | 2024-05-26 | ongoing     |
+  | SVW       |   1 | 2024-05-26 | ongoing     |
+  | TONYC     |   1 | 2024-05-26 | ongoing     |
+  | YOSHIMASA |   1 | 2024-05-26 | ongoing     |
   +-----------+-----+------------+-------------+
 
 =head1 HOMEPAGE

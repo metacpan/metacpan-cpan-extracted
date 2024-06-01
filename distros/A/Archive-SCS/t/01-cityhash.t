@@ -1,7 +1,8 @@
 #!perl
 use strict;
 use warnings;
-use lib qw( blib/arch blib/lib );
+use lib 'lib';
+use blib;
 
 use Archive::SCS::CityHash qw(
   cityhash64

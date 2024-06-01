@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Synthesizer settings librarian
 
-our $VERSION = '0.0056';
+our $VERSION = '0.0058';
 
 use Moo;
 use strictures 2;
@@ -149,7 +149,7 @@ sub search_settings {
 }
 
 
-sub recall_all {
+sub recall_settings {
   my ($self) = @_;
   my $sql = q/select id,name,settings,json_extract(settings, '$.group') as mygroup from /
     . $self->model
@@ -180,16 +180,16 @@ sub recall_models {
 }
 
 
-sub recall_names {
+sub recall_setting_names {
   my ($self) = @_;
-  my @names;
+  my @settings;
   my $results = $self->_sqlite->query(
     'select distinct name from ' . $self->model
   );
   while (my $next = $results->array) {
-    push @names, $next->[0];
+    push @settings, $next->[0];
   }
-  return \@names;
+  return \@settings;
 }
 
 
@@ -300,7 +300,7 @@ sub remove_spec {
 sub import_yaml {
   my ($self, %options) = @_;
 
-  die 'Invalid settings file'
+  croak 'Invalid settings file'
     if $options{file} && !-e $options{file};
 
   my $config = $options{file}
@@ -338,6 +338,8 @@ sub import_yaml {
 
 sub graphviz {
   my ($self, %options) = @_;
+
+  croak 'No settings given' unless $options{settings};
 
   $options{render}    ||= 0;
   $options{path}      ||= '.';
@@ -413,7 +415,7 @@ Synth::Config - Synthesizer settings librarian
 
 =head1 VERSION
 
-version 0.0056
+version 0.0058
 
 =head1 SYNOPSIS
 
@@ -425,7 +427,7 @@ version 0.0056
   # populate the database with patch settings from a YAML file or string
   my $patches = $synth->import_yaml(
       file    => "$model.yaml", # or string => '...' # one or the other is required
-      patches => ['Simple 001', 'Simple 002' ],      # optional
+      patches => ['Simple 001', 'Simple 002'],       # optional
   );
 
   # populate the database with individual settings
@@ -433,29 +435,32 @@ version 0.0056
   my $id1 = $synth->make_setting(name => $patch, group => 'filter', etc => '...');
   my $id2 = $synth->make_setting(name => $patch, group => 'sequencer', etc => '...');
 
-  my $setting = $synth->recall_setting(id => $id1);
-  # { id => 1, group => 'filter', etc => '...' }
+  my $settings = $synth->recall_settings;
+  # [ { id => 1, group => 'envelope', etc => '...' }, { id => 2, group => 'sequencer', etc => '...' } ]
 
   # update the group key
   $synth->make_setting(id => $id1, group => 'envelope');
 
-  my $settings = $synth->search_settings(name => $patch);
+  $settings = $synth->search_settings(name => $patch);
   # [ { id => 1, group => 'envelope', etc => '...' }, { id => 2, group => 'sequencer', etc => '...' } ]
 
   $settings = $synth->search_settings(group => 'sequencer');
   # [ { id => 2, group => 'sequencer', etc => '...' } ]
 
-  my $g = $synth->graphviz(settings => $settings);
+  my $setting = $synth->recall_setting(id => $id1);
+  # { id => 1, group => 'filter', etc => '...' }
+
+  my $g = $synth->graphviz(settings => $setting);
   # or
   $synth->graphviz(
-    settings => $settings,
+    settings => $setting,
     render   => 1,
   );
 
   my $models = $synth->recall_models;
   # [ 'moog_matriarch' ]
 
-  my $names = $synth->recall_names;
+  my $setting_names = $synth->recall_setting_names;
   # [ 'My favorite setting' ]
 
   # declare the possible settings
@@ -485,8 +490,8 @@ version 0.0056
 
 =head1 DESCRIPTION
 
-C<Synth::Config> provides a way to save and recall synthesizer control
-settings in a database.
+C<Synth::Config> provides a way to import, save, recall, and visualize
+synthesizer control settings in a database, and with L<GraphViz2>.
 
 This does B<not> control the synth. It is simply a way to manually
 record the parameters defined by knob, slider, switch, or patch
@@ -553,7 +558,7 @@ Example:
   name: 'My Other Best Setting!'
   settings:
     group parameter control group_to param_to is_default
-    mixer output    patch   filters  vcf-1-in 0
+    mixer output    patch   filters  vcf-in   0
 
 =head2 recall_setting
 
@@ -570,9 +575,9 @@ Return the parameters of a setting for the given B<id>.
 
 Return all the settings given a search query.
 
-=head2 recall_all
+=head2 recall_settings
 
-  my $settings = $synth->recall_all;
+  my $settings = $synth->recall_settings;
 
 Return all the settings for the synth model.
 
@@ -583,9 +588,9 @@ Return all the settings for the synth model.
 Return all the know models. This method can be called without having
 specified a synth B<model> in the constructor.
 
-=head2 recall_names
+=head2 recall_setting_names
 
-  my $settings = $synth->recall_names;
+  my $setting_names = $synth->recall_setting_names;
 
 Return all the setting names for the current model.
 
@@ -675,11 +680,15 @@ The F<t/01-methods.t> and the F<eg/*.pl> files in this distribution
 
 L<GraphViz2>
 
+L<List::Util>
+
 L<Moo>
 
 L<Mojo::JSON>
 
 L<Mojo::SQLite>
+
+L<YAML>
 
 =head1 AUTHOR
 

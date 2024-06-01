@@ -5,7 +5,7 @@ use warnings;
 
 use App::Test::DWG::LibreDWG::JSON;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Run.
 exit App::Test::DWG::LibreDWG::JSON->new->run;
@@ -72,8 +72,32 @@ AutoCAD DWG file to test.
 
 =back
 
-=head1 EXAMPLE
+=head1 ENV VARIABLES
 
+=over
+
+=item * C<DWGREAD>
+
+Env variable to rewrite default 'dwgread' command.
+
+e.g. "wine dwgread.exe"
+
+=item * C<DWGWRITE>
+
+Env variable to rewrite default 'dwgwrite' command.
+
+e.g. "wine dwgwrite.exe"
+
+=back
+
+=head1 EXAMPLE1
+
+ test-dwg-libredwg-json __FILE__.dwg
+
+=head1 EXAMPLE2
+
+ DWGREAD="wine dwgread.exe"
+ DWGWRITE="wine dwgwrite.exe"
  test-dwg-libredwg-json __FILE__.dwg
 
 =head1 SEE ALSO
@@ -98,12 +122,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023 Michal Josef Špaček
+© 2023-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

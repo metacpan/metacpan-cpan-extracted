@@ -8,7 +8,7 @@ use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 use Tags::HTML::Element::Utils qw(tags_boolean tags_label tags_value);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 sub _cleanup {
 	my $self = shift;
@@ -26,7 +26,7 @@ sub _init {
 		|| ! blessed($textarea)
 		|| ! $textarea->isa('Data::HTML::Element::Textarea')) {
 
-		err "Input object must be a 'Data::HTML::Element::Textarea' instance.";
+		err "Textarea object must be a 'Data::HTML::Element::Textarea' instance.";
 	}
 
 	$self->{'_textarea'} = $textarea;
@@ -197,9 +197,15 @@ Returns undef.
                  Parameter 'tags' must be a 'Tags::Output::*' class.
 
  init():
+         Textarea object must be a 'Data::HTML::Element::Textarea' instance.
+
+ process():
          From Tags::HTML::process():
                  Parameter 'tags' isn't defined.
-         Input object must be a 'Data::HTML::Element::Textarea' instance.
+
+ process_css():
+         From Tags::HTML::process_css():
+                 Parameter 'css' isn't defined.
 
 =head1 EXAMPLE
 
@@ -288,6 +294,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

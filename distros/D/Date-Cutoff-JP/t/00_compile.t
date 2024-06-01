@@ -1,8 +1,6 @@
 use strict;
 use Test::More 0.98 tests => 27;
 
-use lib './lib';
-
 use_ok $_ for qw(Date::Cutoff::JP);                                                     # 1
 my $dco = new_ok('Date::Cutoff::JP');                                                   # 2
 

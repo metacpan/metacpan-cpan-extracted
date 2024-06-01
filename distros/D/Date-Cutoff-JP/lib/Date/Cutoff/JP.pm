@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 
 use Carp;
 use Time::Seconds;
@@ -12,11 +12,13 @@ my $tp = Time::Piece->new();
 use Calendar::Japanese::Holiday;
 use Date::DayOfWeek;
 
-use Moose;
+use Moo;
+use Types::Standard qw/Int/;
+use namespace::clean;
 
-has cutoff => ( is => 'rw', isa => 'Int', default => 0 );
-has payday => ( is => 'rw', isa => 'Int', default => 0 );
-has late    => ( is => 'rw', isa => 'Int', default => 1 );
+has cutoff => ( is => 'rw', isa => Int, default => 0 );
+has payday => ( is => 'rw', isa => Int, default => 0 );
+has late   => ( is => 'rw', isa => Int, default => 1 );
 
 around 'cutoff' => sub {
     my $orig = shift;
@@ -55,8 +57,7 @@ around 'late' => sub {
     return $self->$orig($value);
 };
 
-__PACKAGE__->meta->make_immutable;
-no Moose;
+no Moo;
 
 sub _isWeekend {
     my $self = shift;

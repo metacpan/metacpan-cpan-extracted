@@ -1,3 +1,15 @@
+0.002007  2024-05-31 21:49:10-07:00 America/Los_Angeles
+
+    - Bump minimum version to 5.10
+
+0.002006  2024-05-31 12:11:32-07:00 America/Los_Angeles
+
+    - Documentation fixes
+
+0.002005  2024-05-31 10:06:31-07:00 America/Los_Angeles
+
+    - Add diagnostics test that prints module versions
+
 0.002004  2024-05-30 15:32:33-07:00 America/Los_Angeles
 
     - Expand for multiple UUID generators

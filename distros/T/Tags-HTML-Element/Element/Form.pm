@@ -9,7 +9,7 @@ use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 use Tags::HTML::Element::Utils qw(tags_data tags_value);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 # Constructor.
 sub new {
@@ -227,8 +227,7 @@ Returns undef.
                  Parameter 'tags' must be a 'Tags::Output::*' class.
 
  init():
-         From Tags::HTML::init():
-                 Form object must be a 'Data::HTML::Element::Form' instance.
+         Form object must be a 'Data::HTML::Element::Form' instance.
 
  process():
          From Tags::HTML::process():
@@ -339,6 +338,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

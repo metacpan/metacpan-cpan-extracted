@@ -2,7 +2,7 @@ use v5.32;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::InMemory 1.01
+class Archive::SCS::InMemory 1.02
   :isa( Archive::SCS::Mountable );
 
 use stable 0.031 'isa';

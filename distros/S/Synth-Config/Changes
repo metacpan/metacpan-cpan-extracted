@@ -1,7 +1,16 @@
 Revision history for Synth-Config
 
+0.0058 2024-05-31 18:56:58
+    - Fix method names in eg/ programs.
+
+0.0057 2024-05-31 11:41:16
+    - Fix dumb method names.
+    - And fix tests.
+    - Improve documentation.
+
 0.0056 2024-05-26 22:15:55
     - Remove model_name from graphviz() required arguments.
+    - Restrict graphviz() params unless unseen.
 
 0.0055 2024-05-23 20:44:47
     - Allow removal of all model settings at once.

@@ -67,7 +67,7 @@
          "web" : "https://github.com/ology/Synth-Config"
       }
    },
-   "version" : "0.0056",
+   "version" : "0.0058",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"

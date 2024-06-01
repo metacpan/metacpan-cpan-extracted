@@ -11,5 +11,6 @@ cpanfile
 dist.ini
 lib/Test2/Plugin/UUID.pm
 lib/Test2/Util/UUID.pm
+t/00-report.t
 t/uuid.t
 xt/author/pod-syntax.t

@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 use Test::Most tests => 5;
-use Geo::Location::Point 0.07;	# FIXME: 0.08
+use Geo::Location::Point 0.08;
 
 BEGIN {
 	use_ok('TimeZone::TimeZoneDB');
@@ -32,6 +32,7 @@ TZ: {
 		sleep(1);	# Throttle for free accounts
 
 		my $location = new_ok('Geo::Location::Point' => [ latitude => 51.34, longitude => 1.42 ]);
+		$tzdb = $tzdb->new();	# Test clone
 		$tz = $tzdb->get_time_zone($location);
 
 		if($ENV{'TEST_VERBOSE'}) {

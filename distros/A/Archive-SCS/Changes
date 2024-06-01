@@ -1,5 +1,11 @@
 Revision history for perl distribution Archive-SCS
 
+1.02 - 2024-05-31
+
+  - Release fix: select the correct perl executable when running tests
+
+  - Revert requirements workaround
+
 1.01 - 2024-05-30
 
   - Release fix: work around smoke testers ignoring declared runtime
@@ -10,7 +16,7 @@ Revision history for perl distribution Archive-SCS
   - Support Perls back to v5.32
 
   - Drop dependency on the String::CityHash module by including Google's
-    CityHash version 1.03, along with an XS adapter
+    CityHash version 1.0.3, along with an XS adapter
 
   - Improve tests and documentation
 

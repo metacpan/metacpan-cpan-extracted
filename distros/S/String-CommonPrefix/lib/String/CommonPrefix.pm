@@ -1,20 +1,22 @@
 package String::CommonPrefix;
 
-our $DATE = '2014-12-10'; # DATE
-our $VERSION = '0.01'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
-use Exporter;
-our @ISA = qw(Exporter);
+use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-05-16'; # DATE
+our $DIST = 'String-CommonPrefix'; # DIST
+our $VERSION = '0.020'; # VERSION
+
 our @EXPORT_OK = qw(
                        common_prefix
                );
 
 sub common_prefix {
-    return undef unless @_;
+    return undef unless @_; ## no critic: Subroutines::ProhibitExplicitReturnUndef
     my $i;
   L1:
     for ($i=0; $i < length($_[0]); $i++) {
@@ -44,17 +46,13 @@ String::CommonPrefix - Find prefix common to all strings
 
 =head1 VERSION
 
-This document describes version 0.01 of String::CommonPrefix (from Perl distribution String-CommonPrefix), released on 2014-12-10.
+This document describes version 0.020 of String::CommonPrefix (from Perl distribution String-CommonPrefix), released on 2024-05-16.
 
 =head1 FUNCTIONS
 
 =head2 common_prefix(@LIST) => STR
 
 Given a list of strings, return common prefix.
-
-=head1 SEE ALSO
-
-L<String::CommonSuffix>
 
 =head1 HOMEPAGE
 
@@ -64,6 +62,41 @@ Please visit the project's homepage at L<https://metacpan.org/release/String-Com
 
 Source repository is at L<https://github.com/perlancar/perl-String-CommonPrefix>.
 
+=head1 SEE ALSO
+
+L<String::CommonSuffix>
+
+CLI: L<strip-common-prefix> (from L<App::CommonPrefixUtils>).
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=String-CommonPrefix>
@@ -71,16 +104,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2014 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -3,13 +3,14 @@
 
 requires "Test2::API" => "1.302165";
 requires "UUID::Tiny" => "1.04";
-requires "perl" => "5.008009";
+requires "perl" => "5.010000";
 suggests "Data::UUID" => "1.227";
 suggests "Data::UUID::MT" => "1.001";
 suggests "UUID" => "0.35";
 
 on 'test' => sub {
   requires "Test2::Require::Module" => "0.000162";
+  requires "Test2::Util::Table" => "0.000162";
   requires "Test2::V0" => "0.000162";
 };
 

@@ -2,7 +2,7 @@ package Test2::Util::UUID;
 use strict;
 use warnings;
 
-our $VERSION = '0.002004';
+our $VERSION = '0.002007';
 
 use Carp qw/croak/;
 
@@ -189,8 +189,8 @@ perl and thus could be slower than the others. Version 4 UUIDs are generated
 when this module is used.
 
 A warning will be issued with this module. You can surpress the warning with
-either the C<$TEST2_UUID_NO_WARN> environment variable. You can also surpress
-it with the ':nowarn' import argument.
+either the C<$TEST2_UUID_NO_WARN> environment variable or the C<< warn => 0 >>
+import argument.
 
 =item L<Data::UUID> - Not Suitible for Databases
 
@@ -198,8 +198,8 @@ This is the last resort module. This generates UUIDs fast, but they are of a
 type/version that is not suitible for database keys.
 
 A warning will be issued with this module. You can surpress the warning with
-either the C<$TEST2_UUID_NO_WARN> environment variable. You can also surpress
-it with the ':nowarn' import argument.
+either the C<$TEST2_UUID_NO_WARN> environment variable or the C<< warn => 0 >>
+import argument.
 
 =back
 

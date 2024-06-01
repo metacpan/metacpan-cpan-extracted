@@ -3,9 +3,9 @@ package Acme::CPANAuthorsBundle::CPAN::Streaks;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-05-06'; # DATE
+our $DATE = '2024-06-01'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240506.0'; # VERSION
+our $VERSION = '20240601.0'; # VERSION
 
 1;
 # ABSTRACT: A collection of Acme::CPANAuthors::CPAN::Streaks::* modules
@@ -22,7 +22,7 @@ Acme::CPANAuthorsBundle::CPAN::Streaks - A collection of Acme::CPANAuthors::CPAN
 
 =head1 VERSION
 
-This document describes version 20240506.0 of Acme::CPANAuthorsBundle::CPAN::Streaks (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-05-06.
+This document describes version 20240601.0 of Acme::CPANAuthorsBundle::CPAN::Streaks (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-01.
 
 =head1 HOMEPAGE
 

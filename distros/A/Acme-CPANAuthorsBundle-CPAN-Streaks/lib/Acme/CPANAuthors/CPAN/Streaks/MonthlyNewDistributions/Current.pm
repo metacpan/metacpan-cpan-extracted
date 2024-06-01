@@ -4,43 +4,41 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-05-06'; # DATE
+our $DATE = '2024-06-01'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240506.0'; # VERSION
+our $VERSION = '20240601.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
     'SKIM' => '',
     'DJERIUS' => '',
     'BRIANDFOY' => '',
-    'DAVECROSS' => '',
-    'ARISTOTLE' => '',
-    'CORION' => '',
-    'MATHIAS' => '',
     'GBROWN' => '',
     'GDT' => '',
     'LNATION' => '',
-    'BIGPRESH' => '',
-    'CAPOEIRAB' => '',
-    'CROMEDOME' => '',
-    'DAMI' => '',
-    'EGOR' => '',
-    'HIGHTOWE' => '',
-    'ISHIGAKI' => '',
-    'JFORGET' => '',
-    'JMATES' => '',
-    'LEONT' => '',
-    'MGUBIN' => '',
-    'MYSOCIETY' => '',
-    'PHILIPPE' => '',
-    'RSPIER' => '',
-    'SPWHITTON' => '',
-    'TEAM' => '',
     'TIMKA' => '',
     'TYRRMINAL' => '',
-    'UXYZAB' => '',
-    'VNEALV' => '',
-    'WATERKIP' => '',
+    'BPS' => '',
+    'DERIV' => '',
+    'EHUELS' => '',
+    'EXODIST' => '',
+    'HAARG' => '',
+    'HANJE' => '',
+    'JDEGUEST' => '',
+    'LHRST' => '',
+    'MARKOV' => '',
+    'MBALLARIN' => '',
+    'MVSJES' => '',
+    'NAUTOFON' => '',
+    'OLIVER' => '',
+    'OVID' => '',
+    'PLICEASE' => '',
+    'QGARNIER' => '',
+    'RJBS' => '',
+    'SVW' => '',
+    'TEODESIAN' => '',
+    'TONYC' => '',
+    'YOSHIMASA' => '',
 );
 
 
@@ -59,49 +57,47 @@ Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::Current - Authors wit
 
 =head1 VERSION
 
-This document describes version 20240506.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-05-06.
+This document describes version 20240601.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-01.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-05-06, produced by L<cpan-streaks>):
+Current standings (as of 2024-06-01, produced by L<cpan-streaks>):
 
   +-----------+-----+------------+-------------+
   | author    | len | start_date | status      |
   +-----------+-----+------------+-------------+
-  | PERLANCAR | 118 | 2014-08    | ongoing     |
-  | SKIM      |  15 | 2023-03    | ongoing     |
-  | DJERIUS   |   6 | 2023-12    | ongoing     |
-  | BRIANDFOY |   3 | 2024-02    | might-break |
-  | DAVECROSS |   3 | 2024-02    | might-break |
-  | ARISTOTLE |   2 | 2024-03    | might-break |
-  | CORION    |   2 | 2024-03    | might-break |
-  | MATHIAS   |   2 | 2024-03    | might-break |
-  | GBROWN    |   2 | 2024-04    | ongoing     |
-  | GDT       |   2 | 2024-04    | ongoing     |
-  | LNATION   |   2 | 2024-04    | ongoing     |
-  | BIGPRESH  |   1 | 2024-04    | might-break |
-  | CAPOEIRAB |   1 | 2024-04    | might-break |
-  | CROMEDOME |   1 | 2024-04    | might-break |
-  | DAMI      |   1 | 2024-04    | might-break |
-  | EGOR      |   1 | 2024-04    | might-break |
-  | HIGHTOWE  |   1 | 2024-04    | might-break |
-  | ISHIGAKI  |   1 | 2024-04    | might-break |
-  | JFORGET   |   1 | 2024-04    | might-break |
-  | JMATES    |   1 | 2024-04    | might-break |
-  | LEONT     |   1 | 2024-04    | might-break |
-  | MGUBIN    |   1 | 2024-04    | might-break |
-  | MYSOCIETY |   1 | 2024-04    | might-break |
-  | PHILIPPE  |   1 | 2024-04    | might-break |
-  | RSPIER    |   1 | 2024-04    | might-break |
-  | SPWHITTON |   1 | 2024-04    | might-break |
-  | TEAM      |   1 | 2024-04    | might-break |
-  | TIMKA     |   1 | 2024-04    | might-break |
-  | TYRRMINAL |   1 | 2024-04    | might-break |
-  | UXYZAB    |   1 | 2024-04    | might-break |
-  | VNEALV    |   1 | 2024-04    | might-break |
-  | WATERKIP  |   1 | 2024-04    | might-break |
+  | PERLANCAR | 119 | 2014-08    | ongoing     |
+  | SKIM      |  15 | 2023-03    | might-break |
+  | DJERIUS   |   6 | 2023-12    | might-break |
+  | BRIANDFOY |   4 | 2024-02    | might-break |
+  | GBROWN    |   2 | 2024-04    | might-break |
+  | GDT       |   2 | 2024-04    | might-break |
+  | LNATION   |   2 | 2024-04    | might-break |
+  | TIMKA     |   2 | 2024-04    | might-break |
+  | TYRRMINAL |   2 | 2024-04    | might-break |
+  | BPS       |   1 | 2024-05    | might-break |
+  | DERIV     |   1 | 2024-05    | might-break |
+  | EHUELS    |   1 | 2024-05    | might-break |
+  | EXODIST   |   1 | 2024-05    | might-break |
+  | HAARG     |   1 | 2024-05    | might-break |
+  | HANJE     |   1 | 2024-05    | might-break |
+  | JDEGUEST  |   1 | 2024-05    | might-break |
+  | LHRST     |   1 | 2024-05    | might-break |
+  | MARKOV    |   1 | 2024-05    | might-break |
+  | MBALLARIN |   1 | 2024-05    | might-break |
+  | MVSJES    |   1 | 2024-05    | might-break |
+  | NAUTOFON  |   1 | 2024-05    | might-break |
+  | OLIVER    |   1 | 2024-05    | might-break |
+  | OVID      |   1 | 2024-05    | might-break |
+  | PLICEASE  |   1 | 2024-05    | might-break |
+  | QGARNIER  |   1 | 2024-05    | might-break |
+  | RJBS      |   1 | 2024-05    | might-break |
+  | SVW       |   1 | 2024-05    | might-break |
+  | TEODESIAN |   1 | 2024-05    | might-break |
+  | TONYC     |   1 | 2024-05    | might-break |
+  | YOSHIMASA |   1 | 2024-05    | might-break |
   +-----------+-----+------------+-------------+
 
 =head1 HOMEPAGE

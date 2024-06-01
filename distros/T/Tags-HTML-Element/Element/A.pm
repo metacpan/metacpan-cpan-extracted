@@ -8,7 +8,7 @@ use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 use Tags::HTML::Element::Utils qw(tags_data tags_value);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 sub _cleanup {
 	my $self = shift;
@@ -26,7 +26,7 @@ sub _init {
 		|| ! blessed($a)
 		|| ! $a->isa('Data::HTML::Element::A')) {
 
-		err "Input object must be a 'Data::HTML::Element::A' instance.";
+		err "Anchor object must be a 'Data::HTML::Element::A' instance.";
 	}
 
 	$self->{'_a'} = $a;
@@ -166,7 +166,9 @@ Returns undef.
          From Tags::HTML::new():
                  Parameter 'css' must be a 'CSS::Struct::Output::*' class.
                  Parameter 'tags' must be a 'Tags::Output::*' class.
-         Input object must be a 'Data::HTML::Element::A' instance.
+
+ init():
+         Anchor object must be a 'Data::HTML::Element::A' instance.
 
  process():
          From Tags::HTML::process():
@@ -253,6 +255,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::Authentication::OIDC 0.03;
+package Mojolicious::Plugin::Authentication::OIDC 0.04;
 use v5.26;
 use warnings;
 
@@ -315,7 +315,7 @@ sub register($self, $app, $params) {
       my ($user, $token);
       try {
         $token = $c->app->renderer->get_helper($token_helper)->($c);
-        $user  = $c->renderer($current_user_helper)->();
+        $user  = $c->app->renderer->get_helper($current_user_helper)->($c);
         my @roles = $conf{get_roles}->($user, $token)->@*;
         @roles = grep {defined} map {$conf{role_map}->{$_}} @roles if (defined($conf{role_map}));
         return [@roles];
@@ -330,7 +330,7 @@ sub register($self, $app, $params) {
   $app->hook(
     before_dispatch => sub($c) {
       my $u;
-      try {$u = $c->renderer($current_user_helper)->();} catch ($e) {
+      try {$u = $c->app->renderer->get_helper($current_user_helper)->($c);} catch ($e) {
       }
       $conf{on_activity}->($c, $u) if ($u);
     }

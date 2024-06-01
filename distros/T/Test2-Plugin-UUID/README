@@ -60,8 +60,8 @@ BACKENDS
       UUIDs are generated when this module is used.
 
       A warning will be issued with this module. You can surpress the
-      warning with either the $TEST2_UUID_NO_WARN environment variable. You
-      can also surpress it with the ':nowarn' import argument.
+      warning with either the $TEST2_UUID_NO_WARN environment variable or
+      the warn => 0 import argument.
 
     Data::UUID - Not Suitible for Databases
 
@@ -69,8 +69,8 @@ BACKENDS
       are of a type/version that is not suitible for database keys.
 
       A warning will be issued with this module. You can surpress the
-      warning with either the $TEST2_UUID_NO_WARN environment variable. You
-      can also surpress it with the ':nowarn' import argument.
+      warning with either the $TEST2_UUID_NO_WARN environment variable or
+      the warn => 0 import argument.
 
 SOURCE
 

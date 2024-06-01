@@ -9,7 +9,7 @@ use Scalar::Util qw(blessed);
 use Tags::HTML::Element::Option;
 use Tags::HTML::Element::Utils qw(tags_boolean tags_data tags_label tags_value);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 sub _cleanup {
 	my $self = shift;
@@ -198,15 +198,16 @@ Returns undef.
                  Parameter 'css' must be a 'CSS::Struct::Output::*' class.
                  Parameter 'tags' must be a 'Tags::Output::*' class.
 
+ init():
+         Select object must be a 'Data::HTML::Element::Select' instance.
+
  process():
          From Tags::HTML::process():
                  Parameter 'tags' isn't defined.
-         Input object must be a 'Data::HTML::Element::Select' instance.
 
  process_css():
          From Tags::HTML::process_css():
                  Parameter 'css' isn't defined.
-         Input object must be a 'Data::HTML::Element::Select' instance.
 
 =head1 EXAMPLE
 
@@ -290,6 +291,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

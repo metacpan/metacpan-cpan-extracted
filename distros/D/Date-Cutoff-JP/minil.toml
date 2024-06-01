@@ -1,5 +1,5 @@
 name = "Date-Cutoff-JP"
-badges = ["travis-ci.com"]
+badges = ["travis-ci.com","metacpan"]
 module_maker="ModuleBuildTiny"
 static_install = "auto"
 

@@ -2,12 +2,15 @@
 use strict;
 use warnings;
 use lib 'lib', 't/lib';
+use blib;
 use Feature::Compat::Defer;
 
 use IPC::Run3;
 use Path::Tiny 0.119;
 use Test::More;
 use TestArchiveSCS;
+
+can_test_cli() or plan skip_all => 'Cannot test cli';
 
 my $tempdir = Path::Tiny->tempdir('Archive-SCS-test-XXXXXX');
 defer { $tempdir->remove_tree; }
