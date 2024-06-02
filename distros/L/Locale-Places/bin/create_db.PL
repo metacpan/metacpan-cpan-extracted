@@ -42,8 +42,10 @@ foreach my $country('GB', 'US') {
 
 	if(-r $sqlite) {
 		if((-s $sqlite) > 0) {	# Non empty?
-			# Don't bother building if the file is less than a day old
+			# Don't bother building if the SQL file is less than a day old
 			next if(-M $sqlite < 1);
+			# Don't bother building if the SQL file is newer than the CSV file
+			next if((-M $sqlite) >= (-M $csv));
 		}
 		unlink $sqlite;
 	}

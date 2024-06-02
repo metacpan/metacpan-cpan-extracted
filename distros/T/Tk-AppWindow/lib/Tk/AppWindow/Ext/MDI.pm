@@ -11,7 +11,7 @@ use warnings;
 use Carp;
 
 use vars qw($VERSION);
-$VERSION="0.06";
+$VERSION="0.07";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -1296,6 +1296,11 @@ sub silentMode {
 	}
 }
 
+sub ToolSaveAll {
+	my $self = shift;
+	return [	'tool_button',		'Save all',		'doc_save_all',		'document-save',	'Save all open documents'], 
+}
+
 =item B<ToolItems>
 
 Returns the tool items for MDI. Called by extension B<ToolBar>.
@@ -1317,7 +1322,12 @@ sub ToolItems {
 	;
 
 	push @items,
+		
+		[	'tool_list' ],
 		[	'tool_button',		'Save',		'doc_save',		'document-save',	'Save current document'], 
+		[	'tool_button',		'Save as ',		'doc_save_as',		'document-save-as',	'Rename and save current document'],
+		$self->ToolSaveAll,
+		[	'tool_list_end' ],
 	unless $readonly;
 
 	push @items,

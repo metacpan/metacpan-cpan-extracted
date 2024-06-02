@@ -15,7 +15,6 @@ lib/Tk/AppWindow/CookBook/ContentManager.pod
 lib/Tk/AppWindow/CookBook/Extension.pod
 lib/Tk/AppWindow/CookBook/Plugin.pod
 lib/Tk/AppWindow/Ext/Art.pm
-lib/Tk/AppWindow/Ext/Balloon.pm
 lib/Tk/AppWindow/Ext/ConfigFolder.pm
 lib/Tk/AppWindow/Ext/Daemons.pm
 lib/Tk/AppWindow/Ext/Help.pm
@@ -58,7 +57,6 @@ t/130-Tk-AppWindow-Ext-Keyboard.t
 t/140-Tk-AppWindow-Ext-MenuBar.t
 t/150-Tk-AppWindow-Ext-SDI.t
 t/160-Tk-AppWindow-Ext-Help.t
-t/170-Tk-AppWindow-Ext-Balloon.t
 t/180-Tk-AppWindow-Ext-StatusBar.t
 t/190-Tk-AppWindow-Ext-ToolBar.t
 t/200-Tk-AppWindow-Ext-NavigatorPanel.t

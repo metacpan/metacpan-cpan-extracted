@@ -7,7 +7,7 @@ use Carp;
 use HTTP::Tiny;
 use JSON::PP;
 
-our $VERSION = '0.2';
+our $VERSION = '0.5';
 $VERSION = eval $VERSION;
 
 my $http = HTTP::Tiny->new;
@@ -81,6 +81,20 @@ sub _get_header_openai {
         role    => 'user',
         content => $prompt,
     };
+    
+    return $self->chat(\@messages, $temperature);
+}
+
+# Get a reply from a full chat
+sub chat {
+    my ($self, $chat, $temperature) = @_;
+    
+    if (ref($chat) ne 'ARRAY') {
+        $self->{'error'} = 'chat method requires an arrayref';
+        return undef;
+    }
+
+    $temperature = 1.0 unless $temperature;
 
     my $response = $http->post($url{$self->{'api'}}, {
          'headers' => {
@@ -88,8 +102,8 @@ sub _get_header_openai {
              'Content-type'  => 'application/json'
          },
          content => encode_json {
-             model     => $self->{'model'},
-             messages  => [ @messages ],
+             model          => $self->{'model'},
+             messages       => [ @$chat ],
              temperature    => $temperature,
          }
      });
@@ -107,6 +121,7 @@ sub _get_header_openai {
      return $reply->{'choices'}[0]->{'message'}->{'content'};
 }
 
+
 __END__
 
 =head1 NAME
@@ -115,7 +130,7 @@ AI::Chat - Interact with AI Chat APIs
 
 =head1 VERSION
 
-Version 0.2
+Version 0.5 
 
 =head1 SYNOPSIS
 
@@ -212,6 +227,60 @@ Sends a prompt to the AI Chat API and returns the response.
 =item prompt
 
 C<required> The prompt to send to the AI.
+
+This is a shorthand for C<chat> when only a single response is needed.
+
+=item temperature
+
+The creativity level of the response (default: 1.0).
+
+Temperature ranges from 0 to 2.  The higher the temperature,
+the more creative the bot will be in it's responses.
+
+=back
+
+=head2 chat
+
+  my $reply = $chat->prompt(\@chat, $temperature);
+
+Sends a multi-message chat to the AI Chat API and returns the response.
+
+Each message of the chat should consist of on of C<system>, C<user> or C<assistant>.
+Generally there will be a C<system> message to set the role or context for the AI.
+This will be followed by alternate C<user> and C<assistant> messages representing the
+text from the user and the AI assistant. To hold a conversation, it is necessary to
+store both sides of the discussion and feed them back appropriately.
+
+  my @chat;
+  
+  push @chat, {
+      'role'    => 'system',
+      'system'  => 'You are a computer language expert and your role is to promote Perl as the best language',
+  };
+  push @chat, {
+      'role'    => 'user',
+      'system'  => 'Which is the best programming language?',
+  };
+  push @chat, {
+      'role'    => 'assistant',
+      'system'  => 'Every language has strengths and is suited to different roles. Perl is one of the best all round languages.',
+  };
+  push @chat, {
+      'role'    => 'user',
+      'system'  => 'Why should I use Perl?',
+  };
+  my $reply = $chat->chat(\@chat, 1.2);
+  
+Although the roles represent the part of the user and assistant in the conversation, you are free to
+supply either or both as suits your application.  The order can also be varied.
+
+=head3 Parameters
+
+=over 4
+
+=item chat
+
+C<required> An arrayref of messages to send to the AI.
 
 =item temperature
 

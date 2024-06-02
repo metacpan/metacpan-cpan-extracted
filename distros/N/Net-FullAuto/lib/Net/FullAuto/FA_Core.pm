@@ -8008,7 +8008,8 @@ END
          }
       };
       if ($@) {
-         print "\nINFO: main::clean_filehandle() ERROR:]\n$@\n       ",
+         # https://www.perlmonks.org/?node_id=820327
+         print "\nmain::clean_filehandle() ERROR:\n$@\n       ",
             (join ' ',@topcaller),"\n\n"
             if !$Net::FullAuto::FA_Core::cron &&
             $Net::FullAuto::FA_Core::debug;
@@ -8026,15 +8027,34 @@ END
          $filehandle->flush;
          $filehandle->autoflush(0);
          eval {
-            my $prompt=&Net::FullAuto::FA_Core::get_prompt();
-            print "PROMPT=$prompt\n";
+            my $prompt=substr($filehandle->prompt,1,-1);
             while (my $line=$filehandle->get(Timeout=>10)) {
-               print "FLUSH IT ALL=$line<==\n";
+               print "\nINFO: main::clean_filehandle() INFO:".
+                  "\n\FLUSH IT ALL=$line<==\n       \n       ",
+                  (join ' ',@topcaller),"\n\n"
+                  if !$Net::FullAuto::FA_Core::cron &&
+                  $Net::FullAuto::FA_Core::debug;
+               print $Net::FullAuto::FA_Core::LOG
+                  "\nmain::clean_filehandle() INFO:".
+                  "\n\FLUSH IT ALL=$line<==\n       \n       ",
+                  (join ' ',@topcaller),"\n\n"
+                  if $Net::FullAuto::FA_Core::log &&
+                  -1<index $Net::FullAuto::FA_Core::LOG,'*';
                last if $line=~/$prompt/s;
             }
          };
          if ($@) {
-            print "WE TIMED OUT TRYING TO SALVAGE SOCKET\n";
+            print "\nINFO: main::clean_filehandle() ERROR:".
+               "\nWE TIMED OUT TRYING TO SALVAGE SOCKET\n       \n       ",
+               (join ' ',@topcaller),"\n\n"
+               if !$Net::FullAuto::FA_Core::cron &&
+               $Net::FullAuto::FA_Core::debug;
+            print $Net::FullAuto::FA_Core::LOG
+               "\nmain::clean_filehandle() ERROR:".
+               "\nWE TIMED OUT TRYING TO SALVAGE SOCKET\n       \n       ",
+               (join ' ',@topcaller),"\n\n"
+               if $Net::FullAuto::FA_Core::log &&
+               -1<index $Net::FullAuto::FA_Core::LOG,'*';
             &Net::FullAuto::FA_Core::handle_error(
                "WE TIMED OUT TRYING TO SALVAGE SOCKET",
                '__cleanup__');

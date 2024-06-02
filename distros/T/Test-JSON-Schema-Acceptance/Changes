@@ -1,5 +1,9 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.025     2024-06-01 23:58:10Z
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/dd9599a5238abe76d13fab37857265a3be3a01ea...9fc880bfb6d8ccd093bc82431f17d13681ffae8e
+
 1.024     2024-05-04 23:51:50Z
         - no longer include the local git sha in the result output, when
           testing with a local data directory

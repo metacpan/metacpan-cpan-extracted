@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 
 # Translate the given place into the given language
-#	"translate.PL Dover fr" will print Douvres
-#	"translate.PL England fr" will print Angleterre
+#	"translate Dover fr" will print Douvres
+#	"translate England fr" will print Angleterre
 
 use strict;
 use warnings;

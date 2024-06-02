@@ -38,22 +38,23 @@ sub can_test_cli {
 }
 
 sub scs_archive {
-  perl_run('script/scs_archive', @_);
+  perl_run('blib/script/scs_archive', @_);
 }
 
 sub perl_run {
+  my $in = ref $_[$#_] ? pop @_ : \undef;
   my $old_dir = getcwd;
   chdir path(__FILE__)->parent->parent->parent;
   if (wantarray) {
     my @out;
-    run3 [@CMD, @_], \undef, \@out, \@out;
+    run3 [@CMD, @_], $in, \@out, \@out;
     chdir $old_dir;
     chomp for @out;
     @out
   }
   else {
     my $out;
-    run3 [@CMD, @_], \undef, \$out, \$out;
+    run3 [@CMD, @_], $in, \$out, \$out;
     chdir $old_dir;
     $out
   }

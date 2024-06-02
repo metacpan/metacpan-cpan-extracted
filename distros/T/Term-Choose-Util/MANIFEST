@@ -13,6 +13,7 @@ xt/pod.t
 xt/prereqs.t
 xt/spelling.t
 xt/synopsis.t
+xt/vars.t
 xt/version1.t
 xt/version2.t
 xt/whitespaces.t

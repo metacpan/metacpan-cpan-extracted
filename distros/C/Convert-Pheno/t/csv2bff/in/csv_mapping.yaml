@@ -7,7 +7,8 @@ project:
   source: csv
   ontology: ncit
   version: test-0.1
-  baselineFieldsToPropagate: [Sex,Ethnicity,TobaccoUse,AgeAtTobaccoExposure,AlcoholUse,AgeAtAlcoholExposure]
+  description: Mapping file for a CSV with generic clinical data
+  baselineFieldsToPropagate: [Sex,Ethnicity,TobaccoUse,AgeAtTobaccoExposure,AlcoholUse,AgeAtAlcoholExposure,Disease_1,Disease_2,Disease_3,PhenotypicFeature_1,PhenotypicFeature_2]
 
 #################################
 # Beacon v2 Models: individuals #
@@ -98,8 +99,13 @@ sex:
 treatments:
   fields: [DrugName]
   drugDose:
-    Albuterol: DrugDose (mg)
-    Lisinopril: DrugDose (mg)
+    DrugName: DrugDose (mg)
+  drugUnit:
+    DrugName: Milligram
+  duration:
+    DrugName: TreatmentDuration (weeks)
+  durationUnit:
+    DrugName: Week
   routeOfAdministration: 
     Albuterol: oral
     Lisinopril: oral

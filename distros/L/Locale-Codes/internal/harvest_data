@@ -23,7 +23,7 @@ use Mojo::DOM;
 use lib "./internal";
 
 our $VERSION;
-$VERSION='3.78';
+$VERSION='3.79';
 
 # Some required executables
 my @exe     = qw( wget xls2csv );
@@ -275,7 +275,10 @@ sub do_country {
    my $in;
 
    sub _init_country_genc {
-      my $inst = qq
+      my $inst = qq{
+*NOTE* The GENC codes are tricky to download for some reason.  Currently, they
+are GENC 3.0 Update 11.  This is available in internal/genc-3.0.11
+
 (Please download the data manually for GENC country codes.  This can be done
 using the Chrome browser with the Table Capture (georgemike) extension enabled.
 
@@ -301,7 +304,7 @@ rows copied.
 If there are more entries than will fit on a single table, repeat this
 process but make sure you remove extra header lines (but do not remove the
 initial header line).
-);
+};
 
       $in = _read_file('type'      => 'csv',
                        'manual'    => 1,
@@ -316,11 +319,13 @@ initial header line).
    sub _read_country_genc {
       while (@$in) {
          my $ele     = shift(@$in);
-         my $alpha2  = $$ele{'2-Char Code'};
+         my $alpha2  = $$ele{'2-character Code'};
          next  if (! $alpha2);
-         my $alpha3  = $$ele{'3-Char Code'};
+         next  if ($alpha2 eq '[None]');
+         my $alpha3  = $$ele{'3-character Code'};
          my $num     = $$ele{'Numeric Code'};
          my $country = $$ele{'Name'};
+         next  if ($country =~ /^entity/i);
 
          my($id,$i);
 
@@ -517,7 +522,7 @@ initial header line).
    my $in;
 
    sub _init_country_iso {
-      my $inst = qq
+      my $inst = qq{
 (Please download the data manually for ISO 3166 country codes.
 
 Currently, this works in chrome with the Table Capture (georgemike)
@@ -537,7 +542,7 @@ file.
 
 If there are more entries than will fit on a single table, repeat this
 process but make sure you remove extra header lines.
-);
+};
 
       $in = _read_file('type'        => 'csv',
                        'manual'      => 1,
@@ -1686,7 +1691,7 @@ use warnings;
 use utf8;
 
 our(\$VERSION);
-\$VERSION='3.78';
+\$VERSION='3.79';
 
 \$Locale::Codes::Data{'$type'}{'id'} = '$ID';
 

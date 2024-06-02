@@ -9,9 +9,18 @@ Tk::AppWindow::Ext::ToolBar - add a tool bar
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.07";
 use Tk;
 require Tk::Compound;
+require Tk::Poplevel;
+
+my $down_arrow = '#define down_width 10
+#define down_height 10
+static unsigned char down_bits[] = {
+   0x00, 0x00, 0x00, 0x00, 0xff, 0x03, 0xfe, 0x01, 0xfc, 0x00, 0x78, 0x00,
+   0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+';
+
 
 use base qw( Tk::AppWindow::BaseClasses::PanelExtension );
 
@@ -54,13 +63,28 @@ Default value [].
 
 Configure your tool bar here. Example:
 
- [    #type             #label   #command     #icon             #help
-    [	'tool_button',   'New',   'doc_new',   'document-new',   'Create a new document'],
+ [    #type             #label    #command       #icon               #help
+    [	'tool_button',   'New',     'doc_new',     'document-new',     'Create a new document' ],
+ 
+    [	'tool_list' ],
+    [	'tool_button',   'Save',    'doc_save',    'document-save',    'Save current document' ],
+    [	'tool_button',   'Save as', 'doc_save_as', 'document-save-as', 'Rename and save current document' ],
     [	'tool_separator' ],
+    [	'tool_button',   'Save all','doc_save_all','document-save-as', 'Save all modified documents' ],
+    [	'tool_list_end' ],
+ 
+    [	'tool_separator' ],
+ 
+      #type             #label,   #class
+    [	'tool_widget',    'Widget', 'MyWidget', @options ],
+    [	'tool_widget',    '*Nolabel,'MyWidget', @options ],
  ]
+
+'MyWidget', must be the class name of a packable Tk widget.
 
 =item B<-tooltextposition>
 
+Specifies where text should be displayed in tool buttons.
 Default value I<right>. Can be I<top>, I<left>, I<bottom>, I<right> or I<none>.
 
 =back
@@ -83,11 +107,18 @@ sub new {
 		-toolitems => ['PASSIVE', undef, undef, []],
 		-tooltextposition => ['PASSIVE', undef, undef, 'right'],
 	);
+	$self->{BASE} = undef;
+	$self->{MODE} = 0;
+	$self->{POPLEVELS} = [];
 	$self->{TYPESTABLE} = {};
 	$self->{ITEMLIST} = [];
+	$self->{WIDGETS} = {};
 	$self->ConfigureTypes(
-		tool_button			=> ['ConfToolButton', $self],
-		tool_separator		=> ['ConfToolSeparator', $self],
+		tool_button			  => ['ConfButton', $self],
+		tool_list			    => ['ConfList', $self],
+		tool_list_end	  => ['ConfListEnd', $self],
+		tool_separator		=> ['ConfSeparator', $self],
+		tool_widget   		=> ['ConfWidget', $self],
 	);
 
 	$self->addPostConfig('DoPostConfig', $self);
@@ -98,6 +129,22 @@ sub new {
 
 =over 4
 
+=cut
+
+sub _base {
+	my $self = shift;
+	$self->{BASE} = shift if @_;
+	my $b = $self->{BASE};
+	return $b if defined $b;
+	return $self->Subwidget($self->Panel);
+}
+
+sub _mode {
+	my $self = shift;
+	$self->{MODE} = shift if @_;
+	return $self->{MODE};
+}
+
 =item B<AddItem>I<$item, ?$position?);>
 
 Adds an item to the toolbar. The item must be a valid tk widget.
@@ -106,48 +153,46 @@ Your addition will be lost after a call to B<ReConfigure>.
 =cut
 
 sub AddItem {
-	my ($self, $item, $position) = @_;
-	my $list = $self->{ITEMLIST};
-	my $before;
-	if (defined $position) {
-		$position = @$list if $position > @$list;
-		$before = $list->[$position];
-	}
-	my $bar = $self->Subwidget($self->Panel);
-	my @pack = (-side => 'left', -padx => 2, -in => $bar, -fill => 'y');
-	if (defined $before) {
-		$item->pack(@pack, -before => $before);
-		splice @$list, $position, 0, $item;
+	my ($self, $item) = @_;
+	my $mode = $self->_mode;
+	$self->_mode(0);
+	my $base = $self->_base;
+	my @pack = ();
+	if (ref $base eq 'Tk::Poplevel') {
+		push @pack, -fill => 'x';
 	} else {
-		$item->pack(@pack);
-		push @$list, $item;
+		push @pack, -side => 'left', -fill => 'y';
 	}
-}
-
-=item B<AddSeparator>I<?$position?);>
-
-=over 4
-
-Adds a separator to the toolbar.
-Your addition will be lost after a call to B<ReConfigure>.
-
-=back
-
-=cut
-
-sub AddSeparator {
-	my $self = shift;
-	$self->AddItem($self->Subwidget($self->Panel)->Label(-text => '|'), @_);
+	push @pack, -padx => 2, -pady => 2 unless $mode;
+	$item->pack(@pack);
+	my $list = $self->{ITEMLIST};
+	push @$list, $item;
+	if ($mode) {
+		my $p;
+		$base->Button(
+			-highlightthickness => 0,
+			-relief => 'flat',
+			-image => $self->Bitmap(
+				-data => $down_arrow,
+				-foreground => $self->configGet('-foreground'),
+			),
+			-command => sub { $p->popFlip },
+		)->pack(-side => 'left', -fill => 'y');
+		$p = $base->Poplevel(-widget => $base);
+		my $pl = $self->{POPLEVELS};
+		push @$pl, $p;
+		$self->_base($p);
+	}
 }
 
 sub ClearTools {
 	my $self = shift;
 	my $list = $self->{ITEMLIST};
-	for (@$list) {
-		$_->packForget;
-	}
 	my @removed = @$list;
-	@$list = ();
+	while (@$list) {
+		my $t = shift @$list;
+		$t->packForget;
+	}
 	return @removed;
 }
 
@@ -190,9 +235,9 @@ sub ConfigureTypes {
 	}
 }
 
-sub ConfToolButton {
-	my ($self, $label, $cmd, $icon, $help) = @_;
-	my $tb = $self->Subwidget($self->Panel);
+sub ConfButton {
+	my ($self, $label, $cmd, $icon, $help, $padding) = @_;
+	my $tb = $self->_base;
 
 	my $bmp;
 	if (defined $icon) {
@@ -203,38 +248,83 @@ sub ConfToolButton {
 	push @balloon, -statusmsg => $help if defined $help;
 	my $textpos = $self->configGet('-tooltextposition');
 	my $but;
+	my @bo = (-highlightthickness => 0, -relief => 'flat');
 
 	if (defined $bmp) {
-		if ($textpos eq 'none') {
-			push @balloon, -balloonmsg => $label;
-		}
 		my $art = $self->extGet('Art');
-		my $compound = $art->CreateCompound(
+		my $compound = $art->createCompound(
 			-text => $label,
 			-image => $bmp,
 			-textside => $textpos,
 		);
-		$but = $tb->Button(-image => $compound);
+		push @bo, -image => $compound;
 	} else {
-		$but = $tb->Button(-text => $label);
+		push @bo,  -text => $label;
 	}
-	$self->BalloonAttach($but, @balloon) if @balloon;
+
 	my $call;
 	if ($cmd =~ /^<.+>/) { #matching an event
-		$call = ['eventGenerate', $self, $cmd] 
+		$call = sub {
+			$self->PopDown;
+			$self->eventGenerate($cmd);
+		}
 	} else {
-		$call = ['cmdExecute', $self, $cmd]
+		$call = sub {
+			$self->PopDown;
+			$self->cmdExecute($cmd);
+		}
 	}
-	$but->configure(
-		-command => $call,
-		-relief => 'flat'
-	);
-	$self->AddItem($but);
+	push @bo, -command => $call;
+
+	$but = $tb->Button(@bo);
+	$self->BalloonAttach($but, $label) if $textpos eq 'none';
+	if ($self->extExists('StatusBar')) {
+		$self->StatusAttach($but, $help) if defined $help;
+	} else {
+		$self->BalloonAttach($but, $help) if defined $help;
+	}
+	$self->{WIDGETS}->{$label} = $but;
+	$self->AddItem($but, $padding);
 }
 
-sub ConfToolSeparator {
+sub ConfList {
 	my $self = shift;
-	$self->AddSeparator;
+	my $base = $self->_base;
+	my $f = $base->Frame;
+	$self->AddItem($f);
+	$self->_base($f);
+	$self->_mode(1);
+}
+
+sub ConfListEnd {
+	my $self = shift;
+	$self->_base(undef);
+}
+
+sub ConfSeparator {
+	my $self = shift;
+	my $tb = $self->_base;
+	my $s;
+	if (ref $tb eq 'Tk::Poplevel') {
+		$s = $tb->Frame(-relief => 'sunken', -borderwidth => 1, -height => 2, @_)
+	} else {
+		$s = $tb->Frame(-relief => 'sunken', -borderwidth => 1, -width => 2, @_)
+	}
+	$self->AddItem($s);
+}
+
+sub ConfWidget {
+	my ($self, $label, $class, @options) = @_;
+	my $tb = $self->_base;
+	my $f = $tb->Frame;
+	unless ($label =~ s/^\*//) {
+		my $l = "$label:";
+		$f->Label(-text => $l)->pack(-side => 'left');
+	}
+	my $w = $f->$class(@options)->pack(-side => 'left');
+	$self->{WIDGETS}->{$label} = $w;
+	$self->AddItem($f);
+
 }
 
 sub CreateItems {
@@ -247,6 +337,7 @@ sub CreateItems {
 		my @l = ($w);
 		for (@p) { push @l, $w->extGet($_) }
 		for (@l) {
+			#we want toolbar items from plugins loaded last
 			push @u, $_->ToolItems if $_->Name ne 'Plugins';
 			push @plugins, $_->ToolItems if $_->Name eq 'Plugins';
 		}
@@ -259,7 +350,11 @@ sub CreateItems {
 sub DeleteAll {
 	my $self = shift;
 	my @removed = $self->ClearTools;
-	for (@removed) { $_->destroy };
+	for (@removed) {
+		$_->destroy if Exists($_);
+	};
+	$self->{POPLEVELS} = [];
+	$self->{WIDGETS} = {};
 }
 
 sub DoPostConfig {
@@ -268,10 +363,15 @@ sub DoPostConfig {
 	#fixing possible mismatch of iconsize at launch
 	my $art = $self->extGet('Art');
 	my $size = $self->configGet('-tooliconsize');
-	$size = $art->GetAlternateSize($size);
+	$size = $art->getAlternateSize($size) if defined $art;
 	$self->configPut(-tooliconsize => $size);
 
 	$self->CreateItems;
+}
+
+sub GetItem {
+	my ($self, $item) = @_;
+	return $self->{WIDGETS}->{$item}
 }
 
 sub MenuItems {
@@ -281,6 +381,12 @@ sub MenuItems {
 #			 type					menupath			label					Icon		config variable	   off  on
 		[	'menu_check',		'View::',		"Show ~toolbar",	undef,	'-toolbarvisible', undef,	0,   1], 
 	)
+}
+
+sub PopDown {
+	my $self = shift;
+	my $pl = $self->{POPLEVELS};
+	for (@$pl) {	$_->popDown	}
 }
 
 sub ReConfigure {

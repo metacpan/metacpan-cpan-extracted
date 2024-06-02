@@ -139,6 +139,8 @@ You can return a paired list of pagenames and widget.
     )
  }
 
+If 'MyWidget' has an 'Apply' method it will be called when you hit the 'Apply' button.
+
 =cut
 
 sub SettingsPage {

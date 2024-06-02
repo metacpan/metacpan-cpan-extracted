@@ -48,46 +48,6 @@ push @tests, [sub {
 }, [ 'png_1', 'png_2', 'svg_1' ], 'Available themes'];
 
 push @tests, [sub {
-	my @c = $art->AvailableContexts('png_1');
-	return \@c
-}, [ 'Actions', 'Applications', ], 'Available contexts'];
-
-push @tests, [sub {
-	my @c = $art->AvailableContexts('png_1', 'edit-cut');
-	return \@c
-}, [ 'Actions' ], 'Available contexts in name'];
-
-push @tests, [sub {
-	my @c = $art->AvailableContexts('png_1', 'does-not-exist');
-	return \@c
-}, [ ], 'No available contexts in name'];
-
-push @tests, [sub {
-	my @c = $art->AvailableContexts('png_1', 'edit-cut', 32);
-	return \@c
-}, [ 'Actions' ], 'Available contexts in name and size'];
-
-push @tests, [sub {
-	my @c = $art->AvailableContexts('png_1', 'does-not-exist', 32);
-	return \@c
-}, [ ], 'No available contexts in name and size 1'];
-
-push @tests, [sub {
-	my @c = $art->AvailableContexts('png_1', 'edit-cut', 45);
-	return \@c
-}, [ ], 'No available contexts in name and size 2'];
-
-push @tests, [sub {
-	my @c = $art->AvailableContexts('png_1', undef, 22);
-	return \@c
-}, [ 'Actions', 'Applications', ], 'Available contexts in size'];
-
-push @tests, [sub {
-	my @c = $art->AvailableContexts('png_1', undef, 45);
-	return \@c
-}, [ ], 'No available contexts in size'];
-
-push @tests, [sub {
 	my @i = $art->AvailableIcons('png_1');
 	return \@i
 }, [ 'accessories-text-editor', 'document-new', 'document-save', 'edit-cut', 'edit-find',
@@ -168,23 +128,6 @@ push @tests, [sub {
 	return \@s
 }, [ ], 'No available sizes in context'];
 
-push @tests, [sub {
-	return $art->FindImage('document-new', 22, 'Actions');
-}, 't/Themes/PNG1/actions/22/document-new.png', 'Find correct size'];
-
-push @tests, [sub {
-	return $art->FindImage('document-new', 32, 'Actions');
-}, 't/Themes/PNG1/actions/22/document-new.png', 'Find incorrect size'];
-
-push @tests, [sub {
-	return $art->FindImage('document-new', 22, 'Applications');
-}, 't/Themes/PNG1/actions/22/document-new.png', 'Find incorrect context'];
-
-push @tests, [sub {
-	return 1 unless defined $art->FindImage('does-not-exist', 32, 'Actions');
-	return 0
-}, 1, 'Find nothing'];
-
 for (sort keys %pages) {
 	my $size = $_;
 	for ('png_1', 'png_2') {
@@ -220,7 +163,7 @@ sub CreateImgTests {
 		my $icon = $_;
 		push @tests, [sub {
 # 			print "Icon $icon in theme $theme\n";
-			my $img = $art->GetIcon($icon, $size);
+			my $img = $art->getIcon($icon, $size);
 			if (defined $img) {
 				$f->Label(
 					-image => $img,

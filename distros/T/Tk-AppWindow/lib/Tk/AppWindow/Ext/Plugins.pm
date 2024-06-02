@@ -335,9 +335,12 @@ sub Reconfigure {
 
 sub SettingsPage {
 	my $self = shift;
-	return (
-		'Plugins' => ['PluginsForm', -pluginsext => $self ]
-	)
+	my @pages = ('Plugins' => ['PluginsForm', -pluginsext => $self ]);
+	for ($self->plugList) {
+		my $plug = $self->plugGet($_);
+		push @pages, $plug->SettingsPage;
+	}
+	return @pages
 }
 
 sub ToolItems {

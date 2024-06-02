@@ -1,5 +1,5 @@
 package ExtUtils::HasCompiler;
-$ExtUtils::HasCompiler::VERSION = '0.024';
+$ExtUtils::HasCompiler::VERSION = '0.025';
 use strict;
 use warnings;
 
@@ -226,7 +226,7 @@ ExtUtils::HasCompiler - Check for the presence of a compiler
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 

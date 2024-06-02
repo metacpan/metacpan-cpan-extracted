@@ -17,6 +17,7 @@ internal/data.script.pl
 internal/deprecate_codes
 internal/dump_curr
 internal/gen_mods
+internal/genc-3.0.11
 internal/harvest_and_check
 internal/harvest_data
 internal/ispell.isp

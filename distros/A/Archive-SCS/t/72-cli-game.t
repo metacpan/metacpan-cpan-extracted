@@ -42,7 +42,7 @@ like scs_archive('--version', -g => $ATS),
 $ENV{STEAM_LIBRARY} = undef;
 
 my $game_dir = $tempdir->child("steamapps/common/$ATS");
-like scs_archive('--version', -g => $game_dir),
+like scs_archive('--version', -g => "$game_dir"),
   qr/$ATS version 0\.0\.0\.0/, 'path';
 
 done_testing;

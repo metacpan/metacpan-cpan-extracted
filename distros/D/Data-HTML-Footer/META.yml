@@ -26,7 +26,7 @@ no_index:
     - xt
 requires:
   Mo: 0
-  Mo::utils::CSS: 0.06
+  Mo::utils::CSS: 0.07
   Mo::utils::URI: 0
   perl: 5.8.0
 resources:
@@ -34,4 +34,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Data-HTML-Footer
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-HTML-Footer
-version: '0.01'
+version: '0.02'

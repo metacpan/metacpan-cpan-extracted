@@ -8,8 +8,9 @@ Tk::AppWindow::BaseClasses::Plugin - Baseclass for all plugins.
 
 use strict;
 use warnings;
+use Carp;
 use vars qw($VERSION);
-$VERSION="0.03";
+$VERSION="0.07";
 use vars '$AUTOLOAD';
 
 =head1 SYNOPSIS
@@ -23,7 +24,9 @@ use vars '$AUTOLOAD';
  sub new {
     my $class = shift;
     my $self = $class->SUPER::new(@_); #$mainwindow should be the first in @_
-    ...
+    if (defined $self) {
+       ...
+    }
     return $self
  }
 
@@ -36,6 +39,10 @@ A plugin is different from an extension in a couple of ways:
    unload it.
  - A plugin can not define config variables
 
+This is a base class you can inherit to write your own plugin.
+
+It autoloads methods from the mainwindow class.
+
 =cut
 
 sub new {
@@ -46,9 +53,12 @@ sub new {
 	};
 	bless ($self, $class);
 	for (@required) {
-		return undef unless $self->extExists($_);
+		unless ($self->extExists($_)) {
+			croak "Extension $_ is not loaded";
+			return undef
+		}
 	}
-	return $self;
+	return $self
 }
 
 sub AUTOLOAD {
@@ -122,13 +132,33 @@ with menu items here. For details on the format see B<Tk::AppWindow::Ext::MenuBa
 
 =cut
 
+=item B<SettingsPage>
+
+Returns an empty list. It is there for you to overwrite. It is called by the B<Plugins> extension. 
+You can return a paired list of pagenames and widget.
+
+ sub SettingsPage {
+.   return (
+       'Some title' => ['MyWidget', @options],
+    )
+ }
+
+If 'MyWidget' has an 'Apply' method it will be called when you hit the 'Apply' button.
+
+=cut
+
+sub SettingsPage {
+	return ();
+}
+
 sub ToolItems {
 	return ();
 }
 
 =item B<Quit>
 
-Does nothing. It is there for you to overwrite. Here you do everything needed to terminate.
+Does nothing. It is there for you to overwrite. Here you do everything needed when the application
+is to terminate.
 
 =cut
 
@@ -136,11 +166,27 @@ sub Quit { }
 
 =item B<UnLoad>
 
-Returns 1. For you to overwrite. Do here what needs to be done to safely destroy the plugin.
+Removes the settings page for this plugin from the settings dialog if applicable.
+Returns 1. When overwriting this method, make a call to SUPER::Unload to include this. and do what
+is needed to completely unload your plugin.
 
 =cut
 
 sub Unload {
+	my $self = shift;
+	my @sp = $self->SettingsPage;
+	my $set = $self->extGet('Settings');
+	my $nb;
+	$nb = $set->NBWidget if defined $set;
+	if ((@sp) and (defined $set) and (defined $nb)) {
+		while (@sp) {
+			my $page = shift @sp;
+			my @pages = $nb->pages;
+			my @exist = grep(/$page/, @pages);
+			$nb->delete($page) if @exist;
+			shift @sp
+		}
+	}
 	return 1;
 }
 

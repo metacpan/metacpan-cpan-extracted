@@ -20,17 +20,12 @@ defer { $tempdir->remove_tree; }
 my $sample1 = $tempdir->child('sample1.scs');
 create_hashfs2 $sample1, sample1;
 
-my @in = map { "$_\n" } qw( ones dir/subdir/SubDirFile );
-my ($out, $err);
+my $in = join "", map { "$_\n" } qw( ones dir/subdir/SubDirFile );
 
-chdir path(__FILE__)->parent->parent;
-run3 [
-  qw( perl -Ilib script/scs_archive -x - -o - ),
-  -m => $sample1,
-], \@in, \$out, \$err;
+my @out = scs_archive(-x => '-', -o => '-', -m => $sample1, \$in);
 
-is $err, '', 'no error';
-like $out, qr{11111}, 'ones';
-like $out, qr{in a subdirectory}, 'subdir file';
+like $out[0], qr{11111}, 'ones';
+like $out[1], qr{in a subdirectory}, 'subdir file';
+is scalar(@out), 2, 'no error';
 
 done_testing;

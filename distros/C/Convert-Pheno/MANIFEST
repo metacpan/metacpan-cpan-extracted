@@ -53,11 +53,11 @@ t/csv2pxf/out/pxf.json
 t/mapping.t
 t/module.t
 t/omop2bff/in/CONCEPT.csv
+t/omop2bff/in/DRUG_EXPOSURE.csv
 t/omop2bff/in/gz/CONCEPT.csv.gz
-t/omop2bff/in/gz/MEASUREMENT.csv.gz
+t/omop2bff/in/gz/DRUG_EXPOSURE.csv.gz
 t/omop2bff/in/gz/omop_cdm_eunomia.sql.gz
 t/omop2bff/in/gz/PERSON.csv.gz
-t/omop2bff/in/MEASUREMENT.csv
 t/omop2bff/in/omop_cdm_eunomia.sql
 t/omop2bff/in/PERSON.csv
 t/omop2bff/in/README

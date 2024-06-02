@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use lib 'lib';
-use blib;
 use Feature::Compat::Try;
 
 use Test::More;
@@ -10,6 +9,9 @@ use Test::More;
 plan tests => 1;
 
 try {
+
+  require blib;
+  blib->import;
 
   require Archive::SCS::CityHash;
   require Archive::SCS::DirIndex;

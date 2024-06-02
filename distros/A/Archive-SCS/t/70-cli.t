@@ -4,8 +4,6 @@ use warnings;
 use lib 'lib', 't/lib';
 use blib;
 use Feature::Compat::Defer;
-use builtin 'trim';
-no warnings 'experimental::builtin';
 
 use List::Util 1.33 'any';
 use Path::Tiny 0.119;
@@ -23,7 +21,7 @@ like scs_archive(qw[ --version ]),
   qr{Archive::SCS version}, 'version';
 
 my @help = scs_archive(qw[ --help ]);
-ok @help > 60 && ( any { 'OPTIONS' eq trim $_ } @help ), 'help';
+ok @help > 60 && ( any { /OPTIONS/ } @help ), 'help';
 
 like scs_archive(qw[ --foobar ]),
   qr{Unknown option: foobar.*Usage:}s, 'unknown option';

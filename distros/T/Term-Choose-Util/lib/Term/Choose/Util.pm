@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.141';
+our $VERSION = '0.142';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -129,13 +129,12 @@ sub _valid_options {
         info                => 'Str',
         init_dir            => 'Str',
         back                => 'Str',
-        file_type           => 'Str',           # undocumented
         filter              => 'Str',
         footer              => 'Str',           # undocumented
         confirm             => 'Str',
         prefix              => 'Str',
         prompt              => 'Str',
-        prompt_file_dir     => 'Str',           # undocumented
+        prompt2             => 'Str',
         cs_begin            => 'Str',
         cs_end              => 'Str',
         cs_label            => 'Str',
@@ -168,7 +167,6 @@ sub _defaults {
         cs_separator        => ', ',
         decoded             => 1,
         #default_number     => undef,
-        file_type           => 'File',
         #filter             => undef,
         #footer             => undef,
         hide_cursor         => 1,
@@ -186,7 +184,7 @@ sub _defaults {
         parent_dir          => '..',
         prefix              => '',
         prompt              => 'Your choice: ',
-        prompt_file_dir     => 'Choose the directory:',
+        #prompt2            => undef,
         show_hidden         => 1,
         small_first         => 0,
         #tabs_info          => undef,
@@ -204,13 +202,13 @@ sub _routine_options {
     my @every = ( qw( back clear_screen color confirm cs_label footer hide_cursor info keep margin mouse page prompt tabs_info tabs_prompt ) );
     my $options;
     if ( $caller eq 'choose_directories' ) {
-        $options = [ @every, qw( init_dir layout order alignment show_hidden decoded ) ];
+        $options = [ @every, qw( init_dir layout order alignment show_hidden decoded prompt2 ) ];
     }
     elsif ( $caller eq 'choose_a_directory' ) {
         $options = [ @every, qw( init_dir layout order alignment show_hidden decoded ) ];
     }
     elsif ( $caller eq 'choose_a_file' ) {
-        $options = [ @every, qw( init_dir layout order alignment show_hidden decoded filter prompt_file_dir file_type ) ];
+        $options = [ @every, qw( init_dir layout order alignment show_hidden decoded filter prompt2 ) ];
     }
     elsif ( $caller eq 'choose_a_number' ) {
         $options = [ @every, qw( small_first reset thousands_separator default_number ) ];
@@ -327,7 +325,10 @@ sub choose_directories {
             return $decoded ? $chosen_dirs : [ map { encode 'locale_fs', $_ } @$chosen_dirs ];
         }
         elsif ( $choice eq $change_path ) {
-            my $prompt_fmt = $key_path . "%s\n" . 'Choose Location: ';
+            my $prompt_fmt = $key_path . "%s";
+            if ( length $self->{prompt} ) {
+                $prompt_fmt .= "\n" . $self->{prompt};
+            }
             my $tmp_dir = $self->__choose_a_path( $dir, $prompt_fmt, '<<', 'OK' );
             if ( defined $tmp_dir ) {
                $dir = $tmp_dir;
@@ -343,14 +344,15 @@ sub choose_directories {
             for my $o ( @$options ) {
                 $bu_opt{$o} = $self->{$o};
             }
-            my $cs_label = $dirs_chosen . "\n" . $path . "\n" . 'Dirs to add: ';
+            my $cs_label = $dirs_chosen . "\n" . $path . "\n" . 'Add: ';
+            my $prompt = $self->{prompt2} // $self->{prompt};
             # choose_a_subset
             my $idxs = $self->choose_a_subset(
                 [ sort @$avail_dirs ],
-                { cs_label => $cs_label, back => '<<', confirm => 'OK', cs_begin => undef,index => 1, keep_chosen => 1,
-                  #info => $self->{info}, prompt => $self->{prompt}, page => $self->{page}, footer => $self->{footer},
-                  #keep => $self->{keep}, margin => $self->{margin}, tabs_info => $self->{tabs_info},
-                  #tabs_prompt => $self->{tabs_prompt}
+                { cs_label => $cs_label, back => '<<', confirm => 'OK', cs_begin => undef, index => 1, keep_chosen => 1,
+                  prompt => $prompt, # $self->{option} alreday in $self:
+                  #info => $self->{info}, page => $self->{page}, footer => $self->{footer}, keep => $self->{keep},
+                  # margin => $self->{margin}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt}
                 }
             );
             for my $o ( keys %bu_opt ) {
@@ -374,11 +376,9 @@ sub choose_a_file {
     my ( $self, $opt ) = @_;
     $self->__prepare_opt( $opt );
     my $init_dir = $self->__prepare_path();
-    my $curr_dir = $init_dir;
-    my $prompt_fmt = "$self->{file_type}-Directory: %s";
-    $prompt_fmt =~ s/^-//;
-    if ( length $self->{prompt_file_dir} ) {
-        $prompt_fmt .= "\n" . $self->{prompt_file_dir};
+    my $prompt_fmt = "File Directory: %s";
+    if ( length $self->{prompt} ) {
+        $prompt_fmt .= "\n" . $self->{prompt};
     }
 
     CHOOSE_DIR: while ( 1 ) {
@@ -514,13 +514,13 @@ sub __a_file {
             next if -d catdir $dir_fs, $file_fs;
             push @files, decode( 'locale_fs', $file_fs );
         }
-        my $chosen_dir = "$self->{file_type}-Directory: $dir";
-        $chosen_dir =~ s/^-//;
+        my $chosen_dir = "Directory: $dir";
         my @tmp_prompt;
         push @tmp_prompt, $chosen_dir;
-        push @tmp_prompt, ( $self->{cs_label} // $self->{file_type} . ': ' // 'File: ' ) . ( length $prev_dir ? $prev_dir : '' );
-        if ( length $self->{prompt} ) {
-            push @tmp_prompt, $self->{prompt};
+        push @tmp_prompt, ( $self->{cs_label} // 'File: ' ) . ( length $prev_dir ? $prev_dir : '' );
+        my $prompt2 = $self->{prompt2} // $self->{prompt};
+        if ( length $prompt2 ) {
+            push @tmp_prompt, $prompt2;
         }
         my $prompt = join( "\n", @tmp_prompt );
         if ( ! @files ) {
@@ -542,7 +542,7 @@ sub __a_file {
         }
         my @pre = ( undef );
         if ( $chosen_file ) {
-            push @pre, $self->{confirm};
+            push @pre, $self->{confirm}; ##
         }
         # Choose
         $chosen_file = choose(
@@ -630,7 +630,7 @@ sub choose_a_number {
         my $cs_row;
         if ( defined $self->{cs_label} || length $result ) {
             my $tmp_result = length $result ? $result : '';
-            my $tmp_cs_label = defined $self->{cs_label} ? $self->{cs_label} : '';
+            my $tmp_cs_label = $self->{cs_label} // '';
             $cs_row = sprintf(  "%s%*s", $tmp_cs_label, $longest, $tmp_result );
             if ( print_columns( $cs_row ) > get_term_width() ) {
                 $cs_row = $tmp_result;
@@ -1000,7 +1000,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.141
+Version 0.142
 
 =cut
 
@@ -1338,6 +1338,16 @@ Values: 0,[1].
 
 =item
 
+prompt2
+
+While I<prompt> is used in the directory menu, I<prompt2> is the prompt in the menu where you select the file.
+
+If I<prompt2> is set to the empty string, no prompt line is displayed.
+
+Default: value of I<prompt>
+
+=item
+
 show_hidden
 
 If enabled, hidden directories are added to the available directories.
@@ -1398,6 +1408,17 @@ If set to C<1>, the items are ordered vertically else they are ordered horizonta
 This option has no meaning if I<layout> is set to C<2>.
 
 Values: 0,[1].
+
+=item
+
+prompt2
+
+While I<prompt> is used in the "Change Location" menu, I<prompt2> is the prompt in the menu where you select the
+directories.
+
+If I<prompt2> is set to the empty string, no prompt line is displayed.
+
+Default: value of I<prompt>
 
 =item
 

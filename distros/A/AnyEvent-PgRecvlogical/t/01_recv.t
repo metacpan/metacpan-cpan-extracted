@@ -13,13 +13,13 @@ use Try::Tiny;
 use AnyEvent::PgRecvlogical;
 
 sub ae_sleep {
-    my $t = shift || 0;
+    my $t  = shift || 0;
     my $cv = AE::cv;
     $cv->begin; my $wt = AE::timer $t, 0, sub { $cv->end };
     $cv->recv;
 }
 
-my $t_dir = File::Spec->rel2abs(dirname(__FILE__));
+my $t_dir       = File::Spec->rel2abs(dirname(__FILE__));
 my $pg_hba_conf = File::Spec->join($t_dir, 'pg_hba.conf');
 
 my $pg = eval {
@@ -28,6 +28,7 @@ my $pg = eval {
 }
   or plan skip_all => "cannot create test postgres database: $Test::PostgreSQL::errstr";
 
+#<<<
 my @expected = (
     'BEGIN',
     "table public.test_tbl: INSERT: id[integer]:1 payload[text]:'qwerty'",
@@ -36,6 +37,7 @@ my @expected = (
     "table public.test_tbl: INSERT: id[integer]:2 payload[text]:'asdfgh'",
     'COMMIT',
 );
+#>>>
 
 my $control = DBI->connect($pg->dsn, 'postgres');
 $control->do('create table test_tbl (id int primary key, payload text)');
@@ -44,17 +46,17 @@ my $end_cv = AE::cv;
 
 my $recv = new_ok(
     'AnyEvent::PgRecvlogical' => [
-        dbname         => 'test',
-        host           => '127.0.0.1',
-        port           => $pg->port,
-        username       => 'postgres',
-        slot           => 'test',
-        options        => { 'skip-empty-xacts' => 1, 'include-xids' => 0 },
-        do_create_slot => 1,
-        slot_exists_ok => 1,
-        heartbeat      => 1,
+        dbname          => 'test',
+        host            => '127.0.0.1',
+        port            => $pg->port,
+        username        => 'postgres',
+        slot            => 'test',
+        options         => { 'skip-empty-xacts' => 1, 'include-xids' => 0 },
+        do_create_slot  => 1,
+        slot_exists_ok  => 1,
+        heartbeat       => 1,
         reconnect_delay => 1,
-        on_message     => sub { 
+        on_message      => sub {
             is $_[0], shift @expected, $_[0];
             $end_cv->send(1) unless @expected;
         },
@@ -65,7 +67,7 @@ my $recv = new_ok(
 
 ok $recv->dbh, 'connected';
 
-$recv->start->done( sub { pass 'replication started' }, sub { fail 'replication started'; diag @_ });
+$recv->start->done(sub { pass 'replication started' }, sub { fail 'replication started'; diag @_ });
 
 ae_sleep(2);
 
@@ -90,11 +92,13 @@ $control->do('insert into test_tbl (id, payload) values (?, ?)', undef, 3, 'frob
 
 ae_sleep(1);
 
+#<<<
 push @expected, (
     'BEGIN',
     "table public.test_tbl: INSERT: id[integer]:3 payload[text]:'frobnicate'",
     'COMMIT',
 );
+#>>>
 
 $recv->unpause;
 

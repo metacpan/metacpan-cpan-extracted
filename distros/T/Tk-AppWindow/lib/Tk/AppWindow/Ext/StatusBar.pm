@@ -9,9 +9,10 @@ Tk::AppWindow::Ext::StatusBar - adding a status bar
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.01";
+$VERSION="0.07";
 use Tk;
 require Tk::Frame;
+require Tk::Balloon;
 require Tk::AppWindow::Ext::StatusBar::SImageItem;
 require Tk::AppWindow::Ext::StatusBar::SMessageItem;
 require Tk::AppWindow::Ext::StatusBar::SProgressItem;
@@ -99,6 +100,7 @@ sub new {
 		-statusmsgitemoninit =>['PASSIVE', undef, undef, 1],
 	);
 
+	$self->{BALLOON} = $self->Balloon;
 	$self->{ITEMS} = {};
 
 	
@@ -243,6 +245,11 @@ sub AddTextItem {
 	return $self->Add('text', @_);
 }
 
+sub Attach {
+	my ($self, $widget, $text) = @_;
+	$self->{BALLOON}->attach($widget, -statusmsg => $text)
+}
+
 sub Cycle {
 	my $self = shift;
 	my $time = $self->configGet('-statusupdatecycle');
@@ -274,8 +281,7 @@ sub InitMsgItem {
 		unless (exists $self->{MI}) {
 			my $mi = $self->AddMessageItem('msg', -position => 0);
 			$self->{MI} = $mi;
-			my $bl = $self->extGet('Balloon');
-			$bl->Balloon->configure(-statusbar => $mi) if defined $bl;
+			$self->{BALLOON}->configure(-statusbar => $mi);
 			$self->configPut(-logcall => sub { $mi->Message(shift) });
 			$self->configPut(-logerrorcall => sub { $mi->Message(shift, $self->configGet('-errorcolor')) });
 			$self->configPut(-logwarningcall => sub { $mi->Message(shift, $self->configGet('-warningcolor')) });

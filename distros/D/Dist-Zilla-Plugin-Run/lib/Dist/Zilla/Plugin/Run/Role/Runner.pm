@@ -3,7 +3,7 @@ use warnings;
 package Dist::Zilla::Plugin::Run::Role::Runner;
 # vim: set ts=8 sts=2 sw=2 tw=115 et :
 
-our $VERSION = '0.049';
+our $VERSION = '0.050';
 
 use Moose::Role;
 use namespace::autoclean;
@@ -162,8 +162,8 @@ sub _run_cmd {
 
     # autoflush STDOUT so we can see command output right away
     local $| = 1;
-    # combine STDOUT and STDERR for ease of proxying through the logger
-    my $pid = IPC::Open3::open3(my ($in, $out), undef, $command);
+    # allow stderr to remain, for visibility into errors
+    my $pid = IPC::Open3::open3(my ($in, $out), '>&STDERR', $command);
     binmode $out, ':crlf' if $^O eq 'MSWin32';
     while(defined(my $line = <$out>)){
         chomp($line); # logger appends its own newline

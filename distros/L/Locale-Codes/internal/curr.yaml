@@ -3000,7 +3000,6 @@ country:
   genc-alpha-2: 
     code: 
       A2: Guantanamo Bay Naval Base
-      A3: Entity 6
       AD: Andorra
       AE: United Arab Emirates
       AF: Afghanistan
@@ -3015,7 +3014,6 @@ country:
       AT: Austria
       AU: Australia
       AW: Aruba
-      AX: Aland Islands
       AZ: Azerbaijan
       BA: Bosnia and Herzegovina
       BB: Barbados
@@ -3030,7 +3028,7 @@ country:
       BM: Bermuda
       BN: Brunei Darussalam
       BO: Bolivia (Plurinational State of)
-      BQ: Caribbean Netherlands
+      BQ: Bonaire, Sint Eustatius, and Saba
       BR: Brazil
       BS: Bahamas
       BT: Bhutan
@@ -3185,7 +3183,6 @@ country:
       PM: Saint Pierre and Miquelon
       PN: Pitcairn
       PR: Puerto Rico
-      PS: Palestine, State of
       PT: Portugal
       PW: Palau
       PY: Paraguay
@@ -3209,7 +3206,6 @@ country:
       SG: Singapore
       SH: Saint Helena, Ascension, and Tristan Da Cunha
       SI: Slovenia
-      SJ: Svalbard and Jan Mayen
       SK: Slovakia
       SL: Sierra Leone
       SM: San Marino
@@ -3240,7 +3236,6 @@ country:
       TZ: Tanzania
       UA: Ukraine
       UG: Uganda
-      UM: United States Minor Outlying Islands
       US: United States of America
       UY: Uruguay
       UZ: Uzbekistan
@@ -3284,9 +3279,6 @@ country:
       akrotiri: 
         - QZ
         - Akrotiri
-      aland islands: 
-        - AX
-        - Aland Islands
       albania: 
         - AL
         - Albania
@@ -3371,6 +3363,9 @@ country:
       bolivia (plurinational state of): 
         - BO
         - Bolivia (Plurinational State of)
+      bonaire, sint eustatius, and saba: 
+        - BQ
+        - Bonaire, Sint Eustatius, and Saba
       bosnia and herzegovina: 
         - BA
         - Bosnia and Herzegovina
@@ -3410,9 +3405,6 @@ country:
       canada: 
         - CA
         - Canada
-      caribbean netherlands: 
-        - BQ
-        - Caribbean Netherlands
       cayman islands: 
         - KY
         - Cayman Islands
@@ -3503,9 +3495,6 @@ country:
       el salvador: 
         - SV
         - El Salvador
-      entity 6: 
-        - A3
-        - Entity 6
       equatorial guinea: 
         - GQ
         - Equatorial Guinea
@@ -3854,9 +3843,6 @@ country:
       palau: 
         - PW
         - Palau
-      palestine, state of: 
-        - PS
-        - Palestine, State of
       palmyra atoll: 
         - XL
         - Palmyra Atoll
@@ -3995,9 +3981,6 @@ country:
       svalbard: 
         - XR
         - Svalbard
-      svalbard and jan mayen: 
-        - SJ
-        - Svalbard and Jan Mayen
       sweden: 
         - SE
         - Sweden
@@ -4064,9 +4047,6 @@ country:
       united kingdom of great britain and northern ireland: 
         - GB
         - United Kingdom of Great Britain and Northern Ireland
-      united states minor outlying islands: 
-        - UM
-        - United States Minor Outlying Islands
       united states of america: 
         - US
         - United States of America
@@ -4118,7 +4098,6 @@ country:
       AFG: Afghanistan
       AGO: Angola
       AIA: Anguilla
-      ALA: Aland Islands
       ALB: Albania
       AND: Andorra
       ARE: United Arab Emirates
@@ -4131,12 +4110,11 @@ country:
       AUS: Australia
       AUT: Austria
       AX2: Guantanamo Bay Naval Base
-      AX3: Entity 6
       AZE: Azerbaijan
       BDI: Burundi
       BEL: Belgium
       BEN: Benin
-      BES: Caribbean Netherlands
+      BES: Bonaire, Sint Eustatius, and Saba
       BFA: Burkina Faso
       BGD: Bangladesh
       BGR: Bulgaria
@@ -4302,7 +4280,6 @@ country:
       PRK: Korea, North
       PRT: Portugal
       PRY: Paraguay
-      PSE: Palestine, State of
       PYF: French Polynesia
       QAT: Qatar
       REU: Reunion
@@ -4315,7 +4292,6 @@ country:
       SGP: Singapore
       SGS: South Georgia and South Sandwich Islands
       SHN: Saint Helena, Ascension, and Tristan Da Cunha
-      SJM: Svalbard and Jan Mayen
       SLB: Solomon Islands
       SLE: Sierra Leone
       SLV: El Salvador
@@ -4350,7 +4326,6 @@ country:
       TZA: Tanzania
       UGA: Uganda
       UKR: Ukraine
-      UMI: United States Minor Outlying Islands
       URY: Uruguay
       USA: United States of America
       UZB: Uzbekistan
@@ -4399,9 +4374,6 @@ country:
       akrotiri: 
         - XQZ
         - Akrotiri
-      aland islands: 
-        - ALA
-        - Aland Islands
       albania: 
         - ALB
         - Albania
@@ -4486,6 +4458,9 @@ country:
       bolivia (plurinational state of): 
         - BOL
         - Bolivia (Plurinational State of)
+      bonaire, sint eustatius, and saba: 
+        - BES
+        - Bonaire, Sint Eustatius, and Saba
       bosnia and herzegovina: 
         - BIH
         - Bosnia and Herzegovina
@@ -4525,9 +4500,6 @@ country:
       canada: 
         - CAN
         - Canada
-      caribbean netherlands: 
-        - BES
-        - Caribbean Netherlands
       cayman islands: 
         - CYM
         - Cayman Islands
@@ -4618,9 +4590,6 @@ country:
       el salvador: 
         - SLV
         - El Salvador
-      entity 6: 
-        - AX3
-        - Entity 6
       equatorial guinea: 
         - GNQ
         - Equatorial Guinea
@@ -4969,9 +4938,6 @@ country:
       palau: 
         - PLW
         - Palau
-      palestine, state of: 
-        - PSE
-        - Palestine, State of
       palmyra atoll: 
         - XPL
         - Palmyra Atoll
@@ -5110,9 +5076,6 @@ country:
       svalbard: 
         - XSV
         - Svalbard
-      svalbard and jan mayen: 
-        - SJM
-        - Svalbard and Jan Mayen
       sweden: 
         - SWE
         - Sweden
@@ -5179,9 +5142,6 @@ country:
       united kingdom of great britain and northern ireland: 
         - GBR
         - United Kingdom of Great Britain and Northern Ireland
-      united states minor outlying islands: 
-        - UMI
-        - United States Minor Outlying Islands
       united states of america: 
         - USA
         - United States of America
@@ -5302,7 +5262,6 @@ country:
       239: South Georgia and South Sandwich Islands
       242: Fiji
       246: Finland
-      248: Aland Islands
       250: France
       254: French Guiana
       258: French Polynesia
@@ -5311,7 +5270,6 @@ country:
       266: Gabon
       268: Georgia
       270: Gambia
-      275: Palestine, State of
       276: Germany
       288: Ghana
       292: Gibraltar
@@ -5383,7 +5341,7 @@ country:
       531: Curacao
       533: Aruba
       534: Sint Maarten
-      535: Caribbean Netherlands
+      535: Bonaire, Sint Eustatius, and Saba
       540: New Caledonia
       548: Vanuatu
       554: New Zealand
@@ -5394,7 +5352,6 @@ country:
       574: Norfolk Island
       578: Norway
       580: Northern Mariana Islands
-      581: United States Minor Outlying Islands
       583: Micronesia (Federated States of)
       584: Marshall Islands
       585: Palau
@@ -5442,7 +5399,6 @@ country:
       729: Sudan
       732: Western Sahara
       740: Suriname
-      744: Svalbard and Jan Mayen
       748: Eswatini
       752: Sweden
       756: Switzerland
@@ -5487,7 +5443,6 @@ country:
       906: Coral Sea Islands
       907: Dhekelia
       908: Diego Garcia
-      914: Entity 6
       915: Europa Island
       916: Gaza Strip
       917: Glorioso Islands
@@ -5514,9 +5469,6 @@ country:
       akrotiri: 
         - 900
         - Akrotiri
-      aland islands: 
-        - 248
-        - Aland Islands
       albania: 
         - '008'
         - Albania
@@ -5601,6 +5553,9 @@ country:
       bolivia (plurinational state of): 
         - '068'
         - Bolivia (Plurinational State of)
+      bonaire, sint eustatius, and saba: 
+        - 535
+        - Bonaire, Sint Eustatius, and Saba
       bosnia and herzegovina: 
         - '070'
         - Bosnia and Herzegovina
@@ -5640,9 +5595,6 @@ country:
       canada: 
         - 124
         - Canada
-      caribbean netherlands: 
-        - 535
-        - Caribbean Netherlands
       cayman islands: 
         - 136
         - Cayman Islands
@@ -5733,9 +5685,6 @@ country:
       el salvador: 
         - 222
         - El Salvador
-      entity 6: 
-        - 914
-        - Entity 6
       equatorial guinea: 
         - 226
         - Equatorial Guinea
@@ -6084,9 +6033,6 @@ country:
       palau: 
         - 585
         - Palau
-      palestine, state of: 
-        - 275
-        - Palestine, State of
       palmyra atoll: 
         - 927
         - Palmyra Atoll
@@ -6225,9 +6171,6 @@ country:
       svalbard: 
         - 930
         - Svalbard
-      svalbard and jan mayen: 
-        - 744
-        - Svalbard and Jan Mayen
       sweden: 
         - 752
         - Sweden
@@ -6294,9 +6237,6 @@ country:
       united kingdom of great britain and northern ireland: 
         - 826
         - United Kingdom of Great Britain and Northern Ireland
-      united states minor outlying islands: 
-        - 581
-        - United States Minor Outlying Islands
       united states of america: 
         - 840
         - United States of America
@@ -13821,6 +13761,7 @@ language:
       cll: Chala
       clm: Clallam
       clo: Lowland Oaxaca Chontal
+      cls: Classical Sanskrit
       clt: Lautu Chin
       clu: Caluyanun
       clw: Chulym
@@ -14081,7 +14022,7 @@ language:
       dgl: Andaandi
       dgn: Dagoman
       dgo: Dogri (individual language)
-      dgr: Dogrib
+      dgr: Tlicho
       dgs: Dogoso
       dgt: Ndra'ngith
       dgw: Daungwurrung
@@ -15211,6 +15152,7 @@ language:
       isr: Israeli Sign Language
       ist: Istriot
       isu: Isu (Menchum Division)
+      isv: Interslavic
       ita: Italian
       itb: Binongan Itneg
       itc: Italic languages
@@ -18222,6 +18164,7 @@ language:
       rpn: Repanbitip
       rpt: Rapting
       rri: Ririo
+      rrm: Moriori
       rro: Waima
       rrt: Arritinngithigh
       rsb: Romano-Serbian
@@ -19542,6 +19485,7 @@ language:
       vrt: Burmbar
       vsi: Moldova Sign Language
       vsl: Venezuelan Sign Language
+      vsn: Vedic Sanskrit
       vsv: Valencian Sign Language
       vto: Vitou
       vum: Vumbu
@@ -24741,6 +24685,9 @@ language:
       classical quechua: 
         - qwc
         - Classical Quechua
+      classical sanskrit: 
+        - cls
+        - Classical Sanskrit
       classical syriac: 
         - syc
         - Classical Syriac
@@ -25518,9 +25465,6 @@ language:
       dogri (macrolanguage): 
         - doi
         - Dogri (macrolanguage)
-      dogrib: 
-        - dgr
-        - Dogrib
       dogul dom dogon: 
         - dbg
         - Dogul Dom Dogon
@@ -28392,6 +28336,9 @@ language:
       international sign: 
         - ils
         - International Sign
+      interslavic: 
+        - isv
+        - Interslavic
       intha: 
         - int
         - Intha
@@ -34398,6 +34345,9 @@ language:
       morigi: 
         - mdb
         - Morigi
+      moriori: 
+        - rrm
+        - Moriori
       morisyen: 
         - mfe
         - Morisyen
@@ -41562,6 +41512,9 @@ language:
       tlazoyaltepec mixtec: 
         - mqh
         - Tlazoyaltepec Mixtec
+      tlicho: 
+        - dgr
+        - Tlicho
       tlingit: 
         - tli
         - Tlingit
@@ -42672,6 +42625,9 @@ language:
       veddah: 
         - ved
         - Veddah
+      vedic sanskrit: 
+        - vsn
+        - Vedic Sanskrit
       vehes: 
         - val
         - Vehes
@@ -46565,6 +46521,7 @@ langvar:
       akuapem: Akuapem Twi
       alalc97: ALA-LC Romanization, 1997 edition
       aluku: Aluku dialect
+      anpezo: Anpezo standard of Ladin
       ao1990: Portuguese Language Orthographic Agreement of 1990 (Acordo Ortografico da Lingua Portuguesa de 1990)
       aranes: Aranese
       arkaika: Arcaicam Esperantom
@@ -46590,6 +46547,8 @@ langvar:
       dajnko: Slovene in Dajnko alphabet
       ekavsk: Serbian with Ekavian pronunciation
       emodeng: Early Modern English (1500-1700)
+      fascia: Fascia standard of Ladin
+      fodom: Fodom standard of Ladin
       fonipa: International Phonetic Alphabet
       fonkirsh: Kirshenbaum Phonetic Alphabet
       fonnapa: North American Phonetic Alphabet
@@ -46597,6 +46556,7 @@ langvar:
       fonxsamp: X-SAMPA transcription
       gallo: Gallo
       gascon: Gascon
+      gherd: GherdÃ«ina standard of Ladin
       grclass: Classical Occitan orthography
       grital: Italian-inspired Occitan orthography
       grmistr: Mistralian or Mistralian-inspired Occitan orthography
@@ -46633,6 +46593,7 @@ langvar:
       pahawh4: Pahawh Hmong Final Version orthography
       pamaka: Pamaka dialect
       peano: Latino Sine Flexione
+      pehoeji: Hokkien Vernacular Romanization System
       petr1708: Petrine orthography
       pinyin: Pinyin romanization
       polyton: Polytonic Greek
@@ -46651,6 +46612,7 @@ langvar:
       sursilv: Sursilvan idiom of Romansh
       sutsilv: Sutsilvan idiom of Romansh
       synnejyl: Synnejysk
+      tailo: Taiwanese Hokkien Romanization System for Hokkien languages
       tarask: Belarusian in Taraskievica orthography
       tongyong: Tongyong Pinyin romanization
       tunumiit: Tunumiisiut
@@ -46659,6 +46621,7 @@ langvar:
       ulster: Ulster dialect of Scots
       unifon: Unifon phonetic alphabet
       vaidika: Vedic Sanskrit
+      valbadia: Val Badia standard of Ladin
       valencia: Valencian
       vallader: Vallader idiom of Romansh
       vecdruka: Latvian orthography used before 1920s ("veca druka")
@@ -46678,6 +46641,9 @@ langvar:
       aluku dialect: 
         - aluku
         - Aluku dialect
+      anpezo standard of ladin: 
+        - anpezo
+        - Anpezo standard of Ladin
       aranese: 
         - aranes
         - Aranese
@@ -46744,6 +46710,12 @@ langvar:
       epic sanskrit: 
         - itihasa
         - Epic Sanskrit
+      fascia standard of ladin: 
+        - fascia
+        - Fascia standard of Ladin
+      fodom standard of ladin: 
+        - fodom
+        - Fodom standard of Ladin
       gallo: 
         - gallo
         - Gallo
@@ -46753,9 +46725,15 @@ langvar:
       german orthography of 1996: 
         - 1996
         - German orthography of 1996
+      gherdã«ina standard of ladin: 
+        - ~
+        - GherdÃ«ina standard of Ladin
       hepburn romanization: 
         - hepburn
         - Hepburn romanization
+      hokkien vernacular romanization system: 
+        - pehoeji
+        - Hokkien Vernacular Romanization System
       international phonetic alphabet: 
         - fonipa
         - International Phonetic Alphabet
@@ -46912,6 +46890,9 @@ langvar:
       synnejysk: 
         - synnejyl
         - Synnejysk
+      taiwanese hokkien romanization system for hokkien languages: 
+        - tailo
+        - Taiwanese Hokkien Romanization System for Hokkien languages
       the balanka dialect of anii: 
         - balanka
         - The Balanka dialect of Anii
@@ -46972,6 +46953,9 @@ langvar:
       uralic phonetic alphabet: 
         - fonupa
         - Uralic Phonetic Alphabet
+      val badia standard of ladin: 
+        - valbadia
+        - Val Badia standard of Ladin
       valencian: 
         - valencia
         - Valencian

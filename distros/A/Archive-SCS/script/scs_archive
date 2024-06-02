@@ -116,7 +116,7 @@ for my $path ( map { s{^/|/$}{}rg } @extracts ) {
 
 $opts{output} //= '';
 if ($opts{output} eq '-') {
-  say $scs->read_entry($_) for sort @files;
+  say $scs->read_entry($_) for @files;
   exit;
 }
 
@@ -124,7 +124,7 @@ if (length $opts{output}) {
   chdir path($opts{output})->mkdir or die "$opts{output}: $!";
 }
 
-for my $file (sort @files) {
+for my $file (@files) {
   my $path = path $file;
   $path->parent->mkdir;
   $path->spew_raw( $scs->read_entry($file) );

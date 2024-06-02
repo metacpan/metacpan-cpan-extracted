@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use lib 'lib';
+use blib;
 use Feature::Compat::Defer;
 
 use Path::Tiny 0.119;

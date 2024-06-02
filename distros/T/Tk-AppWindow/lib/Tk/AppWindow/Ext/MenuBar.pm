@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Tk;
 use vars qw($VERSION);
-$VERSION="0.03";
+$VERSION="0.07";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -101,7 +101,7 @@ sub CheckStackForImages {
 	}
 	if ($hasimages) {
 		my $size = $self->configGet('-menuiconsize');
-		my $empty = $art->CreateEmptyImage($size) if defined $art;
+		my $empty = $art->createEmptyImage($size) if defined $art;
 		for (@$stack) {
 			my %conv = ( @$_ );
 			unless ((exists $conv{'-image'}) and (defined $empty)) {
@@ -326,25 +326,6 @@ sub ConfMenuSeparator {
 	return 1
 }
 
-sub CreateCompound {
-	my ($self, $text, $icon) = @_;
-	my $w = $self->GetAppWindow;
-	my $comp = $w->Compound;
-	my $space = $self->configGet('-menucolspace');
-	my $img = undef;
-	if (defined $icon) {
-		$img = $self->getArt($icon, $self->configGet('-menuiconsize'));
-	}
-	if (defined $img) {
-		$comp->Image(-image => $img);
-		$comp->Space(-width => $space);
-		$comp->Text( -text => $text);
-	} else {
-		$comp->Text( -text => $text);
-	}
-	return $comp;
-}
-
 sub CreateMenu {
 	my $self = shift;
 	my $w = $self->GetAppWindow;
@@ -416,7 +397,7 @@ sub DoPostConfig {
 	my $art = $self->extGet('Art');
 	if (defined $art) {
 		my $size = $self->configGet('-menuiconsize');
-		$size = $art->GetAlternateSize($size);
+		$size = $art->getAlternateSize($size);
 		$self->configPut(-menuiconsize => $size)
 	}
 	$self->CreateMenu;

@@ -21,11 +21,11 @@ Locale::Places - Translate places between different languages using http://downl
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -210,18 +210,21 @@ sub translate {
 			}
 		} elsif(scalar(@places) == 0) {
 			@places = $db->code2({ type => $from, data => $place, isshortname => undef });
-			if(scalar(@places) == 1) {
-				if(my $data = $db->data({ type => $to, code2 => $places[0] })) {
-					return $data;
-				}
+			if((scalar(@places) == 1) &&
+			   (my $data = $db->data({ type => $to, code2 => $places[0] }))) {
+				return $data;
 			}
 			@places = $db->code2({ type => $from, data => $place });
-			if(scalar(@places) == 1) {
-				if(my $data = $db->data({ type => $to, code2 => $places[0] })) {
-					return $data;
-				}
+			if((scalar(@places) == 1) &&
+			   (my $data = $db->data({ type => $to, code2 => $places[0] }))) {
+				return $data;
 			}
 		}
+		# foreach (@places) {
+			# if(my $data = $db->data({ type => $to, code2 => $_ })) {
+				# ::diag(">>>>>$data");
+			# }
+		# }
 		Carp::croak(__PACKAGE__, ': database has ', scalar(@places), " entries for $place in language $to: ", join(', ', @places));
 		# foreach my $p(@places) {
 			# if(my $line = $db->fetchrow_hashref({ type => $to, code2 => $p->{'code2'} })) {

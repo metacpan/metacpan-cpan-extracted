@@ -11,7 +11,7 @@ use warnings;
 use Carp;
 
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.07";
 use File::Basename;
 use File::Spec;
 require Tk::YAMessage;
@@ -60,6 +60,10 @@ sub CreateInterface {}
 
 sub MenuSaveAll {
 	return ()
+}
+
+sub ToolSaveAll {
+	return () 
 }
 
 =head1 AUTHOR

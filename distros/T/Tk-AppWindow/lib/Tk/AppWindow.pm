@@ -10,15 +10,17 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.06";
+$VERSION="0.07";
 
 use base qw(Tk::Derived Tk::MainWindow);
 Construct Tk::Widget 'AppWindow';
 
 use File::Basename;
 require Tk::AppWindow::BaseClasses::Callback;
+require Tk::Balloon;
 require Tk::YAMessage;
-require Tk::PNG;
+require Tk::DynaMouseWheelBind;
+use Tk::PNG;
 use Module::Load::Conditional('check_install', 'can_load');
 $Module::Load::Conditional::VERBOSE = 1;
 
@@ -150,9 +152,18 @@ sub Populate {
 	$args->{'-title'} = $appname;
 	
 	$self->SUPER::Populate($args);
+	
+	$self->DynaMouseWheelBind(
+		'Tk::Canvas',
+		'Tk::HList',
+		'Tk::ITree',
+		'Tk::Pane',
+		'Tk::Tree',
+	);
 
 	$self->{APPNAME} = $appname;
 	$self->{ARGS} = $args;
+	$self->{BALLOON} = $self->Balloon;
 	$self->{CMNDTABLE} = {};
 	$self->{CONFIGTABLE} = {};
 	$self->{GEOBLOCK} = 0;
@@ -262,16 +273,25 @@ sub appName {
 	return $self->{APPNAME}
 }
 
-=item B<BalloonAttach>I<@options>
+=item B<balloon>
 
-Calls the Attach method of the Balloon widget if the extens Balloon is loaded
+Returns a reference to the Balloon widget.
+
+=cut
+
+sub balloon {
+	return $_[0]->{BALLOON}
+}
+
+=item B<BalloonAttach>I<$widget, $text>
+
+Attaches a balloon message to $widget.
 
 =cut
 
 sub BalloonAttach {
-	my $self = shift;
-	my $b = $self->extGet('Balloon');
-	$b->Attach(@_) if defined $b;
+	my ($self, $widget, $text) = @_;
+	$self->{BALLOON}->attach($widget, -balloonmsg => $text)
 }
 
 =item B<CanQuit>
@@ -526,9 +546,9 @@ sub configInit {
 		unless (defined $value) { $value = $default };
 		unless (exists $table->{$option}) {
 			$table->{$option} = $self->CreateCallback($call, $owner);
-			$self->configPut($option, $value);
+			$self->configPut($option, $value) if defined $value;
 		} else {
-			warn "Config option $option already defined\n";
+			croak "Config option $option already defined\n";
 		}
 	}
 }
@@ -745,7 +765,7 @@ sub getArt {
 	my ($self, $icon, $size) = @_;
 	my $art = $self->extGet('Art');
 	if (defined $art) {
-		return $art->GetIcon($icon, $size);
+		return $art->getIcon($icon, $size);
 	}
 	return undef
 }
@@ -928,6 +948,18 @@ sub PostConfig {
 	}
 	my $pc = $self->{POSTCONFIG};
 	for (@$pc) { $_->execute }
+}
+
+=item B<StatusAttach>I<$widget, $text>
+
+Attaches a status message to $widget
+
+=cut
+
+sub StatusAttach {
+	my ($self, $widget, $text) = @_;
+	my $s = $self->extGet('StatusBar');
+	$s->Attach($widget, $text) if defined $s;
 }
 
 =item B<StatusMessage>I<($text>)>

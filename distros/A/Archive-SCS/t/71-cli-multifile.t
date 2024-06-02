@@ -33,4 +33,9 @@ is scs_archive(-m => $sample1, -o => $tempdir, -x => 'orphan', 'empty'),
 ok $tempdir->child('orphan')->exists, 'extracted orphan';
 ok $tempdir->child('empty' )->exists, 'extracted empty';
 
+my @out = scs_archive(-m => $sample1, -o => '-', -x => 'orphan', 'ones');
+
+like $out[0], qr{whats my name}, 'subdir file';
+like $out[1], qr{11111}, 'ones';
+
 done_testing;

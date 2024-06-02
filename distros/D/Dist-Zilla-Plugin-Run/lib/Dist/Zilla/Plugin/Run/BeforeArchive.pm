@@ -4,7 +4,7 @@ use warnings;
 package Dist::Zilla::Plugin::Run::BeforeArchive;
 # ABSTRACT: execute a command of the distribution before creating the archive
 
-our $VERSION = '0.049';
+our $VERSION = '0.050';
 
 use Moose;
 with qw(
@@ -50,7 +50,7 @@ Dist::Zilla::Plugin::Run::BeforeArchive - execute a command of the distribution 
 
 =head1 VERSION
 
-version 0.049
+version 0.050
 
 =head1 SYNOPSIS
 

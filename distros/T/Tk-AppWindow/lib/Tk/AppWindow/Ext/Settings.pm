@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Tk;
 use vars qw($VERSION);
-$VERSION="0.03";
+$VERSION="0.07";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -146,7 +146,7 @@ sub CmdSettings {
 			if (defined $nb) {
 				for (keys %externals) {
 					my $w = $externals{$_};
-					$w->Apply if $w->can('Apply');
+					$w->Apply if Exists($w) and $w->can('Apply');
 				}
 			}
 		}
@@ -183,12 +183,14 @@ sub CmdSettings {
 			my $page = $nb->add($title, -label => $title);
 			$externals{$title} = $page->$class(@$opt)->pack(-fill => 'both', -expand => 1);
 		}
+		$self->{NB} = $nb;
 	}
 	$f->put($self->GetUserOptions);
 	
 	$m->ButtonPack($b);
 	$m->Show(-popover => $self->GetAppWindow);
 	$m->destroy;
+	delete $self->{NB};
 }
 
 sub GetUserOptions {
@@ -260,6 +262,17 @@ sub MenuItems {
 		[	'menu_normal',		'appname::Quit',		'~Settings',	'settings',	'configure',		'F9',	], 
 		[	'menu_separator',	'appname::Quit',		'h2'], 
 	)
+}
+
+=item B<NBWidget>
+
+Returns a reference to the notebook widget in the settingsdialog when this dialog is active.
+Otherwise returns undef.
+
+=cut
+
+sub NBWidget {
+	return $_[0]->{NB}
 }
 
 sub ReConfigureAll {

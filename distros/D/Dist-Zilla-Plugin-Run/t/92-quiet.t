@@ -9,7 +9,7 @@ use Test::Fatal;
 
 my @configs = (
     {
-        run => [ qq{"$^X" -le"print q(# hello this is a run command)"} ],
+        run => [ qq{"$^X" -le"print q(# hello this is a run command); print STDERR q(# hello to STDERR)"} ],
         eval => [ qq{die "oh noes"} ],
     },
     {

@@ -9,7 +9,7 @@ Tk::AppWindow::BaseClasses::PluginJobs - Baseclass for plugins using background 
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.03";
+$VERSION="0.07";
 use Carp;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
@@ -31,9 +31,10 @@ use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
 =head1 DESCRIPTION
 
-This is a base class for plugins using the B<Daemon> extension for background jobs.
+This is a base class for plugins using the B<Daemons> extension for background jobs.
+Make sure you have loaded the B<Daemons> extension.
 
-All job names are made unique by adding the name of the plugin at the end of the I<$name> you see in this document.
+All job names are made unique to Daemons by adding the name of the plugin at the end of the I<$name> you see in this document.
 
 =head1 METHODS
 
@@ -151,6 +152,7 @@ sub jobStart {
 sub Unload {
 	my $self = shift;
 	for ($self->jobList) { $self->jobEnd($_) };
+	return $self->SUPER::Unload
 }
 
 =back

@@ -1,12 +1,20 @@
 Revision history for Perl extension Tk::AppWindow.
 
+0.07 Sun Jun 02 2024
+	- fixed bug in base class PluginJobs.
+	- added Tk::DynaMouseWheelBind to AppWindow and bound it to some classes.
+	- revised extension Art. Moved all icon search methods to FreeDesktop::Icons. Added -rawiconpath option.
+	- plugins can now have their own settings page.
+	- the tool bar can now have drop down lists.
+	- removed the Balloon extension. Tk::AppWindow now has a balloon widget by default.
+
 0.06 Sun May 19 2024
-	-fixed small bug in extension MDI.
-	-added methods interfaceShow and silentMode to MDI.
+	- fixed small bug in extension MDI.
+	- added methods interfaceShow and silentMode to MDI.
 	
 0.05 Sat May 18 2024
-	-fixed failing tests of Art
-	-fixed undefined variable error in Art
+	- fixed failing tests of Art
+	- fixed undefined variable error in Art
 
 0.04 Fri May 17 2024
 	- Fixed indexing error for CPAN

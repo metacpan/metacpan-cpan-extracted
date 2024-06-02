@@ -1,5 +1,8 @@
 Revision history for Locale::Places
 
+0.12	Sat Jun  1 20:47:55 EDT 2024
+	Don't rebuild SQL database if it's newer than the CSV file
+
 0.11	Wed Apr 10 20:14:23 EDT 2024
 	Move the database directory to data
 	Added t/version.t

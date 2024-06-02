@@ -3,7 +3,7 @@ Locale::Codes::Language_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Fri Mar  8 10:13:49 EST 2024
+#    Generated on: Sat Jun  1 11:32:16 EDT 2024
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.78';
+$VERSION='3.79';
 
 $Locale::Codes::Retired{'language'}{'alpha-2'}{'code'} = {
    q(in) => q(Indonesian),
@@ -380,6 +380,7 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'name'} = {
    q(djauan) => [ q(djn), q(Djauan) ],
    q(djingili) => [ q(jig), q(Djingili) ],
    q(dogri) => [ q(doi), q(Dogri) ],
+   q(dogrib) => [ q(dgr), q(Dogrib) ],
    q(dororo) => [ q(drr), q(Dororo) ],
    q(duduela) => [ q(duk), q(Duduela) ],
    q(duli) => [ q(duz), q(Duli) ],

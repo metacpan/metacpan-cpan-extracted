@@ -9,7 +9,7 @@ Tk::AppWindow::Baseclasses::SidePanel - Basic functionality for extensions assoc
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.04";
+$VERSION="0.07";
 use Tk;
 require Tk::YANoteBook;
 
@@ -79,18 +79,16 @@ sub addPage {
 	my $art = $self->extGet('Art');
 	my $icon;
 	if (defined $art) {
-		$icon = $art->GetIcon($image, $self->IconSize);
+		$icon = $art->getIcon($image, $self->IconSize);
 		
 	}
 	@opt = (-titleimg => $icon) if defined $icon;
 	@opt = (-title => $text) unless defined $icon;
 	my $page = $nb->addPage($name, @opt);
 
-	my $balloon = $self->extGet('Balloon');
-	if (defined $balloon) {
-		my $l = $nb->getTab($name)->Subwidget('Label');
-		$balloon->Attach($l, -statusmsg => $statustext) if defined $statustext;
-	}
+	my $l = $nb->getTab($name)->Subwidget('Label');
+	$self->StatusAttach($l, $statustext) if defined $statustext;
+	$self->BalloonAttach($l, $text);
 	$self->after(500, sub { $nb->UpdateTabs });
 
 	return $page;

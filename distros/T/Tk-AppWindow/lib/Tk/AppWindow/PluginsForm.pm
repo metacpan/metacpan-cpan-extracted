@@ -9,7 +9,7 @@ Tk::AppWindow::PluginsForm - Load and unload plugins.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.02';
+$VERSION = '0.07';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -44,7 +44,6 @@ sub Populate {
 	
 	$self->SUPER::Populate($args);
 
-	my @avail = $ext->AvailablePlugins;
 	my $lf = $self->LabFrame(
 		-label => 'Available plugins',
 		-labelside => 'acrosstop',
@@ -54,9 +53,12 @@ sub Populate {
 		-scrollbars => 'oe',
 		-sticky => 'nsew',
 	)->pack(-expand => 1, -fill => 'both');
-	for (@avail) {
+
+	my %plugins = ();
+	for ($ext->AvailablePlugins) {
 		my $plug = $_;
 		my $val = $ext->plugExists($plug);
+		$plugins{$plug} = \$val;
 		my $f = $pane->Frame(
 			-borderwidth => 2,
 			-relief => 'groove',
@@ -65,8 +67,10 @@ sub Populate {
 			-command => sub {
 				if ($val) {
 					$ext->plugLoad($plug);
+					$self->after(10, sub { $val = '' unless $ext->plugExists($plug) });
 				} else {
 					$ext->plugUnload($plug);
+					$self->after(10, sub { $val = '' if $ext->plugExists($plug) });
 				}
 			},
 			-variable => \$val,
@@ -76,8 +80,9 @@ sub Populate {
 			-text => $ext->plugDescription($plug),
 			-justify => 'left',
 		)->pack(-padx => 2, -pady => 2, -anchor => 'w');
-		
 	}
+	$self->{PLUGINS} = \%plugins;
+
 	my $bf = $self->Frame->pack(-fill => 'x');
 	$bf->Button(
 		-text => 'Load all',
@@ -96,15 +101,37 @@ sub Populate {
 sub LoadAll {
 	my $self = shift;
 	my $ext = $self->cget('-pluginsext');
-	my $avail = $ext->configGet('-availableplugs');
-	for (@$avail) { $ext->plugLoad($_); }
+	my $plugins = $self->{PLUGINS};
+	for (sort keys %$plugins) {
+		my $plug = $_;
+		$ext->plugLoad($plug);
+		$self->after(10, sub {
+			my $v = $plugins->{$plug};
+			if ($ext->plugExists($plug)) {
+				$$v = 1
+			} else {
+				$$v = 0
+			}
+		});
+	}
 }
 
 sub UnloadAll {
 	my $self = shift;
 	my $ext = $self->cget('-pluginsext');
-	my $avail = $ext->configGet('-availableplugs');
-	for (@$avail) { $ext->plugUnload($_); }
+	my $plugins = $self->{PLUGINS};
+	for (sort keys %$plugins) {
+		my $plug = $_;
+		$ext->plugUnload($plug);
+		$self->after(10, sub {
+			my $v = $plugins->{$plug};
+			if ($ext->plugExists($plug)) {
+				$$v = 1
+			} else {
+				$$v = ''
+			}
+		});
+	}
 }
 
 =head1 AUTHOR

@@ -36,6 +36,7 @@
             "File::Basename" : "2.85",
             "File::Path" : "2.18",
             "File::Spec" : "3.84",
+            "FreeDesktop::Icons" : "0.01",
             "Imager" : "1.019",
             "Imager::File::PNG" : "0.99",
             "MIME::Base64" : "3.16",
@@ -47,6 +48,7 @@
             "Test::Tk" : "3.03",
             "Tk" : "804.023",
             "Tk::DocumentTree" : "0.07",
+            "Tk::DynaMouseWheelBind" : "0.02",
             "Tk::FontDialog" : "0.18",
             "Tk::Pod" : "5.41",
             "Tk::QuickForm" : "0.04",
@@ -63,6 +65,6 @@
          "web" : "https://github.com/haje61/Tk-AppWindow"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

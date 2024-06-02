@@ -22,12 +22,13 @@ createapp(
 		return $v + shift if @_;
 		return $v;
 	}]],
-	-extensions => [qw[Art Balloon MenuBar ToolBar Settings Plugins]],
+	-extensions => [qw[Art MenuBar ToolBar Settings Plugins]],
 	-configfolder => 't/settings',
 	-toolitems => [
 		[	'tool_button',		'Placeholder',		'poptest',	'document-open',	'Open a document'], 
 		[	'tool_separator'], 
 	],
+	-namespace => 'Tk::AppWindow',
 	-plugins => ['Test'],
 	-preconfig => [
 		-somecolor => ['PASSIVE', undef, undef, '#34A767'],

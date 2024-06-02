@@ -37,6 +37,12 @@ sub MenuItems {
 	)
 }
 
+sub SettingsPage {
+	return (
+		Test => ['Label', -text => 'TestPage'],
+	)
+}
+
 sub ToolItems {
 	return (
 #	 type					label			cmd					icon					help		
@@ -48,7 +54,7 @@ sub Unload {
 	my $self = shift;
 	if ($self->{QUITTER}) {
 		$self->cmdUnhookBefore('plusser', $plsub);
-		return 1
+		return $self->SUPER::Unload
 	}
 	return 0
 }

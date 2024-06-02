@@ -12,8 +12,7 @@ if($ENV{AUTHOR_TESTING}) {
 	} else {
 		all_perl_files_ok();
 		warnings_ok('lib/Locale/Places.pm');
-		warnings_ok('lib/Locale/Places/DB.pm');
-		warnings_ok('lib/Locale/Places/DB/GB.pm');
+		warnings_ok('lib/Locale/Places/GB.pm');
 	}
 } else {
 	plan(skip_all => 'Author tests not required for installation');

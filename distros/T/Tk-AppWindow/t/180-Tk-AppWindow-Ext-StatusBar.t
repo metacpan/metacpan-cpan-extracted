@@ -17,7 +17,7 @@ BEGIN {
 
 
 createapp(
-	-extensions => [qw[Art Balloon StatusBar MenuBar]],
+	-extensions => [qw[Art StatusBar MenuBar]],
 );
 
 my $ext;

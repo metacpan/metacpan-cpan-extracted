@@ -14,6 +14,7 @@ on 'test' => sub {
 };
 
 on 'configure' => sub {
+  requires "ExtUtils::CppGuess" => "0";
   requires "ExtUtils::MakeMaker" => "7.12";
   requires "ExtUtils::MakeMaker::CPANfile" => "0.08";
   requires "Path::Tiny" => "0.062";

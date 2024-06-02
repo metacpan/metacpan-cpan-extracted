@@ -20,9 +20,6 @@ no HTML is getting added to a code.
    ./internal/harvest_and_check langvar
    ./internal/harvest_and_check langfam
 
-   rm -f _init*
-   rm lib/Locale/Codes/*.bak
-
 #########################################################################
 Update mods/documentation
 
@@ -60,6 +57,9 @@ the changes are good.
 
    ./internal/dump_curr
    ./internal/deprecate_codes
+
+   rm -f _init*
+   rm lib/Locale/Codes/*.bak
 
 #########################################################################
 Update the Change POD file with the date, and then run:

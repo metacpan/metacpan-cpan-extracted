@@ -1,5 +1,13 @@
 Revision history for perl distribution Archive-SCS
 
+1.03 - 2024-06-01
+
+  - Fix CLI tool: Output files in the same order they were requested in
+
+  - Release fix: Some tests were still broken in 1.02
+  
+  - Allow non-GNU C++ compilers
+
 1.02 - 2024-05-31
 
   - Release fix: select the correct perl executable when running tests

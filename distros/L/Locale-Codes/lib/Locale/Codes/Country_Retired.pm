@@ -3,7 +3,7 @@ Locale::Codes::Country_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Fri Mar  8 10:13:49 EST 2024
+#    Generated on: Sat Jun  1 11:32:16 EDT 2024
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.78';
+$VERSION='3.79';
 
 $Locale::Codes::Retired{'country'}{'alpha-2'}{'code'} = {
    q(an) => q(Netherlands Antilles),
@@ -311,14 +311,27 @@ $Locale::Codes::Retired{'country'}{'dom'}{'code'} = {
 $Locale::Codes::Retired{'country'}{'genc-alpha-2'}{'code'} = {
    q(A1) => q(Unknown),
    q(A3) => q(Entity 6),
+   q(AX) => q(Aland Islands),
+   q(PS) => q(Palestine, State of),
+   q(SJ) => q(Svalbard and Jan Mayen),
+   q(UM) => q(United States Minor Outlying Islands),
+   q([None]) => q(),
 };
 
 $Locale::Codes::Retired{'country'}{'genc-alpha-3'}{'code'} = {
+   q(ALA) => q(Aland Islands),
    q(AX1) => q(Unknown),
    q(AX3) => q(Entity 6),
+   q(PSE) => q(Palestine, State of),
+   q(SJM) => q(Svalbard and Jan Mayen),
+   q(UMI) => q(United States Minor Outlying Islands),
 };
 
 $Locale::Codes::Retired{'country'}{'genc-numeric'}{'code'} = {
+   q(248) => q(Aland Islands),
+   q(275) => q(Palestine, State of),
+   q(581) => q(United States Minor Outlying Islands),
+   q(744) => q(Svalbard and Jan Mayen),
    q(914) => q(Entity 6),
    q(932) => q(Unknown),
 };
@@ -538,32 +551,47 @@ $Locale::Codes::Retired{'country'}{'dom'}{'name'} = {
 };
 
 $Locale::Codes::Retired{'country'}{'genc-alpha-2'}{'name'} = {
+   q(aland islands) => [ q(AX), q(Aland Islands) ],
    q(bonaire, sint eustatius, and saba) => [ q(BQ), q(Bonaire, Sint Eustatius, and Saba) ],
+   q(caribbean netherlands) => [ q(BQ), q(Caribbean Netherlands) ],
    q(czech republic) => [ q(CZ), q(Czech Republic) ],
    q(entity 6) => [ q(A3), q(Entity 6) ],
    q(macedonia) => [ q(MK), q(MACEDONIA) ],
    q(macedonia, the former yugoslav republic of) => [ q(MK), q(Macedonia, The former Yugoslav Republic of) ],
+   q(palestine, state of) => [ q(PS), q(Palestine, State of) ],
+   q(svalbard and jan mayen) => [ q(SJ), q(Svalbard and Jan Mayen) ],
    q(swaziland) => [ q(SZ), q(SWAZILAND) ],
+   q(united states minor outlying islands) => [ q(UM), q(United States Minor Outlying Islands) ],
    q(unknown) => [ q(A1), q(Unknown) ],
 };
 
 $Locale::Codes::Retired{'country'}{'genc-alpha-3'}{'name'} = {
+   q(aland islands) => [ q(ALA), q(Aland Islands) ],
    q(bonaire, sint eustatius, and saba) => [ q(BES), q(Bonaire, Sint Eustatius, and Saba) ],
+   q(caribbean netherlands) => [ q(BES), q(Caribbean Netherlands) ],
    q(czech republic) => [ q(CZE), q(Czech Republic) ],
    q(entity 6) => [ q(AX3), q(Entity 6) ],
    q(macedonia) => [ q(MKD), q(MACEDONIA) ],
    q(macedonia, the former yugoslav republic of) => [ q(MKD), q(Macedonia, The former Yugoslav Republic of) ],
+   q(palestine, state of) => [ q(PSE), q(Palestine, State of) ],
+   q(svalbard and jan mayen) => [ q(SJM), q(Svalbard and Jan Mayen) ],
    q(swaziland) => [ q(SWZ), q(SWAZILAND) ],
+   q(united states minor outlying islands) => [ q(UMI), q(United States Minor Outlying Islands) ],
    q(unknown) => [ q(AX1), q(Unknown) ],
 };
 
 $Locale::Codes::Retired{'country'}{'genc-numeric'}{'name'} = {
+   q(aland islands) => [ q(248), q(Aland Islands) ],
    q(bonaire, sint eustatius, and saba) => [ q(535), q(Bonaire, Sint Eustatius, and Saba) ],
+   q(caribbean netherlands) => [ q(535), q(Caribbean Netherlands) ],
    q(czech republic) => [ q(203), q(Czech Republic) ],
    q(entity 6) => [ q(914), q(Entity 6) ],
    q(macedonia) => [ q(807), q(MACEDONIA) ],
    q(macedonia, the former yugoslav republic of) => [ q(807), q(Macedonia, The former Yugoslav Republic of) ],
+   q(palestine, state of) => [ q(275), q(Palestine, State of) ],
+   q(svalbard and jan mayen) => [ q(744), q(Svalbard and Jan Mayen) ],
    q(swaziland) => [ q(748), q(SWAZILAND) ],
+   q(united states minor outlying islands) => [ q(581), q(United States Minor Outlying Islands) ],
    q(unknown) => [ q(932), q(Unknown) ],
 };
 

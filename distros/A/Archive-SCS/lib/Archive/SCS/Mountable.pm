@@ -2,7 +2,7 @@ use v5.28;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::Mountable 1.02;
+class Archive::SCS::Mountable 1.03;
 
 1;
 

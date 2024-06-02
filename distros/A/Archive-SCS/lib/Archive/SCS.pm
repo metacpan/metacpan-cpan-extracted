@@ -2,7 +2,7 @@ use v5.32;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS 1.02;
+class Archive::SCS 1.03;
 
 use stable 0.031 'isa';
 

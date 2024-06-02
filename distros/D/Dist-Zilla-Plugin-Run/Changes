@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Run
 
+0.050     2024-06-02 00:55:05Z
+  - no longer suppressing output to STDERR of "run" commands when in quiet
+    mode
+
 0.049     2023-04-29 15:32:05Z
   - fix some test failures on MSWin32 due to path separators (Graham Ollis,
     #17)

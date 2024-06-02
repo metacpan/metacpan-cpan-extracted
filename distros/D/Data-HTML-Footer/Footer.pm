@@ -4,10 +4,10 @@ use strict;
 use warnings;
 
 use Mo qw(build default is);
-use Mo::utils::CSS 0.06 qw(check_css_unit);
+use Mo::utils::CSS 0.07 qw(check_css_unit);
 use Mo::utils::URI qw(check_location);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 has author => (
 	is => 'ro',
@@ -252,6 +252,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 cut

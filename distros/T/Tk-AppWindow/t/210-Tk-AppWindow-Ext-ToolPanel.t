@@ -16,7 +16,7 @@ require TestTextManager;
 
 createapp(
 	-appname => 'Navigator',
-	-extensions => [qw[Art Balloon MenuBar ToolBar StatusBar MDI Navigator ToolPanel]],
+	-extensions => [qw[Art MenuBar ToolBar StatusBar MDI Navigator ToolPanel]],
 	-configfolder => 't/settings',
 	-contentmanagerclass => 'TestTextManager',
 );

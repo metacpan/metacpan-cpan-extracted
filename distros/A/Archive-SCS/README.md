@@ -57,6 +57,11 @@ perlbrew install --64int latest
 perlbrew switch latest
 ```
 
+You'll also need C and C++ compilers. On a Mac, they're included
+in the Command Line Tools for Xcode. The system should prompt you
+for installation automatically, or you can do it yourself with
+`xcode-select --install`.
+
 For other ways to install Perl, see <https://www.perl.org>.
 
 #### Installing Archive::SCS

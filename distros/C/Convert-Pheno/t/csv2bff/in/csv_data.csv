@@ -1,21 +1,21 @@
-PatientID,EventName,Sex,Ethnicity,TobaccoUse,AgeAtTobaccoExposure,AlcoholUse,AgeAtAlcoholExposure,Hemoglobin (g/dL),WBC (10^9/L),Platelets (10^9/L),BMI (kg/m^2),DrugName,DrugDose (mg),Disease_1,Disease_2,Disease_3,PhenotypicFeature_1,PhenotypicFeature_2
-P001,Baseline,Female,African American,No,,Yes,41.0,12.7,9.4,156.0,28.2,Lisinopril,90,Asthma,Hypertension,Diabetes,Abnormal heart valve morphology,Limitation of joint mobility
-P001,Treatment,,,,,,,13.2,9.1,323.0,28.2,Lisinopril,90,Asthma,Hypertension,Diabetes,Abnormal heart valve morphology,Limitation of joint mobility
-P002,Baseline,Male,Caucasian,No,,No,,11.1,7.8,222.0,25.7,Atorvastatin,90,Asthma,Hypertension,Diabetes,Limitation of joint mobility,Emphysema
-P002,Treatment,,,,,,,12.1,10.8,375.0,25.7,Atorvastatin,90,Asthma,Hypertension,Diabetes,Limitation of joint mobility,Emphysema
-P003,Baseline,Female,Native American,Yes,49.0,No,,16.5,5.4,331.0,25.9,Albuterol,500,Hypertension,Asthma,Diabetes,Abnormal heart valve morphology,Emphysema
-P003,Treatment,,,,,,,16.1,5.1,274.0,25.9,Albuterol,500,Hypertension,Asthma,Diabetes,Abnormal heart valve morphology,Emphysema
-P004,Baseline,Female,Caucasian,No,,Yes,32.0,16.4,9.0,337.0,25.9,Lisinopril,1000,Hypertension,Asthma,Diabetes,Emphysema,Abnormal heart valve morphology
-P004,Treatment,,,,,,,14.9,6.4,261.0,25.9,Lisinopril,1000,Hypertension,Asthma,Diabetes,Emphysema,Abnormal heart valve morphology
-P005,Baseline,Female,Native American,No,,No,,16.1,10.8,281.0,21.7,Metformin,500,Diabetes,Asthma,Hypertension,Emphysema,Limitation of joint mobility
-P005,Treatment,,,,,,,12.0,9.1,291.0,21.7,Metformin,500,Diabetes,Asthma,Hypertension,Emphysema,Limitation of joint mobility
-P006,Baseline,Male,Native American,No,,No,,15.0,10.6,316.0,25.3,Metformin,1000,Diabetes,Hypertension,Asthma,Emphysema,Limitation of joint mobility
-P006,Treatment,,,,,,,15.7,5.1,279.0,25.3,Metformin,1000,Diabetes,Hypertension,Asthma,Emphysema,Limitation of joint mobility
-P007,Baseline,Male,Asian,Yes,18.0,Yes,49.0,15.3,7.2,290.0,28.1,Albuterol,1000,Asthma,Hypertension,Diabetes,Limitation of joint mobility,Abnormal heart valve morphology
-P007,Treatment,,,,,,,12.9,10.5,362.0,28.1,Albuterol,1000,Asthma,Hypertension,Diabetes,Limitation of joint mobility,Abnormal heart valve morphology
-P008,Baseline,Male,Native American,No,,No,,16.1,5.9,334.0,22.5,Lisinopril,500,Asthma,Hypertension,Diabetes,Abnormal heart valve morphology,Limitation of joint mobility
-P008,Treatment,,,,,,,15.7,5.7,255.0,22.5,Lisinopril,500,Asthma,Hypertension,Diabetes,Abnormal heart valve morphology,Limitation of joint mobility
-P009,Baseline,Male,Asian,Yes,21.0,No,,17.0,7.2,225.0,20.3,Albuterol,90,Hypertension,Diabetes,Asthma,Limitation of joint mobility,Emphysema
-P009,Treatment,,,,,,,16.4,6.0,339.0,20.3,Albuterol,90,Hypertension,Diabetes,Asthma,Limitation of joint mobility,Emphysema
-P010,Baseline,Male,Native American,Yes,20.0,No,,13.4,6.1,339.0,27.9,Albuterol,1000,Asthma,Diabetes,Hypertension,Emphysema,Limitation of joint mobility
-P010,Treatment,,,,,,,14.5,5.0,355.0,27.9,Albuterol,1000,Asthma,Diabetes,Hypertension,Emphysema,Limitation of joint mobility
+PatientID,EventName,Sex,Ethnicity,TobaccoUse,AgeAtTobaccoExposure,AlcoholUse,AgeAtAlcoholExposure,Hemoglobin (g/dL),WBC (10^9/L),Platelets (10^9/L),BMI (kg/m^2),DrugName,DrugDose (mg),Disease_1,Disease_2,Disease_3,PhenotypicFeature_1,PhenotypicFeature_2,TreatmentDuration (weeks)
+P001,Baseline,Male,Caucasian,Yes,14.0,No,,16.9,5.4,288.0,29.0,Lisinopril,500,Asthma,Hypertension,Diabetes,Abnormal heart valve morphology,Emphysema,62
+P001,Treatment,,,,,,,12.6,8.6,272.0,29.0,Lisinopril,500,,,,,,62
+P002,Baseline,Male,Hispanic,No,,No,,16.3,10.9,206.0,22.9,Metformin,90,Asthma,Hypertension,Diabetes,Emphysema,Abnormal heart valve morphology,25
+P002,Treatment,,,,,,,12.9,5.5,244.0,22.9,Metformin,90,,,,,,25
+P003,Baseline,Male,Native American,Yes,17.0,Yes,26.0,14.3,10.7,247.0,27.8,Albuterol,1000,Diabetes,Hypertension,Asthma,Emphysema,Abnormal heart valve morphology,36
+P003,Treatment,,,,,,,14.9,4.7,274.0,27.8,Albuterol,1000,,,,,,36
+P004,Baseline,Male,Native American,No,,No,,12.0,10.2,194.0,25.1,Albuterol,50,Diabetes,Asthma,Hypertension,Emphysema,Abnormal heart valve morphology,22
+P004,Treatment,,,,,,,11.5,6.3,227.0,25.1,Albuterol,50,,,,,,22
+P005,Baseline,Male,African American,No,,Yes,41.0,13.5,5.7,336.0,20.6,Atorvastatin,50,Diabetes,Asthma,Hypertension,Abnormal heart valve morphology,Limitation of joint mobility,22
+P005,Treatment,,,,,,,16.8,9.1,345.0,20.6,Atorvastatin,50,,,,,,22
+P006,Baseline,Male,Asian,Yes,21.0,No,,12.5,6.8,220.0,25.0,Lisinopril,90,Diabetes,Asthma,Hypertension,Abnormal heart valve morphology,Limitation of joint mobility,25
+P006,Treatment,,,,,,,12.6,8.8,399.0,25.0,Lisinopril,90,,,,,,25
+P007,Baseline,Male,Asian,Yes,49.0,No,,15.8,5.7,259.0,25.4,Albuterol,50,Hypertension,Asthma,Diabetes,Emphysema,Abnormal heart valve morphology,22
+P007,Treatment,,,,,,,16.8,5.6,243.0,25.4,Albuterol,50,,,,,,22
+P008,Baseline,Male,Asian,No,,No,,13.2,8.0,385.0,29.2,Lisinopril,50,Diabetes,Asthma,Hypertension,Emphysema,Limitation of joint mobility,22
+P008,Treatment,,,,,,,12.1,6.0,372.0,29.2,Lisinopril,50,,,,,,22
+P009,Baseline,Female,Native American,No,,Yes,15.0,13.5,8.3,292.0,29.6,Metformin,90,Hypertension,Asthma,Diabetes,Emphysema,Limitation of joint mobility,25
+P009,Treatment,,,,,,,11.4,10.0,156.0,29.6,Metformin,90,,,,,,25
+P010,Baseline,Male,Caucasian,No,,Yes,28.0,13.9,9.4,275.0,20.5,Lisinopril,50,Asthma,Diabetes,Hypertension,Emphysema,Abnormal heart valve morphology,22
+P010,Treatment,,,,,,,15.3,6.7,390.0,20.5,Lisinopril,50,,,,,,22

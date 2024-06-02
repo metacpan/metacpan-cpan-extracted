@@ -19,7 +19,7 @@ perl_version 5.008;
 readme_from 'Footer.pm';
 recursive_author_tests('xt');
 requires 'Mo' => 0;
-requires 'Mo::utils::CSS' => 0.06;
+requires 'Mo::utils::CSS' => 0.07;
 requires 'Mo::utils::URI' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Data-HTML-Footer/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Data-HTML-Footer';
@@ -29,7 +29,7 @@ test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.01';
+version '0.02';
 
 # Run.
 WriteAll();

@@ -1,6 +1,9 @@
 Revision history for Term::Choose::Util
 
 
+0.142   2024-06-01
+        - Update 'choose_directories' and 'choose_a_file'.
+
 0.141   2024-04-20
         - Term::Choose minimum version 1.764.
         - Updates 'choose_directories'.
