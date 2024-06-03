@@ -1,8 +1,11 @@
+
 Summary: a
 Name: a
 Version: 1
 Release: 1
 License: x
+# Fix build with rpm-4.20:
+BuildArch: noarch
 
 %description
 x

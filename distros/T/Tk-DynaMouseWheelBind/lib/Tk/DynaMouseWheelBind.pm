@@ -13,7 +13,7 @@ package # hide from PAUSE indexer
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.02;
+$VERSION = 0.03;
 
 # keep Tk::Widgets namespace clean
 my ($motion, $do_scroll, $mousewheel_event, $setup );
@@ -53,7 +53,8 @@ $setup = sub{
 	my $delta;
 
 	$motion = sub {
-		$under_cursor = $_[0]->XEvent->Info('W');
+		my $w = shift;
+		$under_cursor = $w->XEvent->Info('W') if defined $w;
 	};
 
 	$do_scroll = sub{

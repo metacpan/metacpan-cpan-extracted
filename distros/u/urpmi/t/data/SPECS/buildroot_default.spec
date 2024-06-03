@@ -1,6 +1,8 @@
 %define macro_using_buildroot $(echo %buildroot)
 %undefine distepoch
 %undefine disttag
+# Fix build with rpm-4.20:
+%global debug_package %{nil}
 
 Summary: x
 Name: buildroot

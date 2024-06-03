@@ -155,6 +155,7 @@ lib/AsposeSlidesCloud/Object/PathOutputFile.pm
 lib/AsposeSlidesCloud/Object/PathSegment.pm
 lib/AsposeSlidesCloud/Object/PatternFill.pm
 lib/AsposeSlidesCloud/Object/PdfExportOptions.pm
+lib/AsposeSlidesCloud/Object/PdfImportOptions.pm
 lib/AsposeSlidesCloud/Object/PictureFill.pm
 lib/AsposeSlidesCloud/Object/PictureFrame.pm
 lib/AsposeSlidesCloud/Object/Pipeline.pm

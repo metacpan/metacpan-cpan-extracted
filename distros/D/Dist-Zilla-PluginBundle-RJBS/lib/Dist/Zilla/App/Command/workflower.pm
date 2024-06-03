@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::workflower 5.030;
+package Dist::Zilla::App::Command::workflower 5.031;
 # ABSTRACT: install rjbs's usual GitHub Actions workflow
 
 use v5.34.0;
@@ -85,7 +85,7 @@ Dist::Zilla::App::Command::workflower - install rjbs's usual GitHub Actions work
 
 =head1 VERSION
 
-version 5.030
+version 5.031
 
 =head1 SYNOPSIS
 
@@ -143,21 +143,26 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
-      - name: Install cpanminus
+      - name: Install cpm
         run: |
-          curl https://cpanmin.us/ > /tmp/cpanm
-          chmod u+x /tmp/cpanm
+          curl https://raw.githubusercontent.com/skaji/cpm/main/cpm > /tmp/cpm
+          chmod u+x /tmp/cpm
       - name: Install Dist::Zilla
-        run: sudo apt-get install -y libdist-zilla-perl
-      - name: Install prereqs
-        # This could probably be made more efficient by looking at what it's
-        # installing via cpanm that could, instead, be installed from apt.  I
-        # may do that later, but for now, it's fine! -- rjbs, 2023-01-07
+        run: sudo apt-get install -y libdist-zilla-perl libdist-zilla-plugin-git-perl libpod-weaver-perl
+      - name: Install authordeps
         run: |
           dzil authordeps --missing > /tmp/deps-phase-1.txt
-          /tmp/cpanm --notest -S < /tmp/deps-phase-1.txt
-          dzil listdeps --author --missing >> /tmp/deps-phase-2.txt
-          /tmp/cpanm --notest -S < /tmp/deps-phase-2.txt
+          echo "---BEGIN AUTHORDEPS---"
+          cat /tmp/deps-phase-1.txt
+          echo "---END AUTHORDEPS---"
+          sudo /tmp/cpm install -g - < /tmp/deps-phase-1.txt
+      - name: Install missing prereqs
+        run: |
+          dzil listdeps --author --missing > /tmp/deps-phase-2.txt
+          echo "---BEGIN PREREQS---"
+          cat /tmp/deps-phase-2.txt
+          echo "---END PREREQS---"
+          sudo /tmp/cpm install -g - < /tmp/deps-phase-2.txt
       - name: Build tarball
         run: |
           dzil build --in Dist-To-Test
@@ -195,14 +200,12 @@ jobs:
         run: tar zxvf Dist-To-Test.tar.gz
       - name: Install dependencies
         working-directory: ./Dist-To-Test
-        run: cpanm --installdeps --notest .
+        run: cpm install -g
       - name: Makefile.PL
         working-directory: ./Dist-To-Test
         run: perl Makefile.PL
       - name: Install yath
-        run: cpanm --notest Test2::Harness
-      - name: Install testing libraries
-        run: cpanm --notest Test2::Harness::Renderer::JUnit
+        run: cpm install -g Test2::Harness Test2::Harness::Renderer::JUnit
       - name: Run the tests
         working-directory: ./Dist-To-Test
         run: |

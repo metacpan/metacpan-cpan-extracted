@@ -4,13 +4,13 @@
       "Peter Karman <perl@peknet.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "SWISH-3",
    "no_index" : {
@@ -43,11 +43,11 @@
       "bugtracker" : {
          "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=SWISH-3"
       },
-      "homepage" : "http://dev.swish-e.org/wiki/swish3",
+      "homepage" : "https://dezi.org/swish3/",
       "repository" : {
-         "url" : "http://svn.swish-e.org/libswish3"
+         "url" : "https://github.com/karpet/libswish3"
       }
    },
-   "version" : "1.000015",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.000016",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,3 +1,5 @@
+# Fix build with rpm-4.20:
+%global debug_package %{nil}
 Summary: various2
 Name: various2
 Version: 1

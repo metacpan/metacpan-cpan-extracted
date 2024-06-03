@@ -1,3 +1,5 @@
+# Fix build with rpm-4.20:
+%global debug_package %{nil}
 %define foobar /etc/foo \
                /etc/bar
 

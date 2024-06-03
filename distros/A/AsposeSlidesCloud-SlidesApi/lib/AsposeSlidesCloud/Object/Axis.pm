@@ -38,6 +38,7 @@ use Date::Parse;
 use DateTime;
 
 use AsposeSlidesCloud::Object::ChartLinesFormat;
+use AsposeSlidesCloud::Object::ChartTitle;
 use AsposeSlidesCloud::Object::EffectFormat;
 use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::LineFormat;
@@ -105,6 +106,13 @@ __PACKAGE__->method_documentation({
     	datatype => 'boolean',
     	base_name => 'HasTitle',
     	description => 'True if the axis has a visible title',
+    	format => '',
+    	read_only => '',
+    		},
+    'title' => {
+    	datatype => 'ChartTitle',
+    	base_name => 'Title',
+    	description => 'Axis title',
     	format => '',
     	read_only => '',
     		},
@@ -365,6 +373,7 @@ __PACKAGE__->method_documentation({
 __PACKAGE__->swagger_types( {
     'is_visible' => 'boolean',
     'has_title' => 'boolean',
+    'title' => 'ChartTitle',
     'position' => 'string',
     'display_unit' => 'string',
     'base_unit_scale' => 'string',
@@ -406,6 +415,7 @@ __PACKAGE__->swagger_types( {
 __PACKAGE__->attribute_map( {
     'is_visible' => 'IsVisible',
     'has_title' => 'HasTitle',
+    'title' => 'Title',
     'position' => 'Position',
     'display_unit' => 'DisplayUnit',
     'base_unit_scale' => 'BaseUnitScale',

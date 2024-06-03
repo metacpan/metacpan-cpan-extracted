@@ -31,11 +31,11 @@ Text::Amuse::Compile - Compiler for Text::Amuse
 
 =head1 VERSION
 
-Version 1.89
+Version 1.90
 
 =cut
 
-our $VERSION = '1.89';
+our $VERSION = '1.90';
 
 =head1 SYNOPSIS
 

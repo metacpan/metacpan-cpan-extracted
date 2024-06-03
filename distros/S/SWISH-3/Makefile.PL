@@ -205,18 +205,18 @@ WriteMakefile(
     OBJECT => '$(O_FILES)',    # links libswish3.o with XS
 
     ( $MM_Version >= 6.48 ? ( MIN_PERL_VERSION => '5.8.3' ) : () ),
-    ( $MM_Version >= 6.31 ? ( LICENSE          => 'GPL2' )  : () ),
+    ( $MM_Version >= 6.31 ? ( LICENSE          => 'gpl_2' )  : () ),
     (   $MM_Version <= 6.44 ? ()
         :
 
             (
             META_MERGE => {
                 resources => {
-                    license  => 'GPL2',
-                    homepage => 'http://dev.swish-e.org/wiki/swish3',
+                    license  => 'gpl_2',
+                    homepage => 'https://dezi.org/swish3/',
                     bugtracker =>
                         'http://rt.cpan.org/NoAuth/Bugs.html?Dist=SWISH-3',
-                    repository => 'http://svn.swish-e.org/libswish3',
+                    repository => 'https://github.com/karpet/libswish3',
                 },
             }
             )

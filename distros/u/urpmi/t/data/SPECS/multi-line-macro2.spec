@@ -1,3 +1,5 @@
+# Fix build with rpm-4.20:
+%global debug_package %{nil}
 %define foobar echo foo > $RPM_BUILD_ROOT/etc/foo \
                echo bar > $RPM_BUILD_ROOT/etc/bar
 

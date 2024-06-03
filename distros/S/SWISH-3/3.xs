@@ -177,13 +177,14 @@ slurp(self, filename, ...)
         else {
             buf = swish_io_slurp_file_len((xmlChar*)filename, buflen, binmode);
         }
-        RETVAL = newSV(0);
-        // warn("%s re-using SV with strlen %d\n", filename, (int)buflen);
         if (buf[buflen] != '\0') {
             croak("Buffer was not NUL-terminated (buflen=%d)\n", (int)buflen);
         }
-        sv_usepvn_flags(RETVAL, (char*)buf, buflen, SV_SMAGIC | SV_HAS_TRAILING_NUL);
-        swish_memcount_dec(); // must do manually since Perl will free() buf
+        // copy our buf into a new SV
+        // this is somewhat inefficient in terms of malloc/free, but re-using our pointer
+        // is buggy on some Perls.
+        RETVAL = newSVpvn(buf, buflen);
+        swish_xfree(buf);
 
     OUTPUT:
         RETVAL

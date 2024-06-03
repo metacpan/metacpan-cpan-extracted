@@ -1,5 +1,8 @@
 Revision history for Tk::DynaMouseWheelBind
 
+0.03 Mon Jun 03 2024
+	-fixed error: Can't call method "XEvent" on an undefined value
+
 0.02 Tue May 21 2024
 	-added missing prerequisite Test::Tk
 

@@ -1,5 +1,7 @@
 # For CPAN testers that run FreeBSD:
 %global __brp_strip_static_archive %nil
+# Fix build with rpm-4.20:
+%global debug_package %{nil}
 
 Summary: arch_to_noarch
 Name: arch_to_noarch

@@ -135,7 +135,7 @@ void *alloca (size_t);
 #include <libxml/xmlstring.h>
 #endif
 
-#define SWISH_LIB_VERSION           "1.0.2480a0b"
+#define SWISH_LIB_VERSION           "1.0.424c228"
 #define SWISH_VERSION               "3.0.0"
 #define SWISH_BUFFER_CHUNK_SIZE     16384
 #define SWISH_TOKEN_LIST_SIZE       1024
@@ -5306,7 +5306,7 @@ mystartElementNs(
             }
             j += 2;
         }
-        atts[j] = NULL;
+        atts[j] = '\0';
     }
 
     if (SWISH_DEBUG & SWISH_DEBUG_PARSER) {
@@ -6950,11 +6950,7 @@ html_parser(
     xmlInitParser();
 
     ctxt = htmlCreateMemoryParserCtxt((const char *)buffer, xmlStrlen(buffer));
-
-    if (ctxt == 0) {
-        return (0);
-    }
-
+    
     parser_data->ctxt = ctxt;
 
     if (parser_data->docinfo->encoding != NULL) {
@@ -6978,6 +6974,10 @@ html_parser(
     }
     */
 
+    if (ctxt == 0) {
+        return (0);
+    }
+    
     if (sax != 0) {
         oldsax = ctxt->sax;
         ctxt->sax = (htmlSAXHandlerPtr) sax;

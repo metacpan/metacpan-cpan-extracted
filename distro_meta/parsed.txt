@@ -92326,3 +92326,16 @@ S/SB/SBECK/Locale-Codes-3.79.tar.gz
 N/NH/NHORNE/Locale-Places-0.12.tar.gz
 K/KU/KUERBIS/Term-Choose-Util-0.142.tar.gz
 E/ET/ETHER/Test-JSON-Schema-Acceptance-1.025.tar.gz
+A/AS/ASPOSE/AsposeSlidesCloud-SlidesApi-24.05.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000649.tar.gz
+R/RJ/RJBS/Dist-Zilla-PluginBundle-RJBS-5.031.tar.gz
+P/PE/PERLANCAR/Graphics-ColorNamesCMYK-All-0.001.tar.gz
+B/BR/BRTASTIC/Kelp-1.07.tar.gz
+B/BR/BRTASTIC/Kelp-Module-Beam-Wire-1.00.tar.gz
+J/JJ/JJATRIA/OpenTelemetry-0.023.tar.gz
+K/KI/KIMOTO/SPVM-IO-0.218.tar.gz
+K/KI/KIMOTO/SPVM-Sys-0.520.tar.gz
+K/KA/KARMAN/SWISH-3-1.000016.tar.gz
+M/ME/MELMOTHX/Text-Amuse-Compile-1.90.tar.gz
+H/HA/HANJE/Tk-DynaMouseWheelBind-0.03.tar.gz
+T/TV/TVIGNAUD/urpmi-v8.133.1.tgz

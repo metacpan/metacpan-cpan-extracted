@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-RJBS
 
+5.031     2024-06-02 22:11:00-04:00 America/New_York
+        - update "dzil workflower" to install prereqs with cpm, not cpanm
+
 5.030     2024-05-29 08:20:18-04:00 America/New_York
         - update "dzil workflower" to use v4 of mikepenz/action-junit-report
 

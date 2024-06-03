@@ -1,7 +1,7 @@
 package OpenTelemetry::Integration::DBI;
 # ABSTRACT: OpenTelemetry integration for DBI
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 use strict;
 use warnings;
@@ -110,7 +110,7 @@ sub install ( $class, %options ) {
         goto $wrapper;
     };
 
-    $DO = \&DBI::st::execute;
+    $DO = \&DBI::st::do;
     install_modifier 'DBI::db' => around => do => sub {
         my ( undef, $dbh, $sql ) = @_;
         unshift @_, $dbh, $sql;

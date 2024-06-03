@@ -915,7 +915,7 @@ sub latex {
 \renewcommand*\thefootnoteB{(\arabic{footnoteB})}
 [% END %]
 [% END %]
-\deffootnote[3em]{0em}{4em}{\textsuperscript{\thefootnotemark}~}
+\deffootnote[3em]{0em}{3em}{\textsuperscript{\thefootnotemark}~}
 
 [% UNLESS safe_options.sansfontsections %]
 \addtokomafont{disposition}{\rmfamily}

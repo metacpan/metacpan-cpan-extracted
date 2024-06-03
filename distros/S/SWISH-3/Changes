@@ -1,5 +1,8 @@
 Revision history for SWISH::3, libswish3 Perl bindings.
 
+1.000016 xxx
+ - slurp() now creates new SV with copy of C string rather than re-using C pointer.
+
 1.000015 01 April 2017
  - segfault fix in libswish3.c via https://github.com/karpet/libswish3/pull/1
  - fix Perl test failures related to null-termination of re-used char* pointer in SV*.

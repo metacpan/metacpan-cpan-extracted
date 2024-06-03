@@ -37,6 +37,9 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
+use AsposeSlidesCloud::Object::EffectFormat;
+use AsposeSlidesCloud::Object::FillFormat;
+use AsposeSlidesCloud::Object::LineFormat;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -97,10 +100,59 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
-    'has_title' => {
+    'x' => {
+    	datatype => 'double',
+    	base_name => 'X',
+    	description => 'the X location',
+    	format => '',
+    	read_only => '',
+    		},
+    'y' => {
+    	datatype => 'double',
+    	base_name => 'Y',
+    	description => 'the Y location',
+    	format => '',
+    	read_only => '',
+    		},
+    'width' => {
+    	datatype => 'double',
+    	base_name => 'Width',
+    	description => 'Width',
+    	format => '',
+    	read_only => '',
+    		},
+    'height' => {
+    	datatype => 'double',
+    	base_name => 'Height',
+    	description => 'Height',
+    	format => '',
+    	read_only => '',
+    		},
+    'overlay' => {
     	datatype => 'boolean',
-    	base_name => 'HasTitle',
-    	description => 'Get or sets value determines visibility of title',
+    	base_name => 'Overlay',
+    	description => 'true if other elements are allowed to overlay the legend',
+    	format => '',
+    	read_only => '',
+    		},
+    'fill_format' => {
+    	datatype => 'FillFormat',
+    	base_name => 'FillFormat',
+    	description => 'Get or sets the fill format.',
+    	format => '',
+    	read_only => '',
+    		},
+    'effect_format' => {
+    	datatype => 'EffectFormat',
+    	base_name => 'EffectFormat',
+    	description => 'Get or sets the effect format.',
+    	format => '',
+    	read_only => '',
+    		},
+    'line_format' => {
+    	datatype => 'LineFormat',
+    	base_name => 'LineFormat',
+    	description => 'Get or sets the line format.',
     	format => '',
     	read_only => '',
     		},
@@ -108,12 +160,26 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'text' => 'string',
-    'has_title' => 'boolean'
+    'x' => 'double',
+    'y' => 'double',
+    'width' => 'double',
+    'height' => 'double',
+    'overlay' => 'boolean',
+    'fill_format' => 'FillFormat',
+    'effect_format' => 'EffectFormat',
+    'line_format' => 'LineFormat'
 } );
 
 __PACKAGE__->attribute_map( {
     'text' => 'Text',
-    'has_title' => 'HasTitle'
+    'x' => 'X',
+    'y' => 'Y',
+    'width' => 'Width',
+    'height' => 'Height',
+    'overlay' => 'Overlay',
+    'fill_format' => 'FillFormat',
+    'effect_format' => 'EffectFormat',
+    'line_format' => 'LineFormat'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

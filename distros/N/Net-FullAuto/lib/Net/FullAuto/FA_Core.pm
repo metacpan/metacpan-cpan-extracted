@@ -8296,7 +8296,7 @@ sub master_transfer_dir
          }
       }
       my ($output1,$output2)=&File_Transfer::get_drive(
-            '/tmp','Destination',$localhost,"__Master_${$}__");
+            'tmp','Destination',$localhost,"__Master_${$}__");
       if ($output1) {
          $work_dirs->{_tmp}=$output1;
          $work_dirs->{_tmp_mswin}=$output2;
@@ -8311,7 +8311,7 @@ sub master_transfer_dir
          return $work_dirs;
       }
       ($output1,$output2)=&File_Transfer::get_drive(
-            '/temp','Destination',$localhost,"__Master_${$}__");
+            'temp','Destination',$localhost,"__Master_${$}__");
       if ($output1) {
          $work_dirs->{_tmp}=$output1;
          $work_dirs->{_tmp_mswin}=$output2;
@@ -16824,6 +16824,7 @@ sub work_dirs
       return $work_dirs;
    }
    if ($cmd_handle->{_uname} eq 'cygwin') {
+	   print "DO WE GET HERE\n";sleep 10;
       (${$work_dirs}{_tmp},${$work_dirs}{_tmp_mswin})
          =&File_Transfer::get_drive(
             'temp','Temp',
@@ -18173,7 +18174,7 @@ print $Net::FullAuto::FA_Core::LOG "File_Transfer::lcd() PATH=$path<==\n" if -1<
 
 sub get
 {
-print "GET CALLER=",caller,"\n";sleep 3;
+
    my @topcaller=caller;
    print "File_Transfer::get() CALLER=",
       (join ' ',@topcaller),"\n" if $Net::FullAuto::FA_Core::debug;
@@ -23202,7 +23203,7 @@ sub get_drive
    ($folder,$base_or_dest,$cmd_handle,$hostlabel)=@_;
    $cmd_handle||='';
    my ($output,$stderr)=('','');
-   my @drvs=();my $dir='';
+   my %drvs=();my $dir='';
    my $drvs='';my $ms_dir='';
    if (exists $Net::FullAuto::FA_Core::drives{$hostlabel}) {
       $drvs=$Net::FullAuto::FA_Core::drives{$hostlabel};
@@ -23218,6 +23219,9 @@ sub get_drive
       }
       $Net::FullAuto::FA_Core::drives{$hostlabel}=$drvs;
    }
+   my $die="Cannot Locate Directory $folder\n"
+          ."       Anywhere on Local $base_or_dest Host "
+          ."$Net::FullAuto::FA_Core::Local_HostName\n";
    foreach my $drv (split /\s*/, $drvs) {
       last unless $drv;
       if ($cmd_handle) {
@@ -23225,34 +23229,68 @@ sub get_drive
             $cmd_handle,
             $cmd_handle->{_cygdrive}."/$drv/$folder/");
          if ($result ne 'NODIR') {
-            push @drvs, "$drv:\\";
+            $drvs{"$drv:"}="$drv:\\";
          }
       }
    }
-   if (-1<$#drvs) {
+   if (keys %drvs) {
       my ($stdout,$stderr)=$cmd_handle->cmd('df');
       my %avail=();my $cygloc='';
+      my ($drv,$blks,$used,$avail,$use,$mnted)=
+            ('','','','','','');
       if ($stdout) {
-         my %avail=();
          foreach my $line (split /\n/, $stdout) {
             next unless $line=~/^.:/;
-            my ($drv,$blks,$used,$avail,$use,$mnted)=
+            ($drv,$blks,$used,$avail,$use,$mnted)=
                split / +/,$line;
+	    my $dr=substr($drv,0,2);
             $cygloc=$drv if 2<length $drv;
-            $avail{$avail}=[$drv,$mnted];
+	    next unless exists $drvs{lc($dr)};
+            $avail{$avail}=[$dr,$mnted];
          }
          my @avail=sort keys %avail;
-         if ($cygloc=~/^$avail{$avail[0]}->[0]/) {
+         if (keys %avail && $cygloc=~/^$avail{$avail[0]}->[0]/) {
             my $result=&Net::FullAuto::FA_Core::test_dir(
-               $cmd_handle,"$cygloc$folder");
+               $cmd_handle,"$cygloc/$folder");
             if ($result=~/WRITE/s) {
-               $folder="$cygloc$folder";
+               $folder="$cygloc/$folder";
             } else {
-               $folder=$avail{$avail[0]}->[1].$folder;
+               my $result=&Net::FullAuto::FA_Core::test_dir(
+                  $cmd_handle,
+                  "$cygloc/tmp/");
+               if ($result eq 'WRITE') {
+                  $folder="$cygloc/tmp/";
+               } else {
+                  &Net::FullAuto::FA_Core::handle_error($die)
+                  unless wantarray;
+                  return '',$die;
+	       } 
             }
-         } else {
-            $folder=$avail{$avail[0]}->[1].$folder;
-         }
+         } elsif (keys %avail && exists $drvs{lc($avail{$avail[0]}->[0])}) {
+            $folder=lc($avail{$avail[0]}->[1]).'/'.$folder;
+         } elsif ($cygloc=~/$drv/i) {
+            my $result=&Net::FullAuto::FA_Core::test_dir(
+               $cmd_handle,
+               "$cygloc/$folder/");
+            if ($result eq 'WRITE') {
+	       $folder="$cygloc/$folder/";
+            } else {
+               &Net::FullAuto::FA_Core::handle_error($die)
+               unless wantarray;
+               return '',$die;
+            }
+         } elsif (exists $drvs{lc(substr($cygloc,0,2))}) {
+            my $result=&Net::FullAuto::FA_Core::test_dir(
+               $cmd_handle,
+               "$cygloc/tmp/");
+            if ($result eq 'WRITE') {
+               $folder="$cygloc/tmp/";
+            } else {
+               &Net::FullAuto::FA_Core::handle_error($die)
+               unless wantarray;
+               return '',$die;
+            }
+	 }
          ($ms_dir,$stderr)=$localhost->cmd(
             "cygpath -w \"$folder\"",'__delay__=20');
          $ms_dir=~s/\\/\\\\/g unless $stderr;
@@ -23260,9 +23298,6 @@ sub get_drive
          &handle_error($stderr,'-1');
       }
    } else {
-      my $die="Cannot Locate Directory $folder\n"
-             ."       Anywhere on Local $base_or_dest Host "
-             ."$Net::FullAuto::FA_Core::Local_HostName\n";
       &Net::FullAuto::FA_Core::handle_error($die)
          unless wantarray;
       return '',$die;

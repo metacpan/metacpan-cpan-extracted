@@ -25379,6 +25379,7 @@ sub import_from_html {
 # 
 # @param string $name Document name. (required)
 # @param File $pdf PDF data. (required)
+# @param PdfImportOptions $options Import options. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -25393,6 +25394,11 @@ sub import_from_html {
         data_type => 'File',
         description => 'PDF data.',
         required => '1',
+    },
+    'options' => {
+        data_type => 'PdfImportOptions',
+        description => 'Import options.',
+        required => '0',
     },
     'password' => {
         data_type => 'string',
@@ -25473,6 +25479,11 @@ sub import_from_pdf {
     if ( exists $args{'pdf'} && $args{'pdf'}) {
         push(@$files, $args{'pdf'});
     }
+    # body params
+    if ( exists $args{'options'} && $args{'options'}) {
+        $_body_data = $args{'options'};
+    }
+
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,

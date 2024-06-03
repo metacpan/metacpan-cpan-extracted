@@ -1,9 +1,15 @@
-Version 8.133 - 31 May 2023
+Version 8.133.1 - 2 June 2024
+
+- testsuite:
+  o list some missing spec files in MANIFEST
+  o Fix building test pkgs with rpm-4.20
+
+Version 8.133 - 31 May 2024
 
 - testsuite:
   o use a more generic compiler for cpan testers
 
-Version 8.132 - 29 May 2023
+Version 8.132 - 29 May 2024
 
 - Set wget as default downloader (mga#24362) 
 - testsuite:

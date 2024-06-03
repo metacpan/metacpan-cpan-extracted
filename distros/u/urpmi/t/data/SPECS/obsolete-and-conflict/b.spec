@@ -6,6 +6,8 @@ License: x
 Provides: a > 1
 Obsoletes: a <= 1
 Requires: c
+# Fix build with rpm-4.20:
+BuildArch: noarch
 
 %description
 x

@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.90 2024-06-03
+
+ - Correct komascript setup for multiparagraph footnotes
+
 1.89 2024-04-01
 
  - Add a timeout to latex/xindy run
