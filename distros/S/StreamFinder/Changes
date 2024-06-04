@@ -640,8 +640,16 @@ Revision history for StreamFinder
         URL.
         - docs - Remove StreamFinder::Google (removed in v2.30) from supported 
         podcast list.
-2.32    
+2.32    2024/05/18
         - Welcome epochtimes.com/epochtv videos by adding 
         StreamFinder::EpochTV.  Site was previously supported by youtube-dl, 
         but was often missing some metadata & often returned wrong HLS stream 
         quality, particularly for users with limited bandwidth.
+2.33    2024/06/03
+        - StreamFinder::Brighteon - Redo to handle their redesigned site (which 
+        now requires JavaScript in order to view pages).  Channel pages are no 
+        longer scrapable (so no more video playlist or fetching latest video), 
+        but individual video pages still contain all the same data embedded 
+        in Json format (at least for now).
+        - StreamFinder::EpochTV - Few minor tweaks to try harder to fetch 
+        streams, the artist, the artist's channel icon, and the year.

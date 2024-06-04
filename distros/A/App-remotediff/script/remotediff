@@ -2,6 +2,7 @@
 #
 # remotediff - remote diff over rsync
 #
+# 2024.06.03 v1.15 jul : replace "." with absolute path
 # 2024.05.28 v1.14 jul : fixed cleanup bug when basename contained dot
 # 2022.11.14 v1.13 jul : bypass test for solaris
 # 2022.11.08 v1.12 jul : fixed cleanup crash bug
@@ -17,9 +18,9 @@ use Getopt::Std;
 use File::Basename;
 use File::Temp qw(tempdir);
 use File::Path qw(make_path remove_tree);
-use Cwd qw(abs_path);
+use Cwd qw(abs_path cwd);
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 my $program  = basename($0);
 my $usage    = <<EOF;
 
@@ -42,6 +43,10 @@ EOF
 die $usage if @ARGV < 2;
 my $opts = @ARGV > 2 ? join(' ', splice(@ARGV,0,@ARGV-2)) : "";
 die $usage if $ARGV[0] =~ /\.\./ or $ARGV[1] =~ /\.\./;
+
+# replace "." with absolute path
+$ARGV[0] = cwd() if $ARGV[0] eq ".";
+$ARGV[1] = cwd() if $ARGV[1] eq ".";
 
 ########
 # MAIN #
@@ -99,7 +104,7 @@ else
 	my $base = basename($ARGV[0]);
 
 	# recreate symlink
-	make_path("$tmp/$path");
+	make_path("$tmp/$path");	
 	symlink(abs_path($ARGV[0]),"$tmp/$path/$base") or die "symlink failed : $!";
 }
 
@@ -170,6 +175,8 @@ remotediff - remote diff over rsync
 
 `remotediff` uses `rsync` to copy remote files to a tmp directory, before
 executing `diff` on them locally.
+
+The remote files are cached between program executions.
 
 `colordiff` is used if installed and STDOUT is a TTY.
 

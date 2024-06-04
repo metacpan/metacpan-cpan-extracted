@@ -1,5 +1,25 @@
 Revision history for Compression-Util
 
+0.08    2024-06-03
+
+        [ADDITIONS]
+
+        - Added the `lzb_compress()` and `lzb_decompress()` functions.
+        - Added the `lzss_encode_symbolic()` and `lzss_decode_symbolic()` functions.
+        - Added the `lzss_compress_symbolic()` and `lzss_decompress_symbolic()` functions.
+        - Added the `$LZ_MAX_DIST` variable, which controls the maximum backreference allowed in LZ parsing.
+
+        [IMPROVEMENTS]
+
+        - Better compression ratio in `lz77_compress()`.
+
+        [CHANGES]
+
+        - Renamed `bz2_compress` and `bz2_decompress` to `bwt_compress` and `bwt_decompress`, respectively.
+        - Renamed `$LZSS_MIN_LEN` to `$LZ_MIN_LEN`.
+        - Renamed `$LZSS_MAX_LEN` to `$LZ_MAX_LEN`.
+        - Removed the `$LZ77_MIN_LEN` and `$LZ77_MAX_LEN` variables. Using `$LZ_MIN_LEN` and `$LZ_MAX_LEN` instead.
+
 0.07    2024-05-12
 
         - Use the value of `$LZ_MAX_CHAIN_LEN` in `lz77_encode_symbolic()` as well.

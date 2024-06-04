@@ -1,3 +1,7 @@
+0.17 2024-06-03
+    - regexp for values which match a DateTime should be anchored to start and
+      end of string (GH#30) (djerius)
+
 0.16 2023-05-31
 - Remove when (GH#25) (Olaf Alders)
 - Test strict mode in to_toml_array() (GH#26) (Olaf Alders)

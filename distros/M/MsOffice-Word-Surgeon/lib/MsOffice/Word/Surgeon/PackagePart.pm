@@ -2,16 +2,19 @@ package MsOffice::Word::Surgeon::PackagePart;
 use 5.24.0;
 use Moose;
 use MooseX::StrictConstructor;
-use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces is_at_run_level decode_entities);
+use MsOffice::Word::Surgeon::Carp;
+use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces is_at_run_level parse_attrs decode_entities encode_entities);
 use MsOffice::Word::Surgeon::Run;
 use MsOffice::Word::Surgeon::Text;
-use XML::LibXML;
+use MsOffice::Word::Surgeon::Field;
+use MsOffice::Word::Surgeon::BookmarkBoundary;
+use XML::LibXML                    ();;
 use List::Util                     qw(max);
-use Carp::Clan                     qw(^MsOffice::Word::Surgeon); # will import carp, croak, etc.
-
+use match::simple                  qw(match);
 
 # syntactic sugar for attributes
 sub has_inner ($@) {my $attr = shift; has($attr => @_, lazy => 1, builder => "_$attr", init_arg => undef)}
+
 
 # constant integers to specify indentation modes -- see L<XML::LibXML>
 use constant XML_NO_INDENT     => 0;
@@ -19,18 +22,15 @@ use constant XML_SIMPLE_INDENT => 1;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.05';
-
+our $VERSION = '2.06';
 
 #======================================================================
 # ATTRIBUTES
 #======================================================================
 
-
 # attributes passed to the constructor
 has       'surgeon'        => (is => 'ro', isa => 'MsOffice::Word::Surgeon', required => 1, weak_ref => 1);
 has       'part_name'      => (is => 'ro', isa => 'Str',                     required => 1);
-
 
 # attributes constructed by the module -- not received through the constructor
 has_inner 'contents'       => (is => 'rw', isa => 'Str',      trigger => \&_on_new_contents);
@@ -55,7 +55,6 @@ my %noise_reduction_regexes = (
   empty_run_props        => qr(<w:rPr></w:rPr>),
   soft_hyphens           => qr(<w:softHyphen/>),
  );
-
 my @noise_reduction_list = qw/proof_checking revision_ids
                               complex_script_bold page_breaks language
                               empty_run_props soft_hyphens/;
@@ -81,10 +80,9 @@ sub _runs {
     </w:t>                            # closing tag for text
   ]x;
 
-
   # split XML content into run fragments
   my $contents      = $self->contents;
-  my @run_fragments = split m[$run_regex], $contents, -1;
+  my @run_fragments = split m[$run_regex], $contents, -1; # -1 : don't strip trailing items
   my @runs;
 
   # build internal RUN objects
@@ -93,7 +91,7 @@ sub _runs {
     $run_contents //= '';
 
     # split XML of this run into text fragmentsn
-    my @txt_fragments = split m[$txt_regex], $run_contents, -1;
+    my @txt_fragments = split m[$txt_regex], $run_contents, -1; # -1 : don't strip trailing items
     my @texts;
 
     # build internal TEXT objects
@@ -180,11 +178,11 @@ sub _on_new_contents {
 }
 
 #======================================================================
-# METHODS
+# GENERAL METHODS
 #======================================================================
 
 
-sub  _rels_xml {
+sub  _rels_xml { # rw accessor
   my ($self, $new_xml) = @_;
   my $rels_name = sprintf "word/_rels/%s.xml.rels", $self->part_name;
   return $self->surgeon->xml_member($rels_name, $new_xml);
@@ -202,20 +200,6 @@ sub original_contents {
 
   return $self->surgeon->xml_member($self->zip_member_name);
 }
-
-
-sub image {
-  my ($self, $title, $new_image_content) = @_;
-
-  # name of the image file within the zip
-  my $zip_member_name = $self->images->{$title}
-                     || ($title =~ /^\d+$/ ? "word/media/image$title.png"
-                                           : die "couldn't find image '$title'");
-
-  # delegate to Archive::Zip::contents
-  return $self->surgeon->zip->contents($zip_member_name, $new_image_content);
-}
-
 
 
 #======================================================================
@@ -252,8 +236,6 @@ sub plain_text {
 }
 
 
-
-
 #======================================================================
 # MODIFYING CONTENTS
 #======================================================================
@@ -264,21 +246,20 @@ sub cleanup_XML {
   # avoid doing it twice
   return if $self->{was_cleaned_up};
 
-  # do the cleanup
+  # start the cleanup
   $self->reduce_all_noises;
-  my $names_of_ASK_fields = $self->unlink_fields;
-  $self->suppress_bookmarks(@$names_of_ASK_fields);
+
+  # remember the names of ASK fields before erasing them
+  my $contents            = $self->contents;
+  my @names_of_ASK_fields = $contents =~ m[<w:instrText[^>]+?>\s+ASK\s+(\w+)]g;
+
+  # unlink fields, suppress bookmarks (and suppress content of ASK bookmarks), merge runs
+  $self->unlink_fields;
+  $self->suppress_bookmarks(full_range => \@names_of_ASK_fields, markup_only => qr/./);
   $self->merge_runs(@merge_args);
 
-  # remember it was done
+  # flag the fact that the cleanup was done
   $self->{was_cleaned_up} = 1;
-}
-
-sub noise_reduction_regex {
-  my ($self, $regex_name) = @_;
-  my $regex = $noise_reduction_regexes{$regex_name}
-    or croak "->noise_reduction_regex('$regex_name') : unknown regex name";
-  return $regex;
 }
 
 sub reduce_noise {
@@ -294,118 +275,17 @@ sub reduce_noise {
   $self->contents($contents);
 }
 
+sub noise_reduction_regex {
+  my ($self, $regex_name) = @_;
+  my $regex = $noise_reduction_regexes{$regex_name}
+    or croak "->noise_reduction_regex('$regex_name') : unknown regex name";
+  return $regex;
+}
+
 sub reduce_all_noises {
   my $self = shift;
 
   $self->reduce_noise(@noise_reduction_list);
-}
-
-
-
-sub _split_into_bookmark_nodes {
-  my ($self, $xml) = @_;
-
-  # regex to find bookmark tags
-  state $bookmark_rx = qr{
-     (                               # the whole tag                       -- capture 1
-      <w:bookmark(Start|End)         # kind of tag name                    -- capture 2
-        .+?                          # optional attributes (may be w:colFirst, w:colLast) -- no capture
-        w:id="(\d+)"                 # 'id' attribute, bookmark identifier -- capture 3
-        (?: \h+ w:name="([^"]+)")?   # optional 'name' attribute           -- capture 4
-        \h* />                       # end of this tag
-     )                               # end of capture 1
-    }sx;
-
-  # split the whole xml according to the regex. Captured groups are also added to the stack
-  my @xml_chunks = split /$bookmark_rx/, $xml;
-
-  # walk through the list of fragments and build a stack of hashrefs as bookmark nodes
-  my @bookmark_nodes;
-  while (my @chunk = splice @xml_chunks, 0, 5) {
-    my %node;  @node{qw/xml_before node_xml node_kind id name/} = @chunk; # initialize a node hash
-    $node{$_} //= "" for qw/xml_before node_kind node_xml/;               # empty strings instead of undef
-    push @bookmark_nodes, \%node;
-  }
-  # note : in most cases the last "node" is not really a node : it has no 'node_kind', but only 'xml_before'
-  
-  # return the stack
-  return @bookmark_nodes;
-}
-
-
-
-sub suppress_bookmarks {
-  my ($self, @names_to_erase) = @_;
-
-  # names of special bookmarks (typically ASK fields) for which the content needs to be erased
-  my %should_erase_contents = map {($_ => 1)} @names_to_erase;
-
-  # loop on bookmark nodes
-  my @bookmark_nodes = $self->_split_into_bookmark_nodes($self->contents);
-  my %node_ix_by_id;
-  while (my ($ix, $node) = each @bookmark_nodes) {
-    if ($node->{node_kind} eq 'Start') {
-      $node_ix_by_id{$node->{id}} = $ix;
-    }
-    elsif ($node->{node_kind} eq 'End') {
-      # find the corresponding bookmarkStart node
-      my $start_ix       = $node_ix_by_id{$node->{id}};
-      my $start_node     = $bookmark_nodes[$start_ix];
-      my $bookmark_name  = $start_node->{name};
-
-      # erase the start and end bookmark nodes
-      $start_node->{node_xml} = "";
-      $node->{node_xml}       = "";
-
-      # if necessary, also erase other xml between start and end
-      if ($should_erase_contents{$bookmark_name}) {
-        for my $erase_ix ($start_ix+1 .. $ix) {
-          my $local_node = $bookmark_nodes[$erase_ix];
-          !$local_node->{node_xml}
-            or die "cannot erase contents of bookmark '$bookmark_name' "
-                  . "because it contains the start of bookmark '$local_node->{name}'";
-          $local_node->{xml_before} = "";
-        }
-      }
-    }
-  }
-
-  # re-build the whole XML from all remaining fragments, and inject it back
-  my $new_contents = join "", map {@{$_}{qw/xml_before node_xml/}} @bookmark_nodes;
-  $self->contents($new_contents);
-}
-
-
-sub reveal_bookmarks {
-  my ($self, @marking_args) = @_;
-
-  # auxiliary objects
-  my $marker            = MsOffice::Word::Surgeon::PackagePart::_BookmarkMarker->new(@marking_args);
-  my $paragraph_tracker = MsOffice::Word::Surgeon::PackagePart::_ParaTracker->new;
-
-  # loop over bookmark nodes
-  my @bookmark_name_by_id;
-
-  my @bookmark_nodes    = $self->_split_into_bookmark_nodes($self->contents);
-  foreach my $node (@bookmark_nodes) {
-
-    # count opening and closing paragraphs in xml before this node
-    $paragraph_tracker->count_paragraphs($node->{xml_before});
-
-    # add visible runs before or after bookmark nodes
-    if ($node->{node_kind} eq 'Start') {
-      $bookmark_name_by_id[$node->{id}] = $node->{name};
-      substr $node->{node_xml}, 0, 0, $paragraph_tracker->maybe_add_paragraph($marker->mark($node->{name}, 0));
-    }
-    elsif ($node->{node_kind} eq 'End') {
-      my $bookmark_name  = $bookmark_name_by_id[$node->{id}];
-      $node->{node_xml} .= $paragraph_tracker->maybe_add_paragraph($marker->mark($bookmark_name, 1));
-    }
-  }
-
-  # re-build the whole XML and inject it back
-  my $new_contents = join "", map {@{$_}{qw/xml_before node_xml/}} @bookmark_nodes;
-  $self->contents($new_contents);
 }
 
 
@@ -440,33 +320,6 @@ sub merge_runs {
   # reassemble the whole stuff and inject it as new contents
   $self->contents(join "", map {$_->as_xml} @new_runs);
 }
-
-
-
-sub unlink_fields {
-  my $self = shift;
-
-  # must find out what are the ASK fields before erasing the markup
-  state $ask_field_rx = qr[<w:instrText[^>]+?>\s+ASK\s+(\w+)];
-  my $contents            = $self->contents;
-  my @names_of_ASK_fields = $contents =~ /$ask_field_rx/g;
-
-
-  # regexes to remove field nodes and "field instruction" nodes
-  state $field_instruction_txt_rx = qr[<w:instrText.*?</w:instrText>];
-  state $field_boundary_rx        = qr[<w:fldChar
-                                         (?:  [^>]*?/>                 # ignore all attributes until end of node ..
-                                            |                          # .. or
-                                              [^>]*?>.*?</w:fldChar>)  # .. ignore node content until closing tag
-                                      ]x;   # field boundaries are encoded as  "begin" / "separate" / "end"
-  state $simple_field_rx          = qr[</?w:fldSimple[^>]*>];
-
-  # apply the regexes
-  $self->reduce_noise($field_instruction_txt_rx, $field_boundary_rx, $simple_field_rx);
-
-  return \@names_of_ASK_fields;
-}
-
 
 sub replace {
   my ($self, $pattern, $replacement_callback, %replacement_args) = @_;
@@ -506,13 +359,316 @@ sub replace {
   return $xml;
 }
 
-
 sub _update_contents_in_zip { # called for each part before saving the zip file
   my $self = shift;
 
   $self->surgeon->xml_member($self->zip_member_name, $self->contents)
     if $self->{contents_has_changed};
 }
+
+
+
+#======================================================================
+# OPERATIONS ON BOOKMARKS
+#======================================================================
+
+sub bookmark_boundaries {
+  my ($self) = @_;
+
+  # regex to find bookmark tags
+  state $bookmark_rx = qr{
+     (                               # $1: the whole tag
+      <w:bookmark(Start|End)         # $2: kind of bookmark boundary
+        \h* ([^>]*?)                 # $3: node attributes
+      />                             # end of tag
+     )                               # end of capture 1
+    }sx;
+
+  # split the whole xml according to the regex. Captured groups are also added to the list
+  my @xml_chunks = split /$bookmark_rx/, $self->contents;
+  my $final_xml  = pop @xml_chunks;
+
+  # walk through the list of fragments and build BookmarkBoundary objects
+  my @bookmark_boundaries;
+  while (my @chunk = splice @xml_chunks, 0, 4) {
+    my %bkmk_args;  @bkmk_args{qw/xml_before node_xml kind attrs/} = @chunk;
+    my %attrs        = parse_attrs(delete $bkmk_args{attrs} // "");
+    $bkmk_args{id}   = $attrs{'w:id'};
+    $bkmk_args{name} = $attrs{'w:name'} if $attrs{'w:name'};
+    push @bookmark_boundaries, MsOffice::Word::Surgeon::BookmarkBoundary->new(%bkmk_args);
+  }
+
+  return wantarray ? (\@bookmark_boundaries, $final_xml) : \@bookmark_boundaries;
+}
+
+
+
+sub suppress_bookmarks {
+  my ($self, %options) = @_;
+
+  # check if options are valid and supply defaults
+  my @invalid_opt = grep {!/^(full_range|markup_only)$/} keys %options;
+  croak "suppress_bookmarks: invalid options: " . join(", ", @invalid_opt) if @invalid_opt;
+  %options = (markup_only => qr/./) if ! keys %options;
+
+  # parse bookmark boundaries
+  my ($bookmark_boundaries, $final_xml) = $self->bookmark_boundaries;
+  
+  # loop on bookmark boundaries
+  my %boundary_ix_by_id;
+  while (my ($ix, $boundary) = each @$bookmark_boundaries) {
+
+    # for starting boundaries, just remember the starting index
+    if ($boundary->kind eq 'Start') {
+      $boundary_ix_by_id{$boundary->id} = $ix;
+    }
+
+    # for ending boundaries, do the suppression
+    elsif ($boundary->kind eq 'End') {
+
+      # try to find the corresponding bookmarkStart node. 
+      my $start_ix = $boundary_ix_by_id{$boundary->id};
+
+      # if not found, this is because the start was within a field that has been erased. So just clear the bookmarkEnd
+      if (!defined $start_ix) {
+        $boundary->node_xml("");
+      }
+
+      # if found, do the normal suppression
+      else {
+        my $bookmark_start      = $bookmark_boundaries->[$start_ix];
+        my $bookmark_name       = $bookmark_start->name;
+        my $should_erase_markup = match($bookmark_name, $options{markup_only});
+        my $should_erase_range  = match($bookmark_name, $options{full_range});
+        if ($should_erase_markup || $should_erase_range) {
+
+          # erase markup (start and end bookmarks)
+          $_->node_xml("") for $boundary, $bookmark_start;
+
+          # if required, also erase inner range
+          if ($should_erase_range) {
+            for my $erase_ix ($start_ix+1 .. $ix) {
+              my $inner_boundary = $bookmark_boundaries->[$erase_ix];
+              !$inner_boundary->node_xml
+                or die "cannot erase contents of bookmark '$bookmark_name' "
+                . "because it contains the start of bookmark '". $inner_boundary->name . "'";
+              $inner_boundary->xml_before("");
+            }
+          }
+        }
+      }
+    }
+  }
+
+  # re-build the whole XML from all remaining fragments, and inject it back
+  my $new_contents = join "", (map {$_->xml_before, $_->node_xml} @$bookmark_boundaries), $final_xml;
+  $self->contents($new_contents);
+}
+
+
+ sub reveal_bookmarks {
+  my ($self, @marking_args) = @_;
+
+  # auxiliary objects
+  my $marker            = MsOffice::Word::Surgeon::PackagePart::_BookmarkMarker->new(@marking_args);
+  my $paragraph_tracker = MsOffice::Word::Surgeon::PackagePart::_ParaTracker->new;
+
+  # parse bookmark boundaries
+  my ($bookmark_boundaries, $final_xml) = $self->bookmark_boundaries;
+
+  # loop on bookmark boundaries
+  my @bookmark_name_by_id;
+  foreach my $boundary (@$bookmark_boundaries) {
+
+    # count opening and closing paragraphs in xml before this node
+    $paragraph_tracker->count_paragraphs($boundary->xml_before);
+
+    # add visible runs before or after bookmark nodes
+    if ($boundary->kind eq 'Start') {
+      $bookmark_name_by_id[$boundary->id] = $boundary->name;
+      $boundary->prepend_xml($paragraph_tracker->maybe_add_paragraph($marker->mark($boundary->name, 0)));
+    }
+    elsif ($boundary->kind eq 'End') {
+      my $bookmark_name  = $bookmark_name_by_id[$boundary->id];
+      $boundary->append_xml($paragraph_tracker->maybe_add_paragraph($marker->mark($bookmark_name, 1)));
+    }
+  }
+
+  # re-build the whole XML and inject it back
+  my $new_contents = join "", (map {$_->xml_before, $_->node_xml} @$bookmark_boundaries), $final_xml;
+  $self->contents($new_contents);
+}
+
+
+#======================================================================
+# OPERATIONS ON FIELDS
+#======================================================================
+
+sub fields {
+  my ($self) = @_;
+
+  # regex to find field nodes
+  state $field_rx = qr{
+    < w:fld                   # initial prefix for a field node
+      (Simple|Char)           # $1 : distinguish between simple fields and complex fields
+      \h* ([^>]*?)            # $2 : node attributes
+      (?:                     # either ..
+          />                  # .. the end of an empty XML element
+        |                     # or ..
+          >                   # .. the end of the opening tag
+            (.*?)             # .. $3: some node content
+          </w:fld\g1>         # .. the closing tag
+      )
+    }sx;
+
+  # split the whole xml according to the regex. Captured groups are also added to the list
+  my @xml_chunks = split /$field_rx/, $self->contents;
+  my $final_xml  = pop @xml_chunks;
+
+  # walk through the list of fragments and build a stack of field objects
+  my @field_stack;
+
+ NODE:
+  while (my @chunk = splice @xml_chunks, 0, 4) {
+
+    # initialize a node hash
+    my %node;  @node{qw/xml_before field_kind attrs node_content/} = @chunk;
+    $node{$_} //= "" for qw/xml_before field_kind attrs node_content/;
+
+    # node attributes
+    my %attrs = parse_attrs($node{attrs});
+
+    if ($node{field_kind} eq 'Simple') {
+      # for a simple field, all information is within the XML node
+      push @field_stack, MsOffice::Word::Surgeon::Field->new(
+        xml_before => $node{xml_before},
+        code       => $attrs{'w:instr'},
+        result     => $node{node_content},
+       );
+    }
+    
+    elsif ($node{field_kind} eq 'Char') {
+      # for a complex field, we need an auxiliary subroutine to handle the begin/separate/end parts
+      _handle_fldChar_node(\@field_stack, \%node, \%attrs);
+    }
+    
+    $self->_maybe_embed_last_field(\@field_stack);
+ }
+  
+  return wantarray ? (\@field_stack, $final_xml) : \@field_stack;
+}
+
+
+sub replace_fields {
+  my ($self, $field_replacer) = @_;
+
+  my ($fields, $final_xml) = $self->fields;
+  my @xml_parts            = map {$_->xml_before, $field_replacer->($_)} @$fields;
+
+  $self->contents(join "", @xml_parts, $final_xml);
+}
+
+
+sub reveal_fields {
+  my $self = shift;
+
+  # replace all fields by a textual representatio of their "code" part
+  my $revealer = sub {my $code = shift->code; encode_entities($code); return "<w:t>{$code}</w:t>"};
+  $self->replace_fields($revealer);
+}
+
+
+sub unlink_fields {
+  my $self = shift;
+
+  # replace all fields by just their "result" part (in other words, ignore the "code" part)
+  my $unlinker = sub {my $result = shift->result; return $result};
+  $self->replace_fields($unlinker);
+}
+
+
+# below: auxiliary methods or subroutines for field handling
+
+sub _decode_instr_text {
+  my ($xml) = @_;
+
+  my @instr_text = $xml =~ m{<w:instrText.*?>(.*?)</w:instrText>}g;
+  my $instr      = join "", @instr_text;
+  decode_entities($instr);
+  return $instr;
+}
+
+sub _handle_fldChar_node {
+  my ($field_stack, $node, $attrs) = @_;
+
+  my $fldChar_type = $attrs->{"w:fldCharType"};
+
+  # if this is the beginning a of a field : push a new field object on top of the stack
+  if ($fldChar_type eq 'begin') {
+    push @$field_stack, MsOffice::Word::Surgeon::Field->new(
+      xml_before => $node->{xml_before},
+      code       => '',
+      result     => '',
+      status     => "begin",
+    );
+  }
+
+  # otherwise this is the continuation of the current field (eiter "separate" or "end") : update it
+  else { 
+    my $current_field  = $field_stack->[-1]
+      or croak qq{met <w:fldChar w:fldCharType="$fldChar_type"> but there is no current field};
+    my $current_status = $current_field->status;
+
+    if ($current_status eq "begin") {
+      $current_field->append_to_code(_decode_instr_text($node->{xml_before}));
+    }
+
+    elsif ($current_status eq "separate") {
+      $fldChar_type eq "end"
+        or croak qq{after a "separate" node, w:fldCharType cannot be "$fldChar_type"};
+      $current_field->append_to_result($node->{xml_before});
+    }
+
+    elsif ($current_status eq "end") {
+      croak qq{met <w:fldChar w:fldCharType="$fldChar_type"> but last field is not open};
+    }
+
+
+    $current_field->status($fldChar_type);
+  }
+}
+
+sub _maybe_embed_last_field {
+  my ($self, $field_stack) = @_;
+
+  my $last_field  = $field_stack->[-1];
+  my $prev_field  = $field_stack->[-2];
+
+  if ($last_field && $prev_field && $last_field->status eq 'end') {
+
+    my $prev_status = $prev_field->status;
+
+    if ($prev_status eq 'begin') {
+      # the last field is embedded within the "code" part of the previous field
+      $prev_field->append_to_code(_decode_instr_text($last_field->xml_before)
+                                  . sprintf $self->surgeon->show_embedded_field, $last_field->code);
+      pop @$field_stack;
+    }
+
+    elsif ($prev_status eq 'separate') {
+      # the last field is embedded within the "result" part of the previous field
+      $prev_field->append_to_result($last_field->xml_before . $last_field->result);
+      pop @$field_stack;
+    }
+
+    # elsif ($prev_status eq 'end') : $last_field is an independend field, just leave it on top of stack
+  }
+}
+
+
+#======================================================================
+# OPERATIONS ON IMAGES
+#======================================================================
 
 
 sub replace_image {
@@ -561,37 +717,6 @@ sub add_image {
 }
 
 
-
-#======================================================================
-# UTILITY FUNCTIONS
-#======================================================================
-
-
-sub parse_attrs {  # cheap parsing of attribute lists in an XML node
-  my ($lst_attrs) = @_;
-
-  state $attr_pair_regex = qr[
-     ([^=\s"'&<>]+)     # attribute name
-     \h* = \h*          # Eq
-     (?:                # attribute value
-        " ([^<"]*) "    # .. enclosed in double quotes
-       |
-        ' ([^<']*) '    # .. or enclosed in single quotes
-     )
-   ]x;
-
-  state $entity       = {quot => '"', amp => '&', 'lt' => '<', gt => '>'};
-  state $entity_names = join "|", keys %$entity;
-
-  my %attr;
-  while ($lst_attrs =~ /$attr_pair_regex/g) {
-    my ($name, $val) = ($1, $2 // $3);
-    decode_entities($val);
-    $attr{$name} = $val;
-  }
-
-  return %attr;
-}
 
 
 #======================================================================
@@ -692,6 +817,8 @@ MsOffice::Word::Surgeon::PackagePart - Operations on a single part within the ZI
   print $part->plain_text;
   $part->replace(qr[$pattern], $replacement_callback);
   $part->replace_image($image_alt_text, $image_PNG_content);
+  $part->unlink_fields;
+  $part->reveal_bookmarks;
 
 
 =head1 DESCRIPTION
@@ -707,7 +834,7 @@ same internal representation and therefore the same operations can be invoked.
 
 =head2 new
 
-  my $run = MsOffice::Word::Surgeon::PackagePart->new(
+  my $part = MsOffice::Word::Surgeon::PackagePart->new(
     surgeon   => $surgeon,
     part_name => $name,
   );
@@ -733,7 +860,7 @@ ZIP member name of this part
 
 =head3 Other attributes
 
-Other attributes, which are not passed through the constructor but are generated lazily on demand, are :
+Other attributes, not passed through the constructor but generated lazily on demand, are :
 
 =over
 
@@ -786,7 +913,7 @@ a hashref of images within this package part. Keys of the hash are image I<alter
 If present, the alternative I<title> will be prefered; otherwise the alternative I<description> will be taken
 (note : the I<title> field was displayed in Office 2013 and 2016, but more recent versions only display
 the I<description> field -- see
-L<https://support.microsoft.com/en-us/office/add-alternative-text-to-a-shape-picture-chart-smartart-graphic-or-other-object-44989b2a-903c-4d9a-b742-6a75b451c669|MsOffice documentation>).
+L<MsOffice documentation|https://support.microsoft.com/en-us/office/add-alternative-text-to-a-shape-picture-chart-smartart-graphic-or-other-object-44989b2a-903c-4d9a-b742-6a75b451c669>).
 
 Images without alternative text will not be accessible through the current Perl module.
 
@@ -889,83 +1016,6 @@ Known regexes are :
 
 Applies all regexes from the previous method.
 
-=head3 unlink_fields
-
-  my $names_of_ASK_fields = $part->unlink_fields;
-
-Removes all fields from the part, just leaving the current
-value stored in each field. This is the equivalent of performing Ctrl-Shift-F9
-on the whole document.
-
-The return value is an arrayref to a  list of names of ASK fields within the document.
-Such names should then be passed to the L</suppress_bookmarks> method
-(see below).
-
-
-=head3 suppress_bookmarks
-
-  $part->suppress_bookmarks(@names_to_erase);
-
-Removes bookmarks markup in the part. This is useful because
-MsWord may silently insert bookmarks in unexpected places; therefore
-some searches within the text may fail because of such bookmarks.
-
-By default, this method only removes the bookmarks markup, leaving
-intact the contents of the bookmark. However, when the name of a
-bookmark belongs to the list C<< @names_to_erase >>, the contents
-is also removed. Currently this is used for suppressing ASK fields,
-because such fields contain a bookmark content that is never displayed by MsWord.
-
-
-=head3 reveal_bookmarks
-
-  $part->reveal_bookmarks(color => 'green');
-
-Usually bookmarks in MsWord are not visible; the only way to have a visual clue is to turn on
-an option in
-L<https://support.microsoft.com/en-gb/office/troubleshoot-bookmarks-9cad566f-913d-49c6-8d37-c21e0e8d6db0|Advanced / Show document content / Show bookmarks> -- but this only displays where bookmarks start and end, without the names of the bookmarks.
-
-The C<reveal_bookmarks()> method will insert a visible run before each bookmark start and after each bookmark end, showing
-the bookmark name. This is an interesting tool for documenting where bookmarks are located in an existing document.
-
-Options to this method are :
-
-=over
-
-=item color
-
-The highligting color for visible marks. This should be a valid
-highlighting color, i.e black, blue, cyan, darkBlue, darkCyan,
-darkGray, darkGreen, darkMagenta, darkRed, darkYellow, green,
-lightGray, magenta, none, red, white or yellow. Default is yellow.
-
-=item props
-
-A string in C<sprintf> format for building the XML to be inserted in C<< <w:rPr> >> node
-when displaying bookmarks marks, i.e. the style for displaying such marks.
-The default is just a highlighting property :  C<< <w:highlight w:val="%s"/> >>.
-
-=item start
-
-A string in C<sprintf> format for generating text before a bookmark start.
-Default is C<< <%s> >>.
-
-=item end
-
-A string in C<sprintf> format for generating text after a bookmark end.
-Default is C<< </%s> >>.
-
-=item ignore
-
-A regexp for deciding wich bookmarks will not be revealed. Default is C<< qr/^_/ >>,
-because bookmarks with an initidal underscore are usually technical bookmarks inserted
-automatically by MsWord, such as C<_GoBack> or C<_Toc53196147>.
-
-
-=back
-
-
-
 
 =head3 merge_runs
 
@@ -983,6 +1033,7 @@ artificial boundaries have been removed.
 If the argument C<< no_caps => 1 >> is present, the merge operation
 will also convert runs with the C<w:caps> property, putting all letters
 into uppercase and removing the property; this makes more merges possible.
+
 
 
 =head3 replace
@@ -1049,6 +1100,161 @@ is typically used as
 =back
 
 
+=head2 Operations on bookmarks
+
+
+=head3 bookmark_boundaries
+
+  my $boundaries               = part->bookmark_boundaries;
+  my ($boundaries, $final_xml) = part->bookmark_boundaries;
+
+Parses the XML content to discover bookmark boundaries.
+In scalar context, returns an arrayref of L<MsOffice::Word::Surgeon::BookmarkBoundary> objects.
+In list context, returns the arrayref followed by a plain string containing the final XML fragment.
+
+
+
+=head3 suppress_bookmarks
+
+  $part->suppress_bookmarks(full_range => [qw/foo bar/], markup_only => qr/^_/);
+
+Suppresses bookmarks according to the specified options :
+
+=over
+
+=item full_range
+
+For bookmark names matching this option, the bookmark will be fully
+suppressed (not only the start and end markers, but also any
+content inbetween).
+
+
+=item markup_only
+
+For bookmark names matching this option, start and end markers
+are suppressed, but the inner content remains.
+
+=back
+
+Options may be specified as lists of strings, or regexes, or coderefs ... anything suitable
+to be compared through L<match::simple>. In absence of any options, the default
+is C<< markup_only => qr/./ >>, meaning that all bookmarks markup is suppressed.
+
+Removing bookmarks is useful because
+MsWord may silently insert bookmarks in unexpected places; therefore
+some searches within the text may fail because of such bookmarks.
+
+The C<full_range> option is especially convenient for removing bookmarks associated
+with ASK fields. Such bookmarks contain ranges of text that are 
+never displayed by MsWord.
+
+
+=head3 reveal_bookmarks
+
+  $part->reveal_bookmarks(color => 'green');
+
+Usually bookmarks boundaries in MsWord are not visible; the only way to have a visual clue is to turn on
+an option in
+L<Advanced / Show document content / Show bookmarks|https://support.microsoft.com/en-gb/office/troubleshoot-bookmarks-9cad566f-913d-49c6-8d37-c21e0e8d6db0> -- but this only displays where bookmarks start and end, without the names of the bookmarks.
+
+The C<reveal_bookmarks()> method will insert a visible run before each bookmark start and after each bookmark end, showing
+the bookmark name. This is an interesting tool for documenting where bookmarks are located in an existing document.
+
+Options to this method are :
+
+=over
+
+=item color
+
+The highligting color for visible marks. This should be a valid
+highlighting color, i.e black, blue, cyan, darkBlue, darkCyan,
+darkGray, darkGreen, darkMagenta, darkRed, darkYellow, green,
+lightGray, magenta, none, red, white or yellow. Default is yellow.
+
+=item props
+
+A string in C<sprintf> format for building the XML to be inserted in C<< <w:rPr> >> node
+when displaying bookmarks marks, i.e. the style for displaying such marks.
+The default is just a highlighting property :  C<< <w:highlight w:val="%s"/> >>.
+
+=item start
+
+A string in C<sprintf> format for generating text before a bookmark start.
+Default is C<< <%s> >>.
+
+=item end
+
+A string in C<sprintf> format for generating text after a bookmark end.
+Default is C<< </%s> >>.
+
+=item ignore
+
+A regexp for deciding wich bookmarks will not be revealed. Default is C<< qr/^_/ >>,
+because bookmarks with an initial underscore are usually technical bookmarks inserted
+automatically by MsWord, such as C<_GoBack> or C<_Toc53196147>.
+
+
+=back
+
+
+=head2 Operations on fields
+
+=head3 fields
+
+  my $fields               = part->fields;
+  my ($fields, $final_xml) = part->fields;
+
+Parses the XML content to discover MsWord fields.
+In scalar context, returns an arrayref of L<MsOffice::Word::Surgeon::Field> objects.
+In list context, returns the arrayref followed by a plain string containing the final XML fragment.
+
+
+
+=head3 replace_fields
+
+  my $field_replacer = sub {my ($code, $result) = @_; return "...";};
+  $part->replace_fields($field_replacer);
+
+Replaces MsWord fields by the product of the C<< $field_replacer >> callback.
+The callback receives two arguments :
+
+=over
+
+=item C<$code>
+
+A plain string containing the field's full code instruction, i.e a keyword followed by optional arguments and switches,
+including initial and final spaces. Embedded fields are represented in curly braces, like for example
+
+C<< IF { DOCPROPERTY foo } = "bar" "is bar" "is not bar" >>.
+
+=item C<$result>
+
+An XML fragment containing the current value for the field.
+
+=back
+
+The callback should return an XML fragment suitable to be inserted within an MsWord I<run>. 
+
+
+=head3 reveal_fields
+
+  $part->reveal_fields;
+
+Replaces each field with a textual representation of its code instruction, embedded in curly braces.
+
+
+=head3 unlink_fields
+
+  $part->unlink_fields;
+
+Replaces each field with its current result, i.e removing the code instruction.
+This is the equivalent of performing Ctrl-Shift-F9 in MsWord on the whole document.
+
+
+
+=head2 Operations on images
+
+
 =head3 replace_image
 
   $part->replace_image($image_alt_text, $image_PNG_content);
@@ -1063,8 +1269,8 @@ nodes refer to the I<same> ZIP member, i.e. if the same image is displayed at se
 locations, the new image will appear at all locations, even if they do not have the
 same alternative text -- unfortunately this module currently has no facility for
 duplicating an existing image into separate instances. So if your intent is to only replace
-one image, your original document should contain several distinct images, coming from
-several distinct C<.PNG> file copies.
+one instance of the image, your original document should contain several distinct copies
+of the C<.PNG> file.
 
 
 =head3 add_image
@@ -1085,7 +1291,7 @@ Laurent Dami, E<lt>dami AT cpan DOT org<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2019-2023 by Laurent Dami.
+Copyright 2019-2024 by Laurent Dami.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

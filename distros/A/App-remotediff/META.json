@@ -58,6 +58,6 @@
          "web" : "https://github.com/kal247/App-remotediff"
       }
    },
-   "version" : "1.14",
+   "version" : "1.15",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

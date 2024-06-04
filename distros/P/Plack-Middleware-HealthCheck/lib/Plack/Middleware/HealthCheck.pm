@@ -2,7 +2,7 @@ package Plack::Middleware::HealthCheck;
 
 # ABSTRACT: A health check endpoint for your Plack app
 use version;
-our $VERSION = 'v0.2.0'; # VERSION
+our $VERSION = 'v0.2.1'; # VERSION
 
 use 5.010;
 use strict;
@@ -130,8 +130,7 @@ sub serve_health_check {
 sub serve_tags_list {
     my ( $self, $env ) = @_;
 
-    my $req          = Plack::Request->new($env);
-    my $query_params = $req->query_parameters;         # a Hash::MultiValue
+    my $req = Plack::Request->new($env);
 
     return $self->health_check_response(
         [ $self->health_check->get_registered_tags ], $req );
@@ -163,7 +162,7 @@ Plack::Middleware::HealthCheck - A health check endpoint for your Plack app
 
 =head1 VERSION
 
-version v0.2.0
+version v0.2.1
 
 =head1 SYNOPSIS
 

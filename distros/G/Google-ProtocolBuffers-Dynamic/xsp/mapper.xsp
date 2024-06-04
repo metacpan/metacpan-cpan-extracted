@@ -4,6 +4,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "perl_unpollute.h"
 
 #include "mapper.h"
 
@@ -17,14 +18,21 @@ handle_warning(SV *text)
     cxt->warn_with_context(aTHX_ text);
 
 void
-set_decoder_options(SV *klass, HV *options)
+set_decoder_options(SV *, HV *options)
   INIT:
     gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
   CODE:
     mapper->set_decoder_options(options);
 
+void
+set_encoder_options(SV *, HV *options)
+  INIT:
+    gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
+  CODE:
+    mapper->set_encoder_options(options);
+
 SV*
-new(SV *klass, SV *ref = NULL)
+new(SV *, SV *ref = NULL)
   INIT:
     gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
   CODE:
@@ -32,7 +40,7 @@ new(SV *klass, SV *ref = NULL)
   OUTPUT: RETVAL
 
 SV*
-new_and_check(SV *klass, SV *ref = NULL)
+new_and_check(SV *, SV *ref = NULL)
   INIT:
     gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
   CODE:
@@ -43,7 +51,7 @@ new_and_check(SV *klass, SV *ref = NULL)
   OUTPUT: RETVAL
 
 SV*
-decode_upb(SV *klass, SV *scalar)
+decode_upb(SV *, SV *scalar)
   INIT:
     gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
     STRLEN bufsize;
@@ -57,7 +65,7 @@ decode_upb(SV *klass, SV *scalar)
   OUTPUT: RETVAL
 
 SV*
-decode_bbpb(SV *klass, SV *scalar)
+decode_bbpb(SV *, SV *scalar)
   INIT:
     gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
     STRLEN bufsize;
@@ -85,7 +93,7 @@ static_decode(SV *scalar)
   OUTPUT: RETVAL
 
 SV*
-decode_json(SV *klass, SV *scalar)
+decode_json(SV *, SV *scalar)
   INIT:
     gpd::Mapper *mapper = (gpd::Mapper *) CvXSUBANY(cv).any_ptr;
     STRLEN bufsize;
@@ -334,7 +342,6 @@ extension_list_size(HV *self, SV *extension)
 void
 get_list(HV *self)
   INIT:
-    dXSTARG;
     gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
   PPCODE:
     PUSHs(field->get_list(self));
@@ -342,7 +349,6 @@ get_list(HV *self)
 void
 get_extension_list(HV *self, SV *extension)
   INIT:
-    dXSTARG;
     gpd::MapperField *field = gpd::MapperField::find_repeated_extension(aTHX_ cv, extension);
   PPCODE:
     PUSHs(field->get_list(self));
@@ -364,7 +370,6 @@ set_extension_list(HV *self, SV *extension, SV *ref)
 void
 get_or_set_list(HV *self, SV *ref = NULL)
   INIT:
-    dXSTARG;
     gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
   PPCODE:
     if (!ref)
@@ -375,7 +380,6 @@ get_or_set_list(HV *self, SV *ref = NULL)
 void
 get_or_set_extension_list(HV *self, SV *extension, SV *ref = NULL)
   INIT:
-    dXSTARG;
     gpd::MapperField *field = gpd::MapperField::find_scalar_extension(aTHX_ cv, extension);
   PPCODE:
     if (!ref)
@@ -412,7 +416,6 @@ get_or_set_map_item(HV *self, SV *key, SV *value = NULL)
 void
 get_map(HV *self)
   INIT:
-    dXSTARG;
     gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
   PPCODE:
     PUSHs(field->get_map(self));
@@ -427,7 +430,6 @@ set_map(HV *self, SV *ref)
 void
 get_or_set_map(HV *self, SV *ref = NULL)
   INIT:
-    dXSTARG;
     gpd::MapperField *field = (gpd::MapperField *) CvXSUBANY(cv).any_ptr;
   PPCODE:
     if (!ref)
@@ -438,8 +440,10 @@ get_or_set_map(HV *self, SV *ref = NULL)
 BOOT:
     gpd::WarnContext::setup(aTHX);
 
-    sv_setiv(get_sv("Google::ProtocolBuffers::Dynamic::Fieldtable::debug_transform", GV_ADDMULTI), PTR2IV(gpd::transform::fieldtable_debug_transform));
-    sv_setiv(get_sv("Google::ProtocolBuffers::Dynamic::Fieldtable::profile_transform", GV_ADDMULTI), PTR2IV(gpd::transform::fieldtable_profile_transform));
+    sv_setiv(get_sv("Google::ProtocolBuffers::Dynamic::Fieldtable::debug_decoder_transform", GV_ADDMULTI), PTR2IV(gpd::transform::fieldtable_debug_decoder_transform));
+    sv_setiv(get_sv("Google::ProtocolBuffers::Dynamic::Fieldtable::profile_decoder_transform", GV_ADDMULTI), PTR2IV(gpd::transform::fieldtable_profile_decoder_transform));
+    sv_setiv(get_sv("Google::ProtocolBuffers::Dynamic::Fieldtable::debug_encoder_transform", GV_ADDMULTI), PTR2IV(gpd::transform::fieldtable_debug_encoder_transform));
+    sv_setiv(get_sv("Google::ProtocolBuffers::Dynamic::Fieldtable::debug_encoder_unknown_fields", GV_ADDMULTI), PTR2IV(gpd::transform::fieldtable_debug_encoder_unknown_fields));
 
 SV *
 grpc_xs_call_service_passthrough(SV *self, ...)
@@ -476,6 +480,22 @@ grpc_xs_call_service_passthrough(SV *self, ...)
     PUTBACK;
 
     SvREFCNT_inc(RETVAL);
+  OUTPUT: RETVAL
+
+%}
+
+%package{Google::ProtocolBuffers::Dynamic::Fieldtable};
+
+%{
+
+SV *
+debug_encoder_unknown_fields_get()
+  INIT:
+    AV *value = gpd::transform::fieldtable_debug_encoder_unknown_fields_get();
+  CODE:
+    if (!value)
+        value = newAV();
+    RETVAL = newRV_noinc((SV *) value);
   OUTPUT: RETVAL
 
 %}

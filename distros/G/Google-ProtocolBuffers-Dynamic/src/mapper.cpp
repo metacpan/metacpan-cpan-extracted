@@ -1,14 +1,15 @@
 #include "mapper.h"
 #include "dynamic.h"
 
-#include "perl_unpollute.h"
-
 #include <upb/pb/encoder.h>
 #include <upb/pb/decoder.h>
+
+#include <cassert>
 
 using namespace gpd;
 using namespace gpd::transform;
 using namespace std;
+using namespace UMS_NS;
 using namespace upb;
 using namespace upb::pb;
 using namespace upb::json;
@@ -20,6 +21,10 @@ using namespace upb::json;
 #endif
 
 #define HAS_FULL_NOMG (PERL_VERSION >= 14)
+
+#if PERL_VERSION < 18
+#    define SvREFCNT_dec_NN SvREFCNT_dec
+#endif
 
 namespace {
     void unref_on_scope_leave(void *ref) {
@@ -46,9 +51,9 @@ namespace {
 
 Mapper::DecoderHandlers::DecoderHandlers(pTHX_ const Mapper *mapper) :
         target_ref(NULL),
+        pending_transforms(aTHX),
         decoder_transform(NULL),
-        transform_fieldtable(false),
-        pending_transforms(aTHX) {
+        decoder_transform_fieldtable(false) {
     SET_THX_MEMBER;
     mappers.push_back(mapper);
 }
@@ -95,7 +100,7 @@ void Mapper::DecoderHandlers::prepare(HV *target) {
 
     pending_transforms.clear();
     if (decoder_transform) {
-        if (transform_fieldtable) {
+        if (decoder_transform_fieldtable) {
             add_transform_fieldtable(target_ref, decoder_transform, NULL);
         } else {
             pending_transforms.add_transform(target_ref, decoder_transform, NULL);
@@ -107,7 +112,7 @@ void Mapper::DecoderHandlers::prepare(HV *target) {
 }
 
 void Mapper::DecoderHandlers::finish() {
-    if (transform_fieldtable) {
+    if (decoder_transform_fieldtable) {
         finish_add_transform_fieldtable();
     }
 
@@ -141,7 +146,7 @@ void Mapper::DecoderHandlers::static_clear(DecoderHandlers *cxt) {
 
     cxt->map_keys.clear();
 
-    for (vector<Fieldtable::Entry>::iterator it = cxt->fieldtable_entries.begin(), en = cxt->fieldtable_entries.end(); it != en; ++it) {
+    for (vector<DecoderFieldtable::Entry>::iterator it = cxt->fieldtable_entries.begin(), en = cxt->fieldtable_entries.end(); it != en; ++it) {
         SvREFCNT_dec(it->value);
     }
 
@@ -195,19 +200,11 @@ string Mapper::Field::full_name() const {
 }
 
 FieldDef::Type Mapper::Field::map_value_type() const {
-    const vector<Field> &map_fields = mapper->fields;
-
-    return map_fields[1].is_map_value() ?
-        map_fields[1].field_def->type() :
-        map_fields[0].field_def->type();
+    return mapper->fields[mapper->map_value_index].field_def->type();
 }
 
-const STD_TR1::unordered_set<int32_t> &Mapper::Field::map_enum_values() const {
-    const vector<Field> &map_fields = mapper->fields;
-
-    return map_fields[1].is_map_value() ?
-        map_fields[1].enum_values :
-        map_fields[0].enum_values;
+const unordered_set<int32_t> &Mapper::Field::map_enum_values() const {
+    return mapper->fields[mapper->map_value_index].enum_values;
 }
 
 bool Mapper::DecoderHandlers::apply_defaults_and_check() {
@@ -381,7 +378,7 @@ Mapper::DecoderHandlers *Mapper::DecoderHandlers::on_start_sub_message(DecoderHa
     const Mapper *message_mapper = mapper->fields[*field_index].mapper;
     SV *target = cxt->get_target(field_index);
 
-    if (!message_mapper->decoder_callbacks.transform_fieldtable) {
+    if (!message_mapper->decoder_callbacks.decoder_transform_fieldtable) {
         HV *hv = NULL;
 
         if (!SvROK(target)) {
@@ -432,7 +429,7 @@ bool Mapper::DecoderHandlers::on_end_sub_message(DecoderHandlers *cxt, const int
         cxt->seen_fields.pop_back();
     cxt->pop_mapper();
 
-    if (message_mapper->decoder_callbacks.transform_fieldtable) {
+    if (message_mapper->decoder_callbacks.decoder_transform_fieldtable) {
         cxt->finish_add_transform_fieldtable();
     }
 
@@ -570,7 +567,7 @@ namespace {
         XPUSHs(sv_2mortal(newSVpvn(negative ? buffer : buffer + 1, negative ? 19 : 18)));
         PUTBACK;
 
-        int count = call_method("new", G_SCALAR);
+        call_method("new", G_SCALAR);
 
         SPAGAIN;
         SV *res = POPs;
@@ -631,7 +628,6 @@ bool Mapper::DecoderHandlers::on_numeric_bool(DecoderHandlers *cxt, const int *f
 }
 
 bool Mapper::DecoderHandlers::on_json_bool(DecoderHandlers *cxt, const int *field_index, bool val) {
-    THX_DECLARE_AND_GET;
     const Mapper *mapper = cxt->mappers.back();
 
     cxt->mark_seen(field_index);
@@ -681,7 +677,7 @@ SV *Mapper::DecoderHandlers::get_target(const int *field_index) {
     case TARGET_FIELDTABLE_ITEM: {
         SV *sv = newSV(0);
 
-        fieldtable_entries.push_back(Fieldtable::Entry(field.field_def->number(), sv));
+        fieldtable_entries.push_back(DecoderFieldtable::Entry(field.field_def->number(), sv));
 
         return sv;
     }
@@ -692,14 +688,14 @@ SV *Mapper::DecoderHandlers::get_hash_item_target(const int *field_index) {
     const Mapper *mapper = mappers.back();
     const Field &field = mapper->fields[*field_index];
 
-    if (!mapper->decoder_callbacks.transform_fieldtable) {
+    if (!mapper->decoder_callbacks.decoder_transform_fieldtable) {
         HV *hv = (HV *) items.back();
 
         return HeVAL(hv_fetch_ent(hv, field.name, 1, field.name_hash));
     } else {
         SV *sv = newSV(0);
 
-        fieldtable_entries.push_back(Fieldtable::Entry(field.field_def->number(), sv));
+        fieldtable_entries.push_back(DecoderFieldtable::Entry(field.field_def->number(), sv));
 
         return sv;
     }
@@ -708,11 +704,11 @@ SV *Mapper::DecoderHandlers::get_hash_item_target(const int *field_index) {
 void Mapper::DecoderHandlers::add_transform_fieldtable(SV *target, const DecoderTransform *message_transform, const DecoderTransform *field_transform) {
     size_t transform_index = pending_transforms.add_transform(target, message_transform, field_transform);
 
-    fieldtable_entries.push_back(Fieldtable::Entry(transform_index, NULL));
+    fieldtable_entries.push_back(DecoderFieldtable::Entry(transform_index, NULL));
 }
 
 void Mapper::DecoderHandlers::finish_add_transform_fieldtable() {
-    for (vector<Fieldtable::Entry>::reverse_iterator it = fieldtable_entries.rbegin(), en = fieldtable_entries.rend(); it != en; ++it) {
+    for (vector<DecoderFieldtable::Entry>::reverse_iterator it = fieldtable_entries.rbegin(), en = fieldtable_entries.rend(); it != en; ++it) {
         if (it->value != NULL)
             continue;
 
@@ -727,16 +723,27 @@ void Mapper::DecoderHandlers::finish_add_transform_fieldtable() {
     }
 }
 
+Mapper::EncoderState::EncoderState(Status *_status, MapperContext *_mapper_context) :
+        status(_status), mapper_context(_mapper_context) {
+}
+
+void Mapper::EncoderState::setup(Sink *_sink) {
+    sink = _sink;
+}
+
 Mapper::Mapper(pTHX_ Dynamic *_registry, const MessageDef *_message_def, const gpd::pb::Descriptor *_gpd_descriptor, HV *_stash, const MappingOptions &options) :
         registry(_registry),
         message_def(_message_def),
         gpd_descriptor(_gpd_descriptor),
-        decoder_field_data(_gpd_descriptor),
         stash(_stash),
-        json_true(NULL),
-        json_false(NULL),
+        encoder_state(&status, &mapper_context),
         decoder_callbacks(aTHX_ this),
-        string_sink(&output_buffer) {
+        decoder_field_data(_gpd_descriptor),
+        encoder_transform(NULL),
+        encoder_transform_fieldtable(false),
+        unknown_field_transform(NULL),
+        json_false(NULL),
+        json_true(NULL) {
     SET_THX_MEMBER;
 
     SvREFCNT_inc(stash);
@@ -794,6 +801,7 @@ Mapper::Mapper(pTHX_ Dynamic *_registry, const MessageDef *_message_def, const g
         const FieldDef *field_def = *it;
         const OneofDef *oneof_def = field_def->containing_oneof();
 
+        field.field_action = field.value_action = ACTION_INVALID;
         fields_by_field_def_index[field_def->index()] = &fields.back();
         has_required = has_required || field_def->label() == UPB_LABEL_REQUIRED;
         field.field_def = field_def;
@@ -810,12 +818,19 @@ Mapper::Mapper(pTHX_ Dynamic *_registry, const MessageDef *_message_def, const g
         field.has_default = field.is_map = false;
         field.mapper = NULL;
         field.decoder_transform = NULL;
+        field.encoder_transform = NULL;
+        field.field_index = index;
         field.oneof_index = -1;
         FieldData field_data;
 
         if (map_entry) {
-            field.field_target = field_def->number() == 1 ?
-                TARGET_MAP_KEY : TARGET_MAP_VALUE;
+            if (field_def->number() == 1) {
+                field.field_target = TARGET_MAP_KEY;
+                map_key_index = index;
+            } else {
+                field.field_target = TARGET_MAP_VALUE;
+                map_value_index = index;
+            }
         } else if (field_def->label() == UPB_LABEL_REPEATED) {
             field.field_target = TARGET_ARRAY_ITEM;
         } else {
@@ -845,12 +860,14 @@ Mapper::Mapper(pTHX_ Dynamic *_registry, const MessageDef *_message_def, const g
             SET_VALUE_HANDLER(float, on_nv<float>);
             field.default_nv = field_def->default_float();
             field_data.action = FieldData::STORE_FLOAT;
+            field.value_action = ACTION_PUT_FLOAT;
             break;
         case UPB_TYPE_DOUBLE:
             GET_SELECTOR(DOUBLE, primitive);
             SET_VALUE_HANDLER(double, on_nv<double>);
             field.default_nv = field_def->default_double();
             field_data.action = FieldData::STORE_DOUBLE;
+            field.value_action = ACTION_PUT_DOUBLE;
             break;
         case UPB_TYPE_BOOL:
             GET_SELECTOR(BOOL, primitive);
@@ -869,6 +886,7 @@ Mapper::Mapper(pTHX_ Dynamic *_registry, const MessageDef *_message_def, const g
                 break;
             }
             field.default_bool = field_def->default_bool();
+            field.value_action = ACTION_PUT_BOOL;
             break;
         case UPB_TYPE_STRING:
         case UPB_TYPE_BYTES:
@@ -881,10 +899,13 @@ Mapper::Mapper(pTHX_ Dynamic *_registry, const MessageDef *_message_def, const g
             field.default_str = field_def->default_string(&field.default_str_len);
             if (field.is_map_key()) {
                 field_data.action = FieldData::STORE_STRING_KEY;
+                field.value_action = ACTION_PUT_STRING;
             } else if (field_def->type() == UPB_TYPE_STRING) {
                 field_data.action = FieldData::STORE_STRING;
+                field.value_action = ACTION_PUT_STRING;
             } else {
                 field_data.action = FieldData::STORE_BYTES;
+                field.value_action = ACTION_PUT_BYTES;
             }
             break;
         case UPB_TYPE_MESSAGE:
@@ -906,6 +927,7 @@ Mapper::Mapper(pTHX_ Dynamic *_registry, const MessageDef *_message_def, const g
             } else {
                 field_data.action = FieldData::STORE_MESSAGE;
             }
+            field.value_action = ACTION_PUT_MESSAGE;
             break;
         case UPB_TYPE_ENUM: {
             GET_SELECTOR(INT32, primitive);
@@ -917,6 +939,7 @@ Mapper::Mapper(pTHX_ Dynamic *_registry, const MessageDef *_message_def, const g
             field_data.action = check_enum_values ?
                                     FieldData::STORE_ENUM :
                                     FieldData::STORE_INT32;
+            field.value_action = ACTION_PUT_ENUM;
 
             if (check_enum_values) {
                 const EnumDef *enumdef = field_def->enum_subdef();
@@ -934,12 +957,14 @@ Mapper::Mapper(pTHX_ Dynamic *_registry, const MessageDef *_message_def, const g
                 field_def->descriptor_type() == UPB_DESCRIPTOR_TYPE_SINT32 ?
                     FieldData::STORE_ZIGZAG :
                     FieldData::STORE_INT32;
+            field.value_action = ACTION_PUT_INT32;
             break;
         case UPB_TYPE_UINT32:
             GET_SELECTOR(UINT32, primitive);
             SET_VALUE_HANDLER(uint32_t, on_uv<uint32_t>);
             field.default_uv = field_def->default_uint32();
             field_data.action = FieldData::STORE_UINT32;
+            field.value_action = ACTION_PUT_UINT32;
             break;
         case UPB_TYPE_INT64:
             GET_SELECTOR(INT64, primitive);
@@ -958,6 +983,7 @@ Mapper::Mapper(pTHX_ Dynamic *_registry, const MessageDef *_message_def, const g
                     field_def->descriptor_type() == UPB_DESCRIPTOR_TYPE_SINT64 ?
                         FieldData::STORE_ZIGZAG :
                         FieldData::STORE_INT64;
+            field.value_action = ACTION_PUT_INT64;
             break;
         case UPB_TYPE_UINT64:
             GET_SELECTOR(UINT64, primitive);
@@ -970,6 +996,7 @@ Mapper::Mapper(pTHX_ Dynamic *_registry, const MessageDef *_message_def, const g
                 field_data.action = FieldData::STORE_BIG_UINT64;
             else
                 field_data.action = FieldData::STORE_UINT64;
+            field.value_action = ACTION_PUT_UINT64;
             break;
         default:
             croak("Unhandled field type %d for field '%s'", field_def->type(), field.full_name().c_str());
@@ -1001,6 +1028,17 @@ Mapper::Mapper(pTHX_ Dynamic *_registry, const MessageDef *_message_def, const g
 #undef SET_VALUE_HANDLER
 #undef SET_HANDLER
 
+        field.field_action = field.value_action;
+        if (field.is_map) {
+            field.field_action = ACTION_PUT_MAP;
+        } else if (field.field_def->label() == UPB_LABEL_REPEATED) {
+            field.field_action = ACTION_PUT_REPEATED;
+        } else if (!encode_defaults && field.has_default &&
+                   !(field.is_map_key() || field.is_map_value())) {
+            field.field_action = field.value_action =
+                (ValueAction) (field.value_action + 1);
+        }
+
         field_data.index = index;
 
         decoder_field_data.add_field(field_def->number(), field_data);
@@ -1015,7 +1053,7 @@ Mapper::Mapper(pTHX_ Dynamic *_registry, const MessageDef *_message_def, const g
             extension_mapper_fields.push_back(new MapperField(aTHX_ this, &*it));
             unref(); // to avoid ref loop
         }
-        field_map[SvPV_nolen(it->name)] = &*it;
+        field_map.add(aTHX_ it->name, it->field_def->number(), &*it);
     }
 
     int oneof_index = 0;
@@ -1032,6 +1070,8 @@ Mapper::Mapper(pTHX_ Dynamic *_registry, const MessageDef *_message_def, const g
 
     decoder_field_data.optimize_lookup();
     check_required_fields = has_required && options.check_required_fields;
+    ignore_undef_fields = options.ignore_undef_fields;
+    field_map.optimize_lookup();
 }
 
 Mapper::~Mapper() {
@@ -1040,10 +1080,15 @@ Mapper::~Mapper() {
             it->mapper->unref();
         if (it->decoder_transform)
             it->decoder_transform->destroy(aTHX);
+        if (it->encoder_transform)
+            it->encoder_transform->destroy(aTHX);
     }
     for (vector<MapperField *>::iterator it = extension_mapper_fields.begin(), en = extension_mapper_fields.end(); it != en; ++it)
         // this will make the mapper ref count to go negative, but it's OK
         (*it)->unref();
+
+    if (encoder_transform)
+        encoder_transform->destroy(aTHX);
 
     // make sure this only goes away after inner destructors have completed
     refcounted_mortalize(aTHX_ registry);
@@ -1154,7 +1199,7 @@ static HV *hash_option(pTHX_ HV *options, const char *name) {
     return (HV *) SvRV(*hv_value);
 }
 
-static DecoderTransform *make_transform(pTHX_ SV *scalar, bool fieldtable) {
+static DecoderTransform *make_decoder_transform(pTHX_ SV *scalar, bool fieldtable) {
     if (SvROK(scalar)) {
         SV *maybe_cv = SvRV(scalar);
         if (SvTYPE(maybe_cv) != SVt_PVCV)
@@ -1176,26 +1221,58 @@ static DecoderTransform *make_transform(pTHX_ SV *scalar, bool fieldtable) {
     croak("Transformation function must be either a code reference or an integer representing a C function pointer");
 }
 
+static EncoderTransform *make_encoder_transform(pTHX_ SV *scalar, bool fieldtable) {
+    if (SvROK(scalar)) {
+        SV *maybe_cv = SvRV(scalar);
+        if (SvTYPE(maybe_cv) != SVt_PVCV)
+            croak("Transformation function is a reference but not a code reference");
+        if (fieldtable)
+            croak("Fieldtable transformation function must be written in C");
+
+        return new EncoderTransform(SvREFCNT_inc(maybe_cv));
+    }
+
+    if (SvIOK(scalar)) {
+        if (fieldtable) {
+            return new EncoderTransform(INT2PTR(CEncoderTransformFieldtable, SvIV(scalar)));
+        } else {
+            return new EncoderTransform(INT2PTR(CEncoderTransform, SvIV(scalar)));
+        }
+    }
+
+    croak("Transformation function must be an integer representing a C function pointer");
+}
+
+static UnknownFieldTransform *make_unknown_field_transform(pTHX_ SV *scalar) {
+    if (SvIOK(scalar)) {
+        return new UnknownFieldTransform(INT2PTR(CUnknownFieldTransform, SvIV(scalar)));
+    }
+
+    croak("Transformation function must be an integer representing a C function pointer");
+}
+
 void Mapper::set_decoder_options(HV *options) {
     SV *transform = scalar_option(aTHX_ options, "transform");
     SV *fieldtable_sv = scalar_option(aTHX_ options, "fieldtable");
     HV *transform_fields = hash_option(aTHX_ options, "transform_fields");
     bool fieldtable = fieldtable_sv ? SvTRUE(fieldtable_sv) : false;
 
+    if (fieldtable && (!transform && !transform_fields)) {
+        croak("Can't use fieldtable without transform");
+    }
+
     if (transform) {
         if (decoder_callbacks.decoder_transform)
             decoder_callbacks.decoder_transform->destroy(aTHX);
-        decoder_callbacks.decoder_transform = make_transform(aTHX_ transform, fieldtable);
+        decoder_callbacks.decoder_transform = make_decoder_transform(aTHX_ transform, fieldtable);
     }
 
     if (fieldtable) {
         if (message_def->mapentry()) {
             croak("Can't use fieldtable for map messages");
-        } else if (!transform) {
-            croak("Can't use fieldtable without transform");
         }
 
-        decoder_callbacks.transform_fieldtable = true;
+        decoder_callbacks.decoder_transform_fieldtable = true;
 
         for (vector<Field>::iterator it = fields.begin(), en = fields.end(); it != en; ++it) {
             if (it->field_target == TARGET_HASH_ITEM) {
@@ -1209,22 +1286,78 @@ void Mapper::set_decoder_options(HV *options) {
         char *key;
         hv_iterinit(transform_fields);
         while (SV *value = hv_iternextsv(transform_fields, &key, &keylen)) {
-            string field_name = string(key, keylen);
-            STD_TR1::unordered_map<std::string, Field *>::const_iterator field_it = field_map.find(field_name);
-            if (field_it == field_map.end()) {
-                croak("Unknown field name %s", field_name.c_str());
+            Field *field = field_map.find_by_name(aTHX_ key, keylen);
+            if (field == NULL) {
+                croak("Unknown field name %.*s", keylen, key);
             }
 
-            Field *field = field_it->second;
             if (field->is_map ||
                     field->field_def->label() == UPB_LABEL_REPEATED ||
                     field->field_def->type() != UPB_TYPE_MESSAGE) {
-                croak("Can't apply transformation to field %s", field_name.c_str());
+                croak("Can't apply transformation to field %.*s", keylen, key);
             }
 
             if (field->decoder_transform)
                 field->decoder_transform->destroy(aTHX);
-            field->decoder_transform = make_transform(aTHX_ value, fieldtable);
+            field->decoder_transform = make_decoder_transform(aTHX_ value, fieldtable);
+        }
+    }
+}
+
+void Mapper::set_encoder_options(HV *options) {
+    SV *transform = scalar_option(aTHX_ options, "transform");
+    SV *fieldtable_sv = scalar_option(aTHX_ options, "fieldtable");
+    HV *transform_fields = hash_option(aTHX_ options, "transform_fields");
+    SV *unknown_field = scalar_option(aTHX_ options, "unknown_field");
+    bool fieldtable = fieldtable_sv ? SvTRUE(fieldtable_sv) : false;
+
+    if (fieldtable && (!transform && !transform_fields)) {
+        croak("Can't use fieldtable without transform");
+    }
+
+    if (transform) {
+        if (encoder_transform)
+            encoder_transform->destroy(aTHX);
+        encoder_transform = make_encoder_transform(aTHX_ transform, fieldtable);
+    }
+
+    if (fieldtable) {
+        if (message_def->mapentry()) {
+            croak("Can't use fieldtable for map messages");
+        }
+
+        encoder_transform_fieldtable = true;
+    }
+
+    if (unknown_field) {
+        if (unknown_field_transform)
+            unknown_field_transform->destroy(aTHX);
+        unknown_field_transform = make_unknown_field_transform(aTHX_ unknown_field);
+    }
+
+    if (transform_fields) {
+        I32 keylen;
+        char *key;
+        hv_iterinit(transform_fields);
+        while (SV *value = hv_iternextsv(transform_fields, &key, &keylen)) {
+            Field *field = field_map.find_by_name(aTHX_ key, keylen);
+            if (field == NULL) {
+                croak("Unknown field name %.*s", keylen, key);
+            }
+
+            if (field->is_map ||
+                    field->field_def->label() == UPB_LABEL_REPEATED ||
+                    field->field_def->type() != UPB_TYPE_MESSAGE) {
+                croak("Can't apply transformation to field %.*s", keylen, key);
+            }
+
+            if (field->encoder_transform)
+                field->encoder_transform->destroy(aTHX);
+            field->encoder_transform = make_encoder_transform(aTHX_ value, fieldtable);
+            if (field->field_action == ACTION_PUT_MESSAGE)
+                field->field_action = ACTION_PUT_FIELDTABLE;
+            if (field->value_action == ACTION_PUT_MESSAGE)
+                field->value_action = ACTION_PUT_FIELDTABLE;
         }
     }
 }
@@ -1259,20 +1392,21 @@ SV *Mapper::encode(SV *ref) {
     if (pb_decoder_method.get() == NULL)
         croak("It looks like resolve_references() was not called (and please use map() anyway)");
     upb::Environment *env = make_localized_environment(aTHX_ &status);
-    upb::pb::Encoder *pb_encoder = upb::pb::Encoder::Create(env, pb_encoder_handlers.get(), string_sink.input());
+    upb::pb::Encoder *pb_encoder = upb::pb::Encoder::Create(env, pb_encoder_handlers.get(), vector_sink.input());
+    encoder_state.setup(pb_encoder->input());
     status.Clear();
-    output_buffer.clear();
-    warn_context->clear();
     warn_context->localize_warning_handler(aTHX);
+    warn_context->set_context(&mapper_context);
+    encoder_state.mapper_context->clear();
+
     SV *result = NULL;
 
 #if HAS_FULL_NOMG
     SvGETMAGIC(ref);
 #endif
 
-    if (encode_value(pb_encoder->input(), &status, ref))
-        result = newSVpvn(output_buffer.data(), output_buffer.size());
-    output_buffer.clear();
+    if (encode_message(encoder_state, ref))
+        result = newSVpvn(vector_sink.data(), vector_sink.size());
 
     return result;
 }
@@ -1281,20 +1415,21 @@ SV *Mapper::encode_json(SV *ref) {
     if (json_decoder_method.get() == NULL)
         croak("It looks like resolve_references() was not called (and please use map() anyway)");
     upb::Environment *env = make_localized_environment(aTHX_ &status);
-    upb::json::Printer *json_encoder = upb::json::Printer::Create(env, json_encoder_handlers.get(), string_sink.input());
+    upb::json::Printer *json_encoder = upb::json::Printer::Create(env, json_encoder_handlers.get(), vector_sink.input());
+    encoder_state.setup(json_encoder->input());
     status.Clear();
-    output_buffer.clear();
-    warn_context->clear();
     warn_context->localize_warning_handler(aTHX);
+    warn_context->set_context(&mapper_context);
+    encoder_state.mapper_context->clear();
+
     SV *result = NULL;
 
 #if HAS_FULL_NOMG
     SvGETMAGIC(ref);
 #endif
 
-    if (encode_value(json_encoder->input(), &status, ref))
-        result = newSVpvn(output_buffer.data(), output_buffer.size());
-    output_buffer.clear();
+    if (encode_message(encoder_state, ref))
+        result = newSVpvn(vector_sink.data(), vector_sink.size());
 
     return result;
 }
@@ -1486,6 +1621,9 @@ bool Mapper::run_bbpb_decoder(Mapper *root_mapper, const char *buffer, STRLEN bu
             case FieldData::STORE_STRING_MAP_MESSAGE:
                 DecoderHandlers::on_end_string_map_entry(decoder_callbacks, &entry->data.index);
                 break;
+            default:
+                assert(false); // precondition: end of a message can be only for message/map entry
+                return false;
             }
         }
             break;
@@ -1497,6 +1635,9 @@ bool Mapper::run_bbpb_decoder(Mapper *root_mapper, const char *buffer, STRLEN bu
             }
         }
             return false;
+        case gpd::pb::TOKEN_UNKNOWN_FIELD:
+            // do nothing for now
+            break;
         }
     }
 
@@ -1526,7 +1667,7 @@ namespace {
         XPUSHs(src);
         PUTBACK;
 
-        int count = call_method("as_hex", G_SCALAR);
+        call_method("as_hex", G_SCALAR);
 
         SPAGAIN;
         SV *res = POPs;
@@ -1563,6 +1704,17 @@ namespace {
         );
 
         return true;
+    }
+
+    bool fail_if_required(Status *status, const Mapper::Field &fd) {
+        if (fd.field_def->label() == UPB_LABEL_REQUIRED) {
+            status->SetFormattedErrorMessage(
+                "Missing required field '%s'",
+                fd.full_name().c_str());
+            return true;
+        }
+
+        return false;
     }
 
     inline bool SvPOK_utf8(SV *sv) {
@@ -1770,7 +1922,7 @@ namespace {
 
         bool operator()(pTHX_ Sink *sink, const Mapper::Field &fd, SV *value) {
             STRLEN len;
-            const char *str = fd.field_def->type() == UPB_TYPE_STRING ? SvPVutf8(value, len) : SvPV(value, len);
+            const char *str = fd.value_action == Mapper::ACTION_PUT_STRING ? SvPVutf8(value, len) : SvPV(value, len);
             Sink sub;
             if (!sink->StartString(fd.selector.str_start, len, &sub))
                 return false;
@@ -1781,9 +1933,9 @@ namespace {
 }
 
 template<class G, class S>
-bool Mapper::encode_from_array(Sink *sink, Status *status, const Mapper::Field &fd, AV *source) const {
+bool Mapper::encode_from_array(EncoderState &state, const Mapper::Field &fd, AV *source) const {
     G getter;
-    S setter(status);
+    S setter(state.status);
     Sink sub;
 
     int size = av_top_index(source) + 1;
@@ -1796,12 +1948,15 @@ bool Mapper::encode_from_array(Sink *sink, Status *status, const Mapper::Field &
         return true;
     }
 
+    Sink *sink = state.sink;
     if (!sink->StartSequence(fd.selector.seq_start, &sub))
         return false;
 
-    WarnContext::Item &warn_cxt = warn_context->push_level(WarnContext::Array);
+    MapperContext::Item &mapper_cxt = state.mapper_context->push_level(source);
+
     for (int i = 0; i < size; ++i) {
-        warn_cxt.index = i;
+        mapper_cxt.set_array_index(i);
+
         SV **item = av_fetch(source, i, 0);
         if (!item)
             return false;
@@ -1810,30 +1965,33 @@ bool Mapper::encode_from_array(Sink *sink, Status *status, const Mapper::Field &
         SvGETMAGIC(*item);
 #endif
 
-        if (fail_ref_coercion && is_coerced_ref(aTHX_ status, fd, *item))
+        if (fail_ref_coercion && is_coerced_ref(aTHX_ state.status, fd, *item))
             return false;
         if (!setter(aTHX_ &sub, fd, getter(aTHX_ *item)))
             return false;
     }
-    warn_context->pop_level();
+    state.mapper_context->pop_level();
 
     return sink->EndSequence(fd.selector.seq_end);
 }
 
-bool Mapper::encode_from_message_array(Sink *sink, Status *status, const Mapper::Field &fd, AV *source) const {
+bool Mapper::encode_from_message_array(EncoderState &state, const Mapper::Field &fd, AV *source) const {
     int size = av_top_index(source) + 1;
-    Sink sub;
+    Sink *sink = state.sink, sub;
 
     if (!sink->StartSequence(fd.selector.seq_start, &sub))
         return false;
 
-    WarnContext::Item &warn_cxt = warn_context->push_level(WarnContext::Array);
+    MapperContext::Item &mapper_cxt = state.mapper_context->push_level(source);
+
     for (int i = 0; i < size; ++i) {
-        warn_cxt.index = i;
+        mapper_cxt.set_array_index(i);
+
         SV **item = av_fetch(source, i, 0);
         if (!item)
             return false;
         Sink submsg;
+        EncoderState submsg_state(state, &submsg);
 
 #if HAS_FULL_NOMG
         SvGETMAGIC(*item);
@@ -1841,12 +1999,12 @@ bool Mapper::encode_from_message_array(Sink *sink, Status *status, const Mapper:
 
         if (!sub.StartSubMessage(fd.selector.msg_start, &submsg))
             return false;
-        if (!encode_value(&submsg, status, *item))
+        if (!encode_message(submsg_state, *item))
             return false;
         if (!sub.EndSubMessage(fd.selector.msg_end))
             return false;
     }
-    warn_context->pop_level();
+    state.mapper_context->pop_level();
 
     return sink->EndSequence(fd.selector.seq_end);
 }
@@ -1858,9 +2016,66 @@ namespace {
 
         return hv_fetch_ent(hv, name, lval, hash);
     }
+
+    class TrackOneof {
+    public:
+        TrackOneof(int oneof_count) :
+                seen_oneof(oneof_count) {
+        }
+
+        bool mark_and_maybe_skip(int oneof_index) {
+            if (oneof_index != -1) {
+                if (seen_oneof[oneof_index])
+                    return true;
+                seen_oneof[oneof_index] = true;
+            }
+
+            return false;
+        }
+
+    private:
+        vector<bool> seen_oneof;
+    };
+
+    class TrackSeen {
+        typedef Mapper::Field Field;
+
+    public:
+        TrackSeen(bool _check, const vector<Field> &_fields) :
+                check(_check),
+                seen_fields(check ? _fields.size() : 0),
+                fields(_fields) {
+        }
+
+        void mark(int index) {
+            if (check)
+                seen_fields[index] = true;
+        }
+
+        bool required_fields_present(Status *status) {
+            return !check || perform_check(status);
+        }
+
+    private:
+        bool perform_check(Status *status) {
+            for (int i = 0, max = fields.size(); i < max; ++i) {
+                const Field &field = fields[i];
+
+                if (!seen_fields[i] && fail_if_required(status, field)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        bool check;
+        vector<bool> seen_fields;
+        const vector<Field> &fields;
+    };
 }
 
-bool Mapper::encode_value(Sink *sink, Status *status, SV *ref) const {
+bool Mapper::encode_simple_message_iterate_fields(EncoderState &state, SV *ref) const {
 #if !HAS_FULL_NOMG
     SvGETMAGIC(ref);
 #endif
@@ -1868,163 +2083,252 @@ bool Mapper::encode_value(Sink *sink, Status *status, SV *ref) const {
     if (!SvROK(ref) || SvTYPE(SvRV(ref)) != SVt_PVHV)
         croak("Not a hash reference when encoding a %s value", message_def->full_name());
     HV *hv = (HV *) SvRV(ref);
+    Sink *sink = state.sink;
 
     if (!sink->StartMessage())
         return false;
 
     bool tied = SvTIED_mg((SV *) hv, PERL_MAGIC_tied);
-    bool ok = true;
-    WarnContext::Item &warn_cxt = warn_context->push_level(WarnContext::Message);
-    vector<bool> seen_oneof;
-    seen_oneof.resize(oneof_count);
+    MapperContext::Item &mapper_cxt = state.mapper_context->push_level(hv, MapperContext::Message);
+    TrackOneof track_oneof(oneof_count);
+
     for (vector<Field>::const_iterator it = fields.begin(), en = fields.end(); it != en; ++it) {
-        warn_cxt.field = &*it;
+        mapper_cxt.set_hash_key(it->name);
+
         HE *he = tied ? hv_fetch_ent_tied(aTHX_ hv, it->name, 0, it->name_hash) :
                         hv_fetch_ent(hv, it->name, 0, it->name_hash);
-
-        if (!he) {
-            if (it->field_def->label() == UPB_LABEL_REQUIRED) {
-                status->SetFormattedErrorMessage(
-                    "Missing required field '%s'",
-                    it->full_name().c_str());
-                return false;
-            } else
-                continue;
-        } else if (it->oneof_index != -1) {
-            if (seen_oneof[it->oneof_index])
-                continue;
-            seen_oneof[it->oneof_index] = true;
+        SV *value = NULL;
+        if (he) {
+            value = HeVAL(he);
+#if HAS_FULL_NOMG
+            SvGETMAGIC(value);
+#endif
         }
 
-        SV *value = HeVAL(he);
+        if (!he || (ignore_undef_fields && !SvOK(value))) {
+            if (fail_if_required(state.status, *it))
+                return false;
+            else
+                continue;
+        } else if (track_oneof.mark_and_maybe_skip(it->oneof_index)) {
+            continue;
+        }
+
+        if (!encode_field(state, *it, value))
+            return false;
+    }
+    state.mapper_context->pop_level();
+
+    if (!sink->EndMessage(state.status))
+        return false;
+
+    return true;
+}
+
+bool Mapper::encode_transformed_fieldtable_message(EncoderState &state, SV *ref, EncoderTransform *encoder_transform) const {
+#if !HAS_FULL_NOMG
+    SvGETMAGIC(ref);
+#endif
+    Sink *sink = state.sink;
+
+    if (!sink->StartMessage())
+        return false;
+
+    MapperContext::Item &mapper_cxt = state.mapper_context->push_level(ref, MapperContext::Message);
+
+    EncoderFieldtable *target = NULL, target_copy;
+    encoder_transform->transform_fieldtable(aTHX_ &target, ref);
+
+    if (target == NULL) {
+        croak("Transform callback for message %s did not return a table", message_def->full_name());
+        return false;
+    }
+
+    if (target->size > 1) {
+        size_t size = target->size * sizeof(EncoderFieldtable::Entry);
+
+        target_copy.size = target->size;
+        target_copy.entries = (EncoderFieldtable::Entry *) memcpy(alloca(size), target->entries, size);
+        target = &target_copy;
+    }
+
+    TrackOneof track_oneof(oneof_count);
+    TrackSeen track_seen(check_required_fields, fields);
+
+    for (int i = 0, max = target->size; i < max; ++i) {
+        EncoderFieldtable::Entry *entry = target->entries + i;
+        const Field *it = field_map.find_by_number(entry->field);
+        if (it == NULL) {
+            continue;
+        }
+
+        mapper_cxt.set_hash_key(it->name);
+
+        if (track_oneof.mark_and_maybe_skip(it->oneof_index)) {
+            continue;
+        }
+        track_seen.mark(it->field_index);
+
+        SV *value = entry->value;
 #if HAS_FULL_NOMG
         SvGETMAGIC(value);
 #endif
 
-        if (it->is_map)
-            ok = ok && encode_from_perl_hash(sink, status, *it, value);
-        else if (it->field_def->label() == UPB_LABEL_REPEATED)
-            ok = ok && encode_from_perl_array(sink, status, *it, value);
-        else if (encode_defaults || !it->has_default)
-            ok = ok && encode_field(sink, status, *it, value);
-        else
-            ok = ok && encode_field_nodefaults(sink, status, *it, value);
+        if (!encode_field(state, *it, value)) {
+            SvREFCNT_dec_NN(value);
+            return false;
+        }
+        SvREFCNT_dec_NN(value);
     }
-    warn_context->pop_level();
+    state.mapper_context->pop_level();
 
-    if (!sink->EndMessage(status))
+    if (!track_seen.required_fields_present(state.status)) {
+        return false;
+    }
+
+    if (!sink->EndMessage(state.status))
         return false;
 
-    return ok;
+    return true;
 }
 
-bool Mapper::encode_field(Sink *sink, Status *status, const Field &fd, SV *ref) const {
-    int field_type = fd.field_def->type();
+bool Mapper::encode_transformed_message(EncoderState &state, SV *ref, EncoderTransform *encoder_transform) const {
+#if !HAS_FULL_NOMG
+    SvGETMAGIC(ref);
+#endif
 
-    if (fail_ref_coercion && field_type != UPB_TYPE_MESSAGE && is_coerced_ref(aTHX_ status, fd, ref))
+    SV *target = sv_newmortal();
+    encoder_transform->transform(aTHX_ target, ref);
+
+    return encode_simple_message_iterate_hash(state, target);
+}
+
+bool Mapper::encode_simple_message_iterate_hash(EncoderState &state, SV *ref) const {
+#if !HAS_FULL_NOMG
+    SvGETMAGIC(ref);
+#endif
+
+    if (!SvROK(ref) || SvTYPE(SvRV(ref)) != SVt_PVHV)
+        croak("Not a hash reference when encoding a %s value", message_def->full_name());
+    HV *hv = (HV *) SvRV(ref);
+    Sink *sink = state.sink;
+
+    if (!sink->StartMessage())
         return false;
 
-    switch (field_type) {
-    case UPB_TYPE_FLOAT:
-        return sink->PutFloat(fd.selector.primitive, SvNV_enc(ref));
-    case UPB_TYPE_DOUBLE:
-        return sink->PutDouble(fd.selector.primitive, SvNV_enc(ref));
-    case UPB_TYPE_BOOL:
-        return sink->PutBool(fd.selector.primitive, SvTRUE_enc(ref));
-    case UPB_TYPE_STRING:
-    case UPB_TYPE_BYTES: {
-        STRLEN len;
-        const char *str = fd.field_def->type() == UPB_TYPE_STRING ? SvPVutf8_enc(ref, len) : SvPV_enc(ref, len);
+    TrackOneof track_oneof(oneof_count);
+    TrackSeen track_seen(check_required_fields, fields);
+
+    bool magical = SvMAGICAL((SV *) hv);
+    hv_iterinit(hv);
+
+    MapperContext::Item &mapper_cxt = state.mapper_context->push_level(hv, MapperContext::Message);
+
+    while (HE *entry = hv_iternext(hv)) {
+        mapper_cxt.set_hash_key(entry);
+        const Field *it = field_map.find_by_name(aTHX_ entry);
+
+        if (it == NULL) {
+            if (unknown_field_transform) {
+                UnknownFieldContext context;
+
+                state.mapper_context->fill_context(&context.mapper_context, &context.size);
+                unknown_field_transform->transform(aTHX_ &context, HeVAL(entry));
+            }
+
+            continue;
+        }
+
+        SV *value = UNLIKELY(magical) ? hv_iterval(hv, entry) : HeVAL(entry);
+#if HAS_FULL_NOMG
+        SvGETMAGIC(value);
+#endif
+        if (ignore_undef_fields && !SvOK(value)) {
+            continue;
+        }
+
+        if (track_oneof.mark_and_maybe_skip(it->oneof_index)) {
+            continue;
+        }
+        track_seen.mark(it->field_index);
+
+        if (!encode_field(state, *it, value))
+            return false;
+    }
+
+    if (!track_seen.required_fields_present(state.status)) {
+        return false;
+    }
+
+    state.mapper_context->pop_level();
+
+    if (!sink->EndMessage(state.status))
+        return false;
+
+    return true;
+}
+
+namespace {
+    inline bool put_string(Sink *sink, const Mapper::Field &fd, const char *str, STRLEN len) {
         Sink sub;
         if (!sink->StartString(fd.selector.str_start, len, &sub))
             return false;
         sub.PutStringBuffer(fd.selector.str_cont, str, len, NULL);
         return sink->EndString(fd.selector.str_end);
     }
-    case UPB_TYPE_MESSAGE: {
-        Sink sub;
-        if (!sink->StartSubMessage(fd.selector.msg_start, &sub))
-            return false;
-        if (!fd.mapper->encode_value(&sub, status, ref))
-            return false;
-        return sink->EndSubMessage(fd.selector.msg_end);
-    }
-    case UPB_TYPE_ENUM: {
-        IV value = SvIV_enc(ref);
-        if (check_enum_values &&
-                fd.enum_values.find(value) == fd.enum_values.end()) {
-            status->SetFormattedErrorMessage(
-                "Invalid enumeration value %d for field '%s'",
-                value,
-                fd.full_name().c_str()
-            );
-            return false;
-        }
 
-        return sink->PutInt32(fd.selector.primitive, value);
-    }
-    case UPB_TYPE_INT32:
-        return sink->PutInt32(fd.selector.primitive, SvIV_enc(ref));
-    case UPB_TYPE_UINT32:
-        return sink->PutUInt32(fd.selector.primitive, SvUV_enc(ref));
-    case UPB_TYPE_INT64:
-        if (sizeof(IV) >= sizeof(int64_t))
-            return sink->PutInt64(fd.selector.primitive, SvIV_enc(ref));
-        else
-            return sink->PutInt64(fd.selector.primitive, SvIV64_enc(ref));
-    case UPB_TYPE_UINT64:
-        if (sizeof(UV) >= sizeof(int64_t))
-            return sink->PutInt64(fd.selector.primitive, SvUV_enc(ref));
-        else
-            return sink->PutUInt64(fd.selector.primitive, SvUV64_enc(ref));
-    default:
-        return false; // just in case
+    inline bool is_default_string(const Mapper::Field &fd, const char *str, STRLEN len) {
+        return len == fd.default_str_len &&
+            (len == 0 || memcmp(str, fd.default_str, len) == 0);
     }
 }
 
-bool Mapper::encode_field_nodefaults(Sink *sink, Status *status, const Field &fd, SV *ref) const {
-    if (fail_ref_coercion && is_coerced_ref(aTHX_ status, fd, ref))
-        return false;
+bool Mapper::encode_field(EncoderState &state, const Field &fd, SV *ref) const {
+    ValueAction field_action = fd.field_action;
 
-    switch (fd.field_def->type()) {
-    case UPB_TYPE_FLOAT: {
+    if (fail_ref_coercion && field_action < ACTION_PUT_MESSAGE && is_coerced_ref(aTHX_ state.status, fd, ref))
+        return false;
+    Sink *sink = state.sink;
+
+    switch (field_action) {
+
+        // do not encode field default value
+
+    case ACTION_PUT_FLOAT_ND: {
         NV value = SvNV_enc(ref);
         if (value == fd.default_nv)
             return true;
         return sink->PutFloat(fd.selector.primitive, value);
     }
-    case UPB_TYPE_DOUBLE: {
+    case ACTION_PUT_DOUBLE_ND: {
         NV value = SvNV_enc(ref);
         if (value == fd.default_nv)
             return true;
         return sink->PutDouble(fd.selector.primitive, value);
     }
-    case UPB_TYPE_BOOL: {
+    case ACTION_PUT_BOOL_ND: {
         bool value = SvTRUE_enc(ref);
         if (value == fd.default_bool)
             return true;
         return sink->PutBool(fd.selector.primitive, value);
     }
-    case UPB_TYPE_STRING:
-    case UPB_TYPE_BYTES: {
+    case ACTION_PUT_STRING_ND: {
         STRLEN len;
-        const char *str = fd.field_def->type() == UPB_TYPE_STRING ? SvPVutf8_enc(ref, len) : SvPV_enc(ref, len);
-        if (len == fd.default_str_len &&
-                (len == 0 || memcmp(str, fd.default_str, len) == 0))
-            return true;
-        Sink sub;
-        if (!sink->StartString(fd.selector.str_start, len, &sub))
-            return false;
-        sub.PutStringBuffer(fd.selector.str_cont, str, len, NULL);
-        return sink->EndString(fd.selector.str_end);
+        const char *str = SvPVutf8_enc(ref, len);
+        return is_default_string(fd, str, len) || put_string(sink, fd, str, len);
     }
-    case UPB_TYPE_ENUM: {
+    case ACTION_PUT_BYTES_ND: {
+        STRLEN len;
+        const char *str = SvPV_enc(ref, len);
+        return is_default_string(fd, str, len) || put_string(sink, fd, str, len);
+    }
+    case ACTION_PUT_ENUM_ND: {
         IV value = SvIV_enc(ref);
         if (value == fd.default_iv)
             return true;
         if (check_enum_values &&
                 fd.enum_values.find(value) == fd.enum_values.end()) {
-            status->SetFormattedErrorMessage(
+            state.status->SetFormattedErrorMessage(
                 "Invalid enumeration value %d for field '%s'",
                 value,
                 fd.full_name().c_str()
@@ -2034,82 +2338,153 @@ bool Mapper::encode_field_nodefaults(Sink *sink, Status *status, const Field &fd
 
         return sink->PutInt32(fd.selector.primitive, value);
     }
-    case UPB_TYPE_INT32: {
+    case ACTION_PUT_INT32_ND: {
         IV value = SvIV_enc(ref);
         if (value == fd.default_iv)
             return true;
         return sink->PutInt32(fd.selector.primitive, value);
     }
-    case UPB_TYPE_UINT32: {
+    case ACTION_PUT_UINT32_ND: {
         UV value = SvUV_enc(ref);
         if (value == fd.default_uv)
             return true;
         return sink->PutUInt32(fd.selector.primitive, value);
     }
-    case UPB_TYPE_INT64: {
+    case ACTION_PUT_INT64_ND: {
         int64_t value = sizeof(IV) >= sizeof(int64_t) ? SvIV_enc(ref) : SvIV64_enc(ref);
         if (value == fd.default_i64)
             return true;
         return sink->PutInt64(fd.selector.primitive, value);
     }
-    case UPB_TYPE_UINT64: {
+    case ACTION_PUT_UINT64_ND: {
         uint64_t value = sizeof(UV) >= sizeof(int64_t) ? SvUV_enc(ref) : SvUV64_enc(ref);
         if (value == fd.default_u64)
             return true;
         return sink->PutUInt64(fd.selector.primitive, value);
     }
+
+        // encode field default value
+
+    case ACTION_PUT_FLOAT:
+        return sink->PutFloat(fd.selector.primitive, SvNV_enc(ref));
+    case ACTION_PUT_DOUBLE:
+        return sink->PutDouble(fd.selector.primitive, SvNV_enc(ref));
+    case ACTION_PUT_BOOL:
+        return sink->PutBool(fd.selector.primitive, SvTRUE_enc(ref));
+    case ACTION_PUT_STRING: {
+        STRLEN len;
+        const char *str = SvPVutf8_enc(ref, len);
+        return put_string(sink, fd, str, len);
+    }
+    case ACTION_PUT_BYTES: {
+        STRLEN len;
+        const char *str = SvPV_enc(ref, len);
+        return put_string(sink, fd, str, len);
+    }
+    case ACTION_PUT_ENUM: {
+        IV value = SvIV_enc(ref);
+        if (check_enum_values &&
+                fd.enum_values.find(value) == fd.enum_values.end()) {
+            state.status->SetFormattedErrorMessage(
+                "Invalid enumeration value %d for field '%s'",
+                value,
+                fd.full_name().c_str()
+            );
+            return false;
+        }
+
+        return sink->PutInt32(fd.selector.primitive, value);
+    }
+    case ACTION_PUT_INT32:
+        return sink->PutInt32(fd.selector.primitive, SvIV_enc(ref));
+    case ACTION_PUT_UINT32:
+        return sink->PutUInt32(fd.selector.primitive, SvUV_enc(ref));
+    case ACTION_PUT_INT64:
+        if (sizeof(IV) >= sizeof(int64_t))
+            return sink->PutInt64(fd.selector.primitive, SvIV_enc(ref));
+        else
+            return sink->PutInt64(fd.selector.primitive, SvIV64_enc(ref));
+    case ACTION_PUT_UINT64:
+        if (sizeof(UV) >= sizeof(int64_t))
+            return sink->PutInt64(fd.selector.primitive, SvUV_enc(ref));
+        else
+            return sink->PutUInt64(fd.selector.primitive, SvUV64_enc(ref));
+
+        // non-scalar fields
+
+    case ACTION_PUT_MESSAGE: {
+        Sink sub;
+        EncoderState sub_state(state, &sub);
+
+        if (!sink->StartSubMessage(fd.selector.msg_start, &sub))
+            return false;
+        if (!fd.mapper->encode_message(sub_state, ref))
+            return false;
+        return sink->EndSubMessage(fd.selector.msg_end);
+    }
+    case ACTION_PUT_FIELDTABLE: {
+        Sink sub;
+        EncoderState sub_state(state, &sub);
+
+        if (!sink->StartSubMessage(fd.selector.msg_start, &sub))
+            return false;
+        if (!fd.mapper->encode_transformed_fieldtable_message(sub_state, ref, fd.encoder_transform))
+            return false;
+        return sink->EndSubMessage(fd.selector.msg_end);
+    }
+    case ACTION_PUT_MAP:
+        return encode_from_perl_hash(state, fd, ref);
+    case ACTION_PUT_REPEATED:
+        return encode_from_perl_array(state, fd, ref);
     default:
         return false; // just in case
     }
 }
 
-bool Mapper::encode_key(Sink *sink, Status *status, const Field &fd, const char *key, I32 keylen) const {
-    switch (fd.field_def->type()) {
-    case UPB_TYPE_BOOL: {
+bool Mapper::encode_key(EncoderState &state, const Field &fd, const char *key, I32 keylen) const {
+    Sink *sink = state.sink;
+
+    switch (fd.value_action) {
+    case ACTION_PUT_BOOL: {
         // follows what SvTRUE() does for strings
         bool bval = keylen > 1 || (keylen == 1 && key[0] != '0');
         return sink->PutBool(fd.selector.primitive, bval);
     }
-    case UPB_TYPE_STRING: {
+    case ACTION_PUT_STRING: {
         Sink sub;
         if (!sink->StartString(fd.selector.str_start, keylen, &sub))
             return false;
         sub.PutStringBuffer(fd.selector.str_cont, key, keylen, NULL);
         return sink->EndString(fd.selector.str_end);
     }
-    case UPB_TYPE_INT32:
+    case ACTION_PUT_INT32:
         return sink->PutInt32(fd.selector.primitive, key_iv(aTHX_ key, keylen));
-    case UPB_TYPE_UINT32:
+    case ACTION_PUT_UINT32:
         return sink->PutUInt32(fd.selector.primitive, key_uv(aTHX_ key, keylen));
-    case UPB_TYPE_INT64:
+    case ACTION_PUT_INT64:
         return sink->PutInt64(fd.selector.primitive, key_iv(aTHX_ key, keylen));
-    case UPB_TYPE_UINT64:
-        return sink->PutInt64(fd.selector.primitive, key_uv(aTHX_ key, keylen));
+    case ACTION_PUT_UINT64:
+        return sink->PutUInt64(fd.selector.primitive, key_uv(aTHX_ key, keylen));
     default:
         return false; // just in case
     }
 }
 
-bool Mapper::encode_hash_kv(Sink *sink, Status *status, const char *key, STRLEN keylen, SV *value) const {
+bool Mapper::encode_hash_kv(EncoderState &state, const char *key, STRLEN keylen, SV *value) const {
+    Sink *sink = state.sink;
+
     if (!sink->StartMessage())
         return false;
-    if (fields[0].is_map_key()) {
-        if (!encode_key(sink, status, fields[0], key, keylen))
-            return false;
-        if (!encode_field(sink, status, fields[1], value))
-            return false;
-    } else {
-        if (!encode_key(sink, status, fields[1], key, keylen))
-            return false;
-        if (!encode_field(sink, status, fields[0], value))
-            return false;
-    }
-    if (!sink->EndMessage(status))
+    if (!encode_key(state, fields[map_key_index], key, keylen))
+        return false;
+    if (!encode_field(state, fields[map_value_index], value))
+        return false;
+    if (!sink->EndMessage(state.status))
         return false;
     return true;
 }
 
-bool Mapper::encode_from_perl_hash(Sink *sink, Status *status, const Field &fd, SV *ref) const {
+bool Mapper::encode_from_perl_hash(EncoderState &state, const Field &fd, SV *ref) const {
 #if !HAS_FULL_NOMG
     SvGETMAGIC(ref);
 #endif
@@ -2117,35 +2492,47 @@ bool Mapper::encode_from_perl_hash(Sink *sink, Status *status, const Field &fd, 
     if (!SvROK(ref) || SvTYPE(SvRV(ref)) != SVt_PVHV)
         croak("Not a hash reference when encoding field '%s'", fd.full_name().c_str());
     HV *hash = (HV *) SvRV(ref);
-    Sink repeated;
+    Sink *sink = state.sink, repeated;
 
     if (!sink->StartSequence(fd.selector.seq_start, &repeated))
         return false;
 
+    bool magical = SvMAGICAL((SV *) hash);
     hv_iterinit(hash);
-    WarnContext::Item &warn_cxt = warn_context->push_level(WarnContext::Hash);
+    MapperContext::Item &mapper_cxt = state.mapper_context->push_level(hash, MapperContext::Hash);
+
+    bool need_unicode = fd.mapper->fields[fd.mapper->map_key_index]
+            .value_action == ACTION_PUT_STRING;
+
     while (HE *entry = hv_iternext(hash)) {
         Sink key_value;
-        SV *value = HeVAL(entry);
+        EncoderState key_value_state(state, &key_value);
+        SV *value = UNLIKELY(magical) ? hv_iterval(hash, entry) : HeVAL(entry);
         const char *key;
         STRLEN keylen;
-        bool needs_free = false;
+
+        if (ignore_undef_fields && !SvOK(value))
+            continue;
 
         if (HeKLEN(entry) == HEf_SVKEY) {
             key = SvPVutf8(HeKEY_sv(entry), keylen);
         } else {
-            if (HeKUTF8(entry)) {
-                key = HeKEY(entry);
-                keylen = HeKLEN(entry);
-            } else {
-                keylen = HeKLEN(entry);
+            key = HeKEY(entry);
+            keylen = HeKLEN(entry);
+
+            // For string keys avoid the copy performed by bytes_to_utf8 if
+            // the string is invariant (ASCII).
+            //
+            // For non-string keys do not care much about the actual encoding, as
+            // they are either invariant or invalid.
+            if (!HeKUTF8(entry) && need_unicode &&
+                    !is_invariant_string((const U8 *) key, keylen)) {
                 key = (const char *) bytes_to_utf8((U8*) HeKEY(entry), &keylen);
                 SAVEFREEPV(key);
             }
         }
 
-        warn_cxt.key = key;
-        warn_cxt.keylen = keylen;
+        mapper_cxt.set_hash_key(key, keylen);
 
 #if HAS_FULL_NOMG
         SvGETMAGIC(value);
@@ -2153,17 +2540,17 @@ bool Mapper::encode_from_perl_hash(Sink *sink, Status *status, const Field &fd, 
 
         if (!repeated.StartSubMessage(fd.selector.msg_start, &key_value))
             return false;
-        if (!fd.mapper->encode_hash_kv(&key_value, status, key, keylen, value))
+        if (!fd.mapper->encode_hash_kv(key_value_state, key, keylen, value))
             return false;
         if (!repeated.EndSubMessage(fd.selector.msg_end))
             return false;
     }
-    warn_context->pop_level();
+    state.mapper_context->pop_level();
 
     return sink->EndSequence(fd.selector.seq_end);
 }
 
-bool Mapper::encode_from_perl_array(Sink *sink, Status *status, const Field &fd, SV *ref) const {
+bool Mapper::encode_from_perl_array(EncoderState &state, const Field &fd, SV *ref) const {
 #if !HAS_FULL_NOMG
     SvGETMAGIC(ref);
 #endif
@@ -2171,38 +2558,38 @@ bool Mapper::encode_from_perl_array(Sink *sink, Status *status, const Field &fd,
         croak("Not an array reference when encoding field '%s'", fd.full_name().c_str());
     AV *array = (AV *) SvRV(ref);
 
-    switch (fd.field_def->type()) {
-    case UPB_TYPE_FLOAT:
-        return encode_from_array<NVGetter, FloatEmitter>(sink, status, fd, array);
-    case UPB_TYPE_DOUBLE:
-        return encode_from_array<NVGetter, DoubleEmitter>(sink, status, fd, array);
-    case UPB_TYPE_BOOL:
-        return encode_from_array<BoolGetter, BoolEmitter>(sink, status, fd, array);
-    case UPB_TYPE_STRING:
-        return encode_from_array<SVGetter, StringEmitter>(sink, status, fd, array);
-    case UPB_TYPE_BYTES:
-        return encode_from_array<SVGetter, StringEmitter>(sink, status, fd, array);
-    case UPB_TYPE_MESSAGE:
-        return fd.mapper->encode_from_message_array(sink, status, fd, array);
-    case UPB_TYPE_ENUM:
+    switch (fd.value_action) {
+    case ACTION_PUT_FLOAT:
+        return encode_from_array<NVGetter, FloatEmitter>(state, fd, array);
+    case ACTION_PUT_DOUBLE:
+        return encode_from_array<NVGetter, DoubleEmitter>(state, fd, array);
+    case ACTION_PUT_BOOL:
+        return encode_from_array<BoolGetter, BoolEmitter>(state, fd, array);
+    case ACTION_PUT_STRING:
+        return encode_from_array<SVGetter, StringEmitter>(state, fd, array);
+    case ACTION_PUT_BYTES:
+        return encode_from_array<SVGetter, StringEmitter>(state, fd, array);
+    case ACTION_PUT_MESSAGE:
+        return fd.mapper->encode_from_message_array(state, fd, array);
+    case ACTION_PUT_ENUM:
         if (check_enum_values)
-            return encode_from_array<IVGetter, EnumEmitter>(sink, status, fd, array);
+            return encode_from_array<IVGetter, EnumEmitter>(state, fd, array);
         else
-            return encode_from_array<IVGetter, Int32Emitter>(sink, status, fd, array);
-    case UPB_TYPE_INT32:
-        return encode_from_array<IVGetter, Int32Emitter>(sink, status, fd, array);
-    case UPB_TYPE_UINT32:
-        return encode_from_array<UVGetter, UInt32Emitter>(sink, status, fd, array);
-    case UPB_TYPE_INT64:
+            return encode_from_array<IVGetter, Int32Emitter>(state, fd, array);
+    case ACTION_PUT_INT32:
+        return encode_from_array<IVGetter, Int32Emitter>(state, fd, array);
+    case ACTION_PUT_UINT32:
+        return encode_from_array<UVGetter, UInt32Emitter>(state, fd, array);
+    case ACTION_PUT_INT64:
         if (sizeof(IV) >= sizeof(int64_t))
-            return encode_from_array<IVGetter, Int64Emitter>(sink, status, fd, array);
+            return encode_from_array<IVGetter, Int64Emitter>(state, fd, array);
         else
-            return encode_from_array<I64Getter, Int64Emitter>(sink, status, fd, array);
-    case UPB_TYPE_UINT64:
+            return encode_from_array<I64Getter, Int64Emitter>(state, fd, array);
+    case ACTION_PUT_UINT64:
         if (sizeof(IV) >= sizeof(int64_t))
-            return encode_from_array<UVGetter, UInt64Emitter>(sink, status, fd, array);
+            return encode_from_array<UVGetter, UInt64Emitter>(state, fd, array);
         else
-            return encode_from_array<U64Getter, UInt64Emitter>(sink, status, fd, array);
+            return encode_from_array<U64Getter, UInt64Emitter>(state, fd, array);
     default:
         return false; // just in case
     }
@@ -2259,19 +2646,15 @@ bool Mapper::check(Status *status, SV *ref) const {
         char *key;
         I32 keylen;
         SV *value = hv_iternextsv(hv, &key, &keylen);
-        // if the key is marked as UTF-8 and contains non-ASCII characters,
-        // it will not be there anyway in the lookup
-        string name(key, keylen < 0 ? -keylen : keylen);
-        STD_TR1::unordered_map<string, Field *>::const_iterator it = field_map.find(name);
+        const Field *field = field_map.find_by_name(aTHX_ key, keylen);
 
-        if (it == field_map.end()) {
+        if (field == NULL) {
             status->SetFormattedErrorMessage(
-                "Unknown field '%s' during check",
-                name.c_str());
+                "Unknown field '%.*s' during check",
+                keylen, key);
             return false;
         }
 
-        Field *field = it->second;
         if (field->field_def->label() == UPB_LABEL_REPEATED)
             ok = ok && check_from_perl_array(status, *field, value);
         else
@@ -2282,10 +2665,10 @@ bool Mapper::check(Status *status, SV *ref) const {
 }
 
 bool Mapper::check(Status *status, const Field &fd, SV *ref) const {
-    switch (fd.field_def->type()) {
-    case UPB_TYPE_MESSAGE:
+    switch (fd.value_action) {
+    case ACTION_PUT_MESSAGE:
         return fd.mapper->check(status, ref);
-    case UPB_TYPE_ENUM: {
+    case ACTION_PUT_ENUM: {
         if (!check_enum_values)
             return true;
 
@@ -2314,10 +2697,10 @@ bool Mapper::check_from_perl_array(Status *status, const Field &fd, SV *ref) con
         croak("Not an array reference when encoding field '%s'", fd.full_name().c_str());
     AV *array = (AV *) SvRV(ref);
 
-    switch (fd.field_def->type()) {
-    case UPB_TYPE_MESSAGE:
+    switch (fd.value_action) {
+    case ACTION_PUT_MESSAGE:
         return fd.mapper->check_from_message_array(status, fd, array);
-    case UPB_TYPE_ENUM:
+    case ACTION_PUT_ENUM:
         if (check_enum_values)
             return check_from_enum_array(status, fd, array);
         else
@@ -2367,15 +2750,14 @@ void Mapper::apply_default(const Field &field, SV *target) const {
     case UPB_TYPE_UINT64:
         sv_setuv(target, field.field_def->default_uint64());
         break;
+    case UPB_TYPE_MESSAGE:
+        // no default for messages
+        break;
     }
 }
 
 void Mapper::apply_map_value_default(SV *target) const {
-    if (fields[1].is_map_value()) {
-        apply_default(fields[1], target);
-    } else {
-        apply_default(fields[0], target);
-    }
+    apply_default(fields[map_value_index], target);
 }
 
 MapperField::MapperField(pTHX_ const Mapper *_mapper, const Mapper::Field *_field) :
@@ -2673,7 +3055,7 @@ void MapperField::copy_value(SV *target, SV *value) {
         break;
     case UPB_TYPE_ENUM: {
         I32 i32 = SvIV(value);
-        const STD_TR1::unordered_set<int32_t> &enum_values = field->is_map ?
+        const unordered_set<int32_t> &enum_values = field->is_map ?
             field->map_enum_values() :
             field->enum_values;
         if (enum_values.size() &&
@@ -2920,21 +3302,45 @@ void WarnContext::localize_warning_handler(pTHX) {
     PL_warnhook = SvREFCNT_inc_simple_NN(warn_handler);
 }
 
+namespace {
+    void concat_key(pTHX_ SV *sv, const MapperContext::ExternalItem *key, bool is_hash) {
+        if (is_hash)
+            sv_catpvs(sv, "{");
+
+        if (key->hash_item.svkey) {
+            sv_catsv(sv, key->hash_item.svkey);
+        } else if (key->hash_item.keybuf) {
+            sv_catpvn(sv, key->hash_item.keybuf, key->hash_item.keylen);
+        } else {
+            sv_catpvs(sv, "<message>.");
+        }
+
+        if (is_hash)
+            sv_catpvs(sv, "}.");
+        else
+            sv_catpvs(sv, ".");
+    }
+}
+
 void WarnContext::warn_with_context(pTHX_ SV *warning) const {
     SV *cxt = sv_2mortal(newSVpvs("While encoding field '"));
+    int mapper_context_size = 0;
+    const gpd::MapperContext::ExternalItem *const *mapper_context = NULL;
 
-    for (Levels::const_iterator it = levels.begin(), en = levels.end(); it != en; ++it) {
-        switch (it->kind) {
-        case Array:
-            sv_catpvf(cxt, "[%d].", it->index);
+    context->fill_context(&mapper_context, &mapper_context_size);
+
+    for (int i = 0; i < mapper_context_size; ++i) {
+        const gpd::MapperContext::ExternalItem *item = mapper_context[i];
+
+        switch (item->kind) {
+        case MapperContext::Array:
+            sv_catpvf(cxt, "[%d].", item->array_item.index);
             break;
-        case Hash:
-            sv_catpvs(cxt, "{");
-            sv_catpvn(cxt, it->key, it->keylen);
-            sv_catpvs(cxt, "}.");
+        case MapperContext::Hash:
+            concat_key(aTHX_ cxt, item, true);
             break;
-        case Message:
-            sv_catpvf(cxt, "%" SVf ".", it->field->name);
+        case MapperContext::Message:
+            concat_key(aTHX_ cxt, item, false);
             break;
         }
     }

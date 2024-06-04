@@ -1,0 +1,50 @@
+---
+abstract: 'Tags helper for message board.'
+author:
+  - 'Michal Josef Spacek <skim@cpan.org>'
+build_requires:
+  CSS::Struct::Output::Structure: 0
+  English: 0
+  Error::Pure::Utils: 0
+  ExtUtils::MakeMaker: 6.36
+  Tags::Output::Structure: 0
+  Test::MockObject: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+  Test::Shared::Fixture::Data::Message::Board::Example: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.21'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tags-HTML-Message-Board
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Class::Utils: 0.06
+  Data::HTML::Element::Button: 0
+  Data::HTML::Element::Textarea: 0
+  Error::Pure: 0.07
+  Mo::utils: 0.06
+  Mo::utils::CSS: 0.02
+  Mo::utils::Language: 0.05
+  Readonly: 0
+  Scalar::Util: 0
+  Tags::HTML: 0.06
+  Tags::HTML::Element::Button: 0
+  Tags::HTML::Element::Textarea: 0
+  perl: 5.8.0
+resources:
+  bugtracker: https://github.com/michal-josef-spacek/Tags-HTML-Message-Board/issues
+  homepage: https://github.com/michal-josef-spacek/Tags-HTML-Message-Board
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: git://github.com/michal-josef-spacek/Tags-HTML-Message-Board
+version: '0.01'

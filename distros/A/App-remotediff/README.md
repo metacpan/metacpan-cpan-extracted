@@ -23,6 +23,8 @@ DESCRIPTION
 `remotediff` uses `rsync` to copy remote files to a tmp directory, before
 executing `diff` on them locally.
 
+The remote files are cached between program executions.
+
 `colordiff` is used if installed and STDOUT is a TTY.
 
 

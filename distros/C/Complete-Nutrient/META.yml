@@ -19,13 +19,13 @@ name: Complete-Nutrient
 provides:
   Complete::Nutrient:
     file: lib/Complete/Nutrient.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Complete::Common: '0.22'
   Complete::Util: '0.620'
   Exporter: '5.57'
   Log::ger: '0.038'
-  TableData::Health::Nutrient: '0'
+  TableData::Health::Nutrient: '0.003'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Nutrient
   homepage: https://metacpan.org/release/Complete-Nutrient
   repository: git://github.com/perlancar/perl-Complete-Nutrient.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

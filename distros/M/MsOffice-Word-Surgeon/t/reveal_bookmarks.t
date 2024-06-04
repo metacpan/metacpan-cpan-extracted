@@ -9,8 +9,6 @@ my $do_save_results = $ARGV[0] && $ARGV[0] eq 'save';
 $dir ||= ".";
 my $sample_file = "$dir/etc/MsOffice-Word-Surgeon.docx";
 
-diag( "Testing MsOffice::Word::Surgeon $MsOffice::Word::Surgeon::VERSION, Perl $], $^X" );
-
 my $surgeon = MsOffice::Word::Surgeon->new($sample_file);
 $surgeon->document->reveal_bookmarks(color => 'cyan');
 

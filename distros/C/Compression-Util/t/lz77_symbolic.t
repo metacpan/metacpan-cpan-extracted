@@ -5,7 +5,7 @@ use 5.036;
 use Test::More;
 use Compression::Util qw(:all);
 
-plan tests => 2;
+plan tests => 3;
 
 foreach my $file (__FILE__) {
 
@@ -15,11 +15,16 @@ foreach my $file (__FILE__) {
         <$fh>;
     };
 
-    my $enc = lz77_compress_symbolic([map { ord($_) } $str =~ /(\X)/g]);
+    my @symbols = map { ord($_) } $str =~ /(\X)/g;
+
+    my $enc = lz77_compress_symbolic(\@symbols);
     my $dec = lz77_decompress_symbolic($enc);
+
+    my $dec2 = lz77_decode_symbolic(lz77_encode_symbolic(\@symbols));
 
     ok(length($enc) < length($str));
     is($str, join('', map { chr($_) } @$dec));
+    is($str, join('', map { chr($_) } @$dec2));
 }
 
 __END__

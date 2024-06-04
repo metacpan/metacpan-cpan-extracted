@@ -1,5 +1,9 @@
 Revision history for App-Git-Info
 
+0.8.0       2024-06-03
+    - Avoid using App::Cmd given SHLOMIF would like to use this app with
+    no CPAN dependencies, fatpacked, etc.
+
 0.6.1       2020-02-20
     - Improve the documentation.
 

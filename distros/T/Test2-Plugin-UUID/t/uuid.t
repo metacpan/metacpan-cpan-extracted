@@ -82,10 +82,21 @@ for my $backend (sort keys %backends) {
             };
 
             Test2::Util::UUID->clear_cache;
-            Test2::Util::UUID->import('gen_uuid', 'GEN_UUID_BACKEND', 'looks_like_uuid', warn => 0, backends => [$backend]);
+            Test2::Util::UUID->import('gen_uuid', 'uuid2bin', 'bin2uuid', 'GEN_UUID_BACKEND', 'looks_like_uuid', warn => 0, backends => [$backend]);
             imported_ok('gen_uuid', 'GEN_UUID_BACKEND', 'looks_like_uuid');
             is(GEN_UUID_BACKEND(), $backend, "Got correct backend");
             ok(looks_like_uuid(gen_uuid()), "Generated a UUID");
+        };
+
+        subtest bin_string_convert => sub {
+            my $subs;
+            warnings { $subs = Test2::Util::UUID->get_gen_uuid(backends => [$backend]) },
+
+            my $uuid = $subs->{gen_uuid}->();
+            ok(looks_like_uuid($uuid), "Looks like a uuid ($uuid)");
+            my $bin = $subs->{uuid2bin}->($uuid);
+            isnt($bin, $uuid, "Not the same");
+            is($subs->{bin2uuid}->($bin), $uuid, "Round trip!");
         };
 
         subtest fork => sub {
@@ -94,14 +105,15 @@ for my $backend (sort keys %backends) {
 
             Test2::Util::UUID->clear_cache;
 
-            my ($gen_uuid, $used_backend);
+            my $subs;
             like(
-                warnings { ($gen_uuid, $used_backend) = Test2::Util::UUID->get_gen_uuid(backends => [$backend]) },
+                warnings { $subs = Test2::Util::UUID->get_gen_uuid(backends => [$backend]) },
                 $warn,
                 "Got expected warnings"
             );
 
-            is($used_backend->(), $backend, "Used correct backend");
+            is($subs->{GEN_UUID_BACKEND}->(), $backend, "Used correct backend");
+            my $gen_uuid = $subs->{gen_uuid};
 
             my ($r, $w) = Atomic::Pipe->pair;
 

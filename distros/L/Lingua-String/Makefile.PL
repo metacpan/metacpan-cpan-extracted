@@ -18,7 +18,8 @@ WriteMakefile(
 	TEST_REQUIRES => {
 		'Test::Carp' => 0,
 		'Test::Most' => 0,
-		'Test::NoWarnings' => 0,
+		'Test::Needs' => 0,
+		'Test::NoWarnings' => 0
 	}, PREREQ_PM => {
 		'Carp' => 0,
 		'Exporter' => 0,

@@ -1,25 +1,26 @@
 #!perl -w
 use strict;
-use Test::More tests => 19;
+use Test::More tests => 20;
 use MIME::Detect;
 my $mime = MIME::Detect->new();
 
-my $pgp = $mime->known_types->{'application/pgp-signature'};
+my $mbox = $mime->known_types->{'application/mbox'};
 
-ok $pgp, "We find a type for 'application/pgp-signature'";
-my $superclass = $pgp->superclass;
+ok $mbox, "We find a type for 'application/mbox'";
+my $superclass = $mbox->superclass;
 if( !ok $superclass, "We have a superclass") {
     use Data::Dumper;
-    diag Dumper $pgp;
+    diag Dumper $mbox;
     SKIP: { skip "We didn't even find a superclass", 1 };
 } else {
-    is $pgp->superclass->mime_type, 'text/plain', "It's a text file";
-    
-    ok $pgp->matches(<<'PGP'), "We match some fake PGP file";
------BEGIN PGP SIGNATURE-----
-some random gibberish
-qweoibvsjewrij
-PGP
+    is $mbox->superclass->mime_type, 'text/plain', "It's a text file";
+
+    ok $mbox->matches(<<'MBOX'), "We match some fake mbox file";
+From me@example.com
+
+Hello Friend!
+
+MBOX
 };
 
 my $perl = $mime->known_types->{'application/x-perl'};
@@ -30,14 +31,24 @@ if( !ok $superclass, "We have a superclass") {
     SKIP: { skip "We didn't even find a superclass", 1 };
 } else {
     is $perl->superclass->mime_type, 'application/x-executable', "It's an executable file";
-    
-    ok $perl->matches(<<'PERL'), "We match some fake PERL file";
-#!perl -w
+
+    ok $perl->matches(<<'PERL'), "We match some fake Perl file";
+#!/usr/bin/perl -w
 use strict;
 some random gibberish
 qweoibvsjewrij
 PERL
 };
+
+{
+    open(my $fh, '<', \<<'PERL');
+#!perl -w
+use strict;
+some random gibberish
+qweoibvsjewrij
+PERL
+    ok $mime->mime_types($fh), "We match the second rule for some fake Perl file";
+}
 
 is $perl->valid_extension($0), 't', ".t is a valid extension for Perl scripts";
 is $perl->valid_extension('test.pl'), 'pl', ".pl is a valid extension for Perl scripts";

@@ -4,7 +4,7 @@ use Moose;
 use MooseX::StrictConstructor;
 use Archive::Zip                          qw(AZ_OK);
 use Encode                                qw(encode_utf8 decode_utf8);
-use Carp::Clan                            qw(^MsOffice::Word::Surgeon); # will import carp, croak, etc.
+use MsOffice::Word::Surgeon::Carp;
 use MsOffice::Word::Surgeon::Revision;
 use MsOffice::Word::Surgeon::PackagePart;
 
@@ -15,28 +15,31 @@ sub has_inner ($@) {my $attr = shift; has_lazy($attr => @_, init_arg => undef)}
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 
 
 #======================================================================
 # ATTRIBUTES
 #======================================================================
 
-# attributes to the constructor -- either the filename or an existing zip archive
-has      'docx'      => (is => 'ro', isa => 'Str');
-has_lazy 'zip'       => (is => 'ro', isa => 'Archive::Zip');
+# how to access the document
+has      'docx'           => (is => 'ro', isa => 'Str');          # the filename, or ..
+has_lazy 'zip'            => (is => 'ro', isa => 'Archive::Zip'); # .. an already opened zip archive
+
+# syntax to show embedded fields -- used by PackagePart::replace_field
+has 'show_embedded_field' => (is => 'ro', isa => 'Str', default => '{%s}');
 
 # inner attributes lazily constructed by the module
-has_inner 'parts'    => (is => 'ro', isa => 'HashRef[MsOffice::Word::Surgeon::PackagePart]',
-                         traits => ['Hash'], handles => {part => 'get'});
-
-has_inner 'document' => (is => 'ro', isa => 'MsOffice::Word::Surgeon::PackagePart',
-                        handles => [qw/contents original_contents indented_contents plain_text replace/]);
+has_inner 'parts'         => (is => 'ro', isa => 'HashRef[MsOffice::Word::Surgeon::PackagePart]',
+                              traits => ['Hash'], handles => {part => 'get'});
+                          
+has_inner 'document'      => (is => 'ro', isa => 'MsOffice::Word::Surgeon::PackagePart',
+                             handles => [qw/contents original_contents indented_contents plain_text replace/]);
   # Note: this attribute is equivalent to $self->part('document'); made into an attribute
   # for convenience and for automatic delegation of methods through the 'handles' declaration
 
 # just a slot for internal storage
-has 'next_rev_id'    => (is => 'bare', isa => 'Num', default => 1, init_arg => undef);
+has 'next_rev_id'         => (is => 'bare', isa => 'Num', default => 1, init_arg => undef);
    # used by the revision() method for creating *::Revision objects -- each instance
    # gets a fresh value
 
@@ -259,6 +262,9 @@ MsOffice::Word::Surgeon - tamper with the guts of Microsoft docx documents, with
   my $main_text    = $surgeon->document->plain_text;
   my @header_texts = map {$surgeon->part($_)->plain_text} $surgeon->headers;
 
+  # unlink fields
+  $surgeon->document->unlink_fields;
+
   # reveal bookmarks
   $surgeon->document->reveal_bookmarks(color => 'cyan');
 
@@ -305,6 +311,10 @@ unlinking fields (equivalent of performing Ctrl-Shift-F9 on the whole document)
 
 =item *
 
+adding markers at bookmark start and end positions
+
+=item *
+
 regex replacements within text, for example for :
 
 =over
@@ -332,16 +342,20 @@ pretty-printing the internal XML structure.
 
 
 
-
-=head2 Operating mode
+=head2 The C<.docx> format
 
 The format of Microsoft C<.docx> documents is described in
 L<http://www.ecma-international.org/publications/standards/Ecma-376.htm>
 and  L<http://officeopenxml.com/>. An excellent introduction can be
 found at L<https://www.toptal.com/xml/an-informal-introduction-to-docx>.
+Another precious source of documentation is L<http://officeopenxml.com/WPcontentOverview.php>.
 Internally, a document is a zipped
 archive, where the member named C<word/document.xml> stores the main
 document contents, in XML format.
+
+
+
+=head2 Operating mode
 
 The present module does not parse all details of the whole XML
 structure because it only focuses on I<text> nodes (those that contain
@@ -350,6 +364,7 @@ properties). All remaining XML information, for example for
 representing sections, paragraphs, tables, etc., is stored as opaque
 XML fragments; these fragments are re-inserted at proper places when
 reassembling the whole document after having modified some text nodes.
+
 
 
 =head1 METHODS
@@ -376,8 +391,7 @@ Instance of L<Archive::Zip> associated with this file
 =head3 parts
 
 Hashref to L<MsOffice::Word::Surgeon::PackagePart> objects, keyed by their part name in the ZIP file.
-There is always a C<'document'> part. Currently, other optional parts may be headers and footers.
-Future versions may include other parts like footnotes or endnotes.
+There is always a C<'document'> part. Other parts may be headers, footers, footnotes or endnotes.
 
 =head3 document
 
@@ -509,7 +523,7 @@ of the inserted text
 =head2 Operations on parts
 
 See the L<MsOffice::Word::Surgeon::PackagePart> documentation for other
-operations on package parts.
+operations on package parts, including operations on fields, bookmarks or images.
 
 =head1 SEE ALSO
 

@@ -1,6 +1,7 @@
 
-[![Travis Build Status](https://travis-ci.org/Corion/MIME-Detect.svg?branch=master)](https://travis-ci.org/Corion/MIME-Detect)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/MIME-Detect?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/MIME-Detect)
+[![Windows](https://github.com/Corion/MIME-Detect/workflows/windows/badge.svg)](https://github.com/Corion/MIME-Detect/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/MIME-Detect/workflows/macos/badge.svg)](https://github.com/Corion/MIME-Detect/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/MIME-Detect/workflows/linux/badge.svg)](https://github.com/Corion/MIME-Detect/actions?query=workflow%3Alinux)
 
 # NAME
 
@@ -50,7 +51,7 @@ The rules will be sorted according to the priority specified in the database
 file(s).
 
 By default, the XML database stored alongside
-[MIME::Detect::FreeDesktopOrgDB](https://metacpan.org/pod/MIME::Detect::FreeDesktopOrgDB)
+[MIME::Detect::FreeDesktopOrgDB](https://metacpan.org/pod/MIME%3A%3ADetect%3A%3AFreeDesktopOrgDB)
 will be loaded after all custom files have been loaded.
 To pass in a different fallback database, either pass in a reference
 to the XML string or the name of a package that has an `get_xml` subroutine.
@@ -67,7 +68,7 @@ for the `xml` key.
 
 Returns the list of MIME types according to their priority.
 The first type is the most likely. The returned objects
-are of type [MIME::Detect::Type](https://metacpan.org/pod/MIME::Detect::Type).
+are of type [MIME::Detect::Type](https://metacpan.org/pod/MIME%3A%3ADetect%3A%3AType).
 
 ## `$mime->mime_type`
 
@@ -75,7 +76,7 @@ are of type [MIME::Detect::Type](https://metacpan.org/pod/MIME::Detect::Type).
     print $type->mime_type, "\n"
         if $type;
 
-Returns the most likely type of a file as [MIME::Detect::Type](https://metacpan.org/pod/MIME::Detect::Type). Returns
+Returns the most likely type of a file as [MIME::Detect::Type](https://metacpan.org/pod/MIME%3A%3ADetect%3A%3AType). Returns
 `undef` if no file type can be determined.
 
 ## `$mime->mime_types_from_name`
@@ -87,7 +88,7 @@ Returns the most likely type of a file as [MIME::Detect::Type](https://metacpan.
 Returns the list of MIME types for a file name based on the extension
 according to their priority.
 The first type is the most likely. The returned objects
-are of type [MIME::Detect::Type](https://metacpan.org/pod/MIME::Detect::Type).
+are of type [MIME::Detect::Type](https://metacpan.org/pod/MIME%3A%3ADetect%3A%3AType).
 
 ## `$mime->mime_type_from_name`
 
@@ -95,7 +96,7 @@ are of type [MIME::Detect::Type](https://metacpan.org/pod/MIME::Detect::Type).
     print $type->mime_type, "\n"
         if $type;
 
-Returns the most likely type of a file name as [MIME::Detect::Type](https://metacpan.org/pod/MIME::Detect::Type). Returns
+Returns the most likely type of a file name as [MIME::Detect::Type](https://metacpan.org/pod/MIME%3A%3ADetect%3A%3AType). Returns
 `undef` if no file type can be determined.
 
 # SEE ALSO
@@ -103,24 +104,24 @@ Returns the most likely type of a file name as [MIME::Detect::Type](https://meta
 [https://www.freedesktop.org/wiki/Software/shared-mime-info/](https://www.freedesktop.org/wiki/Software/shared-mime-info/) - the website
 where the XML file is distributed
 
-[File::MimeInfo](https://metacpan.org/pod/File::MimeInfo) - module to read your locally installed and converted MIME database
+[File::MimeInfo](https://metacpan.org/pod/File%3A%3AMimeInfo) - module to read your locally installed and converted MIME database
 
-[File::LibMagic](https://metacpan.org/pod/File::LibMagic) - if you can install `libmagic` and the appropriate `magic` files
+[File::LibMagic](https://metacpan.org/pod/File%3A%3ALibMagic) - if you can install `libmagic` and the appropriate `magic` files
 
-[File::MMagic](https://metacpan.org/pod/File::MMagic) - if you have the appropriate `magic` files
+[File::MMagic](https://metacpan.org/pod/File%3A%3AMMagic) - if you have the appropriate `magic` files
 
-[File::MMagic::XS](https://metacpan.org/pod/File::MMagic::XS) - if you have the appropriate `magic` files but want more speed
+[File::MMagic::XS](https://metacpan.org/pod/File%3A%3AMMagic%3A%3AXS) - if you have the appropriate `magic` files but want more speed
 
-[File::Type](https://metacpan.org/pod/File::Type) - inlines its database, unsupported since 2004?
+[File::Type](https://metacpan.org/pod/File%3A%3AType) - inlines its database, unsupported since 2004?
 
-[File::Type::WebImages](https://metacpan.org/pod/File::Type::WebImages) - if you're only interested in determining whether
+[File::Type::WebImages](https://metacpan.org/pod/File%3A%3AType%3A%3AWebImages) - if you're only interested in determining whether
 a file is an image or not
 
-[MIME::Types](https://metacpan.org/pod/MIME::Types) - for extension-based detection
+[MIME::Types](https://metacpan.org/pod/MIME%3A%3ATypes) - for extension-based detection
 
 # REPOSITORY
 
-The public repository of this module is 
+The public repository of this module is
 [http://github.com/Corion/mime-detect](http://github.com/Corion/mime-detect).
 
 # SUPPORT
@@ -132,7 +133,7 @@ The public support forum of this module is
 
 Please report bugs in this module via the RT CPAN bug queue at
 [https://rt.cpan.org/Public/Dist/Display.html?Name=MIME-Detect](https://rt.cpan.org/Public/Dist/Display.html?Name=MIME-Detect)
-or via mail to [mime-detect-Bugs@rt.cpan.org](https://metacpan.org/pod/mime-detect-Bugs@rt.cpan.org).
+or via mail to [mime-detect-Bugs@rt.cpan.org](https://metacpan.org/pod/mime-detect-Bugs%40rt.cpan.org).
 
 # AUTHOR
 
@@ -140,7 +141,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2015-2018 by Max Maischein `corion@cpan.org`.
+Copyright 2015-2024 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

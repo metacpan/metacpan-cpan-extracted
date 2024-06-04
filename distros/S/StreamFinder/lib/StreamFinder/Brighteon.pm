@@ -121,9 +121,10 @@ Accepts a brighteon.com video ID or URL and creates and returns a new video
 object, or I<undef> if the URL is not a valid Brighteon video or no streams 
 are found.  The URL can be the full URL, ie. 
 https://www.brighteon.com/B<video-id>, 
-https://www.brighteon.com/channels/B<channel-id>, 
-or just I<video-id> or I<channel-id>.  If a I<channel-id> or channel URL is 
-given, then the first (latest) video of that channel will be returned.
+or just I<video-id>.
+
+NOTE:  Brighteon channel pages are no longer accepted as Brighteon.com has 
+recently made them non-scrapable (without Javascript).
 
 The optional I<-keep> argument can be either a comma-separated string or an 
 array reference ([...]) of stream types to keep (include) and returned in 
@@ -424,7 +425,7 @@ sub new
 	if (!defined($okStreams[0]) && defined($self->{'keep'})) {
 		@okStreams = (ref($self->{'keep'}) =~ /ARRAY/) ? @{$self->{'keep'}} : split(/\,\s*/, $self->{'keep'});
 	}
-	@okStreams = (qw(m4a mpd stream all))  unless (defined $okStreams[0]);  # one of:  {m4a, <ext>, direct, stream, any, all}
+	@okStreams = (qw(m4a mpd mp3 stream all))  unless (defined $okStreams[0]);  # one of:  {m4a, <ext>, direct, stream, any, all}
 
 	print STDERR "-0(Brighteon): URL=$url=\n"  if ($DEBUG);
 	$url =~ s/\?autoplay\=true$//;  #STRIP THIS OFF SO WE DON'T HAVE TO.
@@ -442,8 +443,6 @@ sub new
 	}
 	print STDERR "-1 FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	$self->{'genre'} = 'Video';
-
-	#FIRST TRY SCANNING MANUALLY!:
 
 	my $html = '';
 	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
@@ -463,7 +462,7 @@ sub new
 	}
 	return undef  unless ($html);
 
-	if ($url2fetch =~ m#\/channels\/#) {  #WE'RE A CHANNEL PAGE, GRAB 1ST VIDEO!:
+	if ($url2fetch =~ m#\/channels\/#) {  #WE'RE A CHANNEL PAGE, GRAB 1ST VIDEO! (DEPRECIATED!):
 		print "--WE'RE A BRIGHTEON CHANNEL URL!\n"  if ($DEBUG);
 		if ($html =~ m#\bhref\=\"([^\"]+)\"\>\s*\<img\s+src\=\"https\:\/\/photos\.brighteon\.com\/thumbnail#) {
 			($url2fetch = $1) =~ s#^\/#https://www.brighteon.com/#;
@@ -482,6 +481,9 @@ sub new
 				}
 			}
 			return undef  unless ($html);
+		} else {
+			print STDERR "\ne:Brighteon podcast/channel pages no longer supported (unscrapable)!\n";
+			return undef;
 		}
 	}
 
@@ -494,16 +496,30 @@ sub new
 		$self->{'artist'} = $2;
 		$self->{'albumartist'} = "http://www.brighteon.com/channels/$1"  if ($1);
 	}
-	if ($html =~ m#\<video(.*?)\<\/video\>#s) {
-		my $videotag = $1;
+
+	#FETCH ALL STREAMS:
+
+	unless ($self->{'youtube'} =~ /only/i) {  #FETCH STREAMS HERE UNLESS USER WANT'S youtube-dl STREAMS ONLY:
 		my $streams = '';
-		my ($one, $ext);
-		while ($videotag =~ s#\<source\s+src\=\"([^\"]+)\" type="[^\"]*\"\s*\/?\>##s) {
-			$one = $1;
-			$ext = ($one =~ /\.(\w+)$/) ? $1 : '';
-			$streams .= "$ext=$one|";
+		if ($html =~ m#\"source\"\:\[([^\]]+)#s) {
+			my $sourcedata = $1;
+			my ($one, $ext);
+			while ($sourcedata =~ s#\{\"src\"\:\"([^\"]+)\"##so) {
+				$one = $1;
+				$ext = ($one =~ /\.(\w+)$/) ? $1 : '';
+				$streams .= "$ext=$one|";
+			}
 		}
-		unless ($self->{'youtube'} =~ /only/i) {
+		if ($html =~ m#\"audioSource\"\:\[([^\]]+)#s) {
+			my $sourcedata = $1;
+			my ($one, $ext);
+			while ($sourcedata =~ s#\{\"src\"\:\"([^\"]+)\"##so) {
+				$one = $1;
+				$ext = ($one =~ /\.(\w+)$/) ? $1 : '';
+				$streams .= "$ext=$one|";
+			}
+		}
+		if ($streams) {
 			my $stindex = 0;
 			my $savestreams = $streams;
 			my %havestreams = ();
@@ -516,12 +532,15 @@ sub new
 					}
 				}
 			}
-			print STDERR "--Brighteon: okStreams=".join('|',@okStreams)."= channel=".$self->{'albumartist'}."=\n"  if ($DEBUG);
+			print STDERR "--Brighteon: ok Stream types=".join('|',@okStreams)."= channel=".$self->{'albumartist'}."=\n"  if ($DEBUG);
 			foreach my $streamtype (@okStreams) {
 				$streams = $savestreams;
 				if ($streamtype =~ /^stream$/i) {
 					while ($streams =~ /^([^\=]*)\=([^\|]+)/o) {
-						$ext = $1; $one = $2;
+						my $ext = $1;
+						my $one = $2;
+						$one = 'https://video.brighteon.com/file/BTBucket-Prod/' . $one
+								unless ($one =~ m#^https?\:\/\/#);
 						if ($ext !~ /^pls$/i && !defined($havestreams{"$ext|$one"})) {
 							unless ($self->{'secure'} && $one !~ /^https/o) {
 								$self->{'streams'}->[$stindex++] = $one;
@@ -532,7 +551,8 @@ sub new
 					}
 				} elsif ($streamtype =~ /^playlist$/i) {
 					while ($streams =~ /^([^\=]*)\=([^\|]+)/o) {
-						$ext = $1; $one = $2;
+						my $ext = $1;
+						my $one = $2;
 						if ($ext =~ /^pls$/i && !defined($havestreams{"$ext|$one"})) {
 							unless ($self->{'secure'} && $one !~ /^https/o) {
 								$self->{'streams'}->[$stindex++] = $one;
@@ -543,7 +563,8 @@ sub new
 					}
 				} elsif ($streamtype =~ /^a(?:ny|ll)$/i) {
 					while ($streams =~ /^([^\=]*)\=([^\|]+)/o) {
-						$ext = $1; $one = $2;
+						my $ext = $1;
+						my $one = $2;
 						unless (defined($havestreams{"$ext|$one"})) {
 							unless ($self->{'secure'} && $one !~ /^https/o) {
 								$self->{'streams'}->[$stindex++] = $one;
@@ -554,7 +575,8 @@ sub new
 					}
 				} else {
 					while ($streams =~ /^([^\=]*)\=([^\|]+)/o) {
-						$ext = $1; $one = $2;
+						my $ext = $1;
+						my $one = $2;
 						if ($ext =~ /^${streamtype}$/i && !defined($havestreams{"$ext|$one"})) {
 							unless ($self->{'secure'} && $one !~ /^https/o) {
 								$self->{'streams'}->[$stindex++] = $one;
@@ -566,31 +588,32 @@ sub new
 				}
 			}
 			$self->{'cnt'} = scalar @{$self->{'streams'}};
+		} elsif ($html =~ m#\"audio\"\:\"([^\"]+)#s) {  #TRY FALLBACK AUDIO STREAM IF NO STREAMS FOUND:
+			my $one = $1;
+			$one = 'https://video.brighteon.com/file/BTBucket-Prod/' . $one
+					unless ($one =~ m#^https?\:\/\/#);
+			unless ($self->{'secure'} && $one !~ /^https/o) {
+				$self->{'streams'}->[0] = $one;
+				$self->{'cnt'} = scalar @{$self->{'streams'}};
+			}
 		}
 	}
-	my $id = $self->{'id'};
-	$self->{'title'} = ($html =~ m#\<div\s+class\=\"main\-video\-title\"\>([^\<]+)\<#s) ? $1 : '';
-	$self->{'title'} ||= $1  if ($html =~ m#video\:\s+\{\"id\"\:\"${id}\"\,\"name\"\:\"([^\"]+)\"#s);
-	$self->{'title'} ||= $1  if ($html =~ m#\<meta\s+name\=\"twitter\:title\"\s+content\=\"([^\"]+)\"#s);
-	$self->{'description'} = ($html =~ m#\<meta\s+property\=\"og\:description\"\s+content\=\"([^\"]+)#s)
-			? $1 : '';
-	$self->{'description'} ||= $1  if ($html =~ m#\<meta\s+name\=\"twitter\:description\"\s+content\=\"([^\"]+)\"#s);
 
-	$self->{'iconurl'} = ($html =~ m#\<link\s+rel\=\"image_src\"\s+href\=\"([^\"]+)#) ? $1 : '';
-	$self->{'iconurl'} ||= $1  if ($html =~ m#\<img\s+src\=\"([^\"]+)\"\s+alt\=\"channel[\s\-\_]+image\"\/\>#);
+	#FETCH OTHER METADATA FROM PAGE:
 
-	if ($html =~ m#\<div\s+class\=\"author\"(.+?)\<\/div\>#s) {
-		my $authorstuff = $1;
-		$self->{'articonurl'} = $1  if ($authorstuff =~ m# src\=\"([^\"]+)#s);
-		print STDERR "---CHANNEL ICON URL=".$self->{'articonurl'}."=\n"  if ($DEBUG);
+	$self->{'title'} = $1  if ($html =~ m#\"name\"\:\"([^\"]+)#s);
+	$self->{'description'} = $1  if ($html =~ m#\"description\"\:\"([^\"]+)#s);
+	$self->{'iconurl'} = $1  if ($html =~ m#\"thumbnail\"\:\"([^\"]+)#s);
+	$self->{'imageurl'} = ($html =~ m#\"poster\"\:\"(https?\:\/\/[^\"]+)#s)
+			? $1 : $self->{'iconurl'};
+	$self->{'articonurl'} = $1  if ($html =~ m#\"thumbnailUrl\"\:\"([^\"]+)#s);
+	$self->{'articonurl'} ||= $1  if ($html =~ m#\"channelAvatar\"\:\"([^\"]+)#s);
+	if ($html =~ m#\"createdAt\"\:\"([^\"]+)#s) {
+		$self->{'created'} = $1;
+		$self->{'year'} = $1  if ($self->{'created'} =~ /(\d\d\d\d)/);
 	}
-	if ($html =~ m#©(.+?)All\s+Rights#s) {
-		my $copyright = $1;
-		$self->{'year'} = $1  if ($copyright =~ /(\d\d\d\d)/);
-	}
-	print STDERR "\n--ID=".$self->{'id'}."=\n--ARTIST=".$self->{'artist'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--DESC=".$self->{'description'}."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
 
-	#IF WE DIDN'T FIND ANY STREAMS IN THE PAGE, TRY youtube-dl:
+	#IF WE DIDN'T FIND ANY STREAMS IN THE PAGE, TRY youtube-dl (DEPRECIATED!):
 
 	if ($self->{'cnt'} <= 0 || $self->{'youtube'} =~ /(?:yes|top|first|last)/i) { #(ANYTHING BUT "no"):
 		my $haveYoutube = 0;
@@ -621,24 +644,26 @@ sub new
 				print STDERR "i:Found stream(s) (".join('|',@ytStreams).") via youtube-dl.\n"  if ($DEBUG);
 			}
 		}
-		print STDERR "-count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."=\n"  if ($DEBUG);
 	}
 	if ($self->{'description'} =~ /\w/) {
 		$self->{'description'} =~ s/\s+$//;
 	} else {
 		$self->{'description'} = $self->{'title'};
 	}
-	foreach my $i (qw(title description)) {
+	foreach my $i (qw(title artist description)) {
 		$self->{$i} = HTML::Entities::decode_entities($self->{$i});
 		$self->{$i} = uri_unescape($self->{$i});
 		$self->{$i} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egso;
 	}
-	$self->{'imageurl'} = $self->{'iconurl'};
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'Url'} = ($self->{'cnt'} > 0) ? $self->{'streams'}->[0] : '';
-	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
-			if ($DEBUG && $self->{'cnt'} > 0);
-	print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."=\n--YEAR=".$self->{'year'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
+	if ($DEBUG) {
+		foreach my $i (sort keys %{$self}) {
+			print STDERR "--KEY=$i= VAL=".$self->{$i}."=\n";
+		}
+		print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
+				if ($self->{'cnt'} > 0);
+	}
 	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!

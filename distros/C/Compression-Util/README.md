@@ -17,13 +17,13 @@ getopts('d', \my %opts);
 
 sub compress ($fh, $out_fh) {
     while (read($fh, (my $chunk), CHUNK_SIZE)) {
-        print $out_fh bz2_compress($chunk);
+        print $out_fh bwt_compress($chunk);
     }
 }
 
 sub decompress ($fh, $out_fh) {
     while (!eof($fh)) {
-        print $out_fh bz2_decompress($fh);
+        print $out_fh bwt_decompress($fh);
     }
 }
 
@@ -54,11 +54,10 @@ The provided techniques can be easily combined in various ways to create powerfu
     4. Zero run-length encoding (ZRLE)
     5. Huffman coding
 
-This functionality is provided by the function `bz2_compress()`, which can be explicitly implemented as:
+This functionality is provided by the function `bwt_compress()`, which can be explicitly implemented as:
 
 ```perl
 use 5.036;
-use List::Util qw(uniq);
 use Compression::Util qw(:all);
 
 my $data = do { open my $fh, '<:raw', $^X; local $/; <$fh> };
@@ -76,7 +75,7 @@ say "Original size  : ", length($data);
 say "Compressed size: ", length($enc);
 
 # Decompress the result
-bz2_decompress($enc) eq $data or die "decompression error";
+bwt_decompress($enc) eq $data or die "decompression error";
 ```
 
 ## TERMINOLOGY
@@ -112,14 +111,13 @@ The encoding of file-handles must be set to `:raw`.
 **Compression::Util** provides the following package variables:
 
 ```perl
-    $Compression::Util::VERBOSE = 0;            # true to enable verbose/debug mode
-    $Compression::Util::LZ_MAX_CHAIN_LEN = 32;  # how many recent positions to remember for each match in LZSS/LZ77 encoding
+    $Compression::Util::VERBOSE = 0;           # true to enable verbose/debug mode
 
-    $Compression::Util::LZSS_MIN_LEN = 4;       # minimum match length in LZSS encoding
-    $Compression::Util::LZSS_MAX_LEN = 258;     # maximum match length in LZSS encoding
+    $Compression::Util::LZ_MIN_LEN = 4;        # minimum match length in LZ parsing
+    $Compression::Util::LZ_MAX_LEN = 258;      # maximum match length in LZ parsing
 
-    $Compression::Util::LZ77_MIN_LEN = 4;       # minimum match length in LZ77 encoding (symbolic only)
-    $Compression::Util::LZ77_MAX_LEN = 255;     # maximum match length in LZ77 encoding
+    $Compression::Util::LZ_MAX_DIST = ~0;      # maximum backreference distance allowed
+    $Compression::Util::LZ_MAX_CHAIN_LEN = 32; # how many recent positions to remember for each match in LZ parsing
 ```
 
 The package variables can also be imported as:
@@ -149,14 +147,17 @@ By default, &lt;$LZ\_MAX\_CHAIN\_LEN> is set to `32`.
       mrl_compress_symbolic(\@symbols)     # MRL compression (MTF+ZRLE+RLE4+Huffman coding)
       mrl_decompress_symbolic($fh)         # Inverse of the above method
 
-      bz2_compress($string)                # Bzip2-like compression (RLE4+BWT+MTF+ZRLE+Huffman coding)
-      bz2_decompress($fh)                  # Inverse of the above method
+      bwt_compress($string)                # Bzip2-like compression (RLE4+BWT+MTF+ZRLE+Huffman coding)
+      bwt_decompress($fh)                  # Inverse of the above method
 
-      bz2_compress_symbolic(\@symbols)     # Bzip2-like compression (RLE4+sBWT+MTF+ZRLE+Huffman coding)
-      bz2_decompress_symbolic($fh)         # Inverse of the above method
+      bwt_compress_symbolic(\@symbols)     # Bzip2-like compression (RLE4+sBWT+MTF+ZRLE+Huffman coding)
+      bwt_decompress_symbolic($fh)         # Inverse of the above method
 
-      lzss_compress($string)               # LZSS + DEFLATE-like encoding of distances and lengths
-      lzss_decompress($fh)                 # Inverse of the above two methods
+      lzss_compress($string)               # LZSS + DEFLATE-like encoding of lengths and distances
+      lzss_decompress($fh)                 # Inverse of the above method
+
+      lzss_compress_symbolic($string)      # Symbolic LZSS + DEFLATE-like encoding of lengths and distances
+      lzss_decompress_symbolic($fh)        # Inverse of the above method
 
       lz77_compress($string)               # LZ77 + Huffman coding of lengths and literals + OBH for distances
       lz77_decompress($fh)                 # Inverse of the above method
@@ -320,11 +321,54 @@ High-level function that generates an Adaptive Arithmetic Coding block, given an
 
 Inverse of `create_adaptive_ac_entry()`.
 
-## lzss\_compress
+## lz77\_compress / lz77\_compress\_symbolic
+
+```perl
+    # With Huffman coding
+    my $string = lz77_compress($data);
+    my $string = lz77_compress(\@symbols);
+
+    # With Arithmetic Coding
+    my $string = lz77_compress($data, \&create_ac_entry);
+
+    # Using Fast-LZSS parsing + Huffman coding
+    my $string = lz77_compress($data, \&create_huffman_entry, \&lzss_encode_fast);
+```
+
+High-level function that performs LZ77 compression on the provided data, using the pipeline:
+
+    1. lz77_encode
+    2. create_huffman_entry(literals)
+    3. create_huffman_entry(lengths)
+    4. create_huffman_entry(matches)
+    5. obh_encode(distances)
+
+The function accepts either a string or an array-ref of symbols as the first argument.
+
+## lz77\_decompress / lz77\_decompress\_symbolic
+
+```perl
+    # With Huffman coding
+    my $data = lz77_decompress($fh);
+    my $data = lz77_decompress($string);
+
+    # With Arithemtic coding
+    my $data = lz77_decompress($fh, \&decode_ac_entry);
+    my $data = lz77_decompress($string, \&decode_ac_entry);
+
+    # Symbolic, with Huffman coding
+    my $symbols = lz77_decompress_symbolic($fh);
+    my $symbols = lz77_decompress_symbolic($string);
+```
+
+Inverse of `lz77_compress()` and `lz77_compress_symbolic`, respectively.
+
+## lzss\_compress / lzss\_compress\_symbolic
 
 ```perl
     # With Huffman coding
     my $string = lzss_compress($data);
+    my $string = lzss_compress(\@symbols);
 
     # With Arithmetic Coding
     my $string = lzss_compress($data, \&create_ac_entry);
@@ -338,7 +382,9 @@ High-level function that performs LZSS (Lempel-Ziv-Storer-Szymanski) compression
     1. lzss_encode
     2. deflate_encode
 
-## lzss\_decompress
+The function accepts either a string or an array-ref of symbols as the first argument.
+
+## lzss\_decompress / lzss\_decompress\_symbolic
 
 ```perl
     # With Huffman coding
@@ -348,66 +394,13 @@ High-level function that performs LZSS (Lempel-Ziv-Storer-Szymanski) compression
     # With Arithemtic coding
     my $data = lzss_decompress($fh, \&decode_ac_entry);
     my $data = lzss_decompress($string, \&decode_ac_entry);
+
+    # Symbolic, with Huffman coding
+    my $symbols = lzss_decompress_symbolic($fh);
+    my $symbols = lzss_decompress_symbolic($string);
 ```
 
-Inverse of `lzss_compress()`.
-
-## lz77\_compress
-
-```perl
-    # With Huffman coding
-    my $string = lz77_compress($data);
-
-    # With Arithmetic Coding
-    my $string = lz77_compress($data, \&create_ac_entry);
-```
-
-High-level function that performs LZ77 (Lempel-Ziv 1977) compression on the provided data, using the pipeline:
-
-    1. lz77_encode
-    2. create_huffman_entry(literals)
-    3. create_huffman_entry(lengths)
-    4. obh_encode(distances)
-
-## lz77\_decompress
-
-```perl
-    # With Huffman coding
-    my $data = lz77_decompress($fh);
-    my $data = lz77_decompress($string);
-
-    # With Arithmetic Coding
-    my $data = lz77_decompress($fh, \&decode_ac_entry);
-    my $data = lz77_decompress($string, \&decode_ac_entry);
-```
-
-Inverse of `lz77_compress()`.
-
-## lz77\_compress\_symbolic
-
-```perl
-    # Does Huffman coding
-    my $string = lz77_compress_symbolic(\@symbols);
-
-    # Does Arithmetic coding
-    my $string = lz77_compress_symbolic(\@symbols, \&create_ac_entry);
-```
-
-Similar to `lz77_compress()`, except that it accepts an arbitrary array-ref of non-negative integer values as input.
-
-## lz77\_decompress\_symbolic
-
-```perl
-    # Using Huffman coding
-    my $symbols = lz77_decompress_symbolic($fh);
-    my $symbols = lz77_decompress_symbolic($string);
-
-    # Using Arithmetic coding
-    my $symbols = lz77_decompress_symbolic($fh, \&decode_ac_entry);
-    my $symbols = lz77_decompress_symbolic($string, \&decode_ac_entry);
-```
-
-Inverse of `lz77_compress_symbolic()`.
+Inverse of `lzss_compress()` and `lzss_compress_symbolic`, respectively.
 
 ## lzw\_compress
 
@@ -429,14 +422,14 @@ High-level function that performs LZW (Lempel-Ziv-Welch) compression on the prov
 
 Performs Lempel-Ziv-Welch (LZW) decompression on the provided string or file-handle. Inverse of `lzw_compress()`.
 
-## bz2\_compress
+## bwt\_compress
 
 ```perl
     # Using Huffman Coding
-    my $string = bz2_compress($data);
+    my $string = bwt_compress($data);
 
     # Using Arithmetic Coding
-    my $string = bz2_compress($data, \&create_ac_entry);
+    my $string = bwt_compress($data, \&create_ac_entry);
 ```
 
 High-level function that performs Bzip2-like compression on the provided data, using the pipeline:
@@ -447,45 +440,45 @@ High-level function that performs Bzip2-like compression on the provided data, u
     4. zrle_encode
     5. create_huffman_entry
 
-## bz2\_decompress
+## bwt\_decompress
 
 ```perl
     # With Huffman coding
-    my $data = bz2_decompress($fh);
-    my $data = bz2_decompress($string);
+    my $data = bwt_decompress($fh);
+    my $data = bwt_decompress($string);
 
     # With Arithmetic coding
-    my $data = bz2_decompress($fh, \&decode_ac_entry);
-    my $data = bz2_decompress($string, \&decode_ac_entry);
+    my $data = bwt_decompress($fh, \&decode_ac_entry);
+    my $data = bwt_decompress($string, \&decode_ac_entry);
 ```
 
-Inverse of `bz2_compress()`.
+Inverse of `bwt_compress()`.
 
-## bz2\_compress\_symbolic
+## bwt\_compress\_symbolic
 
 ```perl
     # Does Huffman coding
-    my $string = bz2_compress_symbolic(\@symbols);
+    my $string = bwt_compress_symbolic(\@symbols);
 
     # Does Arithmetic coding
-    my $string = bz2_compress_symbolic(\@symbols, \&create_ac_entry);
+    my $string = bwt_compress_symbolic(\@symbols, \&create_ac_entry);
 ```
 
-Similar to `bz2_compress()`, except that it accepts an arbitrary array-ref of non-negative integer values as input. It is also a bit slower on large inputs.
+Similar to `bwt_compress()`, except that it accepts an arbitrary array-ref of non-negative integer values as input. It is also a bit slower on large inputs.
 
-## bz2\_decompress\_symbolic
+## bwt\_decompress\_symbolic
 
 ```perl
     # Using Huffman coding
-    my $symbols = bz2_decompress_symbolic($fh);
-    my $symbols = bz2_decompress_symbolic($string);
+    my $symbols = bwt_decompress_symbolic($fh);
+    my $symbols = bwt_decompress_symbolic($string);
 
     # Using Arithmetic coding
-    my $symbols = bz2_decompress_symbolic($fh, \&decode_ac_entry);
-    my $symbols = bz2_decompress_symbolic($string, \&decode_ac_entry);
+    my $symbols = bwt_decompress_symbolic($fh, \&decode_ac_entry);
+    my $symbols = bwt_decompress_symbolic($string, \&decode_ac_entry);
 ```
 
-Inverse of `bz2_compress_symbolic()`.
+Inverse of `bwt_compress_symbolic()`.
 
 ## mrl\_compress\_symbolic
 
@@ -1093,67 +1086,67 @@ The function returns the decoded sequence of symbols as an array-ref.
 
 ## lz77\_encode / lz77\_encode\_symbolic
 
-    my ($literals, $distances, $lengths) = lz77_encode($string);
-    my ($literals, $distances, $lengths) = lz77_encode_symbolic(\@symbols);
+```perl
+    my ($literals, $lengths, $matches, $distances) = lz77_encode($string);
+    my ($literals, $lengths, $matches, $distances) = lz77_encode(\@symbols);
+```
 
-Low-level function that applies the LZ77 (Lempel-Ziv 1977) algorithm on the provided data.
+Low-level function that combines LZSS with ideas from the LZ4 method.
 
-The function returns three values: `$literals`, which is an array-ref of uncompressed bytes, `$distances`, which contains the relative back-reference distances of the matched sub-strings, and `$lengths`, which holds the lengths of the matched sub-strings.
+The function returns four values:
 
-The function `lz77_encode_symbolic()` accepts an array-ref of arbitrarily large non-negative integers as input.
-
-Lengths are limited to `255`, but can changed by modifying the \`$Compression::Util::LZ77\_MAX\_LEN\` variable.
+```perl
+    $literals   # array-ref of uncompressed symbols
+    $lengths    # array-ref of literal lengths
+    $matches    # array-ref of match lengths
+    $distances  # array-ref of backreference distances
+```
 
 The output can be decoded with `lz77_decode()` and `lz77_decode_symbolic()`, respectively.
 
 ## lz77\_decode / lz77\_decode\_symbolic
 
 ```perl
-    my $string  = lz77_decode($literals, $distances, $lengths);
-    my $symbols = lz77_decode_symbolic($literals, $distances, $lengths);
+    my $string  = lz77_decode(\@literals, \@lengths, \@matches, \@distances);
+    my $symbols = lz77_decode_symbolic(\@literals, \@lengths, \@matches, \@distances);
 ```
 
-Low-level function that performs LZ77 (Lempel-Ziv 1977) decoding using the provided literals, distances, and lengths of matched sub-strings.
-
-It takes three parameters: `$literals`, representing the array-ref of uncompressed bytes, `$distances`, containing the relative back-reference distances of the matched sub-strings, and `$lengths`, holding the lengths of the matched sub-strings.
+Low-level function that performs decoding using the provided literals, lengths, matches and distances of matched sub-strings.
 
 Inverse of `lz77_encode()` and `lz77_encode_symbolic()`, respectively.
 
-## lzss\_encode
+## lzss\_encode / lzss\_encode\_symbolic / lzss\_encode\_fast
 
 ```perl
+    # Standard version
     my ($literals, $distances, $lengths) = lzss_encode($data);
+    my ($literals, $distances, $lengths) = lzss_encode(\@symbols);
+
+    # Faster version
+    my ($literals, $distances, $lengths) = lzss_encode_fast($data);
+    my ($literals, $distances, $lengths) = lzss_encode_fast(\@symbols);
 ```
 
 Low-level function that applies the LZSS (Lempel-Ziv-Storer-Szymanski) algorithm on the provided data.
 
-The function returns three values: `$literals`, which is an array-ref of uncompressed bytes, `$distances`, which contains the relative back-reference distances, and `$lengths`, which holds the lengths of the matched sub-strings.
-
-The output can be decoded with `lzss_decode()`.
-
-## lzss\_encode\_fast
+The function returns three values:
 
 ```perl
-    my ($literals, $distances, $lengths) = lzss_encode_fast($data);
+    $literals   # array-ref of uncompressed symbols
+    $distances  # array-ref of backreference distances
+    $lengths    # array-ref of match lengths
 ```
 
-Low-level function that applies a fast variant of LZSS on the provided data.
+The output can be decoded with `lzss_decode()` and `lzss_decode_symbolic`, respectively.
 
-The function returns three values: `$literals`, which is an array-ref of uncompressed symbols, `$distances`, which contains the relative back-reference distances, and `$lengths`, which holds the lengths of the matched sub-strings.
+## lzss\_decode / lzss\_decode\_symbolic
 
-The output can be decoded with `lzss_decode()`.
-
-## lzss\_decode
-
-```perl
-    my $string = lzss_decode($literals, $distances, $lengths);
-```
+    my $string  = lzss_decode(\@literals, \@distances, \@lengths);
+    my $symbols = lzss_decode_symbolic(\@literals, \@distances, \@lengths);
 
 Low-level function that decodes the LZSS encoding, using the provided literals, distances, and lengths of matched sub-strings.
 
-It takes three parameters: `$literals`, representing the array-ref of uncompressed bytes, `$distances`, containing the relative back-reference distances of the matched sub-strings, and `$lengths`, holding the lengths of the matched sub-strings.
-
-Inverse of `lzss_encode()` and `lzss_encode_fast()`.
+Inverse of `lzss_encode()`, `lzss_encode_symbolic` and `lzss_encode_fast()`.
 
 ## deflate\_encode
 
@@ -1202,7 +1195,7 @@ Low-level function that returns the index inside the DEFLATE tables for a given 
 Each function can be exported individually, as:
 
 ```perl
-    use Compression::Util qw(bz2_compress);
+    use Compression::Util qw(bwt_compress);
 ```
 
 By specifying the **:all** keyword, will export all the exportable functions:

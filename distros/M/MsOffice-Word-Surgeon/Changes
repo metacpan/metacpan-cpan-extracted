@@ -1,5 +1,10 @@
 Revision history for MsOffice-Word-Surgeon
 
+2.06    03.06.2024
+  - refactoring for fields and bookmark boundaries
+  - new methods replace_fields() and reveal_fields()
+  - internals : Carp::Clan replaced by Carp::Object
+
 2.05    02.03.2024
   - fix missing XML decode/encode operations on &<>
 

@@ -9,7 +9,7 @@ Tk::FileBrowser - Multi column file system explorer
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = 0.03;
+$VERSION = 0.04;
 
 use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'FileBrowser';
@@ -387,7 +387,7 @@ sub Populate {
 			-sortcall => ['SortMode', $self],
 			-text => $_
 		);
-		$tree->headerCreate($column, -itemtype => 'window', -widget => $header);
+		$tree->headerCreate($column, -headerbackground => $self->cget(-background), -itemtype => 'window', -widget => $header);
 		$column ++;
 	}
 	$self->{COLNAMES} = $col_names;
@@ -1470,6 +1470,7 @@ If you find any bugs, please contact the author.
 =cut
 
 1;
+
 
 
 

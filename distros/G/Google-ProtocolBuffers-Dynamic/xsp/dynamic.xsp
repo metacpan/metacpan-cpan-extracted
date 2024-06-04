@@ -1,5 +1,6 @@
 %module{Google::ProtocolBuffers::Dynamic};
 
+#include "perl_unpollute.h"
 #include "dynamic.h"
 
 %name{Google::ProtocolBuffers::Dynamic} class gpd::Dynamic {

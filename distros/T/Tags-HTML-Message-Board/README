@@ -1,0 +1,357 @@
+NAME
+    Tags::HTML::Message::Board - Tags helper for message board.
+
+SYNOPSIS
+     use Tags::HTML::Message::Board;
+
+     my $obj = Tags::HTML::Message::Board->new(%params);
+     $obj->cleanup;
+     $obj->init($message_board);
+     $obj->prepare;
+     $obj->process;
+     $obj->process_css;
+
+DESCRIPTION
+    Tags helper to print HTML page of message board.
+
+    The page contains message and comments for message. Each message or
+    comment contains information about author, date of creation and text.
+    There is form for adding of comment after list of comments.
+
+    This helper is created for usage in Plack::App::Message::Board plack
+    application which is full application for page.
+
+METHODS
+  "new"
+     my $obj = Tags::HTML::Message::Board->new(%params);
+
+    Constructor.
+
+    *       "css"
+
+            CSS::Struct::Output object for process_css processing.
+
+            Default value is undef.
+
+    *       "css_class"
+
+            CSS class for message board.
+
+            Default value is 'message-board'.
+
+    *       "lang"
+
+            Language in ISO 639-3 code.
+
+            Default value is 'eng'.
+
+    *       "tags"
+
+            Tags::Output object.
+
+            Default value is undef.
+
+    *       "text"
+
+            Hash reference with keys defined language in ISO 639-2 code and
+            value with hash reference with texts.
+
+            Required keys are 'add_comment', 'author', 'date' and 'save'.
+
+            Default value is:
+
+             {
+                    'eng' => {
+                            'add_comment' => 'Add comment',
+                            'author' => 'Author',
+                            'date' => 'Date',
+                            'save' => 'Save',
+                    },
+             }
+
+    Returns instance of object.
+
+  "cleanup"
+     $obj->cleanup;
+
+    Process cleanup after page run.
+
+    Returns undef.
+
+  "init"
+     $obj->init($message_board);
+
+    Initialize object. Variable $message_board is reference to array with
+    Data::Message::Board instances.
+
+    Returns undef.
+
+  "prepare"
+     $obj->prepare;
+
+    Prepare object.
+
+    Do nothing in this class.
+
+    Returns undef.
+
+  "process"
+     $obj->process;
+
+    Process Tags structure for message board.
+
+    Returns undef.
+
+  "process_css"
+     $obj->process_css;
+
+    Process CSS::Struct structure for message board.
+
+    Returns undef.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+             From Mo::utils::Language::check_language_639_2():
+                     Parameter 'lang' doesn't contain valid ISO 639-2 code.
+                             Codeset: %s
+                             Value: %s
+             From Tags::HTML::new():
+                     Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+                     Parameter 'tags' must be a 'Tags::Output::*' class.
+             Number of texts isn't same as expected.
+             Parameter 'text' is required.
+             Parameter 'text' must be a hash with language texts.
+             Texts for language '%s' doesn't exist.
+             Text for lang '%s' and key '%s' doesn't exist.
+
+     init():
+             Data object must be a 'Data::Message::Board' instance.
+
+     process():
+             From Tags::HTML::process():
+                     Parameter 'tags' isn't defined.
+
+     process_css():
+             From Tags::HTML::process_css():
+                     Parameter 'css' isn't defined.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Tags::HTML::Message::Board;
+     use Tags::Output::Indent;
+     use Test::Shared::Fixture::Data::Message::Board::Example;
+
+     # Object.
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new(
+             'no_simple' => ['textarea'],
+             'preserved' => ['style', 'textarea'],
+             'xml' => 1,
+     );
+     my $obj = Tags::HTML::Message::Board->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+
+     # Init.
+     my $board = Test::Shared::Fixture::Data::Message::Board::Example->new;
+     $obj->init($board);
+
+     # Process message board.
+     $obj->process_css;
+     $obj->process;
+
+     # Print out.
+     print "CSS\n";
+     print $css->flush."\n\n";
+     print "HTML\n";
+     print $tags->flush."\n";
+
+     # Output:
+     # CSS
+     # .message-board .main-message {
+     #      border: 1px solid #ccc;
+     #      padding: 20px;
+     #      border-radius: 5px;
+     #      background-color: #f9f9f9;
+     #      max-width: 600px;
+     #      margin: auto;
+     # }
+     # .message-board .comments {
+     #      max-width: 600px;
+     #      margin: auto;
+     # }
+     # .message-board .comment {
+     #      border-left: 2px solid #ccc;
+     #      padding-left: 10px;
+     #      margin-top: 20px;
+     #      margin-left: 10px;
+     # }
+     # .author {
+     #      font-weight: bold;
+     #      font-size: 1.2em;
+     # }
+     # .comment .author {
+     #      font-size: 1em;
+     # }
+     # .date {
+     #      color: #555;
+     #      font-size: 0.9em;
+     #      margin-bottom: 10px;
+     # }
+     # .comment .date {
+     #      font-size: 0.8em;
+     # }
+     # .text {
+     #      margin-top: 10px;
+     # }
+     # textarea {
+     #      width: 100%;
+     #      padding: 12px 20px;
+     #      margin: 8px 0;
+     #      display: inline-block;
+     #      border: 1px solid #ccc;
+     #      border-radius: 4px;
+     #      box-sizing: border-box;
+     # }
+     # button {
+     #      width: 100%;
+     #      background-color: #4CAF50;
+     #      color: white;
+     #      padding: 14px 20px;
+     #      margin: 8px 0;
+     #      border: none;
+     #      border-radius: 4px;
+     #      cursor: pointer;
+     # }
+     # button:hover {
+     #      background-color: #45a049;
+     # }
+     # .message-board .add-comment {
+     #      max-width: 600px;
+     #      margin: auto;
+     # }
+     # .message-board .add-comment .title {
+     #      margin-top: 20px;
+     #      font-weight: bold;
+     #      font-size: 1.2em;
+     # }
+     # button {
+     #      margin: 0;
+     # }
+     # 
+     # HTML
+     # <div class="message-board">
+     #   <div class="main-message">
+     #     <div class="author">
+     #       Author: John Wick
+     #     </div>
+     #     <div class="date">
+     #       Date: 25.05.2024 17:53:20
+     #     </div>
+     #     <div class="text">
+     #       How to install Perl?
+     #     </div>
+     #   </div>
+     #   <div class="comments">
+     #     <div class="comment">
+     #       <div class="author">
+     #         Author: Gregor Herrmann
+     #       </div>
+     #       <div class="date">
+     #         Date: 25.05.2024 17:53:27
+     #       </div>
+     #       <div class="text">
+     #         apt-get update; apt-get install perl;
+     #       </div>
+     #     </div>
+     #     <div class="comment">
+     #       <div class="author">
+     #         Author: Emmanuel Seyman
+     #       </div>
+     #       <div class="date">
+     #         Date: 25.05.2024 17:53:37
+     #       </div>
+     #       <div class="text">
+     #         dnf update; dnf install perl-intepreter;
+     #       </div>
+     #     </div>
+     #   </div>
+     #   <div class="add-comment">
+     #     <div class="title">
+     #       Add comment
+     #     </div>
+     #     <form method="post">
+     #       <textarea autofocus="autofocus" rows="6"></textarea>      <button type="button">
+     #         Save
+     #       </button>
+     #     </form>
+     #   </div>
+     # </div>
+
+EXAMPLE2
+     use strict;
+     use warnings;
+ 
+     use CSS::Struct::Output::Indent;
+     use Plack::App::Tags::HTML;
+     use Plack::Runner;
+     use Tags::HTML::Message::Board;
+     use Tags::Output::Indent;
+     use Test::Shared::Fixture::Data::Message::Board::Example;
+ 
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new(
+             'no_simple' => ['textarea'],
+             'preserved' => ['style', 'textarea'],
+             'xml' => 1,
+     );
+     my $message_board = Tags::HTML::Message::Board->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+     my $board = Test::Shared::Fixture::Data::Message::Board::Example->new;
+     $message_board->process_css;
+     my $app = Plack::App::Tags::HTML->new(
+             'component' => 'Tags::HTML::Container',
+             'data' => [sub {
+                     my $self = shift;
+                     $message_board->process_css;
+                     $message_board->init($board);
+                     $message_board->process;
+                     return;
+             }],
+             'css' => $css,
+             'tags' => $tags,
+     )->to_app;
+     Plack::Runner->new->run($app);
+
+     # Output screenshot is in images/ directory.
+
+DEPENDENCIES
+    Class::Utils, Data::HTML::Element::Button,
+    Data::HTML::Element::Textarea, Error::Pure, Mo::utils, Mo::utils::CSS,
+    Mo::utils::Language, Readonly, Scalar::Util, Tags::HTML,
+    Tags::HTML::Element::Button, Tags::HTML::Element::Textarea.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-HTML-Message-Board>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

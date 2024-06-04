@@ -152,18 +152,11 @@ soundcloud.com (non-paywalled) songs (L<StreamFinder::SoundCloud>)
 subsplash.com podcasts (L<StreamFinder::Subsplash>) (EXPERIMENTAL), 
 tunein.com (non-paywalled) radio stations and podcasts 
 (L<StreamFinder::Tunein>), vimeo.com videos (L<StreamFinder::Vimeo>), 
-youtube.com, et. al and other sites that youtube-dl supports 
+youtube.com, et. al and other sites that youtube-dl/yt-dlp support 
 (L<StreamFinder::Youtube>), 
 zeno.fm radio stations and podcasts (L<StreamFinder::Zeno>), 
 and L<StreamFinder::Anystream> - search any (other) webpage URL (not supported 
 by any of the other submodules) for streams.  
-
-NOTE:  StreamFinder::Podcastaddict is now considered depreciated and may be 
-removed in a later StreamFinder release as it now requires a specific valid 
-episode page to fetch streams from, as Podcastaddict.com has javascripted up 
-their podcast pages now to the point that it is no longer possible to obtain 
-a playlist from them via our scripts.  However, it still seems to be able to 
-return the first episode data when given a podcast page for now.
 
 NOTE:  StreamFinder::Google has been removed as Google Podcasts has shut down.
 
@@ -174,6 +167,13 @@ StreamFinder::Youtube or StreamFinder::AnyStream.
 
 NOTE:  StreamFinder::Goodpods has been removed, as that site has redone itself 
 in javascript as to no longer be scrapable for streams.
+
+NOTE:  StreamFinder::Podcastaddict is now considered depreciated and may be 
+removed in a later StreamFinder release as it now requires a specific valid 
+episode page to fetch streams from, as Podcastaddict.com has javascripted up 
+their podcast pages now to the point that it is no longer possible to obtain 
+a playlist from them via our scripts.  However, it still seems to be able to 
+return the first episode data when given a podcast page for now.
 
 NOTE:  Users should also consider StreamFinder::SoundCloud to now be 
 depreciated, as they've added cookie and tracker requirements making it 
@@ -551,7 +551,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '2.32';
+our $VERSION = '2.33';
 our $DEBUG = 0;
 
 require Exporter;

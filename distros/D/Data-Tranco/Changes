@@ -1,0 +1,3 @@
+0.002 - 2024-06-04:
+    - fixed documentation for random_domain() and top_domain()
+    - added sample(), all(), top_domains() and rank()

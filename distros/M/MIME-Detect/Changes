@@ -1,3 +1,7 @@
+0.11 2024-06-03
+    * Update XML database to version 2.4
+    * Update build infrastructure
+
 0.10 2018-11-30
     * Corrected links to bug tracker etc, thanks to RENEEB
     * Minor distribution cleanup

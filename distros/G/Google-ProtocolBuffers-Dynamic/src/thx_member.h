@@ -19,6 +19,7 @@
 
 #include <EXTERN.h>
 #include <perl.h>
+#include "perl_unpollute.h"
 
 #ifdef MULTIPLICITY
 #   define DECL_THX_MEMBER tTHX my_perl;

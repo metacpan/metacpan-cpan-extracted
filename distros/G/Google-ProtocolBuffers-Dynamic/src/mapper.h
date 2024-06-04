@@ -1,25 +1,26 @@
 #ifndef _GPD_XS_MAPPER_INCLUDED
 #define _GPD_XS_MAPPER_INCLUDED
 
-#include "perl_unpollute.h"
-
 #include "ref.h"
 
 #include <upb/pb/encoder.h>
 #include <upb/pb/decoder.h>
 #include <upb/json/printer.h>
 #include <upb/json/parser.h>
-#include <upb/bindings/stdc++/string.h>
 
 #include "unordered_map.h"
 
 #include "EXTERN.h"
 #include "perl.h"
 #include "ppport.h"
+#include "perl_unpollute.h"
 
 #include "thx_member.h"
 #include "transform.h"
+#include "vectorsink.h"
+#include "fieldmap.h"
 #include "pb/decoder.h"
+#include "mapper_context.h"
 
 #include <list>
 #include <vector>
@@ -39,6 +40,38 @@ public:
         TARGET_ARRAY_ITEM       = 3,
         TARGET_HASH_ITEM        = 4,
         TARGET_FIELDTABLE_ITEM  = 5,
+    };
+
+    enum ValueAction {
+        ACTION_INVALID          = 0,
+
+        // scalar values
+        ACTION_PUT_FLOAT        = 1,
+        ACTION_PUT_FLOAT_ND     = 2,
+        ACTION_PUT_DOUBLE       = 3,
+        ACTION_PUT_DOUBLE_ND    = 4,
+        ACTION_PUT_BOOL         = 5,
+        ACTION_PUT_BOOL_ND      = 6,
+        ACTION_PUT_STRING       = 7,
+        ACTION_PUT_STRING_ND    = 8,
+        ACTION_PUT_BYTES        = 9,
+        ACTION_PUT_BYTES_ND     = 10,
+        ACTION_PUT_ENUM         = 11,
+        ACTION_PUT_ENUM_ND      = 12,
+        ACTION_PUT_INT32        = 13,
+        ACTION_PUT_INT32_ND     = 14,
+        ACTION_PUT_UINT32       = 15,
+        ACTION_PUT_UINT32_ND    = 16,
+        ACTION_PUT_INT64        = 17,
+        ACTION_PUT_INT64_ND     = 18,
+        ACTION_PUT_UINT64       = 19,
+        ACTION_PUT_UINT64_ND    = 20,
+
+        // non-scalar values
+        ACTION_PUT_MESSAGE      = 21,
+        ACTION_PUT_REPEATED     = 22,
+        ACTION_PUT_MAP          = 23,
+        ACTION_PUT_FIELDTABLE   = 24,
     };
 
     struct Field {
@@ -64,10 +97,12 @@ public:
         bool has_default;
         bool is_map;
         FieldTarget field_target;
+        ValueAction field_action, value_action;
         const Mapper *mapper; // for Message/Group fields
         gpd::transform::DecoderTransform *decoder_transform;
-        STD_TR1::unordered_set<int32_t> enum_values;
-        int oneof_index;
+        gpd::transform::EncoderTransform *encoder_transform;
+        UMS_NS::unordered_set<int32_t> enum_values;
+        int field_index, oneof_index;
         union {
             struct {
                 size_t default_str_len;
@@ -83,7 +118,7 @@ public:
 
         std::string full_name() const;
         upb::FieldDef::Type map_value_type() const;
-        const STD_TR1::unordered_set<int32_t> &map_enum_values() const;
+        const UMS_NS::unordered_set<int32_t> &map_enum_values() const;
 
         bool is_map_key() const { return field_target == TARGET_MAP_KEY; }
         bool is_map_value() const { return field_target == TARGET_MAP_VALUE; }
@@ -112,11 +147,11 @@ public:
         std::vector<std::vector<int32_t> > seen_oneof;
         gpd::transform::DecoderTransformQueue pending_transforms;
         gpd::transform::DecoderTransform *decoder_transform;
-        bool transform_fieldtable;
+        bool decoder_transform_fieldtable;
         std::string error;
         SV *string;
         bool track_seen_fields;
-        std::vector<gpd::transform::Fieldtable::Entry> fieldtable_entries;
+        std::vector<gpd::transform::DecoderFieldtable::Entry> fieldtable_entries;
 
         DecoderHandlers(pTHX_ const Mapper *mapper);
         ~DecoderHandlers();
@@ -180,6 +215,22 @@ public:
         }
     };
 
+    struct EncoderState {
+        upb::Status *status;
+        upb::Sink *sink;
+        MapperContext *mapper_context;
+
+        EncoderState(upb::Status *_status, MapperContext *_mapper_context);
+
+        EncoderState(EncoderState &original, upb::Sink *_sink) :
+                status(original.status),
+                sink(_sink),
+                mapper_context(original.mapper_context) {
+        }
+
+        void setup(upb::Sink *sink);
+    };
+
 public:
     Mapper(pTHX_ Dynamic *registry, const upb::MessageDef *message_def, const gpd::pb::Descriptor *gpd_descriptor, HV *stash, const MappingOptions &options);
     ~Mapper();
@@ -190,6 +241,7 @@ public:
     void resolve_mappers();
     void create_encoder_decoder();
     void set_decoder_options(HV *options);
+    void set_encoder_options(HV *options);
 
     SV *encode(SV *ref);
     SV *decode_upb(const char *buffer, STRLEN bufsize);
@@ -215,17 +267,33 @@ public:
 private:
     static bool run_bbpb_decoder(Mapper *root_mapper, const char *buffer, STRLEN bufsize);
 
-    bool encode_value(upb::Sink *sink, upb::Status *status, SV *ref) const;
-    bool encode_field(upb::Sink *sink, upb::Status *status, const Field &fd, SV *ref) const;
-    bool encode_field_nodefaults(upb::Sink *sink, upb::Status *status, const Field &fd, SV *ref) const;
-    bool encode_key(upb::Sink *sink, upb::Status *status, const Field &fd, const char *key, I32 keylen) const;
-    bool encode_hash_kv(upb::Sink *sink, upb::Status *status, const char *key, STRLEN keylen, SV *value) const;
-    bool encode_from_perl_array(upb::Sink *sink, upb::Status *status, const Field &fd, SV *ref) const;
-    bool encode_from_perl_hash(upb::Sink *sink, upb::Status *status, const Field &fd, SV *ref) const;
-    bool encode_from_message_array(upb::Sink *sink, upb::Status *status, const Mapper::Field &fd, AV *source) const;
+    bool encode_message(EncoderState &state, SV *ref) const {
+        if (encoder_transform) {
+            if (encoder_transform_fieldtable) {
+                return encode_transformed_fieldtable_message(state, ref, encoder_transform);
+            } else {
+                return encode_transformed_message(state, ref, encoder_transform);
+            }
+        } else if (unknown_field_transform) {
+            return encode_simple_message_iterate_hash(state, ref);
+        } else {
+            return encode_simple_message_iterate_fields(state, ref);
+        }
+    }
+
+    bool encode_simple_message_iterate_fields(EncoderState &state, SV *ref) const;
+    bool encode_simple_message_iterate_hash(EncoderState &state, SV *ref) const;
+    bool encode_transformed_message(EncoderState &state, SV *ref, gpd::transform::EncoderTransform *encoder_transform) const;
+    bool encode_transformed_fieldtable_message(EncoderState &state, SV *ref, gpd::transform::EncoderTransform *encoder_transform) const;
+    bool encode_field(EncoderState &state, const Field &fd, SV *ref) const;
+    bool encode_key(EncoderState &state, const Field &fd, const char *key, I32 keylen) const;
+    bool encode_hash_kv(EncoderState &state, const char *key, STRLEN keylen, SV *value) const;
+    bool encode_from_perl_array(EncoderState &state, const Field &fd, SV *ref) const;
+    bool encode_from_perl_hash(EncoderState &state, const Field &fd, SV *ref) const;
+    bool encode_from_message_array(EncoderState &state, const Mapper::Field &fd, AV *source) const;
 
     template<class G, class S>
-    bool encode_from_array(upb::Sink *sink, upb::Status *status, const Mapper::Field &fd, AV *source) const;
+    bool encode_from_array(EncoderState &state, const Mapper::Field &fd, AV *source) const;
 
     bool check(upb::Status *status, SV *ref) const;
     bool check(upb::Status *status, const Field &fd, SV *ref) const;
@@ -286,17 +354,22 @@ private:
     upb::reffed_ptr<const upb::json::ParserMethod> json_decoder_method;
     std::vector<Field> fields;
     std::vector<MapperField *> extension_mapper_fields;
-    STD_TR1::unordered_map<std::string, Field *> field_map;
+    gpd::FieldMap<Field> field_map;
     upb::Status status;
+    EncoderState encoder_state;
     DecoderHandlers decoder_callbacks;
     gpd::pb::DecoderFieldData<FieldData> decoder_field_data;
-    upb::Sink encoder_sink, decoder_sink;
-    std::string output_buffer;
-    upb::StringSink string_sink;
-    bool check_required_fields, decode_explicit_defaults, encode_defaults, check_enum_values, decode_blessed, fail_ref_coercion;
+    gpd::transform::EncoderTransform *encoder_transform;
+    bool encoder_transform_fieldtable;
+    gpd::transform::UnknownFieldTransform *unknown_field_transform;
+    upb::Sink decoder_sink;
+    gpd::VectorSink vector_sink;
+    bool check_required_fields, decode_explicit_defaults, encode_defaults, check_enum_values, decode_blessed, fail_ref_coercion, ignore_undef_fields;
     int boolean_style;
+    int map_key_index, map_value_index;
     GV *json_false, *json_true;
     WarnContext *warn_context;
+    MapperContext mapper_context;
 };
 
 class MapperField : public Refcounted {
@@ -380,47 +453,18 @@ private:
 
 class WarnContext {
 public:
-    enum Kind {
-        Array   = 1,
-        Hash    = 2,
-        Message = 3,
-    };
-
-    struct Item {
-        Kind kind;
-        union {
-            int index;
-            const Mapper::Field *field;
-            struct {
-                const char *key;
-                STRLEN keylen;
-            };
-        };
-
-        Item(Kind _kind) : kind(_kind) { }
-    };
-
     static void setup(pTHX);
     static WarnContext *get(pTHX);
 
     void warn_with_context(pTHX_ SV *warning) const;
 
-    Item &push_level(Kind kind) {
-        levels.push_back(Item(kind));
-
-        return levels.back();
-    }
-
-    void pop_level() { levels.pop_back(); }
-    void clear() { levels.clear(); }
+    void set_context(MapperContext *cxt) { context = cxt; }
     void localize_warning_handler(pTHX);
 
 private:
-    typedef std::list<Item> Levels;
-
     WarnContext(pTHX);
 
-    Levels levels;
+    MapperContext *context;
     SV *chained_handler;
     SV *warn_handler;
 };

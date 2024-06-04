@@ -1,6 +1,9 @@
 Build.PL
 Changes
 lib/MsOffice/Word/Surgeon.pm
+lib/MsOffice/Word/Surgeon/BookmarkBoundary.pm
+lib/MsOffice/Word/Surgeon/Carp.pm
+lib/MsOffice/Word/Surgeon/Field.pm
 lib/MsOffice/Word/Surgeon/PackagePart.pm
 lib/MsOffice/Word/Surgeon/Revision.pm
 lib/MsOffice/Word/Surgeon/Run.pm
@@ -10,6 +13,7 @@ MANIFEST			This list of files
 README.md
 t/etc/MsOffice-Word-Surgeon.docx
 t/msoffice-word-surgeon.t
+t/replace_fields.t
 t/reveal_bookmarks.t
 xt/manifest.t
 xt/pod.t

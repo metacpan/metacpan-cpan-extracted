@@ -52,6 +52,17 @@ subtest 'oddballs and regressions' => sub{
     is to_toml({a => 'no inf here'}), 'a="no inf here"', '"inf" present in string is string';
     is to_toml({a => 'no nan here'}), 'a="no nan here"', '"nan" present in string is string';
   };
+
+   subtest 'strings that contain DateTime but are not DateTime' => sub {
+
+      my $data = {
+        not_a_dt => 'Not a 2024-05-31T17:08:44',
+      };
+
+     is to_toml( $data ), 'not_a_dt="Not a 2024-05-31T17:08:44"',
+        $data->{not_a_dt};
+
+   };
 };
 
 subtest 'to_toml_array' => sub{

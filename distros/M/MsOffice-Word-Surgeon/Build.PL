@@ -18,7 +18,7 @@ my $builder = Module::Build->new(
     requires => {
       perl                        => '5.24.0',
       'Archive::Zip'              => undef,
-      'Carp::Clan'                => undef,
+      'Carp::Object'              => undef,
       'Encode'                    => undef,
       'List::Util'                => undef,
       'Moose'                     => undef,
@@ -27,6 +27,7 @@ my $builder = Module::Build->new(
       'namespace::clean'          => undef,
       'POSIX'                     => undef,
       'Exporter'                  => undef,
+      'match::simple'             => undef,
     },
     add_to_cleanup     => [ 'MsOffice-Word-Surgeon-*' ],
     meta_merge => {

@@ -1,13 +1,12 @@
 package MIME::Detect;
 use Moo 2;
-use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 use Carp qw(croak);
 use XML::LibXML;
 use MIME::Detect::Type;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -105,7 +104,6 @@ sub read_database( $self, %options ) {
     if( ! exists $options{ xml }) {
         $options{ xml } = 'MIME::Detect::FreeDesktopOrgDB';
     };
-    
     if( $options{ xml } and not ref $options{ xml }) {
         # Load the class name
         if( !eval "require $options{ xml }; 1") {
@@ -113,7 +111,7 @@ sub read_database( $self, %options ) {
         };
         $options{ xml } = $options{ xml }->get_xml;
     };
-    
+
     my @types = map {
         my @args = ref $_ eq 'SCALAR' ? (string   => $_) :
                    ref $_             ? (IO       => $_) :
@@ -179,7 +177,7 @@ sub fragment_to_type( $self, $frag ) {
     if( $magic ) {
         $priority = $magic->getAttribute('priority');
         $priority = 50 if !defined $priority;
-        @rules = grep { $_->nodeType != 3 } # exclude text nodes
+        @rules = grep { $_->nodeType == XML_ELEMENT_NODE } # exclude text nodes and other stuff
                     $magic->childNodes;
         for my $rule (@rules) {
             $rule = $self->parse_rule( $rule );
@@ -202,7 +200,8 @@ sub parse_rule( $self, $rule ) {
     my $offset = $rule->getAttribute('offset');
     my $type = $rule->getAttribute('type');
 
-    my @and = map { $self->parse_rule( $_ ) } grep { $_->nodeType != 3 } $rule->childNodes;
+    my @and = map  { $self->parse_rule( $_ ) }
+              grep { $_->nodeType == XML_ELEMENT_NODE } $rule->childNodes;
     my $and = @and ? \@and : undef;
 
     return {
@@ -318,7 +317,6 @@ sub mime_type_from_name( $self, $file ) {
 
 package MIME::Detect::Buffer;
 use Moo 2;
-use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 use Fcntl 'SEEK_SET';
@@ -369,7 +367,7 @@ sub request($self,$offset,$length) {
                 $updated = 1;
             };
         }
-        
+
         # Setting all three in one go would be more object-oriented ;)
         if( $updated ) {
             $self->offset($offset);
@@ -411,7 +409,7 @@ L<MIME::Types> - for extension-based detection
 
 =head1 REPOSITORY
 
-The public repository of this module is 
+The public repository of this module is
 L<http://github.com/Corion/mime-detect>.
 
 =head1 SUPPORT
@@ -431,7 +429,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2015-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2024 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

@@ -63,14 +63,7 @@ sub mirror_file {
 
     $ttl = $TTL_SECONDS unless (defined($ttl));
 
-    #
-    # the local filename is based on the hash of the URL, salted by the user's
-    # login
-    #
-    my $file = File::Spec->catfile(
-        File::Spec->tmpdir,
-        join('.', __PACKAGE__, sha256_hex(getlogin().':'.($url->isa('URI') ? $url->as_string : $url)), 'dat')
-    );
+    my $file = filename($url);
 
     my $now = time();
 
@@ -182,6 +175,20 @@ sub mirror_csv {
 }
 
 
+sub filename {
+    my $url = shift;
+
+    #
+    # the local filename is based on the hash of the URL, salted by the user's
+    # login
+    #
+    return File::Spec->catfile(
+        File::Spec->tmpdir,
+        join('.', __PACKAGE__, sha256_hex(getlogin().':'.($url->isa('URI') ? $url->as_string : $url)), 'dat')
+    );
+}
+
+
 1;
 
 __END__
@@ -196,7 +203,7 @@ Data::Mirror - a simple way to efficiently retrieve data from the World Wide Web
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -339,6 +346,12 @@ C<undef>, a simple string, or an arrayref or hashref.
 
 This method returns a reference to an array of arrayrefs containing the CSV rows
 in the resource.
+
+=head1 OTHER FUNCTIONS
+
+    $file = Data::Mirror::filename($url);
+
+Returns the local filename that L<Data::Mirror> would use for the given URL.
 
 =head1 REPORTING BUGS, CONTRIBUTING ENHANCEMENTS
 

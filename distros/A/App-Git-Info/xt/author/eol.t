@@ -9,7 +9,6 @@ use Test::EOL;
 my @files = (
     'bin/git-info',
     'lib/App/Git/Info.pm',
-    'lib/App/Git/Info/Command/info.pm',
     't/00-compile.t'
 );
 

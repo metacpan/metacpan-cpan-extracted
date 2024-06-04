@@ -1,12 +1,13 @@
 package MsOffice::Word::Surgeon::Utils;
+use 5.24.0;
 use strict;
 use warnings;
-use Carp::Clan  qw(^MsOffice::Word::Surgeon); # will import carp, croak, etc.
+use MsOffice::Word::Surgeon::Carp;
 use Exporter    qw/import/;
 
-our @EXPORT = qw/maybe_preserve_spaces is_at_run_level decode_entities encode_entities/;
+our @EXPORT = qw/maybe_preserve_spaces is_at_run_level parse_attrs decode_entities encode_entities/;
 
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 
 sub maybe_preserve_spaces {
   my ($txt) = @_;
@@ -17,6 +18,32 @@ sub is_at_run_level {
   my ($xml) = @_;
   return $xml =~ m[</w:(?:r|del|ins)>$];
 }
+
+sub parse_attrs {  # cheap parsing of attribute lists in an XML node
+  my ($lst_attrs) = @_;
+
+  state $attr_pair_regex = qr[
+     ([^=\s"'&<>]+)     # attribute name
+     \h* = \h*          # Eq
+     (?:                # attribute value
+        " ([^<"]*) "    # .. enclosed in double quotes
+       |
+        ' ([^<']*) '    # .. or enclosed in single quotes
+     )
+   ]x;
+
+  my %attr;
+  while ($lst_attrs =~ /$attr_pair_regex/g) {
+    my ($name, $val) = ($1, $2 // $3);
+    decode_entities($val);
+    $attr{$name} = $val;
+  }
+
+  return %attr;
+}
+
+
+
 
 # Cheap version for encoding/decoding XML Entities.
 # We just need 4 of them, so no need for a module with complete support.
@@ -65,6 +92,14 @@ attribute C<<  xml:space="preserve" >>
 
 Returns true if the given XML fragment ends with a C<< </w:r> >>,
 C<< </w:del> >> or C<< </w:ins> >> node.
+
+=head2 parse_attrs
+
+  my %attrs = parse_attrs($lst_attrs)
+
+Returns a hash of name-value pairs parsed from the input string.
+Values may be enclosed in single or in double quotes.
+Values are entity-decoded.
 
 =head2 decode_entities
 

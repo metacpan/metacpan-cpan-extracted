@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "Complete::Util" => "0.620",
     "Exporter" => "5.57",
     "Log::ger" => "0.038",
-    "TableData::Health::Nutrient" => 0,
+    "TableData::Health::Nutrient" => "0.003",
     "strict" => 0,
     "warnings" => 0
   },
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +46,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.038",
-  "TableData::Health::Nutrient" => 0,
+  "TableData::Health::Nutrient" => "0.003",
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

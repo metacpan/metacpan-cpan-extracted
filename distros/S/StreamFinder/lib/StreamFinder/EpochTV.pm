@@ -370,6 +370,7 @@ sub new
 
 	my $self = $class->SUPER::new('EpochTV', @_);
 	$DEBUG = $self->{'debug'}  if (defined $self->{'debug'});
+	my $baseURL = 'https://www.theepochtimes.com';
 	$self->{'id'} = '';
 	(my $url2fetch = $url);
 	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
@@ -382,14 +383,15 @@ sub new
 	my $tried = 0;
 
 TRYIT:
-	if ($url2fetch =~ /^https?\:/) {
+	$html = '';   #RESET HTML EACH TRY.
+	if ($url2fetch =~ m#^(https?\:\/\/[^\/]+)#) {
+		$baseURL = $1;
 		$self->{'id'} = $1  if ($url =~ m#\/([a-z\-\d]+)\/?$#);
 	} else {
 		$self->{'id'} = $url;
-		$url2fetch = 'https://www.theepochtimes.com/epochtv/' . $url;
+		$url2fetch = $baseURL . '/epochtv/' . $url;
 	}
 
-	$html = '';
 	print STDERR "-0(EpochTV): FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	$response = $ua->get($url2fetch);
 	if ($response->is_success) {
@@ -401,25 +403,36 @@ TRYIT:
 	return undef  unless ($html);  #STEP 1 FAILED, INVALID EpochTV URL, PUNT!
 
 	my $protocol = $self->{'secure'} ? '' : '?';
+	$self->{'genre'} = 'Video';  #www.theepochtimes.com DOES NOT CURRENTLY INCLUDE A GENRE/CATEGORY.
 	if ($html =~ m#\,\"contentUrl\"\:\"(https${protocol}\:[^\"]+)#s) {
-		push (@{$self->{'streams'}}, $1);  #WE'RE AN EPISODE PAGE, CONTINUE:
+		my $stream = $1;
+		$stream =~ s/\.(mp3|m3u8|mp4|m4a|pls)\?.*$/\.$1/  unless ($self->{'notrim'});   #STRIP OFF EXTRA GARBAGE PARMS, COMMENT OUT IF STARTS FAILING!
+		push (@{$self->{'streams'}}, $stream);  #WE'RE AN EPISODE PAGE, CONTINUE:
+	} elsif ($html =~ m#\<video\s+src\=\"(https${protocol}\:[^\"]+)#si) {    #LEGACY VIDEO STREAM:
+		my $stream = $1;
+		$stream =~ s/\.(mp3|m3u8|mp4|m4a|pls)\?.*$/\.$1/  unless ($self->{'notrim'});   #STRIP OFF EXTRA GARBAGE PARMS, COMMENT OUT IF STARTS FAILING!
+		push (@{$self->{'streams'}}, $stream);  #WE'RE AN EPISODE PAGE, CONTINUE:
+	} elsif ($html =~ m#\<audio\s+src\=\"(https${protocol}\:[^\"]+)#si) {    #LEGACY AUDIO STREAM:
+		my $stream = $1;
+		$stream =~ s/\.(mp3|m3u8|mp4|m4a|pls)\?.*$/\.$1/  unless ($self->{'notrim'});   #STRIP OFF EXTRA GARBAGE PARMS, COMMENT OUT IF STARTS FAILING!
+		push (@{$self->{'streams'}}, $stream);  #WE'RE AN EPISODE PAGE, CONTINUE:
+		$self->{'genre'} = 'Podcast';
 	} elsif ($tried < 1) {   #NO STREAM URL FOUND, ASSUME WE'RE A CHANNEL PAGE & TRY AGAIN W/IT'S 1ST EPISODE!:
 		++$tried;
 		$isEpisode = 0;
 		if ($html =~ m#\<div\s+class\=\"basis\-1\/6\s+pt\-2\s+sm\:pt\-4\"\>\s*\<a\s+href\=\"([^\"]+)#s) {
 			$url2fetch = $1;
-			$url2fetch = 'https://www.theepochtimes.com' . $url2fetch  unless ($url2fetch =~ m#^https?\:#);
+			$url2fetch = $baseURL . $url2fetch  unless ($url2fetch =~ m#^https?\:#);
 			print STDERR "i:No stream, perhaps channel page1, so fetch marquee episode URL=$url2fetch=\n"  if ($DEBUG);
 			goto TRYIT;
 		} elsif ($html =~ m#\<div\s+class\="relative\s+lg\:order\-first\"\>\s*\<a\s+href\=\"([^\"]+)#s) {
 			$url2fetch = $1;
-			$url2fetch = 'https://www.theepochtimes.com' . $url2fetch  unless ($url2fetch =~ m#^https?\:#);
+			$url2fetch = $baseURL . $url2fetch  unless ($url2fetch =~ m#^https?\:#);
 			print STDERR "i:No stream, perhaps channel page2, so fetch marquee episode URL=$url2fetch=\n"  if ($DEBUG);
 			goto TRYIT;
 		}
 	}
 
-	$self->{'genre'} = 'Video';  #www.theepochtimes.com DOES NOT CURRENTLY INCLUDE A GENRE/CATEGORY.
 	print STDERR "---ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	$self->{'title'} = $1  if ($html =~ m#\<meta\s+(?:name|property)\=\"(?:og|twitter)\:title\"\s+content\=\"([^\"]+)\"\s*\/\>#s);
 	$self->{'title'} ||= $1  if ($html =~ m#\"VideoObject\"\,\"name\"\:\"([^\"]+)#s);
@@ -427,25 +440,34 @@ TRYIT:
 	$self->{'iconurl'} = $1  if ($html =~ m#\<meta\s+(?:name|property)\=\"(?:og|twitter)\:image\"\s+content\=\"([^\"]+)#s);
 	$self->{'iconurl'} ||= $1  if ($html =~ m#data\-thumbnail\=\"([^\"]+)#s);
 	$self->{'imageurl'} = $1  if ($html =~ m#\,\"thumbnailUrl\"\:\"([^\"]+)#s);
-	$self->{'albumartist'} = $url2fetch;
 	$self->{'album'} = ($html =~ m#\bmd\:text\-lg\"\>([^\<]+)#s) ? $1 : '';
+	unless ($self->{'album'}) {
+		my $albumdata = $1  if ($html =~ m#\,\"author\"\:\[([^\]]+)#s);
+		$self->{'album'} = $1  if ($albumdata =~ m#\"url\"\:\"([^\"]+)#s);
+	}
 	if ($html =~ m#\<a\s+href\=\"([^\"]+)\"><div class="(?:h-\d+\s+w-\d+|size\-\d+)">(.+?)\<\/div\>#s) {
 		$self->{'albumartist'} = $1;
 		my $channeldata = $2;
 		if ($self->{'albumartist'}) {
-			$self->{'albumartist'} = 'https://www.theepochtimes.com' . $self->{'albumartist'}
+			$self->{'albumartist'} = $baseURL . $self->{'albumartist'}
 					unless ($self->{'albumartist'} =~ m#^https?\:#);
 		}
 		if ($channeldata =~ m#\burl\=([^\"]+)#s) {
 			$self->{'articonurl'} = $1;
-			$self->{'articonurl'} = HTML::Entities::decode_entities($self->{'iconurl'});
-			$self->{'articonurl'} = uri_unescape($self->{'iconurl'});
-			$self->{'articonurl'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egso;
-			$self->{'articonurl'} =~ s#\&.*$##;
+		}
+	} elsif ($html =~ m#\{\\\"className\\\"\:\\\"mb\-2\s+flex\s+gap([^\}]+)#s) {
+		my $channeldata = $1;
+		if ($channeldata =~ m#\\\"src\\\"\:\\\"([^\\]+)#s) {
+			$self->{'articonurl'} = $1;
+			$self->{'artist'} = $1  if ($channeldata =~ m#\\\"alt\\\"\:\\\"([^\\]+)#s);
 		}
 	}
-	$self->{'artist'} = $1  if ($html =~ m#\\\"authors\\\"\:\[\{\\\"name\\\"\:\\\"([^\\]+)#s);
-	$self->{'articonurl'} = $1  if ($html =~ m#\\\"termIcon\\\"\:\\\"([^\\]+)#s);
+	$self->{'artist'} ||= $1  if ($html =~ m#\\\"authors\\\"\:\[\{\\\"name\\\"\:\\\"([^\\]+)#s);
+	$self->{'articonurl'} ||= $1  if ($html =~ m#\\\"termIcon\\\"\:\\\"([^\\]+)#s);
+	$self->{'articonurl'} = HTML::Entities::decode_entities($self->{'articonurl'});
+	$self->{'articonurl'} = uri_unescape($self->{'articonurl'});
+	$self->{'articonurl'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egso;
+	$self->{'articonurl'} =~ s#\&.*$##;
 	$self->{'artimageurl'} = $1  if ($html =~ m#\\\"termPoster\\\"\:\\\"([^\\]+)#s);
 	if ($html =~ m#\\\"avatar\\\"\:\\\"([^\\]+)#s) {
 		$self->{'articonurl'} ||= $1;
@@ -454,12 +476,13 @@ TRYIT:
 	} else {
 		print STDERR "i:No individual artist avatar found, using category page icon ($$self{'articonurl'}).\n"  if ($DEBUG);
 	}
-	$self->{'articonurl'} ||= $self->{'articonurl'};
+	$self->{'articonurl'} ||= $self->{'artimageurl'};
 	$self->{'description'} = $1  if ($html =~ m#\bwhitespace\-break\-spaces\"\>([^\<]+)#s);
 	$self->{'description'} ||= $1  if ($html =~ m#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)#s);
 	$self->{'description'} ||= $1  if ($html =~ m#\<meta\s+property\=\"og\:description\"\s+content\=\"([^\"]+)#s);
 	$self->{'created'} = $1  if ($html =~ m#\"uploadDate\"\:\"([^\"]+)#s);
 	$self->{'created'} ||= $1  if ($html =~ m#\<div\s+class\=\"whitespace\-nowrap]s+text\-sm\s+text\-\[\#707070\]\"\>([^\<]+)#s);
+	$self->{'created'} ||= $1  if ($html =~ m#\,\"datePublished\"\:\"([^\"]+)#s);
 	$self->{'year'} = ($self->{'created'} =~ /(\d\d\d\d)/) ? $1 : '';
 	$self->{'imageurl'} ||= $self->{'iconurl'};
 
@@ -476,10 +499,10 @@ TRYIT:
 		$epiTitlesSorted{sprintf('%3.3d', $epiCnt++)} = $self->{'title'};
 	}
 	unless ($isEpisode) {
-		while ($html =~ s#^.+?\\\"video\\\"\:\{\\\"id\\\"\:\\\"##so) {
+		while ($html =~ s#^.+?\\\"(?:video|audio)\\\"\:\{\\\"id\\\"\:\\\"##sio) {
 			if ($html =~ m#\\\"url\\\"\:\\\"(https${protocol}\:[^\\]+)#s) {
 				my $epiStream = $1;
-				if ($epiStream =~ /\.(?:m3u8|mp4)$/ && $html =~ m#\d\d\,\\\"(?:title|caption)\\\"\:\\\"([^\\]+)#s) {
+				if ($epiStream =~ /\.(?:mp3|m3u8|mp4|m4a|pls)/o && $html =~ m#\d\d\,\\\"(?:title|caption)\\\"\:\\\"([^\\]+)#so) {
 					my $epiTitle = $1;
 					unless (defined $epiHash{$epiTitle}) {
 						$epiHash{$epiTitle} = $epiStream;

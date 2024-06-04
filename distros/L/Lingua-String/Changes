@@ -1,5 +1,9 @@
 Revision history for Lingua-String
 
+0.04	Mon Jun  3 13:37:29 EDT 2024
+	Fix synopsis
+	Calling new on an object now returns a clone rather than setting the defaults in the new object
+
 0.03	Tue Mar 15 17:26:25 EDT 2022
 	Allow instantiation with only one arg - a string
 	Fix https://github.com/nigelhorne/Lingua-String/issues/2

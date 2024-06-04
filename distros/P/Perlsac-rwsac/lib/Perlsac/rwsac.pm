@@ -3,7 +3,7 @@ package Perlsac::rwsac ;
 use strict ;
 use warnings ;
 
-our $VERSION = 0.01 ;
+our $VERSION = 0.02 ;
 
 our @map ;
 $map[0] = "delta" ;

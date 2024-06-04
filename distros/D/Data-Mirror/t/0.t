@@ -5,7 +5,7 @@ use Test;
 use vars qw($result);
 use strict;
 
-BEGIN { plan tests => 6 }
+BEGIN { plan tests => 7 }
 
 #
 # let's speed up repeated runs by caching everything for a day
@@ -23,6 +23,8 @@ ok(length($result) > 0 ? 1 : 0);
 #
 $result = mirror_file('https://raw.githubusercontent.com/gbxyz/perl-data-mirror-test-files/main/README.md');
 ok(-e $result ? 1 : 0);
+
+ok($result eq Data::Mirror::filename('https://raw.githubusercontent.com/gbxyz/perl-data-mirror-test-files/main/README.md'));
 
 #
 # filehandle mirror

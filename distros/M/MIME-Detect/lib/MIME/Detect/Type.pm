@@ -5,7 +5,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -88,7 +88,7 @@ dot or the glob.
 
 =cut
 
-sub extension($self) { 
+sub extension($self) {
     _get_extension( $self->globs->[0] );
 }
 
@@ -165,7 +165,7 @@ sub BUILD($self, $args) {
                 "\\" => "\\",
             );
             $value =~ s{\\([nrt\\]|([0-7][0-7][0-7])|x([0-9a-fA-F][0-9a-fA-F]))}
-                       { $replace{$1} ? $replace{$1} 
+                       { $replace{$1} ? $replace{$1}
                        : $2 ? chr(oct($2))
                        : $3 ? chr(hex($3))
                        : $1
@@ -266,7 +266,7 @@ sub matches($self, $buffer, $rules = $self->rules) {
 
 =head1 REPOSITORY
 
-The public repository of this module is 
+The public repository of this module is
 L<http://github.com/Corion/mime-detect>.
 
 =head1 SUPPORT
@@ -286,7 +286,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2015-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2024 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

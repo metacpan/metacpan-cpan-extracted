@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 a5ba5106400521a57887575ed92b6cfaf9c5fc68f18bf87eb4a7c638b141aac2 Board.pm
+SHA256 c45fef51b1b9cf2780f0d0eb8a163a80954bfae431c7cbd7f585b704650faf54 Changes
+SHA256 e9721661dbfb60dadebf3cd197cbc00239895aa73fb3431e19490cfad301cf99 LICENSE
+SHA256 2c62c1f3c8610f3b3339310b2af1d965204ab3366ac6c995f85cecfaede675fe MANIFEST
+SHA256 81543de64cb3aa8dc043d82811794f763b71ab08e2a16415775700c2c8e9a164 META.yml
+SHA256 803b623b87edad9c9c9b0ab78162f3438e91b1cc6569581bed4db7df83eae062 Makefile.PL
+SHA256 ab0958f5db55315418823b7c3cdcea69b6eb95cb0c49f8ef7bcf51e32636e4c5 README
+SHA256 a87804e8c84899eb6053db53fc86b117168661db010b1f6e0349448624bcfb96 examples/plack_app_message_board.pl
+SHA256 fd3636f248aa20b5f6c3b0da84d1ba56ddea844403ff445d97cfe3285721cf3a examples/print_block_html_and_css.pl
+SHA256 819a3d2c3343d2763450b328a1ea78dc1c168e6c3b0be6271f753149c9ca5fd1 images/plack_app_message_board.png
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 224cf5a0a96cb28c321eb57378f31601ed91306b7f8148fe2ca062941f5ded95 t/Tags-HTML-Message-Board/01-use.t
+SHA256 f387be9687026661a3c59dad98f8d59ae6a28740265606a2a50c0c1154b876dc t/Tags-HTML-Message-Board/02-version.t
+SHA256 3221483fff3e8b25aa7449ffec22fc21f714cb32c25bc5d3b3921bb5751e4db6 t/Tags-HTML-Message-Board/03-new.t
+SHA256 21393b8f0c8eb80e9d2aa85c398715f8f396a23ed2f7f3cba3543c73b9e408e6 t/Tags-HTML-Message-Board/04-cleanup.t
+SHA256 4ee6c457c84385223a07bd014da7c2ed9e00aa3ef99311a6d3d82ecd2cf3e922 t/Tags-HTML-Message-Board/05-init.t
+SHA256 2fef01f0416fea0b7c4696e13b5fd15ca6242a55ad9e70f418229ab4723c14ae t/Tags-HTML-Message-Board/06-process.t
+SHA256 95df11ec893c5627968f8b301304c7aabb2f3e8e98f4e8c162162579a31c8b9c t/Tags-HTML-Message-Board/07-process_css.t
+SHA256 20b11d8e46e22a4d512a5b1b04b095ffdab6caf06f314b3ef4c0d317445ad4c8 xt/Tags-HTML-Message-Board/01-pod_coverage.t
+SHA256 7503508c6e04860ecb5b0288ee690917c7e3d4c5a30969bd58650b8618b430f8 xt/Tags-HTML-Message-Board/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEbhzVZugfHqSVNvE7YSp92FNcjtAFAmZd6MAACgkQYSp92FNc
+jtBfYgv/SnfmjSsN7rNLgD5HHnCip7cTkLdSLN/fa2swnpYpzfycDnED4JVRoPKu
+3S6v8KUqu5A+wtoK7Vhsn9RmynImg4A9XykcJrPT2vs0eHQsbSbNRrlDI8OUBo3t
+1UWxmH2A1UALbMckVQtb8ZBthlb9o6AbFH0e4dvmQq8s6UzjOjyXrk2BbMlDGZYS
+UV0Q9csHamnHLVcP5EJbUTfKb4FXu84bDYuVPEfnITINPghRb5z+RPUIfDVLmqtF
+BnFmbK/5+lXBeECPbbTDi21bJBj0s68/tVhDrayZHnk28BCInHnr1cd37Wo935GC
+qE9j9B9xHzHT8sS92GNrKRVU2gMqmr+1WtXnsh1eefuS9NYU/c3irvK7wErHGjBf
+Em/cJbA4GJ0gVvHFs2+dofnBrG8/1wol/GIhgxx5+ovfnA4JX7jP+zD07cYptZms
+Ndk4i37UgC2vA9qG4TI4BRJ6YRfsO51+jlJxzvOQ/6G3IOZBBqR3wrh4J+yEQcuf
+D+dlgGFo
+=z4t2
+-----END PGP SIGNATURE-----

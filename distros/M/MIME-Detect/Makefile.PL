@@ -14,6 +14,7 @@ $eumm_version =~ s/_//;
 my $module = 'MIME::Detect';
 (my $main_file = "lib/$module.pm" ) =~ s!::!/!g;
 (my $distbase = $module) =~ s!::!-!g;
+my $distlink = $distbase;
 
 my @tests = map { glob $_ } 't/*.t', 't/*/*.t';
 
@@ -26,23 +27,33 @@ my %module = (
         "meta-spec" => { version => 2 },
         resources => {
             repository => {
-                web => "https://github.com/Corion/$distbase",
-                url => "git://github.com/Corion/$distbase.git",
+                web => "https://github.com/Corion/$distlink",
+                url => "git://github.com/Corion/$distlink.git",
                 type => 'git',
-            }
+            },
+            bugtracker  => {
+              web    => "https://github.com/Corion/$distbase/issues",
+              # mailto => 'meta-bugs@example.com',
+            },
+            license    => "https://dev.perl.org/licenses/",
         },
         dynamic_config   => 0, # we promise to keep META.* up-to-date
         #x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
 
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.020', # I use signatures
 
-    'LICENSE'=> 'perl',
+    'LICENSE'=> 'artistic_2',
 
     PL_FILES            => {},
+
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker'     => 0,
         'File::ShareDir::Install' => 0,
+    },
+
+    BUILD_REQUIRES => {
+        'ExtUtils::MakeMaker' => 0,
     },
 
     PREREQ_PM => {
@@ -50,7 +61,6 @@ my %module = (
         'Moo'                => 2,
         'Carp'               => 0,
         'Fcntl'              => 0,
-        'Filter::signatures' => 0.15,
         'File::ShareDir'     => 0,
     },
     TEST_REQUIRES => {
@@ -71,11 +81,12 @@ my %module = (
 sub get_module_info { %module }
 
 if( ! caller ) {
-    # I should maybe use something like Shipwright...
-    regen_README($main_file);
-    regen_EXAMPLES() if -d 'examples';
     install_share dist => 'share';
-    WriteMakefile1(get_module_info);
+    # I should maybe use something like Shipwright...
+    my $mm = WriteMakefile1(get_module_info);
+    my $version = $mm->parse_version($main_file);
+    regen_README($main_file, $version);
+    regen_EXAMPLES() if -d 'examples';
 };
 
 1;
@@ -110,11 +121,15 @@ sub WriteMakefile1 {  #Written by Alexandr Ciornii, version 0.21. Added by eumm-
 sub regen_README {
     # README is the short version that just tells people what this is
     # and how to install it
+    my( $file, $version ) = @_;
     eval {
         # Get description
         my $readme = join "\n",
-            pod_section($_[0], 'NAME', 'no heading' ),
-            pod_section($_[0], 'DESCRIPTION' ),
+            pod_section($file, 'NAME', 'no heading' ),
+            pod_section($file, 'DESCRIPTION' ),
+            <<VERSION,
+This document describes version $version.
+VERSION
             <<INSTALL,
 
 INSTALLATION
@@ -126,7 +141,7 @@ tool you use to manage your installation of Perl, e.g. any of
   cpan  .
   cpanp -i .
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
 Should you wish to install this module manually, the procedure is
 
   perl Makefile.PL
@@ -135,16 +150,16 @@ Should you wish to install this module manually, the procedure is
   make install
 
 INSTALL
-            pod_section($_[0], 'REPOSITORY'),
-            pod_section($_[0], 'SUPPORT'),
-            pod_section($_[0], 'TALKS'),
-            pod_section($_[0], 'KNOWN ISSUES'),
-            pod_section($_[0], 'BUG TRACKER'),
-            pod_section($_[0], 'CONTRIBUTING'),
-            pod_section($_[0], 'SEE ALSO'),
-            pod_section($_[0], 'AUTHOR'),
-            pod_section($_[0], 'LICENSE' ),
-            pod_section($_[0], 'COPYRIGHT' ),
+            pod_section($file, 'REPOSITORY'),
+            pod_section($file, 'SUPPORT'),
+            pod_section($file, 'TALKS'),
+            pod_section($file, 'KNOWN ISSUES'),
+            pod_section($file, 'BUG TRACKER'),
+            pod_section($file, 'CONTRIBUTING'),
+            pod_section($file, 'SEE ALSO'),
+            pod_section($file, 'AUTHOR'),
+            pod_section($file, 'LICENSE' ),
+            pod_section($file, 'COPYRIGHT' ),
     ;
         update_file( 'README', $readme );
     };
@@ -160,8 +175,9 @@ INSTALL
         $parser->parse_from_file($_[0]);
         my $readme_mkdn = <<STATUS . $parser->as_markdown;
 
-[![Travis Build Status](https://travis-ci.org/Corion/$distbase.svg?branch=master)](https://travis-ci.org/Corion/$distbase)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/$distbase?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/$distbase)
+[![Windows](https://github.com/Corion/$distbase/workflows/windows/badge.svg)](https://github.com/Corion/$distbase/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/$distbase/workflows/macos/badge.svg)](https://github.com/Corion/$distbase/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/$distbase/workflows/linux/badge.svg)](https://github.com/Corion/$distbase/actions?query=workflow%3Alinux)
 
 STATUS
         update_file( 'README.mkdn', $readme_mkdn );
@@ -182,9 +198,9 @@ sub pod_section {
         shift @section if $remove_heading;
 
         pop @section
-            while $section[-1] =~ /^\s*$/;
+            while @section and $section[-1] =~ /^\s*$/;
         shift @section
-            while $section[0] =~ /^\s*$/;
+            while @section and $section[0] =~ /^\s*$/;
     };
 
     @section = map { $_ =~ s!^=\w+\s+!!; $_ } @section;
@@ -209,16 +225,14 @@ sub update_file {
     my( $filename, $new_content ) = @_;
     my $content;
     if( -f $filename ) {
-        open my $fh, '<', $filename
+        open my $fh, '<:raw:encoding(UTF-8)', $filename
             or die "Couldn't read '$filename': $!";
-        binmode $fh;
         local $/;
         $content = <$fh>;
     };
 
     if( $content ne $new_content ) {
-        if( open my $fh, '>', $filename ) {
-            binmode $fh;
+        if( open my $fh, '>:raw:encoding(UTF-8)', $filename ) {
             print $fh $new_content;
         } else {
             warn "Couldn't (re)write '$filename': $!";

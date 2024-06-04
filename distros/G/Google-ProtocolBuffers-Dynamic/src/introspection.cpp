@@ -10,10 +10,17 @@ using namespace gpd::intr;
 using namespace google::protobuf;
 using namespace std;
 
-ValueType gpd::intr::field_value_type(const FieldDescriptor *field_def) {
+namespace {
+#if __cplusplus >= 201103L
     using CppType = FieldDescriptor::CppType;
     using Type = FieldDescriptor::Type;
+#else
+    typedef FieldDescriptor CppType;
+    typedef FieldDescriptor Type;
+#endif
+}
 
+ValueType gpd::intr::field_value_type(const FieldDescriptor *field_def) {
     switch (field_def->cpp_type()) {
     case CppType::CPPTYPE_INT32:
         return VALUE_INT32;
@@ -41,9 +48,6 @@ ValueType gpd::intr::field_value_type(const FieldDescriptor *field_def) {
 }
 
 bool gpd::intr::field_is_primitive(const FieldDescriptor *field_def) {
-    using CppType = FieldDescriptor::CppType;
-    using Type = FieldDescriptor::Type;
-
     switch (field_def->cpp_type()) {
     case CppType::CPPTYPE_STRING:
     case CppType::CPPTYPE_MESSAGE:
@@ -54,9 +58,6 @@ bool gpd::intr::field_is_primitive(const FieldDescriptor *field_def) {
 }
 
 SV *gpd::intr::field_default_value(pTHX_ const FieldDescriptor *field_def) {
-    using CppType = FieldDescriptor::CppType;
-    using Type = FieldDescriptor::Type;
-
     switch (field_def->cpp_type()) {
     case CppType::CPPTYPE_FLOAT:
         return newSVnv(field_def->default_value_float());
@@ -76,7 +77,7 @@ SV *gpd::intr::field_default_value(pTHX_ const FieldDescriptor *field_def) {
     case CppType::CPPTYPE_MESSAGE:
         return &PL_sv_undef;
     case CppType::CPPTYPE_ENUM: {
-        auto enumvalue_def = field_def->default_value_enum();
+        const EnumValueDescriptor *enumvalue_def = field_def->default_value_enum();
 
         return enumvalue_def != NULL ? newSViv(enumvalue_def->number()) : 0;
     }
@@ -214,9 +215,6 @@ bool DescriptorOptionsWrapper::get_attribute(CV *autoload_cv, SV **retval) {
 }
 
 SV *DescriptorOptionsWrapper::get_field(const FieldDescriptor *field) {
-    using CppType = FieldDescriptor::CppType;
-    using Type = FieldDescriptor::Type;
-
     const Reflection *reflection = options->GetReflection();
 
     switch (field->cpp_type()) {
@@ -238,7 +236,7 @@ SV *DescriptorOptionsWrapper::get_field(const FieldDescriptor *field) {
     case CppType::CPPTYPE_MESSAGE:
         return &PL_sv_undef;
     case CppType::CPPTYPE_ENUM: {
-        auto enumvalue_def = reflection->GetEnum(*options, field);
+        const EnumValueDescriptor *enumvalue_def = reflection->GetEnum(*options, field);
 
         return enumvalue_def != NULL ? newSViv(enumvalue_def->number()) : 0;
     }

@@ -12,7 +12,7 @@ cron...
 
 snmpd...
 
-`extend suricata-stats /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin suricata_stat_check -c`
+`extend suricata-stats /bin/cat /var/cache/suricata-monitoring/snmp`
 
 ## SYNOPSIS
 
@@ -21,7 +21,7 @@ suricata_stats_check [B<-m> single] [B<-s> <eve>] [B<-S> <instance name>] [B<-d>
 [B<-D> <drop percent crit>]  [B<-e> <error delta warn>] [B<-E> <error delta crit>]
 [B<-r> <error percent warn>] [B<-r> <error percent crit>]
 
-suricata_stats_check B<-m> slug [B<-s> <slug>] [B<-l> <log dir>]  [B<-d> <drop percent warn>]
+suricata_stats_check B<-m> slug [B<--slug> <slug>] [B<-l> <log dir>]  [B<-d> <drop percent warn>]
 [B<-D> <drop percent crit>]  [B<-e> <error delta warn>] [B<-E> <error delta crit>]
 [B<-r> <error percent warn>] [B<-r> <error percent crit>]
 
@@ -45,7 +45,7 @@ suricata_stats_check -c
 -S <instance name>       Instance name to use in single mode.
                          Default: ids
 
--s <slug>                The slug to use in slug mode.
+--slug <slug>            The slug to use in slug mode.
                          Default: alert
 -l <log dir>             Log directory for slug mode.
                          Default: /var/log/suricata

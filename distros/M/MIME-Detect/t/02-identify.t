@@ -15,7 +15,7 @@ if( !ok 0+@type, "We identify $0 with at least one type" ) {
 } else {
     my $type = $type[0];
     is $type->mime_type, "application/x-perl", "It's a Perl program as the highest priority";
-    
+
     my @t = map { $_->mime_type } @type;
     is_deeply \@t, [
     'application/x-perl',

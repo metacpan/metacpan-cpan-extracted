@@ -4,11 +4,12 @@ Lingua::String - Class to contain a string in many different languages
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
-Hold many strings in one object.
+Hold many strings in one object,
+thereby encapsulating internationalized text.
 
     use Lingua::String;
 
@@ -21,10 +22,10 @@ Hold many strings in one object.
     print "$str\n";     # Prints Hello, World
     $ENV{'LANG'} = 'fr_FR';
     print "$str\n";     # Prints Bonjour Tout le Monde
-    $LANG{'LANG'} = 'de_DE';
+    $ENV{'LANG'} = 'de_DE';
     print "$str\n";     # Prints nothing
 
-    $string = Lingua::String->new('hello');     # Initialises the 'current' language
+    my $string = Lingua::String->new('hello');  # Initialises the 'current' language
 
 # METHODS
 
@@ -104,7 +105,7 @@ You can also look for information at:
 
 # LICENCE AND COPYRIGHT
 
-Copyright 2021-2022 Nigel Horne.
+Copyright 2021-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2 for personal use on
 a single computer.

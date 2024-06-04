@@ -1,5 +1,8 @@
 Revision history for App-remotediff
 
+1.15    2024-06-03
+        - replace "." with absolute path
+
 1.14    2024-05-29
         - fixed cleanup bug when basename contained dot
 

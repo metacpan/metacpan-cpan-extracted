@@ -1,6 +1,12 @@
 Changelog for Plack-Middleware-HealthCheck
 
-v0.2.0 2024-04-08T15:25:55
+v0.2.1 2024-06-03T19:40:31
+ - Update README (Andrew Hewus Fresh)
+ - Pull in Makefile updates from upstream (Andrew Hewus Fresh)
+ - Pull request #7: SM-4902 remove unnecessary line (Austin Hill)
+ - SM-4902 remove unnecessary line (Austin Hill)
+
+v0.2.0 2024-04-08T15:24:44
  - Update README and LICENSE (Andrew Hewus Fresh)
  - Correct POD (Andrew Hewus Fresh)
  - Pull request #6: SM-4772 add support for list_tags query parameter

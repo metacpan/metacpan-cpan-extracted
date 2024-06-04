@@ -1,8 +1,6 @@
 #ifndef _GPD_XS_SOURCETREE_INCLUDED
 #define _GPD_XS_SOURCETREE_INCLUDED
 
-#include "perl_unpollute.h"
-
 #include <google/protobuf/compiler/importer.h>
 
 #include "unordered_map.h"
@@ -29,7 +27,7 @@ public:
     virtual google::protobuf::io::ZeroCopyInputStream *Open(const std::string &filename);
 
 private:
-    STD_TR1::unordered_map<std::string, std::string> sources;
+    UMS_NS::unordered_map<std::string, std::string> sources;
 };
 
 }

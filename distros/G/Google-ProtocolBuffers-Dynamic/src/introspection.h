@@ -1,8 +1,6 @@
 #ifndef _GPD_XS_DYNAMIC_INTROSPECTION
 #define _GPD_XS_DYNAMIC_INTROSPECTION
 
-#include "perl_unpollute.h"
-
 #include <string>
 
 namespace google {
@@ -28,8 +26,6 @@ class DynamicMessageFactory;
 }
 
 #include "thx_member.h"
-#include "perl_unpollute.h"
-
 namespace gpd {
 namespace intr {
 

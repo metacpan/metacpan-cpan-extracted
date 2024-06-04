@@ -1,5 +1,9 @@
 Revision history for Suricata-Monitoring
 
+1.0.0	2024-06-03/23:30
+		-Convert to IO::Compress::Gzip and Pod::Usage
+		-Update to Suricata 7
+
 0.3.1	2022-08-04/11:15
 		-Fix alert location for if it does not find a entry.
 

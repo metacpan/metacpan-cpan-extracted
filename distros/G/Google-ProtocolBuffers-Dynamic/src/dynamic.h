@@ -1,8 +1,6 @@
 #ifndef _GPD_XS_DYNAMIC_INCLUDED
 #define _GPD_XS_DYNAMIC_INCLUDED
 
-#include "perl_unpollute.h"
-
 #include "upb/bridge.h"
 
 #include "pb/decoder.h"
@@ -14,6 +12,7 @@
 
 #include "EXTERN.h"
 #include "perl.h"
+#include "perl_unpollute.h"
 
 namespace gpd {
 
@@ -57,6 +56,7 @@ struct MappingOptions {
     bool decode_blessed;
     bool fail_ref_coercion;
     bool no_redefine_perl_names;
+    bool ignore_undef_fields;
     BoolStyle boolean_style;
     AccessorStyle accessor_style;
     ClientService client_services;
@@ -87,7 +87,7 @@ public:
     const Mapper *find_mapper(const upb::MessageDef *message_def) const;
 
     static bool is_proto3() {
-        return GOOGLE_PROTOBUF_VERSION >= 3000000;
+        return GOOGLE_PROTOBUF_VERSION >= 3000000; // always true
     }
 
     static bool has_proto3_optional() {
@@ -98,7 +98,7 @@ private:
     void add_file_recursively(pTHX_ const google::protobuf::FileDescriptor *file);
     void map_package_or_prefix(pTHX_ const std::string &pb_package, bool is_prefix, const std::string &perl_package_prefix, const MappingOptions &options);
     void map_message_recursive(pTHX_ const google::protobuf::Descriptor *descriptor, const std::string &perl_package, const MappingOptions &options);
-    void map_message_prefix_recursive(pTHX_ const google::protobuf::Descriptor *descriptor, const std::string &perl_package_prefix, const MappingOptions &options, STD_TR1::unordered_set<std::string> &recursed_names);
+    void map_message_prefix_recursive(pTHX_ const google::protobuf::Descriptor *descriptor, const std::string &perl_package_prefix, const MappingOptions &options, UMS_NS::unordered_set<std::string> &recursed_names);
     void map_message(pTHX_ const google::protobuf::Descriptor *descriptor, const std::string &perl_package, const MappingOptions &options);
     void bind_message(pTHX_ const std::string &perl_package, Mapper *mapper, const google::protobuf::Descriptor *descriptor, HV *stash, const MappingOptions &options);
     void map_enum(pTHX_ const google::protobuf::EnumDescriptor *descriptor, const std::string &perl_package, const MappingOptions &options);
@@ -113,10 +113,10 @@ private:
 
     DescriptorLoader descriptor_loader;
     upb::googlepb::DefBuilder def_builder;
-    STD_TR1::unordered_map<std::string, const Mapper *> descriptor_map;
-    STD_TR1::unordered_set<std::string> mapped_enums;
-    STD_TR1::unordered_set<std::string> mapped_services;
-    STD_TR1::unordered_set<const google::protobuf::FileDescriptor *> files;
+    UMS_NS::unordered_map<std::string, const Mapper *> descriptor_map;
+    UMS_NS::unordered_set<std::string> mapped_enums;
+    UMS_NS::unordered_set<std::string> mapped_services;
+    UMS_NS::unordered_set<const google::protobuf::FileDescriptor *> files;
     std::vector<Mapper *> pending;
     std::vector<MethodMapper *> pending_methods;
     gpd::pb::DescriptorSet descriptor_set;

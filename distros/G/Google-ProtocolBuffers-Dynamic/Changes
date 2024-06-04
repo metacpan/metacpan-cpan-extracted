@@ -1,5 +1,47 @@
 Revision history for Google-ProtocolBuffers-Dynamic
 
+0.43      2024-06-04 11:23:51 CEST
+
+    - Release 0.42_07 as stable without changes
+
+0.42_07   2024-06-03 10:52:12 CEST
+
+    - Blind fix for compilation error
+
+0.42_06   2023-11-27 14:59:01 CET
+
+    - Fix encoding of tied/magical hashes as protobuf maps
+
+0.42_05   2023-11-23 22:36:27 CET
+
+    - Added --help/--man to protoc plugins, in case they are called directly
+    - Compilation fix for Perl 5.16 or older
+    - Compilation fix for old C++ compilers
+
+0.42_04   2023-11-16 11:01:05 CET
+
+    - Fail build for protobuf library version 2 with a clear message
+      (it has not been working for a long time). Note that files with 'proto2'
+      syntax are still supported
+    - Build fix for protobuf 3.6 and older
+
+0.42_03   2023-11-14 23:40:15 CET
+
+    - Fix failing assertion with recent versions of GCC standard library
+
+0.42_02   2023-11-13 12:29:58 CET
+
+    - Avoid issues with enum values that clash with "special" Perl names
+      (e.g. STDERR, BEGIN, ...)
+    - Speed up map key encoding
+    - Fix tests on Perl 5.38 (patch by José Joaquín Atria)
+    - Avoid double-destruction when using threads (patch by Joey Korkames)
+
+0.42_01   2023-07-05 15:58:57 CEST
+
+    - Add option to treat undef field/map values as if they were
+      not present
+
 0.42      2023-05-23 14:51:59 CEST
 
     - Release 0.41_15 as stable without changes

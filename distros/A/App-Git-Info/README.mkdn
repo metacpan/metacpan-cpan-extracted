@@ -4,7 +4,7 @@ App::Git::Info - Displays a summary of information about the git repository.
 
 # VERSION
 
-version 0.6.1
+version 0.8.0
 
 # SYNOPSIS
 
@@ -21,6 +21,16 @@ version 0.6.1
 
 Displays a git dashboard-of-sorts with info from `git status`,
 `git status -s`, and `git remote -v` .
+
+# METHODS
+
+## my $app = App::Git::Info->new({ argv => \[@ARGV\], })
+
+Create a git-info app.
+
+## $app->run()
+
+Run the git-info app.
 
 # SUPPORT
 

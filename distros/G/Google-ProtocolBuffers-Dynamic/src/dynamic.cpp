@@ -8,6 +8,7 @@
 
 using namespace gpd;
 using namespace std;
+using namespace UMS_NS;
 using namespace google::protobuf;
 using namespace upb;
 using namespace upb::googlepb;
@@ -35,6 +36,60 @@ namespace {
 
         return stack_trace;
     }
+
+    const string
+        sym_ARGV    = "ARGV",
+        sym_ARGVOUT = "ARGVOUT",
+        sym_ENV     = "ENV",
+        sym_INC     = "INC",
+        sym_SIG     = "SIG",
+        sym_STDIN   = "STDIN",
+        sym_STDOUT  = "STDOUT",
+        sym_STDERR  = "STDERR",
+
+        sym_BEGIN     = "BEGIN",
+        sym_CHECK     = "CHECK",
+        sym_END       = "END",
+        sym_INIT      = "INIT",
+        sym_UNITCHECK = "UNITCHECK";
+
+    // does the same job as S_gv_is_in_main in gv.c
+    bool is_in_main(const string &name) {
+        size_t length = name.length();
+
+        switch (name[0]) {
+        case '_':
+            return length == 1;
+        case 'A':
+            return name == sym_ARGV || name == sym_ARGVOUT;
+        case 'E':
+            return name == sym_ENV;
+        case 'I':
+            return name == sym_INC;
+        case 'S':
+            return name == sym_SIG || name == sym_STDIN ||
+                   name == sym_STDOUT || name == sym_STDERR;
+        default:
+            return false;
+        }
+    }
+
+    bool is_special_sub(const string &name) {
+        switch (name[0]) {
+        case 'B':
+            return name == sym_BEGIN;
+        case 'C':
+            return name == sym_CHECK;
+        case 'E':
+            return name == sym_END;
+        case 'I':
+            return name == sym_INIT;
+        case 'U':
+            return name == sym_UNITCHECK;
+        default:
+            return false;
+        }
+    }
 }
 
 MappingOptions::MappingOptions(pTHX_ SV *options_ref) :
@@ -47,12 +102,13 @@ MappingOptions::MappingOptions(pTHX_ SV *options_ref) :
         generic_extension_methods(true),
         implicit_maps(false),
         decode_blessed(true),
+        fail_ref_coercion(false),
         no_redefine_perl_names(false),
+        ignore_undef_fields(false),
+        boolean_style(Perl),
         accessor_style(GetAndSet),
         client_services(Disable),
-        boolean_style(Perl),
-        default_decoder(Upb),
-        fail_ref_coercion(false) {
+        default_decoder(Upb) {
     stack_trace = get_stack_trace(aTHX);
 
     if (options_ref == NULL || !SvOK(options_ref))
@@ -77,6 +133,7 @@ MappingOptions::MappingOptions(pTHX_ SV *options_ref) :
     BOOLEAN_OPTION(implicit_maps, implicit_maps);
     BOOLEAN_OPTION(decode_blessed, decode_blessed);
     BOOLEAN_OPTION(fail_ref_coercion, fail_ref_coercion);
+    BOOLEAN_OPTION(ignore_undef_fields, ignore_undef_fields);
 
 #undef BOOLEAN_OPTION
 
@@ -131,7 +188,7 @@ Dynamic::Dynamic(const string &root_directory) :
 }
 
 Dynamic::~Dynamic() {
-    for (STD_TR1::unordered_map<std::string, const Mapper *>::iterator it = descriptor_map.begin(), en = descriptor_map.end(); it != en; ++it)
+    for (unordered_map<std::string, const Mapper *>::iterator it = descriptor_map.begin(), en = descriptor_map.end(); it != en; ++it)
         it->second->unref();
 }
 
@@ -183,6 +240,14 @@ namespace {
         return 0;
     }
 
+    int dup_refcounted(pTHX_ MAGIC *mg, CLONE_PARAMS *param) {
+        Refcounted *refcounted = (Refcounted *) mg->mg_ptr;
+
+        refcounted->ref();
+
+        return 0;
+    }
+
     MGVTBL manage_refcounted = {
         NULL, // get
         NULL, // set
@@ -190,9 +255,22 @@ namespace {
         NULL, // clear
         free_refcounted,
         NULL, // copy
-        NULL, // dup
+        dup_refcounted,
         NULL, // local
     };
+
+    void bind_special_constant(pTHX_ const string &target, const string &perl_package, UV value) {
+        static const char xsubname[] = "Google::ProtocolBuffers::Dynamic::Mapper::constant";
+
+        CV *src = get_cv(xsubname, 0);
+        CV *new_xs = newXS((perl_package + "::" + target + "*").c_str(), CvXSUB(src), __FILE__);
+        CvXSUBANY(new_xs).any_uv = value;
+
+        GV *gv = gv_fetchpv((perl_package + "::" + target).c_str(),
+                            GV_ADD, SVt_PVCV);
+
+        GvCV_set(gv, new_xs);
+    }
 
     void copy_and_bind(pTHX_ const char *name, const char *target, const string &perl_package, Refcounted *refcounted, void *obj) {
         static const char prefix[] = "Google::ProtocolBuffers::Dynamic::Mapper::";
@@ -206,9 +284,10 @@ namespace {
         CV *new_xs = newXS((perl_package + "::" + target).c_str(), CvXSUB(src), __FILE__);
 
         CvXSUBANY(new_xs).any_ptr = obj;
-        sv_magicext((SV *) new_xs, NULL,
+        MAGIC *mg = sv_magicext((SV *) new_xs, NULL,
                     PERL_MAGIC_ext, &manage_refcounted,
                     (const char *) refcounted, 0);
+        mg->mg_flags |= MGf_DUP;
         refcounted->ref();
     }
 
@@ -299,7 +378,7 @@ void Dynamic::map_package_prefix(pTHX_ const string &pb_prefix, const string &pe
 void Dynamic::map_package_or_prefix(pTHX_ const string &pb_package_or_prefix, bool is_prefix, const string &perl_package_prefix, const MappingOptions &options) {
     string prefix_and_dot = pb_package_or_prefix + ".";
 
-    for (STD_TR1::unordered_set<const FileDescriptor *>::iterator it = files.begin(), en = files.end(); it != en; ++it) {
+    for (unordered_set<const FileDescriptor *>::iterator it = files.begin(), en = files.end(); it != en; ++it) {
         const FileDescriptor *file = *it;
         const string &file_package = file->package();
         bool is_exact = false;
@@ -356,7 +435,7 @@ void Dynamic::map_package_or_prefix(pTHX_ const string &pb_package_or_prefix, bo
 void Dynamic::map_message_prefix(pTHX_ const string &message, const string &perl_package_prefix, const MappingOptions &options) {
     const DescriptorPool *pool = descriptor_loader.pool();
     const Descriptor *descriptor = pool->FindMessageTypeByName(message);
-    STD_TR1::unordered_set<std::string> recursed_names;
+    unordered_set<std::string> recursed_names;
 
     if (descriptor == NULL) {
         croak("Unable to find a descriptor for message '%s'", message.c_str());
@@ -422,7 +501,7 @@ std::string Dynamic::pbname_to_package(pTHX_ const std::string &pb_name, const s
     return oss.str();
 }
 
-void Dynamic::map_message_prefix_recursive(pTHX_ const Descriptor *descriptor, const string &perl_package_prefix, const MappingOptions &options, STD_TR1::unordered_set<std::string> &recursed_names) {
+void Dynamic::map_message_prefix_recursive(pTHX_ const Descriptor *descriptor, const string &perl_package_prefix, const MappingOptions &options, unordered_set<std::string> &recursed_names) {
 	// avoid recursion loop
 	if (recursed_names.find(descriptor->full_name()) != recursed_names.end())
 		return;
@@ -436,14 +515,18 @@ void Dynamic::map_message_prefix_recursive(pTHX_ const Descriptor *descriptor, c
 			map_message_prefix_recursive(aTHX_ message, perl_package_prefix, options, recursed_names);
 			break;
 		}
-		case FieldDescriptor::Type::TYPE_ENUM:
+		case FieldDescriptor::Type::TYPE_ENUM: {
 			const EnumDescriptor *enumm = field->enum_type();
 			if (mapped_enums.find(enumm->full_name()) == mapped_enums.end()) {
 				std::string perl_package =
 					pbname_to_package(aTHX_ enumm->full_name(), perl_package_prefix);
 				map_enum(aTHX_ enumm, perl_package, options);
 			}
+                }
 			break;
+                default:
+                    // nothing to do; suppress warning
+                    break;
 		}
 
 	}
@@ -524,6 +607,7 @@ void Dynamic::bind_message(pTHX_ const string &perl_package, Mapper *mapper, con
     }
 
     copy_and_bind(aTHX_ "set_decoder_options", perl_package, mapper);
+    copy_and_bind(aTHX_ "set_encoder_options", perl_package, mapper);
     copy_and_bind(aTHX_ "decode_upb", perl_package, mapper);
     copy_and_bind(aTHX_ "decode_bbpb", perl_package, mapper);
     if (options.default_decoder == MappingOptions::Upb) {
@@ -650,8 +734,17 @@ void Dynamic::bind_enum(pTHX_ const string &perl_package, const EnumDescriptor *
     for (int i = 0, max = descriptor->value_count(); i < max; ++i) {
         const EnumValueDescriptor *value = descriptor->value(i);
 
-        newCONSTSUB(stash, value->name().c_str(),
-                    newSVuv(value->number()));
+        // due to an implementation quirk, some special names such as STDERR
+        // are not looked up in stash, and need to be fully qualified
+        if (is_in_main(value->name())) {
+            newCONSTSUB(stash, (perl_package + "::" + value->name()).c_str(),
+                        newSVuv(value->number()));
+        } else if (is_special_sub(value->name())) {
+            bind_special_constant(aTHX_ value->name(), perl_package, value->number());
+        } else {
+            newCONSTSUB(stash, value->name().c_str(),
+                        newSVuv(value->number()));
+        }
     }
 }
 
@@ -737,7 +830,7 @@ void Dynamic::resolve_references() {
 }
 
 const Mapper *Dynamic::find_mapper(const MessageDef *message_def) const {
-    STD_TR1::unordered_map<string, const Mapper *>::const_iterator item = descriptor_map.find(message_def->full_name());
+    unordered_map<string, const Mapper *>::const_iterator item = descriptor_map.find(message_def->full_name());
 
     if (item == descriptor_map.end())
         croak("Unknown type '%s'", message_def->full_name());

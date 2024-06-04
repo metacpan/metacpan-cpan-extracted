@@ -1,5 +1,6 @@
 %module{Google::ProtocolBuffers::Dynamic};
 
+#include "perl_unpollute.h"
 #include "introspection.h"
 
 #include <google/protobuf/descriptor.h>
@@ -152,12 +153,27 @@
 
     const Google::ProtocolBuffers::Dynamic::MessageDef *containing_type() const;
     const Google::ProtocolBuffers::Dynamic::OneofDef *containing_oneof() const;
+#if GOOGLE_PROTOBUF_VERSION >= 3012000
     const Google::ProtocolBuffers::Dynamic::OneofDef *real_containing_oneof() const;
+#else
+    const Google::ProtocolBuffers::Dynamic::OneofDef *real_containing_oneof() const %code{% PERL_UNUSED_VAR(THIS); RETVAL = NULL; %};
+#endif
 
     const Google::ProtocolBuffers::Dynamic::EnumDef *enum_type() const;
     const Google::ProtocolBuffers::Dynamic::MessageDef *message_type() const;
 
+#if GOOGLE_PROTOBUF_VERSION >= 3012000
     bool has_presence() const;
+#else
+    bool has_presence() const %code{%
+       RETVAL =
+           !THIS->is_repeated() && (
+               THIS->cpp_type() == google::protobuf::FieldDescriptor::CppType::CPPTYPE_MESSAGE ||
+               THIS->containing_oneof() ||
+               THIS->file()->syntax() == google::protobuf::FileDescriptor::SYNTAX_PROTO2
+           );
+    %};
+#endif
 
     const Google::ProtocolBuffers::Dynamic::FileDef *file() const;
 
@@ -190,7 +206,11 @@
 
     const Google::ProtocolBuffers::Dynamic::MessageDef *containing_type() const;
 
+#if GOOGLE_PROTOBUF_VERSION >= 3012000
     bool is_synthetic() const;
+#else
+    bool is_synthetic() const %code{% PERL_UNUSED_VAR(THIS); RETVAL = false; %};
+#endif
 
     const Google::ProtocolBuffers::Dynamic::FileDef *file() const;
 
@@ -212,13 +232,13 @@
     int value_count() const;
 
     SV *find_number_by_name(std::string name) %code{%
-       auto value_descriptor = THIS->FindValueByName(name);
+       const google::protobuf::EnumValueDescriptor *value_descriptor = THIS->FindValueByName(name);
 
        RETVAL = value_descriptor ? newSViv(value_descriptor->number()) : &PL_sv_undef;
     %};
 
     SV *find_name_by_number(int number) %code{%
-       auto value_descriptor = THIS->FindValueByNumber(number);
+       const google::protobuf::EnumValueDescriptor *value_descriptor = THIS->FindValueByNumber(number);
 
        if (value_descriptor) {
            const std::string &name = value_descriptor->name();
@@ -233,7 +253,7 @@
         HV *values = newHV();
 
         for (int i = 0, max = THIS->value_count(); i < max; ++i) {
-            auto value_descriptor = THIS->value(i);
+            const google::protobuf::EnumValueDescriptor *value_descriptor = THIS->value(i);
             const std::string &name = value_descriptor->name();
             SV **value = hv_fetch(values, name.data(), name.size(), 1);
 
@@ -346,7 +366,7 @@
 #undef GPD_INTROSPECTION_RETURN_ARRAY
 
 const Google::ProtocolBuffers::Dynamic::MessageDef*
-message_descriptor(SV *klass)
+message_descriptor(SV *)
   INIT:
     google::protobuf::Descriptor *descriptor = (google::protobuf::Descriptor *) CvXSUBANY(cv).any_ptr;
   CODE:
@@ -354,15 +374,21 @@ message_descriptor(SV *klass)
   OUTPUT: RETVAL
 
 const Google::ProtocolBuffers::Dynamic::EnumDef*
-enum_descriptor(SV *klass)
+enum_descriptor(SV *)
   INIT:
     google::protobuf::EnumDescriptor *descriptor = (google::protobuf::EnumDescriptor *) CvXSUBANY(cv).any_ptr;
   CODE:
     RETVAL = descriptor;
   OUTPUT: RETVAL
 
+UV
+constant()
+  CODE:
+    RETVAL = CvXSUBANY(cv).any_uv;
+  OUTPUT: RETVAL
+
 const Google::ProtocolBuffers::Dynamic::ServiceDef*
-service_descriptor(SV *klass)
+service_descriptor(SV *)
   INIT:
     google::protobuf::ServiceDescriptor *descriptor = (google::protobuf::ServiceDescriptor *) CvXSUBANY(cv).any_ptr;
   CODE:

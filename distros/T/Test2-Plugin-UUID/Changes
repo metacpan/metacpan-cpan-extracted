@@ -1,3 +1,7 @@
+0.002008  2024-06-03 18:37:17-07:00 America/Los_Angeles
+
+    - Add uuid<->bin converters
+
 0.002007  2024-05-31 21:49:10-07:00 America/Los_Angeles
 
     - Bump minimum version to 5.10

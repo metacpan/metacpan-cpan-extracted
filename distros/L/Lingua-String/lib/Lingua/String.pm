@@ -5,17 +5,19 @@ use warnings;
 use Carp;
 use HTML::Entities;
 
+# TODO: Investigate Locale::Maketext
+
 =head1 NAME
 
 Lingua::String - Class to contain a string in many different languages
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use overload (
         # '==' => \&equal,
@@ -27,7 +29,8 @@ use overload (
 
 =head1 SYNOPSIS
 
-Hold many strings in one object.
+Hold many strings in one object,
+thereby encapsulating internationalized text.
 
     use Lingua::String;
 
@@ -40,10 +43,10 @@ Hold many strings in one object.
     print "$str\n";	# Prints Hello, World
     $ENV{'LANG'} = 'fr_FR';
     print "$str\n";	# Prints Bonjour Tout le Monde
-    $LANG{'LANG'} = 'de_DE';
+    $ENV{'LANG'} = 'de_DE';
     print "$str\n";	# Prints nothing
 
-    $string = Lingua::String->new('hello');	# Initialises the 'current' language
+    my $string = Lingua::String->new('hello');	# Initialises the 'current' language
 
 =cut
 
@@ -63,28 +66,30 @@ sub new {
 	my $proto = shift;
 	my $class = ref($proto) || $proto;
 
-	# Use Lingua::String->new, not Lingua::String::new
-	if(!defined($class)) {
-		# Using Lingua::String->new(), not Lingua::String::new()
-		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		# return;
-		$class = __PACKAGE__;
-	}
-
-	my %params;
+	my %args;
 	if(ref($_[0]) eq 'HASH') {
-		%params = %{$_[0]};
+		%args = %{$_[0]};
 	} elsif((scalar(@_) == 1) && (my $lang = _get_language())) {
-		%params = ($lang => $_[0]);
+		%args = ($lang => $_[0]);
 	} elsif(scalar(@_) % 2 == 0) {
-		%params = @_;
+		%args = @_;
 	} else {
 		Carp::carp(__PACKAGE__, ': usage: new(%args)');
 		return;
 	}
 
-	if(scalar(%params)) {
-		return bless { strings => \%params }, $class;
+	if(!defined($class)) {
+		# Using Lingua::String->new(), not Lingua::String::new()
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
+	}
+
+	if(scalar(%args)) {
+		return bless { strings => \%args }, $class;
 	}
 	return bless { }, $class;
 }
@@ -278,7 +283,7 @@ L<http://deps.cpantesters.org/?module=Lingua-String>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2021-2022 Nigel Horne.
+Copyright 2021-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2 for personal use on
 a single computer.

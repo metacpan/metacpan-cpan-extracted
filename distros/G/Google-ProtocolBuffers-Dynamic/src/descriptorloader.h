@@ -1,13 +1,47 @@
 #ifndef _GPD_XS_DESCRIPTORLOADER_INCLUDED
 #define _GPD_XS_DESCRIPTORLOADER_INCLUDED
 
-#include "perl_unpollute.h"
-
 #include "sourcetree.h"
 
 #include <google/protobuf/compiler/importer.h>
 
 namespace gpd {
+
+// alternative SourceTreeDescriptorDatabase for protobuf 3.6 or older
+    class SourceTreeDescriptorDatabaseWithFallback : public google::protobuf::DescriptorDatabase {
+public:
+    SourceTreeDescriptorDatabaseWithFallback(google::protobuf::compiler::SourceTree *source_tree,
+                                             google::protobuf::DescriptorDatabase *fallback_database);
+
+    // forwarded SourceTreeDescriptorDatabase methods
+    void RecordErrorsTo(google::protobuf::compiler::MultiFileErrorCollector* error_collector) {
+        database.RecordErrorsTo(error_collector);
+    }
+
+    google::protobuf::DescriptorPool::ErrorCollector* GetValidationErrorCollector() {
+        return database.GetValidationErrorCollector();
+    }
+
+    // DescriptorDatabase implementation
+    bool FindFileByName(const std::string& filename,
+                        google::protobuf::FileDescriptorProto* output);
+
+    bool FindFileContainingSymbol(const std::string& symbol_name,
+                                  google::protobuf::FileDescriptorProto* output) {
+        return false;
+    }
+
+    bool FindFileContainingExtension(const std::string& containing_type,
+                                     int field_number,
+                                     google::protobuf::FileDescriptorProto* output) {
+        return false;
+    }
+
+private:
+    google::protobuf::compiler::SourceTree *source_tree;
+    google::protobuf::compiler::SourceTreeDescriptorDatabase database;
+    google::protobuf::DescriptorDatabase *fallback_database;
+};
 
 // a reimplementation of Importer, with a different DescriptorPool
 class DescriptorLoader {
@@ -49,10 +83,14 @@ private:
     CollectMultiFileErrors multifile_error_collector;
     OverlaySourceTree overlay_source_tree;
     MemorySourceTree memory_source_tree;
-    google::protobuf::compiler::DiskSourceTree disk_source_tree;
-    google::protobuf::compiler::SourceTreeDescriptorDatabase source_database;
-    google::protobuf::SimpleDescriptorDatabase binary_database;
     google::protobuf::DescriptorPoolDatabase generated_database;
+    google::protobuf::compiler::DiskSourceTree disk_source_tree;
+#if GOOGLE_PROTOBUF_VERSION >= 3007000
+    google::protobuf::compiler::SourceTreeDescriptorDatabase source_database;
+#else
+    SourceTreeDescriptorDatabaseWithFallback source_database;
+#endif
+    google::protobuf::SimpleDescriptorDatabase binary_database;
     google::protobuf::MergedDescriptorDatabase merged_source_binary_database;
     google::protobuf::DescriptorPool merged_pool;
 };

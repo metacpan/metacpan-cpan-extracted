@@ -2,11 +2,17 @@ package Test2::Util::UUID;
 use strict;
 use warnings;
 
-our $VERSION = '0.002007';
+our $VERSION = '0.002008';
 
 use Carp qw/croak/;
 
-my %EXPORT = (looks_like_uuid => 1, gen_uuid => 1, GEN_UUID_BACKEND => 1);
+my %EXPORT = (
+    looks_like_uuid => 1,
+    gen_uuid => 1,
+    GEN_UUID_BACKEND => 1,
+    uuid2bin => 1,
+    bin2uuid => 1,
+);
 
 sub import {
     my $class  = shift;
@@ -29,18 +35,13 @@ sub import {
         croak "Invalid argument '$arg'";
     }
 
-    my %out;
-    $out{looks_like_uuid}               = $class->can('looks_like_uuid')    if $import{looks_like_uuid};
-    @out{qw/gen_uuid GEN_UUID_BACKEND/} = $class->get_gen_uuid(%gen_params) if $import{gen_uuid} || $import{GEN_UUID_BACKEND};
+    my $subs = $class->get_gen_uuid(%gen_params);
 
-    delete $out{GEN_UUID_BACKEND} unless $import{GEN_UUID_BACKEND};
-    delete $out{gen_uuid}         unless $import{gen_uuid};
-
-    for my $sym (keys %out) {
-        my $sub = $out{$sym};
+    for my $name (keys %import) {
+        my $sub = $subs->{$name} || $class->can($name) or croak "'$name' is not available for import";
 
         no strict 'refs';
-        *{"$caller\::$sym"} = $sub;
+        *{"$caller\::$name"} = $sub;
     }
 
     return;
@@ -58,7 +59,7 @@ sub get_gen_uuid {
     my $backends = $params{backends} // ($ENV{TEST2_UUID_BACKEND} ? [split /\s*,\s*/, $ENV{TEST2_UUID_BACKEND}] : ['UUID', 'Data::UUID::MT', 'UUID::Tiny', 'Data::UUID']);
 
     for my $backend (@$backends) {
-        return ($GEN_UUID_CACHE{$backend}, sub() { $backend }) if $GEN_UUID_CACHE{$backend};
+        return $GEN_UUID_CACHE{$backend} if $GEN_UUID_CACHE{$backend};
 
         my $meth = lc("_gen_$backend");
         $meth =~ s/::/_/g;
@@ -66,7 +67,8 @@ sub get_gen_uuid {
         croak "'$backend' is not supported" unless $class->can($meth);
 
         $GEN_UUID_CACHE{$backend} = $class->$meth($warn) or next;
-        return ($GEN_UUID_CACHE{$backend}, sub() { $backend });
+        $GEN_UUID_CACHE{$backend}->{GEN_UUID_BACKEND} = sub() { $backend };
+        return $GEN_UUID_CACHE{$backend};
     }
 
     croak "No UUID generator found, please install one of these: UUID, Data::UUID::MT, Data::UUID, or UUID::Tiny. ('UUID' is preferred over the others)\n";
@@ -78,12 +80,19 @@ sub _gen_uuid {
 
     local $@;
     return undef unless eval { require UUID; 1 };
-    return sub { uc(UUID::uuid7->()) } if eval { UUID->VERSION('0.35'); 1 };
 
-    warn "UUID version is too old, need 0.35 or greater to avoid a fork related bug. Please upgrade the UUID module.\n"
-        if $warn;
+    unless (eval { UUID->VERSION('0.35'); 1 }) {
+        warn "UUID version is too old, need 0.35 or greater to avoid a fork related bug. Please upgrade the UUID module.\n"
+            if $warn;
 
-    return undef;
+        return;
+    }
+
+    return {
+        gen_uuid => sub { uc(UUID::uuid7->()) },
+        bin2uuid => sub { my $out; UUID::unparse($_[0], $out); uc($out) },
+        uuid2bin => sub { my $out; UUID::parse($_[0], $out); $out },
+    };
 }
 
 sub _gen_data_uuid_mt {
@@ -94,7 +103,16 @@ sub _gen_data_uuid_mt {
     return undef unless eval { require Data::UUID::MT; 1 };
 
     my $ug = Data::UUID::MT->new(version => 4);
-    return sub { uc($ug->create_string()) };
+    my $out = {
+        gen_uuid => sub { uc($ug->create_string()) },
+    };
+
+    if (eval { require UUID::Tiny; 1 }) {
+        $out->{uuid2bin} = sub { UUID::Tiny::string_to_uuid($_[0]) },
+        $out->{bin2uuid} = sub { uc(UUID::Tiny::uuid_to_string($_[0])) },
+    }
+
+    return $out;
 }
 
 sub _gen_uuid_tiny {
@@ -108,7 +126,11 @@ sub _gen_uuid_tiny {
     warn "Using UUID::Tiny for uuid generation. UUID::Tiny is significantly slower than the 'UUID' or 'Data::UUID::MT' modules, please install 'UUID' or 'Data::UUID::MT' if possible.\n"
         if $warn;
 
-    return sub { uc(UUID::Tiny::create_uuid_as_string(UUID::Tiny::UUID_V4())) };
+    return {
+        gen_uuid => sub { uc(UUID::Tiny::create_uuid_as_string(UUID::Tiny::UUID_V4())) },
+        bin2uuid => sub { uc(UUID::Tiny::uuid_to_string($_[0])) },
+        uuid2bin => sub { UUID::Tiny::string_to_uuid($_[0]) },
+    };
 }
 
 sub _gen_data_uuid {
@@ -133,7 +155,11 @@ sub _gen_data_uuid {
     # Initialize it here in this PID to start
     $UG_INIT->();
 
-    return sub { uc($UG_INIT->()->create_str()) };
+    return {
+        gen_uuid => sub { uc($UG_INIT->()->create_str()) },
+        bin2uuid => sub { uc($UG_INIT->()->to_string($_[0])) },
+        uuid2bin => sub { $UG_INIT->()->from_string($_[0]) },
+    };
 }
 
 sub looks_like_uuid {
@@ -160,9 +186,13 @@ This module provides a consistent UUID source for all of Test2.
 
 =head1 SYNOPSIS
 
-    use Test2::Util::UUID qw/gen_uuid looks_like_uuid/;
+    use Test2::Util::UUID qw/gen_uuid looks_like_uuid uuid2bin bin2uuid/;
 
     my $uuid = gen_uuid;
+
+    my $bin = bin2uuid($uuid);
+
+    my $uuid_again = uuid2bin($uuid);
 
 =head1 UNDER THE HOOD
 

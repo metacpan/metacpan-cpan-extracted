@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-05-15'; # DATE
+our $DATE = '2024-05-30'; # DATE
 our $DIST = 'Complete-Nutrient'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use Complete::Common qw(:all);
 use Exporter qw(import);
@@ -24,7 +24,8 @@ $SPEC{':package'} = {
     summary => 'Completion routines related to nutrients',
 };
 
-state $nutrients;
+my $nutrients;
+my $symbol_replace_map;
 $SPEC{'complete_nutrient_symbol'} = {
     v => 1.1,
     summary => 'Complete from list of nutrient symbols',
@@ -66,6 +67,12 @@ sub complete_nutrient_symbol {
         my $td = TableData::Health::Nutrient->new;
         my @nutrients = $td->get_all_rows_hashref;
         $nutrients = \@nutrients;
+
+        $symbol_replace_map = {};
+        for my $row (@nutrients) {
+            next unless defined $row->{aliases} && length($row->{aliases});
+            $symbol_replace_map->{ $row->{symbol} } = [split /,/, lc($row->{aliases})];
+        }
     }
 
     my $symbols = [];
@@ -78,7 +85,10 @@ sub complete_nutrient_symbol {
 
     require Complete::Util;
     Complete::Util::complete_array_elem(
-        word=>$args{word}, array=>$symbols, summaries=>$summaries);
+        word=>$args{word},
+        array=>$symbols,
+        replace_map=>$symbol_replace_map,
+        summaries=>$summaries);
 }
 
 1;
@@ -96,7 +106,7 @@ Complete::Nutrient - Completion routines related to nutrients
 
 =head1 VERSION
 
-This document describes version 0.001 of Complete::Nutrient (from Perl distribution Complete-Nutrient), released on 2024-05-15.
+This document describes version 0.002 of Complete::Nutrient (from Perl distribution Complete-Nutrient), released on 2024-05-30.
 
 =for Pod::Coverage .+
 

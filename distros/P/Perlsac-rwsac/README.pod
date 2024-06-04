@@ -1,0 +1,33 @@
+=head1 NAME
+
+Perlsac::rwsac - a module to read and write SAC file.
+
+=head1 DESCRIPTION
+
+This is the module for reading and writing the sac file, defined 
+at 'http://ds.iris.edu/files/sac-manual/manual/file_format.html'
+
+=head1 AUTHOR
+
+Hobin Lim
+
+=head1 LICENSE
+
+MIT
+
+=head1 INSTALLATION
+
+Using C<cpan>:
+
+    $ cpan Perlsac
+
+Manual install:
+
+    $ perl Makefile.PL
+    $ make
+    $ make install
+
+
+
+=cut
+

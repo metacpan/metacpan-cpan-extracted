@@ -4,7 +4,7 @@
       "Hobin Lim"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -32,13 +32,13 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.034000",
+            "perl" : "5.032000",
             "strict" : "0",
             "warnings" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : 0.01,
+   "version" : 0.02,
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

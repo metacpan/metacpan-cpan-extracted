@@ -5,7 +5,7 @@ use Test::More;
 use Compression::Util qw(:all);
 use List::Util        qw(shuffle);
 
-plan tests => 523;
+plan tests => 639;
 
 ##################################
 
@@ -36,8 +36,15 @@ sub test_array ($arr) {
     is_deeply(lz77_decompress_symbolic(lz77_compress_symbolic($arr, \&obh_encode),               \&obh_decode),               $arr);
     is_deeply(lz77_decompress_symbolic(lz77_compress_symbolic($arr, \&create_adaptive_ac_entry), \&decode_adaptive_ac_entry), $arr);
 
+    is_deeply(lzss_decode_symbolic(lzss_encode_symbolic($arr)),                                                               $arr);
+    is_deeply(lzss_decode_symbolic(lzss_encode_fast($arr)),                                                                   $arr);
+    is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic($arr, \&delta_encode), \&delta_decode),                         $arr);
+    is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic($arr, \&obh_encode), \&obh_decode),                             $arr);
+    is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic($arr, \&create_adaptive_ac_entry), \&decode_adaptive_ac_entry), $arr);
+
     my ($mtf, $alphabet) = mtf_encode($arr);
     is_deeply(mtf_decode(lz77_decompress_symbolic(lz77_compress_symbolic($mtf)), $alphabet), $arr);
+    is_deeply(mtf_decode(lzss_decompress_symbolic(lzss_compress_symbolic($mtf)), $alphabet), $arr);
 
     is_deeply(obh_decode(obh_encode($arr)), $arr);
     is_deeply(obh_decode(obh_encode($arr, \&obh_encode),               \&obh_decode),               $arr);
@@ -47,9 +54,9 @@ sub test_array ($arr) {
     is_deeply(mrl_decompress_symbolic(mrl_compress_symbolic($arr)),                                                         $arr);
     is_deeply(mrl_decompress_symbolic(mrl_compress_symbolic($arr, \&create_adaptive_ac_entry), \&decode_adaptive_ac_entry), $arr);
 
-    is_deeply(bz2_decompress_symbolic(bz2_compress_symbolic($arr)), $arr);
-    is_deeply(bz2_decompress_symbolic(bz2_compress_symbolic($arr, \&create_ac_entry),          \&decode_ac_entry),          $arr);
-    is_deeply(bz2_decompress_symbolic(bz2_compress_symbolic($arr, \&create_adaptive_ac_entry), \&decode_adaptive_ac_entry), $arr);
+    is_deeply(bwt_decompress_symbolic(bwt_compress_symbolic($arr)), $arr);
+    is_deeply(bwt_decompress_symbolic(bwt_compress_symbolic($arr, \&create_ac_entry),          \&decode_ac_entry),          $arr);
+    is_deeply(bwt_decompress_symbolic(bwt_compress_symbolic($arr, \&create_adaptive_ac_entry), \&decode_adaptive_ac_entry), $arr);
 
     is_deeply($arr, \@copy);    # make sure the array has not been modified in-place
 }
@@ -66,19 +73,22 @@ foreach my $str (
   ) {
     test_array(string2symbols($str));
 
+    is(lzb_decompress(lzb_compress($str)),                                               $str);
+    is(lzb_decompress(lzb_compress($str, \&lzss_encode_fast)),                           $str);
+    is(lz77_decompress(lz77_compress($str)),                                             $str);
     is(lzss_decompress(lzss_compress($str)),                                             $str);
     is(lzss_decompress(lzss_compress($str, \&create_huffman_entry, \&lzss_encode_fast)), $str);
     is(lzw_decompress(lzw_compress($str)),                                               $str);
-    is(bz2_decompress(bz2_compress($str)),                                               $str);
+    is(bwt_decompress(bwt_compress($str)),                                               $str);
     is(symbols2string(mrl_decompress_symbolic(mrl_compress_symbolic($str))),             $str);
 }
 
-is(bz2_decompress(bz2_compress('a')),                                               'a');
+is(bwt_decompress(bwt_compress('a')),                                               'a');
 is(lzss_decompress(lzss_compress('a')),                                             'a');
 is(lzss_decompress(lzss_compress('a', \&create_huffman_entry, \&lzss_encode_fast)), 'a');
 is(lzw_decompress(lzw_compress('a')),                                               'a');
 
-is(bz2_decompress(bz2_compress('')),                                               '');
+is(bwt_decompress(bwt_compress('')),                                               '');
 is(lzss_decompress(lzss_compress('')),                                             '');
 is(lzss_decompress(lzss_compress('', \&create_huffman_entry, \&lzss_encode_fast)), '');
 is(lzw_decompress(lzw_compress('')),                                               '');
@@ -88,15 +98,20 @@ is_deeply(mrl_decompress_symbolic(mrl_compress_symbolic([0])),        [0]);
 is_deeply(mrl_decompress_symbolic(mrl_compress_symbolic('a')),        [ord('a')]);
 is_deeply(mrl_decompress_symbolic(mrl_compress_symbolic([ord('a')])), [ord('a')]);
 
-is_deeply(bz2_decompress_symbolic(bz2_compress_symbolic('a')), [ord('a')]);
-is_deeply(bz2_decompress_symbolic(bz2_compress_symbolic([1])), [1]);
-is_deeply(bz2_decompress_symbolic(bz2_compress_symbolic([0])), [0]);
-is_deeply(bz2_decompress_symbolic(bz2_compress_symbolic([])),  []);
+is_deeply(bwt_decompress_symbolic(bwt_compress_symbolic('a')), [ord('a')]);
+is_deeply(bwt_decompress_symbolic(bwt_compress_symbolic([1])), [1]);
+is_deeply(bwt_decompress_symbolic(bwt_compress_symbolic([0])), [0]);
+is_deeply(bwt_decompress_symbolic(bwt_compress_symbolic([])),  []);
 
 is_deeply(lz77_decompress_symbolic(lz77_compress_symbolic('a')), [ord('a')]);
 is_deeply(lz77_decompress_symbolic(lz77_compress_symbolic([1])), [1]);
 is_deeply(lz77_decompress_symbolic(lz77_compress_symbolic([0])), [0]);
 is_deeply(lz77_decompress_symbolic(lz77_compress_symbolic([])),  []);
+
+is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic('a')), [ord('a')]);
+is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic([1])), [1]);
+is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic([0])), [0]);
+is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic([])),  []);
 
 ##################################
 
@@ -135,6 +150,9 @@ is_deeply(lz77_decompress_symbolic(lz77_compress_symbolic([])),  []);
     is(lzw_decompress(lzw_compress($str, \&create_huffman_entry),     \&decode_huffman_entry),     $str);
     is(lzw_decompress(lzw_compress($str, \&create_adaptive_ac_entry), \&decode_adaptive_ac_entry), $str);
 
+    is(lzb_decompress(lzb_compress($str)),                     $str);
+    is(lzb_decompress(lzb_compress($str, \&lzss_encode_fast)), $str);
+
     is(lz77_decompress(lz77_compress($str)), $str);
     is(lz77_decompress(lz77_compress($str, \&create_ac_entry),          \&decode_ac_entry),          $str);
     is(lz77_decompress(lz77_compress($str, \&create_adaptive_ac_entry), \&decode_adaptive_ac_entry), $str);
@@ -143,17 +161,23 @@ is_deeply(lz77_decompress_symbolic(lz77_compress_symbolic([])),  []);
     is(lzss_decompress(lzss_compress($str, \&create_ac_entry),          \&decode_ac_entry),          $str);
     is(lzss_decompress(lzss_compress($str, \&create_adaptive_ac_entry), \&decode_adaptive_ac_entry), $str);
 
-    is(bz2_decompress(bz2_compress($str)), $str);
-    is(bz2_decompress(bz2_compress($str, \&create_ac_entry),          \&decode_ac_entry),          $str);
-    is(bz2_decompress(bz2_compress($str, \&create_adaptive_ac_entry), \&decode_adaptive_ac_entry), $str);
+    is(bwt_decompress(bwt_compress($str)), $str);
+    is(bwt_decompress(bwt_compress($str, \&create_ac_entry),          \&decode_ac_entry),          $str);
+    is(bwt_decompress(bwt_compress($str, \&create_adaptive_ac_entry), \&decode_adaptive_ac_entry), $str);
 
-    is_deeply(bz2_decompress_symbolic(bz2_compress_symbolic(\@symbols)), \@symbols);
-    is_deeply(bz2_decompress_symbolic(bz2_compress_symbolic(\@symbols, \&create_ac_entry),          \&decode_ac_entry),          \@symbols);
-    is_deeply(bz2_decompress_symbolic(bz2_compress_symbolic(\@symbols, \&create_adaptive_ac_entry), \&decode_adaptive_ac_entry), \@symbols);
+    is_deeply(bwt_decompress_symbolic(bwt_compress_symbolic(\@symbols)), \@symbols);
+    is_deeply(bwt_decompress_symbolic(bwt_compress_symbolic(\@symbols, \&create_ac_entry),          \&decode_ac_entry),          \@symbols);
+    is_deeply(bwt_decompress_symbolic(bwt_compress_symbolic(\@symbols, \&create_adaptive_ac_entry), \&decode_adaptive_ac_entry), \@symbols);
 
-    is_deeply(lz77_decompress_symbolic(lz77_compress_symbolic(\@symbols)), \@symbols);
-    is_deeply(lz77_decompress_symbolic(lz77_compress_symbolic(\@symbols, \&create_ac_entry),          \&decode_ac_entry),          \@symbols);
+    is_deeply(lz77_decompress_symbolic(lz77_compress_symbolic(\@symbols)),                                                         \@symbols);
+    is_deeply(lz77_decompress_symbolic(lz77_compress_symbolic(\@symbols, \&create_huffman_entry, \&lzss_encode_fast)),             \@symbols);
+    is_deeply(lz77_decompress_symbolic(lz77_compress_symbolic(\@symbols, \&create_ac_entry), \&decode_ac_entry),                   \@symbols);
     is_deeply(lz77_decompress_symbolic(lz77_compress_symbolic(\@symbols, \&create_adaptive_ac_entry), \&decode_adaptive_ac_entry), \@symbols);
+
+    is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic(\@symbols)),                                                         \@symbols);
+    is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic(\@symbols, \&create_huffman_entry, \&lzss_encode_fast)),             \@symbols);
+    is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic(\@symbols, \&create_ac_entry), \&decode_ac_entry),                   \@symbols);
+    is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic(\@symbols, \&create_adaptive_ac_entry), \&decode_adaptive_ac_entry), \@symbols);
 
     is_deeply(\@symbols, \@copy);    # make sure the array has not been modified in-place
 }
