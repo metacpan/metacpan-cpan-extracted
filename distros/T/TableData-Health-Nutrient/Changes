@@ -1,3 +1,8 @@
+0.003   2024-05-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Add field: aliases.
+
+
 0.002   2024-05-14  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Set the correct column orders.

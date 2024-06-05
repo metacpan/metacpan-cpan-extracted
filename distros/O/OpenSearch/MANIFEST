@@ -24,6 +24,7 @@ lib/OpenSearch/Cluster/Stats.pm
 lib/OpenSearch/Cluster/UpdateSettings.pm
 lib/OpenSearch/Document.pm
 lib/OpenSearch/Document/Bulk.pm
+lib/OpenSearch/Document/Get.pm
 lib/OpenSearch/Document/Index.pm
 lib/OpenSearch/Filter/Nodes.pm
 lib/OpenSearch/Filter/Source.pm
@@ -62,6 +63,7 @@ lib/OpenSearch/Parameters/Cluster/SetRoutingAwareness.pm
 lib/OpenSearch/Parameters/Cluster/Stats.pm
 lib/OpenSearch/Parameters/Cluster/UpdateSettings.pm
 lib/OpenSearch/Parameters/Document/Bulk.pm
+lib/OpenSearch/Parameters/Document/Get.pm
 lib/OpenSearch/Parameters/Document/Index.pm
 lib/OpenSearch/Parameters/Index/ClearCache.pm
 lib/OpenSearch/Parameters/Index/Clone.pm
@@ -96,6 +98,7 @@ lib/README.md
 minil.toml
 t/00_compile.t
 t/01_opensearch_modules.t
+t/02_index.t
 t/99_pod_coverage.t
 META.yml
 MANIFEST

@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Moose;
 use feature qw(signatures say);
+no warnings qw(experimental::signatures);
 use MooseX::Singleton;
 use Mojo::UserAgent;
 use Mojo::URL;

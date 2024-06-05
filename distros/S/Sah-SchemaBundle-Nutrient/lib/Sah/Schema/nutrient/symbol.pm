@@ -6,7 +6,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-05-30'; # DATE
 our $DIST = 'Sah-SchemaBundle-Nutrient'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our @rows;
 # load and cache the table
@@ -22,7 +22,7 @@ our $schema = [str => {
 
 MARKDOWN
     in => [map {$_->{symbol}} @rows],
-    'x.in.summaries' => [map {$_->{eng_name}} @rows],
+    'x.completion' => 'nutrient_symbol',
     examples => [
         {value=>'', valid=>0, summary=>"Empty string"},
         {value=>'X', valid=>0, summary=>"Unknown nutrient"},
@@ -46,7 +46,7 @@ Sah::Schema::nutrient::symbol - A known nutrient symbol, from TableData::Health:
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schema::nutrient::symbol (from Perl distribution Sah-SchemaBundle-Nutrient), released on 2024-05-30.
+This document describes version 0.002 of Sah::Schema::nutrient::symbol (from Perl distribution Sah-SchemaBundle-Nutrient), released on 2024-05-30.
 
 =head1 SAH SCHEMA DEFINITION
 
@@ -94,51 +94,13 @@ This document describes version 0.001 of Sah::Schema::nutrient::symbol (from Per
        "L_Carnitine",
        "Myo_Inositol",
      ],
-     "x.in.summaries" => [
-       "Vitamin A",
-       "Vitamin D",
-       "Vitamin E",
-       "Vitamin K",
-       "Vitamin B1",
-       "Vitamin B2",
-       "Vitamin B3",
-       "Pantothenic acid",
-       "Vitamin B6",
-       "Folate",
-       "Vitamin B12",
-       "Biotin",
-       "Choline",
-       "Vitamin C",
-       "Calcium",
-       "Phosphorus",
-       "Magnesium",
-       "Iron",
-       "Iodium",
-       "Zinc",
-       "Selenium",
-       "Mangan",
-       "Fluorine",
-       "Chromium",
-       "Potassium",
-       "Sodium",
-       "Chlorine",
-       "Copper",
-       "Energy",
-       "Protein",
-       "Total fat",
-       "Saturated fat",
-       "Cholesterol",
-       "Linoleic acid",
-       "\x{251}-linoleic acid",
-       "Total carbohydrate",
-       "Dietary fiber",
-       "L-Carnitine",
-       "Myo-Inositol",
-     ],
+     "x.completion" => "nutrient_symbol",
    },
  ]
 
 Base type: L<str|Data::Sah::Type::str>
+
+Used completion: L<nutrient_symbol|Perinci::Sub::XCompletion::nutrient_symbol>
 
 =head1 SYNOPSIS
 
@@ -172,7 +134,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "X";
+ $data = "energy";
  my $errmsg = $validator->($data); # => "Must be one of [\"VA\",\"VD\",\"VE\",\"VK\",\"VB1\",\"VB2\",\"VB3\",\"VB5\",\"VB6\",\"VB9\",\"VB12\",\"VB7\",\"VB4\",\"VC\",\"Ca\",\"P\",\"Mg\",\"Fe\",\"I\",\"Zn\",\"Se\",\"Mn\",\"F\",\"Cr\",\"K\",\"Na\",\"Cl\",\"Cu\",\"Energy\",\"Protein\",\"Total_Fat\",\"Saturated_Fat\",\"Cholesterol\",\"Linoleic_Acid\",\"Alpha_Linoleic_Acid\",\"Carbohydrate\",\"Dietary_Fiber\",\"L_Carnitine\",\"Myo_Inositol\"]"
 
 Often a schema has coercion rule or default value rules, so after validation the
@@ -187,8 +149,8 @@ validated value will be different from the original. To return the validated
  my $res = $validator->($data); # => ["","VD"]
  
  # a sample invalid data
- $data = "X";
- my $res = $validator->($data); # => ["Must be one of [\"VA\",\"VD\",\"VE\",\"VK\",\"VB1\",\"VB2\",\"VB3\",\"VB5\",\"VB6\",\"VB9\",\"VB12\",\"VB7\",\"VB4\",\"VC\",\"Ca\",\"P\",\"Mg\",\"Fe\",\"I\",\"Zn\",\"Se\",\"Mn\",\"F\",\"Cr\",\"K\",\"Na\",\"Cl\",\"Cu\",\"Energy\",\"Protein\",\"Total_Fat\",\"Saturated_Fat\",\"Cholesterol\",\"Linoleic_Acid\",\"Alpha_Linoleic_Acid\",\"Carbohydrate\",\"Dietary_Fiber\",\"L_Carnitine\",\"Myo_Inositol\"]","X"]
+ $data = "energy";
+ my $res = $validator->($data); # => ["Must be one of [\"VA\",\"VD\",\"VE\",\"VK\",\"VB1\",\"VB2\",\"VB3\",\"VB5\",\"VB6\",\"VB9\",\"VB12\",\"VB7\",\"VB4\",\"VC\",\"Ca\",\"P\",\"Mg\",\"Fe\",\"I\",\"Zn\",\"Se\",\"Mn\",\"F\",\"Cr\",\"K\",\"Na\",\"Cl\",\"Cu\",\"Energy\",\"Protein\",\"Total_Fat\",\"Saturated_Fat\",\"Cholesterol\",\"Linoleic_Acid\",\"Alpha_Linoleic_Acid\",\"Carbohydrate\",\"Dietary_Fiber\",\"L_Carnitine\",\"Myo_Inositol\"]","energy"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like

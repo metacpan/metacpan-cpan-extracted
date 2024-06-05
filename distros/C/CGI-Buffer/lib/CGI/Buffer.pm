@@ -17,11 +17,11 @@ CGI::Buffer - Verify, Cache and Optimise CGI Output
 
 =head1 VERSION
 
-Version 0.85
+Version 0.86
 
 =cut
 
-our $VERSION = '0.85';
+our $VERSION = '0.86';
 
 =head1 SYNOPSIS
 
@@ -81,7 +81,7 @@ our $compress_content = 1;
 our $optimise_content = 0;
 our $lint_content = 0;
 our $cache;
-our $cache_age;
+our $cache_duration;
 our $cache_key;
 our $info;
 our $logger;
@@ -479,11 +479,11 @@ END {
 		} else {
 			# Not in the server side cache
 			if($status == 200) {
-				unless($cache_age) {
+				unless($cache_duration) {
 					# It would be great if CHI::set()
 					# allowed the time to be 'lru' for least
 					# recently used.
-					$cache_age = '10 minutes';
+					$cache_duration = '10 minutes';
 				}
 				$cache_hash->{'body'} = $unzipped_body;
 				if(@o && defined($o[0])) {
@@ -516,9 +516,9 @@ END {
 				# if($headers !~ /^Expires: /m))) {
 				# }
 				if($logger) {
-					$logger->debug("Store $key in the cache, age = $cache_age ", length($cache_hash->{'body'}), ' bytes');
+					$logger->debug("Store $key in the cache, age = $cache_duration ", length($cache_hash->{'body'}), ' bytes');
 				}
-				$cache->set($key, Storable::freeze($cache_hash), $cache_age);
+				$cache->set($key, Storable::freeze($cache_hash), $cache_duration);
 				if($generate_last_modified) {
 					$cobject = $cache->get_object($key);
 					if(defined($cobject)) {
@@ -818,7 +818,7 @@ Set various options and override default values.
 	optimise_content => 0,	# optimise your program's HTML, CSS and JavaScript
 	cache => CHI->new(driver => 'File'),	# cache requests
 	cache_key => 'string',	# key for the cache
-	cache_age => '10 minutes',	# how long to store responses in the cache
+	cache_duration => '10 minutes',	# how long to store responses in the cache
 	logger => $logger,
 	lint_content => 0,	# Pass through HTML::Lint
 	generate_304 => 1,	# Generate 304: Not modified
@@ -835,7 +835,7 @@ used as a server-side cache to reduce the need to rerun database accesses.
 
 Items stay in the server-side cache by default for 10 minutes.
 This can be overridden by the cache_control HTTP header in the request, and
-the default can be changed by the cache_age argument to init().
+the default can be changed by the cache_duration argument to init().
 
 Logger will be an object that understands debug() such as an L<Log::Log4perl>
 object.
@@ -908,13 +908,18 @@ sub init {
 			if($control =~ /^max-age\s*=\s*(\d+)$/) {
 				# There is an argument not to do this
 				# since one client will affect others
-				$cache_age = "$1 seconds";
+				$cache_duration = "$1 seconds";
 				if(defined($logger)) {
-					$logger->debug("cache_age = $cache_age");
+					$logger->debug("cache_duration = $cache_duration");
 				}
 			}
 		}
-		$cache_age ||= $params{cache_age};
+		$cache_duration ||= $params{'cache_duration'};
+
+		if($params{'cache_age'}) {
+			# Legacy
+			$cache_duration ||= $params{'cache_age'};
+		}
 
 		if((!defined($params{cache})) && defined($cache)) {
 			if(defined($logger)) {
@@ -1283,7 +1288,7 @@ The licence for cgi_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2011-2023 Nigel Horne,
+The rest of the program is Copyright 2011-2024 Nigel Horne,
 and is released under the following licence: GPL2
 
 =cut

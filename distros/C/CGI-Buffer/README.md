@@ -14,7 +14,7 @@ CGI::Buffer - Verify, Cache and Optimise CGI Output
 
 # VERSION
 
-Version 0.85
+Version 0.86
 
 # SYNOPSIS
 
@@ -79,7 +79,7 @@ Set various options and override default values.
         optimise_content => 0,  # optimise your program's HTML, CSS and JavaScript
         cache => CHI->new(driver => 'File'),    # cache requests
         cache_key => 'string',  # key for the cache
-        cache_age => '10 minutes',      # how long to store responses in the cache
+        cache_duration => '10 minutes', # how long to store responses in the cache
         logger => $logger,
         lint_content => 0,      # Pass through HTML::Lint
         generate_304 => 1,      # Generate 304: Not modified
@@ -96,7 +96,7 @@ used as a server-side cache to reduce the need to rerun database accesses.
 
 Items stay in the server-side cache by default for 10 minutes.
 This can be overridden by the cache\_control HTTP header in the request, and
-the default can be changed by the cache\_age argument to init().
+the default can be changed by the cache\_duration argument to init().
 
 Logger will be an object that understands debug() such as an [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl)
 object.
@@ -256,5 +256,5 @@ The licence for cgi\_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2011-2023 Nigel Horne,
+The rest of the program is Copyright 2011-2024 Nigel Horne,
 and is released under the following licence: GPL2

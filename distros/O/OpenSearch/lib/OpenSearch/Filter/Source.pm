@@ -2,6 +2,7 @@ package OpenSearch::Filter::Source;
 use strict;
 use warnings;
 use feature qw(signatures);
+no warnings qw(experimental::signatures);
 use Moose;
 use Data::Dumper;
 

@@ -47,10 +47,37 @@ is
   111,
   "monkey_patch - simple example";
 
-like
-  run( sub { n { select undef, undef, undef, 0.01 } 10 } ),
-  qr{ wallclock }x,
-  "n - sanity check";
+like run(
+    sub {
+        n sub { }
+    }
+  ),
+  qr{ ^ test \s+ \d+ }xm,
+  "n - sanity check (single)";
+
+like run(
+    sub {
+        n sub { }, 10;
+    }
+  ),
+  qr{ ^ test \s+ \d+ }xm,
+  "n - sanity check (single,times)";
+
+like run(
+    sub {
+        n { a => sub { }, b => sub { } };
+    }
+  ),
+  qr{ ^ [ab] \s+ \d+ .+ \n [ab] \s+ \d+ }xm,
+  "n - sanity check (multiple)";
+
+like run(
+    sub {
+        n { a => sub { }, b => sub { } }, 10;
+    }
+  ),
+  qr{ ^ [ab] \s+ \d+ .+ \n [ab] \s+ \d+ }xm,
+  "n - sanity check (multiple,times)";
 
 is
   x ( "<h1>title</h1>" )->at( "h1" )->text,

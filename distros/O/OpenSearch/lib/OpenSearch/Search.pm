@@ -2,6 +2,7 @@ package OpenSearch::Search;
 use strict;
 use warnings;
 use feature qw(signatures);
+no warnings qw(experimental::signatures);
 use Moose;
 use Data::Dumper;
 use OpenSearch::Search::Search;

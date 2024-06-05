@@ -39,6 +39,7 @@ t/pod_spelling.t
 t/port.t
 t/prereq.t
 t/snippets.t
+t/spelling.t
 t/strict.t
 t/too_late.t
 t/unused.t

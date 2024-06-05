@@ -359,6 +359,7 @@ our @EXPORT  = qw(%Hosts $localhost getpasswd
    use Tie::Cache;
    use IO::Pty;
    use POSIX qw(setsid uname getuid geteuid);
+   use Want qw(howmany);
 
 };
 
@@ -16824,7 +16825,6 @@ sub work_dirs
       return $work_dirs;
    }
    if ($cmd_handle->{_uname} eq 'cygwin') {
-	   print "DO WE GET HERE\n";sleep 10;
       (${$work_dirs}{_tmp},${$work_dirs}{_tmp_mswin})
          =&File_Transfer::get_drive(
             'temp','Temp',
@@ -17122,6 +17122,12 @@ print $Net::FullAuto::FA_Core::LOG "main::cmd() LAUNCING ***NEW*** HANDLE=",
             }
          }
          if (wantarray) {
+            my $howmny=Want::howmany()||'';
+            if (!$howmny || $howmny==1) {
+               return $stdout;
+            } elsif ($howmny==2) {
+               return $stdout,$stderr;
+            }
             return $stdout,$stderr,$exitcode;
          } elsif ($stderr) {
             if (-1<index $self,'HASH') {
@@ -30347,12 +30353,22 @@ print $Net::FullAuto::FA_Core::LOG "GRO_OUT_AFTER_MEGA_STRIP=$growoutput\n"
                            $first=0;next;
                         } elsif (unpack('a7',$output) eq 'stdout:') {
                            $first=0;
+                        } elsif ((length $stripped_live_command<length
+                              $test_stripped_output) and
+                              (substr($test_stripped_output,0,
+                              length $stripped_live_command) eq
+                              $stripped_live_command)) {
+                           $first=1;my $ignore='';
+                           ($ignore,$growoutput)=
+                                 split /2\s*\>\s*\&\s*1\s*/s,
+                                 $output;
+                           #$output=$growoutput;
+                           next
                         } else {
                            $appendout=$output;
                            $first=0;
                            next
                         }
-
 if (!$Net::FullAuto::FA_Core::cron && $Net::FullAuto::FA_Core::debug) {
    print "WE DID NOTHING TO STDOUT - $output\n";#sleep 2;
 }
@@ -30733,6 +30749,7 @@ print $Net::FullAuto::FA_Core::LOG "LETS LOOK AT LINE=$line<== and LASTLINE=$las
                                        $fullerror.="\n";
                                     } $errflag=1;
                                     $fullerror.=$line;
+                                    $growoutput=~s/$line//s;
                                  } elsif ($fulloutput || $line!~/^\s*$/s) {
                                     $fulloutput.=$line;
                                     $save=&display($line,$cmd_prompt,$save)
@@ -30793,7 +30810,7 @@ print $Net::FullAuto::FA_Core::LOG "GROW_ADDED_TO_FULL=$growoutput\n"
                         chomp $stderr if $stderr;
                         last FETCH;
                      } elsif (-1<index $lastline, $cmd_prompt) {
-print "WE HAVE LASTLINE CMDPROMPT AND ARE GOING TO EXIT and FO=$fulloutput and MS_CMD=$ms_cmd<==\n"
+print "WE HAVE LASTLINE CMDPROMPT AND ARE GOING TO EXIT and FO=$fulloutput and MS_CMD=$ms_cmd and FULLERROR=$fullerror<==\n"
    if !$Net::FullAuto::FA_Core::cron && $Net::FullAuto::FA_Core::debug;
                         $stdout=$fulloutput;
                         $stderr=$fullerror if $fulloutput!~/^.*\n0$/s;
@@ -30855,7 +30872,7 @@ print "GOING TO INT EIGHTZZZ\n";
                   $starttime=time();$select_timeout=$cmtimeout;
                   $restart_attempt=1;
                }
-            }
+            } # END OF FETCH LOOP
             $stderr=$lastline if $lastline=~/Connection to.*closed/s;
 print $Net::FullAuto::FA_Core::LOG "cmd() STDERRBOTTOM=$stderr<== and LASTLINE=$lastline<==\n"
    if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
@@ -31050,8 +31067,8 @@ print $Net::FullAuto::FA_Core::LOG "LOGINRETRY2=$login_retry and ",
          if ($wantarray) {
 print $Net::FullAuto::FA_Core::LOG "WE ARE RETURNING ERROR=$eval_error\n"
    if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
-            if ($stdout=~/^.*\S+\d+$/s) {
-               $stdout=~s/^(.*\S+)(\d+)$/$1\n$2/s;
+            if ($stdout=~/^.*\n\d+$/s) {
+               $stdout=~s/^(.*)\n(\d+)$/$1\n$2/s;
             }
             my @stdout_contents=split "\n",$stdout;
             my $exitcode=pop(@stdout_contents);
@@ -31076,7 +31093,8 @@ print $Net::FullAuto::FA_Core::LOG "WE ARE RETURNING ERROR=$eval_error\n"
          } else {
             $exitcode=$exit_code;
          }
-         $stdout=join "\n", @stdout_contents;
+         $stdout=join ":${$}FA:", @stdout_contents;
+         $stdout=~s/:${$}FA:/\n/sg;
       } elsif ($stdout=~/\d+$/s) {
          if ($stdout=~/^(.*)(0|1|2|123|126|127|130|137|255)$/s) {
             $stdout=$1;$exitcode=$2;

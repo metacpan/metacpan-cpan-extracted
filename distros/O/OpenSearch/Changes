@@ -1,5 +1,12 @@
 Revision history for Perl extension OpenSearch
 
+0.92 2024-06-04T10:16:01Z
+	- Added tests for Index-API endpoints requires ENV Vars: OS_HOST, OS_USER, OS_PASS, OS_INDEX
+	- Fixxed #3 in GitHub (https://github.com/localh0rst/OpenSearch-Perl/issues/3)
+	- Fixxed #4 in GitHub (https://github.com/localh0rst/OpenSearch-Perl/issues/4)
+	- Updated POD
+	- some small fixxes
+
 0.91 2024-05-28T15:52:39Z
 
 	- Updated Document API to support Bulk inserts (benchmarks better than expected)

@@ -1,6 +1,13 @@
 Revision history for e
 
 =================
+1.16 - 2024-06-05
+=================
+
+Updated n option to compare multiple.
+Preventing double importing.
+
+=================
 1.15 - 2024-05-24
 =================
 

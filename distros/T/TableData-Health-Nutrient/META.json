@@ -53,7 +53,7 @@
    "provides" : {
       "TableData::Health::Nutrient" : {
          "file" : "lib/TableData/Health/Nutrient.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/perlancar/perl-TableData-Health-Nutrient"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

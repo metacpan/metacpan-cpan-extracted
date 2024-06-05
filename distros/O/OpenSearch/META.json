@@ -64,7 +64,7 @@
    "provides" : {
       "OpenSearch" : {
          "file" : "lib/OpenSearch.pm",
-         "version" : "0.91"
+         "version" : "0.92"
       },
       "OpenSearch::Base" : {
          "file" : "lib/OpenSearch/Base.pm"
@@ -110,6 +110,9 @@
       },
       "OpenSearch::Document::Bulk" : {
          "file" : "lib/OpenSearch/Document/Bulk.pm"
+      },
+      "OpenSearch::Document::Get" : {
+         "file" : "lib/OpenSearch/Document/Get.pm"
       },
       "OpenSearch::Document::Index" : {
          "file" : "lib/OpenSearch/Document/Index.pm"
@@ -225,6 +228,9 @@
       "OpenSearch::Parameters::Document::Bulk" : {
          "file" : "lib/OpenSearch/Parameters/Document/Bulk.pm"
       },
+      "OpenSearch::Parameters::Document::Get" : {
+         "file" : "lib/OpenSearch/Parameters/Document/Get.pm"
+      },
       "OpenSearch::Parameters::Document::Index" : {
          "file" : "lib/OpenSearch/Parameters/Document/Index.pm"
       },
@@ -328,7 +334,7 @@
          "web" : "https://github.com/localh0rst/OpenSearch-Perl"
       }
    },
-   "version" : "0.91",
+   "version" : "0.92",
    "x_contributors" : [
       "localh0rst <git@fail.ninja>",
       "localh0rst <localh0rst@users.noreply.github.com>"

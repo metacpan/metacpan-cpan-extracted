@@ -1,5 +1,8 @@
 Revision history for CGI-Buffer
 
+0.86	Tue Jun  4 20:20:38 EDT 2024
+	cache_age is now known as cache_duration
+
 0.85	Fri Oct 20 13:03:18 EDT 2023
 	Don't try to build Brotli on platforms it doesn't support
 

@@ -2,6 +2,7 @@ package OpenSearch::Index::Stats;
 use strict;
 use warnings;
 use feature qw(signatures);
+no warnings qw(experimental::signatures);
 use Moose;
 
 with 'OpenSearch::Parameters::Index::Stats';
@@ -15,7 +16,7 @@ has '_base' => (
 );
 
 sub execute($self) {
-  my $res = $self->_base->_get( $self, [ ( $self->index // () ), '_stats', ( $self->metrics // () ) ] );
+  my $res = $self->_base->_get( $self, [ ( $self->index // () ), '_stats', ( $self->metric // () ) ] );
 }
 
 1;

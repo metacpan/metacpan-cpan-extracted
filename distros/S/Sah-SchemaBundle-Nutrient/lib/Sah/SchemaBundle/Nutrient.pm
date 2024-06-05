@@ -5,7 +5,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-05-30'; # DATE
 our $DIST = 'Sah-SchemaBundle-Nutrient'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to nutrients
@@ -22,7 +22,7 @@ Sah::SchemaBundle::Nutrient - Sah schemas related to nutrients
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaBundle::Nutrient (from Perl distribution Sah-SchemaBundle-Nutrient), released on 2024-05-30.
+This document describes version 0.002 of Sah::SchemaBundle::Nutrient (from Perl distribution Sah-SchemaBundle-Nutrient), released on 2024-05-30.
 
 =head1 SAH SCHEMAS
 

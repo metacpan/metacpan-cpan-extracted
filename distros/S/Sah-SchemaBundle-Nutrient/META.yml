@@ -17,18 +17,22 @@ meta-spec:
   version: '1.4'
 name: Sah-SchemaBundle-Nutrient
 provides:
+  Perinci::Sub::XCompletion::nutrient_symbol:
+    file: lib/Perinci/Sub/XCompletion/nutrient_symbol.pm
+    version: '0.002'
   Sah::Schema::nutrient::symbol:
     file: lib/Sah/Schema/nutrient/symbol.pm
-    version: '0.001'
+    version: '0.002'
   Sah::SchemaBundle::Nutrient:
     file: lib/Sah/SchemaBundle/Nutrient.pm
-    version: '0.001'
+    version: '0.002'
   Sah::SchemaR::nutrient::symbol:
     file: lib/Sah/SchemaR/nutrient/symbol.pm
-    version: '0.001'
+    version: '0.002'
 requires:
+  Complete::Nutrient: '0'
   Data::Sah::Compiler::perl::TH::str: '0.914'
-  TableData::Health::Nutrient: '0'
+  TableData::Health::Nutrient: '0.003'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -36,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-SchemaBundle-Nutrient
   homepage: https://metacpan.org/release/Sah-SchemaBundle-Nutrient
   repository: git://github.com/perlancar/perl-Sah-SchemaBundle-Nutrient.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

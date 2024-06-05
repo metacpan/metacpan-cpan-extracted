@@ -151,6 +151,24 @@ Profile the code from this point on.
     ...
     # $obj goes out of scope and builds results.
 
+## n
+
+Benchmark and compare different pieces of code.
+
+    Time single block of code.
+    n sub{ ... };
+    n sub{ ... }, 100000;
+
+    # Compare blocks of code.
+    n {
+        slow => sub{ ... },
+        fast => sub{ ... },
+    };
+    n {
+        slow => sub{ ... },
+        fast => sub{ ... },
+    }, 10000;
+
 ## j
 
 JSON Parser.

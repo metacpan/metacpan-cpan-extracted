@@ -1,0 +1,663 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/BPOMUtils/NutritionLabelRef/bpom_get_nutrition_label_ref
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-05-30'; # DATE
+our $DIST = 'App-BPOMUtils-NutritionLabelRef'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/BPOMUtils/NutritionLabelRef/bpom_get_nutrition_label_ref",
+    program_name => "bpom-get-nutrition-label-ref",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+    use_utf8 => 1,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Get one or more values from BPOM nutrition label reference (ALG, acuan label gizi)
+# PODNAME: bpom-get-nutrition-label-ref
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+bpom-get-nutrition-label-ref - Get one or more values from BPOM nutrition label reference (ALG, acuan label gizi)
+
+=head1 VERSION
+
+This document describes version 0.001 of bpom-get-nutrition-label-ref (from Perl distribution App-BPOMUtils-NutritionLabelRef), released on 2024-05-30.
+
+=head1 SYNOPSIS
+
+B<bpom-get-nutrition-label-ref> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<bpom-get-nutrition-label-ref> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<bpom-get-nutrition-label-ref> [B<L<--action|/"--list-nutrients">>=I<str>|B<L<--list-groups|/"--list-nutrients">>|B<L<--list-nutrients|/"--list-nutrients">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<nutrient|/"--nutrient=s">>] [I<L<group|/"--group=s">>] [I<L<value|/"--value=s">>]
+
+
+
+See examples in the L</EXAMPLES> section.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--action>=I<s>
+
+Default value:
+
+ "list_refs"
+
+Valid values:
+
+ ["list_refs","list_nutrients","list_groups"]
+
+=item B<--detail>, B<-l>
+
+(No description)
+
+
+=item B<--group>=I<s>
+
+Valid values:
+
+ ["0to6mo","1to3y","7to11mo","breastfeeding","general","pregnant"]
+
+Can also be specified as the 2nd command-line argument.
+
+=item B<--list-groups>
+
+Shortcut for --action=list_groups.
+
+See C<--action>.
+
+=item B<--list-nutrients>
+
+Shortcut for --action=list_nutrients.
+
+See C<--action>.
+
+=item B<--nutrient>=I<s>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--value>=I<s>
+
+(No description)
+
+
+Can also be specified as the 3rd command-line argument.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C bpom-get-nutrition-label-ref bpom-get-nutrition-label-ref
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete bpom-get-nutrition-label-ref 'p/*/`bpom-get-nutrition-label-ref`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+=head2 List all nutrient (symbols)
+
+ % bpom-get-nutrition-label-ref --list-nutrients
+ Alpha_Linoleic_Acid
+ Biotin
+ Ca
+ Carbohydrate
+ Cholesterol
+ Choline
+ Cr
+ Cu
+ Dietary_Fiber
+ Energy
+ F
+ Fe
+ I
+ K
+ L_Carnitine
+ Linoleic_Acid
+ Mg
+ Mn
+ Myo_Inositol
+ Na
+ P
+ Protein
+ Saturated_Fat
+ Se
+ Total_Fat
+ VA
+ VB1
+ VB12
+ VB2
+ VB3
+ VB5
+ VB6
+ VB9
+ VC
+ VD
+ VE
+ VK
+ Zn
+
+=head2 List all groups (symbols)
+
+ % bpom-get-nutrition-label-ref --list-nutrients
+ Alpha_Linoleic_Acid
+ Biotin
+ Ca
+ Carbohydrate
+ Cholesterol
+ Choline
+ Cr
+ Cu
+ Dietary_Fiber
+ Energy
+ F
+ Fe
+ I
+ K
+ L_Carnitine
+ Linoleic_Acid
+ Mg
+ Mn
+ Myo_Inositol
+ Na
+ P
+ Protein
+ Saturated_Fat
+ Se
+ Total_Fat
+ VA
+ VB1
+ VB12
+ VB2
+ VB3
+ VB5
+ VB6
+ VB9
+ VC
+ VD
+ VE
+ VK
+ Zn
+
+=head2 List all ALG values
+
+ % bpom-get-nutrition-label-ref
+ +---------------------+---------------+------+------+
+ | symbol              | group         | ref  | unit |
+ +---------------------+---------------+------+------+
+ | Energy              | 0to6mo        | 550  | kkal |
+ | Energy              | 7to11mo       | 725  | kkal |
+ | Energy              | 1to3y         | 1125 | kkal |
+ | Energy              | general       | 2150 | kkal |
+ | Energy              | pregnant      | 2510 | kkal |
+ | Energy              | breastfeeding | 2615 | kkal |
+ | Protein             | 0to6mo        | 12   | g    |
+ | Protein             | 7to11mo       | 18   | g    |
+ | Protein             | 1to3y         | 26   | g    |
+ | Protein             | general       | 60   | g    |
+ | Protein             | pregnant      | 76   | g    |
+ | Protein             | breastfeeding | 76   | g    |
+ | Total_Fat           | 0to6mo        | 34   | g    |
+ | Total_Fat           | 7to11mo       | 36   | g    |
+ | Total_Fat           | 1to3y         | 44   | g    |
+ | Total_Fat           | general       | 67   | g    |
+ | Total_Fat           | pregnant      | 84   | g    |
+ | Total_Fat           | breastfeeding | 87   | g    |
+ | Saturated_Fat       | 0to6mo        |      | g    |
+ | Saturated_Fat       | 7to11mo       |      | g    |
+ | Saturated_Fat       | 1to3y         |      | g    |
+ | Saturated_Fat       | general       | 20   | g    |
+ | Saturated_Fat       | pregnant      | 20   | g    |
+ | Saturated_Fat       | breastfeeding | 20   | g    |
+ | Cholesterol         | 0to6mo        |      | mg   |
+ | Cholesterol         | 7to11mo       |      | mg   |
+ | Cholesterol         | 1to3y         |      | mg   |
+ | Cholesterol         | general       | <300 | mg   |
+ | Cholesterol         | pregnant      | <300 | mg   |
+ | Cholesterol         | breastfeeding | <300 | mg   |
+ | Linoleic_Acid       | 0to6mo        | 4.4  | g    |
+ | Linoleic_Acid       | 7to11mo       | 4.4  | g    |
+ | Linoleic_Acid       | 1to3y         | 7    | g    |
+ | Linoleic_Acid       | general       | 13   | g    |
+ | Linoleic_Acid       | pregnant      | 14   | g    |
+ | Linoleic_Acid       | breastfeeding | 14   | g    |
+ | Alpha_Linoleic_Acid | 0to6mo        | 0.5  | g    |
+ | Alpha_Linoleic_Acid | 7to11mo       | 0.5  | g    |
+ | Alpha_Linoleic_Acid | 1to3y         | 0.7  | g    |
+ | Alpha_Linoleic_Acid | general       | 1.4  | g    |
+ | Alpha_Linoleic_Acid | pregnant      | 1.4  | g    |
+ | Alpha_Linoleic_Acid | breastfeeding | 1.3  | g    |
+ | Carbohydrate        | 0to6mo        | 58   | g    |
+ | Carbohydrate        | 7to11mo       | 82   | g    |
+ | Carbohydrate        | 1to3y         | 155  | g    |
+ | Carbohydrate        | general       | 325  | g    |
+ | Carbohydrate        | pregnant      | 345  | g    |
+ | Carbohydrate        | breastfeeding | 360  | g    |
+ | Dietary_Fiber       | 0to6mo        | 0    | g    |
+ | Dietary_Fiber       | 7to11mo       | 5    | g    |
+ | Dietary_Fiber       | 1to3y         | 16   | g    |
+ | Dietary_Fiber       | general       | 30   | g    |
+ | Dietary_Fiber       | pregnant      | 35   | g    |
+ | Dietary_Fiber       | breastfeeding | 38   | g    |
+ | VA                  | 0to6mo        | 375  | mcg  |
+ | VA                  | 7to11mo       | 400  | mcg  |
+ | VA                  | 1to3y         | 400  | mcg  |
+ | VA                  | general       | 600  | mcg  |
+ | VA                  | pregnant      | 816  | mcg  |
+ | VA                  | breastfeeding | 850  | mcg  |
+ | VD                  | 0to6mo        | 5    | mcg  |
+ | VD                  | 7to11mo       | 5    | mcg  |
+ | VD                  | 1to3y         | 15   | mcg  |
+ | VD                  | general       | 15   | mcg  |
+ | VD                  | pregnant      | 15   | mcg  |
+ | VD                  | breastfeeding | 15   | mcg  |
+ | VE                  | 0to6mo        | 4    | mg   |
+ | VE                  | 7to11mo       | 5    | mg   |
+ | VE                  | 1to3y         | 6    | mg   |
+ | VE                  | general       | 15   | mg   |
+ | VE                  | pregnant      | 15   | mg   |
+ | VE                  | breastfeeding | 19   | mg   |
+ | VK                  | 0to6mo        | 5    | mcg  |
+ | VK                  | 7to11mo       | 10   | mcg  |
+ | VK                  | 1to3y         | 15   | mcg  |
+ | VK                  | general       | 60   | mcg  |
+ | VK                  | pregnant      | 55   | mcg  |
+ | VK                  | breastfeeding | 55   | mcg  |
+ | VB1                 | 0to6mo        | 0.3  | mg   |
+ | VB1                 | 7to11mo       | 0.4  | mg   |
+ | VB1                 | 1to3y         | 0.6  | mg   |
+ | VB1                 | general       | 1.4  | mg   |
+ | VB1                 | pregnant      | 1.4  | mg   |
+ | VB1                 | breastfeeding | 1.4  | mg   |
+ | VB2                 | 0to6mo        | 0.3  | mg   |
+ | VB2                 | 7to11mo       | 0.4  | mg   |
+ | VB2                 | 1to3y         | 0.7  | mg   |
+ | VB2                 | general       | 1.6  | mg   |
+ | VB2                 | pregnant      | 1.7  | mg   |
+ | VB2                 | breastfeeding | 1.8  | mg   |
+ | VB3                 | 0to6mo        | 2    | mg   |
+ | VB3                 | 7to11mo       | 4    | mg   |
+ | VB3                 | 1to3y         | 6    | mg   |
+ | VB3                 | general       | 15   | mg   |
+ | VB3                 | pregnant      | 16   | mg   |
+ | VB3                 | breastfeeding | 15   | mg   |
+ | VB5                 | 0to6mo        | 1.7  | mg   |
+ | VB5                 | 7to11mo       | 1.8  | mg   |
+ | VB5                 | 1to3y         | 2    | mg   |
+ | VB5                 | general       | 5    | mg   |
+ | VB5                 | pregnant      | 6    | mg   |
+ | VB5                 | breastfeeding | 7    | mg   |
+ | VB6                 | 0to6mo        | 0.1  | mg   |
+ | VB6                 | 7to11mo       | 0.3  | mg   |
+ | VB6                 | 1to3y         | 0.5  | mg   |
+ | VB6                 | general       | 1.3  | mg   |
+ | VB6                 | pregnant      | 1.7  | mg   |
+ | VB6                 | breastfeeding | 1.8  | mg   |
+ | VB9                 | 0to6mo        | 65   | mcg  |
+ | VB9                 | 7to11mo       | 80   | mcg  |
+ | VB9                 | 1to3y         | 160  | mcg  |
+ | VB9                 | general       | 400  | mcg  |
+ | VB9                 | pregnant      | 600  | mcg  |
+ | VB9                 | breastfeeding | 500  | mcg  |
+ | VB12                | 0to6mo        | 0.4  | mcg  |
+ | VB12                | 7to11mo       | 0.5  | mcg  |
+ | VB12                | 1to3y         | 0.9  | mcg  |
+ | VB12                | general       | 2.4  | mcg  |
+ | VB12                | pregnant      | 2.6  | mcg  |
+ | VB12                | breastfeeding | 2.8  | mcg  |
+ | Biotin              | 0to6mo        | 5    | mcg  |
+ | Biotin              | 7to11mo       | 6    | mcg  |
+ | Biotin              | 1to3y         | 8    | mcg  |
+ | Biotin              | general       | 30   | mcg  |
+ | Biotin              | pregnant      | 30   | mcg  |
+ | Biotin              | breastfeeding | 35   | mcg  |
+ | Choline             | 0to6mo        | 125  | mg   |
+ | Choline             | 7to11mo       | 150  | mg   |
+ | Choline             | 1to3y         | 200  | mg   |
+ | Choline             | general       | 450  | mg   |
+ | Choline             | pregnant      | 450  | mg   |
+ | Choline             | breastfeeding | 500  | mg   |
+ | VC                  | 0to6mo        | 40   | mg   |
+ | VC                  | 7to11mo       | 50   | mg   |
+ | VC                  | 1to3y         | 40   | mg   |
+ | VC                  | general       | 90   | mg   |
+ | VC                  | pregnant      | 90   | mg   |
+ | VC                  | breastfeeding | 100  | mg   |
+ | Ca                  | 0to6mo        | 200  | mg   |
+ | Ca                  | 7to11mo       | 250  | mg   |
+ | Ca                  | 1to3y         | 650  | mg   |
+ | Ca                  | general       | 1100 | mg   |
+ | Ca                  | pregnant      | 1300 | mg   |
+ | Ca                  | breastfeeding | 1300 | mg   |
+ | P                   | 0to6mo        | 100  | mg   |
+ | P                   | 7to11mo       | 250  | mg   |
+ | P                   | 1to3y         | 500  | mg   |
+ | P                   | general       | 700  | mg   |
+ | P                   | pregnant      | 700  | mg   |
+ | P                   | breastfeeding | 700  | mg   |
+ | Mg                  | 0to6mo        | 30   | mg   |
+ | Mg                  | 7to11mo       | 55   | mg   |
+ | Mg                  | 1to3y         | 60   | mg   |
+ | Mg                  | general       | 350  | mg   |
+ | Mg                  | pregnant      | 350  | mg   |
+ | Mg                  | breastfeeding | 310  | mg   |
+ | Na                  | 0to6mo        | 120  | mg   |
+ | Na                  | 7to11mo       | 200  | mg   |
+ | Na                  | 1to3y         | 1000 | mg   |
+ | Na                  | general       | 1500 | mg   |
+ | Na                  | pregnant      | 1500 | mg   |
+ | Na                  | breastfeeding | 1500 | mg   |
+ | K                   | 0to6mo        | 500  | mg   |
+ | K                   | 7to11mo       | 700  | mg   |
+ | K                   | 1to3y         | 3000 | mg   |
+ | K                   | general       | 4700 | mg   |
+ | K                   | pregnant      | 4700 | mg   |
+ | K                   | breastfeeding | 5100 | mg   |
+ | Mn                  | 0to6mo        | 5.5  | mcg  |
+ | Mn                  | 7to11mo       | 600  | mcg  |
+ | Mn                  | 1to3y         | 1200 | mcg  |
+ | Mn                  | general       | 2000 | mcg  |
+ | Mn                  | pregnant      | 2000 | mcg  |
+ | Mn                  | breastfeeding | 2600 | mcg  |
+ | Cu                  | 0to6mo        | 200  | mcg  |
+ | Cu                  | 7to11mo       | 220  | mcg  |
+ | Cu                  | 1to3y         | 340  | mcg  |
+ | Cu                  | general       | 800  | mcg  |
+ | Cu                  | pregnant      | 1000 | mcg  |
+ | Cu                  | breastfeeding | 1300 | mcg  |
+ | Cr                  | 0to6mo        |      | mcg  |
+ | Cr                  | 7to11mo       | 6    | mcg  |
+ | Cr                  | 1to3y         | 11   | mcg  |
+ | Cr                  | general       | 26   | mcg  |
+ | Cr                  | pregnant      | 30   | mcg  |
+ | Cr                  | breastfeeding | 45   | mcg  |
+ | Fe                  | 0to6mo        | 2.5  | mg   |
+ | Fe                  | 7to11mo       | 7    | mg   |
+ | Fe                  | 1to3y         | 8    | mg   |
+ | Fe                  | general       | 22   | mg   |
+ | Fe                  | pregnant      | 34   | mg   |
+ | Fe                  | breastfeeding | 33   | mg   |
+ | I                   | 0to6mo        | 90   | mcg  |
+ | I                   | 7to11mo       | 120  | mcg  |
+ | I                   | 1to3y         | 120  | mcg  |
+ | I                   | general       | 150  | mcg  |
+ | I                   | pregnant      | 220  | mcg  |
+ | I                   | breastfeeding | 250  | mcg  |
+ | Zn                  | 0to6mo        | 2.75 | mg   |
+ | Zn                  | 7to11mo       | 3    | mg   |
+ | Zn                  | 1to3y         | 4    | mg   |
+ | Zn                  | general       | 13   | mg   |
+ | Zn                  | pregnant      | 16   | mg   |
+ | Zn                  | breastfeeding | 15   | mg   |
+ | Se                  | 0to6mo        | 5    | mcg  |
+ | Se                  | 7to11mo       | 10   | mcg  |
+ | Se                  | 1to3y         | 17   | mcg  |
+ | Se                  | general       | 30   | mcg  |
+ | Se                  | pregnant      | 35   | mcg  |
+ | Se                  | breastfeeding | 40   | mcg  |
+ | F                   | 0to6mo        |      | mg   |
+ | F                   | 7to11mo       | 0.4  | mg   |
+ | F                   | 1to3y         | 0.6  | mg   |
+ | F                   | general       | 2.5  | mg   |
+ | F                   | pregnant      | 2.5  | mg   |
+ | F                   | breastfeeding | 2.5  | mg   |
+ | L_Carnitine         | 0to6mo        | 6.6  | mg   |
+ | L_Carnitine         | 7to11mo       | 8.7  | mg   |
+ | L_Carnitine         | 1to3y         | 13.5 | mg   |
+ | L_Carnitine         | general       |      | mg   |
+ | L_Carnitine         | pregnant      |      | mg   |
+ | L_Carnitine         | breastfeeding |      | mg   |
+ | Myo_Inositol        | 0to6mo        | 22   | mg   |
+ | Myo_Inositol        | 7to11mo       | 29   | mg   |
+ | Myo_Inositol        | 1to3y         | 45   | mg   |
+ | Myo_Inositol        | general       |      | mg   |
+ | Myo_Inositol        | pregnant      |      | mg   |
+ | Myo_Inositol        | breastfeeding |      | mg   |
+ +---------------------+---------------+------+------+
+
+=head2 List ALG for vitamin D, for all groups
+
+ % bpom-get-nutrition-label-ref VD
+ +---------------+-----+------+
+ |         group | ref | unit |
+ +---------------+-----+------+
+ |        0to6mo | 5   | mcg  |
+ |       7to11mo | 5   | mcg  |
+ |         1to3y | 15  | mcg  |
+ |       general | 15  | mcg  |
+ |      pregnant | 15  | mcg  |
+ | breastfeeding | 15  | mcg  |
+ +---------------+-----+------+
+
+=head2 List ALG for vitamin D, for 1-3 years olds
+
+ % bpom-get-nutrition-label-ref VD 1to3y
+ +-----+------+
+ | ref | unit |
+ +-----+------+
+ | 15  | mcg  |
+ +-----+------+
+
+=head2 List ALG for vitamin D, for 1-3 years olds, and compare a value to reference
+
+ % bpom-get-nutrition-label-ref VD 1to3y 10
+ +-----+------+------------------+
+ | ref | unit | %alg             |
+ +-----+------+------------------+
+ |  15 | mcg  | 66.6666666666667 |
+ +-----+------+------------------+
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-BPOMUtils-NutritionLabelRef>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-BPOMUtils-NutritionLabelRef>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils-NutritionLabelRef>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

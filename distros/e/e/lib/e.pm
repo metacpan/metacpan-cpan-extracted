@@ -34,7 +34,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 =head1 SYNOPSIS
 
@@ -165,6 +165,24 @@ Profile the code from this point on.
     ...
     # $obj goes out of scope and builds results.
 
+=head2 n
+
+Benchmark and compare different pieces of code.
+
+    Time single block of code.
+    n sub{ ... };
+    n sub{ ... }, 100000;
+
+    # Compare blocks of code.
+    n {
+        slow => sub{ ... },
+        fast => sub{ ... },
+    };
+    n {
+        slow => sub{ ... },
+        fast => sub{ ... },
+    }, 10000;
+
 =head2 j
 
 JSON Parser.
@@ -245,8 +263,11 @@ sub monkey_patch {
 }
 
 sub import {
+    my %imported;
+    my $caller = caller();
+
     monkey_patch(
-        ~~ caller(),
+        $caller,
 
         ######################################
         #          Investigation
@@ -254,7 +275,9 @@ sub import {
 
         # Debugging.
         repl => sub {
-            require Runtime::Debugger;
+            if ( !$imported{$caller}{"Runtime::Debugger"}++ ) {
+                require Runtime::Debugger;
+            }
             Runtime::Debugger::repl(
                 levels_up => 1,
                 @_,
@@ -263,30 +286,43 @@ sub import {
 
         # Tracing.
         trace => sub {
-            require Data::Trace;
+            if ( !$imported{$caller}{"Data::Trace"}++ ) {
+                require Data::Trace;
+            }
             Data::Trace::Trace( @_ );
         },
 
         # Alias for trace.
         watch => sub {
-            require Data::Trace;
+            if ( !$imported{$caller}{"Data::Trace"}++ ) {
+                require Data::Trace;
+            }
             Data::Trace::Trace( @_ );
         },
 
 
         # Benchmark/timing.
-        n => sub (&@) {
-            require Benchmark;
-            Benchmark->import( ':hireswallclock' );
-            print STDERR "\n";
-            print STDERR Benchmark::timestr(
-                Benchmark::timeit( $_[1] // 1, $_[0] ) );
-            print STDERR "\n";
+        n => sub {
+            if ( !$imported{$caller}{"Benchmark"}++ ) {
+                require Benchmark;
+                Benchmark->import( ':hireswallclock' );
+            }
+
+            my ( $arg, $times ) = @_;
+            my $subs =
+                ( ref $arg eq "CODE" )
+              ? { "test" => $arg }
+              : $arg;
+            $times //= 1;
+
+            Benchmark::cmpthese( $times, $subs );
         },
 
         # Profiling.
         prof => sub {
-            require Tiny::Prof;
+            if ( !$imported{$caller}{"Tiny::Prof"}++ ) {
+                require Tiny::Prof;
+            }
             Tiny::Prof->run(
                 Name => 'Test',
                 @_,
@@ -299,20 +335,26 @@ sub import {
 
         # Json.
         j => sub {
-            require Mojo::JSON;
+            if ( !$imported{$caller}{"Mojo::JSON"}++ ) {
+                require Mojo::JSON;
+            }
             Mojo::JSON::j( @_ );
         },
 
         # XML/HTML.
         x => sub {
-            require Mojo::DOM;
+            if ( !$imported{$caller}{"Mojo::DOM"}++ ) {
+                require Mojo::DOM;
+            }
             Mojo::DOM->new( @_ );
         },
 
         # YAML.
         yml => sub {
+            if ( !$imported{$caller}{"YAML::XS"}++ ) {
+                require YAML::XS;
+            }
             my ( $thing ) = @_;
-            require YAML::XS;
             ref $thing
               ? YAML::XS::Dump( $thing )
               : YAML::XS::Load( $thing );
@@ -324,13 +366,17 @@ sub import {
 
         # String Object.
         b => sub {
-            require Mojo::ByteStream;
+            if ( !$imported{$caller}{"Mojo::ByteStream"}++ ) {
+                require Mojo::ByteStream;
+            }
             Mojo::ByteStream::b( @_ );
         },
 
         # Array Object.
         c => sub {
-            require Mojo::Collection;
+            if ( !$imported{$caller}{"Mojo::Collection"}++ ) {
+                require Mojo::Collection;
+            }
             Mojo::Collection::c( @_ );
         },
 
@@ -340,7 +386,9 @@ sub import {
 
         # File Object.
         f => sub {
-            require Mojo::File;
+            if ( !$imported{$caller}{"Mojo::File"}++ ) {
+                require Mojo::File;
+            }
             Mojo::File::path( @_ );
         },
 
@@ -350,49 +398,58 @@ sub import {
 
         # Print.
         say => sub {
-            print @_ ? @_ : $_;
-            print "\n";
+            CORE::say( @_ ? @_ : ( $_ ) );
         },
 
         # Pretty Print.
         p => sub {
-            require Data::Printer;
-            Data::Printer->import(
-                use_prototypes => 0,
-                show_dualvar   => "off",
-                hash_separator => " => ",
-                end_separator  => 1,
-                show_refcount  => 1,
-            );
+            if ( !$imported{$caller}{"Data::Printer"}++ ) {
+                require Data::Printer;
+                Data::Printer->import(
+                    use_prototypes => 0,
+                    show_dualvar   => "off",
+                    hash_separator => " => ",
+                    end_separator  => 1,
+                    show_refcount  => 1,
+                );
+            }
             p( @_ );
         },
         np => sub {
-            require Data::Printer;
-            Data::Printer->import(
-                use_prototypes => 0,
-                show_dualvar   => "off",
-                hash_separator => " => ",
-                end_separator  => 1,
-                show_refcount  => 1,
-            );
+            if ( !$imported{$caller}{"Data::Printer"}++ ) {
+                require Data::Printer;
+                Data::Printer->import(
+                    use_prototypes => 0,
+                    show_dualvar   => "off",
+                    hash_separator => " => ",
+                    end_separator  => 1,
+                    show_refcount  => 1,
+                );
+            }
             np( @_ );
         },
 
         # Dumper.
         d => sub {
-            require Mojo::Util;
+            if ( !$imported{$caller}{"Mojo::Util"}++ ) {
+                require Mojo::Util;
+            }
             print Mojo::Util::dumper( @_ );
         },
 
         # Dump C stuctures.
         dd => sub {
-            require Devel::Peek;
+            if ( !$imported{$caller}{"Devel::Peek"}++ ) {
+                require Devel::Peek;
+            }
             Devel::Peek::Dump( @_ );
         },
 
         # Color.
         dye => sub {
-            require Term::ANSIColor;
+            if ( !$imported{$caller}{"Term::ANSIColor"}++ ) {
+                require Term::ANSIColor;
+            }
             Term::ANSIColor::colored( @_ );
         },
 
@@ -402,7 +459,9 @@ sub import {
 
         # GET request.
         g => sub {
-            require Mojo::UserAgent;
+            if ( !$imported{$caller}{"Mojo::UserAgent"}++ ) {
+                require Mojo::UserAgent;
+            }
             my $UA = Mojo::UserAgent->new;
             $UA->max_redirects( 10 ) unless defined $ENV{MOJO_MAX_REDIRECTS};
             $UA->proxy->detect       unless defined $ENV{MOJO_PROXY};
@@ -411,7 +470,9 @@ sub import {
 
         # URL.
         l => sub {
-            require Mojo::URL;
+            if ( !$imported{$caller}{"Mojo::URL"}++ ) {
+                require Mojo::URL;
+            }
             Mojo::URL->new( @_ );
         },
 
@@ -420,8 +481,10 @@ sub import {
         ######################################
 
         pod => sub {
-            require App::Pod;
-            App::Pod->import;
+            if ( !$imported{$caller}{"App::Pod"}++ ) {
+                require App::Pod;
+                App::Pod->import;
+            }
 
             local @ARGV = @_;
             App::Pod->run;

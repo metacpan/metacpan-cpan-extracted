@@ -2,6 +2,7 @@ package OpenSearch::Helper;
 use strict;
 use warnings;
 use feature qw(signatures);
+no warnings qw(experimental::signatures);
 use Moose::Role;
 use JSON::XS;
 use Data::Dumper;

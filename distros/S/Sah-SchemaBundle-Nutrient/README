@@ -2,7 +2,7 @@ NAME
     Sah::SchemaBundle::Nutrient - Sah schemas related to nutrients
 
 VERSION
-    This document describes version 0.001 of Sah::SchemaBundle::Nutrient
+    This document describes version 0.002 of Sah::SchemaBundle::Nutrient
     (from Perl distribution Sah-SchemaBundle-Nutrient), released on
     2024-05-30.
 

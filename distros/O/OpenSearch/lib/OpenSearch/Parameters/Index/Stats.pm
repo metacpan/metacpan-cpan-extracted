@@ -16,7 +16,7 @@ has 'index' => (
   }
 );
 
-has 'metrics' => (
+has 'metric' => (
   is  => 'rw',
   isa => 'Str',
 
@@ -120,7 +120,7 @@ has 'include_segment_file_sizes' => (
 
 # TODO: Handle ARRAYREF getter for path parameters. i.e.: metrics
 around [
-  qw/index metrics expand_wildcards fields completions_fields fielddata_fields forbid_closed_indices groups level include_segment_file_sizes
+  qw/index metric expand_wildcards fields completions_fields fielddata_fields forbid_closed_indices groups level include_segment_file_sizes
   /
 ] => sub {
   my $orig = shift;

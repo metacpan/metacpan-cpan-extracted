@@ -17,8 +17,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Sah::SchemaBundle::Nutrient",
   "PREREQ_PM" => {
+    "Complete::Nutrient" => 0,
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
-    "TableData::Health::Nutrient" => 0,
+    "TableData::Health::Nutrient" => "0.003",
     "strict" => 0,
     "warnings" => 0
   },
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,11 +37,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Complete::Nutrient" => 0,
   "Data::Sah::Compiler::perl::TH::str" => "0.914",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "TableData::Health::Nutrient" => 0,
+  "TableData::Health::Nutrient" => "0.003",
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

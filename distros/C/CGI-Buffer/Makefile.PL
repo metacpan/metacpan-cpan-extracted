@@ -42,10 +42,11 @@ WriteMakefile(
 		 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 			? ('LICENSE'=> 'GPL')
 			: ()),
-	PL_FILES						=> {},
+	PL_FILES	=> {},
 	TEST_REQUIRES => {
 		'autodie' => 0,
 		'Test::Most' => 0,
+		'Test::Needs' => 0,
 		# 'Test::NoWarnings' => 0,
 		'Test::TempDir::Tiny' => 0,
 		'DateTime' => 0,

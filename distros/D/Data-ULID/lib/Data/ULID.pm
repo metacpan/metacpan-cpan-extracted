@@ -3,14 +3,16 @@ package Data::ULID;
 use strict;
 use warnings;
 
-our $VERSION = '1.2.1';
+our $VERSION = '1.3';
 
 use base qw(Exporter);
 our @EXPORT_OK = qw/ulid binary_ulid ulid_date ulid_to_uuid uuid_to_ulid/;
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
 use Time::HiRes qw/time/;
-use Crypt::PRNG qw/random_bytes/;
+
+use Bytes::Random::Secure::Tiny;
+my $rng = Bytes::Random::Secure::Tiny->new;
 
 use constant HAS_DATETIME => eval { require DateTime; 1 };
 
@@ -101,7 +103,7 @@ sub _ulid {
         }
     }
 
-    return (_fix_ts($ts || time()), random_bytes(10));
+    return (_fix_ts($ts || time()), $rng->bytes(10));
 }
 
 sub _pack {
@@ -257,7 +259,7 @@ Timestamp can always be easily extracted if so desired.
 
 =item *
 
-Limited compatibility with UUIDS, since both are 128-bit formats.
+Limited compatibility with UUIDs, since both are 128-bit formats.
 Some conversion back and forth is possible.
 
 =back

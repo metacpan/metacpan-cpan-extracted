@@ -2,9 +2,9 @@
 package Sah::SchemaR::nutrient::symbol;
 
 our $DATE = '2024-05-30'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
-our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\n",examples=>[{summary=>"Empty string",valid=>0,value=>""},{summary=>"Unknown nutrient",valid=>0,value=>"X"},{valid=>1,value=>"VD"},{summary=>"Case matters",valid=>0,value=>"energy"}],in=>["VA","VD","VE","VK","VB1","VB2","VB3","VB5","VB6","VB9","VB12","VB7","VB4","VC","Ca","P","Mg","Fe","I","Zn","Se","Mn","F","Cr","K","Na","Cl","Cu","Energy","Protein","Total_Fat","Saturated_Fat","Cholesterol","Linoleic_Acid","Alpha_Linoleic_Acid","Carbohydrate","Dietary_Fiber","L_Carnitine","Myo_Inositol"],summary=>"A known nutrient symbol, from TableData::Health::Nutrient","x.in.summaries"=>["Vitamin A","Vitamin D","Vitamin E","Vitamin K","Vitamin B1","Vitamin B2","Vitamin B3","Pantothenic acid","Vitamin B6","Folate","Vitamin B12","Biotin","Choline","Vitamin C","Calcium","Phosphorus","Magnesium","Iron","Iodium","Zinc","Selenium","Mangan","Fluorine","Chromium","Potassium","Sodium","Chlorine","Copper","Energy","Protein","Total fat","Saturated fat","Cholesterol","Linoleic acid","\x{251}-linoleic acid","Total carbohydrate","Dietary fiber","L-Carnitine","Myo-Inositol"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\n",examples=>[{summary=>"Empty string",valid=>0,value=>""},{summary=>"Unknown nutrient",valid=>0,value=>"X"},{valid=>1,value=>"VD"},{summary=>"Case matters",valid=>0,value=>"energy"}],in=>["VA","VD","VE","VK","VB1","VB2","VB3","VB5","VB6","VB9","VB12","VB7","VB4","VC","Ca","P","Mg","Fe","I","Zn","Se","Mn","F","Cr","K","Na","Cl","Cu","Energy","Protein","Total_Fat","Saturated_Fat","Cholesterol","Linoleic_Acid","Alpha_Linoleic_Acid","Carbohydrate","Dietary_Fiber","L_Carnitine","Myo_Inositol"],summary=>"A known nutrient symbol, from TableData::Health::Nutrient","x.completion"=>"nutrient_symbol"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: A known nutrient symbol, from TableData::Health::Nutrient
@@ -21,7 +21,7 @@ Sah::SchemaR::nutrient::symbol - A known nutrient symbol, from TableData::Health
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::nutrient::symbol (from Perl distribution Sah-SchemaBundle-Nutrient), released on 2024-05-30.
+This document describes version 0.002 of Sah::SchemaR::nutrient::symbol (from Perl distribution Sah-SchemaBundle-Nutrient), released on 2024-05-30.
 
 =head1 DESCRIPTION
 

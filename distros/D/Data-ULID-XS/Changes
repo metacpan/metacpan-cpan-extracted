@@ -1,5 +1,10 @@
 Revision history for Perl extension Data::ULID::XS.
 
+1.000 Tue Jun 4 2024
+	- Update docs
+	- Maintenance work
+	- No longer considered beta quality
+
 0.005 Sun Dec 4 2022
 	- Make tests more resistant to slow ulid generation times
 

@@ -566,7 +566,7 @@ OUTPUT: {
 
 	close $tmp;
 
-	$ENV{'HTTP_IF_MODIFIED_SINCE'} = DateTime->now();
+	my $t = $ENV{'HTTP_IF_MODIFIED_SINCE'} = DateTime->now();
 
 	open($fin, '-|', "$^X -Iblib/lib $filename");
 
@@ -577,7 +577,7 @@ OUTPUT: {
 
 	if($output !~ /Status: 304 Not Modified/mi) {
 		# Track https://www.cpantesters.org/cpan/report/cbb57c6a-bf6b-11ed-b310-26e96d8775ea
-		diag($output);
+		diag("$t:\n\t$output");
 	}
 
 	ok($output !~ /ETag: "([A-Za-z0-F0-f]{32})"/m);

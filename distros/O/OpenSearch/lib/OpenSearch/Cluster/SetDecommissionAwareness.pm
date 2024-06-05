@@ -2,6 +2,7 @@ package OpenSearch::Cluster::SetDecommissionAwareness;
 use strict;
 use warnings;
 use feature qw(signatures);
+no warnings qw(experimental::signatures);
 use Moose;
 
 with 'OpenSearch::Parameters::Cluster::SetDecommissionAwareness';

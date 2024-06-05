@@ -1,5 +1,5 @@
 package Data::ULID::XS;
-$Data::ULID::XS::VERSION = '0.005';
+$Data::ULID::XS::VERSION = '1.000';
 use strict;
 use warnings;
 
@@ -37,26 +37,28 @@ This module replaces some parts of L<Data::ULID> that are performance-critical
 with XS counterparts. Its interface is the same as Data::ULID, but you get free
 XS speedups.
 
-B<Beta quality>: while this module works well in general cases, it may also
-contain errors common to C code like memory leaks or access violations. Please
-do report if you encounter any problems.
-
 =head1 FUNCTIONS
 
 Same as L<Data::ULID>. All functions should work exactly the same, but C<ulid>
 and C<binary_ulid> called with no arguments are reimplemented in XS.
 
+=head1 RNG backend
+
+The module uses L<CryptX> to quickly generate secure randomness. The default
+algorithm used is C<Sober128>. You can change that by replacing the
+C<$Data::ULID::XS::RNG> variable with a different L<Crypt::PRNG> object.
+
 =head1 BENCHMARK
 
-Comparing speeds of Perl and XS implementations:
+Comparing ULID generation speeds of Perl and XS implementations:
 
 	                                 Rate Data::ULID::ulid Data::ULID::binary_ulid Data::ULID::XS::ulid Data::ULID::XS::binary_ulid
-	Data::ULID::ulid              97342/s               --                    -68%                 -88%                        -91%
-	Data::ULID::binary_ulid      301501/s             210%                      --                 -62%                        -71%
-	Data::ULID::XS::ulid         793885/s             716%                    163%                   --                        -24%
-	Data::ULID::XS::binary_ulid 1043509/s             972%                    246%                  31%                          --
+	Data::ULID::ulid              85339/s               --                    -39%                 -91%                        -93%
+	Data::ULID::binary_ulid      140302/s              64%                      --                 -85%                        -89%
+	Data::ULID::XS::ulid         944258/s            1006%                    573%                   --                        -26%
+	Data::ULID::XS::binary_ulid 1273091/s            1392%                    807%                  35%                          --
 
-Benchmark ran on Thinkpad T480 (i7-8650U) and FreeBSD 12.3.
+Benchmark ran on Thinkpad T480 (i7-8650U) and FreeBSD 14.0.
 
 =head1 SEE ALSO
 

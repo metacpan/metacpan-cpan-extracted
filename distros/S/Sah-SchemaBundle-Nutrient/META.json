@@ -25,16 +25,19 @@
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
+            "Test::Rinci" : "0.151",
             "Test::Sah::Schema" : "0.016"
          },
          "x_spec" : {
+            "Rinci" : "v1.1.102",
             "Sah::SchemaBundle" : "v0.1.0"
          }
       },
       "runtime" : {
          "requires" : {
+            "Complete::Nutrient" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0.914",
-            "TableData::Health::Nutrient" : "0",
+            "TableData::Health::Nutrient" : "0.003",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -50,17 +53,21 @@
       }
    },
    "provides" : {
+      "Perinci::Sub::XCompletion::nutrient_symbol" : {
+         "file" : "lib/Perinci/Sub/XCompletion/nutrient_symbol.pm",
+         "version" : "0.002"
+      },
       "Sah::Schema::nutrient::symbol" : {
          "file" : "lib/Sah/Schema/nutrient/symbol.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Sah::SchemaBundle::Nutrient" : {
          "file" : "lib/Sah/SchemaBundle/Nutrient.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Sah::SchemaR::nutrient::symbol" : {
          "file" : "lib/Sah/SchemaR/nutrient/symbol.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -75,7 +82,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-SchemaBundle-Nutrient"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

@@ -2,6 +2,7 @@ package OpenSearch::Index;
 use strict;
 use warnings;
 use feature qw(signatures);
+no warnings qw(experimental::signatures);
 use Moose;
 use Data::Dumper;
 use OpenSearch::Index::SetAliases;

@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Moose;
 use feature qw(signatures);
+no warnings qw(experimental::signatures);
 use Data::Dumper;
 
 use OpenSearch::Cluster::GetSettings;
