@@ -9,7 +9,7 @@ use File::Temp ();
 use Path::Tiny ();
 
 # ABSTRACT: Plugin to extract a tarball using Archive::Tar
-our $VERSION = '2.80'; # VERSION
+our $VERSION = '2.83'; # VERSION
 
 
 has '+format' => 'tar';
@@ -19,7 +19,7 @@ sub handles
 {
   my(undef, $ext) = @_;
 
-  return 1 if $ext =~ /^(tar|tar.gz|tar.bz2|tbz|taz)$/;
+  return 1 if $ext =~ /^(tar|tar\.gz|tar\.bz2|tar\.xz|tbz|taz|txz)$/;
 
   return 0;
 }
@@ -36,6 +36,10 @@ sub available
   elsif($ext eq 'tar.bz2')
   {
     return !! eval { require Archive::Tar; Archive::Tar->has_bzip2_support && __PACKAGE__->_can_bz2 };
+  }
+  elsif($ext eq 'tar.xz')
+  {
+    return !! eval { require Archive::Tar; Archive::Tar->has_xz_support };
   }
   else
   {
@@ -56,6 +60,11 @@ sub init
   {
     $meta->add_requires('share' => 'IO::Uncompress::Bunzip2' => 0);
     $meta->add_requires('share' => 'IO::Compress::Bzip2' => 0);
+  }
+  elsif($self->format eq 'tar.xz' || $self->format eq 'txz')
+  {
+    $meta->add_requires('share' => 'Archive::Tar' => 2.34);
+    $meta->add_requires('share' => 'IO::Uncompress::UnXz' => 0);
   }
 
   $meta->register_hook(
@@ -103,7 +112,7 @@ Alien::Build::Plugin::Extract::ArchiveTar - Plugin to extract a tarball using Ar
 
 =head1 VERSION
 
-version 2.80
+version 2.83
 
 =head1 SYNOPSIS
 

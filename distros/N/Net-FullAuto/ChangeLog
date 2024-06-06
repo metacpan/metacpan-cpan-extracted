@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2024-06-05  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000651 released
+
+        * Fix identityfile login to aws ec2
+
 2024-06-04  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000650 released

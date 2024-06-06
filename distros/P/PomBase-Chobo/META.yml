@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/pombase/chobo/issues
   homepage: https://github.com/pombase/chobo
   repository: https://github.com/pombase/chobo.git
-version: '0.039'
+version: '0.040'
 x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

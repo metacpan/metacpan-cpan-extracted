@@ -33,10 +33,10 @@ sub ACTION_constant_files {
 ##  my ( $self, @args ) = @_;
     my ( $self ) = @_;		# Arguments not used
     $self->up_to_date(
-	'Constant.PL',
+	'tools/Constant.PL',
 	[ qw{ constant-c.inc constant-h.inc constant-xs.inc } ],
     ) and return;
-    $self->do_system( $self->perl(), 'Constant.PL' );
+    $self->do_system( $self->perl(), 'tools/Constant.PL' );
     return;
 }
 
@@ -140,7 +140,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009, 2011-2023 by Thomas R. Wyant, III
+Copyright (C) 2009, 2011-2024 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

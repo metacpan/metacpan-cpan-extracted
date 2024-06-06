@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package Object::Pad::FieldAttr::Checked 0.06;
+package Object::Pad::FieldAttr::Checked 0.07;
 
 use v5.14;
 use warnings;
@@ -87,20 +87,18 @@ expression must yield either an object reference, a code reference, or a
 string containing the name of a package. In the case of an object or package,
 a method called C<check> must exist on it.
 
-During the string C<eval()> of the expression, the C<strict 'subs'> pragma is
-specifically disabled, allowing a bareword to be used as the name of a
-package. This feature may be removed in future, so be sure to quote package
-names if required.
+If using a plain package name as a checker, be sure to quote package names so
+it will not upset C<use strict>.
 
    field $x :Checked('CheckerPackage');
 
 At runtime, this constraint checker is used every time an attempt is made to
 assign a value to the field I<from outside the object class>, whether that is
-from C<:param> initialisation, or invoking a C<:writer> or C<:accessor>. The
-checker is used as the invocant for invoking a C<check> method, and the new
-value for  the field is passed as an argument. If the method returns true, the
-assignment is allowed. If false, it is rejected with an exception and the
-field itself remains unmodified.
+from C<:param> initialisation, or invoking a C<:writer>, C<:accessor> or
+C<:mutator>. The checker is used as the invocant for invoking a C<check>
+method, and the new value for  the field is passed as an argument. If the
+method returns true, the assignment is allowed. If false, it is rejected with
+an exception and the field itself remains unmodified.
 
    $ok = $checkerobj->check( $value );  # if an object
 
@@ -141,17 +139,6 @@ sub unimport
 {
    delete $^H{"Object::Pad::FieldAttr::Checked/Checked"};
 }
-
-=head1 TODO
-
-=over 4
-
-=item *
-
-Support C<:mutator> accessors as well. This is a bit harder because lvalue
-magic.
-
-=back
 
 =head1 SEE ALSO
 

@@ -5,7 +5,7 @@ use warnings;
 use Module::Build;
 use Object::Pad::ExtensionBuilder;
 
-my @extra_compiler_flags = qw( -Ihax );
+my @extra_compiler_flags = qw( -Ihax -Iinclude );
 
 push @extra_compiler_flags, qw( -DDEBUGGING=-g ) if $^X =~ m|/debugperl|;
 
@@ -33,6 +33,7 @@ my $build = Module::Build->new(
    create_readme  => 1,
 
    extra_compiler_flags => \@extra_compiler_flags,
+   c_source => [ "src/" ],
 );
 
 Object::Pad::ExtensionBuilder->extend_module_build( $build );

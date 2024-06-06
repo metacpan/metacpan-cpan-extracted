@@ -36,7 +36,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.039'; # VERSION
+our $VERSION = '0.040'; # VERSION
 
 use Mouse;
 use FileHandle;
@@ -60,6 +60,11 @@ sub _finish_stanza
   my $metadata_ref = shift;
 
   if ($current->{is_obsolete} && $current->{is_relationshiptype}) {
+    return;
+  }
+
+  if (!defined $current->{name}) {
+    warn "term without a name tag ignored: ", $current->{id}, "\n";
     return;
   }
 

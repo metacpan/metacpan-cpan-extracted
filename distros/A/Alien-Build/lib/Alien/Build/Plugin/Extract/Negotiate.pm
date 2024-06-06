@@ -10,7 +10,7 @@ use Alien::Build::Plugin::Extract::CommandLine;
 use Alien::Build::Plugin::Extract::Directory;
 
 # ABSTRACT: Extraction negotiation plugin
-our $VERSION = '2.80'; # VERSION
+our $VERSION = '2.83'; # VERSION
 
 
 has '+format' => 'tar';
@@ -60,7 +60,23 @@ sub pick
       return 'Extract::CommandLine';
     }
   }
-  elsif($format eq 'tar.xz' || $format eq 'tar.Z')
+  elsif($format eq 'tar.xz')
+  {
+    # The windows version of tar.exe (which is based on BSD tar) will try to use external
+    # program xz to decompress tar.xz files if it is available.  The default windows
+    # install does not have this in the PATH, but if it IS in the PATH then it often
+    # or always can hang, so the pure Perl Archive::Tar is more reliable on that platform,
+    # but will require a newer version of Archive::Tar and IO::Uncompress::UnXz
+    if(Alien::Build::Plugin::Extract::ArchiveTar->available('tar.xz') || $^O eq 'MSWin32')
+    {
+      return 'Extract::ArchiveTar';
+    }
+    else
+    {
+      return 'Extract::CommandLine';
+    }
+  }
+  elsif($format eq 'tar.Z')
   {
     return 'Extract::CommandLine';
   }
@@ -92,7 +108,7 @@ Alien::Build::Plugin::Extract::Negotiate - Extraction negotiation plugin
 
 =head1 VERSION
 
-version 2.80
+version 2.83
 
 =head1 SYNOPSIS
 

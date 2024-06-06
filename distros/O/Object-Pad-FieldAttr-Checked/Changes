@@ -1,5 +1,10 @@
 Revision history for Object-Pad-FieldAttr-Checked
 
+0.07    2024-06-05
+        [CHANGES]
+         * Also support fields with `:mutator`
+         * Don't disable `strict subs`
+
 0.06    2023-09-05
         [CHANGES]
          * Permit checker values to be plain coderefs, invoked on a single

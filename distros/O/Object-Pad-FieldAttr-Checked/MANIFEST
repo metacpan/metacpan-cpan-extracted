@@ -1,7 +1,9 @@
 .editorconfig
 Build.PL
 Changes
+hax/compilerun_sv.c.inc
 hax/optree-additions.c.inc
+include/check.h
 lib/Object/Pad/FieldAttr/Checked.pm
 lib/Object/Pad/FieldAttr/Checked.xs
 LICENSE
@@ -9,6 +11,7 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
+src/check.c
 t/00use.t
 t/01checked.t
 t/10types-standard.t

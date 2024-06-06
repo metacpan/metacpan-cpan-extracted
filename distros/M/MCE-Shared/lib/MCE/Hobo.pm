@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.887';
+our $VERSION = '1.888';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -114,8 +114,27 @@ sub init {
       $_LIST->{ $pkg } = MCE::Hobo::_ordhash->new();
       $_DELY->{ $pkg } = MCE::Hobo::_delay->new( $chnl );
       $_DATA->{ $pkg } = MCE::Hobo::_hash->new();
-      $_DATA->{"$pkg:seed"} = int(rand() * 1e9);
-      $_DATA->{"$pkg:id"  } = 0;
+      $_DATA->{"$pkg:id"} = 0;
+
+      # The PDL module 2.062 ~ 2.089 exports its own srand() function, that
+      # silently clobbers Perl's srand function, and does not seed Perl's
+      # pseudo-random generator. https://perlmonks.org/?node_id=11159773
+
+      if ( $INC{'PDL/Primitive.pm'} && PDL::Primitive->can('srand') ) {
+         # Call PDL's random() function if exported i.e. use PDL.
+
+         my $caller = caller(); local $@;
+         $caller = caller(1) if ( $caller =~ /^MCE/ );
+         $caller = caller(2) if ( $caller =~ /^MCE/ );
+         $caller = caller(3) if ( $caller =~ /^MCE/ );
+
+         $_DATA->{"$pkg:seed"} = eval "$caller->can('random')"
+            ? int(PDL::Primitive::random() * 1e9)
+            : int(CORE::rand() * 1e9);
+      }
+      else {
+         $_DATA->{"$pkg:seed"} = int(CORE::rand() * 1e9);
+      }
 
       $MCE::_GMUTEX->unlock() if ( $_tid && $MCE::_GMUTEX );
    }
@@ -247,18 +266,22 @@ sub create {
          $_DATA->{ $_SELF->{PKG} }->set('S'.$$, '') unless $self->{IGNORE};
          CORE::kill($killed, $$) if $killed;
 
+         MCE::Child->_clear() if $INC{'MCE/Child.pm'};
+         MCE::Hobo->_clear() if $INC{'MCE/Hobo.pm'};
+
          # Sets the seed of the base generator uniquely between workers.
          # The new seed is computed using the current seed and ID value.
          # One may set the seed at the application level for predictable
-         # results. Ditto for Math::Prime::Util, Math::Random, and
+         # results. Ditto for PDL, Math::Prime::Util, Math::Random, and
          # Math::Random::MT::Auto.
 
-         srand( abs($_DATA->{"$pkg:seed"} - ($id * 100000)) % 2147483560 );
+         {
+            my $seed = abs($_DATA->{"$pkg:seed"} - ($id * 100000)) % 2147483560;
 
-         if ( $INC{'Math/Prime/Util.pm'} ) {
-            Math::Prime::Util::srand(
-                abs($_DATA->{"$pkg:seed"} - ($id * 100000)) % 2147483560
-            );
+            CORE::srand($seed);
+            PDL::srand($seed) if $INC{'PDL.pm'} && PDL->can('srand'); # PDL 2.062 ~ 2.089
+            PDL::srandom($seed) if $INC{'PDL.pm'} && PDL->can('srandom'); # PDL 2.089_01+
+            Math::Prime::Util::srand($seed) if $INC{'Math/Prime/Util.pm'};
          }
 
          if ( $INC{'Math/Random.pm'} ) {
@@ -985,7 +1008,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.887
+This document describes MCE::Hobo version 1.888
 
 =head1 SYNOPSIS
 

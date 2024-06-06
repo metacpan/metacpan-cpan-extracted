@@ -24,12 +24,14 @@ t/data/mini_cl.obo
 t/data/mini_go.obo
 t/data/mini_pro.obo
 t/data/mini_test_fypo.obo
+t/data/mondo_alt_bug.obo
 t/data/single_term.obo
 t/data/zfa-test.obo
 t/fake_db.t
 t/lib/ChoboTest/FakeHandle.pm
 t/lib/ChoboTest/FakeStatement.pm
 t/merge_terms.t
+t/obsolete_alt.t
 t/ontology_term.t
 t/read_obo.t
 t/read_obo_alt_id_clash.t

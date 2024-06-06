@@ -49,3 +49,6 @@ const char* spvm_socket_strerror(SPVM_ENV* env, SPVM_VALUE* stack, int32_t error
   return ret_socket_strerror;
 }
 
+const char* spvm_socket_strerror_nolen(SPVM_ENV* env, SPVM_VALUE* stack, int32_t error_number) {
+  return spvm_socket_strerror(env, stack, error_number, 0);
+}

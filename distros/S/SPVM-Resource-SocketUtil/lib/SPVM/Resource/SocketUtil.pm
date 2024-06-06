@@ -1,6 +1,6 @@
 package SPVM::Resource::SocketUtil;
 
-our $VERSION = "1.001";
+our $VERSION = "1.002";
 
 1;
 
@@ -10,13 +10,13 @@ SPVM::Resource::SocketUtil - Resource for Socket Utilities
 
 =head1 Description
 
-SPVM::Resource::SocketUtil is a L<resource|SPVM::Document::Resource> of L<SPVM> for socket utilities.
+Resource::SocketUtil class in L<SPVM> is a L<resource|SPVM::Document::Resource> for socket utilities.
 
 =head1 Usage
 
 MyClass.config:
   
-  my $config = SPVM::Builder::Config->new_c99(file => __FILE__);
+  my $config = SPVM::Builder::Config->new_gnu99(file => __FILE__);
   
   $config->use_resource('Resource::SocketUtil');
   
@@ -38,15 +38,15 @@ The C language
 
 =head1 Language Specification
 
-C99
+GNU C99
 
 =head1 Required Libraries
 
 =over 2
 
-=item * C<wsock32> (Only on Windows)
+=item * C<wsock32> (Only in Windows)
 
-=item * C<ws2_32> (Only on Windows)
+=item * C<ws2_32> (Only in Windows)
 
 =back
 
@@ -54,7 +54,7 @@ C99
 
 =over 2
 
-=item * C<spvm_socket_util.h>
+=item * L<spvm_socket_util.h|https://metacpan.org/dist/SPVM-Resource-SocketUtil/source/lib/SPVM/Resource/SocketUtil.native/include/spvm_socket_util.h>
 
 =back
 

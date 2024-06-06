@@ -8,7 +8,7 @@ use Config;
 use File::Which qw( which );
 
 # ABSTRACT: Core setup plugin
-our $VERSION = '2.80'; # VERSION
+our $VERSION = '2.83'; # VERSION
 
 
 sub init
@@ -229,6 +229,7 @@ sub _cpu_arch {
     }
   } elsif( $Config{archname} =~ /
       \b aarch64 \b
+    | \b arm64 \b    # arm64-freebsd (FreeBSD can have either aarch64 or arm64)
     /ix ) {
     $arch = { name => 'aarch64' };   # ARM64
   } elsif( $Config{archname} =~ m/
@@ -265,7 +266,7 @@ Alien::Build::Plugin::Core::Setup - Core setup plugin
 
 =head1 VERSION
 
-version 2.80
+version 2.83
 
 =head1 SYNOPSIS
 

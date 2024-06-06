@@ -1,0 +1,16 @@
+format-version: 1.2
+data-version: releases/2024-06-04
+ontology: mondo
+
+[Term]
+id: GO:0003674
+name: molecular_function
+
+[Term]
+id: GO:0005554
+name: OBSOLETE molecular_function
+is_obsolete: true
+replaced_by: GO:0003674
+
+
+

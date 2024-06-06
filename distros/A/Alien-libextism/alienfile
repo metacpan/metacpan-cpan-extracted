@@ -1,0 +1,22 @@
+use alienfile;
+
+probe [ 'pkg-config --exists extism' ];
+
+share {
+    start_url 'https://get.extism.org/cli';
+    plugin 'Download';
+    plugin 'Extract' => 'f';
+    build [
+        'mkdir -p %{.install.prefix}/bin',
+        'sh cli -y -o %{.install.prefix}/bin',
+        '%{.install.prefix}/bin/extism lib install --prefix %{.install.prefix}'
+    ];
+    plugin 'Gather::IsolateDynamic';
+};
+
+gather [
+    [ 'pkg-config --cflags extism', \'%{.runtime.cflags}'  ],
+    [ 'pkg-config --libs extism', \'%{.runtime.libs}'    ],
+    [ 'pkg-config --cflags --static extism-static', \'%{.runtime.cflags_static}'  ],
+    [ 'pkg-config --libs --static extism-static', \'%{.runtime.libs_static}'    ],
+];

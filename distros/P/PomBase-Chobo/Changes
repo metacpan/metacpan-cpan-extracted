@@ -1,5 +1,8 @@
 Revision history for PomBase-Chobo
 
+0.040     2024-06-06 16:17:14
+          Fix merging bug when an alt_id matches an obsolete term
+
 0.039     2023-06-17 22:14:38
           Parse and store dbxrefs from the xref: lines
 

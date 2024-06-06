@@ -1,0 +1,49 @@
+---
+abstract: 'find or build and install libextism with development dependencies'
+author:
+  - 'Extism Authors <extism@cpan.org>'
+build_requires:
+  Alien::Build::MM: '0.25'
+  Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
+  HTTP::Tiny: '0.044'
+  IO::Socket::SSL: '1.56'
+  Mozilla::CA: '0'
+  Net::SSLeay: '1.49'
+  Test::More: '0'
+  URI: '0'
+configure_requires:
+  Alien::Build: '1.19'
+  Alien::Build::MM: '0.25'
+  ExtUtils::MakeMaker: '0'
+  Sort::Versions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-libextism
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Build: '0.25'
+  perl: '5.016'
+resources:
+  bugtracker: https://github.com/extism/perl-sdk/issues
+  homepage: https://extism.org
+  repository: https://github.com/extism/perl-sdk.git
+version: v0.1.0
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.80'
+  requires:
+    share:
+      Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
+      URI: '0'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

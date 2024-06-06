@@ -13,7 +13,8 @@ package Numerical {
 }
 
 class CheckerAsPackage {
-   field $x :Checked('Numerical') :param :reader :writer :accessor(acc_x);
+   field $x :Checked('Numerical') :param
+      :reader :writer :accessor(acc_x) :mutator(mut_x);
 }
 
 # Construction time
@@ -51,6 +52,21 @@ class CheckerAsPackage {
       qr/^Field \$x requires a value satisfying :Checked\('Numerical'\) at /,
       '$p->acc_x rejects invalid values' );
    ok( $obj->acc_x, 20, '$obj->acc_x unmodified after rejected ->acc_x' );
+}
+
+# :mutator
+{
+   my $obj = CheckerAsPackage->new( x => 0 );
+
+   is( $obj->mut_x, 0, '$obj->mut_x can read' );
+
+   $obj->mut_x = 20;
+   ok( $obj->mut_x, 20, '$obj->mut_x modified after successful ->mut_x' );
+
+   like( dies { $obj->mut_x = "hello" },
+      qr/^Field \$x requires a value satisfying :Checked\('Numerical'\) at /,
+      '$p->mut_x rejects invalid values' );
+   ok( $obj->mut_x, 20, '$obj->mut_x unmodified after rejected ->mut_x' );
 }
 
 package ArrayRefChecker {

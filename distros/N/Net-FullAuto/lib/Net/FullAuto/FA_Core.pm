@@ -7079,7 +7079,7 @@ sub memnow
 
 sub handle_error
 {
-print "handleerror caller=",caller,"\n";
+
 #my $logreset=1;
 #if ($Net::FullAuto::FA_Core::log) { $logreset=0 }
 #else { $Net::FullAuto::FA_Core::log=1 }
@@ -17940,7 +17940,7 @@ sub ftp
 
 sub ftpcmd
 {
-print "FT FTPCMD CALLER=",caller,"\n";sleep 5;
+
    my @topcaller=caller;
    print "File_Transfer::ftpcmd() CALLER=",
       (join ' ',@topcaller),"\n" if $Net::FullAuto::FA_Core::debug;
@@ -19898,6 +19898,9 @@ END
                   (-1<index $line,'No such file or directory')) {
                die "can\'t open /dev/tty: No such device or address\n";
             } elsif (-1<index $lin,'Authentication succeeded (publickey)') {
+               return $lin,'';
+            } elsif ((-1<index $lin,'Authenticated to ') &&
+                  (-1<index $lin,'using "publickey"')) {
                return $lin,'';
             } elsif (-1<index $lin,'/bin/bash: Operation not permitted') {
                Net::FullAuto::FA_Core::bash_operation_not_permitted(
@@ -27208,6 +27211,7 @@ print $Net::FullAuto::FA_Core::LOG
                            $Net::FullAuto::FA_Core::Hosts{
                               $hostlabel}{'Uname'}='aix';
                         }
+print "DO WE GET HERE????\n";sleep 10;
                         last if $line!~/Last login/i &&
                            $line=~/login[: ]*$|username[: ]*$/i;
                         if ($line=~/(repl\d*)>\s*$/s) {
@@ -27756,7 +27760,11 @@ print $Net::FullAuto::FA_Core::LOG
                   { _cmd_handle=>$cmd_handle,
                     _hostlabel=>[ $hostlabel,'' ] },
                   'set | '.
-                  $Net::FullAuto::FA_Core::gbp->('grep',$cmd_handle,$hostlabel).
+                  $Net::FullAuto::FA_Core::gbp->('grep',
+                  { _cmd_handle=>$cmd_handle,
+                    _cmd_type=>'shell',
+                    _hostlabel=>[ $hostlabel,'' ] },
+                  $hostlabel).
                   'grep SHELL=');
                $shell=~s/SHELL=//;
                $shell=~s/^['"]//;
@@ -31103,6 +31111,12 @@ print $Net::FullAuto::FA_Core::LOG "WE ARE RETURNING ERROR=$eval_error\n"
       if ($wantarray) {
          $stderr=~s/_funkyPrompt_//gs if $stderr &&
             -1<index $stderr,'_funkyPrompt_';
+         my $howmny=Want::howmany()||'';
+         if (!$howmny || $howmny==1) {
+            return $stdout;
+         } elsif ($howmny==2) {
+            return $stdout,$stderr;
+         }
          return $stdout,$stderr,$exitcode;
       } else { return $stdout }
    }

@@ -1,6 +1,12 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.888 Fri Jun 06 04:00:00 EST 2024
+
+  * Apply workaround for PDL::srand in MCE::Hobo. Thank you, PerlMonks.
+    https://www.perlmonks.org/?node_id=11159773
+  * Add PDL::srand (v2.062 ~ v2.089) and PDL::srandom (v2.089_01+).
+
 1.887 Fri May 24 19:00:00 EST 2024
 
   * Improve reaping completed workers in MCE::Hobo.

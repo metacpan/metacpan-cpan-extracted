@@ -59,11 +59,11 @@
    "provides" : {
       "App::ALG" : {
          "file" : "lib/App/ALG.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "App::BPOMUtils::NutritionLabelRef" : {
          "file" : "lib/App/BPOMUtils/NutritionLabelRef.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/perlancar/perl-App-BPOMUtils-NutritionLabelRef"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

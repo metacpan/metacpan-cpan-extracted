@@ -21,7 +21,7 @@ has missing_after                  => 1800;
 has [qw(remove_after stuck_after)] => 172800;
 has tasks                          => sub { {} };
 
-our $VERSION = '10.29';
+our $VERSION = '10.30';
 
 sub add_task {
   my ($self, $name, $task) = @_;
@@ -1171,6 +1171,8 @@ Hubert "depesz" Lubaczewski
 Joel Berger
 
 Paul Williams
+
+Russell Shingleton
 
 Stefan Adams
 

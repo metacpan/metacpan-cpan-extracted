@@ -14,7 +14,7 @@ Alien::Build::Manual::AlienUser - Alien user documentation
 
 =head1 VERSION
 
-version 2.80
+version 2.83
 
 =head1 SYNOPSIS
 

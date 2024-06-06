@@ -1,0 +1,30 @@
+---
+abstract: 'Extism Perl SDK'
+author:
+  - 'Extism Authors <extism@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  Alien::Base::Wrapper: '1.97'
+  Alien::libextism: v0.1.0
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Extism
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.016'
+resources:
+  bugtracker: https://github.com/extism/perl-sdk/issues
+  homepage: https://github.com/extism/perl-sdk
+  repository: https://github.com/extism/perl-sdk.git
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -35,7 +35,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.039'; # VERSION
+our $VERSION = '0.040'; # VERSION
 
 use Mouse;
 use Carp;
@@ -232,6 +232,8 @@ sub merge
   my $self = shift;
   my $other_term = shift;
 
+  my $orig_term = clone $self;
+
   return if $self == $other_term;
 
   my $lc = List::Compare->new([$self->{id}, @{$self->{alt_id}}],
@@ -277,11 +279,11 @@ sub merge
                   "differs from previously ",
                   "seen value (from ", $self->source_file(),
                   " line ", $self->source_file_line_number(), q|) "|,
-                  $self->{$name}, '" ',
+                  $orig_term->{$name}, '" ',
                   qq(- ignoring new value: "$new_field_value"\n\n),
                   "while merging: \n" . $other_term->to_string() . "\n\n",
                   "into existing term:\n",
-                  $self->to_string(), "\n\n";
+                  $orig_term->to_string(), "\n\n";
               }
             }
           } else {

@@ -75,20 +75,19 @@ FIELD ATTRIBUTES
     or a string containing the name of a package. In the case of an object
     or package, a method called check must exist on it.
 
-    During the string eval() of the expression, the strict 'subs' pragma is
-    specifically disabled, allowing a bareword to be used as the name of a
-    package. This feature may be removed in future, so be sure to quote
-    package names if required.
+    If using a plain package name as a checker, be sure to quote package
+    names so it will not upset use strict.
 
        field $x :Checked('CheckerPackage');
 
     At runtime, this constraint checker is used every time an attempt is
     made to assign a value to the field from outside the object class,
-    whether that is from :param initialisation, or invoking a :writer or
-    :accessor. The checker is used as the invocant for invoking a check
-    method, and the new value for the field is passed as an argument. If
-    the method returns true, the assignment is allowed. If false, it is
-    rejected with an exception and the field itself remains unmodified.
+    whether that is from :param initialisation, or invoking a :writer,
+    :accessor or :mutator. The checker is used as the invocant for invoking
+    a check method, and the new value for the field is passed as an
+    argument. If the method returns true, the assignment is allowed. If
+    false, it is rejected with an exception and the field itself remains
+    unmodified.
 
        $ok = $checkerobj->check( $value );  # if an object
     
@@ -117,11 +116,6 @@ FIELD ATTRIBUTES
     module used to claim that even direct assignments would be checked. but
     this gave a false sense of safety if deeply-nested containers were
     involved and modified from within.
-
-TODO
-
-      * Support :mutator accessors as well. This is a bit harder because
-      lvalue magic.
 
 SEE ALSO
 

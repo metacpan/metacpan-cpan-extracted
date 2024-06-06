@@ -19,10 +19,10 @@ name: App-BPOMUtils-NutritionLabelRef
 provides:
   App::ALG:
     file: lib/App/ALG.pm
-    version: '0.001'
+    version: '0.002'
   App::BPOMUtils::NutritionLabelRef:
     file: lib/App/BPOMUtils/NutritionLabelRef.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Data::Sah::Coerce::perl::To_float::From_str::percent: '0'
   Data::Sah::Compiler::perl::TH::bool: '0.914'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils-NutritionLabelRef
   homepage: https://metacpan.org/release/App-BPOMUtils-NutritionLabelRef
   repository: git://github.com/perlancar/perl-App-BPOMUtils-NutritionLabelRef.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

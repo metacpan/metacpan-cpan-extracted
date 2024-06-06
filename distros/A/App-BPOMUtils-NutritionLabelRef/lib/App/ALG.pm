@@ -17,7 +17,7 @@ App::ALG - Shorter alias for App::BPOMUtils::NutritionLabelRef
 
 =head1 VERSION
 
-This document describes version 0.001 of App::ALG (from Perl distribution App-BPOMUtils-NutritionLabelRef), released on 2024-05-30.
+This document describes version 0.002 of App::ALG (from Perl distribution App-BPOMUtils-NutritionLabelRef), released on 2024-05-30.
 
 =head1 DESCRIPTION
 

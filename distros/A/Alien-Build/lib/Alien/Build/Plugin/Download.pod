@@ -14,7 +14,7 @@ Alien::Build::Plugin::Download - Download Alien::Build plugins
 
 =head1 VERSION
 
-version 2.80
+version 2.83
 
 =head1 SYNOPSIS
 

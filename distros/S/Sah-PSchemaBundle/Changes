@@ -1,0 +1,9 @@
+0.1.1   2024-05-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename mod/dist Sah-PSchema{s,Bundle} to be more consistent with
+          others.
+
+
+0.1.0   2020-06-06  Released-By: PERLANCAR
+
+        - First release.

@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+use 5.016;
+use strict;
+use warnings;
+use feature 'say';
+use Extism;
+
+# print Extism Version
+say "Extism version: " . Extism::version() . "\n";
+
+# Should fail with an error message, invalid manifest
+my $notplugin = Extism::Plugin->new('', {wasi => 1}) // "did not load as expected";
+say "notplugin: $notplugin\n";
+
+# load count vowels and test
+my $wasm = do { local(@ARGV, $/) = 'count_vowels.wasm'; <> };
+my $plugin = Extism::Plugin->new($wasm, {wasi => 1});
+my $input = "this is a test";
+say "count_vowels - input: $input";
+my $output = $plugin->call('count_vowels', $input);
+say "count_vowels - output: $output\n";
+
+say "plugin->reset: ". $plugin->reset() . "\n";
+
+# load fail and call run_test, it should fail
+my $failwasm = do { local(@ARGV, $/) = 'fail.wasm'; <> };
+my $failplugin = Extism::Plugin->new($failwasm, {wasi => 1});
+my $failed = $failplugin->call('run_test', "") // "call failed as expected";
+say "failplugin: $failed\n";

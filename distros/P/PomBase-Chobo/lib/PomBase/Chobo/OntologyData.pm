@@ -38,7 +38,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.039'; # VERSION
+our $VERSION = '0.040'; # VERSION
 
 use Mouse;
 
@@ -100,7 +100,7 @@ sub add
     for my $id (@new_term_ids) {
       my $existing_term = $terms_by_id->{$id};
 
-      if (defined $existing_term) {
+      if (defined $existing_term && !$existing_term->{is_obsolete}) {
         if (!grep { $_ == $existing_term } @found_existing_terms) {
           push @found_existing_terms, $existing_term;
         }
