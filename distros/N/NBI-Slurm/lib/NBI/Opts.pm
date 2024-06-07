@@ -313,7 +313,7 @@ NBI::Opts - A class for representing a the SLURM options for NBI::Slurm
 
 =head1 VERSION
 
-version 0.8.2
+version 0.8.6
 
 =head1 SYNOPSIS
 

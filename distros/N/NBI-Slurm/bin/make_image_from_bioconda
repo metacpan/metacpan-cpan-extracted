@@ -8,8 +8,11 @@ use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
 use Term::ANSIColor qw(:constants);
 use NBI::Slurm;
+use Cwd;
 
 my $config = NBI::Slurm::load_config("$ENV{USER}/.nbislurm.config");
+my $current_dir = getcwd();
+my $workdir = $config->{'workdir'} // $current_dir;
 my $output  = undef;
 my $move   = 0;
 my $def_file = undef;
@@ -36,6 +39,10 @@ say STDERR BOLD, GREEN, "Make image from Bioconda
 ============================================================", RESET;
 
 say STDERR "Preparing definition for ", scalar @ARGV, " packages." if $verbose;
+
+# Change current dir to workdir
+chdir($workdir) or die "Error changing to workdir $workdir: $!\n";
+say STDERR "Changed to workdir $workdir" if $verbose;
 for my $package_str (@ARGV) {
     my $package = '';
     my $version = '';
@@ -246,6 +253,10 @@ sub rand_string {
     return $random_string;
 }
 
+END {
+    chdir($current_dir) or die "Error changing to original dir $current_dir: $!\n";
+}
+
 __END__
 
 =pod
@@ -258,7 +269,7 @@ make_image_from_bioconda - Create a Singularity/Apptainer image from micromamba
 
 =head1 VERSION
 
-version 0.8.2
+version 0.8.6
 
 =head1 SYNOPSIS
 

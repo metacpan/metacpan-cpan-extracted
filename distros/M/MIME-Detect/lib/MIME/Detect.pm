@@ -1,12 +1,12 @@
 package MIME::Detect;
+use 5.020;
 use Moo 2;
-use feature 'signatures';
-no warnings 'experimental::signatures';
+use experimental 'signatures';
 use Carp qw(croak);
 use XML::LibXML;
 use MIME::Detect::Type;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 NAME
 

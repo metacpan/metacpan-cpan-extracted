@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 # Module test framework
-# Copyright (c) 2015-2019, Duncan Ross Palmer (2E0EOL) and others,
+# Copyright (c) 2015-2024, Duncan Ross Palmer (2E0EOL) and others,
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -64,12 +64,12 @@ sub tearDown {
 }
 
 sub increment {
-	my $self = shift;
+	my ($self) = @_;
 	$self->dummyRunCount(1 + $self->dummyRunCount);
 }
 
 sub funcNeverCalled {
-	my $self = shift;
+	my ($self) = @_;
 	plan tests => 1;
 
 	$self->increment();
@@ -78,7 +78,7 @@ sub funcNeverCalled {
 }
 
 sub testFuncIsCalled {
-	my $self = shift;
+	my ($self) = @_;
 	plan tests => 1;
 
 	$self->increment();
@@ -88,7 +88,7 @@ sub testFuncIsCalled {
 }
 
 sub testFuncAnotherIsCalled {
-	my $self = shift;
+	my ($self) = @_;
 	plan tests => 1;
 
 	$self->increment();

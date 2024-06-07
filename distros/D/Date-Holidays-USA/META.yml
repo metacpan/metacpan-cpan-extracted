@@ -30,7 +30,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Date-Holidays-USA
   repository: https://github.com/ology/Date-Holidays-USA.git
-version: '0.0205'
+version: '0.0206'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

@@ -1,3 +1,8 @@
+2024-05-17
+----------
+  * The repository has been migrated to Git, please do not use Mercurial going foward,
+    or if you do, please send patches via email.
+
 2017-10-15
 ----------
   * Fix missing dependency on Readonly (Slaven Rezic)

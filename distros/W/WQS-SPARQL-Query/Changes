@@ -1,3 +1,7 @@
+0.03 2024-06-07T10:55:45+02:00
+ - Fix escape sequences in Count.
+ - Fix escape sequences in Select.
+
 0.02 2024-05-12T20:52:17+02:00
  - Add missing version to Count and Select.
  - Add tests for Count.

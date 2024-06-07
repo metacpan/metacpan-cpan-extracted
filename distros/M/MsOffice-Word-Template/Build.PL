@@ -18,14 +18,17 @@ my $builder = Module::Build->new(
   requires => {
     perl                        => '5.24.0',
     'Carp'                      => undef,
-    'HTML::Entities'            => undef,
     'Moose'                     => undef,
     'MooseX::StrictConstructor' => undef,
     'MooseX::AbstractMethod'    => undef,
-    'MsOffice::Word::Surgeon'   => '2.0',
+    'MsOffice::Word::Surgeon'   => '2.06',
     'Template::AutoFilter'      => undef,
     'namespace::clean'          => undef,
   },
+  recommends => {
+    'Barcode::Code128'          => undef,
+    'Image::PNG::QRCode'        => undef,
+   },
   add_to_cleanup     => [ 'MsOffice-Word-Template-*' ],
   meta_merge => {
     resources => {

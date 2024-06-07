@@ -1,5 +1,8 @@
 Revision history for Date-Holidays-Adapter-USA
 
+0.0107 2024-06-06 17:39:39
+    - Keep in-sync with the prerequisite Date::Holidays::USA module.
+
 0.0106 2024-05-23 18:16:14
     - Re-add mistakenly removed Adapter dep. Oops.
 

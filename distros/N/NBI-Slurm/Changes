@@ -1,3 +1,11 @@
+0.8.6	2024-06-01
+
+* Shelf shows version of Singularity packages
+
+0.8.5   2024-05-28
+
+* Minor changes
+ 
 0.8.2   2023-11-08
 
 * Bugfix: test 10-hpc had a typo and didnt work on Slurm clusters

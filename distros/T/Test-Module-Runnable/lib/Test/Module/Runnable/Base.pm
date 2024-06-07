@@ -1,5 +1,6 @@
+package Test::Module::Runnable::Base;
 # Module test framework
-# Copyright (c) 2015-2019, Duncan Ross Palmer (2E0EOL) and others,
+# Copyright (c) 2015-2024, Duncan Ross Palmer (2E0EOL) and others,
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -41,17 +42,32 @@ A few internal-only methods are documented here for project maintainers.
 
 =cut
 
-package Test::Module::Runnable::Base;
+use Data::Dumper;
 use Moose;
 
-use Data::Dumper;
+BEGIN {
+	our $VERSION = '0.6.1';
+}
+
 use POSIX qw/EXIT_SUCCESS/;
+use Readonly;
 use Test::MockModule;
 use Test::More 0.96;
 
-BEGIN {
-	our $VERSION = '0.4.2';
-}
+Readonly my @UNIQUE_STR_CHARS => ('a'..'z', 'A'..'Z', '0'..'9');
+Readonly my @UNIQUE_STR_CI_CHARS => ('a'..'z', '0'..'9');
+Readonly my @UNIQUE_LETTERS_CHARS => ('a'..'z');
+
+Readonly my $DOMAIN_DEFAULT => 'db3eb5cf-a597-4038-aea8-fd06faea6eed';
+
+# This hash tracks the numbers returned from C<unique>.
+my %__unique;
+
+# This counter used by the uniqueDomain() function
+my $__domainCounter;
+
+# nb. don't add any more static globals here; Construct the object where needed, on the fly, even if you
+# have not subclassed it, in legacy tests
 
 =head1 ATTRIBUTES
 
@@ -100,19 +116,6 @@ has 'mocker' => (
 
 =over
 
-=item C<__unique_default_domain>
-
-The internal default domain value.  This is used when C<unique>
-is called without a domain, because a key cannot be C<undef> in Perl.
-
-=cut
-
-has '__unique_default_domain' => (
-	isa => 'Str',
-	is => 'ro',
-	default => 'db3eb5cf-a597-4038-aea8-fd06faea6eed'
-);
-
 =item C<__unique>
 
 Tracks the counter returned by C<unique>.
@@ -156,26 +159,75 @@ See L<Test::Module::Runnable/unique>
 =cut
 
 sub unique {
-	my ($self, $domain) = @_;
-	my $useRandomDomain = 0;
-	my $result;
+	my (@args) = @_;
+	confess('Suspected incorrect call: Test::Module::Runnable->unique(...)') if ($args[0] && $args[0] eq __PACKAGE__);
 
-	if (defined($domain) && length($domain)) {
-		$useRandomDomain++ if ('rand' eq $domain);
-	} else {
-		$domain = $self->__unique_default_domain;
+	shift(@args) if ref($args[0]);
+	my $domain = $args[0];
+
+	if (!defined($domain) || length($domain) == 0) {
+		$domain = $DOMAIN_DEFAULT;
+	} elsif ($domain eq 'rand') {
+		return $__unique{$domain} = int(rand(999_999_999));
 	}
 
-	if ($useRandomDomain) {
-		do {
-			$result = int(rand(999_999_999));
-		} while ($self->__random->{$result});
-		$self->__random->{$result}++;
-	} else {
-		$result = ++($self->__unique->{$domain});
+	if (!defined($__unique{$domain}) && $ENV{TEST_UNIQUE}) {
+		$__unique{$domain} = int($ENV{TEST_UNIQUE}) - 1; # we add 1 to first return value below
 	}
 
-	return $result;
+	return ++$__unique{$domain};
+}
+
+=item C<uniqueStr([$length])>
+
+See L<Test::Module::Runnable/uniqueStr($length)>
+
+=cut
+
+sub uniqueStr {
+	my (@args) = @_;
+	return __uniqueStrHelper(\@UNIQUE_STR_CHARS, @args);
+}
+
+=item C<uniqueStrCI($length)>
+
+See L<Test::Module::Runnable/uniqueStrCI($length)>
+
+=cut
+
+sub uniqueStrCI {
+	my (@args) = @_;
+	return __uniqueStrHelper(\@UNIQUE_STR_CI_CHARS, @args);
+}
+
+=item C<uniqueDomain([$options])>
+
+See L<Test::Module::Runnable/uniqueDomain([$options])>
+
+=cut
+
+sub uniqueDomain {
+	my (@args) = @_;
+
+	shift @args if ref($args[0]); # Remove $self
+	my ($options) = (@args);
+
+	my $counter = ++$__domainCounter;
+	my $extraParts = ($counter % 4);
+
+	my $firstPart = __domainPart($counter, -1, $options);
+	return lc join('.', $firstPart, (map { __domainPart($counter, $_, $options) } 0..$extraParts), 'test');
+}
+
+=item C<uniqueLetters($length)>
+
+See L<Test::Module::Runnable/uniqueLetters($length)>
+
+=cut
+
+sub uniqueLetters {
+	my (@args) = @_;
+	return __uniqueStrHelper(\@UNIQUE_LETTERS_CHARS, @args);
 }
 
 =item C<methodNames>
@@ -185,18 +237,18 @@ See L<Test::Module::Runnable/methodNames>
 =cut
 
 sub methodNames {
-        my @ret = ( );
-        my $self = shift;
-        my @methodList = $self->meta->get_all_methods();
+	my ($self) = @_;
+	my @ret = ( );
+	my @methodList = $self->meta->get_all_methods();
 
-        foreach my $method (@methodList) {
+	foreach my $method (@methodList) {
 		$method = $method->name;
-                next unless ($self->can($method)); # Skip stuff we cannot do
-                next if ($method !~ $self->pattern); # Skip our own helpers
-                push(@ret, $method);
-        }
+		next unless ($self->can($method)); # Skip stuff we cannot do
+		next if ($method !~ $self->pattern); # Skip our own helpers
+		push(@ret, $method);
+	}
 
-        return @ret;
+	return @ret;
 }
 
 =item C<methodCount>
@@ -206,8 +258,8 @@ See L<Test::Module::Runnable/methodCount>
 =cut
 
 sub methodCount {
-        my $self = shift;
-        return scalar($self->methodNames());
+	my ($self) = @_;
+	return scalar($self->methodNames());
 }
 
 =item C<run>
@@ -450,7 +502,7 @@ See L<Test::Module::Runnable/_mockdump>
 =cut
 
 sub _mockdump {
-	my $arg = shift;
+	my ($arg) = @_;
 	my $dumper = Data::Dumper->new([$arg], ['arg']);
 	$dumper->Indent(1);
 	$dumper->Maxdepth(1);
@@ -562,6 +614,78 @@ sub __wrapFail {
 		$method = 'N/A';
 	}
 	return BAIL_OUT($type . ' returned non-zero for ' . $method);
+}
+
+=item C<__uniqueStrHelper(@args)>
+
+Helper method for L</uniqueStr([$length])>.
+
+=cut
+
+sub __uniqueStrHelper {
+	my (@args) = @_;
+	my $chars = shift(@args);
+	my $len = scalar(@$chars);
+
+	my $func = (caller(1))[3];
+	$func =~ s/.*:://;
+	confess("Suspected incorrect call: Test::Module::Runnable->$func") if ($args[0] && $args[0] eq __PACKAGE__);
+
+	shift(@args) if ref($args[0]);
+	my $length = $args[0];
+	my $str = '';
+
+	# default length 1
+	$length = 1 unless(defined($length));
+
+	my $num = unique();
+	my $oddOrEven = ($num % 2);
+	while ($num > 0 || length($str) < $length) {
+		# This character will be the current number modulo the character set length
+		my $modulo = $num % $len;
+
+		# use any remainder next time through
+		$num = int($num / $len);
+
+		my $char = $chars->[$modulo];
+		if ($chars == \@UNIQUE_STR_CI_CHARS && length($str) % 2 == $oddOrEven) {
+			$char = uc($char);
+		}
+
+		$str = $char . $str;
+	}
+
+	$str = __uniqueStrHelper($chars, $length) if ($str eq '0'); # unacceptable
+
+	return $str;
+}
+
+=item C<__domainPart>
+
+Helper method used by L</uniqueDomain([$options])> to construct a single part of a domain name.
+
+Returns a string.
+
+=cut
+
+sub __domainPart {
+	my ($counter, $pos, $options) = @_;
+
+	my $length;
+	if ($pos < 0 && $options->{length}) {
+		# Use specified length, if there is one, for the first part only.
+		$length = $options->{length};
+	}
+
+	# arbitrary calculation to come up with varying but
+	# predictable lengths for a given counter (n-th domain created)
+	# and position $pos within the domain
+	$length = 1 + (($counter * 7 ^ $pos) % 5) unless $length;
+
+	my $str = $options->{lettersOnly} ? uniqueLetters($length) : uniqueStrCI($length);
+	$str = uniqueLetters(1).$str unless $str =~ /^[a-z]/i;
+
+	return $str;
 }
 
 =back

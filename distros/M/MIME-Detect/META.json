@@ -38,6 +38,7 @@
             "File::ShareDir" : "0",
             "Moo" : "2",
             "XML::LibXML" : "1.70",
+            "experimental" : "0.032",
             "perl" : "5.020"
          }
       },
@@ -62,6 +63,6 @@
          "web" : "https://github.com/Corion/MIME-Detect"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

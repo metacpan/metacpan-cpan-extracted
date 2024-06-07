@@ -59,6 +59,7 @@ my %module = (
     PREREQ_PM => {
         'XML::LibXML'        => '1.70', # we want ->load_xml()
         'Moo'                => 2,
+        'experimental'       => '0.032',
         'Carp'               => 0,
         'Fcntl'              => 0,
         'File::ShareDir'     => 0,

@@ -1,3 +1,17 @@
+0.6.1
+-----
+  * dd447e5: Fixed bug where TEST_UNIQUE was ignored
+
+0.6.0
+-----
+  * 16f5ace: Added uniqueDomain(), uniqueLetters(), uniqueStrCI()
+  * 24f956e: Insignificant linter fixes
+
+0.5.0
+-----
+  * b4ca550: uniqueStr() support
+  * 827d8e5: Re-written core unique() logic
+
 0.4.2
 -----
   * fa031cbe4851: Create branch for Lintian (stable)

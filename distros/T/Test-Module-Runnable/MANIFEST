@@ -9,6 +9,7 @@ debian/compat
 debian/control
 debian/copyright
 debian/rules
+debian/source/format
 lib/Test/Module/Runnable.pm
 lib/Test/Module/Runnable/Base.pm
 LICENCE
@@ -16,14 +17,26 @@ Makefile
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-MYMETA.yml
 NEWS
 README
+README.md
 t/getopts.t
+t/lib/Private/Test/Module/Runnable/Appender.pm
+t/lib/Private/Test/Module/Runnable/Dummy.pm
+t/lib/Private/Test/Module/Runnable/DummyWithAutoload.pm
 t/lib/Private/Test/Module/Runnable/unique.pm
+t/mock.t
+t/mockNonExistentMethod.t
+t/modeSwitch.t
 t/podchecker.t
 t/tester.t
 t/unique.t
+t/uniqueDomain.t
+t/uniqueDomain_fuzz.t
+t/uniqueDomain_notExported.t
+t/uniqueExport.t
+t/uniqueStr.t
+t/unmock.t
 t/version.t
 TODO
 META.yml                                 Module YAML meta-data (added by MakeMaker)

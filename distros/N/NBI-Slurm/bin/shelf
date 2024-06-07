@@ -155,9 +155,14 @@ for my $key (keys %$cache) {
 		#print $color, $str, RESET, "\tsource package $pack\n" ;
 		# Print str with 30 chars max and then spaces, then \t and source package $pack
 		my $str2 = substr($str, 0, 30);
+		my $data = getJson($pack);
+		my $ver = '';
+		eval {
+		 $ver = $data->{ApplicationVersion} ? " " .  $data->{ApplicationVersion} : "";
+		};
+                $str2.=$ver;
 		my $spaces = ' ' x (30 - length($str2));
 		print $color, $str2, $spaces, RESET, "\tsource package $pack\n";
-
 	}
 }
 say STDERR BLUE, "Found $result_count results", RESET if ($opt_verbose);
@@ -218,6 +223,16 @@ sub getinfo {
 
     return $decoded_json;
 }
+sub getJson {
+	my $uuid = $_[0];
+	for my $l (@locations) {
+		
+		if (-e "${l}/containers/$uuid/Singularity.manifest") {
+			my $data = getinfo("${l}/containers/$uuid/Singularity.manifest");
+			return $data;
+		} 
+	}	
+}
 
 __END__
 
@@ -231,7 +246,7 @@ shelf - Search for HPC packages in the cluster
 
 =head1 VERSION
 
-version 0.8.2
+version 0.8.6
 
 =head1 SYNOPSIS
 

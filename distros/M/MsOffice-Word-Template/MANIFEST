@@ -6,10 +6,14 @@ lib/MsOffice/Word/Template.pm
 lib/MsOffice/Word/Template/Engine.pm
 lib/MsOffice/Word/Template/Engine/Mustache.pm
 lib/MsOffice/Word/Template/Engine/TT2.pm
+lib/MsOffice/Word/Template/Engine/TT2/Provider.pm
 MANIFEST			This list of files
 README.md
+t/etc/barcode_template.docx
 t/etc/mustache_template.docx
 t/etc/tt2_template.docx
+t/etc/inserted_doc.docx
+t/barcode.t
 t/mustache.t
 t/tt2.t
 META.yml

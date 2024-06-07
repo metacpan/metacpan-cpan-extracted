@@ -8,7 +8,7 @@ extends 'MsOffice::Word::Template::Engine';
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.0';
+our $VERSION = '2.03';
 
 #======================================================================
 # ATTRIBUTES
@@ -22,20 +22,28 @@ has       'end_tag'           => (is => 'ro',   isa => 'Str',  default  => "}}")
 #======================================================================
 
 sub compile_template {
-  my ($self, $part_name, $template_text) = @_;
+  my ($self, $template_text) = @_;
 
-  $self->{compiled_template}{$part_name} = Template::Mustache->new(
+  return Template::Mustache->new(
     template => $template_text,
     $self->{_constructor_args}->%*,
    );
 }
 
 
-sub process {
+sub process_part {
   my ($self, $part_name, $package_part, $vars) = @_;
 
-  my $tmpl         = $self->{compiled_template}{$part_name}
-    or die "don't have a compiled template for '$part_name'";
+  # currently a no-op; but here is a chance to do some processing with $part_name and $vars
+
+  return $self->process($part_name, $vars);
+}
+
+sub process {
+  my ($self, $template_name, $vars) = @_;
+
+  my $tmpl         = $self->compiled_template->{$template_name}
+    or die "don't have a compiled template for '$template_name'";
 
   my $new_contents = $tmpl->render($vars);
 

@@ -3,7 +3,6 @@ use 5.024;
 use Moose;
 use MooseX::StrictConstructor;
 use Carp                           qw(croak);
-use HTML::Entities                 qw(decode_entities);
 use MsOffice::Word::Surgeon 2.0;
 
 # syntactic sugar for attributes
@@ -11,7 +10,7 @@ sub has_inner ($@) {my $attr = shift; has($attr => @_, init_arg => undef, lazy =
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.0';
+our $VERSION = '2.03';
 
 #======================================================================
 # ATTRIBUTES
@@ -25,6 +24,8 @@ has 'data_color'    => (is => 'ro', isa => 'Str',                     default  =
 has 'control_color' => (is => 'ro', isa => 'Str',                     default  => "green");
 has 'part_names'    => (is => 'ro', isa => 'ArrayRef[Str]',           lazy     => 1,
                         default  => sub {[keys shift->surgeon->parts->%*]});
+has 'property_files'=> (is => 'ro', isa => 'ArrayRef[Str]',
+                        default => sub {[qw(docProps/core.xml docProps/app.xml docProps/custom.xml)]});
 
 # constructor attributes for building a templating engine
 has 'engine_class'  => (is => 'ro', isa => 'Str',                     default  => 'TT2');
@@ -32,12 +33,6 @@ has 'engine_args'   => (is => 'ro', isa => 'ArrayRef',                default  =
 
 # attributes lazily constructed by the module -- not received through the constructor
 has_inner 'engine'  => (is => 'ro', isa => 'MsOffice::Word::Template::Engine');
-
-#======================================================================
-# GLOBALS
-#======================================================================
-
-my $XML_COMMENT_FOR_MARKING_DIRECTIVES = '<!--TEMPLATE_DIRECTIVE_ABOVE-->';
 
 
 #======================================================================
@@ -85,137 +80,13 @@ sub _engine {
  CLASS:
   for my $class ("MsOffice::Word::Template::Engine::$engine_class", $engine_class) {
     eval "require $class; 1"                        or  push @load_errors, $@ and next CLASS;
-    $engine = $class->new($self->engine_args->@*)                             and last CLASS;
+    $engine = $class->new(word_template => $self,
+                          $self->engine_args->@*)                             and last CLASS;
   }
   $engine or die "could not load engine class '$engine_class'", @load_errors;
 
-  # compile regexes based on the start/end tags
-  my ($start_tag, $end_tag) = ($engine->start_tag, $engine->end_tag);
-  my @xml_regexes = $self->_xml_regexes($start_tag, $end_tag);
-
-  # tell the engine to build a compiled template for each document part
-  foreach my $part_name ($self->part_names->@*) {
-    my $part = $self->surgeon->part($part_name);
-
-    # assemble template fragments from all runs in the part into a global template text
-    $part->cleanup_XML;
-    my @template_fragments = map {$self->_template_fragment_for_run($_, $start_tag, $end_tag)}
-                                 $part->runs->@*;
-    my $template_text      = join "", @template_fragments;
-
-    # remove markup around directives, successively for table rows, for paragraphs, and finally
-    # for remaining directives embedded within text runs.
-    $template_text =~ s/$_/$1/g foreach @xml_regexes;
-
-    # compile and store the template
-    $engine->compile_template($part_name => $template_text);
-  }
-
   return $engine;
 }
-
-
-
-#======================================================================
-# UTILITY METHODS
-#======================================================================
-
-
-
-sub _template_fragment_for_run { # given an instance of Surgeon::Run, build a template fragment
-  my ($self, $run, $start_tag, $end_tag) = @_;
-
-  my $props         = $run->props;
-  my $data_color    = $self->data_color;
-  my $control_color = $self->control_color;
-
-  # if this run is highlighted in data or control color, it must be translated into a template directive
-  if ($props =~ s{<w:highlight w:val="($data_color|$control_color)"/>}{}) {
-    my $color       = $1;
-    my $xml         = $run->xml_before;
-
-    # re-build the run, removing the highlight, and adding the start/end tags for the template engine
-    my $inner_texts = $run->inner_texts;
-    if (@$inner_texts) {
-      $xml .= "<w:r>";                                                # opening XML tag for run node
-      $xml .= "<w:rPr>" . $props . "</w:rPr>" if $props;              # optional run properties
-      $xml .= "<w:t>";                                                # opening XML tag for text node
-      $xml .= $start_tag;                                             # start a template directive
-      foreach my $inner_text (@$inner_texts) {                        # loop over text nodes
-        my $txt = decode_entities($inner_text->literal_text);         # just take inner literal text
-        $xml .= $txt . "\n";
-        # NOTE : adding "\n" because the template parser may need them for identifying end of comments
-      }
-
-      $xml .= $end_tag;                                               # end of template directive
-      $xml .= $XML_COMMENT_FOR_MARKING_DIRECTIVES
-                                         if $color eq $control_color; # XML comment for marking
-      $xml .= "</w:t>";                                               # closing XML tag for text node
-      $xml .= "</w:r>";                                               # closing XML tag for run node
-    }
-
-    return $xml;
-  }
-
-  # otherwise this run is just regular MsWord content
-  else {
-    return $run->as_xml;
-  }
-}
-
-
-
-
-sub _xml_regexes {
-  my ($self, $start_tag, $end_tag) = @_;
-
-  # start and end character sequences for a template fragment
-  my $rx_start = quotemeta  $start_tag;
-  my $rx_end   = quotemeta  $end_tag;
-
-  # Regexes for extracting template directives within the XML.
-  # Such directives are identified through a specific XML comment -- this comment is
-  # inserted by method "template_fragment_for_run()" below.
-  # The (*SKIP) instructions are used to avoid backtracking after a
-  # closing tag for the subexpression has been found. Otherwise the
-  # .*? inside could possibly match across boundaries of the current
-  # XML node, we don't want that.
-
-  # regex for matching directives to be treated outside the text flow.
-  my $rx_outside_text_flow = qr{
-      <w:r\b           [^>]*>                  # start run node
-        (?: <w:rPr> .*? </w:rPr>   (*SKIP) )?  # optional run properties
-        <w:t\b         [^>]*>                  # start text node
-          ($rx_start .*? $rx_end)  (*SKIP)     # template directive
-          $XML_COMMENT_FOR_MARKING_DIRECTIVES  # specific XML comment
-        </w:t>                                 # close text node
-      </w:r>                                   # close run node
-   }sx;
-
-  # regex for matching paragraphs that contain only a directive
-  my $rx_paragraph = qr{
-    <w:p\b             [^>]*>                  # start paragraph node
-      (?: <w:pPr> .*? </w:pPr>     (*SKIP) )?  # optional paragraph properties
-      $rx_outside_text_flow
-    </w:p>                                     # close paragraph node
-   }sx;
-
-  # regex for matching table rows that contain only a directive in the first cell
-  my $rx_row = qr{
-    <w:tr\b            [^>]*>                  # start row node
-      <w:tc\b          [^>]*>                  # start cell node
-         (?:<w:tcPr> .*? </w:tcPr> (*SKIP) )?  # cell properties
-         $rx_paragraph                         # paragraph in cell
-      </w:tc>                                  # close cell node
-      (?:<w:tc> .*? </w:tc>        (*SKIP) )*  # ignore other cells on the same row
-    </w:tr>                                    # close row node
-   }sx;
-
-  return ($rx_row, $rx_paragraph, $rx_outside_text_flow);
-  # Note : the order is important
-}
-
-
 
 
 
@@ -229,10 +100,19 @@ sub process {
   # create a clone of the original 
   my $new_doc = $self->surgeon->clone;
 
+  # process each package part
   foreach my $part_name ($self->part_names->@*) {
     my $new_doc_part = $new_doc->part($part_name);
-    my $new_contents = $self->engine->process($part_name, $new_doc_part, $vars);
+    my $new_contents = $self->engine->process_part($part_name, $new_doc_part, $vars);
     $new_doc_part->contents($new_contents);
+  }
+
+  # process the property files (core.xml, app.xml. custom.xml -- if present in the original word template)
+  foreach my $property_file ($self->property_files->@*) {
+    if ($self->surgeon->zip->memberNamed($property_file)) {
+      my $new_contents = $self->engine->process($property_file, $vars);
+      $new_doc->xml_member($property_file, $new_contents);
+    }
   }
 
   return $new_doc;
@@ -260,7 +140,7 @@ MsOffice::Word::Template - generate Microsoft Word documents from Word templates
 =head2 Purpose
 
 This module treats a Microsoft Word document as a template for generating other documents. The idea is
-similar to the "mail merge" functionality in Word, but with much richer possibilities, because the
+similar to the "mail merge" functionality in Word, but with much richer possibilities. The
 whole power of a Perl templating engine can be exploited, for example for
 
 =over
@@ -273,10 +153,14 @@ dealing with complex, nested datastructures
 
 using control directives for loops, conditionals, subroutines, etc.
 
+=item *
+
+defining custom data processing functions or macros
+
 =back
 
 
-Template authors just use the highlighing function in MsWord to
+Template authors just use basic highlighing in MsWord to
 mark the templating directives :
 
 =over
@@ -304,17 +188,18 @@ other engines can be specified as subclasses -- see the L</TEMPLATE ENGINE> sect
 
 =head2 Status
 
-This second release is a major refactoring of the first version, together with
-a refactoring of L<MsOffice::Word::Surgeon>. New features include support
-for headers and footers and for image insertion. The internal object-oriented
-structure has been redesigned.
+This distribution is a major refactoring
+of the first version, together with a refactoring of
+L<MsOffice::Word::Surgeon>. New features include support for headers
+and footers, for metadata and for image insertion. The internal
+object-oriented structure has been redesigned.
 
-This module has been used successfully for a pilot project in my organization,
-generating quite complex documents from deeply nested datastructures.
-Yet this has not been used yet at large scale in production, so it is quite likely
-that some youth defects may still be discovered.
-If you use this module, please keep me
-informed of your difficulties, tricks, suggestions, etc.
+This module has been used successfully for a pilot project in my
+organization, generating quite complex documents from deeply nested
+datastructures.  However it has not been used yet at large scale in
+production, so it is quite likely that some youth defects may still be
+discovered.  If you use this module, please keep me informed of your
+difficulties, tricks, suggestions, etc.
 
 
 =head1 METHODS
@@ -353,6 +238,20 @@ the Word highlight color for marking data directives (default : yellow)
 the Word highlight color for marking control directives (default : green).
 Such directives should produce no content. They are treated outside of the regular text flow.
 
+=item part_names
+
+an arrayref to the list of package parts to be processed as templates within the C<.docx>
+ZIP archive. The default list is the main document (C<document.xml>), together with all
+headers and footers found in the ZIP archive.
+
+=item property_files
+
+an arrayref to the list of property files (i.e. metadata) to be processed as templates within the C<.docx>
+ZIP archive. For historical reasons, MsWord has three different XML files for storing document
+properties : C<core.xml>, C<app.xml> and C<custom.xml> : the default list contains those
+three files. Supply an empty list if you don't want any document property to be processed.
+
+
 =back
 
 In addition to the attributes above, other attributes can be passed to the
@@ -372,6 +271,8 @@ That document can then be saved  using L<MsOffice::Word::Surgeon/save_as>.
 
 
 =head1 AUTHORING TEMPLATES
+
+=head2 Textual content
 
 A template is just a regular Word document, in which the highlighted
 fragments represent templating directives.
@@ -398,61 +299,71 @@ outside of the regular XML flow (paragraph nodes, run nodes and text
 nodes), and therefore MsWord would generate an error when trying to
 open such content. There is a workaround, however : data directives
 within a green zone will work if they I<also generate the appropriate markup>
-for paragraph nodes, run nodes and text nodes; but in that case you must
-also apply the "none" filter from L<Template::AutoFilter> so that
-angle brackets in XML markup do not get translated into HTML entities.
+for paragraph nodes, run nodes and text nodes.
+
+To highlight using LibreOffice, set the Character Highlighting to Export As
+"Highlighting" instead of the default "Shading". See
+L<https://help.libreoffice.org/7.5/en-US/text/shared/optionen/01130200.html|LibreOffice help for MS Office>.
+
 
 See also L<MsOffice::Word::Template::Engine::TT2> for
 additional advice on authoring templates based on the
 L<Template Toolkit|Template>.
 
 
+=head2 Images
 
-=head1 TEMPLATE ENGINE
-
-This module invokes a backend I<templating engine> for interpreting the
-template directives. The default engine is
-L<MsOffice::Word::Template::Engine::TT2>, built on top of
-L<Template Toolkit|Template>. Another engine supplied in this distribution is
-L<MsOffice::Word::Template::Engine::Mustache>, mostly as an example.
-To implement another engine, just subclass
-L<MsOffice::Word::Template::Engine>.
-
-To use an engine different from the default, the following arguments
-must be supplied to the L</new> method :
+Insertion of generated images such as barcodes is done in two steps:
 
 =over
 
-=item engine_class
+=item *
 
-The name of the engine class. If the class is within the L<MsOffice::Word::Template::Engine>
-namespace, just the suffix is sufficient; otherwise, specify the fully qualified class name.
+the template must contain a I<placeholder image> : this is an arbitrary image,
+positioned within the document through usual MsWord commands, including alignment
+instructions, border, etc. That image must be given an I<alternative text> -- see
+L<https://support.microsoft.com/en-us/office/add-alternative-text-to-a-shape-picture-chart-smartart-graphic-or-other-object-44989b2a-903c-4d9a-b742-6a75b451c669|MsOffice documentation>). That text 
+will be used as a unique identifier for the image.
 
-=item engine_args
+=item *
 
-An optional list of parameters that may be used for initializing the engine
+somewhere in the document (it doesn't matter where), a directive
+must replace the placeholder image by a generated image.
+For example for a barcode, the TT2 directive looks like :
+
+  [[ PROCESS barcode type="QRCode" img="my_image_name" content="some value for the QR code" ]]
+
+See L<MsOffice::Word::Template::Engine::TT2/barcodes> for details. The source
+code can be used as an example of how to implement other image generating blocks.
 
 =back
 
-The engine will get a C<compile_template> method call for each part in the
-C<.docx> document (main 
+=head2 Metadata (also known as "document properties" in MsWord parlance)
 
-Given a datatree in C<$vars>, the engine will be called as :
+MsWord documents store metadata, also called "document properties". Each property
+has a name and a value. A number of property names are builtin, like 'author' or 'description';
+other custom properties can be defined. Properties are edited from the MsWord 
+"Backstage view" (the screen displayed after a click on the File tab).
+
+For feeding values into document properties, just use the regular syntax of
+the templating engine. For example with the default Template Toolkit engine,
+directives are enclosed in C<'[% '> and C<' %]'>; so you can write
+
+  [% path.to.subject.data %]
+
+within the 'subject' property of the MsWord template, and the resulting document
+will have its subject filled with the given data path.
+
+Obviously, the reason for this different mechanism is that MsWord has no support
+for highlighting contents in property values.
+
+Unfortunately, this mechanism only works for document properties of type 'string'.
+MsWord would not allow specific templating syntax within fields of type
+boolean, number or date.
 
 
-The engine must make sure that ampersand characters and angle brackets
-are automatically replaced by the corresponding HTML entities
-(otherwise the resulting XML would be incorrect and could not be
-opened by Microsoft Word).  The Mustache engine does this
-automatically.  The Template Toolkit would normally require to
-explicitly add an C<html> filter at each directive :
 
-  [% foo.bar | html %]
-
-but thanks to the L<Template::AutoFilter>
-module, this is performed automatically.
-
-
+=head1 TEMPLATE ENGINE
 
 This module invokes a backend I<templating engine> for interpreting the
 template directives. The default engine is
@@ -479,16 +390,22 @@ An optional list of parameters that may be used for initializing the engine
 =back
 
 After initialization the engine will receive a C<compile_template> method call for each part in the
-C<.docx> document, i.e. not only the main document body, but also headers and footers.
+C<.docx> package. The default parts to be handled are the main document body (C<document.xml>), and
+all headers and footers. A different list of package parts can be supplied through the
+C<part_names> argument to the constructor.
 
-Then the main C<process()> method, given a datatree in C<$vars>, will call
-the engine's C<process()> method on each document part.
+In addition to the package parts, templates are also compiled for the I<property> files that contain
+metadata such as author name, subject, description, etc. The list of files can be controlled through
+the C<property_files> argument to the constructor.
 
-The engine must make sure that ampersand characters and angle brackets
-are automatically replaced by the corresponding HTML entities
-(otherwise the resulting XML would be incorrect and could not be
-opened by Microsoft Word).  The Mustache engine does this
-automatically.  The Template Toolkit would normally require to
+When processing templates, the engine must make sure that ampersand
+characters and angle brackets are automatically replaced by the
+corresponding HTML entities (otherwise the resulting XML would be
+incorrect and could not be opened by Microsoft Word).
+The L<Mustache engine|MsOffice::Word::Template::Engine::Mustache> does this
+automatically.
+The L<Template Toolkit engine|MsOffice::Word::Template::Engine::TT2>
+would normally require to
 explicitly add an C<html> filter at each directive :
 
   [% foo.bar | html %]

@@ -9,6 +9,8 @@
 
 ## Scripts
 
+This package provides a set of binaries (and a Perl module) to interact with the NBI HPC cluster.
+
 ### lsjobs 
 
 List or delete your jobs in the queue with **lsjobs**. By default search is restricted to the active user, which can be changed 
@@ -31,13 +33,12 @@ Submit a job to the queue (with cores, memory, time, etc) with **runjob**.
 See [docs](https://metacpan.org/dist/NBI-Slurm/view/bin/runjob)
 
 ```bash
-runjob -n "my-job" -t 2 -r -c 18 -m 32 --after "python script.py --threads 18"
+runjob -n "my-job" -t 2 -r -c 18 -m 32 --after 9290 "python script.py --threads 18"
 ```
 
 If invoked without `--run` (or `-r`) it will print the command to be executed.
 
 ![runjob](docs/runjob.png)
-
 
 ### waitjobs
 
@@ -49,6 +50,39 @@ See [docs](https://metacpan.org/dist/NBI-Slurm/view/bin/waitjobs)
 ```bash
 waitjobs [-u $USER] [pattern]
 ```
+
+### shelf
+
+List packages installed in the NBI HPC with **shelf**. See [docs](https://metacpan.org/dist/NBI-Slurm/view/bin/shelf)
+
+```bash
+shelf QUERY_STRING
+```
+
+![shelf](docs/shelf.png)
+
+### make_image_from_bioconda
+
+Generate a Singularity image from a bioconda package with **make_image_from_bioconda**. 
+
+See [docs](https://metacpan.org/dist/NBI-Slurm/view/bin/make_image_from_bioconda)
+
+```bash
+make_image_from_bioconda --output seqfu-1.20.sif --version 1.20.0 --package seqfu
+```
+
+### make_package
+
+Given a singularity image, "install" a package in the NBI HPC (to be used with `source package xyz`)
+
+See [docs](https://metacpan.org/dist/NBI-Slurm/view/bin/make_package)
+
+```bash
+make_package --image seqfu-1.20.sif --package seqfu__1.20   seqfu fu-orf fu-rename fu-msa...
+```
+
+:warning: If you generated the image with *make_image_from_bioconda* you should be able to omit the list of binaries, as they are
+stored in the image itself.
 
 ### session
 
@@ -71,15 +105,6 @@ whojobs [--min-jobs INT]
 
 ![whojobs](docs/whojobs.png)
 
-### shelf
-
-List packages installed in the NBI HPC with **shelf**. See [docs](https://metacpan.org/dist/NBI-Slurm/view/bin/shelf)
-    
-```bash
-shelf QUERY_STRING
-```
-
-![shelf](docs/shelf.png)
 
 ## Configuration
 

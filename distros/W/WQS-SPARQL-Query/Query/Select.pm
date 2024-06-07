@@ -6,7 +6,7 @@ use warnings;
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub new {
 	my ($class, @params) = @_;
@@ -41,8 +41,11 @@ sub select_value {
 		} elsif ($value =~ m/^\?/ms) {
 			# same
 		} elsif ($value =~ m/^(.*?)(@\w\w)$/ms) {
-			$value = "'$1'$2";
+			my ($main_value, $lang) = ($1, $2);
+			$main_value =~ s/'/\\'/msg;
+			$value = "'$main_value'$lang";
 		} else {
+			$value =~ s/'/\\'/msg;
 			$value = "'$value'";
 		}
 
@@ -206,6 +209,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

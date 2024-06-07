@@ -101,15 +101,15 @@ my $afterok_string = defined $afterok[0] ? "-d afterok:" . join(":", @afterok) :
 
 # 
 if (not NBI::Slurm::valid_queue($queue)) {
-    my @valid_queues = NBI::Slurm::queues(1);
+    my @valid_queues = NBI::Slurm::queues('CAN FAIL');
     if (scalar @valid_queues) {
         say STDERR RED, BOLD, "WARNING:", RESET, " $queue is not a valid queue: ", join(", ", @valid_queues); 
     } else {
         if ($run) {
-            say STDERR RED, BOLD, "ERROR:", RESET, " You might be outside a slurm cluster. Run without --run to see the script.";
+            say STDERR RED, BOLD, "ERROR:", RESET, " You might be outside a slurm cluster. Run without --run to see the script", join(", ", @valid_queues); 
             exit 1;
         } else {
-            say STDERR RED, BOLD, "WARNING:", RESET, " You might be outside a slurm cluster";
+            say STDERR RED, BOLD, "WARNING:", RESET, " You might be outside a slurm cluster", join(", ", @valid_queues); 
         }
         
         
@@ -276,7 +276,7 @@ runjob - Run a job in the cluster using NBI::Slurm
 
 =head1 VERSION
 
-version 0.8.2
+version 0.8.6
 
 =head1 SYNOPSIS
 

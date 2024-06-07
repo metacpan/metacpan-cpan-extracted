@@ -1,5 +1,8 @@
 Revision history for Net-Hadoop-WebHDFS-LWP
 
+0.012 2024-06-07 BURAK
+        Enable SSL.
+
 0.011 2023-09-06 BURAK
         PUT now redirects, which we need to handle.
 

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 # Module test framework
-# Copyright (c) 2015-2019, Duncan Ross Palmer (2E0EOL) and others,
+# Copyright (c) 2015-2024, Duncan Ross Palmer (2E0EOL) and others,
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -52,8 +52,16 @@ has 'trials' => (
 	default => ($ENV{TEST_AUTHOR}) ? (10_000) : (500),
 );
 
+sub setUpBeforeClass {
+	my ($self) = @_;
+
+	$ENV{TEST_UNIQUE} = 1; # Tests rely on fixed, determinate nature of unique() or uniqueStr()
+
+	return EXIT_SUCCESS;
+}
+
 sub setUp {
-	my $self = shift;
+	my ($self) = @_;
 
 	$self->sut(Private::Test::Module::Runnable::unique->new());
 	return EXIT_SUCCESS if ($self->sut);
@@ -61,7 +69,7 @@ sub setUp {
 }
 
 sub testUnique {
-	my $self = shift;
+	my ($self) = @_;
 	my ($default, $other1, $other2) = (0, 0, 0);
 
 	plan tests => 8;
@@ -80,7 +88,7 @@ sub testUnique {
 }
 
 sub testRandom {
-	my $self = shift;
+	my ($self) = @_;
 	my @spent; # Random numbers seen previously
 
 	plan tests => $self->trials;
@@ -108,9 +116,11 @@ sub testRandom {
 
 			# Record result seen and do sanity check
 			push(@spent, $result);
-			is(scalar(@spent), $i + 1, sprintf(
-				'%u items in spent list',
-				$i + 1
+			my $expectCount = $i + 1;
+			is(scalar(@spent), $expectCount, sprintf(
+				'%u item%s in spent list',
+				$expectCount,
+				($expectCount == 1) ? '' : 's',
 			));
 
 			# Check random result is an integer

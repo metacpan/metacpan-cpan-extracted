@@ -13,7 +13,7 @@ use Exporter qw(import);
 
 our @EXPORT = qw(is_holiday holidays);
 
-our $VERSION = '0.0205';
+our $VERSION = '0.0206';
 
 
 sub new {
@@ -82,7 +82,7 @@ sub us_holidays {
             31 => 'Halloween'
         },
         11 => {
-            11 => 'Veterans',
+            11 => "Veteran's Day",
             $dom{thanksgiving} => 'Thanksgiving',
         },
         12 => {
@@ -149,7 +149,7 @@ Date::Holidays::USA - Provides United States of America holidays
 
 =head1 VERSION
 
-version 0.0205
+version 0.0206
 
 =head1 SYNOPSIS
 

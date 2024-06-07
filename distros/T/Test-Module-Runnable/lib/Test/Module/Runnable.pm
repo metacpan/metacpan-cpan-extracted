@@ -1,5 +1,6 @@
+package Test::Module::Runnable;
 # Module test framework
-# Copyright (c) 2015-2019, Duncan Ross Palmer (2E0EOL) and others,
+# Copyright (c) 2015-2024, Duncan Ross Palmer (2E0EOL) and others,
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -66,16 +67,20 @@ L<Test::More>.
 
 =cut
 
-package Test::Module::Runnable;
 use Moose;
-use Test::More 0.96;
-use POSIX qw/EXIT_SUCCESS/;
 
 BEGIN {
-	our $VERSION = '0.4.2';
+	our $VERSION = '0.6.1';
 }
 
 extends 'Test::Module::Runnable::Base';
+
+use Exporter qw(import);
+use POSIX qw/EXIT_SUCCESS/;
+use Test::Module::Runnable::Base;
+use Test::More 0.96;
+
+our @EXPORT_OK = qw(unique uniqueDomain uniqueStr uniqueStrCI uniqueLetters);
 
 =head1 ATTRIBUTES
 
@@ -218,9 +223,8 @@ Normal usage:
 Returns a unique, integer ID, which is predictable.
 
 An optional C<$domain> can be specified, which is a discrete sequence,
-isolated from anhy other domain.  If not specified, a default domain is used.
-The actual name for this domain is opaque, and is specified by
-L<Test::Module::Runnable::Base/__unique_default_domain>.
+isolated from any other domain.  If not specified, a default domain is used.
+The actual name for this domain is opaque.
 
 A special domain; C<rand> can be used for random numbers which will not repeat.
 
@@ -317,6 +321,96 @@ sub tearDown {
 	return EXIT_SUCCESS;
 }
 
+sub unique {
+	my (@args) = @_;
+	return Test::Module::Runnable::Base::unique(@args);
+}
+
+=item C<uniqueStr([$length])>
+
+Return a unique alphanumeric string which shall not be shorter than the specified C<$length>,
+which is 1 by default.  The string is guaranteed to evaluate true in a boolean context.
+
+The numerical value of each character is obtained from L</unique>.
+
+Note that the strings returned from this function are B<only> guaranteed to
+be in monotonically increasing lexicographical order if they are all of
+the same length.  Therefore if this is a concern, specify a length which
+will be long enough to include all the strings you wish to generate,
+for example C<uniqueStr(4)> would produce C<62**4> (over 14 million)
+strings in increasing order.
+
+Can be called statically and exported in the same way as L</unique>.
+
+=cut
+
+sub uniqueStr {
+	my (@args) = @_;
+	return Test::Module::Runnable::Base::uniqueStr(@args);
+}
+
+=item C<uniqueStrCI($length)>
+
+Works exactly the same as L</uniqueStr([$length])> except that the results are case
+sensitively identical.  Note that the strings are not guaranteed to be
+all lowercase or all uppercase, you may get "A" or "a", but you will
+never get both.  No assumption should be made about the case.
+
+=cut
+
+sub uniqueStrCI {
+	my (@args) = @_;
+	return Test::Module::Runnable::Base::uniqueStrCI(@args);
+}
+
+=item C<uniqueDomain([$options])>
+
+Returns a unique, fake domain-name.  No assumptions should be made about the domain
+name or TLD returned, except that this domain cannot be registered via a domain registrar, is lower-case and is
+unique per test suite run.
+
+The optional C<$options>, if specified, must be a C<HASH> ref, and it may contain the following keys:
+
+=over
+
+=item C<length>
+
+The length of the first part of the hostname.  This ensures correct lexicographic ordering.
+
+=item C<lettersOnly>
+
+Ensure that hostname parts only contain letters, not numbers.  This is also useful to
+ensure correct lexicographic ordering.
+
+=back
+
+=cut
+
+sub uniqueDomain {
+	my (@args) = @_;
+	return Test::Module::Runnable::Base::uniqueDomain(@args);
+}
+
+=item C<uniqueLetters($length)>
+
+Return a unique string containing letters only, which shall not be shorter
+than the specified C<$length>, which is 1 by default.  The string is guaranteed
+to evaluate true in a boolean context.
+
+Note that the strings returned from this function are B<only> guaranteed to
+be in monotonically increasing lexicographical order if they are all of
+the same length.  Therefore if this is a concern, specify a length which
+will be long enough to include all the strings you wish to generate,
+for example C<uniqueStr(4)> would produce C<62**4> (over 14 million)
+strings in increasing order.
+
+=cut
+
+sub uniqueLetters {
+	my (@args) = @_;
+	return Test::Module::Runnable::Base::uniqueLetters(@args);
+}
+
 =item C<modeName>
 
 If set, this routine will be called from the internal
@@ -367,21 +461,21 @@ sub modeSwitch {
 Executes all of the tests, in a random order
 An optional override may be passed with the tests parameter.
 
-  * tests
-    An ARRAY ref which contains the inclusive list of all tests
-    to run.  If not passed, all tests are run. If an empty list
-    is passed, no tests are run.  If a test does not exist, C<confess>
-    is called.
+	* tests
+	  An ARRAY ref which contains the inclusive list of all tests
+	  to run.  If not passed, all tests are run. If an empty list
+	  is passed, no tests are run.  If a test does not exist, C<confess>
+	  is called.
 
-  * n
-    Number of times to iterate through the tests.
-    Defaults to 1.  Setting to a higher level is useful if you want to
-    prove that the random ordering of tests does not break, but you do
-    not want to type 'make test' many times.
+	* n
+	  Number of times to iterate through the tests.
+	  Defaults to 1.  Setting to a higher level is useful if you want to
+	  prove that the random ordering of tests does not break, but you do
+	  not want to type 'make test' many times.
 
 Returns:
-    The return value is always C<EXIT_SUCCESS>, which you can pass straight
-    to C<exit>
+	The return value is always C<EXIT_SUCCESS>, which you can pass straight
+	to C<exit>
 
 =back
 
@@ -392,22 +486,22 @@ Duncan Ross Palmer, 2E0EOL L<mailto:palmer@overchat.org>
 =head1 LICENCE
 
 Daybo Logic Shared Library
-Copyright (c) 2015-2019, Duncan Ross Palmer (2E0EOL), Daybo Logic
+Copyright (c) 2015-2024, Duncan Ross Palmer (2E0EOL), Daybo Logic
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-    * Redistributions of source code must retain the above copyright notice,
-      this list of conditions and the following disclaimer.
+	* Redistributions of source code must retain the above copyright notice,
+	  this list of conditions and the following disclaimer.
 
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
+	* Redistributions in binary form must reproduce the above copyright
+	  notice, this list of conditions and the following disclaimer in the
+	  documentation and/or other materials provided with the distribution.
 
-    * Neither the name of the Daybo Logic nor the names of its contributors
-      may be used to endorse or promote products derived from this software
-      without specific prior written permission.
+	* Neither the name of the Daybo Logic nor the names of its contributors
+	  may be used to endorse or promote products derived from this software
+	  without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -424,7 +518,7 @@ POSSIBILITY OF SUCH DAMAGE.
 =head1 AVAILABILITY
 
 L<https://metacpan.org/release/Test-Module-Runnable>
-L<https://hg.sr.ht/~m6kvm/libtest-module-runnable-perl>
+L<https://git.sr.ht/~m6kvm/libtest-module-runnable-perl>
 L<http://www.daybologic.co.uk/software.php?content=libtest-module-runnable-perl>
 
 =head1 CAVEATS

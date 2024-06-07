@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 7;
+use Test::More 'tests' => 9;
 use Test::NoWarnings;
 use WQS::SPARQL::Query::Select;
 
@@ -95,3 +95,37 @@ SELECT ?item WHERE {
 }
 END
 is($sparql, $right_ret, 'SPARQL select query with one statement.');
+
+# Test.
+$property_instance = 'P31';
+$instance = 'Q5';
+my $property_name = 'P1448';
+my $name = "foo'bar'baz";
+$sparql = $obj->select_value({
+	$property_instance => $instance,
+	$property_name => $name,
+});
+$right_ret = <<"END";
+SELECT ?item WHERE {
+  ?item wdt:$property_instance wd:$instance.
+  ?item wdt:$property_name 'foo\\\'bar\\\'baz'.
+}
+END
+is($sparql, $right_ret, 'SPARQL select query with two statements with escape sequences.');
+
+# Test.
+$property_instance = 'P31';
+$instance = 'Q5';
+$property_name = 'P1448';
+$name = "foo'bar'baz\@cs";
+$sparql = $obj->select_value({
+	$property_instance => $instance,
+	$property_name => $name,
+});
+$right_ret = <<"END";
+SELECT ?item WHERE {
+  ?item wdt:$property_instance wd:$instance.
+  ?item wdt:$property_name 'foo\\\'bar\\\'baz'\@cs.
+}
+END
+is($sparql, $right_ret, 'SPARQL select query with two statements with escape sequences plus lang.');

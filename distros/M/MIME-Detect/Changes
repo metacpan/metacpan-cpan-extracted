@@ -1,3 +1,6 @@
+0.12 2024-06-06
+    * Fix prerequisites, Filter::signatures is not needed anymore
+
 0.11 2024-06-03
     * Update XML database to version 2.4
     * Update build infrastructure

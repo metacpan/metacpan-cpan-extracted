@@ -1,8 +1,8 @@
 Source: libtest-module-runnable-perl
 Section: perl
 Priority: optional
-Maintainer: Duncan Ross Palmer <palmer@overchat.org>
-Build-Depends: debhelper (>= 9),
+Maintainer: Rev. Duncan Ross Palmer <2e0eol@gmail.com>
+Build-Depends: debhelper (>= 13),
 Build-Depends-Indep:
  libmoose-perl,
  libreadonly-perl,
@@ -11,13 +11,14 @@ Build-Depends-Indep:
  libtest-exception-perl,
  libtest-mockmodule-perl,
  libtest-output-perl,
-Standards-Version: 4.3.0
-Homepage: https://hg.sr.ht/~m6kvm/libtest-module-runnable-perl
+Standards-Version: 4.6.2
+Homepage: http://www.daybologic.co.uk/software.php?content=libtest-module-runnable-perl
 
 Package: libtest-module-runnable-perl
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends},
  libmoose-perl,
+ libreadonly-perl,
  libtest-deep-perl,
  libtest-exception-perl,
  libtest-mockmodule-perl,

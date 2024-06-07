@@ -1,5 +1,20 @@
 Revision history for MsOffice-Word-Template
 
+
+2.02    06.06.2024
+  - fix MANIFEST forgot one module in v2.01
+
+2.01    06.06.2024
+  - support for inserting fragments from other .docx files
+  - tests for barcode generation
+  - refactoring : methods moved to the back-end class 'Engine'
+  - doc: highlighting help for LibreOffice users
+
+2.0     01.05.2022
+  - general refactoring
+  - first support for barcodes
+  - entity encoding
+
 1.02    28.03.2022
   - support for bookmarks, hyperlinks and Word fields
 

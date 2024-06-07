@@ -92387,3 +92387,14 @@ K/KI/KIMOTO/SPVM-Resource-SocketUtil-1.002.tar.gz
 K/KI/KIMOTO/SPVM-Sys-0.522.tar.gz
 L/LN/LNATION/Terse-0.24.tar.gz
 E/EX/EXODIST/Test2-Suite-0.000163.tar.gz
+I/IN/INGY/Alien-YAMLScript-0.1.60.tar.gz
+G/GE/GENE/Date-Holidays-Adapter-USA-0.0107.tar.gz
+G/GE/GENE/Date-Holidays-USA-0.0206.tar.gz
+C/CO/CORION/MIME-Detect-0.12.tar.gz
+D/DA/DAMI/MsOffice-Word-Template-2.03.tar.gz
+P/PR/PROCH/NBI-Slurm-0.8.6.tar.gz
+B/BU/BURAK/Net-Hadoop-WebHDFS-LWP-0.012.tar.gz
+P/PE/PERLANCAR/Sah-PSchemaBundle-Array-0.010.tar.gz
+D/DD/DDRP/Test-Module-Runnable-0.6.1.tar.gz
+S/SK/SKIM/WQS-SPARQL-Query-0.03.tar.gz
+I/IN/INGY/YAMLScript-0.1.60.tar.gz

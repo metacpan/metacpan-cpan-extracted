@@ -1,5 +1,5 @@
 package Net::Hadoop::WebHDFS::LWP;
-$Net::Hadoop::WebHDFS::LWP::VERSION = '0.011';
+$Net::Hadoop::WebHDFS::LWP::VERSION = '0.012';
 use strict;
 use warnings;
 use parent 'Net::Hadoop::WebHDFS';
@@ -23,6 +23,7 @@ sub new {
     my $class   = shift;
     my %options = @_;
     my $debug   = delete $options{debug} || 0;
+    my $use_ssl = delete $options{use_ssl} || 0;
 
     require Data::Dumper if $debug;
 
@@ -49,6 +50,8 @@ sub new {
 
     $self->_create_ua;
 
+    $self->{use_ssl} = $use_ssl;
+
     return $self;
 }
 
@@ -59,13 +62,16 @@ sub request {
 
     my $request_path = $op ? $self->build_path( $path, $op, %$params ) : $path;
 
+    my $protocol = $self->{use_ssl} ? 'https' : 'http';
+
     # Note: ugly things done with URI, which is already used in the parent
     # module. So we re-parse the path produced there. yuk.
-    my $uri = URI->new( $request_path, 'http' );
+    my $uri = URI->new( $request_path, $protocol );
 
     $uri->host($host);
     $uri->port($port);
-    $uri->scheme('http'); # no ssl for webhdfs? check the docs
+
+    $uri->scheme( $protocol );
 
     printf STDERR "URI : %s\n", $uri if $self->{debug};
 
@@ -281,7 +287,7 @@ Net::Hadoop::WebHDFS::LWP - Client library for Hadoop WebHDFS and HttpFs, with K
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -292,6 +298,7 @@ version 0.011
         port        => 14000,
         username    => 'jdoe',
         httpfs_mode => 1,
+        use_ssl     => 1,
     );
     $client->create(
         '/foo/bar', # path
