@@ -1,5 +1,10 @@
 Revision history for String-Tagged
 
+0.23    2023-10-13
+        [CHANGES]
+         * Don't extend edge-anchored tags when appending a `String::Tagged`
+           instance
+
 0.22    2023-10-02
         [CHANGES]
          * Add the same start/end/len options to `->clone` as

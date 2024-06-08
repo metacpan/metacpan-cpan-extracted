@@ -221,30 +221,22 @@ Check what the build-in Lucene tokenizer(s) will do with your text.
 Add a L<Couch::DB::Client|Couch::DB::Client>-object to be used to contact the CouchDB
 cluster.  Returned is the couch object, so these calls are stackable.
 
-=item $obj-E<gt>B<call>(\%options|($method, $path, %options))
+=item $obj-E<gt>B<call>($method, $path, %options)
 
 Call some couchDB server, to get work done.  This is the base for any
 interaction with the server.
 
  -Option   --Default
-  bookmark   undef
   client     undef
   clients    undef
   delay      false
-  method     <required>
-  paginate   false
-  path       <required>
+  on_chain   undef
+  on_values  undef
+  paging     {}
   query      undef
   send       undef
-  to_values  undef
 
 =over 2
-
-=item bookmark => STRING
-
-When you magically come up with the same query, and a related
-bookmark (save C<< $result->next >> in the session?), then you
-get a next page.
 
 =item client => L<Couch::DB::Client|Couch::DB::Client>
 
@@ -263,18 +255,26 @@ Do not execute the server call yet, but prepare it only in a way that
 it can be combined with other clients in parallel.
 See L<Couch::DB::Result|Couch::DB::Result> chapter L</DETAILS> about delayed requests.
 
-=item method => 'GET'|'POST'|...
+=item on_chain => CODE
 
-HTTP transport method.  Positional parameter when a LIST is passed.
+When the call ends successfully, then run the chain code.  Event
+C<on_error> and C<on_final> are only called on the last results of
+the chain.
 
-=item paginate => BOOLEAN
+=item on_values => CODE
 
-This call supports pagination via bookmarks.
-This enables the use of L<Couch::DB::Result::nextPage()|Couch::DB::Result/"When the document is collected">.
+A function (sub) which transforms the data of the CouchDB answer into
+useful Perl values and objects.  See L<Couch::DB::toPerl()|Couch::DB/"Conversions">.
+The function is called with the result and a partially or unprocessed
+reponse (answer).  That data shall not be modified.  Return a new
+data-structure which contains the processed information, which may
+reuse parts which are not modified.
 
-=item path => $url
+=item paging => HASH
 
-HTTP endpoint.  Positional parameter when a LIST is passed.
+When the endpoint support paging, then its needed configuration
+data has been collected in here.  This enables the use of C<_succeed>,
+C<_page>, C<skip>, and friends.  See examples in section L</Pagination>.
 
 =item query => HASH
 
@@ -285,11 +285,6 @@ Query parameters for the request.
 The content to be sent with POST and PUT methods.
 in those cases, even when there is nothing to pass on, simply to be
 explicit about that.
-
-=item to_values => CODE
-
-A function (sub) which transforms the data of the CouchDB answer into useful Perl
-values and objects.  See L<Couch::DB::toPerl()|Couch::DB/"Conversions">.
 
 =back
 
@@ -468,17 +463,30 @@ boolean to produce C<false> in case of an error.  So typically:
 This CouchDB library hides the fact that endpoint C</_uuids> has been called.
 It also hides the client (UserAgent) which was used to collect the data.
 
+You could also write
+
+  my $uuids  = $couch->requestUUIDs(100)->values->{uuids};
+
+because "values()" will terminate when the database call did not result
+in a successful answer.  Last alternative:
+
+   my @uuids = $couch->freshUUIDs(100);
+
+Besides calls, there are all kinds of facility methods, which add
+further abstraction from the server connection.
+
 =head3 Type conversions
 
-With the C<Couch::DB::Result::values()> method, conversions between JSON
-syntax and pure Perl are done.
+With the L<Couch::DB::Result::values()|Couch::DB::Result/"When the document is collected"> method, conversions between JSON
+syntax and pure Perl are done.  This also hides database interface changes
+for you, based on your L<new(api)|Couch::DB/"Constructors"> setting.  Avoid L<Couch::DB::Result::answer()|Couch::DB::Result/"When the document is collected">,
+which gives the uninterpreted, unabstracted results.
 
-More importantly: this library also converts parameters from Perl space
-into JSON space.  POST and PUT parameters travel in JSON documents.
-In JSON, a boolean is C<true> and C<false> (without quotes).  In Perl,
-these are C<undef> and C<1> (and many alternatives).  For anything besides
-your own documents, C<Couch::DB> will totally hide these differences
-for you!
+This library also converts parameters from Perl space into JSON space.
+POST and PUT parameters travel in JSON documents.  In JSON, a boolean is
+C<true> and C<false> (without quotes).  In Perl, these are C<undef> and
+C<1> (and many alternatives).  For anything besides your own documents,
+C<Couch::DB> will totally hide these differences for you!
 
 =head3 Generic parameters
 
@@ -519,21 +527,148 @@ Besides, at the moment we support the following events:
 
 =item * C<on_error> =E<gt> CODE or ARRAY-of-CODE
 
-A CODE (sub) which is called when the interaction with the server has been completed
-without success.  The CODE gets the result object as only parameter.
+A CODE (sub) which is called when the interaction with the server has
+been completed without success.  The CODE gets the result object as
+only parameter.
 
 =item * C<on_final> =E<gt> CODE or ARRAY-of-CODE
 
-A CODE (sub) which is called when the interaction with the server has been completed.
-This may happen much later, when combined with C<_delay>.  The CODE gets the result
-object as only parameter.
+A CODE (sub) which is called when the interaction with the server has
+been completed.  This may happen much later, when combined with C<_delay>.
+The CODE gets the result object as only parameter, and returns a result
+object which might be different... as calls can be chained.
+
+=item * C<on_chain> =E<gt> CODE
+
+Run the CODE after the call has been processed.  It works as if the
+changed logic is run after the call, with the difference is that this
+next step is defined before the call has been made.  This sometimes
+produces a nicer interface (like paging).
 
 =back
 
+=head2 Pagination
+
+Searches tend to give a large number of anwers.  CouchDB calls will refuse
+to return too many answers at a time (typically 25).  When you need more
+answers, you will need more calls.
+
+To get more answers, there are two mechanisms: some calls provide a
+C<skip> and C<limit> only.  Other calls implement the more sofisticated
+bookmark mechanism.  Both mechanisms are abstracted away by the
+C<_succeed> mechanism.
+
+B<Be aware> that you shall provide the same query parameters to each
+call of the search method.  Succession may be broken when you change
+some parameters: it is not fully documented which ones and how are
+needed to continue, so simply pass all.  Probably, it is save to change
+the C<limit>.
+
+To manage paged results, selected calls support the following options:
+
+=over 4
+
+=item * C<_page> =E<gt> INTEGER (default 1)
+
+Start-point of returned results, for calls which support paging.
+Pages are numbered starting from 1.  When available, bookmarks will
+be used for next pages.  Succeeding searches will automatically move
+through pages (see examples)
+
+=item * C<_page_size> =E<gt> INTEGER (default 25)
+
+The CouchDB server will often not give you more than 25 or 50 answers
+at a time, but you do not want to know.
+
+=item * C<_succeed> =E<gt> $result or $result->paging
+
+Make this query as successor of a previous query.  Some requests support
+paging (via bookmarks).  See examples in a section below.
+
+=item * C<_harvester> =E<gt> CODE
+
+How or what to extract per request.  You may add other information,
+like collecting response objects.  The CODE returns the extract LIST of
+objects/elements. Collection for a page stops once that combined list
+reaches C<_page_size>.
+
+=item * C<_bookmark> =E<gt> STRING
+
+If you accidentally know the bookmark for the search.  Usually, this is
+automatically picked-up via C<_succeed>.
+
+=item * C<skip> =E<gt> INTEGER
+
+Do not return this amount of first following elements.
+B<Be warned:> use as %option, not as search parameter.
+
+=item * C<limit> =E<gt> INTEGER
+
+Do not request more than C<limit> number of results per request.  May be
+less than C<_page_size>.
+B<Be warned:> use as %option, not as search parameter.
+
+=back
+
+B<. Example: paging through result>
+
+Get page by page, where you may use the C<limit> parameter to request
+for a number of elements.  Do not use C<skip>, except in the first call.
+The C<_succeed> handling will play tricks with C<_page>, C<_harvester>,
+and C<_client> which you do not wish to know.
+
+  my $page1 = $couch->find(\%search, limit => 12, skip => 300);
+  my $docs1 = $page1->page;
+  my $page2 = $couch->find(\%search, _succeed => $page1);
+  my $docs2 = $page2->page;
+
+B<. Example: paging via a session>
+
+When you cannot ask for pages within a continuous process, because the
+page is shown to a user who has to take action to see an other page,
+then save the pagingState.  The state cannot contain code references, so
+when you have a specific harvester, than you need to resupply it.
+
+  my $page1 = $couch->find(\%search);
+  my $docs1 = $page1->page;
+  $session->save(current => serialized $page1->pagingState);
+  ...
+  my $prev  = deserialize $session->load('current');
+  my $page2 = $couch->find(\%search, _succeed => $prev);
+  my $docs2 = $page2->page;
+
+B<. Example: get all results>
+
+Handle the responses which are coming in one by one.  This is useful
+when the documents (with attachements?) are large.
+
+  my $list;
+  while($list = $couch->find(\%search, _succeed => $list))
+  {   my $docs = $list->page;
+      @$docs or last;    # nothing left
+      ...;    # use the docs
+  }
+  $list or die "Stopped somewhere with ". $list->message;
+
+B<. Example: get one page of results>
+
+You can jump back and forward in the pages: bookmarks will remember the
+pages already seen.
+
+  my $page4 = $couch->find(\%search,
+	limit      => 10,  # results per server request
+	_page_size => 50,  # results until complete
+    _page      =>  4,  # start point, may use bookmark
+    _harvester => sub { $_[0]->values->{docs} }, # default
+  );
+  my $docs4 = $page4->page;
+  my $page5 = $couch->find(\%search, _succeed => $page4);
+  my $docs5 = $page5->page;
+
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.002,
-built on May 31, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.003,
+built on June 08, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

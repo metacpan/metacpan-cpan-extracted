@@ -194,4 +194,25 @@ HTML
     } => [ $ok ] => 'Finding no matching descendants returns empty collection';
 };
 
+subtest empty => sub {
+    my $html = '<el value="">';
+
+    is intercept {
+        is $html, dom {
+            attr value => '';
+        }
+    } => [ $ok ] => 'Match empty value';
+};
+
+subtest val => sub {
+    my $html = '<el value=42>';
+
+    is intercept {
+        is $html, dom {
+            attr value => 42;
+            val 42;
+        }
+    } => [ $ok ] => 'Can directly retrieve value';
+};
+
 done_testing;

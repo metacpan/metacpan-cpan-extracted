@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240308154351;
+our $VERSION = 1.20240607153920;
 
 my $formatters = [
                 {
@@ -104,33 +104,38 @@ my $validators = {
           )\\d\\d|
           (?:
             5(?:
-              00(?:
-                0\\d|
-                11|
-                22|
-                33|
-                44|
-                5[05]|
-                77|
-                88|
-                9[09]
+              0(?:
+                0(?:
+                  0\\d|
+                  11|
+                  22|
+                  3[0-6]|
+                  44|
+                  5[05]|
+                  77|
+                  88|
+                  9[09]
+                )|
+                111|
+                77\\d
               )|
               1(?:
                 1(?:
-                  00|
-                  [124]\\d|
-                  3[01]
+                  [03][01]|
+                  [124]\\d
                 )|
                 4\\d\\d
               )|
-              (?:
-                44|
-                68
-              )\\d\\d|
+              [23]555|
+              4(?:
+                4\\d\\d|
+                555
+              )|
               5(?:
                 [0157-9]\\d\\d|
                 200
               )|
+              6[89]\\d\\d|
               7(?:
                 [0147-9]\\d\\d|
                 5(?:
@@ -143,7 +148,10 @@ my $validators = {
                   [018]\\d|
                   2[0-4]
                 )|
-                58[89]|
+                5(?:
+                  55|
+                  8[89]
+                )|
                 8(?:
                   55|
                   88
@@ -191,81 +199,81 @@ my $validators = {
                 'voip' => '70[67]\\d{6}'
               };
 my %areanames = ();
-$areanames{en} = {"995437", "Lentekhi",
-"995342", "Akhalgori",
-"995414", "Xobi",
-"995479", "Chiatura",
-"995341", "Rustavi",
-"995364", "Aspindza",
-"995433", "Kharagauli",
-"995495", "Khoni",
-"995353", "Gurdjaani",
-"995346", "Dusheti",
-"995443", "Gagra",
-"995425", "Qeda",
-"995447", "Gali",
-"995419", "Choxatauri",
-"995369", "Kareli",
-"995357", "Marneuli",
-"995350", "Telavi",
-"995432", "Vani",
-"995347", "Djava",
-"995374", "Tigvi",
-"995446", "Tkvarcheli",
-"995431", "Kutaisi",
-"995424", "Shuaxevi",
-"995356", "DedoplisTskaro",
-"995436", "Tskaltubo",
-"995351", "Sagaredjo",
-"995442", "Sukhumi",
-"995418", "Martvili",
-"995494", "lanchxuti",
-"995365", "Akhaltsikhe",
-"995415", "Zugdidi",
-"995352", "Kvareli",
-"995368", "Khashuri",
-"995366", "Adigeni",
-"995497", "Tkibuli",
-"995416", "Tsalendjikha",
-"995472", "Tsageri",
-"995349", "Akhmeta",
-"995410", "Mestia",
-"995435", "Sachkhere",
-"995493", "Poti",
-"995360", "Dmanisi",
-"995358", "Bolnisi",
-"995362", "Akhalkalaki",
-"995427", "Xelvachauri",
-"995445", "Ochamchire",
-"995373", "Mtskheta",
-"995448", "Gulripshi",
-"995355", "Signagi",
-"995412", "Abasha",
-"995361", "Ninotsminda",
+$areanames{en} = {"995367", "Bordjomi",
 "995344", "Tskhinvali",
-"995423", "Xulo",
-"995411", "Samtredia",
-"995354", "Lagodekhi",
-"995426", "Kobuleti",
-"995492", "Zestafoni",
-"995370", "Gori",
-"995444", "Gudauta",
-"995348", "Tianeti",
-"995473", "Oni",
-"995439", "Ambrolauri",
-"995491", "Terdjola",
-"995345", "Stefanstminda\/Kazbegi",
-"995367", "Bordjomi",
+"995437", "Lentekhi",
 "995359", "TetriTskaro",
+"995356", "DedoplisTskaro",
 "995371", "Kaspi",
+"995473", "Oni",
 "995422", "Batumi",
+"995363", "Tsalka",
+"995354", "Lagodekhi",
+"995368", "Khashuri",
+"995346", "Dusheti",
+"995349", "Akhmeta",
+"995433", "Kharagauli",
+"995491", "Terdjola",
+"995370", "Gori",
+"995427", "Xelvachauri",
+"995345", "Stefanstminda\/Kazbegi",
+"995362", "Akhalkalaki",
+"995423", "Xulo",
+"995355", "Signagi",
+"995472", "Tsageri",
+"995432", "Vani",
+"995494", "lanchxuti",
+"995412", "Abasha",
+"995447", "Gali",
+"995351", "Sagaredjo",
+"995374", "Tigvi",
+"995448", "Gulripshi",
+"995341", "Rustavi",
+"995443", "Gagra",
 "995496", "Ozurgeti",
-"995417", "Chkhorotskhu",
 "995413", "Senaki",
-"99532", "Tbilisi",
-"995372", "Gardabani",
+"995495", "Khoni",
+"995418", "Martvili",
+"995417", "Chkhorotskhu",
+"995442", "Sukhumi",
+"995350", "Telavi",
+"995358", "Bolnisi",
+"995364", "Aspindza",
+"995425", "Qeda",
+"995353", "Gurdjaani",
+"995347", "Djava",
 "995434", "Bagdati",
-"995363", "Tsalka",};
+"995439", "Ambrolauri",
+"995436", "Tskaltubo",
+"995357", "Marneuli",
+"995366", "Adigeni",
+"995479", "Chiatura",
+"995348", "Tianeti",
+"995410", "Mestia",
+"995369", "Kareli",
+"995424", "Shuaxevi",
+"995352", "Kvareli",
+"995365", "Akhaltsikhe",
+"995411", "Samtredia",
+"995435", "Sachkhere",
+"995426", "Kobuleti",
+"995342", "Akhalgori",
+"995444", "Gudauta",
+"995497", "Tkibuli",
+"995431", "Kutaisi",
+"995415", "Zugdidi",
+"995493", "Poti",
+"995373", "Mtskheta",
+"995361", "Ninotsminda",
+"995446", "Tkvarcheli",
+"995445", "Ochamchire",
+"995419", "Choxatauri",
+"995360", "Dmanisi",
+"995416", "Tsalendjikha",
+"995414", "Xobi",
+"995492", "Zestafoni",
+"99532", "Tbilisi",
+"995372", "Gardabani",};
 my $timezones = {
                '' => [
                        'Asia/Tbilisi'

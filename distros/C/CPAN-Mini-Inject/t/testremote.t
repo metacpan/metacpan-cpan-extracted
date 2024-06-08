@@ -1,33 +1,51 @@
+use strict;
+use warnings;
+
 use Test::More;
 
-use LWP;
 use CPAN::Mini::Inject;
 use lib 't/lib';
+use Local::localserver;
 
-BEGIN {
-  plan skip_all => "HTTP::Server::Simple required to test update_mirror"
-   if not eval "use CPANServer; 1";
-  plan skip_all => "Net::EmptyPort required to test update_mirror"
-   if not eval "use Net::EmptyPort; 1";
-  plan tests => 3;
+$SIG{'INT'} = sub { print "\nCleaning up before exiting\n"; exit 1 };
+
+my $port =  empty_port();
+my( $pid ) = start_server($port);
+diag( "$$: PORT: $port" ) if $ENV{TEST_VERBOSE};
+diag( "$$: PID: $pid" ) if $ENV{TEST_VERBOSE};
+
+my $url = "http://localhost:$port/";
+
+my $available = 0;
+for( 1 .. 3 ) {
+  my $sleep = $_ * 2;
+  sleep $sleep;
+  diag("Sleeping $sleep seconds waiting for server") if $ENV{TEST_VERBOSE};
+  if( can_fetch($url) ) {
+  	$available = 1;
+  	last;
+  	}
+  elsif( ! kill 0, $pid ) {
+    diag("Server pid is gone") if $ENV{TEST_VERBOSE};
+  	last;
+  	}
 }
 
-my $port = Net::EmptyPort::empty_port;
-my $server = CPANServer->new( $port );
-my $pid    = $server->background;
-ok( $pid, 'HTTP Server started' );
-# Give server time to get going.
-sleep 1;
+unless( $available ) {
+	fail( "Server never came up" );
+	done_testing();
+	exit 1;
+	}
 
-$SIG{__DIE__} = sub { kill( 9, $pid ) };
+ok can_fetch($url), "URL $url is available";
 
 my $mcpi = CPAN::Mini::Inject->new;
 $mcpi->loadcfg( 't/.mcpani/config' )->parsecfg;
 $mcpi->{config}{remote} =~ s/:\d{5}\b/:$port/;
 
-my $url = "http://localhost:$port/";
 $mcpi->testremote;
-is( $mcpi->{site}, $url, 'Correct remote URL' );
+is( $mcpi->{site}, $url, "Site URL is $url" );
+ok can_fetch($url), "URL $url is available";
 
 $mcpi->loadcfg( 't/.mcpani/config_badremote' )->parsecfg;
 $mcpi->{config}{remote} =~ s/:\d{5}\b/:$port/;
@@ -41,7 +59,6 @@ SKIP: {
 }
 
 kill( 9, $pid );
-
 unlink( 't/testconfig' );
 
-sub can_fetch { LWP::UserAgent->new->get( shift )->is_success }
+done_testing();

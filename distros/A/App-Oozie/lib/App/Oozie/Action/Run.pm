@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use parent qw( App::Oozie::Run );
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 1;
 
@@ -23,7 +23,7 @@ App::Oozie::Action::Run
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

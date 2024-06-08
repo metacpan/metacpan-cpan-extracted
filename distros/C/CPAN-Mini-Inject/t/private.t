@@ -4,10 +4,9 @@ use strict;
 use warnings;
 
 use CPAN::Mini::Inject;
-use Test::More tests => 2;
+use Test::More;
 
-{
-  # _fmtmodule
+subtest '_fmtmodule' => sub {
   my @tests = (
     {
       in => [ 'foo', 'foo.tar.gz', '0.01' ],
@@ -28,7 +27,6 @@ use Test::More tests => 2;
     my $got = CPAN::Mini::Inject::_fmtmodule( @{ $test->{in} } );
     is $got, $test->{out}, '_fmtmodule';
   }
-}
+};
 
-# vim:ts=2:sw=2:et:ft=perl
-
+done_testing();

@@ -22,13 +22,12 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240308154353;
+our $VERSION = 1.20240607153922;
 
 my $formatters = [
                 {
                   'format' => '$1 $2 $3 $4',
                   'leading_digits' => '[235-9]',
-                  'national_rule' => '8 $1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
                 }
               ];
@@ -434,9 +433,6 @@ my $timezones = {
       my $number = shift;
       $number =~ s/(^\+998|\D)//g;
       my $self = bless({ country_code => '998', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, }, $class);
-      return $self if ($self->is_valid());
-      $number =~ s/^(?:8)//;
-      $self = bless({ country_code => '998', number => $number, formatters => $formatters, validators => $validators, }, $class);
-      return $self->is_valid() ? $self : undef;
+        return $self->is_valid() ? $self : undef;
     }
 1;

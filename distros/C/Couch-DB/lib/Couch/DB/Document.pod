@@ -224,7 +224,7 @@ example:
 
   if($db->doc($id)->exists) { ... }
 
-=item $obj-E<gt>B<get>(%options)
+=item $obj-E<gt>B<get>( [\%flags, %options] )
 
  [CouchDB API "GET /{db}/{docid}"]
  [CouchDB API "GET /{db}/_local/{docid}"]
@@ -328,8 +328,8 @@ Returns the names of all attachments.
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.002,
-built on May 31, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.003,
+built on June 08, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

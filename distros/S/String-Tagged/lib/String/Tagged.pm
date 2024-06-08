@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2008-2023 -- leonerd@leonerd.org.uk
 
-package String::Tagged 0.22;
+package String::Tagged 0.23;
 
 use v5.14;
 use warnings;
@@ -135,7 +135,7 @@ Out-of-band data
 
 =head2 new
 
-   $st = String::Tagged->new( $str )
+   $st = String::Tagged->new( $str );
 
 Returns a new instance of a C<String::Tagged> object. It will contain no tags.
 If the optional C<$str> argument is supplied, the string buffer will be
@@ -163,7 +163,7 @@ sub new
 
 =head2 new_tagged
 
-   $st = String::Tagged->new_tagged( $str, %tags )
+   $st = String::Tagged->new_tagged( $str, %tags );
 
 Shortcut for creating a new C<String::Tagged> object with the given tags
 applied to the entire length. The tags will not be anchored at either end.
@@ -185,7 +185,7 @@ sub new_tagged
 
 =head2 clone (class)
 
-   $new = String::Tagged->clone( $orig, %opts )
+   $new = String::Tagged->clone( $orig, %opts );
 
 Returns a new instance of C<String::Tagged> made by cloning the original,
 subject to the options provided. The returned instance will be in the
@@ -213,8 +213,8 @@ name and value are passed into the corresponding function, which should return
 an even-sized key/value list giving a tag, or a list of tags, to apply to the
 new clone.
 
-   my @new_tags = $convert_tags->{$orig_name}->( $orig_name, $orig_value )
-   # Where @new_tags is ( $new_name, $new_value, $new_name_2, $new_value_2, ... )
+   my @new_tags = $convert_tags->{$orig_name}->( $orig_name, $orig_value );
+   # Where @new_tags is ( $new_name, $new_value, $new_name_2, $new_value_2, ... );
 
 As a further convenience, if the value for a given tag name is a plain string
 instead of a code reference, it gives the new name for the tag, and will be
@@ -245,7 +245,7 @@ string. This option only applies if C<end> is not given.
 
 =head2 clone (instance)
 
-   $new = $orig->clone( %args )
+   $new = $orig->clone( %args );
 
 Called as an instance (rather than a class) method, the newly-cloned instance
 is returned in the same class as the original.
@@ -333,7 +333,7 @@ sub _mkextent
 
 =head2 from_sprintf
 
-   $str = String::Tagged->from_sprintf( $format, @args )
+   $str = String::Tagged->from_sprintf( $format, @args );
 
 I<Since version 0.15.>
 
@@ -447,7 +447,7 @@ sub from_sprintf
 
 =head2 join
 
-   $str = String::Tagged->join( $sep, @parts )
+   $str = String::Tagged->join( $sep, @parts );
 
 I<Since version 0.17.>
 
@@ -479,9 +479,9 @@ sub join
 
 =head2 str
 
-   $str = $st->str
+   $str = $st->str;
 
-   $str = "$st"
+   $str = "$st";
 
 Returns the plain string contained within the object.
 
@@ -503,9 +503,9 @@ sub str
 
 =head2 length
 
-   $len = $st->length
+   $len = $st->length;
 
-   $len = length( $st )
+   $len = length( $st );
 
 Returns the length of the plain string. Because stringification works on this
 object class, the normal core C<length> function works correctly on it.
@@ -520,7 +520,7 @@ sub length
 
 =head2 substr
 
-   $str = $st->substr( $start, $len )
+   $str = $st->substr( $start, $len );
 
 Returns a C<String::Tagged> instance representing a section from within the
 given string, containing all the same tags at the same conceptual positions.
@@ -537,7 +537,7 @@ sub substr
 
 =head2 plain_substr
 
-   $str = $st->plain_substr( $start, $len )
+   $str = $st->plain_substr( $start, $len );
 
 Returns as a plain perl string, the substring at the given position. This will
 be the same string data as returned by C<substr>, only as a plain string
@@ -661,7 +661,7 @@ sub _insert_tag
 
 =head2 apply_tag
 
-   $st->apply_tag( $start, $len, $name, $value )
+   $st->apply_tag( $start, $len, $name, $value );
 
 Apply the named tag value to the given extent. The tag will start on the
 character at the C<$start> index, and continue for the next C<$len>
@@ -795,14 +795,14 @@ sub _remove_tag
 
 =head2 unapply_tag
 
-   $st->unapply_tag( $start, $len, $name )
+   $st->unapply_tag( $start, $len, $name );
 
 Unapply the named tag value from the given extent. If the tag extends beyond
 this extent, then any partial fragment of the tag will be left in the string.
 
 This method returns the C<$st> object.
 
-   $st->unapply_tag( $e, $name )
+   $st->unapply_tag( $e, $name );
 
 Alternatively, an existing L<String::Tagged::Extent> object can be passed as
 the first argument instead of two integers.
@@ -817,14 +817,14 @@ sub unapply_tag
 
 =head2 delete_tag
 
-   $st->delete_tag( $start, $len, $name )
+   $st->delete_tag( $start, $len, $name );
 
 Delete the named tag within the given extent. Entire tags are removed, even if
 they extend beyond this extent.
 
 This method returns the C<$st> object.
 
-   $st->delete_tag( $e, $name )
+   $st->delete_tag( $e, $name );
 
 Alternatively, an existing L<String::Tagged::Extent> object can be passed as
 the first argument instead of two integers.
@@ -839,7 +839,7 @@ sub delete_tag
 
 =head2 delete_all_tag
 
-   $st->delete_all_tag( $name )
+   $st->delete_all_tag( $name );
 
 I<Since version 0.21.>
 
@@ -872,14 +872,14 @@ sub delete_all_tag
 
 =head2 merge_tags
 
-   $st->merge_tags( $eqsub )
+   $st->merge_tags( $eqsub );
 
 Merge neighbouring or overlapping tags of the same name and equal values.
 
 For each pair of tags of the same name that apply on neighbouring or
 overlapping extents, the C<$eqsub> callback is called, as
 
-   $equal = $eqsub->( $name, $value_a, $value_b )
+   $equal = $eqsub->( $name, $value_a, $value_b );
 
 If this function returns true then the tags are merged.
 
@@ -938,13 +938,13 @@ sub merge_tags
 
 =head2 iter_extents
 
-   $st->iter_extents( $callback, %opts )
+   $st->iter_extents( $callback, %opts );
 
 Iterate the tags stored in the string. For each tag, the CODE reference in
 C<$callback> is invoked once, being passed a L<String::Tagged::Extent> object
 that represents the extent of the tag.
 
-   $callback->( $extent, $tagname, $tagvalue )
+   $callback->( $extent, $tagname, $tagvalue );
 
 Options passed in C<%opts> may include:
 
@@ -1033,13 +1033,13 @@ sub iter_extents
 
 =head2 iter_tags
 
-   $st->iter_tags( $callback, %opts )
+   $st->iter_tags( $callback, %opts );
 
 Iterate the tags stored in the string. For each tag, the CODE reference in
 C<$callback> is invoked once, being passed the start point and length of the
 tag.
 
-   $callback->( $start, $length, $tagname, $tagvalue )
+   $callback->( $start, $length, $tagname, $tagvalue );
 
 Options passed in C<%opts> are the same as for C<iter_extents>.
 
@@ -1061,7 +1061,7 @@ sub iter_tags
 
 =head2 iter_extents_nooverlap
 
-   $st->iter_extents_nooverlap( $callback, %opts )
+   $st->iter_extents_nooverlap( $callback, %opts );
 
 Iterate non-overlapping extents of tags stored in the string. The CODE
 reference in C<$callback> is invoked for each extent in the string where no
@@ -1069,7 +1069,7 @@ tags change. The entire set of tags active in that extent is given to the
 callback. Because the extent covers possibly-multiple tags, it will not define
 the C<anchor_before> and C<anchor_after> flags.
 
-   $callback->( $extent, %tags )
+   $callback->( $extent, %tags );
 
 The callback will be invoked over the entire length of the string, including
 any extents with no tags applied.
@@ -1176,13 +1176,13 @@ sub iter_extents_nooverlap
 
 =head2 iter_tags_nooverlap
 
-   $st->iter_tags_nooverlap( $callback, %opts )
+   $st->iter_tags_nooverlap( $callback, %opts );
 
 Iterate extents of the string using C<iter_extents_nooverlap>, but passing
 the start and length of each extent to the callback instead of the extent
 object.
 
-   $callback->( $start, $length, %tags )
+   $callback->( $start, $length, %tags );
 
 Options may be passed in C<%opts> to control the range of the string iterated
 over, in the same way as the C<iter_extents> method.
@@ -1205,12 +1205,12 @@ sub iter_tags_nooverlap
 
 =head2 iter_substr_nooverlap
 
-   $st->iter_substr_nooverlap( $callback, %opts )
+   $st->iter_substr_nooverlap( $callback, %opts );
 
 Iterate extents of the string using C<iter_extents_nooverlap>, but passing the
 substring of data instead of the extent object.
 
-   $callback->( $substr, %tags )
+   $callback->( $substr, %tags );
 
 Options may be passed in C<%opts> to control the range of the string iterated
 over, in the same way as the C<iter_extents> method.
@@ -1233,7 +1233,7 @@ sub iter_substr_nooverlap
 
 =head2 tagnames
 
-   @names = $st->tagnames
+   @names = $st->tagnames;
 
 Returns the set of tag names used in the string, in no particular order.
 
@@ -1255,7 +1255,7 @@ sub tagnames
 
 =head2 get_tags_at
 
-   $tags = $st->get_tags_at( $pos )
+   $tags = $st->get_tags_at( $pos );
 
 Returns a HASH reference of all the tag values active at the given position.
 
@@ -1285,7 +1285,7 @@ sub get_tags_at
 
 =head2 get_tag_at
 
-   $value = $st->get_tag_at( $pos, $name )
+   $value = $st->get_tag_at( $pos, $name );
 
 Returns the value of the named tag at the given position, or C<undef> if the
 tag is not applied there.
@@ -1315,7 +1315,7 @@ sub get_tag_at
 
 =head2 get_tag_extent
 
-   $extent = $st->get_tag_extent( $pos, $name )
+   $extent = $st->get_tag_extent( $pos, $name );
 
 If the named tag applies to the given position, returns a
 L<String::Tagged::Extent> object to represent the extent of the tag at that
@@ -1356,7 +1356,7 @@ sub get_tag_extent
 
 =head2 get_tag_missing_extent
 
-   $extent = $st->get_tag_missing_extent( $pos, $name )
+   $extent = $st->get_tag_missing_extent( $pos, $name );
 
 If the named tag does not apply at the given position, returns the extent of
 the string around that position that does not have the tag. If it does exist,
@@ -1396,7 +1396,7 @@ sub get_tag_missing_extent
 
 =head2 set_substr
 
-   $st->set_substr( $start, $len, $newstr )
+   $st->set_substr( $start, $len, $newstr );
 
 Modifies a extent of the underlying plain string to that given. The extents of
 tags in the string are adjusted to cope with the modified region, and the
@@ -1419,7 +1419,14 @@ but preserving that applied outside.
 If C<$newstr> is a C<String::Tagged> object, then its tags will be applied to
 C<$st> as appropriate. Edge-anchored tags in C<$newstr> will not be extended
 through C<$st>, though they will apply as edge-anchored if they now sit at the
-edge of the new string.
+edge of the new string. If C<$newstr> is being appended to the end, then any
+existing edge-anchored tags at the end of C<$st> are I<not> extended through
+the string; they will instead become bounded to their end position before the
+append happened.
+
+If C<$newstr> is otherwise treated as a plain string, then any existing
+edge-anchored tags at the end of C<$st> I<are> extended through the newly
+added content and will continue to be edge-anchored in the result.
 
 =cut
 
@@ -1427,6 +1434,8 @@ sub set_substr
 {
    my $self = shift;
    my ( $start, $len, $new ) = @_;
+
+   my $new_is_st = is_string_tagged( $new );
 
    my $limit = $self->length;
 
@@ -1460,9 +1469,15 @@ sub set_substr
       # Plus a case we don't care about
       #    Tag starts and ends entirely before the deleted section - ignore it
 
-      if( $te > $oldend or 
+      if( $te > $oldend or
           ( $te == $oldend and $tf & FLAG_ANCHOR_AFTER ) ) {
          # Case A
+         if( $tf & FLAG_ANCHOR_AFTER and $new_is_st ) {
+            # Do not extend anchor-after tags if we are appending a String::Tagged
+            $t->[4] &= ~FLAG_ANCHOR_AFTER;
+            next;
+         }
+
          $t->[1] += $delta;
 
          if( $t->[0] == $t->[1] ) {
@@ -1526,7 +1541,7 @@ sub set_substr
       }
    }
 
-   if( is_string_tagged( $new ) ) {
+   if( $new_is_st ) {
       my $atstart = $start == 0;
       my $atend   = $newend == $self->length;
 
@@ -1546,7 +1561,7 @@ sub set_substr
 
 =head2 insert
 
-   $st->insert( $start, $newstr )
+   $st->insert( $start, $newstr );
 
 Insert the given string at the given position. A shortcut around
 C<set_substr>.
@@ -1566,15 +1581,19 @@ sub insert
 
 =head2 append
 
-   $st->append( $newstr )
+   $st->append( $newstr );
 
-   $st .= $newstr
+   $st .= $newstr;
 
 Append to the underlying plain string. A shortcut around C<set_substr>.
 
 If C<$newstr> is a C<String::Tagged> object, then its tags will be applied to
 C<$st> as appropriate. Any after-anchored tags in will become after-anchored
 in C<$st>.
+
+As per C<set_substr>, whether any existing edge-anchored tags are extended
+through the newly-added content or become bounded to their current limit
+depends on whether C<$newstr> is a C<String::Tagged> instance or not.
 
 =cut
 
@@ -1607,7 +1626,7 @@ sub append
 
 =head2 append_tagged
 
-   $st->append_tagged( $newstr, %tags )
+   $st->append_tagged( $newstr, %tags );
 
 Append to the underlying plain string, and apply the given tags to the
 newly-inserted extent.
@@ -1632,9 +1651,9 @@ sub append_tagged
 
 =head2 concat
 
-   $ret = $st->concat( $other )
+   $ret = $st->concat( $other );
 
-   $ret = $st . $other
+   $ret = $st . $other;
 
 Returns a new C<String::Tagged> containing the two strings concatenated
 together, preserving any tags present. This method overloads normal string
@@ -1666,7 +1685,7 @@ sub concat
 
 =head2 matches
 
-   @subs = $st->matches( $regexp )
+   @subs = $st->matches( $regexp );
 
 Returns a list of substrings (as C<String::Tagged> instances) for every
 non-overlapping match of the given C<$regexp>.
@@ -1711,7 +1730,7 @@ sub matches
 
 =head2 match_extents
 
-   @extents = $st->match_extents( $regexp )
+   @extents = $st->match_extents( $regexp );
 
 I<Since version 0.20.>
 
@@ -1749,7 +1768,7 @@ sub match_extents
 
 =head2 split
 
-   @parts = $st->split( $regexp, $limit )
+   @parts = $st->split( $regexp, $limit );
 
 Returns a list of substrings by applying the regexp to the string content;
 similar to the core perl C<split> function. If C<$limit> is supplied, the
@@ -1787,7 +1806,7 @@ sub split
 
 =head2 sprintf
 
-   $ret = $st->sprintf( @args )
+   $ret = $st->sprintf( @args );
 
 I<Since version 0.15.>
 
@@ -1806,7 +1825,7 @@ sub sprintf
 
 =head2 debug_sprintf
 
-   $ret = $st->debug_sprintf
+   $ret = $st->debug_sprintf;
 
 Returns a representation of the string data and all the tags, suitable for
 debug printing or other similar use. This is a format such as is given in the

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240308154353;
+our $VERSION = 1.20240607153921;
 
 my $formatters = [
                 {
@@ -90,18 +90,18 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"96612", "Makkah\/Jeddah",
-"96613", "Dammam\/Khobar\/Dahran",
-"96614", "Madenah\/Arar\/Tabuk\/Yanbu",
-"96617", "Abha\/Najran\/Jezan",
-"96611", "Riyadh\/Kharj",
-"96616", "Hail\/Qasim",};
-$areanames{ar} = {"96612", "مكة\/جدة",
-"96613", "الدمام\/الخبر\/الظهران",
-"96614", "المدينة\ المنورة\/عرعر\/تبوك\/ينبع\ البحر",
+$areanames{ar} = {"96611", "الرياض\/الخرج",
+"96612", "مكة\/جدة",
 "96617", "أبها\/نجران\/جازان",
-"96611", "الرياض\/الخرج",
-"96616", "حائل\/القصيم",};
+"96614", "المدينة\ المنورة\/عرعر\/تبوك\/ينبع\ البحر",
+"96616", "حائل\/القصيم",
+"96613", "الدمام\/الخبر\/الظهران",};
+$areanames{en} = {"96611", "Riyadh\/Kharj",
+"96614", "Madenah\/Arar\/Tabuk\/Yanbu",
+"96612", "Makkah\/Jeddah",
+"96617", "Abha\/Najran\/Jezan",
+"96616", "Hail\/Qasim",
+"96613", "Dammam\/Khobar\/Dahran",};
 my $timezones = {
                '' => [
                        'Asia/Riyadh'

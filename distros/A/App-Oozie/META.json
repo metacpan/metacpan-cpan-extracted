@@ -5,7 +5,7 @@
       "Burak Gursoy"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "hadoop",
       "oozie",
@@ -86,7 +86,7 @@
             "Moo::Role" : "0",
             "MooX::Options" : "4.103",
             "Net::Hadoop::Oozie" : "0",
-            "Net::Hadoop::WebHDFS::LWP" : "0.011",
+            "Net::Hadoop::WebHDFS::LWP" : "0.012",
             "Net::Hadoop::YARN::NameNode::JMX" : "0",
             "Path::Tiny" : "0",
             "Ref::Util" : "0",
@@ -144,7 +144,7 @@
          "web" : "https://github.com/Perl-Hadoop/App-Oozie"
       }
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_contributors" : [
       "Abdelrahman Elsergani",
       "Achyuth Samudrala",

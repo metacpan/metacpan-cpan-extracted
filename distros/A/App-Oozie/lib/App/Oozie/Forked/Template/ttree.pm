@@ -1041,7 +1041,7 @@ App::Oozie::Forked::Template::ttree
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

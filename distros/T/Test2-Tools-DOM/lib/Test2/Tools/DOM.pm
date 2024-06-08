@@ -11,7 +11,7 @@ use Test2::Compare ();
 use Test2::Compare::Wildcard ();
 use Test2::Tools::DOM::Check ();
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Exporter 'import';
 our @EXPORT = qw(
@@ -24,6 +24,7 @@ our @EXPORT = qw(
     find
     tag
     text
+    val
 );
 
 sub dom :prototype(&) {
@@ -51,10 +52,10 @@ my sub call ( $name, $args, $expect ) {
 }
 
 # Calls with either only a check, or a key and a check
-my sub multi ( $method, $want, $check = undef ) {
-    $check
-        ? call( $method => [ $want ] => $check )
-        : call( $method => [       ] => $want  )
+my sub multi ( $method, $want, $check = '.oO NOT  A  REAL  VALUE Oo.' ) {
+    $check && $check eq '.oO NOT  A  REAL  VALUE Oo.'
+        ? call( $method => [       ] => $want  )
+        : call( $method => [ $want ] => $check )
 }
 
 sub all_text (        $check ) { call all_text => [       ] => $check }
@@ -63,6 +64,7 @@ sub content  (        $check ) { call content  => [       ] => $check }
 sub find     ( $want, $check ) { call find     => [ $want ] => $check }
 sub tag      (        $check ) { call tag      => [       ] => $check }
 sub text     (        $check ) { call text     => [       ] => $check }
+sub val      (        $check ) { call val      => [       ] => $check }
 
 sub attr     { multi attr     => @_ }
 sub children { multi children => @_ }

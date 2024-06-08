@@ -18,11 +18,12 @@ use Net::RDAP::Registry;
 use Net::RDAP::SearchResult;
 use Net::RDAP::Service;
 use Net::RDAP::Values;
+use Net::RDAP::JCard;
 use vars qw($VERSION);
 use constant DEFAULT_CACHE_TTL => 3600;
 use strict;
 
-$VERSION = 0.24;
+$VERSION = 0.25;
 
 =pod
 
@@ -684,6 +685,8 @@ RDAP-related modules that all work together. They are:
 
 =item * L<Net::RDAP::EPPStatusMap>
 
+=item * L<Net::RDAP::JCard>
+
 =item * L<Net::RDAP::Registry>
 
 =item * L<Net::RDAP::Registry::IANARegistry>
@@ -710,13 +713,13 @@ Data Access Protocol (RDAP)
 =item * L<https://tools.ietf.org/html/rfc7481> - Security Services for the
 Registration Data Access Protocol (RDAP)
 
-=item * L<https://tools.ietf.org/html/rfc7482> - Registration Data Access
+=item * L<https://tools.ietf.org/html/rfc9082> - Registration Data Access
 Protocol (RDAP) Query Format
 
-=item * L<https://tools.ietf.org/html/rfc7483> - JSON Responses for the
+=item * L<https://tools.ietf.org/html/rfc9083> - JSON Responses for the
 Registration Data Access Protocol (RDAP)
 
-=item * L<https://tools.ietf.org/html/rfc7484> - Finding the Authoritative
+=item * L<https://tools.ietf.org/html/rfc9224> - Finding the Authoritative
 Registration Data (RDAP) Service
 
 =item * L<https://tools.ietf.org/html/rfc8056> - Extensible Provisioning

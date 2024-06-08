@@ -1,0 +1,58 @@
+0.011   2024-05-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename mod/dist Sah-PSchema{s,Bundle}-* to be more consistent
+          with others.
+
+
+0.010   2022-09-25  Released-By: PERLANCAR; Urgency: low
+
+        - Remove extras part.
+
+
+0.009   2021-09-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Follow latest Sah::Schema::perl::modname_with_optional_args
+	  (0.039) which allows array form.
+
+
+0.008   2021-03-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add prereqs to Sah::Schema::perl::modname{,_with_optional_args}.
+
+
+0.007   2021-02-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to Complete::Module 0.262, add options ns_prefixes.
+
+
+0.006   2021-02-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Add arg: complete_recurse.
+
+
+0.005   2021-01-26  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix missing variable declaration which was not caught
+	  because we didn't use strict, derp.
+
+
+0.004   2021-01-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Fix typo.
+
+
+0.003   2020-06-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Add parameterized schema: perl::modname_with_optional_args.
+
+	- [bugfix] Didn't return normalized schema.
+
+
+0.002   2020-06-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Use meta() as usual in other projects rather than get_args().
+
+
+0.001   2020-06-04  Released-By: PERLANCAR
+
+        - First release.

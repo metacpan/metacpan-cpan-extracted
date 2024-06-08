@@ -1,123 +1,236 @@
-use Test::More tests => 12;
+use strict;
+use warnings;
 
-use Test::InDistDir;
-use CPAN::Mini::Inject;
-use File::Path;
+use Test::More;
+
+use File::Path qw(make_path);
 use File::Copy;
+use File::Temp ();
 use File::Basename;
+use File::Spec::Functions qw(catfile);
 use Compress::Zlib;
 
-my $root = "t/local";
-my $modules = "$root/CPAN/modules";
-my $authors = "$root/CPAN/authors";
-my $mycpan = "$root/MYCPAN";
-my $mymodules = "$root/mymodules";
+use lib qw(t/lib);
+use Local::utils;
 
-rmtree( ["$mycpan/modulelist"], 0, 1 );
-copy(
-  "$modules/02packages.details.txt.gz.original",
-  "$modules/02packages.details.txt.gz"
-);
-chmod oct(666), "$modules/02packages.details.txt.gz";
-chmod oct(666), "$authors/01mailrc.txt.gz" if -f "$authors/01mailrc.txt.gz";
-rmtree( [$authors], 0, 1 );
-mkdir( $authors );
-copy(
-  "$root/01mailrc.txt.gz.original",
-  "$authors/01mailrc.txt.gz"
-);
-chmod oct(666), "$authors/01mailrc.txt.gz";
-mkdir( $mycpan );
+my $class = 'CPAN::Mini::Inject';
 
-my $mcpi;
-my $module = "S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz";
+my $temp_dir = File::Temp::tempdir(CLEANUP=>1);
 
-$mcpi = CPAN::Mini::Inject->new;
+=begin comment
 
-## add three modules (one that was already there, to make sure it isn't
-## duplicated in the output)
-$mcpi->loadcfg( 't/.mcpani/config' )->parsecfg->readlist->add(
-  module   => 'CPAN::Mini::Inject',
-  authorid => 'SSORICHE',
-  version  => '0.01',
-  file     => "$mymodules/CPAN-Mini-Inject-0.01.tar.gz"
- )->add(
-  module   => 'CPAN::Mini::Inject',
-  authorid => 'SSORICHE',
-  version  => '0.02',
-  file     => "$mymodules/CPAN-Mini-Inject-0.01.tar.gz"
- )->add(
-  module   => 'CPAN::Mini',
-  authorid => 'RJBS',
-  version  => '0.17',
-  file     => "$mymodules/CPAN-Mini-0.17.tar.gz",
- )->writelist;
+C<remote> is the URL for the repo from which we'll download latest versions
 
-ok( $mcpi->inject,                        'Copy modules' );
-ok( -e "$authors/id/$module", 'Module file exists' );
-my $checksum_file = "$authors/id/S/SS/SSORICHE/CHECKSUMS";
-ok( -e "$checksum_file", 'Checksum created' );
+C<local> is our MiniCPAN
 
-open my $chk, '<', $checksum_file;
-my $checksum_text = join "", <$chk>;
-close $chk;
-unlike $checksum_text, qr{$authors/id}, "root path isn't leaked to checksums";
+C<repository> is the dir where we will keep the modules to inject
 
-SKIP: {
-  skip "Not a UNIX system", 3 if ( $^O =~ /^MSWin|^cygwin/ );
-  is( ( stat( "$authors/id/$module" ) )[2] & 07777,
-    0664, 'Module file mode set' );
-  is(
-    ( stat( dirname( "$authors/id/$module" ) ) )[2] & 07777,
-    0775, 'Author directory mode set'
-  );
-  is(
-    ( stat( "$checksum_file" ) )[2] & 07777,
-    0664, 'Checksum file mode set'
-  );
-}
+=end comment
 
-my @goodfile = <DATA>;
-ok( my $gzread
-   = gzopen( "$modules/02packages.details.txt.gz", 'rb' ) );
+=cut
 
-my @packages;
-my $package;
-while ( $gzread->gzreadline( $package ) ) {
-  if ( $package =~ /^Written-By:/ ) {
-    push( @packages, "Written-By:\n" );
-    next;
-  }
-  if ( $package =~ /^Last-Updated:/ ) {
-    push( @packages, "Last-Updated:\n" );
-    next;
-  }
-  push( @packages, $package );
-}
-$gzread->gzclose;
+subtest 'sanity' => sub {
+	use_ok $class or BAIL_OUT( "Could not load $class: $@" );
+	can_ok $class, 'new';
+	isa_ok $class->new, $class;
+	};
 
-is_deeply( \@goodfile, \@packages );
+subtest 'setup directories in temp dir' => sub {
+	my @dirs = (
+		[ qw(modules) ],
+		[ qw(authors) ],
+		[ qw(injects) ],
+		);
 
-ok( my $gzauthread
-   = gzopen( "$authors/01mailrc.txt.gz", 'rb' ) );
+	foreach my $dir ( @dirs ) {
+		my $path = catfile $temp_dir, @$dir;
+		make_path( $path );
+		ok -d $path, "Path for <@$dir> exists";
+		}
+	};
 
-my $author;
-my $author_was_injected = 0;
-while ( $gzauthread->gzreadline( $author ) ) {
-  if ( $author =~ /SSORICHE/ ) {
-    $author_was_injected++;
-  }
-}
-$gzauthread->gzclose;
-ok( $author_was_injected,      'author injected into 01mailrc.txt.gz' );
-ok( $author_was_injected == 1, 'author injected exactly 1 time' );
+my $t_local = catfile qw(t local);
+subtest 'check local dir' => sub {
+	ok -d $t_local, 'local directory exists';
+	};
 
-unlink( "$checksum_file" );
-unlink( "$authors/id/$module" );
-unlink( "$mycpan/modulelist" );
-unlink( "$modules/02packages.details.txt.gz" );
+subtest 'copy initial files' => sub {
+	my $modules_base = catfile $temp_dir, 'modules';
+	ok -d $modules_base, 'modules dir exists';
 
-rmtree( [ $authors, $mycpan ], 0, 1 );
+	my $authors_base = catfile $temp_dir, 'authors';
+	ok -d $authors_base, 'authors dir exists';
+
+	subtest 'packages' => sub {
+		my $file = '02packages.details.txt.gz';
+		my $destination = catfile $modules_base, $file;
+		my $rc = copy(
+		  catfile( $t_local, 'CPAN', 'modules', "$file.original" ),
+		  $destination
+		);
+		ok $rc, 'File::Copy worked';
+		ok -e $destination, 'Copied packages file to temp_dir';
+		ok chmod(0666, $destination), 'chmod packages to 0666';
+		};
+
+	subtest 'mailrc' => sub {
+		my $file = '01mailrc.txt.gz';
+		my $destination   = catfile $authors_base, $file;
+		my $rc = copy(
+		  catfile( $t_local, "$file.original" ),
+		  $destination
+		);
+		ok $rc, 'File::Copy worked';
+		ok -e $destination, 'Copied mailrc file to temp_dir';
+		ok chmod(0666, $destination), 'chmod mailrc to 0666';
+		};
+	};
+
+sub get_module_details {
+	my( $dist_sources ) = @_;
+	my @modules = (
+		{
+		module   => 'CPAN::Mini::Inject',
+		authorid => 'SSORICHE',
+		version  => '0.01',
+		file     => catfile( $dist_sources, 'CPAN-Mini-Inject-0.01.tar.gz' ),
+		},
+		{
+		module   => 'CPAN::Mini::Inject',
+		authorid => 'SSORICHE',
+		version  => '0.02',
+		file     => catfile( $dist_sources, 'CPAN-Mini-Inject-0.01.tar.gz' ),
+		},
+		{
+		module   => 'CPAN::Mini',
+		authorid => 'RJBS',
+		version  => '0.17',
+		file     => catfile( $dist_sources, 'CPAN-Mini-0.17.tar.gz' ),
+		},
+		);
+	}
+
+subtest 'inject the modules' => sub {
+	my $dist_sources = catfile $t_local, 'mymodules';
+	ok -d $dist_sources, 'Dist sources directory exists';
+	my @modules = get_module_details( $dist_sources );
+
+	my $tmp_config_file;
+	subtest 'make config' => sub {
+		$tmp_config_file = write_config(
+			local      => $temp_dir,
+			repository => catfile( $temp_dir, 'injects' ),
+			);
+		ok -e $tmp_config_file, 'configuration file exists';
+		};
+
+	my $mcpi = $class->new;
+	isa_ok $mcpi, $class;
+
+	$mcpi = $mcpi->loadcfg( $tmp_config_file )->parsecfg->readlist;
+
+	foreach my $module ( @modules ) {
+		ok -e $module->{file}, "module file <$module->{file}> exists";
+		$mcpi = $mcpi->add( %$module );
+		}
+
+	subtest 'writelist' => sub {
+		ok $mcpi->writelist, 'inject modules';
+		};
+
+	subtest 'inject' => sub {
+		ok $mcpi->inject( $ENV{TEST_VERBOSE} // 0 ), 'copy modules';
+		};
+
+	subtest 'check the result' => sub {
+		my $authors_dir = catfile $temp_dir, 'authors';
+		ok -e $authors_dir, 'authors dir exists';
+
+		foreach my $module ( @modules ) {
+			subtest "check $module->{file}" => sub {
+				my $author_stub = catfile(
+					$authors_dir,
+					'id',
+					substr( $module->{authorid}, 0, 1 ),
+					substr( $module->{authorid}, 0, 2 ),
+					$module->{authorid}
+					);
+				ok -d $author_stub, "author directory $author_stub for $module->{authorid} exists";
+				is( mode($author_stub), 0775, 'author dir mode is 775' ) if has_modes();
+
+				my $module_basename = basename $module->{file};
+				my $module_path = catfile $author_stub, $module_basename;
+				ok -e $module_path, "$module_basename exists in local";
+				is( mode($module_path), 0664, 'moduole filr is mode is 664' ) if has_modes();
+
+				subtest 'CHECKSUMS' => sub {
+					my $checksums_path = catfile $author_stub, 'CHECKSUMS';
+					my $rc = ok -e $checksums_path, "CHECKSUMS file for $module->{authorid} exists";
+					is( mode($checksums_path), 0664, 'checksum file mode is 664' ) if has_modes();
+
+					if( $rc ) {
+						my $rc = open my $chk, '<', $checksums_path;
+						my $checksum_text = join "", <$chk>;
+						close $chk;
+						unlike $checksum_text, qr{\Q$authors_dir\E/id}, "root path isn't leaked to checksums";
+						}
+					else {
+						fail "Can't check CHECKSUMS since it doesn't exist";
+						}
+					};
+				};
+			}
+		};
+	};
+
+subtest 'packages updated' => sub {
+	my @goodfile = <DATA>;
+	my $packages = catfile $temp_dir, 'modules', '02packages.details.txt.gz';
+	ok -e $packages, 'packages files exists';
+
+	ok( my $gzread = gzopen( $packages, 'rb' ), 'opened packages for reading' );
+
+	my @packages;
+	my $line;
+	while ( $gzread->gzreadline( $line ) ) {
+	  if ( $line =~ /^Written-By:/ ) {
+		push( @packages, "Written-By:\n" );
+		next;
+	  }
+	  if ( $line =~ /^Last-Updated:/ ) {
+		push( @packages, "Last-Updated:\n" );
+		next;
+	  }
+	  push( @packages, $line );
+	}
+	$gzread->gzclose;
+
+	is_deeply( \@goodfile, \@packages, 'got expected packages file data' );
+	};
+
+subtest 'mailrc updated' => sub {
+	my $mailrc = catfile $temp_dir, 'authors', '01mailrc.txt.gz';
+	ok -e $mailrc, 'mailrc files exists';
+
+	ok( my $gzauthread = gzopen( $mailrc, 'rb' ), 'opened mailrc for reading' );
+
+	my %inject_authors = map { $_->{authorid} => 1 } get_module_details('');
+
+	my $line;
+	my %found_authors;
+	while ( $gzauthread->gzreadline( $line ) ) {
+		next unless $line =~ /\A alias \h+ ([A-Z]+)/x;
+		$found_authors{$1}++;
+		fail( "Found $1 $found_authors{$1} times" ) if $found_authors{$1} > 1;
+		}
+	$gzauthread->gzclose;
+
+	foreach my $author ( keys %inject_authors ) {
+		ok exists $found_authors{$author}, "Found $author in $mailrc";
+		}
+	};
+
+done_testing();
 
 __DATA__
 File:         02packages.details.txt

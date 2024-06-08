@@ -182,8 +182,8 @@ Pass this a $db as L<Couch::DB::Database|Couch::DB::Database>-object.
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.002,
-built on May 31, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.003,
+built on June 08, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

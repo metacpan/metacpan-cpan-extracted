@@ -254,28 +254,18 @@ When no design document is specified, then one will be created.
 
 =back
 
-=item $obj-E<gt>B<listDesigns>()
+=item $obj-E<gt>B<listDesigns>( [\%search|\@%search, %options] )
 
  [CouchDB API "GET /{db}/_design_docs", UNTESTED]
  [CouchDB API "POST /{db}/_design_docs", UNTESTED]
  [CouchDB API "POST /{db}/_design_docs/queries", UNTESTED]
 
-Get some design documents.  The search query looks very much like a generic
-view search, but a few parameters are added and missing.
+Pass one or more %search queries to be run.  The default returns all designs.
+The search query looks very much like a generic view search, but a few
+parameters are added and missing.
 
 If there are searches, then C<GET> is used, otherwise the C<POST> version.
 The returned structure depends on the searches and the number of searches.
-
- -Option--Default
-  search  [ +{} ]
-
-=over 2
-
-=item search => \%query|ARRAY
-
-One or more search queries to be run.  The default returns all designs.
-
-=back
 
 =item $obj-E<gt>B<listIndexes>(%options)
 
@@ -310,6 +300,8 @@ data is not included.
 
 The default search will select everything (uses a blank HASH as required
 C<selector>).  By default, the number of results has a C<limit> of 25.
+Pass C<limit> and C<skip> in %options with other pagination control,
+not %search.
 
  -Option   --Default
   partition  undef
@@ -365,7 +357,7 @@ Include the revision history of each document.
 
 =back
 
-=item $obj-E<gt>B<listDocuments>(%options)
+=item $obj-E<gt>B<listDocuments>( [\%search|\@%search, %options] )
 
  [CouchDB API "GET /{db}/_all_docs", UNTESTED]
  [CouchDB API "POST /{db}/_all_docs", UNTESTED]
@@ -386,12 +378,13 @@ L<Couch::DB::Design::viewFind()|Couch::DB::Design/"Views">.
   design     undef
   local      false
   partition  undef
-  search     []
   view       undef
 
 =over 2
 
 =item design => $ddoc|$ddoc_id
+
+Usually called via L<Couch::DB::Design::viewFind()|Couch::DB::Design/"Views">.
 
 =item local => BOOLEAN
 
@@ -401,8 +394,6 @@ a combination with C<partition> or C<view>.
 =item partition => $name
 
 Restrict the search to the specific partition.
-
-=item search => \%view|ARRAY
 
 =item view => $name
 
@@ -453,8 +444,8 @@ example: for error handling
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.002,
-built on May 31, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.003,
+built on June 08, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

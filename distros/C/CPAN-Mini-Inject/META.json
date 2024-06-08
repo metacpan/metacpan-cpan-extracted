@@ -1,29 +1,31 @@
 {
    "abstract" : "Inject modules into a CPAN::Mini mirror.",
    "author" : [
-      "Shawn Sorichetti <ssoriche@coloredblocks.net>",
-      "Andy Armstrong <andy@hexten.net>",
-      "Christian Walde <walde.christian@googlemail.com>",
-      "Randy Stauner <rwstauner@cpan.org>",
-      "Karen Etheridge <ether@cpan.org>",
-      "Salve J. Nilsen <sjn@cpan.org>",
-      "Wolfgang Pecho <pecho@belwue.de>",
-      "Konstantin Yakunin <twinhooker@gmail.com>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
    "name" : "CPAN-Mini-Inject",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.4"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -33,7 +35,6 @@
             "Carp" : "0",
             "Compress::Zlib" : "0",
             "Dist::Metadata" : "0.921",
-            "Env" : "0",
             "File::Basename" : "0",
             "File::Copy" : "0",
             "File::Path" : "2.07",
@@ -42,39 +43,33 @@
             "File::Spec::Functions" : "0",
             "File::Temp" : "0",
             "Getopt::Long" : "0",
-            "HTTP::Server::Simple" : "0.07",
+            "HTTP::Daemon" : "0",
             "IO::Zlib" : "0",
             "LWP::Simple" : "0",
             "Net::EmptyPort" : "0",
             "Pod::Usage" : "0",
-            "Test::InDistDir" : "0",
-            "Test::More" : "0",
-            "YAML" : "0"
+            "YAML" : "0",
+            "perl" : "5.016"
          }
-      }
-   },
-   "provides" : {
-      "CPAN::Mini::Inject" : {
-         "file" : "lib/CPAN/Mini/Inject.pm",
-         "version" : "0.37"
       },
-      "CPAN::Mini::Inject::Config" : {
-         "file" : "lib/CPAN/Mini/Inject/Config.pm",
-         "version" : "0.37"
+      "test" : {
+         "requires" : {
+            "Test::More" : "1"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=CPAN-Mini-Inject"
+         "web" : "https://github.com/briandfoy/cpan-mini-inject/issues"
       },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
+      "homepage" : "https://github.com/briandfoy/cpan-mini-inject",
       "repository" : {
-         "url" : "git://github.com/AndyA/CPAN--Mini--Inject.git"
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/cpan-mini-inject",
+         "web" : "https://github.com/briandfoy/cpan-mini-inject"
       }
    },
-   "version" : "0.37",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.002",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

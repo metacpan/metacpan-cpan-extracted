@@ -1,5 +1,8 @@
 Revision history for Date-Holidays-Adapter-USA
 
+0.0108 2024-06-07 19:33:35
+    - Keep in-sync with Date::Holidays::USA.
+
 0.0107 2024-06-06 17:39:39
     - Keep in-sync with the prerequisite Date::Holidays::USA module.
 

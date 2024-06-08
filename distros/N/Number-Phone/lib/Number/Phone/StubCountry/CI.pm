@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240308154349;
+our $VERSION = 1.20240607153918;
 
 my $formatters = [
                 {
@@ -84,44 +84,44 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{fr} = {};
-$areanames{en} = {"2252120", "Plateau\,\ Abidjan",
-"2252521", "Abidjan\-sud",
-"22527224", "Cocody\,\ Abidjan",
-"2252732", "Daloa",
-"2252532", "Daloa",
-"2252133", "Man",
-"2252124", "Abobo\,\ Abidjan",
-"2252721", "Abidjan\-sud",
-"2252135", "Abengourou",
-"22527222", "Abidjan\-sud",
-"2252720", "Plateau\,\ Abidjan",
-"2252524", "Abobo\,\ Abidjan",
-"2252533", "Man",
-"2252132", "Daloa",
-"2252724", "Abobo\,\ Abidjan",
-"2252733", "Man",
-"2252520", "Plateau\,\ Abidjan",
-"2252121", "Abidjan\-sud",
-"22527225", "Cocody\,\ Abidjan",
+$areanames{en} = {"2252736", "Korhogo",
 "2252735", "Abengourou",
-"2252535", "Abengourou",
-"2252136", "Korhogo",
-"2252731", "Bouaké",
-"2252134", "San\-Pédro",
-"2252522", "Cocody\,\ Abidjan",
-"2252123", "Banco\,\ Abidjan",
-"2252531", "Bouaké",
-"2252130", "Yamoussoukro",
-"2252736", "Korhogo",
-"2252536", "Korhogo",
-"2252131", "Bouaké",
-"2252530", "Yamoussoukro",
-"2252723", "Banco\,\ Abidjan",
-"2252734", "San\-Pédro",
-"2252523", "Banco\,\ Abidjan",
-"2252122", "Cocody\,\ Abidjan",
 "2252534", "San\-Pédro",
-"2252730", "Yamoussoukro",};
+"2252732", "Daloa",
+"2252733", "Man",
+"2252530", "Yamoussoukro",
+"2252120", "Plateau\,\ Abidjan",
+"2252124", "Abobo\,\ Abidjan",
+"2252731", "Bouaké",
+"2252524", "Abobo\,\ Abidjan",
+"22527225", "Cocody\,\ Abidjan",
+"2252723", "Banco\,\ Abidjan",
+"2252520", "Plateau\,\ Abidjan",
+"2252130", "Yamoussoukro",
+"2252721", "Abidjan\-sud",
+"2252134", "San\-Pédro",
+"2252531", "Bouaké",
+"2252123", "Banco\,\ Abidjan",
+"2252122", "Cocody\,\ Abidjan",
+"2252533", "Man",
+"2252730", "Yamoussoukro",
+"2252532", "Daloa",
+"2252121", "Abidjan\-sud",
+"2252734", "San\-Pédro",
+"22527224", "Cocody\,\ Abidjan",
+"2252535", "Abengourou",
+"2252536", "Korhogo",
+"2252521", "Abidjan\-sud",
+"2252132", "Daloa",
+"2252133", "Man",
+"2252720", "Plateau\,\ Abidjan",
+"2252523", "Banco\,\ Abidjan",
+"2252522", "Cocody\,\ Abidjan",
+"2252724", "Abobo\,\ Abidjan",
+"2252131", "Bouaké",
+"2252136", "Korhogo",
+"2252135", "Abengourou",
+"22527222", "Abidjan\-sud",};
 my $timezones = {
                '' => [
                        'Africa/Abidjan'

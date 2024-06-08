@@ -7,7 +7,7 @@
 
 package Couch::DB::Client;
 use vars '$VERSION';
-$VERSION = '0.002';
+$VERSION = '0.003';
 
 
 use Couch::DB::Util   qw(flat);
@@ -31,7 +31,7 @@ sub init($)
 	$self->{CDC_ua}     = delete $args->{user_agent} or panic "Requires 'user_agent'";
 	$self->{CDC_uuids}  = [];
 
-	$self->{CDC_couch}  = delete $args->{couch}      or panic "Requires 'couch'";
+	$self->{CDC_couch}  = delete $args->{couch} or panic "Requires 'couch'";
 	weaken $self->{CDC_couch};
 
 	$self->{CDC_hdrs}   = my $headers = delete $args->{headers} || {};
@@ -66,9 +66,9 @@ sub headers($) { $_[0]->{CDC_hdrs} }
 
 sub _clientIsMe($)   # check no client parameter is used
 {	my ($self, $args) = @_;
-	defined $args->{client} and panic "No parameter 'client' allowed.";
-	$args->{clients} && @{delete $args->{clients}} and panic "No parameter 'clients' allowed.";
-	$args->{client} = $self;
+	defined $args->{_client} and panic "No parameter 'client' allowed.";
+	$args->{_clients} && @{delete $args->{_clients}} and panic "No parameter '_clients' allowed.";
+	$args->{_client} = $self;
 }
 
 sub login(%)
@@ -93,9 +93,9 @@ sub login(%)
 	$self->couch->call(POST => '/_session',
 		send      => $send,
 		query     => { next => delete $args{next} },
-		$self->couch->_resultsConfig(\%args,
-			on_final  => sub { $self->{CDC_roles} = $_[0]->isReady ? $_[0]->values->{roles} : undef },
-		),
+		$self->couch->_resultsConfig(\%args, on_final  => sub {
+			$self->{CDC_roles} = $_[0]->isReady ? $_[0]->values->{roles} : undef;
+		}),
 	);
 }
 
@@ -111,9 +111,9 @@ sub session(%)
 
 	$couch->call(GET => '/_session',
 		query     => \%query,
-		$couch->_resultsConfig(\%args,
-			on_final  => sub { $self->{CDC_roles} = $_[0]->isReady ? $_[0]->values->{userCtx}{roles} : undef },
-		),
+		$couch->_resultsConfig(\%args, on_final => sub {
+			$self->{CDC_roles} = $_[0]->isReady ? $_[0]->values->{userCtx}{roles} : undef; $_[0];
+		}),
 	);
 }
 
@@ -163,8 +163,7 @@ sub serverInfo(%)
 	}
 
 	my $result = $self->couch->call(GET => '/',
-		$self->couch->_resultsConfig(\%args),
-		to_values => \&__serverInfoValues,
+		$self->couch->_resultsConfig(\%args, on_values => \&__serverInfoValues),
 	);
 
 	if($cached ne 'PING')
@@ -209,8 +208,7 @@ sub activeTasks(%)
 	$self->_clientIsMe(\%args);
 
 	$self->couch->call(GET => '/_active_tasks',
-		$self->couch->_resultsConfig(\%args),
-		to_values => \&__activeTasksValues,
+		$self->couch->_resultsConfig(\%args, on_values => \&__activeTasksValues),
 	);
 }
 
@@ -290,14 +288,9 @@ sub clusterNodes(%)
 {	my ($self, %args) = @_;
 	$self->_clientIsMe(\%args);
 
-	my %config = $self->couch->_resultsConfig(\%args);
-	my $send   = \%args;
-
 	$self->couch->call(GET => '/_membership',
 		introduced => '2.0.0',
-		send       => $send,
-		to_values  => \&__clusterNodeValues,
-		%config,
+		$self->couch->_resultsConfig(\%args, on_values => \&__clusterNodeValues),
 	);
 }
 
@@ -320,22 +313,18 @@ sub __replicateValues($$)
 	\%values;
 }
 
-sub replicate(%)
-{	my ($self, %args) = @_;
+sub replicate($%)
+{	my ($self, $rules, %args) = @_;
 	$self->_clientIsMe(\%args);
 
 	my $couch  = $self->couch;
-	my %config = $couch->_resultsConfig(\%args),
-
-	my $send   = \%args;
-	$couch->toJSON($send, bool => qw/cancel continuous create_target/);
+	$couch->toJSON($rules, bool => qw/cancel continuous create_target winning_revs_only/);
 
     #TODO: warn for upcoming changes in source and target: absolute URLs required
 
 	$couch->call(POST => '/_replicate',
-		send       => $send,
-		to_values  => \&__replicateValues,
-		%config,
+		send   => $rules,
+		$couch->_resultsConfig(\%args, on_values => \&__replicateValues),
 	);
 }
 
@@ -362,15 +351,8 @@ sub replicationJobs(%)
 {	my ($self, %args) = @_;
 	$self->_clientIsMe(\%args);
 
-	my %query = (
-		limit => delete $args{limit},
-		skip  => delete $args{skip},
-	);
-
 	$self->couch->call(GET => '/_scheduler/jobs',
-		query      => \%query,
-		to_values  => \&__replJobsValues,
-		$self->couch->_resultsConfig(\%args),
+		$self->couch->_resultsPaging(\%args, on_values => \&__replJobsValues),
 	);
 }
 
@@ -404,15 +386,8 @@ sub replicationDocs(%)
 	{	$path .= '/' . uri_escape($dbname);
 	}
 
-	my %query = (
-		limit => delete $args{limit},
-		skip  => delete $args{skip},
-	);
-
 	$self->couch->call(GET => $path,
-		query      => \%query,
-		to_values  => \&__replDocsValues,
-		$self->couch->_resultsConfig(\%args),
+		$self->couch->_resultsPaging(\%args, on_values => \&__replDocsValues),
 	);
 }
 
@@ -427,15 +402,9 @@ sub replicationDoc($%)
 	my $docid  = blessed $doc ? $doc->id : $doc;
 
 	my $path = '/_scheduler/docs/' . uri_escape($dbname) . '/' . $docid;
-	my %query = (
-		limit => delete $args{limit},
-		skip  => delete $args{skip},
-	);
 
 	$self->couch->call(GET => $path,
-		query      => \%query,
-		to_values  => \&__replDocValues,
-		$self->couch->_resultsConfig(\%args),
+		$self->couch->_resultsPaging(\%args, on_values => \&__replDocValues),
 	);
 }
 
@@ -453,8 +422,7 @@ sub nodeName($%)
 	$self->_clientIsMe(\%args);
 
 	$self->couch->call(GET => "/_node/$name",
-		to_values  => \&__nodeNameValues,
-		$self->couch->_resultsConfig(\%args),
+		$self->couch->_resultsConfig(\%args, on_values => \&__nodeNameValues),
 	);
 }
 
@@ -487,7 +455,7 @@ sub serverStatus(%)
 sub serverIsUp()
 {	my $self = shift;
 	my $result = $self->serverStatus;
-	$result && $result->values->{status} eq 'ok';
+	$result && $result->answer->{status} eq 'ok';
 }
 
 1;

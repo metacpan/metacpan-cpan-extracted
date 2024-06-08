@@ -7,7 +7,7 @@
 
 package Couch::DB::Mojolicious;
 use vars '$VERSION';
-$VERSION = '0.002';
+$VERSION = '0.003';
 
 use parent 'Couch::DB';
 use feature 'state';
@@ -83,6 +83,7 @@ sub _callClient($$%)
 			request  => $tx->req,
 			response => $response,
 			code     => $response->code,
+			message  => $response->message,
 		});
 	});
 

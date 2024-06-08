@@ -92398,3 +92398,16 @@ P/PE/PERLANCAR/Sah-PSchemaBundle-Array-0.010.tar.gz
 D/DD/DDRP/Test-Module-Runnable-0.6.1.tar.gz
 S/SK/SKIM/WQS-SPARQL-Query-0.03.tar.gz
 I/IN/INGY/YAMLScript-0.1.60.tar.gz
+B/BU/BURAK/App-Oozie-0.017.tar.gz
+G/GB/GBROWN/App-rdapper-1.02.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000652.tar.gz
+M/MA/MARKOV/Couch-DB-0.003.tar.gz
+B/BR/BRIANDFOY/CPAN-Mini-Inject-1.002.tar.gz
+G/GE/GENE/Date-Holidays-Adapter-USA-0.0108.tar.gz
+G/GE/GENE/Date-Holidays-USA-0.0207.tar.gz
+C/CH/CHEVALIER/Google-Ads-GoogleAds-Client-23.0.0.tar.gz
+G/GB/GBROWN/Net-RDAP-0.25.tar.gz
+D/DC/DCANTRELL/Number-Phone-4.0003.tar.gz
+P/PE/PERLANCAR/Sah-PSchemaBundle-Perl-0.011.tar.gz
+P/PE/PEVANS/String-Tagged-0.23.tar.gz
+J/JJ/JJATRIA/Test2-Tools-DOM-0.004.tar.gz

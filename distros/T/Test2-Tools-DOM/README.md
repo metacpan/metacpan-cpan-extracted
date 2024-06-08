@@ -251,6 +251,22 @@ passed to the provided check.
         all_text 'Hello, World!'; # OK: use all_text for descendants' text
     };
 
+## val
+
+    val CHECK
+
+_Available from version 0.004_.
+
+Takes a check only. Extracts the value from this element (by calling
+['val' on the Mojo::DOM58 object](https://metacpan.org/pod/Mojo%3A%3ADOM58#val)), and this is
+passed to the provided check.
+
+    is '<input type=checkbox name=answer value=42>', dom {
+        val 42;
+
+        attr value => 42; # The same, but longer
+    };
+
 # SEE ALSO
 
 - [Test2::Tools::HTTP](https://metacpan.org/pod/Test2%3A%3ATools%3A%3AHTTP)

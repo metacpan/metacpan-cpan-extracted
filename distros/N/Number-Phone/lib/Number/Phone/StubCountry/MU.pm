@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240308154352;
+our $VERSION = 1.20240607153921;
 
 my $formatters = [
                 {
@@ -54,7 +54,8 @@ my $validators = {
             )|
             4(?:
               [013568]\\d|
-              2[4-8]
+              2[4-8]|
+              71
             )|
             54(?:
               [3-5]\\d|
@@ -75,7 +76,8 @@ my $validators = {
             )|
             4(?:
               [013568]\\d|
-              2[4-8]
+              2[4-8]|
+              71
             )|
             54(?:
               [3-5]\\d|
@@ -125,17 +127,17 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{es} = {"2306", "Región\ Sur",
-"2302", "Región\ Norte",
-"2304", "Región\ Central",};
-$areanames{en} = {"23083", "Rodrigues",
-"2306", "South\ Region",
+$areanames{en} = {"23081", "Agalega",
 "2302", "North\ Region",
-"23081", "Agalega",
-"2304", "Central\ Region",};
-$areanames{fr} = {"2302", "Région\ Nord",
+"2304", "Central\ Region",
+"23083", "Rodrigues",
+"2306", "South\ Region",};
+$areanames{es} = {"2302", "Región\ Norte",
+"2306", "Región\ Sur",
+"2304", "Región\ Central",};
+$areanames{fr} = {"2304", "Région\ Centrale",
 "2306", "Région\ Sud",
-"2304", "Région\ Centrale",};
+"2302", "Région\ Nord",};
 my $timezones = {
                '' => [
                        'Indian/Mauritius'

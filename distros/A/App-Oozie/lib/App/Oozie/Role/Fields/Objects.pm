@@ -4,7 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
@@ -45,6 +45,12 @@ option webhdfs_port => (
     default => sub { DEFAULT_WEBHDFS_PORT },
 );
 
+option use_ssl => (
+    is      => 'rw',
+    format  => 'i',
+    default => sub { 0 },
+);
+
 has hdfs => (
     is      => 'rw',
     isa     => InstanceOf['Net::Hadoop::WebHDFS'],
@@ -58,6 +64,9 @@ has hdfs => (
             port        => $self->webhdfs_port,
             username    => $self->effective_username,
             httpfs_mode => 1,
+            ( $self->use_ssl ? (
+                use_ssl => 1,
+            ) : () ),
         );
         Net::Hadoop::WebHDFS::LWP->new( %opt );
     },
@@ -101,7 +110,7 @@ App::Oozie::Role::Fields::Objects
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -125,6 +134,8 @@ App::Oozie::Role::Fields::Objects - Overridable objects for internal programs/li
 =head3 resource_manager
 
 =head3 timezone
+
+=head3 use_ssl
 
 =head3 webhdfs_hostname
 

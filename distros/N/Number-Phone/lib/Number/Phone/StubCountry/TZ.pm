@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240308154353;
+our $VERSION = 1.20240607153922;
 
 my $formatters = [
                 {
@@ -54,10 +54,9 @@ my $validators = {
                 'fixed_line' => '2[2-8]\\d{7}',
                 'geographic' => '2[2-8]\\d{7}',
                 'mobile' => '
-          77[2-9]\\d{6}|
           (?:
             6[125-9]|
-            7[13-689]
+            7[13-9]
           )\\d{7}
         ',
                 'pager' => '',
@@ -72,13 +71,13 @@ my $validators = {
                 'voip' => '41\\d{7}'
               };
 my %areanames = ();
-$areanames{en} = {"25525", "Mbeya\/Songwe\/Ruvuma\/Katavi\/Rukwa",
-"25523", "Coast\/Morogoro\/Lindi\/Mtwara",
-"25522", "Dar\-Es\-Salaam",
+$areanames{en} = {"25522", "Dar\-Es\-Salaam",
 "25527", "Arusha\/Manyara\/Kilimanjaro\/Tanga",
 "25524", "Zanzibar",
+"25523", "Coast\/Morogoro\/Lindi\/Mtwara",
+"25526", "Dodoma\/Iringa\/Njombe\/Singida\/Tabora",
 "25528", "Mwanza\/Shinyanga\/Mara\/Geita\/Simiyu\/Kagera\/Kigoma",
-"25526", "Dodoma\/Iringa\/Njombe\/Singida\/Tabora",};
+"25525", "Mbeya\/Songwe\/Ruvuma\/Katavi\/Rukwa",};
 my $timezones = {
                '' => [
                        'Africa/Dar_es_Salaam'

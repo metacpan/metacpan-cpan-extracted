@@ -93,8 +93,8 @@ $number = Number::Phone->new('+447693912345');
 ok($number->is_pager(), "pagers correctly identified");
 
 # see https://github.com/DrHyde/perl-modules-Number-Phone/issues/112
-# checked on 2023-12-10
-# next check due 2024-06-01 (semi-annually)
+# checked on 2024-06-07
+# next check due 2024-12-01 (semi-annually)
 subtest "0800 716 range has the wrong length, OFCOM says 10 digits but 0800 716 598 is diallable" => sub {
     $number = Number::Phone->new('+44800716598'); # used by Barclays
     isa_ok(
@@ -202,7 +202,7 @@ ok($number->is_ipphone(), "VoIP correctly identified");
 
 $number = Number::Phone->new('+443031231234');
 skip_if_mocked("libphonenumber doesn't do operators", 1, sub {
-  ok($number->operator() eq 'BRITISH TELECOMMUNICATIONS', "03 numbers have right operator");
+  ok($number->operator() eq 'BT', "03 numbers have right operator");
 });
 is_deeply(
     [sort $number->type()],

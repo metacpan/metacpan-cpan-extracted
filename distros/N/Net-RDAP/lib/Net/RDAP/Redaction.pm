@@ -11,8 +11,8 @@ response.
 =head1 DESCRIPTION
 
 Any RDAP object which inherits from L<Net::RDAP::Object> has a C<redactions()>
-methid which will return an array of L<Net::RDAP::Redaction> representing the
-fields identified by the server as being redacted (if any).
+method which will return an array of L<Net::RDAP::Redaction> objects
+representing the fields identified by the server as being redacted (if any).
 
 =cut
 
@@ -69,7 +69,7 @@ the redaction method is C<replacementValue>.
 
 C<$field-E<gt>reason> returns the human-readable reason(s) why the field has
 been redacted. C<$field-E<gt>reasonLang> returns the language of the reason,
-which is <en> by default.
+which is C<en> by default.
 
 =cut
 

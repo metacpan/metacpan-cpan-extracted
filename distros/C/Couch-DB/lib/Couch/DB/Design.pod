@@ -312,7 +312,7 @@ The search query.
 
 =over 4
 
-=item $obj-E<gt>B<viewFind>($view, %options)
+=item $obj-E<gt>B<viewFind>( $view, [\%search|\@%search), %options] )
 
  [CouchDB API "GET /{db}/_design/{ddoc}/_view/{view}"]
  [CouchDB API "POST /{db}/_design/{ddoc}/_view/{view}", UNTESTED]
@@ -330,24 +330,14 @@ This work is handled in L<Couch::DB::Database::listDocuments()|Couch::DB::Databa
 
 =over 4
 
-=item $obj-E<gt>B<applyUpdate>($function, %options)
+=item $obj-E<gt>B<applyUpdate>( $function, [$doc|$docid|undef, %options] )
 
  [CouchDB API "POST /{db}/_design/{ddoc}/_update/{func}", UNTESTED]
  [CouchDB API "POST /{db}/_design/{ddoc}/_update/{func}/{docid}", UNTESTED]
 
-Executes an update function against a document.
-
- -Option--Default
-  doc     null
-
-=over 2
-
-=item doc => $document|$docid
-
-Run the function on the specified document.  By default, the function is applied to
-a C<null> (missing) document.
-
-=back
+See what the update function would change.  The update $function is run
+on a document, specified by id or object.  By default or explicit undef,
+a C<null> (missing) document will be used.
 
 =item $obj-E<gt>B<list>($function, $view, %options)
 
@@ -369,32 +359,22 @@ When the $view resides in a differen design.
 
 =back
 
-=item $obj-E<gt>B<show>($function, %options)
+=item $obj-E<gt>B<show>( $function, [$doc|$docid|undef, %options] )
 
  [CouchDB API "GET /{db}/_design/{ddoc}/_show/{func}", deprecated 3.0, removed 4.0, UNTESTED]
  [CouchDB API "POST /{db}/_design/{ddoc}/_show/{func}", deprecated 3.0, removed 4.0, UNTESTED]
  [CouchDB API "GET /{db}/_design/{ddoc}/_show/{func}/{docid}", deprecated 3.0, removed 4.0, UNTESTED]
  [CouchDB API "POST /{db}/_design/{ddoc}/_show/{func}/{docid}", deprecated 3.0, removed 4.0, UNTESTED]
 
-Apply show $function on the document.
-
- -Option--Default
-  doc     null
-
-=over 2
-
-=item doc => $document|$docid
-
-Run the function on the specified document, by default a C<null> document.
-
-=back
+Apply show $function on the document, as specified by id or object.  By default or explicit
+undef, a C<null> document will be used.
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.002,
-built on May 31, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.003,
+built on June 08, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

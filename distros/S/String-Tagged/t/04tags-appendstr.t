@@ -68,4 +68,31 @@ is( \@tags,
            ],
            'tags list after third append' );
 
+# Behaviour of edge-anchored tags under append
+{
+   my $str = String::Tagged->new( "orig" )
+      ->apply_tag( 2, -1, tag => 1 );
+
+   $str->append( "plain" );
+
+   undef @tags;
+   $str->iter_tags_nooverlap( \&fetch_tags );
+   is( \@tags, [
+         [ 0, 2 ],
+         [ 2, 7, tag => 1 ],
+      ],
+      'edge-anchored tag extended after append plain string' );
+
+   $str->append( String::Tagged->new( "tagged" ) );
+
+   undef @tags;
+   $str->iter_tags_nooverlap( \&fetch_tags );
+   is( \@tags, [
+         [ 0, 2 ],
+         [ 2, 7, tag => 1 ],
+         [ 9, 6 ],
+      ],
+      'edge-anchored tag extended after append String::Tagged' );
+}
+
 done_testing;

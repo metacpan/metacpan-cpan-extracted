@@ -6,6 +6,8 @@ lib/Net/RDAP/Error.pm
 lib/Net/RDAP/Event.pm
 lib/Net/RDAP/Help.pm
 lib/Net/RDAP/ID.pm
+lib/Net/RDAP/JCard.pm
+lib/Net/RDAP/JCard/Node.pm
 lib/Net/RDAP/Link.pm
 lib/Net/RDAP/Notice.pm
 lib/Net/RDAP/Object.pm

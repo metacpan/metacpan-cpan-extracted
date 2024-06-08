@@ -1,5 +1,8 @@
 Revision history for App-Oozie
 
+0.017     2024-06-07 12:47:11+02:00 Europe/Brussels
+- Use the ssl change in Net::Hadoop::WebHDFS::LWP.
+
 0.016     2023-12-05 18:19:59+01:00 Europe/Brussels
 - Switch to _ttree_obj() for the template processor.
 

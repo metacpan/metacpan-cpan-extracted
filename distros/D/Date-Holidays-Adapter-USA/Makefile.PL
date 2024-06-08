@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Date::Holidays::Adapter::USA",
   "PREREQ_PM" => {
     "Date::Holidays::Adapter" => 0,
-    "Date::Holidays::USA" => "0.0206",
+    "Date::Holidays::USA" => "0.0207",
     "base" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.0107",
+  "VERSION" => "0.0108",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Date::Holidays::Adapter" => 0,
-  "Date::Holidays::USA" => "0.0206",
+  "Date::Holidays::USA" => "0.0207",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

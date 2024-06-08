@@ -1,5 +1,9 @@
 Revision history for perl module Net::RDAP:
 
+0.25 - 2024-06-07
+  - add a new object (Net::RDAP::JCard) that provides a way to access
+    contact data in entity objects that isn't lossless, unless vCard.
+
 0.24 - 2024-05-30
   - add support for Redacted Fields (RFC 9537)
 

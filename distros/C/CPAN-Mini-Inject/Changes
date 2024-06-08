@@ -1,159 +1,173 @@
 Revision history for CPAN-Mini-Inject
 
-0.37    2023/06/06
-        - add a test dependency
+1.002 2024-06-07T19:31:11Z
+	* promote to a user version
 
-0.36    2023/06/06
-        - implement compatibility with new toolchain cpan_path regime
-        - skip permission tests on cygwin
+1.001_02 2024-05-29T00:56:52Z
+	* Adjust the test for unreachable hosts when the tester resolves any host
 
-0.35    2017/07/19
-        - use Net::EmptyPort to find an empty port to use
-          instead of a hard-coded one
+1.001_01 2024-05-26T12:27:59Z
+	* fix bug in t/update_mirror.t that caused weird issues when the
+	test web server went away (AndyA/CPAN--Mini--Inject#26, from
+	Lukas Märdian)
+	* added --skip_cleanup for updating a mirror (AndyA/CPAN--Mini--Inject#1,
+	from Matt Lanier)
+	* improved some docs (AndyA/CPAN--Mini--Inject#18, from Tim Bunce)
+	* verbose now reports each time a module is injected (AndyA/CPAN--Mini--Inject#21,
+	from Wolfgang Pecho)
+	* repo is now https://github.com/briandfoy/cpan-mini-inject . Added
+	GitHub workflows too.
+	* tests can now be run in parallel.
 
-0.34    2017/07/18
-        Konstantin Yakunin <twinhooker@gmail.com>:
-        - sort packages case insensitively
+0.37    2023-06-06
+	* add a test dependency
 
-0.33    2013/07/30
-        Wolfgang Pecho <pecho@belwue.de>:
-        - allow spaces in configuration file
+0.36    2023-06-06
+	* implement compatibility with new toolchain cpan_path regime
+	* skip permission tests on cygwin
 
-0.32    2013/04/17
-        Karen Etheridge <ether@cpan.org>:
-        - add link for mcpani
-        Randy Stauner <rwstauner@cpan.org>:
-        - Add module name to verbose "injected" message
-        Salve J. Nilsen <sjn@cpan.org>:
-        - Inject distributions once per file instead of once per module
+0.35    2017-07-19
+	* use Net::EmptyPort to find an empty port to use
+	instead of a hard-coded one
 
-0.31    2011/10/10
-        Randy Stauner <rwstauner@cpan.org>:
-        - outsource module discovery to Dist::Metadata
-        - moved module discovery from script to CPAN::Mini::Inject
+0.34    2017-07-18
+	Konstantin Yakunin <twinhooker@gmail.com>:
+	* sort packages case insensitively
 
-0.30    2011/06/13
-        - keep just the last added module, even if there was one in
-          02packages.details.txt before we injected
-          (Paul Driver <frodwith@cpan.org>)
-        - documentation fix (Randy Stauner <rwstauner@cpan.org>)
+0.33    2013-07-30
+	Wolfgang Pecho <pecho@belwue.de>:
+	* allow spaces in configuration file
 
-0.29    2011/05/15
-        - Skip tests that are unreliable under a DNS regime where any
-          hostname resolves.
-        - RT 63350 - Anchor the regex to filter old modules
-        - RT 55463 - Don't use .bak for test files
-        - RT 63407 - Win32 fixes related to file locks in tests
-        - Changed tests so they'll be able to deal with read-only dist files
+0.32    2013-04-17
+	Karen Etheridge <ether@cpan.org>:
+	* add link for mcpani
+	Randy Stauner <rwstauner@cpan.org>:
+	* Add module name to verbose "injected" message
+	Salve J. Nilsen <sjn@cpan.org>:
+	* Inject distributions once per file instead of once per module
 
-0.27    2010/01/28
-        All the following are thanks to Jozef Kutej <jozef@kutej.net>:
+0.31    2011-10-10
+	Randy Stauner <rwstauner@cpan.org>:
+	* outsource module discovery to Dist::Metadata
+	* moved module discovery from script to CPAN::Mini::Inject
 
-        - --discover-packages option added to parse .pm files inside
-          --file and extract package names andV versions.
+0.30    2011-06-13
+	* keep just the last added module, even if there was one in
+	02packages.details.txt before we injected
+	(Paul Driver <frodwith@cpan.org>)
+	* documentation fix (Randy Stauner <rwstauner@cpan.org>)
 
-        - allow CHECKSUMS signing.
+0.29    2011-05-15
+	* Skip tests that are unreliable under a DNS regime where any
+	hostname resolves.
+	* RT 63350 - Anchor the regex to filter old modules
+	* RT 55463 - Don't use .bak for test files
+	* RT 63407 - Win32 fixes related to file locks in tests
+	* Changed tests so they'll be able to deal with read-only dist files
 
-        - keep just last added module version in 02packages.details.txt.
+0.27    2010-01-28
+	All the following are thanks to Jozef Kutej <jozef@kutej.net>:
+	* --discover-packages option added to parse .pm files inside
+	--file and extract package names andV versions.
+	* allow CHECKSUMS signing.
+	* keep just last added module version in 02packages.details.txt.
 
-0.26    2009/06/15
-        - Specify minimum File::Path version
+0.26    2009-06-15
+	* Specify minimum File::Path version
 
-0.25    2009/05/29
-        - Move to GitHub
+0.25    2009-05-29
+	* Move to GitHub
 
-0.24    2009/05/10
-        - Made tests use a port (11027) other than 8080 to avoid clashes
-          with existing services.
+0.24    2009-05-10
+	* Made tests use a port (11027) other than 8080 to avoid clashes
+	with existing services.
 
-0.23    2008/10/25
-        - Rebundled to remove OS X extended attributes that were causing
-          tests to fail.
+0.23    2008-10-25
+	* Rebundled to remove OS X extended attributes that were causing
+	tests to fail.
 
-0.22    2008/06/25
-        - fixed a bug where authors were being added
-          more than once to 01mailrc.txt.gz
+0.22    2008-06-25
+	* fixed a bug where authors were being added
+	more than once to 01mailrc.txt.gz
 
-0.21    2008/06/25
-        - changes for RT bug 17386 by: David Bartle
+0.21    2008-06-25
+	* changes for RT bug 17386 by: David Bartle
 
-0.20    2008/06/25
-        - added a command line option '--all-in-meta' which will
-          parse the META.yml and index every module listed in the
-          'provides' section
-        - module name and version is now parsed correctly from the
-          filename if relative or absolute paths are specified
-        - changes for RT bug 37093 by: David Bartle
+0.20    2008-06-25
+	* added a command line option '--all-in-meta' which will
+	parse the META.yml and index every module listed in the
+	'provides' section
+	* module name and version is now parsed correctly from the
+	filename if relative or absolute paths are specified
+	* changes for RT bug 37093 by: David Bartle
 
-0.18.1  2008/06/25
-        - Fixed bug number 28363
-          http://rt.cpan.org/Ticket/Display.html?id=28363
+0.18.1  2008-06-25
+	* Fixed bug number 28363
+	http://rt.cpan.org/Ticket/Display.html?id=28363
 
-0.18    2005/04/02
-        - Fixed bug number 11718 involving the Line-Count in
-          02packages.details.txt.gz not being updated.
-        - Added tests for update_mirror method.
-        - Migrated tests to HTTP::Server::Simple.
+0.18    2005-04-02
+	* Fixed bug number 11718 involving the Line-Count in
+	02packages.details.txt.gz not being updated.
+	* Added tests for update_mirror method.
+	* Migrated tests to HTTP::Server::Simple.
 
-0.16    2005/01/08
-        - Decreased the size of t/read/authors/01mailrc.txt.gz reducing
-          greatly the size of the package.
-        - More problems discovered with exception testing. Moved all
-          exception tests to a single zz.exceptions.t, skip them all
-          if Test::Exception isn't installed.
+0.16    2005-01-08
+	* Decreased the size of t/read/authors/01mailrc.txt.gz reducing
+	greatly the size of the package.
+	* More problems discovered with exception testing. Moved all
+	exception tests to a single zz.exceptions.t, skip them all
+	if Test::Exception isn't installed.
 
-0.14    2005/01/05
-        - Added an optional filename parameter to parsecfg. This allows
-          calling parsecfg without having to previously call loadcfg
-          (tests added as required).
-        - Updated Synopsis to not using method chaining, but documented
-          that it is possible.
-        - Updated prereq of CPAN::Mini to version 0.32
-        - Fixed a warning message if dirmode isn't configured during the
-          inject process.
-        - Fixed update_mirror to call CPAN::Mini->update_mirror directly
-          fixing a problem with CPAN::Mini::Inject and the latest version
-          of CPAN::Mini (0.32).
+0.14    2005-01-05
+	* Added an optional filename parameter to parsecfg. This allows
+	calling parsecfg without having to previously call loadcfg
+	(tests added as required).
+	* Updated Synopsis to not using method chaining, but documented
+	that it is possible.
+	* Updated prereq of CPAN::Mini to version 0.32
+	* Fixed a warning message if dirmode isn't configured during the
+	inject process.
+	* Fixed update_mirror to call CPAN::Mini->update_mirror directly
+	fixing a problem with CPAN::Mini::Inject and the latest version
+	of CPAN::Mini (0.32).
 
-0.12    2005/01/04
-        - Tests failed for inject and add on Windows systems. These tests
-          have now been skipped.
-        - Reverted all tests to use eval{}. Using eval "" caused problems
-          on Windows, while eval{} only caused problems on one AIX box.
+0.12    2005-01-04
+	* Tests failed for inject and add on Windows systems. These tests
+	have now been skipped.
+	* Reverted all tests to use eval{}. Using eval "" caused problems
+	on Windows, while eval{} only caused problems on one AIX box.
 
-0.10    2004/12/30
-        - Fixed dirmode in inject(), add(), writelist(), so that all files
-          created are set with the correct permissions.
-        - Added tests for directory and file modes.
+0.10    2004-12-30
+	* Fixed dirmode in inject(), add(), writelist(), so that all files
+	created are set with the correct permissions.
+	* Added tests for directory and file modes.
 
-0.08    2004/12/08
-        - Tests were found to fail on AIX which contained eval{}, all
-          tests updated with eval "".
-        - Added a default value for dirmode in update_mirror based on
-          umask.
-        - Added a dirmode option to the config file.
-        - Fixed regex in mcpani to allow for developer version numbers
-          with add (ie. CPAN-Mini-Inject-0.07_001).
-        - Add a prereq for CPAN::Mini version 0.24. This version contains
-          a bugfix to properly handle dirmode. (Thanks RJBS).
+0.08    2004-12-08
+	* Tests were found to fail on AIX which contained eval{}, all
+	tests updated with eval "".
+	* Added a default value for dirmode in update_mirror based on
+	umask.
+	* Added a dirmode option to the config file.
+	* Fixed regex in mcpani to allow for developer version numbers
+	with add (ie. CPAN-Mini-Inject-0.07_001).
+	* Add a prereq for CPAN::Mini version 0.24. This version contains
+	a bugfix to properly handle dirmode. (Thanks RJBS).
 
-0.06    2004/11/10
+0.06    2004-11-10
+	* mcpani now parses the file passed to it to determine module name
+	and version. Command line options override the parsing.
+	* loadcfg() croaks if no configuration file is found.
 
-        - mcpani now parses the file passed to it to determine module name
-          and version. Command line options override the parsing.
-        - loadcfg() croaks if no configuration file is found.
+0.04    2004-11-05
+	* t/readlist.t and t/writelist.t both skip failure tests if
+	the uid is 0.
+	* inject accepts a true parameter to enable verbose mode which
+	lists modules as they are injected.
+	* testremote accepts a true parameter to enable verbose mode
+	which display the site being tested, and which is selected.
+	* Added --passive switch to mcpani to enable passive ftp
+	* Minor updates to perldoc in mcpani
+	* Added CPAN::Mini as a required module to Makefile.PL
 
-0.04    2004/11/05
-
-        - t/readlist.t and t/writelist.t both skip failure tests if
-          the uid is 0.
-        - inject accepts a true parameter to enable verbose mode which
-          lists modules as they are injected.
-        - testremote accepts a true parameter to enable verbose mode
-          which display the site being tested, and which is selected.
-        - Added --passive switch to mcpani to enable passive ftp
-        - Minor updates to perldoc in mcpani
-        - Added CPAN::Mini as a required module to Makefile.PL
-
-0.02    2004/10/31
-        - First version, released on an unsuspecting world.
+0.02    2004-10-31
+	* First version, released on an unsuspecting world.

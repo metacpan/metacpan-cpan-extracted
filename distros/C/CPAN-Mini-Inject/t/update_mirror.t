@@ -1,65 +1,110 @@
-use Test::More;
-use File::Spec::Functions;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
-BEGIN {
-  plan skip_all => "HTTP::Server::Simple required to test update_mirror"
-   if not eval "use CPANServer; 1";
-  plan skip_all => "Net::EmptyPort required to test update_mirror"
-   if not eval "use Net::EmptyPort; 1";
-  plan tests => 8;
-}
+use Test::More;
 
 use CPAN::Mini::Inject;
 use File::Path;
+use File::Spec::Functions;
+use File::Temp ();
 
-rmtree( [ catdir( 't', 'mirror' ) ], 0, 1 );
+use lib 't/lib';
+use Local::localserver;
+use Local::utils;
 
-my $port = Net::EmptyPort::empty_port;
-my $server = CPANServer->new( $port );
-my $pid    = $server->background;
-ok( $pid, 'HTTP Server started' );
-sleep 1;
+$SIG{'INT'} = sub { print "\nCleaning up before exiting\n"; exit 1 };
+my $tmp_dir = File::Temp::tempdir( CLEANUP => 1 );
+my $tmp_config_file;
 
-$SIG{__DIE__} = sub { kill( 9, $pid ) };
+my $url;
+my $port;
+my $pid;
+subtest 'start local server' => sub {
+	$port =  empty_port();
+	( $pid ) = start_server($port);
 
-my $mcpi = CPAN::Mini::Inject->new;
-$mcpi->parsecfg( 't/.mcpani/config' );
-$mcpi->{config}{remote} =~ s/:\d{5}\b/:$port/;
+	diag( "$$: PORT: $port" ) if $ENV{TEST_VERBOSE};
+	diag( "$$: PID: $pid" ) if $ENV{TEST_VERBOSE};
 
-mkdir( catdir( 't', 'mirror' ) );
+	$url = "http://localhost:$port/";
 
-$mcpi->update_mirror(
-  remote => "http://localhost:$port",
-  local  => catdir( 't', 'mirror' )
-);
+	for( 1 .. 4 ) {
+	  my $sleep = $_ * 2;
+	  sleep $sleep;
+	  diag("Sleeping $sleep seconds waiting for server") if $ENV{TEST_VERBOSE};
+	  last if can_fetch($url);
+	  }
 
+	ok can_fetch($url), "URL $url is available";
+	};
+
+subtest 'make config' => sub {
+	$tmp_config_file = write_config(
+		local      => catfile( qw(t local CPAN) ),
+		remote     => $url,
+		repository => $tmp_dir,
+		);
+	diag("Temp file is <$tmp_config_file>") if $ENV{TEST_VERBOSE};
+
+	ok -e $tmp_config_file, "<tmp_config_file> exists";
+	};
+
+my $mcpi;
+subtest 'setup' => sub {
+	my $class = 'CPAN::Mini::Inject';
+	use_ok $class;
+	$mcpi = $class->new;
+	isa_ok $mcpi, $class;
+	};
+
+subtest 'testremote' => sub {
+	$mcpi->loadcfg( $tmp_config_file )->parsecfg;
+	$mcpi->{config}{remote} =~ s/:\d{5}\b/:$port/;
+
+	ok can_fetch($url), "URL $url is available";
+
+	eval { $mcpi->testremote } or print STDERR "testremote died: $@";
+
+	ok can_fetch($url), "URL $url is still available";
+
+	is( $mcpi->{site}, $url, "Site URL is $url" );
+	};
+
+subtest 'update mirror' => sub {
+	ok( -e $tmp_dir, 'mirror directory exists' );
+
+	ok can_fetch($url), "URL $url is available";
+
+	eval {
+		diag( "updating mirror, which can take a couple minutes" );
+		$mcpi->update_mirror(
+		  remote => $url,
+		  local  => $tmp_dir,
+		  trace  => 1,
+		  log_level => 'info',
+		  );
+		} or print STDERR "update_mirror died: $@";
+	};
+
+subtest 'mirror state' => sub {
+	ok( -e catfile( $tmp_dir, qw(authors) ), 'authors/ exists' );
+	ok( -e catfile( $tmp_dir, qw(modules) ), 'modules/ exists' );
+	ok( -e catfile( $tmp_dir, qw(authors 01mailrc.txt.gz) ), '01mailrc.txt.gz exists' );
+	ok( -e catfile( $tmp_dir, qw(modules 02packages.details.txt.gz) ), '02packages.details.txt.gz exists' );
+	ok( -e catfile( $tmp_dir, qw(modules 03modlist.data.gz) ), '03modlist.data.gz exists' );
+	ok( -e catfile( $tmp_dir, qw(authors id R RJ RJBS CHECKSUMS) ), 'RJBS/CHECKSUMS exists' );
+	ok( -e catfile( $tmp_dir, qw(authors id R RJ RJBS CPAN-Mini-2.1828.tar.gz) ), 'CPAN-Mini-2.1828.tar.gz exists' );
+	ok( -e catfile( $tmp_dir, qw(authors id S SS SSORICHE CHECKSUMS) ), 'SSORICHE/CHECKSUMS exists' );
+	ok( -e catfile( $tmp_dir, qw(authors id S SS SSORICHE CPAN-Mini-Inject-1.01.tar.gz) ), 'CPAN::Mini::Inject exixts' );
+	};
+
+sleep 1; # allow locks to expire
 kill( 9, $pid );
 
-ok( -e catfile( qw(t mirror authors 01mailrc.txt.gz) ),
-  'Mirrored 01mailrc.txt.gz' );
-ok( -e catfile( qw(t mirror modules 02packages.details.txt.gz) ),
-  'Mirrored 02packages.details.txt.gz' );
-ok( -e catfile( qw(t mirror modules 03modlist.data.gz) ),
-  'Mirrored 03modlist.data.gz' );
+done_testing();
 
-ok( -e catfile( qw(t mirror authors id R RJ RJBS CHECKSUMS) ),
-  'RJBS CHECKSUMS' );
-ok(
-  -e catfile(
-    qw(t mirror authors id R RJ RJBS CPAN-Mini-2.1828.tar.gz) ),
-  'CPAN::Mini'
-);
-ok( -e catfile( qw(t mirror authors id S SS SSORICHE CHECKSUMS) ),
-  'SSORICHE CHECKSUMS' );
-ok(
-  -e catfile(
-    qw(t mirror authors id S SS SSORICHE CPAN-Mini-Inject-1.01.tar.gz)
-  ),
-  'CPAN::Mini::Inject'
-);
-sleep 1; # allow locks to expire
-rmtree( [ catdir( 't', 'mirror' ) ], 0, 1 );
+
+
+
+
+

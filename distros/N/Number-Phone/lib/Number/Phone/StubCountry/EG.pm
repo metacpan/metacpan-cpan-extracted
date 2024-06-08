@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240308154351;
+our $VERSION = 1.20240607153920;
 
 my $formatters = [
                 {
@@ -97,34 +97,34 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2065", "Red\ Sea",
-"203", "Alexandria",
-"2046", "Marsa\ Matruh",
-"2082", "Beni\ Suef",
-"2092", "Wadi\ El\-Gedid",
+$areanames{en} = {"2057", "Damietta",
 "2064", "Ismailia",
-"2050", "Mansoura",
-"2055", "Zagazig",
-"2093", "Sohag",
-"2069", "El\-Tor",
-"2015", "10th\ of\ Ramadan",
-"20554", "10th\ of\ Ramadan",
-"2057", "Damietta",
-"2086", "Minia",
 "2096", "Qena",
-"2068", "El\-Arish",
-"2013", "Banha",
-"202", "Cairo\/Giza\/Qalyubia",
-"2095", "Luxor",
-"2048", "Monufia",
 "2084", "Fayoum",
-"2097", "Aswan",
-"2040", "Tanta",
-"2062", "Suez",
-"2045", "Damanhur",
+"2092", "Wadi\ El\-Gedid",
+"2095", "Luxor",
 "2047", "Kafr\ El\-Sheikh",
+"2069", "El\-Tor",
+"2040", "Tanta",
+"20554", "10th\ of\ Ramadan",
+"2093", "Sohag",
+"2050", "Mansoura",
+"203", "Alexandria",
+"2045", "Damanhur",
+"2097", "Aswan",
+"2046", "Marsa\ Matruh",
 "2088", "Assiout",
-"2066", "Port\ Said",};
+"2013", "Banha",
+"2068", "El\-Arish",
+"2055", "Zagazig",
+"2062", "Suez",
+"202", "Cairo\/Giza\/Qalyubia",
+"2065", "Red\ Sea",
+"2082", "Beni\ Suef",
+"2066", "Port\ Said",
+"2086", "Minia",
+"2048", "Monufia",
+"2015", "10th\ of\ Ramadan",};
 my $timezones = {
                '' => [
                        'Africa/Cairo'

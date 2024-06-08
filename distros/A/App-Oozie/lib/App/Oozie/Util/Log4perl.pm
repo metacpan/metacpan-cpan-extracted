@@ -4,7 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use App::Oozie::Util::Plugin qw(
     find_files_in_inc
@@ -37,7 +37,7 @@ App::Oozie::Util::Log4perl
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

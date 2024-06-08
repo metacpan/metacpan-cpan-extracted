@@ -4,13 +4,13 @@ require 5.026;
 
 use IO::Handle;
 
-my $VERSION = '0.002';
+my $VERSION = '0.003';
 
 my %prereq =  # also included in t/00use.t
   (	'DateTime'			=> 0
   , 'DateTime::Format::ISO8601'	=> 0
   , 'DateTime::Format::Mail'	=> 0
-  , 'HTTP::Status'		=> 0
+  , 'HTTP::Status'		=> 6.39
   , 'JSON'				=> 0
   , 'List::Util'		=> 0
   , 'Log::Report'		=> 0

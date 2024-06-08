@@ -27,6 +27,14 @@ lib/Couch/DB/Util.pm
 lib/Couch/DB/Util.pod
 reference.html
 t/00use.t
+t/01util.t
+t/10result.t
+t/11events.t
+t/12paging.t
+t/20client.t
+t/30database.t
+t/40document.t
+t/Test.pm
 xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

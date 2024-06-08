@@ -23,17 +23,32 @@ additional features to the namespace, like 'warnings' and 'strict'.
 
 =over 4
 
+=item B<apply_tree>($tree, CODE)
+
+Apply the CODE to all elements in the $tree.  Returns a new tree.
+
 =item B<flat>(LIST|ARRAY)
 
 Returns all defined elements found in the LIST or ARRAY.  The parameter
 LIST may contain ARRAYs.
 
+=item B<pile>(LIST|ARRAY)
+
+Create a new ARRAY from the offered arguments, combining all elements
+from the LIST and ARRAYs.  Undefined elements are removed.
+
+=item B<simplified>($name, $data)
+
+Returns a Data::Dumper output, which is a simplified version of the $data.
+A normal dump would show internals of objects which make the output very verbose,
+hence harder to interpret.
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.002,
-built on May 31, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.003,
+built on June 08, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

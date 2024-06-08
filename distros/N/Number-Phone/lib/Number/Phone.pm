@@ -15,10 +15,11 @@ use Number::Phone::StubCountry;
 
 use Devel::Deprecations::Environmental
     OldPerl => { unsupported_from => '2022-11-08', older_than => '5.10.0' },
-    OldPerl => { unsupported_from => '2023-01-08', older_than => '5.12.0' };
+    OldPerl => { unsupported_from => '2023-01-08', older_than => '5.12.0' },
+    OldPerl => { unsupported_from => '2024-03-09', older_than => '5.14.0' };
 
 # MUST be in format N.NNNN, see https://github.com/DrHyde/perl-modules-Number-Phone/issues/58
-our $VERSION = '4.0002';
+our $VERSION = '4.0003';
 
 my $NOSTUBS = 0;
 sub import {
@@ -187,19 +188,30 @@ Number::Phone::Country, the constructor will return undef.
 
 =head1 INCOMPATIBLE CHANGES
 
-Early versions of this module allowed what are now object methods
-to also be called as class methods or even as functions. This was a
-bad design decision. Use of those calling conventions was deprecated
-in version 2.0, released in January 2012, and started to emit
-warnings. All code to support those calling conventions has now been removed.
+=head2 from version 4.0003 onwards
 
-Until 2017 we used KOS for the country code for Kosovo, that has now changed to
-XK. See L<Number::Phone::Country>.
+As of version 4.0003, alphabetic characters and underscores in phone numbers
+will cause a warning to be emitted. The first release after August 2026 will
+upgrade those to be fatal errors.
 
-From version 3.4000 to 3.4003 inclusive we accepted any old garbage after
-+383 as being valid, as the Kosovo numbering plan had not been published.
-Now that that has been published, we use libphonenumber data, and validate
-against it.
+=head2 from version 3.9002 onwards
+
+3.9002 is the last version that supported perls with 32-bit integers.
+
+=head2 from version 3.8000 onwards
+
+3.8000 is a bit stricter about numbers and countries not matching in the
+constructor. This may affect users who specify places like Guernsey but
+provide numbers from Jersey or the Isle of Man, all three of which are separate
+jurisdictions squatting on random places all over the UK's number plan.
+
+=head2 from version 3.6000 onwards
+
+As of version 3.6000 the C<areaname> method is documented as taking an optional
+language code. As far as I can tell providing this new parameter to the method
+as provided by all the subclasses on the CPAN won't do any harm.
+
+=head2 from version 3.4004 onwards
 
 The prefix codes in 3.4003 and earlier were managed by hand and so got out
 of date. After that release they are mostly derived from libphonenumber.
@@ -207,20 +219,25 @@ libphonenumber's data includes carrier selection codes when they are
 mandatory for dialling so those are now included. This sometimes means that
 some random carrier has been arbitrarily privileged over others.
 
-As of version 3.6000 the C<areaname> method is documented as taking an optional
-language code. As far as I can tell providing this new parameter to the method
-as provided by all the subclasses on the CPAN won't do any harm.
+=head2 from version 3.4000 to 3.4003
 
-As of version 3.6000 the C<areaname> method pays attention to your locale
-settings and so you might start getting locale-appropriate versions of
-areanames instead of what you used to get.
+From version 3.4000 to 3.4003 inclusive we accepted any old garbage after
++383 as being valid, as the Kosovo numbering plan had not been published.
+Now that that has been published, we use libphonenumber data, and validate
+against it.
 
-3.8000 is a bit stricter about numbers and countries not matching in the
-constructor. This may affect users who specify places like Guernsey but
-provide numbers from Jersey or the Isle of Man, all three of which are separate
-jurisdictions squatting on random places all over the UK's number plan.
+=head2 until version 3.3000
 
-3.9002 is the last version that supported perls with 32-bit integers.
+We used to use KOS for the country code for Kosovo, that has now changed to
+XK. See L<Number::Phone::Country>.
+
+=head2 until version 3.0014
+
+Early versions of this module allowed what are now object methods
+to also be called as class methods or even as functions. This was a
+bad design decision. Use of those calling conventions was deprecated
+in version 2.0, released in January 2012, and started to emit
+warnings. All code to support those calling conventions has now been removed.
 
 =head1 COMPATIBILITY WITH libphonenumber
 
@@ -249,7 +266,7 @@ slow, because it uses a huge database for some of its features.
 Your perl must support 64 bit ints.
 
 Because they are not supported by some libraries that we depend on, perl
-versions below 5.12 are not supported. If you have old versions of those
+versions below 5.14 are not supported. If you have old versions of those
 libraries installed then Number::Phone I<may> still work, but because I can't
 automatically test on those older versions any more that is liable to change
 without notice.
@@ -288,6 +305,9 @@ sub _new_args {
         $number = join('', grep { defined } ($country, $number));
     }
 
+    if($number =~ /[^0-9+#*()\[\]{},.<> \t\n\r-]/) {
+        warn(__PACKAGE__ . ": ridiculous characters in '$number'\n");
+    }
     $number =~ s/[^+0-9]//g;
     $number = "+$number" unless($number =~ /^\+/);
 

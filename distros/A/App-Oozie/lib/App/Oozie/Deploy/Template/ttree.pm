@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent qw( App::Oozie::Forked::Template::ttree );
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 sub new {
     my($class, $log_collector, @pass_through) = @_;
@@ -54,7 +54,7 @@ App::Oozie::Deploy::Template::ttree
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 AUTHORS
 

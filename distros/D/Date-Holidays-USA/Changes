@@ -1,5 +1,9 @@
 Revision history for Date-Holidays-USA
 
+0.0207 2024-06-07 19:32:38
+    - Fix documented examples.
+    - Improve tests.
+
 0.0206 2024-06-06 17:39:09
     - Add " Day" to Veteran's too!
 

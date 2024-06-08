@@ -231,6 +231,7 @@ RDAP-related modules that all work together. They are:
     - [Net::RDAP::Remark](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3ARemark), and its submodule:
         - [Net::RDAP::Notice](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3ANotice)
 - [Net::RDAP::EPPStatusMap](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AEPPStatusMap)
+- [Net::RDAP::JCard](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AJCard)
 - [Net::RDAP::Registry](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3ARegistry)
 - [Net::RDAP::Registry::IANARegistry](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3ARegistry%3A%3AIANARegistry)
 - [Net::RDAP::Registry::IANARegistry::Service](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3ARegistry%3A%3AIANARegistry%3A%3AService)
@@ -245,11 +246,11 @@ RDAP-related modules that all work together. They are:
 Data Access Protocol (RDAP)
 - [https://tools.ietf.org/html/rfc7481](https://tools.ietf.org/html/rfc7481) - Security Services for the
 Registration Data Access Protocol (RDAP)
-- [https://tools.ietf.org/html/rfc7482](https://tools.ietf.org/html/rfc7482) - Registration Data Access
+- [https://tools.ietf.org/html/rfc9082](https://tools.ietf.org/html/rfc9082) - Registration Data Access
 Protocol (RDAP) Query Format
-- [https://tools.ietf.org/html/rfc7483](https://tools.ietf.org/html/rfc7483) - JSON Responses for the
+- [https://tools.ietf.org/html/rfc9083](https://tools.ietf.org/html/rfc9083) - JSON Responses for the
 Registration Data Access Protocol (RDAP)
-- [https://tools.ietf.org/html/rfc7484](https://tools.ietf.org/html/rfc7484) - Finding the Authoritative
+- [https://tools.ietf.org/html/rfc9224](https://tools.ietf.org/html/rfc9224) - Finding the Authoritative
 Registration Data (RDAP) Service
 - [https://tools.ietf.org/html/rfc8056](https://tools.ietf.org/html/rfc8056) - Extensible Provisioning
 Protocol (EPP) and Registration Data Access Protocol (RDAP) Status Mapping

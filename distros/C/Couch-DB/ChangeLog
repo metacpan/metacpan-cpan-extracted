@@ -3,6 +3,20 @@
 	  All code was made by Mark Overmeer.
 	  Attributes refer to people who made contributions in ideas and bug-reports.
 
+version 0.003: Sat  8 Jun 10:46:02 CEST 2024
+
+	Changes:
+	- changed paging implementation.
+	- moved quite some 'search' and other complex options to positional
+	  params.
+
+	Fixes:
+	- require HTTP::Status 6.39 for default_status_name() [cpantesters]
+
+	Improvements:
+	- add ::Util functions pile(), apply_tree(), and simplified().
+	- add tests to the distribution.
+
 version 0.002: Fri 31 May 10:27:47 CEST 2024
 
 	Fixes:

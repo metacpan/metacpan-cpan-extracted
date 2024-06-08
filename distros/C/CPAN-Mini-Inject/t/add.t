@@ -1,55 +1,100 @@
-use Test::More tests => 6;
+use strict;
+use warnings;
 
-use CPAN::Mini::Inject;
-use File::Path;
+use Test::More;
 
-mkdir( 't/local/MYCPAN' );
+use File::Path qw(make_path);
+use File::Spec::Functions qw(catfile);
+use File::Temp;
 
-my $mcpi;
-$mcpi = CPAN::Mini::Inject->new;
-$mcpi->loadcfg( 't/.mcpani/config' )->parsecfg;
+use lib 't/lib';
+use Local::localserver;
+use Local::utils;
 
-$mcpi->add(
-  module   => 'CPAN::Mini::Inject',
-  authorid => 'SSORICHE',
-  version  => '0.01',
-  file     => 't/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz'
- )->add(
-  module   => 'CPAN::Mini::Inject',
-  authorid => 'SSORICHE',
-  version  => '0.02',
-  file     => 't/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz'
- );
+my $class = 'CPAN::Mini::Inject';
 
-my $soriche_path = File::Spec->catfile( 'S', 'SS', 'SSORICHE' );
-is( $mcpi->{authdir}, $soriche_path, 'author directory' );
-ok(
-  -r 't/local/MYCPAN/authors/id/S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz',
-  'Added module is readable'
-);
-my $module
- = "CPAN::Mini::Inject                 0.02  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz";
-ok( grep( /$module/, @{ $mcpi->{modulelist} } ),
-  'Module added to list' );
-is( grep( /^CPAN::Mini::Inject\s+/, @{ $mcpi->{modulelist} } ),
-  1, 'Module added to list just once' );
+$SIG{'INT'} = sub { print "\nCleaning up before exiting\n"; exit 1 };
+my $temp_dir = File::Temp::tempdir(CLEANUP=>1);
 
-SKIP: {
-  skip "Not a UNIX system", 2 if ( $^O =~ /^MSWin|^cygwin/ );
-  is( ( stat( 't/local/MYCPAN/authors/id/S/SS/SSORICHE' ) )[2] & 07777,
-    0775, 'Added author directory mode is 0775' );
-  is(
-    (
-      stat(
-        't/local/MYCPAN/authors/id/S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz'
-      )
-    )[2] & 07777,
-    0664,
-    'Added module mode is 0664'
-  );
-}
+subtest 'sanity' => sub {
+	use_ok $class or BAIL_OUT( "Could not load $class: $@" );
+	can_ok $class, 'new';
+	isa_ok $class->new, $class;
+	};
 
-# XXX do the same test as above again, but this time with a ->readlist after
-# the ->parsecfg
+my $repo_dir = catfile $temp_dir, 'injects';
+subtest 'create directory' => sub {
+	make_path $repo_dir;
+	ok -e $repo_dir, 'repository dir exists'
+	};
 
-rmtree( 't/local/MYCPAN', 0, 1 );
+my $tmp_config_file = catfile $temp_dir, 'config';
+subtest 'make config' => sub {
+	my $fh;
+	if( open $fh, '>', $tmp_config_file ) {
+		print {$fh} <<"HERE";
+local: $temp_dir
+remote : http://localhost:11027
+repository: $repo_dir
+dirmode: 0775
+passive: yes
+HERE
+		close $fh;
+		pass( "created config file" );
+		}
+	else {
+		fail("Could not create config file. Cannot continue");
+		done_testing();
+		exit;
+		}
+	};
+
+subtest 'add' => sub {
+	my $mcpi = $class->new;
+	isa_ok $mcpi, $class;
+	can_ok $mcpi, 'add';
+
+	ok -e $tmp_config_file, 'config file exists';
+	$mcpi->loadcfg( $tmp_config_file )->parsecfg;
+
+	my $archive_file = 'CPAN-Mini-Inject-0.01.tar.gz';
+	my $archive_path = catfile qw(t local mymodules), $archive_file;
+	my $module = $class;
+	ok( -e $archive_path, "file <$archive_file> exists" );
+
+	my $author = 'SSORICHE';
+	ok $mcpi->add(
+		module   => $module,
+		authorid => $author,
+		version  => '0.01',
+		file     => $archive_path
+	)->add(
+		module   => $module,
+		authorid => $author,
+		version  => '0.02',
+		file     => $archive_path
+	), 'adding twice succeeded';
+
+	ok exists $mcpi->{modulelist}, 'modulelist key exists';
+	isa_ok $mcpi->{modulelist}, ref [], 'modulelist value is an array ref';
+	is scalar @{$mcpi->{modulelist}}, 1, 'modulelist array has one entry';
+	like $mcpi->{modulelist}[0], qr/\A\Q$module\E/, "modulelist entry has $module";
+
+	my $author_path = catfile
+		$repo_dir,
+		qw(authors id),
+		substr( $author, 0, 1 ),
+		substr( $author, 0, 2 ),
+		$author;
+	ok -e $author_path, "author directory for $author exists";
+	is( mode($author_path), 0775, 'author dir mode is 775' ) if has_modes();
+
+	my $repo_archive_path = catfile $author_path, $archive_file;
+	ok -e $repo_archive_path, 'archive exists in repository';
+	is( mode($repo_archive_path), 0664, 'archive path is mode is 664' ) if has_modes();
+	ok -r $repo_archive_path, 'archive in repository is readable';
+	};
+
+
+
+done_testing();

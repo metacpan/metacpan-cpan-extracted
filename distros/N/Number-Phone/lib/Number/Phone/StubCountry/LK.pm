@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240308154352;
+our $VERSION = 1.20240607153921;
 
 my $formatters = [
                 {
@@ -93,35 +93,35 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"9451", "Hatton\,\ Nuwara\ Eliya",
-"9436", "Avissawella\,\ Colombo",
-"9411", "Colombo",
-"9431", "Negombo\,\ Gampaha",
-"9433", "Gampaha",
-"9432", "Chilaw\,\ Puttalam",
-"9424", "Vavuniya",
-"9427", "Polonnaruwa",
-"9445", "Ratnapura",
-"9463", "Ampara",
-"9466", "Matale",
-"9425", "Anuradhapura",
-"9447", "Hambantota",
-"9452", "Nuwara\ Eliya",
-"9438", "Panadura\,\ Kalutara",
-"9426", "Trincomalee",
-"9441", "Matara",
-"9465", "Batticaloa",
+$areanames{en} = {"9454", "Nawalapitiya\,\ Kandy",
 "9467", "Kalmunai\,\ Ampara",
-"9482", "Kandy",
-"9421", "Jaffna",
-"9423", "Mannar",
-"9434", "Kalutara",
-"9437", "Kurunegala",
-"9455", "Badulla",
+"9424", "Vavuniya",
 "9491", "Galle",
+"9437", "Kurunegala",
+"9447", "Hambantota",
+"9434", "Kalutara",
+"9427", "Polonnaruwa",
+"9457", "Bandarawela\,\ Badulla",
+"9441", "Matara",
+"9423", "Mannar",
 "9435", "Kegalle",
-"9454", "Nawalapitiya\,\ Kandy",
-"9457", "Bandarawela\,\ Badulla",};
+"9466", "Matale",
+"9432", "Chilaw\,\ Puttalam",
+"9421", "Jaffna",
+"9482", "Kandy",
+"9436", "Avissawella\,\ Colombo",
+"9465", "Batticaloa",
+"9451", "Hatton\,\ Nuwara\ Eliya",
+"9455", "Badulla",
+"9433", "Gampaha",
+"9452", "Nuwara\ Eliya",
+"9425", "Anuradhapura",
+"9463", "Ampara",
+"9438", "Panadura\,\ Kalutara",
+"9431", "Negombo\,\ Gampaha",
+"9411", "Colombo",
+"9445", "Ratnapura",
+"9426", "Trincomalee",};
 my $timezones = {
                '' => [
                        'Asia/Colombo'

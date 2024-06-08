@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2008-2022 -- leonerd@leonerd.org.uk
 
-package String::Tagged::Extent 0.22;
+package String::Tagged::Extent 0.23;
 
 use v5.14;
 use warnings;
@@ -29,7 +29,7 @@ querying the result of an operation, then discarded soon after.
 
 =head2 string
 
-   $extent->string
+   $extent->string;
 
 Returns the containing L<String::Tagged> object.
 
@@ -42,7 +42,7 @@ sub string
 
 =head2 start
 
-   $extent->start
+   $extent->start;
 
 Returns the start index of the extent. This is the index of the first
 character within the extent.
@@ -56,7 +56,7 @@ sub start
 
 =head2 end
 
-   $extent->end
+   $extent->end;
 
 Returns the end index of the extent. This is the index of the first character
 beyond the end of the extent.
@@ -70,7 +70,7 @@ sub end
 
 =head2 anchor_before
 
-   $extent->anchor_before
+   $extent->anchor_before;
 
 True if this extent begins "before" the start of the string. Only certain
 methods return extents with this flag defined.
@@ -84,7 +84,7 @@ sub anchor_before
 
 =head2 anchor_after
 
-   $extent->anchor_after
+   $extent->anchor_after;
 
 True if this extent ends "after" the end of the string. Only certain methods
 return extents with this flag defined.
@@ -98,7 +98,7 @@ sub anchor_after
 
 =head2 length
 
-   $extent->length
+   $extent->length;
 
 Returns the number of characters within the extent.
 
@@ -112,7 +112,7 @@ sub length
 
 =head2 substr
 
-   $extent->substr
+   $extent->substr;
 
 Returns the substring contained by the extent, as a L<String::Tagged>
 complete with all the relevant tag values.
@@ -127,7 +127,7 @@ sub substr
 
 =head2 plain_substr
 
-   $extent->plain_substr
+   $extent->plain_substr;
 
 Returns the substring of the underlying plain string buffer contained by the
 extent, as a plain Perl string.

@@ -2492,12 +2492,14 @@ print "localhost cleanup() LINE=$line<==\n"
    }
    if ($fa_conf::save_fa_logs_dot_zip_in_current_directory) {
       if (my $zip=$Net::FullAuto::FA_Core::gbp->('zip')) {
-         `cp $Hosts{"__Master_${$}__"}{'LogFile'} .`;
-         `cp $outd/OUTPUT.txt .`;
+         `cp $Hosts{"__Master_${$}__"}{'LogFile'} .`
+               if (-e $Hosts{"__Master_${$}__"}{'LogFile'});
+         `cp $outd/OUTPUT.txt .` if (-e "$outd/OUTPUT.txt");
          my $logname=$Hosts{"__Master_${$}__"}{'LogFile'};
          $logname=~s/^.*\/(.*)$/$1/;
          unlink 'fa_logs.zip';
-         `$zip/zip fa_logs.zip OUTPUT.txt $logname`;
+         `$zip/zip fa_logs.zip OUTPUT.txt $logname`
+            if (-e "$outd/OUTPUT.txt");
          unlink "OUTPUT.txt";
          unlink $logname;
       }
@@ -18122,9 +18124,17 @@ sub ls
       substr($path,-1)='';
    }
    if ($path) {
-      ($output,$stderr)=&Rem_Command::ftpcmd($self,"ls \"$path\"",$cache);
+      if ($options eq '-l') {
+         ($output,$stderr)=&Rem_Command::ftpcmd($self,"ls -l \"$path\"",$cache);
+      } else {
+         ($output,$stderr)=&Rem_Command::ftpcmd($self,"ls \"$path\"",$cache);
+      }
    } else {
-      ($output,$stderr)=&Rem_Command::ftpcmd($self,'ls',$cache);
+      if ($options eq '-l') {
+         ($output,$stderr)=&Rem_Command::ftpcmd($self,'ls -l',$cache);
+      } else {
+         ($output,$stderr)=&Rem_Command::ftpcmd($self,'ls',$cache);
+      }
    }
    my $newout='';
    if ($options eq '1' || $options eq '-1') {
@@ -28368,6 +28378,7 @@ sub ftpcmd
    my $cmd=$_[1];my $ftperr='';my $return_all=0;my $display=0;
    if (1<$#_) {
       foreach my $i (2..$#_) {
+         $_[$i]||='';
          if ($_[$i] eq '__return_all_output__') {
             $return_all=1;
          } elsif (-1<index $_[$i],'Cache::FileCache') {
@@ -31222,7 +31233,8 @@ sub display
       }
       $line=$save.$line;
       $line=~s/^stdout: ?//mg;
-      $line=~s/\d?\s?$cmd_prompt$//s;
+      $line=~s/\s?$cmd_prompt$//s;
+      $line=~s/\d(\d|\d\d)?\s*$//s;
       print $line;
       print $OUTPUT $line if $print_out;
       return '';
@@ -31234,14 +31246,14 @@ sub display
          $save.=$line;
          return $save;
       } else {
-         $line=~s/\s*\d\s*$//s;
+         $line=~s/\s*\d(\d|\d\d)?\s*$//s;
          print $line;
          print $OUTPUT $line if $print_out;
          return '';
       }
    } elsif ($line=~s/\n*$cmd_prompt//gs) {
-      $line=~s/\s+\d\s*$//s;
-      unless ($line=~/^\d$/) {
+      $line=~s/\s+\d(\d|\d\d)?\s*$//s;
+      unless ($line=~/^\d(\d|\d\d)?$/) {
          print $line."\n";
          print $OUTPUT "\n" if $print_out;
       }
@@ -31257,7 +31269,7 @@ sub display
       print $OUTPUT $line if $print_out;
       return '';
    } else {
-      $line=~s/\s+\d\s*$//s;
+      $line=~s/\s+\d(\d|\d\d)?\s*$//s;
       print $line;
       print $OUTPUT $line if $print_out;
       return '';

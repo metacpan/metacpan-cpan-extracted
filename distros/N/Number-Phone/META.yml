@@ -10,6 +10,7 @@ build_requires:
   ExtUtils::Manifest: '0'
   File::ShareDir::Install: '0.11'
   Parallel::ForkManager: v0.7.6
+  Test2::V0: '0'
   Test::Differences: '0.62'
   Test::More: '0.96'
   Test::Warnings: '0.031'
@@ -46,5 +47,5 @@ requires:
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-Number-Phone/issues
   repository: https://github.com/DrHyde/perl-modules-Number-Phone
-version: '4.0002'
+version: '4.0003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

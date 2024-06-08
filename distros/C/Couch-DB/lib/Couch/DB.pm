@@ -7,7 +7,7 @@
 
 package Couch::DB;
 use vars '$VERSION';
-$VERSION = '0.002';
+$VERSION = '0.003';
 
 use version;
 
@@ -20,15 +20,15 @@ use Couch::DB::Design   ();
 use Couch::DB::Node     ();
 use Couch::DB::Util     qw(flat);
 
-use Scalar::Util      qw(blessed);
-use List::Util        qw(first);
 use DateTime          ();
-use DateTime::Format::Mail    ();
 use DateTime::Format::ISO8601 ();
+use DateTime::Format::Mail    ();
+use JSON              qw/encode_json/;
+use List::Util        qw(first min);
+use Scalar::Util      qw(blessed);
+use Storable          qw/dclone/;
 use URI               ();
 use URI::Escape       qw/uri_escape uri_unescape/;
-use JSON              qw/encode_json/;
-use Storable          qw/dclone/;
 
 use constant
 {	DEFAULT_SERVER => 'http://127.0.0.1:5984',
@@ -155,12 +155,10 @@ sub client($)
 
 
 sub call($$%)
-{	my $self = shift;
-	my %args = @_==1 ? %{$_[0]} : (method => shift, path => shift, @_);
-
-	my $method = $args{method};
-	my $path   = $args{path};
-	$args{query}  ||= {};
+{	my ($self, $method, $path, %args) = @_;
+	$args{method}   = $method;
+	$args{path}     = $path;
+	$args{query}  ||= my $query = {};
 
 	my $headers     = $args{headers} ||= {};
 	$headers->{Accept} ||= 'application/json';
@@ -169,11 +167,35 @@ sub call($$%)
 #use Data::Dumper;
 #warn "CALL ", Dumper \%args;
 
-    defined $args{send} || ($method ne 'POST' && $method ne 'PUT')
+    my $send = $args{send};
+	defined $send || ($method ne 'POST' && $method ne 'PUT')
 		or panic "No send in $method $path";
 
-	($method eq 'GET' ? $args{query} : $args{send})->{bookmark} = delete $args{bookmark}
-		if exists $args{bookmark};
+	if(my $paging = $args{paging})
+	{	# Translate paging status into call parameters
+		my $params   = $method eq 'GET' ? $query : $send;
+		my $progress = @{$paging->{harvested}};      # within a page
+#use Data::Dumper;
+#warn "PAGING IN=", Dumper $paging;
+		$params->{limit} = min $paging->{page_size} - $progress, $paging->{req_max};
+
+		my $start    = $paging->{start};
+		if(my $bookmark = $paging->{bookmarks}{$start + $progress})
+		{	$params->{bookmark} = $bookmark;
+			$params->{skip}     = $paging->{skip};
+		}
+		else
+		{	delete $params->{bookmark};
+			$params->{skip}     = $start + $progress + $paging->{skip};
+		}
+
+		if(my $client = $paging->{client})
+		{	# No free choices for clients once we are on page 2
+			$args{client} = $client;
+			delete $args{clients};
+		}
+#warn "PAGING PARAMS = ", Dumper $params;
+	}
 
 	### On this level, we pick a client.  Extensions implement the transport.
 
@@ -195,10 +217,11 @@ sub call($$%)
 
 	my $result  = Couch::DB::Result->new(
 		couch     => $self,
-		to_values => $args{to_values},
+		on_values => $args{on_values},
 		on_error  => $args{on_error},
 		on_final  => $args{on_final},
-		next      => ($args{paginate} ? \%args : undef),
+		on_chain  => $args{on_chain},
+		paging    => $args{paging},
 	);
 
   CLIENT:
@@ -217,34 +240,98 @@ sub call($$%)
 
 sub _callClient { panic "must be extended" }
 
-# Described in the DETAILS below
+# Described in the DETAILS below, non-paging commands
 sub _resultsConfig($%)
 {	my ($self, $args, @more) = @_;
 	my %config;
+
 	exists $args->{"_$_"} && ($config{$_} = delete $args->{"_$_"})
 		for qw/delay client clients headers/;
 
-	exists $args->{$_} && ($config{$_} = delete $args->{$_})
-		for qw/on_error on_final/;
+	exists $args->{$_} && (push @{$config{$_}}, delete $args->{$_})
+		for qw/on_error on_final on_chain on_values/;
 
 	while(@more)
 	{	my ($key, $value) = (shift @more, shift @more);
-		if($key eq 'headers')
+		if($key eq '_headers')
 		{	# Headers are added, as default only
 			my $headers = $config{headers} ||= {};
 			exists $headers->{$_} or ($headers->{$_} = $value->{$_}) for keys %$value;
 			next;
 		}
 		elsif($key =~ /^on_/)
-		{	# Events are added to list of events
-			$config{$key} = exists $config{$key} ? [ flat $config{$key}, $value ] : $value;
+		{	push @{$config{$key}}, $value;
 		}
 		else
 		{	# Other parameters used as default
 			exists $config{$key} or $config{$key} = $value;
 		}
 	}
+
+	keys %$args and warn "Unused call parameters: ", join ', ', sort keys %$args;
 	%config;
+}
+
+# Described in the DETAILS below, paging commands
+sub _resultsPaging($%)
+{	my ($self, $args, @more) = @_;
+
+	my %state = (harvested => []);
+	my $succ;  # successor
+	if(my $succeeds = delete $args->{_succeed})
+	{	delete $args->{_clients}; # no client switching within paging
+
+		if(blessed $succeeds && $succeeds->isa('Couch::DB::Result'))
+		{	# continue from living previous result
+			$succ = $succeeds->nextPageSettings;
+			$args->{_client} = $succeeds->client;
+		}
+		else
+		{	# continue from resurrected from Result->pagingState()
+			my $h = $succeeds->{harvester}
+				or panic "_succeed does not contain data from pagingState() nor is a Result object.";
+
+			$h eq 'DEFAULT' || $args->{_harvester}
+				or panic "Harvester does not survive pagingState(), resupply.";
+
+			$succ  = $succeeds;
+			$args->{_client} = $succeeds->{client};
+		}
+	}
+
+	$state{start}     = $succ->{start} || 0;
+	$state{skip}      = delete $args->{skip} || 0;
+	$state{harvester} = my $harvester = delete $args->{_harvester} || $succ->{harvester};
+	$state{page_size} = delete $args->{_page_size} || $succ->{page_size} || 25;
+	$state{req_max}   = delete $args->{limit}      || $succ->{req_max}   || 100;
+
+	if(my $page = delete $args->{_page})
+	{	$state{start}  = ($page - 1) * $state{page_size};
+	}
+
+	$state{bookmarks} = $succ->{bookmarks} ||= { };
+	if(my $b = delete $args->{_bookmark})
+	{	$state{bookmarks}{$state{start}} = $b;
+	}
+
+	$harvester ||= sub { $_[0]->values->{docs} };
+	my $continue_partial = sub {
+		my $result = shift;
+		if($result)
+		{	my @found = flat $harvester->($result);
+			$result->_pageAdd($result->answer->{bookmark}, @found) if @found;
+
+$result->_pageAdd if $result->pageIsPartial;
+#warn "NOT YET IMPLEMENTED" if $result->pageIsPartial;   #XXX
+		}
+		$result;
+	};
+
+	# When less elements are returned
+	return
+	( $self->_resultsConfig($args, @more, on_chain => $continue_partial),
+	   paging => \%state,
+	);
 }
 
 #-------------
@@ -344,8 +431,8 @@ sub jsonText($%)
 my (%surpress_depr, %surpress_intro);
 
 sub check($$$$)
-{	defined $_[3] or return $_[0];
-	my ($self, $element, $change, $version, $what) = @_;
+{	$_[1] or return $_[0];
+	my ($self, $condition, $change, $version, $what) = @_;
 
 	# API-doc versions are sometimes without 3rd part.
 	my $cv = version->parse($version);

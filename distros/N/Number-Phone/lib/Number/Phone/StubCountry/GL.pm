@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240308154351;
+our $VERSION = 1.20240607153920;
 
 my $formatters = [
                 {
@@ -62,32 +62,32 @@ my $validators = {
                 'voip' => '3[89]\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"29964", "Qaqortoq",
-"29932", "Nuuk",
-"29991", "Qasigannguit",
-"29998", "Tasiilaq",
-"29934", "Nuuk",
-"29981", "Maniitsoq",
-"29995", "Uummannaq",
-"29933", "Nuuk",
+$areanames{en} = {"29984", "Kangerlussuaq",
 "29997", "Qaanaaq",
-"29966", "Narsaq",
-"29936", "Nuuk",
-"29985", "Sisimiut",
-"29987", "Kangaatsiaq",
-"29968", "Paamiut",
-"299691", "Ivittuut",
-"29992", "Qeqertasuaq",
-"29984", "Kangerlussuaq",
-"29931", "Nuuk",
-"29994", "Ilulissat",
-"29961", "Nanortalik",
-"29937", "Nuuk",
-"29999", "Ittoqqortoormiit",
-"29935", "Nuuk",
+"29989", "Aasiaat",
 "29986", "Sisimiut",
+"29935", "Nuuk",
+"29934", "Nuuk",
+"29961", "Nanortalik",
+"29985", "Sisimiut",
+"29936", "Nuuk",
+"29931", "Nuuk",
+"29966", "Narsaq",
+"29992", "Qeqertasuaq",
+"29964", "Qaqortoq",
+"29998", "Tasiilaq",
+"29981", "Maniitsoq",
+"29994", "Ilulissat",
+"29999", "Ittoqqortoormiit",
+"29987", "Kangaatsiaq",
 "29996", "Upernavik",
-"29989", "Aasiaat",};
+"29937", "Nuuk",
+"29933", "Nuuk",
+"29968", "Paamiut",
+"29995", "Uummannaq",
+"299691", "Ivittuut",
+"29932", "Nuuk",
+"29991", "Qasigannguit",};
 my $timezones = {
                '' => [
                        'America/Godthab',

@@ -8,7 +8,6 @@ use CPAN::Mini;
 use CPAN::Mini::Inject::Config;
 use Carp;
 use Compress::Zlib;
-use Env;
 use File::Basename;
 use File::Copy;
 use File::Path qw( make_path );
@@ -20,16 +19,12 @@ use Dist::Metadata ();
 
 CPAN::Mini::Inject - Inject modules into a CPAN::Mini mirror.
 
-=head1 VERSION
-
-Version 0.37
-
 =cut
 
-our $VERSION = '0.37';
+our $VERSION = '1.002';
 our @ISA     = qw( CPAN::Mini );
 
-=head1 Synopsis
+=head1 SYNOPSIS
 
 If you're not going to customize the way CPAN::Mini::Inject works you
 probably want to look at the L<mcpani> command instead.
@@ -50,9 +45,15 @@ probably want to look at the L<mcpani> command instead.
 
 =head1 DESCRIPTION
 
-CPAN::Mini::Inject uses CPAN::Mini to build or update a local CPAN mirror
-then adds modules from your repository to it, allowing the inclusion
-of private modules in a minimal CPAN mirror.
+CPAN::Mini::Inject uses CPAN::Mini to build or update a I<local> CPAN mirror
+from a I<remote> one.  It adds two extra features:
+
+1. an additional I<repository> of distribution files and related information
+(author and module versions), separate from the local and remote mirrors, to
+which you can add your own distribution files.
+
+2. the ability to I<inject> the distribution files from your I<repository>
+into a I<local> CPAN mirror.
 
 =head1 METHODS
 
@@ -68,7 +69,9 @@ A C<CPAN::Mini::Inject> ISA L<CPAN::Mini>. Refer to the
 L<documentation|CPAN::Mini> for that module for details of the interface
 C<CPAN::Mini::Inject> inherits from it.
 
-=head2 C<new>
+=over 4
+
+=item C<new>
 
 Create a new CPAN::Mini::Inject object.
 
@@ -80,7 +83,7 @@ sub new {
    $_[0];
 }
 
-=head2 C<< config_class( [CLASS] ) >>
+=item C<< config_class( [CLASS] ) >>
 
 Returns the name of the class handling the configuration.
 
@@ -98,7 +101,7 @@ sub config_class {
   $self->{config_class};
 }
 
-=head2 C<< config >>
+=item C<< config >>
 
 Returns the configuration object. This object should be from
 the class returned by C<config_class> unless you've done something
@@ -114,7 +117,7 @@ sub config {
   $self->{config};
 }
 
-=head2 C<< loadcfg( [FILENAME] ) >>
+=item C<< loadcfg( [FILENAME] ) >>
 
 
 This is a bridge to CPAN::Mini::Inject::Config's loadconfig. It sets the
@@ -134,7 +137,7 @@ sub loadcfg {
   return $self;
 }
 
-=head2 C<< parsecfg() >>
+=item C<< parsecfg() >>
 
 This is a bridge to CPAN::Mini::Inject::Config's parseconfig.
 
@@ -152,7 +155,7 @@ sub parsecfg {
   return $self;
 }
 
-=head2 C<< site( [SITE] ) >>
+=item C<< site( [SITE] ) >>
 
 Returns the CPAN site that CPAN::Mini::Inject chose from the
 list specified in the C<remote> directive.
@@ -168,7 +171,7 @@ sub site {
   $self->{site} || '';
 }
 
-=head2 C<testremote>
+=item C<testremote>
 
 Test each site listed in the remote parameter of the config file by performing
 a get on each site in order for authors/01mailrc.txt.gz. The first site to
@@ -207,7 +210,7 @@ sub testremote {
   return $self;
 }
 
-=head2 C<update_mirror>
+=item C<update_mirror>
 
 This is a subclass of CPAN::Mini.
 
@@ -225,6 +228,7 @@ sub update_mirror {
   $options{local}     ||= $self->config->get( 'local' );
   $options{trace}     ||= 0;
   $options{skip_perl} ||= $self->config->get( 'perl' ) || 1;
+  $options{skip_cleanup} ||= $self->config->get( 'skip_cleanup' ) || 0;
 
   $self->testremote( $options{trace} )
    unless ( $self->site || $options{remote} );
@@ -236,7 +240,7 @@ sub update_mirror {
   CPAN::Mini->update_mirror( %options );
 }
 
-=head2 C<add>
+=item C<add>
 
 Add a new module to the repository. The add method copies the module
 file into the repository with the same structure as a CPAN site. For
@@ -275,8 +279,6 @@ but you can specify one explicitly.
 The tar.gz of the module.
 
 =back
-
-=head3 Example
 
   add( module => 'Module::Name',
        authorid => 'AUTHOR',
@@ -362,7 +364,7 @@ sub add {
   return $self;
 }
 
-=head2 C<added_modules>
+=item C<added_modules>
 
 Returns a list of hash references describing the modules added by this instance.
 Each hashref will contain C<file>, C<authorid>, and C<modules>.
@@ -381,7 +383,7 @@ sub added_modules {
   return @{ $self->{added_modules} ||= [] };
 }
 
-=head2 C<inject>
+=item C<inject>
 
 Insert modules from the repository into the local CPAN::Mini mirror. inject
 copies each module into the appropriate directory in the CPAN::Mini mirror
@@ -403,12 +405,17 @@ sub inject {
 
   my %updatedir;
   my %already_injected;
+  my %report;
   for my $modline ( @{ $self->{modulelist} } ) {
     my ( $module, $version, $file ) = split( /\s+/, $modline );
 
-    next if $already_injected{$file}++;
-
     my $target = $self->config->get( 'local' ) . '/authors/id/' . $file;
+
+    # collect all modules of a target/file
+    # needed for report
+    push @{ $report{$target} }, $module;
+    next if $already_injected{$module}++;
+
     my $source
      = $self->config->get( 'repository' ) . '/authors/id/' . $file;
 
@@ -420,7 +427,19 @@ sub inject {
      or croak "Copy $source to $tdir failed: $!";
 
     $self->_updperms( $target );
-    print "$target ... injected $module\n" if $verbose;
+  }
+
+  # if verbose report target file and the modules it contains
+  if ( $verbose ) {
+    for my $target (keys %report) {
+        my $target_str = "$target ... injected modules : ";
+        my $fmt = '%' . length($target_str) . "s%s\n";
+        my @modules = @{ $report{$target} };
+        printf $fmt, $target_str, shift @modules;    # first line with target
+        for my $module ( @modules ) {                # rest only the module
+            printf $fmt, '', $module;
+        }
+    }
   }
 
   for my $dir ( keys( %updatedir ) ) {
@@ -437,7 +456,7 @@ sub inject {
   return $self;
 }
 
-=head2 C<updpackages>
+=item C<updpackages>
 
 Update the CPAN::Mini mirror's modules/02packages.details.txt.gz with the
 injected module information.
@@ -461,7 +480,7 @@ sub updpackages {
   $self->_writepkgs( [ sort { lc $a cmp lc $b } values %packages ] );
 }
 
-=head2 C<updauthors>
+=item C<updauthors>
 
 Update the CPAN::Mini mirror's authors/01mailrc.txt.gz with
 stub information should the author not actually exist on CPAN
@@ -500,7 +519,7 @@ sub updauthors {
 
 }
 
-=head2 C<readlist>
+=item C<readlist>
 
 Load the repository's modulelist.
 
@@ -530,7 +549,7 @@ sub readlist {
   return $self;
 }
 
-=head2 C<writelist>
+=item C<writelist>
 
 Write to the repository modulelist.
 
@@ -710,33 +729,30 @@ sub _fmtdate {
   return "$date[0], $date[2] $date[1] $date[4] $date[3] GMT";
 }
 
-=head1 See Also
+=back
+
+=head1 SEE ALSO
 
 L<CPAN::Mini>
-
-=head1 Current Maintainer
-
-Christian Walde C<< <walde.christian@googlemail.com> >>
 
 =head1 Original Author
 
 Shawn Sorichetti, C<< <ssoriche@cpan.org> >>
 
-=head1 Acknowledgements
+=head1 ACKNOWLEDGEMENTS
 
 Special thanks to David Bartle, for bringing this module up
 to date, and resolving the reported bugs.
 
 Thanks to Jozef Kutej <jozef@kutej.net> for numerous patches.
 
-=head1 Bugs
+=head1 BUGS
 
-Please report any bugs or feature requests to
-C<bug-cpan-mini-inject@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.  I will be notified, and then you'll automatically
-be notified of progress on your bug as I make changes.
+Report issues to the GitHub queue at
 
-=head1 Copyright & License
+	https://github.com/briandfoy/cpan-mini-inject/issues
+
+=head1 COPYRIGHT AND LICENSE
 
 Copyright 2008-2009 Shawn Sorichetti, Andy Armstrong, All Rights Reserved.
 

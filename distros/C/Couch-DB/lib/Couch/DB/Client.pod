@@ -279,7 +279,7 @@ This fact is cached.
 The only useful application is with the abstract name C<_local>, which will
 return you the name of the node represented by the CouchDB instance.
 
-=item $obj-E<gt>B<replicate>(%options)
+=item $obj-E<gt>B<replicate>(\%rules, %options)
 
  [CouchDB API "POST /_replicate", UNTESTED]
 
@@ -292,6 +292,7 @@ All %options are posted as parameters.
  [CouchDB API "GET /_scheduler/docs/{replicator_db}/{docid}", UNTESTED]
 
 Retrieve information about a particular replication document.
+Supports pagination.
 
  -Option--Default
   dbname  _replicator
@@ -310,6 +311,7 @@ Pass a C<dbname> for the database which contains the replication information.
  [CouchDB API "GET /_scheduler/docs/{replicator_db}", UNTESTED]
 
 Retrieve information about replication documents.
+Supports pagination.
 
  -Option--Default
   dbname  _replicator
@@ -329,7 +331,7 @@ Pass a C<dbname> for the database which contains the replication information.
 Returns information about current replication jobs (which preform tasks), on
 this CouchDB server instance.  The results are ordered by replication ID.
 
-The %options can be C<limit> and C<skip>.
+Supports pagination.
 
 =item $obj-E<gt>B<serverInfo>(%options)
 
@@ -375,8 +377,8 @@ Returns the version of the server software, as version object.
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.002,
-built on May 31, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.003,
+built on June 08, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

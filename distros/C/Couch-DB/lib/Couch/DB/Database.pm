@@ -7,7 +7,7 @@
 
 package Couch::DB::Database;
 use vars '$VERSION';
-$VERSION = '0.002';
+$VERSION = '0.003';
 
 
 use Log::Report 'couch-db';
@@ -78,8 +78,7 @@ sub details(%)
 	#XXX zero in old nodes?
 
 	$self->couch->call(GET => $self->_pathToDB($part ? '_partition/'.uri_escape($part) : undef),
-		to_values  => \&__detailsValues,
-		$self->couch->_resultsConfig(\%args),
+		$self->couch->_resultsConfig(\%args, on_values => \&__detailsValues),
 	);
 }
 
@@ -166,8 +165,7 @@ sub ensureFullCommit(%)
 	$self->couch->call(POST => $self->_pathToDB('_ensure_full_commit'),
 		deprecated => '3.0.0',
 		send       => { },
-		to_values  => \&__ensure,
-		$self->couch->_resultsConfig(\%args),
+		$self->couch->_resultsConfig(\%args, on_values => \&__ensure),
 	);
 }
 
@@ -263,12 +261,13 @@ sub revisionLimitSet($%)
 
 #-------------
 
-sub listDesigns(%)
-{	my ($self, %args) = @_;
+sub listDesigns(;$%)
+{	my ($self, $search, %args) = @_;
 	my $couch   = $self->couch;
+	my @search  = flat $search;
 
 	my ($method, $path, $send) = (GET => $self->_pathToDB('_design_docs'), undef);
-	if(my @search  = flat delete $args{search})
+	if(@search)
 	{	$method = 'POST';
 	 	my @s   = map $self->_designPrepare($method, $_), @search;
 
@@ -439,11 +438,11 @@ sub __listValues($$%)
 	$values;
 }
 
-sub listDocuments(%)
-{	my ($self, %args) = @_;
+sub listDocuments(;$%)
+{	my ($self, $search, %args) = @_;
 	my $couch  = $self->couch;
 
-	my @search = flat delete $args{search};
+	my @search = flat $search;
 	my $part   = delete $args{partition};
 	my $local  = delete $args{local};
 	my $view   = delete $args{view};
@@ -482,8 +481,9 @@ sub listDocuments(%)
 
 	$couch->call($method => $path,
 		@params,
-		to_values => sub { $self->__listValues($_[0], $_[1], local => $local) },
-		$couch->_resultsConfig(\%args),
+		$couch->_resultsConfig(\%args,
+			on_values => sub { $self->__listValues($_[0], $_[1], local => $local) },
+		),
 	);
 }
 
@@ -535,10 +535,8 @@ sub find($%)
 	$path     .= '/_partition/'. uri_espace($part) if $part;
 
 	$self->couch->call(POST => "$path/_find",
-		send      => $self->_findPrepare(POST => $search),
-		paginate  => 1,
-		to_values => sub { $self->__findValues(@_) },
-		$self->couch->_resultsConfig(\%args),
+		send   => $self->_findPrepare(POST => $search),
+		$self->couch->_resultsPaging(\%args, on_values => sub { $self->__findValues(@_) }),
 	);
 }
 

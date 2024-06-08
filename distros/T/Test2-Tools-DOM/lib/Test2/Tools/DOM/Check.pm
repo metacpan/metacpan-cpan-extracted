@@ -7,7 +7,7 @@ use experimental 'signatures';
 use Test2::Util ();
 use Mojo::DOM58;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use parent 'Test2::Compare::Base';
 

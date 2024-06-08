@@ -7,22 +7,22 @@
 
 package Couch::DB::Result;
 use vars '$VERSION';
-$VERSION = '0.002';
+$VERSION = '0.003';
 
 
-use Couch::DB::Util     qw(flat);
+use Couch::DB::Util     qw(flat pile);
 use Couch::DB::Document ();
 
 use Log::Report   'couch-db';
 use HTTP::Status  qw(is_success status_constant_name HTTP_OK HTTP_CONTINUE HTTP_MULTIPLE_CHOICES);
-use Scalar::Util  qw(weaken);
+use Scalar::Util  qw(weaken blessed);
 
 my %couch_code_names   = ();   # I think I saw them somewhere.  Maybe none
 
 my %default_code_texts = (  # do not construct them all the time again
-	HTTP_OK					=> 'Data collected successfully.',
-	HTTP_CONTINUE			=> 'The data collection is delayed.',
-	HTTP_MULTIPLE_CHOICES	=> 'The Result object does not know what to do, yet.',
+	&HTTP_OK				=> 'Data collected successfully.',
+	&HTTP_CONTINUE			=> 'The data collection is delayed.',
+	&HTTP_MULTIPLE_CHOICES	=> 'The Result object does not know what to do, yet.',
 );
 
 
@@ -38,11 +38,13 @@ sub init($)
 	$self->{CDR_couch}     = delete $args->{couch} or panic;
 	weaken $self->{CDR_couch};
 
-	$self->{CDR_on_final}  = [ flat delete $args->{on_final} ];
-	$self->{CDR_on_error}  = [ flat delete $args->{on_error} ];
+	$self->{CDR_on_final}  = pile delete $args->{on_final};
+	$self->{CDR_on_error}  = pile delete $args->{on_error};
+	$self->{CDR_on_chain}  = pile delete $args->{on_chain};
+	$self->{CDR_on_values} = pile delete $args->{on_values};
 	$self->{CDR_code}      = HTTP_MULTIPLE_CHOICES;
-	$self->{CDR_to_values} = delete $args->{to_values} || sub { $_[1] };
-	$self->{CDR_next}      = delete $args->{next};
+	$self->{CDR_page}      = delete $args->{paging};
+
 	$self;
 }
 
@@ -83,9 +85,6 @@ sub request()   { $_[0]->{CDR_request} }
 sub response()  { $_[0]->{CDR_response} }
 
 
-sub next()      { $_[0]->{CDR_next} }
-
-
 sub answer(%)
 {	my ($self, %args) = @_;
 
@@ -101,24 +100,67 @@ sub answer(%)
 
 sub values(@)
 {	my $self = shift;
-	$self->{CDR_values} ||= $self->{CDR_to_values}->($self, $self->answer);
+	return $self->{CDR_values} if exists $self->{CDR_values};
+
+	my $values = $self->answer;
+	$values = $_->($self, $values) for reverse @{$self->{CDR_on_values}};
+	$self->{CDR_values} = $values;
+}
+
+#-------------
+
+sub pagingState(%)
+{	my ($self, %args) = @_;
+	my $next = $self->nextPageSettings;
+	$next->{harvester} = defined $next->{harvester} ? 'CODE' : 'DEFAULT';
+	$next->{client}    = $self->client->name;
+
+	if(my $maxbook = delete $args{max_bookmarks} // 10)
+	{	my $bookmarks = $next->{bookmarks};
+		$next->{bookmarks} = +{ (%$bookmarks)[0..(2*$maxbook-1)] } if keys %$bookmarks > $maxbook;
+	}
+
+	$next;
+}
+
+# The next is used r/w when _succeed is a result object, and when results
+# have arrived.
+
+sub _thisPage() { $_[0]->{CDR_page} or panic "Call does not support paging." }
+
+
+sub nextPageSettings()
+{	my $self = shift;
+	my %next = %{$self->_thisPage};
+	delete $next{harvested};
+	$next{start} += (delete $next{skip}) + @{$self->page};
+#use Data::Dumper;
+#warn "NEXT PAGE=", Dumper \%next;
+	\%next;
 }
 
 
-sub nextPage(%)
-{	my ($self, %options) = @_;
+sub page() { $_[0]->_thisPage->{harvested} }
 
-	$self->isReady
-		or panic "The results are not available yet, not ready.";
-
-	my $next     = $self->next
-		or panic "This call does not support pagination.";
-
-	$self
-		or error __x"The previous page had an error";
-
-	$self->couch->call($next);
+sub _pageAdd($@)
+{	my $this     = shift->_thisPage;
+	my $bookmark = shift;
+	my $page     = $this->{harvested};
+	$this->{end_reached} = ! @_;
+	push @$page, @_;
+	$this->{bookmarks}{$this->{start} + $this->{skip} + @$page} = $bookmark
+		if defined $bookmark;
+	$page;
 }
+
+
+sub pageIsPartial()
+{	my $this = shift->_thisPage;
+	$this->{end_reached} || @{$this->{harvested}} < $this->{page_size};
+}
+
+
+sub isLastPage() { $_[0]->_thisPage->{end_reached} }
 
 #-------------
 
@@ -129,25 +171,29 @@ sub setFinalResult($%)
 	$self->{CDR_client}   = my $client = delete $data->{client} or panic "No client";
 	weaken $self->{CDR_client};
 
+	$self->{CDR_ready}    = 1;
 	$self->{CDR_request}  = delete $data->{request};
 	$self->{CDR_response} = delete $data->{response};
 	$self->status($code, delete $data->{message});
-	$self->{CDR_ready}    = 1;
 
-	$_->($self) for @{$self->{CDR_on_final}};
-
-	if(is_success $code)
-	{	if(my $next = $self->next)
-		{	$next->{client}   = $client->name;   # no objects!
-			$next->{bookmark} = $self->answer->{bookmark};
-		}
-	}
-	else
+	unless(is_success $code)
 	{	$_->($self) for @{$self->{CDR_on_error}};
 		#XXX what to do with pagination here?
 	}
 
-	$self;
+	$_->($self) for @{$self->{CDR_on_final}};
+
+	# First run inner chains, working towards outer
+	my @chains = @{$self->{CDR_on_chain} || []};
+	my $tail   = $self;
+
+	while(@chains && $tail)
+ 	{	$tail = (pop @chains)->($tail);
+		blessed $tail && $tail->isa('Couch::DB::Result')
+			or panic "Chain must return a Result object";
+	}
+
+	$tail;
 }
 
 

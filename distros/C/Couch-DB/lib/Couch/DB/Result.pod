@@ -37,21 +37,25 @@ more.  So: let them run out-of-scope once you have collected your C<values()>.
 
 =item Couch::DB::Result-E<gt>B<new>(%options)
 
+For details on the C<on_*> event handlers, see L<Couch::DB/DETAILS>.
+
  -Option   --Default
   couch      <required>
-  next       undef
+  on_chain   [ ]
   on_error   [ ]
   on_final   [ ]
-  to_values  <keep data>
+  on_values  [ ]
+  paging     undef
 
 =over 2
 
 =item couch => L<Couch::DB|Couch::DB>-object
 
-=item next => HASH
+=item on_chain => CODE|ARRAY
 
-Contains the raw information about the request which produced this result,
-to be used for pagination.
+When a request was completed, a new request can be made immediately.  This
+is especially usefull in combination with C<_delay>, and with internal
+logic.
 
 =item on_error => CODE|ARRAY
 
@@ -61,10 +65,15 @@ Called each time when the result CODE changes to be "not a success".
 
 Called when the Result object has either an error or an success.
 
-=item to_values => CODE
+=item on_values => CODE|ARRAY
 
 Provide a sub which translates incoming JSON data from the server, into
 pure perl.
+
+=item paging => HASH
+
+When a call support paging, internal information about it is passed in
+this HASH.
 
 =back
 
@@ -125,37 +134,6 @@ Perlish way: as Perl booleans, DateTime objects, and so on.
 Which client L<Couch::DB::Client|Couch::DB::Client> was used in the last action.  Initially,
 none.  When the results are ready, the client is known.
 
-=item $obj-E<gt>B<next>()
-
-When the call supports pagination, this structure will have captured anything
-you need to know about how to collect the next page.  This structure does not
-contain objects, so can be serialized into a session.
-
-=item $obj-E<gt>B<nextPage>(%options)
-
-[UNTESTED]
-Repeat the request which lead to this result, to receive the next batch
-of answers.  This is only supported by a small set of (search) endpoints.
-This uses the C<bookmark> token. Do not combine it with the C<skip>
-search option (which is probably ignored).
-
-example: paging through result
-
-  my $page1 = $couch->find;
-  my $docs1 = $page1->answer->{docs};
-  my $page2 = $page1->nextPage;
-  my $docs2 = $page2->answer->{docs};
-
-example: paging via a session
-
-  my $page1 = $couch->find;
-  my $docs1 = $page1->answer->{docs};
-  $session->save(next => serialized $page1->next);
-  ...
-  my $next  = deserialize $session->load('next');
-  my $page2 = $couch->call($next);
-  my $docs2 = $page2->answer->{docs};
-
 =item $obj-E<gt>B<request>()
 
 Returns the request (framework specific) object which was used to collect
@@ -173,6 +151,51 @@ Each CouchDB API call knows whether it passes data types which are
 converted for you for convenience in your main program.
 
 The raw data is returned with L<answer()|Couch::DB::Result/"When the document is collected">.  See L</DETAILS> below.
+
+=back
+
+=head2 Paging through results
+
+=over 4
+
+=item $obj-E<gt>B<isLastPage>()
+
+Returns a true value when there are no more page elements to be expected.  The
+L<page()|Couch::DB::Result/"Paging through results"> may already be empty.
+
+=item $obj-E<gt>B<nextPageSettings>()
+
+Returns the details for the next page to be collected.  When you need these
+details to be saved outside the program, than use L<pagingState()|Couch::DB::Result/"Paging through results">.
+
+=item $obj-E<gt>B<page>()
+
+Returns an ARRAY with the elements collected (harvested) for this page.
+When there are less elements than the requested page size, then there
+are no more elements in the collections.
+
+=item $obj-E<gt>B<pageIsPartial>()
+
+Returns a true value when there should be made another attempt to fill the
+page upto the the requested page size.
+
+=item $obj-E<gt>B<pagingState>(%options)
+
+Returns information about the logical next page for this response, in a format
+which can be saved into a session.
+
+ -Option       --Default
+  max_bookmarks  10
+
+=over 2
+
+=item max_bookmarks => INTEGER
+
+When you save this paging information into a session cookie, you should not
+store many bookmarks, because they are pretty large and do not compress.  Random
+bookmarks are thrown away.  Set to '0' to disable this restriction.
+
+=back
 
 =back
 
@@ -274,8 +297,8 @@ this object is initially created.
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.002,
-built on May 31, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.003,
+built on June 08, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

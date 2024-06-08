@@ -36,11 +36,26 @@ sub roles { $_[0]->{'roles'} ? @{$_[0]->{'roles'}} : () }
 
 =pod
 
+    my $jcard = $entity->jcard;
+
+Returns a L<Net::RDAP::JCard> for the entity. This is the recommended way
+to access the contents of the C<vcardArray> property of the entity object.
+
+=cut
+
+sub jcard {
+    my $self = shift;
+    return $self->{'vcardArray'}->[1] ? Net::RDAP::JCard->new($self->{'vcardArray'}->[1]) : undef;
+}
+
+=pod
+
     $vcard = $entity->vcard;
 
 Returns a L<vCard> object for the entity. Support for all the miriad options in
 vCard files is limited: only the C<fn>, C<org>, C<email>, C<tel> and C<adr> node
-types are supported.
+types (structured addresses only) are supported. The C<vcardArray()> method above
+is a better option of you need anything more than this.
 
 =cut
 

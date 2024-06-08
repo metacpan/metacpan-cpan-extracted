@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240308154350;
+our $VERSION = 1.20240607153919;
 
 my $formatters = [
                 {
@@ -96,7 +96,7 @@ my $validators = {
                 'mobile' => '
           (?:
             5\\d|
-            63
+            6[2-4]
           )\\d{6}
         ',
                 'pager' => '',
@@ -106,22 +106,22 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"5322", "Santiago\ de\ Cuba\ Province",
+$areanames{en} = {"5349", "Artemisa\ Province",
+"5323", "Granma\ Province",
+"5348", "Pinar\ del\ Río\ Province",
+"5341", "Sancti\ Spíritus\ Province",
 "5332", "Camagüey\ Province",
 "5324", "Holguín\ Province",
-"5345", "Matanzas\ Province",
-"537", "Havana\ City",
-"5347", "Mayabeque\ and\ Artemisa",
-"5342", "Villa\ Clara\ Province",
 "5343", "Cienfuegos\ Province",
-"5341", "Sancti\ Spíritus\ Province",
-"5349", "Artemisa\ Province",
 "5321", "Guantánamo\ Province",
-"5331", "Las\ Tunas\ Province",
-"5323", "Granma\ Province",
+"5347", "Mayabeque\ and\ Artemisa",
 "5333", "Ciego\ de\ Ávila\ Province",
 "5346", "Isle\ of\ Youth",
-"5348", "Pinar\ del\ Río\ Province",};
+"537", "Havana\ City",
+"5322", "Santiago\ de\ Cuba\ Province",
+"5331", "Las\ Tunas\ Province",
+"5345", "Matanzas\ Province",
+"5342", "Villa\ Clara\ Province",};
 my $timezones = {
                '' => [
                        'America/Havana'

@@ -1,5 +1,11 @@
 Revision history for Test2-Tools-DOM
 
+0.004     2024-06-07 17:37:02+01:00 Europe/London
+
+* Fixed an issue with tests that explicitly checked for attributes
+  set to the empty string
+* Added the 'val' method as a shortcut to the 'value' attribute
+
 0.003     2022-03-18 09:08:51+00:00 Europe/London
 
 * Fixed missing entry in this change log for previous version

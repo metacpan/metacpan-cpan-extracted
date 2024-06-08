@@ -13,7 +13,7 @@ use Exporter qw(import);
 
 our @EXPORT = qw(is_holiday holidays);
 
-our $VERSION = '0.0206';
+our $VERSION = '0.0207';
 
 
 sub new {
@@ -149,7 +149,7 @@ Date::Holidays::USA - Provides United States of America holidays
 
 =head1 VERSION
 
-version 0.0206
+version 0.0207
 
 =head1 SYNOPSIS
 
@@ -180,7 +180,7 @@ Return a new C<Date::Holidays::USA> object.
 
 =head2 is_holiday
 
-  $holiday = is_holiday($year, $month, $day);
+  $holiday = $dh->is_holiday($year, $month, $day);
 
 Takes three arguments:
 
@@ -192,16 +192,16 @@ Returns the name of the holiday, if one exists on that day.
 
 =head2 us_holidays
 
-  $holidays = us_holidays;
-  $holidays = us_holidays($year);
+  $holidays = $dh->us_holidays;
+  $holidays = $dh->us_holidays($year);
 
 Returns a hash reference of holiday names, where the keys are by month
 and day.
 
 =head2 holidays
 
-  $holidays = holidays;
-  $holidays = holidays($year);
+  $holidays = $dh->holidays;
+  $holidays = $dh->holidays($year);
 
 Returns a hash reference of holiday names, where the keys are 4 digit
 strings month and day.

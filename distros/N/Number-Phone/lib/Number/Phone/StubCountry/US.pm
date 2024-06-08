@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240308154353;
+our $VERSION = 1.20240607153922;
 
 my $formatters = [
                 {
@@ -57,7 +57,7 @@ my $validators = {
               [0-35-9]\\d|
               4[468]
             )|
-            7302[0-3]\\d
+            7302[0-4]\\d
           )\\d{4}|
           (?:
             472[24]|
@@ -70,7 +70,7 @@ my $validators = {
               0[1-35-9]|
               1[02-9]|
               2[03-57-9]|
-              3[149]|
+              3[1459]|
               4[08]|
               5[1-46]|
               6[0279]|
@@ -158,7 +158,7 @@ my $validators = {
               [0-35-9]\\d|
               4[468]
             )|
-            7302[0-3]\\d
+            7302[0-4]\\d
           )\\d{4}|
           (?:
             472[24]|
@@ -171,7 +171,7 @@ my $validators = {
               0[1-35-9]|
               1[02-9]|
               2[03-57-9]|
-              3[149]|
+              3[1459]|
               4[08]|
               5[1-46]|
               6[0279]|
@@ -1819,6 +1819,9 @@ my $timezones = {
                '234' => [
                           'America/New_York'
                         ],
+               '235' => [
+                          'America/Chicago'
+                        ],
                '236' => [
                           'America/Vancouver'
                         ],
@@ -3269,7 +3272,6 @@ my $timezones = {
                           'America/Chicago'
                         ],
                '480' => [
-                          'America/Denver',
                           'America/Phoenix'
                         ],
                '484' => [
@@ -3330,7 +3332,6 @@ my $timezones = {
                           'America/Toronto'
                         ],
                '520' => [
-                          'America/Denver',
                           'America/Phoenix'
                         ],
                '530' => [
@@ -3442,7 +3443,6 @@ my $timezones = {
                           'America/Chicago'
                         ],
                '602' => [
-                          'America/Denver',
                           'America/Phoenix'
                         ],
                '603' => [
@@ -6016,6 +6016,10 @@ my $timezones = {
                         ],
                '878' => [
                           'America/New_York'
+                        ],
+               '879' => [
+                          'America/Puerto_Rico',
+                          'America/St_Johns'
                         ],
                '901' => [
                           'America/Chicago'
