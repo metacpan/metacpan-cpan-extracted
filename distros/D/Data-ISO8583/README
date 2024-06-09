@@ -1,0 +1,32 @@
+Data::ISO8583
+==============
+
+Data::ISO8583 provides parsing and construction ISO8583 message data stream
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Data::ISO8583 uses:
+
+    Encode;
+    Data::Tools 1.44;
+
+and for debugging purpose:
+
+    Data::Dumper;
+    Data::HexDump;
+
+COPYRIGHT AND LICENCE
+
+See `COPYING' file for full GPL license text.
+
+Copyright (C) 2011-2024 Vladi Belperchinov-Shabanski 
+                        <cade@noxrun.com>  <cade@cpan.org>  <cade@bis.bg>

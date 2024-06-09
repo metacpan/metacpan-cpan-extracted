@@ -1,6 +1,7 @@
 package Tk::CodeText::TagsEditor;
 
-package MyColorEntry;
+package #hide from MetaCPAN
+	MyColorEntry;
 
 use strict;
 use warnings;
@@ -42,11 +43,12 @@ Tk:CodeText::TagsEditor - Edit highlighting tags for L<Tk::CodeText>
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.48';
+$VERSION = '0.51';
 
 use base qw(Tk::Derived Tk::Frame);
 
 require Tk::ColorEntry;
+require Tk::PopColor;
 require Tk::HList;
 require Tk::Balloon;
 use Tk::CodeText::Theme;
@@ -158,15 +160,17 @@ sub Populate {
 		-header => 1,
 		-scrollbars => 'osoe',
 	)->pack(-expand => 1, -fill => 'both');
+	$self->{HLIST} = $list;
 	my $count = 0;
 	for (@columns) {
 		my $header = $list->Frame;
 		$header->Label(-text => $_)->pack(-side => 'left');
-		$list->headerCreate($count, -itemtype => 'window', -widget => $header);
+		$list->headerCreate($count, -headerbackground => $bg, -itemtype => 'window', -widget => $header);
 #		$list->headerCreate($count, -text => $_);
 		$count ++;
 	}
 
+	my $popcolor = $self->PopColor(-widget => '');
 	for ($self->Theme->tagList) {
 		my $tag = $_;
 
@@ -184,6 +188,7 @@ sub Populate {
 			-width => 8,
 			-historyfile => $historyfile,
 			-command => ['updateForeground', $self, $tag],
+			-popcolor => $popcolor,
 		);
 		$list->itemCreate($tag, 1, -itemtype => 'window', -widget => $fg);
 
@@ -192,39 +197,26 @@ sub Populate {
 			-width => 8,
 			-historyfile => $historyfile,
 			-command => ['updateBackground', $self, $tag],
+			-popcolor => $popcolor,
 		);
 		$list->itemCreate($tag, 2, -itemtype => 'window', -widget => $bg);
 
 		my $b = '';
-		Tie::Watch->new(
-			-variable => \$b,
-			-store => sub {
-				my ($watch, $value) = @_;
-				$watch->Store($value);
-				$self->updateFont($tag, '-weight', $b);
-			},
-		);
 		$self->Advertise($tag . "W", \$b);
 		my $bold = $list->Checkbutton(
 			-offvalue => '',
 			-onvalue => 'bold',
+			-command => ['updateFont', $self, $tag, -weight => $b],
 			-variable => \$b,
 		);
 		$list->itemCreate($tag, 3, -itemtype => 'window', -widget => $bold);
 
 		my $i = '';
-		Tie::Watch->new(
-			-variable => \$i,
-			-store => sub {
-				my ($watch, $value) = @_;
-				$watch->Store($value);
-				$self->updateFont($tag, '-slant', $i);
-			},
-		);
 		$self->Advertise($tag . "S", \$i);
 		my $italic = $list->Checkbutton(
 			-offvalue => '',
 			-onvalue => 'italic',
+			-command => ['updateFont', $self, $tag, -slant => $i],
 			-variable => \$i,
 		);
 		$list->itemCreate($tag, 4, -itemtype => 'window', -widget => $italic);

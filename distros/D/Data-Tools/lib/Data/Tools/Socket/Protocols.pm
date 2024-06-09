@@ -18,7 +18,7 @@ use Carp;
 use Data::Tools;
 use Data::Tools::Socket;
 
-our $VERSION = '1.41';
+our $VERSION = '1.44';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -67,6 +67,7 @@ sub socket_protocol_read_message
 {
   my $socket  = shift;
   my $timeout = shift;
+  my $opt     = shift || {};
   
   my ( $data, $data_read_len ) = socket_read_message( $socket, $timeout );
   if( ! defined $data )
@@ -77,6 +78,11 @@ sub socket_protocol_read_message
   my $ptype = substr( $data, 0, 1 );
   confess "unknown or forbidden PROTOCOL_TYPE requested [$ptype] expected one of [" . join( ',', keys %PROTOCOL_ALLOW ) . "]" unless exists $PROTOCOL_ALLOW{ $ptype };
   my $proto = $PROTOCOL_TYPES{ $ptype };
+
+  if( $opt and $opt->{ 'CHECK_FOR_EMPTY' } and substr( $data, 1 ) eq '' )
+    {
+    return wantarray ? ( undef, undef, 'E_EMPTY' ) : undef;
+    }
 
   my $hr = $proto->{ 'unpack' }->( substr( $data, 1 ) );
   confess "invalid data received from socket stream, expected HASH reference" unless ref( $hr ) eq 'HASH';

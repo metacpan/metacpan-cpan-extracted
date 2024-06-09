@@ -9,7 +9,7 @@ use utf8;
 
 use Object::Pad 0.805;
 
-package App::sdview::Output::Tickit 0.06;
+package App::sdview::Output::Tickit 0.07;
 class App::sdview::Output::Tickit
    :strict(params);
 

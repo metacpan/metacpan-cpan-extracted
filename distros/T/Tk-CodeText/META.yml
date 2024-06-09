@@ -22,10 +22,10 @@ requires:
   Math::Round: '0'
   Syntax::Kamelon: '0.24'
   Test::Tk: '3.03'
-  Tk: '800.024'
-  Tk::ColorEntry: '0.05'
-  Tk::PopList: '0.07'
+  Tk: '804.030'
+  Tk::ColorEntry: '0.07'
+  Tk::PopList: '0.09'
 resources:
   repository: git://github.com/haje61/Tk-CodeText.git
-version: '0.50'
+version: '0.51'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

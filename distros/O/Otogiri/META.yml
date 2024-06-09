@@ -38,7 +38,7 @@ provides:
     file: lib/DBIx/Otogiri/Iterator.pm
   Otogiri:
     file: lib/Otogiri.pm
-    version: '0.22'
+    version: '0.23'
 requires:
   Class::Accessor::Lite: '0'
   DBIx::Sunny: '0.9993'
@@ -49,7 +49,7 @@ resources:
   bugtracker: https://github.com/ytnobody/Otogiri/issues
   homepage: https://github.com/ytnobody/Otogiri
   repository: https://github.com/ytnobody/Otogiri.git
-version: '0.22'
+version: '0.23'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Takuya Tsuchida <tsucchi@cpan.org>'

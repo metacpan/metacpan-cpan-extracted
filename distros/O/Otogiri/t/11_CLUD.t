@@ -70,7 +70,8 @@ subtest transaction_and_update => sub {
 subtest rollback => sub {
     do {
         my $txn = $db->txn_scope;
-        $db->update(member => [name => 'tonny', updated_at => time], {name => 'tonkichi'});
+        #  update parameters can be arrayref or hashref. In this case, it's hashref.
+        $db->update(member => {name => 'tonny', updated_at => time}, {name => 'tonkichi'});
         $txn->rollback;
     };
 

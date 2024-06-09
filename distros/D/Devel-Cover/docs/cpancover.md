@@ -3,7 +3,7 @@
 ## Overview
 
 Cpancover requires a bourne shell, plenv, and docker, as well as a recent perl.
-The code requires Perl 5.16.0 but earlier versions may work.
+The code requires Perl 5.26.0 but earlier versions may work.
 
 ## Docker
 
@@ -31,7 +31,11 @@ to the correct container.
 ## Plenv
 
 Install plenv by following the instructions on
-[github](https://github.com/tokuhirom/plenv).
+[github](https://github.com/tokuhirom/plenv).  If you are running brew
+
+```sh
+brew install plenv
+```
 
 ## Running
 
@@ -120,3 +124,6 @@ For each version there is a standard and a threaded plenv installation.
 The development directory for these purposes is `/cover/Devel--Cover`.  New
 versions of perl can be installed by adding them to `utils/all_versions` and
 running `dc all_versions --build`.
+
+To install a version of perl with development tools run `dc install_dc_dev_perl
+5.38.2`.

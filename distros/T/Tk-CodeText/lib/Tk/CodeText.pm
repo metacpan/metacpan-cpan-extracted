@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.50';
+$VERSION = '0.51';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -135,6 +135,11 @@ level and style of the previous line.
 An empty string by default. If set to an existing folder that folder will be used
 for config files. Currently there is only one of those. The recent colors for the 
 TagsEditor.
+
+=item Switch: B<-contextmenu>
+
+Reference to a Tk::Menu object that is used as context menu.
+If you do not specify it, the B<-menuitems> option is checked.
 
 =item Switch: B<-disablemenu>
 
@@ -804,7 +809,7 @@ sub foldsClear {
 
 sub foldsMenuPop {
 	my ($self, $x, $y) = @_;
-	$self->Subwidget('Foldsmenu')->post($x, $y);
+	$self->Subwidget('Foldsmenu')->post($x - 2, $y - 2);
 }
 
 =item B<fontCompose>I<($font, %options)>
@@ -1271,6 +1276,7 @@ sub themeDialog {
 		-historyfile => $historyfile,
 		-relief => 'sunken',
 		-borderwidth => 2,
+		-width => 62,
 	)->pack(-expand => 1, -fill => 'both', -padx => 2, -pady => 2);
 	my $toolframe =  $dialog->add('Frame',
 	)->pack(-fill => 'x');

@@ -3,7 +3,7 @@ package Tk::ColorPicker;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.02';
+$VERSION = '0.06';
 use Tk;
 
 use base qw(Tk::Derived Tk::Frame);
@@ -156,6 +156,7 @@ sub Populate {
 			$slframe->Label(-width => 8, -text => $_)->pack;
 		}
 	}
+	
 	$self->{VARPOOL} = \%varpool;
 	my $recent = $nb->add('Recent', -label => 'Recent');
 	my $hp = $recent->Scrolled('Pane',
@@ -731,6 +732,7 @@ sub sliderheight {
 		$self->{SLIDERHEIGHT} = $height;
 		unless ($self->ConfigMode) {
 			for (qw/Red Green Blue Cyan Magenta Yellow Hue Saturation Value/) {
+#			for (qw/Red Green Blue/) {
 				$self->Subwidget($_)->configure('-length' => $height);
 			}
 		}

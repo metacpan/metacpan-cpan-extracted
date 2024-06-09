@@ -1,0 +1,34 @@
+1717818844.07596302	Running [systemd-run --scope --user podman stop shlomi_fish_homesite_debian]
+1717818844.07607293	Running scope as unit: run-r02ac876fa1eb4ffe8c3ff642fb48e506.scope
+1717818846.17535210	Error: no container with name or ID "shlomi_fish_homesite_debian" found: no such container
+1717818846.22416902	Running [systemd-run --scope --user podman rm shlomi_fish_homesite_debian]
+1717818846.25017190	Running scope as unit: run-r481c3495ce734fe1ab65c15095db8037.scope
+1717818846.33803201	Error: no container with ID or name "shlomi_fish_homesite_debian" found: no such container
+1717818846.34151912	Running [systemd-run --scope --user podman pull debian:12]
+1717818846.36499000	Running scope as unit: run-r62f3841b29b54db08a6b1e841946ae28.scope
+1717818846.56784391	Trying to pull docker.io/library/debian:12...
+1717818848.80047011	Getting image source signatures
+1717818848.83435702	Copying blob sha256:c6cf28de8a067787ee0d08f8b01d7f1566a508b56f6e549687b41dfd375f12c7
+1717818848.84505296	Copying config sha256:5027089adc4ce4ec3058d84ce51db1cd2f3eac5675e5aadfcf1f585f62fec9ed
+1717818849.29331899	Writing manifest to image destination
+1717818849.69775295	5027089adc4ce4ec3058d84ce51db1cd2f3eac5675e5aadfcf1f585f62fec9ed
+1717818849.70483303	Running [systemd-run --scope --user podman run -t -d --name shlomi_fish_homesite_debian debian:12]
+1717818849.72870207	Running scope as unit: run-r85f75208b6fb4fde8663e763889ad0be.scope
+1717818851.20777607	d1851a6b713ba05bdb44a5fc33dd3cf452fd11a38e4a9bf125865caab345a2db
+1717818851.21327400	Running [rm -fr ../temp-git]
+1717818854.63497710	Running [git clone --recurse-submodules . ../temp-git]
+1717818854.65632701	Cloning into '../temp-git'...
+1717818854.70332289	done.
+1717818860.35400295	Updating files:  16% (654/3865)Updating files:  17% (658/3865)Updating files:  18% (696/3865)Updating files:  19% (735/3865)Updating files:  20% (773/3865)Updating files:  21% (812/3865)Updating files:  22% (851/3865)Updating files:  23% (889/3865)Updating files:  24% (928/3865)Updating files:  25% (967/3865)Updating files:  26% (1005/3865)Updating files:  27% (1044/3865)Updating files:  28% (1083/3865)Updating files:  29% (1121/3865)Updating files:  30% (1160/3865)Updating files:  31% (1199/3865)Updating files:  32% (1237/3865)Updating files:  33% (1276/3865)Updating files:  34% (1315/3865)Updating files:  35% (1353/3865)Updating files:  36% (1392/3865)Updating files:  37% (1431/3865)Updating files:  38% (1469/3865)Updating files:  39% (1508/3865)Updating files:  40% (1546/3865)Updating files:  41% (1585/3865)Updating files:  42% (1624/3865)Updating files:  43% (1662/3865)Updating files:  44% (1701/3865)Updating files:  45% (1740/3865)Updating files:  46% (1778/3865)Updating files:  47% (1817/3865)Updating files:  48% (1856/3865)Updating files:  49% (1894/3865)Updating files:  50% (1933/3865)Updating files:  51% (1972/3865)Updating files:  52% (2010/3865)Updating files:  53% (2049/3865)Updating files:  54% (2088/3865)Updating files:  55% (2126/3865)Updating files:  56% (2165/3865)Updating files:  57% (2204/3865)Updating files:  58% (2242/3865)Updating files:  59% (2281/3865)Updating files:  60% (2319/3865)Updating files:  61% (2358/3865)Updating files:  62% (2397/3865)Updating files:  63% (2435/3865)Updating files:  64% (2474/3865)Updating files:  65% (2513/3865)Updating files:  66% (2551/3865)Updating files:  67% (2590/3865)Updating files:  68% (2629/3865)Updating files:  69% (2667/3865)Updating files:  70% (2706/3865)Updating files:  70% (2727/3865)Updating files:  71% (2745/3865)Updating files:  72% (2783/3865)Updating files:  73% (2822/3865)Updating files:  74% (2861/3865)Updating files:  75% (2899/3865)Updating files:  76% (2938/3865)Updating files:  77% (2977/3865)Updating files:  78% (3015/3865)Updating files:  79% (3054/3865)Updating files:  80% (3092/3865)Updating files:  81% (3131/3865)Updating files:  82% (3170/3865)Updating files:  83% (3208/3865)Updating files:  84% (3247/3865)Updating files:  85% (3286/3865)Updating files:  86% (3324/3865)Updating files:  87% (3363/3865)Updating files:  88% (3402/3865)Updating files:  89% (3440/3865)Updating files:  90% (3479/3865)Updating files:  90% (3517/3865)Updating files:  91% (3518/3865)Updating files:  91% (3543/3865)Updating files:  92% (3556/3865)Updating files:  93% (3595/3865)Updating files:  94% (3634/3865)Updating files:  95% (3672/3865)Updating files:  96% (3711/3865)Updating files:  97% (3750/3865)Updating files:  98% (3788/3865)Updating files:  99% (3827/3865)Updating files: 100% (3865/3865)Updating files: 100% (3865/3865), done.
+1717818860.41710901	Submodule 'lib/repos/shlomif-ikiwiki-wiki' (https://github.com/shlomif/shlomif-ikiwiki-wiki) registered for path 'lib/repos/shlomif-ikiwiki-wiki'
+1717818860.41734004	Submodule 'lib/repos/xslt10-stylesheets' (https://github.com/docbook/xslt10-stylesheets/) registered for path 'lib/repos/xslt10-stylesheets'
+1717818860.42136598	Cloning into '/home/shlomif/Docs/homepage/homepage/temp-git/lib/repos/shlomif-ikiwiki-wiki'...
+1717818861.56844211	Cloning into '/home/shlomif/Docs/homepage/homepage/temp-git/lib/repos/xslt10-stylesheets'...
+1717818868.92091703	Submodule path 'lib/repos/shlomif-ikiwiki-wiki': checked out 'bd71e6e23a9726717eb31079f0e932716fc5914c'
+1717818869.44203901	Submodule path 'lib/repos/xslt10-stylesheets': checked out 'fe16c90013b64e316c3e21ef92d1e8813c10f88c'
+1717818869.45192409	Running [find lib -name .git | xargs dirname | perl -lnE 'system(qq[d=../temp-git/$_ ; if test -d \$d ; then exit 0 ; fi ; mkdir -p `dirname \$d` ;cp -a $_/ ../temp-git/$_]);'
+1717818869.45202494	]
+1717818899.48430705	Running [systemd-run --scope --user podman cp ../temp-git shlomi_fish_homesite_debian:/temp-git]
+1717818899.62555408	Running scope as unit: run-r4976b1a66af745aaa5de1e9dd1e1b51f.scope
+1717818956.82327199	Running [systemd-run --scope --user podman exec shlomi_fish_homesite_debian bash -c mkdir -p /temp-git]
+1717818956.93670702	Running scope as unit: run-r5abcc2f47d1e4ab6bc32b32d7d191521.scope

@@ -5,8 +5,9 @@ lib/Tk/PopColor.pm
 Makefile.PL
 MANIFEST
 README.md
+t/colorentry_history
+t/Tk-ColorEntry-multi.t
 t/Tk-ColorEntry.t
-t/Tk-ColorEntryMulti.t
 t/Tk-ColorPicker.t
 t/Tk-PopColor.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

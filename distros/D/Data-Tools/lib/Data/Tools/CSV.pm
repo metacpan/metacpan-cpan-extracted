@@ -12,7 +12,7 @@ package Data::Tools::CSV;
 use strict;
 use Exporter;
 
-our $VERSION = '1.41';
+our $VERSION = '1.44';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -38,6 +38,7 @@ sub parse_csv
 {
   my $csv_data = shift();
   my $delim    = shift();
+  my $strip = shift;
   
   my @csv_data = grep /\S/, split /[\r\n]+/, $csv_data;
   
@@ -45,7 +46,7 @@ sub parse_csv
   my @res;
   for my $line ( @csv_data )
     {
-    push @res, parse_csv_line( $line, $delim );
+    push @res, parse_csv_line( $line, $delim, $strip );
     }
 
   return \@res;
@@ -55,6 +56,7 @@ sub parse_csv_line
 {
   my @line = split //, shift();
   my $delim = shift() || ',';
+  my $strip = shift;
   my @out;
   my $fld;
   my $q;
@@ -62,6 +64,8 @@ sub parse_csv_line
     {
     if( ( $_ eq $delim and $q % 2 == 0 ) or ! defined )
       {
+      $fld =~ s/^\s*// if $strip;
+      $fld =~ s/\s*$// if $strip;
       $fld =~ s/^"(.*?)"$/$1/;
       $fld =~ s/""/"/g;
       push @out, $fld;
@@ -81,15 +85,16 @@ sub parse_csv_to_hash_array
 {
   my $csv_data = shift();
   my $delim    = shift();
+  my $strip    = shift;
   
   my @csv_data = grep /\S/, split /[\r\n]+/, $csv_data;
   
-  my $head = parse_csv_line( shift @csv_data, $delim );
+  my $head = parse_csv_line( shift @csv_data, $delim, $strip );
   
   my @res;
   for my $line ( @csv_data )
     {
-    my $line_array = parse_csv_line( $line, $delim );
+    my $line_array = parse_csv_line( $line, $delim, $strip );
     push @res, { map { $_ => shift @$line_array } @$head };
     }
 
@@ -132,16 +137,30 @@ sub parse_csv_to_hash_array
 In all functions the '$delim' argument is optional and sets the delimiter to
 be used. Default one is comma ',' (accordingly to RFC4180, see below).
 
-=head2 parse_csv( $csv_data_string, $delim )
+In all functions the '$strip' argument should be true ("1" or non-zero string)
+to strip data from leading and trailing whitespace. If leading or trailing
+whitespace is required but stripping is needed to pad visually the data then
+actual data must be quoted:
+
+    NAME,   TEL
+    jim,    123
+    boo,    "  413  "
+    
+second field will be [TEL] and data will be [123] and [  413  ].
+
+Unfortunately, for keeping API simple, using stripping will require $delim.
+However $delim may be undef to use default delimiter.
+
+=head2 parse_csv( $csv_data_string, $delim, $strip )
 
 Parses multi-line CSV text
 
-=head2 parse_csv_line( $single_csv_line, $delim )
+=head2 parse_csv_line( $single_csv_line, $delim, $strip )
 
 Parses single line CSV data. This function will NOT strip trailing CR/LFs.
 However, parse_csv() and parse_csv_to_hash_array() will strip CR/LFs.
 
-=head2 parse_csv_to_hash_array( $csv_data, $delim )
+=head2 parse_csv_to_hash_array( $csv_data, $delim, $strip )
 
 This function uses first line as hash key names to produce array of hashes
 for the rest of the data.

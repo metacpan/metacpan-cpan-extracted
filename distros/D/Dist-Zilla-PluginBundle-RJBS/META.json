@@ -94,7 +94,7 @@
          "web" : "https://github.com/rjbs/Dist-Zilla-PluginBundle-RJBS"
       }
    },
-   "version" : "5.031",
+   "version" : "5.032",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"
@@ -420,7 +420,7 @@
          {
             "class" : "Dist::Zilla::Plugin::RJBSMisc",
             "name" : "@RJBS/RJBSMisc",
-            "version" : "5.031"
+            "version" : "5.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
@@ -483,7 +483,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "5.031",
+                  "tag" : "5.032",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::RJBS 5.031;
+package Dist::Zilla::PluginBundle::RJBS 5.032;
 # ABSTRACT: BeLike::RJBS when you build your dists
 
 use Moose;
@@ -65,7 +65,7 @@ use Dist::Zilla::PluginBundle::Basic;
 use Dist::Zilla::PluginBundle::Filter;
 use Dist::Zilla::PluginBundle::Git;
 
-package Dist::Zilla::Plugin::RJBSMisc 5.031 {
+package Dist::Zilla::Plugin::RJBSMisc 5.032 {
   use Moose;
   with 'Dist::Zilla::Role::BeforeBuild',
        'Dist::Zilla::Role::AfterBuild',
@@ -365,7 +365,7 @@ Dist::Zilla::PluginBundle::RJBS - BeLike::RJBS when you build your dists
 
 =head1 VERSION
 
-version 5.031
+version 5.032
 
 =head1 DESCRIPTION
 

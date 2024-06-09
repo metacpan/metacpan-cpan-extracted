@@ -28,6 +28,7 @@ my $builder = Module::Build->new(
   recommends => {
     'Barcode::Code128'          => undef,
     'Image::PNG::QRCode'        => undef,
+    'GD'                        => undef,
    },
   add_to_cleanup     => [ 'MsOffice-Word-Template-*' ],
   meta_merge => {

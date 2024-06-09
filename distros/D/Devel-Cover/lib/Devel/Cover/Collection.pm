@@ -7,10 +7,10 @@
 
 package Devel::Cover::Collection;
 
-use 5.26.0;
+use 5.38.0;
 use warnings;
 
-our $VERSION = '1.42'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 use Devel::Cover::DB;
 use Devel::Cover::DB::IO::JSON;
@@ -29,41 +29,37 @@ use warnings FATAL => "all";  # be explicit since Moo sets this
 
 my %A = (
   ro => [ qw( bin_dir cpancover_dir cpan_dir results_dir dryrun force
-    output_file report timeout verbose workers docker local    ) ],
-  rwp => [qw( build_dirs local_timeout modules module_file               )],
-  rw  => [qw(                                                            )],
+    output_file report timeout verbose workers docker local            ) ],
+  rwp => [qw( build_dirs local_timeout modules module_file              )],
+  rw  => [qw( dir file                                                  )],
 );
 while (my ($type, $names) = each %A) { has $_ => (is => $type) for @$names }
 
-sub BUILDARGS {
-  my $class = shift;
-  my (%args) = @_;
-  {
-    build_dirs    => [],
-    cpan_dir      => [ grep -d, glob("~/.cpan ~/.local/share/.cpan") ],
-    docker        => "docker",
-    dryrun        => 0,
-    force         => 0,
-    local         => 0,
-    local_timeout => 0,
-    modules       => [],
-    output_file   => "index.html",
-    report        => "html_basic",
-    timeout       => 1800,  # half an hour
-    verbose       => 0,
-    workers       => 0,
-    %args,
-  }
-}
+sub BUILDARGS ($class, %args) { {
+  build_dirs    => [],
+  cpan_dir      => [ grep -d, glob "~/.cpan ~/.local/share/.cpan" ],
+  docker        => "docker",
+  dryrun        => 0,
+  force         => 0,
+  local         => 0,
+  local_timeout => 0,
+  modules       => [],
+  output_file   => "index.html",
+  report        => "html_basic",
+  timeout       => 1800,  # half an hour
+  verbose       => 0,
+  workers       => 0,
+  %args,
+} }
+
+sub get_timeout ($self) { $self->local_timeout || $self->timeout || 30 * 60 }
 
 # display $non_buffered characters, then buffer
-sub _sys {
-  my $self = shift;
-  my ($non_buffered, @command) = @_;
+sub _sys ($self, $non_buffered, @command) {
   # system @command; return ".";
   my ($output1, $output2) = ("", "");
   $output1 = "dc -> @command\n" if $self->verbose;
-  my $timeout = $self->local_timeout || $self->timeout || 30 * 60;
+  my $timeout = $self->get_timeout;
   my $max     = 4e4;
   # say "Setting alarm for $timeout seconds";
   my $ok = 0;
@@ -80,9 +76,8 @@ sub _sys {
         # say "printed $printed of $non_buffered";
         if ($printed < $non_buffered) {
           print;
-          if (($printed += length) >= $non_buffered) {
-            say "Devel::Cover: buffering ...";
-          }
+          say "Devel::Cover: buffering ..."
+            if ($printed += length) >= $non_buffered;
         } elsif (length $output2) {
           $output2 = substr $output2 . $_, $max * -.1, $max * .1;
         } else {
@@ -101,7 +96,7 @@ sub _sys {
       }
     } else {
       setsid() != -1 or die "Can't start a new session: $!";
-      open STDERR, ">&STDOUT" or die "Can't dup stdout: $!";
+      open STDERR, ">&", STDOUT or die "Can't dup stdout: $!";
       exec @command or die "Can't exec @command: $!";
     }
   };
@@ -109,36 +104,23 @@ sub _sys {
     $ok = 0;
     die "$@" unless $@ eq "alarm\n";  # propagate unexpected errs
     warn "Timed out after $timeout seconds!\n";
-    my $pgrp = getpgrp($pid);
+    my $pgrp = getpgrp $pid;
     my $n    = kill "-KILL", $pgrp;
     warn "killed $n processes";
   }
   $ok ? length $output2 ? "$output1\n...\n$output2" : $output1 : undef
 }
 
-sub sys   { my ($s, @a) = @_; $s->_sys(4e4, @a) // "" }
-sub bsys  { my ($s, @a) = @_; $s->_sys(0,   @a) // "" }
-sub fsys  { my ($s, @a) = @_; $s->_sys(4e4, @a) // die "Can't run @a\n" }
-sub fbsys { my ($s, @a) = @_; $s->_sys(0,   @a) // die "Can't run @a\n" }
+sub sys   ($s, @a) { $s->_sys(4e4, @a) // "" }
+sub bsys  ($s, @a) { $s->_sys(0,   @a) // "" }
+sub fsys  ($s, @a) { $s->_sys(4e4, @a) // die "Can't run @a" }
+sub fbsys ($s, @a) { $s->_sys(0,   @a) // die "Can't run @a" }
 
-sub add_modules {
-  my $self = shift;
-  push @{ $self->modules }, @_;
-}
+sub add_modules     ($self, @o)    { push $self->modules->@*, @o }
+sub set_modules     ($self, @o)    { $self->modules->@* = @o }
+sub set_module_file ($self, $file) { $self->set_module_file($file) }
 
-sub set_modules {
-  my $self = shift;
-  @{ $self->modules } = @_;
-}
-
-sub set_module_file {
-  my $self = shift;
-  my ($file) = @_;
-  $self->set_module_file($file);
-}
-
-sub process_module_file {
-  my $self = shift;
+sub process_module_file ($self) {
   my $file = $self->module_file;
   return unless defined $file && length $file;
   open my $fh, "<", $file or die "Can't open $file: $!";
@@ -148,16 +130,15 @@ sub process_module_file {
   $self->add_modules(@modules);
 }
 
-sub build_modules {
-  my $self    = shift;
-  my @command = qw( cpan -i -T );
+sub build_modules ($self) {
+  my @command = qw( cpan -Ti );
   push @command, "-f" if $self->force;
   # my @command = qw( cpan );
   # $ENV{CPAN_OPTS} = "-i -T";
   # $ENV{CPAN_OPTS} .= " -f" if $self->force;
   # $self->_set_local_timeout(300);
   my %m;
-  for my $module (sort grep !$m{$_}++, @{ $self->modules }) {
+  for my $module (sort grep !$m{$_}++, $self->modules->@*) {
     say "Building $module";
     my $output = $self->fsys(@command, $module);
     say $output;
@@ -165,8 +146,7 @@ sub build_modules {
   $self->_set_local_timeout(0);
 }
 
-sub add_build_dirs {
-  my $self = shift;
+sub add_build_dirs ($self) {
   # say "add_build_dirs"; say for @{$self->build_dirs};
   # say && system "ls -al $_" for "/remote_staging",
   # map "$_/build", @{$self->cpan_dir};
@@ -177,15 +157,12 @@ sub add_build_dirs {
     # say "checking [$dir] -> [@files]";
     @files
   };
-  push @{ $self->build_dirs }, grep { !$exists->() } grep -d,
-    map glob("$_/build/*"), @{ $self->cpan_dir };
+  push $self->build_dirs->@*, grep { !$exists->() } grep -d,
+    map glob("$_/build/*"), $self->cpan_dir->@*;
   # say "add_build_dirs:"; say for @{$self->build_dirs};
 }
 
-sub run {
-
-  my $self = shift;
-  my ($build_dir) = @_;
+sub run ($self, $build_dir) {
 
   my ($module)    = $build_dir =~ m|.*/([^/]+?)(?:-\d+)$| or return;
   my $db          = "$build_dir/cover_db";
@@ -234,9 +211,7 @@ sub run {
   say "\n$line\n$output$line\n";
 }
 
-sub run_all {
-  my $self = shift;
-
+sub run_all ($self) {
   my $results_dir = $self->results_dir // die "No results dir";
   $self->fsys("mkdir", "-p", $results_dir);
 
@@ -252,13 +227,10 @@ sub run_all {
   # print Dumper \@res;
 }
 
-sub write_json {
-  my $self = shift;
-  my ($vars) = @_;
-
+sub write_json ($self, $vars) {
   # print Dumper $vars;
   my $results = {};
-  for my $module (keys %{ $vars->{vals} }) {
+  for my $module (keys $vars->{vals}->%*) {
     my $m   = $vars->{vals}{$module};
     my $mod = $m->{module};
     my ($name, $version) = ($mod->{module} // $module) =~ /(.+)-(\d+\.\d+)$/;
@@ -291,13 +263,41 @@ sub class {
     : "c3"
 }
 
-sub generate_html {
-  my $self = shift;
+sub write_summary($self, $vars) {
+  my $d = $self->dir;
+  my $f = $self->file;
 
+  $self->write_stylesheet;
+  my $template = Template->new({
+    LOAD_TEMPLATES =>
+      [ Devel::Cover::Collection::Template::Provider->new({}) ]
+  });
+  $template->process("summary", $vars, $f) or die $template->error;
+  for my $start (sort keys $vars->{modules}->%*) {
+    $vars->{module_start} = $start;
+    my $dist = "$d/dist/$start.html";
+    $template->process("module_by_start", $vars, $dist) or die $template->error;
+  }
+
+  my $about_f = "$d/about.html";
+  say "\nWriting about page to $about_f ...";
+
+  $template->process("about", { subdir => "latest/" }, $about_f)
+    or die $template->error;
+
+  # print Dumper $vars;
+  $self->write_json($vars);
+
+  say "Wrote collection output to $f";
+}
+
+sub generate_html ($self) {
   my $d = $self->results_dir;
   chdir $d or die "Can't chdir $d: $!\n";
+  $self->dir($d);
 
   my $f = "$d/index.html";
+  $self->file($f);
   say "\n\nWriting collection output to $f ...";
 
   my $vars = {
@@ -333,13 +333,13 @@ sub generate_html {
       $mod->{version} //= $version;
     }
     my $start = uc substr $module, 0, 1;
-    push @{ $vars->{modules}{$start} }, $mod;
+    push $vars->{modules}{$start}->@*, $mod;
 
     my $m = $vars->{vals}{$module} = {};
     $m->{module} = $mod;
     $m->{link} = "/$module/index.html" if $json->{summary}{Total}{total}{total};
 
-    for my $criterion (@{ $vars->{criteria} }) {
+    for my $criterion ($vars->{criteria}->%*) {
       my $summary = $json->{summary}{Total}{$criterion};
       # print "summary:", Dumper $summary;
       my $pc = $summary->{percentage};
@@ -367,35 +367,10 @@ sub generate_html {
   say "";
 
   # print "vars ", Dumper $vars;
-
-  $self->write_stylesheet;
-  my $template = Template->new({
-    LOAD_TEMPLATES =>
-      [ Devel::Cover::Collection::Template::Provider->new({}) ]
-  });
-  $template->process("summary", $vars, $f) or die $template->error;
-  for my $start (sort keys %{ $vars->{modules} }) {
-    $vars->{module_start} = $start;
-    my $dist = "$d/dist/$start.html";
-    $template->process("module_by_start", $vars, $dist) or die $template->error;
-  }
-
-  my $about_f = "$d/about.html";
-  say "\nWriting about page to $about_f ...";
-
-  $template->process("about", { subdir => "latest/" }, $about_f)
-    or die $template->error;
-
-  # print Dumper $vars;
-  $self->write_json($vars);
-
-  say "Wrote collection output to $f";
+  $self->write_summary($vars);
 }
 
-sub compress_old_versions {
-  my $self = shift;
-  my ($versions) = @_;
-
+sub compress_old_versions ($self, $versions) {
   my $dir = $self->results_dir;
   opendir my $fh, $dir or die "Can't opendir $dir: $!";
   my @dirs = sort grep -d, map "$dir/$_", readdir $fh;
@@ -454,71 +429,39 @@ sub compress_old_versions {
   }
 }
 
-sub local_build {
-  my $self = shift;
-
+sub local_build ($self) {
   $self->process_module_file;
   $self->build_modules;
   $self->add_build_dirs;
   $self->run_all;
 }
 
-sub failed_dir {
-  my $self = shift;
-  my $dir  = $self->results_dir . "/__failed__";
+sub failed_dir ($self) {
+  my $dir = $self->results_dir . "/__failed__";
   -d $dir or mkdir $dir or die "Can't mkdir $dir: $!";
   $dir
 }
 
-sub covered_dir {
-  my $self = shift;
-  my ($dir) = @_;
-  $self->results_dir . "/$dir"
-}
+sub covered_dir ($self, $dir) { $self->results_dir . "/$dir" }
+sub failed_file ($self, $dir) { $self->failed_dir . "/$dir" }
+sub is_covered  ($self, $dir) { -d $self->covered_dir($dir) }
+sub is_failed   ($self, $dir) { -e $self->failed_file($dir) }
+sub set_covered ($self, $dir) { unlink $self->failed_file($dir) }
 
-sub failed_file {
-  my $self = shift;
-  my ($dir) = @_;
-  $self->failed_dir . "/$dir"
-}
-
-sub is_covered {
-  my $self = shift;
-  my ($dir) = @_;
-  -d $self->covered_dir($dir)
-}
-
-sub is_failed {
-  my $self = shift;
-  my ($dir) = @_;
-  -e $self->failed_file($dir)
-}
-
-sub set_covered {
-  my $self = shift;
-  my ($dir) = @_;
-  unlink $self->failed_file($dir);
-}
-
-sub set_failed {
-  my $self  = shift;
-  my ($dir) = @_;
-  my $ff    = $self->failed_file($dir);
+sub set_failed ($self, $dir) {
+  my $ff = $self->failed_file($dir);
   open my $fh, ">", $ff or return warn "Can't open $ff: $!";
   print $fh scalar localtime;
   close $fh or warn "Can't close $ff: $!";
 }
 
-sub dc_file {
-  my $self = shift;
-  my $dir  = "";
+sub dc_file ($self) {
+  my $dir = "";
   $dir = "/dc/" if $self->local && -d "/dc";
   "${dir}utils/dc"
 }
 
-sub cover_modules {
-  my $self = shift;
-
+sub cover_modules ($self) {
   $self->process_module_file;
   # say "modules: ", Dumper $self->modules;
 
@@ -542,7 +485,7 @@ sub cover_modules {
         return                       unless $self->force;
       }
 
-      my $timeout = $self->local_timeout || $self->timeout || 30 * 60;
+      my $timeout = $self->get_timeout;
       # say "Setting alarm for $timeout seconds";
       my $name = sprintf("%s-%18.6f", $module, time) =~ tr/a-zA-Z0-9_./-/cr;
       say "$dir -> $name";
@@ -573,9 +516,7 @@ sub cover_modules {
   $self->_set_local_timeout(0);
 }
 
-sub get_latest {
-  my $self = shift;
-
+sub get_latest ($self) {
   require CPAN::Releases::Latest;
 
   my $latest   = CPAN::Releases::Latest->new(max_age => 0);  # no caching
@@ -592,9 +533,7 @@ sub get_latest {
   }
 }
 
-sub write_stylesheet {
-  my $self = shift;
-
+sub write_stylesheet ($self) {
   my $css = $self->results_dir . "/collection.css";
   open my $fh, ">", $css or die "Can't open $css: $!\n";
   print $fh <<EOF;
@@ -608,56 +547,56 @@ sub write_stylesheet {
 /* Note: default values use the color-safe web palette. */
 
 body {
-    font-family: sans-serif;
+  font-family: sans-serif;
 }
 
 h1 {
-    text-align : center;
-    background-color: #cc99ff;
-    border: solid 1px #999999;
-    padding: 0.2em;
-    -moz-border-radius: 10px;
+  text-align : center;
+  background-color: #cc99ff;
+  border: solid 1px #999999;
+  padding: 0.2em;
+  -moz-border-radius: 10px;
 }
 
 a {
-    color: #000000;
+  color: #000000;
 }
 a:visited {
-    color: #333333;
+  color: #333333;
 }
 
 table {
-    border-spacing: 0px;
+  border-spacing: 0px;
 }
 tr {
-    text-align : center;
-    vertical-align: top;
+  text-align : center;
+  vertical-align: top;
 }
 th,.h,.hh {
-    background-color: #cccccc;
-    border: solid 1px #333333;
-    padding: 0em 0.2em;
-    -moz-border-radius: 4px;
+  background-color: #cccccc;
+  border: solid 1px #333333;
+  padding: 0em 0.2em;
+  -moz-border-radius: 4px;
 }
 td {
-    border: solid 1px #cccccc;
-    border-top: none;
-    border-left: none;
-    -moz-border-radius: 4px;
+  border: solid 1px #cccccc;
+  border-top: none;
+  border-left: none;
+  -moz-border-radius: 4px;
 }
 .hblank {
-    height: 0.5em;
+  height: 0.5em;
 }
 .dblank {
-    border: none;
+  border: none;
 }
 
 /* source code */
 pre,.s {
-    text-align: left;
-    font-family: monospace;
-    white-space: pre;
-    padding: 0.2em 0.5em 0em 0.5em;
+  text-align: left;
+  font-family: monospace;
+  white-space: pre;
+  padding: 0.2em 0.5em 0em 0.5em;
 }
 
 /* Classes for color-coding coverage information:
@@ -667,20 +606,20 @@ pre,.s {
  *   c3  : path covered or coverage = 100%
  */
 .c0 {
-    background-color: #ff9999;
-    border: solid 1px #cc0000;
+  background-color: #ff9999;
+  border: solid 1px #cc0000;
 }
 .c1 {
-    background-color: #ffcc99;
-    border: solid 1px #ff9933;
+  background-color: #ffcc99;
+  border: solid 1px #ff9933;
 }
 .c2 {
-    background-color: #ffff99;
-    border: solid 1px #cccc66;
+  background-color: #ffff99;
+  border: solid 1px #cccc66;
 }
 .c3 {
-    background-color: #99ff99;
-    border: solid 1px #009900;
+  background-color: #99ff99;
+  border: solid 1px #009900;
 }
 EOF
 
@@ -692,28 +631,26 @@ package Devel::Cover::Collection::Template::Provider;
 use strict;
 use warnings;
 
-our $VERSION = '1.42'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 use base "Template::Provider";
 
 my %Templates;
 
-sub fetch {
-  my $self = shift;
-  my ($name) = @_;
+sub fetch ($self, $name) {
   # print "Looking for <$name>\n";
   $self->SUPER::fetch(exists $Templates{$name} ? \$Templates{$name} : $name)
 }
 
 $Templates{colours} = <<'EOT';
 [%
-    colours = {
-        default => "#ffffad",
-        text    => "#000000",
-        number  => "#ffffc0",
-        error   => "#ff0000",
-        ok      => "#00ff00",
-    }
+  colours = {
+    default => "#ffffad",
+    text    => "#000000",
+    number  => "#ffffc0",
+    error   => "#ff0000",
+    ok      => "#00ff00",
+  }
 %]
 
 [% MACRO bg BLOCK -%]
@@ -723,8 +660,8 @@ EOT
 
 $Templates{html} = <<'EOT';
 <!DOCTYPE html
-     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <!--
 This file was generated by Devel::Cover Version $VERSION
@@ -735,31 +672,31 @@ http://www.pjcj.net
 -->
 [% PROCESS colours %]
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
-    <meta http-equiv="Content-Language" content="en-us"></meta>
-    <link rel="stylesheet" type="text/css" href="/[% subdir %]collection.css"></link>
-    <title> [% title %] </title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+  <meta http-equiv="Content-Language" content="en-us"></meta>
+  <link rel="stylesheet" type="text/css" href="/[% subdir %]collection.css"></link>
+  <title> [% title %] </title>
 </head>
 <body>
-    [% content %]
-    <hr/>
-    <p>
-    Coverage information from <a href="https://metacpan.org/module/Devel::Cover">
-      Devel::Cover
-    </a> by <a href="http://pjcj.net">Paul Johnson</a>.
+  [% content %]
+  <hr/>
+  <p>
+  Coverage information from <a href="https://metacpan.org/module/Devel::Cover">
+    Devel::Cover
+  </a> by <a href="http://pjcj.net">Paul Johnson</a>.
 
-    <br/>
+  <br/>
 
-    Please report problems with this site to the
-    <a href="https://github.com/pjcj/Devel--Cover/issues">issue tracker</a>.</p>
+  Please report problems with this site to the
+  <a href="https://github.com/pjcj/Devel--Cover/issues">issue tracker</a>.</p>
 
-    <p><a href="http://cpancover.com/latest/about.html">About</a> the project.</p>
+  <p><a href="http://cpancover.com/latest/about.html">About</a> the project.</p>
 
-    <p>This server generously donated by
-    <a href="http://www.bytemark.co.uk/r/cpancover">
-      <img src="http://www.bytemark.co.uk/images/subpages/spreadtheword/bytemark_logo_179_x_14.png" alt="bytemark"/>
-    </a>
-    </p>
+  <p>This server generously donated by
+  <a href="http://www.bytemark.co.uk/r/cpancover">
+    <img src="http://www.bytemark.co.uk/images/subpages/spreadtheword/bytemark_logo_179_x_14.png" alt="bytemark"/>
+  </a>
+  </p>
 </body>
 </html>
 EOT
@@ -774,7 +711,7 @@ $Templates{summary} = <<'EOT';
 <p>Search for distributions by first character:</p>
 
 [% FOREACH start = modules.keys.sort %]
-    <a href="dist/[%- start -%].html">[% start %]</a>
+  <a href="dist/[%- start -%].html">[% start %]</a>
 [% END %]
 
 <h2> Core coverage </h2>
@@ -818,39 +755,39 @@ $Templates{module_by_start} = <<'EOT';
 
 <table>
 
-    [% IF modules.$module_start %]
-        <tr align="right" valign="middle">
-            <th class="header" align="left" style='white-space: nowrap;'> Module </th>
-            <th class="header"> Version </th>
-            <th class="header"> Log </th>
-            [% FOREACH header = headers %]
-                <th class="header"> [% header %] </th>
-            [% END %]
-        </tr>
-    [% END %]
+  [% IF modules.$module_start %]
+    <tr align="right" valign="middle">
+      <th class="header" align="left" style='white-space: nowrap;'> Module </th>
+      <th class="header"> Version </th>
+      <th class="header"> Log </th>
+      [% FOREACH header = headers %]
+        <th class="header"> [% header %] </th>
+      [% END %]
+    </tr>
+  [% END %]
 
-    [% FOREACH module = modules.$module_start %]
-        [% m = module.module %]
-        <tr align="right" valign="middle">
-            <td align="left">
-                [% IF vals.$m.link %]
-                    <a href="/[% subdir %][%- vals.$m.link -%]">
-                        [% module.name || module.module %]
-                    </a>
-                [% ELSE %]
-                    [% module.name || module.module %]
-                [% END %]
-            </td>
-            <td> [% module.version %] </td>
-            <td> <a href="/[% subdir %][% vals.$m.log %]"> &para; </a> </td>
-            [% FOREACH criterion = criteria %]
-                <td class="[%- vals.$m.$criterion.class -%]"
-                    title="[%- vals.$m.$criterion.details -%]">
-                    [% vals.$m.$criterion.pc %]
-                </td>
-            [% END %]
-        </tr>
-    [% END %]
+  [% FOREACH module = modules.$module_start %]
+    [% m = module.module %]
+    <tr align="right" valign="middle">
+      <td align="left">
+        [% IF vals.$m.link %]
+          <a href="/[% subdir %][%- vals.$m.link -%]">
+            [% module.name || module.module %]
+          </a>
+        [% ELSE %]
+          [% module.name || module.module %]
+        [% END %]
+      </td>
+      <td> [% module.version %] </td>
+      <td> <a href="/[% subdir %][% vals.$m.log %]"> &para; </a> </td>
+      [% FOREACH criterion = criteria %]
+        <td class="[%- vals.$m.$criterion.class -%]"
+          title="[%- vals.$m.$criterion.details -%]">
+          [% vals.$m.$criterion.pc %]
+        </td>
+      [% END %]
+    </tr>
+  [% END %]
 
 </table>
 
@@ -872,7 +809,7 @@ Devel::Cover::Collection - Code coverage for a collection of modules
 
 =head1 VERSION
 
-version 1.42
+version 1.43
 
 =head1 SYNOPSIS
 

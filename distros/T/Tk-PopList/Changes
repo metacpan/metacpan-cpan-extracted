@@ -1,5 +1,12 @@
 Revision history for Perl extension Tk::PopList.
 
+0.08 Sat Jun 08 2024
+	- widget option no longer mandatory
+	- updated documentation
+
+0.08 Sat Jun 08 2024
+	- -widget option can now change value.
+
 0.07 Fri Mar 22 2024
 	- fixed calculation of listbox height.
 

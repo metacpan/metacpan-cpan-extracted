@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.005;
+our $VERSION = 1.006;
 
 use Exporter qw(import);
 use IO::Uncompress::Unzip;
@@ -181,6 +181,7 @@ our %ARCHIVES = (
     bzip2    => 'bzip2 File',
     cpio     => 'CPIO Archive',
     deb      => 'Debian Package',
+    dll      => 'Dynamic Link Library',
     dmg      => 'Disk Image',
     esd      => 'Disk Image',
     fat      => 'Zip Archive',
@@ -188,6 +189,7 @@ our %ARCHIVES = (
     gzip     => 'gzip File',
     hfs      => 'Disk Image',
     lha      => 'LHA File',
+    lz       => 'Lzip Compressed File',
     lzh      => 'LZH File',
     lzma     => 'LZMA File',
     ntfs     => 'Disk Image',
@@ -285,7 +287,7 @@ Mail::Exim::ACL::Attachments - Reject email attachments
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 
@@ -425,7 +427,7 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2023 Andreas Vögele
+Copyright (C) 2024 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

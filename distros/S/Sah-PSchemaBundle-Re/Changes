@@ -1,0 +1,16 @@
+0.003   2024-05-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename mod/dist Sah-PSchema{s,Bundle}-* to be more consistent
+          with others.
+
+
+0.002   2022-08-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Mention Sah::Schemas::Re.
+
+
+0.001   2022-07-08  Released-By: PERLANCAR
+
+        - First release.

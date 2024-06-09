@@ -23,7 +23,7 @@
          "requires" : {
             "App::sdview::Style" : "0.12",
             "Object::Pad" : "0.805",
-            "String::Tagged" : "0.21",
+            "String::Tagged" : "0.23",
             "Tickit" : "0",
             "Tickit::Style" : "0",
             "Tickit::Widget::FloatBox" : "0",
@@ -42,7 +42,7 @@
    "provides" : {
       "App::sdview::Output::Tickit" : {
          "file" : "lib/App/sdview/Output/Tickit.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

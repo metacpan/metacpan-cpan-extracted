@@ -1,5 +1,12 @@
 Revision history for JSON-Relaxed
 
+0.095	2024-06-08
+
+	- Further enhancements for pretty printing.
+	- With prp, allow on and off as boolean values.
+	- Optionally, use schema data to provide comments when encoding.
+	- Simplify combinations of options.
+
 0.094	2024-05-15
 
 	- Further enhancements for pretty printing.

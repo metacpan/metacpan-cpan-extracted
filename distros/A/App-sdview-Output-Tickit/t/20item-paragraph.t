@@ -75,6 +75,8 @@ clear_term;
 
 # RT150015
 {
+   use String::Tagged 0.23;  # bugfix
+
    my $item = App::sdview::Output::Tickit::_ParagraphItem->new(
       text => String::Tagged->new( "A " )
          ->append_tagged( "B C", bold => 1 )

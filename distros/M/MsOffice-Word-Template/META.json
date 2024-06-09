@@ -22,6 +22,7 @@
       "runtime" : {
          "recommends" : {
             "Barcode::Code128" : "0",
+            "GD" : "0",
             "Image::PNG::QRCode" : "0"
          },
          "requires" : {
@@ -44,23 +45,23 @@
    "provides" : {
       "MsOffice::Word::Template" : {
          "file" : "lib/MsOffice/Word/Template.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "MsOffice::Word::Template::Engine" : {
          "file" : "lib/MsOffice/Word/Template/Engine.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "MsOffice::Word::Template::Engine::Mustache" : {
          "file" : "lib/MsOffice/Word/Template/Engine/Mustache.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "MsOffice::Word::Template::Engine::TT2" : {
          "file" : "lib/MsOffice/Word/Template/Engine/TT2.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "MsOffice::Word::Template::Engine::TT2::Provider" : {
          "file" : "lib/MsOffice/Word/Template/Engine/TT2/Provider.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       }
    },
    "release_status" : "stable",
@@ -72,6 +73,6 @@
          "url" : "https://github.com/damil/MsOffice-Word-Template"
       }
    },
-   "version" : "2.03",
+   "version" : "2.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

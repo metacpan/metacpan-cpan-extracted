@@ -1,0 +1,69 @@
+#!/usr/bin/env perl
+
+use v5.14;
+use warnings;
+
+use Getopt::Long;
+use JSON::PP;
+use XDR::Gen;
+
+my $transform;
+
+sub _set_transform {
+    my ($opt, $arg) = @_;
+    my ($from, $to) = split /,/, ($arg // '');
+
+    if ($from) {
+        say STDERR "Transforming $from to $to";
+        $transform = sub {
+            return $_[0] =~ s/$from/$to/egr;
+        }
+    }
+    else {
+        $transform = sub { return $_[0]; };
+    }
+}
+
+sub usage {
+    say STDERR <<~'ERR';
+    usage: xdr-gen [options]
+    ERR
+
+    exit $_[0];
+}
+
+
+_set_transform;
+
+GetOptions( 'transform=s' => \&_set_transform )
+    or usage(1);
+
+
+my $decoder = JSON::PP->new;
+my $json = do { local $/ = undef; <STDIN> };
+my $ast = $decoder->decode( $json );
+
+STDOUT->autoflush(1);
+STDERR->autoflush(1);
+XDR::Gen->generate( $ast, undef,
+                    external_constants => { VIR_UUID_BUFLEN => 16 },
+                    transform => $transform );
+
+exit 0;
+
+
+__END__
+
+=head1 NAME
+
+xdr-gen - Generate Perl code from an XDR (RFC4506) AST from XDR::Parse
+
+=head1 VERSION
+
+version 0.0.1
+
+=head1 DESCRIPTION
+
+=head1 LICENSE AND COPYRIGHT
+
+See the LICENSE file in this distribution

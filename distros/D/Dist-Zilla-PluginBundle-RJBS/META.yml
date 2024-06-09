@@ -59,7 +59,7 @@ resources:
   bugtracker: https://github.com/rjbs/Dist-Zilla-PluginBundle-RJBS/issues
   homepage: https://github.com/rjbs/Dist-Zilla-PluginBundle-RJBS
   repository: https://github.com/rjbs/Dist-Zilla-PluginBundle-RJBS.git
-version: '5.031'
+version: '5.032'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -314,7 +314,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::RJBSMisc
       name: '@RJBS/RJBSMisc'
-      version: '5.031'
+      version: '5.032'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@RJBS/GithubMeta'
@@ -362,7 +362,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '5.031'
+          tag: '5.032'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

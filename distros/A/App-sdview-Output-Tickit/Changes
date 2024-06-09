@@ -1,5 +1,9 @@
 Revision history for App-sdview-Output-Tickit
 
+0.07    2024-06-08
+        [CHANGES]
+         * Notate dependency on String::Tagged v0.23 for RT150015 bugfix
+
 0.06    2024-04-11
         [CHANGES]
          * Use Object::Pad v0.805 so `ADJUST :params` is no longer

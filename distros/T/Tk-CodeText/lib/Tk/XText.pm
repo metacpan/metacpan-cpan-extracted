@@ -7,7 +7,7 @@ Tk::XText - Extended Text widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.50';
+$VERSION = '0.51';
 use strict;
 use warnings;
 use Carp;
@@ -44,6 +44,10 @@ within the L<Tk::CodeText> context. Otherwise see there.
 =item Class: B<AutoIndent>
 
 =item Switch: B<-autoindent>
+
+.
+
+=item Switch: B<-contextmenu>
 
 .
 
@@ -142,6 +146,7 @@ sub Populate {
 	
 	$self->ConfigSpecs(
 		-autoindent => ['PASSIVE', 'autoIndent', 'AutoIndent', 0],
+		-contextmenu => ['PASSIVE'],
 		-findandreplacecall => ['PASSIVE'],
 		-indentstyle => ['PASSIVE', 'indentStyle', 'IndentStyle', "tab"],
 		-logcall => ['CALLBACK', undef, undef, sub {}],
@@ -162,7 +167,6 @@ sub Populate {
 	$self->eventAdd('<<UnComment>>', '<Control-G>');
 	$self->eventAdd('<<Undo>>', '<Control-z>');
 	$self->eventAdd('<<Redo>>', '<Control-Z>');
-	$self->bind('<Control-Tab>', 'UnIndent' );
 	$self->bind('<KeyRelease>', 'matchCheck');
 	$self->bind('<ButtonRelease-1>', 'matchCheck');
 	$self->bind('<Control-a>', 'selectAll');
@@ -180,6 +184,89 @@ sub Backspace {
 		}
 		$self->Callback('-modifycall', 'insert');
 	}
+}
+
+sub bindRdOnly {
+	my ($class,$mw) = @_;
+
+	# Standard Motif bindings:
+	$mw->bind($class,'<Meta-B1-Motion>','NoOp');
+	$mw->bind($class,'<Meta-1>','NoOp');
+	$mw->bind($class,'<Alt-KeyPress>','NoOp');
+	$mw->bind($class,'<Meta-KeyPress>','NoOp');
+	$mw->bind($class,'<Control-KeyPress>','NoOp');
+	$mw->bind($class,'<Escape>','unselectAll');
+ 
+	$mw->bind($class,'<1>',['Button1',Ev('x'),Ev('y')]);
+	$mw->bind($class,'<B1-Motion>','B1_Motion' ) ;
+	$mw->bind($class,'<B1-Leave>','B1_Leave' ) ;
+	$mw->bind($class,'<B1-Enter>','CancelRepeat');
+	$mw->bind($class,'<ButtonRelease-1>','CancelRepeat');
+	$mw->bind($class,'<Control-1>',['markSet','insert',Ev('@')]);
+ 
+	$mw->bind($class,'<Double-1>','selectWord' ) ;
+	$mw->bind($class,'<Triple-1>','selectLine' ) ;
+	$mw->bind($class,'<Shift-1>','adjustSelect' ) ;
+	$mw->bind($class,'<Double-Shift-1>',['SelectTo',Ev('@'),'word']);
+	$mw->bind($class,'<Triple-Shift-1>',['SelectTo',Ev('@'),'line']);
+ 
+	$mw->bind($class,'<Left>',['SetCursor',Ev('index','insert-1c')]);
+	$mw->bind($class,'<Shift-Left>',['KeySelect',Ev('index','insert-1c')]);
+	$mw->bind($class,'<Control-Left>',['SetCursor',Ev('index','insert-1c wordstart')]);
+	$mw->bind($class,'<Shift-Control-Left>',['KeySelect',Ev('index','insert-1c wordstart')]);
+
+	$mw->bind($class,'<Right>',['SetCursor',Ev('index','insert+1c')]);
+	$mw->bind($class,'<Shift-Right>',['KeySelect',Ev('index','insert+1c')]);
+	$mw->bind($class,'<Control-Right>',['SetCursor',Ev('index','insert+1c wordend')]);
+	$mw->bind($class,'<Shift-Control-Right>',['KeySelect',Ev('index','insert wordend')]);
+ 
+	$mw->bind($class,'<Up>',['SetCursor',Ev('UpDownLine',-1)]);
+	$mw->bind($class,'<Shift-Up>',['KeySelect',Ev('UpDownLine',-1)]);
+	$mw->bind($class,'<Control-Up>',['SetCursor',Ev('PrevPara','insert')]);
+	$mw->bind($class,'<Shift-Control-Up>',['KeySelect',Ev('PrevPara','insert')]);
+ 
+	$mw->bind($class,'<Down>',['SetCursor',Ev('UpDownLine',1)]);
+	$mw->bind($class,'<Shift-Down>',['KeySelect',Ev('UpDownLine',1)]);
+	$mw->bind($class,'<Control-Down>',['SetCursor',Ev('NextPara','insert')]);
+	$mw->bind($class,'<Shift-Control-Down>',['KeySelect',Ev('NextPara','insert')]);
+
+	$mw->bind($class,'<Home>',['HomeEndKey', 0]);
+	$mw->bind($class,'<Shift-Home>',['KeySelect','insert linestart']);
+	$mw->bind($class,'<Control-Home>',['SetCursor','1.0']);
+	$mw->bind($class,'<Control-Shift-Home>',['KeySelect','1.0']);
+
+	$mw->bind($class,'<End>',['HomeEndKey', 1]);
+	$mw->bind($class,'<Shift-End>',['KeySelect','insert lineend']);
+	$mw->bind($class,'<Control-End>',['SetCursor','end-1char']);
+	$mw->bind($class,'<Control-Shift-End>',['KeySelect','end-1char']);
+
+	$mw->bind($class,'<Prior>',['SetCursor',Ev('ScrollPages',-1)]);
+	$mw->bind($class,'<Shift-Prior>',['KeySelect',Ev('ScrollPages',-1)]);
+	$mw->bind($class,'<Control-Prior>',['xview','scroll',-1,'page']);
+
+	$mw->bind($class,'<Next>',['SetCursor',Ev('ScrollPages',1)]);
+	$mw->bind($class,'<Shift-Next>',['KeySelect',Ev('ScrollPages',1)]);
+	$mw->bind($class,'<Control-Next>',['xview','scroll',1,'page']);
+
+	$mw->bind($class,'<Shift-Tab>', 'NoOp'); # Needed only to keep <Tab> binding from triggering; does not have to actually do anything.
+	$mw->bind($class,'<Control-Tab>','focusNext');
+	$mw->bind($class,'<Control-Shift-Tab>','focusPrev');
+
+	$mw->bind($class,'<Control-space>',['markSet','anchor','insert']);
+	$mw->bind($class,'<Select>',['markSet','anchor','insert']);
+	$mw->bind($class,'<Control-Shift-space>',['SelectTo','insert','char']);
+	$mw->bind($class,'<Shift-Select>',['SelectTo','insert','char']);
+	$mw->bind($class,'<Control-slash>','selectAll');
+	$mw->bind($class,'<Control-backslash>','unselectAll');
+
+	$mw->bind($class,'<Destroy>','Destroy');
+	$mw->bind($class, '<3>', ['PostPopupMenu', Ev('X'), Ev('Y')]  );
+	$mw->YMouseWheelBind($class);
+	$mw->XMouseWheelBind($class);
+
+	$mw->MouseWheelBind($class);
+ 
+	return $class;
 }
 
 sub Buffer {
@@ -233,7 +320,10 @@ sub canRedo {
 
 sub ClassInit {
 	my ($class,$mw) = @_;
-	$mw->bind($class, '<<Find>>','FindPopUp');
+	$class->SUPER::ClassInit($mw);
+	$class->bindRdOnly($mw);
+ 
+ 	$mw->bind($class, '<<Find>>','FindPopUp');
 	$mw->bind($class, '<<Replace>>','FindAndReplacePopUp');
 	$mw->bind($class, '<<Comment>>','comment');
 	$mw->bind($class, '<<Comment>>','comment');
@@ -242,7 +332,7 @@ sub ClassInit {
 	$mw->bind($class,'<<UnIndent>>','unindent');
 	$mw->bind($class, '<<Undo>>','undo');
 	$mw->bind($class,'<<Redo>>','redo');
-	return $class->SUPER::ClassInit($mw);
+	return $class
 }
 
 =item B<clear>
@@ -251,7 +341,7 @@ sub ClassInit {
 
 sub clear {
 	my $self = shift;
-	$self->delete('1.0', 'end');
+	$self->SUPER::delete('1.0', 'end');
 
 	$self->ResetRedo;
 	$self->ResetUndo;
@@ -277,6 +367,7 @@ sub clearModified {
 	for (@$r, @$u) { $_->{'modified'} = 1 }
 }
 
+#preventing copy and cut from sending empty string to the clipboard
 sub clipboardCopy {
 	my $self = shift;
 	$self->SUPER::clipboardCopy(@_) if $self->tagRanges('sel');
@@ -495,8 +586,39 @@ sub getFontInfo {
 
 sub goTo {
 	my ($self, $pos) = @_;
-	$self->markSet('insert', $pos);
-	$self->see($pos);
+	$self->SetCursor($pos);
+}
+
+sub HomeEndKey {
+	my ($self, $flag) = @_;
+	my $index = $self->index('insert');
+	my $text = $self->get("$index linestart", "$index lineend");
+#	print "index $index\n";
+	$index =~ /^(\d+)\.(\d+)/;
+	my $pos = $2;
+	my $line = $1;
+	my $spaces = '';
+	if ($text =~ /^(\s+)/) { $spaces = $1 }
+	$spaces = length($spaces);
+	if ($spaces) {
+		if ($flag) { #End key = 1, Home key = 0
+			if ($pos < $spaces) {
+				$self->SetCursor("$line.$spaces");
+				return
+			}
+		} else {
+			if ($pos > $spaces) {
+				$self->SetCursor("$line.$spaces");
+				return
+			}
+		}
+	}
+	if ($flag) {
+		$self->SetCursor("$index lineend");
+	} else {
+		$self->SetCursor("$index linestart");
+	}
+#	print "HomeEndKey $flag\n";
 }
 
 =item B<indent>
@@ -715,14 +837,18 @@ sub matchoptions {
 
 sub PostPopupMenu {
 	my ($self, $x, $y) = @_;
-	my $items = $self->cget('-menuitems');
-	return unless defined $items;
-	my $menu = $self->Menu(
-		-tearoff => 0,
-		-menuitems => $items,
-	);
-	$menu->bind('<Leave>', [$menu, 'unpost']);
-	$menu->post($x, $y);
+	my $menu = $self->cget('-contextmenu');
+	unless (defined $menu) {
+		my $items = $self->cget('-menuitems');
+		return unless defined $items;
+		$menu = $self->Menu(
+			-tearoff => 0,
+			-menuitems => $items,
+		);
+		$menu->bind('<Leave>', [$menu, 'unpost']);
+		$self->configure(-contextmenu => $menu);
+	}
+	$menu->post($x - 2, $y - 2);
 }
 
 sub PullUndo {

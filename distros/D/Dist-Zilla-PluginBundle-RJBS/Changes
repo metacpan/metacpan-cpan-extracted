@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-PluginBundle-RJBS
 
+5.032     2024-06-08 11:21:44-04:00 America/New_York
+        - updates to "dzil workflower":
+          - use reusable actions for build and test
+          - compute range of perls to test at test time, not in workflow
+          - permit run on workflow_dispatch
+
 5.031     2024-06-02 22:11:00-04:00 America/New_York
         - update "dzil workflower" to install prereqs with cpm, not cpanm
 

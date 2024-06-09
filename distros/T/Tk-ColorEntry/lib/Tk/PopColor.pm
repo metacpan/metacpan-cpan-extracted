@@ -3,7 +3,7 @@ package Tk::PopColor;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.02';
+$VERSION = '0.06';
 use Tk;
 
 use base qw(Tk::Derived Tk::Poplevel);
@@ -42,8 +42,8 @@ sub Populate {
 	)->pack(-fill => 'both');
 	$self->Advertise(Picker => $picker);
 	$self->ConfigSpecs(
-		-borderwidth => [$self, 'borderWidth', 'BorderWidth', 1],
-		-relief => [$self, 'relief', 'Relief', 'raised'],
+#		-borderwidth => [$self, 'borderWidth', 'BorderWidth', 1],
+#		-relief => [$self, 'relief', 'Relief', 'raised'],
 		DEFAULT => [ $picker ],
 	);
 

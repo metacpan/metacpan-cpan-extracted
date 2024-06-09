@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base 'Template::Provider';
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 
 sub _template_content {

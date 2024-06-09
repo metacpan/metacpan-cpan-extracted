@@ -1,5 +1,10 @@
 Revision history for MsOffice-Word-Template
 
+2.04    09.06.2024
+  - recommends GD, necessary for barcode generation in addition to Barcode::Code128
+
+2.03    08.06.2024
+  - forgot dependency on Barcode::Code128
 
 2.02    06.06.2024
   - fix MANIFEST forgot one module in v2.01

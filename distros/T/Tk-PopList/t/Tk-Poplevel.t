@@ -15,10 +15,22 @@ createapp(
 
 my $poplevel;
 if (defined $app) {
-	my $b = $app->Button(
-		-command => sub  { $poplevel->popUp },
-		-text => 'Popper',
-	)->pack;
+	my $b;
+	$b = $app->Button(
+		-command => sub  { 
+			$poplevel->configure(-widget => $b);
+			$poplevel->popUp
+		},
+		-text => 'Popper 1',
+	)->pack(-side => 'left');
+	my $c;
+	$c = $app->Button(
+		-command => sub  { 
+			$poplevel->configure(-widget => $c);
+			$poplevel->popUp
+		},
+		-text => 'Popper 2',
+	)->pack(-side => 'left');
 	my $frame = $app->Frame(
 		-width => 300,
 		-height => 200,

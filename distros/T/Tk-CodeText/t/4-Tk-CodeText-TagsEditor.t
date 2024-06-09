@@ -6,10 +6,9 @@ use Tk;
 require Tk::CodeText;
 require Tk::Balloon;
 use Data::Dumper;
-
 BEGIN { use_ok('Tk::CodeText::TagsEditor') };
 
-# $delay = 3000;
+#$delay = 3000;
 
 createapp;
 
@@ -63,10 +62,11 @@ if (defined $app) {
 		-expand => 1,
 		-fill => 'both',
 	);
-# 	$app->after(1, sub { 
+	$text->destroy;
+ 	$app->after(500, sub { 
 		$tags->put(@defaultattributes);
 		$tags->updateAll;
-# 	});
+ 	});
 	my $bframe = $app->Frame->pack(-fill => 'x');
 	$bframe->Button(
 		-text => 'Get',

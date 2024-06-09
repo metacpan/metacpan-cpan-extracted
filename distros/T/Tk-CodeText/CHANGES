@@ -1,5 +1,12 @@
 Tk::CodeText module changes log
 
+0.51 03 Jun 2024
+	Fixed header background color of the TagsEditor.
+	Fixed double call of modified callback in method clear of XText.
+	Prevented context menu from being created every time.
+	Added -contextmenu option
+	Revised TagsEditor to only use one PopColor instance
+
 19 may 2024
 	Update to version 0.50
 	Fixed save method in XText

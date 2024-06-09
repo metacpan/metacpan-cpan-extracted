@@ -11,7 +11,7 @@ my $build = Module::Build->new(
       'Object::Pad' => '0.805',
 
       'App::sdview::Style' => '0.12',
-      'String::Tagged' => '0.21',
+      'String::Tagged' => '0.23',
       'Tickit' => 0,
       'Tickit::Style' => 0,
       'Tickit::Widget::FloatBox' => 0,

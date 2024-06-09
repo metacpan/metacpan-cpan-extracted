@@ -6,8 +6,8 @@ use MsOffice::Word::Template;
 use Test::More;
 
 SKIP: {
-  eval "use Barcode::Code128; use Image::PNG::QRCode; 1"
-    or skip "Barcode::Code128 or Image::PNG::QRCode is not installed";
+  eval "use GD; use Barcode::Code128; use Image::PNG::QRCode; 1"
+    or skip "GD or Barcode::Code128 or Image::PNG::QRCode is not installed";
 
   my $do_save_results = $ARGV[0] && $ARGV[0] eq 'save';
 

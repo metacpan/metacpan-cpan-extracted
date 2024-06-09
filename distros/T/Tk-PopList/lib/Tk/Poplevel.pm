@@ -9,7 +9,7 @@ Tk::Poplevel - Popping a toplevel without decoration relative to a widget
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.09';
 
 use base qw(Tk::Derived Tk::Toplevel);
 
@@ -59,11 +59,7 @@ Does nothing when B<-confine> is set.
 
 =item B<-widget>
 
-Mandatory!
-
-Reference to the widget the list should pop relative to.
-
-Only available at create time.
+Set and return a reference to the widget the Poplevel should pop relative to.
 
 =back
 
@@ -76,13 +72,9 @@ Only available at create time.
 sub Populate {
 	my ($self,$args) = @_;
 	
-	my $widget = delete $args->{'-widget'};
-	die 'You need to set the -widget option' unless defined $widget;
-
 	$self->SUPER::Populate($args);
 
 	$self->{POPDIRECTION} = '';
-	$self->{WIDGET} = $widget;
 	
 	$self->overrideredirect(1);
 	$self->withdraw;
@@ -104,6 +96,7 @@ sub Populate {
 		-popalign => ['PASSIVE', undef, undef, 'left'],
 		-popdirection => ['PASSIVE', undef, undef, 'down'],
 		-relief => [$self, 'relief', 'Relief', 'raised'],
+		-widget => ['PASSIVE'],
 		DEFAULT => [ $self ],
 	);
 }
@@ -133,7 +126,7 @@ sub calculateWidth {
 sub ConfigureSizeAndPos {
 	my $self = shift;
 
-	my $widget = $self->widget;
+	my $widget = $self->cget('-widget');
 	my $screenheight = $self->vrootheight;
 	my $screenwidth = $self->vrootwidth;
 	my $confine = $self->cget('-confine');
@@ -240,10 +233,6 @@ sub popUp {
 	$self->raise;
 	$self->{'_BE_grabinfo'} = $self->grabSave;
 	$self->parent->grabGlobal;
-}
-
-sub widget {
-	return $_[0]->{WIDGET}
 }
 
 =back

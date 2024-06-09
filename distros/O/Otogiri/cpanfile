@@ -17,6 +17,8 @@ on 'test' => sub {
 };
 
 on 'develop' => sub {
+    requires 'DBD::Pg';
     requires 'Test::PostgreSQL';
+    requires 'DBD::mysql';
     requires 'Test::mysqld';
 };
