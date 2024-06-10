@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::ColorEntry.
 
+0.07  Sun Jun 09 2024
+	- updated and corrected documentation
+
 0.06  Sun Jun 09 2024
 	- Multiple ColorEntry widgets can now use the same PopColor widget
 

@@ -1,5 +1,8 @@
 use Test::More tests => 13;
 use MIME::Base64 qw/encode_base64 decode_base64/;
+use Crypt::OpenSSL::Guess qw/openssl_version/;
+
+my ($major, $minor, $patch) = openssl_version();
 
 BEGIN { use_ok('Crypt::OpenSSL::AES') };
 
@@ -25,18 +28,21 @@ my $c = Crypt::OpenSSL::AES->new($key,
 ok($c->decrypt($c->encrypt("Hello World. 123")) eq "Hello World. 123", "Simple String Encrypted/Decrypted Successfully with AES-256-CBC and IV");
 
 {
-    $key    = "e4e9ac6aa161179889f0e3804d187112f59f3325950a27d943be398074968afc";
-    $iv     = "4b2e6d920c60f1212c07c2e4d7ce6776c";
-    # Following data was encrypted with Crypt::Mode::CBC
-    $ciphertext = decode_base64("bnTwr7+SR5m71I2TKZNJzz5UcQuoTRdzKvXU/2aN+aA=");
+    SKIP: {
+        skip "Crypt::Mode::CBC not supported - OpenSSL $major$minor", 1 if $major le '0.9' && $minor le '7';
+        $key    = "e4e9ac6aa161179889f0e3804d187112f59f3325950a27d943be398074968afc";
+        $iv     = "4b2e6d920c60f1212c07c2e4d7ce6776c";
+        # Following data was encrypted with Crypt::Mode::CBC
+        $ciphertext = decode_base64("bnTwr7+SR5m71I2TKZNJzz5UcQuoTRdzKvXU/2aN+aA=");
 
-    my $c = Crypt::OpenSSL::AES->new(pack("H*", $key),
+        my $c = Crypt::OpenSSL::AES->new(pack("H*", $key),
                                     {
                                         cipher   => 'AES-256-CBC',
                                         iv          => pack("H*", $iv),
                                         padding     => 1,
                                     });
-    ok($c->decrypt($ciphertext) eq "Hello World. 123", "Decrypt Crypt::Mode::CBC encrypted data");
+        ok($c->decrypt($ciphertext) eq "Hello World. 123", "Decrypt Crypt::Mode::CBC encrypted data");
+    }
 }
 
 eval {
@@ -63,19 +69,25 @@ eval {
 unlike ($@, qr/AES: Data size must be multiple of blocksize/, "Padding and data over Block Size");
 
 {
-    eval {
-        $c = Crypt::OpenSSL::AES->new(pack("H*", $key),
-            { cipher => "AES-256-ECB", iv => pack("H*", substr($iv, 0, 32)), });
-    };
-    like ($@, qr/AES-256-ECB does not use IV/, "AES-256-ECB does not use IV");
+    SKIP: {
+        skip "IVs unsupported - OpenSSL $major$minor", 1 if $major le '0.9' && $minor le '7';
+        eval {
+            $c = Crypt::OpenSSL::AES->new(pack("H*", $key),
+                { cipher => "AES-256-ECB", iv => pack("H*", substr($iv, 0, 32)), });
+        };
+        like ($@, qr/AES-256-ECB does not use IV/, "AES-256-ECB does not use IV");
+    }
 }
 
 {
-    eval {
+    SKIP: {
+        skip "cipher unsupported - OpenSSL $major$minor", 1 if $major le '0.9' && $minor le '7';
+        eval {
         $c = Crypt::OpenSSL::AES->new(pack("H*", $key),
             { cipher => "AES-512-ECB", iv => pack("H*", substr($iv, 0, 32)), });
-    };
-    like ($@, qr/You specified an unsupported cipher/, "Unsupported Cipher specified!");
+        };
+        like ($@, qr/You specified an unsupported cipher/, "Unsupported Cipher specified!");
+    }
 }
 
 eval {

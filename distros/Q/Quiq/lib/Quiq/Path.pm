@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.215';
+our $VERSION = '1.216';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -2711,6 +2711,17 @@ sub chmod {
 
   $this->delete($path);
 
+=head4 Options
+
+=over 4
+
+=item -sloppy => $bool (Default: 0)
+
+Wirf keine Exception, wenn das Verzeichnis oder die Datei nicht
+gelöscht werden kann.
+
+=back
+
 =head4 Description
 
 Lösche den Pfad aus dem Dateisystem, also die Datei oder das Verzeichnis
@@ -2724,6 +2735,16 @@ sub delete {
     my $this = shift;
     my $path = $this->expandTilde(shift);
 
+    # Options
+
+    my $sloppy = 0;
+    
+    Quiq::Option->extract(\@_,
+        -sloppy => \$sloppy,
+    );
+
+    # Operation ausführen
+
     if (!defined($path) || $path eq '' || !-e $path && !-l $path) {
         # Bei Nichtexistenz nichts tun, aber nur, wenn es
         # kein Symlink ist. Bei Symlinks schlägt -e fehl, wenn
@@ -2734,7 +2755,7 @@ sub delete {
         (my $dir = $path) =~ s/'/\\'/g; # ' quoten
         eval {Quiq::Shell->exec("/bin/rm -r --interactive=never".
             " '$dir' >/dev/null 2>&1")};
-        if ($@) {
+        if ($@ && !$sloppy) {
             $this->throw(
                 'PATH-00002: Can\'t delete directory',
                 Error => $@,
@@ -2744,7 +2765,7 @@ sub delete {
     }
     else {
         # Datei löschen
-        if (!CORE::unlink $path) {
+        if (!CORE::unlink($path) && !$sloppy) {
             $this->throw(
                 'PATH-00003: Can\'t delete file',
                 Path => $path,
@@ -4195,7 +4216,7 @@ sub uid {
 
 =head1 VERSION
 
-1.215
+1.216
 
 =head1 AUTHOR
 

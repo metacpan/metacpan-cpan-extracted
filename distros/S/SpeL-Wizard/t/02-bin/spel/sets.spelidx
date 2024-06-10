@@ -1,0 +1,9 @@
+format|ogg
+audiodir|spel
+chunkdir|spel
+language|dutch
+macad|jz|-NoValue-|-NoValue-|,j,
+macad|setenum|1|-NoValue-|@{i18n(Setenum,##1)}
+macad|setdesc|1|-NoValue-|@{i18n(Setdesc,##1)}
+macad|text|1|-NoValue-|##1
+chunk|sets

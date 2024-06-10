@@ -1,0 +1,110 @@
+$tex = bless( {
+  'path' => 't/01-lib/SpeL/Parser/Chunk',
+  'tree' => bless( {
+    'ElementList' => bless( {
+      'Element' => [
+        bless( {
+          'MathUnit' => [
+            bless( {
+              '' => 'a = b > c \\gt e ',
+              'Left' => bless( {
+                'Component' => bless( {
+                  'Alphabet' => 'a',
+                  'trailingws' => ' '
+                }, 'SpeL::Object::Variable' ),
+                'Rest' => bless( {
+                  'ws' => ''
+                }, 'SpeL::Object::Expressionrest' )
+              }, 'SpeL::Object::Expression' ),
+              'RelationChain' => [
+                {
+                  'RelOperator' => bless( {
+                    '' => '='
+                  }, 'SpeL::Object::RelOperator' ),
+                  'Right' => bless( {
+                    'Component' => bless( {
+                      'Alphabet' => 'b',
+                      'trailingws' => ' '
+                    }, 'SpeL::Object::Variable' ),
+                    'Rest' => bless( {
+                      'ws' => ''
+                    }, 'SpeL::Object::Expressionrest' )
+                  }, 'SpeL::Object::Expression' )
+                },
+                {
+                  'RelOperator' => bless( {
+                    '' => '>'
+                  }, 'SpeL::Object::RelOperator' ),
+                  'Right' => bless( {
+                    'Component' => bless( {
+                      'Alphabet' => 'c',
+                      'trailingws' => ' '
+                    }, 'SpeL::Object::Variable' ),
+                    'Rest' => bless( {
+                      'ws' => ''
+                    }, 'SpeL::Object::Expressionrest' )
+                  }, 'SpeL::Object::Expression' )
+                },
+                {
+                  'RelOperator' => bless( {
+                    '' => '\\gt'
+                  }, 'SpeL::Object::RelOperator' ),
+                  'Right' => bless( {
+                    'Component' => bless( {
+                      'Alphabet' => 'e',
+                      'trailingws' => ' '
+                    }, 'SpeL::Object::Variable' ),
+                    'Rest' => bless( {
+                      'ws' => ''
+                    }, 'SpeL::Object::Expressionrest' )
+                  }, 'SpeL::Object::Expression' )
+                }
+              ]
+            }, 'SpeL::Object::Relation' ),
+            bless( {
+              'RelationChain' => [
+                {
+                  'RelOperator' => bless( {
+                    '' => '='
+                  }, 'SpeL::Object::RelOperator' ),
+                  'Right' => bless( {
+                    'Component' => bless( {
+                      'Alphabet' => 'd',
+                      'trailingws' => ' '
+                    }, 'SpeL::Object::Variable' ),
+                    'Rest' => bless( {
+                      'ws' => ''
+                    }, 'SpeL::Object::Expressionrest' )
+                  }, 'SpeL::Object::Expression' )
+                },
+                {
+                  'RelOperator' => bless( {
+                    '' => '<'
+                  }, 'SpeL::Object::RelOperator' ),
+                  'Right' => bless( {
+                    'Component' => bless( {
+                      'Alphabet' => 'f',
+                      'trailingws' => '
+'
+                    }, 'SpeL::Object::Variable' ),
+                    'Rest' => bless( {
+                      'ws' => ''
+                    }, 'SpeL::Object::Expressionrest' )
+                  }, 'SpeL::Object::Expression' )
+                }
+              ]
+            }, 'SpeL::Object::Relation' )
+          ],
+          'mathtag' => 'align',
+          'trailingws' => '
+        '
+        }, 'SpeL::Object::MathEnvironment' ),
+        bless( {
+          '' => '
+'
+        }, 'SpeL::Object::TokenSequence' )
+      ]
+    }, 'SpeL::Object::ElementList' )
+  }, 'SpeL::Object::Document' )
+}, 'SpeL::Parser::Chunk' );
+

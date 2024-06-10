@@ -53,6 +53,7 @@ my $builder = $class->new(
         'YAML::XS'          => '0',
         'Data::Printer'     => '0',
         'App::Pod'          => '0.36',
+        'Term::Table'       => '0',
     },
     add_to_cleanup => [ 'e-*', 'MANIFEST*.bak', 'blib/' ],
     meta_merge     => {

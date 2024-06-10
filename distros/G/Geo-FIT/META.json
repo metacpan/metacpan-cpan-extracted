@@ -30,7 +30,7 @@
             "Clone" : "0",
             "HTML::Entities" : "0",
             "IPC::System::Simple" : "1.30",
-            "perl" : "5.008"
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -53,7 +53,7 @@
          "web" : "https://github.com/patjoly/geo-fit"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

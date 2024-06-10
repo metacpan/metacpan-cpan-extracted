@@ -2,7 +2,7 @@ package Geo::FIT;
 use strict;
 use warnings;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 =encoding utf-8
 
@@ -398,6 +398,7 @@ my %named_type = (
         'beat_intervals' => 290,
         'respiration_rate' => 297,
         'split' => 312,
+        'split_summary' => 313,
         'climb_pro' => 317,
         'tank_update' => 319,
         'tank_summary' => 323,
@@ -807,6 +808,9 @@ my %named_type = (
         'diving' => 53,
         'hiit' => 62,
         'racket' => 64,
+        'wheelchair_push_walk' => 65,
+        'wheelchair_push_run' => 66,
+        'meditation' => 67,
         'water_tubing' => 76,
         'wakesurfing' => 77,
         'all' => 254,
@@ -962,6 +966,9 @@ my %named_type = (
         'tabata' => 75, # HIIT
         'pickleball' => 84, # Racket
         'padel' => 85, # Racket
+        'indoor_wheelchair_walk' => 86,
+        'indoor_wheelchair_run' => 87,
+        'indoor_hand_cycling' => 88,
         'fly_canopy' => 110,        # Flying
         'fly_paraglide' => 111,     # Flying
         'fly_paramotor' => 112,     # Flying
@@ -1446,6 +1453,8 @@ my %named_type = (
         'blackbird' => 146,
         'meilan_byte' => 147,
         'ezon' => 148,
+        'laisi' => 149,
+        'myzone' => 150,
         'development' => 255,
         'healthandlife' => 257,
         'lezyne' => 258,
@@ -1515,6 +1524,9 @@ my %named_type = (
         'shanyue' => 322,
         'spinning_mda' => 323,
         'hilldating' => 324,
+        'aero_sensor' => 325,
+        'nike' => 326,
+        'magicshine' => 327,
         'actigraphcorp' => 5759,
     },
 
@@ -1850,6 +1862,7 @@ my %named_type = (
         'marq_golfer' => 3739,
         'venu_daimler' => 3740,
         'fr745_asia' => 3794,
+        'varia_rct715' => 3808,
         'lily_asia' => 3809,
         'edge_1030_plus_asia' => 3812,
         'edge_130_plus_asia' => 3813,
@@ -1906,6 +1919,8 @@ my %named_type = (
         'approach_s70' => 4233,
         'fr265_large' => 4257,
         'fr265_small' => 4258,
+        'venu3' => 4260,
+        'venu3s' => 4261,
         'tacx_neo_smart' => 4265, # Neo Smart, Tacx
         'tacx_neo2_smart' => 4266, # Neo 2 Smart, Tacx
         'tacx_neo2_t_smart' => 4267, # Neo 2T Smart, Tacx
@@ -1924,9 +1939,14 @@ my %named_type = (
         'epix_gen2_pro_51' => 4314,
         'fr965' => 4315,
         'enduro2' => 4341,
+        'fenix7s_pro_solar' => 4374,
         'fenix7_pro_solar' => 4375,
+        'fenix7x_pro_solar' => 4376,
         'instinct_2x' => 4394,
+        'vivoactive5' => 4426,
         'descent_t2' => 4442,
+        'marq_gen2_commander' => 4472,
+        'd2_mach1_pro' => 4556,
         'sdm4' => 10007, # SDM4 footpod
         'edge_remote' => 10014,
         'tacx_training_app_win' => 20533,
@@ -4729,7 +4749,7 @@ my %msgtype_by_name = (
 
     'user_profile' => +{
         254 => +{'name' => 'message_index', 'type_name' => 'message_index'},
-        0 => +{'name' => 'friendly_name'},
+        0 => +{'name' => 'friendly_name'},  # Used for Morning Report greeting
         1 => +{'name' => 'gender', 'type_name' => 'gender'},
         2 => +{'name' => 'age', 'unit' => 'years'},
         3 => +{'name' => 'height', scale => 100, 'unit' => 'm'},
@@ -5894,11 +5914,42 @@ my %msgtype_by_name = (
     },
 
     'split' => +{
-        0 => +{ 'name' => 'split_type',         'type_name' => 'split_type'    },
-        1 => +{ 'name' => 'total_elapsed_time', 'unit' => 's', 'scale' => 1000 },
-        2 => +{ 'name' => 'total_timer_time',   'unit' => 's', 'scale' => 1000 },
-        3 => +{ 'name' => 'total_distance',     'unit' => 'm', 'scale' => 100  },
-        9 => +{ 'name' => 'start_time',         'type_name' => 'date_time'     },
+        254 => +{ 'name' => 'message_index',       'type_name' => 'message_index' },
+        0   => +{ 'name' => 'split_type',          'type_name' => 'split_type'    },
+        1   => +{ 'name' => 'total_elapsed_time',  'unit' => 's', 'scale' => 1000 },
+        2   => +{ 'name' => 'total_timer_time',    'unit' => 's', 'scale' => 1000 },
+        3   => +{ 'name' => 'total_distance',      'unit' => 'm', 'scale' => 100  },
+        4   => +{ 'name' => 'avg_speed',           'unit' => 'm/s', 'scale' => 1000 },
+        9   => +{ 'name' => 'start_time',          'type_name' => 'date_time' },
+        13  => +{ 'name' => 'total_ascent',        'unit' => 'm'},
+        14  => +{ 'name' => 'total_descent',       'unit' => 'm'},
+        21  => +{ 'name' => 'start_position_lat',  'unit' => 'semicircles'},
+        22  => +{ 'name' => 'start_position_long', 'unit' => 'semicircles'},
+        23  => +{ 'name' => 'end_position_lat',    'unit' => 'semicircles'},
+        24  => +{ 'name' => 'end_position_long',   'unit' => 'semicircles'},
+        25  => +{ 'name' => 'max_speed',           'unit' => 'm/s', 'scale' => 1000 },
+        26  => +{ 'name' => 'avg_vert_speed',      'unit' => 'm/s', 'scale' => 1000 },
+        27  => +{ 'name' => 'end_time',            'type_name' => 'date_time' },
+        28  => +{ 'name' => 'total_calories',      'unit' => 'kcal'},
+        74  => +{ 'name' => 'start_elevation',     'unit' => 'm', 'scale' => 5, 'offset' => 500 },
+        110 => +{ 'name' => 'total_moving_time',   'unit' => 's', 'scale' => 1000 },
+    },
+
+    'split_summary' => +{
+        254 => +{ 'name' => 'message_index',       'type_name' => 'message_index' },
+        0   => +{ 'name' => 'split_type',          'type_name' => 'split_type'    },
+        3   => +{ 'name' => 'num_splits' },
+        4   => +{ 'name' => 'total_timer_time',    'unit' => 's', 'scale' => 1000 },
+        5   => +{ 'name' => 'total_distance',      'unit' => 'm', 'scale' => 100  },
+        6   => +{ 'name' => 'avg_speed',           'unit' => 'm/s', 'scale' => 1000 },
+        7   => +{ 'name' => 'max_speed',           'unit' => 'm/s', 'scale' => 1000 },
+        8   => +{ 'name' => 'total_ascent',        'unit' => 'm' },
+        9   => +{ 'name' => 'total_descent',       'unit' => 'm' },
+        10  => +{ 'name' => 'avg_heart_rate',      'unit' => 'bpm' },
+        11  => +{ 'name' => 'max_heart_rate',      'unit' => 'bpm' },
+        12  => +{ 'name' => 'avg_vert_speed',      'unit' => 'm/s', 'scale' => 1000 },
+        13  => +{ 'name' => 'total_calories',      'unit' => 'kcal' },
+        77  => +{ 'name' => 'total_moving_time',   'unit' => 's', 'scale' => 1000 },
     },
 
     'climb_pro' => +{
@@ -6902,7 +6953,7 @@ returns a string representing the .FIT profile version on which this class based
 
 =cut
 
-my $profile_current  = '21.115';
+my $profile_current  = '21.126';
 my $protocol_current = '2.3';       # is there such a thing as current protocol for the class?
                                     # don't think so, pod was removed for protocol_* above
 
@@ -9113,7 +9164,7 @@ Please visit the project page at: L<https://github.com/patjoly/geo-fit>.
 
 =head1 VERSION
 
-1.11
+1.12
 
 =head1 LICENSE AND COPYRIGHT
 

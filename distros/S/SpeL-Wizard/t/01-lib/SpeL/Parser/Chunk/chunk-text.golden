@@ -1,0 +1,15 @@
+$tex = bless( {
+  'path' => 't/01-lib/SpeL/Parser/Chunk',
+  'tree' => bless( {
+    'ElementList' => bless( {
+      'Element' => [
+        bless( {
+          '' => 'This is just some text in a chunk.
+And some more text.
+'
+        }, 'SpeL::Object::TokenSequence' )
+      ]
+    }, 'SpeL::Object::ElementList' )
+  }, 'SpeL::Object::Document' )
+}, 'SpeL::Parser::Chunk' );
+

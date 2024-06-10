@@ -27,7 +27,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.215';
+our $VERSION = '1.216';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -3599,6 +3599,27 @@ sub schemas {
 
 =over 4
 
+=item -insert => \@rows
+
+Füge die Zeilen @rows in die Tabelle ein. Beispiel:
+
+  $db->createTable('bereich',
+      ['ber_id',type=>'INTEGER',primaryKey=>1,autoIncrement=>1],
+      ['ber_name',type=>'STRING(50)',notNull=>1],
+      ['ber_kuerzel',type=>'STRING(3)',notNull=>1],
+      ['ber_plural',type=>'STRING(50)',notNull=>1],
+      ['ber_url',type=>'STRING(50)',notNull=>1],
+      ['ber_reihenfolge',type=>'INTEGER(2)',notNull=>1],
+      ['ber_prioritaet',type=>'INTEGER'],
+      -insert => [
+          [qw(1 Thema tma Themen /themaListe 1 10)],
+          [qw(2 Memo mem Memos /memoListe 2 10)],
+          [qw(3 Notiz ntz Notizen /notizListe 3 10)],
+          [qw(4 Dokument dok Dokumente /dokumentListe 4 10)],
+          [qw(5 Termin trm Termine /terminListe 5 10)],
+      ],
+  );
+
 =item -replace => $bool (Default: 0)
 
 Erzeuge Tabelle neu, falls sie bereits existiert.
@@ -3624,10 +3645,12 @@ sub createTable {
 
     # Optionen
 
+    my $rowsA = undef;
     my $replace = 0;
     my $sloppy = 0;
 
     Quiq::Option->extract(-mode=>'sloppy',\@_,
+        -insert => \$rowsA,
         -reCreate => \$replace, # Rückwärtskompatibilität
         -recreate => \$replace, # Rückwärtskompatibilität
         -replace => \$replace,
@@ -3650,6 +3673,12 @@ sub createTable {
 
     my $stmt = $self->stmt->createTable($table,@_);
     my $cur = $self->sqlAtomic($stmt);
+
+    if ($rowsA) {
+        my $titleA = $self->titles($table);
+        my $cur = $self->insertMulti($table,$titleA,$rowsA);
+        printf "%s: %s rows inserted\n",$table,$cur->hits;
+    }
 
     return $cur;
 }
@@ -3814,6 +3843,24 @@ Verbindung zur Quelldatenbank
 
 Kopiere die Datensätze in Chunks der Größe $n.
 
+=item -ignoreSourceTable => $bool (Default: 0)
+
+Wenn gesetzt, ignoriere den Inhalt der Tabelle auf der Quelldatenbank.
+Diese Option ist nützlich, wenn der Inhalt der Zieltabelle von -initialData
+aufgebaut werden soll. Alternativ kann auch insertMulit genutzt werden,
+a la
+
+  $cur = $db->insertMulti('bereich',
+      [$bakDb->titles('bereich')],[
+          [qw(1 Thema tma Themen /themaListe 1 10)],
+          [qw(2 Memo mem Memos /memoListe 2 10)],
+          [qw(3 Notiz ntz Notizen /notizListe 3 10)],
+          [qw(4 Dokument dok Dokumente /dokumentListe 4 10)],
+          [qw(5 Termin trm Termine /terminListe 5 10)],
+      ]
+  );
+  printf "bereich: %s rows inserted\n",$cur->hits;
+
 =item -srcTable => $srcTable (Default: $table)
 
 Name der Tabelle in der Quelldatenbank, wenn er vom Namen der
@@ -3828,8 +3875,9 @@ werden, die nicht übereinstimmen.
 
 =item -initialData => \@rows
 
-Ist die Tabelle leer, befülle sie mit den Zeilen @rows. Jede Zeile
-ist ein Array von Werten. Beispiel:
+Existiert die Tabelle auf der Quelldatenbak nicht oder ist sie leer oder ist
+-forceInitialData gesetzt, befülle die Tablle auf der Ziedatenbank mit den
+Zeilen @rows. Jede Zeile ist ein Array von Werten. Beispiel:
 
   -initialData => [
       [qw/1 Emily/],
@@ -3861,12 +3909,14 @@ sub copyData {
     # Optionen
 
     my $chunkSize = 100;
+    my $ignoreSourceTable = 0;
     my $mapH = undef;
     my $srcTable = $destTable;
     my $initialData = undef;
 
     $self->parameters(0,\@_,
         -chunkSize => \$chunkSize,
+        -ignoreSourceTable => \$ignoreSourceTable,
         -srcTable => \$srcTable,
         -mapColumns => \$mapH,
         -initialData => \$initialData,
@@ -3877,7 +3927,7 @@ sub copyData {
 
     my $cnt = 0;
     my @destTitles = $self->titles($destTable);
-    if ($srcDb->tableExists($srcTable)) {
+    if ($srcDb->tableExists($srcTable) && !$ignoreSourceTable) {
         # Erstelle Abbildung der Kolumnen
 
         my @srcTitles = $srcDb->titles($srcTable);
@@ -6105,7 +6155,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.215
+1.216
 
 =head1 AUTHOR
 

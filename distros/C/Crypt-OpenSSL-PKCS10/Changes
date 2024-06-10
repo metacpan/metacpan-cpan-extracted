@@ -1,5 +1,18 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS10.
 
+0.26 -- Sun Jun 09 12:18:15 ADT 2024
+
+        [Significant updates since 0.25]
+        - Fix an issue linking to the proper openssl on HPUX and others
+
+        [Change Log]
+        - 1aaefd1 Fix windows workflow action
+        - 0c36e9d Update windows workflow action
+        - d8a7959 Update main module version
+        - c372fd6 Prepare for release 0.26
+        - bc70bcc Add LDDLFLAGS as the default
+        - 6785373 v0.25
+
 0.25 -- Sun Oct 15 20:41:15 ADT 2023
 
         [Significant updates since 0.24]

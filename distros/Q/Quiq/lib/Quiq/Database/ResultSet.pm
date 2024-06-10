@@ -26,7 +26,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.215';
+our $VERSION = '1.216';
 
 use Quiq::Object;
 use Time::HiRes ();
@@ -1174,7 +1174,7 @@ sub reverse {
 
 =head1 VERSION
 
-1.215
+1.216
 
 =head1 AUTHOR
 

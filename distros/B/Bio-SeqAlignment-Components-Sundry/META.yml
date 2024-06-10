@@ -1,0 +1,58 @@
+---
+abstract: 'Miscellaneous components for building awesome sequencing apps.'
+author:
+  - 'Christos Argyropoulos <chrisarg@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-SeqAlignment-Components-Sundry
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Bio::SeqAlignment::Components::Sundry:
+    file: lib/Bio/SeqAlignment/Components/Sundry.pm
+    version: '0.01'
+  Bio::SeqAlignment::Components::Sundry::DocumentSequenceModifications:
+    file: lib/Bio/SeqAlignment/Components/Sundry/DocumentSequenceModifications.pm
+    version: '0.01'
+  Bio::SeqAlignment::Components::Sundry::IOHelpers:
+    file: lib/Bio/SeqAlignment/Components/Sundry/IOHelpers.pm
+    version: '0.01'
+  Bio::SeqAlignment::Components::Sundry::Tailing:
+    file: lib/Bio/SeqAlignment/Components/Sundry/Tailing.pm
+    version: '0.01'
+requires:
+  Bio::SeqAlignment::Examples::TailingPolyester::PDLRNG: '0'
+  Bio::SeqAlignment::Examples::TailingPolyester::SimulatePDLGSL: '0'
+  BioX::Seq: '0'
+  BioX::Seq::Stream: '0'
+  Carp: '0'
+  Data::MessagePack: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  JSON: '0'
+  PDL::Lite: '0'
+  YAML::Tiny: '0'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.01'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

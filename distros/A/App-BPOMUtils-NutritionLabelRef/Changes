@@ -1,3 +1,9 @@
+0.003   2024-05-30  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add -n as alias for --list-nutrients, -g as alias for
+          --list-groups.
+
+
 0.002   2024-05-30  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

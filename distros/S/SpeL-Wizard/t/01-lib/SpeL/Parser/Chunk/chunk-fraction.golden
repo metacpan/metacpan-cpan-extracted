@@ -1,0 +1,107 @@
+$tex = bless( {
+  'path' => 't/01-lib/SpeL/Parser/Chunk',
+  'tree' => bless( {
+    'ElementList' => bless( {
+      'Element' => [
+        bless( {
+          'MathUnit' => bless( {
+            '' => 'y = \\frac{3}{5}',
+            'Left' => bless( {
+              'Component' => bless( {
+                'Alphabet' => 'y',
+                'trailingws' => ' '
+              }, 'SpeL::Object::Variable' ),
+              'Rest' => bless( {
+                'ws' => ''
+              }, 'SpeL::Object::Expressionrest' )
+            }, 'SpeL::Object::Expression' ),
+            'RelationChain' => [
+              {
+                'RelOperator' => bless( {
+                  '' => '='
+                }, 'SpeL::Object::RelOperator' ),
+                'Right' => bless( {
+                  'Component' => bless( {
+                    'den' => bless( {
+                      'Realnumber' => bless( {
+                        'Sign' => '',
+                        'Value' => '5',
+                        'trailingws' => ''
+                      }, 'SpeL::Object::Realnumber' )
+                    }, 'SpeL::Object::Number' ),
+                    'num' => bless( {
+                      'Realnumber' => bless( {
+                        'Sign' => '',
+                        'Value' => '3',
+                        'trailingws' => ''
+                      }, 'SpeL::Object::Realnumber' )
+                    }, 'SpeL::Object::Number' )
+                  }, 'SpeL::Object::Fraction' ),
+                  'Rest' => bless( {
+                    'ws' => ''
+                  }, 'SpeL::Object::Expressionrest' )
+                }, 'SpeL::Object::Expression' )
+              }
+            ]
+          }, 'SpeL::Object::Relation' )
+        }, 'SpeL::Object::MathInline' ),
+        bless( {
+          'MathUnit' => bless( {
+            '' => 'y = \\frac{3}{a+b}',
+            'Left' => bless( {
+              'Component' => bless( {
+                'Alphabet' => 'y',
+                'trailingws' => ' '
+              }, 'SpeL::Object::Variable' ),
+              'Rest' => bless( {
+                'ws' => ''
+              }, 'SpeL::Object::Expressionrest' )
+            }, 'SpeL::Object::Expression' ),
+            'RelationChain' => [
+              {
+                'RelOperator' => bless( {
+                  '' => '='
+                }, 'SpeL::Object::RelOperator' ),
+                'Right' => bless( {
+                  'Component' => bless( {
+                    'den' => bless( {
+                      'Component' => bless( {
+                        'Alphabet' => 'a',
+                        'trailingws' => ''
+                      }, 'SpeL::Object::Variable' ),
+                      'Rest' => bless( {
+                        'Op' => bless( {
+                          'Op' => '+'
+                        }, 'SpeL::Object::Binop' ),
+                        'Remainder' => bless( {
+                          'Component' => bless( {
+                            'Alphabet' => 'b',
+                            'trailingws' => ''
+                          }, 'SpeL::Object::Variable' ),
+                          'Rest' => bless( {
+                            'ws' => ''
+                          }, 'SpeL::Object::Expressionrest' )
+                        }, 'SpeL::Object::Expression' )
+                      }, 'SpeL::Object::Expressionrest' )
+                    }, 'SpeL::Object::Expression' ),
+                    'num' => bless( {
+                      'Realnumber' => bless( {
+                        'Sign' => '',
+                        'Value' => '3',
+                        'trailingws' => ''
+                      }, 'SpeL::Object::Realnumber' )
+                    }, 'SpeL::Object::Number' )
+                  }, 'SpeL::Object::Fraction' ),
+                  'Rest' => bless( {
+                    'ws' => ''
+                  }, 'SpeL::Object::Expressionrest' )
+                }, 'SpeL::Object::Expression' )
+              }
+            ]
+          }, 'SpeL::Object::Relation' )
+        }, 'SpeL::Object::MathInline' )
+      ]
+    }, 'SpeL::Object::ElementList' )
+  }, 'SpeL::Object::Document' )
+}, 'SpeL::Parser::Chunk' );
+

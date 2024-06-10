@@ -1,6 +1,20 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.890 Sun Jun 10 01:00:00 EST 2024
+
+  * Revert back to calling CORE::rand() to set the internal seed.
+    MCE::Hobo cannot assume the srand or setter function used by the
+    application for predictability.
+    1. https://perlmonks.org/?node_id=11159834
+    2. https://perlmonks.org/?node_id=11159827
+
+  * Add class method MCE::Hobo->seed to retrieve the seed.
+
+1.889 Sun Jun 09 15:30:00 EST 2024
+
+  * Improve support for PDL.
+
 1.888 Fri Jun 06 04:00:00 EST 2024
 
   * Apply workaround for PDL::srand in MCE::Hobo. Thank you, PerlMonks.

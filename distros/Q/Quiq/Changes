@@ -1,3 +1,27 @@
+1.216 2024-06-09
+================
+
+[Quiq::Confluence::Client]
+* Doku bearbeitet
+* Methode send(): Exception-Information verbessert
+
+[Quiq::Database::Connection]
+* Methode createTable(): Option -insert hinzugefügt
+* Methode copyData(): Option -ignoreSourceTable hinzugefügt
+
+[Quiq::DestinationTree]
+* Testcode verbessert
+
+[Quiq::Eog]
+* Methode transferImages() verbessert
+
+[Quiq::Path]
+* Methode delete(): Option -sloppy hinzugefügt
+* Testcode verbessert
+
+[Quiq::Rsync]
+* Testcode verbessert
+
 1.215 2024-03-28
 ================
 

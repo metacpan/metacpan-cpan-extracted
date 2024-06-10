@@ -347,7 +347,7 @@ Please visit the project page at: [https://github.com/patjoly/geo-fit](https://g
 
 # VERSION
 
-1.11
+1.12
 
 # LICENSE AND COPYRIGHT
 

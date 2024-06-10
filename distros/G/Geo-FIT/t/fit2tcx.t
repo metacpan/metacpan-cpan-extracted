@@ -1,5 +1,5 @@
 # t/fit2tcx.t - script to convert FIT files to TCX 
-use Test::More tests => 3;
+use Test::More tests => 5;
 
 use strict;
 use warnings;
@@ -12,7 +12,6 @@ my ($input_file, $output_file, $at_least_version);
 $input_file = 't/10004793344_ACTIVITY.fit';
 ($output_file = $input_file) =~ s/\.fit$/.tcx/;
 $at_least_version = '1.03';              # arbitrary number, just to check if we can check
-unlink $output_file if -f $output_file;
 
 #
 # Look-up the script's --version (testing look-up works)
@@ -73,7 +72,7 @@ if ($has_a_version_installed) {
 
 my @args = ('--indent=4', $input_file, $output_file );
 run($^X, 'script/fit2tcx.pl', @args);
-is(-f $output_file, 1, "    fit2tcx.pl: results in new gpx file");
+is(-f $output_file, 1, "    fit2tcx.pl: results in new tcx file");
 unlink $output_file;
 
 # 
@@ -83,7 +82,21 @@ my ($fh, $tmp_fname) = tempfile();
 # may have to add option --force once it is added to the script
 @args = ('--indent=4', $input_file, $tmp_fname );
 run($^X, 'script/fit2tcx.pl', @args);
-is(-f $tmp_fname, 1, "    fit2tcx.pl: results in new tcx temporry file");
+is(-f $tmp_fname, 1, "    fit2tcx.pl: results in new temporary file");
+
+#
+# convert a file that is not a FIT file -- expect failure
+
+#  - case 1) already a *.tcx
+@args = ('--indent=4', $output_file, 'foo.fit' );    # $output_file from above becomes the input_file
+eval { run($^X, 'script/fit2tcx.pl', @args) };
+is( $IPC::System::Simple::EXITVAL, 255, "    fit2tcx.pl: skip converting file that is already a *.tcx file");
+is(-f 'foo.fit', undef,                 "    fit2tcx.pl: does NOT result in new FIT file");
+
+#  - case 2) neither a *.tcx nor a FIT file --  will fail at fetch_header()
+#  TODO: test case 2)
+
+unlink $output_file;
 
 print "so debugger doesn't exit\n";
 

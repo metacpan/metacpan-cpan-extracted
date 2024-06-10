@@ -34,7 +34,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 =head1 SYNOPSIS
 
@@ -66,6 +66,10 @@ Watch a reference for changes:
         A::f2();
     '
 
+Benchmark two snippets of code:
+
+    perl -Me -e 'n { slow => sub{ ... }, fast => sub{ ... }}, 10000'
+
 Launch the Runtime::Debugger:
 
     perl -Me -e 'repl'
@@ -93,6 +97,16 @@ Data dump a data structure:
 Devel::Peek dump a data structure:
 
     perl -Me -e 'dd { a => [ 1..3] }'
+
+Print data as a table:
+
+    perl -Me -e 'table( [qw(key value)], [qw(red 111)], [qw(blue 222)] )'
+    +------+-------+
+    | key  | value |
+    +------+-------+
+    | red  | 111   |
+    | blue | 222   |
+    +------+-------+
 
 =cut
 
@@ -232,6 +246,24 @@ Internal data dumper.
 Color a string.
 
     say dye( "HEY", "RED" );
+
+=head2 table
+
+Print data as a table:
+
+    perl -Me -e 'table( [qw(key value)], [qw(red 111)], [qw(blue 222)] )'
+    +------+-------+
+    | key  | value |
+    +------+-------+
+    | red  | 111   |
+    | blue | 222   |
+    +------+-------+
+
+Context sensitive!
+
+    - Void   - output table.
+    - List   - return individual lines.
+    - Scalar - return entire table as a string.
 
 =head2 g
 
@@ -451,6 +483,24 @@ sub import {
                 require Term::ANSIColor;
             }
             Term::ANSIColor::colored( @_ );
+        },
+
+        # Table.
+        table => sub {
+            if ( !$imported{$caller}{"Term::Table"}++ ) {
+                require Term::Table;
+            }
+
+            my ( $header, @rows ) = @_;
+            my @lines = Term::Table->new(
+                header => $header,
+                rows   => \@rows,
+            )->render;
+
+            return @lines if wantarray;
+            return join "\n", @lines if defined wantarray;
+
+            print "$_\n" for @lines;
         },
 
         ######################################

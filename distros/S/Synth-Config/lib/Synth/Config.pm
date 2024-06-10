@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Synthesizer settings librarian
 
-our $VERSION = '0.0058';
+our $VERSION = '0.0061';
 
 use Moo;
 use strictures 2;
@@ -297,7 +297,39 @@ sub remove_spec {
 }
 
 
-sub import_yaml {
+sub import_specs {
+  my ($self, %options) = @_;
+
+  croak 'Invalid specs file'
+    if $options{file} && !-e $options{file};
+
+  my $config = $options{file}
+    ? LoadFile($options{file})
+    : Load($options{string});
+
+  my $specs = $self->recall_specs;
+
+  if ($specs && @$specs) {
+    print 'Removing spec from ', $self->model, "\n"
+        if $self->verbose;
+    $self->remove_spec;
+  }
+
+  my @list = @{ $config->{specs} };;
+
+  for my $name (@list) {
+      for my $spec (@{ $config->{$name} }) {
+        print "Adding $name spec to ", $self->model, "\n"
+          if $self->verbose;
+        $self->make_spec(name => $name, %$spec);
+      }
+  }
+
+  return \@list;
+}
+
+
+sub import_patches {
   my ($self, %options) = @_;
 
   croak 'Invalid settings file'
@@ -352,48 +384,53 @@ sub graphviz {
     node   => { shape => $options{shape} },
     edge   => { color => $options{color} },
   );
-  my (%edges, %sets, %labels);
+  my (%edges, %sets, %labels, %seen, $patch_name);
 
-  my $patch_name = '';
   # collect settings by group
   for my $set (@{ $options{settings} }) {
-    my $from = $set->{group};
     $patch_name = $set->{name};
-    push @{ $sets{$from} }, $set;
+    my $from = $set->{group};
+    push @{ $sets{$from} }, $_ for @{ $set->{parameters} };
   }
 
-  # accumulate parameter = value lines
-  my %seen;
+  # accumulate non-patch parameter = value labels
   for my $from (keys %sets) {
-    my @label = ($from);
-    for my $group (@{ $sets{$from} }) {
-      next if $group->{control} eq 'patch';
-      my $label = "$group->{parameter} = $group->{value}$group->{unit}";
-      push @label, $label unless $seen{ "$from $label" }++;
+    my @labels;
+    for my $parameter (@{ $sets{$from} }) {
+      next if $parameter->{control} eq 'patch';
+      my $label = "$parameter->{param} = $parameter->{value}$parameter->{unit}";
+      my $key   = "$from $label";
+      push @labels, $label unless $seen{$key}++;
     }
-    $labels{$from} = join "\n", @label;
+    $labels{$from} = join "\n", $from, @labels;
   }
 
   # add patch edges
-  for my $set (@{ $options{settings} }) {
-    next if $set->{control} ne 'patch';
-    my ($from, $to, $param, $param_to) = @$set{qw(group group_to parameter param_to)};
-    my $key = "$from $param to $to $param_to";
-    my $label = "$param to $param_to";
-    $from = $labels{$from};
-    $to = $labels{$to} if exists $labels{$to};
-    $g->add_edge(
-      from  => $from,
-      to    => $to,
-      label => $label,
-    ) unless $edges{$key}++;
+  for my $from (keys %sets) {
+    for my $parameter (@{ $sets{$from} }) {
+      next if $parameter->{control} ne 'patch';
+      my $to         = $parameter->{group_to};
+      my $param      = $parameter->{param};
+      my $param_to   = $parameter->{param_to};
+      my $key        = "$from $param to $to $param_to";
+      my $label      = "$param to $param_to";
+      my $from_label = $labels{$from};
+      my $to_label   = exists $labels{$to}
+        ? $labels{$to}
+        : ucfirst lc $to;
+      $g->add_node(name => $to_label);
+      $g->add_edge(
+        from  => $from_label,
+        to    => $to_label,
+        label => $label,
+      ) unless $edges{$key}++;
+    }
   }
 
   # save a file
   if ($options{render}) {
     my $model = $self->model;
     (my $patch = $patch_name) =~ s/\W/_/g;
-    # TODO render to data
     my $filename = "$options{path}/$model-$patch.$options{extension}";
     $g->run(format => $options{extension}, output_file => $filename);
   }
@@ -415,7 +452,7 @@ Synth::Config - Synthesizer settings librarian
 
 =head1 VERSION
 
-version 0.0058
+version 0.0061
 
 =head1 SYNOPSIS
 
@@ -424,8 +461,8 @@ version 0.0058
   my $model = 'Modular';
   my $synth = Synth::Config->new(model => $model, verbose => 1);
 
-  # populate the database with patch settings from a YAML file or string
-  my $patches = $synth->import_yaml(
+  # populate the database with patch settings
+  my $patches = $synth->import_patches(
       file    => "$model.yaml", # or string => '...' # one or the other is required
       patches => ['Simple 001', 'Simple 002'],       # optional
   );
@@ -463,7 +500,13 @@ version 0.0058
   my $setting_names = $synth->recall_setting_names;
   # [ 'My favorite setting' ]
 
-  # declare the possible settings
+  # populate the database with the model specification
+  my $specs = $synth->import_specs(
+      file => "$model.yaml",
+      # or string => '...' # one or the other is required
+  );
+
+  # declare the possible setting specifications
   my %spec = (
     order      => [qw(group parameter control group_to param_to bottom top value unit is_default)],
     group      => [],
@@ -479,7 +522,7 @@ version 0.0058
   );
   my $spec_id = $synth->make_spec(%spec);
   my $spec = $synth->recall_spec(id => $spec_id);
-  my $specs = $synth->recall_specs;
+  $specs = $synth->recall_specs;
   # { order => [ ... ], etc => ... }
 
   # remove stuff!
@@ -645,13 +688,45 @@ Return the model configuration specification for the given B<id>.
 Remove the database table for the current object model configuration
 specification.
 
-=head2 import_yaml
+=head2 import_specs
 
-Add the settings in a L<YAML> file or string, to the database and
-return the setting (patch) name.
+Add the specifications defined in a L<YAML> file or string, to the
+database and return the spec name.
 
-Import a specific set of B<patches> in the settings, by providing them
-in the B<options>.
+Option defaults:
+
+  file   = undef
+  string = undef
+
+=head2 import_patches
+
+Add the settings defined in a L<YAML> file or string, to the database
+and return the setting (patch) name.
+
+A specific subset of B<patches> can be imported, by providing their
+names in the B<options>.
+
+YAML format:
+
+  model: "Model name"
+  patches:
+    - patch: "Setting name"
+      settings:
+        - group: "Group name"
+          parameters:
+            - param: "Patch parameter name"
+              control: 'patch'
+              group_to: "Connect to group"
+              param_to: "Connected group parameter"
+            - param: "Control parameter name"
+              control: "Named physical control"
+              value: "Parameter value"
+              unit: "Parameter unit of measure"
+    - patch: "Another parameter name"
+      ...
+
+Please see the L</"SEE ALSO"> section for examples of configuration
+files.
 
 Option defaults:
 
@@ -673,6 +748,25 @@ Option defaults:
   extension = png
   shape     = oval
   color     = grey
+
+  model => 'Modular',
+  patches => [
+    {
+      patch => 'Simple 000',
+      settings => [
+        {
+          group => 'oscillator',
+          parameters => [
+            { control => 'patch', group_to => 'mixer', param => 'out', param_to => 'in' },
+            { control => 'knob', param => 'range', unit => "'", value => 8 },
+            { control => 'switch', param => 'waveform', unit => '', value => 'square' },
+          ],
+        }, {
+          group => 'mixer',
+          parameters => [ { control => 'patch', group_to => 'audio', param => 'stereo-out', param_to => 'stereo-in' } ],
+        },
+      ],
+    }
 
 =head1 SEE ALSO
 

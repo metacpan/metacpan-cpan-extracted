@@ -19,10 +19,10 @@ no_index:
     - inc
 requires:
   SPVM: '0.989063'
-  SPVM::Sys: '0.510'
+  SPVM::Sys: '0.523'
   SPVM::Thread: '0.001'
   SPVM::Time::HiRes: '0.004'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Go.git
-version: '0.007002'
+version: '0.007003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

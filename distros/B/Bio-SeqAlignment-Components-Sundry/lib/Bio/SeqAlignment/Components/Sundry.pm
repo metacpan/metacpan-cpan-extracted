@@ -1,0 +1,75 @@
+  use strict;
+  use warnings;
+  package Bio::SeqAlignment::Components::Sundry;
+$Bio::SeqAlignment::Components::Sundry::VERSION = '0.01';
+  # ABSTRACT: Miscellaneous components for building awesome sequencing apps.
+  
+  1;
+=head1 NAME
+
+Bio::SeqAlignment::Components::Sundry Placeholder for miscellaneous components
+
+=head1 VERSION
+
+version 0.01
+
+=head1 SYNOPSIS
+
+  use Bio::SeqAlignment::Components::Sundry::ComponentName;
+
+
+=head1 DESCRIPTION
+
+This module reserves the name space for miscellaneous components that are 
+relevant for building awesome sequencing applications using the
+Bio::SeqAlignment framework. The module itself does not provide any
+functionality, so you will have to load the specific components you need
+as you build your application, e.g.:
+
+  use Bio::SeqAlignment::Components::Sundry::ComponentName;
+
+where ComponentName is the name of the component you need.
+
+=head1 COMPONENTS
+
+=over 4
+
+=item B<Tailing>
+
+This module provides functions to add various tails to the 3' of biological
+sequences. Such modifications are useful for e.g. simulating polyA tails 
+in RNAseq, adding UMI tags to sequences, etc.
+
+=item B<DocumentSequenceModifications>
+
+This module provides functions to store and retrieve sequence modifications in
+various formats. These modifications provide a meta-data layer to fasta files
+(and down the road to fastq files) that can be used to track changes made to
+the sequences in the file. While there are many ways to store such information,
+this module provides a simple way to store and retrieve it in common serialization
+formats (e.g. JSON/YAML/MessagePack). Storing this information in this manner
+allows for easy retrieval and use in downstream analyses and avoids the use of
+the rather heavyweight BioPerl modules.
+
+=item B<IOHelpers>
+
+This module provides helper functions for reading and writing (simple) sequence
+files. By simple sequence files, we mean files that contain only sequence data, 
+such as FASTA (and some time in the future FASTQ) files. The module uses the 
+BioX::Seq module to parse sequences. This is a simple module that provides a
+lightweight object-oriented interface to sequence data. It is also wickedly fast.
+
+=back
+
+=head1 AUTHOR
+
+Christos Argyropoulos <chrisarg@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by Christos Argyropoulos.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

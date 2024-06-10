@@ -1,0 +1,8 @@
+format|ogg
+audiodir|spel
+chunkdir|spel
+language|dutch
+macad|Arg|1|-NoValue-|@{i18n(Arg,##1)}
+macad|textasciitilde|1|-NoValue-|
+macad|emph|1|-NoValue-|##1
+chunk|chunk-firstmathcommand

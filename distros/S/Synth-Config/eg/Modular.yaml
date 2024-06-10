@@ -2,231 +2,225 @@ model: 'Modular'
 patches:
   - patch: 'Simple 000'
     settings:
-      # VCO
       - group: 'oscillator'
-        parameter: 'out'
-        control: 'patch'
-        group_to: 'mixer'
-        param_to: 'in'
-      - group: 'oscillator'
-        parameter: 'range'
-        control: 'knob'
-        value: 8
-        unit: "'"
-      - group: 'oscillator'
-        parameter: 'waveform'
-        control: 'switch'
-        value: 'square'
-        unit: ''
-      # MIX
+        parameters:
+          - param: 'out'
+            control: 'patch'
+            group_to: 'mixer'
+            param_to: 'in'
+          - param: 'range'
+            control: 'knob'
+            value: 8
+            unit: "'"
+          - param: 'waveform'
+            control: 'switch'
+            value: 'square'
+            unit: ''
       - group: 'mixer'
-        parameter: 'stereo-out'
-        control: 'patch'
-        group_to: 'audio'
-        param_to: 'stereo-in'
+        parameters:
+          - param: 'stereo-out'
+            control: 'patch'
+            group_to: 'audio'
+            param_to: 'stereo-in'
   - patch: 'Simple 001'
     settings:
-      # SEQ
       - group: 'sequencer / midi'
-        parameter: 'cv-out'
-        control: 'patch'
-        group_to: 'oscillator'
-        param_to: 'mod-in'
-      # VCO
+        parameters:
+          - param: 'cv-out'
+            control: 'patch'
+            group_to: 'oscillator'
+            param_to: 'mod-in'
       - group: 'oscillator'
-        parameter: 'out'
-        control: 'patch'
-        group_to: 'mixer'
-        param_to: 'in'
-      - group: 'oscillator'
-        parameter: 'range'
-        control: 'knob'
-        value: 8
-        unit: "'"
-      # MIX
+        parameters:
+          - param: 'out'
+            control: 'patch'
+            group_to: 'mixer'
+            param_to: 'in'
+          - param: 'range'
+            control: 'knob'
+            value: 8
+            unit: "'"
       - group: 'mixer'
-        parameter: 'stereo-out'
-        control: 'patch'
-        group_to: 'audio'
-        param_to: 'stereo-in'
+        parameters:
+          - param: 'stereo-out'
+            control: 'patch'
+            group_to: 'audio'
+            param_to: 'stereo-in'
   - patch: 'Simple 002'
     settings:
-      # SEQ
       - group: 'sequencer'
-        parameter: 'cv-out'
-        control: 'patch'
-        group_to: 'oscillator'
-        param_to: 'mod-in'
-      # VCO
+        parameters:
+          - param : 'cv-out'
+            control: 'patch'
+            group_to: 'oscillator'
+            param_to: 'mod-in'
       - group: 'oscillator'
-        parameter: 'out'
-        control: 'patch'
-        group_to: 'filter'
-        param_to: 'sig-in'
-      - group: 'oscillator'
-        parameter: 'range'
-        control: 'knob'
-        value: 8
-        unit: "'"
-      # VCF
+        parameters:
+          - param : 'out'
+            control: 'patch'
+            group_to: 'filter'
+            param_to: 'sig-in'
+          - param : 'range'
+            control: 'knob'
+            value: 8
+            unit: "'"
       - group: 'filter'
-        parameter: 'out'
-        control: 'patch'
-        group_to: 'mixer'
-        param_to: 'in'
-      # MIX
+        parameters:
+          - param : 'out'
+            control: 'patch'
+            group_to: 'mixer'
+            param_to: 'in'
       - group: 'mixer'
-        parameter: 'stereo-out'
-        control: 'patch'
-        group_to: 'audio'
-        param_to: 'stereo-in'
+        parameters:
+          - param : 'stereo-out'
+            control: 'patch'
+            group_to: 'audio'
+            param_to: 'stereo-in'
   - patch: 'Simple 003'
     settings:
-      # SEQ
       - group: 'sequencer'
-        parameter: 'cv-out'
-        control: 'patch'
-        group_to: 'oscillator'
-        param_to: 'mod-in'
-      # VCO
+        parameters:
+          - param : 'cv-out'
+            control: 'patch'
+            group_to: 'oscillator'
+            param_to: 'mod-in'
       - group: 'oscillator'
-        parameter: 'out'
-        control: 'patch'
-        group_to: 'filter'
-        param_to: 'sig-in'
-      - group: 'oscillator'
-        parameter: 'range'
-        control: 'knob'
-        value: 8
-        unit: "'"
-      # LFO
+        parameters:
+          - param : 'out'
+            control: 'patch'
+            group_to: 'filter'
+            param_to: 'sig-in'
+          - param : 'range'
+            control: 'knob'
+            value: 8
+            unit: "'"
       - group: 'lfo'
-        parameter: 'out'
-        control: 'patch'
-        group_to: 'filter'
-        param_to: 'mod-in'
+        parameters:
+          - param : 'out'
+            control: 'patch'
+            group_to: 'filter'
+            param_to: 'mod-in'
       - group: 'filter'
-        parameter: 'out'
-        control: 'patch'
-        group_to: 'mixer'
-        param_to: 'in'
-      # MIX
+        parameters:
+          - param : 'out'
+            control: 'patch'
+            group_to: 'mixer'
+            param_to: 'in'
       - group: 'mixer'
-        parameter: 'stereo-out'
-        control: 'patch'
-        group_to: 'audio'
-        param_to: 'stereo-in'
+        parameters:
+          - param : 'stereo-out'
+            control: 'patch'
+            group_to: 'audio'
+            param_to: 'stereo-in'
   - patch: 'Simple 004'
     settings:
-      # SEQ
       - group: 'sequencer'
-        parameter: 'cv-out'
-        control: 'patch'
-        group_to: 'oscillator'
-        param_to: 'mod-in'
-      - group: 'sequencer'
-        parameter: 'trig-out'
-        control: 'patch'
-        group_to: 'envelope'
-        param_to: 'gate-in'
-      # ENV
+        parameters:
+          - param : 'cv-out'
+            control: 'patch'
+            group_to: 'oscillator'
+            param_to: 'mod-in'
+          - param : 'trig-out'
+            control: 'patch'
+            group_to: 'envelope'
+            param_to: 'gate-in'
       - group: 'envelope'
-        parameter: 'env-out'
-        control: 'patch'
-        group_to: 'amplifier'
-        param_to: 'mod-in'
-      - group: 'envelope'
-        parameter: 'attack'
-        control: 'slider'
-        value: 2
-        unit: '%'
-      - group: 'envelope'
-        parameter: 'decay'
-        control: 'slider'
-        value: 4
-        unit: '%'
-      - group: 'envelope'
-        parameter: 'sustain'
-        control: 'slider'
-        value: 9
-        unit: '%'
-      - group: 'envelope'
-        parameter: 'release'
-        control: 'slider'
-        value: 8.5
-        unit: '%'
-      # VCO
+        parameters:
+          - param : 'env-out'
+            control: 'patch'
+            group_to: 'amplifier'
+            param_to: 'mod-in'
+          - param : 'attack'
+            control: 'slider'
+            value: 2
+            unit: '%'
+          - param : 'decay'
+            control: 'slider'
+            value: 4
+            unit: '%'
+          - param : 'sustain'
+            control: 'slider'
+            value: 9
+            unit: '%'
+          - param : 'release'
+            control: 'slider'
+            value: 8.5
+            unit: '%'
       - group: 'oscillator'
-        parameter: 'out'
-        control: 'patch'
-        group_to: 'amplifier'
-        param_to: 'sig-in'
-      - group: 'oscillator'
-        parameter: 'range'
-        control: 'knob'
-        value: 8
-        unit: "'"
-      # VCA
+        parameters:
+          - param : 'out'
+            control: 'patch'
+            group_to: 'amplifier'
+            param_to: 'sig-in'
+          - param : 'range'
+            control: 'knob'
+            value: 8
+            unit: "'"
       - group: 'amplifier'
-        parameter: 'out'
-        control: 'patch'
-        group_to: 'mixer'
-        param_to: 'in'
-      - group: 'amplifier'
-        parameter: 'gain'
-        control: 'knob'
-        value: 40
-        unit: '%'
-      # MIX
+        parameters:
+          - param : 'out'
+            control: 'patch'
+            group_to: 'mixer'
+            param_to: 'in'
+          - param : 'gain'
+            control: 'knob'
+            value: 40
+            unit: '%'
       - group: 'mixer'
-        parameter: 'stereo-out'
-        control: 'patch'
-        group_to: 'audio'
-        param_to: 'stereo-in'
-      - group: 'mixer'
-        parameter: 'volume'
-        control: 'slider'
-        value: 80
-        unit: '%'
+        parameters:
+          - param : 'stereo-out'
+            control: 'patch'
+            group_to: 'audio'
+            param_to: 'stereo-in'
+          - param : 'volume'
+            control: 'slider'
+            value: 80
+            unit: '%'
   - patch: 'Simple 005'
     settings:
       - group: 'SEQ'
-        parameter: 'cv-out'
-        control: 'patch'
-        group_to: 'VCO'
-        param_to: 'mod-in'
-      - group: 'SEQ'
-        parameter: 'trig-out'
-        control: 'patch'
-        group_to: 'ENV'
-        param_to: 'gate-in'
+        parameters:
+          - param : 'cv-out'
+            control: 'patch'
+            group_to: 'VCO'
+            param_to: 'mod-in'
+          - param : 'trig-out'
+            control: 'patch'
+            group_to: 'ENV'
+            param_to: 'gate-in'
       - group: 'ENV'
-        parameter: 'env-out'
-        control: 'patch'
-        group_to: 'VCA'
-        param_to: 'mod-in'
+        parameters:
+          - param : 'env-out'
+            control: 'patch'
+            group_to: 'VCA'
+            param_to: 'mod-in'
       - group: 'VCO'
-        parameter: 'out'
-        control: 'patch'
-        group_to: 'VCF'
-        param_to: 'sig-in'
+        parameters:
+          - param : 'out'
+            control: 'patch'
+            group_to: 'VCF'
+            param_to: 'sig-in'
       - group: 'LFO'
-        parameter: 'out'
-        control: 'patch'
-        group_to: 'VCF'
-        param_to: 'mod-in'
+        parameters:
+          - param : 'out'
+            control: 'patch'
+            group_to: 'VCF'
+            param_to: 'mod-in'
       - group: 'VCF'
-        parameter: 'out'
-        control: 'patch'
-        group_to: 'VCA'
-        param_to: 'in'
+        parameters:
+          - param : 'out'
+            control: 'patch'
+            group_to: 'VCA'
+            param_to: 'in'
       - group: 'VCA'
-        parameter: 'out'
-        control: 'patch'
-        group_to: 'MIX'
-        param_to: 'in'
+        parameters:
+          - param : 'out'
+            control: 'patch'
+            group_to: 'MIX'
+            param_to: 'in'
       - group: 'MIX'
-        parameter: 'stereo-out'
-        control: 'patch'
-        group_to: 'audio'
-        param_to: 'stereo-in'
+        parameters:
+          - param : 'stereo-out'
+            control: 'patch'
+            group_to: 'audio'
+            param_to: 'stereo-in'

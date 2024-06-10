@@ -19,7 +19,7 @@ my %module_build_args = (
     "Patrick Joly <patjol\@cpan.org>"
   ],
   "dist_name" => "Geo-FIT",
-  "dist_version" => "1.11",
+  "dist_version" => "1.12",
   "license" => "perl",
   "module_name" => "Geo::FIT",
   "recursive_test_files" => 1,
@@ -27,7 +27,7 @@ my %module_build_args = (
     "Clone" => 0,
     "HTML::Entities" => 0,
     "IPC::System::Simple" => "1.30",
-    "perl" => "5.008"
+    "perl" => "5.010"
   },
   "script_files" => [
     "script/fit2tcx.pl",

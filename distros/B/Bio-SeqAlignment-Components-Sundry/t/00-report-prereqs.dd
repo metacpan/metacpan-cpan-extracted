@@ -1,0 +1,48 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'perl' => '5.006'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Bio::SeqAlignment::Examples::TailingPolyester::PDLRNG' => '0',
+                                      'Bio::SeqAlignment::Examples::TailingPolyester::SimulatePDLGSL' => '0',
+                                      'BioX::Seq' => '0',
+                                      'BioX::Seq::Stream' => '0',
+                                      'Carp' => '0',
+                                      'Data::MessagePack' => '0',
+                                      'Exporter' => '0',
+                                      'File::Basename' => '0',
+                                      'File::Spec' => '0',
+                                      'JSON' => '0',
+                                      'PDL::Lite' => '0',
+                                      'YAML::Tiny' => '0',
+                                      'constant' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

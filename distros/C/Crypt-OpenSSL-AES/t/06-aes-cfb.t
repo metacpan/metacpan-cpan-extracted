@@ -2,8 +2,14 @@ use strict;
 use warnings;
 use Test::More tests => 16;
 use MIME::Base64 qw/encode_base64 decode_base64/;
+use Crypt::OpenSSL::Guess qw/openssl_version/;
+
+my ($major, $minor, $patch) = openssl_version();
 
 BEGIN { use_ok('Crypt::OpenSSL::AES') };
+
+SKIP: {
+        skip "CFB Cipher unsupported - OpenSSL $major$minor", 15 if $major le '0.9' && $minor le '7';
 
 # key = substr(sha512_256_hex(rand(1000)), 0, ($ks/4));
 my %key = (
@@ -71,5 +77,6 @@ foreach my $ks (@keysize) {
         };
         like($@, qr//, "Match of keysize ($ks) and cipher ($iks)");
     }
+}
 }
 done_testing;

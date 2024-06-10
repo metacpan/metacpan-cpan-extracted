@@ -2,11 +2,16 @@ use strict;
 use warnings;
 use Test::More tests => 3;
 use Digest::SHA qw(sha256 sha256_base64);
+use Crypt::OpenSSL::Guess qw(openssl_version);
+
+my ($major, $minor, $patch) = openssl_version();
 
 BEGIN { use_ok('Crypt::OpenSSL::AES') };
 
 {
 
+SKIP: {
+    skip "IVs unsupported - OpenSSL $major$minor", 2 if $major le '0.9' && $minor le '7';
     my $key = 'fe004cb16d14814b71e2c0e7c52f0c1d20fecdbca37bce926c6fc46de7f58ad5';
     my $iv = 'bb160a0e845bf36fe92310ba368c0d60';
 
@@ -33,6 +38,7 @@ BEGIN { use_ok('Crypt::OpenSSL::AES') };
 
     # Verify Crypt::OpenSSL::AES and Decrypt its Encryption
     ok($checksum_orig eq sha256_base64($plaintext), "Crypt::OpenSSL::AES Encrypted and Decrypted Successfully");
+}
 
 }
 

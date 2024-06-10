@@ -15,7 +15,7 @@ do { my $x = {
                                       'Clone' => '0',
                                       'HTML::Entities' => '0',
                                       'IPC::System::Simple' => '1.30',
-                                      'perl' => '5.008'
+                                      'perl' => '5.010'
                                     }
                     },
        'test' => {

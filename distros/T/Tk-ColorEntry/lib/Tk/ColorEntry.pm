@@ -3,7 +3,7 @@ package Tk::ColorEntry;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.07';
 use Tk;
 
 use base qw(Tk::Derived Tk::Frame);
@@ -14,7 +14,7 @@ require Tk::PopColor;
 
 =head1 NAME
 
-Tk::ColorEntry - Entry widget with a Tk::PopColor widget attached.
+Tk::ColorEntry - Entry widget with a color selection facilities.
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ Callback to be executed when a color is selected. The color is given as paramete
 
 =item Switch: B<-entryerrorcolor>
 
-Default value '#FF0000'. Foreground color of the entry
+Default value '#FF0000' (red). Foreground color of the entry
 when it's content is not a valid color.
 
 =item Switch: B<-indborderwidth>
@@ -56,13 +56,9 @@ Default value 4. Width of the indicator label.
 
 Default value 'sunken'. Relief of the indicator label.
 
-=item Switch: B<-popborderwidth>
+=item Switch: B<-popcolor>
 
-Default value 1. Borderwidth of the ColorPop widget.
-
-=item Switch: B<-poprelief>
-
-Default value 'raised'. Relief of the ColorPop widget.
+Sets and returns the reference to the PopColor widget to be used.
 
 =item Switch: B<-variable>
 
@@ -92,6 +88,7 @@ sub Populate {
 	);
 	my $indicator = $self->Label->pack(
 		-side => 'left',
+		-fill => 'y',
 		-padx => 2,
 # 		-pady => 2,
 	);
@@ -120,18 +117,9 @@ sub Populate {
 		-entryforeground => ['PASSIVE', undef, undef, $self->Subwidget('Entry')->cget('-foreground')],
 		-font => [$entry],
 		-foreground => [$entry],
-		-indborderwidth => [{
-			-borderwidth => $indicator,
-			-indborderwidth => $pop,
-		}, undef, undef, 2],
-		-indicatorwidth => [{
-			-width => $indicator,
-			-indicatorwidth => $pop,
-		}, undef, undef, 4],
-		-indrelief => [{
-			-relief => $indicator,
-			-indrelief => $pop,
-		}, undef, undef, 'sunken'],
+		-indborderwidth => [{-borderwidth => $indicator}, undef, undef, 2],
+		-indicatorwidth => [{-width => $indicator}, undef, undef, 4],
+		-indrelief => [{-relief => $indicator}, undef, undef, 'sunken'],
 		-justify => [$entry],
 		-popborderwidth => [{-borderwidth => $pop}, undef, undef, 1],
 		-popcolor => ['PASSIVE', undef, undef, $pop],
@@ -277,6 +265,18 @@ Hans Jeuken (hanje at cpan dot org)
 =head1 BUGS
 
 Unknown. If you find any, please contact the author.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Tk::Poplevel>
+
+=item L<Tk::PopColor>
+
+=item L<Tk::ColorPicker>
+
+=back
 
 =cut
 

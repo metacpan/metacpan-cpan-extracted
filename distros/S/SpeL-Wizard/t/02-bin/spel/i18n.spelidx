@@ -1,0 +1,6 @@
+format|ogg
+audiodir|spel
+chunkdir|spel
+language|english
+macad|numpower|2|-NoValue-|preceding ##1 @{i18n(Power,##2)} trailing
+chunk|i18n

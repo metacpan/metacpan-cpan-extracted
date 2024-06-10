@@ -13,7 +13,7 @@ WriteMakefile(
 		'Imager::Screenshot' => '0.014',
 		'Test::Tk' => '3.03',
 		'Tk' => '804.030',
-		'Tk::PopList' => '0.08',
+		'Tk::PopList' => '0.09',
 	},
 	ABSTRACT_FROM => "lib/Tk/$pm.pm",
 	VERSION_FROM => "lib/Tk/$pm.pm",

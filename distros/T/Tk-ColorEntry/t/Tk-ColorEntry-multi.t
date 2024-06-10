@@ -26,26 +26,17 @@ if (defined $app) {
 	)->pack(
 		-fill => 'both',
 	);
-#	$entry = $frame->ColorEntry(
-#		-balloon => $balloon,
-#		-command => sub { $l->configure(-background => shift) },
-#		-depthselect => 1,
-#		-indicatorwidth => 4,
-#		-historyfile => 't/colorentry_history',
-#	)->pack(
-#		-fill => 'x',
-#	);
 	$pop = $app->PopColor(
 		-depthselect => 1,
-		-widget => '',
+		-historyfile => 't/colorentry_history',
 	);
 	for (1 .. 25) {
 		my $e = $frame->ColorEntry(
 			-balloon => $balloon,
 			-command => sub { $l->configure(-background => shift) },
 #			-depthselect => 1,
-			-indicatorwidth => 4,
-			-historyfile => 't/colorentry_history',
+#			-historyfile => 't/colorentry_history',
+#			-indicatorwidth => 16,
 			-popcolor => $pop,
 		)->pack(
 			-fill => 'x',

@@ -53,7 +53,10 @@ if ($Config{myuname} =~ /sunos|solaris/i) {
   if ($Config{PERL_VERSION} <= 24) {
     $args{LIBS} = [openssl_lib_paths() . ' -leay32'];
   }
+} elsif ($Config{myuname} =~ /darwin/ ) {
+  $args{LDDLFLAGS} = openssl_lib_paths() . " " . $Config{lddlflags};
 } else {
+  $args{LDDLFLAGS} = openssl_lib_paths() . " " . $Config{lddlflags};
   $args{OPTIMIZE} = $cc_option_flags;
 }
 
@@ -80,7 +83,7 @@ my %WriteMakefileArgs = (
     "Crypt::OpenSSL::RSA" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.25",
+  "VERSION" => "0.26",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,0 +1,397 @@
+$tex = bless( {
+  'path' => 't/01-lib/SpeL/Parser/Chunk',
+  'tree' => bless( {
+    'ElementList' => bless( {
+      'Element' => [
+        bless( {
+          'MathUnit' => [
+            bless( {
+              '' => '\\ds \\frac{z_1}{z_2} & \\ds = \\frac{x_1 + y_1 \\jz}{x_2 + y_2 \\jz} ',
+              'Left' => bless( {
+                'Component' => bless( {
+                  'Name' => 'ds',
+                  'trailingws' => ' '
+                }, 'SpeL::Object::Command' ),
+                'Rest' => bless( {
+                  'Op' => bless( {
+                    'Op' => ''
+                  }, 'SpeL::Object::Binop' ),
+                  'Remainder' => bless( {
+                    'Component' => bless( {
+                      'den' => bless( {
+                        'Component' => bless( {
+                          'Alphabet' => 'z',
+                          'trailingws' => ''
+                        }, 'SpeL::Object::Variable' ),
+                        'Rest' => bless( {
+                          'Op' => bless( {
+                            'Lit' => '2',
+                            'sub' => '_'
+                          }, 'SpeL::Object::Subscript' ),
+                          'Remainder' => bless( {
+                            'ws' => ''
+                          }, 'SpeL::Object::Expressionrest' )
+                        }, 'SpeL::Object::Expressionrest' )
+                      }, 'SpeL::Object::Expression' ),
+                      'num' => bless( {
+                        'Component' => bless( {
+                          'Alphabet' => 'z',
+                          'trailingws' => ''
+                        }, 'SpeL::Object::Variable' ),
+                        'Rest' => bless( {
+                          'Op' => bless( {
+                            'Lit' => '1',
+                            'sub' => '_'
+                          }, 'SpeL::Object::Subscript' ),
+                          'Remainder' => bless( {
+                            'ws' => ''
+                          }, 'SpeL::Object::Expressionrest' )
+                        }, 'SpeL::Object::Expressionrest' )
+                      }, 'SpeL::Object::Expression' )
+                    }, 'SpeL::Object::Fraction' ),
+                    'Rest' => bless( {
+                      'ws' => ''
+                    }, 'SpeL::Object::Expressionrest' )
+                  }, 'SpeL::Object::Expression' )
+                }, 'SpeL::Object::Expressionrest' )
+              }, 'SpeL::Object::Expression' ),
+              'RelationChain' => [
+                {
+                  'RelOperator' => bless( {
+                    '' => '&'
+                  }, 'SpeL::Object::RelOperator' ),
+                  'Right' => bless( {
+                    'Component' => bless( {
+                      'Name' => 'ds',
+                      'trailingws' => ' '
+                    }, 'SpeL::Object::Command' ),
+                    'Rest' => bless( {
+                      'ws' => ''
+                    }, 'SpeL::Object::Expressionrest' )
+                  }, 'SpeL::Object::Expression' )
+                },
+                {
+                  'RelOperator' => bless( {
+                    '' => '='
+                  }, 'SpeL::Object::RelOperator' ),
+                  'Right' => bless( {
+                    'Component' => bless( {
+                      'den' => bless( {
+                        'Component' => bless( {
+                          'Alphabet' => 'x',
+                          'trailingws' => ''
+                        }, 'SpeL::Object::Variable' ),
+                        'Rest' => bless( {
+                          'Op' => bless( {
+                            'Lit' => '2',
+                            'sub' => '_'
+                          }, 'SpeL::Object::Subscript' ),
+                          'Remainder' => bless( {
+                            'Op' => bless( {
+                              'Op' => '+'
+                            }, 'SpeL::Object::Binop' ),
+                            'Remainder' => bless( {
+                              'Component' => bless( {
+                                'Alphabet' => 'y',
+                                'trailingws' => ''
+                              }, 'SpeL::Object::Variable' ),
+                              'Rest' => bless( {
+                                'Op' => bless( {
+                                  'Lit' => '2',
+                                  'sub' => '_'
+                                }, 'SpeL::Object::Subscript' ),
+                                'Remainder' => bless( {
+                                  'Op' => bless( {
+                                    'Op' => ''
+                                  }, 'SpeL::Object::Binop' ),
+                                  'Remainder' => bless( {
+                                    'Component' => bless( {
+                                      'Name' => 'jz',
+                                      'trailingws' => ''
+                                    }, 'SpeL::Object::Command' ),
+                                    'Rest' => bless( {
+                                      'ws' => ''
+                                    }, 'SpeL::Object::Expressionrest' )
+                                  }, 'SpeL::Object::Expression' )
+                                }, 'SpeL::Object::Expressionrest' )
+                              }, 'SpeL::Object::Expressionrest' )
+                            }, 'SpeL::Object::Expression' )
+                          }, 'SpeL::Object::Expressionrest' )
+                        }, 'SpeL::Object::Expressionrest' )
+                      }, 'SpeL::Object::Expression' ),
+                      'num' => bless( {
+                        'Component' => bless( {
+                          'Alphabet' => 'x',
+                          'trailingws' => ''
+                        }, 'SpeL::Object::Variable' ),
+                        'Rest' => bless( {
+                          'Op' => bless( {
+                            'Lit' => '1',
+                            'sub' => '_'
+                          }, 'SpeL::Object::Subscript' ),
+                          'Remainder' => bless( {
+                            'Op' => bless( {
+                              'Op' => '+'
+                            }, 'SpeL::Object::Binop' ),
+                            'Remainder' => bless( {
+                              'Component' => bless( {
+                                'Alphabet' => 'y',
+                                'trailingws' => ''
+                              }, 'SpeL::Object::Variable' ),
+                              'Rest' => bless( {
+                                'Op' => bless( {
+                                  'Lit' => '1',
+                                  'sub' => '_'
+                                }, 'SpeL::Object::Subscript' ),
+                                'Remainder' => bless( {
+                                  'Op' => bless( {
+                                    'Op' => ''
+                                  }, 'SpeL::Object::Binop' ),
+                                  'Remainder' => bless( {
+                                    'Component' => bless( {
+                                      'Name' => 'jz',
+                                      'trailingws' => ''
+                                    }, 'SpeL::Object::Command' ),
+                                    'Rest' => bless( {
+                                      'ws' => ''
+                                    }, 'SpeL::Object::Expressionrest' )
+                                  }, 'SpeL::Object::Expression' )
+                                }, 'SpeL::Object::Expressionrest' )
+                              }, 'SpeL::Object::Expressionrest' )
+                            }, 'SpeL::Object::Expression' )
+                          }, 'SpeL::Object::Expressionrest' )
+                        }, 'SpeL::Object::Expressionrest' )
+                      }, 'SpeL::Object::Expression' )
+                    }, 'SpeL::Object::Fraction' ),
+                    'Rest' => bless( {
+                      'ws' => ''
+                    }, 'SpeL::Object::Expressionrest' )
+                  }, 'SpeL::Object::Expression' )
+                }
+              ]
+            }, 'SpeL::Object::Relation' ),
+            bless( {
+              'RelationChain' => [
+                {
+                  'RelOperator' => bless( {
+                    '' => '&'
+                  }, 'SpeL::Object::RelOperator' ),
+                  'Right' => bless( {
+                    'Component' => bless( {
+                      'Name' => 'ds',
+                      'trailingws' => ' '
+                    }, 'SpeL::Object::Command' ),
+                    'Rest' => bless( {
+                      'ws' => ''
+                    }, 'SpeL::Object::Expressionrest' )
+                  }, 'SpeL::Object::Expression' )
+                },
+                {
+                  'RelOperator' => bless( {
+                    '' => '='
+                  }, 'SpeL::Object::RelOperator' ),
+                  'Right' => bless( {
+                    'Component' => bless( {
+                      'den' => bless( {
+                        'Component' => bless( {
+                          'Alphabet' => 'x',
+                          'trailingws' => ''
+                        }, 'SpeL::Object::Variable' ),
+                        'Rest' => bless( {
+                          'Op' => bless( {
+                            'Lit' => '2',
+                            'sub' => '_'
+                          }, 'SpeL::Object::Subscript' ),
+                          'Remainder' => bless( {
+                            'Op' => bless( {
+                              'Op' => '+'
+                            }, 'SpeL::Object::Binop' ),
+                            'Remainder' => bless( {
+                              'Component' => bless( {
+                                'Alphabet' => 'y',
+                                'trailingws' => ''
+                              }, 'SpeL::Object::Variable' ),
+                              'Rest' => bless( {
+                                'Op' => bless( {
+                                  'Lit' => '2',
+                                  'sub' => '_'
+                                }, 'SpeL::Object::Subscript' ),
+                                'Remainder' => bless( {
+                                  'Op' => bless( {
+                                    'Op' => ''
+                                  }, 'SpeL::Object::Binop' ),
+                                  'Remainder' => bless( {
+                                    'Component' => bless( {
+                                      'Name' => 'jz',
+                                      'trailingws' => ''
+                                    }, 'SpeL::Object::Command' ),
+                                    'Rest' => bless( {
+                                      'ws' => ''
+                                    }, 'SpeL::Object::Expressionrest' )
+                                  }, 'SpeL::Object::Expression' )
+                                }, 'SpeL::Object::Expressionrest' )
+                              }, 'SpeL::Object::Expressionrest' )
+                            }, 'SpeL::Object::Expression' )
+                          }, 'SpeL::Object::Expressionrest' )
+                        }, 'SpeL::Object::Expressionrest' )
+                      }, 'SpeL::Object::Expression' ),
+                      'num' => bless( {
+                        'Component' => bless( {
+                          'Alphabet' => 'x',
+                          'trailingws' => ''
+                        }, 'SpeL::Object::Variable' ),
+                        'Rest' => bless( {
+                          'Op' => bless( {
+                            'Lit' => '1',
+                            'sub' => '_'
+                          }, 'SpeL::Object::Subscript' ),
+                          'Remainder' => bless( {
+                            'Op' => bless( {
+                              'Op' => '+'
+                            }, 'SpeL::Object::Binop' ),
+                            'Remainder' => bless( {
+                              'Component' => bless( {
+                                'Alphabet' => 'y',
+                                'trailingws' => ''
+                              }, 'SpeL::Object::Variable' ),
+                              'Rest' => bless( {
+                                'Op' => bless( {
+                                  'Lit' => '1',
+                                  'sub' => '_'
+                                }, 'SpeL::Object::Subscript' ),
+                                'Remainder' => bless( {
+                                  'Op' => bless( {
+                                    'Op' => ''
+                                  }, 'SpeL::Object::Binop' ),
+                                  'Remainder' => bless( {
+                                    'Component' => bless( {
+                                      'Name' => 'jz',
+                                      'trailingws' => ''
+                                    }, 'SpeL::Object::Command' ),
+                                    'Rest' => bless( {
+                                      'ws' => ''
+                                    }, 'SpeL::Object::Expressionrest' )
+                                  }, 'SpeL::Object::Expression' )
+                                }, 'SpeL::Object::Expressionrest' )
+                              }, 'SpeL::Object::Expressionrest' )
+                            }, 'SpeL::Object::Expression' )
+                          }, 'SpeL::Object::Expressionrest' )
+                        }, 'SpeL::Object::Expressionrest' )
+                      }, 'SpeL::Object::Expression' )
+                    }, 'SpeL::Object::Fraction' ),
+                    'Rest' => bless( {
+                      'Op' => bless( {
+                        'Op' => '\\cdot'
+                      }, 'SpeL::Object::Binop' ),
+                      'Remainder' => bless( {
+                        'Component' => bless( {
+                          'den' => bless( {
+                            'Component' => bless( {
+                              'Alphabet' => 'x',
+                              'trailingws' => ''
+                            }, 'SpeL::Object::Variable' ),
+                            'Rest' => bless( {
+                              'Op' => bless( {
+                                'Lit' => '2',
+                                'sub' => '_'
+                              }, 'SpeL::Object::Subscript' ),
+                              'Remainder' => bless( {
+                                'Op' => bless( {
+                                  'Op' => '-'
+                                }, 'SpeL::Object::Binop' ),
+                                'Remainder' => bless( {
+                                  'Component' => bless( {
+                                    'Alphabet' => 'y',
+                                    'trailingws' => ''
+                                  }, 'SpeL::Object::Variable' ),
+                                  'Rest' => bless( {
+                                    'Op' => bless( {
+                                      'Lit' => '2',
+                                      'sub' => '_'
+                                    }, 'SpeL::Object::Subscript' ),
+                                    'Remainder' => bless( {
+                                      'Op' => bless( {
+                                        'Op' => ''
+                                      }, 'SpeL::Object::Binop' ),
+                                      'Remainder' => bless( {
+                                        'Component' => bless( {
+                                          'Name' => 'jz',
+                                          'trailingws' => ''
+                                        }, 'SpeL::Object::Command' ),
+                                        'Rest' => bless( {
+                                          'ws' => ''
+                                        }, 'SpeL::Object::Expressionrest' )
+                                      }, 'SpeL::Object::Expression' )
+                                    }, 'SpeL::Object::Expressionrest' )
+                                  }, 'SpeL::Object::Expressionrest' )
+                                }, 'SpeL::Object::Expression' )
+                              }, 'SpeL::Object::Expressionrest' )
+                            }, 'SpeL::Object::Expressionrest' )
+                          }, 'SpeL::Object::Expression' ),
+                          'num' => bless( {
+                            'Component' => bless( {
+                              'Alphabet' => 'x',
+                              'trailingws' => ''
+                            }, 'SpeL::Object::Variable' ),
+                            'Rest' => bless( {
+                              'Op' => bless( {
+                                'Lit' => '2',
+                                'sub' => '_'
+                              }, 'SpeL::Object::Subscript' ),
+                              'Remainder' => bless( {
+                                'Op' => bless( {
+                                  'Op' => '-'
+                                }, 'SpeL::Object::Binop' ),
+                                'Remainder' => bless( {
+                                  'Component' => bless( {
+                                    'Alphabet' => 'y',
+                                    'trailingws' => ''
+                                  }, 'SpeL::Object::Variable' ),
+                                  'Rest' => bless( {
+                                    'Op' => bless( {
+                                      'Lit' => '2',
+                                      'sub' => '_'
+                                    }, 'SpeL::Object::Subscript' ),
+                                    'Remainder' => bless( {
+                                      'Op' => bless( {
+                                        'Op' => ''
+                                      }, 'SpeL::Object::Binop' ),
+                                      'Remainder' => bless( {
+                                        'Component' => bless( {
+                                          'Name' => 'jz',
+                                          'trailingws' => ''
+                                        }, 'SpeL::Object::Command' ),
+                                        'Rest' => bless( {
+                                          'ws' => ''
+                                        }, 'SpeL::Object::Expressionrest' )
+                                      }, 'SpeL::Object::Expression' )
+                                    }, 'SpeL::Object::Expressionrest' )
+                                  }, 'SpeL::Object::Expressionrest' )
+                                }, 'SpeL::Object::Expression' )
+                              }, 'SpeL::Object::Expressionrest' )
+                            }, 'SpeL::Object::Expressionrest' )
+                          }, 'SpeL::Object::Expression' )
+                        }, 'SpeL::Object::Fraction' ),
+                        'Rest' => bless( {
+                          'ws' => ''
+                        }, 'SpeL::Object::Expressionrest' )
+                      }, 'SpeL::Object::Expression' )
+                    }, 'SpeL::Object::Expressionrest' )
+                  }, 'SpeL::Object::Expression' )
+                }
+              ]
+            }, 'SpeL::Object::Relation' )
+          ],
+          'mathtag' => 'align',
+          'trailingws' => '
+'
+        }, 'SpeL::Object::MathEnvironment' ),
+        bless( {
+          '' => '
+'
+        }, 'SpeL::Object::TokenSequence' )
+      ]
+    }, 'SpeL::Object::ElementList' )
+  }, 'SpeL::Object::Document' )
+}, 'SpeL::Parser::Chunk' );
+

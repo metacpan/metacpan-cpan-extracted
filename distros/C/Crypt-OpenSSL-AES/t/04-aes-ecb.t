@@ -2,6 +2,9 @@ use strict;
 use warnings;
 use Test::More tests => 24;
 use MIME::Base64 qw/encode_base64 decode_base64/;
+use Crypt::OpenSSL::Guess qw(openssl_version);
+
+my ($major, $minor, $patch) = openssl_version();
 
 BEGIN { use_ok('Crypt::OpenSSL::AES') };
 
@@ -46,11 +49,13 @@ my %encrypted = (
                 );
 
 my @keysize = ("128", "192", "256");
+
 foreach my $ks (@keysize) {
     foreach my $padding (0..1) {
+SKIP: {
+        skip "Padding unsupported - OpenSSL $major$minor", 2 if $padding == 1 && $major le '0.9' && $minor le '7';
         my $msg = $padding ? "Padding" : "No Padding";
 
-        {
             my $coa = Crypt::OpenSSL::AES->new(pack("H*", $key{$ks}),
                                         {
                                         cipher  => "AES-$ks-ECB",
@@ -62,15 +67,16 @@ foreach my $ks (@keysize) {
 
             $plaintext = $coa->decrypt(decode_base64($encrypted{$ks}[$padding]));
             ok($plaintext eq "Hello World. 123", "Crypt::Mode::ECB ($ks $msg) - Decrypted with Crypt::OpenSSL::AES");
-        }
+    }
     }
 }
-
 foreach my $ks (@keysize) {
     my $padding = 1;
     my $msg = $padding ? "Padding" : "No Padding";
     foreach my $iks (@keysize) {
         next if ($ks eq $iks);
+SKIP: {
+        skip "Padding unsupported - OpenSSL $major$minor", 1 if $major le '0.9' && $minor le '7';
         my $coa;
         eval {
             $coa = Crypt::OpenSSL::AES->new(pack("H*", $key{$ks}),
@@ -81,8 +87,11 @@ foreach my $ks (@keysize) {
         };
         like($@, qr/unsupported cipher for this keysize/, "Mismatch of keysize ($ks) and cipher ($iks)");
     }
+    }
     foreach my $iks (@keysize) {
         next if ($ks ne $iks);
+SKIP: {
+        skip "Padding unsupported - OpenSSL $major$minor", 1 if $major le '0.9' && $minor le '7';
         my $coa;
         eval {
             $coa = Crypt::OpenSSL::AES->new(pack("H*", $key{$ks}),
@@ -93,5 +102,6 @@ foreach my $ks (@keysize) {
         };
         like($@, qr//, "Match of keysize ($ks) and cipher ($iks)");
     }
+}
 }
 done_testing;

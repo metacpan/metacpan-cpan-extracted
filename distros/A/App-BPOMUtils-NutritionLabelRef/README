@@ -3,7 +3,7 @@ NAME
     nutrition label reference (ALG, acuan label gizi)
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     App::BPOMUtils::NutritionLabelRef (from Perl distribution
     App-BPOMUtils-NutritionLabelRef), released on 2024-05-30.
 

@@ -1,0 +1,7 @@
+format|ogg
+audiodir|spel
+chunkdir|spel
+language|english
+macad|jz|-NoValue-|-NoValue-|,j,
+macad|leadsto|-NoValue-|-NoValue-|@{i18n(Assoc)}
+chunk|leadsto

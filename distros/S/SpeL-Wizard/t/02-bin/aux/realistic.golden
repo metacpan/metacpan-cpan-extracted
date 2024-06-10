@@ -1,0 +1,29 @@
+$auxDB = {
+  'bibcite' => {
+    'ADOBEREADER' => '8',
+    'BALABOLKA' => '2',
+    'CPAN' => '4',
+    'CTAN' => '3',
+    'EVINCE' => '6',
+    'FESTIVAL' => '1',
+    'OKULAR' => '7',
+    'XPDF' => '5'
+  },
+  'newlabel' => {
+    'eqn:refray' => [
+      '17',
+      '13',
+      'A parabola tale',
+      'equation.6.17',
+      ''
+    ],
+    'fig:blockdiagram' => [
+      '1',
+      '12',
+      'A block diagram of the filter system',
+      'figure.1',
+      ''
+    ]
+  }
+};
+

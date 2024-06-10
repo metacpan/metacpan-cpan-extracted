@@ -1,3 +1,7 @@
+0.007003 2024-06-10
+  [Requrement Changes]
+    * Require SPVM::Sys 0.523.
+  
 0.007002 2023-12-07
   [Requrement Changes]
     * Require SPVM::Sys 0.510.

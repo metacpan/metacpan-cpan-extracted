@@ -1,0 +1,23 @@
+0.004   2024-06-10  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Sah-Schema{s,Bundle}-* for consistency with
+          others.
+
+
+0.003   2023-12-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Explain difference between code_from_str and str_or_code.
+
+
+0.002   2023-09-05  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Fix Abstract of Data/Sah/Filter/perl/Code/eval.pm.
+
+
+0.001   2023-09-03  Released-By: PERLANCAR
+
+        - First release.

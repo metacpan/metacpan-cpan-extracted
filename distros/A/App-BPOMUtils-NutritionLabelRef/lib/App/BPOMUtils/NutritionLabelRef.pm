@@ -7,7 +7,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-05-30'; # DATE
 our $DIST = 'App-BPOMUtils-NutritionLabelRef'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_get_nutrition_label_ref
@@ -45,7 +45,9 @@ $SPEC{bpom_get_nutrition_label_ref} = {
             default => 'list_refs',
             cmdline_aliases => {
                 list_nutrients => {is_flag=>1, code=>sub {$_[0]{action}='list_nutrients'}, summary=>'Shortcut for --action=list_nutrients'},
+                n              => {is_flag=>1, code=>sub {$_[0]{action}='list_nutrients'}, summary=>'Shortcut for --action=list_nutrients'},
                 list_groups    => {is_flag=>1, code=>sub {$_[0]{action}='list_groups'   }, summary=>'Shortcut for --action=list_groups'   },
+                g              => {is_flag=>1, code=>sub {$_[0]{action}='list_groups'   }, summary=>'Shortcut for --action=list_groups'   },
             },
         },
         nutrient => {
@@ -145,7 +147,7 @@ App::BPOMUtils::NutritionLabelRef - Get one or more values from BPOM nutrition l
 
 =head1 VERSION
 
-This document describes version 0.002 of App::BPOMUtils::NutritionLabelRef (from Perl distribution App-BPOMUtils-NutritionLabelRef), released on 2024-05-30.
+This document describes version 0.003 of App::BPOMUtils::NutritionLabelRef (from Perl distribution App-BPOMUtils-NutritionLabelRef), released on 2024-05-30.
 
 =head1 SYNOPSIS
 

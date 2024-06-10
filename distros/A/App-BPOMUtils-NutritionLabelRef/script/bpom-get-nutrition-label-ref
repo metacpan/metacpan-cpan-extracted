@@ -13,7 +13,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-05-30'; # DATE
 our $DIST = 'App-BPOMUtils-NutritionLabelRef'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/NutritionLabelRef/bpom_get_nutrition_label_ref",
@@ -41,7 +41,7 @@ bpom-get-nutrition-label-ref - Get one or more values from BPOM nutrition label 
 
 =head1 VERSION
 
-This document describes version 0.002 of bpom-get-nutrition-label-ref (from Perl distribution App-BPOMUtils-NutritionLabelRef), released on 2024-05-30.
+This document describes version 0.003 of bpom-get-nutrition-label-ref (from Perl distribution App-BPOMUtils-NutritionLabelRef), released on 2024-05-30.
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ B<bpom-get-nutrition-label-ref> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--he
 
 B<bpom-get-nutrition-label-ref> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<bpom-get-nutrition-label-ref> [B<L<--action|/"--list-nutrients">>=I<str>|B<L<--list-groups|/"--list-nutrients">>|B<L<--list-nutrients|/"--list-nutrients">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<nutrient|/"--nutrient=s">>] [I<L<group|/"--group=s">>] [I<L<value|/"--value=s">>]
+B<bpom-get-nutrition-label-ref> [B<L<--action|/"-n">>=I<str>|B<L<-g|/"-n">>|B<L<--list-groups|/"-n">>|B<L<--list-nutrients|/"-n">>|B<L<-n|/"-n">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<nutrient|/"--nutrient=s">>] [I<L<group|/"--group=s">>] [I<L<value|/"--value=s">>]
 
 
 
@@ -111,6 +111,18 @@ Can also be specified as the 1st command-line argument.
 
 
 Can also be specified as the 3rd command-line argument.
+
+=item B<-g>
+
+Shortcut for --action=list_groups.
+
+See C<--action>.
+
+=item B<-n>
+
+Shortcut for --action=list_nutrients.
+
+See C<--action>.
 
 =back
 

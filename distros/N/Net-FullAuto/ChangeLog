@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2024-06-09  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000653 released
+
+	* Repaired all-dependencies installer
+
 2024-06-07  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000652 released

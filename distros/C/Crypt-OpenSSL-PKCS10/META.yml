@@ -10,7 +10,7 @@ configure_requires:
   Crypt::OpenSSL::Guess: '0.11'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,7 @@ name: Crypt-OpenSSL-PKCS10
 provides:
   Crypt::OpenSSL::PKCS10:
     file: lib/Crypt/OpenSSL/PKCS10.pm
-    version: '0.25'
+    version: '0.26'
 recommends:
   Crypt::OpenSSL::Bignum: '0'
 requires:
@@ -31,8 +31,8 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-OpenSSL-PKCS10
   homepage: http://search.cpan.org/dist/Crypt-OpenSSL-PKCS10/
   repository: git://github.com/perl-openssl/perl-crypt-openssl-pkcs10.git
-version: '0.25'
-x_generated_by_perl: v5.38.0
+version: '0.26'
+x_generated_by_perl: v5.38.2
 x_maintainers:
   - 'Timothy Legge <timlegge@cpan.org>'
 x_serialization_backend: 'YAML::Tiny version 1.74'

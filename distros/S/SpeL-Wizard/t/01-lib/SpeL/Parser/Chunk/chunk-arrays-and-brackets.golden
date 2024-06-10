@@ -1,0 +1,302 @@
+$tex = bless( {
+  'path' => 't/01-lib/SpeL/Parser/Chunk',
+  'tree' => bless( {
+    'ElementList' => bless( {
+      'Element' => [
+        bless( {
+          'MathUnit' => [
+            bless( {
+              '' => '\\left\\{\\begin{array}{l}
+-4a-b=7 \\\\
+a-4b =-3
+\\end{array}
+\\right.    ~~\\Leftrightarrow~~
+\\left\\{\\begin{array}{l}
+a=-\\frac{31}{17} \\\\
+b=\\frac{5}{17}
+\\end{array}
+\\right.
+',
+              'Left' => bless( {
+                'Component' => bless( {
+                  '' => '\\begin{array}{l}
+-4a-b=7 \\\\
+a-4b =-3
+\\end{array}
+',
+                  'Left' => bless( {
+                    'Component' => bless( {
+                      'Args' => [
+                        bless( {
+                          'Element' => [
+                            bless( {
+                              '' => 'l'
+                            }, 'SpeL::Object::TokenSequence' )
+                          ]
+                        }, 'SpeL::Object::ElementList' )
+                      ],
+                      'MathUnit' => [
+                        bless( {
+                          '' => '-4a-b=7 ',
+                          'Left' => bless( {
+                            'Component' => bless( {
+                              'Realnumber' => bless( {
+                                'Sign' => '-',
+                                'Value' => '4',
+                                'trailingws' => ''
+                              }, 'SpeL::Object::Realnumber' )
+                            }, 'SpeL::Object::Number' ),
+                            'Rest' => bless( {
+                              'Op' => bless( {
+                                'Op' => ''
+                              }, 'SpeL::Object::Binop' ),
+                              'Remainder' => bless( {
+                                'Component' => bless( {
+                                  'Alphabet' => 'a',
+                                  'trailingws' => ''
+                                }, 'SpeL::Object::Variable' ),
+                                'Rest' => bless( {
+                                  'Op' => bless( {
+                                    'Op' => '-'
+                                  }, 'SpeL::Object::Binop' ),
+                                  'Remainder' => bless( {
+                                    'Component' => bless( {
+                                      'Alphabet' => 'b',
+                                      'trailingws' => ''
+                                    }, 'SpeL::Object::Variable' ),
+                                    'Rest' => bless( {
+                                      'ws' => ''
+                                    }, 'SpeL::Object::Expressionrest' )
+                                  }, 'SpeL::Object::Expression' )
+                                }, 'SpeL::Object::Expressionrest' )
+                              }, 'SpeL::Object::Expression' )
+                            }, 'SpeL::Object::Expressionrest' )
+                          }, 'SpeL::Object::Expression' ),
+                          'RelationChain' => [
+                            {
+                              'RelOperator' => bless( {
+                                '' => '='
+                              }, 'SpeL::Object::RelOperator' ),
+                              'Right' => bless( {
+                                'Component' => bless( {
+                                  'Realnumber' => bless( {
+                                    'Sign' => '',
+                                    'Value' => '7',
+                                    'trailingws' => ' '
+                                  }, 'SpeL::Object::Realnumber' )
+                                }, 'SpeL::Object::Number' ),
+                                'Rest' => bless( {
+                                  'ws' => ''
+                                }, 'SpeL::Object::Expressionrest' )
+                              }, 'SpeL::Object::Expression' )
+                            }
+                          ]
+                        }, 'SpeL::Object::Relation' ),
+                        bless( {
+                          '' => 'a-4b =-3
+',
+                          'Left' => bless( {
+                            'Component' => bless( {
+                              'Alphabet' => 'a',
+                              'trailingws' => ''
+                            }, 'SpeL::Object::Variable' ),
+                            'Rest' => bless( {
+                              'Op' => bless( {
+                                'Op' => '-'
+                              }, 'SpeL::Object::Binop' ),
+                              'Remainder' => bless( {
+                                'Component' => bless( {
+                                  'Realnumber' => bless( {
+                                    'Sign' => '',
+                                    'Value' => '4',
+                                    'trailingws' => ''
+                                  }, 'SpeL::Object::Realnumber' )
+                                }, 'SpeL::Object::Number' ),
+                                'Rest' => bless( {
+                                  'Op' => bless( {
+                                    'Op' => ''
+                                  }, 'SpeL::Object::Binop' ),
+                                  'Remainder' => bless( {
+                                    'Component' => bless( {
+                                      'Alphabet' => 'b',
+                                      'trailingws' => ' '
+                                    }, 'SpeL::Object::Variable' ),
+                                    'Rest' => bless( {
+                                      'ws' => ''
+                                    }, 'SpeL::Object::Expressionrest' )
+                                  }, 'SpeL::Object::Expression' )
+                                }, 'SpeL::Object::Expressionrest' )
+                              }, 'SpeL::Object::Expression' )
+                            }, 'SpeL::Object::Expressionrest' )
+                          }, 'SpeL::Object::Expression' ),
+                          'RelationChain' => [
+                            {
+                              'RelOperator' => bless( {
+                                '' => '='
+                              }, 'SpeL::Object::RelOperator' ),
+                              'Right' => bless( {
+                                'Component' => bless( {
+                                  'Realnumber' => bless( {
+                                    'Sign' => '-',
+                                    'Value' => '3',
+                                    'trailingws' => '
+'
+                                  }, 'SpeL::Object::Realnumber' )
+                                }, 'SpeL::Object::Number' ),
+                                'Rest' => bless( {
+                                  'ws' => ''
+                                }, 'SpeL::Object::Expressionrest' )
+                              }, 'SpeL::Object::Expression' )
+                            }
+                          ]
+                        }, 'SpeL::Object::Relation' )
+                      ],
+                      'mathtaginner' => 'array',
+                      'trailingws' => '
+'
+                    }, 'SpeL::Object::MathEnvironmentInner' ),
+                    'Rest' => bless( {
+                      'ws' => ''
+                    }, 'SpeL::Object::Expressionrest' )
+                  }, 'SpeL::Object::Expression' )
+                }, 'SpeL::Object::Relation' ),
+                'Rest' => bless( {
+                  'Op' => bless( {
+                    'Op' => '\\Leftrightarrow'
+                  }, 'SpeL::Object::Arrow' ),
+                  'Remainder' => bless( {
+                    'Component' => bless( {
+                      '' => '\\begin{array}{l}
+a=-\\frac{31}{17} \\\\
+b=\\frac{5}{17}
+\\end{array}
+',
+                      'Left' => bless( {
+                        'Component' => bless( {
+                          'Args' => [
+                            bless( {
+                              'Element' => [
+                                bless( {
+                                  '' => 'l'
+                                }, 'SpeL::Object::TokenSequence' )
+                              ]
+                            }, 'SpeL::Object::ElementList' )
+                          ],
+                          'MathUnit' => [
+                            bless( {
+                              '' => 'a=-\\frac{31}{17} ',
+                              'Left' => bless( {
+                                'Component' => bless( {
+                                  'Alphabet' => 'a',
+                                  'trailingws' => ''
+                                }, 'SpeL::Object::Variable' ),
+                                'Rest' => bless( {
+                                  'ws' => ''
+                                }, 'SpeL::Object::Expressionrest' )
+                              }, 'SpeL::Object::Expression' ),
+                              'RelationChain' => [
+                                {
+                                  'RelOperator' => bless( {
+                                    '' => '='
+                                  }, 'SpeL::Object::RelOperator' ),
+                                  'Right' => bless( {
+                                    'Component' => bless( {
+                                      'den' => bless( {
+                                        'Realnumber' => bless( {
+                                          'Sign' => '',
+                                          'Value' => '17',
+                                          'trailingws' => ''
+                                        }, 'SpeL::Object::Realnumber' )
+                                      }, 'SpeL::Object::Number' ),
+                                      'num' => bless( {
+                                        'Realnumber' => bless( {
+                                          'Sign' => '',
+                                          'Value' => '31',
+                                          'trailingws' => ''
+                                        }, 'SpeL::Object::Realnumber' )
+                                      }, 'SpeL::Object::Number' )
+                                    }, 'SpeL::Object::Fraction' ),
+                                    'Rest' => bless( {
+                                      'ws' => ''
+                                    }, 'SpeL::Object::Expressionrest' ),
+                                    'Sign' => '-'
+                                  }, 'SpeL::Object::Expression' )
+                                }
+                              ]
+                            }, 'SpeL::Object::Relation' ),
+                            bless( {
+                              '' => 'b=\\frac{5}{17}
+',
+                              'Left' => bless( {
+                                'Component' => bless( {
+                                  'Alphabet' => 'b',
+                                  'trailingws' => ''
+                                }, 'SpeL::Object::Variable' ),
+                                'Rest' => bless( {
+                                  'ws' => ''
+                                }, 'SpeL::Object::Expressionrest' )
+                              }, 'SpeL::Object::Expression' ),
+                              'RelationChain' => [
+                                {
+                                  'RelOperator' => bless( {
+                                    '' => '='
+                                  }, 'SpeL::Object::RelOperator' ),
+                                  'Right' => bless( {
+                                    'Component' => bless( {
+                                      'den' => bless( {
+                                        'Realnumber' => bless( {
+                                          'Sign' => '',
+                                          'Value' => '17',
+                                          'trailingws' => ''
+                                        }, 'SpeL::Object::Realnumber' )
+                                      }, 'SpeL::Object::Number' ),
+                                      'num' => bless( {
+                                        'Realnumber' => bless( {
+                                          'Sign' => '',
+                                          'Value' => '5',
+                                          'trailingws' => ''
+                                        }, 'SpeL::Object::Realnumber' )
+                                      }, 'SpeL::Object::Number' )
+                                    }, 'SpeL::Object::Fraction' ),
+                                    'Rest' => bless( {
+                                      'ws' => ''
+                                    }, 'SpeL::Object::Expressionrest' )
+                                  }, 'SpeL::Object::Expression' )
+                                }
+                              ]
+                            }, 'SpeL::Object::Relation' )
+                          ],
+                          'mathtaginner' => 'array',
+                          'trailingws' => '
+'
+                        }, 'SpeL::Object::MathEnvironmentInner' ),
+                        'Rest' => bless( {
+                          'ws' => ''
+                        }, 'SpeL::Object::Expressionrest' )
+                      }, 'SpeL::Object::Expression' )
+                    }, 'SpeL::Object::Relation' ),
+                    'Rest' => bless( {
+                      'ws' => ''
+                    }, 'SpeL::Object::Expressionrest' ),
+                    'cbracket' => '\\right.',
+                    'obracket' => '\\left\\{'
+                  }, 'SpeL::Object::Expression' )
+                }, 'SpeL::Object::Expressionrest' ),
+                'cbracket' => '\\right.',
+                'obracket' => '\\left\\{'
+              }, 'SpeL::Object::Expression' )
+            }, 'SpeL::Object::Relation' )
+          ],
+          'mathtag' => 'equation',
+          'trailingws' => '
+'
+        }, 'SpeL::Object::MathEnvironment' ),
+        bless( {
+          '' => '
+'
+        }, 'SpeL::Object::TokenSequence' )
+      ]
+    }, 'SpeL::Object::ElementList' )
+  }, 'SpeL::Object::Document' )
+}, 'SpeL::Parser::Chunk' );
+

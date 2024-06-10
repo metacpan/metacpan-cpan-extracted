@@ -19,7 +19,7 @@ END {
     done_testing();
 }
 
-my $model = 'Moog Matriarch';
+my $model = 'Modular';
 my $first = 'Simple 001';
 my $initial;
 
@@ -30,18 +30,27 @@ my $obj = new_ok 'Synth::Config' => [
 ];
 
 subtest defaults => sub {
-  is $obj->model, 'moog_matriarch', 'model';
+  is $obj->model, 'modular', 'model';
   is $obj->verbose, 0, 'verbose';
 };
 
-subtest yaml => sub {
-  my $got = $obj->import_yaml(
+subtest import => sub {
+  my $got = $obj->import_patches(
     file    => 'eg/Modular.yaml',
     patches => [ $first ],
   );
-  is @$got, 1, 'import_yaml';
+  is @$got, 1, 'import_patches';
   $initial = $obj->recall_setting_names;
   is @$initial, 1, 'recall_setting_names';
+};
+
+subtest graphviz => sub {
+  my $settings = $obj->search_settings(name => $first);
+  my $got = $obj->graphviz(
+    settings   => $settings,
+    patch_name => $first,
+  );
+  isa_ok $got, 'GraphViz2';
 };
 
 subtest settings => sub {
@@ -133,15 +142,6 @@ subtest settings => sub {
   $obj->remove_settings;
   $settings = $obj->recall_settings;
   is_deeply $settings, [], 'recall_settings';
-};
-
-subtest graphviz => sub {
-  my $settings = $obj->search_settings(name => $initial);
-  my $got = $obj->graphviz(
-    settings   => $settings,
-    patch_name => $first,
-  );
-  isa_ok $got, 'GraphViz2';
 };
 
 subtest specs => sub {

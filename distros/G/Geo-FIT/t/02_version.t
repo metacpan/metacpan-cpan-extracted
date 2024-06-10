@@ -14,7 +14,7 @@ isa_ok($o, 'Geo::FIT');
 # A -- called with arguments
 
 my @versions;
-@versions = qw( 21.72 21.94 21.115 );
+@versions = qw( 21.72 21.94 21.126 );
 for my $version (@versions) {
 
     # expected values
@@ -23,6 +23,7 @@ for my $version (@versions) {
     my $expected_string  = sprintf '%u.%03u', @expected_maj_min;
     $expected_integer = 2207 if $version eq '21.107';
     $expected_integer = 2215 if $version eq '21.115';
+    $expected_integer = 2226 if $version eq '21.126';
     # ... gets tricky with 3-digit minor versions
     # ....we can generalize the above line but let's just do that for now:
 
@@ -60,7 +61,7 @@ for my $version (@versions) {
 
 # B -- called w/o arguments
 
-my $version = '21.115';
+my $version = '21.126';
 # ... update this one each time we update $profile_current in FIT.pm
 
 # expected values
@@ -69,6 +70,7 @@ my $expected_integer = join('', split /\./, $version);
 my $expected_string  = sprintf '%u.%03u', @expected_maj_min;
 $expected_integer = 2207 if $version eq '21.107';
 $expected_integer = 2215 if $version eq '21.115';
+$expected_integer = 2226 if $version eq '21.126';
 
 # profile_version() -- undocumented -- meant to accept both integer and string
 

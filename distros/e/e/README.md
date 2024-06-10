@@ -56,6 +56,10 @@ Watch a reference for changes:
         A::f2();
     '
 
+Benchmark two snippets of code:
+
+    perl -Me -e 'n { slow => sub{ ... }, fast => sub{ ... }}, 10000'
+
 Launch the Runtime::Debugger:
 
     perl -Me -e 'repl'
@@ -83,6 +87,16 @@ Data dump a data structure:
 Devel::Peek dump a data structure:
 
     perl -Me -e 'dd { a => [ 1..3] }'
+
+Print data as a table:
+
+    perl -Me -e 'table( [qw(key value)], [qw(red 111)], [qw(blue 222)] )'
+    +------+-------+
+    | key  | value |
+    +------+-------+
+    | red  | 111   |
+    | blue | 222   |
+    +------+-------+
 
 # DESCRIPTION
 
@@ -218,6 +232,24 @@ Internal data dumper.
 Color a string.
 
     say dye( "HEY", "RED" );
+
+## table
+
+Print data as a table:
+
+    perl -Me -e 'table( [qw(key value)], [qw(red 111)], [qw(blue 222)] )'
+    +------+-------+
+    | key  | value |
+    +------+-------+
+    | red  | 111   |
+    | blue | 222   |
+    +------+-------+
+
+Context sensitive!
+
+    - Void   - output table.
+    - List   - return individual lines.
+    - Scalar - return entire table as a string.
 
 ## g
 

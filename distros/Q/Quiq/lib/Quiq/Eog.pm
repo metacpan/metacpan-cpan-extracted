@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.215';
+our $VERSION = '1.216';
 
 use Quiq::Trash;
 use Quiq::Shell;
@@ -179,6 +179,9 @@ sub transferImages {
         my @srcFiles = ($trashFile);
         my $srcBasePath = sprintf '%s/%s',$srcDir,$p->basename($trashFile);
         push @srcFiles,$p->glob("$srcBasePath.*"); # ggf. .xcf-Datei hinzu
+        if (-d $srcBasePath) {
+            push @srcFiles,$srcBasePath, # füge Verzeichnis hinzu
+        }
 
         if ($nameToNumber) {
             $number += $step;
@@ -188,7 +191,12 @@ sub transferImages {
             my $destFile;
             if ($nameToNumber) {
                 my $ext = $p->extension($srcFile);
-                $destFile = sprintf '%s/%0*d.%s',$destDir,$width,$number,$ext;
+                if ($ext) {
+                    $destFile = sprintf '%s/%0*d.%s',$destDir,$width,$number,$ext;
+                }
+                else {
+                    $destFile = sprintf '%s/%0*d',$destDir,$width,$number; # Verzeichnis
+                }
             }
             else {
                 $destFile = sprintf '%s/%s',$destDir,$p->filename($srcFile);
@@ -206,7 +214,7 @@ sub transferImages {
 
 =head1 VERSION
 
-1.215
+1.216
 
 =head1 AUTHOR
 
