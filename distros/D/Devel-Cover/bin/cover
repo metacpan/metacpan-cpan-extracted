@@ -14,7 +14,7 @@ use warnings;
 
 our $VERSION;
 BEGIN {
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.44'; # VERSION
 }
 
 use Devel::Cover::DB;
@@ -462,7 +462,7 @@ cover - report coverage statistics
 
 =head1 VERSION
 
-version 1.43
+version 1.44
 
 =head1 SYNOPSIS
 

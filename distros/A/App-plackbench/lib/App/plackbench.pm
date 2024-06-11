@@ -1,5 +1,5 @@
 package App::plackbench;
-$App::plackbench::VERSION = '0.5';
+$App::plackbench::VERSION = '0.6';
 use strict;
 use warnings;
 use autodie;
@@ -7,7 +7,7 @@ use v5.10;
 
 use HTTP::Request qw();
 use List::Util qw( reduce );
-use Plack::Test qw( test_psgi );
+use Plack::Test qw();
 use Plack::Util qw();
 use Scalar::Util qw( reftype );
 use Time::HiRes qw( gettimeofday tv_interval );
@@ -16,6 +16,7 @@ use App::plackbench::Stats;
 
 my %attributes = (
     app       => \&_build_app,
+    tester    => \&_build_tester,
     count     => 1,
     warm      => 0,
     fixup     => sub { [] },
@@ -69,6 +70,11 @@ sub new {
 sub _build_app {
     my $self = shift;
     return Plack::Util::load_psgi($self->psgi_path());
+}
+
+sub _build_tester {
+    my $self = shift;
+    return Plack::Test->create($self->app());
 }
 
 sub run {
@@ -170,14 +176,10 @@ sub add_fixup_from_file {
 sub _execute_request {
     my $self = shift;
     my $request = shift;
-
-    test_psgi $self->app(), sub {
-        my $cb       = shift;
-        my $response = $cb->($request);
-        if ( $response->is_error() ) {
-            die "Request failed: " . $response->decoded_content;
-        }
-    };
+    my $response = $self->tester->request($request);
+    if ( $response->is_error() ) {
+        die "Request failed: " . $response->decoded_content;
+    }
 
     return;
 }
@@ -212,6 +214,10 @@ Class for executing requests on a L<Plack> application and recording stats.
 =head2 app
 
 Defaults to a L<Plack> app loaded from L<psgi_path>, using L<Plack::Util/load_psgi>.
+
+=head2 tester
+
+Defaults to a L<Plack::Test> instance initialized with the app from L</app>.
 
 =head2 count
 
@@ -288,3 +294,4 @@ the same terms as the Perl 5 programming language system itself.
 =head1 SEE ALSO
 
 L<plackbench>, L<Plack>
+

@@ -29,7 +29,7 @@ I highly recommend you install the system (or package) version of the "Imager" l
 
 The "build-essential" tools need to be installed. This is generally a C compiler, linker, and standard C libraries (usually gcc variety).  The module "Inline::C", which this module uses, requires it.  Also, the package "kernel-headers".
 
-You should also install typical TTF fonts as well.  I suggest the Windows fonts (fonts-wine), Ubuntu fonts (fonts-ubuntu) and anything else you wish to use.
+You should also install typical TTF fonts as well.  I suggest the FreeType fonts, the Windows fonts (fonts-wine), Ubuntu fonts (fonts-ubuntu) and anything else you wish to use.
 
 ## INSTALLATION
 
@@ -47,6 +47,12 @@ installation/install-prerequisites-debian.sh
 
 ```bash
 installation/install-prerequisites-redhat.sh
+```
+
+You can use the following to detect your distribution type:
+
+```bash
+installation/detech.sh
 ```
 
 ## Continuing...
@@ -94,7 +100,7 @@ Here's what I have tested this module on (all 1920x1080x32):
 
 * **Windows 10 PC with VirtualBox, 4 GHz 6 core i7 CPU and 2 NVidia 970 Ti's** - Holy cow!  No, seriously, this sucker is fast!  I wonder how much faster if it were running Linux natively?  In addition, 3840x2160x32 (4K) is surprisingly fast.  Who'd have thought?  Full screen animations were choppy, but everything else was plenty fast enough.
 
-* **Native Linux Mint with 4.2 GHz 6 core i7 CPU and 2 NVidia 1080 Ti's** - This is how I found out that the Nouveau driver is very poor when handling a framebuffer.  It's actually disgraceful at how bad and how slow it really is.  It doesn't appear to be using any DMA for the memory copy of the framebuffer, but CPU itself for transfers.  Running Virtual Box on Windows is much faster than running Linux natively with the  Nouveau framebuffer drivers.  Sad, really sad.
+* **Native Linux Mint with 4.2 GHz 6 core i7 CPU and 2 NVidia 1080 Ti's** - This is how I found out that the Nouveau driver is very poor when handling a framebuffer.  It's actually disgraceful at how bad and how slow it really is.  It doesn't appear to be using any DMA for the memory copy of the framebuffer, but CPU itself for transfers.  Running Virtual Box on Windows is much faster than running Linux natively with the Nouveau framebuffer drivers.  Sad, really sad.
 
 * **NVidia Jetson Nano with 4GB of RAM** - Plenty zippy.  I am quite pleased with this offering by NVidia.
 
@@ -124,7 +130,7 @@ You can also look for information at:
 
 ## LICENSE AND COPYRIGHT
 
-Copyright © 2013-2023 Richard Kelsch
+Copyright © 2013-2024 Richard Kelsch
 
 This program is free software; you can redistribute it and/or modify it under the terms of either: the GNU General Public License as published by the Free Software Foundation; or the Artistic License.
 

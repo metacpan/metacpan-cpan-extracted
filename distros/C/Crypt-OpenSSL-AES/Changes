@@ -1,5 +1,15 @@
 Revision history for Perl extension Crypt::OpenSSL::AES.
 
+0.21 -- Mon Jun 10 20:24:50 ADT 2024
+
+    [Updates since 0.19]
+    A patch from @ppisar to quiet unused variable warnings. Thanks!
+
+    [Detailed Change Log]
+    - 855254d Update Copright year and increment version
+    - f54d079 Fix warning about unused variables
+    - 1f84bf8 v0.20
+
 0.20 -- Sun Jun 09 21:25:57 ADT 2024
 
     [Significant updates since 0.19]

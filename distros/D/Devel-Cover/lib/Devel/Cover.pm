@@ -13,7 +13,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-  our $VERSION = '1.43'; # VERSION
+  our $VERSION = '1.44'; # VERSION
 }
 
 use DynaLoader ();
@@ -1332,7 +1332,7 @@ Devel::Cover - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.43
+version 1.44
 
 =head1 SYNOPSIS
 

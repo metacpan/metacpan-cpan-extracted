@@ -6,14 +6,14 @@ hax/optree-additions.c.inc
 include/check.h
 lib/Signature/Attribute/Checked.pm
 lib/Signature/Attribute/Checked.xs
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 src/check.c
 t/00use.t
 t/01positional.t
 t/02named.t
 t/10types-standard.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

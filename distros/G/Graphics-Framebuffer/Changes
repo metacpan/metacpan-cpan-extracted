@@ -1665,3 +1665,15 @@ Revision history for Graphics-Framebuffer
        Improved the Makefile.PL script
 
        Tests completely revamped
+
+6.59   Jan 18, 2024
+
+       Minor changes to font handling
+
+       Added missing font documentation
+
+6.60   Jun 10, 2024
+
+       More aliased commands added to cater to taste.
+
+       Documentation updated and improved, typos corrected.

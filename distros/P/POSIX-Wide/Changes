@@ -1,4 +1,4 @@
-Copyright 2010, 2014 Kevin Ryde
+Copyright 2010, 2014, 2024 Kevin Ryde
 
 This file is part of POSIX-Wide.
 
@@ -16,6 +16,10 @@ You should have received a copy of the GNU General Public License along
 with POSIX-Wide.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
+Version 11, June 2024
+    - tests force timezone to avoid apparent daylight saving
+      variation on strftime %H
 
 Version 10, October 2014
     - debian/control depend on libencode-locale-perl

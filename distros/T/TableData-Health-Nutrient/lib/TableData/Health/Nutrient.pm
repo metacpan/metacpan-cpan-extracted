@@ -339,9 +339,23 @@ our $data = [
         default_unit => 'g',
     },
     {
-        symbol => 'Alpha_Linoleic_Acid',
-        eng_name => 'ɑ-linoleic acid',
-        ind_name => 'Asam ɑ-linoleat',
+        symbol => 'Omega6',
+        eng_name => 'Omega-6 fatty acids',
+        ind_name => 'Asam lemak omega-6',
+        category => 'fatty acid',
+        default_unit => 'g',
+    },
+    {
+        symbol => 'Alpha_Linolenic_Acid',
+        eng_name => 'ɑ-linolenic acid',
+        ind_name => 'Asam ɑ-linolenat',
+        category => 'fatty acid',
+        default_unit => 'g',
+    },
+    {
+        symbol => 'Omega3',
+        eng_name => 'Omega-3 fatty acids',
+        ind_name => 'Asam lemak omega-3',
         category => 'fatty acid',
         default_unit => 'g',
     },
@@ -425,9 +439,9 @@ sub get_table_def {
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-05-30'; # DATE
 our $DIST = 'TableData-Health-Nutrient'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
-our %STATS = ("num_columns",13,"num_rows",39); # STATS
+our %STATS = ("num_rows",41,"num_columns",13); # STATS
 
 1;
 # ABSTRACT: Nutrients
@@ -444,7 +458,7 @@ TableDataRole::Health::Nutrient0 - Nutrients
 
 =head1 VERSION
 
-This document describes version 0.003 of TableDataRole::Health::Nutrient0 (from Perl distribution TableData-Health-Nutrient), released on 2024-05-30.
+This document describes version 0.004 of TableDataRole::Health::Nutrient0 (from Perl distribution TableData-Health-Nutrient), released on 2024-05-30.
 
 =head1 SYNOPSIS
 
@@ -482,7 +496,7 @@ See the L<tabledata> CLI's documentation for other available actions and options
  | key         | value |
  +-------------+-------+
  | num_columns | 13    |
- | num_rows    | 39    |
+ | num_rows    | 41    |
  +-------------+-------+
 
 The statistics is available in the C<%STATS> package variable.

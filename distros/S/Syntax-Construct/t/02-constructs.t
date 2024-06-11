@@ -27,6 +27,25 @@ sub skippable {
 
 
 my %tests = (
+    '5.040' => [
+        [ '^^',
+          '1 ^^ 0', 1 ],
+        [ '__CLASS__',
+          'use experimental qw{ class };
+           class MyClass1 {
+               method cl { __CLASS__ }
+           }
+           class MyChild1 :isa(MyClass1) {}
+           my $o = MyChild1->new;
+           $o->cl',
+          'MyChild1' ],
+        [ ':reader',
+          'use experimental qw{ class };
+           class MyClass2 { field $x :reader :param }
+           my $o = MyClass2->new(x => 2);
+           $o->x',
+          '2' ]
+    ],
     '5.038' => [
         [ 'unicode15.0',
           '"\N{MOOSE}" eq "\N{U+1FACE}"', 1 ],
@@ -324,6 +343,10 @@ my $count = 0;
 for my $version (keys %tests) {
     my @triples = @{ $tests{$version} };
     my $can = eval { require (0 + "$version") };
+    if (Syntax::Construct::_nearest_stable() == $version) {
+        warn "Faking next stable version";
+        $can = 1;
+    }
     $count += @triples;
     for my $triple (@triples) {
         my $removed_version = Syntax::Construct::removed($triple->[0]);

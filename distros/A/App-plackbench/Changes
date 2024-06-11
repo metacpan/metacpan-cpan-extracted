@@ -1,3 +1,9 @@
+0.6  2024-06-10
+      - Add a new command line option -p for specifying time precision
+      - Add rate (requests per second) to the default output
+      - Add elapsed() and rate() methods to App::plackbench::Stats
+      - Slightly increase measurement precision by reducing the calling process overhead
+
 0.5  2014-07-25
       - Fix test failures on Windows
 
@@ -19,3 +25,4 @@
 
 0.1  2014-07-11
       - Initial release
+

@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/briandfoy/scriptdist/issues
   homepage: https://github.com/briandfoy/scriptdist
   repository: https://github.com/briandfoy/scriptdist
-version: '1.003'
+version: '1.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -12,7 +12,7 @@
 #include "ppport.h"
 
 /*
-*  Copyright (C) 2006-2023 DelTel, Inc.
+*  Copyright (C) 2006-2024 DelTel, Inc.
 *
 *  This library is free software; you can redistribute it and/or modify
 *  it under the same terms as Perl itself, either Perl version 5.8.5 or,
@@ -181,9 +181,9 @@ new(class, key_sv, ...)
     SV *  key_sv
 CODE:
     {
+        PERL_UNUSED_ARG(class);
         STRLEN keysize;
         unsigned char * key;
-        SV * self;
         HV * options = newHV();
 #if OPENSSL_VERSION_NUMBER >= 0x00908000L
 #ifdef LIBRESSL_VERSION_NUMBER

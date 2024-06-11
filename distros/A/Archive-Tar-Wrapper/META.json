@@ -53,7 +53,7 @@
    "provides" : {
       "Archive::Tar::Wrapper" : {
          "file" : "lib/Archive/Tar/Wrapper.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       }
    },
    "release_status" : "stable",
@@ -67,6 +67,6 @@
          "web" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl"
       }
    },
-   "version" : "0.40",
+   "version" : "0.41",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

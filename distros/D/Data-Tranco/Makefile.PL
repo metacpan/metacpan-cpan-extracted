@@ -22,7 +22,6 @@ my %WriteMakefileArgs = (
     "DBD::SQLite" => 0,
     "DBI" => 0,
     "Data::Mirror" => 0,
-    "Digest::SHA" => 0,
     "File::Basename" => 0,
     "File::Spec" => 0,
     "File::stat" => 0,
@@ -39,7 +38,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +52,6 @@ my %FallbackPrereqs = (
   "DBD::SQLite" => 0,
   "DBI" => 0,
   "Data::Mirror" => 0,
-  "Digest::SHA" => 0,
   "File::Basename" => 0,
   "File::Spec" => 0,
   "File::stat" => 0,

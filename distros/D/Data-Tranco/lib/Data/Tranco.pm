@@ -6,7 +6,6 @@ use Carp;
 use DBD::SQLite;
 use DBI;
 use Data::Mirror qw(mirror_file);
-use Digest::SHA qw(sha256_hex);
 use File::Basename qw(basename dirname);
 use File::Spec;
 use File::stat;
@@ -21,7 +20,7 @@ use vars qw($TTL $ZIPFILE $DBFILE $DSN $STATIC);
 use warnings;
 
 $TTL        = 86400;
-$ZIPFILE    = Data::Mirror::filename(TRANCO_URL);
+$ZIPFILE    = mirror_file(TRANCO_URL);
 $DBFILE     = File::Spec->catfile(dirname($ZIPFILE), basename($ZIPFILE, '.zip').'.db');
 $DSN        = 'dbi:SQLite:dbname='.$DBFILE;
 $STATIC     = undef;
@@ -216,7 +215,7 @@ Data::Tranco - An interface to the Tranco domain list.
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

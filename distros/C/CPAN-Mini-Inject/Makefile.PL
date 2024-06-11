@@ -85,6 +85,8 @@ my %WriteMakefile = (
 		'YAML'                      => '0',
 		},
 
+	'EXE_FILES' => [qw(bin/mcpani)],
+
 	'META_MERGE' => {
 		'meta-spec' => { version => 2 },
 		resources => {

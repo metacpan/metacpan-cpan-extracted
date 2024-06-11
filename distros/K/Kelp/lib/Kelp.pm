@@ -12,7 +12,7 @@ use Plack::Util;
 use Class::Inspector;
 use Scalar::Util qw(blessed);
 
-our $VERSION = '1.07';
+our $VERSION = '2.00';
 
 # Basic attributes
 attr -host => hostname;
@@ -62,8 +62,8 @@ sub new {
     return $self;
 }
 
-my $last_anon = 0;
 sub new_anon {
+    state $last_anon = 0;
     my $class = shift;
 
     # make sure we don't eval something dodgy
@@ -81,6 +81,8 @@ sub new_anon {
             {
                 package $anon_class;
                 use parent -norequire, '$class';
+
+                sub _real_class { '$class' }
             }
             1;
         ];
@@ -161,6 +163,23 @@ sub build_response {
     return $package->new( app => $self );
 }
 
+# Override to change what happens before the route is handled
+sub before_dispatch {
+    my ( $self, $destination ) = @_;
+
+    # Log info about the route
+    if ( $self->can('logger') ) {
+        my $req = $self->req;
+
+        $self->info(
+            sprintf "%s: %s - %s %s - %s",
+                ref $self,
+                $req->address, $req->method,
+                $req->path,    $destination
+        );
+    }
+}
+
 # Override to manipulate the end response
 sub before_finalize {
     my $self = shift;
@@ -212,18 +231,9 @@ sub psgi {
         for my $route (@$match) {
 
             # Dispatch
-            $self->req->named( $route->named );
-            $self->req->route_name( $route->name );
+            $req->named( $route->named );
+            $req->route_name( $route->name );
             my $data = $self->routes->dispatch( $self, $route );
-
-            # Log info about the route
-            if ( $self->can('logger') ) {
-                $self->info(
-                    sprintf( "%s - %s %s - %s",
-                        $req->address, $req->method,
-                        $req->path,    $route->to )
-                );
-            }
 
             # Is it a bridge? Bridges must return a true value
             # to allow the rest of the routes to run.
@@ -245,7 +255,7 @@ sub psgi {
         }
 
         # If nothing got rendered
-        if ( !$self->res->rendered ) {
+        if ( !$res->rendered ) {
             # render 404 if only briges matched
             if ( $match->[-1]->bridge ) {
                 $res->render_404;
@@ -262,7 +272,6 @@ sub psgi {
     }
     catch {
         my $exception = $_;
-        my $res = $self->res;
 
         if (blessed $exception && $exception->isa('Kelp::Exception')) {
             # No logging here, since it is a message for the user with a code
@@ -556,6 +565,25 @@ the class of the object used.
     }
 
     # Now each request will be handled by MyApp::Request
+
+=head2 before_dispatch
+
+Override this method to modify the behavior before a route is handled. The
+default behavior is to log access (if C<logger> is available).
+
+    package MyApp;
+
+    sub before_dispatch {
+        my ( $self, $destination ) = @_;
+
+        # default access logging is disabled
+    }
+
+The C<$destination> param will depend on the routes implementation used. The
+default router will pass the unchanged L<Kelp::Routes::Pattern/to>. If
+possible, it will be run on the controller object (allowing overriding
+C<before_dispatch> on controller classes).
+
 
 =head2 before_finalize
 

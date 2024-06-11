@@ -1,24 +1,9 @@
 package Kelp::Routes::Controller;
 
 use Kelp::Base 'Kelp::Routes';
-use Carp;
 
-sub dispatch {
-    my $self = shift;
-    my $app = shift or croak "no app supplied";
-    my $match = shift or croak "no route pattern instance supplied";
-
-    my $to = $match->to or croak 'No destination defined';
-
-    return $self->SUPER::dispatch($app, $match) if ref $to;
-
-    my ($controller_class, $action) = ($to =~ /^(.+)::(\w+)$/)
-        or croak "Invalid controller '$to'";
-
-    my $controller = $app->_clone($controller_class);
-    return $controller->$action(@{ $match->param });
-}
-
+# the new Kelp::Routes does the Controller logic by itself, we just need to configure it correctly
+attr rebless => 1;
 
 1;
 
@@ -28,7 +13,7 @@ __END__
 
 =head1 NAME
 
-Kelp::Routes::Controller - Routes and controller for Kelp
+Kelp::Routes::Controller - Legacy routes and controller for Kelp
 
 =head1 SYNOPSIS
 
@@ -37,8 +22,8 @@ Kelp::Routes::Controller - Routes and controller for Kelp
     {
         modules_init => {
             Routes => {
+                router => 'Controller',
                 base   => 'MyApp::Controller',
-                router => 'Controller'
             }
         }
     }
@@ -67,6 +52,10 @@ Kelp::Routes::Controller - Routes and controller for Kelp
 
 =head1 DESCRIPTION
 
+B<< This module is no longer needed, since L<Kelp::Routes> handles reblessing
+by itself when configured with C<rebless>. It's only here for backward
+compatibility and documentation purposes. >>
+
 This router module reblesses a Kelp application into its own controller class.
 This allows you to structure your web application in a classic object oriented
 fashion, having C<$self> an instance to the current class rather than the main
@@ -78,3 +67,4 @@ functionality.
 
 
 =cut
+

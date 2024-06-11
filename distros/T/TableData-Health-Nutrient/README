@@ -2,7 +2,7 @@ NAME
     TableDataRole::Health::Nutrient0 - Nutrients
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.004 of
     TableDataRole::Health::Nutrient0 (from Perl distribution
     TableData-Health-Nutrient), released on 2024-05-30.
 
@@ -41,7 +41,7 @@ TABLEDATA STATISTICS
      | key         | value |
      +-------------+-------+
      | num_columns | 13    |
-     | num_rows    | 39    |
+     | num_rows    | 41    |
      +-------------+-------+
 
     The statistics is available in the %STATS package variable.

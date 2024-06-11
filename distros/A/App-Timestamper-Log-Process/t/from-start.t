@@ -2,6 +2,9 @@
 
 use strict;
 use warnings;
+use 5.014;
+use autodie;
+
 use Test::More tests => 6;
 
 use Path::Tiny qw/ cwd path tempdir tempfile /;

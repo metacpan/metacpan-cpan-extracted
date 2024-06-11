@@ -19,7 +19,7 @@ name: TableData-Health-Nutrient
 provides:
   TableData::Health::Nutrient:
     file: lib/TableData/Health/Nutrient.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Role::Tiny: '0'
   Role::Tiny::With: '0'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TableData-Health-Nutrient
   homepage: https://metacpan.org/release/TableData-Health-Nutrient
   repository: git://github.com/perlancar/perl-TableData-Health-Nutrient.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

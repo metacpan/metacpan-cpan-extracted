@@ -16,24 +16,12 @@ use Term::ANSIColor;
 my ($COLS,$ROWS,$w,$h) = GetTerminalSize(*STDOUT);
 my $pmt = 'Y';
 my $line = '-' x 28 . ' Graphics::Framebuffer ' . '-' x 28;
+if (-e 'Makefile') {
+	`make veryclean;reset`;
+}
 # Graphics::Framebuffer
-print colored(['red on_red'],$line),"\n";
-
-print colored(['on_red'],' '),colored(['red'],                  '                     ____                 _     _                            '), colored(['on_red'],' '), "\n";
-print colored(['on_red'],' '),colored(['red'],                  '                    / ___|_ __ __ _ _ __ | |__ (_) ___ ___                   '),colored(['on_red'],' '),"\n";
-print colored(['on_bright_red'],' '),colored(['bright_red'],   q(                   | |  _| '__/ _` | '_ \| '_ \| |/ __/ __                   ) ), colored(['on_bright_red'],' '),"\n";
-print colored(['on_bright_red'],' '),colored(['bright_red'],    '                   | |_| | | | (_| | |_) | | | | | (__\__ \                  '),colored(['on_bright_red'],' '),"\n";
-print colored(['on_green'],' '),colored(['green'],              '                    \____|_|  \__,_| .__/|_| |_|_|\___|___/                  '),colored(['on_green'],' '),"\n";
-print colored(['on_green'],' '),colored(['green'],              '                                   |_|                                       '),colored(['on_green'],' '),"\n";
-print colored(['on_bright_green'],' '),colored(['bright_green'],'         _____                         _            __  __                   '),colored(['on_bright_green'],' '),"\n";
-print colored(['on_bright_green'],' '),colored(['bright_green'],'        |  ___| __ __ _ _ __ ___   ___| |__  _   _ / _|/ _| ___ _ __         '),colored(['on_bright_green'],' '),"\n";
-print colored(['on_blue'],' '),colored(['blue'],               q(        | |_ | '__/ _` | '_ ` _ \ / _ \ '_ \| | | | |_| |_ / _ \ '__|        ) ),colored(['on_blue'],' '),"\n";
-print colored(['on_blue'],' '),colored(['blue'],                '        |  _|| | | (_| | | | | | |  __/ |_) | |_| |  _|  _|  __/ |           '),colored(['on_blue'],' '),"\n";
-print colored(['on_bright_blue'],' '),colored(['bright_blue'],  '        |_|  |_|  \__,_|_| |_| |_|\___|_.__/ \__,_|_| |_|  \___|_|           '),colored(['on_bright_blue'],' '),"\n";
-print colored(['on_bright_blue'], ' '),                         '                                                                             ',colored(['on_bright_blue'],' '),"\n";
-$line = ' ' x 79;
-print colored(['bright_blue on_bright_blue'],$line),"\n";
-$line = ' ' x $COLS;
+my $banner = slurp_file('examples/banner.vt');
+print $banner;
 if ($^O =~ /MSWin/i) { # Some people will still try
     print colored(['white on_red']," This module does not work natively on MS Windows.  It will only function in emulation mode, and you will not be able to see the output.  Please read the documentation on emulation mode. \n\n");
     $pmt = ExtUtils::MakeMaker::prompt('Do you really wish to install anyway?  ','N');
@@ -136,7 +124,7 @@ WriteMakefile(
 print colored(['cyan on_cyan'],$line),"\n";
 
 my $message;
-if ($COLS <= 80) {
+if ($COLS <= 185) {
     print "The ",'"', colored(['bold green'],'examples'), qq{" directory has some handy scripts to help get you started, and\nshow you how to use the module.  Just "} . colored(['bold green'],'perldoc') . qq{" on each to see how to use\nthem:};
     $message = qq{
 ------------------------------------------------------------------------------
@@ -200,7 +188,7 @@ print colored(['blue on_blue'],$line),"\n";
 print colored(['bright_white on_magenta'],' Building    -> '),colored(['bright_green'],'       make'),"\n";
 print colored(['bright_white on_magenta'],' Testing     -> '),colored(['bright_green'],'       make')," test\n";
 print colored(['bright_white on_magenta'],' Installing  -> '),colored(['red'],'  sudo '),colored(['bright_green'],'make')," install\n";
-print colored(['bright_white on_magenta'],' Cleaning Up -> '),colored(['bright_green'],'       make')," realclean\n";
+print colored(['bright_white on_magenta'],' Cleaning Up -> '),colored(['bright_green'],'       make')," veryclean\n";
 
 exit(0);
 

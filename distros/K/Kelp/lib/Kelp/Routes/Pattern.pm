@@ -7,6 +7,7 @@ use Kelp::Base;
 attr pattern  => sub { die "pattern is required" };
 attr via      => undef;
 attr method   => sub { $_[0]->via };
+attr has_name => undef;
 attr name     => sub { $_[0]->pattern };
 attr check    => sub { {} };
 attr defaults => sub { {} };
@@ -15,42 +16,76 @@ attr regex    => sub { $_[0]->_build_regex };
 attr named    => sub { {} };
 attr param    => sub { [] };
 attr to       => undef;
+attr dest     => undef;
 
+# helpers for matching different types of wildcards
+sub __noslash  { 1 == grep { $_[0] eq $_ } ':', '?' }
+sub __matchall { 1 == grep { $_[0] eq $_ } '*', '>' }
+sub __optional { 1 == grep { $_[0] eq $_ } '?', '>' }
 
 sub new {
     my $class = shift;
     my $self = $class->SUPER::new(@_);
-    $self->{_tokens} = [];
-    $self->regex;    # Compile the regex
+    $self->has_name(defined $self->{name} && length $self->{name}); # remember if pattern was named
+
+    $self->_fix_pattern;
+    $self->regex; # Compile the regex
     return $self;
+}
+
+sub _fix_pattern {
+    my ( $self ) = @_;
+    my $pattern = $self->pattern;
+    return if ref $pattern; # only fix non-regex patterns
+
+    # operations performed
+    $pattern =~ s{/+}{/}g;
+
+    $self->pattern($pattern);
 }
 
 sub _rep_regex {
     my ( $self, $char, $switch, $token ) = @_;
+    my $re;
 
-    push @{$self->{_tokens}}, $token;
+    my $optional = sub {
+        return unless __optional($switch);
+        $re = "(?:$re)" if $char eq '/';
+        $re .= '?';
+    };
 
-    my ( $a, $b, $r ) = ( "(?<$token>", ')', undef );
-    for ($switch) {
-        if ( $_ eq ':' || $_ eq '?' ) {
-            $r = $a . ( $self->check->{$token} // '[^\/]+' ) . $b
+    # no token - only valid for the wildcard * and slurpy >
+    if ( !defined $token ) {
+
+        # do nothing
+        return $char . $switch
+            unless __matchall($switch);
+
+        $re = $char . '(.+)';
+    }
+    else {
+        push @{$self->{_tokens}}, $token;
+
+        my ( $prefix, $suffix ) = ( "(?<$token>", ')' );
+        if ( __noslash($switch) ) {
+            $re = $char . $prefix . ( $self->check->{$token} // '[^\/]+' ) . $suffix;
         }
-        if ( $_ eq '*' ) {
-            $r = $a . '.+' . $b
+        elsif ( __matchall($switch) ) {
+            $re = $char . $prefix .  ( $self->check->{$token} // '.+' ) . $suffix;
         }
     }
 
-    $char = $char . '?' if $char eq '/' && $switch eq '?';
-    $r .= '?' if $switch eq '?';
-
-    return $char . $r;
+    $optional->();
+    return $re;
 }
 
 sub _build_regex {
     my $self = shift;
+    $self->{_tokens} = [];
+
     return $self->pattern if ref $self->pattern eq 'Regexp';
 
-    my $PAT = '(.?)([:*?])(\w+)';
+    my $PAT = '(.?)([:*?>])(\w+)?';
     my $pattern =  $self->pattern;
 
     # Curly braces and brackets are only used for separation.
@@ -68,14 +103,22 @@ sub _build_regex {
 
 sub _rep_build {
     my ( $self, $switch, $token, %args ) = @_;
+
+    if (!defined $token) {
+        return $switch unless __matchall($switch);
+        $token = $switch;
+    }
+
     my $rep = $args{$token} // $self->defaults->{$token} // '';
-    if ($switch ne '?' && !$rep) {
+    if ( !__optional($switch) && !$rep) {
         return '{?' . $token . '}';
     }
+
     my $check = $self->check->{$token};
     if ( $check && $args{$token} !~ $check ) {
         return '{!' . $token . '}';
     }
+
     return $rep;
 }
 
@@ -88,9 +131,9 @@ sub build {
         return;
     }
 
-    my $PAT = '([:*?])(\w+)';
+    my $PAT = '([:*?>])(\w+)?';
     $pattern =~ s/{?$PAT}?/$self->_rep_build($1, $2, %args)/eg;
-    if ($pattern =~ /{([!?])(\w+)}/) {
+    if ($pattern =~ /{([!?])(\w+|[*>])}/) {
         carp $1 eq '!'
             ? "Field $2 doesn't match checks"
             : "Default value for field $2 is missing";
@@ -103,24 +146,25 @@ sub match {
     my ( $self, $path, $method ) = @_;
     return 0 if ( $self->method && $self->method ne ( $method // '' ) );
     return 0 unless my @matched = $path =~ $self->regex;
-
-    @matched = () unless $#+; # were there any captures? see perlvar @+
+    my $has_matches = $#+; # see perlvar @+
 
     # Initialize the named parameters hash and its default values
-    my %named = map { $_ => $+{$_} } keys %+;
-    for ( keys %{ $self->defaults } ) {
-        $named{$_} = $self->defaults->{$_} unless exists $named{$_};
-    }
-    $self->named( \%named );
+    my %named = ( %{ $self->defaults }, %+ );
 
-    # Initialize the param array, containing the values of the
-    # named placeholders in the order they appear in the regex.
-    if ( my @tokens = @{ $self->{_tokens} } ) {
-        $self->param( [ map { $named{$_} } @tokens ] );
+    if ( @{ $self->{_tokens} } ) {
+        # values of the named placeholders in the order they appear in the
+        # regex.
+        @matched = map { $named{$_} } @{ $self->{_tokens} };
+    }
+    elsif ( $has_matches ) {
+        @matched = map { length($_ // '') ? $_ : undef } @matched;
     }
     else {
-        $self->param( [ map { $_ eq '' ? undef : $_ } @matched] );
+        @matched = ();
     }
+
+    $self->named( \%named );
+    $self->param( \@matched );
 
     return 1;
 }
@@ -185,6 +229,11 @@ you build a URL for it.
     # Prints '/100/something-else'
 
 If no name is provided for the route, the C<pattern> is used.
+
+=head2 has_name
+
+A boolean signifying whether this route was originally given a specific name.
+It will be false if the name was taken from C<pattern>.
 
 =head2 check
 
@@ -263,6 +312,12 @@ pattern.
 
 Specifies the route destination. See examples in L<Kelp::Routes>.
 
+=head2 dest
+
+The loaded destination. An array reference with two values, a controller name
+(or undef if not a controller) and the code reference to the method. It will be
+automatically generated by the router based on the contents of L</to>.
+
 =head1 METHODS
 
 =head2 match
@@ -274,12 +329,22 @@ was successful, this sub will return a true value and the L</named> and L</param
 attributes will be initialized with the names and values of the matched placeholders.
 
 =head2 build
+
 C<build( %args )>
 
 Builds a URL from a pattern.
 
     my $p = Kelp::Routes::Patters->new( pattern  => '/:id/:line/:row' );
     $p->build( id => 100, line => 5, row => 8 ); # Returns '/100/5/8'
+
+If the pattern contains an unnamed wildcard C<*> or slurpy C<< > >>, then it
+should be built like this:
+
+    my $p = Kelp::Routes::Patters->new( pattern  => '/hello/*/>' );
+    $p->build( '*' => 'kelp', '>' => 'world' ); # Returns '/hello/kelp/world'
+
+If the pattern contains more than one unnamed items, then you should
+probably give them some names.
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -288,3 +353,4 @@ This module was inspired by L<Routes::Tiny>.
 The concept of bridges was borrowed from L<Mojolicious>
 
 =cut
+

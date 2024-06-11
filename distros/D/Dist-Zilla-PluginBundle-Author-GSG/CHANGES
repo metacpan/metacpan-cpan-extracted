@@ -1,6 +1,12 @@
 Changelog for Dist-Zilla-PluginBundle-Author-GSG
 
-v0.5.4 2024-05-07T17:18:58
+v0.6.0 2024-06-10T21:42:49
+ - Pull request #25: SM-4923 - Enable OurPkgVersion overwrite (Andrew Hewus
+   Fresh)
+ - Document the dist.ini changes for XS modules (Andrew Hewus Fresh)
+ - Enable OurPkgVersion->overwrite (Andrew Hewus Fresh)
+
+v0.5.4 2024-05-07T17:17:29
  - Pull request #24: SM-4834 - Add force update target (Andrew Hewus Fresh)
  - Name target `make forceupdate` (Andrew Hewus Fresh)
  - Update LICENSE and README (Andrew Hewus Fresh)
@@ -231,8 +237,8 @@ v0.0.1 2019-03-27T01:48:40
  - Support main_module from dist.ini in Makefile (Andrew Fresh)
  - Use perl instead of sed to parse dist.ini (Andrew Fresh)
  - Simple explanation in CONTRIBUTING about how (Andrew Fresh)
- - More documentation improvmenets (Andrew Fresh)
  - Update README.md (Andrew Fresh)
+ - More documentation improvmenets (Andrew Fresh)
  - Rearrange Plugins to make documentation clearer (Andrew Fresh)
  - Initial stab at the beginnings of CONTRIBUTING doc (Andrew Fresh)
  - Add a clean and realclean targets (Andrew Fresh)

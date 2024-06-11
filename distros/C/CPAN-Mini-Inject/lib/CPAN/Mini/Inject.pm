@@ -21,7 +21,7 @@ CPAN::Mini::Inject - Inject modules into a CPAN::Mini mirror.
 
 =cut
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 our @ISA     = qw( CPAN::Mini );
 
 =head1 SYNOPSIS

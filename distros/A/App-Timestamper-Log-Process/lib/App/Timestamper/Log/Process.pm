@@ -1,5 +1,5 @@
 package App::Timestamper::Log::Process;
-$App::Timestamper::Log::Process::VERSION = '0.0.2';
+$App::Timestamper::Log::Process::VERSION = '0.0.3';
 use 5.014;
 use strict;
 use warnings;
@@ -114,7 +114,7 @@ sub _mode_from_start
     {
         chomp $line;
         if ( my ( $seconds, $dotdigits, $data_str ) =
-            ( $line =~ m#\A([0-9]+)((?:\.[0-9]{,16})?)\t([^\n]*\z)#ms ) )
+            ( $line =~ m#\A([0-9]+)((?:\.(?:[0-9]){0,16})?)\t([^\n]*\z)#ms ) )
         {
             my $ticks = $seconds * $HIGH_BASE;
             if ( $dotdigits =~ s#\A\.##ms )
@@ -166,7 +166,7 @@ L<App::Timestamper> logs.
 
 =head1 VERSION
 
-version 0.0.2
+version 0.0.3
 
 =head1 SYNOPSIS
 

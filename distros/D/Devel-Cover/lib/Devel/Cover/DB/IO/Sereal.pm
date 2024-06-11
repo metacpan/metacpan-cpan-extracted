@@ -15,7 +15,7 @@ use base "Devel::Cover::DB::IO::Base";
 use Sereal::Decoder;
 use Sereal::Encoder;
 
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.44'; # VERSION
 
 my ($Decoder, $Encoder);
 
@@ -63,7 +63,7 @@ Devel::Cover::DB::IO::Sereal - Sereal based IO routines for Devel::Cover::DB
 
 =head1 VERSION
 
-version 1.43
+version 1.44
 
 =head1 SYNOPSIS
 

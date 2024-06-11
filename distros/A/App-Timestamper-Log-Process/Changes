@@ -1,5 +1,12 @@
 Revision history for App-Timestamper-Log-Process
 
+0.0.3       2024-06-10
+
+    - Use a more portable regular-expression syntax:
+        - [0-9]{,16} → (?:[0-9]){0,16}
+        - https://github.com/shlomif/App-Timestamper/issues/2
+        - Thanks to @eserte
+
 0.0.2       2024-06-09
 
     - Correct the GitHub links and meta-data in the dist.ini

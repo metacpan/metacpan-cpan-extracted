@@ -34,7 +34,7 @@ use POSIX ();
 use Encode;
 use Encode::Locale;  # has 'locale' from its initial 0.01 release
 
-our $VERSION = 10;
+our $VERSION = 11;
 
 use Exporter;
 our @ISA = ('Exporter');

@@ -89,6 +89,8 @@ bool Check_check_value(pTHX_ struct CheckData *data, SV *value)
 
   bool ok = SvTRUEx(POPs);
 
+  PUTBACK;
+
   FREETMPS;
   LEAVE;
 

@@ -70,6 +70,6 @@
          "web" : "https://github.com/briandfoy/cpan-mini-inject"
       }
    },
-   "version" : "1.002",
+   "version" : "1.003",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

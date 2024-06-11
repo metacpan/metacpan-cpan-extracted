@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010, 2011, 2014 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2014, 2020, 2024 Kevin Ryde
 
 # This file is part of POSIX-Wide.
 #
@@ -30,7 +30,7 @@ BEGIN { MyTestHelpers::nowarnings(); }
 # doesn't provoke a "used once" warning
 use POSIX::Wide;
 
-my $want_version = 10;
+my $want_version = 11;
 is ($POSIX::Wide::VERSION, $want_version, 'VERSION variable');
 is (POSIX::Wide->VERSION,  $want_version, 'VERSION class method');
 { ok (eval { POSIX::Wide->VERSION($want_version); 1 },
@@ -60,6 +60,18 @@ sub my_printable_string {
   }
 }
 
+
+# On a GNU/Linux apparently with timezone CET and daylight savings,
+# the %H hour field specified seemed to be subject to dst adjustment
+# even when isdst field 0.  Don't know whether the system would be
+# to blame for that, but POSIX::Wide is straight-through for that
+# sort of thing.  Force GMT so as to hopefully eliminate that
+# variation from testing.
+#
+$ENV{'TZ'} = 'GMT';
+POSIX::tzset();
+
+
 #------------------------------------------------------------------------------
 # localeconv()
 
@@ -68,21 +80,32 @@ foreach my $field (@POSIX::Wide::LOCALECONV_STRING_FIELDS) {
   $localeconv_is_string{$field} = 1;
 }
 my %localeconv_is_binary = (frac_digits     => 1, # number
-                            int_frac_digits => 1, # number
-                            mon_grouping    => 1, # numbers
+                        int_frac_digits => 1,
+                            grouping        => 1, # bytes numbers
+                        mon_grouping        => 1,
                             n_cs_precedes   => 1, # boolean
+                        int_n_cs_precedes   => 1,
                             n_sep_by_space  => 1, # boolean
+                        int_n_sep_by_space  => 1,
                             n_sign_posn     => 1, # enum
+                        int_n_sign_posn     => 1,
                             p_cs_precedes   => 1, # boolean
+                        int_p_cs_precedes   => 1,
                             p_sep_by_space  => 1, # boolean
+                        int_p_sep_by_space  => 1,
                             p_sign_posn     => 1, # enum
+                        int_p_sign_posn     => 1,
                            );
-
+{
+  my $l = POSIX::localeconv();
+  my @keys = sort keys %$l;
+  diag "keys from POSIX::localeconv : ", join(' ',@keys);
+}
 {
   my $good = 1;
   my $l = POSIX::Wide::localeconv();
   my @keys = sort keys %$l;
-  diag "keys: ", join(' ',@keys);
+  diag "keys from POSIX::Wide::localeconv : ", join(' ',@keys);
   cmp_ok (@keys, '!=', 0, 'keys found');
 
   foreach my $key (@keys) {

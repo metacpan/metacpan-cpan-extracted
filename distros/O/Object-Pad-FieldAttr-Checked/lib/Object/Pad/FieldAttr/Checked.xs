@@ -144,6 +144,9 @@ static void checked_gen_accessor_ops(pTHX_ FieldMeta *fieldmeta, SV *attrdata, v
       else
         OpLASTSIB_set(newkid, o);
 
+      if(cLISTOPo->op_last == kid)
+        cLISTOPo->op_last = newkid;
+
       OpLASTSIB_set(kid, newkid);
       return;
     }

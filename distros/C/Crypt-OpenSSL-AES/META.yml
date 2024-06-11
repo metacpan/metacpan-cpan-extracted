@@ -21,7 +21,7 @@ name: Crypt-OpenSSL-AES
 provides:
   Crypt::OpenSSL::AES:
     file: lib/Crypt/OpenSSL/AES.pm
-    version: '0.20'
+    version: '0.21'
 requires:
   Exporter: '0'
   XSLoader: '0'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-OpenSSL-AES
   homepage: http://search.cpan.org/dist/Crypt-OpenSSL-AES/
   repository: git://github.com/perl-openssl/perl-Crypt-OpenSSL-AES.git
-version: '0.20'
+version: '0.21'
 x_generated_by_perl: v5.38.2
 x_maintainers:
   - 'Timothy Legge <timlegge@cpan.org>'

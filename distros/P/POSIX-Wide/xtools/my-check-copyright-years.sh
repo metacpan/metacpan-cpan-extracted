@@ -2,7 +2,7 @@
 
 # my-check-copyright-years.sh -- check copyright years in dist
 
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2022, 2023 Kevin Ryde
 
 # my-check-copyright-years.sh is shared by several distributions.
 #
@@ -28,6 +28,9 @@ set -x   # echo
 if test -z "$DISTVNAME"; then
   DISTVNAME=`sed -n 's/^DISTVNAME = \(.*\)/\1/p' Makefile`
 fi
+case $DISTVNAME in
+  *\$*) DISTVNAME=`make echo-DISTVNAME` ;;
+esac
 if test -z "$DISTVNAME"; then
   echo "DISTVNAME not set and not in Makefile"
   exit 1
@@ -67,7 +70,24 @@ do
     | */MathI''mage/ln2.gz | */MathI''mage/pi.gz \
     | *.mo | *.locatedb* | t/samp.* \
     | t/empty.dat | t/*.xpm | t/*.xbm | t/*.jpg | t/*.gif \
-    | t/*.g${MY_HIDE}d)
+    | t/*.g${MY_HIDE}d \
+    | tools/*-oeis-samples.gp \
+    | test-oeis-samples.gp \
+    | tools/configurations-gfs-generated.gp \
+    | devel/configurations-t-generated.gp \
+    | test-symbols.txt | test-funcs.txt \
+    | tests/test-symbols.txt | tests/test-funcs.txt \
+    | devel/minimal-domsets-max-even2.c \
+    | devel/a002251-Wythoff-LU-swap.txt \
+    | devel/a159917-Zeckendorf-low2digits.txt \
+    | devel/devel/a341258-lazy-reverse.txt \
+    | devel/a341258-lazy-reverse.txt \
+    | oeis/a002251-Wythoff-LU-swap.txt \
+    | debian/user-background-jobs.conf \
+    | */*/b3*.txt \
+    | */*/saved-state.txt \
+    | oeis/a159917-Zeckendorf-low2digits.txt \
+    | */_whizzy*)
       continue ;;
     *.gz)
       GREP=zgrep

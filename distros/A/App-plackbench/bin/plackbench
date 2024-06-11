@@ -29,7 +29,7 @@ if ($opts->{fixup_files}) {
 }
 
 my $stats = $bench->run();
-_report($stats);
+_report($stats, $opts);
 
 exit 0;
 
@@ -46,6 +46,7 @@ sub _parse_argv {
         'post=s' => \$opts{post_data},
         'e=s'    => \$opts{fixup},
         'f=s'    => \$opts{fixup_files},
+        'p=i'    => \$opts{precision},
     );
 
     ( $opts{psgi_path}, $opts{uri} ) = @{$argv};
@@ -76,16 +77,22 @@ sub _post_data {
 
 sub _report {
     my $stats = shift;
+    my $opts = shift;
+
+    $opts->{precision} //= 3;
+    my $time = "%8.$opts->{precision}f";
+
+    printf "Rate (requests per second): %.2f\n\n", $stats->rate;
 
     print "Request times (seconds):\n";
     printf( "%8s %8s %8s %8s %8s\n", 'min', 'mean', 'sd', 'median', 'max' );
-    printf( "%8.3f %8.3f %8.3f %8.3f %8.3f\n\n",
+    printf( "$time $time $time $time $time\n\n",
         $stats->min(), $stats->mean(), $stats->standard_deviation(), $stats->median(), $stats->max() );
 
     print "Percentage of requests within a certain time (seconds):\n";
     for my $percent ( 50, 66, 75, 80, 90, 95, 98, 99, 100 ) {
         my $value = $stats->percentile( $percent );
-        printf( "%4d%% %8.3f\n", $percent, $value );
+        printf( "%4d%% $time\n", $percent, $value );
     }
 }
 
@@ -170,6 +177,10 @@ A simple example:
 The file can contain any valid Perl code, but the last statement in the file
 must be a subroutine reference.
 
+=item -p <precision>
+
+The number of decimal places in times included in the report. Defaults to 3.
+
 =back
 
 =head1 Using with L<Devel::NYTProf>
@@ -195,6 +206,8 @@ See L<Devel::NYTProf> for more information.
 
 Paul Boyd <boyd.paul2@gmail.com>
 
+Currently maintained by Bartosz Jarzyna <bbrtj.pro@gmail.com>
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2014 by Paul Boyd.
@@ -203,3 +216,4 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+

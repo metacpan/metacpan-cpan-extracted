@@ -1,4 +1,8 @@
 Revision history for Signature-Attribute-Checked
 
+0.02    2024-06-10
+        [BUGFIXES]
+         * Remember to PUTBACK after POPs in check.c
+
 0.01    2023-09-18
         First version, released on an unsuspecting world.
