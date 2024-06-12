@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,7 @@ name: Pod-Query
 provides:
   Pod::Query:
     file: lib/Pod/Query.pm
-    version: '0.37'
+    version: '0.38'
 requires:
   Pod::LOL: '0.08'
   Role::Tiny: '2.002004'
@@ -24,7 +24,7 @@ requires:
   perl: '5.018'
 resources:
   bugtracker: https://github.com/poti1/pod-query/issues
-  license: http://opensource.org/licenses/artistic-license-2.0.php
+  license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/poti1/pod-query
-version: '0.37'
+version: '0.38'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

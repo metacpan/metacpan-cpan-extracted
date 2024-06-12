@@ -4,27 +4,24 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-06-01'; # DATE
+our $DATE = '2024-06-12'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240601.0'; # VERSION
+our $VERSION = '20240612.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
-    'LNATION' => '',
-    'TYRRMINAL' => '',
-    'HANJE' => '',
-    'NAUTOFON' => '',
-    'RJBS' => '',
-    'BRIANDFOY' => '',
-    'DERIV' => '',
     'GBROWN' => '',
-    'MARKOV' => '',
-    'OVID' => '',
-    'QGARNIER' => '',
     'SKIM' => '',
-    'SVW' => '',
-    'TONYC' => '',
-    'YOSHIMASA' => '',
+    'BRTASTIC' => '',
+    'CADE' => '',
+    'EHUELS' => '',
+    'EXTISM' => '',
+    'BRIANDFOY' => '',
+    'CHRISARG' => '',
+    'RADIUSCZ' => '',
+    'SHLOMIF' => '',
+    'TYRRMINAL' => '',
+    'WDAEMS' => '',
 );
 
 
@@ -43,33 +40,30 @@ Acme::CPANAuthors::CPAN::Streaks::WeeklyNewDistributions::Current - Authors with
 
 =head1 VERSION
 
-This document describes version 20240601.0 of Acme::CPANAuthors::CPAN::Streaks::WeeklyNewDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-01.
+This document describes version 20240612.0 of Acme::CPANAuthors::CPAN::Streaks::WeeklyNewDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-12.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-06-01, produced by L<cpan-streaks>):
+Current standings (as of 2024-06-12, produced by L<cpan-streaks>):
 
   +-----------+-----+------------+-------------+
   | author    | len | start_date | status      |
   +-----------+-----+------------+-------------+
-  | PERLANCAR | 510 | 2014-08-24 | ongoing     |
-  | LNATION   |   4 | 2024-04-28 | might-break |
-  | TYRRMINAL |   2 | 2024-05-12 | might-break |
-  | HANJE     |   2 | 2024-05-19 | ongoing     |
-  | NAUTOFON  |   1 | 2024-05-19 | might-break |
-  | RJBS      |   1 | 2024-05-19 | might-break |
-  | BRIANDFOY |   1 | 2024-05-26 | ongoing     |
-  | DERIV     |   1 | 2024-05-26 | ongoing     |
-  | GBROWN    |   1 | 2024-05-26 | ongoing     |
-  | MARKOV    |   1 | 2024-05-26 | ongoing     |
-  | OVID      |   1 | 2024-05-26 | ongoing     |
-  | QGARNIER  |   1 | 2024-05-26 | ongoing     |
-  | SKIM      |   1 | 2024-05-26 | ongoing     |
-  | SVW       |   1 | 2024-05-26 | ongoing     |
-  | TONYC     |   1 | 2024-05-26 | ongoing     |
-  | YOSHIMASA |   1 | 2024-05-26 | ongoing     |
+  | PERLANCAR | 512 | 2014-08-24 | ongoing     |
+  | GBROWN    |   2 | 2024-05-26 | might-break |
+  | SKIM      |   2 | 2024-05-26 | might-break |
+  | BRTASTIC  |   2 | 2024-06-02 | ongoing     |
+  | CADE      |   1 | 2024-06-02 | might-break |
+  | EHUELS    |   1 | 2024-06-02 | might-break |
+  | EXTISM    |   1 | 2024-06-02 | might-break |
+  | BRIANDFOY |   1 | 2024-06-09 | ongoing     |
+  | CHRISARG  |   1 | 2024-06-09 | ongoing     |
+  | RADIUSCZ  |   1 | 2024-06-09 | ongoing     |
+  | SHLOMIF   |   1 | 2024-06-09 | ongoing     |
+  | TYRRMINAL |   1 | 2024-06-09 | ongoing     |
+  | WDAEMS    |   1 | 2024-06-09 | ongoing     |
   +-----------+-----+------------+-------------+
 
 =head1 HOMEPAGE

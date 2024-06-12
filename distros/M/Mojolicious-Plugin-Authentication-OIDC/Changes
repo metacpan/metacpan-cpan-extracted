@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojolicious::Plugin::Authentication::OIDC
 
+0.05      2024-06-11T16:53:36-05:00
+  - Make access safer to current_user/roles when user not logged in
+
 0.04      2024-05-31T11:12:13-05:00
   - Fix bug preventing user roles from being applied
   - Fix bug preventing on_activity handler from being called

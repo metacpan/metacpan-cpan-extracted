@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.1.7
+## Version v0.1.8
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2024/05/29
+## Modified 2024/06/12
 ## All rights reserved
 ## 
 ## 
@@ -307,7 +307,7 @@ BEGIN
     our $PROP_TO_SUB = {};
     # False, by default
     our $EXPLICIT_BOOLEAN = 0;
-    our $VERSION = 'v0.1.7';
+    our $VERSION = 'v0.1.8';
 };
 
 use strict;
@@ -829,6 +829,8 @@ sub ks { return( shift->colStrength( @_ ) ); }
 sub kv { return( shift->colValue( @_ ) ); }
 
 sub lang { return( shift->reset(@_)->_set_get_prop( 'locale', @_ ) ); }
+
+sub language { return( shift->lang( @_ ) ); }
 
 # u-lb
 sub lb { return( shift->reset(@_)->_set_get_prop( 'line_break', @_ ) ); }
@@ -3352,7 +3354,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.1.7
+    v0.1.8
 
 =head1 DESCRIPTION
 
@@ -3913,6 +3915,10 @@ This is an alias for L</colValue>
 Sets or gets the C<locale> part of this Local object.
 
 See also L</locale>
+
+=head2 language
+
+This is an alias for L<lang|/lang>
 
 =head2 lb
 

@@ -5,6 +5,7 @@ use strictures 2;
 use 5.020;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -67,7 +68,7 @@ sub acceptance_tests (%options) {
                 && $_->{error} !~ /but short_circuit is enabled/            # unevaluated*
                 && $_->{error} !~ /(max|min)imum value is not a number$/)   # optional/bignum.json
                 && !($in_todo //= grep $_->{todo}, Test2::API::test2_stack->top->{_pre_filters}->@*),
-              $r->{errors}->@*;
+              ($r->{errors}//[])->@*;
       }
 
       $result->{valid};

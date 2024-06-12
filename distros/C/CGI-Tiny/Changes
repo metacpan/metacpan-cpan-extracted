@@ -1,3 +1,6 @@
+1.003     2024-06-11 05:56:03 EDT
+  - Update messages of HTTP status codes 413 and 422 based on RFC 9110
+
 1.002     2021-06-09 00:33:32 EDT
   - Documentation updates
 

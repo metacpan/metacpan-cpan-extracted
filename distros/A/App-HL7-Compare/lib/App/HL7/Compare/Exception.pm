@@ -1,5 +1,5 @@
 package App::HL7::Compare::Exception;
-$App::HL7::Compare::Exception::VERSION = '0.003';
+$App::HL7::Compare::Exception::VERSION = '0.004';
 use v5.10;
 use strict;
 use warnings;

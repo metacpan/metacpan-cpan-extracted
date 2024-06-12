@@ -343,8 +343,10 @@ my $count = 0;
 for my $version (keys %tests) {
     my @triples = @{ $tests{$version} };
     my $can = eval { require (0 + "$version") };
-    if (Syntax::Construct::_nearest_stable() == $version) {
-        warn "Faking next stable version";
+    if (! Syntax::Construct::_is_stable($])
+        && Syntax::Construct::_nearest_stable() == $version
+    ) {
+        warn "Faking next stable version $version";
         $can = 1;
     }
     $count += @triples;

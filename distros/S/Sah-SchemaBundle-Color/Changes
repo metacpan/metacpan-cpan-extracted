@@ -1,0 +1,92 @@
+0.015   2024-06-08  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Sah-Schema{s,Bundle}-* for consistency with others.
+
+        - Add schema: color::cmyk.
+
+
+0.014   2021-07-19  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [build] Rebuild with updated Pod::Weaver plugin [-Sah::Schemas] to
+          correctly show examples.
+
+
+0.013   2020-06-13  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] We must not use 'return' inside do {} in coercion
+	  expression.
+
+
+0.012   2020-03-08  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+	- [build] Rebuild with updated Pod::Weaver plugin [-Sah::Schemas] to
+          correctly show examples.
+
+
+0.011   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Update property names in examples (data -> value, res ->
+	  validated_value).
+
+
+0.010   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Update examples, use 'value' instead of 'data'.
+
+
+0.009   2020-03-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes
+
+        - [build] Render examples in Synopsis, using
+          Pod::Weaver::Plugin::Sah::Schemas 0.060+.
+
+
+0.008   2020-03-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [test] Remove tests in t/ because we have provided schema
+	  exampleswhich will also be tested.
+
+
+0.007   2020-03-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Forgot to add #AUTHORITY, #DIST, et al to main module.
+
+
+0.006   2020-03-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Add examples (tests).
+
+
+0.005   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Add test and explicit depndency to Data::Sah::Coerce >0.034 to
+	  support new coercion rule names.
+
+
+0.004   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule modules (Data::Sah::Coerce 0.037+).
+
+
+0.003   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Update metadata version of coerce rule module(s) 3->4.
+
+
+0.002   2018-09-26  Released-By: PERLANCAR
+
+	- [ux] color::rgb24: Coerce and complete from color names.
+
+
+0.001   2017-12-03  Released-By: PERLANCAR
+
+        - First release.

@@ -349,6 +349,31 @@ subtest 'NextVersion' => sub {
         || diag explain [ \%got, \%expect ];
 };
 
+subtest "OurPkgVersion Plugin Settings" => sub {
+    my $tzil = Builder->from_config(
+        { dist_root => 'corpus/dist/metaprovides_subclass' },
+        {   add_files => {
+                'source/dist.ini' => dist_ini(
+                    { name => 'External-Fake' },
+                    [ '@Author::GSG' => { github_remote => 'fake' } ],
+                ),
+                'source/lib/External/Fake.pm' =>
+                    "package External::Fake;\n# ABSTRACT: ABSTRACT\n1;",
+            }
+        }
+    );
+
+    my ($our_pkg_version_plugin)
+        = $tzil->plugin_named('@Author::GSG/OurPkgVersion');
+
+    Test::Deep::cmp_bag(
+        $our_pkg_version_plugin->finder,
+        ['@Author::GSG/MungeableFiles'],
+        "Correctly only have our MungableFiles Plugin"
+    );
+    ok $our_pkg_version_plugin->semantic_version, "Semantic Version is enabled";
+    ok $our_pkg_version_plugin->overwrite, "Overwrite is enabled";
+};
 subtest "Override MetaProvides subclass" => sub {
     {   package Dist::Zilla::Plugin::MetaProvides::Fake;
         use Moose;

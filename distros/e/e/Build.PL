@@ -6,30 +6,23 @@ use warnings;
 use Module::Build;
 Module::Build->VERSION( '0.4004' );
 
+sub _readme {
+    print "Building README\n";
+    system "pod2markdown lib/e.pm > README.md";
+}
+_readme();
+
 my $class = Module::Build->subclass(
     code => q{
-        sub ACTION_readme {
-            my ($s) = @_;
-            print "Building README\n";
-            system "pod2markdown lib/e.pm > README.md";
-        }
         sub ACTION_install {
             my ($s) = @_;
             $s->SUPER::ACTION_install;
 
             # Display logo/image.
-            local @ARGV = (
-                "e",
-                "-q",
-                "head1=LOGO/Verbatim",
-            );
-            require App::Pod;
-            App::Pod->import;
-            App::Pod->run;
+            system qq( pod e -q head1=LOGO/Verbatim );
         }
     },
 );
-$class->ACTION_readme();
 
 my $builder = $class->new(
     module_name        => 'e',
@@ -45,17 +38,17 @@ my $builder = $class->new(
     },
     requires => {
         'perl'              => '5.016',
-        'Sub::Util'         => '0',
-        'Runtime::Debugger' => '1.02',
-        'Data::Trace'       => '1.04',
-        'Tiny::Prof'        => '0',
-        'Mojolicious'       => '0',
-        'YAML::XS'          => '0',
+        'App::Pod'          => '0.37',
         'Data::Printer'     => '0',
-        'App::Pod'          => '0.36',
+        'Data::Trace'       => '1.05',
+        'Mojolicious'       => '0',
+        'Runtime::Debugger' => '1.03',
+        'Sub::Util'         => '0',
         'Term::Table'       => '0',
+        'Tiny::Prof'        => '0.03',
+        'YAML::XS'          => '0',
     },
-    add_to_cleanup => [ 'e-*', 'MANIFEST*.bak', 'blib/' ],
+    add_to_cleanup => [ 'e-*', 'MANIFEST*.bak', 'blib/', 'pod2htmd.tmp' ],
     meta_merge     => {
         resources => {
             bugtracker => 'https://github.com/poti1/e/issues',

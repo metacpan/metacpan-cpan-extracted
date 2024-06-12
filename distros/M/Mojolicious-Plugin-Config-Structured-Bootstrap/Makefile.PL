@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Mojolicious::Plugin::Config::Structured::Bootstrap",
   "PREREQ_PM" => {
     "Array::Utils" => "0.5",
+    "DateTime::Format::MySQL" => "0.08",
     "HTTP::Status" => "6.45",
     "Hash::Merge" => "0.302",
     "List::MoreUtils" => "0.430",
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test2::Suite" => "0.000155",
     "Test::More" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Array::Utils" => "0.5",
+  "DateTime::Format::MySQL" => "0.08",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "HTTP::Status" => "6.45",

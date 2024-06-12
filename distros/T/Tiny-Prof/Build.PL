@@ -6,18 +6,13 @@ use warnings;
 use Module::Build;
 Module::Build->VERSION( '0.4004' );
 
-my $class = Module::Build->subclass(
-    code => q{
-        sub ACTION_readme {
-            my ($s) = @_;
-            print "Building README\n";
-            system "pod2markdown lib/Tiny/Prof.pm > README.md";
-        }
-    },
-);
-$class->ACTION_readme();
+sub _readme {
+    print "Building README\n";
+    system "pod2markdown lib/Tiny/Prof.pm > README.md";
+}
+_readme();
 
-my $builder = $class->new(
+my $builder = Module::Build->new(
     module_name        => 'Tiny::Prof',
     license            => 'artistic_2',
     dist_author        => q{tim Potapov <tim.potapov[AT]gmail.com>},

@@ -3,9 +3,9 @@ NAME
     year 2024
 
 VERSION
-    This document describes version 20240601.0 of
+    This document describes version 20240612.0 of
     TableDataRole::Perl::CPAN::Release::Static::2024 (from Perl distribution
-    TableData-Perl-CPAN-Release-Static-2024), released on 2024-06-01.
+    TableData-Perl-CPAN-Release-Static-2024), released on 2024-06-12.
 
 SYNOPSIS
     To use from Perl code:
@@ -42,7 +42,7 @@ TABLEDATA STATISTICS
      | key         | value |
      +-------------+-------+
      | num_columns | 9     |
-     | num_rows    | 5951  |
+     | num_rows    | 6177  |
      +-------------+-------+
 
     The statistics is available in the %STATS package variable.

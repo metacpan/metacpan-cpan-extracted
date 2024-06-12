@@ -4,7 +4,7 @@
       "Tim Potapov <tim.potapov[AT]gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "artistic_2"
    ],
@@ -36,7 +36,7 @@
    "provides" : {
       "Pod::Query" : {
          "file" : "lib/Pod/Query.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       }
    },
    "release_status" : "stable",
@@ -45,12 +45,12 @@
          "web" : "https://github.com/poti1/pod-query/issues"
       },
       "license" : [
-         "http://opensource.org/licenses/artistic-license-2.0.php"
+         "http://www.perlfoundation.org/artistic_license_2_0"
       ],
       "repository" : {
          "url" : "https://github.com/poti1/pod-query"
       }
    },
-   "version" : "0.37",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.38",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

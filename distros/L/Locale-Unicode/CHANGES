@@ -1,5 +1,8 @@
 Revision history for Perl module Locale::Unicode
 
+v0.1.8 2024-06-12T15:10:36+0900
+    - Added the method 'language' as an alias to 'lang'
+
 v0.1.7 2024-05-29T13:49:30+0900
     - Skipping test with DateTime::Locale if minimum version is not available
 

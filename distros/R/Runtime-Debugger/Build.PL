@@ -6,6 +6,19 @@ use warnings;
 use Module::Build;
 Module::Build->VERSION( '0.4004' );
 
+sub _remove_old_history {
+    my $old = "$ENV{HOME}/.runtime_debugger.info";
+    unlink $old if -e $old;
+}
+
+sub _readme {
+    print "Building README\n";
+    system "pod2markdown lib/Runtime/Debugger.pm > README.md";
+}
+
+_remove_old_history();
+_readme();
+
 my $class = Module::Build->subclass(
     code => q{
         use ExtUtils::MakeMaker;
@@ -21,14 +34,8 @@ my $class = Module::Build->subclass(
             }
             $s->SUPER::ACTION_installdeps;
         }
-        sub ACTION_readme {
-            my ($s) = @_;
-            print "Building README\n";
-            system "pod2markdown lib/Runtime/Debugger.pm > README.md";
-        }
     },
 );
-$class->ACTION_readme();
 
 my $builder = $class->new(
     module_name        => 'Runtime::Debugger',
@@ -44,19 +51,18 @@ my $builder = $class->new(
     },
     requires => {
         'perl'                => '5.018',
-        'Term::ReadLine::Gnu' => '1.44',
-        'PadWalker'           => '2.5',
         'Class::Tiny'         => '1.008',
         'Data::Printer'       => '1.002001',
+        'PadWalker'           => '2.5',
+        'Term::ReadLine::Gnu' => '1.44',
+        'YAML::XS'            => '0',
     },
     add_to_cleanup => [
-        'Runtime-Debugger-*',
-        'build_dir/',
-        'MANIFEST*.bak',
-        'README*',
-        'blib/',
+        'Runtime-Debugger-*', 'build_dir/', 'MANIFEST*.bak', 'README*',
+        'blib/', "$ENV{HOME}/.runtime_debugger.info",
+        'pod2htmd.tmp',
     ],
-    meta_merge     => {
+    meta_merge => {
         resources => {
             bugtracker => 'https://github.com/poti1/runtime-debugger/issues',
             repository => 'https://github.com/poti1/runtime-debugger',

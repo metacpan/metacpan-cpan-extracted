@@ -1,5 +1,5 @@
 {
-   "abstract" : "beastmode unleashed",
+   "abstract" : "beast mode unleashed",
    "author" : [
       "Tim Potapov <tim.potapov@gmail.com>"
    ],
@@ -21,14 +21,14 @@
       },
       "runtime" : {
          "requires" : {
-            "App::Pod" : "0.36",
+            "App::Pod" : "0.37",
             "Data::Printer" : "0",
-            "Data::Trace" : "1.04",
+            "Data::Trace" : "1.05",
             "Mojolicious" : "0",
-            "Runtime::Debugger" : "1.02",
+            "Runtime::Debugger" : "1.03",
             "Sub::Util" : "0",
             "Term::Table" : "0",
-            "Tiny::Prof" : "0",
+            "Tiny::Prof" : "0.03",
             "YAML::XS" : "0",
             "perl" : "5.016"
          }
@@ -42,7 +42,7 @@
    "provides" : {
       "e" : {
          "file" : "lib/e.pm",
-         "version" : "1.17"
+         "version" : "1.19"
       }
    },
    "release_status" : "stable",
@@ -57,6 +57,6 @@
          "url" : "https://github.com/poti1/e"
       }
    },
-   "version" : "1.17",
+   "version" : "1.19",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

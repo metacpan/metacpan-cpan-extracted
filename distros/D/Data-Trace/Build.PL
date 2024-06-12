@@ -6,18 +6,13 @@ use warnings;
 use Module::Build;
 Module::Build->VERSION( '0.4004' );
 
-my $class = Module::Build->subclass(
-    code => q{
-        sub ACTION_readme {
-            my ($s) = @_;
-            print "Building README\n";
-            system "pod2markdown lib/Data/Trace.pm > README.md";
-        }
-    },
-);
-$class->ACTION_readme();
+sub _readme {
+    print "Building README\n";
+    system "pod2markdown lib/Data/Trace.pm > README.md";
+}
+_readme();
 
-my $builder = $class->new(
+my $builder = Module::Build->new(
     module_name        => 'Data::Trace',
     license            => 'artistic_2',
     dist_author        => q{Tim Potapov <tim.potapov@gmail.com>},
@@ -39,6 +34,7 @@ my $builder = $class->new(
         'MANIFEST*.bak',
         'README*',
         'blib/',
+        'pod2htmd.tmp',
     ],
     meta_merge     => {
         resources => {

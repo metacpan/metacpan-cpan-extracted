@@ -36,8 +36,9 @@ use CallBackery::Config;
 use CallBackery::Plugin::Doc;
 use CallBackery::Database;
 use CallBackery::User;
+use Scalar::Util qw(weaken);
 
-our $VERSION = '0.49.3';
+our $VERSION = '0.49.4';
 
 =head2 config
 
@@ -63,12 +64,15 @@ An instance of L<CallBackery::Database> or a module with the same API.
 
 =cut
 
-has 'database' => sub {
+has database => sub {
     CallBackery::Database->new(app=>shift);
 };
 
-has 'userObject' => sub {
-    CallBackery::User->new();
+has userObject => sub {
+    my $app = shift;
+    my $ obj = CallBackery::User->new(app=>$app,log=>$app->log);
+    $obj->{prototype} = 1;
+    return $obj;
 };
 
 =head2 securityHeaders
@@ -131,7 +135,7 @@ sub startup {
     # when things get converted to string and back
     setlocale(LC_NUMERIC, "C");
     setlocale(LC_TIME, "C");
-
+    weaken($app);
     $app->config->postProcessCfg();
     my $gcfg = $app->config->cfgHash->{BACKEND};
     if ($gcfg->{log_file}){

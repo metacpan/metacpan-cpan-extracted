@@ -26,9 +26,12 @@ use Carp;
 use autodie;
 use File::Spec;
 use Locale::PO;
+use Mojo::Promise;
 use Mojo::Loader qw(load_class);
 use Mojo::JSON qw(true false);
 use Mojo::Exception;
+use Scalar::Util qw(blessed);
+# use Devel::Cycle;
 
 =head2 file
 
@@ -50,7 +53,7 @@ has secretFile => sub ($self) {
     return $secretFile;
 };
 
-has app => sub { croak "the app parameter is mandatory" };
+has app => sub { croak "the app parameter is mandatory" }, weak => 1;
 
 has log => sub {
     shift->app->log;
@@ -67,6 +70,8 @@ has cfgHash => sub {
     my $cfg_file = shift;
     my $parser = $self->makeParser();
     my $cfg = $parser->parse($self->file, {encoding => 'utf8'}) or croak($parser->{err});
+    # the grammar is self referential, so we need to clean it up
+    $self->grammar(undef);
     return $cfg;
 };
 
@@ -149,7 +154,9 @@ sub loadAndNewPlugin {
         if (my $e = load_class "${path}::$plugin") {
             die mkerror(3894,"Loading ${path}::$plugin: $e") if ref $e;
         } else {
-            return "${path}::${plugin}"->new();
+            my $proto =  "${path}::${plugin}"->new(log=>$self->log);
+            $proto->{prototype} = 1;
+            return $proto;
         }
     }
     die mkerror(123, "Plugin Module $plugin not found");
@@ -157,6 +164,7 @@ sub loadAndNewPlugin {
 
 has grammar => sub {
     my $self = shift;
+
     my $pluginList = {};
     my $pluginPath = $self->pluginPath;
     for my $path (@INC){
@@ -375,7 +383,7 @@ sub postProcessCfg {
     my $self = shift;
     my $cfg = $self->cfgHash;
     # only postprocess once
-    return $cfg if $cfg->{PLUGIN}{list};        
+    return $cfg if $cfg->{PLUGIN}{list};
     my %plugin;
     my @pluginOrder;
     for my $section (sort keys %$cfg){
@@ -429,28 +437,35 @@ sub _getPluginObject {
     $name =~ s/[^-_0-9a-z]/_/gi;
     die mkerror(39943,"No prototype for $name")
         if not defined $prototype;
-
-    $prototype->new(
+    my $obj = $prototype->new(
         user => $user,
         name => $prototype->name,
         config => $prototype->config,
         args => $args // {},
         app => $self->app,
     );
+    $obj->log; # make sure logging is initialized
+    return $obj;
 }
 
-async sub instantiatePlugin_p {
+# do not (!!!) implement this with async/await as it causes the the generated
+# object to be somehow get a problem with reference counting with prevents
+# timely destruction of the object 2024-06-12 tobi
+sub instantiatePlugin_p {
     my $self = shift;
     my $obj = $self->_getPluginObject(@_);
-    my $name = $obj->name;
-    die mkerror(39944,"No permission to access $name")
-        if not await $self->promisify($obj->checkAccess);
-    return $obj;
+    return $self->promisify($obj->checkAccess)->then(sub {
+        my $access = shift;
+        return $obj if $access;
+        my $name = $obj->name;
+        Mojo::Promise->reject(mkerror(39944,"No permission to access $name"));
+    });
 }
 
 sub instantiatePlugin {
     my $self = shift;
-    my $obj = $self->_getPluginObject(@_);
+    my @args = @_;
+    my $obj = $self->_getPluginObject(@args);
     my $name = $obj->name;
     die mkerror(39944,"No permission to access $name")
         if not $self->promiseDeath($obj->checkAccess);
@@ -465,7 +480,7 @@ return the configuration state of the system as a blob
 
 has configPlugins => sub {
     my $self = shift;
-    my $user = $self->app->userObject->new(app=>$self->app,userId=>'__CONFIG');
+    my $user = $self->app->userObject->new(app=>$self->app,userId=>'__CONFIG', log=>$self->log);
     my $cfg = $self->cfgHash;
     my @plugins;
     for my $name (@{$cfg->{PLUGIN}{list}}){
@@ -554,7 +569,7 @@ sub restoreConfigBlob {
     $config = $self->unpack16($crypt->decrypt($config));
 
     my $cfg = $self->cfgHash;
-    my $user = $self->app->userObject->new(app=>$self->app,userId=>'__CONFIG');
+    my $user = $self->app->userObject->new(app=>$self->app,userId=>'__CONFIG', log=>$self->log);
     open my $fh ,'<', \$config;
     my $zip = Archive::Zip->new();
     $zip->readFromFileHandle($fh);
@@ -669,7 +684,8 @@ sub promisify {
     if (eval { blessed $value && $value->isa('Mojo::Promise') }){
         return $value;
     }
-    return Mojo::Promise->resolve($value,@_);
+
+    return Mojo::Promise->resolve($value);
 }
 
 =head2 $cfg->promiseDeath(xxx)

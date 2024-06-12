@@ -1,6 +1,13 @@
 Changelog for Dist-Zilla-PluginBundle-Author-GSG
 
-v0.6.0 2024-06-10T21:42:49
+v0.6.1 2024-06-11T18:01:40
+ - Pull request #26: Patch - SM-4923 - Enable OurPkgVersion overwrite
+   correctly (Andrew Hewus Fresh)
+ - Correct spelling of overwrite option (Andrew Hewus Fresh)
+ - Test OurPkgVersion settings are set (Andrew Hewus Fresh)
+ - Update README (Andrew Hewus Fresh)
+
+v0.6.0 2024-06-10T21:40:03
  - Pull request #25: SM-4923 - Enable OurPkgVersion overwrite (Andrew Hewus
    Fresh)
  - Document the dist.ini changes for XS modules (Andrew Hewus Fresh)

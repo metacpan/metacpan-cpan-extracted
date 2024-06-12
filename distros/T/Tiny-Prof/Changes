@@ -1,5 +1,8 @@
 Revision history for tiny-prof
 
+0.03    2024-06-11
+        [Internal] Github CI trying v5.40.
+
 0.02    2024-04-27
         Fixed typos in pod (Thanks ronsavage).
 

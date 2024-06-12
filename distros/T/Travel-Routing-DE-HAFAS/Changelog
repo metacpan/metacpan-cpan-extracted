@@ -1,3 +1,8 @@
+Travel::Routing::DE::HAFAS 0.08 - Tue Jun 11 2024
+
+    * Adjust walking connection segment handling for DB HAFAS update on
+      Sun Jun 09 (ignore walking segments without a duration)
+
 Travel::Routing::DE::HAFAS 0.07 - Sat Apr 13 2024
 
     * Replace built-in HAFAS service list with the one provided by

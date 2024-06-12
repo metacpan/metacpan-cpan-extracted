@@ -19,7 +19,7 @@ use Travel::Status::DE::HAFAS;
 use Travel::Status::DE::HAFAS::Location;
 use Travel::Status::DE::HAFAS::Message;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # {{{ Endpoint Definition
 
@@ -535,7 +535,7 @@ Travel::Routing::DE::HAFAS - Interface to HAFAS itinerary services
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 DESCRIPTION
 

@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-06-01'; # DATE
+our $DATE = '2024-06-12'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240601.0'; # VERSION
+our $VERSION = '20240612.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'DROLSKY' => '',
@@ -113,14 +113,15 @@ use Acme::CPANAuthors::Register (
     'VANSTYN' => '',
     'JMATES' => '',
     'STEVEB' => '',
+    'SKIM' => '',
     'ILYAZ' => '',
     'TJMATHER' => '',
     'AUDREYT' => '',
     'HORNBURG' => '',
     'PREACTION' => '',
-    'SKIM' => '',
     'RBOW' => '',
     'TEAM' => '',
+    'DERF' => '',
     'DOUGM' => '',
     'LBROCARD' => '',
     'JSIRACUSA' => '',
@@ -129,7 +130,6 @@ use Acme::CPANAuthors::Register (
     'SULLR' => '',
     'BLHOTSKY' => '',
     'FSEITZ' => '',
-    'DERF' => '',
     'JDEGUEST' => '',
     'MRAMBERG' => '',
     'HINRIK' => '',
@@ -191,24 +191,24 @@ Acme::CPANAuthors::CPAN::Streaks::MonthlyReleases::AllTime - Authors with all-ti
 
 =head1 VERSION
 
-This document describes version 20240601.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyReleases::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-01.
+This document describes version 20240612.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyReleases::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-12.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-06-01, produced by L<cpan-streaks>, only streaks with length of at least 20 are included):
+Current standings (as of 2024-06-12, produced by L<cpan-streaks>, only streaks with length of at least 20 are included):
 
   +-----------+-----+------------+----------+-------------+
   | author    | len | start_date | end_date | status      |
   +-----------+-----+------------+----------+-------------+
   | DROLSKY   | 245 | 2001-01    | 2021-05  | broken      |
-  | BINGOS    | 219 | 2006-03    |          | might-break |
-  | ETHER     | 147 | 2012-03    |          | might-break |
+  | BINGOS    | 220 | 2006-03    |          | ongoing     |
+  | ETHER     | 148 | 2012-03    |          | ongoing     |
   | RJBS      | 146 | 2003-12    | 2016-01  | broken      |
   | PEVANS    | 142 | 2006-07    | 2018-04  | broken      |
   | PLICEASE  | 133 | 2012-08    | 2023-08  | broken      |
-  | LEEJO     | 122 | 2014-04    |          | might-break |
+  | LEEJO     | 123 | 2014-04    |          | ongoing     |
   | PERLANCAR | 119 | 2014-08    |          | ongoing     |
   | IVANWILLS | 114 | 2014-05    | 2023-10  | broken      |
   | LEONT     | 112 | 2009-10    | 2019-01  | broken      |
@@ -229,7 +229,7 @@ Current standings (as of 2024-06-01, produced by L<cpan-streaks>, only streaks w
   | AUTRIJUS  |  62 | 2001-06    | 2006-07  | broken      |
   | PETDANCE  |  61 | 2002-01    | 2007-01  | broken      |
   | SHARYANTO |  60 | 2009-10    | 2014-09  | broken      |
-  | OALDERS   |  58 | 2019-08    |          | might-break |
+  | OALDERS   |  59 | 2019-08    |          | ongoing     |
   | KENTNL    |  55 | 2012-10    | 2017-04  | broken      |
   | FELIPE    |  55 | 2017-07    | 2022-01  | broken      |
   | MGV       |  54 | 2014-01    | 2018-06  | broken      |
@@ -301,12 +301,12 @@ Current standings (as of 2024-06-01, produced by L<cpan-streaks>, only streaks w
   | XAICRON   |  31 | 2010-02    | 2012-08  | broken      |
   | OLIVER    |  31 | 2013-12    | 2016-06  | broken      |
   | TANIGUCHI |  31 | 2014-08    | 2017-02  | broken      |
+  | KIMOTO    |  31 | 2021-12    |          | ongoing     |
   | DMAKI     |  30 | 2006-12    | 2009-05  | broken      |
   | JOHND     |  30 | 2009-10    | 2012-03  | broken      |
   | YANICK    |  30 | 2010-02    | 2012-07  | broken      |
   | JJNAPIORK |  30 | 2010-06    | 2012-11  | broken      |
   | ETJ       |  30 | 2020-05    | 2022-10  | broken      |
-  | KIMOTO    |  30 | 2021-12    |          | might-break |
   | JWIED     |  29 | 1997-08    | 1999-12  | broken      |
   | DAGOLDEN  |  29 | 2004-12    | 2007-04  | broken      |
   | BOSU      |  29 | 2005-10    | 2008-02  | broken      |
@@ -332,18 +332,19 @@ Current standings (as of 2024-06-01, produced by L<cpan-streaks>, only streaks w
   | VANSTYN   |  27 | 2013-06    | 2015-08  | broken      |
   | JMATES    |  27 | 2013-12    | 2016-02  | broken      |
   | STEVEB    |  27 | 2015-06    | 2017-08  | broken      |
+  | SKIM      |  27 | 2022-04    |          | ongoing     |
   | ILYAZ     |  26 | 1997-05    | 1999-06  | broken      |
   | TJMATHER  |  26 | 2000-12    | 2003-01  | broken      |
   | AUDREYT   |  26 | 2006-07    | 2008-08  | broken      |
   | HORNBURG  |  26 | 2014-07    | 2016-08  | broken      |
   | PREACTION |  26 | 2018-07    | 2020-08  | broken      |
-  | SKIM      |  26 | 2022-04    |          | might-break |
   | RBOW      |  25 | 2000-06    | 2002-06  | broken      |
   | FREW      |  25 | 2009-09    | 2011-09  | broken      |
   | PJFL      |  25 | 2012-02    | 2014-02  | broken      |
   | YANICK    |  25 | 2017-01    | 2019-01  | broken      |
   | GUGOD     |  25 | 2018-10    | 2020-10  | broken      |
   | TEAM      |  25 | 2020-03    | 2022-03  | broken      |
+  | DERF      |  25 | 2022-06    |          | ongoing     |
   | DOUGM     |  24 | 1996-05    | 1998-04  | broken      |
   | LBROCARD  |  24 | 2002-12    | 2004-11  | broken      |
   | JSIRACUSA |  24 | 2005-03    | 2007-02  | broken      |
@@ -352,7 +353,6 @@ Current standings (as of 2024-06-01, produced by L<cpan-streaks>, only streaks w
   | SULLR     |  24 | 2012-08    | 2014-07  | broken      |
   | BLHOTSKY  |  24 | 2013-04    | 2015-03  | broken      |
   | FSEITZ    |  24 | 2019-01    | 2020-12  | broken      |
-  | DERF      |  24 | 2022-06    |          | might-break |
   | JDEGUEST  |  24 | 2022-06    |          | might-break |
   | BOOK      |  23 | 2005-01    | 2006-11  | broken      |
   | MRAMBERG  |  23 | 2005-03    | 2007-01  | broken      |

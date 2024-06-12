@@ -342,7 +342,7 @@ time has limits. [See also](#lossy-undef-variable)
 Works like eval, but without [the lossy bug](#lossy-undef-variable)
 
 repl (
-    history\_file => "$ENV{HOME}/.runtime\_debugger.info",
+    history\_file => "$ENV{HOME}/.runtime\_debugger.yml",
     debug        => $ENV{RUNTIME\_DEBUGGER\_DEBUG} // 0,
     levels\_up    => 0,
 );

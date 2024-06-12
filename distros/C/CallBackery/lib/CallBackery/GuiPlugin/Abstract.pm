@@ -14,6 +14,7 @@ use POSIX qw<F_SETFD F_GETFD FD_CLOEXEC>;
 use Time::HiRes qw(usleep);
 use Mojo::JSON qw(encode_json decode_json true false);
 use Mojo::File;
+use Scalar::Util 'weaken';
 # disable warnings below, otherwise testing will give warnings
 eval { local $^W=0; require "sys/ioctl.ph" };
 
@@ -31,7 +32,8 @@ The abstract base class for callbackery gui classes.
 
 =cut
 
-use Mojo::Base -base;
+use Mojo::Base -base, -signatures, -async_await;
+
 
 =head1 ATTRIBUTES
 
@@ -57,7 +59,7 @@ The current user object
 
 =cut
 
-has 'user';
+has 'user'=> undef, weak => 1;
 
 =head2 tabName
 
@@ -116,21 +118,21 @@ has schema => sub {
             unlisted => {
                 type => 'boolean'
             },
-            map { 
+            map {
                 $_ => {
                     type => 'string',
-                    $grammar->{$_}{_doc} ? 
+                    $grammar->{$_}{_doc} ?
                         ( description => $grammar->{$_}{_doc} ) : (),
-                    $grammar->{$_}{_re} ? 
+                    $grammar->{$_}{_re} ?
                         ( pattern => $grammar->{$_}{_re} ) : (),
-                    $grammar->{$_}{_default} ? 
+                    $grammar->{$_}{_default} ?
                         ( default => $grammar->{$_}{_default} ) : (),
                 }
             } @{$grammar->{_vars}},
-            map { 
+            map {
                 $_ => {
                     type => 'object',
-                    $grammar->{$_}{_doc} ? 
+                    $grammar->{$_}{_doc} ?
                         ( description => $grammar->{$_}{_doc} ) : (),
                 }
             } @{$grammar->{_sections}},
@@ -153,7 +155,7 @@ the current controller
 
 has controller => sub {
     shift->user->controller;
-};
+}, weak => 1;
 
 =head2 app
 
@@ -163,7 +165,7 @@ the app object
 
 has app => sub {
     shift->user->app;
-};
+}, weak => 1;
 
 =head2 log
 
@@ -173,7 +175,7 @@ the log object
 
 has log => sub {
     my $self = shift;
-    $self->user and $self->controller and return $self->controller->log;
+    return $self->controller->log if $self->user and $self->controller;
     $self->app->log;
 };
 
@@ -305,8 +307,8 @@ sub filterHashKey {
     my $data = shift;
     my $filterKey = shift;
     my $ref = ref $data;
-    if (not $ref 
-        or $ref eq ref true 
+    if (not $ref
+        or $ref eq ref true
         or $ref eq 'CallBackery::Translate'){
         return $data;
     }
@@ -464,10 +466,17 @@ slurp(file)
 
 =cut
 
+has cfgHash => sub {
+    my $self = shift;
+    return $self->app->config->cfgHash;
+}, weak => 1;
+
 has template => sub {
     my $self = shift;
     my $mt = Mojo::Template->new();
+    weaken($self);
     my $dbLookup = sub { $self->getConfigValue(@_) // ''};
+ 
     # don't use L, use dbLookup instead
     monkey_patch $mt->namespace,
         L => $dbLookup;
@@ -484,10 +493,13 @@ has template => sub {
             return Mojo::File->new($filename)->slurp;
         };
     monkey_patch $mt->namespace,
-        cfgHash => sub { $self->app->config->cfgHash };
+        cfgHash => sub { $self->cfgHash };
+
     monkey_patch $mt->namespace,
         pluginCfg => sub { my $instance = shift;
-            $self->app->config->cfgHash->{PLUGIN}{prototype}{$instance}->config
+            my $cfg = $self->cfgHash->{PLUGIN}{prototype}{$instance}->config;
+            weaken $cfg;
+            return $cfg;
         };
     return $mt;
 };
@@ -517,7 +529,7 @@ sub renderTemplate{
     $self->log->debug('['.$self->name."] writing $destination\n$newData");
     eval {
         local $SIG{__DIE__};
-        $destination->spurt($newData);
+        $destination->spew($newData);
     };
     if ($@){
         if (blessed $@ and $@->isa('autodie::exception')){
@@ -642,6 +654,23 @@ sub systemNoFd {
         return $ret;
     }
     return undef;
+}
+
+sub DESTROY ($self) {
+    # we are only interested in objects that get destroyed during
+    # global destruction as this is a potential problem
+    my $class = ref($self) // "child of ". __PACKAGE__;
+    if (${^GLOBAL_PHASE} ne 'DESTRUCT') {
+        # $self->log->debug($class." DESTROYed");
+        return;
+    }
+    if (blessed $self && ref $self->log){
+        $self->log->debug("late destruction of $class object during global destruction")
+            unless $self->{prototype};
+        return;
+    }
+    warn "extra late destruction of $class object during global destruction\n"
+        unless $self->{prototype};
 }
 
 1;

@@ -11,16 +11,16 @@ HTML::SocialMedia - Put social media links onto your website
 
 =head1 VERSION
 
-Version 0.28
+Version 0.29
 
 =cut
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 =head1 SYNOPSIS
 
 Many websites these days have links and buttons into social media sites.
-This module eases links into Twitter, Facebook and Google's PlusOne.
+This module eases links into Twitter and Facebook.
 
     use HTML::SocialMedia;
     my $sm = HTML::SocialMedia->new();
@@ -62,19 +62,27 @@ info: Object which understands host_name messages, such as L<CGI::Info>.
 =cut
 
 sub new {
-	my $proto = shift;
+	my $class = shift;
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	my $class = ref($proto) || $proto;
-	return unless(defined($class));
+	if(!defined($class)) {
+		# Using HTML::SocialMedia->new(), not HTML::SocialMedia::new()
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
 
-	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
+	}
 
-	my $lingua = $params{lingua};
+	my $lingua = $args{lingua};
 	unless(defined($lingua)) {
 		my %args;
-		if($params{twitter}) {
+		if($args{twitter}) {
 			# Languages supported by Twitter according to
-			# https://twitter.com/about/resources/tweetbutton
+			# https://x.com/about/resources/tweetbutton
 			$args{supported} = ['en', 'nl', 'fr', 'fr-fr', 'de', 'id', 'il', 'ja', 'ko', 'pt', 'ru', 'es', 'tr'];
 		} else {
 			# TODO: Google plus only supports the languages listed at
@@ -90,13 +98,13 @@ sub new {
 				$args{supported} = [];
 			}
 		}
-		if($params{cache}) {
-			$args{cache} = $params{cache};
+		if($args{cache}) {
+			$args{cache} = $args{cache};
 		}
-		if($params{logger}) {
-			$args{logger} = $params{logger};
+		if($args{logger}) {
+			$args{logger} = $args{logger};
 		}
-		$lingua = $params{lingua} || CGI::Lingua->new(%args);
+		$lingua = $args{lingua} || CGI::Lingua->new(%args);
 		if((!defined($lingua)) && scalar($args{supported})) {
 			$args{supported} = [];
 			$lingua = CGI::Lingua->new(%args);
@@ -105,11 +113,11 @@ sub new {
 
 	return bless {
 		_lingua => $lingua,
-		_twitter => $params{twitter},
-		_twitter_related => $params{twitter_related},
-		_cache => $params{cache},
-		_logger => $params{logger},
-		_info => $params{info},
+		_twitter => $args{twitter},
+		_twitter_related => $args{twitter_related},
+		_cache => $args{cache},
+		_logger => $args{logger},
+		_info => $args{info},
 		# _alpha2 => undef,
 	}, $class;
 }
@@ -137,7 +145,6 @@ in the language of the user.
 	facebook_like_button => 1,
 	facebook_share_button => 1,
 	linkedin_share_button => 1,
-	google_plusone => 1,
 	reddit_button => 1,
 	align => 'right',
     );
@@ -156,8 +163,6 @@ facebook_like_button: add a Facebook like button
 facebook_share_button: add a Facebook share button
 
 linkedin_share_button: add a LinkedIn share button
-
-google_plusone: add a Google +1 button
 
 reddit_button: add a Reddit button
 
@@ -246,7 +251,7 @@ sub as_string {
 			# Grab the Facebook preamble and put it as early as we can
 
 			# See if Facebook supports our wanted language. If not then
-			# I suppose we could enuerate through other requested languages,
+			# I suppose we could enumerate through other requested languages,
 			# but that is probably not worth the effort.
 
 			my $country = $self->{_alpha2} || 'en_US';
@@ -260,7 +265,7 @@ sub as_string {
 					$country = 'en_US';
 				}
 			} else {
-				# Resposnse is of type HTTP::Response
+				# Response is of type HTTP::Response
 				require LWP::UserAgent;
 
 				my $response;
@@ -323,10 +328,10 @@ END
 		if($params{twitter_follow_button}) {
 			my $language = $lingua->language();
 			if(($language eq 'English') || ($language eq 'Unknown')) {
-				$rc .= '<a href="//twitter.com/' . $self->{_twitter} . '" class="twitter-follow-button">Follow @' . $self->{_twitter} . '</a>';
+				$rc .= '<a href="//x.com/' . $self->{_twitter} . '" class="twitter-follow-button">Follow @' . $self->{_twitter} . '</a>';
 			} else {
 				my $langcode = substr($self->{_alpha2}, 0, 2);
-				$rc .= '<a href="//twitter.com/' . $self->{_twitter} . "\" class=\"twitter-follow-button\" data-lang=\"$langcode\">Follow \@" . $self->{_twitter} . '</a>';
+				$rc .= '<a href="//x.com/' . $self->{_twitter} . "\" class=\"twitter-follow-button\" data-lang=\"$langcode\">Follow \@" . $self->{_twitter} . '</a>';
 			}
 			if($params{twitter_tweet_button}) {
 				$rc .= $paragraph;
@@ -341,7 +346,7 @@ END
 						if (d.getElementById(id)) return t;
 						js = d.createElement(s);
 						js.id = id;
-						js.src = "https://platform.twitter.com/widgets.js";
+						js.src = "https://platform.x.com/widgets.js";
 						fjs.parentNode.insertBefore(js, fjs);
 
 						t._e = [];
@@ -352,7 +357,7 @@ END
 						return t;
 					}(document, "script", "twitter-wjs"));
 				</script>
-				<a href="//twitter.com/intent/tweet" class="twitter-share-button" data-count="horizontal" data-via="
+				<a href="//x.com/intent/tweet" class="twitter-share-button" data-count="horizontal" data-via="
 END
 			$rc =~ s/\n$//;
 			$rc .= $self->{_twitter} . '"';
@@ -360,7 +365,7 @@ END
 				my @related = @{$self->{_twitter_related}};
 				$rc .= ' data-related="' . $related[0] . ':' . $related[1] . '"';
 			}
-			$rc .= '>Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>';
+			$rc .= '>Tweet</a><script type="text/javascript" src="//platform.x.com/widgets.js"></script>';
 		}
 	}
 
@@ -522,7 +527,7 @@ L<http://search.cpan.org/dist/HTML-SocialMedia/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2011-2020 Nigel Horne.
+Copyright 2011-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

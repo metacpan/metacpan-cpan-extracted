@@ -52,6 +52,7 @@ do { my $x = {
                                       'Ref::Util' => '0.100',
                                       'Scalar::Util' => '0',
                                       'Storable' => '0',
+                                      'autovivification' => '0',
                                       'experimental' => '0.026',
                                       'if' => '0',
                                       'namespace::clean' => '0',

@@ -9,12 +9,12 @@ HTML::SocialMedia - Put social media links onto your website
 
 # VERSION
 
-Version 0.28
+Version 0.29
 
 # SYNOPSIS
 
 Many websites these days have links and buttons into social media sites.
-This module eases links into Twitter, Facebook and Google's PlusOne.
+This module eases links into Twitter and Facebook.
 
     use HTML::SocialMedia;
     my $sm = HTML::SocialMedia->new();
@@ -76,7 +76,6 @@ in the language of the user.
         facebook_like_button => 1,
         facebook_share_button => 1,
         linkedin_share_button => 1,
-        google_plusone => 1,
         reddit_button => 1,
         align => 'right',
     );
@@ -95,8 +94,6 @@ facebook\_like\_button: add a Facebook like button
 facebook\_share\_button: add a Facebook share button
 
 linkedin\_share\_button: add a LinkedIn share button
-
-google\_plusone: add a Google +1 button
 
 reddit\_button: add a Reddit button
 
@@ -149,6 +146,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2011-2020 Nigel Horne.
+Copyright 2011-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2

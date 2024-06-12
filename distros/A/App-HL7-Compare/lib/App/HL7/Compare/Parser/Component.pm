@@ -1,5 +1,5 @@
 package App::HL7::Compare::Parser::Component;
-$App::HL7::Compare::Parser::Component::VERSION = '0.003';
+$App::HL7::Compare::Parser::Component::VERSION = '0.004';
 use v5.10;
 use strict;
 use warnings;

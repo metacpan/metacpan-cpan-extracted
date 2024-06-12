@@ -2,7 +2,7 @@ package Dist::Zilla::PluginBundle::Author::GSG;
 
 # ABSTRACT: Grant Street Group CPAN dists
 use version;
-our $VERSION = 'v0.6.0'; # VERSION
+our $VERSION = 'v0.6.1'; # VERSION
 
 use Carp;
 use Git::Wrapper;
@@ -65,7 +65,7 @@ sub configure {
         [ 'OurPkgVersion' => {
             finder           => [ "$name/MungeableFiles" ],
             semantic_version => 1,
-            overwite         => 1,
+            overwrite        => 1,
         } ],
         'Prereqs::FromCPANfile',
         $meta_provides,
@@ -286,7 +286,7 @@ Dist::Zilla::PluginBundle::Author::GSG - Grant Street Group CPAN dists
 
 =head1 VERSION
 
-version v0.6.0
+version v0.6.1
 
 =head1 SYNOPSIS
 

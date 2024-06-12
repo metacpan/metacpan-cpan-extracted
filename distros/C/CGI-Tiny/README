@@ -1141,8 +1141,10 @@ COMPARISON TO CGI.PM
       implementations on CPAN; see "Templating" in CGI::Tiny::Cookbook.
 
       * CGI::Tiny does not do any implicit encoding of cookie values or the
-      Expires header or cookie attribute. The "epoch_to_date" convenience
-      function is provided to render appropriate Expires date values.
+      Expires header or cookie attribute. See "Cookies" in
+      CGI::Tiny::Cookbook for examples of encoding and decoding cookie
+      values. The "epoch_to_date" convenience function is provided to
+      render appropriate Expires date values.
 
     There are a number of alternatives to CGI.pm but they do not
     sufficiently address the design issues; primarily, none of them

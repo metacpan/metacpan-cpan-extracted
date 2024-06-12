@@ -1,5 +1,10 @@
 Revision history for HTML-SocialMedia
 
+0.29	Tue Jun 11 09:07:25 EDT 2024
+	Removed documentation of Google PlusOne
+	twitter.com has been rebranded as x.com
+	Calling new on an object now returns a clone rather than setting the defaults in the new object
+
 0.28	Sat Jan 18 06:38:22 EST 2020
 	Fix RT#131501
 

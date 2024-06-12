@@ -20,7 +20,7 @@ use parent  qw( Exporter );
 use feature qw( say );
 
 our @EXPORT  = qw( Trace );
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 =head1 SYNOPSIS
 

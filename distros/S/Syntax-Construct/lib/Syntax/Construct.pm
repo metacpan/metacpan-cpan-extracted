@@ -4,7 +4,7 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.035';
+our $VERSION = '1.036';
 
 my %introduces = do { no warnings 'qw';
                  ( '5.040' => [qw[
@@ -261,10 +261,9 @@ sub import {
     die 'Empty construct list at ', _position(), ".\n" unless @_;
 
     my $nearest_stable = _nearest_stable();
-    my $is_stable = $nearest_stable == $];
     if ($max_version le $nearest_stable) {
         warn "Faking version $nearest_stable to test removed constructs.\n"
-            if ! $is_stable && $max_version eq $nearest_stable;
+            if ! _is_stable($]) && $max_version eq $nearest_stable;
         die "$d_constr removed in $max_version at ", _position(), ".\n";
     }
 
@@ -275,14 +274,22 @@ sub import {
     $_->() for @actions;
 }
 
+
+sub _is_stable {
+    my ($version) = @_;
+    return $version =~ /^[0-5]\.[0-9][0-9][02468]/
+}
+
 sub _nearest_stable {
-    return $] if $] =~ /^[0-5]\.[0-9][0-9][02468]/;
+    return $] if _is_stable($]);
     my ($major, $minor) = $] =~ /^([0-5])\.([0-9][0-9][13579])/;
     ++$minor;
     return "$major.$minor"
 }
 
+
 sub _is_old_empty { @{ $introduces{old} } ? 0 : 1 }
+
 
 =head1 NAME
 
@@ -290,7 +297,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.035
+Version 1.036
 
 =head1 SYNOPSIS
 

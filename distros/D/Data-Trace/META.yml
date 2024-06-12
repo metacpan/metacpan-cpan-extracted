@@ -19,7 +19,7 @@ provides:
     version: v1.302.2
   Data::Trace:
     file: lib/Data/Trace.pm
-    version: '1.04'
+    version: '1.05'
 requires:
   Data::DPath: '0.58'
   Time::Moment: '0.44'
@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/poti1/data-trace/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/poti1/data-trace
-version: '1.04'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

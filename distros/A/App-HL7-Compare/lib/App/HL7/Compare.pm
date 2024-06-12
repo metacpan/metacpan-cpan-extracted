@@ -1,5 +1,5 @@
 package App::HL7::Compare;
-$App::HL7::Compare::VERSION = '0.003';
+$App::HL7::Compare::VERSION = '0.004';
 use v5.10;
 use strict;
 use warnings;
@@ -200,9 +200,11 @@ sub compare
 {
 	my ($self) = @_;
 
-	my $compared = $self->_compare_messages(map {
-		$self->parser->parse($_, %{$self->message_opts})
-		} $self->_get_files);
+	my $compared = $self->_compare_messages(
+		map {
+			$self->parser->parse($_, %{$self->message_opts})
+		} $self->_get_files
+	);
 	$self->_remove_matching($compared);
 
 	return $compared;

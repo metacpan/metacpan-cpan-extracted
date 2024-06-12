@@ -4,7 +4,7 @@
       "Tim Potapov <tim.potapov[AT]gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "artistic_2"
    ],
@@ -38,7 +38,7 @@
    "provides" : {
       "App::Pod" : {
          "file" : "lib/App/Pod.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "url" : "https://github.com/poti1/app-pod"
       }
    },
-   "version" : "0.36",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.37",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

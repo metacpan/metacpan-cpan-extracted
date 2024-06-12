@@ -12,16 +12,28 @@ sub build
 sub build_from_methods
 {
 	my $self = shift;
-	$self->symbiosis->mount('/test', $self->testmod);
+
+	if ($self->symbiosis->engine->isa('KelpX::Symbiosis::Engine::Kelp')) {
+		$self->symbiosis->mount('/test', $self->testmod);
+	}
+	else {
+		$self->symbiosis->mount('/test', $self->testmod);
+	}
 }
 
 sub build_from_loaded
 {
 	my $self = shift;
 
-	$self->symbiosis->mount('/s', $self);
-	$self->symbiosis->mount('/test', 'symbiont');
-	$self->symbiosis->mount('/test/test2', 'AnotherTestSymbiont');
+	if ($self->symbiosis->engine->isa('KelpX::Symbiosis::Engine::Kelp')) {
+		$self->symbiosis->mount('/test/test2', 'AnotherTestSymbiont');
+		$self->symbiosis->mount('/test', 'symbiont');
+	}
+	else {
+		$self->symbiosis->mount('/s', $self);
+		$self->symbiosis->mount('/test', 'symbiont');
+		$self->symbiosis->mount('/test/test2', 'AnotherTestSymbiont');
+	}
 }
 
 sub home
@@ -30,3 +42,4 @@ sub home
 }
 
 1;
+

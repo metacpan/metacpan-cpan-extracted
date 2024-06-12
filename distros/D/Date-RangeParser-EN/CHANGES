@@ -1,6 +1,9 @@
 Changelog for Date-RangeParser-EN
 
-v1.1.0 2024-05-14T18:30:32
+v1.2.0 2024-06-11T18:05:38
+ - Update README (Andrew Hewus Fresh)
+
+v1.1.0 2024-05-14T18:30:20
  - Update README (Andrew Hewus Fresh)
  - Update Makefile (Andrew Hewus Fresh)
  - Pull request #3: SM-4835 (James Hammer)

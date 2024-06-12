@@ -3,7 +3,7 @@ package Date::RangeParser::EN;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Parse plain English date/time range strings
 use version;
-our $VERSION = 'v1.1.0'; # VERSION
+our $VERSION = 'v1.2.0'; # VERSION
 
 use strict;
 use warnings;
@@ -1190,7 +1190,7 @@ Date::RangeParser::EN - Parse plain English date/time range strings
 
 =head1 VERSION
 
-version v1.1.0
+version v1.2.0
 
 =head1 SYNOPSIS
 

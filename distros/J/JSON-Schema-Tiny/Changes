@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-Tiny
 
+0.025     2024-06-11 20:17:39Z
+          - update test results and exemptions for TJSA 1.025
+
 0.024     2024-05-09 16:27:25Z
           - update test results and exemptions for TJSA 1.024
 

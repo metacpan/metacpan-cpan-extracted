@@ -3,9 +3,9 @@ NAME
     Acme::CPANAuthors::CPAN::Streaks::* modules
 
 VERSION
-    This document describes version 20240601.0 of
+    This document describes version 20240612.0 of
     Acme::CPANAuthorsBundle::CPAN::Streaks (from Perl distribution
-    Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-01.
+    Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-12.
 
 HOMEPAGE
     Please visit the project's homepage at

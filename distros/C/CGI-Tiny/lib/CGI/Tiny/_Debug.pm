@@ -7,7 +7,7 @@ package CGI::Tiny::_Debug;
 use strict;
 use warnings;
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 my %methods = (get => 1, head => 1, post => 1, put => 1, delete => 1);
 sub debug_command {

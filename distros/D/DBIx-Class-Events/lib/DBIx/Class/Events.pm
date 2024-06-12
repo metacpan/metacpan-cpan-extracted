@@ -1,7 +1,8 @@
 package DBIx::Class::Events;
 
 # ABSTRACT: Store Events for your DBIC Results
-our $VERSION = '0.9.2'; # VERSION
+use version;
+our $VERSION = 'v0.9.3'; # VERSION
 
 use v5.10;
 use strict;
@@ -101,8 +102,6 @@ sub update {
 sub delete {
     my ( $self, @args ) = @_;
 
-    my $ret = $self->next::method(@args);
-
     # DBIx::Class::Row::delete has a special edge case for calling
     # delete as a class method, we however can't log it in that case.
     if ( ref $self ) {
@@ -110,7 +109,8 @@ sub delete {
         $self->event( delete => { details => \%deleted } );
     }
 
-    return $ret;
+    return $self->next::method(@args);
+
 };
 
 1;
@@ -125,7 +125,7 @@ DBIx::Class::Events - Store Events for your DBIC Results
 
 =head1 VERSION
 
-version 0.9.2
+version v0.9.3
 
 =head1 SYNOPSIS
 
@@ -340,6 +340,12 @@ or you should add a default to L</event_defaults>.
         } );
     }
 
+This L<C<belongs_to>|DBIx::Class::Relationship/belongs_to>
+relationship is optional,
+and the examples and tests assume if it exists,
+it is not a real database-enforced foreign key
+that will trigger constraint violations if the thing being tracked is deleted.
+
     # A path back to the object that this event is for,
     # not required unlike the has_many "events" relationship above
     __PACKAGE__->belongs_to(
@@ -374,6 +380,9 @@ Logs dirty columns to the C<details> column, with an C<update> event.
 =item delete
 
 Logs all columns to the C<details> column, with a C<delete> event.
+
+See the L</BUGS AND LIMITATIONS> for more information about
+using this method with a database enforced foreign key.
 
 =back
 
@@ -428,6 +437,11 @@ will not create events the same as L<single row|DBIx::Class::Row> modifications.
 L<"update_all"|DBIx::Class::ResultSet/update_all> or L<"delete_all"|DBIx::Class::ResultSet/delete_all>
 methods of the C<ResultSet> if you want these triggers.
 
+If you create the C<belongs_to> relationship
+described under L</Tracking Table>
+as a database-enforced foreign key
+then deleting from the tracked table will fail due to those constraints.
+
 There are three required columns on the L</events_relationship> table:
 C<event>, C<triggered_on>, and C<details>.  We should eventually make those
 configurable.
@@ -452,35 +466,11 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2019 by Grant Street Group.
+This software is Copyright (c) 2018 - 2024 by Grant Street Group.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
-
-=head1 CONTRIBUTORS
-
-=for stopwords Andrew Fresh Brendan Byrd Justin Wheeler
-
-=over 4
-
-=item *
-
-Andrew Fresh <andrew.fresh@grantstreet.com>
-
-=item *
-
-Andrew Fresh <andrew+github@afresh1.com>
-
-=item *
-
-Brendan Byrd <brendan.byrd@grantstreet.com>
-
-=item *
-
-Justin Wheeler <justin.wheeler@grantstreet.com>
-
-=back
 
 =cut
 

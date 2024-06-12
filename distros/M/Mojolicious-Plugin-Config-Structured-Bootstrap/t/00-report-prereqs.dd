@@ -16,7 +16,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                        'Mojolicious::Plugin::Authentication::OIDC' => '0.03',
+                                        'Mojolicious::Plugin::Authentication::OIDC' => '0.05',
                                         'Mojolicious::Plugin::Authorization::AccessControl' => '0.02',
                                         'Mojolicious::Plugin::Cron::Scheduler' => '0.02',
                                         'Mojolicious::Plugin::Data::Transfigure' => '0.01',
@@ -28,6 +28,7 @@ do { my $x = {
                                       },
                       'requires' => {
                                       'Array::Utils' => '0.5',
+                                      'DateTime::Format::MySQL' => '0.08',
                                       'HTTP::Status' => '6.45',
                                       'Hash::Merge' => '0.302',
                                       'List::MoreUtils' => '0.430',

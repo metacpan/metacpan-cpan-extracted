@@ -4,28 +4,29 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-06-01'; # DATE
+our $DATE = '2024-06-12'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240601.0'; # VERSION
+our $VERSION = '20240612.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
-    'GBROWN' => '',
-    'SKIM' => '',
-    'EXODIST' => '',
-    'NAUTOFON' => '',
+    'BRTASTIC' => '',
+    'MARIOROY' => '',
+    'SHLOMIF' => '',
+    'GSG' => '',
+    'JJATRIA' => '',
+    'TIMKA' => '',
+    'DBOOK' => '',
+    'DERF' => '',
+    'ETHER' => '',
+    'JV' => '',
+    'KRYDE' => '',
     'NHORNE' => '',
-    'ARFREITAS' => '',
-    'CORION' => '',
-    'GENE' => '',
-    'HANJE' => '',
-    'KIMOTO' => '',
-    'MARKOV' => '',
-    'REEDFISH' => '',
-    'TANIGUCHI' => '',
-    'TVIGNAUD' => '',
+    'RWF' => '',
+    'SHOGO' => '',
+    'SKIM' => '',
+    'TONYC' => '',
     'TYRRMINAL' => '',
-    'WORTHMINE' => '',
 );
 
 
@@ -44,34 +45,35 @@ Acme::CPANAuthors::CPAN::Streaks::DailyReleases::Current - Authors with ongoing 
 
 =head1 VERSION
 
-This document describes version 20240601.0 of Acme::CPANAuthors::CPAN::Streaks::DailyReleases::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-01.
+This document describes version 20240612.0 of Acme::CPANAuthors::CPAN::Streaks::DailyReleases::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-12.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-06-01, produced by L<cpan-streaks>):
+Current standings (as of 2024-06-12, produced by L<cpan-streaks>):
 
   +-----------+-----+------------+-------------+
   | author    | len | start_date | status      |
   +-----------+-----+------------+-------------+
-  | PERLANCAR | 100 | 2024-02-23 | ongoing     |
-  | GBROWN    |   3 | 2024-05-29 | might-break |
-  | SKIM      |   3 | 2024-05-29 | might-break |
-  | EXODIST   |   2 | 2024-05-30 | might-break |
-  | NAUTOFON  |   2 | 2024-05-30 | might-break |
-  | NHORNE    |   2 | 2024-05-30 | might-break |
-  | ARFREITAS |   1 | 2024-05-31 | might-break |
-  | CORION    |   1 | 2024-05-31 | might-break |
-  | GENE      |   1 | 2024-05-31 | might-break |
-  | HANJE     |   1 | 2024-05-31 | might-break |
-  | KIMOTO    |   1 | 2024-05-31 | might-break |
-  | MARKOV    |   1 | 2024-05-31 | might-break |
-  | REEDFISH  |   1 | 2024-05-31 | might-break |
-  | TANIGUCHI |   1 | 2024-05-31 | might-break |
-  | TVIGNAUD  |   1 | 2024-05-31 | might-break |
-  | TYRRMINAL |   1 | 2024-05-31 | might-break |
-  | WORTHMINE |   1 | 2024-05-31 | might-break |
+  | PERLANCAR | 111 | 2024-02-23 | ongoing     |
+  | BRTASTIC  |   4 | 2024-06-08 | might-break |
+  | MARIOROY  |   4 | 2024-06-08 | might-break |
+  | SHLOMIF   |   3 | 2024-06-09 | might-break |
+  | GSG       |   2 | 2024-06-10 | might-break |
+  | JJATRIA   |   2 | 2024-06-10 | might-break |
+  | TIMKA     |   2 | 2024-06-10 | might-break |
+  | DBOOK     |   1 | 2024-06-11 | might-break |
+  | DERF      |   1 | 2024-06-11 | might-break |
+  | ETHER     |   1 | 2024-06-11 | might-break |
+  | JV        |   1 | 2024-06-11 | might-break |
+  | KRYDE     |   1 | 2024-06-11 | might-break |
+  | NHORNE    |   1 | 2024-06-11 | might-break |
+  | RWF       |   1 | 2024-06-11 | might-break |
+  | SHOGO     |   1 | 2024-06-11 | might-break |
+  | SKIM      |   1 | 2024-06-11 | might-break |
+  | TONYC     |   1 | 2024-06-11 | might-break |
+  | TYRRMINAL |   1 | 2024-06-11 | might-break |
   +-----------+-----+------------+-------------+
 
 =head1 HOMEPAGE

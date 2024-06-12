@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.9.2
+    version v0.9.3
 
 SYNOPSIS
 
@@ -216,7 +216,12 @@ CONFIGURATION AND ENVIRONMENT
                 deflate => sub { $json->encode(shift) },
             } );
         }
-    
+
+    This belongs_to relationship is optional, and the examples and tests
+    assume if it exists, it is not a real database-enforced foreign key
+    that will trigger constraint violations if the thing being tracked is
+    deleted.
+
         # A path back to the object that this event is for,
         # not required unlike the has_many "events" relationship above
         __PACKAGE__->belongs_to(
@@ -249,6 +254,9 @@ PRECONFIGURED EVENTS
     delete
 
       Logs all columns to the details column, with a delete event.
+
+      See the "BUGS AND LIMITATIONS" for more information about using this
+      method with a database enforced foreign key.
 
 METHODS
 
@@ -298,6 +306,10 @@ BUGS AND LIMITATIONS
     events the same as single row modifications. Use the "update_all" or
     "delete_all" methods of the ResultSet if you want these triggers.
 
+    If you create the belongs_to relationship described under "Tracking
+    Table" as a database-enforced foreign key then deleting from the
+    tracked table will fail due to those constraints.
+
     There are three required columns on the "events_relationship" table:
     event, triggered_on, and details. We should eventually make those
     configurable.
@@ -318,19 +330,9 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2018 - 2019 by Grant Street Group.
+    This software is Copyright (c) 2018 - 2024 by Grant Street Group.
 
     This is free software, licensed under:
 
       The Artistic License 2.0 (GPL Compatible)
-
-CONTRIBUTORS
-
-      * Andrew Fresh <andrew.fresh@grantstreet.com>
-
-      * Andrew Fresh <andrew+github@afresh1.com>
-
-      * Brendan Byrd <brendan.byrd@grantstreet.com>
-
-      * Justin Wheeler <justin.wheeler@grantstreet.com>
 

@@ -1,6 +1,14 @@
 Revision history for Runtime-Debugger
 
 =================
+1.03 - 2024-06-11
+=================
+
+Updated git flow for perl v5.40.
+Newlines are preserved in history.
+Renamed history file.
+
+=================
 1.02 - 2024-05-16
 =================
 

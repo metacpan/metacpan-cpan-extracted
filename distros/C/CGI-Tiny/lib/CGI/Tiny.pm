@@ -11,7 +11,7 @@ use Carp ();
 use IO::Handle ();
 use Exporter ();
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 use constant DEFAULT_REQUEST_BODY_LIMIT => 16777216;
 use constant DEFAULT_REQUEST_BODY_BUFFER => 262144;
@@ -19,7 +19,7 @@ use constant DEFAULT_RESPONSE_BODY_BUFFER => 131072;
 
 our @EXPORT = 'cgi';
 
-# List from HTTP::Status 6.29
+# List from HTTP::Status 6.46
 # Unmarked codes are from RFC 7231 (2017-12-20)
 my %HTTP_STATUS = (
     100 => 'Continue',
@@ -43,7 +43,7 @@ my %HTTP_STATUS = (
     304 => 'Not Modified',                    # RFC 7232: Conditional Request
     305 => 'Use Proxy',
     307 => 'Temporary Redirect',
-    308 => 'Permanent Redirect',              # RFC 7528: Permanent Redirect
+    308 => 'Permanent Redirect',              # RFC 9110: HTTP Semantics
     400 => 'Bad Request',
     401 => 'Unauthorized',                    # RFC 7235: Authentication
     402 => 'Payment Required',
@@ -57,14 +57,14 @@ my %HTTP_STATUS = (
     410 => 'Gone',
     411 => 'Length Required',
     412 => 'Precondition Failed',             # RFC 7232: Conditional Request
-    413 => 'Payload Too Large',
+    413 => 'Content Too Large',               # RFC 9110: HTTP Semantics
     414 => 'URI Too Long',
     415 => 'Unsupported Media Type',
     416 => 'Range Not Satisfiable',           # RFC 7233: Range Requests
     417 => 'Expectation Failed',
     418 => 'I\'m a teapot',                   # RFC 2324: HTCPC/1.0  1-april
-    421 => 'Misdirected Request',             # RFC 7540: HTTP/2
-    422 => 'Unprocessable Entity',            # RFC 4918: WebDAV
+    421 => 'Misdirected Request',             # RFC 9110: HTTP Semantics
+    422 => 'Unprocessable Content',           # RFC 9110: HTTP Semantics
     423 => 'Locked',                          # RFC 4918: WebDAV
     424 => 'Failed Dependency',               # RFC 4918: WebDAV
     425 => 'Too Early',                       # RFC 8470: Using Early Data in HTTP

@@ -8,13 +8,9 @@ use warnings;
 
 Subs::Trace - Trace all calls in a package.
 
-=head1 VERSION
-
-Version 0.08
-
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -44,6 +40,8 @@ But for ALL functions in a class.
 
 This module updates all methods/functions in a class to
 also print a message when invoked.
+
+(This is a more of a proof-of-concept than useful!)
 
 =head1 SUBROUTINES/METHODS
 

@@ -5,7 +5,7 @@
       "Michael Aquilina <aquilina@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -54,7 +54,7 @@
    "provides" : {
       "Date::RangeParser::EN" : {
          "file" : "lib/Date/RangeParser/EN.pm",
-         "version" : "v1.1.0"
+         "version" : "v1.2.0"
       }
    },
    "release_status" : "stable",
@@ -68,8 +68,8 @@
          "web" : "https://github.com/mjaquilina/Date-RangeParser-EN"
       }
    },
-   "version" : "v1.1.0",
-   "x_generated_by_perl" : "v5.38.2",
+   "version" : "v1.2.0",
+   "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1

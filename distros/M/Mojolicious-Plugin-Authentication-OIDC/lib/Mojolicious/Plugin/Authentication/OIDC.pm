@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::Authentication::OIDC 0.04;
+package Mojolicious::Plugin::Authentication::OIDC 0.05;
 use v5.26;
 use warnings;
 
@@ -300,14 +300,17 @@ sub register($self, $app, $params) {
     $token_helper => sub($c, $token = undef, $decode = 1) {
       my $t = $token // $conf{get_token}->($c);
       return $t unless ($decode);
-      return decode_jwt(token => ($token // $conf{get_token}->($c)), key => \$conf{public_key});
+      return undef if (!defined($t) || $t eq 'null');
+      return decode_jwt(token => $t, key => \$conf{public_key});
     }
   );
 
   # public helper to access current user and OIDC roles
   $app->helper(
     $current_user_helper => sub($c) {
-      return $conf{get_user}->($c->app->renderer->get_helper($token_helper)->($c));
+      my $t = $c->app->renderer->get_helper($token_helper)->($c);
+      return undef if (!defined($t) || $t eq 'null');
+      return $conf{get_user}->($t);
     }
   );
   $app->helper(
@@ -315,7 +318,8 @@ sub register($self, $app, $params) {
       my ($user, $token);
       try {
         $token = $c->app->renderer->get_helper($token_helper)->($c);
-        $user  = $c->app->renderer->get_helper($current_user_helper)->($c);
+        return [] unless ($token);
+        $user = $c->app->renderer->get_helper($current_user_helper)->($c);
         my @roles = $conf{get_roles}->($user, $token)->@*;
         @roles = grep {defined} map {$conf{role_map}->{$_}} @roles if (defined($conf{role_map}));
         return [@roles];

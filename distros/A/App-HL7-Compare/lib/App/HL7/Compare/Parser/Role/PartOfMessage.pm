@@ -1,5 +1,5 @@
 package App::HL7::Compare::Parser::Role::PartOfMessage;
-$App::HL7::Compare::Parser::Role::PartOfMessage::VERSION = '0.003';
+$App::HL7::Compare::Parser::Role::PartOfMessage::VERSION = '0.004';
 use v5.10;
 use strict;
 use warnings;

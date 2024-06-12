@@ -172,6 +172,7 @@ sub getFieldValue {
     my $self = shift;
     my $field = shift;
     my $entry = $self->formCfgMap->{$field};
+    my $log = $self->log;
     return undef unless ref $entry eq 'HASH';
     if ($entry->{getter}){
         if (ref $entry->{getter} eq 'CODE'){
@@ -179,17 +180,17 @@ sub getFieldValue {
             my $data = $entry->{getter}->($self);
             if (eval { blessed $data && $data->isa('Mojo::Promise')}){
                 $data = $data->then(sub ($value) {
-                    $self->log->debug(sprintf("async getter %s: %0.2fs",$field,time-$start));
+                    $log->debug(sprintf("async getter %s: %0.2fs",$field,time-$start));
                     return $value;
                 });
             }
             else {
-                $self->log->debug(sprintf("getter %s: %0.2fs",$field,time-$start));
+                $log->debug(sprintf("getter %s: %0.2fs",$field,time-$start));
             }
             return $data;
         }
         else {
-            $self->log->warn('Plugin instance'.$self->name." field $field has a broken getter\n");
+            $log->warn('Plugin instance'.$self->name." field $field has a broken getter\n");
         }
     }
     return $self->getConfigValue($self->name.'::'.$field);

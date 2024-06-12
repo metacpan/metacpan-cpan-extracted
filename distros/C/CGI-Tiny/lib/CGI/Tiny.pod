@@ -1166,8 +1166,9 @@ L<CGI::Tiny::Cookbook/"Templating">.
 =item *
 
 CGI::Tiny does not do any implicit encoding of cookie values or the C<Expires>
-header or cookie attribute. The L</"epoch_to_date"> convenience function is
-provided to render appropriate C<Expires> date values.
+header or cookie attribute. See L<CGI::Tiny::Cookbook/"Cookies"> for examples
+of encoding and decoding cookie values. The L</"epoch_to_date"> convenience
+function is provided to render appropriate C<Expires> date values.
 
 =back
 

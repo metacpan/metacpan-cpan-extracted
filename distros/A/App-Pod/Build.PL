@@ -7,6 +7,12 @@ use Module::Build;
 use File::Spec::Functions qw( catfile );
 Module::Build->VERSION( '0.4004' );
 
+sub readme {
+    print "Building README\n";
+    system "pod2markdown lib/App/Pod.pm > README.md";
+}
+readme();
+
 my $class = Module::Build->subclass(
     code => q{
         use Perl::OSType    qw(os_type);

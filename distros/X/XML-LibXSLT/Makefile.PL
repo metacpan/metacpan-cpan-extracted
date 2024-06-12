@@ -127,7 +127,7 @@ if ($config{LIBS} !~ /\-l(lib)?xslt\b/) {
             $config{LIBS} .= ' -llibxslt -llibxml2';
         }
     } else {
-        $config{LIBS} .= ' -lxml2 -lz';
+        $config{LIBS} .= ' -lxml2 -lxslt -lz';
     }
 }
 

@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-06-01'; # DATE
+our $DATE = '2024-06-12'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240601.0'; # VERSION
+our $VERSION = '20240612.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
@@ -25,8 +25,8 @@ use Acme::CPANAuthors::Register (
     'BOBTFISH' => '',
     'FAYLAND' => '',
     'PLICEASE' => '',
-    'NUFFIN' => '',
     'SKIM' => '',
+    'NUFFIN' => '',
     'MSCHWERN' => '',
     'MIYAGAWA' => '',
     'SIMON' => '',
@@ -157,13 +157,13 @@ Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::AllTime - Authors wit
 
 =head1 VERSION
 
-This document describes version 20240601.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-01.
+This document describes version 20240612.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-12.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-06-01, produced by L<cpan-streaks>, only streaks with length of at least 6 are included):
+Current standings (as of 2024-06-12, produced by L<cpan-streaks>, only streaks with length of at least 6 are included):
 
   +-----------+-----+------------+----------+-------------+
   | author    | len | start_date | end_date | status      |
@@ -186,9 +186,9 @@ Current standings (as of 2024-06-01, produced by L<cpan-streaks>, only streaks w
   | BINGOS    |  17 | 2009-07    | 2010-11  | broken      |
   | FAYLAND   |  16 | 2008-09    | 2009-12  | broken      |
   | PLICEASE  |  16 | 2015-01    | 2016-04  | broken      |
+  | SKIM      |  16 | 2023-03    |          | ongoing     |
   | NUFFIN    |  15 | 2007-12    | 2009-02  | broken      |
   | SHARYANTO |  15 | 2013-07    | 2014-09  | broken      |
-  | SKIM      |  15 | 2023-03    |          | might-break |
   | MSCHWERN  |  14 | 2000-11    | 2001-12  | broken      |
   | ADAMK     |  14 | 2008-12    | 2010-01  | broken      |
   | MIYAGAWA  |  14 | 2009-02    | 2010-03  | broken      |

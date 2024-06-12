@@ -1,0 +1,43 @@
+---
+abstract: 'Store Events for your DBIC Results'
+author:
+  - 'Grant Street Group <developers@grantstreet.com>'
+build_requires:
+  DBD::SQLite: '0'
+  DBIx::Class::Core: '0'
+  DBIx::Class::Schema: '0'
+  DateTime: '0'
+  DateTime::Format::SQLite: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  JSON::PP: '0'
+  Pod::Coverage::TrustPod: '0'
+  Test::Mock::Time: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.1101'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-Events
+provides:
+  DBIx::Class::Events:
+    file: lib/DBIx/Class/Events.pm
+    version: v0.9.3
+requires:
+  DBIx::Class: '0'
+resources:
+  bugtracker: https://github.com/GrantStreetGroup/p5-DBIx-Class-Events/issues
+  repository: git://github.com/GrantStreetGroup/p5-DBIx-Class-Events.git
+version: v0.9.3
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: Artistic-2.0
+x_static_install: 1

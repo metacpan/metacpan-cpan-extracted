@@ -14,8 +14,7 @@ CREATE TABLE "artist_event" (
     "artistid" INTEGER NOT NULL,
     "event" VARCHAR(32) NOT NULL,
     "triggered_on" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "details" LONGTEXT,
-  FOREIGN KEY ("artistid") REFERENCES "artist"("artistid") ON UPDATE CASCADE
+    "details" LONGTEXT
 );
 
 CREATE INDEX "artist_event_idx_artist" ON "artist_event" ("artistid", "event", "triggered_on");
@@ -37,8 +36,7 @@ CREATE TABLE "cd_event" (
     "cdid" INTEGER NOT NULL,
     "event" VARCHAR(32) NOT NULL,
     "triggered_on" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "details" LONGTEXT,
-  FOREIGN KEY ("cdid") REFERENCES "cd"("cdid") ON UPDATE CASCADE
+    "details" LONGTEXT
 );
 
 CREATE INDEX "cd_event_idx_cd" ON "cd_event" ("cdid", "event", "triggered_on");
@@ -61,8 +59,7 @@ CREATE TABLE "track_event" (
     "event" VARCHAR(32) NOT NULL,
     "triggered_on" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "details" LONGTEXT,
-    "title" text NULL,
-  FOREIGN KEY ("trackid") REFERENCES "track"("trackid") ON UPDATE CASCADE
+    "title" text NULL
 );
 
 CREATE INDEX "track_event_idx_track" ON "track_event" ("trackid", "event", "triggered_on");

@@ -1,7 +1,8 @@
 package KelpX::Symbiosis::Test;
-$KelpX::Symbiosis::Test::VERSION = '1.14';
+$KelpX::Symbiosis::Test::VERSION = '2.00';
 use Kelp::Base;
 use Kelp::Test;
+use Carp;
 
 attr "-app" => sub { die "`app` parameter is required" };
 
@@ -9,6 +10,12 @@ sub wrap
 {
 	my ($class, %args) = @_;
 	my $self = $class->new(%args);
+
+	die 'This is not a Kelp app'
+		unless $self->app->isa('Kelp');
+	die 'This Kelp app does not have Symbiosis'
+		unless $self->app->can('symbiosis');
+
 	return Kelp::Test->new(app => $self);
 }
 
@@ -31,7 +38,7 @@ sub can
 
 sub AUTOLOAD
 {
-	my ($self) = shift;
+	my ($self) = @_;
 
 	my $func = our $AUTOLOAD;
 	return if $func =~ /::DESTROY$/;
@@ -60,7 +67,12 @@ KelpX::Symbiosis::Test - Allow testing symbiotic environments using Kelp::Test
 
 =head1 DESCRIPTION
 
-This module allows testing Kelp apps with Symbiosis using L<Kelp::Test>. The problem with I<Kelp::Test> is that it automatically runs I<run()> on the app without any way to configure this behavior. Symbiotic apps use I<run_all()> to run the whole environment, while I<run()> stays the same and only runs Kelp. This module replaces those two methods and autoloads the rest of the methods from Kelp instance.
+This module allows testing Kelp apps with Symbiosis using L<Kelp::Test>. The
+problem with I<Kelp::Test> is that it automatically runs I<run()> on the app
+without any way to configure this behavior. Symbiotic apps use I<run_all()> to
+run the whole environment, while I<run()> stays the same and only runs Kelp.
+This module replaces those two methods and autoloads the rest of the methods
+from Kelp instance.
 
 =head1 USAGE
 
@@ -68,9 +80,15 @@ This module allows testing Kelp apps with Symbiosis using L<Kelp::Test>. The pro
 
 I<new in 1.10>
 
-Instead of using I<Kelp::Test::new> use I<KelpX::Symbiosis::Test::wrap> with the same interface. Then you can create test cases not only for Kelp routes but also for the rest of Plack applications. The I<wrap> method will return a L<Kelp::Test> object, so refer to its documentation for more details.
+Instead of using I<Kelp::Test::new> use I<KelpX::Symbiosis::Test::wrap> with
+the same interface. Then you can create test cases not only for Kelp routes but
+also for the rest of Plack applications. The I<wrap> method will return a
+L<Kelp::Test> object, so refer to its documentation for more details.
 
 =head1 HOW DOES IT WORK?
 
-The main Kelp instance is wrapped in this module class and the resulting object is passed into Kelp::Test instead. I<KelpX::Symbiosis::Test> autoloads Kelp methods and wraps I<run_all> inside I<run>, which allows L<Kelp::Test> to use it.
+The main Kelp instance is wrapped in this module class and the resulting object
+is passed into Kelp::Test instead. I<KelpX::Symbiosis::Test> autoloads Kelp
+methods and wraps I<run_all> inside I<run>, which allows L<Kelp::Test> to use
+it.
 

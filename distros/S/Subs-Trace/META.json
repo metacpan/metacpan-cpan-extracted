@@ -4,7 +4,7 @@
       "Tim Potapov <tim.potapov@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "artistic_2"
    ],
@@ -33,7 +33,7 @@
    "provides" : {
       "Subs::Trace" : {
          "file" : "lib/Subs/Trace.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -42,12 +42,12 @@
          "web" : "https://github.com/poti1/subs-trace/issues"
       },
       "license" : [
-         "http://opensource.org/licenses/artistic-license-2.0.php"
+         "http://www.perlfoundation.org/artistic_license_2_0"
       ],
       "repository" : {
          "url" : "https://github.com/poti1/subs-trace"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

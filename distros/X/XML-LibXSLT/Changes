@@ -1,5 +1,10 @@
 Revision history for Perl extension XML::LibXSLT.
 
+2.003000    2024-06-11
+    - lib/XML/LibXSLT/Quick.pm .
+        - Add an 'implicit' type to $dest
+        - Correct a type spelling ('file' instead of 'path')
+
 2.002001    2023-02-10
     - Makefile.PL
         - Corrections and refactorings

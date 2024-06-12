@@ -16,16 +16,17 @@ name: Runtime-Debugger
 provides:
   Runtime::Debugger:
     file: lib/Runtime/Debugger.pm
-    version: '1.02'
+    version: '1.03'
 requires:
   Class::Tiny: '1.008'
   Data::Printer: '1.002001'
   PadWalker: '2.5'
   Term::ReadLine::Gnu: '1.44'
+  YAML::XS: '0'
   perl: '5.018'
 resources:
   bugtracker: https://github.com/poti1/runtime-debugger/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/poti1/runtime-debugger
-version: '1.02'
+version: '1.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

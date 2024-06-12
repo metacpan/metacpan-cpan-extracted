@@ -1,5 +1,11 @@
 Revision history for Perl extension Kelp::Module::Symbiosis.
 
+2.00 Wed Jun 12 2024
+	- added interchangeable engines, configured through 'engine'
+	- existing functionality moved to Adapter and Engine::URLMap
+	- added Kelp engine, using Kelp router to access apps
+	- made Util module public, added useful plack_to_kelp function
+
 1.14 Wed May 11 2022
 	- remove broken homepage link
 

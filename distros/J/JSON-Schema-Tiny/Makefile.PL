@@ -97,6 +97,7 @@ my %WriteMakefileArgs = (
     "Ref::Util" => "0.100",
     "Scalar::Util" => 0,
     "Storable" => 0,
+    "autovivification" => 0,
     "experimental" => "0.026",
     "if" => 0,
     "namespace::clean" => 0,
@@ -122,7 +123,7 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.024",
+  "VERSION" => "0.025",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -153,6 +154,7 @@ my %FallbackPrereqs = (
   "Test::JSON::Schema::Acceptance" => "1.014",
   "Test::More" => "0.96",
   "Test::Warnings" => 0,
+  "autovivification" => 0,
   "constant" => 0,
   "experimental" => "0.026",
   "if" => 0,

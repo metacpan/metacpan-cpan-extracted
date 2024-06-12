@@ -17,7 +17,7 @@ CallBackery::Translate - gettext po file translation functionality
 =head1 SYNOPSIS
 
  use CallBackery::Translate qw(mtr);
- my $loc = CallBackery::Translate::new(localeRoot=>$dir);
+ my $loc = CallBackery::Translate->new(localeRoot=>$dir);
  $loc->setLocale('de');
  $loc->tra("Hello %1","Tobi");
 

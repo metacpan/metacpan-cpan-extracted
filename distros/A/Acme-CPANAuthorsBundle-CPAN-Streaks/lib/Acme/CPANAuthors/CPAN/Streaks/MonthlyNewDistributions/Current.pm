@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-06-01'; # DATE
+our $DATE = '2024-06-12'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240601.0'; # VERSION
+our $VERSION = '20240612.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
@@ -14,13 +14,13 @@ use Acme::CPANAuthors::Register (
     'DJERIUS' => '',
     'BRIANDFOY' => '',
     'GBROWN' => '',
+    'TYRRMINAL' => '',
     'GDT' => '',
     'LNATION' => '',
     'TIMKA' => '',
-    'TYRRMINAL' => '',
+    'EHUELS' => '',
     'BPS' => '',
     'DERIV' => '',
-    'EHUELS' => '',
     'EXODIST' => '',
     'HAARG' => '',
     'HANJE' => '',
@@ -39,6 +39,13 @@ use Acme::CPANAuthors::Register (
     'TEODESIAN' => '',
     'TONYC' => '',
     'YOSHIMASA' => '',
+    'BRTASTIC' => '',
+    'CADE' => '',
+    'CHRISARG' => '',
+    'EXTISM' => '',
+    'RADIUSCZ' => '',
+    'SHLOMIF' => '',
+    'WDAEMS' => '',
 );
 
 
@@ -57,29 +64,29 @@ Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::Current - Authors wit
 
 =head1 VERSION
 
-This document describes version 20240601.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-01.
+This document describes version 20240612.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-06-12.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-06-01, produced by L<cpan-streaks>):
+Current standings (as of 2024-06-12, produced by L<cpan-streaks>):
 
   +-----------+-----+------------+-------------+
   | author    | len | start_date | status      |
   +-----------+-----+------------+-------------+
   | PERLANCAR | 119 | 2014-08    | ongoing     |
-  | SKIM      |  15 | 2023-03    | might-break |
+  | SKIM      |  16 | 2023-03    | ongoing     |
   | DJERIUS   |   6 | 2023-12    | might-break |
-  | BRIANDFOY |   4 | 2024-02    | might-break |
-  | GBROWN    |   2 | 2024-04    | might-break |
+  | BRIANDFOY |   5 | 2024-02    | ongoing     |
+  | GBROWN    |   3 | 2024-04    | ongoing     |
+  | TYRRMINAL |   3 | 2024-04    | ongoing     |
   | GDT       |   2 | 2024-04    | might-break |
   | LNATION   |   2 | 2024-04    | might-break |
   | TIMKA     |   2 | 2024-04    | might-break |
-  | TYRRMINAL |   2 | 2024-04    | might-break |
+  | EHUELS    |   2 | 2024-05    | ongoing     |
   | BPS       |   1 | 2024-05    | might-break |
   | DERIV     |   1 | 2024-05    | might-break |
-  | EHUELS    |   1 | 2024-05    | might-break |
   | EXODIST   |   1 | 2024-05    | might-break |
   | HAARG     |   1 | 2024-05    | might-break |
   | HANJE     |   1 | 2024-05    | might-break |
@@ -98,6 +105,13 @@ Current standings (as of 2024-06-01, produced by L<cpan-streaks>):
   | TEODESIAN |   1 | 2024-05    | might-break |
   | TONYC     |   1 | 2024-05    | might-break |
   | YOSHIMASA |   1 | 2024-05    | might-break |
+  | BRTASTIC  |   1 | 2024-06    | ongoing     |
+  | CADE      |   1 | 2024-06    | ongoing     |
+  | CHRISARG  |   1 | 2024-06    | ongoing     |
+  | EXTISM    |   1 | 2024-06    | ongoing     |
+  | RADIUSCZ  |   1 | 2024-06    | ongoing     |
+  | SHLOMIF   |   1 | 2024-06    | ongoing     |
+  | WDAEMS    |   1 | 2024-06    | ongoing     |
   +-----------+-----+------------+-------------+
 
 =head1 HOMEPAGE

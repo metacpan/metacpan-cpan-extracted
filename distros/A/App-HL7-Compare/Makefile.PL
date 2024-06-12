@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "Mooish::AttributeBuilder" => "1.001",
     "Type::Tiny" => 2
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }

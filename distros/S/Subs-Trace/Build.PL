@@ -6,6 +6,12 @@ use warnings;
 use Module::Build;
 Module::Build->VERSION( '0.4004' );
 
+sub readme {
+    print "Building README\n";
+    system "pod2markdown lib/Subs/Trace.pm > README.md";
+}
+readme();
+
 my $builder = Module::Build->new(
     module_name        => 'Subs::Trace',
     license            => 'artistic_2',

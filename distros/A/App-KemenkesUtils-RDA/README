@@ -1,0 +1,309 @@
+NAME
+    App::KemenkesUtils::RDA - Get one or more values from Indonesian
+    Ministry of Health's RDA (AKG, angka kecukupan gizi, from Kemenkes)
+
+VERSION
+    This document describes version 0.001 of App::KemenkesUtils::RDA (from
+    Perl distribution App-KemenkesUtils-RDA), released on 2024-06-08.
+
+SYNOPSIS
+DESCRIPTION
+    This distribution includes CLI utilities related to "AKG" (angka
+    kecukupan gizi, nutritional adeqecy rate, RDA, recommended daily intake)
+    from Kemenkes (Kementerian Kesehatan, Indonesia) Indonesia's Ministry of
+    Health.
+
+    *   akg
+
+    *   kemenkes-get-rda
+
+FUNCTIONS
+  kemenkes_get_rda
+    Usage:
+
+     kemenkes_get_rda(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Get one or more values from Indonesian Ministry of Health's RDA (AKG,
+    angka kecukupan gizi, from Kemenkes).
+
+    Examples:
+
+    *   List all nutrient (symbols):
+
+         kemenkes_get_rda(action => "list_nutrients");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             "Ca",
+             "Cl",
+             "Cr",
+             "Cu",
+             "Dietary_Fiber",
+             "Energy",
+             "F",
+             "Fe",
+             "I",
+             "K",
+             "Mg",
+             "Mn",
+             "Na",
+             "Omega3",
+             "Omega6",
+             "P",
+             "Protein",
+             "Se",
+             "Total_Carbohydrate",
+             "Total_Fat",
+             "VA",
+             "VB1",
+             "VB12",
+             "VB2" .. "VB7",
+             "VB9",
+             "VC",
+             "VD",
+             "VE",
+             "VK",
+             "Water",
+             "Zn",
+             "group",
+             "height",
+             "weight",
+           ],
+           {},
+         ]
+
+    *   List all groups (symbols):
+
+         kemenkes_get_rda(action => "list_nutrients");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             "Ca",
+             "Cl",
+             "Cr",
+             "Cu",
+             "Dietary_Fiber",
+             "Energy",
+             "F",
+             "Fe",
+             "I",
+             "K",
+             "Mg",
+             "Mn",
+             "Na",
+             "Omega3",
+             "Omega6",
+             "P",
+             "Protein",
+             "Se",
+             "Total_Carbohydrate",
+             "Total_Fat",
+             "VA",
+             "VB1",
+             "VB12",
+             "VB2" .. "VB7",
+             "VB9",
+             "VC",
+             "VD",
+             "VE",
+             "VK",
+             "Water",
+             "Zn",
+             "group",
+             "height",
+             "weight",
+           ],
+           {},
+         ]
+
+    *   List all AKG values:
+
+         kemenkes_get_rda();
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             { symbol => "Ca", group => "0to5mo", height => 60, weight => 6, ref => 200 },
+             { symbol => "Cl", group => "0to5mo", height => 60, weight => 6, ref => 180 },
+             { symbol => "Cr", group => "0to5mo", height => 60, weight => 6, ref => 0.2 },
+             { symbol => "Cu", group => "0to5mo", height => 60, weight => 6, ref => 200 },
+         # ...snipped 5477 lines for brevity...
+               weight => "",
+               ref    => "",
+             },
+           ],
+           {
+             "table.fields" => ["symbol", "group", "height", "weight", "ref", "%akg"],
+           },
+         ]
+
+    *   List AKG for vitamin D, for all groups:
+
+         kemenkes_get_rda(nutrient => "VD");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             { group => "0to5mo", height => 60, weight => 6, ref => 10 },
+             { group => "6to11mo", height => 72, weight => 9, ref => 10 },
+             { group => "1to3y", height => 92, weight => 13, ref => 15 },
+             { group => "4to6y", height => 113, weight => 19, ref => 15 },
+             { group => "7to9y", height => 130, weight => 27, ref => 15 },
+             { group => "male_10to12y", height => 145, weight => 36, ref => 15 },
+             { group => "male_13to15y", height => 163, weight => 50, ref => 15 },
+             { group => "male_16to18y", height => 168, weight => 60, ref => 15 },
+             { group => "male_19to29y", height => 168, weight => 60, ref => 15 },
+             { group => "male_30to49y", height => 166, weight => 60, ref => 15 },
+             { group => "male_50to64y", height => 166, weight => 60, ref => 15 },
+             { group => "male_65to80y", height => 164, weight => 58, ref => 20 },
+             { group => "male_80y_plus", height => 164, weight => 54, ref => 20 },
+             { group => "female_10to12y", height => 147, weight => 38, ref => 15 },
+             { group => "female_13to15y", height => 156, weight => 48, ref => 15 },
+             { group => "female_16to18y", height => 159, weight => 52, ref => 15 },
+             { group => "female_19to29y", height => 159, weight => 55, ref => 15 },
+             { group => "female_30to49y", height => 158, weight => 56, ref => 15 },
+             { group => "female_50to64y", height => 158, weight => 56, ref => 15 },
+             { group => "female_65to80y", height => 157, weight => 53, ref => 20 },
+             { group => "female_80y_plus", height => 157, weight => 53, ref => 20 },
+             { group => "add_pregnant_trimst1", height => "", weight => "", ref => 0 },
+             { group => "add_pregnant_trimst2", height => "", weight => "", ref => 0 },
+             { group => "add_pregnant_trimst3", height => "", weight => "", ref => 0 },
+             { group => "add_breastfeeding_0to6m", height => "", weight => "", ref => 0 },
+             { group => "add_breastfeeding_6to12m", height => "", weight => "", ref => 0 },
+           ],
+           {
+             "table.fields" => ["symbol", "group", "height", "weight", "ref", "%akg"],
+           },
+         ]
+
+    *   List AKG for vitamin D, for 1-3 years olds:
+
+         kemenkes_get_rda(nutrient => "VD", group => "1to3y");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [{ height => 92, weight => 13, ref => 15 }],
+           {
+             "table.fields" => ["symbol", "group", "height", "weight", "ref", "%akg"],
+           },
+         ]
+
+    *   List AKG for vitamin D, for 1-3 years olds, and compare a value to
+        reference:
+
+         kemenkes_get_rda(nutrient => "VD", group => "1to3y", value => 10);
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             { "height" => 92, "weight" => 13, "ref" => 15, "%akg" => 66.6666666666667 },
+           ],
+           {
+             "table.fields" => ["symbol", "group", "height", "weight", "ref", "%akg"],
+           },
+         ]
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action => *str* (default: "list_refs")
+
+        (No description)
+
+    *   detail => *bool*
+
+        (No description)
+
+    *   group => *str*
+
+        (No description)
+
+    *   nutrient => *nutrient::symbol*
+
+        (No description)
+
+    *   value => *float*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-KemenkesUtils-RDA>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-KemenkesUtils-RDA>.
+
+SEE ALSO
+    TableData::Business::ID::Kemenkes::RDA
+
+    Other "App::BPOMUtils::*" distributions.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-KemenkesUtils-RDA
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

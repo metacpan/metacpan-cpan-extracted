@@ -4,9 +4,9 @@ use Mojo::Base qw(Mojolicious::Plugin::Qooxdoo::JsonRpcController),
     -signatures,-async_await;
 use CallBackery::Exception qw(mkerror);
 use CallBackery::Translate qw(trm);
-use Scalar::Util qw(blessed weaken);
 use Mojo::JSON qw(encode_json decode_json from_json);
 use Syntax::Keyword::Try;
+use Scalar::Util qw(blessed weaken);
 
 =head1 NAME
 
@@ -47,18 +47,17 @@ my %allow = (
 
 has config => sub ($self) {
     $self->app->config;
-};
+}, weak => 1;
 
 has user => sub ($self) {
-    my $obj = $self->app->userObject->new(controller=>$self,log=>$self->log);
-    weaken $obj->{controller};
+    my $obj = $self->app->userObject->new(app=>$self->app,controller=>$self,log=>$self->log);
     return $obj;
 };
 
 has pluginMap => sub ($self) {
     my $map = $self->config->cfgHash->{PLUGIN};
     return $map;
-};
+}, weak => 1;
 
 
 sub allow_rpc_access ($self,$method) {
@@ -217,9 +216,9 @@ async sub login { ## no critic (RequireArgUnpacking)
     my $login = shift;
     my $password = shift;
     my $cfg = $self->config->cfgHash->{BACKEND};
-    if (my $ok = 
+    if (my $ok =
         await $self->config->promisify($self->user->login($login,$password))){
-        return {            
+        return {
             sessionCookie => $self->user->makeSessionCookie()
         }
     } else {
@@ -253,6 +252,16 @@ async sub instantiatePlugin_p {
     my $args = shift;
     my $user = $self->user;
     my $plugin =  await $self->config->instantiatePlugin_p($name,$user,$args);
+    $plugin->log($self->log);
+    return $plugin;
+}
+
+sub instantiatePlugin {
+    my $self = shift;
+    my $name = shift;
+    my $args = shift;
+    my $user = $self->user;
+    my $plugin =  $self->config->instantiatePlugin($name,$user,$args);
     $plugin->log($self->log);
     return $plugin;
 }
@@ -311,27 +320,28 @@ returns user specific configuration information
 
 =cut
 
+
 async sub getUserConfig {
     my $self = shift;
     my $args = shift;
     my @plugins;
-    my $ph = $self->pluginMap;
-    for my $plugin (@{$ph->{list}}){
-        my $obj;
+    for my $plugin ($self->pluginMap->{list}->@*){
         try {
-            $obj = await $self->instantiatePlugin_p($plugin,$args);
+            my $obj = await $self->instantiatePlugin_p($plugin,$args);
+            #$obj =  $self->instantiatePlugin($plugin,$args);
+            # $self->log->debug("instanciate $plugin");
+            push @plugins, {
+                tabName => $obj->tabName,
+                name => $obj->name,
+                instantiationMode => $obj->instantiationMode
+            };
         } catch ($error) {
             warn "$error";
         }
-        next unless $obj;
-        push @plugins, {
-            tabName => $obj->tabName,
-            name => $obj->name,
-            instantiationMode => $obj->instantiationMode
-        };
     }
+    my $userConfig = await $self->config->promisify($self->user->userInfo);
     return {
-        userInfo => await $self->config->promisify($self->user->userInfo),
+        userInfo => $userConfig,
         plugins => \@plugins,
     };
 }
@@ -363,10 +373,10 @@ following events are known:
 sub runEventActions {
     my $self = shift;
     my $event = shift;
+    my @args = @_;
     for my $obj (@{$self->config->configPlugins}){
-        weaken $obj->controller($self)->{controller};
         if (my $action = $obj->eventActions->{$event}){
-            $action->(@_)
+            $action->(@args)
         }
     }
 }
@@ -548,6 +558,20 @@ async sub handleDownload {
     $self->rendered(200);
 }
 
+sub DESTROY ($self) {
+    # we are only interested in objects that get destroyed during
+    # global destruction as this is a potential problem
+    my $class = ref($self) // "child of ". __PACKAGE__;
+    if (${^GLOBAL_PHASE} ne 'DESTRUCT') {
+        # $self->log->debug($class." DESTROYed");
+        return;
+    }
+    if (blessed $self && ref $self->log){
+        $self->log->debug("late destruction of $class object during global destruction");
+        return;
+    }
+    warn "extra late destruction of $class object during global destruction\n";
+}
 
 1;
 __END__

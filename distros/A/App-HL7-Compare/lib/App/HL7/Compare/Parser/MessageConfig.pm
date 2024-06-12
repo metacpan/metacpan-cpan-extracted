@@ -1,5 +1,5 @@
 package App::HL7::Compare::Parser::MessageConfig;
-$App::HL7::Compare::Parser::MessageConfig::VERSION = '0.003';
+$App::HL7::Compare::Parser::MessageConfig::VERSION = '0.004';
 use v5.10;
 use strict;
 use warnings;
@@ -7,7 +7,9 @@ use warnings;
 use Moo;
 use Mooish::AttributeBuilder -standard;
 use Types::Common::String qw(StrLength);
-use Carp qw(croak);
+use Carp qw(carp croak);
+
+use constant DEFAULT_SEPARATORS => '|^~\&';
 
 has param 'segment_separator' => (
 	isa => StrLength [1, 2],
@@ -43,7 +45,12 @@ has option 'subcomponent_separator' => (
 sub from_MSH
 {
 	my ($self, $input) = @_;
-	$input =~ s/\AMSH//;
+	my $has_msh = $input =~ s/\AMSH//;
+
+	if (!$has_msh) {
+		$input = DEFAULT_SEPARATORS;
+		carp "no MSH segment found - using default separators ($input)";
+	}
 
 	my @order = qw(
 		field_separator

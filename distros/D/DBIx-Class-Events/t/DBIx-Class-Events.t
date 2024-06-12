@@ -15,6 +15,8 @@ require DBD::SQLite;
 require DateTime::Format::SQLite;
 
 my $schema = MyApp::Schema->connect('dbi:SQLite:dbname=:memory:');
+$schema->storage->dbh_do(
+    sub { $_[1]->selectrow_arrayref("PRAGMA foreign_keys = ON;") } );
 
 {
     my $dtf = $schema->storage->datetime_parser;
@@ -115,6 +117,7 @@ $schema->txn_do( sub {
     is $events[0]->event, 'insert', 'Insert event';
     is $events[1]->event, 'delete', 'Delete event';
     is $events[1]->artistid, $artist_id, 'Delete event has correct artist';
+    is $events[1]->artist, undef, "Can't belong to an artist that is deleted";
     is $events[1]->triggered_on, DateTime->now,
         "Triggered event when we expected";
 

@@ -1,3 +1,0 @@
-{
-	modules => [qw(JSON)],
-}

@@ -3,12 +3,15 @@ package Net::DNS::Resolver::Unbound;
 use strict;
 use warnings;
 use Net::DNS;
-use base qw(Net::DNS::Resolver DynaLoader);
+
+use constant OS_SPEC => defined eval "require Net::DNS::Resolver::$^O";	## no critic
+use constant OS_CONF => join '::', 'Net::DNS::Resolver', OS_SPEC ? $^O : 'UNIX';
+use base qw(Net::DNS::Resolver::Base DynaLoader), OS_CONF;
 
 our $VERSION;
 
 BEGIN {
-	$VERSION = '1.21';
+	$VERSION = '1.22';
 	eval { __PACKAGE__->bootstrap($VERSION) };
 }
 
@@ -77,12 +80,13 @@ Returns a new Net::DNS::Resolver::Unbound resolver object.
 =cut
 
 sub new {
-	my ( $class, @argument ) = @_;
-	my $self = $class->SUPER::new();
+	my ( $class, %args ) = @_;
+	my @pass = map { ( $_, delete $args{$_} ) } qw(config_file);
+	my $self = $class->SUPER::new(@pass);
 	$self->{ub_ctx} = Net::DNS::Resolver::Unbound::Context->new();
-	while ( my $attr = shift @argument ) {
-		my $value = shift @argument;
-		$self->$attr( ref($value) ? @$value : $value );
+	while ( my ( $attr, $value ) = each %args ) {
+		my $ref = ref($value);
+		$self->$attr( $ref ? @$value : $value );
 	}
 	return $self;
 }
@@ -110,7 +114,7 @@ By default, DNS queries are sent to the IP addresses listed in
 
 =cut
 
-sub nameservers {
+sub xnameservers {
 	my $self = shift;
 	local $self->{debug};		## "no nameservers" ok in this context
 	return $self->SUPER::nameservers(@_);
@@ -149,6 +153,7 @@ sub bgsend {
 	$self->_reset_errorstring;
 
 	my $query = $self->_make_query_packet(@argument);
+	my $image = $query->encode;
 	my $ident = $query->header->id;
 	my ($q)	  = $query->question;
 	return $self->{ub_ctx}->ub_resolve_async( $q->name, $q->{qtype}, $q->{qclass}, $ident );
@@ -460,6 +465,7 @@ sub _finalise_config {
 	}
 
 	my $count = 3;
+	local $self->{debug};		## "no nameservers" ok in this context
 	foreach ( grep { $count-- > 0 } $self->nameservers ) {
 		$self->set_fwd($_);
 	}

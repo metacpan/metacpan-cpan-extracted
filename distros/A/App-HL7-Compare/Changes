@@ -1,5 +1,9 @@
 Revision history for Perl extension App::HL7::Compare.
 
+0.004 Tue Jun 11 2024
+	- fix -m flag not working due to case insensitivity
+	- add a warning and default message separators in case there is no message header
+
 0.003 Fri Oct 27 2023
 	- add --msh option which turns on comparing MSH header segment
 	- improve the order of segments in the comparison if one of the messages is missing a segment

@@ -12,7 +12,7 @@ use XML::LibXSLT ();
 
 use vars qw( $VERSION );
 
-$VERSION = '2.002001';
+$VERSION = '2.003000';
 
 sub stylesheet
 {
@@ -153,6 +153,11 @@ sub generic_transform
             my $path = $dest->{path};
             _write_utf8_file( $path, scalar( $calc_ret->() ) );
         }
+        elsif ( $type eq "implicit" )
+        {
+            $calc_ret->();
+            return undef();
+        }
         elsif ( $type eq "return" )
         {
             return scalar( $calc_ret->() );
@@ -250,7 +255,9 @@ C<\$my_string_var>
 
 C<<< {type => 'dom', } >>> - the DOM will be returned.
 
-C<<< {type => 'path', path => $filepath, } >>> - the output string will be written to $filepath .
+C<<< {type => 'file', path => $filepath, } >>> - the output string will be written to $filepath .
+
+C<<< {type => 'implicit', } >>> - the output string will be calculated but implicitly discarded and undef() returned. (Added in version 2.00300 .)
 
 C<<< {type => 'return', } >>> - the output string will be returned.
 

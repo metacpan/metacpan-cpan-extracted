@@ -1,3 +1,11 @@
+Changes in version 2.58
+-----------------------
+
+* Be more precise about numeric errors (issue #26).
+* Add strict to G::L::Parser.
+* Doc enhancements, thanks to Elvin Aslanov.
+* Silence unnecessary test diagnostics (issue #29).
+
 Changes in version 2.57
 -----------------------
 

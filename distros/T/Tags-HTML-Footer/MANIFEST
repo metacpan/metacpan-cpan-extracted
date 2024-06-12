@@ -1,7 +1,9 @@
 Changes
 CONCEPT
 examples/create_and_print_footer.pl
+examples/plack_app_table_with_footer.pl
 Footer.pm
+images/plack_app_table_with_footer.png
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

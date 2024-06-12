@@ -27,12 +27,13 @@ use Term::ANSIColor qw( colored );
 use PadWalker       qw( peek_our  peek_my );
 use Scalar::Util    qw( blessed reftype );
 use Class::Tiny     qw( term attr debug levels_up );
-use re              qw( eval );                        # For debug.
-use feature         qw( say );
-use parent          qw( Exporter );
-use subs            qw( uniq );
+use YAML::XS();
+use re      qw( eval );       # For debug.
+use feature qw( say );
+use parent  qw( Exporter );
+use subs    qw( uniq );
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 our @EXPORT  = qw( run repl d dd np p );
 our %PEEKS;
 
@@ -407,7 +408,7 @@ CODE
 Works like eval, but without L<the lossy bug|/Lossy undef Variable>
 
 repl (
-    history_file => "$ENV{HOME}/.runtime_debugger.info",
+    history_file => "$ENV{HOME}/.runtime_debugger.yml",
     debug        => $ENV{RUNTIME_DEBUGGER_DEBUG} // 0,
     levels_up    => 0,
 );
@@ -455,7 +456,7 @@ sub _init {
 
     # Build the debugger object.
     my $self = bless {
-        history_file => "$ENV{HOME}/.runtime_debugger.info",
+        history_file => "$ENV{HOME}/.runtime_debugger.yml",
         term         => $term,
         attr         => $attribs,
         debug        => $ENV{RUNTIME_DEBUGGER_DEBUG} // 0,
@@ -1376,12 +1377,12 @@ sub _restore_history {
 
     # Restore last history.
     if ( -e $self->{history_file} ) {
-        open my $fh, '<', $self->{history_file} or die $!;
-        while ( <$fh> ) {
-            chomp;
-            push @history, $_;
+        my $all = eval { YAML::XS::LoadFile( $self->{history_file} ) };
+        if ( $@ ) {
+            warn "$@\n";
+            return;
         }
-        close $fh;
+        @history = @{$all->{history}};
     }
 
     @history = ( "q" ) if not @history;    # avoid blank history.
@@ -1392,9 +1393,15 @@ sub _save_history {
     my ( $self ) = @_;
 
     # Save current history.
-    open my $fh, '>', $self->{history_file} or die $!;
-    say $fh $_ for $self->_history;
-    close $fh;
+    eval {
+        YAML::XS::DumpFile(
+            $self->{history_file},
+            {
+                history => [ $self->_history ],
+            },
+        );
+    };
+    warn "$@\n" if $@;
 }
 
 # Print

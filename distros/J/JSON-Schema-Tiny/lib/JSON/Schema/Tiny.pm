@@ -1,15 +1,16 @@
 # vim: set ft=perl ts=8 sts=2 sw=2 tw=100 et :
 use strictures 2;
-package JSON::Schema::Tiny; # git description: v0.023-2-g2185e91
+package JSON::Schema::Tiny; # git description: v0.024-3-g81fed08
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 use 5.020;  # for unicode_strings, signatures, postderef features
 use stable 0.031 'postderef';
 use experimental 0.026 qw(signatures args_array_with_signatures);
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -146,10 +147,13 @@ sub _eval_subschema ($data, $schema, $state) {
   # if any of them are absolute prefix of this schema location, we are in a loop.
   my $canonical_uri = canonical_uri($state);
   my $schema_location = $state->{traversed_schema_path}.$state->{schema_path};
-  abort($state, 'EXCEPTION: infinite loop detected (same location evaluated twice)')
-    if grep substr($schema_location, 0, length) eq $_,
-      keys $state->{seen}{$state->{data_path}}{$canonical_uri}->%*;
-  $state->{seen}{$state->{data_path}}{$canonical_uri}{$schema_location}++;
+  {
+    use autovivification qw(fetch store);
+    abort($state, 'EXCEPTION: infinite loop detected (same location evaluated twice)')
+      if grep substr($schema_location, 0, length) eq $_,
+        keys $state->{seen}{$state->{data_path}}{$canonical_uri}->%*;
+    $state->{seen}{$state->{data_path}}{$canonical_uri}{$schema_location}++;
+  }
 
   my $schema_type = get_type($schema);
   return $schema || E($state, 'subschema is false') if $schema_type eq 'boolean';
@@ -211,7 +215,7 @@ sub _eval_subschema ($data, $schema, $state) {
   }
 
   # check for previously-supported but now removed keywords
-  foreach my $keyword (sort keys $removed_keywords{$spec_version}->%*) {
+  foreach my $keyword (sort keys(($removed_keywords{$spec_version}//{})->%*)) {
     next if not exists $schema->{$keyword};
     my $message ='no-longer-supported "'.$keyword.'" keyword present (at location "'
       .canonical_uri($state).'")';
@@ -1308,7 +1312,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 

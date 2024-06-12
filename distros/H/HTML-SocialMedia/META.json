@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -25,6 +25,7 @@
             "CGI::Info" : "0.1",
             "Carp" : "0",
             "Test::Most" : "0",
+            "Test::Needs" : "0",
             "Test::NoWarnings" : "0"
          }
       },
@@ -51,6 +52,6 @@
          "web" : "https://github.com/nigelhorne/HTML-SocialMedia"
       }
    },
-   "version" : "0.28",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.29",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

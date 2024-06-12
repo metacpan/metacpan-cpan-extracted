@@ -7,7 +7,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 META.json
 META.yml
-README
+README.md
 t/00-load.t
 t/01-usage-simple.t
 t/02-trim.t
@@ -17,4 +17,3 @@ t/cpan/ojo.pm
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-xt/boilerplate.t
