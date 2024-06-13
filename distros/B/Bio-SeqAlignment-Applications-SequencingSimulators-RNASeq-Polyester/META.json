@@ -70,11 +70,11 @@
    "provides" : {
       "Bio::SeqAlignment::Applications::SequencingSimulators::RNASeq::Polyester" : {
          "file" : "lib/Bio/SeqAlignment/Applications/SequencingSimulators/RNASeq/Polyester.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_generated_by_perl" : "v5.38.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

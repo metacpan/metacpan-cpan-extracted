@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::Signal;
-$ExtUtils::Typemaps::Signal::VERSION = '0.005';
+$ExtUtils::Typemaps::Signal::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -52,7 +52,7 @@ T_TIMESPEC
 
 OUTPUT
 T_TIMESPEC
-	$var.tv_sec + $var.tv_nsec / 1000000000.0;
+	sv_setnv($arg, $var.tv_sec + $var.tv_nsec / 1000000000.0);
 
 T_SIGINFO
 	{
@@ -94,7 +94,44 @@ ExtUtils::Typemaps::Signal - A typemap for dealing with signal related types
 
 =head1 VERSION
 
-version 0.005
+version 0.006
+
+=head1 SYNOPSIS
+
+ use ExtUtils::Typemaps::Signal;
+ # First, read my own type maps:
+ my $private_map = ExtUtils::Typemaps->new(file => 'my.map');
+
+ # Then, get the Signal set and merge it into my maps
+ my $map = ExtUtils::Typemaps::Signal->new;
+ $private_map->merge(typemap => $map);
+
+ # Now, write the combined map to an output file
+ $private_map->write(file => 'typemap');
+
+=head1 DESCRIPTION
+
+ExtUtils::Typemaps::Signal is an ExtUtils::Typemaps subclass that provides several useful typemaps when dealing with signalling code. In particular it converts the following C types:
+
+=over 4
+
+=item * signo_t
+
+Input only. This turns a signal name (e.g. C<TERM>) or number (C<15>) into a signal number. Do note you need to typedef int to this type yourself.
+
+=item * sigset_t*
+
+Input only. This turns a C<POSIX::SigSet> object into a C<sigset_t*>. Alternatively, it will convert a signal name/number into a signal set.
+
+=item * siginfo_t
+
+Output only. This turns a C<siginfo_t> into a hash containing the various values
+
+=item * struct timespec
+
+This turns a numeric duration into a struct timespec. This supports input and output.
+
+=back
 
 =head1 AUTHOR
 

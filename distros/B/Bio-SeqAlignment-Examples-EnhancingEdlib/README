@@ -1,0 +1,182 @@
+NAME
+    Bio::SeqAlignment::Examples::EnhancingEdlib - Parallelizing Edlib with
+    MCE, OpenMP using Inline and FFI::Platypus
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+    A collection of examples that demonstrate how to enhance the sequence
+    alignment library Edlib by adding process level parallelism (through
+    MCE) and thread level parallelism (through OpenMP). These examples
+    hopefully demonstrate the general present day relevance of Perl for
+    constructing bioinformatic applications related to sequence mapping.
+
+DESCRIPTION
+    This distribution provides examples of sequence mapping applications
+    build on top of the Edlib library. The examples demonstrate how to use
+    the MCE and OpenMP parallelism libraries to speed up the sequence
+    alignment process through process and thread level parallelism. The
+    examples are meant to be illustrative of the capabilities of Perl to
+    create parallel components for sequencing applications. These examples
+    educational, and are not meant to be used in production code. However,
+    they can be used as a starting point for creating such applications,
+    which is the point we are trying to make in the presentation given at
+    the Perl and Raku conference 2024.
+
+    All scripts were used to generate data for the talk given to the Science
+    Track of the Perl & Raku conference 2024 https://tprc.us/tprc-2024-las/
+    https://blogs.perl.org/users/oodler_577/2024/01/perl-raku-conference-202
+    4-to-host-a-science-track.html
+
+db
+    This is a directory that holds the sequence data used in the examples.
+    It contains two files : Homo_sapiens.GRCh38.cds.sample.strip.fasta :
+    1000 sequences Homo_sapiens.GRCh38.sample.end.strip.fasta : 648
+    sequences from the human transcriptome.
+
+scripts
+    This is a directory that holds various scripts in Perl and R that are
+    used to generate and analyze performance data for the MCE and openMP
+    enhanced versions of edlib.
+
+  testMapMCE_openMP.pl
+    Perl script that illustrates the use of the Linear dataflow and the
+    Generic Mapper dicussed in Bio::SeqAlignment::Components::SeqMapping
+    <https://metacpan.org/pod/Bio::SeqAlignment::Components::SeqMapping> for
+    the creation of an MCE and OpenMP enhanced version of Edlib. Running the
+    script generates the results file timings_openMP.txt . Before running in
+    your own machine, please make sure that the number of workers and the
+    number of threads are set between 1 and the maximum number of
+    hyperthreads for your system.
+
+  testMapMCE_overC.pl
+    Perl script that illustrates the use of the Linear dataflow and the
+    Generic Mapper dicussed in Bio::SeqAlignment::Components::SeqMapping
+    <https://metacpan.org/pod/Bio::SeqAlignment::Components::SeqMapping> for
+    the creation of an MCE enhanced version of Edlib. Running the script
+    generates the results file timings.txt . Before running in your own
+    machine, please make sure that the number of workers is set between 1
+    and the maximum number of hyperthreads for your system. Feel free to
+    experiment with different chunk sizes (the script only checks chunk
+    sizes between 1 and 20 query sequences).
+
+  plot_timings.R
+    R script that generates the figures for the benchmarking between the MCE
+    and MCE/OpenMP enhanced versions of Edlib.
+
+  timings.txt
+    Execution timings of the MCE version of the enhanced Edlib library. This
+    is a tab separated file with three columns: Workers : number of MCE
+    workers Time : execution time in seconds Chunk_Size : MCE chunk size
+
+  timings_openMP.txt
+    Execution timings of the MCE/openMP version of the enhanced Edlib
+    library. This is a tab separated file with three columns: Workers :
+    number of MCE workers Time : execution time in seconds Num_Threads :
+    Number of OpenMP threads
+
+  timings_chunk.png
+    Plot of the timings.txt file
+
+  timings_MCE_OMP.png
+    Plot of the execution times of the MCE enhanced version of Edlib (for
+    chunk size of one) for an increasing number of MCE workers v.s. the
+    MCE/OpenMP enhancement for an increasing number of threads for single
+    worker.
+
+  timings_MCE_with_OMP.png
+    Plot of the execution times of the MCE/OpenMP enhanced version of Edlib
+    for various combinations of workers and threads. The figure is a two
+    dimensional histogram (rendered as a contour plot) with the 5% best
+    performing combinations marked with a '+' sign.
+
+  spacetime_MCE_OMP.png
+    Plot of the resources (copies of data in memory x execution time) used
+    by the MCE enhanced version of Edlib (for chunk size of one) for an
+    increasing number of MCE workers v.s. the MCE/OpenMP enhancement for an
+    increasing number of threads for single worker.
+
+  spacetime_MCE_with_OMP.png
+    Plot of the resources (copies of data in memory x execution time) used
+    by the MCE/OpenMP enhanced version of Edlib for various combinations of
+    workers and threads. The figure is a two dimensional histogram (rendered
+    as a contour plot) with the 5% best performing combinations marked with
+    a '+' sign.
+
+  Worker_Thread_effects.png
+    Main effects of the number of workers and threads on the execution time
+    of the MCE/OpenMP enhanced version of Edlib. The figure is generated by
+    fitting a Generalized Additive Model (GAM) analysis of the data in the
+    timings_MCE_with_OMP.txt file and plotting the main effects of the
+    number of workers and threads.
+
+  Worker_Thread_interaction.png
+    Interaction effects of the number of workers and threads on the
+    execution time of the MCE/OpenMP enhanced version of Edlib. The figure
+    is generated by fitting a Generalized Additive Model (GAM) analysis of
+    the data in the timings_MCE_with_OMP.txt file and plotting the
+    generalized interaction term between the number of workers and threads.
+
+SEE ALSO
+    *   edlib <https://metacpan.org/pod/Alien::SeqAlignment::edlib>
+
+        This distribution provides edlib static and shared libraries so that
+        they can be used by other Perl distributions that are on CPAN.
+
+    *   Bio::SeqAlignment <https://metacpan.org/pod/Bio::SeqAlignment>
+
+        A collection of tools and libraries for aligning biological
+        sequences from within Perl.
+
+    *   Bio::SeqAlignment::Components::SeqMapping
+        <https://metacpan.org/pod/Bio::SeqAlignment::Components::SeqMapping>
+
+        Components (modules for dataflow in sequencing applications and
+        generic mappers) to create sequence mapping applications in Perl.
+
+    *   Bio::SeqAlignment::Components::Libraries::edlib
+        <https://metacpan.org/pod/Bio::SeqAlignment::Components::Libraries::
+        edlib>
+
+        Edlib sequence mapping library binding for Perl. Two versions are
+        provided, one that is FFI based and one that is Inline based.
+
+    *   MCE <https://metacpan.org/pod/MCE>
+
+        MCE (Many-Core Engine) is a high performance parallel processing
+        library for Perl. It is designed to take advantage of the many cores
+        available on modern processors and provides a simple interface for
+        creating parallel components in Perl.
+
+    *   OpenMP <https://www.openmp.org/>
+
+        The OpenMP ARB (Architecture Review Boards) mission is to
+        standardize directive-based multi-language high-level parallelism
+        that is performant, productive and portable. Jointly defined by a
+        group of major computer hardware and software vendors and major
+        parallel computing user facilities, the OpenMP API is a portable,
+        scalable model that gives shared-memory parallel programmers a
+        simple and flexible interface for developing parallel applications
+        on platforms ranging from embedded systems and accelerator devices
+        to multicore systems and shared-memory systems.
+
+    *   PDL <https://metacpan.org/pod/PDL>
+
+        The Perl Data Language (PDL) gives standard Perl the ability to
+        compactly store and speedily manipulate the large N-dimensional data
+        arrays which are the bread and butter of scientific computing. PDL
+        turns Perl into a free, array-oriented, numerical language that can
+        be a very solid alternative to switching to Python or R for
+        numerical computations during complex data analysis tasks and
+        pipelines.
+
+AUTHOR
+    Christos Argyropoulos <chrisarg@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by Christos Argyropoulos.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

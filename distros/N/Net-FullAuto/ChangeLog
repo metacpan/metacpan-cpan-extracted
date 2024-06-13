@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2024-06-12  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000654 released
+
+        * cwd() method repaired
+
 2024-06-09  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000653 released

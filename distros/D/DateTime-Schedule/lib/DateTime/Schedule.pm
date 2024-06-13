@@ -1,4 +1,4 @@
-package DateTime::Schedule 0.01;
+package DateTime::Schedule 0.02;
 use v5.26;
 
 # ABSTRACT: Determine scheduled days in range based on inclusions/exclusions

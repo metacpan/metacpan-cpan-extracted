@@ -1,4 +1,4 @@
-package DateTime::Schedule::Weekly 0.01;
+package DateTime::Schedule::Weekly 0.02;
 use v5.26;
 
 # ABSTRACT: Augment DateTime::Schedule with a weekly recurrrence pattern

@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::Magic;
-$ExtUtils::Typemaps::Magic::VERSION = '0.004';
+$ExtUtils::Typemaps::Magic::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -40,7 +40,7 @@ ExtUtils::Typemaps::Magic - Typemap for storing objects in magic
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -61,7 +61,10 @@ C<ExtUtils::Typemaps::Magic> is an C<ExtUtils::Typemaps> subclass that is essent
 
 =head1 DEPENDENCIES
 
-On perls older than C<5.14>, this will require F<ppport.h> to provide C<mg_findext>.
+On perls older than C<5.14>, this will require F<ppport.h> to provide C<mg_findext>. E.g.
+
+ #define NEED_mg_findext
+ #include "ppport.h"
 
 =head1 AUTHOR
 

@@ -2,12 +2,13 @@ package DBIx::QuickDB::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.000033';
+our $VERSION = '0.000034';
 
 use Carp qw/croak/;
 use POSIX qw/:sys_wait_h/;
 use Time::HiRes qw/sleep time/;
 use Scalar::Util qw/weaken/;
+use File::Path qw/remove_tree/;
 
 use DBIx::QuickDB::Util::HashBase qw{
     <db <args
@@ -77,34 +78,75 @@ sub watch {
 
     $0 = 'db-quick-watcher';
 
-    my $blah;
-    close(STDIN);
-    open(STDIN, '<', \$blah) or warn "$!";
-
-    my $kill = 0;
+    my $kill = '';
+    my $hup = 0;
     local $SIG{TERM} = sub { $kill = 'TERM' };
     local $SIG{INT}  = sub { $kill = 'INT' };
-
-    local $SIG{HUP} = sub {
-        close(STDOUT);
-        open(STDOUT, '>', \$blah) or warn "$!";
-        close(STDERR);
-        open(STDERR, '>', \$blah) or warn "$!";
-    };
+    local $SIG{HUP} = sub { $hup = 1 };
 
     my $start_pid = $$;
     my $pid = $self->spawn();
     print $wh "$pid\n";
     close($wh);
 
+    my $mpid = $self->{+MASTER_PID};
+    my $spid = $self->{+SERVER_PID} or die "No server pid";
+
+    my $ddir = $self->{+DB}->dir;
+    my $ssig = $self->{+DB}->stop_sig // 'TERM';
+
+    exec(
+        $^X, '-Ilib',
+
+        '-e' => "require DBIx::QuickDB::Watcher; DBIx::QuickDB::Watcher->_do_watch()",
+
+        master_pid => $mpid,
+        data_dir   => $ddir,
+        server_pid => $spid,
+        signal     => $ssig,
+        kill       => $kill,
+        hup        => $hup,
+    );
+}
+
+sub _do_watch {
+    my $class = shift;
+
+    $0 = 'db-quick-watcher';
+
+    my %params = @ARGV;
+
+    my $kill = $params{kill} // '';
+    my $hup  = $params{hup}  // 0;
+    local $SIG{TERM} = sub { $kill = 'TERM' };
+    local $SIG{INT}  = sub { $kill = 'INT' };
+    local $SIG{HUP}  = sub { $hup  = 1 };
+
+    my $blah;
+    close(STDIN);
+    open(STDIN, '<', \$blah) or warn "$!";
+
+    my $master_pid = $params{master_pid} or die "No master pid provided";
+    my $server_pid = $params{server_pid} or die "No server pid provided";
+    my $data_dir   = $params{data_dir}   or die "No data dir provided";
+    my $signal     = $params{signal} // 'TERM';
+
+    my $hupped = 0;
     while (!$kill) {
+        if ($hup && !$hupped) {
+            close(STDOUT);
+            open(STDOUT, '>', \$blah) or warn "$!";
+            close(STDERR);
+            open(STDERR, '>', \$blah) or warn "$!";
+        }
+
         sleep 0.1;
 
-        next if kill(0, $self->{+MASTER_PID});
+        next if kill(0, $master_pid);
         $kill = 'TERM';
     }
 
-    unless (eval { $self->_watcher_terminate($kill); 1 }) {
+    unless (eval { $class->_watcher_terminate(send_sig => $signal, got_sig => $kill, pid => $server_pid, dir => $data_dir); 1 }) {
         my $err = $@;
         eval { warn $@ };
         POSIX::_exit(1);
@@ -130,21 +172,29 @@ sub spawn {
 }
 
 sub _watcher_terminate {
-    my $self = shift;
-    my ($sig) = @_;
+    my $class = shift;
+    my %params = @_;
 
-    $self->_watcher_kill();
+    my $pid = $params{pid} or die "No pid";
+    my $dir = $params{dir} or die "No dir";
 
-    $self->{+DB}->cleanup() if $sig && $sig eq 'TERM';
+    my $got_sig  = $params{got_sig};
+    my $send_sig = $params{send_sig} // $got_sig // 'TERM';
+
+    $class->_watcher_kill($send_sig, $pid);
+
+    if ($got_sig && $got_sig eq 'TERM') {
+        # Ignore errors here.
+        my $err = [];
+        remove_tree($dir, {safe => 1, error => \$err}) if -d $dir;
+    }
 }
 
 sub _watcher_kill {
-    my $self = shift;
+    my $class = shift;
+    my ($sig, $pid) = @_;
 
-    my $db = $self->{+DB};
-
-    my $pid = $self->{+SERVER_PID} or die "No server pid";
-    kill($db->stop_sig, $pid) or die "Could not send kill signal";
+    kill($sig, $pid) or die "Could not send kill signal";
 
     my ($check, $exit, $killed);
     my $start = time;

@@ -1,6 +1,11 @@
 Changelog for Date-RangeParser-EN
 
-v1.2.0 2024-06-11T18:05:38
+v1.2.1 2024-06-12T15:48:01
+ - Update README (Andrew Hewus Fresh)
+ - Pull request #4: SM-4899 (James Hammer)
+ - SM-4899 Support weekday intervals (James Hammer)
+
+v1.2.0 2024-06-11T18:00:45
  - Update README (Andrew Hewus Fresh)
 
 v1.1.0 2024-05-14T18:30:20

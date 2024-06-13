@@ -1,4 +1,7 @@
 Revision history for perl distribution DateTime::Schedule
 
-0.01      2024-05-29T18:11:58-05:00
+0.02      2024-06-12T12:34:15-05:00
+  - corrected missing dependency
+
+0.01      2024-06-11T18:11:58-05:00
   - First public release

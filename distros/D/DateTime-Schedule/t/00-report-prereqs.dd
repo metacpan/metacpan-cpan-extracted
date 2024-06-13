@@ -18,6 +18,7 @@ do { my $x = {
                       'requires' => {
                                       'DateTime::Set' => '0.3900',
                                       'Object::Pad' => '0.808',
+                                      'Readonly' => '2.05',
                                       'perl' => '5.026000'
                                     }
                     },

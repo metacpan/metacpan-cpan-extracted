@@ -2,7 +2,7 @@ package DBIx::QuickDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000033';
+our $VERSION = '0.000034';
 
 use Carp;
 use List::Util qw/first/;

@@ -1,5 +1,8 @@
 Revision history for ExtUtils-Typemaps-Magic
 
+0.005     2024-06-12 23:15:22+02:00 Europe/Brussels
+          - Clarify ppport usage in docs
+
 0.004     2023-11-16 07:17:17+01:00 Europe/Brussels
           - Split dist into a module for every typemap
 

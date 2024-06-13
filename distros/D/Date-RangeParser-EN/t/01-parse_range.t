@@ -904,6 +904,21 @@ my @tests = (
         as_of             => '2024-04-29 07:23:00',
         beg               => '04/26/2024 12:00:00AM',
         end               => '04/26/2024 11:59:59PM',
+    }, {
+        date_range_string => 'last 10 weekdays',
+        as_of             => '2024-05-28 07:23:00',
+        beg               => '05/15/2024 12:00:00AM',
+        end               => '05/28/2024 11:59:59PM',
+    }, {
+        date_range_string => '10 weekdays ago',
+        as_of             => '2024-05-28 07:23:00',
+        beg               => '05/14/2024 12:00:00AM',
+        end               => '05/14/2024 11:59:59PM',
+    }, {
+        date_range_string => '10 weekdays ago at noon - 8 weekdays ago at noon',
+        as_of             => '2024-05-28 07:23:00',
+        beg               => '05/14/2024 12:00:00PM',
+        end               => '05/16/2024 12:00:00PM',
     }
 );
 

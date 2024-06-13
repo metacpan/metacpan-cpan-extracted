@@ -18,7 +18,8 @@ my %WriteMakefileArgs = (
   "NAME" => "DateTime::Schedule",
   "PREREQ_PM" => {
     "DateTime::Set" => "0.3900",
-    "Object::Pad" => "0.808"
+    "Object::Pad" => "0.808",
+    "Readonly" => "2.05"
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -26,7 +27,7 @@ my %WriteMakefileArgs = (
     "Test2::Suite" => "0.000155",
     "Test::More" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,6 +39,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Object::Pad" => "0.808",
+  "Readonly" => "2.05",
   "Test2::Suite" => "0.000155",
   "Test::More" => 0
 );

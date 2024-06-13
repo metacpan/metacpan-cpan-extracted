@@ -3,7 +3,7 @@ package Date::RangeParser::EN;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Parse plain English date/time range strings
 use version;
-our $VERSION = 'v1.2.0'; # VERSION
+our $VERSION = 'v1.2.1'; # VERSION
 
 use strict;
 use warnings;
@@ -393,9 +393,19 @@ sub parse_range
     $string =~ s/2nd$/second/;
 
     # Handle weekdays as we do business days
+    # We are going to mimic what we do for business days and let it
+    # fall into Date::Manip since we can handle business days there.
     if ($string =~ /^(?:last|past)\s?(\d+)?\s?weekdays?/) {
         my $interval = $1 || 1;
-        $string =~ s/^(?:last|past)\s?(\d+)?\s?weekdays?/$interval business days ago/;
+        if ($interval == 1) {
+            $string =~ s/^(?:last|past)\s?(\d+)?\s?weekdays?/$interval business days ago/;
+        } else {
+            $string =~ s/^(?:last|past)\s?(\d+)?\s?weekdays?/past $interval business days/;
+        }
+    }
+    if ($string =~ /^(\d+)?\s?weekdays? ago/) {
+        my $interval = $1 || 1;
+        $string =~ s/^(\d+)?\s?weekdays? ago/$interval business days ago/;
     }
 
     # Sometimes we get a bare US style date, but the user has used dashes.
@@ -898,7 +908,7 @@ sub parse_range
 
             # past N business days
             # generally includes today, unless it is being run on a weekend.
-            if ($string =~ /^past (\d+)? (business day)(s?)$/) {
+            if ($string =~ /^(?:last|past) (\d+)? (business day)(s?)$/) {
 
                 $beg->set(%BOD);
                 my $bdow = $beg->day_of_week % 7;         # Monday == 1
@@ -1190,7 +1200,7 @@ Date::RangeParser::EN - Parse plain English date/time range strings
 
 =head1 VERSION
 
-version v1.2.0
+version v1.2.1
 
 =head1 SYNOPSIS
 

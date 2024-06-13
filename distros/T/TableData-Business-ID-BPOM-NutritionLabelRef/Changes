@@ -1,0 +1,22 @@
+0.004   2024-06-13  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Do not hide package declaration for
+          TableData::Business::ID::BPOM::NutritionLabelRef (thanks NEILB!).
+
+
+0.003   2024-05-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Replace shorter alias: TableData::Business::ID::BPOM::RDA with
+          TableData::Business::ID::BPOM::ALG.
+
+        - Tweak Abstract.
+
+
+0.002   2024-05-16  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add alias: TableData::Business::ID::BPOM::RDA.
+
+
+0.001   2024-05-14  Released-By: PERLANCAR
+
+        - First release.

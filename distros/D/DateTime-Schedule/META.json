@@ -43,6 +43,7 @@
          "requires" : {
             "DateTime::Set" : "0.3900",
             "Object::Pad" : "0.808",
+            "Readonly" : "2.05",
             "perl" : "5.026000"
          }
       },
@@ -61,11 +62,11 @@
    "provides" : {
       "DateTime::Schedule" : {
          "file" : "lib/DateTime/Schedule.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "DateTime::Schedule::Weekly" : {
          "file" : "lib/DateTime/Schedule/Weekly.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -79,7 +80,7 @@
          "web" : "https://github.com/tyrrminal/datetime-schedule.git"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "MIT"
