@@ -22,6 +22,8 @@ t/data/ex1/Schema/Foo.pm
 t/data/ex1/Schema/Foo/0_1_0.pm
 t/data/ex1/Schema/Foo/0_1_1.pm
 t/data/ex1/Schema/Foo/0_2_0.pm
+t/data/ex2/Schema/Bar.pm
+t/data/ex3/Schema/Baz.pm
 t/Schema-Abstract/01-use.t
 t/Schema-Abstract/02-version.t
 t/Schema-Abstract/03-new.t

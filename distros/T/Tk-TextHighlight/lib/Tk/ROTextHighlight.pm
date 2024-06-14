@@ -1,8 +1,9 @@
 package Tk::ROTextHighlight;
 
 use vars qw($VERSION);
-$VERSION = '1.1.1';
+$VERSION = '1.2';
 use base qw(Tk::Derived Tk::ROText);
+use Tk qw(Ev);
 use strict;
 use Storable;
 use File::Basename;
@@ -137,12 +138,7 @@ sub EditMenuItems {
 	my $cw = shift;
 	return [
 		@{$cw->SUPER::EditMenuItems},
-		"-",
-		["command"=>'Comment', -command => [$cw => 'selectionComment']],
-		["command"=>'Uncomment', -command => [$cw => 'selectionUnComment']],
-		"-",
-		["command"=>'Indent', -command => [$cw => 'selectionIndent']],
-		["command"=>'Unindent', -command => [$cw => 'selectionUnIndent']],
+		["command"=>'Select', -command => [$cw => 'adjustSelect']]
 	];
 }
 
@@ -650,24 +646,62 @@ sub selectionModify {
 	}
 }
 
-sub selectionComment {
-	my $cw = shift;
-	$cw->selectionModify($cw->cget('-commentchar'), 0);
+# SelectTo --
+# This procedure is invoked to extend the selection, typically when
+# dragging it with the mouse. Depending on the selection mode (character,
+# word, line) it selects in different-sized units. This procedure
+# ignores mouse motions initially until the mouse has moved from
+# one character to another or until there have been multiple clicks.
+#
+# Arguments:
+# w - The text window in which the button was pressed.
+# index - Index of character at which the mouse button was pressed.
+sub SelectTo
+{
+	my ($w, $index, $mode)= @_;
+	$Tk::selectMode = $mode if defined ($mode);
+	my $cur = $w->index($index);
+	my $anchor = $w->index('insert');
+	$Tk::mouseMoved = ($w->compare($cur,'!=',$anchor)) ? 1 : 0;
+	$Tk::selectMode = 'char' unless (defined $Tk::selectMode);
+	$mode = $Tk::selectMode;
+	my ($first,$last);
+	if ($mode eq 'char') {
+		if ($w->compare($cur,'<','anchor')) {
+			$first = $cur;
+			$last = 'anchor';
+		} else {
+			$first = 'anchor';
+			$last = $cur
+		}
+	} elsif ($mode eq 'word') {
+		if ($w->compare($cur,'<','anchor')) {
+			$first = $w->index("$cur wordstart");
+			$last = $w->index('anchor - 1c wordend')
+		} else {
+			$first = $w->index('anchor wordstart');
+			$last = $w->index("$cur wordend")
+		}
+	} elsif ($mode eq 'line') {		if ($w->compare($cur,'<','anchor')) {
+			$first = $w->index("$cur linestart");
+			$last = $w->index('anchor - 1c lineend + 1c')
+		} else {
+			$first = $w->index('anchor linestart');
+			$last = $w->index("$cur lineend + 1c")
+		}
+	}
+	if ($Tk::mouseMoved || $Tk::selectMode ne 'char') {
+		$w->tagRemove('sel','1.0',$first);
+		$w->tagAdd('sel',$first,$last);
+		$w->tagRemove('sel',$last,'end');
+		$w->idletasks;
+	}
 }
 
-sub selectionIndent {
-	my $cw = shift;
-	$cw->selectionModify($cw->cget('-indentchar'), 0);
-}
-
-sub selectionUnComment {
-	my $cw = shift;
-	$cw->selectionModify($cw->cget('-commentchar'), 1);
-}
-
-sub selectionUnIndent {
-	my $cw = shift;
-	$cw->selectionModify($cw->cget('-indentchar'), 1);
+sub adjustSelect {
+	my ($w) = @_;
+	my $Ev = $w->XEvent;
+	$w->SelectTo($Ev->xy,'char');
 }
 
 sub syntax {

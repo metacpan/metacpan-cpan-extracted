@@ -2,7 +2,7 @@
 # MIT License
 
 class HTTP::Tiny {
-  version "0.001";
+  version "0.003";
   
   use Fn;
   use Regex;
@@ -77,16 +77,7 @@ class HTTP::Tiny {
     return $self;
   }
   
-  static method can_ssl_static : int () {
-    
-    my $error_ref = [(string)undef];
-    
-    my $can_ssl = &can_ssl_get_error_static($error_ref);
-    
-    return $can_ssl;
-  }
-  
-  static method can_ssl_get_error_static : int ($error_ref : string[] = undef) {
+  static method can_ssl : int ($error_ref : string[] = undef) {
     
     unless ($error_ref) {
       die "\$error_ref must be defined.";
@@ -133,18 +124,9 @@ class HTTP::Tiny {
     return $can_ssl;
   }
   
-  method can_ssl : int () {
+  method can_ssl_with_verify : int ($error_ref : string[] = undef) {
     
-    my $error_ref = [(string)undef];
-    
-    my $can_ssl = $self->can_ssl_get_error($error_ref);
-    
-    return $can_ssl;
-  }
-  
-  method can_ssl_get_error : int ($error_ref : string[] = undef) {
-    
-    my $can_ssl = &can_ssl_get_error_static($error_ref);
+    my $can_ssl = &can_ssl($error_ref);
     
     my $reason = $error_ref->[0];
     

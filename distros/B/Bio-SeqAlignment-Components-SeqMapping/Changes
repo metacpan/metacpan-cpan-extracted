@@ -1,4 +1,7 @@
 Revision history for Bio-SeqAlignment-Components-SeqMapping
 
+0.02      2024-06-13 18:22:47-06:00 America/Denver
+- Explicitly reaping workings after processing with MCE by calling shutdown as
+suggested by Mario Roy, the creator of MCE.
 0.01      2024-06-09 22:15:06-06:00 America/Denver
-initial build
+- Initial build

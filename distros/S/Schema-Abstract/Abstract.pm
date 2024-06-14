@@ -8,7 +8,7 @@ use English;
 use Error::Pure qw(err);
 use Perl6::Slurp qw(slurp);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -118,8 +118,6 @@ This is abstract class for versioned schemas modules.
 
 Constructor.
 
-Returns instance of object.
-
 =over 8
 
 =item * C<version>
@@ -129,6 +127,8 @@ Selected schema version.
 Default value is last version.
 
 =back
+
+Returns instance of object.
 
 =head2 C<list_versions>
 
@@ -262,12 +262,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022 Michal Josef Špaček
+© 2022-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

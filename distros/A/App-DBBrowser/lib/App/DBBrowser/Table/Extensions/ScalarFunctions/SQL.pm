@@ -82,8 +82,7 @@ sub function_with_one_col {
             }
             return "strftime($field,$col)";
         }
-        elsif ( $driver =~ /^(?:mysql|MariaDB|DB2|Informix)\z/ ) {
-            return "EXTEND($col,$field to $field)" if $driver eq 'Informix' && $field =~ /^(?:HOUR|MINUTE|SECOND)\z/;
+        elsif ( $driver =~ /^(?:mysql|MariaDB|DB2)\z/ ) {
             return "$field($col)";
             # mysql: WEEKDAY:   0 = Monday
             # mysql: DAYOFWEEK: 1 = Sunday
@@ -102,6 +101,11 @@ sub function_with_one_col {
             return "EXTRACT(WEEKDAY FROM $col)"             if $field eq 'DAYOFWEEK';
             return "EXTRACT(YEARDAY FROM $col)"             if $field eq 'DAYOFYEAR';
             return "EXTRACT($field FROM $col)";
+        }
+        elsif ( $driver eq 'Informix' ) {
+            return "EXTEND($col,$field to $field)" if $field =~ /^(?:HOUR|MINUTE|SECOND)\z/;
+            return "WEEKDAY($col)"                 if $field eq 'DAYOFWEEK';
+            return "$field($col)";
         }
         elsif ( $driver eq 'Oracle' ) {
             return "to_char($col,'Q')"   if $field eq 'QUARTER';

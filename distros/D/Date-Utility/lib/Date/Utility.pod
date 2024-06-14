@@ -365,15 +365,13 @@ Returns a valid L<Date::Utility> object whose date part is same with the given y
 
 =over 4
 
-=item L<Moose>
+=item L<Moo>
 
 =item L<DateTime>
 
 =item L<POSIX>
 
 =item L<Scalar::Util>
-
-=item L<Tie::Hash::LRU>
 
 =item L<Time::Local>
 
@@ -463,9 +461,9 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =over 4
 
-=item L<Moose::Object>
+=item L<Moo::Object>
 
-L<BUILDALL|Moose::Object/BUILDALL>, L<BUILDARGS|Moose::Object/BUILDARGS>, L<DEMOLISHALL|Moose::Object/DEMOLISHALL>, L<DOES|Moose::Object/DOES>, L<does|Moose::Object/does>, L<dump|Moose::Object/dump>
+L<BUILDALL|Moo::Object/BUILDALL>, L<DEMOLISHALL|Moo::Object/DEMOLISHALL>, L<does|Moo::Object/does>, L<meta|Moo::Object/meta>
 
 =back
 

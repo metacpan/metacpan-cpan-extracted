@@ -22,5 +22,5 @@ no_index:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/rurban/Crypt-OpenSSL-Random
-version: '0.16'
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

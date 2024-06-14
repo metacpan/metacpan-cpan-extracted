@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.014;
-our $VERSION = '2.413';
+our $VERSION = '2.414';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.413
+Version 2.414
 
 =head1 SYNOPSIS
 
@@ -906,6 +906,8 @@ There are two regexp entries: C<REGEXP> matches case-sensitive, while C<REGEXP_i
 With C<MySQL>, the sensitive match is achieved by enabling the C<BINARY> operator.
 
 With C<Firebird>, C<SIMILAR TO> is used instead of C<REGEXP>.
+
+With C<Informix>, C<MATCHES> is used instead of C<REGEXP>.
 
 =head3 Aliases
 

@@ -7,7 +7,7 @@ use English;
 use Error::Pure qw(err);
 use Getopt::Std;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -29,18 +29,20 @@ sub run {
 		'd' => 0,
 		'h' => 0,
 		'p' => '',
+		'q' => 0,
 		'u' => '',
 		'v' => undef,
 	};
-	if (! getopts('dhp:u:v:', $self->{'_opts'})
+	if (! getopts('dhp:qu:v:', $self->{'_opts'})
 		|| $self->{'_opts'}->{'h'}
 		|| @ARGV < 2) {
 
-		print STDERR "Usage: $0 [-d] [-h] [-p password] [-u user] [-v schema_version] ".
+		print STDERR "Usage: $0 [-d] [-h] [-p password] [-q] [-u user] [-v schema_version] ".
 			"[--version] dsn schema_module\n";
 		print STDERR "\t-d\t\t\tDrop tables.\n";
 		print STDERR "\t-h\t\t\tPrint help.\n";
 		print STDERR "\t-p password\t\tDatabase password.\n";
+		print STDERR "\t-q\t\t\tQuiet mode.\n";
 		print STDERR "\t-u user\t\t\tDatabase user.\n";
 		print STDERR "\t-v schema_version\tSchema version (default is ".
 			"latest version).\n";
@@ -113,12 +115,14 @@ sub run {
 		}
 	}
 
-	my $print_version = '';
-	if (defined $schema_version) {
-		$print_version = '(v'.$schema_version.') ';
+	if (! $self->{'_opts'}->{'q'}) {
+		my $print_version = '';
+		if (defined $schema_version) {
+			$print_version = '(v'.$schema_version.') ';
+		}
+		print "Schema ${print_version}from '$self->{'_schema_module'}' was ".
+			"deployed to '$self->{'_dsn'}'.\n";
 	}
-	print "Schema ${print_version}from '$self->{'_schema_module'}' was ".
-		"deployed to '$self->{'_dsn'}'.\n";
 
 	return 0;
 }
@@ -193,7 +197,7 @@ Returns 1 for error, 0 for success.
  exit App::Schema::Deploy->new->run;
 
  # Output like:
- # Schema (v0.1.0) from 'Schema::Commons::Vote' was deployed to 'dbi:SQLite:dbname=ex2.db'.
+ # Schema (v0.1.0) from 'Schema::Commons::Vote' was deployed to 'dbi:SQLite:dbname=sqlite.db'.
 
 =head1 DEPENDENCIES
 
@@ -233,6 +237,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

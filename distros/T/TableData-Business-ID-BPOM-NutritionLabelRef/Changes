@@ -1,3 +1,10 @@
+0.005   2024-06-13  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak Abstract.
+
+
 0.004   2024-06-13  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Do not hide package declaration for

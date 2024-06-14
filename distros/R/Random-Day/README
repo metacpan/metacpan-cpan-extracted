@@ -91,7 +91,7 @@ METHODS
   "random_day_month_year"
      my $dt = $obj->random_day_month_year($day, $month, $year);
 
-    Get date defined by day, month and year.
+    Get random date defined by day, month and year.
 
     Returns DateTime object for date.
 
@@ -120,6 +120,13 @@ ERRORS
      new():
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
+             From Mo::utils::check_isa():
+                     Parameter 'dt_from' must be a 'DateTime' object.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'dt_to' must be a 'DateTime' object.
+                             Value: %s
+                             Reference: %s
 
      random_day():
              Day cannot be a zero.
@@ -211,7 +218,7 @@ EXAMPLE
 
 DEPENDENCIES
     Class::Utils, DateTime, DateTime::Event::Random,
-    DateTime::Event::Recurrence, English, Error::Pure.
+    DateTime::Event::Recurrence, English, Error::Pure, Mo::utils.
 
 SEE ALSO
     Data::Random
@@ -237,5 +244,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.14
+    0.15
 

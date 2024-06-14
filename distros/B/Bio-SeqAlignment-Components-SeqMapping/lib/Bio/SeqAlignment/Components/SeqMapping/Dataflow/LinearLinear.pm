@@ -1,6 +1,6 @@
 
 package Bio::SeqAlignment::Components::SeqMapping::Dataflow::LinearLinear;
-$Bio::SeqAlignment::Components::SeqMapping::Dataflow::LinearLinear::VERSION = '0.01';
+$Bio::SeqAlignment::Components::SeqMapping::Dataflow::LinearLinear::VERSION = '0.02';
 use strict;
 use warnings;
 
@@ -58,6 +58,7 @@ sub sim_seq_search {
             }
         );
         $mce->process($workload);
+        $mce->shutdown();
     }
     return \@results;
 }
@@ -71,7 +72,7 @@ Bio::SeqAlignment::Components::SeqMapping::Dataflow::LinearLinear - A role to im
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 DESCRIPTION
 

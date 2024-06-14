@@ -9,7 +9,7 @@ require Exporter;
 @EXPORT_OK = qw( random_bytes random_pseudo_bytes random_seed
                  random_egd random_status );
 
-$VERSION = '0.16';
+$VERSION = '0.17';
 XSLoader::load( __PACKAGE__, $VERSION );
 
 1;

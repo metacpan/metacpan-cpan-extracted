@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Bio::SeqAlignment::Components::SeqMapping::Mapper;
-$Bio::SeqAlignment::Components::SeqMapping::Mapper::VERSION = '0.01';
+$Bio::SeqAlignment::Components::SeqMapping::Mapper::VERSION = '0.02';
 use Module::Find;
 
 #ABSTRACT: Imports all mapper modules
@@ -18,7 +18,7 @@ Bio::SeqAlignment::Components::SeqMapping::Mapper Components that map sequences 
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

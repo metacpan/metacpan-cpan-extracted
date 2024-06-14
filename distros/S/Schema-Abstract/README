@@ -25,13 +25,13 @@ METHODS
 
     Constructor.
 
-    Returns instance of object.
-
     *       "version"
 
             Selected schema version.
 
             Default value is last version.
+
+    Returns instance of object.
 
   "list_versions"
      my @versions = $obj->list_versions;
@@ -151,10 +151,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2022 Michal Josef Špaček
+    © 2022-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

@@ -1,73 +1,581 @@
-This package is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+NAME
+    Tk::TextHighlight - a TextUndo/SuperText widget with syntax highlighting
+    capabilities, can also use Kate languages.
 
-Tk::TextHighlight.pm is a modified / derived version of the no longer maintained 
-Tk::CodeText module, by Hans Jeuken.  Thank you Hans for doing the hard work in 
-creating a really cool module.  CodeText was built on the Tk::TextUndo 
-widget with capabilities of syntax highlighting.  Several formats are supported, namely 
-Perl, HTML, Javascript, and Bash.  I (Jim Turner), have added several features:
+    Tk::ROTextHighlight - a Read-only version of this widget.
 
-1)  Added ability to also use the Syntax::Highlight::Engine::Kate highlighing 
-engine and thus now supporting the many, many languages it supports.
+SYNOPSIS
+         use Tk;
+         my $haveKateInstalled = 0;
+         eval "use Syntax::Highlight::Engine::Kate; \$haveKateInstalled = 1; 1";
 
-2)  Tk::Text::SuperText - like bracket highlighting / matching with vi-like 
-jump-to-matching bracket (Ctrl-p).
+         require Tk::TextHighlight;
 
-3)  Added feature to auto-change rules-colors for rules whose color is the same as 
-the background color of the widget (to avoid invisible text).  The color is set to 
-either black or white depending on the brightness of the background color.
+         my $m = new MainWindow;
 
-4)  Fixed TextUndo-related bug to allow user to see text as he types past right-edge 
-of screen.
+         my $e = $m->Scrolled("TextHighlight",
+            -syntax => "Perl",
+            -scrollbars => "se",
+         )->pack(-expand => 1, -fill => "both");
 
-5)  Added "setRule()" method to allow altering of individual rules by the programmer.
+         if ($haveKateInstalled) {
+          my ($sections, $kateExtensions) = $e->fetchKateInfo;
+          $e->addKate2ViewMenu($sections);
+         }
+         $m->configure(-menu => $e->menu);
+         $m->MainLoop;
 
-6)  Modified right-click menu to allow saving of modified rules.
+DESCRIPTION
+    Tk::TextHighlight inherits Tk::TextUndo and all its options and methods.
+    Besides syntax highlighting, methods are provided for commenting and
+    uncommenting as well as indenting and unindenting a selected area,
+    matching pairs of braces, brackets and brackets and curlies and
+    automatic indenting of new lines. The included companion module
+    Tk::ROTextHighlight provides all the same functionality in a "readonly"
+    widget for text viewers, etc. Tk::TextHighlight also supports
+    highlighting of all the lauguages of the
+    Syntax::Highlight::Engine::Kate, if that module is installed.
 
-7)  Added new options:  -noRulesMenu (dont show rules-menu in right-click menu), 
--noSyntaxMenu, -noRulesEditMenu, -noSaveRulesMenu to prevent the corresponding items 
-from appearing in the right-click menu.  -noPlugInit - disables new feature #8 and 
-behaves as original CodeText.
+    If you want your widget to be read-only, then require
+    Tk::ROTextHighlight, which is based on Tk::ROText instead of
+    Tk::TextUndo.
 
-8) Fixed small bug w/auto-indenting.
+    Syntax highlighting is done through a plugin approach. Adding languages
+    is a matter of writing plugin modules. Theoretically this is not limited
+    to programming languages. The plugin approach could also provide the
+    possibility for grammar or spell checking in spoken languages.
 
-9) Fixed small bug w/rules-initialization when no .rules file present.
+    Currently there is support for Bash, HTML, Perl, Pod, Kate, and
+    Xresources.
 
-10) Created a "Readonly" version called ROTextHighlight that works the same way but 
-is based on Tk::ROText and is read-only.
+OPTIONS
+    Name: autoindent
+    Class: Autoindent
+    Switch: -autoindent
+        Boolean, when you press the enter button, should the next line begin
+        at the same position as the current line or not. By default false.
 
-The highlight mechanism however, is of a plugin-type. Adding additional 
-languages should be a matter of writing Tk::TextHighlight::MyLanguage modules.
+    Name: commentchar
+    Class: Commentchar
+    Switch: -commentchar
+        By default "#".
 
-The perl syntax module is based on and requires either 
-Syntax::Highlight::Perl or Syntax::Highlight::Perl::Improved.  It will attempt 
-to use Perl::Improved first if it is available, failing that, 
-Syntax::Highlight::Perl will be used.
+    Name: disablemenu
+    Class: Disablemenu
+    Switch: -disablemenu
+        Boolean, by default 0. In case you don't want the menu under the
+        right mouse button to pop up.
 
-The PerlCool module was written by Jim Turner and is derived from the Perl 
-syntax module, but uses mustly "cool" colors, ie. blues, greens, violets, etc.
-instead of the "warm" colors that the "Perl" syntax module uses.
+    Name: highlightInBackground
+    Class: highlightInBackground
+    Switch: -highlightInBackground
+        Whether or not to do highlighting in background freeing up the mouse
+        and keyboard for most events (experimental). May be 1 or 0. Default
+        0 (Do not highlight in background - block input until highlighting
+        completed).
 
-This is the initial release. It has been written and tested on a
-linux machine, though I have used it on some earlier versions on some 
-m$-based machines.  Please try it out on those machines and report your 
-findings back to me.
+    Name: indentchar
+    Class: Indentchar
+    Switch: -indentchar
+        String to be inserted when the [Tab] key is pressed or when
+        indenting. Default "\t".
 
-Not that you didn't know, but you install it like this:
+    Name: match
+    Class: Match
+    Switch: -match
+        string of pairs for brace/bracket/curlie etc matching. If this
+        description doesn't make anything clear, don't worry, the default
+        setting will:
 
-	perl Makefile.PL
-	make
-	make test
-	
-and then as root
+         '[]{}()'
 
-	make install
+        if you don't want matching to be available, simply set it to ''.
 
+    Name: matchoptions
+    Class: Matchoptions
+    Switch: -matchoptions
+        Options list for the tag 'Match'. By default:
 
-This software comes with no warranty whatsoever.
+         [-background => 'red', -foreground => 'yellow']
 
-Original CodeText:  February 2003,
-Hans Jeuken (haje@toneel.demon.nl)
+        You can also specify this option as a space separated string. Might
+        come in handy for your Xresource files.
 
-TextHighlight:  August 2007
-turnerjw784@yahoo.com
+         "-background red -foreground yellow"
+
+    Name: not available
+    Class: not available
+    Switch -rules
+        Specify the color and font options for highlighting. You specify a
+        list looking a bit like this.
+
+         [
+             ['Tagname1', @options1],
+             ['Tagname2', @options2],
+         ]
+
+        The names of the tags are depending on the syntax that is
+        highlighted. See the language modules for more information about
+        this data structure.
+
+    Name: rulesdir
+    Class: Rulesdir
+    Switch -rulesdir
+        Specify the directory where this widget stores its coloring
+        defenitions. Files in this directory are stored as "HTML.rules",
+        "Perl.rules" etc. By default it is set to '', which means that when
+        you switch syntax the highlighting rules are not loaded or stored.
+        The hard coded defaults in the language modules will be used.
+
+    Name: syntax
+    Class: Syntax
+    Switch: -syntax
+        Specifies the language for highlighting. At this moment the possible
+        values are None, HTML, Perl, Pod Kate:Language, and Xresources.
+        Default: None
+
+        If Syntax::Highlight::Engine::Kate is installed, you may specify any
+        language that the Kate syntax highlight engine supports.
+
+        Alternatively it is possible to specify a reference to your
+        independent plugin.
+
+    Name: Not available
+    Class: Not available
+    Switch: -updatecall
+        Here you can specify a callback that will be executed whenever the
+        insert cursor has moved or text has been modified, so your
+        application can keep track of position etc. Don't make this callback
+        to heavy, the widget will get sluggish quickly.
+
+    Name: Not available
+    Class: Not available
+    Switch: -noPlugInit
+        Disables TextHighlight feature of initializing default rules when no
+        .rules file present.
+
+    Name: Not available
+    Class: Not available
+    Switch: -noSyntaxMenu
+        Don't show the Syntax submenu option in the View submenu of the
+        right-click menu.
+
+    Name: Not available
+    Class: Not available
+    Switch: -noSaveRulesMenu
+        Don't show the Save Rules submenu option in the View submenu of the
+        right-click menu.
+
+    Name: Not available
+    Class: Not available
+    Switch: -noRulesEditMenu
+        Don't show the Rules Editor option in the View submenu of the
+        right-click menu.
+
+    Name: Not available
+    Class: Not available
+    Switch: -noRulesMenu
+        Don't show any of the TextHighlight menu items (combines
+        -noSyntaxMenu, -noRulesEditMenu, and -noSaveRulesMenu options.
+
+    There are some undocumented options. They are used internally. It is
+    propably best to leave them alone.
+
+METHODS
+    doAutoIndent
+        Checks the indention of the previous line and indents the line where
+        the cursor is equally deep.
+
+    highlight(*$begin*, *$end*);
+        Does syntax highlighting on the section of text indicated by $begin
+        and $end. $begin and $end are linenumbers not indexes!
+
+    highlightCheck>(*$begin*, *$end*);
+        An insert or delete has taken place affecting the section of text
+        between $begin and $end. highlightCheck is being called after and
+        insert or delete operation. $begin and $end (again, linenumbers, not
+        indexes) indicate the section of text affected. highlightCheck
+        checks what needs to be highlighted again and does the highlighting.
+
+    highlightLine(*$line*);
+        Does syntax highlighting on linenumber $line.
+
+    highlightPlug
+        Checks wether the appropriate highlight plugin has been loaded. If
+        none or the wrong one is loaded, it loads the correct plugin. It
+        returns a reference to the plugin loaded. It also checks wether the
+        rules have changed. If so, it restarts highlighting from the
+        beginning of the text.
+
+    highlightPlugInit
+        Loads and initalizes a highlighting plugin. First it checks the
+        value of the -syntax option to see which plugin should be loaded.
+        Then it checks wether a set of rules is defined to this plugin in
+        the -rules option. If not, it tries to obtain a set of rules from
+        disk using rulesFetch. If this fails as well it will use the
+        hardcoded rules from the syntax plugin.
+
+    highlightPurge(*$line*);
+        Tells the widget that the text from linenumber $line to the end of
+        the text is not to be considered highlighted any more.
+
+    highlightVisual
+        Calls visualEnd to see what part of the text is visible on the
+        display, and adjusts highlighting accordingly.
+
+    linenumber(*$index*);
+        Returns the linenumber part of an index. You may also specify
+        indexes like 'end' or 'insert' etc.
+
+    matchCheck
+        Checks wether the character that is just before the 'insert'-mark
+        should be matched, and if so, should it match forwards or backwards.
+        It then calls matchFind.
+
+    matchFind(*$direction*, *$char*, *$match*, *$start*, *$stop*);
+        Matches $char to $match, skipping nested $char/$match pairs, and
+        displays the match found (if any).
+
+    rulesEdit
+        Pops up a window that enables the user to set the color and font
+        options for the current syntax.
+
+    rulesFetch
+        Checks wether the file
+
+         $text->cget('-rulesdir') . '/' . $text->cget('-syntax') . '.rules'
+
+        exists, and if so attempts to load this as a set of rules.
+
+    rulesSave
+        Saves the currently loaded rules as
+
+         $text->cget('-rulesdir') . '/' . $text->cget('-syntax') . '.rules'
+
+    selectionComment
+        Comment currently selected text.
+
+    selectionIndent
+        Indent currently selected text.
+
+    selectionModify
+        Used by the other selection... methods to do the actual work.
+
+    selectionUnComment
+        Uncomment currently selected text.
+
+    selectionUnIndent
+        Unindent currently selected text.
+
+    setRule(rulename,colorattribute,color)
+        Allows altering of individual rules by the programmer.
+
+    fetchKateInfo
+        Fetches 3 hashrefs containing information about the installed Kate
+        highlight engine (if installed). The three hashrefs contain in
+        order: The first can be passed to the addkate2viewmenu() method to
+        add the Kate languages to the Syntax.View menu. the keys are
+        "Kate::language" and the values are what's needed to instantiate
+        Kate for that language. the 2nd is a list of file- extension pattern
+        suitable for matching against file-names and the values are the
+        reccomended Kate language for that file-extension. It will return
+        (undef, undef, undef) if Kate is not installed.
+
+    addKate2ViewMenu($sections)
+        Inserts the list of Kate-supported languages to the widget's
+        Syntax.View right-mousebutton popup menu along with the basic
+        TextHight-supported choices. These choices can then be selected to
+        change the current language-highlighting used in the text in the
+        widget. $sections is a hash-ref normally returned as the 1st item in
+        the list returned by fetchKateInfo. NOTE: No menu items will be
+        added if Kate is not installed or if -noRulesMenu or -noSyntaxMenu
+        is set!
+
+SYNTAX HIGHLIGHTING
+    This section is a brief description of how the syntax highlighting
+    process works.
+
+    Initiating plugin
+
+    The highlighting plugin is only then initiated when it is needed. When
+    some highlighting needs to be done, the widget calls highlightPlug to
+    retrieve a reference to the plugin.
+
+    highlightPlug checks wether a plugin is present. Next it will check
+    whether the -rules option has been specified or wether the -rules option
+    has changed. If no rules are specified in -rules, it will look for a
+    pathname in the -rulesdir option. If that is found it will try to load a
+    file called '*.rules', where * is the value of -syntax.
+
+    If no plugin is present, or the -syntax option has changed value,
+    highlightPlug loads the plugin. and constructs optionally giving it a
+    reference to the found rules as parameter. if no rules are specified,
+    the plugin will use its internal hardcoded defaults.
+
+    Changing the rules
+
+    A set of rules is a list, containing lists of tagnames, followed by
+    options. If you want to see what they look like, you can have a look at
+    the constructors of each plugin module. Every plugin has a fixed set of
+    tagnames it can handle.
+
+    There are two ways to change the rules.
+
+    You can invoke the rulesEdit method, which is also available through the
+    View menu. The result is a popup in which you can specify color and font
+    options for each tagname. After pressing 'Ok', the edited rules will be
+    applied. If -rulesdir is specified, the rules will be saved on disk as
+    *rulesdir/syntax.rules*.
+
+    You can also use configure to specify a new set of rules. In this you
+    have ofcause more freedom to use all available tag options. For more
+    details about those there is a nice section about tag options in the
+    Tk::Text documentation. After the call to configure it is wise to call
+    highlightPlug.
+
+    Highlighting text
+
+    Syntax highlighting is done in a lazy manor. Only that piece of text is
+    highlighted that is needed to present the user a pretty picture. This is
+    done to minimize use of system resources. Highlighting is running on the
+    foreground. Jumping directly to the end of a long fresh loaded textfile
+    may very well take a couple of seconds.
+
+    Highlighting is done on a line to line basis. At the end of each line
+    the highlighting status is saved in the list in -colorinf, so when
+    highlighting the next line, the highlight method of TextHighlight will
+    know how to begin.
+
+    The line that needs highlighting is offered to the highlight method of
+    the plugin. This method returns a list of offset and tagname pairs. Take
+    for example the following line of perl code.
+
+     my $mother = 'older than i am';
+
+    The highlight method of the Perl plugin will return the following list;
+
+     (2 => 'Reserved',    #'my' is a reserved word
+      1 => 'DEFAULT',     #Space
+      7 => 'Variable',    #$mother
+      1 => 'DEFAULT',     #Space
+      1 => 'Operator',    #'='
+      1 => 'DEFAULT',     #Space
+      17 => 'String',     #'older than i am'
+      1 => 'DEFAULT',)    #;
+
+    The highlight method of TextHighlight will then mark positions 0 to 2 as
+    'Reserved', positions 2 to 3 as 'DEFAULT', positions 3 to 10 as
+    'Variable', etc.
+
+WRITING PLUGINS
+    After writing a couple of plugins myself i have come to a couple of
+    guidelines about how to set them up. If you are interested in adding
+    support for your own syntax highlighting problem or language this
+    section is of interest to you.
+
+    From scratch
+
+    If you choose to build a plugin completely from scratch, your module
+    needs to meet the following requirements.
+
+     - If you want to write a formal addition to Tk::TextHighlight, 
+       your plugin must be in the namespace 
+       Tk::TextHighlight::YourSyntax.
+
+     - The constructor is called 'new', and it should accept 
+       a reference a reference to a list of rules as parameters.
+
+     - The following methods will be called upon by Tk::TextHighlight:  
+       highlight, stateCompare, rules, setSate, getState, syntax.
+
+    More information about those methods is available in the documentation
+    of Tk::TextHighlight::None and Tk::TextHighlight::Template.
+
+    Inheriting Tk::TextHighlight::Template
+
+    For many highlighting problems Tk::TextHighlight::Template provides a
+    nice basis to start from. Your code could look like this:
+
+     package Tk::TextHighlight::MySyntax;
+ 
+     use strict;
+     use base('Tk::TextHighlight::Template');
+ 
+     sub new {
+        my ($proto, $wdg, $rules) = @_;
+        my $class = ref($proto) || $proto;
+
+    Next, specify the set of hardcoded rules.
+
+        if (not defined($rules)) {
+           $rules =  [
+              ['Tagname1', -foreground => 'red'],
+              ['Tagname1', -foreground => 'red'],
+           ];
+        };
+
+    Call the constructor of Tk::TextHighlight::Template and bless your
+    object.
+
+        my $self = $class->SUPER::new($rules);
+
+    So now we have the SUPER class avalable and we can start defining a
+    couple of things.
+
+    You could add a couple of lists, usefull for keywords etc.
+
+        $self->lists({
+            'Keywords' => ['foo', 'bar'],
+            'Operators' => ['and', 'or'],
+        });
+
+    For every tag you have to define a corresponding callback like this.
+
+        $self->callbacks({
+            'Tagname1' => \&Callback1,
+            'Tagname2' => \&Callback2,
+        });
+
+    You have to define a default tagname like this:
+
+        $self->stackPush('Tagname1');
+
+    Perhaps do a couple of other things but in the end, wrap up the new
+    method.
+
+        bless ($self, $class);
+        return $self;
+     }
+
+    Then you need define the callbacks that are mentioned in the callbacks
+    hash. When you just start writing your plugin i suggest you make them
+    look like this:
+
+     sub callback1 {
+        my ($self $txt) = @_;
+        return $self->parserError($txt); #for debugging your later additions
+     }
+
+    Later you add matching statements inside these callback methods. For
+    instance, if you want *callback1* to parse spaces it is going to look
+    like this:
+
+     sub callback1 {
+        my ($self $txt) = @_;
+        if ($text =~ s/^(\s+)//) { #spaces
+            $self->snippetParse($1, 'Tagname1'); #the tagname here is optional
+            return $text;
+        }
+        return $self->parserError($txt); #for debugging your later additions
+     }
+
+    If *callback1* is the callback that is called by default, you have to
+    add the mechanism for checking lists to it. Hnce, the code will look
+    like this:
+
+     sub callback1 {
+        my ($self $txt) = @_;
+        if ($text =~ s/^(\s+)//) { #spaces
+            $self->snippetParse($1, 'Tagname1'); #the tagname here is optional
+            return $text;
+        }
+        if ($text =~ s/^([^$separators]+)//) {      #fetching a bare part
+            if ($self->tokenTest($1, 'Reserved')) {
+                $self->snippetParse($1, 'Reserved');
+            } elsif ($self->tokenTest($1, 'Keyword')) {
+                $self->snippetParse($1, 'Keyword');
+            } else { #unrecognized text
+                $self->snippetParse($1);
+            }
+            return $text
+        }
+        return $self->parserError($txt); #for debugging your later additions
+     }
+
+    Have a look at the code of Tk::TextHighlight::Bash. Things should clear
+    up. Then, last but not least, you need a syntax method.
+
+    Using another module as basis
+
+    An example of this approach is the Perl syntax module.
+
+    Also with this approach you will have to meet the minimum criteria as
+    set out in the From scratch section.
+
+CONTRIBUTIONS
+    If you have written a plugin, i will be happy to include it in the next
+    release of Tk::TextHighlight. If you send it to me, please have it
+    accompanied with the sample of code that you used for testing.
+
+AUTHOR
+    This module is Copyright (C) 2007-2024 by
+
+    Jim Turner, "<turnerjw784 at yahoo.com>"
+
+    All rights reserved.
+
+    You may distribute this module under the terms of either the GNU General
+    Public License or the Artistic License, as specified in the Perl README
+    file.
+
+    This is a derived work from Tk::CodeText, by Hans Jeuken (haje at
+    toneel.demon.nl)
+
+    Thanks go to Mr. Hans Jeuken for his great work in making this and the
+    Kate modules possible. He did the hard work!
+
+LICENSE AND COPYRIGHT
+    Copyright 2007-2024 Jim Turner.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a copy
+    of the full license at:
+
+    <http://www.perlfoundation.org/artistic_license_2_0>
+
+    Any use, modification, and distribution of the Standard or Modified
+    Versions is governed by this Artistic License. By using, modifying or
+    distributing the Package, you accept this license. Do not use, modify,
+    or distribute the Package, if you do not accept this license.
+
+    If your Modified Version has been derived from a Modified Version made
+    by someone other than you, you are nevertheless required to ensure that
+    your Modified Version complies with the requirements of this license.
+
+    This license does not grant you the right to use any trademark, service
+    mark, tradename, or logo of the Copyright Holder.
+
+    This license includes the non-exclusive, worldwide, free-of-charge
+    patent license to make, have made, use, offer to sell, sell, import and
+    otherwise transfer the Package with respect to any patent claims
+    licensable by the Copyright Holder that are necessarily infringed by the
+    Package. If you institute patent litigation (including a cross-claim or
+    counterclaim) against any party alleging that the Package constitutes
+    direct or contributory patent infringement, then this Artistic License
+    to you shall terminate on the date that such litigation is filed.
+
+    Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+    AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+    THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+    YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+    CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+BUGS
+    Unknown. If you find any, please contact the author.
+
+TODO
+    Add additional language modules. I am going to need help on this one. We
+    currently support all the original Tk::CodeText languages (included)
+    plus all those supported by Syntax::Highlight::Engine::Kate, if it's
+    installed.
+    The sample files in the test suite should be set up so that conformity
+    with the language specification can actually be verified.
+
+SEE ALSO
+    Tk::Text, Tk::TextUndo, Tk::Text::SuperText, Tk::TextHighlight::Bash,
+    Tk::CodeText, Syntax::Highlight::Perl::Improved,
+    Syntax::Highlight::Engine::Kate
+

@@ -9,8 +9,9 @@ use DateTime::Event::Random;
 use DateTime::Event::Recurrence;
 use English;
 use Error::Pure qw(err);
+use Mo::utils 0.08 qw(check_isa);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 # Constructor.
 sub new {
@@ -40,6 +41,9 @@ sub new {
 
 	# Process parameters.
 	set_params($self, @params);
+
+	check_isa($self, 'dt_from', 'DateTime');
+	check_isa($self, 'dt_to', 'DateTime');
 
 	return $self;
 }
@@ -458,7 +462,7 @@ Returns DateTime object for date.
 
  my $dt = $obj->random_day_month_year($day, $month, $year);
 
-Get date defined by day, month and year.
+Get random date defined by day, month and year.
 
 Returns DateTime object for date.
 
@@ -491,6 +495,13 @@ Returns DateTime object for date.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+         From Mo::utils::check_isa():
+                 Parameter 'dt_from' must be a 'DateTime' object.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'dt_to' must be a 'DateTime' object.
+                         Value: %s
+                         Reference: %s
 
  random_day():
          Day cannot be a zero.
@@ -590,7 +601,8 @@ L<DateTime>,
 L<DateTime::Event::Random>,
 L<DateTime::Event::Recurrence>,
 L<English>,
-L<Error::Pure>.
+L<Error::Pure>,
+L<Mo::utils>.
 
 =head1 SEE ALSO
 
@@ -628,6 +640,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

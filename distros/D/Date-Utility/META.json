@@ -1,10 +1,10 @@
 {
    "abstract" : "A class that represents a datetime in various format",
    "author" : [
-      "DERIV <DERIV@cpan.org>"
+      "deriv.com <DERIV@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -63,14 +63,15 @@
             "Carp" : "0",
             "DateTime" : "0",
             "DateTime::TimeZone" : "0",
+            "Moo" : "0",
             "Moose" : "0",
             "POSIX" : "0",
             "Scalar::Util" : "0",
             "Syntax::Keyword::Try" : "0",
-            "Tie::Hash::LRU" : "0",
             "Time::Duration::Concise::Localize" : "2.5",
             "Time::Local" : "0",
             "Time::Piece" : "0",
+            "constant" : "0",
             "feature" : "0",
             "perl" : "5.010000",
             "strict" : "0",
@@ -99,22 +100,22 @@
    "provides" : {
       "Date::Utility" : {
          "file" : "lib/Date/Utility.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/binary-com/perl-Date-Utility/issues"
+         "web" : "https://github.com/mwm-deriv/perl-Date-Utility/issues"
       },
-      "homepage" : "https://github.com/binary-com/perl-Date-Utility",
+      "homepage" : "https://github.com/mwm-deriv/perl-Date-Utility",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/binary-com/perl-Date-Utility.git",
-         "web" : "https://github.com/binary-com/perl-Date-Utility"
+         "url" : "https://github.com/mwm-deriv/perl-Date-Utility.git",
+         "web" : "https://github.com/mwm-deriv/perl-Date-Utility"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "Chylli <chylli@binary.com>",
@@ -125,18 +126,19 @@
       "Jean-Yves Sireau <jy@binary.com>",
       "Matt Miller <matt@binary.com>",
       "Mahdi Mohammadi <mm@binary.com>",
+      "Matt Miller <matthew.miller@deriv.com>",
       "Kaveh Mousavi Zamani <kavehmz@gmail.com>",
       "billmarriott <38449124+billmarriott@users.noreply.github.com>",
+      "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
       "Fayland Lam <fayland@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Shantanu Patil <shantanu@regentmarkets.com>",
       "Anthony-Wong <34021543+Anthony-Wong@users.noreply.github.com>",
       "Chris Travers <chris@efficito.com>",
-      "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
       "farzaneh <17272890+farzaneh-fs@users.noreply.github.com>"
    ],
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

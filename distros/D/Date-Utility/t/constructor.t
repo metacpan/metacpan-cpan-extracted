@@ -7,9 +7,9 @@ require Test::NoWarnings;
 use Date::Utility;
 use charnames qw(:full);
 
-throws_ok { Date::Utility->new({}) } qr/Must pass either datetime or epoch/, 'empty parameters, no object';
+throws_ok { Date::Utility->new({}) } qr/Must pass exactly one of datetime or epoch/, 'empty parameters, no object';
 # Faily stuff
-throws_ok { Date::Utility->new({datetime => 'fake', epoch => 1}) } qr/Must pass only one of datetime or epoch/, 'both epoch and datetime';
+throws_ok { Date::Utility->new({datetime => 'fake', epoch => 1}) } qr/Must pass exactly one of datetime or epoch/, 'both epoch and datetime';
 throws_ok { Date::Utility->new(datetime => 'fake', epoch => 1); } qr/Invalid datetime format/, 'params not in a hash ref';
 throws_ok { Date::Utility->new({datetime => '991111'}); } qr/Invalid datetime format/,
     'numeric string as supplied date time is neither 8 nor 14 chars long';

@@ -1,0 +1,31 @@
+version : 0.86
+languages : %
+    C : C
+    C++ : CPP
+    CPP : CPP
+    CXX : CPP
+    Cplusplus : CPP
+    Foo : Foo
+    PDLPP : Pdlpp
+    Pdlpp : Pdlpp
+    c++ : CPP
+    cplusplus : CPP
+    cpp : CPP
+    cxx : CPP
+    foo : Foo
+    pdlpp : Pdlpp
+types : %
+    C : compiled
+    CPP : compiled
+    Foo : interpreted
+    Pdlpp : compiled
+modules : %
+    C : Inline::C
+    CPP : Inline::CPP
+    Foo : Inline::Foo
+    Pdlpp : Inline::Pdlpp
+suffixes : %
+    C : so
+    CPP : so
+    Foo : foo
+    Pdlpp : so

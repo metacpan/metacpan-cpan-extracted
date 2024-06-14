@@ -6,6 +6,7 @@ no warnings 'redefine';
 
 use Encode qw(encode);
 
+use lib qw(.);
 use URI::file;
 use Test::More;
 use File::Temp qw(tempfile);

@@ -1,4 +1,19 @@
+0.003 2024-06-14
+  [Support Changes]
+    * Do not support 32bit systems.
+  [Requirement Changes]
+    * Require Perl v5.20.3 instead of Perl v5.32.
+    * Remove Mojolicious requirement.
+    * Remove Test::TCP requirement.
+  [Incompatible Changes of Undocumented Methods]
+    * Rename HTTP::Tiny#can_ssl method to can_ssl_with_verify and add 1th optional argument.
+    * Rename HTTP::Tiny#can_ssl_static method to can_ssl and add 1th optional argument..
+    * Remove HTTP::Tiny#can_ssl_static_get_error method.
+    * Remove HTTP::Tiny#can_ssl_get_error method.
+    
+0.002 2024-05-01
+  [Test Changes]
+    * Mojolicious and Test::TCP is required for HTTP tests in Perl v5.32+.
 0.001 2024-02-23
   [Changes]
     * First release.
-  

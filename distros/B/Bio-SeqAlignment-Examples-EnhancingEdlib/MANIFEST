@@ -10,8 +10,13 @@ dist.ini
 lib/Bio/SeqAlignment/Examples/EnhancingEdlib.pm
 scripts/Worker_Thread_effects.png
 scripts/Worker_Thread_interaction.png
+scripts/_Inline/config-x86_64-linux-5.038000
+scripts/_Inline/lib/auto/Bio/SeqAlignment/Components/Libraries/edlib/OpenMP_3255/OpenMP_3255.inl
+scripts/_Inline/lib/auto/Bio/SeqAlignment/Components/Libraries/edlib/OpenMP_3255/OpenMP_3255.so
 scripts/db/Homo_sapiens.GRCh38.cds.sample.strip.fasta
 scripts/db/Homo_sapiens.GRCh38.sample.end.strip.fasta
+scripts/db/Hsapiens.cds.sample.txt
+scripts/db/Hsapiens.cds.sample_index_txt.msgpack
 scripts/plot_timings.R
 scripts/spacetime_MCE_OMP.png
 scripts/spacetime_MCE_with_OMP.png
@@ -23,6 +28,7 @@ scripts/timings_MCE_OMP.png
 scripts/timings_MCE_with_OMP.png
 scripts/timings_chunk.png
 scripts/timings_openMP.txt
+scripts/timings_openMP2.txt
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 xt/author/00-compile.t

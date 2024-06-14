@@ -35,7 +35,6 @@ sub new {
     }, $class;
 }
 
-
 sub _groups {
     my $groups = [
         { name => 'group_plugins',      text => "  Plugins"   },

@@ -1,4 +1,4 @@
-use 5.008_007;
+use v5.20.3;
 use ExtUtils::MakeMaker;
 use strict;
 use warnings;
@@ -19,6 +19,7 @@ unless ($meta) {
 }
 
 my %configure_and_runtime_requires = ('SPVM' => '0.9706');
+
 WriteMakefile(
   NAME              => 'SPVM::HTTP::Tiny',
   VERSION_FROM           => 'lib/SPVM/HTTP/Tiny.pm',
@@ -51,9 +52,7 @@ WriteMakefile(
     'SPVM::Regex' => '0.243',
     'SPVM::Mozilla::CA' => '0.001',
     'SPVM::File::Temp' => '0.021',
-  },
-  TEST_REQUIRES => {
-    
+    'SPVM::Time::Piece' => '0.003',
   },
 );
 

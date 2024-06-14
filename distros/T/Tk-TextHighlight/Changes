@@ -140,8 +140,17 @@ December 2007
 	languages.  Without Kate, this modules provides full highlighting for 
 	Perl, Bash, Pod, and Xresources files.
 	3) Other than that, just a few minor optimizations and cleanups.
+
 19 January 2016
 	Update to version 1.1.1
 	Re-fix all internal packages to be under Tk::TextHighlight::*" to 
 	fix "Unauthorized" Package namespace trespassing in CPAN.  Not sure 
 	WHY this got undone somewhere.
+
+13 June 2024
+	Update to version 1.2
+	1) Add "Select" option to Edit menu to select text between the cursor and 
+	the current mouse location (when right-button pressed to popup the menu.
+	2) ROTextHighlight - Remove "*Comment" and "*Indent" options from the Edit 
+	menu since these modify text (in readonly mode)!
+	3) Tidy up the POD docs a bit.

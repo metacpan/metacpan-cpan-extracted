@@ -1,3 +1,9 @@
+0.05 2024-06-13T23:30:31+02:00
+ - Add -q option for quiet mode.
+ - Add tests.
+ - Fix typo in doc.
+ - Improve testing of help output.
+
 0.04 2024-05-04T12:02:57+02:00
  - Improve error handling.
  - Update Module::Install to 1.21 version.

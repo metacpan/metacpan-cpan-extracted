@@ -1,6 +1,5 @@
 .gitattributes
-.github/workflows/linux-ubuntu-latest-32bit.yml
-.github/workflows/linux-ubuntu-latest-perl-5.8.9.yml
+.github/workflows/linux-ubuntu-latest-perl-v5.20.3.yml
 .github/workflows/linux-ubuntu-latest.yml
 .github/workflows/macos-latest.yml
 .github/workflows/windows-latest.yml
@@ -27,7 +26,9 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
-t/basic.t
+t/HTTP-Tiny-online.t
+t/HTTP-Tiny.t.disable
 t/lib/SPVM/TestCase/HTTP/Tiny.spvm
+t/webapp/basic.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

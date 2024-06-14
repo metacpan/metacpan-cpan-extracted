@@ -75,7 +75,7 @@ class HTTP::Tiny::URL {
     
     my $replace_info_ref = [(Regex::ReplaceInfo)undef];
     
-    Regex->new(":(\d*)\z")->replace($host, "", 0, -1, {info => $replace_info_ref});
+    $host = Regex->new(":(\d*)\z")->replace($host, "", 0, -1, {info => $replace_info_ref});
     my $match = $replace_info_ref->[0]->match;
     if ($match) {
       $port_string = $match->cap1;

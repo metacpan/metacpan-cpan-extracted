@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::ORM::DBIx 0.01;
+package Mojolicious::Plugin::ORM::DBIx 0.02;
 use v5.26;
 use warnings;
 
@@ -255,7 +255,8 @@ See L<DBIx::Class::Schema::Loader::Base/quiet>
         unshift(@filters, sub($type, $class, $text) {$text .= sprintf("\nuse %s;", $feature_bundle)});
       }
       if (defined($tidy_fs)) {
-        push(@filters, sub($type, $class, $text) {join("\n", $tidy_fs->[0], $text, $tidy_fs->[1])});
+        my ($end, $start) = (reverse($tidy_fs->@*))[0, 1];
+        push(@filters, sub($type, $class, $text) {join("\n", $start, $text, $end)});
       }
       make_schema_at(
         $namespace, {

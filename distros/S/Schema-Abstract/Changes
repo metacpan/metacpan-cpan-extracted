@@ -1,3 +1,9 @@
+0.05 2024-06-13T20:02:40+02:00
+ - Add tests for constructor.
+ - Improve constructor doc.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.04 2022-09-09T18:15:21+02:00
  - Fix repository URLs.
  - Remove nonsense 'use Schema::Abstract' from tests.

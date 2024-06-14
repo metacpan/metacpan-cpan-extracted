@@ -497,11 +497,11 @@ sub __func_with_one_col {
         if ( ! length $arg || $arg eq "''" ) {
             if ( $func eq $replace && @$args == 1 ) {
                 # replacement_string: an empty string is a valid argument
-                $arg = '';
+                $arg = "''";
             }
             elsif ( $func =~ /^(?:$position|$instr|$locate)\z/ && @$args == 0 ) {
                 # substring: an empty string is a valid argument
-                $arg = '';
+                $arg = "''";
             }
             elsif ( $func eq $trim ) {
                 # an unset argument does not close the function

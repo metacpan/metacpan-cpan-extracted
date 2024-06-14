@@ -26,20 +26,10 @@ share {
     my $repo_response;
 
     ## use one of two locations to source edlib
-    $repo_url =
-      'https://github.com/Martinsos/edlib/archive/refs/heads/master2.zip';
-    $repo_response = HTTP::Tiny->new->head($repo_url);
-    unless ( $repo_response->{success} )
-    {    ## failed original download, try my fork
-        $repo_url =
-          'https://github.com/chrisarg/edlib/archive/refs/heads/master.zip';
-        $repo_response = HTTP::Tiny->new->head($repo_url);
-        croak "Failed to download edlib from either location"
-          unless $repo_response->{success};
-    }
-
-    start_url $repo_url;
-    plugin 'Download';
+    plugin 'Download::GitHub' => (
+        github_repo => 'edlib',
+        github_user => 'Martinsos',
+    );
     plugin 'Extract' => 'zip';
     plugin 'Build::CMake';
     plugin 'Gather::IsolateDynamic';

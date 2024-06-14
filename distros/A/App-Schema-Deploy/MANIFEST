@@ -24,5 +24,8 @@ t/App-Schema-Deploy/01-use.t
 t/App-Schema-Deploy/02-version.t
 t/App-Schema-Deploy/03-new.t
 t/App-Schema-Deploy/04-run.t
+t/data/ex1/Schema/Foo.pm
+t/data/ex1/Schema/Foo/0_1_0.pm
+t/data/ex1/Schema/Foo/0_1_0/Result/Person.pm
 xt/App-Schema-Deploy/01-pod_coverage.t
 xt/App-Schema-Deploy/02-pod.t

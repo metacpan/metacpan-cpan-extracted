@@ -22,7 +22,9 @@ requires 'Class::Utils' => 0.03;
 requires 'DateTime' => 0;
 requires 'DateTime::Event::Random' => 0;
 requires 'DateTime::Event::Recurrence' => 0;
+requires 'English' => 0;
 requires 'Error::Pure' => 0.15;
+requires 'Mo::utils' => '0.08';
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Random-Day/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Random-Day';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Random-Day';
@@ -31,7 +33,7 @@ test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.14';
+version '0.15';
 
 # Run.
 WriteAll();

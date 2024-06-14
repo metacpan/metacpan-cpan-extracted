@@ -1,0 +1,105 @@
+<%init>
+use JSON;
+use Data::Dumper;
+use Digest::SHA qw(hmac_sha1_base64);
+
+RT->Logger->debug( 'twilio webhook got args: ' . Dumper( \%ARGS ) );
+
+my $from = $ARGS{From};
+my $to   = $ARGS{To};
+my $body = $ARGS{Body};
+my $sig  = RT::Interface::Web::RequestENV('HTTP_X_TWILIO_SIGNATURE');
+
+if ( !( $from && $to && $body && $sig ) ) {
+    RT->Logger->error('twilio webhook failed: missing args');
+    $m->abort(400);
+}
+
+# validate the signature
+# see: https://www.twilio.com/docs/usage/security#validating-requests
+my $config      = RT::Config->Get('SMSWebhookTwilio') // {};
+my $webhook_url = $config->{url};
+my $token       = $config->{token};
+
+if ( !( $webhook_url && $token ) ) {
+    RT->Logger->error('twilio webhook failed: missing config');
+    $m->abort(400);
+}
+
+for my $post_arg ( sort keys %ARGS ) {
+    $webhook_url .= $post_arg . $ARGS{$post_arg};
+}
+
+my $calc_sig = hmac_sha1_base64( $webhook_url, $token );
+
+# need to pad the digest: https://metacpan.org/pod/Digest::SHA#PADDING-OF-BASE64-DIGESTS
+while ( length($calc_sig) % 4 ) {
+    $calc_sig .= '=';
+}
+
+if ( $sig ne $calc_sig ) {
+    RT->Logger->error(
+        'twilio webhook failed: cannot validate twilio signature');
+    $m->abort(400);
+}
+
+my $user_obj = $session{CurrentUser};
+unless ($user_obj) {
+    RT->Logger->error('twilio webhook failed: no current user');
+    $m->abort(401);
+}
+
+my $User = RT::User->new($user_obj);
+my ( $id, $msg ) = $User->LoadOrCreateByPagerPhone($from);
+unless ($id) {
+    RT->Logger->error(
+        "twilio webhook failed: could not load or create user - $msg");
+    $m->abort(400);
+}
+
+my $current_user = RT::CurrentUser->new($id);
+RT->Logger->debug( 'twilio webhook found user: ' . $current_user->Name );
+
+# find all active tickets for the user sending the sms
+my $tickets = RT::Tickets->new($current_user);
+$tickets->FromSQL( "Watcher.id = " . $id . " AND Status = '__Active__'" );
+RT->Logger->debug(
+    'twilio webhook # of active tickets for user: ' . $tickets->Count );
+
+if ( $tickets->Count == 1 ) {
+
+    # only one active ticket so add a comment to it
+    my $ticket = $tickets->First;
+    my ( $ret, $msg )
+        = $ticket->Comment( Content => "To: $to\nFrom: $from\n\n$body" );
+    unless ($ret) {
+        RT->Logger->error("twilio webhook could not add comment: $msg");
+    }
+} else {
+
+    # either zero or more than one active tickets
+    # don't know which one the text relates to so create a new ticket
+    my $mime = HTML::Mason::Commands::MakeMIMEEntity(
+        Body => "To: $to\nFrom: $from\n\n$body",
+        Type => 'text/plain',
+    );
+    my $Ticket = RT::Ticket->new($current_user);
+    my ( $id, $Trans, $ErrMsg ) = $Ticket->Create(
+        Requestor => $current_user->Name,
+        Type      => 'ticket',
+        Queue     => $config->{queue} // 'General',
+        Subject   => "SMS Message from "
+            . ( $current_user->RealName // $current_user->Name ),
+        MIMEObj => $mime,
+    );
+
+    if ($id) {
+        RT::Logger->debug("twilio webhook created new ticket: $id");
+    } else {
+        RT::Logger->error(
+            "twilio webhook failed to create new ticket: $ErrMsg");
+    }
+}
+</%init>
+<Response></Response>
+% $m->abort;

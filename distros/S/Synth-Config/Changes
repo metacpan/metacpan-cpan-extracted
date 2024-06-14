@@ -1,5 +1,8 @@
 Revision history for Synth-Config
 
+0.0062 2024-06-13 21:36:53
+    - Fix synopsis.
+
 0.0061 2024-06-09 23:58:47
     - Make sure there can be multiple module parameters in the graphviz() method.
     - Add missing VCAs to the Maths.yaml patches.

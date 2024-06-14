@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::ORM::DBIx::Command::schema_load 0.01;
+package Mojolicious::Plugin::ORM::DBIx::Command::schema_load 0.02;
 use v5.26;
 use warnings;
 

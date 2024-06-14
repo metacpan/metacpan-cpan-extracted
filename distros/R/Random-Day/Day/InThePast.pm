@@ -6,7 +6,7 @@ use warnings;
 
 use DateTime;
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 sub new {
 	my ($class, @params) = @_;
@@ -158,6 +158,10 @@ Returns DateTime object for date.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+         From Mo::utils::check_isa():
+                 Parameter 'dt_from' must be a 'DateTime' object.
+                         Value: %s
+                         Reference: %s
 
  random_day():
          From Random::Day::random_day():
@@ -268,6 +272,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Alien::SeqAlignment::edlib;
-$Alien::SeqAlignment::edlib::VERSION = '0.09';
+$Alien::SeqAlignment::edlib::VERSION = '0.10';
 
 use parent qw( Alien::Base );
 
@@ -12,7 +12,7 @@ Alien::SeqAlignment::edlib - find, build and install the edlib library
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ NAME
     schema-deploy - Script to deploy Schema.
 
 SYNOPSIS
-     schema-deploy [-d] [-h] [-p password] [-u user] [-v schema_version] [--version] dsn schema_module
+     schema-deploy [-d] [-h] [-p password] [-q] [-u user] [-v schema_version] [--version] dsn schema_module
 
 ARGUMENTS
     *       "-d"
@@ -16,6 +16,10 @@ ARGUMENTS
     *       "-p password"
 
             Database password.
+
+    *       "-q"
+
+            Quiet mode.
 
     *       "-u user"
 
@@ -59,5 +63,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

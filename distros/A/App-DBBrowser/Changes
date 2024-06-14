@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+2.414  2024-06-13
+        Bugfix Informix 'not matches'.
+        Bugfix in 'replace' function: allow empty replacement string.
+        Bugfix Informix 'day_of_week'.
+
 2.413  2024-05-23
         Bugfix import: don't check for emptiness of the first row if the file is a text file.
 

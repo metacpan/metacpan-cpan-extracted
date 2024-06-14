@@ -3,7 +3,6 @@ requires 'DateTime';
 requires 'Moose';
 requires 'POSIX';
 requires 'Scalar::Util';
-requires 'Tie::Hash::LRU';
 requires 'Time::Duration::Concise::Localize', '2.5';
 requires 'Time::Local';
 requires 'Time::Piece';

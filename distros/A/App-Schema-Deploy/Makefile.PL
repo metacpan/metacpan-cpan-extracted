@@ -25,15 +25,22 @@ requires 'Getopt::Std' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/App-Schema-Deploy/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/App-Schema-Deploy';
 resources 'repository' => 'git://github.com/michal-josef-spacek/App-Schema-Deploy';
+test_requires 'DBIx::Class::Core' => 0;
+test_requires 'DBIx::Class::InflateColumn::DateTime' => 0;
+test_requires 'DBIx::Class::Schema' => 0;
 test_requires 'English' => 0;
 test_requires 'File::Object' => 0;
 test_requires 'File::Spec::Functions' => 0;
+test_requires 'File::Temp' => 0;
+test_requires 'IO::Barf' => 0;
+test_requires 'SQL::Translator' => 0.11018;
+test_requires 'Schema::Abstract' => 0.03;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
 test_requires 'Test::Warn' => 0.31;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

@@ -1,8 +1,9 @@
 NAME
-    TableDataRole::Business::ID::BPOM::NutritionLabelRef - Nutrients
+    TableDataRole::Business::ID::BPOM::NutritionLabelRef - BPOM's nutrition
+    label reference (ALG, acuan label gizi)
 
 VERSION
-    This document describes version 0.004 of
+    This document describes version 0.005 of
     TableDataRole::Business::ID::BPOM::NutritionLabelRef (from Perl
     distribution TableData-Business-ID-BPOM-NutritionLabelRef), released on
     2024-06-13.

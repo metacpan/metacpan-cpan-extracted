@@ -15,4 +15,4 @@ use App::Schema::Deploy;
 exit App::Schema::Deploy->new->run;
 
 # Output like:
-# Schema (v0.1.0) from 'Schema::Commons::Vote' was deployed to 'dbi:SQLite:dbname=ex2.db'.
+# Schema (v0.1.0) from 'Schema::Commons::Vote' was deployed to 'dbi:SQLite:dbname=sqlite.db'.

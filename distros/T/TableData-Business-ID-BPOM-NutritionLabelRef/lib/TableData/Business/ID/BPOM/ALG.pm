@@ -10,7 +10,7 @@ with 'TableDataRole::Business::ID::BPOM::NutritionLabelRef';
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-06-13'; # DATE
 our $DIST = 'TableData-Business-ID-BPOM-NutritionLabelRef'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our %STATS = ("num_columns",4,"num_rows",228); # STATS
 
@@ -29,7 +29,7 @@ TableData::Business::ID::BPOM::ALG - Nutrients (shorter alias for TableData::Bus
 
 =head1 VERSION
 
-This document describes version 0.004 of TableData::Business::ID::BPOM::ALG (from Perl distribution TableData-Business-ID-BPOM-NutritionLabelRef), released on 2024-06-13.
+This document describes version 0.005 of TableData::Business::ID::BPOM::ALG (from Perl distribution TableData-Business-ID-BPOM-NutritionLabelRef), released on 2024-06-13.
 
 =head1 SYNOPSIS
 

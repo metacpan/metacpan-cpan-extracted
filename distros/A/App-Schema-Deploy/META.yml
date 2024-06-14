@@ -3,10 +3,17 @@ abstract: 'Base class and script for Schema deploy.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  DBIx::Class::Core: 0
+  DBIx::Class::InflateColumn::DateTime: 0
+  DBIx::Class::Schema: 0
   English: 0
   ExtUtils::MakeMaker: 6.59
   File::Object: 0
   File::Spec::Functions: 0
+  File::Temp: 0
+  IO::Barf: 0
+  SQL::Translator: 0.11018
+  Schema::Abstract: 0.03
   Test::More: 0
   Test::NoWarnings: 0
   Test::Output: 0
@@ -37,4 +44,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-Schema-Deploy
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Schema-Deploy
-version: '0.04'
+version: '0.05'

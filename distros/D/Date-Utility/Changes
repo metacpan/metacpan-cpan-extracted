@@ -1,5 +1,10 @@
 Revision history for Date-Utility
 
+1.12      2024-06-14 08:30:42+02:00 Africa/Maputo
+	Remove dependency on Tie::Hash::LRU
+	Switch dependency from Moose to Moo
+	Improve datatime parsing performance
+
 1.11      2022-10-17 14:32:15+00:00 UTC
     - Replace Try::Tiny with Syntax::Keyword::Try
 

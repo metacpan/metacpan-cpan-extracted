@@ -4,6 +4,7 @@ use strict;
 use warnings;
 no warnings 'redefine';
 
+use lib qw(.);
 use URI::file;
 use RDF::Query;
 use Test::More;

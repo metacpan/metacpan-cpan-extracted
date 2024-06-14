@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Bio::SeqAlignment::Components::Libraries::edlib::OpenMP;
-$Bio::SeqAlignment::Components::Libraries::edlib::OpenMP::VERSION = '0.01';
+$Bio::SeqAlignment::Components::Libraries::edlib::OpenMP::VERSION = '0.02';
 # ABSTRACT: basic edlib library that uses OpenMP for parallelism
 use Config;
 use Alien::SeqAlignment::edlib;
@@ -71,7 +71,6 @@ our %EXPORT_TAGS = (
           configure_edlib_aligner
           edlibAlign
           make_C_index
-          print_config
           fork_around_find_out
         )
     ]
@@ -155,7 +154,7 @@ Bio::SeqAlignment::Components::Libraries::edlib::OpenMP - basic edlib library th
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

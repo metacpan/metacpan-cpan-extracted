@@ -1,4 +1,7 @@
 Revision history for perl distribution Mojolicious::Plugin::ORM::DBIx
 
+0.02      2024-06-13T10:49:45-05:00
+  - improve support for config array merging by using last items in format skipping array
+
 0.01      2024-04-03T09:11:05-05:00
   - initial release

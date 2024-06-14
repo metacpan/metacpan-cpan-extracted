@@ -32,23 +32,25 @@ Tk::ROTextHighlight - a Read-only version of this widget.
 
 =head1 DESCRIPTION
 
-Tk::TextHighlight inherits Tk::TextUndo and all its options and methods. Besides
-syntax highlighting, methods are provided for commenting and uncommenting
-as well as indenting and unindenting a selected area, matching pairs of braces, brackets and
-brackets and curlies and automatic indenting of new lines.  The included companion 
-module B<Tk::ROTextHighlight> provides all the same functionality in a "readonly" 
-widget for text viewers, etc.  B<Tk::TextHighlight> also supports highlighting of all 
-the lauguages of the B<Syntax::Highlight::Engine::Kate>, if that module is installed.
+Tk::TextHighlight inherits Tk::TextUndo and all its options and methods.  
+Besides syntax highlighting, methods are provided for commenting and 
+uncommenting as well as indenting and unindenting a selected area, matching 
+pairs of braces, brackets and brackets and curlies and automatic indenting of 
+new lines.  The included companion module B<Tk::ROTextHighlight> provides all 
+the same functionality in a "readonly" widget for text viewers, etc.  
+B<Tk::TextHighlight> also supports highlighting of all the lauguages of the 
+B<Syntax::Highlight::Engine::Kate>, if that module is installed.
 
-If you want your widget to be read-only, then B<require Tk::ROTextHighlight>, which 
-is based on B<Tk::ROText> instead of B<Tk::TextUndo>.
+If you want your widget to be read-only, then B<require Tk::ROTextHighlight>, 
+which is based on B<Tk::ROText> instead of B<Tk::TextUndo>.
 
 Syntax highlighting is done through a plugin approach. Adding languages 
-is a matter of writing plugin modules. Theoretically this is not limited to programming languages. 
-The plugin approach could also provide the possibility for grammar or spell checking in spoken 
-languages.
+is a matter of writing plugin modules. Theoretically this is not limited to 
+programming languages.  The plugin approach could also provide the possibility 
+for grammar or spell checking in spoken languages.
 
-Currently there is support for B<Bash>, B<HTML>, B<Perl>, B<Pod>, B<Kate>, and B<Xresources>.
+Currently there is support for B<Bash>, B<HTML>, B<Perl>, B<Pod>, B<Kate>, 
+and B<Xresources>.
 
 =head1 OPTIONS
 
@@ -60,7 +62,7 @@ Currently there is support for B<Bash>, B<HTML>, B<Perl>, B<Pod>, B<Kate>, and B
 
 =item Switch: B<-autoindent>
 
-Boolean, when you press the enter button, should the next line begin at the
+Boolean, when you press the enter button, should the next line begin at the 
 same position as the current line or not. By default B<false>.
 
 =item Name: B<commentchar>
@@ -77,8 +79,8 @@ By default "#".
 
 =item Switch: B<-disablemenu>
 
-Boolean, by default 0. In case you don't want the menu under the
-right mouse button to pop up.
+Boolean, by default 0. In case you don't want the menu under the right mouse 
+button to pop up.
 
 =item Name: B<highlightInBackground>
 
@@ -105,7 +107,7 @@ Default "\t".
 
 =item Switch: B<-match>
 
-string of pairs for brace/bracket/curlie etc matching. If this description
+string of pairs for brace/bracket/curlie etc matching. If this description 
 doesn't make anything clear, don't worry, the default setting will:
 
  '[]{}()'
@@ -122,7 +124,7 @@ Options list for the tag 'Match'. By default:
 
  [-background => 'red', -foreground => 'yellow']
 
-You can also specify this option as a space separated string. Might come in
+You can also specify this option as a space separated string. Might come in 
 handy for your Xresource files.
 
  "-background red -foreground yellow"
@@ -133,7 +135,7 @@ handy for your Xresource files.
 
 =item Switch B<-rules>
 
-Specify the color and font options for highlighting. You specify a list
+Specify the color and font options for highlighting. You specify a list 
 looking a bit like this.
 
  [
@@ -141,7 +143,7 @@ looking a bit like this.
      ['Tagname2', @options2],
  ]
 
-The names of the tags are depending on the syntax that is highlighted. 
+The names of the tags are depending on the syntax that is highlighted.  
 See the language modules for more information about this data structure.
 
 =item Name: rulesdir
@@ -150,10 +152,10 @@ See the language modules for more information about this data structure.
 
 =item Switch B<-rulesdir>
 
-Specify the directory where this widget stores its coloring defenitions.
-Files in this directory are stored as "HTML.rules", "Perl.rules" etc.
-By default it is set to '', which means that when you switch syntax
-the highlighting rules are not loaded or stored. The hard coded defaults
+Specify the directory where this widget stores its coloring defenitions. 
+Files in this directory are stored as "HTML.rules", "Perl.rules" etc.  
+By default it is set to '', which means that when you switch syntax 
+the highlighting rules are not loaded or stored. The hard coded defaults 
 in the language modules will be used.
 
 =item Name: B<syntax>
@@ -163,14 +165,14 @@ in the language modules will be used.
 =item Switch: B<-syntax>
 
 
-Specifies the language for highlighting. At this moment the possible
-values are B<None>, B<HTML>, B<Perl>, B<Pod> B<Kate:Language>, and B<Xresources>. 
-By default B<None>
+Specifies the language for highlighting. At this moment the possible 
+values are B<None>, B<HTML>, B<Perl>, B<Pod> B<Kate:Language>, 
+and B<Xresources>.  Default:  B<None>
 
-If B<Syntax::Highlight::Engine::Kate> is installed, you may specify any language 
-that the B<Kate> syntax highlight engine supports.
+If B<Syntax::Highlight::Engine::Kate> is installed, you may specify any 
+language that the B<Kate> syntax highlight engine supports.
 
-Alternatively it is possible to specify a reference to your independent plugin.
+Alternatively it is possible to specify a reference to your independent plugin. 
 
 =item Name: Not available
 
@@ -178,9 +180,9 @@ Alternatively it is possible to specify a reference to your independent plugin.
 
 =item Switch: B<-updatecall>
 
-Here you can specify a callback that will be executed whenever the insert
-cursor has moved or text has been modified, so your application can keep
-track of position etc. Don't make this callback to heavy, the widget will
+Here you can specify a callback that will be executed whenever the insert 
+cursor has moved or text has been modified, so your application can keep 
+track of position etc. Don't make this callback to heavy, the widget will 
 get sluggish quickly.
 
 =item Name: Not available
@@ -189,7 +191,8 @@ get sluggish quickly.
 
 =item Switch: B<-noPlugInit>
 
-Disables TextHighlight feature of initializing default rules when no B<.rules> file present.
+Disables TextHighlight feature of initializing default rules when no B<.rules> 
+file present.
 
 =item Name: Not available
 
@@ -197,7 +200,8 @@ Disables TextHighlight feature of initializing default rules when no B<.rules> f
 
 =item Switch: B<-noSyntaxMenu>
 
-Don't show the B<Syntax> submenu option in the B<View> submenu of the right-click menu.
+Don't show the B<Syntax> submenu option in the B<View> submenu of the 
+right-click menu.
 
 =item Name: Not available
 
@@ -205,7 +209,8 @@ Don't show the B<Syntax> submenu option in the B<View> submenu of the right-clic
 
 =item Switch: B<-noSaveRulesMenu>
 
-Don't show the B<Save Rules> submenu option in the B<View> submenu of the right-click menu.
+Don't show the B<Save Rules> submenu option in the B<View> submenu of the 
+right-click menu.
 
 =item Name: Not available
 
@@ -213,7 +218,8 @@ Don't show the B<Save Rules> submenu option in the B<View> submenu of the right-
 
 =item Switch: B<-noRulesEditMenu>
 
-Don't show the B<Rules Editor> option in the B<View> submenu of the right-click menu.
+Don't show the B<Rules Editor> option in the B<View> submenu of the 
+right-click menu.
 
 =item Name: Not available
 
@@ -226,10 +232,8 @@ B<-noRulesEditMenu>, and B<-noSaveRulesMenu> options.
 
 =back
 
-There are some undocumented options. They are used internally. 
+There are some undocumented options. They are used internally.  
 It is propably best to leave them alone.
-
-=cut
 
 =head1 METHODS
 
@@ -237,20 +241,21 @@ It is propably best to leave them alone.
 
 =item B<doAutoIndent>
 
-Checks the indention of the previous line and indents
-the line where the cursor is equally deep.
+Checks the indention of the previous line and indents the line where the 
+cursor is equally deep.
 
 =item B<highlight>(I<$begin>, I<$end>);
 
-Does syntax highlighting on the section of text indicated by $begin and $end. 
+Does syntax highlighting on the section of text indicated by $begin and $end.  
 $begin and $end are linenumbers not indexes!
 
 =item B<highlightCheck>>(I<$begin>, I<$end>);
 
-An insert or delete has taken place affecting the section of text between $begin and $end.
-B<highlightCheck> is being called after and insert or delete operation. $begin and $end (again
-linenumbers, not indexes) indicate the section of text affected. B<highlightCheck> checks what 
-needs to be highlighted again and does the highlighting.
+An insert or delete has taken place affecting the section of text between 
+$begin and $end.  B<highlightCheck> is being called after and insert or delete 
+operation. $begin and $end (again, linenumbers, not indexes) indicate the 
+section of text affected. B<highlightCheck> checks what needs to be 
+highlighted again and does the highlighting.
 
 =item B<highlightLine>(I<$line>);
 
@@ -258,44 +263,48 @@ Does syntax highlighting on linenumber $line.
 
 =item B<highlightPlug>
 
-Checks wether the appropriate highlight plugin has been loaded. If none or the wrong 
-one is loaded, it loads the correct plugin. It returns a reference to the plugin loaded.
-It also checks wether the rules have changed. If so, it restarts highlighting 
-from the beginning of the text.
+Checks wether the appropriate highlight plugin has been loaded. If none or the 
+wrong one is loaded, it loads the correct plugin. It returns a reference to 
+the plugin loaded.  It also checks wether the rules have changed. If so, it 
+restarts highlighting from the beginning of the text.
 
 =item B<highlightPlugInit>
 
-Loads and initalizes a highlighting plugin. First it checks the value of the B<-syntax> option
-to see which plugin should be loaded. Then it checks wether a set of rules is defined to this plugin
-in the B<-rules> option. If not, it tries to obtain a set of rules from disk using B<rulesFetch>. 
-If this fails as well it will use the hardcoded rules from the syntax plugin.
+Loads and initalizes a highlighting plugin. First it checks the value of the 
+B<-syntax> option to see which plugin should be loaded. Then it checks wether 
+a set of rules is defined to this plugin in the B<-rules> option. If not, it 
+tries to obtain a set of rules from disk using B<rulesFetch>.  If this fails 
+as well it will use the hardcoded rules from the syntax plugin.
 
 =item B<highlightPurge>(I<$line>);
 
-Tells the widget that the text from linenumber $line to the end of the text is not to be considered 
-highlighted any more.
+Tells the widget that the text from linenumber $line to the end of the text is 
+not to be considered highlighted any more.
 
 =item B<highlightVisual>
 
-Calls B<visualEnd> to see what part of the text is visible on the display, and adjusts highlighting
-accordingly.
+Calls B<visualEnd> to see what part of the text is visible on the display, and 
+adjusts highlighting accordingly.
 
 =item B<linenumber>(I<$index>);
 
-Returns the linenumber part of an index. You may also specify indexes like 'end' or 'insert' etc.
+Returns the linenumber part of an index. You may also specify indexes like 
+'end' or 'insert' etc.
 
 =item B<matchCheck>
 
-Checks wether the character that is just before the 'insert'-mark should be matched, and if so
-should it match forwards or backwards. It then calls B<matchFind>.
+Checks wether the character that is just before the 'insert'-mark should be 
+matched, and if so, should it match forwards or backwards.  
+It then calls B<matchFind>.
 
 =item B<matchFind>(I<$direction>, I<$char>, I<$match>, I<$start>, I<$stop>);
 
-Matches $char to $match, skipping nested $char/$match pairs, and displays the match found (if any).
+Matches $char to $match, skipping nested $char/$match pairs, and displays the 
+match found (if any).
 
 =item B<rulesEdit>
 
-Pops up a window that enables the user to set the color and font options
+Pops up a window that enables the user to set the color and font options 
 for the current syntax.
 
 =item B<rulesFetch>
@@ -361,59 +370,60 @@ B<-noSyntaxMenu> is set!
 
 =head1 SYNTAX HIGHLIGHTING
 
-This section is a brief description of how the syntax highlighting process
-works.
+This section is a brief description of how the syntax highlighting 
+process works.
 
 B<Initiating plugin>
 
-The highlighting plugin is only then initiated when it is needed. When some
-highlighting needs to be done, the widget calls B<highlightPlug> to retrieve
+The highlighting plugin is only then initiated when it is needed. When some 
+highlighting needs to be done, the widget calls B<highlightPlug> to retrieve 
 a reference to the plugin. 
 
-B<highlightPlug> checks wether a plugin is present. Next it will check whether
-the B<-rules> option has been specified or wether the B<-rules> option has changed.
-If no rules are specified in B<-rules>, it will look for a pathname
-in the B<-rulesdir> option. If that is found it will try to load a file
-called '*.rules', where * is the value of B<-syntax>. 
+B<highlightPlug> checks wether a plugin is present. Next it will check whether 
+the B<-rules> option has been specified or wether the B<-rules> option 
+has changed.  If no rules are specified in B<-rules>, it will look for a 
+pathname in the B<-rulesdir> option. If that is found it will try to load a 
+file called '*.rules', where * is the value of B<-syntax>. 
 
-If no plugin is present, or the B<-syntax> option has changed value,
+If no plugin is present, or the B<-syntax> option has changed value, 
 B<highlightPlug> loads the plugin. and constructs optionally giving it 
-a reference to the found rules as parameter. if no rules
+a reference to the found rules as parameter. if no rules 
 are specified, the plugin will use its internal hardcoded defaults.
 
 B<Changing the rules>
 
-A set of rules is a list, containing lists of tagnames, followed by options. 
-If you want to see what they look like, you can have a look at the constructors
+A set of rules is a list, containing lists of tagnames, followed by options.  
+If you want to see what they look like, you can have a look at the constructors 
 of each plugin module. Every plugin has a fixed set of tagnames it can handle.
 
 There are two ways to change the rules.
 
 You can invoke the B<rulesEdit> method, which is also available through the 
-B<View> menu. The result is a popup in which you can specify color and font
-options for each tagname. After pressing 'Ok', the edited rules will be applied.
-If B<-rulesdir> is specified, the rules will be saved on disk as
+B<View> menu. The result is a popup in which you can specify color and font 
+options for each tagname. After pressing 'Ok', the edited rules will 
+be applied.  If B<-rulesdir> is specified, the rules will be saved on disk as 
 I<rulesdir/syntax.rules>.
 
-You can also use B<configure> to specify a new set of rules. In this you have
-ofcause more freedom to use all available tag options. For more details about
-those there is a nice section about tag options in the Tk::Text documentation.
+You can also use B<configure> to specify a new set of rules. In this you have 
+ofcause more freedom to use all available tag options. For more details about 
+those there is a nice section about tag options in the Tk::Text documentation.  
 After the call to B<configure> it is wise to call B<highlightPlug>.
 
 B<Highlighting text>
 
-Syntax highlighting is done in a lazy manor. Only that piece of text is
-highlighted that is needed to present the user a pretty picture. This is
-done to minimize use of system resources. Highlighting is running on the
-foreground. Jumping directly to the end of a long fresh loaded textfile may
+Syntax highlighting is done in a lazy manor. Only that piece of text is 
+highlighted that is needed to present the user a pretty picture. This is 
+done to minimize use of system resources. Highlighting is running on the 
+foreground. Jumping directly to the end of a long fresh loaded textfile may 
 very well take a couple of seconds.
 
 Highlighting is done on a line to line basis. At the end of each line the
 highlighting status is saved in the list in B<-colorinf>, so when highlighting
-the next line, the B<highlight> method of B<TextHighlight> will know how to begin.
+the next line, the B<highlight> method of B<TextHighlight> will know how 
+to begin.
 
-The line that needs highlighting is offered to the B<highlight> method of
-the plugin. This method returns a list of offset and tagname pairs.
+The line that needs highlighting is offered to the B<highlight> method of 
+the plugin. This method returns a list of offset and tagname pairs.  
 Take for example the following line of perl code.
 
  my $mother = 'older than i am';
@@ -430,39 +440,36 @@ The B<highlight> method of the Perl plugin will return the following list;
   1 => 'DEFAULT',)    #;
 
 The B<highlight> method of TextHighlight will then mark positions 0 to 2 as 
-'Reserved', positions 2 to 3 as 'DEFAULT', positions 3 to 10 as 'Variable',
-etcetera.
-
-=cut
+'Reserved', positions 2 to 3 as 'DEFAULT', positions 3 to 10 as 'Variable', etc.
 
 =head1 WRITING PLUGINS
 
-After writing a couple of plugins myself i have come to a couple of guidelines
-about how to set them up. If you are interested in adding support for your
+After writing a couple of plugins myself i have come to a couple of guidelines 
+about how to set them up. If you are interested in adding support for your 
 own syntax highlighting problem or language this section is of interest to you.
 
 B<From scratch>
 
-If you choose to build a plugin completely from scratch, your module needs
+If you choose to build a plugin completely from scratch, your module needs 
 to meet the following requirements.
 
  - If you want to write a formal addition to Tk::TextHighlight, 
    your plugin must be in the namespace 
    Tk::TextHighlight::YourSyntax.
+
  - The constructor is called 'new', and it should accept 
    a reference a reference to a list of rules as parameters.
- - The following methods will be called upon by Tk::TextHighlight: 
-     highlight, stateCompare, rules, setSate, 
-     getState, syntax.
 
-More information about those methods is available in the documentation of
-Tk::TextHighlight::None and Tk::TextHighlight::Template. Good luck, you're on your own now.
+ - The following methods will be called upon by Tk::TextHighlight:  
+   highlight, stateCompare, rules, setSate, getState, syntax.
+
+More information about those methods is available in the documentation of 
+Tk::TextHighlight::None and Tk::TextHighlight::Template.
 
 B<Inheriting Tk::TextHighlight::Template>
 
-For many highlighting problems Tk::TextHighlight::Template
-provides a nice basis to start from. Your code
-could look like this:
+For many highlighting problems Tk::TextHighlight::Template 
+provides a nice basis to start from. Your code could look like this:
 
  package Tk::TextHighlight::MySyntax;
  
@@ -482,12 +489,11 @@ Next, specify the set of hardcoded rules.
        ];
     };
 
-Call the constructor of Tk::TextHighlight::Template and bless your
-object.
+Call the constructor of Tk::TextHighlight::Template and bless your object.
 
     my $self = $class->SUPER::new($rules);
 
-So now we have the SUPER class avalable and we can start defining
+So now we have the SUPER class avalable and we can start defining 
 a couple of things.
 
 You could add a couple of lists, usefull for keywords etc.
@@ -515,8 +521,8 @@ Perhaps do a couple of other things but in the end, wrap up the new method.
     return $self;
  }
 
-Then you need define the callbacks that are mentioned in the B<callbacks>
-hash. When you just start writing your plugin i suggest you make them look
+Then you need define the callbacks that are mentioned in the B<callbacks> 
+hash. When you just start writing your plugin i suggest you make them look 
 like this:
 
  sub callback1 {
@@ -524,7 +530,7 @@ like this:
     return $self->parserError($txt); #for debugging your later additions
  }
 
-Later you add matching statements inside these callback methods. For instance,
+Later you add matching statements inside these callback methods. For instance, 
 if you want I<callback1> to parse spaces it is going to look like this:
 
 
@@ -537,7 +543,7 @@ if you want I<callback1> to parse spaces it is going to look like this:
     return $self->parserError($txt); #for debugging your later additions
  }
 
-If I<callback1> is the callback that is called by default, you have to add
+If I<callback1> is the callback that is called by default, you have to add 
 the mechanism for checking lists to it. Hnce, the code will look like this:
 
  sub callback1 {
@@ -559,65 +565,102 @@ the mechanism for checking lists to it. Hnce, the code will look like this:
     return $self->parserError($txt); #for debugging your later additions
  }
 
-Have a look at the code of Tk::TextHighlight::Bash. Things should clear up.
-And then, last but not least, you need a B<syntax> method.
+Have a look at the code of Tk::TextHighlight::Bash. Things should clear up.  
+Then, last but not least, you need a B<syntax> method.
 
 B<Using another module as basis>
 
 An example of this approach is the Perl syntax module.
 
-Also with this approach you will have to meet the minimum criteria
+Also with this approach you will have to meet the minimum criteria 
 as set out in the B<From scratch> section.
-
-=cut
 
 =head1 CONTRIBUTIONS
 
-If you have written a plugin, i will be happy to include it in the next release
+If you have written a plugin, i will be happy to include it in the next release 
 of Tk::TextHighlight. If you send it to me, please have it accompanied with the 
 sample of code that you used for testing.
 
 =head1 AUTHOR
 
-=over 4
+This module is Copyright (C) 2007-2024 by
 
-=item Jim Turner (turnerjw784 - att.symbol.thingy - yahoo.com).  
+Jim Turner, C<< <turnerjw784 at yahoo.com> >>
+		
+All rights reserved.
 
-This is a derived work from Tk::CodeText, by Hans Jeuken (haje - att.symbol.thingy - toneel.demon.nl)
+You may distribute this module under the terms of either the GNU General 
+Public License or the Artistic License, as specified in the Perl README file.
+
+This is a derived work from Tk::CodeText, by Hans Jeuken 
+(haje at toneel.demon.nl)
 
 Thanks go to Mr. Hans Jeuken for his great work in making this and the Kate 
 modules possible.  He did the hard work!
 
-=back
+=head1 LICENSE AND COPYRIGHT
 
-=cut
+Copyright 2007-2024 Jim Turner.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =head1 BUGS
 
 Unknown. If you find any, please contact the author.
 
-=cut
-
 =head1 TODO
 
 =over 4
 
-=item Add additional language modules. I am going to need help on this one.  We currently 
-support all the original B<Tk::CodeText> languages (included) plus all those supported by 
-B<Syntax::Highlight::Engine::Kate>, if it's installed.
+=item Add additional language modules. I am going to need help on this one.  
+We currently support all the original B<Tk::CodeText> languages (included) plus 
+all those supported by B<Syntax::Highlight::Engine::Kate>, if it's installed.
 
-=item The sample files in the test suite should be set up so that conformity
+=item The sample files in the test suite should be set up so that conformity 
 with the language specification can actually be verified.
 
 =back
-
-=cut
 
 =head1 SEE ALSO
 
 =over 4
 
-=item L<Tk::Text>, L<Tk::TextUndo>, L<Tk::Text::SuperText>, L<Tk::TextHighlight::Bash>, L<Tk::CodeText>, 
+=item L<Tk::Text>, L<Tk::TextUndo>, L<Tk::Text::SuperText>, 
+L<Tk::TextHighlight::Bash>, L<Tk::CodeText>, 
 L<Syntax::Highlight::Perl::Improved>, L<Syntax::Highlight::Engine::Kate>
 
 =back
@@ -627,8 +670,9 @@ L<Syntax::Highlight::Perl::Improved>, L<Syntax::Highlight::Engine::Kate>
 package Tk::TextHighlight;
 
 use vars qw($VERSION);
-$VERSION = '1.1.1';
+$VERSION = '1.2';
 use base qw(Tk::Derived Tk::TextUndo);
+use Tk qw(Ev);
 use strict;
 use Storable;
 use File::Basename;
@@ -841,6 +885,7 @@ sub EditMenuItems {
 	my $cw = shift;
 	return [
 		@{$cw->SUPER::EditMenuItems},
+		["command"=>'Select', -command => [$cw => 'adjustSelect']],
 		"-",
 		["command"=>'Comment', -command => [$cw => 'selectionComment']],
 		["command"=>'Uncomment', -command => [$cw => 'selectionUnComment']],
@@ -1353,6 +1398,64 @@ sub selectionModify {
 		}
 		$cw->tagAdd('sel', @ranges);
 	}
+}
+
+# SelectTo --
+# This procedure is invoked to extend the selection, typically when
+# dragging it with the mouse. Depending on the selection mode (character,
+# word, line) it selects in different-sized units. This procedure
+# ignores mouse motions initially until the mouse has moved from
+# one character to another or until there have been multiple clicks.
+#
+# Arguments:
+# w - The text window in which the button was pressed.
+# index - Index of character at which the mouse button was pressed.
+sub SelectTo
+{
+	my ($w, $index, $mode)= @_;
+	$Tk::selectMode = $mode if defined ($mode);
+	my $cur = $w->index($index);
+	my $anchor = $w->index('insert');
+	$Tk::mouseMoved = ($w->compare($cur,'!=',$anchor)) ? 1 : 0;
+	$Tk::selectMode = 'char' unless (defined $Tk::selectMode);
+	$mode = $Tk::selectMode;
+	my ($first,$last);
+	if ($mode eq 'char') {
+		if ($w->compare($cur,'<','anchor')) {
+			$first = $cur;
+			$last = 'anchor';
+		} else {
+			$first = 'anchor';
+			$last = $cur
+		}
+	} elsif ($mode eq 'word') {
+		if ($w->compare($cur,'<','anchor')) {
+			$first = $w->index("$cur wordstart");
+			$last = $w->index('anchor - 1c wordend')
+		} else {
+			$first = $w->index('anchor wordstart');
+			$last = $w->index("$cur wordend")
+		}
+	} elsif ($mode eq 'line') {		if ($w->compare($cur,'<','anchor')) {
+			$first = $w->index("$cur linestart");
+			$last = $w->index('anchor - 1c lineend + 1c')
+		} else {
+			$first = $w->index('anchor linestart');
+			$last = $w->index("$cur lineend + 1c")
+		}
+	}
+	if ($Tk::mouseMoved || $Tk::selectMode ne 'char') {
+		$w->tagRemove('sel','1.0',$first);
+		$w->tagAdd('sel',$first,$last);
+		$w->tagRemove('sel',$last,'end');
+		$w->idletasks;
+	}
+}
+
+sub adjustSelect {
+	my ($w) = @_;
+	my $Ev = $w->XEvent;
+	$w->SelectTo($Ev->xy,'char');
 }
 
 sub selectionComment {

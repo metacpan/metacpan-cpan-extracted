@@ -1,5 +1,9 @@
 Revision history for Perl extension Crypt::OpenSSL::Random.
 
+0.17  2024-06-13 rurban
+        - fix older aix with missing -lz dependencies (timlegge PR #16)
+        - minor ci fixes
+
 0.16  2024-04-13 rurban
         - add github actions, travis and appveyor.
         - Many patches by Takumi Akiyama.

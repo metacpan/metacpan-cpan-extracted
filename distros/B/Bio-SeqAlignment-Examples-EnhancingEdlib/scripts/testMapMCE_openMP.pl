@@ -24,9 +24,8 @@ use OpenMP::Environment;
 use Time::HiRes qw(time);
 
 ###############################################################################
-
-
 my $openmp_env = OpenMP::Environment->new;
+$openmp_env->omp_num_threads(1); ## at least one thread for systems w/o OMP env
 ###############################################################################
 my $cwd         = getcwd;
 my $db_location = File::Spec->catfile( $cwd, 'db' );

@@ -13,6 +13,10 @@ if ($args =~ /LIBDIR[ =](\S+)/) {
 }
 my $libs = "-lssl -lcrypto";
 
+if ( $Config{osname} eq 'aix' ) {
+  $libs = $libs . ' -lz';
+}
+
 WriteMakefile(
   'NAME'	    => 'Crypt::OpenSSL::Random',
   'VERSION_FROM'    => 'Random.pm',

@@ -27,10 +27,10 @@ no_index:
 provides:
   Mojolicious::Plugin::ORM::DBIx:
     file: lib/Mojolicious/Plugin/ORM/DBIx.pm
-    version: '0.01'
+    version: '0.02'
   Mojolicious::Plugin::ORM::DBIx::Command::schema_load:
     file: lib/Mojolicious/Plugin/ORM/DBIx/Command/schema_load.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   DBIx::Class: '0.082843'
   DBIx::Class::Schema::Loader: '0.07052'
@@ -41,7 +41,7 @@ requires:
 resources:
   bugtracker: https://github.com/tyrrminal/mojolicious-plugin-orm-dbix/issues
   repository: https://github.com/tyrrminal/mojolicious-plugin-orm-dbix.git
-version: '0.01'
+version: '0.02'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: MIT

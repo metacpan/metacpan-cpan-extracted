@@ -4,8 +4,12 @@ use warnings;
 use English qw(-no_match_vars);
 use Error::Pure::Utils qw(clean);
 use Random::Day;
-use Test::More 'tests' => 4;
+use Test::More 'tests' => 6;
 use Test::NoWarnings;
+
+# Test.
+my $obj = Random::Day->new;
+isa_ok($obj, 'Random::Day');
 
 # Test.
 eval {
@@ -25,5 +29,21 @@ is($EVAL_ERROR, "Unknown parameter 'something'.\n",
 clean();
 
 # Test.
-my $obj = Random::Day->new;
-isa_ok($obj, 'Random::Day');
+eval {
+	Random::Day->new(
+		'dt_from' => 'bad',
+	);
+};
+is($EVAL_ERROR, "Parameter 'dt_from' must be a 'DateTime' object.\n",
+	"Parameter 'dt_from' must be a 'DateTime' object (bad).");
+clean();
+
+# Test.
+eval {
+	Random::Day->new(
+		'dt_to' => 'bad',
+	);
+};
+is($EVAL_ERROR, "Parameter 'dt_to' must be a 'DateTime' object.\n",
+	"Parameter 'dt_to' must be a 'DateTime' object (bad).");
+clean();

@@ -11,6 +11,7 @@ do { my $x = {
                                         'Alien::Build' => '2.70',
                                         'Alien::Build::MM' => '0.32',
                                         'Alien::Build::Plugin::Build::CMake' => '0.99',
+                                        'Alien::Build::Plugin::Download::GitHub' => '0',
                                         'Alien::Meson' => '0',
                                         'Carp' => '0',
                                         'ExtUtils::MakeMaker' => '6.52',

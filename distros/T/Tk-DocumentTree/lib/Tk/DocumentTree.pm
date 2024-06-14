@@ -8,7 +8,7 @@ Tk::DocumentTree - ITree based document list
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -388,7 +388,7 @@ sub entrySaved {
 	my $sep = $self->cget('-separator');
 	$entry =~ s/^$sep// unless $Config{osname} eq 'MSWin32';
 	$entry = $self->StripPath($entry);
-	$self->entryconfigure($entry, -image => $self->GetFileIcon);
+	$self->entryconfigure($entry, -image => $self->GetFileIcon($entry));
 }
 
 =item B<entrySelect>I<($filename)>

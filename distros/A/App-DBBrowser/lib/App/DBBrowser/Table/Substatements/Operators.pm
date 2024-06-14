@@ -33,8 +33,11 @@ sub add_operator_and_value {
     if ( $sf->{i}{driver} eq 'SQLite' ) {
         @operators = grep { ! /^(?:ANY|ALL)\z/ } @operators;
     }
-    elsif ( $sf->{i}{driver} =~ /(?:Firebird|Informix)\z/ ) {
-        @operators = uniq map { s/(?<=REGEXP)_i\z//; $_ } @operators;
+    elsif ( $sf->{i}{driver} eq 'Firebird' ) {
+        @operators = uniq map { s/REGEXP(?:_i)?\z/SIMILAR TO/; $_ } @operators;
+    }
+    elsif ( $sf->{i}{driver} eq 'Informix' ) {
+        @operators = uniq map { s/REGEXP(?:_i)?\z/MATCHES/; $_ } @operators;
     }
     elsif ( $sf->{i}{driver} eq 'ODBC' ) {
         @operators = grep { ! /REGEXP/ } @operators;
@@ -62,10 +65,10 @@ sub add_operator_and_value {
         }
         $operator =~ s/^\s+|\s+\z//g;
         $ax->print_sql_info( $ax->get_sql_info( $sql ) );
-        if ( $operator =~ /REGEXP(_i)?\z/ ) {
-            my $do_not_match_regexp = $operator =~ /^NOT/ ? 1 : 0;
+        if ( $operator =~ /(?:REGEXP(?:_i)?|SIMILAR\sTO)\z/ ) {
+            my $not_match = $operator =~ /^NOT/ ? 1 : 0;
             my $case_sensitive = $operator =~ /REGEXP_i\z/ ? 0 : 1;
-            my $regex_op = $sf->_regexp( $qt_col, $do_not_match_regexp, $case_sensitive );
+            my $regex_op = $sf->pattern_match( $qt_col, $not_match, $case_sensitive );
             if ( ! $regex_op ) {
                 next OPERATOR if @operators > 1;
                 return;
@@ -170,24 +173,31 @@ sub read_and_add_value {
         $sql->{$stmt} .= ' ' . $value_2;
         return 1;
     }
-    elsif ( $operator =~ /REGEXP(_i)?\z/ ) {
+    elsif ( $operator =~ /(?:REGEXP(?:_i)?|SIMILAR\sTO|MATCHES|LIKE)\z/ ) {
         # Readline
         my $value = $ext->value( $sql, $clause, {}, $operator, { is_numeric => 0 } );
         if ( ! defined $value ) {
             return;
         }
-        $value = '^$' if ! length $value;
-        if ( $sf->{i}{driver} eq 'SQLite' ) {
-            $sql->{$stmt} =~ s/ (?<=\sREGEXP\() \? (?=,\Q$qt_col\E,[01]\)\z) /$value/x;
+        #if ( ! length $value ) {
+        #    $value = "''";
+        #}
+        if ( $operator =~ /SIMILAR\sTO\z/ ) {
+            $sql->{$stmt} =~ s/ \? (?=\sESCAPE\s'\\'\z) /$value/x;
         }
-        elsif ( $sf->{i}{driver} eq 'Firebird' ) {
-            $sql->{$stmt} =~ s/ \? (?=\sESCAPE\s'\#'\z) /$value/x;
-        }
-        elsif ( $sf->{i}{driver} =~ /^(?:DB2|Oracle)\z/ ) {
-            $sql->{$stmt} =~ s/ \?  (?=,'[ci]'\)\z) /$value/x;
+        elsif ( $operator =~ /REGEXP(?:_i)?\z/ ) {
+            if ( $sf->{i}{driver} eq 'SQLite' ) {
+                $sql->{$stmt} =~ s/ (?<=\sREGEXP\() \? (?=,\Q$qt_col\E,[01]\)\z) /$value/x;
+            }
+            elsif ( $sf->{i}{driver} =~ /^(?:DB2|Oracle)\z/ ) {
+                $sql->{$stmt} =~ s/ \?  (?=,'[ci]'\)\z) /$value/x;
+            }
+            else {
+                $sql->{$stmt} .= ' ' . $value;
+            }
         }
         else {
-            $sql->{$stmt} =~ s/\?\z/$value/;
+            $sql->{$stmt} .= ' ' . $value;
         }
         return 1;
     }
@@ -203,11 +213,11 @@ sub read_and_add_value {
 }
 
 
-sub _regexp {
-    my ( $sf, $col, $do_not_match, $case_sensitive ) = @_;
+sub pattern_match {
+    my ( $sf, $col, $not_match, $case_sensitive ) = @_;
     my $driver = $sf->{i}{driver};
     if ( $driver eq 'SQLite' ) {
-        if ( $do_not_match ) {
+        if ( $not_match ) {
             return sprintf " NOT REGEXP(?,%s,%d)", $col, $case_sensitive;
         }
         else {
@@ -215,39 +225,35 @@ sub _regexp {
         }
     }
     elsif ( $driver =~ /^(?:mysql|MariaDB)\z/ ) {
-        if ( $do_not_match ) {
-            return " $col NOT REGEXP ?"        if ! $case_sensitive;
-            return " $col NOT REGEXP BINARY ?" if   $case_sensitive;
+        if ( $not_match ) {
+            return " $col NOT REGEXP"        if ! $case_sensitive;
+            return " $col NOT REGEXP BINARY" if   $case_sensitive;
         }
         else {
-            return " $col REGEXP ?"        if ! $case_sensitive;
-            return " $col REGEXP BINARY ?" if   $case_sensitive;
+            return " $col REGEXP"        if ! $case_sensitive;
+            return " $col REGEXP BINARY" if   $case_sensitive;
         }
     }
     elsif ( $driver eq 'Pg' ) {
-        if ( $do_not_match ) {
-            return " ${col}::text !~* ?" if ! $case_sensitive;
-            return " ${col}::text !~ ?"  if   $case_sensitive;
+        if ( $not_match ) {
+            return " ${col}::text !~*" if ! $case_sensitive;
+            return " ${col}::text !~"  if   $case_sensitive;
         }
         else {
-            return " ${col}::text ~* ?" if ! $case_sensitive;
-            return " ${col}::text ~ ?"  if   $case_sensitive;
+            return " ${col}::text ~*" if ! $case_sensitive;
+            return " ${col}::text ~"  if   $case_sensitive;
         }
     }
     elsif ( $driver eq 'Firebird' ) {
-        # SIMILAR TO
-        # Unlike in some other languages, the pattern must match the entire
-        # string in order to succeed — matching a substring is not enough.
-        # wildcards: % and _
-        if ( $do_not_match ) {
-            return " $col NOT SIMILAR TO ? ESCAPE '#'";
+        if ( $not_match ) {
+            return " $col NOT SIMILAR TO ? ESCAPE '\\'";
         }
         else {
-            return " $col SIMILAR TO ? ESCAPE '#'";
+            return " $col SIMILAR TO ? ESCAPE '\\'";
         }
     }
     elsif ( $driver =~ /^(?:DB2|Oracle)\z/ ) {
-        if ( $do_not_match ) {
+        if ( $not_match ) {
             return " NOT REGEXP_LIKE($col,?,'i')" if ! $case_sensitive;
             return " NOT REGEXP_LIKE($col,?,'c')" if   $case_sensitive;
         }
@@ -256,17 +262,14 @@ sub _regexp {
             return " REGEXP_LIKE($col,?,'c')" if   $case_sensitive;
         }
     }
-    elsif ( $driver eq 'Informix' ) {
-        # Wildcard characters: *, ?, [...], [^...]
-        # \ removes the special significance of the next character
-        if ( $do_not_match ) {
-            return " $col NOT MATCHES ? ";
-        }
-        else {
-            return " $col MATCHES ?";
-        }
-    }
 }
+
+
+# The pattern must match the entire string:
+#
+# SIMILAR TO:   %   _       no default Escape
+# MATCHES:      *   ?       \
+# LIKE:         %   _       \    SQLite, Firebird, DB2 and Oracle no default Escape
 
 
 

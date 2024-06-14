@@ -10,6 +10,7 @@ use YAML;
 use Data::Dumper;
 use Scalar::Util qw(reftype);
 
+$YAML::LoadBlessed = 1;
 use RDF::Query;
 use_ok( 'RDF::Query::Parser::SPARQL' );
 my $parser	= new RDF::Query::Parser::SPARQL ();
@@ -23,16 +24,21 @@ foreach (@data) {
 	my $parsed	= $parser->parse( $sparql );
 	my $r	= is_deeply( $parsed, $correct, $name );
 	unless ($r) {
-		warn 'PARSE ERROR: ' . $parser->error;
+		warn "${name}: PARSE ERROR: " . $parser->error;
 # 		my $triples	= $parsed->{triples} || [];
 # 		foreach my $t (@$triples) {
 # 			warn $t->as_sparql . "\n";
 # 		}
 		
 #		warn Dumper($parsed);
-		my $dump	= YAML::Dump($parsed);
-		$dump		=~ s/\n/\n  /g;
-		warn $dump;
+		warn "Query:\n======\n$sparql\n========\n";
+		foreach my $d ([parsed => $parsed], [expected => $correct]) {
+			my ($name, $parsed) = @$d;
+			my $dump	= YAML::Dump($d);
+			$dump		=~ s/\n/\n  /g;
+			warn "${name}: " . $dump;
+# 			warn Dumper($parsed);
+		}
 		exit;
 	}
 }
@@ -772,16 +778,16 @@ __END__
 ---
 - filter with variable/function-call equality
 - |
-  		PREFIX	rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-  		PREFIX	foaf: <http://xmlns.com/foaf/0.1/>
-  		PREFIX	dcterms: <http://purl.org/dc/terms/>
-  		PREFIX	geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
-  		SELECT	?person ?homepage
-  		WHERE	{
-  					?person foaf:name "Gregory Todd Williams" .
-  					?person ?pred ?homepage .
-  					FILTER( ?pred = <func:homepagepred>() ) .
-  				}
+  PREFIX	rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+  PREFIX	foaf: <http://xmlns.com/foaf/0.1/>
+  PREFIX	dcterms: <http://purl.org/dc/terms/>
+  PREFIX	geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+  SELECT	?person ?homepage
+  WHERE	{
+  			?person foaf:name "Gregory Todd Williams" .
+  			?person ?pred ?homepage .
+  			FILTER( ?pred = <func:homepagepred>() ) .
+  		}
 - method: SELECT
   namespaces:
     dcterms: http://purl.org/dc/terms/

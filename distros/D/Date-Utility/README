@@ -356,15 +356,13 @@ STATIC METHODS
 
 DEPENDENCIES
 
-    Moose
+    Moo
 
     DateTime
 
     POSIX
 
     Scalar::Util
-
-    Tie::Hash::LRU
 
     Time::Local
 

@@ -1,5 +1,5 @@
 ---
-abstract: Nutrients
+abstract: "BPOM's nutrition label reference (ALG, acuan label gizi)"
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -19,10 +19,10 @@ name: TableData-Business-ID-BPOM-NutritionLabelRef
 provides:
   TableData::Business::ID::BPOM::ALG:
     file: lib/TableData/Business/ID/BPOM/ALG.pm
-    version: '0.004'
+    version: '0.005'
   TableData::Business::ID::BPOM::NutritionLabelRef:
     file: lib/TableData/Business/ID/BPOM/NutritionLabelRef.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Role::Tiny: '0'
   Role::Tiny::With: '0'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TableData-Business-ID-BPOM-NutritionLabelRef
   homepage: https://metacpan.org/release/TableData-Business-ID-BPOM-NutritionLabelRef
   repository: git://github.com/perlancar/perl-TableData-Business-ID-BPOM-NutritionLabelRef.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

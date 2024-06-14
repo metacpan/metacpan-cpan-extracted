@@ -12,9 +12,10 @@ lib/Tk/TextHighlight/Kate.pm
 lib/Tk/TextHighlight/None.pm
 lib/Tk/TextHighlight/Perl.pm
 lib/Tk/TextHighlight/PerlCool.pm
+lib/Tk/TextHighlight/Pod.pm
+lib/Tk/TextHighlight/RulesEditor.pm
 lib/Tk/TextHighlight/Template.pm
 lib/Tk/TextHighlight/Xresources.pm
-lib/Tk/TextHighlight/RulesEditor.pm
 samples/Bash.test
 samples/HTML.test
 samples/Kate.test
