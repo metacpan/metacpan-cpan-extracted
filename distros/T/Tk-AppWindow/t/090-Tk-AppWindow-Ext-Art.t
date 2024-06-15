@@ -7,7 +7,6 @@ $mwclass = 'Tk::AppWindow';
 my @iconpath = ('t/Themes');
 require Tk::NoteBook;
 require Tk::LabFrame;
-use Module::Load::Conditional('check_install', 'can_load');
 
 use Config;
 my $osname = $Config{'osname'};
@@ -23,6 +22,7 @@ createapp(
 my $art;
 my $notebook;
 my %pages = ();
+my $mimepage;
 my %testicons = (
 	png_1 => [ 'accessories-text-editor', 'document-new', 'document-save', 'edit-cut', 'edit-find',
 			'help-browser', 'multimedia-volume-control', 'system-file-manager'],
@@ -38,6 +38,7 @@ if (defined $app) {
 	$notebook = $app->NoteBook->pack(-fill => 'both');
 	$pages{22} = $notebook->add(22, -label => 22);
 	$pages{32} = $notebook->add(32, -label => 32);
+	$mimepage = $notebook->add('mime', -label => 'Mime');
 }
 
 push @tests, [sub { return $art->Name }, 'Art', 'extension Art loaded'];
@@ -134,13 +135,37 @@ for (sort keys %pages) {
 		&CreateImgTests($_, $size);
 	}
 	my $modname = 'Image::LibRSVG';
-	my $inst = check_install(module => $modname);
-	if (defined $inst) {
-		if (can_load(modules => {$modname => $inst->{'version'}})){
-			&CreateImgTests('svg_1', $size);
-		}
+	eval 'use Image::LibRSVG';
+	unless ($@) {
+		&CreateImgTests('svg_1', $size);
 	}
 }
+
+my @files = (
+	'Makefile.PL',
+	'Changes',
+	'lib/Tk/AppWindow.pm',
+	'bin/mdi_editor',
+	't/Themes/PNG1/actions/22/document-new.png',
+);
+
+#my $mrow = 0;
+#for (@files) {
+#	my $file = $_;
+#	push @tests, [sub {
+#		my $icon =$art->getFileIcon($file);
+#		if (defined $icon) {
+#			$mimepage->Label(
+#				-text => $file,
+#			)->grid(-row => $mrow, -column => 0);
+#			$mimepage->Label(
+#				-image => $icon,
+#			)->grid(-row => $mrow, -column => 1);
+#			$mrow ++
+#		}
+#		return defined $icon;
+#	}, 1, 'Mime type test'];
+#}
 
 starttesting;
 my $num_of_tests = @tests + 3;

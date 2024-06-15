@@ -10,14 +10,12 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.03";
+$VERSION="0.08";
 use Tk;
 use Pod::Usage;
 use File::Basename;
 require Tk::YADialog;
 require Tk::AppWindow::PluginsForm;
-use Module::Load::Conditional('check_install', 'can_load');
-$Module::Load::Conditional::VERBOSE = 1;
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -150,16 +148,10 @@ sub DoPostConfig {
 			$self->plugLoad($_);
 		}
 	} else {
-		my $file = $self->configGet('-configfolder') . '/plugins';
-		if (-e $file) {
-			if (open OFILE, "<", $file) {
-				while (<OFILE>) {
-					my $plug = $_;
-					chomp($plug);
-					$self->plugLoad($plug);
-				}
-				close OFILE;
-			}
+		my $cnf = $self->extGet('ConfigFolder');
+		my @list = $cnf->loadList('plugins', 'aw_pluglist');
+		for (@list) {
+			$self->plugLoad($_);
 		}
 	}
 }
@@ -252,24 +244,13 @@ Loads the plugin; returns 1 if succesfull;
 sub plugLoad {
 	my ($self, $plug) = @_;
 	return if $self->plugExists($plug);
-	my @paths = ('Tk::AppWindow::Plugins');
 	my $namespace = $self->NameSpace;
 	if (defined $namespace) {
 		$namespace = $namespace . '::Plugins';
-		push @paths, $namespace;
-	}
-	for (@paths) {
-		my $p = $_;
 		my $obj;
-		
-		my $modname = $p . "::$plug";
+		my $modname = $namespace . "::$plug";
 		my $app = $self->GetAppWindow;
-		my $inst = check_install(module => $modname);
-		if (defined $inst) {
-			if (can_load(modules => {$modname => $inst->{'version'}})){
-				$obj = $modname->new($app);
-			}
-		}
+		eval "use $modname;	\$obj = new $modname(\$app);";
 		if (defined($obj)) {
 			$self->{PLUGINS}->{$plug} = $obj;
 			$self->ConfigureBars($obj);
@@ -296,12 +277,6 @@ sub plugUnload {
 		return 1
 	}
 	return 0;
-}
-
-sub plugUse {
-	my ($self, $plug) = @_;
-	my $modname = "Tk::AppWindow::Plugins::$plug";
-	eval "use $modname;";
 }
 
 sub PopPlugsDialog {
@@ -333,6 +308,13 @@ sub Reconfigure {
 	return $succes
 }
 
+sub SavePlugList {
+	my $self = shift;
+	my $id = 'aw_pluglist';
+	my $cnf = $self->extGet('ConfigFolder');
+	$cnf->saveList('plugins', $id, @_);
+}
+
 sub SettingsPage {
 	my $self = shift;
 	my @pages = ('Plugins' => ['PluginsForm', -pluginsext => $self ]);
@@ -356,13 +338,7 @@ sub ToolItems {
 sub Quit {
 	my $self = shift;
 	my @plugs = $self->plugList;
-	unless ($self->configGet('-noplugins') or (defined $self->configGet('-plugins'))) {
-		my $file = $self->configGet('-configfolder') . '/plugins';
-		if (open OFILE, ">", $file) {
-			for (@plugs) { print OFILE "$_\n" }
-			close OFILE;
-		}
-	}
+	$self->SavePlugList(@plugs);
 	for (@plugs) {
 		$self->plugGet($_)->Quit
 	}

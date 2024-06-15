@@ -7,7 +7,7 @@ use sigtrap qw(die normal-signals error-signals);
 use Fcntl qw(:DEFAULT :mode);
 use File::Path 'rmtree';
 use File::Temp 'mktemp';
-use Test::More tests => 35;
+use Test::More tests => 41;
 
 use POSIX::2008;
 
@@ -56,8 +56,12 @@ SKIP: {
     cmp_ok(syswrite($fh, '333444'), '==', 6, '... syswrite(fh) bytes written (fallback)');
     skip 'pwrite() UNAVAILABLE', 2;
   }
-  my $rv = eval { POSIX::2008::pwrite($fh, '', -3, 0) };
+  my $rv = eval { POSIX::2008::pwrite($fh, 'foo', -3, 0) };
   ok(!$rv && $@ =~ /negative/, 'pwrite fails due to negative size');
+  foreach my $buf_offset (-1290880921, -4, 4, ~0) {
+    my $rv = eval { POSIX::2008::pwrite($fh, 'foo', undef, 0, $buf_offset) };
+    ok(!$rv && $@ =~ /outside/, 'pwrite fails due to invalid buf_offset');
+  }
   cmp_ok(POSIX::2008::pwrite($fh, '444', undef, 3), '==', 3, 'pwrite(fh) bytes written');
   cmp_ok(POSIX::2008::pwrite($fd, '333', undef, 0), '==', 3, 'pwrite(fd) bytes written');
 }
@@ -71,6 +75,11 @@ SKIP: {
   }
   my $rv = eval { POSIX::2008::pread($fh, my $buf, -3, 0) };
   ok(!$rv && $@ =~ /negative/, 'pread fails due to negative size');
+  foreach my $buf_offset (-1290880921, -4) {
+    my $buf = 'foo';
+    my $rv = eval { POSIX::2008::pread($fh, $buf, 0, 0, $buf_offset) };
+    ok(!$rv && $@ =~ /outside/, 'pwrite fails due to invalid buf_offset');
+  }
   cmp_ok(POSIX::2008::pread($fh, $buf, 3, 3), '==', 3, 'pread(fh) bytes read');
   cmp_ok($buf, 'eq', '444', 'pread(fh) string read');
   cmp_ok(POSIX::2008::pread($fd, $buf, 3, 0), '==', 3, 'pread(fd) bytes read');
@@ -89,6 +98,7 @@ SKIP: {
   my $rv = eval { POSIX::2008::writev($fh, "foobar") };
   # Note: The /i is needed because some Perls say "ARRAY", others say "array".
   ok(!$rv && $@ =~ /not an ARRAY/i);
+  no warnings 'uninitialized';
   cmp_ok(POSIX::2008::writev($fh, ['55', '', undef, '5']), '==', 3, 'writev(fh) bytes written');
   cmp_ok(POSIX::2008::writev($fd, ['6', undef, '', '66']), '==', 3, 'writev(fd) bytes written');
 }
@@ -124,6 +134,7 @@ SKIP: {
     cmp_ok(syswrite($fh, '777888'), '==', 6, '... syswrite(fh) bytes written (fallback)');
     skip 'pwritev() UNAVAILABLE', 1;
   }
+  no warnings 'uninitialized';
   cmp_ok(POSIX::2008::pwritev($fh, ['88', '', undef, '8'], 3), '==', 3, 'pwritev(fh) bytes written');
   cmp_ok(POSIX::2008::pwritev($fd, ['7', undef, '', '77'], 0), '==', 3, 'pwritev(fd) bytes written');
 }

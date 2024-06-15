@@ -41,20 +41,22 @@ Specify the structure of your layout.
 The keys used below are all home to the pack geometry manager. Plus a
 few more. These are:
 
-over 4
+=over 4
 
-B<-canhide>
+=item B<-canhide>
 
 Specify if a panel is capable of hiding and showing. By default 0.
 
-B<-adjuster>
+=item B<-adjuster>
 
 If specified the panel is adjustable. The value is transferred to the
 B<-side> option of the adjuster.
 
+=back
+
 Default value:
 
-[
+ [
     CENTER => {
        -in => 'MAIN',
        -side => 'top',

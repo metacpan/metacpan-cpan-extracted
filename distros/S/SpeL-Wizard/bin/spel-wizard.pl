@@ -97,10 +97,7 @@ eval {
 ########################
 # generate closing line
 ######################
-say STDERR
-  "Done.      " . pack( "A50", "" ) .
-  sprintf( "[%3d%%]", 100 )
-  if( $opt_verbose >= 1 );
+say STDERR "Done." if( $opt_verbose >= 1 );
 
 #########################################################
 
@@ -122,7 +119,7 @@ spel-wizard.pl - converts spelchunks to to plain text
 
 =head1 VERSION
 
-version 20240610
+version 20240614
 
 =head1 SYNOPSIS
 

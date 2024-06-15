@@ -5,7 +5,7 @@ use lib './t/lib';
 use Tk;
 
 use Test::Tk;
-use Test::More tests => 27;
+use Test::More tests => 26;
 $mwclass = 'Tk::AppWindow';
 
 BEGIN { use_ok('Tk::AppWindow') };
@@ -76,7 +76,7 @@ createapp(
 $app->geometry('640x400+100+100') if defined $app;
 
 #testing accessors
-testaccessors($app, qw/appName Verbose/);
+testaccessors($app, qw/appName/);
 
 push @tests, (
 	[sub { return $app->cmdExecute('test1') }, 'Caterpillar', 'anonymous command without parameter'],

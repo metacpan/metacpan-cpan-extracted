@@ -92536,3 +92536,14 @@ G/GE/GENE/Synth-Config-0.0062.tar.gz
 P/PE/PERLANCAR/TableData-Business-ID-BPOM-NutritionLabelRef-0.005.tar.gz
 H/HA/HANJE/Tk-DocumentTree-0.08.tar.gz
 T/TU/TURNERJW/Tk-TextHighlight-1.2.tar.gz
+Y/YO/YOSHIMASA/Aozora2Epub-0.01.tar.gz
+D/DA/DAVECROSS/App-Aphra-0.1.3.tar.gz
+B/BR/BRIANDFOY/Business-ISBN-Data-20240614.001.tar.gz
+B/BD/BDFOY/CPAN-Audit-20240615.001.tar.gz
+E/ET/ETHER/Dist-Zilla-Plugin-Git-2.050.tar.gz
+M/MB/MBALLARIN/Linux-Landlock-0.8.tar.gz
+C/CG/CGPAN/POSIX-2008-0.24.tar.gz
+P/PE/PERLANCAR/Sah-SchemaBundle-CPAN-0.016.tar.gz
+W/WD/WDAEMS/SpeL-Wizard-20240614.tar.gz
+M/MA/MAUKE/Sys-GetRandom-PP-0.01.tar.gz
+H/HA/HANJE/Tk-AppWindow-0.08.tar.gz

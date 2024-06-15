@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::Push;
 # ABSTRACT: Push current branch
 
-our $VERSION = '2.049';
+our $VERSION = '2.050';
 
 use Moose;
 use MooseX::Has::Sugar;
@@ -88,6 +88,9 @@ sub after_release {
     my $self = shift;
     my $git  = $self->git;
 
+    # requires git 2.4.1; see "git push --follow-tags"
+    $git->config('push.followTags', 'true');
+
     # push everything on remote branch
     for my $remote ( @{ $self->push_to } ) {
       $self->log("pushing to $remote");
@@ -102,8 +105,9 @@ sub after_release {
         }
         push @remote, $branch;
       }
+      # push.followTags is set, so this also pushes the release tag that was
+      # likely just created by [Git::Tag]
       $self->log_debug($_) for $git->push( @remote );
-      $self->log_debug($_) for $git->push( { tags=>1 },  $remote[0] );
     }
 }
 
@@ -122,7 +126,7 @@ Dist::Zilla::Plugin::Git::Push - Push current branch
 
 =head1 VERSION
 
-version 2.049
+version 2.050
 
 =head1 SYNOPSIS
 

@@ -40,6 +40,8 @@ our $elements = do {
       <objrule: SpeL::Object::ElementList = ElementList>
                 <[Element]>*
 
+      
+
       <objrule: SpeL::Object::Element = Element>
                 <!egroup> <!stray_etag>
                 ( <MATCH=VerbatimEnv> |
@@ -59,6 +61,7 @@ our $elements = do {
                   <eol> |
 		  \| <Docstrip=(?:[^|]+)> \| |
 		  <MATCH=TokenSequence> )
+	       
 
       <objrule: SpeL::Object::Element = BareElement>
                 <!egroup> <!stray_etag>
@@ -458,7 +461,7 @@ our $chunk = do {
       <objrule: SpeL::Object::Document = Document>
                 <ElementList>
 
-		<token: Endinput>       \\ endinput
+      <token: Endinput>       \\ endinput
   }xs
 };
 
@@ -487,6 +490,8 @@ sub parseDocumentString {
 
   # preprocess macros and environments that are in the list
   # say STDERR "Before cleansing:\n" . $document;
+  # Final prep to accomdate for docstrip '{Change History}'
+ 
   foreach my $arr (@$prepmacrolist) {
     # say STDERR "REGEXP = " . $regexp;
     if ( $arr->[1] eq 'keep' ) {
@@ -511,7 +516,7 @@ sub parseDocumentString {
   my $doc = SpeL::Object::Document->new();
   $doc->{ElementList} = SpeL::Object::ElementList->new();
   $doc->{ElementList}->{Element} = [];
-  
+
   my $result;
   if ( $result = ( $document . "\n\\endinput" ) =~ $SpeL::Parser::Chunk::chunk ) {
     if( exists $/{Document}->{ElementList}->{Element} ) {
@@ -552,7 +557,7 @@ sub parseDocument {
 
   # parse
   my $document = join( '', @{$self->{lines}} );
-  $document =~ s/^\{(.*)\}$//s;
+  $document =~ s/^\{(.*)\}$/$1/s; # solve docstrip's problem of {Change History}
   $self->{tree} = $self->parseDocumentString( $document, $filename, 1 );
 
   delete $self->{lines};
@@ -593,7 +598,7 @@ SpeL::Parser::Chunk - LaTeX file parser
 
 =head1 VERSION
 
-version 20240610
+version 20240614
 
 =head1 METHODS
 

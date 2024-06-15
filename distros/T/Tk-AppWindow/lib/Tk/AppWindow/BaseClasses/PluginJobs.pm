@@ -98,10 +98,10 @@ sub jobList {
 	my $self = shift;
 	my @l = $self->_daem->jobList;
 	my @o = ();
-	my $xt = $self->Name;
+	my $xt = quotemeta($self->Name);
 	for (@l) {
 		my $n = $_;
-		push @o, $n if $n =~ s/$xt!//
+		push @o, $n if $n =~ s/$xt$//
 	}
 	return @o;
 }

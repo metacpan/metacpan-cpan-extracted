@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::Help - about box and help facilities
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.04";
+$VERSION="0.08";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -19,6 +19,7 @@ require Tk::YADialog;
 require Tk::NoteBook;
 require Tk::ROText;
 require Tk::Pod::Text;
+
 
 =head1 SYNOPSIS
 
@@ -38,21 +39,56 @@ menu entries for them.
 
 =item Switch: B<-aboutinfo>
 
-Specify the link to a hash. Possible keys
+Specify the link to a hash. Possible keys:
 
- version
- license
- author
- http
- email
+=over 4
+
+=item B<author>
+
+Your name
+
+=item B<components>
+
+Specify a list of modules you want the version numbers displayed.
+Opens a new tab.
+
+=item B<email>
+
+Who to contact
+
+=item B<http>
+
+The website that supports this application
+
+=item B<license>
+
+Specify your license. By default it is set to I<Same as Perl>.
+Set it to I<undef> if you do not want it to show.
+
+=item B<licensefile>
+
+Specify a plain text file as your license file. It is displayed in a new
+tab with a L<Tk::ROText> widget.
+
+=item B<licenselink>
+
+Works only if the I<license> key is defined. Specify the weblink to your license. By default it 
+is set to L<https://dev.perl.org/licenses/>.
+Set it to I<undef> if you do not want it to show.
+
+=item B<version>
+
+Specify the version of your application. By default it is set to the
+version numer of the main window widget. Set it to undef if you do not
+want it to show.
+
+=back
 
 =item Switch: B<-helpfile>
 
-Point to your help file.
-
-=item Switch: B<-helptype>
-
-Can be B<pod>, B<html> or B<pdf>. Default value is B<pod>.
+Point to your help file. Can be a weblink.
+If it is a I<.pod> file it will launch a dialog box with
+a I<PodText> widget.
 
 =back
 
@@ -68,7 +104,7 @@ Pops the about box.
 
 =item B<help>
 
-Pops the help dialog or initiates the internet browser..
+Loads the helpfile in your system's default application or browser.
 
 =back
 
@@ -78,89 +114,142 @@ sub new {
 	my $class = shift;
 	my $self = $class->SUPER::new(@_);
 
+	$self->{ABOUTDEFAULTS} = {
+		version => $self->GetAppWindow->VERSION,
+		license => 'Same as Perl',
+		licenselink => 'https://dev.perl.org/licenses/',
+	};
 	$self->addPreConfig(
-		-aboutinfo => ['PASSIVE', undef, undef, {
-			version => $VERSION,
-			license => 'Same as Perl',
-			author => 'Some Dude',
-			http => 'www.nowhere.com',
-			email => 'nobody@nowhere.com',
-		}],
+		-aboutinfo => ['PASSIVE', undef, undef, {	}],
 		-helpfile => ['PASSIVE'],
 	);
 
 	$self->cmdConfig(
-		about => [\&CmdAbout, $self],
-		help => [\&CmdHelp, $self],
+		about => ['CmdAbout', $self],
+		help => ['CmdHelp', $self],
 	);
 	return $self;
 }
 
 =head1 METHODS
 
+=over 4
+
 =cut
 
 sub CmdAbout {
 	my $self = shift;
 	my $inf = $self->configGet('-aboutinfo');
-	my $w = $self->GetAppWindow;
-	my $db = $w->YADialog(
+	my $defaults = $self->{ABOUTDEFAULTS};
+	for (keys %$defaults) {
+		$inf->{$_} = $defaults->{$_} unless exists $inf->{$_}
+	}
+
+	my $db = $self->YADialog(
 		-buttons => ['Ok'],
 		-defaultbutton => 'Ok',
-		-title => 'About ' . $w->appName,
+		-title => 'About ' . $self->appName,
 	);
-	$db->configure(-command => sub { $db->destroy });
+
 	my @padding = (-padx => 2);
-	my $ap;
-	if (exists $inf->{licensefile}) {
-		my $nb = $db-NoteBook->pack(-expand => 1, -fill => 'both');
-		$ap = $nb->add('about', -label =>'About');
+	my $nb; #NoteBookWidget;
+	my $ap; #About frame widget
+	my $addnb = sub {
+		unless (defined $nb) {
+			$nb = $db->NoteBook->pack(-expand => 1, -fill => 'both') ;
+			$ap = $nb->add('about', -label =>'About');
+		}
+	};
+	my @col0 = ( -column => 0, -sticky => 'e', @padding);
+	my @col1 = ( -column => 1, -sticky => 'w', @padding);
+
+	if (my $file = $inf->{licensefile}) {
+		&$addnb;
 		my $lp = $nb->add('licence', -label => 'License');
-		my $t = $lp->Scrolled('ROText', -scrollbars => 'osoe')->pack(-expand =>1, -fill => 'both', @padding);
+		my $t = $lp->Scrolled('ROText', 
+			-width => 8, 
+			-height => 8, 
+			-scrollbars => 'osoe'
+		)->pack(-expand =>1, -fill => 'both', @padding);
+		if (open(my $fh, '<', $file)) {
+			while (my $line = <$fh>) {
+				$t->insert('end', $line)
+			}
+			close $fh
+		}
 	} else {
-		$ap = $db->Frame->pack(-expand => 1, -fill => 'both');;
+		$ap = $db->Frame->pack(-expand => 1, -fill => 'both') unless defined $ap;
 	}
+
+	if (exists $inf->{components}) {
+		&$addnb;
+		my $lp = $nb->add('components', -label => 'Components');
+		my $cf = $lp->Frame->pack(-fill => 'x', @padding);
+		my $components = $inf->{components};
+		my $row = 0;
+		for (@$components) {
+			my $module = $_;
+			my $version = $self->moduleVersion($module);
+			if (defined $version) {
+				$cf->Label(-text => "$module :")->grid(-row => $row, @col0);
+				$cf->Label(-text => $version)->grid(-row => $row, @col1);
+				$row++
+			}
+		}
+	} else {
+		$ap = $db->Frame->pack(-expand => 1, -fill => 'both') unless defined $ap;
+	}
+
 	my $lg = $self->configGet('-logo');
 	if (defined $lg) {
-		$ap->Label(-image => $w->Photo(-file => $lg))->pack;
+		$ap->Label(-image => $self->Photo(-file => $lg))->pack;
 	}
 	my $gf = $ap->Frame->pack(-expand => 1, -fill => 'both');
 	my $row = 0;
-	my @col0 = ( -column => 0, -sticky => 'e', @padding);
-	my @col1 = ( -column => 1, -sticky => 'w', @padding);
-	if (exists $inf->{version}) {
+	my $ver = $inf->{version};
+	if (defined $ver) {
 		$gf->Label(-text => 'Version:')->grid(-row => $row, @col0);
-		$gf->Label(-text => $inf->{version})->grid(-row => $row, @col1);
+		my $l = $gf->Label(-text => $ver)->grid(-row => $row, @col1);
 		$row ++;
 	}
-	if (exists $inf->{author}) {
+	my $aut = $inf->{author};
+	if (defined $aut) {
 		$gf->Label(-text => 'Author:')->grid(-row => $row, @col0);
-		$gf->Label(-text => $inf->{author})->grid(-row => $row, @col1);
+		$gf->Label(-text => $aut)->grid(-row => $row, @col1);
 		$row ++;
 	}
-	if (exists $inf->{email}) {
+	my $mail = $inf->{email};
+	if (defined $mail) {
 		$gf->Label(-text => 'E-mail:')->grid(-row => $row, @col0);
-		$gf->Label(-text => $inf->{email})->grid(-row => $row, @col1);
+		my $url = $gf->Label(
+			-text => $mail,
+		)->grid(-row => $row, @col1);
+		$self->ConnectURL($url, "mailto:$mail"); 
 		$row ++;
 	}
-	if (exists $inf->{http}) {
+	my $web = $inf->{http};
+	if (defined $web) {
 		$gf->Label(-text => 'Website:')->grid(-row => $row, @col0);
 		my $url = $gf->Label(
-			-text => $inf->{http},
-			-cursor => 'hand2',
+			-text => $web,
 		)->grid(-row => $row, @col1);
-		my $fg = $url->cget('-foreground');
-		$url->bind('<Enter>', sub { $url->configure(-foreground => 'blue') });
-		$url->bind('<Leave>', sub { $url->configure(-foreground => $fg) });
-		$url->bind('<Button-1>', sub { $self->openURL($url->cget('-text')) });
+		$self->ConnectURL($url, $web); 
 		$row ++;
 	}
-	if (exists $inf->{license}) {
-		$gf->Label(-text => 'License:')->grid(-row => $row, @col0);
-		$gf->Label(-text => $inf->{license})->grid(-row => $row, @col1);
+	my $lc = $inf->{license}; 
+	if (defined $lc) {
+		if (defined $lc) {
+			$gf->Label(-text => 'License:')->grid(-row => $row, @col0);
+			my $l = $gf->Label(-text => $lc)->grid(-row => $row, @col1);
+			my $lcu = $inf->{licenselink};
+			if (defined $lcu) {
+				$self->ConnectURL($l, $lcu) if defined $lcu;
+			}
+		}
 		$row ++;
 	}
-	$db->Show(-popover => $w);
+	$db->Show(-popover => $self->GetAppWindow);
+	$db->destroy;
 }
 
 sub CmdHelp {
@@ -168,29 +257,29 @@ sub CmdHelp {
 	my $file = $self->configGet('-helpfile');
 	if (defined $file) {
 		if ($file =~ /\.pod$/) { #is pod
-			my $w = $self->GetAppWindow;
-			my $db = $w->YADialog(
+			my $db = $self->YADialog(
 				-buttons => ['Close'],
 				-title => 'Help',
 			);
-			$db->configure(-command => sub { $db->destroy });
 			my $pod = $db->PodText( 
 				-file => $file,
 				-scrollbars => 'oe',
 			)->pack(-expand => 1, -fill => 'both');
-			$db->Show(-popover => $w);
+			$db->Show(-popover => $self->GetAppWindow);
+			$db->destroy;
 		} else {
 			$self->openURL($file);
 		}
 	}
 }
 
-=item B<MenuItems>
-
-Returns the about and help menu items for the main menu.
-Called by the b<MenuBar> extension.
-
-=cut
+sub ConnectURL {
+	my ($self, $widget, $url) = @_;
+	$widget->configure(-cursor => 'hand2');
+	$widget->bind('<Enter>', sub { $widget->configure(-foreground => 'blue') });
+	$widget->bind('<Leave>', sub { $widget->configure(-foreground => $self->configGet('-foreground')) });
+	$widget->bind('<Button-1>', sub { $self->openURL($url) });
+}
 
 sub MenuItems {
 	my $self = shift;
@@ -202,6 +291,20 @@ sub MenuItems {
 		[	'menu_separator',	'appname::Quit',	'h1'], 
 
 	)
+}
+
+=item B<moduleVersion>I<($module)>
+
+Returns the version number of I<$module>. Returns undef if the module is not found.
+
+=cut
+
+sub moduleVersion {
+	my ($self, $module) = @_;
+	my $version;
+	my $s = '->VERSION';
+	eval "use $module; \$version = $module$s";
+	return $version
 }
 
 =back

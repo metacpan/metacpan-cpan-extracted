@@ -19,6 +19,7 @@ use File::Basename;
 use File::Spec;
 use File::stat;
 use Time::localtime;
+require Tk::LabFrame;
 require Tk::YAMessage;
 require Tk::YANoteBook;
 
@@ -219,6 +220,7 @@ sub new {
 		doc_select => ['docSelect', $self],
 		set_title => ['setTitle', $self],
 		pop_hist_menu => ['CmdPopulateHistoryMenu', $self],
+		pop_hist_tool => ['CmdPopulateHistoryTool', $self],
 	);
 
 	$self->addPostConfig('DoPostConfig', $self);
@@ -374,7 +376,7 @@ sub CmdPopulateHistoryMenu {
 				my $f = $_;
 				$submenu->add('command',
 					-label => $f,
-					-command => sub { $self->CmdDocOpen($f) }
+					-command => sub { $self->cmdExecute('doc_open', $f) }
 				);
 			}
 			$submenu->add('separator');
@@ -384,6 +386,60 @@ sub CmdPopulateHistoryMenu {
 			);
 		}
 	}
+}
+
+sub CmdPopulateHistoryTool {
+	my $self = shift;
+	my $tb = $self->extGet('ToolBar');
+	my $hist = $tb->GetItem('history');
+	for ($hist->children) { $_->destroy }
+	my $lf = $hist->LabFrame(
+		-label => 'Recent files',
+		-labelside => 'acrosstop',
+	)->pack(-fill => 'both');
+	my $f = $lf->Subwidget('frame');
+	my $h = $self->{HISTORY};
+	for (@$h) {
+		my $file = $_;
+		my $l = $f->Label(
+			-anchor => 'w',
+			-borderwidth => 1,
+			-text => $file,
+		)->pack(-fill => 'x');
+		$l->bind('<Enter>', sub { $l->configure(-relief => 'raised') });
+		$l->bind('<Leave>', sub { $l->configure(-relief => 'flat') });
+		$l->bind('<Button-1>', sub { $l->configure(-relief => 'sunken') });
+		$l->bind('<ButtonRelease-1>', sub {
+			$l->configure(-relief => 'flat');
+			$self->update;
+			$tb->PopDown;
+			$self->cmdExecute('doc_open', $file);
+		});
+	}
+	$f->Frame(-borderwidth => 1, -relief => 'sunken', -height => 2)->pack(-fill => 'x', -pady => 2);
+	my $l = $f->Label(
+		-anchor => 'w',
+		-borderwidth => 1,
+		-text => 'Clear list',
+	)->pack(-fill => 'x');
+	$l->bind('<Enter>', sub { $l->configure(-relief => 'raised') });
+	$l->bind('<Leave>', sub { $l->configure(-relief => 'flat') });
+	$l->bind('<Button-1>', sub { $l->configure(-relief => 'sunken') });
+	$l->bind('<ButtonRelease-1>', sub {
+		$l->configure(-relief => 'flat');
+		$self->update;
+		$tb->PopDown;
+		@$h = ();
+	});
+	my $width = 0;
+	my $height = 0;
+	for ($f->children) {
+		my $w = $_->reqwidth;
+		my $h = $_->reqheight;
+		$width = $w if $w >$width;
+		$height = $height + $h;
+	}
+	$hist->configure(-height => $height + 32, -width => $width + 12);
 }
 
 sub CommandDocSaveAll {
@@ -1318,7 +1374,10 @@ sub ToolItems {
 	unless $readonly;
 
 	push @items,
-		[	'tool_button',		'Open',		'doc_open',		'document-open',	'Open a document'], 
+		[	'tool_list',    'history', 'pop_hist_tool' ],
+		[	'tool_button',		'Open',		'doc_open',		'document-open',	'Open a document'],
+		[	'tool_list_end' ],
+		
 	;
 
 	push @items,
@@ -1366,38 +1425,3 @@ Unknown. If you find any, please contact the author.
 =cut
 
 1;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

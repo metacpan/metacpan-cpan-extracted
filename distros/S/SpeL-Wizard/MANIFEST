@@ -68,6 +68,8 @@ t/01-lib/SpeL/Parser/Aux.t
 t/01-lib/SpeL/Parser/Aux/test-file-1.aux
 t/01-lib/SpeL/Parser/Aux/test-file-1.golden
 t/01-lib/SpeL/Parser/Chunk.t
+t/01-lib/SpeL/Parser/Chunk/change-history.golden
+t/01-lib/SpeL/Parser/Chunk/change-history.tex
 t/01-lib/SpeL/Parser/Chunk/chunk-arrays-and-brackets.golden
 t/01-lib/SpeL/Parser/Chunk/chunk-arrays-and-brackets.tex
 t/01-lib/SpeL/Parser/Chunk/chunk-arrows.golden

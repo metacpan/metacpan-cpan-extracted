@@ -12,18 +12,20 @@ my $supports_Q = eval { no warnings 'void'; pack('Q', 1); 1 };
 # endianness test from https://perldoc.perl.org/perlpacktut#Pack-Recipes
 my $is_le = unpack('c', pack('s', 1));
 # emulate pack('Q', ...) on Perl without 64-bit integer support
+
+#@type $arg Math::BigInt
 sub Q_pack {
     my ($arg) = @_;
 
     if ($supports_Q) {
-        return pack('Q', $arg);
+        return pack('Q', $arg->numify);
     } else {
         my $high = $arg >> 32;
         my $low  = $arg & 0xFFFFFFFF;
         if ($is_le) {
-            return pack('LL', $low, $high);
+            return pack('VV', $low, $high);
         } else {
-            return pack('LL', $high, $low);
+            return pack('NN', $high, $low);
         }
     }
 }
@@ -49,7 +51,7 @@ sub NR {
                 landlock_restrict_self  => 446,
                 prctl                   => $prctl{$arch},
             );
-        } elsif ($^O eq 'linux' && (eval { require 'syscall.ph'; 1 } || eval { require 'sys/syscall.ph'; 1 })) {
+        } elsif ($^O eq 'linux' && (eval { require 'syscall.ph'; } || eval { require 'sys/syscall.ph'; })) {
             %SYSCALLS = (
                 landlock_create_ruleset => &SYS_landlock_create_ruleset,
                 landlock_add_rule       => &SYS_landlock_add_rule,

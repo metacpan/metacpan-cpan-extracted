@@ -12,12 +12,13 @@ WriteMakefile(
     LICENSE   => 'perl',
     NAME      => 'Linux::Landlock',
     PREREQ_PM => {
-        'POSIX'      => 0,
-        'List::Util' => 0,
-        'Exporter'   => 0,
-        'Config'     => 0,
+        'POSIX'        => 0,
+        'List::Util'   => 0,
+        'Exporter'     => 0,
+        'Config'       => 0,
+        'Math::BigInt' => 0,
     },
-    VERSION       => '0.7',
+    VERSION       => '0.8',
     TEST_REQUIRES => {
         'Test::Exception'  => 0,
         'Test::More'       => 0,

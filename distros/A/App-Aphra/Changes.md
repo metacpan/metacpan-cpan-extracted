@@ -1,5 +1,18 @@
 # Change Log
 
+## [0.1.3] - 2024-06-14
+
+### Fixed
+
+- Bug in App::Aphra::File::uri
+
+## [0.1.2] - 2024-06-14
+
+### Added
+
+- Added uri() method to both classes
+- Pass $self (as "file") to file template processing
+
 ## [0.1.1] - 2024-01-24
 
 ### Fixed

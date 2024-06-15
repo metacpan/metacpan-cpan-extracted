@@ -10,7 +10,7 @@ Tk::AppWindow::Ext::Art - Use icon libraries quick & easy
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.05";
+$VERSION="0.08";
 use Config;
 my $mswin = 0;
 $mswin = 1 if $Config{'osname'} eq 'MSWin32';
@@ -18,10 +18,8 @@ my $osname = $Config{'osname'};
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
-use Module::Load::Conditional('check_install', 'can_load');
-$Module::Load::Conditional::VERBOSE = 1;
-
 use File::Basename;
+use File::MimeInfo;
 use Imager;
 use MIME::Base64;
 require FreeDesktop::Icons;
@@ -31,13 +29,8 @@ use Tk::PNG;
 
 my $svgsupport = 0;
 
-my $modname = 'Image::LibRSVG';
-my $inst = check_install(module => $modname);
-if (defined $inst) {
-	if (can_load(modules => {$modname => $inst->{'version'}})){
-		$svgsupport = 1;
-	}
-}
+eval 'use Image::LibRSVG';
+$svgsupport = 1 unless $@;
 
 =head1 SYNOPSIS
 
@@ -135,6 +128,8 @@ sub new {
 	$ip = [] unless defined $ip;
 
 	my $fdi = FreeDesktop::Icons->new(@$ip);
+	$self->{CACHE} = {};
+	$self->{CACHEDISABLED} = 0;
 	$self->{FDI} = $fdi;
 	$self->{THEMEPOOL} = {};
 	$self->{THEMES} = {};
@@ -158,6 +153,12 @@ sub new {
 	$self->addPostConfig('DoPostConfig', $self);
 	
 	return $self;
+}
+
+sub _cache {
+	my $self = shift;
+	$self->{CACHE} = shift if @_;
+	return $self->{CACHE}
 }
 
 sub _fdi {
@@ -189,6 +190,61 @@ sub AvailableThemes {
 	my $self = shift;
 	my $fdi = $self->_fdi;
 	return $fdi->availableThemes
+}
+
+sub cacheAdd {
+	my ($self, $name, $image) = @_;
+	my $cache = $self->_cache;
+	unless ($self->cacheExists($name)) {
+		$cache->{$name} = $image;
+	} else {
+		warn "Art::cache '$name' already exists"
+	}
+}
+
+=item B<cacheDisabled>I<(?$flag?)>
+
+Sets and returns the state of the cache.
+If the cache is disabled, images will allways be loaded from disk.
+
+=cut
+
+sub cacheDisabled {
+	my $self = shift;
+	$self->{CACHEDISABLED} = shift if @_;
+	return $self->{CACHEDISABLED}
+}
+
+
+sub cacheExists {
+	my ($self, $name) = @_;
+	my $cache = $self->_cache;
+	return exists $cache->{$name}
+}
+
+=item B<cacheClear>
+
+Clears the cache.
+
+=cut
+
+sub cacheClear {
+	my $self = shift;
+	$self->_cache({})
+}
+
+sub cacheGet {
+	my ($self, $name) = @_;
+	my $cache = $self->_cache;
+	return $cache->{$name} if $self->cacheExists($name);
+	warn "Art::cache '$name' does not exist"
+}
+
+sub cacheName {
+	my ($self, $file, $width, $height) = @_;
+	$width = '' unless defined $width;
+	$height = $width unless defined $height;
+	return "$file-$width-$height"
 }
 
 =item B<createCompound>I<(%args)>
@@ -343,9 +399,30 @@ sub getAlternateSize {
 	return $size
 }
 
+
+=item B<getFileIcon>I<($file>, [ I<$size, $context> ] I<);>
+
+Determines the mime type of $file and returns the belonging
+icon. If it can not determine the mime type, the default file 
+icon is returned.
+
+=cut
+
+sub getFileIcon {
+	my $self = shift;
+	my $file = shift;
+	my $mime = mimetype($file);
+	if (defined $mime) {
+		$mime =~ s/\//-/;
+		my $icon = $self->getIcon($mime, @_);
+		return $icon if defined $icon
+	}
+	return $self->getIcon('text-plain', @_)
+}
+
 =item B<getIcon>I<($name>, [ I<$size, $context> ] I<);>
 
-Returns a Tk::Image. If you do not specify I<$size> or the icon does
+Returns a Tk::Photo object. If you do not specify I<$size> or the icon does
 not exist in the specified size, it will find the largest possible icon and
 scale it to the requested size. I<$force> can be 0 or 1. It is 0 by default.
 If you set it to 1 a missing icon image is returned instead of undef when the
@@ -355,7 +432,7 @@ icon cannot be found.
 
 sub getIcon {
 	my ($self, $name, $size, $context) = @_;
-	unless (defined $size) { $size = $self->configGet('-iconsize')}
+	$size = $self->configGet('-iconsize') unless defined $size;
 	my $fdi = $self->_fdi;
 	$fdi->theme($self->configGet('-icontheme'));
 	my $resize = 0;
@@ -384,19 +461,26 @@ sub loadImage {
 	if (defined $width) {
 		$height = $width unless defined $height
 	}
+
+	my $load = 0;
+
+	#create chache name
+	my $cachename = $self->cacheName($file, $width, $height);
+
+	if ($self->cacheExists($cachename)) {
+		return $self->cacheGet($cachename) unless $self->cacheDisabled;
+	}
 	if (-e $file) {
+		my $data;
 		unless ($self->isSVG($file)) {
 			my $img = Imager->new(file=>$file);
 			if (defined $img) {
 				$width = $img->getwidth unless defined $width;
 				$height = $img->getheight unless defined $height;
-				$img = $img->scale(xpixels => $width, ypixels => $height) if ($width ne $img->getwidth) or ($height ne $img->getheight);;
-				my $data;
+				if (($width ne $img->getwidth) or ($height ne $img->getheight)) {
+					$img = $img->scale(xpixels => $width, ypixels => $height)
+				}
 				$img->write(data => \$data, type => 'png');
-				return $self->GetAppWindow->Photo(
-					-data => encode_base64($data), 
-					-format => 'png',
-				)
 			}
 		} else {
 			unless ($svgsupport) {
@@ -405,13 +489,15 @@ sub loadImage {
 			}
 			my $renderer = Image::LibRSVG->new;
 			$renderer->loadFromFileAtSize($file, $width, $height);
-			my $png = $renderer->getImageBitmap("png", 100);
-			if (defined $png) {
-				return $self->GetAppWindow->Photo(
-					-data => encode_base64($png), 
-					-format => 'png'
-				);
-			} 
+			$data = $renderer->getImageBitmap("png", 100);
+		}
+		if (defined $data) {
+			my $i = $self->GetAppWindow->Photo(
+				-data => encode_base64($data), 
+				-format => 'png',
+			);
+			$self->cacheAdd($cachename, $i) unless $self->cacheDisabled;
+			return $i
 		}
 	}  else {
 		warn "image file $file not found \n";

@@ -1,0 +1,101 @@
+0.016   2024-06-13  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc][ux] Tweak schemas' descriptions, mention the
+          (as-of-now-yet-unwritten) schemas
+          cpan::{modname,distname,pause_id}::{exists,not_exists}.
+
+
+0.015   2024-06-08  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Sah-Schema{s,Bundle}-* for consistency with
+          others.
+
+
+0.014   2022-09-25  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [ux] Tweak Abstracts (give example).
+
+
+0.013   2021-07-19  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Build with fixed Pod::Weaver plugin [-Sah::Schemas] (0.064) to
+          properly list schemas in the distribution in lib/Sah/Schemas/Perl.pm.
+
+
+0.012   2021-01-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump perl prereq to 5.014 because during build
+	  Sah::SchemaR::cpan::pause_id will contain regex sequence (?^...)
+	  [GH#1].
+
+
+0.011   2021-01-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schemas: cpan::distname, cpan::modname.
+
+
+0.010   2020-03-08  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+	- [build] Rebuild with updated Pod::Weaver plugin [-Sah::Schemas] to
+          correctly show examples.
+
+
+0.009   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Update property names in examples (data -> value, res ->
+	  validated_value).
+
+
+0.008   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Update examples, use 'value' instead of 'data'.
+
+
+0.007   2020-03-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes
+
+        - [build] Render examples in Synopsis, using
+          Pod::Weaver::Plugin::Sah::Schemas 0.060+.
+
+
+0.006   2020-03-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix regex: add anchoring.
+
+        - Add examples (tests).
+
+	- It's okay to depend on Regexp::Pattern::CPAN.
+
+
+0.005   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names (Data::Sah::Coerce 0.034+).
+
+
+0.004   2019-01-13  Released-By: PERLANCAR
+
+	- Add completion for cpan::pause_id.
+
+
+0.003   2018-09-02  Released-By: PERLANCAR
+
+	- Rebuild to correct regex for PAUSE ID (uppercase intead of lowercase).
+
+
+0.002   2018-04-06  Released-By: PERLANCAR
+
+	- [ux] cpan::pause_id: Convert to uppercase.
+
+
+0.001   2017-01-08  Released-By: PERLANCAR
+
+        - First release.

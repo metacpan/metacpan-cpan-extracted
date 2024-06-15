@@ -43,6 +43,7 @@ my $row = 0;
 my $ext;
 if (defined $app) {
 	$app->geometry('640x400+100+100') if defined $app;
+	$ext = $app->extGet('MenuBar');
 	for (@configs) {
 		my $var = '';
 		$showitems{$_} = \$var;
@@ -50,7 +51,21 @@ if (defined $app) {
 		$app->Label(-width => 10, -textvariable => \$var)->grid(-row => $row, -column => 1, -padx => 3, -pady => 3);
 		$row ++
 	}
-	$ext = $app->extGet('MenuBar');
+	my $b = $app->Button(
+		-text => 'Pop menu',
+		-command => sub {
+			my $m = $ext->menuCreate($app,
+				[	'menu_normal',		  undef,		"~New",					'doc_new',				'document-new',	'Control-n'			], 
+				[	'menu_separator',	undef,		'f1' ], 
+				[	'menu_radio_s',	  undef,		'S~easons',		[qw[Winter Spring Summer Autumn]], undef,	'-radio_2'],
+				[	'menu_check',		   undef,			"Check 2",		'edit-copy',	'-check_2'],
+			);
+			$m->post(200, 200);
+		},
+	);
+	$b->grid(
+		-row => $row, -column => 0
+	);
 	&Update;
 }
 

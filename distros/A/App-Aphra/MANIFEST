@@ -15,6 +15,7 @@ t/05-vars.t
 t/data1/in/index.html.md
 t/data1/in/static.txt
 t/data1/layouts/page
+t/data1/site.yml
 t/data2/in/index.html.md
 t/data2/in/static.txt
 t/data2/in/test.html.md

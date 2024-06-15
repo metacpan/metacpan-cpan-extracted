@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::Navigator - Navigate opened documents and files
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.04";
+$VERSION="0.08";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -36,6 +36,11 @@ Loads extension NavigatorPanel if it is not already loaded.
 Default value 'MDI'. Sets the extension name for the
 multiple docoment interface that B<Navigator> communicates with.
 
+=item B<-treeiconsize>
+
+By default undefined. Sets and returns the icon size of icons
+in the document tree.
+
 =back
 
 =cut
@@ -48,6 +53,7 @@ sub new {
 
 	$self->addPreConfig(
 		-documentinterface => ['PASSIVE', undef, undef, 'MDI'],
+		-treeiconsize => ['PASSIVE'],
 	);
 
 	$self->addPostConfig('CreateDocumentList', $self);
@@ -126,7 +132,7 @@ Callback for the document tree. Returns the folder icon.
 
 sub GetDirIcon {
 	my ($self, $name) = @_;
-	my $icon = $self->getArt('folder');
+	my $icon = $self->getArt('folder', $self->configGet('-treeiconsize'));
 	return $icon if defined $icon;
 	return $self->Subwidget('NAVTREE')->DefaultDirIcon;
 }
@@ -139,8 +145,11 @@ Callback for the document tree. Returns the file icon.
 
 sub GetFileIcon {
 	my ($self, $name) = @_;
-	my $icon = $self->getArt('text-x-plain');
-	return $icon if defined $icon;
+	my $art = $self->extGet('Art');
+	if (defined $art) {
+		my $icon = $art->getFileIcon($name, $self->configGet('-treeiconsize'));
+		return $icon if defined $icon;
+	}
 	return $self->Subwidget('NAVTREE')->DefaultFileIcon;
 }
 

@@ -9,7 +9,7 @@ Tk::AppWindow::BaseClasses::Extension - Baseclass for all extensions in this fra
 use strict;
 use warnings;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION="0.02";
+$VERSION="0.08";
 use Carp;
 
 =head1 SYNOPSIS
@@ -109,23 +109,26 @@ modified settings.
 
 sub ReConfigure {}
 
-=item B<Require>I<($extension)>
+=item B<Require>I<(@extensions)>
 
 Only call this during extension construction.
-Loads $extension if it isn't already.
+Loads @extensions. ignores already loaded ones.
+returns true on succes.
 
 =cut
 
 sub Require {
 	my $self = shift;
-	my $f = $self->GetAppWindow;
 	my $args = $self->GetArgsRef;
+	my $success = 1;
 	while (@_) {
 		my $m = shift;
-		unless (defined($f->extGet($m))) {
-			$f->extLoad($m, $args);
+		unless ($self->extExists($m)) {
+			$self->extLoad($m, $args);
+			$success = '' unless $self->extExists($m);
 		}
 	}
+	return $success
 }
 
 =item B<SettingsPage>

@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.07";
+$VERSION="0.08";
 
 use base qw(Tk::Derived Tk::MainWindow);
 Construct Tk::Widget 'AppWindow';
@@ -19,10 +19,12 @@ use File::Basename;
 require Tk::AppWindow::BaseClasses::Callback;
 require Tk::Balloon;
 require Tk::YAMessage;
-require Tk::DynaMouseWheelBind;
 use Tk::PNG;
-use Module::Load::Conditional('check_install', 'can_load');
-$Module::Load::Conditional::VERBOSE = 1;
+
+#require Tk::DynaMouseWheelBind;
+my $wheelbind = 0;
+eval 'require Tk::DynaMouseWheelBind';
+$wheelbind = 1 unless $@;
 
 use Config;
 my $mswin = 0;
@@ -113,12 +115,6 @@ Only available at create time.
 Default value 0. Saves the geometry on quit and loads it on start. Only works
 if the extension B<ConfigFolder> is loaded.
 
-=item Switch: B<-verbose>
-
-Default value is 0.
-Set or get verbosity.
-Does not do anything at this moment. Meant for logging.
-
 =back
 
 =head1 COMMANDS
@@ -159,7 +155,7 @@ sub Populate {
 		'Tk::ITree',
 		'Tk::Pane',
 		'Tk::Tree',
-	);
+	) if $wheelbind; # DynaMouseWheelBind does not install on perl 5.40
 
 	$self->{APPNAME} = $appname;
 	$self->{ARGS} = $args;
@@ -173,7 +169,6 @@ sub Populate {
 	$self->{EXTLOADORDER} = [];
 	$self->{NAMESPACE} = $namespace;
 	$self->{WORKSPACE} = $self;
-	$self->{VERBOSE} = 0;
 
 	$self->cmdConfig(
 		poptest => ['popTest', $self], #usefull for testing only
@@ -182,7 +177,6 @@ sub Populate {
 	);
 	$self->configInit(
 		-appname => ['appName', $self, $appname],
-		-verbose => ['Verbose', $self, 0],
 	);
 	
 	$self->{POSTCONFIG} = [];
@@ -681,26 +675,22 @@ sub extLoad {
 			$namespace = $namespace . '::Ext';
 			push @paths, $namespace;
 		}
+		my $error = '';
 		for (@paths) {
 			my $p = $_;
-			my $obj;
 			
 			my $modname = $p . "::$name";
-			my $inst = check_install(module => $modname);
-			if (defined $inst) {
-				if (can_load(modules => {$modname => $inst->{'version'}})){
-					$ext = $modname->new($self);
-				}
-			}
-			if (defined($ext)) {
-				$self->log("Extension $name loaded\n") if $self->Verbose;
+			eval "use $modname;";
+			$error = $@;
+			unless ($error) {
+				my $ext = $modname->new($self);
 				$exts->{$name} = $ext;
 				my $o = $self->{EXTLOADORDER};
 				push @$o, $name;
 				return
 			}
 		}
-		warn "unable to load extension $name\n";
+		die "unable to load extension $name\n$error";
 	}
 }
 
@@ -825,7 +815,7 @@ Please provide 'https://' or whatever protocol in front if it is on the web.
 
 sub openURL {
 	my ($self, $url) = @_;
-	print "is web $url\n" if $url =~ /^[A-Za-z]+:\/\//;
+#	print "is web $url\n" if $url =~ /^[A-Za-z]+:\/\//;
 	if ($mswin) {
 		if ($url =~ /^[A-Za-z]+:\/\//) { #is a web document
 			system("explorer \"$url\"");
@@ -1017,18 +1007,6 @@ sub ToolItems {
 	my $self = shift;
 	return (
 	)
-}
-
-=item B<Verbose>
-
-Set or get verbosity. Same as $app->configPut(-verbose => $value) or $self->configGet('-verbose');
-
-=cut
-
-sub Verbose {
-	my $self = shift;
-	$self->{VERBOSE} = shift if @_;
-	return $self->{VERBOSE}
 }
 
 sub WorkSpace {

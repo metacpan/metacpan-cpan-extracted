@@ -86,6 +86,7 @@ about Landlock.
         make_sym
         refer
         truncate
+        ioctl_dev
 
     See  [https://docs.kernel.org/userspace-api/landlock.html](https://docs.kernel.org/userspace-api/landlock.html) for all possible access rights.
 
@@ -94,8 +95,8 @@ about Landlock.
     current kernel.
 
     **Beware**: While the API accepts a path or user space file descriptor, the rule is actually
-    applied to the kernel internal file system object. This means that you will lose access if a
-    path or directory you allowed access to is renamed or replaced.
+    checked against the corresponding, kernel internal file system object. This means that you
+    will lose access if a path or directory you allowed access to is renamed or replaced.
 
 - add\_net\_port\_rule($port, @allowed)
 

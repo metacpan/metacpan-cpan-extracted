@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Tk;
 use vars qw($VERSION);
-$VERSION="0.07";
+$VERSION="0.08";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -98,6 +98,8 @@ sub new {
 	$self->Require( 'ConfigFolder');
 	$self->{SETTINGSFILE} = undef;
 	$self->{USEROPTIONS} = undef;
+	$self->{EXTERNALS} = {};
+	$self->{DIALOG} = undef;
 
 	
 	$self->configInit(
@@ -120,6 +122,23 @@ sub new {
 
 sub CmdSettings {
 	my $self = shift;
+	
+	#create dialog if necessary
+	unless (defined $self->dialog) {
+		$self->dialogCreate;
+	}
+
+	$self->dialogPop;
+}
+
+sub dialog {
+	my $self = shift;
+	$self->{DIALOG} = shift if @_;
+	return $self->{DIALOG}
+}
+
+sub dialogCreate {
+	my $self = shift;
 	my $m = $self->GetAppWindow->YADialog(
 		-buttons => ['Close'],
 		-title => 'Configure settings',
@@ -127,25 +146,32 @@ sub CmdSettings {
 	
 	my $f;
 	my $nb;
-	my %externals = ();
 	my $b = $m->Subwidget('buttonframe')->Button(
 		-text => 'Apply',
 		-command => sub {
 			my %options = $f->get;
 			my @opts = sort keys %options;
 			my @save = ();
+			my $restart = 0;
 			for (@opts) {
 				my $val = $options{$_};
 				if ($val ne '') {
 					$self->configPut($_, $val);
 					push @save, $_;
+				} else {
+					$restart = 1
 				}
 			}
 			$self->ReConfigureAll;
 			$self->SaveSettings(@save);
+#			if ($restart) {
+#				my $name = $self->configGet('-appname');
+#				$self->popMessage("Please restart $name", 'dialog-warning');
+#			}
 			if (defined $nb) {
-				for (keys %externals) {
-					my $w = $externals{$_};
+				my $externals = $self->_externals;
+				for (keys %$externals) {
+					my $w = $externals->{$_};
 					$w->Apply if Exists($w) and $w->can('Apply');
 				}
 			}
@@ -175,23 +201,51 @@ sub CmdSettings {
 	)->pack(-expand => 1, -fill => 'both');
 	$nb = $f->createForm;
 	if (defined $nb) {
-		my @pages = $self->GetSettingsPages;
-		while (@pages) {
-			my $title = shift @pages;
-			my $opt = shift @pages;
-			my $class = shift @$opt;
-			my $page = $nb->add($title, -label => $title);
-			$externals{$title} = $page->$class(@$opt)->pack(-fill => 'both', -expand => 1);
-		}
 		$self->{NB} = $nb;
+		$self->externalAdd($self->GetSettingsPages);
 	}
 	$f->put($self->GetUserOptions);
 	
 	$m->ButtonPack($b);
-	$m->Show(-popover => $self->GetAppWindow);
-	$m->destroy;
-	delete $self->{NB};
+	$self->dialog($m);
 }
+
+sub dialogPop {
+	my $self = shift;
+	$self->dialog->Show(-popover => $self->GetAppWindow);
+}
+
+sub _externals { return $_[0]->{EXTERNALS} }
+
+sub externalAdd {
+	my $self = shift;
+	my $nb = $self->NBWidget;
+	return unless defined $nb;
+	while (@_) {
+		my $title = shift @_;
+		my $opt = shift @_;
+		my $class = shift @$opt;
+		my $page = $nb->add($title, -label => $title);
+		$self->_externals->{$title} = $page->$class(@$opt)->pack(-fill => 'both', -expand => 1);
+	}
+}
+
+sub externalExists {
+	my ($self, $page) = @_;
+	return exists $self->_externals->{$page}
+}
+
+sub externalRemove {
+	my ($self, $page) = @_;
+	my $nb = $self->NBWidget;
+	return unless defined $nb;
+	if ($self->externalExists($page)) {
+		$nb->delete($page);
+		delete $self->_externals->{$page};
+	}
+}
+
+sub GetExternalPages { return $_[0]->{EXTERNALS} }
 
 sub GetUserOptions {
 	my $self = shift;

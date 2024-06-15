@@ -15,6 +15,7 @@ sub Populate {
 		-text => ' ',
 		-anchor => 'w',
 	)->pack(-side => 'left', -expand => 1, -fill => 'x');
+	$self->{L} = $e;
 	$self->{COLORBCK} = $e->cget('-foreground');
 	$self->toplevel->bind('<Any-KeyPress>', sub { $self->Clear });
 	$self->toplevel->bind('<Button-1>', sub { $self->Clear });
@@ -38,6 +39,17 @@ sub Clear {
 sub Message {
 	my ($self, $message, $color) = @_;
 	$color = $self->{COLORBCK} unless defined $color;
+
+	#shorten message if it is larger than the label allows.
+	my $l = $self->{L};
+	my $lw = $l->width;
+	my $font = $self->cget('-font');
+	my $width = $font->measure($message);
+	while ($width > $lw) {
+		$message = substr($message, 0, length($message - 1));
+		$width = $font->measure($message);
+	}
+
 	$self->configure(
 		-text => $message,
 		-foreground => $color,

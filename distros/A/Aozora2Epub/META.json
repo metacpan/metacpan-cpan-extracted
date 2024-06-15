@@ -1,0 +1,87 @@
+{
+   "abstract" : "Convert Aozora Bunko XHTML to EPUB",
+   "author" : [
+      "Yoshimasa Ueno <saltyduck@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Aozora2Epub",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.22",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "Cache::FileCache" : "0",
+            "Carp" : "0",
+            "Class::Accessor" : "0",
+            "Encode" : "0",
+            "File::Find" : "0",
+            "File::ShareDir" : "0",
+            "Getopt::Long" : "0",
+            "HTML::Element" : "0",
+            "HTML::Escape" : "0",
+            "HTML::Selector::XPath" : "0",
+            "HTML::TreeBuilder::XPath" : "0",
+            "HTTP::Date" : "0",
+            "HTTP::Tiny" : "0",
+            "IO::Socket::SSL" : "0",
+            "Path::Tiny" : "0",
+            "Text::Xslate" : "0",
+            "URI" : "0",
+            "UUID" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Base" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/saltyduck/Aozora2Epub/issues"
+      },
+      "homepage" : "https://github.com/saltyduck/Aozora2Epub",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/saltyduck/Aozora2Epub.git",
+         "web" : "https://github.com/saltyduck/Aozora2Epub"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_static_install" : 1
+}
+

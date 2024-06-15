@@ -1,3 +1,4 @@
+aw_logo.svg
 bin/mdi_editor
 bin/simple_editor
 Changes
@@ -40,6 +41,7 @@ lib/Tk/AppWindow/PluginsForm.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+README
 README.md
 t/010-Tk-AppWindow-BaseClasses-Callback.t
 t/020-Tk-AppWindow-BaseClasses-ContentManager.t
@@ -65,14 +67,14 @@ t/220-Tk-AppWindow-Ext-Settings.t
 t/230-Tk-AppWindow-Ext-MDI.t
 t/240-Tk-AppWindow-Ext-Navigator.t
 t/250-Tk-AppWindow-Ext-Plugins.t
+t/lib/Alternative/NameSpace.pm
 t/lib/Alternative/NameSpace/Ext/TestExt.pm
+t/lib/Alternative/NameSpace/Plugins/Test.pm
+t/lib/Alternative/NameSpace/Plugins/TestJobs.pm
 t/lib/TestTextManager.pm
 t/lib/Tk/AppWindow/Ext/Dummy.pm
 t/lib/Tk/AppWindow/Ext/TestPlugin.pm
-t/lib/Tk/AppWindow/Plugins/Test.pm
 t/sample_help.pod
-t/settings/geometry
-t/settings/history
 t/Themes/PNG1/actions/22/document-new.png
 t/Themes/PNG1/actions/22/document-save.png
 t/Themes/PNG1/actions/32/edit-cut.png

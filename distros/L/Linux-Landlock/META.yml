@@ -27,10 +27,11 @@ requires:
   Config: '0'
   Exporter: '0'
   List::Util: '0'
+  Math::BigInt: '0'
   POSIX: '0'
 resources:
   bugtracker: https://github.com/mballarin/perl-linux-landlock/issues
   repository: https://github.com/mballarin/perl-linux-landlock.git
-version: '0.7'
+version: '0.8'
 x_osname: linux
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

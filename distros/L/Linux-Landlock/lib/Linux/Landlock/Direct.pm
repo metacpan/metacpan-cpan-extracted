@@ -143,6 +143,8 @@ C<%LANDLOCK_ACCESS_FS>
     REFER
     # ABI version 3
     TRUNCATE
+    # ABI version 5
+    IOCTL_DEV
 
 C<%LANDLOCK_ACCESS_NET>
 
@@ -176,34 +178,36 @@ use Exporter 'import';
 use List::Util                qw(reduce);
 use POSIX                     qw();
 use Linux::Landlock::Syscalls qw(NR Q_pack);
-
-our $VERSION = '0.7';
+use Math::BigInt;
+our $VERSION = '0.8';
 # adapted from linux/landlock.ph, architecture independent consts
 my $LANDLOCK_CREATE_RULESET_VERSION = (1 << 0);
 our %LANDLOCK_ACCESS_FS = (
     # ABI version 1
-    EXECUTE     => (1 << 0),
-    WRITE_FILE  => (1 << 1),
-    READ_FILE   => (1 << 2),
-    READ_DIR    => (1 << 3),
-    REMOVE_DIR  => (1 << 4),
-    REMOVE_FILE => (1 << 5),
-    MAKE_CHAR   => (1 << 6),
-    MAKE_DIR    => (1 << 7),
-    MAKE_REG    => (1 << 8),
-    MAKE_SOCK   => (1 << 9),
-    MAKE_FIFO   => (1 << 10),
-    MAKE_BLOCK  => (1 << 11),
-    MAKE_SYM    => (1 << 12),
+    EXECUTE     => Math::BigInt->new(1)->blsft(0),
+    WRITE_FILE  => Math::BigInt->new(1)->blsft(1),
+    READ_FILE   => Math::BigInt->new(1)->blsft(2),
+    READ_DIR    => Math::BigInt->new(1)->blsft(3),
+    REMOVE_DIR  => Math::BigInt->new(1)->blsft(4),
+    REMOVE_FILE => Math::BigInt->new(1)->blsft(5),
+    MAKE_CHAR   => Math::BigInt->new(1)->blsft(6),
+    MAKE_DIR    => Math::BigInt->new(1)->blsft(7),
+    MAKE_REG    => Math::BigInt->new(1)->blsft(8),
+    MAKE_SOCK   => Math::BigInt->new(1)->blsft(9),
+    MAKE_FIFO   => Math::BigInt->new(1)->blsft(10),
+    MAKE_BLOCK  => Math::BigInt->new(1)->blsft(11),
+    MAKE_SYM    => Math::BigInt->new(1)->blsft(12),
     # ABI version 2
-    REFER => (1 << 13),
+    REFER => Math::BigInt->new(1)->blsft(13),
     # ABI version 3
-    TRUNCATE => (1 << 14),
+    TRUNCATE => Math::BigInt->new(1)->blsft(14),
+    # ABI version 5
+    IOCTL_DEV => Math::BigInt->new(1)->blsft(15),
 );
 our %LANDLOCK_ACCESS_NET = (
     # ABI version 4
-    BIND_TCP    => (1 << 0),
-    CONNECT_TCP => (1 << 1),
+    BIND_TCP    => Math::BigInt->new(1)->blsft(0),
+    CONNECT_TCP => Math::BigInt->new(1)->blsft(1),
 );
 our %LANDLOCK_RULE = (
     PATH_BENEATH => 1,
@@ -234,6 +238,8 @@ my %MAX_FS_SUPPORTED = (
     1  => $LANDLOCK_ACCESS_FS{MAKE_SYM},
     2  => $LANDLOCK_ACCESS_FS{REFER},
     3  => $LANDLOCK_ACCESS_FS{TRUNCATE},
+    4  => $LANDLOCK_ACCESS_FS{TRUNCATE},
+    5  => $LANDLOCK_ACCESS_FS{IOCTL_DEV},
 );
 my %MAX_NET_SUPPORTED = (
     -1 => 0,
@@ -248,8 +254,8 @@ my ($abi_version, $fs_access_supported, $net_port_supported);
 sub ll_all_fs_access_supported {
     if (!defined $fs_access_supported) {
         my $version = ll_get_abi_version();
-        $version             = 3 if $version > 3;
-        $fs_access_supported = reduce { $a | $b } 0,
+        $version             = 5 if $version > 5;
+        $fs_access_supported = reduce { $a | $b } Math::BigInt->new(0),
           grep { $_ <= $MAX_FS_SUPPORTED{$version} } values %LANDLOCK_ACCESS_FS;
     }
     return $fs_access_supported;
@@ -260,7 +266,8 @@ sub ll_all_net_access_supported {
         my $version = ll_get_abi_version();
         $version = 4 if $version > 4;
         $net_port_supported =
-          reduce { $a | $b } 0, grep { $_ <= $MAX_NET_SUPPORTED{$version} } values %LANDLOCK_ACCESS_NET;
+          reduce { $a | $b } Math::BigInt->new(0),
+          grep { $_ <= $MAX_NET_SUPPORTED{$version} } values %LANDLOCK_ACCESS_NET;
     }
     return $net_port_supported;
 }
@@ -289,9 +296,9 @@ sub ll_create_net_ruleset {
 sub ll_create_ruleset {
     my ($fs_actions, $net_actions) = @_;
 
-    my $allowed = Q_pack(reduce { $a | $b } 0, @$fs_actions);
+    my $allowed = Q_pack(reduce { $a | $b } Math::BigInt->new(0), @$fs_actions);
     if (ll_get_abi_version >= 4) {
-        $allowed .= Q_pack(reduce { $a | $b } 0, @$net_actions);
+        $allowed .= Q_pack(reduce { $a | $b } Math::BigInt->new(0), @$net_actions);
     }
     my $nr = NR('landlock_create_ruleset') or return;
     my $fd = syscall($nr, $allowed, length $allowed, 0);
@@ -317,7 +324,8 @@ sub ll_add_net_port_rule {
 
     my $applied = $allowed_access & ll_all_net_access_supported;
     my $nr      = NR('landlock_add_rule') or return;
-    my $result  = syscall($nr, $ruleset_fd, $LANDLOCK_RULE{NET_PORT}, Q_pack($applied) . Q_pack($port), 0);
+    my $result =
+      syscall($nr, $ruleset_fd, $LANDLOCK_RULE{NET_PORT}, Q_pack($applied) . Q_pack(Math::BigInt->new($port)), 0);
     return ($result == 0) ? $applied : undef;
 }
 

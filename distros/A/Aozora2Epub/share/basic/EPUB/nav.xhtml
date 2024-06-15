@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="ja-JP" xml:lang="ja-JP">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="aozora2epub" />
+  <title><: $title :></title>
+  <style>
+  </style>
+</head>
+<body epub:type="frontmatter">
+  <nav epub:type="toc" role="doc-toc" id="toc">
+    <h1 id="toc-title"><: $title :></h1>
+      <ol class="toc">
+        : if $has_sections {
+        <li id="toc"><a href="toc.xhtml">目次</a></li>
+        : }
+        : for $sections -> $s {
+	<li id="<: $s.file :>-<: $s.id :>"><a href="text/<: $s.file :>.xhtml#<:$s.id :>"><: $s.title :></a>
+          : if $s.children {
+          <ol class="toc">
+	    : for $s.children -> $s1 {
+	    <li id="<: $s1.file :>-<: $s1.id :>"><a href="text/<: $s1.file :>.xhtml#<:$s1.id :>"><: $s1.title :></a></li>
+	    : }
+          </ol>
+	  : }
+	</li>
+        : }
+	: if $has_okuzuke {
+	<li><a href="text/okuzuke.xhtml">奥付</a></li>
+	: }
+      </ol>
+  </nav>
+<nav epub:type="landmarks" id="landmarks" hidden="hidden">
+  <ol>
+    <li><a href="text/title_page.xhtml" epub:type="titlepage">表紙</a></li>
+    <li><a href="toc.xhtml" epub:type="toc">目次</a></li>
+  </ol>
+</nav>
+</body>
+</html>

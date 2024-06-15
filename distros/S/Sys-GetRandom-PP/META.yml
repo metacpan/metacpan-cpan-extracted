@@ -1,0 +1,34 @@
+---
+abstract: 'pure Perl interface to getrandom(2)'
+author:
+  - 'Lukas Mai <l.mai@web.de>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.0'
+  File::Find: '0'
+  File::Spec: '0'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sys-GetRandom-PP
+no_index:
+  directory:
+    - t
+    - inc
+    - xt
+requires:
+  Carp: '0'
+  Exporter: '5.57'
+  constant: '1.03'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/mauke/Sys-GetRandom-PP
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

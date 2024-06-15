@@ -1493,16 +1493,22 @@ Returns the empty list on error.
 
 =item C<strptime>
 
-(sec, min, hour, mday, mon, year, wday, yday, isdst) = strptime(s, format[,
-sec, min, hour, mday, mon, year, wday, yday, isdst]);
+  (sec, min, hour, mday, mon, year, wday, yday, isdst) =
+    strptime(s, format[, sec, min, hour, mday, mon, year, wday, yday, isdst]);
+
+  ... = strptime(s, format, \@tm);
 
 C<strptime()> converts the string I<s> into a broken-down time according to
-the format string I<format>. The time fields may optionally be initialized in
-whole or in part and will be returned as initialized if they are not affected
-by the format string. Unprocessed uninitialized or undef fields are returned
-as undef.
+the format string I<format>.
 
-Returns the empty list on error.
+The time fields may optionally be initialized in whole or in part either with
+up to 9 separate arguments or with a single array reference after the format.
+Omitted arguments are treated as undef. In case of an array reference the array
+is updated according to the fields affected by the format string. If an error
+occurred the array is not udpated.
+
+In list context returns the broken-down time or the empty list on error.
+Fields not affected by the format string are returned as initialized.
 
 In scalar context returns the index of the first byte in I<s> that was not
 processed or the byte length of I<s> if the whole string was consumed or undef
@@ -1512,6 +1518,8 @@ As C<strptime()> acts on null-terminated strings, strings containing NUL bytes
 will only be processed up to the first NUL byte.
 
 I<New in version 0.02.>
+
+I<Changed in version 0.24:> Accept an array reference as the third argument.
 
 =item C<symlink>
 
@@ -1673,7 +1681,11 @@ C<writev()> writes multiple I<buffers> of data to the file associated with the
 file descriptor I<fd>.
 
 I<buffers> must be an array reference, i.e. C<\@buf>, C<$buf> or C<[...]>. The
-buffers are processed in array order. Undefined or empty elements are skipped.
+buffers are processed in array order.
+
+Note that C<writev($fh, $buf);> is not the same as C<print $fh, @$buf;> or
+C<syswrite $fh, $_ for @$buf;> because C<writev()> transfers data atomically
+as a single block. See the manpage for details.
 
 Returns the number of bytes written or undef on error.
 

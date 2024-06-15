@@ -1,0 +1,54 @@
+---
+abstract: 'Convert Aozora Bunko XHTML to EPUB'
+author:
+  - 'Yoshimasa Ueno <saltyduck@gmail.com>'
+build_requires:
+  Test::Base: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.22, Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Aozora2Epub
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Archive::Zip: '0'
+  Cache::FileCache: '0'
+  Carp: '0'
+  Class::Accessor: '0'
+  Encode: '0'
+  File::Find: '0'
+  File::ShareDir: '0'
+  Getopt::Long: '0'
+  HTML::Element: '0'
+  HTML::Escape: '0'
+  HTML::Selector::XPath: '0'
+  HTML::TreeBuilder::XPath: '0'
+  HTTP::Date: '0'
+  HTTP::Tiny: '0'
+  IO::Socket::SSL: '0'
+  Path::Tiny: '0'
+  Text::Xslate: '0'
+  URI: '0'
+  UUID: '0'
+resources:
+  bugtracker: https://github.com/saltyduck/Aozora2Epub/issues
+  homepage: https://github.com/saltyduck/Aozora2Epub
+  repository: https://github.com/saltyduck/Aozora2Epub.git
+version: '0.01'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 1

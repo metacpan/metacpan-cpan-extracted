@@ -21,6 +21,8 @@ WriteMakefile(
     'Text::FrontMatter::YAML' => 0,
     'Path::Tiny' => 0,
     'YAML::XS' => 0,
+    'Sys::Hostname' => 0,
+    URI      => 0,
   },
 
   META_MERGE    => {

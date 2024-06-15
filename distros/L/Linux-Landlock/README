@@ -86,6 +86,7 @@ SYNOPSIS
          make_sym
          refer
          truncate
+         ioctl_dev
 
      See <https://docs.kernel.org/userspace-api/landlock.html> for all
      possible access rights.
@@ -95,9 +96,9 @@ SYNOPSIS
      die if the rules are not supported by the current kernel.
 
      Beware: While the API accepts a path or user space file descriptor, the
-     rule is actually applied to the kernel internal file system object.
-     This means that you will lose access if a path or directory you allowed
-     access to is renamed or replaced.
+     rule is actually checked against the corresponding, kernel internal
+     file system object. This means that you will lose access if a path or
+     directory you allowed access to is renamed or replaced.
 
     add_net_port_rule($port, @allowed)
      Add a rule to the ruleset that allows the specified access to the given

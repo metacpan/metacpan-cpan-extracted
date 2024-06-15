@@ -66,7 +66,7 @@ Configure your tool bar here. Example:
  [    #type             #label    #command       #icon               #help
     [	'tool_button',   'New',     'doc_new',     'document-new',     'Create a new document' ],
  
-    [	'tool_list' ],
+    [	'tool_list',     'popcommand' ],
     [	'tool_button',   'Save',    'doc_save',    'document-save',    'Save current document' ],
     [	'tool_button',   'Save as', 'doc_save_as', 'document-save-as', 'Rename and save current document' ],
     [	'tool_separator' ],
@@ -168,6 +168,9 @@ sub AddItem {
 	my $list = $self->{ITEMLIST};
 	push @$list, $item;
 	if ($mode) {
+		my $prop = $self->{LISTPROP};
+		delete $self->{LISTPROP};
+		my ($name, $call) = @$prop if defined $prop;
 		my $p;
 		$base->Button(
 			-highlightthickness => 0,
@@ -176,9 +179,15 @@ sub AddItem {
 				-data => $down_arrow,
 				-foreground => $self->configGet('-foreground'),
 			),
-			-command => sub { $p->popFlip },
+			-command => sub {
+				unless ($p->ismapped) {
+					$self->cmdExecute($call) if defined $call
+				}
+				$p->popFlip 
+			},
 		)->pack(-side => 'left', -fill => 'y');
 		$p = $base->Poplevel(-widget => $base);
+		$self->{WIDGETS}->{$name} = $p if defined $name;
 		my $pl = $self->{POPLEVELS};
 		push @$pl, $p;
 		$self->_base($p);
@@ -288,11 +297,12 @@ sub ConfButton {
 }
 
 sub ConfList {
-	my $self = shift;
+	my ($self, $name, $call) = @_;
 	my $base = $self->_base;
 	my $f = $base->Frame;
 	$self->AddItem($f);
 	$self->_base($f);
+	$self->{LISTPROP} = [ $name, $call ];
 	$self->_mode(1);
 }
 
@@ -317,7 +327,7 @@ sub ConfWidget {
 	my ($self, $label, $class, @options) = @_;
 	my $tb = $self->_base;
 	my $f = $tb->Frame;
-	unless ($label =~ s/^\*//) {
+	unless ($label =~ /^\*/) {
 		my $l = "$label:";
 		$f->Label(-text => $l)->pack(-side => 'left');
 	}

@@ -2,34 +2,34 @@
 use strict;
 use warnings;
 use lib './t/lib';
-
+use Test::More tests => 21;
 use Test::Tk;
-$mwclass = 'Tk::AppWindow';
+$mwclass = 'Alternative::NameSpace';
 # $delay = 1500;
 
-use Test::More tests => 12;
 BEGIN { 
 	use_ok('Tk::AppWindow::Ext::Plugins');
 	use_ok('Tk::AppWindow::PluginsForm');
+	use_ok('Alternative::NameSpace');
+	use_ok('Alternative::NameSpace::Plugins::Test');
+	use_ok('Alternative::NameSpace::Plugins::TestJobs');
 };
 
 require TestTextManager;
 
 createapp(
-	-appname => 'Plugins',
 	-commands => [plusser => [sub {
 		my $v = 2;
 		return $v + shift if @_;
 		return $v;
 	}]],
-	-extensions => [qw[Art MenuBar ToolBar Settings Plugins]],
 	-configfolder => 't/settings',
 	-toolitems => [
 		[	'tool_button',		'Placeholder',		'poptest',	'document-open',	'Open a document'], 
 		[	'tool_separator'], 
 	],
-	-namespace => 'Tk::AppWindow',
-	-plugins => ['Test'],
+	-namespace => 'Alternative::NameSpace',
+	-plugins => ['Test', 'TestJobs'],
 	-preconfig => [
 		-somecolor => ['PASSIVE', undef, undef, '#34A767'],
 	],
@@ -40,9 +40,11 @@ createapp(
 );
 
 my $ext;
+my $daem;
 if (defined $app) {
 	$app->geometry('640x400+100+100') if defined $app;
 	$ext = $app->extGet('Plugins');
+	$daem = $app->extGet('Daemons');
 	
 	$app->Button(
 		-width => 30,
@@ -79,6 +81,24 @@ if (defined $app) {
 		return $ext->plugGet('Test'); 
 	}, undef, 'plugin Test unloaded'],
 	[sub { return $app->cmdExecute('plusser') }, 2, 'Hook unloaded'],
+	[sub { return $ext->plugGet('TestJobs')->Name }, 'TestJobs', 'plugin TestJobs loaded',],
+	[sub { 
+		return $ext->plugGet('TestJobs')->jobExists('jobtest'); 
+	}, 1, 'job jobtest exists'],
+	[sub { 
+		my @l = $ext->plugGet('TestJobs')->jobList;
+		return \@l
+	}, [ 'jobtest' ], 'jobList'],
+	[sub { 
+		return $daem->jobExists('jobtestTestJobs'); 
+	}, 1, 'job jobtestTestJobs exists'],
+	[sub {
+		$ext->plugUnload('TestJobs');
+		return $ext->plugGet('TestJobs'); 
+	}, undef, 'plugin TestJobs unloaded'],
+	[sub { 
+		return $daem->jobExists('jobtestTestJobs'); 
+	}, '', 'job jobtestTestJobs terminated'],
 );
 
 starttesting;

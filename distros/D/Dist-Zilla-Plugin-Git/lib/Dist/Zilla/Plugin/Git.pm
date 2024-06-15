@@ -10,10 +10,10 @@ use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Git; # git description: v2.048-11-g5e1a731
+package Dist::Zilla::Plugin::Git; # git description: v2.049-2-g22fddc0
 # ABSTRACT: Update your git repository after release
 
-our $VERSION = '2.049';
+our $VERSION = '2.050';
 
 1;
 
@@ -29,7 +29,7 @@ Dist::Zilla::Plugin::Git - Update your git repository after release
 
 =head1 VERSION
 
-version 2.049
+version 2.050
 
 =head1 DESCRIPTION
 

@@ -23,8 +23,8 @@ if ($abi_version < 0) {
     opendir(my $dh, $base) or BAIL_OUT("$!");
     my $writable_fh = IO::File->new("$base/b", 'r');
     # (1 << 60) is not a valid value, $LANDLOCK_ACCESS_FS{TRUNCATE} is only valid for ABI version 3+
-    my $expected = $LANDLOCK_ACCESS_FS{READ_FILE} | $LANDLOCK_ACCESS_FS{WRITE_FILE} |
-      ($abi_version >= 3 && $LANDLOCK_ACCESS_FS{TRUNCATE});
+    my $expected = $LANDLOCK_ACCESS_FS{READ_FILE} | $LANDLOCK_ACCESS_FS{WRITE_FILE};
+    if ($abi_version >= 3) { $expected->bior($LANDLOCK_ACCESS_FS{TRUNCATE}) }
     is(
         ll_add_path_beneath_rule(
             $ruleset_fd,

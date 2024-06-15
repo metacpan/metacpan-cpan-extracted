@@ -56,6 +56,10 @@ This will allow you to load vector graphics based themes like Breeze. We did not
 prerequisite since it does not respond well to unattended install. It requires the gnome library 
 librsvg-2 and its development files to be installed.
 
+## Tk::DynaMouseWheelBind
+
+For mouse wheel scrolling of all kinds of Panes and Canvasses.
+
 ## On Windows
 
 If you use the windows operating system please make sure you have an icon library installed.

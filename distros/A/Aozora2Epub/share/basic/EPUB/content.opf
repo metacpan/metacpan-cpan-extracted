@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package version="3.0" xmlns="http://www.idpf.org/2007/opf" xml:lang="ja-JP" unique-identifier="epub-id-1" prefix="ibooks: http://vocabulary.itunes.apple.com/rdf/ibooks/vocabulary-extensions-1.0/">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
+    <dc:identifier id="epub-id-1">urn:uuid:<: $uuid :></dc:identifier>
+    <dc:title id="epub-title-1"><: $title :></dc:title>
+    <dc:date id="epub-date"><: $date :></dc:date>
+    <dc:language>ja-JP</dc:language>
+    <dc:creator id="epub-creator-1"><: $author :></dc:creator>
+    <meta refines="#epub-creator-1" property="role" scheme="marc:relators">aut</meta>
+    <meta name="primary-writing-mode" content="vertical-rl" />
+    <meta property="dcterms:modified"><: $date :></meta>
+    <meta property="schema:accessMode">textual</meta>
+    <meta property="schema:accessModeSufficient">textual</meta>
+    <meta property="schema:accessibilityFeature">alternativeText</meta>
+    <meta property="schema:accessibilityFeature">readingOrder</meta>
+    <meta property="schema:accessibilityFeature">structuralNavigation</meta>
+    <meta property="schema:accessibilityFeature">tableOfContents</meta>
+    <meta property="schema:accessibilityHazard">none</meta>
+    : if $has_coverpage {
+    <meta name="cover" content="cover" />    
+    : }
+  </metadata>
+  <manifest>
+    : if $has_coverpage {
+    <item properties="cover-image" id="cover" href="cover.jpg" media-type="image/jpeg" />
+    : }
+    <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />
+    <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav" />
+    <item id="stylesheet1" href="styles/style.css" media-type="text/css" />
+    <item id="title_page_xhtml" href="text/title_page.xhtml" media-type="application/xhtml+xml" />
+    : if $has_okuzuke {
+    <item id="okuzuke_xhtml" href="text/okuzuke.xhtml" media-type="application/xhtml+xml" />
+    : }
+    : if $has_sections {
+    <item id="toc" href="toc.xhtml" media-type="application/xhtml+xml" />
+    : }
+    : for $files -> $c {
+    <item id="<: $c.name :>_xhtml" href="text/<: $c.name :>.xhtml" media-type="application/xhtml+xml" />
+    : }
+    : for $assets -> $c {
+    <item id="<: $c.name :>" href="<: $c.value :>" media-type="image/png" />
+    : }
+  </manifest>
+  <spine toc="ncx" page-progression-direction="rtl">
+    <itemref idref="title_page_xhtml" linear="yes" />
+    : if $has_sections {
+    <itemref idref="toc" />
+    : }
+    : for $files -> $c {
+    <itemref idref="<: $c.name :>_xhtml" />
+    : }
+    : if $has_okuzuke {    
+    <itemref idref="okuzuke_xhtml" />
+    : }
+  </spine>
+  <guide>
+    <reference type="toc" title="目次" href="nav.xhtml" />
+  </guide>
+</package>

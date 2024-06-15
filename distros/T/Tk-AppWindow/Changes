@@ -1,5 +1,16 @@
 Revision history for Perl extension Tk::AppWindow.
 
+0.08 Fri Jun 14 2024
+	- fixed bug in extension MDI.
+	- added methods menuCreate and menuConfig to extension MenuBar
+	- fixed bug in base class PluginJobs
+	- got rid of Module::Load::Conditional;
+	- added method getFileIcon to extension Art
+	- extension art now has a cache to reduce system resources for frequently used icons.
+	- corrected documentation in extension Panels
+	- extension MDI now has a dropdown item for recent files on the toolbar
+	- revised about box in extension Help
+
 0.07 Sun Jun 02 2024
 	- fixed bug in base class PluginJobs.
 	- added Tk::DynaMouseWheelBind to AppWindow and bound it to some classes.

@@ -45,7 +45,7 @@ SpeL::Object::Relation - LaTeX relation object
 
 =head1 VERSION
 
-version 20240610
+version 20240614
 
 =head1 METHODS
 

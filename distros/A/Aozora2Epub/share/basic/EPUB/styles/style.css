@@ -1,0 +1,163 @@
+body {
+    writing-mode: vertical-rl;
+    -epub-writing-mode: vertical-rl;
+    -webkit-writing-mode: vertical-rl;
+}
+
+.o-midashi {
+    margin: 0; paddig:0;
+}
+.naka-midashi {
+    margin: 0; paddig:0;
+}
+
+.dogyo-o-midashi { display:inline;}
+.dogyo-naka-midashi { display:inline;}
+.dogyo-ko-midashi { display:inline;}
+.mado-o-midashi { display:inline;}
+.mado-naka-midashi { display:inline;}
+.mado-ko-midashi {
+    display: inline;
+    margin:0; padding:0;
+    font-size: 1.1em;
+}
+
+figure {
+    writing-mode: horizontal-tb;
+    -epub-writing-mode: horizontal-tb;
+    -webkit-writing-mode: horizontal-tb;
+}
+
+figure figcaption {
+    text-align: center;
+}
+
+h1.tobira {
+    padding-right: 3em; 
+    padding-top: 3em;
+    font-size: 1.2em;
+}
+
+h1, h2 {
+    padding-top: 4em;
+    font-size: 1.1em;
+    padding-right: 1em;
+}
+
+.subscript { font-size: small; }
+.superscript { font-size: small; }
+.kaeriten { font-size: small; }
+.okurigana { font-size: small; }
+
+span.notes {font-size: 0.8em;}
+img.gaiji { width: 1em; height: 1em; align: top; }
+
+.gaiji_list {margin-left: 3em;}
+
+.keigakomi {border: solid 1px;}
+div.keigakomi{padding-top: 0.5em;
+              padding-bottom: 0.5em;
+              padding-right: 0.5em;
+              padding-left: 1em;}
+
+.futoji { font-weight: bold;}
+.shatai { font-style: italic;}
+
+.sesame_dot {
+    font-style: normal;
+    text-emphasis-style: filled sesame;
+    -webkit-text-emphasis-style: filled sesame;
+    -epub-text-emphasis-style: filled sesame;
+}
+
+.white_sesame_dot {
+    font-style: normal;
+    text-emphasis-style: open sesame;
+    -webkit-text-emphasis-style: open sesame;
+    -epub-text-emphasis-style: open sesame;
+}
+
+.black_circle {
+    font-style: normal;
+    text-emphasis-style: filled circle;
+    -webkit-text-emphasis-style: filled circle;
+    -epub-text-emphasis-style: filled circle;
+}
+
+.white_circle {
+    font-style: normal;
+    text-emphasis-style: open circle;
+    -webkit-text-emphasis-style: open circle;
+    -epub-text-emphasis-style: open circle;
+}
+
+.black_up-pointing_triangle {
+    font-style: normal;
+    text-emphasis-style: filled triangle;
+    -webkit-text-emphasis-style: filled triangle;
+    -epub-text-emphasis-style: filled triangle;
+}
+
+.white_up-pointing_triangle {
+    font-style: normal;
+    text-emphasis-style: open triangle;
+    -webkit-text-emphasis-style: open triangle;
+    -epub-text-emphasis-style: open triangle;
+}
+
+.saltire {
+    font-style: normal;
+    text-emphasis-style: 'x'
+    -webkit-text-emphasis-style: 'x';
+    -epub-text-emphasis-style: 'x';
+}
+
+.underline_solid  {
+    font-style: normal;
+    text-decoration: underline solid;
+}
+
+.underline_double {
+    font-style: normal;
+    text-decoration: underline double;
+}
+
+.underline_dotted {
+    font-style: normal;
+    text-decoration: underline dotted;
+}
+
+.underline_dashed {
+    font-style: normal;
+    text-decoration: underline dashed;
+}
+
+.underline_wave   {
+    font-style: normal;
+    text-decoration: underline wavy;
+}
+
+.overline_solid  {
+    font-style: normal;
+    text-decoration: overline solid;
+}
+
+.overline_double {
+    font-style: normal;
+    text-decoration: overline double;
+}
+
+.overline_dotted {
+    font-style: normal;
+    text-decoration: overline dotted;
+}
+
+.overline_dashed {
+    font-style: normal;
+    text-decoration: overline dashed;
+}
+
+.overline_wave   {
+    font-style: normal;
+    text-decoration: overline wavy;
+}

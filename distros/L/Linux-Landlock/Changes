@@ -1,3 +1,7 @@
+0.8   2024-06-15T00:17:56+02:00
+     - add support for Landlock ABI 5
+     - switch to Math::BigInt to support pure 32-bit Perls
+
 0.7   2024-05-25T14:38:00+02:00
      - require Perl 5.22 or newer, since fileno on directory handles
        is more or less essential for this module

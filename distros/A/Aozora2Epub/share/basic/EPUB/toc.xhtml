@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="ja-JP" xml:lang="ja-JP">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="aozora2epub" />
+  <title><: $title :></title>
+  <style>
+    h1 { font-size: 1.25em; }
+    div.level1 { margin-top: 2em; }
+    div.level2 { margin-top: 4em; }
+  </style>
+  <link rel="stylesheet" type="text/css" href="styles/style.css" />
+</head>
+<body epub:type="bodymatter">
+  <h1>目次</h1>
+  : for $sections -> $s {
+      <div class="level1"><a href="text/<: $s.file :>.xhtml#<:$s.id :>"><: $s.title :></a></div>
+    : if $s.children  {
+      : for $s.children -> $s1 {
+	<div class="level2"><a href="text/<: $s1.file :>.xhtml#<:$s1.id :>"><: $s1.title :></a></div>
+      : }
+    : }
+  : }
+</body>
+</html>

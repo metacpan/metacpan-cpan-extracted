@@ -195,7 +195,6 @@ Tk::AppWindow::CookBook - Some recipies
         -statusbarvisible => ['boolean', 'Visible at launch'],
         '*end',
      ],
-     -verbose => 1,
   );
   
   $iv->cmdConfig('scaletofit' => [\&Zoom, 'fit']);

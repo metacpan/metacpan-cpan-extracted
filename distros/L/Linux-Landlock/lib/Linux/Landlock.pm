@@ -90,6 +90,7 @@ Possible access rights are:
     make_sym
     refer
     truncate
+    ioctl_dev
 
 See  L<https://docs.kernel.org/userspace-api/landlock.html> for all possible access rights.
 
@@ -98,8 +99,8 @@ If C<die_on_unsupported> is used, it will also die if the rules are not supporte
 current kernel.
 
 B<Beware>: While the API accepts a path or user space file descriptor, the rule is actually
-applied to the kernel internal file system object. This means that you will lose access if a
-path or directory you allowed access to is renamed or replaced.
+checked against the corresponding, kernel internal file system object. This means that you
+will lose access if a path or directory you allowed access to is renamed or replaced.
 
 =item add_net_port_rule($port, @allowed)
 
@@ -161,7 +162,7 @@ use Linux::Landlock::Direct qw(
   ll_create_net_ruleset
   set_no_new_privs
 );
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 
 sub new {
     my ($class, %args) = @_;

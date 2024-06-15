@@ -26,15 +26,13 @@ requires:
   Imager: '1.019'
   Imager::File::PNG: '0.99'
   MIME::Base64: '3.16'
-  Module::Load::Conditional: '0.74'
   Pod::Usage: '2.01'
   Scalar::Util: '1.62'
   Scalar::Util::Numeric: '0.40'
   Test::More: '1.3'
   Test::Tk: '3.03'
   Tk: '804.023'
-  Tk::DocumentTree: '0.07'
-  Tk::DynaMouseWheelBind: '0.02'
+  Tk::DocumentTree: '0.08'
   Tk::FontDialog: '0.18'
   Tk::Pod: '5.41'
   Tk::QuickForm: '0.04'
@@ -42,5 +40,5 @@ requires:
   Tk::YANoteBook: '0.06'
 resources:
   repository: git://github.com/haje61/Tk-AppWindow.git
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

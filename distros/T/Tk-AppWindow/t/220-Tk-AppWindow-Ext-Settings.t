@@ -18,7 +18,7 @@ use lib './t/lib';
 use Test::Tk;
 $mwclass = 'Tk::AppWindow';
 
-use Test::More tests => 4;
+use Test::More tests => 7;
 BEGIN { 
 	use_ok('Tk::AppWindow::Ext::Settings');
 };
@@ -58,9 +58,11 @@ if (defined $app) {
 	$ext = $app->extGet('Settings');
 }
 
-@tests = (
-	[sub { return $ext->Name }, 'Settings', 'extension Settings loaded']
-);
+testaccessors($ext, 'dialog', 'SettingsFile', 'UserOptions');
+
+push @tests,
+	[sub { return $ext->Name }, 'Settings', 'extension Settings loaded'],
+;
 
 starttesting;
 

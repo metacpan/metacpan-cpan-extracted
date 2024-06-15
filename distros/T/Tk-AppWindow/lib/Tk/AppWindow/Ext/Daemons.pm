@@ -1,40 +1,40 @@
-{#hide from metacpan
-	package BackgroundJob;
-	
-	use strict;
-	use warnings;
-	use Carp;
-	use base qw(Tk::AppWindow::BaseClasses::Callback);
-	
-	sub new {
-		my $class = shift;
-		my $interval = shift;
-		my $self = $class->SUPER::new(@_);
-		$self->{INTERVAL} = $interval;
+package #hide from metacpan
+	BackgroundJob;
+
+use strict;
+use warnings;
+use Carp;
+use base qw(Tk::AppWindow::BaseClasses::Callback);
+
+sub new {
+	my $class = shift;
+	my $interval = shift;
+	my $self = $class->SUPER::new(@_);
+	$self->{INTERVAL} = $interval;
+	$self->{COUNT} = 1;
+	$self->{PAUSED} = 0;
+	return $self;
+}
+
+sub execute {
+	my $self = shift;
+	return if $self->paused;
+	my $interval = $self->{INTERVAL};
+	my $count = $self->{COUNT};
+	if ($count eq $interval) {
+		$self->SUPER::execute(@_);
 		$self->{COUNT} = 1;
-		$self->{PAUSED} = 0;
-		return $self;
-	}
-	
-	sub execute {
-		my $self = shift;
-		return if $self->paused;
-		my $interval = $self->{INTERVAL};
-		my $count = $self->{COUNT};
-		if ($count eq $interval) {
-			$self->SUPER::execute(@_);
-			$self->{COUNT} = 1;
-		} else {
-			$self->{COUNT} = $count + 1
-		}
-	}
-	
-	sub paused {
-		my $self = shift;
-		$self->{PAUSED} = shift if @_;
-		return $self->{PAUSED}
+	} else {
+		$self->{COUNT} = $count + 1
 	}
 }
+
+sub paused {
+	my $self = shift;
+	$self->{PAUSED} = shift if @_;
+	return $self->{PAUSED}
+}
+
 
 package Tk::AppWindow::Ext::Daemons;
 
@@ -48,7 +48,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.04";
+$VERSION="0.08";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -61,7 +61,7 @@ use base qw( Tk::AppWindow::BaseClasses::Extension );
 
 =head1 DESCRIPTION
 
-Easily run background jobs organized neatly system wide.
+Easily run background jobs organized neatly application wide.
 
 =head1 CONFIG VARIABLES
 

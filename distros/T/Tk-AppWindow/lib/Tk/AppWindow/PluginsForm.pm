@@ -17,6 +17,7 @@ Construct Tk::Widget 'PluginsForm';
 
 require Tk::LabFrame;
 require Tk::Pane;
+use Data::Compare;
 
 =head1 DESCRIPTION
 
@@ -64,6 +65,7 @@ sub Populate {
 			-relief => 'groove',
 		)->pack(-fill => 'x', -padx => 2, -pady => 2);
 		$f->Checkbutton(
+# TODO reinstate this after bugfix with plug loading after main loop
 			-command => sub {
 				if ($val) {
 					$ext->plugLoad($plug);
@@ -85,11 +87,11 @@ sub Populate {
 
 	my $bf = $self->Frame->pack(-fill => 'x');
 	$bf->Button(
-		-text => 'Load all',
+		-text => 'Select all',
 		-command => ['LoadAll', $self],
 	)->pack(-side => 'left', -padx => 2, -pady => 2);
 	$bf->Button(
-		-text => 'Unload all',
+		-text => 'Select none',
 		-command => ['UnloadAll', $self],
 	)->pack(-side => 'left', -padx => 2, -pady => 2);
 	$self->ConfigSpecs(
@@ -98,19 +100,39 @@ sub Populate {
 	);
 }
 
+#sub Apply {
+#	my $self = shift;
+#	my $ext = $self->cget('-pluginsext');
+#	my @current = $ext->plugList;
+#	my @new = ();
+#	my $plugs = $self->{PLUGINS};
+#	for (sort keys %$plugs) {
+#		my $var = $plugs->{$_};
+#		push @new, $_ if $$var;
+#	}
+#	unless (Compare(\@current, \@new)) {
+#		$ext->SavePlugList(@new);
+#		my $name = $ext->configGet('-appname');
+#		$ext->popMessage("Please restart $name", 'dialog-warning');
+#	}
+#}
+
 sub LoadAll {
 	my $self = shift;
 	my $ext = $self->cget('-pluginsext');
 	my $plugins = $self->{PLUGINS};
 	for (sort keys %$plugins) {
 		my $plug = $_;
+#		my $val = $plugins->{$plug};
+#		$$val = 1;
+# TODO reinstate this after bugfix with plug loading after main loop
 		$ext->plugLoad($plug);
 		$self->after(10, sub {
 			my $v = $plugins->{$plug};
 			if ($ext->plugExists($plug)) {
 				$$v = 1
 			} else {
-				$$v = 0
+				$$v = ''
 			}
 		});
 	}
@@ -122,6 +144,9 @@ sub UnloadAll {
 	my $plugins = $self->{PLUGINS};
 	for (sort keys %$plugins) {
 		my $plug = $_;
+#		my $val = $plugins->{$plug};
+#		$$val = '';
+# TODO reinstate this after bugfix with plug loading after main loop
 		$ext->plugUnload($plug);
 		$self->after(10, sub {
 			my $v = $plugins->{$plug};

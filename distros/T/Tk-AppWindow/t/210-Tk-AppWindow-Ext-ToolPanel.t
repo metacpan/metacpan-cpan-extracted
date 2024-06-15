@@ -6,6 +6,7 @@ use lib './t/lib';
 use Test::Tk;
 $mwclass = 'Tk::AppWindow';
 $delay = 1500;
+$quitdelay = 1000;
 
 use Test::More tests => 4;
 BEGIN { 

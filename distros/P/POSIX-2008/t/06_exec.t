@@ -19,7 +19,7 @@ if ($^O ne 'VMS' && $perlpath !~ m/$Config{_exe}$/i) {
 
 my $rv;
 my $tmpf = mktemp('X'x20);
-my $envp = {_ec_ => 37};
+my $envp = {_ec_ => 73};
 my $argv = ['perl', '-e', 'exit($ENV{_ec_})'];
 
 SKIP: {
@@ -44,7 +44,7 @@ SKIP: {
   my $pid = fork();
   if ($pid) {
     wait();
-    cmp_ok($?>>8, '==', 37, 'execveat() returned 37');
+    cmp_ok($?>>8, '==', 73, 'execveat() returned 73');
   }
   elsif (defined $pid) {
     POSIX::2008::execveat(POSIX::2008::AT_FDCWD, $perlpath, $argv, $envp);
@@ -87,7 +87,7 @@ SKIP: {
   my $pid = fork();
   if ($pid) {
     wait();
-    cmp_ok($?>>8, '==', 37, 'fexecve() returned 37');
+    cmp_ok($?>>8, '==', 73, 'fexecve() returned 73');
   }
   elsif (defined $pid) {
     my $omode =

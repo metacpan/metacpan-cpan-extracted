@@ -1,5 +1,19 @@
 Revision history for POSIX::2008.
 
+0.24  2024-06-14
+  - Updated ppport.h to version 3.72.
+  - Fixed potential env buffer overflow in _execve50c().
+  - Flush I/O buffers before calling fexecve()/execveat().
+  - Support magic function arguments.
+  - Support arrayref argument for strptime() (addresses foreign RT#66519).
+  - Call readlinkat() for readlink() if available to avoid a branch.
+  - Don't write to SvPV(sv)[SvLEN(sv)-1], otherwise Perl >= 5.20 tends to
+    segfault because it abuses this char for COW counting. [facepalm.gif]
+  - Adjusted some prototypes: clock_nanosleep($$@), clock_settime($@),
+    futimens($@), nanosleep(@), setitimer($@), timer_settime($$@),
+    utimensat($$;$@).
+  - POD updates.
+
 0.23  2024-01-27
   - t/06_exec.t: Skip fexecve test if we can't sysopen() the Perl executable.
   - Removed silly fileno int range check added in 0.22 because AT_FDCWD is

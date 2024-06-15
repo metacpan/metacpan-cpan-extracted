@@ -36,7 +36,7 @@ SpeL::Object::MathGroup - LaTeX Mathgroup object
 
 =head1 VERSION
 
-version 20240610
+version 20240614
 
 =head1 METHODS
 

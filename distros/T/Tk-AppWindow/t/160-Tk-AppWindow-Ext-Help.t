@@ -10,6 +10,16 @@ BEGIN { use_ok('Tk::AppWindow::Ext::Help') };
 
 createapp(
 	-extensions => [qw[Art MenuBar Help]],
+	-aboutinfo => {
+#		version => undef,
+		author => 'Some L. Dude',
+		http => 'https://www.nowhere.com',
+		email => 'sdude@nowhere.com',
+#		license => undef,
+#		licenselink => 'https://www.nowhere.com',
+		licensefile => 't/sample_help.pod',
+		components => [ 'Tk', 'Imager' ],
+	},
 	-helpfile => 't/sample_help.pod',
 #	-helpfile => 'https://www.google.com',
 );

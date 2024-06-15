@@ -22,7 +22,9 @@ for ($outfile, $outfile2) {
   unlink $_ if -r $_;
 }
 
-App::Aphra->new->run;
+my $app = App::Aphra->new;
+is($app->uri, 'https://example.com/', 'Correct URI');
+$app->run;
 
 ok(-e $outfile, 'Got an output file');
 ok(-f $outfile, "... and it's a real file");

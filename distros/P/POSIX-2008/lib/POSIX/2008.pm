@@ -8,7 +8,7 @@ use IO::File ();
 
 require Exporter;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION; # so "use Module 0.002" won't warn on underscore
 

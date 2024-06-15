@@ -1,4 +1,4 @@
-package Tk::AppWindow::Plugins::Test;
+package Alternative::NameSpace::Plugins::Test;
 
 use strict;
 use warnings;
@@ -15,7 +15,11 @@ This is for testing only. Yes, you read me, for TESTING. Didn't you hear me say?
 
 sub new {
 	my $class = shift;
-	my $self = $class->SUPER::new(@_);
+	my $self = $class->SUPER::new(@_, 'NavigatorPanel');
+	return undef unless defined $self;
+	my $tp = $self->extGet('NavigatorPanel');
+	my $page = $tp->addPage('Colors', 'fill-color', undef, 'Select and insert colors');
+	$page->Label(-text => 'Colors')->pack(-expand => 1, -fill => 'both');
 	$self->{QUITTER} = 1;
 	$self->cmdHookBefore('plusser', $plsub);
 # 	$self->Require('Dummy');
@@ -54,6 +58,7 @@ sub Unload {
 	my $self = shift;
 	if ($self->{QUITTER}) {
 		$self->cmdUnhookBefore('plusser', $plsub);
+		$self->extGet('NavigatorPanel')->deletePage('Colors');
 		return $self->SUPER::Unload
 	}
 	return 0

@@ -34,10 +34,12 @@ use Getopt::Long;
 use Carp;
 use Clone 'clone';
 use YAML::XS 'LoadFile';
+use Sys::Hostname;
+use URI;
 
 use App::Aphra::File;
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.3';
 
 has commands => (
   isa => 'HashRef',
@@ -161,6 +163,27 @@ sub _build_template {
     OUTPUT_PATH  => $self->config->{target},
     WRAPPER      => $self->config->{wrapper},
   );
+}
+
+has uri => (
+  isa => 'URI',
+  is  => 'ro',
+  lazy_build => 1,
+);
+
+sub _build_uri {
+  my $self = shift;
+
+  return URI->new($self->site_vars->{uri}) if $self->site_vars->{uri};
+
+  my $host = $self->site_vars->{host} || hostname;
+  my $protocol = $self->site_vars->{protocol} || 'https';
+
+  my $uri = "$protocol://$host";
+  $uri .= ':' . $self->site_vars->{port} if $self->site_vars->{port};
+  $uri .= '/';
+
+  return URI->new($uri);
 }
 
 sub run {

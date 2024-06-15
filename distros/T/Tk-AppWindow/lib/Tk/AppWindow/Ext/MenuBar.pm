@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Tk;
 use vars qw($VERSION);
-$VERSION="0.07";
+$VERSION="0.08";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -151,34 +151,6 @@ my %types = (
 	menu_separator => \&ConfMenuSeparator,
 );
 
-sub MenuStack {
-	my $self = shift;
-	my $stack = [];
-	my @menuitems = @_;
-	my $count = 0;
-	my $keeploop = 1;
-	while ((@menuitems) and $keeploop) {
-		my $i = shift @menuitems;
-		my @item = @$i;
-		my $type = shift @item;
-		if (exists $types{$type}) {
-			my $c = $types{$type};
-			unless (&$c($self, $stack, @item)) {
-				push @menuitems, $i
-			}
-		} else {
-			warn "undefined menu type $type"
-		}
-		$count ++;
-		if ($count > 1000) {
-			warn "Invalid menupath: " . $item[0];
-			$keeploop = 0;
-		}
-	}
-	$self->CheckStackForImages($stack);
-	return $stack
-}
-
 sub Configure {
 	my $self = shift;
 	my $w = $self->GetAppWindow;
@@ -189,8 +161,30 @@ sub Configure {
 	} else {
 		$menu->delete(0, 'end');
 	}
-	my $stack = $self->MenuStack(@_);
+	my $stack = $self->menuStack(@_);
 	$self->FillMenu($menu, $stack);
+}
+
+sub createMenu {
+	my $self = shift;
+	my $parent = shift;
+	my $mpsave = $self->{MENUPOST};
+	my $calls = [];
+	$self->{MENUPOST} = $calls;
+	my $menu = $parent->Menu(
+		-menuitems => $self->menuStack(@_),
+		-postcommand => sub {
+			for (@$calls) {
+				if (ref $_) {
+					&$_
+				} else {
+					$self->cmdExecute($_)
+				}
+			}
+		},
+	);
+	$self->{MENUPOST} = $mpsave;
+	return $menu
 }
 
 sub ConfGetCommand {
@@ -461,15 +455,57 @@ sub FindMenuEntry {
 	warn "Menu entry $path  not found";
 }
 
+=item B<menuContext>I<($parent, @menulist)>
+
+Same as B<menuCreate>, but binds it unpost at <Leave> basically turning
+it into a context menu.
+
+=cut
+
+sub menuContext {
+	my $self = shift;
+	my $menu = $self->menuCreate(@_);
+	$menu->bind('<Leave>', sub { $menu->unpost });
+	return $menu
+}
+
+=item B<menuCreate>I<($parent, @menulist)>
+
+Returns a Tk::Menu object. It's items in @menulist are according to the
+section below CONFIGURING MENUS.
+
+=cut
+
+sub menuCreate {
+	my $self = shift;
+	my $parent = shift;
+	my $mpsave = $self->{MENUPOST};
+	my $calls = [];
+	$self->{MENUPOST} = $calls;
+	my $menu = $parent->Menu(
+		-menuitems => $self->menuStack(@_),
+		-postcommand => sub {
+			for (@$calls) {
+				if (ref $_) {
+					&$_
+				} else {
+					$self->cmdExecute($_)
+				}
+			}
+		},
+	);
+	$self->{MENUPOST} = $mpsave;
+	return $menu
+}
+
 sub MenuPost {
 	my $self = shift;
 	my $calls = $self->{MENUPOST};
-	my $w = $self->GetAppWindow;
 	for (@$calls) {
 		if (ref $_) {
 			&$_
 		} else {
-			$w->cmdExecute($_)
+			$self->cmdExecute($_)
 		}
 	}
 }
@@ -478,6 +514,46 @@ sub MenuPostAdd {
 	my ($self, $cmd) = @_;
 	my $calls = $self->{MENUPOST};
 	push @$calls, $cmd
+}
+
+=item B<menuStack>I<(@menulist)>
+
+Returns a reference to a list that can be used as the B<-menuitems>
+at menu creation. So:
+
+ my $menu = $w->Menu(-menuitems => $menubar->menuStack(@menulist);
+ 
+
+Items in @menulist are according to the section below CONFIGURING MENUS.
+
+=cut
+
+sub menuStack {
+	my $self = shift;
+	my $stack = [];
+	my @menuitems = @_;
+	my $count = 0;
+	my $keeploop = 1;
+	while ((@menuitems) and $keeploop) {
+		my $i = shift @menuitems;
+		my @item = @$i;
+		my $type = shift @item;
+		if (exists $types{$type}) {
+			my $c = $types{$type};
+			unless (&$c($self, $stack, @item)) {
+				push @menuitems, $i
+			}
+		} else {
+			warn "undefined menu type $type"
+		}
+		$count ++;
+		if ($count > 1000) {
+			warn "Invalid menupath: " . $item[0];
+			$keeploop = 0;
+		}
+	}
+	$self->CheckStackForImages($stack);
+	return $stack
 }
 
 sub ReConfigure {

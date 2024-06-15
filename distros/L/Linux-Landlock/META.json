@@ -35,6 +35,7 @@
             "Config" : "0",
             "Exporter" : "0",
             "List::Util" : "0",
+            "Math::BigInt" : "0",
             "POSIX" : "0"
          }
       },
@@ -60,7 +61,7 @@
          "web" : "https://github.com/mballarin/perl-linux-landlock"
       }
    },
-   "version" : "0.7",
+   "version" : "0.8",
    "x_osname" : "linux",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

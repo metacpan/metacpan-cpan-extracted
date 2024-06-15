@@ -58,6 +58,7 @@ sub new {
 			return undef
 		}
 	}
+	$self->after(10, ['CheckSettingsPage', $self]);
 	return $self
 }
 
@@ -66,6 +67,14 @@ sub AUTOLOAD {
 	return if $AUTOLOAD =~ /::DESTROY$/;
 	$AUTOLOAD =~ s/^.*:://;
 	return $self->{APPWINDOW}->$AUTOLOAD(@_);
+}
+
+sub _getnb {
+	my $self = shift;
+	my $set = $self->extGet('Settings');
+	my $nb;
+	$nb = $set->NBWidget if defined $set;
+	return $nb;
 }
 
 =head1 METHODS
@@ -81,6 +90,13 @@ Overwrite it to check for unsaved data and possibly veto these commands by retur
 
 sub CanQuit { return 1 }
 
+sub CheckSettingsPage {
+	my $self = shift;
+	my $nb = $self->_getnb;
+	return unless defined $nb;
+	my $set = $self->extGet('Settings');
+	$set->externalAdd($self->SettingsPage);
+}
 
 =item B<GetAppWindow>
 
@@ -176,14 +192,10 @@ sub Unload {
 	my $self = shift;
 	my @sp = $self->SettingsPage;
 	my $set = $self->extGet('Settings');
-	my $nb;
-	$nb = $set->NBWidget if defined $set;
-	if ((@sp) and (defined $set) and (defined $nb)) {
+	if (defined $set) {
 		while (@sp) {
 			my $page = shift @sp;
-			my @pages = $nb->pages;
-			my @exist = grep(/$page/, @pages);
-			$nb->delete($page) if @exist;
+			$set->externalRemove($page);
 			shift @sp
 		}
 	}

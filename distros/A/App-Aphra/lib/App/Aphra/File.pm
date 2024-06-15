@@ -7,6 +7,7 @@ use File::Path 'make_path';
 use File::Copy;
 use Text::FrontMatter::YAML;
 use Path::Tiny ();
+use URI;
 
 has [qw[path name extension ]] => (
   isa => 'Str',
@@ -88,6 +89,19 @@ sub full_name {
   return $full_name;
 }
 
+sub uri {
+  my $self = shift;
+
+  my $uri = $self->app->uri;
+  my $base = $self->app->site_vars->{base};
+  my $path = $self->output_name;
+  $path =~ s/^$base//;
+  $uri .= $path;
+  $uri =~ s/index\.html$//;
+  
+  return URI->new($uri);
+}
+
 sub process {
   my $self = shift;
 
@@ -113,6 +127,7 @@ sub process {
 
     $self->app->template->process($template, {
       page => ($front_matter->frontmatter_hashref // {}),
+      file => $self,
     }, $out)
       or croak $self->app->template->error;
   } else {
