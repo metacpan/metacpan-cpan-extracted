@@ -6,11 +6,8 @@ package SpeL::Object::RelOperator;
 
 use SpeL::Object::Environment;
 use SpeL::Object::Group;
-use SpeL::Object::PositionGroup;
 use SpeL::Object::MathInline;
 use SpeL::Object::MathEnvironment;
-use SpeL::Object::Sectioning;
-use SpeL::Object::Parsep;
 use SpeL::Object::Item;
 use SpeL::Object::Command;
 use SpeL::Object::TokenSequence;
@@ -57,7 +54,7 @@ SpeL::Object::RelOperator - LaTeX relational operator object
 
 =head1 VERSION
 
-version 20240614
+version 20240615
 
 =head1 METHODS
 

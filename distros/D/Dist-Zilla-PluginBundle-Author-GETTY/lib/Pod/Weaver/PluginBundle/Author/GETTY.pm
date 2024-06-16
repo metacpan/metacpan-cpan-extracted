@@ -3,7 +3,7 @@ use warnings;
 package Pod::Weaver::PluginBundle::Author::GETTY;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: GETTY's default Pod::Weaver config
-$Pod::Weaver::PluginBundle::Author::GETTY::VERSION = '0.114';
+$Pod::Weaver::PluginBundle::Author::GETTY::VERSION = '0.115';
 
 use Pod::Weaver::Config::Assembler;
 sub _exp { Pod::Weaver::Config::Assembler->expand_package($_[0]) }
@@ -56,7 +56,7 @@ Pod::Weaver::PluginBundle::Author::GETTY - GETTY's default Pod::Weaver config
 
 =head1 VERSION
 
-version 0.114
+version 0.115
 
 =head1 DESCRIPTION
 
@@ -80,11 +80,11 @@ C<-Transformer> with L<Pod::Elemental::Transformer::List>
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudss.us> L<http://www.raudss.us/>
+Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Torsten Raudssus L<http://www.raudss.us/>.
+This software is copyright (c) 2024 by Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

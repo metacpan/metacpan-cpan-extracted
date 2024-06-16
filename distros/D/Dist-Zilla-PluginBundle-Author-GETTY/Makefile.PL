@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "BeLike::GETTY when you build your dists",
-  "AUTHOR" => "Torsten Raudssus <torsten\@raudss.us> L<http://www.raudss.us/>",
+  "AUTHOR" => "Torsten Raudssus <torsten\@raudssus.de> L<https://raudss.us/>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -20,7 +20,6 @@ my %WriteMakefileArgs = (
     "Dist::Zilla" => "4.300030",
     "Dist::Zilla::Plugin::Alien" => "0.011",
     "Dist::Zilla::Plugin::Authority" => "1.006",
-    "Dist::Zilla::Plugin::BumpVersionFromGit" => "0.009",
     "Dist::Zilla::Plugin::ChangelogFromGit" => "0.006",
     "Dist::Zilla::Plugin::Deprecated" => "0.007",
     "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" => "0.006",
@@ -33,7 +32,6 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::Repository" => "0.19",
     "Dist::Zilla::Plugin::Run" => "0.018",
     "Dist::Zilla::Plugin::TaskWeaver" => "0.101624",
-    "Dist::Zilla::Plugin::TravisCI" => 0,
     "Dist::Zilla::PluginBundle::Git" => "2.009",
     "Pod::Elemental" => "0.102362",
     "Pod::Elemental::Transformer::List" => "0.101620",
@@ -42,7 +40,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.114",
+  "VERSION" => "0.115",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +52,6 @@ my %FallbackPrereqs = (
   "Dist::Zilla" => "4.300030",
   "Dist::Zilla::Plugin::Alien" => "0.011",
   "Dist::Zilla::Plugin::Authority" => "1.006",
-  "Dist::Zilla::Plugin::BumpVersionFromGit" => "0.009",
   "Dist::Zilla::Plugin::ChangelogFromGit" => "0.006",
   "Dist::Zilla::Plugin::Deprecated" => "0.007",
   "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" => "0.006",
@@ -67,7 +64,6 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::Repository" => "0.19",
   "Dist::Zilla::Plugin::Run" => "0.018",
   "Dist::Zilla::Plugin::TaskWeaver" => "0.101624",
-  "Dist::Zilla::Plugin::TravisCI" => 0,
   "Dist::Zilla::PluginBundle::Git" => "2.009",
   "Pod::Elemental" => "0.102362",
   "Pod::Elemental::Transformer::List" => "0.101620",

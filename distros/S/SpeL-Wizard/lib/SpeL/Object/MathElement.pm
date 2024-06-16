@@ -35,7 +35,7 @@ SpeL::Object::MathElement - LaTeX mathelement object
 
 =head1 VERSION
 
-version 20240614
+version 20240615
 
 =head1 METHODS
 

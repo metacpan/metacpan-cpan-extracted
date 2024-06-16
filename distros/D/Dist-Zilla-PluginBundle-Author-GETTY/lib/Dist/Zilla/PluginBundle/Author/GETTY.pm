@@ -1,13 +1,11 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: BeLike::GETTY when you build your dists
-$Dist::Zilla::PluginBundle::Author::GETTY::VERSION = '0.114';
+$Dist::Zilla::PluginBundle::Author::GETTY::VERSION = '0.115';
 use Moose;
 use Moose::Autobox;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
-
-use Dist::Zilla::Plugin::TravisCI ();
 
 
 use Dist::Zilla::PluginBundle::Basic;
@@ -74,13 +72,6 @@ has no_cpan => (
   isa     => 'Bool',
   lazy    => 1,
   default => sub { $_[0]->payload->{no_cpan} },
-);
-
-has no_travis => (
-  is      => 'ro',
-  isa     => 'Bool',
-  lazy    => 1,
-  default => sub { exists $_[0]->payload->{no_travis} ? $_[0]->payload->{no_travis} : 1 },
 );
 
 has no_changelog_from_git => (
@@ -206,40 +197,7 @@ has alien_bin_requires => (
   default => sub { defined $_[0]->payload->{alien_bin_requires} ? $_[0]->payload->{alien_bin_requires} : [] },
 );
 
-my @travis_str_options = (
-  @Dist::Zilla::Plugin::TravisCI::bools,
-);
-
-my @travis_str_attributes = map { 'travis_'.$_ } @travis_str_options;
-
-for my $attr (@travis_str_attributes) {
-  has $attr => (
-    is      => 'ro',
-    isa     => 'Str',
-    lazy    => 1,
-    default => sub { defined $_[0]->payload->{$attr} ? $_[0]->payload->{$attr} : "" },
-  );
-}
-
-my @travis_array_options = (
-  @Dist::Zilla::Plugin::TravisCI::phases,
-  @Dist::Zilla::Plugin::TravisCI::emptymvarrayattr,
-  'irc_template',
-  'perl_version',
-);
-
-my @travis_array_attributes = map { 'travis_'.$_ } @travis_array_options;
-
-for my $attr (@travis_array_attributes) {
-  has $attr => (
-    is      => 'ro',
-    isa     => 'ArrayRef[Str]',
-    lazy    => 1,
-    default => sub { defined $_[0]->payload->{$attr} ? $_[0]->payload->{$attr} : [] },
-  );
-}
-
-sub mvp_multivalue_args { @travis_array_attributes, @run_attributes, @gather_array_attributes, 'alien_bin_requires' }
+sub mvp_multivalue_args { @run_attributes, @gather_array_attributes, 'alien_bin_requires' }
 
 sub configure {
   my ($self) = @_;
@@ -323,21 +281,6 @@ sub configure {
   ));
 
   $self->add_plugins($self->no_github ? 'Repository' : 'GithubMeta');
-
-  unless ($self->no_travis) {
-    $self->add_plugins([
-      TravisCI => {
-        ( map {
-          my $func = 'travis_'.$_;
-          $self->$func ? ( $_ => $self->$func ) : ();
-        } @travis_str_options ),
-        ( map {
-          my $func = 'travis_'.$_;
-          scalar @{$self->$func} ? ( $_ => $self->$func ) : ();
-        } @travis_array_options ),
-      },
-    ]);
-  }
 
   if ($self->is_alien) {
     my %alien_values;
@@ -434,7 +377,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.114
+version 0.115
 
 =head1 SYNOPSIS
 
@@ -458,7 +401,6 @@ are default):
   release_branch = master
   weaver_config = @Author::GETTY
   no_cpan = 0
-  no_travis = 1 # deactivate by default now
   no_install = 0
   no_makemaker = 0
   no_installrelease = 0
@@ -482,7 +424,6 @@ In default configuration it is equivalent to:
   [NextRelease]
   [PodSyntaxTests]
   [GithubMeta]
-  [TravisCI]
 
   [InstallRelease]
   install_command = cpanm .
@@ -544,12 +485,6 @@ excluding I<root> or I<prefix>:
   gather_exclude_filename = dir/skip
   gather_exclude_match = ^local_
 
-You can use all options of L<Dist::Zilla::Plugin::TravisCI> just by prefix
-them with B<travis_>, like here:
-
-  [@Author::GETTY]
-  travis_before_install = install_additional_packages.sh
-
 It also combines on request with L<Dist::Zilla::Plugin::Alien>, you can set
 all parameter of the Alien plugin here, just by preceeding with I<alien_>, the
 only required parameter here is C<alien_repo>:
@@ -593,11 +528,6 @@ will add L<Dist::Zilla::Plugin::Repository> instead.
 
 If set to 1, this attribute will disable L<Dist::Zilla::Plugin::UploadToCPAN>.
 By default a dzil release would release to L<CPAN|http://www.cpan.org/>.
-
-=head2 no_travis
-
-If set to 1, this attribute will disable L<Dist::Zilla::Plugin::TravisCI>. By
-default a dzil build or release would also generate a B<.travis.yml>.
 
 =head2 no_changelog_from_git
 
@@ -650,8 +580,6 @@ L<Dist::Zilla::Plugin::Alien>
 
 L<Dist::Zilla::Plugin::Authority>
 
-L<Dist::Zilla::Plugin::BumpVersionFromGit>
-
 L<Dist::Zilla::PluginBundle::Git>
 
 L<Dist::Zilla::Plugin::ChangelogFromGit>
@@ -672,15 +600,13 @@ L<Dist::Zilla::Plugin::Run>
 
 L<Dist::Zilla::Plugin::TaskWeaver>
 
-L<Dist::Zilla::Plugin::TravisCI>
-
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudss.us> L<http://www.raudss.us/>
+Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Torsten Raudssus L<http://www.raudss.us/>.
+This software is copyright (c) 2024 by Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

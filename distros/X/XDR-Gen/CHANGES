@@ -1,5 +1,12 @@
 -----
 
 
+0.0.2   2024-06-15
+    [Fixed]
+        * 'enum' allowed value validation during (de)serialization
+        * Undefined values when calculating name of (nested) 'enum' type
+    [Added]
+        * Emission of (for now empty) 'postamble' section
+
 0.0.1   2024-06-08
     Initial release

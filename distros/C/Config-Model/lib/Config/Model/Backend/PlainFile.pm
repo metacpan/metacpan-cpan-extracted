@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::PlainFile 2.153;
+package Config::Model::Backend::PlainFile 2.154;
 
 use 5.10.1;
 use Carp;
@@ -65,7 +65,7 @@ sub read {
         my $dir = $self->get_tuned_config_dir(%args);
         my $file = $dir->child($file_name);
 
-        $logger->trace("looking for plainfile $file for ", $obj->location);
+        $logger->trace("looking to read plainfile $file for ", $obj->location);
 
         my $type = $obj->get_type;
 
@@ -144,6 +144,8 @@ sub write {
         my $file_name = $self->get_file_name(%args, elt => $elt);
         my $file = $dir->child($file_name);
 
+        $logger->trace("looking to write plainfile $file for ", $obj->location);
+
         my $type = $obj->get_type;
         my @v;
 
@@ -220,7 +222,7 @@ Config::Model::Backend::PlainFile - Read and write config as plain file
 
 =head1 VERSION
 
-version 2.153
+version 2.154
 
 =head1 SYNOPSIS
 

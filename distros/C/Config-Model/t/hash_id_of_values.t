@@ -304,6 +304,12 @@ $oh->fetch_with_id('z')->store('1z');
 $oh->fetch_with_id('x')->store('2x');
 $oh->fetch_with_id('a')->store('3a');
 
+throws_ok {
+    $oh->copy('bogus','dont_care');
+}
+    'Config::Model::Exception::User',
+   "check copy unknown key";
+
 eq_or_diff( [ $oh->fetch_all_indexes ], [qw/z x a/], "check index order of ordered_hash" );
 $inst->clear_changes;
 
@@ -433,6 +439,12 @@ $oh->load_data( {
 } );
 eq_or_diff( [ $oh->fetch_all_indexes ],
     [qw/a b c d e/], "check index order of ordered_hash loaded with hash and __order" );
+
+throws_ok {
+    $oh->move('bogus','dont_care');
+}
+    'Config::Model::Exception::User',
+    "check move unknown key";
 
 $oh->move( 'e', 'e2' );
 eq_or_diff( [ $oh->fetch_all_indexes ],

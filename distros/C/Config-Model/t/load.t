@@ -554,8 +554,8 @@ subtest "test list.ensure" => sub {
     $root->load( qq!lista:.ensure(b2)! );
     eq_or_diff( [ $lista->fetch_all_values ], [qw/a b b2 c d/], "ensure(b2) -> inserted and sorted");
 
-    $root->load( qq!lista:.ensure(c2,f4,b2,c2)! );
-    eq_or_diff( [ $lista->fetch_all_values ], [qw/a b b2 c c2 d f4/], "ensure several values");
+    $root->load( qq!lista:.ensure(c2,f4,b2,c2,"z z")! );
+    eq_or_diff( [ $lista->fetch_all_values ], [qw/a b b2 c c2 d f4/, "z z"], "ensure several values");
 };
 
 subtest "test combination of annotation plus load and some utf8" => sub {
@@ -611,9 +611,13 @@ subtest "test element with embedded dash" => sub {
     is( $root->grab_value('std_id:ab X-Y-Z'), "Av", "check load grab of X-Y-Z" );
 };
 
-subtest "test deep copy" => sub {
+subtest "test deep copy and rename" => sub {
     $root->load("std_id:.copy(ab,copy)");
     is( $root->grab_value('std_id:copy X-Y-Z'), "Av", "check hash copy" );
+
+    $root->load("std_id:.rename(copy,copy2)");
+    ok( ! $root->grab('std_id')->exists('copy'), "check hash rename: old key is gone" );
+    is( $root->grab_value('std_id:copy2 X-Y-Z'), "Av", "check hash rename: new key is found" );
 
     $root->load('lista=a,b,c,d,e,f');
     is( $root->grab_value('lista:5'), 'f' , "list copy" );

@@ -163,7 +163,7 @@ SpeL::I18n::nl - class for Dutch localization
 
 =head1 VERSION
 
-version 20240614
+version 20240615
 
 =head1 SYNOPSYS
 

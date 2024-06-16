@@ -92547,3 +92547,13 @@ P/PE/PERLANCAR/Sah-SchemaBundle-CPAN-0.016.tar.gz
 W/WD/WDAEMS/SpeL-Wizard-20240614.tar.gz
 M/MA/MAUKE/Sys-GetRandom-PP-0.01.tar.gz
 H/HA/HANJE/Tk-AppWindow-0.08.tar.gz
+I/IN/INGY/Alien-YAMLScript-0.1.62.tar.gz
+D/DD/DDUMONT/Config-Model-2.154.tar.gz
+B/BD/BDFOY/CPAN-Audit-20240615.002.tar.gz
+G/GE/GETTY/Dist-Zilla-PluginBundle-Author-GETTY-0.115.tar.gz
+E/EX/EXODIST/Long-Jump-0.000003.tar.gz
+S/SU/SULLR/Net-SIP-0.837.tar.gz
+P/PE/PERLANCAR/Sah-SchemaBundle-Collection-0.009.tar.gz
+W/WD/WDAEMS/SpeL-Wizard-20240615.tar.gz
+E/EH/EHUELS/XDR-Gen-0.0.2.tar.gz
+I/IN/INGY/YAMLScript-0.1.62.tar.gz

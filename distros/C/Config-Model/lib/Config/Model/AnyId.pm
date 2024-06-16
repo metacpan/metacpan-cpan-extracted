@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::AnyId 2.153;
+package Config::Model::AnyId 2.154;
 
 use 5.020;
 
@@ -783,8 +783,12 @@ sub set ($self, $path, @args) {
     return $self->fetch_with_id($item)->set( $new_path, @args );
 }
 
-sub copy {
-    my ( $self, $from, $to ) = @_;
+sub copy ( $self, $from, $to ) {
+
+    Config::Model::Exception::User->throw(
+        object  => $self,
+        message => "move: unknow from key $from"
+    ) unless $self->exists($from);
 
     my $from_obj = $self->fetch_with_id($from);
     my $ok       = $self->check_idx($to);
@@ -1066,7 +1070,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.153
+version 2.154
 
 =head1 SYNOPSIS
 

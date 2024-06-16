@@ -3,7 +3,7 @@ use warnings;
 
 
 package XDR::Gen;
-$XDR::Gen::VERSION = '0.0.1';
+$XDR::Gen::VERSION = '0.0.2';
 use Carp qw(croak confess);
 use IO::Handle;
 use List::Util qw(max);
@@ -724,7 +724,7 @@ sub _deserializer_enum {
         if (\$input_length - \$_[2]) < 4;
     $value = unpack("l>", substr( \$_[3], \$_[2] ) );
     die "Out of range enum value supplied: $value"
-        unless vec(state $state_var = unpack('H*', '$allowed_hex'),
+        unless vec(state $state_var = pack('H*', '$allowed_hex'),
                    $value, 1);
     \$_[2] += 4;
     SERIAL
@@ -741,7 +741,7 @@ sub _serializer_enum {
     croak "Missing required input 'enum' value"
         unless defined $value;
     die "Out of range enum value: $value"
-        unless vec(state $state_var = unpack('H*', '$allowed_hex'),
+        unless vec(state $state_var = pack('H*', '$allowed_hex'),
                    $value, 1);
     substr( \$_[3], \$_[2] ) = pack("l>", $value);
     \$_[2] += 4;
@@ -1082,12 +1082,11 @@ sub _define_constant {
     SERIAL
 }
 
-our @nesting;
-
 sub _define_enum {
-    my ($node, %args) = @_;
-    my $name = $node->{name}->{content} // join('.', @nesting);
+    my ($node, $names, %args) = @_;
+    my ($name, @nesting) = @{ $names };
     my $elements = $node->{type}->{declaration}->{elements};
+    $name =  $args{transform}->( $name ) . join('.', @nesting);
 
     my @fragments = (
         "# Define elements from enum '$name'",
@@ -1105,26 +1104,27 @@ sub _define_enum {
 }
 
 sub _serializer_nested_enums {
-    my ($cb, $node, %args) = @_;
+    my ($cb, $names, $node, %args) = @_;
     my $decl = $node->{type}->{declaration};
 
     if ($node->{type}->{spec} eq 'union') {
         do { # restrict "local" scope
             my $discriminator = $decl->{discriminator};
 
-            local @nesting = (@nesting,
-                              $discriminator->{name}->{content});
-            _serializer_nested_enums( $cb, $discriminator->{declaration}, %args );
+            _serializer_nested_enums( $cb,
+                                      [ @{ $names }, $discriminator->{name}->{content} ],
+                                      $discriminator->{declaration}, %args );
         };
         my $members = $decl->{members};
         for my $case (@{ $members->{cases} }) {
-            local @nesting = (@nesting, $case->{name}->{content});
-            _serializer_nested_enums( $cb, $case->{declaration}, %args );
+            _serializer_nested_enums( $cb,
+                                      [ @{ $names }, $case->{name}->{content} ],
+                                      $case->{declaration}, %args );
         }
         if (my $default = $members->{default}) {
-            local @nesting = (@nesting,
-                              $default->{name}->{content});
-            _serializer_nested_enums( $cb, $default->{declaration}, %args );
+            _serializer_nested_enums( $cb,
+                                      [ @{ $names }, $default->{name}->{content} ],
+                                      $default->{declaration}, %args );
         }
 
         return;
@@ -1132,14 +1132,18 @@ sub _serializer_nested_enums {
     elsif ($node->{type}->{spec} eq 'struct') {
         my $members = $decl->{members};
         for my $member (@{ $members }) {
-            local @nesting = (@nesting, $member->{name}->{content});
-            _serializer_nested_enums( $cb, $member->{declaration}, %args );
+            _serializer_nested_enums( $cb,
+                                      [ @{ $names }, $member->{name}->{content} ],
+                                      $member->{declaration}, %args );
         }
 
         return;
     }
     elsif ($node->{type}->{spec} eq 'enum') {
-        $cb->( $node, _define_enum( $node ), type => 'enum', %args{transform} );
+        $cb->( $node, _define_enum( $node, %args{transform} ),
+               names => $names,
+               type  => 'enum',
+               %args{transform} );
         return;
     }
 
@@ -1169,10 +1173,13 @@ sub _iterate_toplevel_nodes {
         if ($node->{def} eq 'enum') {
             next if $options{exclude_enums};
 
-            local @nesting = ($node->{name}->{content});
-            $cb->( $node, _define_enum( $node->{definition},
-                                        transform => $options{transform} ),
-                   type => 'enum', transform => $options{transform}  );
+            $cb->( $node->{definition},
+                   _define_enum( $node->{definition},
+                                 [ $node->{name}->{content} ],
+                                 transform => $options{transform} ),
+                   names => [ $node->{name}->{content} ],
+                   type  => 'enum',
+                   transform => $options{transform}  );
             # fall through to create serializers too
         }
         elsif (not $options{exclude_enums}
@@ -1182,8 +1189,9 @@ sub _iterate_toplevel_nodes {
             # enums declared inline to push the symbols into
             # the symbol table
 
-            local @nesting = ($node->{name}->{content});
-            _serializer_nested_enums( $cb, $node->{definition},
+            _serializer_nested_enums( $cb,
+                                      [ $node->{name}->{content} ],
+                                      $node->{definition},
                                       transform => $options{transform} );
         }
 
@@ -1228,6 +1236,7 @@ sub generate {
     $class->_iterate_toplevel_nodes( $ast, $cb,
                                      transform => sub { $_[0] },
                                      %options );
+    $cb->( undef, '', type => 'postamble' );
 }
 
 
@@ -1239,7 +1248,7 @@ XDR::Gen - Generator for XDR (de)serializers
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 SYNOPSIS
 
@@ -1322,7 +1331,14 @@ Code fragment to preceed the generated code. Defaults to
 
 If it's the intent to use the generated code as a stand-alone module,
 at the absolute minimum, a C<package> statement needs to be prepended
-and a closing C<1;> module end appended.
+to the preamble.
+
+=item * postamble
+
+Code fragment to follow the generated code. Default to an empty string.
+If it's the intent to use the generated code as a stand-alone module,
+at the absolute minimum, a C<1;> statement should be appended to this
+postamble.
 
 =item * constant
 

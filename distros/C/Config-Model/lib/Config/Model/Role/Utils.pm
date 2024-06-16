@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::Utils 2.153;
+package Config::Model::Role::Utils 2.154;
 
 # ABSTRACT: Provide some utilities
 
@@ -38,7 +38,7 @@ Config::Model::Role::Utils - Provide some utilities
 
 =head1 VERSION
 
-version 2.153
+version 2.154
 
 =head1 AUTHOR
 

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model 2.153;
+package Config::Model 2.154;
 
 use 5.20.0;
 use strict ;
@@ -1903,7 +1903,7 @@ Config::Model - a framework to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.153
+version 2.154
 
 =head1 SYNOPSIS
 
@@ -2507,7 +2507,7 @@ C<force-load>.
 
 Like L<cme> command, C<cme> functions accepts C<force-load>
 parameters. When this argument is true, the instance is created with
-C<check => 'no'>. Hence bad values are stored in C<cme> and must be
+C<<check => 'no'>>. Hence bad values are stored in C<cme> and must be
 corrected before saving back the data.
 
 =head1 Configuration class

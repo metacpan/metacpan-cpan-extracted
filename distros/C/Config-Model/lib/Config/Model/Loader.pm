@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Loader 2.153;
+package Config::Model::Loader 2.154;
 
 use Carp;
 use strict;
@@ -517,6 +517,7 @@ sub _load_check_list {
         'hash_*' => {
             ':.sort'          => sub { $_[1]->sort; return 'ok'; },
             ':.copy'          => sub { $_[1]->copy( $_[5], $_[6] ); return 'ok'; },
+            ':.rename'        => sub { $_[1]->move( $_[5], $_[6] ); return 'ok'; },
             ':.clear'         => sub { $_[1]->clear; return 'ok';},
         },
         # part of list or hash. leaf element have their own dispatch table
@@ -534,7 +535,7 @@ sub _load_check_list {
     );
 
     my %equiv = (
-        'hash_*' => { qw/:@ :.sort/},
+        'hash_*' => { qw/:@ :.sort :.move :.rename/},
         list_leaf => { qw/:@ :.sort :< :.push :> :.unshift/ },
         # fix for cme gh#2
         leaf => { qw/:-= :.rm_value :-~ :.rm_match :=~ :.substitute/ },
@@ -1101,7 +1102,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.153
+version 2.154
 
 =head1 SYNOPSIS
 
@@ -1349,11 +1350,12 @@ is preserved. Note that all keys are sorted once this instruction is
 called. Putting key order aside, C<xxx:.insort(zz,vv)> has the
 same effect as C<xxx:zz=vv> instruction.
 
-=item xxx:.ensure(zz)
+=item xxx:.ensure(zz,...)
 
 Ensure that list C<xxx> contains value C<zz>. If value C<zz> is
 already stored in C<xxx> list, this function does nothing. In the
-other case, value C<zz> is inserted in alphabetical order.
+other case, value C<zz> is inserted in alphabetical order. This
+function accepts a list of values separated by a comma.
 
 =item xxx:=z1,z2,z3
 
@@ -1372,6 +1374,14 @@ Using C<xxx:~/yy/=zz> is also possible.
 =item xxx:.copy(yy,zz)
 
 copy item C<yy> in C<zz> (hash or list).
+
+=item xxx:.rename(yy,zz)
+
+rename item C<yy> in C<zz> (hash).
+
+=item xxx:.move(yy,zz)
+
+Alias to rename.
 
 =item xxx:.json("path/to/file.json/foo/bar")
 

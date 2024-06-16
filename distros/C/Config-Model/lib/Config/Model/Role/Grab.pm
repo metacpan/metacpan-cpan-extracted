@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::Grab 2.153;
+package Config::Model::Role::Grab 2.154;
 
 # ABSTRACT: Role to grab data from elsewhere in the tree
 
@@ -184,6 +184,7 @@ COMMAND:
                     object   => $obj,
                     element  => $name,
                     function => 'grab',
+                    autoadd  => $autoadd,
                     info     => "grab called from '" . $self->name . "' with steps '@saved'"
                 );
             }
@@ -370,7 +371,7 @@ Config::Model::Role::Grab - Role to grab data from elsewhere in the tree
 
 =head1 VERSION
 
-version 2.153
+version 2.154
 
 =head1 SYNOPSIS
 

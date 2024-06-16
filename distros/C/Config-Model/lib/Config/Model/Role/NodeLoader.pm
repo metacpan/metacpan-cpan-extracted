@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::NodeLoader 2.153;
+package Config::Model::Role::NodeLoader 2.154;
 
 # ABSTRACT: Load Node element in configuration tree
 
@@ -52,7 +52,7 @@ Config::Model::Role::NodeLoader - Load Node element in configuration tree
 
 =head1 VERSION
 
-version 2.153
+version 2.154
 
 =head1 SYNOPSIS
 

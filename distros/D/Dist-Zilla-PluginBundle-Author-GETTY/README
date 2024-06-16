@@ -1,9 +1,9 @@
 This archive contains the distribution Dist-Zilla-PluginBundle-Author-GETTY,
-version 0.114:
+version 0.115:
 
   BeLike::GETTY when you build your dists
 
-This software is copyright (c) 2014 by Torsten Raudssus L<http://www.raudss.us/>.
+This software is copyright (c) 2024 by Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
